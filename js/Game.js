@@ -4,7 +4,16 @@ import Obstacle from './gameObjects/Obstacle.js';
 
 export default class Game {
   constructor() {
-    this.player = new Champion();
+    this.players = [];
+    for (let i = 0; i < 10; i++) {
+      let champ = new Champion(random(width), random(height));
+      champ.isAllied = false;
+      this.players.push(champ);
+    }
+
+    this.player = this.players[0];
+    this.player.isAllied = true;
+
     this.camera = new Camera();
     this.obstacles = [];
 
@@ -19,7 +28,10 @@ export default class Game {
 
     // update
     this.camera.update();
-    this.player.update();
+
+    for (let p of this.players) {
+      p.update();
+    }
 
     for (let o of this.obstacles) {
       let response = new SAT.Response();
@@ -44,7 +56,9 @@ export default class Game {
     for (let o of this.obstacles) {
       o.draw();
     }
-    this.player.draw();
+    for (let p of this.players) {
+      p.draw();
+    }
 
     this.camera.pop();
   }

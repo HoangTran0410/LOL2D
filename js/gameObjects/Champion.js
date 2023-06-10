@@ -1,9 +1,16 @@
 export default class Champion {
-  constructor() {
-    this.position = createVector(0, 0);
+  static avatar;
+
+  constructor(x, y) {
+    this.position = createVector(x, y);
     this.speed = 5;
     this.size = 50;
-    this.destination = createVector(0, 0);
+    this.destination = createVector(x, y);
+
+    this.isAllied = true;
+
+    this.maxHealth = 100;
+    this.health = random(this.maxHealth);
 
     this.spells = [];
   }
@@ -25,9 +32,30 @@ export default class Champion {
   }
 
   draw() {
+    push();
     noStroke();
     fill(240);
-    circle(this.position.x, this.position.y, this.size);
+    // circle(this.position.x, this.position.y, this.size);
+    imageMode(CENTER);
+    image(Champion.avatar, this.position.x, this.position.y, this.size, this.size);
+
+    // draw health bar
+    let x = this.position.x,
+      y = this.position.y + this.size / 2 + 15,
+      w = 100,
+      h = 13;
+
+    fill(70, 100);
+    rect(x - w / 2, y - h / 2, w, h); // background
+    if (this.isAllied) fill(0, 150, 0, 180);
+    else fill(150, 0, 0, 180);
+    rect(x - w / 2, y - h / 2, w * (this.health / this.maxHealth), h); // health
+
+    fill(190, 200);
+    textAlign(CENTER, CENTER);
+    textSize(13);
+    text(Math.ceil(this.health), x, y);
+    pop();
   }
 
   toSATCircle() {

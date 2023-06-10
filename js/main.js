@@ -1,6 +1,11 @@
 import Game from './Game.js';
+import Champion from './gameObjects/Champion.js';
 
 let game;
+
+export function preload() {
+  Champion.avatar = loadImage('assets/blitzcrank.png');
+}
 
 export function setup() {
   const c = createCanvas(windowWidth, windowHeight);
