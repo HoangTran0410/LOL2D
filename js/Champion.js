@@ -1,7 +1,7 @@
 export default class Champion {
   constructor() {
     this.position = createVector(0, 0);
-    this.speed = 5;
+    this.speed = 30;
     this.size = 50;
 
     this.destination = createVector(0, 0);
@@ -20,6 +20,12 @@ export default class Champion {
   }
 
   draw() {
+    noStroke();
+    fill(240);
     circle(this.position.x, this.position.y, this.size);
+  }
+
+  toSATCircle() {
+    return new SAT.Circle(new SAT.Vector(this.position.x, this.position.y), this.size / 2);
   }
 }
