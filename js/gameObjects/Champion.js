@@ -1,10 +1,15 @@
 export default class Champion {
   constructor() {
     this.position = createVector(0, 0);
-    this.speed = 30;
+    this.speed = 5;
     this.size = 50;
-
     this.destination = createVector(0, 0);
+
+    this.spells = [];
+  }
+
+  castSpell(spell) {
+    alert(`Cast ${spell}`);
   }
 
   moveTo(x, y) {

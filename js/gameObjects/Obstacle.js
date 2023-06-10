@@ -20,9 +20,9 @@ export default class Obstacle {
 
   draw() {
     push();
-    stroke(255);
-    strokeWeight(2);
-    // noStroke();
+    // stroke(255);
+    // strokeWeight(2);
+    noStroke();
     fill(100);
     beginShape();
     for (let v of this.vertices) {

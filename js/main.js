@@ -1,71 +1,22 @@
-import Champion from './Champion.js';
-import Camera from './Camera.js';
-import Obstacle from './Obstacle.js';
+import Game from './Game.js';
 
-let player,
-  camera,
-  obstacles = [];
+let game;
 
 export function setup() {
   const c = createCanvas(windowWidth, windowHeight);
   c.elt.oncontextmenu = () => false;
 
-  for (let i = 0; i < 10; i++) obstacles.push(new Obstacle(random(width), random(height)));
-
-  player = new Champion();
-  camera = new Camera();
-
-  camera.target = player;
+  game = new Game();
 }
 
 export function draw() {
-  background(30);
+  game.update();
+  game.draw();
+}
 
-  camera.push();
-
-  // update
-  camera.update();
-  player.update();
-
-  let overlaps = [];
-  for (let o of obstacles) {
-    let response = new SAT.Response();
-    let collided = SAT.testPolygonCircle(o.toSATPolygon(), player.toSATCircle(), response);
-    if (collided) {
-      let overlap = createVector(response.overlapV.x, response.overlapV.y);
-      player.position.add(overlap);
-
-      overlaps.push(overlap);
-    }
+export function keyPressed() {
+  if (keyCode === 81) {
   }
-
-  // draw
-  camera.drawGrid();
-  for (let o of obstacles) {
-    o.draw();
-  }
-  player.draw();
-
-  // draw overlap
-  let overlap = overlaps.reduce((acc, cur) => acc.add(cur), createVector(0, 0));
-  push();
-  stroke(255, 0, 0);
-  strokeWeight(2);
-  line(
-    player.position.x,
-    player.position.y,
-    player.position.x + overlap.x,
-    player.position.y + overlap.y
-  );
-  pop();
-
-  // control player
-  if (mouseIsPressed && mouseButton === RIGHT) {
-    let worldMouse = camera.screenToWorld(mouseX, mouseY);
-    player.moveTo(worldMouse.x, worldMouse.y);
-  }
-
-  camera.pop();
 }
 
 export function windowResized() {
