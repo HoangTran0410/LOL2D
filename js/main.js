@@ -4,7 +4,12 @@ import Champion from './gameObjects/Champion.js';
 let game;
 
 export function preload() {
-  Champion.avatar = loadImage('assets/blitzcrank.png');
+  Champion.avatars = [
+    loadImage('assets/blitzcrank.png'),
+    loadImage('assets/lux.png'),
+    loadImage('assets/jinx.png'),
+    loadImage('assets/yasuo.png'),
+  ];
 }
 
 export function setup() {

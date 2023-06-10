@@ -1,5 +1,5 @@
 export default class Champion {
-  static avatar;
+  static avatars = [];
 
   constructor(x, y) {
     this.position = createVector(x, y);
@@ -13,6 +13,7 @@ export default class Champion {
     this.health = random(this.maxHealth);
 
     this.spells = [];
+    this.avatar = random(Champion.avatars);
   }
 
   castSpell(spell) {
@@ -37,7 +38,7 @@ export default class Champion {
     fill(240);
     // circle(this.position.x, this.position.y, this.size);
     imageMode(CENTER);
-    image(Champion.avatar, this.position.x, this.position.y, this.size, this.size);
+    image(this.avatar, this.position.x, this.position.y, this.size, this.size);
 
     // draw health bar
     let x = this.position.x,
