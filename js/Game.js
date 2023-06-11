@@ -1,6 +1,6 @@
-import Camera from './gameObjects/Camera.js';
-import Champion from './gameObjects/Champion.js';
-import Obstacle from './gameObjects/Obstacle.js';
+import Camera from './gameObject/Camera.js';
+import Champion from './gameObject/Champion.js';
+import Obstacle from './gameObject/Obstacle.js';
 
 export default class Game {
   constructor() {
@@ -15,12 +15,34 @@ export default class Game {
     this.player.isAllied = true;
 
     this.camera = new Camera();
-    this.obstacles = [];
-
-    for (let i = 0; i < 10; i++) {
-      this.obstacles.push(new Obstacle(random(width), random(height)));
-    }
     this.camera.target = this.player;
+
+    // quadtree obstacle
+    this.quadtree = new Quadtree(
+      {
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+      },
+      10,
+      4
+    );
+
+    for (let i = 0; i < 1000; i++) {
+      let o = new Obstacle(
+        random(-5000, 5000),
+        random(-5000, 5000),
+        // Obstacle.rectVertices(random(100, 200), random(100, 200), random(TWO_PI))
+        // Obstacle.circleVertices(random(50, 100), random(10, 20))
+        Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
+      );
+
+      this.quadtree.insert({
+        ...o.getBoundingBox(),
+        object: o,
+      });
+    }
   }
 
   update() {
@@ -33,10 +55,22 @@ export default class Game {
       p.update();
     }
 
-    for (let o of this.obstacles) {
+    let obstacles = this.quadtree
+      .retrieve({
+        x: this.player.position.x,
+        y: this.player.position.y,
+        width: this.player.size / 2,
+        height: this.player.size / 2,
+      })
+      .map(o => o.object);
+
+    for (let o of obstacles) {
       let response = new SAT.Response();
       let collided = SAT.testPolygonCircle(o.toSATPolygon(), this.player.toSATCircle(), response);
       if (collided) {
+        let a = 0.01;
+        o.vertices = o.vertices.map(v => v.rotate(a));
+
         let overlap = createVector(response.overlapV.x, response.overlapV.y);
         this.player.position.add(overlap);
       }
@@ -53,9 +87,12 @@ export default class Game {
     this.camera.push();
 
     this.camera.drawGrid();
-    for (let o of this.obstacles) {
+
+    let obstacles = this.quadtree.retrieve(this.camera.getViewBounds()).map(o => o.object);
+    for (let o of obstacles) {
       o.draw();
     }
+
     for (let p of this.players) {
       p.draw();
     }
