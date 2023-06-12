@@ -28,6 +28,7 @@ export default class Game {
       maxLevels: 6, // optional, default:  4
     });
 
+    this.obstacles = [];
     for (let i = 0; i < 1000; i++) {
       let o = new Obstacle(
         random(-5000, 5000),
@@ -36,6 +37,8 @@ export default class Game {
         // Obstacle.circleVertices(random(50, 100), random(10, 20))
         // Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
       );
+
+      this.obstacles.push(o);
 
       const rectangle = new Rectangle({
         ...o.getBoundingBox(),
@@ -52,23 +55,25 @@ export default class Game {
       p.update();
     }
 
-    let area = new Rectangle({
-      x: this.player.position.x,
-      y: this.player.position.y,
-      width: this.player.size / 2,
-      height: this.player.size / 2,
-    });
-    let obstacles = this.quadtree.retrieve(area).map(o => o.data);
+    for (let p of this.players) {
+      let area = new Rectangle({
+        x: p.position.x,
+        y: p.position.y,
+        width: p.size / 2,
+        height: p.size / 2,
+      });
+      let obstacles = this.quadtree.retrieve(area).map(o => o.data);
 
-    for (let o of obstacles) {
-      let response = new SAT.Response();
-      let collided = SAT.testPolygonCircle(o.toSATPolygon(), this.player.toSATCircle(), response);
-      if (collided) {
-        let a = 0.01;
-        o.vertices = o.vertices.map(v => v.rotate(a));
+      for (let o of obstacles) {
+        let response = new SAT.Response();
+        let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
+        if (collided) {
+          let a = 0.01;
+          o.vertices = o.vertices.map(v => v.rotate(a));
 
-        let overlap = createVector(response.overlapV.x, response.overlapV.y);
-        this.player.position.add(overlap);
+          let overlap = createVector(response.overlapV.x, response.overlapV.y);
+          p.position.add(overlap);
+        }
       }
     }
 
@@ -80,6 +85,15 @@ export default class Game {
   }
 
   update() {
+    this.quadtree.clear();
+    for (let o of this.obstacles) {
+      const rectangle = new Rectangle({
+        ...o.getBoundingBox(),
+        data: o,
+      });
+      this.quadtree.insert(rectangle);
+    }
+
     // always update at 60 fps, no matter the frame rate
     let _deltaTime = deltaTime;
     while (_deltaTime > 0) {
