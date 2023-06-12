@@ -1,6 +1,7 @@
 import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
+import { Quadtree, Rectangle } from './lib/quadtree.js';
 
 export default class Game {
   constructor() {
@@ -18,16 +19,14 @@ export default class Game {
     this.camera.target = this.player;
 
     // quadtree obstacle
-    this.quadtree = new Quadtree(
-      {
-        x: 0,
-        y: 0,
-        width: width,
-        height: height,
-      },
-      10,
-      4
-    );
+    this.quadtree = new Quadtree({
+      x: -5000,
+      y: -5000,
+      width: 10000,
+      height: 10000,
+      maxObjects: 10, // optional, default: 10
+      maxLevels: 4, // optional, default:  4
+    });
 
     for (let i = 0; i < 1000; i++) {
       let o = new Obstacle(
@@ -38,10 +37,11 @@ export default class Game {
         Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
       );
 
-      this.quadtree.insert({
+      const rectangle = new Rectangle({
         ...o.getBoundingBox(),
-        object: o,
+        data: o,
       });
+      this.quadtree.insert(rectangle);
     }
   }
 
@@ -55,14 +55,13 @@ export default class Game {
       p.update();
     }
 
-    let obstacles = this.quadtree
-      .retrieve({
-        x: this.player.position.x,
-        y: this.player.position.y,
-        width: this.player.size / 2,
-        height: this.player.size / 2,
-      })
-      .map(o => o.object);
+    let area = new Rectangle({
+      x: this.player.position.x,
+      y: this.player.position.y,
+      width: this.player.size / 2,
+      height: this.player.size / 2,
+    });
+    let obstacles = this.quadtree.retrieve(area).map(o => o.data);
 
     for (let o of obstacles) {
       let response = new SAT.Response();
@@ -88,7 +87,10 @@ export default class Game {
 
     this.camera.drawGrid();
 
-    let obstacles = this.quadtree.retrieve(this.camera.getViewBounds()).map(o => o.object);
+    let obstacles = this.quadtree
+      .retrieve(new Rectangle(this.camera.getViewBounds()))
+      .map(o => o.data);
+
     for (let o of obstacles) {
       o.draw();
     }
