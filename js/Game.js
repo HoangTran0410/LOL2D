@@ -45,10 +45,7 @@ export default class Game {
     }
   }
 
-  update() {
-    background(30);
-
-    // update
+  fixedUpdate() {
     this.camera.update();
 
     for (let p of this.players) {
@@ -82,9 +79,19 @@ export default class Game {
     }
   }
 
-  draw() {
-    this.camera.push();
+  update() {
+    // always update at 60 fps, no matter the frame rate
+    let _deltaTime = deltaTime;
+    while (_deltaTime > 0) {
+      this.fixedUpdate();
+      _deltaTime -= 1000 / 60;
+    }
+  }
 
+  draw() {
+    background(30);
+
+    this.camera.push();
     this.camera.drawGrid();
 
     let obstacles = this.quadtree
