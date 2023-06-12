@@ -25,7 +25,7 @@ export default class Game {
       width: 10000,
       height: 10000,
       maxObjects: 10, // optional, default: 10
-      maxLevels: 4, // optional, default:  4
+      maxLevels: 6, // optional, default:  4
     });
 
     for (let i = 0; i < 1000; i++) {
@@ -97,6 +97,8 @@ export default class Game {
     let obstacles = this.quadtree
       .retrieve(new Rectangle(this.camera.getViewBounds()))
       .map(o => o.data);
+
+    console.log(obstacles.length);
 
     for (let o of obstacles) {
       o.draw();
