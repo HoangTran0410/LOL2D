@@ -31,10 +31,10 @@ export default class Game {
     for (let i = 0; i < 1000; i++) {
       let o = new Obstacle(
         random(-5000, 5000),
-        random(-5000, 5000),
+        random(-5000, 5000)
         // Obstacle.rectVertices(random(100, 200), random(100, 200), random(TWO_PI))
         // Obstacle.circleVertices(random(50, 100), random(10, 20))
-        Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
+        // Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
       );
 
       const rectangle = new Rectangle({
@@ -97,8 +97,6 @@ export default class Game {
     let obstacles = this.quadtree
       .retrieve(new Rectangle(this.camera.getViewBounds()))
       .map(o => o.data);
-
-    console.log(obstacles.length);
 
     for (let o of obstacles) {
       o.draw();

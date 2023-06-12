@@ -1,8 +1,10 @@
 import Stats from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
 import Game from './Game.js';
 import Champion from './gameObject/Champion.js';
+import Obstacle from './gameObject/Obstacle.js';
 
 let game, stats;
+let mapData;
 
 export function preload() {
   Champion.avatars = [
@@ -11,6 +13,8 @@ export function preload() {
     loadImage('assets/jinx.png'),
     loadImage('assets/yasuo.png'),
   ];
+
+  mapData = loadJSON('assets/map.json');
 }
 
 export function setup() {
@@ -19,6 +23,22 @@ export function setup() {
 
   rectMode(CORNER);
   imageMode(CORNER);
+
+  Obstacle.Predefined = mapData.wall.map(arr => {
+    // calculate center of polygon
+    let x = 0,
+      y = 0;
+    for (let i = 0; i < arr.length; i++) {
+      x += arr[i][0];
+      y += arr[i][1];
+    }
+    x /= arr.length;
+    y /= arr.length;
+
+    // then normalize all vertices to center
+
+    return arr.map(v => [v[0] - x, v[1] - y]);
+  });
 
   game = new Game();
 

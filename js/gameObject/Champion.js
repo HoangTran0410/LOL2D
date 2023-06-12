@@ -3,7 +3,7 @@ export default class Champion {
 
   constructor(x, y) {
     this.position = createVector(x, y);
-    this.speed = 15;
+    this.speed = 5;
     this.size = 50;
     this.destination = createVector(x, y);
 

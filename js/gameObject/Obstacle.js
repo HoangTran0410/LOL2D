@@ -1,7 +1,9 @@
 export default class Obstacle {
+  static Predefined = [];
+
   constructor(x, y, vertices) {
     this.position = createVector(x, y);
-    this.vertices = vertices || Obstacle.polygonVertices();
+    this.vertices = vertices || Obstacle.arrayToVertices(random(Obstacle.Predefined));
   }
 
   get vertices() {
@@ -18,9 +20,10 @@ export default class Obstacle {
     push();
     noStroke();
     fill(100);
+    translate(this.position.x, this.position.y);
     beginShape();
     for (let v of this.vertices) {
-      vertex(this.position.x + v.x, this.position.y + v.y);
+      vertex(v.x, v.y);
     }
     endShape(CLOSE);
 
@@ -102,5 +105,9 @@ export default class Obstacle {
     }
 
     return vertices;
+  }
+
+  static arrayToVertices(arr) {
+    return arr.map(v => createVector(v[0], v[1]));
   }
 }
