@@ -68,8 +68,8 @@ export default class Game {
         let response = new SAT.Response();
         let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
         if (collided) {
-          let a = 0.01;
-          o.vertices = o.vertices.map(v => v.rotate(a));
+          // let a = 0.01;
+          // o.vertices = o.vertices.map(v => v.rotate(a));
 
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           p.position.add(overlap);

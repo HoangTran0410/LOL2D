@@ -3,17 +3,17 @@ export default class Champion {
 
   constructor(x, y) {
     this.position = createVector(x, y);
-    this.speed = 5;
-    this.size = 50;
     this.destination = createVector(x, y);
-
     this.isAllied = true;
-
-    this.maxHealth = 100;
-    this.health = random(this.maxHealth);
+    this.avatar = random(Champion.avatars);
 
     this.spells = [];
-    this.avatar = random(Champion.avatars);
+    this.buffs = [];
+
+    this.speed = 5;
+    this.size = 50;
+    this.maxHealth = 100;
+    this.health = random(this.maxHealth);
   }
 
   castSpell(spell) {
@@ -24,12 +24,16 @@ export default class Champion {
     this.destination = createVector(x, y);
   }
 
-  update() {
+  move() {
     const direction = p5.Vector.sub(this.destination, this.position);
     const distance = direction.mag();
     const delta = Math.min(distance, this.speed);
 
     this.position.add(direction.setMag(delta));
+  }
+
+  update() {
+    this.move();
   }
 
   draw() {
