@@ -38,7 +38,6 @@ export function setup() {
       y /= arr.length;
 
       // then normalize all vertices to center
-
       return arr.map(v => [v[0] - x, v[1] - y]);
     });
 

@@ -3,6 +3,7 @@ export default class Obstacle {
 
   constructor(x, y, vertices) {
     this.position = createVector(x, y);
+    this.angle = random(TWO_PI);
     this.vertices = vertices || Obstacle.arrayToVertices(random(Obstacle.Predefined));
   }
 
@@ -21,18 +22,20 @@ export default class Obstacle {
     noStroke();
     fill(100);
     translate(this.position.x, this.position.y);
+    rotate(this.angle);
     beginShape();
     for (let v of this.vertices) {
       vertex(v.x, v.y);
     }
     endShape(CLOSE);
+    pop();
 
+    push();
     // draw bounding box
-    // let bb = this.getBoundingBox();
-    // stroke(255, 0, 0);
-    // noFill();
-    // rect(bb.x, bb.y, bb.width, bb.height);
-
+    let bb = this.getBoundingBox();
+    stroke(255, 0, 0);
+    noFill();
+    rect(bb.x, bb.y, bb.width, bb.height);
     pop();
   }
 
@@ -45,8 +48,11 @@ export default class Obstacle {
     let maxY = -Infinity;
 
     for (let v of this.vertices) {
-      let x = this.position.x + v.x;
-      let y = this.position.y + v.y;
+      // get rotated vertices
+      let _v = v.copy().rotate(this.angle);
+      let x = this.position.x + _v.x;
+      let y = this.position.y + _v.y;
+
       minX = min(minX, x);
       maxX = max(maxX, x);
       minY = min(minY, y);
@@ -68,7 +74,7 @@ export default class Obstacle {
       new SAT.Vector(this.position.x, this.position.y),
       this.vertices.map(v => new SAT.Vector(v.x, v.y))
     );
-    polygon.setAngle(0);
+    polygon.setAngle(this.angle);
     return polygon;
   }
 

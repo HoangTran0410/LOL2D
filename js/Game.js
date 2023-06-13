@@ -29,7 +29,7 @@ export default class Game {
     });
 
     this.obstacles = [];
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 300; i++) {
       let o = new Obstacle(
         random(-5000, 5000),
         random(-5000, 5000)
@@ -85,14 +85,14 @@ export default class Game {
   }
 
   update() {
-    this.quadtree.clear();
-    for (let o of this.obstacles) {
-      const rectangle = new Rectangle({
-        ...o.getBoundingBox(),
-        data: o,
-      });
-      this.quadtree.insert(rectangle);
-    }
+    // this.quadtree.clear();
+    // for (let o of this.obstacles) {
+    //   const rectangle = new Rectangle({
+    //     ...o.getBoundingBox(),
+    //     data: o,
+    //   });
+    //   this.quadtree.insert(rectangle);
+    // }
 
     // always update at 60 fps, no matter the frame rate
     let _deltaTime = deltaTime;
