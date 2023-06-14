@@ -95,7 +95,7 @@ export default class Game {
     // }
 
     // always update at 60 fps, no matter the frame rate
-    let _deltaTime = deltaTime;
+    let _deltaTime = Math.min(deltaTime, 1000);
     while (_deltaTime > 0) {
       this.fixedUpdate();
       _deltaTime -= 1000 / 60;

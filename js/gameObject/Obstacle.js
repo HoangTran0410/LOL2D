@@ -30,13 +30,13 @@ export default class Obstacle {
     endShape(CLOSE);
     pop();
 
-    push();
     // draw bounding box
-    let bb = this.getBoundingBox();
-    stroke(255, 0, 0);
-    noFill();
-    rect(bb.x, bb.y, bb.width, bb.height);
-    pop();
+    // push();
+    // let bb = this.getBoundingBox();
+    // stroke(255, 0, 0);
+    // noFill();
+    // rect(bb.x, bb.y, bb.width, bb.height);
+    // pop();
   }
 
   getBoundingBox(getCached = true) {
