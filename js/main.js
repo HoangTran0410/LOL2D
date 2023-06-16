@@ -23,6 +23,7 @@ export function setup() {
 
   rectMode(CORNER);
   imageMode(CORNER);
+  frameRate(60);
 
   Obstacle.Predefined = mapData.wall
     .filter(arr => arr.length > 3)

@@ -7,7 +7,7 @@ export default class Game {
   constructor() {
     this.players = [];
     for (let i = 0; i < 10; i++) {
-      let champ = new Champion(random(width), random(height));
+      let champ = new Champion(this, random(width), random(height));
       champ.isAllied = false;
       this.players.push(champ);
     }

@@ -1,7 +1,8 @@
 export default class Champion {
   static avatars = [];
 
-  constructor(x, y) {
+  constructor(game, x, y) {
+    this.game = game;
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
     this.isAllied = true;
@@ -38,11 +39,27 @@ export default class Champion {
 
   draw() {
     push();
+    // draw circle around champion based on allies
+    fill(this.isAllied ? 'green' : 'red');
+    circle(this.position.x, this.position.y, this.size + 5);
+
     noStroke();
     fill(240);
     // circle(this.position.x, this.position.y, this.size);
     imageMode(CENTER);
     image(this.avatar, this.position.x, this.position.y, this.size, this.size);
+
+    // draw direction to mouse
+    let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(this.size / 1.75);
+    stroke(255);
+    strokeWeight(3);
+    line(
+      this.position.x,
+      this.position.y,
+      this.position.x + mouseDir.x,
+      this.position.y + mouseDir.y
+    );
 
     // draw health bar
     let x = this.position.x,
@@ -50,6 +67,7 @@ export default class Champion {
       w = 100,
       h = 13;
 
+    noStroke();
     fill(70, 100);
     rect(x - w / 2, y - h / 2, w, h); // background
     if (this.isAllied) fill(0, 150, 0, 180);
