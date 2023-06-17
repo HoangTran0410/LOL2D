@@ -8,7 +8,7 @@ export default class Blitzcrank_W extends BuffScript {
   constructor() {
     super();
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = 1;
+    this.statsModifier.speed.percentBaseBonus = 0.5;
     this.buffAddType = BuffAddType.REPLACE_EXISTING;
     this.maxStack = 1;
   }
@@ -18,7 +18,7 @@ export default class Blitzcrank_W extends BuffScript {
   }
 
   onDeactivate(targetUnit, buff) {
-    let newBuff = new Buff(buff.game, Blitzcrank_W2, 3000, buff.sourceUnit, buff.targetUnit);
+    let newBuff = new Buff(buff.game, Blitzcrank_W2, 2500, buff.sourceUnit, buff.targetUnit);
     targetUnit.addBuff(newBuff);
   }
 
