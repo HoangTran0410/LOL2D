@@ -1,6 +1,8 @@
+import Buff from './gameObject/Buff.js';
 import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
+import Blitzcrank_W from './gameObject/buffs/Blitzcrank_W.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
 
 export default class Game {

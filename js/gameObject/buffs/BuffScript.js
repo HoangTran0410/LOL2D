@@ -1,4 +1,4 @@
-import BuffAddType from '../../enums/BuffAddType';
+import BuffAddType from '../../enums/BuffAddType.js';
 
 export default class BuffScript {
   statsModifier = null;

@@ -1,7 +1,6 @@
 import { hasFlag } from '../utils/index.js';
 import Stats from './Stats.js';
 import StatusFlags from '../enums/StatusFlags.js';
-import Buff from './Buff.js';
 import BuffAddType from '../enums/BuffAddType.js';
 
 export default class Champion {

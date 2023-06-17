@@ -23,7 +23,7 @@ export default class Buff {
   }
 
   activateBuff() {
-    this.buffScript.onActivate(this.targetUnit);
+    this.buffScript.onActivate(this.targetUnit, this);
 
     // if (this.buffScript.statsModifier) {
     //   this.targetUnit.stats.addModifier(this.buffScript.statsModifier);
@@ -31,7 +31,7 @@ export default class Buff {
   }
 
   deactivateBuff() {
-    this.buffScript.onDeactivate(this.targetUnit);
+    this.buffScript.onDeactivate(this.targetUnit, this);
 
     if (this.buffScript.statsModifier) {
       this.targetUnit.stats.removeModifier(this.buffScript.statsModifier);

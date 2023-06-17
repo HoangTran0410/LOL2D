@@ -2,6 +2,8 @@ import Stats from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min
 import Game from './Game.js';
 import Champion from './gameObject/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
+import Buff from './gameObject/Buff.js';
+import Blitzcrank_W from './gameObject/buffs/Blitzcrank_W.js';
 
 let game, stats;
 let mapData;
@@ -60,6 +62,8 @@ export function draw() {
 
 export function keyPressed() {
   if (keyCode === 81) {
+    let buff = new Buff(game, Blitzcrank_W, 3000, game.player, game.player);
+    game.player.addBuff(buff);
   }
 }
 

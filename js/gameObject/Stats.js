@@ -11,10 +11,10 @@ export class StatsModifier {
 
 export default class Stats {
   constructor() {
-    this.maxHealth = new Stat(0);
-    this.health = new Stat(0);
-    this.speed = new Stat(0);
-    this.size = new Stat(0);
+    this.maxHealth = new Stat(100);
+    this.health = new Stat(100);
+    this.speed = new Stat(2);
+    this.size = new Stat(50);
   }
 
   addModifier(modifier) {
