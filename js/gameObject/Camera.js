@@ -1,7 +1,7 @@
 export default class Camera {
   constructor() {
     this.position = createVector(0, 0);
-    this.currentZoom = 1;
+    this.currentZoom = 0.01;
     this.zoom = 1;
     this.target = null;
   }
@@ -21,12 +21,13 @@ export default class Camera {
       this.position.lerp(this.target.position, 0.1);
     }
 
-    this.currentZoom = lerp(this.currentZoom, this.zoom, 0.1);
+    this.currentZoom = lerp(this.currentZoom, this.zoom, 0.07);
   }
 
-  drawGrid(gridSize = 350) {
-    stroke(255, 255, 255, 50);
-    strokeWeight(1);
+  drawGrid(gridSize = 300) {
+    stroke(100, 70);
+    strokeWeight(2);
+
     // get bounds (included zoom)
     let topLeft = this.screenToWorld(0, 0);
     let bottomRight = this.screenToWorld(width, height);
@@ -41,6 +42,33 @@ export default class Camera {
     }
     for (let y = startY; y < bottomRight.y; y += gridSize) {
       line(topLeft.x, y, bottomRight.x, y);
+    }
+  }
+
+  drawGrid_(gridSize = 300) {
+    stroke(100, 70);
+    strokeWeight(2);
+    let delta = 1;
+
+    let { x: left, y: top } = this.screenToWorld(0, 0);
+    let { x: right, y: bottom } = this.screenToWorld(width, height);
+
+    for (let x = left; x < right; x += delta) {
+      if (floor(x) % gridSize == 0) {
+        /* while you find 1 x%gridSize==0 
+                => delta will equal gridSize => shorter loop */
+        delta = gridSize;
+        line(x, top, x, bottom);
+      }
+    }
+
+    // do the same thing to y axis
+    delta = 1;
+    for (let y = top; y < bottom; y += delta) {
+      if (floor(y) % gridSize == 0) {
+        delta = gridSize;
+        line(left, y, right, y);
+      }
     }
   }
 

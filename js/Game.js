@@ -103,7 +103,7 @@ export default class Game {
   }
 
   draw() {
-    background(30);
+    background(20);
 
     this.camera.push();
     this.camera.drawGrid();

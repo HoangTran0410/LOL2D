@@ -39,9 +39,6 @@ export default class Champion {
 
   draw() {
     push();
-    // draw circle around champion based on allies
-    fill(this.isAllied ? 'green' : 'red');
-    circle(this.position.x, this.position.y, this.size + 5);
 
     noStroke();
     fill(240);
@@ -49,11 +46,17 @@ export default class Champion {
     imageMode(CENTER);
     image(this.avatar, this.position.x, this.position.y, this.size, this.size);
 
+    // draw circle around champion based on allies
+    stroke(this.isAllied ? '#0f0' : '#f00');
+    strokeWeight(3);
+    noFill();
+    circle(this.position.x, this.position.y, this.size);
+
     // draw direction to mouse
     let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
     let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(this.size / 1.75);
     stroke(255);
-    strokeWeight(3);
+    strokeWeight(4);
     line(
       this.position.x,
       this.position.y,
