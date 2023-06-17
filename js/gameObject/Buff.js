@@ -1,43 +1,31 @@
+import BuffAddType from '../enums/BuffAddType.js';
+
 export default class Buff {
-  constructor(game, BuffScriptClass, duration, sourceUnit, targetUnit) {
-    this.game = game;
-    this.buffScript = new BuffScriptClass();
+  buffAddType = BuffAddType.REPLACE_EXISTING;
+  maxStack = 0;
+
+  constructor(duration, sourceUnit, targetUnit) {
     this.duration = duration;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
 
     this.timeElapsed = 0;
     this.isToRemove = false;
+
+    this.onCreate();
   }
 
   get name() {
-    return this.buffScript.constructor.name;
-  }
-
-  get buffAddType() {
-    return this.buffScript.buffAddType;
-  }
-
-  get maxStack() {
-    return this.buffScript.maxStack;
+    return this.constructor.name;
   }
 
   activateBuff() {
-    this.buffScript.onActivate(this.targetUnit, this);
-
-    // if (this.buffScript.statsModifier) {
-    //   this.targetUnit.stats.addModifier(this.buffScript.statsModifier);
-    // }
+    this.onActivate();
   }
 
   deactivateBuff() {
-    this.buffScript.onDeactivate(this.targetUnit, this);
-
-    if (this.buffScript.statsModifier) {
-      this.targetUnit.stats.removeModifier(this.buffScript.statsModifier);
-    }
-
     this.isToRemove = true;
+    this.onDeactivate();
   }
 
   renewBuff() {
@@ -45,12 +33,17 @@ export default class Buff {
   }
 
   update() {
-    if (this.isToRemove) return;
+    this.onUpdate();
 
     this.timeElapsed += deltaTime;
-    this.buffScript.onUpdate();
     if (this.timeElapsed >= this.duration) {
       this.deactivateBuff();
     }
   }
+
+  // for override
+  onCreate() {}
+  onUpdate() {}
+  onActivate() {}
+  onDeactivate() {}
 }

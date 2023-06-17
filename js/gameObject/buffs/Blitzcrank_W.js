@@ -1,25 +1,18 @@
 import { StatsModifier } from '../Stats.js';
-import BuffScript from './BuffScript.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
-import Blitzcrank_W2 from './Blitzcrank_W2.js';
 
-export default class Blitzcrank_W extends BuffScript {
-  constructor() {
-    super();
+export default class Blitzcrank_W extends Buff {
+  onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = 0.5;
-    this.buffAddType = BuffAddType.REPLACE_EXISTING;
-    this.maxStack = 1;
+    this.statsModifier.speed.percentBaseBonus = 0.7;
   }
 
-  onActivate(targetUnit, buff) {
-    targetUnit.stats.addModifier(this.statsModifier);
+  onActivate() {
+    this.targetUnit.stats.addModifier(this.statsModifier);
   }
 
-  onDeactivate(targetUnit, buff) {
-    let newBuff = new Buff(buff.game, Blitzcrank_W2, 2500, buff.sourceUnit, buff.targetUnit);
-    targetUnit.addBuff(newBuff);
+  onDeactivate() {
+    this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 
   onUpdate() {}

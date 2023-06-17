@@ -1,21 +1,19 @@
-import BuffScript from './BuffScript.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import { StatsModifier } from '../Stats.js';
+import Buff from '../Buff.js';
 
-export default class Blitzcrank_W2 extends BuffScript {
-  constructor() {
-    super();
+export default class Blitzcrank_W2 extends Buff {
+  onCreate() {
     this.statsModifier = new StatsModifier();
     this.statsModifier.speed.percentBaseBonus = -0.7;
-    this.buffAddType = BuffAddType.REPLACE_EXISTING;
-    this.maxStack = 1;
   }
 
-  onActivate(targetUnit, buff) {
-    targetUnit.stats.addModifier(this.statsModifier);
+  onActivate() {
+    this.targetUnit.stats.addModifier(this.statsModifier);
   }
 
-  onDeactivate(targetUnit, buff) {}
+  onDeactivate() {
+    this.targetUnit.stats.removeModifier(this.statsModifier);
+  }
 
   onUpdate() {}
 }

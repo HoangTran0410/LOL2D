@@ -1,5 +1,5 @@
 import Camera from './gameObject/Camera.js';
-import Champion from './gameObject/Champion.js';
+import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
 
