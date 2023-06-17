@@ -1,3 +1,5 @@
+import Stats from './Stats.js';
+
 export default class Champion {
   static avatars = [];
 
@@ -10,11 +12,7 @@ export default class Champion {
 
     this.spells = [];
     this.buffs = [];
-
-    this.speed = 5;
-    this.size = 50;
-    this.maxHealth = 100;
-    this.health = random(this.maxHealth);
+    this.stats = new Stats();
   }
 
   castSpell(spell) {
@@ -28,7 +26,7 @@ export default class Champion {
   move() {
     const direction = p5.Vector.sub(this.destination, this.position);
     const distance = direction.mag();
-    const delta = Math.min(distance, this.speed);
+    const delta = Math.min(distance, this.stats.speed.value);
 
     this.position.add(direction.setMag(delta));
   }
@@ -40,21 +38,24 @@ export default class Champion {
   draw() {
     push();
 
+    let size = this.stats.size.value;
+    let health = this.stats.health.value;
+    let maxHealth = this.stats.maxHealth.value;
+
     noStroke();
     fill(240);
-    // circle(this.position.x, this.position.y, this.size);
     imageMode(CENTER);
-    image(this.avatar, this.position.x, this.position.y, this.size, this.size);
+    image(this.avatar, this.position.x, this.position.y, size, size);
 
     // draw circle around champion based on allies
     stroke(this.isAllied ? '#0f0' : '#f00');
     strokeWeight(3);
     noFill();
-    circle(this.position.x, this.position.y, this.size);
+    circle(this.position.x, this.position.y, size);
 
     // draw direction to mouse
     let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
-    let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(this.size / 1.75);
+    let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(size / 1.75);
     stroke(255);
     strokeWeight(4);
     line(
@@ -66,7 +67,7 @@ export default class Champion {
 
     // draw health bar
     let x = this.position.x,
-      y = this.position.y + this.size / 2 + 15,
+      y = this.position.y + size / 2 + 15,
       w = 100,
       h = 13;
 
@@ -75,16 +76,19 @@ export default class Champion {
     rect(x - w / 2, y - h / 2, w, h); // background
     if (this.isAllied) fill(0, 150, 0, 180);
     else fill(150, 0, 0, 180);
-    rect(x - w / 2, y - h / 2, w * (this.health / this.maxHealth), h); // health
+    rect(x - w / 2, y - h / 2, w * (health / maxHealth), h); // health
 
     fill(190, 200);
     textAlign(CENTER, CENTER);
     textSize(13);
-    text(Math.ceil(this.health), x, y);
+    text(Math.ceil(health), x, y);
     pop();
   }
 
   toSATCircle() {
-    return new SAT.Circle(new SAT.Vector(this.position.x, this.position.y), this.size / 2);
+    return new SAT.Circle(
+      new SAT.Vector(this.position.x, this.position.y),
+      this.stats.size.value / 2
+    );
   }
 }

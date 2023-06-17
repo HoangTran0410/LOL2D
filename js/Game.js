@@ -59,8 +59,8 @@ export default class Game {
       let area = new Rectangle({
         x: p.position.x,
         y: p.position.y,
-        width: p.size / 2,
-        height: p.size / 2,
+        width: p.stats.size.value / 2,
+        height: p.stats.size.value / 2,
       });
       let obstacles = this.quadtree.retrieve(area).map(o => o.data);
 
