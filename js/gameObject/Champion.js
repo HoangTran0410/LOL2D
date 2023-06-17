@@ -1,4 +1,8 @@
+import { hasFlag } from '../utils/index.js';
 import Stats from './Stats.js';
+import StatusFlags from '../enums/StatusFlags.js';
+import Buff from './Buff.js';
+import BuffAddType from '../enums/BuffAddType.js';
 
 export default class Champion {
   static avatars = [];
@@ -13,11 +17,17 @@ export default class Champion {
     this.spells = [];
     this.buffs = [];
     this.stats = new Stats();
+    this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
   }
 
-  castSpell(spell) {
-    alert(`Cast ${spell}`);
-  }
+  // setStatus(status, enabled) {
+  //   let _statusBeforeApplyingBuffEfects = 0;
+  //   if (enabled) _statusBeforeApplyingBuffEfects |= status;
+  //   else _statusBeforeApplyingBuffEfects &= ~status;
+
+  //   this.status =
+  //     (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
+  // }
 
   moveTo(x, y) {
     this.destination = createVector(x, y);
@@ -31,11 +41,53 @@ export default class Champion {
     this.position.add(direction.setMag(delta));
   }
 
+  updateBuff() {
+    for (let buff of this.buffs) {
+      buff.update();
+    }
+
+    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
+  }
+
+  addBuff(buff) {
+    switch (buff.buffAddType) {
+      case BuffAddType.REPLACE_EXISTING:
+        // remove all buffs with the same name
+        this.preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
+        for (let b of this.preBuffs) {
+          b.deactivateBuff();
+        }
+
+        // add new buff
+        this.buffs.push(buff);
+        buff.activateBuff();
+        break;
+      case BuffAddType.RENEW_EXISTING:
+        this.preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
+        for (let b of this.preBuffs) {
+          b.renewBuff();
+        }
+        break;
+      case BuffAddType.STACKS_AND_CONTINUE:
+        break;
+      case BuffAddType.STACKS_AND_OVERLAPS:
+        break;
+      case BuffAddType.STACKS_AND_RENEWS:
+        break;
+      default:
+        break;
+    }
+  }
+
   update() {
-    this.move();
+    this.updateBuff();
+    if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
   }
 
   draw() {
+    if (hasFlag(this.status, StatusFlags.NoRender)) return;
+    let alpha = hasFlag(this.status, StatusFlags.Stealthed) ? 50 : 255;
+
     push();
 
     let size = this.stats.size.value;
@@ -43,12 +95,15 @@ export default class Champion {
     let maxHealth = this.stats.maxHealth.value;
 
     noStroke();
-    fill(240);
+    fill(240, alpha);
     imageMode(CENTER);
+
+    // tint alpha for image
+    if (alpha < 255) tint(255, alpha);
     image(this.avatar, this.position.x, this.position.y, size, size);
 
     // draw circle around champion based on allies
-    stroke(this.isAllied ? '#0f0' : '#f00');
+    stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
     strokeWeight(3);
     noFill();
     circle(this.position.x, this.position.y, size);
@@ -56,7 +111,7 @@ export default class Champion {
     // draw direction to mouse
     let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
     let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(size / 1.75);
-    stroke(255);
+    stroke(255, alpha);
     strokeWeight(4);
     line(
       this.position.x,
@@ -72,13 +127,12 @@ export default class Champion {
       h = 13;
 
     noStroke();
-    fill(70, 100);
+    fill(70, alpha);
     rect(x - w / 2, y - h / 2, w, h); // background
-    if (this.isAllied) fill(0, 150, 0, 180);
-    else fill(150, 0, 0, 180);
+    fill(this.isAllied ? [0, 150, 0, 180] : [150, 0, 0, 180]);
     rect(x - w / 2, y - h / 2, w * (health / maxHealth), h); // health
 
-    fill(190, 200);
+    fill(255);
     textAlign(CENTER, CENTER);
     textSize(13);
     text(Math.ceil(health), x, y);

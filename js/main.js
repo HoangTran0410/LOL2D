@@ -31,9 +31,9 @@ export function setup() {
       // calculate center of polygon
       let x = 0,
         y = 0;
-      for (let i = 0; i < arr.length; i++) {
-        x += arr[i][0];
-        y += arr[i][1];
+      for (let [_x, _y] of arr) {
+        x += _x;
+        y += _y;
       }
       x /= arr.length;
       y /= arr.length;
