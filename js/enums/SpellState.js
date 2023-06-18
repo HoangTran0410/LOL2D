@@ -1,8 +1,8 @@
 const SpellState = {
-  READY: 0,
-  CASTING: 1,
-  COOLDOWN: 2,
-  CHANNELING: 3,
+  READY: 'READY',
+  CASTING: 'CASTING',
+  COOLDOWN: 'COOLDOWN',
+  CHANNELING: 'CHANNELING',
 };
 
 Object.freeze(SpellState);

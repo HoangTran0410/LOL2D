@@ -2,15 +2,14 @@ import BuffAddType from '../enums/BuffAddType.js';
 
 export default class Buff {
   buffAddType = BuffAddType.REPLACE_EXISTING;
-  maxStack = 0;
+  maxStacks = 0;
+  timeElapsed = 0;
+  isToRemove = false;
 
   constructor(duration, sourceUnit, targetUnit) {
     this.duration = duration;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
-
-    this.timeElapsed = 0;
-    this.isToRemove = false;
 
     this.onCreate();
   }
@@ -30,6 +29,7 @@ export default class Buff {
 
   renewBuff() {
     this.timeElapsed = 0;
+    this.isToRemove = false;
   }
 
   update() {

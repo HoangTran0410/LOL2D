@@ -41,20 +41,51 @@ export default class Champion {
   }
 
   updateBuff() {
+    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
+
     for (let buff of this.buffs) {
       buff.update();
     }
-
-    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
   }
 
   addBuff(buff) {
+    let preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
+
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
         // remove all buffs with the same name
-        this.preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
-        for (let b of this.preBuffs) {
-          b.deactivateBuff();
+        for (let b of preBuffs) b.deactivateBuff();
+        // add new buff
+        this.buffs.push(buff);
+        buff.activateBuff();
+        break;
+
+      case BuffAddType.RENEW_EXISTING:
+        if (preBuffs.length > 0) {
+          preBuffs[0].renewBuff();
+        } else {
+          this.buffs.push(buff);
+          buff.activateBuff();
+        }
+        break;
+
+      case BuffAddType.STACKS_AND_CONTINUE:
+        buff.timeElapsed = preBuffs[0].timeElapsed; // continue from current timeElapsed
+
+        if (preBuffs.length >= buff.maxStacks) {
+          preBuffs[0].deactivateBuff();
+          preBuffs[0] = buff;
+          buff.activateBuff();
+        } else {
+          this.buffs.push(buff);
+          buff.activateBuff();
+        }
+        break;
+
+      case BuffAddType.STACKS_AND_OVERLAPS:
+        // remove oldest buff
+        if (preBuffs.length >= buff.maxStacks) {
+          preBuffs[0].deactivateBuff();
         }
 
         // add new buff
@@ -62,24 +93,20 @@ export default class Champion {
         buff.activateBuff();
         break;
 
-      case BuffAddType.RENEW_EXISTING:
-        this.preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
-        if (this.preBuffs.length > 0) {
-          for (let b of this.preBuffs) {
-            b.renewBuff();
-          }
-        } else {
-          this.buffs.push(buff);
-          buff.activateBuff();
+      case BuffAddType.STACKS_AND_RENEWS:
+        // renew preBuffs
+        for (let b of preBuffs) b.renewBuff();
+
+        // remove oldest buff (if maxStacks is reached)
+        if (preBuffs.length >= buff.maxStacks) {
+          preBuffs[0].deactivateBuff();
         }
 
+        // add new buff
+        this.buffs.push(buff);
+        buff.activateBuff();
         break;
-      case BuffAddType.STACKS_AND_CONTINUE:
-        break;
-      case BuffAddType.STACKS_AND_OVERLAPS:
-        break;
-      case BuffAddType.STACKS_AND_RENEWS:
-        break;
+
       default:
         break;
     }
