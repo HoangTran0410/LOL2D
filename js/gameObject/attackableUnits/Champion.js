@@ -111,6 +111,8 @@ export default class Champion {
   update() {
     this.updateBuff();
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
+
+    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.3);
   }
 
   draw() {
@@ -119,7 +121,6 @@ export default class Champion {
 
     push();
 
-    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.3);
     let size = this.animatedSize;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;
