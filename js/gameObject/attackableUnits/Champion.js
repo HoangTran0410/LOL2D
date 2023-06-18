@@ -70,16 +70,12 @@ export default class Champion {
         break;
 
       case BuffAddType.STACKS_AND_CONTINUE:
-        buff.timeElapsed = preBuffs[0].timeElapsed; // continue from current timeElapsed
-
         if (preBuffs.length >= buff.maxStacks) {
+          buff.timeElapsed = preBuffs[0].timeElapsed; // continue from current timeElapsed
           preBuffs[0].deactivateBuff();
-          preBuffs[0] = buff;
-          buff.activateBuff();
-        } else {
-          this.buffs.push(buff);
-          buff.activateBuff();
         }
+        this.buffs.push(buff);
+        buff.activateBuff();
         break;
 
       case BuffAddType.STACKS_AND_OVERLAPS:
@@ -123,7 +119,8 @@ export default class Champion {
 
     push();
 
-    let size = this.stats.size.value;
+    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.3);
+    let size = this.animatedSize;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;
 
