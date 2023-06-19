@@ -2,7 +2,9 @@ import Stats from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min
 import Game from './Game.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
-import Blitzcrank_W from './gameObject/buffs/Blitzcrank_W.js';
+import ChangeStatsBuff from './gameObject/buffs/ChangeStatsBuff.js';
+import { StatsModifier } from './gameObject/Stats.js';
+import BuffAddType from './enums/BuffAddType.js';
 
 let game, stats;
 let mapData;
@@ -61,7 +63,18 @@ export function draw() {
 
 export function keyPressed() {
   if (keyCode === 81) {
-    let buff = new Blitzcrank_W(3000, game.player, game.player);
+    let modifier = new StatsModifier();
+    modifier.speed.percentBaseBonus = 0.3;
+    modifier.size.percentBonus = 0.3;
+
+    let buff = new ChangeStatsBuff(
+      3000,
+      game.player,
+      game.player,
+      modifier,
+      BuffAddType.STACKS_AND_CONTINUE,
+      3
+    );
     game.player.addBuff(buff);
   }
 }

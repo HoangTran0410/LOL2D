@@ -112,7 +112,7 @@ export default class Champion {
     this.updateBuff();
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
-    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.3);
+    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
   }
 
   draw() {
