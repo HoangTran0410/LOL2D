@@ -2,9 +2,12 @@ import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
+import HUD from './hud/HUD.js';
 
 export default class Game {
   constructor() {
+    this.HUD = new HUD(this);
+
     this.players = [];
     for (let i = 0; i < 10; i++) {
       let champ = new Champion(this, random(width), random(height));
@@ -121,5 +124,30 @@ export default class Game {
     }
 
     this.camera.pop();
+
+    this.HUD.draw();
+  }
+
+  keyPressed() {
+    // let modifier = new StatsModifier();
+    // modifier.speed.percentBaseBonus = 0.3;
+    // modifier.size.percentBonus = 0.3;
+
+    // let buff = new ChangeStatsBuff(
+    //   3000,
+    //   this.player,
+    //   this.player,
+    //   modifier,
+    //   BuffAddType.STACKS_AND_CONTINUE,
+    //   3
+    // );
+    // this.player.addBuff(buff);
+
+    // Q W E R
+    let keyCodes = [81, 87, 69, 82];
+    let spellIndex = keyCodes.indexOf(keyCode);
+    if (spellIndex !== -1) {
+      this.player.spells[spellIndex].cast();
+    }
   }
 }

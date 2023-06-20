@@ -1,28 +1,20 @@
-import Stats from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
+import Stats from './lib/stats.min.js';
 import Game from './Game.js';
-import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
-import ChangeStatsBuff from './gameObject/buffs/ChangeStatsBuff.js';
-import { StatsModifier } from './gameObject/Stats.js';
-import BuffAddType from './enums/BuffAddType.js';
+import { preload as preloadAssets } from '../assets/index.js';
 
 let game, stats;
 let mapData;
 
 export function preload() {
-  Champion.avatars = [
-    loadImage('assets/blitzcrank.png'),
-    loadImage('assets/lux.png'),
-    loadImage('assets/jinx.png'),
-    loadImage('assets/yasuo.png'),
-  ];
-
+  preloadAssets();
   mapData = loadJSON('assets/map.json');
 }
 
 export function setup() {
   const c = createCanvas(windowWidth, windowHeight);
   c.elt.oncontextmenu = () => false;
+  document.querySelector('#HUD').oncontextmenu = () => false;
 
   rectMode(CORNER);
   imageMode(CORNER);
@@ -62,21 +54,7 @@ export function draw() {
 }
 
 export function keyPressed() {
-  if (keyCode === 81) {
-    let modifier = new StatsModifier();
-    modifier.speed.percentBaseBonus = 0.3;
-    modifier.size.percentBonus = 0.3;
-
-    let buff = new ChangeStatsBuff(
-      3000,
-      game.player,
-      game.player,
-      modifier,
-      BuffAddType.STACKS_AND_CONTINUE,
-      3
-    );
-    game.player.addBuff(buff);
-  }
+  game.keyPressed();
 }
 
 export function mouseWheel(event) {

@@ -2,17 +2,14 @@ import SpellState from '../enums/SpellState.js';
 import StatusFlags from '../enums/StatusFlags.js';
 
 export default class Spell {
+  image = null; // for display in HUD
+
   level = 0;
   coolDown = 0;
-  channelDuration = 0;
-
   currentCooldown = 0;
-  currentCastTime = 0; // Time until casting will end for this spell.
-  currentChannelDuration = 0; // Time until channeling will finish for this spell.
 
   constructor(owner) {
     this.owner = owner;
-
     this.state = SpellState.READY;
 
     this.onActivate();
@@ -29,31 +26,11 @@ export default class Spell {
       case SpellState.READY:
         break;
 
-      case SpellState.CASTING:
-        if (this.castCancelCheck()) break;
-        this.currentCastTime -= deltaTime;
-
-        if (this.currentCastTime <= 0) {
-          this.finishCasting();
-
-          if (this.channelDuration > 0) {
-            this.channel();
-          }
-        }
-        break;
-
       case SpellState.COOLDOWN:
         this.currentCooldown -= deltaTime;
         if (this.currentCooldown <= 0) {
+          this.currentCooldown = 0;
           this.state = SpellState.READY;
-        }
-        break;
-
-      case SpellState.CHANNELING:
-        this.currentChannelDuration -= deltaTime;
-        this.channelCancelCheck();
-        if (this.currentChannelDuration <= 0) {
-          this.finishChanneling();
         }
         break;
 
@@ -62,13 +39,13 @@ export default class Spell {
   }
 
   cast() {
-    this.onSpellPreCast();
+    if (this.state !== SpellState.READY) return;
+    if (this.castCancelCheck()) return;
 
+    this.state = SpellState.COOLDOWN;
+    this.currentCooldown = this.coolDown;
     this.onSpellCast();
-
-    this.onSpellPostCast();
   }
-  finishCasting() {}
   castCancelCheck() {
     let status = this.owner.status;
     if (
@@ -85,20 +62,7 @@ export default class Spell {
     return false;
   }
 
-  channel() {
-    this.onSpellChannel();
-  }
-  finishChanneling() {
-    this.onSpellPostChannel();
-  }
-  channelCancelCheck() {
-    let willCancel = this.castCancelCheck();
-    if (willCancel) {
-      this.onSpellChannelCancel();
-    }
-    return willCancel;
-  }
-
+  // Notes: Deactivate is never called as spell removal hasn't been added yet.
   deactivate() {
     this.resetSpellCast();
     this.onDeactivate();
@@ -111,13 +75,8 @@ export default class Spell {
   }
 
   // for override
-  onActivate(owner, spell) {}
-  onDeactivate(owner, spell) {}
-  onSpellPreCast(owner, spell, target, start, end) {}
-  onSpellCast(spell) {}
-  onSpellPostCast(spell) {}
-  onSpellChannel(spell) {}
-  onSpellChannelCancel(spell, channelingStopReason) {}
-  onSpellPostChannel(spell) {}
+  onActivate() {}
+  onDeactivate() {}
+  onSpellCast() {}
   onUpdate() {}
 }

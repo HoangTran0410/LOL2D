@@ -2,6 +2,8 @@ import { hasFlag } from '../../utils/index.js';
 import Stats from '../Stats.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import Blitzcrank_W_Spell from '../spells/Blitzcrank_W.js';
+import ASSETS from '../../../assets/index.js';
 
 export default class Champion {
   static avatars = [];
@@ -11,9 +13,14 @@ export default class Champion {
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
     this.isAllied = true;
-    this.avatar = random(Champion.avatars);
+    this.avatar = random(Object.values(ASSETS.Champions));
 
-    this.spells = [];
+    this.spells = [
+      new Blitzcrank_W_Spell(this),
+      new Blitzcrank_W_Spell(this),
+      new Blitzcrank_W_Spell(this),
+      new Blitzcrank_W_Spell(this),
+    ];
     this.buffs = [];
     this.stats = new Stats();
     this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
@@ -38,14 +45,6 @@ export default class Champion {
     const delta = Math.min(distance, this.stats.speed.value);
 
     this.position.add(direction.setMag(delta));
-  }
-
-  updateBuff() {
-    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
-
-    for (let buff of this.buffs) {
-      buff.update();
-    }
   }
 
   addBuff(buff) {
@@ -109,7 +108,18 @@ export default class Champion {
   }
 
   update() {
-    this.updateBuff();
+    // update buffs
+    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
+    for (let buff of this.buffs) {
+      buff.update();
+    }
+
+    // update spells
+    for (let spell of this.spells) {
+      spell.update();
+    }
+
+    // move
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
