@@ -35,6 +35,10 @@
                                 <p>{{spell.coolDownText}}</p>
                             </div>
                         </div>
+                        <div class="spell-info">
+                            <h4>{{spell.name}}</h4>
+                            <p>{{spell.description}}</p>
+                        </div>
                     </div>
                 </div>
                 <div class="health-bar">
@@ -50,6 +54,7 @@
                 <div class="buffs">
                     <div v-for="buff of buffs" class="buff">
                         <img src="assets/spells/blitzcrank_w.png" alt="buff">
+                        <span>{{buff.timeLeftText}}</span>
                     </div>
                 </div>
             </div>

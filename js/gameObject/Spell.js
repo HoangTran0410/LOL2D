@@ -2,8 +2,12 @@ import SpellState from '../enums/SpellState.js';
 import StatusFlags from '../enums/StatusFlags.js';
 
 export default class Spell {
-  image = null; // for display in HUD
+  // for display in HUD
+  name = this.constructor.name;
+  image = null;
+  description = null;
 
+  // for spell logic
   level = 0;
   coolDown = 0;
   currentCooldown = 0;
@@ -13,10 +17,6 @@ export default class Spell {
     this.state = SpellState.READY;
 
     this.onActivate();
-  }
-
-  get name() {
-    return this.constructor.name;
   }
 
   update() {

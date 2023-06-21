@@ -1,14 +1,15 @@
 import { StatsModifier } from '../Stats.js';
 import Buff from '../Buff.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import ASSETS from '../../../assets/index.js';
 
-export default class Blitzcrank_W extends Buff {
-  buffAddType = BuffAddType.STACKS_AND_OVERLAPS;
-  maxStacks = 3;
+export default class Blitzcrank_W2 extends Buff {
+  image = ASSETS.Buffs.blitzcrank_w;
+  buffAddType = BuffAddType.REPLACE_EXISTING;
 
   onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = 0.5;
+    this.statsModifier.speed.percentBaseBonus = -0.75;
   }
 
   onActivate() {

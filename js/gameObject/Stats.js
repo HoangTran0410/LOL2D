@@ -4,6 +4,8 @@ export class StatsModifier {
   constructor() {
     this.maxHealth = new StatModifier(0);
     this.health = new StatModifier(0);
+    this.maxMana = new StatModifier(0);
+    this.mana = new StatModifier(0);
     this.speed = new StatModifier(0);
     this.size = new StatModifier(0);
   }

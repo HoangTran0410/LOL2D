@@ -1,10 +1,15 @@
 import BuffAddType from '../enums/BuffAddType.js';
 
 export default class Buff {
+  name = this.constructor.name;
+  image = null;
+
   buffAddType = BuffAddType.REPLACE_EXISTING;
   maxStacks = 0;
   timeElapsed = 0;
   isToRemove = false;
+
+  #deactivateListeners = [];
 
   constructor(duration, sourceUnit, targetUnit) {
     this.duration = duration;
@@ -14,10 +19,6 @@ export default class Buff {
     this.onCreate();
   }
 
-  get name() {
-    return this.constructor.name;
-  }
-
   activateBuff() {
     this.onActivate();
   }
@@ -25,6 +26,9 @@ export default class Buff {
   deactivateBuff() {
     this.isToRemove = true;
     this.onDeactivate();
+    for (let listener of this.#deactivateListeners) {
+      listener?.();
+    }
   }
 
   renewBuff() {
@@ -46,4 +50,8 @@ export default class Buff {
   onUpdate() {}
   onActivate() {}
   onDeactivate() {}
+
+  addDeactivateListener(listener) {
+    this.#deactivateListeners.push(listener);
+  }
 }

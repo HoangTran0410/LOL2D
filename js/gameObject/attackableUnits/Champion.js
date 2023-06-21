@@ -162,21 +162,24 @@ export default class Champion {
     );
 
     // draw health bar
-    let x = this.position.x,
-      y = this.position.y + size / 2 + 15,
-      w = 100,
-      h = 13;
+    if (this !== this.game.player) {
+      let x = this.position.x,
+        y = this.position.y + size / 2 + 15,
+        w = 100,
+        h = 13;
 
-    noStroke();
-    fill(70, alpha);
-    rect(x - w / 2, y - h / 2, w, h); // background
-    fill(this.isAllied ? [0, 150, 0, 180] : [150, 0, 0, 180]);
-    rect(x - w / 2, y - h / 2, w * (health / maxHealth), h); // health
+      noStroke();
+      fill(70, alpha);
+      rect(x - w / 2, y - h / 2, w, h); // background
+      fill(this.isAllied ? [0, 150, 0, 180] : [150, 0, 0, 180]);
+      rect(x - w / 2, y - h / 2, w * (health / maxHealth), h); // health
 
-    fill(255);
-    textAlign(CENTER, CENTER);
-    textSize(13);
-    text(Math.ceil(health), x, y);
+      fill(255);
+      textAlign(CENTER, CENTER);
+      textSize(13);
+      text(Math.ceil(health), x, y);
+    }
+
     pop();
   }
 
