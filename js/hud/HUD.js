@@ -11,6 +11,7 @@ export default class HUD {
     const { createApp } = Vue;
     this.vueInstance = createApp({
       data() {
+        // init default values
         return {
           avatar: 'assets/champions/blitzcrank.png',
           stats: {
@@ -56,13 +57,15 @@ export default class HUD {
         image: image?.path,
         coolDown,
         currentCooldown,
+        state,
+
+        // custom properties for display
         coolDownText:
           currentCooldown < 1000
             ? (currentCooldown / 1000).toFixed(1)
             : Math.ceil(currentCooldown / 1000),
         coolDownPercent: (currentCooldown / coolDown) * 100,
         showCoolDown: currentCooldown > 0,
-        state,
       };
     });
 
@@ -71,6 +74,4 @@ export default class HUD {
       return { image: image?.path, coolDown, currentCooldown };
     });
   }
-
-  draw() {}
 }

@@ -126,8 +126,6 @@ export default class Game {
     }
 
     this.camera.pop();
-
-    this.HUD.draw();
   }
 
   keyPressed() {
