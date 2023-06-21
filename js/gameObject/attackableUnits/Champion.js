@@ -141,7 +141,7 @@ export default class Champion {
 
     // tint alpha for image
     if (alpha < 255) tint(255, alpha);
-    image(this.avatar, this.position.x, this.position.y, size, size);
+    image(this.avatar?.image, this.position.x, this.position.y, size, size);
 
     // draw circle around champion based on allies
     stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);

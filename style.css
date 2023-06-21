@@ -1,3 +1,12 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #222;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 canvas {
     position: fixed;
     top: 0;
@@ -15,4 +24,147 @@ canvas {
     /* pointer-events: none; */
     /* prevent right click */
     -webkit-touch-callout: none;
+}
+
+/* ============================ Bottom HUD ============================  */
+.bottom-HUD {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 100px;
+    /* height: 100px; */
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #1119;
+    border-radius: 5px;
+    border-top-left-radius: 50px;
+    border: solid 2px #fff3;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.bottom-HUD .champion-avatar img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #aaa;
+}
+
+/* =============== Spells =============== */
+.bottom-HUD .spells {
+    display: flex;
+    flex-direction: row;
+    padding: 0 10px;
+}
+
+.bottom-HUD .spells .spell {
+    margin: 5px;
+    position: relative;
+    border: 2px solid #aaa6;
+    overflow: hidden;
+
+    width: 50px;
+    height: 50px;
+}
+
+.bottom-HUD .spells .spell img {
+    width: 100%;
+    height: 100%;
+}
+
+.spell.internal {
+    width: 35px !important;
+    height: 35px !important;
+}
+
+.spell.summoner {
+    width: 35px !important;
+    height: 35px !important;
+}
+
+.cooldown {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cooldown p {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+
+.spell.in-cooldown .cooldown {
+    opacity: 0.7;
+    transition: none;
+}
+
+.spell .cooldown-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #111d;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    /* transition: transform 0.3s ease; */
+}
+
+.spell img {
+    transition: filter 0.3s ease;
+}
+
+.spell.in-cooldown img {
+    filter: grayscale(100%);
+}
+
+/* =============== Healthbar =============== */
+.health-bar {
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.health-bar .health {
+    height: 10px;
+    width: 100%;
+    background-color: rgb(12, 162, 12);
+}
+
+.health-bar .mana {
+    height: 10px;
+    width: 100%;
+    background-color: #218bdd;
+    margin-top: 5px;
+}
+
+/* =============== Buffs =============== */
+.buffs {
+    position: absolute;
+    top: 0;
+    transform: translateY(-100%);
+    display: flex;
+    flex-direction: row;
+}
+
+.buffs .buff {
+    width: 35px;
+    height: 35px;
+    background-color: #1119;
+}
+
+.buffs .buff img {
+    width: 100%;
+    height: 100%;
 }

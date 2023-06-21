@@ -17,7 +17,79 @@
     <script src="index.js" type="module"></script>
 
     <div id="HUD">
-        <button style="margin: 100px" onclick="alert('abc')">ABC</button>
+        <!-- bottom HUD: champion avatar and list spells at the bottom -->
+        <div class="bottom-HUD">
+            <div class="champion-avatar">
+                <img src="assets/champions/blitzcrank.png" alt="champion-avatar">
+            </div>
+            <div class="champion-details">
+                <div class="spells">
+                    <!-- Nội tại -->
+                    <div class="spell internal">
+                        <img src="assets/spells/blitzcrank_internal.png" alt="spell" />
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+
+                    <!-- 4 chiêu thức Q W E R -->
+                    <div class="spell">
+                        <img src="assets/spells/blitzcrank_q.png" alt="spell" />
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+                    <div class="spell">
+                        <img src="assets/spells/blitzcrank_w.png" alt="spell">
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+                    <div class="spell">
+                        <img src="assets/spells/blitzcrank_e.png" alt="spell">
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+                    <div class="spell">
+                        <img src="assets/spells/blitzcrank_r.png" alt="spell">
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+
+                    <!-- Phép bổ trợ -->
+                    <div class="spell summoner">
+                        <img src="assets/spells/flash.png" alt="spell">
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+                    <div class="spell summoner">
+                        <img src="assets/spells/heal.png" alt="spell">
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>10</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="health-bar">
+                    <div class="health"></div>
+                    <div class="mana"></div>
+                </div>
+                <div class="buffs">
+                    <!-- <div class="buff">
+                        <img src="assets/spells/blitzcrank_w.png" alt="">
+                    </div> -->
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 

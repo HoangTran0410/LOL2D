@@ -103,6 +103,8 @@ export default class Game {
       this.fixedUpdate();
       _deltaTime -= 1000 / 60;
     }
+
+    this.HUD.update();
   }
 
   draw() {
