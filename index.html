@@ -8,9 +8,11 @@
     <title>LOL2D</title>
 
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sat/0.8.0/SAT.min.js"></script>
-    <!-- <script src="https://unpkg.com/@timohausmann/quadtree-js/quadtree.min.js"></script> -->
+    <script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 
 <body>
@@ -20,21 +22,29 @@
         <!-- bottom HUD: champion avatar and list spells at the bottom -->
         <div class="bottom-HUD">
             <div class="champion-avatar">
-                <img src="assets/champions/blitzcrank.png" alt="champion-avatar">
+                <img v-bind:src="avatar" alt="champion-avatar">
             </div>
             <div class="champion-details">
                 <div class="spells">
+                    <div v-for="spell of spells" class="spell">
+                        <img :src="spell.image" alt="spell" />
+                        <div class="cooldown-overlay"></div>
+                        <div class="cooldown">
+                            <p>{{spell.coolDown}}</p>
+                        </div>
+                    </div>
+
                     <!-- Nội tại -->
-                    <div class="spell internal">
+                    <!-- <div class="spell internal">
                         <img src="assets/spells/blitzcrank_internal.png" alt="spell" />
                         <div class="cooldown-overlay"></div>
                         <div class="cooldown">
                             <p>10</p>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- 4 chiêu thức Q W E R -->
-                    <div class="spell">
+                    <!-- <div class="spell">
                         <img src="assets/spells/blitzcrank_q.png" alt="spell" />
                         <div class="cooldown-overlay"></div>
                         <div class="cooldown">
@@ -61,10 +71,10 @@
                         <div class="cooldown">
                             <p>10</p>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Phép bổ trợ -->
-                    <div class="spell summoner">
+                    <!-- <div class="spell summoner">
                         <img src="assets/spells/flash.png" alt="spell">
                         <div class="cooldown-overlay"></div>
                         <div class="cooldown">
@@ -77,7 +87,7 @@
                         <div class="cooldown">
                             <p>10</p>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="health-bar">
                     <div class="health"></div>

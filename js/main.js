@@ -1,4 +1,3 @@
-import Stats from './lib/stats.min.js';
 import Game from './Game.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { preload as preloadAssets } from '../assets/index.js';
@@ -47,8 +46,8 @@ export function setup() {
 export function draw() {
   stats.begin();
 
-  game.update();
-  game.draw();
+  // game.update();
+  // game.draw();
 
   stats.end();
 }
