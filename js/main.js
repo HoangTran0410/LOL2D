@@ -46,8 +46,8 @@ export function setup() {
 export function draw() {
   stats.begin();
 
-  // game.update();
-  // game.draw();
+  game.update();
+  game.draw();
 
   stats.end();
 }

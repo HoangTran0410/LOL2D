@@ -22,81 +22,35 @@
         <!-- bottom HUD: champion avatar and list spells at the bottom -->
         <div class="bottom-HUD">
             <div class="champion-avatar">
-                <img v-bind:src="avatar" alt="champion-avatar">
+                <img :src="avatar" alt="champion-avatar">
             </div>
             <div class="champion-details">
                 <div class="spells">
-                    <div v-for="spell of spells" class="spell">
-                        <img :src="spell.image" alt="spell" />
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>{{spell.coolDown}}</p>
+                    <div v-for="spell of spells" :class="spell.small ? 'spell small' : 'spell'">
+                        <img :src="spell.image" alt="spell"
+                            :style="spell.showCoolDown ? 'filter: grayscale(100%)' : ''" />
+                        <div v-if="spell.showCoolDown">
+                            <div class="cooldown-overlay" :style="`height: ${spell.coolDownPercent}%`"></div>
+                            <div class="cooldown">
+                                <p>{{spell.coolDownText}}</p>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Nội tại -->
-                    <!-- <div class="spell internal">
-                        <img src="assets/spells/blitzcrank_internal.png" alt="spell" />
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div> -->
-
-                    <!-- 4 chiêu thức Q W E R -->
-                    <!-- <div class="spell">
-                        <img src="assets/spells/blitzcrank_q.png" alt="spell" />
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div>
-                    <div class="spell">
-                        <img src="assets/spells/blitzcrank_w.png" alt="spell">
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div>
-                    <div class="spell">
-                        <img src="assets/spells/blitzcrank_e.png" alt="spell">
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div>
-                    <div class="spell">
-                        <img src="assets/spells/blitzcrank_r.png" alt="spell">
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div> -->
-
-                    <!-- Phép bổ trợ -->
-                    <!-- <div class="spell summoner">
-                        <img src="assets/spells/flash.png" alt="spell">
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div>
-                    <div class="spell summoner">
-                        <img src="assets/spells/heal.png" alt="spell">
-                        <div class="cooldown-overlay"></div>
-                        <div class="cooldown">
-                            <p>10</p>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="health-bar">
-                    <div class="health"></div>
-                    <div class="mana"></div>
+                    <div class="bar">
+                        <div :style="`width:${stats.health/stats.maxHealth*100}%; background-color:#0ca20c`"></div>
+                        <p>{{stats.health}} / {{stats.maxHealth}}</p>
+                    </div>
+                    <div class="bar" style="margin-top:3px">
+                        <div :style="`width:${stats.mana/stats.maxMana*100}%; background-color:#218bdd;`"></div>
+                        <p>{{stats.mana}} / {{stats.maxMana}}</p>
+                    </div>
                 </div>
                 <div class="buffs">
-                    <!-- <div class="buff">
-                        <img src="assets/spells/blitzcrank_w.png" alt="">
-                    </div> -->
+                    <div v-for="buff of buffs" class="buff">
+                        <img src="assets/spells/blitzcrank_w.png" alt="buff">
+                    </div>
                 </div>
             </div>
         </div>
