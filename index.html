@@ -45,17 +45,19 @@
                 </div>
                 <div class="health-bar">
                     <div class="bar">
-                        <div :style="`width:${stats.health/stats.maxHealth*100}%; background-color:#0ca20c`"></div>
+                        <div :style="`width:${stats.healthPercent}%; background-color:#0ca20c`">
+                        </div>
                         <p>{{stats.health}} / {{stats.maxHealth}}</p>
                     </div>
                     <div class="bar" style="margin-top:3px">
-                        <div :style="`width:${stats.mana/stats.maxMana*100}%; background-color:#218bdd;`"></div>
+                        <div :style="`width:${stats.manaPercent}%; background-color:#218bdd;`">
+                        </div>
                         <p>{{stats.mana}} / {{stats.maxMana}}</p>
                     </div>
                 </div>
                 <div class="buffs">
                     <div v-for="buff of buffs" class="buff">
-                        <img src="assets/spells/blitzcrank_w.png" alt="buff">
+                        <img :src="buff.image" alt="buff">
                         <span>{{buff.timeLeftText}}</span>
                     </div>
                 </div>

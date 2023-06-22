@@ -48,6 +48,9 @@ export default class InGameHUD {
     this.vueInstance.stats.mana = mana?.value;
     this.vueInstance.stats.maxMana = maxMana?.value;
 
+    this.vueInstance.stats.healthPercent = Math.min(health?.value / maxHealth?.value, 1) * 100;
+    this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;
+
     // update avatar
     const { spells = [], buffs = [], avatar } = this.game?.player || {};
     this.vueInstance.avatar = avatar?.path || '';
@@ -55,7 +58,9 @@ export default class InGameHUD {
     // update spells
     this.vueInstance.spells = spells
       .filter(i => i?.image?.path)
-      .map(spell => {
+      .map((spell, index) => {
+        let isInternalSpell = index == 0;
+        let isSummonerSpell = index > 4;
         const { image, coolDown, state, currentCooldown, name, description } = spell || {};
         return {
           image: image?.path,
@@ -69,6 +74,7 @@ export default class InGameHUD {
           coolDownText: Math.ceil(currentCooldown / 1000),
           coolDownPercent: (currentCooldown / coolDown) * 100,
           showCoolDown: currentCooldown > 0,
+          small: isInternalSpell || isSummonerSpell,
         };
       });
 

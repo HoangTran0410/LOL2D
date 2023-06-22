@@ -4,6 +4,7 @@ import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Blitzcrank_W_Spell from '../spells/Blitzcrank_W.js';
 import ASSETS from '../../../assets/index.js';
+import { Flash, Ghost, Heal } from '../spells/index.js';
 
 export default class Champion {
   static avatars = [];
@@ -16,10 +17,18 @@ export default class Champion {
     this.avatar = random(Object.values(ASSETS.Champions));
 
     this.spells = [
+      // internal spell
+      new Blitzcrank_W_Spell(this),
+
+      // normal spell
       new Blitzcrank_W_Spell(this),
       new Blitzcrank_W_Spell(this),
       new Blitzcrank_W_Spell(this),
-      new Blitzcrank_W_Spell(this),
+      new Heal(this),
+
+      // summoner spell
+      new Flash(this),
+      new Ghost(this),
     ];
     this.buffs = [];
     this.stats = new Stats();

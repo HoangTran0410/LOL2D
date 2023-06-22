@@ -4,7 +4,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import ASSETS from '../../../assets/index.js';
 
 export default class Blitzcrank_W2 extends Buff {
-  image = ASSETS.Buffs.blitzcrank_w;
+  image = ASSETS.Spells.blitzcrank_w;
   buffAddType = BuffAddType.REPLACE_EXISTING;
 
   onCreate() {

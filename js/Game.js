@@ -144,7 +144,20 @@ export default class Game {
     // this.player.addBuff(buff);
 
     // Q W E R
-    let keyCodes = [81, 87, 69, 82];
+    let keyCodes = [
+      // internal
+      null,
+
+      // Q W E R
+      81,
+      87,
+      69,
+      82,
+
+      // DF
+      68,
+      70,
+    ];
     let spellIndex = keyCodes.indexOf(keyCode);
     if (spellIndex !== -1) {
       this.player.spells[spellIndex].cast();
