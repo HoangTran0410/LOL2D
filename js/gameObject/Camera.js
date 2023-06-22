@@ -24,7 +24,7 @@ export default class Camera {
     this.currentZoom = lerp(this.currentZoom, this.zoom, 0.07);
   }
 
-  drawGrid(gridSize = 300) {
+  drawGrid(gridSize = 400) {
     stroke(100, 70);
     strokeWeight(2);
 

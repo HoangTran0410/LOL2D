@@ -31,6 +31,8 @@
                     <div v-for="spell of spells" :class="spell.small ? 'spell small' : 'spell'">
                         <img :src="spell.image" alt="spell"
                             :style="spell.showCoolDown ? 'filter: grayscale(100%)' : ''" />
+
+                        <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <div v-if="spell.showCoolDown">
                             <div class="cooldown-overlay" :style="`height: ${spell.coolDownPercent}%`"></div>
                             <div class="cooldown">

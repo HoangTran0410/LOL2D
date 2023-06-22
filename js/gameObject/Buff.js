@@ -2,6 +2,7 @@ import BuffAddType from '../enums/BuffAddType.js';
 
 export default class Buff {
   name = this.constructor.name;
+  description = null;
   image = null;
 
   buffAddType = BuffAddType.REPLACE_EXISTING;

@@ -2,11 +2,14 @@ import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
+import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 
 export default class Game {
   constructor() {
     this.InGameHUD = new InGameHUD(this);
+
+    this.objects = [];
 
     this.players = [];
     for (let i = 0; i < 10; i++) {
@@ -49,14 +52,21 @@ export default class Game {
       });
       this.quadtree.insert(rectangle);
     }
+
+    this.clickedPoint = {
+      x: 0,
+      y: 0,
+      size: 0,
+    };
   }
 
   fixedUpdate() {
     this.camera.update();
 
-    for (let p of this.players) {
-      p.update();
-    }
+    this.objects = this.objects.filter(o => !o.toRemove);
+    for (let o of this.objects) o.update();
+
+    for (let p of this.players) p.update();
 
     for (let p of this.players) {
       let area = new Rectangle({
@@ -84,7 +94,15 @@ export default class Game {
     if (mouseIsPressed && mouseButton === RIGHT) {
       let worldMouse = this.camera.screenToWorld(mouseX, mouseY);
       this.player.moveTo(worldMouse.x, worldMouse.y);
+
+      this.clickedPoint = {
+        x: worldMouse.x,
+        y: worldMouse.y,
+        size: 40,
+      };
     }
+
+    this.clickedPoint.size *= 0.9;
   }
 
   update() {
@@ -121,44 +139,27 @@ export default class Game {
       o.draw();
     }
 
+    for (let o of this.objects) {
+      o.draw();
+    }
+
     for (let p of this.players) {
       p.draw();
+    }
+
+    // draw clicked point
+    if (this.clickedPoint.size > 0) {
+      push();
+      fill('green');
+      ellipse(this.clickedPoint.x, this.clickedPoint.y, this.clickedPoint.size);
+      pop();
     }
 
     this.camera.pop();
   }
 
   keyPressed() {
-    // let modifier = new StatsModifier();
-    // modifier.speed.percentBaseBonus = 0.3;
-    // modifier.size.percentBonus = 0.3;
-
-    // let buff = new ChangeStatsBuff(
-    //   3000,
-    //   this.player,
-    //   this.player,
-    //   modifier,
-    //   BuffAddType.STACKS_AND_CONTINUE,
-    //   3
-    // );
-    // this.player.addBuff(buff);
-
-    // Q W E R
-    let keyCodes = [
-      // internal
-      null,
-
-      // Q W E R
-      81,
-      87,
-      69,
-      82,
-
-      // DF
-      68,
-      70,
-    ];
-    let spellIndex = keyCodes.indexOf(keyCode);
+    let spellIndex = SpellHotKeys.indexOf(keyCode);
     if (spellIndex !== -1) {
       this.player.spells[spellIndex].cast();
     }

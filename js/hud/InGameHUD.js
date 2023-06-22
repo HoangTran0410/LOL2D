@@ -1,3 +1,5 @@
+import { SpellHotKeys } from '../constants.js';
+
 export default class InGameHUD {
   constructor(game) {
     this.game = game;
@@ -61,6 +63,11 @@ export default class InGameHUD {
       .map((spell, index) => {
         let isInternalSpell = index == 0;
         let isSummonerSpell = index > 4;
+
+        let hotKey = SpellHotKeys[index]
+          ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
+          : '';
+
         const { image, coolDown, state, currentCooldown, name, description } = spell || {};
         return {
           image: image?.path,
@@ -75,6 +82,7 @@ export default class InGameHUD {
           coolDownPercent: (currentCooldown / coolDown) * 100,
           showCoolDown: currentCooldown > 0,
           small: isInternalSpell || isSummonerSpell,
+          hotKey,
         };
       });
 
