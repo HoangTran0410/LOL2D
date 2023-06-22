@@ -5,7 +5,7 @@ import SpellObject from '../SpellObject.js';
 export default class Flash extends Spell {
   image = ASSETS.Spells.flash;
   description = 'Tốc biến 1 tới vị trí con trỏ, tối đa 180px khoảng cách';
-  coolDown = 1;
+  coolDown = 1000;
 
   onSpellCast() {
     let maxDistance = 180;

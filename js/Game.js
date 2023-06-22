@@ -26,19 +26,19 @@ export default class Game {
 
     // quadtree obstacle
     this.quadtree = new Quadtree({
-      x: -5000,
-      y: -5000,
-      width: 10000,
-      height: 10000,
+      x: -3000,
+      y: -3000,
+      width: 6000,
+      height: 6000,
       maxObjects: 10, // optional, default: 10
       maxLevels: 6, // optional, default:  4
     });
 
     this.obstacles = [];
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < 200; i++) {
       let o = new Obstacle(
-        random(-5000, 5000),
-        random(-5000, 5000)
+        random(-3000, 3000),
+        random(-3000, 3000)
         // Obstacle.rectVertices(random(100, 200), random(100, 200), random(TWO_PI))
         // Obstacle.circleVertices(random(50, 100), random(10, 20))
         // Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
@@ -86,6 +86,12 @@ export default class Game {
 
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           p.position.add(overlap);
+
+          if (p != this.player) {
+            let x = random(-3000, 3000);
+            let y = random(-3000, 3000);
+            p.moveTo(x, y);
+          }
         }
       }
     }
@@ -103,6 +109,24 @@ export default class Game {
     }
 
     this.clickedPoint.size *= 0.9;
+
+    // fake ai
+    for (let p of this.players) {
+      if (p !== this.player) {
+        let distToDest = p.position.dist(p.destination);
+        if (distToDest < 10) {
+          let x = random(-3000, 3000);
+          let y = random(-3000, 3000);
+          p.moveTo(x, y);
+        }
+
+        // random spell cast
+        if (random() < 0.008) {
+          let spellIndex = floor(random(p.spells.length));
+          p.spells[spellIndex].cast();
+        }
+      }
+    }
   }
 
   update() {

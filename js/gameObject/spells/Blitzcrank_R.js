@@ -6,7 +6,7 @@ export default class Blitzcrank_R extends Spell {
   image = ASSETS.Spells.blitzcrank_r;
   description =
     'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 0.5 giây';
-  coolDown = 1000;
+  coolDown = 5000;
 
   onSpellCast() {
     this.game.objects.push(new Blitzcrank_R_Object(this.owner));

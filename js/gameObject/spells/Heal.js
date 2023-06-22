@@ -7,7 +7,7 @@ import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 export default class Heal extends Spell {
   image = ASSETS.Spells.heal;
   description = 'Hồi phục 30% máu tối đa và tăng 50% tốc độ di chuyển trong 1s';
-  coolDown = 1;
+  coolDown = 10000;
 
   onSpellCast() {
     // heal 50% health
