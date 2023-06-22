@@ -11,9 +11,8 @@ export function preload() {
 }
 
 export function setup() {
-  const c = createCanvas(windowWidth, windowHeight);
+  const c = createCanvas(windowWidth, windowHeight).parent('canvas');
   c.elt.oncontextmenu = () => false;
-  document.querySelector('#HUD').oncontextmenu = () => false;
 
   rectMode(CORNER);
   imageMode(CORNER);

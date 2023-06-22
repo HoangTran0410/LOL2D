@@ -2,11 +2,11 @@ import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
-import HUD from './hud/HUD.js';
+import InGameHUD from './hud/InGameHUD.js';
 
 export default class Game {
   constructor() {
-    this.HUD = new HUD(this);
+    this.InGameHUD = new InGameHUD(this);
 
     this.players = [];
     for (let i = 0; i < 10; i++) {
@@ -104,7 +104,7 @@ export default class Game {
       _deltaTime -= 1000 / 60;
     }
 
-    this.HUD.update();
+    this.InGameHUD.update();
   }
 
   draw() {

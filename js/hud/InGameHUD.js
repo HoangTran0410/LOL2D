@@ -1,6 +1,4 @@
-import SpellState from '../enums/SpellState.js';
-
-export default class HUD {
+export default class InGameHUD {
   constructor(game) {
     this.game = game;
 
@@ -8,8 +6,7 @@ export default class HUD {
   }
 
   initVue() {
-    const { createApp } = Vue;
-    this.vueInstance = createApp({
+    this.vueInstance = Vue.createApp({
       data() {
         // init default values
         return {
@@ -21,24 +18,26 @@ export default class HUD {
             maxMana: 100,
           },
           spells: [
-            { image: 'assets/spells/blitzcrank_internal.png', coolDown: 0, small: true },
+            { image: 'assets/spells/blitzcrank_internal.png' },
 
-            { image: 'assets/spells/blitzcrank_q.png', coolDown: 0 },
-            { image: 'assets/spells/blitzcrank_w.png', coolDown: 0 },
-            { image: 'assets/spells/blitzcrank_e.png', coolDown: 0 },
-            { image: 'assets/spells/blitzcrank_r.png', coolDown: 0 },
+            { image: 'assets/spells/blitzcrank_q.png' },
+            { image: 'assets/spells/blitzcrank_w.png' },
+            { image: 'assets/spells/blitzcrank_e.png' },
+            { image: 'assets/spells/blitzcrank_r.png' },
 
-            { image: 'assets/spells/flash.png', coolDown: 0, small: true },
-            { image: 'assets/spells/heal.png', coolDown: 0, small: true },
+            { image: 'assets/spells/flash.png' },
+            { image: 'assets/spells/heal.png' },
           ],
           buffs: [
-            { image: 'assets/spells/blitzcrank_w.png', coolDown: 0 },
-            { image: 'assets/spells/blitzcrank_w.png', coolDown: 0 },
+            { image: 'assets/spells/blitzcrank_w.png' },
+            { image: 'assets/spells/blitzcrank_w.png' },
           ],
         };
       },
       methods: {},
-    }).mount('#HUD');
+    }).mount('#InGameHUD');
+
+    document.querySelector('#InGameHUD').oncontextmenu = () => false;
   }
 
   update() {
