@@ -1,9 +1,11 @@
 import ASSETS from '../../../assets/index.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 
 export default class Silence extends Buff {
   image = ASSETS.Buffs.silence;
+  buffAddType = BuffAddType.RENEW_EXISTING;
 
   onActivate() {
     this.targetUnit.status &= ~StatusFlags.CanCast;
