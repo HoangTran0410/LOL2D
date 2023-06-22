@@ -121,7 +121,7 @@ export default class Game {
         }
 
         // random spell cast
-        if (random() < 0.008) {
+        if (random() < 0.1) {
           let spellIndex = floor(random(p.spells.length));
           p.spells[spellIndex].cast();
         }
