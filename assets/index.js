@@ -40,6 +40,7 @@ export function preload() {
   // Buffs
   Object.entries({
     // TODO: add buff images
+    silence: 'assets/buffs/silence.png',
   }).forEach(([name, path]) => {
     ASSETS.Buffs[name] = {
       image: loadImage(path),

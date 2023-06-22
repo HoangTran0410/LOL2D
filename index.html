@@ -30,7 +30,7 @@
                 <div class="spells">
                     <div v-for="spell of spells" :class="spell.small ? 'spell small' : 'spell'">
                         <img :src="spell.image" alt="spell"
-                            :style="spell.showCoolDown ? 'filter: grayscale(100%)' : ''" />
+                            :style="(spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <div v-if="spell.showCoolDown">
@@ -42,6 +42,7 @@
                         <div class="spell-info">
                             <h4>{{spell.name}}</h4>
                             <p>{{spell.description}}</p>
+                            <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
                         </div>
                     </div>
                 </div>

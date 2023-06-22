@@ -1,6 +1,7 @@
 import ASSETS from '../../../assets/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import Silence from '../buffs/Silence.js';
 
 export default class Blitzcrank_R extends Spell {
   image = ASSETS.Spells.blitzcrank_r;
@@ -11,7 +12,14 @@ export default class Blitzcrank_R extends Spell {
   onSpellCast() {
     this.game.objects.push(new Blitzcrank_R_Object(this.owner));
 
-    // TODO add damage and silence
+    let playersInRange = this.game.players.filter(
+      champ => champ != this.owner && champ.position.dist(this.owner.position) < 200
+    );
+
+    playersInRange.forEach(champ => {
+      let silenceBuff = new Silence(5000, this.owner, champ);
+      champ.addBuff(silenceBuff);
+    });
   }
 }
 

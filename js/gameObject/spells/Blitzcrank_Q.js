@@ -73,7 +73,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     circle(this.position.x, this.position.y, handSize);
 
     fill(200, 100, 90, 200);
-    let dir = this.destination.copy().sub(this.position).normalize();
+    let dir = this.destination.copy().sub(this.owner.position).normalize();
     for (let i = 0; i < 3; i++) {
       let angle = dir.heading() + (i - 1) * 0.5;
       let x = this.position.x + cos(angle) * handSize;

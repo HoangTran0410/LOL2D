@@ -15,13 +15,15 @@ export default class Heal extends Spell {
     let maxHeal = this.owner.stats.maxHealth.value;
     let newHeal = Math.min(currentHeal + maxHeal * 0.3, maxHeal);
 
-    let modifier = new StatModifier();
-    modifier.baseBonus = newHeal - currentHeal;
-    this.owner.stats.health.addModifier(modifier);
+    if (newHeal > currentHeal) {
+      let modifier = new StatModifier();
+      modifier.baseValue = newHeal - currentHeal;
+      this.owner.stats.health.addModifier(modifier);
 
-    // heal effect
-    let healObject = new Heal_Object(this.owner);
-    this.game.objects.push(healObject);
+      // heal effect
+      let healObject = new Heal_Object(this.owner);
+      this.game.objects.push(healObject);
+    }
 
     // ghost buff for 1s
     let ghostBuff = new Ghost_Buff(1000, this.owner, this.owner);

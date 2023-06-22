@@ -1,4 +1,6 @@
 import { SpellHotKeys } from '../constants.js';
+import StatusFlags from '../enums/StatusFlags.js';
+import { hasFlag } from '../utils/index.js';
 
 export default class InGameHUD {
   constructor(game) {
@@ -54,10 +56,11 @@ export default class InGameHUD {
     this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;
 
     // update avatar
-    const { spells = [], buffs = [], avatar } = this.game?.player || {};
+    const { spells = [], buffs = [], avatar, status } = this.game?.player || {};
     this.vueInstance.avatar = avatar?.path || '';
 
     // update spells
+    let canCast = hasFlag(status, StatusFlags.CanCast);
     this.vueInstance.spells = spells
       .filter(i => i?.image?.path)
       .map((spell, index) => {
@@ -83,6 +86,7 @@ export default class InGameHUD {
           showCoolDown: currentCooldown > 0,
           small: isInternalSpell || isSummonerSpell,
           hotKey,
+          canCast,
         };
       });
 

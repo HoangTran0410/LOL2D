@@ -1,5 +1,6 @@
 import SpellState from '../enums/SpellState.js';
 import StatusFlags from '../enums/StatusFlags.js';
+import { hasFlag } from '../utils/index.js';
 
 export default class Spell {
   // for display in HUD
@@ -50,11 +51,11 @@ export default class Spell {
   castCancelCheck() {
     let status = this.owner.status;
     if (
-      this.owner.isDead ||
-      status === !StatusFlags.CanCast ||
-      status === StatusFlags.Stunned ||
-      status === StatusFlags.Charmed ||
-      status === StatusFlags.Feared
+      !hasFlag(status, StatusFlags.CanCast) ||
+      hasFlag(status, StatusFlags.Silenced) ||
+      hasFlag(status, StatusFlags.Stunned) ||
+      hasFlag(status, StatusFlags.Charmed) ||
+      hasFlag(status, StatusFlags.Feared)
     ) {
       this.resetSpellCast();
       return true;
