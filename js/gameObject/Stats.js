@@ -14,7 +14,7 @@ export class StatsModifier {
 export default class Stats {
   constructor() {
     this.maxHealth = new Stat(100);
-    this.health = new Stat(100);
+    this.health = new Stat(50);
     this.maxMana = new Stat(100);
     this.mana = new Stat(100);
     this.speed = new Stat(2);
