@@ -1,15 +1,18 @@
 import { SpellHotKeys } from '../constants.js';
 import StatusFlags from '../enums/StatusFlags.js';
 import { hasFlag } from '../utils/index.js';
+import * as AllSpells from '../gameObject/spells/index.js';
 
 export default class InGameHUD {
   constructor(game) {
     this.game = game;
 
-    this.initVue();
+    console.log(Object.values(AllSpells).map(spellClass => new spellClass(null)));
+
+    this.initVue(game);
   }
 
-  initVue() {
+  initVue(game) {
     this.vueInstance = Vue.createApp({
       data() {
         return {
@@ -17,9 +20,41 @@ export default class InGameHUD {
           stats: {},
           spells: [],
           buffs: [],
+
+          game: game,
+          showSpellsPicker: false,
+          spellIndexToSwap: 0,
+          allSpells: Object.values(AllSpells)
+            // create instance. TODO: optimize this
+            .map(SpellClass => ({
+              instance: new SpellClass(null),
+              spellClass: SpellClass,
+            }))
+            .map(({ instance, spellClass }) => ({
+              name: instance.name,
+              image: instance.image?.path,
+              description: instance.description,
+              coolDown: instance.coolDown,
+              spellClass: spellClass,
+            })),
         };
       },
-      methods: {},
+      methods: {
+        pick(spell) {
+          if (
+            this.spellIndexToSwap >= 0 &&
+            this.spellIndexToSwap <= this.game.player.spells.length
+          ) {
+            let spellInstance = new spell.spellClass(this.game.player);
+            this.game.player.spells[this.spellIndexToSwap] = spellInstance;
+          }
+          this.showSpellsPicker = false;
+        },
+        changeSpell(index) {
+          this.spellIndexToSwap = index;
+          this.showSpellsPicker = !this.showSpellsPicker;
+        },
+      },
     }).mount('#InGameHUD');
 
     document.querySelector('#InGameHUD').oncontextmenu = () => false;

@@ -45,12 +45,12 @@ canvas {
 }
 
 /* =============== Spells =============== */
-.bottom-HUD .spells {
+.spells {
     display: flex;
     flex-direction: row;
 }
 
-.bottom-HUD .spells .spell {
+.spells .spell {
     margin-right: 5px;
     position: relative;
     border: 2px solid #aaa6;
@@ -64,7 +64,7 @@ canvas {
     cursor: pointer;
 }
 
-.bottom-HUD .spells .spell img {
+.spells .spell img {
     width: 100%;
     height: 100%;
 }
@@ -215,4 +215,43 @@ canvas {
     color: white;
     background-color: #111e;
     padding: 0 5px;
+}
+
+/* ===================== Spell Picker ===================== */
+.spell-picker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #111c;
+    border-radius: 5px;
+    border: solid 2px #fff3;
+    padding: 10px;
+}
+
+.spell-picker .spell {
+    position: relative;
+}
+
+.spell-picker .title {
+    margin: 0;
+    padding: 0;
+    color: white;
+    text-align: center;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.spell-picker .list {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 500px;
+}
+
+.spell-picker .spell {
+    margin: 5px;
+    border: 2px solid #aaa6;
 }

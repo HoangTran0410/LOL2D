@@ -15,7 +15,7 @@ export default class Spell {
 
   constructor(owner) {
     this.owner = owner;
-    this.game = owner.game;
+    this.game = owner?.game;
     this.state = SpellState.READY;
 
     this.onActivate();

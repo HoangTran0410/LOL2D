@@ -28,7 +28,8 @@
             </div>
             <div class="champion-details">
                 <div class="spells">
-                    <div v-for="spell of spells" :class="spell.small ? 'spell small' : 'spell'">
+                    <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
+                        @click="changeSpell(index)">
                         <img :src="spell.image" alt="spell"
                             :style="(spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
@@ -62,6 +63,21 @@
                     <div v-for="buff of buffs" class="buff">
                         <img :src="buff.image" alt="buff">
                         <span>{{buff.timeLeftText}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- spell picker -->
+        <div v-if="showSpellsPicker" class="spell-picker">
+            <p class="title">Chọn chiêu thức</p>
+            <div class="list">
+                <div v-for="spell of allSpells" class="spell" @click="pick(spell)">
+                    <img :src="spell.image" alt="spell" />
+                    <div class="spell-info">
+                        <h4>{{spell.name}}</h4>
+                        <p>{{spell.description}}</p>
+                        <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
                     </div>
                 </div>
             </div>
