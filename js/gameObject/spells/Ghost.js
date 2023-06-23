@@ -8,7 +8,7 @@ import SpellObject from '../SpellObject.js';
 export default class Ghost extends Spell {
   image = ASSETS.Spells.ghost;
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
-  coolDown = 10000;
+  coolDown = 500;
 
   onSpellCast() {
     let ghostBuff = new Ghost_Buff(5000, this.owner, this.owner);
@@ -25,7 +25,8 @@ export default class Ghost extends Spell {
 
 export class Ghost_Buff extends Buff {
   image = ASSETS.Spells.ghost;
-  buffAddType = BuffAddType.REPLACE_EXISTING;
+  buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+  maxStacks = 10;
 
   onCreate() {
     this.statsModifier = new StatsModifier();

@@ -6,17 +6,30 @@ export default class Blitzcrank_Q extends Spell {
   image = ASSETS.Spells.blitzcrank_q;
   description =
     'Bắn bàn tay theo hướng con trỏ (max 400px), kéo kẻ địch đầu tiên trúng phải, gây sát thương và làm choáng chúng trong 0.5 giây';
-  coolDown = 3000;
+  coolDown = 1000;
 
   onSpellCast() {
+    // if (this.owner == this.game.player) {
+    //   let angle = random(TWO_PI);
+    //   let num = 20;
+    //   for (let i = 0; i < num; i++) {
+    //     let pos = this.owner.position.copy().add(p5.Vector.fromAngle(angle).mult(1000));
+    //     let obj = new Blitzcrank_Q_Object(this.owner);
+    //     obj.destination = pos;
+    //     this.game.objects.push(obj);
+    //     angle += TWO_PI / num;
+    //   }
+    // } else {
     this.game.objects.push(new Blitzcrank_Q_Object(this.owner));
+    // }
   }
 }
 
 export class Blitzcrank_Q_Object extends SpellObject {
   init() {
-    this.range = 400;
+    this.range = 500;
     this.speed = 7;
+    this.grabSpeed = 10;
     this.position = this.owner.position.copy();
 
     let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
@@ -32,11 +45,12 @@ export class Blitzcrank_Q_Object extends SpellObject {
 
   update() {
     let distance = this.destination.dist(this.position);
-    if (distance < this.speed) {
+    let speed = this.state == this.STATE.FORWARD ? this.speed : this.grabSpeed;
+    if (distance < speed) {
       this.position = this.destination.copy();
       this.toRemove = true;
     } else {
-      let direction = this.destination.copy().sub(this.position).setMag(this.speed);
+      let direction = this.destination.copy().sub(this.position).setMag(speed);
       this.position.add(direction);
     }
 
@@ -73,7 +87,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     circle(this.position.x, this.position.y, handSize);
 
     fill(200, 100, 90, 200);
-    let dir = this.destination.copy().sub(this.owner.position).normalize();
+    let dir = p5.Vector.sub(this.destination, this.position).normalize();
     for (let i = 0; i < 3; i++) {
       let angle = dir.heading() + (i - 1) * 0.5;
       let x = this.position.x + cos(angle) * handSize;

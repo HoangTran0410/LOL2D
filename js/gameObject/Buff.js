@@ -6,7 +6,7 @@ export default class Buff {
   image = null;
 
   buffAddType = BuffAddType.REPLACE_EXISTING;
-  maxStacks = 0;
+  maxStacks = 1;
   timeElapsed = 0;
   isToRemove = false;
 
