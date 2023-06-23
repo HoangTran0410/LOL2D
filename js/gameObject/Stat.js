@@ -11,7 +11,7 @@ export class StatModifier {
 export class Stat extends StatModifier {
   constructor(args) {
     super(args);
-    this.value = this.#calculateTotal();
+    this.value = this._calculateTotal();
   }
 
   addModifier(modifier) {
@@ -22,7 +22,7 @@ export class Stat extends StatModifier {
     this.percentBonus += modifier.percentBonus;
     this.percentBaseBonus += modifier.percentBaseBonus;
 
-    this.value = this.#calculateTotal();
+    this.value = this._calculateTotal();
   }
 
   removeModifier(modifier) {
@@ -33,10 +33,10 @@ export class Stat extends StatModifier {
     this.percentBonus -= modifier.percentBonus;
     this.percentBaseBonus -= modifier.percentBaseBonus;
 
-    this.value = this.#calculateTotal();
+    this.value = this._calculateTotal();
   }
 
-  #calculateTotal() {
+  _calculateTotal() {
     return (
       ((this.baseValue + this.baseBonus) * (1 + this.percentBaseBonus) + this.flatBonus) *
       (1 + this.percentBonus)

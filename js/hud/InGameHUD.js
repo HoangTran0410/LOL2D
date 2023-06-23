@@ -49,10 +49,14 @@ export default class InGameHUD {
             this.game.player.spells[this.spellIndexToSwap] = spellInstance;
           }
           this.showSpellsPicker = false;
+          this.game.unpause();
         },
         changeSpell(index) {
           this.spellIndexToSwap = index;
           this.showSpellsPicker = !this.showSpellsPicker;
+
+          if (this.showSpellsPicker) this.game.pause();
+          else this.game.unpause();
         },
       },
     }).mount('#InGameHUD');

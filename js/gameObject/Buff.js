@@ -10,7 +10,7 @@ export default class Buff {
   timeElapsed = 0;
   isToRemove = false;
 
-  #deactivateListeners = [];
+  _deactivateListeners = [];
 
   constructor(duration, sourceUnit, targetUnit) {
     this.duration = duration;
@@ -27,7 +27,7 @@ export default class Buff {
   deactivateBuff() {
     this.isToRemove = true;
     this.onDeactivate();
-    for (let listener of this.#deactivateListeners) {
+    for (let listener of this._deactivateListeners) {
       listener?.();
     }
   }
@@ -53,6 +53,6 @@ export default class Buff {
   onDeactivate() {}
 
   addDeactivateListener(listener) {
-    this.#deactivateListeners.push(listener);
+    this._deactivateListeners.push(listener);
   }
 }

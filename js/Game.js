@@ -60,6 +60,14 @@ export default class Game {
     };
   }
 
+  pause() {
+    this.paused = true;
+  }
+
+  unpause() {
+    this.paused = false;
+  }
+
   fixedUpdate() {
     this.camera.update();
 
@@ -139,6 +147,8 @@ export default class Game {
     //   this.quadtree.insert(rectangle);
     // }
 
+    if (this.paused) return;
+
     // always update at 60 fps, no matter the frame rate
     let _deltaTime = Math.min(deltaTime, 1000);
     while (_deltaTime > 0) {
@@ -150,6 +160,7 @@ export default class Game {
   }
 
   draw() {
+    if (this.paused) return;
     background(20);
 
     this.camera.push();
