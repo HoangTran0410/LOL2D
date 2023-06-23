@@ -20,12 +20,16 @@ export default class Flash extends Spell {
     this.owner.destination = this.owner.position.copy();
 
     // add smoke effect
-    let flashObject = new Flash_Object(this.owner);
-    this.game.objects.push(flashObject);
+    // let newPosEffect = new Flash_Object(this.owner);
+    // this.game.objects.push(newPosEffect);
 
-    let flashObject2 = new Flash_Object(this.owner);
-    flashObject2.position = oldPos;
-    this.game.objects.push(flashObject2);
+    // let oldPosEffect = new Flash_Object(this.owner);
+    // oldPosEffect.position = oldPos;
+    // this.game.objects.push(oldPosEffect);
+
+    let flashObject = new Flash_Object2(this.owner);
+    flashObject.position = oldPos;
+    this.game.objects.push(flashObject);
   }
 }
 
@@ -69,10 +73,32 @@ export class Flash_Object extends SpellObject {
 
     noStroke();
     for (let s of this.smokes) {
-      fill(255, 255, 0, s.opacity);
+      fill(255, 255, 100, s.opacity);
       circle(this.position.x + s.x, this.position.y + s.y, s.size);
     }
 
+    pop();
+  }
+}
+
+export class Flash_Object2 extends SpellObject {
+  opacity = 255;
+  position = this.owner.position.copy();
+
+  update() {
+    this.opacity -= 3;
+
+    if (this.opacity <= 0) {
+      this.toRemove = true;
+    }
+  }
+
+  draw() {
+    // draw a circle have size = owner size
+    push();
+    stroke(255, 0, 0, this.opacity + random(100));
+    fill(100, 100, 100, this.opacity + random(-30, 30));
+    circle(this.position.x, this.position.y, this.owner.stats.size.value + 3);
     pop();
   }
 }

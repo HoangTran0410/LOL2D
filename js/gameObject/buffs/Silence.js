@@ -7,7 +7,8 @@ export default class Silence extends Buff {
   image = ASSETS.Buffs.silence;
   buffAddType = BuffAddType.RENEW_EXISTING;
 
-  onActivate() {
+  onUpdate() {
+    // apply silence every frame
     this.targetUnit.status &= ~StatusFlags.CanCast;
   }
 

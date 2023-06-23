@@ -26,6 +26,7 @@ export function preload() {
     blitzcrank_w: 'assets/spells/blitzcrank_w.png',
     blitzcrank_e: 'assets/spells/blitzcrank_e.png',
     blitzcrank_r: 'assets/spells/blitzcrank_r.png',
+    lux_e: 'assets/spells/lux_e.png',
     flash: 'assets/spells/flash.png',
     ghost: 'assets/spells/ghost.png',
     heal: 'assets/spells/heal.png',

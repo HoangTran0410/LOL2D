@@ -10,16 +10,20 @@ export default class Blitzcrank_R extends Spell {
   coolDown = 10000;
 
   onSpellCast() {
-    this.game.objects.push(new Blitzcrank_R_Object(this.owner));
+    const range = 200;
 
-    let playersInRange = this.game.players.filter(
-      champ => champ != this.owner && champ.position.dist(this.owner.position) < 200
-    );
+    let obj = new Blitzcrank_R_Object(this.owner);
+    obj.maxSize = range * 2;
+    this.game.objects.push(obj);
 
-    playersInRange.forEach(champ => {
-      let silenceBuff = new Silence(5000, this.owner, champ);
-      champ.addBuff(silenceBuff);
-    });
+    // let playersInRange = this.game.players.filter(
+    //   champ => champ != this.owner && champ.position.dist(this.owner.position) < range
+    // );
+
+    // playersInRange.forEach(champ => {
+    //   let silenceBuff = new Silence(5000, this.owner, champ);
+    //   champ.addBuff(silenceBuff);
+    // });
   }
 }
 
@@ -29,12 +33,28 @@ export class Blitzcrank_R_Object extends SpellObject {
   liveTime = 1000;
   starTime = 0;
   position = this.owner.position.copy();
+  playersEffected = [];
 
   update() {
     this.starTime += deltaTime;
     if (this.starTime > this.liveTime) this.toRemove = true;
 
-    if (this.size < this.maxSize) this.size += 35;
+    if (this.size < this.maxSize) this.size += 20;
+
+    // apply silence
+    let playersInRange = this.game.players.filter(
+      champ =>
+        champ != this.owner &&
+        champ.position.dist(this.position) < this.size / 2 && // in range
+        !this.playersEffected.find(player => player == champ) // not effected yet
+    );
+
+    playersInRange.forEach(champ => {
+      let silenceBuff = new Silence(5000, this.owner, champ);
+      champ.addBuff(silenceBuff);
+    });
+
+    this.playersEffected.push(...playersInRange);
   }
 
   draw() {

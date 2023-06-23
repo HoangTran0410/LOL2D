@@ -12,30 +12,11 @@ export default class InGameHUD {
   initVue() {
     this.vueInstance = Vue.createApp({
       data() {
-        // init default values
         return {
-          avatar: 'assets/champions/blitzcrank.png',
-          stats: {
-            health: 100,
-            maxHealth: 200,
-            mana: 100,
-            maxMana: 100,
-          },
-          spells: [
-            { image: 'assets/spells/blitzcrank_internal.png' },
-
-            { image: 'assets/spells/blitzcrank_q.png' },
-            { image: 'assets/spells/blitzcrank_w.png' },
-            { image: 'assets/spells/blitzcrank_e.png' },
-            { image: 'assets/spells/blitzcrank_r.png' },
-
-            { image: 'assets/spells/flash.png' },
-            { image: 'assets/spells/heal.png' },
-          ],
-          buffs: [
-            { image: 'assets/spells/blitzcrank_w.png' },
-            { image: 'assets/spells/blitzcrank_w.png' },
-          ],
+          avatar: '',
+          stats: {},
+          spells: [],
+          buffs: [],
         };
       },
       methods: {},

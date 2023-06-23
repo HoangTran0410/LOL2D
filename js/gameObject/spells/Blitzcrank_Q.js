@@ -68,7 +68,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
         }
       }
     } else if (this.champToGrab) {
-      this.champToGrab.position = this.position.copy();
+      this.champToGrab.position.set(this.position.x, this.position.y);
     }
   }
 
