@@ -37,7 +37,7 @@ export default class Lux_R extends Spell {
 }
 
 export class Lux_R_Buff extends Buff {
-  buffAddType = BuffAddType.REPLACE_EXISTING;
+  buffAddType = BuffAddType.RENEW_EXISTING;
   onCreate() {
     this.statsModifier = new StatsModifier();
     this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue; // slow 100%
