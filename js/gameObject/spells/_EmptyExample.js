@@ -1,6 +1,7 @@
+import ASSETS from '../../../assets/index.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
-import SpellObject from '../SpellObject';
+import SpellObject from '../SpellObject.js';
 
 export default class SpellName extends Spell {
   image = ASSETS.Spells.spell_name;

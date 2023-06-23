@@ -11,6 +11,7 @@ import {
   Blitzcrank_Q,
   Blitzcrank_W,
   Lux_E,
+  Lux_R,
 } from '../spells/index.js';
 
 export default class Champion {
@@ -29,7 +30,7 @@ export default class Champion {
 
       // normal spell
       new Blitzcrank_Q(this),
-      new Blitzcrank_W(this),
+      new Lux_R(this),
       new Lux_E(this),
       new Blitzcrank_R(this),
 

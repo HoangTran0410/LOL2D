@@ -20,16 +20,17 @@ export default class Flash extends Spell {
     this.owner.destination = this.owner.position.copy();
 
     // add smoke effect
-    // let newPosEffect = new Flash_Object(this.owner);
-    // this.game.objects.push(newPosEffect);
+    let newPosEffect = new Flash_Object(this.owner);
+    this.game.objects.push(newPosEffect);
 
-    // let oldPosEffect = new Flash_Object(this.owner);
-    // oldPosEffect.position = oldPos;
-    // this.game.objects.push(oldPosEffect);
+    let oldPosEffect = new Flash_Object(this.owner);
+    oldPosEffect.position = oldPos;
+    this.game.objects.push(oldPosEffect);
 
-    let flashObject = new Flash_Object2(this.owner);
-    flashObject.position = oldPos;
-    this.game.objects.push(flashObject);
+    // test different effect
+    // let flashObject = new Flash_Object2(this.owner);
+    // flashObject.position = oldPos;
+    // this.game.objects.push(flashObject);
   }
 }
 
