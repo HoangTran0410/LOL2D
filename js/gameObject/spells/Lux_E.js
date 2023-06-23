@@ -9,7 +9,7 @@ import { StatsModifier } from '../Stats.js';
 export default class Lux_E extends Spell {
   image = ASSETS.Spells.lux_e;
   description =
-    'Phóng ra 1 phòng xoáy (rộng 200px) tới vị trí chỉ định (xa tối đa 400px), làm chậm kẻ định 50%. Tái kích hoạt hoặc kết thúc 5s sẽ phát nổ gây sát thương lên kẻ địch trong phạm vi';
+    'Phóng ra 1 xoáy ánh sáng (rộng 200px) tới vị trí chỉ định (xa tối đa 400px), làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ';
   coolDown = 1000;
 
   onSpellCast() {
