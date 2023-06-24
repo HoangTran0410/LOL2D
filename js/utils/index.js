@@ -13,8 +13,21 @@ export const statusFlagsToString = (status, statusFlags) => {
 };
 
 export const collideRotatedRectVsPoint = (rx, ry, rw, rh, angle, px, py) => {
-  let poly = new SAT.Box(new SAT.Vector(rx, ry), rw, rh).toPolygon();
-  poly.setAngle(angle);
-  let point = new SAT.Vector(px, py);
-  return SAT.pointInPolygon(point, poly);
+  // get point position relative to rect
+  let dx = px - rx;
+  let dy = py - ry;
+
+  // pre-compute rotation matrix entries
+  let cos = Math.cos(angle);
+  let sin = Math.sin(angle);
+
+  // get position in rotated rect space
+  let rotatedX = cos * dx + sin * dy;
+  let rotatedY = -sin * dx + cos * dy;
+
+  // check collisions
+  if (rotatedX > 0 && rotatedX < rw && rotatedY > 0 && rotatedY < rh) {
+    return true;
+  }
+  return false;
 };

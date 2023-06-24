@@ -4,21 +4,20 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import { Lux_Q_Buff } from './Lux_Q.js';
-import Silence from '../buffs/Silence.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   image = ASSETS.Spells.lux_r;
   description =
     'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định, rộng 100px, dài 1000px. Trói chân kẻ địch trong 1 giây.';
-  coolDown = 5000;
+  coolDown = 1000;
 
   onSpellCast() {
-    const prepairTime = 1000;
-    const fireTime = 400;
-    const rayLength = 1000;
-    const rayWidth = 50;
-    const stunTime = 1000;
+    const prepairTime = 1000,
+      fireTime = 1000,
+      rayLength = 800,
+      rayWidth = 50,
+      stunTime = 1000;
 
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let dir = mouse.copy().sub(this.owner.position).normalize();
@@ -85,11 +84,11 @@ export class Lux_R_Object extends SpellObject {
         if (this.playersEffected.includes(p)) continue;
 
         // get rx, ry, rw, rh, angle
-        let rx = this.owner.position.x - this.rayWidth / 2;
+        let rx = this.owner.position.x;
         let ry = this.owner.position.y;
-        let rw = this.rayWidth + p.stats.size.value / 2;
-        let rh = this.destination.dist(this.owner.position);
-        let angle = this.destination.copy().sub(this.owner.position).heading() - HALF_PI;
+        let rw = this.destination.dist(this.owner.position);
+        let rh = this.rayWidth;
+        let angle = this.destination.copy().sub(this.owner.position).heading();
 
         // get px, py
         let px = p.position.x;
@@ -97,11 +96,10 @@ export class Lux_R_Object extends SpellObject {
 
         // check collision
         if (collideRotatedRectVsPoint(rx, ry, rw, rh, angle, px, py)) {
-          // stun and silence buff for enemy
+          // stun buff for enemy
           let stun = new Lux_Q_Buff(this.stunTime, this.owner, p);
           stun.image = ASSETS.Spells.lux_r;
           p.addBuff(stun);
-          // p.addBuff(new Silence(2000, this.owner, p));
           this.playersEffected.push(p);
         }
       }

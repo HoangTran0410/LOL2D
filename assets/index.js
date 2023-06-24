@@ -29,6 +29,7 @@ export function preload() {
     lux_q: 'assets/spells/lux_q.png',
     lux_e: 'assets/spells/lux_e.png',
     lux_r: 'assets/spells/lux_r.png',
+    yasuo_w: 'assets/spells/yasuo_w.png',
     flash: 'assets/spells/flash.png',
     ghost: 'assets/spells/ghost.png',
     heal: 'assets/spells/heal.png',

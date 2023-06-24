@@ -12,7 +12,7 @@ export default class Game {
     this.objects = [];
 
     this.players = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 2; i++) {
       let champ = new Champion(this, random(width), random(height));
       champ.isAllied = false;
       this.players.push(champ);
@@ -22,7 +22,7 @@ export default class Game {
     this.player.isAllied = true;
 
     this.camera = new Camera();
-    this.camera.target = this.player;
+    this.camera.target = this.player.position;
 
     // quadtree obstacle
     this.quadtree = new Quadtree({
@@ -76,6 +76,7 @@ export default class Game {
 
     for (let p of this.players) p.update();
 
+    // collision with obstacles
     for (let p of this.players) {
       let area = new Rectangle({
         x: p.position.x,
@@ -95,11 +96,11 @@ export default class Game {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           p.position.add(overlap);
 
-          if (p != this.player) {
-            let x = random(-3000, 3000);
-            let y = random(-3000, 3000);
-            p.moveTo(x, y);
-          }
+          // if (p != this.player) {
+          //   let x = random(-3000, 3000);
+          //   let y = random(-3000, 3000);
+          //   p.moveTo(x, y);
+          // }
         }
       }
     }
@@ -116,25 +117,39 @@ export default class Game {
       };
     }
 
+    if (keyIsPressed) {
+      // cast spell
+      for (let i = 0; i < SpellHotKeys.length; i++) {
+        if (keyIsDown(SpellHotKeys[i])) {
+          this.player.spells[i].cast();
+        }
+      }
+
+      // camera follow player
+      if (keyIsDown(32)) {
+        this.camera.target.set(this.player.position.x, this.player.position.y);
+      }
+    }
+
     this.clickedPoint.size *= 0.9;
 
     // fake ai
-    for (let p of this.players) {
-      if (p !== this.player) {
-        let distToDest = p.position.dist(p.destination);
-        if (distToDest < 10) {
-          let x = random(-3000, 3000);
-          let y = random(-3000, 3000);
-          p.moveTo(x, y);
-        }
+    // for (let p of this.players) {
+    //   if (p !== this.player) {
+    //     let distToDest = p.position.dist(p.destination);
+    //     if (distToDest < 10) {
+    //       let x = random(-3000, 3000);
+    //       let y = random(-3000, 3000);
+    //       p.moveTo(x, y);
+    //     }
 
-        // random spell cast
-        if (random() < 0.1) {
-          let spellIndex = floor(random(p.spells.length));
-          p.spells[spellIndex].cast();
-        }
-      }
-    }
+    //     // random spell cast
+    //     if (random() < 0.1) {
+    //       let spellIndex = floor(random(p.spells.length));
+    //       p.spells[spellIndex].cast();
+    //     }
+    //   }
+    // }
   }
 
   update() {
@@ -174,14 +189,6 @@ export default class Game {
       o.draw();
     }
 
-    for (let o of this.objects) {
-      o.draw();
-    }
-
-    for (let p of this.players) {
-      p.draw();
-    }
-
     // draw clicked point
     if (this.clickedPoint.size > 0) {
       push();
@@ -190,13 +197,21 @@ export default class Game {
       pop();
     }
 
+    for (let o of this.objects) {
+      o.draw();
+    }
+
+    for (let p of this.players) {
+      p.draw();
+    }
+
     this.camera.pop();
   }
 
   keyPressed() {
-    let spellIndex = SpellHotKeys.indexOf(keyCode);
-    if (spellIndex !== -1) {
-      this.player.spells[spellIndex].cast();
-    }
+    // let spellIndex = SpellHotKeys.indexOf(keyCode);
+    // if (spellIndex !== -1) {
+    //   this.player.spells[spellIndex].cast();
+    // }
   }
 }

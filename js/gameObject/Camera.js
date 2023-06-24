@@ -18,7 +18,7 @@ export default class Camera {
 
   update() {
     if (this.target) {
-      this.position.lerp(this.target.position, 0.1);
+      this.position.lerp(this.target, 0.1);
     }
 
     this.currentZoom = lerp(this.currentZoom, this.zoom, 0.07);
