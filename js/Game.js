@@ -12,7 +12,7 @@ export default class Game {
     this.objects = [];
 
     this.players = [];
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 6; i++) {
       let champ = new Champion(this, random(width), random(height));
       champ.isAllied = false;
       this.players.push(champ);
@@ -96,11 +96,11 @@ export default class Game {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           p.position.add(overlap);
 
-          // if (p != this.player) {
-          //   let x = random(-3000, 3000);
-          //   let y = random(-3000, 3000);
-          //   p.moveTo(x, y);
-          // }
+          if (p != this.player) {
+            let x = random(-3000, 3000);
+            let y = random(-3000, 3000);
+            p.moveTo(x, y);
+          }
         }
       }
     }
@@ -134,22 +134,22 @@ export default class Game {
     this.clickedPoint.size *= 0.9;
 
     // fake ai
-    // for (let p of this.players) {
-    //   if (p !== this.player) {
-    //     let distToDest = p.position.dist(p.destination);
-    //     if (distToDest < 10) {
-    //       let x = random(-3000, 3000);
-    //       let y = random(-3000, 3000);
-    //       p.moveTo(x, y);
-    //     }
+    for (let p of this.players) {
+      if (p !== this.player) {
+        let distToDest = p.position.dist(p.destination);
+        if (distToDest < 10) {
+          let x = random(-3000, 3000);
+          let y = random(-3000, 3000);
+          p.moveTo(x, y);
+        }
 
-    //     // random spell cast
-    //     if (random() < 0.1) {
-    //       let spellIndex = floor(random(p.spells.length));
-    //       p.spells[spellIndex].cast();
-    //     }
-    //   }
-    // }
+        // random spell cast
+        if (random() < 0.1) {
+          let spellIndex = floor(random(p.spells.length));
+          p.spells[spellIndex].cast();
+        }
+      }
+    }
   }
 
   update() {

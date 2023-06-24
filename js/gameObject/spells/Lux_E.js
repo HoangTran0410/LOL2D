@@ -11,7 +11,7 @@ export default class Lux_E extends Spell {
   image = ASSETS.Spells.lux_e;
   description =
     'Phóng ra 1 xoáy ánh sáng (rộng 200px) tới vị trí chỉ định (xa tối đa 400px), làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ';
-  coolDown = 1000;
+  coolDown = 6000;
 
   onSpellCast() {
     // first cast
@@ -60,7 +60,7 @@ export default class Lux_E extends Spell {
     }
 
     // reset lux object when it exploded
-    if (this.luxEObject?.phase === Lux_E_Object.PHASES.EXPLODE) {
+    if (this.luxEObject?.phase === Lux_E_Object.PHASES.EXPLODE || this.luxEObject?.toRemove) {
       this.luxEObject = null;
     }
   }

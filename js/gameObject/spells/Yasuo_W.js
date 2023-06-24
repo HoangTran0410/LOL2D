@@ -1,7 +1,5 @@
 import ASSETS from '../../../assets/index.js';
-import BuffAddType from '../../enums/BuffAddType.js';
-import { collideRotatedRectVsPoint } from '../../utils/index.js';
-import Buff from '../Buff.js';
+import { collidePolygonPoint, rectToVertices } from '../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
@@ -10,7 +8,7 @@ export default class Yasuo_W extends Spell {
   name = 'Tường Gió (Yasuo_W)';
   description =
     'Tạo ra một bức tường gió (rộng 300px) theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';
-  coolDown = 1;
+  coolDown = 6000;
 
   onSpellCast() {
     const size = 300,
@@ -43,7 +41,7 @@ export class Yasuo_W_Object extends SpellObject {
   // for smooth display
   animatedWidth = 0;
   animatedSize = 0;
-  animatedPosition = this.position.copy();
+  animatedPosition = this.owner.position.copy();
 
   update() {
     // move wall
@@ -55,25 +53,28 @@ export class Yasuo_W_Object extends SpellObject {
 
     // check collision with game objects
     let rx = this.animatedPosition.x;
-    let ry = this.animatedPosition.y;
+    let ry = this.animatedPosition.y - this.animatedSize / 2;
     let rw = this.animatedWidth;
     let rh = this.animatedSize;
     let angle = this.direction.heading();
-    this.rectToCheck = { rx, ry, rw, rh, angle };
+    let vertices = rectToVertices(rx, ry, rw, rh, angle, {
+      x: this.animatedPosition.x,
+      y: this.animatedPosition.y,
+    });
+    // this.debug = vertices;
 
     for (let obj of this.game.objects) {
       if (
         obj !== this && // check self
         obj instanceof SpellObject &&
         !(obj instanceof Yasuo_W_Object) && // check spell type
-        // obj.owner !== this.owner && // check owner
+        obj.owner !== this.owner && // check owner
         obj.position
       ) {
         let px = obj.position.x;
         let py = obj.position.y;
-        let isCollideWall = collideRotatedRectVsPoint(rx, ry, rw, rh, angle, px, py);
 
-        if (isCollideWall) {
+        if (collidePolygonPoint(vertices, px, py)) {
           obj.toRemove = true;
         }
       }
@@ -93,20 +94,18 @@ export class Yasuo_W_Object extends SpellObject {
     strokeWeight(1);
     translate(this.animatedPosition.x, this.animatedPosition.y);
     rotate(this.direction.heading());
-    rect(0, 0, this.animatedWidth + random(-5, 5), this.animatedSize);
+    rect(0, -this.animatedSize / 2, this.animatedWidth + random(-5, 5), this.animatedSize);
     pop();
 
-    if (this.rectToCheck) {
-      push();
-      let { rx, ry, rw, rh, angle } = this.rectToCheck || {};
-
-      fill(255, 0, 0, 100);
-      stroke(255, 0, 0);
-      strokeWeight(1);
-      translate(rx, ry);
-      rotate(angle);
-      rect(0, 0, rw, rh);
-      pop();
-    }
+    // if (this.debug) {
+    //   push();
+    //   fill(255, 0, 0);
+    //   beginShape();
+    //   for (let v of this.debug) {
+    //     vertex(v.x, v.y);
+    //   }
+    //   endShape(CLOSE);
+    //   pop();
+    // }
   }
 }
