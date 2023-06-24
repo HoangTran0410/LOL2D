@@ -40,6 +40,7 @@ export default class Lux_R extends Spell {
 }
 
 export class Lux_R_Object extends SpellObject {
+  isMissile = false;
   static PHASES = {
     PREPAIR: 0,
     FIRE: 1,

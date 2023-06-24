@@ -30,6 +30,7 @@ export default class Yasuo_W extends Spell {
 }
 
 export class Yasuo_W_Object extends SpellObject {
+  isMissile = false;
   position = this.owner.position.copy();
   direction = p5.Vector.random2D();
   speed = 0.3;
@@ -51,7 +52,7 @@ export class Yasuo_W_Object extends SpellObject {
     this.animatedWidth = lerp(this.animatedWidth, this.width, 0.1);
     this.animatedPosition = p5.Vector.lerp(this.animatedPosition, this.position, 0.1);
 
-    // check collision with game objects
+    // check collision with spell objects
     let rx = this.animatedPosition.x;
     let ry = this.animatedPosition.y - this.animatedSize / 2;
     let rw = this.animatedWidth;
@@ -61,15 +62,14 @@ export class Yasuo_W_Object extends SpellObject {
       x: this.animatedPosition.x,
       y: this.animatedPosition.y,
     });
-    // this.debug = vertices;
 
     for (let obj of this.game.objects) {
       if (
         obj !== this && // check self
         obj instanceof SpellObject &&
-        !(obj instanceof Yasuo_W_Object) && // check spell type
         obj.owner !== this.owner && // check owner
-        obj.position
+        obj.position &&
+        obj.isMissile
       ) {
         let px = obj.position.x;
         let py = obj.position.y;
@@ -96,16 +96,5 @@ export class Yasuo_W_Object extends SpellObject {
     rotate(this.direction.heading());
     rect(0, -this.animatedSize / 2, this.animatedWidth + random(-5, 5), this.animatedSize);
     pop();
-
-    // if (this.debug) {
-    //   push();
-    //   fill(255, 0, 0);
-    //   beginShape();
-    //   for (let v of this.debug) {
-    //     vertex(v.x, v.y);
-    //   }
-    //   endShape(CLOSE);
-    //   pop();
-    // }
   }
 }

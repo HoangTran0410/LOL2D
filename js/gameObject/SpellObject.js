@@ -1,5 +1,6 @@
 export default class SpellObject {
   toRemove = false;
+  isMissile = true;
 
   constructor(owner) {
     this.owner = owner;

@@ -29,6 +29,7 @@ export default class Blitzcrank_R extends Spell {
 }
 
 export class Blitzcrank_R_Object extends SpellObject {
+  isMissile = false;
   size = 10;
   maxSize = 400;
   liveTime = 1000;
