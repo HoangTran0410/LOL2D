@@ -142,6 +142,7 @@ export default class Champion {
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
+    this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.07);
   }
 
   draw() {
@@ -150,35 +151,42 @@ export default class Champion {
 
     push();
 
-    let size = this.animatedSize;
+    let size = this.animatedSize + this.animatedHeight;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;
+
+    let pos = this.position.copy();
+    // let isFlying = this.animatedHeight > 0;
+    // if (isFlying) {
+    //   pos.y -= this.animatedHeight;
+    // }
 
     noStroke();
     fill(240, alpha);
     imageMode(CENTER);
 
+    // draw shadow
+    // if (isFlying) {
+    //   fill(200, 100);
+    //   circle(this.position.x, this.position.y, size - this.animatedHeight);
+    // }
+
     // tint alpha for image
     if (alpha < 255) tint(255, alpha);
-    image(this.avatar?.image, this.position.x, this.position.y, size, size);
+    image(this.avatar?.image, pos.x, pos.y, size, size);
 
     // draw circle around champion based on allies
     stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
     strokeWeight(3);
     noFill();
-    circle(this.position.x, this.position.y, size);
+    circle(pos.x, pos.y, size);
 
     // draw direction to mouse
     let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
-    let mouseDir = p5.Vector.sub(mousePos, this.position).setMag(size / 1.75);
+    let mouseDir = p5.Vector.sub(mousePos, pos).setMag(size / 1.75);
     stroke(255, alpha);
     strokeWeight(4);
-    line(
-      this.position.x,
-      this.position.y,
-      this.position.x + mouseDir.x,
-      this.position.y + mouseDir.y
-    );
+    line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
 
     // draw health bar
     if (this !== this.game.player) {

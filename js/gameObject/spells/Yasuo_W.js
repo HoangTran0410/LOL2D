@@ -33,9 +33,9 @@ export class Yasuo_W_Object extends SpellObject {
   isMissile = false;
   position = this.owner.position.copy();
   direction = p5.Vector.random2D();
-  speed = 0.3;
+  speed = 0.5;
   size = 150;
-  width = 20;
+  width = 25;
   duration = 3750;
   timeSinceCreated = 0;
 
@@ -89,12 +89,18 @@ export class Yasuo_W_Object extends SpellObject {
 
   draw() {
     push();
-    fill(200, 200, 255, 200);
-    stroke(70, 90, 255);
-    strokeWeight(1);
+
+    let alpha = map(this.timeSinceCreated, 0, this.duration, 255, 50);
+    fill(180, 170, 255, alpha);
     translate(this.animatedPosition.x, this.animatedPosition.y);
     rotate(this.direction.heading());
-    rect(0, -this.animatedSize / 2, this.animatedWidth + random(-5, 5), this.animatedSize);
+
+    beginShape();
+    vertex(0, -this.animatedSize / 2);
+    vertex(this.animatedWidth, -this.animatedSize / 2);
+    vertex(this.animatedWidth, this.animatedSize / 2);
+    vertex(0, this.animatedSize / 2);
+    endShape(CLOSE);
     pop();
   }
 }

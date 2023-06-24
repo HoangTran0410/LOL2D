@@ -5,6 +5,9 @@ import { Quadtree, Rectangle } from './lib/quadtree.js';
 import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 
+const fps = 60;
+let accumulator = 0;
+
 export default class Game {
   constructor() {
     this.InGameHUD = new InGameHUD(this);
@@ -58,6 +61,7 @@ export default class Game {
       y: 0,
       size: 0,
     };
+    this.accumulator = 0;
   }
 
   pause() {
@@ -164,11 +168,13 @@ export default class Game {
 
     if (this.paused) return;
 
+    accumulator += Math.min(deltaTime, 250);
+
     // always update at 60 fps, no matter the frame rate
-    let _deltaTime = Math.min(deltaTime, 1000);
-    while (_deltaTime > 0) {
+    while (accumulator > 1000 / (fps + 1)) {
       this.fixedUpdate();
-      _deltaTime -= 1000 / 60;
+      accumulator -= 1000 / (fps - 1);
+      if (accumulator < 1000 / (fps - 1) - 1000 / fps) accumulator = 0;
     }
 
     this.InGameHUD.update();

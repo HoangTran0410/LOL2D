@@ -106,6 +106,7 @@ export class Lux_R_Object extends SpellObject {
           let stun = new Lux_Q_Buff(this.stunTime, this.owner, p);
           stun.image = ASSETS.Spells.lux_r;
           p.addBuff(stun);
+
           this.playersEffected.push(p);
         }
       }

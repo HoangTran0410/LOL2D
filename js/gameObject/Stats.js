@@ -8,6 +8,7 @@ export class StatsModifier {
     this.mana = new StatModifier(0);
     this.speed = new StatModifier(0);
     this.size = new StatModifier(0);
+    this.height = new StatModifier(0);
   }
 }
 
@@ -17,8 +18,9 @@ export default class Stats {
     this.health = new Stat(50);
     this.maxMana = new Stat(100);
     this.mana = new Stat(100);
-    this.speed = new Stat(2);
+    this.speed = new Stat(3);
     this.size = new Stat(50);
+    this.height = new Stat(0);
   }
 
   addModifier(modifier) {
@@ -28,6 +30,7 @@ export default class Stats {
     this.mana.addModifier(modifier.mana);
     this.speed.addModifier(modifier.speed);
     this.size.addModifier(modifier.size);
+    this.height.addModifier(modifier.height);
   }
 
   removeModifier(modifier) {
@@ -37,5 +40,6 @@ export default class Stats {
     this.mana.removeModifier(modifier.mana);
     this.speed.removeModifier(modifier.speed);
     this.size.removeModifier(modifier.size);
+    this.height.removeModifier(modifier.height);
   }
 }

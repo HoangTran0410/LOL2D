@@ -29,6 +29,9 @@ export function preload() {
     lux_q: 'assets/spells/lux_q.png',
     lux_e: 'assets/spells/lux_e.png',
     lux_r: 'assets/spells/lux_r.png',
+    yasuo_q1: 'assets/spells/yasuo_q1.png',
+    yasuo_q2: 'assets/spells/yasuo_q2.png',
+    yasuo_q3: 'assets/spells/yasuo_q3.png',
     yasuo_w: 'assets/spells/yasuo_w.png',
     flash: 'assets/spells/flash.png',
     ghost: 'assets/spells/ghost.png',
@@ -43,10 +46,10 @@ export function preload() {
 
   // Buffs
   Object.entries({
-    // TODO: add buff images
     silence: 'assets/buffs/silence.png',
     slow: 'assets/buffs/slow.png',
     root: 'assets/buffs/root.png',
+    airborne: 'assets/buffs/airborne.png',
   }).forEach(([name, path]) => {
     ASSETS.Buffs[name] = {
       image: loadImage(path),
