@@ -4,5 +4,6 @@ export { default as Heal } from './Heal.js';
 export { default as Blitzcrank_Q } from './Blitzcrank_Q.js';
 export { default as Blitzcrank_W } from './Blitzcrank_W.js';
 export { default as Blitzcrank_R } from './Blitzcrank_R.js';
+export { default as Lux_Q } from './Lux_Q.js';
 export { default as Lux_E } from './Lux_E.js';
 export { default as Lux_R } from './Lux_R.js';

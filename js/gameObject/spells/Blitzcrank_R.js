@@ -4,6 +4,7 @@ import SpellObject from '../SpellObject.js';
 import Silence from '../buffs/Silence.js';
 
 export default class Blitzcrank_R extends Spell {
+  name = 'Trường Điện Từ (Blitzcrank_R)';
   image = ASSETS.Spells.blitzcrank_r;
   description =
     'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 5 giây';

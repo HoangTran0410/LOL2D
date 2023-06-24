@@ -7,8 +7,6 @@ export default class InGameHUD {
   constructor(game) {
     this.game = game;
 
-    console.log(Object.values(AllSpells).map(spellClass => new spellClass(null)));
-
     this.initVue(game);
   }
 

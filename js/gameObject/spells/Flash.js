@@ -3,6 +3,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
 export default class Flash extends Spell {
+  name = 'Tốc Biến (Flash)';
   image = ASSETS.Spells.flash;
   description = 'Tốc biến 1 tới vị trí con trỏ, tối đa 180px khoảng cách';
   coolDown = 3000;

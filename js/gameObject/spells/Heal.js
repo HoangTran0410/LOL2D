@@ -5,6 +5,7 @@ import { StatModifier } from '../Stat.js';
 import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
 export default class Heal extends Spell {
+  name = 'Hồi Máu (Heal)';
   image = ASSETS.Spells.heal;
   description = 'Hồi phục 30% máu tối đa và tăng 50% tốc độ di chuyển trong 1s';
   coolDown = 10000;

@@ -6,6 +6,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import SpellObject from '../SpellObject.js';
 
 export default class Ghost extends Spell {
+  name = 'Tốc Hành (Ghost)';
   image = ASSETS.Spells.ghost;
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
   coolDown = 500;
@@ -40,8 +41,6 @@ export class Ghost_Buff extends Buff {
   onDeactivate() {
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
-
-  onUpdate() {}
 }
 
 export class Ghost_Buff_Object extends SpellObject {

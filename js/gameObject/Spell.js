@@ -17,8 +17,6 @@ export default class Spell {
     this.owner = owner;
     this.game = owner?.game;
     this.state = SpellState.READY;
-
-    this.onActivate();
   }
 
   update() {
@@ -67,7 +65,6 @@ export default class Spell {
   // Notes: Deactivate is never called as spell removal hasn't been added yet.
   deactivate() {
     this.resetSpellCast();
-    this.onDeactivate();
   }
 
   resetSpellCast() {
@@ -77,8 +74,6 @@ export default class Spell {
   }
 
   // for override
-  onActivate() {}
-  onDeactivate() {}
   onSpellCast() {}
   onUpdate() {}
 }

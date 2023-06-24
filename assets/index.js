@@ -26,6 +26,7 @@ export function preload() {
     blitzcrank_w: 'assets/spells/blitzcrank_w.png',
     blitzcrank_e: 'assets/spells/blitzcrank_e.png',
     blitzcrank_r: 'assets/spells/blitzcrank_r.png',
+    lux_q: 'assets/spells/lux_q.png',
     lux_e: 'assets/spells/lux_e.png',
     lux_r: 'assets/spells/lux_r.png',
     flash: 'assets/spells/flash.png',
@@ -43,6 +44,8 @@ export function preload() {
   Object.entries({
     // TODO: add buff images
     silence: 'assets/buffs/silence.png',
+    slow: 'assets/buffs/slow.png',
+    root: 'assets/buffs/root.png',
   }).forEach(([name, path]) => {
     ASSETS.Buffs[name] = {
       image: loadImage(path),

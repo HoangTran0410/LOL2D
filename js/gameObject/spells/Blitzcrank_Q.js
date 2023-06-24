@@ -3,6 +3,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
 export default class Blitzcrank_Q extends Spell {
+  name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
   image = ASSETS.Spells.blitzcrank_q;
   description =
     'Bắn bàn tay theo hướng con trỏ (max 400px), kéo kẻ địch đầu tiên trúng phải, gây sát thương và làm choáng chúng trong 0.5 giây';

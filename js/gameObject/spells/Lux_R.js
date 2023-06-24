@@ -1,14 +1,16 @@
 import ASSETS from '../../../assets/index.js';
-import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
+import { collideRotatedRectVsPoint } from '../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import { StatsModifier } from '../Stats.js';
+import RootBuff from '../buffs/Root.js';
+import { Lux_Q_Buff } from './Lux_Q.js';
+import Silence from '../buffs/Silence.js';
 
 export default class Lux_R extends Spell {
+  name = 'Cầu Vồng Tối Thượng (Lux_R)';
   image = ASSETS.Spells.lux_r;
   description =
-    'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định, rộng 100px, dài 1000px. Chưa nghĩ ra hiệu ứng áp dụng lên kẻ địch :)';
+    'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định, rộng 100px, dài 1000px. Trói chân kẻ địch trong 1 giây.';
   coolDown = 5000;
 
   onSpellCast() {
@@ -16,6 +18,7 @@ export default class Lux_R extends Spell {
     const fireTime = 400;
     const rayLength = 1000;
     const rayWidth = 50;
+    const stunTime = 1000;
 
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let dir = mouse.copy().sub(this.owner.position).normalize();
@@ -26,28 +29,15 @@ export default class Lux_R extends Spell {
     obj.rayWidth = rayWidth;
     obj.prepairTime = prepairTime;
     obj.fireTime = fireTime;
+    obj.stunTime = stunTime;
 
     this.game.objects.push(obj);
 
     // stun buff for owner
-    this.owner.addBuff(new Lux_R_Buff(prepairTime + fireTime, this.owner, this.owner));
+    this.owner.addBuff(new RootBuff(prepairTime + fireTime, this.owner, this.owner));
   }
 
   onUpdate() {}
-}
-
-export class Lux_R_Buff extends Buff {
-  buffAddType = BuffAddType.RENEW_EXISTING;
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue; // slow 100%
-  }
-  onActivate() {
-    this.targetUnit.stats.addModifier(this.statsModifier);
-  }
-  onDeactivate() {
-    this.targetUnit.stats.removeModifier(this.statsModifier);
-  }
 }
 
 export class Lux_R_Object extends SpellObject {
@@ -68,6 +58,8 @@ export class Lux_R_Object extends SpellObject {
   // fire phase
   fireTime = 400;
   timeSinceFire = 0;
+  playersEffected = [];
+  stunTime = 500;
 
   update() {
     // prepaire phase
@@ -85,6 +77,33 @@ export class Lux_R_Object extends SpellObject {
       this.timeSinceFire += deltaTime;
       if (this.timeSinceFire > this.fireTime) {
         this.toRemove = true;
+      }
+
+      // check collision ray-enemy
+      for (let p of this.game.players) {
+        if (p === this.owner) continue;
+        if (this.playersEffected.includes(p)) continue;
+
+        // get rx, ry, rw, rh, angle
+        let rx = this.owner.position.x - this.rayWidth / 2;
+        let ry = this.owner.position.y;
+        let rw = this.rayWidth + p.stats.size.value / 2;
+        let rh = this.destination.dist(this.owner.position);
+        let angle = this.destination.copy().sub(this.owner.position).heading() - HALF_PI;
+
+        // get px, py
+        let px = p.position.x;
+        let py = p.position.y;
+
+        // check collision
+        if (collideRotatedRectVsPoint(rx, ry, rw, rh, angle, px, py)) {
+          // stun and silence buff for enemy
+          let stun = new Lux_Q_Buff(this.stunTime, this.owner, p);
+          stun.image = ASSETS.Spells.lux_r;
+          p.addBuff(stun);
+          // p.addBuff(new Silence(2000, this.owner, p));
+          this.playersEffected.push(p);
+        }
       }
     }
   }

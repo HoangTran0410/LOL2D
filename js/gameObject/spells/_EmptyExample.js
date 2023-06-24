@@ -1,4 +1,5 @@
 import ASSETS from '../../../assets/index.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -9,6 +10,7 @@ export default class SpellName extends Spell {
   coolDown = 1000;
 
   onSpellCast() {}
+  onUpdate() {}
 }
 
 export class SpellName_Buff extends Buff {
@@ -20,8 +22,10 @@ export class SpellName_Buff extends Buff {
   onActivate() {}
   onDeactivate() {}
   onUpdate() {}
+  draw() {} // draw buff effect (if needed)
 }
 
+// Or create spell object, to display buff effect => other buff can reuse this object
 export class SpellName_Object extends SpellObject {
   init() {}
   update() {}

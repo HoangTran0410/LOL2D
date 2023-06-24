@@ -3,17 +3,17 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 
-// Câm lặng
-export default class Silence extends Buff {
-  image = ASSETS.Buffs.silence;
+// Trói chân
+export default class Root extends Buff {
+  image = ASSETS.Buffs.root;
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onUpdate() {
-    // apply silence every frame
-    this.targetUnit.status &= ~StatusFlags.CanCast;
+    // apply root every frame
+    this.targetUnit.status &= ~StatusFlags.CanMove;
   }
 
   onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanCast;
+    this.targetUnit.status |= StatusFlags.CanMove;
   }
 }

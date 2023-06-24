@@ -12,6 +12,7 @@ import {
   Blitzcrank_W,
   Lux_E,
   Lux_R,
+  Lux_Q,
 } from '../spells/index.js';
 
 export default class Champion {
@@ -30,9 +31,9 @@ export default class Champion {
 
       // normal spell
       new Blitzcrank_Q(this),
-      new Lux_R(this),
-      new Lux_E(this),
+      new Lux_Q(this),
       new Blitzcrank_R(this),
+      new Lux_R(this),
 
       // summoner spell
       new Flash(this),
@@ -195,6 +196,10 @@ export default class Champion {
       textAlign(CENTER, CENTER);
       textSize(13);
       text(Math.ceil(health), x, y);
+    }
+
+    for (let buff of this.buffs) {
+      buff.draw();
     }
 
     pop();
