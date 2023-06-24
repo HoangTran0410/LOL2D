@@ -8,12 +8,12 @@ export default class Lux_Q extends Spell {
   name = 'Khóa Ánh Sáng (Lux_Q)';
   image = ASSETS.Spells.lux_q;
   description =
-    'Lux phóng ra một quả cầu ánh sáng theo đường thẳng (xa 300px), trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
+    'Lux phóng ra một quả cầu ánh sáng theo đường thẳng (xa 500px), trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
   coolDown = 5000;
 
   onSpellCast() {
-    const range = 1000,
-      buffTime = 2000;
+    const range = 500,
+      stunTime = 2000;
 
     let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let direction = worldMouse.sub(this.owner.position).normalize();
@@ -21,7 +21,7 @@ export default class Lux_Q extends Spell {
 
     let obj = new Lux_Q_Object(this.owner);
     obj.destination = destination;
-    obj.buffTime = buffTime;
+    obj.stunTime = stunTime;
     obj.maxPlayersEffected = 2;
 
     this.game.objects.push(obj);
@@ -49,9 +49,9 @@ export class Lux_Q_Buff extends RootBuff {
 export class Lux_Q_Object extends SpellObject {
   playersEffected = [];
   maxPlayersEffected = 2;
-  speed = 7;
+  speed = 5;
   size = 15;
-  buffTime = 2000;
+  stunTime = 2000;
   position = this.owner.position.copy();
   destination = this.owner.position.copy();
 
@@ -72,7 +72,7 @@ export class Lux_Q_Object extends SpellObject {
 
       let distance = this.position.dist(champ.position);
       if (distance < champ.stats.size.value) {
-        champ.addBuff(new Lux_Q_Buff(this.buffTime, this.owner, champ));
+        champ.addBuff(new Lux_Q_Buff(this.stunTime, this.owner, champ));
         this.playersEffected.push(champ);
 
         if (this.playersEffected.length === this.maxPlayersEffected) {
@@ -89,6 +89,17 @@ export class Lux_Q_Object extends SpellObject {
     strokeWeight(2);
     fill(255, 150);
     circle(this.position.x, this.position.y, this.size);
+
+    // random 10 rays of light
+    stroke(255, 200);
+    strokeWeight(2);
+    for (let i = 0; i < 10; i++) {
+      let angle = random(0, 2 * PI);
+      let len = random(this.size, this.size + 10);
+      let x = this.position.x + len * cos(angle);
+      let y = this.position.y + len * sin(angle);
+      line(this.position.x, this.position.y, x, y);
+    }
     pop();
   }
 }
