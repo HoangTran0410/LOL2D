@@ -11,7 +11,9 @@ export default class InGameHUD {
   }
 
   initVue(game) {
-    this.vueInstance = Vue.createApp({
+    const { isProxy, toRaw, createApp } = Vue;
+
+    this.vueInstance = createApp({
       data() {
         return {
           avatar: '',
@@ -43,7 +45,7 @@ export default class InGameHUD {
             this.spellIndexToSwap >= 0 &&
             this.spellIndexToSwap <= this.game.player.spells.length
           ) {
-            let spellInstance = new spell.spellClass(this.game.player);
+            let spellInstance = new spell.spellClass(toRaw(this.game.player));
             this.game.player.spells[this.spellIndexToSwap] = spellInstance;
           }
           this.showSpellsPicker = false;

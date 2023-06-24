@@ -22,10 +22,9 @@ export class SpellName_Buff extends Buff {
   onActivate() {}
   onDeactivate() {}
   onUpdate() {}
-  draw() {} // draw buff effect (if needed)
+  draw() {}
 }
 
-// Or create spell object, to display buff effect => other buff can reuse this object
 export class SpellName_Object extends SpellObject {
   init() {}
   update() {}

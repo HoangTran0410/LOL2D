@@ -66,8 +66,8 @@ export class Yasuo_W_Object extends SpellObject {
     for (let obj of this.game.objects) {
       if (
         obj !== this && // check self
-        obj instanceof SpellObject &&
         obj.owner !== this.owner && // check owner
+        obj instanceof SpellObject &&
         obj.position &&
         obj.isMissile
       ) {
