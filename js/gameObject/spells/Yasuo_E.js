@@ -5,7 +5,7 @@ import Dash from '../buffs/Dash.js';
 
 export default class Yasuo_E extends Spell {
   image = ASSETS.Spells.yasuo_e;
-  naem = 'Quét Kiếm (Yasuo_E)';
+  name = 'Quét Kiếm (Yasuo_E)';
   description = 'Lướt một khoảng ngắn về hướng địch';
   coolDown = 2000;
 
