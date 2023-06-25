@@ -138,13 +138,13 @@ canvas {
 
     opacity: 0;
     transform: translateY(-90%) scaleZ(0);
-    transition: all .1s ease-out;
+    transition: all .05s ease-out;
 }
 
 .spell:hover .spell-info {
     opacity: 1;
     transform: translateY(-100%);
-    transition: all .13s ease-in;
+    transition: all .08s ease-in;
 }
 
 .spell .spell-info h4 {

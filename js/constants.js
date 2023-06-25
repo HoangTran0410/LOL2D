@@ -1,4 +1,6 @@
 export const HotKeys = {
+  A: 65,
+
   Q: 81,
   W: 87,
   E: 69,
@@ -10,7 +12,7 @@ export const HotKeys = {
 
 export const SpellHotKeys = [
   // internal spell
-  null,
+  HotKeys.A,
 
   // normal spells
   HotKeys.Q,

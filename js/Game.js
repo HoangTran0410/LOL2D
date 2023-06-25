@@ -4,6 +4,8 @@ import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
 import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
+import { hasFlag } from './utils/index.js';
+import StatusFlags from './enums/StatusFlags.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -90,6 +92,7 @@ export default class Game {
       });
       let obstacles = this.quadtree.retrieve(area).map(o => o.data);
 
+      if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
       for (let o of obstacles) {
         let response = new SAT.Response();
         let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);

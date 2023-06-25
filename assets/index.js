@@ -34,6 +34,7 @@ export function preload() {
     yasuo_q2: 'assets/spells/yasuo_q2.png',
     yasuo_q3: 'assets/spells/yasuo_q3.png',
     yasuo_w: 'assets/spells/yasuo_w.png',
+    yasuo_e: 'assets/spells/yasuo_e.png',
     yasuo_r: 'assets/spells/yasuo_r.png',
     flash: 'assets/spells/flash.png',
     ghost: 'assets/spells/ghost.png',
