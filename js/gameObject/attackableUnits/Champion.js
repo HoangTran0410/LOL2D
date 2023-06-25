@@ -15,24 +15,24 @@ export default class Champion {
     this.isAllied = true;
     this.avatar = random(Object.values(ASSETS.Champions));
 
-    // this.spells = shuffleArray(Object.values(AllSpells))
-    //   .slice(0, 7)
-    //   .map(Spell => new Spell(this));
+    this.spells = shuffleArray(Object.values(AllSpells))
+      .slice(0, 7)
+      .map(Spell => new Spell(this));
 
-    this.spells = [
-      // internal spell
-      new AllSpells.Blitzcrank_W(this),
+    // this.spells = [
+    //   // internal spell
+    //   new AllSpells.Blitzcrank_W(this),
 
-      // normal spell
-      new AllSpells.Yasuo_Q(this),
-      new AllSpells.Yasuo_W(this),
-      new AllSpells.Blitzcrank_Q(this),
-      new AllSpells.Yasuo_R(this),
+    //   // normal spell
+    //   new AllSpells.Yasuo_Q(this),
+    //   new AllSpells.Yasuo_W(this),
+    //   new AllSpells.Blitzcrank_Q(this),
+    //   new AllSpells.Yasuo_R(this),
 
-      // summoner spell
-      new AllSpells.Flash(this),
-      new AllSpells.Lux_E(this),
-    ];
+    //   // summoner spell
+    //   new AllSpells.Flash(this),
+    //   new AllSpells.Lux_E(this),
+    // ];
     this.buffs = [];
     this.stats = new Stats();
     this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
