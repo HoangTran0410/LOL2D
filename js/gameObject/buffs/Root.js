@@ -6,6 +6,7 @@ import Buff from '../Buff.js';
 // Trói chân
 export default class Root extends Buff {
   image = ASSETS.Buffs.root;
+  name = 'Trói';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 

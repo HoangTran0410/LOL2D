@@ -4,6 +4,10 @@ import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import ASSETS from '../../../assets/index.js';
 import * as AllSpells from '../spells/index.js';
+import Airborne from '../buffs/Airborne.js';
+import Root from '../buffs/Root.js';
+import Silence from '../buffs/Silence.js';
+import Dash from '../buffs/Dash.js';
 
 export default class Champion {
   static avatars = [];
@@ -184,6 +188,21 @@ export default class Champion {
     stroke(255, alpha);
     strokeWeight(4);
     line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+
+    // draw status string
+    let statusString = [Airborne, Root, Silence, Dash]
+      .map(BuffClass => {
+        return this.hasBuff(BuffClass) ? new BuffClass().name : '';
+      })
+      .filter(Boolean)
+      .join(', ');
+    if (statusString) {
+      noStroke();
+      fill(255, alpha);
+      textAlign(CENTER, CENTER);
+      textSize(13);
+      text(statusString, pos.x, pos.y - size / 2 - 15);
+    }
 
     // draw health bar
     if (this !== this.game.player) {

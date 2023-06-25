@@ -10,6 +10,7 @@ import Silence from './Silence.js';
 // Lướt
 export default class Dash extends Buff {
   image = ASSETS.Buffs.root;
+  name = 'Lướt';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 

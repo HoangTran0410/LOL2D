@@ -6,6 +6,7 @@ import Buff from '../Buff.js';
 // Câm lặng
 export default class Silence extends Buff {
   image = ASSETS.Buffs.silence;
+  name = 'Câm Lặng';
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onUpdate() {

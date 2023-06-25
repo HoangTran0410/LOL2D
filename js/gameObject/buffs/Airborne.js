@@ -7,6 +7,7 @@ import { StatsModifier } from '../Stats.js';
 // Hất tung
 export default class Airborne extends Buff {
   image = ASSETS.Buffs.airborne;
+  name = 'Hất Tung';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
   height = 20;
@@ -31,3 +32,5 @@ export default class Airborne extends Buff {
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }
+
+console.log(Airborne.name);
