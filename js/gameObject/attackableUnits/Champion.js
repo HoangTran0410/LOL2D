@@ -1,21 +1,9 @@
-import { hasFlag } from '../../utils/index.js';
+import { hasFlag, shuffleArray } from '../../utils/index.js';
 import Stats from '../Stats.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import ASSETS from '../../../assets/index.js';
-import {
-  Flash,
-  Ghost,
-  Heal,
-  Blitzcrank_R,
-  Blitzcrank_Q,
-  Blitzcrank_W,
-  Lux_E,
-  Lux_R,
-  Lux_Q,
-  Yasuo_W,
-  Yasuo_Q,
-} from '../spells/index.js';
+import * as AllSpells from '../spells/index.js';
 
 export default class Champion {
   static avatars = [];
@@ -27,19 +15,23 @@ export default class Champion {
     this.isAllied = true;
     this.avatar = random(Object.values(ASSETS.Champions));
 
+    // this.spells = shuffleArray(Object.values(AllSpells))
+    //   .slice(0, 7)
+    //   .map(Spell => new Spell(this));
+
     this.spells = [
       // internal spell
-      new Blitzcrank_W(this),
+      new AllSpells.Blitzcrank_W(this),
 
       // normal spell
-      new Blitzcrank_Q(this),
-      new Yasuo_Q(this),
-      new Blitzcrank_R(this),
-      new Lux_R(this),
+      new AllSpells.Yasuo_Q(this),
+      new AllSpells.Yasuo_W(this),
+      new AllSpells.Blitzcrank_Q(this),
+      new AllSpells.Yasuo_R(this),
 
       // summoner spell
-      new Flash(this),
-      new Ghost(this),
+      new AllSpells.Flash(this),
+      new AllSpells.Lux_E(this),
     ];
     this.buffs = [];
     this.stats = new Stats();
@@ -127,6 +119,10 @@ export default class Champion {
     }
   }
 
+  hasBuff(BuffClass) {
+    return this.buffs.some(buff => buff instanceof BuffClass);
+  }
+
   update() {
     // update buffs
     this.buffs = this.buffs.filter(buff => !buff.isToRemove);
@@ -143,7 +139,7 @@ export default class Champion {
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
-    this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.07);
+    this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
   }
 
   draw() {

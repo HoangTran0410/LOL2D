@@ -7,6 +7,7 @@ import RootBuff from '../buffs/Root.js';
 
 export default class Yasuo_Q extends Spell {
   image = ASSETS.Spells.yasuo_q1;
+  name = 'Bão Kiếm (Yasuo_Q)';
   description =
     'Đâm lưỡi kiếm về hướng chỉ định, cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu';
   coolDown = 4000;
@@ -80,6 +81,7 @@ export default class Yasuo_Q extends Spell {
       this.hitStackCount = 0;
       if (!this.currentState != this.States.Q1) this.changeState(this.States.Q1);
     }
+    this.hitStackCount = constrain(this.hitStackCount, 0, 2);
 
     // if hit once, change state to Q2
     if (this.currentState == this.States.Q1) {
@@ -189,7 +191,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     }
 
     this.size += this.sizeIncreaseSpeed;
-    this.angle += 0.1;
+    this.angle += 0.2;
 
     let distance = this.position.dist(this.destination);
     if (distance < this.speed) {

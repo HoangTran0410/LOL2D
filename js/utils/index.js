@@ -12,6 +12,15 @@ export const statusFlagsToString = (status, statusFlags) => {
   return result;
 };
 
+export const shuffleArray = array => {
+  let result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+};
+
 // RectMode: CORNER
 export const rectToVertices = (rx, ry, rw, rh, angle, anchor) => {
   let vertices = [];

@@ -1,6 +1,7 @@
 import ASSETS from '../../../assets/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import Airborne from '../buffs/Airborne.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Blitzcrank_Q extends Spell {
@@ -76,6 +77,8 @@ export class Blitzcrank_Q_Object extends SpellObject {
             this.state = this.STATE.GRAB;
             this.champToGrab = champ;
             this.destination = this.owner.position;
+
+            champ.addBuff(new Airborne(500, this.owner, champ));
             break;
           }
         }

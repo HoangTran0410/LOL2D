@@ -7,8 +7,9 @@ import { StatsModifier } from '../Stats.js';
 // Hất tung
 export default class Airborne extends Buff {
   image = ASSETS.Buffs.airborne;
-  buffAddType = BuffAddType.RENEW_EXISTING;
-  height = 30;
+  buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+  maxStacks = 10;
+  height = 20;
 
   onCreate() {
     this.statsModifier = new StatsModifier();

@@ -9,3 +9,4 @@ export { default as Lux_E } from './Lux_E.js';
 export { default as Lux_R } from './Lux_R.js';
 export { default as Yasuo_W } from './Yasuo_W.js';
 export { default as Yasuo_Q } from './Yasuo_Q.js';
+export { default as Yasuo_R } from './Yasuo_R.js';
