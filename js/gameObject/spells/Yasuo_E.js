@@ -17,12 +17,21 @@ export default class Yasuo_E extends Spell {
 
     const rangeToCheck = 230;
 
-    // find nearest enemy in range, and nearest
+    // find all enemies in range
+    let enemiesInRange = this.game.players.filter(
+      p => p != this.owner && p.position.dist(this.owner.position) < rangeToCheck
+    );
+    if (enemiesInRange.length == 0) {
+      this.currentCooldown = 0;
+      return;
+    }
+
+    // find nearest enemy to mouse
+    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let nearestEnemy = null;
     let nearestDistance = Infinity;
-    for (let p of this.game.players) {
-      if (p == this.owner) continue;
-      let d = p.position.dist(this.owner.position);
+    for (let p of enemiesInRange) {
+      let d = p.position.dist(mouse);
       if (d < nearestDistance) {
         nearestEnemy = p;
         nearestDistance = d;
@@ -30,7 +39,7 @@ export default class Yasuo_E extends Spell {
     }
 
     // if found, dash to nearest enemy
-    if (nearestEnemy && nearestDistance < rangeToCheck) {
+    if (nearestEnemy) {
       let destination = nearestEnemy.position
         .copy()
         .sub(this.owner.position)
@@ -44,11 +53,6 @@ export default class Yasuo_E extends Spell {
 
       this.owner.addBuff(buff);
       this.owner.destination.set(destination.x, destination.y);
-    }
-
-    // else, cancel cooldown
-    else {
-      this.currentCooldown = 0;
     }
   }
 }

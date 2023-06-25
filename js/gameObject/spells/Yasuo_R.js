@@ -56,6 +56,7 @@ export default class Yasuo_R extends Spell {
           // draw random lines inside enemy
           let { x, y } = enemy.position;
           let size = enemy.stats.size.value;
+          stroke(255, random(50, 200));
           for (let i = 0; i < 3; i++) {
             let x1 = x + random(-size, size);
             let y1 = y + random(-size, size);

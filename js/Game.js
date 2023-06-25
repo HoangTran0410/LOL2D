@@ -6,6 +6,8 @@ import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { hasFlag } from './utils/index.js';
 import StatusFlags from './enums/StatusFlags.js';
+import * as AllSpells from './gameObject/spells/index.js';
+import ASSETS from '../assets/index.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -25,6 +27,18 @@ export default class Game {
 
     this.player = this.players[0];
     this.player.isAllied = true;
+    this.player.avatar = ASSETS.Champions.yasuo;
+    this.player.spells = [
+      new AllSpells.Blitzcrank_Q(this.player),
+
+      new AllSpells.Yasuo_Q(this.player),
+      new AllSpells.Yasuo_W(this.player),
+      new AllSpells.Yasuo_E(this.player),
+      new AllSpells.Yasuo_R(this.player),
+
+      new AllSpells.Flash(this.player),
+      new AllSpells.Ghost(this.player),
+    ];
 
     this.camera = new Camera();
     this.camera.target = this.player.position;

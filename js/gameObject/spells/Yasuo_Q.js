@@ -41,7 +41,7 @@ export default class Yasuo_Q extends Spell {
     // Q1, Q2
     if (this.currentState == this.States.Q1 || this.currentState == this.States.Q2) {
       const stunTime = 300,
-        range = 130,
+        range = 150,
         rayWidth = 25;
 
       let obj = new Yasuo_Q_Object(this.owner);
