@@ -36,6 +36,7 @@ export function preload() {
     yasuo_w: 'assets/spells/yasuo_w.png',
     yasuo_e: 'assets/spells/yasuo_e.png',
     yasuo_r: 'assets/spells/yasuo_r.png',
+    teemo_r: 'assets/spells/teemo_r.png',
     flash: 'assets/spells/flash.png',
     ghost: 'assets/spells/ghost.png',
     heal: 'assets/spells/heal.png',

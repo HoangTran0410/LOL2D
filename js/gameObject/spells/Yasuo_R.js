@@ -56,8 +56,8 @@ export default class Yasuo_R extends Spell {
           // draw random lines inside enemy
           let { x, y } = enemy.position;
           let size = enemy.stats.size.value;
-          stroke(255, random(50, 200));
-          for (let i = 0; i < 3; i++) {
+          stroke(random(200, 255));
+          for (let i = 0; i < 1; i++) {
             let x1 = x + random(-size, size);
             let y1 = y + random(-size, size);
             let x2 = x + random(-size, size);
@@ -81,7 +81,7 @@ export default class Yasuo_R extends Spell {
       obj.oldPosition = this.owner.position.copy();
       obj.position = nearestEnemy.position.copy();
       obj.size = rangeToApplyAirborne;
-      obj.liveTime = timeToApplyAirborne;
+      obj.lifeTime = timeToApplyAirborne;
       obj.playersEffected = enemiesInRange;
       this.game.objects.push(obj);
 
@@ -111,7 +111,7 @@ export class Yasuo_R_Object extends SpellObject {
 
   position = this.owner.position.copy();
   size = 300;
-  liveTime = 2000;
+  lifeTime = 2000;
   age = 0;
 
   playersEffected = [];
@@ -120,14 +120,14 @@ export class Yasuo_R_Object extends SpellObject {
     this.oldPosition = p5.Vector.lerp(this.oldPosition, this.position, 0.1);
 
     this.age += deltaTime;
-    if (this.age > this.liveTime) {
+    if (this.age > this.lifeTime) {
       this.toRemove = true;
     }
   }
 
   draw() {
     push();
-    let alpha = map(this.age, 0, this.liveTime, 100, 0);
+    let alpha = map(this.age, 0, this.lifeTime, 100, 0);
     stroke(255, alpha);
     fill(100, 100, 200, alpha);
     circle(this.position.x, this.position.y, this.size + random(-5, 5));
@@ -143,12 +143,12 @@ export class Yasuo_R_Object extends SpellObject {
 
 export class Yasuo_R_Empty_Object extends SpellObject {
   position = this.owner.position.copy();
-  liveTime = 10;
+  lifeTime = 10;
   range = 300;
 
   update() {
-    this.liveTime -= deltaTime;
-    if (this.liveTime <= 0) {
+    this.lifeTime -= deltaTime;
+    if (this.lifeTime <= 0) {
       this.toRemove = true;
     }
   }

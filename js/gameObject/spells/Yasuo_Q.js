@@ -42,11 +42,11 @@ export default class Yasuo_Q extends Spell {
     if (this.currentState == this.States.Q1 || this.currentState == this.States.Q2) {
       const stunTime = 300,
         range = 150,
-        rayWidth = 25;
+        rayWidth = 30;
 
       let obj = new Yasuo_Q_Object(this.owner);
       obj.angle = angle;
-      obj.liveTime = stunTime;
+      obj.lifeTime = stunTime;
       obj.range = range;
       obj.rayWidth = rayWidth;
       obj.onHit = champ => {
@@ -112,7 +112,7 @@ export class Yasuo_Q_Object extends SpellObject {
   raySpeed = 30;
   currentRayLength = 0;
 
-  liveTime = 200;
+  lifeTime = 200;
   age = 0;
 
   playersEffected = [];
@@ -139,7 +139,7 @@ export class Yasuo_Q_Object extends SpellObject {
         );
 
         if (collidePolygonPoint(vertices, p.position.x, p.position.y)) {
-          let buff = new RootBuff(this.liveTime / 2, this.owner, p);
+          let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q1;
           p.addBuff(buff);
 
@@ -150,13 +150,13 @@ export class Yasuo_Q_Object extends SpellObject {
     }
 
     this.age += deltaTime;
-    if (this.age > this.liveTime) this.toRemove = true;
+    if (this.age > this.lifeTime) this.toRemove = true;
   }
 
   draw() {
     push();
     let triangleHeight = this.rayWidth / 2;
-    let alpha = map(this.age, 0, this.liveTime, 255, 50);
+    let alpha = map(this.age, 0, this.lifeTime, 255, 150);
 
     translate(this.owner.position.x, this.owner.position.y);
     rotate(this.angle);

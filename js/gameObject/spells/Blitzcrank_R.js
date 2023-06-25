@@ -35,7 +35,7 @@ export class Blitzcrank_R_Object extends SpellObject {
   size = 10;
   maxSize = 400;
   silenceTime = 3000;
-  liveTime = 1000;
+  lifeTime = 1000;
   starTime = 0;
   expantionSpeed = 15;
   position = this.owner.position.copy();
@@ -43,7 +43,7 @@ export class Blitzcrank_R_Object extends SpellObject {
 
   update() {
     this.starTime += deltaTime;
-    if (this.starTime > this.liveTime) this.toRemove = true;
+    if (this.starTime > this.lifeTime) this.toRemove = true;
 
     if (this.size < this.maxSize) this.size += this.expantionSpeed;
 
@@ -67,7 +67,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     push();
 
     // draw range circle
-    let alpha = map(this.starTime, 0, this.liveTime, 200, 0);
+    let alpha = map(this.starTime, 0, this.lifeTime, 200, 0);
     stroke(255, 50 + alpha);
     strokeWeight(2);
     fill(255, alpha);

@@ -99,7 +99,7 @@ export class Lux_E_Object extends SpellObject {
   destination = this.owner.position.copy();
 
   // static phase
-  liveTimeWhenStatic = 5000;
+  lifeTimeWhenStatic = 5000;
   timeSinceStatic = 0;
   staticSize = 100;
 
@@ -143,7 +143,7 @@ export class Lux_E_Object extends SpellObject {
 
       this.size = lerp(this.size, this.staticSize, 0.3);
 
-      if (this.timeSinceStatic > this.liveTimeWhenStatic) {
+      if (this.timeSinceStatic > this.lifeTimeWhenStatic) {
         this.phase = Lux_E_Object.PHASES.EXPLODE;
       }
     }
