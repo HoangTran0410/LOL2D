@@ -10,6 +10,9 @@ export default class Yasuo_E extends Spell {
   coolDown = 2000;
 
   onSpellCast() {
+    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    this.owner.destination.set(mouse.x, mouse.y);
+
     if (!Dash.CanDash(this.owner)) {
       this.currentCooldown = 0;
       return;
@@ -27,7 +30,6 @@ export default class Yasuo_E extends Spell {
     }
 
     // find nearest enemy to mouse
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let nearestEnemy = null;
     let nearestDistance = Infinity;
     for (let p of enemiesInRange) {
