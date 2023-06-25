@@ -139,6 +139,7 @@ canvas {
     opacity: 0;
     transform: translateY(-90%) scaleZ(0);
     transition: all .05s ease-out;
+    pointer-events: none;
 }
 
 .spell:hover .spell-info {
