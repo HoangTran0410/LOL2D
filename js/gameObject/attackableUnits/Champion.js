@@ -14,6 +14,7 @@ import {
   Lux_R,
   Lux_Q,
   Yasuo_W,
+  Yasuo_Q,
 } from '../spells/index.js';
 
 export default class Champion {
@@ -32,7 +33,7 @@ export default class Champion {
 
       // normal spell
       new Blitzcrank_Q(this),
-      new Yasuo_W(this),
+      new Yasuo_Q(this),
       new Blitzcrank_R(this),
       new Lux_R(this),
 

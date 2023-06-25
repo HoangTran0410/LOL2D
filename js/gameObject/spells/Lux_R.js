@@ -2,7 +2,6 @@ import ASSETS from '../../../assets/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
-import { Lux_Q_Buff } from './Lux_Q.js';
 import { rectToVertices, collidePolygonPoint } from '../../utils/index.js';
 
 export default class Lux_R extends Spell {
@@ -103,7 +102,7 @@ export class Lux_R_Object extends SpellObject {
         // check collision
         if (collidePolygonPoint(vertices, px, py)) {
           // stun buff for enemy
-          let stun = new Lux_Q_Buff(this.stunTime, this.owner, p);
+          let stun = new RootBuff(this.stunTime, this.owner, p);
           stun.image = ASSETS.Spells.lux_r;
           p.addBuff(stun);
 

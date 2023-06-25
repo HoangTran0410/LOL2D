@@ -6,7 +6,8 @@ import Buff from '../Buff.js';
 // Trói chân
 export default class Root extends Buff {
   image = ASSETS.Buffs.root;
-  buffAddType = BuffAddType.RENEW_EXISTING;
+  buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+  maxStacks = 10;
 
   onUpdate() {
     // apply root every frame
@@ -15,5 +16,18 @@ export default class Root extends Buff {
 
   onDeactivate() {
     this.targetUnit.status |= StatusFlags.CanMove;
+  }
+
+  draw() {
+    // draw buff on target unit
+    let pos = this.targetUnit.position;
+    let size = this.targetUnit.stats.size.value;
+
+    push();
+    noFill();
+    stroke(255, 200);
+    strokeWeight(4);
+    circle(pos.x, pos.y, size + random(-3, 3));
+    pop();
   }
 }

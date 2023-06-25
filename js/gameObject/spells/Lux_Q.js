@@ -28,28 +28,10 @@ export default class Lux_Q extends Spell {
   }
 }
 
-export class Lux_Q_Buff extends RootBuff {
-  image = ASSETS.Spells.lux_q;
-  buffAddType = BuffAddType.RENEW_EXISTING;
-
-  draw() {
-    // draw buff on target unit
-    let pos = this.targetUnit.position;
-    let size = this.targetUnit.stats.size.value;
-
-    push();
-    noFill();
-    stroke(255);
-    strokeWeight(4);
-    circle(pos.x, pos.y, size + random(-5, 10));
-    pop();
-  }
-}
-
 export class Lux_Q_Object extends SpellObject {
   playersEffected = [];
   maxPlayersEffected = 2;
-  speed = 5;
+  speed = 7;
   size = 15;
   stunTime = 2000;
   position = this.owner.position.copy();
@@ -72,9 +54,11 @@ export class Lux_Q_Object extends SpellObject {
 
       let distance = this.position.dist(champ.position);
       if (distance < champ.stats.size.value) {
-        champ.addBuff(new Lux_Q_Buff(this.stunTime, this.owner, champ));
-        this.playersEffected.push(champ);
+        let stunBuff = new RootBuff(this.stunTime, this.owner, champ);
+        stunBuff.image = ASSETS.Spells.lux_q;
+        champ.addBuff(stunBuff);
 
+        this.playersEffected.push(champ);
         if (this.playersEffected.length === this.maxPlayersEffected) {
           this.toRemove = true;
           break;

@@ -7,14 +7,16 @@ export default class Blitzcrank_R extends Spell {
   name = 'Trường Điện Từ (Blitzcrank_R)';
   image = ASSETS.Spells.blitzcrank_r;
   description =
-    'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 5 giây';
+    'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 3 giây';
   coolDown = 10000;
 
   onSpellCast() {
-    const range = 200;
+    const range = 200,
+      silenceTime = 3000;
 
     let obj = new Blitzcrank_R_Object(this.owner);
     obj.maxSize = range * 2;
+    obj.silenceTime = silenceTime;
     this.game.objects.push(obj);
 
     // let playersInRange = this.game.players.filter(
@@ -32,8 +34,10 @@ export class Blitzcrank_R_Object extends SpellObject {
   isMissile = false;
   size = 10;
   maxSize = 400;
+  silenceTime = 3000;
   liveTime = 1000;
   starTime = 0;
+  expantionSpeed = 15;
   position = this.owner.position.copy();
   playersEffected = [];
 
@@ -41,7 +45,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     this.starTime += deltaTime;
     if (this.starTime > this.liveTime) this.toRemove = true;
 
-    if (this.size < this.maxSize) this.size += 20;
+    if (this.size < this.maxSize) this.size += this.expantionSpeed;
 
     // apply silence
     let playersInRange = this.game.players.filter(
@@ -52,7 +56,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     );
 
     playersInRange.forEach(champ => {
-      let silenceBuff = new Silence(5000, this.owner, champ);
+      let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
       champ.addBuff(silenceBuff);
     });
 

@@ -2,6 +2,7 @@ const ASSETS = {
   Champions: {},
   Spells: {},
   Buffs: {},
+  Objects: {},
 };
 export default ASSETS;
 
@@ -52,6 +53,16 @@ export function preload() {
     airborne: 'assets/buffs/airborne.png',
   }).forEach(([name, path]) => {
     ASSETS.Buffs[name] = {
+      image: loadImage(path),
+      path,
+    };
+  });
+
+  // Objects
+  Object.entries({
+    yasuo_q3: 'assets/objects/yasuo_q3.png',
+  }).forEach(([name, path]) => {
+    ASSETS.Objects[name] = {
       image: loadImage(path),
       path,
     };
