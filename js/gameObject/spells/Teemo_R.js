@@ -11,7 +11,7 @@ export default class Teemo_R extends Spell {
   description =
     'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong phạm vi và gây 30 sát thương';
 
-  coolDown = 5000;
+  coolDown = 3000;
 
   onSpellCast() {
     let throwRange = 100,
@@ -155,8 +155,8 @@ export class Teemo_R_Object extends SpellObject {
       circle(this.position.x, this.position.y, this.size);
 
       // draw random circle
-      noStroke();
-      fill(114, 63, 127);
+      stroke(100);
+      fill(90, 40, 100);
       let delta = p5.Vector.random2D().mult(random(0, this.size / 2));
       let r = random(10, 20);
       circle(this.position.x + delta.x, this.position.y + delta.y, r);

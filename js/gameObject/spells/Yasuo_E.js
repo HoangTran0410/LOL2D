@@ -49,7 +49,7 @@ export default class Yasuo_E extends Spell {
         .setMag(nearestEnemy.stats.size.value / 2 + this.owner.stats.size.value / 2)
         .add(nearestEnemy.position);
 
-      let buff = new Dash(100000, this.owner, this.owner);
+      let buff = new Yasuo_E_Buff(100000, this.owner, this.owner);
       buff.buffAddType = BuffAddType.REPLACE_EXISTING;
       buff.dashDestination = destination;
       buff.dashSpeed = 8;
@@ -58,4 +58,8 @@ export default class Yasuo_E extends Spell {
       this.owner.destination.set(destination.x, destination.y);
     }
   }
+}
+
+export class Yasuo_E_Buff extends Dash {
+  image = ASSETS.Spells.yasuo_e;
 }
