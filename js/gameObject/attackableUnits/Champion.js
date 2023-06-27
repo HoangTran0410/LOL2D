@@ -127,6 +127,10 @@ export default class Champion {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
+  takeDamage(damage) {
+    this.stats.health.baseValue -= damage;
+  }
+
   update() {
     // update buffs
     this.buffs = this.buffs.filter(buff => !buff.isToRemove);
@@ -148,6 +152,8 @@ export default class Champion {
     // animation
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
     this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
+    this.animatedHealth = lerp(this.animatedHealth || 0, this.stats.health.value, 0.2);
+    this.animatedMana = lerp(this.animatedMana || 0, this.stats.mana.value, 0.2);
   }
 
   draw() {
@@ -208,12 +214,12 @@ export default class Champion {
 
     // health
     const healthContainerW = barWidth - barHeight;
-    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
+    const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
     fill('#43C41D');
     rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
     // mana
-    const manaW = map(mana, 0, maxMana, 0, barWidth - barHeight);
+    const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
     fill('#6CB3D5');
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 

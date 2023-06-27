@@ -8,7 +8,7 @@ export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   image = ASSETS.Spells.lux_r;
   description =
-    'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định, rộng 100px, dài 1000px. Trói chân kẻ địch trong 1 giây.';
+    'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định. Trói chân kẻ địch trong 1 giây. Gây 30 sát thương';
   coolDown = 10000;
   manaCost = 50;
 
@@ -40,7 +40,6 @@ export default class Lux_R extends Spell {
 }
 
 export class Lux_R_Object extends SpellObject {
-  isMissile = false;
   static PHASES = {
     PREPAIR: 0,
     FIRE: 1,
@@ -106,6 +105,7 @@ export class Lux_R_Object extends SpellObject {
           let stun = new RootBuff(this.stunTime, this.owner, p);
           stun.image = ASSETS.Spells.lux_r;
           p.addBuff(stun);
+          p.takeDamage(30);
 
           this.playersEffected.push(p);
         }

@@ -7,7 +7,7 @@ export default class Blitzcrank_R extends Spell {
   name = 'Trường Điện Từ (Blitzcrank_R)';
   image = ASSETS.Spells.blitzcrank_r;
   description =
-    'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 3 giây';
+    'Kích hoạt trường điện từ, gây sát thương lên các kẻ địch trong tầm, gây 30 sát thương và làm Câm lặng chúng trong 3 giây';
   coolDown = 10000;
   manaCost = 50;
 
@@ -59,6 +59,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     playersInRange.forEach(champ => {
       let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
       champ.addBuff(silenceBuff);
+      champ.takeDamage(30);
     });
 
     this.playersEffected.push(...playersInRange);

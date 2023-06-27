@@ -8,7 +8,7 @@ export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
   image = ASSETS.Spells.blitzcrank_q;
   description =
-    'Bắn bàn tay theo hướng con trỏ (max 400px), kéo kẻ địch đầu tiên trúng phải, gây sát thương và làm choáng chúng trong 0.5 giây';
+    'Bắn bàn tay theo hướng chỉ định, kéo kẻ địch đầu tiên trúng phải, gây 20 sát thương và làm choáng chúng trong 0.5 giây';
   coolDown = 5000;
   manaCost = 20;
 
@@ -41,6 +41,8 @@ export default class Blitzcrank_Q extends Spell {
 }
 
 export class Blitzcrank_Q_Object extends SpellObject {
+  isMissile = true;
+
   init() {
     this.range = 500;
     this.speed = 10;
@@ -80,6 +82,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
             this.destination = this.owner.position;
 
             champ.addBuff(new Airborne(500, this.owner, champ));
+            champ.takeDamage(20);
             break;
           }
         }

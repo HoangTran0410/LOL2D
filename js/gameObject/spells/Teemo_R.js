@@ -9,7 +9,7 @@ export default class Teemo_R extends Spell {
   image = ASSETS.Spells.teemo_r;
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
-    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong phạm vi 200px';
+    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong phạm vi và gây 30 sát thương';
 
   coolDown = 5000;
 
@@ -50,7 +50,6 @@ export class Teemo_R_Buff extends Buff {
 }
 
 export class Teemo_R_Object extends SpellObject {
-  isMissile = true;
   position = createVector();
   destination = createVector();
   invisibleAfter = 1000;
@@ -113,6 +112,7 @@ export class Teemo_R_Object extends SpellObject {
 
           for (let p of enemiesInRange) {
             p.addBuff(new Teemo_R_Buff(2000, this.owner, p));
+            p.takeDamage(30);
           }
 
           this.state = this.STATES.EXPLORING;

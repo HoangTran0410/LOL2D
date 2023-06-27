@@ -8,7 +8,7 @@ export default class Lux_Q extends Spell {
   name = 'Khóa Ánh Sáng (Lux_Q)';
   image = ASSETS.Spells.lux_q;
   description =
-    'Lux phóng ra một quả cầu ánh sáng theo đường thẳng (xa 500px), trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
+    'Lux phóng ra một quả cầu ánh sáng theo đường thẳng, gây 20 sát thương và trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
   coolDown = 5000;
   manaCost = 20;
 
@@ -30,6 +30,7 @@ export default class Lux_Q extends Spell {
 }
 
 export class Lux_Q_Object extends SpellObject {
+  isMissile = true;
   playersEffected = [];
   maxPlayersEffected = 2;
   speed = 7;
@@ -58,6 +59,7 @@ export class Lux_Q_Object extends SpellObject {
         let stunBuff = new RootBuff(this.stunTime, this.owner, champ);
         stunBuff.image = ASSETS.Spells.lux_q;
         champ.addBuff(stunBuff);
+        champ.takeDamage(20);
 
         this.playersEffected.push(champ);
         if (this.playersEffected.length === this.maxPlayersEffected) {

@@ -10,7 +10,7 @@ export default class Lux_E extends Spell {
   name = 'Quả Cầu Ánh Sáng (Lux_E)';
   image = ASSETS.Spells.lux_e;
   description =
-    'Phóng ra 1 xoáy ánh sáng (rộng 200px) tới vị trí chỉ định (xa tối đa 400px), làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ';
+    'Phóng ra 1 xoáy ánh sáng tới vị trí chỉ định, làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ, gây 20 sát thương';
   coolDown = 6000;
   manaCost = 20;
 
@@ -86,6 +86,7 @@ export class Lux_E_Buff extends Buff {
 }
 
 export class Lux_E_Object extends SpellObject {
+  isMissile = true;
   static PHASES = {
     MOVE: 0,
     STATIC: 1,
@@ -151,6 +152,19 @@ export class Lux_E_Object extends SpellObject {
 
     // explode phase
     else if (this.phase === Lux_E_Object.PHASES.EXPLODE) {
+      if (!this.takedDamage) {
+        this.takedDamage = true;
+
+        // apply damage to enemies in range
+        let enemiesInRange = this.game.players.filter(
+          champ => champ != this.owner && champ.position.dist(this.position) < this.staticSize / 2
+        );
+
+        enemiesInRange.forEach(champ => {
+          champ.takeDamage(20);
+        });
+      }
+
       this.exploreSize += this.explodeSpeed;
 
       this.size = lerp(this.size, this.exploreSize, 0.1);

@@ -9,7 +9,7 @@ export default class Yasuo_Q extends Spell {
   image = ASSETS.Spells.yasuo_q1;
   name = 'Bão Kiếm (Yasuo_Q)';
   description =
-    'Đâm lưỡi kiếm về hướng chỉ định, cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu';
+    'Đâm lưỡi kiếm về hướng chỉ định, gây 10 sát thương. Cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu và gây 20 sát thương';
   coolDown = 4000;
   manaCost = 20;
 
@@ -105,7 +105,6 @@ export default class Yasuo_Q extends Spell {
 }
 
 export class Yasuo_Q_Object extends SpellObject {
-  isMissile = false;
   position = this.owner.position.copy();
   angle = 0;
   range = 130;
@@ -143,6 +142,7 @@ export class Yasuo_Q_Object extends SpellObject {
           let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q1;
           p.addBuff(buff);
+          p.takeDamage(10);
 
           this.playersEffected.push(p);
           this.onHit?.(p);
@@ -211,6 +211,7 @@ export class Yasuo_Q3_Object extends SpellObject {
           let buff = new Airborne(this.airBorneTime, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q3;
           p.addBuff(buff);
+          p.takeDamage(20);
 
           this.playerEffected.push(p);
         }

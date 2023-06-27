@@ -7,7 +7,7 @@ export default class Yasuo_W extends Spell {
   image = ASSETS.Spells.yasuo_w;
   name = 'Tường Gió (Yasuo_W)';
   description =
-    'Tạo ra một bức tường gió (rộng 300px) theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';
+    'Tạo ra một bức tường gió theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';
   coolDown = 6000;
   manaCost = 20;
 
@@ -31,7 +31,6 @@ export default class Yasuo_W extends Spell {
 }
 
 export class Yasuo_W_Object extends SpellObject {
-  isMissile = false;
   position = this.owner.position.copy();
   direction = p5.Vector.random2D();
   speed = 0.5;
