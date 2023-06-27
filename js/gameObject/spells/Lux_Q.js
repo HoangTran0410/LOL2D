@@ -10,6 +10,7 @@ export default class Lux_Q extends Spell {
   description =
     'Lux phóng ra một quả cầu ánh sáng theo đường thẳng (xa 500px), trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
   coolDown = 5000;
+  manaCost = 20;
 
   onSpellCast() {
     const range = 500,

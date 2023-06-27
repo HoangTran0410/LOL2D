@@ -10,6 +10,7 @@ export default class Blitzcrank_W extends Spell {
   image = ASSETS.Spells.blitzcrank_w;
   description = 'Tăng tốc 50% trong 2s, sau đó bị giảm tốc 75% trong 3s';
   coolDown = 10000;
+  manaCost = 20;
 
   onSpellCast() {
     let speedUpEffect = new Ghost_Buff_Object(this.owner);

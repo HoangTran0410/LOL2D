@@ -11,6 +11,7 @@ export default class Yasuo_Q extends Spell {
   description =
     'Đâm lưỡi kiếm về hướng chỉ định, cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu';
   coolDown = 4000;
+  manaCost = 20;
 
   States = {
     Q1: {

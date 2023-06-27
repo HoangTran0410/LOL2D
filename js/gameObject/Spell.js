@@ -12,6 +12,8 @@ export default class Spell {
   level = 0;
   coolDown = 0;
   currentCooldown = 0;
+  manaCost = 0;
+  healthCost = 0;
 
   constructor(owner) {
     this.owner = owner;
@@ -45,6 +47,9 @@ export default class Spell {
     this.state = SpellState.COOLDOWN;
     this.currentCooldown = this.coolDown;
     this.onSpellCast();
+
+    // if (this.manaCost) this.owner.stats.mana.baseValue -= this.manaCost;
+    // if (this.healthCost) this.owner.stats.health.baseValue -= this.healthCost;
   }
   castCancelCheck() {
     let status = this.owner.status;
@@ -53,7 +58,10 @@ export default class Spell {
       hasFlag(status, StatusFlags.Silenced) ||
       hasFlag(status, StatusFlags.Stunned) ||
       hasFlag(status, StatusFlags.Charmed) ||
-      hasFlag(status, StatusFlags.Feared)
+      hasFlag(status, StatusFlags.Feared) ||
+      this.owner.stats.mana.value < this.manaCost ||
+      this.owner.stats.health.value < this.healthCost ||
+      !this.checkCastCondition()
     ) {
       this.resetSpellCast();
       return true;
@@ -74,6 +82,9 @@ export default class Spell {
   }
 
   // for override
+  checkCastCondition() {
+    return true;
+  }
   onSpellCast() {}
   onUpdate() {}
 }

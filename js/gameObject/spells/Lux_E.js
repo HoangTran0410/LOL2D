@@ -12,6 +12,7 @@ export default class Lux_E extends Spell {
   description =
     'Phóng ra 1 xoáy ánh sáng (rộng 200px) tới vị trí chỉ định (xa tối đa 400px), làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ';
   coolDown = 6000;
+  manaCost = 20;
 
   onSpellCast() {
     // first cast

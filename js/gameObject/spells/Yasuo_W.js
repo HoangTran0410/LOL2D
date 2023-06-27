@@ -9,6 +9,7 @@ export default class Yasuo_W extends Spell {
   description =
     'Tạo ra một bức tường gió (rộng 300px) theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';
   coolDown = 6000;
+  manaCost = 20;
 
   onSpellCast() {
     const size = 300,

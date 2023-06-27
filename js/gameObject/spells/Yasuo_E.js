@@ -8,6 +8,7 @@ export default class Yasuo_E extends Spell {
   name = 'Quét Kiếm (Yasuo_E)';
   description = 'Lướt một khoảng ngắn về hướng địch';
   coolDown = 2000;
+  manaCost = 30;
 
   onSpellCast() {
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);

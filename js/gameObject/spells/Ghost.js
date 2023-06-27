@@ -10,6 +10,7 @@ export default class Ghost extends Spell {
   image = ASSETS.Spells.ghost;
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
   coolDown = 2000;
+  manaCost = 100;
 
   onSpellCast() {
     let ghostBuff = new Ghost_Buff(5000, this.owner, this.owner);

@@ -127,7 +127,7 @@ export default class Game {
     }
 
     // control player
-    if (mouseIsPressed && mouseButton === RIGHT) {
+    if (mouseIsPressed) {
       let worldMouse = this.camera.screenToWorld(mouseX, mouseY);
       this.player.moveTo(worldMouse.x, worldMouse.y);
 

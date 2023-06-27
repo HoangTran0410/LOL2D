@@ -9,6 +9,7 @@ export default class Blitzcrank_R extends Spell {
   description =
     'Kích hoạt trường điện từ bán kính 200px, gây sát thương lên các kẻ địch trong tầm và làm Câm lặng chúng trong 3 giây';
   coolDown = 10000;
+  manaCost = 50;
 
   onSpellCast() {
     const range = 200,

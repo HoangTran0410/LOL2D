@@ -11,6 +11,7 @@ export default class Yasuo_R extends Spell {
   description =
     'Yasuo lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung (xa nhất 700px). Giữ chúng trên không trong 2 giây';
   coolDown = 10000;
+  manaCost = 50;
 
   onSpellCast() {
     const rangeToFindEnemies = 500,

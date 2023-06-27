@@ -10,6 +10,7 @@ export default class Lux_R extends Spell {
   description =
     'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định, rộng 100px, dài 1000px. Trói chân kẻ địch trong 1 giây.';
   coolDown = 10000;
+  manaCost = 50;
 
   onSpellCast() {
     const prepairTime = 1000,

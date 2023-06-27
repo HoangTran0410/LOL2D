@@ -9,7 +9,7 @@ export default class Teemo_R extends Spell {
   image = ASSETS.Spells.teemo_r;
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
-    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 60% các kẻ địch trong phạm vi 150px';
+    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong phạm vi 200px';
 
   coolDown = 5000;
 
@@ -17,7 +17,7 @@ export default class Teemo_R extends Spell {
     let throwRange = 100,
       invisibleAfter = 1000,
       lifeTime = 20000,
-      exploreRange = 150;
+      exploreRange = 200;
 
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     let destination = mouse.sub(this.owner.position).setMag(throwRange).add(this.owner.position);
@@ -39,7 +39,7 @@ export class Teemo_R_Buff extends Buff {
 
   onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue * 0.6; // slow 50%
+    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue * 0.7; // slow 70%
   }
   onActivate() {
     this.targetUnit.stats.addModifier(this.statsModifier);
@@ -57,7 +57,8 @@ export class Teemo_R_Object extends SpellObject {
   lifeTime = 30000;
   age = 0;
   moveSpeed = 6;
-  exploreRange = 150;
+  exploreRange = 200;
+  exploreLifeTime = 1500;
 
   size = 50;
   angle = 0;
@@ -91,37 +92,40 @@ export class Teemo_R_Object extends SpellObject {
 
     // invisible phase
     else if (this.state === this.STATES.INVISIBLE) {
-      // check collide with enemy
-      let enemyStepIn = this.game.players.find(
-        p =>
-          p != this.owner && p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2
-      );
-      if (enemyStepIn) {
-        let enemiesInRange = this.game.players.filter(
-          p =>
-            p != this.owner &&
-            p.position.dist(this.position) < this.exploreRange / 2 + p.stats.size.value / 2
-        );
-
-        for (let p of enemiesInRange) {
-          p.addBuff(new Teemo_R_Buff(2000, this.owner, p));
-        }
-
-        this.state = this.STATES.EXPLORING;
-      }
-
       // rotate and check age
       this.angle += 0.02;
       this.age += deltaTime;
       if (this.age > this.lifeTime) {
         this.toRemove = true;
       }
+
+      if (this.age > this.invisibleAfter) {
+        // check collide with enemy
+        let enemyStepIn = this.game.players.find(
+          p =>
+            p != this.owner &&
+            p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2
+        );
+        if (enemyStepIn) {
+          let enemiesInRange = this.game.players.filter(
+            p => p != this.owner && p.position.dist(this.position) < this.exploreRange / 2
+          );
+
+          for (let p of enemiesInRange) {
+            p.addBuff(new Teemo_R_Buff(2000, this.owner, p));
+          }
+
+          this.state = this.STATES.EXPLORING;
+          this.age = 0; // reset age
+          this.size = this.exploreRange;
+        }
+      }
     }
 
     // exploring phase
     else if (this.state === this.STATES.EXPLORING) {
-      this.size += 6;
-      if (this.size > this.exploreRange) {
+      this.age += deltaTime;
+      if (this.age > this.exploreLifeTime) {
         this.toRemove = true;
       }
     }
@@ -144,10 +148,18 @@ export class Teemo_R_Object extends SpellObject {
       }
       pop();
     } else if (this.state === this.STATES.EXPLORING) {
-      let alpha = map(this.size, 0, this.exploreRange, 255, 0);
+      let alpha = map(this.age, 0, this.exploreLifeTime, 255, 0);
       stroke(150, alpha + 50);
+      strokeWeight(2);
       fill(114, 63, 127, alpha);
       circle(this.position.x, this.position.y, this.size);
+
+      // draw random circle
+      noStroke();
+      fill(114, 63, 127);
+      let delta = p5.Vector.random2D().mult(random(0, this.size / 2));
+      let r = random(10, 20);
+      circle(this.position.x + delta.x, this.position.y + delta.y, r);
     }
   }
 }

@@ -67,10 +67,10 @@ export default class InGameHUD {
   update() {
     // update stats
     const { health, maxHealth, mana, maxMana } = this.game?.player?.stats || {};
-    this.vueInstance.stats.health = health?.value;
-    this.vueInstance.stats.maxHealth = maxHealth?.value;
-    this.vueInstance.stats.mana = mana?.value;
-    this.vueInstance.stats.maxMana = maxMana?.value;
+    this.vueInstance.stats.health = ~~health?.value;
+    this.vueInstance.stats.maxHealth = ~~maxHealth?.value;
+    this.vueInstance.stats.mana = ~~mana?.value;
+    this.vueInstance.stats.maxMana = ~~maxMana?.value;
 
     this.vueInstance.stats.healthPercent = Math.min(health?.value / maxHealth?.value, 1) * 100;
     this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;

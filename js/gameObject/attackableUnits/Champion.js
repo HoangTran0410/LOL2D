@@ -139,9 +139,13 @@ export default class Champion {
       spell.update();
     }
 
+    // regen health and mana
+    this.stats.update();
+
     // move
     if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
+    // animation
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
     this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
   }
@@ -155,22 +159,13 @@ export default class Champion {
     let size = this.animatedSize + this.animatedHeight;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;
-
+    let mana = this.stats.mana.value;
+    let maxMana = this.stats.maxMana.value;
     let pos = this.position.copy();
-    // let isFlying = this.animatedHeight > 0;
-    // if (isFlying) {
-    //   pos.y -= this.animatedHeight;
-    // }
 
     noStroke();
     fill(240, alpha);
     imageMode(CENTER);
-
-    // draw shadow
-    // if (isFlying) {
-    //   fill(200, 100);
-    //   circle(this.position.x, this.position.y, size - this.animatedHeight);
-    // }
 
     // tint alpha for image
     if (alpha < 255) tint(255, alpha);
@@ -178,7 +173,7 @@ export default class Champion {
 
     // draw circle around champion based on allies
     stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
-    strokeWeight(3);
+    strokeWeight(2);
     noFill();
     circle(pos.x, pos.y, size);
 
@@ -188,6 +183,50 @@ export default class Champion {
     stroke(255, alpha);
     strokeWeight(4);
     line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+
+    // draw health bar
+    let borderWidth = 3,
+      barWidth = 125,
+      barHeight = 17,
+      manaHeight = 5,
+      topleft = {
+        x: this.position.x - barWidth / 2,
+        y: this.position.y - size / 2 - barHeight - 15,
+      };
+
+    fill('#020F15');
+    stroke('#5B5C57');
+    strokeWeight(3);
+    rect(
+      topleft.x - borderWidth * 0.5,
+      topleft.y - borderWidth * 0.5,
+      barWidth + borderWidth,
+      barHeight + borderWidth
+    );
+
+    noStroke();
+
+    // health
+    const healthContainerW = barWidth - barHeight;
+    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
+    fill('#43C41D');
+    rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
+
+    // mana
+    const manaW = map(mana, 0, maxMana, 0, barWidth - barHeight);
+    fill('#6CB3D5');
+    rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
+
+    // draw buffs
+    let x = topleft.x + 10;
+    for (let buff of this.buffs) {
+      buff.draw();
+
+      if (buff.image) {
+        image(buff.image.image, x, topleft.y - 13, 20, 20);
+        x += 20;
+      }
+    }
 
     // draw status string
     let statusString = [Airborne, Root, Silence, Dash]
@@ -201,30 +240,7 @@ export default class Champion {
       fill(255, alpha);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text(statusString, pos.x, pos.y - size / 2 - 15);
-    }
-
-    // draw health bar
-    if (this !== this.game.player) {
-      let x = this.position.x,
-        y = this.position.y + size / 2 + 15,
-        w = 100,
-        h = 13;
-
-      noStroke();
-      fill(70, alpha);
-      rect(x - w / 2, y - h / 2, w, h); // background
-      fill(this.isAllied ? [0, 150, 0, 180] : [150, 0, 0, 180]);
-      rect(x - w / 2, y - h / 2, w * (health / maxHealth), h); // health
-
-      fill(255);
-      textAlign(CENTER, CENTER);
-      textSize(13);
-      text(Math.ceil(health), x, y);
-    }
-
-    for (let buff of this.buffs) {
-      buff.draw();
+      text(statusString, pos.x, topleft.y - 10);
     }
 
     pop();
