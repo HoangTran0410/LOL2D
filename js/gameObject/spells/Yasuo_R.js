@@ -48,7 +48,7 @@ export default class Yasuo_R extends Spell {
       // add airborne buff to all enemies in range
       for (let enemy of enemiesInRange) {
         let buff = new Airborne(timeToApplyAirborne, this.owner, enemy);
-        buff.buffAddType = BuffAddType.REPLACE_EXISTING;
+        buff.buffAddType = BuffAddType.RENEW_EXISTING;
         buff.draw = () => {
           push();
           strokeWeight(5);
