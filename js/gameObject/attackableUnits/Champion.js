@@ -246,7 +246,7 @@ export default class Champion {
       fill(255, alpha);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text(statusString, pos.x, topleft.y - 10);
+      text(statusString, pos.x, topleft.y + barHeight + 8);
     }
 
     pop();

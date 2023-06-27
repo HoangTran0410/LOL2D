@@ -176,6 +176,7 @@ export class Yasuo_Q_Object extends SpellObject {
 }
 
 export class Yasuo_Q3_Object extends SpellObject {
+  isMissile = true;
   position = this.owner.position.copy();
   destination = this.owner.position.copy();
   speed = 4;

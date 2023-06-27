@@ -8,16 +8,16 @@ import { Ghost_Buff_Object } from './Ghost.js';
 export default class Blitzcrank_W extends Spell {
   name = 'Tăng Tốc (Blitzcrank_W)';
   image = ASSETS.Spells.blitzcrank_w;
-  description = 'Tăng tốc 50% trong 2s, sau đó bị giảm tốc 75% trong 3s';
+  description = 'Tăng tốc 50% trong 4s, sau đó bị giảm tốc 75% trong 1s';
   coolDown = 10000;
   manaCost = 20;
 
   onSpellCast() {
     let speedUpEffect = new Ghost_Buff_Object(this.owner);
 
-    let speedupBuff = new Blitzcrank_W_Buff(2000, this.owner, this.owner);
+    let speedupBuff = new Blitzcrank_W_Buff(4000, this.owner, this.owner);
     speedupBuff.addDeactivateListener(() => {
-      let slowDownBuff = new Blitzcrank_W2_Buff(3000, this.owner, this.owner);
+      let slowDownBuff = new Blitzcrank_W2_Buff(1000, this.owner, this.owner);
       this.owner.addBuff(slowDownBuff);
 
       speedUpEffect.toRemove = true;
@@ -29,6 +29,7 @@ export default class Blitzcrank_W extends Spell {
 }
 
 export class Blitzcrank_W_Buff extends Buff {
+  image = ASSETS.Spells.blitzcrank_w;
   buffAddType = BuffAddType.STACKS_AND_OVERLAPS;
   maxStacks = 3;
 
