@@ -35,7 +35,7 @@ export default class Teemo_R extends Spell {
 
 export class Teemo_R_Buff extends Buff {
   image = ASSETS.Spells.teemo_r;
-  buffAddType = BuffAddType.REPLACE_EXISTING;
+  buffAddType = BuffAddType.RENEW_EXISTING;
 
   onCreate() {
     this.statsModifier = new StatsModifier();
