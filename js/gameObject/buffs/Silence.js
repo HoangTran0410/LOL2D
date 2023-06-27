@@ -1,3 +1,5 @@
+// https://leagueoflegends.fandom.com/wiki/Silence
+
 import ASSETS from '../../../assets/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';

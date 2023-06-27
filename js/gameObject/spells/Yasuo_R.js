@@ -86,13 +86,13 @@ export default class Yasuo_R extends Spell {
       this.game.objects.push(obj);
 
       // move owner to behind (10px) nearest enemy
-      let behindNearestEnemy = nearestEnemy.position
+      let nearEnemyPos = mouse
         .copy()
-        .sub(this.owner.position)
-        .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value)
+        .sub(nearestEnemy.position)
+        .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value / 2)
         .add(nearestEnemy.position);
 
-      this.owner.position.set(behindNearestEnemy.x, behindNearestEnemy.y);
+      this.owner.position.set(nearEnemyPos.x, nearEnemyPos.y);
     } else {
       // if no enemy is found, reset cooldown
       this.currentCooldown = 0;
