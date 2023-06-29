@@ -51,6 +51,7 @@ export default class Lux_E extends Spell {
       let playersInRange = this.game.players.filter(
         champ =>
           champ != this.owner &&
+          !champ.isDead &&
           champ.position.dist(this.luxEObject.position) < this.luxEObject.staticSize / 2
       );
 
@@ -157,7 +158,10 @@ export class Lux_E_Object extends SpellObject {
 
         // apply damage to enemies in range
         let enemiesInRange = this.game.players.filter(
-          champ => champ != this.owner && champ.position.dist(this.position) < this.staticSize / 2
+          champ =>
+            !champ.isDead &&
+            champ != this.owner &&
+            champ.position.dist(this.position) < this.staticSize / 2
         );
 
         enemiesInRange.forEach(champ => {

@@ -22,10 +22,11 @@ export default class Yasuo_R extends Spell {
 
     // query all enemies that have height > 0 in range 500px
     let enemies = this.game.players.filter(
-      player =>
-        player != this.owner &&
-        player.stats.height.value > 0 &&
-        player.position.dist(this.owner.position) < rangeToFindEnemies
+      p =>
+        !p.isDead &&
+        p != this.owner &&
+        p.stats.height.value > 0 &&
+        p.position.dist(this.owner.position) < rangeToFindEnemies
     );
 
     // find enemy that is nearest to mouse

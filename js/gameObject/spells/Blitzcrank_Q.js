@@ -73,7 +73,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     // check collision with enemy
     if (this.state == this.STATE.FORWARD) {
       for (let champ of this.game.players) {
-        if (champ != this.owner) {
+        if (champ != this.owner && !champ.isDead) {
           let distance = champ.position.dist(this.position);
           if (distance < champ.stats.size.value / 2) {
             this.state = this.STATE.GRAB;
@@ -97,6 +97,10 @@ export class Blitzcrank_Q_Object extends SpellObject {
     } else if (this.champToGrab) {
       this.dashBuff.destination = this.owner.position.copy();
       this.champToGrab.position.set(this.position.x, this.position.y);
+
+      if (this.champToGrab.isDead) {
+        this.toRemove = true;
+      }
     }
   }
 

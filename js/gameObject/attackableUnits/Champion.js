@@ -9,7 +9,6 @@ import Root from '../buffs/Root.js';
 import Silence from '../buffs/Silence.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
-import Died from '../buffs/Died.js';
 
 export default class Champion {
   static avatars = [];
@@ -20,7 +19,9 @@ export default class Champion {
     this.destination = createVector(x, y);
     this.isAllied = true;
     this.avatar = random(Object.values(ASSETS.Champions));
+
     this.score = 0;
+    this.reviveAfter = 0;
 
     this.spells = shuffleArray(Object.values(AllSpells))
       .slice(0, 7)
@@ -67,7 +68,8 @@ export default class Champion {
   }
 
   addBuff(buff) {
-    if (!buff || this.died()) return;
+    if (this.isDead || !buff) return;
+
     let preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
 
     switch (buff.buffAddType) {
@@ -132,20 +134,23 @@ export default class Champion {
   }
 
   takeDamage(damage, source) {
-    if (this.died()) return;
+    if (this.isDead) return;
 
     this.stats.health.baseValue -= damage;
     if (source && this.stats.health.baseValue <= 0) {
-      this.buffs.forEach(buff => buff.deactivateBuff());
-      this.addBuff(new Died(5000, source, this));
-
-      this.score--;
-      source.score++;
+      this.die(source);
     }
   }
 
-  died() {
-    return this.hasBuff(Died);
+  die(source) {
+    // this.buffs.forEach(buff => buff.deactivateBuff());
+    this.reviveAfter = 5000; // revive after 5 seconds
+    this.score--;
+    source.score++;
+  }
+
+  get isDead() {
+    return this.reviveAfter > 0;
   }
 
   update() {
@@ -164,13 +169,23 @@ export default class Champion {
     this.stats.update();
 
     // move
-    if (hasFlag(this.status, StatusFlags.CanMove)) this.move();
+    if (!this.isDead && hasFlag(this.status, StatusFlags.CanMove)) this.move();
 
     // animation
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
     this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
     this.animatedHealth = lerp(this.animatedHealth || 0, this.stats.health.value, 0.2);
     this.animatedMana = lerp(this.animatedMana || 0, this.stats.mana.value, 0.2);
+
+    if (this.isDead) {
+      this.reviveAfter -= deltaTime;
+
+      if (this.reviveAfter <= 0) {
+        let range = 2000;
+        this.position.add(random(-range, range), random(-range, range));
+        this.destination = this.position.copy();
+      }
+    }
   }
 
   draw() {
@@ -237,12 +252,12 @@ export default class Champion {
     // health
     const healthContainerW = barWidth - barHeight;
     const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
-    fill('#43C41D');
+    fill(this.isDead ? '#999' : '#43C41D');
     rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
     // mana
     const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
-    fill('#6CB3D5');
+    fill(this.isDead ? '#999' : '#6CB3D5');
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 
     // draw buffs
@@ -257,12 +272,28 @@ export default class Champion {
     }
 
     // draw status string
-    if (this.died()) {
+    if (this.isDead) {
       noStroke();
       fill(255);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text('ĐANG HỒI SINH...', pos.x, topleft.y + barHeight + 8);
+      text(`ĐANG HỒI SINH ${~~(this.reviveAfter / 1000)}...`, pos.x, topleft.y + barHeight + 8);
+
+      push();
+      translate(pos.x, pos.y);
+      // draw black circle
+      fill(0, 200);
+      noStroke();
+      circle(0, 0, size);
+
+      // draw X using 2 rects
+      fill(255, 0, 0, 100);
+      noStroke();
+      rotate(PI / 4);
+      rectMode(CENTER);
+      rect(0, 0, size, 15);
+      rect(0, 0, 15, size);
+      pop();
     } else {
       let statusString = [Airborne, Root, Silence, Dash, Stun]
         .map(BuffClass => {

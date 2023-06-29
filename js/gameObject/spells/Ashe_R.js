@@ -51,6 +51,7 @@ export class Ashe_R_Object extends SpellObject {
       for (let enemy of this.game.players) {
         if (
           enemy != this.owner &&
+          !enemy.isDead &&
           p5.Vector.dist(this.position, enemy.position) < enemy.stats.size.value / 2
         ) {
           this.exploring = true;

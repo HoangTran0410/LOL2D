@@ -65,6 +65,7 @@ export class Ashe_W_Object extends SpellObject {
     for (let enemy of this.game.players) {
       if (
         enemy != this.owner &&
+        !enemy.isDead &&
         this.position.dist(enemy.position) < enemy.stats.size.value / 2 + this.size / 2
       ) {
         enemy.addBuff(new Ashe_W_Buff(1500, this.owner, enemy));

@@ -238,4 +238,17 @@ export default class Game {
     //   this.player.spells[spellIndex].cast();
     // }
   }
+
+  queryObjectsInRange(position, range) {
+    return this.objects.filter(o => o.position.dist(position) < range / 2);
+  }
+
+  queryPlayerInRange(position, range, includePlayerSize = false, includeDead = false) {
+    return this.players.filter(
+      p =>
+        p !== this.player &&
+        (includeDead ? true : p.isDead === false) &&
+        p.position.dist(position) < range / 2 + (includePlayerSize ? p.stats.size.value / 2 : 0)
+    );
+  }
 }

@@ -86,8 +86,7 @@ export class Lux_R_Object extends SpellObject {
 
       // check collision ray-enemy
       for (let p of this.game.players) {
-        if (p === this.owner) continue;
-        if (this.playersEffected.includes(p)) continue;
+        if (p.isDead || p === this.owner || this.playersEffected.includes(p)) continue;
 
         // get vertices
         let dir = this.destination.copy().sub(this.owner.position).normalize();

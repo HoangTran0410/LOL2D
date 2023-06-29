@@ -103,12 +103,14 @@ export class Teemo_R_Object extends SpellObject {
         // check collide with enemy
         let enemyStepIn = this.game.players.find(
           p =>
+            !p.isDead &&
             p != this.owner &&
             p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2
         );
         if (enemyStepIn) {
           let enemiesInRange = this.game.players.filter(
-            p => p != this.owner && p.position.dist(this.position) < this.exploreRange / 2
+            p =>
+              !p.isDead && p != this.owner && p.position.dist(this.position) < this.exploreRange / 2
           );
 
           for (let p of enemiesInRange) {

@@ -125,7 +125,7 @@ export class Yasuo_Q_Object extends SpellObject {
 
     // check collide with enemy
     for (let p of this.game.players) {
-      if (p != this.owner && !this.playersEffected.includes(p)) {
+      if (!p.isDead && p != this.owner && !this.playersEffected.includes(p)) {
         let vertices = rectToVertices(
           this.owner.position.x,
           this.owner.position.y - this.rayWidth / 2 - p.stats.size.value / 2,
@@ -207,7 +207,7 @@ export class Yasuo_Q3_Object extends SpellObject {
 
     // check collide with enemy
     for (let p of this.game.players) {
-      if (p != this.owner && !this.playerEffected.includes(p)) {
+      if (!p.isDead && p != this.owner && !this.playerEffected.includes(p)) {
         if (p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2) {
           let buff = new Airborne(this.airBorneTime, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q3;

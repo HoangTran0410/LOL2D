@@ -52,7 +52,7 @@ export class Lux_Q_Object extends SpellObject {
 
     // check collision with enemy
     for (let champ of this.game.players) {
-      if (champ == this.owner || this.playersEffected.includes(champ)) continue;
+      if ((!champ.isDead && champ == this.owner) || this.playersEffected.includes(champ)) continue;
 
       let distance = this.position.dist(champ.position);
       if (distance < champ.stats.size.value) {

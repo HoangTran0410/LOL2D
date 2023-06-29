@@ -24,7 +24,7 @@ export default class Yasuo_E extends Spell {
 
     // find all enemies in range
     let enemiesInRange = this.game.players.filter(
-      p => p != this.owner && p.position.dist(this.owner.position) < rangeToCheck
+      p => !p.isDead && p != this.owner && p.position.dist(this.owner.position) < rangeToCheck
     );
     if (enemiesInRange.length == 0) {
       this.currentCooldown = 0;

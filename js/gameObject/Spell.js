@@ -54,6 +54,7 @@ export default class Spell {
   castCancelCheck() {
     let status = this.owner.status;
     if (
+      this.owner.isDead || // TODO: verify this
       !hasFlag(status, StatusFlags.CanCast) ||
       hasFlag(status, StatusFlags.Silenced) ||
       hasFlag(status, StatusFlags.Stunned) ||

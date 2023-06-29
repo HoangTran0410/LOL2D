@@ -55,6 +55,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     let playersInRange = this.game.players.filter(
       champ =>
         champ != this.owner &&
+        !champ.isDead &&
         champ.position.dist(this.position) < this.size / 2 && // in range
         !this.playersEffected.find(player => player == champ) // not effected yet
     );
