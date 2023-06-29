@@ -73,7 +73,7 @@ export default class Yasuo_R extends Spell {
           pop();
         };
         enemy.addBuff(buff);
-        enemy.takeDamage(30);
+        enemy.takeDamage(30, this.owner);
       }
 
       // add airborne buff to owner

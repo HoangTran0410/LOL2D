@@ -142,7 +142,7 @@ export class Yasuo_Q_Object extends SpellObject {
           let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q1;
           p.addBuff(buff);
-          p.takeDamage(10);
+          p.takeDamage(10, this.owner);
 
           this.playersEffected.push(p);
           this.onHit?.(p);
@@ -212,7 +212,7 @@ export class Yasuo_Q3_Object extends SpellObject {
           let buff = new Airborne(this.airBorneTime, this.owner, p);
           buff.image = ASSETS.Spells.yasuo_q3;
           p.addBuff(buff);
-          p.takeDamage(20);
+          p.takeDamage(20, this.owner);
 
           this.playerEffected.push(p);
         }

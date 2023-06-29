@@ -113,7 +113,7 @@ export class Teemo_R_Object extends SpellObject {
 
           for (let p of enemiesInRange) {
             p.addBuff(new Teemo_R_Buff(2000, this.owner, p));
-            p.takeDamage(30);
+            p.takeDamage(30, this.owner);
           }
 
           this.state = this.STATES.EXPLORING;

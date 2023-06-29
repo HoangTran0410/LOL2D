@@ -63,7 +63,7 @@ export class Blitzcrank_R_Object extends SpellObject {
       let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
       silenceBuff.image = ASSETS.Spells.blitzcrank_r;
       champ.addBuff(silenceBuff);
-      champ.takeDamage(30);
+      champ.takeDamage(30, this.owner);
     });
 
     this.playersEffected.push(...playersInRange);

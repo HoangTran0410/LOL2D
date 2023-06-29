@@ -9,6 +9,7 @@ import Root from '../buffs/Root.js';
 import Silence from '../buffs/Silence.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
+import Died from '../buffs/Died.js';
 
 export default class Champion {
   static avatars = [];
@@ -19,6 +20,7 @@ export default class Champion {
     this.destination = createVector(x, y);
     this.isAllied = true;
     this.avatar = random(Object.values(ASSETS.Champions));
+    this.score = 0;
 
     this.spells = shuffleArray(Object.values(AllSpells))
       .slice(0, 7)
@@ -65,7 +67,7 @@ export default class Champion {
   }
 
   addBuff(buff) {
-    if (!buff) return;
+    if (!buff || this.died()) return;
     let preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
 
     switch (buff.buffAddType) {
@@ -129,8 +131,21 @@ export default class Champion {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
-  takeDamage(damage) {
+  takeDamage(damage, source) {
+    if (this.died()) return;
+
     this.stats.health.baseValue -= damage;
+    if (source && this.stats.health.baseValue <= 0) {
+      this.buffs.forEach(buff => buff.deactivateBuff());
+      this.addBuff(new Died(5000, source, this));
+
+      this.score--;
+      source.score++;
+    }
+  }
+
+  died() {
+    return this.hasBuff(Died);
   }
 
   update() {
@@ -212,6 +227,11 @@ export default class Champion {
       barHeight + borderWidth
     );
 
+    // score
+    fill('#F2F2F2');
+    textSize(12);
+    text(this.score, topleft.x + 6, topleft.y + 12);
+
     noStroke();
 
     // health
@@ -237,18 +257,26 @@ export default class Champion {
     }
 
     // draw status string
-    let statusString = [Airborne, Root, Silence, Dash, Stun]
-      .map(BuffClass => {
-        return this.hasBuff(BuffClass) ? new BuffClass().name : '';
-      })
-      .filter(Boolean)
-      .join(', ');
-    if (statusString) {
+    if (this.died()) {
       noStroke();
-      fill(255, alpha);
+      fill(255);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text(statusString, pos.x, topleft.y + barHeight + 8);
+      text('ĐANG HỒI SINH...', pos.x, topleft.y + barHeight + 8);
+    } else {
+      let statusString = [Airborne, Root, Silence, Dash, Stun]
+        .map(BuffClass => {
+          return this.hasBuff(BuffClass) ? new BuffClass().name : '';
+        })
+        .filter(Boolean)
+        .join(', ');
+      if (statusString) {
+        noStroke();
+        fill(255, alpha);
+        textAlign(CENTER, CENTER);
+        textSize(13);
+        text(statusString, pos.x, topleft.y + barHeight + 8);
+      }
     }
 
     pop();

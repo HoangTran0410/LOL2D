@@ -89,7 +89,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
             this.dashBuff.cancelable = false;
             champ.addBuff(this.dashBuff);
 
-            champ.takeDamage(20);
+            champ.takeDamage(20, this.owner);
             break;
           }
         }

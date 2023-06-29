@@ -8,7 +8,7 @@ export default class Ashe_R extends Spell {
   image = ASSETS.Spells.ashe_r;
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
-    'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu trong 2.5s.';
+    'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu trong 2.5s và gây 30 sát thương.';
   coolDown = 10000;
 
   onSpellCast() {
@@ -69,6 +69,7 @@ export class Ashe_R_Object extends SpellObject {
               stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
               stunBuff.image = ASSETS.Spells.ashe_r;
               p.addBuff(stunBuff);
+              p.takeDamage(30, this.owner);
             });
         }
       }

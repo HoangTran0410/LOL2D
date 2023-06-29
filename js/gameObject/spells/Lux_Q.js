@@ -59,7 +59,7 @@ export class Lux_Q_Object extends SpellObject {
         let stunBuff = new RootBuff(this.stunTime, this.owner, champ);
         stunBuff.image = ASSETS.Spells.lux_q;
         champ.addBuff(stunBuff);
-        champ.takeDamage(20);
+        champ.takeDamage(20, this.owner);
 
         this.playersEffected.push(champ);
         if (this.playersEffected.length === this.maxPlayersEffected) {

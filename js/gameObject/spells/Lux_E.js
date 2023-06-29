@@ -161,7 +161,7 @@ export class Lux_E_Object extends SpellObject {
         );
 
         enemiesInRange.forEach(champ => {
-          champ.takeDamage(20);
+          champ.takeDamage(20, this.owner);
         });
       }
 
