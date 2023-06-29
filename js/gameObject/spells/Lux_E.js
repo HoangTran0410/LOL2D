@@ -187,7 +187,7 @@ export class Lux_E_Object extends SpellObject {
       // lighting effect
       stroke(255, 200);
       strokeWeight(3);
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 5; i++) {
         let angle = random(0, 2 * PI);
         let r = random(this.size);
         let x1 = this.position.x;
@@ -207,7 +207,7 @@ export class Lux_E_Object extends SpellObject {
       // draw lighting effect srtike from center to circle edge
       stroke(255, 200);
       strokeWeight(3);
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 10; i++) {
         let angle = random(0, 2 * PI);
         let r1 = random(this.staticSize / 2);
         let r2 = random(this.staticSize / 2);

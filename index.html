@@ -71,14 +71,18 @@
         <!-- spell picker -->
         <div v-if="showSpellsPicker" class="spell-picker">
             <p class="title">Chọn chiêu thức</p>
+            <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức" v-model="searchSpellText" />
             <div class="list">
-                <div v-for="spell of allSpells" class="spell" @click="pick(spell)">
+                <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
                     <img :src="spell.image" alt="spell" />
                     <div class="spell-info">
                         <h4>{{spell.name}}</h4>
                         <p>{{spell.description}}</p>
                         <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
                     </div>
+                </div>
+                <div v-if="filteredSpells.length === 0" class="not-found">
+                    <span>Không tìm thấy chiêu thức</span>
                 </div>
             </div>
         </div>

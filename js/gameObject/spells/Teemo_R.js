@@ -133,6 +133,7 @@ export class Teemo_R_Object extends SpellObject {
   }
 
   draw() {
+    // moving phase + invisible phase
     if (this.state === this.STATES.MOVING || this.state === this.STATES.INVISIBLE) {
       let alpha = this.state === this.STATES.INVISIBLE && this.age > this.invisibleAfter ? 50 : 255;
       push();
@@ -148,7 +149,10 @@ export class Teemo_R_Object extends SpellObject {
         circle(this.position.x + x, this.position.y + y, spot.r);
       }
       pop();
-    } else if (this.state === this.STATES.EXPLORING) {
+    }
+
+    // exploring phase
+    else if (this.state === this.STATES.EXPLORING) {
       let alpha = map(this.age, 0, this.exploreLifeTime, 255, 0);
       stroke(150, alpha + 50);
       strokeWeight(2);
@@ -157,7 +161,7 @@ export class Teemo_R_Object extends SpellObject {
 
       // draw random circle
       stroke(100);
-      fill(90, 40, 100);
+      fill(150, 100, 160);
       let delta = p5.Vector.random2D().mult(random(0, this.size / 2));
       let r = random(10, 20);
       circle(this.position.x + delta.x, this.position.y + delta.y, r);

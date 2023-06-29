@@ -33,7 +33,7 @@ export class Lux_Q_Object extends SpellObject {
   isMissile = true;
   playersEffected = [];
   maxPlayersEffected = 2;
-  speed = 7;
+  speed = 6;
   size = 15;
   stunTime = 2000;
   position = this.owner.position.copy();
@@ -71,16 +71,18 @@ export class Lux_Q_Object extends SpellObject {
   }
 
   draw() {
+    let alpha = Math.min(255, this.position.dist(this.destination));
+
     push();
-    stroke(255);
+    stroke(255, alpha);
     strokeWeight(2);
-    fill(255, 150);
+    fill(255, Math.max(50, alpha / 3));
     circle(this.position.x, this.position.y, this.size);
 
     // random 10 rays of light
-    stroke(255, 200);
+    stroke(255, alpha);
     strokeWeight(2);
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
       let angle = random(0, 2 * PI);
       let len = random(this.size, this.size + 10);
       let x = this.position.x + len * cos(angle);

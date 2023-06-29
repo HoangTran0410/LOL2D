@@ -22,6 +22,7 @@ export default class InGameHUD {
           buffs: [],
 
           game: game,
+          searchSpellText: '',
           showSpellsPicker: false,
           spellIndexToSwap: 0,
           allSpells: Object.values(AllSpells)
@@ -57,6 +58,15 @@ export default class InGameHUD {
 
           if (this.showSpellsPicker) this.game.pause();
           else this.game.unpause();
+        },
+      },
+      computed: {
+        filteredSpells() {
+          return this.allSpells.filter(
+            spell =>
+              spell.name.toLowerCase().includes(this.searchSpellText.toLowerCase()) ||
+              spell.description.toLowerCase().includes(this.searchSpellText.toLowerCase())
+          );
         },
       },
     }).mount('#InGameHUD');
