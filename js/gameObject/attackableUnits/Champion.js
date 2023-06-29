@@ -245,7 +245,7 @@ export default class Champion {
     // score
     fill('#F2F2F2');
     textSize(12);
-    text(this.score, topleft.x + 6, topleft.y + 12);
+    text(this.score, topleft.x + 3, topleft.y + 12);
 
     noStroke();
 
