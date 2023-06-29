@@ -1,4 +1,5 @@
 import ASSETS from '../../../assets/index.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 import { collidePolygonPoint, rectToVertices } from '../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -27,6 +28,8 @@ export default class Yasuo_W extends Spell {
     obj.duration = duration;
 
     this.game.objects.push(obj);
+
+    playSound(SOUNDS.yasuo_w);
   }
 }
 

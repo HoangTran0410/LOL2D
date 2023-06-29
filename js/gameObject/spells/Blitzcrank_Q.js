@@ -2,6 +2,7 @@ import ASSETS from '../../../assets/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
+import Dash from '../buffs/Dash.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Blitzcrank_Q extends Spell {
@@ -13,35 +14,33 @@ export default class Blitzcrank_Q extends Spell {
   manaCost = 20;
 
   onSpellCast() {
-    // if (this.owner == this.game.player) {
-    //   let angle = random(TWO_PI);
-    //   let num = 100;
-    //   for (let i = 0; i < num; i++) {
-    //     let pos = this.owner.position.copy().add(p5.Vector.fromAngle(angle).mult(500));
-    //     let obj = new Blitzcrank_Q_Object(this.owner);
-    //     obj.destination = pos;
-    //     this.game.objects.push(obj);
-    //     angle += TWO_PI / num;
-    //   }
-    // } else {
     this.blitObj = new Blitzcrank_Q_Object(this.owner);
     this.game.objects.push(this.blitObj);
 
     this.ownerStunBuff = new RootBuff(100000, this.owner, this.owner);
+    this.ownerStunBuff.image = ASSETS.Spells.blitzcrank_q;
     this.owner.addBuff(this.ownerStunBuff);
-    // }
   }
 
   onUpdate() {
-    if (this.blitObj && (this.blitObj?.state == this.blitObj.STATE.GRAB || this.blitObj.toRemove)) {
-      this.ownerStunBuff.deactivateBuff();
-      this.blitObj = null;
+    if (this.blitObj) {
+      if (this.blitObj.state == this.blitObj.STATE.GRAB || this.blitObj.toRemove) {
+        this.ownerStunBuff.deactivateBuff();
+      }
+
+      if (this.blitObj.toRemove) {
+        this.blitObj = null;
+      }
     }
   }
 }
 
 export class Blitzcrank_Q_Object extends SpellObject {
   isMissile = true;
+
+  airborneBuff = null;
+  dashBuff = null;
+  champToGrab = null;
 
   init() {
     this.range = 500;
@@ -81,15 +80,29 @@ export class Blitzcrank_Q_Object extends SpellObject {
             this.champToGrab = champ;
             this.destination = this.owner.position;
 
-            champ.addBuff(new Airborne(500, this.owner, champ));
+            this.airborneBuff = new Airborne(999999, this.owner, champ);
+            this.airborneBuff.image = ASSETS.Spells.blitzcrank_q;
+            champ.addBuff(this.airborneBuff);
+
+            this.dashBuff = new Dash(999999, this.owner, champ);
+            this.dashBuff.showTrail = false;
+            this.dashBuff.cancelable = false;
+            champ.addBuff(this.dashBuff);
+
             champ.takeDamage(20);
             break;
           }
         }
       }
     } else if (this.champToGrab) {
+      this.dashBuff.destination = this.owner.position.copy();
       this.champToGrab.position.set(this.position.x, this.position.y);
     }
+  }
+
+  onBeforeRemove() {
+    this.airborneBuff?.deactivateBuff?.();
+    this.dashBuff?.deactivateBuff?.();
   }
 
   draw() {

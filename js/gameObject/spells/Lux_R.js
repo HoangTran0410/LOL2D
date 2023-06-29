@@ -3,6 +3,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import { rectToVertices, collidePolygonPoint } from '../../utils/index.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
@@ -33,7 +34,11 @@ export default class Lux_R extends Spell {
     this.game.objects.push(obj);
 
     // stun buff for owner
-    this.owner.addBuff(new RootBuff(prepairTime + fireTime, this.owner, this.owner));
+    let buff = new RootBuff(prepairTime + fireTime, this.owner, this.owner);
+    buff.image = ASSETS.Spells.lux_r;
+    this.owner.addBuff(buff);
+
+    playSound(SOUNDS.lux_r1);
   }
 
   onUpdate() {}
@@ -68,6 +73,7 @@ export class Lux_R_Object extends SpellObject {
       this.timeSincePrepair += deltaTime;
       if (this.timeSincePrepair > this.prepairTime) {
         this.phase = Lux_R_Object.PHASES.FIRE;
+        playSound(SOUNDS.lux_r2);
       }
     }
 

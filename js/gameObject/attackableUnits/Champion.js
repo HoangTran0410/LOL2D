@@ -64,6 +64,7 @@ export default class Champion {
   }
 
   addBuff(buff) {
+    if (!buff) return;
     let preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
 
     switch (buff.buffAddType) {

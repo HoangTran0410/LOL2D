@@ -4,6 +4,7 @@ import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import SpellObject from '../SpellObject.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 
 export default class Ghost extends Spell {
   name = 'Tốc Hành (Ghost)';
@@ -22,6 +23,8 @@ export default class Ghost extends Spell {
     ghostBuff.addDeactivateListener(() => {
       ghostBuffObject.toRemove = true;
     });
+
+    playSound(SOUNDS.ghost);
   }
 }
 

@@ -1,4 +1,5 @@
 import ASSETS from '../../../assets/index.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Silence from '../buffs/Silence.js';
@@ -19,6 +20,8 @@ export default class Blitzcrank_R extends Spell {
     obj.maxSize = range * 2;
     obj.silenceTime = silenceTime;
     this.game.objects.push(obj);
+
+    playSound(SOUNDS.blit_r);
 
     // let playersInRange = this.game.players.filter(
     //   champ => champ != this.owner && champ.position.dist(this.owner.position) < range
@@ -58,6 +61,7 @@ export class Blitzcrank_R_Object extends SpellObject {
 
     playersInRange.forEach(champ => {
       let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
+      silenceBuff.image = ASSETS.Spells.blitzcrank_r;
       champ.addBuff(silenceBuff);
       champ.takeDamage(30);
     });

@@ -91,6 +91,7 @@ export default class Game {
   fixedUpdate() {
     this.camera.update();
 
+    this.objects.map(o => o.toRemove && o.onBeforeRemove?.());
     this.objects = this.objects.filter(o => !o.toRemove);
     for (let o of this.objects) o.update();
 
@@ -127,7 +128,7 @@ export default class Game {
     }
 
     // control player
-    if (mouseIsPressed) {
+    if (mouseIsPressed && mouseButton === RIGHT) {
       let worldMouse = this.camera.screenToWorld(mouseX, mouseY);
       this.player.moveTo(worldMouse.x, worldMouse.y);
 

@@ -14,4 +14,6 @@ export default class SpellObject {
   update() {}
 
   draw() {}
+
+  onBeforeRemove() {}
 }

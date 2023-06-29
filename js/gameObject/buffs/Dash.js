@@ -16,9 +16,11 @@ export default class Dash extends Buff {
 
   // for update
   trailsDelayFrame = 0;
+  showTrail = true;
   trails = [];
   dashSpeed = 6;
   dashDestination = null;
+  cancelable = true;
 
   static CanDash(targetUnit) {
     return hasFlag(targetUnit.status, StatusFlags.CanMove);
@@ -41,6 +43,7 @@ export default class Dash extends Buff {
 
     // cancel if target unit is have other buffs
     if (
+      this.cancelable &&
       this.targetUnit.buffs.find(
         buff =>
           buff !== this &&
@@ -67,6 +70,7 @@ export default class Dash extends Buff {
   }
 
   draw() {
+    if (!this.showTrail) return;
     push();
     // draw trails
     stroke(255, 100);

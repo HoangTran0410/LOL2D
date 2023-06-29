@@ -50,6 +50,7 @@ export class Teemo_R_Buff extends Buff {
 }
 
 export class Teemo_R_Object extends SpellObject {
+  isMissile = true;
   position = createVector();
   destination = createVector();
   invisibleAfter = 1000;

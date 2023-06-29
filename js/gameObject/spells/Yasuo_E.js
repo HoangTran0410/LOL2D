@@ -1,4 +1,5 @@
 import ASSETS from '../../../assets/index.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import Dash from '../buffs/Dash.js';
@@ -56,6 +57,8 @@ export default class Yasuo_E extends Spell {
 
       this.owner.addBuff(buff);
       this.owner.destination.set(destination.x, destination.y);
+
+      playSound(SOUNDS.dash);
     }
   }
 }

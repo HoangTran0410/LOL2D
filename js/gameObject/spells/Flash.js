@@ -1,4 +1,5 @@
 import ASSETS from '../../../assets/index.js';
+import SOUNDS, { playSound } from '../../../sounds/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
@@ -28,6 +29,8 @@ export default class Flash extends Spell {
     let oldPosEffect = new Flash_Object(this.owner);
     oldPosEffect.position = oldPos;
     this.game.objects.push(oldPosEffect);
+
+    playSound(SOUNDS.flash);
 
     // test different effect
     // let flashObject = new Flash_Object2(this.owner);
