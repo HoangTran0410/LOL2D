@@ -8,7 +8,7 @@ export default class Ashe_R extends Spell {
   image = ASSETS.Spells.ashe_r;
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
-    'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu.';
+    'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu trong 2.5s.';
   coolDown = 10000;
 
   onSpellCast() {
