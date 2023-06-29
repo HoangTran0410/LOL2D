@@ -8,7 +8,7 @@ export default class Buff {
   buffAddType = BuffAddType.REPLACE_EXISTING;
   maxStacks = 1;
   timeElapsed = 0;
-  isToRemove = false;
+  toRemove = false;
 
   _deactivateListeners = [];
   _created = false;
@@ -28,7 +28,7 @@ export default class Buff {
   }
 
   deactivateBuff() {
-    this.isToRemove = true;
+    this.toRemove = true;
     this.onDeactivate();
     for (let listener of this._deactivateListeners) {
       listener?.();
@@ -37,7 +37,7 @@ export default class Buff {
 
   renewBuff() {
     this.timeElapsed = 0;
-    this.isToRemove = false;
+    this.toRemove = false;
   }
 
   update() {

@@ -8,6 +8,7 @@ import Airborne from '../buffs/Airborne.js';
 import Root from '../buffs/Root.js';
 import Silence from '../buffs/Silence.js';
 import Dash from '../buffs/Dash.js';
+import Stun from '../buffs/Stun.js';
 
 export default class Champion {
   static avatars = [];
@@ -134,7 +135,7 @@ export default class Champion {
 
   update() {
     // update buffs
-    this.buffs = this.buffs.filter(buff => !buff.isToRemove);
+    this.buffs = this.buffs.filter(buff => !buff.toRemove);
     for (let buff of this.buffs) {
       buff.update();
     }
@@ -236,7 +237,7 @@ export default class Champion {
     }
 
     // draw status string
-    let statusString = [Airborne, Root, Silence, Dash]
+    let statusString = [Airborne, Root, Silence, Dash, Stun]
       .map(BuffClass => {
         return this.hasBuff(BuffClass) ? new BuffClass().name : '';
       })

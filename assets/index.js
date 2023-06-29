@@ -13,6 +13,11 @@ export function preload() {
     lux: 'assets/champions/lux.png',
     jinx: 'assets/champions/jinx.png',
     yasuo: 'assets/champions/yasuo.png',
+    ashe: 'assets/champions/ashe.png',
+    teemo: 'assets/champions/teemo.png',
+    ahri: 'assets/champions/ahri.png',
+    zed: 'assets/champions/zed.png',
+    leblanc: 'assets/champions/leblanc.png',
   }).forEach(([name, path]) => {
     ASSETS.Champions[name] = {
       image: loadImage(path),
@@ -22,6 +27,8 @@ export function preload() {
 
   // Spells
   Object.entries({
+    ashe_w: 'assets/spells/ashe_w.png',
+    ashe_r: 'assets/spells/ashe_r.png',
     blitzcrank_internal: 'assets/spells/blitzcrank_internal.png',
     blitzcrank_q: 'assets/spells/blitzcrank_q.png',
     blitzcrank_w: 'assets/spells/blitzcrank_w.png',
@@ -54,6 +61,7 @@ export function preload() {
     slow: 'assets/buffs/slow.png',
     root: 'assets/buffs/root.png',
     airborne: 'assets/buffs/airborne.png',
+    stun: 'assets/buffs/stun.png',
   }).forEach(([name, path]) => {
     ASSETS.Buffs[name] = {
       image: loadImage(path),

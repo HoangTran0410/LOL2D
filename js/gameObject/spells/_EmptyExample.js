@@ -6,6 +6,7 @@ import SpellObject from '../SpellObject.js';
 
 export default class SpellName extends Spell {
   image = ASSETS.Spells.spell_name;
+  name = '';
   description = 'Spell description';
   coolDown = 1000;
 

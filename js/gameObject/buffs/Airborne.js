@@ -32,5 +32,3 @@ export default class Airborne extends Buff {
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }
-
-console.log(Airborne.name);

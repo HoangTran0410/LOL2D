@@ -9,7 +9,7 @@ export default class Teemo_R extends Spell {
   image = ASSETS.Spells.teemo_r;
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
-    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong phạm vi và gây 30 sát thương';
+    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong 2s và gây 30 sát thương';
 
   coolDown = 3000;
 
