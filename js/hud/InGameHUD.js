@@ -107,9 +107,11 @@ export default class InGameHUD {
           ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
           : '';
 
-        const { image, coolDown, state, currentCooldown, name, description } = spell || {};
+        const { disabled, image, coolDown, state, currentCooldown, name, description } =
+          spell || {};
         return {
           image: image?.path,
+          disabled,
           coolDown,
           currentCooldown,
           state,

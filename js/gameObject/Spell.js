@@ -7,6 +7,7 @@ export default class Spell {
   name = this.constructor.name;
   image = null;
   description = null;
+  disabled = false;
 
   // for spell logic
   level = 0;
@@ -54,6 +55,7 @@ export default class Spell {
   castCancelCheck() {
     let status = this.owner.status;
     if (
+      this.disabled ||
       this.owner.isDead || // TODO: verify this
       !hasFlag(status, StatusFlags.CanCast) ||
       hasFlag(status, StatusFlags.Silenced) ||

@@ -24,7 +24,7 @@ export default class Blitzcrank_Q extends Spell {
 
   onUpdate() {
     if (this.blitObj) {
-      if (this.blitObj.state == this.blitObj.STATE.GRAB || this.blitObj.toRemove) {
+      if (this.blitObj.currentState == this.blitObj.STATES.GRAB || this.blitObj.toRemove) {
         this.ownerStunBuff.deactivateBuff();
       }
 
@@ -52,16 +52,16 @@ export class Blitzcrank_Q_Object extends SpellObject {
     let direction = worldMouse.sub(this.position).normalize();
     this.destination = this.position.copy().add(direction.mult(this.range));
 
-    this.STATE = {
+    this.STATES = {
       FORWARD: 'forward',
       GRAB: 'grab',
     };
-    this.state = this.STATE.FORWARD;
+    this.currentState = this.STATES.FORWARD;
   }
 
   update() {
     let distance = this.destination.dist(this.position);
-    let speed = this.state == this.STATE.FORWARD ? this.speed : this.grabSpeed;
+    let speed = this.currentState == this.STATES.FORWARD ? this.speed : this.grabSpeed;
     if (distance < speed) {
       this.position = this.destination.copy();
       this.toRemove = true;
@@ -71,12 +71,12 @@ export class Blitzcrank_Q_Object extends SpellObject {
     }
 
     // check collision with enemy
-    if (this.state == this.STATE.FORWARD) {
+    if (this.currentState == this.STATES.FORWARD) {
       for (let champ of this.game.players) {
         if (champ != this.owner && !champ.isDead) {
           let distance = champ.position.dist(this.position);
           if (distance < champ.stats.size.value / 2) {
-            this.state = this.STATE.GRAB;
+            this.currentState = this.STATES.GRAB;
             this.champToGrab = champ;
             this.destination = this.owner.position;
 

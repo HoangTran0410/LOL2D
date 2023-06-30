@@ -13,7 +13,7 @@ export default class Yasuo_Q extends Spell {
   coolDown = 4000;
   manaCost = 20;
 
-  States = {
+  STATES = {
     Q1: {
       image: ASSETS.Spells.yasuo_q1,
     },
@@ -24,7 +24,7 @@ export default class Yasuo_Q extends Spell {
       image: ASSETS.Spells.yasuo_q3,
     },
   };
-  currentState = this.States.Q1;
+  currentState = this.STATES.Q1;
   coolDownIfHit = 1000;
   hitStackCount = 0;
   lastHitTime = 0;
@@ -40,7 +40,7 @@ export default class Yasuo_Q extends Spell {
     let angle = mouse.sub(this.owner.position).heading();
 
     // Q1, Q2
-    if (this.currentState == this.States.Q1 || this.currentState == this.States.Q2) {
+    if (this.currentState == this.STATES.Q1 || this.currentState == this.STATES.Q2) {
       const stunTime = 300,
         range = 150,
         rayWidth = 30;
@@ -63,7 +63,7 @@ export default class Yasuo_Q extends Spell {
     }
 
     // Q3
-    else if (this.currentState == this.States.Q3) {
+    else if (this.currentState == this.STATES.Q3) {
       const airBorneTime = 1000,
         range = 400;
 
@@ -80,21 +80,21 @@ export default class Yasuo_Q extends Spell {
     // reset hit stack if not hit for a while
     if (this.lastHitTime + this.timeToResetHitStack < Date.now()) {
       this.hitStackCount = 0;
-      if (!this.currentState != this.States.Q1) this.changeState(this.States.Q1);
+      if (!this.currentState != this.STATES.Q1) this.changeState(this.STATES.Q1);
     }
     this.hitStackCount = constrain(this.hitStackCount, 0, 2);
 
     // if hit once, change state to Q2
-    if (this.currentState == this.States.Q1) {
+    if (this.currentState == this.STATES.Q1) {
       if (this.hitStackCount == 1) {
-        this.changeState(this.States.Q2);
+        this.changeState(this.STATES.Q2);
       }
     }
 
     // if hit twice, change state to Q3
-    else if (this.currentState == this.States.Q2) {
+    else if (this.currentState == this.STATES.Q2) {
       if (this.hitStackCount == 2) {
-        this.changeState(this.States.Q3);
+        this.changeState(this.STATES.Q3);
       }
     }
 

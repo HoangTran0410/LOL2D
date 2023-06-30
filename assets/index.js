@@ -27,6 +27,8 @@ export function preload() {
 
   // Spells
   Object.entries({
+    leblanc_w: 'assets/spells/leblanc_w.png',
+    leblanc_w2: 'assets/spells/leblanc_w2.png',
     ashe_w: 'assets/spells/ashe_w.png',
     ashe_r: 'assets/spells/ashe_r.png',
     blitzcrank_internal: 'assets/spells/blitzcrank_internal.png',

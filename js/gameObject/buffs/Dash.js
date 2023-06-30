@@ -36,6 +36,7 @@ export default class Dash extends Buff {
       this.targetUnit.position.add(dir.setMag(this.dashSpeed));
 
       if (this.targetUnit.position.dist(this.dashDestination) < this.dashSpeed) {
+        this.onReachedDestination?.();
         this.dashDestination = null;
         this.deactivateBuff();
       }
@@ -64,6 +65,8 @@ export default class Dash extends Buff {
     this.trailsDelayFrame++;
     if (this.trailsDelayFrame >= 5) this.trailsDelayFrame = 0;
   }
+
+  onReachedDestination() {}
 
   onDeactivate() {
     this.targetUnit.status &= ~StatusFlags.Ghosted;

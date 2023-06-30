@@ -75,23 +75,23 @@ export class Teemo_R_Object extends SpellObject {
     INVISIBLE: 1,
     EXPLORING: 2,
   };
-  state = this.STATES.MOVING;
+  currentState = this.STATES.MOVING;
 
   update() {
     // moving phase
-    if (this.state === this.STATES.MOVING) {
+    if (this.currentState === this.STATES.MOVING) {
       let distance = this.position.dist(this.destination);
       if (distance < this.moveSpeed) {
         this.position = this.destination.copy();
         this.isMissile = false; // yasuo W cant block this
-        this.state = this.STATES.INVISIBLE;
+        this.currentState = this.STATES.INVISIBLE;
       } else {
         this.position.add(this.destination.copy().sub(this.position).setMag(this.moveSpeed));
       }
     }
 
     // invisible phase
-    else if (this.state === this.STATES.INVISIBLE) {
+    else if (this.currentState === this.STATES.INVISIBLE) {
       // rotate and check age
       this.angle += 0.02;
       this.age += deltaTime;
@@ -118,7 +118,7 @@ export class Teemo_R_Object extends SpellObject {
             p.takeDamage(30, this.owner);
           }
 
-          this.state = this.STATES.EXPLORING;
+          this.currentState = this.STATES.EXPLORING;
           this.age = 0; // reset age
           this.size = this.exploreRange;
         }
@@ -126,7 +126,7 @@ export class Teemo_R_Object extends SpellObject {
     }
 
     // exploring phase
-    else if (this.state === this.STATES.EXPLORING) {
+    else if (this.currentState === this.STATES.EXPLORING) {
       this.age += deltaTime;
       if (this.age > this.exploreLifeTime) {
         this.toRemove = true;
@@ -136,8 +136,9 @@ export class Teemo_R_Object extends SpellObject {
 
   draw() {
     // moving phase + invisible phase
-    if (this.state === this.STATES.MOVING || this.state === this.STATES.INVISIBLE) {
-      let alpha = this.state === this.STATES.INVISIBLE && this.age > this.invisibleAfter ? 50 : 255;
+    if (this.currentState === this.STATES.MOVING || this.currentState === this.STATES.INVISIBLE) {
+      let alpha =
+        this.currentState === this.STATES.INVISIBLE && this.age > this.invisibleAfter ? 50 : 255;
       push();
       // stroke(100, alpha);
       noStroke();
@@ -154,7 +155,7 @@ export class Teemo_R_Object extends SpellObject {
     }
 
     // exploring phase
-    else if (this.state === this.STATES.EXPLORING) {
+    else if (this.currentState === this.STATES.EXPLORING) {
       let alpha = map(this.age, 0, this.exploreLifeTime, 255, 0);
       stroke(150, alpha + 50);
       strokeWeight(2);

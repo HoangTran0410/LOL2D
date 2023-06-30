@@ -31,7 +31,7 @@
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
                         @click="changeSpell(index)">
                         <img :src="spell.image" alt="spell"
-                            :style="(spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
+                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <div v-if="spell.showCoolDown">
