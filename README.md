@@ -1,45 +1,8 @@
-## PeerJS
+# Liên minh huyền thoại - 2D
 
-#### Install and Run peer server
+Test tướng Liên minh huyền thoại ngay trên trình duyệt
 
-Documents: [peerjs-client](https://peerjs.com/), [peerjs-server](https://github.com/peers/peerjs-server)
+[Chơi Ngay](https://hoangtran0410.github.io/LOL2D)
 
-```node
-npm i -g peerjs
-peerjs --port 9000 --key peerjs --allow_discovery true
-```
-
-#### Public localhost server to internet
-
-Documents: [serveo.net](http://serveo.net/) or using [localhost.run](https://localhost.run/)
-
-```node
-// example for using serveo.net
-ssh -R 80:localhost:9000 nokey@localhost.run 
-
-// optional
-// add "-o ServerAliveInterval=6000" to keep connection alive
-```
-
-#### Client
-
-index.html
-
-```html
-<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
-```
-
-main.js
-
-```js
-var peer = new Peer('', {
-  secure: true, // using https if server is public on serveo.net
-  host: 'localhost', // or serveo.net
-  port: 9000, // or 443 if using serveo.net
-  path: '/',
-});
-```
-
-#### Get list of peers-client connected to server
-
-<http://localhost:9000/get/peers>
+<!-- display screenshot -->
+![Screenshot](/assets/screenshots/Screenshot%202023-06-30%20at%2012.03.08.png)
