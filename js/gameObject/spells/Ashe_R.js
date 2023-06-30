@@ -18,7 +18,7 @@ export default class Ashe_R extends Spell {
     let obj = new Ashe_R_Object(this.owner);
     obj.position = this.owner.position.copy();
     obj.direction = direction;
-    obj.speed = 8;
+    obj.speed = 10;
 
     this.game.objects.push(obj);
   }
