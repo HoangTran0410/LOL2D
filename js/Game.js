@@ -12,6 +12,8 @@ import ASSETS from '../assets/index.js';
 const fps = 60;
 let accumulator = 0;
 
+const MAPSIZE = 5000;
+
 const ChampionPreset = {
   yasuo: {
     avatar: 'yasuo',
@@ -83,12 +85,20 @@ export default class Game {
     this.objects = [];
     this.players = [];
     for (let i = 0; i < 6; i++) {
-      let champ = new Champion(this, random(width), random(height));
+      let champ = new Champion(
+        this,
+        MAPSIZE / 2 + random(-width, width),
+        MAPSIZE / 2 + random(-height, -height)
+      );
       champ.isAllied = false;
       this.players.push(champ);
     }
 
-    this.player = new Champion(this, random(width), random(height));
+    this.player = new Champion(
+      this,
+      MAPSIZE / 2 + random(-width, width),
+      MAPSIZE / 2 + random(-height, -height)
+    );
     let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
     this.player.isAllied = true;
     this.player.avatar = ASSETS.Champions[preset.avatar];
@@ -100,19 +110,19 @@ export default class Game {
 
     // quadtree obstacle
     this.quadtree = new Quadtree({
-      x: -3000,
-      y: -3000,
-      width: 6000,
-      height: 6000,
+      x: 0,
+      y: 0,
+      width: MAPSIZE,
+      height: MAPSIZE,
       maxObjects: 10, // optional, default: 10
       maxLevels: 6, // optional, default:  4
     });
 
     this.obstacles = [];
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 100; i++) {
       let o = new Obstacle(
-        random(-3000, 3000),
-        random(-3000, 3000)
+        random(MAPSIZE),
+        random(MAPSIZE)
         // Obstacle.rectVertices(random(100, 200), random(100, 200), random(TWO_PI))
         // Obstacle.circleVertices(random(50, 100), random(10, 20))
         // Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
@@ -182,6 +192,28 @@ export default class Game {
       }
     }
 
+    // collision map edges
+    for (let p of this.players) {
+      let size = p.stats.size.value / 2;
+      if (p.position.x < size) p.position.x = size;
+      if (p.position.x > MAPSIZE - size) p.position.x = MAPSIZE - size;
+      if (p.position.y < size) p.position.y = size;
+      if (p.position.y > MAPSIZE - size) p.position.y = MAPSIZE - size;
+
+      if (p != this.player) {
+        if (
+          p.position.x < size ||
+          p.position.x > MAPSIZE - size ||
+          p.position.y < size ||
+          p.position.y > MAPSIZE - size
+        ) {
+          let x = random(MAPSIZE);
+          let y = random(MAPSIZE);
+          p.moveTo(x, y);
+        }
+      }
+    }
+
     // control player
     if (mouseIsPressed && mouseButton === RIGHT) {
       let worldMouse = this.camera.screenToWorld(mouseX, mouseY);
@@ -203,9 +235,9 @@ export default class Game {
       }
 
       // camera follow player
-      if (keyIsDown(32)) {
-        this.camera.target.set(this.player.position.x, this.player.position.y);
-      }
+      // if (keyIsDown(32)) {
+      //   this.camera.target.set(this.player.position.x, this.player.position.y);
+      // }
     }
 
     this.clickedPoint.size *= 0.9;
@@ -215,8 +247,8 @@ export default class Game {
       if (p !== this.player) {
         let distToDest = p.position.dist(p.destination);
         if (distToDest < 10) {
-          let x = random(-3000, 3000);
-          let y = random(-3000, 3000);
+          let x = random(MAPSIZE);
+          let y = random(MAPSIZE);
           p.moveTo(x, y);
         }
 
@@ -283,6 +315,14 @@ export default class Game {
     for (let p of this.players) {
       p.draw();
     }
+
+    // draw edges
+    stroke('white');
+    strokeWeight(3);
+    line(0, 0, MAPSIZE, 0);
+    line(MAPSIZE, 0, MAPSIZE, MAPSIZE);
+    line(MAPSIZE, MAPSIZE, 0, MAPSIZE);
+    line(0, MAPSIZE, 0, 0);
 
     this.camera.pop();
   }

@@ -27,6 +27,8 @@ export default class Dash extends Buff {
   }
 
   onUpdate() {
+    if (this.toRemove) return;
+
     // apply ghosted every frame
     this.targetUnit.status |= StatusFlags.Ghosted;
 

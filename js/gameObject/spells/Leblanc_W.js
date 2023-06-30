@@ -48,7 +48,7 @@ export default class Leblanc_W extends Spell {
         .copy()
         .add(direction.setMag(Math.min(distance, maxDistance)));
 
-      let dashBuff = new Leblanc_W_Buff(10000, this.owner, this.owner);
+      let dashBuff = new Leblanc_W_Buff(2000, this.owner, this.owner);
       dashBuff.dashDestination = destination;
       dashBuff.onReachedDestination = () => {
         // effect at destination

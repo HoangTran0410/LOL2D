@@ -14,7 +14,7 @@ export default class Buff {
   _created = false;
 
   constructor(duration, sourceUnit, targetUnit) {
-    this.duration = duration;
+    this.duration = duration || 0;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
   }
@@ -44,7 +44,7 @@ export default class Buff {
     this.onUpdate();
 
     this.timeElapsed += deltaTime;
-    if (this.timeElapsed >= this.duration) {
+    if (this.duration && this.timeElapsed >= this.duration) {
       this.deactivateBuff();
     }
   }
