@@ -301,11 +301,11 @@ export default class Game {
     });
   }
 
-  queryObjectsInRange(position, range) {
+  queryObjectsInRange({ position, range }) {
     return this.objects.filter(o => o.position.dist(position) < range / 2);
   }
 
-  queryPlayerInRange(position, range, includePlayerSize = false, includeDead = false) {
+  queryPlayerInRange({ position, range, includePlayerSize = false, includeDead = false }) {
     return this.players.filter(
       p =>
         p !== this.player &&

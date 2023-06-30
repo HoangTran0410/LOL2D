@@ -50,11 +50,24 @@ export default class Leblanc_W extends Spell {
 
       let dashBuff = new Leblanc_W_Buff(10000, this.owner, this.owner);
       dashBuff.dashDestination = destination;
-      // dashBuff.onReachedDestination = () => {
-      //   if (this.currentState == this.STATE.W2) {
-      //     this.currentCooldown = this.STATE.W2.coolDown;
-      //   }
-      // };
+      dashBuff.onReachedDestination = () => {
+        // effect at destination
+        let w2Obj = new Leblanc_W_Object2(this.owner);
+        w2Obj.position = destination.copy();
+        w2Obj.lifeTime = 700;
+        w2Obj.size = 200;
+        this.game.objects.push(w2Obj);
+
+        // enemy take damage
+        let enemies = this.game.queryPlayerInRange({
+          position: destination,
+          range: w2Obj.size / 2,
+          includePlayerSize: true,
+        });
+        enemies.forEach(enemy => {
+          enemy.takeDamage(20, this.owner);
+        });
+      };
 
       this.owner.destination = destination;
       this.owner.addBuff(dashBuff);
@@ -101,6 +114,10 @@ export class Leblanc_W_Object extends SpellObject {
 
   update() {
     this.age += deltaTime;
+
+    if (this.age >= this.lifeTime) {
+      this.toRemove = true;
+    }
   }
 
   draw() {
@@ -113,6 +130,19 @@ export class Leblanc_W_Object extends SpellObject {
     stroke('yellow');
     fill(180, 180, 120, alpha);
     circle(this.position.x, this.position.y, size);
+    pop();
+  }
+}
+
+export class Leblanc_W_Object2 extends Leblanc_W_Object {
+  size = 200;
+  draw() {
+    push();
+    let alpha = map(this.age, 0, this.lifeTime, 200, 0);
+
+    stroke(100, alpha + 50);
+    fill(200, 200, 50, alpha);
+    circle(this.position.x, this.position.y, this.size);
     pop();
   }
 }
