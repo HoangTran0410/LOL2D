@@ -121,7 +121,7 @@ export class Yasuo_R_Object extends SpellObject {
   playersEffected = [];
 
   update() {
-    this.oldPosition = p5.Vector.lerp(this.oldPosition, this.position, 0.1);
+    this.oldPosition = p5.Vector.lerp(this.oldPosition, this.owner.position, 0.1);
 
     this.age += deltaTime;
     if (this.age > this.lifeTime) {
