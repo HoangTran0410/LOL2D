@@ -21,6 +21,10 @@ export const shuffleArray = array => {
   return result;
 };
 
+export const removeAccents = str => {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+};
+
 // RectMode: CORNER
 export const rectToVertices = (rx, ry, rw, rh, angle, anchor) => {
   let vertices = [];

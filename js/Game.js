@@ -12,12 +12,75 @@ import ASSETS from '../assets/index.js';
 const fps = 60;
 let accumulator = 0;
 
+const ChampionPreset = {
+  yasuo: {
+    avatar: 'yasuo',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Yasuo_Q,
+      AllSpells.Yasuo_W,
+      AllSpells.Yasuo_E,
+      AllSpells.Yasuo_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
+  lux: {
+    avatar: 'lux',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Lux_Q,
+      AllSpells.Yasuo_W,
+      AllSpells.Lux_E,
+      AllSpells.Lux_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
+  blitzcrank: {
+    avatar: 'blitzcrank',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Blitzcrank_Q,
+      AllSpells.Blitzcrank_W,
+      AllSpells.Yasuo_E,
+      AllSpells.Blitzcrank_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
+  ashe: {
+    avatar: 'ashe',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Ashe_W,
+      AllSpells.Ashe_W,
+      AllSpells.Yasuo_W,
+      AllSpells.Ashe_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
+  teemo: {
+    avatar: 'teemo',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Blitzcrank_Q,
+      AllSpells.Yasuo_W,
+      AllSpells.Teemo_R,
+      AllSpells.Teemo_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
+};
+
 export default class Game {
   constructor() {
     this.InGameHUD = new InGameHUD(this);
 
+    this.kills = [];
     this.objects = [];
-
     this.players = [];
     for (let i = 0; i < 6; i++) {
       let champ = new Champion(this, random(width), random(height));
@@ -25,20 +88,12 @@ export default class Game {
       this.players.push(champ);
     }
 
-    this.player = this.players[0];
+    this.player = new Champion(this, random(width), random(height));
+    let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
     this.player.isAllied = true;
-    this.player.avatar = ASSETS.Champions.yasuo;
-    this.player.spells = [
-      new AllSpells.Blitzcrank_Q(this.player),
-
-      new AllSpells.Yasuo_Q(this.player),
-      new AllSpells.Yasuo_W(this.player),
-      new AllSpells.Yasuo_E(this.player),
-      new AllSpells.Yasuo_R(this.player),
-
-      new AllSpells.Flash(this.player),
-      new AllSpells.Ghost(this.player),
-    ];
+    this.player.avatar = ASSETS.Champions[preset.avatar];
+    this.player.spells = preset.spells.map(Spell => new Spell(this.player));
+    this.players.push(this.player);
 
     this.camera = new Camera();
     this.camera.target = this.player.position;
@@ -237,6 +292,13 @@ export default class Game {
     // if (spellIndex !== -1) {
     //   this.player.spells[spellIndex].cast();
     // }
+  }
+
+  addKill(killer, victim) {
+    this.kills.push({
+      killer,
+      victim,
+    });
   }
 
   queryObjectsInRange(position, range) {

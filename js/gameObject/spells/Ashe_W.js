@@ -8,7 +8,8 @@ import { StatsModifier } from '../Stats.js';
 export default class Ashe_W extends Spell {
   image = ASSETS.Spells.ashe_w;
   name = 'Tán Xạ Tiễn (Ashe_W)';
-  description = 'Bắn ra 10 mũi tên theo hình nón, làm chậm kẻ địch trúng chiêu đi 75% trong 1.5s';
+  description =
+    'Bắn ra 10 mũi tên theo hình nón, mỗi mũi tên gây 5 sát thương làm chậm kẻ địch trúng chiêu đi 75% trong 1.5s và ';
   coolDown = 5000;
 
   onSpellCast() {
@@ -69,6 +70,7 @@ export class Ashe_W_Object extends SpellObject {
         this.position.dist(enemy.position) < enemy.stats.size.value / 2 + this.size / 2
       ) {
         enemy.addBuff(new Ashe_W_Buff(1500, this.owner, enemy));
+        enemy.takeDamage(5, this.owner);
         this.toRemove = true;
         break;
       }

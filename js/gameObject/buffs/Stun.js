@@ -31,7 +31,7 @@ export default class Stun extends Buff {
 
     push();
     translate(pos.x, pos.y);
-    rotate(frameCount / 15);
+    rotate(-frameCount / 15);
     image(ASSETS.Buffs.stun.image, 0, 0, size, size);
     pop();
   }

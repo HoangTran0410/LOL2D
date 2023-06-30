@@ -1,6 +1,6 @@
 import { SpellHotKeys } from '../constants.js';
 import StatusFlags from '../enums/StatusFlags.js';
-import { hasFlag } from '../utils/index.js';
+import { hasFlag, removeAccents } from '../utils/index.js';
 import * as AllSpells from '../gameObject/spells/index.js';
 
 export default class InGameHUD {
@@ -59,14 +59,20 @@ export default class InGameHUD {
           if (this.showSpellsPicker) this.game.pause();
           else this.game.unpause();
         },
+        closeSpellPicker() {
+          this.showSpellsPicker = false;
+          this.game.unpause();
+        },
       },
       computed: {
         filteredSpells() {
-          return this.allSpells.filter(
-            spell =>
-              spell.name.toLowerCase().includes(this.searchSpellText.toLowerCase()) ||
-              spell.description.toLowerCase().includes(this.searchSpellText.toLowerCase())
-          );
+          return this.allSpells.filter(spell => {
+            let search = removeAccents(this.searchSpellText.toLowerCase());
+            let name = removeAccents(spell.name.toLowerCase());
+            let desc = removeAccents(spell.description.toLowerCase());
+
+            return search === '' || name.includes(search) || desc.includes(search);
+          });
         },
       },
     }).mount('#InGameHUD');
@@ -86,11 +92,11 @@ export default class InGameHUD {
     this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;
 
     // update avatar
-    const { spells = [], buffs = [], avatar, status } = this.game?.player || {};
+    const { spells = [], buffs = [], avatar, status, isDead } = this.game?.player || {};
     this.vueInstance.avatar = avatar?.path || '';
 
     // update spells
-    let canCast = hasFlag(status, StatusFlags.CanCast);
+    let canCast = hasFlag(status, StatusFlags.CanCast) && !isDead;
     this.vueInstance.spells = spells
       .filter(i => i?.image?.path)
       .map((spell, index) => {
