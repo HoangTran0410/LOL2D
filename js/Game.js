@@ -1,5 +1,6 @@
 import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
+import AIChampion from './gameObject/attackableUnits/AIChampion.js';
 import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from './lib/quadtree.js';
 import { SpellHotKeys } from './constants.js';
@@ -11,8 +12,6 @@ import ASSETS from '../assets/index.js';
 
 const fps = 60;
 let accumulator = 0;
-
-const MAPSIZE = 5000;
 
 const ChampionPreset = {
   yasuo: {
@@ -81,14 +80,15 @@ export default class Game {
   constructor() {
     this.InGameHUD = new InGameHUD(this);
 
+    this.MAPSIZE = 5000;
     this.kills = [];
     this.objects = [];
     this.players = [];
     for (let i = 0; i < 6; i++) {
-      let champ = new Champion(
+      let champ = new AIChampion(
         this,
-        MAPSIZE / 2 + random(-width, width),
-        MAPSIZE / 2 + random(-height, -height)
+        this.MAPSIZE / 2 + random(-width, width),
+        this.MAPSIZE / 2 + random(-height, -height)
       );
       champ.isAllied = false;
       this.players.push(champ);
@@ -96,8 +96,8 @@ export default class Game {
 
     this.player = new Champion(
       this,
-      MAPSIZE / 2 + random(-width, width),
-      MAPSIZE / 2 + random(-height, -height)
+      this.MAPSIZE / 2 + random(-width, width),
+      this.MAPSIZE / 2 + random(-height, -height)
     );
     let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
     this.player.isAllied = true;
@@ -112,8 +112,8 @@ export default class Game {
     this.quadtree = new Quadtree({
       x: 0,
       y: 0,
-      width: MAPSIZE,
-      height: MAPSIZE,
+      width: this.MAPSIZE,
+      height: this.MAPSIZE,
       maxObjects: 10, // optional, default: 10
       maxLevels: 6, // optional, default:  4
     });
@@ -121,8 +121,8 @@ export default class Game {
     this.obstacles = [];
     for (let i = 0; i < 100; i++) {
       let o = new Obstacle(
-        random(MAPSIZE),
-        random(MAPSIZE)
+        random(this.MAPSIZE),
+        random(this.MAPSIZE)
         // Obstacle.rectVertices(random(100, 200), random(100, 200), random(TWO_PI))
         // Obstacle.circleVertices(random(50, 100), random(10, 20))
         // Obstacle.polygonVertices(random(3, 10), random(70, 100), random(70, 100))
@@ -184,9 +184,7 @@ export default class Game {
           p.position.add(overlap);
 
           if (p != this.player) {
-            let x = random(-3000, 3000);
-            let y = random(-3000, 3000);
-            p.moveTo(x, y);
+            p.moveToRandomLocation();
           }
         }
       }
@@ -196,20 +194,18 @@ export default class Game {
     for (let p of this.players) {
       let size = p.stats.size.value / 2;
       if (p.position.x < size) p.position.x = size;
-      if (p.position.x > MAPSIZE - size) p.position.x = MAPSIZE - size;
+      if (p.position.x > this.MAPSIZE - size) p.position.x = this.MAPSIZE - size;
       if (p.position.y < size) p.position.y = size;
-      if (p.position.y > MAPSIZE - size) p.position.y = MAPSIZE - size;
+      if (p.position.y > this.MAPSIZE - size) p.position.y = this.MAPSIZE - size;
 
       if (p != this.player) {
         if (
           p.position.x < size ||
-          p.position.x > MAPSIZE - size ||
+          p.position.x > this.MAPSIZE - size ||
           p.position.y < size ||
-          p.position.y > MAPSIZE - size
+          p.position.y > this.MAPSIZE - size
         ) {
-          let x = random(MAPSIZE);
-          let y = random(MAPSIZE);
-          p.moveTo(x, y);
+          p.moveToRandomLocation();
         }
       }
     }
@@ -241,24 +237,6 @@ export default class Game {
     }
 
     this.clickedPoint.size *= 0.9;
-
-    // fake ai
-    for (let p of this.players) {
-      if (p !== this.player) {
-        let distToDest = p.position.dist(p.destination);
-        if (distToDest < 10) {
-          let x = random(MAPSIZE);
-          let y = random(MAPSIZE);
-          p.moveTo(x, y);
-        }
-
-        // random spell cast
-        if (random() < 0.1) {
-          let spellIndex = floor(random(p.spells.length));
-          p.spells[spellIndex].cast();
-        }
-      }
-    }
   }
 
   update() {
@@ -319,10 +297,10 @@ export default class Game {
     // draw edges
     stroke('white');
     strokeWeight(3);
-    line(0, 0, MAPSIZE, 0);
-    line(MAPSIZE, 0, MAPSIZE, MAPSIZE);
-    line(MAPSIZE, MAPSIZE, 0, MAPSIZE);
-    line(0, MAPSIZE, 0, 0);
+    line(0, 0, this.MAPSIZE, 0);
+    line(this.MAPSIZE, 0, this.MAPSIZE, this.MAPSIZE);
+    line(this.MAPSIZE, this.MAPSIZE, 0, this.MAPSIZE);
+    line(0, this.MAPSIZE, 0, 0);
 
     this.camera.pop();
   }

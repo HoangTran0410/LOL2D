@@ -71,7 +71,7 @@ export class Lux_Q_Object extends SpellObject {
   }
 
   draw() {
-    let alpha = Math.min(255, this.position.dist(this.destination));
+    let alpha = Math.min(255, this.position.dist(this.destination) + 50);
 
     push();
     stroke(255, alpha);

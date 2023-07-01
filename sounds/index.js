@@ -15,7 +15,7 @@ const SOUNDS = {
 };
 
 export const playSound = sound => {
-  zzfx(...sound);
+  // zzfx(...sound);
 };
 
 export default SOUNDS;

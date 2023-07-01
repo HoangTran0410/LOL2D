@@ -10,7 +10,7 @@ export default class Ghost extends Spell {
   name = 'Tốc Hành (Ghost)';
   image = ASSETS.Spells.ghost;
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
-  coolDown = 2000;
+  coolDown = 7000;
   manaCost = 100;
 
   onSpellCast() {

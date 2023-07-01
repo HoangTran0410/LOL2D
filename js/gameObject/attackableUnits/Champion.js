@@ -144,7 +144,7 @@ export default class Champion {
 
   die(source) {
     // this.buffs.forEach(buff => buff.deactivateBuff());
-    this.reviveAfter = 5000; // revive after 5 seconds
+    this.reviveAfter = 3000;
     this.score--;
     source.score++;
   }
@@ -181,8 +181,7 @@ export default class Champion {
       this.reviveAfter -= deltaTime;
 
       if (this.reviveAfter <= 0) {
-        let range = 2000;
-        this.position.add(random(-range, range), random(-range, range));
+        this.position.set(random(this.game.MAPSIZE), random(this.game.MAPSIZE));
         this.destination = this.position.copy();
       }
     }

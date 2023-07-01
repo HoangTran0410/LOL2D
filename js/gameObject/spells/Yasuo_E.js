@@ -7,7 +7,7 @@ import Dash from '../buffs/Dash.js';
 export default class Yasuo_E extends Spell {
   image = ASSETS.Spells.yasuo_e;
   name = 'Quét Kiếm (Yasuo_E)';
-  description = 'Lướt một khoảng ngắn về hướng địch trong tầm';
+  description = 'Lướt một khoảng ngắn về hướng địch trong tầm. Gây 10 sát thương';
   coolDown = 2000;
   manaCost = 30;
 
@@ -57,6 +57,8 @@ export default class Yasuo_E extends Spell {
 
       this.owner.addBuff(buff);
       this.owner.destination.set(destination.x, destination.y);
+
+      nearestEnemy.takeDamage(10, this.owner);
 
       playSound(SOUNDS.dash);
     }

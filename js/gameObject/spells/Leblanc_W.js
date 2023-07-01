@@ -1,45 +1,43 @@
 import ASSETS from '../../../assets/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
+import SpellState from '../../enums/SpellState.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 
 export default class Leblanc_W extends Spell {
-  STATE = {
+  PHASES = {
     W1: {
       image: ASSETS.Spells.leblanc_w,
-      coolDown: 5000,
     },
     W2: {
       image: ASSETS.Spells.leblanc_w2,
-      coolDown: 1000,
     },
   };
-  currentState = this.STATE.W1;
+  phase = this.PHASES.W1;
 
-  image = this.currentState.image;
+  image = this.phase.image;
   name = 'Biến Ảnh (Leblanc_W)';
   description =
     'Phóng 1 khoảng cách theo hướng chỉ định, gây 20 sát thương, để lại 1 dị điểm tồn tại 3s tại ví trí cũ. Tái dùng chiêu sẽ dịch chuyển bạn về dị điểm.';
-  coolDown = this.STATE.W2.coolDown;
+  coolDown = 5000;
 
-  timeSinceW1 = 0;
   w1Object = null;
+  w1LifeTime = 3000;
+  waitTimeBeforeRecast = 1000;
 
-  setCurrentState(state) {
-    this.currentState = state;
-    this.image = state.image;
-    this.currentCooldown = state.coolDown;
-    this.coolDown = Math.max(this.coolDown, state.coolDown);
+  swtichPhase(phase, coolDown) {
+    this.phase = phase;
+    this.image = phase.image;
+    this.currentCooldown = coolDown;
 
-    if (state == this.STATE.W1) {
-      this.timeSinceW1 = 0;
+    if (coolDown > 0) {
+      this.state = SpellState.COOLDOWN;
     }
   }
 
   onSpellCast() {
-    if (this.currentState == this.STATE.W1) {
+    if (this.phase == this.PHASES.W1) {
       let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
       let direction = mouse.copy().sub(this.owner.position);
       let distance = direction.mag();
@@ -48,6 +46,7 @@ export default class Leblanc_W extends Spell {
         .copy()
         .add(direction.setMag(Math.min(distance, maxDistance)));
 
+      // dash owner to destination
       let dashBuff = new Leblanc_W_Buff(2000, this.owner, this.owner);
       dashBuff.dashDestination = destination;
       dashBuff.onReachedDestination = () => {
@@ -74,27 +73,27 @@ export default class Leblanc_W extends Spell {
 
       this.w1Object = new Leblanc_W_Object(this.owner);
       this.w1Object.position = this.owner.position.copy();
-      this.w1Object.lifeTime = this.STATE.W1.coolDown;
+      this.w1Object.lifeTime = this.w1LifeTime;
       this.game.objects.push(this.w1Object);
 
-      this.setCurrentState(this.STATE.W2);
+      // switch to phase 2
+      this.swtichPhase(this.PHASES.W2, this.waitTimeBeforeRecast);
     } else {
       if (this.w1Object) {
         this.owner.position.set(this.w1Object.position.x, this.w1Object.position.y);
         this.w1Object.toRemove = true;
       }
 
-      this.setCurrentState(this.STATE.W1);
+      // swith to phase 1
+      this.swtichPhase(this.PHASES.W1, this.coolDown);
     }
   }
 
   onUpdate() {
-    if (this.currentState == this.STATE.W2) {
-      this.timeSinceW1 += deltaTime;
-      if (this.timeSinceW1 >= this.STATE.W1.coolDown) {
-        if (this.w1Object) this.w1Object.toRemove = true;
-        this.setCurrentState(this.STATE.W1);
-        this.currentCooldown = 0;
+    if (this.phase == this.PHASES.W2) {
+      if (this.w1Object?.toRemove) {
+        // switch to phase 1
+        this.swtichPhase(this.PHASES.W1, this.coolDown);
       }
     }
   }
