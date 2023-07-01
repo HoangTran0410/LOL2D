@@ -1,6 +1,5 @@
 import AssetManager from '../managers/AssetManager.js';
 import { Scene } from '../managers/SceneManager.js';
-import MenuScene from './MenuScene.js';
 
 export default class LoadingScene extends Scene {
   setup() {
@@ -29,13 +28,20 @@ export default class LoadingScene extends Scene {
 
       // success
       () => {
-        this.sceneManager.showScene(MenuScene);
+        this.loadingText.innerHTML = '99%<br/>Đang khởi tạo game...';
+        import('./MenuScene.js')
+          .then(({ default: MenuScene }) => this.sceneManager.showScene(MenuScene))
+          .catch(error => {
+            console.error(error);
+            this.errorText.innerHTML =
+              'LỖI: Khởi tạo game không thành công. Vui lòng tải lại trang.<br/>' + error.message;
+          });
       },
 
       // failed
-      error => {
+      ({ path, error }) => {
         this.loadingAnimation.style.display = 'none';
-        errorAssets.push(error.path);
+        errorAssets.push(path);
         this.errorText.innerHTML =
           'LỖI: Tải game không thành công. Vui lòng tải lại trang. <br/>' + errorAssets.join('\n');
       }

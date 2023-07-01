@@ -87,27 +87,23 @@ export default class AssetManager {
         path,
         // success
         data => {
-          this._asset[key] = {
-            data: data,
-            path: path,
-          };
+          this._asset[key] = { data, path };
           loadedCount++;
 
-          onProgress &&
-            onProgress({
-              index: loadedCount,
-              total: total,
-              path: path,
-            });
+          onProgress?.({
+            index: loadedCount,
+            total: total,
+            path: path,
+          });
 
           if (loadedCount == total && !hasError) {
-            onSuccess && onSuccess();
+            onSuccess?.();
           }
         },
         // failed
         error => {
           hasError = true;
-          onFailed && onFailed({ path });
+          onFailed?.({ path, error });
         }
       );
     }
