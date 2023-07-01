@@ -1,5 +1,4 @@
 import Game from './Game.js';
-import Obstacle from './gameObject/Obstacle.js';
 import { preload as preloadAssets } from '../../assets/index.js';
 
 let game, stats;
