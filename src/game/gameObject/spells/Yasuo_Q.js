@@ -231,7 +231,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     // circle(0, 0, this.size);
     rotate(this.angle);
     imageMode(CENTER);
-    image(AssetManager.getAsset('spell_yasuo_q3')?.image, 0, 0, this.size, this.size);
+    image(AssetManager.getAsset('spell_yasuo_q3')?.data, 0, 0, this.size, this.size);
 
     pop();
   }

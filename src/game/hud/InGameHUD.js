@@ -27,14 +27,14 @@ export default class InGameHUD {
           allSpells: Object.values(AllSpells)
             // create instance. TODO: optimize this
             .map(SpellClass => ({
-              instance: new SpellClass(null),
+              spellInstance: new SpellClass(null),
               spellClass: SpellClass,
             }))
-            .map(({ instance, spellClass }) => ({
-              name: instance.name,
-              image: instance.image?.path,
-              description: instance.description,
-              coolDown: instance.coolDown,
+            .map(({ spellInstance, spellClass }) => ({
+              name: spellInstance.name,
+              image: spellInstance.image?.path,
+              description: spellInstance.description,
+              coolDown: spellInstance.coolDown,
               spellClass: spellClass,
             })),
         };

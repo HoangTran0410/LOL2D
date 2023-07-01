@@ -123,7 +123,7 @@ export class Leblanc_W_Object extends SpellObject {
     push();
     let { stats, avatar } = this.owner;
     let size = stats.size.value;
-    image(avatar.image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+    image(avatar.data, this.position.x - size / 2, this.position.y - size / 2, size, size);
 
     let alpha = map(this.age, 0, this.lifeTime, 0, 255);
     stroke('yellow');

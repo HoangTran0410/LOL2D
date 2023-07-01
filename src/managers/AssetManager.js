@@ -44,12 +44,15 @@ const AssetPaths = {
 
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
+
+  // json
+  json_summoner_map: 'assets/json/summoner_map.json',
 };
 
 export default class AssetManager {
   static _asset = {
     // _key: {
-    //   image: 'string',
+    //   data: 'string',
     //   path: 'string',
     // }
   };
@@ -61,7 +64,7 @@ export default class AssetManager {
 
     return (
       this._asset[randomKey] || {
-        image: null,
+        data: null,
         path: null,
       }
     );
@@ -79,12 +82,13 @@ export default class AssetManager {
     const total = entries.length;
 
     for (const [key, path] of entries) {
-      loadImage(
+      let func = key.startsWith('json') ? loadJSON : loadImage;
+      func(
         path,
         // success
         data => {
           this._asset[key] = {
-            image: data,
+            data: data,
             path: path,
           };
           loadedCount++;

@@ -31,7 +31,7 @@ export default class Stun extends Buff {
     push();
     translate(pos.x, pos.y);
     rotate(-frameCount / 15);
-    image(AssetManager.getAsset('buff_stun')?.image, 0, 0, size, size);
+    image(AssetManager.getAsset('buff_stun')?.data, 0, 0, size, size);
     pop();
   }
 }
