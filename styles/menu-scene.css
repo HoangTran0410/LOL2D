@@ -1,10 +1,33 @@
-/* menu scene */
 #menu-scene {
+    width: 100vw;
+    height: 100vh;
     text-align: center;
+
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#menu-scene .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(5px) brightness(0.5);
+
+    transition: background-image 0.5s ease-in-out;
 }
 
 #menu-scene button {
     margin-top: 50px;
+}
+
+#play-btn {
+    z-index: 10;
 }
 
 .shiny {
@@ -25,7 +48,6 @@
 
 .shiny:before {
     content: "";
-    z-index: 10;
     position: absolute;
     height: 200%;
     width: 200%;
@@ -52,6 +74,10 @@
         left: 100%;
         top: 100%;
     }
+}
+
+.logo {
+    position: relative;
 }
 
 .p2d {
