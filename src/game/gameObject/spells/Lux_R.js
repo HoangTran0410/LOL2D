@@ -1,13 +1,13 @@
-import ASSETS from '../../../../assets/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import { rectToVertices, collidePolygonPoint } from '../../../utils/index.js';
-import SOUNDS, { playSound } from '../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
-  image = ASSETS.Spells.lux_r;
+  image = AssetManager.getAsset('spell_lux_r');
   description =
     'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định. Trói chân kẻ địch trong 1 giây. Gây 30 sát thương';
   coolDown = 10000;
@@ -35,7 +35,7 @@ export default class Lux_R extends Spell {
 
     // stun buff for owner
     let buff = new RootBuff(prepairTime + fireTime, this.owner, this.owner);
-    buff.image = ASSETS.Spells.lux_r;
+    buff.image = this.image;
     this.owner.addBuff(buff);
 
     playSound(SOUNDS.lux_r1);
@@ -108,7 +108,7 @@ export class Lux_R_Object extends SpellObject {
         if (collidePolygonPoint(vertices, px, py)) {
           // stun buff for enemy
           let stun = new RootBuff(this.stunTime, this.owner, p);
-          stun.image = ASSETS.Spells.lux_r;
+          stun.image = AssetManager.getAsset('spell_lux_r');
           p.addBuff(stun);
           p.takeDamage(30, this.owner);
 

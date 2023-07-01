@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
@@ -6,7 +6,7 @@ import SpellObject from '../SpellObject.js';
 import { StatsModifier } from '../Stats.js';
 
 export default class Teemo_R extends Spell {
-  image = ASSETS.Spells.teemo_r;
+  image = AssetManager.getAsset('spell_teemo_r');
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
     'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong 2s và gây 30 sát thương';
@@ -34,7 +34,7 @@ export default class Teemo_R extends Spell {
 }
 
 export class Teemo_R_Buff extends Buff {
-  image = ASSETS.Spells.teemo_r;
+  image = AssetManager.getAsset('spell_teemo_r');
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onCreate() {

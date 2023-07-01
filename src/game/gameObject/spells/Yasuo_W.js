@@ -1,11 +1,11 @@
-import ASSETS from '../../../../assets/index.js';
-import SOUNDS, { playSound } from '../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import { collidePolygonPoint, rectToVertices } from '../../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
 export default class Yasuo_W extends Spell {
-  image = ASSETS.Spells.yasuo_w;
+  image = AssetManager.getAsset('spell_yasuo_w');
   name = 'Tường Gió (Yasuo_W)';
   description =
     'Tạo ra một bức tường gió theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';

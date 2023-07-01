@@ -1,14 +1,13 @@
 // TODO https://leagueoflegends.fandom.com/wiki/Stun
 // https://leagueoflegends.fandom.com/wiki/Root
-
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 
 // Làm choáng
 export default class Stun extends Buff {
-  image = ASSETS.Buffs.stun;
+  image = AssetManager.getAsset('buff_stun');
   name = 'Choáng';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
@@ -32,7 +31,7 @@ export default class Stun extends Buff {
     push();
     translate(pos.x, pos.y);
     rotate(-frameCount / 15);
-    image(ASSETS.Buffs.stun.image, 0, 0, size, size);
+    image(AssetManager.getAsset('buff_stun')?.image, 0, 0, size, size);
     pop();
   }
 }

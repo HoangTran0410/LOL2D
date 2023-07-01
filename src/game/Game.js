@@ -2,20 +2,20 @@ import Camera from './gameObject/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
 import Obstacle from './gameObject/Obstacle.js';
-import { Quadtree, Rectangle } from '../libs/quadtree.js';
+import { Quadtree, Rectangle } from '../../libs/quadtree.js';
 import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { hasFlag } from '../utils/index.js';
 import StatusFlags from './enums/StatusFlags.js';
 import * as AllSpells from './gameObject/spells/index.js';
-import ASSETS from '../../assets/index.js';
+import AssetManager from '../managers/AssetManager.js';
 
 const fps = 60;
 let accumulator = 0;
 
 const ChampionPreset = {
   yasuo: {
-    avatar: 'yasuo',
+    avatar: 'champ_yasuo',
     spells: [
       AllSpells.Heal,
       AllSpells.Yasuo_Q,
@@ -27,7 +27,7 @@ const ChampionPreset = {
     ],
   },
   lux: {
-    avatar: 'lux',
+    avatar: 'champ_lux',
     spells: [
       AllSpells.Heal,
       AllSpells.Lux_Q,
@@ -39,7 +39,7 @@ const ChampionPreset = {
     ],
   },
   blitzcrank: {
-    avatar: 'blitzcrank',
+    avatar: 'champ_blitzcrank',
     spells: [
       AllSpells.Heal,
       AllSpells.Blitzcrank_Q,
@@ -51,7 +51,7 @@ const ChampionPreset = {
     ],
   },
   ashe: {
-    avatar: 'ashe',
+    avatar: 'champ_ashe',
     spells: [
       AllSpells.Heal,
       AllSpells.Ashe_W,
@@ -63,7 +63,7 @@ const ChampionPreset = {
     ],
   },
   teemo: {
-    avatar: 'teemo',
+    avatar: 'champ_teemo',
     spells: [
       AllSpells.Heal,
       AllSpells.Blitzcrank_Q,
@@ -93,7 +93,7 @@ export default class Game {
     this.player = new Champion(this, random(this.MAPSIZE), random(this.MAPSIZE));
     let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
     this.player.isAllied = true;
-    this.player.avatar = ASSETS.Champions[preset.avatar];
+    this.player.avatar = AssetManager.getAsset(preset.avatar);
     this.player.spells = preset.spells.map(Spell => new Spell(this.player));
     this.players.push(this.player);
 

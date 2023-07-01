@@ -1,0 +1,18 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #1E1E1E;
+    color: #eee;
+
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.center-page-container>div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: none;
+}

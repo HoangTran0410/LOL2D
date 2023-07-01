@@ -1,11 +1,11 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Stun from '../buffs/Stun.js';
 
 export default class Ashe_R extends Spell {
-  image = ASSETS.Spells.ashe_r;
+  image = AssetManager.getAsset('spell_ashe_r');
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
     'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu trong 2.5s và gây 30 sát thương.';
@@ -68,7 +68,7 @@ export class Ashe_R_Object extends SpellObject {
             .forEach(p => {
               let stunBuff = new Stun(2500, this.owner, p);
               stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-              stunBuff.image = ASSETS.Spells.ashe_r;
+              stunBuff.image = AssetManager.getAsset('spell_ashe_r');
               p.addBuff(stunBuff);
               p.takeDamage(30, this.owner);
             });

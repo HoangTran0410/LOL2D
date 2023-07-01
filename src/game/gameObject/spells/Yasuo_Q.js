@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import { collidePolygonPoint, rectToVertices } from '../../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -6,25 +6,26 @@ import Airborne from '../buffs/Airborne.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Yasuo_Q extends Spell {
-  image = ASSETS.Spells.yasuo_q1;
+  PHASES = {
+    Q1: {
+      image: AssetManager.getAsset('spell_yasuo_q1'),
+    },
+    Q2: {
+      image: AssetManager.getAsset('spell_yasuo_q2'),
+    },
+    Q3: {
+      image: AssetManager.getAsset('spell_yasuo_q3'),
+    },
+  };
+  phase = this.PHASES.Q1;
+
+  image = this.phase.image;
   name = 'Bão Kiếm (Yasuo_Q)';
   description =
     'Đâm lưỡi kiếm về hướng chỉ định, gây 10 sát thương. Cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu và gây 20 sát thương';
   coolDown = 4000;
   manaCost = 20;
 
-  PHASES = {
-    Q1: {
-      image: ASSETS.Spells.yasuo_q1,
-    },
-    Q2: {
-      image: ASSETS.Spells.yasuo_q2,
-    },
-    Q3: {
-      image: ASSETS.Spells.yasuo_q3,
-    },
-  };
-  phase = this.PHASES.Q1;
   coolDownIfHit = 1000;
   hitStackCount = 0;
   lastHitTime = 0;
@@ -140,7 +141,7 @@ export class Yasuo_Q_Object extends SpellObject {
 
         if (collidePolygonPoint(vertices, p.position.x, p.position.y)) {
           let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
-          buff.image = ASSETS.Spells.yasuo_q1;
+          buff.image = AssetManager.getAsset('spell_yasuo_q1');
           p.addBuff(buff);
           p.takeDamage(10, this.owner);
 
@@ -210,7 +211,7 @@ export class Yasuo_Q3_Object extends SpellObject {
       if (!p.isDead && p != this.owner && !this.playerEffected.includes(p)) {
         if (p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2) {
           let buff = new Airborne(this.airBorneTime, this.owner, p);
-          buff.image = ASSETS.Spells.yasuo_q3;
+          buff.image = AssetManager.getAsset('spell_yasuo_q3');
           p.addBuff(buff);
           p.takeDamage(20, this.owner);
 
@@ -230,7 +231,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     // circle(0, 0, this.size);
     rotate(this.angle);
     imageMode(CENTER);
-    image(ASSETS.Objects.yasuo_q3.image, 0, 0, this.size, this.size);
+    image(AssetManager.getAsset('spell_yasuo_q3')?.image, 0, 0, this.size, this.size);
 
     pop();
   }

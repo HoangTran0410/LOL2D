@@ -5,9 +5,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+
     <title>LOL2D</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pxlucasf/hextech-css@master/dist/hextech.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/loading-scene.css">
+    <link rel="stylesheet" href="styles/menu-scene.css">
+    <link rel="stylesheet" href="styles/game-scene.css">
+    <link rel="stylesheet" href="styles/hud.css">
+
+    <!-- global libraries -->
     <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sat/0.8.0/SAT.min.js"></script>
     <script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
@@ -18,72 +34,92 @@
 <body>
     <script src="src/app.js" type="module"></script>
 
-    <div id="canvas"></div>
+    <div class="center-page-container">
+        <div id="game-scene"></div>
 
-    <div id="InGameHUD">
-        <!-- bottom HUD: champion avatar and list spells at the bottom -->
-        <div v-if="avatar && spells && buffs" class="bottom-HUD">
-            <div class="champion-avatar">
-                <img :src="avatar" alt="champion-avatar">
+        <div id="loading-scene">
+            <div class="loading"></div>
+            <div class="loading-text"></div>
+            <h2 class="error-text"></h2>
+        </div>
+
+        <div id="menu-scene">
+            <div>
+                <div class="shiny">
+                    <img src="./assets/images/others/newlogo.png" alt="logo" class="logo">
+                </div>
+                <p class="p2d slide-bck-center">2D</p>
             </div>
-            <div class="champion-details">
-                <div class="spells">
-                    <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
-                        @click="changeSpell(index)">
-                        <img :src="spell.image" alt="spell"
-                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
-                        <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
-                        <div v-if="spell.showCoolDown">
-                            <div class="cooldown-overlay" :style="`height: ${spell.coolDownPercent}%`"></div>
-                            <div class="cooldown">
-                                <p>{{spell.coolDownText}}</p>
+            <button id="play-btn" class="button is-primary">Play</button>
+        </div>
+
+        <div id="InGameHUD">
+            <!-- bottom HUD: champion avatar and list spells at the bottom -->
+            <div v-if="avatar && spells && buffs" class="bottom-HUD">
+                <div class="champion-avatar">
+                    <img :src="avatar" alt="champion-avatar">
+                </div>
+                <div class="champion-details">
+                    <div class="spells">
+                        <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
+                            @click="changeSpell(index)">
+                            <img :src="spell.image" alt="spell"
+                                :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
+
+                            <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
+                            <div v-if="spell.showCoolDown">
+                                <div class="cooldown-overlay" :style="`height: ${spell.coolDownPercent}%`"></div>
+                                <div class="cooldown">
+                                    <p>{{spell.coolDownText}}</p>
+                                </div>
+                            </div>
+                            <div class="spell-info">
+                                <h4>{{spell.name}}</h4>
+                                <p>{{spell.description}}</p>
+                                <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
                             </div>
                         </div>
+                    </div>
+                    <div class="health-bar">
+                        <div class="bar">
+                            <div :style="`width:${stats.healthPercent}%; background-color:#0ca20c`">
+                            </div>
+                            <p>{{stats.health}} / {{stats.maxHealth}}</p>
+                        </div>
+                        <div class="bar" style="margin-top:3px">
+                            <div :style="`width:${stats.manaPercent}%; background-color:#218bdd;`">
+                            </div>
+                            <p>{{stats.mana}} / {{stats.maxMana}}</p>
+                        </div>
+                    </div>
+                    <div class="buffs">
+                        <div v-for="buff of buffs" class="buff">
+                            <img :src="buff.image" alt="buff">
+                            <span>{{buff.timeLeftText}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- spell picker -->
+            <div v-if="showSpellsPicker" class="spell-picker">
+                <button class="close-btn" @click="closeSpellPicker()">X</button>
+                <p class="title">Chọn chiêu thức</p>
+                <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức"
+                    v-model="searchSpellText" />
+                <div class="list">
+                    <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
+                        <img :src="spell.image" alt="spell" />
                         <div class="spell-info">
                             <h4>{{spell.name}}</h4>
                             <p>{{spell.description}}</p>
                             <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
                         </div>
                     </div>
-                </div>
-                <div class="health-bar">
-                    <div class="bar">
-                        <div :style="`width:${stats.healthPercent}%; background-color:#0ca20c`">
-                        </div>
-                        <p>{{stats.health}} / {{stats.maxHealth}}</p>
+                    <div v-if="filteredSpells.length === 0" class="not-found">
+                        <span>Không tìm thấy chiêu thức</span>
                     </div>
-                    <div class="bar" style="margin-top:3px">
-                        <div :style="`width:${stats.manaPercent}%; background-color:#218bdd;`">
-                        </div>
-                        <p>{{stats.mana}} / {{stats.maxMana}}</p>
-                    </div>
-                </div>
-                <div class="buffs">
-                    <div v-for="buff of buffs" class="buff">
-                        <img :src="buff.image" alt="buff">
-                        <span>{{buff.timeLeftText}}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- spell picker -->
-        <div v-if="showSpellsPicker" class="spell-picker">
-            <button class="close-btn" @click="closeSpellPicker()">X</button>
-            <p class="title">Chọn chiêu thức</p>
-            <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức" v-model="searchSpellText" />
-            <div class="list">
-                <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
-                    <img :src="spell.image" alt="spell" />
-                    <div class="spell-info">
-                        <h4>{{spell.name}}</h4>
-                        <p>{{spell.description}}</p>
-                        <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
-                    </div>
-                </div>
-                <div v-if="filteredSpells.length === 0" class="not-found">
-                    <span>Không tìm thấy chiêu thức</span>
                 </div>
             </div>
         </div>

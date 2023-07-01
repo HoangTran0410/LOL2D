@@ -1,4 +1,3 @@
-import ASSETS from '../../../../assets/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import { hasFlag } from '../../../utils/index.js';
@@ -6,10 +5,11 @@ import Buff from '../Buff.js';
 import Airborne from './Airborne.js';
 import Root from './Root.js';
 import Silence from './Silence.js';
+import AssetManager from '../../../managers/AssetManager.js';
 
 // Lướt
 export default class Dash extends Buff {
-  image = ASSETS.Buffs.root;
+  image = AssetManager.getAsset('buff_root');
   name = 'Lướt';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;

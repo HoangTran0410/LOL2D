@@ -1,12 +1,12 @@
-import ASSETS from '../../../../assets/index.js';
-import SOUNDS, { playSound } from '../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Silence from '../buffs/Silence.js';
 
 export default class Blitzcrank_R extends Spell {
   name = 'Trường Điện Từ (Blitzcrank_R)';
-  image = ASSETS.Spells.blitzcrank_r;
+  image = AssetManager.getAsset('spell_blitzcrank_r');
   description =
     'Kích hoạt trường điện từ, gây sát thương lên các kẻ địch trong tầm, gây 30 sát thương và làm Câm lặng chúng trong 3 giây';
   coolDown = 10000;
@@ -62,7 +62,7 @@ export class Blitzcrank_R_Object extends SpellObject {
 
     playersInRange.forEach(champ => {
       let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
-      silenceBuff.image = ASSETS.Spells.blitzcrank_r;
+      silenceBuff.image = AssetManager.getAsset('spell_blitzcrank_r');
       champ.addBuff(silenceBuff);
       champ.takeDamage(30, this.owner);
     });

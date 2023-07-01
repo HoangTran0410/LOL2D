@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { StatModifier } from '../Stat.js';
@@ -6,7 +6,7 @@ import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
 export default class Heal extends Spell {
   name = 'Hồi Máu (Heal)';
-  image = ASSETS.Spells.heal;
+  image = AssetManager.getAsset('spell_heal');
   description = 'Hồi phục 30% máu tối đa và tăng 50% tốc độ di chuyển trong 1s';
   coolDown = 10000;
   manaCost = 100;
@@ -29,7 +29,7 @@ export default class Heal extends Spell {
 
     // ghost buff for 1s
     let ghostBuff = new Ghost_Buff(1000, this.owner, this.owner);
-    ghostBuff.image = ASSETS.Spells.heal;
+    ghostBuff.image = this.image;
     this.owner.addBuff(ghostBuff);
 
     // ghost effect

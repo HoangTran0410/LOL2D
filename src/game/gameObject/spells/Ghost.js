@@ -1,14 +1,14 @@
-import ASSETS from '../../../../assets/index.js';
 import Spell from '../Spell.js';
 import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import SpellObject from '../SpellObject.js';
-import SOUNDS, { playSound } from '../../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 
 export default class Ghost extends Spell {
   name = 'Tốc Hành (Ghost)';
-  image = ASSETS.Spells.ghost;
+  image = AssetManager.getAsset('spell_ghost');
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
   coolDown = 7000;
   manaCost = 100;
@@ -29,7 +29,7 @@ export default class Ghost extends Spell {
 }
 
 export class Ghost_Buff extends Buff {
-  image = ASSETS.Spells.ghost;
+  image = AssetManager.getAsset('spell_ghost');
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 

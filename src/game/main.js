@@ -11,7 +11,7 @@ export function preload() {
 }
 
 export function setup() {
-  const c = createCanvas(windowWidth, windowHeight).parent('canvas');
+  const c = createCanvas(windowWidth, windowHeight).parent('game-scene');
   c.elt.oncontextmenu = () => false;
 
   cursor('assets/cursors/normal.cur');

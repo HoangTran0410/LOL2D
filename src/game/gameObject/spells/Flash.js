@@ -1,11 +1,11 @@
-import ASSETS from '../../../../assets/index.js';
-import SOUNDS, { playSound } from '../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
 export default class Flash extends Spell {
   name = 'Tốc Biến (Flash)';
-  image = ASSETS.Spells.flash;
+  image = AssetManager.getAsset('spell_flash');
   description = 'Tốc biến 1 tới vị trí con trỏ, tối đa 180px khoảng cách';
   coolDown = 3000;
   manaCost = 100;

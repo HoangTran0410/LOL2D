@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
@@ -7,7 +7,7 @@ import RootBuff from '../buffs/Root.js';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
-  image = ASSETS.Spells.blitzcrank_q;
+  image = AssetManager.getAsset('spell_blitzcrank_q');
   description =
     'Bắn bàn tay theo hướng chỉ định, kéo kẻ địch đầu tiên trúng phải, gây 20 sát thương và làm choáng chúng trong 0.5 giây';
   coolDown = 5000;
@@ -18,7 +18,7 @@ export default class Blitzcrank_Q extends Spell {
     this.game.objects.push(this.blitObj);
 
     this.ownerStunBuff = new RootBuff(100000, this.owner, this.owner);
-    this.ownerStunBuff.image = ASSETS.Spells.blitzcrank_q;
+    this.ownerStunBuff.image = this.image;
     this.owner.addBuff(this.ownerStunBuff);
   }
 
@@ -81,7 +81,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
             this.destination = this.owner.position;
 
             this.airborneBuff = new Airborne(999999, this.owner, champ);
-            this.airborneBuff.image = ASSETS.Spells.blitzcrank_q;
+            this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
             champ.addBuff(this.airborneBuff);
 
             this.dashBuff = new Dash(999999, this.owner, champ);

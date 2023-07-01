@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import SpellState from '../../enums/SpellState.js';
 import Buff from '../Buff.js';
@@ -8,7 +8,7 @@ import { StatsModifier } from '../Stats.js';
 
 export default class Lux_E extends Spell {
   name = 'Quả Cầu Ánh Sáng (Lux_E)';
-  image = ASSETS.Spells.lux_e;
+  image = AssetManager.getAsset('spell_lux_e');
   description =
     'Phóng ra 1 xoáy ánh sáng tới vị trí chỉ định, làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ, gây 20 sát thương';
   coolDown = 6000;
@@ -69,7 +69,7 @@ export default class Lux_E extends Spell {
 }
 
 export class Lux_E_Buff extends Buff {
-  image = ASSETS.Spells.lux_e;
+  image = AssetManager.getAsset('spell_lux_e');
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onCreate() {
@@ -96,7 +96,7 @@ export class Lux_E_Object extends SpellObject {
   phase = Lux_E_Object.PHASES.MOVE;
 
   // moving phase
-  moveSpeed = 5;
+  moveSpeed = 7;
   moveSize = 30;
   position = this.owner.position.copy();
   destination = this.owner.position.copy();

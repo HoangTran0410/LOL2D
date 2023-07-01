@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import SpellState from '../../enums/SpellState.js';
 import Spell from '../Spell.js';
@@ -8,10 +8,10 @@ import Dash from '../buffs/Dash.js';
 export default class Leblanc_W extends Spell {
   PHASES = {
     W1: {
-      image: ASSETS.Spells.leblanc_w,
+      image: AssetManager.getAsset('spell_leblanc_w1'),
     },
     W2: {
-      image: ASSETS.Spells.leblanc_w2,
+      image: AssetManager.getAsset('spell_leblanc_w2'),
     },
   };
   phase = this.PHASES.W1;
@@ -100,7 +100,7 @@ export default class Leblanc_W extends Spell {
 }
 
 export class Leblanc_W_Buff extends Dash {
-  image = ASSETS.Spells.leblanc_w;
+  image = AssetManager.getAsset('spell_leblanc_w1');
   buffAddType = BuffAddType.REPLACE_EXISTING;
   dashSpeed = 10;
   dashDestination = createVector();

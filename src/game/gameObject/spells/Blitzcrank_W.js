@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
@@ -7,7 +7,7 @@ import { Ghost_Buff_Object } from './Ghost.js';
 
 export default class Blitzcrank_W extends Spell {
   name = 'Tăng Tốc (Blitzcrank_W)';
-  image = ASSETS.Spells.blitzcrank_w;
+  image = AssetManager.getAsset('spell_blitzcrank_w');
   description = 'Tăng tốc 50% trong 4s, sau đó bị giảm tốc 75% trong 1s';
   coolDown = 10000;
   manaCost = 20;
@@ -29,7 +29,7 @@ export default class Blitzcrank_W extends Spell {
 }
 
 export class Blitzcrank_W_Buff extends Buff {
-  image = ASSETS.Spells.blitzcrank_w;
+  image = AssetManager.getAsset('spell_blitzcrank_w');
   buffAddType = BuffAddType.STACKS_AND_OVERLAPS;
   maxStacks = 3;
 
@@ -50,7 +50,7 @@ export class Blitzcrank_W_Buff extends Buff {
 }
 
 export class Blitzcrank_W2_Buff extends Blitzcrank_W_Buff {
-  image = ASSETS.Spells.blitzcrank_w;
+  image = AssetManager.getAsset('spell_blitzcrank_w');
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onCreate() {

@@ -1,11 +1,11 @@
-import ASSETS from '../../../../assets/index.js';
-import SOUNDS, { playSound } from '../../../../sounds/index.js';
+import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import Dash from '../buffs/Dash.js';
 
 export default class Yasuo_E extends Spell {
-  image = ASSETS.Spells.yasuo_e;
+  image = AssetManager.getAsset('spell_yasuo_e');
   name = 'Quét Kiếm (Yasuo_E)';
   description = 'Lướt một khoảng ngắn về hướng địch trong tầm. Gây 10 sát thương';
   coolDown = 2000;
@@ -66,5 +66,5 @@ export default class Yasuo_E extends Spell {
 }
 
 export class Yasuo_E_Buff extends Dash {
-  image = ASSETS.Spells.yasuo_e;
+  image = AssetManager.getAsset('spell_yasuo_e');
 }

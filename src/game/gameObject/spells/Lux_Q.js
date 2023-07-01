@@ -1,12 +1,11 @@
-import ASSETS from '../../../../assets/index.js';
-import BuffAddType from '../../enums/BuffAddType.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Lux_Q extends Spell {
   name = 'Khóa Ánh Sáng (Lux_Q)';
-  image = ASSETS.Spells.lux_q;
+  image = AssetManager.getAsset('spell_lux_q');
   description =
     'Lux phóng ra một quả cầu ánh sáng theo đường thẳng, gây 20 sát thương và trói chân 2 kẻ địch đầu tiên trúng phải trong 2 giây.';
   coolDown = 5000;
@@ -33,7 +32,7 @@ export class Lux_Q_Object extends SpellObject {
   isMissile = true;
   playersEffected = [];
   maxPlayersEffected = 2;
-  speed = 6;
+  speed = 7;
   size = 15;
   stunTime = 2000;
   position = this.owner.position.copy();
@@ -57,7 +56,7 @@ export class Lux_Q_Object extends SpellObject {
       let distance = this.position.dist(champ.position);
       if (distance < champ.stats.size.value) {
         let stunBuff = new RootBuff(this.stunTime, this.owner, champ);
-        stunBuff.image = ASSETS.Spells.lux_q;
+        stunBuff.image = AssetManager.getAsset('spell_lux_q');
         champ.addBuff(stunBuff);
         champ.takeDamage(20, this.owner);
 

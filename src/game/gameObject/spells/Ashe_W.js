@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
@@ -6,7 +6,7 @@ import SpellObject from '../SpellObject.js';
 import { StatsModifier } from '../Stats.js';
 
 export default class Ashe_W extends Spell {
-  image = ASSETS.Spells.ashe_w;
+  image = AssetManager.getAsset('spell_ashe_w');
   name = 'Tán Xạ Tiễn (Ashe_W)';
   description =
     'Bắn ra 10 mũi tên theo hình nón, mỗi mũi tên gây 5 sát thương làm chậm kẻ địch trúng chiêu đi 75% trong 1.5s và ';
@@ -33,7 +33,7 @@ export default class Ashe_W extends Spell {
 }
 
 export class Ashe_W_Buff extends Buff {
-  image = ASSETS.Spells.ashe_w;
+  image = AssetManager.getAsset('spell_ashe_w');
   buffAddType = BuffAddType.RENEW_EXISTING;
 
   onCreate() {

@@ -1,13 +1,12 @@
 // https://leagueoflegends.fandom.com/wiki/Silence
-
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 
 // Câm lặng
 export default class Silence extends Buff {
-  image = ASSETS.Buffs.silence;
+  image = AssetManager.getAsset('buff_silence');
   name = 'Câm Lặng';
   buffAddType = BuffAddType.RENEW_EXISTING;
 

@@ -1,58 +1,109 @@
-const AssetPaths = [
-  // hud
-  'asset/image/hud/ability.png',
-  'asset/image/hud/item.png',
-  'asset/image/hud/avatar.png',
+const AssetPaths = {
+  // champions
+  champ_blitzcrank: 'assets/images/champions/blitzcrank.png',
+  champ_lux: 'assets/images/champions/lux.png',
+  champ_jinx: 'assets/images/champions/jinx.png',
+  champ_yasuo: 'assets/images/champions/yasuo.png',
+  champ_ashe: 'assets/images/champions/ashe.png',
+  champ_teemo: 'assets/images/champions/teemo.png',
+  champ_ahri: 'assets/images/champions/ahri.png',
+  champ_zed: 'assets/images/champions/zed.png',
+  champ_leblanc: 'assets/images/champions/leblanc.png',
 
-  // spell
-  'asset/image/spell/Flash.png',
+  // spells
+  spell_leblanc_w: 'assets/images/spells/leblanc_w.png',
+  spell_leblanc_w2: 'assets/images/spells/leblanc_w2.png',
+  spell_ashe_w: 'assets/images/spells/ashe_w.png',
+  spell_ashe_r: 'assets/images/spells/ashe_r.png',
+  spell_blitzcrank_internal: 'assets/images/spells/blitzcrank_internal.png',
+  spell_blitzcrank_q: 'assets/images/spells/blitzcrank_q.png',
+  spell_blitzcrank_w: 'assets/images/spells/blitzcrank_w.png',
+  spell_blitzcrank_e: 'assets/images/spells/blitzcrank_e.png',
+  spell_blitzcrank_r: 'assets/images/spells/blitzcrank_r.png',
+  spell_lux_q: 'assets/images/spells/lux_q.png',
+  spell_lux_e: 'assets/images/spells/lux_e.png',
+  spell_lux_r: 'assets/images/spells/lux_r.png',
+  spell_yasuo_q1: 'assets/images/spells/yasuo_q1.png',
+  spell_yasuo_q2: 'assets/images/spells/yasuo_q2.png',
+  spell_yasuo_q3: 'assets/images/spells/yasuo_q3.png',
+  spell_yasuo_w: 'assets/images/spells/yasuo_w.png',
+  spell_yasuo_e: 'assets/images/spells/yasuo_e.png',
+  spell_yasuo_r: 'assets/images/spells/yasuo_r.png',
+  spell_teemo_r: 'assets/images/spells/teemo_r.png',
+  spell_flash: 'assets/images/spells/flash.png',
+  spell_ghost: 'assets/images/spells/ghost.png',
+  spell_heal: 'assets/images/spells/heal.png',
+  spell_ignite: 'assets/images/spells/ignite.png',
 
-  // ahri
-  'asset/image/champion/ahri/Ahri.avatar.circle.png',
-  'asset/image/champion/ahri/Ahri.avatar.square.png',
-  'asset/image/champion/ahri/Charm.ability.png',
-  'asset/image/champion/ahri/Fox-Fire.ability.png',
-  'asset/image/champion/ahri/Orb-of-Deception.ability.png',
-  'asset/image/champion/ahri/Spirit-Rush.ability.png',
+  // buffs
+  buff_silence: 'assets/images/buffs/silence.png',
+  buff_slow: 'assets/images/buffs/slow.png',
+  buff_root: 'assets/images/buffs/root.png',
+  buff_airborne: 'assets/images/buffs/airborne.png',
+  buff_stun: 'assets/images/buffs/stun.png',
 
-  // jinx
-  'asset/image/champion/jinx/Jinx.avatar.circle.png',
-];
+  // objects
+  obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
+};
 
 export default class AssetManager {
-  static _asset = {};
+  static _asset = {
+    // _key: {
+    //   image: 'string',
+    //   path: 'string',
+    // }
+  };
 
-  static getAsset(path) {
-    return this._asset[path];
+  static getRandomChampion() {
+    const keys = Object.keys(AssetPaths);
+    const filteredKeys = keys.filter(key => key.startsWith('champ_'));
+    const randomKey = filteredKeys[Math.floor(Math.random() * filteredKeys.length)];
+
+    return (
+      this._asset[randomKey] || {
+        image: null,
+        path: null,
+      }
+    );
+  }
+
+  static getAsset(key) {
+    return this._asset[key];
   }
 
   static loadAssets(onProgress, onSuccess, onFailed) {
     let loadedCount = 0;
     let hasError = false;
 
-    for (let path of AssetPaths) {
+    const entries = Object.entries(AssetPaths);
+    const total = entries.length;
+
+    for (const [key, path] of entries) {
       loadImage(
         path,
         // success
         data => {
-          this._asset[path] = data;
+          this._asset[key] = {
+            image: data,
+            path: path,
+          };
           loadedCount++;
 
           onProgress &&
             onProgress({
               index: loadedCount,
-              total: AssetPaths.length,
+              total: total,
               path: path,
             });
 
-          if (loadedCount == AssetPaths.length && !hasError) {
+          if (loadedCount == total && !hasError) {
             onSuccess && onSuccess();
           }
         },
         // failed
         error => {
           hasError = true;
-          onFailed && onFailed(error);
+          onFailed && onFailed({ path });
         }
       );
     }

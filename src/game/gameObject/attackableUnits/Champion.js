@@ -2,23 +2,21 @@ import { hasFlag, shuffleArray } from '../../../utils/index.js';
 import Stats from '../Stats.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import ASSETS from '../../../../assets/index.js';
 import * as AllSpells from '../spells/index.js';
 import Airborne from '../buffs/Airborne.js';
 import Root from '../buffs/Root.js';
 import Silence from '../buffs/Silence.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
+import AssetManager from '../../../managers/AssetManager.js';
 
 export default class Champion {
-  static avatars = [];
-
   constructor(game, x, y) {
     this.game = game;
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
     this.isAllied = true;
-    this.avatar = random(Object.values(ASSETS.Champions));
+    this.avatar = AssetManager.getRandomChampion();
 
     this.score = 0;
     this.reviveAfter = 0;

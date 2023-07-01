@@ -1,4 +1,4 @@
-import ASSETS from '../../../../assets/index.js';
+import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -6,7 +6,7 @@ import Airborne from '../buffs/Airborne.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Yasuo_R extends Spell {
-  image = ASSETS.Spells.yasuo_r;
+  image = AssetManager.getAsset('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =
     'Yasuo lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 2 giây và gây 30 sát thương';
@@ -50,7 +50,7 @@ export default class Yasuo_R extends Spell {
       for (let enemy of enemiesInRange) {
         let buff = new Airborne(timeToApplyAirborne, this.owner, enemy);
         buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
-        buff.image = ASSETS.Spells.yasuo_r;
+        buff.image = this.image;
         buff.draw = () => {
           push();
           strokeWeight(5);
