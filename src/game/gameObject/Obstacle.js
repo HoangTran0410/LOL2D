@@ -1,10 +1,8 @@
 export default class Obstacle {
-  static Predefined = [];
-
   constructor(x, y, vertices) {
     this.position = createVector(x, y);
-    this.angle = random(TWO_PI);
-    this.vertices = vertices || Obstacle.arrayToVertices(random(Obstacle.Predefined));
+    this.angle = 0;
+    this.vertices = vertices || [];
   }
 
   get vertices() {
