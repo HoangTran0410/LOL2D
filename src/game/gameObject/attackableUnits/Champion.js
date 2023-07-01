@@ -21,27 +21,16 @@ export default class Champion {
     this.score = 0;
     this.reviveAfter = 0;
 
-    this.spells = shuffleArray(Object.values(AllSpells))
-      .slice(0, 7)
-      .map(Spell => new Spell(this));
-
-    // this.spells = [
-    //   // internal spell
-    //   new AllSpells.Blitzcrank_W(this),
-
-    //   // normal spell
-    //   new AllSpells.Yasuo_Q(this),
-    //   new AllSpells.Yasuo_W(this),
-    //   new AllSpells.Blitzcrank_Q(this),
-    //   new AllSpells.Yasuo_R(this),
-
-    //   // summoner spell
-    //   new AllSpells.Flash(this),
-    //   new AllSpells.Lux_E(this),
-    // ];
+    this.spells = this.getRandomSpells();
     this.buffs = [];
     this.stats = new Stats();
     this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
+  }
+
+  getRandomSpells() {
+    return shuffleArray(Object.values(AllSpells))
+      .slice(0, 7)
+      .map(Spell => new Spell(this));
   }
 
   // setStatus(status, enabled) {
@@ -181,6 +170,7 @@ export default class Champion {
       if (this.reviveAfter <= 0) {
         this.position.set(random(this.game.MAPSIZE), random(this.game.MAPSIZE));
         this.destination = this.position.copy();
+        this.stats.health.baseValue = this.stats.maxHealth.value / 2;
       }
     }
   }

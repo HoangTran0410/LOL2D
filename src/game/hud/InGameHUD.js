@@ -15,6 +15,7 @@ export default class InGameHUD {
     this.vueInstance = createApp({
       data() {
         return {
+          reviveAfter: 0,
           avatar: '',
           stats: {},
           spells: [],
@@ -92,8 +93,17 @@ export default class InGameHUD {
     this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;
 
     // update avatar
-    const { spells = [], buffs = [], avatar, status, isDead } = this.game?.player || {};
+    const {
+      spells = [],
+      buffs = [],
+      avatar,
+      status,
+      isDead,
+      reviveAfter,
+    } = this.game?.player || {};
     this.vueInstance.avatar = avatar?.path || '';
+    this.vueInstance.isDead = isDead;
+    this.vueInstance.reviveAfter = ~~(reviveAfter / 1000);
 
     // update spells
     let canCast = hasFlag(status, StatusFlags.CanCast) && !isDead;

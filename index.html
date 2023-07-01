@@ -58,7 +58,8 @@
             <!-- bottom HUD: champion avatar and list spells at the bottom -->
             <div v-if="avatar && spells && buffs" class="bottom-HUD">
                 <div class="champion-avatar">
-                    <img :src="avatar" alt="champion-avatar">
+                    <img :src="avatar" alt="champion-avatar" :style="isDead ? 'filter: grayscale(100%)' : ''">
+                    <span v-if="isDead" class="revive-counter">{{reviveAfter}}</span>
                 </div>
                 <div class="champion-details">
                     <div class="spells">

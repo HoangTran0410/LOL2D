@@ -27,4 +27,10 @@ export default class AIChampion extends Champion {
     super.takeDamage(damage, source);
     this.moveToRandomLocation();
   }
+
+  die(source) {
+    super.die(source);
+
+    this.spells = this.getRandomSpells();
+  }
 }
