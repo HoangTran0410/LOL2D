@@ -19,25 +19,6 @@ export function setup() {
   imageMode(CORNER);
   frameRate(60);
 
-  Obstacle.Predefined = mapData.wall;
-  // .filter(arr => arr.length > 3)
-  // .map(arr => {
-  //   // calculate center of polygon
-  //   let x = 0,
-  //     y = 0;
-  //   for (let [_x, _y] of arr) {
-  //     x += _x;
-  //     y += _y;
-  //   }
-  //   x /= arr.length;
-  //   y /= arr.length;
-
-  //   // then normalize all vertices to center
-  //   return arr.map(v => [~~(v[0] - x), ~~(v[1] - y)]);
-  // });
-
-  console.log(Obstacle.Predefined);
-
   game = new Game();
 
   stats = new Stats();
