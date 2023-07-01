@@ -11,7 +11,7 @@ import Stun from '../buffs/Stun.js';
 import AssetManager from '../../../managers/AssetManager.js';
 
 export default class Champion {
-  constructor(game, x, y) {
+  constructor(game, x = 0, y = 0) {
     this.game = game;
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
@@ -168,7 +168,8 @@ export default class Champion {
       this.reviveAfter -= deltaTime;
 
       if (this.reviveAfter <= 0) {
-        this.position.set(random(this.game.MAPSIZE), random(this.game.MAPSIZE));
+        let pos = this.game.getRandomSpawnLocation();
+        this.position.set(pos.x, pos.y);
         this.destination = this.position.copy();
         this.stats.health.baseValue = this.stats.maxHealth.value / 2;
       }

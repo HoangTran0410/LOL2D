@@ -74,6 +74,18 @@ const ChampionPreset = {
       AllSpells.Ghost,
     ],
   },
+  leblanc: {
+    avatar: 'champ_leblanc',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Blitzcrank_Q,
+      AllSpells.Leblanc_W,
+      AllSpells.Leblanc_W,
+      AllSpells.Leblanc_W,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
 };
 
 export default class Game {
@@ -85,13 +97,15 @@ export default class Game {
     this.objects = [];
     this.players = [];
     for (let i = 0; i < 9; i++) {
-      let champ = new AIChampion(this, random(this.MAPSIZE), random(this.MAPSIZE));
+      let pos = this.getRandomSpawnLocation();
+      let champ = new AIChampion(this, pos.x, pos.y);
       champ.isAllied = false;
       this.players.push(champ);
     }
 
     let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
-    this.player = new Champion(this, random(this.MAPSIZE), random(this.MAPSIZE));
+    let pos = this.getRandomSpawnLocation();
+    this.player = new Champion(this, pos.x, pos.y);
     this.player.isAllied = true;
     this.player.avatar = AssetManager.getAsset(preset.avatar);
     this.player.spells = preset.spells.map(Spell => new Spell(this.player));
@@ -112,7 +126,6 @@ export default class Game {
 
     this.obstacles = [];
     const walls = AssetManager.getAsset('json_summoner_map')?.data?.wall ?? [];
-    console.log(walls);
     for (let i = 0; i < walls.length; i++) {
       let o = new Obstacle(0, 0, Obstacle.arrayToVertices(walls[i]));
       this.obstacles.push(o);
@@ -333,5 +346,11 @@ export default class Game {
         (includeDead ? true : p.isDead === false) &&
         p.position.dist(position) < range / 2 + (includePlayerSize ? p.stats.size.value / 2 : 0)
     );
+  }
+
+  getRandomSpawnLocation() {
+    let x = this.MAPSIZE / 2 + random(-this.MAPSIZE / 3, this.MAPSIZE / 3);
+    let y = this.MAPSIZE / 2 + random(-this.MAPSIZE / 3, this.MAPSIZE / 3);
+    return createVector(x, y);
   }
 }
