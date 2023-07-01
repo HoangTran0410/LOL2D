@@ -13,7 +13,7 @@ export default class Ashe_R extends Spell {
 
   onSpellCast() {
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let direction = p5.Vector.sub(mouse, this.game.player.position).normalize();
+    let direction = p5.Vector.sub(mouse, this.owner.position).normalize();
 
     let obj = new Ashe_R_Object(this.owner);
     obj.position = this.owner.position.copy();

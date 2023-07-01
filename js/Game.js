@@ -84,21 +84,13 @@ export default class Game {
     this.kills = [];
     this.objects = [];
     this.players = [];
-    for (let i = 0; i < 6; i++) {
-      let champ = new AIChampion(
-        this,
-        this.MAPSIZE / 2 + random(-width, width),
-        this.MAPSIZE / 2 + random(-height, -height)
-      );
+    for (let i = 0; i < 9; i++) {
+      let champ = new AIChampion(this, random(this.MAPSIZE), random(this.MAPSIZE));
       champ.isAllied = false;
       this.players.push(champ);
     }
 
-    this.player = new Champion(
-      this,
-      this.MAPSIZE / 2 + random(-width, width),
-      this.MAPSIZE / 2 + random(-height, -height)
-    );
+    this.player = new Champion(this, random(this.MAPSIZE), random(this.MAPSIZE));
     let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
     this.player.isAllied = true;
     this.player.avatar = ASSETS.Champions[preset.avatar];
@@ -218,7 +210,7 @@ export default class Game {
       this.clickedPoint = {
         x: worldMouse.x,
         y: worldMouse.y,
-        size: 40,
+        size: 50,
       };
     }
 
@@ -303,6 +295,13 @@ export default class Game {
     line(0, this.MAPSIZE, 0, 0);
 
     this.camera.pop();
+
+    // draw mouse
+    push();
+    strokeWeight(10);
+    stroke(150);
+    line(mouseX, mouseY, pmouseX, pmouseY);
+    pop();
   }
 
   keyPressed() {

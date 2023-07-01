@@ -6,7 +6,6 @@ import * as AllSpells from '../gameObject/spells/index.js';
 export default class InGameHUD {
   constructor(game) {
     this.game = game;
-
     this.initVue(game);
   }
 
@@ -78,6 +77,7 @@ export default class InGameHUD {
     }).mount('#InGameHUD');
 
     document.querySelector('#InGameHUD').oncontextmenu = () => false;
+    document.querySelector('#InGameHUD').style.display = 'block';
   }
 
   update() {

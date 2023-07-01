@@ -14,6 +14,7 @@ export function setup() {
   const c = createCanvas(windowWidth, windowHeight).parent('canvas');
   c.elt.oncontextmenu = () => false;
 
+  cursor('assets/cursors/normal.cur');
   rectMode(CORNER);
   imageMode(CORNER);
   frameRate(60);
