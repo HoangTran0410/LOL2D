@@ -12,7 +12,7 @@ export default class InGameHUD {
   initVue(game) {
     const { isProxy, toRaw, createApp } = Vue;
 
-    this.vueInstance = createApp({
+    this.app = createApp({
       data() {
         return {
           reviveAfter: 0,
@@ -75,10 +75,79 @@ export default class InGameHUD {
           });
         },
       },
-    }).mount('#InGameHUD');
+      template: `
+        <div v-if="avatar && spells && buffs" class="bottom-HUD">
+            <div class="champion-avatar">
+                <img :src="avatar" alt="champion-avatar" :style="isDead ? 'filter: grayscale(100%)' : ''">
+                <span v-if="isDead" class="revive-counter">{{reviveAfter}}</span>
+            </div>
+            <div class="champion-details">
+                <div class="spells">
+                    <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
+                        @click="changeSpell(index)">
+                        <img :src="spell.image" alt="spell"
+                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
+
+                        <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
+                        <div v-if="spell.showCoolDown">
+                            <div class="cooldown-overlay" :style="'height:'+ spell.coolDownPercent +'%'"></div>
+                            <div class="cooldown">
+                                <p>{{spell.coolDownText}}</p>
+                            </div>
+                        </div>
+                        <div class="spell-info">
+                            <h4>{{spell.name}}</h4>
+                            <p>{{spell.description}}</p>
+                            <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="health-bar">
+                    <div class="bar">
+                        <div :style="'width:'+ stats.healthPercent +'%; background-color:#0ca20c'">
+                        </div>
+                        <p>{{stats.health}} / {{stats.maxHealth}}</p>
+                    </div>
+                    <div class="bar" style="margin-top:3px">
+                        <div :style="'width:'+ stats.manaPercent + '%; background-color:#218bdd;'">
+                        </div>
+                        <p>{{stats.mana}} / {{stats.maxMana}}</p>
+                    </div>
+                </div>
+                <div class="buffs">
+                    <div v-for="buff of buffs" class="buff">
+                        <img :src="buff.image" alt="buff">
+                        <span>{{buff.timeLeftText}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showSpellsPicker" class="spell-picker">
+            <button class="close-btn" @click="closeSpellPicker()">X</button>
+            <p class="title">Chọn chiêu thức</p>
+            <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức"
+                v-model="searchSpellText" />
+            <div class="list">
+                <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
+                    <img :src="spell.image" alt="spell" />
+                    <div class="spell-info">
+                        <h4>{{spell.name}}</h4>
+                        <p>{{spell.description}}</p>
+                        <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
+                    </div>
+                </div>
+                <div v-if="filteredSpells.length === 0" class="not-found">
+                    <span>Không tìm thấy chiêu thức</span>
+                </div>
+            </div>
+        </div>
+      `,
+    });
+
+    this.vueInstance = this.app.mount('#InGameHUD');
 
     document.querySelector('#InGameHUD').oncontextmenu = () => false;
-    document.querySelector('#InGameHUD').style.display = 'block';
   }
 
   update() {
@@ -152,5 +221,9 @@ export default class InGameHUD {
           timeLeftText: Math.ceil(timeLeft / 1000),
         };
       });
+  }
+
+  destroy() {
+    this.app.unmount();
   }
 }

@@ -138,6 +138,15 @@ export default class Game {
     this.paused = false;
   }
 
+  destroy() {
+    this.objects = [];
+    this.objects = [];
+    this.players = [];
+    this.obstacles = [];
+    this.quadtree.clear();
+    this.InGameHUD.destroy();
+  }
+
   fixedUpdate() {
     this.camera.update();
 
