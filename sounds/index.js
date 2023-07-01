@@ -1,4 +1,4 @@
-import { zzfx, zzfxP, zzfxM } from '../js/lib/zzfx.js';
+import { zzfx, zzfxP, zzfxM } from '../src/libs/zzfx.js';
 
 // prettier-ignore
 const SOUNDS = {
