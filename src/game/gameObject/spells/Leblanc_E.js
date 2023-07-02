@@ -71,6 +71,8 @@ export class Leblanc_E_Object extends SpellObject {
   enemyHit = null;
   timeSinceHit = 0;
 
+  movingCirclePercent = 0;
+
   PHASES = {
     MOVING: 0,
     WAITING_FOR_STUN: 1,
@@ -103,10 +105,15 @@ export class Leblanc_E_Object extends SpellObject {
       }
     }
 
-    // stun phase
+    // wait for stun phase
     else if (this.phase == this.PHASES.WAITING_FOR_STUN) {
       this.timeSinceHit += deltaTime;
-      this.position = this.enemyHit.position.copy();
+      this.position = this.enemyHit.position.copy().add(random(-5, 5), random(-5, 5));
+
+      this.movingCirclePercent += this.timeSinceHit / 150;
+      if (this.movingCirclePercent > 100) {
+        this.movingCirclePercent = 0;
+      }
 
       // remove if enemy dead
       if (this.enemyHit.isDead) {
@@ -145,9 +152,35 @@ export class Leblanc_E_Object extends SpellObject {
     strokeWeight(4 + this.timeSinceHit / 200);
     line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);
 
-    noStroke();
-    fill(200, 200, 40);
-    circle(this.position.x, this.position.y, this.size);
+    // phase moving
+    if (this.phase == this.PHASES.MOVING) {
+      noStroke();
+      fill(200, 200, 40);
+      circle(this.position.x, this.position.y, this.size);
+    }
+
+    // phase wait for stun
+    else if (this.enemyHit) {
+      let a = map(this.timeSinceHit, 0, this.stunAfter, 50, 255);
+      stroke(200, 200, 40, a);
+      noFill();
+      circle(
+        this.enemyHit.position.x,
+        this.enemyHit.position.y,
+        this.enemyHit.stats.size.value + random(10)
+      );
+
+      // draw circle that on the line from owner to enemy, and at position based on movingCirclePercent
+      let distance = this.owner.position.dist(this.enemyHit.position);
+      let direction = this.enemyHit.position.copy().sub(this.owner.position).normalize();
+      let position = this.owner.position
+        .copy()
+        .add(direction.mult((distance * this.movingCirclePercent) / 100));
+
+      noStroke();
+      fill(200, 200, 40);
+      circle(position.x, position.y, this.size);
+    }
     pop();
   }
 }
