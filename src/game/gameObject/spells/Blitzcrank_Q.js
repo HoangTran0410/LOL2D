@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
@@ -14,10 +15,25 @@ export default class Blitzcrank_Q extends Spell {
   manaCost = 20;
 
   onSpellCast() {
+    let range = 500,
+      speed = 10,
+      grabSpeed = 10,
+      position = this.owner.position.copy();
+
+    let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let direction = worldMouse.sub(position).normalize();
+    let destination = position.copy().add(direction.mult(range));
+
     this.blitObj = new Blitzcrank_Q_Object(this.owner);
+    this.blitObj.position = position;
+    this.blitObj.destination = destination;
+    this.blitObj.speed = speed;
+    this.blitObj.grabSpeed = grabSpeed;
+    this.blitObj.range = range;
     this.game.objects.push(this.blitObj);
 
     this.ownerStunBuff = new RootBuff(100000, this.owner, this.owner);
+    this.ownerStunBuff.buffAddType = BuffAddType.REPLACE_EXISTING;
     this.ownerStunBuff.image = this.image;
     this.owner.addBuff(this.ownerStunBuff);
   }
@@ -38,26 +54,21 @@ export default class Blitzcrank_Q extends Spell {
 export class Blitzcrank_Q_Object extends SpellObject {
   isMissile = true;
 
+  position = createVector();
+  destination = createVector();
+  range = 500;
+  speed = 10;
+  grabSpeed = 10;
+
   airborneBuff = null;
   dashBuff = null;
   champToGrab = null;
 
-  init() {
-    this.range = 500;
-    this.speed = 10;
-    this.grabSpeed = 10;
-    this.position = this.owner.position.copy();
-
-    let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let direction = worldMouse.sub(this.position).normalize();
-    this.destination = this.position.copy().add(direction.mult(this.range));
-
-    this.PHASES = {
-      FORWARD: 'forward',
-      GRAB: 'grab',
-    };
-    this.phase = this.PHASES.FORWARD;
-  }
+  PHASES = {
+    FORWARD: 'forward',
+    GRAB: 'grab',
+  };
+  phase = this.PHASES.FORWARD;
 
   update() {
     let distance = this.destination.dist(this.position);

@@ -28,6 +28,7 @@ export default class Buff {
   }
 
   deactivateBuff() {
+    if (this.toRemove) return;
     this.toRemove = true;
     this.onDeactivate();
     for (let listener of this._deactivateListeners) {

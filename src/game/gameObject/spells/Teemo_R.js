@@ -20,7 +20,11 @@ export default class Teemo_R extends Spell {
       exploreRange = 200;
 
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let destination = mouse.sub(this.owner.position).setMag(throwRange).add(this.owner.position);
+    let mouseDistance = mouse.dist(this.owner.position);
+    let destination = mouse
+      .sub(this.owner.position)
+      .setMag(Math.min(throwRange, mouseDistance))
+      .add(this.owner.position);
 
     let obj = new Teemo_R_Object(this.owner);
     obj.position = this.owner.position.copy();
@@ -137,7 +141,7 @@ export class Teemo_R_Object extends SpellObject {
   draw() {
     // moving phase + invisible phase
     if (this.phase === this.PHASES.MOVING || this.phase === this.PHASES.INVISIBLE) {
-      let alpha = this.phase === this.PHASES.INVISIBLE && this.age > this.invisibleAfter ? 50 : 255;
+      let alpha = this.phase === this.PHASES.INVISIBLE && this.age > this.invisibleAfter ? 25 : 255;
       push();
       // stroke(100, alpha);
       noStroke();
