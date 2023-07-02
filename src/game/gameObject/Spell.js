@@ -27,6 +27,9 @@ export default class Spell {
 
     switch (this.state) {
       case SpellState.READY:
+        if (this.currentCooldown > 0) {
+          this.state = SpellState.COOLDOWN;
+        }
         break;
 
       case SpellState.COOLDOWN:

@@ -14,6 +14,8 @@ const AssetPaths = {
   spell_leblanc_w1: 'assets/images/spells/leblanc_w1.png',
   spell_leblanc_w2: 'assets/images/spells/leblanc_w2.png',
   spell_leblanc_e: 'assets/images/spells/leblanc_e.png',
+  spell_leesin_q1: 'assets/images/spells/leesin_q1.png',
+  spell_leesin_q2: 'assets/images/spells/leesin_q2.png',
   spell_ashe_w: 'assets/images/spells/ashe_w.png',
   spell_ashe_r: 'assets/images/spells/ashe_r.png',
   spell_blitzcrank_internal: 'assets/images/spells/blitzcrank_internal.png',

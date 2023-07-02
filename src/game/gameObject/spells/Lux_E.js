@@ -43,7 +43,6 @@ export default class Lux_E extends Spell {
     // cancel cooldown on lux object reached destination
     if (this.luxEObject?.phase === Lux_E_Object.PHASES.STATIC) {
       if (this.state == SpellState.COOLDOWN) {
-        this.state = SpellState.READY;
         this.currentCooldown = 0;
       }
 

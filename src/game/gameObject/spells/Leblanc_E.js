@@ -91,14 +91,15 @@ export class Leblanc_E_Object extends SpellObject {
       }
 
       // check collide enemy
-      let enemies = this.game.queryPlayerInRange({
+      let enemy = this.game.queryPlayerInRange({
         position: this.position,
         range: this.size,
         excludePlayers: [this.owner],
         includePlayerSize: true,
+        getOnlyOne: true,
       });
-      if (enemies.length > 0) {
-        this.enemyHit = enemies[0];
+      if (enemy) {
+        this.enemyHit = enemy;
         this.enemyHit.takeDamage(this.hitDamage, this.owner);
         this.isMissile = false; // cant be blocked after hit enemy
         this.phase = this.PHASES.WAITING_FOR_STUN;

@@ -396,13 +396,21 @@ export default class Game {
     excludePlayers = [],
     includePlayerSize = false,
     includeDead = false,
+    getOnlyOne = false,
   }) {
-    return this.players.filter(
-      p =>
-        !excludePlayers.includes(p) &&
+    let result = [];
+    for (let p of this.players) {
+      if (
         (includeDead ? true : p.isDead === false) &&
+        !excludePlayers.includes(p) &&
         p.position.dist(position) < range / 2 + (includePlayerSize ? p.stats.size.value / 2 : 0)
-    );
+      ) {
+        if (getOnlyOne) return p;
+        result.push(p);
+      }
+    }
+
+    return getOnlyOne ? null : result;
   }
 
   getRandomSpawnLocation() {

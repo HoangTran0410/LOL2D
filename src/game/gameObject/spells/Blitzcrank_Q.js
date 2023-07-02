@@ -124,7 +124,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     push();
 
     // draw line from hand to owner
-    let alpha = map(this.position.dist(this.owner.position), 0, this.range, 200, 0);
+    let alpha = map(this.position.dist(this.owner.position), 0, this.range, 200, 50);
     stroke(255, alpha);
     strokeWeight(4);
     line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);

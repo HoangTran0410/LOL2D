@@ -16,3 +16,4 @@ export { default as Ashe_W } from './Ashe_W.js';
 export { default as Ashe_R } from './Ashe_R.js';
 export { default as Leblanc_W } from './Leblanc_W.js';
 export { default as Leblanc_E } from './Leblanc_E.js';
+export { default as LeeSin_Q } from './LeeSin_Q.js';

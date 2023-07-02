@@ -32,10 +32,6 @@ export default class Leblanc_W extends Spell {
     this.phase = phase;
     this.image = phase.image;
     this.currentCooldown = coolDown;
-
-    if (coolDown > 0) {
-      this.state = SpellState.COOLDOWN;
-    }
   }
 
   checkCastCondition() {
