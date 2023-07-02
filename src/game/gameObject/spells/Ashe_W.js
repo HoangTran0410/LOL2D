@@ -63,17 +63,18 @@ export class Ashe_W_Object extends SpellObject {
       this.toRemove = true;
     }
 
-    for (let enemy of this.game.players) {
-      if (
-        enemy != this.owner &&
-        !enemy.isDead &&
-        this.position.dist(enemy.position) < enemy.stats.size.value / 2 + this.size / 2
-      ) {
-        enemy.addBuff(new Ashe_W_Buff(1500, this.owner, enemy));
-        enemy.takeDamage(5, this.owner);
-        this.toRemove = true;
-        break;
-      }
+    let enemy = this.game.queryPlayerInRange({
+      position: this.position,
+      range: this.size / 2,
+      includePlayerSize: true,
+      excludePlayers: [this.owner],
+      getOnlyOne: true,
+    });
+
+    if (enemy) {
+      enemy.addBuff(new Ashe_W_Buff(1500, this.owner, enemy));
+      enemy.takeDamage(5, this.owner);
+      this.toRemove = true;
     }
   }
 
