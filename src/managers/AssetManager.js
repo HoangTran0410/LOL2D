@@ -9,6 +9,7 @@ const AssetPaths = {
   champ_ahri: 'assets/images/champions/ahri.png',
   champ_zed: 'assets/images/champions/zed.png',
   champ_leblanc: 'assets/images/champions/leblanc.png',
+  champ_leesin: 'assets/images/champions/leesin.png',
 
   // spells
   spell_leblanc_w1: 'assets/images/spells/leblanc_w1.png',
