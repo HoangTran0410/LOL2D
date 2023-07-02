@@ -8,6 +8,7 @@ export default class Spell {
   image = null;
   description = null;
   disabled = false;
+  willDrawPreview = false;
 
   // for spell logic
   level = 0;
@@ -25,6 +26,7 @@ export default class Spell {
   update() {
     this.onUpdate();
 
+    this.willDrawPreview = false;
     switch (this.state) {
       case SpellState.READY:
         if (this.currentCooldown > 0) {
@@ -45,6 +47,7 @@ export default class Spell {
   }
 
   cast() {
+    this.willDrawPreview = true;
     if (this.state !== SpellState.READY) return;
     if (this.castCancelCheck()) return;
 
@@ -93,4 +96,5 @@ export default class Spell {
   }
   onSpellCast() {}
   onUpdate() {}
+  drawPreview() {}
 }

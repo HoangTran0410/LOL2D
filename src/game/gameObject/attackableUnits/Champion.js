@@ -182,6 +182,10 @@ export default class Champion {
 
     push();
 
+    if (this === this.game.player) {
+      this.spells.forEach(spell => spell.willDrawPreview && spell.drawPreview?.());
+    }
+
     let size = this.animatedSize + this.animatedHeight;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;

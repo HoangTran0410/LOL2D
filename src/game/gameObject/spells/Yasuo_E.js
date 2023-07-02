@@ -11,6 +11,8 @@ export default class Yasuo_E extends Spell {
   coolDown = 2000;
   manaCost = 30;
 
+  rangeToFindEnemies = 230;
+
   onSpellCast() {
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
     this.owner.destination.set(mouse.x, mouse.y);
@@ -20,12 +22,12 @@ export default class Yasuo_E extends Spell {
       return;
     }
 
-    const rangeToCheck = 230;
-
     // find all enemies in range
-    let enemiesInRange = this.game.players.filter(
-      p => !p.isDead && p != this.owner && p.position.dist(this.owner.position) < rangeToCheck
-    );
+    let enemiesInRange = this.game.queryPlayerInRange({
+      position: this.owner.position,
+      range: this.rangeToFindEnemies,
+      excludePlayers: [this.owner],
+    });
     if (enemiesInRange.length == 0) {
       this.currentCooldown = 0;
       return;
@@ -62,6 +64,14 @@ export default class Yasuo_E extends Spell {
 
       playSound(SOUNDS.dash);
     }
+  }
+
+  drawPreview() {
+    push();
+    stroke(255, 100);
+    noFill();
+    circle(this.owner.position.x, this.owner.position.y, this.rangeToFindEnemies * 2);
+    pop();
   }
 }
 

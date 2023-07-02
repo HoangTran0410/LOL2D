@@ -93,7 +93,7 @@ export class Leblanc_E_Object extends SpellObject {
       // check collide enemy
       let enemy = this.game.queryPlayerInRange({
         position: this.position,
-        range: this.size,
+        range: this.size / 2,
         excludePlayers: [this.owner],
         includePlayerSize: true,
         getOnlyOne: true,

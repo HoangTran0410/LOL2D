@@ -133,7 +133,7 @@ export class LeeSin_Q_Object extends SpellObject {
       // check collision with enemy
       let enemy = this.game.queryPlayerInRange({
         position: this.position,
-        range: this.size,
+        range: this.size / 2,
         excludePlayers: [this.owner],
         includePlayerSize: true,
         includeDead: false,

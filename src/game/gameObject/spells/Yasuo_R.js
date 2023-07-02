@@ -13,21 +13,20 @@ export default class Yasuo_R extends Spell {
   coolDown = 10000;
   manaCost = 50;
 
-  onSpellCast() {
-    const rangeToFindEnemies = 500,
-      rangeToApplyAirborne = 400,
-      timeToApplyAirborne = 1500;
+  rangeToFindEnemies = 500;
+  rangeToApplyAirborne = 400;
+  timeToApplyAirborne = 1500;
 
+  onSpellCast() {
     let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
 
     // query all enemies that have height > 0 in range 500px
-    let enemies = this.game.players.filter(
-      p =>
-        !p.isDead &&
-        p != this.owner &&
-        p.stats.height.value > 0 &&
-        p.position.dist(this.owner.position) < rangeToFindEnemies
-    );
+    let enemies = this.game.queryPlayerInRange({
+      position: this.owner.position,
+      range: this.rangeToFindEnemies,
+      customFilter: p => p.stats.height.value > 0,
+      excludePlayers: [this.owner],
+    });
 
     // find enemy that is nearest to mouse
     let nearestEnemy = null;
@@ -43,12 +42,12 @@ export default class Yasuo_R extends Spell {
     if (nearestEnemy) {
       // find all enemies that are in range 300px to nearest enemy
       let enemiesInRange = enemies.filter(
-        enemy => enemy.position.dist(nearestEnemy.position) < rangeToApplyAirborne / 2
+        enemy => enemy.position.dist(nearestEnemy.position) < this.rangeToApplyAirborne / 2
       );
 
       // add airborne buff to all enemies in range
       for (let enemy of enemiesInRange) {
-        let buff = new Airborne(timeToApplyAirborne, this.owner, enemy);
+        let buff = new Airborne(this.timeToApplyAirborne, this.owner, enemy);
         buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
         buff.image = this.image;
         buff.draw = () => {
@@ -78,14 +77,14 @@ export default class Yasuo_R extends Spell {
       }
 
       // add airborne buff to owner
-      this.owner.addBuff(new RootBuff(timeToApplyAirborne, this.owner, this.owner));
+      this.owner.addBuff(new RootBuff(this.timeToApplyAirborne, this.owner, this.owner));
 
       // add spell object animation
       let obj = new Yasuo_R_Object(this.owner);
       obj.oldPosition = this.owner.position.copy();
       obj.position = nearestEnemy.position.copy();
-      obj.size = rangeToApplyAirborne;
-      obj.lifeTime = timeToApplyAirborne;
+      obj.size = this.rangeToApplyAirborne;
+      obj.lifeTime = this.timeToApplyAirborne;
       obj.playersEffected = enemiesInRange;
       this.game.objects.push(obj);
 
@@ -100,13 +99,15 @@ export default class Yasuo_R extends Spell {
     } else {
       // if no enemy is found, reset cooldown
       this.currentCooldown = 0;
-
-      if (this.owner == this.game.player) {
-        let obj = new Yasuo_R_Empty_Object(this.owner);
-        obj.range = rangeToFindEnemies * 2;
-        this.game.objects.push(obj);
-      }
     }
+  }
+
+  drawPreview() {
+    push();
+    stroke(255, 100);
+    noFill();
+    circle(this.owner.position.x, this.owner.position.y, this.rangeToFindEnemies * 2);
+    pop();
   }
 }
 
@@ -141,27 +142,6 @@ export class Yasuo_R_Object extends SpellObject {
     strokeWeight(this.owner.stats.size.value);
     line(this.oldPosition.x, this.oldPosition.y, this.owner.position.x, this.owner.position.y);
 
-    pop();
-  }
-}
-
-export class Yasuo_R_Empty_Object extends SpellObject {
-  position = this.owner.position.copy();
-  lifeTime = 10;
-  range = 300;
-
-  update() {
-    this.lifeTime -= deltaTime;
-    if (this.lifeTime <= 0) {
-      this.toRemove = true;
-    }
-  }
-
-  draw() {
-    push();
-    stroke(255, 100);
-    noFill();
-    circle(this.position.x, this.position.y, this.range);
     pop();
   }
 }

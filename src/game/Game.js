@@ -392,18 +392,20 @@ export default class Game {
 
   queryPlayerInRange({
     position,
-    range,
+    range, // radius
     excludePlayers = [],
     includePlayerSize = false,
     includeDead = false,
     getOnlyOne = false,
+    customFilter = null,
   }) {
     let result = [];
     for (let p of this.players) {
       if (
         (includeDead ? true : p.isDead === false) &&
         !excludePlayers.includes(p) &&
-        p.position.dist(position) < range / 2 + (includePlayerSize ? p.stats.size.value / 2 : 0)
+        p.position.dist(position) < range + (includePlayerSize ? p.stats.size.value / 2 : 0) &&
+        (customFilter === null || customFilter(p))
       ) {
         if (getOnlyOne) return p;
         result.push(p);
