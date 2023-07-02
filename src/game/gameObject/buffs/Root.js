@@ -11,6 +11,8 @@ export default class Root extends Buff {
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 
+  effectColor = [255, 255, 255, 200];
+
   onUpdate() {
     // apply root every frame
     this.targetUnit.status &= ~StatusFlags.CanMove;
@@ -27,7 +29,7 @@ export default class Root extends Buff {
 
     push();
     noFill();
-    stroke(255, 200);
+    stroke(this.effectColor);
     strokeWeight(4);
     circle(pos.x, pos.y, size + random(-3, 3));
     pop();

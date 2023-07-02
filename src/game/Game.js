@@ -80,7 +80,7 @@ const ChampionPreset = {
       AllSpells.Heal,
       AllSpells.Blitzcrank_Q,
       AllSpells.Leblanc_W,
-      AllSpells.Leblanc_W,
+      AllSpells.Leblanc_E,
       AllSpells.Leblanc_W,
       AllSpells.Flash,
       AllSpells.Ghost,
