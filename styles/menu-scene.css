@@ -30,6 +30,27 @@
     z-index: 10;
 }
 
+.hextech-btn {
+    text-transform: uppercase;
+    font-size: 18px;
+    color: #f0e6d2;
+    padding: .75rem 2rem;
+
+    border: 3px solid transparent;
+    background: #1e2328;
+    border-image: linear-gradient(#08abac, #01698b) 1;
+    transition: all ease .5s;
+}
+
+.hextech-btn:hover {
+    background-image: url(https://cdn.jsdelivr.net/gh/pxlucasf/hextech-css@master/dist/img/btn.jpg);
+    background-position: center center;
+    background-size: cover;
+    box-shadow: 0 0 10px 4px rgba(192, 252, 253, .4), inset 0 0 5px 2px rgba(192, 252, 253, .3);
+    border: 3px solid rgba(192, 252, 253, .75);
+    cursor: pointer
+}
+
 .shiny {
     display: block;
     height: 200px;
@@ -84,6 +105,7 @@
     position: absolute;
     top: 0;
     right: 0;
+    margin: 0;
     text-transform: uppercase;
     font-family: verdana;
     font-size: 4em;

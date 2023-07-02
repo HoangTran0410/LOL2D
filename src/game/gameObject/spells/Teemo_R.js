@@ -150,6 +150,10 @@ export class Teemo_R_Object extends SpellObject {
         let y = spot.x * sin(this.angle) + spot.y * cos(this.angle);
         circle(this.position.x + x, this.position.y + y, spot.r);
       }
+
+      // fill(200, alpha);
+      // textAlign(CENTER, CENTER);
+      // text(~~((this.lifeTime - this.age) / 1000), this.position.x, this.position.y);
       pop();
     }
 

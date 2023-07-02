@@ -93,6 +93,7 @@ export default class Game {
     this.InGameHUD = new InGameHUD(this);
 
     this.MAPSIZE = 6400;
+    // this.collideCheckObstacles = [];
     this.kills = [];
     this.objects = [];
     this.players = [];
@@ -172,6 +173,7 @@ export default class Game {
     for (let p of this.players) p.update();
 
     // collision with obstacles
+    this.collideCheckObstacles = [];
     for (let p of this.players) {
       let area = new Rectangle({
         x: p.position.x,
@@ -180,6 +182,7 @@ export default class Game {
         height: p.stats.size.value / 2,
       });
       let obstacles = this.quadtree.retrieve(area).map(o => o.data);
+      // this.collideCheckObstacles.push(...obstacles);
 
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
       for (let o of obstacles) {
@@ -287,6 +290,17 @@ export default class Game {
       o.draw();
     }
 
+    // debug SAT collision check
+    // push();
+    // fill('#e55');
+    // stroke('#e55');
+    // for (let o of this.collideCheckObstacles) {
+    //   beginShape();
+    //   for (let v of o.vertices) vertex(v.x, v.y);
+    //   endShape(CLOSE);
+    // }
+    // pop();
+
     // draw clicked point
     if (this.clickedPoint.size > 0) {
       push();
@@ -314,11 +328,11 @@ export default class Game {
     this.camera.pop();
 
     // draw mouse
-    push();
-    strokeWeight(10);
-    stroke(150);
-    line(mouseX, mouseY, pmouseX, pmouseY);
-    pop();
+    // push();
+    // strokeWeight(10);
+    // stroke(150);
+    // line(mouseX, mouseY, pmouseX, pmouseY);
+    // pop();
   }
 
   keyPressed() {

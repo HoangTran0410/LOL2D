@@ -17,7 +17,7 @@ export default class Obstacle {
 
   draw() {
     push();
-    noStroke();
+    stroke(100);
     fill(100);
     translate(this.position.x, this.position.y);
     rotate(this.angle);
