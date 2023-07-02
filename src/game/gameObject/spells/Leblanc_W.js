@@ -71,6 +71,7 @@ export default class Leblanc_W extends Spell {
         let enemies = this.game.queryPlayerInRange({
           position: destination,
           range: w2Obj.size / 2,
+          excludePlayers: [this.owner],
           includePlayerSize: true,
         });
         enemies.forEach(enemy => {

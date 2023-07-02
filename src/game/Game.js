@@ -377,10 +377,16 @@ export default class Game {
     return this.objects.filter(o => o.position.dist(position) < range / 2);
   }
 
-  queryPlayerInRange({ position, range, includePlayerSize = false, includeDead = false }) {
+  queryPlayerInRange({
+    position,
+    range,
+    excludePlayers = [],
+    includePlayerSize = false,
+    includeDead = false,
+  }) {
     return this.players.filter(
       p =>
-        p !== this.player &&
+        !excludePlayers.includes(p) &&
         (includeDead ? true : p.isDead === false) &&
         p.position.dist(position) < range / 2 + (includePlayerSize ? p.stats.size.value / 2 : 0)
     );

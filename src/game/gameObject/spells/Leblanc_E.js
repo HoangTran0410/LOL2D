@@ -92,6 +92,7 @@ export class Leblanc_E_Object extends SpellObject {
       let enemies = this.game.queryPlayerInRange({
         position: this.position,
         range: this.size,
+        excludePlayers: [this.owner],
         includePlayerSize: true,
       });
       if (enemies.length > 0) {
