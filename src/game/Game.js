@@ -203,14 +203,27 @@ export default class Game {
         width: p.stats.size.value / 2,
         height: p.stats.size.value / 2,
       });
-      let obstacles = this.quadtree
-        .retrieve(area)
-        .map(o => o.data)
-        .filter(o => o.type === TerrainType.WALL);
+      let obstacles = this.quadtree.retrieve(area).map(o => o.data);
       // this.collideCheckObstacles.push(...obstacles);
 
+      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
+      let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
+
+      // Collide with bushes
+      let isInBush = false;
+      for (let b of bushes) {
+        let response = new SAT.Response();
+        let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
+        if (collided) {
+          isInBush = true;
+          break;
+        }
+      }
+      p.isInBush = isInBush;
+
+      // Collide with walls
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
-      for (let o of obstacles) {
+      for (let o of walls) {
         let response = new SAT.Response();
         let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
         if (collided) {
@@ -313,9 +326,10 @@ export default class Game {
 
     let waters = obstacles.filter(o => o.type === TerrainType.WATER);
     let walls = obstacles.filter(o => o.type === TerrainType.WALL);
-    let bush = obstacles.filter(o => o.type === TerrainType.BUSH);
+    let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
 
     for (let w of waters) w.draw();
+    for (let b of bushes) b.draw();
     for (let w of walls) w.draw();
 
     // debug SAT collision check
@@ -339,7 +353,6 @@ export default class Game {
 
     for (let o of this.objects) o.draw();
     for (let p of this.players) p.draw();
-    for (let b of bush) b.draw();
 
     // draw edges
     stroke('white');

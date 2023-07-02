@@ -178,7 +178,7 @@ export default class Champion {
 
   draw() {
     if (hasFlag(this.status, StatusFlags.NoRender)) return;
-    let alpha = hasFlag(this.status, StatusFlags.Stealthed) ? 50 : 255;
+    let alpha = this.isInBush || hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
 
     push();
 
@@ -222,8 +222,8 @@ export default class Champion {
         y: this.position.y - size / 2 - barHeight - 15,
       };
 
-    fill('#020F15');
-    stroke('#5B5C57');
+    fill(2, 15, 21, alpha);
+    stroke(91, 92, 87, alpha);
     strokeWeight(3);
     rect(
       topleft.x - borderWidth * 0.5,
@@ -233,7 +233,7 @@ export default class Champion {
     );
 
     // score
-    fill('#F2F2F2');
+    fill(242, 242, 242, alpha);
     textSize(12);
     text(this.score, topleft.x + 3, topleft.y + 12);
 
@@ -242,12 +242,12 @@ export default class Champion {
     // health
     const healthContainerW = barWidth - barHeight;
     const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
-    fill(this.isDead ? '#999' : '#43C41D');
+    fill(this.isDead ? [153, 153, 153, alpha] : [67, 196, 29, alpha]);
     rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
     // mana
     const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
-    fill(this.isDead ? '#999' : '#6CB3D5');
+    fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 
     // draw buffs
@@ -293,7 +293,7 @@ export default class Champion {
         .join(', ');
       if (statusString) {
         noStroke();
-        fill(255, alpha);
+        fill(200);
         textAlign(CENTER, CENTER);
         textSize(13);
         text(statusString, pos.x, topleft.y + barHeight + 8);
