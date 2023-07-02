@@ -93,7 +93,7 @@ const ChampionPreset = {
       AllSpells.Heal,
       AllSpells.LeeSin_Q,
       AllSpells.LeeSin_Q,
-      AllSpells.LeeSin_R,
+      AllSpells.LeeSin_E,
       AllSpells.LeeSin_R,
       AllSpells.Flash,
       AllSpells.Ghost,

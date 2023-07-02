@@ -56,6 +56,12 @@ export default class LeeSin_R extends Spell {
     // apply damage to target enemy
     closestEnemyToMouse.takeDamage(this.damage, this.owner);
 
+    // effect object that will follow the target enemy, to check for enemies in collide
+    let obj = new LeeSin_R_Object(this.owner);
+    obj.targetEnemy = closestEnemyToMouse;
+    obj.collideDamage = this.collideDamage;
+    this.game.objects.push(obj);
+
     // target enemy dash to destination
     let airborneBuff = new Airborne(3000, this.owner, closestEnemyToMouse);
     closestEnemyToMouse.addBuff(airborneBuff);
@@ -75,12 +81,6 @@ export default class LeeSin_R extends Spell {
       closestEnemyToMouse.addBuff(stunBuff);
     };
     closestEnemyToMouse.addBuff(dashBuff);
-
-    // effect object that will follow the target enemy, to check for enemies in collide
-    let obj = new LeeSin_R_Object(this.owner);
-    obj.targetEnemy = closestEnemyToMouse;
-    obj.collideDamage = this.collideDamage;
-    this.game.objects.push(obj);
   }
 
   drawPreview() {
@@ -99,6 +99,8 @@ export class LeeSin_R_Object extends SpellObject {
   effectedEnemies = [];
 
   update() {
+    if (this.targetEnemy.isDead) this.toRemove = true;
+
     // find enemies in collide with targetEnemy
     let enemies = this.game.queryPlayerInRange({
       position: this.targetEnemy.position,
