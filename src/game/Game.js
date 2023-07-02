@@ -87,6 +87,18 @@ const ChampionPreset = {
       AllSpells.Ghost,
     ],
   },
+  leesin: {
+    avatar: 'champ_leesin',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.LeeSin_Q,
+      AllSpells.LeeSin_Q,
+      AllSpells.LeeSin_R,
+      AllSpells.LeeSin_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
 };
 
 export default class Game {
