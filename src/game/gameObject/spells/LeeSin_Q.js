@@ -1,6 +1,7 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import { hasFlag } from '../../../utils/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import SpellState from '../../enums/SpellState.js';
+import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
@@ -20,10 +21,19 @@ export default class LeeSin_Q extends Spell {
   name = 'Sóng Âm / Vô Ảnh Cước (LeeSin_Q)';
   description =
     'Chưởng 1 luồng sóng âm về hướng chỉ định, gây 15 sát thương. Có thể tái kích hoạt trong vòng 3s để lao tới kẻ địch trúng Sóng Âm, gây thêm 15 sát thương.';
-  coolDown = 1000;
+  coolDown = 5000;
+  collDownAfterQ1 = 500;
 
   spellObject = null;
   enemyHit = null;
+
+  checkCastCondition() {
+    // if Q1 hitted, but can't move => can't cast Q2
+    if (this.phase === this.PHASES.Q2 && !hasFlag(this.owner.status, StatusFlags.CanMove)) {
+      return false;
+    }
+    return true;
+  }
 
   onSpellCast() {
     const range = 400,
@@ -54,7 +64,7 @@ export default class LeeSin_Q extends Spell {
         // switch to phase 2 if Q1 hits
         this.phase = this.PHASES.Q2;
         this.image = this.phase.image;
-        this.currentCooldown = 0; // reset cooldown -> can recast immediately
+        this.currentCooldown = this.collDownAfterQ1;
       };
       this.spellObject = obj;
 
@@ -155,7 +165,7 @@ export class LeeSin_Q_Object extends SpellObject {
 
     // move phase
     if (this.phase === this.PHASES.MOVING) {
-      let alpha = map(p5.Vector.sub(this.destination, this.position).mag(), 0, this.range, 50, 255);
+      let alpha = map(p5.Vector.sub(this.destination, this.position).mag(), 0, this.range, 99, 255);
       fill(181, 237, 232, alpha);
       stroke(190);
       translate(this.position.x, this.position.y);
@@ -174,7 +184,8 @@ export class LeeSin_Q_Object extends SpellObject {
       noStroke();
       [0, PI / 2, PI / 2, PI / 2].forEach((angle, i) => {
         rotate(angle);
-        triangle(-s, 0, -s - 15, -s, -s - 15, s);
+        let r = random(15, 20);
+        triangle(-s, 0, -s - r, -s, -s - r, s);
       });
     }
     pop();

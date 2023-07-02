@@ -26,7 +26,7 @@ export default class Stats {
     this.height = new Stat(0);
 
     this.manaRegen = new Stat(0.1);
-    this.healthRegen = new Stat(0.1);
+    this.healthRegen = new Stat(0.06);
   }
 
   addModifier(modifier) {
