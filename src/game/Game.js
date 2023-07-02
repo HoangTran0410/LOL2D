@@ -9,6 +9,7 @@ import { hasFlag } from '../utils/index.js';
 import StatusFlags from './enums/StatusFlags.js';
 import * as AllSpells from './gameObject/spells/index.js';
 import AssetManager from '../managers/AssetManager.js';
+import TerrainType from './enums/TerrainType.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -126,9 +127,25 @@ export default class Game {
     });
 
     this.obstacles = [];
-    const walls = AssetManager.getAsset('json_summoner_map')?.data?.wall ?? [];
-    for (let i = 0; i < walls.length; i++) {
-      let o = new Obstacle(0, 0, Obstacle.arrayToVertices(walls[i]));
+    let polygons = [];
+    const terrains = AssetManager.getAsset('json_summoner_map')?.data;
+    for (let terrainType in terrains) {
+      polygons.push(
+        ...terrains[terrainType].map(_ => ({
+          vertices: _,
+          type:
+            terrainType === 'wall'
+              ? TerrainType.WALL
+              : terrainType === 'bush'
+              ? TerrainType.BUSH
+              : TerrainType.WATER,
+        }))
+      );
+    }
+    console.log(polygons);
+
+    for (let i = 0; i < polygons.length; i++) {
+      let o = new Obstacle(0, 0, Obstacle.arrayToVertices(polygons[i].vertices), polygons[i].type);
       this.obstacles.push(o);
 
       const rectangle = new Rectangle({
@@ -186,7 +203,10 @@ export default class Game {
         width: p.stats.size.value / 2,
         height: p.stats.size.value / 2,
       });
-      let obstacles = this.quadtree.retrieve(area).map(o => o.data);
+      let obstacles = this.quadtree
+        .retrieve(area)
+        .map(o => o.data)
+        .filter(o => o.type === TerrainType.WALL);
       // this.collideCheckObstacles.push(...obstacles);
 
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
@@ -291,9 +311,12 @@ export default class Game {
       .retrieve(new Rectangle(this.camera.getViewBounds()))
       .map(o => o.data);
 
-    for (let o of obstacles) {
-      o.draw();
-    }
+    let waters = obstacles.filter(o => o.type === TerrainType.WATER);
+    let walls = obstacles.filter(o => o.type === TerrainType.WALL);
+    let bush = obstacles.filter(o => o.type === TerrainType.BUSH);
+
+    for (let w of waters) w.draw();
+    for (let w of walls) w.draw();
 
     // debug SAT collision check
     // push();
@@ -314,13 +337,9 @@ export default class Game {
       pop();
     }
 
-    for (let o of this.objects) {
-      o.draw();
-    }
-
-    for (let p of this.players) {
-      p.draw();
-    }
+    for (let o of this.objects) o.draw();
+    for (let p of this.players) p.draw();
+    for (let b of bush) b.draw();
 
     // draw edges
     stroke('white');

@@ -204,11 +204,13 @@ export default class Champion {
     circle(pos.x, pos.y, size);
 
     // draw direction to mouse
-    let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
-    let mouseDir = p5.Vector.sub(mousePos, pos).setMag(size / 1.75);
-    stroke(255, alpha);
-    strokeWeight(4);
-    line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+    if (!this.isDead) {
+      let mousePos = this.game.camera.screenToWorld(mouseX, mouseY);
+      let mouseDir = p5.Vector.sub(mousePos, pos).setMag(size / 1.75);
+      stroke(255, alpha);
+      strokeWeight(4);
+      line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+    }
 
     // draw health bar
     let borderWidth = 3,
@@ -275,12 +277,12 @@ export default class Champion {
       circle(0, 0, size);
 
       // draw X using 2 rects
-      fill(255, 0, 0, 100);
-      noStroke();
-      rotate(PI / 4);
-      rectMode(CENTER);
-      rect(0, 0, size, 15);
-      rect(0, 0, 15, size);
+      // fill(255, 0, 0, 100);
+      // noStroke();
+      // rotate(PI / 4);
+      // rectMode(CENTER);
+      // rect(0, 0, size, 15);
+      // rect(0, 0, 15, size);
       pop();
     } else {
       let statusString = [Airborne, Root, Silence, Dash, Stun]

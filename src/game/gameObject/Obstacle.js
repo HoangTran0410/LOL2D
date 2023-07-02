@@ -1,5 +1,8 @@
+import TerrainType from '../enums/TerrainType.js';
+
 export default class Obstacle {
-  constructor(x, y, vertices) {
+  constructor(x, y, vertices, type) {
+    this.type = type || TerrainType.WALL;
     this.position = createVector(x, y);
     this.angle = 0;
     this.vertices = vertices || [];
@@ -17,8 +20,17 @@ export default class Obstacle {
 
   draw() {
     push();
-    stroke(100);
-    fill(100);
+
+    if (this.type === TerrainType.WALL) {
+      stroke('#555');
+      fill('#555');
+    } else if (this.type === TerrainType.WATER) {
+      noStroke();
+      fill('#082740');
+    } else if (this.type === TerrainType.BUSH) {
+      stroke('#107d49');
+      fill('#10613aee');
+    }
     translate(this.position.x, this.position.y);
     rotate(this.angle);
     beginShape();

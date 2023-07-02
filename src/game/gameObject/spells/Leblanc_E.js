@@ -1,6 +1,4 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
@@ -147,7 +145,7 @@ export class Leblanc_E_Object extends SpellObject {
     line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);
 
     noStroke();
-    fill(200, 200, 40, alpha);
+    fill(200, 200, 40);
     circle(this.position.x, this.position.y, this.size);
     pop();
   }
