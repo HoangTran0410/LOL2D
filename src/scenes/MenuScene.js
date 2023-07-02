@@ -22,7 +22,7 @@ export default class MenuScene extends Scene {
         this.currentBgIndex = 1;
       }
     }
-    this.background.style.backgroundImage = `url(../assets/images/others/menu-bg-${this.currentBgIndex}.jpg)`;
+    this.background.style.backgroundImage = `url(./assets/images/others/menu-bg-${this.currentBgIndex}.jpg)`;
   }
 
   enter() {
