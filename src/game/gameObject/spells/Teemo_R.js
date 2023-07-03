@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -18,12 +19,11 @@ export default class Teemo_R extends Spell {
       lifeTime = 20000,
       exploreRange = 200;
 
-    let mouse = this.game.worldMouse.copy();
-    let mouseDistance = mouse.dist(this.owner.position);
-    let destination = mouse
-      .sub(this.owner.position)
-      .setMag(Math.min(throwRange, mouseDistance))
-      .add(this.owner.position);
+    let { from, to: destination } = VectorUtils.getVectorWithMaxRange(
+      this.owner.position,
+      this.game.worldMouse,
+      throwRange
+    );
 
     let obj = new Teemo_R_Object(this.owner);
     obj.position = this.owner.position.copy();
@@ -73,13 +73,12 @@ export class Teemo_R_Object extends SpellObject {
   update() {
     // moving phase
     if (this.phase === Teemo_R_Object.PHASES.MOVING) {
-      let distance = this.position.dist(this.destination);
-      if (distance < this.moveSpeed) {
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
+
+      if (this.position.dist(this.destination) < this.moveSpeed) {
         this.position = this.destination.copy();
         this.isMissile = false; // yasuo W cant block this
         this.phase = Teemo_R_Object.PHASES.INVISIBLE;
-      } else {
-        this.position.add(this.destination.copy().sub(this.position).setMag(this.moveSpeed));
       }
     }
 
@@ -94,22 +93,26 @@ export class Teemo_R_Object extends SpellObject {
 
       if (this.age > this.invisibleAfter) {
         // check collide with enemy
-        let enemyStepIn = this.game.players.find(
-          p =>
-            !p.isDead &&
-            p != this.owner &&
-            p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2
-        );
-        if (enemyStepIn) {
-          let enemiesInRange = this.game.players.filter(
-            p =>
-              !p.isDead && p != this.owner && p.position.dist(this.position) < this.exploreRange / 2
-          );
+        let enemyStepIn = this.game.queryPlayerInRange({
+          position: this.position,
+          range: this.size / 2,
+          includePlayerSize: true,
+          excludePlayers: [this.owner],
+          getOnlyOne: true,
+        });
 
-          for (let p of enemiesInRange) {
-            p.addBuff(new Teemo_R_Buff(2000, this.owner, p));
-            p.takeDamage(30, this.owner);
-          }
+        if (enemyStepIn) {
+          let enemiesInRange = this.game.queryPlayerInRange({
+            position: this.position,
+            range: this.exploreRange / 2,
+            includePlayerSize: false,
+            excludePlayers: [this.owner],
+          });
+
+          enemiesInRange.forEach(enemy => {
+            enemy.addBuff(new Teemo_R_Buff(2000, this.owner, enemy));
+            enemy.takeDamage(30, this.owner);
+          });
 
           this.phase = Teemo_R_Object.PHASES.EXPLORING;
           this.age = 0; // reset age

@@ -5,6 +5,7 @@ import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import RootBuff from '../buffs/Root.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
@@ -17,15 +18,16 @@ export default class Blitzcrank_Q extends Spell {
   onSpellCast() {
     let range = 500,
       speed = 10,
-      grabSpeed = 10,
-      position = this.owner.position.copy();
+      grabSpeed = 10;
 
-    let mouse = this.game.worldMouse.copy();
-    let direction = mouse.sub(position).normalize();
-    let destination = position.copy().add(direction.mult(range));
+    let { from, to: destination } = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      this.game.worldMouse,
+      range
+    );
 
     this.blitObj = new Blitzcrank_Q_Object(this.owner);
-    this.blitObj.position = position;
+    this.blitObj.position = this.owner.position.copy();
     this.blitObj.destination = destination;
     this.blitObj.speed = speed;
     this.blitObj.grabSpeed = grabSpeed;
@@ -77,8 +79,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
       this.position = this.destination.copy();
       this.toRemove = true;
     } else {
-      let direction = this.destination.copy().sub(this.position).setMag(speed);
-      this.position.add(direction);
+      VectorUtils.moveVectorToVector(this.position, this.destination, speed);
     }
 
     // check collision with enemy

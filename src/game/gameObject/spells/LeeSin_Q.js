@@ -5,6 +5,7 @@ import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class LeeSin_Q extends Spell {
   PHASES = {
@@ -45,9 +46,11 @@ export default class LeeSin_Q extends Spell {
 
     // phase 1: Sóng âm
     if (this.phase === this.PHASES.Q1) {
-      let mouse = this.game.worldMouse.copy();
-      let direction = mouse.sub(this.owner.position).normalize();
-      let destination = this.owner.position.copy().add(direction.mult(range));
+      let { from, to: destination } = VectorUtils.getVectorWithRange(
+        this.owner.position,
+        this.game.worldMouse,
+        range
+      );
 
       let obj = new LeeSin_Q_Object(this.owner);
       obj.position = this.owner.position.copy();
@@ -123,11 +126,10 @@ export class LeeSin_Q_Object extends SpellObject {
 
   update() {
     if (this.phase === this.PHASES.MOVING) {
-      let dir = p5.Vector.sub(this.destination, this.position);
-      if (dir.mag() < this.speed) {
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+
+      if (this.destination.dist(this.position) < this.speed) {
         this.toRemove = true;
-      } else {
-        this.position.add(dir.setMag(this.speed));
       }
 
       // check collision with enemy
@@ -138,6 +140,7 @@ export class LeeSin_Q_Object extends SpellObject {
         includePlayerSize: true,
         getOnlyOne: true,
       });
+
       if (enemy) {
         this.onHit?.(enemy);
         this.enemyHit = enemy;
@@ -164,7 +167,7 @@ export class LeeSin_Q_Object extends SpellObject {
 
     // move phase
     if (this.phase === this.PHASES.MOVING) {
-      let alpha = map(p5.Vector.sub(this.destination, this.position).mag(), 0, this.range, 99, 255);
+      let alpha = map(this.destination.dist(this.position), 0, this.range, 99, 255);
       fill(181, 237, 232, alpha);
       stroke(190);
       translate(this.position.x, this.position.y);

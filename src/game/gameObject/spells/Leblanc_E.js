@@ -2,6 +2,7 @@ import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');
@@ -25,9 +26,11 @@ export default class Leblanc_E extends Spell {
       speed = 10,
       size = 25;
 
-    let mouse = this.game.worldMouse.copy();
-    let direction = mouse.sub(this.owner.position).normalize();
-    let destination = this.owner.position.copy().add(direction.mult(range));
+    let { from, to: destination } = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      this.game.worldMouse,
+      range
+    );
 
     let obj = new Leblanc_E_Object(this.owner);
     obj.destination = destination;
@@ -82,11 +85,10 @@ export class Leblanc_E_Object extends SpellObject {
   update() {
     // moving phase
     if (this.phase == Leblanc_E_Object.PHASES.MOVING) {
-      this.position.add(this.destination.copy().sub(this.position).setMag(this.speed));
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
       // remove if reach destination but not hit enemy
-      let distance = this.destination.dist(this.position);
-      if (distance <= this.speed) {
+      if (this.destination.dist(this.position) <= this.speed) {
         this.toRemove = true;
       }
 

@@ -1,5 +1,6 @@
 import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import Dash from '../buffs/Dash.js';
@@ -44,13 +45,15 @@ export default class Yasuo_E extends Spell {
       }
     }
 
-    // if found, dash to nearest enemy
+    // if found, dash to behind nearest enemy
     if (nearestEnemy) {
-      let destination = nearestEnemy.position
-        .copy()
-        .sub(this.owner.position)
-        .setMag(nearestEnemy.stats.size.value / 2 + this.owner.stats.size.value / 2)
-        .add(nearestEnemy.position);
+      let { from, to: destination } = VectorUtils.getVectorWithRange(
+        this.owner.position,
+        nearestEnemy.position,
+        this.owner.position.dist(nearestEnemy.position) +
+          nearestEnemy.stats.size.value / 2 +
+          this.owner.stats.size.value / 2
+      );
 
       let buff = new Yasuo_E_Buff(100000, this.owner, this.owner);
       buff.buffAddType = BuffAddType.REPLACE_EXISTING;

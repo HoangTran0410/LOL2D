@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
@@ -15,9 +16,11 @@ export default class Lux_Q extends Spell {
     const range = 500,
       stunTime = 2000;
 
-    let mouse = this.game.worldMouse.copy();
-    let direction = mouse.sub(this.owner.position).normalize();
-    let destination = this.owner.position.copy().add(direction.mult(range));
+    let { from, to: destination } = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      this.game.worldMouse,
+      range
+    );
 
     let obj = new Lux_Q_Object(this.owner);
     obj.destination = destination;
@@ -40,31 +43,34 @@ export class Lux_Q_Object extends SpellObject {
 
   update() {
     // move
-    let distance = this.destination.dist(this.position);
-    if (distance < this.speed) {
+    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+
+    if (this.destination.dist(this.position) < this.speed) {
       this.position = this.destination.copy();
       this.toRemove = true;
-    } else {
-      let direction = this.destination.copy().sub(this.position).setMag(this.speed);
-      this.position.add(direction);
+    }
+
+    if (this.playersEffected.length === this.maxPlayersEffected) {
+      this.toRemove = true;
     }
 
     // check collision with enemy
-    for (let champ of this.game.players) {
-      if ((!champ.isDead && champ == this.owner) || this.playersEffected.includes(champ)) continue;
+    else {
+      let enemy = this.game.queryPlayerInRange({
+        position: this.position,
+        range: this.size,
+        includePlayerSize: true,
+        excludePlayers: [this.owner, ...this.playersEffected],
+        getOnlyOne: true,
+      });
 
-      let distance = this.position.dist(champ.position);
-      if (distance < champ.stats.size.value) {
-        let stunBuff = new RootBuff(this.stunTime, this.owner, champ);
+      if (enemy) {
+        let stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
         stunBuff.image = AssetManager.getAsset('spell_lux_q');
-        champ.addBuff(stunBuff);
-        champ.takeDamage(20, this.owner);
+        enemy.addBuff(stunBuff);
+        enemy.takeDamage(20, this.owner);
 
-        this.playersEffected.push(champ);
-        if (this.playersEffected.length === this.maxPlayersEffected) {
-          this.toRemove = true;
-          break;
-        }
+        this.playersEffected.push(enemy);
       }
     }
   }

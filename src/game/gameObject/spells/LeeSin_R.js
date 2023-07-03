@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
@@ -47,14 +48,11 @@ export default class LeeSin_R extends Spell {
     });
 
     // Calculate destination
-    let direction = p5.Vector.sub(closestEnemyToMouse.position, this.owner.position).normalize();
-    let destination = p5.Vector.add(
+    let { from, to: destination } = VectorUtils.getVectorWithRange(
+      this.owner.position,
       closestEnemyToMouse.position,
-      direction.mult(this.rangeToDashEnemy)
+      this.rangeToDashEnemy
     );
-
-    // apply damage to target enemy
-    closestEnemyToMouse.takeDamage(this.damage, this.owner);
 
     // effect object that will follow the target enemy, to check for enemies in collide
     let obj = new LeeSin_R_Object(this.owner);
@@ -81,6 +79,9 @@ export default class LeeSin_R extends Spell {
       closestEnemyToMouse.addBuff(stunBuff);
     };
     closestEnemyToMouse.addBuff(dashBuff);
+
+    // apply damage to target enemy
+    closestEnemyToMouse.takeDamage(this.damage, this.owner);
   }
 
   drawPreview() {

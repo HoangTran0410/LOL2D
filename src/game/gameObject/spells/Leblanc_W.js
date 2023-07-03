@@ -5,6 +5,7 @@ import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class Leblanc_W extends Spell {
   PHASES = {
@@ -43,13 +44,13 @@ export default class Leblanc_W extends Spell {
 
   onSpellCast() {
     if (this.phase == this.PHASES.W1) {
-      let mouse = this.game.worldMouse.copy();
-      let direction = mouse.sub(this.owner.position);
-      let distance = direction.mag();
       let maxDistance = 300;
-      let destination = this.owner.position
-        .copy()
-        .add(direction.setMag(Math.min(distance, maxDistance)));
+
+      let { from, to: destination } = VectorUtils.getVectorWithMaxRange(
+        this.owner.position,
+        this.game.worldMouse,
+        maxDistance
+      );
 
       // dash owner to destination
       let dashBuff = new Leblanc_W_Buff(2000, this.owner, this.owner);

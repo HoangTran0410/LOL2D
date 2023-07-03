@@ -1,5 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import { collidePolygonPoint, rectToVertices } from '../../../utils/index.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
@@ -64,19 +65,23 @@ export default class Yasuo_Q extends Spell {
     }
 
     // Q3
-    else if (this.phase == this.PHASES.Q3) {
-      const airBorneTime = 1000,
-        range = 400,
-        speed = 5;
+    // else if (this.phase == this.PHASES.Q3) {
+    const airBorneTime = 1000,
+      range = 400,
+      speed = 5;
 
-      let destination = this.owner.position.copy().add(p5.Vector.fromAngle(angle).mult(range));
+    let { from, to: destination } = VectorUtils.getVectorWithAngleAndRange(
+      this.owner.position,
+      angle,
+      range
+    );
 
-      let tornado = new Yasuo_Q3_Object(this.owner);
-      tornado.destination = destination;
-      tornado.airBorneTime = airBorneTime;
-      tornado.speed = speed;
-      this.game.objects.push(tornado);
-    }
+    let tornado = new Yasuo_Q3_Object(this.owner);
+    tornado.destination = destination;
+    tornado.airBorneTime = airBorneTime;
+    tornado.speed = speed;
+    this.game.objects.push(tornado);
+    // }
   }
 
   onUpdate() {
@@ -192,19 +197,14 @@ export class Yasuo_Q3_Object extends SpellObject {
   playerEffected = [];
 
   update() {
-    if (!this.originalLength) {
-      this.originalLength = this.destination.dist(this.position);
-    }
+    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
     let distance = this.position.dist(this.destination);
     if (distance < this.speed) {
       this.position = this.destination.copy();
       this.toRemove = true;
-    } else {
-      this.position.add(
-        p5.Vector.sub(this.destination, this.position).normalize().mult(this.speed)
-      );
     }
+    if (!this.originalLength) this.originalLength = distance;
 
     this.size = map(distance, this.originalLength, 0, this.minSize, this.maxSize);
     this.angle += 0.2;

@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import SpellState from '../../enums/SpellState.js';
 import Buff from '../Buff.js';
@@ -20,13 +21,11 @@ export default class Lux_E extends Spell {
       const range = 400,
         size = 200;
 
-      const destination = this.game.worldMouse.copy();
-      // limit the range
-      if (destination.dist(this.owner.position) > range) {
-        destination.sub(this.owner.position);
-        destination.setMag(range);
-        destination.add(this.owner.position);
-      }
+      let { from, to: destination } = VectorUtils.getVectorWithMaxRange(
+        this.owner.position,
+        this.game.worldMouse,
+        range
+      );
 
       this.luxEObject = new Lux_E_Object(this.owner, destination, size);
       this.game.objects.push(this.luxEObject);
@@ -109,18 +108,17 @@ export class Lux_E_Object extends SpellObject {
   update() {
     // moving phase
     if (this.phase === Lux_E_Object.PHASES.MOVE) {
-      if (!this.originalDistance) this.originalDistance = this.destination.dist(this.position);
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
 
-      const direction = this.destination.copy().sub(this.position).setMag(this.moveSpeed);
-      this.position.add(direction);
-
-      this.size = lerp(this.size, this.moveSize, 0.1);
-
-      const distance = this.destination.dist(this.position);
+      let distance = this.destination.dist(this.position);
       if (distance < this.moveSpeed) {
         this.position = this.destination.copy();
         this.phase = Lux_E_Object.PHASES.STATIC;
       }
+
+      if (!this.originalDistance) this.originalDistance = distance;
+
+      this.size = lerp(this.size, this.moveSize, 0.1);
     }
 
     // static phase

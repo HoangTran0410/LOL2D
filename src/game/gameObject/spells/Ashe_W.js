@@ -3,6 +3,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
@@ -21,10 +22,17 @@ export default class Ashe_W extends Spell {
     let angleStep = Math.PI / 20;
 
     for (let i = 0; i < arrowCount; i++) {
+      let _angle = angle - (angleStep * arrowCount) / 2 + angleStep * i;
+      let { from, to } = VectorUtils.getVectorWithAngleAndRange(
+        this.owner.position,
+        _angle,
+        arrowLength
+      );
+
       let obj = new Ashe_W_Object(this.owner);
-      obj.position = this.owner.position.copy();
-      obj.direction = p5.Vector.fromAngle(angle - (angleStep * arrowCount) / 2 + angleStep * i);
-      obj.destination = obj.position.copy().add(obj.direction.copy().mult(arrowLength));
+      obj.position = from;
+      obj.destination = to;
+      obj.direction = p5.Vector.fromAngle(_angle);
 
       this.game.objects.push(obj);
     }
@@ -46,7 +54,7 @@ export class Ashe_W_Object extends SpellObject {
   size = 10;
 
   update() {
-    this.position.add(this.direction.copy().mult(this.speed));
+    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
     if (this.position.dist(this.destination) < this.speed) {
       this.toRemove = true;
