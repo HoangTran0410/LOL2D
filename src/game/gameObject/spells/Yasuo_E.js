@@ -11,10 +11,10 @@ export default class Yasuo_E extends Spell {
   coolDown = 2000;
   manaCost = 30;
 
-  rangeToFindEnemies = 230;
+  rangeToFindEnemies = 180;
 
   onSpellCast() {
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
     this.owner.destination.set(mouse.x, mouse.y);
 
     if (!Dash.CanDash(this.owner)) {

@@ -18,7 +18,7 @@ export default class Yasuo_R extends Spell {
   timeToApplyAirborne = 1500;
 
   onSpellCast() {
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
 
     // query all enemies that have height > 0 in range 500px
     let enemies = this.game.queryPlayerInRange({

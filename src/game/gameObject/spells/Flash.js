@@ -13,7 +13,7 @@ export default class Flash extends Spell {
   onSpellCast() {
     let maxDistance = 180;
 
-    let target = this.game.camera.screenToWorld(mouseX, mouseY);
+    let target = this.game.worldMouse.copy();
     let direction = p5.Vector.sub(target, this.owner.position);
     let distance = direction.mag();
     let distToMove = Math.min(distance, maxDistance);
@@ -40,7 +40,9 @@ export default class Flash extends Spell {
 }
 
 export class Flash_Object extends SpellObject {
-  init() {
+  constructor(owner) {
+    super(owner);
+
     this.position = this.owner.position.copy();
 
     this.smokes = [];

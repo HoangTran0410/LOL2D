@@ -19,7 +19,7 @@ export default class LeeSin_R extends Spell {
   collideDamage = 30;
 
   onSpellCast() {
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
 
     let enemies = this.game.queryPlayerInRange({
       position: this.owner.position,

@@ -5,11 +5,7 @@ export default class SpellObject {
   constructor(owner) {
     this.owner = owner;
     this.game = owner.game;
-
-    this.init();
   }
-
-  init() {}
 
   update() {}
 

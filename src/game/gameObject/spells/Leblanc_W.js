@@ -1,7 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import { hasFlag } from '../../../utils/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import SpellState from '../../enums/SpellState.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -44,8 +43,8 @@ export default class Leblanc_W extends Spell {
 
   onSpellCast() {
     if (this.phase == this.PHASES.W1) {
-      let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
-      let direction = mouse.copy().sub(this.owner.position);
+      let mouse = this.game.worldMouse.copy();
+      let direction = mouse.sub(this.owner.position);
       let distance = direction.mag();
       let maxDistance = 300;
       let destination = this.owner.position

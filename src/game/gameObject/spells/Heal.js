@@ -42,11 +42,9 @@ export default class Heal extends Spell {
 }
 
 export class Heal_Object extends SpellObject {
-  init() {
-    this.particles = [];
-    this.age = 0;
-    this.maxAge = 90;
-  }
+  particles = [];
+  age = 0;
+  maxAge = 90;
 
   update() {
     if (this.age < this.maxAge && random() < 0.15) {

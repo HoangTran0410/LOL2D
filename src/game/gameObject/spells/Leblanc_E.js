@@ -25,7 +25,7 @@ export default class Leblanc_E extends Spell {
       speed = 10,
       size = 25;
 
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
     let direction = mouse.sub(this.owner.position).normalize();
     let destination = this.owner.position.copy().add(direction.mult(range));
 
@@ -73,15 +73,15 @@ export class Leblanc_E_Object extends SpellObject {
 
   movingCirclePercent = 0;
 
-  PHASES = {
+  static PHASES = {
     MOVING: 0,
     WAITING_FOR_STUN: 1,
   };
-  phase = this.PHASES.MOVING;
+  phase = Leblanc_E_Object.PHASES.MOVING;
 
   update() {
     // moving phase
-    if (this.phase == this.PHASES.MOVING) {
+    if (this.phase == Leblanc_E_Object.PHASES.MOVING) {
       this.position.add(this.destination.copy().sub(this.position).setMag(this.speed));
 
       // remove if reach destination but not hit enemy
@@ -102,12 +102,12 @@ export class Leblanc_E_Object extends SpellObject {
         this.enemyHit = enemy;
         this.enemyHit.takeDamage(this.hitDamage, this.owner);
         this.isMissile = false; // cant be blocked after hit enemy
-        this.phase = this.PHASES.WAITING_FOR_STUN;
+        this.phase = Leblanc_E_Object.PHASES.WAITING_FOR_STUN;
       }
     }
 
     // wait for stun phase
-    else if (this.phase == this.PHASES.WAITING_FOR_STUN) {
+    else if (this.phase == Leblanc_E_Object.PHASES.WAITING_FOR_STUN) {
       this.timeSinceHit += deltaTime;
       this.position = this.enemyHit.position.copy().add(random(-5, 5), random(-5, 5));
 
@@ -154,7 +154,7 @@ export class Leblanc_E_Object extends SpellObject {
     line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);
 
     // phase moving
-    if (this.phase == this.PHASES.MOVING) {
+    if (this.phase == Leblanc_E_Object.PHASES.MOVING) {
       noStroke();
       fill(200, 200, 40);
       circle(this.position.x, this.position.y, this.size);
@@ -180,7 +180,9 @@ export class Leblanc_E_Object extends SpellObject {
 
       noStroke();
       fill(200, 200, 40);
-      circle(position.x, position.y, this.size);
+      translate(position.x, position.y);
+      rotate(direction.heading());
+      ellipse(0, 0, this.size + 15, this.size);
     }
     pop();
   }

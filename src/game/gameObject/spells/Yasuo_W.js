@@ -17,7 +17,7 @@ export default class Yasuo_W extends Spell {
       duration = 3750;
 
     let startRange = this.owner.stats.size.value + 20;
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
     let direction = mouse.copy().sub(this.owner.position).normalize();
     let position = this.owner.position.copy().add(direction.setMag(startRange));
 

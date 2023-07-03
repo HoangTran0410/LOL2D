@@ -22,15 +22,6 @@ export default class Blitzcrank_R extends Spell {
     this.game.objects.push(obj);
 
     playSound(SOUNDS.blit_r);
-
-    // let playersInRange = this.game.players.filter(
-    //   champ => champ != this.owner && champ.position.dist(this.owner.position) < range
-    // );
-
-    // playersInRange.forEach(champ => {
-    //   let silenceBuff = new Silence(5000, this.owner, champ);
-    //   champ.addBuff(silenceBuff);
-    // });
   }
 }
 
@@ -49,25 +40,24 @@ export class Blitzcrank_R_Object extends SpellObject {
     this.starTime += deltaTime;
     if (this.starTime > this.lifeTime) this.toRemove = true;
 
-    if (this.size < this.maxSize) this.size += this.expantionSpeed;
+    this.size = Math.min(this.size + this.expantionSpeed, this.maxSize);
 
     // apply silence
-    let playersInRange = this.game.players.filter(
-      champ =>
-        champ != this.owner &&
-        !champ.isDead &&
-        champ.position.dist(this.position) < this.size / 2 && // in range
-        !this.playersEffected.find(player => player == champ) // not effected yet
-    );
-
-    playersInRange.forEach(champ => {
-      let silenceBuff = new Silence(this.silenceTime, this.owner, champ);
-      silenceBuff.image = AssetManager.getAsset('spell_blitzcrank_r');
-      champ.addBuff(silenceBuff);
-      champ.takeDamage(30, this.owner);
+    let enemies = this.game.queryPlayerInRange({
+      position: this.position,
+      range: this.size / 2,
+      includePlayerSize: true,
+      excludePlayers: [this.owner, ...this.playersEffected],
     });
 
-    this.playersEffected.push(...playersInRange);
+    enemies.forEach(enemy => {
+      let silenceBuff = new Silence(this.silenceTime, this.owner, enemy);
+      silenceBuff.image = AssetManager.getAsset('spell_blitzcrank_r');
+      enemy.addBuff(silenceBuff);
+      enemy.takeDamage(30, this.owner);
+    });
+
+    this.playersEffected.push(...enemies);
   }
 
   draw() {

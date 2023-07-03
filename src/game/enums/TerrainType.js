@@ -1,7 +1,7 @@
 const TerrainType = {
-  BUSH: 'BUSH',
-  WATER: 'WATER',
-  WALL: 'WALL',
+  BUSH: 'bush',
+  WATER: 'water',
+  WALL: 'wall',
 };
 
 Object.freeze(TerrainType);

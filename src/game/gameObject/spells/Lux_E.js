@@ -20,7 +20,7 @@ export default class Lux_E extends Spell {
       const range = 400,
         size = 200;
 
-      const destination = this.game.camera.screenToWorld(mouseX, mouseY);
+      const destination = this.game.worldMouse.copy();
       // limit the range
       if (destination.dist(this.owner.position) > range) {
         destination.sub(this.owner.position);
@@ -33,7 +33,7 @@ export default class Lux_E extends Spell {
     }
 
     // second cast
-    else if (this.luxEObject.canReCast) {
+    else if (this.luxEObject.phase === Lux_E_Object.PHASES.STATIC) {
       this.luxEObject.phase = Lux_E_Object.PHASES.EXPLODE;
       this.luxEObject = null;
     }
@@ -42,22 +42,7 @@ export default class Lux_E extends Spell {
   onUpdate() {
     // cancel cooldown on lux object reached destination
     if (this.luxEObject?.phase === Lux_E_Object.PHASES.STATIC) {
-      if (this.state == SpellState.COOLDOWN) {
-        this.currentCooldown = 0;
-      }
-
-      // apply slow buff
-      let playersInRange = this.game.players.filter(
-        champ =>
-          champ != this.owner &&
-          !champ.isDead &&
-          champ.position.dist(this.luxEObject.position) < this.luxEObject.staticSize / 2
-      );
-
-      playersInRange.forEach(champ => {
-        // apply slow with duration: 200ms
-        champ.addBuff(new Lux_E_Buff(200, this.owner, champ));
-      });
+      this.currentCooldown = 0;
     }
 
     // reset lux object when it exploded
@@ -134,7 +119,6 @@ export class Lux_E_Object extends SpellObject {
       const distance = this.destination.dist(this.position);
       if (distance < this.moveSpeed) {
         this.position = this.destination.copy();
-        this.canReCast = true;
         this.phase = Lux_E_Object.PHASES.STATIC;
       }
     }
@@ -144,6 +128,16 @@ export class Lux_E_Object extends SpellObject {
       this.timeSinceStatic += deltaTime;
 
       this.size = lerp(this.size, this.staticSize, 0.3);
+
+      // apply slow buff
+      let enemies = this.game.queryPlayerInRange({
+        position: this.position,
+        range: this.staticSize / 2,
+        excludePlayers: [this.owner],
+      });
+      enemies.forEach(enemy => {
+        enemy.addBuff(new Lux_E_Buff(200, this.owner, enemy));
+      });
 
       if (this.timeSinceStatic > this.lifeTimeWhenStatic) {
         this.phase = Lux_E_Object.PHASES.EXPLODE;
@@ -156,15 +150,13 @@ export class Lux_E_Object extends SpellObject {
         this.takedDamage = true;
 
         // apply damage to enemies in range
-        let enemiesInRange = this.game.players.filter(
-          champ =>
-            !champ.isDead &&
-            champ != this.owner &&
-            champ.position.dist(this.position) < this.staticSize / 2
-        );
-
-        enemiesInRange.forEach(champ => {
-          champ.takeDamage(20, this.owner);
+        let enemies = this.game.queryPlayerInRange({
+          position: this.position,
+          range: this.staticSize / 2,
+          excludePlayers: [this.owner],
+        });
+        enemies.forEach(enemy => {
+          enemy.takeDamage(20, this.owner);
         });
       }
 

@@ -20,8 +20,8 @@ export default class Blitzcrank_Q extends Spell {
       grabSpeed = 10,
       position = this.owner.position.copy();
 
-    let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let direction = worldMouse.sub(position).normalize();
+    let mouse = this.game.worldMouse.copy();
+    let direction = mouse.sub(position).normalize();
     let destination = position.copy().add(direction.mult(range));
 
     this.blitObj = new Blitzcrank_Q_Object(this.owner);
@@ -40,7 +40,7 @@ export default class Blitzcrank_Q extends Spell {
 
   onUpdate() {
     if (this.blitObj) {
-      if (this.blitObj.phase == this.blitObj.PHASES.GRAB || this.blitObj.toRemove) {
+      if (this.blitObj.phase == Blitzcrank_Q_Object.PHASES.GRAB || this.blitObj.toRemove) {
         this.ownerStunBuff.deactivateBuff();
       }
 
@@ -64,15 +64,15 @@ export class Blitzcrank_Q_Object extends SpellObject {
   dashBuff = null;
   champToGrab = null;
 
-  PHASES = {
+  static PHASES = {
     FORWARD: 'forward',
     GRAB: 'grab',
   };
-  phase = this.PHASES.FORWARD;
+  phase = Blitzcrank_Q_Object.PHASES.FORWARD;
 
   update() {
     let distance = this.destination.dist(this.position);
-    let speed = this.phase == this.PHASES.FORWARD ? this.speed : this.grabSpeed;
+    let speed = this.phase == Blitzcrank_Q_Object.PHASES.FORWARD ? this.speed : this.grabSpeed;
     if (distance < speed) {
       this.position = this.destination.copy();
       this.toRemove = true;
@@ -82,12 +82,12 @@ export class Blitzcrank_Q_Object extends SpellObject {
     }
 
     // check collision with enemy
-    if (this.phase == this.PHASES.FORWARD) {
+    if (this.phase == Blitzcrank_Q_Object.PHASES.FORWARD) {
       for (let champ of this.game.players) {
         if (champ != this.owner && !champ.isDead) {
           let distance = champ.position.dist(this.position);
           if (distance < champ.stats.size.value / 2) {
-            this.phase = this.PHASES.GRAB;
+            this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
             this.champToGrab = champ;
             this.destination = this.owner.position;
 

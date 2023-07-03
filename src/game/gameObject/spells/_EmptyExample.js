@@ -27,7 +27,6 @@ export class SpellName_Buff extends Buff {
 }
 
 export class SpellName_Object extends SpellObject {
-  init() {}
   update() {}
   draw() {}
 }

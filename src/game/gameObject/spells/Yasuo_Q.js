@@ -37,7 +37,7 @@ export default class Yasuo_Q extends Spell {
   }
 
   onSpellCast() {
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
     let angle = mouse.sub(this.owner.position).heading();
 
     // Q1, Q2

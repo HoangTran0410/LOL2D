@@ -48,10 +48,8 @@ export class Ghost_Buff extends Buff {
 }
 
 export class Ghost_Buff_Object extends SpellObject {
-  init() {
-    this.trail = [];
-    this.maxAge = 30;
-  }
+  trail = [];
+  maxAge = 30;
 
   update() {
     if (random(1) < 0.2) {

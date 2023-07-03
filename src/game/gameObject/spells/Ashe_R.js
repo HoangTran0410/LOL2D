@@ -12,8 +12,7 @@ export default class Ashe_R extends Spell {
   coolDown = 10000;
 
   onSpellCast() {
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let direction = p5.Vector.sub(mouse, this.owner.position).normalize();
+    let direction = p5.Vector.sub(this.game.worldMouse, this.owner.position).normalize();
 
     let obj = new Ashe_R_Object(this.owner);
     obj.position = this.owner.position.copy();
@@ -43,38 +42,42 @@ export class Ashe_R_Object extends SpellObject {
       this.toRemove = true;
     }
 
-    // moving
+    // moving phase
     if (!this.exploring) {
       this.position.add(this.direction.copy().mult(this.speed));
 
       // check collide enemy
-      for (let enemy of this.game.players) {
-        if (
-          enemy != this.owner &&
-          !enemy.isDead &&
-          p5.Vector.dist(this.position, enemy.position) < enemy.stats.size.value / 2
-        ) {
-          this.exploring = true;
-          this.age = this.lifeTime - this.exploreLifeTime; // reset age to display explore animation
+      let enemy = this.game.queryPlayerInRange({
+        position: this.position,
+        range: this.size / 2,
+        includePlayerSize: true,
+        excludePlayers: [this.owner],
+        getOnlyOne: true,
+      });
 
-          //   add buff to enemies
-          this.game.players
-            .filter(
-              p =>
-                p != this.owner &&
-                p5.Vector.dist(this.position, p.position) <
-                  this.exploreSize / 2 + enemy.stats.size.value / 2
-            )
-            .forEach(p => {
-              let stunBuff = new Stun(2500, this.owner, p);
-              stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-              stunBuff.image = AssetManager.getAsset('spell_ashe_r');
-              p.addBuff(stunBuff);
-              p.takeDamage(30, this.owner);
-            });
-        }
+      if (enemy) {
+        this.exploring = true;
+        this.age = this.lifeTime - this.exploreLifeTime; // reset age to display explore animation
+
+        // add buff to enemies
+        let enemies = this.game.queryPlayerInRange({
+          position: this.position,
+          range: this.exploreSize / 2,
+          includePlayerSize: true,
+          excludePlayers: [this.owner],
+        });
+        enemies.forEach(p => {
+          let stunBuff = new Stun(2500, this.owner, p);
+          stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+          stunBuff.image = AssetManager.getAsset('spell_ashe_r');
+          p.addBuff(stunBuff);
+          p.takeDamage(30, this.owner);
+        });
       }
-    } else {
+    }
+
+    // exploring phase
+    else {
       this.size = lerp(this.size, this.exploreSize, 0.2);
     }
   }

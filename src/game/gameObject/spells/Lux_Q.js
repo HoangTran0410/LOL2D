@@ -15,8 +15,8 @@ export default class Lux_Q extends Spell {
     const range = 500,
       stunTime = 2000;
 
-    let worldMouse = this.game.camera.screenToWorld(mouseX, mouseY);
-    let direction = worldMouse.sub(this.owner.position).normalize();
+    let mouse = this.game.worldMouse.copy();
+    let direction = mouse.sub(this.owner.position).normalize();
     let destination = this.owner.position.copy().add(direction.mult(range));
 
     let obj = new Lux_Q_Object(this.owner);

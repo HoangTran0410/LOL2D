@@ -20,7 +20,7 @@ export default class Lux_R extends Spell {
       rayWidth = 50,
       stunTime = 1000;
 
-    let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+    let mouse = this.game.worldMouse.copy();
     let dir = mouse.copy().sub(this.owner.position).normalize();
     let dest = dir.setMag(rayLength).add(this.owner.position);
 

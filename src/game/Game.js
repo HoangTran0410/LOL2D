@@ -110,6 +110,11 @@ export default class Game {
     this.kills = [];
     this.objects = [];
     this.players = [];
+    this.clickedPoint = { x: 0, y: 0, size: 0 };
+    this.accumulator = 0;
+    this.worldMouse = createVector(0, 0);
+
+    // init players
     for (let i = 0; i < 9; i++) {
       let pos = this.getRandomSpawnLocation();
       let champ = new AIChampion(this, pos.x, pos.y);
@@ -125,10 +130,11 @@ export default class Game {
     this.player.spells = preset.spells.map(Spell => new Spell(this.player));
     this.players.push(this.player);
 
+    // init camera
     this.camera = new Camera();
     this.camera.target = this.player.position;
 
-    // quadtree obstacle
+    // init quadtree obstacle
     this.quadtree = new Quadtree({
       x: 0,
       y: 0,
@@ -145,19 +151,13 @@ export default class Game {
       polygons.push(
         ...terrains[terrainType].map(_ => ({
           vertices: _,
-          type:
-            terrainType === 'wall'
-              ? TerrainType.WALL
-              : terrainType === 'bush'
-              ? TerrainType.BUSH
-              : TerrainType.WATER,
+          type: terrainType,
         }))
       );
     }
-    console.log(polygons);
 
-    for (let i = 0; i < polygons.length; i++) {
-      let o = new Obstacle(0, 0, Obstacle.arrayToVertices(polygons[i].vertices), polygons[i].type);
+    for (let { vertices, type } of polygons) {
+      let o = new Obstacle(0, 0, Obstacle.arrayToVertices(vertices), type);
       this.obstacles.push(o);
 
       const rectangle = new Rectangle({
@@ -166,13 +166,6 @@ export default class Game {
       });
       this.quadtree.insert(rectangle);
     }
-
-    this.clickedPoint = {
-      x: 0,
-      y: 0,
-      size: 0,
-    };
-    this.accumulator = 0;
   }
 
   pause() {
@@ -194,6 +187,7 @@ export default class Game {
 
   fixedUpdate() {
     this.camera.update();
+    this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
 
     this.objects = this.objects.filter(o => {
       if (o.toRemove) {
@@ -203,7 +197,6 @@ export default class Game {
       return true;
     });
     for (let o of this.objects) o.update();
-
     for (let p of this.players) p.update();
 
     // collision with obstacles
@@ -274,12 +267,11 @@ export default class Game {
 
     // control player
     if (mouseIsPressed && mouseButton === RIGHT) {
-      let worldMouse = this.camera.screenToWorld(mouseX, mouseY);
-      this.player.moveTo(worldMouse.x, worldMouse.y);
+      this.player.moveTo(this.worldMouse.x, this.worldMouse.y);
 
       this.clickedPoint = {
-        x: worldMouse.x,
-        y: worldMouse.y,
+        x: this.worldMouse.x,
+        y: this.worldMouse.y,
         size: 50,
       };
     }

@@ -45,7 +45,7 @@ export default class LeeSin_Q extends Spell {
 
     // phase 1: Sóng âm
     if (this.phase === this.PHASES.Q1) {
-      let mouse = this.game.camera.screenToWorld(mouseX, mouseY);
+      let mouse = this.game.worldMouse.copy();
       let direction = mouse.sub(this.owner.position).normalize();
       let destination = this.owner.position.copy().add(direction.mult(range));
 
@@ -136,7 +136,6 @@ export class LeeSin_Q_Object extends SpellObject {
         range: this.size / 2,
         excludePlayers: [this.owner],
         includePlayerSize: true,
-        includeDead: false,
         getOnlyOne: true,
       });
       if (enemy) {
