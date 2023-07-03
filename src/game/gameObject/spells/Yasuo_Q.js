@@ -65,23 +65,23 @@ export default class Yasuo_Q extends Spell {
     }
 
     // Q3
-    // else if (this.phase == this.PHASES.Q3) {
-    const airBorneTime = 1000,
-      range = 400,
-      speed = 5;
+    else if (this.phase == this.PHASES.Q3) {
+      const airBorneTime = 1000,
+        range = 400,
+        speed = 5;
 
-    let { from, to: destination } = VectorUtils.getVectorWithAngleAndRange(
-      this.owner.position,
-      angle,
-      range
-    );
+      let { from, to: destination } = VectorUtils.getVectorWithAngleAndRange(
+        this.owner.position,
+        angle,
+        range
+      );
 
-    let tornado = new Yasuo_Q3_Object(this.owner);
-    tornado.destination = destination;
-    tornado.airBorneTime = airBorneTime;
-    tornado.speed = speed;
-    this.game.objects.push(tornado);
-    // }
+      let tornado = new Yasuo_Q3_Object(this.owner);
+      tornado.destination = destination;
+      tornado.airBorneTime = airBorneTime;
+      tornado.speed = speed;
+      this.game.objects.push(tornado);
+    }
   }
 
   onUpdate() {

@@ -1,7 +1,7 @@
-import Camera from './gameObject/Camera.js';
+import Camera from './gameObject/map/Camera.js';
+import Obstacle from './gameObject/map/Obstacle.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import Obstacle from './gameObject/Obstacle.js';
 import { Quadtree, Rectangle } from '../../libs/quadtree.js';
 import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';

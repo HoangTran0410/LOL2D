@@ -1,4 +1,4 @@
-import TerrainType from '../enums/TerrainType.js';
+import TerrainType from '../../enums/TerrainType.js';
 
 export default class Obstacle {
   constructor(x, y, vertices, type) {
@@ -86,41 +86,6 @@ export default class Obstacle {
     );
     polygon.setAngle(this.angle);
     return polygon;
-  }
-
-  // pre-defined vertices
-  static rectVertices(w, h, angle = 0) {
-    return [
-      createVector(-w / 2, -h / 2),
-      createVector(w / 2, -h / 2),
-      createVector(w / 2, h / 2),
-      createVector(-w / 2, h / 2),
-    ].map(v => v.rotate(angle));
-  }
-
-  static circleVertices(r, numVertices = 10) {
-    let vertices = [];
-    for (let i = 0; i < numVertices; i++) {
-      let angle = map(i, 0, numVertices, 0, TWO_PI);
-      let x = r * cos(angle);
-      let y = r * sin(angle);
-      vertices.push(createVector(x, y));
-    }
-
-    return vertices;
-  }
-
-  static polygonVertices(numVertices = random(3, 10), minSize = 70, maxSize = 100) {
-    let vertices = [];
-    for (let i = 0; i < numVertices; i++) {
-      let angle = map(i, 0, numVertices, 0, TWO_PI);
-      let r = random(minSize, maxSize);
-      let x = r * cos(angle);
-      let y = r * sin(angle);
-      vertices.push(createVector(x, y));
-    }
-
-    return vertices;
   }
 
   static arrayToVertices(arr) {
