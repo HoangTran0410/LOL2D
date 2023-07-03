@@ -12,17 +12,23 @@ import AssetManager from '../../../managers/AssetManager.js';
 import Slow from '../buffs/Slow.js';
 
 export default class Champion {
-  constructor(game, x = 0, y = 0) {
+  constructor(game, x = 0, y = 0, preset) {
     this.game = game;
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
     this.isAllied = true;
-    this.avatar = AssetManager.getRandomChampion();
+
+    if (preset) {
+      this.avatar = AssetManager.getAsset(preset.avatar);
+      this.spells = preset.spells.map(Spell => new Spell(this));
+    } else {
+      this.avatar = AssetManager.getRandomChampion();
+      this.spells = this.getRandomSpells();
+    }
 
     this.score = 0;
     this.reviveAfter = 0;
 
-    this.spells = this.getRandomSpells();
     this.buffs = [];
     this.stats = new Stats();
     this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
@@ -137,6 +143,13 @@ export default class Champion {
     source.score++;
   }
 
+  respawn() {
+    let pos = this.game.getRandomSpawnLocation();
+    this.position.set(pos.x, pos.y);
+    this.destination = this.position.copy();
+    this.stats.health.baseValue = this.stats.maxHealth.value / 2;
+  }
+
   get isDead() {
     return this.reviveAfter > 0;
   }
@@ -167,12 +180,8 @@ export default class Champion {
 
     if (this.isDead) {
       this.reviveAfter -= deltaTime;
-
       if (this.reviveAfter <= 0) {
-        let pos = this.game.getRandomSpawnLocation();
-        this.position.set(pos.x, pos.y);
-        this.destination = this.position.copy();
-        this.stats.health.baseValue = this.stats.maxHealth.value / 2;
+        this.respawn();
       }
     }
   }

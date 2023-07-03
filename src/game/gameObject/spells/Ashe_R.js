@@ -57,6 +57,7 @@ export class Ashe_R_Object extends SpellObject {
 
       if (enemy) {
         this.exploring = true;
+        this.isMissile = false;
         this.age = this.lifeTime - this.exploreLifeTime; // reset age to display explore animation
 
         // add buff to enemies

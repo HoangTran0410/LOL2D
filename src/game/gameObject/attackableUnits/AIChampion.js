@@ -1,6 +1,13 @@
+import AssetManager from '../../../managers/AssetManager.js';
+import { getRandomChampionPreset } from '../../preset.js';
 import Champion from './Champion.js';
 
 export default class AIChampion extends Champion {
+  constructor(game, x, y, preset) {
+    super(game, x, y, preset);
+    this.isAllied = false;
+  }
+
   update() {
     super.update();
 
@@ -28,9 +35,11 @@ export default class AIChampion extends Champion {
     this.moveToRandomLocation();
   }
 
-  die(source) {
-    super.die(source);
+  respawn() {
+    super.respawn();
 
-    this.spells = this.getRandomSpells();
+    let newPresset = getRandomChampionPreset();
+    this.avatar = AssetManager.getAsset(newPresset.avatar);
+    this.spells = newPresset.spells.map(Spell => new Spell(this));
   }
 }

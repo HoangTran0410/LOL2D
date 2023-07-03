@@ -7,99 +7,13 @@ import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { hasFlag } from '../utils/index.js';
 import StatusFlags from './enums/StatusFlags.js';
-import * as AllSpells from './gameObject/spells/index.js';
+
 import AssetManager from '../managers/AssetManager.js';
 import TerrainType from './enums/TerrainType.js';
+import { getRandomChampionPreset } from './preset.js';
 
 const fps = 60;
 let accumulator = 0;
-
-const ChampionPreset = {
-  yasuo: {
-    avatar: 'champ_yasuo',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Yasuo_Q,
-      AllSpells.Yasuo_W,
-      AllSpells.Yasuo_E,
-      AllSpells.Yasuo_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  lux: {
-    avatar: 'champ_lux',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Lux_Q,
-      AllSpells.Yasuo_W,
-      AllSpells.Lux_E,
-      AllSpells.Lux_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  blitzcrank: {
-    avatar: 'champ_blitzcrank',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Blitzcrank_Q,
-      AllSpells.Blitzcrank_W,
-      AllSpells.Yasuo_E,
-      AllSpells.Blitzcrank_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  ashe: {
-    avatar: 'champ_ashe',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Ashe_W,
-      AllSpells.Ashe_W,
-      AllSpells.Yasuo_W,
-      AllSpells.Ashe_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  teemo: {
-    avatar: 'champ_teemo',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Blitzcrank_Q,
-      AllSpells.Yasuo_W,
-      AllSpells.Teemo_R,
-      AllSpells.Teemo_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  leblanc: {
-    avatar: 'champ_leblanc',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.Blitzcrank_Q,
-      AllSpells.Leblanc_W,
-      AllSpells.Leblanc_E,
-      AllSpells.Leblanc_W,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-  leesin: {
-    avatar: 'champ_leesin',
-    spells: [
-      AllSpells.Heal,
-      AllSpells.LeeSin_Q,
-      AllSpells.LeeSin_Q,
-      AllSpells.LeeSin_E,
-      AllSpells.LeeSin_R,
-      AllSpells.Flash,
-      AllSpells.Ghost,
-    ],
-  },
-};
 
 export default class Game {
   constructor() {
@@ -116,18 +30,15 @@ export default class Game {
 
     // init players
     for (let i = 0; i < 9; i++) {
+      let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
-      let champ = new AIChampion(this, pos.x, pos.y);
-      champ.isAllied = false;
+      let champ = new AIChampion(this, pos.x, pos.y, preset);
       this.players.push(champ);
     }
 
-    let preset = ChampionPreset[random(Object.keys(ChampionPreset))];
+    let preset = getRandomChampionPreset();
     let pos = this.getRandomSpawnLocation();
-    this.player = new Champion(this, pos.x, pos.y);
-    this.player.isAllied = true;
-    this.player.avatar = AssetManager.getAsset(preset.avatar);
-    this.player.spells = preset.spells.map(Spell => new Spell(this.player));
+    this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
 
     // init camera
@@ -228,20 +139,27 @@ export default class Game {
 
       // Collide with walls
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
+
+      let collided = false,
+        overlaps = [];
       for (let o of walls) {
         let response = new SAT.Response();
         let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
         if (collided) {
-          // let a = 0.01;
-          // o.vertices = o.vertices.map(v => v.rotate(a));
-
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
-          p.position.add(overlap);
-
-          if (p != this.player) {
-            p.moveToRandomLocation();
-          }
+          overlaps.push(overlap);
+          collided = true;
         }
+      }
+
+      if (overlaps.length) {
+        let overlap = overlaps.reduce((a, b) => a.add(b), createVector(0, 0));
+        overlap.div(overlaps.length);
+        p.position.add(overlap);
+      }
+
+      if (p != this.player && collided) {
+        p.moveToRandomLocation();
       }
     }
 
