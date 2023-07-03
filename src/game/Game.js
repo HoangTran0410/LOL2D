@@ -7,10 +7,10 @@ import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { hasFlag } from '../utils/index.js';
 import StatusFlags from './enums/StatusFlags.js';
-
 import AssetManager from '../managers/AssetManager.js';
 import TerrainType from './enums/TerrainType.js';
 import { getRandomChampionPreset } from './preset.js';
+// import PolygonUtils from '../utils/polygon.utils.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -20,7 +20,6 @@ export default class Game {
     this.InGameHUD = new InGameHUD(this);
 
     this.MAPSIZE = 6400;
-    // this.collideCheckObstacles = [];
     this.kills = [];
     this.objects = [];
     this.players = [];
@@ -111,7 +110,6 @@ export default class Game {
     for (let p of this.players) p.update();
 
     // collision with obstacles
-    this.collideCheckObstacles = [];
     for (let p of this.players) {
       let area = new Rectangle({
         x: p.position.x,
@@ -120,7 +118,6 @@ export default class Game {
         height: p.stats.size.value / 2,
       });
       let obstacles = this.quadtree.retrieve(area).map(o => o.data);
-      // this.collideCheckObstacles.push(...obstacles);
 
       let walls = obstacles.filter(o => o.type === TerrainType.WALL);
       let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
@@ -147,13 +144,34 @@ export default class Game {
         let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
         if (collided) {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
-          overlaps.push(overlap);
+          overlaps.push({ obstacle: o, overlap });
           collided = true;
         }
       }
 
+      // if overlapped with multiple walls, merge the walls and recalculate the overlap
+      // this.collideCheckObstacles = [];
+      // if (overlaps.length > 1) {
+      //   let polyContainer = PolygonUtils.getPolygonsContainer(
+      //     overlaps.map(_ => _.obstacle.vertices)
+      //   );
+      //   this.collideCheckObstacles = polyContainer;
+
+      //   let SATPoly = new SAT.Polygon(
+      //     new SAT.Vector(0, 0),
+      //     polyContainer.map(v => new SAT.Vector(v.x, v.y))
+      //   );
+      //   let response = new SAT.Response();
+      //   let collided = SAT.testPolygonCircle(SATPoly, p.toSATCircle(), response);
+      //   if (collided) {
+      //     console.log('collided');
+      //     let overlap = createVector(response.overlapV.x, response.overlapV.y);
+      //     overlaps = [{ overlap }];
+      //   }
+      // }
+
       if (overlaps.length) {
-        let overlap = overlaps.reduce((a, b) => a.add(b), createVector(0, 0));
+        let overlap = overlaps.map(_ => _.overlap).reduce((a, b) => a.add(b), createVector(0, 0));
         overlap.div(overlaps.length);
         p.position.add(overlap);
       }
@@ -255,15 +273,17 @@ export default class Game {
     for (let w of walls) w.draw();
 
     // debug SAT collision check
-    // push();
-    // fill('#e55');
-    // stroke('#e55');
-    // for (let o of this.collideCheckObstacles) {
-    //   beginShape();
-    //   for (let v of o.vertices) vertex(v.x, v.y);
-    //   endShape(CLOSE);
-    // }
-    // pop();
+    if (this.collideCheckObstacles?.length) {
+      push();
+      noFill();
+      stroke('#e55');
+      beginShape();
+      for (let v of this.collideCheckObstacles) {
+        vertex(v.x, v.y);
+      }
+      endShape(CLOSE);
+      pop();
+    }
 
     // draw clicked point
     if (this.clickedPoint.size > 0) {
