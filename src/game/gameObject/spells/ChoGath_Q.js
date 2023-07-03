@@ -8,28 +8,36 @@ export default class ChoGath_Q extends Spell {
   image = AssetManager.getAsset('spell_chogath_q');
   name = "Rạn Nứt (Cho'Gath_Q)";
   description =
-    'Tạo một vụ địa chấn tại vùng đã chọn sau một khoảng 0.625-giây trễ, Hất tung icon hất tung kẻ địch trúng phải trong 1 giây, Chậm chúng đi 60% trong 1.5 giây, gây 20 sát thương';
+    'Tạo một vụ địa chấn tại vùng đã chọn sau một khoảng 0.7 giây trễ, Hất tung icon hất tung kẻ địch trúng phải trong 1 giây, Chậm chúng đi 60% trong 1.5 giây, gây 20 sát thương';
   coolDown = 5000;
 
-  onSpellCast() {
-    let maxRange = 600,
-      size = 200,
-      expandSize = 240,
-      damage = 20;
+  maxRange = 400;
+  size = 150;
+  expandSize = 200;
+  damage = 20;
 
+  onSpellCast() {
     let mouse = this.game.worldMouse.copy();
     let position = mouse
       .copy()
       .sub(this.owner.position)
-      .setMag(Math.min(maxRange, mouse.dist(this.owner.position)))
+      .setMag(Math.min(this.maxRange, mouse.dist(this.owner.position)))
       .add(this.owner.position);
 
     let obj = new ChoGath_Q_Object(this.owner);
-    obj.size = size;
-    obj.damage = damage;
+    obj.size = this.size;
+    obj.damage = this.damage;
     obj.position = position;
-    obj.expandSize = expandSize;
+    obj.expandSize = this.expandSize;
     this.game.objects.push(obj);
+  }
+
+  drawPreview() {
+    push();
+    stroke(200);
+    noFill();
+    circle(this.owner.position.x, this.owner.position.y, this.maxRange * 2);
+    pop();
   }
 }
 
@@ -42,8 +50,8 @@ export class ChoGath_Q_Object extends SpellObject {
   position = this.owner.position.copy();
   size = 120;
   expandSize = 150;
-  prepareTime = 625;
-  lifeTime = 1000;
+  prepareTime = 700;
+  lifeTime = 1100;
   age = 0;
   damage = 20;
 
