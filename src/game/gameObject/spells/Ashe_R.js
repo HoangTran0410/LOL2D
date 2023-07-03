@@ -49,7 +49,7 @@ export class Ashe_R_Object extends SpellObject {
       // check collide enemy
       let enemy = this.game.queryPlayerInRange({
         position: this.position,
-        range: this.size / 2,
+        range: this.size / 4,
         includePlayerSize: true,
         excludePlayers: [this.owner],
         getOnlyOne: true,
