@@ -8,8 +8,8 @@ export default class ChoGath_Q extends Spell {
   image = AssetManager.getAsset('spell_chogath_q');
   name = "Rạn Nứt (Cho'Gath_Q)";
   description =
-    'Tạo một vụ địa chấn tại vùng đã chọn sau một khoảng 0.7 giây trễ, Hất tung icon hất tung kẻ địch trúng phải trong 1 giây, Chậm chúng đi 60% trong 1.5 giây, gây 20 sát thương';
-  coolDown = 5000;
+    'Tạo một vụ địa chấn tại vùng đã chọn sau một khoảng 0.7 giây trễ, Hất tung icon hất tung kẻ địch trúng phải trong 1 giây, Chậm chúng đi 60% trong 1.5 giây, gây 15 sát thương';
+  coolDown = 7000;
 
   maxRange = 400;
   size = 150;

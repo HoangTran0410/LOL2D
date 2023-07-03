@@ -32,7 +32,7 @@ export default class Blitzcrank_Q extends Spell {
     this.blitObj.range = range;
     this.game.objects.push(this.blitObj);
 
-    this.ownerStunBuff = new RootBuff(100000, this.owner, this.owner);
+    this.ownerStunBuff = new RootBuff(1500, this.owner, this.owner);
     this.ownerStunBuff.buffAddType = BuffAddType.REPLACE_EXISTING;
     this.ownerStunBuff.image = this.image;
     this.owner.addBuff(this.ownerStunBuff);

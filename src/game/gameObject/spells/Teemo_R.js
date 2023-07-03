@@ -1,8 +1,8 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import Slow from '../buffs/Slow.js';
 
 export default class Teemo_R extends Spell {
   image = AssetManager.getAsset('spell_teemo_r');
@@ -36,7 +36,7 @@ export default class Teemo_R extends Spell {
   }
 }
 
-export class Teemo_R_Buff extends Buff {
+export class Teemo_R_Buff extends Slow {
   image = AssetManager.getAsset('spell_teemo_r');
   buffAddType = BuffAddType.RENEW_EXISTING;
   percent = 0.7;

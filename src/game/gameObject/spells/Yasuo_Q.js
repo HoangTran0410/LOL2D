@@ -22,11 +22,11 @@ export default class Yasuo_Q extends Spell {
   image = this.phase.image;
   name = 'Bão Kiếm (Yasuo_Q)';
   description =
-    'Đâm lưỡi kiếm về hướng chỉ định, gây 10 sát thương. Cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu và gây 20 sát thương';
-  coolDown = 4000;
+    'Đâm lưỡi kiếm về hướng chỉ định, gây 10 sát thương. Cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu trong 1s và gây 20 sát thương';
+  coolDown = 3500;
   manaCost = 20;
 
-  coolDownIfHit = 1000;
+  coolDownIfHit = 800;
   hitStackCount = 0;
   lastHitTime = 0;
   timeToResetHitStack = 3000;
@@ -66,13 +66,15 @@ export default class Yasuo_Q extends Spell {
     // Q3
     else if (this.phase == this.PHASES.Q3) {
       const airBorneTime = 1000,
-        range = 400;
+        range = 400,
+        speed = 5;
 
       let destination = this.owner.position.copy().add(p5.Vector.fromAngle(angle).mult(range));
 
       let tornado = new Yasuo_Q3_Object(this.owner);
       tornado.destination = destination;
       tornado.airBorneTime = airBorneTime;
+      tornado.speed = speed;
       this.game.objects.push(tornado);
     }
   }
@@ -119,14 +121,17 @@ export class Yasuo_Q_Object extends SpellObject {
   playersEffected = [];
 
   update() {
-    this.currentRayLength += this.raySpeed;
-    if (this.currentRayLength > this.range) {
-      this.currentRayLength = this.range;
-    }
+    this.age += deltaTime;
+    if (this.age > this.lifeTime) this.toRemove = true;
+    this.currentRayLength = Math.min(this.currentRayLength + this.raySpeed, this.range);
 
     // check collide with enemy
-    for (let p of this.game.players) {
-      if (!p.isDead && p != this.owner && !this.playersEffected.includes(p)) {
+    let enemies = this.game.queryPlayerInRange({
+      position: this.owner.position,
+      range: this.currentRayLength,
+      includePlayerSize: true,
+      excludePlayers: [this.owner, ...this.playersEffected],
+      customFilter: p => {
         let vertices = rectToVertices(
           this.owner.position.x,
           this.owner.position.y - this.rayWidth / 2 - p.stats.size.value / 2,
@@ -138,21 +143,19 @@ export class Yasuo_Q_Object extends SpellObject {
             y: this.owner.position.y,
           }
         );
+        return collidePolygonPoint(vertices, p.position.x, p.position.y);
+      },
+    });
 
-        if (collidePolygonPoint(vertices, p.position.x, p.position.y)) {
-          let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
-          buff.image = AssetManager.getAsset('spell_yasuo_q1');
-          p.addBuff(buff);
-          p.takeDamage(10, this.owner);
+    enemies.forEach(p => {
+      let buff = new RootBuff(this.lifeTime / 2, this.owner, p);
+      buff.image = AssetManager.getAsset('spell_yasuo_q1');
+      p.addBuff(buff);
+      p.takeDamage(10, this.owner);
 
-          this.playersEffected.push(p);
-          this.onHit?.(p);
-        }
-      }
-    }
-
-    this.age += deltaTime;
-    if (this.age > this.lifeTime) this.toRemove = true;
+      this.playersEffected.push(p);
+      this.onHit?.(p);
+    });
   }
 
   draw() {
@@ -180,9 +183,9 @@ export class Yasuo_Q3_Object extends SpellObject {
   isMissile = true;
   position = this.owner.position.copy();
   destination = this.owner.position.copy();
-  speed = 4;
-  size = 30;
-  sizeIncreaseSpeed = 2;
+  speed = 5;
+  minSize = 30;
+  maxSize = 200;
   airBorneTime = 1000;
   angle = 0;
 
@@ -192,9 +195,6 @@ export class Yasuo_Q3_Object extends SpellObject {
     if (!this.originalLength) {
       this.originalLength = this.destination.dist(this.position);
     }
-
-    this.size += this.sizeIncreaseSpeed;
-    this.angle += 0.2;
 
     let distance = this.position.dist(this.destination);
     if (distance < this.speed) {
@@ -206,29 +206,30 @@ export class Yasuo_Q3_Object extends SpellObject {
       );
     }
 
-    // check collide with enemy
-    for (let p of this.game.players) {
-      if (!p.isDead && p != this.owner && !this.playerEffected.includes(p)) {
-        if (p.position.dist(this.position) < this.size / 2 + p.stats.size.value / 2) {
-          let buff = new Airborne(this.airBorneTime, this.owner, p);
-          buff.image = AssetManager.getAsset('spell_yasuo_q3');
-          p.addBuff(buff);
-          p.takeDamage(20, this.owner);
+    this.size = map(distance, this.originalLength, 0, this.minSize, this.maxSize);
+    this.angle += 0.2;
 
-          this.playerEffected.push(p);
-        }
-      }
-    }
+    // check collide with enemy
+    let enemies = this.game.queryPlayerInRange({
+      position: this.position,
+      range: this.size / 2,
+      includePlayerSize: true,
+      excludePlayers: [this.owner, ...this.playerEffected],
+    });
+
+    enemies.forEach(p => {
+      let buff = new Airborne(this.airBorneTime, this.owner, p);
+      buff.image = AssetManager.getAsset('spell_yasuo_q3');
+      p.addBuff(buff);
+      p.takeDamage(20, this.owner);
+
+      this.playerEffected.push(p);
+    });
   }
 
   draw() {
     push();
     translate(this.position.x, this.position.y);
-    // let alpha = map(this.position.dist(this.destination), 0, this.originalLength, 10, 255);
-    // fill(90, 100, 180, alpha);
-    // stroke(150, 105, 180, 100);
-    // strokeWeight(2);
-    // circle(0, 0, this.size);
     rotate(this.angle);
     imageMode(CENTER);
     image(AssetManager.getAsset('obj_yasuo_q3')?.data, 0, 0, this.size, this.size);
