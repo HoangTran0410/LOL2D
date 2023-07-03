@@ -1,9 +1,8 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import { StatsModifier } from '../Stats.js';
+import Slow from '../buffs/Slow.js';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
@@ -32,20 +31,10 @@ export default class Ashe_W extends Spell {
   }
 }
 
-export class Ashe_W_Buff extends Buff {
+export class Ashe_W_Buff extends Slow {
   image = AssetManager.getAsset('spell_ashe_w');
   buffAddType = BuffAddType.RENEW_EXISTING;
-
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue * 0.75;
-  }
-  onActivate() {
-    this.targetUnit.stats.addModifier(this.statsModifier);
-  }
-  onDeactivate() {
-    this.targetUnit.stats.removeModifier(this.statsModifier);
-  }
+  percent = 0.75;
 }
 
 export class Ashe_W_Object extends SpellObject {

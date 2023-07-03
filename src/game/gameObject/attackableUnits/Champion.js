@@ -9,6 +9,7 @@ import Silence from '../buffs/Silence.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import Slow from '../buffs/Slow.js';
 
 export default class Champion {
   constructor(game, x = 0, y = 0) {
@@ -288,7 +289,7 @@ export default class Champion {
       // rect(0, 0, 15, size);
       pop();
     } else {
-      let statusString = [Airborne, Root, Silence, Dash, Stun]
+      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow]
         .map(BuffClass => {
           return this.hasBuff(BuffClass) ? new BuffClass().name : '';
         })

@@ -3,7 +3,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import { StatsModifier } from '../Stats.js';
 
 export default class Teemo_R extends Spell {
   image = AssetManager.getAsset('spell_teemo_r');
@@ -40,17 +39,7 @@ export default class Teemo_R extends Spell {
 export class Teemo_R_Buff extends Buff {
   image = AssetManager.getAsset('spell_teemo_r');
   buffAddType = BuffAddType.RENEW_EXISTING;
-
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue * 0.7; // slow 70%
-  }
-  onActivate() {
-    this.targetUnit.stats.addModifier(this.statsModifier);
-  }
-  onDeactivate() {
-    this.targetUnit.stats.removeModifier(this.statsModifier);
-  }
+  percent = 0.7;
 }
 
 export class Teemo_R_Object extends SpellObject {

@@ -1,8 +1,8 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import Buff from '../Buff.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import { StatsModifier } from '../Stats.js';
+import Slow from '../buffs/Slow.js';
 
 export default class LeeSin_E extends Spell {
   image = AssetManager.getAsset('spell_leesin_e');
@@ -35,18 +35,10 @@ export default class LeeSin_E extends Spell {
   onUpdate() {}
 }
 
-export class LeeSin_E_Buff extends Buff {
+export class LeeSin_E_Buff extends Slow {
   image = AssetManager.getAsset('spell_leesin_e');
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.targetUnit.stats.speed.baseValue * 0.5;
-  }
-  onActivate() {
-    this.targetUnit.stats.addModifier(this.statsModifier);
-  }
-  onDeactivate() {
-    this.targetUnit.stats.removeModifier(this.statsModifier);
-  }
+  buffAddType = BuffAddType.RENEW_EXISTING;
+  percent = 0.5;
 }
 
 export class LeeSin_E_Object extends SpellObject {

@@ -12,6 +12,10 @@ const AssetPaths = {
   champ_leesin: 'assets/images/champions/leesin.png',
 
   // spells
+  spell_flash: 'assets/images/spells/flash.png',
+  spell_ghost: 'assets/images/spells/ghost.png',
+  spell_heal: 'assets/images/spells/heal.png',
+  spell_ignite: 'assets/images/spells/ignite.png',
   spell_leblanc_w1: 'assets/images/spells/leblanc_w1.png',
   spell_leblanc_w2: 'assets/images/spells/leblanc_w2.png',
   spell_leblanc_e: 'assets/images/spells/leblanc_e.png',
@@ -36,10 +40,7 @@ const AssetPaths = {
   spell_yasuo_e: 'assets/images/spells/yasuo_e.png',
   spell_yasuo_r: 'assets/images/spells/yasuo_r.png',
   spell_teemo_r: 'assets/images/spells/teemo_r.png',
-  spell_flash: 'assets/images/spells/flash.png',
-  spell_ghost: 'assets/images/spells/ghost.png',
-  spell_heal: 'assets/images/spells/heal.png',
-  spell_ignite: 'assets/images/spells/ignite.png',
+  spell_chogath_q: 'assets/images/spells/chogath_q.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
