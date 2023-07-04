@@ -60,17 +60,17 @@ export default class TerrainMap {
       let obstacles = this.getObstaclesCollideChampion(p, [TerrainType.WALL, TerrainType.BUSH]);
 
       // Collide with bushes
-      // let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
-      // let isInBush = false;
-      // for (let b of bushes) {
-      //   let response = new SAT.Response();
-      //   let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
-      //   if (collided) {
-      //     isInBush = true;
-      //     break;
-      //   }
-      // }
-      // p.isInBush = isInBush;
+      let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
+      let isInBush = false;
+      for (let b of bushes) {
+        let response = new SAT.Response();
+        let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
+        if (collided) {
+          isInBush = true;
+          break;
+        }
+      }
+      p.isInBush = isInBush;
 
       // Collide with walls
       let walls = obstacles.filter(o => o.type === TerrainType.WALL);

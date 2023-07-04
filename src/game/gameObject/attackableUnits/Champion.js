@@ -188,7 +188,7 @@ export default class Champion {
 
   draw() {
     if (hasFlag(this.status, StatusFlags.NoRender)) return;
-    let alpha = this.isInBush || hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
+    let alpha = this.isInBush ? 100 : hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
 
     push();
 
