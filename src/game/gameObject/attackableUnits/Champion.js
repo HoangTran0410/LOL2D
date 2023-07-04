@@ -236,33 +236,41 @@ export default class Champion {
         y: this.position.y - size / 2 - barHeight - 15,
       };
 
-    fill(2, 15, 21, alpha);
-    stroke(91, 92, 87, alpha);
-    strokeWeight(3);
-    rect(
-      topleft.x - borderWidth * 0.5,
-      topleft.y - borderWidth * 0.5,
-      barWidth + borderWidth,
-      barHeight + borderWidth
-    );
+    if (!this.isDead) {
+      fill(2, 15, 21, alpha);
+      stroke(91, 92, 87, alpha);
+      strokeWeight(3);
+      rect(
+        topleft.x - borderWidth * 0.5,
+        topleft.y - borderWidth * 0.5,
+        barWidth + borderWidth,
+        barHeight + borderWidth
+      );
 
-    // score
-    fill(242, 242, 242, alpha);
-    textSize(12);
-    text(this.score, topleft.x + 3, topleft.y + 12);
+      // score
+      fill(242, 242, 242, alpha);
+      textSize(12);
+      text(this.score, topleft.x + 3, topleft.y + 12);
 
-    noStroke();
+      noStroke();
 
-    // health
-    const healthContainerW = barWidth - barHeight;
-    const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
-    fill(this.isDead ? [153, 153, 153, alpha] : [67, 196, 29, alpha]);
-    rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
+      // health
+      const healthContainerW = barWidth - barHeight;
+      const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
+      fill(
+        this.isDead
+          ? [153, 153, 153, alpha]
+          : this.isAllied
+          ? [67, 196, 29, alpha]
+          : [196, 67, 29, alpha]
+      );
+      rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
-    // mana
-    const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
-    fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
-    rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
+      // mana
+      const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
+      fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
+      rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
+    }
 
     // draw buffs
     let x = topleft.x + 10;
@@ -278,7 +286,7 @@ export default class Champion {
     // draw status string
     if (this.isDead) {
       noStroke();
-      fill(255);
+      fill(200);
       textAlign(CENTER, CENTER);
       textSize(13);
       text(`ĐANG HỒI SINH ${~~(this.reviveAfter / 1000)}...`, pos.x, topleft.y + barHeight + 8);
