@@ -97,11 +97,11 @@ export class Blitzcrank_Q_Object extends SpellObject {
         this.champToGrab = enemy;
         this.destination = this.owner.position;
 
-        this.airborneBuff = new Airborne(999999, this.owner, enemy);
+        this.airborneBuff = new Airborne(7000, this.owner, enemy);
         this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
         enemy.addBuff(this.airborneBuff);
 
-        this.dashBuff = new Dash(999999, this.owner, enemy);
+        this.dashBuff = new Dash(10000, this.owner, enemy);
         this.dashBuff.showTrail = false;
         this.dashBuff.cancelable = false;
         enemy.addBuff(this.dashBuff);

@@ -77,7 +77,7 @@ export default class LeeSin_Q extends Spell {
     // phase 2: Vô ảnh cước
     else {
       // dash owner to target
-      let dashBuff = new Dash(99999, this.owner, this.owner);
+      let dashBuff = new Dash(10000, this.owner, this.owner);
       dashBuff.dashSpeed = 15;
       dashBuff.dashDestination = this.enemyHit.position;
       dashBuff.buffAddType = BuffAddType.RENEW_EXISTING;

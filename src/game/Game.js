@@ -59,7 +59,13 @@ export default class Game {
     this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
 
     // remove objects that are marked to be removed + call onBeforeRemove
-    this.objects = this.objects.filter(o => !o.toRemove && (o.onBeforeRemove?.() || true));
+    this.objects = this.objects.filter(o => {
+      if (o.toRemove) {
+        o.onBeforeRemove?.();
+        return false;
+      }
+      return true;
+    });
 
     for (let o of this.objects) o.update();
     for (let p of this.players) p.update();
