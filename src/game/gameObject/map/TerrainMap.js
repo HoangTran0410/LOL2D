@@ -1,6 +1,7 @@
 import SAT from '../../../../libs/SAT.js';
 import { Circle, Quadtree, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import CollideUtils from '../../../utils/collide.utils.js';
 import { hasFlag } from '../../../utils/index.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import TerrainType from '../../enums/TerrainType.js';
@@ -64,8 +65,7 @@ export default class TerrainMap {
       let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
       let isInBush = false;
       for (let b of bushes) {
-        let response = new SAT.Response();
-        let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
+        let collided = CollideUtils.pointPolygon(p.position.x, p.position.y, b.vertices);
         if (collided) {
           isInBush = true;
           break;
