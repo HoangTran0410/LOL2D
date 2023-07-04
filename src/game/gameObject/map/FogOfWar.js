@@ -74,7 +74,6 @@ export default class FogOfWar {
     return sightPoly;
   }
 
-  // polygons: array of vertices [[x, y], [x, y], ...]
   calculateVisibility({ sourceOfLight, sightBound, polygons }) {
     let _polygons = polygons.map(p => p.map(v => [v.x, v.y]));
     let segments = PolyVisibility.convertToSegments(_polygons);
@@ -93,7 +92,6 @@ export default class FogOfWar {
     // this.drawCircleSight(player.position.x, player.position.y, player.stats.sightRadius.value);
 
     // ===================== visibility ========================
-    // prepare gradient color
     this.prepareRadialGradient(
       player.position.x,
       player.position.y,

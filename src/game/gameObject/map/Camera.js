@@ -70,6 +70,12 @@ export default class Camera {
     );
   }
 
+  makeDraw(drawFunc) {
+    this.push();
+    drawFunc?.();
+    this.pop();
+  }
+
   push() {
     push();
     translate(width / 2, height / 2);

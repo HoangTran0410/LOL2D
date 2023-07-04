@@ -102,19 +102,18 @@ export default class TerrainMap {
     // collision map edges
     for (let p of this.game.players) {
       let size = p.stats.size.value / 2;
-      if (p.position.x < size) p.position.x = size;
-      if (p.position.x > this.size - size) p.position.x = this.size - size;
-      if (p.position.y < size) p.position.y = size;
-      if (p.position.y > this.size - size) p.position.y = this.size - size;
 
-      if (p != this.game.player) {
-        if (
-          p.position.x < size ||
-          p.position.x > this.size - size ||
-          p.position.y < size ||
-          p.position.y > this.size - size
-        ) {
-          p.moveToRandomLocation();
+      if (
+        p.position.x < size ||
+        p.position.x > this.size - size ||
+        p.position.y < size ||
+        p.position.y > this.size - size
+      ) {
+        p.position.x = constrain(p.position.x, size, this.size - size);
+        p.position.y = constrain(p.position.y, size, this.size - size);
+
+        if (p != this.game.player) {
+          p.moveToRandomLocation?.();
         }
       }
     }

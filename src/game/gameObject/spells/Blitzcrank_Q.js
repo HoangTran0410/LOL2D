@@ -84,27 +84,29 @@ export class Blitzcrank_Q_Object extends SpellObject {
 
     // check collision with enemy
     if (this.phase == Blitzcrank_Q_Object.PHASES.FORWARD) {
-      for (let champ of this.game.players) {
-        if (champ != this.owner && !champ.isDead) {
-          let distance = champ.position.dist(this.position);
-          if (distance < champ.stats.size.value / 2) {
-            this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
-            this.champToGrab = champ;
-            this.destination = this.owner.position;
+      let enemy = this.game.queryPlayerInRange({
+        position: this.position,
+        range: 0,
+        includePlayerSize: true,
+        excludePlayers: [this.owner],
+        getOnlyOne: true,
+      });
 
-            this.airborneBuff = new Airborne(999999, this.owner, champ);
-            this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
-            champ.addBuff(this.airborneBuff);
+      if (enemy) {
+        this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
+        this.champToGrab = enemy;
+        this.destination = this.owner.position;
 
-            this.dashBuff = new Dash(999999, this.owner, champ);
-            this.dashBuff.showTrail = false;
-            this.dashBuff.cancelable = false;
-            champ.addBuff(this.dashBuff);
+        this.airborneBuff = new Airborne(999999, this.owner, enemy);
+        this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
+        enemy.addBuff(this.airborneBuff);
 
-            champ.takeDamage(20, this.owner);
-            break;
-          }
-        }
+        this.dashBuff = new Dash(999999, this.owner, enemy);
+        this.dashBuff.showTrail = false;
+        this.dashBuff.cancelable = false;
+        enemy.addBuff(this.dashBuff);
+
+        enemy.takeDamage(20, this.owner);
       }
     } else if (this.champToGrab) {
       this.dashBuff.destination = this.owner.position.copy();

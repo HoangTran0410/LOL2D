@@ -21,6 +21,7 @@ export default class Obstacle {
   draw() {
     push();
 
+    strokeWeight(5);
     if (this.type === TerrainType.WALL) {
       stroke('#555');
       fill('#555');

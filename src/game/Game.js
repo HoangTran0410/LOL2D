@@ -1,12 +1,11 @@
 import Camera from './gameObject/map/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import { SpellHotKeys } from './constants.js';
-import InGameHUD from './hud/InGameHUD.js';
 import { getRandomChampionPreset } from './preset.js';
+import { SpellHotKeys } from './constants.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
-// import PolygonUtils from '../utils/polygon.utils.js';
+import InGameHUD from './hud/InGameHUD.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -113,42 +112,29 @@ export default class Game {
 
   draw() {
     if (this.paused) return;
-    background(20);
+    background(30);
 
-    this.camera.push();
-    // this.camera.drawGrid();
+    this.camera.makeDraw(() => {
+      // this.camera.drawGrid();
+      this.terrainMap.draw();
+      this.terrainMap.drawEdges();
 
-    this.terrainMap.draw();
-    this.terrainMap.drawEdges();
+      for (let o of this.objects) o.draw();
+    });
 
-    // debug SAT collision check
-    if (this.collideCheckObstacles?.length) {
-      push();
-      noFill();
-      stroke('#e55');
-      beginShape();
-      for (let v of this.collideCheckObstacles) {
-        vertex(v.x, v.y);
+    this.fogOfWar.draw(); // draw fog of war on top of everything, except players
+
+    this.camera.makeDraw(() => {
+      if (this.clickedPoint.size > 0) {
+        push();
+        fill('green');
+        ellipse(this.clickedPoint.x, this.clickedPoint.y, this.clickedPoint.size);
+        pop();
       }
-      endShape(CLOSE);
-      pop();
-    }
 
-    // draw clicked point
-    if (this.clickedPoint.size > 0) {
-      push();
-      fill('green');
-      ellipse(this.clickedPoint.x, this.clickedPoint.y, this.clickedPoint.size);
-      pop();
-    }
-
-    for (let o of this.objects) o.draw();
-    // for (let p of this.players) p.draw();
-    for (let p of this.player.visiblePlayers ?? []) p.draw();
-
-    this.camera.pop();
-
-    this.fogOfWar.draw();
+      // for (let p of this.players) p.draw();
+      for (let p of this.player.visiblePlayers ?? []) p.draw();
+    });
   }
 
   keyPressed() {

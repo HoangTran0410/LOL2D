@@ -6,12 +6,14 @@ let stats;
 
 export default class GameScene extends Scene {
   setup() {
-    createCanvas(windowWidth, windowHeight).parent('game-scene');
-
     this.dom = document.querySelector('#game-scene');
 
     this.canvas = createCanvas(windowWidth, windowHeight).parent('game-scene');
     this.canvas.elt.oncontextmenu = () => false;
+
+    strokeJoin(ROUND);
+    strokeCap(ROUND);
+    pixelDensity(1);
 
     this.game = null;
 
