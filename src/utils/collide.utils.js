@@ -1,14 +1,16 @@
+import SAT from '../../libs/SAT.js';
 import PolyDecomp from '../../libs/poly-decomp.js';
 
 const CollideUtils = {
   // using SAT library
   pointPolygon: (x, y, vertices) => {
-    let point = new SAT.Vector(x, y);
-    let polygon = new SAT.Polygon(
-      new SAT.Vector(0, 0),
-      vertices.map(_ => new SAT.Vector(_.x, _.y))
+    return SAT.pointInPolygon(
+      new SAT.Vector(x, y),
+      new SAT.Polygon(
+        new SAT.Vector(0, 0),
+        vertices.map(_ => new SAT.Vector(_.x, _.y))
+      )
     );
-    return SAT.pointInPolygon(point, polygon);
   },
 
   // using SAT library + decomp library
@@ -18,19 +20,13 @@ const CollideUtils = {
     PolyDecomp.makeCCW(_vertices);
     let decompVisibility = PolyDecomp.quickDecomp(_vertices);
 
-    let SATPoint = new SAT.Vector(x, y);
     for (let poly of decompVisibility) {
-      let SATpolygon = new SAT.Polygon(
-        new SAT.Vector(),
-        poly.map(p => new SAT.Vector(p[0], p[1]))
-      );
-      let overlap = SAT.pointInPolygon(SATPoint, SATpolygon);
-
+      let _poly = poly.map(_ => ({ x: _[0], y: _[1] }));
+      let overlap = CollideUtils.pointPolygon(x, y, _poly);
       if (overlap) {
         return true;
       }
     }
-
     return false;
   },
 };

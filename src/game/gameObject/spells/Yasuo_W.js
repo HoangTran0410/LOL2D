@@ -1,6 +1,7 @@
 import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
-import { collidePolygonPoint, rectToVertices } from '../../../utils/index.js';
+import CollideUtils from '../../../utils/collide.utils.js';
+import { rectToVertices } from '../../../utils/index.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
@@ -77,7 +78,7 @@ export class Yasuo_W_Object extends SpellObject {
         let px = obj.position.x;
         let py = obj.position.y;
 
-        if (collidePolygonPoint(vertices, px, py)) {
+        if (CollideUtils.pointPolygon(px, py, vertices)) {
           obj.toRemove = true;
         }
       }

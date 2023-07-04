@@ -1,3 +1,4 @@
+import SAT from '../../../../libs/SAT.js';
 import TerrainType from '../../enums/TerrainType.js';
 
 export default class Obstacle {

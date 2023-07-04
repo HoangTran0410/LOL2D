@@ -1,3 +1,4 @@
+import SAT from '../../../../libs/SAT.js';
 import { Circle, Quadtree, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import { hasFlag } from '../../../utils/index.js';

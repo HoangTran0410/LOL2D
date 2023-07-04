@@ -50,15 +50,3 @@ export const rotateVerticesWithAnchor = (vertices, angle, anchor) => {
   }
   return result;
 };
-
-// using SAT.js
-export const collidePolygonPoint = (vertices, px, py) => {
-  let collision = SAT.pointInPolygon(
-    new SAT.Vector(px, py),
-    new SAT.Polygon(
-      new SAT.Vector(),
-      vertices.map(v => new SAT.Vector(v.x, v.y))
-    )
-  );
-  return collision;
-};

@@ -10,6 +10,7 @@ import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Slow from '../buffs/Slow.js';
+import SAT from '../../../../libs/SAT.js';
 
 export default class Champion {
   constructor(game, x = 0, y = 0, preset) {

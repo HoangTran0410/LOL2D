@@ -1,5 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import { collidePolygonPoint, rectToVertices } from '../../../utils/index.js';
+import CollideUtils from '../../../utils/collide.utils.js';
+import { rectToVertices } from '../../../utils/index.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -148,7 +149,7 @@ export class Yasuo_Q_Object extends SpellObject {
             y: this.owner.position.y,
           }
         );
-        return collidePolygonPoint(vertices, p.position.x, p.position.y);
+        return CollideUtils.pointPolygon(p.position.x, p.position.y, vertices);
       },
     });
 

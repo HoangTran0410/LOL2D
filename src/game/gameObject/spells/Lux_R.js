@@ -1,10 +1,11 @@
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
-import { rectToVertices, collidePolygonPoint } from '../../../utils/index.js';
+import { rectToVertices } from '../../../utils/index.js';
 import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import CollideUtils from '../../../utils/collide.utils.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
@@ -111,7 +112,7 @@ export class Lux_R_Object extends SpellObject {
           let py = p.position.y;
 
           // check collision
-          return collidePolygonPoint(vertices, px, py);
+          return CollideUtils.pointPolygon(px, py, vertices);
         },
       });
 
