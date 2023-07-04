@@ -21,3 +21,5 @@ const ColorUtils = {
     canvas.drawingContext.fillStyle = g;
   },
 };
+
+export default ColorUtils;

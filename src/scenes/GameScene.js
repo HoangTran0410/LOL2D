@@ -6,6 +6,8 @@ let stats;
 
 export default class GameScene extends Scene {
   setup() {
+    createCanvas(windowWidth, windowHeight).parent('game-scene');
+
     this.dom = document.querySelector('#game-scene');
 
     this.canvas = createCanvas(windowWidth, windowHeight).parent('game-scene');
@@ -49,5 +51,10 @@ export default class GameScene extends Scene {
   exit() {
     this.dom.style.display = 'none';
     this.game.destroy();
+  }
+
+  windowResized() {
+    this.game.resize(windowWidth, windowHeight);
+    resizeCanvas(windowWidth, windowHeight, true);
   }
 }

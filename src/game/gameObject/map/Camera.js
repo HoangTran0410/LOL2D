@@ -2,18 +2,18 @@ export default class Camera {
   constructor() {
     this.position = createVector(0, 0);
     this.currentZoom = 0.5;
-    this.zoom = 1;
+    this.scale = 1;
     this.target = null;
   }
 
   zoomBy(delta) {
-    this.zoom += delta;
-    this.zoom = constrain(this.zoom, 0.5, 2);
+    this.scale += delta;
+    this.scale = constrain(this.scale, 0.5, 2);
   }
 
   zoomTo(zoom) {
-    this.zoom = zoom;
-    this.zoom = constrain(this.zoom, 0.5, 2);
+    this.scale = zoom;
+    this.scale = constrain(this.scale, 0.5, 2);
   }
 
   update() {
@@ -21,14 +21,14 @@ export default class Camera {
       this.position.lerp(this.target, 0.1);
     }
 
-    this.currentZoom = lerp(this.currentZoom, this.zoom, 0.07);
+    this.currentZoom = lerp(this.currentZoom, this.scale, 0.07);
   }
 
   drawGrid(gridSize = 400) {
     stroke(100, 70);
     strokeWeight(2);
 
-    // get bounds (included zoom)
+    // get bounds (included scale)
     let topLeft = this.screenToWorld(0, 0);
     let bottomRight = this.screenToWorld(width, height);
 

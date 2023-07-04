@@ -1,4 +1,4 @@
-import { Quadtree, Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Quadtree, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import { hasFlag } from '../../../utils/index.js';
 import StatusFlags from '../../enums/StatusFlags.js';
@@ -37,7 +37,10 @@ export default class TerrainMap {
       let o = new Obstacle(0, 0, Obstacle.arrayToVertices(vertices), type);
       this.obstacles.push(o);
 
-      const rectangle = new Rectangle({ ...o.getBoundingBox(), data: o });
+      const rectangle = new Rectangle({
+        ...o.getBoundingBox(), // quadtree node
+        data: o, // obstacle instance
+      });
       this.quadtree.insert(rectangle);
     }
   }
@@ -54,64 +57,36 @@ export default class TerrainMap {
 
     // players collision with obstacles
     for (let p of this.game.players) {
-      let area = new Rectangle({
-        x: p.position.x,
-        y: p.position.y,
-        width: p.stats.size.value / 2,
-        height: p.stats.size.value / 2,
-      });
-      let obstacles = this.quadtree.retrieve(area).map(o => o.data);
-
-      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
-      let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
+      let obstacles = this.getObstaclesCollideChampion(p, [TerrainType.WALL, TerrainType.BUSH]);
 
       // Collide with bushes
-      let isInBush = false;
-      for (let b of bushes) {
-        let response = new SAT.Response();
-        let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
-        if (collided) {
-          isInBush = true;
-          break;
-        }
-      }
-      p.isInBush = isInBush;
+      // let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
+      // let isInBush = false;
+      // for (let b of bushes) {
+      //   let response = new SAT.Response();
+      //   let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
+      //   if (collided) {
+      //     isInBush = true;
+      //     break;
+      //   }
+      // }
+      // p.isInBush = isInBush;
 
       // Collide with walls
+      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
 
-      let collided = false,
-        overlaps = [];
+      let collided = false;
+      let overlaps = [];
       for (let o of walls) {
         let response = new SAT.Response();
-        let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
-        if (collided) {
+        let _collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
+        if (_collided) {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           overlaps.push({ obstacle: o, overlap });
           collided = true;
         }
       }
-
-      // if overlapped with multiple walls, merge the walls and recalculate the overlap
-      // this.collideCheckObstacles = [];
-      // if (overlaps.length > 1) {
-      //   let polyContainer = PolygonUtils.getPolygonsContainer(
-      //     overlaps.map(_ => _.obstacle.vertices)
-      //   );
-      //   this.collideCheckObstacles = polyContainer;
-
-      //   let SATPoly = new SAT.Polygon(
-      //     new SAT.Vector(0, 0),
-      //     polyContainer.map(v => new SAT.Vector(v.x, v.y))
-      //   );
-      //   let response = new SAT.Response();
-      //   let collided = SAT.testPolygonCircle(SATPoly, p.toSATCircle(), response);
-      //   if (collided) {
-      //     console.log('collided');
-      //     let overlap = createVector(response.overlapV.x, response.overlapV.y);
-      //     overlaps = [{ overlap }];
-      //   }
-      // }
 
       if (overlaps.length) {
         let overlap = overlaps.map(_ => _.overlap).reduce((a, b) => a.add(b), createVector(0, 0));
@@ -119,8 +94,8 @@ export default class TerrainMap {
         p.position.add(overlap);
       }
 
-      if (p != this.player && collided) {
-        p.moveToRandomLocation();
+      if (p != this.game.player && collided) {
+        p.moveToRandomLocation?.();
       }
     }
 
@@ -147,9 +122,7 @@ export default class TerrainMap {
 
   draw() {
     push();
-    let obstacles = this.quadtree
-      .retrieve(new Rectangle(this.game.camera.getViewBounds()))
-      .map(o => o.data);
+    let obstacles = this.getObstaclesInView();
 
     let waters = obstacles.filter(o => o.type === TerrainType.WATER);
     let walls = obstacles.filter(o => o.type === TerrainType.WALL);
@@ -170,5 +143,35 @@ export default class TerrainMap {
     line(this.size, this.size, 0, this.size);
     line(0, this.size, 0, 0);
     pop();
+  }
+
+  getObstaclesInArea(area, terrainTypes = []) {
+    return this.quadtree
+      .retrieve(area)
+      .map(o => o.data) // get obstacle data from quadtree node
+      .filter(o => !terrainTypes.length || terrainTypes.includes(o.type));
+  }
+
+  getObstaclesInView(terrainTypes) {
+    let area = new Rectangle(this.game.camera.getViewBounds());
+    return this.getObstaclesInArea(area, terrainTypes);
+  }
+
+  getObstaclesCollideChampion(champion, terrainTypes) {
+    let area = new Circle({
+      x: champion.position.x,
+      y: champion.position.y,
+      r: champion.stats.size.value,
+    });
+    return this.getObstaclesInArea(area, terrainTypes);
+  }
+
+  getObstaclesInChampionSight(champion, terrainTypes) {
+    let area = new Circle({
+      x: champion.position.x,
+      y: champion.position.y,
+      r: champion.stats.sightRadius.value,
+    });
+    return this.getObstaclesInArea(area, terrainTypes);
   }
 }

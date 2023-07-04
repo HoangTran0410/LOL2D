@@ -18,6 +18,7 @@ const P5Events = [
   'deviceMoved',
   'deviceTurned',
   'deviceShaken',
+  'windowResized',
 ];
 
 export class Scene {
@@ -68,6 +69,7 @@ export class Scene {
   deviceMoved() {}
   deviceTurned() {}
   deviceShaken() {}
+  windowResized() {}
 }
 
 export default class SceneManager {

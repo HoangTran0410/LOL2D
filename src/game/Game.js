@@ -5,6 +5,7 @@ import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { getRandomChampionPreset } from './preset.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
+import FogOfWar from './gameObject/map/FogOfWar.js';
 // import PolygonUtils from '../utils/polygon.utils.js';
 
 const fps = 60;
@@ -15,8 +16,8 @@ export default class Game {
     this.camera = new Camera();
     this.InGameHUD = new InGameHUD(this);
     this.terrainMap = new TerrainMap(this);
+    this.fogOfWar = new FogOfWar(this);
 
-    this.kills = [];
     this.objects = [];
     this.players = [];
     this.clickedPoint = { x: 0, y: 0, size: 0 };
@@ -115,7 +116,7 @@ export default class Game {
     background(20);
 
     this.camera.push();
-    this.camera.drawGrid();
+    // this.camera.drawGrid();
 
     this.terrainMap.draw();
     this.terrainMap.drawEdges();
@@ -142,9 +143,12 @@ export default class Game {
     }
 
     for (let o of this.objects) o.draw();
-    for (let p of this.players) p.draw();
+    // for (let p of this.players) p.draw();
+    for (let p of this.player.visiblePlayers ?? []) p.draw();
 
     this.camera.pop();
+
+    this.fogOfWar.draw();
   }
 
   keyPressed() {
@@ -154,11 +158,8 @@ export default class Game {
     // }
   }
 
-  addKill(killer, victim) {
-    this.kills.push({
-      killer,
-      victim,
-    });
+  resize(w, h) {
+    this.fogOfWar.resize(w, h);
   }
 
   queryObjectsInRange({ position, range }) {
@@ -189,7 +190,6 @@ export default class Game {
 
     return getOnlyOne ? null : result;
   }
-
   getRandomSpawnLocation() {
     let mapSize = this.terrainMap.size;
     let x = mapSize / 2 + random(-mapSize / 3, mapSize / 3);

@@ -9,9 +9,9 @@ export class StatsModifier {
     this.speed = new StatModifier(0);
     this.size = new StatModifier(0);
     this.height = new StatModifier(0);
-
     this.manaRegen = new StatModifier(0);
     this.healthRegen = new StatModifier(0);
+    this.sightRadius = new StatModifier(0);
   }
 }
 
@@ -24,9 +24,9 @@ export default class Stats {
     this.speed = new Stat(3);
     this.size = new Stat(55);
     this.height = new Stat(0);
-
     this.manaRegen = new Stat(0.1);
     this.healthRegen = new Stat(0.06);
+    this.sightRadius = new Stat(600);
   }
 
   addModifier(modifier) {
@@ -37,9 +37,9 @@ export default class Stats {
     this.speed.addModifier(modifier.speed);
     this.size.addModifier(modifier.size);
     this.height.addModifier(modifier.height);
-
     this.manaRegen.addModifier(modifier.manaRegen);
     this.healthRegen.addModifier(modifier.healthRegen);
+    this.sightRadius.addModifier(modifier.sightRadius);
   }
 
   removeModifier(modifier) {
@@ -50,9 +50,9 @@ export default class Stats {
     this.speed.removeModifier(modifier.speed);
     this.size.removeModifier(modifier.size);
     this.height.removeModifier(modifier.height);
-
     this.manaRegen.removeModifier(modifier.manaRegen);
     this.healthRegen.removeModifier(modifier.healthRegen);
+    this.sightRadius.removeModifier(modifier.sightRadius);
   }
 
   update() {

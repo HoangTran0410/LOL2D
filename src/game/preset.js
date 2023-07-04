@@ -54,7 +54,7 @@ export const ChampionPreset = {
     spells: [
       AllSpells.Heal,
       AllSpells.Blitzcrank_Q,
-      AllSpells.Yasuo_W,
+      AllSpells.Blitzcrank_W,
       AllSpells.Teemo_R,
       AllSpells.Teemo_R,
       AllSpells.Flash,

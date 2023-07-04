@@ -9,13 +9,13 @@ export default class Yasuo_R extends Spell {
   image = AssetManager.getAsset('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =
-    'Yasuo lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 1.5 giây và gây 30 sát thương';
+    'Yasuo lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 1 giây và gây 30 sát thương';
   coolDown = 10000;
   manaCost = 50;
 
   rangeToFindEnemies = 500;
-  rangeToApplyAirborne = 400;
-  timeToApplyAirborne = 1500;
+  rangeToApplyAirborne = 200;
+  timeToApplyAirborne = 1000;
 
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
@@ -24,7 +24,7 @@ export default class Yasuo_R extends Spell {
     let enemies = this.game.queryPlayerInRange({
       position: this.owner.position,
       range: this.rangeToFindEnemies,
-      customFilter: p => p.stats.height.value > 0,
+      customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
       excludePlayers: [this.owner],
     });
 
@@ -41,9 +41,10 @@ export default class Yasuo_R extends Spell {
 
     if (nearestEnemy) {
       // find all enemies that are in range 300px to nearest enemy
-      let enemiesInRange = enemies.filter(
-        enemy => enemy.position.dist(nearestEnemy.position) < this.rangeToApplyAirborne / 2
-      );
+      let enemiesInRange = this.game.queryPlayerInRange({
+        position: nearestEnemy.position,
+        range: this.rangeToApplyAirborne,
+      });
 
       // add airborne buff to all enemies in range
       for (let enemy of enemiesInRange) {
@@ -83,7 +84,7 @@ export default class Yasuo_R extends Spell {
       let obj = new Yasuo_R_Object(this.owner);
       obj.oldPosition = this.owner.position.copy();
       obj.position = nearestEnemy.position.copy();
-      obj.size = this.rangeToApplyAirborne;
+      obj.size = this.rangeToApplyAirborne * 2;
       obj.lifeTime = this.timeToApplyAirborne;
       obj.playersEffected = enemiesInRange;
       this.game.objects.push(obj);
@@ -92,7 +93,7 @@ export default class Yasuo_R extends Spell {
       let nearEnemyPos = mouse
         .copy()
         .sub(nearestEnemy.position)
-        .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value / 2)
+        .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value / 2 + 10)
         .add(nearestEnemy.position);
 
       this.owner.position.set(nearEnemyPos.x, nearEnemyPos.y);
