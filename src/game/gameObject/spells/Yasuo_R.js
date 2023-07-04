@@ -44,6 +44,8 @@ export default class Yasuo_R extends Spell {
       let enemiesInRange = this.game.queryPlayerInRange({
         position: nearestEnemy.position,
         range: this.rangeToApplyAirborne,
+        customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
+        excludePlayers: [this.owner],
       });
 
       // add airborne buff to all enemies in range
