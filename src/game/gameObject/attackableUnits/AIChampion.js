@@ -25,8 +25,8 @@ export default class AIChampion extends Champion {
   }
 
   moveToRandomLocation() {
-    let x = random(this.game.MAPSIZE);
-    let y = random(this.game.MAPSIZE);
+    let x = random(this.game.terrainMap.size);
+    let y = random(this.game.terrainMap.size);
     this.moveTo(x, y);
   }
 

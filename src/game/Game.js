@@ -1,15 +1,10 @@
 import Camera from './gameObject/map/Camera.js';
-import Obstacle from './gameObject/map/Obstacle.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import { Quadtree, Rectangle } from '../../libs/quadtree.js';
 import { SpellHotKeys } from './constants.js';
 import InGameHUD from './hud/InGameHUD.js';
-import { hasFlag } from '../utils/index.js';
-import StatusFlags from './enums/StatusFlags.js';
-import AssetManager from '../managers/AssetManager.js';
-import TerrainType from './enums/TerrainType.js';
 import { getRandomChampionPreset } from './preset.js';
+import TerrainMap from './gameObject/map/TerrainMap.js';
 // import PolygonUtils from '../utils/polygon.utils.js';
 
 const fps = 60;
@@ -17,9 +12,10 @@ let accumulator = 0;
 
 export default class Game {
   constructor() {
+    this.camera = new Camera();
     this.InGameHUD = new InGameHUD(this);
+    this.terrainMap = new TerrainMap(this);
 
-    this.MAPSIZE = 6400;
     this.kills = [];
     this.objects = [];
     this.players = [];
@@ -40,42 +36,8 @@ export default class Game {
     this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
 
-    // init camera
-    this.camera = new Camera();
+    // camera follow player
     this.camera.target = this.player.position;
-
-    // init quadtree obstacle
-    this.quadtree = new Quadtree({
-      x: 0,
-      y: 0,
-      width: this.MAPSIZE,
-      height: this.MAPSIZE,
-      maxObjects: 10, // optional, default: 10
-      maxLevels: 6, // optional, default:  4
-    });
-
-    this.obstacles = [];
-    let polygons = [];
-    const terrains = AssetManager.getAsset('json_summoner_map')?.data;
-    for (let terrainType in terrains) {
-      polygons.push(
-        ...terrains[terrainType].map(_ => ({
-          vertices: _,
-          type: terrainType,
-        }))
-      );
-    }
-
-    for (let { vertices, type } of polygons) {
-      let o = new Obstacle(0, 0, Obstacle.arrayToVertices(vertices), type);
-      this.obstacles.push(o);
-
-      const rectangle = new Rectangle({
-        ...o.getBoundingBox(),
-        data: o,
-      });
-      this.quadtree.insert(rectangle);
-    }
   }
 
   pause() {
@@ -88,10 +50,7 @@ export default class Game {
 
   destroy() {
     this.objects = [];
-    this.objects = [];
     this.players = [];
-    this.obstacles = [];
-    this.quadtree.clear();
     this.InGameHUD.destroy();
   }
 
@@ -99,107 +58,14 @@ export default class Game {
     this.camera.update();
     this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
 
-    this.objects = this.objects.filter(o => {
-      if (o.toRemove) {
-        o.onBeforeRemove?.();
-        return false;
-      }
-      return true;
-    });
+    // remove objects that are marked to be removed + call onBeforeRemove
+    this.objects = this.objects.filter(o => !o.toRemove && (o.onBeforeRemove?.() || true));
+
     for (let o of this.objects) o.update();
     for (let p of this.players) p.update();
 
-    // collision with obstacles
-    for (let p of this.players) {
-      let area = new Rectangle({
-        x: p.position.x,
-        y: p.position.y,
-        width: p.stats.size.value / 2,
-        height: p.stats.size.value / 2,
-      });
-      let obstacles = this.quadtree.retrieve(area).map(o => o.data);
-
-      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
-      let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
-
-      // Collide with bushes
-      let isInBush = false;
-      for (let b of bushes) {
-        let response = new SAT.Response();
-        let collided = SAT.testPolygonCircle(b.toSATPolygon(), p.toSATCircle(), response);
-        if (collided) {
-          isInBush = true;
-          break;
-        }
-      }
-      p.isInBush = isInBush;
-
-      // Collide with walls
-      if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
-
-      let collided = false,
-        overlaps = [];
-      for (let o of walls) {
-        let response = new SAT.Response();
-        let collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
-        if (collided) {
-          let overlap = createVector(response.overlapV.x, response.overlapV.y);
-          overlaps.push({ obstacle: o, overlap });
-          collided = true;
-        }
-      }
-
-      // if overlapped with multiple walls, merge the walls and recalculate the overlap
-      // this.collideCheckObstacles = [];
-      // if (overlaps.length > 1) {
-      //   let polyContainer = PolygonUtils.getPolygonsContainer(
-      //     overlaps.map(_ => _.obstacle.vertices)
-      //   );
-      //   this.collideCheckObstacles = polyContainer;
-
-      //   let SATPoly = new SAT.Polygon(
-      //     new SAT.Vector(0, 0),
-      //     polyContainer.map(v => new SAT.Vector(v.x, v.y))
-      //   );
-      //   let response = new SAT.Response();
-      //   let collided = SAT.testPolygonCircle(SATPoly, p.toSATCircle(), response);
-      //   if (collided) {
-      //     console.log('collided');
-      //     let overlap = createVector(response.overlapV.x, response.overlapV.y);
-      //     overlaps = [{ overlap }];
-      //   }
-      // }
-
-      if (overlaps.length) {
-        let overlap = overlaps.map(_ => _.overlap).reduce((a, b) => a.add(b), createVector(0, 0));
-        overlap.div(overlaps.length);
-        p.position.add(overlap);
-      }
-
-      if (p != this.player && collided) {
-        p.moveToRandomLocation();
-      }
-    }
-
-    // collision map edges
-    for (let p of this.players) {
-      let size = p.stats.size.value / 2;
-      if (p.position.x < size) p.position.x = size;
-      if (p.position.x > this.MAPSIZE - size) p.position.x = this.MAPSIZE - size;
-      if (p.position.y < size) p.position.y = size;
-      if (p.position.y > this.MAPSIZE - size) p.position.y = this.MAPSIZE - size;
-
-      if (p != this.player) {
-        if (
-          p.position.x < size ||
-          p.position.x > this.MAPSIZE - size ||
-          p.position.y < size ||
-          p.position.y > this.MAPSIZE - size
-        ) {
-          p.moveToRandomLocation();
-        }
-      }
-    }
+    // update terrain map, check for collision
+    this.terrainMap.update();
 
     // control player
     if (mouseIsPressed && mouseButton === RIGHT) {
@@ -230,15 +96,6 @@ export default class Game {
   }
 
   update() {
-    // this.quadtree.clear();
-    // for (let o of this.obstacles) {
-    //   const rectangle = new Rectangle({
-    //     ...o.getBoundingBox(),
-    //     data: o,
-    //   });
-    //   this.quadtree.insert(rectangle);
-    // }
-
     if (this.paused) return;
 
     accumulator += Math.min(deltaTime, 250);
@@ -260,17 +117,8 @@ export default class Game {
     this.camera.push();
     this.camera.drawGrid();
 
-    let obstacles = this.quadtree
-      .retrieve(new Rectangle(this.camera.getViewBounds()))
-      .map(o => o.data);
-
-    let waters = obstacles.filter(o => o.type === TerrainType.WATER);
-    let walls = obstacles.filter(o => o.type === TerrainType.WALL);
-    let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
-
-    for (let w of waters) w.draw();
-    for (let b of bushes) b.draw();
-    for (let w of walls) w.draw();
+    this.terrainMap.draw();
+    this.terrainMap.drawEdges();
 
     // debug SAT collision check
     if (this.collideCheckObstacles?.length) {
@@ -296,22 +144,7 @@ export default class Game {
     for (let o of this.objects) o.draw();
     for (let p of this.players) p.draw();
 
-    // draw edges
-    stroke('white');
-    strokeWeight(3);
-    line(0, 0, this.MAPSIZE, 0);
-    line(this.MAPSIZE, 0, this.MAPSIZE, this.MAPSIZE);
-    line(this.MAPSIZE, this.MAPSIZE, 0, this.MAPSIZE);
-    line(0, this.MAPSIZE, 0, 0);
-
     this.camera.pop();
-
-    // draw mouse
-    // push();
-    // strokeWeight(10);
-    // stroke(150);
-    // line(mouseX, mouseY, pmouseX, pmouseY);
-    // pop();
   }
 
   keyPressed() {
@@ -358,8 +191,9 @@ export default class Game {
   }
 
   getRandomSpawnLocation() {
-    let x = this.MAPSIZE / 2 + random(-this.MAPSIZE / 3, this.MAPSIZE / 3);
-    let y = this.MAPSIZE / 2 + random(-this.MAPSIZE / 3, this.MAPSIZE / 3);
+    let mapSize = this.terrainMap.size;
+    let x = mapSize / 2 + random(-mapSize / 3, mapSize / 3);
+    let y = mapSize / 2 + random(-mapSize / 3, mapSize / 3);
     return createVector(x, y);
   }
 }
