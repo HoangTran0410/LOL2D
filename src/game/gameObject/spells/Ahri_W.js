@@ -36,7 +36,7 @@ export class Ahri_W_Object extends SpellObject {
   targetEnemy = null;
 
   trailSystem = new TrailSystem({
-    trailColor: '#77F5',
+    trailColor: '#77F3',
     trailSize: this.size,
   });
 
@@ -65,6 +65,7 @@ export class Ahri_W_Object extends SpellObject {
     // rotating
     else if (this.phase === Ahri_W_Object.PHASES.ROTATING) {
       this.position = p5.Vector.lerp(this.position, this.getPosition(), 0.2);
+      this.trailSystem.addTrail(this.position);
 
       // query players in range
       let enemies = this.game.queryPlayerInRange({
@@ -120,7 +121,7 @@ export class Ahri_W_Object extends SpellObject {
   draw() {
     push();
     let alpha = this.phase === Ahri_W_Object.PHASES.PREPARING ? 50 : 255;
-    let size = this.phase === Ahri_W_Object.PHASES.ROTATING ? this.size + random(-5, 5) : this.size;
+    let size = this.phase === Ahri_W_Object.PHASES.ROTATING ? this.size + random(-3, 3) : this.size;
     translate(this.position.x, this.position.y);
     noStroke();
     fill(119, 119, 245, alpha);

@@ -13,7 +13,7 @@ export default class LoadingScene extends Scene {
     // reset dom
     this.loadingSceneDiv.style.display = 'block';
     this.loadingAnimation.style.display = 'block';
-    this.loadingText.innerHTML = '0%';
+    this.loadingText.innerHTML = '0%<br/>Đang tải tài nguyên game...';
     this.errorText.innerHTML = '';
 
     const errorAssets = [];
