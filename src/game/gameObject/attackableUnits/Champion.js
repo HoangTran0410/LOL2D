@@ -219,7 +219,7 @@ export default class Champion {
     circle(pos.x, pos.y, size);
 
     // draw direction to mouse
-    if (!this.isDead) {
+    if (!this.isDead && this.game.worldMouse) {
       let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 1.75);
       stroke(255, alpha);
       strokeWeight(4);

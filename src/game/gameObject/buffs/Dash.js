@@ -4,9 +4,10 @@ import { hasFlag } from '../../../utils/index.js';
 import Buff from '../Buff.js';
 import Airborne from './Airborne.js';
 import Root from './Root.js';
-import Silence from './Silence.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import Stun from './Stun.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 // Lướt
 export default class Dash extends Buff {
@@ -18,13 +19,17 @@ export default class Dash extends Buff {
   // for override
   trailsDelayFrame = 0;
   trails = [];
+  trailSystem = new TrailSystem({
+    trailColor: [255, 100],
+    maxLength: 20,
+  });
 
   // for override
   showTrail = true;
   dashSpeed = 6;
   dashDestination = null;
   cancelable = true;
-  buffsToCheckCancel = [Airborne, Root, Silence];
+  buffsToCheckCancel = [Airborne, Root, Stun];
 
   static CanDash(targetUnit) {
     return hasFlag(targetUnit.status, StatusFlags.CanMove);
@@ -65,12 +70,7 @@ export default class Dash extends Buff {
     }
 
     // update trails
-    if (this.trailsDelayFrame == 0) {
-      this.trails.push(this.targetUnit.position.copy());
-      if (this.trails.length > 20) this.trails.shift();
-    }
-    this.trailsDelayFrame++;
-    if (this.trailsDelayFrame >= 5) this.trailsDelayFrame = 0;
+    this.trailSystem.addTrail(this.targetUnit.position);
   }
 
   onDeactivate() {
@@ -79,18 +79,9 @@ export default class Dash extends Buff {
 
   draw() {
     if (!this.showTrail) return;
-    push();
-    // draw trails
-    stroke(255, 100);
-    strokeWeight(this.targetUnit.stats.size.value);
-    noFill();
 
-    beginShape();
-    this.trails.forEach(trail => {
-      vertex(trail.x, trail.y);
-    });
-    endShape();
-    pop();
+    this.trailSystem.trailSize = this.targetUnit.stats.size.value;
+    this.trailSystem.draw();
   }
 
   // for override

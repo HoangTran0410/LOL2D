@@ -6,8 +6,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import Airborne from '../buffs/Airborne.js';
-import Root from '../buffs/Root.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class LeeSin_Q extends Spell {
   PHASES = {
@@ -84,7 +83,6 @@ export default class LeeSin_Q extends Spell {
       dashBuff.dashDestination = this.enemyHit.position;
       dashBuff.buffAddType = BuffAddType.RENEW_EXISTING;
       dashBuff.image = this.PHASES.Q2.image;
-      dashBuff.buffsToCheckCancel = [Airborne, Root];
       dashBuff.onReachedDestination = () => {
         // deal damage to target
         if (this.enemyHit) this.enemyHit.takeDamage(q2HitDamage, this.owner);
@@ -130,6 +128,11 @@ export class LeeSin_Q_Object extends SpellObject {
 
   enemyHit = null;
 
+  trailSystem = new TrailSystem({
+    trailSize: this.size,
+    trailColor: '#b5ede822',
+  });
+
   update() {
     if (this.phase === this.PHASES.MOVING) {
       VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
@@ -137,6 +140,8 @@ export class LeeSin_Q_Object extends SpellObject {
       if (this.destination.dist(this.position) < this.speed) {
         this.toRemove = true;
       }
+
+      this.trailSystem.addTrail(this.position);
 
       // check collision with enemy
       let enemy = this.game.queryPlayerInRange({
@@ -169,20 +174,23 @@ export class LeeSin_Q_Object extends SpellObject {
   }
 
   draw() {
-    push();
-
     // move phase
     if (this.phase === this.PHASES.MOVING) {
+      push();
       let alpha = map(this.destination.dist(this.position), 0, this.range, 99, 255);
       fill(181, 237, 232, alpha);
       stroke(190);
       translate(this.position.x, this.position.y);
       rotate(p5.Vector.sub(this.destination, this.position).heading());
       ellipse(0, 0, this.size + 15, this.size);
+      pop();
+
+      this.trailSystem.draw();
     }
 
     // hit phase
     else if (this.phase === this.PHASES.HIT) {
+      push();
       // draw 4 triangle around the enemy, west, north, east, south
       let s = this.enemyHit.stats.size.value / 2;
 
@@ -195,7 +203,7 @@ export class LeeSin_Q_Object extends SpellObject {
         let r = random(15, 20);
         triangle(-s, 0, -s - r, -s, -s - r, s);
       });
+      pop();
     }
-    pop();
   }
 }

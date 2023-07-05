@@ -1,21 +1,21 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Root from '../buffs/Root.js';
-import Silence from '../buffs/Silence.js';
+import Stun from '../buffs/Stun.js';
 
 export default class ChoGath_W extends Spell {
   image = AssetManager.getAsset('spell_chogath_w');
   name = "Tiếng Gầm Hoang Dã (Cho'Gath_W)";
   description =
-    'Gầm vào hướng đã chọn, gây 20 sát thương theo hình nón và Câm lặng kẻ địch trong 1.5s và Trói chân trong 0.75s';
+    'Gầm vào hướng đã chọn theo hình nón, Làm choáng 1s và gây 15 sát thương cho các kẻ địch trong tầm.';
   coolDown = 5000;
 
   onSpellCast() {
     let lifeTime = 1000;
-    let silenceTime = 1500;
-    let rootTime = 750;
+    let stunTime = 1000;
     let angleRange = PI / 2.5;
     let angle = this.game.worldMouse.copy().sub(this.owner.position).heading();
 
@@ -24,12 +24,12 @@ export default class ChoGath_W extends Spell {
     obj.position = this.owner.position.copy();
     obj.angleStart = angle - angleRange / 2;
     obj.angleEnd = angle + angleRange / 2;
-    obj.silenceTime = silenceTime;
-    obj.rootTime = rootTime;
+    obj.stunTime = stunTime;
     obj.lifeTime = lifeTime;
     this.game.objects.push(obj);
 
     let rootBuff = new Root(lifeTime, this.owner, this.owner);
+    rootBuff.buffAddType = BuffAddType.RENEW_EXISTING;
     rootBuff.image = this.image;
     this.owner.addBuff(rootBuff);
   }
@@ -43,8 +43,7 @@ export class ChoGath_W_Object extends SpellObject {
   angleStart = 0;
   angleEnd = 0;
 
-  silenceTime = 1500;
-  rootTime = 750;
+  stunTime = 1000;
   lifeTime = 1000;
   age = 0;
 
@@ -75,21 +74,14 @@ export class ChoGath_W_Object extends SpellObject {
       },
     });
 
-    if (enemies.length) {
-      enemies.forEach(enemy => {
-        let silenceBuff = new Silence(this.silenceTime, this.owner, enemy);
-        silenceBuff.image = AssetManager.getAsset('spell_chogath_w');
-        enemy.addBuff(silenceBuff);
+    enemies.forEach(enemy => {
+      let stunBuff = new Stun(this.stunTime, this.owner, enemy);
+      stunBuff.image = AssetManager.getAsset('spell_chogath_w');
+      enemy.addBuff(stunBuff);
 
-        let rootBuff = new Root(this.rootTime, this.owner, enemy);
-        rootBuff.image = AssetManager.getAsset('spell_chogath_w');
-        enemy.addBuff(rootBuff);
-
-        enemy.takeDamage(20, this.owner);
-      });
-
-      this.playersEffected.push(...enemies);
-    }
+      enemy.takeDamage(20, this.owner);
+      this.playersEffected.push(enemy);
+    });
   }
 
   draw() {

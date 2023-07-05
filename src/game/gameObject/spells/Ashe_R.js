@@ -3,6 +3,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Stun from '../buffs/Stun.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ashe_R extends Spell {
   image = AssetManager.getAsset('spell_ashe_r');
@@ -36,6 +37,11 @@ export class Ashe_R_Object extends SpellObject {
   exploring = false;
   exploreLifeTime = 1000;
 
+  trailSystem = new TrailSystem({
+    trailSize: this.size / 1.5,
+    trailColor: [100, 100, 200, 50],
+  });
+
   update() {
     this.age += deltaTime;
     if (this.age > this.lifeTime) {
@@ -45,6 +51,7 @@ export class Ashe_R_Object extends SpellObject {
     // moving phase
     if (!this.exploring) {
       this.position.add(this.direction.copy().mult(this.speed));
+      this.trailSystem.addTrail(this.position);
 
       // check collide enemy
       let enemy = this.game.queryPlayerInRange({
@@ -119,6 +126,8 @@ export class Ashe_R_Object extends SpellObject {
       );
     }
     pop();
+
+    this.trailSystem.draw();
   }
 
   randSize() {

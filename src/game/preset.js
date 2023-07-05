@@ -97,6 +97,18 @@ export const ChampionPreset = {
       AllSpells.Ghost,
     ],
   },
+  ahri: {
+    avatar: 'champ_ahri',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Ahri_Q,
+      AllSpells.Ahri_Q,
+      AllSpells.Ahri_Q,
+      AllSpells.Ahri_Q,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
 };
 
 export const getRandomChampionPreset = () => {

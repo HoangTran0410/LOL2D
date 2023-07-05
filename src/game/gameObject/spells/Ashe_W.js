@@ -4,6 +4,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
@@ -53,8 +54,15 @@ export class Ashe_W_Object extends SpellObject {
   speed = 7;
   size = 10;
 
+  trailSystem = new TrailSystem({
+    maxLength: 10,
+    trailSize: this.size,
+    trailColor: [100, 100, 200, 50],
+  });
+
   update() {
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+    this.trailSystem.addTrail(this.position);
 
     if (this.position.dist(this.destination) < this.speed) {
       this.toRemove = true;
@@ -84,12 +92,14 @@ export class Ashe_W_Object extends SpellObject {
 
     noStroke();
     fill(39, 98, 180, alpha);
-    rect(-10, 0, 25, this.size);
+    rect(-10, -this.size / 2, 25, this.size);
 
     // draw triangle at head of arrow
     stroke(200, alpha);
-    triangle(15, 0, 30, this.size / 2, 15, this.size);
+    triangle(15, -this.size / 2, 30, 0, 15, this.size / 2);
 
     pop();
+
+    this.trailSystem.draw();
   }
 }

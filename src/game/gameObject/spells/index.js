@@ -21,3 +21,4 @@ export { default as LeeSin_E } from './LeeSin_E.js';
 export { default as LeeSin_R } from './LeeSin_R.js';
 export { default as ChoGath_Q } from './ChoGath_Q.js';
 export { default as ChoGath_W } from './ChoGath_W.js';
+export { default as Ahri_Q } from './Ahri_Q.js';
