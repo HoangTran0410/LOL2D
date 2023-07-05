@@ -90,7 +90,7 @@ export const ChampionPreset = {
     spells: [
       AllSpells.Heal,
       AllSpells.ChoGath_Q,
-      AllSpells.Yasuo_W,
+      AllSpells.ChoGath_W,
       AllSpells.Yasuo_E,
       AllSpells.Yasuo_R,
       AllSpells.Flash,

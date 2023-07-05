@@ -42,6 +42,7 @@ const AssetPaths = {
   spell_yasuo_r: 'assets/images/spells/yasuo_r.png',
   spell_teemo_r: 'assets/images/spells/teemo_r.png',
   spell_chogath_q: 'assets/images/spells/chogath_q.png',
+  spell_chogath_w: 'assets/images/spells/chogath_w.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
