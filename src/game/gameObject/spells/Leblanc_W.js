@@ -75,7 +75,7 @@ export default class Leblanc_W extends Spell {
         });
       };
 
-      this.owner.destination = destination;
+      this.owner.moveTo(destination.x, destination.y);
       this.owner.addBuff(dashBuff);
 
       this.w1Object = new Leblanc_W_Object(this.owner);

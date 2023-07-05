@@ -108,6 +108,7 @@ export class Ahri_Q_Object extends SpellObject {
   }
 
   draw() {
+    this.trailSystem.draw();
     let angle = this.destination.copy().sub(this.position).heading();
 
     push();
@@ -117,9 +118,6 @@ export class Ahri_Q_Object extends SpellObject {
     ellipse(0, 0, this.size - 5 + this.speed, this.size);
     pop();
 
-    push();
-    this.trailSystem.draw();
     this.particleSystem.draw();
-    pop();
   }
 }

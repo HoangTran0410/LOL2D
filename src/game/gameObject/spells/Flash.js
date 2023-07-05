@@ -20,7 +20,7 @@ export default class Flash extends Spell {
 
     let oldPos = this.owner.position.copy();
     this.owner.position.add(direction.setMag(distToMove));
-    this.owner.destination = this.owner.position.copy();
+    this.owner.moveTo(this.owner.position.x, this.owner.position.y);
 
     // add smoke effect
     let newPosEffect = new Flash_Object(this.owner);

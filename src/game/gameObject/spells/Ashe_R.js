@@ -91,6 +91,8 @@ export class Ashe_R_Object extends SpellObject {
   }
 
   draw() {
+    this.trailSystem.draw();
+
     push();
 
     // expore
@@ -126,8 +128,6 @@ export class Ashe_R_Object extends SpellObject {
       );
     }
     pop();
-
-    this.trailSystem.draw();
   }
 
   randSize() {

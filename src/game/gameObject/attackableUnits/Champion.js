@@ -11,6 +11,7 @@ import Stun from '../buffs/Stun.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Slow from '../buffs/Slow.js';
 import SAT from '../../../../libs/SAT.js';
+import Charm from '../buffs/Charm.js';
 
 export default class Champion {
   constructor(game, x = 0, y = 0, preset) {
@@ -51,7 +52,7 @@ export default class Champion {
   // }
 
   moveTo(x, y) {
-    this.destination = createVector(x, y);
+    this.destination.set(x, y);
   }
 
   move() {
@@ -147,7 +148,7 @@ export default class Champion {
   respawn() {
     let pos = this.game.getRandomSpawnLocation();
     this.position.set(pos.x, pos.y);
-    this.destination = this.position.copy();
+    this.destination.set(this.position.x, this.position.y);
     this.stats.health.baseValue = this.stats.maxHealth.value / 2;
   }
 
@@ -307,12 +308,13 @@ export default class Champion {
       // rect(0, 0, 15, size);
       pop();
     } else {
-      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow]
+      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm]
         .map(BuffClass => {
           return this.hasBuff(BuffClass) ? new BuffClass().name : '';
         })
         .filter(Boolean)
         .join(', ');
+
       if (statusString) {
         noStroke();
         fill(200);

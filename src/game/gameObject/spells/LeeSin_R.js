@@ -32,7 +32,7 @@ export default class LeeSin_R extends Spell {
     // If no enemies in range, reset cooldown
     if (!enemies?.length) {
       this.currentCooldown = 0;
-      this.owner.destination = mouse;
+      this.owner.moveTo(mouse.x, mouse.y);
       return;
     }
 

@@ -50,7 +50,7 @@ export default class ParticleSystem {
 }
 
 export const PredefinedParticleSystems = {
-  randomMovingParticlesDecreaseSize: (colour = '#77f9') =>
+  randomMovingParticlesDecreaseSize: (colour = '#77f9', decreaseSizeSpeed = 0.2) =>
     new ParticleSystem({
       isDeadFn: p => {
         return p.r <= 0;
@@ -58,14 +58,18 @@ export const PredefinedParticleSystems = {
       updateFn: p => {
         p.x += random(-2, 2);
         p.y += random(-2, 2);
-        p.r -= 0.2;
+        p.r -= decreaseSizeSpeed;
       },
       preDrawFn: () => {
+        push();
         fill(colour);
         noStroke();
       },
       drawFn: p => {
         circle(p.x, p.y, p.r * 2);
+      },
+      postDrawFn: () => {
+        pop();
       },
     }),
 };

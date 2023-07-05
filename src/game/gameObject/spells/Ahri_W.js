@@ -3,6 +3,7 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import Charm from '../buffs/Charm.js';
 import Slow from '../buffs/Slow.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -28,8 +29,8 @@ export class Ahri_W_Object extends SpellObject {
   prepairTime = 1000;
   age = 0;
   angle = 0;
-  rotateSpeed = 0.05;
-  moveSpeed = 7;
+  rotateSpeed = 0.07;
+  moveSpeed = 8;
   size = 25;
   rangeToFindEnemy = 160;
   damage = 10;
@@ -119,6 +120,8 @@ export class Ahri_W_Object extends SpellObject {
   }
 
   draw() {
+    this.trailSystem.draw();
+
     push();
     let alpha = this.phase === Ahri_W_Object.PHASES.PREPARING ? 50 : 255;
     let size = this.phase === Ahri_W_Object.PHASES.ROTATING ? this.size + random(-3, 3) : this.size;
@@ -131,7 +134,5 @@ export class Ahri_W_Object extends SpellObject {
     // noFill();
     // circle(0, 0, this.rangeToFindEnemy * 2);
     pop();
-
-    this.trailSystem.draw();
   }
 }

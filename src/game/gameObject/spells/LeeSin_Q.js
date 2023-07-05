@@ -176,6 +176,8 @@ export class LeeSin_Q_Object extends SpellObject {
   draw() {
     // move phase
     if (this.phase === this.PHASES.MOVING) {
+      this.trailSystem.draw();
+
       push();
       let alpha = map(this.destination.dist(this.position), 0, this.range, 99, 255);
       fill(181, 237, 232, alpha);
@@ -184,8 +186,6 @@ export class LeeSin_Q_Object extends SpellObject {
       rotate(p5.Vector.sub(this.destination, this.position).heading());
       ellipse(0, 0, this.size + 15, this.size);
       pop();
-
-      this.trailSystem.draw();
     }
 
     // hit phase

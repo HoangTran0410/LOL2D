@@ -55,6 +55,7 @@ const AssetPaths = {
   buff_root: 'assets/images/buffs/root.png',
   buff_airborne: 'assets/images/buffs/airborne.png',
   buff_stun: 'assets/images/buffs/stun.png',
+  buff_charm: 'assets/images/buffs/charm.png',
 
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
