@@ -5,6 +5,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import SpellObject from '../SpellObject.js';
 import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import ParticleSystem from '../helpers/ParticleSystem.js';
 
 export default class Ghost extends Spell {
   name = 'Tốc Hành (Ghost)';
@@ -51,13 +52,28 @@ export class Ghost_Buff_Object extends SpellObject {
   trail = [];
   maxAge = 30;
 
+  particleSystem = new ParticleSystem({
+    isDeadFn: p => {
+      return p.age > this.maxAge;
+    },
+    updateFn: p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.age += 1;
+    },
+    drawFn: p => {
+      stroke(255, map(p.age, 0, this.maxAge, 255, 10));
+      line(p.x, p.y, p.x + p.vx * 10, p.y + p.vy * 10);
+    },
+  });
+
   update() {
     if (random(1) < 0.2) {
       let ownerDirection = p5.Vector.sub(this.owner.destination, this.owner.position);
       let vel = ownerDirection.normalize().mult(random(-2, -1));
 
       let size = this.owner.stats.size.value / 2;
-      this.trail.push({
+      this.particleSystem.addParticle({
         x: this.owner.position.x + random(-size, size),
         y: this.owner.position.y + random(-size, size),
         vx: vel.x,
@@ -66,27 +82,13 @@ export class Ghost_Buff_Object extends SpellObject {
       });
     }
 
-    for (let t of this.trail) {
-      t.x += t.vx;
-      t.y += t.vy;
-      t.age += 1;
-    }
-
-    for (let i = this.trail.length - 1; i >= 0; i--) {
-      if (this.trail[i].age > this.maxAge) {
-        this.trail.splice(i, 1);
-      }
-    }
+    this.particleSystem.update();
   }
 
   draw() {
     push();
     strokeWeight(3);
-
-    for (let t of this.trail) {
-      stroke(255, map(t.age, 0, this.maxAge, 255, 10));
-      line(t.x, t.y, t.x + t.vx * 10, t.y + t.vy * 10);
-    }
+    this.particleSystem.draw();
     pop();
   }
 }
