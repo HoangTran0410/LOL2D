@@ -49,7 +49,6 @@ export class Ghost_Buff extends Buff {
 }
 
 export class Ghost_Buff_Object extends SpellObject {
-  trail = [];
   maxAge = 30;
 
   particleSystem = new ParticleSystem({
