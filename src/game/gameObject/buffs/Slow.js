@@ -1,6 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 

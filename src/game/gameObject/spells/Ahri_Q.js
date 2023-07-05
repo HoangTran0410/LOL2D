@@ -4,7 +4,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
-import ParticleSystem from '../helpers/ParticleSystem.js';
+import ParticleSystem, { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ahri_Q extends Spell {
@@ -52,23 +52,7 @@ export class Ahri_Q_Object extends SpellObject {
     trailColor: '#77F5',
     trailSize: this.size,
   });
-  particleSystem = new ParticleSystem({
-    isDeadFn: p => {
-      return p.r <= 0;
-    },
-    updateFn: p => {
-      p.x += random(-2, 2);
-      p.y += random(-2, 2);
-      p.r -= 0.2;
-    },
-    preDrawFn: () => {
-      fill('#77f9');
-      noStroke();
-    },
-    drawFn: p => {
-      circle(p.x, p.y, p.r * 2);
-    },
-  });
+  particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#77f9');
 
   update() {
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);

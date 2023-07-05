@@ -102,8 +102,8 @@ export const ChampionPreset = {
     spells: [
       AllSpells.Heal,
       AllSpells.Ahri_Q,
-      AllSpells.Ahri_Q,
-      AllSpells.Ahri_Q,
+      AllSpells.Ahri_W,
+      AllSpells.Yasuo_W,
       AllSpells.Ahri_Q,
       AllSpells.Flash,
       AllSpells.Ghost,

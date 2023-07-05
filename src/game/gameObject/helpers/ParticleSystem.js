@@ -48,3 +48,24 @@ export default class ParticleSystem {
     this.postDrawFn?.(this.particles);
   }
 }
+
+export const PredefinedParticleSystems = {
+  randomMovingParticlesDecreaseSize: (colour = '#77f9') =>
+    new ParticleSystem({
+      isDeadFn: p => {
+        return p.r <= 0;
+      },
+      updateFn: p => {
+        p.x += random(-2, 2);
+        p.y += random(-2, 2);
+        p.r -= 0.2;
+      },
+      preDrawFn: () => {
+        fill(colour);
+        noStroke();
+      },
+      drawFn: p => {
+        circle(p.x, p.y, p.r * 2);
+      },
+    }),
+};
