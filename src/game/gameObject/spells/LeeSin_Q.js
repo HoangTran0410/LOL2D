@@ -6,6 +6,8 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import Airborne from '../buffs/Airborne.js';
+import Root from '../buffs/Root.js';
 
 export default class LeeSin_Q extends Spell {
   PHASES = {
@@ -82,10 +84,14 @@ export default class LeeSin_Q extends Spell {
       dashBuff.dashDestination = this.enemyHit.position;
       dashBuff.buffAddType = BuffAddType.RENEW_EXISTING;
       dashBuff.image = this.PHASES.Q2.image;
+      dashBuff.buffsToCheckCancel = [Airborne, Root];
       dashBuff.onReachedDestination = () => {
         // deal damage to target
         if (this.enemyHit) this.enemyHit.takeDamage(q2HitDamage, this.owner);
         // remove spell object
+        if (this.spellObject) this.spellObject.toRemove = true;
+      };
+      dashBuff.onCancelled = () => {
         if (this.spellObject) this.spellObject.toRemove = true;
       };
       this.owner.addBuff(dashBuff);

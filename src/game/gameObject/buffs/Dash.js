@@ -6,6 +6,7 @@ import Airborne from './Airborne.js';
 import Root from './Root.js';
 import Silence from './Silence.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 // Lướt
 export default class Dash extends Buff {
@@ -14,13 +15,16 @@ export default class Dash extends Buff {
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 
-  // for update
+  // for override
   trailsDelayFrame = 0;
-  showTrail = true;
   trails = [];
+
+  // for override
+  showTrail = true;
   dashSpeed = 6;
   dashDestination = null;
   cancelable = true;
+  buffsToCheckCancel = [Airborne, Root, Silence];
 
   static CanDash(targetUnit) {
     return hasFlag(targetUnit.status, StatusFlags.CanMove);
@@ -34,12 +38,14 @@ export default class Dash extends Buff {
 
     // apply dash
     if (this.dashDestination) {
-      let dir = this.dashDestination.copy().sub(this.targetUnit.position);
-      this.targetUnit.position.add(dir.setMag(this.dashSpeed));
+      VectorUtils.moveVectorToVector(
+        this.targetUnit.position,
+        this.dashDestination,
+        this.dashSpeed
+      );
 
-      if (this.targetUnit.position.dist(this.dashDestination) < this.dashSpeed) {
+      if (p5.Vector.dist(this.targetUnit.position, this.dashDestination) < this.dashSpeed) {
         this.onReachedDestination?.();
-        this.dashDestination = null;
         this.deactivateBuff();
       }
     }
@@ -51,11 +57,10 @@ export default class Dash extends Buff {
         buff =>
           buff !== this &&
           buff.sourceUnit !== this.sourceUnit && // cancel if target unit is have other buffs from other source unit
-          (buff instanceof Airborne || // cancel if target unit is airborne
-            buff instanceof Root || // cancel if target unit is rooted
-            buff instanceof Silence) // cancel if target unit is silenced
+          this.buffsToCheckCancel.find(buffClass => buff instanceof buffClass)
       )
     ) {
+      this.onCancelled?.();
       this.deactivateBuff();
     }
 
@@ -67,8 +72,6 @@ export default class Dash extends Buff {
     this.trailsDelayFrame++;
     if (this.trailsDelayFrame >= 5) this.trailsDelayFrame = 0;
   }
-
-  onReachedDestination() {}
 
   onDeactivate() {
     this.targetUnit.status &= ~StatusFlags.Ghosted;
@@ -89,4 +92,8 @@ export default class Dash extends Buff {
     endShape();
     pop();
   }
+
+  // for override
+  onCancelled() {}
+  onReachedDestination() {}
 }
