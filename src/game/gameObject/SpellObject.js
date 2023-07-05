@@ -4,7 +4,7 @@ export default class SpellObject {
 
   constructor(owner) {
     this.owner = owner;
-    this.game = owner.game;
+    this.game = owner?.game;
   }
 
   update() {}

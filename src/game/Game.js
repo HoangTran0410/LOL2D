@@ -27,12 +27,14 @@ export default class Game {
     for (let i = 0; i < 9; i++) {
       let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
+      // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
       let champ = new AIChampion(this, pos.x, pos.y, preset);
       this.players.push(champ);
     }
 
     let preset = getRandomChampionPreset();
     let pos = this.getRandomSpawnLocation();
+    // pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
 

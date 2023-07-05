@@ -1,4 +1,6 @@
-export default class ParticleSystem {
+import SpellObject from '../SpellObject.js';
+
+export default class ParticleSystem extends SpellObject {
   particles = [];
 
   constructor({
@@ -10,7 +12,9 @@ export default class ParticleSystem {
     drawFn,
     postDrawFn,
     maxParticles = 30,
+    owner,
   }) {
+    super(owner);
     this.isDeadFn = isDeadFn;
     this.preUpdateFn = preUpdateFn;
     this.updateFn = updateFn;
@@ -41,11 +45,17 @@ export default class ParticleSystem {
   }
 
   draw() {
+    push();
     this.preDrawFn?.(this.particles);
     for (const particle of this.particles) {
       this.drawFn?.(particle);
     }
     this.postDrawFn?.(this.particles);
+    pop();
+  }
+
+  get toRemove() {
+    return this.particles.length === 0;
   }
 }
 
@@ -61,15 +71,11 @@ export const PredefinedParticleSystems = {
         p.r -= decreaseSizeSpeed;
       },
       preDrawFn: () => {
-        push();
         fill(colour);
         noStroke();
       },
       drawFn: p => {
         circle(p.x, p.y, p.r * 2);
-      },
-      postDrawFn: () => {
-        pop();
       },
     }),
 };

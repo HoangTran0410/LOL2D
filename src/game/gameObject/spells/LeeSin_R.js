@@ -5,13 +5,14 @@ import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
+import ParticleSystem from '../helpers/ParticleSystem.js';
 
 export default class LeeSin_R extends Spell {
   image = AssetManager.getAsset('spell_leesin_r');
   name = 'Nộ Long Cước (LeeSin_R)';
   description =
     'Tung cước làm mục tiêu văng ra phía sau, làm choáng và gây 30 sát thương. Kẻ địch bị mục tiêu va trúng sẽ bị hất tung trong 1s và gây 30 sát thương mỗi kẻ địch.';
-  coolDown = 10000;
+  coolDown = 500;
 
   rangeToCheckEnemies = 80;
   rangeToDashEnemy = 350;
@@ -58,6 +59,7 @@ export default class LeeSin_R extends Spell {
     let obj = new LeeSin_R_Object(this.owner);
     obj.targetEnemy = closestEnemyToMouse;
     obj.collideDamage = this.collideDamage;
+    obj.destination = destination;
     this.game.objects.push(obj);
 
     // target enemy dash to destination
@@ -82,6 +84,42 @@ export default class LeeSin_R extends Spell {
 
     // apply damage to target enemy
     closestEnemyToMouse.takeDamage(this.damage, this.owner);
+
+    // use particles system to create effect
+    let particleSystem = new ParticleSystem({
+      isDeadFn: p => p.lifeSpan <= 0,
+      updateFn: p => {
+        p.position.add(p.velocity);
+        p.lifeSpan -= deltaTime;
+      },
+      drawFn: p => {
+        let alpha = map(p.lifeSpan, 0, p.lifeTime, 50, 200);
+        stroke(255, 234, 79, alpha);
+        strokeWeight(4);
+        let vel = p.velocity.copy().setMag(random(3, 15));
+        line(p.position.x, p.position.y, p.position.x + vel.x, p.position.y + vel.y);
+      },
+    });
+
+    // pos is contact point
+    let dir = closestEnemyToMouse.position.copy().sub(this.owner.position).normalize();
+    let pos = closestEnemyToMouse.position
+      .copy()
+      .sub(dir.copy().mult(closestEnemyToMouse.stats.size.value / 2));
+
+    for (let i = 0; i < 20; i++) {
+      let lifeTime = random(300, 1500);
+      particleSystem.addParticle({
+        position: pos.copy(),
+        velocity: dir
+          .copy()
+          .setMag(random(2, 5))
+          .rotate(random(-PI / 4, PI / 4)),
+        lifeSpan: lifeTime,
+        lifeTime,
+      });
+    }
+    this.game.objects.push(particleSystem);
   }
 
   drawPreview() {
