@@ -6,6 +6,7 @@ import { hasFlag } from '../../../utils/index.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import TerrainType from '../../enums/TerrainType.js';
 import Obstacle from './Obstacle.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class TerrainMap {
   constructor(game) {
@@ -78,21 +79,37 @@ export default class TerrainMap {
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
 
       let collided = false;
-      let overlaps = [];
-      for (let o of walls) {
+      let totalOverlap = createVector(0, 0);
+      let overlapsWalls = [];
+
+      // Iterate over each wall/polygon
+      for (let wall of walls) {
         let response = new SAT.Response();
-        let _collided = SAT.testPolygonCircle(o.toSATPolygon(), p.toSATCircle(), response);
+        let _collided = SAT.testPolygonCircle(wall.toSATPolygon(), p.toSATCircle(), response);
         if (_collided) {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
-          overlaps.push({ obstacle: o, overlap });
+          totalOverlap.add(overlap); // Accumulate the overlap vectors
+          overlapsWalls.push(wall);
           collided = true;
         }
       }
 
-      if (overlaps.length) {
-        let overlap = overlaps.map(_ => _.overlap).reduce((a, b) => a.add(b), createVector(0, 0));
-        overlap.div(overlaps.length);
-        p.position.add(overlap);
+      if (collided) {
+        // push away from the overlapped wall center (middle of all vertices)
+        // if (overlapsWalls.length > 1) {
+        //   let vertices = overlapsWalls.reduce((acc, curr) => [...acc, ...curr.vertices], []);
+        //   let center = vertices
+        //     .reduce((acc, curr) => acc.add(curr), createVector(0, 0))
+        //     .div(vertices.length);
+        //   let toMove = p.position
+        //     .copy()
+        //     .sub(center)
+        //     .setMag(p.stats.size.value / 2);
+
+        //   totalOverlap.add(toMove);
+        // }
+        totalOverlap.div(overlapsWalls.length); // Calculate the average overlap vector
+        p.position.add(totalOverlap); // Apply the resolution vector to the circle's position
       }
 
       if (p != this.game.player && collided) {

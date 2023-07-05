@@ -41,7 +41,7 @@ export default class FogOfWar {
     obstaclesInSight = obstaclesInSight.filter(
       o =>
         !(
-          o.type === TerrainType.BUSH &&
+          // o.type === TerrainType.BUSH &&
           CollideUtils.pointPolygon(player.position.x, player.position.y, o.vertices)
         )
     );

@@ -61,36 +61,48 @@
 
 .spells .spell {
     margin-right: 5px;
-    position: relative;
-    border: 2px solid #aaa6;
+}
 
-    width: 50px;
-    height: 50px;
+.spell {
+    position: relative;
+
+    /* background: -moz-linear-gradient(top left, #e8c17d 0%, #705424 100%);
+    background: -webkit-linear-gradient(top left, #e8c17d 0%, #705424 100%);
+    background: linear-gradient(to bottom right, #e8c17d 0%, #705424 100%); */
+    background: #aaa6;
+    padding: 2px;
+
+    width: 3em;
+    height: 3em;
 }
 
 .spell:hover {
-    border: 2px solid #ddd !important;
+    /* border: 2px solid #ddd !important; */
+    background: white !important;
     cursor: pointer;
 }
 
-.spells .spell img {
+.spell img {
     width: 100%;
     height: 100%;
 }
 
 .spell.small {
-    width: 35px !important;
-    height: 35px !important;
+    width: 2em !important;
+    height: 2em !important;
 }
 
 .spell .hotKey {
     position: absolute;
     bottom: -5px;
     right: -5px;
-    color: #eee;
+    color: #e8c17d;
     font-size: .9em;
     font-weight: bold;
     z-index: 10;
+
+    /* text shadow */
+    text-shadow: #000 1px 0 10px;
 }
 
 .cooldown {
@@ -242,10 +254,6 @@
     flex-direction: column;
 }
 
-.spell-picker .spell {
-    position: relative;
-}
-
 .spell-picker .title {
     margin: 0;
     padding: 0;
@@ -265,7 +273,7 @@
 
 .spell-picker .spell {
     margin: 5px;
-    border: 2px solid #aaa6;
+    /* border: 2px solid #aaa6; */
 }
 
 .spell-search-box {
