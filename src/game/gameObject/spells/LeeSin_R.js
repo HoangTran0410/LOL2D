@@ -12,7 +12,7 @@ export default class LeeSin_R extends Spell {
   name = 'Nộ Long Cước (LeeSin_R)';
   description =
     'Tung cước làm mục tiêu văng ra phía sau, làm choáng và gây 30 sát thương. Kẻ địch bị mục tiêu va trúng sẽ bị hất tung trong 1s và gây 30 sát thương mỗi kẻ địch.';
-  coolDown = 500;
+  coolDown = 10000;
 
   rangeToCheckEnemies = 80;
   rangeToDashEnemy = 350;
