@@ -3,10 +3,7 @@ import { getRandomChampionPreset } from '../../preset.js';
 import Champion from './Champion.js';
 
 export default class AIChampion extends Champion {
-  constructor(game, x, y, preset) {
-    super(game, x, y, preset);
-    this.isAllied = false;
-  }
+  isAllied = false;
 
   update() {
     super.update();

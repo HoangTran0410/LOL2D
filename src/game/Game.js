@@ -1,11 +1,12 @@
 import Camera from './gameObject/map/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import { getRandomChampionPreset } from './preset.js';
+import { ChampionPreset, getRandomChampionPreset } from './preset.js';
 import { SpellHotKeys } from './constants.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
 import InGameHUD from './hud/InGameHUD.js';
+import DummyChampion from './gameObject/attackableUnits/DummyChampion.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -24,7 +25,7 @@ export default class Game {
     this.worldMouse = createVector(0, 0);
 
     // init players
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 1; i++) {
       let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
@@ -32,11 +33,16 @@ export default class Game {
       this.players.push(champ);
     }
 
-    let preset = getRandomChampionPreset();
-    let pos = this.getRandomSpawnLocation();
-    // pos = createVector(3200, 3200);
+    let preset = ChampionPreset.leesin; // getRandomChampionPreset();
+    // let pos = this.getRandomSpawnLocation();
+    let pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
+
+    // dummy
+    preset = getRandomChampionPreset();
+    pos = createVector(3200, 3200);
+    this.players.push(new DummyChampion(this, pos.x, pos.y, preset));
 
     // camera follow player
     this.camera.target = this.player.position;

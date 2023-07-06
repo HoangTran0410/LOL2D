@@ -14,11 +14,19 @@ import SAT from '../../../../libs/SAT.js';
 import Charm from '../buffs/Charm.js';
 
 export default class Champion {
+  isAllied = true;
+  respawnTime = 3000;
+  score = 0;
+  reviveAfter = 0;
+
+  buffs = [];
+  stats = new Stats();
+  status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
+
   constructor(game, x = 0, y = 0, preset) {
     this.game = game;
     this.position = createVector(x, y);
     this.destination = createVector(x, y);
-    this.isAllied = true;
 
     if (preset) {
       this.avatar = AssetManager.getAsset(preset.avatar);
@@ -27,13 +35,6 @@ export default class Champion {
       this.avatar = AssetManager.getRandomChampion();
       this.spells = this.getRandomSpells();
     }
-
-    this.score = 0;
-    this.reviveAfter = 0;
-
-    this.buffs = [];
-    this.stats = new Stats();
-    this.status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
   }
 
   getRandomSpells() {
@@ -140,7 +141,7 @@ export default class Champion {
 
   die(source) {
     // this.buffs.forEach(buff => buff.deactivateBuff());
-    this.reviveAfter = 3000;
+    this.reviveAfter = this.respawnTime;
     this.score--;
     source.score++;
   }
