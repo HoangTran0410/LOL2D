@@ -141,8 +141,10 @@ export default class Game {
       }
 
       // for (let p of this.players) p.draw();
-      for (let p of this.player.visiblePlayers ?? []) p.isDead && p.draw();
-      for (let p of this.player.visiblePlayers ?? []) !p.isDead && p.draw(); // alive players on top of dead players
+      // let playerToDraw = this.players;
+      let playerToDraw = this.player.visiblePlayers ?? [];
+      for (let p of playerToDraw) p.isDead && p.draw();
+      for (let p of playerToDraw) !p.isDead && p.draw(); // alive players on top of dead players
     });
   }
 
