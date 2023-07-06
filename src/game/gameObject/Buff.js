@@ -17,6 +17,7 @@ export default class Buff {
     this.duration = duration || 0;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
+    this.game = targetUnit?.game || sourceUnit?.game;
   }
 
   activateBuff() {

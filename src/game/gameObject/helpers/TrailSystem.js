@@ -1,7 +1,10 @@
-export default class TrailSystem {
+import SpellObject from '../SpellObject.js';
+
+export default class TrailSystem extends SpellObject {
   trails = [];
 
   constructor({ maxLength = 15, trailColor = '#77F5', trailSize = 5, trailLifeTime = 500 } = {}) {
+    super({});
     this.maxLength = maxLength;
     this.trailColor = trailColor;
     this.trailSize = trailSize;
@@ -37,5 +40,9 @@ export default class TrailSystem {
       trail.lifeSpan -= deltaTime;
     });
     this.trails = this.trails.filter(trail => trail.lifeSpan > 0);
+  }
+
+  get toRemove() {
+    return this.trails.length === 0;
   }
 }

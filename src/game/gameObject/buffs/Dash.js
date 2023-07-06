@@ -35,6 +35,13 @@ export default class Dash extends Buff {
     return hasFlag(targetUnit.status, StatusFlags.CanMove);
   }
 
+  onCreate() {
+    if (this.showTrail && this.game) {
+      this.game.objects.push(this.trailSystem);
+      this.trailSystem.trailSize = this.targetUnit.stats.size.value;
+    }
+  }
+
   onUpdate() {
     if (this.toRemove) return;
 
@@ -70,18 +77,13 @@ export default class Dash extends Buff {
     }
 
     // update trails
-    this.trailSystem.addTrail(this.targetUnit.position);
+    if (this.showTrail) {
+      this.trailSystem.addTrail(this.targetUnit.position);
+    }
   }
 
   onDeactivate() {
     this.targetUnit.status &= ~StatusFlags.Ghosted;
-  }
-
-  draw() {
-    if (!this.showTrail) return;
-
-    this.trailSystem.trailSize = this.targetUnit.stats.size.value;
-    this.trailSystem.draw();
   }
 
   // for override
