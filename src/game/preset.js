@@ -2,6 +2,7 @@ import * as AllSpells from './gameObject/spells/index.js';
 
 export const ChampionPreset = {
   yasuo: {
+    name: 'Yasuo',
     avatar: 'champ_yasuo',
     spells: [
       AllSpells.Heal,
@@ -14,6 +15,7 @@ export const ChampionPreset = {
     ],
   },
   lux: {
+    name: 'Lux',
     avatar: 'champ_lux',
     spells: [
       AllSpells.Heal,
@@ -26,6 +28,7 @@ export const ChampionPreset = {
     ],
   },
   blitzcrank: {
+    name: 'Blitzcrank',
     avatar: 'champ_blitzcrank',
     spells: [
       AllSpells.Heal,
@@ -38,6 +41,7 @@ export const ChampionPreset = {
     ],
   },
   ashe: {
+    name: 'Ashe',
     avatar: 'champ_ashe',
     spells: [
       AllSpells.Heal,
@@ -50,6 +54,7 @@ export const ChampionPreset = {
     ],
   },
   teemo: {
+    name: 'Teemo',
     avatar: 'champ_teemo',
     spells: [
       AllSpells.Heal,
@@ -62,6 +67,7 @@ export const ChampionPreset = {
     ],
   },
   leblanc: {
+    name: 'Leblanc',
     avatar: 'champ_leblanc',
     spells: [
       AllSpells.Heal,
@@ -74,6 +80,7 @@ export const ChampionPreset = {
     ],
   },
   leesin: {
+    name: 'Lee Sin',
     avatar: 'champ_leesin',
     spells: [
       AllSpells.Heal,
@@ -86,6 +93,7 @@ export const ChampionPreset = {
     ],
   },
   chogath: {
+    name: 'Cho Gath',
     avatar: 'champ_chogath',
     spells: [
       AllSpells.Heal,
@@ -98,6 +106,7 @@ export const ChampionPreset = {
     ],
   },
   ahri: {
+    name: 'Ahri',
     avatar: 'champ_ahri',
     spells: [
       AllSpells.Heal,

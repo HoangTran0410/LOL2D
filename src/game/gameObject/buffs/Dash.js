@@ -13,8 +13,7 @@ import TrailSystem from '../helpers/TrailSystem.js';
 export default class Dash extends Buff {
   image = AssetManager.getAsset('buff_root');
   name = 'Lướt';
-  buffAddType = BuffAddType.STACKS_AND_CONTINUE;
-  maxStacks = 10;
+  buffAddType = BuffAddType.REPLACE_EXISTING;
 
   // for override
   trailsDelayFrame = 0;

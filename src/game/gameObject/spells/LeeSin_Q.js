@@ -1,6 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import { hasFlag } from '../../../utils/index.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -9,7 +8,7 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class LeeSin_Q extends Spell {
-  PHASES = {
+  static PHASES = {
     Q1: {
       image: AssetManager.getAsset('spell_leesin_q1'),
     },
@@ -17,7 +16,7 @@ export default class LeeSin_Q extends Spell {
       image: AssetManager.getAsset('spell_leesin_q2'),
     },
   };
-  phase = this.PHASES.Q1;
+  phase = LeeSin_Q.PHASES.Q1;
 
   image = this.phase.image;
   name = 'Sóng Âm / Vô Ảnh Cước (LeeSin_Q)';
@@ -31,7 +30,7 @@ export default class LeeSin_Q extends Spell {
 
   checkCastCondition() {
     // if Q1 hitted, but can't move => can't cast Q2
-    if (this.phase === this.PHASES.Q2 && !hasFlag(this.owner.status, StatusFlags.CanMove)) {
+    if (this.phase === LeeSin_Q.PHASES.Q2 && !hasFlag(this.owner.status, StatusFlags.CanMove)) {
       return false;
     }
     return true;
@@ -46,7 +45,7 @@ export default class LeeSin_Q extends Spell {
       q2HitDamage = 15;
 
     // phase 1: Sóng âm
-    if (this.phase === this.PHASES.Q1) {
+    if (this.phase === LeeSin_Q.PHASES.Q1) {
       let { from, to: destination } = VectorUtils.getVectorWithRange(
         this.owner.position,
         this.game.worldMouse,
@@ -66,7 +65,7 @@ export default class LeeSin_Q extends Spell {
         enemy.takeDamage(hitDamage);
 
         // switch to phase 2 if Q1 hits
-        this.phase = this.PHASES.Q2;
+        this.phase = LeeSin_Q.PHASES.Q2;
         this.image = this.phase.image;
         this.currentCooldown = this.collDownAfterQ1;
       };
@@ -78,24 +77,14 @@ export default class LeeSin_Q extends Spell {
     // phase 2: Vô ảnh cước
     else {
       // dash owner to target
-      let dashBuff = new Dash(10000, this.owner, this.owner);
-      dashBuff.dashSpeed = 15;
+      let dashBuff = new LeeSin_Q_Buff(10000, this.owner, this.owner);
+      dashBuff.spell = this;
+      dashBuff.hitDamage = q2HitDamage;
       dashBuff.dashDestination = this.enemyHit.position;
-      dashBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-      dashBuff.image = this.PHASES.Q2.image;
-      dashBuff.onReachedDestination = () => {
-        // deal damage to target
-        if (this.enemyHit) this.enemyHit.takeDamage(q2HitDamage, this.owner);
-        // remove spell object
-        if (this.spellObject) this.spellObject.toRemove = true;
-      };
-      dashBuff.onCancelled = () => {
-        if (this.spellObject) this.spellObject.toRemove = true;
-      };
       this.owner.addBuff(dashBuff);
 
       // reset to phase 1 after cast Q2
-      this.phase = this.PHASES.Q1;
+      this.phase = LeeSin_Q.PHASES.Q1;
       this.image = this.phase.image;
     }
   }
@@ -105,10 +94,36 @@ export default class LeeSin_Q extends Spell {
     if (this.spellObject && this.spellObject.toRemove) {
       this.spellObject = null;
       this.enemyHit = null;
-      this.phase = this.PHASES.Q1;
+      this.phase = LeeSin_Q.PHASES.Q1;
       this.image = this.phase.image;
       this.currentCooldown = this.coolDown;
     }
+  }
+}
+
+export class LeeSin_Q_Buff extends Dash {
+  image = LeeSin_Q.PHASES.Q2.image;
+  dashSpeed = 15;
+  hitDamage = 15;
+  spell = null;
+
+  onReachedDestination() {
+    super.onReachedDestination?.();
+
+    // deal damage to target
+    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.owner);
+    // remove spell object
+    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
+  }
+
+  onCancelled() {
+    super.onCancelled?.();
+    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
+  }
+
+  onDeactivate() {
+    super.onDeactivate?.();
+    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
   }
 }
 
@@ -120,11 +135,11 @@ export class LeeSin_Q_Object extends SpellObject {
   hitDamage = 15;
   lifeTimeAfterHit = 3000;
 
-  PHASES = {
+  static PHASES = {
     MOVING: 0,
     HIT: 1,
   };
-  phase = this.PHASES.MOVING;
+  phase = LeeSin_Q_Object.PHASES.MOVING;
 
   enemyHit = null;
 
@@ -134,7 +149,7 @@ export class LeeSin_Q_Object extends SpellObject {
   });
 
   update() {
-    if (this.phase === this.PHASES.MOVING) {
+    if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
       VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
       if (this.destination.dist(this.position) < this.speed) {
@@ -157,13 +172,13 @@ export class LeeSin_Q_Object extends SpellObject {
         this.enemyHit = enemy;
 
         // switch to hit phase
-        this.phase = this.PHASES.HIT;
+        this.phase = LeeSin_Q_Object.PHASES.HIT;
         this.isMissile = false;
       }
     }
 
     // hit phase
-    else if (this.phase === this.PHASES.HIT) {
+    else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
       this.position = this.enemyHit.position.copy();
 
       this.lifeTimeAfterHit -= deltaTime;
@@ -175,7 +190,7 @@ export class LeeSin_Q_Object extends SpellObject {
 
   draw() {
     // move phase
-    if (this.phase === this.PHASES.MOVING) {
+    if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
       this.trailSystem.draw();
 
       push();
@@ -189,7 +204,7 @@ export class LeeSin_Q_Object extends SpellObject {
     }
 
     // hit phase
-    else if (this.phase === this.PHASES.HIT) {
+    else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
       push();
       // draw 4 triangle around the enemy, west, north, east, south
       let s = this.enemyHit.stats.size.value / 2;

@@ -16,6 +16,7 @@ import Charm from '../buffs/Charm.js';
 export default class Champion {
   isAllied = true;
   respawnTime = 3000;
+  showName = false;
   score = 0;
   reviveAfter = 0;
 
@@ -29,6 +30,7 @@ export default class Champion {
     this.destination = createVector(x, y);
 
     if (preset) {
+      this.name = preset.name;
       this.avatar = AssetManager.getAsset(preset.avatar);
       this.spells = preset.spells.map(Spell => new Spell(this));
     } else {
@@ -238,41 +240,41 @@ export default class Champion {
         y: this.position.y - size / 2 - barHeight - 15,
       };
 
-    if (!this.isDead) {
-      fill(2, 15, 21, alpha);
-      stroke(91, 92, 87, alpha);
-      strokeWeight(3);
-      rect(
-        topleft.x - borderWidth * 0.5,
-        topleft.y - borderWidth * 0.5,
-        barWidth + borderWidth,
-        barHeight + borderWidth
-      );
+    // if (!this.isDead) {
+    fill(2, 15, 21, alpha);
+    stroke(91, 92, 87, alpha);
+    strokeWeight(3);
+    rect(
+      topleft.x - borderWidth * 0.5,
+      topleft.y - borderWidth * 0.5,
+      barWidth + borderWidth,
+      barHeight + borderWidth
+    );
 
-      // score
-      fill(242, 242, 242, alpha);
-      textSize(12);
-      text(this.score, topleft.x + 3, topleft.y + 12);
+    // score
+    fill(242, 242, 242, alpha);
+    textSize(12);
+    text(this.score, topleft.x + 3, topleft.y + 12);
 
-      noStroke();
+    noStroke();
 
-      // health
-      const healthContainerW = barWidth - barHeight;
-      const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
-      fill(
-        this.isDead
-          ? [153, 153, 153, alpha]
-          : this.isAllied
-          ? [67, 196, 29, alpha]
-          : [196, 67, 29, alpha]
-      );
-      rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
+    // health
+    const healthContainerW = barWidth - barHeight;
+    const healthW = map(this.animatedHealth, 0, maxHealth, 0, healthContainerW);
+    fill(
+      this.isDead
+        ? [153, 153, 153, alpha]
+        : this.isAllied
+        ? [67, 196, 29, alpha]
+        : [196, 67, 29, alpha]
+    );
+    rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
-      // mana
-      const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
-      fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
-      rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
-    }
+    // mana
+    const manaW = map(this.animatedMana, 0, maxMana, 0, barWidth - barHeight);
+    fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
+    rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
+    // }
 
     // draw buffs
     let x = topleft.x + 10;
@@ -283,6 +285,15 @@ export default class Champion {
         image(buff.image.data, x, topleft.y - 13, 20, 20);
         x += 20;
       }
+    }
+
+    // draw name
+    if (this.showName && this.name) {
+      fill(150);
+      noStroke();
+      textAlign(CENTER, CENTER);
+      textSize(13);
+      text(this.name, pos.x, topleft.y - 13);
     }
 
     // draw status string

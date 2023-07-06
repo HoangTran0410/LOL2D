@@ -2,6 +2,7 @@ import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import ParticleSystem from '../helpers/ParticleSystem.js';
 
 export default class Flash extends Spell {
   name = 'Tốc Biến (Flash)';
@@ -40,15 +41,28 @@ export default class Flash extends Spell {
 }
 
 export class Flash_Object extends SpellObject {
+  particleSystem = new ParticleSystem({
+    isDeadFn: p => p.opacity <= 0,
+    updateFn: p => {
+      p.x += random(-2, 2);
+      p.y += random(-2, 2);
+      p.size += 0.1;
+      p.opacity -= 2;
+    },
+    drawFn: p => {
+      noStroke();
+      fill(255, 255, 100, p.opacity);
+      circle(this.position.x + p.x, this.position.y + p.y, p.size);
+    },
+  });
+
   constructor(owner) {
     super(owner);
-
     this.position = this.owner.position.copy();
 
-    this.smokes = [];
     let size = this.owner.stats.size.value / 2;
     for (let i = 0; i < 10; i++) {
-      this.smokes.push({
+      this.particleSystem.addParticle({
         x: random(-size, size),
         y: random(-size, size),
         size: random(10, 20),
@@ -58,34 +72,12 @@ export class Flash_Object extends SpellObject {
   }
 
   update() {
-    for (let s of this.smokes) {
-      s.x += random(-1, 1);
-      s.y += random(-1, 1);
-      s.opacity -= 2;
-      s.size += 0.1;
-    }
-
-    for (let i = this.smokes.length - 1; i >= 0; i--) {
-      if (this.smokes[i].opacity <= 0) {
-        this.smokes.splice(i, 1);
-      }
-    }
-
-    if (this.smokes.length == 0) {
-      this.toRemove = true;
-    }
+    this.particleSystem.update();
+    this.toRemove = this.particleSystem.toRemove;
   }
 
   draw() {
-    push();
-
-    noStroke();
-    for (let s of this.smokes) {
-      fill(255, 255, 100, s.opacity);
-      circle(this.position.x + s.x, this.position.y + s.y, s.size);
-    }
-
-    pop();
+    this.particleSystem.draw();
   }
 }
 

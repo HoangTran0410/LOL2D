@@ -93,11 +93,11 @@ export default class LeeSin_R extends Spell {
         p.lifeSpan -= deltaTime;
       },
       drawFn: p => {
-        let alpha = map(p.lifeSpan, 0, p.lifeTime, 50, 200);
+        let alpha = map(p.lifeSpan, 0, p.lifeTime, 100, 255);
         stroke(255, 234, 79, alpha);
-        strokeWeight(4);
-        let vel = p.velocity.copy().setMag(random(3, 15));
-        line(p.position.x, p.position.y, p.position.x + vel.x, p.position.y + vel.y);
+        strokeWeight(random(3, 8));
+        let len = p.velocity.copy().setMag(random(5, 10));
+        line(p.position.x, p.position.y, p.position.x + len.x, p.position.y + len.y);
       },
     });
 
@@ -113,7 +113,7 @@ export default class LeeSin_R extends Spell {
         position: pos.copy(),
         velocity: dir
           .copy()
-          .setMag(random(2, 5))
+          .setMag(random(2, 6))
           .rotate(random(-PI / 4, PI / 4)),
         lifeSpan: lifeTime,
         lifeTime,

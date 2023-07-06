@@ -11,7 +11,7 @@ export default class ParticleSystem extends SpellObject {
     preDrawFn,
     drawFn,
     postDrawFn,
-    maxParticles = 30,
+    maxParticles = Infinity,
     owner,
   }) {
     super(owner);
