@@ -6,11 +6,11 @@ import Dash from '../buffs/Dash.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ahri_R extends Spell {
-  static image = AssetManager.getAsset('spell_ahri_r');
-  static name = 'Phi Hồ (Ahri_R)';
-  static description =
+  image = AssetManager.getAsset('spell_ahri_r');
+  name = 'Phi Hồ (Ahri_R)';
+  description =
     'Lướt tới trước theo hướng chỉ định, bắn ba luồng sét vào ba kẻ địch gần nhất trong phạm vi, gây 20 sát thương mỗi luồng sét. Có thể sử dụng 3 lần trong vòng 10s.';
-  static coolDown = 5000;
+  coolDown = 5000;
 
   maxDashCount = 3;
   maxDashDistance = 150;
