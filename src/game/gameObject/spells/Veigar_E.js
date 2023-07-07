@@ -9,7 +9,7 @@ export default class Veigar_E extends Spell {
   image = AssetManager.getAsset('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
   description = 'Vặn xoắn không gian, tạo ra một lồng giam Làm choáng 2s kẻ địch dám bước qua.';
-  coolDown = 1000;
+  coolDown = 5000;
 
   onSpellCast() {
     let { from, to } = VectorUtils.getVectorWithMaxRange(
