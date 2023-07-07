@@ -71,7 +71,7 @@ export class LeeSin_E_Object extends SpellObject {
     fill(255, 190, 30, alpha);
     let sizeIncrease = map(this.age, 0, this.lifeTime, 0, 50);
     this.enemies.forEach(enemy => {
-      circle(enemy.position.x, enemy.position.y, enemy.stats.size.valueee + sizeIncrease);
+      circle(enemy.position.x, enemy.position.y, enemy.stats.size.value + sizeIncrease);
     });
     pop();
   }

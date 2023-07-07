@@ -11,18 +11,19 @@ export default class Charm extends Buff {
   image = AssetManager.getAsset('buff_charm');
   name = 'Mê Hoặc';
   buffAddType = BuffAddType.REPLACE_EXISTING;
-
   statusFlagsToDisable = StatusFlags.CanCast | StatusFlags.CanMove;
   statusFlagsToEnable = StatusFlags.Charmed;
 
   speed = 1;
-  charmDestination = null;
-
   particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#f5429588', 0.1);
 
   onUpdate() {
-    if (this.charmDestination && !this.targetUnit.isDead) {
-      VectorUtils.moveVectorToVector(this.targetUnit.position, this.charmDestination, this.speed);
+    if (this.sourceUnit?.position && !this.targetUnit.isDead) {
+      VectorUtils.moveVectorToVector(
+        this.targetUnit.position,
+        this.sourceUnit.position,
+        this.speed
+      );
     }
 
     // update particle system

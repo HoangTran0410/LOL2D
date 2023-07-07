@@ -1,6 +1,5 @@
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
-import { hasFlag } from '../../../utils/index.js';
 import Buff from '../Buff.js';
 import Airborne from './Airborne.js';
 import Root from './Root.js';
@@ -23,7 +22,7 @@ export default class Dash extends Buff {
 
   // for override
   showTrail = true;
-  dashSpeed = 10;
+  dashSpeed = 13;
   dashDestination = null;
   stayAtDestination = true;
   cancelable = true;

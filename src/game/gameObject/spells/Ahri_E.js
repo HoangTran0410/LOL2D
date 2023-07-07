@@ -64,7 +64,6 @@ export class Ahri_E_Object extends SpellObject {
     if (enemy) {
       let charmBuff = new Charm(this.charmTime, this.owner, enemy);
       charmBuff.image = AssetManager.getAsset('spell_ahri_e');
-      charmBuff.charmDestination = this.owner.position; // pass reference to owner position
       charmBuff.speed = 1;
       enemy.addBuff(charmBuff);
 

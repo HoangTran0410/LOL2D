@@ -13,6 +13,7 @@ import Slow from '../buffs/Slow.js';
 import SAT from '../../../../libs/SAT.js';
 import Charm from '../buffs/Charm.js';
 import ActionState from '../../enums/ActionState.js';
+import Fear from '../buffs/Fear.js';
 
 export default class Champion {
   isAllied = true;
@@ -356,7 +357,7 @@ export default class Champion {
       // rect(0, 0, 15, size);
       pop();
     } else {
-      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm]
+      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
         .map(BuffClass => {
           return this.hasBuff(BuffClass) ? new BuffClass().name : '';
         })

@@ -12,7 +12,6 @@ export default class Airborne extends Buff {
   maxStacks = 10;
   height = 20;
 
-  statusFlagsToDisable = StatusFlags.CanCast | StatusFlags.CanMove;
   statusFlagsToEnable = StatusFlags.Suppressed;
 
   onCreate() {
