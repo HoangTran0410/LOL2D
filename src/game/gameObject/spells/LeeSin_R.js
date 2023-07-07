@@ -12,7 +12,7 @@ export default class LeeSin_R extends Spell {
   name = 'Nộ Long Cước (LeeSin_R)';
   description =
     'Tung cước làm mục tiêu văng ra phía sau, làm choáng và gây 30 sát thương. Kẻ địch bị mục tiêu va trúng sẽ bị hất tung trong 1s và gây 30 sát thương mỗi kẻ địch.';
-  coolDown = 10000;
+  coolDown = 100;
 
   rangeToCheckEnemies = 80;
   rangeToDashEnemy = 350;
@@ -60,7 +60,7 @@ export default class LeeSin_R extends Spell {
     obj.targetEnemy = closestEnemyToMouse;
     obj.collideDamage = this.collideDamage;
     obj.destination = destination;
-    this.game.objects.push(obj);
+    this.game.addSpellObject(obj);
 
     // target enemy dash to destination
     let airborneBuff = new Airborne(3000, this.owner, closestEnemyToMouse);
@@ -119,7 +119,7 @@ export default class LeeSin_R extends Spell {
         lifeTime,
       });
     }
-    this.game.objects.push(particleSystem);
+    this.game.addSpellObject(particleSystem);
   }
 
   drawPreview() {

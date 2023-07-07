@@ -7,6 +7,7 @@ import TerrainMap from './gameObject/map/TerrainMap.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
 import InGameHUD from './hud/InGameHUD.js';
 import DummyChampion from './gameObject/attackableUnits/DummyChampion.js';
+import SpellObject from './gameObject/SpellObject.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -25,7 +26,7 @@ export default class Game {
     this.worldMouse = createVector(0, 0);
 
     // init players
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 1; i++) {
       let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
@@ -169,8 +170,22 @@ export default class Game {
     this.fogOfWar.resize(w, h);
   }
 
-  queryObjectsInRange({ position, range }) {
-    return this.objects.filter(o => o.position.dist(position) < range / 2);
+  addSpellObject(spellObject) {
+    if (!(spellObject instanceof SpellObject))
+      throw new Error('spellObject must be an instance of SpellObject');
+    this.objects.push(spellObject);
+  }
+
+  queryObjects({ type, getOnlyOne = false, customFilter = null }) {
+    let result = [];
+    for (let o of this.objects) {
+      if ((!type || (type && o instanceof type)) && (customFilter === null || customFilter(o))) {
+        if (getOnlyOne) return o;
+        result.push(o);
+      }
+    }
+
+    return getOnlyOne ? null : result;
   }
 
   queryPlayerInRange({

@@ -35,7 +35,7 @@ export default class Ashe_W extends Spell {
       obj.destination = to;
       obj.direction = p5.Vector.fromAngle(_angle);
 
-      this.game.objects.push(obj);
+      this.game.addSpellObject(obj);
     }
   }
 }

@@ -24,7 +24,7 @@ export default class Blitzcrank_W extends Spell {
     });
 
     this.owner.addBuff(speedupBuff);
-    this.game.objects.push(speedUpEffect);
+    this.game.addSpellObject(speedUpEffect);
   }
 }
 

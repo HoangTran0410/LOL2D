@@ -28,7 +28,7 @@ export default class Yasuo_W extends Spell {
     obj.size = size;
     obj.duration = duration;
 
-    this.game.objects.push(obj);
+    this.game.addSpellObject(obj);
 
     playSound(SOUNDS.yasuo_w);
   }
@@ -67,22 +67,19 @@ export class Yasuo_W_Object extends SpellObject {
       y: this.animatedPosition.y,
     });
 
-    for (let obj of this.game.objects) {
-      if (
-        obj !== this && // check self
-        obj.owner !== this.owner && // check owner
-        obj instanceof SpellObject &&
-        obj.position &&
-        obj.isMissile
-      ) {
-        let px = obj.position.x;
-        let py = obj.position.y;
+    let objs = this.game.queryObjects({
+      type: SpellObject,
+      customFilter: o =>
+        o.isMissile &&
+        o.position &&
+        o.owner !== this.owner &&
+        o !== this &&
+        CollideUtils.pointPolygon(o.position.x, o.position.y, vertices),
+    });
 
-        if (CollideUtils.pointPolygon(px, py, vertices)) {
-          obj.toRemove = true;
-        }
-      }
-    }
+    objs.forEach(o => {
+      o.toRemove = true;
+    });
 
     // check to remove
     this.timeSinceCreated += deltaTime;

@@ -27,11 +27,12 @@ export default class Ahri_E extends Spell {
     obj.destination = to;
     obj.range = range;
     obj.charmTime = charmTime;
-    this.game.objects.push(obj);
+    this.game.addSpellObject(obj);
   }
 }
 
 export class Ahri_E_Object extends SpellObject {
+  isMissile = true;
   position = createVector();
   destination = createVector();
   speed = 9;

@@ -25,7 +25,7 @@ export default class Heal extends Spell {
 
     // heal effect
     let healObject = new Heal_Object(this.owner);
-    this.game.objects.push(healObject);
+    this.game.addSpellObject(healObject);
     // }
 
     // ghost buff for 1s
@@ -35,7 +35,7 @@ export default class Heal extends Spell {
 
     // ghost effect
     let ghostBuffObject = new Ghost_Buff_Object(this.owner);
-    this.game.objects.push(ghostBuffObject);
+    this.game.addSpellObject(ghostBuffObject);
     ghostBuff.addDeactivateListener(() => {
       ghostBuffObject.toRemove = true;
     });

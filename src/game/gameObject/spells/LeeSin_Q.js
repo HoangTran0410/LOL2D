@@ -71,7 +71,7 @@ export default class LeeSin_Q extends Spell {
       };
       this.spellObject = obj;
 
-      this.game.objects.push(obj);
+      this.game.addSpellObject(obj);
     }
 
     // phase 2: Vô ảnh cước

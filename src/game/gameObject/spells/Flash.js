@@ -25,18 +25,18 @@ export default class Flash extends Spell {
 
     // add smoke effect
     let newPosEffect = new Flash_Object(this.owner);
-    this.game.objects.push(newPosEffect);
+    this.game.addSpellObject(newPosEffect);
 
     let oldPosEffect = new Flash_Object(this.owner);
     oldPosEffect.position = oldPos;
-    this.game.objects.push(oldPosEffect);
+    this.game.addSpellObject(oldPosEffect);
 
     playSound(SOUNDS.flash);
 
     // test different effect
     // let flashObject = new Flash_Object2(this.owner);
     // flashObject.position = oldPos;
-    // this.game.objects.push(flashObject);
+    // this.game.addSpellObject(flashObject);
   }
 }
 

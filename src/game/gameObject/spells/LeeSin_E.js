@@ -29,7 +29,7 @@ export default class LeeSin_E extends Spell {
     let obj = new LeeSin_E_Object(this.owner);
     obj.range = this.range;
     obj.enemies = enemies;
-    this.game.objects.push(obj);
+    this.game.addSpellObject(obj);
   }
 
   onUpdate() {}
@@ -68,10 +68,10 @@ export class LeeSin_E_Object extends SpellObject {
     strokeWeight(2);
     circle(this.position.x, this.position.y, this.size);
 
-    fill(255, 190, 30, alpha + 100);
-    let sizeIncrease = map(this.age, 0, this.lifeTime, 0, 40);
+    fill(255, 190, 30, alpha);
+    let sizeIncrease = map(this.age, 0, this.lifeTime, 0, 50);
     this.enemies.forEach(enemy => {
-      circle(enemy.position.x, enemy.position.y, enemy.stats.size.value + sizeIncrease);
+      circle(enemy.position.x, enemy.position.y, enemy.stats.size.valueee + sizeIncrease);
     });
     pop();
   }

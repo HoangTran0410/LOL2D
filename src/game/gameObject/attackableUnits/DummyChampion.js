@@ -1,19 +1,19 @@
-import Champion from './Champion.js';
+import AIChampion from './AIChampion.js';
 
-export default class DummyChampion extends Champion {
+export default class DummyChampion extends AIChampion {
   isAllied = false;
   showName = true;
   respawnTime = 1000;
+  _autoCast = true;
+  _autoMove = false;
+  _autoMoveOnTakeDamage = false;
+  _respawnWithNewPreset = false;
 
   constructor(game, x, y, preset) {
     super(game, x, y, preset);
 
     this.stats.healthRegen.baseValue = 0.1;
-    this.name += ' (Hình nộm)';
-  }
-
-  die() {
-    // do nothing
+    this.name = 'Hình nộm';
   }
 
   respawn() {

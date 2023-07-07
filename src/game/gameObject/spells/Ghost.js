@@ -19,7 +19,7 @@ export default class Ghost extends Spell {
     this.owner.addBuff(ghostBuff);
 
     let ghostBuffObject = new Ghost_Buff_Object(this.owner);
-    this.game.objects.push(ghostBuffObject);
+    this.game.addSpellObject(ghostBuffObject);
 
     ghostBuff.addDeactivateListener(() => {
       ghostBuffObject.toRemove = true;

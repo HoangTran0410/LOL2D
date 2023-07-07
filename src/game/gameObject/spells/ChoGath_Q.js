@@ -29,7 +29,7 @@ export default class ChoGath_Q extends Spell {
     obj.damage = this.damage;
     obj.position = position;
     obj.expandSize = this.expandSize;
-    this.game.objects.push(obj);
+    this.game.addSpellObject(obj);
   }
 
   drawPreview() {
