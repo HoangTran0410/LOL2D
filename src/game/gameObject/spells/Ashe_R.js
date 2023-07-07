@@ -3,6 +3,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Stun from '../buffs/Stun.js';
+import ParticleSystem from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ashe_R extends Spell {
@@ -33,9 +34,9 @@ export class Ashe_R_Object extends SpellObject {
   lifeTime = 10000;
   age = 0;
 
-  exploreSize = 250;
-  exploring = false;
-  exploreLifeTime = 1000;
+  explodeSize = 250;
+  exploding = false;
+  explodeLifeTime = 1000;
 
   trailSystem = new TrailSystem({
     trailSize: this.size / 1.5,
@@ -49,7 +50,7 @@ export class Ashe_R_Object extends SpellObject {
     }
 
     // moving phase
-    if (!this.exploring) {
+    if (!this.exploding) {
       this.position.add(this.direction.copy().mult(this.speed));
       this.trailSystem.addTrail(this.position);
 
@@ -63,14 +64,14 @@ export class Ashe_R_Object extends SpellObject {
       });
 
       if (enemy) {
-        this.exploring = true;
+        this.exploding = true;
         this.isMissile = false;
-        this.age = this.lifeTime - this.exploreLifeTime; // reset age to display explore animation
+        this.age = this.lifeTime - this.explodeLifeTime; // reset age to display explode animation
 
         // add buff to enemies
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
-          range: this.exploreSize / 2,
+          range: this.explodeSize / 2,
           includePlayerSize: true,
           excludePlayers: [this.owner],
         });
@@ -84,9 +85,9 @@ export class Ashe_R_Object extends SpellObject {
       }
     }
 
-    // exploring phase
+    // explode phase
     else {
-      this.size = lerp(this.size, this.exploreSize, 0.2);
+      this.size = lerp(this.size, this.explodeSize, 0.2);
     }
   }
 
@@ -96,14 +97,14 @@ export class Ashe_R_Object extends SpellObject {
     push();
 
     // expore
-    if (this.exploring) {
+    if (this.exploding) {
       let alpha = Math.min(this.lifeTime - this.age, 150);
 
       stroke(200, alpha);
       fill(100, 100, 200, alpha);
       circle(this.position.x, this.position.y, this.size);
 
-      fill(200, alpha + 50);
+      fill(200, alpha);
       for (let i = 0; i < 5; i++) {
         let randPos = p5.Vector.random2D().mult(random(this.size / 2));
         circle(this.position.x + randPos.x, this.position.y + randPos.y, random(10, 20));

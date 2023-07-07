@@ -3,6 +3,7 @@ import { Circle, Quadtree, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import { hasFlag } from '../../../utils/index.js';
+import ActionState from '../../enums/ActionState.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import TerrainType from '../../enums/TerrainType.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
@@ -80,8 +81,8 @@ export default class TerrainMap {
           break;
         }
       }
-      if (isInsideBush) p.addStatus(StatusFlags.InBush);
-      else p.removeStatus(StatusFlags.InBush);
+      if (isInsideBush) p.setStatus(StatusFlags.InBush, true);
+      else p.setStatus(StatusFlags.InBush, false);
 
       // Collide with waters => add ripple effect
       if (!p.isDead && frameCount % 45 === 0 && p.position.dist(p.destination) > 0) {
@@ -108,7 +109,7 @@ export default class TerrainMap {
       }
 
       // Collide with walls
-      if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
+      if (hasFlag(p.stats.actionState, ActionState.IS_GHOSTED)) continue;
       let walls = obstacles.filter(o => o.type === TerrainType.WALL);
 
       let collided = false;

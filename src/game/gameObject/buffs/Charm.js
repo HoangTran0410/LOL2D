@@ -12,15 +12,15 @@ export default class Charm extends Buff {
   name = 'Mê Hoặc';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 
+  statusFlagsToDisable = StatusFlags.CanCast | StatusFlags.CanMove;
+  statusFlagsToEnable = StatusFlags.Charmed;
+
   speed = 1;
   charmDestination = null;
 
   particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#f5429588', 0.1);
 
   onUpdate() {
-    this.targetUnit.status &= ~StatusFlags.CanCast;
-    this.targetUnit.status &= ~StatusFlags.CanMove;
-
     if (this.charmDestination && !this.targetUnit.isDead) {
       VectorUtils.moveVectorToVector(this.targetUnit.position, this.charmDestination, this.speed);
     }
@@ -35,11 +35,6 @@ export default class Charm extends Buff {
       });
     }
     this.particleSystem.update();
-  }
-
-  onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanCast;
-    this.targetUnit.status |= StatusFlags.CanMove;
   }
 
   draw() {

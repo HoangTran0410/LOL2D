@@ -89,7 +89,7 @@ export class Lux_E_Object extends SpellObject {
   staticSize = 100;
 
   // explode phase
-  exploreSize = 100;
+  explodeSize = 100;
   explodeMaxSize = 200;
   explodeSpeed = 5;
 
@@ -100,7 +100,7 @@ export class Lux_E_Object extends SpellObject {
     super(owner);
     this.destination = destination;
     this.staticSize = size;
-    this.exploreSize = size;
+    this.explodeSize = size;
     this.explodeMaxSize = size + 50;
   }
 
@@ -157,11 +157,11 @@ export class Lux_E_Object extends SpellObject {
         });
       }
 
-      this.exploreSize += this.explodeSpeed;
+      this.explodeSize += this.explodeSpeed;
 
-      this.size = lerp(this.size, this.exploreSize, 0.1);
+      this.size = lerp(this.size, this.explodeSize, 0.1);
 
-      if (this.exploreSize > this.explodeMaxSize) {
+      if (this.explodeSize > this.explodeMaxSize) {
         this.toRemove = true;
       }
     }
@@ -213,7 +213,7 @@ export class Lux_E_Object extends SpellObject {
 
     // explode phase
     else if (this.phase === Lux_E_Object.PHASES.EXPLODE) {
-      let opacity = map(this.exploreSize, this.staticSize, this.explodeMaxSize, 100, 0);
+      let opacity = map(this.explodeSize, this.staticSize, this.explodeMaxSize, 100, 0);
       stroke(255, opacity);
       fill(255, opacity);
       circle(this.position.x, this.position.y, this.size);

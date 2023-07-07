@@ -36,7 +36,7 @@ export default class Leblanc_W extends Spell {
 
   checkCastCondition() {
     if (this.phase == this.PHASES.W1) {
-      return hasFlag(this.owner.status, StatusFlags.CanMove);
+      return this.owner.canMove;
     } else if (this.phase == this.PHASES.W2) {
       return this.w1Object != null;
     }

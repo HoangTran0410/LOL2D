@@ -9,15 +9,7 @@ export default class Silence extends Buff {
   image = AssetManager.getAsset('buff_silence');
   name = 'Câm Lặng';
   buffAddType = BuffAddType.RENEW_EXISTING;
-
-  onUpdate() {
-    // apply silence every frame
-    this.targetUnit.status &= ~StatusFlags.CanCast;
-  }
-
-  onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanCast;
-  }
+  statusFlagsToEnable = StatusFlags.Silenced;
 
   draw() {
     // draw buff on target unit

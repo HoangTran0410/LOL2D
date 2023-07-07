@@ -12,6 +12,9 @@ export default class Airborne extends Buff {
   maxStacks = 10;
   height = 20;
 
+  statusFlagsToDisable = StatusFlags.CanCast | StatusFlags.CanMove;
+  statusFlagsToEnable = StatusFlags.Suppressed;
+
   onCreate() {
     this.statsModifier = new StatsModifier();
     this.statsModifier.height.baseBonus = this.height;
@@ -21,14 +24,7 @@ export default class Airborne extends Buff {
     this.targetUnit.stats.addModifier(this.statsModifier);
   }
 
-  onUpdate() {
-    this.targetUnit.status &= ~StatusFlags.CanCast;
-    this.targetUnit.status &= ~StatusFlags.CanMove;
-  }
-
   onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanCast;
-    this.targetUnit.status |= StatusFlags.CanMove;
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }

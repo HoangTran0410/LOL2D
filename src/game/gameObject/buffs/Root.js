@@ -12,15 +12,7 @@ export default class Root extends Buff {
   maxStacks = 10;
 
   effectColor = [255, 255, 255, 200];
-
-  onUpdate() {
-    // apply root every frame
-    this.targetUnit.status &= ~StatusFlags.CanMove;
-  }
-
-  onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanMove;
-  }
+  statusFlagsToEnable = StatusFlags.Rooted;
 
   draw() {
     // draw buff on target unit

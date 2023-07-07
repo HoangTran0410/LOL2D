@@ -59,15 +59,10 @@ export default class Spell {
     // if (this.healthCost) this.owner.stats.health.baseValue -= this.healthCost;
   }
   castCancelCheck() {
-    let status = this.owner.status;
     if (
       this.disabled ||
       this.owner.isDead || // TODO: verify this
-      !hasFlag(status, StatusFlags.CanCast) ||
-      hasFlag(status, StatusFlags.Silenced) ||
-      hasFlag(status, StatusFlags.Stunned) ||
-      hasFlag(status, StatusFlags.Charmed) ||
-      hasFlag(status, StatusFlags.Feared) ||
+      !this.owner.canCast ||
       this.owner.stats.mana.value < this.manaCost ||
       this.owner.stats.health.value < this.healthCost ||
       !this.checkCastCondition()

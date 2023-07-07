@@ -1,3 +1,6 @@
+import { hasFlag } from '../../utils/index.js';
+import ActionState from '../enums/ActionState.js';
+import StatusFlags from '../enums/StatusFlags.js';
 import { Stat, StatModifier } from './Stat.js';
 
 export class StatsModifier {
@@ -27,6 +30,8 @@ export default class Stats {
     this.manaRegen = new Stat(0.1);
     this.healthRegen = new Stat(0.06);
     this.sightRadius = new Stat(600);
+
+    this.actionState = ActionState.CAN_CAST | ActionState.CAN_MOVE | ActionState.TARGETABLE;
   }
 
   addModifier(modifier) {
@@ -53,6 +58,50 @@ export default class Stats {
     this.manaRegen.removeModifier(modifier.manaRegen);
     this.healthRegen.removeModifier(modifier.healthRegen);
     this.sightRadius.removeModifier(modifier.sightRadius);
+  }
+
+  getActionState(state) {
+    return hasFlag(this.actionState, state);
+  }
+
+  setActionState(state, enabled) {
+    if (enabled) {
+      this.actionState = this.actionState |= state;
+    } else {
+      this.actionState = this.actionState &= ~state;
+    }
+  }
+
+  updateActionState(statusFlag) {
+    this.setActionState(ActionState.CHARMED, hasFlag(statusFlag, StatusFlags.Charmed));
+    this.setActionState(ActionState.FEARED, hasFlag(statusFlag, StatusFlags.Feared));
+    this.setActionState(ActionState.IS_GHOSTED, hasFlag(statusFlag, StatusFlags.Ghosted));
+    this.setActionState(ActionState.IS_NEAR_SIGHTED, hasFlag(statusFlag, StatusFlags.NearSighted));
+    this.setActionState(ActionState.NO_RENDER, hasFlag(statusFlag, StatusFlags.NoRender));
+    this.setActionState(ActionState.STEALTHED, hasFlag(statusFlag, StatusFlags.Stealthed));
+    this.setActionState(ActionState.TARGETABLE, hasFlag(statusFlag, StatusFlags.Targetable));
+
+    this.setActionState(
+      ActionState.CAN_MOVE,
+      !(
+        hasFlag(statusFlag, StatusFlags.Charmed) ||
+        hasFlag(statusFlag, StatusFlags.Feared) ||
+        hasFlag(statusFlag, StatusFlags.Immovable) ||
+        hasFlag(statusFlag, StatusFlags.Rooted) ||
+        hasFlag(statusFlag, StatusFlags.Stunned) ||
+        hasFlag(statusFlag, StatusFlags.Suppressed)
+      )
+    );
+
+    this.setActionState(
+      ActionState.CAN_CAST,
+      !(
+        hasFlag(statusFlag, StatusFlags.Charmed) ||
+        hasFlag(statusFlag, StatusFlags.Feared) ||
+        hasFlag(statusFlag, StatusFlags.Stunned) ||
+        hasFlag(statusFlag, StatusFlags.Suppressed)
+      )
+    );
   }
 
   update() {

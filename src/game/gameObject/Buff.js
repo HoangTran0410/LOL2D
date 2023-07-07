@@ -10,6 +10,9 @@ export default class Buff {
   timeElapsed = 0;
   toRemove = false;
 
+  statusFlagsToEnable = 0;
+  statusFlagsToDisable = 0;
+
   _deactivateListeners = [];
   _created = false;
   _deactivated = false;

@@ -30,7 +30,7 @@ export default class LeeSin_Q extends Spell {
 
   checkCastCondition() {
     // if Q1 hitted, but can't move => can't cast Q2
-    if (this.phase === LeeSin_Q.PHASES.Q2 && !hasFlag(this.owner.status, StatusFlags.CanMove)) {
+    if (this.phase === LeeSin_Q.PHASES.Q2 && !this.owner.canMove) {
       return false;
     }
     return true;
@@ -103,7 +103,6 @@ export default class LeeSin_Q extends Spell {
 
 export class LeeSin_Q_Buff extends Dash {
   image = LeeSin_Q.PHASES.Q2.image;
-  dashSpeed = 15;
   hitDamage = 15;
   spell = null;
 

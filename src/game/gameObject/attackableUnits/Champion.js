@@ -12,6 +12,7 @@ import AssetManager from '../../../managers/AssetManager.js';
 import Slow from '../buffs/Slow.js';
 import SAT from '../../../../libs/SAT.js';
 import Charm from '../buffs/Charm.js';
+import ActionState from '../../enums/ActionState.js';
 
 export default class Champion {
   isAllied = true;
@@ -23,6 +24,9 @@ export default class Champion {
   buffs = [];
   stats = new Stats();
   status = StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable;
+
+  _buffEffectsToEnable = 0;
+  _buffEffectsToDisable = 0;
 
   constructor(game, x = 0, y = 0, preset) {
     this.game = game;
@@ -45,21 +49,15 @@ export default class Champion {
       .map(Spell => new Spell(this));
   }
 
-  _setStatus(status, enabled) {
+  setStatus(status, enabled) {
     let _statusBeforeApplyingBuffEfects = 0;
     if (enabled) _statusBeforeApplyingBuffEfects |= status;
     else _statusBeforeApplyingBuffEfects &= ~status;
 
     this.status =
       (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
-  }
 
-  addStatus(status) {
-    this.status |= status;
-  }
-
-  removeStatus(status) {
-    this.status &= ~status;
+    this.stats.updateActionState(this.status);
   }
 
   moveTo(x, y) {
@@ -160,19 +158,44 @@ export default class Champion {
     let pos = this.game.getRandomSpawnLocation();
     this.position.set(pos.x, pos.y);
     this.destination.set(this.position.x, this.position.y);
-    this.stats.health.baseValue = this.stats.maxHealth.value / 2;
+    this.stats.health.baseValue = this.stats.maxHealth.value;
   }
 
   get isDead() {
     return this.reviveAfter > 0;
   }
 
-  update() {
-    // update buffs
+  get canCast() {
+    return hasFlag(this.stats.actionState, ActionState.CAN_CAST);
+  }
+
+  get canMove() {
+    return hasFlag(this.stats.actionState, ActionState.CAN_MOVE);
+  }
+
+  updateBuffs() {
     this.buffs = this.buffs.filter(buff => !buff.toRemove);
+
+    // Combine the status effects of all the buffs
+    this._buffEffectsToEnable = 0;
+    this._buffEffectsToDisable = 0;
+
     for (let buff of this.buffs) {
       buff.update();
+
+      this._buffEffectsToEnable |= buff.statusFlagsToEnable;
+      this._buffEffectsToDisable |= buff.statusFlagsToDisable;
     }
+
+    // If the effect should be enabled, it overrides disable.
+    this._buffEffectsToDisable &= ~this._buffEffectsToEnable;
+
+    this.setStatus(StatusFlags.None, true);
+  }
+
+  update() {
+    // update buffs
+    this.updateBuffs();
 
     // update spells
     for (let spell of this.spells) {
@@ -183,7 +206,7 @@ export default class Champion {
     this.stats.update();
 
     // move
-    if (!this.isDead && hasFlag(this.status, StatusFlags.CanMove)) this.move();
+    if (!this.isDead && this.canMove) this.move();
 
     // animation
     this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
@@ -200,9 +223,13 @@ export default class Champion {
   }
 
   draw() {
-    if (hasFlag(this.status, StatusFlags.NoRender)) return;
+    if (hasFlag(this.stats.actionState, ActionState.NO_RENDER)) return;
     let isInsideBush = hasFlag(this.status, StatusFlags.InBush);
-    let alpha = isInsideBush ? 100 : hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
+    let alpha = isInsideBush
+      ? 100
+      : hasFlag(this.stats.actionState, ActionState.STEALTHED)
+      ? 40
+      : 255;
 
     push();
 

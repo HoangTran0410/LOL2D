@@ -17,7 +17,7 @@ export default class Teemo_R extends Spell {
     let throwRange = 100,
       invisibleAfter = 1000,
       lifeTime = 20000,
-      exploreRange = 200;
+      explodeRange = 200;
 
     let { from, to: destination } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
@@ -30,7 +30,7 @@ export default class Teemo_R extends Spell {
     obj.destination = destination;
     obj.invisibleAfter = invisibleAfter;
     obj.lifeTime = lifeTime;
-    obj.exploreRange = exploreRange;
+    obj.explodeRange = explodeRange;
 
     this.game.addSpellObject(obj);
   }
@@ -50,8 +50,8 @@ export class Teemo_R_Object extends SpellObject {
   lifeTime = 30000;
   age = 0;
   moveSpeed = 6;
-  exploreRange = 200;
-  exploreLifeTime = 1500;
+  explodeRange = 200;
+  explodeLifeTime = 1500;
 
   size = 50;
   angle = 0;
@@ -66,7 +66,7 @@ export class Teemo_R_Object extends SpellObject {
   static PHASES = {
     MOVING: 0,
     INVISIBLE: 1,
-    EXPLORING: 2,
+    exploding: 2,
   };
   phase = Teemo_R_Object.PHASES.MOVING;
 
@@ -104,7 +104,7 @@ export class Teemo_R_Object extends SpellObject {
         if (enemyStepIn) {
           let enemiesInRange = this.game.queryPlayersInRange({
             position: this.position,
-            range: this.exploreRange / 2,
+            range: this.explodeRange / 2,
             includePlayerSize: false,
             excludePlayers: [this.owner],
           });
@@ -114,17 +114,17 @@ export class Teemo_R_Object extends SpellObject {
             enemy.takeDamage(30, this.owner);
           });
 
-          this.phase = Teemo_R_Object.PHASES.EXPLORING;
+          this.phase = Teemo_R_Object.PHASES.exploding;
           this.age = 0; // reset age
-          this.size = this.exploreRange;
+          this.size = this.explodeRange;
         }
       }
     }
 
-    // exploring phase
-    else if (this.phase === Teemo_R_Object.PHASES.EXPLORING) {
+    // exploding phase
+    else if (this.phase === Teemo_R_Object.PHASES.exploding) {
       this.age += deltaTime;
-      if (this.age > this.exploreLifeTime) {
+      if (this.age > this.explodeLifeTime) {
         this.toRemove = true;
       }
     }
@@ -157,9 +157,9 @@ export class Teemo_R_Object extends SpellObject {
       pop();
     }
 
-    // exploring phase
-    else if (this.phase === Teemo_R_Object.PHASES.EXPLORING) {
-      let alpha = map(this.age, 0, this.exploreLifeTime, 255, 0);
+    // exploding phase
+    else if (this.phase === Teemo_R_Object.PHASES.exploding) {
+      let alpha = map(this.age, 0, this.explodeLifeTime, 255, 0);
       stroke(150, alpha + 50);
       strokeWeight(2);
       fill(114, 63, 127, alpha);

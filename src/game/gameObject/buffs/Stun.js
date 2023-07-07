@@ -11,17 +11,7 @@ export default class Stun extends Buff {
   name = 'Choáng';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
-
-  onUpdate() {
-    // apply root every frame
-    this.targetUnit.status &= ~StatusFlags.CanCast;
-    this.targetUnit.status &= ~StatusFlags.CanMove;
-  }
-
-  onDeactivate() {
-    this.targetUnit.status |= StatusFlags.CanCast;
-    this.targetUnit.status |= StatusFlags.CanMove;
-  }
+  statusFlagsToEnable = StatusFlags.Stunned;
 
   draw() {
     // draw buff on target unit

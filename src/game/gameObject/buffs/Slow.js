@@ -13,7 +13,7 @@ export default class Slow extends Buff {
 
   onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.baseValue = -this.percent * this.targetUnit.stats.speed.baseValue;
+    this.statsModifier.speed.percentBaseBonus = -this.percent;
   }
 
   onActivate() {

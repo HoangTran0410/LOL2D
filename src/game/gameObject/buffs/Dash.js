@@ -29,8 +29,10 @@ export default class Dash extends Buff {
   cancelable = true;
   buffsToCheckCancel = [Airborne, Root, Stun];
 
+  statusFlagsToEnable = StatusFlags.Ghosted;
+
   static CanDash(targetUnit) {
-    return hasFlag(targetUnit.status, StatusFlags.CanMove);
+    return targetUnit.canMove;
   }
 
   onCreate() {
@@ -48,9 +50,6 @@ export default class Dash extends Buff {
 
   onUpdate() {
     if (this.toRemove) return;
-
-    // apply ghosted every frame
-    this.targetUnit.status |= StatusFlags.Ghosted;
 
     // apply dash
     if (this.dashDestination) {
@@ -84,10 +83,6 @@ export default class Dash extends Buff {
     if (this.showTrail) {
       this.trailSystem.addTrail(this.targetUnit.position);
     }
-  }
-
-  onDeactivate() {
-    this.targetUnit.status &= ~StatusFlags.Ghosted;
   }
 
   // for override

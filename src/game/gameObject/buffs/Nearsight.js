@@ -1,13 +1,15 @@
 // TODO: https://leagueoflegends.fandom.com/wiki/Nearsight
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import StatusFlags from '../../enums/StatusFlags.js';
 import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 
 export default class Nearsight extends Buff {
   image = AssetManager.getAsset('buff_nearsight');
-  name = 'Mù';
+  name = 'Mờ Mắt';
   buffAddType = BuffAddType.REPLACE_EXISTING;
+  statusFlagsToEnable = StatusFlags.NearSighted;
 
   // for override
   newSightRadius = 0;

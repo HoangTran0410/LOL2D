@@ -166,16 +166,15 @@ export default class InGameHUD {
       spells = [],
       buffs = [],
       avatar,
-      status,
       isDead,
       reviveAfter,
+      canCast,
     } = this.game?.player || {};
     this.vueInstance.avatar = avatar?.path || '';
     this.vueInstance.isDead = isDead;
     this.vueInstance.reviveAfter = ~~(reviveAfter / 1000);
 
     // update spells
-    let canCast = hasFlag(status, StatusFlags.CanCast) && !isDead;
     this.vueInstance.spells = spells
       .filter(i => i?.image?.path)
       .map((spell, index) => {
@@ -202,8 +201,8 @@ export default class InGameHUD {
           coolDownPercent: (currentCooldown / coolDown) * 100,
           showCoolDown: currentCooldown > 0,
           small: isInternalSpell || isSummonerSpell,
+          canCast: canCast && !isDead,
           hotKey,
-          canCast,
         };
       });
 
