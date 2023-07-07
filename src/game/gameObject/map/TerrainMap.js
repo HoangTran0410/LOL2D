@@ -76,14 +76,12 @@ export default class TerrainMap {
       else p.removeStatus(StatusFlags.InBush);
 
       // Collide with walls
-      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
+      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
 
       let collided = false;
       let totalOverlap = createVector(0, 0);
       let overlapsWalls = [];
-
-      // Iterate over each wall/polygon
       for (let wall of walls) {
         let response = new SAT.Response();
         let _collided = SAT.testPolygonCircle(wall.toSATPolygon(), p.toSATCircle(), response);
