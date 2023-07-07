@@ -7,6 +7,8 @@ export default class AIChampion extends Champion {
   _autoMove = true;
   _autoCast = true;
   _autoMoveOnTakeDamage = true;
+  _autoMoveOnCollideWall = true;
+  _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
 
   update() {
@@ -37,12 +39,12 @@ export default class AIChampion extends Champion {
 
   onCollideMapEdge() {
     super.onCollideMapEdge();
-    this.moveToRandomLocation();
+    if (this._autoMoveOnCollideMapEdge) this.moveToRandomLocation();
   }
 
   onCollideWall() {
     super.onCollideWall();
-    this.moveToRandomLocation();
+    if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
   }
 
   takeDamage(damage, source) {

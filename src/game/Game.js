@@ -131,7 +131,7 @@ export default class Game {
 
   draw() {
     if (this.paused) return;
-    background(30);
+    background(50);
 
     this.camera.makeDraw(() => {
       // this.camera.drawGrid();

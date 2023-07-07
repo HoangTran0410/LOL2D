@@ -6,7 +6,7 @@ import { StatsModifier } from '../Stats.js';
 // Hất tung
 export default class Slow extends Buff {
   image = AssetManager.getAsset('buff_slow');
-  name = 'Làm Chậm';
+  name = 'Chậm';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
   percent = 0;

@@ -3,7 +3,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import Charm from '../buffs/Charm.js';
 import Slow from '../buffs/Slow.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -102,7 +101,6 @@ export class Ahri_W_Object extends SpellObject {
       if (distance <= this.targetEnemy.stats.size.value / 2) {
         let slowBuff = new Slow(500, this.owner, this.targetEnemy);
         slowBuff.image = AssetManager.getAsset('spell_ahri_w');
-        slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
         slowBuff.percent = 0.2;
         this.targetEnemy.addBuff(slowBuff);
         this.targetEnemy.takeDamage(this.damage, this.owner);

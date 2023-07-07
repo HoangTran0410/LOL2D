@@ -12,6 +12,8 @@ export default class Buff {
 
   _deactivateListeners = [];
   _created = false;
+  _deactivated = false;
+  _activated = false;
 
   constructor(duration, sourceUnit, targetUnit) {
     this.duration = duration || 0;
@@ -25,11 +27,14 @@ export default class Buff {
       this.onCreate();
       this._created = true;
     }
+    if (this._activated) return;
     this.onActivate();
+    this._activated = true;
   }
 
   deactivateBuff() {
-    if (this.toRemove) return;
+    if (this._deactivated) return;
+    this._deactivated = true;
     this.toRemove = true;
     this.onDeactivate();
     for (let listener of this._deactivateListeners) {
@@ -38,6 +43,10 @@ export default class Buff {
   }
 
   renewBuff() {
+    if (this._deactivated) {
+      this.onActivate(); // re-activate
+      this._deactivated = false;
+    }
     this.timeElapsed = 0;
     this.toRemove = false;
   }

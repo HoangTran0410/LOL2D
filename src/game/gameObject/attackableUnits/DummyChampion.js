@@ -4,9 +4,10 @@ export default class DummyChampion extends AIChampion {
   isAllied = false;
   showName = true;
   respawnTime = 1000;
-  _autoCast = true;
+  _autoCast = false;
   _autoMove = false;
   _autoMoveOnTakeDamage = false;
+  _autoMoveOnCollideWall = false;
   _respawnWithNewPreset = false;
 
   constructor(game, x, y, preset) {

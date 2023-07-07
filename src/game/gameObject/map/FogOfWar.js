@@ -8,12 +8,15 @@ export default class FogOfWar {
     this.game = game;
 
     this.overlay = createGraphics(windowWidth, windowHeight);
-    this.outOfViewColor = '#0008';
+    this.outOfViewColor = '#0009';
 
     this.colorStops = [
       { stop: 0, color: '#fff' },
       { stop: 1, color: '#0001' },
     ];
+
+    this.sightRadiusAnimated = 0;
+    this.sightChangeLerpSpeed = 0.1;
   }
 
   draw() {
@@ -47,21 +50,26 @@ export default class FogOfWar {
     );
 
     // calculate visibility
+    this.sightRadiusAnimated = lerp(
+      this.sightRadiusAnimated,
+      player.stats.sightRadius.value,
+      this.sightChangeLerpSpeed
+    );
     let sightPoly = this.calculateVisibility({
       polygons: obstaclesInSight.map(o => o.vertices),
       sourceOfLight: [player.position.x, player.position.y],
       sightBound: {
-        x: player.position.x - player.stats.sightRadius.value,
-        y: player.position.y - player.stats.sightRadius.value,
-        w: player.stats.sightRadius.value * 2,
-        h: player.stats.sightRadius.value * 2,
+        x: player.position.x - this.sightRadiusAnimated,
+        y: player.position.y - this.sightRadiusAnimated,
+        w: this.sightRadiusAnimated * 2,
+        h: this.sightRadiusAnimated * 2,
       },
     });
 
     // calculate visible players
     let playersInSight = this.game.queryPlayersInRange({
       position: player.position,
-      range: player.stats.sightRadius.value,
+      range: this.sightRadiusAnimated,
       includePlayerSize: true,
       includeDead: true,
       excludePlayers: [player],
@@ -92,12 +100,7 @@ export default class FogOfWar {
     // this.drawCircleSight(player.position.x, player.position.y, player.stats.sightRadius.value);
 
     // ===================== visibility ========================
-    this.prepareRadialGradient(
-      player.position.x,
-      player.position.y,
-      player.stats.sightRadius.value,
-      100
-    );
+    this.prepareRadialGradient(player.position.x, player.position.y, this.sightRadiusAnimated, 100);
 
     // draw visibility
     let sightPolygon = this.calculateSight();

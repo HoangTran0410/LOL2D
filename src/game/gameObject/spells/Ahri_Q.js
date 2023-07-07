@@ -35,7 +35,7 @@ export class Ahri_Q_Object extends SpellObject {
   position = createVector();
   destination = createVector();
   speed = 7;
-  size = 40;
+  size = 35;
 
   speedBackward = 15;
   increaseSpeedBackward = 0.2;
@@ -97,7 +97,6 @@ export class Ahri_Q_Object extends SpellObject {
 
     enemies.forEach(enemy => {
       let slowBuff = new Slow(500, this.owner, enemy);
-      slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
       slowBuff.percent = 0.5;
       slowBuff.image = AssetManager.getAsset('spell_ahri_q');
       enemy.addBuff(slowBuff);

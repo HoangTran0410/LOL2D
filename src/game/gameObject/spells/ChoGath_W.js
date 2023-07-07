@@ -21,7 +21,7 @@ export default class ChoGath_W extends Spell {
 
     let obj = new ChoGath_W_Object(this.owner);
     obj.speed = 10;
-    obj.position = this.owner.position.copy();
+    obj.position = this.owner.position; // follow owner
     obj.angleStart = angle - angleRange / 2;
     obj.angleEnd = angle + angleRange / 2;
     obj.stunTime = stunTime;
