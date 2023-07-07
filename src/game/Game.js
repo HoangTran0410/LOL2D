@@ -26,7 +26,7 @@ export default class Game {
     this.worldMouse = createVector(0, 0);
 
     // init players
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 5; i++) {
       let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
@@ -34,9 +34,9 @@ export default class Game {
       this.players.push(champ);
     }
 
-    let preset = ChampionPreset.ahri; // getRandomChampionPreset();
-    // let pos = this.getRandomSpawnLocation();
-    let pos = createVector(3200, 3200);
+    let preset = getRandomChampionPreset();
+    let pos = this.getRandomSpawnLocation();
+    // let pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
 

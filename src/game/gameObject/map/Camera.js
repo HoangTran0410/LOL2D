@@ -1,7 +1,7 @@
 export default class Camera {
   constructor() {
     this.position = createVector(0, 0);
-    this.currentZoom = 0.5;
+    this.currentScale = 0.5;
     this.scale = 1;
     this.target = null;
   }
@@ -21,7 +21,7 @@ export default class Camera {
       this.position.lerp(this.target, 0.1);
     }
 
-    this.currentZoom = lerp(this.currentZoom, this.scale, 0.07);
+    this.currentScale = lerp(this.currentScale, this.scale, 0.07);
   }
 
   drawGrid(gridSize = 400) {
@@ -58,15 +58,15 @@ export default class Camera {
 
   screenToWorld(x, y) {
     return createVector(
-      (x - width / 2) / this.currentZoom + this.position.x,
-      (y - height / 2) / this.currentZoom + this.position.y
+      (x - width / 2) / this.currentScale + this.position.x,
+      (y - height / 2) / this.currentScale + this.position.y
     );
   }
 
   worldToScreen(x, y) {
     return createVector(
-      (x - this.position.x) * this.currentZoom + width / 2,
-      (y - this.position.y) * this.currentZoom + height / 2
+      (x - this.position.x) * this.currentScale + width / 2,
+      (y - this.position.y) * this.currentScale + height / 2
     );
   }
 
@@ -79,7 +79,7 @@ export default class Camera {
   push() {
     push();
     translate(width / 2, height / 2);
-    scale(this.currentZoom);
+    scale(this.currentScale);
     translate(-this.position.x, -this.position.y);
   }
 

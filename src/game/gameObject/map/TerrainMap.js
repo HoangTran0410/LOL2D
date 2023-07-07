@@ -5,8 +5,8 @@ import CollideUtils from '../../../utils/collide.utils.js';
 import { hasFlag } from '../../../utils/index.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import TerrainType from '../../enums/TerrainType.js';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import Obstacle from './Obstacle.js';
-import VectorUtils from '../../../utils/vector.utils.js';
 
 export default class TerrainMap {
   constructor(game) {
@@ -14,6 +14,8 @@ export default class TerrainMap {
 
     this.size = 6400;
     this.obstacles = [];
+
+    this.rippleEffect = PredefinedParticleSystems.ripple();
 
     // init quadtree
     this.quadtree = new Quadtree({
@@ -58,9 +60,15 @@ export default class TerrainMap {
     //   this.quadtree.insert(rectangle);
     // }
 
+    this.rippleEffect.update();
+
     // players collision with obstacles
     for (let p of this.game.players) {
-      let obstacles = this.getObstaclesCollideChampion(p, [TerrainType.WALL, TerrainType.BUSH]);
+      let obstacles = this.getObstaclesCollideChampion(p, [
+        TerrainType.WALL,
+        TerrainType.BUSH,
+        TerrainType.WATER,
+      ]);
 
       // Collide with bushes
       let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
@@ -74,6 +82,30 @@ export default class TerrainMap {
       }
       if (isInsideBush) p.addStatus(StatusFlags.InBush);
       else p.removeStatus(StatusFlags.InBush);
+
+      // Collide with waters => add ripple effect
+      if (!p.isDead && frameCount % 45 === 0 && p.position.dist(p.destination) > 0) {
+        let waters = obstacles.filter(o => o.type === TerrainType.WATER);
+        let isInsideWater = false;
+        for (let w of waters) {
+          let collided = CollideUtils.pointPolygon(p.position.x, p.position.y, w.vertices);
+          if (collided) {
+            isInsideWater = true;
+            break;
+          }
+        }
+        if (isInsideWater) {
+          let vel = p.destination.copy().sub(p.position).setMag(0.9);
+          this.rippleEffect.addParticle({
+            x: p.position.x,
+            y: p.position.y,
+            vx: vel.x,
+            vy: vel.y,
+            r: random(5, 10),
+            maxr: random(40, 80),
+          });
+        }
+      }
 
       // Collide with walls
       if (hasFlag(p.status, StatusFlags.Ghosted)) continue;
@@ -141,6 +173,8 @@ export default class TerrainMap {
     let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
 
     for (let w of waters) w.draw();
+    this.rippleEffect.draw();
+
     for (let b of bushes) b.draw();
     for (let w of walls) w.draw();
     pop();

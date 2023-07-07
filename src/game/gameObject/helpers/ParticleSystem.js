@@ -11,7 +11,7 @@ export default class ParticleSystem extends SpellObject {
     preDrawFn,
     drawFn,
     postDrawFn,
-    maxParticles = Infinity,
+    maxParticles = 200,
     owner,
   }) {
     super(owner);
@@ -76,6 +76,24 @@ export const PredefinedParticleSystems = {
       },
       drawFn: p => {
         circle(p.x, p.y, p.r * 2);
+      },
+    }),
+
+  ripple: () =>
+    new ParticleSystem({
+      isDeadFn: p => {
+        return p.r >= p.maxr;
+      },
+      updateFn: p => {
+        p.x += p.vx || 0;
+        p.y += p.vy || 0;
+        p.r += 0.7;
+      },
+      drawFn: p => {
+        let alpha = map(p.r, 0, p.maxr, 150, 0);
+        noStroke();
+        fill(100, 100, 150, alpha);
+        circle(p.x, p.y, p.r * 2 + random(-3, 3));
       },
     }),
 };
