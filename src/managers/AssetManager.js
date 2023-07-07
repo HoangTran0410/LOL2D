@@ -48,6 +48,7 @@ const AssetPaths = {
   spell_ahri_w: 'assets/images/spells/ahri_w.png',
   spell_ahri_e: 'assets/images/spells/ahri_e.png',
   spell_ahri_r: 'assets/images/spells/ahri_r.png',
+  spell_veigar_e: 'assets/images/spells/veigar_e.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
