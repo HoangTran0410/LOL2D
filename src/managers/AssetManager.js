@@ -12,6 +12,7 @@ const AssetPaths = {
   champ_leesin: 'assets/images/champions/leesin.png',
   champ_chogath: 'assets/images/champions/chogath.png',
   champ_ahri: 'assets/images/champions/ahri.png',
+  champ_shaco: 'assets/images/champions/shaco.png',
 
   // spells
   spell_flash: 'assets/images/spells/flash.png',
@@ -49,6 +50,7 @@ const AssetPaths = {
   spell_ahri_e: 'assets/images/spells/ahri_e.png',
   spell_ahri_r: 'assets/images/spells/ahri_r.png',
   spell_veigar_e: 'assets/images/spells/veigar_e.png',
+  spell_shaco_w: 'assets/images/spells/shaco_w.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
