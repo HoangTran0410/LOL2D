@@ -53,7 +53,7 @@ export class Ahri_E_Object extends SpellObject {
       this.toRemove = true;
     }
 
-    let enemy = this.game.queryPlayerInRange({
+    let enemy = this.game.queryPlayersInRange({
       position: this.position,
       range: 0,
       includePlayerSize: true,

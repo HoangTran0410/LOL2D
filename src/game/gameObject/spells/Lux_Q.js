@@ -56,7 +56,7 @@ export class Lux_Q_Object extends SpellObject {
 
     // check collision with enemy
     else {
-      let enemy = this.game.queryPlayerInRange({
+      let enemy = this.game.queryPlayersInRange({
         position: this.position,
         range: this.size,
         includePlayerSize: true,

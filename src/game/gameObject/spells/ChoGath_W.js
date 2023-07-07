@@ -55,7 +55,7 @@ export class ChoGath_W_Object extends SpellObject {
 
     this.currentRange = constrain(this.currentRange + this.speed, 0, this.range);
 
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.position,
       range: this.currentRange,
       includePlayerSize: true,

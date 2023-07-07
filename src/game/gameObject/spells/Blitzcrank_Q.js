@@ -84,7 +84,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
 
     // check collision with enemy
     if (this.phase == Blitzcrank_Q_Object.PHASES.FORWARD) {
-      let enemy = this.game.queryPlayerInRange({
+      let enemy = this.game.queryPlayersInRange({
         position: this.position,
         range: 0,
         includePlayerSize: true,

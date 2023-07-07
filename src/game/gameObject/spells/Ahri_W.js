@@ -69,7 +69,7 @@ export class Ahri_W_Object extends SpellObject {
       this.trailSystem.addTrail(this.position);
 
       // query players in range
-      let enemies = this.game.queryPlayerInRange({
+      let enemies = this.game.queryPlayersInRange({
         position: this.position,
         range: this.rangeToFindEnemy,
         excludePlayers: [this.owner],

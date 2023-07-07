@@ -132,7 +132,7 @@ export class Yasuo_Q_Object extends SpellObject {
     this.currentRayLength = Math.min(this.currentRayLength + this.raySpeed, this.range);
 
     // check collide with enemy
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.currentRayLength,
       includePlayerSize: true,
@@ -211,7 +211,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     this.angle += 0.2;
 
     // check collide with enemy
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,

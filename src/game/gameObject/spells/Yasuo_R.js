@@ -21,7 +21,7 @@ export default class Yasuo_R extends Spell {
     let mouse = this.game.worldMouse.copy();
 
     // query all enemies that have height > 0 in range 500px
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.rangeToFindEnemies,
       customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
@@ -41,7 +41,7 @@ export default class Yasuo_R extends Spell {
 
     if (nearestEnemy) {
       // find all enemies that are in range 300px to nearest enemy
-      let enemiesInRange = this.game.queryPlayerInRange({
+      let enemiesInRange = this.game.queryPlayersInRange({
         position: nearestEnemy.position,
         range: this.rangeToApplyAirborne,
         customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,

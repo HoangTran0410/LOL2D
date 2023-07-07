@@ -64,7 +64,7 @@ export default class Leblanc_W extends Spell {
         this.game.addSpellObject(w2Obj);
 
         // enemy take damage
-        let enemies = this.game.queryPlayerInRange({
+        let enemies = this.game.queryPlayersInRange({
           position: destination,
           range: w2Obj.size / 2,
           excludePlayers: [this.owner],

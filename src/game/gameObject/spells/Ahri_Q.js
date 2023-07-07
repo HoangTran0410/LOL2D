@@ -88,7 +88,7 @@ export class Ahri_Q_Object extends SpellObject {
     this.particleSystem.update();
 
     // collide with enemy
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,

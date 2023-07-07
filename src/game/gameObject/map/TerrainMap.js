@@ -64,15 +64,16 @@ export default class TerrainMap {
 
       // Collide with bushes
       let bushes = obstacles.filter(o => o.type === TerrainType.BUSH);
-      let isInBush = false;
+      let isInsideBush = false;
       for (let b of bushes) {
         let collided = CollideUtils.pointPolygon(p.position.x, p.position.y, b.vertices);
         if (collided) {
-          isInBush = true;
+          isInsideBush = true;
           break;
         }
       }
-      p.isInBush = isInBush;
+      if (isInsideBush) p.addStatus(StatusFlags.InBush);
+      else p.removeStatus(StatusFlags.InBush);
 
       // Collide with walls
       let walls = obstacles.filter(o => o.type === TerrainType.WALL);
@@ -110,10 +111,8 @@ export default class TerrainMap {
         // }
         totalOverlap.div(overlapsWalls.length); // Calculate the average overlap vector
         p.position.add(totalOverlap); // Apply the resolution vector to the circle's position
-      }
 
-      if (p != this.game.player && collided) {
-        p.moveToRandomLocation?.();
+        p.onCollideWall?.();
       }
     }
 
@@ -130,9 +129,7 @@ export default class TerrainMap {
         p.position.x = constrain(p.position.x, size, this.size - size);
         p.position.y = constrain(p.position.y, size, this.size - size);
 
-        if (p != this.game.player) {
-          p.moveToRandomLocation?.();
-        }
+        p.onCollideMapEdge?.();
       }
     }
   }

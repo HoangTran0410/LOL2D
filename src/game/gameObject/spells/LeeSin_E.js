@@ -14,7 +14,7 @@ export default class LeeSin_E extends Spell {
   range = 150;
 
   onSpellCast() {
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.range,
       excludePlayers: [this.owner],

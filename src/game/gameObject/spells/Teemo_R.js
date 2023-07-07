@@ -93,7 +93,7 @@ export class Teemo_R_Object extends SpellObject {
 
       if (this.age > this.invisibleAfter) {
         // check collide with enemy
-        let enemyStepIn = this.game.queryPlayerInRange({
+        let enemyStepIn = this.game.queryPlayersInRange({
           position: this.position,
           range: this.size / 2,
           includePlayerSize: true,
@@ -102,7 +102,7 @@ export class Teemo_R_Object extends SpellObject {
         });
 
         if (enemyStepIn) {
-          let enemiesInRange = this.game.queryPlayerInRange({
+          let enemiesInRange = this.game.queryPlayersInRange({
             position: this.position,
             range: this.exploreRange / 2,
             includePlayerSize: false,

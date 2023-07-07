@@ -59,7 +59,7 @@ export default class FogOfWar {
     });
 
     // calculate visible players
-    let playersInSight = this.game.queryPlayerInRange({
+    let playersInSight = this.game.queryPlayersInRange({
       position: player.position,
       range: player.stats.sightRadius.value,
       includePlayerSize: true,

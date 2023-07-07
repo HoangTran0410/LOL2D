@@ -43,7 +43,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     this.size = Math.min(this.size + this.expantionSpeed, this.maxSize);
 
     // apply silence
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,

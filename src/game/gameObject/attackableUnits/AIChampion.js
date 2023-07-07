@@ -35,6 +35,16 @@ export default class AIChampion extends Champion {
     this.moveTo(x, y);
   }
 
+  onCollideMapEdge() {
+    super.onCollideMapEdge();
+    this.moveToRandomLocation();
+  }
+
+  onCollideWall() {
+    super.onCollideWall();
+    this.moveToRandomLocation();
+  }
+
   takeDamage(damage, source) {
     super.takeDamage(damage, source);
     if (this._autoMoveOnTakeDamage) this.moveToRandomLocation();

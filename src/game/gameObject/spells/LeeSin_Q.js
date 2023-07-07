@@ -159,7 +159,7 @@ export class LeeSin_Q_Object extends SpellObject {
       this.trailSystem.addTrail(this.position);
 
       // check collision with enemy
-      let enemy = this.game.queryPlayerInRange({
+      let enemy = this.game.queryPlayersInRange({
         position: this.position,
         range: this.size / 2,
         excludePlayers: [this.owner],

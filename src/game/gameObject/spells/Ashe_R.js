@@ -54,7 +54,7 @@ export class Ashe_R_Object extends SpellObject {
       this.trailSystem.addTrail(this.position);
 
       // check collide enemy
-      let enemy = this.game.queryPlayerInRange({
+      let enemy = this.game.queryPlayersInRange({
         position: this.position,
         range: this.size / 4,
         includePlayerSize: true,
@@ -68,7 +68,7 @@ export class Ashe_R_Object extends SpellObject {
         this.age = this.lifeTime - this.exploreLifeTime; // reset age to display explore animation
 
         // add buff to enemies
-        let enemies = this.game.queryPlayerInRange({
+        let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.exploreSize / 2,
           includePlayerSize: true,

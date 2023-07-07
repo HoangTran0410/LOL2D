@@ -23,7 +23,7 @@ export default class LeeSin_R extends Spell {
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
 
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.rangeToCheckEnemies,
       excludePlayers: [this.owner],
@@ -141,7 +141,7 @@ export class LeeSin_R_Object extends SpellObject {
     if (this.targetEnemy.isDead) this.toRemove = true;
 
     // find enemies in collide with targetEnemy
-    let enemies = this.game.queryPlayerInRange({
+    let enemies = this.game.queryPlayersInRange({
       position: this.targetEnemy.position,
       range: this.targetEnemy.stats.size.value / 2,
       excludePlayers: [this.targetEnemy, this.owner, ...this.effectedEnemies],

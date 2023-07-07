@@ -128,7 +128,7 @@ export class Lux_E_Object extends SpellObject {
       this.size = lerp(this.size, this.staticSize, 0.3);
 
       // apply slow buff
-      let enemies = this.game.queryPlayerInRange({
+      let enemies = this.game.queryPlayersInRange({
         position: this.position,
         range: this.staticSize / 2,
         excludePlayers: [this.owner],
@@ -148,7 +148,7 @@ export class Lux_E_Object extends SpellObject {
         this.takedDamage = true;
 
         // apply damage to enemies in range
-        let enemies = this.game.queryPlayerInRange({
+        let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.staticSize / 2,
           excludePlayers: [this.owner],

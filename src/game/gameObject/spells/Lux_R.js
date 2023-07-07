@@ -89,7 +89,7 @@ export class Lux_R_Object extends SpellObject {
       }
 
       // check collision ray-enemy
-      let enemies = this.game.queryPlayerInRange({
+      let enemies = this.game.queryPlayersInRange({
         position: this.owner.position,
         range: this.destination.dist(this.owner.position),
         includePlayerSize: true,

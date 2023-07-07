@@ -65,7 +65,7 @@ export class ChoGath_Q_Object extends SpellObject {
 
     if (this.age >= this.prepareTime) {
       if (!this.affected) {
-        let enemies = this.game.queryPlayerInRange({
+        let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.size / 2,
           excludePlayers: [this.owner],

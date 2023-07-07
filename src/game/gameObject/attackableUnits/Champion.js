@@ -45,14 +45,22 @@ export default class Champion {
       .map(Spell => new Spell(this));
   }
 
-  // setStatus(status, enabled) {
-  //   let _statusBeforeApplyingBuffEfects = 0;
-  //   if (enabled) _statusBeforeApplyingBuffEfects |= status;
-  //   else _statusBeforeApplyingBuffEfects &= ~status;
+  _setStatus(status, enabled) {
+    let _statusBeforeApplyingBuffEfects = 0;
+    if (enabled) _statusBeforeApplyingBuffEfects |= status;
+    else _statusBeforeApplyingBuffEfects &= ~status;
 
-  //   this.status =
-  //     (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
-  // }
+    this.status =
+      (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
+  }
+
+  addStatus(status) {
+    this.status |= status;
+  }
+
+  removeStatus(status) {
+    this.status &= ~status;
+  }
 
   moveTo(x, y) {
     this.destination.set(x, y);
@@ -193,7 +201,8 @@ export default class Champion {
 
   draw() {
     if (hasFlag(this.status, StatusFlags.NoRender)) return;
-    let alpha = this.isInBush ? 100 : hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
+    let isInsideBush = hasFlag(this.status, StatusFlags.InBush);
+    let alpha = isInsideBush ? 100 : hasFlag(this.status, StatusFlags.Stealthed) ? 40 : 255;
 
     push();
 
@@ -345,4 +354,7 @@ export default class Champion {
       this.stats.size.value / 2
     );
   }
+
+  onCollideWall() {}
+  onCollideMapEdge() {}
 }

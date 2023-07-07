@@ -188,7 +188,7 @@ export default class Game {
     return getOnlyOne ? null : result;
   }
 
-  queryPlayerInRange({
+  queryPlayersInRange({
     position,
     range, // radius
     excludePlayers = [],

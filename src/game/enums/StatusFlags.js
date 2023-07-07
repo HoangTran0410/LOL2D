@@ -12,6 +12,9 @@ const StatusFlags = {
   Suppressed: 1 << 9, // Bị khống chế (không thể dùng skill)
   Feared: 1 << 10, // Bị sợ hãi (chạy khỏi kẻ địch)
   Charmed: 1 << 11, // Bị mê hoặc
+
+  // Các trạng thái khác
+  InBush: 1 << 12, // Trong bụi cỏ
 };
 
 Object.freeze(StatusFlags);
