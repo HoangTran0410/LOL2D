@@ -34,7 +34,7 @@ export default class Game {
       this.players.push(champ);
     }
 
-    let preset = ChampionPreset.leesin; // getRandomChampionPreset();
+    let preset = ChampionPreset.ahri; // getRandomChampionPreset();
     // let pos = this.getRandomSpawnLocation();
     let pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
@@ -131,7 +131,7 @@ export default class Game {
 
   draw() {
     if (this.paused) return;
-    background(50);
+    background(45);
 
     this.camera.makeDraw(() => {
       // this.camera.drawGrid();

@@ -16,8 +16,6 @@ export default class Dash extends Buff {
   buffAddType = BuffAddType.REPLACE_EXISTING;
 
   // for override
-  trailsDelayFrame = 0;
-  trails = [];
   trailSystem = new TrailSystem({
     trailColor: [255, 100],
     maxLength: 20,
@@ -25,8 +23,9 @@ export default class Dash extends Buff {
 
   // for override
   showTrail = true;
-  dashSpeed = 6;
+  dashSpeed = 10;
   dashDestination = null;
+  stayAtDestination = true;
   cancelable = true;
   buffsToCheckCancel = [Airborne, Root, Stun];
 
@@ -38,6 +37,12 @@ export default class Dash extends Buff {
     if (this.showTrail && this.game) {
       this.game.addSpellObject(this.trailSystem);
       this.trailSystem.trailSize = this.targetUnit.stats.size.value;
+    }
+  }
+
+  onActivate() {
+    if (this.stayAtDestination && this.dashDestination) {
+      this.targetUnit.moveTo(this.dashDestination.x, this.dashDestination.y);
     }
   }
 

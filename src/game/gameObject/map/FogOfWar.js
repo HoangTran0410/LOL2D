@@ -8,7 +8,7 @@ export default class FogOfWar {
     this.game = game;
 
     this.overlay = createGraphics(windowWidth, windowHeight);
-    this.outOfViewColor = '#0009';
+    this.outOfViewColor = '#0006';
 
     this.colorStops = [
       { stop: 0, color: '#fff' },

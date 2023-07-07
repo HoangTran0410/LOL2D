@@ -113,7 +113,7 @@ export const ChampionPreset = {
       AllSpells.Ahri_Q,
       AllSpells.Ahri_W,
       AllSpells.Ahri_E,
-      AllSpells.Ahri_Q,
+      AllSpells.Ahri_R,
       AllSpells.Flash,
       AllSpells.Ghost,
     ],

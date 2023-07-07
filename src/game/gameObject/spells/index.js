@@ -24,3 +24,4 @@ export { default as ChoGath_W } from './ChoGath_W.js';
 export { default as Ahri_Q } from './Ahri_Q.js';
 export { default as Ahri_W } from './Ahri_W.js';
 export { default as Ahri_E } from './Ahri_E.js';
+export { default as Ahri_R } from './Ahri_R.js';
