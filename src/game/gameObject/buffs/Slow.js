@@ -3,7 +3,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 
-// Hất tung
 export default class Slow extends Buff {
   image = AssetManager.getAsset('buff_slow');
   name = 'Chậm';

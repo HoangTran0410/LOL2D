@@ -1,8 +1,7 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
-import { StatsModifier } from '../Stats.js';
+import Slow from '../buffs/Slow.js';
 import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
 export default class Blitzcrank_W extends Spell {
@@ -35,12 +34,8 @@ export class Blitzcrank_W_Buff extends Ghost_Buff {
   percent = 0.5;
 }
 
-export class Blitzcrank_W2_Buff extends Blitzcrank_W_Buff {
+export class Blitzcrank_W2_Buff extends Slow {
   image = AssetManager.getAsset('spell_blitzcrank_w');
   buffAddType = BuffAddType.RENEW_EXISTING;
-
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = -0.75;
-  }
+  percent = 0.75;
 }

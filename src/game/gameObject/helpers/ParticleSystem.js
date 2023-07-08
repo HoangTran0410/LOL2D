@@ -39,6 +39,12 @@ export default class ParticleSystem extends SpellObject {
       this.updateFn?.(particle);
       if (this.isDeadFn?.(particle)) {
         this.particles.splice(i, 1);
+
+        // if all particles are dead, remove this particle system
+        // particle system only be removed if there was particle added
+        if (this.particles.length === 0) {
+          this.toRemove = true;
+        }
       }
     }
     this.postUpdateFn?.(this.particles);
@@ -52,10 +58,6 @@ export default class ParticleSystem extends SpellObject {
     }
     this.postDrawFn?.(this.particles);
     pop();
-  }
-
-  get toRemove() {
-    return this.particles.length === 0;
   }
 }
 
