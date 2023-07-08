@@ -35,32 +35,52 @@ export default class FogOfWar {
   }
 
   calculateSight() {
-    let { player, terrainMap } = this.game;
+    let allyPlayers = this.game.players.filter(p => p.teamId === this.game.player.teamId);
+    let allSightPoly = [],
+      allPlayerInSights = [];
 
+    allyPlayers.forEach(p => {
+      let { sightPoly, playersInSight } = this.calculateSightForChamp(p);
+      allPlayerInSights.push(p);
+      allPlayerInSights.push(...playersInSight);
+      allSightPoly.push({
+        player: p,
+        sightPoly,
+      });
+    });
+    this.game.player.visiblePlayers = allPlayerInSights;
+
+    return allSightPoly;
+  }
+
+  calculateSightForChamp(champ) {
     // get obstacles in sight
-    let obstaclesInSight = terrainMap.getObstaclesInView([TerrainType.WALL, TerrainType.BUSH]);
+    let obstaclesInSight = this.game.terrainMap.getObstaclesInChampionSight(champ, [
+      TerrainType.WALL,
+      TerrainType.BUSH,
+    ]);
 
     // remove bushes that player is inside => player can see through that bushes
     obstaclesInSight = obstaclesInSight.filter(
       o =>
         !(
           // o.type === TerrainType.BUSH &&
-          CollideUtils.pointPolygon(player.position.x, player.position.y, o.vertices)
+          CollideUtils.pointPolygon(champ.position.x, champ.position.y, o.vertices)
         )
     );
 
     // calculate visibility
     this.sightRadiusAnimated = lerp(
       this.sightRadiusAnimated,
-      player.stats.sightRadius.value,
+      champ.stats.sightRadius.value,
       this.sightChangeLerpSpeed
     );
     let sightPoly = this.calculateVisibility({
       polygons: obstaclesInSight.map(o => o.vertices),
-      sourceOfLight: [player.position.x, player.position.y],
+      sourceOfLight: [champ.position.x, champ.position.y],
       sightBound: {
-        x: player.position.x - this.sightRadiusAnimated,
-        y: player.position.y - this.sightRadiusAnimated,
+        x: champ.position.x - this.sightRadiusAnimated,
+        y: champ.position.y - this.sightRadiusAnimated,
         w: this.sightRadiusAnimated * 2,
         h: this.sightRadiusAnimated * 2,
       },
@@ -68,18 +88,19 @@ export default class FogOfWar {
 
     // calculate visible players
     let playersInSight = this.game.queryPlayersInRange({
-      position: player.position,
+      position: champ.position,
       range: this.sightRadiusAnimated,
       includePlayerSize: true,
       includeDead: true,
-      excludePlayers: [player],
       customFilter: p => {
         return CollideUtils.pointPolygonConcave(p.position.x, p.position.y, sightPoly);
       },
     });
-    player.visiblePlayers = [player, ...playersInSight];
 
-    return sightPoly;
+    return {
+      sightPoly,
+      playersInSight,
+    };
   }
 
   calculateVisibility({ sourceOfLight, sightBound, polygons }) {
@@ -96,20 +117,28 @@ export default class FogOfWar {
 
   drawSights() {
     // default sight
-    let { player, camera } = this.game;
+    let { camera } = this.game;
     // this.drawCircleSight(player.position.x, player.position.y, player.stats.sightRadius.value);
 
     // ===================== visibility ========================
-    this.prepareRadialGradient(player.position.x, player.position.y, this.sightRadiusAnimated, 100);
-
     // draw visibility
-    let sightPolygon = this.calculateSight();
-    this.overlay.beginShape();
-    sightPolygon.forEach(v => {
-      let pos = camera.worldToScreen(v.x, v.y);
-      this.overlay.vertex(pos.x, pos.y);
+    let allSightPoly = this.calculateSight();
+
+    allSightPoly.forEach(({ player, sightPoly }) => {
+      this.prepareRadialGradient(
+        player.position.x,
+        player.position.y,
+        this.sightRadiusAnimated,
+        100
+      );
+
+      this.overlay.beginShape();
+      sightPoly.forEach(v => {
+        let pos = camera.worldToScreen(v.x, v.y);
+        this.overlay.vertex(pos.x, pos.y);
+      });
+      this.overlay.endShape(CLOSE);
     });
-    this.overlay.endShape(CLOSE);
   }
 
   drawCircleSight(_x, _y, _r) {

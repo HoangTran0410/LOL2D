@@ -25,6 +25,14 @@ export const removeAccents = str => {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 };
 
+export const uuidv4 = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    let r = (Math.random() * 16) | 0;
+    let v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 // RectMode: CORNER
 export const rectToVertices = (rx, ry, rw, rh, angle, anchor) => {
   let vertices = [];

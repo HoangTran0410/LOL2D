@@ -3,7 +3,6 @@ import { getRandomChampionPreset } from '../../preset.js';
 import Champion from './Champion.js';
 
 export default class AIChampion extends Champion {
-  isAllied = false;
   _autoMove = true;
   _autoCast = true;
   _autoMoveOnTakeDamage = true;

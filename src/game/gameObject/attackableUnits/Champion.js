@@ -1,8 +1,7 @@
-import { hasFlag, shuffleArray } from '../../../utils/index.js';
+import { hasFlag, uuidv4 } from '../../../utils/index.js';
 import Stats from '../Stats.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import * as AllSpells from '../spells/index.js';
 import Airborne from '../buffs/Airborne.js';
 import Root from '../buffs/Root.js';
 import Silence from '../buffs/Silence.js';
@@ -17,12 +16,13 @@ import Fear from '../buffs/Fear.js';
 import CombatText from '../helpers/CombatText.js';
 
 export default class Champion {
-  isAllied = true;
   respawnTime = 3000;
   showName = false;
   score = 0;
   reviveAfter = 0;
   toRemove = false;
+
+  teamId = uuidv4();
 
   buffs = [];
   stats = new Stats();
@@ -42,14 +42,8 @@ export default class Champion {
       this.spells = preset.spells.map(Spell => new Spell(this));
     } else {
       this.avatar = AssetManager.getRandomChampion();
-      this.spells = this.getRandomSpells();
+      this.spells = [];
     }
-  }
-
-  getRandomSpells() {
-    return shuffleArray(Object.values(AllSpells))
-      .slice(0, 7)
-      .map(Spell => new Spell(this));
   }
 
   setStatus(status, enabled) {
@@ -179,6 +173,10 @@ export default class Champion {
 
   get canMove() {
     return hasFlag(this.stats.actionState, ActionState.CAN_MOVE);
+  }
+
+  get isAllied() {
+    return this.teamId == this.game.player.teamId;
   }
 
   updateBuffs() {

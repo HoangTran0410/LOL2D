@@ -1,7 +1,6 @@
 import AIChampion from './AIChampion.js';
 
 export default class DummyChampion extends AIChampion {
-  isAllied = false;
   showName = true;
   respawnTime = 1000;
   _autoCast = false;

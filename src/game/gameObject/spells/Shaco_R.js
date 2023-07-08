@@ -15,6 +15,7 @@ export default class Shaco_R extends Spell {
   clonePlayer = null;
   cloneLifeTime = 10000;
   timeSinceCloneCreated = 0;
+  maxRange = 1000;
 
   checkCastCondition() {
     if (this.clonePlayer) {
@@ -28,10 +29,12 @@ export default class Shaco_R extends Spell {
   }
 
   onSpellCast() {
-    let clone = new Champion(this.game, this.owner.position.x, this.owner.position.y);
+    let clone = new Shaco_R_Clone(this.game, this.owner.position.x, this.owner.position.y);
     clone.avatar = this.owner.avatar;
-    clone.isAllied = this.owner.isAllied;
     clone.spells = [];
+    clone.championOwner = this.owner;
+    clone.maxRange = this.maxRange;
+    clone.teamId = this.owner.teamId;
     this.game.addPlayer(clone);
 
     this.clonePlayer = clone;
@@ -45,7 +48,7 @@ export default class Shaco_R extends Spell {
       this.timeSinceCloneCreated += deltaTime;
 
       // move clone to owner position if too far away
-      if (this.clonePlayer.position.dist(this.owner.position) > 1000) {
+      if (this.clonePlayer.position.dist(this.owner.position) > this.maxRange) {
         this.clonePlayer.position.set(this.owner.position.x, this.owner.position.y);
       }
 
@@ -87,6 +90,7 @@ export default class Shaco_R extends Spell {
         let enemies = this.game.queryPlayersInRange({
           position: clonePos,
           range: explodeRadius,
+          includePlayerSize: true,
           excludePlayers: [this.owner, this.clonePlayer],
         });
 
@@ -114,6 +118,24 @@ export default class Shaco_R extends Spell {
         this.image = AssetManager.getAsset('spell_shaco_r');
         this.currentCooldown = this.coolDown;
       }
+    }
+  }
+}
+
+class Shaco_R_Clone extends Champion {
+  championOwner = null;
+  maxRange = 1000;
+
+  draw() {
+    super.draw();
+
+    // draw circle if clone too far away from owner
+    let distance = this.position.dist(this.championOwner.position);
+    if (distance > this.maxRange / 2) {
+      let alpha = map(distance, this.maxRange / 2, this.maxRange, 0, 255);
+      noFill();
+      stroke(255, alpha);
+      circle(this.position.x, this.position.y, this.maxRange * 2);
     }
   }
 }
