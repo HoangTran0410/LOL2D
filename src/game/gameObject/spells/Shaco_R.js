@@ -130,6 +130,7 @@ class Shaco_R_Clone extends Champion {
     super.draw();
 
     // draw circle if clone too far away from owner
+    if (this.championOwner != this.game.player) return;
     let distance = this.position.dist(this.championOwner.position);
     if (distance > this.maxRange / 2) {
       let alpha = map(distance, this.maxRange / 2, this.maxRange, 0, 255);

@@ -1,6 +1,4 @@
 import SpellState from '../enums/SpellState.js';
-import StatusFlags from '../enums/StatusFlags.js';
-import { hasFlag } from '../../utils/index.js';
 
 export default class Spell {
   // for display in HUD

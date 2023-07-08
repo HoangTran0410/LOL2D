@@ -63,6 +63,12 @@ export default class InGameHUD {
           this.showSpellsPicker = false;
           this.game.unpause();
         },
+        mouseover(spell) {
+          this.spellHover = spell;
+        },
+        mouseout(spell) {
+          this.spellHover = null;
+        },
       },
       computed: {
         filteredSpells() {
@@ -84,7 +90,7 @@ export default class InGameHUD {
             <div class="champion-details">
                 <div class="spells">
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
-                        @click="changeSpell(index)">
+                        @click="changeSpell(index)" @mouseover="mouseover(spell)" @mouseout="mouseout(spell)">
                         <img :src="spell.image" alt="spell"
                             :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
@@ -188,6 +194,8 @@ export default class InGameHUD {
         const { disabled, image, coolDown, state, currentCooldown, name, description } =
           spell || {};
         return {
+          instance: spell,
+
           image: image?.path,
           disabled,
           coolDown,
@@ -220,6 +228,16 @@ export default class InGameHUD {
           timeLeftText: Math.ceil(timeLeft / 1000),
         };
       });
+
+    // draw spell preview on hover
+    if (this.vueInstance.spellHover) {
+      try {
+        let spell = Vue.toRaw(this.vueInstance.spellHover.instance);
+        spell.willDrawPreview = true;
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }
 
   destroy() {
