@@ -14,6 +14,7 @@ export default class Fear extends Buff {
   statusFlagsToEnable = StatusFlags.Feared;
 
   speed = 1;
+  sourcePosition = null;
 
   particleSystem = new ParticleSystem({
     isDeadFn: p => p.r > p.maxR,
@@ -37,10 +38,14 @@ export default class Fear extends Buff {
   }
 
   onUpdate() {
-    if (this.sourceUnit?.position && this.targetUnit && !this.targetUnit.isDead) {
+    if (
+      (this.sourcePosition || this.sourceUnit?.position) &&
+      this.targetUnit &&
+      !this.targetUnit.isDead
+    ) {
       let destination = this.targetUnit.position
         .copy()
-        .sub(this.sourceUnit.position)
+        .sub(this.sourcePosition || this.sourceUnit.position)
         .setMag(1000)
         .add(this.targetUnit.position);
       VectorUtils.moveVectorToVector(this.targetUnit.position, destination, this.speed);

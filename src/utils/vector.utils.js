@@ -17,6 +17,9 @@ const VectorUtils = {
   moveVectorToVector(vector, targetVector, speed) {
     return vector.add(p5.Vector.sub(targetVector, vector).setMag(speed));
   },
+  getDirectionVector(from, to) {
+    return p5.Vector.sub(to, from).normalize();
+  },
 };
 
 export default VectorUtils;

@@ -26,3 +26,4 @@ export { default as Ahri_W } from './Ahri_W.js';
 export { default as Ahri_E } from './Ahri_E.js';
 export { default as Ahri_R } from './Ahri_R.js';
 export { default as Veigar_E } from './Veigar_E.js';
+export { default as Shaco_W } from './Shaco_W.js';

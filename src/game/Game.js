@@ -26,7 +26,10 @@ export default class Game {
     this.worldMouse = createVector(0, 0);
 
     // init players
-    for (let i = 0; i < 5; i++) {
+    let aiCount = 5;
+    let dummyCount = 1;
+
+    for (let i = 0; i < aiCount; i++) {
       let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
@@ -34,20 +37,18 @@ export default class Game {
       this.players.push(champ);
     }
 
+    // dummy
+    for (let i = 0; i < dummyCount; i++) {
+      let preset = getRandomChampionPreset();
+      let pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
+      this.players.push(new DummyChampion(this, pos.x, pos.y, preset));
+    }
+
     let preset = getRandomChampionPreset();
-    let pos = this.getRandomSpawnLocation();
-    // let pos = createVector(3200, 3200);
+    // let pos = this.getRandomSpawnLocation();
+    let pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
     this.players.push(this.player);
-
-    // dummy
-    preset = getRandomChampionPreset();
-    pos = createVector(3200, 3200);
-    this.players.push(new DummyChampion(this, pos.x, pos.y, preset));
-
-    preset = getRandomChampionPreset();
-    pos = createVector(3400, 3200);
-    this.players.push(new DummyChampion(this, pos.x, pos.y, preset));
 
     // camera follow player
     this.camera.target = this.player.position;

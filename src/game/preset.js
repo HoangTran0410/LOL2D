@@ -118,6 +118,19 @@ export const ChampionPreset = {
       AllSpells.Ghost,
     ],
   },
+  shaco: {
+    name: 'Shaco',
+    avatar: 'champ_shaco',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.LeeSin_Q,
+      AllSpells.Shaco_W,
+      AllSpells.Yasuo_E,
+      AllSpells.LeeSin_R,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
 };
 
 export const getRandomChampionPreset = () => {

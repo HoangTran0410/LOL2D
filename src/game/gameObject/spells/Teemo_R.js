@@ -19,15 +19,15 @@ export default class Teemo_R extends Spell {
       lifeTime = 20000,
       explodeRange = 200;
 
-    let { from, to: destination } = VectorUtils.getVectorWithMaxRange(
+    let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.game.worldMouse,
       throwRange
     );
 
     let obj = new Teemo_R_Object(this.owner);
-    obj.position = this.owner.position.copy();
-    obj.destination = destination;
+    obj.position = from;
+    obj.destination = to;
     obj.invisibleAfter = invisibleAfter;
     obj.lifeTime = lifeTime;
     obj.explodeRange = explodeRange;
