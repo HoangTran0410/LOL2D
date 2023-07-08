@@ -34,9 +34,11 @@ export class Ghost_Buff extends Buff {
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
 
+  percent = 0.5;
+
   onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = 0.5;
+    this.statsModifier.speed.percentBaseBonus = this.percent;
   }
 
   onActivate() {

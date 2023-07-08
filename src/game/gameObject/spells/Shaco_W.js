@@ -9,7 +9,7 @@ export default class Shaco_W extends Spell {
   name = 'Hộp Hề Ma Quái (Shaco_W)';
   description =
     'Tạo một Hộp Hề Ma Quái tàng hình sau 1s, tồn tại trong 20s. Khi kẻ địch tới gần, nó sẽ gây hoảng sợ và tấn công các kẻ địch xung quanh trong 3s, gây 5 sát thương mỗi lần tấn công.';
-  coolDown = 1000;
+  coolDown = 5000;
 
   onSpellCast() {
     let { from, to } = VectorUtils.getVectorWithMaxRange(

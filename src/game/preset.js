@@ -123,7 +123,7 @@ export const ChampionPreset = {
     avatar: 'champ_shaco',
     spells: [
       AllSpells.Heal,
-      AllSpells.LeeSin_Q,
+      AllSpells.Shaco_Q,
       AllSpells.Shaco_W,
       AllSpells.Yasuo_E,
       AllSpells.LeeSin_R,

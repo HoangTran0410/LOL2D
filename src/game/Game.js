@@ -27,7 +27,7 @@ export default class Game {
 
     // init players
     let aiCount = 5;
-    let dummyCount = 1;
+    let dummyCount = 2;
 
     for (let i = 0; i < aiCount; i++) {
       let preset = getRandomChampionPreset();

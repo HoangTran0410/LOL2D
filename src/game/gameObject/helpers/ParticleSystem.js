@@ -96,4 +96,20 @@ export const PredefinedParticleSystems = {
         circle(p.x, p.y, p.r * 2 + random(-3, 3));
       },
     }),
+
+  smoke: (colour = [255, 255, 100], spreadSpeed = 0.1, opacitySpeed = 2) =>
+    new ParticleSystem({
+      isDeadFn: p => p.opacity <= 0,
+      updateFn: p => {
+        p.x += random(-2, 2);
+        p.y += random(-2, 2);
+        p.size += spreadSpeed;
+        p.opacity -= opacitySpeed;
+      },
+      drawFn: p => {
+        noStroke();
+        fill(...colour, p.opacity);
+        circle(p.x, p.y, p.size);
+      },
+    }),
 };

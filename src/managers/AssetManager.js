@@ -50,6 +50,7 @@ const AssetPaths = {
   spell_ahri_e: 'assets/images/spells/ahri_e.png',
   spell_ahri_r: 'assets/images/spells/ahri_r.png',
   spell_veigar_e: 'assets/images/spells/veigar_e.png',
+  spell_shaco_q: 'assets/images/spells/shaco_q.png',
   spell_shaco_w: 'assets/images/spells/shaco_w.png',
 
   // buffs
@@ -61,6 +62,7 @@ const AssetPaths = {
   buff_charm: 'assets/images/buffs/charm.png',
   buff_nearsight: 'assets/images/buffs/nearsight.png',
   buff_fear: 'assets/images/buffs/fear.png',
+  buff_invisible: 'assets/images/buffs/invisible.png',
 
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',

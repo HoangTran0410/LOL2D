@@ -7,8 +7,9 @@ import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Stun from './Stun.js';
 import TrailSystem from '../helpers/TrailSystem.js';
+import Fear from './Fear.js';
+import Charm from './Charm.js';
 
-// Lướt
 export default class Dash extends Buff {
   image = AssetManager.getAsset('buff_root');
   name = 'Lướt';
@@ -26,7 +27,7 @@ export default class Dash extends Buff {
   dashDestination = null;
   stayAtDestination = true;
   cancelable = true;
-  buffsToCheckCancel = [Airborne, Root, Stun];
+  buffsToCheckCancel = [Airborne, Root, Stun, Fear, Charm];
 
   statusFlagsToEnable = StatusFlags.Ghosted;
 

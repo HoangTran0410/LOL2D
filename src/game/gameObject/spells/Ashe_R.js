@@ -72,7 +72,6 @@ export class Ashe_R_Object extends SpellObject {
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.explodeSize / 2,
-          includePlayerSize: true,
           excludePlayers: [this.owner],
         });
         enemies.forEach(p => {

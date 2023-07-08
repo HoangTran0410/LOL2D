@@ -214,6 +214,10 @@ export default class Champion {
     this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
     this.animatedHealth = lerp(this.animatedHealth || 0, this.stats.health.value, 0.2);
     this.animatedMana = lerp(this.animatedMana || 0, this.stats.mana.value, 0.2);
+    this.animatedAlphaColor =
+      this.alphaColor > this.animatedAlphaColor
+        ? lerp(this.animatedAlphaColor || 0, this.alphaColor, 0.2) // smooth fade in
+        : this.alphaColor; // instant fade out
 
     if (this.isDead) {
       this.reviveAfter -= deltaTime;
@@ -226,10 +230,10 @@ export default class Champion {
   draw() {
     if (hasFlag(this.stats.actionState, ActionState.NO_RENDER)) return;
     let isInsideBush = hasFlag(this.status, StatusFlags.InBush);
-    let alpha = isInsideBush
+    this.alphaColor = isInsideBush
       ? 100
       : hasFlag(this.stats.actionState, ActionState.STEALTHED)
-      ? 40
+      ? 20
       : 255;
 
     push();
@@ -244,6 +248,7 @@ export default class Champion {
     let mana = this.stats.mana.value;
     let maxMana = this.stats.maxMana.value;
     let pos = this.position.copy();
+    let alpha = this.animatedAlphaColor;
 
     noStroke();
     fill(240, alpha);
@@ -359,7 +364,8 @@ export default class Champion {
     } else {
       let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
         .map(BuffClass => {
-          return this.hasBuff(BuffClass) ? new BuffClass().name : '';
+          let buff = this.buffs.find(b => b instanceof BuffClass);
+          if (buff && buff.sourceUnit !== this) return buff.name;
         })
         .filter(Boolean)
         .join(', ');

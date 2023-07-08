@@ -2,7 +2,7 @@ import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import ParticleSystem from '../helpers/ParticleSystem.js';
+import ParticleSystem, { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 
 export default class Flash extends Spell {
   name = 'Tốc Biến (Flash)';
@@ -27,8 +27,7 @@ export default class Flash extends Spell {
     let newPosEffect = new Flash_Object(this.owner);
     this.game.addSpellObject(newPosEffect);
 
-    let oldPosEffect = new Flash_Object(this.owner);
-    oldPosEffect.position = oldPos;
+    let oldPosEffect = new Flash_Object(this.owner, oldPos);
     this.game.addSpellObject(oldPosEffect);
 
     playSound(SOUNDS.flash);
@@ -41,30 +40,17 @@ export default class Flash extends Spell {
 }
 
 export class Flash_Object extends SpellObject {
-  particleSystem = new ParticleSystem({
-    isDeadFn: p => p.opacity <= 0,
-    updateFn: p => {
-      p.x += random(-2, 2);
-      p.y += random(-2, 2);
-      p.size += 0.1;
-      p.opacity -= 2;
-    },
-    drawFn: p => {
-      noStroke();
-      fill(255, 255, 100, p.opacity);
-      circle(this.position.x + p.x, this.position.y + p.y, p.size);
-    },
-  });
+  particleSystem = PredefinedParticleSystems.smoke([255, 255, 100]);
 
-  constructor(owner) {
+  constructor(owner, position) {
     super(owner);
-    this.position = this.owner.position.copy();
 
+    let pos = position || this.owner.position;
     let size = this.owner.stats.size.value / 2;
     for (let i = 0; i < 10; i++) {
       this.particleSystem.addParticle({
-        x: random(-size, size),
-        y: random(-size, size),
+        x: pos.x + random(-size, size),
+        y: pos.y + random(-size, size),
         size: random(10, 20),
         opacity: random(100, 200),
       });
@@ -78,27 +64,5 @@ export class Flash_Object extends SpellObject {
 
   draw() {
     this.particleSystem.draw();
-  }
-}
-
-export class Flash_Object2 extends SpellObject {
-  opacity = 255;
-  position = this.owner.position.copy();
-
-  update() {
-    this.opacity -= 3;
-
-    if (this.opacity <= 0) {
-      this.toRemove = true;
-    }
-  }
-
-  draw() {
-    // draw a circle have size = owner size
-    push();
-    stroke(255, 0, 0, this.opacity + random(100));
-    fill(100, 100, 100, this.opacity + random(-30, 30));
-    circle(this.position.x, this.position.y, this.owner.stats.size.value + 3);
-    pop();
   }
 }
