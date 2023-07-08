@@ -31,7 +31,7 @@ export default class Game {
     let dummyCount = 1;
 
     for (let i = 0; i < aiCount; i++) {
-      let preset = ChampionPreset.shaco; // getRandomChampionPreset();
+      let preset = getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
       let champ = new AIChampion(this, pos.x, pos.y, preset);
