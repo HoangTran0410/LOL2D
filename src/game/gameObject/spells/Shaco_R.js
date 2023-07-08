@@ -92,6 +92,7 @@ export default class Shaco_R extends Spell {
 
         enemies.forEach(e => {
           let fearBuff = new Fear(1000, this.owner, e);
+          fearBuff.sourcePosition = clonePos;
           e.addBuff(fearBuff);
           e.takeDamage(30, this.owner);
         });
