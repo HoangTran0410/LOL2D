@@ -9,7 +9,7 @@ export default class Shaco_W extends Spell {
   image = AssetManager.getAsset('spell_shaco_w');
   name = 'Hộp Hề Ma Quái (Shaco_W)';
   description =
-    'Tạo một Hộp Hề Ma Quái tàng hình sau 1s, tồn tại trong 20s. Khi kẻ địch tới gần, nó sẽ gây hoảng sợ và tấn công các kẻ địch xung quanh trong 3s, gây 5 sát thương mỗi lần tấn công.';
+    'Tạo một Hộp Hề Ma Quái tàng hình sau 1s, tồn tại trong 20s. Khi kẻ địch tới gần, nó sẽ gây hoảng sợ và tấn công các kẻ địch xung quanh trong 3s, gây 7 sát thương mỗi lần tấn công.';
   coolDown = 5000;
 
   onSpellCast() {
@@ -41,7 +41,7 @@ export class Shaco_W_Object extends SpellObject {
   fearRange = 100;
   attackRange = 150;
   attackCooldown = 500;
-  attackDamage = 10;
+  attackDamage = 7;
   attackMaxCount = 3;
   timeSinceLastAttack = this.attackCooldown;
   attackLifeTime = 3000;
@@ -169,7 +169,7 @@ export class Shaco_W_Bullet_Object extends SpellObject {
   position = createVector();
   targetEnemy = null;
   speed = 10;
-  damage = 10;
+  damage = 7;
   hitEffectDuration = 300;
   timeSinceHit = 0;
 

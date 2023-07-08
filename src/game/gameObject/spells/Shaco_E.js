@@ -76,5 +76,5 @@ export class Shaco_E_Object extends Shaco_W_Bullet_Object {
   strokeColor = [255, 150, 50];
   lazerWidth = 10;
   lazerLength = 20;
-  speed = 6;
+  speed = 8;
 }

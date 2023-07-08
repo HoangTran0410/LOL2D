@@ -28,7 +28,7 @@ export default class Game {
 
     // init players
     let aiCount = 5;
-    let dummyCount = 3;
+    let dummyCount = 1;
 
     for (let i = 0; i < aiCount; i++) {
       let preset = ChampionPreset.shaco; // getRandomChampionPreset();

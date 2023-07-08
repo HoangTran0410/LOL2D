@@ -80,6 +80,10 @@ export default class LeeSin_R extends Spell {
       stunBuff.image = this.image;
       closestEnemyToMouse.addBuff(stunBuff);
     };
+    dashBuff.addDeactivateListener(() => {
+      airborneBuff.deactivateBuff();
+      obj.toRemove = true;
+    });
     closestEnemyToMouse.addBuff(dashBuff);
 
     // apply damage to target enemy
