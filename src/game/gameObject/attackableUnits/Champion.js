@@ -14,6 +14,7 @@ import SAT from '../../../../libs/SAT.js';
 import Charm from '../buffs/Charm.js';
 import ActionState from '../../enums/ActionState.js';
 import Fear from '../buffs/Fear.js';
+import CombatText from '../helpers/CombatText.js';
 
 export default class Champion {
   isAllied = true;
@@ -140,6 +141,11 @@ export default class Champion {
   }
 
   takeDamage(damage, source) {
+    let damageText = new CombatText(this);
+    damageText.text = ' - ' + ~~damage;
+    damageText.textColor = [255, 0, 0];
+    this.game.addSpellObject(damageText);
+
     if (this.isDead) return;
 
     this.stats.health.baseValue -= damage;

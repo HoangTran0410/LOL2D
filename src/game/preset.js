@@ -125,7 +125,7 @@ export const ChampionPreset = {
       AllSpells.Heal,
       AllSpells.Shaco_Q,
       AllSpells.Shaco_W,
-      AllSpells.Yasuo_E,
+      AllSpells.Shaco_E,
       AllSpells.LeeSin_R,
       AllSpells.Flash,
       AllSpells.Ghost,

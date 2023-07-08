@@ -2,6 +2,7 @@ import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { StatModifier } from '../Stat.js';
+import CombatText from '../helpers/CombatText.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
 import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
@@ -39,6 +40,14 @@ export default class Heal extends Spell {
     ghostBuff.addDeactivateListener(() => {
       ghostBuffObject.toRemove = true;
     });
+
+    // combat text
+    if (newHeal > currentHeal) {
+      let combatText = new CombatText(this.owner);
+      combatText.text = `+ ${~~(newHeal - currentHeal)}`;
+      combatText.textColor = [0, 255, 0];
+      this.game.addSpellObject(combatText);
+    }
   }
 }
 

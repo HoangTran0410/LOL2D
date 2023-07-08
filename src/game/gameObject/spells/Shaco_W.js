@@ -3,6 +3,7 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Fear from '../buffs/Fear.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Shaco_W extends Spell {
   image = AssetManager.getAsset('spell_shaco_w');
@@ -169,7 +170,6 @@ export class Shaco_W_Bullet_Object extends SpellObject {
   targetEnemy = null;
   speed = 10;
   damage = 10;
-
   hitEffectDuration = 300;
   timeSinceHit = 0;
 
@@ -180,11 +180,24 @@ export class Shaco_W_Bullet_Object extends SpellObject {
 
   phase = Shaco_W_Bullet_Object.PHASES.MOVING;
 
+  // for display
+  lazerWidth = 5;
+  lazerLength = 20;
+  strokeColor = [255, 255, 0];
+  fillColor = [255, 150, 0];
+
+  trailSystem = new TrailSystem({
+    trailColor: [...this.strokeColor, 50],
+    trailSize: this.lazerWidth,
+    maxLength: 10,
+  });
+
   update() {
     // move phase
     if (this.phase === Shaco_W_Bullet_Object.PHASES.MOVING) {
       if (this.position.dist(this.targetEnemy.position) > this.speed) {
         VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.speed);
+        this.trailSystem.addTrail(this.position);
       } else {
         // hit target
         this.targetEnemy.takeDamage(this.damage, this.owner);
@@ -206,15 +219,14 @@ export class Shaco_W_Bullet_Object extends SpellObject {
 
     // move phase
     if (this.phase === Shaco_W_Bullet_Object.PHASES.MOVING) {
-      // draw lazer line with length 15
+      this.trailSystem.draw();
+
       let dir = VectorUtils.getDirectionVector(this.position, this.targetEnemy.position);
-      let lazerWidth = 5,
-        lazerLength = 20;
-      strokeWeight(lazerWidth);
-      stroke(255, 255, 0);
+      strokeWeight(this.lazerWidth);
+      stroke(...this.strokeColor);
       line(
-        this.position.x - dir.x * lazerLength,
-        this.position.y - dir.y * lazerLength,
+        this.position.x - dir.x * this.lazerLength,
+        this.position.y - dir.y * this.lazerLength,
         this.position.x,
         this.position.y
       );
@@ -226,8 +238,8 @@ export class Shaco_W_Bullet_Object extends SpellObject {
       let targetSize = this.targetEnemy.stats.size.value;
       let alpha = map(this.timeSinceHit, 0, this.hitEffectDuration, 150, 0);
       let size = map(this.timeSinceHit, 0, this.hitEffectDuration, targetSize, targetSize + 50);
-      stroke(255, 255, 0, alpha + 20);
-      fill(255, 150, 0, alpha);
+      stroke(...this.strokeColor, alpha + 20);
+      fill(...this.fillColor, alpha);
       circle(this.targetEnemy.position.x, this.targetEnemy.position.y, size);
     }
     pop();

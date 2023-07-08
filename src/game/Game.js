@@ -8,6 +8,7 @@ import FogOfWar from './gameObject/map/FogOfWar.js';
 import InGameHUD from './hud/InGameHUD.js';
 import DummyChampion from './gameObject/attackableUnits/DummyChampion.js';
 import SpellObject from './gameObject/SpellObject.js';
+import CombatText from './gameObject/helpers/CombatText.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -27,10 +28,10 @@ export default class Game {
 
     // init players
     let aiCount = 5;
-    let dummyCount = 2;
+    let dummyCount = 3;
 
     for (let i = 0; i < aiCount; i++) {
-      let preset = getRandomChampionPreset();
+      let preset = ChampionPreset.shaco; // getRandomChampionPreset();
       let pos = this.getRandomSpawnLocation();
       // pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
       let champ = new AIChampion(this, pos.x, pos.y, preset);
@@ -139,7 +140,7 @@ export default class Game {
       this.terrainMap.draw();
       this.terrainMap.drawEdges();
 
-      for (let o of this.objects) o.draw();
+      for (let o of this.objects) if (!(o instanceof CombatText)) o.draw();
     });
 
     this.fogOfWar.draw(); // draw fog of war on top of everything, except players
@@ -157,6 +158,9 @@ export default class Game {
       let playerToDraw = this.player.visiblePlayers ?? [];
       for (let p of playerToDraw) p.isDead && p.draw();
       for (let p of playerToDraw) !p.isDead && p.draw(); // alive players on top of dead players
+
+      // draw combat text
+      for (let o of this.objects) if (o instanceof CombatText) o.draw();
     });
   }
 
