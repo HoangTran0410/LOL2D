@@ -34,7 +34,7 @@ export const ChampionPreset = {
       AllSpells.Heal,
       AllSpells.Blitzcrank_Q,
       AllSpells.Blitzcrank_W,
-      AllSpells.Yasuo_E,
+      AllSpells.Veigar_E,
       AllSpells.Blitzcrank_R,
       AllSpells.Flash,
       AllSpells.Ghost,
