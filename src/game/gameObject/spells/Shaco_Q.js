@@ -52,7 +52,7 @@ export class Shaco_Q_Buff extends Ghost_Buff {
 }
 
 export class Shaco_Q_Object extends SpellObject {
-  particleSystem = PredefinedParticleSystems.smoke([200], 2, 3);
+  particleSystem = PredefinedParticleSystems.smoke([255, 130, 80], 2, 3);
 
   constructor(owner, position) {
     super(owner);

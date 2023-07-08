@@ -2,7 +2,7 @@ import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import ParticleSystem, { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 
 export default class Flash extends Spell {
   name = 'Tốc Biến (Flash)';
