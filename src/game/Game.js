@@ -81,8 +81,16 @@ export default class Game {
       }
       return true;
     });
-
     for (let o of this.objects) o.update();
+
+    // update players
+    this.players = this.players.filter(p => {
+      if (p.toRemove) {
+        p.onBeforeRemove?.();
+        return false;
+      }
+      return true;
+    });
     for (let p of this.players) p.update();
 
     // update terrain map, check for collision
@@ -179,6 +187,11 @@ export default class Game {
     if (!(spellObject instanceof SpellObject))
       throw new Error('spellObject must be an instance of SpellObject');
     this.objects.push(spellObject);
+  }
+
+  addPlayer(player) {
+    if (!(player instanceof Champion)) throw new Error('player must be an instance of Champion');
+    this.players.push(player);
   }
 
   queryObjects({ type, getOnlyOne = false, customFilter = null }) {

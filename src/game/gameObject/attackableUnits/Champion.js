@@ -22,6 +22,7 @@ export default class Champion {
   showName = false;
   score = 0;
   reviveAfter = 0;
+  toRemove = false;
 
   buffs = [];
   stats = new Stats();

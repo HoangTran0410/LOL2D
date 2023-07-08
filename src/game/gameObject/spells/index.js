@@ -29,3 +29,4 @@ export { default as Veigar_E } from './Veigar_E.js';
 export { default as Shaco_Q } from './Shaco_Q.js';
 export { default as Shaco_W } from './Shaco_W.js';
 export { default as Shaco_E } from './Shaco_E.js';
+export { default as Shaco_R } from './Shaco_R.js';

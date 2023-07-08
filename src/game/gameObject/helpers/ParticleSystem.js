@@ -114,4 +114,23 @@ export const PredefinedParticleSystems = {
         circle(p.x, p.y, p.size);
       },
     }),
+
+  // explode: ({x, y, range = 100, particlesCount = 30, color }) => {
+  //   let system = new ParticleSystem({
+  //     isDeadFn: p => p.opacity <= 0,
+  //     updateFn: p => {
+  //       p.x += p.vx || 0;
+  //       p.y += p.vy || 0;
+  //       p.opacity -= 2;
+  //     },
+  //     drawFn: p => {
+  //       noStroke();
+  //       fill(255, 255, 100,)
+  //     },
+  //   });
+
+  //   for (let i = 0; i < particlesCount; i++) {}
+
+  //   return system;
+  // },
 };
