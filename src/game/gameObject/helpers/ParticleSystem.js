@@ -12,6 +12,7 @@ export default class ParticleSystem extends SpellObject {
     drawFn,
     postDrawFn,
     maxParticles = 200,
+    autoRemoveIfEmpty = true,
     owner,
   }) {
     super(owner);
@@ -23,6 +24,7 @@ export default class ParticleSystem extends SpellObject {
     this.drawFn = drawFn;
     this.postDrawFn = postDrawFn;
     this.maxParticles = maxParticles;
+    this.autoRemoveIfEmpty = autoRemoveIfEmpty;
   }
 
   addParticle(particle) {
@@ -42,7 +44,7 @@ export default class ParticleSystem extends SpellObject {
 
         // if all particles are dead, remove this particle system
         // particle system only be removed if there was particle added
-        if (this.particles.length === 0) {
+        if (this.autoRemoveIfEmpty && this.particles.length === 0) {
           this.toRemove = true;
         }
       }

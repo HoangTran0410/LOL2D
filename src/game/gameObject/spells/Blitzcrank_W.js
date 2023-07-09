@@ -2,7 +2,7 @@ import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import Slow from '../buffs/Slow.js';
-import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
+import Speedup from '../buffs/Speedup.js';
 
 export default class Blitzcrank_W extends Spell {
   name = 'Tăng Tốc (Blitzcrank_W)';
@@ -12,30 +12,17 @@ export default class Blitzcrank_W extends Spell {
   manaCost = 20;
 
   onSpellCast() {
-    let speedUpEffect = new Ghost_Buff_Object(this.owner);
-
-    let speedupBuff = new Blitzcrank_W_Buff(4000, this.owner, this.owner);
-    speedupBuff.addDeactivateListener(() => {
-      let slowDownBuff = new Blitzcrank_W2_Buff(1000, this.owner, this.owner);
-      this.owner.addBuff(slowDownBuff);
-
-      speedUpEffect.toRemove = true;
+    let speedBuff = new Speedup(4000, this.owner, this.owner);
+    speedBuff.image = this.image;
+    speedBuff.percent = 0.5;
+    speedBuff.addDeactivateListener(() => {
+      let slowBuff = new Slow(1000, this.owner, this.owner);
+      slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+      slowBuff.image = this.image;
+      slowBuff.percent = 0.75;
+      this.owner.addBuff(slowBuff);
     });
 
-    this.owner.addBuff(speedupBuff);
-    this.game.addSpellObject(speedUpEffect);
+    this.owner.addBuff(speedBuff);
   }
-}
-
-export class Blitzcrank_W_Buff extends Ghost_Buff {
-  image = AssetManager.getAsset('spell_blitzcrank_w');
-  buffAddType = BuffAddType.STACKS_AND_OVERLAPS;
-  maxStacks = 3;
-  percent = 0.5;
-}
-
-export class Blitzcrank_W2_Buff extends Slow {
-  image = AssetManager.getAsset('spell_blitzcrank_w');
-  buffAddType = BuffAddType.RENEW_EXISTING;
-  percent = 0.75;
 }

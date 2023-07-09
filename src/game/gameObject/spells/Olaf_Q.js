@@ -1,16 +1,17 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
-import { Ghost_Buff } from './Ghost.js';
+import Speedup from '../buffs/Speedup.js';
+import ParticleSystem from '../helpers/ParticleSystem.js';
+import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Olaf_Q extends Spell {
   image = AssetManager.getAsset('spell_olaf_q');
   name = 'Phóng Rìu (Olaf_Q)';
   description =
-    'Ném rìu đến điểm chỉ định, gây 15 sát thương và làm chậm 40% trong 1s cho những kẻ địch nó đi qua, bạn cũng nhận được 30% tốc chạy trong 1s nếu ném trúng. Rìu tồn tại trong 5s, nếu nhặt được rìu, thời gian hồi chiêu được giảm 60%.';
+    'Ném rìu đến điểm chỉ định, gây 15 sát thương và làm chậm 40% trong 1s cho những kẻ địch nó đi qua, bạn cũng nhận được 30% tốc chạy trong 1s cho mỗi kẻ địch bị ném trúng. Rìu tồn tại trong 5s, nếu nhặt được rìu, thời gian hồi chiêu được giảm 60%.';
   coolDown = 5000;
 
   maxThrowRange = 350;
@@ -26,7 +27,8 @@ export default class Olaf_Q extends Spell {
     let axe = new Olaf_Q_Object(this.owner);
     axe.destination = to;
     axe.position = from;
-    axe.angle = to.copy().sub(from).heading();
+    axe.initialAngle = to.copy().sub(from).heading();
+    console.log(axe.initialAngle);
     axe.speed = 8.5;
     axe.waitForPickUpLifeTime = this.axeLifeTime;
     axe.damage = 20;
@@ -49,6 +51,7 @@ export class Olaf_Q_Object extends SpellObject {
   destination = this.owner.position.copy();
   spellSource = null;
   angle = 0;
+  initialAngle = 0;
   speed = 10;
   size = 30;
   pickupRange = 100;
@@ -65,12 +68,45 @@ export class Olaf_Q_Object extends SpellObject {
 
   playerEffected = [];
 
+  trailSystem = new TrailSystem({
+    trailSize: this.size,
+  });
+  particleSystem = new ParticleSystem({
+    isDeadFn: p => p.age > 1000,
+    updateFn: p => {
+      p.size += 1;
+      p.age += deltaTime;
+    },
+    drawFn: p => {
+      let alpha = map(p.age, 0, 1000, 200, 0);
+      noStroke();
+      fill(200, 150, 200, alpha);
+      circle(p.position.x, p.position.y, p.size);
+    },
+  });
+
+  constructor(owner) {
+    super(owner);
+
+    // game will handle update and draw for this system
+    this.game.addSpellObject(this.particleSystem);
+  }
+
+  get willRotateRight() {
+    return this.initialAngle > -PI / 2 && this.initialAngle < PI / 2;
+  }
+
   update() {
     // flying phase
     if (this.phase === Olaf_Q_Object.PHASES.FLYING) {
-      this.angle += 0.2;
+      if (this.willRotateRight) this.angle += 0.2;
+      else this.angle -= 0.2;
 
       VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+
+      let axeHead = this.position.copy().add(p5.Vector.fromAngle(this.angle).mult(this.size / 2));
+      this.trailSystem.addTrail(axeHead);
+
       if (this.position.dist(this.destination) < this.speed) {
         this.phase = Olaf_Q_Object.PHASES.WAIT_FOR_PICK_UP;
         this.isMissile = false;
@@ -91,12 +127,18 @@ export class Olaf_Q_Object extends SpellObject {
         enemy.addBuff(slowBuff);
         enemy.takeDamage(this.damage, this.owner);
         this.playerEffected.push(enemy);
+
+        this.particleSystem.addParticle({
+          position: enemy.position.copy(),
+          size: enemy.stats.size.value + 20,
+          age: 0,
+        });
       });
 
       // speed up owner if hit
       if (enemies.length > 0) {
-        let speedUpBuff = new Ghost_Buff(1000, this.owner, this.owner);
-        speedUpBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+        let speedUpBuff = new Speedup(1000, this.owner, this.owner);
+        // speedUpBuff.buffAddType = BuffAddType.RENEW_EXISTING;
         speedUpBuff.image = AssetManager.getAsset('spell_olaf_q');
         speedUpBuff.percent = 0.3;
         this.owner.addBuff(speedUpBuff);
@@ -128,20 +170,23 @@ export class Olaf_Q_Object extends SpellObject {
   }
 
   draw() {
+    this.trailSystem.draw();
+
     // draw axe shape, with small rect is the handle, and 2 triangle is the blade
     push();
-    noStroke();
+    stroke('#eeea');
+    strokeWeight(3);
     fill(200, 150, 200);
     translate(this.position.x, this.position.y);
     rotate(this.angle);
 
-    let handleLength = this.size * 1.5;
-    let handleWidth = 10;
-    let bladeSize = 30;
+    // prettier-ignore
+    let shape = [[-9,-2],[-2,-1],[6,-2],[7,4],[0,4],[2,0],[-9,0]]
+    if (!this.willRotateRight) shape = shape.map(([x, y]) => [-x, y]);
+    beginShape();
+    shape.forEach(([x, y]) => vertex(x * 5, y * 5));
+    endShape(CLOSE);
 
-    rect(-handleLength, -handleWidth / 2, handleLength, handleWidth);
-    triangle(0, bladeSize / 2, bladeSize / 3, -bladeSize, -bladeSize, -bladeSize);
-    triangle(0, -bladeSize / 2, bladeSize / 3, bladeSize, -bladeSize, bladeSize);
     pop();
 
     // wait for pick up phase

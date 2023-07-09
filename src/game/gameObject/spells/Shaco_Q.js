@@ -4,8 +4,8 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Invisible from '../buffs/Invisible.js';
+import Speedup from '../buffs/Speedup.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
-import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
 export default class Shaco_Q extends Spell {
   image = AssetManager.getAsset('spell_shaco_q');
@@ -30,25 +30,14 @@ export default class Shaco_Q extends Spell {
     this.owner.addBuff(insivibleBuff);
 
     // speedup buff
-    let speedUpEffect = new Ghost_Buff_Object(this.owner);
-    this.game.addSpellObject(speedUpEffect);
-
-    let speedupBuff = new Shaco_Q_Buff(2000, this.owner, this.owner);
-    speedupBuff.addDeactivateListener(() => {
-      speedUpEffect.toRemove = true;
-    });
+    let speedupBuff = new Speedup(2000, this.owner, this.owner);
+    speedupBuff.image = this.image;
+    speedupBuff.percent = 0.4;
     this.owner.addBuff(speedupBuff);
 
     let obj = new Shaco_Q_Object(this.owner, from);
     this.game.addSpellObject(obj);
   }
-
-  onUpdate() {}
-}
-
-export class Shaco_Q_Buff extends Ghost_Buff {
-  buffAddType = BuffAddType.REPLACE_EXISTING;
-  percent = 0.4;
 }
 
 export class Shaco_Q_Object extends SpellObject {

@@ -2,9 +2,9 @@ import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { StatModifier } from '../Stat.js';
+import Speedup from '../buffs/Speedup.js';
 import CombatText from '../helpers/CombatText.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
-import { Ghost_Buff, Ghost_Buff_Object } from './Ghost.js';
 
 export default class Heal extends Spell {
   name = 'Hồi Máu (Heal)';
@@ -30,16 +30,10 @@ export default class Heal extends Spell {
     // }
 
     // ghost buff for 1s
-    let ghostBuff = new Ghost_Buff(1000, this.owner, this.owner);
-    ghostBuff.image = this.image;
-    this.owner.addBuff(ghostBuff);
-
-    // ghost effect
-    let ghostBuffObject = new Ghost_Buff_Object(this.owner);
-    this.game.addSpellObject(ghostBuffObject);
-    ghostBuff.addDeactivateListener(() => {
-      ghostBuffObject.toRemove = true;
-    });
+    let speedBuff = new Speedup(1000, this.owner, this.owner);
+    speedBuff.image = this.image;
+    speedBuff.percent = 0.5;
+    this.owner.addBuff(speedBuff);
 
     // combat text
     if (newHeal > currentHeal) {

@@ -45,7 +45,7 @@ export default class Spell {
   }
 
   cast() {
-    this.willDrawPreview = true;
+    // this.willDrawPreview = true;
     if (this.state !== SpellState.READY) return;
     if (this.castCancelCheck()) return;
 
