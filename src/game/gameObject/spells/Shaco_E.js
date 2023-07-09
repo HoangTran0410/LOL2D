@@ -63,9 +63,8 @@ export default class Shaco_E extends Spell {
 
   drawPreview() {
     push();
-    stroke(200, 100);
-    strokeWeight(2);
     noFill();
+    stroke(200, 100);
     circle(this.owner.position.x, this.owner.position.y, this.range * 2);
     pop();
   }

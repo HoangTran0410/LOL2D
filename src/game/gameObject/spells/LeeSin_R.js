@@ -32,7 +32,7 @@ export default class LeeSin_R extends Spell {
 
     // If no enemies in range, reset cooldown
     if (!enemies?.length) {
-      this.currentCooldown = 0;
+      this.resetCoolDown();
       this.owner.moveTo(mouse.x, mouse.y);
       return;
     }
@@ -128,10 +128,9 @@ export default class LeeSin_R extends Spell {
 
   drawPreview() {
     push();
-    stroke(200, 200);
     noFill();
-    translate(this.owner.position.x, this.owner.position.y);
-    circle(0, 0, this.rangeToCheckEnemies * 2);
+    stroke(200, 100);
+    circle(this.owner.position.x, this.owner.position.y, this.rangeToCheckEnemies * 2);
     pop();
   }
 }

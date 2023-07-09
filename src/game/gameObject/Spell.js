@@ -65,7 +65,7 @@ export default class Spell {
       this.owner.stats.health.value < this.healthCost ||
       !this.checkCastCondition()
     ) {
-      this.resetSpellCast();
+      this.resetCoolDown();
       return true;
     }
 
@@ -74,13 +74,13 @@ export default class Spell {
 
   // Notes: Deactivate is never called as spell removal hasn't been added yet.
   deactivate() {
-    this.resetSpellCast();
+    this.resetCoolDown();
   }
 
-  resetSpellCast() {
-    this.state = SpellState.READY;
-    this.currentCastTime = 0;
-    this.currentChannelDuration = 0;
+  resetCoolDown() {
+    this.currentCooldown = 0;
+    // this.currentCastTime = 0;
+    // this.currentChannelDuration = 0;
   }
 
   // for override

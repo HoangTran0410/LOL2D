@@ -43,8 +43,8 @@ export default class Shaco_R extends Spell {
     this.game.addPlayer(clone);
 
     this.clonePlayer = clone;
-    this.currentCooldown = 0;
     this.image = AssetManager.getAsset('spell_shaco_r2');
+    this.resetCoolDown();
   }
 
   onUpdate() {

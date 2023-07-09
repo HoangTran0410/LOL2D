@@ -17,19 +17,32 @@ export default class Yasuo_R extends Spell {
   rangeToApplyAirborne = 200;
   timeToApplyAirborne = 1000;
 
+  checkCastCondition() {
+    return Dash.CanDash(this.owner);
+  }
+
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
 
-    // query all enemies that have height > 0 in range 500px
+    // query all enemies that have Airborne buff
     let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.rangeToFindEnemies,
-      customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
+
+      // has airborne buff from other unit
+      customFilter: p =>
+        p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length,
       excludePlayers: [this.owner],
     });
 
+    // if no enemy found, reset spell cast
+    if (enemies.length == 0) {
+      this.resetCoolDown();
+      return;
+    }
+
     // find enemy that is nearest to mouse
-    let nearestEnemy = null;
+    let nearestEnemy = enemies[0];
     let nearestDistance = Infinity;
     for (let enemy of enemies) {
       let distance = enemy.position.dist(mouse);
@@ -39,78 +52,73 @@ export default class Yasuo_R extends Spell {
       }
     }
 
-    if (nearestEnemy) {
-      // find all enemies that are in range 300px to nearest enemy
-      let enemiesInRange = this.game.queryPlayersInRange({
-        position: nearestEnemy.position,
-        range: this.rangeToApplyAirborne,
-        customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
-        excludePlayers: [this.owner],
-      });
+    // find all enemies that are in range 300px to nearest enemy
+    let enemiesInRange = this.game.queryPlayersInRange({
+      position: nearestEnemy.position,
+      range: this.rangeToApplyAirborne,
+      customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
+      excludePlayers: [this.owner],
+    });
 
-      // add airborne buff to owner
-      this.owner.addBuff(new Airborne(this.timeToApplyAirborne, this.owner, this.owner));
+    // add airborne buff to owner
+    this.owner.addBuff(new Airborne(this.timeToApplyAirborne, this.owner, this.owner));
 
-      // add airborne buff to all enemies in range
-      for (let enemy of enemiesInRange) {
-        let buff = new Airborne(this.timeToApplyAirborne, this.owner, enemy);
-        buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
-        buff.image = this.image;
-        buff.draw = () => {
-          push();
-          strokeWeight(5);
-          stroke(255, 200);
+    // add airborne buff to all enemies in range
+    for (let enemy of enemiesInRange) {
+      let buff = new Airborne(this.timeToApplyAirborne, this.owner, enemy);
+      buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+      buff.image = this.image;
+      buff.draw = () => {
+        push();
+        strokeWeight(5);
+        stroke(255, 200);
 
-          // draw random lines inside enemy
-          let { x, y } = enemy.position;
-          let size = enemy.stats.size.value;
-          stroke(random(200, 255));
-          for (let i = 0; i < 1; i++) {
-            let x1 = x + random(-size, size);
-            let y1 = y + random(-size, size);
-            let x2 = x + random(-size, size);
-            let y2 = y + random(-size, size);
-            line(x1, y1, x2, y2);
-          }
+        // draw random lines inside enemy
+        let { x, y } = enemy.position;
+        let size = enemy.stats.size.value;
+        stroke(random(200, 255));
+        for (let i = 0; i < 1; i++) {
+          let x1 = x + random(-size, size);
+          let y1 = y + random(-size, size);
+          let x2 = x + random(-size, size);
+          let y2 = y + random(-size, size);
+          line(x1, y1, x2, y2);
+        }
 
-          // draw line from owner to enemy
-          stroke(100, 100, 255);
-          line(this.owner.position.x, this.owner.position.y, x, y);
-          pop();
-        };
-        enemy.addBuff(buff);
-        enemy.takeDamage(30, this.owner);
-      }
-
-      // add spell object animation
-      let obj = new Yasuo_R_Object(this.owner);
-      obj.position = nearestEnemy.position.copy();
-      obj.size = this.rangeToApplyAirborne * 2;
-      obj.lifeTime = this.timeToApplyAirborne;
-      this.game.addSpellObject(obj);
-
-      // dash owner to behind (10px) nearest enemy
-      let nearEnemyPos = mouse
-        .copy()
-        .sub(nearestEnemy.position)
-        .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value / 2 + 10)
-        .add(nearestEnemy.position);
-
-      let dashBuff = new Dash(1000, this.owner, this.owner);
-      dashBuff.dashDestination = nearEnemyPos;
-      dashBuff.dashSpeed = 50;
-      dashBuff.cancelable = false;
-      this.owner.addBuff(dashBuff);
-    } else {
-      // if no enemy is found, reset cooldown
-      this.currentCooldown = 0;
+        // draw line from owner to enemy
+        stroke(100, 100, 255);
+        line(this.owner.position.x, this.owner.position.y, x, y);
+        pop();
+      };
+      enemy.addBuff(buff);
+      enemy.takeDamage(30, this.owner);
     }
+
+    // add spell object animation
+    let obj = new Yasuo_R_Object(this.owner);
+    obj.position = nearestEnemy.position.copy();
+    obj.size = this.rangeToApplyAirborne * 2;
+    obj.lifeTime = this.timeToApplyAirborne;
+    this.game.addSpellObject(obj);
+
+    // dash owner to behind (10px) nearest enemy
+    let nearEnemyPos = mouse
+      .copy()
+      .sub(nearestEnemy.position)
+      .setMag(nearestEnemy.stats.size.value + this.owner.stats.size.value / 2 + 10)
+      .add(nearestEnemy.position);
+
+    let dashBuff = new Dash(1000, this.owner, this.owner);
+    dashBuff.dashDestination = nearEnemyPos;
+    dashBuff.dashSpeed = 50;
+    dashBuff.cancelable = false;
+    this.owner.addBuff(dashBuff);
   }
 
   drawPreview() {
     push();
-    stroke(255, 100);
     noFill();
+    stroke(255, 100);
     circle(this.owner.position.x, this.owner.position.y, this.rangeToFindEnemies * 2);
     pop();
   }

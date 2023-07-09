@@ -14,14 +14,13 @@ export default class Yasuo_E extends Spell {
 
   rangeToFindEnemies = 180;
 
+  checkCastCondition() {
+    return Dash.CanDash(this.owner);
+  }
+
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
     this.owner.destination.set(mouse.x, mouse.y);
-
-    if (!Dash.CanDash(this.owner)) {
-      this.currentCooldown = 0;
-      return;
-    }
 
     // find all enemies in range
     let enemiesInRange = this.game.queryPlayersInRange({
@@ -30,7 +29,7 @@ export default class Yasuo_E extends Spell {
       excludePlayers: [this.owner],
     });
     if (enemiesInRange.length == 0) {
-      this.currentCooldown = 0;
+      this.resetCoolDown();
       return;
     }
 
@@ -55,13 +54,11 @@ export default class Yasuo_E extends Spell {
           this.owner.stats.size.value / 2
       );
 
-      let buff = new Yasuo_E_Buff(100000, this.owner, this.owner);
-      buff.buffAddType = BuffAddType.REPLACE_EXISTING;
-      buff.dashDestination = destination;
-      buff.dashSpeed = 8;
-
-      this.owner.addBuff(buff);
-      this.owner.destination.set(destination.x, destination.y);
+      let dashBuff = new Dash(2000, this.owner, this.owner);
+      dashBuff.image = this.image;
+      dashBuff.dashDestination = destination;
+      dashBuff.dashSpeed = 8;
+      this.owner.addBuff(dashBuff);
 
       nearestEnemy.takeDamage(10, this.owner);
 
@@ -71,13 +68,9 @@ export default class Yasuo_E extends Spell {
 
   drawPreview() {
     push();
-    stroke(255, 100);
     noFill();
+    stroke(255, 100);
     circle(this.owner.position.x, this.owner.position.y, this.rangeToFindEnemies * 2);
     pop();
   }
-}
-
-export class Yasuo_E_Buff extends Dash {
-  image = AssetManager.getAsset('spell_yasuo_e');
 }

@@ -56,6 +56,7 @@ const AssetPaths = {
   spell_shaco_r: 'assets/images/spells/shaco_r.png',
   spell_shaco_r2: 'assets/images/spells/shaco_r2.png',
   spell_malphite_r: 'assets/images/spells/malphite_r.png',
+  spell_olaf_q: 'assets/images/spells/olaf_q.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
