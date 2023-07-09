@@ -11,11 +11,11 @@ export default class Olaf_Q extends Spell {
   image = AssetManager.getAsset('spell_olaf_q');
   name = 'Phóng Rìu (Olaf_Q)';
   description =
-    'Ném rìu đến điểm chỉ định, gây 15 sát thương và làm chậm 40% trong 1s cho những kẻ địch nó đi qua, bạn cũng nhận được 30% tốc chạy trong 1s cho mỗi kẻ địch bị ném trúng. Rìu tồn tại trong 5s, nếu nhặt được rìu, thời gian hồi chiêu được giảm 60%.';
-  coolDown = 5000;
+    'Ném rìu đến điểm chỉ định, gây 15 sát thương và làm chậm 40% trong 1s cho những kẻ địch nó đi qua, bạn cũng nhận được 30% tốc chạy trong 1s cho mỗi kẻ địch bị ném trúng. Rìu tồn tại trong 4s, nếu nhặt được rìu, thời gian hồi chiêu được giảm 60%.';
+  coolDown = 7500;
 
   maxThrowRange = 350;
-  axeLifeTime = 5000;
+  axeLifeTime = 4000;
 
   onSpellCast() {
     let { from, to } = VectorUtils.getVectorWithMaxRange(
@@ -28,7 +28,6 @@ export default class Olaf_Q extends Spell {
     axe.destination = to;
     axe.position = from;
     axe.initialAngle = to.copy().sub(from).heading();
-    console.log(axe.initialAngle);
     axe.speed = 8.5;
     axe.waitForPickUpLifeTime = this.axeLifeTime;
     axe.damage = 20;
@@ -58,6 +57,7 @@ export class Olaf_Q_Object extends SpellObject {
   timeSinceReachedDestination = 0;
   waitForPickUpLifeTime = 5000;
   damage = 15;
+  color = [2, 151, 177];
 
   static PHASES = {
     FLYING: 'FLYING',
@@ -70,6 +70,7 @@ export class Olaf_Q_Object extends SpellObject {
 
   trailSystem = new TrailSystem({
     trailSize: this.size,
+    trailColor: [...this.color, 100],
   });
   particleSystem = new ParticleSystem({
     isDeadFn: p => p.age > 1000,
@@ -79,8 +80,8 @@ export class Olaf_Q_Object extends SpellObject {
     },
     drawFn: p => {
       let alpha = map(p.age, 0, 1000, 200, 0);
-      noStroke();
-      fill(200, 150, 200, alpha);
+      stroke(200, alpha + 10);
+      fill(...this.color, alpha);
       circle(p.position.x, p.position.y, p.size);
     },
   });
@@ -129,7 +130,7 @@ export class Olaf_Q_Object extends SpellObject {
         this.playerEffected.push(enemy);
 
         this.particleSystem.addParticle({
-          position: enemy.position.copy(),
+          position: enemy.position,
           size: enemy.stats.size.value + 20,
           age: 0,
         });
@@ -139,6 +140,7 @@ export class Olaf_Q_Object extends SpellObject {
       if (enemies.length > 0) {
         let speedUpBuff = new Speedup(1000, this.owner, this.owner);
         // speedUpBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+        speedUpBuff.maxStacks = 3;
         speedUpBuff.image = AssetManager.getAsset('spell_olaf_q');
         speedUpBuff.percent = 0.3;
         this.owner.addBuff(speedUpBuff);
@@ -172,13 +174,14 @@ export class Olaf_Q_Object extends SpellObject {
   draw() {
     this.trailSystem.draw();
 
-    // draw axe shape, with small rect is the handle, and 2 triangle is the blade
+    // draw axe shape
     push();
-    stroke('#eeea');
-    strokeWeight(3);
-    fill(200, 150, 200);
     translate(this.position.x, this.position.y);
     rotate(this.angle);
+
+    stroke('#eeea');
+    strokeWeight(3);
+    fill(...this.color, 200);
 
     // prettier-ignore
     let shape = [[-9,-2],[-2,-1],[6,-2],[7,4],[0,4],[2,0],[-9,0]]
@@ -193,7 +196,8 @@ export class Olaf_Q_Object extends SpellObject {
     if (this.phase === Olaf_Q_Object.PHASES.WAIT_FOR_PICK_UP) {
       // draw pickup range
       push();
-      fill(100, 30);
+      // fill(100, 30);
+      noFill();
       stroke(200, 100);
       let arcLength = map(
         this.timeSinceReachedDestination,
@@ -202,7 +206,7 @@ export class Olaf_Q_Object extends SpellObject {
         2 * PI,
         0
       );
-      arc(this.position.x, this.position.y, this.pickupRange, this.pickupRange, 0, arcLength, PIE);
+      arc(this.position.x, this.position.y, this.pickupRange, this.pickupRange, 0, arcLength);
       pop();
     }
   }

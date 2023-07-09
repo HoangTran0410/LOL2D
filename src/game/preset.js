@@ -131,6 +131,19 @@ export const ChampionPreset = {
       AllSpells.Ghost,
     ],
   },
+  olaf: {
+    name: 'Olaf',
+    avatar: 'champ_olaf',
+    spells: [
+      AllSpells.Heal,
+      AllSpells.Olaf_Q,
+      AllSpells.Olaf_Q,
+      AllSpells.Olaf_Q,
+      AllSpells.Olaf_Q,
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  },
 };
 
 export const getRandomChampionPreset = () => {
