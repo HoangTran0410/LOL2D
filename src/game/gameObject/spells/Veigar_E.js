@@ -8,7 +8,8 @@ import ParticleSystem from '../helpers/ParticleSystem.js';
 export default class Veigar_E extends Spell {
   image = AssetManager.getAsset('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
-  description = 'Vặn xoắn không gian, tạo ra một lồng giam Làm choáng 2s kẻ địch dám bước qua.';
+  description =
+    'Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong 4s. Làm choáng 2s kẻ địch dám bước qua.';
   coolDown = 5000;
 
   onSpellCast() {
@@ -27,7 +28,7 @@ export default class Veigar_E extends Spell {
 export class Veigar_E_Object extends SpellObject {
   position = this.owner.position.copy();
   prepairTime = 1000;
-  lifeTime = 5000;
+  lifeTime = 4000;
   age = 0;
   strokeWidth = 30;
   size = 300;
