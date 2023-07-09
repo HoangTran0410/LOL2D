@@ -7,7 +7,7 @@ export default class CombatText extends SpellObject {
   movedVector = createVector();
   lifeTime = 1000;
   age = 0;
-  textSize = 17;
+  textSize = 18;
   textColor = 'white';
   text = '';
 
@@ -35,14 +35,16 @@ export default class CombatText extends SpellObject {
     // text(this.text, this.position.x, this.position.y);
 
     let alpha = map(this.age, 0, this.lifeTime, 255, 10);
+    let strokeColor = ColorUtils.applyColorAlpha('yellow', alpha);
     let colorAlpha = ColorUtils.applyColorAlpha(this.textColor, alpha);
     let size = this.owner.stats.size.value;
     let x = this.owner.position.x + this.movedVector.x;
     let y = this.owner.position.y + this.movedVector.y - size / 2;
 
-    strokeWeight(1);
-    stroke(colorAlpha);
+    strokeWeight(2);
+    stroke(strokeColor);
     fill(colorAlpha);
+    textStyle(BOLD);
     textSize(this.textSize);
     text(this.text, x, y);
     pop();
