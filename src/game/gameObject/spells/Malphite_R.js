@@ -10,7 +10,7 @@ export default class Malphite_R extends Spell {
   image = AssetManager.getAsset('spell_malphite_r');
   name = 'Không Thể Cản Phá (Malphite_R)';
   description =
-    'Phóng tới khu vực chỉ định với tốc độ cao, gây 30 sát thương và hất tung các kẻ địch lên không.';
+    'Phóng tới khu vực chỉ định với tốc độ cao, gây 30 sát thương và hất tung các kẻ địch lên không. Không thể cản phá bởi các hiệu ứng khống chế.';
   coolDown = 10000;
 
   maxRange = 350;

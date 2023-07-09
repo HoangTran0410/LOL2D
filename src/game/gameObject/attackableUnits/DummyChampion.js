@@ -15,4 +15,8 @@ export default class DummyChampion extends AIChampion {
     this.stats.healthRegen.baseValue = 0.1;
     this.name = 'Hình Nộm';
   }
+
+  respawn() {
+    this.stats.health.baseValue = this.stats.maxHealth.baseValue;
+  }
 }

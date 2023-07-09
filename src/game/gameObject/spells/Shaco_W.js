@@ -24,8 +24,6 @@ export default class Shaco_W extends Spell {
     obj.destination = to;
     this.game.addSpellObject(obj);
   }
-
-  onUpdate() {}
 }
 
 export class Shaco_W_Object extends SpellObject {

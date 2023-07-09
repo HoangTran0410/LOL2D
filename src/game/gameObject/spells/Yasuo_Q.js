@@ -192,6 +192,7 @@ export class Yasuo_Q3_Object extends SpellObject {
   speed = 5;
   minSize = 30;
   maxSize = 200;
+  size = this.minSize;
   airBorneTime = 1000;
   angle = 0;
 
@@ -234,7 +235,6 @@ export class Yasuo_Q3_Object extends SpellObject {
     rotate(this.angle);
     imageMode(CENTER);
     image(AssetManager.getAsset('obj_yasuo_q3')?.data, 0, 0, this.size, this.size);
-
     pop();
   }
 }

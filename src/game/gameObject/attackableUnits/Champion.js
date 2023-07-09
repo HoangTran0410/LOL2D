@@ -215,7 +215,7 @@ export default class Champion {
     if (!this.isDead && this.canMove) this.move();
 
     // animation
-    this.animatedSize = lerp(this.animatedSize || 0, this.stats.size.value, 0.1);
+    this.animatedSize = lerp(this.animatedSize || 10, this.stats.size.value, 0.1);
     this.animatedHeight = lerp(this.animatedHeight || 0, this.stats.height.value, 0.3);
     this.animatedHealth = lerp(this.animatedHealth || 0, this.stats.health.value, 0.2);
     this.animatedMana = lerp(this.animatedMana || 0, this.stats.mana.value, 0.2);
@@ -272,7 +272,7 @@ export default class Champion {
     // draw direction to mouse
     if (!this.isDead && this.game.worldMouse) {
       let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 1.75);
-      stroke(255, alpha);
+      stroke(255, Math.min(alpha, 125));
       strokeWeight(4);
       line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
     }
