@@ -34,16 +34,25 @@ export default class Shaco_R extends Spell {
     clone.shacoR_championOwner = this.owner;
     clone.shacoR_maxRange = this.maxRange;
     clone.teamId = this.owner.teamId;
-    clone.onExplode = () => {
-      this.clonePlayer = null;
-      this.image = AssetManager.getAsset('spell_shaco_r');
-      this.currentCooldown = this.coolDown;
-    };
+    clone.shacoR_lifeTime = this.cloneLifeTime;
+    // clone.onExplode = () => {
+    //   this.image = AssetManager.getAsset('spell_shaco_r');
+    //   this.currentCooldown = this.coolDown;
+    //   this.clonePlayer = null;
+    // };
     this.game.addPlayer(clone);
 
     this.clonePlayer = clone;
     this.currentCooldown = 0;
     this.image = AssetManager.getAsset('spell_shaco_r2');
+  }
+
+  onUpdate() {
+    if (this.clonePlayer?.toRemove) {
+      this.clonePlayer = null;
+      this.image = AssetManager.getAsset('spell_shaco_r');
+      this.currentCooldown = this.coolDown;
+    }
   }
 }
 
@@ -63,8 +72,8 @@ class Shaco_R_Clone extends Champion {
 
     this.shacoR_age += deltaTime;
     if (this.shacoR_age >= this.shacoR_lifeTime || this.isDead) {
-      this.onExplode?.();
       this.shacoR_explode();
+      // this.onExplode?.();
     }
   }
 
