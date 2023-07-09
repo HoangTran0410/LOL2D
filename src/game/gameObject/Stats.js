@@ -96,6 +96,7 @@ export default class Stats {
     this.setActionState(
       ActionState.CAN_CAST,
       !(
+        hasFlag(statusFlag, StatusFlags.Silenced) ||
         hasFlag(statusFlag, StatusFlags.Charmed) ||
         hasFlag(statusFlag, StatusFlags.Feared) ||
         hasFlag(statusFlag, StatusFlags.Stunned) ||
