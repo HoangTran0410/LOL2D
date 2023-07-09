@@ -13,7 +13,7 @@ export default class MenuScene extends Scene {
   }
 
   nextBackground() {
-    let maxIndex = 7;
+    let maxIndex = 6;
     if (this.currentBgIndex === undefined) {
       this.currentBgIndex = Math.floor(Math.random() * maxIndex) + 1;
     } else {
