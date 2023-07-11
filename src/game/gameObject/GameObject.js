@@ -30,7 +30,6 @@ export default class GameObject {
   onRemoved() {}
 
   update() {}
-  lateUpdate() {}
   draw() {}
 
   isCollidingWith(other) {
