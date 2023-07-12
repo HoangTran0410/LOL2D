@@ -9,6 +9,7 @@ import InGameHUD from './hud/InGameHUD.js';
 import DummyChampion from './gameObject/attackableUnits/DummyChampion.js';
 import SpellObject from './gameObject/SpellObject.js';
 import CombatText from './gameObject/helpers/CombatText.js';
+import ObjectManager from './ObjectManager.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -19,6 +20,7 @@ export default class Game {
     this.InGameHUD = new InGameHUD(this);
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
+    this.objectManager = new ObjectManager(this);
 
     this.objects = [];
     this.players = [];

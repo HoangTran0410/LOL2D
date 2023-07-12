@@ -2,6 +2,9 @@ import { uuidv4 } from '../../utils';
 
 export default class GameObject {
   toRemove = false;
+  isAffectedByFogOfWar = false;
+  _visibleByTeamIds = new Set();
+  _visibleForPlayers = new Set();
 
   constructor({
     game,
@@ -20,10 +23,6 @@ export default class GameObject {
     this.id = id;
 
     this.direction = createVector(0, 0);
-    this.isAffectedByFogOfWar = false;
-
-    this.visibleByTeamIds = new Set();
-    this.visibleForPlayers = new Set();
   }
 
   onAdded() {}
@@ -46,29 +45,33 @@ export default class GameObject {
 
   onEnterVision(playerId, teamId) {}
   isVisibleByTeam(teamId) {
-    return !this.isAffectedByFogOfWar || this.visibleByTeamIds.has(teamId);
+    return !this.isAffectedByFogOfWar || this._visibleByTeamIds.has(teamId);
   }
   setVisibleByTeam(teamId, isVisible) {
     if (isVisible) {
-      this.visibleByTeamIds.add(teamId);
+      this._visibleByTeamIds.add(teamId);
     } else {
-      this.visibleByTeamIds.delete(teamId);
+      this._visibleByTeamIds.delete(teamId);
     }
   }
   isVisibleForPlayer(playerId) {
-    return !this.isAffectedByFogOfWar || this.visibleForPlayers.has(playerId);
+    return !this.isAffectedByFogOfWar || this._visibleForPlayers.has(playerId);
   }
   setVisibleForPlayer(playerId, isVisible) {
     if (isVisible) {
-      this.visibleForPlayers.add(playerId);
+      this._visibleForPlayers.add(playerId);
     } else {
-      this.visibleForPlayers.delete(playerId);
+      this._visibleForPlayers.delete(playerId);
     }
+  }
+
+  isVisibleForOther(other) {
+    return this.isVisibleByTeam(other.teamId) || this.isVisibleForPlayer(other.id);
   }
 
   // Gets a list of all teams that have vision of this object.
   getTeamsHasVisionOnThis() {
-    return Array.from(this.visibleByTeamIds);
+    return Array.from(this._visibleByTeamIds);
   }
 
   teleportTo(x, y) {

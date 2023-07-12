@@ -33,6 +33,8 @@ export default class MenuScene extends Scene {
     this.interval = setInterval(() => {
       this.nextBackground();
     }, 5000);
+
+    this.sceneManager.showScene(GameScene);
   }
 
   exit() {
