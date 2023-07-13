@@ -49,16 +49,16 @@ export default class GameScene extends Scene {
     if (keyCode === 27) {
       this.sceneManager.showScene(MenuScene);
     }
-    this.game.keyPressed();
+    this.game.keyPressed?.();
   }
 
   exit() {
     this.dom.style.display = 'none';
-    this.game.destroy();
+    this.game.destroy?.();
   }
 
   windowResized() {
-    this.game.resize(windowWidth, windowHeight);
+    this.game.resize?.(windowWidth, windowHeight);
     resizeCanvas(windowWidth, windowHeight, true);
   }
 }

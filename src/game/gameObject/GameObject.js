@@ -25,8 +25,12 @@ export default class GameObject {
     this.direction = createVector(0, 0);
   }
 
-  onAdded() {}
-  onRemoved() {}
+  onAdded() {
+    this.game.objectManager.addObject(this);
+  }
+  onRemoved() {
+    this.game.objectManager.removeObject(this);
+  }
 
   update() {}
   draw() {

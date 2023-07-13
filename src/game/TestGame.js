@@ -1,26 +1,29 @@
-import AssetManager from '../managers/AssetManager.js';
 import ObjectManager from './ObjectManager.js';
-import AttackableUnit from './gameObject/attackableUnits/AttackableUnit.js';
+import Champion from './gameObject/attackableUnits/AI/Champion.js';
+import { ChampionPreset } from './preset.js';
 
 export default class TestGame {
   constructor() {
     this.objectManager = new ObjectManager(this);
 
-    let obj = new AttackableUnit({
+    this.player = new Champion({
       game: this,
       position: createVector(100, 100),
-      avatar: AssetManager.getAsset('champ_yasuo').data,
+      preset: ChampionPreset.leesin,
     });
-    obj.moveTo(600, 300);
-    this.objectManager.addObject(obj);
+    this.objectManager.addObject(this.player);
   }
 
   update() {
     this.objectManager.update();
+
+    if (mouseIsPressed && mouseButton === RIGHT) {
+      this.player.moveTo(createVector(mouseX, mouseY));
+    }
   }
 
   draw() {
-    background(50);
+    background(35);
     this.objectManager.draw();
   }
 }

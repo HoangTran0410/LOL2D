@@ -72,7 +72,7 @@ export default class Champion {
   addBuff(buff) {
     if (this.isDead || !buff) return;
 
-    let preBuffs = this.buffs.filter(_buff => _buff.name == buff.name);
+    let preBuffs = this.buffs.filter(_buff => _buff.constructor === buff.constructor);
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -242,10 +242,6 @@ export default class Champion {
       : 255;
 
     push();
-
-    if (this === this.game.player) {
-      this.spells.forEach(spell => spell.willDrawPreview && spell.drawPreview?.());
-    }
 
     let size = this.animatedSize + this.animatedHeight;
     let health = this.stats.health.value;

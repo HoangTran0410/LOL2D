@@ -1,3 +1,5 @@
+import Champion from './gameObject/attackableUnits/AI/Champion.js';
+
 export default class ObjectManager {
   objects = {};
   // _teamIds = new Set();
@@ -94,5 +96,9 @@ export default class ObjectManager {
 
   getAllObjectsForTeam(teamIds, types, customFilter) {
     return this.getObjectsInRange({ teamIds, types, customFilter });
+  }
+
+  getAllChampions(teamIds, customFilter) {
+    return this.getObjectsInRange({ teamIds, types: [Champion], customFilter });
   }
 }
