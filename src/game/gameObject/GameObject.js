@@ -1,4 +1,4 @@
-import { uuidv4 } from '../../utils.js';
+import { uuidv4 } from '../../utils/index.js';
 
 export default class GameObject {
   toRemove = false;
