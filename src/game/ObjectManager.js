@@ -21,9 +21,15 @@ export default class ObjectManager {
     }
   }
 
+  draw() {
+    for (let key in this.objects) {
+      this.objects[key].draw();
+    }
+  }
+
   addObject(object) {
     this.objects[object.id] = object;
-    this._teamIds.add(object.teamId);
+    // this._teamIds.add(object.teamId);
     object.onAdded();
   }
 

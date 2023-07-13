@@ -76,6 +76,8 @@ export default class Game {
     this.camera.update();
     this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
 
+    this.objectManager.update();
+
     // remove objects that are marked to be removed + call onBeforeRemove
     this.objects = this.objects.filter(o => {
       if (o.toRemove) {
@@ -152,6 +154,8 @@ export default class Game {
       this.terrainMap.drawEdges();
 
       for (let o of this.objects) if (!(o instanceof CombatText)) o.draw();
+
+      this.objectManager.draw();
     });
 
     this.fogOfWar.draw(); // draw fog of war on top of everything, except players

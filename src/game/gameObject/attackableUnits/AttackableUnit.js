@@ -1,3 +1,4 @@
+import StatusFlags from '../../enums/StatusFlags.js';
 import GameObject from '../GameObject.js';
 import Stats from '../Stats.js';
 
@@ -6,6 +7,8 @@ export default class AttackableUnit extends GameObject {
   buffs = [];
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;
+
+  status = 0;
 
   constructor({
     game,
@@ -16,6 +19,8 @@ export default class AttackableUnit extends GameObject {
     id = uuidv4(),
   }) {
     super({ game, position, collisionRadius, visionRadius, teamId, id });
+
+    this.setStatus(StatusFlags.CanCast | StatusFlags.CanMove, true);
   }
 
   update() {
