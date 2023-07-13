@@ -110,7 +110,7 @@ export class LeeSin_Q_Buff extends Dash {
     super.onReachedDestination?.();
 
     // deal damage to target
-    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.owner);
+    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.targetUnit);
     // remove spell object
     if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
   }
