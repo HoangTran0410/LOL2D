@@ -206,7 +206,7 @@ export default class InGameHUD {
 
           // custom properties for display
           coolDownText: Math.ceil(currentCooldown / 1000),
-          coolDownPercent: (currentCooldown / coolDown) * 100,
+          coolDownPercent: Math.min((currentCooldown / coolDown) * 100, 100),
           showCoolDown: currentCooldown > 0,
           small: isInternalSpell || isSummonerSpell,
           canCast: canCast && !isDead,
