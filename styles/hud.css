@@ -149,12 +149,12 @@
 .spell .spell-info {
     position: absolute;
     padding: 10px;
-    background-color: #111d;
+    background-color: #111;
     box-shadow: 0px 0px 10px 0px #999b;
     z-index: 10;
     color: #eee;
     font-size: 1em;
-    width: 200px;
+    width: 230px;
     top: 0;
 
     opacity: 0;
@@ -167,6 +167,17 @@
     opacity: 1;
     transform: translateY(-100%);
     transition: all .08s ease-in;
+}
+
+.spell-info .header {
+    display: flex;
+    align-items: center;
+}
+
+.spell-info img {
+    width: 50px;
+    margin-right: 10px;
+    border: 2px solid #9999;
 }
 
 .spell .spell-info h4 {

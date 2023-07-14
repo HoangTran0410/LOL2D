@@ -101,9 +101,12 @@ export default class InGameHUD {
                             </div>
                         </div>
                         <div class="spell-info">
-                            <h4>{{spell.name}}</h4>
-                            <p>{{spell.description}}</p>
+                            <div class="header">
+                              <img :src="spell.image" alt="spell" />
+                              <h4>{{spell.name}}</h4>
+                            </div>
                             <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
+                            <p>{{spell.description}}</p>
                         </div>
                     </div>
                 </div>
@@ -137,9 +140,12 @@ export default class InGameHUD {
                 <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
                     <img :src="spell.image" alt="spell" />
                     <div class="spell-info">
-                        <h4>{{spell.name}}</h4>
-                        <p>{{spell.description}}</p>
+                        <div class="header">
+                            <img :src="spell.image" alt="spell" />
+                            <h4>{{spell.name}}</h4>
+                        </div>
                         <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
+                        <p>{{spell.description}}</p>
                     </div>
                 </div>
                 <div v-if="filteredSpells.length === 0" class="not-found">
