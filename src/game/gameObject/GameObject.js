@@ -33,26 +33,25 @@ export default class GameObject {
   }
 
   update() {}
-  draw() {
-    // default draw
-    push();
-    fill(255);
-    translate(this.position.x, this.position.y);
-    ellipse(0, 0, this.collisionRadius * 2);
-    pop();
-  }
+  draw() {}
 
   isCollidingWith(other) {
     return this.position.dist(other.position) <= this.collisionRadius + other.collisionRadius;
   }
-  onCollision(other, isTerrain = false) {
-    // TODO: verify if this is needed
-  }
+  // onCollision(other, isTerrain = false) {
+  //   // TODO: verify if this is needed
+  // }
 
   setTeamId(teamId) {
     // TODO: remove visioin from old team
     // TODO: add vision to new team
     this.teamId = teamId;
+  }
+
+  teleportTo(x, y) {
+    // TODO: get closest terrain exit
+    this.position.x = x;
+    this.position.y = y;
   }
 
   // onEnterVision(playerId, teamId) {}
@@ -87,10 +86,4 @@ export default class GameObject {
   // getTeamsHasVisionOnThis() {
   //   return Array.from(this._visibleByTeamIds);
   // }
-
-  teleportTo(x, y) {
-    // TODO: get closest terrain exit
-    this.position.x = x;
-    this.position.y = y;
-  }
 }

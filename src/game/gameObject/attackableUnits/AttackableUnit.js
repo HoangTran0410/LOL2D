@@ -11,7 +11,7 @@ export default class AttackableUnit extends GameObject {
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;
   status = 0;
-  _deathData = null;
+  deathData = null;
 
   constructor({
     game,
@@ -48,9 +48,9 @@ export default class AttackableUnit extends GameObject {
     if (this.canMove) this.move();
 
     // die
-    if (this._deathData) {
-      this._deathData.reviveAfter -= deltaTime;
-      if (this._deathData.reviveAfter <= 0) {
+    if (this.deathData) {
+      this.deathData.reviveAfter -= deltaTime;
+      if (this.deathData.reviveAfter <= 0) {
         this.respawn();
       }
     }
@@ -75,7 +75,7 @@ export default class AttackableUnit extends GameObject {
     if (this.avatar) {
       let size = this.animatedValues.size + this.animatedValues.height;
       if (this.animatedValues.alpha < 255) tint(255, this.animatedValues.alpha);
-      image(this.avatar, -size / 2, -size / 2, size, size);
+      image(this.avatar?.data || this.avatar, -size / 2, -size / 2, size, size);
     }
     pop();
   }
@@ -181,13 +181,13 @@ export default class AttackableUnit extends GameObject {
   }
 
   die(deathData) {
-    this._deathData = deathData;
+    this.deathData = deathData;
     // TODO: more logic here ?
   }
 
   respawn() {
     this.stats.health.baseValue = this.stats.health.maxValue;
-    this._deathData = null;
+    this.deathData = null;
   }
 
   setStatus(status, enabled) {
@@ -230,6 +230,10 @@ export default class AttackableUnit extends GameObject {
   }
 
   get isDead() {
-    return this._deathData !== null;
+    return this.deathData !== null;
+  }
+
+  get isAllied() {
+    return this.teamId === this.game.player.teamId;
   }
 }

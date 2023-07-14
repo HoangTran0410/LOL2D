@@ -17,7 +17,7 @@ export default class ObjectManager {
     // check remove
     for (let key in this.objects) {
       if (this.objects[key].toRemove) {
-        this.objects[key].onRemoved();
+        this.objects[key].onRemoved?.();
         delete this.objects[key];
       }
     }
@@ -32,7 +32,7 @@ export default class ObjectManager {
   addObject(object) {
     this.objects[object.id] = object;
     // this._teamIds.add(object.teamId);
-    object.onAdded();
+    object.onAdded?.();
   }
 
   removeObject(object) {

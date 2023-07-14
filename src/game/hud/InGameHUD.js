@@ -1,6 +1,5 @@
 import { SpellHotKeys } from '../constants.js';
-import StatusFlags from '../enums/StatusFlags.js';
-import { hasFlag, removeAccents } from '../../utils/index.js';
+import { removeAccents } from '../../utils/index.js';
 import * as AllSpells from '../gameObject/spells/index.js';
 
 export default class InGameHUD {

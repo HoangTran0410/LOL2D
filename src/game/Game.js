@@ -1,7 +1,7 @@
 import Camera from './gameObject/map/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import { ChampionPreset, getRandomChampionPreset } from './preset.js';
+import { ChampionPreset, getPresetRandom, getRandomChampionPreset } from './preset.js';
 import { SpellHotKeys } from './constants.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
@@ -9,7 +9,6 @@ import InGameHUD from './hud/InGameHUD.js';
 import DummyChampion from './gameObject/attackableUnits/DummyChampion.js';
 import SpellObject from './gameObject/SpellObject.js';
 import CombatText from './gameObject/helpers/CombatText.js';
-import ObjectManager from './ObjectManager.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -20,7 +19,6 @@ export default class Game {
     this.InGameHUD = new InGameHUD(this);
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
-    this.objectManager = new ObjectManager(this);
 
     this.objects = [];
     this.players = [];
@@ -33,7 +31,7 @@ export default class Game {
     let dummyCount = 1;
 
     for (let i = 0; i < aiCount; i++) {
-      let preset = getRandomChampionPreset();
+      let preset = getPresetRandom();
       let pos = this.getRandomSpawnLocation();
       // let pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
       let champ = new AIChampion(this, pos.x, pos.y, preset);
@@ -43,12 +41,12 @@ export default class Game {
 
     // dummy
     for (let i = 0; i < dummyCount; i++) {
-      let preset = getRandomChampionPreset();
+      let preset = getPresetRandom();
       let pos = createVector(3200 + random(-200, 200), 3200 + random(-200, 200));
       this.players.push(new DummyChampion(this, pos.x, pos.y, preset));
     }
 
-    let preset = getRandomChampionPreset();
+    let preset = getPresetRandom();
     // let pos = this.getRandomSpawnLocation();
     let pos = createVector(3200, 3200);
     this.player = new Champion(this, pos.x, pos.y, preset);
@@ -75,8 +73,6 @@ export default class Game {
   fixedUpdate() {
     this.camera.update();
     this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
-
-    this.objectManager.update();
 
     // remove objects that are marked to be removed + call onBeforeRemove
     this.objects = this.objects.filter(o => {
@@ -154,8 +150,6 @@ export default class Game {
       this.terrainMap.drawEdges();
 
       for (let o of this.objects) if (!(o instanceof CombatText)) o.draw();
-
-      this.objectManager.draw();
     });
 
     this.fogOfWar.draw(); // draw fog of war on top of everything, except players

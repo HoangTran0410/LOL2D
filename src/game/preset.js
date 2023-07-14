@@ -146,6 +146,23 @@ export const ChampionPreset = {
   },
 };
 
+export const getPresetRandom = () => {
+  return {
+    name: 'Random',
+    avatar: random(Object.values(ChampionPreset).map(x => x.avatar)),
+    spells: [
+      AllSpells.Heal,
+      ...Array.from({ length: 4 })
+        .fill(0)
+        .map(() => {
+          return random(Object.values(AllSpells));
+        }),
+      AllSpells.Flash,
+      AllSpells.Ghost,
+    ],
+  };
+};
+
 export const getRandomChampionPreset = () => {
   const keys = Object.keys(ChampionPreset);
   const randomKey = keys[Math.floor(Math.random() * keys.length)];

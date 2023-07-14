@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import { getRandomChampionPreset } from '../../preset.js';
 import Champion from './Champion.js';
+import { getPresetRandom } from '../../preset.js';
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -55,7 +55,7 @@ export default class AIChampion extends Champion {
     super.respawn();
 
     if (this._respawnWithNewPreset) {
-      let newPresset = getRandomChampionPreset();
+      let newPresset = getPresetRandom();
       this.avatar = AssetManager.getAsset(newPresset.avatar);
       this.spells = newPresset.spells.map(Spell => new Spell(this));
     }
