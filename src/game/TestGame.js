@@ -22,6 +22,8 @@ export default class TestGame {
       let id = prompt('Enter other player id');
       if (id) this.peerManager.connect(id);
     }, 3000);
+
+    window.game = this;
   }
 
   update() {

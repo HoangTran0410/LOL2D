@@ -46,6 +46,8 @@ export default class PeerManager {
       console.log('Connected to: ' + conn.peer);
       this.peers[conn.peer] = conn;
 
+      this.syncData(conn);
+
       conn.on('data', data => {
         this.syncDataFromOther(conn, data);
       });
@@ -61,7 +63,16 @@ export default class PeerManager {
     });
   }
 
+  syncData(conn) {
+    conn.send({
+      data: {
+        a: 1,
+      }, //this.game.objectManager.getObjects(),
+    });
+  }
+
   syncDataFromOther(conn, data) {
     // TODO: sync data
+    console.log(data);
   }
 }
