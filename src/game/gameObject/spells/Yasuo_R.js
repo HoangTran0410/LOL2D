@@ -4,12 +4,13 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
+import Speedup from '../buffs/Speedup.js';
 
 export default class Yasuo_R extends Spell {
   image = AssetManager.getAsset('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =
-    'Yasuo lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 1 giây và gây 30 sát thương';
+    'Lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 1 giây và gây 30 sát thương. Tăng 40% tốc chạy trong 2s sau đó.';
   coolDown = 10000;
   manaCost = 50;
 
@@ -60,40 +61,6 @@ export default class Yasuo_R extends Spell {
       excludePlayers: [this.owner],
     });
 
-    // add airborne buff to owner
-    this.owner.addBuff(new Airborne(this.timeToApplyAirborne, this.owner, this.owner));
-
-    // add airborne buff to all enemies in range
-    for (let enemy of enemiesInRange) {
-      let buff = new Airborne(this.timeToApplyAirborne, this.owner, enemy);
-      buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
-      buff.image = this.image;
-      buff.draw = () => {
-        push();
-        strokeWeight(5);
-        stroke(255, 200);
-
-        // draw random lines inside enemy
-        let { x, y } = enemy.position;
-        let size = enemy.stats.size.value;
-        stroke(random(200, 255));
-        for (let i = 0; i < 1; i++) {
-          let x1 = x + random(-size, size);
-          let y1 = y + random(-size, size);
-          let x2 = x + random(-size, size);
-          let y2 = y + random(-size, size);
-          line(x1, y1, x2, y2);
-        }
-
-        // draw line from owner to enemy
-        stroke(100, 100, 255);
-        line(this.owner.position.x, this.owner.position.y, x, y);
-        pop();
-      };
-      enemy.addBuff(buff);
-      enemy.takeDamage(30, this.owner);
-    }
-
     // add spell object animation
     let obj = new Yasuo_R_Object(this.owner);
     obj.position = nearestEnemy.position.copy();
@@ -110,8 +77,47 @@ export default class Yasuo_R extends Spell {
 
     let dashBuff = new Dash(1000, this.owner, this.owner);
     dashBuff.dashDestination = nearEnemyPos;
-    dashBuff.dashSpeed = 50;
+    dashBuff.dashSpeed = 100;
     dashBuff.cancelable = false;
+    dashBuff.onReachedDestination = () => {
+      // add airborne buff to owner
+      this.owner.addBuff(new Airborne(this.timeToApplyAirborne, this.owner, this.owner));
+
+      // add airborne buff to all enemies in range
+      for (let enemy of enemiesInRange) {
+        let buff = new Airborne(this.timeToApplyAirborne, this.owner, enemy);
+        buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+        buff.image = this.image;
+        buff.draw = () => {
+          push();
+          strokeWeight(5);
+          stroke(255, 200);
+
+          // draw random lines inside enemy
+          let { x, y } = enemy.position;
+          let size = enemy.stats.size.value;
+          stroke(random(200, 255));
+          for (let i = 0; i < 1; i++) {
+            let x1 = x + random(-size, size);
+            let y1 = y + random(-size, size);
+            let x2 = x + random(-size, size);
+            let y2 = y + random(-size, size);
+            line(x1, y1, x2, y2);
+          }
+
+          // draw line from owner to enemy
+          stroke(100, 100, 255);
+          line(this.owner.position.x, this.owner.position.y, x, y);
+          pop();
+        };
+        enemy.addBuff(buff);
+        enemy.takeDamage(30, this.owner);
+      }
+
+      let speedup = new Speedup(3000, this.owner, this.owner);
+      speedup.percent = 0.4;
+      this.owner.addBuff(speedup);
+    };
     this.owner.addBuff(dashBuff);
   }
 

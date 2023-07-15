@@ -72,8 +72,6 @@ export default class Fear extends Buff {
       this.targetUnit.position.y,
       this.targetUnit.stats.size.value + random(-10, 10)
     );
-
-    imageMode(CENTER);
     image(
       this.image.data,
       this.targetUnit.position.x,

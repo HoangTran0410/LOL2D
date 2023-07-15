@@ -52,7 +52,8 @@ export class Olaf_Q_Object extends SpellObject {
   angle = 0;
   initialAngle = 0;
   speed = 10;
-  size = 30;
+  rotateSpeed = 0.25;
+  size = 40;
   pickupRange = 100;
   timeSinceReachedDestination = 0;
   waitForPickUpLifeTime = 5000;
@@ -100,8 +101,8 @@ export class Olaf_Q_Object extends SpellObject {
   update() {
     // flying phase
     if (this.phase === Olaf_Q_Object.PHASES.FLYING) {
-      if (this.willRotateRight) this.angle += 0.2;
-      else this.angle -= 0.2;
+      if (this.willRotateRight) this.angle += this.rotateSpeed;
+      else this.angle -= this.rotateSpeed;
 
       VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
@@ -116,7 +117,7 @@ export class Olaf_Q_Object extends SpellObject {
       // check collision with enemy
       let enemies = this.game.queryPlayersInRange({
         position: this.position,
-        range: this.size,
+        range: this.size / 2,
         includePlayerSize: true,
         excludePlayers: [this.owner, ...this.playerEffected],
       });
@@ -184,10 +185,10 @@ export class Olaf_Q_Object extends SpellObject {
     fill(...this.color, 200);
 
     // prettier-ignore
-    let shape = [[-9,-2],[-2,-1],[6,-2],[7,4],[0,4],[2,0],[-9,0]]
+    let shape = [[-45,-10],[-10,-5],[30,-10],[35,20],[0,20],[10,0],[-45,0]]
     if (!this.willRotateRight) shape = shape.map(([x, y]) => [-x, y]);
     beginShape();
-    shape.forEach(([x, y]) => vertex(x * 5, y * 5));
+    shape.forEach(([x, y]) => vertex(x, y));
     endShape(CLOSE);
 
     pop();

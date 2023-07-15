@@ -16,7 +16,7 @@ export default class Stun extends Buff {
   draw() {
     // draw buff on target unit
     let pos = this.targetUnit.position;
-    let size = this.targetUnit.stats.size.value;
+    let size = this.targetUnit.animatedValues.displaySize;
 
     push();
     translate(pos.x, pos.y);

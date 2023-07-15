@@ -1,6 +1,4 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import { hasFlag } from '../../../utils/index.js';
-import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';

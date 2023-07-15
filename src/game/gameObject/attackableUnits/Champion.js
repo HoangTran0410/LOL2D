@@ -253,7 +253,6 @@ export default class Champion {
 
     noStroke();
     fill(240, alpha);
-    imageMode(CENTER);
 
     // tint alpha for image
     if (alpha < 255) tint(255, alpha);

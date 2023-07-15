@@ -1,7 +1,7 @@
 import Camera from './gameObject/map/Camera.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import { ChampionPreset, getPresetRandom, getRandomChampionPreset } from './preset.js';
+import { getPresetRandom } from './preset.js';
 import { SpellHotKeys } from './constants.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';

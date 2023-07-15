@@ -14,10 +14,12 @@ export default class Silence extends Buff {
   draw() {
     // draw buff on target unit
     let pos = this.targetUnit.position;
-    let size = this.targetUnit.stats.size.value;
+    let size = this.targetUnit.animatedValues.displaySize;
 
     push();
-    fill(30, 150);
+    fill(100, 100);
+    stroke(200, 100);
+    strokeWeight(2);
     circle(pos.x, pos.y, size + random(-5, 10));
     pop();
   }

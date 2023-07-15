@@ -21,6 +21,16 @@ export default class TestGame {
     });
     this.objectManager.addObject(this.player);
 
+    for (let i = 0; i < 3; i++) {
+      this.objectManager.addObject(
+        new Champion({
+          game: this,
+          position: createVector(100 + i * 100, 100),
+          preset: getPresetRandom(),
+        })
+      );
+    }
+
     window.game = this;
     this.camera.target = this.player.position;
     this.clickedPoint = { x: 0, y: 0, size: 0 };
@@ -90,6 +100,10 @@ export default class TestGame {
       }
 
       this.objectManager.draw();
+
+      this.player.spells.forEach(spell => {
+        if (spell.willDrawPreview) spell.drawPreview?.();
+      });
     });
   }
 
@@ -99,6 +113,17 @@ export default class TestGame {
 
   addSpellObject(spellObject) {
     this.objectManager.addObject(spellObject);
+  }
+
+  queryObjects({ type, getOnlyOne = false, customFilter = null }) {
+    let result = [];
+    for (let o of this.objectManager.objects) {
+      if ((!type || (type && o instanceof type)) && (customFilter === null || customFilter(o))) {
+        if (getOnlyOne) return o;
+        result.push(o);
+      }
+    }
+    return getOnlyOne ? null : result;
   }
 
   queryPlayersInRange({

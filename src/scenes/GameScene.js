@@ -28,7 +28,7 @@ export default class GameScene extends Scene {
 
     cursor('assets/cursors/normal.cur');
     rectMode(CORNER);
-    imageMode(CORNER);
+    imageMode(CENTER);
     frameRate(60);
 
     // this.game = new Game();

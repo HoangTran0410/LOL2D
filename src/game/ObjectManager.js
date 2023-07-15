@@ -1,8 +1,16 @@
+import SpellObject from './gameObject/SpellObject.js';
 import Champion from './gameObject/attackableUnits/AI/Champion.js';
+import CombatText from './gameObject/helpers/CombatText.js';
+
+const DisplayZIndex = [
+  //
+  Champion,
+  SpellObject,
+  CombatText,
+];
 
 export default class ObjectManager {
-  objects = {};
-  // _teamIds = new Set();
+  objects = [];
 
   constructor(game) {
     this.game = game;
@@ -10,57 +18,46 @@ export default class ObjectManager {
 
   update() {
     // update
-    for (let key in this.objects) {
-      this.objects[key].update();
+    for (let o of this.objects) {
+      o.update?.();
     }
 
     // check remove
-    for (let key in this.objects) {
-      if (this.objects[key].toRemove) {
-        this.objects[key].onRemoved?.();
-        delete this.objects[key];
+    for (let i = this.objects.length - 1; i >= 0; i--) {
+      const o = this.objects[i];
+      if (o.toRemove) {
+        o.onBeforeRemove?.();
+        this.objects.splice(i, 1);
       }
     }
   }
 
   draw() {
-    for (let key in this.objects) {
-      this.objects[key].draw();
+    for (let o of this.objects) {
+      o.draw?.();
     }
   }
 
   addObject(object) {
-    this.objects[object.id] = object;
-    // this._teamIds.add(object.teamId);
+    this.objects.push(object);
+    this.objects.sort((a, b) => {
+      let aZIndex = DisplayZIndex.findIndex(t => a instanceof t);
+      let bZIndex = DisplayZIndex.findIndex(t => b instanceof t);
+      return aZIndex - bZIndex;
+    });
     object.onAdded?.();
   }
 
   removeObject(object) {
     object.toRemove = true;
-
-    // check remove teamId
-    // let hasTeamId = false;
-    // for (let key in this.objects) {
-    //   if (this.objects[key].teamId === object.teamId) {
-    //     hasTeamId = true;
-    //     break;
-    //   }
-    // }
-    // if (!hasTeamId) {
-    //   this._teamIds.delete(object.teamId);
-    // }
-  }
-
-  getObjects() {
-    return Object.values(this.objects);
   }
 
   getObjectsByType(type) {
-    return this.getObjects().filter(o => o instanceof type);
+    return this.objects.filter(o => o instanceof type);
   }
 
   getObjectById(id) {
-    return this.objects[id];
+    return this.objects.find(o => o.id === id);
   }
 
   getObjectsInRange({
@@ -74,11 +71,10 @@ export default class ObjectManager {
     customFilter,
     maxResults = 0,
   }) {
-    const objects = this.getObjects();
     const results = [];
     let count = 0;
-    for (let i = 0; i < objects.length && (maxResults === 0 || count < maxResults); i++) {
-      const o = objects[i];
+    for (let i = 0; i < this.objects.length && (maxResults === 0 || count < maxResults); i++) {
+      const o = this.objects[i];
       if (o.toRemove) continue;
       if (radius > 0 && position instanceof p5.Vector && o.position.dist(position) > radius)
         continue;
@@ -95,13 +91,7 @@ export default class ObjectManager {
   }
 
   getObjectsWithTypes(types) {
-    let result = [];
-    for (let key in this.objects) {
-      if (types.some(t => this.objects[key] instanceof t)) {
-        result.push(this.objects[key]);
-      }
-    }
-    return result;
+    return this.objects.filter(o => types.some(t => o instanceof t));
   }
 
   getAllChampions() {

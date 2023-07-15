@@ -198,6 +198,8 @@ export class Yasuo_Q3_Object extends SpellObject {
 
   playerEffected = [];
 
+  image = AssetManager.getAsset('obj_yasuo_q3');
+
   update() {
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
@@ -233,8 +235,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     push();
     translate(this.position.x, this.position.y);
     rotate(this.angle);
-    imageMode(CENTER);
-    image(AssetManager.getAsset('obj_yasuo_q3')?.data, 0, 0, this.size, this.size);
+    image(this.image?.data, 0, 0, this.size, this.size);
     pop();
   }
 }

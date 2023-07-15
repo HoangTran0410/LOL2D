@@ -1,4 +1,4 @@
-import { hasFlag, uuidv4 } from '../../../utils/index.js';
+import { hasFlag } from '../../../utils/index.js';
 import ActionState from '../../enums/ActionState.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
@@ -14,16 +14,7 @@ export default class AttackableUnit extends GameObject {
   status = 0;
   deathData = null;
 
-  constructor({
-    game,
-    position = createVector(),
-    collisionRadius = 25,
-    visionRadius = 0,
-    teamId = uuidv4(),
-    id = uuidv4(),
-    avatar,
-    stats,
-  }) {
+  constructor({ game, position, collisionRadius, visionRadius, teamId, id, avatar, stats }) {
     super({ game, position, collisionRadius, visionRadius, teamId, id });
 
     this.avatar = avatar;
@@ -35,6 +26,7 @@ export default class AttackableUnit extends GameObject {
       size: 10,
       height: 0,
       alpha: 255,
+      displaySize: 10,
     };
   }
 
@@ -60,33 +52,69 @@ export default class AttackableUnit extends GameObject {
     let isInsideBush = hasFlag(this.status, StatusFlags.InBush);
     let isStealthed = hasFlag(this.stats.actionState, ActionState.STEALTHED);
     let alphaColor = isInsideBush ? 100 : isStealthed ? 20 : 255;
+
+    let { size, height, alpha } = this.animatedValues;
     this.animatedValues = {
-      size: lerp(this.animatedValues.size, this.stats.size.value, 0.1),
-      height: lerp(this.animatedValues.height, this.stats.height.value, 0.3),
+      displaySize: size + height,
+      size: lerp(size, this.stats.size.value, 0.1), // higher height = bigger size
+      height: lerp(height, this.stats.height.value, 0.3),
       alpha:
-        alphaColor > this.animatedAlphaColor
-          ? lerp(this.animatedAlphaColor || 0, alphaColor, 0.2) // smooth fade in
+        alphaColor > alpha
+          ? lerp(alpha || 0, alphaColor, 0.2) // smooth fade in
           : alphaColor, // instant fade out
     };
   }
 
   draw() {
+    this.drawAvatar();
+    this.drawBuffs();
+  }
+
+  drawAvatar() {
+    let pos = this.position;
+    let { displaySize: size, alpha } = this.animatedValues;
+
     push();
-    translate(this.position.x, this.position.y);
-    if (this.avatar) {
-      let size = this.animatedValues.size + this.animatedValues.height;
-      if (this.animatedValues.alpha < 255) tint(255, this.animatedValues.alpha);
-      image(this.avatar?.data || this.avatar, -size / 2, -size / 2, size, size);
+
+    // tint alpha for image
+    if (alpha < 255) tint(255, alpha);
+    noStroke();
+    fill(240, alpha);
+    image(this.avatar?.data, pos.x, pos.y, size, size);
+
+    // draw circle around champion based on allies
+    stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
+    strokeWeight(2);
+    noFill();
+    circle(pos.x, pos.y, size);
+
+    // draw direction to mouse
+    if (!this.isDead && this.game.worldMouse && this === this.game.player) {
+      let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 2 + 2);
+      stroke(255, Math.min(alpha, 125));
+      strokeWeight(4);
+      line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+    }
+
+    if (this.isDead) {
+      // draw black circle
+      noStroke();
+      fill(0, 200);
+      circle(pos.x, pos.y, size);
     }
     pop();
   }
+
+  drawBuffs() {
+    this.buffs.forEach(buff => buff.draw?.());
+  }
+
+  drawHud() {}
 
   addBuff(buff) {
     if (this.isDead || !buff) return;
 
     let preBuffs = this.buffs.filter(_buff => _buff.constructor === buff.constructor);
-
-    console.log(buff);
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -179,7 +207,7 @@ export default class AttackableUnit extends GameObject {
 
     this.stats.health.baseValue -= damage;
     if (this.stats.health.baseValue <= 0) {
-      die({ attacker, reviveAfter: 5000 });
+      this.die({ attacker, reviveAfter: 5000 });
     }
   }
 
@@ -189,7 +217,7 @@ export default class AttackableUnit extends GameObject {
   }
 
   respawn() {
-    this.stats.health.baseValue = this.stats.health.maxValue;
+    this.stats.health.baseValue = this.stats.maxHealth.value;
     this.deathData = null;
   }
 
@@ -223,6 +251,10 @@ export default class AttackableUnit extends GameObject {
 
   stopMovement() {
     this.destination.set(this.position.x, this.position.y);
+  }
+
+  hasBuff(BuffClass) {
+    return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
   get canCast() {
