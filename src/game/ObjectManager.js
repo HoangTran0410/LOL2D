@@ -94,11 +94,17 @@ export default class ObjectManager {
     return results;
   }
 
-  getAllObjectsForTeam(teamIds, types, customFilter) {
-    return this.getObjectsInRange({ teamIds, types, customFilter });
+  getObjectsWithTypes(types) {
+    let result = [];
+    for (let key in this.objects) {
+      if (types.some(t => this.objects[key] instanceof t)) {
+        result.push(this.objects[key]);
+      }
+    }
+    return result;
   }
 
-  getAllChampions(teamIds, customFilter) {
-    return this.getObjectsInRange({ teamIds, types: [Champion], customFilter });
+  getAllChampions() {
+    return this.getObjectsWithTypes([Champion]);
   }
 }

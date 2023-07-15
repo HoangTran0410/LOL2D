@@ -1,5 +1,6 @@
 import { hasFlag, uuidv4 } from '../../../utils/index.js';
 import ActionState from '../../enums/ActionState.js';
+import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import GameObject from '../GameObject.js';
 import Stats from '../Stats.js';
@@ -84,6 +85,8 @@ export default class AttackableUnit extends GameObject {
     if (this.isDead || !buff) return;
 
     let preBuffs = this.buffs.filter(_buff => _buff.constructor === buff.constructor);
+
+    console.log(buff);
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -198,7 +201,7 @@ export default class AttackableUnit extends GameObject {
     this.status =
       (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
 
-    this.stats.updateActionState(status);
+    this.stats.updateActionState(this.status);
   }
 
   move() {

@@ -3,7 +3,7 @@ import { SpellHotKeys } from './constants.js';
 import Champion from './gameObject/attackableUnits/AI/Champion.js';
 import Camera from './gameObject/map/Camera.js';
 import InGameHUD from './hud/InGameHUD.js';
-import { ChampionPreset } from './preset.js';
+import { ChampionPreset, getPresetRandom } from './preset.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -17,7 +17,7 @@ export default class TestGame {
     this.player = new Champion({
       game: this,
       position: createVector(100, 100),
-      preset: ChampionPreset.leesin,
+      preset: getPresetRandom(),
     });
     this.objectManager.addObject(this.player);
 
@@ -25,6 +25,13 @@ export default class TestGame {
     this.camera.target = this.player.position;
     this.clickedPoint = { x: 0, y: 0, size: 0 };
     this.worldMouse = createVector(0, 0);
+  }
+
+  pause() {
+    this.paused = true;
+  }
+  unpause() {
+    this.paused = false;
   }
 
   fixedUpdate() {
@@ -69,6 +76,8 @@ export default class TestGame {
   }
 
   draw() {
+    if (this.paused) return;
+
     background(45);
 
     this.camera.makeDraw(() => {
@@ -84,7 +93,38 @@ export default class TestGame {
     });
   }
 
+  destroy() {
+    this.inGameHUD.destroy();
+  }
+
   addSpellObject(spellObject) {
     this.objectManager.addObject(spellObject);
+  }
+
+  queryPlayersInRange({
+    position,
+    range, // radius
+    excludePlayers = [],
+    includePlayerSize = false,
+    includeDead = false,
+    getOnlyOne = false,
+    customFilter = null,
+  }) {
+    let champions = this.objectManager.getAllChampions();
+
+    let result = [];
+    for (let p of champions) {
+      if (
+        (includeDead ? true : p.isDead === false) &&
+        !excludePlayers.includes(p) &&
+        p.position.dist(position) < range + (includePlayerSize ? p.stats.size.value / 2 : 0) &&
+        (customFilter === null || customFilter(p))
+      ) {
+        if (getOnlyOne) return p;
+        result.push(p);
+      }
+    }
+
+    return getOnlyOne ? null : result;
   }
 }

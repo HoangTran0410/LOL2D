@@ -3,8 +3,14 @@ import SpellObject from '../SpellObject.js';
 export default class TrailSystem extends SpellObject {
   trails = [];
 
-  constructor({ maxLength = 15, trailColor = '#77F5', trailSize = 5, trailLifeTime = 500 } = {}) {
-    super({});
+  constructor({
+    maxLength = 15,
+    trailColor = '#77F5',
+    trailSize = 5,
+    trailLifeTime = 500,
+    owner,
+  } = {}) {
+    super(owner);
     this.maxLength = maxLength;
     this.trailColor = trailColor;
     this.trailSize = trailSize;

@@ -31,8 +31,8 @@ export default class GameScene extends Scene {
     imageMode(CORNER);
     frameRate(60);
 
-    this.game = new Game();
-    // this.game = new TestGame();
+    // this.game = new Game();
+    this.game = new TestGame();
   }
 
   draw() {
