@@ -27,7 +27,7 @@ export default class Lux_E extends Spell {
       );
 
       this.luxEObject = new Lux_E_Object(this.owner, destination, size);
-      this.game.addSpellObject(this.luxEObject);
+      this.game.addObject(this.luxEObject);
     }
 
     // second cast
@@ -87,6 +87,7 @@ export class Lux_E_Object extends SpellObject {
   lifeTimeWhenStatic = 5000;
   timeSinceStatic = 0;
   staticSize = 100;
+  visionRadius = this.staticSize * 2;
 
   // explode phase
   explodeSize = 100;

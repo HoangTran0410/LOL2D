@@ -32,7 +32,7 @@ export default class Olaf_Q extends Spell {
     axe.waitForPickUpLifeTime = this.axeLifeTime;
     axe.damage = 20;
     axe.spellSource = this;
-    this.game.addSpellObject(axe);
+    this.game.addObject(axe);
   }
 
   drawPreview() {
@@ -91,7 +91,7 @@ export class Olaf_Q_Object extends SpellObject {
     super(owner);
 
     // game will handle update and draw for this system
-    this.game.addSpellObject(this.particleSystem);
+    this.game.addObject(this.particleSystem);
   }
 
   get willRotateRight() {

@@ -26,7 +26,7 @@ export default class Heal extends Spell {
 
     // heal effect
     let healObject = new Heal_Object(this.owner);
-    this.game.addSpellObject(healObject);
+    this.game.addObject(healObject);
     // }
 
     // ghost buff for 1s
@@ -40,7 +40,7 @@ export default class Heal extends Spell {
       let combatText = new CombatText(this.owner);
       combatText.text = `+ ${~~(newHeal - currentHeal)}`;
       combatText.textColor = [0, 255, 0];
-      this.game.addSpellObject(combatText);
+      this.game.addObject(combatText);
     }
   }
 }

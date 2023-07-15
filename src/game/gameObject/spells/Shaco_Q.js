@@ -35,7 +35,7 @@ export default class Shaco_Q extends Spell {
     this.owner.addBuff(speedupBuff);
 
     let obj = new Shaco_Q_Object(this.owner, from);
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 

@@ -58,7 +58,7 @@ export default class Shaco_E extends Spell {
     let obj = new Shaco_E_Object(this.owner);
     obj.targetEnemy = this.targetEnemy;
     obj.damage = damage;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 
   drawPreview() {

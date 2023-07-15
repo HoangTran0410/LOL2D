@@ -21,7 +21,7 @@ export default class Veigar_E extends Spell {
 
     let obj = new Veigar_E_Object(this.owner);
     obj.position = to;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 

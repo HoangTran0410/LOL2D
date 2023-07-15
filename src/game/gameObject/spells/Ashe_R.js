@@ -3,7 +3,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Stun from '../buffs/Stun.js';
-import ParticleSystem from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ashe_R extends Spell {
@@ -21,7 +20,7 @@ export default class Ashe_R extends Spell {
     obj.direction = direction;
     obj.speed = 10;
 
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 

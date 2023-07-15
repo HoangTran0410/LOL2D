@@ -2,7 +2,7 @@ import ColorUtils from '../../../utils/color.utils.js';
 import SpellObject from '../SpellObject.js';
 
 export default class CombatText extends SpellObject {
-  velocity = createVector(random(-1, 1), -2);
+  velocity = createVector(0, -2);
   gravity = createVector(0.01, 0.05);
   movedVector = createVector();
   lifeTime = 1000;

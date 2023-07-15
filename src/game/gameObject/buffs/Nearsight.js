@@ -12,14 +12,14 @@ export default class Nearsight extends Buff {
   statusFlagsToEnable = StatusFlags.NearSighted;
 
   // for override
-  newSightRadius = 0;
+  newVisionRadius = 0;
   activeLerpSpeed = 0.1; // speed of changing sight radius when buff is active
   deactiveLerpSpeed = 0.05; // speed of changing sight radius when buff is deactivated
 
   onCreate() {
     this.statsModifier = new StatsModifier();
-    this.statsModifier.sightRadius.baseValue =
-      -this.targetUnit.stats.sightRadius.baseValue + this.newSightRadius;
+    this.statsModifier.visionRadius.baseValue =
+      -this.targetUnit.stats.visionRadius.baseValue + this.newVisionRadius;
   }
 
   onActivate() {

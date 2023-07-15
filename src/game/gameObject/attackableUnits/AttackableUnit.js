@@ -4,6 +4,7 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import GameObject from '../GameObject.js';
 import Stats from '../Stats.js';
+import CombatText from '../helpers/CombatText.js';
 
 /// Base class for all attackable units.
 /// AttackableUnits normally follow these guidelines of functionality: Death state, movements, Crowd Control, Stats (including modifiers), Buffs.
@@ -27,7 +28,9 @@ export default class AttackableUnit extends GameObject {
       height: 0,
       alpha: 255,
       displaySize: 10,
+      visionRadius: 0,
     };
+    this.isInsideBush = false;
   }
 
   update() {
@@ -49,15 +52,15 @@ export default class AttackableUnit extends GameObject {
     }
 
     // animated
-    let isInsideBush = hasFlag(this.status, StatusFlags.InBush);
     let isStealthed = hasFlag(this.stats.actionState, ActionState.STEALTHED);
-    let alphaColor = isInsideBush ? 100 : isStealthed ? 20 : 255;
+    let alphaColor = this.isInsideBush ? 100 : isStealthed ? 20 : 255;
 
-    let { size, height, alpha } = this.animatedValues;
+    let { size, height, alpha, visionRadius } = this.animatedValues;
     this.animatedValues = {
       displaySize: size + height,
       size: lerp(size, this.stats.size.value, 0.1), // higher height = bigger size
       height: lerp(height, this.stats.height.value, 0.3),
+      visionRadius: lerp(visionRadius, this.visionRadius || this.stats.visionRadius.value, 0.1),
       alpha:
         alphaColor > alpha
           ? lerp(alpha || 0, alphaColor, 0.2) // smooth fade in
@@ -89,7 +92,7 @@ export default class AttackableUnit extends GameObject {
     circle(pos.x, pos.y, size);
 
     // draw direction to mouse
-    if (!this.isDead && this.game.worldMouse && this === this.game.player) {
+    if (!this.isDead && this.game.worldMouse) {
       let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 2 + 2);
       stroke(255, Math.min(alpha, 125));
       strokeWeight(4);
@@ -195,6 +198,12 @@ export default class AttackableUnit extends GameObject {
 
   takeHeal(heal, healer) {
     if (this.isDead) return;
+
+    let combatText = new CombatText(this);
+    combatText.text = '+' + damage;
+    combatText.textColor = [0, 255, 0];
+    this.game.addObject(combatText);
+
     this.stats.health.baseValue = constrain(
       this.stats.health.baseValue + heal,
       0,
@@ -204,6 +213,11 @@ export default class AttackableUnit extends GameObject {
 
   takeDamage(damage, attacker) {
     if (this.isDead) return;
+
+    let combatText = new CombatText(this);
+    combatText.text = '-' + damage;
+    combatText.textColor = [255, 0, 0];
+    this.game.addObject(combatText);
 
     this.stats.health.baseValue -= damage;
     if (this.stats.health.baseValue <= 0) {

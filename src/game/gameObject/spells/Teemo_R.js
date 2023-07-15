@@ -32,7 +32,7 @@ export default class Teemo_R extends Spell {
     obj.lifeTime = lifeTime;
     obj.explodeRange = explodeRange;
 
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 

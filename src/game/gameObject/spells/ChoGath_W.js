@@ -26,7 +26,7 @@ export default class ChoGath_W extends Spell {
     obj.angleEnd = angle + angleRange / 2;
     obj.stunTime = stunTime;
     obj.lifeTime = lifeTime;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
 
     let rootBuff = new Root(lifeTime, this.owner, this.owner);
     rootBuff.buffAddType = BuffAddType.RENEW_EXISTING;

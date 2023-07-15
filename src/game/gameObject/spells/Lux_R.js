@@ -35,7 +35,7 @@ export default class Lux_R extends Spell {
     obj.fireTime = fireTime;
     obj.stunTime = stunTime;
 
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
 
     // stun buff for owner
     let buff = new RootBuff(prepairTime + fireTime, this.owner, this.owner);

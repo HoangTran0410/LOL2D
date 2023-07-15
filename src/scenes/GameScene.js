@@ -1,5 +1,4 @@
 import Game from '../game/Game.js';
-import TestGame from '../game/TestGame.js';
 import { Scene } from '../managers/SceneManager.js';
 import MenuScene from './MenuScene.js';
 
@@ -31,8 +30,7 @@ export default class GameScene extends Scene {
     imageMode(CENTER);
     frameRate(60);
 
-    // this.game = new Game();
-    this.game = new TestGame();
+    this.game = new Game();
   }
 
   draw() {

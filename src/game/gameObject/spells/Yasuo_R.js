@@ -66,7 +66,7 @@ export default class Yasuo_R extends Spell {
     obj.position = nearestEnemy.position.copy();
     obj.size = this.rangeToApplyAirborne * 2;
     obj.lifeTime = this.timeToApplyAirborne;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
 
     // dash owner to behind (10px) nearest enemy
     let nearEnemyPos = mouse

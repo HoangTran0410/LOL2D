@@ -22,7 +22,7 @@ export default class Shaco_W extends Spell {
     let obj = new Shaco_W_Object(this.owner);
     obj.position = from;
     obj.destination = to;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 
@@ -114,7 +114,7 @@ export class Shaco_W_Object extends SpellObject {
             bullet.position = this.position.copy();
             bullet.targetEnemy = enemy;
             bullet.damage = this.attackDamage;
-            this.game.addSpellObject(bullet);
+            this.game.addObject(bullet);
           });
 
           this.timeSinceLastAttack = 0;

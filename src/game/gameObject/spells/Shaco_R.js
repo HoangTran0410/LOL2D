@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
-import Champion from '../attackableUnits/AI/Champion.js';
+import Champion from '../attackableUnits/Champion.js';
 import Fear from '../buffs/Fear.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
 import { Shaco_W_Object } from './Shaco_W.js';
@@ -128,7 +128,7 @@ class Shaco_R_Clone extends Champion {
         vel: v,
       });
     }
-    this.game.addSpellObject(explodeEffect);
+    this.game.addObject(explodeEffect);
 
     // take damage + fear nearby enemies
     let enemies = this.game.queryPlayersInRange({
@@ -154,7 +154,7 @@ class Shaco_R_Clone extends Champion {
         Math.cos((i * 2 * Math.PI) / 3) * 100, // 100 is the radius
         Math.sin((i * 2 * Math.PI) / 3) * 100
       );
-      this.game.addSpellObject(obj);
+      this.game.addObject(obj);
     }
   }
 }

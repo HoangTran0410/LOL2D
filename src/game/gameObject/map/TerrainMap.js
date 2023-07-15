@@ -81,8 +81,7 @@ export default class TerrainMap {
           break;
         }
       }
-      if (isInsideBush) p.setStatus(StatusFlags.InBush, true);
-      else p.setStatus(StatusFlags.InBush, false);
+      p.isInsideBush = isInsideBush;
 
       // Collide with waters => add ripple effect
       if (!p.isDead && frameCount % 45 === 0 && p.position.dist(p.destination) > 0) {
@@ -117,7 +116,11 @@ export default class TerrainMap {
       let overlapsWalls = [];
       for (let wall of walls) {
         let response = new SAT.Response();
-        let _collided = SAT.testPolygonCircle(wall.toSATPolygon(), p.toSATCircle(), response);
+        let pSAT = new SAT.Circle(
+          new SAT.Vector(p.position.x, p.position.y),
+          p.stats.size.value / 2
+        );
+        let _collided = SAT.testPolygonCircle(wall.toSATPolygon(), pSAT, response);
         if (_collided) {
           let overlap = createVector(response.overlapV.x, response.overlapV.y);
           totalOverlap.add(overlap); // Accumulate the overlap vectors
@@ -148,21 +151,21 @@ export default class TerrainMap {
     }
 
     // collision map edges
-    for (let p of this.game.players) {
-      let size = p.stats.size.value / 2;
+    // for (let p of this.game.players) {
+    //   let size = p.stats.size.value / 2;
 
-      if (
-        p.position.x < size ||
-        p.position.x > this.size - size ||
-        p.position.y < size ||
-        p.position.y > this.size - size
-      ) {
-        p.position.x = constrain(p.position.x, size, this.size - size);
-        p.position.y = constrain(p.position.y, size, this.size - size);
+    //   if (
+    //     p.position.x < size ||
+    //     p.position.x > this.size - size ||
+    //     p.position.y < size ||
+    //     p.position.y > this.size - size
+    //   ) {
+    //     p.position.x = constrain(p.position.x, size, this.size - size);
+    //     p.position.y = constrain(p.position.y, size, this.size - size);
 
-        p.onCollideMapEdge?.();
-      }
-    }
+    //     p.onCollideMapEdge?.();
+    //   }
+    // }
   }
 
   draw() {
@@ -217,7 +220,7 @@ export default class TerrainMap {
     let area = new Circle({
       x: champion.position.x,
       y: champion.position.y,
-      r: champion.stats.sightRadius.value,
+      r: champion.animatedValues?.visionRadius || champion.visionRadius,
     });
     return this.getObstaclesInArea(area, terrainTypes);
   }

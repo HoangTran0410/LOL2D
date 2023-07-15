@@ -14,7 +14,7 @@ export class StatsModifier {
     this.height = new StatModifier(0);
     this.manaRegen = new StatModifier(0);
     this.healthRegen = new StatModifier(0);
-    this.sightRadius = new StatModifier(0);
+    this.visionRadius = new StatModifier(0);
   }
 }
 
@@ -29,7 +29,7 @@ export default class Stats {
     this.height = new Stat(0);
     this.manaRegen = new Stat(0.1);
     this.healthRegen = new Stat(0.06);
-    this.sightRadius = new Stat(600);
+    this.visionRadius = new Stat(600);
 
     this.actionState = ActionState.CAN_CAST | ActionState.CAN_MOVE | ActionState.TARGETABLE;
   }
@@ -44,7 +44,7 @@ export default class Stats {
     this.height.addModifier(modifier.height);
     this.manaRegen.addModifier(modifier.manaRegen);
     this.healthRegen.addModifier(modifier.healthRegen);
-    this.sightRadius.addModifier(modifier.sightRadius);
+    this.visionRadius.addModifier(modifier.visionRadius);
   }
 
   removeModifier(modifier) {
@@ -57,7 +57,7 @@ export default class Stats {
     this.height.removeModifier(modifier.height);
     this.manaRegen.removeModifier(modifier.manaRegen);
     this.healthRegen.removeModifier(modifier.healthRegen);
-    this.sightRadius.removeModifier(modifier.sightRadius);
+    this.visionRadius.removeModifier(modifier.visionRadius);
   }
 
   getActionState(state) {

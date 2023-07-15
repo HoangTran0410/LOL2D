@@ -19,7 +19,7 @@ export default class Blitzcrank_R extends Spell {
     let obj = new Blitzcrank_R_Object(this.owner);
     obj.maxSize = range * 2;
     obj.silenceTime = silenceTime;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
 
     playSound(SOUNDS.blit_r);
   }

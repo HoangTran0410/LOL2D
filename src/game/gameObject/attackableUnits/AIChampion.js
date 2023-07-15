@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import Champion from './Champion.js';
 import { getPresetRandom } from '../../preset.js';
+import Champion from './Champion.js';
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -31,23 +31,23 @@ export default class AIChampion extends Champion {
   }
 
   moveToRandomLocation() {
-    let x = random(this.game.terrainMap.size);
-    let y = random(this.game.terrainMap.size);
+    let x = random(this.game.mapSize);
+    let y = random(this.game.mapSize);
     this.moveTo(x, y);
   }
 
   onCollideMapEdge() {
-    super.onCollideMapEdge();
+    super.onCollideMapEdge?.();
     if (this._autoMoveOnCollideMapEdge) this.moveToRandomLocation();
   }
 
   onCollideWall() {
-    super.onCollideWall();
+    super.onCollideWall?.();
     if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
   }
 
-  takeDamage(damage, source) {
-    super.takeDamage(damage, source);
+  takeDamage(damage, attacker) {
+    super.takeDamage(damage, attacker);
     if (this._autoMoveOnTakeDamage) this.moveToRandomLocation();
   }
 

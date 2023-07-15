@@ -37,7 +37,7 @@ export default class Dash extends Buff {
 
   onCreate() {
     if (this.showTrail && this.game) {
-      this.game.addSpellObject(this.trailSystem);
+      this.game.addObject(this.trailSystem);
       this.trailSystem.trailSize = this.targetUnit.stats.size.value;
     }
   }

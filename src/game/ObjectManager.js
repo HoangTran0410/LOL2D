@@ -1,5 +1,6 @@
 import SpellObject from './gameObject/SpellObject.js';
-import Champion from './gameObject/attackableUnits/AI/Champion.js';
+import Champion from './gameObject/attackableUnits/Champion.js';
+import AttackableUnit from './gameObject/attackableUnits/AttackableUnit.js';
 import CombatText from './gameObject/helpers/CombatText.js';
 
 const DisplayZIndex = [
@@ -35,8 +36,8 @@ export default class ObjectManager {
     // sort
     if (!this._sorted) {
       this.objects.sort((a, b) => {
-        let aZIndex = DisplayZIndex.findIndex(t => a instanceof t);
-        let bZIndex = DisplayZIndex.findIndex(t => b instanceof t);
+        let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
+        let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
         return aZIndex - bZIndex;
       });
       this._sorted = true;
@@ -98,11 +99,7 @@ export default class ObjectManager {
     return results;
   }
 
-  getObjectsWithTypes(types) {
-    return this.objects.filter(o => types.some(t => o instanceof t));
-  }
-
   getAllChampions() {
-    return this.getObjectsWithTypes([Champion]);
+    return this.objects.filter(o => o instanceof Champion);
   }
 }

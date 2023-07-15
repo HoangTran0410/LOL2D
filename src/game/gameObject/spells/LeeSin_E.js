@@ -29,7 +29,7 @@ export default class LeeSin_E extends Spell {
     let obj = new LeeSin_E_Object(this.owner);
     obj.range = this.range;
     obj.enemies = enemies;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 
   onUpdate() {}

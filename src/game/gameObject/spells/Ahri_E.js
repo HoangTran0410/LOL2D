@@ -27,7 +27,7 @@ export default class Ahri_E extends Spell {
     obj.destination = to;
     obj.range = range;
     obj.charmTime = charmTime;
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
   }
 }
 

@@ -46,7 +46,7 @@ export default class Malphite_R extends Spell {
 
       let obj = new Malphite_R_Object(this.owner);
       obj.hitRadius = this.hitRadius;
-      this.game.addSpellObject(obj);
+      this.game.addObject(obj);
     };
     this.owner.addBuff(dashBuff);
 

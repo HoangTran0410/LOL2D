@@ -28,7 +28,7 @@ export default class Yasuo_W extends Spell {
     obj.size = size;
     obj.duration = duration;
 
-    this.game.addSpellObject(obj);
+    this.game.addObject(obj);
 
     playSound(SOUNDS.yasuo_w);
   }
