@@ -1,7 +1,9 @@
 const VectorUtils = {
   getVectorWithRange(rootVector, targetVector, range) {
     let from = rootVector.copy();
-    let to = p5.Vector.add(from, p5.Vector.sub(targetVector, from).setMag(range));
+    let dir = p5.Vector.sub(targetVector, from);
+    if (dir.mag() === 0) dir.add(random(-1, 1), random(-1, 1));
+    let to = p5.Vector.add(from, dir.setMag(range));
     return { from, to };
   },
   getVectorWithMaxRange(rootVector, targetVector, maxRange) {

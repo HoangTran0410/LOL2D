@@ -10,20 +10,20 @@ import Slow from '../../buffs/Slow.js';
 import Stun from '../../buffs/Stun.js';
 
 export default class Champion extends AttackableUnit {
-  constructor({ game, position, collisionRadius, visionRadius, teamId, stats, preset }) {
+  constructor({ game, position, collisionRadius, visionRadius, teamId, stats, avatar, preset }) {
     super({
       game,
       position,
       collisionRadius,
       visionRadius,
       teamId,
-      avatar: AssetManager.getAsset(preset.avatar),
+      avatar: avatar || AssetManager.getAsset(preset.avatar),
       stats,
     });
 
     this.score = 0;
-    this.name = preset.name;
-    this.spells = preset.spells.map(spell => new spell(this));
+    this.name = preset?.name;
+    this.spells = preset?.spells?.map?.(spell => new spell(this)) || [];
   }
 
   onAdded() {}

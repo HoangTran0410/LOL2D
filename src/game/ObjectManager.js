@@ -4,13 +4,14 @@ import CombatText from './gameObject/helpers/CombatText.js';
 
 const DisplayZIndex = [
   //
-  Champion,
   SpellObject,
+  Champion,
   CombatText,
 ];
 
 export default class ObjectManager {
   objects = [];
+  _sorted = true;
 
   constructor(game) {
     this.game = game;
@@ -30,6 +31,16 @@ export default class ObjectManager {
         this.objects.splice(i, 1);
       }
     }
+
+    // sort
+    if (!this._sorted) {
+      this.objects.sort((a, b) => {
+        let aZIndex = DisplayZIndex.findIndex(t => a instanceof t);
+        let bZIndex = DisplayZIndex.findIndex(t => b instanceof t);
+        return aZIndex - bZIndex;
+      });
+      this._sorted = true;
+    }
   }
 
   draw() {
@@ -40,12 +51,9 @@ export default class ObjectManager {
 
   addObject(object) {
     this.objects.push(object);
-    this.objects.sort((a, b) => {
-      let aZIndex = DisplayZIndex.findIndex(t => a instanceof t);
-      let bZIndex = DisplayZIndex.findIndex(t => b instanceof t);
-      return aZIndex - bZIndex;
-    });
     object.onAdded?.();
+    this._sorted = false;
+    // Cannot sort here because it will break the for loop in update()
   }
 
   removeObject(object) {

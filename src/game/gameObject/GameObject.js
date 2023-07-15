@@ -46,8 +46,7 @@ export default class GameObject {
 
   teleportTo(x, y) {
     // TODO: get closest terrain exit
-    this.position.x = x;
-    this.position.y = y;
+    this.position.set(x, y);
   }
 
   // onEnterVision(playerId, teamId) {}

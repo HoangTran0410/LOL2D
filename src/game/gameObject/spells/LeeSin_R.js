@@ -106,10 +106,10 @@ export default class LeeSin_R extends Spell {
     });
 
     // pos is contact point
-    let dir = closestEnemyToMouse.position.copy().sub(this.owner.position).normalize();
+    let dir = p5.Vector.sub(destination, from);
     let pos = closestEnemyToMouse.position
       .copy()
-      .sub(dir.copy().mult(closestEnemyToMouse.stats.size.value / 2));
+      .sub(dir.setMag(closestEnemyToMouse.stats.size.value / 2));
 
     for (let i = 0; i < 20; i++) {
       let lifeTime = random(300, 1500);

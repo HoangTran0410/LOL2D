@@ -21,11 +21,11 @@ export default class TestGame {
     });
     this.objectManager.addObject(this.player);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
         new Champion({
           game: this,
-          position: createVector(100 + i * 100, 100),
+          position: createVector(100 + i * 60, 100 + i * 30),
           preset: getPresetRandom(),
         })
       );
@@ -113,6 +113,10 @@ export default class TestGame {
 
   addSpellObject(spellObject) {
     this.objectManager.addObject(spellObject);
+  }
+
+  addPlayer(player) {
+    this.objectManager.addObject(player);
   }
 
   queryObjects({ type, getOnlyOne = false, customFilter = null }) {

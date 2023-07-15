@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
-import Champion from '../attackableUnits/Champion.js';
+import Champion from '../attackableUnits/AI/Champion.js';
 import Fear from '../buffs/Fear.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
 import { Shaco_W_Object } from './Shaco_W.js';
@@ -28,7 +28,11 @@ export default class Shaco_R extends Spell {
   }
 
   onSpellCast() {
-    let clone = new Shaco_R_Clone(this.game, this.owner.position.x, this.owner.position.y);
+    let clone = new Shaco_R_Clone({
+      game: this.game,
+      position: this.owner.position.copy(),
+      avatar: this.owner.avatar,
+    });
     clone.avatar = this.owner.avatar;
     clone.spells = [];
     clone.shacoR_championOwner = this.owner;
@@ -66,14 +70,14 @@ class Shaco_R_Clone extends Champion {
     super.update();
 
     // move clone to owner position if too far away
-    if (this.position.dist(this.shacoR_championOwner.position) > this.shacoR_maxRange) {
-      this.position.set(this.shacoR_championOwner.position.x, this.shacoR_championOwner.position.y);
+    let ownerPos = this.shacoR_championOwner.position;
+    if (this.position.dist(ownerPos) > this.shacoR_maxRange) {
+      this.teleportTo(ownerPos.x, ownerPos.y);
     }
 
     this.shacoR_age += deltaTime;
-    if (this.shacoR_age >= this.shacoR_lifeTime || this.isDead) {
+    if (this.shacoR_age >= this.shacoR_lifeTime) {
       this.shacoR_explode();
-      // this.onExplode?.();
     }
   }
 

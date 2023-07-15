@@ -12,7 +12,7 @@ export default class ChoGath_Q extends Spell {
   coolDown = 7000;
 
   maxRange = 400;
-  size = 150;
+  size = 140;
   expandSize = 200;
   damage = 20;
 
@@ -68,6 +68,7 @@ export class ChoGath_Q_Object extends SpellObject {
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.size / 2,
+          includePlayerSize: true,
           excludePlayers: [this.owner],
         });
 
