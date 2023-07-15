@@ -32,7 +32,7 @@ export default class TestGame {
       this.objectManager.addObject(
         new AIChampion({
           game: this,
-          position: createVector(random(this.mapSize), random(this.mapSize)),
+          position: this.randomSpawnPoint(),
           preset: getPresetRandom(),
         })
       );
@@ -190,6 +190,13 @@ export default class TestGame {
 
   get mapSize() {
     return this.terrainMap.size;
+  }
+
+  randomSpawnPoint() {
+    return createVector(
+      this.mapSize / 2 + random(-this.mapSize / 3, this.mapSize / 3),
+      this.mapSize / 2 + random(-this.mapSize / 3, this.mapSize / 3)
+    );
   }
 
   resize(w, h) {

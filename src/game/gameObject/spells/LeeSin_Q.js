@@ -4,6 +4,7 @@ import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
+import TrueSight from '../buffs/TrueSight.js';
 
 export default class LeeSin_Q extends Spell {
   static PHASES = {
@@ -61,6 +62,10 @@ export default class LeeSin_Q extends Spell {
       obj.onHit = enemy => {
         this.enemyHit = enemy;
         enemy.takeDamage(hitDamage);
+
+        // true sight
+        let trueSightBuff = new TrueSight(1000, this.owner, enemy);
+        enemy.addBuff(trueSightBuff);
 
         // switch to phase 2 if Q1 hits
         this.phase = LeeSin_Q.PHASES.Q2;

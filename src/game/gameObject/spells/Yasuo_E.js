@@ -67,10 +67,6 @@ export default class Yasuo_E extends Spell {
   }
 
   drawPreview() {
-    push();
-    noFill();
-    stroke(255, 100);
-    circle(this.owner.position.x, this.owner.position.y, this.rangeToFindEnemies * 2);
-    pop();
+    super.drawPreview(this.rangeToFindEnemies);
   }
 }

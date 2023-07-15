@@ -89,5 +89,13 @@ export default class Spell {
   }
   onSpellCast() {}
   onUpdate() {}
-  drawPreview() {}
+  drawPreview(radius) {
+    if (radius) {
+      push();
+      stroke(200, 100);
+      noFill();
+      circle(this.owner.position.x, this.owner.position.y, radius * 2);
+      pop();
+    }
+  }
 }

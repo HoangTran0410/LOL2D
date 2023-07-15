@@ -190,9 +190,6 @@ export default class AttackableUnit extends GameObject {
       this._buffEffectsToDisable |= buff.statusFlagsToDisable;
     }
 
-    // If the effect should be enabled, it overrides disable.
-    this._buffEffectsToDisable &= ~this._buffEffectsToEnable;
-
     this.setStatus(StatusFlags.None, true);
   }
 
@@ -233,6 +230,10 @@ export default class AttackableUnit extends GameObject {
   respawn() {
     this.stats.health.baseValue = this.stats.maxHealth.value;
     this.deathData = null;
+
+    let spawnPoint = this.game.randomSpawnPoint();
+    this.position.set(spawnPoint.x, spawnPoint.y);
+    this.destination.set(spawnPoint.x, spawnPoint.y);
   }
 
   setStatus(status, enabled) {

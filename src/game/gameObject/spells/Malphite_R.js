@@ -67,11 +67,7 @@ export default class Malphite_R extends Spell {
   }
 
   drawPreview() {
-    push();
-    noFill();
-    stroke(100, 100);
-    circle(this.owner.position.x, this.owner.position.y, this.maxRange * 2);
-    pop();
+    super.drawPreview(this.maxRange);
   }
 }
 

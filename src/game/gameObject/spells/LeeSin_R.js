@@ -127,11 +127,7 @@ export default class LeeSin_R extends Spell {
   }
 
   drawPreview() {
-    push();
-    noFill();
-    stroke(200, 100);
-    circle(this.owner.position.x, this.owner.position.y, this.rangeToCheckEnemies * 2);
-    pop();
+    super.drawPreview(this.rangeToCheckEnemies);
   }
 }
 

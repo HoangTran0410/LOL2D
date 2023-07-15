@@ -16,6 +16,7 @@ const AssetPaths = {
   champ_olaf: 'assets/images/champions/olaf.png',
 
   // spells
+  spell_stealthward: 'assets/images/spells/stealthward.png',
   spell_flash: 'assets/images/spells/flash.png',
   spell_ghost: 'assets/images/spells/ghost.png',
   spell_heal: 'assets/images/spells/heal.png',
@@ -71,6 +72,7 @@ const AssetPaths = {
   buff_nearsight: 'assets/images/buffs/nearsight.png',
   buff_fear: 'assets/images/buffs/fear.png',
   buff_invisible: 'assets/images/buffs/invisible.png',
+  buff_truesight: 'assets/images/buffs/truesight.png',
 
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',

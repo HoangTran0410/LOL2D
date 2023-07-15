@@ -136,4 +136,10 @@ export default class Champion extends AttackableUnit {
     }
     pop();
   }
+
+  die(deathData) {
+    super.die(deathData);
+    this.score--;
+    if (deathData.attacker) deathData.attacker.score++;
+  }
 }

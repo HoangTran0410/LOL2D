@@ -33,11 +33,7 @@ export default class ChoGath_Q extends Spell {
   }
 
   drawPreview() {
-    push();
-    noFill();
-    stroke(200, 100);
-    circle(this.owner.position.x, this.owner.position.y, this.maxRange * 2);
-    pop();
+    super.drawPreview(this.maxRange);
   }
 }
 

@@ -32,3 +32,4 @@ export { default as Shaco_E } from './Shaco_E.js';
 export { default as Shaco_R } from './Shaco_R.js';
 export { default as Malphite_R } from './Malphite_R.js';
 export { default as Olaf_Q } from './Olaf_Q.js';
+export { default as StealthWard } from './StealthWard.js';
