@@ -51,8 +51,8 @@ export default class Camera {
     return {
       x: topLeft.x,
       y: topLeft.y,
-      width: bottomRight.x - topLeft.x,
-      height: bottomRight.y - topLeft.y,
+      w: bottomRight.x - topLeft.x,
+      h: bottomRight.y - topLeft.y,
     };
   }
 

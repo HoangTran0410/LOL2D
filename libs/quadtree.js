@@ -5,8 +5,8 @@ class Quadtree {
     this.bounds = {
       x: props.x || 0,
       y: props.y || 0,
-      width: props.width,
-      height: props.height,
+      w: props.w,
+      h: props.h,
     };
     this.maxObjects = typeof props.maxObjects === 'number' ? props.maxObjects : 10;
     this.maxLevels = typeof props.maxLevels === 'number' ? props.maxLevels : 4;
@@ -21,8 +21,8 @@ class Quadtree {
 
   split() {
     const level = this.level + 1,
-      width = this.bounds.width / 2,
-      height = this.bounds.height / 2,
+      width = this.bounds.w / 2,
+      height = this.bounds.h / 2,
       x = this.bounds.x,
       y = this.bounds.y;
     const coords = [
@@ -36,8 +36,8 @@ class Quadtree {
         {
           x: coords[i].x,
           y: coords[i].y,
-          width,
-          height,
+          w: width,
+          h: height,
           maxObjects: this.maxObjects,
           maxLevels: this.maxLevels,
         },
@@ -106,19 +106,19 @@ class Rectangle {
   constructor(props) {
     this.x = props.x;
     this.y = props.y;
-    this.width = props.width;
-    this.height = props.height;
+    this.w = props.w;
+    this.h = props.h;
     this.data = props.data;
   }
 
   qtIndex(node) {
     const indexes = [],
-      boundsCenterX = node.x + node.width / 2,
-      boundsCenterY = node.y + node.height / 2;
+      boundsCenterX = node.x + node.w / 2,
+      boundsCenterY = node.y + node.h / 2;
     const startIsNorth = this.y < boundsCenterY,
       startIsWest = this.x < boundsCenterX,
-      endIsEast = this.x + this.width > boundsCenterX,
-      endIsSouth = this.y + this.height > boundsCenterY;
+      endIsEast = this.x + this.w > boundsCenterX,
+      endIsSouth = this.y + this.h > boundsCenterY;
     //top-right quad
     if (startIsNorth && endIsEast) {
       indexes.push(0);
@@ -149,8 +149,8 @@ class Circle {
 
   qtIndex(node) {
     const indexes = [],
-      w2 = node.width / 2,
-      h2 = node.height / 2,
+      w2 = node.w / 2,
+      h2 = node.h / 2,
       x2 = node.x + w2,
       y2 = node.y + h2;
     //an array of node origins where the array index equals the node index
@@ -197,8 +197,8 @@ class Line {
 
   qtIndex(node) {
     const indexes = [],
-      w2 = node.width / 2,
-      h2 = node.height / 2,
+      w2 = node.w / 2,
+      h2 = node.h / 2,
       x2 = node.x + w2,
       y2 = node.y + h2;
     //an array of node origins where the array index equals the node index

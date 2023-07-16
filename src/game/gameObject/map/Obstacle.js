@@ -74,8 +74,8 @@ export default class Obstacle {
     return {
       x: minX,
       y: minY,
-      width: maxX - minX,
-      height: maxY - minY,
+      w: maxX - minX,
+      h: maxY - minY,
     };
   }
 

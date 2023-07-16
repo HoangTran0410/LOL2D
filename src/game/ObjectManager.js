@@ -6,13 +6,14 @@ import CombatText from './gameObject/helpers/CombatText.js';
 const DisplayZIndex = [
   //
   SpellObject,
+  AttackableUnit,
   Champion,
   CombatText,
 ];
 
 export default class ObjectManager {
   objects = [];
-  _sorted = true;
+  _objectToBeAdded = [];
 
   constructor(game) {
     this.game = game;
@@ -28,19 +29,25 @@ export default class ObjectManager {
     for (let i = this.objects.length - 1; i >= 0; i--) {
       const o = this.objects[i];
       if (o.toRemove) {
-        o.onBeforeRemove?.();
+        o.onRemoved?.();
         this.objects.splice(i, 1);
       }
     }
 
-    // sort
-    if (!this._sorted) {
+    // check add
+    if (this._objectToBeAdded.length > 0) {
+      for (let o of this._objectToBeAdded) {
+        this.objects.push(o);
+        o.onAdded?.();
+      }
+      this._objectToBeAdded = [];
       this.objects.sort((a, b) => {
         let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
         let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
         return aZIndex - bZIndex;
       });
-      this._sorted = true;
+
+      console.log(this.objects);
     }
   }
 
@@ -51,10 +58,7 @@ export default class ObjectManager {
   }
 
   addObject(object) {
-    this.objects.push(object);
-    object.onAdded?.();
-    this._sorted = false;
-    // Cannot sort here because it will break the for loop in update()
+    this._objectToBeAdded.push(object);
   }
 
   removeObject(object) {

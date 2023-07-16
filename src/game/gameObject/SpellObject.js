@@ -11,10 +11,4 @@ export default class SpellObject extends GameObject {
     });
     this.owner = owner;
   }
-
-  update() {}
-
-  draw() {}
-
-  onBeforeRemove() {}
 }

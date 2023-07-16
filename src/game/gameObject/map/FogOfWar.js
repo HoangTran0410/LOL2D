@@ -41,21 +41,24 @@ export default class FogOfWar {
       .filter(o => {
         if (o === this.game.player) return true;
         if (o instanceof AttackableUnit) return !o.isDead;
-        return o.visionRadius > 0;
+        if (o.visionRadius > 0) {
+          // check in camera view
+          let { x, y, w, h } = this.game.camera.getViewBounds();
+          let { x: ox, y: oy } = o.position;
+          return CollideUtils.circleRect(ox, oy, o.visionRadius, x, y, w, h);
+        }
+        return false;
       });
-
-    // console.log('allyObjects', allyObjects);
 
     let allSightPoly = [],
       visiblePlayers = [];
 
     allyObjects.forEach(obj => {
-      let { sightPoly, playersInSight, visionRadius } = this.calculateSightForObject(obj);
+      let { sightPoly, playersInSight } = this.calculateSightForObject(obj);
       visiblePlayers.push(obj);
       visiblePlayers.push(...playersInSight);
       allSightPoly.push({
         object: obj,
-        visionRadius,
         sightPoly,
       });
     });
@@ -82,22 +85,21 @@ export default class FogOfWar {
     );
 
     // calculate visibility
-    let visionRadius = obj.animatedValues?.visionRadius || obj.visionRadius;
     let sightPoly = this.calculateVisibility({
       polygons: obstaclesInSight.map(o => o.vertices),
       sourceOfLight: [obj.position.x, obj.position.y],
       sightBound: {
-        x: obj.position.x - visionRadius,
-        y: obj.position.y - visionRadius,
-        w: visionRadius * 2,
-        h: visionRadius * 2,
+        x: obj.position.x - obj.visionRadius,
+        y: obj.position.y - obj.visionRadius,
+        w: obj.visionRadius * 2,
+        h: obj.visionRadius * 2,
       },
     });
 
     // calculate visible players
     let playersInSight = this.game.queryPlayersInRange({
       position: obj.position,
-      range: visionRadius,
+      range: obj.visionRadius,
       includePlayerSize: true,
       includeDead: true,
       customFilter: p => {
@@ -107,7 +109,6 @@ export default class FogOfWar {
 
     return {
       sightPoly,
-      visionRadius,
       playersInSight,
     };
   }
@@ -127,8 +128,8 @@ export default class FogOfWar {
   drawVisions() {
     let allSightPoly = this.calculateSight();
 
-    allSightPoly.forEach(({ object, visionRadius, sightPoly }) => {
-      this.prepareRadialGradient(object.position.x, object.position.y, visionRadius, 50);
+    allSightPoly.forEach(({ object, sightPoly }) => {
+      this.prepareRadialGradient(object.position.x, object.position.y, object.visionRadius, 50);
 
       this.overlay.beginShape();
       sightPoly.forEach(v => {

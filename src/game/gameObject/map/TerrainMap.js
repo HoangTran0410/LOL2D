@@ -22,8 +22,8 @@ export default class TerrainMap {
     this.quadtree = new Quadtree({
       x: 0,
       y: 0,
-      width: this.size,
-      height: this.size,
+      w: this.size,
+      h: this.size,
       maxObjects: 10, // optional, default: 10
       maxLevels: 6, // optional, default:  4
     });

@@ -30,7 +30,7 @@ export default class TestGame {
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
-        new AIChampion({
+        new Champion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getPresetRandom(),
@@ -39,6 +39,8 @@ export default class TestGame {
     }
 
     this.camera.target = this.player.position;
+    this.camera.position = this.player.position.copy();
+
     this.clickedPoint = { x: 0, y: 0, size: 0 };
     this.worldMouse = createVector(0, 0);
   }
@@ -116,20 +118,15 @@ export default class TestGame {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
 
-      for (let o of this.objectManager.objects) {
-        if (!(o instanceof AttackableUnit)) {
-          o.draw();
-        }
-      }
+      this.objectManager.objects
+        .filter(o => !(o instanceof Champion)) // draw everything except players
+        .forEach(o => o.draw());
     });
 
     this.fogOfWar.draw(); // draw fog of war on top of everything, except players
 
     this.camera.makeDraw(() => {
-      if (!this.visiblePlayers?.length) console.log('no visible players');
-      for (let p of this.visiblePlayers || []) {
-        p.draw();
-      }
+      this.visiblePlayers?.forEach(p => p.draw());
     });
   }
 
@@ -193,9 +190,10 @@ export default class TestGame {
   }
 
   randomSpawnPoint() {
+    let range = 300;
     return createVector(
-      this.mapSize / 2 + random(-this.mapSize / 3, this.mapSize / 3),
-      this.mapSize / 2 + random(-this.mapSize / 3, this.mapSize / 3)
+      this.mapSize / 2 + random(-range, range),
+      this.mapSize / 2 + random(-range, range)
     );
   }
 

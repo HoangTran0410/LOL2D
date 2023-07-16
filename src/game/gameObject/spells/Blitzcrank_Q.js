@@ -118,7 +118,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     }
   }
 
-  onBeforeRemove() {
+  onRemoved() {
     this.airborneBuff?.deactivateBuff?.();
     this.dashBuff?.deactivateBuff?.();
   }

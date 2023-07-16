@@ -26,22 +26,17 @@ export default class Champion extends AttackableUnit {
     this.spells = preset?.spells?.map?.(spell => new spell(this)) || [];
   }
 
-  onAdded() {}
-
-  onRemoved() {}
-
   update() {
     super.update();
     this.spells.forEach(spell => spell.update());
   }
 
   draw() {
-    this.drawAvatar();
-    this.drawBuffs();
-    this.drawHud();
+    super.draw();
+    this.drawHealthBar();
   }
 
-  drawHud() {
+  drawHealthBar() {
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;
     let health = this.stats.health.value;
@@ -116,7 +111,11 @@ export default class Champion extends AttackableUnit {
       fill(200);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text(`ĐANG HỒI SINH ${~~(this.reviveAfter / 1000)}...`, pos.x, topleft.y + barHeight + 8);
+      text(
+        `Hồi Sinh Sau ${~~(this.deathData.reviveAfter / 1000)}...`,
+        pos.x,
+        topleft.y + barHeight + 8
+      );
     } else {
       let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
         .map(BuffClass => {

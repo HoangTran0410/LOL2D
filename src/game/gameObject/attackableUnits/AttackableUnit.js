@@ -60,12 +60,13 @@ export default class AttackableUnit extends GameObject {
       displaySize: size + height,
       size: lerp(size, this.stats.size.value, 0.1), // higher height = bigger size
       height: lerp(height, this.stats.height.value, 0.3),
-      visionRadius: lerp(visionRadius, this.visionRadius || this.stats.visionRadius.value, 0.1),
+      visionRadius: lerp(visionRadius, this.stats.visionRadius.value, 0.1),
       alpha:
         alphaColor > alpha
           ? lerp(alpha || 0, alphaColor, 0.2) // smooth fade in
           : alphaColor, // instant fade out
     };
+    this.visionRadius = this.animatedValues.visionRadius;
   }
 
   draw() {
@@ -112,7 +113,7 @@ export default class AttackableUnit extends GameObject {
     this.buffs.forEach(buff => buff.draw?.());
   }
 
-  drawHud() {}
+  drawHealthBar() {}
 
   addBuff(buff) {
     if (this.isDead || !buff) return;
