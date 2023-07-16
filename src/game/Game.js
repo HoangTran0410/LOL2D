@@ -8,7 +8,6 @@ import TerrainMap from './gameObject/map/TerrainMap.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { ChampionPreset, MonsterPreset, getChampionPresetRandom } from './preset.js';
 import Monster from './gameObject/attackableUnits/Monster.js';
-import AssetManager from '../managers/AssetManager.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -29,17 +28,15 @@ export default class TestGame {
     });
     this.objectManager.addObject(this.player);
 
-    this.player.position.set(4709, 2743);
-
-    // for (let i = 0; i < 5; i++) {
-    //   this.objectManager.addObject(
-    //     new AIChampion({
-    //       game: this,
-    //       position: this.randomSpawnPoint(),
-    //       preset: getPresetRandom(),
-    //     })
-    //   );
-    // }
+    for (let i = 0; i < 5; i++) {
+      this.objectManager.addObject(
+        new AIChampion({
+          game: this,
+          position: this.randomSpawnPoint(),
+          preset: getChampionPresetRandom(),
+        })
+      );
+    }
 
     for (let key in MonsterPreset) {
       this.objectManager.addObject(
@@ -55,8 +52,6 @@ export default class TestGame {
 
     this.clickedPoint = { x: 0, y: 0, size: 0 };
     this.worldMouse = createVector(0, 0);
-
-    window.game = this;
   }
 
   pause() {
