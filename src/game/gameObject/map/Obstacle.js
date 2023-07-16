@@ -22,10 +22,10 @@ export default class Obstacle {
   draw() {
     push();
 
-    strokeWeight(5);
+    strokeWeight(7);
     if (this.type === TerrainType.WALL) {
-      stroke('#555');
-      fill('#555');
+      stroke('#777');
+      fill('#777');
     } else if (this.type === TerrainType.WATER) {
       noStroke();
       fill('#082740');

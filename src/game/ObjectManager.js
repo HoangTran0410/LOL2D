@@ -53,7 +53,7 @@ export default class ObjectManager {
 
   draw() {
     for (let o of this.objects) {
-      o.draw?.();
+      if (o.willDraw) o.draw?.();
     }
   }
 

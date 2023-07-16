@@ -2,12 +2,12 @@ import ColorUtils from '../../../utils/color.utils.js';
 import SpellObject from '../SpellObject.js';
 
 export default class CombatText extends SpellObject {
-  velocity = createVector(0, -2);
-  gravity = createVector(0.01, 0.05);
+  velocity = createVector(0, -1);
+  gravity = createVector(random(-0.03, 0.03), 0.05);
   movedVector = createVector();
   lifeTime = 1000;
   age = 0;
-  textSize = 18;
+  textSize = 20;
   textColor = 'white';
   text = '';
 
@@ -23,17 +23,6 @@ export default class CombatText extends SpellObject {
 
   draw() {
     push();
-    // let _textSize = map(this.age, 0, this.lifeTime, this.textSize, 10);
-    // let alpha = map(this.age, 0, this.lifeTime, 255, 50);
-    // let colour = [...this.textColor, alpha];
-
-    // noStroke();
-    // fill(colour);
-    // textStyle(BOLD);
-    // textSize(_textSize);
-    // textAlign(CENTER, CENTER);
-    // text(this.text, this.position.x, this.position.y);
-
     let alpha = map(this.age, 0, this.lifeTime, 255, 10);
     let strokeColor = ColorUtils.applyColorAlpha('yellow', alpha);
     let colorAlpha = ColorUtils.applyColorAlpha(this.textColor, alpha);

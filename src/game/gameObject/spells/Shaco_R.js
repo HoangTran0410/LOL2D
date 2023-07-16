@@ -76,7 +76,7 @@ class Shaco_R_Clone extends Champion {
     }
 
     this.shacoR_age += deltaTime;
-    if (this.shacoR_age >= this.shacoR_lifeTime) {
+    if (this.shacoR_age >= this.shacoR_lifeTime || this.isDead) {
       this.shacoR_explode();
     }
   }

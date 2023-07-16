@@ -92,6 +92,7 @@ export class Shaco_W_Object extends SpellObject {
         this.phase = Shaco_W_Object.PHASES.ATTACKING;
         this.lifeTime = this.attackLifeTime;
         this.age = 0;
+        this.visionRadius = this.attackRange;
       }
     }
 

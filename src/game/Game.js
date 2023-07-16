@@ -30,7 +30,7 @@ export default class TestGame {
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
-        new Champion({
+        new AIChampion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getPresetRandom(),
@@ -100,7 +100,7 @@ export default class TestGame {
   draw() {
     if (this.paused) return;
 
-    background(35);
+    background(50);
 
     this.camera.makeDraw(() => {
       this.terrainMap.draw();
@@ -118,16 +118,10 @@ export default class TestGame {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
 
-      this.objectManager.objects
-        .filter(o => !(o instanceof Champion)) // draw everything except players
-        .forEach(o => o.draw());
+      this.objectManager.draw();
     });
 
-    this.fogOfWar.draw(); // draw fog of war on top of everything, except players
-
-    this.camera.makeDraw(() => {
-      this.visiblePlayers?.forEach(p => p.draw());
-    });
+    this.fogOfWar.draw(); // draw fog of war on top of everything
   }
 
   destroy() {
@@ -199,5 +193,12 @@ export default class TestGame {
 
   resize(w, h) {
     this.fogOfWar.resize(w, h);
+  }
+
+  keyPressed() {
+    if (key === ' ') {
+      if (this.camera.target) this.camera.target = null; // stop following player
+      else this.camera.target = this.player.position;
+    }
   }
 }

@@ -117,6 +117,7 @@ export class Teemo_R_Object extends SpellObject {
           this.phase = Teemo_R_Object.PHASES.exploding;
           this.age = 0; // reset age
           this.size = this.explodeRange;
+          this.visionRadius = this.explodeRange;
         }
       }
     }

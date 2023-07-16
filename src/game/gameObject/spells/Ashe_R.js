@@ -80,6 +80,8 @@ export class Ashe_R_Object extends SpellObject {
           p.addBuff(stunBuff);
           p.takeDamage(30, this.owner);
         });
+
+        this.visionRadius = this.explodeSize;
       }
     }
 

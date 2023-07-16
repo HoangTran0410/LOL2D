@@ -12,9 +12,6 @@ export default class ChoGath_Q extends Spell {
   coolDown = 7000;
 
   maxRange = 400;
-  size = 140;
-  expandSize = 200;
-  damage = 20;
 
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
@@ -25,10 +22,7 @@ export default class ChoGath_Q extends Spell {
       .add(this.owner.position);
 
     let obj = new ChoGath_Q_Object(this.owner);
-    obj.size = this.size;
-    obj.damage = this.damage;
     obj.position = position;
-    obj.expandSize = this.expandSize;
     this.game.addObject(obj);
   }
 
@@ -44,12 +38,13 @@ export class ChoGath_Q_Slow_Buff extends Slow {
 
 export class ChoGath_Q_Object extends SpellObject {
   position = this.owner.position.copy();
-  size = 120;
-  expandSize = 150;
+  size = 140;
+  expandSize = 200;
+  damage = 20;
+  visionRadius = this.size;
   prepareTime = 700;
   lifeTime = 1100;
   age = 0;
-  damage = 20;
 
   affected = false;
 

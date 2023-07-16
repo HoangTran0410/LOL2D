@@ -2,6 +2,7 @@ import { uuidv4 } from '../../utils/index.js';
 
 export default class GameObject {
   toRemove = false;
+  willDraw = true;
   // isAffectedByFogOfWar = false;
   // _visibleByTeamIds = new Set();
   // _visibleForPlayers = new Set();
