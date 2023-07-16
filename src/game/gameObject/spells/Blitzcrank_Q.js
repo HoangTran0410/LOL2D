@@ -61,6 +61,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
   range = 500;
   speed = 10;
   grabSpeed = 10;
+  handSize = 30;
 
   airborneBuff = null;
   dashBuff = null;
@@ -86,7 +87,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     if (this.phase == Blitzcrank_Q_Object.PHASES.FORWARD) {
       let enemy = this.game.queryPlayersInRange({
         position: this.position,
-        range: 0,
+        range: this.handSize / 2,
         includePlayerSize: true,
         excludePlayers: [this.owner],
         getOnlyOne: true,
@@ -137,17 +138,16 @@ export class Blitzcrank_Q_Object extends SpellObject {
     line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);
 
     // draw hand with five circle fingers
-    let handSize = 30;
     noStroke();
     fill(255, 150, 50);
-    circle(this.position.x, this.position.y, handSize);
+    circle(this.position.x, this.position.y, this.handSize);
 
     fill(200, 100, 90);
     let dir = p5.Vector.sub(this.destination, this.position).normalize();
     for (let i = 0; i < 3; i++) {
       let angle = dir.heading() + (i - 1) * 0.5;
-      let x = this.position.x + cos(angle) * handSize;
-      let y = this.position.y + sin(angle) * handSize;
+      let x = this.position.x + cos(angle) * this.handSize;
+      let y = this.position.y + sin(angle) * this.handSize;
       circle(x, y, 15);
     }
 

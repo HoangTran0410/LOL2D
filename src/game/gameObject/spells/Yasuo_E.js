@@ -1,7 +1,5 @@
-import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import Dash from '../buffs/Dash.js';
 
@@ -61,8 +59,6 @@ export default class Yasuo_E extends Spell {
       this.owner.addBuff(dashBuff);
 
       nearestEnemy.takeDamage(10, this.owner);
-
-      playSound(SOUNDS.dash);
     }
   }
 

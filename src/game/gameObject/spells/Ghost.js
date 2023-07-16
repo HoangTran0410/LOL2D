@@ -2,7 +2,6 @@ import Spell from '../Spell.js';
 import Buff from '../Buff.js';
 import { StatsModifier } from '../Stats.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Speedup from '../buffs/Speedup.js';
 
@@ -17,7 +16,6 @@ export default class Ghost extends Spell {
     let speedupBuff = new Speedup(5000, this.owner, this.owner);
     speedupBuff.percent = 0.5;
     this.owner.addBuff(speedupBuff);
-    playSound(SOUNDS.ghost);
   }
 }
 

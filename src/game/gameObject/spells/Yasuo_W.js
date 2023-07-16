@@ -1,4 +1,3 @@
-import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import { rectToVertices } from '../../../utils/index.js';
@@ -29,8 +28,6 @@ export default class Yasuo_W extends Spell {
     obj.duration = duration;
 
     this.game.addObject(obj);
-
-    playSound(SOUNDS.yasuo_w);
   }
 }
 

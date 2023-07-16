@@ -1,4 +1,3 @@
-import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -20,8 +19,6 @@ export default class Blitzcrank_R extends Spell {
     obj.maxSize = range * 2;
     obj.silenceTime = silenceTime;
     this.game.addObject(obj);
-
-    playSound(SOUNDS.blit_r);
   }
 }
 

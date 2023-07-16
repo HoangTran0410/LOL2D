@@ -1,9 +1,7 @@
 import ObjectManager from './ObjectManager.js';
 import { SpellHotKeys } from './constants.js';
-import SpellObject from './gameObject/SpellObject.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
-import AttackableUnit from './gameObject/attackableUnits/AttackableUnit.js';
 import Camera from './gameObject/map/Camera.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
@@ -23,7 +21,7 @@ export default class TestGame {
 
     this.player = new Champion({
       game: this,
-      position: createVector(this.mapSize / 2, this.mapSize / 2),
+      position: this.randomSpawnPoint(),
       preset: getPresetRandom(),
     });
     this.objectManager.addObject(this.player);
@@ -184,7 +182,7 @@ export default class TestGame {
   }
 
   randomSpawnPoint() {
-    let range = 300;
+    let range = 2000;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)

@@ -1,10 +1,9 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
-import ParticleSystem, { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
 export default class Ahri_Q extends Spell {

@@ -25,6 +25,7 @@ export default class Ahri_R extends Spell {
 
   checkCastCondition() {
     return (
+      this.owner.canMove &&
       this.dashCount < this.maxDashCount &&
       (!this.timeSinceLastDash || this.timeSinceLastDash >= this.timeWaitForNextDash)
     );

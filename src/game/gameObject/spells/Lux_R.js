@@ -2,7 +2,6 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import { rectToVertices } from '../../../utils/index.js';
-import SOUNDS, { playSound } from '../../../../assets/sounds/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import CollideUtils from '../../../utils/collide.utils.js';
@@ -41,8 +40,6 @@ export default class Lux_R extends Spell {
     let buff = new RootBuff(prepairTime + fireTime, this.owner, this.owner);
     buff.image = this.image;
     this.owner.addBuff(buff);
-
-    playSound(SOUNDS.lux_r1);
   }
 
   onUpdate() {}
@@ -77,7 +74,6 @@ export class Lux_R_Object extends SpellObject {
       this.timeSincePrepair += deltaTime;
       if (this.timeSincePrepair > this.prepairTime) {
         this.phase = Lux_R_Object.PHASES.FIRE;
-        playSound(SOUNDS.lux_r2);
       }
     }
 
