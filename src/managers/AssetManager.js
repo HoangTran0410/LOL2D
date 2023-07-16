@@ -77,6 +77,18 @@ const AssetPaths = {
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
 
+  // monsters
+  monster_Ancient_Krug: 'assets/images/monsters/Ancient_Krug.png',
+  monster_Blue_Sentinel: 'assets/images/monsters/Blue_Sentinel.png', // Bùa xanh
+  monster_Crimson_Raptor: 'assets/images/monsters/Crimson_Raptor.png', // Gà rừng
+  monster_Raptor: 'assets/images/monsters/Raptor.png', // Gà rừng con
+  monster_Gromp: 'assets/images/monsters/Gromp.png', // Cóc
+  monster_Greater_Murk_Wolf: 'assets/images/monsters/Greater_Murk_Wolf.png', // Sói lớn
+  monster_Murk_Wolf: 'assets/images/monsters/Murk_Wolf.png', // Sói
+  monster_Rift_Scuttle: 'assets/images/monsters/Rift_Scuttle.png', // Cua kỳ cục
+  monster_Red_Brambleback: 'assets/images/monsters/Red_Brambleback.png', // Bùa đỏ
+  monster_Baron_Nashor: 'assets/images/monsters/Baron_Nashor.png',
+
   // json
   json_summoner_map: 'assets/json/summoner_map.json',
 };

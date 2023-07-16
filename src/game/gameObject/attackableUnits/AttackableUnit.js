@@ -14,6 +14,7 @@ export default class AttackableUnit extends GameObject {
   _buffEffectsToDisable = 0;
   status = 0;
   deathData = null;
+  reviveTime = 5000;
 
   constructor({ game, position, collisionRadius, visionRadius, teamId, id, avatar, stats }) {
     super({ game, position, collisionRadius, visionRadius, teamId, id });
@@ -71,7 +72,9 @@ export default class AttackableUnit extends GameObject {
 
   draw() {
     this.drawAvatar();
+    this.drawDir();
     this.drawBuffs();
+    this.drawHealthBar();
   }
 
   drawAvatar() {
@@ -92,14 +95,6 @@ export default class AttackableUnit extends GameObject {
     noFill();
     circle(pos.x, pos.y, size);
 
-    // draw direction to mouse
-    if (!this.isDead && this.game.worldMouse) {
-      let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 2 + 2);
-      stroke(255, Math.min(alpha, 125));
-      strokeWeight(4);
-      line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
-    }
-
     if (this.isDead) {
       // draw black circle
       noStroke();
@@ -109,11 +104,57 @@ export default class AttackableUnit extends GameObject {
     pop();
   }
 
+  drawDir() {
+    // draw direction to mouse
+    if (!this.isDead && this.game.worldMouse) {
+      let pos = this.position;
+      let { displaySize: size, alpha } = this.animatedValues;
+
+      push();
+      let mouseDir = p5.Vector.sub(this.game.worldMouse, pos).setMag(size / 2 + 2);
+      stroke(255, Math.min(alpha, 125));
+      strokeWeight(4);
+      line(pos.x, pos.y, pos.x + mouseDir.x, pos.y + mouseDir.y);
+      pop();
+    }
+  }
+
   drawBuffs() {
     this.buffs.forEach(buff => buff.draw?.());
   }
 
-  drawHealthBar() {}
+  drawHealthBar() {
+    push();
+    let pos = this.position;
+    let { displaySize: size, alpha } = this.animatedValues;
+
+    // draw health bar
+    let healthBarHeight = 6;
+    let healthBarWidth = 100;
+    let healthBarX = pos.x - healthBarWidth / 2;
+    let healthBarY = pos.y - size / 2 - healthBarHeight - 15;
+    let healthBarColor = this.isAllied ? [67, 196, 29, alpha] : [196, 67, 29, alpha];
+    let healthBarBgColor = [242, 242, 242, alpha];
+    let healthBarValue = ~~this.stats.health.value;
+    let healthBarMaxValue = ~~this.stats.maxHealth.value;
+    let healthBarValuePercent = healthBarValue / healthBarMaxValue;
+
+    // draw background
+    noStroke();
+    fill(healthBarBgColor);
+    rect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+
+    // draw health
+    fill(healthBarColor);
+    rect(healthBarX, healthBarY, healthBarWidth * healthBarValuePercent, healthBarHeight);
+
+    // draw health text
+    fill(180, alpha);
+    textAlign(CENTER, CENTER);
+    textSize(12);
+    text(`${healthBarValue} / ${healthBarMaxValue}`, pos.x, healthBarY - 10);
+    pop();
+  }
 
   addBuff(buff) {
     if (this.isDead || !buff) return;
@@ -219,7 +260,7 @@ export default class AttackableUnit extends GameObject {
 
     this.stats.health.baseValue -= damage;
     if (this.stats.health.baseValue <= 0) {
-      this.die({ attacker, reviveAfter: 5000 });
+      this.die({ attacker, reviveAfter: this.reviveTime });
     }
   }
 

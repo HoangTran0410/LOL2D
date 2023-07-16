@@ -14,7 +14,7 @@ export default class FogOfWar {
 
     this.colorStops = [
       { stop: 0, color: '#fff' },
-      { stop: 1, color: '#0001' },
+      { stop: 1, color: '#0000' },
     ];
   }
 
@@ -64,9 +64,9 @@ export default class FogOfWar {
       });
     });
 
-    // reset willDraw for all champion
+    // reset willDraw for all AttackableUnit
     this.game.objectManager.objects.forEach(o => {
-      if (o instanceof Champion) o.willDraw = false;
+      if (o instanceof AttackableUnit) o.willDraw = false;
     });
     // enable willDraw for all visible players
     visiblePlayers.forEach(p => (p.willDraw = true));

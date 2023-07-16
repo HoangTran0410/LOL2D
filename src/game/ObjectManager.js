@@ -46,8 +46,6 @@ export default class ObjectManager {
         let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
         return aZIndex - bZIndex;
       });
-
-      console.log(this.objects);
     }
   }
 
@@ -104,6 +102,6 @@ export default class ObjectManager {
   }
 
   getAllChampions() {
-    return this.objects.filter(o => o instanceof Champion);
+    return this.objects.filter(o => o instanceof AttackableUnit);
   }
 }

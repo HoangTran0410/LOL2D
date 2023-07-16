@@ -91,7 +91,7 @@ export default class Champion extends AttackableUnit {
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
     // }
 
-    // draw buffs
+    // draw buffs image
     push();
     let x = topleft.x + 10;
     if (alpha < 255) tint(255, alpha);

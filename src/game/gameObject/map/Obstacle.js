@@ -27,7 +27,7 @@ export default class Obstacle {
       stroke('#777');
       fill('#777');
     } else if (this.type === TerrainType.WATER) {
-      noStroke();
+      stroke('#082740');
       fill('#082740');
     } else if (this.type === TerrainType.BUSH) {
       stroke('#107d49');

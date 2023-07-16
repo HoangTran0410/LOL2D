@@ -6,7 +6,9 @@ import Camera from './gameObject/map/Camera.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import InGameHUD from './hud/InGameHUD.js';
-import { ChampionPreset, getPresetRandom } from './preset.js';
+import { ChampionPreset, MonsterPreset, getChampionPresetRandom } from './preset.js';
+import Monster from './gameObject/attackableUnits/Monster.js';
+import AssetManager from '../managers/AssetManager.js';
 
 const fps = 60;
 let accumulator = 0;
@@ -19,19 +21,31 @@ export default class TestGame {
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
 
+    let spawnPoint = this.randomSpawnPoint();
     this.player = new Champion({
       game: this,
-      position: this.randomSpawnPoint(),
-      preset: getPresetRandom(),
+      position: spawnPoint.copy(), // this.randomSpawnPoint(),
+      preset: getChampionPresetRandom(),
     });
     this.objectManager.addObject(this.player);
 
-    for (let i = 0; i < 5; i++) {
+    this.player.position.set(4709, 2743);
+
+    // for (let i = 0; i < 5; i++) {
+    //   this.objectManager.addObject(
+    //     new AIChampion({
+    //       game: this,
+    //       position: this.randomSpawnPoint(),
+    //       preset: getPresetRandom(),
+    //     })
+    //   );
+    // }
+
+    for (let key in MonsterPreset) {
       this.objectManager.addObject(
-        new AIChampion({
+        new Monster({
           game: this,
-          position: this.randomSpawnPoint(),
-          preset: getPresetRandom(),
+          preset: MonsterPreset[key],
         })
       );
     }
@@ -41,6 +55,8 @@ export default class TestGame {
 
     this.clickedPoint = { x: 0, y: 0, size: 0 };
     this.worldMouse = createVector(0, 0);
+
+    window.game = this;
   }
 
   pause() {
@@ -98,7 +114,7 @@ export default class TestGame {
   draw() {
     if (this.paused) return;
 
-    background(50);
+    background(30);
 
     this.camera.makeDraw(() => {
       this.terrainMap.draw();

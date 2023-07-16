@@ -32,7 +32,7 @@ export default class StealthWard extends Spell {
 export class StealthWard_Object extends SpellObject {
   visionRadius = 350;
   size = 0;
-  maxSize = 30;
+  maxSize = 10;
   lifeTime = 20000;
   age = 0;
 
@@ -45,15 +45,8 @@ export class StealthWard_Object extends SpellObject {
   draw() {
     push();
     noStroke();
-    fill(250, 255, 0, 100);
+    fill(250, 255, 0, 50);
     ellipse(this.position.x, this.position.y, this.size);
-
-    // draw lifespan
-    let lifePercent = 1 - this.age / this.lifeTime;
-    noFill();
-    stroke(200, 100);
-    arc(this.position.x, this.position.y, this.size + 15, this.size + 15, 0, TWO_PI * lifePercent);
-
     pop();
   }
 }

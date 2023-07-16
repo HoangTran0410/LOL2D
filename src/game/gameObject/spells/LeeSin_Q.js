@@ -61,7 +61,7 @@ export default class LeeSin_Q extends Spell {
       obj.lifeTimeAfterHit = lifeTimeAfterHit;
       obj.onHit = enemy => {
         this.enemyHit = enemy;
-        enemy.takeDamage(hitDamage);
+        enemy.takeDamage(hitDamage, this.owner);
 
         // true sight
         let trueSightBuff = new TrueSight(1000, this.owner, enemy);
@@ -113,7 +113,7 @@ export class LeeSin_Q_Buff extends Dash {
     super.onReachedDestination?.();
 
     // deal damage to target
-    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.targetUnit);
+    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.sourceUnit);
     // remove spell object
     if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
   }
