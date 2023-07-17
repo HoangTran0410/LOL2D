@@ -10,7 +10,7 @@ export default class Zed_W extends Spell {
   image = AssetManager.getAsset('spell_zed_w');
   name = 'Phân Thân Bóng Tối (Zed_W)';
   description =
-    'Tạo 1 phân thân lướt tới trước và đứng yên trong 5s, nó có thể bắt chước các kỹ năng bạn tung ra. Có thể tái kích hoạt kỹ nămg để đổi chỗ với phân thân.';
+    'Tạo 1 phân thân lướt tới trước và đứng yên trong 5s, nó có thể bắt chước các kỹ năng bạn tung ra. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân.';
   coolDown = 5000;
 
   zedWClone = null;
@@ -113,7 +113,7 @@ export class Zed_W_Clone extends Champion {
 
   // un-targetable, immune to damage/heal, ...
   // TODO: implement targetable status instead of this
-  addBuff() {}
+  // addBuff() {}
   takeDamage() {}
   takeHeal() {}
   drawHealthBar() {}

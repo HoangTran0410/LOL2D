@@ -29,15 +29,15 @@ export default class Game {
     });
     this.objectManager.addObject(this.player);
 
-    // for (let i = 0; i < 5; i++) {
-    //   this.objectManager.addObject(
-    //     new AIChampion({
-    //       game: this,
-    //       position: this.randomSpawnPoint(),
-    //       preset: getChampionPresetRandom(),
-    //     })
-    //   );
-    // }
+    for (let i = 0; i < 5; i++) {
+      this.objectManager.addObject(
+        new AIChampion({
+          game: this,
+          position: this.randomSpawnPoint(),
+          preset: getChampionPresetRandom(),
+        })
+      );
+    }
 
     // for (let key in MonsterPreset) {
     //   this.objectManager.addObject(
