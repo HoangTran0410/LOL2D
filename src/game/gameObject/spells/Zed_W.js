@@ -3,7 +3,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import EventType from '../../enums/EventType.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
-import SpellObject from '../SpellObject.js';
 import Champion from '../attackableUnits/Champion.js';
 import Dash from '../buffs/Dash.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
@@ -12,8 +11,8 @@ export default class Zed_W extends Spell {
   image = AssetManager.getAsset('spell_zed_w');
   name = 'Phân Thân Bóng Tối (Zed_W)';
   description =
-    'Tạo 1 phân thân lướt tới trước và đứng yên trong 5s, nó có thể bắt chước các kỹ năng bạn tung ra. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân.';
-  coolDown = 5000;
+    'Tạo 1 phân thân lướt tới trước. Sẽ bắt chước các kỹ năng bạn tung ra trong 3s. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân (Phân thân không thể bị chọn làm mục tiêu)';
+  coolDown = 7500;
 
   zedWClone = null;
 
@@ -81,13 +80,15 @@ export class Zed_W_Clone extends Champion {
 
     // recast spell (if already casted)
     if (spellInstance.id in this._mapSpells) {
-      this._mapSpells[spellInstance.id].onSpellCast(); // immediately cast without checking
+      this._mapSpells[spellInstance.id].cast(); // immediately cast without checking
+      console.log(this._mapSpells[spellInstance.id]);
     }
 
     // clone new spell
     else {
       let spellClone = new spellInstance.constructor(this);
       spellClone.cast();
+      console.log(spellClone);
       this._mapSpells[spellInstance.id] = spellClone;
     }
   };

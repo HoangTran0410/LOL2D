@@ -11,7 +11,7 @@ export default class Lux_E extends Spell {
   image = AssetManager.getAsset('spell_lux_e');
   description =
     'Phóng ra 1 xoáy ánh sáng tới vị trí chỉ định, làm chậm kẻ định 50%. Tái kích hoạt hoặc sau 5s sẽ phát nổ, gây 20 sát thương';
-  coolDown = 6000;
+  coolDown = 5000;
   manaCost = 20;
 
   onSpellCast() {

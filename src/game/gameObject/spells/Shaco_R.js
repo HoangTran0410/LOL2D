@@ -9,7 +9,7 @@ export default class Shaco_R extends Spell {
   image = AssetManager.getAsset('spell_shaco_r');
   name = 'Phân Thân (Shaco_R)';
   description =
-    'Tạo ra một phân thân, tồn tại trong 10s, có thể tái kích hoạt để điều khiển phân thân. Khi chết, nó phát nổ, gây 30 sát thương và gây hoảng sợ các kẻ địch gần đó, đồng thời sinh ra ba Hộp Hề Ma Quái nhỏ (tồn tại trong 3s)';
+    'Tạo ra một phân thân tồn tại trong 10s. Tái kích hoạt để điều khiển phân thân. Khi chết nó phát nổ, gây 30 sát thương + Hoảng Sợ (1s) các kẻ địch xunh quanh + để lại 3 Hộp Hề Ma Quái nhỏ';
   coolDown = 10000;
 
   clonePlayer = null;

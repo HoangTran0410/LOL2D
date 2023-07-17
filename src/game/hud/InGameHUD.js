@@ -1,6 +1,8 @@
 import { SpellHotKeys } from '../constants.js';
 import { removeAccents } from '../../utils/index.js';
 import * as AllSpells from '../gameObject/spells/index.js';
+import { SpellGroups } from '../preset.js';
+import AssetManager from '../../managers/AssetManager.js';
 
 export default class InGameHUD {
   constructor(game) {
@@ -38,6 +40,27 @@ export default class InGameHUD {
               coolDown: spellInstance.coolDown,
               spellClass: spellClass,
             })),
+
+          spellGroups: SpellGroups.map(group => {
+            return {
+              name: group.name,
+              image: AssetManager.getAsset(group.image)?.path,
+              spells: group.spells
+                .map(SpellClass => ({
+                  spellInstance: new SpellClass(null),
+                  spellClass: SpellClass,
+                }))
+                .map(({ spellInstance, spellClass }) => {
+                  return {
+                    name: spellInstance.name,
+                    image: spellInstance.image?.path,
+                    description: spellInstance.description,
+                    coolDown: spellInstance.coolDown,
+                    spellClass: spellClass,
+                  };
+                }),
+            };
+          }),
         };
       },
       methods: {
@@ -96,11 +119,13 @@ export default class InGameHUD {
       <div>
         <div v-if="spellHover" class="spell-info" :style="'top:'+spellInfoTop+'px;left:'+spellInfoLeft+'px'">
             <div class="header">
-              <img :src="spellHover.image" alt="spell" />
-              <h4>{{spellHover.name}}</h4>
+              <div>
+                <img :src="spellHover.image" alt="spell" />
+                <h4>{{spellHover.name}}</h4>
+              </div>
+              <span>{{spellHover.coolDown/1000}}s</span>
             </div>
-            <p>Hồi chiêu: {{spellHover.coolDown/1000}}s</p>
-            <p>{{spellHover.description}}</p>
+            <p class="body">{{spellHover.description}}</p>
         </div>
       
         <div v-if="avatar && spells && buffs" class="bottom-HUD">
@@ -153,18 +178,19 @@ export default class InGameHUD {
               <i class="fa-solid fa-xmark"></i>
             </button>
             <p class="title">Chọn chiêu thức</p>
-            <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức"
-                v-model="searchSpellText" />
             <div class="list">
-                <div v-for="spell of filteredSpells" class="spell" 
+              <div class="group" v-for="group of spellGroups">
+                <div class="group-header">
+                  <img v-if="group.image" :src="group.image" alt="spell" />
+                  <p>{{group.name}}</p>
+                </div>
+                <div v-for="spell of group.spells" class="spell" 
                   @click="pick(spell, $event)"
                   @mouseover="mouseover(spell, $event)" 
                   @mouseout="mouseout(spell, $event)">
                     <img :src="spell.image" alt="spell" />
                 </div>
-                <div v-if="filteredSpells.length === 0" class="not-found">
-                    <span>Không tìm thấy chiêu thức</span>
-                </div>
+              </div>
             </div>
         </div>
       </div>

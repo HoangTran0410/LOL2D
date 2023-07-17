@@ -10,7 +10,7 @@ export default class Ahri_R extends Spell {
   name = 'Phi Hồ (Ahri_R)';
   description =
     'Lướt tới trước theo hướng chỉ định, bắn ba luồng sét vào ba kẻ địch gần nhất trong phạm vi, gây 20 sát thương mỗi luồng sét. Có thể sử dụng 3 lần trong vòng 10s.';
-  coolDown = 5000;
+  coolDown = 10000;
 
   maxDashCount = 3;
   maxDashDistance = 150;

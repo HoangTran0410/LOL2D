@@ -10,7 +10,7 @@ export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
   name = 'Tán Xạ Tiễn (Ashe_W)';
   description =
-    'Bắn ra 10 mũi tên theo hình nón, mỗi mũi tên gây 5 sát thương làm chậm kẻ địch trúng chiêu đi 75% trong 1.5s.';
+    'Bắn ra 10 mũi tên theo hình nón. Mỗi mũi tên gây 5 sát thương + Làm Chậm kẻ địch trúng chiêu đi 75% trong 1.5s.';
   coolDown = 5000;
 
   onSpellCast() {

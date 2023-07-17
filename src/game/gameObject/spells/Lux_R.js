@@ -10,7 +10,7 @@ export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   image = AssetManager.getAsset('spell_lux_r');
   description =
-    'Sau khi tích tụ năng lượng trong 1 giây, Lux bắn một dải sáng theo hướng chỉ định. Trói chân kẻ địch trong 1 giây. Gây 30 sát thương';
+    'Bắn một dải sáng theo hướng chỉ định. Trói chân kẻ địch trong 1 giây. Gây 30 sát thương';
   coolDown = 10000;
   manaCost = 50;
 

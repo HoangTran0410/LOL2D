@@ -11,7 +11,7 @@ export default class Olaf_Q extends Spell {
   image = AssetManager.getAsset('spell_olaf_q');
   name = 'Phóng Rìu (Olaf_Q)';
   description =
-    'Ném rìu đến điểm chỉ định, gây 15 sát thương và làm chậm 40% trong 1s cho những kẻ địch nó đi qua, bạn cũng nhận được 30% tốc chạy trong 1s cho mỗi kẻ địch bị ném trúng. Rìu tồn tại trong 4s, nếu nhặt được rìu, thời gian hồi chiêu được giảm 60%.';
+    'Ném rìu đến điểm chỉ định, gây 15 sát thương + làm chậm 40% (1s) cho những kẻ địch trúng chiêu, bạn được tăng 30% tốc chạy (1s) cho mỗi kẻ địch. Rìu tồn tại trong 4s, nếu nhặt được rìu thời gian hồi chiêu được giảm 60%.';
   coolDown = 7500;
 
   maxThrowRange = 350;

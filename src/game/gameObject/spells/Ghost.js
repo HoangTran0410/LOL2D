@@ -9,7 +9,7 @@ export default class Ghost extends Spell {
   name = 'Tốc Hành (Ghost)';
   image = AssetManager.getAsset('spell_ghost');
   description = 'Tăng 50% tốc độ di chuyển trong 5s';
-  coolDown = 7000;
+  coolDown = 10000;
   manaCost = 100;
 
   onSpellCast() {

@@ -1,16 +1,12 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import VectorUtils from '../../../utils/vector.utils.js';
-import BuffAddType from '../../enums/BuffAddType.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
-import SpellObject from '../SpellObject.js';
 import { Shaco_W_Bullet_Object } from './Shaco_W.js';
 
 export default class Shaco_E extends Spell {
   image = AssetManager.getAsset('spell_shaco_e');
   name = 'Dao Độc (Shaco_E)';
   description =
-    'Ném dao tới kẻ địch, làm chậm kẻ địch 40%. Gây 15 sát thương, gây thêm 10 sát thương nếu mục tiêu dưới 30% máu.';
+    'Ném dao tới kẻ địch, Làm Chậm kẻ địch 40% + gây 15 sát thương, gây thêm 10 sát thương nếu mục tiêu dưới 30% máu.';
   coolDown = 5000;
 
   range = 250;
@@ -68,8 +64,8 @@ export default class Shaco_E extends Spell {
 
 export class Shaco_E_Object extends Shaco_W_Bullet_Object {
   position = this.owner.position.copy();
-  strokeColor = [255, 150, 50];
+  strokeColor = [255, 100, 50];
   lazerWidth = 10;
-  lazerLength = 20;
-  speed = 8;
+  lazerLength = 35;
+  speed = 7;
 }

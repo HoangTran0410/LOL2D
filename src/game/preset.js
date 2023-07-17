@@ -169,6 +169,81 @@ export const getRandomChampionPreset = () => {
   return ChampionPreset[randomKey];
 };
 
+export const SpellGroups = [
+  {
+    name: 'Yasuo',
+    image: 'champ_yasuo',
+    spells: [AllSpells.Yasuo_Q, AllSpells.Yasuo_W, AllSpells.Yasuo_E, AllSpells.Yasuo_R],
+  },
+  {
+    name: 'Shaco',
+    image: 'champ_shaco',
+    spells: [AllSpells.Shaco_Q, AllSpells.Shaco_W, AllSpells.Shaco_E, AllSpells.Shaco_R],
+  },
+  {
+    name: 'Ahri',
+    image: 'champ_ahri',
+    spells: [AllSpells.Ahri_Q, AllSpells.Ahri_W, AllSpells.Ahri_E, AllSpells.Ahri_R],
+  },
+  {
+    name: 'Lee Sin',
+    image: 'champ_leesin',
+    spells: [AllSpells.LeeSin_Q, AllSpells.LeeSin_E, AllSpells.LeeSin_R],
+  },
+  {
+    name: 'Blitzcrank',
+    image: 'champ_blitzcrank',
+    spells: [AllSpells.Blitzcrank_Q, AllSpells.Blitzcrank_W, AllSpells.Blitzcrank_R],
+  },
+  {
+    name: 'Lux',
+    image: 'champ_lux',
+    spells: [AllSpells.Lux_Q, AllSpells.Lux_E, AllSpells.Lux_R],
+  },
+  {
+    name: "Cho'Gath",
+    image: 'champ_chogath',
+    spells: [AllSpells.ChoGath_Q, AllSpells.ChoGath_W],
+  },
+  {
+    name: 'Leblanc',
+    image: 'champ_leblanc',
+    spells: [AllSpells.Leblanc_W, AllSpells.Leblanc_E],
+  },
+  {
+    name: 'Malphite',
+    image: 'champ_malphite',
+    spells: [AllSpells.Malphite_R],
+  },
+  {
+    name: 'Olaf',
+    image: 'champ_olaf',
+    spells: [AllSpells.Olaf_Q],
+  },
+
+  {
+    name: 'Teemo',
+    image: 'champ_teemo',
+    spells: [AllSpells.Teemo_R],
+  },
+  {
+    name: 'Veigar',
+    image: 'champ_veigar',
+    spells: [AllSpells.Veigar_E],
+  },
+
+  {
+    name: 'Zed',
+    image: 'champ_zed',
+    spells: [AllSpells.Zed_W],
+  },
+  {
+    name: 'Phép Bổ Trợ',
+    image: '',
+    spells: [AllSpells.Flash, AllSpells.Ghost, AllSpells.Heal, AllSpells.StealthWard],
+  },
+];
+
 export const MonsterPreset = {
   baron: {
     name: 'Baron',
