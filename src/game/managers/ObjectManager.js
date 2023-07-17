@@ -1,7 +1,7 @@
-import SpellObject from './gameObject/SpellObject.js';
-import Champion from './gameObject/attackableUnits/Champion.js';
-import AttackableUnit from './gameObject/attackableUnits/AttackableUnit.js';
-import CombatText from './gameObject/helpers/CombatText.js';
+import SpellObject from '../gameObject/SpellObject.js';
+import Champion from '../gameObject/attackableUnits/Champion.js';
+import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
+import CombatText from '../gameObject/helpers/CombatText.js';
 
 const DisplayZIndex = [
   //

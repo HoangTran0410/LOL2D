@@ -1,4 +1,3 @@
-import ObjectManager from './ObjectManager.js';
 import { SpellHotKeys } from './constants.js';
 import Champion from './gameObject/attackableUnits/Champion.js';
 import AIChampion from './gameObject/attackableUnits/AIChampion.js';
@@ -8,17 +7,17 @@ import TerrainMap from './gameObject/map/TerrainMap.js';
 import InGameHUD from './hud/InGameHUD.js';
 import { ChampionPreset, MonsterPreset, getChampionPresetRandom } from './preset.js';
 import Monster from './gameObject/attackableUnits/Monster.js';
+import ObjectManager from './managers/ObjectManager.js';
 
-const fps = 60;
-let accumulator = 0;
-
-export default class TestGame {
+export default class Game {
   constructor() {
     this.camera = new Camera();
     this.inGameHUD = new InGameHUD(this);
     this.objectManager = new ObjectManager(this);
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
+
+    this.fps = 60;
 
     let spawnPoint = this.randomSpawnPoint();
     this.player = new Champion({
@@ -38,14 +37,14 @@ export default class TestGame {
       );
     }
 
-    for (let key in MonsterPreset) {
-      this.objectManager.addObject(
-        new Monster({
-          game: this,
-          preset: MonsterPreset[key],
-        })
-      );
-    }
+    // for (let key in MonsterPreset) {
+    //   this.objectManager.addObject(
+    //     new Monster({
+    //       game: this,
+    //       preset: MonsterPreset[key],
+    //     })
+    //   );
+    // }
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();
@@ -93,16 +92,7 @@ export default class TestGame {
 
   update() {
     if (this.paused) return;
-
-    accumulator += Math.min(deltaTime, 250);
-
-    // always update at 60 fps, no matter the frame rate
-    while (accumulator > 1000 / (fps + 1)) {
-      this.fixedUpdate();
-      accumulator -= 1000 / (fps - 1);
-      if (accumulator < 1000 / (fps - 1) - 1000 / fps) accumulator = 0;
-    }
-
+    this.fixedUpdate();
     this.inGameHUD.update();
   }
 

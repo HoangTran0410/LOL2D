@@ -12,7 +12,6 @@ export default class StealthWard extends Spell {
   maxRange = 300;
 
   onSpellCast() {
-    console.log(this.owner);
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.game.worldMouse,
