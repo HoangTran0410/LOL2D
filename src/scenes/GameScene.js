@@ -4,6 +4,7 @@ import { preventRightClick } from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
 
 let drawStats, updateStats;
+let currentTime, previousTime;
 
 export default class GameScene extends Scene {
   setup() {
@@ -39,25 +40,25 @@ export default class GameScene extends Scene {
     frameRate(60);
 
     this.game = new Game();
-    this.update();
+
+    currentTime = performance.now();
+    previousTime = currentTime;
+
+    this.updateLoop();
   }
 
-  update() {
-    updateStats.begin();
+  updateLoop() {
+    requestAnimationFrame(this.updateLoop.bind(this));
 
-    let startTime = performance.now();
-    this.game.update();
-    let endTime = performance.now();
-
-    let _deltaTime = endTime - startTime;
-    let _waitTime =
-      // 1000 / (this.game.fps || 60)
-      Math.max(1000 / (this.game.fps || 60) - _deltaTime, 0);
-
-    setTimeout(() => {
+    currentTime = performance.now();
+    const elapsedTime = currentTime - previousTime;
+    const interval = 1000 / this.game.fps;
+    if (elapsedTime > interval) {
+      updateStats.begin();
+      this.game.update();
+      previousTime = currentTime - (elapsedTime % interval);
       updateStats.end();
-      this.update();
-    }, _waitTime);
+    }
   }
 
   draw() {
