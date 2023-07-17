@@ -20,7 +20,7 @@ export default class Shaco_E extends Spell {
     let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.range,
-      excludePlayers: [this.owner],
+      excludeTeamIds: [this.owner.teamId],
     });
 
     if (!enemies.length) {

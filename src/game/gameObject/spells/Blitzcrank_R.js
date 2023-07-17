@@ -44,7 +44,8 @@ export class Blitzcrank_R_Object extends SpellObject {
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,
-      excludePlayers: [this.owner, ...this.playersEffected],
+      excludeTeamIds: [this.owner.teamId],
+      excludePlayers: this.playersEffected,
     });
 
     enemies.forEach(enemy => {

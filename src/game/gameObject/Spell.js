@@ -1,3 +1,4 @@
+import { uuidv4 } from '../../utils/index.js';
 import EventType from '../enums/EventType.js';
 import SpellState from '../enums/SpellState.js';
 
@@ -15,6 +16,8 @@ export default class Spell {
   currentCooldown = 0;
   manaCost = 0;
   healthCost = 0;
+
+  id = uuidv4();
 
   constructor(owner) {
     this.owner = owner;

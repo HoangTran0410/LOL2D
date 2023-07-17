@@ -89,7 +89,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
         position: this.position,
         range: this.handSize / 2,
         includePlayerSize: true,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
         getOnlyOne: true,
       });
 

@@ -12,6 +12,7 @@ export default class AttackableUnit extends GameObject {
   buffs = [];
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;
+  _statusBeforeApplyingBuffEfects = 0;
   status = 0;
   deathData = null;
   reviveTime = 5000;
@@ -22,7 +23,7 @@ export default class AttackableUnit extends GameObject {
     this.avatar = avatar;
     this.destination = position.copy();
     this.stats = stats || new Stats();
-    this.setStatus(StatusFlags.CanCast | StatusFlags.CanMove, true);
+    this.setStatus(StatusFlags.CanCast | StatusFlags.CanMove | StatusFlags.Targetable, true);
 
     this.animatedValues = {
       size: 10,
@@ -279,12 +280,12 @@ export default class AttackableUnit extends GameObject {
   }
 
   setStatus(status, enabled) {
-    let _statusBeforeApplyingBuffEfects = 0;
-    if (enabled) _statusBeforeApplyingBuffEfects |= status;
-    else _statusBeforeApplyingBuffEfects &= ~status;
+    if (enabled) this._statusBeforeApplyingBuffEfects |= status;
+    else this._statusBeforeApplyingBuffEfects &= ~status;
 
     this.status =
-      (_statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) | this._buffEffectsToEnable;
+      (this._statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) |
+      this._buffEffectsToEnable;
 
     this.stats.updateActionState(this.status);
   }
@@ -325,11 +326,12 @@ export default class AttackableUnit extends GameObject {
   get canMove() {
     return !this.isDead && hasFlag(this.stats.actionState, ActionState.CAN_MOVE);
   }
-
+  get targetable() {
+    return !this.isDead && hasFlag(this.stats.actionState, ActionState.TARGETABLE);
+  }
   get isDead() {
     return this.deathData !== null;
   }
-
   get isAllied() {
     return this.teamId === this.game.player.teamId;
   }

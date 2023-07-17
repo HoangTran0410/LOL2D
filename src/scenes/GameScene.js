@@ -8,12 +8,6 @@ let drawStats, updateStats, previousTime;
 export default class GameScene extends Scene {
   setup() {
     this.dom = document.querySelector('#game-scene');
-
-    let c = createCanvas(windowWidth, windowHeight).parent('game-scene');
-    preventRightClick(c.elt);
-
-    this.game = null;
-
     this.statsContainer = document.querySelector('#stats');
 
     drawStats = new Stats();
@@ -29,6 +23,9 @@ export default class GameScene extends Scene {
 
   enter() {
     this.dom.style.display = 'block';
+
+    this.canvas = createCanvas(windowWidth, windowHeight).parent('game-scene');
+    preventRightClick(this.canvas.elt);
 
     cursor('assets/cursors/normal.cur');
     pixelDensity(1);
@@ -77,11 +74,12 @@ export default class GameScene extends Scene {
   exit() {
     cancelAnimationFrame(this.animationFrameId);
     this.dom.style.display = 'none';
-    this.game.destroy?.();
+    this.game.destroy();
+    this.canvas.remove();
   }
 
   windowResized() {
-    this.game.resize?.(windowWidth, windowHeight);
+    this.game.resize(windowWidth, windowHeight);
     resizeCanvas(windowWidth, windowHeight, true);
   }
 }

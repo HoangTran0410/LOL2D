@@ -57,7 +57,7 @@ export class Ahri_E_Object extends SpellObject {
       position: this.position,
       range: 0,
       includePlayerSize: true,
-      excludePlayers: [this.owner],
+      excludeTeamIds: [this.owner.teamId],
       getOnlyOne: true,
     });
 

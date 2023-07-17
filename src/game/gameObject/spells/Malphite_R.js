@@ -32,7 +32,7 @@ export default class Malphite_R extends Spell {
       let enemies = this.game.queryPlayersInRange({
         position: this.owner.position,
         range: this.hitRadius,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
         includePlayerSize: true,
       });
 

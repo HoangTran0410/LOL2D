@@ -80,10 +80,21 @@ export default class LeeSin_Q extends Spell {
     // phase 2: Vô ảnh cước
     else {
       // dash owner to target
-      let dashBuff = new LeeSin_Q_Buff(10000, this.owner, this.owner);
-      dashBuff.spell = this;
-      dashBuff.hitDamage = q2HitDamage;
+      let dashBuff = new Dash(10000, this.owner, this.owner);
       dashBuff.dashDestination = this.enemyHit.position;
+      dashBuff.image = LeeSin_Q.PHASES.Q2.image;
+      dashBuff.onCancelled = () => {
+        if (this.spellObject) this.spellObject.toRemove = true;
+      };
+      dashBuff.onDeactivate = () => {
+        if (this.spellObject) this.spellObject.toRemove = true;
+      };
+      dashBuff.onReachedDestination = () => {
+        // deal damage to target
+        if (this.enemyHit) this.enemyHit.takeDamage(q2HitDamage, this.owner);
+        // remove spell object
+        if (this.spellObject) this.spellObject.toRemove = true;
+      };
       this.owner.addBuff(dashBuff);
 
       // reset to phase 1 after cast Q2
@@ -101,31 +112,6 @@ export default class LeeSin_Q extends Spell {
       this.image = this.phase.image;
       this.currentCooldown = this.coolDown;
     }
-  }
-}
-
-export class LeeSin_Q_Buff extends Dash {
-  image = LeeSin_Q.PHASES.Q2.image;
-  hitDamage = 15;
-  spell = null;
-
-  onReachedDestination() {
-    super.onReachedDestination?.();
-
-    // deal damage to target
-    if (this.spell?.enemyHit) this.spell.enemyHit.takeDamage(this.hitDamage, this.sourceUnit);
-    // remove spell object
-    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
-  }
-
-  onCancelled() {
-    super.onCancelled?.();
-    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
-  }
-
-  onDeactivate() {
-    super.onDeactivate?.();
-    if (this.spell?.spellObject) this.spell.spellObject.toRemove = true;
   }
 }
 
@@ -164,7 +150,7 @@ export class LeeSin_Q_Object extends SpellObject {
       let enemy = this.game.queryPlayersInRange({
         position: this.position,
         range: this.size / 2,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
         includePlayerSize: true,
         getOnlyOne: true,
       });

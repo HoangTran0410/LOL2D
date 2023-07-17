@@ -78,7 +78,7 @@ export class Shaco_W_Object extends SpellObject {
       let enemies = this.game.queryPlayersInRange({
         position: this.position,
         range: this.fearRange,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
       });
 
       if (enemies.length > 0) {
@@ -106,7 +106,7 @@ export class Shaco_W_Object extends SpellObject {
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.attackRange,
-          excludePlayers: [this.owner],
+          excludeTeamIds: [this.owner.teamId],
         });
 
         if (enemies.length > 0) {

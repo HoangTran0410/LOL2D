@@ -20,8 +20,6 @@ export default class Dash extends Buff {
     trailColor: [255, 100],
     maxLength: 20,
   });
-
-  // for override
   showTrail = true;
   dashSpeed = 13;
   dashDestination = null;

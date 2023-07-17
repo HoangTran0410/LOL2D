@@ -60,7 +60,7 @@ export class ChoGath_Q_Object extends SpellObject {
           position: this.position,
           range: this.size / 2,
           includePlayerSize: true,
-          excludePlayers: [this.owner],
+          excludeTeamIds: [this.owner.teamId],
         });
 
         enemies.forEach(enemy => {

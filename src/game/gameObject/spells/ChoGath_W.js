@@ -59,7 +59,8 @@ export class ChoGath_W_Object extends SpellObject {
       position: this.position,
       range: this.currentRange,
       includePlayerSize: true,
-      excludePlayers: [this.owner, ...this.playersEffected],
+      excludeTeamIds: [this.owner.teamId],
+      excludePlayers: this.playersEffected,
       customFilter: e => {
         return CollideUtils.circleArc(
           e.position.x,

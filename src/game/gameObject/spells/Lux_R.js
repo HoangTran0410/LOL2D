@@ -89,7 +89,8 @@ export class Lux_R_Object extends SpellObject {
         position: this.owner.position,
         range: this.destination.dist(this.owner.position),
         includePlayerSize: true,
-        excludePlayers: [this.owner, ...this.playersEffected],
+        excludeTeamIds: [this.owner.teamId],
+        excludePlayers: this.playersEffected,
         customFilter: p => {
           // get vertices
           let dir = this.destination.copy().sub(this.owner.position).normalize();

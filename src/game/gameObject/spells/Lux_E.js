@@ -131,7 +131,7 @@ export class Lux_E_Object extends SpellObject {
       let enemies = this.game.queryPlayersInRange({
         position: this.position,
         range: this.staticSize / 2,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
       });
       enemies.forEach(enemy => {
         enemy.addBuff(new Lux_E_Buff(200, this.owner, enemy));
@@ -151,7 +151,7 @@ export class Lux_E_Object extends SpellObject {
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.staticSize / 2,
-          excludePlayers: [this.owner],
+          excludeTeamIds: [this.owner.teamId],
         });
         enemies.forEach(enemy => {
           enemy.takeDamage(20, this.owner);

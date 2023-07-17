@@ -108,6 +108,7 @@ export default class FogOfWar {
       range: obj.visionRadius,
       includePlayerSize: true,
       includeDead: true,
+      includeUntargetable: true,
       customFilter: p => {
         return CollideUtils.pointPolygonConcave(p.position.x, p.position.y, sightPoly);
       },
@@ -163,5 +164,9 @@ export default class FogOfWar {
 
   resize(w, h) {
     this.overlay.resizeCanvas(w, h, true);
+  }
+
+  destroy() {
+    this.overlay.remove();
   }
 }

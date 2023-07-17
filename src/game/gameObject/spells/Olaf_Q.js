@@ -115,7 +115,8 @@ export class Olaf_Q_Object extends SpellObject {
         position: this.position,
         range: this.size / 2,
         includePlayerSize: true,
-        excludePlayers: [this.owner, ...this.playerEffected],
+        excludeTeamIds: [this.owner.teamId],
+        excludePlayers: this.playerEffected,
       });
 
       enemies.forEach(enemy => {

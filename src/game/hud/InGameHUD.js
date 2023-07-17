@@ -6,6 +6,7 @@ export default class InGameHUD {
   constructor(game) {
     this.game = game;
     this.initVue(game);
+    this.updateLoop();
   }
 
   initVue(game) {
@@ -50,6 +51,8 @@ export default class InGameHUD {
           }
           this.showSpellsPicker = false;
           this.game.unpause();
+
+          this.spellHover = null;
         },
         changeSpell(index) {
           this.spellIndexToSwap = index;
@@ -57,15 +60,24 @@ export default class InGameHUD {
 
           if (this.showSpellsPicker) this.game.pause();
           else this.game.unpause();
+
+          this.spellHover = null;
         },
         closeSpellPicker() {
           this.showSpellsPicker = false;
           this.game.unpause();
         },
-        mouseover(spell) {
+        mouseover(spell, event) {
           this.spellHover = spell;
+
+          let element = event.target;
+          let { width, height, x, y } = element.getBoundingClientRect();
+          let { clientX, clientY } = event;
+
+          this.spellInfoTop = y;
+          this.spellInfoLeft = x + width / 2;
         },
-        mouseout(spell) {
+        mouseout(spell, event) {
           this.spellHover = null;
         },
       },
@@ -81,15 +93,28 @@ export default class InGameHUD {
         },
       },
       template: `
+      <div>
+        <div v-if="spellHover" class="spell-info" :style="'top:'+spellInfoTop+'px;left:'+spellInfoLeft+'px'">
+            <div class="header">
+              <img :src="spellHover.image" alt="spell" />
+              <h4>{{spellHover.name}}</h4>
+            </div>
+            <p>Hồi chiêu: {{spellHover.coolDown/1000}}s</p>
+            <p>{{spellHover.description}}</p>
+        </div>
+      
         <div v-if="avatar && spells && buffs" class="bottom-HUD">
             <div class="champion-avatar">
                 <img :src="avatar" alt="champion-avatar" :style="isDead ? 'filter: grayscale(100%)' : ''">
                 <span v-if="isDead" class="revive-counter">{{reviveAfter}}</span>
             </div>
+
             <div class="champion-details">
                 <div class="spells">
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
-                        @click="changeSpell(index)" @mouseover="mouseover(spell)" @mouseout="mouseout(spell)">
+                        @click="changeSpell(index)" 
+                        @mouseover="mouseover(spell, $event)" 
+                        @mouseout="mouseout(spell, $event)">
                         <img :src="spell.image" alt="spell"
                             :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
@@ -99,14 +124,6 @@ export default class InGameHUD {
                             <div class="cooldown">
                                 <p>{{spell.coolDownText}}</p>
                             </div>
-                        </div>
-                        <div class="spell-info">
-                            <div class="header">
-                              <img :src="spell.image" alt="spell" />
-                              <h4>{{spell.name}}</h4>
-                            </div>
-                            <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
-                            <p>{{spell.description}}</p>
                         </div>
                     </div>
                 </div>
@@ -132,33 +149,40 @@ export default class InGameHUD {
         </div>
 
         <div v-if="showSpellsPicker" class="spell-picker">
-            <button class="close-btn" @click="closeSpellPicker()">X</button>
+            <button class="close-btn" @click="closeSpellPicker()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
             <p class="title">Chọn chiêu thức</p>
             <input class="spell-search-box" type="text" placeholder="Tìm kiếm chiêu thức"
                 v-model="searchSpellText" />
             <div class="list">
-                <div v-for="spell of filteredSpells" class="spell" @click="pick(spell)">
+                <div v-for="spell of filteredSpells" class="spell" 
+                  @click="pick(spell, $event)"
+                  @mouseover="mouseover(spell, $event)" 
+                  @mouseout="mouseout(spell, $event)">
                     <img :src="spell.image" alt="spell" />
-                    <div class="spell-info">
-                        <div class="header">
-                            <img :src="spell.image" alt="spell" />
-                            <h4>{{spell.name}}</h4>
-                        </div>
-                        <p>Hồi chiêu: {{spell.coolDown/1000}}s</p>
-                        <p>{{spell.description}}</p>
-                    </div>
                 </div>
                 <div v-if="filteredSpells.length === 0" class="not-found">
                     <span>Không tìm thấy chiêu thức</span>
                 </div>
             </div>
         </div>
+      </div>
       `,
     });
 
     this.vueInstance = this.app.mount('#InGameHUD');
 
     document.querySelector('#InGameHUD').oncontextmenu = () => false;
+  }
+
+  updateLoop() {
+    this.update();
+
+    if (this.app)
+      setTimeout(() => {
+        this.updateLoop();
+      }, 1000 / 30);
   }
 
   update() {
@@ -231,7 +255,7 @@ export default class InGameHUD {
     if (this.vueInstance.spellHover) {
       try {
         let spell = Vue.toRaw(this.vueInstance.spellHover.instance);
-        spell.willDrawPreview = true;
+        if (spell) spell.willDrawPreview = true;
       } catch (e) {
         console.error(e);
       }
@@ -240,5 +264,7 @@ export default class InGameHUD {
 
   destroy() {
     this.app.unmount();
+    this.app = null;
+    clearInterval(this.intervalId);
   }
 }

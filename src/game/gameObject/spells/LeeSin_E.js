@@ -17,7 +17,7 @@ export default class LeeSin_E extends Spell {
     let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.range,
-      excludePlayers: [this.owner],
+      excludeTeamIds: [this.owner.teamId],
       includePlayerSize: true,
     });
 

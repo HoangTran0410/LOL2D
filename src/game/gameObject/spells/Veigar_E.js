@@ -79,7 +79,8 @@ export class Veigar_E_Object extends SpellObject {
         position: this.position,
         range: this.size / 2,
         includePlayerSize: true,
-        excludePlayers: [this.owner, ...this.enemiesEffected],
+        excludeTeamIds: [this.owner.teamId],
+        excludePlayers: this.enemiesEffected,
         customFilter: p => {
           let distance = p.position.dist(this.position);
           // collide with edge of the circle

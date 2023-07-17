@@ -32,12 +32,11 @@ export default class Shaco_R extends Spell {
       game: this.game,
       position: this.owner.position.copy(),
       avatar: this.owner.avatar,
+      teamId: this.owner.teamId,
     });
-    clone.avatar = this.owner.avatar;
     clone.spells = [];
     clone.shacoR_championOwner = this.owner;
     clone.shacoR_maxRange = this.maxRange;
-    clone.teamId = this.owner.teamId;
     clone.shacoR_lifeTime = this.cloneLifeTime;
     // clone.onExplode = () => {
     //   this.image = AssetManager.getAsset('spell_shaco_r');
@@ -135,7 +134,7 @@ class Shaco_R_Clone extends Champion {
       position: clonePos,
       range: explodeRadius,
       includePlayerSize: true,
-      excludePlayers: [this.shacoR_championOwner, this],
+      excludeTeamIds: [this.teamId],
     });
 
     enemies.forEach(e => {

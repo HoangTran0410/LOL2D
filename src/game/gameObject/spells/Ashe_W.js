@@ -72,7 +72,7 @@ export class Ashe_W_Object extends SpellObject {
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,
-      excludePlayers: [this.owner],
+      excludeTeamIds: [this.owner.teamId],
       getOnlyOne: true,
     });
 

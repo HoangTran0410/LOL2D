@@ -58,7 +58,7 @@ export class Ashe_R_Object extends SpellObject {
         position: this.position,
         range: this.size / 4,
         includePlayerSize: true,
-        excludePlayers: [this.owner],
+        excludeTeamIds: [this.owner.teamId],
         getOnlyOne: true,
       });
 
@@ -71,7 +71,7 @@ export class Ashe_R_Object extends SpellObject {
         let enemies = this.game.queryPlayersInRange({
           position: this.position,
           range: this.explodeSize / 2,
-          excludePlayers: [this.owner],
+          excludeTeamIds: [this.owner.teamId],
         });
         enemies.forEach(p => {
           let stunBuff = new Stun(2500, this.owner, p);

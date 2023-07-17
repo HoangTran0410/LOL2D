@@ -1,14 +1,29 @@
-.loading {
-    height: 40px;
-    width: 40px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 50%;
-    border-top: 2px solid #1D9AF2;
-    border-right: 2px solid transparent;
-    border-bottom: none;
-    border-left: none;
-    animation: spinner5 700ms linear infinite;
-    margin: auto;
+#loading-scene {
+    text-align: center;
+}
+
+#loading-scene .logo {
+    width: 80px;
+    margin-bottom: 20px;
+}
+
+.progress {
+    height: 10px;
+    width: 300px;
+    border: 2px solid #61616188;
+    border-radius: 12px;
+    background: #51515140;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #08cbcb;
+    border-image: linear-gradient(#08abac, #01698b) 1;
+    border-radius: 20px;
+    transition: 0.1s linear;
+    transition-property: width, background-color;
 }
 
 @keyframes spinner5 {
@@ -18,7 +33,7 @@
 }
 
 .loading-text {
-    margin-top: 10px;
+    margin-top: 5px;
     text-align: center;
 }
 

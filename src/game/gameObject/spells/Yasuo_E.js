@@ -24,7 +24,7 @@ export default class Yasuo_E extends Spell {
     let enemiesInRange = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.rangeToFindEnemies,
-      excludePlayers: [this.owner],
+      excludeTeamIds: [this.owner.teamId],
     });
     if (enemiesInRange.length == 0) {
       this.resetCoolDown();

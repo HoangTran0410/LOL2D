@@ -4,7 +4,7 @@ import { Scene } from '../managers/SceneManager.js';
 export default class LoadingScene extends Scene {
   setup() {
     this.loadingSceneDiv = document.querySelector('#loading-scene');
-    this.loadingAnimation = this.loadingSceneDiv.querySelector('.loading');
+    this.progressBar = this.loadingSceneDiv.querySelector('.progress-bar');
     this.loadingText = this.loadingSceneDiv.querySelector('.loading-text');
     this.errorText = this.loadingSceneDiv.querySelector('.error-text');
   }
@@ -12,8 +12,8 @@ export default class LoadingScene extends Scene {
   enter() {
     // reset dom
     this.loadingSceneDiv.style.display = 'block';
-    this.loadingAnimation.style.display = 'block';
-    this.loadingText.innerHTML = '0%<br/>Đang tải tài nguyên game...';
+    this.progressBar.style.display = 'block';
+    this.loadingText.innerHTML = 'Đang tải tài nguyên game...';
     this.errorText.innerHTML = '';
 
     const errorAssets = [];
@@ -23,14 +23,17 @@ export default class LoadingScene extends Scene {
       // progress
       ({ index, total, path }) => {
         let percent = round((index / total) * 100);
-        this.loadingText.innerHTML = percent + '%' + `<br/>${path}`;
+        this.progressBar.style.width = percent + '%';
+        this.loadingText.innerHTML = path;
       },
 
       // success
       () => {
-        this.loadingText.innerHTML = '99%<br/>Đang khởi tạo game...';
+        this.loadingText.innerHTML = 'Đang khởi tạo game...';
         import('./MenuScene.js')
-          .then(({ default: MenuScene }) => this.sceneManager.showScene(MenuScene))
+          .then(({ default: MenuScene }) => {
+            setTimeout(() => this.sceneManager.showScene(MenuScene), 1000);
+          })
           .catch(error => {
             console.error(error);
             this.errorText.innerHTML =
@@ -40,7 +43,7 @@ export default class LoadingScene extends Scene {
 
       // failed
       ({ path, error }) => {
-        this.loadingAnimation.style.display = 'none';
+        this.progressBar.style.display = 'none';
         errorAssets.push(path);
         this.errorText.innerHTML =
           'LỖI: Tải game không thành công. Vui lòng tải lại trang. <br/>' + errorAssets.join('\n');

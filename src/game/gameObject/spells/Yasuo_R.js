@@ -29,11 +29,10 @@ export default class Yasuo_R extends Spell {
     let enemies = this.game.queryPlayersInRange({
       position: this.owner.position,
       range: this.rangeToFindEnemies,
-
+      excludeTeamIds: [this.owner.teamId],
       // has airborne buff from other unit
       customFilter: p =>
         p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length,
-      excludePlayers: [this.owner],
     });
 
     // if no enemy found, reset spell cast
@@ -57,8 +56,8 @@ export default class Yasuo_R extends Spell {
     let enemiesInRange = this.game.queryPlayersInRange({
       position: nearestEnemy.position,
       range: this.rangeToApplyAirborne,
+      excludeTeamIds: [this.owner.teamId],
       customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
-      excludePlayers: [this.owner],
     });
 
     // add spell object animation

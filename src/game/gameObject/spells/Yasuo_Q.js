@@ -136,7 +136,8 @@ export class Yasuo_Q_Object extends SpellObject {
       position: this.owner.position,
       range: this.currentRayLength,
       includePlayerSize: true,
-      excludePlayers: [this.owner, ...this.playersEffected],
+      excludeTeamIds: [this.owner.teamId],
+      excludePlayers: this.playersEffected,
       customFilter: p => {
         let vertices = rectToVertices(
           this.owner.position.x,
@@ -218,7 +219,8 @@ export class Yasuo_Q3_Object extends SpellObject {
       position: this.position,
       range: this.size / 2,
       includePlayerSize: true,
-      excludePlayers: [this.owner, ...this.playerEffected],
+      excludeTeamIds: [this.owner.teamId],
+      excludePlayers: this.playerEffected,
     });
 
     enemies.forEach(p => {

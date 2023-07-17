@@ -97,7 +97,7 @@ export class Teemo_R_Object extends SpellObject {
           position: this.position,
           range: this.size / 2,
           includePlayerSize: true,
-          excludePlayers: [this.owner],
+          excludeTeamIds: [this.owner.teamId],
           getOnlyOne: true,
         });
 
@@ -106,7 +106,7 @@ export class Teemo_R_Object extends SpellObject {
             position: this.position,
             range: this.explodeRange / 2,
             includePlayerSize: false,
-            excludePlayers: [this.owner],
+            excludeTeamIds: [this.owner.teamId],
           });
 
           enemiesInRange.forEach(enemy => {
