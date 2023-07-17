@@ -5,6 +5,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Champion from '../attackableUnits/Champion.js';
 import Dash from '../buffs/Dash.js';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 
 export default class Zed_W extends Spell {
   image = AssetManager.getAsset('spell_zed_w');
@@ -60,17 +61,41 @@ export default class Zed_W extends Spell {
 export class Zed_W_Clone extends Champion {
   lifeTime = 3000;
   age = 0;
+  castedSpells = [
+    // {
+    //   ownerSpell: null,
+    //   cloneSpell: null,
+    // }
+  ];
+
+  smokeEffect = PredefinedParticleSystems.smoke([150], 2, 10);
 
   onSomeoneCastSpell = spellInstance => {
+    if (spellInstance.owner.id != this.owner.id) return;
     if (spellInstance instanceof Zed_W) return;
-    if (spellInstance.owner != this.owner) return;
-    let spellClone = new spellInstance.constructor(this);
-    spellClone.cast();
+
+    // recast spell (if already casted)
+    let exitsSpell = this.castedSpells.find(s => s.ownerSpell === spellInstance);
+    if (exitsSpell) {
+      exitsSpell.cloneSpell.cast();
+    }
+
+    // clone new spell
+    else {
+      let spellClone = new spellInstance.constructor(this);
+      spellClone.cast();
+      this.castedSpells.push({
+        ownerSpell: spellInstance,
+        cloneSpell: spellClone,
+      });
+    }
   };
 
   onAdded() {
+    // listen to spell cast event
     this.game.eventManager.on(EventType.ON_CAST_SPELL, this.onSomeoneCastSpell);
 
+    // dash to destination
     let originSize = this.stats.size.baseValue;
     this.stats.size.baseValue = 15;
 
@@ -82,8 +107,20 @@ export class Zed_W_Clone extends Champion {
     dashBuff.cancelable = false;
     dashBuff.dashDestination = this.destination;
     dashBuff.onReachedDestination = () => {
+      // restore size/visionRadius
       this.stats.size.baseValue = originSize;
       this.stats.visionRadius.baseValue = originVisionRadius / 3;
+
+      // add smoke effect
+      for (let i = 0; i < 10; i++) {
+        this.smokeEffect.addParticle({
+          x: this.position.x + random(-originSize / 2, originSize / 2),
+          y: this.position.y + random(-originSize / 2, originSize / 2),
+          size: random(30, 50),
+          opacity: random(200, 255),
+        });
+      }
+
       this.onReachedDestination?.();
     };
     this.buffs.push(dashBuff);
@@ -91,11 +128,27 @@ export class Zed_W_Clone extends Champion {
 
   onRemoved() {
     this.game.eventManager.unsub(EventType.ON_CAST_SPELL, this.onSomeoneCastSpell);
+
+    // add smoke effect
+    let size = this.stats.size.baseValue;
+    for (let i = 0; i < 10; i++) {
+      this.smokeEffect.addParticle({
+        x: this.position.x + random(-size / 2, size / 2),
+        y: this.position.y + random(-size / 2, size / 2),
+        size: random(20, 40),
+        opacity: random(200, 255),
+      });
+    }
+    console.log('add smoke');
+
+    // update and draw will be handled by game from now on
+    this.game.addObject(this.smokeEffect);
   }
 
   update() {
     super.update();
 
+    this.smokeEffect.update();
     this.age += deltaTime;
     if (this.age >= this.lifeTime) this.toRemove = true;
   }
@@ -104,10 +157,14 @@ export class Zed_W_Clone extends Champion {
     super.draw();
 
     push();
+
     //gray overlay
     fill(50, 150);
     noStroke();
     circle(this.position.x, this.position.y, this.animatedValues.size);
+
+    // draw smoke effect
+    this.smokeEffect.draw();
     pop();
   }
 

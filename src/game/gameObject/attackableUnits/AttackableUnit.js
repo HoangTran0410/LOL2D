@@ -306,6 +306,11 @@ export default class AttackableUnit extends GameObject {
     this.destination.set(x, y);
   }
 
+  teleportTo(x, y) {
+    this.position.set(x, y);
+    this.destination.set(x, y);
+  }
+
   stopMovement() {
     this.destination.set(this.position.x, this.position.y);
   }
