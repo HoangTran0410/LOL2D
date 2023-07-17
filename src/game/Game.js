@@ -189,7 +189,7 @@ export default class Game {
   }
 
   randomSpawnPoint() {
-    let range = 500;
+    let range = 2000;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)
