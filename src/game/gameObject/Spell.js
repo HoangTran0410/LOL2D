@@ -1,3 +1,4 @@
+import EventType from '../enums/EventType.js';
 import SpellState from '../enums/SpellState.js';
 
 export default class Spell {
@@ -52,6 +53,7 @@ export default class Spell {
     this.state = SpellState.COOLDOWN;
     this.currentCooldown = this.coolDown;
     this.onSpellCast();
+    this.game.eventManager.emit(EventType.ON_CAST_SPELL, this);
 
     // if (this.manaCost) this.owner.stats.mana.baseValue -= this.manaCost;
     // if (this.healthCost) this.owner.stats.health.baseValue -= this.healthCost;

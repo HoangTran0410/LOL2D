@@ -8,34 +8,36 @@ import InGameHUD from './hud/InGameHUD.js';
 import { ChampionPreset, MonsterPreset, getChampionPresetRandom } from './preset.js';
 import Monster from './gameObject/attackableUnits/Monster.js';
 import ObjectManager from './managers/ObjectManager.js';
+import EventManager from '../managers/EventManager.js';
 
 export default class Game {
   constructor() {
+    this.eventManager = new EventManager();
+    this.objectManager = new ObjectManager(this);
+
     this.camera = new Camera();
     this.inGameHUD = new InGameHUD(this);
-    this.objectManager = new ObjectManager(this);
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
 
     this.fps = 60;
 
-    let spawnPoint = this.randomSpawnPoint();
     this.player = new Champion({
       game: this,
-      position: spawnPoint.copy(), // this.randomSpawnPoint(),
+      position: this.randomSpawnPoint(),
       preset: getChampionPresetRandom(),
     });
     this.objectManager.addObject(this.player);
 
-    for (let i = 0; i < 5; i++) {
-      this.objectManager.addObject(
-        new AIChampion({
-          game: this,
-          position: this.randomSpawnPoint(),
-          preset: getChampionPresetRandom(),
-        })
-      );
-    }
+    // for (let i = 0; i < 5; i++) {
+    //   this.objectManager.addObject(
+    //     new AIChampion({
+    //       game: this,
+    //       position: this.randomSpawnPoint(),
+    //       preset: getChampionPresetRandom(),
+    //     })
+    //   );
+    // }
 
     // for (let key in MonsterPreset) {
     //   this.objectManager.addObject(

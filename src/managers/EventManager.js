@@ -10,15 +10,15 @@ export default class EventManager {
       this.subscribers.set(eventType, []);
     }
     this.subscribers.get(eventType).push(callback);
-    return () => this.unsubscribeOf(eventType, callback);
+    return () => this.unsub(eventType, callback);
   }
 
   once(eventType, callback) {
-    const unsubscribe = this.on(eventType, () => {
+    const unsub = this.on(eventType, () => {
       callback.apply(undefined, arguments);
-      unsubscribe();
+      unsub();
     });
-    return unsubscribe;
+    return unsub;
   }
 
   emit(eventType, arg) {
@@ -31,7 +31,7 @@ export default class EventManager {
     return refunds;
   }
 
-  unsubscribeOf(eventType, callback) {
+  unsub(eventType, callback) {
     if (callback) {
       const subscribers = this.subscribers.get(eventType);
       const index = subscribers.indexOf(callback);
