@@ -36,7 +36,6 @@ export default class GameScene extends Scene {
     strokeCap(ROUND);
     rectMode(CORNER);
     imageMode(CENTER);
-    frameRate(60);
 
     this.game = new Game();
     this.startGame();
