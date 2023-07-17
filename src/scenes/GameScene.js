@@ -3,8 +3,7 @@ import { Scene } from '../managers/SceneManager.js';
 import { preventRightClick } from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
 
-let drawStats, updateStats;
-let currentTime, previousTime;
+let drawStats, updateStats, previousTime;
 
 export default class GameScene extends Scene {
   setup() {
@@ -40,17 +39,16 @@ export default class GameScene extends Scene {
     frameRate(60);
 
     this.game = new Game();
+    this.startGame();
+  }
 
-    currentTime = performance.now();
-    previousTime = currentTime;
-
+  startGame() {
+    previousTime = performance.now();
     this.updateLoop();
   }
 
   updateLoop() {
-    requestAnimationFrame(this.updateLoop.bind(this));
-
-    currentTime = performance.now();
+    let currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
     if (elapsedTime > interval) {
@@ -59,14 +57,13 @@ export default class GameScene extends Scene {
       previousTime = currentTime - (elapsedTime % interval);
       updateStats.end();
     }
+
+    this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 
   draw() {
     drawStats.begin();
-
-    // this.game.update();
     this.game.draw();
-
     drawStats.end();
   }
 
@@ -79,6 +76,7 @@ export default class GameScene extends Scene {
   }
 
   exit() {
+    cancelAnimationFrame(this.animationFrameId);
     this.dom.style.display = 'none';
     this.game.destroy?.();
   }
