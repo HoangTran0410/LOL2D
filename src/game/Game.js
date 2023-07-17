@@ -31,7 +31,7 @@ export default class Game {
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
-        new Champion({
+        new AIChampion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getChampionPresetRandom(),
