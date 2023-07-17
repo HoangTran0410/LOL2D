@@ -6,6 +6,8 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+
+    overflow: hidden;
 }
 
 #menu-scene .background {
@@ -23,11 +25,22 @@
 }
 
 #menu-scene button {
-    margin-top: 50px;
+    z-index: 10;
 }
 
 #play-btn {
-    z-index: 10;
+    margin-top: 50px;
+}
+
+#fullscreen-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: transparent;
+    border: none;
+    color: #bbb;
+    font-size: 1em;
+    cursor: pointer;
 }
 
 .hextech-btn {
@@ -54,6 +67,7 @@
 .shiny {
     display: block;
     width: 500px;
+    max-width: 80vw;
     position: relative;
     overflow: hidden;
 }

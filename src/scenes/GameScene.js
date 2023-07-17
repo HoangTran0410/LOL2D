@@ -1,5 +1,6 @@
 import Game from '../game/Game.js';
 import { Scene } from '../managers/SceneManager.js';
+import { preventRightClick } from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
 
 let stats;
@@ -8,8 +9,8 @@ export default class GameScene extends Scene {
   setup() {
     this.dom = document.querySelector('#game-scene');
 
-    this.canvas = createCanvas(windowWidth, windowHeight).parent('game-scene');
-    this.canvas.elt.oncontextmenu = () => false;
+    let c = createCanvas(windowWidth, windowHeight).parent('game-scene');
+    preventRightClick(c.elt);
 
     strokeJoin(ROUND);
     strokeCap(ROUND);
