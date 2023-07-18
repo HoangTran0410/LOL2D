@@ -28,7 +28,6 @@ export default class Spell {
   update() {
     this.onUpdate();
 
-    this.willDrawPreview = false;
     switch (this.state) {
       case SpellState.READY:
         if (this.currentCooldown > 0) {
@@ -50,7 +49,6 @@ export default class Spell {
 
   cast() {
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
-    // this.willDrawPreview = true;
     if (this.state !== SpellState.READY) return;
     if (this.castCancelCheck()) return;
 
@@ -98,6 +96,7 @@ export default class Spell {
   drawPreview(radius) {
     if (radius) {
       push();
+      strokeWeight(2);
       stroke(200, 100);
       noFill();
       circle(this.owner.position.x, this.owner.position.y, radius * 2);

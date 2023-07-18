@@ -90,8 +90,9 @@ export default class InGameHUD {
           this.showSpellsPicker = false;
           this.game.unpause();
         },
-        mouseover(spell, event) {
-          this.spellHover = spell;
+        mouseover(spellProxy, event) {
+          this.showPreview(spellProxy, true);
+          this.spellHover = spellProxy;
 
           let element = event.target;
           let { width, height, x, y } = element.getBoundingClientRect();
@@ -100,8 +101,17 @@ export default class InGameHUD {
           this.spellInfoTop = y;
           this.spellInfoLeft = x + width / 2;
         },
-        mouseout(spell, event) {
+        mouseout(spellProxy, event) {
+          this.showPreview(spellProxy, false);
           this.spellHover = null;
+        },
+        showPreview(spellProxy, show) {
+          try {
+            let s = Vue.toRaw(spellProxy.instance);
+            if (s) s.willDrawPreview = show || false;
+          } catch (e) {
+            console.error(e);
+          }
         },
       },
       computed: {
@@ -276,16 +286,6 @@ export default class InGameHUD {
           timeLeftText: Math.ceil(timeLeft / 1000),
         };
       });
-
-    // draw spell preview on hover
-    if (this.vueInstance.spellHover) {
-      try {
-        let spell = Vue.toRaw(this.vueInstance.spellHover.instance);
-        if (spell) spell.willDrawPreview = true;
-      } catch (e) {
-        console.error(e);
-      }
-    }
   }
 
   destroy() {
