@@ -112,7 +112,7 @@ export class Zed_W_Clone extends Champion {
     // listen to spell cast event
     this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOneCastSpell);
 
-    // untargetable + unmovable
+    // untargetable
     this.setStatus(StatusFlags.Targetable, false);
 
     // dash to destination
@@ -204,5 +204,6 @@ export class Zed_W_Clone extends Champion {
     this.smokeEffect.draw();
   }
 
-  drawHealthBar() {}
+  drawHealthBar() {} // no health bar
+  move() {} // no movement
 }
