@@ -17,6 +17,10 @@ export default class Malphite_R extends Spell {
   hitRadius = 100;
   damage = 30;
 
+  castCancelCheck() {
+    return !this.owner.canMove;
+  }
+
   onSpellCast() {
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
