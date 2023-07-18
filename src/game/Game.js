@@ -12,13 +12,12 @@ import EventManager from '../managers/EventManager.js';
 
 export default class Game {
   constructor() {
-    this.eventManager = new EventManager();
-    this.objectManager = new ObjectManager(this);
-
     this.camera = new Camera();
-    this.inGameHUD = new InGameHUD(this);
     this.terrainMap = new TerrainMap(this);
     this.fogOfWar = new FogOfWar(this);
+    this.eventManager = new EventManager();
+    this.objectManager = new ObjectManager(this);
+    this.inGameHUD = new InGameHUD(this);
 
     this.fps = 60;
 
@@ -29,7 +28,7 @@ export default class Game {
     });
     this.objectManager.addObject(this.player);
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       this.objectManager.addObject(
         new AIChampion({
           game: this,

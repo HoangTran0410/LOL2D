@@ -208,7 +208,7 @@ export default class InGameHUD {
     if (this.app)
       setTimeout(() => {
         this.updateLoop();
-      }, 1000 / 30);
+      }, 1000 / 15);
   }
 
   update() {

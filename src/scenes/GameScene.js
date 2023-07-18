@@ -67,7 +67,7 @@ export default class GameScene extends Scene {
     if (this.game) {
       setTimeout(() => {
         this.updateLoop();
-      }, 0);
+      }, 1);
     }
 
     // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
@@ -88,6 +88,7 @@ export default class GameScene extends Scene {
   }
 
   exit() {
+    cancelAnimationFrame(this.animationFrameId);
     this.dom.style.display = 'none';
     this.game.destroy();
     this.canvas.remove();
