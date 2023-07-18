@@ -3,22 +3,30 @@ import { Scene } from '../managers/SceneManager.js';
 import { preventRightClick } from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
 
-let drawStats, updateStats, previousTime;
+let drawAnalys, updateAnalys, realUpdateAnalys, previousTime;
 
 export default class GameScene extends Scene {
   setup() {
     this.dom = document.querySelector('#game-scene');
     this.statsContainer = document.querySelector('#stats');
 
-    drawStats = new Stats();
-    drawStats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    drawStats.dom.style.cssText = '';
-    this.statsContainer.appendChild(drawStats.dom);
+    drawAnalys = new Stats();
+    drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    drawAnalys.dom.style.cssText = '';
+    drawAnalys.dom.title = 'Draw time';
+    this.statsContainer.appendChild(drawAnalys.dom);
 
-    updateStats = new Stats();
-    updateStats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    updateStats.dom.style.cssText = '';
-    this.statsContainer.appendChild(updateStats.dom);
+    realUpdateAnalys = new Stats();
+    realUpdateAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    realUpdateAnalys.dom.style.cssText = '';
+    realUpdateAnalys.dom.title = 'Real update time';
+    this.statsContainer.appendChild(realUpdateAnalys.dom);
+
+    updateAnalys = new Stats();
+    updateAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    updateAnalys.dom.style.cssText = '';
+    updateAnalys.dom.title = 'Update time';
+    this.statsContainer.appendChild(updateAnalys.dom);
   }
 
   enter() {
@@ -47,20 +55,28 @@ export default class GameScene extends Scene {
     let currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
+    updateAnalys.begin();
     if (elapsedTime > interval) {
-      updateStats.begin();
+      realUpdateAnalys.begin();
       this.game.update();
       previousTime = currentTime - (elapsedTime % interval);
-      updateStats.end();
+      realUpdateAnalys.end();
+    }
+    updateAnalys.end();
+
+    if (this.game) {
+      setTimeout(() => {
+        this.updateLoop();
+      }, 0);
     }
 
-    this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
+    // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 
   draw() {
-    drawStats.begin();
+    drawAnalys.begin();
     this.game.draw();
-    drawStats.end();
+    drawAnalys.end();
   }
 
   keyPressed() {
@@ -72,10 +88,10 @@ export default class GameScene extends Scene {
   }
 
   exit() {
-    cancelAnimationFrame(this.animationFrameId);
     this.dom.style.display = 'none';
     this.game.destroy();
     this.canvas.remove();
+    this.game = null;
   }
 
   windowResized() {
