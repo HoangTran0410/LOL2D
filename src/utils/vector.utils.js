@@ -1,4 +1,7 @@
 const VectorUtils = {
+  getAngle(from, to) {
+    return p5.Vector.sub(to, from).heading();
+  },
   getVectorWithRange(rootVector, targetVector, range) {
     let from = rootVector.copy();
     let dir = p5.Vector.sub(targetVector, from);

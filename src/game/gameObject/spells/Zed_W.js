@@ -47,6 +47,7 @@ export default class Zed_W extends Spell {
       this.currentCooldown = this.coolDown;
 
       this.zedWClone.teleportTo(curPos.x, curPos.y);
+      this.zedWClone.swapable = false;
       this.zedWClone = null;
       this.image = AssetManager.getAsset('spell_zed_w');
     }
@@ -67,6 +68,7 @@ export class Zed_W_Clone extends Champion {
   _mapSpells = {
     // ownerSpellId: cloneSpellInstance
   };
+  swapable = true;
 
   smokeEffect = PredefinedParticleSystems.smoke([150], 2, 10);
 
@@ -80,15 +82,13 @@ export class Zed_W_Clone extends Champion {
 
     // recast spell (if already casted)
     if (spellInstance.id in this._mapSpells) {
-      this._mapSpells[spellInstance.id].cast(); // immediately cast without checking
-      console.log(this._mapSpells[spellInstance.id]);
+      this._mapSpells[spellInstance.id].cast();
     }
 
     // clone new spell
     else {
       let spellClone = new spellInstance.constructor(this);
       spellClone.cast();
-      console.log(spellClone);
       this._mapSpells[spellInstance.id] = spellClone;
     }
   };
@@ -114,7 +114,7 @@ export class Zed_W_Clone extends Champion {
 
       // add smoke effect
       let size = this.stats.size.value;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 5; i++) {
         this.smokeEffect.addParticle({
           x: this.position.x + random(-size / 2, size / 2),
           y: this.position.y + random(-size / 2, size / 2),
@@ -122,10 +122,8 @@ export class Zed_W_Clone extends Champion {
           opacity: random(200, 255),
         });
       }
-
-      // this.onReachedDestination?.();
     };
-    this.buffs.push(dashBuff);
+    this.addBuff(dashBuff);
   }
 
   onRemoved() {
@@ -151,17 +149,19 @@ export class Zed_W_Clone extends Champion {
     pop();
 
     // draw arrow on owner to this
-    let pos = VectorUtils.getVectorWithRange(
+    let arrowSize = 20;
+    let { from, to } = VectorUtils.getVectorWithRange(
       this.owner.position,
       this.position,
-      this.owner.animatedValues.size / 2 + 15
+      this.owner.stats.size.value / 2 + 10 + arrowSize
     );
-    let angle = p5.Vector.sub(this.position, this.owner.position).heading();
+    let angle = VectorUtils.getAngle(this.owner.position, this.position);
     push();
-    translate(pos.x, pos.y);
+    translate(to.x, to.y);
     rotate(angle);
-    fill(255);
-    triangle(0, 0, -10, -5, -10, 5);
+    fill(this.swapable ? [255, 150] : [255, 100, 100, 150]);
+    noStroke();
+    triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
     pop();
 
     // draw smoke effect
