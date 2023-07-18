@@ -2,6 +2,7 @@ import SpellObject from '../gameObject/SpellObject.js';
 import Champion from '../gameObject/attackableUnits/Champion.js';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
 import CombatText from '../gameObject/helpers/CombatText.js';
+import { Quadtree } from '../../../libs/quadtree.js';
 
 const DisplayZIndex = [
   //
@@ -15,8 +16,30 @@ export default class ObjectManager {
   objects = [];
   _objectToBeAdded = [];
 
+  _objectQuadtree = null;
+  _playerQuadtree = null;
+
   constructor(game) {
     this.game = game;
+
+    let mapSize = this.game.mapSize;
+    this._objectQuadtree = new Quadtree({
+      x: 0,
+      y: 0,
+      w: mapSize,
+      h: mapSize,
+      maxObjects: 5,
+      maxLevels: 4,
+    });
+
+    this._playerQuadtree = new Quadtree({
+      x: 0,
+      y: 0,
+      w: mapSize,
+      h: mapSize,
+      maxObjects: 5,
+      maxLevels: 4,
+    });
   }
 
   update() {

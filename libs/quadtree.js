@@ -1,15 +1,10 @@
 // https://github.com/timohausmann/quadtree-ts
 
 class Quadtree {
-  constructor(props, level = 0) {
-    this.bounds = {
-      x: props.x || 0,
-      y: props.y || 0,
-      w: props.w,
-      h: props.h,
-    };
-    this.maxObjects = typeof props.maxObjects === 'number' ? props.maxObjects : 10;
-    this.maxLevels = typeof props.maxLevels === 'number' ? props.maxLevels : 4;
+  constructor({ x = 0, y = 0, w, h, maxObjects = 10, maxLevels = 4 } = {}, level = 0) {
+    this.bounds = { x, y, w, h };
+    this.maxObjects = typeof maxObjects === 'number' ? maxObjects : 10;
+    this.maxLevels = typeof maxLevels === 'number' ? maxLevels : 4;
     this.level = level;
     this.objects = [];
     this.nodes = [];
