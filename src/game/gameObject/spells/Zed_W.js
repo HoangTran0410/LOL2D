@@ -11,7 +11,7 @@ export default class Zed_W extends Spell {
   image = AssetManager.getAsset('spell_zed_w');
   name = 'Phân Thân Bóng Tối (Zed_W)';
   description =
-    'Tạo 1 phân thân lướt tới trước. Sẽ bắt chước các kỹ năng bạn tung ra trong 3s. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân (Phân thân không thể bị chọn làm mục tiêu)';
+    'Tạo 1 phân thân lướt tới trước. Đứng im và sẽ bắt chước các kỹ năng bạn tung ra trong 3s. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân (Phân thân không thể bị chọn làm mục tiêu)';
   coolDown = 7500;
 
   zedWClone = null;
@@ -66,38 +66,53 @@ export class Zed_W_Clone extends Champion {
   lifeTime = 3000;
   age = 0;
   _mapSpells = {
-    // ownerSpellId: cloneSpellInstance
+    // sourceSpellId: {
+    //   clone: cloneSpellInstance,
+    //   source: sourceSpellInstance,
+    // },
   };
+  _pendingSpellIds = [];
+  _reachedDestination = false;
   swapable = true;
 
   smokeEffect = PredefinedParticleSystems.smoke([150], 2, 10);
 
-  onSomeOneCastSpell = spellInstance => {
+  onSomeOneCastSpell = sourceSpell => {
     // check if spell is casted by owner
-    if (spellInstance.owner.id !== this.owner.id) return;
+    if (sourceSpell.owner.id !== this.owner.id) return;
     // check if spell is source spell (spell that created this clone)
-    if (spellInstance.id === this.spellSource?.id) return;
+    if (sourceSpell.id === this.spellSource?.id) return;
     // TODO verify this, could we enable multiple clone zedW?
-    if (spellInstance instanceof Zed_W) return;
+    if (sourceSpell instanceof Zed_W) return;
 
-    // recast spell (if already casted)
-    if (spellInstance.id in this._mapSpells) {
-      this._mapSpells[spellInstance.id].cast();
+    // get or create new clone spell to cast
+    let spell = null;
+    if (sourceSpell.id in this._mapSpells) {
+      spell = this._mapSpells[sourceSpell.id].clone;
+    } else {
+      spell = new sourceSpell.constructor(this);
+      this._mapSpells[sourceSpell.id] = {
+        clone: spell,
+        source: sourceSpell,
+      };
     }
 
-    // clone new spell
-    else {
-      let spellClone = new spellInstance.constructor(this);
-      spellClone.cast();
-      this._mapSpells[spellInstance.id] = spellClone;
+    // cast spell if clone reached destination. Otherwise, queue it
+    if (this._reachedDestination) {
+      spell.cast();
+    } else {
+      this._pendingSpellIds.push({
+        id: sourceSpell.id,
+        mouse: this.game.worldMouse.copy(), // cache mouse position when spell is casted
+      });
     }
   };
 
   onAdded() {
     // listen to spell cast event
-    this.game.eventManager.on(EventType.ON_CAST_SPELL, this.onSomeOneCastSpell);
+    this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOneCastSpell);
 
-    // untargetable
+    // untargetable + unmovable
     this.setStatus(StatusFlags.Targetable, false);
 
     // dash to destination
@@ -109,6 +124,14 @@ export class Zed_W_Clone extends Champion {
     dashBuff.cancelable = false;
     dashBuff.dashDestination = this.destination;
     dashBuff.onReachedDestination = () => {
+      this._reachedDestination = true;
+
+      // cast pending spells
+      this._pendingSpellIds.forEach(({ id, mouse }) => {
+        this.game.worldMouse = mouse; // restore mouse position
+        this._mapSpells[id].clone.cast();
+      });
+
       // restore visionRadius
       this.stats.visionRadius.baseValue = originVisionRadius / 3;
 
@@ -127,7 +150,7 @@ export class Zed_W_Clone extends Champion {
   }
 
   onRemoved() {
-    this.game.eventManager.unsub(EventType.ON_CAST_SPELL, this.onSomeOneCastSpell);
+    this.game.eventManager.unsub(EventType.ON_PRE_CAST_SPELL, this.onSomeOneCastSpell);
   }
 
   update() {
@@ -136,6 +159,16 @@ export class Zed_W_Clone extends Champion {
     this.smokeEffect.update();
     this.age += deltaTime;
     if (this.age >= this.lifeTime) this.toRemove = true;
+
+    // manually update clone spells
+    for (let spellId in this._mapSpells) {
+      let { clone, source } = this._mapSpells[spellId];
+      clone.update();
+
+      if (source.currentCooldown <= 0) {
+        clone.currentCooldown = 0;
+      }
+    }
   }
 
   draw() {
@@ -150,19 +183,22 @@ export class Zed_W_Clone extends Champion {
 
     // draw arrow on owner to this
     let arrowSize = 20;
-    let { from, to } = VectorUtils.getVectorWithRange(
+    let { from, to, distance } = VectorUtils.getVectorWithRange(
       this.owner.position,
       this.position,
-      this.owner.stats.size.value / 2 + 10 + arrowSize
+      this.owner.animatedValues.size / 2 + 10 + arrowSize,
+      false
     );
-    let angle = VectorUtils.getAngle(this.owner.position, this.position);
-    push();
-    translate(to.x, to.y);
-    rotate(angle);
-    fill(this.swapable ? [255, 150] : [255, 100, 100, 150]);
-    noStroke();
-    triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
-    pop();
+    if (distance > 0) {
+      let angle = VectorUtils.getAngle(this.owner.position, this.position);
+      push();
+      translate(to.x, to.y);
+      rotate(angle);
+      fill(this.swapable ? [255, 150] : [255, 100, 100, 150]);
+      noStroke();
+      triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
+      pop();
+    }
 
     // draw smoke effect
     this.smokeEffect.draw();

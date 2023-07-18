@@ -14,7 +14,7 @@ export default class Yasuo_R extends Spell {
   coolDown = 10000;
   manaCost = 50;
 
-  rangeToFindEnemies = 500;
+  rangeToFindEnemies = 600;
   rangeToApplyAirborne = 200;
   timeToApplyAirborne = 1000;
 

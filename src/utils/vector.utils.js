@@ -2,12 +2,13 @@ const VectorUtils = {
   getAngle(from, to) {
     return p5.Vector.sub(to, from).heading();
   },
-  getVectorWithRange(rootVector, targetVector, range) {
+  getVectorWithRange(rootVector, targetVector, range, autoRandomWhenZero = true) {
     let from = rootVector.copy();
     let dir = p5.Vector.sub(targetVector, from);
-    if (dir.mag() === 0) dir.add(random(-1, 1), random(-1, 1));
+    let distance = dir.mag();
+    if (autoRandomWhenZero && distance === 0) dir.add(random(-1, 1), random(-1, 1));
     let to = p5.Vector.add(from, dir.setMag(range));
-    return { from, to };
+    return { from, to, distance };
   },
   getVectorWithMaxRange(rootVector, targetVector, maxRange) {
     let from = rootVector.copy();

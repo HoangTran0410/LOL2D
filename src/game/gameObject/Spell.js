@@ -49,6 +49,7 @@ export default class Spell {
   }
 
   cast() {
+    this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     // this.willDrawPreview = true;
     if (this.state !== SpellState.READY) return;
     if (this.castCancelCheck()) return;
@@ -56,7 +57,7 @@ export default class Spell {
     this.state = SpellState.COOLDOWN;
     this.currentCooldown = this.coolDown;
     this.onSpellCast();
-    this.game.eventManager.emit(EventType.ON_CAST_SPELL, this);
+    this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
 
     // if (this.manaCost) this.owner.stats.mana.baseValue -= this.manaCost;
     // if (this.healthCost) this.owner.stats.health.baseValue -= this.healthCost;

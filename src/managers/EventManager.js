@@ -34,12 +34,17 @@ export default class EventManager {
   unsub(eventType, callback) {
     if (callback) {
       const subscribers = this.subscribers.get(eventType);
-      const index = subscribers.indexOf(callback);
-      if (index > -1) {
-        subscribers.splice(index, 1);
+      if (subscribers) {
+        const index = subscribers.indexOf(callback);
+        if (index > -1) {
+          subscribers.splice(index, 1);
+          return true;
+        }
       }
-    } else {
+    } else if (this.subscribers.has(eventType)) {
       this.subscribers.delete(eventType);
+      return true;
     }
+    return false;
   }
 }

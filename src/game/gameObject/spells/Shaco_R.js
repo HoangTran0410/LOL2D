@@ -43,6 +43,7 @@ export default class Shaco_R extends Spell {
     //   this.currentCooldown = this.coolDown;
     //   this.clonePlayer = null;
     // };
+    clone.moveTo(this.game.worldMouse.x, this.game.worldMouse.y);
     this.game.addPlayer(clone);
 
     this.clonePlayer = clone;

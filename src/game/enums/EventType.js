@@ -5,7 +5,8 @@ const EventType = {
   ON_HEAL: 'onUnitHeal',
   ON_BUFF_ADD: 'onUnitBuffAdd',
   ON_BUFF_REMOVE: 'onUnitBuffRemove',
-  ON_CAST_SPELL: 'onUnitCastSpell',
+  ON_PRE_CAST_SPELL: 'onUnitPreCastSpell',
+  ON_POST_CAST_SPELL: 'onUnitCastSpell',
 };
 
 Object.freeze(EventType);
