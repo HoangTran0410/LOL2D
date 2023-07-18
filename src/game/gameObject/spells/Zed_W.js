@@ -165,9 +165,17 @@ export class Zed_W_Clone extends Champion {
       let { clone, source } = this._mapSpells[spellId];
       clone.update();
 
-      if (source.currentCooldown <= 0) {
-        clone.currentCooldown = 0;
-      }
+      // ===== sync cooldown =====
+      // case 1: clone is on cooldown, source is not => set source cooldown to clone cooldown
+      // usually occurs on spells that have custom castCancelCheck (e.g. lee sin R, yasuo E, etc.)
+      // in that case, clone casted but source not casted => need to sync cooldown
+      if (clone.currentCooldown > 0 && source.currentCooldown === 0)
+        source.currentCooldown = clone.currentCooldown;
+
+      // case 2: source is on cooldown, clone is not => set clone cooldown to source cooldown
+      // to immediately enable clone spell when source spell is ready to cast
+      // usually occurs on spells that have multiple phases (e.g. lee sin R, ahri R, etc.)
+      if (source.currentCooldown === 0) clone.currentCooldown = 0;
     }
   }
 
