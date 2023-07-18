@@ -182,14 +182,7 @@ export class Zed_W_Clone extends Champion {
   draw() {
     super.draw();
 
-    //gray overlay
-    push();
-    fill(50, 150);
-    noStroke();
-    circle(this.position.x, this.position.y, this.animatedValues.size);
-    pop();
-
-    // draw arrow on owner to this
+    // draw arrow on owner point to this
     let arrowSize = 20;
     let { from, to, distance } = VectorUtils.getVectorWithRange(
       this.owner.position,
