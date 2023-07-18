@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../libs/quadtree.js';
 import { uuidv4 } from '../../utils/index.js';
 
 export default class GameObject {
@@ -32,15 +33,8 @@ export default class GameObject {
   update() {}
   draw() {}
 
-  isCollidingWith(other) {
-    return this.position.dist(other.position) <= this.collisionRadius + other.collisionRadius;
-  }
-  // onCollision(other, isTerrain = false) {
-  //   // TODO: verify if this is needed
-  // }
-
   setTeamId(teamId) {
-    // TODO: remove visioin from old team
+    // TODO: remove vision from old team
     // TODO: add vision to new team
     this.teamId = teamId;
   }
@@ -49,6 +43,23 @@ export default class GameObject {
     // TODO: get closest terrain exit
     this.position.set(x, y);
   }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.collisionRadius,
+      y: this.position.y - this.collisionRadius,
+      w: this.collisionRadius * 2,
+      h: this.collisionRadius * 2,
+      data: this,
+    });
+  }
+
+  // isCollidingWith(other) {
+  //   return this.position.dist(other.position) <= this.collisionRadius + other.collisionRadius;
+  // }
+  // onCollision(other, isTerrain = false) {
+  //   // TODO: verify if this is needed
+  // }
 
   // onEnterVision(playerId, teamId) {}
   // onLeaveVision(playerId, teamId) {}

@@ -6,6 +6,8 @@ const VectorUtils = {
     let from = rootVector.copy();
     let dir = p5.Vector.sub(targetVector, from);
     let distance = dir.mag();
+    // case leesinQ to target, then R => fail because distance = 0, target will not dash to other side
+    // so we add a random vector to dir
     if (autoRandomWhenZero && distance === 0) dir.add(random(-1, 1), random(-1, 1));
     let to = p5.Vector.add(from, dir.setMag(range));
     return { from, to, distance };

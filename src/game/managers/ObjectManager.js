@@ -14,25 +14,15 @@ const DisplayZIndex = [
 
 export default class ObjectManager {
   objects = [];
-  _objectToBeAdded = [];
-
+  _objectToBeAdd = [];
   _objectQuadtree = null;
-  _playerQuadtree = null;
+  _quadtreeInUpdating = false;
 
   constructor(game) {
     this.game = game;
 
     let mapSize = this.game.mapSize;
     this._objectQuadtree = new Quadtree({
-      x: 0,
-      y: 0,
-      w: mapSize,
-      h: mapSize,
-      maxObjects: 5,
-      maxLevels: 4,
-    });
-
-    this._playerQuadtree = new Quadtree({
       x: 0,
       y: 0,
       w: mapSize,
@@ -58,18 +48,26 @@ export default class ObjectManager {
     }
 
     // check add
-    if (this._objectToBeAdded.length > 0) {
-      for (let o of this._objectToBeAdded) {
+    if (this._objectToBeAdd.length > 0) {
+      for (let o of this._objectToBeAdd) {
         this.objects.push(o);
         o.onAdded?.();
       }
-      this._objectToBeAdded = [];
+      this._objectToBeAdd = [];
       this.objects.sort((a, b) => {
         let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
         let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
         return aZIndex - bZIndex;
       });
     }
+
+    // update quadtree
+    this._quadtreeInUpdating = true;
+    this._objectQuadtree.clear();
+    for (let o of this.objects) {
+      this._objectQuadtree.insert(o.getBoundingBox());
+    }
+    this._quadtreeInUpdating = false;
   }
 
   draw() {
@@ -79,7 +77,7 @@ export default class ObjectManager {
   }
 
   addObject(object) {
-    this._objectToBeAdded.push(object);
+    this._objectToBeAdd.push(object);
   }
 
   removeObject(object) {
@@ -90,8 +88,20 @@ export default class ObjectManager {
     return this.objects.filter(o => o instanceof type);
   }
 
+  getAllChampions() {
+    return this.objects.filter(o => o instanceof AttackableUnit);
+  }
+
   getObjectById(id) {
     return this.objects.find(o => o.id === id);
+  }
+
+  // area: Rectangle | Circle | Line
+  getObjectInArea(area) {
+    if (this._quadtreeInUpdating) {
+      console.warn('Quadtree is updating, this may cause unexpected result.');
+    }
+    return this._objectQuadtree.retrieve(area);
   }
 
   getObjectsInRange({
@@ -122,9 +132,5 @@ export default class ObjectManager {
       count++;
     }
     return results;
-  }
-
-  getAllChampions() {
-    return this.objects.filter(o => o instanceof AttackableUnit);
   }
 }

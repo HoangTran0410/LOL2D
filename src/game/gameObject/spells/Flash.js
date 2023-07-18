@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
+import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
@@ -13,14 +14,13 @@ export default class Flash extends Spell {
   onSpellCast() {
     let maxDistance = 180;
 
-    let target = this.game.worldMouse.copy();
-    let direction = p5.Vector.sub(target, this.owner.position);
-    let distance = direction.mag();
-    let distToMove = Math.min(distance, maxDistance);
-
     let oldPos = this.owner.position.copy();
-    this.owner.position.add(direction.setMag(distToMove));
-    this.owner.moveTo(this.owner.position.x, this.owner.position.y);
+    let { from, to } = VectorUtils.getVectorWithMaxRange(
+      this.owner.position,
+      this.game.worldMouse,
+      maxDistance
+    );
+    this.owner.teleportTo(to.x, to.y);
 
     // add smoke effect
     let newPosEffect = new Flash_Object(this.owner);
