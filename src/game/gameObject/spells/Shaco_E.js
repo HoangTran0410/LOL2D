@@ -1,5 +1,8 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import { Shaco_W_Bullet_Object } from './Shaco_W.js';
 
 export default class Shaco_E extends Spell {
@@ -13,10 +16,16 @@ export default class Shaco_E extends Spell {
   targetEnemy = null;
 
   checkCastCondition() {
-    let enemies = this.game.queryPlayersInRange({
-      position: this.owner.position,
-      range: this.range,
-      excludeTeamIds: [this.owner.teamId],
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.range,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+      ],
     });
 
     if (!enemies.length) {

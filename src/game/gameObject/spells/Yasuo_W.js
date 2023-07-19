@@ -105,7 +105,7 @@ export class Yasuo_W_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.animatedPosition.x - this.animatedSize / 2 - this.animatedWidth / 2,
       y: this.animatedPosition.y - this.animatedSize / 2 - this.animatedWidth / 2,

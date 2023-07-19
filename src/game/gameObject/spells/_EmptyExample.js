@@ -31,5 +31,5 @@ export class SpellName_Object extends SpellObject {
   onRemoved() {}
   update() {}
   draw() {}
-  getBoundingBox() {}
+  getDisplayBoundingBox() {}
 }

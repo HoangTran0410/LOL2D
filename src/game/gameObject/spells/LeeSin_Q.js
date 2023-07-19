@@ -5,7 +5,9 @@ import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 import TrueSight from '../buffs/TrueSight.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class LeeSin_Q extends Spell {
   static PHASES = {
@@ -151,14 +153,19 @@ export class LeeSin_Q_Object extends SpellObject {
       this.trailSystem.addTrail(this.position);
 
       // check collision with enemy
-      let enemy = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size / 2,
-        excludeTeamIds: [this.owner.teamId],
-        includePlayerSize: true,
-        getOnlyOne: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
 
+      let enemy = enemies?.[0];
       if (enemy) {
         this.onHit?.(enemy);
         this.enemyHit = enemy;
@@ -210,7 +217,7 @@ export class LeeSin_Q_Object extends SpellObject {
     }
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
       return new Rectangle({
         x: this.position.x - this.size / 2,

@@ -4,7 +4,9 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Leblanc_W extends Spell {
   PHASES = {
@@ -65,11 +67,16 @@ export default class Leblanc_W extends Spell {
         this.game.objectManager.addObject(w2Obj);
 
         // enemy take damage
-        let enemies = this.game.queryPlayersInRange({
-          position: destination,
-          range: w2Obj.size / 2,
-          excludeTeamIds: [this.owner.teamId],
-          includePlayerSize: true,
+        let enemies = this.game.objectManager.queryObjects({
+          area: new Circle({
+            x: destination.x,
+            y: destination.y,
+            r: w2Obj.size / 2,
+          }),
+          filters: [
+            PredefinedFilters.includeTypes([AttackableUnit]),
+            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          ],
         });
         enemies.forEach(enemy => {
           enemy.takeDamage(20, this.owner);
@@ -130,7 +137,7 @@ export class Leblanc_W_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.owner.stats.size.value / 2,
       y: this.position.y - this.owner.stats.size.value / 2,
@@ -152,7 +159,7 @@ export class Leblanc_W_Object2 extends Leblanc_W_Object {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

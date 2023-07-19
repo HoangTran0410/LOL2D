@@ -1,7 +1,9 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Silence from '../buffs/Silence.js';
 
 export default class Blitzcrank_R extends Spell {
@@ -41,12 +43,17 @@ export class Blitzcrank_R_Object extends SpellObject {
     this.size = Math.min(this.size + this.expantionSpeed, this.maxSize);
 
     // apply silence
-    let enemies = this.game.queryPlayersInRange({
-      position: this.position,
-      range: this.size / 2,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: this.playersEffected,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.size / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects(this.playersEffected),
+      ],
     });
 
     enemies.forEach(enemy => {
@@ -85,7 +92,7 @@ export class Blitzcrank_R_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

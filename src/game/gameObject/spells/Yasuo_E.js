@@ -1,6 +1,9 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Dash from '../buffs/Dash.js';
 
 export default class Yasuo_E extends Spell {
@@ -11,7 +14,7 @@ export default class Yasuo_E extends Spell {
   coolDown = 2000;
   manaCost = 30;
 
-  rangeToFindEnemies = 180;
+  rangeToFindEnemies = 130;
 
   checkCastCondition() {
     return Dash.CanDash(this.owner);
@@ -22,10 +25,16 @@ export default class Yasuo_E extends Spell {
     this.owner.destination.set(mouse.x, mouse.y);
 
     // find all enemies in range
-    let enemiesInRange = this.game.queryPlayersInRange({
-      position: this.owner.position,
-      range: this.rangeToFindEnemies,
-      excludeTeamIds: [this.owner.teamId],
+    let enemiesInRange = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.rangeToFindEnemies,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+      ],
     });
     if (enemiesInRange.length == 0) {
       this.resetCoolDown();

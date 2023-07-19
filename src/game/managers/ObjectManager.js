@@ -60,18 +60,13 @@ export default class ObjectManager {
         o.onAdded?.();
       }
       this._objectToBeAdd = [];
-      this.objects.sort((a, b) => {
-        let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
-        let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
-        return aZIndex - bZIndex;
-      });
     }
 
     // update quadtree
     this._quadtreeInUpdating = true;
     this._objectQuadtree.clear();
     for (let o of this.objects) {
-      this._objectQuadtree.insert(o.getBoundingBox());
+      this._objectQuadtree.insert(o.getDisplayBoundingBox());
     }
     this._quadtreeInUpdating = false;
   }
@@ -79,12 +74,19 @@ export default class ObjectManager {
   draw() {
     let camBound = this.game.camera.getBoundingBox();
     let objectsInCamera = this.queryObjects({
+      queryByDisplayBoundingBox: true,
       area: camBound,
+    });
+
+    objectsInCamera.sort((a, b) => {
+      let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
+      let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
+      return aZIndex - bZIndex;
     });
 
     for (let o of objectsInCamera) {
       if (o.willDraw) o.draw?.();
-      o.drawBoundingBox?.();
+      // o.drawBoundingBox?.(true);
     }
 
     // draw camera bound
@@ -103,7 +105,7 @@ export default class ObjectManager {
     object.toRemove = true;
   }
 
-  queryObjects({ area, filters, debug }) {
+  queryObjects({ area, filters, queryByDisplayBoundingBox = false }) {
     if (this._quadtreeInUpdating) {
       console.warn('Quadtree is updating, this may cause unexpected result.');
     }
@@ -115,12 +117,11 @@ export default class ObjectManager {
       objects = this.objects;
     }
 
-    if (debug) console.log('queryObjects', objects);
-
     if (!filters || filters.length === 0) {
       return objects;
     }
 
+    if (!queryByDisplayBoundingBox) filters.push(PredefinedFilters.collideWith(area));
     return objects.filter(o => filters.every(filter => filter(o)));
   }
 }
@@ -143,4 +144,8 @@ export const PredefinedFilters = {
     o =>
       o instanceof AttackableUnit &&
       p5.Vector.dist(o.position, pos) <= radius + (includeSize ? o.animatedValues.size / 2 : 0),
+  collideWith: area => o => {
+    if (typeof o.getCollideBoundingBox !== 'function') return false;
+    return o.getCollideBoundingBox().intersect(area);
+  },
 };

@@ -5,7 +5,9 @@ import SpellObject from '../SpellObject.js';
 import Slow from '../buffs/Slow.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
@@ -65,16 +67,22 @@ export class Ashe_W_Object extends SpellObject {
 
     if (this.position.dist(this.destination) < this.speed) {
       this.toRemove = true;
+      this.trailSystem.toRemove = true;
     }
 
-    let enemy = this.game.queryPlayersInRange({
-      position: this.position,
-      range: this.size / 2,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      getOnlyOne: true,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.size / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+      ],
     });
 
+    let enemy = enemies?.[0];
     if (enemy) {
       let slowBuff = new Slow(1500, this.owner, enemy);
       slowBuff.percent = 0.75;
@@ -104,7 +112,7 @@ export class Ashe_W_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

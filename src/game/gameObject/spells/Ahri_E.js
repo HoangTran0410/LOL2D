@@ -64,16 +64,11 @@ export class Ahri_E_Object extends SpellObject {
       area: new Circle({
         x: this.position.x,
         y: this.position.y,
-        r: 100,
+        r: this.size / 2,
       }),
       filters: [
-        o => {
-          console.log(o);
-          return true;
-        },
         PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-        PredefinedFilters.attackableUnitInRange(this.position, 0, true),
       ],
     });
     let enemy = enemies?.[0];
@@ -101,7 +96,7 @@ export class Ahri_E_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

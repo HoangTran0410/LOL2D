@@ -1,10 +1,12 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import { rectToVertices } from '../../../utils/index.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import RootBuff from '../buffs/Root.js';
 
@@ -133,26 +135,31 @@ export class Yasuo_Q_Object extends SpellObject {
     this.currentRayLength = Math.min(this.currentRayLength + this.raySpeed, this.range);
 
     // check collide with enemy
-    let enemies = this.game.queryPlayersInRange({
-      position: this.owner.position,
-      range: this.currentRayLength,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: this.playersEffected,
-      customFilter: p => {
-        let vertices = rectToVertices(
-          this.owner.position.x,
-          this.owner.position.y - this.rayWidth / 2 - p.stats.size.value / 2,
-          this.currentRayLength,
-          this.rayWidth + p.stats.size.value,
-          this.angle,
-          {
-            x: this.owner.position.x,
-            y: this.owner.position.y,
-          }
-        );
-        return CollideUtils.pointPolygon(p.position.x, p.position.y, vertices);
-      },
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.currentRayLength,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects(this.playersEffected),
+        o => {
+          let vertices = rectToVertices(
+            this.owner.position.x,
+            this.owner.position.y - this.rayWidth / 2 - o.stats.size.value / 2,
+            this.currentRayLength,
+            this.rayWidth + o.stats.size.value,
+            this.angle,
+            {
+              x: this.owner.position.x,
+              y: this.owner.position.y,
+            }
+          );
+          return CollideUtils.pointPolygon(o.position.x, o.position.y, vertices);
+        },
+      ],
     });
 
     enemies.forEach(p => {
@@ -186,7 +193,7 @@ export class Yasuo_Q_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.owner.position.x - this.range,
       y: this.owner.position.y - this.range,
@@ -208,7 +215,7 @@ export class Yasuo_Q3_Object extends SpellObject {
   airBorneTime = 1000;
   angle = 0;
 
-  playerEffected = [];
+  playersEffected = [];
 
   image = AssetManager.getAsset('obj_yasuo_q3');
 
@@ -226,12 +233,17 @@ export class Yasuo_Q3_Object extends SpellObject {
     this.angle += 0.2;
 
     // check collide with enemy
-    let enemies = this.game.queryPlayersInRange({
-      position: this.position,
-      range: this.size / 2,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: this.playerEffected,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.size / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects(this.playersEffected),
+      ],
     });
 
     enemies.forEach(p => {
@@ -240,7 +252,7 @@ export class Yasuo_Q3_Object extends SpellObject {
       p.addBuff(buff);
       p.takeDamage(20, this.owner);
 
-      this.playerEffected.push(p);
+      this.playersEffected.push(p);
     });
   }
 
@@ -252,7 +264,7 @@ export class Yasuo_Q3_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

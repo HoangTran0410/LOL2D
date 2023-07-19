@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Dash from '../buffs/Dash.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -44,11 +46,16 @@ export default class Ahri_R extends Spell {
     dashBuff.image = this.image;
     dashBuff.dashSpeed = 10;
     dashBuff.onReachedDestination = () => {
-      let enemies = this.game.queryPlayersInRange({
-        position: this.owner.position,
-        range: this.rangeToFindEnemies,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.owner.position.x,
+          y: this.owner.position.y,
+          r: this.rangeToFindEnemies,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
 
       for (let i = 0; i < Math.min(3, enemies.length); i++) {
@@ -121,7 +128,7 @@ export class Ahri_R_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

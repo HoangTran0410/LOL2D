@@ -5,7 +5,9 @@ import { rectToVertices } from '../../../utils/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import CollideUtils from '../../../utils/collide.utils.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
@@ -84,32 +86,37 @@ export class Lux_R_Object extends SpellObject {
       }
 
       // check collision ray-enemy
-      let enemies = this.game.queryPlayersInRange({
-        position: this.owner.position,
-        range: this.destination.dist(this.owner.position),
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        excludePlayers: this.playersEffected,
-        customFilter: p => {
-          // get vertices
-          let dir = this.destination.copy().sub(this.owner.position).normalize();
-          let angle = dir.heading();
-          let rx = this.owner.position.x;
-          let ry = this.owner.position.y - this.prepairRayWidth / 2 - p.stats.size.value / 2;
-          let rw = this.destination.dist(this.owner.position);
-          let rh = this.prepairRayWidth + p.stats.size.value; // increase ray width to fit enemy size
-          let vertices = rectToVertices(rx, ry, rw, rh, angle, {
-            x: this.owner.position.x,
-            y: this.owner.position.y,
-          });
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.owner.position.x,
+          y: this.owner.position.y,
+          r: this.destination.dist(this.owner.position),
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.excludeObjects(this.playersEffected),
+          o => {
+            // get vertices
+            let dir = this.destination.copy().sub(this.owner.position).normalize();
+            let angle = dir.heading();
+            let rx = this.owner.position.x;
+            let ry = this.owner.position.y - this.prepairRayWidth / 2 - o.stats.size.value / 2;
+            let rw = this.destination.dist(this.owner.position);
+            let rh = this.prepairRayWidth + o.stats.size.value; // increase ray width to fit enemy size
+            let vertices = rectToVertices(rx, ry, rw, rh, angle, {
+              x: this.owner.position.x,
+              y: this.owner.position.y,
+            });
 
-          // get px, py
-          let px = p.position.x;
-          let py = p.position.y;
+            // get px, py
+            let px = o.position.x;
+            let py = o.position.y;
 
-          // check collision
-          return CollideUtils.pointPolygon(px, py, vertices);
-        },
+            // check collision
+            return CollideUtils.pointPolygon(px, py, vertices);
+          },
+        ],
       });
 
       enemies.forEach(enemy => {
@@ -164,7 +171,7 @@ export class Lux_R_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: Math.min(this.owner.position.x, this.destination.x) - this.rayWidth / 2,
       y: Math.min(this.owner.position.y, this.destination.y) - this.rayWidth / 2,

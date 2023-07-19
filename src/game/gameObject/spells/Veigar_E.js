@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Stun from '../buffs/Stun.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
 
@@ -80,20 +82,25 @@ export class Veigar_E_Object extends SpellObject {
     // active phase
     else if (this.phase === Veigar_E_Object.PHASES.ACTIVE) {
       // check collision
-      let enemies = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size / 2,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        excludePlayers: this.enemiesEffected,
-        customFilter: p => {
-          let distance = p.position.dist(this.position);
-          // collide with edge of the circle
-          return (
-            distance <= this.size / 2 + this.strokeWidth / 2 &&
-            distance >= this.size / 2 - this.strokeWidth / 2
-          );
-        },
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.excludeObjects(this.enemiesEffected),
+          o => {
+            let distance = o.position.dist(this.position);
+            // collide with edge of the circle
+            return (
+              distance <= this.size / 2 + this.strokeWidth / 2 &&
+              distance >= this.size / 2 - this.strokeWidth / 2
+            );
+          },
+        ],
       });
 
       enemies.forEach(enemy => {
@@ -149,7 +156,7 @@ export class Veigar_E_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2 - this.strokeWidth / 2,
       y: this.position.y - this.size / 2 - this.strokeWidth / 2,

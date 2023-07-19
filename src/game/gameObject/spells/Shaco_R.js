@@ -1,5 +1,8 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Champion from '../attackableUnits/Champion.js';
 import Fear from '../buffs/Fear.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
@@ -130,11 +133,16 @@ class Shaco_R_Clone extends Champion {
     this.game.objectManager.addObject(explodeEffect);
 
     // take damage + fear nearby enemies
-    let enemies = this.game.queryPlayersInRange({
-      position: clonePos,
-      range: explodeRadius,
-      includePlayerSize: true,
-      excludeTeamIds: [this.teamId],
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: clonePos.x,
+        y: clonePos.y,
+        r: explodeRadius,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.teamId]),
+      ],
     });
 
     enemies.forEach(e => {

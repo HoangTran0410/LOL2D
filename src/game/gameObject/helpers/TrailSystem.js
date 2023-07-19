@@ -57,7 +57,7 @@ export default class TrailSystem extends SpellObject {
     }
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     if (this.trails.length === 0) return new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
 
     let topLeft = {

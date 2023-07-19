@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { hasFlag } from '../../../utils/index.js';
 import ActionState from '../../enums/ActionState.js';
 import BuffAddType from '../../enums/BuffAddType.js';
@@ -321,7 +321,17 @@ export default class AttackableUnit extends GameObject {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
-  getBoundingBox() {
+  getCollideBoundingBox() {
+    let size = this.animatedValues.size;
+    return new Circle({
+      x: this.position.x,
+      y: this.position.y,
+      r: size / 2,
+      data: this,
+    });
+  }
+
+  getDisplayBoundingBox() {
     let size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
     // let size = this.animatedValues.size;
     return new Rectangle({
@@ -331,6 +341,12 @@ export default class AttackableUnit extends GameObject {
       h: size,
       data: this,
     });
+    // return new Circle({
+    //   x: this.position.x,
+    //   y: this.position.y,
+    //   r: size / 2,
+    //   data: this,
+    // });
   }
 
   get canCast() {

@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Stun from '../buffs/Stun.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -59,26 +61,36 @@ export class Ashe_R_Object extends SpellObject {
       this.trailSystem.addTrail(this.position);
 
       // check collide enemy
-      let enemy = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size / 4,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        getOnlyOne: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 4,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
 
-      if (enemy) {
+      if (enemies?.length > 0) {
         this.exploding = true;
         this.isMissile = false;
         this.age = this.lifeTime - this.explodeLifeTime; // reset age to display explode animation
 
         // add buff to enemies
-        let enemies = this.game.queryPlayersInRange({
-          position: this.position,
-          range: this.explodeSize / 2,
-          excludeTeamIds: [this.owner.teamId],
+        let enemiesInRange = this.game.objectManager.queryObjects({
+          area: new Circle({
+            x: this.position.x,
+            y: this.position.y,
+            r: this.explodeSize / 2,
+          }),
+          filters: [
+            PredefinedFilters.includeTypes([AttackableUnit]),
+            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          ],
         });
-        enemies.forEach(p => {
+        enemiesInRange.forEach(p => {
           let stunBuff = new Stun(2500, this.owner, p);
           stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
           stunBuff.image = AssetManager.getAsset('spell_ashe_r');
@@ -138,7 +150,7 @@ export class Ashe_R_Object extends SpellObject {
     return random(this.size / 1.5, this.size * 1.5);
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

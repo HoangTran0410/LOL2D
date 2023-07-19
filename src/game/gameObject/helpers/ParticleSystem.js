@@ -67,7 +67,7 @@ export default class ParticleSystem extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     if (this.particles.length === 0 || !this.getParticlePosFn || !this.getParticleSizeFn)
       return new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
 

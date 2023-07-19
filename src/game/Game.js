@@ -131,40 +131,8 @@ export default class Game {
     this.inGameHUD.destroy();
   }
 
-  queryPlayersInRange({
-    position,
-    range, // radius
-    teamId,
-    excludePlayers = [],
-    excludeTeamIds = [],
-    includePlayerSize = false,
-    includeDead = false,
-    includeUntargetable = false,
-    getOnlyOne = false,
-    customFilter = null,
-  }) {
-    let champions = this.objectManager.queryObjects({
-      filters: [o => o instanceof Champion],
-    });
-
-    let result = [];
-    for (let p of champions) {
-      if (teamId && o.teamId !== teamId) continue;
-      if (!includeDead && p.isDead) continue;
-      if (!includeUntargetable && !p.targetable) continue;
-      if (excludePlayers.includes(p)) continue;
-      if (excludeTeamIds.includes(p.teamId)) continue;
-      if (p.position.dist(position) > range + (includePlayerSize ? p.stats.size.value / 2 : 0))
-        continue;
-      if (typeof customFilter === 'function' && !customFilter(p)) continue;
-      if (getOnlyOne) return p;
-      result.push(p);
-    }
-    return getOnlyOne ? null : result;
-  }
-
   randomSpawnPoint() {
-    let range = 2000;
+    let range = 500;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)

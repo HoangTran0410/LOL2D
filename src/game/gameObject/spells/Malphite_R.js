@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 
@@ -33,11 +35,16 @@ export default class Malphite_R extends Spell {
     dashBuff.dashDestination = to;
     dashBuff.dashSpeed = 15;
     dashBuff.onReachedDestination = () => {
-      let enemies = this.game.queryPlayersInRange({
-        position: this.owner.position,
-        range: this.hitRadius,
-        excludeTeamIds: [this.owner.teamId],
-        includePlayerSize: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.owner.position.x,
+          y: this.owner.position.y,
+          r: this.hitRadius,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
 
       enemies.forEach(enemy => {
@@ -98,7 +105,7 @@ export class Malphite_R_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.hitRadius,
       y: this.position.y - this.hitRadius,

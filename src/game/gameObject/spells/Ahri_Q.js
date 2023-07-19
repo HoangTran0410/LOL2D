@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Slow from '../buffs/Slow.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
@@ -93,12 +95,17 @@ export class Ahri_Q_Object extends SpellObject {
     this.particleSystem.update();
 
     // collide with enemy
-    let enemies = this.game.queryPlayersInRange({
-      position: this.position,
-      range: this.size / 2,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: this.playerEffected,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.size / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects(this.playerEffected),
+      ],
     });
 
     enemies.forEach(enemy => {
@@ -123,7 +130,7 @@ export class Ahri_Q_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

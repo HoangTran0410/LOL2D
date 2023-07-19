@@ -62,6 +62,7 @@ export default class TerrainMap {
 
     // players collision with obstacles
     let players = this.game.objectManager.queryObjects({
+      queryByDisplayBoundingBox: true,
       filters: [PredefinedFilters.type(Champion)],
     });
     for (let p of players) {
@@ -208,11 +209,7 @@ export default class TerrainMap {
   }
 
   getObstaclesCollideChampion(champion, terrainTypes) {
-    let area = new Circle({
-      x: champion.position.x,
-      y: champion.position.y,
-      r: champion.stats.size.value,
-    });
+    let area = champion.getCollideBoundingBox();
     return this.getObstaclesInArea(area, terrainTypes);
   }
 

@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Slow from '../buffs/Slow.js';
 import Speedup from '../buffs/Speedup.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
@@ -112,12 +114,17 @@ export class Olaf_Q_Object extends SpellObject {
       }
 
       // check collision with enemy
-      let enemies = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size / 2,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        excludePlayers: this.playerEffected,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.excludeObjects(this.playerEffected),
+        ],
       });
 
       enemies.forEach(enemy => {
@@ -208,7 +215,7 @@ export class Olaf_Q_Object extends SpellObject {
     }
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.pickupRange / 2,
       y: this.position.y - this.pickupRange / 2,

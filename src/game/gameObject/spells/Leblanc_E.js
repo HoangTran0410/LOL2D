@@ -3,7 +3,9 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');
@@ -88,13 +90,18 @@ export class Leblanc_E_Object extends SpellObject {
       }
 
       // check collide enemy
-      let enemy = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size / 2,
-        excludeTeamIds: [this.owner.teamId],
-        includePlayerSize: true,
-        getOnlyOne: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
+      let enemy = enemies?.[0];
       if (enemy) {
         this.enemyHit = enemy;
         this.enemyHit.takeDamage(this.hitDamage, this.owner);
@@ -186,7 +193,7 @@ export class Leblanc_E_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     // get boundary including owner position
     return new Rectangle({
       x: Math.min(this.position.x, this.owner.position.x) - this.size / 2,

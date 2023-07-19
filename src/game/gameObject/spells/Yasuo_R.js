@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import Speedup from '../buffs/Speedup.js';
@@ -27,13 +29,17 @@ export default class Yasuo_R extends Spell {
     let mouse = this.game.worldMouse.copy();
 
     // query all enemies that have Airborne buff
-    let enemies = this.game.queryPlayersInRange({
-      position: this.owner.position,
-      range: this.rangeToFindEnemies,
-      excludeTeamIds: [this.owner.teamId],
-      // has airborne buff from other unit
-      customFilter: p =>
-        p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.rangeToFindEnemies,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        p => p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length > 0,
+      ],
     });
 
     // if no enemy found, reset spell cast
@@ -54,11 +60,17 @@ export default class Yasuo_R extends Spell {
     }
 
     // find all enemies that are in range 300px to nearest enemy
-    let enemiesInRange = this.game.queryPlayersInRange({
-      position: nearestEnemy.position,
-      range: this.rangeToApplyAirborne,
-      excludeTeamIds: [this.owner.teamId],
-      customFilter: p => p.hasBuff(Airborne), // p.stats.height.value > 0,
+    let enemiesInRange = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: nearestEnemy.position.x,
+        y: nearestEnemy.position.y,
+        r: this.rangeToApplyAirborne,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        p => p.hasBuff(Airborne),
+      ],
     });
 
     // add spell object animation
@@ -146,7 +158,7 @@ export class Yasuo_R_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

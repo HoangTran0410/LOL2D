@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import RootBuff from '../buffs/Root.js';
 
 export default class Lux_Q extends Spell {
@@ -57,15 +59,19 @@ export class Lux_Q_Object extends SpellObject {
 
     // check collision with enemy
     else {
-      let enemy = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.size,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        excludePlayers: this.playersEffected,
-        getOnlyOne: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.excludeObjects(this.playersEffected),
+        ],
       });
-
+      let enemy = enemies?.[0];
       if (enemy) {
         let stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
         stunBuff.image = AssetManager.getAsset('spell_lux_q');
@@ -99,7 +105,7 @@ export class Lux_Q_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.size / 2,
       y: this.position.y - this.size / 2,

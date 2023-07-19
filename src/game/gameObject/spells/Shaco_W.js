@@ -1,8 +1,10 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Fear from '../buffs/Fear.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -76,10 +78,16 @@ export class Shaco_W_Object extends SpellObject {
     // invisible phase
     else if (this.phase === Shaco_W_Object.PHASES.INVISIBLE) {
       // query nearby enemies
-      let enemies = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.fearRange,
-        excludeTeamIds: [this.owner.teamId],
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.fearRange,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.teamId]),
+        ],
       });
 
       if (enemies.length > 0) {
@@ -104,10 +112,16 @@ export class Shaco_W_Object extends SpellObject {
       this.timeSinceLastAttack += deltaTime;
       if (this.timeSinceLastAttack >= this.attackCooldown) {
         // attack nearby enemies
-        let enemies = this.game.queryPlayersInRange({
-          position: this.position,
-          range: this.attackRange,
-          excludeTeamIds: [this.owner.teamId],
+        let enemies = this.game.objectManager.queryObjects({
+          area: new Circle({
+            x: this.position.x,
+            y: this.position.y,
+            r: this.attackRange,
+          }),
+          filters: [
+            PredefinedFilters.includeTypes([AttackableUnit]),
+            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          ],
         });
 
         if (enemies.length > 0) {
@@ -247,7 +261,7 @@ export class Shaco_W_Bullet_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.lazerLength,
       y: this.position.y - this.lazerLength,

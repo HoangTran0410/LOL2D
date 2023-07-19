@@ -1,10 +1,13 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { StatsModifier } from '../Stats.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Slow from '../buffs/Slow.js';
 
 export default class Lux_E extends Spell {
@@ -111,11 +114,7 @@ export class Lux_E_Object extends SpellObject {
       this.size = lerp(this.size, this.staticSize, 0.3);
 
       // apply slow buff
-      let enemies = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.staticSize / 2,
-        excludeTeamIds: [this.owner.teamId],
-      });
+      let enemies = this._getEnemisInRange();
       enemies.forEach(enemy => {
         let slowBuff = new Slow(200, this.owner, enemy);
         slowBuff.image = AssetManager.getAsset('spell_lux_e');
@@ -135,11 +134,7 @@ export class Lux_E_Object extends SpellObject {
         this.takedDamage = true;
 
         // apply damage to enemies in range
-        let enemies = this.game.queryPlayersInRange({
-          position: this.position,
-          range: this.staticSize / 2,
-          excludeTeamIds: [this.owner.teamId],
-        });
+        let enemies = this._getEnemisInRange();
         enemies.forEach(enemy => {
           enemy.takeDamage(20, this.owner);
         });
@@ -153,6 +148,20 @@ export class Lux_E_Object extends SpellObject {
         this.toRemove = true;
       }
     }
+  }
+
+  _getEnemisInRange() {
+    return this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.staticSize / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+      ],
+    });
   }
 
   draw() {

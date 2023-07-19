@@ -38,6 +38,7 @@ export default class FogOfWar {
     // get objects of player team
     let { x, y, w, h } = this.game.camera.getBoundingBox();
     let allyObjects = this.game.objectManager.queryObjects({
+      queryByDisplayBoundingBox: true,
       filters: [
         PredefinedFilters.teamId(this.game.player.teamId),
         o => {

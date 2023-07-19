@@ -1,7 +1,10 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import Stun from '../buffs/Stun.js';
@@ -23,11 +26,16 @@ export default class LeeSin_R extends Spell {
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
 
-    let enemies = this.game.queryPlayersInRange({
-      position: this.owner.position,
-      range: this.rangeToCheckEnemies,
-      excludeTeamIds: [this.owner.teamId],
-      includePlayerSize: true,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.rangeToCheckEnemies,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+      ],
     });
 
     // If no enemies in range, reset cooldown
@@ -142,12 +150,17 @@ export class LeeSin_R_Object extends SpellObject {
     if (this.targetEnemy.isDead) this.toRemove = true;
 
     // find enemies in collide with targetEnemy
-    let enemies = this.game.queryPlayersInRange({
-      position: this.targetEnemy.position,
-      range: this.targetEnemy.stats.size.value / 2,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: [this.targetEnemy, ...this.effectedEnemies],
-      includePlayerSize: true,
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.targetEnemy.position.x,
+        y: this.targetEnemy.position.y,
+        r: this.targetEnemy.stats.size.value / 2,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects([this.targetEnemy, ...this.effectedEnemies]),
+      ],
     });
 
     enemies.forEach(enemy => {

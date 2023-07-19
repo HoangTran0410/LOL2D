@@ -6,7 +6,9 @@ import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
@@ -86,14 +88,19 @@ export class Blitzcrank_Q_Object extends SpellObject {
 
     // check collision with enemy
     if (this.phase == Blitzcrank_Q_Object.PHASES.FORWARD) {
-      let enemy = this.game.queryPlayersInRange({
-        position: this.position,
-        range: this.handSize / 2,
-        includePlayerSize: true,
-        excludeTeamIds: [this.owner.teamId],
-        getOnlyOne: true,
+      let enemies = this.game.objectManager.queryObjects({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.handSize / 2,
+        }),
+        filters: [
+          PredefinedFilters.includeTypes([AttackableUnit]),
+          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        ],
       });
 
+      let enemy = enemies?.[0];
       if (enemy) {
         this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
         this.champToGrab = enemy;
@@ -155,7 +162,7 @@ export class Blitzcrank_Q_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     // get boundary including owner position
     return new Rectangle({
       x: Math.min(this.position.x, this.owner.position.x) - this.handSize / 2,

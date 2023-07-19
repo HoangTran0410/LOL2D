@@ -1,9 +1,11 @@
-import { Rectangle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Root from '../buffs/Root.js';
 import Stun from '../buffs/Stun.js';
 
@@ -56,24 +58,29 @@ export class ChoGath_W_Object extends SpellObject {
 
     this.currentRange = constrain(this.currentRange + this.speed, 0, this.range);
 
-    let enemies = this.game.queryPlayersInRange({
-      position: this.position,
-      range: this.currentRange,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      excludePlayers: this.playersEffected,
-      customFilter: e => {
-        return CollideUtils.circleArc(
-          e.position.x,
-          e.position.y,
-          e.stats.size.value / 2,
-          this.position.x,
-          this.position.y,
-          this.currentRange,
-          this.angleStart,
-          this.angleEnd
-        );
-      },
+    let enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.currentRange,
+      }),
+      filters: [
+        PredefinedFilters.includeTypes([AttackableUnit]),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.excludeObjects(this.playersEffected),
+        o => {
+          return CollideUtils.circleArc(
+            o.position.x,
+            o.position.y,
+            o.stats.size.value / 2,
+            this.position.x,
+            this.position.y,
+            this.currentRange,
+            this.angleStart,
+            this.angleEnd
+          );
+        },
+      ],
     });
 
     enemies.forEach(enemy => {
@@ -118,7 +125,7 @@ export class ChoGath_W_Object extends SpellObject {
     pop();
   }
 
-  getBoundingBox() {
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.currentRange,
       y: this.position.y - this.currentRange,

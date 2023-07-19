@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../libs/quadtree.js';
+import { Circle, Line, Rectangle } from '../../../libs/quadtree.js';
 import { uuidv4 } from '../../utils/index.js';
 
 export default class GameObject {
@@ -44,7 +44,17 @@ export default class GameObject {
     this.position.set(x, y);
   }
 
-  getBoundingBox() {
+  getCollideBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.collisionRadius,
+      y: this.position.y - this.collisionRadius,
+      w: this.collisionRadius * 2,
+      h: this.collisionRadius * 2,
+      data: this,
+    });
+  }
+
+  getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.visionRadius,
       y: this.position.y - this.visionRadius,
@@ -54,12 +64,22 @@ export default class GameObject {
     });
   }
 
-  drawBoundingBox() {
-    let bb = this.getBoundingBox();
+  drawBoundingBox(collide = false) {
+    let bb = collide ? this.getCollideBoundingBox() : this.getDisplayBoundingBox();
+    if (!bb) return;
     push();
-    stroke(255, 0, 0);
+    stroke(255, 255, 0, 200);
+    strokeWeight(2);
     noFill();
-    rect(bb.x, bb.y, bb.w, bb.h);
+    if (bb instanceof Rectangle) {
+      rect(bb.x, bb.y, bb.w, bb.h);
+    }
+    if (bb instanceof Circle) {
+      ellipse(bb.x, bb.y, bb.r * 2, bb.r * 2);
+    }
+    if (bb instanceof Line) {
+      line(bb.x1, bb.y1, bb.x2, bb.y2);
+    }
     pop();
   }
 
