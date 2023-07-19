@@ -80,10 +80,7 @@ export class Ahri_W_Object extends SpellObject {
           y: this.position.y,
           r: this.rangeToFindEnemy,
         }),
-        filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-        ],
+        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
       });
 
       // find the closest enemy

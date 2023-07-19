@@ -65,8 +65,7 @@ export class ChoGath_W_Object extends SpellObject {
         r: this.currentRange,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.excludeObjects(this.playersEffected),
         o => {
           return CollideUtils.circleArc(

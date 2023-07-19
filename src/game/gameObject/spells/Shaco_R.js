@@ -139,10 +139,7 @@ class Shaco_R_Clone extends Champion {
         y: clonePos.y,
         r: explodeRadius,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
     });
 
     enemies.forEach(e => {

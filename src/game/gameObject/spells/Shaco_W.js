@@ -84,10 +84,7 @@ export class Shaco_W_Object extends SpellObject {
           y: this.position.y,
           r: this.fearRange,
         }),
-        filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.teamId]),
-        ],
+        filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
       });
 
       if (enemies.length > 0) {
@@ -119,8 +116,10 @@ export class Shaco_W_Object extends SpellObject {
             r: this.attackRange,
           }),
           filters: [
-            PredefinedFilters.includeTypes([AttackableUnit]),
-            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+            PredefinedFilters.type(AttackableUnit),
+            PredefinedFilters.excludeUntargetable,
+            PredefinedFilters.excludeDead,
+            PredefinedFilters.excludeTeamId(this.owner.teamId),
           ],
         });
 

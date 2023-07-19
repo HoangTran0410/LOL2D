@@ -93,8 +93,7 @@ export class Lux_R_Object extends SpellObject {
           r: this.destination.dist(this.owner.position),
         }),
         filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
           PredefinedFilters.excludeObjects(this.playersEffected),
           o => {
             // get vertices

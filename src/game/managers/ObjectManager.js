@@ -129,7 +129,9 @@ export default class ObjectManager {
 export const PredefinedFilters = {
   id: id => o => o.id === id,
   type: type => o => o instanceof type,
+  excludeType: type => o => !(o instanceof type),
   teamId: teamId => o => o.teamId === teamId,
+  excludeTeamId: teamId => o => o.teamId !== teamId,
   includeTeamIds: teamIds => o => teamIds.some(t => o.teamId === t),
   excludeTeamIds: teamIds => o => !teamIds.some(t => o.teamId === t),
   includeTypes: types => o => types.some(t => o instanceof t),
@@ -148,4 +150,7 @@ export const PredefinedFilters = {
     if (typeof o.getCollideBoundingBox !== 'function') return false;
     return o.getCollideBoundingBox().intersect(area);
   },
+  canTakeDamage: o => o instanceof AttackableUnit && o.targetable && !o.isDead,
+  canTakeDamageFromTeam: teamId => o =>
+    o instanceof AttackableUnit && o.targetable && !o.isDead && o.teamId !== teamId,
 };

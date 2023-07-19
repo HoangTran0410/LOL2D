@@ -89,8 +89,7 @@ export class Veigar_E_Object extends SpellObject {
           r: this.size / 2,
         }),
         filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
           PredefinedFilters.excludeObjects(this.enemiesEffected),
           o => {
             let distance = o.position.dist(this.position);

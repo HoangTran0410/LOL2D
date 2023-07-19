@@ -66,8 +66,7 @@ export class Lux_Q_Object extends SpellObject {
           r: this.size / 2,
         }),
         filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
           PredefinedFilters.excludeObjects(this.playersEffected),
         ],
       });

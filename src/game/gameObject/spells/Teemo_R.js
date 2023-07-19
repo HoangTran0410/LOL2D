@@ -103,8 +103,10 @@ export class Teemo_R_Object extends SpellObject {
             r: this.size / 2,
           }),
           filters: [
-            PredefinedFilters.includeTypes([AttackableUnit]),
-            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+            PredefinedFilters.type(AttackableUnit),
+            PredefinedFilters.excludeUntargetable,
+            PredefinedFilters.excludeDead,
+            PredefinedFilters.excludeTeamId(this.owner.teamId),
           ],
         });
 
@@ -116,10 +118,7 @@ export class Teemo_R_Object extends SpellObject {
               y: this.position.y,
               r: this.explodeRange / 2,
             }),
-            filters: [
-              PredefinedFilters.includeTypes([AttackableUnit]),
-              PredefinedFilters.excludeTeamIds([this.teamId]),
-            ],
+            filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
           });
 
           enemiesInRange.forEach(enemy => {

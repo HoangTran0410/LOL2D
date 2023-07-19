@@ -142,8 +142,10 @@ export class Yasuo_Q_Object extends SpellObject {
         r: this.currentRayLength,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.type(AttackableUnit),
+        PredefinedFilters.excludeUntargetable,
+        PredefinedFilters.excludeDead,
+        PredefinedFilters.excludeTeamId(this.owner.teamId),
         PredefinedFilters.excludeObjects(this.playersEffected),
         o => {
           let vertices = rectToVertices(
@@ -240,8 +242,7 @@ export class Yasuo_Q3_Object extends SpellObject {
         r: this.size / 2,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.excludeObjects(this.playersEffected),
       ],
     });

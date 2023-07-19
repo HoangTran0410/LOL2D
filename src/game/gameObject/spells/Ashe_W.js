@@ -76,10 +76,7 @@ export class Ashe_W_Object extends SpellObject {
         y: this.position.y,
         r: this.size / 2,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
 
     let enemy = enemies?.[0];

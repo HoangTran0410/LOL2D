@@ -157,10 +157,7 @@ export class Lux_E_Object extends SpellObject {
         y: this.position.y,
         r: this.staticSize / 2,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
   }
 

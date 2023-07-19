@@ -23,10 +23,7 @@ export default class LeeSin_E extends Spell {
         y: this.owner.position.y,
         r: this.range,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
 
     enemies.forEach(enemy => {

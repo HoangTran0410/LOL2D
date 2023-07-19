@@ -108,18 +108,9 @@ export class Zed_W_Clone extends Champion {
     }
   };
 
-  onSomeOnePostCastSpell = sourceSpell => {
-    if (!this._reachedDestination) return;
-    if (sourceSpell.id in this._mapSpells) {
-      let { clone, source } = this._mapSpells[sourceSpell.id];
-      source.currentCooldown = clone.currentCooldown;
-    }
-  };
-
   onAdded() {
     // listen to spell cast event
     this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
-    this.game.eventManager.on(EventType.ON_POST_CAST_SPELL, this.onSomeOnePostCastSpell);
 
     // untargetable
     this.setStatus(StatusFlags.Targetable, false);
@@ -160,7 +151,6 @@ export class Zed_W_Clone extends Champion {
 
   onRemoved() {
     this.game.eventManager.unsub(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
-    this.game.eventManager.unsub(EventType.ON_POST_CAST_SPELL, this.onSomeOnePostCastSpell);
   }
 
   update() {

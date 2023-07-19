@@ -36,8 +36,10 @@ export default class Yasuo_R extends Spell {
         r: this.rangeToFindEnemies,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.type(AttackableUnit),
+        PredefinedFilters.excludeUntargetable,
+        PredefinedFilters.excludeDead,
+        PredefinedFilters.excludeTeamId(this.owner.teamId),
         p => p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length > 0,
       ],
     });
@@ -67,8 +69,7 @@ export default class Yasuo_R extends Spell {
         r: this.rangeToApplyAirborne,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         p => p.hasBuff(Airborne),
       ],
     });

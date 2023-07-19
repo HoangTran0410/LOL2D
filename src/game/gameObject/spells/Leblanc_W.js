@@ -73,10 +73,7 @@ export default class Leblanc_W extends Spell {
             y: destination.y,
             r: w2Obj.size / 2,
           }),
-          filters: [
-            PredefinedFilters.includeTypes([AttackableUnit]),
-            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-          ],
+          filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
         });
         enemies.forEach(enemy => {
           enemy.takeDamage(20, this.owner);

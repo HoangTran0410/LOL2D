@@ -32,10 +32,7 @@ export default class LeeSin_R extends Spell {
         y: this.owner.position.y,
         r: this.rangeToCheckEnemies,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
 
     // If no enemies in range, reset cooldown
@@ -157,8 +154,10 @@ export class LeeSin_R_Object extends SpellObject {
         r: this.targetEnemy.stats.size.value / 2,
       }),
       filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.type(AttackableUnit),
+        PredefinedFilters.excludeUntargetable,
+        PredefinedFilters.excludeDead,
+        PredefinedFilters.excludeTeamId(this.owner.teamId),
         PredefinedFilters.excludeObjects([this.targetEnemy, ...this.effectedEnemies]),
       ],
     });

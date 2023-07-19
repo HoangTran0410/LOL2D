@@ -68,8 +68,10 @@ export class Ashe_R_Object extends SpellObject {
           r: this.size / 4,
         }),
         filters: [
-          PredefinedFilters.includeTypes([AttackableUnit]),
-          PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+          PredefinedFilters.type(AttackableUnit),
+          PredefinedFilters.excludeUntargetable,
+          PredefinedFilters.excludeDead,
+          PredefinedFilters.excludeTeamId(this.owner.teamId),
         ],
       });
 
@@ -85,10 +87,7 @@ export class Ashe_R_Object extends SpellObject {
             y: this.position.y,
             r: this.explodeSize / 2,
           }),
-          filters: [
-            PredefinedFilters.includeTypes([AttackableUnit]),
-            PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-          ],
+          filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
         });
         enemiesInRange.forEach(p => {
           let stunBuff = new Stun(2500, this.owner, p);

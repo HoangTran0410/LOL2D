@@ -22,10 +22,7 @@ export default class Shaco_E extends Spell {
         y: this.owner.position.y,
         r: this.range,
       }),
-      filters: [
-        PredefinedFilters.includeTypes([AttackableUnit]),
-        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
-      ],
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
 
     if (!enemies.length) {
