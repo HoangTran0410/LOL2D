@@ -28,7 +28,7 @@ export default class ObjectManager {
       y: 0,
       w: mapSize,
       h: mapSize,
-      maxObjects: 5,
+      maxObjects: 2,
       maxLevels: 4,
     });
 
@@ -86,45 +86,48 @@ export default class ObjectManager {
     object.toRemove = true;
   }
 
-  getObjectsByType(type) {
-    return this.objects.filter(o => o instanceof type);
-  }
-
-  getObjectById(id) {
-    return this.objects.find(o => o.id === id);
-  }
-
-  getObjectsInRange({
-    position,
-    radius,
-    teamIds,
-    excludeTeamIds,
-    types,
-    excludeTypes,
-    excludeObjects,
-    customFilter,
-    maxResults = 0,
-  }) {
-    const results = [];
-    let count = 0;
-    for (let i = 0; i < this.objects.length && (maxResults === 0 || count < maxResults); i++) {
-      const o = this.objects[i];
-      if (o.toRemove) continue;
-      if (radius > 0 && position instanceof p5.Vector && o.position.dist(position) > radius)
-        continue;
-      if (excludeTeamIds?.length > 0 && excludeTeamIds.some(t => o.teamId === t)) continue;
-      if (teamIds?.length > 0 && !teamIds.some(t => o.teamId === t)) continue;
-      if (excludeTypes?.length > 0 && excludeTypes.some(t => o instanceof t)) continue;
-      if (types?.length > 0 && !types.some(t => o instanceof t)) continue;
-      if (excludeObjects?.length > 0 && excludeObjects.some(e => e === o)) continue;
-      if (typeof customFilter === 'function' && !customFilter(o)) continue;
-      results.push(o);
-      count++;
+  queryObjects({ area, filters, debug }) {
+    if (this._quadtreeInUpdating) {
+      console.warn('Quadtree is updating, this may cause unexpected result.');
     }
-    return results;
+
+    let objects;
+    if (area) {
+      objects = this._objectQuadtree.retrieve(area).map(r => r.data);
+    } else {
+      objects = this.objects;
+    }
+
+    if (debug) console.log('queryObjects', objects);
+
+    if (!filters || filters.length === 0) {
+      return objects;
+    }
+
+    return objects.filter(o => filters.every(filter => filter(o)));
   }
 
   getAllChampions() {
     return this.objects.filter(o => o instanceof AttackableUnit);
   }
 }
+
+export const PredefinedFilters = {
+  id: id => o => o.id === id,
+  type: type => o => o instanceof type,
+  teamId: teamId => o => o.teamId === teamId,
+  includeTeamIds: teamIds => o => teamIds.some(t => o.teamId === t),
+  excludeTeamIds: teamIds => o => !teamIds.some(t => o.teamId === t),
+  includeTypes: types => o => types.some(t => o instanceof t),
+  excludeTypes: types => o => !types.some(t => o instanceof t),
+  excludeObjects: objects => o => !objects.some(e => e === o),
+  includeDead: o => o instanceof AttackableUnit && o.isDead,
+  excludeDead: o => !(o instanceof AttackableUnit && o.isDead),
+  includeUntargetable: o => !o.targetable,
+  excludeUntargetable: o => o.targetable,
+  attackableUnitInRange:
+    (pos, radius, includeSize = false) =>
+    o =>
+      o instanceof AttackableUnit &&
+      p5.Vector.dist(o.position, pos) <= radius + (includeSize ? o.animatedValues.size / 2 : 0),
+};

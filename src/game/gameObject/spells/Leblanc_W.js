@@ -61,7 +61,7 @@ export default class Leblanc_W extends Spell {
         w2Obj.position = destination.copy();
         w2Obj.lifeTime = 700;
         w2Obj.size = 200;
-        this.game.addObject(w2Obj);
+        this.game.objectManager.addObject(w2Obj);
 
         // enemy take damage
         let enemies = this.game.queryPlayersInRange({
@@ -81,7 +81,7 @@ export default class Leblanc_W extends Spell {
       this.w1Object = new Leblanc_W_Object(this.owner);
       this.w1Object.position = this.owner.position.copy();
       this.w1Object.lifeTime = this.w1LifeTime;
-      this.game.addObject(this.w1Object);
+      this.game.objectManager.addObject(this.w1Object);
 
       // switch to phase 2
       this.swtichPhase(this.PHASES.W2, this.waitTimeBeforeRecast);

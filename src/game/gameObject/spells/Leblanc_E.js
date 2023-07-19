@@ -43,7 +43,7 @@ export default class Leblanc_E extends Spell {
     obj.size = size;
     this.spellObject = obj;
 
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 
   onUpdate() {

@@ -34,7 +34,7 @@ export default class Zed_W extends Spell {
       this.zedWClone.owner = this.owner;
       this.zedWClone.spellSource = this;
       this.zedWClone.destination = to;
-      this.game.addPlayer(this.zedWClone);
+      this.game.objectManager.addObject(this.zedWClone);
 
       this.currentCooldown = 500;
       this.image = AssetManager.getAsset('spell_zed_w2');
@@ -77,7 +77,7 @@ export class Zed_W_Clone extends Champion {
 
   smokeEffect = PredefinedParticleSystems.smoke([150], 2, 10);
 
-  onSomeOneCastSpell = sourceSpell => {
+  onSomeOnePreCastSpell = sourceSpell => {
     // check if spell is casted by owner
     if (sourceSpell.owner.id !== this.owner.id) return;
     // check if spell is source spell (spell that created this clone)
@@ -108,9 +108,18 @@ export class Zed_W_Clone extends Champion {
     }
   };
 
+  onSomeOnePostCastSpell = sourceSpell => {
+    if (!this._reachedDestination) return;
+    if (sourceSpell.id in this._mapSpells) {
+      let { clone, source } = this._mapSpells[sourceSpell.id];
+      source.currentCooldown = clone.currentCooldown;
+    }
+  };
+
   onAdded() {
     // listen to spell cast event
-    this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOneCastSpell);
+    this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
+    this.game.eventManager.on(EventType.ON_POST_CAST_SPELL, this.onSomeOnePostCastSpell);
 
     // untargetable
     this.setStatus(StatusFlags.Targetable, false);
@@ -150,7 +159,8 @@ export class Zed_W_Clone extends Champion {
   }
 
   onRemoved() {
-    this.game.eventManager.unsub(EventType.ON_PRE_CAST_SPELL, this.onSomeOneCastSpell);
+    this.game.eventManager.unsub(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
+    this.game.eventManager.unsub(EventType.ON_POST_CAST_SPELL, this.onSomeOnePostCastSpell);
   }
 
   update() {
@@ -169,13 +179,13 @@ export class Zed_W_Clone extends Champion {
       // case 1: clone is on cooldown, source is not => set source cooldown to clone cooldown
       // usually occurs on spells that have custom castCancelCheck (e.g. lee sin R, yasuo E, etc.)
       // in that case, clone casted but source not casted => need to sync cooldown
-      if (clone.currentCooldown > 0 && source.currentCooldown === 0)
-        source.currentCooldown = clone.currentCooldown;
+      // if (clone.currentCooldown > 0 && source.currentCooldown === 0)
+      //   source.currentCooldown = clone.currentCooldown;
 
       // case 2: source is on cooldown, clone is not => set clone cooldown to source cooldown
       // to immediately enable clone spell when source spell is ready to cast
       // usually occurs on spells that have multiple phases (e.g. lee sin R, ahri R, etc.)
-      if (source.currentCooldown === 0) clone.currentCooldown = 0;
+      // if (source.currentCooldown === 0) clone.currentCooldown = 0;
     }
   }
 

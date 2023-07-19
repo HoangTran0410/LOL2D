@@ -1,6 +1,7 @@
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import { rectToVertices } from '../../../utils/index.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 
@@ -27,7 +28,7 @@ export default class Yasuo_W extends Spell {
     obj.size = size;
     obj.duration = duration;
 
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 }
 
@@ -64,14 +65,15 @@ export class Yasuo_W_Object extends SpellObject {
       y: this.animatedPosition.y,
     });
 
-    let objs = this.game.queryObjects({
-      type: SpellObject,
-      customFilter: o =>
-        o.isMissile &&
-        o.position &&
-        o.owner !== this.owner &&
-        o !== this &&
-        CollideUtils.pointPolygon(o.position.x, o.position.y, vertices),
+    let objs = this.game.objectManager.queryObjects({
+      filters: [
+        PredefinedFilters.type(SpellObject),
+        PredefinedFilters.excludeObjects([this]),
+        o =>
+          o.isMissile &&
+          o.owner !== this.owner &&
+          CollideUtils.pointPolygon(o.position.x, o.position.y, vertices),
+      ],
     });
 
     objs.forEach(o => {

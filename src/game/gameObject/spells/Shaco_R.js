@@ -44,7 +44,7 @@ export default class Shaco_R extends Spell {
     //   this.clonePlayer = null;
     // };
     clone.moveTo(this.game.worldMouse.x, this.game.worldMouse.y);
-    this.game.addPlayer(clone);
+    this.game.objectManager.addObject(clone);
 
     this.clonePlayer = clone;
     this.image = AssetManager.getAsset('spell_shaco_r2');
@@ -128,7 +128,7 @@ class Shaco_R_Clone extends Champion {
         vel: v,
       });
     }
-    this.game.addObject(explodeEffect);
+    this.game.objectManager.addObject(explodeEffect);
 
     // take damage + fear nearby enemies
     let enemies = this.game.queryPlayersInRange({
@@ -154,7 +154,7 @@ class Shaco_R_Clone extends Champion {
         Math.cos((i * 2 * Math.PI) / 3) * 100, // 100 is the radius
         Math.sin((i * 2 * Math.PI) / 3) * 100
       );
-      this.game.addObject(obj);
+      this.game.objectManager.addObject(obj);
     }
   }
 }

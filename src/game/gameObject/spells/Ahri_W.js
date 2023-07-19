@@ -16,7 +16,7 @@ export default class Ahri_W extends Spell {
     for (let i = 0; i < 3; i++) {
       let obj = new Ahri_W_Object(this.owner);
       obj.angle = (i * 2 * PI) / 3;
-      this.game.addObject(obj);
+      this.game.objectManager.addObject(obj);
     }
   }
 }

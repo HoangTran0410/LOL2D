@@ -6,6 +6,8 @@ import { hasFlag } from '../../../utils/index.js';
 import ActionState from '../../enums/ActionState.js';
 import StatusFlags from '../../enums/StatusFlags.js';
 import TerrainType from '../../enums/TerrainType.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import Champion from '../attackableUnits/Champion.js';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import Obstacle from './Obstacle.js';
 
@@ -64,7 +66,10 @@ export default class TerrainMap {
     this.rippleEffect.update();
 
     // players collision with obstacles
-    for (let p of this.game.players) {
+    let players = this.game.objectManager.queryObjects({
+      filters: [PredefinedFilters.type(Champion)],
+    });
+    for (let p of players) {
       let obstacles = this.getObstaclesCollideChampion(p, [
         TerrainType.WALL,
         TerrainType.BUSH,

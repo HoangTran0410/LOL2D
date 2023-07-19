@@ -56,7 +56,7 @@ export default class Ahri_R extends Spell {
         let obj = new Ahri_R_Object(this.owner);
         obj.targetEnemy = enemy;
         obj.damage = this.damage;
-        this.game.addObject(obj);
+        this.game.objectManager.addObject(obj);
       }
     };
     this.owner.addBuff(dashBuff);

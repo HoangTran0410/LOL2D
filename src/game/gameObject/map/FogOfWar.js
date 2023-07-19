@@ -3,7 +3,8 @@ import ColorUtils from '../../../utils/color.utils.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import PolyVisibility from '../../../../libs/poly-visibility.js';
 import AttackableUnit from '../attackableUnits/AttackableUnit.js';
-import Champion from '../attackableUnits/Champion.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
+import { Circle } from '../../../../libs/quadtree.js';
 
 export default class FogOfWar {
   constructor(game) {
@@ -35,28 +36,27 @@ export default class FogOfWar {
 
   calculateSight() {
     // get objects of player team
-    let allyObjects = this.game
-      .queryObjects({
-        teamId: this.game.player.teamId,
-      })
-      .filter(o => {
-        if (o === this.game.player) return true;
-        if (o instanceof AttackableUnit) return !o.isDead;
-        if (o.visionRadius > 0) {
-          // check in camera view
-          let { x, y, w, h } = this.game.camera.getViewBounds();
-          let { x: ox, y: oy } = o.position;
-          return CollideUtils.circleRect(ox, oy, o.visionRadius, x, y, w, h);
-        }
-        return false;
-      });
+    let { x, y, w, h } = this.game.camera.getViewBounds();
+    let allyObjects = this.game.objectManager.queryObjects({
+      filters: [
+        PredefinedFilters.teamId(this.game.player.teamId),
+        o => {
+          if (o === this.game.player) return true;
+          if (PredefinedFilters.includeDead(o)) return false;
+          if (o.visionRadius > 0) {
+            let { x: ox, y: oy } = o.position;
+            return CollideUtils.circleRect(ox, oy, o.visionRadius, x, y, w, h);
+          }
+          return false;
+        },
+      ],
+    });
 
     let allSightPoly = [],
       visiblePlayers = [];
 
     allyObjects.forEach(obj => {
       let { sightPoly, playersInSight } = this.calculateSightForObject(obj);
-      visiblePlayers.push(obj);
       visiblePlayers.push(...playersInSight);
       allSightPoly.push({
         object: obj,
@@ -103,16 +103,19 @@ export default class FogOfWar {
     });
 
     // calculate visible players
-    let playersInSight = this.game.queryPlayersInRange({
-      position: obj.position,
-      range: obj.visionRadius,
-      includePlayerSize: true,
-      includeDead: true,
-      includeUntargetable: true,
-      customFilter: p => {
-        return CollideUtils.pointPolygonConcave(p.position.x, p.position.y, sightPoly);
-      },
+    let playersInSight = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: obj.position.x,
+        y: obj.position.y,
+        r: obj.visionRadius,
+      }),
+      filters: [
+        PredefinedFilters.type(AttackableUnit),
+        o => CollideUtils.pointPolygonConcave(o.position.x, o.position.y, sightPoly),
+      ],
     });
+
+    if (keyIsDown(13)) console.log(playersInSight);
 
     return {
       sightPoly,

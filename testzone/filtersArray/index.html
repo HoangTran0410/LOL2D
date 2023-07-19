@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let objects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+        function queryObjectsWithFilters(filters) {
+            return objects.filter(o => {
+                for (let filter of filters) {
+                    if (!filter(o)) return false;
+                }
+                return true;
+            });
+        }
+
+        const PredefinedFilters = {
+            isEven: (o) => o % 2 === 0,
+            isOdd: (o) => o % 2 !== 0,
+            isGreaterThan: (n) => (o) => o > n,
+            isLessThan: (n) => (o) => o < n,
+            isBetween: (n1, n2) => (o) => o > n1 && o < n2,
+            isPrime: (o) => {
+                if (o === 1) return false;
+                if (o === 2) return true;
+                for (let i = 2; i < o; i++) {
+                    if (o % i === 0) return false;
+                }
+                return true;
+            },
+        }
+    </script>
+</body>
+
+</html>

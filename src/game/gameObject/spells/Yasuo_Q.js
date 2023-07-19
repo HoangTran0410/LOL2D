@@ -59,7 +59,7 @@ export default class Yasuo_Q extends Spell {
         this.currentCooldown = this.coolDownIfHit;
       };
 
-      this.game.addObject(obj);
+      this.game.objectManager.addObject(obj);
 
       // stay while casting
       this.owner.addBuff(new RootBuff(stunTime, this.owner, this.owner));
@@ -81,7 +81,7 @@ export default class Yasuo_Q extends Spell {
       tornado.destination = destination;
       tornado.airBorneTime = airBorneTime;
       tornado.speed = speed;
-      this.game.addObject(tornado);
+      this.game.objectManager.addObject(tornado);
     }
   }
 

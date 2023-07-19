@@ -20,7 +20,7 @@ export default class StealthWard extends Spell {
 
     let obj = new StealthWard_Object(this.owner);
     obj.position = to;
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 
   drawPreview() {

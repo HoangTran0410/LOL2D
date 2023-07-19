@@ -23,7 +23,7 @@ export default class Ahri_Q extends Spell {
     let obj = new Ahri_Q_Object(this.owner);
     obj.position = from;
     obj.destination = to;
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 
   onUpdate() {}

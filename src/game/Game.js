@@ -30,7 +30,7 @@ export default class Game {
 
     for (let i = 0; i < 4; i++) {
       this.objectManager.addObject(
-        new AIChampion({
+        new Champion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getChampionPresetRandom(),
@@ -103,7 +103,8 @@ export default class Game {
 
     this.camera.makeDraw(() => {
       this.terrainMap.draw();
-      this.terrainMap.drawEdges();
+      // this.terrainMap.drawEdges();
+      // this.camera.drawGrid();
 
       if (this.clickedPoint.size > 0) {
         push();
@@ -128,27 +129,6 @@ export default class Game {
     this.inGameHUD.destroy();
   }
 
-  addObject(object) {
-    this.objectManager.addObject(object);
-  }
-
-  addPlayer(player) {
-    this.objectManager.addObject(player);
-  }
-
-  queryObjects({ type, teamId, getOnlyOne = false, customFilter = null }) {
-    let result = [];
-    // TODO: optimize + use exported method from ObjectManager
-    for (let o of this.objectManager.objects) {
-      if (teamId && o.teamId !== teamId) continue;
-      if (type && !(o instanceof type)) continue;
-      if (typeof customFilter === 'function' && !customFilter(o)) continue;
-      if (getOnlyOne) return o;
-      result.push(o);
-    }
-    return getOnlyOne ? null : result;
-  }
-
   queryPlayersInRange({
     position,
     range, // radius
@@ -161,7 +141,9 @@ export default class Game {
     getOnlyOne = false,
     customFilter = null,
   }) {
-    let champions = this.objectManager.getAllChampions();
+    let champions = this.objectManager.queryObjects({
+      filters: [o => o instanceof Champion],
+    });
 
     let result = [];
     for (let p of champions) {
@@ -179,16 +161,12 @@ export default class Game {
     return getOnlyOne ? null : result;
   }
 
-  get players() {
-    return this.objectManager.getAllChampions();
-  }
-
   get mapSize() {
     return this.terrainMap.size;
   }
 
   randomSpawnPoint() {
-    let range = 2000;
+    let range = 500;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)

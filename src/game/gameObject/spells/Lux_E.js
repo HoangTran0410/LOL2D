@@ -27,7 +27,7 @@ export default class Lux_E extends Spell {
       );
 
       this.luxEObject = new Lux_E_Object(this.owner, destination, size);
-      this.game.addObject(this.luxEObject);
+      this.game.objectManager.addObject(this.luxEObject);
     }
 
     // second cast

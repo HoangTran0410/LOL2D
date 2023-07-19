@@ -1,7 +1,10 @@
+import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
+import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Charm from '../buffs/Charm.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -27,7 +30,7 @@ export default class Ahri_E extends Spell {
     obj.destination = to;
     obj.range = range;
     obj.charmTime = charmTime;
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 }
 
@@ -53,15 +56,27 @@ export class Ahri_E_Object extends SpellObject {
       this.toRemove = true;
     }
 
-    let enemy = this.game.queryPlayersInRange({
-      position: this.position,
-      range: 0,
-      includePlayerSize: true,
-      excludeTeamIds: [this.owner.teamId],
-      getOnlyOne: true,
+    let enemies = this.game.objectManager.queryObjects({
+      debug: true,
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: 100,
+      }),
+      filters: [
+        o => {
+          console.log(o);
+          return true;
+        },
+        PredefinedFilters.type(AttackableUnit),
+        PredefinedFilters.excludeTeamIds([this.owner.teamId]),
+        PredefinedFilters.attackableUnitInRange(this.position, 0, true),
+      ],
     });
+    let enemy = enemies?.[0];
 
     if (enemy) {
+      console.log(enemies);
       let charmBuff = new Charm(this.charmTime, this.owner, enemy);
       charmBuff.image = AssetManager.getAsset('spell_ahri_e');
       charmBuff.speed = 1;

@@ -23,7 +23,7 @@ export default class TrueSight extends Buff {
   }
 
   onActivate() {
-    this.game.addObject(this.sightObj);
+    this.game.objectManager.addObject(this.sightObj);
   }
 
   onDeactivate() {

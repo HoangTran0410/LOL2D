@@ -60,7 +60,7 @@ export default class LeeSin_R extends Spell {
     obj.targetEnemy = closestEnemyToMouse;
     obj.collideDamage = this.collideDamage;
     obj.destination = destination;
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
 
     // target enemy dash to destination
     let airborneBuff = new Airborne(3000, this.owner, closestEnemyToMouse);
@@ -123,7 +123,7 @@ export default class LeeSin_R extends Spell {
         lifeTime,
       });
     }
-    this.game.addObject(particleSystem);
+    this.game.objectManager.addObject(particleSystem);
   }
 
   drawPreview() {

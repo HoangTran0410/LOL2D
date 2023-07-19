@@ -23,7 +23,7 @@ export default class GameScene extends Scene {
     this.statsContainer.appendChild(realUpdateAnalys.dom);
 
     updateAnalys = new Stats();
-    updateAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    updateAnalys.showPanel(0);
     updateAnalys.dom.style.cssText = '';
     updateAnalys.dom.title = 'Update time';
     this.statsContainer.appendChild(updateAnalys.dom);
@@ -84,7 +84,7 @@ export default class GameScene extends Scene {
     if (keyCode === 27) {
       this.sceneManager.showScene(MenuScene);
     }
-    this.game.keyPressed?.();
+    this.game?.keyPressed?.();
   }
 
   exit() {

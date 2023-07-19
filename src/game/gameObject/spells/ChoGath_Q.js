@@ -23,7 +23,7 @@ export default class ChoGath_Q extends Spell {
 
     let obj = new ChoGath_Q_Object(this.owner);
     obj.position = position;
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 
   drawPreview() {

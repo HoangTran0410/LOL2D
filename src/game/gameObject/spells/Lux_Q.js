@@ -27,7 +27,7 @@ export default class Lux_Q extends Spell {
     obj.stunTime = stunTime;
     obj.maxPlayersEffected = 2;
 
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 }
 

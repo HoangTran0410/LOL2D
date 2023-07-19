@@ -20,7 +20,7 @@ export default class Ashe_R extends Spell {
     obj.direction = direction;
     obj.speed = 10;
 
-    this.game.addObject(obj);
+    this.game.objectManager.addObject(obj);
   }
 }
 

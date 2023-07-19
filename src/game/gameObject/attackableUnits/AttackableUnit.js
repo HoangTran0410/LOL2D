@@ -242,7 +242,7 @@ export default class AttackableUnit extends GameObject {
     let combatText = new CombatText(this);
     combatText.text = '+' + damage;
     combatText.textColor = [0, 255, 0];
-    this.game.addObject(combatText);
+    this.game.objectManager.addObject(combatText);
 
     this.stats.health.baseValue = constrain(
       this.stats.health.baseValue + heal,
@@ -257,7 +257,7 @@ export default class AttackableUnit extends GameObject {
     let combatText = new CombatText(this);
     combatText.text = '-' + damage;
     combatText.textColor = [255, 0, 0];
-    this.game.addObject(combatText);
+    this.game.objectManager.addObject(combatText);
 
     this.stats.health.baseValue -= damage;
     if (this.stats.health.baseValue <= 0) {

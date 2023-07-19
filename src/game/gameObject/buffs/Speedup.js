@@ -34,7 +34,7 @@ export default class Speedup extends Buff {
     this.statsModifier = new StatsModifier();
     this.statsModifier.speed.percentBaseBonus = this.percent;
 
-    this.game.addObject(this.particleSystem);
+    this.game.objectManager.addObject(this.particleSystem);
   }
 
   onActivate() {
