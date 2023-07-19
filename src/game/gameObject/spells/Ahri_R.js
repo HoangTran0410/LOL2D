@@ -9,7 +9,7 @@ export default class Ahri_R extends Spell {
   image = AssetManager.getAsset('spell_ahri_r');
   name = 'Phi Hồ (Ahri_R)';
   description =
-    'Lướt tới trước theo hướng chỉ định, bắn ba luồng sét vào ba kẻ địch gần nhất trong phạm vi, gây 20 sát thương mỗi luồng sét. Có thể sử dụng 3 lần trong vòng 10s.';
+    '<span class="buff">Lướt</span> tới trước theo hướng chỉ định, bắn tối đa 3 quả cầu vào 3 kẻ địch gần nhất trong phạm vi, gây <span class="damage">20 sát thương</span> mỗi quả cầu. Có thể sử dụng tối đa <span>3 lần</span> lướt trong vòng <span class="time">10 giây</span>';
   coolDown = 10000;
 
   maxDashCount = 3;

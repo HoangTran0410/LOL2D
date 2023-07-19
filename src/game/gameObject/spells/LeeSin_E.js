@@ -8,7 +8,7 @@ export default class LeeSin_E extends Spell {
   image = AssetManager.getAsset('spell_leesin_e');
   name = 'Địa Chấn / Dư Chấn (LeeSin_E)';
   description =
-    'Dẫm xuống đất, gây 20 sát thương lên kẻ địch xung quanh. Làm chậm chúng đi 50% trong 2s';
+    'Dẫm mạnh xuống đất, gây <span class="damage">20 sát thương</span> lên kẻ địch xung quanh. <span class="buff">Làm Chậm 50%</span> các kẻ địch trong <span class="time">2 giây</span>';
   coolDown = 5000;
 
   range = 150;

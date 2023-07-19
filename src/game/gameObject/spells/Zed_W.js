@@ -11,7 +11,7 @@ export default class Zed_W extends Spell {
   image = AssetManager.getAsset('spell_zed_w');
   name = 'Phân Thân Bóng Tối (Zed_W)';
   description =
-    'Tạo 1 phân thân lướt tới trước. Đứng im và sẽ bắt chước các kỹ năng bạn tung ra trong 3s. Có thể tái kích hoạt kỹ năng để đổi chỗ với phân thân (Phân thân không thể bị chọn làm mục tiêu)';
+    'Tạo 1 phân thân <span class="buff">Lướt</span> tới trước, sau đó đứng im và sẽ <span>bắt chước</span> các kỹ năng bạn tung ra trong <span class="time">3 giây</span>. Có thể tái kích hoạt kỹ năng để <span class="buff">Đổi chỗ</span> với phân thân <i>(Phân thân không thể bị chọn làm mục tiêu)</i>';
   coolDown = 7500;
 
   zedWClone = null;

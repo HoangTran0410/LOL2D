@@ -10,7 +10,7 @@ export default class Yasuo_R extends Spell {
   image = AssetManager.getAsset('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =
-    'Lập tức dịch chuyển đến các mục tiêu gần nhất bị Hất tung. Giữ chúng trên không trong 1 giây và gây 30 sát thương. Tăng 40% tốc chạy trong 2s sau đó.';
+    'Lập tức <span class="buff">Dịch chuyển</span> đến các mục tiêu gần nhất bị <span>Hất tung</span>. <span class="buff">Giữ chúng trên không</span> trong <span class="time">1 giây</span> và gây <span class="damage">30 sát thương</span>. Bạn được <span class="buff">Tăng tốc 40%</span> trong <span class="time">2 giây</span> sau đó.';
   coolDown = 10000;
   manaCost = 50;
 

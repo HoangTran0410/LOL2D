@@ -7,7 +7,8 @@ import Speedup from '../buffs/Speedup.js';
 export default class Blitzcrank_W extends Spell {
   name = 'Tăng Tốc (Blitzcrank_W)';
   image = AssetManager.getAsset('spell_blitzcrank_w');
-  description = 'Tăng tốc 50% trong 4s, sau đó bị giảm tốc 75% trong 1s';
+  description =
+    '<span class="buff">Tăng Tốc 50%</span> trong <span class="time">4 giây</span>, sau đó bị <span class="buff">Làm Chậm 75%</span> trong <span class="time">1 giây</span>';
   coolDown = 7500;
   manaCost = 20;
 

@@ -9,7 +9,7 @@ export default class Yasuo_W extends Spell {
   image = AssetManager.getAsset('spell_yasuo_w');
   name = 'Tường Gió (Yasuo_W)';
   description =
-    'Tạo ra một bức tường gió theo hướng chỉ định. Bức tường sẽ trôi nhẹ về trước trong 3.75 giây, chặn toàn bộ đạn đạo từ kẻ địch';
+    'Tạo ra một bức tường gió theo hướng chỉ định, <span class="buff">Chặn</span> toàn bộ đạn đạo từ kẻ địch trong <span class="time">3.75 giây</span>';
   coolDown = 6000;
   manaCost = 20;
 

@@ -9,7 +9,7 @@ export default class Teemo_R extends Spell {
   image = AssetManager.getAsset('spell_teemo_r');
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
-    'Đặt 1 bẫy độc tàng hình sau 1s, tồn tại trong 20 giây, phát nổ khi kẻ địch dẫm phải, làm chậm 70% các kẻ địch trong 2s và gây 30 sát thương';
+    'Đặt 1 bẫy độc tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>, phát nổ khi kẻ địch dẫm phải, <span class="buff">Làm Chậm 70%</span> các kẻ địch trong <span class="time">2 giây</span> và gây <span class="damage">30 sát thương</span>';
 
   coolDown = 3000;
 

@@ -9,7 +9,8 @@ import ParticleSystem from '../helpers/ParticleSystem.js';
 export default class Heal extends Spell {
   name = 'Hồi Máu (Heal)';
   image = AssetManager.getAsset('spell_heal');
-  description = 'Hồi phục 30% máu tối đa và tăng 50% tốc độ di chuyển trong 1s';
+  description =
+    '<span class="buff">Hồi Máu</span> một lượng bằng <span>30% máu tối đa</span> và <span class="buff">Tăng Tốc 50%</span> trong <span class="time">1 giây</span>';
   coolDown = 10000;
   manaCost = 100;
 
@@ -57,8 +58,8 @@ export class Heal_Object extends SpellObject {
       p.life--;
     },
     drawFn: p => {
-      let alpha = map(p.life, 0, 60, 0, 255);
-      stroke(0, 255, 0, alpha + 50);
+      let alpha = map(p.life, 0, 60, 0, 200);
+      stroke(0, 255, 0, alpha);
       strokeWeight(3);
 
       // chữ thập

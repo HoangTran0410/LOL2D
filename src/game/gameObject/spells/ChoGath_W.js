@@ -10,7 +10,7 @@ export default class ChoGath_W extends Spell {
   image = AssetManager.getAsset('spell_chogath_w');
   name = "Tiếng Gầm Hoang Dã (Cho'Gath_W)";
   description =
-    'Gầm vào hướng đã chọn theo hình nón, Làm choáng 1s và gây 15 sát thương cho các kẻ địch trong tầm.';
+    'Gầm vào hướng đã chọn theo <span>hình nón</span>, <span class="buff">Làm Choáng</span> <span class="time">1 giây</span> và gây <span class="damage">15 sát thương</span> cho các kẻ địch trong tầm.';
   coolDown = 5000;
 
   onSpellCast() {

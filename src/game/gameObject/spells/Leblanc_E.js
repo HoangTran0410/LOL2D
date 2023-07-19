@@ -8,7 +8,7 @@ export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');
   name = 'Sợi Xích Siêu Phàm (Leblanc_E)';
   description =
-    'Phóng 1 sợi xích theo hướng chỉ định, gây 15 sát thương khi trúng địch. Nếu giữ được trong tầm sau 1.5s, trói chân địch trong 1.5s và gây thêm 15 sát thương';
+    'Phóng 1 sợi xích theo hướng chỉ định, gây <span class="damage">15 sát thương</span> khi trúng địch. Nếu giữ được trong tầm sau <span class="time">1.5 giây</span>, <span class="buff">Trói Chân</span> địch trong <span class="time">1.5 giây</span> và gây thêm <span class="damage">15 sát thương</span>';
   coolDown = 5000;
 
   spellObject = null;

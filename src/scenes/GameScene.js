@@ -58,25 +58,24 @@ export default class GameScene extends Scene {
   }
 
   updateLoop() {
+    if (!this.game) return;
+
     let currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
-    // updateAnalys.begin();
+    updateAnalys.begin();
     if (elapsedTime > interval) {
       realUpdateAnalys.begin();
       previousTime = currentTime - (elapsedTime % interval);
       this.game.update();
       realUpdateAnalys.end();
     }
-    // updateAnalys.end();
+    updateAnalys.end();
 
-    // if (this.game) {
-    //   setTimeout(() => {
-    //     this.updateLoop();
-    //   }, 1);
-    // }
-
-    this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
+    setTimeout(() => {
+      this.updateLoop();
+    }, 1);
+    // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 
   draw() {

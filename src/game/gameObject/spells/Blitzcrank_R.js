@@ -7,7 +7,7 @@ export default class Blitzcrank_R extends Spell {
   name = 'Trường Điện Từ (Blitzcrank_R)';
   image = AssetManager.getAsset('spell_blitzcrank_r');
   description =
-    'Kích hoạt trường điện từ, gây sát thương lên các kẻ địch trong tầm, gây 30 sát thương và làm Câm lặng chúng trong 3 giây';
+    'Kích hoạt trường điện từ, gây <span class="damage">30 sát thương</span> lên các kẻ địch xung quanh và làm <span class="buff">Câm Lặng</span> chúng trong <span class="time">3 giây</span>';
   coolDown = 10000;
   manaCost = 50;
 

@@ -11,7 +11,7 @@ export default class LeeSin_R extends Spell {
   image = AssetManager.getAsset('spell_leesin_r');
   name = 'Nộ Long Cước (LeeSin_R)';
   description =
-    'Tung cước đá mục tiêu văng ra xa, Làm Choáng và gây 30 sát thương. Những kẻ địch bị mục tiêu va trúng sẽ bị Hất Tung (1s) và nhận 30 sát thương.';
+    'Tung cước đá mục tiêu <span class="buff">Văng ra xa</span>, gây <span class="damage">30 sát thương</span> và <span class="buff">Làm Choáng</span> mục tiêu trong <span class="time">0.5 giây</span>. Những kẻ địch khác bị mục tiêu va trúng sẽ bị <span class="buff">Hất Tung</span> trong <span class="time">1 giây</span> và nhận <span class="damage">30 sát thương</span>';
   coolDown = 10000;
 
   rangeToCheckEnemies = 80;

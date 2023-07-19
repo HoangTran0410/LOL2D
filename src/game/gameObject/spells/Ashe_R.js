@@ -9,7 +9,7 @@ export default class Ashe_R extends Spell {
   image = AssetManager.getAsset('spell_ashe_r');
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
-    'Bắn mũi tên băng bay xuyên bản đồ, làm choáng diện rộng những kẻ địch trúng chiêu trong 2.5s và gây 30 sát thương.';
+    'Bắn mũi tên băng bay xuyên bản đồ, <span class="buff">Làm Choáng</span> diện rộng những kẻ địch trúng chiêu trong <span class="time">2.5 giây</span> và gây <span class="damage">30 sát thương</span>';
   coolDown = 10000;
 
   onSpellCast() {

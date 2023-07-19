@@ -9,7 +9,7 @@ export default class Shaco_W extends Spell {
   image = AssetManager.getAsset('spell_shaco_w');
   name = 'Hộp Hề Ma Quái (Shaco_W)';
   description =
-    'Tạo một Hộp Hề Ma Quái tàng hình sau 1s, tồn tại trong 20s. Khi kẻ địch tới gần, nó sẽ gây hoảng sợ và tấn công các kẻ địch xung quanh trong 3s, gây 7 sát thương mỗi lần tấn công.';
+    'Tạo một Hộp Hề Ma Quái tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>. Khi kẻ địch tới gần, nó sẽ gây <span class="buff">Hoảng Sợ</span> và tấn công các kẻ địch xung quanh trong <span class="time">3 giây</span>, gây <span class="damage">7 sát thương</span> mỗi lần tấn công';
   coolDown = 5000;
 
   onSpellCast() {

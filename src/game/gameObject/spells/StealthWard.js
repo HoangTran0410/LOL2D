@@ -6,7 +6,8 @@ import SpellObject from '../SpellObject.js';
 export default class StealthWard extends Spell {
   image = AssetManager.getAsset('spell_stealthward');
   name = 'Mắt Xanh (Stealth Ward)';
-  description = 'Cắm một mắt xanh, cung cấp tầm nhìn 700px, tồn tại 20s.';
+  description =
+    'Cắm một mắt xanh, cung cấp <span class="buff">Tầm Nhìn</span> 700px, tồn tại trong <span class="time">20 giây</span>';
   coolDown = 10000;
 
   maxRange = 300;

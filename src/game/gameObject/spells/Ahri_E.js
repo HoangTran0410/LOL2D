@@ -12,7 +12,7 @@ export default class Ahri_E extends Spell {
   image = AssetManager.getAsset('spell_ahri_e');
   name = 'Hôn Gió (Ahri_E)';
   description =
-    'Hôn gió theo hướng chỉ định, gây 15 sát thương và mê hoặc kẻ địch, khiến chúng câm lặng và đi về phía bạn trong 1.5s';
+    'Hôn gió theo hướng chỉ định, gây <span class="damage">15 sát thương</span> và <span class="buff">Mê Hoặc</span> kẻ địch trong <span class="time">1.5 giây</span>';
   coolDown = 5000;
 
   onSpellCast() {

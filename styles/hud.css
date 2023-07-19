@@ -153,7 +153,7 @@
     box-shadow: 0px 0px 10px 0px #999b;
     color: #eee;
     font-size: 1em;
-    width: 230px;
+    max-width: 300px;
     pointer-events: none;
 
     transition: all .08s ease-in;
@@ -185,12 +185,34 @@
 .spell-info span {
     margin: 0;
     padding: 0;
+    margin-left: 5px;
     font-weight: bold;
     color: #e8c17d;
 }
 
 .spell-info .body {
     margin-top: 10px;
+    color: #eee;
+}
+
+.spell-info .body span {
+    /* font-weight: bold; */
+    /* font-weight: normal; */
+    font-style: italic;
+    padding: 0;
+    margin: 0;
+}
+
+.spell-info .body .damage {
+    color: #dd5b5b;
+}
+
+.spell-info .body .buff {
+    color: #88f;
+}
+
+.spell-info .body .time {
+    color: #c1ffb6;
 }
 
 /* =============== Healthbar =============== */

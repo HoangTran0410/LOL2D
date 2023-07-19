@@ -9,7 +9,7 @@ export default class Veigar_E extends Spell {
   image = AssetManager.getAsset('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
   description =
-    'Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong 3s. Làm choáng 1.5s những kẻ địch dám bước qua.';
+    'Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong <span class="time">3 giây</span>. <span class="buff">Làm Choáng</span> <span class="time">1.5 giây</span> những kẻ địch dám bước qua.';
   coolDown = 5000;
 
   onSpellCast() {

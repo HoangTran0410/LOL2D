@@ -9,7 +9,7 @@ export default class Ahri_W extends Spell {
   image = AssetManager.getAsset('spell_ahri_w');
   name = 'Lửa Hồ Ly (Ahri_W)';
   description =
-    'Tạo ra 3 ngọn lửa quay xung quanh bản thân trong 5s. Sau 1s sẽ tự tìm và bay tới mục tiêu trong tầm, gây 10 sát thương và giảm 20% tốc chạy trong 0.5s mỗi ngọn lửa. ';
+    'Tạo ra <span>3 ngọn lửa</span> quay xung quanh bản thân trong <span class="time">5 giây</span>. Mỗi ngọn lửa sẽ tự động tấn công mục tiêu gần nhất trong tầm, gây <span class="damage">10 sát thương</span> và <span class="buff">Làm Châm 20%</span> tốc chạy kẻ địch trong <span class="time">0.5 giây</span>';
   coolDown = 5000;
 
   onSpellCast() {

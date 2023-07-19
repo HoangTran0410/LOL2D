@@ -201,6 +201,11 @@ export const SpellGroups = [
     spells: [AllSpells.Lux_Q, AllSpells.Lux_E, AllSpells.Lux_R],
   },
   {
+    name: 'Ashe',
+    image: 'champ_ashe',
+    spells: [AllSpells.Ashe_W, AllSpells.Ashe_R],
+  },
+  {
     name: "Cho'Gath",
     image: 'champ_chogath',
     spells: [AllSpells.ChoGath_Q, AllSpells.ChoGath_W],

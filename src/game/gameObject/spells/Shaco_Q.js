@@ -10,7 +10,7 @@ export default class Shaco_Q extends Spell {
   image = AssetManager.getAsset('spell_shaco_q');
   name = 'Lừa Gạt (Shaco_Q)';
   description =
-    'Dịch chuyển đến vị trí chỉ định, trở nên Tàng Hình trong 2s + Tăng Tốc 40% trong thời gian tàng hình.';
+    '<span class="buff">Dịch chuyển</span> đến vị trí chỉ định, trở nên <span class="buff">Tàng Hình</span> trong <span class="time">2 giây</span> và <span class="buff">Tăng Tốc 40%</span> trong thời gian tàng hình.';
   coolDown = 5000;
 
   onSpellCast() {

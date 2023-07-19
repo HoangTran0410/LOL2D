@@ -20,7 +20,7 @@ export default class LeeSin_Q extends Spell {
   image = this.phase.image;
   name = 'Sóng Âm / Vô Ảnh Cước (LeeSin_Q)';
   description =
-    'Chưởng 1 luồng sóng âm về hướng chỉ định, gây 15 sát thương. Có thể tái kích hoạt trong vòng 3s để lao tới kẻ địch trúng Sóng Âm, gây thêm 15 sát thương.';
+    'Chưởng 1 luồng Sóng Âm về hướng chỉ định, gây <span class="damage">15 sát thương</span> khi trúng địch. Có thể tái kích hoạt trong vòng <span class="time">3 giây</span> để <span class="buff">Lướt</span> tới kẻ địch trúng Sóng Âm, gây thêm <span class="damage">15 sát thương</span> khi tới nơi';
   coolDown = 5000;
   collDownAfterQ1 = 500;
 

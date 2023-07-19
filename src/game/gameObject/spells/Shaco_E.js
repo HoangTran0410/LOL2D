@@ -6,7 +6,7 @@ export default class Shaco_E extends Spell {
   image = AssetManager.getAsset('spell_shaco_e');
   name = 'Dao Độc (Shaco_E)';
   description =
-    'Ném dao tới kẻ địch, Làm Chậm kẻ địch 40% + gây 15 sát thương, gây thêm 10 sát thương nếu mục tiêu dưới 30% máu.';
+    'Ném dao tới kẻ địch, <span class="buff">Làm Chậm 40%</span> và gây <span class="damage">15 sát thương</span>, gây thêm <span class="damage">10 sát thương</span> nếu mục tiêu <span>dưới 30% máu</span>';
   coolDown = 5000;
 
   range = 250;

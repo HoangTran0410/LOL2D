@@ -24,7 +24,7 @@ export default class Yasuo_Q extends Spell {
   image = this.phase.image;
   name = 'Bão Kiếm (Yasuo_Q)';
   description =
-    'Đâm lưỡi kiếm về hướng chỉ định, gây 10 sát thương. Cộng dồn 2 lần sẽ tạo ra một cơn lốc lớn, hất tung kẻ địch trúng chiêu trong 1s và gây 20 sát thương';
+    'Đâm lưỡi kiếm về hướng chỉ định, gây <span class="damage">10 sát thương</span>. <span>Cộng dồn 2 lần</span> sẽ tạo ra một cơn lốc lớn, <span class="buff">Hất Tung</span> kẻ địch trúng chiêu trong <span class="time">1 giây</span> và gây <span class="damage">20 sát thương</span>';
   coolDown = 3500;
   manaCost = 20;
 

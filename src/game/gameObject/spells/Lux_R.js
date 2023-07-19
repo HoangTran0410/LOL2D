@@ -10,7 +10,7 @@ export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   image = AssetManager.getAsset('spell_lux_r');
   description =
-    'Bắn một dải sáng theo hướng chỉ định. Trói chân kẻ địch trong 1 giây. Gây 30 sát thương';
+    'Tích tụ năng lượng trong <span class="time">1 giây</span> rồi bắn một dải sáng dài theo hướng chỉ định. Gây <span class="damage">30 sát thương</span> và <span class="buff">Trói Chân</span> các kẻ địch trúng chiêu trong <span class="time">1 giây</span>';
   coolDown = 10000;
   manaCost = 50;
 
@@ -41,8 +41,6 @@ export default class Lux_R extends Spell {
     buff.image = this.image;
     this.owner.addBuff(buff);
   }
-
-  onUpdate() {}
 }
 
 export class Lux_R_Object extends SpellObject {

@@ -98,8 +98,10 @@ export default class InGameHUD {
           let { width, height, x, y } = element.getBoundingClientRect();
           let { clientX, clientY } = event;
 
-          this.spellInfoTop = y;
-          this.spellInfoLeft = x + width / 2;
+          this.spellInfo = {
+            top: y,
+            left: x + width / 2,
+          };
         },
         mouseout(spellProxy, event) {
           this.showPreview(spellProxy, false);
@@ -127,7 +129,7 @@ export default class InGameHUD {
       },
       template: `
       <div>
-        <div v-if="spellHover" class="spell-info" :style="'top:'+spellInfoTop+'px;left:'+spellInfoLeft+'px'">
+        <div v-if="spellHover" class="spell-info" :style="'top:'+spellInfo.top+'px;left:'+spellInfo.left+'px'">
             <div class="header">
               <div>
                 <img :src="spellHover.image" alt="spell" />
@@ -135,7 +137,7 @@ export default class InGameHUD {
               </div>
               <span>{{spellHover.coolDown/1000}}s</span>
             </div>
-            <p class="body">{{spellHover.description}}</p>
+            <p class="body" v-html="spellHover.description"></p>
         </div>
       
         <div v-if="avatar && spells && buffs" class="bottom-HUD">

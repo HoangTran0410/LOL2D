@@ -6,7 +6,8 @@ import Dash from '../buffs/Dash.js';
 export default class Yasuo_E extends Spell {
   image = AssetManager.getAsset('spell_yasuo_e');
   name = 'Quét Kiếm (Yasuo_E)';
-  description = 'Lướt một khoảng ngắn về hướng địch trong tầm. Gây 10 sát thương';
+  description =
+    '<span class="buff">Lướt</span> một khoảng ngắn về hướng địch trong tầm. Gây <span class="damage">10 sát thương</span>';
   coolDown = 2000;
   manaCost = 30;
 

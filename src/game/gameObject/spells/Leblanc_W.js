@@ -1,7 +1,5 @@
 import AssetManager from '../../../managers/AssetManager.js';
-import { hasFlag } from '../../../utils/index.js';
 import BuffAddType from '../../enums/BuffAddType.js';
-import StatusFlags from '../../enums/StatusFlags.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
@@ -21,7 +19,7 @@ export default class Leblanc_W extends Spell {
   image = this.phase.image;
   name = 'Biến Ảnh (Leblanc_W)';
   description =
-    'Phóng 1 khoảng cách theo hướng chỉ định, gây 20 sát thương, để lại 1 dị điểm tồn tại 3s tại ví trí cũ. Tái dùng chiêu sẽ dịch chuyển bạn về dị điểm.';
+    '<span class="buff">Lướt</span> tới vị trí chỉ định, gây <span class="damage">20 sát thương</span> cho những kẻ địch tại vị trí đó, đồng thời để lại <span>1 dị điểm</span> tồn tại <span class="time">3 giây</span> tại ví trí cũ. Tái kích hoạt sẽ lập tức <span class="buff">Dịch Chuyển</span> bạn về dị điểm.';
   coolDown = 5000;
 
   w1Object = null;
