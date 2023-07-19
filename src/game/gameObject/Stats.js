@@ -35,6 +35,7 @@ export default class Stats {
   }
 
   addModifier(modifier) {
+    if (!(modifier instanceof StatsModifier)) return;
     this.maxHealth.addModifier(modifier.maxHealth);
     this.health.addModifier(modifier.health);
     this.maxMana.addModifier(modifier.maxMana);
@@ -48,6 +49,7 @@ export default class Stats {
   }
 
   removeModifier(modifier) {
+    if (!(modifier instanceof StatsModifier)) return;
     this.maxHealth.removeModifier(modifier.maxHealth);
     this.health.removeModifier(modifier.health);
     this.maxMana.removeModifier(modifier.maxMana);

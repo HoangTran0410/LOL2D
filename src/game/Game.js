@@ -30,7 +30,7 @@ export default class Game {
     });
     this.objectManager.addObject(this.player);
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
         new AIChampion({
           game: this,
@@ -132,7 +132,7 @@ export default class Game {
   }
 
   randomSpawnPoint() {
-    let range = 500;
+    let range = 1000;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)
