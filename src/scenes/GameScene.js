@@ -17,7 +17,7 @@ export default class GameScene extends Scene {
     this.statsContainer.appendChild(drawAnalys.dom);
 
     realUpdateAnalys = new Stats();
-    realUpdateAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    realUpdateAnalys.showPanel(0);
     realUpdateAnalys.dom.style.cssText = '';
     realUpdateAnalys.dom.title = 'Real update time';
     this.statsContainer.appendChild(realUpdateAnalys.dom);
@@ -42,35 +42,41 @@ export default class GameScene extends Scene {
     rectMode(CORNER);
     imageMode(CENTER);
 
-    this.game = new Game();
     this.startGame();
   }
 
   startGame() {
+    this.game = new Game();
     previousTime = performance.now();
-    this.updateLoop();
+    requestAnimationFrame(this.updateLoop.bind(this));
+  }
+
+  stopGame() {
+    cancelAnimationFrame(this.animationFrameId);
+    this.game.destroy();
+    this.game = null;
   }
 
   updateLoop() {
     let currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
-    updateAnalys.begin();
+    // updateAnalys.begin();
     if (elapsedTime > interval) {
       realUpdateAnalys.begin();
-      this.game.update();
       previousTime = currentTime - (elapsedTime % interval);
+      this.game.update();
       realUpdateAnalys.end();
     }
-    updateAnalys.end();
+    // updateAnalys.end();
 
-    if (this.game) {
-      setTimeout(() => {
-        this.updateLoop();
-      }, 1);
-    }
+    // if (this.game) {
+    //   setTimeout(() => {
+    //     this.updateLoop();
+    //   }, 1);
+    // }
 
-    // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
+    this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 
   draw() {
@@ -88,11 +94,9 @@ export default class GameScene extends Scene {
   }
 
   exit() {
-    cancelAnimationFrame(this.animationFrameId);
+    this.stopGame();
     this.dom.style.display = 'none';
-    this.game.destroy();
     this.canvas.remove();
-    this.game = null;
   }
 
   windowResized() {

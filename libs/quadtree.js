@@ -98,18 +98,18 @@ class Quadtree {
 }
 
 class Rectangle {
-  constructor(props) {
-    this.x = props.x;
-    this.y = props.y;
-    this.w = props.w;
-    this.h = props.h;
-    this.data = props.data;
+  constructor({ x, y, w, h, data }) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.data = data;
   }
 
-  qtIndex(node) {
+  qtIndex({ x, y, w, h }) {
     const indexes = [],
-      boundsCenterX = node.x + node.w / 2,
-      boundsCenterY = node.y + node.h / 2;
+      boundsCenterX = x + w / 2,
+      boundsCenterY = y + h / 2;
     const startIsNorth = this.y < boundsCenterY,
       startIsWest = this.x < boundsCenterX,
       endIsEast = this.x + this.w > boundsCenterX,
@@ -135,24 +135,24 @@ class Rectangle {
 }
 
 class Circle {
-  constructor(props) {
-    this.x = props.x;
-    this.y = props.y;
-    this.r = props.r;
-    this.data = props.data;
+  constructor({ x, y, r, data }) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.data = data;
   }
 
-  qtIndex(node) {
+  qtIndex({ x, y, w, h }) {
     const indexes = [],
-      w2 = node.w / 2,
-      h2 = node.h / 2,
-      x2 = node.x + w2,
-      y2 = node.y + h2;
+      w2 = w / 2,
+      h2 = h / 2,
+      x2 = x + w2,
+      y2 = y + h2;
     //an array of node origins where the array index equals the node index
     const nodes = [
-      [x2, node.y],
-      [node.x, node.y],
-      [node.x, y2],
+      [x2, y],
+      [x, y],
+      [x, y2],
       [x2, y2],
     ];
     //test all nodes for circle intersections
@@ -182,25 +182,25 @@ class Circle {
 }
 
 class Line {
-  constructor(props) {
-    this.x1 = props.x1;
-    this.y1 = props.y1;
-    this.x2 = props.x2;
-    this.y2 = props.y2;
-    this.data = props.data;
+  constructor({ x1, y1, x2, y2, data }) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+    this.data = data;
   }
 
-  qtIndex(node) {
+  qtIndex({ x, y, w, h }) {
     const indexes = [],
-      w2 = node.w / 2,
-      h2 = node.h / 2,
-      x2 = node.x + w2,
-      y2 = node.y + h2;
+      w2 = w / 2,
+      h2 = h / 2,
+      x2 = x + w2,
+      y2 = y + h2;
     //an array of node origins where the array index equals the node index
     const nodes = [
-      [x2, node.y],
-      [node.x, node.y],
-      [node.x, y2],
+      [x2, y],
+      [x, y],
+      [x, y2],
       [x2, y2],
     ];
     //test all nodes for line intersections
