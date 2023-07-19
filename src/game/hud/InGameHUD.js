@@ -91,6 +91,7 @@ export default class InGameHUD {
           this.game.unpause();
         },
         mouseover(spellProxy, event) {
+          // clearTimeout(this.mouseOutSpellTimeout);
           this.showPreview(spellProxy, true);
           this.spellHover = spellProxy;
 
@@ -99,13 +100,15 @@ export default class InGameHUD {
           let { clientX, clientY } = event;
 
           this.spellInfo = {
-            top: y,
-            left: x + width / 2,
+            bottom: 'calc(100vh - ' + (y - 5) + 'px)',
+            left: Math.max(x + width / 2 - 150, 0) + 'px',
           };
         },
         mouseout(spellProxy, event) {
           this.showPreview(spellProxy, false);
+          // this.mouseOutSpellTimeout = setTimeout(() => {
           this.spellHover = null;
+          // }, 250);
         },
         showPreview(spellProxy, show) {
           try {
@@ -129,7 +132,7 @@ export default class InGameHUD {
       },
       template: `
       <div>
-        <div v-if="spellHover" class="spell-info" :style="'top:'+spellInfo.top+'px;left:'+spellInfo.left+'px'">
+        <div v-if="spellHover" class="spell-info" :style="'bottom:'+spellInfo.bottom+';left:'+spellInfo.left">
             <div class="header">
               <div>
                 <img :src="spellHover.image" alt="spell" />
@@ -149,11 +152,11 @@ export default class InGameHUD {
             <div class="champion-details">
                 <div class="spells">
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
-                        @click="changeSpell(index)" 
-                        @mouseover="mouseover(spell, $event)" 
-                        @mouseout="mouseout(spell, $event)">
+                        @click="changeSpell(index)">
                         <img :src="spell.image" alt="spell"
-                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
+                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" 
+                            @mouseover="mouseover(spell, $event)" 
+                            @mouseout="mouseout(spell, $event)"/>
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <div v-if="spell.showCoolDown">
@@ -197,10 +200,10 @@ export default class InGameHUD {
                   <p>{{group.name}}</p>
                 </div>
                 <div v-for="spell of group.spells" class="spell" 
-                  @click="pick(spell, $event)"
-                  @mouseover="mouseover(spell, $event)" 
-                  @mouseout="mouseout(spell, $event)">
-                    <img :src="spell.image" alt="spell" />
+                  @click="pick(spell, $event)">
+                    <img :src="spell.image" alt="spell" 
+                      @mouseover="mouseover(spell, $event)" 
+                      @mouseout="mouseout(spell, $event)"/>
                 </div>
               </div>
             </div>
