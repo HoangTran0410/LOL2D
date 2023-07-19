@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
@@ -110,7 +111,11 @@ export class Teemo_R_Object extends SpellObject {
           });
 
           enemiesInRange.forEach(enemy => {
-            enemy.addBuff(new Teemo_R_Buff(2000, this.owner, enemy));
+            let slowBuff = new Slow(2000, this.owner, enemy);
+            slowBuff.image = AssetManager.getAsset('spell_teemo_r');
+            slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+            slowBuff.percent = 0.7;
+            enemy.addBuff(slowBuff);
             enemy.takeDamage(30, this.owner);
           });
 
@@ -173,5 +178,15 @@ export class Teemo_R_Object extends SpellObject {
       let r = random(10, 20);
       circle(this.position.x + delta.x, this.position.y + delta.y, r);
     }
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

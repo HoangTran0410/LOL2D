@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -82,5 +83,15 @@ export class Blitzcrank_R_Object extends SpellObject {
     }
 
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

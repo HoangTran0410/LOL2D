@@ -28,22 +28,18 @@ export default class Flash extends Spell {
     this.game.objectManager.addObject(newPosEffect);
 
     let oldPosEffect = new Flash_Object(this.owner, oldPos);
+    oldPosEffect.position = oldPos;
     this.game.objectManager.addObject(oldPosEffect);
-
-    // test different effect
-    // let flashObject = new Flash_Object2(this.owner);
-    // flashObject.position = oldPos;
-    // this.game.objectManager.addObject(flashObject);
   }
 }
 
 export class Flash_Object extends SpellObject {
   particleSystem = PredefinedParticleSystems.smoke([255, 255, 100]);
 
-  constructor(owner, position) {
-    super(owner);
+  onAdded() {
+    this.game.objectManager.addObject(this.particleSystem);
 
-    let pos = position || this.owner.position;
+    let pos = this.position;
     let size = this.owner.stats.size.value / 2;
     for (let i = 0; i < 10; i++) {
       this.particleSystem.addParticle({
@@ -53,14 +49,7 @@ export class Flash_Object extends SpellObject {
         opacity: random(100, 200),
       });
     }
-  }
 
-  update() {
-    this.particleSystem.update();
-    this.toRemove = this.particleSystem.toRemove;
-  }
-
-  draw() {
-    this.particleSystem.draw();
+    this.toRemove = true;
   }
 }

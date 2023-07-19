@@ -27,6 +27,9 @@ export class SpellName_Buff extends Buff {
 }
 
 export class SpellName_Object extends SpellObject {
+  onAdded() {}
+  onRemoved() {}
   update() {}
   draw() {}
+  getBoundingBox() {}
 }

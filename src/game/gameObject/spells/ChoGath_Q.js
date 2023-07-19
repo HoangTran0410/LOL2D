@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
@@ -31,11 +32,6 @@ export default class ChoGath_Q extends Spell {
   }
 }
 
-export class ChoGath_Q_Slow_Buff extends Slow {
-  image = AssetManager.getAsset('spell_chogath_q');
-  percent = 0.6;
-}
-
 export class ChoGath_Q_Object extends SpellObject {
   position = this.owner.position.copy();
   size = 140;
@@ -66,7 +62,11 @@ export class ChoGath_Q_Object extends SpellObject {
         enemies.forEach(enemy => {
           let airborneBuff = new Airborne(1000, this.owner, enemy);
           enemy.addBuff(airborneBuff);
-          enemy.addBuff(new ChoGath_Q_Slow_Buff(1500, this.owner, enemy));
+
+          let slowBuff = new Slow(1500, this.owner, enemy);
+          slowBuff.percent = 0.6;
+          slowBuff.image = AssetManager.getAsset('spell_chogath_q');
+          enemy.addBuff(slowBuff);
           enemy.takeDamage(this.damage, this.owner);
         });
 
@@ -102,5 +102,15 @@ export class ChoGath_Q_Object extends SpellObject {
       }
     }
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

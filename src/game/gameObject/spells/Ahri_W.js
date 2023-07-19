@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -47,6 +48,10 @@ export class Ahri_W_Object extends SpellObject {
 
   phase = Ahri_W_Object.PHASES.PREPARING;
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
+
   update() {
     this.age += deltaTime;
     this.angle += this.rotateSpeed;
@@ -54,7 +59,7 @@ export class Ahri_W_Object extends SpellObject {
 
     // preparing
     if (this.phase === Ahri_W_Object.PHASES.PREPARING) {
-      this.position = p5.Vector.lerp(this.position, this.getPosition(), 0.2);
+      this.position = p5.Vector.lerp(this.position, this._getPosition(), 0.2);
 
       if (this.age >= this.prepairTime) {
         this.phase = Ahri_W_Object.PHASES.ROTATING;
@@ -63,7 +68,7 @@ export class Ahri_W_Object extends SpellObject {
 
     // rotating
     else if (this.phase === Ahri_W_Object.PHASES.ROTATING) {
-      this.position = p5.Vector.lerp(this.position, this.getPosition(), 0.2);
+      this.position = p5.Vector.lerp(this.position, this._getPosition(), 0.2);
       this.trailSystem.addTrail(this.position);
 
       // query players in range
@@ -108,7 +113,7 @@ export class Ahri_W_Object extends SpellObject {
     }
   }
 
-  getPosition() {
+  _getPosition() {
     return this.owner.position.copy().add(
       p5.Vector.fromAngle(this.angle).mult(
         this.owner.stats.size.value / 2 + this.size / 2 + 20 // 20 is padding between owner and this object
@@ -117,19 +122,27 @@ export class Ahri_W_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
-
     push();
     let alpha = this.phase === Ahri_W_Object.PHASES.PREPARING ? 50 : 255;
     let size = this.phase === Ahri_W_Object.PHASES.ROTATING ? this.size + random(-3, 3) : this.size;
     translate(this.position.x, this.position.y);
     noStroke();
     fill(119, 119, 245, alpha);
-    circle(random(-3, 3), random(-3, 3), size);
+    circle(0, 0, size);
 
     // stroke(200);
     // noFill();
     // circle(0, 0, this.rangeToFindEnemy * 2);
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

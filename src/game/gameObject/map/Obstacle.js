@@ -1,5 +1,6 @@
 import SAT from '../../../../libs/SAT.js';
 import { Rectangle } from '../../../../libs/quadtree.js';
+import { uuidv4 } from '../../../utils/index.js';
 import TerrainType from '../../enums/TerrainType.js';
 
 export default class Obstacle {
@@ -8,16 +9,7 @@ export default class Obstacle {
     this.position = createVector(x, y);
     this.angle = 0;
     this.vertices = vertices || [];
-  }
-
-  get vertices() {
-    return this._vertices;
-  }
-
-  set vertices(vertices) {
-    this._vertices = vertices;
-    this._SATPolygon = this.toSATPolygon(false);
-    this._boundingBox = this.getBoundingBox(false);
+    this.id = uuidv4(); // for quadtree
   }
 
   draw() {
@@ -34,6 +26,8 @@ export default class Obstacle {
       stroke('#107d49');
       fill('#10613aee');
     }
+    // fill('#7777');
+    // stroke('#999');
     translate(this.position.x, this.position.y);
     rotate(this.angle);
     beginShape();
@@ -48,7 +42,7 @@ export default class Obstacle {
     // let bb = this.getBoundingBox();
     // stroke(255, 0, 0);
     // noFill();
-    // rect(bb.x, bb.y, bb.width, bb.height);
+    // rect(bb.x, bb.y, bb.w, bb.h);
     // pop();
   }
 
@@ -59,7 +53,6 @@ export default class Obstacle {
     let maxX = -Infinity;
     let minY = Infinity;
     let maxY = -Infinity;
-
     for (let v of this.vertices) {
       // get rotated vertices
       let _v = v.copy().rotate(this.angle);
@@ -71,14 +64,14 @@ export default class Obstacle {
       minY = min(minY, y);
       maxY = max(maxY, y);
     }
-
-    return new Rectangle({
+    this._boundingBox = new Rectangle({
       x: minX,
       y: minY,
       w: maxX - minX,
       h: maxY - minY,
       data: this,
     });
+    return this._boundingBox;
   }
 
   toSATPolygon(getCached = true) {
@@ -89,7 +82,8 @@ export default class Obstacle {
       this.vertices.map(v => new SAT.Vector(v.x, v.y))
     );
     polygon.setAngle(this.angle);
-    return polygon;
+    this._SATPolygon = polygon;
+    return this._SATPolygon;
   }
 
   static arrayToVertices(arr) {

@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import { hasFlag } from '../../../utils/index.js';
 import ActionState from '../../enums/ActionState.js';
 import BuffAddType from '../../enums/BuffAddType.js';
@@ -318,6 +319,18 @@ export default class AttackableUnit extends GameObject {
 
   hasBuff(BuffClass) {
     return this.buffs.some(buff => buff instanceof BuffClass);
+  }
+
+  getBoundingBox() {
+    let size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
+    // let size = this.animatedValues.size;
+    return new Rectangle({
+      x: this.position.x - size / 2,
+      y: this.position.y - size / 2,
+      w: size,
+      h: size,
+      data: this,
+    });
   }
 
   get canCast() {

@@ -103,6 +103,8 @@ class Shaco_R_Clone extends Champion {
 
     // create explosion
     let explodeEffect = new ParticleSystem({
+      getParticlePosFn: p => p.pos,
+      getParticleSizeFn: p => 20,
       isDeadFn: p => p.pos.dist(clonePos) > explodeRadius,
       updateFn: p => {
         p.pos.add(p.vel);
@@ -123,10 +125,7 @@ class Shaco_R_Clone extends Champion {
     for (let i = 0; i < 20; i++) {
       let p = clonePos.copy();
       let v = p5.Vector.random2D().mult(random(1, 3));
-      explodeEffect.addParticle({
-        pos: p,
-        vel: v,
-      });
+      explodeEffect.addParticle({ pos: p, vel: v });
     }
     this.game.objectManager.addObject(explodeEffect);
 

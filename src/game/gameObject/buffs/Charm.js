@@ -17,6 +17,10 @@ export default class Charm extends Buff {
   speed = 1;
   particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#f5429588', 0.1);
 
+  onCreate() {
+    this.game.objectManager.addObject(this.particleSystem);
+  }
+
   onUpdate() {
     if (this.sourceUnit?.position && !this.targetUnit.isDead) {
       VectorUtils.moveVectorToVector(
@@ -36,11 +40,5 @@ export default class Charm extends Buff {
       });
     }
     this.particleSystem.update();
-  }
-
-  draw() {
-    push();
-    this.particleSystem.draw();
-    pop();
   }
 }

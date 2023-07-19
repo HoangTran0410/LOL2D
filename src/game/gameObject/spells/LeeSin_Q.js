@@ -5,6 +5,7 @@ import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 import TrueSight from '../buffs/TrueSight.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 
 export default class LeeSin_Q extends Spell {
   static PHASES = {
@@ -23,7 +24,6 @@ export default class LeeSin_Q extends Spell {
     'Chưởng 1 luồng Sóng Âm về hướng chỉ định, gây <span class="damage">15 sát thương</span> khi trúng địch. Có thể tái kích hoạt trong vòng <span class="time">3 giây</span> để <span class="buff">Lướt</span> tới kẻ địch trúng Sóng Âm, gây thêm <span class="damage">15 sát thương</span> khi tới nơi';
   coolDown = 5000;
   collDownAfterQ1 = 500;
-
   spellObject = null;
   enemyHit = null;
 
@@ -136,6 +136,10 @@ export class LeeSin_Q_Object extends SpellObject {
     trailColor: '#b5ede822',
   });
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
+
   update() {
     if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
       VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
@@ -179,8 +183,6 @@ export class LeeSin_Q_Object extends SpellObject {
   draw() {
     // move phase
     if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
-      this.trailSystem.draw();
-
       push();
       let alpha = map(this.destination.dist(this.position), 0, this.range, 99, 255);
       fill(181, 237, 232, alpha);
@@ -195,10 +197,8 @@ export class LeeSin_Q_Object extends SpellObject {
     else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
       push();
       // draw 4 triangle around the enemy, west, north, east, south
-      let s = this.enemyHit.stats.size.value / 2;
-
+      let s = this.enemyHit.animatedValues.size / 2;
       translate(this.position.x, this.position.y);
-
       fill('#b5ede8');
       noStroke();
       [0, PI / 2, PI / 2, PI / 2].forEach((angle, i) => {
@@ -207,6 +207,26 @@ export class LeeSin_Q_Object extends SpellObject {
         triangle(-s, 0, -s - r, -s, -s - r, s);
       });
       pop();
+    }
+  }
+
+  getBoundingBox() {
+    if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
+      return new Rectangle({
+        x: this.position.x - this.size / 2,
+        y: this.position.y - this.size / 2,
+        w: this.size,
+        h: this.size,
+        data: this,
+      });
+    } else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
+      return new Rectangle({
+        x: this.position.x - this.enemyHit.animatedValues.size / 2 - 20,
+        y: this.position.y - this.enemyHit.animatedValues.size / 2 - 20,
+        w: this.enemyHit.animatedValues.size + 40,
+        h: this.enemyHit.animatedValues.size + 40,
+        data: this,
+      });
     }
   }
 }

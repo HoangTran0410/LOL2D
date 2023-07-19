@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -95,5 +96,15 @@ export class Malphite_R_Object extends SpellObject {
     fill(255, 200, 150, alpha);
     circle(this.position.x, this.position.y, this.hitRadius * 2);
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.hitRadius,
+      y: this.position.y - this.hitRadius,
+      w: this.hitRadius * 2,
+      h: this.hitRadius * 2,
+      data: this,
+    });
   }
 }

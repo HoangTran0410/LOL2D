@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import { rectToVertices } from '../../../utils/index.js';
@@ -102,5 +103,15 @@ export class Yasuo_W_Object extends SpellObject {
     vertex(0, this.animatedSize / 2);
     endShape(CLOSE);
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.animatedPosition.x - this.animatedSize / 2 - this.animatedWidth / 2,
+      y: this.animatedPosition.y - this.animatedSize / 2 - this.animatedWidth / 2,
+      w: this.animatedSize + this.animatedWidth,
+      h: this.animatedSize + this.animatedWidth,
+      data: this,
+    });
   }
 }

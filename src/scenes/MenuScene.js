@@ -1,5 +1,5 @@
 import { Scene } from '../managers/SceneManager.js';
-import { toggleFullscreen } from '../utils/dom.utils.js';
+import DomUtils from '../utils/dom.utils.js';
 import GameScene from './GameScene.js';
 
 export default class MenuScene extends Scene {
@@ -13,13 +13,15 @@ export default class MenuScene extends Scene {
       this.sceneManager.showScene(GameScene);
     });
     this.fullscreenBtn.addEventListener('click', () => {
-      let isFullscreen = toggleFullscreen();
+      let isFullscreen = DomUtils.toggleFullscreen();
       if (isFullscreen) {
         this.fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
       } else {
         this.fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
       }
     });
+
+    DomUtils.preventZoom();
   }
 
   nextBackground() {

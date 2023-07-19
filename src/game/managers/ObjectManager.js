@@ -3,9 +3,13 @@ import Champion from '../gameObject/attackableUnits/Champion.js';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
 import CombatText from '../gameObject/helpers/CombatText.js';
 import { Quadtree } from '../../../libs/quadtree.js';
+import TrailSystem from '../gameObject/helpers/TrailSystem.js';
+import ParticleSystem from '../gameObject/helpers/ParticleSystem.js';
 
 const DisplayZIndex = [
   //
+  TrailSystem,
+  ParticleSystem,
   SpellObject,
   AttackableUnit,
   Champion,
@@ -30,6 +34,8 @@ export default class ObjectManager {
       maxObjects: 2,
       maxLevels: 4,
     });
+
+    window.objectManager = this;
   }
 
   update() {
@@ -71,9 +77,22 @@ export default class ObjectManager {
   }
 
   draw() {
-    for (let o of this.objects) {
+    let camBound = this.game.camera.getBoundingBox();
+    let objectsInCamera = this.queryObjects({
+      area: camBound,
+    });
+
+    for (let o of objectsInCamera) {
       if (o.willDraw) o.draw?.();
+      o.drawBoundingBox?.();
     }
+
+    // draw camera bound
+    // push();
+    // fill(200, 50);
+    // stroke(255);
+    // rect(camBound.x, camBound.y, camBound.w, camBound.h);
+    // pop();
   }
 
   addObject(object) {

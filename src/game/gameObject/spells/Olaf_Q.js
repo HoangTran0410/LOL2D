@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -70,6 +71,8 @@ export class Olaf_Q_Object extends SpellObject {
     trailColor: [...this.color, 100],
   });
   particleSystem = new ParticleSystem({
+    getParticlePosFn: p => p.position,
+    getParticleSizeFn: p => p.size,
     isDeadFn: p => p.age > 1000,
     updateFn: p => {
       p.size += 1;
@@ -83,10 +86,8 @@ export class Olaf_Q_Object extends SpellObject {
     },
   });
 
-  constructor(owner) {
-    super(owner);
-
-    // game will handle update and draw for this system
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
     this.game.objectManager.addObject(this.particleSystem);
   }
 
@@ -170,8 +171,6 @@ export class Olaf_Q_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
-
     // draw axe shape
     push();
     translate(this.position.x, this.position.y);
@@ -207,5 +206,15 @@ export class Olaf_Q_Object extends SpellObject {
       arc(this.position.x, this.position.y, this.pickupRange, this.pickupRange, 0, arcLength);
       pop();
     }
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.pickupRange / 2,
+      y: this.position.y - this.pickupRange / 2,
+      w: this.pickupRange,
+      h: this.pickupRange,
+      data: this,
+    });
   }
 }

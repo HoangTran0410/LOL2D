@@ -12,11 +12,13 @@ import EventManager from '../managers/EventManager.js';
 
 export default class Game {
   constructor() {
+    this.mapSize = 6400;
+
     this.camera = new Camera();
-    this.terrainMap = new TerrainMap(this);
-    this.fogOfWar = new FogOfWar(this);
-    this.eventManager = new EventManager();
     this.objectManager = new ObjectManager(this);
+    this.eventManager = new EventManager();
+    this.terrainMap = new TerrainMap(this, this.mapSize);
+    this.fogOfWar = new FogOfWar(this);
     this.inGameHUD = new InGameHUD(this);
 
     this.fps = 60;
@@ -30,7 +32,7 @@ export default class Game {
 
     for (let i = 0; i < 4; i++) {
       this.objectManager.addObject(
-        new Champion({
+        new AIChampion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getChampionPresetRandom(),
@@ -161,12 +163,8 @@ export default class Game {
     return getOnlyOne ? null : result;
   }
 
-  get mapSize() {
-    return this.terrainMap.size;
-  }
-
   randomSpawnPoint() {
-    let range = 500;
+    let range = 2000;
     return createVector(
       this.mapSize / 2 + random(-range, range),
       this.mapSize / 2 + random(-range, range)

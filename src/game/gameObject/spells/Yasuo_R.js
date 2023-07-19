@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
@@ -138,10 +139,20 @@ export class Yasuo_R_Object extends SpellObject {
 
   draw() {
     push();
-    let alpha = map(this.age, 0, this.lifeTime, 100, 0);
+    let alpha = map(this.age, 0, this.lifeTime, 100, 50);
     stroke(255, alpha);
     fill(100, 100, 200, alpha);
     circle(this.position.x, this.position.y, this.size + random(-5, 5));
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

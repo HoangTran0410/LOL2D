@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -58,6 +59,10 @@ export class Veigar_E_Object extends SpellObject {
   });
 
   enemiesEffected = [];
+
+  onAdded() {
+    this.game.objectManager.addObject(this.particleSystem);
+  }
 
   update() {
     this.age += deltaTime;
@@ -142,7 +147,15 @@ export class Veigar_E_Object extends SpellObject {
       }
     }
     pop();
+  }
 
-    this.particleSystem.draw();
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2 - this.strokeWidth / 2,
+      y: this.position.y - this.size / 2 - this.strokeWidth / 2,
+      w: this.size + this.strokeWidth,
+      h: this.size + this.strokeWidth,
+      data: this,
+    });
   }
 }

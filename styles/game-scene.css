@@ -4,7 +4,7 @@
     left: 0;
     display: flex;
     flex-direction: row;
-    /* opacity: 0.05; */
+    /* opacity: 0.1; */
     transition: all 0.2s ease-in-out;
 }
 

@@ -5,6 +5,7 @@ import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import { StatsModifier } from '../Stats.js';
+import Slow from '../buffs/Slow.js';
 
 export default class Lux_E extends Spell {
   name = 'Quả Cầu Ánh Sáng (Lux_E)';
@@ -47,24 +48,6 @@ export default class Lux_E extends Spell {
     if (this.luxEObject?.phase === Lux_E_Object.PHASES.EXPLODE || this.luxEObject?.toRemove) {
       this.luxEObject = null;
     }
-  }
-}
-
-export class Lux_E_Buff extends Buff {
-  image = AssetManager.getAsset('spell_lux_e');
-  buffAddType = BuffAddType.RENEW_EXISTING;
-
-  onCreate() {
-    this.statsModifier = new StatsModifier();
-    this.statsModifier.speed.percentBaseBonus = -0.5;
-  }
-
-  onActivate() {
-    this.targetUnit.stats.addModifier(this.statsModifier);
-  }
-
-  onDeactivate() {
-    this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }
 
@@ -134,7 +117,11 @@ export class Lux_E_Object extends SpellObject {
         excludeTeamIds: [this.owner.teamId],
       });
       enemies.forEach(enemy => {
-        enemy.addBuff(new Lux_E_Buff(200, this.owner, enemy));
+        let slowBuff = new Slow(200, this.owner, enemy);
+        slowBuff.image = AssetManager.getAsset('spell_lux_e');
+        slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+        slowBuff.percent = 0.5;
+        enemy.addBuff(slowBuff);
       });
 
       if (this.timeSinceStatic > this.lifeTimeWhenStatic) {

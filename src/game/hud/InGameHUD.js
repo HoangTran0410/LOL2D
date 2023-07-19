@@ -95,7 +95,7 @@ export default class InGameHUD {
           this.showPreview(spellProxy, true);
           this.spellHover = spellProxy;
 
-          let element = event.target;
+          let element = event.currentTarget || event.target;
           let { width, height, x, y } = element.getBoundingClientRect();
           let { clientX, clientY } = event;
 
@@ -152,11 +152,11 @@ export default class InGameHUD {
             <div class="champion-details">
                 <div class="spells">
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
-                        @click="changeSpell(index)">
+                        @click="changeSpell(index)"
+                        @mouseover="mouseover(spell, $event)" 
+                        @mouseout="mouseout(spell, $event)">
                         <img :src="spell.image" alt="spell"
-                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" 
-                            @mouseover="mouseover(spell, $event)" 
-                            @mouseout="mouseout(spell, $event)"/>
+                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <div v-if="spell.showCoolDown">
@@ -200,10 +200,10 @@ export default class InGameHUD {
                   <p>{{group.name}}</p>
                 </div>
                 <div v-for="spell of group.spells" class="spell" 
-                  @click="pick(spell, $event)">
-                    <img :src="spell.image" alt="spell" 
-                      @mouseover="mouseover(spell, $event)" 
-                      @mouseout="mouseout(spell, $event)"/>
+                  @click="pick(spell, $event)"
+                  @mouseover="mouseover(spell, $event)" 
+                  @mouseout="mouseout(spell, $event)">
+                    <img :src="spell.image" alt="spell" />
                 </div>
               </div>
             </div>

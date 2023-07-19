@@ -5,6 +5,7 @@ import { rectToVertices } from '../../../utils/index.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import CollideUtils from '../../../utils/collide.utils.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 
 export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
@@ -36,7 +37,7 @@ export default class Lux_R extends Spell {
 
     this.game.objectManager.addObject(obj);
 
-    // stun buff for owner
+    // owner cannot move while casting
     let buff = new RootBuff(prepairTime + fireTime, this.owner, this.owner);
     buff.image = this.image;
     this.owner.addBuff(buff);
@@ -124,8 +125,7 @@ export class Lux_R_Object extends SpellObject {
   }
 
   draw() {
-    let dir = p5.Vector.sub(this.destination, this.owner.position).normalize();
-    let angle = dir.heading();
+    let angle = VectorUtils.getAngle(this.owner.position, this.destination);
 
     push();
     translate(this.owner.position.x, this.owner.position.y);
@@ -162,5 +162,15 @@ export class Lux_R_Object extends SpellObject {
       }
     }
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: Math.min(this.owner.position.x, this.destination.x) - this.rayWidth / 2,
+      y: Math.min(this.owner.position.y, this.destination.y) - this.rayWidth / 2,
+      w: Math.abs(this.owner.position.x - this.destination.x) + this.rayWidth,
+      h: Math.abs(this.owner.position.y - this.destination.y) + this.rayWidth,
+      data: this,
+    });
   }
 }

@@ -3,6 +3,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 
 export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');
@@ -51,12 +52,6 @@ export default class Leblanc_E extends Spell {
       this.spellObject = null;
     }
   }
-}
-
-export class Leblanc_E_Buff extends RootBuff {
-  image = AssetManager.getAsset('spell_leblanc_e');
-
-  effectColor = [255, 255, 0];
 }
 
 export class Leblanc_E_Object extends SpellObject {
@@ -126,7 +121,9 @@ export class Leblanc_E_Object extends SpellObject {
       // stun enemy after stunAfter
       else if (this.timeSinceHit >= this.stunAfter) {
         if (this.enemyHit) {
-          let rootBuff = new Leblanc_E_Buff(this.stunTime, this.owner, this.enemyHit);
+          let rootBuff = new RootBuff(this.stunTime, this.owner, this.enemyHit);
+          rootBuff.image = AssetManager.getAsset('spell_leblanc_e');
+          rootBuff.effectColor = [255, 255, 0];
           this.enemyHit.addBuff(rootBuff);
           this.enemyHit.takeDamage(this.stunDamage, this.owner);
         }
@@ -187,5 +184,16 @@ export class Leblanc_E_Object extends SpellObject {
       ellipse(0, 0, this.size + 15, this.size);
     }
     pop();
+  }
+
+  getBoundingBox() {
+    // get boundary including owner position
+    return new Rectangle({
+      x: Math.min(this.position.x, this.owner.position.x) - this.size / 2,
+      y: Math.min(this.position.y, this.owner.position.y) - this.size / 2,
+      w: Math.abs(this.position.x - this.owner.position.x) + this.size,
+      h: Math.abs(this.position.y - this.owner.position.y) + this.size,
+      data: this,
+    });
   }
 }

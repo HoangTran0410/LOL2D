@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -191,6 +192,10 @@ export class Shaco_W_Bullet_Object extends SpellObject {
     maxLength: 10,
   });
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
+
   update() {
     // move phase
     if (this.phase === Shaco_W_Bullet_Object.PHASES.MOVING) {
@@ -218,8 +223,6 @@ export class Shaco_W_Bullet_Object extends SpellObject {
 
     // move phase
     if (this.phase === Shaco_W_Bullet_Object.PHASES.MOVING) {
-      this.trailSystem.draw();
-
       let dir = VectorUtils.getDirectionVector(this.position, this.targetEnemy.position);
       strokeWeight(this.lazerWidth);
       stroke(...this.strokeColor);
@@ -242,5 +245,15 @@ export class Shaco_W_Bullet_Object extends SpellObject {
       circle(this.targetEnemy.position.x, this.targetEnemy.position.y, size);
     }
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.lazerLength,
+      y: this.position.y - this.lazerLength,
+      w: this.lazerLength * 2,
+      h: this.lazerLength * 2,
+      data: this,
+    });
   }
 }

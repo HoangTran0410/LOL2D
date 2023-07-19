@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -53,6 +54,11 @@ export class Ahri_Q_Object extends SpellObject {
   });
   particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#77f9');
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+    this.game.objectManager.addObject(this.particleSystem);
+  }
+
   update() {
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
 
@@ -107,7 +113,6 @@ export class Ahri_Q_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
     let angle = this.destination.copy().sub(this.position).heading();
 
     push();
@@ -116,7 +121,15 @@ export class Ahri_Q_Object extends SpellObject {
     fill('#77f');
     ellipse(0, 0, this.size - 5 + this.speed, this.size);
     pop();
+  }
 
-    this.particleSystem.draw();
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

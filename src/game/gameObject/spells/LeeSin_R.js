@@ -91,6 +91,8 @@ export default class LeeSin_R extends Spell {
 
     // use particles system to create effect
     let particleSystem = new ParticleSystem({
+      getParticlePosFn: p => p.position,
+      getParticleSizeFn: p => 10,
       isDeadFn: p => p.lifeSpan <= 0,
       updateFn: p => {
         p.position.add(p.velocity);
@@ -161,6 +163,4 @@ export class LeeSin_R_Object extends SpellObject {
       this.effectedEnemies.push(enemy);
     });
   }
-
-  draw() {}
 }

@@ -6,6 +6,7 @@ import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
@@ -152,5 +153,16 @@ export class Blitzcrank_Q_Object extends SpellObject {
     }
 
     pop();
+  }
+
+  getBoundingBox() {
+    // get boundary including owner position
+    return new Rectangle({
+      x: Math.min(this.position.x, this.owner.position.x) - this.handSize / 2,
+      y: Math.min(this.position.y, this.owner.position.y) - this.handSize / 2,
+      w: Math.abs(this.position.x - this.owner.position.x) + this.handSize,
+      h: Math.abs(this.position.y - this.owner.position.y) + this.handSize,
+      data: this,
+    });
   }
 }

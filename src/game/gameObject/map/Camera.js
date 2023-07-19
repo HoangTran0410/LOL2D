@@ -1,3 +1,5 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
+
 export default class Camera {
   constructor() {
     this.position = createVector(0, 0);
@@ -45,15 +47,17 @@ export default class Camera {
     }
   }
 
-  getViewBounds() {
+  getBoundingBox() {
+    // let topLeft = this.screenToWorld(width / 2 - 100, height / 2 - 100);
+    // let bottomRight = this.screenToWorld(width / 2 + 100, height / 2 + 100);
     let topLeft = this.screenToWorld(0, 0);
     let bottomRight = this.screenToWorld(width, height);
-    return {
+    return new Rectangle({
       x: topLeft.x,
       y: topLeft.y,
       w: bottomRight.x - topLeft.x,
       h: bottomRight.y - topLeft.y,
-    };
+    });
   }
 
   screenToWorld(x, y) {

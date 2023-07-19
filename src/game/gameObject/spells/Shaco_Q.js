@@ -35,6 +35,7 @@ export default class Shaco_Q extends Spell {
     this.owner.addBuff(speedupBuff);
 
     let obj = new Shaco_Q_Object(this.owner, from);
+    obj.position = from;
     this.game.objectManager.addObject(obj);
   }
 }
@@ -42,10 +43,8 @@ export default class Shaco_Q extends Spell {
 export class Shaco_Q_Object extends SpellObject {
   particleSystem = PredefinedParticleSystems.smoke([255, 130, 80], 2, 3);
 
-  constructor(owner, position) {
-    super(owner);
-
-    let pos = position || this.owner.position;
+  onAdded() {
+    let pos = this.position;
     let size = this.owner.stats.size.value / 2;
     for (let i = 0; i < 7; i++) {
       this.particleSystem.addParticle({
@@ -55,14 +54,8 @@ export class Shaco_Q_Object extends SpellObject {
         opacity: random(100, 200),
       });
     }
-  }
 
-  update() {
-    this.particleSystem.update();
-    this.toRemove = this.particleSystem.toRemove;
-  }
-
-  draw() {
-    this.particleSystem.draw();
+    this.game.objectManager.addObject(this.particleSystem);
+    this.toRemove = true;
   }
 }

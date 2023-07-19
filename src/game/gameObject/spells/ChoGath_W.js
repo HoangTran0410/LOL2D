@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import CollideUtils from '../../../utils/collide.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
@@ -115,5 +116,15 @@ export class ChoGath_W_Object extends SpellObject {
     }
 
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.currentRange,
+      y: this.position.y - this.currentRange,
+      w: this.currentRange * 2,
+      h: this.currentRange * 2,
+      data: this,
+    });
   }
 }

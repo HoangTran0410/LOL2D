@@ -1,9 +1,9 @@
 import Game from '../game/Game.js';
 import { Scene } from '../managers/SceneManager.js';
-import { preventRightClick } from '../utils/dom.utils.js';
+import DomUtils from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
 
-let drawAnalys, updateAnalys, realUpdateAnalys, previousTime;
+let drawAnalys, checkUpdateAnalys, realUpdateAnalys, previousTime;
 
 export default class GameScene extends Scene {
   setup() {
@@ -19,21 +19,21 @@ export default class GameScene extends Scene {
     realUpdateAnalys = new Stats();
     realUpdateAnalys.showPanel(0);
     realUpdateAnalys.dom.style.cssText = '';
-    realUpdateAnalys.dom.title = 'Real update time';
+    realUpdateAnalys.dom.title = 'Update time';
     this.statsContainer.appendChild(realUpdateAnalys.dom);
 
-    updateAnalys = new Stats();
-    updateAnalys.showPanel(0);
-    updateAnalys.dom.style.cssText = '';
-    updateAnalys.dom.title = 'Update time';
-    this.statsContainer.appendChild(updateAnalys.dom);
+    checkUpdateAnalys = new Stats();
+    checkUpdateAnalys.showPanel(0);
+    checkUpdateAnalys.dom.style.cssText = '';
+    checkUpdateAnalys.dom.title = 'Check update time';
+    this.statsContainer.appendChild(checkUpdateAnalys.dom);
   }
 
   enter() {
     this.dom.style.display = 'block';
 
     this.canvas = createCanvas(windowWidth, windowHeight).parent('game-scene');
-    preventRightClick(this.canvas.elt);
+    DomUtils.preventRightClick(this.canvas.elt);
 
     cursor('assets/cursors/normal.cur');
     pixelDensity(1);
@@ -63,18 +63,21 @@ export default class GameScene extends Scene {
     let currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
-    updateAnalys.begin();
+    checkUpdateAnalys.begin();
     if (elapsedTime > interval) {
-      realUpdateAnalys.begin();
       previousTime = currentTime - (elapsedTime % interval);
-      this.game.update();
-      realUpdateAnalys.end();
+      for (let i = 0; i < Math.floor(Math.min(elapsedTime, 100) / interval); i++) {
+        realUpdateAnalys.begin();
+        this.game.update();
+        realUpdateAnalys.end();
+      }
     }
-    updateAnalys.end();
+    checkUpdateAnalys.end();
 
     setTimeout(() => {
       this.updateLoop();
-    }, 1);
+    }, interval);
+
     // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }
 

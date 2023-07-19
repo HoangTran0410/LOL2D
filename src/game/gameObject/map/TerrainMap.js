@@ -12,10 +12,10 @@ import { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 import Obstacle from './Obstacle.js';
 
 export default class TerrainMap {
-  constructor(game) {
+  constructor(game, mapSize) {
     this.game = game;
 
-    this.size = 6400;
+    this.size = mapSize || 6400;
     this.obstacles = [];
 
     this.rippleEffect = PredefinedParticleSystems.ripple();
@@ -203,7 +203,7 @@ export default class TerrainMap {
   }
 
   getObstaclesInView(terrainTypes) {
-    let area = new Rectangle(this.game.camera.getViewBounds());
+    let area = this.game.camera.getBoundingBox();
     return this.getObstaclesInArea(area, terrainTypes);
   }
 

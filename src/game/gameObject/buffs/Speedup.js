@@ -15,6 +15,8 @@ export default class Speedup extends Buff {
   maxParticleAge = 30;
   particleSystem = new ParticleSystem({
     autoRemoveIfEmpty: false,
+    getParticlePosFn: p => ({ x: p.x, y: p.y }),
+    getParticleSizeFn: p => 30,
     isDeadFn: p => {
       return p.age > this.maxParticleAge;
     },

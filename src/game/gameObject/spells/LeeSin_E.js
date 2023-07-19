@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
@@ -22,7 +23,11 @@ export default class LeeSin_E extends Spell {
     });
 
     enemies.forEach(enemy => {
-      enemy.addBuff(new LeeSin_E_Buff(2000, this.owner, enemy));
+      let slowBuff = new Slow(2000, this.owner, enemy);
+      slowBuff.image = this.image;
+      slowBuff.percent = 0.5;
+      slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+      enemy.addBuff(slowBuff);
       enemy.takeDamage(20, this.owner);
     });
 
@@ -35,27 +40,17 @@ export default class LeeSin_E extends Spell {
   onUpdate() {}
 }
 
-export class LeeSin_E_Buff extends Slow {
-  image = AssetManager.getAsset('spell_leesin_e');
-  buffAddType = BuffAddType.RENEW_EXISTING;
-  percent = 0.5;
-}
-
 export class LeeSin_E_Object extends SpellObject {
   position = this.owner.position.copy();
   range = 200;
   lifeTime = 800;
   age = 0;
-
   size = 0;
-
   enemies = [];
 
   update() {
     this.age += deltaTime;
-    if (this.age >= this.lifeTime) {
-      this.toRemove = true;
-    }
+    if (this.age >= this.lifeTime) this.toRemove = true;
   }
 
   draw() {
@@ -74,5 +69,15 @@ export class LeeSin_E_Object extends SpellObject {
       circle(enemy.position.x, enemy.position.y, enemy.stats.size.value + sizeIncrease);
     });
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

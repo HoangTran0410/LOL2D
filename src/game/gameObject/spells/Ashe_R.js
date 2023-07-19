@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import Spell from '../Spell.js';
@@ -41,6 +42,10 @@ export class Ashe_R_Object extends SpellObject {
     trailSize: this.size / 1.5,
     trailColor: [100, 100, 200, 50],
   });
+
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
 
   update() {
     this.age += deltaTime;
@@ -92,8 +97,6 @@ export class Ashe_R_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
-
     push();
 
     // expore
@@ -120,18 +123,28 @@ export class Ashe_R_Object extends SpellObject {
       fill(50, 50, 200);
       rect(-60, -10, 30, 20);
       triangle(
-        this.randSize(),
+        this._randSize(),
         0,
-        -this.randSize(),
-        -this.randSize() / 2,
-        -this.randSize(),
-        this.randSize() / 2
+        -this._randSize(),
+        -this._randSize() / 2,
+        -this._randSize(),
+        this._randSize() / 2
       );
     }
     pop();
   }
 
-  randSize() {
+  _randSize() {
     return random(this.size / 1.5, this.size * 1.5);
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

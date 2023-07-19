@@ -1,4 +1,4 @@
-import { Circle } from '../../../../libs/quadtree.js';
+import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
@@ -48,6 +48,10 @@ export class Ahri_E_Object extends SpellObject {
     trailSize: this.size,
   });
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
+
   update() {
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
     this.trailSystem.addTrail(this.position);
@@ -57,7 +61,6 @@ export class Ahri_E_Object extends SpellObject {
     }
 
     let enemies = this.game.objectManager.queryObjects({
-      debug: true,
       area: new Circle({
         x: this.position.x,
         y: this.position.y,
@@ -76,7 +79,6 @@ export class Ahri_E_Object extends SpellObject {
     let enemy = enemies?.[0];
 
     if (enemy) {
-      console.log(enemies);
       let charmBuff = new Charm(this.charmTime, this.owner, enemy);
       charmBuff.image = AssetManager.getAsset('spell_ahri_e');
       charmBuff.speed = 1;
@@ -87,8 +89,6 @@ export class Ahri_E_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
-
     push();
     let alpha = map(this.position.dist(this.destination), this.range, 0, 255, 50);
     noStroke();
@@ -99,5 +99,15 @@ export class Ahri_E_Object extends SpellObject {
       this.size + random(-3, 3)
     );
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

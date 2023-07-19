@@ -36,7 +36,7 @@ export default class FogOfWar {
 
   calculateSight() {
     // get objects of player team
-    let { x, y, w, h } = this.game.camera.getViewBounds();
+    let { x, y, w, h } = this.game.camera.getBoundingBox();
     let allyObjects = this.game.objectManager.queryObjects({
       filters: [
         PredefinedFilters.teamId(this.game.player.teamId),

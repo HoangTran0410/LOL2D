@@ -4,6 +4,7 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 
 export default class Leblanc_W extends Spell {
   PHASES = {
@@ -51,7 +52,9 @@ export default class Leblanc_W extends Spell {
       );
 
       // dash owner to destination
-      let dashBuff = new Leblanc_W_Buff(2000, this.owner, this.owner);
+      let dashBuff = new Dash(2000, this.owner, this.owner);
+      dashBuff.image = AssetManager.getAsset('spell_leblanc_w1');
+      dashBuff.dashSpeed = 10;
       dashBuff.dashDestination = destination;
       dashBuff.onReachedDestination = () => {
         // effect at destination
@@ -104,13 +107,6 @@ export default class Leblanc_W extends Spell {
   }
 }
 
-export class Leblanc_W_Buff extends Dash {
-  image = AssetManager.getAsset('spell_leblanc_w1');
-  buffAddType = BuffAddType.REPLACE_EXISTING;
-  dashSpeed = 10;
-  dashDestination = createVector();
-}
-
 export class Leblanc_W_Object extends SpellObject {
   position = createVector();
   lifeTime = 3000;
@@ -118,10 +114,7 @@ export class Leblanc_W_Object extends SpellObject {
 
   update() {
     this.age += deltaTime;
-
-    if (this.age >= this.lifeTime) {
-      this.toRemove = true;
-    }
+    if (this.age >= this.lifeTime) this.toRemove = true;
   }
 
   draw() {
@@ -136,6 +129,16 @@ export class Leblanc_W_Object extends SpellObject {
     circle(this.position.x, this.position.y, size);
     pop();
   }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.owner.stats.size.value / 2,
+      y: this.position.y - this.owner.stats.size.value / 2,
+      w: this.owner.stats.size.value,
+      h: this.owner.stats.size.value,
+      data: this,
+    });
+  }
 }
 
 export class Leblanc_W_Object2 extends Leblanc_W_Object {
@@ -143,10 +146,19 @@ export class Leblanc_W_Object2 extends Leblanc_W_Object {
   draw() {
     push();
     let alpha = map(this.age, 0, this.lifeTime, 200, 0);
-
     stroke(100, alpha + 50);
     fill(200, 200, 50, alpha);
     circle(this.position.x, this.position.y, this.size);
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

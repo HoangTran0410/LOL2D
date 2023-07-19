@@ -4,7 +4,7 @@ import SpellObject from '../SpellObject.js';
 import { StatModifier } from '../Stat.js';
 import Speedup from '../buffs/Speedup.js';
 import CombatText from '../helpers/CombatText.js';
-import ParticleSystem from '../helpers/ParticleSystem.js';
+import ParticleSystem, { PredefinedParticleSystems } from '../helpers/ParticleSystem.js';
 
 export default class Heal extends Spell {
   name = 'Hồi Máu (Heal)';
@@ -48,44 +48,24 @@ export default class Heal extends Spell {
 
 export class Heal_Object extends SpellObject {
   age = 0;
-  maxAge = 90;
+  lifeTime = 1000;
 
-  particleSystem = new ParticleSystem({
-    isDeadFn: p => p.life <= 0,
-    updateFn: p => {
-      p.x += random(-2, 2);
-      p.y -= random(3);
-      p.life--;
-    },
-    drawFn: p => {
-      let alpha = map(p.life, 0, 60, 0, 200);
-      stroke(0, 255, 0, alpha);
-      strokeWeight(3);
+  particleSystem = PredefinedParticleSystems.heal();
 
-      // chữ thập
-      line(p.x - 5, p.y, p.x + 5, p.y);
-      line(p.x, p.y - 5, p.x, p.y + 5);
-    },
-  });
+  onAdded() {
+    this.game.objectManager.addObject(this.particleSystem);
+  }
 
   update() {
-    if (this.age < this.maxAge && random() < 0.15) {
+    this.age += deltaTime;
+    if (this.age > this.lifeTime) this.toRemove = true;
+
+    if (random() < 0.15) {
       let size = this.owner.stats.size.value / 2;
       this.particleSystem.addParticle({
         x: this.owner.position.x + random(-size, size),
         y: this.owner.position.y + random(-size, size),
-        life: 60,
       });
     }
-    this.particleSystem.update();
-
-    this.age++;
-    if (this.age > 120 && this.particleSystem.toRemove) {
-      this.toRemove = true;
-    }
-  }
-
-  draw() {
-    this.particleSystem.draw();
   }
 }

@@ -1,3 +1,4 @@
+import { Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import Spell from '../Spell.js';
@@ -94,6 +95,10 @@ export class Ahri_R_Object extends SpellObject {
     trailSize: this.size,
   });
 
+  onAdded() {
+    this.game.objectManager.addObject(this.trailSystem);
+  }
+
   update() {
     VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.speed);
     this.trailSystem.addTrail(this.position);
@@ -105,8 +110,6 @@ export class Ahri_R_Object extends SpellObject {
   }
 
   draw() {
-    this.trailSystem.draw();
-
     push();
     noStroke();
     fill(150, 150, 255);
@@ -116,5 +119,15 @@ export class Ahri_R_Object extends SpellObject {
     let lightningCount = 10;
     for (let i = 0; i < lightningCount; i++) {}
     pop();
+  }
+
+  getBoundingBox() {
+    return new Rectangle({
+      x: this.position.x - this.size / 2,
+      y: this.position.y - this.size / 2,
+      w: this.size,
+      h: this.size,
+      data: this,
+    });
   }
 }

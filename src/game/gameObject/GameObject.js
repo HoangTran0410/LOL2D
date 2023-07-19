@@ -54,6 +54,15 @@ export default class GameObject {
     });
   }
 
+  drawBoundingBox() {
+    let bb = this.getBoundingBox();
+    push();
+    stroke(255, 0, 0);
+    noFill();
+    rect(bb.x, bb.y, bb.w, bb.h);
+    pop();
+  }
+
   // isCollidingWith(other) {
   //   return this.position.dist(other.position) <= this.collisionRadius + other.collisionRadius;
   // }

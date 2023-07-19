@@ -1,5 +1,7 @@
 // https://github.com/timohausmann/quadtree-ts
 
+import CollideUtils from '../src/utils/collide.utils.js';
+
 class Quadtree {
   constructor({ x = 0, y = 0, w, h, maxObjects = 10, maxLevels = 4 } = {}, level = 0) {
     this.bounds = { x, y, w, h };
@@ -10,29 +12,29 @@ class Quadtree {
     this.nodes = [];
   }
 
-  getIndex(obj) {
-    return obj.qtIndex(this.bounds);
+  getIndex(areaObj) {
+    return areaObj.qtIndex(this.bounds);
   }
 
   split() {
     const level = this.level + 1,
-      width = this.bounds.w / 2,
-      height = this.bounds.h / 2,
+      w = this.bounds.w / 2,
+      h = this.bounds.h / 2,
       x = this.bounds.x,
       y = this.bounds.y;
     const coords = [
-      { x: x + width, y: y },
+      { x: x + w, y: y },
       { x: x, y: y },
-      { x: x, y: y + height },
-      { x: x + width, y: y + height },
+      { x: x, y: y + h },
+      { x: x + w, y: y + h },
     ];
     for (let i = 0; i < 4; i++) {
       this.nodes[i] = new Quadtree(
         {
           x: coords[i].x,
           y: coords[i].y,
-          w: width,
-          h: height,
+          w: w,
+          h: h,
           maxObjects: this.maxObjects,
           maxLevels: this.maxLevels,
         },
@@ -41,17 +43,17 @@ class Quadtree {
     }
   }
 
-  insert(obj) {
+  insert(areaObj) {
     //if we have subnodes, call insert on matching subnodes
     if (this.nodes.length) {
-      const indexes = this.getIndex(obj);
+      const indexes = this.getIndex(areaObj);
       for (let i = 0; i < indexes.length; i++) {
-        this.nodes[indexes[i]].insert(obj);
+        this.nodes[indexes[i]].insert(areaObj);
       }
       return;
     }
     //otherwise, store object here
-    this.objects.push(obj);
+    this.objects.push(areaObj);
     //maxObjects reached
     if (this.objects.length > this.maxObjects && this.level < this.maxLevels) {
       //split if we don't already have subnodes
@@ -70,19 +72,18 @@ class Quadtree {
     }
   }
 
-  retrieve(obj) {
-    const indexes = this.getIndex(obj);
+  retrieve(areaObj) {
+    const indexes = this.getIndex(areaObj);
     let returnObjects = this.objects;
-    //if we have subnodes, retrieve their objects
+    // if we have subnodes, retrieve their objects
     if (this.nodes.length) {
       for (let i = 0; i < indexes.length; i++) {
-        returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(obj));
+        returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(areaObj));
       }
     }
     //remove duplicates
-    returnObjects = returnObjects.filter(function (item, index) {
-      return returnObjects.indexOf(item) >= index;
-    });
+    returnObjects = returnObjects.filter((item, index) => returnObjects.indexOf(item) >= index);
+    returnObjects = returnObjects.filter(item => areaObj.intersect(item));
     return returnObjects;
   }
 
@@ -97,6 +98,7 @@ class Quadtree {
   }
 }
 
+// ======== AREA OBJECTS ========
 class Rectangle {
   constructor({ x, y, w, h, data }) {
     this.x = x;
@@ -131,6 +133,19 @@ class Rectangle {
       indexes.push(3);
     }
     return indexes;
+  }
+
+  // prettier-ignore
+  intersect(other) {
+    if (other instanceof Rectangle) {
+      return CollideUtils.rectRect(this.x, this.y, this.w, this.h, other.x, other.y, other.w, other.h);
+    }
+    if (other instanceof Circle) {
+      return CollideUtils.circleRect(other.x, other.y, other.r, this.x, this.y, this.w, this.h);
+    }
+    if (other instanceof Line) {
+      return CollideUtils.lineRect(other.x1, other.y1, other.x2, other.y2, this.x, this.y, this.w, this.h);
+    }
   }
 }
 
@@ -178,6 +193,19 @@ class Circle {
     const deltaX = x - Math.max(minX, Math.min(x, maxX));
     const deltaY = y - Math.max(minY, Math.min(y, maxY));
     return deltaX * deltaX + deltaY * deltaY < r * r;
+  }
+
+  // prettier-ignore
+  intersect(other) {
+    if (other instanceof Rectangle) {
+      return CollideUtils.circleRect(this.x, this.y, this.r, other.x, other.y, other.w, other.h);
+    }
+    if (other instanceof Circle) {
+      return CollideUtils.circleCircle(this.x, this.y, this.r, other.x, other.y, other.r);
+    }
+    if (other instanceof Line) {
+      return CollideUtils.lineCircle(other.x1, other.y1, other.x2, other.y2, this.x, this.y, this.r);
+    }
   }
 }
 
@@ -248,6 +276,19 @@ class Line {
     x = (maxY - y1) / m + x1;
     if (x > minX && x < maxX) return true;
     return false;
+  }
+
+  // prettier-ignore
+  intersect(other) {
+    if (other instanceof Rectangle) {
+      return CollideUtils.lineRect(this.x1, this.y1, this.x2, this.y2, other.x, other.y, other.w, other.h);
+    }
+    if (other instanceof Circle) {
+      return CollideUtils.lineCircle(this.x1, this.y1, this.x2, this.y2, other.x, other.y, other.r);
+    }
+    if (other instanceof Line) {
+      return CollideUtils.lineLine(this.x1, this.y1, this.x2, this.y2, other.x1, other.y1, other.x2, other.y2);
+    }
   }
 }
 
