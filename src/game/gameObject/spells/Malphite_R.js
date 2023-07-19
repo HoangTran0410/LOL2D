@@ -4,7 +4,6 @@ import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
-import ParticleSystem from '../helpers/ParticleSystem.js';
 
 export default class Malphite_R extends Spell {
   image = AssetManager.getAsset('spell_malphite_r');
