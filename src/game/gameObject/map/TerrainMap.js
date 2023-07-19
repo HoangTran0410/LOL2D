@@ -44,12 +44,7 @@ export default class TerrainMap {
     for (let { vertices, type } of polygons) {
       let o = new Obstacle(0, 0, Obstacle.arrayToVertices(vertices), type);
       this.obstacles.push(o);
-
-      const rectangle = new Rectangle({
-        ...o.getBoundingBox(), // quadtree node
-        data: o, // obstacle instance
-      });
-      this.quadtree.insert(rectangle);
+      this.quadtree.insert(o.getBoundingBox());
     }
   }
 

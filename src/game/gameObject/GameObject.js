@@ -46,10 +46,10 @@ export default class GameObject {
 
   getBoundingBox() {
     return new Rectangle({
-      x: this.position.x - this.collisionRadius,
-      y: this.position.y - this.collisionRadius,
-      w: this.collisionRadius * 2,
-      h: this.collisionRadius * 2,
+      x: this.position.x - this.visionRadius,
+      y: this.position.y - this.visionRadius,
+      w: this.visionRadius * 2,
+      h: this.visionRadius * 2,
       data: this,
     });
   }

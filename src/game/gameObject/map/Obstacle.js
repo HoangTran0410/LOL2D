@@ -1,4 +1,5 @@
 import SAT from '../../../../libs/SAT.js';
+import { Rectangle } from '../../../../libs/quadtree.js';
 import TerrainType from '../../enums/TerrainType.js';
 
 export default class Obstacle {
@@ -71,12 +72,13 @@ export default class Obstacle {
       maxY = max(maxY, y);
     }
 
-    return {
+    return new Rectangle({
       x: minX,
       y: minY,
       w: maxX - minX,
       h: maxY - minY,
-    };
+      data: this,
+    });
   }
 
   toSATPolygon(getCached = true) {

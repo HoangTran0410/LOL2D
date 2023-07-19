@@ -24,7 +24,7 @@ export default class Stats {
     this.health = new Stat(100);
     this.maxMana = new Stat(500);
     this.mana = new Stat(500);
-    this.speed = new Stat(3);
+    this.speed = new Stat(2.5);
     this.size = new Stat(55);
     this.height = new Stat(0);
     this.manaRegen = new Stat(0.1);
