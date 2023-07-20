@@ -5,7 +5,6 @@ import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');

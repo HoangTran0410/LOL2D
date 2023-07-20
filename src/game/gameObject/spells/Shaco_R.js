@@ -2,7 +2,6 @@ import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Champion from '../attackableUnits/Champion.js';
 import Fear from '../buffs/Fear.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';

@@ -4,7 +4,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Charm from '../buffs/Charm.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 

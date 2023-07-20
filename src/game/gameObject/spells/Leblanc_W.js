@@ -6,7 +6,6 @@ import Dash from '../buffs/Dash.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Leblanc_W extends Spell {
   PHASES = {

@@ -8,7 +8,6 @@ import RootBuff from '../buffs/Root.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';

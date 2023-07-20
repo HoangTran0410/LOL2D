@@ -4,7 +4,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Stun from '../buffs/Stun.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -67,12 +66,7 @@ export class Ashe_R_Object extends SpellObject {
           y: this.position.y,
           r: this.size / 4,
         }),
-        filters: [
-          PredefinedFilters.type(AttackableUnit),
-          PredefinedFilters.excludeUntargetable,
-          PredefinedFilters.excludeDead,
-          PredefinedFilters.excludeTeamId(this.owner.teamId),
-        ],
+        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
       });
 
       if (enemies?.length > 0) {

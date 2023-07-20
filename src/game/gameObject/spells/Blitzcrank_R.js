@@ -3,7 +3,6 @@ import AssetManager from '../../../managers/AssetManager.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Silence from '../buffs/Silence.js';
 
 export default class Blitzcrank_R extends Spell {

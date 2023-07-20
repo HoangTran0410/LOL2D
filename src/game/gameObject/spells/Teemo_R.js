@@ -5,7 +5,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Slow from '../buffs/Slow.js';
 
 export default class Teemo_R extends Spell {
@@ -102,12 +101,7 @@ export class Teemo_R_Object extends SpellObject {
             y: this.position.y,
             r: this.size / 2,
           }),
-          filters: [
-            PredefinedFilters.type(AttackableUnit),
-            PredefinedFilters.excludeUntargetable,
-            PredefinedFilters.excludeDead,
-            PredefinedFilters.excludeTeamId(this.owner.teamId),
-          ],
+          filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
         });
 
         let enemyStepIn = enemies?.[0];

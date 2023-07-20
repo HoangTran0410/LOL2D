@@ -4,7 +4,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import Dash from '../buffs/Dash.js';
 import Speedup from '../buffs/Speedup.js';
@@ -36,10 +35,7 @@ export default class Yasuo_R extends Spell {
         r: this.rangeToFindEnemies,
       }),
       filters: [
-        PredefinedFilters.type(AttackableUnit),
-        PredefinedFilters.excludeUntargetable,
-        PredefinedFilters.excludeDead,
-        PredefinedFilters.excludeTeamId(this.owner.teamId),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         p => p.buffs.filter(buff => buff.sourceUnit != p && buff instanceof Airborne)?.length > 0,
       ],
     });

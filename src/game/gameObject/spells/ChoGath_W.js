@@ -5,7 +5,6 @@ import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Root from '../buffs/Root.js';
 import Stun from '../buffs/Stun.js';
 

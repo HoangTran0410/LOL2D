@@ -7,7 +7,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');

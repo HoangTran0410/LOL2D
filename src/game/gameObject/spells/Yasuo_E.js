@@ -3,7 +3,6 @@ import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Dash from '../buffs/Dash.js';
 
 export default class Yasuo_E extends Spell {

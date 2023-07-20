@@ -6,7 +6,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import RootBuff from '../buffs/Root.js';
 
@@ -142,10 +141,7 @@ export class Yasuo_Q_Object extends SpellObject {
         r: this.currentRayLength,
       }),
       filters: [
-        PredefinedFilters.type(AttackableUnit),
-        PredefinedFilters.excludeUntargetable,
-        PredefinedFilters.excludeDead,
-        PredefinedFilters.excludeTeamId(this.owner.teamId),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.excludeObjects(this.playersEffected),
         o => {
           let vertices = rectToVertices(

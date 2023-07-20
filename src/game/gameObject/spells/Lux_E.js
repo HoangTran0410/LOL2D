@@ -3,11 +3,8 @@ import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
 import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import Buff from '../Buff.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import { StatsModifier } from '../Stats.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Slow from '../buffs/Slow.js';
 
 export default class Lux_E extends Spell {

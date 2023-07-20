@@ -7,7 +7,6 @@ import TrailSystem from '../helpers/TrailSystem.js';
 import TrueSight from '../buffs/TrueSight.js';
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 
 export default class LeeSin_Q extends Spell {
   static PHASES = {

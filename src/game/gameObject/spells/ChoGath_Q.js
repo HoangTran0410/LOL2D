@@ -3,7 +3,6 @@ import AssetManager from '../../../managers/AssetManager.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Airborne from '../buffs/Airborne.js';
 import Slow from '../buffs/Slow.js';
 

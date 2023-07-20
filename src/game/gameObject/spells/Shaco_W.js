@@ -4,7 +4,6 @@ import VectorUtils from '../../../utils/vector.utils.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
 import SpellObject from '../SpellObject.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import Fear from '../buffs/Fear.js';
 import TrailSystem from '../helpers/TrailSystem.js';
 
@@ -115,12 +114,7 @@ export class Shaco_W_Object extends SpellObject {
             y: this.position.y,
             r: this.attackRange,
           }),
-          filters: [
-            PredefinedFilters.type(AttackableUnit),
-            PredefinedFilters.excludeUntargetable,
-            PredefinedFilters.excludeDead,
-            PredefinedFilters.excludeTeamId(this.owner.teamId),
-          ],
+          filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
         });
 
         if (enemies.length > 0) {

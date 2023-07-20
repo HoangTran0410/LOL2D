@@ -2,7 +2,6 @@ import { Circle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
 import Spell from '../Spell.js';
-import AttackableUnit from '../attackableUnits/AttackableUnit.js';
 import { Shaco_W_Bullet_Object } from './Shaco_W.js';
 
 export default class Shaco_E extends Spell {
