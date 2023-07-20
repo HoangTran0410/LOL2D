@@ -1,5 +1,6 @@
 import * as funcs from './sketch.js';
 import { every, filter, forEach, map, some } from './utils/optimized.utils.js';
+import * as ABC from '../libs/detect-collisions.js';
 
 for (let key in funcs) {
   window[key] = funcs[key];
