@@ -153,10 +153,7 @@ export class LeeSin_R_Object extends SpellObject {
         r: this.targetEnemy.stats.size.value / 2,
       }),
       filters: [
-        PredefinedFilters.type(AttackableUnit),
-        PredefinedFilters.excludeUntargetable,
-        PredefinedFilters.excludeDead,
-        PredefinedFilters.excludeTeamId(this.owner.teamId),
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.excludeObjects([this.targetEnemy, ...this.effectedEnemies]),
       ],
     });

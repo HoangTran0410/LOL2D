@@ -66,7 +66,9 @@ export default class GameScene extends Scene {
     checkUpdateAnalys.begin();
     if (elapsedTime > interval) {
       previousTime = currentTime - (elapsedTime % interval);
+      let count = 0;
       for (let i = 0; i < Math.floor(Math.min(elapsedTime, 100) / interval); i++) {
+        if (++count > 1) console.log('update ' + count);
         realUpdateAnalys.begin();
         this.game.update();
         realUpdateAnalys.end();
@@ -76,7 +78,7 @@ export default class GameScene extends Scene {
 
     setTimeout(() => {
       this.updateLoop();
-    }, interval);
+    }, interval / 2);
 
     // this.animationFrameId = requestAnimationFrame(this.updateLoop.bind(this));
   }

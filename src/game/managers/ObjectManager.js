@@ -19,14 +19,14 @@ const DisplayZIndex = [
 export default class ObjectManager {
   objects = [];
   _objectToBeAdd = [];
-  _objectQuadtree = null;
-  _quadtreeInUpdating = false;
+  _objectsTree = null;
+  _objectsTreeIsUpdating = false;
 
   constructor(game) {
     this.game = game;
 
     let mapSize = this.game.mapSize;
-    this._objectQuadtree = new Quadtree({
+    this._objectsTree = new Quadtree({
       x: 0,
       y: 0,
       w: mapSize,
@@ -63,12 +63,12 @@ export default class ObjectManager {
     }
 
     // update quadtree
-    this._quadtreeInUpdating = true;
-    this._objectQuadtree.clear();
+    this._objectsTreeIsUpdating = true;
+    this._objectsTree.clear();
     for (let o of this.objects) {
-      this._objectQuadtree.insert(o.getDisplayBoundingBox());
+      this._objectsTree.insert(o.getDisplayBoundingBox());
     }
-    this._quadtreeInUpdating = false;
+    this._objectsTreeIsUpdating = false;
   }
 
   draw() {
@@ -106,13 +106,13 @@ export default class ObjectManager {
   }
 
   queryObjects({ area, filters, queryByDisplayBoundingBox = false }) {
-    if (this._quadtreeInUpdating) {
+    if (this._objectsTreeIsUpdating) {
       console.warn('Quadtree is updating, this may cause unexpected result.');
     }
 
     let objects;
     if (area) {
-      objects = this._objectQuadtree.retrieve(area).map(r => r.data);
+      objects = this._objectsTree.retrieve(area).map(r => r.data);
     } else {
       objects = this.objects;
     }

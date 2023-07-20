@@ -72,18 +72,23 @@ class Quadtree {
     }
   }
 
-  retrieve(areaObj) {
+  retrieve(areaObj, cleanUp = true) {
     const indexes = this.getIndex(areaObj);
     let returnObjects = this.objects;
     // if we have subnodes, retrieve their objects
     if (this.nodes.length) {
       for (let i = 0; i < indexes.length; i++) {
-        returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(areaObj));
+        returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(areaObj, false));
       }
     }
-    //remove duplicates
-    returnObjects = returnObjects.filter((item, index) => returnObjects.indexOf(item) >= index);
-    returnObjects = returnObjects.filter(item => areaObj.intersect(item));
+
+    // only clean up at the root of recursive calls
+    if (cleanUp) {
+      //remove duplicates
+      returnObjects = returnObjects.filter((item, index) => returnObjects.indexOf(item) >= index);
+      //get only objects that really intersect with areaObj
+      returnObjects = returnObjects.filter(item => areaObj.intersect(item));
+    }
     return returnObjects;
   }
 
@@ -106,6 +111,7 @@ class Rectangle {
     this.w = w;
     this.h = h;
     this.data = data;
+    this.bounds = { minX: x, minY: y, maxX: x + w, maxY: y + h }; // for BVH
   }
 
   qtIndex({ x, y, w, h }) {
@@ -155,6 +161,7 @@ class Circle {
     this.y = y;
     this.r = r;
     this.data = data;
+    this.bounds = { minX: x - r, minY: y - r, maxX: x + r, maxY: y + r }; // for BVH
   }
 
   qtIndex({ x, y, w, h }) {
@@ -216,6 +223,12 @@ class Line {
     this.x2 = x2;
     this.y2 = y2;
     this.data = data;
+    this.bounds = {
+      minX: Math.min(x1, x2),
+      minY: Math.min(y1, y2),
+      maxX: Math.max(x1, x2),
+      maxY: Math.max(y1, y2),
+    }; // for BVH
   }
 
   qtIndex({ x, y, w, h }) {
