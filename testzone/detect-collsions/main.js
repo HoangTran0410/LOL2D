@@ -13,7 +13,7 @@ window.setup = () => {
   stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
   document.body.appendChild(stats.dom);
 
-  test = new Stress(1000);
+  test = new Stress(2000);
   test.start();
 };
 
@@ -44,7 +44,7 @@ function makeLoop(callback) {
 
 class Stress {
   constructor(count = 2000) {
-    const size = Math.sqrt((width * height) / (count * 20));
+    const size = Math.sqrt((width * height) / (count * 10));
 
     this.physics = new System(5);
     this.bodies = [];
@@ -76,13 +76,6 @@ class Stress {
       this.createShape(!random(0, 20), size);
     }
 
-    this.legend = `<div><b>Total:</b> ${count}</div>
-      <div><b>Polygons:</b> ${this.polygons}</div>
-      <div><b>Boxes:</b> ${this.boxes}</div>
-      <div><b>Circles:</b> ${this.circles}</div>
-      <div><b>Ellipses:</b> ${this.ellipses}</div>
-      <div><b>Lines:</b> ${this.lines}</div>`;
-
     this.lastTime = Date.now();
     this.updateBody = this.updateBody.bind(this);
     this.checkBounce = this.checkBounce.bind(this);
@@ -90,6 +83,14 @@ class Stress {
     this.start = () => {
       makeLoop(this.update.bind(this));
     };
+
+    this.legendDom = document.querySelector('#legend');
+    this.legendDom.innerHTML = `<div><b>Total:</b> ${this.count}</div>
+    <div><b>Polygons:</b> ${this.polygons}</div>
+    <div><b>Boxes:</b> ${this.boxes}</div>
+    <div><b>Circles:</b> ${this.circles}</div>
+    <div><b>Ellipses:</b> ${this.ellipses}</div>
+    <div><b>Lines:</b> ${this.lines}</div>`;
   }
 
   update() {
