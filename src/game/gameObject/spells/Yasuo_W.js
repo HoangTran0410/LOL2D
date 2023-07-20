@@ -66,18 +66,16 @@ export class Yasuo_W_Object extends SpellObject {
       y: this.animatedPosition.y,
     });
 
-    let objs = this.game.objectManager.queryObjects({
+    let spellObjects = this.game.objectManager.queryObjects({
+      queryByDisplayBoundingBox: true,
       filters: [
-        PredefinedFilters.type(SpellObject),
-        PredefinedFilters.excludeObjects([this]),
-        o =>
-          o.isMissile &&
-          o.owner !== this.owner &&
-          CollideUtils.pointPolygon(o.position.x, o.position.y, vertices),
+        PredefinedFilters.missileSpellObject,
+        PredefinedFilters.excludeTeamId(this.owner.teamId),
+        o => CollideUtils.pointPolygon(o.position.x, o.position.y, vertices),
       ],
     });
 
-    objs.forEach(o => {
+    spellObjects.forEach(o => {
       o.toRemove = true;
     });
 

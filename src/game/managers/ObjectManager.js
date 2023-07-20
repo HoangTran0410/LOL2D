@@ -150,6 +150,7 @@ export const PredefinedFilters = {
     if (typeof o.getCollideBoundingBox !== 'function') return false;
     return o.getCollideBoundingBox().intersect(area);
   },
+  missileSpellObject: o => o instanceof SpellObject && o.isMissile,
   canTakeDamage: o => o instanceof AttackableUnit && o.targetable && !o.isDead,
   canTakeDamageFromTeam: teamId => o =>
     o instanceof AttackableUnit && o.targetable && !o.isDead && o.teamId !== teamId,
