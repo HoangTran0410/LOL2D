@@ -17,8 +17,8 @@ export default class Game {
     this.camera = new Camera();
     this.objectManager = new ObjectManager(this);
     this.eventManager = new EventManager();
-    this.terrainMap = new TerrainMap(this, this.mapSize);
-    this.fogOfWar = new FogOfWar(this);
+    // this.terrainMap = new TerrainMap(this, this.mapSize);
+    // this.fogOfWar = new FogOfWar(this);
     this.inGameHUD = new InGameHUD(this);
 
     this.fps = 60;
@@ -32,7 +32,7 @@ export default class Game {
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
-        new AIChampion({
+        new Champion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getChampionPresetRandom(),
@@ -71,7 +71,7 @@ export default class Game {
     this.objectManager.update();
 
     // update terrain map, check for collision
-    this.terrainMap.update();
+    // this.terrainMap.update();
 
     if (mouseIsPressed && mouseButton === RIGHT) {
       this.player.moveTo(this.worldMouse.x, this.worldMouse.y);
@@ -104,7 +104,7 @@ export default class Game {
     background(30);
 
     this.camera.makeDraw(() => {
-      this.terrainMap.draw();
+      // this.terrainMap.draw();
       // this.terrainMap.drawEdges();
       // this.camera.drawGrid();
 
@@ -123,7 +123,7 @@ export default class Game {
       this.objectManager.draw();
     });
 
-    this.fogOfWar.draw(); // draw fog of war on top of everything
+    // this.fogOfWar.draw(); // draw fog of war on top of everything
   }
 
   destroy() {

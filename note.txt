@@ -1,0 +1,2 @@
+- deltaTime cannot be used in updateLoop anymore. because it's value based on drawLoop.
+- zed W's kill score need to add to owner's score => fixed

@@ -1,8 +1,6 @@
-// https://prozi.github.io/detect-collisions/modules.html
+// https://prozi.github.io/detect-collisions/index.html
 
 import detectCollisions from 'https://cdn.jsdelivr.net/npm/detect-collisions@9.1.1/+esm';
-
-console.log(detectCollisions);
 
 export const {
   // Enumerations
