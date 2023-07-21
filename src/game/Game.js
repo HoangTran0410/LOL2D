@@ -106,7 +106,7 @@ export default class Game {
     this.camera.makeDraw(() => {
       // this.terrainMap.draw();
       // this.terrainMap.drawEdges();
-      // this.camera.drawGrid();
+      this.camera.drawGrid();
 
       if (this.clickedPoint.size > 0) {
         push();
@@ -127,7 +127,7 @@ export default class Game {
   }
 
   destroy() {
-    this.fogOfWar.destroy();
+    // this.fogOfWar.destroy();
     this.inGameHUD.destroy();
   }
 
@@ -140,7 +140,7 @@ export default class Game {
   }
 
   resize(w, h) {
-    this.fogOfWar.resize(w, h);
+    // this.fogOfWar.resize(w, h);
   }
 
   keyPressed() {

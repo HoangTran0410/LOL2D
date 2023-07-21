@@ -1,95 +1,42 @@
-import { Circle, Line, Rectangle } from '../../../libs/quadtree.js';
 import { uuidv4 } from '../../utils/index.js';
+import TeamId from '../enums/TeamId.js';
+import { Box, Circle, Ellipse, Line, Point, Polygon } from '../../../libs/detect-collisions.js';
 
 export default class GameObject {
   toRemove = false;
-  willDraw = true;
-  isAffectedByFogOfWar = false;
+  // willDraw = true;
+  // isAffectedByFogOfWar = false;
   // _visibleByTeamIds = new Set();
   // _visibleForPlayers = new Set();
-  body = null;
+  _body = null;
 
-  constructor({
-    game,
-    position = createVector(),
-    collisionRadius = 25,
-    visionRadius = 0,
-    teamId = uuidv4(),
-    id = uuidv4(),
-  }) {
+  constructor({ game, visionRadius = 0, teamId = TeamId.TEAM_ALL, id = uuidv4() }) {
     this.game = game;
 
-    this.position = position;
-    this.collisionRadius = collisionRadius;
     this.visionRadius = visionRadius;
     this.teamId = teamId;
     this.id = id;
+  }
 
-    this.direction = createVector(0, 0);
+  get body() {
+    return this._body;
+  }
+
+  set body(body) {
+    this._body = body;
+    this._body.gameObject = this;
   }
 
   onAdded() {}
   onRemoved() {}
 
-  update() {}
+  update(dt) {}
   draw() {}
 
-  setTeamId(teamId) {
-    // TODO: remove vision from old team
-    // TODO: add vision to new team
-    this.teamId = teamId;
+  isCollidingWith(other) {
+    return this.game.objectManager.checkCollision(this, other);
   }
-
-  teleportTo(x, y) {
-    // TODO: get closest terrain exit
-    this.position.set(x, y);
-  }
-
-  getCollideBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.collisionRadius,
-      y: this.position.y - this.collisionRadius,
-      w: this.collisionRadius * 2,
-      h: this.collisionRadius * 2,
-      data: this,
-    });
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.visionRadius,
-      y: this.position.y - this.visionRadius,
-      w: this.visionRadius * 2,
-      h: this.visionRadius * 2,
-      data: this,
-    });
-  }
-
-  drawBoundingBox(collide = false) {
-    let bb = collide ? this.getCollideBoundingBox() : this.getDisplayBoundingBox();
-    if (!bb) return;
-    push();
-    stroke(255, 255, 0, 200);
-    strokeWeight(2);
-    noFill();
-    if (bb instanceof Rectangle) {
-      rect(bb.x, bb.y, bb.w, bb.h);
-    }
-    if (bb instanceof Circle) {
-      ellipse(bb.x, bb.y, bb.r * 2, bb.r * 2);
-    }
-    if (bb instanceof Line) {
-      line(bb.x1, bb.y1, bb.x2, bb.y2);
-    }
-    pop();
-  }
-
-  // isCollidingWith(other) {
-  //   return this.position.dist(other.position) <= this.collisionRadius + other.collisionRadius;
-  // }
-  // onCollision(other, isTerrain = false) {
-  //   // TODO: verify if this is needed
-  // }
+  onCollision(other) {}
 
   // onEnterVision(playerId, teamId) {}
   // onLeaveVision(playerId, teamId) {}

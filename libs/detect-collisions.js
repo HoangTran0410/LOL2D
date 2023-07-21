@@ -73,3 +73,23 @@ export const {
   polygonInPolygon,
   rad2deg,
 } = detectCollisions;
+
+// use p5.js to draw
+export const drawBody = body => {
+  switch (body.type) {
+    case BodyType.Point:
+      point(body.pos.x, body.pos.y);
+      break;
+    case BodyType.Line:
+    case BodyType.Polygon:
+    case BodyType.Ellipse:
+    case BodyType.Box:
+      beginShape();
+      body.calcPoints.forEach(p => vertex(p.x + body.pos.x, p.y + body.pos.y));
+      endShape(CLOSE);
+      break;
+    case BodyType.Circle:
+      circle(body.pos.x + body.offset.x, body.pos.y + body.offset.y, body.r * 2);
+      break;
+  }
+};

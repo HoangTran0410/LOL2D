@@ -1,4 +1,5 @@
 import SceneManager from './managers/SceneManager.js';
+import GameScene from './scenes/GameScene.js';
 import LoadingScene from './scenes/LoadingScene.js';
 
 export function setup() {
@@ -10,5 +11,5 @@ export function setup() {
   mgr.gameData = {};
 
   // open loading scene
-  mgr.showScene(LoadingScene);
+  mgr.showScene(GameScene);
 }

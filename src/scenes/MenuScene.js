@@ -46,7 +46,7 @@ export default class MenuScene extends Scene {
       this.nextBackground();
     }, 5000);
 
-    // this.sceneManager.showScene(GameScene);
+    this.sceneManager.showScene(GameScene);
   }
 
   exit() {

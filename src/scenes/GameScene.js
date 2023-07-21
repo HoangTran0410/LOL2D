@@ -1,4 +1,5 @@
-import Game from '../game/Game.js';
+// import Game from '../game/Game.js';
+import Game from '../game/gameObject/GameTest.js';
 import { Scene } from '../managers/SceneManager.js';
 import DomUtils from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';
@@ -69,11 +70,11 @@ export default class GameScene extends Scene {
 
       let _elapsedTime = Math.min(elapsedTime, 100);
       let _updateCount = Math.floor(_elapsedTime / interval);
-      for (let i = 0; i < _updateCount; i++) {
-        realUpdateAnalys.begin();
-        this.game.update();
-        realUpdateAnalys.end();
-      }
+      // for (let i = 0; i < _updateCount; i++) {
+      realUpdateAnalys.begin();
+      this.game.update();
+      realUpdateAnalys.end();
+      // }
     }
     checkUpdateAnalys.end();
 

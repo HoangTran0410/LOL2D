@@ -3,7 +3,6 @@ import SpellObject from '../gameObject/SpellObject.js';
 import Champion from '../gameObject/attackableUnits/Champion.js';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
 import CombatText from '../gameObject/helpers/CombatText.js';
-import { Quadtree } from '../../../libs/quadtree.js';
 import TrailSystem from '../gameObject/helpers/TrailSystem.js';
 import ParticleSystem from '../gameObject/helpers/ParticleSystem.js';
 
@@ -20,24 +19,10 @@ const DisplayZIndex = [
 export default class ObjectManager {
   objects = [];
   _objectToBeAdd = [];
-  _objectsTree = null;
-  _objectsTreeIsUpdating = false;
-
   _system = new System();
 
   constructor(game) {
     this.game = game;
-
-    let mapSize = this.game.mapSize;
-    this._objectsTree = new Quadtree({
-      x: 0,
-      y: 0,
-      w: mapSize,
-      h: mapSize,
-      maxObjects: 2,
-      maxLevels: 4,
-    });
-
     window.objectManager = this;
   }
 
@@ -71,31 +56,23 @@ export default class ObjectManager {
       this._objectToBeAdd = [];
     }
 
-    // update quadtree
-    this._objectsTreeIsUpdating = true;
-    this._objectsTree.clear();
-    for (let o of this.objects) {
-      this._objectsTree.insert(o.getDisplayBoundingBox());
-    }
-    this._objectsTreeIsUpdating = false;
-
     // update system
   }
 
   draw() {
-    let camBound = this.game.camera.getBoundingBox();
-    let objectsInCamera = this.queryObjects({
-      queryByDisplayBoundingBox: true,
-      area: camBound,
-    });
+    // let camBound = this.game.camera.getBoundingBox();
+    // let objectsInCamera = this.queryObjects({
+    //   queryByDisplayBoundingBox: true,
+    //   area: camBound,
+    // });
 
-    objectsInCamera.sort((a, b) => {
-      let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
-      let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
-      return aZIndex - bZIndex;
-    });
+    // objectsInCamera.sort((a, b) => {
+    //   let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
+    //   let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
+    //   return aZIndex - bZIndex;
+    // });
 
-    for (let o of objectsInCamera) {
+    for (let o of this.objects) {
       if (o.willDraw) o.draw?.();
       // o.drawBoundingBox?.(true);
     }
@@ -116,6 +93,18 @@ export default class ObjectManager {
     object.toRemove = true;
   }
 
+  checkCollision(a, b) {
+    if (!a.body || !b.body) return false;
+    return this._system.checkCollision(a.body, b.body);
+    // TODO return collision response
+  }
+
+  collisionCheckOne(a, callback) {
+    this._system.checkOne(a.body, response => {
+      callback(response);
+    });
+  }
+
   queryObjects({ area, filters, queryByDisplayBoundingBox = false }) {
     if (this._objectsTreeIsUpdating) {
       console.warn('Quadtree is updating, this may cause unexpected result.');
@@ -132,7 +121,6 @@ export default class ObjectManager {
       return objects;
     }
 
-    if (!queryByDisplayBoundingBox) filters.push(PredefinedFilters.collideWith(area));
     return objects.filter(o => filters.every(filter => filter(o)));
   }
 }
@@ -157,10 +145,6 @@ export const PredefinedFilters = {
     o =>
       o instanceof AttackableUnit &&
       p5.Vector.dist(o.position, pos) <= radius + (includeSize ? o.animatedValues.size / 2 : 0),
-  collideWith: area => o => {
-    if (typeof o.getCollideBoundingBox !== 'function') return false;
-    return o.getCollideBoundingBox().intersect(area);
-  },
   missileSpellObject: o => o instanceof SpellObject && o.isMissile,
   canTakeDamage: o => o instanceof AttackableUnit && o.targetable && !o.isDead,
   canTakeDamageFromTeam: teamId => o =>

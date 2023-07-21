@@ -321,16 +321,6 @@ export default class AttackableUnit extends GameObject {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
-  getCollideBoundingBox() {
-    let size = this.animatedValues.size;
-    return new Circle({
-      x: this.position.x,
-      y: this.position.y,
-      r: size / 2,
-      data: this,
-    });
-  }
-
   getDisplayBoundingBox() {
     let size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
     // let size = this.animatedValues.size;
