@@ -38,8 +38,8 @@ export class Shaco_W_Object extends SpellObject {
   age = 0;
 
   rangeToDraw = 0;
-  fearRange = 100;
-  attackRange = 150;
+  fearRange = 70;
+  attackRange = 100;
   attackCooldown = 500;
   attackDamage = 7;
   attackMaxCount = 3;

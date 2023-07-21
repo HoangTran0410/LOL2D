@@ -66,9 +66,10 @@ export default class GameScene extends Scene {
     checkUpdateAnalys.begin();
     if (elapsedTime > interval) {
       previousTime = currentTime - (elapsedTime % interval);
-      let count = 0;
-      for (let i = 0; i < Math.floor(Math.min(elapsedTime, 100) / interval); i++) {
-        if (++count > 1) console.log('update ' + count);
+
+      let _elapsedTime = Math.min(elapsedTime, 100);
+      let _updateCount = Math.floor(_elapsedTime / interval);
+      for (let i = 0; i < _updateCount; i++) {
         realUpdateAnalys.begin();
         this.game.update();
         realUpdateAnalys.end();

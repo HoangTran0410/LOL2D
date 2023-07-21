@@ -193,6 +193,14 @@ export class Zed_W_Clone extends Champion {
     this.smokeEffect.draw();
   }
 
+  get score() {
+    return this.owner?.score;
+  }
+
+  set score(value) {
+    if (this.owner) this.owner.score = value;
+  }
+
   drawHealthBar() {} // no health bar
   move() {} // no movement
 }
