@@ -7,9 +7,11 @@ Test tướng Liên minh huyền thoại ngay trên trình duyệt
 [Chơi Ngay](https://hoangtran0410.github.io/LOL2D)
 
 <!-- display screenshot -->
-![Screenshot](/assets/images/screenshots/Screenshot_2.png)
+![Screenshot](/assets/images/screenshots/Screenshot_1.jpg)
 
-![Screenshot](/assets/images/screenshots/Screenshot_1.png)
+![Screenshot](/assets/images/screenshots/Screenshot_4.jpg)
+
+![Screenshot](/assets/images/screenshots/Screenshot_3.jpg)
 
 ## Giới thiệu
 
