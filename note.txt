@@ -1,2 +1,5 @@
 - deltaTime cannot be used in updateLoop anymore. because it's value based on drawLoop.
 - zed W's kill score need to add to owner's score => fixed
+
+https://github.com/schteppe/poly-decomp.js/
+https://prozi.github.io/detect-collisions/index.html

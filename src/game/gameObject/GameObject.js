@@ -7,6 +7,7 @@ export default class GameObject {
   isAffectedByFogOfWar = false;
   // _visibleByTeamIds = new Set();
   // _visibleForPlayers = new Set();
+  body = null;
 
   constructor({
     game,

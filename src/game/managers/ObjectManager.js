@@ -1,3 +1,4 @@
+import { System } from '../../../libs/detect-collisions.js';
 import SpellObject from '../gameObject/SpellObject.js';
 import Champion from '../gameObject/attackableUnits/Champion.js';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
@@ -21,6 +22,8 @@ export default class ObjectManager {
   _objectToBeAdd = [];
   _objectsTree = null;
   _objectsTreeIsUpdating = false;
+
+  _system = new System();
 
   constructor(game) {
     this.game = game;
@@ -48,8 +51,11 @@ export default class ObjectManager {
     for (let i = this.objects.length - 1; i >= 0; i--) {
       const o = this.objects[i];
       if (o.toRemove) {
-        o.onRemoved?.();
         this.objects.splice(i, 1);
+        if (o.body) {
+          this._system.remove(o.body);
+        }
+        o.onRemoved?.();
       }
     }
 
@@ -57,6 +63,9 @@ export default class ObjectManager {
     if (this._objectToBeAdd.length > 0) {
       for (let o of this._objectToBeAdd) {
         this.objects.push(o);
+        if (o.body) {
+          this._system.insert(o.body);
+        }
         o.onAdded?.();
       }
       this._objectToBeAdd = [];
@@ -69,6 +78,8 @@ export default class ObjectManager {
       this._objectsTree.insert(o.getDisplayBoundingBox());
     }
     this._objectsTreeIsUpdating = false;
+
+    // update system
   }
 
   draw() {
