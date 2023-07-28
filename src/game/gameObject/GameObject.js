@@ -1,6 +1,5 @@
 import { uuidv4 } from '../../utils/index.js';
 import TeamId from '../enums/TeamId.js';
-import { Box, Circle, Ellipse, Line, Point, Polygon } from '../../../libs/detect-collisions.js';
 
 export default class GameObject {
   toRemove = false;
@@ -10,9 +9,16 @@ export default class GameObject {
   // _visibleForPlayers = new Set();
   _body = null;
 
-  constructor({ game, visionRadius = 0, teamId = TeamId.TEAM_ALL, id = uuidv4() }) {
+  constructor({
+    game,
+    position = createVector(0, 0),
+    visionRadius = 0,
+    teamId = uuidv4(),
+    id = uuidv4(),
+  }) {
     this.game = game;
 
+    this.position = position;
     this.visionRadius = visionRadius;
     this.teamId = teamId;
     this.id = id;

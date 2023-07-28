@@ -49,6 +49,8 @@ export default class Game {
     //   );
     // }
 
+    console.log(this.player);
+
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();
 

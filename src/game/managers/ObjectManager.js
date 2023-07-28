@@ -74,7 +74,8 @@ export default class ObjectManager {
     // });
 
     for (let o of this.objects) {
-      if (o.willDraw) o.draw?.();
+      // if (o.willDraw)
+      o.draw?.();
       // o.drawBoundingBox?.(true);
     }
 

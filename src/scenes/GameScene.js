@@ -1,5 +1,5 @@
 // import Game from '../game/Game.js';
-import Game from '../game/gameObject/GameTest.js';
+import Game from '../game/Game.js';
 import { Scene } from '../managers/SceneManager.js';
 import DomUtils from '../utils/dom.utils.js';
 import MenuScene from './MenuScene.js';

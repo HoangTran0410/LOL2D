@@ -23,7 +23,7 @@ export default class Champion extends AttackableUnit {
 
     this.score = 0;
     this.name = preset?.name;
-    this.spells = preset?.spells?.map?.(spell => new spell(this)) || [];
+    this.spells = preset?.spells?.map?.(spellClass => new spellClass(this)) || [];
   }
 
   update() {
