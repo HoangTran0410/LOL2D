@@ -1,3 +1,4 @@
+import { System } from '../../../libs/detect-collisions.js';
 import SpellObject from '../gameObject/SpellObject.js';
 import Champion from '../gameObject/attackableUnits/Champion.js';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit.js';
@@ -17,6 +18,7 @@ const DisplayZIndex = [
 ];
 
 export default class ObjectManager {
+  system = new System();
   objects = [];
   _objectToBeAdd = [];
   _objectsTree = null;
