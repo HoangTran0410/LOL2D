@@ -17,6 +17,7 @@ const DisplayZIndex = [
 ];
 
 export default class ObjectManager {
+  system = new System();
   objects = [];
   _objectToBeAdd = [];
   _system = new System();
