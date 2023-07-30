@@ -82,6 +82,19 @@ export default class FogOfWar {
       TerrainType.BUSH,
     ]);
 
+    // draw obstacles in sight
+    // this.overlay.noErase();
+    // this.overlay.fill('#e00');
+    // obstaclesInSight.forEach(o => {
+    //   this.overlay.beginShape();
+    //   o.vertices.forEach(v => {
+    //     let pos = this.game.camera.worldToScreen(v.x, v.y);
+    //     this.overlay.vertex(pos.x, pos.y);
+    //   });
+    //   this.overlay.endShape(CLOSE);
+    // });
+    // this.overlay.erase();
+
     // remove bushes that player is inside => player can see through that bushes
     obstaclesInSight = obstaclesInSight.filter(
       o =>
