@@ -15,9 +15,10 @@ export default class Ahri_W extends Spell {
   coolDown = 5000;
 
   onSpellCast() {
-    for (let i = 0; i < 3; i++) {
+    let count = 3;
+    for (let i = 0; i < count; i++) {
       let obj = new Ahri_W_Object(this.owner);
-      obj.angle = (i * 2 * PI) / 3;
+      obj.angle = (i * 2 * PI) / count;
       this.game.objectManager.addObject(obj);
     }
   }

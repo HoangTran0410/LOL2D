@@ -13,16 +13,16 @@ export default class Ashe_W extends Spell {
   name = 'Tán Xạ Tiễn (Ashe_W)';
   description =
     'Bắn ra <span>10 mũi tên</span> theo hình nón. Mỗi mũi tên gây <span class="damage">5 sát thương</span> và <span class="buff">Làm Chậm 75%</span> kẻ địch trúng chiêu trong <span class="time">1.5 giây</span>';
-  coolDown = 5000;
+  coolDown = 1000;
 
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
     let direction = mouse.sub(this.owner.position).normalize();
 
-    let arrowCount = 10;
+    let arrowCount = 15;
     let arrowLength = 500;
     let angle = direction.heading();
-    let angleStep = Math.PI / 20;
+    let angleStep = Math.PI / (arrowCount * 2);
 
     for (let i = 0; i < arrowCount; i++) {
       let _angle = angle - (angleStep * arrowCount) / 2 + angleStep * i;

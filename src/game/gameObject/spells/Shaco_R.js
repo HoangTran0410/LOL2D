@@ -149,13 +149,14 @@ class Shaco_R_Clone extends Champion {
     });
 
     // create 3 shaco W objects, place around dead clone
-    for (let i = 0; i < 3; i++) {
+    let count = 3;
+    for (let i = 0; i < count; i++) {
       let obj = new Shaco_W_Object(this.shacoR_championOwner);
       obj.lifeTime = 3000;
       obj.position = clonePos.copy();
       obj.destination = clonePos.copy().add(
-        Math.cos((i * 2 * Math.PI) / 3) * 100, // 100 is the radius
-        Math.sin((i * 2 * Math.PI) / 3) * 100
+        Math.cos((i * 2 * Math.PI) / count) * 100, // 100 is the radius
+        Math.sin((i * 2 * Math.PI) / count) * 100
       );
       this.game.objectManager.addObject(obj);
     }
