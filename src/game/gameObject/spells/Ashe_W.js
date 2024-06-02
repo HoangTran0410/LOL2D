@@ -13,7 +13,7 @@ export default class Ashe_W extends Spell {
   name = 'Tán Xạ Tiễn (Ashe_W)';
   description =
     'Bắn ra <span>10 mũi tên</span> theo hình nón. Mỗi mũi tên gây <span class="damage">5 sát thương</span> và <span class="buff">Làm Chậm 75%</span> kẻ địch trúng chiêu trong <span class="time">1.5 giây</span>';
-  coolDown = 1000;
+  coolDown = 5000;
 
   onSpellCast() {
     let mouse = this.game.worldMouse.copy();
