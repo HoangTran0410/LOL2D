@@ -30,10 +30,10 @@ export default class Yasuo_Q extends Spell {
   coolDown = 3500;
   manaCost = 20;
 
-  coolDownIfHit = 800;
+  coolDownIfHit = 500;
   hitStackCount = 0;
   lastHitTime = 0;
-  timeToResetHitStack = 3000;
+  timeToResetHitStack = 3500;
 
   changeState(newState) {
     this.phase = newState;
@@ -47,7 +47,7 @@ export default class Yasuo_Q extends Spell {
     // Q1, Q2
     if (this.phase == this.PHASES.Q1 || this.phase == this.PHASES.Q2) {
       const stunTime = 300,
-        range = 150,
+        range = 200,
         rayWidth = 30;
 
       let obj = new Yasuo_Q_Object(this.owner);
@@ -84,6 +84,8 @@ export default class Yasuo_Q extends Spell {
       tornado.airBorneTime = airBorneTime;
       tornado.speed = speed;
       this.game.objectManager.addObject(tornado);
+
+      this.changeState(this.PHASES.Q1);
     }
   }
 

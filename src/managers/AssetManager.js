@@ -16,6 +16,7 @@ const AssetPaths = {
   champ_olaf: 'assets/images/champions/olaf.png',
   champ_malphite: 'assets/images/champions/malphite.png',
   champ_veigar: 'assets/images/champions/veigar.png',
+  champ_graves: 'assets/images/champions/graves.png',
 
   // spells
   spell_stealthward: 'assets/images/spells/stealthward.png',
@@ -63,6 +64,7 @@ const AssetPaths = {
   spell_olaf_q: 'assets/images/spells/olaf_q.png',
   spell_zed_w: 'assets/images/spells/zed_w.png',
   spell_zed_w2: 'assets/images/spells/zed_w2.png',
+  spell_graves_w: 'assets/images/spells/graves_w.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',

@@ -5,7 +5,7 @@ import Camera from './gameObject/map/Camera.js';
 import FogOfWar from './gameObject/map/FogOfWar.js';
 import TerrainMap from './gameObject/map/TerrainMap.js';
 import InGameHUD from './hud/InGameHUD.js';
-import { ChampionPreset, MonsterPreset, getChampionPresetRandom } from './preset.js';
+import { MonsterPreset, getChampionPresetRandom } from './preset.js';
 import Monster from './gameObject/attackableUnits/Monster.js';
 import ObjectManager from './managers/ObjectManager.js';
 import EventManager from '../managers/EventManager.js';

@@ -34,3 +34,4 @@ export { default as Malphite_R } from './Malphite_R.js';
 export { default as Olaf_Q } from './Olaf_Q.js';
 export { default as StealthWard } from './StealthWard.js';
 export { default as Zed_W } from './Zed_W.js';
+export { default as Graves_W } from './Graves_W.js';
