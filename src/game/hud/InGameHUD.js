@@ -223,6 +223,21 @@ export default class InGameHUD {
                 </div>
               </div>
             </div>
+
+            <div class="change-logs">
+              <p class="title">Lịch sử cập nhật</p>
+
+              <p>
+              2024-09-12:
+                <ul>
+                  <li>MỚI: Graves W  - Bom mù</li>
+                  <li>MỚI: Cơ chế giảm tầm nhìn
+                  <li>CẬP NHẬT: Teemo R nay có thể nảy</li>
+                  <li>CẬP NHẬT: Giảm thời gian đợi Q2 của yasuo - tích cộng dồn nhanh hơn
+                  <li>Cập nhật hình ảnh các bộ chiêu thức</li>
+                </ul>
+              </p>
+            </div>
         </div>
       </div>
       `,

@@ -7,9 +7,11 @@ Play your favorite League of Legends champions right on your browser
 [Play Now](https://hoangtran0410.github.io/LOL2D)
 
 <!-- display screenshot -->
-![Screenshot](/assets/images/screenshots/Screenshot_2.png)
+![Screenshot](/assets/images/screenshots/Screenshot_1.jpg)
 
-![Screenshot](/assets/images/screenshots/Screenshot_1.png)
+![Screenshot](/assets/images/screenshots/Screenshot_4.jpg)
+
+![Screenshot](/assets/images/screenshots/Screenshot_3.jpg)
 
 ## Introduction
 
