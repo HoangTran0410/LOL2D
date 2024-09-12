@@ -11,7 +11,7 @@ export default class Teemo_R extends Spell {
   image = AssetManager.getAsset('spell_teemo_r');
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
-    'Đặt 1 bẫy độc tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>, phát nổ khi kẻ địch dẫm phải, <span class="buff">Làm Chậm 70%</span> các kẻ địch trong <span class="time">2 giây</span> và gây <span class="damage">30 sát thương</span>';
+    'Đặt 1 bẫy độc tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>, phát nổ khi kẻ địch dẫm phải, <span class="buff">Làm Chậm 70%</span> các kẻ địch trong <span class="time">2 giây</span> và gây <span class="damage">30 sát thương</span> <i>(sẽ nảy nếu đặt trên bẫy độc khác)</i>';
 
   coolDown = 3000;
 
@@ -33,6 +33,7 @@ export default class Teemo_R extends Spell {
     obj.invisibleAfter = invisibleAfter;
     obj.lifeTime = lifeTime;
     obj.explodeRange = explodeRange;
+    obj.throwRange = throwRange;
 
     this.game.objectManager.addObject(obj);
   }
@@ -54,8 +55,11 @@ export class Teemo_R_Object extends SpellObject {
   moveSpeed = 6;
   explodeRange = 200;
   explodeLifeTime = 1500;
+  throwRange = 100;
+  bouncedOn = [];
 
   size = 50;
+  curSize = this.size;
   angle = 0;
   mushroom_spots = [
     { x: 0, y: 0, r: 16 },
@@ -73,14 +77,48 @@ export class Teemo_R_Object extends SpellObject {
   phase = Teemo_R_Object.PHASES.MOVING;
 
   update() {
+    if (!this.originalPosition) {
+      this.originalPosition = this.position.copy();
+    }
+
+    // update size
+    this.curSize = lerp(this.curSize, this.size, 0.1);
+
     // moving phase
     if (this.phase === Teemo_R_Object.PHASES.MOVING) {
       VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
 
       if (this.position.dist(this.destination) < this.moveSpeed) {
-        this.position = this.destination.copy();
-        this.isMissile = false; // yasuo W cant block this
-        this.phase = Teemo_R_Object.PHASES.INVISIBLE;
+        // check collide with other teemo R
+        let others = this.game.objectManager.queryObjects({
+          area: new Circle({
+            x: this.destination.x,
+            y: this.destination.y,
+            r: this.size / 2,
+          }),
+          filters: [
+            o =>
+              o instanceof Teemo_R_Object &&
+              o.phase === Teemo_R_Object.PHASES.INVISIBLE &&
+              o !== this &&
+              this.bouncedOn.indexOf(o) === -1,
+          ],
+        });
+        if (others?.length > 0) {
+          const newDest = VectorUtils.moveVectorToVector(
+            this.originalPosition,
+            this.destination,
+            this.throwRange * 2
+          );
+          this.originalPosition = this.position.copy();
+          this.destination = newDest.copy();
+          this.bouncedOn.push(others[0]);
+          this.curSize = this.size + 10;
+        } else {
+          this.position = this.destination.copy();
+          this.isMissile = false; // yasuo W cant block this
+          this.phase = Teemo_R_Object.PHASES.INVISIBLE;
+        }
       }
     }
 
@@ -150,11 +188,12 @@ export class Teemo_R_Object extends SpellObject {
       let alpha =
         this.phase === Teemo_R_Object.PHASES.INVISIBLE && this.age > this.invisibleAfter ? 25 : 255;
       push();
-      // stroke(100, alpha);
-      noStroke();
+      stroke(150, alpha);
+      strokeWeight(this.curSize - this.size);
       fill(40, 97, 40, alpha);
-      circle(this.position.x, this.position.y, this.size);
+      circle(this.position.x, this.position.y, this.curSize);
 
+      noStroke();
       fill(114, 63, 127, alpha);
       for (let spot of this.mushroom_spots) {
         let x = spot.x * cos(this.angle) - spot.y * sin(this.angle);
