@@ -12,7 +12,7 @@ export default class Graves_W extends Spell {
   image = AssetManager.getAsset('spell_graves_w');
   name = 'Bom mù (Graves_W)';
   description =
-    'Tạo một làn khói tại khu vực chỉ định, <span class="buff">Giảm tầm nhìn</span> và <span class="buff">Làm chậm 40%</span> tất cả kẻ địch / đồng minh trong khu vực';
+    'Tạo một làn khói tại khu vực chỉ định trong <span class="time">5 giây</span>, <span class="buff">Giảm tầm nhìn</span> và <span class="buff">Làm chậm 40%</span> tất cả kẻ địch / đồng minh trong khu vực';
   coolDown = 5000;
 
   range = 350;
