@@ -82,6 +82,7 @@ export class Graves_W_Object extends SpellObject {
     enemies.forEach(enemy => {
       if (!enemy.hasBuff(Nearsight)) {
         let nearsight = new Nearsight(500, this.owner, enemy);
+        nearsight.newVisionRadius = this.range;
         enemy.addBuff(nearsight);
 
         let slow = new Slow(500, this.owner, enemy);
