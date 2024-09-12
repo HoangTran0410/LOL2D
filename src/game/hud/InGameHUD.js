@@ -45,6 +45,7 @@ export default class InGameHUD {
             return {
               name: group.name,
               image: AssetManager.getAsset(group.image)?.path,
+              background: group.background,
               spells: group.spells
                 .map(SpellClass => ({
                   spellInstance: new SpellClass(null),
@@ -61,6 +62,7 @@ export default class InGameHUD {
                 }),
             };
           }),
+          backgroundPicker: null,
         };
       },
       methods: {
@@ -110,6 +112,12 @@ export default class InGameHUD {
           this.spellHover = null;
           // }, 250);
         },
+        mouseoverGroup(group, event) {
+          if (group.background) this.backgroundPicker = group.background;
+        },
+        mouseoutGroup() {
+          this.backgroundPicker = null;
+        },
         showPreview(spellProxy, show) {
           try {
             let s = Vue.toRaw(spellProxy.instance);
@@ -130,7 +138,7 @@ export default class InGameHUD {
           });
         },
       },
-      template: `
+      template: /*html*/ `
       <div>
         <div v-if="spellHover" class="spell-info" :style="'bottom:'+spellInfo.bottom+';left:'+spellInfo.left">
             <div class="header">
@@ -142,7 +150,7 @@ export default class InGameHUD {
             </div>
             <p class="body" v-html="spellHover.description"></p>
         </div>
-      
+
         <div v-if="avatar && spells && buffs" class="bottom-HUD">
             <div class="champion-avatar">
                 <img :src="avatar" alt="champion-avatar" :style="isDead ? 'filter: grayscale(100%)' : ''">
@@ -153,7 +161,7 @@ export default class InGameHUD {
                 <div class="spells">
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
                         @click="changeSpell(index)"
-                        @mouseover="mouseover(spell, $event)" 
+                        @mouseover="mouseover(spell, $event)"
                         @mouseout="mouseout(spell, $event)">
                         <img :src="spell.image" alt="spell"
                             :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
@@ -189,19 +197,27 @@ export default class InGameHUD {
         </div>
 
         <div v-if="showSpellsPicker" class="spell-picker">
+            <img
+              alt="background"
+              class="background-picker"
+              :src="backgroundPicker"
+            />
             <button class="close-btn" @click="closeSpellPicker()">
               <i class="fa-solid fa-xmark"></i>
             </button>
             <p class="title">Chọn chiêu thức</p>
             <div class="list">
-              <div class="group" v-for="group of spellGroups">
+              <div
+                class="group"
+                v-for="group of spellGroups"
+                @mouseover="mouseoverGroup(group, $event)">
                 <div class="group-header">
                   <img v-if="group.image" :src="group.image" alt="spell" />
                   <p>{{group.name}}</p>
                 </div>
-                <div v-for="spell of group.spells" class="spell" 
+                <div v-for="spell of group.spells" class="spell"
                   @click="pick(spell, $event)"
-                  @mouseover="mouseover(spell, $event)" 
+                  @mouseover="mouseover(spell, $event)"
                   @mouseout="mouseout(spell, $event)">
                     <img :src="spell.image" alt="spell" />
                 </div>
