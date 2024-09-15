@@ -380,11 +380,12 @@
 .change-logs {
     max-height: 30px;
     overflow: hidden;
-    transition: all 0.2s;
+    transition: all 0.2s 0s;
 }
 
 .change-logs:hover {
     max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
+    transition: all 0.2s 0.5s;
 }
