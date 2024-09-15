@@ -16,8 +16,9 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   editor.camera = JSON.parse(localStorage.getItem('shape-maker-camera')) || editor.camera;
-  editor.points =
-    convertArrayToPoints(JSON.parse(localStorage.getItem('shape-maker-points'))) || [];
+  editor.points = convertArrayToPoints(
+    JSON.parse(localStorage.getItem('shape-maker-points')) || []
+  );
 
   window.addEventListener('beforeunload', () => {
     localStorage.setItem('shape-maker-points', JSON.stringify(convertPointsToArray(editor.points)));
@@ -232,5 +233,5 @@ function convertPointsToArray(points = []) {
   return points.map(p => [p.x, p.y]);
 }
 function convertArrayToPoints(array = []) {
-  return array.map(p => createVector(p[0], p[1]));
+  return array?.map(p => createVector(p[0], p[1])) || [];
 }

@@ -115,7 +115,7 @@ export const SpellGroups = [
     name: 'Zed',
     image: 'champ_zed',
     background: './assets/images/champions/background/zed.png',
-    spells: [AllSpells.Zed_W],
+    spells: [AllSpells.Zed_Q, AllSpells.Zed_W],
   },
   {
     name: 'Graves',

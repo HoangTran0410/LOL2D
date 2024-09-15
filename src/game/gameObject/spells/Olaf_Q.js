@@ -20,19 +20,19 @@ export default class Olaf_Q extends Spell {
   axeLifeTime = 4000;
 
   onSpellCast() {
-    let { from, to } = VectorUtils.getVectorWithMaxRange(
+    const { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.game.worldMouse,
       this.maxThrowRange
     );
 
-    let axe = new Olaf_Q_Object(this.owner);
+    const axe = new Olaf_Q_Object(this.owner);
     axe.destination = to;
     axe.position = from;
     axe.initialAngle = to.copy().sub(from).heading();
     axe.speed = 8.5;
     axe.waitForPickUpLifeTime = this.axeLifeTime;
-    axe.damage = 20;
+    axe.damage = 15;
     axe.spellSource = this;
     this.game.objectManager.addObject(axe);
   }

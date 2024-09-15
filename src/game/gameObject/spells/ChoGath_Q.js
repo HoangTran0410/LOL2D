@@ -37,7 +37,7 @@ export class ChoGath_Q_Object extends SpellObject {
   position = this.owner.position.copy();
   size = 140;
   expandSize = 200;
-  damage = 20;
+  damage = 15;
   visionRadius = this.size;
   prepareTime = 700;
   lifeTime = 1100;
