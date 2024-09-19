@@ -36,3 +36,4 @@ export { default as StealthWard } from './StealthWard.js';
 export { default as Zed_W } from './Zed_W.js';
 export { default as Graves_W } from './Graves_W.js';
 export { default as Zed_Q } from './Zed_Q.js';
+export { default as Zed_E } from './Zed_E.js';

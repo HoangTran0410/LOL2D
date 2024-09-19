@@ -1,9 +1,7 @@
 import { Circle, Rectangle } from '../../../../libs/quadtree.js';
 import AssetManager from '../../../managers/AssetManager.js';
 import VectorUtils from '../../../utils/vector.utils.js';
-import BuffAddType from '../../enums/BuffAddType.js';
 import { PredefinedFilters } from '../../managers/ObjectManager.js';
-import Buff from '../Buff.js';
 import Slow from '../buffs/Slow.js';
 import ParticleSystem from '../helpers/ParticleSystem.js';
 import TrailSystem from '../helpers/TrailSystem.js';
