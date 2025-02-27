@@ -78,6 +78,7 @@ export default class InGameHUD {
               () => new spell.spellClass(toRaw(this.game.player))
             );
             bots.forEach(bot => {
+              bot._respawnWithNewPreset = false;
               bot.spells = bot.spells.map(() => new spell.spellClass(toRaw(bot)));
             });
           } else if (
@@ -87,12 +88,15 @@ export default class InGameHUD {
             let spellInstance = new spell.spellClass(toRaw(this.game.player));
             this.game.player.spells[this.spellIndexToSwap] = spellInstance;
 
-            if (cloneMySpell) {
-              bots.forEach(bot => {
+            bots.forEach(bot => {
+              if (this.cloneMySpell) {
+                bot._respawnWithNewPreset = false;
                 let spellInstance = new spell.spellClass(toRaw(bot));
                 bot.spells[this.spellIndexToSwap] = spellInstance;
-              });
-            }
+              } else {
+                bot._respawnWithNewPreset = true;
+              }
+            });
           }
           this.showSpellsPicker = false;
           this.game.unpause();
