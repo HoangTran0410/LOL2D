@@ -3,6 +3,7 @@ import { removeAccents } from '../../utils/index.js';
 import * as AllSpells from '../gameObject/spells/index.js';
 import { SpellGroups } from '../preset.js';
 import AssetManager from '../../managers/AssetManager.js';
+import AIChampion from '../gameObject/attackableUnits/AIChampion.js';
 
 export default class InGameHUD {
   constructor(game) {
@@ -22,6 +23,9 @@ export default class InGameHUD {
           stats: {},
           spells: [],
           buffs: [],
+
+          oneForAll: false,
+          cloneMySpell: false,
 
           game: game,
           searchSpellText: '',
@@ -67,12 +71,28 @@ export default class InGameHUD {
       },
       methods: {
         pick(spell) {
-          if (
+          const bots = this.game.objectManager.objects.filter(o => o instanceof AIChampion);
+
+          if (this.oneForAll) {
+            this.game.player.spells = this.game.player.spells.map(
+              () => new spell.spellClass(toRaw(this.game.player))
+            );
+            bots.forEach(bot => {
+              bot.spells = bot.spells.map(() => new spell.spellClass(toRaw(bot)));
+            });
+          } else if (
             this.spellIndexToSwap >= 0 &&
             this.spellIndexToSwap <= this.game.player.spells.length
           ) {
             let spellInstance = new spell.spellClass(toRaw(this.game.player));
             this.game.player.spells[this.spellIndexToSwap] = spellInstance;
+
+            if (cloneMySpell) {
+              bots.forEach(bot => {
+                let spellInstance = new spell.spellClass(toRaw(bot));
+                bot.spells[this.spellIndexToSwap] = spellInstance;
+              });
+            }
           }
           this.showSpellsPicker = false;
           this.game.unpause();
@@ -206,6 +226,22 @@ export default class InGameHUD {
               <i class="fa-solid fa-xmark"></i>
             </button>
             <p class="title">Chọn chiêu thức</p>
+
+            <p>
+              Chế độ (mới):
+              <span class="tooltip">
+                <input type="checkbox" id="oneForAll" v-model="oneForAll" />
+                <label for="oneForAll">ONE spell for ALL</label>
+                <span class="tooltiptext">Tất cả đều chỉ dùng 1 chiêu thức</span>
+              </span>
+
+              <span class="tooltip" >
+                <input type="checkbox" id="cloneMySpell" v-model="cloneMySpell" />
+                <label for="cloneMySpell">Clone my spells</label>
+                <span class="tooltiptext">Tất cả đều dùng bộ chiêu thức giống bạn</span>
+              </span>
+            </p>
+
             <div class="list">
               <div
                 class="group"

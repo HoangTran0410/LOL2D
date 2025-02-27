@@ -1,391 +1,422 @@
 #InGameHUD {
-    z-index: 100;
+  z-index: 100;
 }
 
 /* ============================ Bottom HUD ============================  */
 .bottom-HUD {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 100px;
-    /* height: 100px; */
-    padding: 5px;
-    margin-bottom: 10px;
-    background-color: #111c;
-    border-radius: 5px;
-    border-top-left-radius: 50px;
-    border: solid 2px #fff3;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 100px;
+  /* height: 100px; */
+  padding: 5px;
+  margin-bottom: 10px;
+  background-color: #111c;
+  border-radius: 5px;
+  border-top-left-radius: 50px;
+  border: solid 2px #fff3;
 
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
 .bottom-HUD .champion-avatar img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    border: 2px solid #aaa;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #aaa;
 }
 
 .champion-avatar {
-    position: relative;
+  position: relative;
 }
 
 .champion-avatar .revive-counter {
-    position: absolute;
+  position: absolute;
 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #1119;
-    text-align: center;
-    line-height: 80px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1119;
+  text-align: center;
+  line-height: 80px;
 
-    color: #eee;
-    font-size: 1.5em;
-    font-weight: bold;
+  color: #eee;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .champion-details {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 /* =============== Spells =============== */
 .spells {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .spells .spell {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .spell {
-    position: relative;
+  position: relative;
 
-    /* background: -moz-linear-gradient(top left, #e8c17d 0%, #705424 100%);
+  /* background: -moz-linear-gradient(top left, #e8c17d 0%, #705424 100%);
     background: -webkit-linear-gradient(top left, #e8c17d 0%, #705424 100%);
     background: linear-gradient(to bottom right, #e8c17d 0%, #705424 100%); */
-    background: #aaa6;
-    padding: 2px;
+  background: #aaa6;
+  padding: 2px;
 
-    width: 3em;
-    height: 3em;
+  width: 3em;
+  height: 3em;
 
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .spell:hover {
-    /* border: 2px solid #ddd !important; */
-    background: #eee !important;
-    cursor: pointer;
+  /* border: 2px solid #ddd !important; */
+  background: #eee !important;
+  cursor: pointer;
 }
 
 .spell img {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .spell.small {
-    width: 2em !important;
-    height: 2em !important;
+  width: 2em !important;
+  height: 2em !important;
 }
 
 .spell .hotKey {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    color: #e8c17d;
-    font-size: .9em;
-    font-weight: bold;
-    z-index: 10;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  color: #e8c17d;
+  font-size: 0.9em;
+  font-weight: bold;
+  z-index: 10;
 
-    /* text shadow */
-    text-shadow: #000 1px 0 10px;
+  /* text shadow */
+  text-shadow: #000 1px 0 10px;
 }
 
 .cooldown {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    transition: opacity 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .cooldown p {
-    color: #eee;
-    text-align: center;
-    font-weight: bold;
+  color: #eee;
+  text-align: center;
+  font-weight: bold;
 }
 
 .spell.in-cooldown .cooldown {
-    opacity: 0.7;
-    transition: none;
+  opacity: 0.7;
+  transition: none;
 }
 
 .spell .cooldown-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 0%;
-    background-color: #111d;
-    transform-origin: bottom;
-    border-top: 2px solid #eee;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background-color: #111d;
+  transform-origin: bottom;
+  border-top: 2px solid #eee;
 }
 
 .spell.in-cooldown img {
-    filter: grayscale(100%);
+  filter: grayscale(100%);
 }
 
 /* Spell info */
 .spell-info {
-    position: fixed;
-    padding: 10px;
-    background-color: #111;
-    box-shadow: 0px 0px 10px 0px #999b;
-    color: #eee;
-    font-size: 1em;
-    width: 300px;
-    pointer-events: none;
-    transition: all .08s ease-in;
-    z-index: 100;
+  position: fixed;
+  padding: 10px;
+  background-color: #111;
+  box-shadow: 0px 0px 10px 0px #999b;
+  color: #eee;
+  font-size: 1em;
+  width: 300px;
+  pointer-events: none;
+  transition: all 0.08s ease-in;
+  z-index: 100;
 }
 
 .spell-info .header,
-.spell-info .header>div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.spell-info .header > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .spell-info img {
-    width: 50px;
-    margin-right: 10px;
-    border: 2px solid #9999;
+  width: 50px;
+  margin-right: 10px;
+  border: 2px solid #9999;
 }
 
 .spell-info h4 {
-    font-size: 1em;
-    font-weight: bold;
-    margin: 0;
-    padding: 0;
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
 }
 
 .spell-info span {
-    margin: 0;
-    padding: 0;
-    margin-left: 5px;
-    font-weight: bold;
-    color: #e8c17d;
+  margin: 0;
+  padding: 0;
+  margin-left: 5px;
+  font-weight: bold;
+  color: #e8c17d;
 }
 
 .spell-info .body {
-    margin-top: 10px;
-    color: #eee;
+  margin-top: 10px;
+  color: #eee;
 }
 
 .spell-info .body span {
-    /* font-weight: bold; */
-    /* font-weight: normal; */
-    font-style: italic;
-    padding: 0;
-    margin: 0;
+  /* font-weight: bold; */
+  /* font-weight: normal; */
+  font-style: italic;
+  padding: 0;
+  margin: 0;
 }
 
 .spell-info .body .damage {
-    color: #ff5858;
+  color: #ff5858;
 }
 
 .spell-info .body .buff {
-    color: #88f;
+  color: #88f;
 }
 
 .spell-info .body .time {
-    color: #c1ffb6;
+  color: #c1ffb6;
 }
 
 /* =============== Healthbar =============== */
 .health-bar {
-    margin-top: 10px;
-    text-align: center;
-    color: #eee;
+  margin-top: 10px;
+  text-align: center;
+  color: #eee;
 }
 
 .health-bar .bar {
-    height: 15px;
-    width: 100%;
-    position: relative;
+  height: 15px;
+  width: 100%;
+  position: relative;
 }
 
 .health-bar .bar div {
-    transition: width 0.1s ease;
-    height: 100%;
+  transition: width 0.1s ease;
+  height: 100%;
 }
 
 .health-bar .bar p {
-    margin: 0;
-    padding: 0;
-    font-size: .8em;
-    line-height: 100%;
-    position: absolute;
-    top: 0;
-    width: 100%;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8em;
+  line-height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 
 /* =============== Buffs =============== */
 .buffs {
-    position: absolute;
-    top: -3px;
-    transform: translateY(-100%);
-    display: flex;
-    flex-direction: row;
+  position: absolute;
+  top: -3px;
+  transform: translateY(-100%);
+  display: flex;
+  flex-direction: row;
 }
 
 .buffs .buff {
-    width: 35px;
-    height: 35px;
-    background-color: #1119;
-    position: relative;
+  width: 35px;
+  height: 35px;
+  background-color: #1119;
+  position: relative;
 }
 
 .buffs .buff img {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .buffs .buff span {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    font-size: 0.8em;
-    color: #eee;
-    background-color: #111e;
-    padding: 0 5px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 0.8em;
+  color: #eee;
+  background-color: #111e;
+  padding: 0 5px;
 }
 
 /* ===================== Spell Picker ===================== */
 .spell-picker {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #111;
-    border-radius: 5px;
-    border: solid 2px #fff3;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    width: 80vw;
-    max-width: 1000px;
-    max-height: 95vh;
-    overflow-y: auto;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  border-radius: 5px;
+  border: solid 2px #fff3;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  max-width: 1000px;
+  max-height: 95vh;
+  overflow-y: auto;
 }
 
 .spell-picker .title {
-    margin: 0;
-    padding: 0;
-    margin-bottom: 10px;
-    color: #eee;
-    text-align: center;
-    font-size: 1.4em;
-    font-weight: bold;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 10px;
+  color: #eee;
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: bold;
 }
 
-.spell-picker .list {}
+.spell-picker .list {
+}
 
 .spell-picker .spell {
-    margin: 2px;
-    display: inline-block;
+  margin: 2px;
+  display: inline-block;
 }
 
 .spell-picker .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: white;
-    font-size: 1.5em;
-    cursor: pointer;
-    border: none;
-    background-color: #ddd2;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  font-size: 1.5em;
+  cursor: pointer;
+  border: none;
+  background-color: #ddd2;
 }
 
 .spell-picker .close-btn:hover {
-    background-color: #b50000;
+  background-color: #b50000;
 }
 
 /* ====================== group ====================== */
 .spell-picker .group {
-    display: inline-block;
-    border: 1px solid #fff3;
-    border-radius: 5px;
-    margin: 10px;
-    padding: 5px;
-    transition: all 0.1s ease;
+  display: inline-block;
+  border: 1px solid #fff3;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 5px;
+  transition: all 0.1s ease;
 }
 
 .spell-picker .group:hover {
-    transform: translateY(-5px);
-    border: 1px solid #eee;
+  transform: translateY(-5px);
+  border: 1px solid #eee;
 }
 
 .spell-picker .group-header {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-    margin-bottom: 5px;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .spell-picker .group-header img {
-    width: 40px;
-    height: 40px;
-    margin-right: 5px;
-    background-color: #fff5;
-    border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
+  background-color: #fff5;
+  border-radius: 50%;
 }
 
 .spell-picker .group-header p {
-    display: inline-block;
-    margin: 0;
-    padding: 0;
-    font-weight: bold;
-    color: #ddd;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  color: #ddd;
 }
 
 .spell-picker .group:hover .group-header p {
-    color: #eee;
+  color: #eee;
 }
 
 .background-picker {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    filter: blur(3px);
-    opacity: 0.2;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  filter: blur(3px);
+  opacity: 0.2;
+  object-fit: cover;
 }
 
 .change-logs {
-    max-height: 30px;
-    overflow: hidden;
-    transition: all 0.2s 0s;
+  max-height: 30px;
+  overflow: hidden;
+  transition: all 0.2s 0s;
 }
 
 .change-logs:hover {
-    max-height: 200px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    transition: all 0.2s 0.5s;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.2s 0.5s;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
