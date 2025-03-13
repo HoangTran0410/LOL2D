@@ -10,7 +10,17 @@ import Slow from '../buffs/Slow.js';
 import Stun from '../buffs/Stun.js';
 
 export default class Champion extends AttackableUnit {
-  constructor({ game, position, collisionRadius, visionRadius, teamId, stats, avatar, preset }) {
+  constructor({
+    game,
+    position,
+    collisionRadius,
+    visionRadius,
+    teamId,
+    stats,
+    avatar,
+    preset,
+    id,
+  }) {
     super({
       game,
       position,
@@ -24,6 +34,12 @@ export default class Champion extends AttackableUnit {
     this.score = 0;
     this.name = preset?.name;
     this.spells = preset?.spells?.map?.(spell => new spell(this)) || [];
+    this.preset = preset;
+    this.id = id || this.generateId();
+  }
+
+  generateId() {
+    return 'champion_' + Math.random().toString(36).substr(2, 9);
   }
 
   update() {
