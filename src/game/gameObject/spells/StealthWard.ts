@@ -1,0 +1,52 @@
+import AssetManager from '../../../managers/AssetManager';
+import VectorUtils from '../../../utils/vector.utils';
+import Spell from '../Spell';
+import SpellObject from '../SpellObject';
+
+export default class StealthWard extends Spell {
+  image = AssetManager.getAsset('spell_stealthward');
+  name = 'Mắt Xanh (Stealth Ward)';
+  description =
+    'Cắm một mắt xanh, cung cấp <span class="buff">Tầm Nhìn</span> 700px, tồn tại trong <span class="time">20 giây</span>';
+  coolDown = 10000;
+
+  maxRange = 300;
+
+  onSpellCast() {
+    const { to } = VectorUtils.getVectorWithMaxRange(
+      this.owner.position,
+      this.game.worldMouse,
+      this.maxRange
+    );
+
+    const obj = new StealthWard_Object(this.owner);
+    obj.position = to;
+    this.game.objectManager.addObject(obj);
+  }
+
+  drawPreview() {
+    super.drawPreview(this.maxRange);
+  }
+}
+
+export class StealthWard_Object extends SpellObject {
+  visionRadius = 350;
+  size = 0;
+  maxSize = 10;
+  lifeTime = 20000;
+  age = 0;
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+    this.size = lerp(this.size, this.maxSize, 0.1);
+  }
+
+  draw() {
+    push();
+    noStroke();
+    fill(250, 255, 0, 50);
+    ellipse(this.position.x, this.position.y, this.size);
+    pop();
+  }
+}

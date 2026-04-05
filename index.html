@@ -25,16 +25,15 @@
     <link rel="stylesheet" href="styles/game-scene.css">
     <link rel="stylesheet" href="styles/hud.css">
 
-    <!-- global libraries -->
-    <!-- <script src="https://quinton-ashley.github.io/q5.js/q5.js"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.5.0/lib/p5.min.js"></script>
+    <!-- p5.js and stats.js must load here (not in <body>) so they are parsed and
+         execute before the deferred ES module — this exposes all p5 globals
+         (loadImage, loadJSON, createVector, background, etc.) to the module below. -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
     <script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <!-- <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script> -->
 </head>
 
 <body>
-    <script src="src/app.js" type="module"></script>
+    <script type="module" src="/src/main.ts"></script>
 
     <div class="center-page-container">
         <div id="game-scene">

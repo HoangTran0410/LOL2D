@@ -1,0 +1,152 @@
+import AssetManager from '../../../managers/AssetManager';
+import AttackableUnit from './AttackableUnit';
+import Airborne from '../buffs/Airborne';
+import Charm from '../buffs/Charm';
+import Dash from '../buffs/Dash';
+import Fear from '../buffs/Fear';
+import Root from '../buffs/Root';
+import Silence from '../buffs/Silence';
+import Slow from '../buffs/Slow';
+import Stun from '../buffs/Stun';
+
+export default class Champion extends AttackableUnit {
+  score = 0;
+  name: string | undefined;
+  spells: any[] = [];
+
+  constructor({
+    game,
+    position,
+    collisionRadius,
+    visionRadius,
+    teamId,
+    stats,
+    avatar,
+    preset,
+  }: {
+    game?: any;
+    position?: p5.Vector;
+    collisionRadius?: number;
+    visionRadius?: number;
+    teamId?: string;
+    stats?: any;
+    avatar?: any;
+    preset?: any;
+  }) {
+    super({
+      game,
+      position,
+      collisionRadius,
+      visionRadius,
+      teamId,
+      avatar: avatar || AssetManager.getAsset(preset?.avatar),
+      stats,
+    });
+
+    this.score = 0;
+    this.name = preset?.name;
+    this.spells = preset?.spells?.map?.((spell: any) => new spell(this)) || [];
+  }
+
+  update() {
+    super.update();
+    this.spells.forEach(spell => spell.update());
+  }
+
+  drawHealthBar() {
+    let pos = this.position;
+    let { displaySize: size, alpha } = this.animatedValues;
+    let health = this.stats.health.value;
+    let maxHealth = this.stats.maxHealth.value;
+    let mana = this.stats.mana.value;
+    let maxMana = this.stats.maxMana.value;
+
+    push();
+    let borderWidth = 3,
+      barWidth = 125,
+      barHeight = 17,
+      manaHeight = 5,
+      topleft = {
+        x: pos.x - barWidth / 2,
+        y: pos.y - size / 2 - barHeight - 15,
+      };
+
+    fill(2, 15, 21, alpha);
+    stroke(91, 92, 87, alpha);
+    strokeWeight(3);
+    rect(
+      topleft.x - borderWidth * 0.5,
+      topleft.y - borderWidth * 0.5,
+      barWidth + borderWidth,
+      barHeight + borderWidth
+    );
+
+    fill(242, 242, 242, alpha);
+    textSize(12);
+    text(this.score, topleft.x + 3, topleft.y + 12);
+
+    noStroke();
+
+    const healthContainerW = barWidth - barHeight;
+    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
+    fill(
+      this.isDead
+        ? [153, 153, 153, alpha]
+        : this.isAllied
+        ? [67, 196, 29, alpha]
+        : [196, 67, 29, alpha]
+    );
+    rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
+
+    const manaW = map(mana, 0, maxMana, 0, barWidth - barHeight);
+    fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
+    rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
+
+    push();
+    let x = topleft.x + 10;
+    if (alpha < 255) tint(255, alpha);
+    for (let buff of this.buffs) {
+      buff.draw?.();
+      if (buff.image) {
+        image(buff.image.data, x, topleft.y - 13, 20, 20);
+        x += 20;
+      }
+    }
+    pop();
+
+    if (this.isDead) {
+      noStroke();
+      fill(200);
+      textAlign(CENTER, CENTER);
+      textSize(13);
+      text(
+        `Hồi Sinh Sau ${~~(this.deathData!.reviveAfter / 1000)}...`,
+        pos.x,
+        topleft.y + barHeight + 8
+      );
+    } else {
+      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
+        .map(BuffClass => {
+          let buff = this.buffs.find((b: any) => b instanceof BuffClass);
+          if (buff && buff.sourceUnit !== this) return buff.name;
+        })
+        .filter(Boolean)
+        .join(', ');
+
+      if (statusString) {
+        noStroke();
+        fill(200);
+        textAlign(CENTER, CENTER);
+        textSize(13);
+        text(statusString, pos.x, topleft.y + barHeight + 8);
+      }
+    }
+    pop();
+  }
+
+  die(deathData: { attacker?: any; reviveAfter: number }) {
+    super.die(deathData);
+    this.score--;
+    if (deathData.attacker) deathData.attacker.score++;
+  }
+}
