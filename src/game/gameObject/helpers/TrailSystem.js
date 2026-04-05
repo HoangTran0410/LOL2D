@@ -3,6 +3,7 @@ import SpellObject from '../SpellObject.js';
 
 export default class TrailSystem extends SpellObject {
   trails = [];
+  _cachedBB = null;
 
   constructor({
     maxLength = 15,
@@ -25,21 +26,22 @@ export default class TrailSystem extends SpellObject {
         lifeSpan: this.trailLifeTime,
       });
       if (this.trails.length > this.maxLength) this.trails.shift();
+      this._cachedBB = null; // invalidate cache on add
     }
   }
 
   update() {
-    for (let i = this.trails.length - 1; i >= 0; i--) {
+    let i = 0;
+    while (i < this.trails.length) {
       this.trails[i].lifeSpan -= deltaTime;
       if (this.trails[i].lifeSpan <= 0) {
-        this.trails.splice(i, 1);
-
-        // only check toRemove if there was particle added
-        if (this.trails.length === 0) {
-          this.toRemove = true;
-        }
+        this.trails.splice(i, 1); // remove current, don't advance i
+      } else {
+        i++;
       }
     }
+    this._cachedBB = null; // invalidate cache after update
+    if (this.trails.length === 0) this.toRemove = true;
   }
 
   draw() {
@@ -49,39 +51,41 @@ export default class TrailSystem extends SpellObject {
       stroke(this.trailColor);
       strokeWeight(this.trailSize);
       beginShape();
-      this.trails.forEach(trail => {
+      for (let trail of this.trails) {
         vertex(trail.pos.x, trail.pos.y);
-      });
+      }
       endShape();
       pop();
     }
   }
 
   getDisplayBoundingBox() {
-    if (this.trails.length === 0) return new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
+    if (this._cachedBB) return this._cachedBB;
 
-    let topLeft = {
-      x: Infinity,
-      y: Infinity,
-    };
-    let bottomRight = {
-      x: -Infinity,
-      y: -Infinity,
-    };
-
-    for (let trail of this.trails) {
-      topLeft.x = min(topLeft.x, trail.pos.x);
-      topLeft.y = min(topLeft.y, trail.pos.y);
-      bottomRight.x = max(bottomRight.x, trail.pos.x);
-      bottomRight.y = max(bottomRight.y, trail.pos.y);
+    if (this.trails.length === 0) {
+      this._cachedBB = new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
+      return this._cachedBB;
     }
 
-    return new Rectangle({
-      x: topLeft.x - this.trailSize / 2,
-      y: topLeft.y - this.trailSize / 2,
-      w: bottomRight.x - topLeft.x + this.trailSize,
-      h: bottomRight.y - topLeft.y + this.trailSize,
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+
+    for (let trail of this.trails) {
+      if (trail.pos.x < minX) minX = trail.pos.x;
+      if (trail.pos.y < minY) minY = trail.pos.y;
+      if (trail.pos.x > maxX) maxX = trail.pos.x;
+      if (trail.pos.y > maxY) maxY = trail.pos.y;
+    }
+
+    this._cachedBB = new Rectangle({
+      x: minX - this.trailSize / 2,
+      y: minY - this.trailSize / 2,
+      w: maxX - minX + this.trailSize,
+      h: maxY - minY + this.trailSize,
       data: this,
     });
+    return this._cachedBB;
   }
 }

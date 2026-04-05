@@ -110,12 +110,14 @@ export default class TerrainMap {
 
       // Collide with walls
       if (hasFlag(p.stats.actionState, ActionState.IS_GHOSTED)) continue;
-      let walls = obstacles.filter(o => o.type === TerrainType.WALL);
+
+      // Use quadtree to narrow walls to only those near this champion before SAT test
+      let nearbyWalls = this.getObstaclesInArea(p.getCollideBoundingBox(), [TerrainType.WALL]);
 
       let collided = false;
       let totalOverlap = createVector(0, 0);
       let overlapsWalls = [];
-      for (let wall of walls) {
+      for (let wall of nearbyWalls) {
         let response = new SAT.Response();
         let pSAT = new SAT.Circle(
           new SAT.Vector(p.position.x, p.position.y),

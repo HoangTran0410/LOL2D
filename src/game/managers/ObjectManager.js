@@ -17,12 +17,18 @@ const DisplayZIndex = [
   CombatText,
 ];
 
+// Precompute Z-index map once at startup — avoids O(n) instanceof search per object per frame
+const Z_INDEX_MAP = new Map();
+DisplayZIndex.forEach((cls, i) => Z_INDEX_MAP.set(cls, i));
+const DEFAULT_Z_INDEX = 99;
+
 export default class ObjectManager {
   system = new System();
   objects = [];
   _objectToBeAdd = [];
   _objectsTree = null;
   _objectsTreeIsUpdating = false;
+  _deadBuffer = [];
 
   constructor(game) {
     this.game = game;
@@ -46,13 +52,17 @@ export default class ObjectManager {
       o.update?.();
     }
 
-    // check remove
-    for (let i = this.objects.length - 1; i >= 0; i--) {
-      const o = this.objects[i];
-      if (o.toRemove) {
-        o.onRemoved?.();
-        this.objects.splice(i, 1);
+    // two-pass remove: collect dead, then filter once (avoids O(n²) splice)
+    for (let i = 0, l = this.objects.length; i < l; i++) {
+      if (this.objects[i].toRemove) this._deadBuffer.push(i);
+    }
+    if (this._deadBuffer.length > 0) {
+      for (let i = this._deadBuffer.length - 1; i >= 0; i--) {
+        const idx = this._deadBuffer[i];
+        this.objects[idx].onRemoved?.();
+        this.objects.splice(idx, 1);
       }
+      this._deadBuffer.length = 0;
     }
 
     // check add
@@ -81,9 +91,8 @@ export default class ObjectManager {
     });
 
     objectsInCamera.sort((a, b) => {
-      let aZIndex = DisplayZIndex.findLastIndex(t => a instanceof t);
-      let bZIndex = DisplayZIndex.findLastIndex(t => b instanceof t);
-      return aZIndex - bZIndex;
+      return (Z_INDEX_MAP.get(a.constructor) ?? DEFAULT_Z_INDEX) -
+             (Z_INDEX_MAP.get(b.constructor) ?? DEFAULT_Z_INDEX);
     });
 
     for (let o of objectsInCamera) {

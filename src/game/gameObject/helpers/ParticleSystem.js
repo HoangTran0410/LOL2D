@@ -3,6 +3,7 @@ import SpellObject from '../SpellObject.js';
 
 export default class ParticleSystem extends SpellObject {
   particles = [];
+  _cachedBB = null;
 
   constructor({
     isDeadFn,
@@ -37,22 +38,24 @@ export default class ParticleSystem extends SpellObject {
     if (this.particles.length > this.maxParticles) {
       this.particles.shift();
     }
+    this._cachedBB = null; // invalidate cache on add
   }
 
   update() {
     this.preUpdateFn?.(this.particles);
-    for (let i = this.particles.length - 1; i >= 0; i--) {
+    let i = 0;
+    while (i < this.particles.length) {
       const particle = this.particles[i];
       this.updateFn?.(particle);
       if (this.isDeadFn?.(particle)) {
-        this.particles.splice(i, 1);
-
-        // if all particles are dead, remove this particle system
-        // particle system only be removed if there was particle added
-        if (this.autoRemoveIfEmpty && this.particles.length === 0) {
-          this.toRemove = true;
-        }
+        this.particles.splice(i, 1); // remove current, don't advance i
+      } else {
+        i++;
       }
+    }
+    this._cachedBB = null; // invalidate cache after update
+    if (this.autoRemoveIfEmpty && this.particles.length === 0) {
+      this.toRemove = true;
     }
     this.postUpdateFn?.(this.particles);
   }
@@ -68,34 +71,36 @@ export default class ParticleSystem extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    if (this.particles.length === 0 || !this.getParticlePosFn || !this.getParticleSizeFn)
-      return new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
+    if (this._cachedBB) return this._cachedBB;
 
-    let topLeft = {
-      x: Infinity,
-      y: Infinity,
-    };
-    let bottomRight = {
-      x: -Infinity,
-      y: -Infinity,
-    };
+    if (this.particles.length === 0 || !this.getParticlePosFn || !this.getParticleSizeFn) {
+      this._cachedBB = new Rectangle({ x: 0, y: 0, w: 0, h: 0, data: this });
+      return this._cachedBB;
+    }
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
     for (let p of this.particles) {
       let pos = this.getParticlePosFn(p);
       let size = this.getParticleSizeFn(p);
-      topLeft.x = min(topLeft.x, pos.x - size / 2);
-      topLeft.y = min(topLeft.y, pos.y - size / 2);
-      bottomRight.x = max(bottomRight.x, pos.x + size / 2);
-      bottomRight.y = max(bottomRight.y, pos.y + size / 2);
+      let half = size / 2;
+      if (pos.x - half < minX) minX = pos.x - half;
+      if (pos.y - half < minY) minY = pos.y - half;
+      if (pos.x + half > maxX) maxX = pos.x + half;
+      if (pos.y + half > maxY) maxY = pos.y + half;
     }
 
-    return new Rectangle({
-      x: topLeft.x,
-      y: topLeft.y,
-      w: bottomRight.x - topLeft.x,
-      h: bottomRight.y - topLeft.y,
+    this._cachedBB = new Rectangle({
+      x: minX,
+      y: minY,
+      w: maxX - minX,
+      h: maxY - minY,
       data: this,
     });
+    return this._cachedBB;
   }
 }
 

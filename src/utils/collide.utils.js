@@ -35,42 +35,37 @@ const CollideUtils = {
     circle_x,
     circle_y,
     circle_r,
-    arx_x,
+    arc_x,
     arc_y,
     arc_r,
     arc_angle_start,
     arc_angle_end
   ) => {
-    // check if circle is outside of arc's bounding box
-    let distance = Math.sqrt(Math.pow(circle_x - arx_x, 2) + Math.pow(circle_y - arc_y, 2));
-    if (distance > circle_r + arc_r) return false;
-
-    // check if circle is between arc's angle
-    let angle = atan2(circle_y - arc_y, circle_x - arx_x);
+    const dx = circle_x - arc_x;
+    const dy = circle_y - arc_y;
+    if (Math.sqrt(dx * dx + dy * dy) > circle_r + arc_r) return false;
+    const angle = Math.atan2(dy, dx);
     if (angle < arc_angle_start || angle > arc_angle_end) return false;
-
     return true;
   },
 
   // http://www.jeffreythompson.org/collision-detection/point-point.php
   pointPoint(x1, y1, x2, y2, buffer = 0) {
-    return sqr(x1 - x2) <= buffer && sqr(y1 == y2) <= buffer;
+    return (x1 - x2) * (x1 - x2) <= buffer && (y1 - y2) * (y1 - y2) <= buffer;
   },
 
   // http://www.jeffreythompson.org/collision-detection/point-circle.php
   pointCircle(px, py, cx, cy, r) {
-    let distX = px - cx;
-    let distY = py - cy;
-    let distance = sqrt(distX * distX + distY * distY);
-    return distance <= r;
+    const dx = px - cx;
+    const dy = py - cy;
+    return Math.sqrt(dx * dx + dy * dy) <= r;
   },
 
   // http://www.jeffreythompson.org/collision-detection/circle-circle.php
   circleCircle(c1x, c1y, c1r, c2x, c2y, c2r) {
-    let distX = c1x - c2x;
-    let distY = c1y - c2y;
-    let distance = sqrt(distX * distX + distY * distY);
-    return distance <= c1r + c2r;
+    const dx = c1x - c2x;
+    const dy = c1y - c2y;
+    return Math.sqrt(dx * dx + dy * dy) <= c1r + c2r;
   },
 
   // http://www.jeffreythompson.org/collision-detection/point-rect.php
@@ -91,37 +86,40 @@ const CollideUtils = {
     else if (cx > rx + rw) testX = rx + rw;
     if (cy < ry) testY = ry;
     else if (cy > ry + rh) testY = ry + rh;
-    let distX = cx - testX;
-    let distY = cy - testY;
-    let distance = sqrt(distX * distX + distY * distY);
-    return distance <= radius;
+    const dx = cx - testX;
+    const dy = cy - testY;
+    return Math.sqrt(dx * dx + dy * dy) <= radius;
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-point.php
   linePoint(x1, y1, x2, y2, px, py, buffer = 0.1) {
-    let d1 = dist(px, py, x1, y1);
-    let d2 = dist(px, py, x2, y2);
-    let lineLen = dist(x1, y1, x2, y2);
+    const dx1 = px - x1;
+    const dy1 = py - y1;
+    const dx2 = px - x2;
+    const dy2 = py - y2;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const d1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+    const d2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    const lineLen = Math.sqrt(dx * dx + dy * dy);
     return d1 + d2 >= lineLen - buffer && d1 + d2 <= lineLen + buffer;
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-circle.php
   lineCircle(x1, y1, x2, y2, cx, cy, r) {
-    let inside1 = this.pointCircle(x1, y1, cx, cy, r);
-    let inside2 = this.pointCircle(x2, y2, cx, cy, r);
-    if (inside1 || inside2) return true;
-    let distX = x1 - x2;
-    let distY = y1 - y2;
-    let len = sqrt(distX * distX + distY * distY);
-    let dot = ((cx - x1) * (x2 - x1) + (cy - y1) * (y2 - y1)) / pow(len, 2);
-    let closestX = x1 + dot * (x2 - x1);
-    let closestY = y1 + dot * (y2 - y1);
-    let onSegment = this.linePoint(x1, y1, x2, y2, closestX, closestY);
-    if (!onSegment) return false;
-    distX = closestX - cx;
-    distY = closestY - cy;
-    let distance = sqrt(distX * distX + distY * distY);
-    return distance <= r;
+    if (this.pointCircle(x1, y1, cx, cy, r)) return true;
+    if (this.pointCircle(x2, y2, cx, cy, r)) return true;
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return false;
+    let dot = ((cx - x1) * dx + (cy - y1) * dy) / lenSq;
+    dot = Math.max(0, Math.min(1, dot));
+    const closestX = x1 + dot * dx;
+    const closestY = y1 + dot * dy;
+    const nearDx = closestX - cx;
+    const nearDy = closestY - cy;
+    return Math.sqrt(nearDx * nearDx + nearDy * nearDy) <= r;
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-line.php
@@ -229,11 +227,11 @@ const CollideUtils = {
 
   // http://www.jeffreythompson.org/collision-detection/tri-point.php
   triPoint(x1, y1, x2, y2, x3, y3, px, py) {
-    let areaOrig = abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
-    let area1 = abs((x1 - px) * (y2 - py) - (x2 - px) * (y1 - py));
-    let area2 = abs((x2 - px) * (y3 - py) - (x3 - px) * (y2 - py));
-    let area3 = abs((x3 - px) * (y1 - py) - (x1 - px) * (y3 - py));
-    return area1 + area2 + area3 == areaOrig;
+    const areaOrig = Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
+    const area1 = Math.abs((x1 - px) * (y2 - py) - (x2 - px) * (y1 - py));
+    const area2 = Math.abs((x2 - px) * (y3 - py) - (x3 - px) * (y2 - py));
+    const area3 = Math.abs((x3 - px) * (y1 - py) - (x1 - px) * (y3 - py));
+    return area1 + area2 + area3 === areaOrig;
   },
 };
 

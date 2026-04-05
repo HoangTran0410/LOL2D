@@ -8,12 +8,13 @@ import AIChampion from '../gameObject/attackableUnits/AIChampion.js';
 export default class InGameHUD {
   constructor(game) {
     this.game = game;
+    this._rafId = null;
     this.initVue(game);
-    this.updateLoop();
+    this._startUpdateLoop();
   }
 
   initVue(game) {
-    const { isProxy, toRaw, createApp } = Vue;
+    const { toRaw, createApp } = Vue;
 
     this.app = createApp({
       data() {
@@ -117,26 +118,22 @@ export default class InGameHUD {
           this.game.unpause();
         },
         mouseover(spellProxy, event) {
-          // clearTimeout(this.mouseOutSpellTimeout);
           this.showPreview(spellProxy, true);
           this.spellHover = spellProxy;
 
-          let element = event.currentTarget || event.target;
-          let { width, height, x, y } = element.getBoundingClientRect();
-          let { clientX, clientY } = event;
+          const element = event.currentTarget || event.target;
+          const { width, x, y } = element.getBoundingClientRect();
 
           this.spellInfo = {
             bottom: 'calc(100vh - ' + (y - 5) + 'px)',
             left: Math.max(x + width / 2 - 150, 0) + 'px',
           };
         },
-        mouseout(spellProxy, event) {
+        mouseout(spellProxy) {
           this.showPreview(spellProxy, false);
-          // this.mouseOutSpellTimeout = setTimeout(() => {
           this.spellHover = null;
-          // }, 250);
         },
-        mouseoverGroup(group, event) {
+        mouseoverGroup(group) {
           if (group.background) this.backgroundPicker = group.background;
         },
         mouseoutGroup() {
@@ -288,40 +285,36 @@ export default class InGameHUD {
     document.querySelector('#InGameHUD').oncontextmenu = () => false;
   }
 
-  updateLoop() {
-    this.update();
-
-    if (this.app)
-      setTimeout(() => {
-        this.updateLoop();
-      }, 1000 / 15);
+  _startUpdateLoop() {
+    const tick = () => {
+      this.update();
+      this._rafId = requestAnimationFrame(tick);
+    };
+    this._rafId = requestAnimationFrame(tick);
   }
 
   update() {
-    // update stats
-    const { health, maxHealth, mana, maxMana } = this.game?.player?.stats || {};
+    const player = this.game?.player;
+    if (!player) return;
+
+    const { health, maxHealth, mana, maxMana } = player.stats || {};
     this.vueInstance.stats.health = ~~health?.value;
     this.vueInstance.stats.maxHealth = ~~maxHealth?.value;
     this.vueInstance.stats.mana = ~~mana?.value;
     this.vueInstance.stats.maxMana = ~~maxMana?.value;
-
     this.vueInstance.stats.healthPercent = Math.min(health?.value / maxHealth?.value, 1) * 100;
     this.vueInstance.stats.manaPercent = Math.min(mana?.value / maxMana?.value, 1) * 100;
 
-    // update avatar
-    const { spells = [], buffs = [], avatar, isDead, deathData, canCast } = this.game?.player || {};
-    this.vueInstance.avatar = avatar?.path || '';
-    this.vueInstance.isDead = isDead;
-    this.vueInstance.reviveAfter = ~~(deathData?.reviveAfter / 1000);
+    this.vueInstance.avatar = player.avatar?.path || '';
+    this.vueInstance.isDead = player.isDead;
+    this.vueInstance.reviveAfter = ~~(player.deathData?.reviveAfter / 1000);
 
-    // update spells
-    this.vueInstance.spells = spells
+    this.vueInstance.spells = (player.spells || [])
       .filter(i => i?.image?.path)
       .map((spell, index) => {
-        let isInternalSpell = index == 0;
-        let isSummonerSpell = index > 4;
-
-        let hotKey = SpellHotKeys[index]
+        const isInternalSpell = index === 0;
+        const isSummonerSpell = index > 4;
+        const hotKey = SpellHotKeys[index]
           ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
           : '';
 
@@ -329,7 +322,6 @@ export default class InGameHUD {
           spell || {};
         return {
           instance: spell,
-
           image: image?.path,
           disabled,
           coolDown,
@@ -337,36 +329,32 @@ export default class InGameHUD {
           state,
           name,
           description,
-
-          // custom properties for display
           coolDownText: Math.ceil(currentCooldown / 1000),
           coolDownPercent: Math.min((currentCooldown / coolDown) * 100, 100),
           showCoolDown: currentCooldown > 0,
           small: isInternalSpell || isSummonerSpell,
-          canCast: canCast && !isDead,
+          canCast: player.canCast && !player.isDead,
           hotKey,
         };
       });
 
-    // update buffs
-    this.vueInstance.buffs = buffs
+    this.vueInstance.buffs = (player.buffs || [])
       .filter(i => i?.image?.path)
       .map(buff => {
         const { image, duration, timeElapsed } = buff || {};
-        let timeLeft = duration - timeElapsed;
+        const timeLeft = duration - timeElapsed;
         return {
           image: image?.path,
           duration,
           timeElapsed,
-
           timeLeftText: Math.ceil(timeLeft / 1000),
         };
       });
   }
 
   destroy() {
+    if (this._rafId) cancelAnimationFrame(this._rafId);
     this.app.unmount();
     this.app = null;
-    clearInterval(this.intervalId);
   }
 }
