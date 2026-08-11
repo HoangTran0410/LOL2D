@@ -1,9 +1,10 @@
-import PolyVisibility from '../../../../libs/poly-visibility';
+import PolyVisibility from '../../../libs/poly-visibility';
 import TerrainType from '../../enums/TerrainType';
+import ColorUtils from '../../../utils/color.utils';
 import CollideUtils from '../../../utils/collide.utils';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 
 export default class FogOfWar {
   game: any;
@@ -126,7 +127,7 @@ export default class FogOfWar {
     sightBound: { x: number; y: number; w: number; h: number };
     polygons: { x: number; y: number }[][];
   }): { x: number; y: number }[] {
-    const _polygons = polygons.map(p => p.map(v => [v.x, v.y]));
+    const _polygons = polygons.map(p => p.map(v => [v.x, v.y] as [number, number]));
     let segments = PolyVisibility.convertToSegments(_polygons);
     segments = PolyVisibility.breakIntersections(segments);
     return PolyVisibility.computeViewport(
@@ -161,7 +162,6 @@ export default class FogOfWar {
     const pos = this.game.camera.worldToScreen(x, y);
     const radius = r * this.game.camera.scale;
     const innerR = max(0, radius - rRing * this.game.camera.scale);
-    const ColorUtils = (window as any).ColorUtils;
     ColorUtils.createRadialGradient(this.overlay, pos.x, pos.y, innerR, radius, this.colorStops);
 
     return { x: pos.x, y: pos.y, r: radius };

@@ -1,52 +1,48 @@
 /**
  * main.ts — LOL2D application entry point
  *
- * IMPORTANT: sketch code is inlined here (not imported) because Rollup/Vite
- * drops pure side-effect imports in the production chunk.
+ * p5 is loaded via CDN <script> tag in global mode. p5 waits for the window
+ * `load` event, and only boots (binding loadImage, createVector, background,
+ * etc. onto window) if a global setup()/draw() exists at that point.
+ *
+ * This module runs before `load` fires (module scripts are deferred), so
+ * assigning window.setup here is what activates p5. All game code that uses
+ * p5 globals must therefore run inside setup() — NOT at module eval time.
  */
 import { every, filter, forEach, map, some } from './utils/optimized.utils';
 import { System } from './libs/detect-collisions';
 import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
 
-// ── Force p5.js to initialize in global mode ──────────────────────────────────
-// p5 is loaded via CDN <script> tag but without setup()/draw() in global scope it
-// stays dormant and does NOT copy its functions to window.
-// Calling new p5() with empty stubs forces global-mode initialization.
-try {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new ((window as any).p5 as any)((p: any) => { p.setup = () => {}; p.draw = () => {}; });
-} catch (e) {
-  // p5 already initialized or unavailable — ignore
-}
-
-// ── Expose detect-collisions System globally ───────────────────────────────────
+// Expose detect-collisions System globally for code that accesses window.ABC
 (window as any).ABC = { System };
 
-// ── Patch Array prototype for performance ────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(Array.prototype as any).map = function <T, U>(this: T[], callback: (value: T, index: number) => U): U[] {
-  return map(this, callback as any);
+// Patch Array prototype for performance (mirrors original app.js behaviour)
+/* eslint-disable @typescript-eslint/no-explicit-any */
+(Array.prototype as any).map = function (callback: any) {
+  return map(this, callback);
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(Array.prototype as any).forEach = function <T>(this: T[], callback: (value: T, index: number) => void): void {
-  forEach(this, callback as any);
+(Array.prototype as any).forEach = function (callback: any) {
+  forEach(this, callback);
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(Array.prototype as any).some = function <T>(this: T[], callback: (value: T, index: number) => boolean): boolean {
-  return some(this, callback as any);
+(Array.prototype as any).some = function (callback: any) {
+  return some(this, callback);
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(Array.prototype as any).every = function <T>(this: T[], callback: (value: T, index: number) => boolean): boolean {
-  return every(this, callback as any);
+(Array.prototype as any).every = function (callback: any) {
+  return every(this, callback);
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(Array.prototype as any).filter = function <T>(this: T[], callback: (value: T, index: number) => boolean): T[] {
-  return filter(this, callback as any);
+(Array.prototype as any).filter = function (callback: any) {
+  return filter(this, callback);
 };
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
-// ── Wire the scene manager and start ─────────────────────────────────────────────
-const mgr = new SceneManager();
-mgr.wire();
-(mgr as any).gameData = {};
-mgr.showScene(LoadingScene);
+(window as any).setup = function setup() {
+  const mgr = new SceneManager() as any;
+  mgr.wire();
+
+  // holding global data
+  mgr.gameData = {};
+
+  // open loading scene
+  mgr.showScene(LoadingScene);
+};

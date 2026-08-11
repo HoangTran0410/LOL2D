@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import CollideUtils from '../../../utils/collide.utils';
 import { rectToVertices } from '../../../utils/index';

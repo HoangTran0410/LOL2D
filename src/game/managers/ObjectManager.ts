@@ -1,9 +1,9 @@
-import { System } from '../../../libs/detect-collisions';
+import { System } from '../../libs/detect-collisions';
 import SpellObject from '../gameObject/SpellObject';
 import Champion from '../gameObject/attackableUnits/Champion';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 import CombatText from '../gameObject/helpers/CombatText';
-import { Quadtree } from '../../../libs/quadtree';
+import { Quadtree } from '../../libs/quadtree';
 import TrailSystem from '../gameObject/helpers/TrailSystem';
 import ParticleSystem from '../gameObject/helpers/ParticleSystem';
 

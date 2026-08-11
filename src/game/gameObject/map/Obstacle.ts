@@ -1,5 +1,5 @@
-import SAT from '../../../../libs/SAT';
-import { Rectangle } from '../../../../libs/quadtree';
+import SAT from '../../../libs/SAT';
+import { Rectangle } from '../../../libs/quadtree';
 import { uuidv4 } from '../../../utils/index';
 import TerrainType from '../../enums/TerrainType';
 

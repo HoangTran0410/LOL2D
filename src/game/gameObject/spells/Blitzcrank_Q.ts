@@ -6,7 +6,7 @@ import Airborne from '../buffs/Airborne';
 import Dash from '../buffs/Dash';
 import RootBuff from '../buffs/Root';
 import VectorUtils from '../../../utils/vector.utils';
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export default class Blitzcrank_Q extends Spell {

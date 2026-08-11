@@ -71,9 +71,6 @@ export default class InGameHUD {
   }
 
   initVue(game: Game) {
-    const VueAny = (window as any).Vue;
-    const { toRaw, createApp } = VueAny;
-
     this.app = createApp({
       data() {
         return {
@@ -202,7 +199,7 @@ export default class InGameHUD {
         },
         showPreview(spellProxy: any, show: boolean) {
           try {
-            const s = VueAny.toRaw(spellProxy.instance);
+            const s = toRaw(spellProxy.instance);
             if (s) s.willDrawPreview = show || false;
           } catch (e) {
             console.error(e);

@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../../libs/quadtree';
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import ParticleSystem from '../helpers/ParticleSystem';
 import Spell from '../Spell';

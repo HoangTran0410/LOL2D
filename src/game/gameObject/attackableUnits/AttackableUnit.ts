@@ -94,6 +94,9 @@ export default class AttackableUnit extends GameObject {
     this.visionRadius = this.animatedValues.visionRadius;
   }
 
+  // hook called by TerrainMap when this unit hits a wall
+  onCollideWall() {}
+
   draw() {
     this.drawAvatar();
     this.drawDir();

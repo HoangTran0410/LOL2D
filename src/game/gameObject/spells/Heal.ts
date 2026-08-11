@@ -1,7 +1,7 @@
 import AssetManager from '../../../managers/AssetManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
-import { StatModifier } from '../Stat';
+import { StatModifier } from '../Stats';
 import Speedup from '../buffs/Speedup';
 import CombatText from '../helpers/CombatText';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';

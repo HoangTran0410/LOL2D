@@ -5,7 +5,7 @@ import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export default class Ashe_W extends Spell {

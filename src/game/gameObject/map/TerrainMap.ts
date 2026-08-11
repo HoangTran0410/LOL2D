@@ -1,5 +1,5 @@
-import SAT from '../../../../libs/SAT';
-import { Circle, Quadtree, Rectangle } from '../../../../libs/quadtree';
+import SAT from '../../../libs/SAT';
+import { Circle, Quadtree, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import CollideUtils from '../../../utils/collide.utils';
 import { hasFlag } from '../../../utils/index';

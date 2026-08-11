@@ -5,7 +5,7 @@ import Dash from '../buffs/Dash';
 import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
 import TrueSight from '../buffs/TrueSight';
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export default class LeeSin_Q extends Spell {

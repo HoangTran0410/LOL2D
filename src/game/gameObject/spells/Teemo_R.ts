@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import BuffAddType from '../../enums/BuffAddType';

@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../../libs/quadtree';
+import { Rectangle } from '../../../libs/quadtree';
 
 export default class Camera {
   position: p5.Vector;

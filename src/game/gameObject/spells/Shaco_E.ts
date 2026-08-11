@@ -1,4 +1,4 @@
-import { Circle } from '../../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';

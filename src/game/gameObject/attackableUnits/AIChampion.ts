@@ -62,7 +62,7 @@ export default class AIChampion extends Champion {
   }
 
   onCollideWall() {
-    this.onCollideWall?.();
+    super.onCollideWall();
     if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
   }
 

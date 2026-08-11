@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../../libs/quadtree';
+import { Rectangle } from '../../../libs/quadtree';
 import SpellObject from '../SpellObject';
 
 interface TrailParticle {

@@ -5,7 +5,7 @@ import { rectToVertices } from '../../../utils/index';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import CollideUtils from '../../../utils/collide.utils';
-import { Circle, Rectangle } from '../../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export default class Lux_R extends Spell {
