@@ -3,9 +3,14 @@ import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
+import SpellObject from '../SpellObject';
 import Dash from '../buffs/Dash';
 import Stun from '../buffs/Stun';
 import TrailSystem from '../helpers/TrailSystem';
+
+/** Dirty linen, with a darker weave underneath for contrast on pale ground. */
+const LINEN: [number, number, number] = [235, 222, 172];
+const LINEN_DARK: [number, number, number] = [125, 108, 66];
 
 export default class Amumu_Q extends Spell {
   image = AssetManager.getAsset('spell_amumu_q');
@@ -63,6 +68,11 @@ export class Amumu_Q_Object extends MissileSpellObject {
   dashBuff: Dash | null = null;
   stunBuff: Stun | null = null;
 
+  /** Cosmetic only: how far the wrapping has slid along the bandage. */
+  _wrapScroll = 0;
+  /** Cosmetic only: counts down from the moment of the catch. */
+  _catchFlash = 0;
+
   trailSystem = new TrailSystem({
     trailSize: this.size,
     trailColor: '#E8D9A044',
@@ -71,6 +81,12 @@ export class Amumu_Q_Object extends MissileSpellObject {
   onHit(enemy: any) {
     this.enemyHit = enemy;
     this.isMissile = false;
+    this._catchFlash = 400;
+
+    // the wrap taking hold, so the catch is not a silent teleport
+    const impact = new Amumu_Q_Impact(this.owner);
+    impact.position = enemy.position.copy();
+    this.game.objectManager.addObject(impact);
 
     enemy.takeDamage(this.damage, this.owner);
 
@@ -94,6 +110,10 @@ export class Amumu_Q_Object extends MissileSpellObject {
   }
 
   update() {
+    // the wrapping runs outwards on the throw and reels back on the pull
+    this._wrapScroll += (deltaTime / 1000) * (this.enemyHit ? -150 : 220);
+    if (this._catchFlash > 0) this._catchFlash -= deltaTime;
+
     if (!this.enemyHit) {
       super.update();
       return;
@@ -113,37 +133,202 @@ export class Amumu_Q_Object extends MissileSpellObject {
   }
 
   draw() {
+    const ownerPos = this.owner.position;
+    const hooked = !!this.enemyHit;
+    const [lr, lg, lb] = LINEN;
+    const [dr, dg, db] = LINEN_DARK;
+
+    const dist = this.position.dist(ownerPos);
+    const dirX = dist > 0.001 ? (this.position.x - ownerPos.x) / dist : 1;
+    const dirY = dist > 0.001 ? (this.position.y - ownerPos.y) / dist : 0;
+    const normX = -dirY;
+    const normY = dirX;
+    // a rope under tension is straight and thin; a thrown one still has slack
+    const sway = hooked ? 0 : 5;
+
     push();
 
-    // the bandage itself, stretched between the caster and its head
-    stroke(232, 217, 160, 220);
-    strokeWeight(6);
-    line(this.owner.position.x, this.owner.position.y, this.position.x, this.position.y);
-
-    stroke(200, 185, 130, 220);
-    strokeWeight(2);
-    const dir = p5.Vector.sub(this.position, this.owner.position);
-    const steps = Math.max(2, Math.floor(dir.mag() / 20));
-    for (let i = 1; i < steps; i++) {
-      const x = this.owner.position.x + (dir.x * i) / steps;
-      const y = this.owner.position.y + (dir.y * i) / steps;
-      point(x, y);
+    // the bandage: a dark weave with a pale cloth over it, so it reads on any ground
+    noFill();
+    for (const [col, weight] of [
+      [[dr, dg, db, 235], 11],
+      [[lr, lg, lb, 240], 7],
+    ] as [number[], number][]) {
+      (stroke as any)(...col);
+      strokeWeight(hooked ? weight + 2 : weight);
+      beginShape();
+      for (let i = 0; i <= 10; i++) {
+        const t = i / 10;
+        const wobble = sin(t * PI) * sin(this._wrapScroll / 40 + t * 5) * sway;
+        vertex(
+          ownerPos.x + dirX * dist * t + normX * wobble,
+          ownerPos.y + dirY * dist * t + normY * wobble
+        );
+      }
+      endShape();
     }
 
-    noStroke();
-    fill(232, 217, 160);
-    circle(this.position.x, this.position.y, this.size);
+    // the wrapping itself: diagonal turns of cloth sliding along the strip
+    const spacing = 15;
+    const wraps = Math.min(48, Math.max(1, Math.floor(dist / spacing)));
+    const offset = ((this._wrapScroll % spacing) + spacing) % spacing;
+    stroke(dr, dg, db, 200);
+    strokeWeight(2.5);
+    for (let i = 0; i < wraps; i++) {
+      const along = offset + i * spacing;
+      if (along > dist - 4) continue;
+      const t = along / dist;
+      const wobble = sin(t * PI) * sin(this._wrapScroll / 40 + t * 5) * sway;
+      const cx = ownerPos.x + dirX * along + normX * wobble;
+      const cy = ownerPos.y + dirY * along + normY * wobble;
+      const halfW = hooked ? 7 : 6;
+      // slanted, so consecutive turns read as a spiral around the strip
+      line(
+        cx + normX * halfW - dirX * 3,
+        cy + normY * halfW - dirY * 3,
+        cx - normX * halfW + dirX * 3,
+        cy - normY * halfW + dirY * 3
+      );
+    }
 
     pop();
+
+    // the head: a wadded ball of bandage, cross-wrapped
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(Math.atan2(dirY, dirX));
+
+    noStroke();
+    fill(dr, dg, db, 255);
+    circle(0, 0, this.size + 8);
+    fill(lr, lg, lb, 255);
+    circle(0, 0, this.size + 2);
+
+    stroke(dr, dg, db, 220);
+    strokeWeight(2.5);
+    noFill();
+    arc(0, 0, this.size + 2, this.size + 2, -0.9, 0.9);
+    line(-this.size * 0.4, -this.size * 0.3, this.size * 0.45, this.size * 0.2);
+    line(-this.size * 0.4, this.size * 0.3, this.size * 0.45, -this.size * 0.2);
+
+    // frayed ends trailing off the ball
+    stroke(lr, lg, lb, 190);
+    strokeWeight(2);
+    for (let i = 0; i < 3; i++) {
+      const a = -0.7 + i * 0.7 + sin(this._wrapScroll / 30 + i) * 0.2;
+      line(
+        cos(a) * this.size * 0.5,
+        sin(a) * this.size * 0.5,
+        cos(a) * (this.size * 0.5 + 12),
+        sin(a) * (this.size * 0.5 + 12)
+      );
+    }
+    pop();
+
+    // while Amumu is being reeled in, chevrons run along the bandage towards
+    // the victim — the direction he is about to travel
+    if (hooked) {
+      const pulse = (frameCount % 30) / 30;
+      push();
+      noFill();
+      stroke(255, 250, 220, 200);
+      strokeWeight(3);
+      for (let i = 0; i < 3; i++) {
+        const along = ((pulse + i / 3) % 1) * dist;
+        const bx = ownerPos.x + dirX * along;
+        const by = ownerPos.y + dirY * along;
+        line(bx - normX * 10 - dirX * 12, by - normY * 10 - dirY * 12, bx, by);
+        line(bx + normX * 10 - dirX * 12, by + normY * 10 - dirY * 12, bx, by);
+      }
+      pop();
+    }
   }
 
   // the bandage spans from the caster to its head, so the box must cover both
   getDisplayBoundingBox() {
+    const pad = this.size * 2;
     return new Rectangle({
-      x: Math.min(this.position.x, this.owner.position.x) - this.size / 2,
-      y: Math.min(this.position.y, this.owner.position.y) - this.size / 2,
-      w: Math.abs(this.position.x - this.owner.position.x) + this.size,
-      h: Math.abs(this.position.y - this.owner.position.y) + this.size,
+      x: Math.min(this.position.x, this.owner.position.x) - pad,
+      y: Math.min(this.position.y, this.owner.position.y) - pad,
+      w: Math.abs(this.position.x - this.owner.position.x) + pad * 2,
+      h: Math.abs(this.position.y - this.owner.position.y) + pad * 2,
+      data: this,
+    });
+  }
+}
+
+/** The catch: cloth flaring out and dust knocked off where the bandage bit. */
+export class Amumu_Q_Impact extends SpellObject {
+  position = this.owner.position.copy();
+  age = 0;
+  lifeTime = 400;
+  maxRadius = 72;
+
+  _strands: { angle: number; length: number; curl: number }[] = [];
+
+  onAdded() {
+    for (let i = 0; i < 9; i++) {
+      this._strands.push({
+        angle: (TWO_PI * i) / 9 + random(-0.2, 0.2),
+        length: random(0.6, 1),
+        curl: random(-0.7, 0.7),
+      });
+    }
+  }
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const [lr, lg, lb] = LINEN;
+    const [dr, dg, db] = LINEN_DARK;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // dust ring thrown off the wrap
+    noFill();
+    stroke(dr, dg, db, 190 * fade);
+    strokeWeight(9 * fade + 1);
+    circle(0, 0, this.maxRadius * 2 * (0.25 + t * 0.75));
+
+    // loose strands whipping out and curling
+    stroke(lr, lg, lb, 235 * fade);
+    strokeWeight(4 * fade + 1.5);
+    noFill();
+    for (const s of this._strands) {
+      const reach = this.maxRadius * s.length * (0.3 + t * 0.7);
+      const a = s.angle;
+      beginShape();
+      vertex(cos(a) * 8, sin(a) * 8);
+      const midA = a + s.curl * 0.3;
+      vertex(cos(midA) * reach * 0.6, sin(midA) * reach * 0.6);
+      const endA = a + s.curl;
+      vertex(cos(endA) * reach, sin(endA) * reach);
+      endShape();
+    }
+
+    const flash = 1 - constrain(t / 0.28, 0, 1);
+    if (flash > 0) {
+      noStroke();
+      fill(255, 248, 215, 210 * flash);
+      circle(0, 0, 42 * flash + 8);
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.maxRadius + 20;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

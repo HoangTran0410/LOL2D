@@ -150,22 +150,36 @@ export class Anivia_W_Object extends SpellObject {
       this.age > this.lifeTime - 500 ? map(this.age, this.lifeTime - 500, this.lifeTime, 1, 0) : 1;
     const halfLength = (this.length / 2) * this.growth;
     const halfThickness = this.thickness / 2;
+    // how far through its life the slab is — drives the cracks that spread
+    const life = constrain(this.age / this.lifeTime, 0, 1);
 
     push();
     translate(this.position.x, this.position.y);
     rotate(this.angle);
 
+    // spikes of ice punched up out of the ground along both faces: the
+    // silhouette that says "solid barrier" rather than "puddle of light"
+    const columns = 9;
+    noStroke();
+    fill(120, 185, 235, 220 * fade);
+    for (let i = 0; i < columns; i++) {
+      const x = -halfLength + ((i + 0.5) / columns) * halfLength * 2;
+      const w = (halfLength * 2) / columns / 2;
+      const spike = halfThickness * (0.55 + 0.45 * sin(i * 2.3));
+      triangle(x - w, -halfThickness, x + w, -halfThickness, x, -halfThickness - spike);
+      triangle(x - w, halfThickness, x + w, halfThickness, x, halfThickness + spike);
+    }
+
     rectMode(CENTER);
-    strokeWeight(2);
-    stroke(235, 250, 255, 230 * fade);
+    strokeWeight(3);
+    stroke(30, 80, 125, 235 * fade);
     // opaque enough to read as a solid barrier rather than a ground effect
-    fill(150, 210, 248, 210 * fade);
-    rect(0, 0, halfLength * 2, halfThickness * 2, 6);
+    fill(150, 210, 248, 230 * fade);
+    rect(0, 0, halfLength * 2, halfThickness * 2, 5);
 
     // chunky ice blocks along the slab, like the segments of the real wall
-    stroke(255, 200 * fade);
-    strokeWeight(2);
-    const columns = 8;
+    stroke(235, 250, 255, 220 * fade);
+    strokeWeight(2.5);
     for (let i = 1; i < columns; i++) {
       const x = -halfLength + (i / columns) * halfLength * 2;
       line(x, -halfThickness, x, halfThickness);
@@ -173,8 +187,22 @@ export class Anivia_W_Object extends SpellObject {
 
     // frosted highlight down the middle
     noStroke();
-    fill(255, 130 * fade);
-    rect(0, 0, halfLength * 2, halfThickness * 0.5);
+    fill(255, 170 * fade);
+    rect(0, -halfThickness * 0.35, halfLength * 2, halfThickness * 0.4);
+
+    // the slab fissures as it ages, so its remaining life is visible in the ice
+    if (life > 0.35) {
+      const cracking = constrain((life - 0.35) / 0.65, 0, 1);
+      stroke(255, 255, 255, 200 * cracking * fade);
+      strokeWeight(1.5 + cracking * 1.5);
+      for (let i = 0; i < columns; i++) {
+        const x = -halfLength + ((i + 0.5) / columns) * halfLength * 2;
+        const reach = halfThickness * cracking;
+        const skew = sin(i * 5.1) * halfThickness * 0.5 * cracking;
+        line(x, -reach, x + skew, 0);
+        line(x + skew, 0, x - skew * 0.6, reach);
+      }
+    }
 
     pop();
   }

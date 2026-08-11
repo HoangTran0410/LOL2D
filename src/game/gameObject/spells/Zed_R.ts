@@ -220,7 +220,88 @@ export class Zed_R_Mark extends Buff {
     const payload = Math.round(this.storedDamage);
     if (payload > 0 && this.targetUnit && !this.targetUnit.isDead) {
       this.targetUnit.takeDamage(payload, this.sourceUnit);
+
+      // the payload landing: without this the mark deals its damage in silence
+      const burst = new Zed_R_Detonation(this.sourceUnit);
+      burst.position = this.targetUnit.position.copy();
+      burst.payload = payload;
+      this.game?.objectManager?.addObject(burst);
     }
+  }
+}
+
+/** The banked damage going off all at once. Scaled by how much was stored. */
+export class Zed_R_Detonation extends SpellObject {
+  position = this.owner.position.copy();
+  payload = 0;
+  age = 0;
+  lifeTime = 600;
+
+  get maxRadius(): number {
+    return constrain(70 + this.payload * 1.6, 70, 190);
+  }
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const r = this.maxRadius;
+    const [cr, cg, cb] = SHADOW_COLOR;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // shadow imploding, then blowing out
+    const implode = constrain(t / 0.18, 0, 1);
+    noFill();
+    stroke(cr, cg, cb, 230 * (1 - implode));
+    strokeWeight(5);
+    circle(0, 0, r * 2 * (1 - implode * 0.85));
+
+    if (t > 0.14) {
+      const k = constrain((t - 0.14) / 0.86, 0, 1);
+      stroke(25, 5, 40, 220 * fade);
+      strokeWeight(20 * fade + 3);
+      circle(0, 0, r * 2 * k);
+      stroke(cr, cg, cb, 250 * fade);
+      strokeWeight(6 * fade + 1.5);
+      circle(0, 0, r * 2 * k);
+
+      // blades of shadow thrown out — Zed's shuriken shape, exploded
+      stroke(240, 210, 255, 240 * fade);
+      strokeWeight(4 * fade + 1);
+      for (let i = 0; i < 8; i++) {
+        const a = (TWO_PI * i) / 8 + t * 1.4;
+        const inner = r * k * 0.55;
+        const outer = r * k;
+        line(cos(a) * inner, sin(a) * inner, cos(a) * outer, sin(a) * outer);
+      }
+    }
+
+    // the flash at the moment it goes off
+    const flash = 1 - constrain(Math.abs(t - 0.16) / 0.16, 0, 1);
+    if (flash > 0) {
+      noStroke();
+      fill(255, 235, 255, 235 * flash);
+      circle(0, 0, r * 0.85 * flash + 16);
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.maxRadius + 30;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }
 
@@ -247,47 +328,98 @@ export class Zed_R_Object extends SpellObject {
   draw() {
     const alpha =
       this.age > this.lifeTime - 400
-        ? map(this.age, this.lifeTime - 400, this.lifeTime, 200, 0)
-        : 200;
+        ? map(this.age, this.lifeTime - 400, this.lifeTime, 220, 0)
+        : 220;
     const size = this.target
-      ? Math.max(this.size, this.target.animatedValues.displaySize + 16)
+      ? Math.max(this.size, this.target.animatedValues.displaySize + 20)
       : this.size;
+    const [cr, cg, cb] = SHADOW_COLOR;
+    const left = constrain(1 - this.age / this.lifeTime, 0, 1);
+    const stored = this.mark?.storedDamage ?? 0;
+    // the closer the mark is to going off, the harder the rune throbs
+    const urgency = 0.5 + 0.5 * sin(frameCount / (3 + left * 8));
 
     push();
     translate(this.position.x, this.position.y);
+
+    // dark disc under the rune so it never washes out against the victim
+    noStroke();
+    fill(20, 4, 34, alpha * 0.45);
+    circle(0, 0, size * 1.05);
+
+    // the fuse: how long until the banked damage lands
+    noFill();
+    stroke(20, 4, 34, alpha);
+    strokeWeight(7);
+    circle(0, 0, size + 14);
+    stroke(cr, cg, cb, alpha);
+    strokeWeight(4);
+    arc(0, 0, size + 14, size + 14, -HALF_PI, -HALF_PI + TWO_PI * left);
+
+    push();
     rotate(frameCount / 30);
 
-    noFill();
-    strokeWeight(3);
-    stroke(SHADOW_COLOR[0], SHADOW_COLOR[1], SHADOW_COLOR[2], alpha);
-
     // two counter-set arcs plus a triangle: a simple, readable death rune
+    noFill();
+    stroke(20, 4, 34, alpha);
+    strokeWeight(7);
+    arc(0, 0, size, size, 0, PI * 0.6);
+    arc(0, 0, size, size, PI, PI * 1.6);
+    stroke(cr, cg, cb, alpha);
+    strokeWeight(3.5);
     arc(0, 0, size, size, 0, PI * 0.6);
     arc(0, 0, size, size, PI, PI * 1.6);
 
-    strokeWeight(2);
-    stroke(255, alpha * 0.8);
+    strokeWeight(2.5);
+    stroke(255, alpha * 0.85);
     const r = size / 3;
     triangle(0, -r, cos(PI / 6) * r, sin(PI / 6) * r, -cos(PI / 6) * r, sin(PI / 6) * r);
+    pop();
 
     // banked damage swells the rune, so the payload is readable before it lands
-    const stored = this.mark?.storedDamage ?? 0;
     if (stored > 0) {
       noStroke();
-      fill(SHADOW_COLOR[0], SHADOW_COLOR[1], SHADOW_COLOR[2], alpha * 0.5);
-      circle(0, 0, constrain(stored * 1.5, 4, size));
+      fill(cr, cg, cb, alpha * (0.35 + 0.3 * urgency));
+      circle(0, 0, constrain(stored * 1.6, 6, size * 0.9));
+      fill(255, 235, 255, alpha * 0.5 * urgency);
+      circle(0, 0, constrain(stored * 0.7, 3, size * 0.4));
     }
 
     pop();
+
+    // a thread of shadow back to Zed: whose mark this is, at a glance
+    if (this.owner && !this.owner.isDead) {
+      push();
+      const ox = this.owner.position.x;
+      const oy = this.owner.position.y;
+      const dashes = 9;
+      stroke(cr, cg, cb, alpha * 0.5);
+      strokeWeight(2.5);
+      for (let i = 0; i < dashes; i++) {
+        const t1 = (i + ((frameCount / 60) % 1) * 0.5) / dashes;
+        const t2 = t1 + 0.4 / dashes;
+        if (t2 > 1) continue;
+        line(
+          lerp(ox, this.position.x, t1),
+          lerp(oy, this.position.y, t1),
+          lerp(ox, this.position.x, t2),
+          lerp(oy, this.position.y, t2)
+        );
+      }
+      pop();
+    }
   }
 
+  // the tether spans from Zed to the victim, so the box must cover both
   getDisplayBoundingBox() {
-    const r = this.size;
+    const pad = this.size;
+    const ox = this.owner?.position?.x ?? this.position.x;
+    const oy = this.owner?.position?.y ?? this.position.y;
     return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
+      x: Math.min(this.position.x, ox) - pad,
+      y: Math.min(this.position.y, oy) - pad,
+      w: Math.abs(this.position.x - ox) + pad * 2,
+      h: Math.abs(this.position.y - oy) + pad * 2,
       data: this,
     });
   }

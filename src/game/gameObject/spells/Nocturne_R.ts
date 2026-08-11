@@ -74,6 +74,11 @@ export default class Nocturne_R extends Spell {
     const obj = new Nocturne_R_Object(this.owner);
     this.game.objectManager.addObject(obj);
 
+    // a marker that rides on Nocturne for exactly as long as the leap is live
+    const window = new Nocturne_R_Window(this.owner);
+    window.spell = this;
+    this.game.objectManager.addObject(window);
+
     // open the recast window; the real cooldown only starts when it closes
     this.phase = 'R2';
     this.image = Nocturne_R.PHASES.R2.image;
@@ -93,6 +98,11 @@ export default class Nocturne_R extends Spell {
     dashBuff.cancelable = false; // displacement immunity: nothing stops the flight
     dashBuff.onReachedDestination = () => {
       if (!target.isDead) target.takeDamage(this.damage, this.owner);
+
+      // the landing: something has to happen where 35 damage arrived
+      const land = new Nocturne_R_Landing(this.owner);
+      land.position = target.position.copy();
+      this.game.objectManager.addObject(land);
     };
     this.owner.addBuff(dashBuff);
   }
@@ -148,8 +158,8 @@ export default class Nocturne_R extends Spell {
 export class Nocturne_R_Object extends SpellObject {
   position = this.owner.position.copy();
   age = 0;
-  lifeTime = 700;
-  maxRadius = 400;
+  lifeTime = 900;
+  maxRadius = 760;
 
   update() {
     this.age += deltaTime;
@@ -157,27 +167,180 @@ export class Nocturne_R_Object extends SpellObject {
   }
 
   draw() {
-    const radius = map(this.age, 0, this.lifeTime, 20, this.maxRadius);
-    const alpha = map(this.age, 0, this.lifeTime, 200, 0);
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const radius = lerp(30, this.maxRadius, t);
 
     push();
-    noFill();
-    stroke(40, 10, 70, alpha);
-    strokeWeight(14);
-    circle(this.position.x, this.position.y, radius * 2);
+    translate(this.position.x, this.position.y);
 
-    stroke(120, 60, 190, alpha);
-    strokeWeight(3);
-    circle(this.position.x, this.position.y, radius * 2);
+    // a wall of black rolling out — heavy enough to read as "the lights went out"
+    noFill();
+    stroke(6, 2, 14, 210 * fade);
+    strokeWeight(42 * fade + 6);
+    circle(0, 0, radius * 2);
+    stroke(52, 14, 92, 220 * fade);
+    strokeWeight(24 * fade + 4);
+    circle(0, 0, radius * 2);
+    stroke(165, 95, 255, 245 * fade);
+    strokeWeight(5 * fade + 1.5);
+    circle(0, 0, radius * 2);
+
+    // claws of shadow raking outwards inside the wave
+    stroke(120, 55, 200, 190 * fade);
+    strokeWeight(7 * fade + 1);
+    for (let i = 0; i < 12; i++) {
+      const a = (TWO_PI * i) / 12 + t * 0.5;
+      const inner = radius - 60 * fade - 20;
+      arc(0, 0, inner * 2, inner * 2, a, a + 0.28);
+      arc(0, 0, radius * 2 * 0.82, radius * 2 * 0.82, a + 0.5, a + 0.72);
+    }
+
+    // the pitch-dark heart of it, right where Nocturne cast
+    noStroke();
+    fill(4, 1, 10, 190 * fade * fade);
+    circle(0, 0, radius * 1.1);
+
     pop();
   }
 
   getDisplayBoundingBox() {
+    const r = this.maxRadius + 60;
     return new Rectangle({
-      x: this.position.x - this.maxRadius,
-      y: this.position.y - this.maxRadius,
-      w: this.maxRadius * 2,
-      h: this.maxRadius * 2,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/**
+ * Rides on Nocturne while Paranoia's leap is available and disappears the moment
+ * it is not — so "can I still jump?" is answered in the world, not in the HUD.
+ */
+export class Nocturne_R_Window extends SpellObject {
+  spell: Nocturne_R | null = null;
+  position = this.owner.position.copy();
+  size = 96;
+  age = 0;
+
+  update() {
+    this.age += deltaTime;
+
+    // the phase check is the real one; the age cap is a backstop so the marker
+    // can never outlive the window even if its spell stops being updated
+    const expired = !this.spell || this.age > this.spell.nearsightTime + 500;
+    if (expired || this.spell!.phase !== 'R2' || this.owner.isDead) {
+      this.toRemove = true;
+      return;
+    }
+    this.position.set(this.owner.position.x, this.owner.position.y);
+  }
+
+  draw() {
+    if (!this.spell) return;
+    const left = constrain(this.spell._recastTimeLeft / this.spell.nearsightTime, 0, 1);
+    const bodySize = this.owner.animatedValues?.displaySize ?? 40;
+    const ring = Math.max(this.size, bodySize + 34);
+    const pulse = 0.5 + 0.5 * sin(frameCount / 7);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // a pool of dark under him
+    noStroke();
+    fill(20, 4, 38, 120);
+    circle(0, 0, ring * 0.9);
+
+    // the arc that drains: exactly how long the leap stays available
+    noFill();
+    stroke(10, 2, 20, 220);
+    strokeWeight(9);
+    circle(0, 0, ring);
+    stroke(175, 105, 255, 235);
+    strokeWeight(5);
+    arc(0, 0, ring, ring, -HALF_PI, -HALF_PI + TWO_PI * left);
+
+    // shadow spikes flaring off him while the window is open
+    stroke(140, 70, 230, 120 + 90 * pulse);
+    strokeWeight(3);
+    for (let i = 0; i < 8; i++) {
+      const a = (TWO_PI * i) / 8 - frameCount / 45;
+      const r1 = ring / 2 + 4;
+      const r2 = ring / 2 + 12 + 6 * pulse;
+      line(cos(a) * r1, sin(a) * r1, cos(a) * r2, sin(a) * r2);
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.size;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/** Where the leap ends: shadow slamming down on the victim. */
+export class Nocturne_R_Landing extends SpellObject {
+  position = this.owner.position.copy();
+  age = 0;
+  lifeTime = 480;
+  maxRadius = 120;
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    noFill();
+    stroke(12, 3, 24, 230 * fade);
+    strokeWeight(16 * fade + 2);
+    circle(0, 0, this.maxRadius * 2 * (0.2 + t * 0.8));
+    stroke(180, 110, 255, 245 * fade);
+    strokeWeight(5 * fade + 1.5);
+    circle(0, 0, this.maxRadius * 2 * (0.2 + t * 0.8));
+
+    // three raking claw marks
+    stroke(230, 200, 255, 250 * fade);
+    strokeWeight(6 * fade + 2);
+    for (let i = -1; i <= 1; i++) {
+      const a = -0.5 + i * 0.42;
+      const reach = this.maxRadius * (0.4 + t * 0.6);
+      arc(0, 0, reach * 2, reach * 1.5, a - 0.55, a + 0.55);
+    }
+
+    const flash = 1 - constrain(t / 0.25, 0, 1);
+    if (flash > 0) {
+      noStroke();
+      fill(210, 160, 255, 220 * flash);
+      circle(0, 0, 60 * flash + 12);
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.maxRadius + 20;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

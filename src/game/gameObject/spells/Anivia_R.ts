@@ -43,6 +43,17 @@ export default class Anivia_R extends Spell {
   }
 }
 
+interface Flake {
+  /** Polar, so a flake keeps its place in the vortex as the storm widens. */
+  angle: number;
+  radiusRatio: number;
+  spin: number;
+  size: number;
+  drift: number;
+}
+
+const FLAKE_COUNT = 34;
+
 /** A circular zone whose radius ramps from `startRadius` to `endRadius` over its life. */
 export class Anivia_R_Object extends SpellObject {
   position = this.owner.position.copy();
@@ -60,6 +71,21 @@ export class Anivia_R_Object extends SpellObject {
   applyInterval = 250;
   _timeSinceApply = 0;
   _swirl = 0;
+  /** Cosmetic: counts down from each damage tick so the storm can pulse. */
+  _bitePulse = 0;
+  _flakes: Flake[] = [];
+
+  onAdded() {
+    for (let i = 0; i < FLAKE_COUNT; i++) {
+      this._flakes.push({
+        angle: random(TWO_PI),
+        radiusRatio: Math.sqrt(random(0.02, 1)), // even spread over the disc
+        spin: random(0.6, 1.9) * (random() < 0.5 ? -1 : 1),
+        size: random(2.5, 6),
+        drift: random(-0.06, 0.06),
+      });
+    }
+  }
 
   update() {
     this.age += deltaTime;
@@ -71,10 +97,21 @@ export class Anivia_R_Object extends SpellObject {
     this.radius = map(this.age, 0, this.lifeTime, this.startRadius, this.endRadius);
     this.visionRadius = this.radius;
     this._swirl += deltaTime / 900;
+    if (this._bitePulse > 0) this._bitePulse -= deltaTime;
+
+    // the vortex keeps turning whether or not anyone is standing in it
+    const step = deltaTime / 1000;
+    for (const flake of this._flakes) {
+      flake.angle += flake.spin * step;
+      flake.radiusRatio += flake.drift * step;
+      if (flake.radiusRatio > 1) flake.radiusRatio = 0.12;
+      if (flake.radiusRatio < 0.1) flake.radiusRatio = 1;
+    }
 
     this._timeSinceApply += deltaTime;
     if (this._timeSinceApply < this.applyInterval) return;
     this._timeSinceApply = 0;
+    this._bitePulse = 220; // cosmetic: a flash of frost on every application
 
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({
@@ -106,24 +143,54 @@ export class Anivia_R_Object extends SpellObject {
   draw() {
     const fade =
       this.age > this.lifeTime - 600 ? map(this.age, this.lifeTime - 600, this.lifeTime, 1, 0) : 1;
+    const bite = this._bitePulse > 0 ? this._bitePulse / 220 : 0;
 
     push();
     translate(this.position.x, this.position.y);
 
+    // the ground the storm covers, brightest at the freezing eye
     noStroke();
-    fill(150, 210, 245, 45 * fade);
+    fill(120, 185, 235, 60 * fade);
+    circle(0, 0, this.radius * 2);
+    fill(190, 230, 255, 45 * fade);
+    circle(0, 0, this.radius * 1.15);
+
+    // the edge, drawn twice so it survives on both light and dark ground —
+    // this is the line between "taking damage" and "safe"
+    noFill();
+    stroke(25, 70, 115, 200 * fade);
+    strokeWeight(7);
+    circle(0, 0, this.radius * 2);
+    stroke(225, 248, 255, (185 + 70 * bite) * fade);
+    strokeWeight(3);
     circle(0, 0, this.radius * 2);
 
-    strokeWeight(2);
-    stroke(220, 245, 255, 140 * fade);
-    noFill();
-    circle(0, 0, this.radius * 2);
+    // teeth of frost biting inwards off that edge
+    stroke(215, 245, 255, 150 * fade);
+    strokeWeight(3);
+    for (let i = 0; i < 16; i++) {
+      const a = (TWO_PI * i) / 16 + this._swirl * 0.35;
+      const inner = this.radius - 10 - 8 * bite;
+      line(cos(a) * inner, sin(a) * inner, cos(a) * this.radius, sin(a) * this.radius);
+    }
 
     // three spiral arms turning around the eye of the storm
-    stroke(255, 170 * fade);
-    strokeWeight(2);
+    push();
+    blendMode(ADD);
+    noFill();
     for (let arm = 0; arm < 3; arm++) {
       const offset = this._swirl + (arm / 3) * TWO_PI;
+      stroke(150, 210, 255, 120 * fade);
+      strokeWeight(9);
+      beginShape();
+      for (let t = 0; t <= 1.001; t += 0.1) {
+        const r = this.radius * (0.15 + t * 0.85);
+        const a = offset + t * 2.4;
+        vertex(cos(a) * r, sin(a) * r);
+      }
+      endShape();
+      stroke(240, 252, 255, 190 * fade);
+      strokeWeight(3);
       beginShape();
       for (let t = 0; t <= 1.001; t += 0.1) {
         const r = this.radius * (0.15 + t * 0.85);
@@ -132,15 +199,21 @@ export class Anivia_R_Object extends SpellObject {
       }
       endShape();
     }
+    blendMode(BLEND);
+    pop();
 
-    // drifting snow flecks
+    // snow riding the vortex — the same flakes every frame, so it does not fizz
     noStroke();
-    fill(255, 200 * fade);
-    for (let i = 0; i < 8; i++) {
-      const a = random(TWO_PI);
-      const r = random(this.radius);
-      circle(cos(a) * r, sin(a) * r, random(2, 5));
+    for (const flake of this._flakes) {
+      const r = this.radius * flake.radiusRatio;
+      fill(255, (140 + 90 * flake.radiusRatio) * fade);
+      circle(cos(flake.angle) * r, sin(flake.angle) * r, flake.size);
     }
+
+    // the eye: a cold core that flares each time the storm bites
+    noStroke();
+    fill(255, (110 + 100 * bite) * fade);
+    circle(0, 0, 16 + 10 * bite);
 
     pop();
   }

@@ -44,6 +44,7 @@ export default class Blitzcrank_E extends Spell {
       ],
     });
 
+    const hitPositions: p5.Vector[] = [];
     enemies.forEach((enemy: any) => {
       const airborneBuff = new Airborne(this.airborneDuration, this.owner, enemy);
       airborneBuff.height = this.airborneHeight;
@@ -51,17 +52,39 @@ export default class Blitzcrank_E extends Spell {
       enemy.addBuff(airborneBuff);
 
       enemy.takeDamage(this.damage, this.owner);
+      hitPositions.push(enemy.position.copy());
     });
 
     const obj = new Blitzcrank_E_Object(this.owner);
     obj.angle = angle;
     obj.halfAngle = this.halfAngle;
     obj.range = this.range;
+    obj.hitPositions = hitPositions;
     this.game.objectManager.addObject(obj);
   }
 
+  /**
+   * The circle a bare `drawPreview` draws is a lie: this hits a cone, not a disc.
+   * Draw the actual wedge, aimed where the mouse is.
+   */
   drawPreview() {
-    super.drawPreview(this.range);
+    const angle = VectorUtils.getAngle(this.owner.position, this.game.worldMouse);
+    const d = this.range * 2;
+
+    push();
+    translate(this.owner.position.x, this.owner.position.y);
+
+    noStroke();
+    fill(255, 190, 80, 20);
+    arc(0, 0, d, d, angle - this.halfAngle, angle + this.halfAngle, PIE);
+
+    noFill();
+    stroke(255, 205, 120, 130);
+    strokeWeight(2);
+    arc(0, 0, d, d, angle - this.halfAngle, angle + this.halfAngle);
+    line(0, 0, cos(angle - this.halfAngle) * this.range, sin(angle - this.halfAngle) * this.range);
+    line(0, 0, cos(angle + this.halfAngle) * this.range, sin(angle + this.halfAngle) * this.range);
+    pop();
   }
 }
 
@@ -72,6 +95,9 @@ export class Blitzcrank_E_Object extends SpellObject {
   lifeTime = 320;
   age = 0;
 
+  /** Cosmetic: where the punch connected, so each victim gets an impact star. */
+  hitPositions: p5.Vector[] = [];
+
   update() {
     this.age += deltaTime;
     if (this.age >= this.lifeTime) this.toRemove = true;
@@ -79,44 +105,89 @@ export class Blitzcrank_E_Object extends SpellObject {
 
   draw() {
     const t = constrain(this.age / this.lifeTime, 0, 1);
-    // the fist sweeps out fast then fades
-    const reach = this.range * (0.35 + 0.65 * t) * 2;
-    const alpha = 180 * (1 - t);
+    // the fist punches out fast, then the wedge it swept fades behind it
+    const punch = Math.min(1, t / 0.45);
+    const fistDist = this.range * (0.2 + 0.8 * punch);
+    const fade = 1 - t;
+    const from = this.angle - this.halfAngle;
+    const to = this.angle + this.halfAngle;
 
     push();
-    noStroke();
-    fill(255, 190, 80, alpha * 0.45);
-    arc(
-      this.position.x,
-      this.position.y,
-      reach,
-      reach,
-      this.angle - this.halfAngle,
-      this.angle + this.halfAngle,
-      PIE
-    );
+    translate(this.position.x, this.position.y);
 
-    stroke(255, 225, 160, alpha);
-    strokeWeight(3);
+    // --- the wedge that was actually hit ---------------------------------
+    // full size from the first frame: this is a telegraph, not an expansion
+    const d = this.range * 2;
+    noStroke();
+    fill(255, 175, 60, 90 * fade);
+    arc(0, 0, d, d, from, to, PIE);
+
+    // hard edges, so the shape of the damage is unmistakable
     noFill();
-    arc(
-      this.position.x,
-      this.position.y,
-      reach,
-      reach,
-      this.angle - this.halfAngle,
-      this.angle + this.halfAngle
-    );
+    stroke(255, 235, 170, 240 * fade);
+    strokeWeight(4 * fade + 1);
+    arc(0, 0, d, d, from, to);
+    stroke(255, 210, 130, 200 * fade);
+    strokeWeight(2);
+    line(0, 0, cos(from) * this.range, sin(from) * this.range);
+    line(0, 0, cos(to) * this.range, sin(to) * this.range);
 
-    // the fist itself, thrown out along the aim line
+    // shock ring racing out through the wedge
+    stroke(255, 255, 220, 200 * (1 - punch));
+    strokeWeight(5 * (1 - punch) + 1);
+    arc(0, 0, fistDist * 2, fistDist * 2, from, to);
+
+    // --- the steam fist --------------------------------------------------
+    push();
+    rotate(this.angle);
+    translate(fistDist, 0);
+
+    // piston arm back to Blitzcrank's shoulder
+    stroke(90, 70, 45, 220 * fade);
+    strokeWeight(11);
+    line(-fistDist, 0, -6, 0);
+    stroke(190, 150, 80, 230 * fade);
+    strokeWeight(5);
+    line(-fistDist, 0, -6, 0);
+
+    // knuckle block
+    stroke(70, 45, 20, 240 * fade);
+    strokeWeight(2);
+    fill(225, 165, 70, 245 * fade);
+    rect(-14, -15, 26, 30, 6);
+    fill(255, 215, 140, 235 * fade);
+    rect(4, -12, 9, 24, 4);
     noStroke();
-    fill(220, 150, 60, alpha + 60);
-    const fistDist = this.range * (0.35 + 0.65 * t);
-    circle(
-      this.position.x + cos(this.angle) * fistDist,
-      this.position.y + sin(this.angle) * fistDist,
-      28 * (1 - t * 0.4)
-    );
+    fill(120, 80, 35, 220 * fade);
+    for (let i = 0; i < 3; i++) rect(-6, -10 + i * 8, 14, 3, 2);
+    pop();
+
+    // --- who got hit ------------------------------------------------------
+    if (t < 0.5) {
+      const hitFade = 1 - t / 0.5;
+      for (const p of this.hitPositions) {
+        const x = p.x - this.position.x;
+        const y = p.y - this.position.y;
+        blendMode(ADD);
+        noStroke();
+        fill(255, 220, 150, 130 * hitFade);
+        circle(x, y, 60 * (1 - hitFade) + 25);
+        blendMode(BLEND);
+
+        stroke(255, 245, 200, 240 * hitFade);
+        strokeWeight(3);
+        for (let i = 0; i < 4; i++) {
+          const a = this.angle + (i * TWO_PI) / 4 + 0.4;
+          const r0 = 12 + 20 * (1 - hitFade);
+          line(
+            cos(a) * r0,
+            sin(a) * r0,
+            cos(a) * (r0 + 16 * hitFade),
+            sin(a) * (r0 + 16 * hitFade)
+          );
+        }
+      }
+    }
     pop();
   }
 

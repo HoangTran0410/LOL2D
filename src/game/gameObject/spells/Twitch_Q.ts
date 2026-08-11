@@ -27,47 +27,139 @@ export default class Twitch_Q extends Spell {
     this.owner.addBuff(speedupBuff);
 
     const obj = new Twitch_Q_Object(this.owner);
+    obj.stealthBuff = invisibleBuff;
     this.game.objectManager.addObject(obj);
   }
 }
 
-/** The puff of smoke Twitch vanishes into. */
+/**
+ * The puff of smoke Twitch vanishes into, and then the faint outline that keeps
+ * a nearly transparent champion findable for his own team. It follows the
+ * stealth buff rather than a clock of its own, so it can never linger after the
+ * stealth is gone.
+ */
 export class Twitch_Q_Object extends SpellObject {
   position = this.owner.position.copy();
   age = 0;
   lifeTime = 500;
   maxRadius = 55;
 
+  stealthBuff: any = null;
+
+  /** Cosmetic: motes of dust disturbed by the cloaked body. */
+  _motes: { a: number; r: number; age: number; size: number }[] = [];
+  _moteTimer = 0;
+
+  get _cloaked() {
+    return this.stealthBuff && !this.stealthBuff.toRemove && !this.owner.isDead;
+  }
+
   update() {
     this.age += deltaTime;
-    if (this.age >= this.lifeTime) this.toRemove = true;
+
+    if (this._cloaked) {
+      this._moteTimer += deltaTime;
+      if (this._moteTimer >= 110 && this._motes.length < 10) {
+        this._moteTimer = 0;
+        this._motes.push({
+          a: random(TWO_PI),
+          r: this.owner.animatedValues.displaySize / 2 + random(-4, 10),
+          age: 0,
+          size: random(3, 6),
+        });
+      }
+    }
+
+    let i = 0;
+    while (i < this._motes.length) {
+      const m = this._motes[i];
+      m.age += deltaTime;
+      if (m.age >= 600) this._motes.splice(i, 1);
+      else i++;
+    }
+
+    // the smoke has cleared and the stealth is over: nothing left to draw
+    if (this.age >= this.lifeTime && !this._cloaked && this._motes.length === 0) {
+      this.toRemove = true;
+    }
   }
 
   draw() {
+    if (this.age < this.lifeTime) this._drawSmoke();
+    if (this._cloaked || this._motes.length > 0) this._drawCloak();
+  }
+
+  /** The vanish itself, left behind at the spot he disappeared from. */
+  _drawSmoke() {
     const progress = this.age / this.lifeTime;
-    const alpha = map(this.age, 0, this.lifeTime, 180, 0);
+    const alpha = map(this.age, 0, this.lifeTime, 190, 0);
 
     push();
+    translate(this.position.x, this.position.y);
     noStroke();
-    fill(120, 160, 110, alpha);
-    for (let i = 0; i < 5; i++) {
-      const angle = (i * TWO_PI) / 5;
-      const distance = progress * this.maxRadius;
-      circle(
-        this.position.x + cos(angle) * distance,
-        this.position.y + sin(angle) * distance,
-        25 + progress * 20
-      );
+    for (let i = 0; i < 7; i++) {
+      const angle = (i * TWO_PI) / 7 + progress * 0.8;
+      const distance = progress * this.maxRadius * (0.6 + (i % 3) * 0.2);
+      fill(110, 150, 100, alpha * (0.5 + 0.5 * (i % 2 === 0 ? 1 : 0.6)));
+      circle(cos(angle) * distance, sin(angle) * distance, 22 + progress * 26 + (i % 3) * 5);
     }
+    // a darker heart to the cloud so it does not read as a flat green disc
+    fill(60, 85, 55, alpha * 0.8);
+    circle(0, 0, 26 + progress * 20);
+    pop();
+  }
+
+  /** Where the invisible Twitch actually is — deliberately faint. */
+  _drawCloak() {
+    const pos = this.owner.position;
+    const size = this.owner.animatedValues.displaySize;
+    const left =
+      this.stealthBuff && this.stealthBuff.duration
+        ? constrain(1 - this.stealthBuff.timeElapsed / this.stealthBuff.duration, 0, 1)
+        : 0;
+
+    push();
+    translate(pos.x, pos.y);
+
+    // disturbed dust drifting off the cloaked body
+    noStroke();
+    for (const m of this._motes) {
+      const t = m.age / 600;
+      fill(150, 190, 140, 110 * (1 - t));
+      circle(cos(m.a) * (m.r + t * 10), sin(m.a) * (m.r + t * 10) - t * 8, m.size * (1 - t * 0.5));
+    }
+
+    if (!this._cloaked) {
+      pop();
+      return;
+    }
+
+    // a broken outline: enough to track him, not enough to give him away
+    noFill();
+    stroke(150, 200, 140, 90);
+    strokeWeight(2);
+    const segs = 7;
+    for (let i = 0; i < segs; i++) {
+      const a = (i * TWO_PI) / segs + frameCount / 90;
+      arc(0, 0, size + 6, size + 6, a, a + 0.42);
+    }
+
+    // how much of the stealth is left
+    stroke(180, 225, 160, 150);
+    strokeWeight(2);
+    arc(0, 0, size + 20, size + 20, -HALF_PI, -HALF_PI + TWO_PI * left);
     pop();
   }
 
   getDisplayBoundingBox() {
+    // covers both the smoke left behind and Twitch himself, wherever he has got to
+    const minX = Math.min(this.position.x, this.owner.position.x) - this.maxRadius - 30;
+    const minY = Math.min(this.position.y, this.owner.position.y) - this.maxRadius - 30;
     return new Rectangle({
-      x: this.position.x - this.maxRadius - 25,
-      y: this.position.y - this.maxRadius - 25,
-      w: (this.maxRadius + 25) * 2,
-      h: (this.maxRadius + 25) * 2,
+      x: minX,
+      y: minY,
+      w: Math.abs(this.position.x - this.owner.position.x) + (this.maxRadius + 30) * 2,
+      h: Math.abs(this.position.y - this.owner.position.y) + (this.maxRadius + 30) * 2,
       data: this,
     });
   }

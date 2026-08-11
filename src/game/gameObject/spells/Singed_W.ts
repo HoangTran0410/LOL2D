@@ -63,6 +63,12 @@ export class Singed_W_Object extends SpellObject {
   image = AssetManager.getAsset('spell_singed_w');
   position: p5.Vector = this.owner.position.copy();
 
+  /**
+   * Painted with the other ground effects, under the units standing in it —
+   * a puddle you can see your own champion's feet in reads as a puddle.
+   */
+  zIndex = 2;
+
   radius = 130;
   lifeTime = 5000;
   age = 0;
@@ -164,62 +170,85 @@ export class Singed_W_Object extends SpellObject {
 
   draw() {
     const opacity = this._getOpacity();
+    const left = constrain(1 - this.age / this.lifeTime, 0, 1);
 
     push();
+    translate(this.position.x, this.position.y);
 
-    // thick amber glue, deliberately NOT the green of a poison pool
-    noStroke();
-    fill(190, 150, 40, 90 * opacity);
+    // the body of the glue: an uneven, gloopy outline rather than a clean disc
+    const edge: number[] = [];
+    for (let i = 0; i < EDGE_SEGMENTS; i++) {
+      edge.push(1 + 0.06 * sin(this.age / 320 + i * 1.7) + 0.03 * sin(i * 3.1));
+    }
+
+    // dark rim under the glue so the boundary survives on pale ground
+    stroke(70, 45, 5, 200 * opacity);
+    strokeWeight(7);
+    fill(150, 110, 25, 150 * opacity);
     beginShape();
     for (let i = 0; i < EDGE_SEGMENTS; i++) {
       const angle = (TWO_PI * i) / EDGE_SEGMENTS;
-      const wobble = 1 + 0.05 * sin(this.age / 320 + i * 1.7);
-      vertex(
-        this.position.x + cos(angle) * this.radius * wobble,
-        this.position.y + sin(angle) * this.radius * wobble
-      );
+      vertex(cos(angle) * this.radius * edge[i], sin(angle) * this.radius * edge[i]);
     }
     endShape(CLOSE);
 
+    // bright meniscus on the inside of that rim: this is where "inside" starts
     noFill();
-    stroke(230, 195, 80, 150 * opacity);
-    strokeWeight(3);
-    circle(this.position.x, this.position.y, this.radius * 2);
+    stroke(255, 220, 110, 235 * opacity);
+    strokeWeight(3.5);
+    beginShape();
+    for (let i = 0; i < EDGE_SEGMENTS; i++) {
+      const angle = (TWO_PI * i) / EDGE_SEGMENTS;
+      vertex(cos(angle) * this.radius * edge[i], sin(angle) * this.radius * edge[i]);
+    }
+    endShape(CLOSE);
+
+    // how much longer the glue holds, read straight off its rim
+    stroke(255, 245, 200, 200 * opacity);
+    strokeWeight(5);
+    arc(0, 0, this.radius * 2 + 12, this.radius * 2 + 12, -HALF_PI, -HALF_PI + TWO_PI * left);
 
     // slow, viscous blobs sagging inside the puddle
     noStroke();
     for (const blob of this._blobs) {
       const t = blob.age / blob.lifeTime;
-      fill(240, 210, 110, 120 * (1 - t) * opacity);
-      circle(
-        this.position.x + blob.offsetX,
-        this.position.y + blob.offsetY,
-        blob.size * (1 - t * 0.4)
-      );
+      const size = blob.size * (1 - t * 0.4);
+      fill(120, 85, 15, 130 * (1 - t) * opacity);
+      circle(blob.offsetX, blob.offsetY + 2, size);
+      fill(245, 205, 95, 170 * (1 - t) * opacity);
+      circle(blob.offsetX, blob.offsetY, size);
+      // highlight, so each blob reads as a wet bubble and not a flat dot
+      fill(255, 245, 200, 150 * (1 - t) * opacity);
+      circle(blob.offsetX - size * 0.2, blob.offsetY - size * 0.22, size * 0.32);
     }
 
-    // sticky strands across the puddle, to read as "you are stuck here"
-    stroke(250, 225, 150, 70 * opacity);
-    strokeWeight(1);
-    for (let i = 0; i < 5; i++) {
-      const a = (TWO_PI * i) / 5 + this.age / 1400;
-      line(
-        this.position.x + cos(a) * this.radius * 0.25,
-        this.position.y + sin(a) * this.radius * 0.25,
-        this.position.x + cos(a) * this.radius * 0.9,
-        this.position.y + sin(a) * this.radius * 0.9
+    // sticky strands stretched between the middle and the rim
+    noFill();
+    stroke(255, 235, 165, 130 * opacity);
+    strokeWeight(2.5);
+    for (let i = 0; i < 7; i++) {
+      const a = (TWO_PI * i) / 7 + this.age / 1400;
+      const sag = sin(this.age / 500 + i) * 0.12;
+      beginShape();
+      vertex(cos(a) * this.radius * 0.15, sin(a) * this.radius * 0.15);
+      vertex(
+        cos(a + sag) * this.radius * 0.55,
+        sin(a + sag) * this.radius * 0.55
       );
+      vertex(cos(a) * this.radius * 0.95, sin(a) * this.radius * 0.95);
+      endShape();
     }
 
     pop();
   }
 
   getDisplayBoundingBox() {
+    const r = this.radius + 20; // the duration arc sits outside the rim
     return new Rectangle({
-      x: this.position.x - this.radius,
-      y: this.position.y - this.radius,
-      w: this.radius * 2,
-      h: this.radius * 2,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

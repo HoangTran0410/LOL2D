@@ -1,9 +1,16 @@
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
+import SpellObject from '../SpellObject';
 import Airborne from '../buffs/Airborne';
 import TrailSystem from '../helpers/TrailSystem';
+
+/** Pale sea-green, the colour of Janna's wind. */
+const WIND: [number, number, number] = [185, 243, 228];
+/** What the funnel turns as it reaches full charge. */
+const WIND_CHARGED: [number, number, number] = [255, 240, 170];
 
 /**
  * Howling Gale is a charged spell, not a plain skillshot: the whirlwind is summoned
@@ -117,6 +124,22 @@ export class Janna_Q_Object extends MissileSpellObject {
     trailColor: '#B9F3E433',
   });
 
+  /** Cosmetic: debris caught in the funnel, orbiting at a fixed radius ratio. */
+  _motes: { angle: number; ratio: number; spin: number; lift: number; size: number }[] = [];
+
+  onAdded() {
+    super.onAdded();
+    for (let i = 0; i < 16; i++) {
+      this._motes.push({
+        angle: random(TWO_PI),
+        ratio: random(0.25, 1),
+        spin: random(2.5, 6) * (random() < 0.5 ? -1 : 1),
+        lift: random(0.1, 1),
+        size: random(3, 7),
+      });
+    }
+  }
+
   get chargeRatio(): number {
     return constrain(this.chargeTime / this.maxChargeTime, 0, 1);
   }
@@ -172,24 +195,87 @@ export class Janna_Q_Object extends MissileSpellObject {
     airborneBuff.image = AssetManager.getAsset('spell_janna_q');
     airborneBuff.height = 25;
     enemy.addBuff(airborneBuff);
+
+    // the gust that lifted them, so the knock-up is not a silent hop
+    const gust = new Janna_Q_Gust(this.owner);
+    gust.position = enemy.position.copy();
+    gust.radius = this.size * 0.8 + 40;
+    this.game.objectManager.addObject(gust);
+  }
+
+  /** Green while it winds up, gold once it is fully charged. */
+  _funnelColor(): [number, number, number] {
+    const k = this.charging ? this.chargeRatio : 1;
+    return [
+      lerp(WIND[0], WIND_CHARGED[0], k),
+      lerp(WIND[1], WIND_CHARGED[1], k),
+      lerp(WIND[2], WIND_CHARGED[2], k),
+    ];
   }
 
   draw() {
+    const [cr, cg, cb] = this._funnelColor();
+    const r = this.size / 2;
+    const full = this.charging && this.chargeRatio >= 0.999;
+
     push();
     translate(this.position.x, this.position.y);
-    rotate(this.angle);
 
+    // the footprint on the ground: the storm's actual width
+    noStroke();
+    fill(cr, cg, cb, 55);
+    ellipse(0, 0, this.size * 1.05, this.size * 0.42);
     noFill();
+    stroke(cr, cg, cb, 200);
     strokeWeight(3);
-    for (let i = 0; i < 3; i++) {
-      const radius = this.size * (1 - i * 0.28);
-      stroke(185, 243, 228, 220 - i * 55);
-      arc(0, 0, radius, radius, i * 0.7, i * 0.7 + PI * 1.4);
+    ellipse(0, 0, this.size * 1.05, this.size * 0.42);
+
+    // the funnel: rings stacked upwards, widening — a tornado, not a ball.
+    // Every ring gets a dark under-stroke, or the pale wind vanishes on
+    // the light half of the map.
+    noFill();
+    for (let i = 0; i < 5; i++) {
+      const k = i / 4;
+      const ringR = r * (0.25 + k * 0.95);
+      const lift = -k * this.size * 0.62;
+      const wobble = sin(this.angle * 1.4 + i) * this.size * 0.05;
+      const a0 = this.angle + i * 1.1;
+
+      stroke(18, 55, 48, 210);
+      strokeWeight(11 - i);
+      arc(wobble, lift, ringR * 2, ringR * 0.72, a0, a0 + PI * 1.35);
+      stroke(cr, cg, cb, 250);
+      strokeWeight(7 - i);
+      arc(wobble, lift, ringR * 2, ringR * 0.72, a0, a0 + PI * 1.35);
+      stroke(255, 255, 255, 210);
+      strokeWeight(2.5);
+      arc(wobble, lift, ringR * 2, ringR * 0.72, a0 + 0.25, a0 + PI * 1.1);
     }
 
+    // a soft core of light inside the funnel
+    push();
+    blendMode(ADD);
     noStroke();
-    fill(230, 255, 250, 90);
-    circle(0, 0, this.size * 0.35);
+    fill(cr, cg, cb, 70);
+    ellipse(0, -this.size * 0.3, this.size * 0.55, this.size * 0.75);
+    blendMode(BLEND);
+    pop();
+
+    // debris caught in the vortex, climbing as it turns
+    noStroke();
+    for (const m of this._motes) {
+      const a = m.angle + this.angle * m.spin * 0.25;
+      const climb = ((frameCount / 60) * m.lift) % 1;
+      const ringR = r * (0.25 + climb * 0.95) * m.ratio;
+      fill(255, 255, 255, 200 * (1 - climb * 0.7));
+      ellipse(
+        cos(a) * ringR,
+        sin(a) * ringR * 0.36 - climb * this.size * 0.62,
+        m.size,
+        m.size * 0.6
+      );
+    }
+
     pop();
 
     // charge meter, so the player can see how much power is stored
@@ -197,17 +283,86 @@ export class Janna_Q_Object extends MissileSpellObject {
       push();
       translate(this.position.x, this.position.y);
       noFill();
-      stroke(255, 255, 255, 200);
-      strokeWeight(3);
-      arc(
-        0,
-        0,
-        this.maxSize + 16,
-        this.maxSize + 16,
-        -HALF_PI,
-        -HALF_PI + TWO_PI * this.chargeRatio
-      );
+      const meter = this.maxSize + 26;
+      stroke(20, 45, 40, 180);
+      strokeWeight(8);
+      circle(0, 0, meter);
+      stroke(cr, cg, cb, 245);
+      strokeWeight(6);
+      arc(0, 0, meter, meter, -HALF_PI, -HALF_PI + TWO_PI * this.chargeRatio);
+
+      // at full charge the ring flares — it is about to fire on its own
+      if (full) {
+        stroke(255, 255, 235, 120 + 100 * sin(frameCount / 4));
+        strokeWeight(3);
+        circle(0, 0, meter + 12);
+      }
       pop();
     }
+  }
+
+  // the funnel climbs well above `position`, and the meter sits outside it
+  getDisplayBoundingBox() {
+    const r = this.maxSize;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/** The burst of wind that throws a unit into the air. */
+export class Janna_Q_Gust extends SpellObject {
+  position = this.owner.position.copy();
+  radius = 80;
+  age = 0;
+  lifeTime = 420;
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // a flat ring of air blown out from under them
+    noFill();
+    stroke(WIND[0], WIND[1], WIND[2], 235 * fade);
+    strokeWeight(8 * fade + 1.5);
+    ellipse(0, 0, this.radius * 2 * (0.25 + t * 0.95), this.radius * 0.85 * (0.25 + t * 0.95));
+
+    // gust streaks curling upwards around them
+    stroke(255, 255, 255, 210 * fade);
+    strokeWeight(3);
+    for (let i = 0; i < 6; i++) {
+      const a = (TWO_PI * i) / 6 + t * 2.2;
+      const rr = this.radius * (0.35 + t * 0.6);
+      beginShape();
+      vertex(cos(a) * rr * 0.5, sin(a) * rr * 0.2);
+      vertex(cos(a + 0.5) * rr * 0.8, sin(a + 0.5) * rr * 0.3 - 16 * t);
+      vertex(cos(a + 1.0) * rr, sin(a + 1.0) * rr * 0.35 - 34 * t);
+      endShape();
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.radius + 40;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }

@@ -1,9 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Buff from '../Buff';
 import Spell from '../Spell';
+import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
 import Dash from '../buffs/Dash';
@@ -57,8 +58,7 @@ export default class LeeSin_W extends Spell {
     const ally = this.findNearestAlly();
 
     // the real spell halves its cooldown when it lands on an allied champion
-    this._cooldownAfterSafeguard =
-      ally instanceof Champion ? this.coolDown / 2 : this.coolDown;
+    this._cooldownAfterSafeguard = ally instanceof Champion ? this.coolDown / 2 : this.coolDown;
 
     if (ally && Dash.CanDash(this.owner)) {
       const dashBuff = new Dash(3000, this.owner, this.owner);
@@ -71,6 +71,13 @@ export default class LeeSin_W extends Spell {
         if (ally instanceof Champion && !ally.isDead) this.grantShield(ally);
       };
       this.owner.addBuff(dashBuff);
+
+      // the default dash streak is a fat grey capsule; make it read as Lee Sin's
+      // own blue rush (cosmetic only — trailSize is set by Dash.onCreate, which
+      // has already run by now)
+      dashBuff.trailSystem.trailColor = '#8FD8FFAA';
+      dashBuff.trailSystem.trailSize = this.owner.stats.size.value * 0.55;
+      dashBuff.trailSystem.trailLifeTime = 260;
     } else {
       // self-cast: shield goes up immediately, no travel
       this.grantShield(this.owner);
@@ -100,6 +107,13 @@ export default class LeeSin_W extends Spell {
     shieldBuff.image = LeeSin_W.PHASES.W1.image;
     shieldBuff.stackId = 'leesin_w_shield';
     unit.addBuff(shieldBuff);
+
+    // a shield that just appears as a thin ring is easy to miss — slam it on
+    const burst = new LeeSin_W_Burst(this.owner);
+    burst.follow = unit;
+    burst.position = unit.position.copy();
+    burst.targetSize = unit.animatedValues?.displaySize ?? 50;
+    this.game.objectManager.addObject(burst);
   }
 
   endRecastWindow() {
@@ -161,15 +175,44 @@ export class LeeSin_W_IronWill extends Buff {
   tickInterval = 500;
   _tickTimer = 0;
 
+  /** Cosmetic motes of chi drifting up off the target. */
+  _motes: { x: number; y: number; age: number; life: number; size: number }[] = [];
+  _spawnTimer = 0;
+
   onUpdate(): void {
     if (this.targetUnit.isDead) return;
 
     this._tickTimer += deltaTime;
-    if (this._tickTimer < this.tickInterval) return;
-    this._tickTimer -= this.tickInterval;
+    if (this._tickTimer >= this.tickInterval) {
+      this._tickTimer -= this.tickInterval;
 
-    const ticks = Math.max(1, Math.round(this.duration / this.tickInterval));
-    this.targetUnit.takeHeal(Math.round(this.totalHeal / ticks), this.sourceUnit);
+      const ticks = Math.max(1, Math.round(this.duration / this.tickInterval));
+      this.targetUnit.takeHeal(Math.round(this.totalHeal / ticks), this.sourceUnit);
+    }
+
+    // particles are spawned here, never in draw(), so their density does not
+    // depend on how often the unit happens to be rendered
+    const radius = this.targetUnit.animatedValues.displaySize / 2;
+    this._spawnTimer += deltaTime;
+    while (this._spawnTimer >= 70 && this._motes.length < 18) {
+      this._spawnTimer -= 70;
+      this._motes.push({
+        x: random(-radius, radius),
+        y: random(0, radius * 0.6),
+        age: 0,
+        life: random(500, 850),
+        size: random(3, 6),
+      });
+    }
+    if (this._spawnTimer > 70) this._spawnTimer = 0;
+
+    let i = 0;
+    while (i < this._motes.length) {
+      const m = this._motes[i];
+      m.age += deltaTime;
+      if (m.age >= m.life) this._motes.splice(i, 1);
+      else i++;
+    }
   }
 
   draw(): void {
@@ -177,17 +220,89 @@ export class LeeSin_W_IronWill extends Buff {
 
     const pos = this.targetUnit.position;
     const size = this.targetUnit.animatedValues.displaySize;
+    const left = this.duration ? constrain(1 - this.timeElapsed / this.duration, 0, 1) : 1;
 
     push();
+
+    // rising chi, additive so it glows instead of speckling
+    blendMode(ADD);
+    noStroke();
+    for (const m of this._motes) {
+      const t = m.age / m.life;
+      fill(90, 200, 255, 140 * (1 - t));
+      circle(pos.x + m.x * (1 - t * 0.5), pos.y + m.y - t * size * 0.9, m.size * (1 - t * 0.5));
+    }
+    blendMode(BLEND);
+
     noFill();
-    stroke(120, 220, 255, 160);
-    strokeWeight(2);
     // a slowly turning brace of arcs, "hardened" rather than shielded
     const a = frameCount / 25;
     for (let i = 0; i < 3; i++) {
       const start = a + (i * TWO_PI) / 3;
+      stroke(120, 220, 255, 170);
+      strokeWeight(3);
       arc(pos.x, pos.y, size + 18, size + 18, start, start + 0.9);
     }
+
+    // how much of Iron Will is left, as a closing arc
+    stroke(200, 245, 255, 190);
+    strokeWeight(2);
+    arc(pos.x, pos.y, size + 30, size + 30, -HALF_PI, -HALF_PI + TWO_PI * left);
     pop();
+  }
+}
+
+/** Stone-hard shell snapping shut around whoever Safeguard covered. */
+export class LeeSin_W_Burst extends SpellObject {
+  follow: any = null;
+  targetSize = 50;
+  age = 0;
+  lifeTime = 380;
+
+  update() {
+    this.age += deltaTime;
+    if (this.follow) this.position.set(this.follow.position.x, this.follow.position.y);
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    // the ring collapses inward, reading as a shield closing rather than a blast
+    const r = this.targetSize * (1.5 - 0.75 * t);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    blendMode(ADD);
+    noStroke();
+    fill(110, 190, 255, 70 * fade);
+    circle(0, 0, r * 1.6);
+    blendMode(BLEND);
+
+    noFill();
+    stroke(160, 225, 255, 240 * fade);
+    strokeWeight(4 * fade + 1);
+    circle(0, 0, r);
+
+    // four braces slamming in from the sides
+    stroke(210, 245, 255, 220 * fade);
+    strokeWeight(3);
+    for (let i = 0; i < 4; i++) {
+      const a = (i * TWO_PI) / 4 + PI / 4;
+      arc(0, 0, r + 12, r + 12, a - 0.35, a + 0.35);
+    }
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.targetSize * 1.6;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }

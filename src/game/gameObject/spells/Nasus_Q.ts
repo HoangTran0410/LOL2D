@@ -34,6 +34,9 @@ export default class Nasus_Q extends Spell {
     const obj = new Nasus_Q_Object(this.owner);
     obj.targetPosition = target.position.copy();
     obj.angle = VectorUtils.getAngle(this.owner.position, target.position);
+    obj.targetSize = target.animatedValues?.displaySize ?? 50;
+    obj.stacks = this.stacks;
+    obj.range = this.range;
     this.game.objectManager.addObject(obj);
   }
 
@@ -71,6 +74,12 @@ export class Nasus_Q_Object extends SpellObject {
   lifeTime = 350;
   age = 0;
 
+  /** All cosmetic: how big the victim is, how many stacks this swing carried,
+   *  and how far the strike could reach — the last one is the telegraph. */
+  targetSize = 50;
+  stacks = 1;
+  range = 150;
+
   update() {
     this.age += deltaTime;
     if (this.age >= this.lifeTime) {
@@ -79,31 +88,90 @@ export class Nasus_Q_Object extends SpellObject {
   }
 
   draw() {
-    const t = this.age / this.lifeTime;
-    const diameter = this.size * (0.6 + t * 0.7);
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    // the swing gets visibly heavier as the stacks pile up
+    const heft = 1 + Math.min(0.5, this.stacks * 0.02);
 
+    // --- the reach of the strike, flashed on the caster -------------------
+    push();
+    translate(this.owner.position.x, this.owner.position.y);
+    noFill();
+    stroke(255, 205, 120, 150 * fade);
+    strokeWeight(3 * fade + 1);
+    circle(0, 0, this.range * 2);
+    // the arm of the swing, from Nasus to the victim
+    stroke(255, 225, 160, 190 * fade);
+    strokeWeight(6 * fade + 1);
+    const reach = this.owner.position.dist(this.targetPosition);
+    const swing = this.angle + (1 - t) * 0.5 - 0.25;
+    line(0, 0, cos(swing) * reach, sin(swing) * reach);
+    pop();
+
+    // --- the strike landing on the victim ---------------------------------
     push();
     translate(this.targetPosition.x, this.targetPosition.y);
+
+    // white flash on the first frames, so the moment of contact is obvious
+    if (t < 0.3) {
+      blendMode(ADD);
+      noStroke();
+      fill(255, 220, 150, 170 * (1 - t / 0.3));
+      circle(0, 0, this.targetSize * 1.4 * heft);
+      blendMode(BLEND);
+    }
+
     rotate(this.angle);
 
-    noFill();
-    stroke(255, 210, 130, 230 * (1 - t));
-    strokeWeight(7 * (1 - t) + 2);
-    arc(0, 0, diameter, diameter, -PI / 3, PI / 3);
+    // three claw gashes sweeping across the target
+    const span = this.targetSize * (0.9 + 0.5 * t) * heft;
+    for (let i = -1; i <= 1; i++) {
+      const off = i * span * 0.22;
+      stroke(255, 245, 210, 240 * fade);
+      strokeWeight((5 - Math.abs(i) * 1.5) * fade + 1);
+      noFill();
+      arc(off * 0.4, off, span, span * 1.5, -PI / 2.6 + t * 0.4, PI / 2.6 + t * 0.4);
+    }
 
-    stroke(255, 255, 220, 180 * (1 - t));
-    strokeWeight(2);
-    arc(0, 0, diameter * 0.8, diameter * 0.8, -PI / 4, PI / 4);
+    // the heavy leading edge of the staff
+    stroke(255, 200, 110, 220 * fade);
+    strokeWeight(8 * fade + 2);
+    arc(0, 0, span * 1.25, span * 1.7, -PI / 3 + t * 0.4, PI / 3 + t * 0.4);
 
+    // sand and grit knocked loose
+    noStroke();
+    fill(240, 210, 150, 200 * fade);
+    for (let i = 0; i < 6; i++) {
+      const a = -0.9 + i * 0.36;
+      const d = span * 0.45 + 40 * t;
+      circle(cos(a) * d, sin(a) * d, (6 - i * 0.4) * fade + 1);
+    }
+
+    pop();
+
+    // --- the tally ---------------------------------------------------------
+    // below the unit: the health bar and buff icons already own the space above
+    push();
+    const ty = this.targetPosition.y + this.targetSize * 0.6 + 16 + t * 10;
+    textAlign(CENTER, CENTER);
+    noStroke();
+    fill(20, 12, 0, 150 * fade);
+    rect(this.targetPosition.x - 24, ty - 10, 48, 20, 5);
+    fill(255, 225, 165, 245 * fade);
+    textSize(15 + 7 * (1 - Math.min(1, t * 4)));
+    text(`Q ${this.stacks}`, this.targetPosition.x, ty);
     pop();
   }
 
   getDisplayBoundingBox() {
+    // covers the victim, the swing arm and the range ring around Nasus
+    const minX = Math.min(this.targetPosition.x, this.owner.position.x) - this.range;
+    const minY = Math.min(this.targetPosition.y, this.owner.position.y) - this.range;
     return new Rectangle({
-      x: this.targetPosition.x - this.size,
-      y: this.targetPosition.y - this.size,
-      w: this.size * 2,
-      h: this.size * 2,
+      x: minX,
+      y: minY,
+      w: Math.abs(this.targetPosition.x - this.owner.position.x) + this.range * 2,
+      h: Math.abs(this.targetPosition.y - this.owner.position.y) + this.range * 2,
       data: this,
     });
   }

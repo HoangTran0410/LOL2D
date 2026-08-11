@@ -59,6 +59,9 @@ export class Cassiopeia_W_Object extends SpellObject {
   image = AssetManager.getAsset('spell_cassiopeia_w');
   position: p5.Vector = this.owner.position.copy();
 
+  /** A pool of venom on the floor: painted under the units wading through it. */
+  zIndex = 2;
+
   radius = 100;
   lifeTime = 5000;
   age = 0;
@@ -164,48 +167,92 @@ export class Cassiopeia_W_Object extends SpellObject {
 
   draw() {
     const opacity = this._getOpacity();
+    const left = constrain(1 - this.age / this.lifeTime, 0, 1);
 
     push();
-    noStroke();
+    translate(this.position.x, this.position.y);
 
     // dark base so the cloud reads as a hole of venom on the ground
-    fill(60, 30, 80, 70 * opacity);
-    circle(this.position.x, this.position.y, this.radius * 2);
+    noStroke();
+    fill(38, 16, 52, 150 * opacity);
+    circle(0, 0, this.radius * 2);
+    fill(70, 130, 45, 90 * opacity);
+    circle(0, 0, this.radius * 1.7);
 
-    // slowly churning puffs
+    // slowly churning puffs of gas
     for (const cloud of this._clouds) {
       const breathe = 1 + 0.15 * sin(this.age / 350 + cloud.phase);
-      const x = this.position.x + cos(cloud.angle) * cloud.distance;
-      const y = this.position.y + sin(cloud.angle) * cloud.distance;
+      const x = cos(cloud.angle) * cloud.distance;
+      const y = sin(cloud.angle) * cloud.distance;
 
-      fill(120, 60, 160, 45 * opacity);
+      fill(105, 45, 145, 70 * opacity);
       circle(x, y, cloud.size * breathe);
-      fill(160, 230, 130, 30 * opacity);
+      fill(150, 235, 110, 65 * opacity);
       circle(x, y, cloud.size * breathe * 0.55);
+      fill(215, 255, 175, 55 * opacity);
+      circle(x, y, cloud.size * breathe * 0.22);
     }
 
+    // scalloped boundary: a hard, unmistakable line around the venom
+    const lobes = 22;
     noFill();
-    stroke(180, 120, 220, 120 * opacity);
-    strokeWeight(2);
-    circle(this.position.x, this.position.y, this.radius * 2);
+    stroke(25, 10, 38, 220 * opacity);
+    strokeWeight(7);
+    beginShape();
+    for (let i = 0; i <= lobes; i++) {
+      const a = (TWO_PI * i) / lobes;
+      const r = this.radius * (1 + 0.045 * sin(i * 3 + this.age / 700));
+      vertex(cos(a) * r, sin(a) * r);
+    }
+    endShape(CLOSE);
+    stroke(175, 255, 130, 240 * opacity);
+    strokeWeight(3);
+    beginShape();
+    for (let i = 0; i <= lobes; i++) {
+      const a = (TWO_PI * i) / lobes;
+      const r = this.radius * (1 + 0.045 * sin(i * 3 + this.age / 700));
+      vertex(cos(a) * r, sin(a) * r);
+    }
+    endShape(CLOSE);
 
-    // tendrils clawing at the ground, marking the field as a grounding zone
-    stroke(200, 160, 235, 90 * opacity);
-    strokeWeight(2);
-    for (let i = 0; i < 8; i++) {
-      const a = (TWO_PI * i) / 8 + this.age / 2200;
-      arc(this.position.x, this.position.y, this.radius * 1.7, this.radius * 1.7, a, a + 0.35);
+    // how much venom is left, read off the rim
+    stroke(220, 255, 190, 200 * opacity);
+    strokeWeight(5);
+    arc(0, 0, this.radius * 2 + 12, this.radius * 2 + 12, -HALF_PI, -HALF_PI + TWO_PI * left);
+
+    // tendrils curling in off the edge: the grounding, made visible
+    noFill();
+    for (let i = 0; i < 10; i++) {
+      const a = (TWO_PI * i) / 10 + this.age / 2200;
+      const wave = sin(this.age / 600 + i) * 0.12;
+      for (const [col, weight] of [
+        [[35, 12, 55, 190 * opacity], 7],
+        [[200, 150, 245, 220 * opacity], 3],
+      ] as [number[], number][]) {
+        (stroke as any)(...col);
+        strokeWeight(weight);
+        beginShape();
+        for (let k = 0; k <= 6; k++) {
+          const u = k / 6;
+          // spiralling inwards and tightening: a tentacle, not a dash
+          const ang = a + u * (0.75 + wave);
+          const rr = this.radius * (1.02 - u * 0.45);
+          vertex(cos(ang) * rr, sin(ang) * rr);
+        }
+        endShape();
+      }
     }
 
     pop();
   }
 
   getDisplayBoundingBox() {
+    const r = this.radius + 20; // the duration arc sits outside the rim
     return new Rectangle({
-      x: this.position.x - this.radius,
-      y: this.position.y - this.radius,
-      w: this.radius * 2,
-      h: this.radius * 2,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

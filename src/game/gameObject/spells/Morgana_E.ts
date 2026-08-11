@@ -95,6 +95,8 @@ export class Morgana_E_BlackShield extends Shield {
   _preExisting: Set<any> = new Set();
   blockedCount = 0;
   _flash = 0;
+  /** Cosmetic: one expanding ripple per disable eaten, capped so it stays cheap. */
+  _ripples: number[] = [];
 
   onActivate(): void {
     for (const buff of this.targetUnit.buffs) this._preExisting.add(buff);
@@ -102,6 +104,16 @@ export class Morgana_E_BlackShield extends Shield {
 
   onUpdate(): void {
     if (this._flash > 0) this._flash -= deltaTime;
+
+    // ripples age here, never in draw(), so their speed does not depend on
+    // how many times the unit happens to be rendered
+    let r = 0;
+    while (r < this._ripples.length) {
+      this._ripples[r] += deltaTime;
+      if (this._ripples[r] >= 450) this._ripples.splice(r, 1);
+      else r++;
+    }
+
     if (this.toRemove || this.targetUnit.isDead) return;
 
     const targetTeamId = this.targetUnit.teamId;
@@ -120,6 +132,7 @@ export class Morgana_E_BlackShield extends Shield {
 
       this.blockedCount++;
       this._flash = 250;
+      if (this._ripples.length < 4) this._ripples.push(0);
     }
   }
 
@@ -129,29 +142,71 @@ export class Morgana_E_BlackShield extends Shield {
 
     const pos = this.targetUnit.position;
     const size = this.targetUnit.animatedValues.displaySize;
+    const flash = this._flash > 0 ? this._flash / 250 : 0;
 
     push();
-    noFill();
-    // dark runic ring, brightening for a moment whenever it eats a disable
-    const flashAlpha = this._flash > 0 ? map(this._flash, 0, 250, 0, 180) : 0;
-    stroke(40, 0, 60, 140 + flashAlpha);
-    strokeWeight(3);
-    circle(pos.x, pos.y, size + 18);
+    translate(pos.x, pos.y);
 
-    stroke(200, 120, 255, 120 + flashAlpha);
-    strokeWeight(2);
+    // the shield itself: a dome of darkness, not a hairline ring
+    noStroke();
+    fill(30, 0, 48, 120 + 90 * flash);
+    circle(0, 0, size + 20);
+    fill(90, 25, 140, 70 + 70 * flash);
+    circle(0, 0, size + 8);
+
+    noFill();
+    stroke(15, 0, 26, 220);
+    strokeWeight(6);
+    circle(0, 0, size + 20);
+    stroke(205, 130, 255, 200 + 55 * flash);
+    strokeWeight(3);
+    circle(0, 0, size + 20);
+
+    // runes turning on the surface of the dome
+    stroke(215, 150, 255, 150 + 105 * flash);
+    strokeWeight(3);
     const a = -frameCount / 40;
-    for (let i = 0; i < 5; i++) {
-      const angle = a + (i * TWO_PI) / 5;
-      const r1 = size / 2 + 6;
-      const r2 = size / 2 + 14;
-      line(
-        pos.x + cos(angle) * r1,
-        pos.y + sin(angle) * r1,
-        pos.x + cos(angle) * r2,
-        pos.y + sin(angle) * r2
-      );
+    for (let i = 0; i < 6; i++) {
+      const angle = a + (i * TWO_PI) / 6;
+      const r1 = size / 2 + 4;
+      const r2 = size / 2 + 15;
+      line(cos(angle) * r1, sin(angle) * r1, cos(angle) * r2, sin(angle) * r2);
+      // a short cross-bar turns each spoke into a rune rather than a tick
+      const mx = cos(angle) * (r1 + r2) * 0.5;
+      const my = sin(angle) * (r1 + r2) * 0.5;
+      line(mx - sin(angle) * 4, my + cos(angle) * 4, mx + sin(angle) * 4, my - cos(angle) * 4);
     }
+
+    // every disable eaten throws off a ring — the block, made visible
+    for (const age of this._ripples) {
+      const t = constrain(age / 450, 0, 1);
+      const fade = 1 - t;
+      const ripple = size + 20 + t * 150;
+      noFill();
+      stroke(25, 0, 40, 220 * fade);
+      strokeWeight(16 * fade + 1);
+      circle(0, 0, ripple);
+      stroke(235, 185, 255, 250 * fade);
+      strokeWeight(6 * fade + 1);
+      circle(0, 0, ripple);
+
+      // shards of the broken effect spat outwards
+      stroke(255, 235, 255, 240 * fade);
+      strokeWeight(4 * fade + 1.5);
+      for (let i = 0; i < 10; i++) {
+        const ang = (TWO_PI * i) / 10 + t;
+        const r1 = ripple / 2;
+        const r2 = r1 + 20 * fade + 4;
+        line(cos(ang) * r1, sin(ang) * r1, cos(ang) * r2, sin(ang) * r2);
+      }
+    }
+
+    if (flash > 0) {
+      noStroke();
+      fill(235, 190, 255, 150 * flash);
+      circle(0, 0, size + 26);
+    }
+
     pop();
   }
 }
@@ -172,14 +227,39 @@ export class Morgana_E_Object extends SpellObject {
     if (!this.targetUnit) return;
 
     const pos = this.targetUnit.position;
-    const radius = map(this.age, 0, this.lifeTime, 5, this.maxRadius);
-    const alpha = map(this.age, 0, this.lifeTime, 220, 0);
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const bodySize = this.targetUnit.animatedValues?.displaySize ?? 40;
 
     push();
+    translate(pos.x, pos.y);
+
+    // the dome slamming shut: a ring collapsing onto the target, not a bloom
     noFill();
-    stroke(180, 90, 230, alpha);
-    strokeWeight(4);
-    circle(pos.x, pos.y, radius * 2);
+    const closing = lerp(this.maxRadius * 2, bodySize + 20, t);
+    stroke(20, 0, 34, 220 * fade);
+    strokeWeight(11 * fade + 2);
+    circle(0, 0, closing);
+    stroke(205, 130, 255, 250 * fade);
+    strokeWeight(5 * fade + 1.5);
+    circle(0, 0, closing);
+
+    // sigils dropping in with it
+    stroke(235, 190, 255, 220 * fade);
+    strokeWeight(3);
+    for (let i = 0; i < 6; i++) {
+      const a = (TWO_PI * i) / 6 - t * 1.6;
+      line(cos(a) * closing * 0.5, sin(a) * closing * 0.5, cos(a) * closing * 0.4, sin(a) * closing * 0.4);
+    }
+
+    // it settles with a dark pulse over the protected champion
+    const settle = constrain((t - 0.6) / 0.4, 0, 1);
+    if (settle > 0) {
+      noStroke();
+      fill(40, 0, 62, 150 * settle * fade * 2.5);
+      circle(0, 0, bodySize + 20);
+    }
+
     pop();
   }
 

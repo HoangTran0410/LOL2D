@@ -57,6 +57,12 @@ export default class Warwick_Q extends Spell {
 
       const obj = new Warwick_Q_Object(this.owner);
       obj.position = target.position.copy();
+      // the bite faces the way Warwick came in, so the pounce has a direction
+      obj.angle = Math.atan2(
+        target.position.y - this.owner.position.y,
+        target.position.x - this.owner.position.x
+      );
+      obj.healed = this.healAmount;
       this.game.objectManager.addObject(obj);
     };
     this.owner.addBuff(dashBuff);
@@ -67,13 +73,33 @@ export default class Warwick_Q extends Spell {
   }
 }
 
-/** Claw marks left where the pounce landed. */
+interface BloodDrop {
+  angle: number;
+  speed: number;
+  size: number;
+}
+
+/** The bite: three slashes torn out of the victim, and the life they cost. */
 export class Warwick_Q_Object extends SpellObject {
   position = this.owner.position.copy();
   age = 0;
-  lifeTime = 400;
-  size = 50;
+  lifeTime = 520;
+  size = 96;
   angle = random(TWO_PI);
+  /** Cosmetic: how much Warwick drained, drawn as a thread back to him. */
+  healed = 0;
+
+  _blood: BloodDrop[] = [];
+
+  onAdded() {
+    for (let i = 0; i < 12; i++) {
+      this._blood.push({
+        angle: this.angle + PI + random(-1.1, 1.1),
+        speed: random(60, 170),
+        size: random(4, 10),
+      });
+    }
+  }
 
   update() {
     this.age += deltaTime;
@@ -81,26 +107,98 @@ export class Warwick_Q_Object extends SpellObject {
   }
 
   draw() {
-    const alpha = map(this.age, 0, this.lifeTime, 230, 0);
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    // the claws rake open fast, then linger and fade
+    const rake = constrain(t / 0.35, 0, 1);
 
     push();
     translate(this.position.x, this.position.y);
+
+    // spray thrown back off the wound
+    noStroke();
+    for (const d of this._blood) {
+      const dist = 10 + d.speed * t;
+      fill(160, 20, 25, 220 * fade);
+      circle(cos(d.angle) * dist, sin(d.angle) * dist, d.size * (1 - t * 0.5));
+    }
+
+    push();
     rotate(this.angle);
+
+    // three claw gashes raked across the victim, perpendicular to the pounce.
+    // Cut dark first, then red, then a white edge, so they read on any avatar.
     noFill();
-    stroke(220, 60, 60, alpha);
-    strokeWeight(4);
-    for (let i = -1; i <= 1; i++) {
-      arc(i * 12, 0, this.size, this.size, -PI / 3, PI / 3);
+    for (const [col, weight] of [
+      [[55, 0, 5, 240 * fade], 13],
+      [[240, 40, 40, 250 * fade], 7],
+      [[255, 225, 215, 235 * fade], 2.5],
+    ] as [number[], number][]) {
+      (stroke as any)(...col);
+      strokeWeight(weight);
+      for (let i = -1; i <= 1; i++) {
+        const length = this.size * (0.9 - Math.abs(i) * 0.18) * rake;
+        beginShape();
+        for (let k = 0; k <= 8; k++) {
+          const u = k / 8;
+          // a shallow bow, so each gash curves the way a claw drags
+          const bow = (0.25 - (u - 0.5) * (u - 0.5)) * 4 * 13;
+          vertex(i * 21 + bow, lerp(-length / 2, length / 2, u));
+        }
+        endShape();
+      }
+    }
+
+    // the fangs closing, only at the very start
+    const bite = 1 - constrain(t / 0.22, 0, 1);
+    if (bite > 0) {
+      stroke(255, 245, 240, 250 * bite);
+      strokeWeight(5);
+      const gap = 26 * bite + 6;
+      for (let i = -1; i <= 1; i += 2) {
+        line(-18, i * gap, 14, (i * gap) / 3);
+      }
+      noStroke();
+      fill(255, 235, 235, 200 * bite);
+      circle(0, 0, 40 * bite + 10);
     }
     pop();
+    pop();
+
+    // the life he tore out, drifting back to Warwick
+    if (this.healed > 0 && this.owner && !this.owner.isDead) {
+      const ox = this.owner.position.x;
+      const oy = this.owner.position.y;
+      push();
+      noStroke();
+      for (let i = 0; i < 5; i++) {
+        const k = constrain(t * 1.4 - i * 0.1, 0, 1);
+        const x = lerp(this.position.x, ox, k) + sin(k * 8 + i) * 12;
+        const y = lerp(this.position.y, oy, k) + cos(k * 8 + i) * 12;
+        fill(30, 90, 30, 200 * (1 - k) * fade);
+        circle(x, y, 16 * (1 - k * 0.4));
+        fill(140, 250, 140, 240 * (1 - k) * fade);
+        circle(x, y, 11 * (1 - k * 0.4));
+      }
+      // a pulse of health landing on him
+      noFill();
+      stroke(120, 245, 120, 220 * fade);
+      strokeWeight(4);
+      circle(ox, oy, (this.owner.animatedValues?.displaySize ?? 40) + 14 + t * 22);
+      pop();
+    }
   }
 
+  // the drain thread reaches all the way back to the caster
   getDisplayBoundingBox() {
+    const pad = this.size;
+    const ox = this.owner?.position?.x ?? this.position.x;
+    const oy = this.owner?.position?.y ?? this.position.y;
     return new Rectangle({
-      x: this.position.x - this.size,
-      y: this.position.y - this.size,
-      w: this.size * 2,
-      h: this.size * 2,
+      x: Math.min(this.position.x, ox) - pad,
+      y: Math.min(this.position.y, oy) - pad,
+      w: Math.abs(this.position.x - ox) + pad * 2,
+      h: Math.abs(this.position.y - oy) + pad * 2,
       data: this,
     });
   }

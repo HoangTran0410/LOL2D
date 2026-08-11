@@ -135,34 +135,84 @@ export class Anivia_Q_Object extends MissileSpellObject {
   }
 
   draw() {
+    // the chunk is armed the whole time it flies, so it always shows the
+    // circle it would shatter into — the recast is a decision, not a gamble
+    push();
+    noFill();
+    const pulse = 0.5 + 0.5 * sin(frameCount / 9);
+    stroke(150, 215, 250, 60 + 45 * pulse);
+    strokeWeight(2);
+    const segments = 30;
+    for (let i = 0; i < segments; i++) {
+      if (i % 2) continue;
+      const a1 = (TWO_PI * i) / segments - frameCount / 160;
+      const a2 = (TWO_PI * (i + 1)) / segments - frameCount / 160;
+      arc(this.position.x, this.position.y, this.blastRadius * 2, this.blastRadius * 2, a1, a2);
+    }
+    // frost creeping in from that edge as it charges
+    stroke(215, 245, 255, 40 + 40 * pulse);
+    strokeWeight(3);
+    for (let i = 0; i < 8; i++) {
+      const a = (TWO_PI * i) / 8 + frameCount / 200;
+      line(
+        this.position.x + cos(a) * this.blastRadius,
+        this.position.y + sin(a) * this.blastRadius,
+        this.position.x + cos(a) * (this.blastRadius - 16),
+        this.position.y + sin(a) * (this.blastRadius - 16)
+      );
+    }
+    pop();
+
     push();
     translate(this.position.x, this.position.y);
     rotate(frameCount / 40);
 
-    stroke(230, 250, 255, 220);
-    strokeWeight(2);
-    fill(140, 210, 245, 170);
-    circle(0, 0, this.size);
+    const r = this.size / 2;
 
-    // jagged shards clinging to the core
-    stroke(255, 200);
-    strokeWeight(3);
+    // a hexagonal shard of ice rather than a ball: faceted, with a lit core
+    stroke(35, 90, 130, 235);
+    strokeWeight(4);
+    fill(120, 195, 240, 225);
+    beginShape();
     for (let i = 0; i < 6; i++) {
       const a = (i / 6) * TWO_PI;
-      const len = this.size / 2 + 6;
-      line((cos(a) * this.size) / 3, (sin(a) * this.size) / 3, cos(a) * len, sin(a) * len);
+      vertex(cos(a) * r * 1.15, sin(a) * r * 1.15);
+    }
+    endShape(CLOSE);
+
+    // facets cut into the face
+    stroke(240, 252, 255, 200);
+    strokeWeight(2);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * TWO_PI;
+      line(0, 0, cos(a) * r * 1.05, sin(a) * r * 1.05);
     }
 
-    pop();
+    // spikes of frost growing off the corners
+    stroke(255, 255, 255, 230);
+    strokeWeight(3.5);
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * TWO_PI + PI / 6;
+      line(cos(a) * r * 0.7, sin(a) * r * 0.7, cos(a) * (r + 11), sin(a) * (r + 11));
+    }
 
-    // pulsing halo: a reminder that the chunk is armed and can be recast
-    push();
-    noFill();
-    const pulse = 1 + 0.12 * sin(frameCount / 6);
-    stroke(190, 235, 255, 110);
-    strokeWeight(2);
-    circle(this.position.x, this.position.y, this.size * 1.6 * pulse);
+    noStroke();
+    fill(255, 255, 255, 200 + 55 * pulse);
+    circle(0, 0, r * 0.8);
+
     pop();
+  }
+
+  // the armed ring is far wider than the shard itself
+  getDisplayBoundingBox() {
+    const r = this.blastRadius + 20;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }
 
@@ -208,36 +258,77 @@ export class Anivia_Q_Blast extends SpellObject {
   }
 
   draw() {
-    const alpha = map(this.age, 0, this.lifeTime, 180, 0);
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const flash = 1 - constrain(t / 0.2, 0, 1);
 
     push();
-    strokeWeight(3);
-    stroke(235, 250, 255, alpha);
-    fill(150, 215, 250, alpha / 2.5);
-    circle(this.position.x, this.position.y, this.radius * 2);
+    translate(this.position.x, this.position.y);
 
-    // splinters flying outwards
-    stroke(255, alpha);
-    strokeWeight(2);
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * TWO_PI;
-      const inner = this.radius * 0.65;
-      line(
-        this.position.x + cos(a) * inner,
-        this.position.y + sin(a) * inner,
-        this.position.x + cos(a) * this.radius,
-        this.position.y + sin(a) * this.radius
+    // the area that was actually hit, filled so it cannot be missed
+    noStroke();
+    fill(150, 215, 250, 110 * fade);
+    circle(0, 0, this.maxRadius * 2);
+
+    // hard frozen rim exactly on the blast radius
+    noFill();
+    stroke(35, 90, 135, 220 * fade);
+    strokeWeight(10 * fade + 2);
+    circle(0, 0, this.maxRadius * 2);
+    stroke(240, 252, 255, 250 * fade);
+    strokeWeight(4 * fade + 1.5);
+    circle(0, 0, this.maxRadius * 2);
+
+    // the shatter front racing out to it
+    stroke(215, 245, 255, 230 * fade);
+    strokeWeight(9 * fade + 2);
+    circle(0, 0, this.radius * 2);
+
+    // splinters of the chunk thrown out to the edge
+    strokeWeight(4 * fade + 1);
+    for (let i = 0; i < 14; i++) {
+      const a = (i / 14) * TWO_PI + 0.2;
+      const inner = this.maxRadius * (0.25 + t * 0.5);
+      const outer = inner + this.maxRadius * 0.3 * fade + 8;
+      stroke(255, 255, 255, 235 * fade);
+      line(cos(a) * inner, sin(a) * inner, cos(a) * outer, sin(a) * outer);
+    }
+
+    // spikes of ice punched up around the rim
+    stroke(230, 250, 255, 200 * fade);
+    strokeWeight(3);
+    fill(180, 230, 255, 150 * fade);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * TWO_PI + 0.35;
+      const base = this.maxRadius * 0.92;
+      const tip = this.maxRadius * (1 + 0.16 * (0.4 + fade));
+      triangle(
+        cos(a) * base - sin(a) * 11,
+        sin(a) * base + cos(a) * 11,
+        cos(a) * base + sin(a) * 11,
+        sin(a) * base - cos(a) * 11,
+        cos(a) * tip,
+        sin(a) * tip
       );
     }
+
+    // the crack of the shatter
+    if (flash > 0) {
+      noStroke();
+      fill(255, 255, 255, 235 * flash);
+      circle(0, 0, this.maxRadius * flash + 24);
+    }
+
     pop();
   }
 
   getDisplayBoundingBox() {
+    const r = this.maxRadius + 40; // the rim spikes stand outside the blast
     return new Rectangle({
-      x: this.position.x - this.maxRadius,
-      y: this.position.y - this.maxRadius,
-      w: this.maxRadius * 2,
-      h: this.maxRadius * 2,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }
