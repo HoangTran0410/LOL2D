@@ -1,6 +1,7 @@
 export { default as Ghost } from './Ghost';
 export { default as Flash } from './Flash';
 export { default as Heal } from './Heal';
+export { default as Ignite } from './Ignite';
 export { default as Blitzcrank_Q } from './Blitzcrank_Q';
 export { default as Blitzcrank_W } from './Blitzcrank_W';
 export { default as Blitzcrank_R } from './Blitzcrank_R';
@@ -37,3 +38,36 @@ export { default as Zed_W } from './Zed_W';
 export { default as Graves_W } from './Graves_W';
 export { default as Zed_Q } from './Zed_Q';
 export { default as Zed_E } from './Zed_E';
+export { default as Zed_R } from './Zed_R';
+
+// kits completed on existing champions
+export { default as Ashe_Q } from './Ashe_Q';
+export { default as Ashe_E } from './Ashe_E';
+export { default as Lux_W } from './Lux_W';
+export { default as LeeSin_W } from './LeeSin_W';
+export { default as Blitzcrank_E } from './Blitzcrank_E';
+export { default as ChoGath_E } from './ChoGath_E';
+export { default as ChoGath_R } from './ChoGath_R';
+export { default as Malphite_Q } from './Malphite_Q';
+export { default as Malphite_W } from './Malphite_W';
+export { default as Teemo_Q } from './Teemo_Q';
+export { default as Veigar_Q } from './Veigar_Q';
+
+// new champions
+export { default as Rammus_Q } from './Rammus_Q';
+export { default as Anivia_Q } from './Anivia_Q';
+export { default as Anivia_W } from './Anivia_W';
+export { default as Anivia_R } from './Anivia_R';
+export { default as Thresh_Q } from './Thresh_Q';
+export { default as Morgana_Q } from './Morgana_Q';
+export { default as Morgana_E } from './Morgana_E';
+export { default as Janna_Q } from './Janna_Q';
+export { default as Alistar_W } from './Alistar_W';
+export { default as Nocturne_R } from './Nocturne_R';
+export { default as Twitch_Q } from './Twitch_Q';
+export { default as Amumu_Q } from './Amumu_Q';
+export { default as Warwick_Q } from './Warwick_Q';
+export { default as Singed_W } from './Singed_W';
+export { default as Cassiopeia_W } from './Cassiopeia_W';
+export { default as Fizz_E } from './Fizz_E';
+export { default as Nasus_Q } from './Nasus_Q';
