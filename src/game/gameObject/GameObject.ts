@@ -5,6 +5,19 @@ export default class GameObject {
   toRemove = false;
   willDraw = true;
 
+  /**
+   * Draw order override. `null` falls back to the class table in ObjectManager,
+   * which cannot list every subclass without importing it (and half of them
+   * import ObjectManager back). Lower paints first.
+   */
+  zIndex: number | null = null;
+
+  /**
+   * Structures stay on screen once discovered, so FogOfWar must not clear their
+   * `willDraw` the way it does for units.
+   */
+  alwaysVisible = false;
+
   game: any;
   position: p5.Vector;
   collisionRadius: number;

@@ -22,6 +22,16 @@ const Z_INDEX_MAP = new Map<any, number>();
 DisplayZIndex.forEach((cls, i) => Z_INDEX_MAP.set(cls, i));
 const DEFAULT_Z_INDEX = 99;
 
+/**
+ * The table above is keyed by exact constructor, so a subclass it does not list
+ * falls through to DEFAULT_Z_INDEX. Classes that need a specific slot but cannot
+ * be imported here (structures import PredefinedFilters from this module) set
+ * `zIndex` on themselves instead — e.g. Fountain paints under everything.
+ */
+function zIndexOf(o: any): number {
+  return o.zIndex ?? Z_INDEX_MAP.get(o.constructor) ?? DEFAULT_Z_INDEX;
+}
+
 interface QueryOptions {
   area?: any;
   filters?: ((o: any) => boolean)[];
@@ -128,10 +138,7 @@ export default class ObjectManager {
       area: camBound,
     });
 
-    objectsInCamera.sort((a, b) => {
-      return (Z_INDEX_MAP.get(a.constructor) ?? DEFAULT_Z_INDEX) -
-             (Z_INDEX_MAP.get(b.constructor) ?? DEFAULT_Z_INDEX);
-    });
+    objectsInCamera.sort((a, b) => zIndexOf(a) - zIndexOf(b));
 
     for (const o of objectsInCamera) {
       if (o.willDraw) o.draw?.();

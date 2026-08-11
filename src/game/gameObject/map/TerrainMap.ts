@@ -35,7 +35,13 @@ export default class TerrainMap {
 
     const polygons: { vertices: number[][]; type: string }[] = [];
     const terrains: any = AssetManager.getAsset('json_summoner_map')?.data;
-    for (const terrainType in terrains) {
+    // summoner_map.json also carries `turret1`/`turret2`, which are flat [x, y]
+    // points rather than polygons. Feeding those through arrayToVertices built 22
+    // obstacles with NaN bounds and pushed them into the terrain quadtree; only
+    // real terrain layers belong here. Game.ts reads the turret points directly.
+    const terrainTypes: string[] = [TerrainType.WALL, TerrainType.BUSH, TerrainType.WATER];
+    for (const terrainType of terrainTypes) {
+      if (!terrains?.[terrainType]) continue;
       polygons.push(
         ...terrains[terrainType].map((_: number[][]) => ({
           vertices: _,

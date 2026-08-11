@@ -65,9 +65,11 @@ export default class FogOfWar {
       });
     });
 
-    // reset willDraw for all AttackableUnit
+    // reset willDraw for all AttackableUnit (structures opt out — once built they
+    // stay on the map, and the update loop is not in lockstep with draw, so
+    // re-enabling them from their own update() would flicker)
     this.game.objectManager.objects.forEach((o: any) => {
-      if (o instanceof AttackableUnit) o.willDraw = false;
+      if (o instanceof AttackableUnit && !o.alwaysVisible) o.willDraw = false;
     });
     // enable willDraw for all visible players
     visiblePlayers.forEach((p: any) => (p.willDraw = true));

@@ -1,11 +1,19 @@
 import { SpellHotKeys } from './constants';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
+import Monster from './gameObject/attackableUnits/Monster';
 import Camera from './gameObject/map/Camera';
 import FogOfWar from './gameObject/map/FogOfWar';
 import TerrainMap from './gameObject/map/TerrainMap';
+import Fountain from './gameObject/structures/Fountain';
+import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
-import { getChampionPresetRandom } from './preset';
+import {
+  FountainPreset,
+  MonsterPreset,
+  getChampionPresetRandom,
+  getTurretPositions,
+} from './preset';
 import ObjectManager from './managers/ObjectManager';
 import EventManager from '../managers/EventManager';
 
@@ -21,6 +29,10 @@ export default class Game {
   inGameHUD!: InGameHUD;
   player!: Champion;
 
+  fountains: Fountain[] = [];
+  turrets: Turret[] = [];
+  monsters: Monster[] = [];
+
   clickedPoint = { x: 0, y: 0, size: 0 };
   worldMouse!: p5.Vector;
   paused = false;
@@ -33,6 +45,10 @@ export default class Game {
     this.terrainMap = new TerrainMap(this, this.mapSize);
     this.fogOfWar = new FogOfWar(this);
     this.inGameHUD = new InGameHUD(this);
+
+    // fountains first: randomSpawnPoint() is defined in terms of them, and both
+    // the player and every AI champion are placed with it
+    this.spawnFountains();
 
     this.player = new Champion({
       game: this,
@@ -51,8 +67,36 @@ export default class Game {
       );
     }
 
+    // anything reading `isAllied` needs this.player, so these come after it
+    this.spawnJungle();
+    this.spawnTurrets();
+
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();
+  }
+
+  spawnFountains() {
+    for (const preset of FountainPreset) {
+      const fountain = new Fountain({ game: this, preset });
+      this.fountains.push(fountain);
+      this.objectManager.addObject(fountain);
+    }
+  }
+
+  spawnJungle() {
+    for (const key in MonsterPreset) {
+      const monster = new Monster({ game: this, preset: MonsterPreset[key] });
+      this.monsters.push(monster);
+      this.objectManager.addObject(monster);
+    }
+  }
+
+  spawnTurrets() {
+    for (const { x, y } of getTurretPositions()) {
+      const turret = new Turret({ game: this, position: createVector(x, y) });
+      this.turrets.push(turret);
+      this.objectManager.addObject(turret);
+    }
   }
 
   pause() { this.paused = true; }
@@ -111,7 +155,17 @@ export default class Game {
     this.inGameHUD.destroy();
   }
 
+  /**
+   * Spawn and respawn point (AttackableUnit.respawn() calls this too). Picking a
+   * fountain rather than scattering everyone around the map centre is what makes
+   * the platforms worth having: you come back on one and heal up before leaving.
+   */
   randomSpawnPoint() {
+    if (this.fountains.length > 0) {
+      const fountain = this.fountains[Math.floor(random(this.fountains.length))];
+      return fountain.randomPointInside();
+    }
+
     return createVector(
       this.mapSize / 2 + random(-1000, 1000),
       this.mapSize / 2 + random(-1000, 1000)

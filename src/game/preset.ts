@@ -1,4 +1,7 @@
 import * as AllSpells from './gameObject/spells/index';
+import AssetManager from '../managers/AssetManager';
+import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
+import type { FountainPresetData } from './gameObject/structures/Fountain';
 
 // Workaround: AllSpells is a namespace of named Spell class exports.
 // Filter out string exports by excluding values whose prototype chain doesn't lead to Spell.
@@ -250,19 +253,7 @@ export const SpellGroups: {
   },
 ];
 
-export const MonsterPreset: Record<
-  string,
-  {
-    name: string;
-    avatar: string;
-    camp: { x: number; y: number; r: number };
-    speed: number;
-    size: number;
-    attackRange: number;
-    reviveTime: number;
-    health: number;
-  }
-> = {
+export const MonsterPreset: Record<string, MonsterPresetData> = {
   baron: {
     name: 'Baron',
     avatar: 'monster_Baron_Nashor',
@@ -272,6 +263,10 @@ export const MonsterPreset: Record<
     attackRange: 400,
     reviveTime: 3000,
     health: 1000,
+    // rooted in place with a long reach, so it hits hard but slowly
+    damage: 25,
+    attackInterval: 2000,
+    aggroRange: 480,
   },
   blue1: {
     name: 'Blue',
@@ -473,4 +468,38 @@ export const MonsterPreset: Record<
     reviveTime: 3000,
     health: 50,
   },
+};
+
+/**
+ * The two spawn platforms, in the corners the map's own turret rows point at.
+ * Coordinates were picked by scanning the wall polygons in summoner_map.json for
+ * the roomiest open spot in each base — both sit ~260px clear of any wall.
+ */
+export const FountainPreset: FountainPresetData[] = [
+  { name: 'Bệ Đá Cổ', x: 400, y: 6075, r: 190 },
+  { name: 'Bệ Đá Cổ', x: 6100, y: 375, r: 190 },
+];
+
+/**
+ * summoner_map.json already ships the two turret rows (`turret1`/`turret2`) as
+ * flat [x, y] points — 11 per side, all on open ground at lane chokepoints.
+ * They were never read by anything; TerrainMap used to try to parse them as
+ * polygons and produced NaN obstacles.
+ */
+export const getTurretPositions = (): { x: number; y: number }[] => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapData: any = AssetManager.getAsset('json_summoner_map')?.data;
+  const positions: { x: number; y: number }[] = [];
+
+  for (const key of ['turret1', 'turret2']) {
+    const points = mapData?.[key];
+    if (!Array.isArray(points)) continue;
+    for (const p of points) {
+      if (Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1])) {
+        positions.push({ x: p[0], y: p[1] });
+      }
+    }
+  }
+
+  return positions;
 };
