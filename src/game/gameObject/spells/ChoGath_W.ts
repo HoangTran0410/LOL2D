@@ -68,13 +68,14 @@ export class ChoGath_W_Object extends SpellObject {
         PredefinedFilters.excludeObjects(this.playersEffected),
         (o: any) => {
           return CollideUtils.circleArc(
+            o.position.x,
+            o.position.y,
+            o.stats.size.value / 2,
             this.position.x,
             this.position.y,
             this.currentRange,
             this.angleStart,
-            this.angleEnd,
-            o.position.x,
-            o.position.y
+            this.angleEnd
           );
         },
       ],
