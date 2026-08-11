@@ -56,7 +56,7 @@ GameObject
 
 Each spell is a separate file exporting a class extending `Spell`. `Spell` manages cooldown state machine (READY → COOLDOWN → READY). Spell files reference their champion prefix (e.g., `Ahri_Q.js`, `Yasuo_R.js`). Summoner spells (`Flash`, `Ghost`, `Heal`, `StealthWard`) are at the root of the spells folder.
 
-**Adding a new spell**: Create a new file in the spells folder, extend `Spell`, implement `onSpellCast()`, then export it from `spells/index.js` and add it to `SpellGroups` in `src/game/preset.js`.
+**Adding a new spell**: read `docs/ADDING_SPELLS.md` first. It covers the three registration points, the `MissileSpellObject` base every skillshot should extend, the buff catalogue and its mandatory `stackId` rule, the engine traps `tsc` cannot catch (dead status flags, double-updated particle systems, the null-owner HUD path), and how to verify a spell by driving the real game.
 
 ### Buffs (`src/game/gameObject/buffs/`)
 
