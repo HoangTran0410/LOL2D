@@ -273,6 +273,16 @@
   padding: 0 5px;
 }
 
+/* stack count sits opposite the countdown so the two never overlap */
+.buffs .buff span.stacks {
+  bottom: auto;
+  right: auto;
+  top: 0;
+  left: 0;
+  color: #ffd97a;
+  font-weight: bold;
+}
+
 /* ===================== Spell Picker ===================== */
 .spell-picker {
   position: fixed;

@@ -121,13 +121,31 @@ export default class Champion extends AttackableUnit {
     push();
     let x = topleft.x + 10;
     if (alpha < 255) tint(255, alpha);
-    // buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too drew
-    // every buff twice, and inside this block's tint()
-    for (let buff of this.buffs) {
-      if (buff.image) {
-        image(buff.image.data, x, topleft.y - 13, 20, 20);
-        x += 20;
+    // One icon per kind of buff with a stack count, not one per instance:
+    // Veigar Q can hold hundreds of StatAmp stacks, which used to draw hundreds
+    // of icons straight off the side of the screen.
+    // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
+    // drew every buff twice, and inside this block's tint().)
+    const buffCounts = new Map<any, { image: any; count: number }>();
+    for (const buff of this.buffs) {
+      if (!buff.image) continue;
+      const key = buff.stackId ?? buff.constructor;
+      const row = buffCounts.get(key);
+      if (row) row.count++;
+      else buffCounts.set(key, { image: buff.image, count: 1 });
+    }
+
+    for (const { image: buffImage, count } of buffCounts.values()) {
+      image(buffImage.data, x, topleft.y - 13, 20, 20);
+      if (count > 1) {
+        noStroke();
+        fill(255, alpha);
+        textAlign(RIGHT, BOTTOM);
+        textSize(10);
+        text(count, x + 10, topleft.y - 3);
+        textAlign(LEFT, BASELINE);
       }
+      x += 20;
     }
     pop();
 

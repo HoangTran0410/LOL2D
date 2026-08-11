@@ -31,6 +31,7 @@ interface BuffDisplay {
   duration: number;
   timeElapsed: number;
   timeLeftText: number;
+  stacks: number;
 }
 
 interface SpellGroupDisplay {
@@ -276,6 +277,7 @@ export default class InGameHUD {
                     <div v-for="buff of buffs" class="buff">
                         <img :src="buff.image" alt="buff">
                         <span>{{buff.timeLeftText}}</span>
+                        <span v-if="buff.stacks > 1" class="stacks">{{buff.stacks}}</span>
                     </div>
                 </div>
             </div>
@@ -411,18 +413,36 @@ export default class InGameHUD {
         };
       });
 
-    this.vueInstance.buffs = (player.buffs || [])
-      .filter((i: any) => i?.image?.path)
-      .map((buff: any) => {
-        const { image, duration, timeElapsed } = buff || {};
-        const timeLeft = duration - timeElapsed;
-        return {
-          image: image?.path,
-          duration,
-          timeElapsed,
-          timeLeftText: Math.ceil(timeLeft / 1000),
-        };
+    // One row per kind of buff, not per stack: Veigar Q alone can hold hundreds
+    // of StatAmp instances, which used to render hundreds of icons. The longest
+    // remaining instance drives the countdown.
+    const buffRows = new Map<any, BuffDisplay>();
+    for (const buff of player.buffs || []) {
+      if (!buff?.image?.path) continue;
+
+      const key = buff.stackId ?? buff.constructor;
+      const timeLeft = (buff.duration || 0) - (buff.timeElapsed || 0);
+      const existing = buffRows.get(key);
+
+      if (existing) {
+        existing.stacks++;
+        if (timeLeft > existing.duration - existing.timeElapsed) {
+          existing.duration = buff.duration;
+          existing.timeElapsed = buff.timeElapsed;
+          existing.timeLeftText = Math.ceil(timeLeft / 1000);
+        }
+        continue;
+      }
+
+      buffRows.set(key, {
+        image: buff.image.path,
+        duration: buff.duration,
+        timeElapsed: buff.timeElapsed,
+        timeLeftText: Math.ceil(timeLeft / 1000),
+        stacks: 1,
       });
+    }
+    this.vueInstance.buffs = [...buffRows.values()];
   }
 
   destroy() {
