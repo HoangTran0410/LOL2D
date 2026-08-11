@@ -1,9 +1,10 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 import Dash from '../buffs/Dash';
 import TrailSystem from '../helpers/TrailSystem';
 
@@ -34,7 +35,7 @@ export default class Ahri_R extends Spell {
   }
 
   onSpellCast() {
-    const { from, to } = VectorUtils.getVectorWithMaxRange(
+    const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.game.worldMouse,
       this.maxDashDistance
@@ -88,21 +89,25 @@ export default class Ahri_R extends Spell {
   }
 }
 
-export class Ahri_R_Object extends SpellObject {
-  isMissile = true;
-  position: p5.Vector = this.owner.position.copy();
+export class Ahri_R_Object extends MissileSpellObject {
   targetEnemy: SpellObject['owner'] | null = null;
   damage = 20;
   speed = 7;
   size = 20;
+  // locked onto one enemy, so it passes harmlessly through everyone else
+  maxHitCount = 0;
 
   trailSystem = new TrailSystem({
     trailColor: [150, 150, 255, 100] as any,
     trailSize: this.size,
   });
 
-  onAdded() {
-    this.game.objectManager.addObject(this.trailSystem);
+  onBeforeMove() {
+    this.destination = this.targetEnemy.position; // live ref: the orb tracks its target
+  }
+
+  onArrive() {
+    this.targetEnemy.takeDamage(this.damage, this.owner);
   }
 
   update() {
@@ -111,13 +116,7 @@ export class Ahri_R_Object extends SpellObject {
       return;
     }
 
-    VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.speed);
-    this.trailSystem.addTrail(this.position);
-
-    if (this.position.dist(this.targetEnemy.position) < this.speed) {
-      this.targetEnemy.takeDamage(this.damage, this.owner);
-      this.toRemove = true;
-    }
+    super.update();
   }
 
   draw() {
@@ -130,15 +129,5 @@ export class Ahri_R_Object extends SpellObject {
       this.size
     );
     pop();
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
-      data: this,
-    });
   }
 }

@@ -120,7 +120,6 @@ export class Veigar_E_Object extends SpellObject {
           r: 10,
         });
       }
-      this.particleSystem.update();
     }
   }
 

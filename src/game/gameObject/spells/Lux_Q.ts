@@ -1,9 +1,7 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
 import RootBuff from '../buffs/Root';
 
 export default class Lux_Q extends Spell {
@@ -18,7 +16,7 @@ export default class Lux_Q extends Spell {
     const range = 500;
     const stunTime = 2000;
 
-    const { from, to: destination } = VectorUtils.getVectorWithRange(
+    const { to: destination } = VectorUtils.getVectorWithRange(
       this.owner.position,
       this.game.worldMouse,
       range
@@ -27,54 +25,23 @@ export default class Lux_Q extends Spell {
     const obj = new Lux_Q_Object(this.owner);
     obj.destination = destination;
     obj.stunTime = stunTime;
-    obj.maxPlayersEffected = 2;
+    obj.maxHitCount = 2;
 
     this.game.objectManager.addObject(obj);
   }
 }
 
-export class Lux_Q_Object extends SpellObject {
-  isMissile = true;
-  playersEffected: any[] = [];
-  maxPlayersEffected = 2;
+export class Lux_Q_Object extends MissileSpellObject {
   speed = 7;
   size = 15;
   stunTime = 2000;
-  position = this.owner.position.copy();
-  destination = this.owner.position.copy();
+  maxHitCount = 2;
 
-  update() {
-    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
-
-    if (this.destination.dist(this.position) < this.speed) {
-      this.position = this.destination.copy();
-      this.toRemove = true;
-    }
-
-    if (this.playersEffected.length === this.maxPlayersEffected) {
-      this.toRemove = true;
-    } else {
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.size / 2,
-        }),
-        filters: [
-          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
-          PredefinedFilters.excludeObjects(this.playersEffected),
-        ],
-      });
-      const enemy = enemies?.[0];
-      if (enemy) {
-        const stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
-        stunBuff.image = AssetManager.getAsset('spell_lux_q');
-        enemy.addBuff(stunBuff);
-        enemy.takeDamage(20, this.owner);
-
-        this.playersEffected.push(enemy);
-      }
-    }
+  onHit(enemy: any) {
+    const stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
+    stunBuff.image = AssetManager.getAsset('spell_lux_q');
+    enemy.addBuff(stunBuff);
+    enemy.takeDamage(20, this.owner);
   }
 
   draw() {
@@ -96,15 +63,5 @@ export class Lux_Q_Object extends SpellObject {
       line(this.position.x, this.position.y, x, y);
     }
     pop();
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
-      data: this,
-    });
   }
 }

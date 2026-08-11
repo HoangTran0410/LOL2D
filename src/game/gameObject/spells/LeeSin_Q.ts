@@ -1,12 +1,11 @@
 import AssetManager from '../../../managers/AssetManager';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 import Dash from '../buffs/Dash';
 import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
 import TrueSight from '../buffs/TrueSight';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Rectangle } from '../../../libs/quadtree';
 
 export default class LeeSin_Q extends Spell {
   static PHASES = {
@@ -19,7 +18,7 @@ export default class LeeSin_Q extends Spell {
   };
   phase: 'Q1' | 'Q2' = 'Q1';
 
-  image = (this.phase as any).image;
+  image = LeeSin_Q.PHASES[this.phase].image;
   name = 'Sóng Âm / Vô Ảnh Cước (LeeSin_Q)';
   description =
     'Chưởng 1 luồng Sóng Âm về hướng chỉ định, gây <span class="damage">15 sát thương</span> khi trúng địch. Có thể tái kích hoạt trong vòng <span class="time">3 giây</span> để <span class="buff">Lướt</span> tới kẻ địch trúng Sóng Âm, gây thêm <span class="damage">15 sát thương</span> khi tới nơi';
@@ -44,7 +43,7 @@ export default class LeeSin_Q extends Spell {
     const q2HitDamage = 15;
 
     if (this.phase === 'Q1') {
-      const { from, to: destination } = VectorUtils.getVectorWithRange(
+      const { to: destination } = VectorUtils.getVectorWithRange(
         this.owner.position,
         this.game.worldMouse,
         range
@@ -58,7 +57,7 @@ export default class LeeSin_Q extends Spell {
       obj.size = size;
       obj.hitDamage = hitDamage;
       obj.lifeTimeAfterHit = lifeTimeAfterHit;
-      obj.onHit = (enemy: any) => {
+      obj.onHitCallback = (enemy: any) => {
         this.enemyHit = enemy;
         enemy.takeDamage(hitDamage, this.owner);
 
@@ -66,7 +65,7 @@ export default class LeeSin_Q extends Spell {
         enemy.addBuff(trueSightBuff);
 
         this.phase = 'Q2';
-        this.image = (this.phase as any).image;
+        this.image = LeeSin_Q.PHASES[this.phase].image;
         this.currentCooldown = this.collDownAfterQ1;
       };
       this.spellObject = obj;
@@ -75,7 +74,7 @@ export default class LeeSin_Q extends Spell {
     } else {
       const dashBuff = new Dash(10000, this.owner, this.owner);
       dashBuff.dashDestination = this.enemyHit.position;
-      dashBuff.image = (LeeSin_Q as any).PHASES.Q2.image;
+      dashBuff.image = LeeSin_Q.PHASES.Q2.image;
       dashBuff.onCancelled = () => {
         if (this.spellObject) this.spellObject.toRemove = true;
       };
@@ -89,7 +88,7 @@ export default class LeeSin_Q extends Spell {
       this.owner.addBuff(dashBuff);
 
       this.phase = 'Q1';
-      this.image = (this.phase as any).image;
+      this.image = LeeSin_Q.PHASES[this.phase].image;
     }
   }
 
@@ -98,20 +97,21 @@ export default class LeeSin_Q extends Spell {
       this.spellObject = null;
       this.enemyHit = null;
       this.phase = 'Q1';
-      this.image = (this.phase as any).image;
+      this.image = LeeSin_Q.PHASES[this.phase].image;
       this.currentCooldown = this.coolDown;
     }
   }
 }
 
-export class LeeSin_Q_Object extends SpellObject {
-  isMissile = true;
-  destination = createVector();
+export class LeeSin_Q_Object extends MissileSpellObject {
   range = 400;
   speed = 10;
   size = 25;
   hitDamage = 15;
   lifeTimeAfterHit = 3000;
+  // the wave sticks to whoever it hits so Q2 has something to dash at
+  maxHitCount = 1;
+  removeOnMaxHit = false;
 
   static PHASES = {
     MOVING: 0,
@@ -121,55 +121,31 @@ export class LeeSin_Q_Object extends SpellObject {
     LeeSin_Q_Object.PHASES.MOVING;
 
   enemyHit: any = null;
-  onHit: ((enemy: any) => void) | null = null;
+  onHitCallback: ((enemy: any) => void) | null = null;
 
-  trailSystem: TrailSystem;
+  trailSystem = new TrailSystem({
+    trailSize: this.size,
+    trailColor: '#b5ede822',
+  });
 
-  constructor(owner: any) {
-    super(owner);
-    this.trailSystem = new TrailSystem({
-      trailSize: this.size,
-      trailColor: '#b5ede822',
-    });
-  }
-
-  onAdded() {
-    this.game.objectManager.addObject(this.trailSystem);
+  onHit(enemy: any) {
+    this.onHitCallback?.(enemy);
+    this.enemyHit = enemy;
+    this.phase = LeeSin_Q_Object.PHASES.HIT;
+    this.isMissile = false;
   }
 
   update() {
     if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
-      VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+      super.update();
+      return;
+    }
 
-      if (this.destination.dist(this.position) < this.speed) {
-        this.toRemove = true;
-      }
+    this.position = this.enemyHit.position.copy();
 
-      this.trailSystem.addTrail(this.position);
-
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.size / 2,
-        }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-      });
-
-      const enemy = enemies?.[0];
-      if (enemy) {
-        this.onHit?.(enemy);
-        this.enemyHit = enemy;
-        this.phase = LeeSin_Q_Object.PHASES.HIT;
-        this.isMissile = false;
-      }
-    } else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
-      this.position = this.enemyHit.position.copy();
-
-      this.lifeTimeAfterHit -= deltaTime;
-      if (this.lifeTimeAfterHit <= 0) {
-        this.toRemove = true;
-      }
+    this.lifeTimeAfterHit -= deltaTime;
+    if (this.lifeTimeAfterHit <= 0) {
+      this.toRemove = true;
     }
   }
 
@@ -200,22 +176,17 @@ export class LeeSin_Q_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     if (this.phase === LeeSin_Q_Object.PHASES.MOVING) {
-      return new Rectangle({
-        x: this.position.x - this.size / 2,
-        y: this.position.y - this.size / 2,
-        w: this.size,
-        h: this.size,
-        data: this,
-      });
-    } else if (this.phase === LeeSin_Q_Object.PHASES.HIT) {
-      const enemySize = this.enemyHit?.animatedValues?.size ?? 40;
-      return new Rectangle({
-        x: this.position.x - enemySize / 2 - 20,
-        y: this.position.y - enemySize / 2 - 20,
-        w: enemySize + 40,
-        h: enemySize + 40,
-        data: this,
-      });
+      return super.getDisplayBoundingBox();
     }
+
+    // once latched, the marker is drawn around the victim, not the missile
+    const enemySize = this.enemyHit?.animatedValues?.size ?? 40;
+    return new Rectangle({
+      x: this.position.x - enemySize / 2 - 20,
+      y: this.position.y - enemySize / 2 - 20,
+      w: enemySize + 40,
+      h: enemySize + 40,
+      data: this,
+    });
   }
 }

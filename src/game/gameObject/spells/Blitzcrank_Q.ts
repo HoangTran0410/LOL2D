@@ -1,13 +1,12 @@
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 import Airborne from '../buffs/Airborne';
 import Dash from '../buffs/Dash';
 import RootBuff from '../buffs/Root';
 import VectorUtils from '../../../utils/vector.utils';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Rectangle } from '../../../libs/quadtree';
 
 export default class Blitzcrank_Q extends Spell {
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
@@ -25,7 +24,7 @@ export default class Blitzcrank_Q extends Spell {
     const speed = 10;
     const grabSpeed = 10;
 
-    const { from, to: destination } = VectorUtils.getVectorWithRange(
+    const { to: destination } = VectorUtils.getVectorWithRange(
       this.owner.position,
       this.game.worldMouse,
       range
@@ -58,15 +57,14 @@ export default class Blitzcrank_Q extends Spell {
   }
 }
 
-export class Blitzcrank_Q_Object extends SpellObject {
-  isMissile = true;
-
-  position: p5.Vector = createVector();
-  destination: p5.Vector = createVector();
+export class Blitzcrank_Q_Object extends MissileSpellObject {
   range = 500;
   speed = 10;
   grabSpeed = 10;
-  handSize = 30;
+  size = 30;
+  // the hand grabs one enemy and drags them home instead of dying on impact
+  maxHitCount = 1;
+  removeOnMaxHit = false;
 
   airborneBuff: Airborne | null = null;
   dashBuff: Dash | null = null;
@@ -79,45 +77,31 @@ export class Blitzcrank_Q_Object extends SpellObject {
   phase: (typeof Blitzcrank_Q_Object.PHASES)[keyof typeof Blitzcrank_Q_Object.PHASES] =
     Blitzcrank_Q_Object.PHASES.FORWARD;
 
+  onBeforeMove() {
+    if (this.phase === Blitzcrank_Q_Object.PHASES.GRAB) this.speed = this.grabSpeed;
+  }
+
+  onHit(enemy: any) {
+    this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
+    this.champToGrab = enemy;
+    this.destination = this.owner.position;
+
+    this.airborneBuff = new Airborne(7000, this.owner, enemy);
+    this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
+    enemy.addBuff(this.airborneBuff);
+
+    this.dashBuff = new Dash(10000, this.owner, enemy);
+    this.dashBuff.showTrail = false;
+    this.dashBuff.cancelable = false;
+    enemy.addBuff(this.dashBuff);
+
+    enemy.takeDamage(20, this.owner);
+  }
+
   update() {
-    const distance = this.destination.dist(this.position);
-    const speed =
-      this.phase === Blitzcrank_Q_Object.PHASES.FORWARD ? this.speed : this.grabSpeed;
-    if (distance < speed) {
-      this.position = this.destination.copy();
-      this.toRemove = true;
-    } else {
-      VectorUtils.moveVectorToVector(this.position, this.destination, speed);
-    }
+    super.update();
 
-    if (this.phase === Blitzcrank_Q_Object.PHASES.FORWARD) {
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.handSize / 2,
-        }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-      });
-
-      const enemy = enemies?.[0];
-      if (enemy) {
-        this.phase = Blitzcrank_Q_Object.PHASES.GRAB;
-        this.champToGrab = enemy;
-        this.destination = this.owner.position;
-
-        this.airborneBuff = new Airborne(7000, this.owner, enemy);
-        this.airborneBuff.image = AssetManager.getAsset('spell_blitzcrank_q');
-        enemy.addBuff(this.airborneBuff);
-
-        this.dashBuff = new Dash(10000, this.owner, enemy);
-        this.dashBuff.showTrail = false;
-        this.dashBuff.cancelable = false;
-        enemy.addBuff(this.dashBuff);
-
-        enemy.takeDamage(20, this.owner);
-      }
-    } else if (this.champToGrab) {
+    if (this.champToGrab) {
       this.dashBuff!.dashDestination = this.owner.position.copy();
       this.champToGrab.position.set(this.position.x, this.position.y);
 
@@ -146,26 +130,27 @@ export class Blitzcrank_Q_Object extends SpellObject {
 
     noStroke();
     fill(255, 150, 50);
-    circle(this.position.x, this.position.y, this.handSize);
+    circle(this.position.x, this.position.y, this.size);
 
     fill(200, 100, 90);
     const dir = p5.Vector.sub(this.destination, this.position).normalize();
     for (let i = 0; i < 3; i++) {
       const angle = dir.heading() + (i - 1) * 0.5;
-      const x = this.position.x + cos(angle) * this.handSize;
-      const y = this.position.y + sin(angle) * this.handSize;
+      const x = this.position.x + cos(angle) * this.size;
+      const y = this.position.y + sin(angle) * this.size;
       circle(x, y, 15);
     }
 
     pop();
   }
 
+  // the arm spans from the caster to the hand, so the box must cover both
   getDisplayBoundingBox() {
     return new Rectangle({
-      x: Math.min(this.position.x, this.owner.position.x) - this.handSize / 2,
-      y: Math.min(this.position.y, this.owner.position.y) - this.handSize / 2,
-      w: Math.abs(this.position.x - this.owner.position.x) + this.handSize,
-      h: Math.abs(this.position.y - this.owner.position.y) + this.handSize,
+      x: Math.min(this.position.x, this.owner.position.x) - this.size / 2,
+      y: Math.min(this.position.y, this.owner.position.y) - this.size / 2,
+      w: Math.abs(this.position.x - this.owner.position.x) + this.size,
+      h: Math.abs(this.position.y - this.owner.position.y) + this.size,
       data: this,
     });
   }

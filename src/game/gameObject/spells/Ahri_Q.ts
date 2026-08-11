@@ -1,9 +1,7 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import TrailSystem from '../helpers/TrailSystem';
@@ -31,12 +29,11 @@ export default class Ahri_Q extends Spell {
   onUpdate() {}
 }
 
-export class Ahri_Q_Object extends SpellObject {
-  isMissile = true;
-  position: p5.Vector = createVector();
-  destination: p5.Vector = createVector();
+export class Ahri_Q_Object extends MissileSpellObject {
   speed = 7;
   size = 35;
+  // the orb turns around at max range instead of dying there
+  removeOnArrive = false;
 
   speedBackward = 15;
   increaseSpeedBackward = 0.2;
@@ -49,7 +46,6 @@ export class Ahri_Q_Object extends SpellObject {
   phase: (typeof Ahri_Q_Object.PHASES)[keyof typeof Ahri_Q_Object.PHASES] =
     Ahri_Q_Object.PHASES.FORWARD;
 
-  playerEffected: SpellObject['owner'][] = [];
   trailSystem = new TrailSystem({
     trailColor: '#77F5',
     trailSize: this.size,
@@ -57,31 +53,39 @@ export class Ahri_Q_Object extends SpellObject {
   particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#77f9');
 
   onAdded() {
-    this.game.objectManager.addObject(this.trailSystem);
+    super.onAdded();
     this.game.objectManager.addObject(this.particleSystem);
   }
 
-  update() {
-    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
-
-    if (this.position.dist(this.destination) < this.speed) {
-      if (this.phase === Ahri_Q_Object.PHASES.FORWARD) {
-        this.destination = this.owner.position; // move back to owner (live ref: follows the owner)
-        this.playerEffected = []; // reset player effected
-        this.speed = 0;
-        this.phase = Ahri_Q_Object.PHASES.BACKWARD;
-      } else {
-        this.toRemove = true;
-      }
-    }
-
+  onBeforeMove() {
     // increase speed when move back to owner
     if (this.phase === Ahri_Q_Object.PHASES.BACKWARD) {
       this.speed = constrain(this.speed + this.increaseSpeedBackward, 0, this.speedBackward);
     }
+  }
 
-    // trails
-    this.trailSystem.addTrail(this.position);
+  onArrive() {
+    if (this.phase === Ahri_Q_Object.PHASES.FORWARD) {
+      this.destination = this.owner.position; // move back to owner (live ref: follows the owner)
+      this.hitTargets = []; // the return trip may hit the same enemies again
+      this.speed = 0;
+      this.phase = Ahri_Q_Object.PHASES.BACKWARD;
+    } else {
+      this.toRemove = true;
+    }
+  }
+
+  onHit(enemy: any) {
+    const slowBuff = new Slow(500, this.owner, enemy);
+    slowBuff.percent = 0.5;
+    slowBuff.image = AssetManager.getAsset('spell_ahri_q');
+    enemy.addBuff(slowBuff);
+
+    enemy.takeDamage(15, this.owner);
+  }
+
+  update() {
+    super.update();
 
     // dots
     if (this.phase === Ahri_Q_Object.PHASES.FORWARD && random() < 0.7) {
@@ -92,30 +96,6 @@ export class Ahri_Q_Object extends SpellObject {
         r: random(5, 10),
       });
     }
-    this.particleSystem.update();
-
-    // collide with enemy
-    const enemies = this.game.objectManager.queryObjects({
-      area: new Circle({
-        x: this.position.x,
-        y: this.position.y,
-        r: this.size / 2,
-      }),
-      filters: [
-        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
-        PredefinedFilters.excludeObjects(this.playerEffected),
-      ],
-    });
-
-    enemies.forEach(enemy => {
-      const slowBuff = new Slow(500, this.owner, enemy);
-      slowBuff.percent = 0.5;
-      slowBuff.image = AssetManager.getAsset('spell_ahri_q');
-      enemy.addBuff(slowBuff);
-
-      enemy.takeDamage(15, this.owner);
-      this.playerEffected.push(enemy);
-    });
   }
 
   draw() {
@@ -127,15 +107,5 @@ export class Ahri_Q_Object extends SpellObject {
     fill('#77f');
     ellipse(0, 0, this.size - 5 + this.speed, this.size);
     pop();
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
-      data: this,
-    });
   }
 }

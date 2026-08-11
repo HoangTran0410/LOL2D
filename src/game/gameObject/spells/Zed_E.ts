@@ -1,5 +1,7 @@
-import { Rectangle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { PredefinedFilters } from '../../managers/ObjectManager';
+import Slow from '../buffs/Slow';
 import ParticleSystem from '../helpers/ParticleSystem';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -19,7 +21,14 @@ export default class Zed_E extends Spell {
 
 export class Zed_E_Object extends SpellObject {
   angle = 0;
+  angleSpeed = 0.5;
   radius = 100;
+  damage = 15;
+  slowPercent = 0.3;
+  slowDuration = 1000;
+
+  /** Hit once each, as the blade sweeps past them. */
+  playersEffected: any[] = [];
 
   particleSystem = new ParticleSystem({
     getParticlePosFn: (p: any) => p.position,
@@ -38,15 +47,60 @@ export class Zed_E_Object extends SpellObject {
     },
   });
 
-  onAdded() {}
+  onAdded() {
+    this.game.objectManager.addObject(this.particleSystem);
+  }
+
   onRemoved() {}
 
   update() {
     this.position.set(this.owner.position.x, this.owner.position.y);
 
-    this.angle += 0.5;
+    this.angle += this.angleSpeed;
     if (this.angle > 2 * Math.PI) {
       this.toRemove = true;
+      return;
+    }
+
+    const enemies = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.position.x,
+        y: this.position.y,
+        r: this.radius,
+      }),
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.excludeObjects(this.playersEffected),
+      ],
+    });
+
+    for (const enemy of enemies) {
+      const bearing = Math.atan2(
+        enemy.position.y - this.position.y,
+        enemy.position.x - this.position.x
+      );
+
+      // the blade is a bar through the centre, so both ends sweep at once —
+      // fold the difference into [0, PI/2] and hit whichever end arrives
+      let delta = Math.abs(((this.angle - bearing + Math.PI) % (2 * Math.PI)) - Math.PI);
+      delta = Math.min(delta, Math.PI - delta);
+      // wide enough that a bearing can never slip between two frames' angles
+      if (delta > this.angleSpeed) continue;
+
+      enemy.takeDamage(this.damage, this.owner);
+
+      const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
+      slowBuff.percent = this.slowPercent;
+      slowBuff.image = AssetManager.getAsset('spell_zed_e');
+      enemy.addBuff(slowBuff);
+
+      this.playersEffected.push(enemy);
+      this.particleSystem.addParticle({
+        position: enemy.position.copy(),
+        velocity: p5.Vector.fromAngle(bearing).mult(random(1, 3)),
+        lifeSpan: 300,
+        lifeTime: 300,
+      });
     }
   }
 

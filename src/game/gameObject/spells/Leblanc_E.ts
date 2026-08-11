@@ -1,10 +1,9 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
 import VectorUtils from '../../../utils/vector.utils';
 import RootBuff from '../buffs/Root';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 
 export default class Leblanc_E extends Spell {
   image = AssetManager.getAsset('spell_leblanc_e');
@@ -55,12 +54,12 @@ export default class Leblanc_E extends Spell {
   }
 }
 
-export class Leblanc_E_Object extends SpellObject {
-  isMissile = true;
-  position = this.owner.position.copy();
-  destination = this.owner.position.copy();
+export class Leblanc_E_Object extends MissileSpellObject {
   speed = 10;
   size = 25;
+  // the chain grabs one enemy and stays alive on them instead of dying on impact
+  maxHitCount = 1;
+  removeOnMaxHit = false;
 
   range = 500;
   hitDamage = 15;
@@ -78,55 +77,41 @@ export class Leblanc_E_Object extends SpellObject {
   };
   phase: number = Leblanc_E_Object.PHASES.MOVING;
 
+  onHit(enemy: any) {
+    this.enemyHit = enemy;
+    this.enemyHit.takeDamage(this.hitDamage, this.owner);
+    this.isMissile = false;
+    this.phase = Leblanc_E_Object.PHASES.WAITING_FOR_STUN;
+  }
+
   update() {
     if (this.phase == Leblanc_E_Object.PHASES.MOVING) {
-      VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+      super.update();
+      return;
+    }
 
-      if (this.destination.dist(this.position) <= this.speed) {
+    this.timeSinceHit += deltaTime;
+    this.position = this.enemyHit.position.copy().add(random(-5, 5), random(-5, 5));
+
+    this.movingCirclePercent += this.timeSinceHit / 150;
+    if (this.movingCirclePercent > 100) {
+      this.movingCirclePercent = 0;
+    }
+
+    if (this.enemyHit.isDead) {
+      this.toRemove = true;
+    } else if (this.timeSinceHit >= this.stunAfter) {
+      const rootBuff = new RootBuff(this.stunTime, this.owner, this.enemyHit);
+      rootBuff.image = AssetManager.getAsset('spell_leblanc_e');
+      rootBuff.effectColor = [255, 255, 0] as any;
+      this.enemyHit.addBuff(rootBuff);
+      this.enemyHit.takeDamage(this.stunDamage, this.owner);
+
+      this.toRemove = true;
+    } else {
+      const distance = this.position.dist(this.owner.position);
+      if (distance > this.range) {
         this.toRemove = true;
-      }
-
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.size / 2,
-        }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-      });
-      const enemy = enemies?.[0];
-      if (enemy) {
-        this.enemyHit = enemy;
-        this.enemyHit.takeDamage(this.hitDamage, this.owner);
-        this.isMissile = false;
-        this.phase = Leblanc_E_Object.PHASES.WAITING_FOR_STUN;
-      }
-    } else if (this.phase == Leblanc_E_Object.PHASES.WAITING_FOR_STUN) {
-      this.timeSinceHit += deltaTime;
-      this.position = this.enemyHit.position.copy().add(random(-5, 5), random(-5, 5));
-
-      this.movingCirclePercent += this.timeSinceHit / 150;
-      if (this.movingCirclePercent > 100) {
-        this.movingCirclePercent = 0;
-      }
-
-      if (this.enemyHit.isDead) {
-        this.toRemove = true;
-      } else if (this.timeSinceHit >= this.stunAfter) {
-        if (this.enemyHit) {
-          const rootBuff = new RootBuff(this.stunTime, this.owner, this.enemyHit);
-          rootBuff.image = AssetManager.getAsset('spell_leblanc_e');
-          rootBuff.effectColor = [255, 255, 0] as any;
-          this.enemyHit.addBuff(rootBuff);
-          this.enemyHit.takeDamage(this.stunDamage, this.owner);
-        }
-
-        this.toRemove = true;
-      } else {
-        const distance = this.position.dist(this.owner.position);
-        if (distance > this.range) {
-          this.toRemove = true;
-        }
       }
     }
   }
@@ -171,6 +156,7 @@ export class Leblanc_E_Object extends SpellObject {
     pop();
   }
 
+  // the chain spans from the caster to the tip, so the box must cover both
   getDisplayBoundingBox() {
     return new Rectangle({
       x: Math.min(this.position.x, this.owner.position.x) - this.size / 2,

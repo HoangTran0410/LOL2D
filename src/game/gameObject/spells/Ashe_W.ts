@@ -1,12 +1,10 @@
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 import Slow from '../buffs/Slow';
 import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export default class Ashe_W extends Spell {
   image = AssetManager.getAsset('spell_ashe_w');
@@ -42,13 +40,10 @@ export default class Ashe_W extends Spell {
   }
 }
 
-export class Ashe_W_Object extends SpellObject {
-  isMissile = true;
-  position = createVector();
-  destination = createVector();
-  direction = createVector();
+export class Ashe_W_Object extends MissileSpellObject {
   speed = 7;
   size = 10;
+  maxHitCount = 1;
 
   trailSystem = new TrailSystem({
     maxLength: 10,
@@ -56,38 +51,18 @@ export class Ashe_W_Object extends SpellObject {
     trailColor: [100, 100, 200, 50] as any,
   });
 
-  onAdded() {
-    this.game.objectManager.addObject(this.trailSystem);
+  onArrive() {
+    // cut the trail immediately rather than letting it fade out on its own
+    if (this.trailSystem) this.trailSystem.toRemove = true;
   }
 
-  update() {
-    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
-    this.trailSystem.addTrail(this.position);
-
-    if (this.position.dist(this.destination) < this.speed) {
-      this.toRemove = true;
-      this.trailSystem.toRemove = true;
-    }
-
-    let enemies = this.game.objectManager.queryObjects({
-      area: new Circle({
-        x: this.position.x,
-        y: this.position.y,
-        r: this.size / 2,
-      }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-    });
-
-    let enemy = enemies?.[0];
-    if (enemy) {
-      let slowBuff = new Slow(1500, this.owner, enemy);
-      slowBuff.percent = 0.75;
-      slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-      slowBuff.image = AssetManager.getAsset('spell_ashe_w');
-      enemy.addBuff(slowBuff);
-      enemy.takeDamage(5, this.owner);
-      this.toRemove = true;
-    }
+  onHit(enemy: any) {
+    let slowBuff = new Slow(1500, this.owner, enemy);
+    slowBuff.percent = 0.75;
+    slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
+    slowBuff.image = AssetManager.getAsset('spell_ashe_w');
+    enemy.addBuff(slowBuff);
+    enemy.takeDamage(5, this.owner);
   }
 
   draw() {
@@ -106,15 +81,5 @@ export class Ashe_W_Object extends SpellObject {
     triangle(15, -this.size / 2, 30, 0, 15, this.size / 2);
 
     pop();
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
-      data: this,
-    });
   }
 }

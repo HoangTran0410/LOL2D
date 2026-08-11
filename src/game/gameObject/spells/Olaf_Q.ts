@@ -1,13 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
 import VectorUtils from '../../../utils/vector.utils';
 import ParticleSystem from '../helpers/ParticleSystem';
 import TrailSystem from '../helpers/TrailSystem';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 
 export default class Olaf_Q extends Spell {
   image = AssetManager.getAsset('spell_olaf_q');
@@ -42,10 +41,7 @@ export default class Olaf_Q extends Spell {
   }
 }
 
-export class Olaf_Q_Object extends SpellObject {
-  isMissile = true;
-  position = this.owner.position.copy();
-  destination = this.owner.position.copy();
+export class Olaf_Q_Object extends MissileSpellObject {
   spellSource: Olaf_Q | null = null;
   angle = 0;
   initialAngle = 0;
@@ -57,6 +53,8 @@ export class Olaf_Q_Object extends SpellObject {
   waitForPickUpLifeTime = 5000;
   damage = 15;
   color: [number, number, number] = [2, 151, 177];
+  // the axe lands and waits to be picked up instead of vanishing at max range
+  removeOnArrive = false;
 
   static PHASES = {
     FLYING: 'FLYING',
@@ -64,8 +62,6 @@ export class Olaf_Q_Object extends SpellObject {
   };
 
   phase: string = Olaf_Q_Object.PHASES.FLYING;
-
-  playerEffected: any[] = [];
 
   trailSystem = new TrailSystem({
     trailSize: this.size,
@@ -88,7 +84,7 @@ export class Olaf_Q_Object extends SpellObject {
   });
 
   onAdded() {
-    this.game.objectManager.addObject(this.trailSystem);
+    super.onAdded();
     this.game.objectManager.addObject(this.particleSystem);
   }
 
@@ -96,70 +92,67 @@ export class Olaf_Q_Object extends SpellObject {
     return this.initialAngle > -PI / 2 && this.initialAngle < PI / 2;
   }
 
+  onBeforeMove() {
+    if (this.willRotateRight) this.angle += this.rotateSpeed;
+    else this.angle -= this.rotateSpeed;
+  }
+
+  getTrailPosition() {
+    return this.position.copy().add(p5.Vector.fromAngle(this.angle).mult(this.size / 2));
+  }
+
+  onArrive() {
+    this.phase = Olaf_Q_Object.PHASES.WAIT_FOR_PICK_UP;
+    this.isMissile = false;
+  }
+
+  onHit(enemy: any) {
+    const slowBuff = new Slow(1000, this.owner, enemy);
+    slowBuff.image = AssetManager.getAsset('spell_olaf_q');
+    slowBuff.percent = 0.4;
+    enemy.addBuff(slowBuff);
+    enemy.takeDamage(this.damage, this.owner);
+
+    this.particleSystem.addParticle({
+      position: enemy.position,
+      size: enemy.stats.size.value + 20,
+      age: 0,
+    });
+  }
+
+  checkCollision() {
+    const hitCountBefore = this.hitTargets.length;
+    super.checkCollision();
+
+    // one speed-up stack per pass-through, however many enemies it caught
+    if (this.hitTargets.length > hitCountBefore) {
+      const speedUpBuff = new Speedup(1000, this.owner, this.owner);
+      speedUpBuff.maxStacks = 3;
+      speedUpBuff.image = AssetManager.getAsset('spell_olaf_q');
+      speedUpBuff.percent = 0.3;
+      this.owner.addBuff(speedUpBuff);
+    }
+  }
+
   update() {
     if (this.phase === Olaf_Q_Object.PHASES.FLYING) {
-      if (this.willRotateRight) this.angle += this.rotateSpeed;
-      else this.angle -= this.rotateSpeed;
+      super.update();
+      return;
+    }
 
-      VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+    this.timeSinceReachedDestination += deltaTime;
+    if (this.timeSinceReachedDestination >= this.waitForPickUpLifeTime) {
+      this.toRemove = true;
+    }
 
-      const axeHead = this.position.copy().add(p5.Vector.fromAngle(this.angle).mult(this.size / 2));
-      this.trailSystem.addTrail(axeHead);
-
-      if (this.position.dist(this.destination) < this.speed) {
-        this.phase = Olaf_Q_Object.PHASES.WAIT_FOR_PICK_UP;
-        this.isMissile = false;
+    if (
+      this.owner.position.dist(this.position) <
+      this.owner.stats.size.value / 2 + this.size / 2
+    ) {
+      if (this.spellSource) {
+        this.spellSource.currentCooldown *= 0.4;
       }
-
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.size / 2,
-        }),
-        filters: [
-          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
-          PredefinedFilters.excludeObjects(this.playerEffected),
-        ],
-      });
-
-      enemies.forEach((enemy: any) => {
-        const slowBuff = new Slow(1000, this.owner, enemy);
-        slowBuff.image = AssetManager.getAsset('spell_olaf_q');
-        slowBuff.percent = 0.4;
-        enemy.addBuff(slowBuff);
-        enemy.takeDamage(this.damage, this.owner);
-        this.playerEffected.push(enemy);
-
-        this.particleSystem.addParticle({
-          position: enemy.position,
-          size: enemy.stats.size.value + 20,
-          age: 0,
-        });
-      });
-
-      if (enemies.length > 0) {
-        const speedUpBuff = new Speedup(1000, this.owner, this.owner);
-        speedUpBuff.maxStacks = 3;
-        speedUpBuff.image = AssetManager.getAsset('spell_olaf_q');
-        speedUpBuff.percent = 0.3;
-        this.owner.addBuff(speedUpBuff);
-      }
-    } else if (this.phase === Olaf_Q_Object.PHASES.WAIT_FOR_PICK_UP) {
-      this.timeSinceReachedDestination += deltaTime;
-      if (this.timeSinceReachedDestination >= this.waitForPickUpLifeTime) {
-        this.toRemove = true;
-      }
-
-      if (
-        this.owner.position.dist(this.position) <
-        this.owner.stats.size.value / 2 + this.size / 2
-      ) {
-        if (this.spellSource) {
-          this.spellSource.currentCooldown *= 0.4;
-        }
-        this.toRemove = true;
-      }
+      this.toRemove = true;
     }
   }
 
@@ -196,6 +189,7 @@ export class Olaf_Q_Object extends SpellObject {
     }
   }
 
+  // sized to the pickup radius so the axe stays visible while waiting on the ground
   getDisplayBoundingBox() {
     return new Rectangle({
       x: this.position.x - this.pickupRange / 2,

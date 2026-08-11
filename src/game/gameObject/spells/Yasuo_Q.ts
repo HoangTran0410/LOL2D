@@ -6,6 +6,7 @@ import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import MissileSpellObject from '../MissileSpellObject';
 import Airborne from '../buffs/Airborne';
 import RootBuff from '../buffs/Root';
 
@@ -201,10 +202,7 @@ export class Yasuo_Q_Object extends SpellObject {
   }
 }
 
-export class Yasuo_Q3_Object extends SpellObject {
-  isMissile = true;
-  position = this.owner.position.copy();
-  destination = this.owner.position.copy();
+export class Yasuo_Q3_Object extends MissileSpellObject {
   speed = 5;
   minSize = 30;
   maxSize = 200;
@@ -213,43 +211,22 @@ export class Yasuo_Q3_Object extends SpellObject {
   angle = 0;
   originalLength = 0;
 
-  playersEffected: any[] = [];
-
   image = AssetManager.getAsset('obj_yasuo_q3');
 
-  update() {
-    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+  onAfterMove() {
     const distance = this.position.dist(this.destination);
-    if (distance < this.speed) {
-      this.position = this.destination.copy();
-      this.toRemove = true;
-    }
     if (!this.originalLength) this.originalLength = distance;
 
+    // the tornado widens as it travels, which also widens its hitbox
     this.size = map(distance, this.originalLength, 0, this.minSize, this.maxSize);
     this.angle += 0.2;
+  }
 
-    // check collide with enemy
-    const enemies = this.game.objectManager.queryObjects({
-      area: new Circle({
-        x: this.position.x,
-        y: this.position.y,
-        r: this.size / 2,
-      }),
-      filters: [
-        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
-        PredefinedFilters.excludeObjects(this.playersEffected),
-      ],
-    });
-
-    enemies.forEach(p => {
-      const buff = new Airborne(this.airBorneTime, this.owner, p);
-      buff.image = AssetManager.getAsset('spell_yasuo_q3');
-      p.addBuff(buff);
-      p.takeDamage(20, this.owner);
-
-      this.playersEffected.push(p);
-    });
+  onHit(enemy: any) {
+    const buff = new Airborne(this.airBorneTime, this.owner, enemy);
+    buff.image = AssetManager.getAsset('spell_yasuo_q3');
+    enemy.addBuff(buff);
+    enemy.takeDamage(20, this.owner);
   }
 
   draw() {
@@ -258,15 +235,5 @@ export class Yasuo_Q3_Object extends SpellObject {
     rotate(this.angle);
     image(this.image?.data, 0, 0, this.size, this.size);
     pop();
-  }
-
-  getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
-      data: this,
-    });
   }
 }
