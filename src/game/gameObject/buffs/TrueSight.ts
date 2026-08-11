@@ -2,6 +2,7 @@ import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import StatusFlags from '../../enums/StatusFlags';
 import Buff from '../Buff';
+import GameObject from '../GameObject';
 
 // Cung cấp tầm nhìn
 export default class TrueSight extends Buff {
@@ -15,9 +16,10 @@ export default class TrueSight extends Buff {
   sightObj: any = null;
 
   onCreate(): void {
-    this.sightObj = new (this.game.objectManager.ObjectClasses.GameObject)({
+    // share the live position vector so the sight follows the unit
+    this.sightObj = new GameObject({
       game: this.game,
-      position: this.targetUnit.position.copy(),
+      position: this.targetUnit.position,
       teamId: this.sourceUnit.teamId,
       visionRadius: this.visionRadius,
     });

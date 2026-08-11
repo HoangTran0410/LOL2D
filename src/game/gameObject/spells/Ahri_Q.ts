@@ -66,7 +66,7 @@ export class Ahri_Q_Object extends SpellObject {
 
     if (this.position.dist(this.destination) < this.speed) {
       if (this.phase === Ahri_Q_Object.PHASES.FORWARD) {
-        this.destination = this.owner.position.copy(); // move back to owner
+        this.destination = this.owner.position; // move back to owner (live ref: follows the owner)
         this.playerEffected = []; // reset player effected
         this.speed = 0;
         this.phase = Ahri_Q_Object.PHASES.BACKWARD;

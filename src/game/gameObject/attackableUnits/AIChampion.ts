@@ -57,7 +57,7 @@ export default class AIChampion extends Champion {
   }
 
   onCollideMapEdge() {
-    this.onCollideMapEdge?.();
+    super.onCollideMapEdge();
     if (this._autoMoveOnCollideMapEdge) this.moveToRandomLocation();
   }
 

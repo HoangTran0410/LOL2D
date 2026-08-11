@@ -97,6 +97,9 @@ export default class AttackableUnit extends GameObject {
   // hook called by TerrainMap when this unit hits a wall
   onCollideWall() {}
 
+  // hook for units colliding with the map edge (old JS: super.onCollideMapEdge?.())
+  onCollideMapEdge() {}
+
   draw() {
     this.drawAvatar();
     this.drawDir();
