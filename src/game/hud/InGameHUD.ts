@@ -55,6 +55,9 @@ interface StatsDisplay {
   maxMana: number;
   healthPercent: number;
   manaPercent: number;
+  shieldPercent: number;
+  shieldLeftPercent: number;
+  shield: number;
 }
 
 export default class InGameHUD {
@@ -258,7 +261,10 @@ export default class InGameHUD {
                     <div class="bar">
                         <div :style="'width:'+ stats.healthPercent +'%; background-color:#0ca20c'">
                         </div>
-                        <p>{{stats.health}} / {{stats.maxHealth}}</p>
+                        <div v-if="stats.shield > 0" class="shield"
+                          :style="'position:absolute; top:0; bottom:0; left:'+ stats.shieldLeftPercent +'%; width:'+ stats.shieldPercent +'%; background-color:rgba(225,230,238,0.85)'">
+                        </div>
+                        <p>{{stats.health}} / {{stats.maxHealth}}<span v-if="stats.shield > 0"> (+{{stats.shield}})</span></p>
                     </div>
                     <div class="bar" style="margin-top:3px">
                         <div :style="'width:'+ stats.manaPercent + '%; background-color:#218bdd;'">
@@ -362,6 +368,15 @@ export default class InGameHUD {
     this.vueInstance.stats.maxMana = ~~maxMana?.value;
     this.vueInstance.stats.healthPercent = Math.min((health?.value as number) / maxHealth?.value, 1) * 100;
     this.vueInstance.stats.manaPercent = Math.min((mana?.value as number) / maxMana?.value, 1) * 100;
+
+    const shield = player.shieldAmount ?? 0;
+    const shieldPercent = Math.min(shield / (maxHealth?.value || 1), 1) * 100;
+    this.vueInstance.stats.shield = ~~shield;
+    this.vueInstance.stats.shieldPercent = shieldPercent;
+    this.vueInstance.stats.shieldLeftPercent = Math.min(
+      this.vueInstance.stats.healthPercent,
+      100 - shieldPercent
+    );
 
     this.vueInstance.avatar = player.avatar?.path || '';
     this.vueInstance.isDead = player.isDead;

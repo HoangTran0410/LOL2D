@@ -98,6 +98,22 @@ export default class Champion extends AttackableUnit {
     );
     rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
+    // Shields sit to the right of current health, since they are eaten first.
+    // On a healthy champion there is no room there, so the segment slides left
+    // and overlays the health instead — a shield must never be invisible.
+    const shield = this.shieldAmount;
+    if (shield > 0) {
+      const shieldW = Math.min(map(shield, 0, maxHealth, 0, healthContainerW), healthContainerW);
+      const shieldX = Math.min(healthW, healthContainerW - shieldW);
+      fill(225, 230, 238, alpha * 0.85);
+      rect(
+        topleft.x + barHeight + shieldX,
+        topleft.y,
+        shieldW,
+        barHeight - manaHeight - 1
+      );
+    }
+
     const manaW = map(mana, 0, maxMana, 0, barWidth - barHeight);
     fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
@@ -105,8 +121,9 @@ export default class Champion extends AttackableUnit {
     push();
     let x = topleft.x + 10;
     if (alpha < 255) tint(255, alpha);
+    // buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too drew
+    // every buff twice, and inside this block's tint()
     for (let buff of this.buffs) {
-      buff.draw?.();
       if (buff.image) {
         image(buff.image.data, x, topleft.y - 13, 20, 20);
         x += 20;

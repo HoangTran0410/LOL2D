@@ -29,8 +29,12 @@ export default class Dash extends Buff {
 
   statusFlagsToEnable = StatusFlags.Ghosted;
 
+  /**
+   * Whether a unit may dash under its own power. Grounding blocks this, but not
+   * displacements applied by someone else — those construct a Dash directly.
+   */
   static CanDash(targetUnit: any): boolean {
-    return targetUnit.canMove;
+    return targetUnit.canMove && !targetUnit.grounded;
   }
 
   onCreate(): void {

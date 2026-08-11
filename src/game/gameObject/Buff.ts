@@ -7,6 +7,17 @@ export default class Buff {
 
   buffAddType = BuffAddType.REPLACE_EXISTING;
   maxStacks = 1;
+
+  /**
+   * Identity used to decide which existing buffs this one stacks with or
+   * replaces. Defaults to the class itself, which is what you want for a buff
+   * that means one thing (Stun, Root).
+   *
+   * Set it when several unrelated spells apply the same generic buff class —
+   * two bare `StatAmp`s or `DamageOverTime`s would otherwise fight over one
+   * slot, so each spell should tag its own, e.g. `buff.stackId = 'ignite'`.
+   */
+  stackId: any = null;
   timeElapsed = 0;
   toRemove = false;
 
@@ -74,6 +85,24 @@ export default class Buff {
   onActivate(): void {}
   onDeactivate(): void {}
   draw(): void {}
+
+  /**
+   * Runs before damage reaches the target's health. Return what should get
+   * through: less for shields and damage reduction, more for amplification.
+   * Every buff on the unit sees the damage in turn.
+   */
+  modifyIncomingDamage(damage: number, _attacker: any): number {
+    return damage;
+  }
+
+  /**
+   * Damage this buff can still absorb, drawn as a grey overlay on the health
+   * bar. Anything that soaks damage should report it here so the player can see
+   * how much cushion is left; the health bar never has to know the class.
+   */
+  get shieldAmount(): number {
+    return 0;
+  }
 
   addDeactivateListener(listener: () => void): void {
     this._deactivateListeners.push(listener);

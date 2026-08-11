@@ -167,6 +167,18 @@ export default class AttackableUnit extends GameObject {
     fill(healthBarColor);
     rect(healthBarX, healthBarY, healthBarWidth * healthBarValuePercent, healthBarHeight);
 
+    // Shields sit to the right of current health, since they are eaten first.
+    // On a healthy unit there is no room there, so the segment slides left and
+    // overlays the health instead — a shield must never be invisible.
+    const shield = this.shieldAmount;
+    if (shield > 0) {
+      const filled = healthBarWidth * healthBarValuePercent;
+      const shieldW = Math.min((shield / healthBarMaxValue) * healthBarWidth, healthBarWidth);
+      const shieldX = Math.min(filled, healthBarWidth - shieldW);
+      fill(225, 230, 238, alpha * 0.85);
+      rect(healthBarX + shieldX, healthBarY, shieldW, healthBarHeight);
+    }
+
     fill(180, alpha);
     textAlign(CENTER, CENTER);
     textSize(12);
@@ -177,7 +189,12 @@ export default class AttackableUnit extends GameObject {
   addBuff(buff: any) {
     if (this.isDead || !buff) return;
 
-    let preBuffs = this.buffs.filter((_buff: any) => _buff.constructor === buff.constructor);
+    // group by stackId when a buff declares one, so two spells applying the same
+    // generic class (StatAmp, DamageOverTime) do not evict each other
+    const stackKey = buff.stackId ?? buff.constructor;
+    let preBuffs = this.buffs.filter(
+      (_buff: any) => (_buff.stackId ?? _buff.constructor) === stackKey
+    );
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -258,6 +275,12 @@ export default class AttackableUnit extends GameObject {
 
   takeDamage(damage: number, attacker: any) {
     if (this.isDead) return;
+
+    // shields and damage modifiers get first look; they may eat all of it
+    for (const buff of this.buffs) {
+      damage = buff.modifyIncomingDamage(damage, attacker);
+      if (damage <= 0) return;
+    }
 
     let combatText = new CombatText(this);
     combatText.text = '-' + damage;
@@ -350,6 +373,17 @@ export default class AttackableUnit extends GameObject {
   }
   get canMove() {
     return !this.isDead && hasFlag(this.stats.actionState, ActionState.CAN_MOVE);
+  }
+  /** Total damage every shield on this unit can still absorb. */
+  get shieldAmount(): number {
+    let total = 0;
+    for (const buff of this.buffs) total += buff.shieldAmount || 0;
+    return total;
+  }
+
+  /** Grounded units keep walking but cannot use their own movement abilities. */
+  get grounded() {
+    return hasFlag(this.stats.actionState, ActionState.GROUNDED);
   }
   get targetable() {
     return !this.isDead && hasFlag(this.stats.actionState, ActionState.TARGETABLE);

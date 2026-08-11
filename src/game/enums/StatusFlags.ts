@@ -5,6 +5,7 @@ const StatusFlags = {
   Charmed: 1 << 5,
   Feared: 1 << 8,
   Ghosted: 1 << 11,
+  Grounded: 1 << 9,
   Immovable: 1 << 13,
   Invulnerable: 1 << 14,
   NearSighted: 1 << 16,

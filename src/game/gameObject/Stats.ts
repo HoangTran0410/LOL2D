@@ -188,6 +188,7 @@ export default class Stats {
     this.setActionState(ActionState.CHARMED, hasFlag(statusFlag, StatusFlags.Charmed));
     this.setActionState(ActionState.FEARED, hasFlag(statusFlag, StatusFlags.Feared));
     this.setActionState(ActionState.IS_GHOSTED, hasFlag(statusFlag, StatusFlags.Ghosted));
+    this.setActionState(ActionState.GROUNDED, hasFlag(statusFlag, StatusFlags.Grounded));
     this.setActionState(ActionState.IS_NEAR_SIGHTED, hasFlag(statusFlag, StatusFlags.NearSighted));
     this.setActionState(ActionState.NO_RENDER, hasFlag(statusFlag, StatusFlags.NoRender));
     this.setActionState(ActionState.STEALTHED, hasFlag(statusFlag, StatusFlags.Stealthed));

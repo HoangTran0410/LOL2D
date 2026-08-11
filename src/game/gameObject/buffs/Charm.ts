@@ -39,6 +39,5 @@ export default class Charm extends Buff {
         r: random(5, 15),
       });
     }
-    this.particleSystem.update();
   }
 }

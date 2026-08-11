@@ -67,6 +67,15 @@ const AssetPaths = {
   spell_zed_w2: 'assets/images/spells/zed_w2.png',
   spell_zed_e: 'assets/images/spells/zed_e.png',
   spell_graves_w: 'assets/images/spells/graves_w.png',
+  spell_zed_r1: 'assets/images/spells/zed_r1.png',
+  spell_zed_r2: 'assets/images/spells/zed_r2.png',
+  spell_rammus_q: 'assets/images/spells/rammus_q.png',
+  spell_teemo_q: 'assets/images/spells/teemo_q.png',
+  spell_anivia_q: 'assets/images/spells/anivia_q.png',
+  spell_anivia_w: 'assets/images/spells/anivia_w.png',
+  spell_anivia_r: 'assets/images/spells/anivia_r.png',
+  spell_thresh_q: 'assets/images/spells/thresh_q.png',
+  spell_thresh_q2: 'assets/images/spells/thresh_q2.png',
 
   // buffs
   buff_silence: 'assets/images/buffs/silence.png',
@@ -79,6 +88,10 @@ const AssetPaths = {
   buff_fear: 'assets/images/buffs/fear.png',
   buff_invisible: 'assets/images/buffs/invisible.png',
   buff_truesight: 'assets/images/buffs/truesight.png',
+  buff_poison: 'assets/images/buffs/poison.png',
+  buff_ground: 'assets/images/buffs/ground.png',
+  buff_untargetable: 'assets/images/buffs/untargetable.png',
+  buff_stasis: 'assets/images/buffs/untargetable.png',
 
   // objects
   obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
@@ -100,6 +113,60 @@ const AssetPaths = {
 } as const;
 
 export type AssetKey = keyof typeof AssetPaths;
+
+const PLACEHOLDER_SIZE = 64;
+
+/** Initials + a stable colour derived from the key, so each spell looks distinct. */
+function placeholderStyle(key: string): { label: string; hue: number } {
+  const cleaned = key.replace(/^(spell|buff|obj|champ|monster)_/, '');
+  const label = cleaned
+    .split('_')
+    .filter(Boolean)
+    .map(part => part[0].toUpperCase())
+    .join('')
+    .slice(0, 3);
+
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
+
+  return { label: label || '?', hue: Math.abs(hash) % 360 };
+}
+
+function placeholderSvgDataUri(label: string, hue: number): string {
+  const svg =
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${PLACEHOLDER_SIZE}" height="${PLACEHOLDER_SIZE}">` +
+    `<rect width="100%" height="100%" fill="hsl(${hue} 45% 26%)"/>` +
+    `<rect x="2" y="2" width="${PLACEHOLDER_SIZE - 4}" height="${PLACEHOLDER_SIZE - 4}" ` +
+    `fill="none" stroke="hsl(${hue} 60% 62%)" stroke-width="3"/>` +
+    `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" ` +
+    `font-family="sans-serif" font-size="26" font-weight="bold" fill="hsl(${hue} 75% 82%)">${label}</text>` +
+    `</svg>`;
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function drawPlaceholderGraphics(label: string, hue: number): any {
+  // p5's Graphics type omits the drawing methods it actually forwards
+  const g = createGraphics(PLACEHOLDER_SIZE, PLACEHOLDER_SIZE) as any;
+  g.colorMode(HSL, 360, 100, 100);
+  g.noStroke();
+  g.fill(hue, 45, 26);
+  g.rect(0, 0, PLACEHOLDER_SIZE, PLACEHOLDER_SIZE);
+
+  g.noFill();
+  g.stroke(hue, 60, 62);
+  g.strokeWeight(3);
+  g.rect(2, 2, PLACEHOLDER_SIZE - 4, PLACEHOLDER_SIZE - 4);
+
+  g.noStroke();
+  g.fill(hue, 75, 82);
+  g.textAlign(CENTER, CENTER);
+  g.textSize(26);
+  g.textStyle(BOLD);
+  g.text(label, PLACEHOLDER_SIZE / 2, PLACEHOLDER_SIZE / 2);
+
+  return g;
+}
 
 export interface LoadedAsset {
   data: any;
@@ -133,8 +200,51 @@ export default class AssetManager {
     );
   }
 
+  /**
+   * Real art if we have it, otherwise a generated stand-in so a spell without an
+   * icon still renders as a labelled tile instead of a broken image. Drop a real
+   * file into AssetPaths under the same key and the placeholder disappears.
+   */
   static getAsset(key: string): LoadedAsset | undefined {
-    return this._asset[key];
+    const loaded = this._asset[key];
+    if (loaded) return loaded;
+
+    // callers pass an absent key on purpose (e.g. `getAsset(preset?.avatar)`);
+    // only a real key earns a placeholder
+    if (!key || typeof key !== 'string') return undefined;
+
+    return this._getPlaceholder(key);
+  }
+
+  static _placeholders: Record<string, LoadedAsset> = {};
+  static _warnedPlaceholders = new Set<string>();
+
+  static _getPlaceholder(key: string): LoadedAsset {
+    const cached = this._placeholders[key];
+    if (cached) return cached;
+
+    if (!this._warnedPlaceholders.has(key)) {
+      this._warnedPlaceholders.add(key);
+      console.warn(`[AssetManager] no art for "${key}", using a placeholder`);
+    }
+
+    const { label, hue } = placeholderStyle(key);
+
+    // `path` feeds HTML <img> in the HUD; `data` feeds p5's image() on canvas.
+    // data is built lazily because p5 globals do not exist at module-eval time.
+    let graphics: any = null;
+    const asset = {
+      path: placeholderSvgDataUri(label, hue),
+      get data() {
+        if (!graphics && typeof createGraphics === 'function') {
+          graphics = drawPlaceholderGraphics(label, hue);
+        }
+        return graphics;
+      },
+    } as LoadedAsset;
+
+    this._placeholders[key] = asset;
+    return asset;
   }
 
   static loadAssets(
