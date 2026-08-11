@@ -110,12 +110,14 @@ export default class TerrainMap {
       let collided = false;
       const totalOverlap = createVector(0, 0);
       const overlapsWalls: Obstacle[] = [];
+      // hoisted out of the wall loop: one circle per unit, one reused Response
+      const pSAT = new SAT.Circle(
+        new SAT.Vector(p.position.x, p.position.y),
+        p.stats.size.value / 2
+      );
+      const response = new SAT.Response();
       for (const wall of nearbyWalls) {
-        const response: any = new SAT.Response();
-        const pSAT = new SAT.Circle(
-          new SAT.Vector(p.position.x, p.position.y),
-          p.stats.size.value / 2
-        );
+        response.clear();
         const _collided = SAT.testPolygonCircle(wall.toSATPolygon(), pSAT, response);
         if (_collided) {
           const overlap = createVector(response.overlapV.x, response.overlapV.y);

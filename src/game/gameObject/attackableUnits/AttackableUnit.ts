@@ -80,18 +80,15 @@ export default class AttackableUnit extends GameObject {
     let isStealthed = hasFlag(this.stats.actionState, ActionState.STEALTHED);
     let alphaColor = this.isInsideBush ? 100 : isStealthed ? 20 : 255;
 
-    let { size, height, alpha, visionRadius } = this.animatedValues;
-    this.animatedValues = {
-      displaySize: size + height,
-      size: lerp(size, this.stats.size.value, 0.1),
-      height: lerp(height, this.stats.height.value, 0.3),
-      visionRadius: lerp(visionRadius, this.stats.visionRadius.value, 0.1),
-      alpha:
-        alphaColor > alpha
-          ? lerp(alpha || 0, alphaColor, 0.2)
-          : alphaColor,
-    };
-    this.visionRadius = this.animatedValues.visionRadius;
+    // mutate in place to avoid allocating a new object every frame per unit
+    const av = this.animatedValues;
+    const { size, height, alpha, visionRadius } = av;
+    av.displaySize = size + height; // PREVIOUS frame's size/height, keep this ordering
+    av.size = lerp(size, this.stats.size.value, 0.1);
+    av.height = lerp(height, this.stats.height.value, 0.3);
+    av.visionRadius = lerp(visionRadius, this.stats.visionRadius.value, 0.1);
+    av.alpha = alphaColor > alpha ? lerp(alpha || 0, alphaColor, 0.2) : alphaColor;
+    this.visionRadius = av.visionRadius;
   }
 
   // hook called by TerrainMap when this unit hits a wall
