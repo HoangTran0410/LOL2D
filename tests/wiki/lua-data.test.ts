@@ -45,6 +45,29 @@ describe('League Wiki Lua data', () => {
     expect(parseLuaData('return { hp_lvl = 84+1000/17 }')).toEqual({ hp_lvl: 84 + 1000 / 17 });
   });
 
+  it('uses Lua source-order overwrite semantics and reports duplicate keys', () => {
+    const warnings: string[] = [];
+    const data = parseLuaData(`return {
+      LeBlanc = { skill_i = {[1] = "Mirror Image", "Mirror Image 2"} },
+      Viktor = { skill_r = {[1] = "Arcane Storm", [2] = "Arcane Storm 2", [2] = "Arcane Storm 3"} },
+      repeated = { value = "old", ["value"] = "new" },
+    }`, { warn: warning => warnings.push(warning) });
+
+    expect(data.LeBlanc.skill_i).toEqual({ 1: 'Mirror Image 2' });
+    expect(data.Viktor.skill_r).toEqual({ 1: 'Arcane Storm', 2: 'Arcane Storm 3' });
+    expect(data.repeated).toEqual({ value: 'new' });
+    expect(warnings).toHaveLength(3);
+    expect(warnings).toEqual(expect.arrayContaining([
+      expect.stringMatching(/LeBlanc\.skill_i\[1\].*2:\d+.*2:\d+/),
+      expect.stringMatching(/Viktor\.skill_r\[2\].*3:\d+.*3:\d+/),
+      expect.stringMatching(/repeated\.value.*4:\d+.*4:\d+/),
+    ]));
+  });
+
+  it('rejects distinct Lua keys that alias as JavaScript object keys', () => {
+    expect(() => parseLuaData('return { [1] = "number", ["1"] = "string" }')).toThrow(/normalized lua key collision/i);
+  });
+
   it('rejects calls, functions, index expressions, and duplicate keys', () => {
     for (const source of [
       'return os.execute("no")',
@@ -59,7 +82,6 @@ describe('League Wiki Lua data', () => {
       'return { value = 1/0 }',
       'return { value = 1+other }',
       'return { value = 1+make() }',
-      'return { name = "one", ["name"] = "two" }',
     ]) {
       expect(() => parseLuaData(source)).toThrow(/unsupported|duplicate/i);
     }
