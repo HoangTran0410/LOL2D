@@ -1,4 +1,5 @@
 const RAW_FIELDS = /^(description[2-6]?|leveling[2-6]?|notes)$/;
+const SOURCE_FIELDS = { name: '1', casttime: 'cast time', effectradius: 'effect radius' };
 
 export const ABILITY_FIELDS = [
   'name', 'icon',
@@ -48,5 +49,5 @@ export function normalizeAbilityFields(source) {
 }
 
 export function renderFieldRequest(page) {
-  return `${ABILITY_FIELDS.map(field => `@@${field}@@{{${page}|${field}}}`).join('')}@@`;
+  return `${ABILITY_FIELDS.map(field => `@@${field}@@{{${page}|pst2|${SOURCE_FIELDS[field] ?? field}}}`).join('')}@@`;
 }

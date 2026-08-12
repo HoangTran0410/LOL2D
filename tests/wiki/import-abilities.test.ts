@@ -9,7 +9,7 @@ import {
   parseCli,
   syncChampionIndex,
 } from '../../scripts/wiki/import-abilities.mjs';
-import { normalizeAbilityFields } from '../../scripts/wiki/normalize.mjs';
+import { normalizeAbilityFields, renderFieldRequest } from '../../scripts/wiki/normalize.mjs';
 import { checkAbilities } from '../../scripts/wiki/check-abilities.mjs';
 
 const fixtureUrl = new URL('../fixtures/wiki/janna-howling-gale.json', import.meta.url);
@@ -54,6 +54,21 @@ function client(data: Awaited<ReturnType<typeof fixture>>, overrides = {}) {
 afterEach(() => vi.restoreAllMocks());
 
 describe('League Wiki importer', () => {
+  it('uses the documented pst2 selector and verified source parameter aliases', () => {
+    const request = renderFieldRequest('Template:Data Lux/Final Spark');
+
+    expect(request).toContain('@@name@@{{Template:Data Lux/Final Spark|pst2|1}}');
+    expect(request).toContain('@@icon@@{{Template:Data Lux/Final Spark|pst2|icon}}');
+    expect(request).toContain('@@casttime@@{{Template:Data Lux/Final Spark|pst2|cast time}}');
+    expect(request).toContain('@@effectradius@@{{Template:Data Lux/Final Spark|pst2|effect radius}}');
+    expect(request).toContain('@@radius@@{{Template:Data Lux/Final Spark|pst2|radius}}');
+    expect(normalizeAbilityFields('@@name@@Final Spark@@icon@@Final Spark.png@@casttime@@1@@effectradius@@@@radius@@@@')).toEqual({
+      name: 'Final Spark',
+      icon: 'Final Spark.png',
+      casttime: '1',
+    });
+  });
+
   it('normalizes selected fields and preserves raw formulas', async () => {
     const data = await fixture();
     const fields = normalizeAbilityFields(data.expanded.expandtemplates.wikitext);
