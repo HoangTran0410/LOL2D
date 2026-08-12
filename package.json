@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:all": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",
@@ -20,6 +23,7 @@
     "@types/p5": "^1.7.6",
     "@types/sat": "^0.0.35",
     "typescript": "^5.4.0",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vitest": "^1.6.1"
   }
 }
