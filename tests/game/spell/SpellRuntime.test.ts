@@ -240,4 +240,161 @@ describe('SpellRuntime', () => {
     spell.state = 'READY';
     expect(spell.state).toBe('READY');
   });
+
+  it('does not run channel ticks after the channel duration', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({ channel: { durationMs: 1_000, tickEveryMs: 300 } }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(2_000);
+
+    expect(events.filter((event) => event.startsWith('tick:'))).toEqual([
+      'tick:1',
+      'tick:2',
+      'tick:3',
+    ]);
+    expect(events.filter((event) => event === 'complete')).toHaveLength(1);
+  });
+
+  it.each([
+    ['channel tick', spec({ channel: { durationMs: 1_000, tickEveryMs: 0 } }), 'channel.tickEveryMs'],
+    [
+      'resource tick',
+      spec({
+        active: {},
+        resource: { commitAt: 'tick', refundOn: [], tickEveryMs: -1 },
+      }),
+      'resource.tickEveryMs',
+    ],
+  ])('rejects a non-progressing %s interval', (_name, invalidSpec, field) => {
+    const { delegate } = fakeDelegate();
+
+    expect(() => new SpellRuntime(invalidSpec, delegate)).toThrow(`${field} must be greater than 0`);
+  });
+
+  it('uses independent channel and resource tick cadences', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        channel: { durationMs: 1_000, tickEveryMs: 300 },
+        resource: { commitAt: 'tick', refundOn: [], tickEveryMs: 250 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(1_000);
+
+    expect(events.filter((event) => event.startsWith('tick:'))).toEqual([
+      'tick:1',
+      'tick:2',
+      'tick:3',
+    ]);
+    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(4);
+  });
+
+  it('commits tick resources while ACTIVE', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'RECAST',
+        active: { maxDurationMs: 1_000 },
+        resource: { commitAt: 'tick', refundOn: [], tickEveryMs: 200 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(600);
+
+    expect(runtime.state).toBe('ACTIVE');
+    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(3);
+  });
+
+  it('cancels ACTIVE when a tick resource commit fails', () => {
+    const { delegate, events } = fakeDelegate();
+    let commits = 0;
+    delegate.commitResource = (_context, point) => {
+      events.push(`commit:${point}`);
+      commits += 1;
+      return commits < 2;
+    };
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'RECAST',
+        active: { maxDurationMs: 1_000 },
+        resource: { commitAt: 'tick', refundOn: [], tickEveryMs: 200 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(600);
+
+    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(2);
+    expect(events).toContain('cancel:OUT_OF_RESOURCE');
+    expect(runtime.state).toBe('COOLDOWN');
+  });
+
+  it.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
+    'requires charge configuration for %s activation',
+    (activation) => {
+      const { delegate } = fakeDelegate();
+
+      expect(() => new SpellRuntime(spec({ activation }), delegate)).toThrow(
+        `${activation} activation requires charge`
+      );
+    }
+  );
+
+  it('rejects charge configuration for PRESS activation', () => {
+    const { delegate } = fakeDelegate();
+
+    expect(
+      () =>
+        new SpellRuntime(
+          spec({ activation: 'PRESS', charge: { maxDurationMs: 500, releaseAtMax: false } }),
+          delegate
+        )
+    ).toThrow('PRESS activation does not support charge');
+  });
+
+  it('enters CHARGING for TAP_OR_HOLD activation', () => {
+    const { delegate } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'TAP_OR_HOLD',
+        charge: { maxDurationMs: 500, releaseAtMax: false },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+
+    expect(runtime.state).toBe('CHARGING');
+  });
+
+  it('returns false when release resource commitment fails', () => {
+    const { delegate, events } = fakeDelegate();
+    delegate.commitResource = (_context, point) => {
+      events.push(`commit:${point}`);
+      return false;
+    };
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'HOLD_RELEASE',
+        charge: { maxDurationMs: 500, releaseAtMax: false },
+        resource: { commitAt: 'release', refundOn: [] },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+
+    expect(runtime.release(context)).toBe(false);
+    expect(events).toContain('cancel:OUT_OF_RESOURCE');
+  });
 });

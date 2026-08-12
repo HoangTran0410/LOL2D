@@ -45,6 +45,27 @@ const snapshotContext = (context: CastContext): CastContext =>
     direction: Object.freeze({ ...context.direction }),
   });
 
+const validateTickInterval = (field: string, value: number | undefined): void => {
+  if (value !== undefined && (!Number.isFinite(value) || value <= 0)) {
+    throw new Error(`${field} must be greater than 0`);
+  }
+};
+
+const validateSpec = (spec: CastSpec): void => {
+  validateTickInterval('channel.tickEveryMs', spec.channel?.tickEveryMs);
+  validateTickInterval('resource.tickEveryMs', spec.resource.tickEveryMs);
+
+  if (
+    (spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD') &&
+    !spec.charge
+  ) {
+    throw new Error(`${spec.activation} activation requires charge`);
+  }
+  if (spec.activation === 'PRESS' && spec.charge) {
+    throw new Error('PRESS activation does not support charge');
+  }
+};
+
 export class SpellRuntime {
   private _state: SpellRuntimeState = 'READY';
   private _cooldownRemainingMs = 0;
@@ -52,6 +73,8 @@ export class SpellRuntime {
   private elapsedMs = 0;
   private channelTickIndex = 0;
   private nextChannelTickMs = 0;
+  private resourceElapsedMs = 0;
+  private nextResourceTickMs = Number.POSITIVE_INFINITY;
   private resourceCommitted = false;
   private cooldownStarted = false;
   private released = false;
@@ -60,7 +83,9 @@ export class SpellRuntime {
   constructor(
     private readonly spec: CastSpec,
     private readonly delegate: SpellRuntimeDelegate
-  ) {}
+  ) {
+    validateSpec(spec);
+  }
 
   get state(): SpellRuntimeState {
     return this._state;
@@ -78,6 +103,8 @@ export class SpellRuntime {
     this.elapsedMs = 0;
     this.channelTickIndex = 0;
     this.nextChannelTickMs = 0;
+    this.resourceElapsedMs = 0;
+    this.nextResourceTickMs = Number.POSITIVE_INFINITY;
     this.resourceCommitted = false;
     this.cooldownStarted = false;
     this.released = false;
@@ -87,7 +114,7 @@ export class SpellRuntime {
     this.startCooldown('start');
     this.delegate.onCastStart(this.context);
 
-    if (this.spec.charge) {
+    if (this.spec.activation === 'HOLD_RELEASE' || this.spec.activation === 'TAP_OR_HOLD') {
       this._state = 'CHARGING';
     } else if ((this.spec.castTimeMs ?? 0) > 0) {
       this._state = 'CASTING';
@@ -106,8 +133,7 @@ export class SpellRuntime {
   release(context: CastContext): boolean {
     void context;
     if (this._state !== 'CHARGING') return false;
-    this.releaseCast();
-    return true;
+    return this.releaseCast();
   }
 
   cancel(reason: CancelReason): boolean {
@@ -122,6 +148,7 @@ export class SpellRuntime {
 
     if (!this.context || this.terminal) return;
 
+    const previousElapsedMs = this.elapsedMs;
     this.elapsedMs += elapsed;
     switch (this._state) {
       case 'CASTING':
@@ -134,15 +161,10 @@ export class SpellRuntime {
         this.updateCharge();
         break;
       case 'CHANNELING':
-        this.updateChannel();
+        this.updateChannel(previousElapsedMs);
         break;
       case 'ACTIVE':
-        if (
-          this.spec.active?.maxDurationMs !== undefined &&
-          this.elapsedMs >= this.spec.active.maxDurationMs
-        ) {
-          this.completeActivation();
-        }
+        this.updateActive(previousElapsedMs);
         break;
       default:
         break;
@@ -170,9 +192,9 @@ export class SpellRuntime {
     return true;
   }
 
-  private releaseCast(): void {
-    if (!this.context || this.released || this.terminal) return;
-    if (!this.commitResource('release')) return;
+  private releaseCast(): boolean {
+    if (!this.context || this.released || this.terminal) return false;
+    if (!this.commitResource('release')) return false;
 
     this.released = true;
     this.startCooldown('release');
@@ -181,15 +203,18 @@ export class SpellRuntime {
     if ((this.spec.castTimeMs ?? 0) > 0 && this._state === 'CHARGING') {
       this._state = 'CASTING';
       this.elapsedMs = 0;
-      return;
+      return true;
     }
 
     this.afterCast();
+    return true;
   }
 
   private afterCast(): void {
     if (!this.context || this.terminal) return;
     this.elapsedMs = 0;
+    this.resourceElapsedMs = 0;
+    this.nextResourceTickMs = this.spec.resource.tickEveryMs ?? Number.POSITIVE_INFINITY;
 
     if (this.spec.channel) {
       this._state = 'CHANNELING';
@@ -212,15 +237,48 @@ export class SpellRuntime {
     else this.cancelActivation('MAX_DURATION');
   }
 
-  private updateChannel(): void {
+  private updateChannel(previousElapsedMs: number): void {
     if (!this.context || !this.spec.channel) return;
-    while (this.nextChannelTickMs <= this.elapsedMs) {
-      if (!this.commitResource('tick')) return;
-      this.channelTickIndex += 1;
-      this.delegate.onChannelTick(this.context, this.channelTickIndex);
-      this.nextChannelTickMs += this.spec.channel.tickEveryMs;
+    const boundedElapsedMs = Math.min(this.elapsedMs, this.spec.channel.durationMs);
+    this.resourceElapsedMs += Math.max(0, boundedElapsedMs - previousElapsedMs);
+
+    while (true) {
+      const nextChannelTick =
+        this.nextChannelTickMs <= boundedElapsedMs
+          ? this.nextChannelTickMs
+          : Number.POSITIVE_INFINITY;
+      const nextResourceTick =
+        this.nextResourceTickMs <= this.resourceElapsedMs
+          ? this.nextResourceTickMs
+          : Number.POSITIVE_INFINITY;
+
+      if (!Number.isFinite(Math.min(nextChannelTick, nextResourceTick))) break;
+      if (nextResourceTick <= nextChannelTick) {
+        if (!this.commitResource('tick')) return;
+        this.nextResourceTickMs += this.spec.resource.tickEveryMs!;
+      } else {
+        this.channelTickIndex += 1;
+        this.delegate.onChannelTick(this.context, this.channelTickIndex);
+        this.nextChannelTickMs += this.spec.channel.tickEveryMs;
+      }
     }
     if (this.elapsedMs >= this.spec.channel.durationMs) this.completeActivation();
+  }
+
+  private updateActive(previousElapsedMs: number): void {
+    const maxDurationMs = this.spec.active?.maxDurationMs;
+    const boundedElapsedMs =
+      maxDurationMs === undefined ? this.elapsedMs : Math.min(this.elapsedMs, maxDurationMs);
+    this.resourceElapsedMs += Math.max(0, boundedElapsedMs - previousElapsedMs);
+
+    while (this.nextResourceTickMs <= this.resourceElapsedMs) {
+      if (!this.commitResource('tick')) return;
+      this.nextResourceTickMs += this.spec.resource.tickEveryMs!;
+    }
+
+    if (maxDurationMs !== undefined && this.elapsedMs >= maxDurationMs) {
+      this.completeActivation();
+    }
   }
 
   private recast(): boolean {
