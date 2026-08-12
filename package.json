@@ -8,7 +8,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:all": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "typecheck:core": "tsc -p tsconfig.strict-core.json"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",

@@ -1,6 +1,22 @@
 import { uuidv4 } from '../../utils/index';
 import EventType from '../enums/EventType';
 import SpellState from '../enums/SpellState';
+import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
+import type {
+  CancelReason,
+  CastContext,
+  CastSpec,
+  ResourceCommitPoint,
+  SpellRuntimeState,
+} from '../spell/runtime/types';
+
+const legacyCastSpec = (durationMs: number): CastSpec => ({
+  activation: 'PRESS',
+  targeting: 'DIRECTION',
+  castTimeMs: 0,
+  resource: { commitAt: 'start', refundOn: [] },
+  cooldown: { startAt: 'start', durationMs },
+});
 
 export default class Spell {
   // for display in HUD
@@ -13,52 +29,84 @@ export default class Spell {
   // for spell logic
   level = 0;
   coolDown = 0;
-  currentCooldown = 0;
   manaCost = 0;
   healthCost = 0;
 
   id: string = uuidv4();
   owner: any;
   game: any;
-  state: string = SpellState.READY;
+  private spellRuntime?: SpellRuntime;
 
   constructor(owner: any) {
     this.owner = owner;
     this.game = owner?.game;
-    this.state = SpellState.READY;
+  }
+
+  /** @deprecated New and migrated spells must use lifecycle policies. */
+  get state(): SpellRuntimeState {
+    return this.runtime.state;
+  }
+
+  set state(state: SpellRuntimeState) {
+    this.runtime.setCompatibilityState(state);
+  }
+
+  /** @deprecated New and migrated spells must use lifecycle policies. */
+  get currentCooldown(): number {
+    return this.runtime.cooldownRemainingMs;
+  }
+
+  set currentCooldown(remainingMs: number) {
+    this.runtime.setCompatibilityCooldown(remainingMs);
   }
 
   update(): void {
     this.onUpdate();
-
-    switch (this.state) {
-      case SpellState.READY:
-        if (this.currentCooldown > 0) {
-          this.state = SpellState.COOLDOWN;
-        }
-        break;
-
-      case SpellState.COOLDOWN:
-        this.currentCooldown -= deltaTime;
-        if (this.currentCooldown <= 0) {
-          this.currentCooldown = 0;
-          this.state = SpellState.READY;
-        }
-        break;
-
-      default:
-    }
+    this.runtime.update(deltaTime);
   }
 
   cast(): void {
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     if (this.state !== SpellState.READY) return;
-    if (this.castCancelCheck()) return;
 
-    this.state = SpellState.COOLDOWN;
-    this.currentCooldown = this.coolDown;
-    this.onSpellCast();
-    this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
+    const origin = { x: this.owner.position.x, y: this.owner.position.y };
+    const cursorWorld = {
+      x: this.game.worldMouse.x,
+      y: this.game.worldMouse.y,
+    };
+    const dx = cursorWorld.x - origin.x;
+    const dy = cursorWorld.y - origin.y;
+    const length = Math.hypot(dx, dy);
+    this.press(
+      Object.freeze({
+        spellId: this.id,
+        activationId: uuidv4(),
+        startedAtMs: Date.now(),
+        caster: this.owner,
+        origin: Object.freeze(origin),
+        cursorWorld: Object.freeze(cursorWorld),
+        direction: Object.freeze({
+          x: length === 0 ? 0 : dx / length,
+          y: length === 0 ? 0 : dy / length,
+        }),
+      })
+    );
+  }
+
+  press(context: CastContext): boolean {
+    return this.runtime.press(context);
+  }
+
+  hold(context: CastContext): boolean {
+    return this.runtime.hold(context);
+  }
+
+  release(context: CastContext): boolean {
+    return this.runtime.release(context);
+  }
+
+  cancel(reason: CancelReason): boolean {
+    return this.runtime.cancel(reason);
   }
 
   castCancelCheck(): boolean {
@@ -93,6 +141,54 @@ export default class Spell {
 
   onSpellCast(): void {}
   onUpdate(): void {}
+  onCastStart(_context: CastContext): void {}
+  onChargeUpdate(_context: CastContext, _elapsedMs: number, _ratio: number): void {}
+  onRelease(_context: CastContext): void {}
+  onChannelTick(_context: CastContext, _tickIndex: number): void {}
+  onActivate(_context: CastContext): void {}
+  onRecast(_context: CastContext): void {}
+  onCancel(_context: CastContext, _reason: CancelReason): void {}
+  onComplete(_context: CastContext): void {}
+
+  private get runtime(): SpellRuntime {
+    if (!this.spellRuntime) {
+      const delegate: SpellRuntimeDelegate = {
+        canStart: (context) => this.canStart(context),
+        commitResource: (context, point) => this.commitResource(context, point),
+        refundResource: (context, reason) => this.refundResource(context, reason),
+        onCastStart: (context) => this.onCastStart(context),
+        onChargeUpdate: (context, elapsedMs, ratio) =>
+          this.onChargeUpdate(context, elapsedMs, ratio),
+        onRelease: (context) => {
+          this.onRelease(context);
+          this.onSpellCast();
+          this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
+        },
+        onChannelTick: (context, tickIndex) => this.onChannelTick(context, tickIndex),
+        onActivate: (context) => this.onActivate(context),
+        onRecast: (context) => this.onRecast(context),
+        onCancel: (context, reason) => this.onCancel(context, reason),
+        onComplete: (context) => this.onComplete(context),
+      };
+      this.spellRuntime = new SpellRuntime(legacyCastSpec(this.coolDown), delegate);
+    }
+    return this.spellRuntime;
+  }
+
+  private canStart(_context: CastContext): boolean {
+    return !this.castCancelCheck();
+  }
+
+  private commitResource(_context: CastContext, _point: ResourceCommitPoint): boolean {
+    this.owner.stats.mana.value -= this.manaCost;
+    this.owner.stats.health.value -= this.healthCost;
+    return true;
+  }
+
+  private refundResource(_context: CastContext, _reason: CancelReason): void {
+    this.owner.stats.mana.value += this.manaCost;
+    this.owner.stats.health.value += this.healthCost;
+  }
 
   drawPreview(radius?: number): void {
     if (radius) {

@@ -1,0 +1,243 @@
+import { describe, expect, it } from 'vitest';
+import Spell from '../../../src/game/gameObject/Spell';
+import { SpellRuntime, type SpellRuntimeDelegate } from '../../../src/game/spell/runtime/SpellRuntime';
+import type {
+  CastContext,
+  CastSpec,
+  CooldownStartPoint,
+} from '../../../src/game/spell/runtime/types';
+
+const context: CastContext = Object.freeze({
+  spellId: 'spell',
+  activationId: 'activation',
+  startedAtMs: 0,
+  caster: {},
+  origin: Object.freeze({ x: 1, y: 2 }),
+  cursorWorld: Object.freeze({ x: 4, y: 6 }),
+  direction: Object.freeze({ x: 3, y: 4 }),
+});
+
+const spec = (overrides: Partial<CastSpec> = {}): CastSpec => ({
+  activation: 'PRESS',
+  targeting: 'DIRECTION',
+  resource: { commitAt: 'start', refundOn: [] },
+  cooldown: { startAt: 'end', durationMs: 1_000 },
+  ...overrides,
+});
+
+const fakeDelegate = () => {
+  const events: string[] = [];
+  const delegate: SpellRuntimeDelegate = {
+    canStart: () => true,
+    commitResource: (_context, point) => {
+      events.push(`commit:${point}`);
+      return true;
+    },
+    refundResource: (_context, reason) => events.push(`refund:${reason}`),
+    onCastStart: () => events.push('castStart'),
+    onChargeUpdate: (_context, elapsedMs, ratio) =>
+      events.push(`charge:${elapsedMs}:${ratio}`),
+    onRelease: () => events.push('release'),
+    onChannelTick: (_context, tickIndex) => events.push(`tick:${tickIndex}`),
+    onActivate: () => events.push('activate'),
+    onRecast: () => events.push('recast'),
+    onCancel: (_context, reason) => events.push(`cancel:${reason}`),
+    onComplete: () => events.push('complete'),
+  };
+
+  return { delegate, events };
+};
+
+describe('SpellRuntime', () => {
+  it('moves a timed cast from READY through CASTING to COOLDOWN', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(spec({ castTimeMs: 100 }), delegate);
+
+    expect(runtime.state).toBe('READY');
+    runtime.press(context);
+    expect(runtime.state).toBe('CASTING');
+
+    runtime.update(99);
+    expect(runtime.state).toBe('CASTING');
+    runtime.update(1);
+
+    expect(runtime.state).toBe('COOLDOWN');
+    expect(events).toEqual(['commit:start', 'castStart', 'release', 'complete']);
+  });
+
+  it('commits start resources exactly once', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(spec({ castTimeMs: 100 }), delegate);
+
+    runtime.press(context);
+    runtime.press(context);
+    runtime.hold(context);
+    runtime.update(50);
+
+    expect(events.filter((event) => event === 'commit:start')).toHaveLength(1);
+  });
+
+  it('commits release resources only when a charge releases', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'HOLD_RELEASE',
+        charge: { maxDurationMs: 500, releaseAtMax: false },
+        resource: { commitAt: 'release', refundOn: [] },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(200);
+    expect(events).not.toContain('commit:release');
+
+    runtime.release(context);
+    runtime.release(context);
+
+    expect(events.filter((event) => event === 'commit:release')).toHaveLength(1);
+    expect(events.filter((event) => event === 'release')).toHaveLength(1);
+  });
+
+  it('refunds according to the cancel policy', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        castTimeMs: 100,
+        resource: { commitAt: 'start', refundOn: ['STUN'] },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.cancel('STUN');
+    runtime.cancel('STUN');
+
+    expect(events.filter((event) => event === 'refund:STUN')).toHaveLength(1);
+  });
+
+  it('starts cooldown at start, release, or end according to policy', () => {
+    const makeRuntime = (startAt: CooldownStartPoint) => {
+      const { delegate } = fakeDelegate();
+      return new SpellRuntime(
+        spec({
+          activation: startAt === 'release' ? 'HOLD_RELEASE' : 'PRESS',
+          castTimeMs: startAt === 'release' ? undefined : 100,
+          charge:
+            startAt === 'release'
+              ? { maxDurationMs: 500, releaseAtMax: false }
+              : undefined,
+          cooldown: { startAt, durationMs: 1_000 },
+        }),
+        delegate
+      );
+    };
+    const atStart = makeRuntime('start');
+    const atRelease = makeRuntime('release');
+    const atEnd = makeRuntime('end');
+
+    atStart.press(context);
+    atRelease.press(context);
+    atEnd.press(context);
+    expect(atStart.cooldownRemainingMs).toBe(1_000);
+    expect(atRelease.cooldownRemainingMs).toBe(0);
+    expect(atEnd.cooldownRemainingMs).toBe(0);
+
+    atRelease.release(context);
+    expect(atRelease.cooldownRemainingMs).toBe(1_000);
+
+    atEnd.update(100);
+    expect(atEnd.cooldownRemainingMs).toBe(1_000);
+  });
+
+  it('keeps an ACTIVE recast available until completion', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'RECAST',
+        active: { recastDelayMs: 100 },
+        cooldown: { startAt: 'start', durationMs: 50 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    expect(runtime.state).toBe('ACTIVE');
+    runtime.update(50);
+    expect(runtime.state).toBe('ACTIVE');
+
+    runtime.press(context);
+    expect(events).not.toContain('recast');
+    runtime.update(50);
+    runtime.press(context);
+
+    expect(events.filter((event) => event === 'recast')).toHaveLength(1);
+    expect(events.filter((event) => event === 'complete')).toHaveLength(1);
+    expect(runtime.state).toBe('READY');
+  });
+
+  it('rejects an interrupt disabled by the spell override', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({ castTimeMs: 100, interrupts: { stun: false } }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.cancel('STUN');
+
+    expect(runtime.state).toBe('CASTING');
+    expect(events).not.toContain('cancel:STUN');
+  });
+
+  it('runs cancel cleanup exactly once', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(spec({ castTimeMs: 100 }), delegate);
+
+    runtime.press(context);
+    runtime.cancel('PLAYER_CANCEL');
+    runtime.cancel('PLAYER_CANCEL');
+
+    expect(events.filter((event) => event === 'cancel:PLAYER_CANCEL')).toHaveLength(1);
+  });
+
+  it('maps legacy cast to an immediate onSpellCast call', () => {
+    const emitted: string[] = [];
+    const owner = {
+      game: {
+        worldMouse: { x: 4, y: 6 } as { x: number; y: number } | undefined,
+        eventManager: { emit: (event: string) => emitted.push(event) },
+      },
+      position: { x: 1, y: 2 },
+      isDead: false,
+      canCast: true,
+      stats: { mana: { value: 100 }, health: { value: 100 } },
+    };
+    class LegacySpell extends Spell {
+      coolDown = 500;
+      manaCost = 20;
+      healthCost = 10;
+      casts = 0;
+      onSpellCast(): void {
+        this.casts += 1;
+      }
+    }
+    const spell = new LegacySpell(owner);
+
+    spell.cast();
+    owner.game.worldMouse = undefined;
+    expect(() => spell.cast()).not.toThrow();
+
+    expect(spell.casts).toBe(1);
+    expect(spell.state).toBe('COOLDOWN');
+    expect(spell.currentCooldown).toBe(500);
+    expect(owner.stats.mana.value).toBe(80);
+    expect(owner.stats.health.value).toBe(90);
+    expect(emitted).toHaveLength(3);
+
+    spell.currentCooldown = 25;
+    expect(spell.currentCooldown).toBe(25);
+    spell.state = 'READY';
+    expect(spell.state).toBe('READY');
+  });
+});

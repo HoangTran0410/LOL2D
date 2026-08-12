@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true
+  },
+  "include": [
+    "src/types/**/*.d.ts",
+    "src/game/spell/**/*.ts",
+    "tests/game/spell/**/*.ts",
+    "src/game/input/**/*.ts",
+    "src/game/targeting/**/*.ts",
+    "src/game/vfx/**/*.ts",
+    "src/generated/**/*.ts",
+    "scripts/wiki/**/*.ts"
+  ]
+}
