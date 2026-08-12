@@ -44,9 +44,10 @@ export default class MissileSpellObject extends SpellObject {
     this.onBeforeMove();
 
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
-    if (this.position.dist(this.destination) < this.speed) {
+    if (this.position.dist(this.destination) <= this.getArrivalThreshold()) {
       this.onArrive();
       if (this.removeOnArrive) this.toRemove = true;
+      if (this.toRemove) return;
     }
 
     this.onAfterMove();
@@ -104,6 +105,8 @@ export default class MissileSpellObject extends SpellObject {
   onBeforeMove(): void {}
   /** Runs after the step, before collision — for visuals that track distance travelled. */
   onAfterMove(): void {}
+  /** Distance from the destination that counts as arrival after a movement step. */
+  getArrivalThreshold(): number { return this.speed; }
   onArrive(): void {}
   onHit(_enemy: any): void {}
   getTrailPosition(): p5.Vector {
