@@ -11,6 +11,9 @@ function literal(node) {
       return null;
     case 'TableConstructorExpression':
       return table(node);
+    case 'UnaryExpression':
+      if (node.operator === '-' && node.argument?.type === 'NumericLiteral') return -node.argument.value;
+      throw new Error(`Unsupported Lua unary expression: ${node.operator}`);
     default:
       throw new Error(`Unsupported Lua AST node: ${node?.type ?? 'missing'}`);
   }

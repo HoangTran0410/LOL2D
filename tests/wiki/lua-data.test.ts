@@ -37,12 +37,19 @@ describe('League Wiki Lua data', () => {
     expect(data.Janna.title).toBe('Janna’s Gió Mùa');
   });
 
+  it('preserves negative numeric literals exactly', () => {
+    expect(parseLuaData('return { offset = -42.5 }')).toEqual({ offset: -42.5 });
+  });
+
   it('rejects calls, functions, index expressions, and duplicate keys', () => {
     for (const source of [
       'return os.execute("no")',
       'return function() end',
       'return value[key]',
       'return "not a table"',
+      'return { value = not 1 }',
+      'return { value = #{} }',
+      'return { value = ~1 }',
       'return { name = "one", ["name"] = "two" }',
     ]) {
       expect(() => parseLuaData(source)).toThrow(/unsupported|duplicate/i);
