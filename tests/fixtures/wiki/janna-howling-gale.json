@@ -1,0 +1,32 @@
+{
+  "revision": {
+    "batchcomplete": "",
+    "query": {
+      "pages": [{
+        "pageid": 123,
+        "title": "Template:Data Janna/Howling Gale",
+        "revisions": [{ "revid": 456, "timestamp": "2026-08-12T00:00:00Z" }]
+      }]
+    }
+  },
+  "expanded": {
+    "batchcomplete": "",
+    "expandtemplates": {
+      "wikitext": "@@name@@Howling Gale@@description@@'''Active:''' Janna summons a [[File:Airborne icon.png|20px]] whirlwind dealing {{as|magic damage}}.@@leveling@@{{pp|60 / 85 / 110 / 135 / 160}} (+ 35% AP)@@range@@1100 - 1760@@width@@120@@speed@@667 - 1170@@casttime@@none@@cost@@90 / 100 / 110 / 120 / 130 mana@@cooldown@@12@@targeting@@Direction@@projectile@@true@@icon@@Howling Gale.png@@notes@@* Charges over 3 seconds.<br />* Recast releases it.@@"
+    }
+  },
+  "imageinfo": {
+    "batchcomplete": "",
+    "query": {
+      "pages": [{
+        "pageid": 789,
+        "title": "File:Howling Gale.png",
+        "imageinfo": [{
+          "url": "https://wiki.leagueoflegends.com/images/Howling_Gale.png",
+          "sha1": "0123456789abcdef",
+          "mime": "image/png"
+        }]
+      }]
+    }
+  }
+}
