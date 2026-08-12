@@ -69,6 +69,14 @@ describe('League Wiki importer', () => {
     });
   });
 
+  it('omits exact unresolved pst2 placeholders without dropping embedded braces', () => {
+    const fields = normalizeAbilityFields('@@description@@Keep {{{value}}} literal@@description2@@ {{{description2}}} @@range@@{{{target range}}}@@');
+
+    expect(fields.description).toMatchObject({ raw: 'Keep {{{value}}} literal' });
+    expect(fields).not.toHaveProperty('description2');
+    expect(fields).not.toHaveProperty('range');
+  });
+
   it('normalizes selected fields and preserves raw formulas', async () => {
     const data = await fixture();
     const fields = normalizeAbilityFields(data.expanded.expandtemplates.wikitext);

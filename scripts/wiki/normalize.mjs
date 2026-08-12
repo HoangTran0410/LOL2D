@@ -38,6 +38,7 @@ export function normalizeAbilityFields(source) {
   for (const field of ABILITY_FIELDS) {
     const raw = parsed[field];
     if (raw == null || raw === '') continue;
+    if (/^\{\{\{[^{}]+\}\}\}$/.test(raw.trim())) continue;
     const text = wikiTextToText(raw);
     if (field === 'projectile' || field === 'spellshield') {
       normalized[field] = /^(?:1|true|yes)$/i.test(text);
