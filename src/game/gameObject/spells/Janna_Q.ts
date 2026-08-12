@@ -1,16 +1,22 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Airborne from '../buffs/Airborne';
 import TrailSystem from '../helpers/TrailSystem';
+import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 
 /** Pale sea-green, the colour of Janna's wind. */
 const WIND: [number, number, number] = [185, 243, 228];
 /** What the funnel turns as it reaches full charge. */
 const WIND_CHARGED: [number, number, number] = [255, 240, 170];
+
+interface JannaTarget {
+  position: p5.Vector;
+  takeDamage(damage: number, source: unknown): void;
+  addBuff(buff: Airborne): void;
+}
 
 /**
  * Howling Gale is a charged spell, not a plain skillshot: the whirlwind is summoned
@@ -19,13 +25,7 @@ const WIND_CHARGED: [number, number, number] = [255, 240, 170];
  * releases it automatically.
  */
 export default class Janna_Q extends Spell {
-  static PHASES = {
-    CHARGE: { image: AssetManager.getAsset('spell_janna_q') },
-    RELEASE: { image: AssetManager.getAsset('spell_janna_q2') },
-  };
-  phase: 'CHARGE' | 'RELEASE' = 'CHARGE';
-
-  image = Janna_Q.PHASES[this.phase].image;
+  image = AssetManager.getAsset('spell_janna_q');
   name = 'Bão Tố (Janna_Q)';
   description =
     'Triệu hồi một cơn lốc tại chỗ và <span class="buff">tích luỹ sức mạnh</span> trong tối đa <span class="time">3 giây</span>. Tái kích hoạt để phóng cơn lốc về hướng con trỏ, hoặc nó tự phóng khi tích đầy. Tích càng lâu thì tầm bay, tốc độ, sát thương và thời gian hất tung càng lớn: gây <span class="damage">15 - 30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.5 - 1.25 giây</span>, xuyên qua mọi kẻ địch trên đường đi';
@@ -38,54 +38,65 @@ export default class Janna_Q extends Spell {
 
   spellObject: Janna_Q_Object | null = null;
 
-  onSpellCast() {
-    if (this.phase === 'CHARGE') this.startCharging();
-    else this.releaseStorm();
+  protected get castSpec(): CastSpec {
+    return {
+      activation: 'RECAST',
+      targeting: 'DIRECTION',
+      active: { maxDurationMs: this.maxChargeTime },
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'end', durationMs: this.coolDown },
+      interrupts: { move: false },
+    };
   }
 
-  startCharging() {
+  onActivate(context: CastContext): void {
     const obj = new Janna_Q_Object(this.owner);
     obj.maxChargeTime = this.maxChargeTime;
-    obj.onReleased = () => this.endCharge();
-    obj.getReleaseDestination = (chargeRatio: number) => this.getDestination(obj, chargeRatio);
+    obj.minRange = this.minRange;
+    obj.maxRange = this.maxRange;
+    obj.position = createVector(context.origin.x, context.origin.y);
+    obj.releaseDirection = createVector(context.direction.x, context.direction.y);
     this.spellObject = obj;
     this.game.objectManager.addObject(obj);
-
-    this.phase = 'RELEASE';
-    this.image = Janna_Q.PHASES.RELEASE.image;
-    // the recast has to be available immediately while the storm builds up
-    this.currentCooldown = 150;
   }
 
-  releaseStorm() {
-    // fires the storm early; the object calls back into endCharge()
-    this.spellObject?.release();
-    this.endCharge();
+  onRecast(_context: CastContext): void {
+    this.releaseStorm();
   }
 
-  /** The storm flies from where it was summoned, not from Janna. */
-  getDestination(obj: Janna_Q_Object, chargeRatio: number) {
-    const range = lerp(this.minRange, this.maxRange, chargeRatio);
-    const aim = this.aimPoint;
-    const { to } = VectorUtils.getVectorWithRange(obj.position, aim, range);
-    return to;
+  onComplete(_context: CastContext): void {
+    this.releaseStorm(true);
   }
 
-  endCharge() {
-    if (this.phase !== 'RELEASE') return;
-    this.phase = 'CHARGE';
-    this.image = Janna_Q.PHASES.CHARGE.image;
+  onCancel(_context: CastContext, _reason: CancelReason): void {
+    this.removeStorm();
+  }
+
+  deactivate(): void {
+    this.removeStorm();
+    super.deactivate();
+  }
+
+  onRemoved(): void {
+    this.removeStorm();
+    super.onRemoved();
+  }
+
+  private releaseStorm(atMaxCharge = false): void {
+    const storm = this.spellObject;
+    if (!storm) return;
+    storm.release(atMaxCharge);
     this.spellObject = null;
-    this.currentCooldown = this.coolDown;
   }
 
-  onUpdate() {
-    // the storm dies with its caster; don't leave the spell stuck mid-charge
-    if (this.phase === 'RELEASE' && this.spellObject?.toRemove) this.endCharge();
+  private removeStorm(): void {
+    if (!this.spellObject) return;
+    this.spellObject.toRemove = true;
+    this.spellObject = null;
   }
 
   drawPreview() {
-    super.drawPreview(this.phase === 'CHARGE' ? this.maxRange : this.currentRange);
+    super.drawPreview(this.state === 'ACTIVE' ? this.currentRange : this.maxRange);
   }
 
   get currentRange(): number {
@@ -107,17 +118,18 @@ export class Janna_Q_Object extends MissileSpellObject {
   maxSpeed = 10;
   speed = this.minSpeed;
 
+  minRange = 400;
+  maxRange = 640;
+
   minDamage = 15;
   maxDamage = 30;
   minAirborneTime = 500;
   maxAirborneTime = 1250;
 
   angle = 0;
+  releaseDirection = createVector();
   // the storm blows through everyone it touches
   maxHitCount = Infinity;
-
-  onReleased: (() => void) | null = null;
-  getReleaseDestination: ((chargeRatio: number) => p5.Vector) | null = null;
 
   trailSystem = new TrailSystem({
     trailSize: this.maxSize / 2,
@@ -165,19 +177,15 @@ export class Janna_Q_Object extends MissileSpellObject {
   }
 
   /** Launches the storm with whatever charge it has accumulated. */
-  release() {
+  release(atMaxCharge = false) {
     if (!this.charging) return;
 
+    if (atMaxCharge) this.chargeTime = this.maxChargeTime;
     const ratio = this.chargeRatio;
     this.charging = false;
     this.speed = lerp(this.minSpeed, this.maxSpeed, ratio);
-    const fallbackAim = this.owner.position;
-    this.destination =
-      this.getReleaseDestination?.(ratio) ??
-      VectorUtils.getVectorWithRange(this.position, fallbackAim, 400).to;
-
-    this.onReleased?.();
-    this.onReleased = null;
+    const range = lerp(this.minRange, this.maxRange, ratio);
+    this.destination = this.position.copy().add(this.releaseDirection.copy().mult(range));
   }
 
   getCurrentDamage(): number {
@@ -188,7 +196,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     return Math.round(lerp(this.minAirborneTime, this.maxAirborneTime, this.chargeRatio));
   }
 
-  onHit(enemy: any) {
+  onHit(enemy: JannaTarget) {
     enemy.takeDamage(this.getCurrentDamage(), this.owner);
 
     const airborneBuff = new Airborne(this.getCurrentAirborneTime(), this.owner, enemy);
