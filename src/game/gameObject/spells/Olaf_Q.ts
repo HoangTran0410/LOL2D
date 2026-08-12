@@ -21,7 +21,7 @@ export default class Olaf_Q extends Spell {
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.maxThrowRange
     );
 

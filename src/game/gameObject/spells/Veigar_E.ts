@@ -17,7 +17,7 @@ export default class Veigar_E extends Spell {
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       300
     );
 

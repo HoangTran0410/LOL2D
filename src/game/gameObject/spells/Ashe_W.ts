@@ -14,7 +14,7 @@ export default class Ashe_W extends Spell {
   coolDown = 5000;
 
   onSpellCast() {
-    let mouse = this.game.worldMouse.copy();
+    let mouse = this.aimPoint;
     let direction = mouse.sub(this.owner.position).normalize();
 
     let arrowCount = 15;

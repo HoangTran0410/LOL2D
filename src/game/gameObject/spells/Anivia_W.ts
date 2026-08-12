@@ -41,7 +41,7 @@ export default class Anivia_W extends Spell {
   onSpellCast() {
     const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.range
     );
 

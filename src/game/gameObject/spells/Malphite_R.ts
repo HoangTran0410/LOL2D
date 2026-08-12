@@ -25,7 +25,7 @@ export default class Malphite_R extends Spell {
   onSpellCast() {
     const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.maxRange
     );
 

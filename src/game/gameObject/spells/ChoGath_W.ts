@@ -19,7 +19,7 @@ export default class ChoGath_W extends Spell {
     const lifeTime = 1000;
     const stunTime = 1000;
     const angleRange = PI / 2.5;
-    const angle = this.game.worldMouse.copy().sub(this.owner.position).heading();
+    const angle = this.aimPoint.sub(this.owner.position).heading();
 
     const obj = new ChoGath_W_Object(this.owner);
     obj.speed = 10;

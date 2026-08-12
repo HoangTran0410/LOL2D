@@ -19,7 +19,7 @@ export default class Yasuo_W extends Spell {
       duration = 3750;
 
     const startRange = this.owner.stats.size.value + 20;
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
     const direction = mouse.copy().sub(this.owner.position).normalize();
     const position = this.owner.position.copy().add(direction.setMag(startRange));
 

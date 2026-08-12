@@ -25,7 +25,7 @@ export default class Lux_R extends Spell {
 
     const { from, to: destination } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       rayLength
     );
 

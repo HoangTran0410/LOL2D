@@ -48,7 +48,7 @@ export default class Leblanc_W extends Spell {
 
       const { to: destination } = VectorUtils.getVectorWithMaxRange(
         this.owner.position,
-        this.game.worldMouse,
+        this.aimPoint,
         maxDistance
       );
 

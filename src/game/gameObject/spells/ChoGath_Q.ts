@@ -16,7 +16,7 @@ export default class ChoGath_Q extends Spell {
   maxRange = 400;
 
   onSpellCast() {
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
     const position = mouse
       .copy()
       .sub(this.owner.position)

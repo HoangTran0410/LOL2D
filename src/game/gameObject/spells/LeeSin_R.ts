@@ -23,7 +23,7 @@ export default class LeeSin_R extends Spell {
   collideDamage = 30;
 
   onSpellCast() {
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
 
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({

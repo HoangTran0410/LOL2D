@@ -45,7 +45,7 @@ export default class LeeSin_Q extends Spell {
     if (this.phase === 'Q1') {
       const { to: destination } = VectorUtils.getVectorWithRange(
         this.owner.position,
-        this.game.worldMouse,
+        this.aimPoint,
         range
       );
 

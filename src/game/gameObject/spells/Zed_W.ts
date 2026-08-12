@@ -2,6 +2,8 @@ import AssetManager from '../../../managers/AssetManager';
 import EventType from '../../enums/EventType';
 import StatusFlags from '../../enums/StatusFlags';
 import VectorUtils from '../../../utils/vector.utils';
+import { uuidv4 } from '../../../utils';
+import type { CastContext } from '../../spell/runtime/types';
 import Champion from '../attackableUnits/Champion';
 import Dash from '../buffs/Dash';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
@@ -20,7 +22,7 @@ export default class Zed_W extends Spell {
     if (!this.zedWClone) {
       const { from, to } = VectorUtils.getVectorWithMaxRange(
         this.owner.position,
-        this.game.worldMouse,
+        this.aimPoint,
         350
       );
 
@@ -69,7 +71,7 @@ export class Zed_W_Clone extends Champion {
       source: any;
     };
   } = {};
-  _pendingSpellIds: { id: string; mouse: any }[] = [];
+  _pendingSpellIds: { id: string; context: CastContext }[] = [];
   _reachedDestination = false;
   swapable = true;
   spellSource: Zed_W | null = null;
@@ -80,6 +82,8 @@ export class Zed_W_Clone extends Champion {
     if (sourceSpell.owner.id !== this.owner.id) return;
     if (sourceSpell.id === this.spellSource?.id) return;
     if (sourceSpell instanceof Zed_W) return;
+    const sourceContext = sourceSpell.castContext as CastContext | undefined;
+    if (!sourceContext) return;
 
     let spell: any = null;
     if (sourceSpell.id in this._mapSpells) {
@@ -93,14 +97,26 @@ export class Zed_W_Clone extends Champion {
     }
 
     if (this._reachedDestination) {
-      spell.cast();
+      this.pressClone(spell, sourceContext);
     } else {
       this._pendingSpellIds.push({
         id: sourceSpell.id,
-        mouse: this.game.worldMouse.copy(),
+        context: sourceContext,
       });
     }
   };
+
+  pressClone(spell: Spell, sourceContext: CastContext) {
+    spell.press(Object.freeze({
+      ...sourceContext,
+      spellId: spell.id,
+      activationId: uuidv4(),
+      caster: this,
+      origin: Object.freeze({ x: this.position.x, y: this.position.y }),
+      cursorWorld: Object.freeze({ ...sourceContext.cursorWorld }),
+      direction: Object.freeze({ ...sourceContext.direction }),
+    }));
+  }
 
   onAdded() {
     this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
@@ -117,10 +133,10 @@ export class Zed_W_Clone extends Champion {
     dashBuff.onReachedDestination = () => {
       this._reachedDestination = true;
 
-      this._pendingSpellIds.forEach(({ id, mouse }: { id: string; mouse: any }) => {
-        this.game.worldMouse = mouse;
-        this._mapSpells[id].clone.cast();
+      this._pendingSpellIds.forEach(({ id, context }) => {
+        this.pressClone(this._mapSpells[id].clone, context);
       });
+      this._pendingSpellIds = [];
 
       this.stats.visionRadius.baseValue = originVisionRadius / 3;
 

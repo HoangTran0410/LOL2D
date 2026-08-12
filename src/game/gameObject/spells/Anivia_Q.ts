@@ -45,7 +45,7 @@ export default class Anivia_Q extends Spell {
     if (this.phase === 'Q1') {
       const { to } = VectorUtils.getVectorWithRange(
         this.owner.position,
-        this.game.worldMouse,
+        this.aimPoint,
         this.range
       );
 

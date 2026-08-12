@@ -23,7 +23,7 @@ export default class Teemo_R extends Spell {
 
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       throwRange
     );
 

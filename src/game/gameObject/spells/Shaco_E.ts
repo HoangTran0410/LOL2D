@@ -36,9 +36,9 @@ export default class Shaco_E extends Spell {
 
     // Find the closest enemy to the mouse
     let closestEnemy = enemies[0];
-    let closestDistance = closestEnemy.position.dist(this.game.worldMouse);
+    let closestDistance = closestEnemy.position.dist(this.aimPoint);
     enemies.forEach((enemy: any) => {
-      const distance = enemy.position.dist(this.game.worldMouse);
+      const distance = enemy.position.dist(this.aimPoint);
       if (distance < closestDistance) {
         closestDistance = distance;
         closestEnemy = enemy;

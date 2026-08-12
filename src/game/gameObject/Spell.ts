@@ -18,6 +18,14 @@ const legacyCastSpec = (durationMs: number): CastSpec => ({
   cooldown: { startAt: 'start', durationMs },
 });
 
+const snapshotContext = (context: CastContext): CastContext =>
+  Object.freeze({
+    ...context,
+    origin: Object.freeze({ ...context.origin }),
+    cursorWorld: Object.freeze({ ...context.cursorWorld }),
+    direction: Object.freeze({ ...context.direction }),
+  });
+
 export default class Spell {
   // for display in HUD
   name = this.constructor.name;
@@ -36,6 +44,7 @@ export default class Spell {
   owner: any;
   game: any;
   private spellRuntime?: SpellRuntime;
+  private _castContext?: CastContext;
 
   constructor(owner: any) {
     this.owner = owner;
@@ -58,6 +67,15 @@ export default class Spell {
 
   set currentCooldown(remainingMs: number) {
     this.runtime.setCompatibilityCooldown(remainingMs);
+  }
+
+  get castContext(): CastContext | undefined {
+    return this._castContext;
+  }
+
+  get aimPoint(): p5.Vector {
+    const aim = this._castContext?.cursorWorld ?? this.game.worldMouse;
+    return createVector(aim.x, aim.y);
   }
 
   update(): void {
@@ -93,8 +111,9 @@ export default class Spell {
   }
 
   press(context: CastContext): boolean {
+    this._castContext = snapshotContext(context);
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
-    return this.runtime.press(context);
+    return this.runtime.press(this._castContext);
   }
 
   hold(context: CastContext): boolean {
@@ -139,7 +158,7 @@ export default class Spell {
     return true;
   }
 
-  onSpellCast(): void {}
+  onSpellCast(_context: CastContext): void {}
   onUpdate(): void {}
   onCastStart(_context: CastContext): void {}
   onChargeUpdate(_context: CastContext, _elapsedMs: number, _ratio: number): void {}
@@ -161,7 +180,7 @@ export default class Spell {
           this.onChargeUpdate(context, elapsedMs, ratio),
         onRelease: (context) => {
           this.onRelease(context);
-          this.onSpellCast();
+          this.onSpellCast(context);
           this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
         },
         onChannelTick: (context, tickIndex) => this.onChannelTick(context, tickIndex),

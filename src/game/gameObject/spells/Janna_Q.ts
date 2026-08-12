@@ -66,7 +66,7 @@ export default class Janna_Q extends Spell {
   /** The storm flies from where it was summoned, not from Janna. */
   getDestination(obj: Janna_Q_Object, chargeRatio: number) {
     const range = lerp(this.minRange, this.maxRange, chargeRatio);
-    const aim = this.game.worldMouse ?? this.owner.position;
+    const aim = this.aimPoint;
     const { to } = VectorUtils.getVectorWithRange(obj.position, aim, range);
     return to;
   }
@@ -171,7 +171,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     const ratio = this.chargeRatio;
     this.charging = false;
     this.speed = lerp(this.minSpeed, this.maxSpeed, ratio);
-    const fallbackAim = this.game.worldMouse ?? this.owner.position;
+    const fallbackAim = this.owner.position;
     this.destination =
       this.getReleaseDestination?.(ratio) ??
       VectorUtils.getVectorWithRange(this.position, fallbackAim, 400).to;

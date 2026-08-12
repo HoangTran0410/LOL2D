@@ -16,7 +16,7 @@ export default class Shaco_Q extends Spell {
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       200
     );
 

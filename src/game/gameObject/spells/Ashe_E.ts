@@ -21,7 +21,7 @@ export default class Ashe_E extends Spell {
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.range
     );
 

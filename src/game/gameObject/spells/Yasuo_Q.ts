@@ -42,7 +42,7 @@ export default class Yasuo_Q extends Spell {
   }
 
   onSpellCast() {
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
     const angle = mouse.sub(this.owner.position).heading();
 
     // Q1, Q2

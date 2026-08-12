@@ -18,7 +18,7 @@ export default class Ahri_E extends Spell {
 
     const { from, to } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       range
     );
 

@@ -35,7 +35,7 @@ export default class Amumu_Q extends Spell {
   onSpellCast() {
     const { to: destination } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.range
     );
 

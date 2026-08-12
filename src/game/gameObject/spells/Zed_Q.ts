@@ -18,7 +18,7 @@ export default class Zed_Q extends Spell {
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.maxThrowRange
     );
 

@@ -25,7 +25,7 @@ export default class Yasuo_R extends Spell {
   }
 
   onSpellCast() {
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
 
     // query all enemies that have Airborne buff
     const enemies = this.game.objectManager.queryObjects({

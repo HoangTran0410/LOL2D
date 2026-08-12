@@ -21,7 +21,8 @@ export default class Shaco_R extends Spell {
   checkCastCondition() {
     if (this.clonePlayer) {
       // move clone to mouse position
-      this.clonePlayer.moveTo(this.game.worldMouse.x, this.game.worldMouse.y);
+      const aim = this.aimPoint;
+      this.clonePlayer.moveTo(aim.x, aim.y);
 
       return false;
     }
@@ -40,7 +41,8 @@ export default class Shaco_R extends Spell {
     clone.shacoR_championOwner = this.owner;
     clone.shacoR_maxRange = this.maxRange;
     clone.shacoR_lifeTime = this.cloneLifeTime;
-    clone.moveTo(this.game.worldMouse.x, this.game.worldMouse.y);
+    const aim = this.aimPoint;
+    clone.moveTo(aim.x, aim.y);
     this.game.objectManager.addObject(clone);
 
     this.clonePlayer = clone;

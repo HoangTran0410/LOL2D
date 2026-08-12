@@ -128,7 +128,7 @@ export default class Nocturne_R extends Spell {
       ],
     });
 
-    const aim = this.game.worldMouse ?? this.owner.position;
+    const aim = this.aimPoint;
 
     let best: any = null;
     let bestDistance = Infinity;

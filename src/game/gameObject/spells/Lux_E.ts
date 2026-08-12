@@ -24,7 +24,7 @@ export default class Lux_E extends Spell {
 
       const { from, to: destination } = VectorUtils.getVectorWithMaxRange(
         this.owner.position,
-        this.game.worldMouse,
+        this.aimPoint,
         range
       );
 

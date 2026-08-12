@@ -20,7 +20,7 @@ export default class Yasuo_E extends Spell {
   }
 
   onSpellCast() {
-    const mouse = this.game.worldMouse.copy();
+    const mouse = this.aimPoint;
     this.owner.destination.set(mouse.x, mouse.y);
 
     // find all enemies in range

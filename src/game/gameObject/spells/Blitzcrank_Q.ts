@@ -26,7 +26,7 @@ export default class Blitzcrank_Q extends Spell {
 
     const { to: destination } = VectorUtils.getVectorWithRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       range
     );
 

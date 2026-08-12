@@ -23,7 +23,7 @@ export default class Blitzcrank_E extends Spell {
   airborneHeight = 25;
 
   onSpellCast() {
-    const angle = VectorUtils.getAngle(this.owner.position, this.game.worldMouse);
+    const angle = VectorUtils.getAngle(this.owner.position, this.aimPoint);
     const facing = p5.Vector.fromAngle(angle);
     const minDot = Math.cos(this.halfAngle);
 

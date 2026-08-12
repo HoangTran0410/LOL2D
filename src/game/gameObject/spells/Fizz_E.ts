@@ -73,7 +73,7 @@ export default class Fizz_E extends Spell {
 
     const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.maxRange
     );
 
@@ -116,7 +116,7 @@ export default class Fizz_E extends Spell {
 
     const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       this.tricksterRange
     );
 

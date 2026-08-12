@@ -15,7 +15,7 @@ export default class Ashe_R extends Spell {
   coolDown = 10000;
 
   onSpellCast() {
-    let direction = p5.Vector.sub(this.game.worldMouse, this.owner.position).normalize();
+    let direction = p5.Vector.sub(this.aimPoint, this.owner.position).normalize();
 
     let obj = new Ashe_R_Object(this.owner);
     obj.position = this.owner.position.copy();

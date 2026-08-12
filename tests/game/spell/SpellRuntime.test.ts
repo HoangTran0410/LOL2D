@@ -219,8 +219,10 @@ describe('SpellRuntime', () => {
       manaCost = 20;
       healthCost = 10;
       casts = 0;
-      onSpellCast(): void {
+      receivedContext?: CastContext;
+      onSpellCast(context: CastContext): void {
         this.casts += 1;
+        this.receivedContext = context;
       }
     }
     const spell = new LegacySpell(owner);
@@ -234,6 +236,7 @@ describe('SpellRuntime', () => {
     expect(spell.currentCooldown).toBe(500);
     expect(owner.stats.mana.value).toBe(80);
     expect(owner.stats.health.value).toBe(90);
+    expect(spell.receivedContext?.cursorWorld).toEqual({ x: 4, y: 6 });
     expect(emitted.filter(event => event === EventType.ON_PRE_CAST_SPELL)).toHaveLength(1);
     expect(emitted.filter(event => event === EventType.ON_POST_CAST_SPELL)).toHaveLength(1);
 

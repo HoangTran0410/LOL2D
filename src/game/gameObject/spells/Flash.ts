@@ -18,7 +18,7 @@ export default class Flash extends Spell {
     let oldPos = this.owner.position.copy();
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
-      this.game.worldMouse,
+      this.aimPoint,
       maxDistance
     );
     this.owner.teleportTo(to.x, to.y);

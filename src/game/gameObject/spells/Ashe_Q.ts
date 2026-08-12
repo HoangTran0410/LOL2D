@@ -22,7 +22,7 @@ export default class Ashe_Q extends Spell {
   angleStep = Math.PI / 30;
 
   onSpellCast() {
-    const angle = VectorUtils.getAngle(this.owner.position, this.game.worldMouse);
+    const angle = VectorUtils.getAngle(this.owner.position, this.aimPoint);
 
     for (let i = 0; i < this.arrowCount; i++) {
       const arrowAngle = angle + (i - (this.arrowCount - 1) / 2) * this.angleStep;
