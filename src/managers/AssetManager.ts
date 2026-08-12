@@ -185,6 +185,14 @@ export default class AssetManager {
     return Promise.all(keys.map(key => this.ensure(key)));
   }
 
+  static renderable(handle: AssetHandle | undefined, label?: string): unknown {
+    if (handle?.status === 'ready' && handle.data !== null) return handle.data;
+    if (handle?.key && handle.status === 'idle') {
+      void this.ensure(handle.key).catch(() => undefined);
+    }
+    return this.placeholder(label ?? handle?.key ?? 'Missing asset').data!;
+  }
+
   static placeholder(label: string): AssetHandle {
     if (!label.trim()) throw new Error('Placeholder label is required');
 

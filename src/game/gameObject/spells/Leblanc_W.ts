@@ -118,7 +118,7 @@ export class Leblanc_W_Object extends SpellObject {
     push();
     const { stats, avatar } = this.owner as any;
     const size = stats.size.value;
-    image(avatar.data, this.position.x, this.position.y, size, size);
+    image(AssetManager.renderable(avatar), this.position.x, this.position.y, size, size);
 
     const alpha = map(this.age, 0, this.lifeTime, 0, 255);
     stroke('yellow');

@@ -11,6 +11,28 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+function stubPlaceholderGraphics(marker: object) {
+  const graphics = {
+    colorMode: vi.fn(),
+    noStroke: vi.fn(),
+    fill: vi.fn(),
+    rect: vi.fn(),
+    noFill: vi.fn(),
+    stroke: vi.fn(),
+    strokeWeight: vi.fn(),
+    textAlign: vi.fn(),
+    textSize: vi.fn(),
+    textStyle: vi.fn(),
+    text: vi.fn(),
+    ...marker,
+  };
+  vi.stubGlobal('HSL', 'hsl');
+  vi.stubGlobal('CENTER', 'center');
+  vi.stubGlobal('BOLD', 'bold');
+  vi.stubGlobal('createGraphics', vi.fn(() => graphics));
+  return graphics;
+}
+
 describe('AssetManager', () => {
   const imageLoads = new Map<string, ReturnType<typeof deferred<unknown>>>();
   const imageLoader = vi.fn((url: string) => {
@@ -69,5 +91,34 @@ describe('AssetManager', () => {
   it('requires an explicit placeholder label', () => {
     expect(() => AssetManager.placeholder('')).toThrow(/placeholder label/i);
     expect(AssetManager.placeholder('Missing R').key).toBeNull();
+  });
+
+  it('renders a placeholder on first canvas use and loaded data through the same handle', async () => {
+    const placeholder = stubPlaceholderGraphics({ placeholder: true });
+    const handle = AssetManager.get('champ_jinx');
+
+    expect(AssetManager.renderable(handle)).toBe(placeholder);
+    expect(AssetManager.renderable(handle)).toBe(placeholder);
+    expect(imageLoader).toHaveBeenCalledTimes(1);
+
+    const image = { width: 64 };
+    imageLoads.get(handle.url)?.resolve(image);
+    await AssetManager.ensure('champ_jinx');
+
+    expect(AssetManager.renderable(handle)).toBe(image);
+    expect(AssetManager.get('champ_jinx')).toBe(handle);
+  });
+
+  it('keeps rendering a placeholder after a failed on-use load', async () => {
+    const placeholder = stubPlaceholderGraphics({ placeholder: true });
+    const handle = AssetManager.get('champ_blitzcrank');
+
+    expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
+    const error = new Error('draw load failed');
+    imageLoads.get(handle.url)?.reject(error);
+    await vi.waitFor(() => expect(handle.status).toBe('error'));
+
+    expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
+    expect(imageLoader).toHaveBeenCalledTimes(1);
   });
 });

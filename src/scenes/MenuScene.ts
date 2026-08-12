@@ -25,6 +25,8 @@ export default class MenuScene extends Scene {
     this.background = document.querySelector('#menu-scene .background') as HTMLElement;
     this.playBtn = document.querySelector('#play-btn') as HTMLElement;
     this.fullscreenBtn = document.querySelector('#fullscreen-btn') as HTMLElement;
+    (document.querySelector('#menu-logo') as HTMLImageElement).src =
+      AssetManager.get('other_newlogo_vi').url;
 
     this.playBtn.addEventListener('click', () => {
       this.sceneManager.showScene(GameScene);

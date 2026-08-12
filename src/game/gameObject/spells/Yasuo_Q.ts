@@ -233,7 +233,7 @@ export class Yasuo_Q3_Object extends MissileSpellObject {
     push();
     translate(this.position.x, this.position.y);
     rotate(this.angle);
-    image(this.image?.data, 0, 0, this.size, this.size);
+    image(AssetManager.renderable(this.image), 0, 0, this.size, this.size);
     pop();
   }
 }

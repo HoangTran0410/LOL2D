@@ -1,4 +1,4 @@
-import AssetManager from '../../../managers/AssetManager';
+import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
 import type Spell from '../Spell';
 import AttackableUnit from './AttackableUnit';
 import Airborne from '../buffs/Airborne';
@@ -9,6 +9,12 @@ import Root from '../buffs/Root';
 import Silence from '../buffs/Silence';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
+
+export interface ChampionPresetData {
+  name?: string;
+  avatar?: AssetKey;
+  spells?: Array<new (owner: Champion) => Spell>;
+}
 
 export default class Champion extends AttackableUnit {
   score = 0;
@@ -32,7 +38,7 @@ export default class Champion extends AttackableUnit {
     teamId?: string;
     stats?: any;
     avatar?: any;
-    preset?: any;
+    preset?: ChampionPresetData;
   }) {
     super({
       game,
@@ -46,7 +52,7 @@ export default class Champion extends AttackableUnit {
 
     this.score = 0;
     this.name = preset?.name;
-    this.spells = preset?.spells?.map?.((spell: any) => new spell(this)) || [];
+    this.spells = preset?.spells?.map(spell => new spell(this)) || [];
   }
 
   update() {
@@ -161,7 +167,7 @@ export default class Champion extends AttackableUnit {
     }
 
     for (const { image: buffImage, count } of buffCounts.values()) {
-      image(buffImage.data, x, topleft.y - 13, 20, 20);
+      image(AssetManager.renderable(buffImage), x, topleft.y - 13, 20, 20);
       if (count > 1) {
         noStroke();
         fill(255, alpha);

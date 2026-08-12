@@ -39,7 +39,7 @@ export default class Fear extends Buff {
       this.targetUnit.stats.size.value + random(-10, 10)
     );
     image(
-      this.image?.data,
+      AssetManager.renderable(this.image),
       this.targetUnit.position.x,
       this.targetUnit.position.y,
       Math.min(40, this.targetUnit.stats.size.value),

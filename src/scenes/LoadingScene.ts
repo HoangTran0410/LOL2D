@@ -10,6 +10,8 @@ export default class LoadingScene extends Scene {
 
   setup() {
     this.loadingSceneDiv = document.querySelector('#loading-scene') as HTMLElement;
+    (document.querySelector('#loading-logo') as HTMLImageElement).src =
+      AssetManager.get('other_logo').url;
     this.progressBar = this.loadingSceneDiv.querySelector('.progress-bar') as HTMLElement;
     this.loadingText = this.loadingSceneDiv.querySelector('.loading-text') as HTMLElement;
     this.errorText = this.loadingSceneDiv.querySelector('.error-text') as HTMLElement;

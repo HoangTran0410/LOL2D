@@ -6,6 +6,7 @@ import StatusFlags from '../../enums/StatusFlags';
 import GameObject from '../GameObject';
 import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
+import AssetManager from '../../../managers/AssetManager';
 
 export default class AttackableUnit extends GameObject {
   buffs: any[] = [];
@@ -112,7 +113,7 @@ export default class AttackableUnit extends GameObject {
     if (alpha < 255) tint(255, alpha);
     noStroke();
     fill(240, alpha);
-    image(this.avatar?.data, pos.x, pos.y, size, size);
+    image(AssetManager.renderable(this.avatar), pos.x, pos.y, size, size);
 
     stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
     strokeWeight(2);

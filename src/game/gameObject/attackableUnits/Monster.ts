@@ -1,12 +1,12 @@
 import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
+import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import Champion from './Champion';
 
 export interface MonsterPresetData {
   name: string;
-  avatar: string;
+  avatar: AssetKey;
   camp: { x: number; y: number; r: number };
   speed: number;
   size: number;

@@ -2,6 +2,7 @@ import * as AllSpells from './gameObject/spells/index';
 import AssetManager, { type AssetKey } from '../managers/AssetManager';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
+import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
 
 // Workaround: AllSpells is a namespace of named Spell class exports.
 // Filter out string exports by excluding values whose prototype chain doesn't lead to Spell.
@@ -10,11 +11,7 @@ type SpellClass = Exclude<(typeof AllSpells)[keyof typeof AllSpells], string> | 
 
 const random = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
-export const getChampionPresetRandom = (): {
-  name: string;
-  avatar: string;
-  spells: SpellClass[];
-} => {
+export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetKey } => {
   return {
     name: 'Random',
     avatar: random([

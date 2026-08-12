@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager';
 import { getChampionPresetRandom } from '../../preset';
-import Champion from './Champion';
+import Champion, { type ChampionPresetData } from './Champion';
 import { uuidv4 } from '../../../utils';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 
@@ -29,7 +29,7 @@ export default class AIChampion extends Champion {
     teamId?: string;
     stats?: any;
     avatar?: any;
-    preset?: any;
+    preset?: ChampionPresetData;
   }) {
     super({ game, position, collisionRadius, visionRadius, teamId, stats, avatar, preset });
   }

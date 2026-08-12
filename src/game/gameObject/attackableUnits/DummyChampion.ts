@@ -1,4 +1,5 @@
 import AIChampion from './AIChampion';
+import type { ChampionPresetData } from './Champion';
 
 export default class DummyChampion extends AIChampion {
   showName = true;
@@ -9,7 +10,11 @@ export default class DummyChampion extends AIChampion {
   _autoMoveOnCollideWall = false;
   _respawnWithNewPreset = false;
 
-  constructor({ game, position, preset }: { game: any; position: p5.Vector; preset?: any }) {
+  constructor({ game, position, preset }: {
+    game: any;
+    position: p5.Vector;
+    preset?: ChampionPresetData;
+  }) {
     super({ game, position, preset });
 
     this.stats.healthRegen.baseValue = 0.1;
