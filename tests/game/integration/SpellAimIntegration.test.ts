@@ -183,6 +183,12 @@ describe('spell aim integration', () => {
     expect(replay.usedContext?.cursorWorld).toEqual({ x: 0, y: 10 });
     expect(replay.usedContext?.origin).toEqual({ x: 5, y: 5 });
     expect(replay.usedContext?.caster).toBe(clone);
+    expect(replay.usedContext?.direction.x).toBeCloseTo(-Math.SQRT1_2);
+    expect(replay.usedContext?.direction.y).toBeCloseTo(Math.SQRT1_2);
+
+    const coincidentReplay = new MirroredSpell(clone);
+    clone.pressClone(coincidentReplay, castContext(owner, { x: 5, y: 5 }));
+    expect(coincidentReplay.usedContext?.direction).toEqual({ x: 0, y: 0 });
   });
 
   it('keeps shared worldMouse out of spell activation code', () => {

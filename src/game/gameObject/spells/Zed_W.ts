@@ -106,17 +106,26 @@ export class Zed_W_Clone extends Champion {
     }
   };
 
-  pressClone(spell: Spell, sourceContext: CastContext) {
-    spell.press(Object.freeze({
-      ...sourceContext,
-      spellId: spell.id,
-      activationId: uuidv4(),
-      caster: this,
-      origin: Object.freeze({ x: this.position.x, y: this.position.y }),
-      cursorWorld: Object.freeze({ ...sourceContext.cursorWorld }),
-      direction: Object.freeze({ ...sourceContext.direction }),
-    }));
-  }
+	pressClone(spell: Spell, sourceContext: CastContext) {
+		const origin = Object.freeze({ x: this.position.x, y: this.position.y });
+		const cursorWorld = Object.freeze({ ...sourceContext.cursorWorld });
+		const dx = cursorWorld.x - origin.x;
+		const dy = cursorWorld.y - origin.y;
+		const length = Math.hypot(dx, dy);
+
+		spell.press(Object.freeze({
+			...sourceContext,
+			spellId: spell.id,
+			activationId: uuidv4(),
+			caster: this,
+			origin,
+			cursorWorld,
+			direction: Object.freeze({
+				x: length === 0 ? 0 : dx / length,
+				y: length === 0 ? 0 : dy / length,
+			}),
+		}));
+	}
 
   onAdded() {
     this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, this.onSomeOnePreCastSpell);
