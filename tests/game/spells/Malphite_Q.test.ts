@@ -61,6 +61,7 @@ const unit = (x: number, teamId: string, speed = 10) => {
     isDead: false,
     canCast: true,
     toRemove: false,
+    willDraw: true,
     targetable: true,
     stats: {
       ...stats,
@@ -112,6 +113,10 @@ const launch = (owner: ReturnType<typeof unit>, target: ReturnType<typeof unit>)
   return owner.game.objects[0] as Malphite_Q_Object;
 };
 
+const arrive = (missile: Malphite_Q_Object) => {
+  for (let i = 0; i < 100 && !missile.toRemove; i++) missile.update();
+};
+
 describe('Malphite Q', () => {
   beforeEach(() => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
@@ -153,6 +158,38 @@ describe('Malphite Q', () => {
     expect(new Malphite_Q(owner).press(castContext(owner, outOfRange))).toBe(false);
   });
 
+  it('rejects unseen targets and cancels when the target leaves sight during cast time', () => {
+    const owner = unit(0, 'blue');
+    owner.game = gameFor();
+    const unseen = unit(100, 'red');
+    unseen.willDraw = false;
+
+    expect(new Malphite_Q(owner).press(castContext(owner, unseen))).toBe(false);
+
+    const target = unit(100, 'red');
+    const spell = new Malphite_Q(owner);
+    const onCancel = vi.spyOn(spell, 'onCancel');
+    expect(spell.press(castContext(owner, target))).toBe(true);
+    target.willDraw = false;
+
+    spell.update();
+
+    expect(onCancel).toHaveBeenCalledWith(expect.anything(), 'TARGET_INVALID');
+    expect(spell.state).toBe('READY');
+    expect(owner.stats.mana.value).toBe(100);
+    expect(owner.game.objects).toEqual([]);
+  });
+
+  it('spawns the shard 100 units toward the selected target', () => {
+    const owner = unit(0, 'blue');
+    owner.game = gameFor();
+    const target = unit(300, 'red');
+
+    const missile = launch(owner, target);
+
+    expect(missile.position).toMatchObject({ x: 100, y: 0 });
+  });
+
   it('follows the selected target instead of the cursor line', () => {
     const owner = unit(0, 'blue');
     owner.game = gameFor();
@@ -160,7 +197,7 @@ describe('Malphite Q', () => {
     const missile = launch(owner, target);
     target.position.set(40, 0);
 
-    missile.update();
+    arrive(missile);
 
     expect(missile).toBeInstanceOf(HomingMissileSpellObject);
     expect(missile.destination).toMatchObject({ x: 40, y: 0 });
@@ -173,7 +210,7 @@ describe('Malphite Q', () => {
     const bystander = unit(10, 'red');
     const missile = launch(owner, target);
 
-    missile.update();
+    arrive(missile);
 
     expect(target.takeDamage).toHaveBeenCalledWith(20, owner);
     expect(target.addBuff).toHaveBeenCalledWith(expect.any(Slow));
@@ -187,7 +224,7 @@ describe('Malphite Q', () => {
     const target = unit(10, 'red', 100);
     const missile = launch(owner, target);
 
-    missile.update();
+    arrive(missile);
 
     const slow = target.buffs.find(buff => buff instanceof Slow) as Slow;
     const speedup = owner.buffs.find(buff => buff instanceof Speedup) as Speedup;
@@ -202,7 +239,7 @@ describe('Malphite Q', () => {
     const target = unit(10, 'red');
     const missile = launch(owner, target);
 
-    missile.update();
+    arrive(missile);
     missile.update();
 
     expect(target.takeDamage).toHaveBeenCalledTimes(1);

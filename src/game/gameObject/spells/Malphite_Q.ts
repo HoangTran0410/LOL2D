@@ -1,5 +1,6 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import VectorUtils from '../../../utils/vector.utils';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
@@ -14,6 +15,7 @@ import TargetResolver from '../../spell/targeting/TargetResolver';
 type MalphiteTarget = HomingTarget & {
   teamId: unknown;
   targetable?: boolean;
+  willDraw: boolean;
   stats: { speed: { value: number } };
   takeDamage(damage: number, attacker: unknown): void;
   addBuff(buff: Slow): void;
@@ -27,6 +29,7 @@ const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
     collisionRadius?: unknown;
     teamId?: unknown;
     targetable?: unknown;
+    willDraw?: unknown;
     isDead?: unknown;
     toRemove?: unknown;
     stats?: { speed?: { value?: unknown } };
@@ -37,6 +40,7 @@ const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
     typeof candidate.collisionRadius === 'number' &&
     candidate.teamId !== undefined &&
     candidate.targetable !== false &&
+    typeof candidate.willDraw === 'boolean' &&
     !candidate.isDead &&
     !candidate.toRemove &&
     typeof candidate.stats?.speed?.value === 'number' &&
@@ -80,7 +84,7 @@ export default class Malphite_Q extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: isMalphiteTarget,
+      isTargetable: candidate => isMalphiteTarget(candidate) && candidate.willDraw,
       getTargetInfo: candidate => isMalphiteTarget(candidate) ? candidate : null,
     });
     return result.ok ? super.press(result.context) : false;
@@ -96,6 +100,12 @@ export default class Malphite_Q extends Spell {
     if (!isMalphiteTarget(context.target)) return;
 
     const obj = new Malphite_Q_Object(this.owner, context.target);
+    obj.position = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      context.target.position,
+      100,
+      false
+    ).to;
     obj.damage = this.damage;
     obj.slowPercent = this.slowPercent;
     obj.slowDuration = this.slowDuration;
@@ -110,6 +120,7 @@ export default class Malphite_Q extends Spell {
 
   private isValidTarget(target: unknown): target is MalphiteTarget {
     return isMalphiteTarget(target) &&
+      target.willDraw &&
       target.teamId !== this.owner.teamId &&
       this.owner.position.dist(target.position) <= this.range;
   }
