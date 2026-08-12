@@ -89,7 +89,7 @@ export default class AIChampion extends Champion {
     if (this._respawnWithNewPreset) {
       let newPreset = getChampionPresetRandom();
       this.avatar = AssetManager.getAsset(newPreset.avatar);
-      this.spells = newPreset.spells.map((Spell: any) => new Spell(this));
+      this.replaceSpells(newPreset.spells.map((Spell: any) => new Spell(this)));
     }
   }
 }

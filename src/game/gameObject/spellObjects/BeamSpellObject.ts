@@ -19,6 +19,7 @@ interface BeamOptions<TTarget extends BeamTarget> {
   hitTest?: (target: TTarget, geometry: BeamGeometry) => boolean;
   onHit?: (target: TTarget) => void;
   instant?: boolean;
+  durationMs?: number;
 }
 
 export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): boolean => {
@@ -39,11 +40,13 @@ export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): bool
 export default class BeamSpellObject<TTarget extends BeamTarget = BeamTarget> extends SpellObject {
   readonly hitTargets = new Set<TTarget>();
   readonly geometry: BeamGeometry;
+  elapsedMs = 0;
   private readonly candidates?: () => Iterable<TTarget>;
   private readonly candidateFilter: (target: TTarget) => boolean;
   private readonly hitTest: (target: TTarget, geometry: BeamGeometry) => boolean;
   private readonly onTargetHit: (target: TTarget) => void;
   private readonly instant: boolean;
+  private readonly durationMs?: number;
 
   constructor(
     owner: SpellObject['owner'],
@@ -57,9 +60,13 @@ export default class BeamSpellObject<TTarget extends BeamTarget = BeamTarget> ex
     this.hitTest = options.hitTest ?? intersectsBeam;
     this.onTargetHit = options.onHit ?? (() => undefined);
     this.instant = options.instant ?? true;
+    if (!this.instant && (!Number.isFinite(options.durationMs) || options.durationMs! <= 0)) {
+      throw new Error('durationMs must be finite and greater than 0');
+    }
+    this.durationMs = options.durationMs;
   }
 
-  update(): void {
+  update(deltaMs = deltaTime): void {
     if (this.toRemove) return;
     for (const target of this.queryCandidates()) {
       if (this.hitTargets.has(target) || !this.candidateFilter(target)) continue;
@@ -67,7 +74,12 @@ export default class BeamSpellObject<TTarget extends BeamTarget = BeamTarget> ex
       this.hitTargets.add(target);
       this.onTargetHit(target);
     }
-    if (this.instant) this.toRemove = true;
+    if (this.instant) {
+      this.toRemove = true;
+    } else {
+      this.elapsedMs = Math.min(this.durationMs!, this.elapsedMs + Math.max(0, deltaMs));
+      if (this.elapsedMs >= this.durationMs!) this.toRemove = true;
+    }
   }
 
   getDisplayBoundingBox(): Rectangle {

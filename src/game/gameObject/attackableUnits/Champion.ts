@@ -53,6 +53,30 @@ export default class Champion extends AttackableUnit {
     this.spells.forEach(spell => spell.update());
   }
 
+  draw() {
+    this.spells.forEach(spell => spell.drawVfx());
+    super.draw();
+  }
+
+  onRemoved() {
+    this.spells.forEach(spell => this.removeSpell(spell));
+  }
+
+  replaceSpells(spells: any[]) {
+    this.spells.forEach(spell => this.removeSpell(spell));
+    this.spells = spells;
+  }
+
+  replaceSpell(index: number, spell: any) {
+    this.removeSpell(this.spells[index]);
+    this.spells[index] = spell;
+  }
+
+  private removeSpell(spell: any) {
+    spell?.deactivate();
+    spell?.onRemoved?.();
+  }
+
   drawHealthBar() {
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;

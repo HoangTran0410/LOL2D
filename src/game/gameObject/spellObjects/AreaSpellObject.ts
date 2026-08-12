@@ -40,9 +40,8 @@ export default class AreaSpellObject<TTarget extends AreaTarget = AreaTarget> ex
     options: AreaOptions<TTarget> = {}
   ) {
     super(owner);
-    if (options.tickEveryMs !== undefined && options.tickEveryMs <= 0) {
-      throw new Error('tickEveryMs must be greater than 0');
-    }
+    this.validateInterval('tickEveryMs', options.tickEveryMs);
+    this.validateInterval('durationMs', options.durationMs);
     this.center = center;
     this.radius = radius;
     this.candidates = options.candidates;
@@ -57,7 +56,10 @@ export default class AreaSpellObject<TTarget extends AreaTarget = AreaTarget> ex
 
   update(deltaMs = deltaTime): void {
     if (this.toRemove) return;
-    const elapsed = Math.max(0, deltaMs);
+    const remainingMs = this.durationMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : Math.max(0, this.durationMs - this.elapsedMs);
+    const elapsed = Math.min(Math.max(0, deltaMs), remainingMs);
     this.elapsedMs += elapsed;
     if (this.radiusAt) this.radius = Math.max(0, this.radiusAt(this.elapsedMs));
 
@@ -112,5 +114,11 @@ export default class AreaSpellObject<TTarget extends AreaTarget = AreaTarget> ex
     return this.game.objectManager.queryObjects({
       area: new Circle({ x: this.center.x, y: this.center.y, r: this.radius }),
     }) as unknown as TTarget[];
+  }
+
+  private validateInterval(field: string, value: number | undefined): void {
+    if (value !== undefined && (!Number.isFinite(value) || value <= 0)) {
+      throw new Error(`${field} must be finite and greater than 0`);
+    }
   }
 }

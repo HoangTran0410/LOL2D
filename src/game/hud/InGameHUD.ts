@@ -137,25 +137,25 @@ export default class InGameHUD {
           const bots = this.game.objectManager.objects.filter((o: any) => o instanceof AIChampion);
 
           if (this.oneForAll) {
-            this.game.player.spells = this.game.player.spells.map(
+            this.game.player.replaceSpells(this.game.player.spells.map(
               () => new spell.spellClass(toRaw(this.game.player))
-            );
+            ));
             bots.forEach((bot: any) => {
               bot._respawnWithNewPreset = false;
-              bot.spells = bot.spells.map(() => new spell.spellClass(toRaw(bot)));
+              bot.replaceSpells(bot.spells.map(() => new spell.spellClass(toRaw(bot))));
             });
           } else if (
             this.spellIndexToSwap >= 0 &&
             this.spellIndexToSwap <= this.game.player.spells.length
           ) {
             const spellInstance = new spell.spellClass(toRaw(this.game.player));
-            this.game.player.spells[this.spellIndexToSwap] = spellInstance;
+            this.game.player.replaceSpell(this.spellIndexToSwap, spellInstance);
 
             bots.forEach((bot: any) => {
               if (this.cloneMySpell) {
                 bot._respawnWithNewPreset = false;
                 const botSpellInstance = new spell.spellClass(toRaw(bot));
-                bot.spells[this.spellIndexToSwap] = botSpellInstance;
+                bot.replaceSpell(this.spellIndexToSwap, botSpellInstance);
               } else {
                 bot._respawnWithNewPreset = true;
               }

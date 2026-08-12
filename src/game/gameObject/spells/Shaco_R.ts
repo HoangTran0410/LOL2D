@@ -37,7 +37,7 @@ export default class Shaco_R extends Spell {
       avatar: this.owner.avatar,
       teamId: this.owner.teamId,
     });
-    clone.spells = [];
+    clone.replaceSpells([]);
     clone.shacoR_championOwner = this.owner;
     clone.shacoR_maxRange = this.maxRange;
     clone.shacoR_lifeTime = this.cloneLifeTime;

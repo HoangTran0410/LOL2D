@@ -84,6 +84,7 @@ export default class Spell {
     this.onUpdate();
     if (this.owner.isDead && !this.runtime.cancel('DEATH')) this.spellVfx?.dispose();
     this.runtime.update(deltaTime);
+    this.syncVfxPhase();
     this.spellVfx?.update(deltaTime);
   }
 
@@ -121,7 +122,9 @@ export default class Spell {
   press(context: CastContext): boolean {
     this._castContext = snapshotContext(context);
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
-    return this.runtime.press(this._castContext);
+    const accepted = this.runtime.press(this._castContext);
+    this.syncVfxPhase();
+    return accepted;
   }
 
   hold(context: CastContext): boolean {
@@ -129,7 +132,9 @@ export default class Spell {
   }
 
   release(context: CastContext): boolean {
-    return this.runtime.release(context);
+    const released = this.runtime.release(context);
+    this.syncVfxPhase();
+    return released;
   }
 
   cancel(reason: CancelReason): boolean {
@@ -203,7 +208,7 @@ export default class Spell {
         onChargeUpdate: (context, elapsedMs, ratio) =>
           this.onChargeUpdate(context, elapsedMs, ratio),
         onRelease: (context) => {
-          this.spellVfx?.release(context, spec.channel !== undefined);
+          this.spellVfx?.release(context);
           this.onRelease(context);
           this.onSpellCast(context);
           this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
@@ -241,6 +246,12 @@ export default class Spell {
   private refundResource(_context: CastContext, _reason: CancelReason): void {
     this.owner.stats.mana.value += this.manaCost;
     this.owner.stats.health.value += this.healthCost;
+  }
+
+  private syncVfxPhase(): void {
+    if (this.runtime.state === 'CHANNELING' && this._castContext) {
+      this.spellVfx?.channel(this._castContext);
+    }
   }
 
   drawPreview(radius?: number): void {

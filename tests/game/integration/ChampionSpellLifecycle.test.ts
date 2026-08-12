@@ -1,0 +1,117 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../../src/managers/AssetManager', () => ({
+  default: { getAsset: vi.fn(() => undefined) },
+}));
+
+const replacementPreset = vi.hoisted(() => ({
+  value: { avatar: 'replacement', spells: [] as Array<new (owner: unknown) => unknown> },
+}));
+
+vi.mock('../../../src/game/preset', () => ({
+  getChampionPresetRandom: () => replacementPreset.value,
+}));
+
+import ObjectManager from '../../../src/game/managers/ObjectManager';
+import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
+
+describe('Champion spell presentation lifecycle', () => {
+  it('draws VFX for every owned spell in the champion world layer', () => {
+    const champion = Object.create(Champion.prototype) as Champion;
+    const first = { drawVfx: vi.fn() };
+    const second = { drawVfx: vi.fn() };
+    champion.spells = [first, second];
+    champion.drawAvatar = vi.fn();
+    champion.drawDir = vi.fn();
+    champion.drawBuffs = vi.fn();
+    champion.drawHealthBar = vi.fn();
+
+    champion.draw();
+
+    expect(first.drawVfx).toHaveBeenCalledOnce();
+    expect(second.drawVfx).toHaveBeenCalledOnce();
+    expect(champion.drawAvatar).toHaveBeenCalledOnce();
+  });
+
+  it('deactivates owned spells through ObjectManager champion removal', () => {
+    const deactivate = vi.fn();
+    const champion = Object.assign(Object.create(Champion.prototype) as Champion, {
+      spells: [{ deactivate }],
+      toRemove: true,
+      update: vi.fn(),
+    });
+    const manager = Object.assign(Object.create(ObjectManager.prototype) as ObjectManager, {
+      objects: [champion],
+      _objectToBeAdd: [],
+      _deadBuffer: [],
+      _objectsTreeIsUpdating: false,
+      _objectsTree: { clear: vi.fn(), insert: vi.fn() },
+    });
+
+    manager.update();
+
+    expect(deactivate).toHaveBeenCalledOnce();
+    expect(manager.objects).toEqual([]);
+  });
+
+  it('deactivates old spells when an AI respawn replaces its preset', () => {
+    const deactivate = vi.fn();
+    class ReplacementSpell {
+      constructor(readonly owner: unknown) {}
+    }
+    replacementPreset.value = { avatar: 'replacement', spells: [ReplacementSpell] };
+    const position = { x: 0, y: 0, set: vi.fn() };
+    const champion = Object.assign(Object.create(AIChampion.prototype) as AIChampion, {
+      spells: [{ deactivate }],
+      _respawnWithNewPreset: true,
+      stats: { health: { baseValue: 0 }, maxHealth: { value: 100 } },
+      deathData: { reviveAfter: 0 },
+      game: { randomSpawnPoint: () => ({ x: 5, y: 6 }) },
+      position,
+      destination: { ...position, set: vi.fn() },
+    });
+
+    champion.respawn();
+
+    expect(deactivate).toHaveBeenCalledOnce();
+    expect(champion.spells).toHaveLength(1);
+    expect(champion.spells[0]).toBeInstanceOf(ReplacementSpell);
+  });
+
+  it('deactivates both array and slot replacements', () => {
+    const first = { deactivate: vi.fn(), onRemoved: vi.fn() };
+    const second = { deactivate: vi.fn(), onRemoved: vi.fn() };
+    const champion = Object.assign(Object.create(Champion.prototype) as Champion, {
+      spells: [first, second],
+    });
+    const replacement = { deactivate: vi.fn(), onRemoved: vi.fn() };
+
+    champion.replaceSpell(0, replacement);
+    champion.replaceSpells([]);
+
+    expect(first.deactivate).toHaveBeenCalledOnce();
+    expect(first.onRemoved).toHaveBeenCalledOnce();
+    expect(replacement.deactivate).toHaveBeenCalledOnce();
+    expect(replacement.onRemoved).toHaveBeenCalledOnce();
+    expect(second.deactivate).toHaveBeenCalledOnce();
+    expect(second.onRemoved).toHaveBeenCalledOnce();
+  });
+
+  it('routes production spell replacement through Champion cleanup', () => {
+    const files = [
+      '../../../src/game/gameObject/attackableUnits/AIChampion.ts',
+      '../../../src/game/gameObject/spells/Shaco_R.ts',
+      '../../../src/game/hud/InGameHUD.ts',
+    ];
+    const directAssignments = files.flatMap(relativePath =>
+      readFileSync(fileURLToPath(new URL(relativePath, import.meta.url)), 'utf8')
+        .split('\n')
+        .filter(line => /(?:game\.player|bot|clone)\.spells(?:\[[^\]]+\])?\s*=/.test(line))
+    );
+
+    expect(directAssignments).toEqual([]);
+  });
+});
