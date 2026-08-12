@@ -1,0 +1,106 @@
+import AssetManager from '../../../managers/AssetManager';
+import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
+import MissileSpellObject from '../MissileSpellObject';
+import Spell from '../Spell';
+import Slow from '../buffs/Slow';
+import CastBar from '../../vfx/CastBar';
+
+const MAX_CHARGE_MS = 4_000;
+const RANGE_CHARGE_MS = 1_500;
+const DAMAGE_CHARGE_MS = 1_250;
+const MIN_RANGE = 895;
+const MAX_RANGE = 1_595;
+
+export default class Varus_Q extends Spell {
+  image = AssetManager.getAsset('spell_varus_q');
+  name = 'Mũi Tên Xuyên Phá (Varus_Q)';
+  description = 'Giữ để tích lực rồi bắn một mũi tên xuyên theo hướng con trỏ.';
+  coolDown = 12_000;
+  manaCost = 50;
+
+  private chargeMs = 0;
+  private aimContext?: CastContext;
+  private chargeSlow?: Slow;
+
+  protected get castSpec(): CastSpec {
+    return {
+      activation: 'HOLD_RELEASE',
+      targeting: 'DIRECTION',
+      charge: { maxDurationMs: MAX_CHARGE_MS, releaseAtMax: false },
+      resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'SILENCE', 'STUN'] },
+      cooldown: { startAt: 'end', durationMs: this.coolDown },
+      interrupts: { move: false },
+      vfx: { castLoop: context => new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS) },
+    };
+  }
+
+  hold(context: CastContext): boolean {
+    this.aimContext = context;
+    return super.hold(context);
+  }
+
+  onCastStart(context: CastContext): void {
+    this.chargeMs = 0;
+    this.aimContext = context;
+    this.chargeSlow = new Slow(MAX_CHARGE_MS, this.owner, this.owner);
+    this.chargeSlow.percent = 0.2;
+    this.chargeSlow.stackId = 'varus_q_charge_slow';
+    this.owner.addBuff(this.chargeSlow);
+  }
+
+  onChargeUpdate(_context: CastContext, elapsedMs: number): void {
+    this.chargeMs = elapsedMs;
+  }
+
+  onRelease(context: CastContext): void {
+    this.removeChargeSlow();
+    const aim = this.aimContext ?? context;
+    const range = this.rangeAt(this.chargeMs);
+    const origin = this.owner.position;
+    const direction = this.directionTo(aim, origin.x, origin.y);
+    const arrow = new Varus_Q_Arrow(this.owner);
+    arrow.destination = createVector(origin.x + direction.x * range, origin.y + direction.y * range);
+    arrow.damage = this.damageAt(this.chargeMs);
+    this.game.objectManager.addObject(arrow);
+  }
+
+  onCancel(_context: CastContext, reason: CancelReason): void {
+    this.removeChargeSlow();
+    if (reason === 'MAX_DURATION' || reason === 'SILENCE' || reason === 'STUN') {
+      this.owner.stats.mana.value -= this.manaCost / 2;
+    }
+  }
+
+  private rangeAt(elapsedMs: number): number {
+    return MIN_RANGE + (MAX_RANGE - MIN_RANGE) * Math.min(1, elapsedMs / RANGE_CHARGE_MS);
+  }
+
+  private damageAt(elapsedMs: number): number {
+    return 20 + 10 * Math.min(1, elapsedMs / DAMAGE_CHARGE_MS);
+  }
+
+  private directionTo(context: CastContext, x: number, y: number): { x: number; y: number } {
+    const dx = context.cursorWorld.x - x;
+    const dy = context.cursorWorld.y - y;
+    const length = Math.hypot(dx, dy);
+    return length === 0 ? context.direction : { x: dx / length, y: dy / length };
+  }
+
+  private removeChargeSlow(): void {
+    this.chargeSlow?.deactivateBuff();
+    this.chargeSlow = undefined;
+  }
+}
+
+export class Varus_Q_Arrow extends MissileSpellObject {
+  image = AssetManager.getAsset('spell_varus_q');
+  speed = 16;
+  size = 70;
+  maxHitCount = Infinity;
+  damage = 20;
+
+  onHit(enemy: { takeDamage(damage: number, owner: unknown): void }): void {
+    const reduction = Math.min(0.67, this.hitTargets.length > 1 ? (this.hitTargets.length - 1) * 0.15 : 0);
+    enemy.takeDamage(this.damage * (1 - reduction), this.owner);
+  }
+}

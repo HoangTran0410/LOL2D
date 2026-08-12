@@ -71,3 +71,5 @@ export { default as Singed_W } from './Singed_W';
 export { default as Cassiopeia_W } from './Cassiopeia_W';
 export { default as Fizz_E } from './Fizz_E';
 export { default as Nasus_Q } from './Nasus_Q';
+export { default as Varus_Q } from './Varus_Q';
+export { default as Pantheon_Q } from './Pantheon_Q';
