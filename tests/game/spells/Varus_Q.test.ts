@@ -40,7 +40,10 @@ describe('Varus Q', () => {
     expect(spell.state).toBe('CHARGING');
     spell.release(context(1, 0));
 
-    expect(caster.objects[0]).toBeInstanceOf(Varus_Q_Arrow);
+    const arrow = caster.objects[0] as Varus_Q_Arrow;
+    expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
+    expect(arrow.destination).toMatchObject({ x: 825, y: 0 });
+    expect(arrow.size).toBe(140);
     expect(spell.state).toBe('COOLDOWN');
   });
 
@@ -55,8 +58,18 @@ describe('Varus Q', () => {
 
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow.destination).toMatchObject({ x: 0 });
-    expect(arrow.destination.y).toBeCloseTo(1_478.33, 2);
+    expect(arrow.destination.y).toBeCloseTo(1_408.33, 2);
     expect(arrow.damage).toBe(30);
+  });
+
+  it('caps missile center travel at 1525 after range finishes charging', () => {
+    const caster = owner();
+    const spell = new Varus_Q(caster);
+    spell.press(context(1, 0));
+    spell.onChargeUpdate(context(1, 0), 1_500, 1);
+    spell.release(context(1, 0));
+
+    expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(1_525);
   });
 
   it('applies and removes its researched self slow', () => {

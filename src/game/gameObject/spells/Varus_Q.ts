@@ -8,8 +8,8 @@ import CastBar from '../../vfx/CastBar';
 const MAX_CHARGE_MS = 4_000;
 const RANGE_CHARGE_MS = 1_500;
 const DAMAGE_CHARGE_MS = 1_250;
-const MIN_RANGE = 895;
-const MAX_RANGE = 1_595;
+const MIN_CENTER_TRAVEL = 825;
+const MAX_CENTER_TRAVEL = 1_525;
 
 export default class Varus_Q extends Spell {
   image = AssetManager.getAsset('spell_varus_q');
@@ -72,7 +72,8 @@ export default class Varus_Q extends Spell {
   }
 
   private rangeAt(elapsedMs: number): number {
-    return MIN_RANGE + (MAX_RANGE - MIN_RANGE) * Math.min(1, elapsedMs / RANGE_CHARGE_MS);
+    return MIN_CENTER_TRAVEL +
+      (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * Math.min(1, elapsedMs / RANGE_CHARGE_MS);
   }
 
   private damageAt(elapsedMs: number): number {
@@ -95,7 +96,7 @@ export default class Varus_Q extends Spell {
 export class Varus_Q_Arrow extends MissileSpellObject {
   image = AssetManager.getAsset('spell_varus_q');
   speed = 16;
-  size = 70;
+  size = 140;
   maxHitCount = Infinity;
   damage = 20;
 

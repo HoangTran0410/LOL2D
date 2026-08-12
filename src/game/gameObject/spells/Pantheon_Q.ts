@@ -5,6 +5,8 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
 import CastBar from '../../vfx/CastBar';
+import AttackableUnit from '../attackableUnits/AttackableUnit';
+import Monster from '../attackableUnits/Monster';
 
 const HOLD_THRESHOLD_MS = 350;
 const MAX_CHARGE_MS = 4_000;
@@ -12,8 +14,17 @@ const RANGE = 1_200;
 
 interface SpearTarget extends BeamTarget {
   readonly stats: { health: { value: number }; maxHealth: { value: number } };
+  readonly unitType?: 'minion';
   takeDamage(damage: number, owner: unknown): void;
 }
+
+const damageMultiplier = (target: SpearTarget): number =>
+  target instanceof Monster ? 0.8 : target.unitType === 'minion' ? 0.7 : 1;
+
+const spearDamage = (target: SpearTarget, subsequent: boolean): number => {
+  const executeMultiplier = target.stats.health.value < target.stats.maxHealth.value * 0.2 ? 2 : 1;
+  return 20 * damageMultiplier(target) * executeMultiplier * (subsequent ? 0.5 : 1);
+};
 
 export default class Pantheon_Q extends Spell {
   image = AssetManager.getAsset('spell_pantheon_q');
@@ -25,6 +36,7 @@ export default class Pantheon_Q extends Spell {
   private chargeMs = 0;
   private chargeSlow?: Slow;
   private wasThrust = false;
+  private castDirection: Vec2 = { x: 0, y: 0 };
 
   protected get castSpec(): CastSpec {
     return {
@@ -38,9 +50,10 @@ export default class Pantheon_Q extends Spell {
     };
   }
 
-  onCastStart(_context: CastContext): void {
+  onCastStart(context: CastContext): void {
     this.chargeMs = 0;
     this.wasThrust = false;
+    this.castDirection = context.direction;
     this.chargeSlow = new Slow(MAX_CHARGE_MS, this.owner, this.owner);
     this.chargeSlow.percent = 0.1;
     this.chargeSlow.stackId = 'pantheon_q_charge_slow';
@@ -51,10 +64,10 @@ export default class Pantheon_Q extends Spell {
     this.chargeMs = elapsedMs;
   }
 
-  onRelease(context: CastContext): void {
+  onRelease(_context: CastContext): void {
     this.removeChargeSlow();
     const start = { x: this.owner.position.x, y: this.owner.position.y };
-    const direction = this.directionTo(context, start);
+    const direction = this.castDirection;
     if (this.chargeMs <= HOLD_THRESHOLD_MS) {
       this.createThrust(start, direction);
       this.wasThrust = true;
@@ -79,23 +92,18 @@ export default class Pantheon_Q extends Spell {
 
   private createThrust(start: Vec2, direction: Vec2): void {
     const beam = new BeamSpellObject<SpearTarget>(this.owner, {
-      start,
+      start: { x: start.x - direction.x * 40, y: start.y - direction.y * 40 },
       end: { x: start.x + direction.x * 560, y: start.y + direction.y * 560 },
       width: 120,
-    }, { onHit: target => this.damage(target, 20) });
+    }, {
+      candidateFilter: target =>
+        target instanceof AttackableUnit &&
+        target.targetable &&
+        !target.isDead &&
+        target.teamId !== this.owner.teamId,
+      onHit: target => target.takeDamage(spearDamage(target, false), this.owner),
+    });
     this.game.objectManager.addObject(beam);
-  }
-
-  private directionTo(context: CastContext, origin: Vec2): Vec2 {
-    const dx = context.cursorWorld.x - origin.x;
-    const dy = context.cursorWorld.y - origin.y;
-    const length = Math.hypot(dx, dy);
-    return length === 0 ? context.direction : { x: dx / length, y: dy / length };
-  }
-
-  private damage(target: SpearTarget, baseDamage: number): void {
-    const execute = target.stats.health.value < target.stats.maxHealth.value * 0.2;
-    target.takeDamage(execute ? baseDamage * 2 : baseDamage, this.owner);
   }
 
   private removeChargeSlow(): void {
@@ -111,8 +119,6 @@ export class Pantheon_Q_Spear extends MissileSpellObject {
   maxHitCount = Infinity;
 
   onHit(enemy: SpearTarget): void {
-    const baseDamage = this.hitTargets.length === 1 ? 20 : 10;
-    const execute = enemy.stats.health.value < enemy.stats.maxHealth.value * 0.2;
-    enemy.takeDamage(execute ? baseDamage * 2 : baseDamage, this.owner);
+    enemy.takeDamage(spearDamage(enemy, this.hitTargets.length > 1), this.owner);
   }
 }
