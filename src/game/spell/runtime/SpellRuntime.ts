@@ -53,16 +53,21 @@ const validateTickInterval = (field: string, value: number | undefined): void =>
 
 const validateSpec = (spec: CastSpec): void => {
   validateTickInterval('channel.tickEveryMs', spec.channel?.tickEveryMs);
-  validateTickInterval('resource.tickEveryMs', spec.resource.tickEveryMs);
-
-  if (
-    (spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD') &&
-    !spec.charge
-  ) {
-    throw new Error(`${spec.activation} activation requires charge`);
+  if (spec.resource.commitAt === 'tick') {
+    if (spec.resource.tickEveryMs === undefined) {
+      throw new Error('resource.tickEveryMs is required when commitAt is tick');
+    }
+    validateTickInterval('resource.tickEveryMs', spec.resource.tickEveryMs);
+  } else if (spec.resource.tickEveryMs !== undefined) {
+    throw new Error('resource.tickEveryMs is only valid when commitAt is tick');
   }
-  if (spec.activation === 'PRESS' && spec.charge) {
-    throw new Error('PRESS activation does not support charge');
+
+  const acceptsCharge =
+    spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD';
+  if (acceptsCharge) {
+    if (!spec.charge) throw new Error(`${spec.activation} activation requires charge`);
+  } else if (spec.charge) {
+    throw new Error(`${spec.activation} activation does not support charge`);
   }
 };
 
@@ -214,7 +219,10 @@ export class SpellRuntime {
     if (!this.context || this.terminal) return;
     this.elapsedMs = 0;
     this.resourceElapsedMs = 0;
-    this.nextResourceTickMs = this.spec.resource.tickEveryMs ?? Number.POSITIVE_INFINITY;
+    this.nextResourceTickMs =
+      this.spec.resource.commitAt === 'tick'
+        ? this.spec.resource.tickEveryMs!
+        : Number.POSITIVE_INFINITY;
 
     if (this.spec.channel) {
       this._state = 'CHANNELING';
@@ -248,6 +256,7 @@ export class SpellRuntime {
           ? this.nextChannelTickMs
           : Number.POSITIVE_INFINITY;
       const nextResourceTick =
+        this.spec.resource.commitAt === 'tick' &&
         this.nextResourceTickMs <= this.resourceElapsedMs
           ? this.nextResourceTickMs
           : Number.POSITIVE_INFINITY;
@@ -271,7 +280,10 @@ export class SpellRuntime {
       maxDurationMs === undefined ? this.elapsedMs : Math.min(this.elapsedMs, maxDurationMs);
     this.resourceElapsedMs += Math.max(0, boundedElapsedMs - previousElapsedMs);
 
-    while (this.nextResourceTickMs <= this.resourceElapsedMs) {
+    while (
+      this.spec.resource.commitAt === 'tick' &&
+      this.nextResourceTickMs <= this.resourceElapsedMs
+    ) {
       if (!this.commitResource('tick')) return;
       this.nextResourceTickMs += this.spec.resource.tickEveryMs!;
     }

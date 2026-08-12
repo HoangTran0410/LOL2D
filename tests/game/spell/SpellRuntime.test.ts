@@ -362,6 +362,45 @@ describe('SpellRuntime', () => {
     ).toThrow('PRESS activation does not support charge');
   });
 
+  it.each(['RECAST', 'TOGGLE'] as const)(
+    'rejects charge configuration for %s activation',
+    (activation) => {
+      const { delegate } = fakeDelegate();
+
+      expect(
+        () =>
+          new SpellRuntime(
+            spec({ activation, charge: { maxDurationMs: 500, releaseAtMax: false } }),
+            delegate
+          )
+      ).toThrow(`${activation} activation does not support charge`);
+    }
+  );
+
+  it('requires a cadence for tick resource commitment', () => {
+    const { delegate } = fakeDelegate();
+
+    expect(
+      () =>
+        new SpellRuntime(
+          spec({ active: {}, resource: { commitAt: 'tick', refundOn: [] } }),
+          delegate
+        )
+    ).toThrow('resource.tickEveryMs is required when commitAt is tick');
+  });
+
+  it('rejects resource tick cadence for non-tick commitment', () => {
+    const { delegate } = fakeDelegate();
+
+    expect(
+      () =>
+        new SpellRuntime(
+          spec({ resource: { commitAt: 'start', refundOn: [], tickEveryMs: 100 } }),
+          delegate
+        )
+    ).toThrow('resource.tickEveryMs is only valid when commitAt is tick');
+  });
+
   it('enters CHARGING for TAP_OR_HOLD activation', () => {
     const { delegate } = fakeDelegate();
     const runtime = new SpellRuntime(
