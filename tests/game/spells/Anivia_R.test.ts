@@ -104,17 +104,51 @@ describe('Anivia R', () => {
     expect(spell.state).toBe('ACTIVE');
   });
 
-  it('grows and applies damage and slow on imported tick cadence', () => {
+  it('applies the initial damage and slow tick at 0ms', () => {
     const { spell, added, enemy } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
-    added[0].update(500);
-    added[0].update(1_000);
-    added[0].update(500);
+
+    expect(added[0].radius).toBe(200);
+    expect(enemy.damage).toEqual([4]);
+    expect(enemy.buffs).toHaveLength(1);
+  });
+
+  it('grows and empowers damage and slow at exactly 1500ms', () => {
+    const { spell, added, enemy } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].update(1_500);
 
     expect(added[0].radius).toBe(400);
     expect(enemy.damage).toEqual([4, 4, 4, 12]);
-    expect(enemy.buffs).toHaveLength(5);
+    expect(enemy.buffs).toHaveLength(4);
+    expect(enemy.buffs.at(-1)).toMatchObject({ percent: 0.75, duration: 1_500 });
+  });
+
+  it('uses each due tick radius when catching up a long frame', () => {
+    const { spell, added, enemy } = setup();
+    enemy.position.x = 450;
+
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].update(1_500);
+
+    expect(enemy.damage).toEqual([12]);
+    expect(enemy.buffs).toHaveLength(1);
+  });
+
+  it('queries the imported 200 267 333 and 400 radius checkpoints', () => {
+    const { spell, owner, added } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].update(1_500);
+
+    const radii = owner.game.objectManager.queryObjects.mock.calls
+      .map(([query]) => query.area.r as number);
+    expect(radii).toContain(200);
+    expect(radii).toContain(267);
+    expect(radii).toContain(333);
+    expect(radii).toContain(400);
   });
 
   it('drains mana through the central tick resource policy', () => {
@@ -128,13 +162,14 @@ describe('Anivia R', () => {
   });
 
   it('ends after a permitted second press', () => {
-    const { spell, added } = setup();
+    const { spell, added, enemy } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
     spell.press(context({ x: 100, y: 0 }));
 
     expect(spell.state).toBe('COOLDOWN');
     expect(added[0].toRemove).toBe(true);
+    expect(enemy.damage).toEqual([4, 4]);
   });
 
   it.each([
@@ -164,6 +199,6 @@ describe('Anivia R', () => {
 
     expect(spell.currentCooldown).toBe(spell.coolDown);
     expect(added[0].members?.size).toBe(0);
-    expect(enemy.damage).toEqual([4, 4]);
+    expect(enemy.damage).toEqual([4, 4, 4]);
   });
 });

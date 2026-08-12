@@ -18,6 +18,8 @@ const NORMAL_DAMAGE = 4;
 const EMPOWERED_DAMAGE = 12;
 const NORMAL_SLOW = 0.5;
 const EMPOWERED_SLOW = 0.75;
+const stormRadiusAt = (elapsedMs: number): number =>
+  Math.round(START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS));
 
 interface StormTarget extends AreaTarget {
   addBuff(buff: Slow): void;
@@ -49,6 +51,7 @@ export default class Anivia_R extends Spell {
     const center = this.pointInRange(context.cursorWorld);
     const storm = new Anivia_R_Object(this.owner, center);
     this.activeStorm = storm;
+    storm.activate();
     this.game.objectManager.addObject(storm);
   }
 
@@ -109,9 +112,14 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
           area: new Circle({ x: center.x, y: center.y, r: END_RADIUS }),
           filters: [PredefinedFilters.canTakeDamageFromTeam(owner.teamId)],
         }) as unknown as Iterable<StormTarget>,
-      radiusAt: elapsedMs =>
-        START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS),
+      radiusAt: stormRadiusAt,
     });
+  }
+
+  activate(): void {
+    this.refreshMembers(START_RADIUS);
+    this.applyDamage(0, this.members);
+    this.applySlow(0, this.members);
   }
 
   update(deltaMs = deltaTime): void {
@@ -119,17 +127,22 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     super.update(deltaMs);
     const elapsedMs = this.elapsedMs;
     while (this.nextDamageAtMs <= elapsedMs) {
-      if (this.nextDamageAtMs > previousElapsedMs) this.applyDamage(this.nextDamageAtMs);
+      if (this.nextDamageAtMs > previousElapsedMs) {
+        this.applyDamage(this.nextDamageAtMs, this.targetsAt(this.radiusAt(this.nextDamageAtMs)));
+      }
       this.nextDamageAtMs += DAMAGE_TICK_MS;
     }
     while (this.nextSlowAtMs <= elapsedMs) {
-      if (this.nextSlowAtMs > previousElapsedMs) this.applySlow(this.nextSlowAtMs);
+      if (this.nextSlowAtMs > previousElapsedMs) {
+        this.applySlow(this.nextSlowAtMs, this.targetsAt(this.radiusAt(this.nextSlowAtMs)));
+      }
       this.nextSlowAtMs += this.nextSlowAtMs >= GROWTH_MS ? SLOW_TICK_MS : DAMAGE_TICK_MS;
     }
   }
 
   applyFinalTick(): void {
-    this.applyDamage(this.elapsedMs);
+    this.refreshMembers(this.radius);
+    this.applyDamage(this.elapsedMs, this.members);
   }
 
   draw(): void {
@@ -151,9 +164,29 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     pop();
   }
 
-  private applySlow(atMs: number): void {
-    const empowered = atMs > GROWTH_MS;
-    for (const target of this.members) {
+  private radiusAt(atMs: number): number {
+    return stormRadiusAt(atMs);
+  }
+
+  private targetsAt(radius: number): StormTarget[] {
+    const candidates = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.center.x, y: this.center.y, r: radius }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+    }) as unknown as StormTarget[];
+    return candidates.filter(target =>
+      Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
+        radius + target.collisionRadius
+    );
+  }
+
+  private refreshMembers(radius: number): void {
+    this.members.clear();
+    for (const target of this.targetsAt(radius)) this.members.add(target);
+  }
+
+  private applySlow(atMs: number, targets: Iterable<StormTarget>): void {
+    const empowered = atMs >= GROWTH_MS;
+    for (const target of targets) {
       const slow = new Slow(empowered ? 1_500 : 1_000, this.owner, target);
       slow.percent = empowered ? EMPOWERED_SLOW : NORMAL_SLOW;
       slow.buffAddType = BuffAddType.RENEW_EXISTING;
@@ -162,8 +195,8 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     }
   }
 
-  private applyDamage(atMs: number): void {
-    const damage = atMs > GROWTH_MS ? EMPOWERED_DAMAGE : NORMAL_DAMAGE;
-    for (const target of this.members) target.takeDamage(damage, this.owner);
+  private applyDamage(atMs: number, targets: Iterable<StormTarget>): void {
+    const damage = atMs >= GROWTH_MS ? EMPOWERED_DAMAGE : NORMAL_DAMAGE;
+    for (const target of targets) target.takeDamage(damage, this.owner);
   }
 }
