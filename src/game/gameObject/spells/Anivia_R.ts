@@ -36,14 +36,14 @@ export default class Anivia_R extends Spell {
   range = TETHER_RANGE;
   activeStorm?: Anivia_R_Object;
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'TOGGLE',
       targeting: 'POINT',
       active: {},
       resource: { commitAt: 'tick', refundOn: [], tickEveryMs: DAMAGE_TICK_MS },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false },
+      interrupts: { move: false, displacement: false },
     };
   }
 
@@ -69,8 +69,7 @@ export default class Anivia_R extends Spell {
 
   onUpdate(): void {
     if (this.state !== 'ACTIVE' || !this.activeStorm) return;
-    if (!this.owner.canCast) this.cancel('SILENCE');
-    else if (this.distanceToStorm() > TETHER_RANGE) this.cancel('OUT_OF_RANGE');
+    if (this.distanceToStorm() > TETHER_RANGE) this.cancel('OUT_OF_RANGE');
   }
 
   drawPreview(): void {

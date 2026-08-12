@@ -86,7 +86,7 @@ export default class Lux_R extends Spell {
   private castLock?: Lux_R_CastLock;
   private sightObjects: Lux_R_Vision[] = [];
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
       targeting: 'DIRECTION',

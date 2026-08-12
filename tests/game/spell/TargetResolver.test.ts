@@ -42,8 +42,8 @@ describe('TargetResolver', () => {
   });
 
   it('selects the nearest valid UNIT target under the cursor', () => {
-    const farther = { position: { x: 20, y: 20 }, teamId: 'red', targetable: true };
-    const nearer = { position: { x: 14, y: 24 }, teamId: 'red', targetable: true };
+    const farther = { position: { x: 20, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 8 };
+    const nearer = { position: { x: 14, y: 24 }, teamId: 'red', targetable: true, selectionRadius: 8 };
     const queryCandidates = vi.fn(() => [farther, nearer]);
 
     const result = TargetResolver.resolve('UNIT', baseRequest({
@@ -59,10 +59,28 @@ describe('TargetResolver', () => {
     expect(result).toMatchObject({ ok: true, context: { target: nearer } });
   });
 
+  it('requires the cursor to intersect a UNIT selection radius before eligibility checks', () => {
+    const enemy = {
+      position: { x: 30, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      selectionRadius: 5,
+    };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      cursorWorld: { x: 10, y: 20 },
+      range: 100,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [enemy],
+      getTargetInfo: candidate => candidate as typeof enemy,
+      isTargetable: candidate => (candidate as typeof enemy).targetable,
+    }))).toEqual({ ok: false, reason: 'TARGET_INVALID' });
+  });
+
   it('rejects enemy, range, or targetability violations', () => {
-    const enemy = { position: { x: 11, y: 20 }, teamId: 'red', targetable: true };
-    const farAlly = { position: { x: 100, y: 20 }, teamId: 'blue', targetable: true };
-    const hiddenAlly = { position: { x: 12, y: 20 }, teamId: 'blue', targetable: false };
+    const enemy = { position: { x: 11, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 20 };
+    const farAlly = { position: { x: 100, y: 20 }, teamId: 'blue', targetable: true, selectionRadius: 100 };
+    const hiddenAlly = { position: { x: 12, y: 20 }, teamId: 'blue', targetable: false, selectionRadius: 20 };
     const request = baseRequest({
       cursorWorld: { x: 12, y: 20 },
       range: 20,

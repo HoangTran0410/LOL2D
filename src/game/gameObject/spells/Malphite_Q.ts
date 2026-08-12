@@ -11,6 +11,7 @@ import HomingMissileSpellObject, {
 } from '../spellObjects/HomingMissileSpellObject';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
+import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 
 type MalphiteTarget = HomingTarget & {
   teamId: unknown;
@@ -62,13 +63,29 @@ export default class Malphite_Q extends Spell {
   slowDuration = 3000;
   speedupDuration = 3000;
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
       targeting: 'UNIT',
       castTimeMs: 250,
       resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
+    };
+  }
+
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {
+      range: this.range,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => isMalphiteTarget(candidate) && candidate.willDraw,
+      getTargetInfo: candidate => isMalphiteTarget(candidate) ? {
+        position: candidate.position,
+        teamId: candidate.teamId,
+        selectionRadius: candidate.animatedValues?.displaySize
+          ? candidate.animatedValues.displaySize / 2
+          : candidate.collisionRadius,
+      } : null,
     };
   }
 
@@ -81,11 +98,7 @@ export default class Malphite_Q extends Spell {
     const result = TargetResolver.resolve('UNIT', {
       ...context,
       casterTeamId: this.owner.teamId,
-      range: this.range,
-      targetTeam: 'ENEMY',
-      queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isMalphiteTarget(candidate) && candidate.willDraw,
-      getTargetInfo: candidate => isMalphiteTarget(candidate) ? candidate : null,
+      ...this.targetingRequest,
     });
     return result.ok ? super.press(result.context) : false;
   }

@@ -3,6 +3,8 @@ import EventType from '../enums/EventType';
 import SpellState from '../enums/SpellState';
 import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
 import SpellVfx from '../vfx/SpellVfx';
+import StatusFlags from '../enums/StatusFlags';
+import type { TargetingRequest } from '../spell/targeting/TargetResolver';
 import type {
   CancelReason,
   CastContext,
@@ -47,6 +49,10 @@ export default class Spell {
   private spellRuntime?: SpellRuntime;
   private spellVfx?: SpellVfx;
   private _castContext?: CastContext;
+  private ownerSnapshot?: {
+    position: { x: number; y: number };
+    destination?: { x: number; y: number };
+  };
 
   constructor(owner: any) {
     this.owner = owner;
@@ -82,13 +88,12 @@ export default class Spell {
 
   update(): void {
     this.onUpdate();
+    this.observeInterrupts();
+    this.runtime.update(deltaTime);
     if (this.owner.isDead) {
-      this.runtime.cancel('DEATH');
-      this.runtime.update(deltaTime);
       this.spellVfx?.dispose();
       return;
     }
-    this.runtime.update(deltaTime);
     this.syncVfxPhase();
     this.spellVfx?.update(deltaTime);
   }
@@ -128,6 +133,7 @@ export default class Spell {
     this._castContext = snapshotContext(context);
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     const accepted = this.runtime.press(this._castContext);
+    if (accepted) this.snapshotOwner();
     this.syncVfxPhase();
     return accepted;
   }
@@ -164,11 +170,15 @@ export default class Spell {
 
   // Notes: Deactivate is never called as spell removal hasn't been added yet.
   deactivate(): void {
+    this.runtime.cancel('SCENE_EXIT');
     this.resetCoolDown();
     this.spellVfx?.dispose();
   }
 
-  onRemoved(): void { this.spellVfx?.dispose(); }
+  onRemoved(): void {
+    this.runtime.cancel('SCENE_EXIT');
+    this.spellVfx?.dispose();
+  }
 
   resetCoolDown(): void {
     this.currentCooldown = 0;
@@ -190,9 +200,11 @@ export default class Spell {
   onCancel(_context: CastContext, _reason: CancelReason): void {}
   onComplete(_context: CastContext): void {}
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return legacyCastSpec(this.coolDown);
   }
+
+  get targetingRequest(): Readonly<TargetingRequest> { return {}; }
 
   protected playImpactVfx(context: CastContext): void {
     this.spellVfx?.impact(context);
@@ -200,7 +212,7 @@ export default class Spell {
 
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
-      const spec = this.castSpec;
+      const spec = this.castSpec as CastSpec;
       this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
         canStart: (context) => this.canStart(context),
@@ -249,14 +261,66 @@ export default class Spell {
     ) {
       return false;
     }
-    this.owner.stats.mana.value -= this.manaCost;
-    this.owner.stats.health.value -= this.healthCost;
+    this.changeResource(this.owner.stats.mana, -this.manaCost);
+    this.changeResource(this.owner.stats.health, -this.healthCost);
     return true;
   }
 
   private refundResource(_context: CastContext, _reason: CancelReason): void {
-    this.owner.stats.mana.value += this.manaCost;
-    this.owner.stats.health.value += this.healthCost;
+    this.changeResource(this.owner.stats.mana, this.manaCost);
+    this.changeResource(this.owner.stats.health, this.healthCost);
+  }
+
+  protected changeResource(
+    resource: { value: number; baseValue?: number; current?: number },
+    amount: number
+  ): void {
+    if (typeof resource.baseValue === 'number') resource.baseValue += amount;
+    else if (typeof resource.current === 'number') resource.current += amount;
+    else resource.value += amount;
+  }
+
+  private observeInterrupts(): void {
+    if (!['CASTING', 'CHARGING', 'CHANNELING', 'ACTIVE'].includes(this.runtime.state)) return;
+    if (this.owner.isDead) {
+      this.runtime.cancel('DEATH');
+      return;
+    }
+
+    const status = typeof this.owner.status === 'number' ? this.owner.status : 0;
+    if ((status & (StatusFlags.Stunned | StatusFlags.Suppressed)) !== 0) {
+      this.runtime.cancel('STUN');
+    } else if ((status & StatusFlags.Silenced) !== 0 || !this.owner.canCast) {
+      this.runtime.cancel('SILENCE');
+    } else if (this.ownerSnapshot) {
+      const { position, destination } = this.ownerSnapshot;
+      const currentPosition = this.owner.position;
+      const currentDestination = this.owner.destination;
+      const destinationChanged = destination && currentDestination &&
+        (currentDestination.x !== destination.x || currentDestination.y !== destination.y);
+      const positionChanged = currentPosition.x !== position.x || currentPosition.y !== position.y;
+      if (destinationChanged || (positionChanged && destination &&
+          (destination.x !== position.x || destination.y !== position.y))) {
+        this.runtime.cancel('MOVE');
+      } else if (positionChanged) {
+        this.runtime.cancel('DISPLACEMENT');
+      }
+      if (destination && currentDestination) {
+        destination.x = currentDestination.x;
+        destination.y = currentDestination.y;
+      }
+      position.x = currentPosition.x;
+      position.y = currentPosition.y;
+    }
+  }
+
+  private snapshotOwner(): void {
+    const position = this.owner.position;
+    const destination = this.owner.destination;
+    this.ownerSnapshot = {
+      position: { x: position.x, y: position.y },
+      ...(destination ? { destination: { x: destination.x, y: destination.y } } : {}),
+    };
   }
 
   private syncVfxPhase(): void {

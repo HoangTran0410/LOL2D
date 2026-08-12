@@ -55,7 +55,7 @@ export default class Janna_R extends Spell {
   private channelOrigin?: { x: number; y: number };
   private stopWatching: (() => void)[] = [];
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
       targeting: 'SELF',
@@ -77,28 +77,6 @@ export default class Janna_R extends Spell {
         !target.isDead && target.teamId === this.owner.teamId && typeof target.takeHeal === 'function',
     });
     this.game.objectManager.addObject(this.activeArea);
-  }
-
-  onUpdate(): void {
-    if (this.state !== 'CHANNELING' || !this.channelOrigin) return;
-    if (!this.owner.canCast) {
-      this.cancel('SILENCE');
-      return;
-    }
-    if (
-      this.owner.position.x !== this.channelOrigin.x ||
-      this.owner.position.y !== this.channelOrigin.y
-    ) {
-      this.cancel('DISPLACEMENT');
-      return;
-    }
-    if (
-      this.owner.destination &&
-      (this.owner.destination.x !== this.owner.position.x ||
-        this.owner.destination.y !== this.owner.position.y)
-    ) {
-      this.cancel('MOVE');
-    }
   }
 
   onChannelTick(): void {
@@ -129,16 +107,6 @@ export default class Janna_R extends Spell {
 
   onComplete(): void {
     this.finishChannel();
-  }
-
-  deactivate(): void {
-    this.finishChannel();
-    super.deactivate();
-  }
-
-  onRemoved(): void {
-    this.finishChannel();
-    super.onRemoved();
   }
 
   private knockEnemies(context: CastContext): void {

@@ -9,6 +9,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import ActionState from '../../../src/game/enums/ActionState';
 import Spell from '../../../src/game/gameObject/Spell';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
+import Game from '../../../src/game/Game';
 import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
 import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -153,6 +154,75 @@ describe('spell aim integration', () => {
     ai.update();
 
     expect(spell.usedAim).toMatchObject({ x: 0, y: 20 });
+  });
+
+  it.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
+    'releases AI %s casts at a deterministic charge instead of timing out',
+    activation => {
+      const game = gameWithMouse();
+      const ai = new AIChampion({
+        game,
+        position: new TestVector(0, 0) as any,
+        teamId: 'red',
+        preset: { spells: [] },
+      });
+      makeResourcesWritable(ai);
+      ai.destination = new TestVector(0, 20) as any;
+      ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
+      class ChargedSpell extends Spell {
+        releases = 0;
+        get castSpec() {
+          return {
+            activation,
+            targeting: 'DIRECTION' as const,
+            charge: { maxDurationMs: 100, releaseAtMax: false },
+            resource: { commitAt: 'start' as const, refundOn: [] },
+            cooldown: { startAt: 'end' as const, durationMs: 0 },
+            interrupts: { move: false },
+          };
+        }
+        onRelease() { this.releases += 1; }
+      }
+      const spell = new ChargedSpell(ai);
+      ai.spells = [spell];
+      vi.stubGlobal('random', vi.fn(() => 0));
+      vi.stubGlobal('deltaTime', 50);
+
+      ai.update();
+      expect(spell.state).toBe('CHARGING');
+      ai.update();
+      expect(spell.releases).toBe(1);
+    }
+  );
+
+  it('creates player contexts from the actual spell targeting mode', () => {
+    const caster = ownerFor(gameWithMouse(new TestVector(100, 0)));
+    const target = {
+      position: new TestVector(100, 0),
+      collisionRadius: 20,
+      teamId: 'red',
+      targetable: true,
+    };
+    class UnitSpell extends Spell {
+      get castSpec() {
+        return {
+          activation: 'PRESS' as const,
+          targeting: 'UNIT' as const,
+          resource: { commitAt: 'start' as const, refundOn: [] },
+          cooldown: { startAt: 'start' as const, durationMs: 0 },
+        };
+      }
+      get targetingRequest() { return { range: 500, targetTeam: 'ENEMY' as const }; }
+    }
+    const game = Object.assign(Object.create(Game.prototype), {
+      worldMouse: new TestVector(100, 0),
+      objectManager: { objects: [target] },
+    }) as Game;
+    const spell = new UnitSpell(caster);
+
+    expect(game.createSpellContext(spell, caster, game.worldMouse)).toMatchObject({ target });
+    game.worldMouse.x = 200;
+    expect(game.createSpellContext(spell, caster, game.worldMouse)).toBeUndefined();
   });
 
   it('replays a pending Zed shadow cast without mutating worldMouse', () => {

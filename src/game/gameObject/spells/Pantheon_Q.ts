@@ -38,7 +38,7 @@ export default class Pantheon_Q extends Spell {
   private wasThrust = false;
   private castDirection: Vec2 = { x: 0, y: 0 };
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'TAP_OR_HOLD',
       targeting: 'DIRECTION',
@@ -82,7 +82,7 @@ export default class Pantheon_Q extends Spell {
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
     if (reason === 'MAX_DURATION' || reason === 'SILENCE' || reason === 'STUN') {
-      this.owner.stats.mana.value -= this.manaCost / 2;
+      this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
 

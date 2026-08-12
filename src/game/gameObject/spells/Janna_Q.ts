@@ -38,14 +38,14 @@ export default class Janna_Q extends Spell {
 
   spellObject: Janna_Q_Object | null = null;
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'RECAST',
       targeting: 'DIRECTION',
       active: { maxDurationMs: this.maxChargeTime },
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false },
+      interrupts: { move: false, displacement: false },
     };
   }
 
@@ -70,16 +70,6 @@ export default class Janna_Q extends Spell {
 
   onCancel(_context: CastContext, _reason: CancelReason): void {
     this.removeStorm();
-  }
-
-  deactivate(): void {
-    this.removeStorm();
-    super.deactivate();
-  }
-
-  onRemoved(): void {
-    this.removeStorm();
-    super.onRemoved();
   }
 
   private releaseStorm(atMaxCharge = false): void {

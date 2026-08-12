@@ -19,6 +19,8 @@ import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
 import TargetResolver from './spell/targeting/TargetResolver';
+import type Spell from './gameObject/Spell';
+import type { CastContext, Vec2 } from './spell/runtime/types';
 
 export default class Game {
   readonly mapSize = 6400;
@@ -65,17 +67,7 @@ export default class Game {
       getSpell: slot => this.player.spells[slot],
       createContext: (_spell, slot) => {
         const spell = this.player.spells[slot];
-        if (!spell) return undefined;
-        const result = TargetResolver.resolve('DIRECTION', {
-          spellId: spell.id,
-          activationId: uuidv4(),
-          startedAtMs: Date.now(),
-          caster: this.player,
-          casterTeamId: this.player.teamId,
-          origin: this.player.position,
-          cursorWorld: this.worldMouse,
-        });
-        return result.ok ? result.context : undefined;
+        return spell ? this.createSpellContext(spell, this.player, this.worldMouse) : undefined;
       },
     });
 
@@ -189,6 +181,45 @@ export default class Game {
   }
 
   resize(w: number, h: number) { this.fogOfWar.resize(w, h); }
+
+  createSpellContext(
+    spell: Spell,
+    caster: { readonly teamId?: unknown; readonly position: Vec2 },
+    cursorWorld: Vec2
+  ): CastContext | undefined {
+    const result = TargetResolver.resolve(spell.castSpec.targeting, {
+      spellId: spell.id,
+      activationId: uuidv4(),
+      startedAtMs: Date.now(),
+      caster,
+      casterTeamId: caster.teamId,
+      origin: caster.position,
+      cursorWorld,
+      queryCandidates: () => this.objectManager.objects,
+      isTargetable: candidate =>
+        typeof candidate === 'object' && candidate !== null &&
+        (candidate as { targetable?: boolean }).targetable !== false,
+      getTargetInfo: candidate => {
+        if (typeof candidate !== 'object' || candidate === null) return null;
+        const target = candidate as {
+          position?: Vec2;
+          teamId?: unknown;
+          selectionRadius?: number;
+          collisionRadius?: number;
+          animatedValues?: { displaySize?: number };
+        };
+        if (!target.position) return null;
+        return {
+          position: target.position,
+          teamId: target.teamId,
+          selectionRadius: target.selectionRadius ?? target.collisionRadius ??
+            (target.animatedValues?.displaySize ?? 0) / 2,
+        };
+      },
+      ...spell.targetingRequest,
+    });
+    return result.ok ? result.context : undefined;
+  }
 
   keyPressed(keyCode: number, repeated = false) {
     if (keyCode === 32 && !repeated) {

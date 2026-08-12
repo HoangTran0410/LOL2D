@@ -94,14 +94,18 @@ const gameFor = () => {
   };
 };
 
-const castContext = (owner: ReturnType<typeof unit>, target?: unknown): CastContext =>
+const castContext = (
+  owner: ReturnType<typeof unit>,
+  target?: unknown,
+  cursorWorld = { x: 0, y: 500 }
+): CastContext =>
   Object.freeze({
     spellId: 'malphite-q',
     activationId: 'activation',
     startedAtMs: 1,
     caster: owner,
     origin: Object.freeze({ x: owner.position.x, y: owner.position.y }),
-    cursorWorld: Object.freeze({ x: 0, y: 500 }),
+    cursorWorld: Object.freeze(cursorWorld),
     direction: Object.freeze({ x: 0, y: 1 }),
     ...(target === undefined ? {} : { target }),
   });
@@ -153,7 +157,8 @@ describe('Malphite Q', () => {
     expect(resolution).toMatchObject({ ok: true, context: { target } });
     expect(spell.press(castContext(owner))).toBe(false);
     owner.game.objectManager.objects.push(target);
-    expect(new Malphite_Q(owner).press(castContext(owner))).toBe(true);
+    expect(new Malphite_Q(owner).press(castContext(owner))).toBe(false);
+    expect(new Malphite_Q(owner).press(castContext(owner, undefined, target.position))).toBe(true);
     expect(new Malphite_Q(owner).press(castContext(owner, ally))).toBe(false);
     expect(new Malphite_Q(owner).press(castContext(owner, outOfRange))).toBe(false);
   });

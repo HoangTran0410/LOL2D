@@ -5,6 +5,7 @@ export type TargetTeam = 'ALLY' | 'ENEMY' | 'ANY';
 export interface TargetInfo {
   readonly position: Vec2;
   readonly teamId?: unknown;
+  readonly selectionRadius?: number;
 }
 
 export interface TargetRequest {
@@ -21,6 +22,10 @@ export interface TargetRequest {
   readonly isTargetable?: (candidate: unknown) => boolean;
   readonly getTargetInfo?: (candidate: unknown) => TargetInfo | null;
 }
+
+export type TargetingRequest = Partial<Pick<TargetRequest,
+  'range' | 'targetTeam' | 'queryCandidates' | 'isTargetable' | 'getTargetInfo'
+>>;
 
 export type TargetResolution =
   | { readonly ok: true; readonly context: CastContext }
@@ -79,7 +84,10 @@ export class TargetResolver {
 
     for (const candidate of candidates) {
       const info = request.getTargetInfo?.(candidate);
-      if (!info || request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
+      if (!info) continue;
+      const cursorDistance = distance(request.cursorWorld, info.position);
+      if (cursorDistance > Math.max(0, info.selectionRadius ?? 0)) continue;
+      if (request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
         continue;
       }
       if (request.range !== undefined && distance(request.origin, info.position) > request.range) {
@@ -87,7 +95,6 @@ export class TargetResolver {
         continue;
       }
 
-      const cursorDistance = distance(request.cursorWorld, info.position);
       if (cursorDistance < bestCursorDistance) {
         bestTarget = candidate;
         bestCursorDistance = cursorDistance;

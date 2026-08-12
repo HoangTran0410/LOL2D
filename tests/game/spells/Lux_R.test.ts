@@ -13,6 +13,7 @@ import Lux_E, { Lux_E_Object } from '../../../src/game/gameObject/spells/Lux_E';
 import Spell from '../../../src/game/gameObject/Spell';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
+import CastBar from '../../../src/game/vfx/CastBar';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -65,6 +66,7 @@ describe('Lux R', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('snapshots its beam and deals damage only after cast completion', () => {
+    const disposeCastBar = vi.spyOn(CastBar.prototype, 'dispose');
     const added: unknown[] = [];
     const targetBuffs: unknown[] = [];
     const ownerBuffs: Array<{ toRemove: boolean; statusFlagsToEnable: number }> = [];
@@ -114,6 +116,8 @@ describe('Lux R', () => {
     owner.position.x = 50;
     vi.stubGlobal('deltaTime', 1_000);
     spell.update();
+
+    expect(disposeCastBar).toHaveBeenCalledOnce();
 
     const beam = added.find(object => object instanceof BeamSpellObject) as BeamSpellObject<TestTarget>;
     expect(beam.geometry).toEqual({

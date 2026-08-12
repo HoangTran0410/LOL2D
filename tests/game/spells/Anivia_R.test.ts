@@ -201,4 +201,18 @@ describe('Anivia R', () => {
     expect(added[0].members?.size).toBe(0);
     expect(enemy.damage).toEqual([4, 4, 4]);
   });
+
+  it('tears down its active storm through base spell deactivation exactly once', () => {
+    const { spell, added } = setup();
+    const onCancel = vi.spyOn(spell, 'onCancel');
+    spell.press(context({ x: 100, y: 0 }));
+
+    spell.deactivate();
+    spell.onRemoved();
+
+    expect(added[0].toRemove).toBe(true);
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(spell.state).toBe('READY');
+    expect(spell.currentCooldown).toBe(0);
+  });
 });

@@ -184,6 +184,7 @@ export class SpellRuntime {
   /** @deprecated Legacy spells may still mutate cooldown while they migrate. */
   setCompatibilityCooldown(remainingMs: number): void {
     this._cooldownRemainingMs = Math.max(0, remainingMs);
+    if (this._state === 'COOLDOWN' && this._cooldownRemainingMs === 0) this._state = 'READY';
   }
 
   private commitResource(point: ResourceCommitPoint): boolean {

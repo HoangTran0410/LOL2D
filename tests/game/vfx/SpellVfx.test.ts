@@ -46,7 +46,7 @@ class VfxSpell extends Spell {
     super(ownerValue);
   }
 
-  protected get castSpec(): CastSpec { return this.spec; }
+  get castSpec(): CastSpec { return this.spec; }
 }
 
 const spec = (vfx: CastSpec['vfx'], sfx?: CastSpec['sfx']): CastSpec => ({
@@ -67,7 +67,7 @@ describe('Spell VFX lifecycle', () => {
       initialized = true;
       reads = 0;
 
-      protected get castSpec(): CastSpec {
+      get castSpec(): CastSpec {
         expect(this.initialized).toBe(true);
         this.reads += 1;
         return spec(undefined);

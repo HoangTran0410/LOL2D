@@ -12,6 +12,8 @@ export default class CastBar implements VfxHandle {
 
   update(_deltaMs: number): void {}
 
+  get complete(): boolean { return this.getProgress() >= 1; }
+
   draw(): void {
     if (!this.disposed) this.render(this.context, Math.max(0, Math.min(1, this.getProgress())));
   }

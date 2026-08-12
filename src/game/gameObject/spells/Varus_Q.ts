@@ -22,7 +22,7 @@ export default class Varus_Q extends Spell {
   private aimContext?: CastContext;
   private chargeSlow?: Slow;
 
-  protected get castSpec(): CastSpec {
+  get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'HOLD_RELEASE',
       targeting: 'DIRECTION',
@@ -67,7 +67,7 @@ export default class Varus_Q extends Spell {
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
     if (reason === 'MAX_DURATION' || reason === 'SILENCE' || reason === 'STUN') {
-      this.owner.stats.mana.value -= this.manaCost / 2;
+      this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
 

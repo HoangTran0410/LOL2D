@@ -3,6 +3,8 @@ import { getChampionPresetRandom } from '../../preset';
 import Champion, { type ChampionPresetData } from './Champion';
 import { uuidv4 } from '../../../utils';
 import TargetResolver from '../../spell/targeting/TargetResolver';
+import type Spell from '../Spell';
+import type { CastContext } from '../../spell/runtime/types';
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -11,6 +13,12 @@ export default class AIChampion extends Champion {
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
+  private pendingCharge?: {
+    spell: Spell;
+    context: CastContext;
+    elapsedMs: number;
+    releaseAtMs: number;
+  };
 
   constructor({
     game,
@@ -44,22 +52,52 @@ export default class AIChampion extends Champion {
       }
     }
 
-    if (this._autoCast) {
+    if (this.pendingCharge) {
+      const pending = this.pendingCharge;
+      pending.elapsedMs += Math.max(0, deltaTime);
+      const context = this.createSpellContext(pending.spell);
+      if (context) {
+        pending.context = context;
+        pending.spell.hold(context);
+      }
+      if (pending.elapsedMs >= pending.releaseAtMs) {
+        pending.spell.release(pending.context);
+        this.pendingCharge = undefined;
+      }
+    } else if (this._autoCast) {
       if (random() < 0.1) {
         let spellIndex = floor(random(this.spells.length));
         const spell = this.spells[spellIndex];
-        const result = TargetResolver.resolve('DIRECTION', {
-          spellId: spell.id,
-          activationId: uuidv4(),
-          startedAtMs: Date.now(),
-          caster: this,
-          casterTeamId: this.teamId,
-          origin: this.position,
-          cursorWorld: this.destination,
-        });
-        if (result.ok) spell.press(result.context);
+        const context = this.createSpellContext(spell);
+        if (context && spell.press(context) &&
+            (spell.castSpec.activation === 'HOLD_RELEASE' ||
+              spell.castSpec.activation === 'TAP_OR_HOLD')) {
+          this.pendingCharge = {
+            spell,
+            context,
+            elapsedMs: 0,
+            releaseAtMs: spell.castSpec.charge!.maxDurationMs / 2,
+          };
+        }
       }
     }
+  }
+
+  private createSpellContext(spell: Spell): CastContext | undefined {
+    if (typeof this.game.createSpellContext === 'function') {
+      return this.game.createSpellContext(spell, this, this.destination);
+    }
+    const result = TargetResolver.resolve(spell.castSpec.targeting, {
+      spellId: spell.id,
+      activationId: uuidv4(),
+      startedAtMs: Date.now(),
+      caster: this,
+      casterTeamId: this.teamId,
+      origin: this.position,
+      cursorWorld: this.destination,
+      ...spell.targetingRequest,
+    });
+    return result.ok ? result.context : undefined;
   }
 
   moveToRandomLocation() {
