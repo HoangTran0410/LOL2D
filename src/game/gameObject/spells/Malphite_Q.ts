@@ -221,7 +221,7 @@ export class Malphite_Q_Object extends HomingMissileSpellObject<MalphiteTarget> 
 
     const s = this.size;
 
-    // a chipped crystal, not a triangle: outline first so it reads on any ground
+    // a chipped crystal, not a triangle: outline first so it reads on every ground
     stroke(40, 34, 54, 235);
     strokeWeight(2.5);
     fill(150, 140, 182);

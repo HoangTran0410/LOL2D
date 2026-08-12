@@ -18,7 +18,8 @@
     "test:all": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "typecheck:core": "tsc -p tsconfig.strict-core.json"
+    "typecheck:core": "tsc -p tsconfig.strict-core.json",
+    "verify": "npm run assets:check && npm run ability:check && npm run typecheck && npm run typecheck:core && npm run test:all && npm run build"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",

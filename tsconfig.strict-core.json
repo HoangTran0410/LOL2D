@@ -7,10 +7,16 @@
     "src/types/**/*.d.ts",
     "src/game/spell/**/*.ts",
     "tests/game/spell/**/*.ts",
-    "src/game/input/**/*.ts",
-    "src/game/targeting/**/*.ts",
+    "src/game/gameObject/spellObjects/**/*.ts",
+    "src/game/gameObject/spells/Lux_R.ts",
+    "src/game/gameObject/spells/Janna_R.ts",
+    "src/game/gameObject/spells/Janna_Q.ts",
+    "src/game/gameObject/spells/Anivia_R.ts",
+    "src/game/gameObject/spells/Varus_Q.ts",
+    "src/game/gameObject/spells/Pantheon_Q.ts",
+    "src/game/gameObject/spells/Malphite_Q.ts",
     "src/game/vfx/**/*.ts",
     "src/generated/**/*.ts",
-    "scripts/wiki/**/*.ts"
+    "tests/game/spells/representative-spells.test.ts"
   ]
 }

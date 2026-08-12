@@ -1,257 +1,100 @@
-# Adding spells to LOL2D
+# Adding spells
 
-Every rule here exists because breaking it produced a real bug in this repo.
-Read it before writing a spell; skim the **Checklist** at the end before you
-claim one is done.
+Use the typed spell runtime for new abilities. Existing spells may still use the legacy `cast()`/`onSpellCast()` bridge, but new code should describe its lifecycle in `castSpec` and implement only the relevant hooks.
 
----
+## 1. Research and register
 
-## 0. Research the ability before writing code
+Import PC League data and images into the repository before implementing mechanics:
 
-Look up the real League of Legends ability on `wiki.leagueoflegends.com`. Do not
-write mechanics from memory — the first pass at Singed W "poisoned" enemies
-(Mega Adhesive deals **no damage**; the poison is his Q), Cassiopeia W silenced
-(Miasma **grounds**, never silences), and Thresh Q dragged the victim all the way
-home (it stuns and **tugs twice**, then Thresh **recasts to leap to them**).
+```sh
+npm run ability:import -- --champion Janna
+npm run ability:update -- --champion Janna --slots Q,R
+npm run ability:check
+npm run assets:generate
+```
 
-`fandom.com` returns HTTP 402 to WebFetch. Use WebSearch, or WebFetch
-`https://wiki.leagueoflegends.com/en-us/<Champion>`.
+Read the checked-in record under `docs/abilities/<champion>/`. Keep English Wiki fields authoritative and record deliberate LOL2D changes in `adaptation`. Normal tests and builds must never fetch the Wiki.
 
-**This game has no basic attacks.** Any ability that empowers the next attack
-(Nasus Q, Ashe Q, Blitzcrank E, Cho'Gath E, Malphite W, Twitch Q) must be adapted
-into something instant. State the adaptation in the Vietnamese `description` so
-players are not misled.
+Export the spell from `src/game/gameObject/spells/index.ts` and add it to its champion group in `src/game/preset.ts`.
 
----
+## 2. Choose activation and targeting
 
-## 1. Registering a spell — three places, all required
+Override `castSpec` with one activation gesture and one targeting mode:
 
-A spell that compiles but is registered in only two places silently never
-appears. There is no error.
+- `PRESS`: one press, such as Lux R or Malphite Q.
+- `HOLD_RELEASE`: press, charge, then physical release, such as Varus Q.
+- `RECAST`: press again while `ACTIVE`, such as Janna Q.
+- `TOGGLE`: press again to end an `ACTIVE` effect, such as Anivia R.
+- `TAP_OR_HOLD`: release behavior depends on the charge duration, such as Pantheon Q.
 
-1. `src/game/gameObject/spells/index.ts` — `export { default as Champ_Q } from './Champ_Q';`
-2. `src/game/preset.ts` — add it to the champion's entry in `SpellGroups`
-   (new champion? add a group; leave `background: ''` when there is no art —
-   the HUD skips a falsy background, but a wrong path renders a broken image)
-3. `src/managers/AssetManager.ts` — `spell_champ_q: 'assets/images/spells/champ_q.png'`,
-   **only if the PNG actually exists**
-
-Missing art is fine: `AssetManager.getAsset()` generates a labelled placeholder
-tile (initials + a colour hashed from the key) that works both as an HTML `<img>`
-and on the p5 canvas. Use the natural key and move on.
-
-`getAsset()` returns `undefined` for a falsy key on purpose — callers like
-`getAsset(preset?.avatar)` depend on it. Do not "fix" that.
-
----
-
-## 2. The `Spell` base class
-
-Override `onSpellCast()`; optionally `onUpdate()`, `checkCastCondition()`,
-`drawPreview()`. Set `image`, `name`, `description`, `coolDown`, `manaCost`.
-The base owns the cooldown state machine — never assign `state` yourself.
-
-> **Class field initializers must never touch `this.owner` or `this.game`.**
-> The HUD builds every spell as `new SpellClass(null)` just to read its metadata.
-> A field initializer that dereferences the owner crashes the whole spell picker.
-> Only method bodies may use them.
-
-`checkCastCondition()` returning `false` refuses the cast **before** the cooldown
-is charged, which is what you want for "no target in range".
-
----
-
-## 3. Projectiles: extend `MissileSpellObject`
-
-`src/game/gameObject/MissileSpellObject.ts` owns travel, hitting each enemy at
-most once, the trail, and the bounding box. A normal skillshot is then just
-tuning fields plus `onHit` and `draw`.
-
-| Field | Meaning |
-|---|---|
-| `maxHitCount` | `Infinity` pierces everything, `1` dies on first enemy, `0` never collides in flight |
-| `removeOnArrive` | `false` keeps it flying past the destination (boomerangs) |
-| `removeOnMaxHit` | `false` survives its last hit (chains and hooks that latch on) |
-
-Hooks: `onHit(enemy)`, `onBeforeMove()`, `onAfterMove()` (after the step, before
-collision — for visuals that track distance), `onArrive()`, `getTrailPosition()`.
-
-> **Declare `trailSystem` in your subclass, never in the base.** Subclass field
-> initializers run *after* the base's, so a trail built in the base reads the
-> base's `size`, not yours.
-
-**Do not force this base on something with a different motion model.** `Lux_E`
-(static zone), `Ashe_R` (direction-based, unbounded), `Teemo_R` (lob then mine),
-`Ahri_W` (orbits then homes) and `Yasuo_Q` Q1/Q2 (cone anchored on the caster)
-deliberately do not use it.
-
----
-
-## 4. Buffs
-
-Construct as `new X(durationMs, sourceUnit, targetUnit)`, then `unit.addBuff(x)`.
-Always set `buff.image = AssetManager.getAsset('spell_<your_key>')` so the player
-can see which spell caused it.
-
-**Crowd control**: `Stun` (no move, no cast), `Root` (no move, can cast),
-`Silence` (no cast), `Slow`/`Speedup` (`.percent`), `Airborne` (`.height`),
-`Charm`/`Fear` (`.speed`), `Nearsight` (`.newVisionRadius`), `Invisible`,
-`TrueSight` (`.visionRadius`).
-
-**Movement / targeting**: `Dash` (`.dashDestination` — assigning a unit's live
-`position` object makes it home; `.dashSpeed`, `.cancelable`, callbacks
-`.onReachedDestination`/`.onCancelled`), `Untargetable`, `Stasis`, `Ground`.
-
-**Generic effects**: `Shield` (`.amount`), `DamageOverTime` (`.damagePerTick`,
-`.tickInterval`, `.flameColor`, `.emberColor`), `StatAmp` (`.bonuses`).
-
-### 4a. `stackId` — mandatory for generic buffs
-
-`addBuff` groups stacks by **constructor**. Two different spells both applying a
-bare `StatAmp` fight over the same slot: each Malphite W cast used to strip a
-Veigar Q stack. Seven spells sharing `DamageOverTime` with `RENEW_EXISTING`
-renewed each other instead of burning independently.
-
-Whenever a spell applies `StatAmp`, `DamageOverTime` or `Shield`, tag it:
+Targeting is `SELF`, `DIRECTION`, `POINT`, or `UNIT`. Use `TargetResolver` for unit validation and range/team checks. A cast context snapshots origin, cursor, direction, and optional target; do not read `game.worldMouse` later unless the mechanic explicitly samples live aim while charging.
 
 ```ts
-burn.stackId = 'ignite_burn';
+protected get castSpec(): CastSpec {
+  return {
+    activation: 'PRESS',
+    targeting: 'DIRECTION',
+    castTimeMs: 500,
+    resource: { commitAt: 'start', refundOn: [] },
+    cooldown: { startAt: 'release', durationMs: this.coolDown },
+  };
+}
 ```
 
-(Subclassing the buff works too, and is better when the buff also needs its own
-stacking rules — see `ChoGath_R_Growth`.)
+## 3. Define lifecycle policies
 
-### 4b. `StatusFlags.CanMove` and `CanCast` are dead flags
+The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `COOLDOWN`. Do not assign `state` or `currentCooldown` in migrated spells.
 
-`Stats.updateActionState()` derives `CAN_MOVE`/`CAN_CAST` **entirely from the CC
-flags** (`Stunned`, `Rooted`, `Charmed`, `Feared`, `Silenced`, `Suppressed`,
-`Immovable`) and never reads `StatusFlags.CanMove` or `CanCast`. Setting
-`statusFlagsToDisable = StatusFlags.CanMove` looks right and does nothing — the
-first `Stasis` did exactly that and the unit walked away.
+- Commit resources at `start`, `release`, or `tick`; list only cancellation reasons that refund them.
+- Start cooldown at `start`, `release`, or `end`.
+- Add `charge`, `channel`, or `active` only when the activation needs it.
+- Override only relevant `interrupts` (`death`, `stun`, `silence`, `displacement`, `move`).
 
-To immobilise, enable a real CC flag. `StatusFlags.Invulnerable` is also never
-read; use `modifyIncomingDamage` instead.
+Use `onCastStart`, `onChargeUpdate`, `onRelease`, `onChannelTick`, `onActivate`, `onRecast`, `onCancel`, and `onComplete`. Cleanup must be idempotent because death, scene exit, removal, and normal completion can converge on the same effect.
 
-`StatusFlags.Targetable` **is** wired, so `statusFlagsToDisable = Targetable`
-genuinely makes a unit untargetable.
+## 4. Choose delivery
 
-### 4c. Status semantics
+- Extend `MissileSpellObject` for linear travel and per-target hit bookkeeping.
+- Extend `HomingMissileSpellObject` for one moving unit target and choose `remove` or `continue` on target loss.
+- Use `BeamSpellObject` for instant or duration capsule geometry shared by collision and rendering.
+- Use `AreaSpellObject` for enter/tick/exit membership, duration, or radius growth.
+- Use `applyTargetedEffect` for an immediate payload that only needs a final validity check.
 
-| Buff | Targetable | Walks | Own dash | Damage |
-|---|---|---|---|---|
-| `Untargetable` | no | yes | yes | AoE queries skip it |
-| `Ground` | yes | yes | **no** | yes |
-| `Stasis` | no | no | no | **zero** |
+The primitive owns geometry, movement, lifetime, and hit bookkeeping. The spell owns damage, buffs, crowd control, and special rules.
 
-Grounding blocks a unit's *own* movement abilities (enforced in
-`Dash.CanDash`); it does **not** make it immune to being hooked or knocked back —
-those construct a `Dash` directly. When gating a self-dash, prefer
-`Dash.CanDash(this.owner)`; but note LoL lets some pulls (Amumu Q) start while
-immobilised, so check the wiki rather than copying blindly.
+## 5. Bind presentation to lifecycle
 
----
+Add optional `vfx` and `sfx` factories to `castSpec` for `castStart`, `castLoop`, `release`, `activeLoop`, `channelLoop`, `impact`, and `cancel`. Use `CastBar`, `CastTelegraph`, `BeamRenderer`, `SpriteEffect`, `ParticleEmitter`, or `ImpactEffect`. Gameplay geometry remains authoritative; VFX observes it.
 
-## 5. Damage pipeline
+Looping effects are disposed by lifecycle transitions. Any spell-owned object or listener still needs idempotent cleanup in `onCancel`, `onComplete`, `deactivate`, and `onRemoved` as applicable.
 
-`AttackableUnit.takeDamage()` runs the damage through every buff's
-`modifyIncomingDamage(damage, attacker)` before it reaches health. Return less to
-absorb, more to amplify, or the same value to merely observe (that is how
-`Zed_R_Mark` banks a share of Zed's damage without changing it).
+## 6. Use typed assets
 
-If you deal damage from inside `onDeactivate`, guard against re-entrancy —
-`takeDamage` will run the pipeline again, including your own buff.
+After adding an image, run `npm run assets:generate` and use its generated key:
 
-Anything that absorbs damage should also report `get shieldAmount()`, which is
-what draws the grey segment on the health bar.
-
----
-
-## 6. Rendering rules
-
-- **`ObjectManager` already calls `update()` on every registered object.**
-  `TrailSystem` and `ParticleSystem` are `SpellObject`s, so once you
-  `addObject()` them, calling `particleSystem.update()` yourself makes particles
-  age twice as fast. Three spells shipped with this bug.
-- `ParticleSystem` defaults to `autoRemoveIfEmpty: true`, so a system that is
-  momentarily empty deletes itself and silently stops rendering. Pass
-  `autoRemoveIfEmpty: false` for a system you feed intermittently.
-- `Buff.draw()` is called once per frame from `AttackableUnit.drawBuffs()`.
-  **Spawn particles in `onUpdate()` and only render in `draw()`** — otherwise
-  their rate depends on how many times the unit happens to be drawn.
-- A spell object with `toRemove = true` is removed before the draw pass, so
-  cosmetic work on its final frame is wasted.
-
----
-
-## 7. Multi-stage and recast spells
-
-`src/game/gameObject/spells/LeeSin_Q.ts` is the canonical pattern: a `phase`
-field on the `Spell`, `onSpellCast()` branching on it, `checkCastCondition()`
-gating the recast, `onUpdate()` restoring the phase and full cooldown when the
-window lapses, and `this.image` swapped per phase so the HUD icon changes.
-Set `currentCooldown` to the short recast delay after the first stage.
-
-`Yasuo_Q.ts` shows a three-stage version. Thresh Q, Zed R, Fizz E, Anivia Q and
-Janna Q all use this shape.
-
----
-
-## 8. Zones and other non-projectiles
-
-Extend `SpellObject`, implement `update()`, `draw()` and
-`getDisplayBoundingBox()` returning a `Rectangle`. Age with `deltaTime` and set
-`this.toRemove = true` when expired. `Lux_E.ts` is the reference.
-
-Re-applying a debuff every frame is fine if it is `RENEW_EXISTING`; prefer a
-short duration refreshed on a tick (~200ms) over one long application, so it
-falls off shortly after the target leaves.
-
-For real collision (`Anivia_W`), run SAT resolution inside the object's own
-`update()`. Do **not** register into the terrain quadtree: it has no `remove()`,
-and `FogOfWar` would make the obstacle block vision too.
-
----
-
-## 9. Verifying — the repo has no test framework
-
-`tsc --noEmit` catches almost nothing here: the project is `strict: false` and
-full of `any`. It did not catch `getAsset(undefined)` crashing the game, nor a
-spell whose description promised damage it never dealt (`Zed_E`).
-
-Drive the real game instead. With `npx vite` running:
-
-```js
-// Playwright + system Chrome
-await page.click('#play-btn');
-await page.waitForFunction(() => window.objectManager?.game?.player);
-await page.evaluate(async () => {
-  const mod = await import('/src/game/gameObject/spells/index.ts');
-  const Dummy = (await import('/src/game/gameObject/attackableUnits/DummyChampion.ts')).default;
-  // park the AI, spawn a frozen dummy, install the spell on game.player, cast
-});
+```ts
+const icon = AssetManager.get('spell_janna_q');
+await AssetManager.ensure('spell_janna_q');
 ```
 
-Assert the *effect*, not the absence of a crash: damage dealt, buff class names
-applied, stats before/during/after. Then confirm nothing leaked — no buffs left
-on either unit, `targetable`/`canMove`/`canCast` back to true, no orphaned spell
-objects.
+Use `AssetManager.ensureMany` for a visible batch. If art is intentionally absent, use `AssetManager.placeholder('Pantheon background')`. Never invent a key or use the deprecated `getAsset(string)` bridge in new code.
 
-> **Vite HMR pitfall**: `import('/src/...')` inside `page.evaluate` can return a
-> *second copy* of a module, so `instanceof` against a re-imported class silently
-> fails and `AssetManager._asset` looks empty. Read live game objects, or resolve
-> the app's actual module URL from `performance.getEntriesByType('resource')`.
+## 7. Test the public commands
 
----
+Add a focused Vitest file under `tests/game/spells/`. Drive `press`, `hold`, `release`, and `cancel` with deterministic cast contexts and clocks. Assert:
 
-## Checklist
+- activation and runtime states;
+- exact resource commitment/refund timing;
+- exact cooldown start timing;
+- targeting rejection before payment;
+- payload and object behavior;
+- exactly-once completion and cleanup.
 
-- [ ] Mechanic checked against the wiki; adaptation noted in `description` if the ability normally modifies basic attacks
-- [ ] Registered in `index.ts`, `preset.ts`, and `AssetManager.ts` (art only if the file exists)
-- [ ] No field initializer touches `this.owner` / `this.game`
-- [ ] `trailSystem` declared in the subclass, not the base
-- [ ] `stackId` set on every generic `StatAmp` / `DamageOverTime` / `Shield`
-- [ ] `buff.image` set on every buff applied
-- [ ] No manual `particleSystem.update()` on a registered system
-- [ ] Particles spawned in `onUpdate()`, drawn in `draw()`
-- [ ] `tsc --noEmit` clean
-- [ ] Cast in the real game: effect confirmed, nothing thrown, no buff or object leak
+Run the focused test while developing, then the complete offline gate:
+
+```sh
+npm test -- tests/game/spells/MySpell.test.ts
+npm run verify
+```
+
+`verify` checks generated assets, imported abilities, both TypeScript boundaries, every Vitest test, and the production build.

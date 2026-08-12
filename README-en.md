@@ -28,3 +28,7 @@ This game is provided for free and does not generate any revenue. It is intended
 ## Language Support
 
 The README file is available in both [English](./README-en.md) and [Vietnamese](./README.md).
+
+## Development
+
+See [Adding spells](./docs/ADDING_SPELLS.md) for the standardized runtime, delivery, assets, Wiki import, and testing workflow. Run `npm run verify` before submitting changes; it is the complete offline repository check.
