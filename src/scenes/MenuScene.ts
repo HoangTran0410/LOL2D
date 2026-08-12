@@ -1,6 +1,16 @@
 import { Scene } from '../managers/SceneManager';
 import DomUtils from '../utils/dom.utils';
 import GameScene from './GameScene';
+import AssetManager, { type AssetKey } from '../managers/AssetManager';
+
+const MENU_BACKGROUNDS: AssetKey[] = [
+  'other_menu_bg_1',
+  'other_menu_bg_2',
+  'other_menu_bg_3',
+  'other_menu_bg_4',
+  'other_menu_bg_5',
+  'other_menu_bg_6',
+];
 
 export default class MenuScene extends Scene {
   menuSceneDiv!: HTMLElement;
@@ -32,7 +42,7 @@ export default class MenuScene extends Scene {
   }
 
   nextBackground() {
-    const maxIndex = 6;
+    const maxIndex = MENU_BACKGROUNDS.length;
     if (this.currentBgIndex === undefined) {
       this.currentBgIndex = Math.floor(Math.random() * maxIndex) + 1;
     } else {
@@ -41,7 +51,8 @@ export default class MenuScene extends Scene {
         this.currentBgIndex = 1;
       }
     }
-    this.background.style.backgroundImage = `url(./assets/images/others/menu-bg-${this.currentBgIndex}.jpg)`;
+    const key = MENU_BACKGROUNDS[this.currentBgIndex - 1];
+    this.background.style.backgroundImage = `url(${AssetManager.get(key).url})`;
   }
 
   enter() {

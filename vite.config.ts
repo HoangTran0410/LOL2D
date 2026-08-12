@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
-import { cpSync } from 'fs';
 
 export default defineConfig({
   root: '.',
@@ -20,19 +19,6 @@ export default defineConfig({
   assetsInclude: ['**/*.json'],
   build: {
     target: 'esnext',
+    assetsInlineLimit: 0,
   },
-  plugins: [
-    {
-      // Game assets (images/json) are loaded at runtime by path string
-      // (AssetManager → loadImage/loadJSON), so Vite never sees them as
-      // imports and won't emit them — copy the whole folder into dist.
-      name: 'copy-runtime-assets',
-      apply: 'build',
-      closeBundle() {
-        cpSync(resolve(__dirname, 'assets'), resolve(__dirname, 'dist/assets'), {
-          recursive: true,
-        });
-      },
-    },
-  ],
 });

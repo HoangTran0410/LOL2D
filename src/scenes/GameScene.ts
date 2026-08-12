@@ -2,6 +2,7 @@ import { Scene } from '../managers/SceneManager';
 import Game from '../game/Game';
 import MenuScene from './MenuScene';
 import DomUtils from '../utils/dom.utils';
+import AssetManager from '../managers/AssetManager';
 
 // Stats.js is loaded via CDN — declare it as a global
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,7 +50,7 @@ export default class GameScene extends Scene {
     this.canvas = (createCanvas(windowWidth, windowHeight) as any).parent('game-scene');
     DomUtils.preventRightClick(this.canvas.elt);
 
-    cursor('assets/cursors/normal.cur');
+    cursor(AssetManager.get('cursor_normal').url);
     pixelDensity(1);
     strokeJoin(ROUND);
     strokeCap(ROUND);

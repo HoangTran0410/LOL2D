@@ -1,122 +1,32 @@
-// p5 globals (loadImage, loadJSON) are declared globally in src/types/global.d.ts
-const AssetPaths = {
-  // champions
-  champ_blitzcrank: 'assets/images/champions/blitzcrank.png',
-  champ_lux: 'assets/images/champions/lux.png',
-  champ_jinx: 'assets/images/champions/jinx.png',
-  champ_yasuo: 'assets/images/champions/yasuo.png',
-  champ_ashe: 'assets/images/champions/ashe.png',
-  champ_teemo: 'assets/images/champions/teemo.png',
-  champ_ahri: 'assets/images/champions/ahri.png',
-  champ_zed: 'assets/images/champions/zed.png',
-  champ_leblanc: 'assets/images/champions/leblanc.png',
-  champ_leesin: 'assets/images/champions/leesin.png',
-  champ_chogath: 'assets/images/champions/chogath.png',
-  champ_shaco: 'assets/images/champions/shaco.png',
-  champ_olaf: 'assets/images/champions/olaf.png',
-  champ_malphite: 'assets/images/champions/malphite.png',
-  champ_veigar: 'assets/images/champions/veigar.png',
-  champ_graves: 'assets/images/champions/graves.png',
+import {
+  assetManifest,
+  type AssetKey,
+  type AssetKind,
+} from '../generated/assetManifest';
 
-  // spells
-  spell_stealthward: 'assets/images/spells/stealthward.png',
-  spell_flash: 'assets/images/spells/flash.png',
-  spell_ghost: 'assets/images/spells/ghost.png',
-  spell_heal: 'assets/images/spells/heal.png',
-  spell_ignite: 'assets/images/spells/ignite.png',
-  spell_leblanc_w1: 'assets/images/spells/leblanc_w1.png',
-  spell_leblanc_w2: 'assets/images/spells/leblanc_w2.png',
-  spell_leblanc_e: 'assets/images/spells/leblanc_e.png',
-  spell_leesin_q1: 'assets/images/spells/leesin_q1.png',
-  spell_leesin_q2: 'assets/images/spells/leesin_q2.png',
-  spell_leesin_e: 'assets/images/spells/leesin_e.png',
-  spell_leesin_r: 'assets/images/spells/leesin_r.png',
-  spell_ashe_w: 'assets/images/spells/ashe_w.png',
-  spell_ashe_r: 'assets/images/spells/ashe_r.png',
-  spell_blitzcrank_internal: 'assets/images/spells/blitzcrank_internal.png',
-  spell_blitzcrank_q: 'assets/images/spells/blitzcrank_q.png',
-  spell_blitzcrank_w: 'assets/images/spells/blitzcrank_w.png',
-  spell_blitzcrank_e: 'assets/images/spells/blitzcrank_e.png',
-  spell_blitzcrank_r: 'assets/images/spells/blitzcrank_r.png',
-  spell_lux_q: 'assets/images/spells/lux_q.png',
-  spell_lux_e: 'assets/images/spells/lux_e.png',
-  spell_lux_r: 'assets/images/spells/lux_r.png',
-  spell_yasuo_q1: 'assets/images/spells/yasuo_q1.png',
-  spell_yasuo_q2: 'assets/images/spells/yasuo_q2.png',
-  spell_yasuo_q3: 'assets/images/spells/yasuo_q3.png',
-  spell_yasuo_w: 'assets/images/spells/yasuo_w.png',
-  spell_yasuo_e: 'assets/images/spells/yasuo_e.png',
-  spell_yasuo_r: 'assets/images/spells/yasuo_r.png',
-  spell_teemo_r: 'assets/images/spells/teemo_r.png',
-  spell_chogath_q: 'assets/images/spells/chogath_q.png',
-  spell_chogath_w: 'assets/images/spells/chogath_w.png',
-  spell_ahri_q: 'assets/images/spells/ahri_q.png',
-  spell_ahri_w: 'assets/images/spells/ahri_w.png',
-  spell_ahri_e: 'assets/images/spells/ahri_e.png',
-  spell_ahri_r: 'assets/images/spells/ahri_r.png',
-  spell_veigar_e: 'assets/images/spells/veigar_e.png',
-  spell_shaco_q: 'assets/images/spells/shaco_q.png',
-  spell_shaco_w: 'assets/images/spells/shaco_w.png',
-  spell_shaco_e: 'assets/images/spells/shaco_e.png',
-  spell_shaco_r: 'assets/images/spells/shaco_r.png',
-  spell_shaco_r2: 'assets/images/spells/shaco_r2.png',
-  spell_malphite_r: 'assets/images/spells/malphite_r.png',
-  spell_olaf_q: 'assets/images/spells/olaf_q.png',
-  spell_zed_q: 'assets/images/spells/zed_q.png',
-  spell_zed_w: 'assets/images/spells/zed_w.png',
-  spell_zed_w2: 'assets/images/spells/zed_w2.png',
-  spell_zed_e: 'assets/images/spells/zed_e.png',
-  spell_graves_w: 'assets/images/spells/graves_w.png',
-  spell_zed_r1: 'assets/images/spells/zed_r1.png',
-  spell_zed_r2: 'assets/images/spells/zed_r2.png',
-  spell_rammus_q: 'assets/images/spells/rammus_q.png',
-  spell_teemo_q: 'assets/images/spells/teemo_q.png',
-  spell_anivia_q: 'assets/images/spells/anivia_q.png',
-  spell_anivia_w: 'assets/images/spells/anivia_w.png',
-  spell_anivia_r: 'assets/images/spells/anivia_r.png',
-  spell_thresh_q: 'assets/images/spells/thresh_q.png',
-  spell_thresh_q2: 'assets/images/spells/thresh_q2.png',
+export type { AssetKey, AssetKind } from '../generated/assetManifest';
 
-  // buffs
-  buff_silence: 'assets/images/buffs/silence.png',
-  buff_slow: 'assets/images/buffs/slow.png',
-  buff_root: 'assets/images/buffs/root.png',
-  buff_airborne: 'assets/images/buffs/airborne.png',
-  buff_stun: 'assets/images/buffs/stun.png',
-  buff_charm: 'assets/images/buffs/charm.png',
-  buff_nearsight: 'assets/images/buffs/nearsight.png',
-  buff_fear: 'assets/images/buffs/fear.png',
-  buff_invisible: 'assets/images/buffs/invisible.png',
-  buff_truesight: 'assets/images/buffs/truesight.png',
-  buff_poison: 'assets/images/buffs/poison.png',
-  buff_ground: 'assets/images/buffs/ground.png',
-  buff_untargetable: 'assets/images/buffs/untargetable.png',
-  buff_stasis: 'assets/images/buffs/untargetable.png',
+export interface AssetHandle<T = unknown> {
+  readonly key: AssetKey | null;
+  readonly kind: AssetKind;
+  status: 'idle' | 'loading' | 'ready' | 'error';
+  data: T | null;
+  url: string;
+  readonly path: string;
+  error?: Error;
+}
 
-  // objects
-  obj_yasuo_q3: 'assets/images/objects/yasuo_q3.png',
+export interface AssetLoaders {
+  image: (url: string) => Promise<unknown>;
+  json: (url: string) => Promise<unknown>;
+  audio: (url: string) => Promise<unknown>;
+}
 
-  // monsters
-  monster_Ancient_Krug: 'assets/images/monsters/Ancient_Krug.png',
-  monster_Blue_Sentinel: 'assets/images/monsters/Blue_Sentinel.png',
-  monster_Crimson_Raptor: 'assets/images/monsters/Crimson_Raptor.png',
-  monster_Raptor: 'assets/images/monsters/Raptor.png',
-  monster_Gromp: 'assets/images/monsters/Gromp.png',
-  monster_Greater_Murk_Wolf: 'assets/images/monsters/Greater_Murk_Wolf.png',
-  monster_Murk_Wolf: 'assets/images/monsters/Murk_Wolf.png',
-  monster_Rift_Scuttle: 'assets/images/monsters/Rift_Scuttle.png',
-  monster_Red_Brambleback: 'assets/images/monsters/Red_Brambleback.png',
-  monster_Baron_Nashor: 'assets/images/monsters/Baron_Nashor.png',
-
-  // json
-  json_summoner_map: 'assets/json/summoner_map.json',
-} as const;
-
-export type AssetKey = keyof typeof AssetPaths;
+/** @deprecated Prefer AssetHandle through get/ensure. */
+export interface LoadedAsset extends AssetHandle<any> {}
 
 const PLACEHOLDER_SIZE = 64;
 
-/** Initials + a stable colour derived from the key, so each spell looks distinct. */
 function placeholderStyle(key: string): { label: string; hue: number } {
   const cleaned = key.replace(/^(spell|buff|obj|champ|monster)_/, '');
   const label = cleaned
@@ -128,7 +38,6 @@ function placeholderStyle(key: string): { label: string; hue: number } {
 
   let hash = 0;
   for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
-
   return { label: label || '?', hue: Math.abs(hash) % 360 };
 }
 
@@ -141,149 +50,186 @@ function placeholderSvgDataUri(label: string, hue: number): string {
     `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" ` +
     `font-family="sans-serif" font-size="26" font-weight="bold" fill="hsl(${hue} 75% 82%)">${label}</text>` +
     `</svg>`;
-
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-function drawPlaceholderGraphics(label: string, hue: number): any {
-  // p5's Graphics type omits the drawing methods it actually forwards
-  const g = createGraphics(PLACEHOLDER_SIZE, PLACEHOLDER_SIZE) as any;
-  g.colorMode(HSL, 360, 100, 100);
-  g.noStroke();
-  g.fill(hue, 45, 26);
-  g.rect(0, 0, PLACEHOLDER_SIZE, PLACEHOLDER_SIZE);
-
-  g.noFill();
-  g.stroke(hue, 60, 62);
-  g.strokeWeight(3);
-  g.rect(2, 2, PLACEHOLDER_SIZE - 4, PLACEHOLDER_SIZE - 4);
-
-  g.noStroke();
-  g.fill(hue, 75, 82);
-  g.textAlign(CENTER, CENTER);
-  g.textSize(26);
-  g.textStyle(BOLD);
-  g.text(label, PLACEHOLDER_SIZE / 2, PLACEHOLDER_SIZE / 2);
-
-  return g;
+interface PlaceholderGraphics {
+  colorMode(mode: unknown, max1: number, max2: number, max3: number): void;
+  noStroke(): void;
+  fill(...values: number[]): void;
+  rect(x: number, y: number, width: number, height: number): void;
+  noFill(): void;
+  stroke(...values: number[]): void;
+  strokeWeight(weight: number): void;
+  textAlign(horizontal: unknown, vertical: unknown): void;
+  textSize(size: number): void;
+  textStyle(style: unknown): void;
+  text(value: string, x: number, y: number): void;
 }
 
-export interface LoadedAsset {
-  data: any;
-  path: string;
+function drawPlaceholderGraphics(label: string, hue: number): PlaceholderGraphics {
+  const graphics = createGraphics(
+    PLACEHOLDER_SIZE,
+    PLACEHOLDER_SIZE
+  ) as unknown as PlaceholderGraphics;
+  graphics.colorMode(HSL, 360, 100, 100);
+  graphics.noStroke();
+  graphics.fill(hue, 45, 26);
+  graphics.rect(0, 0, PLACEHOLDER_SIZE, PLACEHOLDER_SIZE);
+  graphics.noFill();
+  graphics.stroke(hue, 60, 62);
+  graphics.strokeWeight(3);
+  graphics.rect(2, 2, PLACEHOLDER_SIZE - 4, PLACEHOLDER_SIZE - 4);
+  graphics.noStroke();
+  graphics.fill(hue, 75, 82);
+  graphics.textAlign(CENTER, CENTER);
+  graphics.textSize(26);
+  graphics.textStyle(BOLD);
+  graphics.text(label, PLACEHOLDER_SIZE / 2, PLACEHOLDER_SIZE / 2);
+  return graphics;
 }
 
-export interface LoadProgressEvent {
-  index: number;
-  total: number;
-  path: string;
+function p5Loader(name: 'loadImage' | 'loadJSON'): (url: string) => Promise<unknown> {
+  return url => new Promise((resolve, reject) => {
+    const candidate = (globalThis as unknown as Record<string, unknown>)[name];
+    if (typeof candidate !== 'function') {
+      reject(new Error(`${name} is not available`));
+      return;
+    }
+    const loader = candidate as (
+      path: string,
+      success: (data: unknown) => void,
+      failure: (error: unknown) => void
+    ) => void;
+    loader(url, resolve, error => reject(toError(error)));
+  });
 }
 
-export interface LoadFailedEvent {
-  path: string;
-  error: any;
+function audioLoader(url: string): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio();
+    audio.addEventListener('canplaythrough', () => resolve(audio), { once: true });
+    audio.addEventListener('error', () => reject(new Error(`Failed to load ${url}`)), { once: true });
+    audio.src = url;
+  });
 }
+
+function toError(value: unknown): Error {
+  return value instanceof Error ? value : new Error(String(value));
+}
+
+const defaultLoaders: AssetLoaders = {
+  image: p5Loader('loadImage'),
+  json: p5Loader('loadJSON'),
+  audio: audioLoader,
+};
 
 export default class AssetManager {
-  static _asset: Record<string, LoadedAsset> = {};
+  private static loaders = defaultLoaders;
+  private static handles = new Map<AssetKey, AssetHandle>();
+  private static loads = new Map<AssetKey, Promise<AssetHandle>>();
+  private static placeholders = new Map<string, AssetHandle>();
+  private static warnedPlaceholders = new Set<string>();
 
-  static getRandomChampion(): LoadedAsset {
-    const keys = Object.keys(AssetPaths);
-    const filteredKeys = keys.filter(key => key.startsWith('champ_'));
-    const randomKey = filteredKeys[Math.floor(Math.random() * filteredKeys.length)] as any;
-
-    return (
-      this._asset[randomKey] ?? {
-        data: null,
-        path: null,
-      }
-    );
+  static configureLoaders(loaders: AssetLoaders): void {
+    this.loaders = loaders;
   }
 
-  /**
-   * Real art if we have it, otherwise a generated stand-in so a spell without an
-   * icon still renders as a labelled tile instead of a broken image. Drop a real
-   * file into AssetPaths under the same key and the placeholder disappears.
-   */
-  static getAsset(key: string): LoadedAsset | undefined {
-    const loaded = this._asset[key];
-    if (loaded) return loaded;
-
-    // callers pass an absent key on purpose (e.g. `getAsset(preset?.avatar)`);
-    // only a real key earns a placeholder
-    if (!key || typeof key !== 'string') return undefined;
-
-    return this._getPlaceholder(key);
-  }
-
-  static _placeholders: Record<string, LoadedAsset> = {};
-  static _warnedPlaceholders = new Set<string>();
-
-  static _getPlaceholder(key: string): LoadedAsset {
-    const cached = this._placeholders[key];
+  static get(key: AssetKey): AssetHandle {
+    const cached = this.handles.get(key);
     if (cached) return cached;
 
-    if (!this._warnedPlaceholders.has(key)) {
-      this._warnedPlaceholders.add(key);
-      console.warn(`[AssetManager] no art for "${key}", using a placeholder`);
+    const asset = assetManifest[key];
+    const handle: AssetHandle = {
+      key,
+      kind: asset.kind,
+      status: 'idle',
+      data: null,
+      url: asset.url,
+      path: asset.url,
+    };
+    this.handles.set(key, handle);
+    return handle;
+  }
+
+  static ensure(key: AssetKey): Promise<AssetHandle> {
+    const existing = this.loads.get(key);
+    if (existing) return existing;
+
+    const handle = this.get(key);
+    if (handle.kind === 'url') {
+      handle.status = 'ready';
+      handle.data = handle.url;
+      const ready = Promise.resolve(handle);
+      this.loads.set(key, ready);
+      return ready;
     }
 
-    const { label, hue } = placeholderStyle(key);
+    handle.status = 'loading';
+    const load = this.loaders[handle.kind](handle.url)
+      .then(data => {
+        handle.data = data;
+        handle.status = 'ready';
+        return handle;
+      })
+      .catch(error => {
+        handle.error = toError(error);
+        handle.status = 'error';
+        throw handle.error;
+      });
+    this.loads.set(key, load);
+    return load;
+  }
 
-    // `path` feeds HTML <img> in the HUD; `data` feeds p5's image() on canvas.
-    // data is built lazily because p5 globals do not exist at module-eval time.
-    let graphics: any = null;
-    const asset = {
-      path: placeholderSvgDataUri(label, hue),
+  static ensureMany(keys: readonly AssetKey[]): Promise<AssetHandle[]> {
+    return Promise.all(keys.map(key => this.ensure(key)));
+  }
+
+  static placeholder(label: string): AssetHandle {
+    if (!label.trim()) throw new Error('Placeholder label is required');
+
+    const cached = this.placeholders.get(label);
+    if (cached) return cached;
+
+    const { label: initials, hue } = placeholderStyle(label);
+    const url = placeholderSvgDataUri(initials, hue);
+    let graphics: unknown = null;
+    const handle = {
+      key: null,
+      kind: 'image',
+      status: 'ready',
+      url,
+      path: url,
       get data() {
         if (!graphics && typeof createGraphics === 'function') {
-          graphics = drawPlaceholderGraphics(label, hue);
+          graphics = drawPlaceholderGraphics(initials, hue);
         }
         return graphics;
       },
-    } as LoadedAsset;
-
-    this._placeholders[key] = asset;
-    return asset;
+      set data(value: unknown) {
+        graphics = value;
+      },
+    } satisfies AssetHandle;
+    this.placeholders.set(label, handle);
+    return handle;
   }
 
-  static loadAssets(
-    onProgress?: (event: LoadProgressEvent) => void,
-    onSuccess?: () => void,
-    onFailed?: (event: LoadFailedEvent) => void
-  ): void {
-    let loadedCount = 0;
-    let hasError = false;
+  static getRandomChampion(): LoadedAsset {
+    const keys = Object.keys(assetManifest).filter(
+      key => key.startsWith('champ_') && !key.startsWith('champ_background_')
+    ) as AssetKey[];
+    return this.get(keys[Math.floor(Math.random() * keys.length)]) as LoadedAsset;
+  }
 
-    const entries = Object.entries(AssetPaths) as [AssetKey, string][];
-    const total = entries.length;
+  /** @deprecated Use get with an AssetKey, or placeholder with an explicit label. */
+  static getAsset(key: string | null | undefined): LoadedAsset | undefined {
+    if (!key) return undefined;
+    if (key in assetManifest) return this.get(key as AssetKey) as LoadedAsset;
 
-    for (const [key, path] of entries) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fn = key.startsWith('json') ? (window as any).loadJSON : (window as any).loadImage;
-      fn(
-        path,
-        // success
-        (data: any) => {
-          this._asset[key] = { data, path };
-          loadedCount++;
-
-          onProgress?.({
-            index: loadedCount,
-            total,
-            path,
-          });
-
-          if (loadedCount === total && !hasError) {
-            onSuccess?.();
-          }
-        },
-        // failed
-        (error: any) => {
-          hasError = true;
-          onFailed?.({ path, error });
-        }
-      );
+    if (!this.warnedPlaceholders.has(key)) {
+      this.warnedPlaceholders.add(key);
+      console.warn(`[AssetManager] unknown legacy asset "${key}", using a placeholder`);
     }
+    return this.placeholder(key) as LoadedAsset;
   }
 }

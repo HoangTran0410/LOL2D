@@ -1,5 +1,5 @@
 import * as AllSpells from './gameObject/spells/index';
-import AssetManager from '../managers/AssetManager';
+import AssetManager, { type AssetKey } from '../managers/AssetManager';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 
@@ -46,32 +46,32 @@ export const getChampionPresetRandom = (): {
 
 export const SpellGroups: {
   name: string;
-  image: string;
-  background: string;
+  image: AssetKey | null;
+  background: AssetKey | null;
   spells: SpellClass[];
 }[] = [
   {
     name: 'Yasuo',
     image: 'champ_yasuo',
-    background: './assets/images/champions/background/yasuo.png',
+    background: 'champ_background_yasuo',
     spells: [AllSpells.Yasuo_Q, AllSpells.Yasuo_W, AllSpells.Yasuo_E, AllSpells.Yasuo_R],
   },
   {
     name: 'Shaco',
     image: 'champ_shaco',
-    background: './assets/images/champions/background/shaco.png',
+    background: 'champ_background_shaco',
     spells: [AllSpells.Shaco_Q, AllSpells.Shaco_W, AllSpells.Shaco_E, AllSpells.Shaco_R],
   },
   {
     name: 'Ahri',
     image: 'champ_ahri',
-    background: './assets/images/champions/background/ahri.png',
+    background: 'champ_background_ahri',
     spells: [AllSpells.Ahri_Q, AllSpells.Ahri_W, AllSpells.Ahri_E, AllSpells.Ahri_R],
   },
   {
     name: 'Lee Sin',
     image: 'champ_leesin',
-    background: './assets/images/champions/background/leesin.png',
+    background: 'champ_background_leesin',
     spells: [
       AllSpells.LeeSin_Q,
       AllSpells.LeeSin_W,
@@ -82,7 +82,7 @@ export const SpellGroups: {
   {
     name: 'Blitzcrank',
     image: 'champ_blitzcrank',
-    background: './assets/images/champions/background/blitzcrank.png',
+    background: 'champ_background_blitzcrank',
     spells: [
       AllSpells.Blitzcrank_Q,
       AllSpells.Blitzcrank_W,
@@ -93,19 +93,19 @@ export const SpellGroups: {
   {
     name: 'Lux',
     image: 'champ_lux',
-    background: './assets/images/champions/background/lux.png',
+    background: 'champ_background_lux',
     spells: [AllSpells.Lux_Q, AllSpells.Lux_W, AllSpells.Lux_E, AllSpells.Lux_R],
   },
   {
     name: 'Ashe',
     image: 'champ_ashe',
-    background: './assets/images/champions/background/ashe.png',
+    background: 'champ_background_ashe',
     spells: [AllSpells.Ashe_Q, AllSpells.Ashe_W, AllSpells.Ashe_E, AllSpells.Ashe_R],
   },
   {
     name: "Cho'Gath",
     image: 'champ_chogath',
-    background: './assets/images/champions/background/chogath.png',
+    background: 'champ_background_chogath',
     spells: [
       AllSpells.ChoGath_Q,
       AllSpells.ChoGath_W,
@@ -116,133 +116,133 @@ export const SpellGroups: {
   {
     name: 'Leblanc',
     image: 'champ_leblanc',
-    background: './assets/images/champions/background/leblanc.png',
+    background: 'champ_background_leblanc',
     spells: [AllSpells.Leblanc_W, AllSpells.Leblanc_E],
   },
   {
     name: 'Malphite',
     image: 'champ_malphite',
-    background: './assets/images/champions/background/malphite.png',
+    background: 'champ_background_malphite',
     spells: [AllSpells.Malphite_Q, AllSpells.Malphite_W, AllSpells.Malphite_R],
   },
   {
     name: 'Olaf',
     image: 'champ_olaf',
-    background: './assets/images/champions/background/olaf.png',
+    background: 'champ_background_olaf',
     spells: [AllSpells.Olaf_Q],
   },
   {
     name: 'Teemo',
     image: 'champ_teemo',
-    background: './assets/images/champions/background/teemo.png',
+    background: 'champ_background_teemo',
     spells: [AllSpells.Teemo_Q, AllSpells.Teemo_R],
   },
   {
     name: 'Veigar',
     image: 'champ_veigar',
-    background: './assets/images/champions/background/veigar.png',
+    background: 'champ_background_veigar',
     spells: [AllSpells.Veigar_Q, AllSpells.Veigar_E],
   },
   {
     name: 'Zed',
     image: 'champ_zed',
-    background: './assets/images/champions/background/zed.png',
+    background: 'champ_background_zed',
     spells: [AllSpells.Zed_Q, AllSpells.Zed_W, AllSpells.Zed_E, AllSpells.Zed_R],
   },
   {
     name: 'Graves',
     image: 'champ_graves',
-    background: './assets/images/champions/background/graves.png',
+    background: 'champ_background_graves',
     spells: [AllSpells.Graves_W],
   },
   {
     name: 'Anivia',
-    image: 'champ_anivia',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_R],
   },
   {
     name: 'Thresh',
-    image: 'champ_thresh',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Thresh_Q],
   },
   {
     name: 'Rammus',
-    image: 'champ_rammus',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Rammus_Q],
   },
   {
     name: 'Morgana',
-    image: 'champ_morgana',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Morgana_Q, AllSpells.Morgana_E],
   },
   {
     name: 'Janna',
-    image: 'champ_janna',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Janna_Q],
   },
   {
     name: 'Alistar',
-    image: 'champ_alistar',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Alistar_W],
   },
   {
     name: 'Nocturne',
-    image: 'champ_nocturne',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Nocturne_R],
   },
   {
     name: 'Twitch',
-    image: 'champ_twitch',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Twitch_Q],
   },
   {
     name: 'Amumu',
-    image: 'champ_amumu',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Amumu_Q],
   },
   {
     name: 'Warwick',
-    image: 'champ_warwick',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Warwick_Q],
   },
   {
     name: 'Singed',
-    image: 'champ_singed',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Singed_W],
   },
   {
     name: 'Cassiopeia',
-    image: 'champ_cassiopeia',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Cassiopeia_W],
   },
   {
     name: 'Fizz',
-    image: 'champ_fizz',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Fizz_E],
   },
   {
     name: 'Nasus',
-    image: 'champ_nasus',
-    background: '',
+    image: null,
+    background: null,
     spells: [AllSpells.Nasus_Q],
   },
   {
     name: 'Phép Bổ Trợ',
-    image: '',
-    background: '',
+    image: null,
+    background: null,
     spells: [
       AllSpells.Flash,
       AllSpells.Ghost,

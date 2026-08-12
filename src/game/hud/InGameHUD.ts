@@ -6,7 +6,13 @@ import { SpellHotKeys } from '../constants';
 import { removeAccents } from '../../utils/index';
 import * as AllSpells from '../gameObject/spells/index';
 import { SpellGroups } from '../preset';
-import AssetManager from '../../managers/AssetManager';
+import AssetManager, { type AssetHandle, type AssetKey } from '../../managers/AssetManager';
+
+function ensureVisibleAsset(asset: Pick<AssetHandle, 'key' | 'status'> | undefined): void {
+  if (asset?.key && asset.status === 'idle') {
+    void AssetManager.ensure(asset.key).catch(error => console.warn(error));
+  }
+}
 
 // Types for Vue component data
 interface SpellDisplay {
@@ -38,6 +44,8 @@ interface SpellGroupDisplay {
   name: string;
   image: string;
   background: string;
+  imageKey: AssetKey | null;
+  backgroundKey: AssetKey | null;
   spells: SpellItemDisplay[];
 }
 
@@ -47,6 +55,7 @@ interface SpellItemDisplay {
   description: string;
   coolDown: number;
   spellClass: any;
+  assetKey: AssetKey | null;
 }
 
 interface StatsDisplay {
@@ -103,13 +112,18 @@ export default class InGameHUD {
               description: spellInstance.description,
               coolDown: spellInstance.coolDown,
               spellClass: spellClass,
+              assetKey: spellInstance.image?.key ?? null,
             })),
 
           spellGroups: (SpellGroups as any[]).map((group: any) => {
             return {
               name: group.name,
-              image: AssetManager.getAsset(group.image)?.path,
-              background: group.background,
+              image: group.image
+                ? AssetManager.get(group.image).url
+                : AssetManager.placeholder(group.name).url,
+              background: group.background ? AssetManager.get(group.background).url : '',
+              imageKey: group.image,
+              backgroundKey: group.background,
               spells: group.spells
                 .map((SpellClass: any) => ({
                   spellInstance: new SpellClass(null),
@@ -122,6 +136,7 @@ export default class InGameHUD {
                     description: spellInstance.description,
                     coolDown: spellInstance.coolDown,
                     spellClass: spellClass,
+                    assetKey: spellInstance.image?.key ?? null,
                   };
                 }),
             };
@@ -170,10 +185,26 @@ export default class InGameHUD {
           this.spellIndexToSwap = index;
           this.showSpellsPicker = !this.showSpellsPicker;
 
-          if (this.showSpellsPicker) this.game.pause();
+          if (this.showSpellsPicker) {
+            this.loadSpellPickerAssets();
+            this.game.pause();
+          }
           else this.game.unpause();
 
           this.spellHover = null;
+        },
+        loadSpellPickerAssets() {
+          const keys = new Set<AssetKey>();
+          const add = (key: AssetKey | null) => {
+            if (key) keys.add(key);
+          };
+          for (const spell of (this as any).allSpells as SpellItemDisplay[]) add(spell.assetKey);
+          for (const group of (this as any).spellGroups as SpellGroupDisplay[]) {
+            add(group.imageKey);
+            add(group.backgroundKey);
+            for (const spell of group.spells) add(spell.assetKey);
+          }
+          void AssetManager.ensureMany([...keys]).catch(error => console.warn(error));
         },
         closeSpellPicker() {
           this.showSpellsPicker = false;
@@ -363,6 +394,8 @@ export default class InGameHUD {
     const player = this.game?.player;
     if (!player) return;
 
+    ensureVisibleAsset(player.avatar);
+
     const { health, maxHealth, mana, maxMana } = player.stats || {};
     this.vueInstance.stats.health = ~~health?.value;
     this.vueInstance.stats.maxHealth = ~~maxHealth?.value;
@@ -387,6 +420,7 @@ export default class InGameHUD {
     this.vueInstance.spells = (player.spells || [])
       .filter((i: any) => i?.image?.path)
       .map((spell: any, index: number) => {
+        ensureVisibleAsset(spell.image);
         const isInternalSpell = index === 0;
         const isSummonerSpell = index > 4;
         const hotKey = SpellHotKeys[index]
@@ -419,6 +453,7 @@ export default class InGameHUD {
     const buffRows = new Map<any, BuffDisplay>();
     for (const buff of player.buffs || []) {
       if (!buff?.image?.path) continue;
+      ensureVisibleAsset(buff.image);
 
       const key = buff.stackId ?? buff.constructor;
       const timeLeft = (buff.duration || 0) - (buff.timeElapsed || 0);

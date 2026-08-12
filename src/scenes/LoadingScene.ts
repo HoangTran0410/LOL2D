@@ -22,39 +22,21 @@ export default class LoadingScene extends Scene {
     this.loadingText.innerHTML = 'Đang tải tài nguyên game...';
     this.errorText.innerHTML = '';
 
-    const errorAssets: string[] = [];
-
-    // load assets
-    AssetManager.loadAssets(
-      // progress
-      ({ index, total, path }) => {
-        const percent = Math.round((index / total) * 100);
-        this.progressBar.style.width = percent + '%';
-        this.loadingText.innerHTML = path;
-      },
-
-      // success
-      () => {
+    AssetManager.ensure('json_summoner_map')
+      .then(() => {
+        this.progressBar.style.width = '100%';
         this.loadingText.innerHTML = 'Đang khởi tạo game...';
-        import('./MenuScene')
-          .then(({ default: MenuSceneClass }: { default: typeof MenuScene }) => {
-            setTimeout(() => this.sceneManager.showScene(MenuSceneClass), 1000);
-          })
-          .catch(error => {
-            console.error(error);
-            this.errorText.innerHTML =
-              'LỖI: Khởi tạo game không thành công. Vui lòng tải lại trang.<br/>' + error.message;
-          });
-      },
-
-      // failed
-      ({ path, error }) => {
+        return import('./MenuScene');
+      })
+      .then(({ default: MenuSceneClass }: { default: typeof MenuScene }) => {
+        this.sceneManager.showScene(MenuSceneClass);
+      })
+      .catch(error => {
+        console.error(error);
         this.progressBar.style.display = 'none';
-        errorAssets.push(path);
         this.errorText.innerHTML =
-          'LỖI: Tải game không thành công. Vui lòng tải lại trang. <br/>' + errorAssets.join('\n');
-      }
-    );
+          'LỖI: Khởi tạo game không thành công. Vui lòng tải lại trang.<br/>' + error.message;
+      });
   }
 
   exit() {
