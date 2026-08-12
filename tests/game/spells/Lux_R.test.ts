@@ -6,6 +6,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 
 import Lux_R from '../../../src/game/gameObject/spells/Lux_R';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
+import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -35,6 +36,7 @@ interface TestTarget {
   teamId: string;
   isDead: boolean;
   takeDamage: (damage: number, source: unknown) => void;
+  addBuff: (buff: unknown) => void;
 }
 
 const context = (caster: unknown): CastContext => Object.freeze({
@@ -58,12 +60,15 @@ describe('Lux R', () => {
 
   it('snapshots its beam and deals damage only after cast completion', () => {
     const added: unknown[] = [];
+    const targetBuffs: unknown[] = [];
+    const ownerBuffs: Array<{ toRemove: boolean; statusFlagsToEnable: number }> = [];
     const target: TestTarget = {
       position: new TestVector(100, 0),
       collisionRadius: 20,
       teamId: 'red',
       isDead: false,
       takeDamage: vi.fn(),
+      addBuff: buff => targetBuffs.push(buff),
     };
     const owner = {
       game: {
@@ -77,14 +82,24 @@ describe('Lux R', () => {
       teamId: 'blue',
       isDead: false,
       canCast: true,
-      addBuff: vi.fn(),
-      stats: { mana: { value: 100 }, health: { value: 100 } },
+      stopMovement: vi.fn(),
+      addBuff: (buff: { activateBuff(): void; toRemove: boolean; statusFlagsToEnable: number }) => {
+        ownerBuffs.push(buff);
+        buff.activateBuff();
+      },
+      stats: { mana: { value: 200 }, health: { value: 100 } },
     };
     const spell = new Lux_R(owner);
 
     spell.press(context(owner));
 
     expect(spell.state).toBe('CASTING');
+    expect(spell.coolDown).toBe(60_000);
+    expect(spell.manaCost).toBe(100);
+    expect(owner.stats.mana.value).toBe(100);
+    expect(owner.stopMovement).toHaveBeenCalledOnce();
+    expect(ownerBuffs).toHaveLength(1);
+    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Stunned).toBeTruthy();
     expect(target.takeDamage).not.toHaveBeenCalled();
     expect(spell.cancel('MOVE')).toBe(false);
     expect(spell.cancel('STUN')).toBe(false);
@@ -93,7 +108,7 @@ describe('Lux R', () => {
     vi.stubGlobal('deltaTime', 1_000);
     spell.update();
 
-    const beam = added[0] as BeamSpellObject<TestTarget>;
+    const beam = added.find(object => object instanceof BeamSpellObject) as BeamSpellObject<TestTarget>;
     expect(beam.geometry).toEqual({
       start: { x: 0, y: 0 },
       end: { x: 3400, y: 0 },
@@ -104,5 +119,52 @@ describe('Lux R', () => {
     beam.update();
 
     expect(target.takeDamage).toHaveBeenCalledWith(30, owner);
+    expect(targetBuffs).toHaveLength(1);
+    expect(targetBuffs[0]).toMatchObject({ duration: 1_500, visionRadius: 150 });
+    expect(ownerBuffs[0].toRemove).toBe(true);
+  });
+
+  it('grants sight along the frozen beam during the cast and briefly after release', () => {
+    const added: Array<{
+      position?: { x: number; y: number };
+      visionRadius?: number;
+      teamId?: string;
+      toRemove?: boolean;
+      update?: (deltaMs?: number) => void;
+    }> = [];
+    const ownerBuffs: Array<{ activateBuff(): void }> = [];
+    const owner = {
+      game: {
+        eventManager: { emit: vi.fn() },
+        objectManager: {
+          addObject: (object: typeof added[number]) => added.push(object),
+          queryObjects: () => [],
+        },
+      },
+      position: new TestVector(0, 0),
+      teamId: 'blue',
+      isDead: false,
+      canCast: true,
+      stopMovement: vi.fn(),
+      addBuff: (buff: { activateBuff(): void }) => {
+        ownerBuffs.push(buff);
+        buff.activateBuff();
+      },
+      stats: { mana: { value: 200 }, health: { value: 100 } },
+    };
+    const spell = new Lux_R(owner);
+
+    spell.press(context(owner));
+
+    const sight = added.filter(object => (object.visionRadius ?? 0) > 0);
+    expect(sight.length).toBeGreaterThan(1);
+    expect(sight.every(object => object.teamId === 'blue')).toBe(true);
+    expect(Math.min(...sight.map(object => object.position!.x))).toBe(0);
+    expect(Math.max(...sight.map(object => object.position!.x))).toBe(3_400);
+
+    sight.forEach(object => object.update?.(1_499));
+    expect(sight.every(object => object.toRemove === false)).toBe(true);
+    sight.forEach(object => object.update?.(1));
+    expect(sight.every(object => object.toRemove === true)).toBe(true);
   });
 });

@@ -1,8 +1,12 @@
 import AssetManager from '../../../managers/AssetManager';
+import StatusFlags from '../../enums/StatusFlags';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import BeamRenderer from '../../vfx/BeamRenderer';
 import CastBar from '../../vfx/CastBar';
+import Buff from '../Buff';
 import Spell from '../Spell';
+import SpellObject from '../SpellObject';
+import TrueSight from '../buffs/TrueSight';
 import BeamSpellObject, {
   type BeamGeometry,
   type BeamTarget,
@@ -12,6 +16,32 @@ interface LuxTarget extends BeamTarget {
   readonly teamId: string;
   readonly isDead: boolean;
   takeDamage(damage: number, source: unknown): void;
+  addBuff(buff: unknown): void;
+}
+
+class Lux_R_CastLock extends Buff {
+  name = 'Cầu Vồng Tối Thượng';
+  stackId = 'lux_r_cast_lock';
+  statusFlagsToEnable = StatusFlags.Stunned;
+
+  onActivate(): void {
+    this.targetUnit.stopMovement?.();
+  }
+}
+
+class Lux_R_Vision extends SpellObject {
+  visionRadius = 250;
+  private elapsedMs = 0;
+
+  constructor(owner: SpellObject['owner'], position: { x: number; y: number }) {
+    super(owner);
+    this.position = createVector(position.x, position.y);
+  }
+
+  update(deltaMs = deltaTime): void {
+    this.elapsedMs += Math.max(0, deltaMs);
+    if (this.elapsedMs >= 1_500) this.toRemove = true;
+  }
 }
 
 export default class Lux_R extends Spell {
@@ -19,8 +49,8 @@ export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   description =
     'Niệm <span class="time">1 giây</span> rồi bắn một dải sáng theo hướng đã chốt, gây <span class="damage">30 sát thương</span> lên mọi kẻ địch trúng phải';
-  coolDown = 10_000;
-  manaCost = 50;
+  coolDown = 60_000;
+  manaCost = 100;
 
   private readonly castTimeMs = 1_000;
   private readonly range = 3_400;
@@ -28,6 +58,8 @@ export default class Lux_R extends Spell {
   private readonly damage = 30;
   private castElapsedMs = 0;
   private geometry?: BeamGeometry;
+  private castLock?: Lux_R_CastLock;
+  private sightObjects: Lux_R_Vision[] = [];
 
   protected get castSpec(): CastSpec {
     return {
@@ -53,6 +85,10 @@ export default class Lux_R extends Spell {
   onCastStart(context: CastContext): void {
     this.castElapsedMs = 0;
     this.geometry = this.beamGeometry(context);
+    this.castLock = new Lux_R_CastLock(this.castTimeMs, this.owner, this.owner);
+    this.castLock.image = this.image;
+    this.owner.addBuff(this.castLock);
+    this.addBeamSight(this.geometry);
   }
 
   onUpdate(): void {
@@ -65,11 +101,28 @@ export default class Lux_R extends Spell {
     const beam = new BeamSpellObject<LuxTarget>(this.owner, this.geometry, {
       candidateFilter: target =>
         typeof target.takeDamage === 'function' &&
+        typeof target.addBuff === 'function' &&
         !target.isDead &&
         target.teamId !== this.owner.teamId,
-      onHit: target => target.takeDamage(this.damage, this.owner),
+      onHit: target => {
+        target.takeDamage(this.damage, this.owner);
+        const reveal = new TrueSight(1_500, this.owner, target);
+        reveal.visionRadius = 150;
+        reveal.image = this.image;
+        target.addBuff(reveal);
+      },
     });
     this.game.objectManager.addObject(beam);
+  }
+
+  onCancel(): void {
+    this.releaseCastLock();
+    for (const sight of this.sightObjects) sight.toRemove = true;
+    this.sightObjects = [];
+  }
+
+  onComplete(): void {
+    this.releaseCastLock();
   }
 
   private beamGeometry(context: CastContext): BeamGeometry {
@@ -81,5 +134,24 @@ export default class Lux_R extends Spell {
       },
       width: this.width,
     };
+  }
+
+  private addBeamSight(geometry: BeamGeometry): void {
+    const segments = Math.ceil(this.range / 400);
+    this.sightObjects = [];
+    for (let index = 0; index <= segments; index++) {
+      const ratio = index / segments;
+      const sight = new Lux_R_Vision(this.owner, {
+        x: geometry.start.x + (geometry.end.x - geometry.start.x) * ratio,
+        y: geometry.start.y + (geometry.end.y - geometry.start.y) * ratio,
+      });
+      this.sightObjects.push(sight);
+      this.game.objectManager.addObject(sight);
+    }
+  }
+
+  private releaseCastLock(): void {
+    this.castLock?.deactivateBuff();
+    this.castLock = undefined;
   }
 }

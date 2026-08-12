@@ -1,5 +1,7 @@
-import { Circle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import EventType from '../../enums/EventType';
+import TerrainType from '../../enums/TerrainType';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
 import Spell from '../Spell';
@@ -13,12 +15,16 @@ interface JannaTarget extends AreaTarget {
   takeHeal(amount: number, healer: unknown): void;
 }
 
+interface Wall {
+  readonly vertices: readonly { x: number; y: number }[];
+}
+
 export default class Janna_R extends Spell {
   image = AssetManager.getAsset('spell_janna_r');
   name = 'Gió Mùa (Janna_R)';
   description =
     'Đẩy lùi kẻ địch gần đó, rồi vận sức tối đa <span class="time">3 giây</span>, hồi <span class="damage">2 máu mỗi 0.25 giây</span> cho bản thân và đồng minh trong vùng';
-  coolDown = 10_000;
+  coolDown = 130_000;
   manaCost = 100;
 
   private readonly radius = 700;
@@ -28,6 +34,8 @@ export default class Janna_R extends Spell {
   private readonly knockbackDistance = 875;
   private readonly knockbackDurationMs = 500;
   private activeArea?: AreaSpellObject<JannaTarget>;
+  private channelOrigin?: { x: number; y: number };
+  private stopWatching: (() => void)[] = [];
 
   protected get castSpec(): CastSpec {
     return {
@@ -41,23 +49,78 @@ export default class Janna_R extends Spell {
   }
 
   onSpellCast(context: CastContext): void {
+    this.owner.stopMovement?.();
+    this.channelOrigin = context.origin;
+    this.watchInterrupts();
     this.knockEnemies(context);
     this.activeArea = new AreaSpellObject<JannaTarget>(this.owner, context.origin, this.radius, {
       durationMs: this.channelDurationMs,
-      tickEveryMs: this.tickEveryMs,
       candidateFilter: target =>
         !target.isDead && target.teamId === this.owner.teamId && typeof target.takeHeal === 'function',
-      onTick: target => target.takeHeal(this.healPerTick, this.owner),
     });
     this.game.objectManager.addObject(this.activeArea);
   }
 
+  onUpdate(): void {
+    if (this.state !== 'CHANNELING' || !this.channelOrigin) return;
+    if (!this.owner.canCast) {
+      this.cancel('SILENCE');
+      return;
+    }
+    if (
+      this.owner.position.x !== this.channelOrigin.x ||
+      this.owner.position.y !== this.channelOrigin.y
+    ) {
+      this.cancel('DISPLACEMENT');
+      return;
+    }
+    if (
+      this.owner.destination &&
+      (this.owner.destination.x !== this.owner.position.x ||
+        this.owner.destination.y !== this.owner.position.y)
+    ) {
+      this.cancel('MOVE');
+    }
+  }
+
+  onChannelTick(): void {
+    if (!this.channelOrigin) return;
+    const targets = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.channelOrigin.x, y: this.channelOrigin.y, r: this.radius }),
+    }) as unknown as JannaTarget[];
+
+    for (const target of targets) {
+      if (
+        target.isDead ||
+        target.teamId !== this.owner.teamId ||
+        typeof target.takeHeal !== 'function' ||
+        Math.hypot(
+          target.position.x - this.channelOrigin.x,
+          target.position.y - this.channelOrigin.y
+        ) > this.radius + target.collisionRadius
+      ) {
+        continue;
+      }
+      target.takeHeal(this.healPerTick, this.owner);
+    }
+  }
+
   onCancel(): void {
-    this.stopArea();
+    this.finishChannel();
   }
 
   onComplete(): void {
-    this.stopArea();
+    this.finishChannel();
+  }
+
+  deactivate(): void {
+    this.finishChannel();
+    super.deactivate();
+  }
+
+  onRemoved(): void {
+    this.finishChannel();
+    super.onRemoved();
   }
 
   private knockEnemies(context: CastContext): void {
@@ -77,23 +140,106 @@ export default class Janna_R extends Spell {
 
       const directionX = distance === 0 ? 1 : dx / distance;
       const directionY = distance === 0 ? 0 : dy / distance;
-      const displacement = this.knockbackDistance - distance;
+      const desiredDestination = {
+        x: context.origin.x + directionX * this.knockbackDistance,
+        y: context.origin.y + directionY * this.knockbackDistance,
+      };
+      const destination = this.clampKnockbackDestination(target, desiredDestination);
+      const displacement = Math.hypot(
+        destination.x - target.position.x,
+        destination.y - target.position.y
+      );
       const knockback = new Dash(this.knockbackDurationMs, this.owner, target);
       knockback.image = this.image;
-      knockback.dashDestination = createVector(
-        context.origin.x + directionX * this.knockbackDistance,
-        context.origin.y + directionY * this.knockbackDistance
-      );
+      knockback.dashDestination = createVector(destination.x, destination.y);
       knockback.dashSpeed = displacement / (this.knockbackDurationMs / (1000 / 60));
       knockback.showTrail = false;
       knockback.cancelable = false;
+      knockback.stayAtDestination = false;
+      knockback.statusFlagsToEnable = 0;
       target.addBuff(knockback);
     }
   }
 
-  private stopArea(): void {
-    if (!this.activeArea) return;
-    this.activeArea.toRemove = true;
+  private watchInterrupts(): void {
+    this.stopWatching.forEach(stop => stop());
+    this.stopWatching = [
+      this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, (spell: { owner?: unknown }) => {
+        if (spell !== this && spell.owner === this.owner) this.cancel('PLAYER_CANCEL');
+      }),
+      this.game.eventManager.on(EventType.ON_ATTACK, (attacker: unknown) => {
+        if (attacker === this.owner) this.cancel('PLAYER_CANCEL');
+      }),
+    ];
+  }
+
+  private finishChannel(): void {
+    if (this.activeArea) this.activeArea.toRemove = true;
     this.activeArea = undefined;
+    this.channelOrigin = undefined;
+    this.stopWatching.forEach(stop => stop());
+    this.stopWatching = [];
+  }
+
+  private clampKnockbackDestination(
+    target: JannaTarget,
+    desired: { x: number; y: number }
+  ): { x: number; y: number } {
+    const start = target.position;
+    const padding = target.collisionRadius;
+    const walls = (this.game.terrainMap?.getObstaclesInArea?.(
+      new Rectangle({
+        x: Math.min(start.x, desired.x) - padding,
+        y: Math.min(start.y, desired.y) - padding,
+        w: Math.abs(desired.x - start.x) + padding * 2,
+        h: Math.abs(desired.y - start.y) + padding * 2,
+      }),
+      [TerrainType.WALL]
+    ) ?? []) as Wall[];
+
+    let nearestRatio = 1;
+    for (const wall of walls) {
+      for (let index = 0; index < wall.vertices.length; index++) {
+        const ratio = this.intersectionRatio(
+          start,
+          desired,
+          wall.vertices[index],
+          wall.vertices[(index + 1) % wall.vertices.length]
+        );
+        if (ratio !== undefined) nearestRatio = Math.min(nearestRatio, ratio);
+      }
+    }
+
+    if (nearestRatio === 1) return desired;
+    const dx = desired.x - start.x;
+    const dy = desired.y - start.y;
+    const length = Math.hypot(dx, dy);
+    const allowedDistance = Math.max(0, length * nearestRatio - padding);
+    return {
+      x: start.x + (dx / length) * allowedDistance,
+      y: start.y + (dy / length) * allowedDistance,
+    };
+  }
+
+  private intersectionRatio(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    edgeStart: { x: number; y: number },
+    edgeEnd: { x: number; y: number }
+  ): number | undefined {
+    const rayX = end.x - start.x;
+    const rayY = end.y - start.y;
+    const edgeX = edgeEnd.x - edgeStart.x;
+    const edgeY = edgeEnd.y - edgeStart.y;
+    const denominator = rayX * edgeY - rayY * edgeX;
+    if (denominator === 0) return undefined;
+
+    const offsetX = edgeStart.x - start.x;
+    const offsetY = edgeStart.y - start.y;
+    const rayRatio = (offsetX * edgeY - offsetY * edgeX) / denominator;
+    const edgeRatio = (offsetX * rayY - offsetY * rayX) / denominator;
+    return rayRatio >= 0 && rayRatio <= 1 && edgeRatio >= 0 && edgeRatio <= 1
+      ? rayRatio
+      : undefined;
   }
 }

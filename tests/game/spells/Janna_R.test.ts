@@ -14,6 +14,8 @@ vi.mock('../../../src/game/vfx/CastTelegraph', () => ({
   },
 }));
 
+import EventManager from '../../../src/managers/EventManager';
+import EventType from '../../../src/game/enums/EventType';
 import Janna_R from '../../../src/game/gameObject/spells/Janna_R';
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
@@ -23,13 +25,16 @@ import type { CastContext } from '../../../src/game/spell/runtime/types';
 class TestVector {
   constructor(public x = 0, public y = 0) {}
   copy() { return new TestVector(this.x, this.y); }
+  set(x: number, y: number) { this.x = x; this.y = y; return this; }
 }
 
 interface TestUnit {
   position: TestVector;
+  destination: TestVector;
   collisionRadius: number;
   teamId: string;
   isDead: boolean;
+  canCast: boolean;
   addBuff: (buff: unknown) => void;
   takeHeal: (amount: number, healer: unknown) => void;
 }
@@ -43,6 +48,31 @@ const context = (caster: unknown): CastContext => Object.freeze({
   cursorWorld: Object.freeze({ x: 0, y: 0 }),
   direction: Object.freeze({ x: 0, y: 0 }),
 });
+
+const makeOwner = (candidates: TestUnit[] = []) => {
+  const added: unknown[] = [];
+  const owner = {
+    position: new TestVector(0, 0),
+    destination: new TestVector(0, 0),
+    collisionRadius: 20,
+    teamId: 'blue',
+    isDead: false,
+    canCast: true,
+    addBuff: vi.fn(),
+    takeHeal: vi.fn(),
+    stopMovement() { this.destination.set(this.position.x, this.position.y); },
+    game: {
+      eventManager: new EventManager(),
+      terrainMap: { getObstaclesInArea: vi.fn(() => []) },
+      objectManager: {
+        addObject: (object: unknown) => added.push(object),
+        queryObjects: () => [owner, ...candidates],
+      },
+    },
+    stats: { mana: { value: 200 }, health: { value: 100 } },
+  };
+  return { owner, added };
+};
 
 describe('Janna R', () => {
   beforeEach(() => {
@@ -60,52 +90,40 @@ describe('Janna R', () => {
     expect(group?.spells).toContain(Janna_R);
   });
 
-  it('knocks enemies back once then heals allies on channel ticks', () => {
-    const added: unknown[] = [];
+  it('uses imported rank-one resource values', () => {
+    const { owner } = makeOwner();
+    const spell = new Janna_R(owner);
+
+    spell.press(context(owner));
+
+    expect(spell.coolDown).toBe(130_000);
+    expect(spell.manaCost).toBe(100);
+    expect(owner.stats.mana.value).toBe(100);
+  });
+
+  it('knocks enemies back once then heals allies on runtime channel ticks', () => {
     const enemyBuffs: unknown[] = [];
     const enemy: TestUnit = {
       position: new TestVector(100, 0),
+      destination: new TestVector(100, 0),
       collisionRadius: 20,
       teamId: 'red',
       isDead: false,
+      canCast: true,
       addBuff: buff => enemyBuffs.push(buff),
       takeHeal: vi.fn(),
     };
     const ally: TestUnit = {
       position: new TestVector(200, 0),
+      destination: new TestVector(200, 0),
       collisionRadius: 20,
       teamId: 'blue',
       isDead: false,
-      addBuff: vi.fn(),
-      takeHeal: vi.fn(),
-    };
-    const owner: TestUnit & {
-      game: {
-        eventManager: { emit: ReturnType<typeof vi.fn> };
-        objectManager: {
-          addObject: (object: unknown) => void;
-          queryObjects: () => TestUnit[];
-        };
-      };
-      canCast: boolean;
-      stats: { mana: { value: number }; health: { value: number } };
-    } = {
-      position: new TestVector(0, 0),
-      collisionRadius: 20,
-      teamId: 'blue',
-      isDead: false,
-      addBuff: vi.fn(),
-      takeHeal: vi.fn(),
-      game: {
-        eventManager: { emit: vi.fn() },
-        objectManager: {
-          addObject: (object: unknown) => added.push(object),
-          queryObjects: () => [owner, ally, enemy],
-        },
-      },
       canCast: true,
-      stats: { mana: { value: 100 }, health: { value: 100 } },
+      addBuff: vi.fn(),
+      takeHeal: vi.fn(),
     };
+    const { owner } = makeOwner([ally, enemy]);
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
@@ -119,78 +137,91 @@ describe('Janna R', () => {
     expect(knockback.dashDestination).toEqual({ x: 875, y: 0 });
     expect(knockback.dashSpeed).toBeCloseTo(775 / 30);
 
-    const area = added.find(object => object instanceof AreaSpellObject) as AreaSpellObject<TestUnit>;
-    area.update(250);
-    area.update(250);
+    vi.stubGlobal('deltaTime', 250);
+    spell.update();
+    spell.update();
 
     expect(ally.takeHeal).toHaveBeenCalledTimes(2);
     expect(ally.takeHeal).toHaveBeenLastCalledWith(2, owner);
     expect(enemy.takeHeal).not.toHaveBeenCalled();
   });
 
-  it.each(['MOVE', 'STUN'] as const)('stops ticks and loop VFX when %s cancels it', reason => {
-    const added: unknown[] = [];
-    const owner: TestUnit & {
-      game: {
-        eventManager: { emit: ReturnType<typeof vi.fn> };
-        objectManager: {
-          addObject: (object: unknown) => void;
-          queryObjects: () => TestUnit[];
-        };
-      };
-      canCast: boolean;
-      stats: { mana: { value: number }; health: { value: number } };
-    } = {
-      position: new TestVector(0, 0),
-      collisionRadius: 20,
-      teamId: 'blue',
-      isDead: false,
-      addBuff: vi.fn(),
-      takeHeal: vi.fn(),
-      game: {
-        eventManager: { emit: vi.fn() },
-        objectManager: {
-          addObject: (object: unknown) => added.push(object),
-          queryObjects: () => [owner],
-        },
-      },
-      canCast: true,
-      stats: { mana: { value: 100 }, health: { value: 100 } },
-    };
+  it.each([
+    ['movement command', (owner: ReturnType<typeof makeOwner>['owner']) => owner.destination.set(10, 0)],
+    ['displacement', (owner: ReturnType<typeof makeOwner>['owner']) => owner.position.set(10, 0)],
+    ['cast-blocking CC', (owner: ReturnType<typeof makeOwner>['owner']) => { owner.canCast = false; }],
+    ['another spell cast', (owner: ReturnType<typeof makeOwner>['owner']) => {
+      owner.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, { owner });
+    }],
+    ['an attack', (owner: ReturnType<typeof makeOwner>['owner']) => {
+      owner.game.eventManager.emit(EventType.ON_ATTACK, owner);
+    }],
+  ] as const)('gameplay %s cancels ticks and loop VFX', (_name, interrupt) => {
+    const { owner, added } = makeOwner();
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
     const area = added.find(object => object instanceof AreaSpellObject) as AreaSpellObject<TestUnit>;
+    interrupt(owner);
+    spell.update();
 
-    expect(spell.cancel(reason)).toBe(true);
-    area.update(250);
-
+    expect(spell.state).toBe('COOLDOWN');
     expect(area.toRemove).toBe(true);
     expect(owner.takeHeal).not.toHaveBeenCalled();
     expect(loopDispose).toHaveBeenCalledOnce();
   });
 
-  it('completes after its imported maximum channel duration', () => {
-    const owner = {
-      game: {
-        eventManager: { emit: vi.fn() },
-        objectManager: { addObject: vi.fn(), queryObjects: () => [] },
-      },
-      position: new TestVector(0, 0),
+  it('includes the twelfth heal tick at its imported maximum channel duration', () => {
+    const ally: TestUnit = {
+      position: new TestVector(200, 0),
+      destination: new TestVector(200, 0),
       collisionRadius: 20,
       teamId: 'blue',
       isDead: false,
       canCast: true,
       addBuff: vi.fn(),
       takeHeal: vi.fn(),
-      stats: { mana: { value: 100 }, health: { value: 100 } },
     };
+    const { owner } = makeOwner([ally]);
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
     vi.stubGlobal('deltaTime', 3_000);
     spell.update();
 
+    expect(ally.takeHeal).toHaveBeenCalledTimes(12);
     expect(spell.state).toBe('COOLDOWN');
+  });
+
+  it('clamps initial knockback before map walls and leaves collision enabled', () => {
+    const enemyBuffs: unknown[] = [];
+    const enemy: TestUnit = {
+      position: new TestVector(100, 0),
+      destination: new TestVector(100, 0),
+      collisionRadius: 20,
+      teamId: 'red',
+      isDead: false,
+      canCast: true,
+      addBuff: buff => enemyBuffs.push(buff),
+      takeHeal: vi.fn(),
+    };
+    const { owner } = makeOwner([enemy]);
+    owner.game.terrainMap.getObstaclesInArea.mockReturnValue([{
+      vertices: [
+        { x: 400, y: -100 },
+        { x: 500, y: -100 },
+        { x: 500, y: 100 },
+        { x: 400, y: 100 },
+      ],
+    }]);
+    const spell = new Janna_R(owner);
+
+    spell.press(context(owner));
+
+    expect(enemyBuffs).toHaveLength(1);
+    expect(enemyBuffs[0]).toMatchObject({
+      dashDestination: { x: 380, y: 0 },
+      statusFlagsToEnable: 0,
+    });
   });
 });
