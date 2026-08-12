@@ -3,6 +3,7 @@ import luaparse from 'luaparse';
 function literal(node) {
   switch (node?.type) {
     case 'StringLiteral':
+      return Buffer.from(node.value, 'latin1').toString('utf8');
     case 'NumericLiteral':
     case 'BooleanLiteral':
       return node.value;
@@ -16,7 +17,8 @@ function literal(node) {
 }
 
 function keyValue(node) {
-  if (node.type === 'StringLiteral' || node.type === 'NumericLiteral') return node.value;
+  if (node.type === 'StringLiteral') return Buffer.from(node.value, 'latin1').toString('utf8');
+  if (node.type === 'NumericLiteral') return node.value;
   if (node.type === 'Identifier') return node.name;
   throw new Error(`Unsupported Lua table key: ${node.type}`);
 }
@@ -38,7 +40,8 @@ function table(node) {
 }
 
 export function parseLuaData(source) {
-  const ast = luaparse.parse(source, { comments: false, luaVersion: '5.3', encodingMode: 'x-user-defined' });
+  const byteSource = Buffer.from(source, 'utf8').toString('latin1');
+  const ast = luaparse.parse(byteSource, { comments: false, luaVersion: '5.3', encodingMode: 'pseudo-latin1' });
   if (ast.body.length !== 1 || ast.body[0].type !== 'ReturnStatement' || ast.body[0].arguments.length !== 1) {
     throw new Error('Unsupported Lua module: expected one return statement');
   }

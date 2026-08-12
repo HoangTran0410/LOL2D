@@ -7,6 +7,7 @@ import {
 } from '../../scripts/wiki/lua-data.mjs';
 
 const fixtureUrl = new URL('../fixtures/wiki/champion-data.lua', import.meta.url);
+const unicodeFixtureUrl = new URL('../fixtures/wiki/unicode-champion-data.lua', import.meta.url);
 
 describe('League Wiki Lua data', () => {
   it('converts the ChampionData Lua table without executing Lua', async () => {
@@ -28,6 +29,12 @@ describe('League Wiki Lua data', () => {
       'Howling Gale',
       'Howling Gale Recast',
     ]);
+  });
+
+  it('preserves UTF-8 punctuation and Vietnamese text exactly', async () => {
+    const data = parseLuaData(await readFile(unicodeFixtureUrl, 'utf8'));
+
+    expect(data.Janna.title).toBe('Janna’s Gió Mùa');
   });
 
   it('rejects calls, functions, index expressions, and duplicate keys', () => {
