@@ -22,7 +22,8 @@ export function deterministicJson(value) {
 }
 
 function hash(value) {
-  return createHash('sha256').update(typeof value === 'string' ? value : deterministicJson(value)).digest('hex');
+  const content = typeof value === 'string' || value instanceof Uint8Array ? value : deterministicJson(value);
+  return createHash('sha256').update(content).digest('hex');
 }
 
 export function championSlug(name) {
@@ -166,8 +167,11 @@ export async function importAbilities({
       asset: { key: championAssetKey, originalUrl: championImageInfo.url, mime: championImageInfo.mime, sha1: championImageInfo.sha1 },
     };
     const championRecordPath = resolve(root, `docs/abilities/${slug}/champion.json`);
-    const previousChampion = update && await exists(championRecordPath) ? await readJson(championRecordPath, null) : null;
-    if (!previousChampion || previousChampion.source?.revisionId !== championRecord.source.revisionId || previousChampion.source?.contentHash !== championRecord.source.contentHash) {
+    const championExists = await exists(championRecordPath);
+    const previousChampion = update && championExists ? await readJson(championRecordPath, null) : null;
+    const championImageHash = hash(championBytes);
+    const championImageChanged = sourceEntries.get(championAssetKey)?.contentHash !== championImageHash;
+    if (!championExists || update && (previousChampion.source?.revisionId !== championRecord.source.revisionId || previousChampion.source?.contentHash !== championRecord.source.contentHash || championImageChanged)) {
       outputs.push([relative(root, championRecordPath), deterministicJson(championRecord)]);
       outputs.push([`docs/abilities/cache/normalized/${slug}/champion.json`, deterministicJson(championRecord)]);
       outputs.push([championLocalPath, championBytes]);
@@ -177,7 +181,7 @@ export async function importAbilities({
         sourceUrl: championImageInfo.url,
         revisionId: indexSource.revisionId,
         fetchedAt,
-        contentHash: hash(championBytes),
+        contentHash: championImageHash,
       });
     }
     for (const slot of slots) {
@@ -204,6 +208,8 @@ export async function importAbilities({
       const localAssetKey = `spell_${slug.replaceAll('-', '_')}_${slot.toLowerCase()}`;
       const localPath = `assets/images/spells/${slug}_${slot.toLowerCase()}${extension}`;
       const source = sourceRecord(templates[0], fetchedAt, normalizedForms);
+      const imageHash = hash(bytes);
+      const imageChanged = sourceEntries.get(localAssetKey)?.contentHash !== imageHash;
       const record = {
         schemaVersion: 1,
         champion: name,
@@ -215,7 +221,7 @@ export async function importAbilities({
       if (update && await exists(recordPath)) {
         const previous = await readJson(recordPath, null);
         for (const field of changedFields(previous, record)) log(`${name} ${slot}: ${field} changed`);
-        if (previous.source?.revisionId === record.source.revisionId && previous.source?.contentHash === record.source.contentHash) {
+        if (previous.source?.revisionId === record.source.revisionId && previous.source?.contentHash === record.source.contentHash && !imageChanged) {
           log(`${name} ${slot}: unchanged`);
           continue;
         }
@@ -240,7 +246,7 @@ export async function importAbilities({
         sourceUrl: imageInfo.url,
         revisionId: templates[0].revisionId,
         fetchedAt,
-        contentHash: hash(bytes),
+        contentHash: imageHash,
       });
     }
   }
@@ -252,6 +258,7 @@ export async function importAbilities({
 
 export async function syncChampionIndex({ root, client = createMediaWikiClient(), now = () => new Date().toISOString() }) {
   const response = await client.fetchChampionIndex();
+  assertPcSource(response.pageUrl);
   const data = parseLuaData(response.source);
   const fetchedAt = now();
   const normalized = { schemaVersion: 1, source: sourceRecord(response, fetchedAt, data), champions: data };
@@ -275,11 +282,15 @@ export function parseCli(args) {
       if (!value) throw new Error(`${arg} requires a value`);
       options.champions = value.split(',').map(name => name.trim());
       options.champions.forEach(championSlug);
+      if (new Set(options.champions.map(name => name.toLowerCase())).size !== options.champions.length) {
+        throw new Error(`Duplicate champion selection: ${value}`);
+      }
     } else if (arg === '--slots') {
       const value = args[++index];
       if (!value) throw new Error('--slots requires a value');
       options.slots = value.toUpperCase().split(',');
       if (options.slots.some(slot => !ALL_SLOTS.includes(slot))) throw new Error(`Invalid slots: ${value}`);
+      if (new Set(options.slots).size !== options.slots.length) throw new Error(`Duplicate slot selection: ${value}`);
     } else throw new Error(`Unknown argument: ${arg}`);
   }
   if (!options.index && !options.all && !options.champions) throw new Error('Use --champion, --champions, or --all');

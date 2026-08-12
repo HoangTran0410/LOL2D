@@ -21,16 +21,18 @@ function validateSource(source, path) {
 
 export async function checkAbilities(root) {
   const docsRoot = resolve(root, 'docs/abilities');
-  const files = (await walk(docsRoot)).filter(path => path.endsWith('.json') && !path.includes('/cache/'));
+  const allFiles = (await walk(docsRoot)).filter(path => path.endsWith('.json'));
+  const files = allFiles.filter(path => !path.includes('/cache/'));
   const identities = new Set();
   const manifest = await readFile(resolve(root, 'assets/source-manifest.json'), 'utf8').then(JSON.parse, () => ({ sources: [] }));
   const sources = new Map(manifest.sources?.map(source => [source.localAssetKey, source]) ?? []);
   const generated = await readFile(resolve(root, 'src/generated/assetManifest.ts'), 'utf8').catch(() => '');
 
-  for (const path of files) {
+  for (const path of allFiles) {
     const value = JSON.parse(await readFile(path, 'utf8'));
     if (value.schemaVersion !== 1) throw new Error(`${path}: unsupported schemaVersion`);
     validateSource(value.source, path);
+    if (path.includes('/cache/')) continue;
     if (value.asset?.key) {
       if (!sources.has(value.asset.key)) throw new Error(`${path}: missing source-manifest entry`);
       const source = sources.get(value.asset.key);

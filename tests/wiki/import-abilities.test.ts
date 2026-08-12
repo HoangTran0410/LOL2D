@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -6,6 +7,7 @@ import { createMediaWikiClient } from '../../scripts/wiki/mediawiki.mjs';
 import {
   importAbilities,
   parseCli,
+  syncChampionIndex,
 } from '../../scripts/wiki/import-abilities.mjs';
 import { normalizeAbilityFields } from '../../scripts/wiki/normalize.mjs';
 import { checkAbilities } from '../../scripts/wiki/check-abilities.mjs';
@@ -74,6 +76,7 @@ describe('League Wiki importer', () => {
     const record = JSON.parse(await readFile(join(target, 'docs/abilities/janna/q.json'), 'utf8'));
     const raw = JSON.parse(await readFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), 'utf8'));
     const champion = JSON.parse(await readFile(join(target, 'docs/abilities/janna/champion.json'), 'utf8'));
+    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
     expect(record).toMatchObject({
       schemaVersion: 1,
       champion: 'Janna',
@@ -96,10 +99,16 @@ describe('League Wiki importer', () => {
     expect(champion).toMatchObject({ schemaVersion: 1, champion: 'Janna', asset: { key: 'champ_janna' } });
     expect(await readFile(join(target, 'assets/images/spells/janna_q.png'))).toHaveLength(8);
     expect(await readFile(join(target, 'assets/images/champions/janna.png'))).toHaveLength(8);
+    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').contentHash).toBe(
+      createHash('sha256').update(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])).digest('hex')
+    );
 
     await mkdir(join(target, 'src/generated'), { recursive: true });
     await writeFile(join(target, 'src/generated/assetManifest.ts'), 'export const assetManifest = { "champ_janna": {}, "spell_janna_q": {} };\n');
     await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+    raw.source.fetchedAt = 'invalid';
+    await writeFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), JSON.stringify(raw));
+    await expect(checkAbilities(target)).rejects.toThrow(/source timestamp/i);
   });
 
   it('writes nothing when any fetch or validation step fails', async () => {
@@ -113,6 +122,37 @@ describe('League Wiki importer', () => {
     await expect(readFile(join(target, 'existing.txt'), 'utf8')).resolves.toBe('keep me');
   });
 
+  it('does not overwrite an existing champion record when importing another slot', async () => {
+    const data = await fixture();
+    const target = await root();
+    const championPath = join(target, 'docs/abilities/janna/champion.json');
+    const imagePath = join(target, 'assets/images/champions/janna.png');
+    await mkdir(join(target, 'docs/abilities/janna'), { recursive: true });
+    await mkdir(join(target, 'assets/images/champions'), { recursive: true });
+    await writeFile(championPath, 'existing champion record\n');
+    await writeFile(imagePath, 'existing champion image');
+
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+
+    await expect(readFile(championPath, 'utf8')).resolves.toBe('existing champion record\n');
+    await expect(readFile(imagePath, 'utf8')).resolves.toBe('existing champion image');
+  });
+
+  it('rejects a non-PC champion index before writing cache files', async () => {
+    const target = await root();
+    const wiki = {
+      fetchChampionIndex: vi.fn(async () => ({
+        source: 'return {}',
+        revisionId: 1,
+        timestamp: '2026-08-12T00:00:00Z',
+        pageUrl: 'https://wiki.leagueoflegends.com/en-us/Module:ChampionDataWR/data',
+      })),
+    };
+
+    await expect(syncChampionIndex({ root: target, client: wiki })).rejects.toThrow(/wild rift/i);
+    await expect(readdir(target)).resolves.toEqual([]);
+  });
+
   it('reports field-level hash changes during update', async () => {
     const data = await fixture();
     const target = await root();
@@ -123,6 +163,29 @@ describe('League Wiki importer', () => {
     await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: client(data), now: () => '2026-08-14T00:00:00.000Z', log: line => logs.push(line) });
 
     expect(logs).toContain('Janna Q: fields.range changed');
+  });
+
+  it('updates independently changed champion and ability image bytes', async () => {
+    const data = await fixture();
+    const target = await root();
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    const changedPng = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      update: true,
+      client: client(data, { fetchBytes: vi.fn(async () => changedPng) }),
+      now: () => '2026-08-14T00:00:00.000Z',
+    });
+
+    await expect(readFile(join(target, 'assets/images/spells/janna_q.png'))).resolves.toEqual(Buffer.from(changedPng));
+    await expect(readFile(join(target, 'assets/images/champions/janna.png'))).resolves.toEqual(Buffer.from(changedPng));
+    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
+    const expectedHash = createHash('sha256').update(changedPng).digest('hex');
+    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').contentHash).toBe(expectedHash);
+    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'champ_janna').contentHash).toBe(expectedHash);
   });
 
   it('retries transient MediaWiki failures with identifying headers and imageinfo originals', async () => {
@@ -158,5 +221,7 @@ describe('League Wiki importer', () => {
     expect(parseCli(['--champions', 'Janna,Lux', '--slots', 'Q,R'])).toMatchObject({ champions: ['Janna', 'Lux'], slots: ['Q', 'R'] });
     expect(parseCli(['--all'])).toMatchObject({ all: true });
     expect(() => parseCli(['--champion', '../Janna'])).toThrow(/invalid champion/i);
+    expect(() => parseCli(['--champions', 'Janna,Janna'])).toThrow(/duplicate champion/i);
+    expect(() => parseCli(['--champion', 'Janna', '--slots', 'Q,Q'])).toThrow(/duplicate slot/i);
   });
 });
