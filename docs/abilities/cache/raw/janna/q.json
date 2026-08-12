@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Janna/Howling Gale",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Howling Gale@@icon@@Howling Gale.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Janna''' summons a whirlwind at her current location that charges up over 3 seconds, increasing its range, speed, damage, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span> duration every second over the duration. ''Howling Gale's'' direction is determined by this cast.@@description2@@''Howling Gale'' can be recast at any time within the duration, and does so automatically after the duration.@@description3@@<span class=\"template_sbc\">'''Recast:'''</span> '''Janna''' launches the whirlwind in the direction she targeted over 1.<small>25</small> seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking them up]]</span> for <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"seconds charged\" data-start=\"0.5;0\" data-finish=\"1.25;1.5\" data-top-fill=\"16\" data-bot-values=\"0.5;0.55;0.6;0.65;0.7;0.75;0.8;0.85;0.9;0.95;1;1.05;1.1;1.15;1.2;1.25\" data-top-values=\"0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;1;1.1;1.2;1.3;1.4;1.5\">0.<small>5</small> – 1.<small>25</small> (based on seconds charged)</span> seconds.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Magic Damage:'''</span></dt><dd>55 / 90 / 125 / 160 / 195 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Damage Per Second:'''</span></dt><dd>10 / 15 / 20 / 25 / 30 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Magic Damage:'''</span></dt><dd>85 / 135 / 185 / 235 / 285 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"seconds charged\" data-displayformula=\"Increases by 22 every 0.1 seconds.\" data-bot-values=\"1100;1320;1540;1760\" data-top-values=\"0;1;2;3\">1100 – 1760 (based on seconds charged)</span>@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 240@@speed@@<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"seconds charged\" data-displayformula=\"Always travels for 1.25 seconds.\" data-bot-values=\"880;1056;1232;1408\" data-top-values=\"0;1;2;3\">880 – 1408 (based on seconds charged)</span>@@casttime@@none@@cost@@90 / 95 / 100 / 105 / 110@@cooldown@@14@@targeting@@[[Direction-targeted|Direction]] / [[Auto-targeted|Auto]]@@damagetype@@magic@@spellshield@@True@@projectile@@true@@notes@@\n* The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* The storm does not interact with enemy units that stand on top of it while it is charging.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307558,
+                "revisions": [
+                  {
+                    "parentid": 3800400,
+                    "revid": 3800440,
+                    "timestamp": "2024-10-29T15:48:57Z"
+                  }
+                ],
+                "title": "Template:Data Janna/Howling Gale"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3800440,
+      "timestamp": "2024-10-29T15:48:57Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6866b8592284a141b785c3e22e5c1f2ec7b83e2bbd421680551676c4cb14f236",
+    "fetchedAt": "2026-08-12T18:59:09.794Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Howling_Gale",
+    "revisionId": 3800440,
+    "sourceTimestamp": "2024-10-29T15:48:57Z"
+  }
+}

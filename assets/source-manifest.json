@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "sources": [
+    {
+      "contentHash": "030088d50ec496d694a97c04d1cfb4d078f3931d9490760cbda6da12713f2896",
+      "fetchedAt": "2026-08-12T18:55:57.400Z",
+      "localAssetKey": "champ_anivia",
+      "localPath": "assets/images/champions/anivia.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_OriginalSquare.png?dda87"
+    },
+    {
+      "contentHash": "63a9c3424b196da02b8a4eee51d8ba571cf693ed6f9e5f8f62b4568e4d782c67",
+      "fetchedAt": "2026-08-12T18:53:58.621Z",
+      "localAssetKey": "champ_janna",
+      "localPath": "assets/images/champions/janna.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_OriginalSquare.png?ec2a0"
+    },
+    {
+      "contentHash": "453f1abd861dbdbf4878012ebe0cebee85be071748f1f6ec4497b2d479853b8c",
+      "fetchedAt": "2026-08-12T18:53:49.922Z",
+      "localAssetKey": "champ_lux",
+      "localPath": "assets/images/champions/lux.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_OriginalSquare.png?285c1"
+    },
+    {
+      "contentHash": "c0992388ba9b05472c3919f028e69b45e38d423aab7f9c1fd0941b6bbc97e222",
+      "fetchedAt": "2026-08-12T18:56:28.291Z",
+      "localAssetKey": "champ_malphite",
+      "localPath": "assets/images/champions/malphite.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_OriginalSquare.png?e38f9"
+    },
+    {
+      "contentHash": "44b6574407e2b359d75d599a6b87a9da5237d10125cb76d0f4bc93df166c028e",
+      "fetchedAt": "2026-08-12T18:56:19.423Z",
+      "localAssetKey": "champ_pantheon",
+      "localPath": "assets/images/champions/pantheon.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_OriginalSquare.png?81183"
+    },
+    {
+      "contentHash": "585e84015a45bbd474b74d045785120fddf4be3e31a36851b3ff89fd537fc8af",
+      "fetchedAt": "2026-08-12T18:56:06.302Z",
+      "localAssetKey": "champ_varus",
+      "localPath": "assets/images/champions/varus.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_OriginalSquare.png?1f1e0"
+    },
+    {
+      "contentHash": "1761cd7907dec6b047ac1319c806b7ec41fbaa4dbb372f7b8fbbfdb7c63c2e3a",
+      "fetchedAt": "2026-08-12T18:59:22.373Z",
+      "localAssetKey": "spell_anivia_r",
+      "localPath": "assets/images/spells/anivia_r.png",
+      "revisionId": 4006729,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Glacial_Storm.png?a3fdb"
+    },
+    {
+      "contentHash": "c0024c8fab783265d2b415f67453424f10623d11cfbab9ef319a8588642cf922",
+      "fetchedAt": "2026-08-12T18:59:09.794Z",
+      "localAssetKey": "spell_janna_q",
+      "localPath": "assets/images/spells/janna_q.png",
+      "revisionId": 3800440,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Howling_Gale.png?922ce"
+    },
+    {
+      "contentHash": "b67ffd9e03e440ac9eafd67b82f59e68f6aa676fac13feb27cd85162d1d55e88",
+      "fetchedAt": "2026-08-12T18:59:09.794Z",
+      "localAssetKey": "spell_janna_r",
+      "localPath": "assets/images/spells/janna_r.png",
+      "revisionId": 3959332,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Monsoon.png?edd52"
+    },
+    {
+      "contentHash": "0b517a57410b08c33fbc349db1f3b520f90f15d7140d50e090c908699bf7e4b5",
+      "fetchedAt": "2026-08-12T18:59:01.216Z",
+      "localAssetKey": "spell_lux_r",
+      "localPath": "assets/images/spells/lux_r.png",
+      "revisionId": 3919833,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_Final_Spark.png?14069"
+    },
+    {
+      "contentHash": "50186d055900490c772881d72730ca6a0be4ba59447d2808ff96d252578d0d32",
+      "fetchedAt": "2026-08-12T18:59:49.816Z",
+      "localAssetKey": "spell_malphite_q",
+      "localPath": "assets/images/spells/malphite_q.png",
+      "revisionId": 4003493,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Seismic_Shard.png?08012"
+    },
+    {
+      "contentHash": "6f99d51be655ba3f07e6b97097f10187616a3029313bd28cb597dfed1b15f06b",
+      "fetchedAt": "2026-08-12T18:59:41.690Z",
+      "localAssetKey": "spell_pantheon_q",
+      "localPath": "assets/images/spells/pantheon_q.png",
+      "revisionId": 4016044,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Comet_Spear.png?dfd15"
+    },
+    {
+      "contentHash": "31cea3a7a80aed2016ddd07c6f0ec4fc8530ae6baff684ef55b3141a216d7335",
+      "fetchedAt": "2026-08-12T18:59:31.663Z",
+      "localAssetKey": "spell_varus_q",
+      "localPath": "assets/images/spells/varus_q.png",
+      "revisionId": 4026469,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Piercing_Arrow.png?283ea"
+    }
+  ]
+}

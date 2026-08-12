@@ -1,0 +1,117 @@
+{
+  "asset": {
+    "key": "champ_pantheon",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_OriginalSquare.png?81183",
+    "sha1": "dc83628a3d7cf8c3ba5df80a5d8863380abc4cbf"
+  },
+  "champion": "Pantheon",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Pantheon",
+    "be": 675,
+    "changes": "V25.20",
+    "client_positions": [
+      "Top",
+      "Support"
+    ],
+    "client_tags": [
+      "Dive",
+      "Duelist",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2010-02-02",
+    "difficulty": 1,
+    "external_positions": [
+      "Top",
+      "Jungle",
+      "Middle",
+      "Support"
+    ],
+    "fullname": "Atreus",
+    "herotype": "Fighter",
+    "id": 80,
+    "mobility": 2,
+    "patch": "V1.0.0.72",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Aegis Assault"
+    },
+    "skill_i": {
+      "1": "Mortal Will"
+    },
+    "skill_q": {
+      "1": "Comet Spear"
+    },
+    "skill_r": {
+      "1": "Grand Starfall"
+    },
+    "skill_w": {
+      "1": "Shield Vault"
+    },
+    "skills": {
+      "1": "Mortal Will",
+      "2": "Comet Spear",
+      "3": "Shield Vault",
+      "4": "Aegis Assault",
+      "5": "Grand Starfall"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "ar": {
+        "hp_lvl": 11
+      },
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "arm_base": 40,
+      "arm_lvl": 4.95,
+      "as_base": 0.658,
+      "as_lvl": 2.95,
+      "as_ratio": 0.658,
+      "attack_delay_offset": -0.109687499701976,
+      "dam_base": 64,
+      "dam_lvl": 3.3,
+      "hp5_base": 6,
+      "hp5_lvl": 0.65,
+      "hp_base": 650,
+      "hp_lvl": 109,
+      "mp5_base": 7.35,
+      "mp5_lvl": 0.45,
+      "mp_base": 317,
+      "mp_lvl": 31,
+      "mr_base": 28,
+      "mr_lvl": 2.05,
+      "ms": 345,
+      "ofa": {
+        "dmg_dealt": 0.98,
+        "dmg_taken": 1.02
+      },
+      "pathing_radius": 35,
+      "range": 175,
+      "selection_height": 175,
+      "selection_radius": 125
+    },
+    "style": 75,
+    "title": "The Unbreakable Spear",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "0d287cf0eb12b97f7a99d911ddfaab32559d2c1ad03aa0e873c4c718a157b08c",
+    "fetchedAt": "2026-08-12T18:56:19.423Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

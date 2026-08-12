@@ -1,0 +1,60 @@
+{
+  "adaptation": {
+    "descriptionVi": "Malphite chọn một kẻ địch hợp lệ rồi phóng mảnh đá tự bám theo mục tiêu. Khi chạm, mảnh đá gây 20 sát thương và làm chậm mục tiêu trong 3 giây; cùng thời gian đó Malphite nhận lượng tốc độ di chuyển thô đúng bằng lượng mục tiêu thực sự mất vì làm chậm. Nếu mục tiêu chết, không thể bị chọn, ra quá xa hoặc khuất tầm nhìn trong thời gian niệm, kỹ năng bị hủy mà không tốn năng lượng hay vào hồi chiêu.",
+    "gameplayNotes": [
+      "LOL2D thay 70–270 sát thương phép cộng 60% SMPT bằng 20 sát thương cố định để phù hợp tướng có 100 máu cơ bản; không áp dụng tăng tiến theo cấp hay SMPT.",
+      "Giữ nguyên chọn đơn vị, đạn tự bám mục tiêu, thời gian làm chậm và tăng tốc 3 giây, lượng tốc độ lấy theo phần mục tiêu thực mất, cùng các điều kiện hủy trước khi phóng từ dữ liệu PC nhập; không xuyên hay trúng nhiều mục tiêu.",
+      "Nguồn cơ chế: revision 4003493, normalized content hash 8ca26a3ec4dcbfa48fe754d453929f3b41391f2c413930098765d88afc01840b."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_malphite_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Seismic_Shard.png?08012",
+    "sha1": "66daa4370989e22e116f5b084297585c5fbcad06"
+  },
+  "champion": "Malphite",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Malphite''' sends a shard to the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 3 seconds upon impact.",
+          "text": "Active: Malphite sends a shard to the target enemy that deals magic damage and slows them for 3 seconds upon impact."
+        },
+        "description2": {
+          "raw": "'''Malphite''' also gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> equal to the <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"before movement speed soft caps\">raw</span> amount of <span style=\"color:\n#9FFF4D; white-space:normal\">movement speed</span> the target lost from the slow for the duration.",
+          "text": "Malphite also gains &nbsp;bonus movement speed equal to the raw amount of movement speed the target lost from the slow for the duration."
+        },
+        "icon": "Seismic Shard.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 120 / 170 / 220 / 270 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>20 / 25 / 30 / 35 / 40%</dd></dl>",
+          "text": "Magic Damage:70 / 120 / 170 / 220 / 270 (+ 60% AP)\nSlow:20 / 25 / 30 / 35 / 40%"
+        },
+        "name": "Seismic Shard",
+        "notes": {
+          "raw": "* The rock spawns <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 100 units in front of '''Malphite'''.\n* '''Malphite''' will gain the bonus movement speed for the full duration as long as ''Seismic Shard'' impacts the target.\n** Both a buff shown in the hotbar and duration bar above the ability icon will indicate the remaining duration.\n* ''Seismic Shard's'' movement speed gain is based off the target's movement speed <span style=\"color:\n#9FFF4D; white-space:normal\">raw '''total''' movement speed</span> lost at the time of impact.\n** For example, targets that were already <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by another effect will grant '''Malphite''' diminished movement speed, while targets that are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by another effect after being impacted by ''Seismic Shard'' will not.\n** <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow resist\">[[File:Slow immune icon.png|20px|link=Slow resist|An icon representing the keyword Slow resist]] [[:Slow resist|Slow-resistant]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow-immune\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|slow-immune]]</span> targets will reduce or nullify '''Malphite's''' gain.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The rock spawns 100 units in front of Malphite.\nMalphite will gain the bonus movement speed for the full duration as long as Seismic Shard impacts the target.\n* Both a buff shown in the hotbar and duration bar above the ability icon will indicate the remaining duration.\nSeismic Shard's movement speed gain is based off the target's movement speed raw total movement speed lost at the time of impact.\n* For example, targets that were already slowed by another effect will grant Malphite diminished movement speed, while targets that are slowed by another effect after being impacted by Seismic Shard will not.\n* Slow-resistant and slow-immune targets will reduce or nullify Malphite's gain.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1200",
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Seismic Shard"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "8ca26a3ec4dcbfa48fe754d453929f3b41391f2c413930098765d88afc01840b",
+    "fetchedAt": "2026-08-12T18:59:49.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malphite/Seismic_Shard",
+    "revisionId": 4003493,
+    "sourceTimestamp": "2026-03-29T22:51:33Z"
+  }
+}

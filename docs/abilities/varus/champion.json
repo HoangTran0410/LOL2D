@@ -1,0 +1,108 @@
+{
+  "asset": {
+    "key": "champ_varus",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_OriginalSquare.png?1f1e0",
+    "sha1": "ac466e4537952efa6bfaa4b8fd5c918466f80c98"
+  },
+  "champion": "Varus",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Mage",
+    "apiname": "Varus",
+    "be": 2400,
+    "changes": "V26.12",
+    "client_positions": [
+      "Bottom"
+    ],
+    "client_tags": [
+      "Long Range",
+      "Auto-attack",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2012-05-08",
+    "difficulty": 2,
+    "external_positions": [
+      "Bottom"
+    ],
+    "herotype": "Marksman",
+    "id": 110,
+    "mobility": 1,
+    "nickname": "Darkin, Valmar, Kai",
+    "patch": "V1.0.0.139",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Marksman",
+      "Artillery"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Hail of Arrows"
+    },
+    "skill_i": {
+      "1": "Living Vengeance"
+    },
+    "skill_q": {
+      "1": "Piercing Arrow"
+    },
+    "skill_r": {
+      "1": "Chain of Corruption"
+    },
+    "skill_w": {
+      "1": "Blighted Quiver"
+    },
+    "skills": {
+      "1": "Living Vengeance",
+      "2": "Piercing Arrow",
+      "3": "Blighted Quiver",
+      "4": "Hail of Arrows",
+      "5": "Chain of Corruption"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "arm_base": 24,
+      "arm_lvl": 4,
+      "as_base": 0.658,
+      "as_lvl": 3.5,
+      "as_ratio": 0.657999992370605,
+      "attack_delay_offset": -0.124561406672,
+      "dam_base": 59,
+      "dam_lvl": 3.4,
+      "hp5_base": 3.5,
+      "hp5_lvl": 0.55,
+      "hp_base": 600,
+      "hp_lvl": 105,
+      "missile_speed": 2000,
+      "mp5_base": 8,
+      "mp5_lvl": 0.8,
+      "mp_base": 320,
+      "mp_lvl": 40,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 330,
+      "pathing_radius": 35,
+      "range": 575,
+      "selection_height": 155,
+      "selection_radius": 120
+    },
+    "style": 20,
+    "title": "The Arrow of Retribution",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "3053f31ef8ed232cc425a85f006978df9fe515ffc7815fe86ef32bbf21b3136b",
+    "fetchedAt": "2026-08-12T18:56:06.302Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

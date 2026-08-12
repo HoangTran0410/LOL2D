@@ -1,0 +1,66 @@
+{
+  "adaptation": {
+    "descriptionVi": "Lần nhấn đầu triệu hồi một cơn lốc tại vị trí hiện tại của Janna và chốt hướng phóng; cơn lốc tự tích tụ tối đa 3 giây trong khi Janna vẫn được di chuyển và dùng kỹ năng. Nhấn Q lần nữa hoặc chờ tích đầy để phóng lốc xuyên qua kẻ địch, gây 15–30 sát thương và hất tung 0,5–1,25 giây; thời gian tích tụ đồng thời tăng tầm, tốc độ, sát thương và thời gian hất tung.",
+    "gameplayNotes": [
+      "LOL2D dùng 15–30 sát thương theo tỷ lệ tích tụ thay cho các dãy sát thương theo cấp và tỷ lệ SMPT nhập từ Wiki; không áp dụng tăng tiến theo cấp hay SMPT.",
+      "Giữ nguyên vị trí và hướng chốt ở lần nhấn đầu, tái kích hoạt, tự phóng sau 3 giây, nhịp tăng sức mạnh, xuyên mục tiêu và thời gian hất tung từ dữ liệu PC nhập; thả phím vật lý không phải tái kích hoạt.",
+      "Nguồn cơ chế: revision 3800440, normalized content hash 9d1321a2bd61ae50cb8d79b211a7ba0dbdbfacbf4daf723a17f8ffd0d635508b."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_janna_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Howling_Gale.png?922ce",
+    "sha1": "4de9c656caab8eac29cea9903d52deee6fcefb8e"
+  },
+  "champion": "Janna",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "none",
+        "cooldown": "14",
+        "cost": "90 / 95 / 100 / 105 / 110",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Janna''' summons a whirlwind at her current location that charges up over 3 seconds, increasing its range, speed, damage, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span> duration every second over the duration. ''Howling Gale's'' direction is determined by this cast.",
+          "text": "Active: Janna summons a whirlwind at her current location that charges up over 3 seconds, increasing its range, speed, damage, and knock up duration every second over the duration. Howling Gale's direction is determined by this cast."
+        },
+        "description2": {
+          "raw": "''Howling Gale'' can be recast at any time within the duration, and does so automatically after the duration.",
+          "text": "Howling Gale can be recast at any time within the duration, and does so automatically after the duration."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Recast:'''</span> '''Janna''' launches the whirlwind in the direction she targeted over 1.<small>25</small> seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking them up]]</span> for <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"seconds charged\" data-start=\"0.5;0\" data-finish=\"1.25;1.5\" data-top-fill=\"16\" data-bot-values=\"0.5;0.55;0.6;0.65;0.7;0.75;0.8;0.85;0.9;0.95;1;1.05;1.1;1.15;1.2;1.25\" data-top-values=\"0;0.1;0.2;0.3;0.4;0.5;0.6;0.7;0.8;0.9;1;1.1;1.2;1.3;1.4;1.5\">0.<small>5</small> – 1.<small>25</small> (based on seconds charged)</span> seconds.",
+          "text": "Recast: Janna launches the whirlwind in the direction she targeted over 1.25 seconds, dealing magic damage to enemies hit and knocking them up for 0.5 – 1.25 (based on seconds charged) seconds."
+        },
+        "icon": "Howling Gale.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Magic Damage:'''</span></dt><dd>55 / 90 / 125 / 160 / 195 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Damage Per Second:'''</span></dt><dd>10 / 15 / 20 / 25 / 30 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Magic Damage:'''</span></dt><dd>85 / 135 / 185 / 235 / 285 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Minimum Magic Damage:55 / 90 / 125 / 160 / 195 (+ 50% AP)\nBonus Damage Per Second:10 / 15 / 20 / 25 / 30 (+ 10% AP)Maximum Magic Damage:85 / 135 / 185 / 235 / 285 (+ 80% AP)"
+        },
+        "name": "Howling Gale",
+        "notes": {
+          "raw": "* The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* The storm does not interact with enemy units that stand on top of it while it is charging.",
+          "text": "The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\nThe storm does not interact with enemy units that stand on top of it while it is charging."
+        },
+        "projectile": true,
+        "range": "1100 – 1760 (based on seconds charged)",
+        "speed": "880 – 1408 (based on seconds charged)",
+        "spellshield": true,
+        "targeting": "Direction / Auto",
+        "width": "240"
+      },
+      "name": "Howling Gale"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "9d1321a2bd61ae50cb8d79b211a7ba0dbdbfacbf4daf723a17f8ffd0d635508b",
+    "fetchedAt": "2026-08-12T18:59:09.794Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Howling_Gale",
+    "revisionId": 3800440,
+    "sourceTimestamp": "2024-10-29T15:48:57Z"
+  }
+}
