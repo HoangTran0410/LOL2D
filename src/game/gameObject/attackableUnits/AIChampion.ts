@@ -1,6 +1,8 @@
 import AssetManager from '../../../managers/AssetManager';
 import { getChampionPresetRandom } from '../../preset';
 import Champion from './Champion';
+import { uuidv4 } from '../../../utils';
+import TargetResolver from '../../spell/targeting/TargetResolver';
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -45,7 +47,17 @@ export default class AIChampion extends Champion {
     if (this._autoCast) {
       if (random() < 0.1) {
         let spellIndex = floor(random(this.spells.length));
-        this.spells[spellIndex].cast();
+        const spell = this.spells[spellIndex];
+        const result = TargetResolver.resolve('DIRECTION', {
+          spellId: spell.id,
+          activationId: uuidv4(),
+          startedAtMs: Date.now(),
+          caster: this,
+          casterTeamId: this.teamId,
+          origin: this.position,
+          cursorWorld: this.destination,
+        });
+        if (result.ok) spell.press(result.context);
       }
     }
   }

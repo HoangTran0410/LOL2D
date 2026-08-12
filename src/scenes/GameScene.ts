@@ -101,15 +101,21 @@ export default class GameScene extends Scene {
     drawAnalys.end();
   }
 
-  keyPressed() {
+  keyPressed(event?: KeyboardEvent) {
+    const pressedKeyCode = event?.keyCode ?? keyCode;
     // ESC
-    if (keyCode === 27) {
+    if (pressedKeyCode === 27) {
       this.sceneManager.showScene(MenuScene);
     }
-    this.game?.keyPressed?.();
+    this.game?.keyPressed(pressedKeyCode, event?.repeat ?? false);
+  }
+
+  keyReleased(event?: KeyboardEvent) {
+    this.game?.keyReleased(event?.keyCode ?? keyCode);
   }
 
   exit() {
+    this.game?.spellInputController.cancelAll('SCENE_EXIT');
     this.stopGame();
     this.dom.style.display = 'none';
     this.canvas.remove();

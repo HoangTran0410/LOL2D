@@ -16,6 +16,9 @@ import {
 } from './preset';
 import ObjectManager from './managers/ObjectManager';
 import EventManager from '../managers/EventManager';
+import { uuidv4 } from '../utils';
+import SpellInputController from './spell/input/SpellInputController';
+import TargetResolver from './spell/targeting/TargetResolver';
 
 export default class Game {
   readonly mapSize = 6400;
@@ -28,6 +31,7 @@ export default class Game {
   fogOfWar!: FogOfWar;
   inGameHUD!: InGameHUD;
   player!: Champion;
+  spellInputController!: SpellInputController;
 
   fountains: Fountain[] = [];
   turrets: Turret[] = [];
@@ -56,6 +60,24 @@ export default class Game {
       preset: getChampionPresetRandom(),
     });
     this.objectManager.addObject(this.player);
+    this.spellInputController = new SpellInputController({
+      keyBindings: SpellHotKeys,
+      getSpell: slot => this.player.spells[slot],
+      createContext: (_spell, slot) => {
+        const spell = this.player.spells[slot];
+        if (!spell) return undefined;
+        const result = TargetResolver.resolve('DIRECTION', {
+          spellId: spell.id,
+          activationId: uuidv4(),
+          startedAtMs: Date.now(),
+          caster: this.player,
+          casterTeamId: this.player.teamId,
+          origin: this.player.position,
+          cursorWorld: this.worldMouse,
+        });
+        return result.ok ? result.context : undefined;
+      },
+    });
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
@@ -114,13 +136,7 @@ export default class Game {
     }
     this.clickedPoint.size *= 0.9;
 
-    if (keyIsPressed) {
-      for (let i = 0; i < SpellHotKeys.length; i++) {
-        if (keyIsDown(SpellHotKeys[i])) {
-          this.player.spells[i].cast();
-        }
-      }
-    }
+    this.spellInputController.update(deltaTime);
   }
 
   update() {
@@ -174,9 +190,14 @@ export default class Game {
 
   resize(w: number, h: number) { this.fogOfWar.resize(w, h); }
 
-  keyPressed() {
-    if (key === ' ') {
+  keyPressed(keyCode: number, repeated = false) {
+    if (keyCode === 32 && !repeated) {
       this.camera.target = this.camera.target ? null! : this.player.position;
     }
+    this.spellInputController.keyDown(keyCode, repeated);
+  }
+
+  keyReleased(keyCode: number) {
+    this.spellInputController.keyUp(keyCode);
   }
 }

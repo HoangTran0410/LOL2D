@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import EventType from '../../../src/game/enums/EventType';
 import Spell from '../../../src/game/gameObject/Spell';
 import { SpellRuntime, type SpellRuntimeDelegate } from '../../../src/game/spell/runtime/SpellRuntime';
 import type {
@@ -233,12 +234,37 @@ describe('SpellRuntime', () => {
     expect(spell.currentCooldown).toBe(500);
     expect(owner.stats.mana.value).toBe(80);
     expect(owner.stats.health.value).toBe(90);
-    expect(emitted).toHaveLength(3);
+    expect(emitted.filter(event => event === EventType.ON_PRE_CAST_SPELL)).toHaveLength(1);
+    expect(emitted.filter(event => event === EventType.ON_POST_CAST_SPELL)).toHaveLength(1);
 
     spell.currentCooldown = 25;
     expect(spell.currentCooldown).toBe(25);
     spell.state = 'READY';
     expect(spell.state).toBe('READY');
+  });
+
+  it('emits pre and post cast events once for direct press', () => {
+    const emitted: string[] = [];
+    const owner = {
+      game: { eventManager: { emit: (event: string) => emitted.push(event) } },
+      position: { x: 1, y: 2 },
+      isDead: false,
+      canCast: true,
+      stats: { mana: { value: 100 }, health: { value: 100 } },
+    };
+    class DirectSpell extends Spell {
+      coolDown = 500;
+    }
+    const spell = new DirectSpell(owner);
+
+    spell.press(context);
+    spell.press(context);
+
+    expect(emitted).toEqual([
+      EventType.ON_PRE_CAST_SPELL,
+      EventType.ON_POST_CAST_SPELL,
+      EventType.ON_PRE_CAST_SPELL,
+    ]);
   });
 
   it('does not run channel ticks after the channel duration', () => {

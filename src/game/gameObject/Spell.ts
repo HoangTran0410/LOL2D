@@ -66,7 +66,6 @@ export default class Spell {
   }
 
   cast(): void {
-    this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     if (this.state !== SpellState.READY) return;
 
     const origin = { x: this.owner.position.x, y: this.owner.position.y };
@@ -94,6 +93,7 @@ export default class Spell {
   }
 
   press(context: CastContext): boolean {
+    this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     return this.runtime.press(context);
   }
 
