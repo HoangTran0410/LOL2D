@@ -243,6 +243,12 @@ export default class Spell {
   }
 
   private commitResource(_context: CastContext, _point: ResourceCommitPoint): boolean {
+    if (
+      this.owner.stats.mana.value < this.manaCost ||
+      this.owner.stats.health.value < this.healthCost
+    ) {
+      return false;
+    }
     this.owner.stats.mana.value -= this.manaCost;
     this.owner.stats.health.value -= this.healthCost;
     return true;

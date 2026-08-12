@@ -1,0 +1,169 @@
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../../src/managers/AssetManager', () => ({
+  default: { getAsset: vi.fn(() => undefined) },
+}));
+
+import Anivia_R, { Anivia_R_Object } from '../../../src/game/gameObject/spells/Anivia_R';
+import type { CastContext } from '../../../src/game/spell/runtime/types';
+
+class TestVector {
+  constructor(public x = 0, public y = 0) {}
+
+  copy(): TestVector { return new TestVector(this.x, this.y); }
+  limit(maximum: number): TestVector {
+    const magnitude = Math.hypot(this.x, this.y);
+    if (magnitude > maximum) {
+      this.x = (this.x / magnitude) * maximum;
+      this.y = (this.y / magnitude) * maximum;
+    }
+    return this;
+  }
+}
+
+Object.assign(globalThis, {
+  createVector: (x = 0, y = 0) => new TestVector(x, y),
+  map: (value: number, fromLow: number, fromHigh: number, toLow: number, toHigh: number) =>
+    toLow + ((value - fromLow) / (fromHigh - fromLow)) * (toHigh - toLow),
+  p5: {
+    Vector: {
+      add: (left: TestVector, right: TestVector) =>
+        new TestVector(left.x + right.x, left.y + right.y),
+      sub: (left: TestVector, right: TestVector) =>
+        new TestVector(left.x - right.x, left.y - right.y),
+    },
+  },
+});
+
+const vector = (x: number, y: number): p5.Vector =>
+  new TestVector(x, y) as unknown as p5.Vector;
+
+const context = (cursorWorld: { x: number; y: number }): CastContext => ({
+  spellId: 'anivia-r',
+  activationId: 'activation',
+  startedAtMs: 0,
+  caster: {},
+  origin: { x: 0, y: 0 },
+  cursorWorld,
+  direction: { x: 1, y: 0 },
+});
+
+const setup = (mana = 240) => {
+  const added: Anivia_R_Object[] = [];
+  const enemy = {
+    position: new TestVector(100, 0),
+    collisionRadius: 0,
+    damage: [] as number[],
+    buffs: [] as unknown[],
+    takeDamage(damage: number) { this.damage.push(damage); },
+    addBuff(buff: unknown) { this.buffs.push(buff); },
+  };
+  const owner = {
+    game: {
+      worldMouse: { x: 100, y: 0 },
+      eventManager: { emit: vi.fn() },
+      objectManager: {
+        addObject: (object: Anivia_R_Object) => added.push(object),
+        queryObjects: vi.fn(() => [enemy]),
+      },
+    },
+    position: vector(0, 0),
+    teamId: 'blue',
+    isDead: false,
+    canCast: true,
+    stats: { mana: { value: mana }, health: { value: 100 } },
+  };
+
+  return { spell: new Anivia_R(owner), owner, enemy, added };
+};
+
+const updateSpell = (spell: Anivia_R, deltaMs: number) => {
+  vi.stubGlobal('deltaTime', deltaMs);
+  spell.update();
+  vi.stubGlobal('deltaTime', 16);
+};
+
+describe('Anivia R', () => {
+  it('creates one ACTIVE storm at the selected point', () => {
+    const { spell, added } = setup();
+
+    spell.press(context({ x: 300, y: 0 }));
+
+    expect(spell.state).toBe('ACTIVE');
+    expect(added).toHaveLength(1);
+    expect(added[0].center).toEqual({ x: 300, y: 0 });
+  });
+
+  it('lets Anivia move and cast while the storm remains active', () => {
+    const { spell, owner } = setup();
+
+    spell.press(context({ x: 300, y: 0 }));
+    owner.position.x = 200;
+    spell.update();
+
+    expect(spell.state).toBe('ACTIVE');
+  });
+
+  it('grows and applies damage and slow on imported tick cadence', () => {
+    const { spell, added, enemy } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].update(500);
+    added[0].update(1_000);
+    added[0].update(500);
+
+    expect(added[0].radius).toBe(400);
+    expect(enemy.damage).toEqual([4, 4, 4, 12]);
+    expect(enemy.buffs).toHaveLength(5);
+  });
+
+  it('drains mana through the central tick resource policy', () => {
+    const { spell, owner } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    expect(owner.stats.mana.value).toBe(240);
+    updateSpell(spell, 500);
+
+    expect(owner.stats.mana.value).toBe(180);
+  });
+
+  it('ends after a permitted second press', () => {
+    const { spell, added } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    spell.press(context({ x: 100, y: 0 }));
+
+    expect(spell.state).toBe('COOLDOWN');
+    expect(added[0].toRemove).toBe(true);
+  });
+
+  it.each([
+    ['death', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.isDead = true; spell.update(); }],
+    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.value = 0; updateSpell(spell, 500); }],
+    ['tether violation', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.position.x = 600; spell.update(); }],
+    ['silence', (_owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { spell.cancel('SILENCE'); }],
+  ])('ends on %s', (_reason, end) => {
+    const { spell, owner, added } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    end(owner, spell);
+
+    expect(spell.state).toBe('COOLDOWN');
+    expect(added[0].toRemove).toBe(true);
+  });
+
+  it('starts cooldown and cleans storm members exactly once', () => {
+    const { spell, added, enemy } = setup();
+
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].update(500);
+    spell.press(context({ x: 100, y: 0 }));
+    spell.press(context({ x: 100, y: 0 }));
+    added[0].onRemoved();
+    added[0].onRemoved();
+
+    expect(spell.currentCooldown).toBe(spell.coolDown);
+    expect(added[0].members?.size).toBe(0);
+    expect(enemy.damage).toEqual([4, 4]);
+  });
+});
