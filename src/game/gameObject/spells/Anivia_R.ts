@@ -128,13 +128,16 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     const elapsedMs = this.elapsedMs;
     while (this.nextDamageAtMs <= elapsedMs) {
       if (this.nextDamageAtMs > previousElapsedMs) {
-        this.applyDamage(this.nextDamageAtMs, this.targetsAt(this.radiusAt(this.nextDamageAtMs)));
+        this.applyDamage(
+          this.nextDamageAtMs,
+          this.targetsAt(this.stormRadiusAtMs(this.nextDamageAtMs))
+        );
       }
       this.nextDamageAtMs += DAMAGE_TICK_MS;
     }
     while (this.nextSlowAtMs <= elapsedMs) {
       if (this.nextSlowAtMs > previousElapsedMs) {
-        this.applySlow(this.nextSlowAtMs, this.targetsAt(this.radiusAt(this.nextSlowAtMs)));
+        this.applySlow(this.nextSlowAtMs, this.targetsAt(this.stormRadiusAtMs(this.nextSlowAtMs)));
       }
       this.nextSlowAtMs += this.nextSlowAtMs >= GROWTH_MS ? SLOW_TICK_MS : DAMAGE_TICK_MS;
     }
@@ -164,7 +167,7 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     pop();
   }
 
-  private radiusAt(atMs: number): number {
+  private stormRadiusAtMs(atMs: number): number {
     return stormRadiusAt(atMs);
   }
 
