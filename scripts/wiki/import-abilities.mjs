@@ -199,8 +199,9 @@ export async function importAbilities({
         name: forms[index],
         fields: normalizeAbilityFields(template.fields),
       }));
-      const icon = normalizedForms[0].fields.icon;
-      if (typeof icon !== 'string' || !icon) throw new Error(`${name} ${slot}: icon is missing`);
+      const icon = normalizedForms.flatMap(form => [form.fields.icon, form.fields.icon2])
+        .find(value => typeof value === 'string' && value && value.toLowerCase() !== 'false');
+      if (!icon) throw new Error(`${name} ${slot}: icon is missing`);
       const imageInfo = await client.fetchImageInfo(icon);
       const bytes = await client.fetchBytes(imageInfo.url);
       validateImage(bytes, imageInfo.mime);

@@ -82,6 +82,22 @@ describe('League Wiki importer', () => {
     expect(fields.projectile).toBe(true);
   });
 
+  it('uses the authoritative secondary icon when the primary icon is false', async () => {
+    const data = await fixture();
+    const target = await root();
+    data.expanded.expandtemplates.wikitext = data.expanded.expandtemplates.wikitext.replace(
+      '@@icon@@Howling Gale.png',
+      '@@icon@@false@@icon2@@Glacial Storm.png'
+    );
+    const wiki = client(data);
+
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: wiki, now: () => '2026-08-13T00:00:00.000Z' });
+
+    expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Glacial Storm.png');
+    const record = JSON.parse(await readFile(join(target, 'docs/abilities/janna/q.json'), 'utf8'));
+    expect(record.forms[0].fields).toMatchObject({ icon: 'false', icon2: 'Glacial Storm.png' });
+  });
+
   it('writes deterministic raw and normalized caches with source metadata', async () => {
     const data = await fixture();
     const target = await root();

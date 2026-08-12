@@ -2,7 +2,7 @@ const RAW_FIELDS = /^(description[2-6]?|leveling[2-6]?|notes)$/;
 const SOURCE_FIELDS = { name: '1', casttime: 'cast time', effectradius: 'effect radius' };
 
 export const ABILITY_FIELDS = [
-  'name', 'icon',
+  'name', 'icon', 'icon2',
   'description', 'description2', 'description3', 'description4', 'description5', 'description6',
   'leveling', 'leveling2', 'leveling3', 'leveling4', 'leveling5', 'leveling6',
   'range', 'radius', 'effectradius', 'width', 'speed', 'casttime', 'cost', 'cooldown',
