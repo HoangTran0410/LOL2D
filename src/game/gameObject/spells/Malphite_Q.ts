@@ -1,41 +1,104 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 import TrailSystem from '../helpers/TrailSystem';
+import HomingMissileSpellObject, {
+  type HomingTarget,
+} from '../spellObjects/HomingMissileSpellObject';
+import type { CastContext, CastSpec } from '../../spell/runtime/types';
+import TargetResolver from '../../spell/targeting/TargetResolver';
+
+type MalphiteTarget = HomingTarget & {
+  teamId: unknown;
+  targetable?: boolean;
+  stats: { speed: { value: number } };
+  takeDamage(damage: number, attacker: unknown): void;
+  addBuff(buff: Slow): void;
+  animatedValues?: { displaySize?: number };
+};
+
+const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
+  if (typeof target !== 'object' || target === null) return false;
+  const candidate = target as {
+    position?: { copy?: unknown };
+    collisionRadius?: unknown;
+    teamId?: unknown;
+    targetable?: unknown;
+    isDead?: unknown;
+    toRemove?: unknown;
+    stats?: { speed?: { value?: unknown } };
+    takeDamage?: unknown;
+    addBuff?: unknown;
+  };
+  return typeof candidate.position?.copy === 'function' &&
+    typeof candidate.collisionRadius === 'number' &&
+    candidate.teamId !== undefined &&
+    candidate.targetable !== false &&
+    !candidate.isDead &&
+    !candidate.toRemove &&
+    typeof candidate.stats?.speed?.value === 'number' &&
+    typeof candidate.takeDamage === 'function' &&
+    typeof candidate.addBuff === 'function';
+};
 
 export default class Malphite_Q extends Spell {
   image = AssetManager.getAsset('spell_malphite_q');
   name = 'Mảnh Vỡ Kết Tinh (Malphite_Q)';
   description =
-    'Ném một mảnh đá xuyên qua mọi kẻ địch trên đường đi, gây <span class="damage">20 sát thương</span> và <span class="buff">Làm Chậm 35%</span> trong <span class="time">2 giây</span>. Nếu trúng ít nhất một kẻ địch, Malphite được <span class="buff">Tăng Tốc 20%</span> trong <span class="time">2 giây</span>';
+    'Ném một mảnh đá tự bám theo mục tiêu, gây <span class="damage">20 sát thương</span> và <span class="buff">Làm Chậm 35%</span> trong <span class="time">3 giây</span>. Malphite nhận lượng <span class="buff">Tốc Độ Di Chuyển</span> mà mục tiêu thực sự mất trong cùng thời gian';
   coolDown = 6000;
   manaCost = 25;
 
   range = 500;
   damage = 20;
   slowPercent = 0.35;
-  slowDuration = 2000;
-  speedupPercent = 0.2;
-  speedupDuration = 2000;
+  slowDuration = 3000;
+  speedupDuration = 3000;
 
-  onSpellCast() {
-    const { to } = VectorUtils.getVectorWithRange(
-      this.owner.position,
-      this.aimPoint,
-      this.range
-    );
+  protected get castSpec(): CastSpec {
+    return {
+      activation: 'PRESS',
+      targeting: 'UNIT',
+      castTimeMs: 250,
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
+      cooldown: { startAt: 'release', durationMs: this.coolDown },
+    };
+  }
 
-    const obj = new Malphite_Q_Object(this.owner);
-    obj.destination = to;
+  checkCastCondition(): boolean {
+    return this.isValidTarget(this.castContext?.target);
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) return super.press(context);
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      range: this.range,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: isMalphiteTarget,
+      getTargetInfo: candidate => isMalphiteTarget(candidate) ? candidate : null,
+    });
+    return result.ok ? super.press(result.context) : false;
+  }
+
+  onUpdate(): void {
+    if (this.state === 'CASTING' && !this.isValidTarget(this.castContext?.target)) {
+      this.cancel('TARGET_INVALID');
+    }
+  }
+
+  onSpellCast(context: CastContext): void {
+    if (!isMalphiteTarget(context.target)) return;
+
+    const obj = new Malphite_Q_Object(this.owner, context.target);
     obj.damage = this.damage;
     obj.slowPercent = this.slowPercent;
     obj.slowDuration = this.slowDuration;
-    obj.speedupPercent = this.speedupPercent;
     obj.speedupDuration = this.speedupDuration;
 
     this.game.objectManager.addObject(obj);
@@ -44,20 +107,22 @@ export default class Malphite_Q extends Spell {
   drawPreview() {
     super.drawPreview(this.range);
   }
+
+  private isValidTarget(target: unknown): target is MalphiteTarget {
+    return isMalphiteTarget(target) &&
+      target.teamId !== this.owner.teamId &&
+      this.owner.position.dist(target.position) <= this.range;
+  }
 }
 
-export class Malphite_Q_Object extends MissileSpellObject {
+export class Malphite_Q_Object extends HomingMissileSpellObject<MalphiteTarget> {
   image = AssetManager.getAsset('spell_malphite_q');
   speed = 9;
   size = 24;
-  // a shard of the mountain: it does not stop for anybody
-  maxHitCount = Infinity;
-
   damage = 20;
   slowPercent = 0.35;
-  slowDuration = 2000;
-  speedupPercent = 0.2;
-  speedupDuration = 2000;
+  slowDuration = 3000;
+  speedupDuration = 3000;
 
   trailSystem = new TrailSystem({
     trailColor: '#D7CDF566',
@@ -65,7 +130,6 @@ export class Malphite_Q_Object extends MissileSpellObject {
   });
 
   _spin = random(TWO_PI);
-  _grantedSpeedup = false;
   /** Cosmetic: chips of rock shaken loose behind the shard. */
   _chips: { x: number; y: number; vx: number; vy: number; age: number; size: number }[] = [];
   _chipTimer = 0;
@@ -97,32 +161,28 @@ export class Malphite_Q_Object extends MissileSpellObject {
     }
   }
 
-  onHit(enemy: any) {
-    enemy.takeDamage(this.damage, this.owner);
-
-    const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
+  onTargetArrive(target: MalphiteTarget): void {
+    const speedBeforeSlow = target.stats.speed.value;
+    const slowBuff = new Slow(this.slowDuration, this.owner, target);
     slowBuff.image = this.image;
     slowBuff.percent = this.slowPercent;
-    enemy.addBuff(slowBuff);
+    target.addBuff(slowBuff);
 
-    // the caster is sped up once, no matter how many enemies the shard pierces
-    if (!this._grantedSpeedup) {
-      this._grantedSpeedup = true;
+    target.takeDamage(this.damage, this.owner);
 
-      const speedupBuff = new Speedup(this.speedupDuration, this.owner, this.owner);
-      speedupBuff.image = this.image;
-      speedupBuff.percent = this.speedupPercent;
-      this.owner.addBuff(speedupBuff);
+    const speedupBuff = new Malphite_Q_Speedup(this.speedupDuration, this.owner, this.owner);
+    speedupBuff.image = this.image;
+    speedupBuff.amount = Math.max(0, speedBeforeSlow - target.stats.speed.value);
+    this.owner.addBuff(speedupBuff);
 
-      // show the caster he got the speed-up, tied to that buff's own lifetime
-      const rush = new Malphite_Q_Rush(this.owner);
-      rush.buff = speedupBuff;
-      this.game.objectManager.addObject(rush);
-    }
+    // show the caster he got the speed-up, tied to that buff's own lifetime
+    const rush = new Malphite_Q_Rush(this.owner);
+    rush.buff = speedupBuff;
+    this.game.objectManager.addObject(rush);
 
     const shatter = new Malphite_Q_Shatter(this.owner);
-    shatter.position = enemy.position.copy();
-    shatter.targetSize = enemy.animatedValues?.displaySize ?? 40;
+    shatter.position = target.position.copy();
+    shatter.targetSize = target.animatedValues?.displaySize ?? 40;
     this.game.objectManager.addObject(shatter);
   }
 
@@ -195,6 +255,16 @@ export class Malphite_Q_Object extends MissileSpellObject {
       h: r * 2,
       data: this,
     });
+  }
+}
+
+class Malphite_Q_Speedup extends Speedup {
+  amount = 0;
+
+  onCreate(): void {
+    super.onCreate();
+    this.statsModifier.speed.percentBaseBonus = 0;
+    this.statsModifier.speed.flatBonus = this.amount;
   }
 }
 
@@ -277,7 +347,7 @@ export class Malphite_Q_Shatter extends SpellObject {
  * buff instead of counting its own clock, so it can never outlive it.
  */
 export class Malphite_Q_Rush extends SpellObject {
-  buff: any = null;
+  buff: { toRemove: boolean } | null = null;
   _puffs: { x: number; y: number; age: number; size: number }[] = [];
   _timer = 0;
 
