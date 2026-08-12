@@ -16,6 +16,11 @@ vi.mock('../../../src/game/vfx/CastTelegraph', () => ({
 
 import EventManager from '../../../src/managers/EventManager';
 import EventType from '../../../src/game/enums/EventType';
+import StatusFlags from '../../../src/game/enums/StatusFlags';
+import Spell from '../../../src/game/gameObject/Spell';
+import Ghost from '../../../src/game/gameObject/spells/Ghost';
+import Heal from '../../../src/game/gameObject/spells/Heal';
+import Ignite from '../../../src/game/gameObject/spells/Ignite';
 import Janna_R from '../../../src/game/gameObject/spells/Janna_R';
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
@@ -35,6 +40,7 @@ interface TestUnit {
   teamId: string;
   isDead: boolean;
   canCast: boolean;
+  stopMovement: () => void;
   addBuff: (buff: unknown) => void;
   takeHeal: (amount: number, healer: unknown) => void;
 }
@@ -110,6 +116,7 @@ describe('Janna R', () => {
       teamId: 'red',
       isDead: false,
       canCast: true,
+      stopMovement() { this.destination.set(this.position.x, this.position.y); },
       addBuff: buff => enemyBuffs.push(buff),
       takeHeal: vi.fn(),
     };
@@ -120,6 +127,7 @@ describe('Janna R', () => {
       teamId: 'blue',
       isDead: false,
       canCast: true,
+      stopMovement() { this.destination.set(this.position.x, this.position.y); },
       addBuff: vi.fn(),
       takeHeal: vi.fn(),
     };
@@ -151,7 +159,7 @@ describe('Janna R', () => {
     ['displacement', (owner: ReturnType<typeof makeOwner>['owner']) => owner.position.set(10, 0)],
     ['cast-blocking CC', (owner: ReturnType<typeof makeOwner>['owner']) => { owner.canCast = false; }],
     ['another spell cast', (owner: ReturnType<typeof makeOwner>['owner']) => {
-      owner.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, { owner });
+      owner.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, { owner });
     }],
     ['an attack', (owner: ReturnType<typeof makeOwner>['owner']) => {
       owner.game.eventManager.emit(EventType.ON_ATTACK, owner);
@@ -171,6 +179,38 @@ describe('Janna R', () => {
     expect(loopDispose).toHaveBeenCalledOnce();
   });
 
+  it('keeps channeling after rejected casts and imported-permitted summoner casts', () => {
+    class RejectedSpell extends Spell {
+      checkCastCondition(): boolean { return false; }
+    }
+
+    const { owner } = makeOwner();
+    const spell = new Janna_R(owner);
+    spell.press(context(owner));
+
+    const rejected = new RejectedSpell(owner);
+    expect(rejected.press(context(owner))).toBe(false);
+    expect(spell.state).toBe('CHANNELING');
+
+    for (const SummonerSpell of [Ghost, Heal, Ignite]) {
+      const permitted = Object.assign(Object.create(SummonerSpell.prototype), { owner });
+      owner.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, permitted);
+      expect(spell.state).toBe('CHANNELING');
+    }
+  });
+
+  it('cancels only after a prohibited spell successfully casts', () => {
+    class ProhibitedSpell extends Spell {}
+
+    const { owner } = makeOwner();
+    const spell = new Janna_R(owner);
+    spell.press(context(owner));
+
+    const prohibited = new ProhibitedSpell(owner);
+    expect(prohibited.press(context(owner))).toBe(true);
+    expect(spell.state).toBe('COOLDOWN');
+  });
+
   it('includes the twelfth heal tick at its imported maximum channel duration', () => {
     const ally: TestUnit = {
       position: new TestVector(200, 0),
@@ -179,6 +219,7 @@ describe('Janna R', () => {
       teamId: 'blue',
       isDead: false,
       canCast: true,
+      stopMovement() { this.destination.set(this.position.x, this.position.y); },
       addBuff: vi.fn(),
       takeHeal: vi.fn(),
     };
@@ -193,7 +234,7 @@ describe('Janna R', () => {
     expect(spell.state).toBe('COOLDOWN');
   });
 
-  it('clamps initial knockback before map walls and leaves collision enabled', () => {
+  it('clamps knockback before walls, suppresses actions, and freezes normal movement', () => {
     const enemyBuffs: unknown[] = [];
     const enemy: TestUnit = {
       position: new TestVector(100, 0),
@@ -202,6 +243,7 @@ describe('Janna R', () => {
       teamId: 'red',
       isDead: false,
       canCast: true,
+      stopMovement() { this.destination.set(this.position.x, this.position.y); },
       addBuff: buff => enemyBuffs.push(buff),
       takeHeal: vi.fn(),
     };
@@ -219,9 +261,25 @@ describe('Janna R', () => {
     spell.press(context(owner));
 
     expect(enemyBuffs).toHaveLength(1);
-    expect(enemyBuffs[0]).toMatchObject({
+    const knockback = enemyBuffs[0] as {
+      activateBuff(): void;
+      deactivateBuff(): void;
+      dashDestination: TestVector;
+      statusFlagsToEnable: number;
+    };
+    expect(knockback).toMatchObject({
       dashDestination: { x: 380, y: 0 },
-      statusFlagsToEnable: 0,
     });
+    expect(knockback.statusFlagsToEnable & StatusFlags.Immovable).toBeTruthy();
+    expect(knockback.statusFlagsToEnable & StatusFlags.Silenced).toBeTruthy();
+    expect(knockback.statusFlagsToEnable & StatusFlags.Ghosted).toBeFalsy();
+
+    enemy.destination.set(999, 999);
+    knockback.activateBuff();
+    expect(enemy.destination).toEqual({ x: 100, y: 0 });
+
+    knockback.deactivateBuff();
+    expect(enemy.position).toEqual({ x: 380, y: 0 });
+    expect(enemy.destination).toEqual({ x: 380, y: 0 });
   });
 });

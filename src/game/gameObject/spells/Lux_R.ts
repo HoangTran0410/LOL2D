@@ -7,6 +7,11 @@ import Buff from '../Buff';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import TrueSight from '../buffs/TrueSight';
+import Flash from './Flash';
+import Ghost from './Ghost';
+import Heal from './Heal';
+import Ignite from './Ignite';
+import Lux_E, { Lux_E_Object } from './Lux_E';
 import BeamSpellObject, {
   type BeamGeometry,
   type BeamTarget,
@@ -22,10 +27,30 @@ interface LuxTarget extends BeamTarget {
 class Lux_R_CastLock extends Buff {
   name = 'Cầu Vồng Tối Thượng';
   stackId = 'lux_r_cast_lock';
-  statusFlagsToEnable = StatusFlags.Stunned;
+  statusFlagsToEnable = StatusFlags.Immovable;
+  private readonly disabledBeforeCast = new Map<Spell, boolean>();
 
   onActivate(): void {
     this.targetUnit.stopMovement?.();
+    for (const spell of (this.targetUnit.spells ?? []) as Spell[]) {
+      this.disabledBeforeCast.set(spell, spell.disabled);
+      if (!this.isPermitted(spell)) spell.disabled = true;
+    }
+  }
+
+  onDeactivate(): void {
+    for (const [spell, wasDisabled] of this.disabledBeforeCast) spell.disabled = wasDisabled;
+    this.disabledBeforeCast.clear();
+  }
+
+  private isPermitted(spell: Spell): boolean {
+    return (
+      spell instanceof Ghost ||
+      spell instanceof Heal ||
+      spell instanceof Ignite ||
+      spell instanceof Flash ||
+      (spell instanceof Lux_E && spell.luxEObject?.phase === Lux_E_Object.PHASES.STATIC)
+    );
   }
 }
 

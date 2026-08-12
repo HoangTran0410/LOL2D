@@ -1,12 +1,16 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import EventType from '../../enums/EventType';
+import StatusFlags from '../../enums/StatusFlags';
 import TerrainType from '../../enums/TerrainType';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
 import AreaSpellObject, { type AreaTarget } from '../spellObjects/AreaSpellObject';
+import Ghost from './Ghost';
+import Heal from './Heal';
+import Ignite from './Ignite';
 
 interface JannaTarget extends AreaTarget {
   readonly teamId: string;
@@ -17,6 +21,20 @@ interface JannaTarget extends AreaTarget {
 
 interface Wall {
   readonly vertices: readonly { x: number; y: number }[];
+}
+
+class Janna_R_Knockback extends Dash {
+  statusFlagsToEnable = StatusFlags.Immovable | StatusFlags.Silenced;
+
+  onActivate(): void {
+    this.targetUnit.stopMovement?.();
+  }
+
+  onDeactivate(): void {
+    if (!this.dashDestination) return;
+    this.targetUnit.position.set(this.dashDestination.x, this.dashDestination.y);
+    this.targetUnit.destination?.set(this.dashDestination.x, this.dashDestination.y);
+  }
 }
 
 export default class Janna_R extends Spell {
@@ -149,14 +167,13 @@ export default class Janna_R extends Spell {
         destination.x - target.position.x,
         destination.y - target.position.y
       );
-      const knockback = new Dash(this.knockbackDurationMs, this.owner, target);
+      const knockback = new Janna_R_Knockback(this.knockbackDurationMs, this.owner, target);
       knockback.image = this.image;
       knockback.dashDestination = createVector(destination.x, destination.y);
       knockback.dashSpeed = displacement / (this.knockbackDurationMs / (1000 / 60));
       knockback.showTrail = false;
       knockback.cancelable = false;
       knockback.stayAtDestination = false;
-      knockback.statusFlagsToEnable = 0;
       target.addBuff(knockback);
     }
   }
@@ -164,13 +181,23 @@ export default class Janna_R extends Spell {
   private watchInterrupts(): void {
     this.stopWatching.forEach(stop => stop());
     this.stopWatching = [
-      this.game.eventManager.on(EventType.ON_PRE_CAST_SPELL, (spell: { owner?: unknown }) => {
-        if (spell !== this && spell.owner === this.owner) this.cancel('PLAYER_CANCEL');
+      this.game.eventManager.on(EventType.ON_POST_CAST_SPELL, (spell: Spell) => {
+        if (
+          spell !== this &&
+          spell.owner === this.owner &&
+          !this.isPermittedDuringChannel(spell)
+        ) {
+          this.cancel('PLAYER_CANCEL');
+        }
       }),
       this.game.eventManager.on(EventType.ON_ATTACK, (attacker: unknown) => {
         if (attacker === this.owner) this.cancel('PLAYER_CANCEL');
       }),
     ];
+  }
+
+  private isPermittedDuringChannel(spell: Spell): boolean {
+    return spell instanceof Ghost || spell instanceof Heal || spell instanceof Ignite;
   }
 
   private finishChannel(): void {

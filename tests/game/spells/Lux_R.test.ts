@@ -5,6 +5,12 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import Lux_R from '../../../src/game/gameObject/spells/Lux_R';
+import Flash from '../../../src/game/gameObject/spells/Flash';
+import Ghost from '../../../src/game/gameObject/spells/Ghost';
+import Heal from '../../../src/game/gameObject/spells/Heal';
+import Ignite from '../../../src/game/gameObject/spells/Ignite';
+import Lux_E, { Lux_E_Object } from '../../../src/game/gameObject/spells/Lux_E';
+import Spell from '../../../src/game/gameObject/Spell';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -99,7 +105,8 @@ describe('Lux R', () => {
     expect(owner.stats.mana.value).toBe(100);
     expect(owner.stopMovement).toHaveBeenCalledOnce();
     expect(ownerBuffs).toHaveLength(1);
-    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Stunned).toBeTruthy();
+    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Stunned).toBeFalsy();
+    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Immovable).toBeTruthy();
     expect(target.takeDamage).not.toHaveBeenCalled();
     expect(spell.cancel('MOVE')).toBe(false);
     expect(spell.cancel('STUN')).toBe(false);
@@ -122,6 +129,64 @@ describe('Lux R', () => {
     expect(targetBuffs).toHaveLength(1);
     expect(targetBuffs[0]).toMatchObject({ duration: 1_500, visionRadius: 150 });
     expect(ownerBuffs[0].toRemove).toBe(true);
+  });
+
+  it('locks only prohibited actions and restores their prior state exactly once', () => {
+    class ProhibitedSpell extends Spell {}
+
+    const added: unknown[] = [];
+    const ownerBuffs: Array<{
+      activateBuff(): void;
+      deactivateBuff(): void;
+      statusFlagsToEnable: number;
+    }> = [];
+    const owner = {
+      game: {
+        eventManager: { emit: vi.fn() },
+        objectManager: {
+          addObject: (object: unknown) => added.push(object),
+          queryObjects: () => [],
+        },
+      },
+      position: new TestVector(0, 0),
+      teamId: 'blue',
+      isDead: false,
+      canCast: true,
+      stopMovement: vi.fn(),
+      addBuff: (buff: typeof ownerBuffs[number]) => {
+        ownerBuffs.push(buff);
+        buff.activateBuff();
+      },
+      stats: { mana: { value: 500 }, health: { value: 100 } },
+      spells: [] as Spell[],
+    };
+    const spell = new Lux_R(owner);
+    const ghost = new Ghost(owner);
+    const heal = new Heal(owner);
+    const ignite = new Ignite(owner);
+    const flash = new Flash(owner);
+    const recast = new Lux_E(owner);
+    recast.luxEObject = { phase: Lux_E_Object.PHASES.STATIC } as Lux_E_Object;
+    const freshLuxE = new Lux_E(owner);
+    const prohibited = new ProhibitedSpell(owner);
+    const alreadyDisabled = new ProhibitedSpell(owner);
+    alreadyDisabled.disabled = true;
+    owner.spells = [spell, ghost, heal, ignite, flash, recast, freshLuxE, prohibited, alreadyDisabled];
+
+    spell.press(context(owner));
+
+    expect(owner.canCast).toBe(true);
+    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Stunned).toBeFalsy();
+    expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Immovable).toBeTruthy();
+    expect([ghost, heal, ignite, flash, recast].every(candidate => !candidate.disabled)).toBe(true);
+    expect(freshLuxE.disabled).toBe(true);
+    expect(prohibited.castCancelCheck()).toBe(true);
+
+    ownerBuffs[0].deactivateBuff();
+    ownerBuffs[0].deactivateBuff();
+
+    expect(prohibited.disabled).toBe(false);
+    expect(alreadyDisabled.disabled).toBe(true);
   });
 
   it('grants sight along the frozen beam during the cast and briefly after release', () => {
