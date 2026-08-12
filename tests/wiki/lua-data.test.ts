@@ -31,6 +31,15 @@ describe('League Wiki Lua data', () => {
     ]);
   });
 
+  it('orders live explicit numeric-key skill forms and rejects malformed maps', () => {
+    expect(championSkillForms({ skill_r: { 1: 'Final Spark' } }, 'R')).toEqual(['Final Spark']);
+    expect(championSkillForms({ skill_q: { 1: 'First', 2: 'Recast' } }, 'Q')).toEqual(['First', 'Recast']);
+    expect(() => championSkillForms({ skill_q: { 0: 'Zero', 1: 'First' } }, 'Q')).toThrow(/invalid skill_q/i);
+    expect(() => championSkillForms({ skill_q: { 1: 'First', 3: 'Third' } }, 'Q')).toThrow(/invalid skill_q/i);
+    expect(() => championSkillForms({ skill_q: { 1: 'First', extra: 'Other' } }, 'Q')).toThrow(/invalid skill_q/i);
+    expect(() => championSkillForms({ skill_q: { 1: 42 } }, 'Q')).toThrow(/invalid skill_q/i);
+  });
+
   it('preserves UTF-8 punctuation and Vietnamese text exactly', async () => {
     const data = parseLuaData(await readFile(unicodeFixtureUrl, 'utf8'));
 

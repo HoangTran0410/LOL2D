@@ -94,6 +94,12 @@ export function championSkillForms(champion, slot) {
   const value = champion[`skill_${slot.toLowerCase()}`];
   if (typeof value === 'string') return [value];
   if (Array.isArray(value) && value.every(form => typeof form === 'string')) return value;
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value);
+    if (entries.length && entries.every(([key, form], index) => key === String(index + 1) && typeof form === 'string')) {
+      return entries.map(([, form]) => form);
+    }
+  }
   if (value == null) return [];
   throw new Error(`Invalid skill_${slot.toLowerCase()} value`);
 }
