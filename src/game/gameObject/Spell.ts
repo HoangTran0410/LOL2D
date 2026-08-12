@@ -2,6 +2,7 @@ import { uuidv4 } from '../../utils/index';
 import EventType from '../enums/EventType';
 import SpellState from '../enums/SpellState';
 import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
+import SpellVfx from '../vfx/SpellVfx';
 import type {
   CancelReason,
   CastContext,
@@ -44,6 +45,7 @@ export default class Spell {
   owner: any;
   game: any;
   private spellRuntime?: SpellRuntime;
+  private spellVfx?: SpellVfx;
   private _castContext?: CastContext;
 
   constructor(owner: any) {
@@ -80,7 +82,13 @@ export default class Spell {
 
   update(): void {
     this.onUpdate();
+    if (this.owner.isDead && !this.runtime.cancel('DEATH')) this.spellVfx?.dispose();
     this.runtime.update(deltaTime);
+    this.spellVfx?.update(deltaTime);
+  }
+
+  drawVfx(): void {
+    this.spellVfx?.draw();
   }
 
   cast(): void {
@@ -147,7 +155,10 @@ export default class Spell {
   // Notes: Deactivate is never called as spell removal hasn't been added yet.
   deactivate(): void {
     this.resetCoolDown();
+    this.spellVfx?.dispose();
   }
+
+  onRemoved(): void { this.spellVfx?.dispose(); }
 
   resetCoolDown(): void {
     this.currentCooldown = 0;
@@ -169,27 +180,50 @@ export default class Spell {
   onCancel(_context: CastContext, _reason: CancelReason): void {}
   onComplete(_context: CastContext): void {}
 
+  protected get castSpec(): CastSpec {
+    return legacyCastSpec(this.coolDown);
+  }
+
+  protected playImpactVfx(context: CastContext): void {
+    this.spellVfx?.impact(context);
+  }
+
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
+      const spec = this.castSpec;
+      this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
         canStart: (context) => this.canStart(context),
         commitResource: (context, point) => this.commitResource(context, point),
         refundResource: (context, reason) => this.refundResource(context, reason),
-        onCastStart: (context) => this.onCastStart(context),
+        onCastStart: (context) => {
+          this.spellVfx?.castStart(context);
+          this.onCastStart(context);
+        },
         onChargeUpdate: (context, elapsedMs, ratio) =>
           this.onChargeUpdate(context, elapsedMs, ratio),
         onRelease: (context) => {
+          this.spellVfx?.release(context, spec.channel !== undefined);
           this.onRelease(context);
           this.onSpellCast(context);
           this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
         },
         onChannelTick: (context, tickIndex) => this.onChannelTick(context, tickIndex),
-        onActivate: (context) => this.onActivate(context),
+        onActivate: (context) => {
+          this.spellVfx?.activate(context);
+          this.onActivate(context);
+        },
         onRecast: (context) => this.onRecast(context),
-        onCancel: (context, reason) => this.onCancel(context, reason),
-        onComplete: (context) => this.onComplete(context),
+        onCancel: (context, reason) => {
+          this.spellVfx?.cancel(context);
+          this.onCancel(context, reason);
+        },
+        onComplete: (context) => {
+          this.spellVfx?.complete();
+          this.onComplete(context);
+        },
       };
-      this.spellRuntime = new SpellRuntime(legacyCastSpec(this.coolDown), delegate);
+      this.spellRuntime = new SpellRuntime(spec, delegate);
     }
     return this.spellRuntime;
   }

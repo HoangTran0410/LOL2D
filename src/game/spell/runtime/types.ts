@@ -1,3 +1,5 @@
+import type { SpellSfxSpec, SpellVfxSpec } from '../../vfx/SpellVfx';
+
 export type ActivationPattern = 'PRESS' | 'HOLD_RELEASE' | 'RECAST' | 'TOGGLE' | 'TAP_OR_HOLD';
 export type SpellRuntimeState =
   | 'READY'
@@ -82,4 +84,6 @@ export interface CastSpec {
   resource: ResourcePolicy;
   cooldown: CooldownPolicy;
   interrupts?: Partial<InterruptPolicy>;
+  vfx?: SpellVfxSpec;
+  sfx?: SpellSfxSpec;
 }
