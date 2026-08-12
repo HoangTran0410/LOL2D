@@ -43,11 +43,12 @@ export default class MissileSpellObject extends SpellObject {
   update() {
     this.onBeforeMove();
 
+    const previousPosition = this.position.copy();
     VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
-    if (this.position.dist(this.destination) <= this.getArrivalThreshold()) {
+    if (this.hasArrived(previousPosition, this.position)) {
       this.onArrive();
       if (this.removeOnArrive) this.toRemove = true;
-      if (this.toRemove) return;
+      if (this.shouldStopAfterArrival()) return;
     }
 
     this.onAfterMove();
@@ -105,8 +106,12 @@ export default class MissileSpellObject extends SpellObject {
   onBeforeMove(): void {}
   /** Runs after the step, before collision — for visuals that track distance travelled. */
   onAfterMove(): void {}
-  /** Distance from the destination that counts as arrival after a movement step. */
-  getArrivalThreshold(): number { return this.speed; }
+  /** Preserves the original strict endpoint arrival rule for ordinary missiles. */
+  protected hasArrived(_previousPosition: p5.Vector, position: p5.Vector): boolean {
+    return position.dist(this.destination) < this.speed;
+  }
+  /** Homing missiles stop after arrival; ordinary missiles finish their terminal hooks. */
+  protected shouldStopAfterArrival(): boolean { return false; }
   onArrive(): void {}
   onHit(_enemy: any): void {}
   getTrailPosition(): p5.Vector {

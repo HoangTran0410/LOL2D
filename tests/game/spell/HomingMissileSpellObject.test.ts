@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import HomingMissileSpellObject, {
   type HomingTarget,
 } from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
+import MissileSpellObject from '../../../src/game/gameObject/MissileSpellObject';
+import type TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -29,6 +31,19 @@ class TestHomingMissile extends HomingMissileSpellObject<TestTarget> {
   onTargetArrive(target: TestTarget): void {
     this.arrived.push(target);
   }
+}
+
+class TerminalMissile extends MissileSpellObject {
+  speed = 5;
+  arrivals = 0;
+  afterMoves = 0;
+
+  onArrive(): void { this.arrivals += 1; }
+  onAfterMove(): void { this.afterMoves += 1; }
+}
+
+class CollisionCheckingHomingMissile extends TestHomingMissile {
+  maxHitCount = Infinity;
 }
 
 const vector = (x: number, y: number): p5.Vector => new TestVector(x, y) as unknown as p5.Vector;
@@ -64,6 +79,17 @@ describe('HomingMissileSpellObject', () => {
     expect(missile.arrived).toEqual([]);
   });
 
+  it('arrives when a movement segment crosses the target radius', () => {
+    const missileTarget = target(5, 1);
+    const missile = new TestHomingMissile(owner(), missileTarget);
+    missile.speed = 10;
+
+    missile.update();
+
+    expect(missile.arrived).toEqual([missileTarget]);
+    expect(missile.toRemove).toBe(true);
+  });
+
   it('does not query generic collision targets in flight', () => {
     const queryObjects = vi.fn(() => []);
     const missile = new TestHomingMissile(owner(queryObjects), target(20));
@@ -84,6 +110,38 @@ describe('HomingMissileSpellObject', () => {
     expect(missile.toRemove).toBe(true);
   });
 
+  it('preserves ordinary missile strict-step arrival and terminal hooks', () => {
+    const queryObjects = vi.fn(() => []);
+    const missile = new TerminalMissile(owner(queryObjects));
+    const addTrail = vi.fn();
+    missile.destination = vector(10, 0);
+    missile.trailSystem = { addTrail } as unknown as TrailSystem;
+
+    missile.update();
+
+    expect(missile.arrivals).toBe(0);
+    expect(missile.afterMoves).toBe(1);
+    expect(addTrail).toHaveBeenCalledTimes(1);
+    expect(queryObjects).toHaveBeenCalledTimes(1);
+
+    missile.update();
+
+    expect(missile.arrivals).toBe(1);
+    expect(missile.afterMoves).toBe(2);
+    expect(addTrail).toHaveBeenCalledTimes(2);
+    expect(queryObjects).toHaveBeenCalledTimes(2);
+  });
+
+  it('suppresses generic collision after a homing arrival', () => {
+    const queryObjects = vi.fn(() => []);
+    const missile = new CollisionCheckingHomingMissile(owner(queryObjects), target(10, 3));
+
+    missile.update();
+
+    expect(missile.arrived).toHaveLength(1);
+    expect(queryObjects).not.toHaveBeenCalled();
+  });
+
   it('removes itself when a target becomes invalid under remove policy', () => {
     const missileTarget = { ...target(20), isDead: true };
     const missile = new TestHomingMissile(owner(), missileTarget);
@@ -95,7 +153,7 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('continues toward the last position under continue policy', () => {
-    const missileTarget = target(20);
+    const missileTarget = target(20, 3);
     const missile = new TestHomingMissile(owner(), missileTarget);
     missile.targetLossPolicy = 'continue';
 
@@ -107,5 +165,11 @@ describe('HomingMissileSpellObject', () => {
     expect(missile.destination.x).toBe(20);
     expect(missile.arrived).toEqual([]);
     expect(missile.toRemove).toBe(false);
+
+    missile.update();
+
+    expect(missile.position.x).toBe(15);
+    expect(missile.arrived).toEqual([]);
+    expect(missile.toRemove).toBe(true);
   });
 });
