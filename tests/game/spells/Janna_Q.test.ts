@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: () => undefined },
+  default: { get: () => undefined, getAsset: () => undefined },
 }));
 
 import Janna_Q, { Janna_Q_Object } from '../../../src/game/gameObject/spells/Janna_Q';
@@ -70,7 +70,7 @@ describe('Janna Q', () => {
     spell.press(context(owner, { x: 40, y: 60 }, { x: 40, y: 160 }, { x: 0, y: 1 }));
 
     expect(tornado.position).toMatchObject({ x: 10, y: 20 });
-    expect(tornado.destination).toMatchObject({ x: 410, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 990, y: 20 });
   });
 
   it('allows Janna to move and cast while the tornado remains ACTIVE', () => {
@@ -115,10 +115,22 @@ describe('Janna Q', () => {
 
     tornado.release();
 
-    expect(tornado.destination).toMatchObject({ x: 530, y: 20 });
-    expect(tornado.speed).toBe(8);
+    expect(tornado.destination).toMatchObject({ x: 1_320, y: 20 });
+    expect(tornado.speed).toBeCloseTo(1_144 / 60);
+    expect(tornado.size).toBe(240);
     expect(tornado.getCurrentDamage()).toBe(23);
     expect(tornado.getCurrentAirborneTime()).toBe(875);
+  });
+
+  it('uses imported rank-one cooldown, mana, edge range, and speed', () => {
+    const { spell, tornado } = setup();
+
+    expect(spell.coolDown).toBe(14_000);
+    expect(spell.manaCost).toBe(90);
+    expect(spell.minRange).toBe(1_100);
+    expect(spell.maxRange).toBe(1_760);
+    expect(tornado.minSpeed).toBeCloseTo(880 / 60);
+    expect(tornado.maxSpeed).toBeCloseTo(1_408 / 60);
   });
 
   it('cleans up and starts cooldown once on caster death', () => {

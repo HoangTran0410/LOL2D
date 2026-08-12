@@ -25,15 +25,15 @@ interface JannaTarget {
  * releases it automatically.
  */
 export default class Janna_Q extends Spell {
-  image = AssetManager.getAsset('spell_janna_q');
+  image = AssetManager.get('spell_janna_q');
   name = 'Bão Tố (Janna_Q)';
   description =
     'Triệu hồi một cơn lốc tại chỗ và <span class="buff">tích luỹ sức mạnh</span> trong tối đa <span class="time">3 giây</span>. Tái kích hoạt để phóng cơn lốc về hướng con trỏ, hoặc nó tự phóng khi tích đầy. Tích càng lâu thì tầm bay, tốc độ, sát thương và thời gian hất tung càng lớn: gây <span class="damage">15 - 30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.5 - 1.25 giây</span>, xuyên qua mọi kẻ địch trên đường đi';
-  coolDown = 10000;
-  manaCost = 40;
+  coolDown = 14_000;
+  manaCost = 90;
 
-  minRange = 400;
-  maxRange = 640;
+  minRange = 1_100;
+  maxRange = 1_760;
   maxChargeTime = 3000;
 
   spellObject: Janna_Q_Object | null = null;
@@ -100,16 +100,16 @@ export class Janna_Q_Object extends MissileSpellObject {
   chargeTime = 0;
   charging = true;
 
-  minSize = 30;
-  maxSize = 95;
+  minSize = 240;
+  maxSize = 240;
   size = this.minSize;
 
-  minSpeed = 6;
-  maxSpeed = 10;
+  minSpeed = 880 / 60;
+  maxSpeed = 1_408 / 60;
   speed = this.minSpeed;
 
-  minRange = 400;
-  maxRange = 640;
+  minRange = 1_100;
+  maxRange = 1_760;
 
   minDamage = 15;
   maxDamage = 30;
@@ -174,7 +174,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     const ratio = this.chargeRatio;
     this.charging = false;
     this.speed = lerp(this.minSpeed, this.maxSpeed, ratio);
-    const range = lerp(this.minRange, this.maxRange, ratio);
+    const range = lerp(this.minRange, this.maxRange, ratio) - this.size / 2;
     this.destination = this.position.copy().add(this.releaseDirection.copy().mult(range));
   }
 
@@ -190,7 +190,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.getCurrentDamage(), this.owner);
 
     const airborneBuff = new Airborne(this.getCurrentAirborneTime(), this.owner, enemy);
-    airborneBuff.image = AssetManager.getAsset('spell_janna_q');
+    airborneBuff.image = AssetManager.get('spell_janna_q');
     airborneBuff.height = 25;
     enemy.addBuff(airborneBuff);
 

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: () => undefined },
+  default: { get: () => undefined, getAsset: () => undefined },
 }));
 
 import Malphite_Q, { Malphite_Q_Object } from '../../../src/game/gameObject/spells/Malphite_Q';
@@ -193,6 +193,17 @@ describe('Malphite Q', () => {
     const missile = launch(owner, target);
 
     expect(missile.position).toMatchObject({ x: 100, y: 0 });
+    expect(missile.speed).toBe(1_200 / 60);
+  });
+
+  it('uses imported rank-one cooldown, mana, and slow values', () => {
+    const owner = unit(0, 'blue');
+    owner.game = gameFor();
+    const spell = new Malphite_Q(owner);
+
+    expect(spell.coolDown).toBe(8_000);
+    expect(spell.manaCost).toBe(70);
+    expect(spell.slowPercent).toBe(0.2);
   });
 
   it('follows the selected target instead of the cursor line', () => {
@@ -235,7 +246,7 @@ describe('Malphite Q', () => {
     const speedup = owner.buffs.find(buff => buff instanceof Speedup) as Speedup;
     expect(slow.duration).toBe(3000);
     expect(speedup.duration).toBe(3000);
-    expect(owner.stats.speed.value).toBe(45);
+    expect(owner.stats.speed.value).toBe(30);
   });
 
   it('applies arrival payload once and handles an invalidated target', () => {
@@ -249,8 +260,10 @@ describe('Malphite Q', () => {
 
     expect(target.takeDamage).toHaveBeenCalledTimes(1);
 
+    const invalidOwner = unit(0, 'blue');
+    invalidOwner.game = gameFor();
     const invalidTarget = unit(30, 'red');
-    const invalidMissile = launch(owner, invalidTarget);
+    const invalidMissile = launch(invalidOwner, invalidTarget);
     invalidTarget.isDead = true;
     invalidMissile.update();
 

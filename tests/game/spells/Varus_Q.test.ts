@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
+import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class Vector {
@@ -17,9 +18,14 @@ const context = (x: number, y: number): CastContext => Object.freeze({
 const owner = () => {
   const objects: unknown[] = [];
   const buffs: { percent: number; toRemove: boolean }[] = [];
+  const mana = {
+    baseValue: 100,
+    get value() { return this.baseValue; },
+    set value(value: number) { this.baseValue = value; },
+  };
   return {
     position: new Vector(), teamId: 'blue', isDead: false, canCast: true,
-    stats: { mana: { value: 100 }, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
+    stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
     game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
     addBuff: (buff: { percent: number; toRemove: boolean; activateBuff(): void }) => {
       buffs.push(buff);
@@ -44,6 +50,8 @@ describe('Varus Q', () => {
     expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
     expect(arrow.destination).toMatchObject({ x: 825, y: 0 });
     expect(arrow.size).toBe(140);
+    expect(arrow.speed).toBeCloseTo(1_900 / 60);
+    expect(spell.coolDown).toBe(16_000);
     expect(spell.state).toBe('COOLDOWN');
   });
 
@@ -92,5 +100,32 @@ describe('Varus Q', () => {
     expect(caster.objects).toHaveLength(0);
     expect(caster.stats.mana.value).toBe(75);
     expect(spell.state).toBe('COOLDOWN');
+  });
+
+  it.each([
+    ['death', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
+    ['cast-inhibiting status', (caster: ReturnType<typeof owner>) => { caster.canCast = false; }],
+  ])('cancels charging on %s and keeps the imported half-mana refund', (_name, interrupt) => {
+    const caster = owner();
+    const spell = new Varus_Q(caster);
+    spell.press(context(1, 0));
+    interrupt(caster);
+    vi.stubGlobal('deltaTime', 16);
+
+    spell.update();
+
+    expect(spell.state).toBe('COOLDOWN');
+    expect(caster.stats.mana.value).toBe(75);
+  });
+
+  it('applies its direct half-cost adjustment to a real Stat base value', () => {
+    const caster = owner();
+    const stats = new Stats();
+    stats.mana.baseValue = 100;
+    caster.stats = stats as typeof caster.stats;
+
+    new Varus_Q(caster).onCancel(context(1, 0), 'MAX_DURATION');
+
+    expect(stats.mana.baseValue).toBe(75);
   });
 });

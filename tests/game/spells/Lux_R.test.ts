@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: vi.fn(() => undefined) },
+  default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
 import Lux_R from '../../../src/game/gameObject/spells/Lux_R';

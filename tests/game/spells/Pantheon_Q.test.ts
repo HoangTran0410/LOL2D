@@ -4,6 +4,7 @@ import Pantheon_Q, { Pantheon_Q_Spear } from '../../../src/game/gameObject/spell
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import ActionState from '../../../src/game/enums/ActionState';
+import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class Vector {
@@ -45,9 +46,14 @@ const target = (
 
 const owner = () => {
   const objects: unknown[] = [];
+  const mana = {
+    baseValue: 100,
+    get value() { return this.baseValue; },
+    set value(value: number) { this.baseValue = value; },
+  };
   return {
     position: new Vector(), teamId: 'blue', isDead: false, canCast: true,
-    stats: { mana: { value: 100 }, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
+    stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
     game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
     addBuff: vi.fn(), objects,
   };
@@ -70,7 +76,8 @@ describe('Pantheon Q', () => {
       end: { x: 560, y: 0 },
       width: 120,
     });
-    expect(spell.currentCooldown).toBe(3_200);
+    expect(spell.currentCooldown).toBe(4_400);
+    expect(spell.coolDown).toBe(11_000);
   });
 
   it('thrust hits only enemy damageable units and applies unit multipliers before execute', () => {
@@ -109,6 +116,7 @@ describe('Pantheon Q', () => {
     expect(caster.objects[0]).toBeInstanceOf(Pantheon_Q_Spear);
     const spear = caster.objects[0] as Pantheon_Q_Spear;
     expect(spear.destination).toMatchObject({ x: 1_200, y: 0 });
+    expect(spear.speed).toBe(2_700 / 60);
     const damages: number[] = [];
     const targets = [
       target('red'),
@@ -132,6 +140,33 @@ describe('Pantheon Q', () => {
     spell.release(context);
 
     expect(caster.stats.mana.value).toBe(75);
-    expect(spell.currentCooldown).toBe(3_200);
+    expect(spell.currentCooldown).toBe(4_400);
+  });
+
+  it.each([
+    ['death', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
+    ['cast-inhibiting status', (caster: ReturnType<typeof owner>) => { caster.canCast = false; }],
+  ])('cancels charging on %s and keeps the imported half-mana refund', (_name, interrupt) => {
+    const caster = owner();
+    const spell = new Pantheon_Q(caster);
+    spell.press(context);
+    interrupt(caster);
+    vi.stubGlobal('deltaTime', 16);
+
+    spell.update();
+
+    expect(spell.state).toBe('COOLDOWN');
+    expect(caster.stats.mana.value).toBe(87.5);
+  });
+
+  it('applies its direct half-cost adjustment to a real Stat base value', () => {
+    const caster = owner();
+    const stats = new Stats();
+    stats.mana.baseValue = 100;
+    caster.stats = stats as typeof caster.stats;
+
+    new Pantheon_Q(caster).onCancel(context, 'MAX_DURATION');
+
+    expect(stats.mana.baseValue).toBe(87.5);
   });
 });

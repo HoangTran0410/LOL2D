@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: vi.fn(() => undefined) },
+  default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
 import Anivia_R from '../../../src/game/gameObject/spells/Anivia_R';
@@ -14,6 +14,7 @@ import Pantheon_Q, {
 } from '../../../src/game/gameObject/spells/Pantheon_Q';
 import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
+import { SpellGroups } from '../../../src/game/preset';
 import type {
   ActivationPattern,
   CastContext,
@@ -159,6 +160,13 @@ describe('representative spells through public commands', () => {
     });
   });
 
+  it('registers typed champion portraits for the migrated Anivia and Janna groups', () => {
+    const groups = Object.fromEntries(SpellGroups.map(group => [group.name, group]));
+
+    expect(groups.Anivia.image).toBe('champ_anivia');
+    expect(groups.Janna.image).toBe('champ_janna');
+  });
+
   it('honors PRESS, RECAST, and TOGGLE commit points', () => {
     const luxOwner = makeOwner();
     const luxR = new Lux_R(luxOwner);
@@ -195,7 +203,7 @@ describe('representative spells through public commands', () => {
     const aniviaR = new Anivia_R(aniviaOwner);
     expect(aniviaR.press(context(aniviaOwner))).toBe(true);
     expect(aniviaR.state).toBe('ACTIVE');
-    expect(aniviaOwner.stats.mana.value).toBe(200);
+    expect(aniviaOwner.stats.mana.value).toBe(200 - aniviaR.manaCost);
     expect(aniviaR.currentCooldown).toBe(0);
     vi.stubGlobal('deltaTime', 500);
     aniviaR.update();

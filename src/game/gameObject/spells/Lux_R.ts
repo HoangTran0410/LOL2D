@@ -70,7 +70,7 @@ class Lux_R_Vision extends SpellObject {
 }
 
 export default class Lux_R extends Spell {
-  image = AssetManager.getAsset('spell_lux_r');
+  image = AssetManager.get('spell_lux_r');
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   description =
     'Niệm <span class="time">1 giây</span> rồi bắn một dải sáng theo hướng đã chốt, gây <span class="damage">30 sát thương</span> lên mọi kẻ địch trúng phải';

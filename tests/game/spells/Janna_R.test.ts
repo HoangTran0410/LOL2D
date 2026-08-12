@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const loopDispose = vi.hoisted(() => vi.fn());
+const telegraphContexts = vi.hoisted(() => [] as CastContext[]);
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: vi.fn(() => undefined) },
+  default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
 vi.mock('../../../src/game/vfx/CastTelegraph', () => ({
   default: class {
+    constructor(context: CastContext) { telegraphContexts.push(context); }
     update() {}
     draw() {}
     dispose() { loopDispose(); }
@@ -51,7 +53,7 @@ const context = (caster: unknown): CastContext => Object.freeze({
   startedAtMs: 0,
   caster,
   origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 0, y: 0 }),
+  cursorWorld: Object.freeze({ x: 300, y: 200 }),
   direction: Object.freeze({ x: 0, y: 0 }),
 });
 
@@ -85,6 +87,7 @@ describe('Janna R', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     loopDispose.mockClear();
+    telegraphContexts.length = 0;
   });
 
   afterEach(() => vi.unstubAllGlobals());
@@ -94,6 +97,15 @@ describe('Janna R', () => {
 
     expect(AllSpells.Janna_R).toBe(Janna_R);
     expect(group?.spells).toContain(Janna_R);
+    expect(group?.image).toBe('champ_janna');
+  });
+
+  it('centers its channel telegraph on the snapshotted caster origin', () => {
+    const { owner } = makeOwner();
+
+    new Janna_R(owner).press(context(owner));
+
+    expect(telegraphContexts[0].cursorWorld).toEqual({ x: 0, y: 0 });
   });
 
   it('uses imported rank-one resource values', () => {

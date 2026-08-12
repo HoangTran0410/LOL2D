@@ -50,16 +50,16 @@ const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
 };
 
 export default class Malphite_Q extends Spell {
-  image = AssetManager.getAsset('spell_malphite_q');
+  image = AssetManager.get('spell_malphite_q');
   name = 'Mảnh Vỡ Kết Tinh (Malphite_Q)';
   description =
-    'Ném một mảnh đá tự bám theo mục tiêu, gây <span class="damage">20 sát thương</span> và <span class="buff">Làm Chậm 35%</span> trong <span class="time">3 giây</span>. Malphite nhận lượng <span class="buff">Tốc Độ Di Chuyển</span> mà mục tiêu thực sự mất trong cùng thời gian';
-  coolDown = 6000;
-  manaCost = 25;
+    'Ném một mảnh đá tự bám theo mục tiêu, gây <span class="damage">20 sát thương</span> và <span class="buff">Làm Chậm 20%</span> trong <span class="time">3 giây</span>. Malphite nhận lượng <span class="buff">Tốc Độ Di Chuyển</span> mà mục tiêu thực sự mất trong cùng thời gian';
+  coolDown = 8_000;
+  manaCost = 70;
 
   range = 500;
   damage = 20;
-  slowPercent = 0.35;
+  slowPercent = 0.2;
   slowDuration = 3000;
   speedupDuration = 3000;
 
@@ -140,11 +140,11 @@ export default class Malphite_Q extends Spell {
 }
 
 export class Malphite_Q_Object extends HomingMissileSpellObject<MalphiteTarget> {
-  image = AssetManager.getAsset('spell_malphite_q');
-  speed = 9;
+  image = AssetManager.get('spell_malphite_q');
+  speed = 1_200 / 60;
   size = 24;
   damage = 20;
-  slowPercent = 0.35;
+  slowPercent = 0.2;
   slowDuration = 3000;
   speedupDuration = 3000;
 

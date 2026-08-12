@@ -6,18 +6,21 @@ import Spell from '../Spell';
 import type SpellObject from '../SpellObject';
 import AreaSpellObject, { type AreaTarget } from '../spellObjects/AreaSpellObject';
 import Slow from '../buffs/Slow';
+import Stasis from '../buffs/Stasis';
 import { Circle } from '../../../libs/quadtree';
 
 const GROWTH_MS = 1_500;
 const DAMAGE_TICK_MS = 500;
+const UPKEEP_TICK_MS = 1_000;
+const UPKEEP_COST = 35;
 const SLOW_TICK_MS = 250;
 const START_RADIUS = 200;
 const END_RADIUS = 400;
 const TETHER_RANGE = 450;
 const NORMAL_DAMAGE = 4;
 const EMPOWERED_DAMAGE = 12;
-const NORMAL_SLOW = 0.5;
-const EMPOWERED_SLOW = 0.75;
+const NORMAL_SLOW = 0.2;
+const EMPOWERED_SLOW = 0.3;
 const stormRadiusAt = (elapsedMs: number): number =>
   Math.round(START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS));
 
@@ -27,7 +30,7 @@ interface StormTarget extends AreaTarget {
 }
 
 export default class Anivia_R extends Spell {
-  image = AssetManager.getAsset('spell_anivia_r');
+  image = AssetManager.get('spell_anivia_r');
   name = 'Bão Tuyết (Anivia_R)';
   description =
     'Tạo một cơn bão tuyết có thể bật/tắt tại vị trí chỉ định. Bão lớn dần trong <span class="time">1.5 giây</span>, gây <span class="damage">4 sát thương mỗi 0.5 giây</span> và làm chậm kẻ địch trong vùng.';
@@ -35,15 +38,16 @@ export default class Anivia_R extends Spell {
   manaCost = 60;
   range = TETHER_RANGE;
   activeStorm?: Anivia_R_Object;
+  private upkeepElapsedMs = 0;
 
   get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'TOGGLE',
       targeting: 'POINT',
       active: {},
-      resource: { commitAt: 'tick', refundOn: [], tickEveryMs: DAMAGE_TICK_MS },
+      resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false, displacement: false },
+      interrupts: { move: false, displacement: false, silence: false },
     };
   }
 
@@ -51,6 +55,7 @@ export default class Anivia_R extends Spell {
     const center = this.pointInRange(context.cursorWorld);
     const storm = new Anivia_R_Object(this.owner, center);
     this.activeStorm = storm;
+    this.upkeepElapsedMs = 0;
     storm.activate();
     this.game.objectManager.addObject(storm);
   }
@@ -69,7 +74,38 @@ export default class Anivia_R extends Spell {
 
   onUpdate(): void {
     if (this.state !== 'ACTIVE' || !this.activeStorm) return;
-    if (this.distanceToStorm() > TETHER_RANGE) this.cancel('OUT_OF_RANGE');
+    if (this.owner.isDead) {
+      this.cancel('DEATH');
+      return;
+    }
+    if (!this.owner.canCast && !this.owner.hasBuff?.(Stasis)) {
+      this.cancel('SILENCE');
+      return;
+    }
+    if (this.distanceToStorm() > TETHER_RANGE) {
+      this.cancel('OUT_OF_RANGE');
+      return;
+    }
+
+    this.upkeepElapsedMs += Math.max(0, deltaTime);
+    while (this.upkeepElapsedMs >= UPKEEP_TICK_MS) {
+      if (this.owner.stats.mana.value < UPKEEP_COST) {
+        this.cancel('OUT_OF_RESOURCE');
+        return;
+      }
+      this.owner.stats.mana.baseValue -= UPKEEP_COST;
+      this.upkeepElapsedMs -= UPKEEP_TICK_MS;
+    }
+  }
+
+  deactivate(): void {
+    this.finishActive(false);
+    super.deactivate();
+  }
+
+  onRemoved(): void {
+    this.finishActive(false);
+    super.onRemoved();
   }
 
   drawPreview(): void {
@@ -192,13 +228,13 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
       const slow = new Slow(empowered ? 1_500 : 1_000, this.owner, target);
       slow.percent = empowered ? EMPOWERED_SLOW : NORMAL_SLOW;
       slow.buffAddType = BuffAddType.RENEW_EXISTING;
-      slow.image = AssetManager.getAsset('spell_anivia_r');
+      slow.image = AssetManager.get('spell_anivia_r');
       target.addBuff(slow);
     }
   }
 
   private applyDamage(atMs: number, targets: Iterable<StormTarget>): void {
-    const damage = atMs >= GROWTH_MS ? EMPOWERED_DAMAGE : NORMAL_DAMAGE;
+    const damage = atMs >= GROWTH_MS ? EMPOWERED_DAMAGE : NORMAL_DAMAGE / 2;
     for (const target of targets) target.takeDamage(damage, this.owner);
   }
 }

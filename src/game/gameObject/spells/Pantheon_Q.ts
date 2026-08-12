@@ -27,10 +27,10 @@ const spearDamage = (target: SpearTarget, subsequent: boolean): number => {
 };
 
 export default class Pantheon_Q extends Spell {
-  image = AssetManager.getAsset('spell_pantheon_q');
+  image = AssetManager.get('spell_pantheon_q');
   name = 'Ngọn Giá Sao Băng (Pantheon_Q)';
   description = 'Thả sớm để đâm giáo, hoặc giữ để ném một ngọn giáo xuyên.';
-  coolDown = 8_000;
+  coolDown = 11_000;
   manaCost = 25;
 
   private chargeMs = 0;
@@ -43,7 +43,7 @@ export default class Pantheon_Q extends Spell {
       activation: 'TAP_OR_HOLD',
       targeting: 'DIRECTION',
       charge: { maxDurationMs: MAX_CHARGE_MS, releaseAtMax: false },
-      resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'SILENCE', 'STUN'] },
+      resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
       vfx: { castLoop: context => new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS) },
@@ -64,6 +64,12 @@ export default class Pantheon_Q extends Spell {
     this.chargeMs = elapsedMs;
   }
 
+  onUpdate(): void {
+    if (this.state !== 'CHARGING') return;
+    if (this.owner.isDead) this.cancel('DEATH');
+    else if (!this.owner.canCast) this.cancel('SILENCE');
+  }
+
   onRelease(_context: CastContext): void {
     this.removeChargeSlow();
     const start = { x: this.owner.position.x, y: this.owner.position.y };
@@ -81,7 +87,7 @@ export default class Pantheon_Q extends Spell {
 
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
-    if (reason === 'MAX_DURATION' || reason === 'SILENCE' || reason === 'STUN') {
+    if (reason === 'MAX_DURATION' || reason === 'DEATH' || reason === 'SILENCE' || reason === 'STUN') {
       this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
@@ -113,8 +119,8 @@ export default class Pantheon_Q extends Spell {
 }
 
 export class Pantheon_Q_Spear extends MissileSpellObject {
-  image = AssetManager.getAsset('spell_pantheon_q');
-  speed = 16;
+  image = AssetManager.get('spell_pantheon_q');
+  speed = 2_700 / 60;
   size = 110;
   maxHitCount = Infinity;
 

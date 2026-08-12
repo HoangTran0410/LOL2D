@@ -12,10 +12,10 @@ const MIN_CENTER_TRAVEL = 825;
 const MAX_CENTER_TRAVEL = 1_525;
 
 export default class Varus_Q extends Spell {
-  image = AssetManager.getAsset('spell_varus_q');
+  image = AssetManager.get('spell_varus_q');
   name = 'Mũi Tên Xuyên Phá (Varus_Q)';
   description = 'Giữ để tích lực rồi bắn một mũi tên xuyên theo hướng con trỏ.';
-  coolDown = 12_000;
+  coolDown = 16_000;
   manaCost = 50;
 
   private chargeMs = 0;
@@ -27,7 +27,7 @@ export default class Varus_Q extends Spell {
       activation: 'HOLD_RELEASE',
       targeting: 'DIRECTION',
       charge: { maxDurationMs: MAX_CHARGE_MS, releaseAtMax: false },
-      resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'SILENCE', 'STUN'] },
+      resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
       vfx: { castLoop: context => new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS) },
@@ -52,6 +52,12 @@ export default class Varus_Q extends Spell {
     this.chargeMs = elapsedMs;
   }
 
+  onUpdate(): void {
+    if (this.state !== 'CHARGING') return;
+    if (this.owner.isDead) this.cancel('DEATH');
+    else if (!this.owner.canCast) this.cancel('SILENCE');
+  }
+
   onRelease(context: CastContext): void {
     this.removeChargeSlow();
     const aim = this.aimContext ?? context;
@@ -66,7 +72,7 @@ export default class Varus_Q extends Spell {
 
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
-    if (reason === 'MAX_DURATION' || reason === 'SILENCE' || reason === 'STUN') {
+    if (reason === 'MAX_DURATION' || reason === 'DEATH' || reason === 'SILENCE' || reason === 'STUN') {
       this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
@@ -94,8 +100,8 @@ export default class Varus_Q extends Spell {
 }
 
 export class Varus_Q_Arrow extends MissileSpellObject {
-  image = AssetManager.getAsset('spell_varus_q');
-  speed = 16;
+  image = AssetManager.get('spell_varus_q');
+  speed = 1_900 / 60;
   size = 140;
   maxHitCount = Infinity;
   damage = 20;

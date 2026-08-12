@@ -38,7 +38,7 @@ class Janna_R_Knockback extends Dash {
 }
 
 export default class Janna_R extends Spell {
-  image = AssetManager.getAsset('spell_janna_r');
+  image = AssetManager.get('spell_janna_r');
   name = 'Gió Mùa (Janna_R)';
   description =
     'Đẩy lùi kẻ địch gần đó, rồi vận sức tối đa <span class="time">3 giây</span>, hồi <span class="damage">2 máu mỗi 0.25 giây</span> cho bản thân và đồng minh trong vùng';
@@ -62,7 +62,12 @@ export default class Janna_R extends Spell {
       channel: { durationMs: this.channelDurationMs, tickEveryMs: this.tickEveryMs },
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      vfx: { channelLoop: context => new CastTelegraph(context, this.radius) },
+      vfx: {
+        channelLoop: context => new CastTelegraph(
+          { ...context, cursorWorld: context.origin },
+          this.radius
+        ),
+      },
     };
   }
 

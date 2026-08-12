@@ -154,7 +154,7 @@ export const SpellGroups: {
   },
   {
     name: 'Anivia',
-    image: null,
+    image: 'champ_anivia',
     background: null,
     spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_R],
   },
@@ -190,7 +190,7 @@ export const SpellGroups: {
   },
   {
     name: 'Janna',
-    image: null,
+    image: 'champ_janna',
     background: null,
     spells: [AllSpells.Janna_Q, AllSpells.Janna_R],
   },

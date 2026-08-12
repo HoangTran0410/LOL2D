@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: vi.fn(() => undefined) },
+  default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
 import Anivia_R, { Anivia_R_Object } from '../../../src/game/gameObject/spells/Anivia_R';
@@ -58,6 +58,11 @@ const setup = (mana = 240) => {
     takeDamage(damage: number) { this.damage.push(damage); },
     addBuff(buff: unknown) { this.buffs.push(buff); },
   };
+  const manaStat = {
+    baseValue: mana,
+    get value() { return this.baseValue; },
+    set value(value: number) { this.baseValue = value; },
+  };
   const owner = {
     game: {
       worldMouse: { x: 100, y: 0 },
@@ -71,7 +76,11 @@ const setup = (mana = 240) => {
     teamId: 'blue',
     isDead: false,
     canCast: true,
-    stats: { mana: { value: mana }, health: { value: 100 } },
+    inStasis: false,
+    hasBuff: vi.fn(function (this: { inStasis: boolean }, BuffClass: { name: string }) {
+      return this.inStasis && BuffClass.name === 'Stasis';
+    }),
+    stats: { mana: manaStat, health: { value: 100 } },
   };
 
   return { spell: new Anivia_R(owner), owner, enemy, added };
@@ -110,8 +119,9 @@ describe('Anivia R', () => {
     spell.press(context({ x: 100, y: 0 }));
 
     expect(added[0].radius).toBe(200);
-    expect(enemy.damage).toEqual([4]);
+    expect(enemy.damage).toEqual([2]);
     expect(enemy.buffs).toHaveLength(1);
+    expect(enemy.buffs[0]).toMatchObject({ percent: 0.2, duration: 1_000 });
   });
 
   it('grows and empowers damage and slow at exactly 1500ms', () => {
@@ -121,9 +131,9 @@ describe('Anivia R', () => {
     added[0].update(1_500);
 
     expect(added[0].radius).toBe(400);
-    expect(enemy.damage).toEqual([4, 4, 4, 12]);
+    expect(enemy.damage).toEqual([2, 2, 2, 12]);
     expect(enemy.buffs).toHaveLength(4);
-    expect(enemy.buffs.at(-1)).toMatchObject({ percent: 0.75, duration: 1_500 });
+    expect(enemy.buffs.at(-1)).toMatchObject({ percent: 0.3, duration: 1_500 });
   });
 
   it('uses each due tick radius when catching up a long frame', () => {
@@ -151,14 +161,28 @@ describe('Anivia R', () => {
     expect(radii).toContain(400);
   });
 
-  it('drains mana through the central tick resource policy', () => {
+  it('pays 60 mana on activation, then 35 mana once per second', () => {
     const { spell, owner } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
-    expect(owner.stats.mana.value).toBe(240);
-    updateSpell(spell, 500);
-
     expect(owner.stats.mana.value).toBe(180);
+    updateSpell(spell, 999);
+    expect(owner.stats.mana.value).toBe(180);
+    updateSpell(spell, 1);
+
+    expect(owner.stats.mana.value).toBe(145);
+  });
+
+  it('does not mistake Stasis for interrupting crowd control', () => {
+    const { spell, owner, added } = setup();
+    spell.press(context({ x: 100, y: 0 }));
+    owner.canCast = false;
+    owner.inStasis = true;
+
+    spell.update();
+
+    expect(spell.state).toBe('ACTIVE');
+    expect(added[0].toRemove).toBe(false);
   });
 
   it('ends after a permitted second press', () => {
@@ -169,12 +193,12 @@ describe('Anivia R', () => {
 
     expect(spell.state).toBe('COOLDOWN');
     expect(added[0].toRemove).toBe(true);
-    expect(enemy.damage).toEqual([4, 4]);
+    expect(enemy.damage).toEqual([2, 2]);
   });
 
   it.each([
     ['death', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.isDead = true; spell.update(); }],
-    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.value = 0; updateSpell(spell, 500); }],
+    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.baseValue = 0; updateSpell(spell, 1_000); }],
     ['tether violation', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.position.x = 600; spell.update(); }],
     ['silence', (_owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { spell.cancel('SILENCE'); }],
   ])('ends on %s', (_reason, end) => {
@@ -199,7 +223,18 @@ describe('Anivia R', () => {
 
     expect(spell.currentCooldown).toBe(spell.coolDown);
     expect(added[0].members?.size).toBe(0);
-    expect(enemy.damage).toEqual([4, 4, 4]);
+    expect(enemy.damage).toEqual([2, 2, 2]);
+  });
+
+  it('tears down its active area idempotently on deactivate and removal', () => {
+    const { spell, added } = setup();
+    spell.press(context({ x: 100, y: 0 }));
+
+    spell.deactivate();
+    spell.onRemoved();
+
+    expect(added[0].toRemove).toBe(true);
+    expect(spell.activeStorm).toBeUndefined();
   });
 
   it('tears down its active storm through base spell deactivation exactly once', () => {
