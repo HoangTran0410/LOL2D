@@ -41,6 +41,10 @@ describe('League Wiki Lua data', () => {
     expect(parseLuaData('return { offset = -42.5 }')).toEqual({ offset: -42.5 });
   });
 
+  it('evaluates the current finite numeric champion-data expression', () => {
+    expect(parseLuaData('return { hp_lvl = 84+1000/17 }')).toEqual({ hp_lvl: 84 + 1000 / 17 });
+  });
+
   it('rejects calls, functions, index expressions, and duplicate keys', () => {
     for (const source of [
       'return os.execute("no")',
@@ -50,6 +54,11 @@ describe('League Wiki Lua data', () => {
       'return { value = not 1 }',
       'return { value = #{} }',
       'return { value = ~1 }',
+      'return { value = 2-1 }',
+      'return { value = 2*3 }',
+      'return { value = 1/0 }',
+      'return { value = 1+other }',
+      'return { value = 1+make() }',
       'return { name = "one", ["name"] = "two" }',
     ]) {
       expect(() => parseLuaData(source)).toThrow(/unsupported|duplicate/i);

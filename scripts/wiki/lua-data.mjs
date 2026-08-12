@@ -1,5 +1,11 @@
 import luaparse from 'luaparse';
 
+function finiteNumber(node) {
+  const value = literal(node);
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw new Error('Unsupported non-finite Lua arithmetic');
+  return value;
+}
+
 function literal(node) {
   switch (node?.type) {
     case 'StringLiteral':
@@ -14,6 +20,15 @@ function literal(node) {
     case 'UnaryExpression':
       if (node.operator === '-' && node.argument?.type === 'NumericLiteral') return -node.argument.value;
       throw new Error(`Unsupported Lua unary expression: ${node.operator}`);
+    case 'BinaryExpression': {
+      if (node.operator !== '+' && node.operator !== '/') throw new Error(`Unsupported Lua binary expression: ${node.operator}`);
+      const left = finiteNumber(node.left);
+      const right = finiteNumber(node.right);
+      if (node.operator === '/' && right === 0) throw new Error('Unsupported Lua division by zero');
+      const result = node.operator === '+' ? left + right : left / right;
+      if (!Number.isFinite(result)) throw new Error('Unsupported non-finite Lua arithmetic');
+      return result;
+    }
     default:
       throw new Error(`Unsupported Lua AST node: ${node?.type ?? 'missing'}`);
   }
