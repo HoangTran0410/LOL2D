@@ -82,9 +82,10 @@ export default class Spell {
 
   update(): void {
     this.onUpdate();
-    if (this.owner.isDead && !this.runtime.cancel('DEATH')) {
-      this.spellVfx?.dispose();
+    if (this.owner.isDead) {
+      this.runtime.cancel('DEATH');
       this.runtime.update(deltaTime);
+      this.spellVfx?.dispose();
       return;
     }
     this.runtime.update(deltaTime);

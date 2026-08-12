@@ -273,6 +273,59 @@ describe('Spell VFX lifecycle', () => {
     expect(stopSecond).not.toHaveBeenCalled();
   });
 
+  it('suppresses effects created when a dead uninterruptible cast enters ACTIVE', () => {
+    const castStart = handle();
+    const release = handle();
+    const activeLoop = handle();
+    const play = vi.fn();
+    const stop = vi.fn();
+    const releaseFactory = vi.fn(() => release);
+    const activeLoopFactory = vi.fn(() => activeLoop);
+    const spellOwner = owner();
+    const spell = new VfxSpell(spellOwner, {
+      activation: 'PRESS',
+      targeting: 'DIRECTION',
+      castTimeMs: 100,
+      active: { maxDurationMs: 1_000 },
+      interrupts: { death: false },
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'end', durationMs: 0 },
+      vfx: {
+        castStart: () => castStart,
+        release: releaseFactory,
+        activeLoop: activeLoopFactory,
+      },
+      sfx: { activeLoop: () => ({ play, stop }) },
+    });
+    vi.stubGlobal('deltaTime', 100);
+
+    spell.press(context);
+    spellOwner.isDead = true;
+    spell.update();
+    spell.drawVfx();
+
+    expect(spell.state).toBe('ACTIVE');
+    expect(releaseFactory).toHaveBeenCalledOnce();
+    expect(activeLoopFactory).toHaveBeenCalledOnce();
+    expect(castStart.dispose).toHaveBeenCalledOnce();
+    expect(release.dispose).toHaveBeenCalledOnce();
+    expect(activeLoop.dispose).toHaveBeenCalledOnce();
+    expect(play).toHaveBeenCalledOnce();
+    expect(stop).toHaveBeenCalledOnce();
+    expect(castStart.draw).not.toHaveBeenCalled();
+    expect(release.draw).not.toHaveBeenCalled();
+    expect(activeLoop.draw).not.toHaveBeenCalled();
+
+    spell.update();
+
+    expect(releaseFactory).toHaveBeenCalledOnce();
+    expect(activeLoopFactory).toHaveBeenCalledOnce();
+    expect(release.dispose).toHaveBeenCalledOnce();
+    expect(activeLoop.dispose).toHaveBeenCalledOnce();
+    expect(play).toHaveBeenCalledOnce();
+    expect(stop).toHaveBeenCalledOnce();
+  });
+
   it('keeps instant cast-start and release effects alive through completion', () => {
     const castStart = completableHandle();
     const release = completableHandle();
