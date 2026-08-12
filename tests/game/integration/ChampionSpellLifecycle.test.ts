@@ -15,6 +15,7 @@ vi.mock('../../../src/game/preset', () => ({
 }));
 
 import ObjectManager from '../../../src/game/managers/ObjectManager';
+import Spell from '../../../src/game/gameObject/Spell';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
 
@@ -23,7 +24,7 @@ describe('Champion spell presentation lifecycle', () => {
     const champion = Object.create(Champion.prototype) as Champion;
     const first = { drawVfx: vi.fn() };
     const second = { drawVfx: vi.fn() };
-    champion.spells = [first, second];
+    champion.spells = [first, second] as unknown as Spell[];
     champion.drawAvatar = vi.fn();
     champion.drawDir = vi.fn();
     champion.drawBuffs = vi.fn();
@@ -39,7 +40,7 @@ describe('Champion spell presentation lifecycle', () => {
   it('deactivates owned spells through ObjectManager champion removal', () => {
     const deactivate = vi.fn();
     const champion = Object.assign(Object.create(Champion.prototype) as Champion, {
-      spells: [{ deactivate }],
+      spells: [{ deactivate }] as unknown as Spell[],
       toRemove: true,
       update: vi.fn(),
     });
@@ -59,13 +60,11 @@ describe('Champion spell presentation lifecycle', () => {
 
   it('deactivates old spells when an AI respawn replaces its preset', () => {
     const deactivate = vi.fn();
-    class ReplacementSpell {
-      constructor(readonly owner: unknown) {}
-    }
+    class ReplacementSpell extends Spell {}
     replacementPreset.value = { avatar: 'replacement', spells: [ReplacementSpell] };
     const position = { x: 0, y: 0, set: vi.fn() };
     const champion = Object.assign(Object.create(AIChampion.prototype) as AIChampion, {
-      spells: [{ deactivate }],
+      spells: [{ deactivate }] as unknown as Spell[],
       _respawnWithNewPreset: true,
       stats: { health: { baseValue: 0 }, maxHealth: { value: 100 } },
       deathData: { reviveAfter: 0 },
@@ -85,11 +84,11 @@ describe('Champion spell presentation lifecycle', () => {
     const first = { deactivate: vi.fn(), onRemoved: vi.fn() };
     const second = { deactivate: vi.fn(), onRemoved: vi.fn() };
     const champion = Object.assign(Object.create(Champion.prototype) as Champion, {
-      spells: [first, second],
+      spells: [first, second] as unknown as Spell[],
     });
     const replacement = { deactivate: vi.fn(), onRemoved: vi.fn() };
 
-    champion.replaceSpell(0, replacement);
+    champion.replaceSpell(0, replacement as unknown as Spell);
     champion.replaceSpells([]);
 
     expect(first.deactivate).toHaveBeenCalledOnce();

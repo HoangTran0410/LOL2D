@@ -55,18 +55,15 @@ export default class SpellVfx {
   }
 
   release(context: CastContext): void {
-    this.disposePhase('castStart');
     this.stopLoops();
     this.start('release', context);
   }
 
   channel(context: CastContext): void {
-    this.disposePhase('release');
     this.startLoop('channelLoop', context);
   }
 
   activate(context: CastContext): void {
-    this.disposePhase('release');
     this.stopLoops();
     this.startLoop('activeLoop', context);
   }

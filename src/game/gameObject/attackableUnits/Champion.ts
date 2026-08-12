@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager';
+import type Spell from '../Spell';
 import AttackableUnit from './AttackableUnit';
 import Airborne from '../buffs/Airborne';
 import Charm from '../buffs/Charm';
@@ -12,7 +13,7 @@ import Stun from '../buffs/Stun';
 export default class Champion extends AttackableUnit {
   score = 0;
   name: string | undefined;
-  spells: any[] = [];
+  spells: Spell[] = [];
 
   constructor({
     game,
@@ -62,17 +63,17 @@ export default class Champion extends AttackableUnit {
     this.spells.forEach(spell => this.removeSpell(spell));
   }
 
-  replaceSpells(spells: any[]) {
+  replaceSpells(spells: Spell[]) {
     this.spells.forEach(spell => this.removeSpell(spell));
     this.spells = spells;
   }
 
-  replaceSpell(index: number, spell: any) {
+  replaceSpell(index: number, spell: Spell) {
     this.removeSpell(this.spells[index]);
     this.spells[index] = spell;
   }
 
-  private removeSpell(spell: any) {
+  private removeSpell(spell?: Spell) {
     spell?.deactivate();
     spell?.onRemoved?.();
   }

@@ -82,7 +82,11 @@ export default class Spell {
 
   update(): void {
     this.onUpdate();
-    if (this.owner.isDead && !this.runtime.cancel('DEATH')) this.spellVfx?.dispose();
+    if (this.owner.isDead && !this.runtime.cancel('DEATH')) {
+      this.spellVfx?.dispose();
+      this.runtime.update(deltaTime);
+      return;
+    }
     this.runtime.update(deltaTime);
     this.syncVfxPhase();
     this.spellVfx?.update(deltaTime);

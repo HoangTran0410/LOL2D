@@ -30,6 +30,17 @@ const handle = (): VfxHandle => ({
   dispose: vi.fn(),
 });
 
+const completableHandle = () => {
+  let complete = false;
+  const effect: VfxHandle = {
+    get complete() { return complete; },
+    update: vi.fn(),
+    draw: vi.fn(),
+    dispose: vi.fn(),
+  };
+  return { effect, complete: () => { complete = true; } };
+};
+
 class VfxSpell extends Spell {
   constructor(ownerValue: ReturnType<typeof owner>, private readonly spec: CastSpec) {
     super(ownerValue);
@@ -218,6 +229,111 @@ describe('Spell VFX lifecycle', () => {
 
     expect(spell.state).toBe('CHANNELING');
     expect(channelLoop).toHaveBeenCalledOnce();
+  });
+
+  it('does not restart an uninterruptible channel VFX while its owner remains dead', () => {
+    const firstLoop = handle();
+    const secondLoop = handle();
+    const stopFirst = vi.fn();
+    const stopSecond = vi.fn();
+    const channelLoop = vi.fn()
+      .mockReturnValueOnce(firstLoop)
+      .mockReturnValueOnce(secondLoop);
+    const channelSound = vi.fn()
+      .mockReturnValueOnce({ play: vi.fn(), stop: stopFirst })
+      .mockReturnValueOnce({ play: vi.fn(), stop: stopSecond });
+    const spellOwner = owner();
+    const spell = new VfxSpell(spellOwner, {
+      activation: 'PRESS',
+      targeting: 'DIRECTION',
+      channel: { durationMs: 1_000, tickEveryMs: 100 },
+      interrupts: { death: false },
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'end', durationMs: 0 },
+      vfx: { channelLoop },
+      sfx: { channelLoop: channelSound },
+    });
+    vi.stubGlobal('deltaTime', 16);
+
+    spell.press(context);
+    spellOwner.isDead = true;
+    spell.update();
+    spell.update();
+
+    expect(spell.state).toBe('CHANNELING');
+    expect(channelLoop).toHaveBeenCalledOnce();
+    expect(firstLoop.dispose).toHaveBeenCalledOnce();
+    expect(stopFirst).toHaveBeenCalledOnce();
+
+    spellOwner.isDead = false;
+    spell.update();
+
+    expect(channelLoop).toHaveBeenCalledTimes(2);
+    expect(secondLoop.dispose).not.toHaveBeenCalled();
+    expect(stopSecond).not.toHaveBeenCalled();
+  });
+
+  it('keeps instant cast-start and release effects alive through completion', () => {
+    const castStart = completableHandle();
+    const release = completableHandle();
+    const spell = new VfxSpell(owner(), {
+      activation: 'PRESS',
+      targeting: 'DIRECTION',
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'end', durationMs: 0 },
+      vfx: {
+        castStart: () => castStart.effect,
+        release: () => release.effect,
+      },
+    });
+
+    spell.press(context);
+    spell.drawVfx();
+
+    expect(castStart.effect.draw).toHaveBeenCalledOnce();
+    expect(release.effect.draw).toHaveBeenCalledOnce();
+    expect(castStart.effect.dispose).not.toHaveBeenCalled();
+    expect(release.effect.dispose).not.toHaveBeenCalled();
+
+    castStart.complete();
+    release.complete();
+    spell.update();
+
+    expect(castStart.effect.dispose).toHaveBeenCalledOnce();
+    expect(release.effect.dispose).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    ['CHANNELING', { channel: { durationMs: 1_000, tickEveryMs: 100 } }],
+    ['ACTIVE', { active: { maxDurationMs: 1_000 } }],
+  ] as const)('keeps transition effects alive after PRESS enters %s', (_state, phaseSpec) => {
+    const castStart = completableHandle();
+    const release = completableHandle();
+    const spell = new VfxSpell(owner(), {
+      activation: 'PRESS',
+      targeting: 'DIRECTION',
+      ...phaseSpec,
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'end', durationMs: 0 },
+      vfx: {
+        castStart: () => castStart.effect,
+        release: () => release.effect,
+      },
+    });
+
+    spell.press(context);
+    spell.drawVfx();
+
+    expect(spell.state).toBe(_state);
+    expect(castStart.effect.draw).toHaveBeenCalledOnce();
+    expect(release.effect.draw).toHaveBeenCalledOnce();
+
+    castStart.complete();
+    release.complete();
+    spell.update();
+
+    expect(castStart.effect.dispose).toHaveBeenCalledOnce();
+    expect(release.effect.dispose).toHaveBeenCalledOnce();
   });
 
   it('starts ACTIVE loop once while active updates continue', () => {
