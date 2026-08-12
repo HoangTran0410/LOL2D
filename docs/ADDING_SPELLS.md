@@ -15,6 +15,8 @@ npm run assets:generate
 
 Read the checked-in record under `docs/abilities/<champion>/`. Keep English Wiki fields authoritative and record deliberate LOL2D changes in `adaptation`. Normal tests and builds must never fetch the Wiki.
 
+Image provenance currently records the source URL, source revision, fetch time, and content hash. The Wiki image API response used by the importer does not provide rights or license fields, so do not infer or add a license; record one only when the upstream API supplies it directly.
+
 Export the spell from `src/game/gameObject/spells/index.ts` and add it to its champion group in `src/game/preset.ts`.
 
 ## 2. Choose activation and targeting

@@ -91,7 +91,11 @@ export function renderManifest(entries) {
 
 async function walk(directory, root) {
   const paths = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
+  const entries = await readdir(directory, { withFileTypes: true }).catch(error => {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  });
+  for (const entry of entries) {
     const absolutePath = resolve(directory, entry.name);
     if (entry.isDirectory()) paths.push(...await walk(absolutePath, root));
     else {
@@ -102,9 +106,19 @@ async function walk(directory, root) {
   return paths;
 }
 
+export async function renderAssetManifestSource(root, { add = [], remove = [] } = {}) {
+  const paths = new Set(await walk(resolve(root, 'assets'), root));
+  for (const path of remove) paths.delete(path.replaceAll('\\', '/'));
+  for (const path of add) {
+    const normalized = path.replaceAll('\\', '/');
+    if (normalized.startsWith('assets/') && !LEGACY_SOURCE_FILES.has(normalized)) paths.add(normalized);
+  }
+  return renderManifest(buildManifestEntries([...paths]));
+}
+
 export async function generate(root, check = false) {
   const outputPath = resolve(root, 'src/generated/assetManifest.ts');
-  const source = renderManifest(buildManifestEntries(await walk(resolve(root, 'assets'), root)));
+  const source = await renderAssetManifestSource(root);
 
   if (check) {
     const current = await readFile(outputPath, 'utf8').catch(() => '');

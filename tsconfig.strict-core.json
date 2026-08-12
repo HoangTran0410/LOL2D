@@ -17,6 +17,7 @@
     "src/game/gameObject/spells/Malphite_Q.ts",
     "src/game/vfx/**/*.ts",
     "src/generated/**/*.ts",
+    "src/managers/AssetManager.ts",
     "tests/game/spells/representative-spells.test.ts"
   ]
 }

@@ -23,7 +23,7 @@ export interface AssetLoaders {
 }
 
 /** @deprecated Prefer AssetHandle through get/ensure. */
-export interface LoadedAsset extends AssetHandle<any> {}
+export interface LoadedAsset extends AssetHandle<unknown> {}
 
 const PLACEHOLDER_SIZE = 64;
 
@@ -157,7 +157,8 @@ export default class AssetManager {
     if (existing) return existing;
 
     const handle = this.get(key);
-    if (handle.kind === 'url') {
+    const kind = handle.kind;
+    if (kind === 'url') {
       handle.status = 'ready';
       handle.data = handle.url;
       const ready = Promise.resolve(handle);
@@ -166,7 +167,7 @@ export default class AssetManager {
     }
 
     handle.status = 'loading';
-    const load = this.loaders[handle.kind](handle.url)
+    const load = this.loaders[kind](handle.url)
       .then(data => {
         handle.data = data;
         handle.status = 'ready';

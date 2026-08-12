@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generate } from '../generate-assets.mjs';
+import { renderAssetManifestSource } from '../generate-assets.mjs';
 import { createMediaWikiClient } from './mediawiki.mjs';
 import { assertPcSource, championSkillForms, parseLuaData } from './lua-data.mjs';
 import { normalizeAbilityFields } from './normalize.mjs';
@@ -21,7 +21,7 @@ export function deterministicJson(value) {
   return `${JSON.stringify(sorted(value), null, 2)}\n`;
 }
 
-function hash(value) {
+export function contentHash(value) {
   const content = typeof value === 'string' || value instanceof Uint8Array ? value : deterministicJson(value);
   return createHash('sha256').update(content).digest('hex');
 }
@@ -41,7 +41,7 @@ function sourceRecord(source, fetchedAt, content) {
     revisionId: source.revisionId,
     sourceTimestamp: source.timestamp,
     fetchedAt,
-    contentHash: hash(content),
+    contentHash: contentHash(content),
   };
 }
 
@@ -71,21 +71,42 @@ async function exists(path) {
   return stat(path).then(() => true, () => false);
 }
 
-async function commitFiles(root, files) {
+async function commitFiles(root, files, removals = []) {
   const parent = dirname(root);
   await mkdir(parent, { recursive: true });
   const stage = await mkdtemp(join(parent, '.wiki-import-'));
+  const destinations = [...new Set([...files.map(([path]) => path), ...removals])];
+  const backups = [];
+  const installed = [];
   try {
     for (const [path, contents] of files) {
       const staged = join(stage, path);
       await mkdir(dirname(staged), { recursive: true });
       await writeFile(staged, contents);
     }
+
+    for (const path of destinations) {
+      const destination = join(root, path);
+      if (!await exists(destination)) continue;
+      const backup = join(stage, '.backup', path);
+      await mkdir(dirname(backup), { recursive: true });
+      await rename(destination, backup);
+      backups.push(path);
+    }
     for (const [path] of files) {
       const destination = join(root, path);
       await mkdir(dirname(destination), { recursive: true });
       await rename(join(stage, path), destination);
+      installed.push(path);
     }
+  } catch (error) {
+    for (const path of installed.reverse()) await rm(join(root, path), { force: true });
+    for (const path of backups.reverse()) {
+      const destination = join(root, path);
+      await mkdir(dirname(destination), { recursive: true });
+      await rename(join(stage, '.backup', path), destination);
+    }
+    throw error;
   } finally {
     await rm(stage, { recursive: true, force: true });
   }
@@ -108,7 +129,7 @@ function changedFields(previous, next) {
   for (const field of [...fields].sort()) {
     const oldValues = previous?.forms?.map(form => form.fields?.[field]) ?? [];
     const newValues = next?.forms?.map(form => form.fields?.[field]) ?? [];
-    if (hash(oldValues) !== hash(newValues)) changes.push(`fields.${field}`);
+    if (contentHash(oldValues) !== contentHash(newValues)) changes.push(`fields.${field}`);
   }
   return changes;
 }
@@ -147,6 +168,7 @@ export async function importAbilities({
   const manifestPath = resolve(root, 'assets/source-manifest.json');
   const manifest = await readJson(manifestPath, { schemaVersion: 1, sources: [] });
   const sourceEntries = new Map(manifest.sources.map(entry => [entry.localAssetKey, entry]));
+  const removals = new Set();
 
   for (const requestedName of requested) {
     const { value: champion } = findChampion(index, requestedName);
@@ -169,9 +191,11 @@ export async function importAbilities({
     const championRecordPath = resolve(root, `docs/abilities/${slug}/champion.json`);
     const championExists = await exists(championRecordPath);
     const previousChampion = update && championExists ? await readJson(championRecordPath, null) : null;
-    const championImageHash = hash(championBytes);
-    const championImageChanged = sourceEntries.get(championAssetKey)?.contentHash !== championImageHash;
+    const previousChampionSource = sourceEntries.get(championAssetKey);
+    const championImageHash = contentHash(championBytes);
+    const championImageChanged = previousChampionSource?.contentHash !== championImageHash || previousChampionSource?.localPath !== championLocalPath;
     if (!championExists || update && (previousChampion.source?.revisionId !== championRecord.source.revisionId || previousChampion.source?.contentHash !== championRecord.source.contentHash || championImageChanged)) {
+      if (previousChampionSource?.localPath && previousChampionSource.localPath !== championLocalPath) removals.add(previousChampionSource.localPath);
       outputs.push([relative(root, championRecordPath), deterministicJson(championRecord)]);
       outputs.push([`docs/abilities/cache/normalized/${slug}/champion.json`, deterministicJson(championRecord)]);
       outputs.push([championLocalPath, championBytes]);
@@ -209,8 +233,9 @@ export async function importAbilities({
       const localAssetKey = `spell_${slug.replaceAll('-', '_')}_${slot.toLowerCase()}`;
       const localPath = `assets/images/spells/${slug}_${slot.toLowerCase()}${extension}`;
       const source = sourceRecord(templates[0], fetchedAt, normalizedForms);
-      const imageHash = hash(bytes);
-      const imageChanged = sourceEntries.get(localAssetKey)?.contentHash !== imageHash;
+      const previousImageSource = sourceEntries.get(localAssetKey);
+      const imageHash = contentHash(bytes);
+      const imageChanged = previousImageSource?.contentHash !== imageHash || previousImageSource?.localPath !== localPath;
       const record = {
         schemaVersion: 1,
         champion: name,
@@ -241,6 +266,7 @@ export async function importAbilities({
       outputs.push([`docs/abilities/cache/raw/${slug}/${slot.toLowerCase()}.json`, deterministicJson(rawCache)]);
       outputs.push([`docs/abilities/cache/normalized/${slug}/${slot.toLowerCase()}.json`, deterministicJson(record)]);
       outputs.push([localPath, bytes]);
+      if (previousImageSource?.localPath && previousImageSource.localPath !== localPath) removals.add(previousImageSource.localPath);
       sourceEntries.set(localAssetKey, {
         localAssetKey,
         localPath,
@@ -253,7 +279,14 @@ export async function importAbilities({
   }
   manifest.sources = [...sourceEntries.values()].sort((a, b) => a.localAssetKey.localeCompare(b.localAssetKey));
   outputs.push(['assets/source-manifest.json', deterministicJson(manifest)]);
-  await commitFiles(resolve(root), outputs);
+  outputs.push([
+    'src/generated/assetManifest.ts',
+    await renderAssetManifestSource(root, {
+      add: outputs.map(([path]) => path),
+      remove: [...removals],
+    }),
+  ]);
+  await commitFiles(resolve(root), outputs, [...removals]);
   return outputs.map(([path]) => path);
 }
 
@@ -305,10 +338,7 @@ if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   Promise.resolve().then(async () => {
     const options = parseCli(process.argv.slice(2));
     if (options.index) await syncChampionIndex({ root });
-    else {
-      await importAbilities({ root, ...options });
-      await generate(root);
-    }
+    else await importAbilities({ root, ...options });
   }).catch(error => {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;

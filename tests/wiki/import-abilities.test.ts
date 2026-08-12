@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdir, mkdtemp, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -142,8 +142,6 @@ describe('League Wiki importer', () => {
       createHash('sha256').update(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])).digest('hex')
     );
 
-    await mkdir(join(target, 'src/generated'), { recursive: true });
-    await writeFile(join(target, 'src/generated/assetManifest.ts'), 'export const assetManifest = { "champ_janna": {}, "spell_janna_q": {} };\n');
     await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
     raw.source.fetchedAt = 'invalid';
     await writeFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), JSON.stringify(raw));
@@ -225,6 +223,96 @@ describe('League Wiki importer', () => {
     const expectedHash = createHash('sha256').update(changedPng).digest('hex');
     expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').contentHash).toBe(expectedHash);
     expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'champ_janna').contentHash).toBe(expectedHash);
+  });
+
+  it('replaces an old image extension and generated manifest in one import', async () => {
+    const data = await fixture();
+    const target = await root();
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+    const wiki = client(data, {
+      fetchImageInfo: vi.fn(async (file: string) => file.includes('JannaSquare') ? {
+        url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
+        sha1: 'fedcba9876543210',
+        mime: 'image/png',
+      } : {
+        url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg',
+        sha1: 'changed',
+        mime: 'image/jpeg',
+      }),
+      fetchBytes: vi.fn(async (url: string) => url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])),
+    });
+
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: wiki, now: () => '2026-08-14T00:00:00.000Z' });
+
+    await expect(stat(join(target, 'assets/images/spells/janna_q.png'))).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(readFile(join(target, 'assets/images/spells/janna_q.jpg'))).resolves.toEqual(Buffer.from(jpeg));
+    const generated = await readFile(join(target, 'src/generated/assetManifest.ts'), 'utf8');
+    expect(generated).toContain('assets/images/spells/janna_q.jpg?url');
+    expect(generated).not.toContain('assets/images/spells/janna_q.png?url');
+    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+  });
+
+  it('writes nothing when hypothetical asset manifest generation fails', async () => {
+    const data = await fixture();
+    const target = await root();
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    const tracked = [
+      'docs/abilities/janna/q.json',
+      'assets/images/spells/janna_q.png',
+      'assets/source-manifest.json',
+      'src/generated/assetManifest.ts',
+    ];
+    const before = await Promise.all(tracked.map(path => readFile(join(target, path))));
+    await writeFile(join(target, 'assets/images/spells/janna-q.webp'), new Uint8Array([82, 73, 70, 70]));
+    const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+    const wiki = client(data, {
+      fetchImageInfo: vi.fn(async (file: string) => file.includes('JannaSquare') ? {
+        url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png', sha1: 'champion', mime: 'image/png',
+      } : {
+        url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg', sha1: 'ability', mime: 'image/jpeg',
+      }),
+      fetchBytes: vi.fn(async (url: string) => url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])),
+    });
+
+    await expect(importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: wiki, now: () => '2026-08-14T00:00:00.000Z' })).rejects.toThrow(/duplicate asset key/i);
+
+    for (const [index, path] of tracked.entries()) {
+      await expect(readFile(join(target, path))).resolves.toEqual(before[index]);
+    }
+    await expect(stat(join(target, 'assets/images/spells/janna_q.jpg'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('detects normalized record, local image, and source-manifest corruption', async () => {
+    const data = await fixture();
+    const target = await root();
+    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    const recordPath = join(target, 'docs/abilities/janna/q.json');
+    const imagePath = join(target, 'assets/images/spells/janna_q.png');
+    const manifestPath = join(target, 'assets/source-manifest.json');
+    const originalRecord = await readFile(recordPath);
+    const originalImage = await readFile(imagePath);
+    const originalManifest = await readFile(manifestPath);
+
+    const record = JSON.parse(originalRecord.toString());
+    record.forms[0].fields.range = 'corrupted';
+    await writeFile(recordPath, JSON.stringify(record));
+    await expect(checkAbilities(target)).rejects.toThrow(/content hash/i);
+    await writeFile(recordPath, originalRecord);
+
+    await writeFile(imagePath, new Uint8Array([...originalImage, 1]));
+    await expect(checkAbilities(target)).rejects.toThrow(/image hash/i);
+    await writeFile(imagePath, originalImage);
+
+    const manifest = JSON.parse(originalManifest.toString());
+    manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').localPath = 'assets/images/spells/wrong.png';
+    await writeFile(manifestPath, JSON.stringify(manifest));
+    await expect(checkAbilities(target)).rejects.toThrow(/asset key\/path/i);
+    await writeFile(manifestPath, originalManifest);
+
+    const generatedPath = join(target, 'src/generated/assetManifest.ts');
+    await writeFile(generatedPath, `${await readFile(generatedPath, 'utf8')}\n// stale\n`);
+    await expect(checkAbilities(target)).rejects.toThrow(/generated asset manifest is stale/i);
   });
 
   it('retries transient MediaWiki failures with identifying headers and imageinfo originals', async () => {
