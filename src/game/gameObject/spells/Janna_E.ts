@@ -5,6 +5,7 @@ import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
 import Shield from '../buffs/Shield';
+import StatAmp from '../buffs/StatAmp';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
@@ -22,11 +23,9 @@ const isEyeTarget = (target: unknown): target is EyeTarget =>
  * "shield shell on an ally" case, the same shape as `Malphite_W_Armor` but
  * generalised past self-cast.
  *
- * The Wiki also grants bonus attack damage while the shield holds. This game
- * has no attack-damage or attack-speed stat at all (see
- * `docs/abilities/janna/e.json` adaptation notes) — nothing basic attacks
- * scale off — so that half of the payload is dropped rather than faked onto
- * an unrelated stat.
+ * The Wiki also grants bonus attack damage while the shield holds. There is now
+ * an attackDamage stat and a basic attack to spend it on, so that half of the
+ * payload is applied too, on the same clock as the shield.
  *
  * The passive — 20% cooldown refund, once per this spell's own cooldown
  * window, whenever one of Janna's abilities slows or knocks up an enemy
@@ -41,13 +40,18 @@ export const MANA_COST = 70;
 export const RANGE = 500;
 export const SHIELD_DURATION_MS = 4_000;
 export const SHIELD_AMOUNT = 30;
+/**
+ * Bonus attack damage while the shield holds. A champion's base is 16, so this
+ * is a little under a third more — worth having, not worth building around.
+ */
+export const BONUS_ATTACK_DAMAGE = 5;
 export const REFUND_RATIO = 0.2;
 
 export default class Janna_E extends Spell {
   image = AssetManager.get('spell_janna_e');
   name = 'Mắt Bão (Janna_E)';
   description =
-    `Nội tại: khi một kỹ năng của Janna làm chậm hoặc hất tung ít nhất một tướng địch, hoàn <span class="buff">${Math.round(REFUND_RATIO * 100)}% hồi chiêu</span> của kỹ năng này (một lần mỗi chu kỳ hồi chiêu). Chủ động: khiên cho tướng đồng minh hoặc trụ, hấp thụ <span class="damage">${SHIELD_AMOUNT} sát thương</span> trong <span class="time">${SHIELD_DURATION_MS / 1000} giây</span>.`;
+    `Nội tại: khi một kỹ năng của Janna làm chậm hoặc hất tung ít nhất một tướng địch, hoàn <span class="buff">${Math.round(REFUND_RATIO * 100)}% hồi chiêu</span> của kỹ năng này (một lần mỗi chu kỳ hồi chiêu). Chủ động: khiên cho tướng đồng minh hoặc trụ, hấp thụ <span class="damage">${SHIELD_AMOUNT} sát thương</span> và <span class="buff">+${BONUS_ATTACK_DAMAGE} sát thương đánh thường</span> trong <span class="time">${SHIELD_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -113,6 +117,15 @@ export default class Janna_E extends Spell {
     // Shield instance (Malphite W, an item, ...) that must not merge with this.
     shield.stackId = 'janna_e_shield';
     context.target.addBuff(shield);
+
+    // Same duration, own pool: the shield and the damage are one payload, but
+    // two buff classes, and this must not merge with an unrelated StatAmp.
+    const might = new StatAmp(this.shieldDuration, this.owner, context.target);
+    might.name = 'Mắt Bão';
+    might.image = this.image;
+    might.stackId = 'janna_e_might';
+    might.bonuses = { attackDamage: { baseBonus: BONUS_ATTACK_DAMAGE } };
+    context.target.addBuff(might);
 
     const shell = new Janna_E_Shell(this.owner, context.target);
     shell.attachTo(context.target, shield);

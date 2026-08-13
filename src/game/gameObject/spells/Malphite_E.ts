@@ -6,6 +6,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Slow from '../buffs/Slow';
+import StatAmp from '../buffs/StatAmp';
 
 /**
  * Ground Slam. Malphite slams the ground beneath him: an instant, self-centred
@@ -13,10 +14,11 @@ import Slow from '../buffs/Slow';
  * and `Malphite_R_Object` are — a plain `SpellObject` that pays its damage
  * once on its first update and then spends a few hundred ms fading out.
  *
- * The Wiki's "cripple" (an attack-speed slow) has nothing to bind to: this
- * game has no attack-speed stat (see `docs/abilities/malphite/e.json`
- * adaptation notes). It becomes a movement Slow instead, consistent with the
- * rest of Malphite's kit already doing exactly that on Q.
+ * The Wiki's payload is a "cripple" — an attack-speed slow. There is now an
+ * attackSpeed stat to bind that to, so this applies it. It also keeps the
+ * movement slow it was written with: basic attacks are one small part of a
+ * fight here and most damage still comes from abilities, so a pure attack-speed
+ * debuff would read as almost nothing on the receiving end.
  */
 export const COOLDOWN_MS = 7_000;
 export const MANA_COST = 50;
@@ -26,6 +28,8 @@ export const CAST_TIME_MS = 250;
 export const RADIUS = 175;
 export const DAMAGE = 25;
 export const SLOW_PERCENT = 0.3;
+/** Attack-speed cut, the Wiki's actual payload for this ability. */
+export const CRIPPLE_PERCENT = 0.35;
 export const SLOW_DURATION_MS = 3_000;
 export const FADE_MS = 450;
 
@@ -35,7 +39,7 @@ export default class Malphite_E extends Spell {
   image = AssetManager.get('spell_malphite_e');
   name = 'Ground Slam (Malphite_E)';
   description =
-    `Malphite đập tay xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch trong bán kính <span>${RADIUS}px</span> quanh mình và <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
+    `Malphite đập tay xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch trong bán kính <span>${RADIUS}px</span> quanh mình, <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> và <span class="buff">Giảm ${Math.round(CRIPPLE_PERCENT * 100)}% tốc độ đánh</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -120,6 +124,13 @@ export class Malphite_E_Object extends SpellObject {
         // not renew or evict each other's instance.
         slow.stackId = 'malphite_e_cripple';
         enemy.addBuff(slow);
+
+        const cripple = new StatAmp(this.slowDuration, this.owner, enemy);
+        cripple.name = 'Tê Liệt';
+        cripple.image = AssetManager.get('buff_slow');
+        cripple.stackId = 'malphite_e_attack_cripple';
+        cripple.bonuses = { attackSpeed: { percentBonus: -CRIPPLE_PERCENT } };
+        enemy.addBuff(cripple);
       }
     }
 

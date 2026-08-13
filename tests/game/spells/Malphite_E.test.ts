@@ -9,11 +9,13 @@ import Malphite_E, {
   DAMAGE,
   FADE_MS,
   Malphite_E_Object,
+  CRIPPLE_PERCENT,
   RADIUS,
   SLOW_DURATION_MS,
   SLOW_PERCENT,
 } from '../../../src/game/gameObject/spells/Malphite_E';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
+import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
@@ -115,6 +117,29 @@ describe('Malphite E', () => {
     const slow = nearEnemy.buffs.find((buff): buff is Slow => buff instanceof Slow);
     expect(slow).toMatchObject({ percent: SLOW_PERCENT, duration: SLOW_DURATION_MS });
     expect(slow?.stackId).toBe('malphite_e_cripple');
+  });
+
+  // The Wiki's payload for Ground Slam is a cripple, not a movement slow. There
+  // was no attackSpeed stat to bind it to when this spell was written; there is
+  // now, so it lands as well as the slow.
+  it('cripples the attack speed of everyone it slows', () => {
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    game.setPlayer(owner);
+    const enemy = unit(game, RADIUS - 10, 'red');
+    game.objectManager.objects.push(owner, enemy);
+    game.objectManager.update();
+    enemy.stats.attackSpeed.baseValue = 1;
+
+    press(owner).update();
+
+    const cripple = enemy.buffs.find(
+      (buff): buff is StatAmp => buff instanceof StatAmp && buff.stackId === 'malphite_e_attack_cripple'
+    );
+    expect(cripple?.duration).toBe(SLOW_DURATION_MS);
+
+    enemy.updateBuffs();
+    expect(enemy.stats.attackSpeed.value).toBeCloseTo(1 - CRIPPLE_PERCENT);
   });
 
   it('deals damage exactly once even across repeated updates', () => {

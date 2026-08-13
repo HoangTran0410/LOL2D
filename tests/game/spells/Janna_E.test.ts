@@ -10,10 +10,12 @@ import Janna_E, {
   notifyJannaControlLanded,
   REFUND_RATIO,
   RANGE,
+  BONUS_ATTACK_DAMAGE,
   SHIELD_AMOUNT,
   SHIELD_DURATION_MS,
 } from '../../../src/game/gameObject/spells/Janna_E';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
+import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -85,6 +87,25 @@ describe('Janna E', () => {
 
     expect(new Janna_E(owner).press(castContext(owner, owner))).toBe(true);
     expect(owner.buffs.find((buff): buff is Shield => buff instanceof Shield)).toBeDefined();
+  });
+
+  // The other half of the Wiki's payload. It had no stat to land on when this
+  // spell was written and was dropped; basic attacks exist now, so it lands on
+  // the same clock as the shield.
+  it('gives the shielded ally bonus attack damage for as long as the shield holds', () => {
+    const game = createGame();
+    const owner = champion(game, 0, 'blue');
+    const ally = champion(game, 100, 'blue');
+    const before = ally.stats.attackDamage.value;
+
+    expect(new Janna_E(owner).press(castContext(owner, ally))).toBe(true);
+    ally.updateBuffs();
+
+    const might = ally.buffs.find(
+      (buff): buff is StatAmp => buff instanceof StatAmp && buff.stackId === 'janna_e_might'
+    );
+    expect(might?.duration).toBe(SHIELD_DURATION_MS);
+    expect(ally.stats.attackDamage.value).toBe(before + BONUS_ATTACK_DAMAGE);
   });
 
   it('attaches the shield shell to the shielded ally, not the caster', () => {

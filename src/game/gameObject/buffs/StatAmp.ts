@@ -2,17 +2,15 @@ import BuffAddType from '../../enums/BuffAddType';
 import Buff from '../Buff';
 import { StatsModifier } from '../Stats';
 
-export type StatName =
-  | 'maxHealth'
-  | 'health'
-  | 'maxMana'
-  | 'mana'
-  | 'speed'
-  | 'size'
-  | 'height'
-  | 'manaRegen'
-  | 'healthRegen'
-  | 'visionRadius';
+/**
+ * Every stat a buff can modify, derived from StatsModifier rather than listed
+ * again. It was a hand-written union and it fell behind the moment attack stats
+ * were added — the compiler then rejected a perfectly valid attackSpeed debuff.
+ * Deriving it means adding a stat is one edit, in one place.
+ */
+export type StatName = {
+  [K in keyof StatsModifier]: StatsModifier[K] extends { baseValue: number } ? K : never;
+}[keyof StatsModifier];
 
 /**
  * Which slot of the stat formula the bonus lands in:
