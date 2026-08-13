@@ -2,6 +2,8 @@ import { Circle, Rectangle } from '../../../libs/quadtree';
 import TeamId from '../../enums/TeamId';
 import type { LaneWaypoint } from '../../lanes';
 import { PredefinedFilters } from '../../managers/ObjectManager';
+import MissileSpellObject from '../MissileSpellObject';
+import SpellObject from '../SpellObject';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Monster from './Monster';
@@ -63,6 +65,21 @@ export const WAYPOINT_TOLERANCE = 40;
  *  one thing on this class that would actually cost a full board its frame rate. */
 export const AGGRO_SCAN_INTERVAL_MS = 200;
 
+/**
+ * Basic-attack visuals. Exported so the suite asserts the timing/speed the
+ * objects are actually wired with, not a copy of the numbers — retuning one
+ * should not mean editing a test.
+ *
+ * A champion is 55 units across and moves 180 units/sec; this is picked to
+ * read as a slow, deliberate shot next to that, not a spell-speed one (Varus'
+ * arrow and Turret's bolt both move at 780-1200 units/sec).
+ */
+export const RANGED_BOLT_SPEED = 360 / 60;
+/** ms of wind-up before a melee swing's damage resolves. */
+export const MELEE_WINDUP_MS = 130;
+/** Total ms a melee swing's visual lives, wind-up through fade. */
+export const MELEE_SWING_TOTAL_MS = 300;
+
 const TEAM_COLORS: Record<string, { body: number[]; trim: number[]; bar: number[] }> = {
   [TeamId.BLUE]: { body: [64, 142, 232], trim: [16, 44, 82], bar: [96, 186, 255] },
   [TeamId.RED]: { body: [226, 84, 68], trim: [86, 22, 18], bar: [255, 126, 106] },
@@ -121,8 +138,6 @@ export default class Minion extends AttackableUnit {
 
   /** ms left before the next swing. */
   _attackCooldown = 0;
-  /** ms left on the swing flash — purely cosmetic. */
-  _attackFlash = 0;
   /** ms left before the next aggro scan, jittered so a wave does not scan in lockstep. */
   _scanCooldown: number;
 
@@ -174,7 +189,6 @@ export default class Minion extends AttackableUnit {
     super.update();
     if (this.isDead) return;
 
-    if (this._attackFlash > 0) this._attackFlash -= deltaTime;
     if (this._attackCooldown > 0) this._attackCooldown -= deltaTime;
 
     this._scanCooldown -= deltaTime;
@@ -218,8 +232,7 @@ export default class Minion extends AttackableUnit {
 
     // surface to surface, otherwise a 40px reach can never satisfy its own check
     // against two 34px bodies standing next to each other
-    const reach =
-      this.attackRange + this.stats.size.value / 2 + (target.stats?.size?.value ?? 0) / 2;
+    const reach = this.reachTo(target);
     const distance = p5.Vector.dist(this.position, target.position);
 
     if (distance > reach) {
@@ -230,9 +243,39 @@ export default class Minion extends AttackableUnit {
       this.stopMovement();
       if (this._attackCooldown <= 0) {
         this._attackCooldown = this.attackInterval;
-        this._attackFlash = this.kind === 'ranged' ? 220 : 160;
-        target.takeDamage(this.damage, this);
+        this.launchAttack(target, reach);
       }
+    }
+  }
+
+  /** Surface-to-surface reach: this minion's own radius plus the target's. */
+  reachTo(target: AttackableUnit): number {
+    return this.attackRange + this.stats.size.value / 2 + (target.stats?.size?.value ?? 0) / 2;
+  }
+
+  /**
+   * Damage used to land the instant the cooldown allowed a swing, which made a
+   * whole wave fighting unreadable — a dozen simultaneous instant hits with only
+   * a 160-220ms flash to show for them. Now it lands on arrival: a slow homing
+   * bolt for the caster line, a wind-up-then-strike swing for the front line.
+   * Both objects re-validate the target (and this minion) right before damage
+   * actually applies, so a target that dies or leaves takes nothing phantom.
+   */
+  launchAttack(target: AttackableUnit, reach: number): void {
+    if (this.kind === 'ranged') {
+      const bolt = new MinionBolt(this);
+      bolt.target = target;
+      bolt.damage = this.damage;
+      bolt.color = this.colors.bar;
+      bolt.position.set(this.position.x, this.position.y);
+      bolt.destination.set(target.position.x, target.position.y);
+      this.game.objectManager.addObject(bolt);
+    } else {
+      const swing = new MinionSwing(this, target);
+      swing.damage = this.damage;
+      swing.reach = reach;
+      swing.color = this.colors.bar;
+      this.game.objectManager.addObject(swing);
     }
   }
 
@@ -356,7 +399,8 @@ export default class Minion extends AttackableUnit {
     }
     pop();
 
-    this.drawSwing();
+    // the swing/bolt objects spawned by launchAttack() draw themselves as
+    // separate objects now, so there is nothing left to flash here
     // buffs land on minions like they do on anyone else — a stunned minion with
     // no visual reads as a stuck one. Free when the list is empty, which it
     // usually is
@@ -366,31 +410,6 @@ export default class Minion extends AttackableUnit {
 
   /** Points at whatever it is hitting. The base class points at the mouse. */
   drawDir() {}
-
-  drawSwing() {
-    if (this._attackFlash <= 0 || !this.targetLock?.position) return;
-
-    const pos = this.position;
-    const dir = p5.Vector.sub(this.targetLock.position, pos);
-    if (dir.magSq() === 0) return;
-
-    const flash = Math.min(255, this._attackFlash * 1.6);
-    push();
-    if (this.kind === 'ranged') {
-      // a bolt drawn as a fading tracer, rather than a MissileSpellObject: one
-      // more object per minion per swing is exactly the cost this class avoids
-      const { bar } = this.colors;
-      stroke(bar[0], bar[1], bar[2], flash * 0.8);
-      strokeWeight(4);
-      line(pos.x, pos.y, pos.x + dir.x, pos.y + dir.y);
-    } else {
-      dir.setMag(this.stats.size.value / 2 + 12);
-      stroke(255, 220, 160, flash);
-      strokeWeight(5);
-      line(pos.x, pos.y, pos.x + dir.x, pos.y + dir.y);
-    }
-    pop();
-  }
 
   /** Tiny, and no readout — a champion bar on 48 units is a wall of text. */
   drawHealthBar() {
@@ -421,6 +440,183 @@ export default class Minion extends AttackableUnit {
       y: this.position.y - size / 2,
       w: size,
       h: size,
+      data: this,
+    });
+  }
+}
+
+/**
+ * The ranged minion's basic attack: a small bolt that homes on its target and
+ * damages it on arrival — nothing on the way, nothing if the target is gone
+ * by the time it gets there. Mirrors TurretBolt (Turret.ts): `maxHitCount = 0`
+ * switches MissileSpellObject's in-flight collision off entirely, so this can
+ * only ever hit the one unit it was fired at, and only once, at the end.
+ *
+ * No trail, no particle system — up to two dozen of these can be in flight at
+ * once during a big wave fight.
+ */
+export class MinionBolt extends MissileSpellObject {
+  speed = RANGED_BOLT_SPEED;
+  size = 14;
+  maxHitCount = 0;
+  removeOnArrive = true;
+  damage = 0;
+  target: AttackableUnit | null = null;
+  color: number[] = [255, 235, 190];
+  /** Fizzles on its own if it somehow never arrives. */
+  _life = 2_000;
+
+  onBeforeMove() {
+    this._life -= deltaTime;
+    if (this._life <= 0) {
+      this.toRemove = true;
+      return;
+    }
+    if (this.target && !this.target.isDead && !this.target.toRemove) {
+      this.destination.set(this.target.position.x, this.target.position.y);
+    }
+  }
+
+  onArrive() {
+    const target = this.target;
+    if (
+      target &&
+      !target.isDead &&
+      !target.toRemove &&
+      target.targetable &&
+      !this.owner.isDead
+    ) {
+      target.takeDamage(this.damage, this.owner);
+    }
+  }
+
+  draw() {
+    const pos = this.position;
+    push();
+    noStroke();
+    fill(this.color[0], this.color[1], this.color[2], 90);
+    circle(pos.x, pos.y, this.size * 1.8);
+    fill(255, 255, 255, 220);
+    circle(pos.x, pos.y, this.size * 0.55);
+    pop();
+  }
+}
+
+/**
+ * The melee minion's basic attack: a short wind-up, then a fan-shaped swipe
+ * that lands on contact. Not a MissileSpellObject — nothing travels — but the
+ * same discipline applies: damage resolves exactly once, at the strike
+ * instant, and only if the target (and this minion) are still valid then.
+ */
+export class MinionSwing extends SpellObject {
+  target: AttackableUnit | null;
+  damage = 0;
+  /** Surface-to-surface reach, re-checked at the strike instant. */
+  reach = 40;
+  color: number[] = [255, 220, 160];
+  age = 0;
+  struck = false;
+
+  constructor(owner: AttackableUnit, target: AttackableUnit) {
+    super(owner);
+    this.target = target;
+  }
+
+  update() {
+    this.age += deltaTime;
+    this.position.set(this.owner.position.x, this.owner.position.y);
+
+    if (!this.struck && this.age >= MELEE_WINDUP_MS) {
+      this.struck = true;
+      this.strike();
+    }
+    if (this.age >= MELEE_SWING_TOTAL_MS) this.toRemove = true;
+  }
+
+  strike(): void {
+    const target = this.target;
+    if (
+      !target ||
+      target.isDead ||
+      target.toRemove ||
+      !target.targetable ||
+      this.owner.isDead
+    ) {
+      return;
+    }
+    // the target (or this minion) may have drifted during the wind-up
+    if (p5.Vector.dist(this.owner.position, target.position) > this.reach) return;
+    target.takeDamage(this.damage, this.owner);
+  }
+
+  draw() {
+    const target = this.target;
+    const pos = this.owner.position;
+    let dirX = 1;
+    let dirY = 0;
+    if (target) {
+      const dx = target.position.x - pos.x;
+      const dy = target.position.y - pos.y;
+      const len = Math.hypot(dx, dy);
+      if (len > 0) {
+        dirX = dx / len;
+        dirY = dy / len;
+      }
+    }
+    const angle = Math.atan2(dirY, dirX);
+    const bodyRadius = this.owner.stats.size.value / 2;
+
+    push();
+    translate(pos.x, pos.y);
+    rotate(angle);
+    noStroke();
+
+    if (this.age < MELEE_WINDUP_MS) {
+      // wind-up: a small glow pulling back, brightening as the swing charges
+      const windupRatio = this.age / MELEE_WINDUP_MS;
+      fill(this.color[0], this.color[1], this.color[2], 60 + 100 * windupRatio);
+      circle(-bodyRadius * 0.5, 0, 6 + 6 * windupRatio);
+    } else {
+      // strike: a wide fan swipe sweeping past the attacker, fading through
+      // the rest of the swing's life
+      const strikeRatio = constrain(
+        (this.age - MELEE_WINDUP_MS) / (MELEE_SWING_TOTAL_MS - MELEE_WINDUP_MS),
+        0,
+        1
+      );
+      const fade = 1 - strikeRatio;
+      const innerR = bodyRadius * 0.6;
+      const outerR = bodyRadius + this.reach * 0.9;
+      const half = 0.6;
+
+      fill(this.color[0], this.color[1], this.color[2], 200 * fade);
+      beginShape();
+      for (let i = 0; i <= 4; i++) {
+        const a = -half + (2 * half) * (i / 4);
+        vertex(cos(a) * outerR, sin(a) * outerR);
+      }
+      for (let i = 4; i >= 0; i--) {
+        const a = -half + (2 * half) * (i / 4);
+        vertex(cos(a) * innerR, sin(a) * innerR);
+      }
+      endShape(CLOSE);
+
+      noFill();
+      stroke(255, 255, 255, 220 * fade);
+      strokeWeight(2);
+      arc(0, 0, outerR * 2, outerR * 2, -half, half);
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.reach + 20;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

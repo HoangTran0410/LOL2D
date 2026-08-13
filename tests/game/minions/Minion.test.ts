@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Minion, {
   AGGRO_SCAN_INTERVAL_MS,
+  MELEE_SWING_TOTAL_MS,
+  MELEE_WINDUP_MS,
+  MinionBolt,
   MinionPresets,
+  MinionSwing,
+  RANGED_BOLT_SPEED,
   WAYPOINT_TOLERANCE,
 } from '../../../src/game/gameObject/attackableUnits/Minion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
@@ -183,7 +188,7 @@ describe('Minion', () => {
   });
 
   describe('fighting', () => {
-    it('stops walking, closes the gap and swings on its interval', () => {
+    it('stops walking, closes the gap, and lands its swing on the interval — after the wind-up, not on release', () => {
       const minion = makeMinion();
       const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(200, 0) });
       const damage = vi.spyOn(enemy, 'takeDamage');
@@ -198,15 +203,30 @@ describe('Minion', () => {
       expect(minion.waypointIndex).toBe(0);
 
       tick(minion, 60);
+      // the swing exists the instant the cooldown allows it, but must not have
+      // resolved damage yet — that used to happen right here, instantly
+      expect(damage).not.toHaveBeenCalled();
+      const swing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing
+      );
+      if (!swing) throw new Error('Melee minion must spawn a swing when it attacks.');
+
+      tick(swing, Math.ceil(MELEE_WINDUP_MS / 16));
       expect(damage).toHaveBeenCalledWith(MinionPresets.melee.damage, minion);
+      expect(damage).toHaveBeenCalledTimes(1);
 
       // and it holds the interval between swings rather than hitting every frame
-      const swings = damage.mock.calls.length;
       minion._attackCooldown = MinionPresets.melee.attackInterval;
       tick(minion, Math.floor(MinionPresets.melee.attackInterval / 16));
-      expect(damage.mock.calls.length).toBe(swings);
+      expect(damage).toHaveBeenCalledTimes(1);
+
       minion.update();
-      expect(damage.mock.calls.length).toBe(swings + 1);
+      const secondSwing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing && o !== swing
+      );
+      if (!secondSwing) throw new Error('Melee minion must swing again after the interval.');
+      tick(secondSwing, Math.ceil(MELEE_WINDUP_MS / 16));
+      expect(damage).toHaveBeenCalledTimes(2);
     });
 
     it('resumes its lane once the target dies', () => {
@@ -261,6 +281,175 @@ describe('Minion', () => {
       expect(scan).not.toHaveBeenCalled();
       minion.update();
       expect(scan).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('ranged basic attack (MinionBolt)', () => {
+    it('fires a bolt that takes real travel time and damages exactly the target it was fired at, on arrival', () => {
+      const minion = makeMinion({ preset: MinionPresets.ranged });
+      const enemy = makeMinion({
+        preset: MinionPresets.ranged,
+        teamId: TeamId.RED,
+        position: createVector(250, 0),
+      });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+
+      forceScan(minion);
+      minion.update();
+      expect(minion.phase).toBe(Minion.PHASES.ATTACK);
+
+      const bolt = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionBolt => o instanceof MinionBolt
+      );
+      if (!bolt) throw new Error('Ranged minion must fire a bolt when it attacks.');
+      expect(bolt.damage).toBe(MinionPresets.ranged.damage);
+      expect(bolt.speed).toBe(RANGED_BOLT_SPEED);
+      // damage must not resolve the instant the bolt is released
+      expect(damage).not.toHaveBeenCalled();
+
+      bolt.update();
+      expect(bolt.toRemove).toBe(false);
+      expect(damage).not.toHaveBeenCalled();
+
+      for (let i = 0; i < 200 && !bolt.toRemove; i++) bolt.update();
+      expect(bolt.toRemove).toBe(true);
+      expect(damage).toHaveBeenCalledWith(MinionPresets.ranged.damage, minion);
+      expect(damage).toHaveBeenCalledTimes(1);
+    });
+
+    it('lands nothing on a target that dies mid-flight', () => {
+      const minion = makeMinion({ preset: MinionPresets.ranged });
+      const enemy = makeMinion({
+        preset: MinionPresets.ranged,
+        teamId: TeamId.RED,
+        position: createVector(250, 0),
+      });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+      const bolt = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionBolt => o instanceof MinionBolt
+      );
+      if (!bolt) throw new Error('Ranged minion must fire a bolt when it attacks.');
+
+      enemy.die({ reviveAfter: 0 });
+
+      expect(() => {
+        for (let i = 0; i < 200 && !bolt.toRemove; i++) bolt.update();
+      }).not.toThrow();
+      expect(bolt.toRemove).toBe(true);
+      expect(damage).not.toHaveBeenCalled();
+    });
+
+    it('lands nothing if the firing minion dies mid-flight', () => {
+      const minion = makeMinion({ preset: MinionPresets.ranged });
+      const enemy = makeMinion({
+        preset: MinionPresets.ranged,
+        teamId: TeamId.RED,
+        position: createVector(250, 0),
+      });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+      const bolt = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionBolt => o instanceof MinionBolt
+      );
+      if (!bolt) throw new Error('Ranged minion must fire a bolt when it attacks.');
+
+      minion.takeDamage(MinionPresets.ranged.health, undefined);
+      expect(minion.isDead).toBe(true);
+
+      expect(() => {
+        for (let i = 0; i < 200 && !bolt.toRemove; i++) bolt.update();
+      }).not.toThrow();
+      expect(damage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('melee basic attack (MinionSwing)', () => {
+    it('lands damage after the wind-up, not when the swing is created', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(60, 0) });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+
+      const swing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing
+      );
+      if (!swing) throw new Error('Melee minion must spawn a swing when it attacks.');
+      expect(swing.damage).toBe(MinionPresets.melee.damage);
+      expect(damage).not.toHaveBeenCalled();
+
+      // still mid wind-up
+      tick(swing, Math.max(0, Math.ceil(MELEE_WINDUP_MS / 16) - 1));
+      expect(damage).not.toHaveBeenCalled();
+
+      swing.update();
+      expect(damage).toHaveBeenCalledWith(MinionPresets.melee.damage, minion);
+      expect(damage).toHaveBeenCalledTimes(1);
+
+      // and the swing finishes its own lifetime instead of lingering
+      tick(swing, Math.ceil(MELEE_SWING_TOTAL_MS / 16));
+      expect(swing.toRemove).toBe(true);
+    });
+
+    it('does not strike a target that died during the wind-up', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(60, 0) });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+      const swing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing
+      );
+      if (!swing) throw new Error('Melee minion must spawn a swing when it attacks.');
+
+      enemy.die({ reviveAfter: 0 });
+      expect(() => tick(swing, Math.ceil(MELEE_WINDUP_MS / 16))).not.toThrow();
+
+      expect(damage).not.toHaveBeenCalled();
+    });
+
+    it('does not strike if the attacker dies during the wind-up', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(60, 0) });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+      const swing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing
+      );
+      if (!swing) throw new Error('Melee minion must spawn a swing when it attacks.');
+
+      minion.takeDamage(MinionPresets.melee.health, undefined);
+      expect(() => tick(swing, Math.ceil(MELEE_WINDUP_MS / 16))).not.toThrow();
+
+      expect(damage).not.toHaveBeenCalled();
+    });
+
+    it('re-checks reach at the strike instant, in case the target stepped back during the wind-up', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(60, 0) });
+      const damage = vi.spyOn(enemy, 'takeDamage');
+      indexObjects(game, [minion, enemy]);
+      forceScan(minion);
+      minion.update();
+      const swing = minion.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionSwing => o instanceof MinionSwing
+      );
+      if (!swing) throw new Error('Melee minion must spawn a swing when it attacks.');
+
+      enemy.position.set(60 + swing.reach + 10, 0);
+      tick(swing, Math.ceil(MELEE_WINDUP_MS / 16));
+
+      expect(damage).not.toHaveBeenCalled();
     });
   });
 
