@@ -3,7 +3,13 @@ import EventType from '../enums/EventType';
 import SpellState from '../enums/SpellState';
 import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
 import SpellVfx from '../vfx/SpellVfx';
-import StatusFlags from '../enums/StatusFlags';
+import {
+  interruptsSuspended,
+  isInterruptibleState,
+  ownerInterruptReason,
+  snapshotOwnerMovement,
+  type OwnerMovementSnapshot,
+} from '../spell/runtime/CancelPolicy';
 import type { TargetingRequest } from '../spell/targeting/TargetResolver';
 import type {
   CancelReason,
@@ -47,14 +53,10 @@ export default class Spell {
   owner: any;
   game: any;
   private spellRuntime?: SpellRuntime;
+  private resolvedSpec?: CastSpec;
   private spellVfx?: SpellVfx;
   private _castContext?: CastContext;
-  private ownerSnapshot?: {
-    position: { x: number; y: number };
-    destination?: { x: number; y: number };
-    movementRevision?: number;
-    displacementRevision?: number;
-  };
+  private ownerSnapshot?: OwnerMovementSnapshot;
 
   constructor(owner: any) {
     this.owner = owner;
@@ -157,7 +159,7 @@ export default class Spell {
       // an AI champion attempts a cast several times a second and is refused
       // almost every time, so cancelling on the attempt would leave the bots
       // unable to hold an attack order at all. `accepted` is the cast.
-      if (this.cancelsAttackOrder) this.owner?.basicAttack?.clear();
+      if (this.activeCastSpec.attackOrder !== 'keep') this.owner?.basicAttack?.clear();
     }
     this.syncVfxPhase();
     return accepted;
@@ -175,18 +177,6 @@ export default class Spell {
    * else, which is the part that actually reads as a rhythm.
    */
   get cooldownLocksOut(): boolean {
-    return true;
-  }
-
-  /**
-   * Whether casting this spell drops the caster's standing attack order.
-   *
-   * True for every ability. BasicAttack overrides it, because casting that one
-   * *is* the order — and note the ordering this relies on: a PRESS spell runs
-   * `onSpellCast` inside `runtime.press` above, so an order placed there would
-   * be wiped by the line below if the flag were not honoured.
-   */
-  protected get cancelsAttackOrder(): boolean {
     return true;
   }
 
@@ -252,12 +242,19 @@ export default class Spell {
   onCancel(_context: CastContext, _reason: CancelReason): void {}
   onComplete(_context: CastContext): void {}
 
-  protected ignoresOwnerInterrupts(): boolean {
-    return false;
-  }
-
   get castSpec(): Readonly<CastSpec> {
     return legacyCastSpec(this.coolDown);
+  }
+
+  /**
+   * The spec the runtime was actually built from. `castSpec` is a getter that
+   * rebuilds its object on every read, so anything that must agree with the
+   * live runtime — the interrupt form, the attack-order rule — has to read the
+   * copy the runtime kept rather than a fresh one.
+   */
+  protected get activeCastSpec(): Readonly<CastSpec> {
+    void this.runtime;
+    return this.resolvedSpec as CastSpec;
   }
 
   get targetingRequest(): Readonly<TargetingRequest> { return {}; }
@@ -286,6 +283,7 @@ export default class Spell {
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
       const spec = this.castSpec as CastSpec;
+      this.resolvedSpec = spec;
       this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
         canStart: (context) => this.canStart(context),
@@ -353,61 +351,21 @@ export default class Spell {
     else resource.value += amount;
   }
 
+  /**
+   * Watches the caster and hands the runtime whatever went wrong. Which of
+   * those the spell actually dies of is the form's decision, made in
+   * `SpellRuntime.canInterrupt` — see `CancelPolicy`.
+   */
   private observeInterrupts(): void {
-    if (!['CASTING', 'CHARGING', 'CHANNELING', 'ACTIVE'].includes(this.runtime.state)) return;
-    if (this.ignoresOwnerInterrupts()) return;
-    if (this.owner.isDead) {
-      this.runtime.cancel('DEATH');
-      return;
-    }
+    if (!isInterruptibleState(this.runtime.state)) return;
+    if (interruptsSuspended(this.owner, this.activeCastSpec.suspendedBy)) return;
 
-    const status = typeof this.owner.status === 'number' ? this.owner.status : 0;
-    if ((status & (StatusFlags.Stunned | StatusFlags.Suppressed)) !== 0) {
-      this.runtime.cancel('STUN');
-    } else if ((status & StatusFlags.Silenced) !== 0 || !this.owner.canCast) {
-      this.runtime.cancel('SILENCE');
-    } else if (this.ownerSnapshot) {
-      const hasExplicitMovementSignals =
-        typeof this.owner.movementRevision === 'number' &&
-        typeof this.owner.displacementRevision === 'number';
-      if (hasExplicitMovementSignals) {
-        if (this.owner.displacementRevision !== this.ownerSnapshot.displacementRevision) {
-          this.runtime.cancel('DISPLACEMENT');
-        } else if (this.owner.movementRevision !== this.ownerSnapshot.movementRevision) {
-          this.runtime.cancel('MOVE');
-        }
-        return;
-      }
-      const { position, destination } = this.ownerSnapshot;
-      const currentPosition = this.owner.position;
-      const currentDestination = this.owner.destination;
-      const destinationChanged = destination && currentDestination &&
-        (currentDestination.x !== destination.x || currentDestination.y !== destination.y);
-      const positionChanged = currentPosition.x !== position.x || currentPosition.y !== position.y;
-      if (destinationChanged || (positionChanged && destination &&
-          (destination.x !== position.x || destination.y !== position.y))) {
-        this.runtime.cancel('MOVE');
-      } else if (positionChanged) {
-        this.runtime.cancel('DISPLACEMENT');
-      }
-      if (destination && currentDestination) {
-        destination.x = currentDestination.x;
-        destination.y = currentDestination.y;
-      }
-      position.x = currentPosition.x;
-      position.y = currentPosition.y;
-    }
+    const reason = ownerInterruptReason(this.owner, this.ownerSnapshot);
+    if (reason) this.runtime.cancel(reason);
   }
 
   private snapshotOwner(): void {
-    const position = this.owner.position;
-    const destination = this.owner.destination;
-    this.ownerSnapshot = {
-      position: { x: position.x, y: position.y },
-      ...(destination ? { destination: { x: destination.x, y: destination.y } } : {}),
-      movementRevision: this.owner.movementRevision,
-      displacementRevision: this.owner.displacementRevision,
-    };
+    this.ownerSnapshot = snapshotOwnerMovement(this.owner);
   }
 
   private syncVfxPhase(): void {

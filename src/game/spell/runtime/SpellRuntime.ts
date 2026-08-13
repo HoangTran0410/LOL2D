@@ -1,8 +1,8 @@
+import { SpellForm, interruptSwitchFor, resolveInterrupts } from './CancelPolicy';
 import type {
   CancelReason,
   CastContext,
   CastSpec,
-  InterruptPolicy,
   ResourceCommitPoint,
   SpellRuntimeState,
 } from './types';
@@ -20,22 +20,6 @@ export interface SpellRuntimeDelegate {
   onCancel(context: CastContext, reason: CancelReason): void;
   onComplete(context: CastContext): void;
 }
-
-const defaultInterrupts: InterruptPolicy = {
-  death: true,
-  stun: true,
-  silence: true,
-  displacement: true,
-  move: true,
-};
-
-const interruptKey: Partial<Record<CancelReason, keyof InterruptPolicy>> = {
-  DEATH: 'death',
-  STUN: 'stun',
-  SILENCE: 'silence',
-  DISPLACEMENT: 'displacement',
-  MOVE: 'move',
-};
 
 const snapshotContext = (context: CastContext): CastContext =>
   Object.freeze({
@@ -68,6 +52,17 @@ const validateSpec = (spec: CastSpec): void => {
     if (!spec.charge) throw new Error(`${spec.activation} activation requires charge`);
   } else if (spec.charge) {
     throw new Error(`${spec.activation} activation does not support charge`);
+  }
+
+  // A refund named for an interrupt the form refuses is dead configuration: the
+  // reason can never arrive, so the refund reads as a promise the spell does not
+  // keep. Caught here rather than left for a player to notice their mana gone.
+  const interrupts = resolveInterrupts(spec.interrupts);
+  for (const reason of spec.resource.refundOn) {
+    const key = interruptSwitchFor(reason);
+    if (key !== undefined && !interrupts[key]) {
+      throw new Error(`resource.refundOn lists ${reason}, which this spell's form never fires`);
+    }
   }
 };
 
@@ -329,8 +324,8 @@ export class SpellRuntime {
   }
 
   private canInterrupt(reason: CancelReason): boolean {
-    const key = interruptKey[reason];
-    return key === undefined || (this.spec.interrupts?.[key] ?? defaultInterrupts[key]);
+    const key = interruptSwitchFor(reason);
+    return key === undefined || (this.spec.interrupts?.[key] ?? SpellForm.HELD[key]);
   }
 
   private startCooldown(point: CastSpec['cooldown']['startAt']): void {

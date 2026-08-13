@@ -1,4 +1,5 @@
 import type { SpellSfxSpec, SpellVfxSpec } from '../../vfx/SpellVfx';
+import type { BuffConstructor } from '../../gameObject/Buff';
 
 export type ActivationPattern = 'PRESS' | 'HOLD_RELEASE' | 'RECAST' | 'TOGGLE' | 'TAP_OR_HOLD';
 export type SpellRuntimeState =
@@ -22,6 +23,8 @@ export type CancelReason =
   | 'OUT_OF_RANGE'
   | 'OUT_OF_RESOURCE'
   | 'MAX_DURATION'
+  /** The effect the spell put into the world finished on its own terms. */
+  | 'EFFECT_ENDED'
   | 'SCENE_EXIT';
 
 export interface Vec2 {
@@ -59,6 +62,14 @@ export interface InterruptPolicy {
   move: boolean;
 }
 
+/**
+ * What casting this spell does to a standing basic attack order.
+ *
+ * `drop` for every ability: committing to a cast is a decision to stop chasing.
+ * `keep` only for the basic attack itself, where casting *is* the order.
+ */
+export type AttackOrderPolicy = 'drop' | 'keep';
+
 export interface ChargeSpec {
   maxDurationMs: number;
   releaseAtMax: boolean;
@@ -85,7 +96,15 @@ export interface CastSpec {
   active?: ActiveSpec;
   resource: ResourcePolicy;
   cooldown: CooldownPolicy;
+  /** One `SpellForm` from `CancelPolicy`. Omitted means `SpellForm.HELD`. */
   interrupts?: Partial<InterruptPolicy>;
+  /**
+   * Buffs on the caster that suspend the interrupt watcher rather than ending
+   * what it guards — Stasis, and nothing else so far. See `CancelPolicy`.
+   */
+  suspendedBy?: readonly BuffConstructor[];
+  /** Defaults to `drop`. */
+  attackOrder?: AttackOrderPolicy;
   vfx?: SpellVfxSpec;
   sfx?: SpellSfxSpec;
 }
