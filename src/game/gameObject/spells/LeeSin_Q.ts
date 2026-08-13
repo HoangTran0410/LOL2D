@@ -133,6 +133,9 @@ export class LeeSin_Q_Object extends MissileSpellObject {
     this.enemyHit = enemy;
     this.phase = LeeSin_Q_Object.PHASES.HIT;
     this.isMissile = false;
+    // the mark rides the victim for three seconds; it had no death check at
+    // all, so it used to sit on the corpse and give Q2 something to dash at
+    this.attachTo(enemy);
   }
 
   update() {
@@ -140,6 +143,8 @@ export class LeeSin_Q_Object extends MissileSpellObject {
       super.update();
       return;
     }
+
+    if (this.dropIfAttachmentLost()) return;
 
     this.position = this.enemyHit.position.copy();
 

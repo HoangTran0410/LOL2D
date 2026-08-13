@@ -82,6 +82,8 @@ export class Leblanc_E_Object extends MissileSpellObject {
     this.enemyHit.takeDamage(this.hitDamage, this.owner);
     this.isMissile = false;
     this.phase = Leblanc_E_Object.PHASES.WAITING_FOR_STUN;
+    // the chain is anchored on LeBlanc: no caster, no delayed root
+    this.attachTo(this.owner);
   }
 
   update() {
@@ -89,6 +91,8 @@ export class Leblanc_E_Object extends MissileSpellObject {
       super.update();
       return;
     }
+
+    if (this.dropIfAttachmentLost()) return;
 
     this.timeSinceHit += deltaTime;
     this.position = this.enemyHit.position.copy().add(random(-5, 5), random(-5, 5));

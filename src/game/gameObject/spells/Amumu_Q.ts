@@ -82,6 +82,10 @@ export class Amumu_Q_Object extends MissileSpellObject {
     this.enemyHit = enemy;
     this.isMissile = false;
     this._catchFlash = 400;
+    // Once it lands, the bandage is a rope strung between two bodies rather
+    // than a projectile: it has to drop if either end goes. The victim is
+    // checked below; the caster is the attachment.
+    this.attachTo(this.owner);
 
     // the wrap taking hold, so the catch is not a silent teleport
     const impact = new Amumu_Q_Impact(this.owner);
@@ -115,6 +119,11 @@ export class Amumu_Q_Object extends MissileSpellObject {
 
     if (!this.enemyHit) {
       super.update();
+      return;
+    }
+
+    if (this.dropIfAttachmentLost()) {
+      this.dashBuff?.deactivateBuff?.();
       return;
     }
 

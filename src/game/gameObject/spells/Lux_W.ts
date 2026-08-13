@@ -108,6 +108,7 @@ export class Lux_W_Object extends MissileSpellObject {
       const burst = new Lux_W_Burst(this.owner);
       burst.position = ally.position.copy();
       burst.follow = ally;
+      burst.attachTo(ally);
       burst.targetSize = ally.animatedValues?.displaySize ?? 50;
       this.game.objectManager.addObject(burst);
     }
@@ -184,6 +185,8 @@ export class Lux_W_Burst extends SpellObject {
   lifeTime = 420;
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.age += deltaTime;
     if (this.follow) this.position.set(this.follow.position.x, this.follow.position.y);
     if (this.age >= this.lifeTime) this.toRemove = true;

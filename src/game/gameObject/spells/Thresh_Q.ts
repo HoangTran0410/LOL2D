@@ -173,6 +173,9 @@ export class Thresh_Q_Object extends MissileSpellObject {
     this.phase = Thresh_Q_Object.PHASES.SHACKLE;
     this.champHooked = enemy;
     this.isMissile = false; // stop colliding; the chain is spent
+    // the chain hangs off Thresh: killing him drops it instead of leaving a
+    // corpse hauling the victim in with the remaining tugs
+    this.attachTo(this.owner);
 
     enemy.takeDamage(this.damage, this.owner);
 
@@ -199,6 +202,8 @@ export class Thresh_Q_Object extends MissileSpellObject {
       super.update();
       return;
     }
+
+    if (this.dropIfAttachmentLost()) return;
 
     // the scythe rides on the victim for as long as the shackle holds
     this.position.set(this.champHooked.position.x, this.champHooked.position.y);

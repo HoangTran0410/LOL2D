@@ -86,6 +86,7 @@ export class Ashe_E_Object extends MissileSpellObject {
       // a ping on the newly spotted enemy, so being revealed is visible
       const ping = new Ashe_E_Ping(this.owner);
       ping.target = enemy;
+      ping.attachTo(enemy);
       this.game.objectManager.addObject(ping);
     }
   }
@@ -184,6 +185,8 @@ export class Ashe_E_Ping extends SpellObject {
   lifeTime = 700;
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.age += deltaTime;
     if (this.target) this.position.set(this.target.position.x, this.target.position.y);
     if (this.age >= this.lifeTime || !this.target) this.toRemove = true;

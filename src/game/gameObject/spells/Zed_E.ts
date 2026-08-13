@@ -15,6 +15,8 @@ export default class Zed_E extends Spell {
 
   onSpellCast() {
     const obj = new Zed_E_Object(this.owner);
+    // the blade sweeps around Zed's body, so it goes when the body does
+    obj.attachTo(this.owner);
     this.game.objectManager.addObject(obj);
   }
 }
@@ -54,6 +56,8 @@ export class Zed_E_Object extends SpellObject {
   onRemoved() {}
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.position.set(this.owner.position.x, this.owner.position.y);
 
     this.angle += this.angleSpeed;

@@ -27,7 +27,7 @@ export default class Twitch_Q extends Spell {
     this.owner.addBuff(speedupBuff);
 
     const obj = new Twitch_Q_Object(this.owner);
-    obj.stealthBuff = invisibleBuff;
+    obj.attachTo(this.owner, invisibleBuff);
     this.game.objectManager.addObject(obj);
   }
 }
@@ -44,14 +44,18 @@ export class Twitch_Q_Object extends SpellObject {
   lifeTime = 500;
   maxRadius = 55;
 
-  stealthBuff: any = null;
-
   /** Cosmetic: motes of dust disturbed by the cloaked body. */
   _motes: { a: number; r: number; age: number; size: number }[] = [];
   _moteTimer = 0;
 
-  get _cloaked() {
-    return this.stealthBuff && !this.stealthBuff.toRemove && !this.owner.isDead;
+  /**
+   * The cloak is drawn while the attachment holds — Twitch alive and the
+   * stealth buff still ticking. It is not `dropIfAttachmentLost()` because the
+   * smoke puff left at the vanish spot has to finish fading first; update()
+   * below removes the object once nothing is left to draw.
+   */
+  get _cloaked(): boolean {
+    return !!this._anchorBuff && !this.attachmentLost;
   }
 
   update() {
@@ -113,9 +117,10 @@ export class Twitch_Q_Object extends SpellObject {
   _drawCloak() {
     const pos = this.owner.position;
     const size = this.owner.animatedValues.displaySize;
+    const stealthBuff = this._anchorBuff;
     const left =
-      this.stealthBuff && this.stealthBuff.duration
-        ? constrain(1 - this.stealthBuff.timeElapsed / this.stealthBuff.duration, 0, 1)
+      stealthBuff && stealthBuff.duration
+        ? constrain(1 - stealthBuff.timeElapsed / stealthBuff.duration, 0, 1)
         : 0;
 
     push();

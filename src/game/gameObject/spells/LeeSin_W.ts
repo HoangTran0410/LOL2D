@@ -114,6 +114,7 @@ export default class LeeSin_W extends Spell {
     // a shield that just appears as a thin ring is easy to miss — slam it on
     const burst = new LeeSin_W_Burst(this.owner);
     burst.follow = unit;
+    burst.attachTo(unit);
     burst.position = unit.position.copy();
     burst.targetSize = unit.animatedValues?.displaySize ?? 50;
     this.game.objectManager.addObject(burst);
@@ -263,6 +264,8 @@ export class LeeSin_W_Burst extends SpellObject {
   lifeTime = 380;
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.age += deltaTime;
     if (this.follow) this.position.set(this.follow.position.x, this.follow.position.y);
     if (this.age >= this.lifeTime) this.toRemove = true;

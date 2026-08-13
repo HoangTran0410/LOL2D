@@ -19,6 +19,9 @@ export default class Ahri_W extends Spell {
     for (let i = 0; i < count; i++) {
       const obj = new Ahri_W_Object(this.owner);
       obj.angle = (i * 2 * PI) / count;
+      // the fires orbit Ahri's body; they die with it instead of circling a
+      // corpse (and still hunting) for the rest of their five seconds
+      obj.attachTo(this.owner);
       this.game.objectManager.addObject(obj);
     }
   }
@@ -56,6 +59,8 @@ export class Ahri_W_Object extends SpellObject {
   }
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.age += deltaTime;
     this.angle += this.rotateSpeed;
     if (this.age >= this.lifeTime) this.toRemove = true;

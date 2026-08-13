@@ -60,6 +60,7 @@ export default class Morgana_E extends Spell {
 
     const obj = new Morgana_E_Object(this.owner);
     obj.targetUnit = target;
+    obj.attachTo(target);
     this.game.objectManager.addObject(obj);
   }
 
@@ -220,6 +221,8 @@ export class Morgana_E_Object extends SpellObject {
   maxRadius = 60;
 
   update() {
+    if (this.dropIfAttachmentLost()) return;
+
     this.age += deltaTime;
     if (this.age >= this.lifeTime || !this.targetUnit) this.toRemove = true;
   }
