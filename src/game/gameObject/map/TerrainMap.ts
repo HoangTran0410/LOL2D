@@ -6,7 +6,9 @@ import { hasFlag } from '../../../utils/index';
 import ActionState from '../../enums/ActionState';
 import TerrainType from '../../enums/TerrainType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
+import Minion from '../attackableUnits/Minion';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import Obstacle from './Obstacle';
 
@@ -109,35 +111,55 @@ export default class TerrainMap {
       }
 
       // Collide with walls
-      if (hasFlag(p.stats.actionState, ActionState.IS_GHOSTED)) continue;
+      this.pushOutOfWalls(p);
+    }
 
-      const nearbyWalls = this.getObstaclesInArea(p.getCollideBoundingBox(), [TerrainType.WALL]);
+    // Lane minions get the wall pass too, but nothing else in the champion loop:
+    // no bush stealth, no water ripples, no vision. Their waypoints already keep
+    // them ~70px clear of every wall, so this only matters when one steps off the
+    // lane to reach something it aggroed — without it, that minion embeds itself
+    // in a wall and never comes out.
+    const minions = this.game.objectManager.queryObjects({
+      queryByDisplayBoundingBox: true,
+      filters: [PredefinedFilters.type(Minion), PredefinedFilters.excludeDead],
+    });
+    for (const m of minions) this.pushOutOfWalls(m);
+  }
 
-      let collided = false;
-      const totalOverlap = createVector(0, 0);
-      const overlapsWalls: Obstacle[] = [];
-      // hoisted out of the wall loop: one circle per unit, one reused Response
-      const pSAT = new SAT.Circle(
-        new SAT.Vector(p.position.x, p.position.y),
-        p.stats.size.value / 2
-      );
-      const response = new SAT.Response();
-      for (const wall of nearbyWalls) {
-        response.clear();
-        const _collided = SAT.testPolygonCircle(wall.toSATPolygon(), pSAT, response);
-        if (_collided) {
-          const overlap = createVector(response.overlapV.x, response.overlapV.y);
-          totalOverlap.add(overlap);
-          overlapsWalls.push(wall);
-          collided = true;
-        }
+  /**
+   * Moves `unit` out of any wall it overlaps, by the averaged SAT overlap of
+   * every wall it is inside. Shared by champions and minions.
+   */
+  pushOutOfWalls(unit: AttackableUnit): void {
+    if (hasFlag(unit.stats.actionState, ActionState.IS_GHOSTED)) return;
+
+    const nearbyWalls = this.getObstaclesInArea(unit.getCollideBoundingBox(), [TerrainType.WALL]);
+    if (nearbyWalls.length === 0) return;
+
+    let collided = false;
+    const totalOverlap = createVector(0, 0);
+    const overlapsWalls: Obstacle[] = [];
+    // hoisted out of the wall loop: one circle per unit, one reused Response
+    const pSAT = new SAT.Circle(
+      new SAT.Vector(unit.position.x, unit.position.y),
+      unit.stats.size.value / 2
+    );
+    const response = new SAT.Response();
+    for (const wall of nearbyWalls) {
+      response.clear();
+      const _collided = SAT.testPolygonCircle(wall.toSATPolygon(), pSAT, response);
+      if (_collided) {
+        const overlap = createVector(response.overlapV.x, response.overlapV.y);
+        totalOverlap.add(overlap);
+        overlapsWalls.push(wall);
+        collided = true;
       }
+    }
 
-      if (collided) {
-        totalOverlap.div(overlapsWalls.length);
-        p.position.add(totalOverlap);
-        p.onCollideWall?.();
-      }
+    if (collided) {
+      totalOverlap.div(overlapsWalls.length);
+      unit.position.add(totalOverlap);
+      unit.onCollideWall?.();
     }
   }
 

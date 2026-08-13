@@ -15,6 +15,7 @@ import {
   getTurretPositions,
 } from './preset';
 import ObjectManager from './managers/ObjectManager';
+import MinionSpawner from './managers/MinionSpawner';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
@@ -37,6 +38,7 @@ export default class Game {
   inGameHUD!: InGameHUD;
   player!: Champion;
   spellInputController!: SpellInputController;
+  minionSpawner!: MinionSpawner;
 
   fountains: Fountain[] = [];
   turrets: Turret[] = [];
@@ -87,6 +89,8 @@ export default class Game {
     // anything reading `isAllied` needs this.player, so these come after it
     this.spawnJungle();
     this.spawnTurrets();
+    // the spawner reads teams off the fountains, so it comes after them
+    this.minionSpawner = new MinionSpawner(this);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();
@@ -122,6 +126,9 @@ export default class Game {
   fixedUpdate() {
     this.camera.update();
     this.worldMouse = this.camera.screenToWorld(mouseX, mouseY);
+    // before objectManager.update(), so a minion released this frame is added
+    // to the world in the same pass as everything else spawned this frame
+    this.minionSpawner.update();
     this.objectManager.update();
     this.terrainMap.update();
 
