@@ -83,6 +83,16 @@ export default class Spell {
     return this._castContext;
   }
 
+  /**
+   * A counter this spell accumulates across casts, e.g. Nasus Q's strikes. The
+   * HUD badges the icon with it, so a stacking spell shows its progress instead
+   * of only flashing a number at the moment it lands. `undefined` means the
+   * spell has nothing to count and gets no badge.
+   */
+  get stackCount(): number | undefined {
+    return undefined;
+  }
+
   get aimPoint(): p5.Vector {
     const aim = this._castContext?.cursorWorld ?? this.game.worldMouse;
     return createVector(aim.x, aim.y);

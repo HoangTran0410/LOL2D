@@ -5,19 +5,35 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
+export const RANGE = 150;
+export const BASE_DAMAGE = 25;
+export const DAMAGE_PER_STACK = 5;
+
+const describe = (stacks: number): string =>
+  `Chém kẻ địch gần nhất trong phạm vi <span>${RANGE}px</span>, gây ` +
+  `<span class="damage">${BASE_DAMAGE + stacks * DAMAGE_PER_STACK} sát thương</span>` +
+  ` <i>(${stacks} cộng dồn)</i>. Mỗi lần chém trúng, sát thương của chiêu này ` +
+  `<span class="buff">vĩnh viễn tăng thêm ${DAMAGE_PER_STACK}</span>`;
+
 export default class Nasus_Q extends Spell {
   image = AssetManager.get('spell_nasus_q');
   name = 'Chém Hủy Diệt (Nasus_Q)';
-  description =
-    'Chém kẻ địch gần nhất trong phạm vi <span>150px</span>, gây <span class="damage">25 sát thương</span>. Mỗi lần chém trúng, sát thương của chiêu này <span class="buff">vĩnh viễn tăng thêm 5</span>';
+  // Rebuilt on every stack so the tooltip states the damage the next strike
+  // will actually deal, not the value it had at level one.
+  description = describe(0);
   coolDown = 3000;
   manaCost = 10;
 
-  range = 150;
-  baseDamage = 25;
-  damagePerStack = 5;
+  range = RANGE;
+  baseDamage = BASE_DAMAGE;
+  damagePerStack = DAMAGE_PER_STACK;
   /** Grows by one every time the strike connects; never resets. */
   stacks = 0;
+
+  /** Surfaced to the HUD, which badges the icon with it. */
+  get stackCount(): number {
+    return this.stacks;
+  }
 
   checkCastCondition() {
     return !!this._findNearestEnemy();
@@ -29,6 +45,7 @@ export default class Nasus_Q extends Spell {
 
     target.takeDamage(this.baseDamage + this.stacks * this.damagePerStack, this.owner);
     this.stacks++;
+    this.description = describe(this.stacks);
 
     const obj = new Nasus_Q_Object(this.owner);
     obj.targetPosition = target.position.copy();

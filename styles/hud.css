@@ -94,6 +94,26 @@
   height: 2em !important;
 }
 
+/* Stack counter for spells that accumulate, e.g. Nasus Q. Sits opposite the
+   hotkey so the two never collide, and shows at 0 so a stacking spell reads as
+   one before it has any stacks. */
+.spell .stacks {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  min-width: 16px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #1b1206cc;
+  border: 1px solid #c8a15e;
+  color: #ffe6ae;
+  font-size: 0.78em;
+  font-weight: bold;
+  line-height: 15px;
+  text-align: center;
+  z-index: 11;
+}
+
 .spell .hotKey {
   position: absolute;
   bottom: -5px;

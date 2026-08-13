@@ -30,6 +30,8 @@ interface SpellDisplay {
   small: boolean;
   canCast: boolean;
   hotKey: string;
+  /** Undefined for spells that do not accumulate anything. */
+  stackCount?: number;
 }
 
 interface BuffDisplay {
@@ -281,6 +283,7 @@ export default class InGameHUD {
                             :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
+                        <span v-if="spell.stackCount !== undefined" class="stacks">{{spell.stackCount}}</span>
                         <div v-if="spell.showCoolDown">
                             <div class="cooldown-overlay" :style="'height:'+ spell.coolDownPercent +'%'"></div>
                             <div class="cooldown">
@@ -427,7 +430,7 @@ export default class InGameHUD {
           ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
           : '';
 
-        const { disabled, image, coolDown, state, currentCooldown, name, description } =
+        const { disabled, image, coolDown, state, currentCooldown, name, description, stackCount } =
           spell || {};
         return {
           instance: spell,
@@ -444,6 +447,7 @@ export default class InGameHUD {
           small: isInternalSpell || isSummonerSpell,
           canCast: player.canCast && !player.isDead,
           hotKey,
+          stackCount,
         };
       });
 
