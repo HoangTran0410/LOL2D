@@ -5,20 +5,42 @@ import AttackableUnit from '../attackableUnits/AttackableUnit';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { Circle } from '../../../libs/quadtree';
 
-// Recompute a unit's sight polygon at most this often — vision doesn't need
-// frame-accurate geometry, and this is what makes the throttle below actually
-// cut work instead of just deferring it by one frame.
-const SIGHT_RECOMPUTE_INTERVAL_MS = 100;
-// Below this many world units of movement, the obstacle set in range and the
-// resulting polygon are effectively unchanged (see TerrainMap.getObstaclesInChampionSight).
-const SIGHT_POSITION_EPSILON = 4;
+// The fog polygon is recomputed at the unit's live position every frame — no
+// throttle, no interpolation — so the gradient (drawn every frame at the
+// unit's live screen position, see drawVisions/prepareRadialGradient) and the
+// polygon never drift apart. That's affordable because computeSightPoly's
+// cost splits cleanly in two:
+//   1. which obstacles are in vision range, and the broken (non-intersecting)
+//      segment list built from them — this is the O(n^2) part
+//      (PolyVisibility.breakIntersections) — only changes when the unit
+//      crosses into a new neighbourhood of walls/bushes, so it's cached per
+//      unit (see SightCacheEntry.segments/obstacleSignature) and reused
+//      across frames until that set turns over;
+//   2. the radial sweep against the exact source point
+//      (PolyVisibility.computeViewport) depends on the unit's live position
+//      and must run every frame for the fog to track it smoothly — it's the
+//      O(n) part, and it's what actually runs unconditionally below.
+// A unit that hasn't moved at all since last frame (exact position/vision
+// radius equality) skips both and returns last frame's polygon outright, so
+// a standing unit still costs nothing.
+type SightSegment = [number, number][];
 
 interface SightCacheEntry {
   sightPoly: { x: number; y: number }[];
   x: number;
   y: number;
   visionRadius: number;
-  nextRecomputeAt: number;
+  // Broken segment list for the obstacles currently in range. Obstacle
+  // vertices are static world coordinates, so this depends only on *which*
+  // obstacles are selected, never on the unit's exact position — see
+  // buildSegments/obstacleSignature.
+  segments: SightSegment[];
+  // Fingerprint of the obstacle set `segments` was built from: sorted
+  // obstacle ids, after the "bush I'm standing in" filter, plus the vision
+  // radius that defined the query range (see buildObstacleSignature). A bush
+  // entering/leaving containment changes which ids survive that filter, so
+  // it doesn't need its own field here — it already changes this string.
+  obstacleSignature: string;
 }
 
 export default class FogOfWar {
@@ -115,11 +137,11 @@ export default class FogOfWar {
   }
 
   calculateSightForObject(obj: any): { sightPoly: { x: number; y: number }[]; playersInSight: any[] } {
-    // The segment/viewport math is the expensive part (see computeSightPoly);
-    // reuse it across frames whenever the unit hasn't moved enough to matter.
-    // playersInSight stays a full per-frame query — it's a cheap quadtree
-    // lookup and gates visibility (willDraw), so it must stay frame-accurate
-    // even while the polygon itself is stale by up to SIGHT_RECOMPUTE_INTERVAL_MS.
+    // getSightPoly recomputes the polygon at obj's live position every frame
+    // (reusing the cached segment list whenever it can — see the file header
+    // and computeSightPoly), so it's always frame-accurate. playersInSight is
+    // a separate, cheap-enough-to-always-run quadtree lookup that gates
+    // visibility (willDraw); it was already frame-accurate and stays that way.
     const sightPoly = this.getSightPoly(obj);
 
     const playersInSight = this.game.objectManager.queryObjects({
@@ -142,48 +164,35 @@ export default class FogOfWar {
     };
   }
 
-  // Returns the cached sight polygon for `obj`, recomputing it only when the
-  // throttle window has elapsed AND its position/vision radius actually
-  // changed beyond epsilon. The window start is jittered per-unit on first
-  // sight so many units created in the same frame don't all fall due together.
+  // Returns the sight polygon for `obj`, always at its current position. A
+  // unit whose position and vision radius are bit-for-bit identical to last
+  // frame's (i.e. it hasn't moved) casts the exact same polygon, so this
+  // short-circuits straight to the cached result without even querying
+  // obstacles. Anything else — the unit moved, its radius changed, or this is
+  // the first time we've seen it — goes through computeSightPoly.
   getSightPoly(obj: any): { x: number; y: number }[] {
-    const now = performance.now();
     const entry = this.sightCache.get(obj);
 
-    if (!entry) {
-      const sightPoly = this.computeSightPoly(obj);
-      this.sightCache.set(obj, {
-        sightPoly,
-        x: obj.position.x,
-        y: obj.position.y,
-        visionRadius: obj.visionRadius,
-        nextRecomputeAt: now + random(SIGHT_RECOMPUTE_INTERVAL_MS),
-      });
-      return sightPoly;
+    if (
+      entry &&
+      obj.position.x === entry.x &&
+      obj.position.y === entry.y &&
+      obj.visionRadius === entry.visionRadius
+    ) {
+      return entry.sightPoly;
     }
 
-    if (now >= entry.nextRecomputeAt) {
-      entry.nextRecomputeAt = now + SIGHT_RECOMPUTE_INTERVAL_MS;
-
-      const dx = obj.position.x - entry.x;
-      const dy = obj.position.y - entry.y;
-      const moved = dx * dx + dy * dy > SIGHT_POSITION_EPSILON * SIGHT_POSITION_EPSILON;
-      const radiusChanged = obj.visionRadius !== entry.visionRadius;
-
-      if (moved || radiusChanged) {
-        entry.sightPoly = this.computeSightPoly(obj);
-        entry.x = obj.position.x;
-        entry.y = obj.position.y;
-        entry.visionRadius = obj.visionRadius;
-      }
-    }
-
-    return entry.sightPoly;
+    return this.computeSightPoly(obj, entry);
   }
 
-  // The actual visibility-polygon computation: obstacle lookup + segment
-  // breaking + viewport sweep. This is what getSightPoly caches.
-  computeSightPoly(obj: any): { x: number; y: number }[] {
+  // The actual visibility-polygon computation, run every frame a unit moves.
+  // The obstacle lookup and the "bush I'm standing in" filter are
+  // position-dependent and cheap, so they always run; segment breaking (the
+  // O(n^2) part) only reruns when the obstacle set they produce differs from
+  // what `entry` was built from (see buildObstacleSignature); the viewport
+  // sweep always runs against obj's live position/radius so the returned
+  // polygon is frame-accurate.
+  computeSightPoly(obj: any, entry?: SightCacheEntry): { x: number; y: number }[] {
     let obstaclesInSight = this.game.terrainMap.getObstaclesInChampionSight(obj, [
       TerrainType.WALL,
       TerrainType.BUSH,
@@ -195,36 +204,50 @@ export default class FogOfWar {
         !CollideUtils.pointPolygon(obj.position.x, obj.position.y, o.vertices)
     );
 
-    return this.calculateVisibility({
-      polygons: obstaclesInSight.map((o: any) => o.vertices),
-      sourceOfLight: [obj.position.x, obj.position.y],
-      sightBound: {
-        x: obj.position.x - obj.visionRadius,
-        y: obj.position.y - obj.visionRadius,
-        w: obj.visionRadius * 2,
-        h: obj.visionRadius * 2,
-      },
+    const obstacleSignature = this.buildObstacleSignature(obstaclesInSight, obj.visionRadius);
+    const segments =
+      entry && entry.obstacleSignature === obstacleSignature
+        ? entry.segments
+        : this.buildSegments(obstaclesInSight);
+
+    const sightPoly = PolyVisibility.computeViewport(
+      [obj.position.x, obj.position.y],
+      segments,
+      [obj.position.x - obj.visionRadius, obj.position.y - obj.visionRadius],
+      [obj.position.x + obj.visionRadius, obj.position.y + obj.visionRadius]
+    ).map((v: number[]) => ({ x: v[0], y: v[1] }));
+
+    this.sightCache.set(obj, {
+      sightPoly,
+      x: obj.position.x,
+      y: obj.position.y,
+      visionRadius: obj.visionRadius,
+      segments,
+      obstacleSignature,
     });
+
+    return sightPoly;
   }
 
-  calculateVisibility({
-    sourceOfLight,
-    sightBound,
-    polygons,
-  }: {
-    sourceOfLight: [number, number];
-    sightBound: { x: number; y: number; w: number; h: number };
-    polygons: { x: number; y: number }[][];
-  }): { x: number; y: number }[] {
-    const _polygons = polygons.map(p => p.map(v => [v.x, v.y] as [number, number]));
-    let segments = PolyVisibility.convertToSegments(_polygons);
-    segments = PolyVisibility.breakIntersections(segments);
-    return PolyVisibility.computeViewport(
-      sourceOfLight,
-      segments,
-      [sightBound.x, sightBound.y],
-      [sightBound.x + sightBound.w, sightBound.y + sightBound.h]
-    ).map((v: number[]) => ({ x: v[0], y: v[1] }));
+  // Converts obstacle polygons into a broken (non-self-intersecting) segment
+  // list — the O(n^2) step (PolyVisibility.breakIntersections) that
+  // computeSightPoly caches by obstacleSignature instead of paying every frame.
+  buildSegments(obstacles: { vertices: { x: number; y: number }[] }[]): SightSegment[] {
+    const polygons = obstacles.map(o => o.vertices.map(v => [v.x, v.y] as [number, number]));
+    const segments = PolyVisibility.convertToSegments(polygons);
+    return PolyVisibility.breakIntersections(segments);
+  }
+
+  // Cheap fingerprint for "which obstacles are in range right now": sorted
+  // obstacle ids plus the vision radius that defined the query. Obstacle
+  // counts in range are small (a handful of walls/bushes at most), so
+  // sorting/joining every frame is far cheaper than the segment break it
+  // guards, and a plain string compare is enough to detect any change in the
+  // obstacle set — new obstacle entering range, one leaving, or a bush
+  // flipping in/out of the containment filter.
+  buildObstacleSignature(obstacles: { id: string }[], visionRadius: number): string {
+    const ids = obstacles.map(o => o.id).sort();
+    return `${visionRadius}|${ids.join(',')}`;
   }
 
   drawVisions(): void {
