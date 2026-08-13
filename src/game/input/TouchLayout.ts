@@ -74,13 +74,23 @@ const onArc = (
 };
 
 /**
- * Abilities occupy the quarter turn from "left of the attack button" round to
- * "directly above it", which is the sweep a right thumb makes without the hand
- * leaving the phone. Summoners take a second, wider ring at the same reach.
+ * Abilities sweep from level with the attack button round to just past
+ * vertical, which is the arc a right thumb travels without the hand leaving
+ * the phone. Summoners take a second ring outside it.
  */
-const ABILITY_ARC_START = 188;
-const ABILITY_ARC_END = 268;
-const SUMMONER_ARC = [206, 250];
+const ABILITY_ARC_START = 178;
+const ABILITY_ARC_END = 278;
+const SUMMONER_ARC = [196, 252];
+
+/**
+ * Clear space between neighbouring buttons, as a fraction of an ability's
+ * radius. It is what the arc's radius is *solved for* below rather than a
+ * number chosen alongside it: pick the radius by eye and four buttons over a
+ * hundred degrees overlap each other by 25 pixels, which is both ugly and
+ * ambiguous to hit-test. 0.42 is about 13 pixels on a landscape phone — a
+ * visible gap between two circles a thumb is 45 pixels wide.
+ */
+const BUTTON_GAP_SCALE = 0.42;
 
 export function computeTouchLayout(
   viewport: TouchViewport,
@@ -89,15 +99,28 @@ export function computeTouchLayout(
   const unit = Math.min(viewport.width, viewport.height);
   const margin = clamp(unit * 0.05, 14, 34);
 
-  const attackRadius = clamp(unit * 0.115, 38, 62);
-  const abilityRadius = attackRadius * 0.78;
-  const summonerRadius = attackRadius * 0.6;
+  const attackRadius = clamp(unit * 0.105, 34, 58);
+  const abilityRadius = attackRadius * 0.76;
+  const summonerRadius = attackRadius * 0.56;
   const joystickRadius = clamp(unit * 0.17, 54, 92);
 
   const attackX = viewport.width - margin - attackRadius;
   const attackY = viewport.height - margin - attackRadius;
 
-  const abilityRing = attackRadius + abilityRadius + attackRadius * 0.42;
+  const abilityCount = Math.max(0, Math.min(4, slotCount - 1));
+  // The arc's radius is derived from how many buttons have to fit on it, not
+  // chosen and then hoped over: the chord between two neighbours is
+  // 2 * R * sin(step / 2), and it has to clear a whole button plus a gap.
+  const stepDegrees =
+    abilityCount > 1 ? (ABILITY_ARC_END - ABILITY_ARC_START) / (abilityCount - 1) : 0;
+  const chordRing =
+    abilityCount > 1
+      ? (abilityRadius * (2 + BUTTON_GAP_SCALE)) /
+        (2 * Math.sin(((stepDegrees / 2) * Math.PI) / 180))
+      : 0;
+  const abilityRing = Math.max(attackRadius + abilityRadius + attackRadius * 0.35, chordRing);
+  // Radial clearance, which is the worst case: a summoner sitting between two
+  // abilities is further from both than this.
   const summonerRing = abilityRing + abilityRadius + summonerRadius + attackRadius * 0.3;
 
   const buttons: TouchButton[] = [];
@@ -115,10 +138,8 @@ export function computeTouchLayout(
 
   if (slotCount > 0) push(0, attackX, attackY, attackRadius, true);
 
-  const abilityCount = Math.max(0, Math.min(4, slotCount - 1));
   for (let i = 0; i < abilityCount; i++) {
-    const spread = abilityCount === 1 ? 0 : i / (abilityCount - 1);
-    const degrees = ABILITY_ARC_START + spread * (ABILITY_ARC_END - ABILITY_ARC_START);
+    const degrees = ABILITY_ARC_START + i * stepDegrees;
     const point = onArc(attackX, attackY, abilityRing, degrees);
     push(i + 1, point.x, point.y, abilityRadius, false);
   }

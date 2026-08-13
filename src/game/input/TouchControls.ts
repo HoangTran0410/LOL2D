@@ -479,41 +479,56 @@ export class TouchControls {
   }
 
   private drawButtons(): void {
+    push();
+    // Never tint. p5's tint() does not set a canvas property — it re-runs the
+    // whole image through a per-pixel loop on a scratch canvas on *every*
+    // image() call, uncached. Seven icons a frame made it the single most
+    // expensive thing this layer did, by a wide margin. A greyed-out button is
+    // drawn as the icon plus a dark disc over it instead, which is one fill.
+    noTint();
+    textAlign(CENTER, CENTER);
+
     for (const button of this.layout.buttons) {
       const view = this.host.spellView(button.slot);
       if (!view) continue;
       const gesture = this.gestureFor(button.slot);
       const cancelling = gesture?.phase === 'CANCEL';
       const dim = view.onCooldown || !view.affordable || !view.castable;
+      const diameter = button.radius * 2;
 
-      push();
       noStroke();
       fill(12, 16, 24, 200);
-      circle(button.x, button.y, button.radius * 2);
+      circle(button.x, button.y, diameter);
 
       if (view.icon) {
-        push();
-        if (dim) tint(140, 140, 140, 220);
-        else tint(255, 255, 255, 255);
         // imageMode(CENTER) is set once in GameScene.enter and never changed.
-        image(view.icon as p5.Image, button.x, button.y, button.radius * 1.7, button.radius * 1.7);
-        pop();
+        // 1.36 rather than something larger because the icon is square and the
+        // button is round: a square of side s only fits a circle of diameter d
+        // while s <= d/sqrt(2), and anything above that hangs its corners out
+        // past the ring.
+        const size = button.radius * 1.36;
+        image(view.icon as p5.Image, button.x, button.y, size, size);
       } else {
         fill(230, 230, 230, dim ? 120 : 230);
-        textAlign(CENTER, CENTER);
         textSize(button.radius * 0.8);
         text(view.label, button.x, button.y);
       }
 
-      // The cooldown wedge: a darkened cap whose height is what is left to run.
+      if (dim) {
+        noStroke();
+        fill(8, 12, 20, 130);
+        circle(button.x, button.y, diameter);
+      }
+
+      // The cooldown wedge: a dark cap sweeping round what is left to run.
       if (view.cooldownRatio > 0) {
         noStroke();
         fill(6, 10, 18, 170);
         arc(
           button.x,
           button.y,
-          button.radius * 2,
-          button.radius * 2,
+          diameter,
+          diameter,
           -HALF_PI,
           -HALF_PI + TWO_PI * view.cooldownRatio,
           PIE
@@ -526,7 +541,7 @@ export class TouchControls {
       else if (view.charging) stroke(255, 208, 120, 240);
       else if (gesture) stroke(120, 220, 255, 240);
       else stroke(210, 210, 210, dim ? 90 : 160);
-      circle(button.x, button.y, button.radius * 2);
+      circle(button.x, button.y, diameter);
 
       if (cancelling) {
         stroke(235, 70, 70, 245);
@@ -535,8 +550,8 @@ export class TouchControls {
         line(button.x - arm, button.y - arm, button.x + arm, button.y + arm);
         line(button.x + arm, button.y - arm, button.x - arm, button.y + arm);
       }
-      pop();
     }
+    pop();
   }
 }
 

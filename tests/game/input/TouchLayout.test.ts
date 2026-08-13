@@ -46,20 +46,50 @@ describe('computeTouchLayout', () => {
     expect(layout.buttons[0].y).toBeGreaterThan(PHONE.height * 0.6);
   });
 
-  it('arcs the abilities up and to the left of the attack button', () => {
+  it('arcs the abilities from beside the attack button round to above it', () => {
     const layout = computeTouchLayout(PHONE, SLOTS);
-    const attack = layout.buttons[0];
+    const abilities = [1, 2, 3, 4].map(slot => layout.buttons.find(b => b.slot === slot)!);
 
-    for (const slot of [1, 2, 3, 4]) {
-      const button = layout.buttons.find(b => b.slot === slot)!;
-      expect(button.x).toBeLessThanOrEqual(attack.x);
-      expect(button.y).toBeLessThan(attack.y);
+    // Each one is higher than the last: the arc sweeps anticlockwise.
+    for (let i = 1; i < abilities.length; i++) {
+      expect(abilities[i].y).toBeLessThan(abilities[i - 1].y);
     }
-    // Q is the leftmost and R the highest: the arc runs anticlockwise.
-    const q = layout.buttons.find(b => b.slot === 1)!;
-    const r = layout.buttons.find(b => b.slot === 4)!;
-    expect(q.x).toBeLessThan(r.x);
-    expect(r.y).toBeLessThan(q.y);
+    // Q is the leftmost, R the highest.
+    expect(abilities[0].x).toBeLessThan(abilities[3].x);
+    expect(abilities[3].y).toBeLessThan(abilities[0].y);
+  });
+
+  it('never lets two buttons overlap, at any viewport', () => {
+    for (const viewport of [
+      PHONE,
+      { width: 667, height: 375 },
+      { width: 932, height: 430 },
+      { width: 1280, height: 800 },
+    ]) {
+      const layout = computeTouchLayout(viewport, SLOTS);
+      for (let i = 0; i < layout.buttons.length; i++) {
+        for (let j = i + 1; j < layout.buttons.length; j++) {
+          const a = layout.buttons[i];
+          const b = layout.buttons[j];
+          const gap = Math.hypot(a.x - b.x, a.y - b.y) - a.radius - b.radius;
+          expect(
+            gap,
+            `${viewport.width}x${viewport.height}: slots ${a.slot} and ${b.slot} overlap by ${-gap}`
+          ).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it('keeps the stick clear of every spell button', () => {
+    const layout = computeTouchLayout(PHONE, SLOTS);
+    for (const button of layout.buttons) {
+      const gap =
+        Math.hypot(button.x - layout.joystickHome.x, button.y - layout.joystickHome.y) -
+        button.radius -
+        layout.joystickHome.radius;
+      expect(gap).toBeGreaterThan(0);
+    }
   });
 
   it('keeps every button fully on screen', () => {

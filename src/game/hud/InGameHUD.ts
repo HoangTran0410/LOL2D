@@ -386,7 +386,10 @@ export default class InGameHUD {
       },
       template: /*html*/ `
       <div>
-        <button class="touch-toggle" :class="touchUi ? 'on' : ''" @click="toggleTouchUi()"
+        <!-- Hidden behind the picker: both live in the top-right corner, and
+             the toggle would otherwise sit on top of the picker's close
+             button, which is the only way out of it. -->
+        <button v-if="!showSpellsPicker" class="touch-toggle" :class="touchUi ? 'on' : ''" @click="toggleTouchUi()"
             :title="touchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'">
           <i class="fa-solid fa-gamepad"></i>
         </button>
