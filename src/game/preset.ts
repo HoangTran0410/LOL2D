@@ -30,14 +30,25 @@ export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetK
       'champ_graves',
     ]),
     spells: [
-      AllSpells.Heal,
+      // Slot 0 is the internal slot and SpellHotKeys[0] is `A`, so whatever
+      // sits here is what `A` presses. The basic attack lives there: it is an
+      // ability like the rest, and putting it in a slot is what gives the
+      // champion's own attack a key, an icon and a timer without inventing a
+      // second input path beside the spell one.
+      //
+      // Heal used to hold this slot and has moved down to `F`, taking Ghost's
+      // place: Heal already grants a 50% Speedup for a second, so of the two it
+      // is the one that keeps both effects, and Flash + Heal is the pair a
+      // player reaches for anyway. Ghost is one click away in the picker, and so
+      // is the basic attack itself, so swapping slot 0 out is not a one-way door.
+      AllSpells.BasicAttack,
       ...Array.from({ length: 4 })
         .fill(0)
         .map(() => {
           return random(Object.values(AllSpells) as SpellClass[]);
         }),
       AllSpells.Flash,
-      AllSpells.Ghost,
+      AllSpells.Heal,
     ],
   };
 };
@@ -48,6 +59,18 @@ export const SpellGroups: {
   background: AssetKey | null;
   spells: SpellClass[];
 }[] = [
+  // First, and a shelf of its own rather than a line on the summoner spell
+  // shelf: it belongs to no champion and it is not a summoner spell, it is the
+  // attack every champion already has. It is also the way back — a player who
+  // swaps slot 0 out for something else and wants `A` to attack again needs to
+  // find this, and hunting for it at the bottom of the Phép Bổ Trợ list would
+  // make that a one-way door in practice.
+  {
+    name: 'Đánh Thường',
+    image: 'spell_basic_attack',
+    background: null,
+    spells: [AllSpells.BasicAttack],
+  },
   {
     name: 'Yasuo',
     image: 'champ_yasuo',
