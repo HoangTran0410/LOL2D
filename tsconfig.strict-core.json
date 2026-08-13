@@ -6,7 +6,9 @@
   "include": [
     "src/types/**/*.d.ts",
     "src/game/spell/**/*.ts",
+    "src/game/combat/**/*.ts",
     "tests/game/spell/**/*.ts",
+    "tests/game/combat/**/*.ts",
     "src/game/gameObject/spellObjects/**/*.ts",
     "src/game/gameObject/GameObject.ts",
     "src/game/gameObject/SpellObject.ts",

@@ -1,0 +1,167 @@
+import { hasFlag } from '../../utils/index';
+import ActionState from '../enums/ActionState';
+import EventType from '../enums/EventType';
+import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
+import {
+  BasicAttackBolt,
+  BasicAttackSwing,
+  MELEE_RANGE_THRESHOLD,
+  canBeHit,
+} from './BasicAttack';
+
+/**
+ * Why an attack order stopped. Surfaced so callers (the AI, later an order
+ * queue) can tell "it died" from "it walked out of my sight".
+ */
+export type AttackOrderEnd = 'KILLED' | 'LOST' | 'CLEARED';
+
+/**
+ * Owns one unit's basic attack: the standing order, the walk into range, the
+ * swing timer, and the two events that make the attack visible to spells.
+ *
+ * Composition rather than a base class, because the three units that already
+ * attack (Minion, Monster, Turret) each grew their own loop and unifying them is
+ * a separate change. This one is written to be adoptable by them as it is: it
+ * only ever touches `owner.stats`, `owner.moveTo/stopMovement` and the object
+ * manager.
+ *
+ * The controller never scans for targets. A target is always *given* to it —
+ * by the player's right click or by the AI's own jittered scan — so adding a
+ * champion costs zero quadtree queries per frame.
+ */
+export default class BasicAttackController {
+  readonly owner: AttackableUnit;
+
+  /** Standing order. Null means the unit is not attacking anything. */
+  target: AttackableUnit | null = null;
+  /** ms until the next swing may start. Runs whether or not there is a target,
+   *  so switching targets does not refund the wind-down of the last swing. */
+  cooldownMs = 0;
+  /** Why the last order ended. Reset when a new one is issued. */
+  lastEnd: AttackOrderEnd | null = null;
+
+  constructor(owner: AttackableUnit) {
+    this.owner = owner;
+  }
+
+  get attackDamage(): number {
+    return this.owner.stats.attackDamage.value;
+  }
+
+  /** Attacks per second, floored so a zeroed stat cannot divide by zero. */
+  get attacksPerSecond(): number {
+    return Math.max(0.05, this.owner.stats.attackSpeed.value);
+  }
+
+  get intervalMs(): number {
+    return 1_000 / this.attacksPerSecond;
+  }
+
+  get isRanged(): boolean {
+    return this.owner.stats.attackRange.value > MELEE_RANGE_THRESHOLD;
+  }
+
+  /** Surface to surface: a 40-unit reach can never satisfy itself against two
+   *  55-unit bodies standing next to each other. */
+  reachTo(target: AttackableUnit): number {
+    return (
+      this.owner.stats.attackRange.value +
+      this.owner.stats.size.value / 2 +
+      (target.stats?.size?.value ?? 0) / 2
+    );
+  }
+
+  /**
+   * How far the unit will chase before giving the order up. Its own sight: an
+   * attack order should never drag a champion after something it cannot see.
+   */
+  leashTo(target: AttackableUnit): number {
+    return this.owner.stats.visionRadius.value + (target.stats?.size?.value ?? 0) / 2;
+  }
+
+  order(target: AttackableUnit | null): void {
+    if (!target || target === this.owner || target.teamId === this.owner.teamId) return;
+    if (!canBeHit(target)) return;
+    this.target = target;
+    this.lastEnd = null;
+  }
+
+  /** Drop the order without stopping the unit — a move order does its own moving. */
+  clear(): void {
+    if (this.target) this.lastEnd = 'CLEARED';
+    this.target = null;
+  }
+
+  update(): void {
+    if (this.cooldownMs > 0) this.cooldownMs -= deltaTime;
+
+    if (this.owner.isDead) {
+      this.target = null;
+      return;
+    }
+
+    const target = this.target;
+    if (!target) return;
+
+    const reach = this.reachTo(target);
+    if (!this.canKeep(target)) {
+      // A lock goes stale between frames: the target dies, is removed, is made
+      // untargetable, vanishes into stealth, or simply outruns our sight. In
+      // every one of those cases the unit stops where it is rather than picking
+      // a new fight nobody ordered.
+      this.lastEnd = target.isDead || target.toRemove ? 'KILLED' : 'LOST';
+      this.target = null;
+      this.owner.stopMovement();
+      return;
+    }
+
+    const distance = p5.Vector.dist(this.owner.position, target.position);
+    if (distance > reach) {
+      this.owner.moveTo(target.position.x, target.position.y);
+      return;
+    }
+
+    this.owner.stopMovement();
+    if (this.cooldownMs > 0) return;
+    if (!this.owner.canAttack) return;
+
+    this.cooldownMs = this.intervalMs;
+    this.launch(target, reach);
+  }
+
+  /** Whether the standing order is still worth keeping this frame. */
+  canKeep(target: AttackableUnit): boolean {
+    if (!canBeHit(target)) return false;
+    // stealth is not untargetability, but chasing something invisible is the
+    // same bad experience, so an order drops on it too
+    if (hasFlag(target.stats.actionState, ActionState.STEALTHED)) return false;
+    return p5.Vector.dist(this.owner.position, target.position) <= this.leashTo(target);
+  }
+
+  /**
+   * Fires one swing. ON_ATTACK is emitted here, at the start, with the attacker
+   * as its payload — that is the shape Janna's ultimate already listens for, and
+   * "the unit committed to a swing" is exactly when a channel should break.
+   * ON_ATTACK_HIT comes later, from whichever object actually lands.
+   */
+  launch(target: AttackableUnit, reach: number): void {
+    const damage = this.attackDamage;
+    const ranged = this.isRanged;
+
+    this.owner.game?.eventManager?.emit(EventType.ON_ATTACK, this.owner);
+
+    if (ranged) {
+      const bolt = new BasicAttackBolt(this.owner);
+      bolt.target = target;
+      bolt.damage = damage;
+      bolt.position.set(this.owner.position.x, this.owner.position.y);
+      bolt.destination.set(target.position.x, target.position.y);
+      this.owner.game.objectManager.addObject?.(bolt);
+    } else {
+      const swing = new BasicAttackSwing(this.owner, target);
+      swing.damage = damage;
+      swing.reach = reach;
+      this.owner.game.objectManager.addObject?.(swing);
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import AssetManager, { type AssetHandle, type AssetKey } from '../../../managers/AssetManager';
 import type Spell from '../Spell';
+import BasicAttackController from '../../combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Airborne from '../buffs/Airborne';
@@ -12,10 +13,41 @@ import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 import type { BuffStackId } from '../Buff';
 
+/** A champion's basic attack profile. `range` alone decides melee or ranged. */
+export interface ChampionAttackTuning {
+  /** Damage per swing. */
+  damage: number;
+  /** Swings per second. */
+  attacksPerSecond: number;
+  /** Surface-to-surface reach. Above MELEE_RANGE_THRESHOLD this fires a bolt. */
+  range: number;
+}
+
+/**
+ * Basic attack numbers for a champion with no profile of its own.
+ *
+ * A champion pool is 100 health, a minion 140, a turret 400 dealing 12 per
+ * 1.3s (9.2 dps). 16 per swing at 0.8/s is 12.8 dps, so autos alone take about
+ * six and a quarter connected swings — roughly ten seconds once regeneration is
+ * counted — to end a champion. That is long enough that a duel is a fight with
+ * room for spells and disengages, and short enough that autoing is worth doing.
+ *
+ * The range is 300, comfortably inside the 500 sight radius (so you can attack
+ * what you can see and the leash never fires first) and below a turret's 430.
+ */
+export const DEFAULT_CHAMPION_ATTACK: ChampionAttackTuning = {
+  damage: 16,
+  attacksPerSecond: 0.8,
+  range: 300,
+};
+
 export interface ChampionPresetData {
   name?: string;
   avatar?: AssetKey;
   spells?: Array<new (owner: Champion) => Spell>;
+  /** Overrides DEFAULT_CHAMPION_ATTACK. Drop `range` below the melee threshold
+   *  and the champion swings instead of shooting; nothing else changes. */
+  attack?: ChampionAttackTuning;
 }
 
 export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
@@ -45,6 +77,9 @@ export default class Champion extends AttackableUnit {
   name?: string;
   spells: Spell[] = [];
 
+  /** Standing attack order, swing timer and delivery. Never scans on its own. */
+  basicAttack: BasicAttackController = new BasicAttackController(this);
+
   constructor({ game, position, collisionRadius, visionRadius, teamId, id, stats, avatar, preset }: ChampionOptions) {
     super({
       game,
@@ -60,16 +95,59 @@ export default class Champion extends AttackableUnit {
     this.score = 0;
     this.name = preset?.name;
     this.spells = preset?.spells?.map(spell => new spell(this)) || [];
+
+    const attack = preset?.attack ?? DEFAULT_CHAMPION_ATTACK;
+    this.stats.attackDamage.baseValue = attack.damage;
+    this.stats.attackSpeed.baseValue = attack.attacksPerSecond;
+    this.stats.attackRange.baseValue = attack.range;
   }
 
   update() {
     super.update();
+    this.basicAttack.update();
     this.spells.forEach(spell => spell.update());
   }
 
   draw() {
     super.draw();
+    this.drawAttackOrder();
     this.spells.forEach(spell => spell.drawVfx());
+  }
+
+  /**
+   * Order this champion to attack a unit: walk into range, then swing on the
+   * interval until it dies, leaves sight or a different order arrives.
+   */
+  orderAttack(target: AttackableUnit): void {
+    this.basicAttack.order(target);
+  }
+
+  /** A move order is also the cancel for an attack order. */
+  orderMove(x: number, y: number): void {
+    this.basicAttack.clear();
+    this.moveTo(x, y);
+  }
+
+  /**
+   * The reticle. Only the local player draws one: six overlapping rings would
+   * turn a teamfight into noise, and the bots' targets are already legible from
+   * the bolts in the air.
+   */
+  drawAttackOrder(): void {
+    // `?.` because the draw path is reached by prototype-only champions built
+    // with Object.create, which never run a field initializer
+    const target = this.basicAttack?.target;
+    if (!target || this.isDead || this.game.player !== this) return;
+
+    const size = target.animatedValues.displaySize;
+    push();
+    noFill();
+    stroke(255, 92, 78, 190);
+    strokeWeight(2);
+    circle(target.position.x, target.position.y, size + 16);
+    stroke(255, 92, 78, 55);
+    circle(this.position.x, this.position.y, this.basicAttack.reachTo(target) * 2);
+    pop();
   }
 
   onRemoved() {
@@ -241,6 +319,7 @@ export default class Champion extends AttackableUnit {
 
   die(deathData: UnitDeathData) {
     super.die(deathData);
+    this.basicAttack.clear();
     this.score--;
     if (deathData.attacker instanceof Champion) deathData.attacker.score++;
   }
