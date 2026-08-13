@@ -114,6 +114,37 @@
   z-index: 11;
 }
 
+/* Mana cost, bottom-left — the one corner the stack badge (top-left) and the
+   hotkey (bottom-right) both leave free. Hidden entirely at 0 so the free
+   spells and the summoner spells stay uncluttered.
+   Unlike those two this sits *inside* the icon: the bar leaves only a 5px gap
+   between icons, which the neighbour's hotkey already hangs into, so a badge
+   poking out to the left lands on top of it. */
+.spell .mana-cost {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  min-width: 15px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #061426cc;
+  border: 1px solid #3d7fb8;
+  color: #9ed4ff;
+  font-size: 0.78em;
+  font-weight: bold;
+  line-height: 15px;
+  text-align: center;
+  z-index: 11;
+}
+
+/* Not enough mana in the pool right now: the icon greys out, and the badge
+   says which resource is missing rather than leaving the player guessing. */
+.spell .mana-cost.short {
+  background: #2a0a0acc;
+  border-color: #b8503d;
+  color: #ff9e9e;
+}
+
 .spell .hotKey {
   position: absolute;
   bottom: -5px;
@@ -207,6 +238,15 @@
   margin-left: 5px;
   font-weight: bold;
   color: #e8c17d;
+}
+
+.spell-info .costs {
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.spell-info .costs .mana {
+  color: #9ed4ff;
 }
 
 .spell-info .body {

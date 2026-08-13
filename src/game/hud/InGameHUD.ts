@@ -32,6 +32,9 @@ interface SpellDisplay {
   hotKey: string;
   /** Undefined for spells that do not accumulate anything. */
   stackCount?: number;
+  manaCost: number;
+  /** False once the pool has dropped below manaCost, which greys the icon. */
+  affordable: boolean;
 }
 
 interface BuffDisplay {
@@ -56,6 +59,7 @@ interface SpellItemDisplay {
   image: string;
   description: string;
   coolDown: number;
+  manaCost: number;
   spellClass: any;
   assetKey: AssetKey | null;
 }
@@ -113,6 +117,7 @@ export default class InGameHUD {
               image: spellInstance.image?.path,
               description: spellInstance.description,
               coolDown: spellInstance.coolDown,
+              manaCost: spellInstance.manaCost,
               spellClass: spellClass,
               assetKey: spellInstance.image?.key ?? null,
             })),
@@ -137,6 +142,7 @@ export default class InGameHUD {
                     image: spellInstance.image?.path,
                     description: spellInstance.description,
                     coolDown: spellInstance.coolDown,
+                    manaCost: spellInstance.manaCost,
                     spellClass: spellClass,
                     assetKey: spellInstance.image?.key ?? null,
                   };
@@ -262,7 +268,10 @@ export default class InGameHUD {
                 <img :src="spellHover.image" alt="spell" />
                 <h4>{{spellHover.name}}</h4>
               </div>
-              <span>{{spellHover.coolDown/1000}}s</span>
+              <div class="costs">
+                <span v-if="spellHover.manaCost > 0" class="mana">{{spellHover.manaCost}} mana</span>
+                <span>{{spellHover.coolDown/1000}}s</span>
+              </div>
             </div>
             <p class="body" v-html="spellHover.description"></p>
         </div>
@@ -280,10 +289,11 @@ export default class InGameHUD {
                         @mouseover="mouseover(spell, $event)"
                         @mouseout="mouseout(spell, $event)">
                         <img :src="spell.image" alt="spell"
-                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast) ? 'filter: grayscale(100%)' : ''" />
+                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast || !spell.affordable) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <span v-if="spell.stackCount !== undefined" class="stacks">{{spell.stackCount}}</span>
+                        <span v-if="spell.manaCost > 0" :class="spell.affordable ? 'mana-cost' : 'mana-cost short'">{{spell.manaCost}}</span>
                         <div v-if="spell.showCoolDown">
                             <div class="cooldown-overlay" :style="'height:'+ spell.coolDownPercent +'%'"></div>
                             <div class="cooldown">
@@ -430,8 +440,17 @@ export default class InGameHUD {
           ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
           : '';
 
-        const { disabled, image, coolDown, state, currentCooldown, name, description, stackCount } =
-          spell || {};
+        const {
+          disabled,
+          image,
+          coolDown,
+          state,
+          currentCooldown,
+          name,
+          description,
+          stackCount,
+          manaCost,
+        } = spell || {};
         return {
           instance: spell,
           image: image?.path,
@@ -448,6 +467,8 @@ export default class InGameHUD {
           canCast: player.canCast && !player.isDead,
           hotKey,
           stackCount,
+          manaCost: manaCost ?? 0,
+          affordable: (mana?.value ?? 0) >= (manaCost ?? 0),
         };
       });
 

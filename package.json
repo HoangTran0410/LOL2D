@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "typecheck:core": "tsc -p tsconfig.strict-core.json",
     "verify": "npm run assets:check && npm run ability:check && npm run typecheck && npm run typecheck:core && npm run test:all && npm run build",
-    "e2e": "node tests/e2e/drive-game.mjs"
+    "e2e": "node tests/e2e/drive-game.mjs",
+    "e2e:hud": "node tests/e2e/hud-mana.mjs"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",
