@@ -87,7 +87,7 @@ export class Ahri_W_Object extends SpellObject {
       // find the closest enemy
       let closestEnemy: (typeof enemies)[0] | null = null;
       let closestDistance = Infinity;
-      enemies.forEach(enemy => {
+      enemies.forEach((enemy: SpellObject['owner']) => {
         const distance = this.position.dist(enemy.position);
         if (distance < closestDistance) {
           closestDistance = distance;

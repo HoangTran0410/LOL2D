@@ -47,7 +47,7 @@ export default class Anivia_R extends Spell {
       active: {},
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false, displacement: false, silence: false },
+      interrupts: { move: false, displacement: false },
     };
   }
 
@@ -110,6 +110,10 @@ export default class Anivia_R extends Spell {
 
   drawPreview(): void {
     super.drawPreview(this.range);
+  }
+
+  protected ignoresOwnerInterrupts(): boolean {
+    return Boolean(this.owner.hasBuff?.(Stasis));
   }
 
   private pointInRange(point: { x: number; y: number }): { x: number; y: number } {

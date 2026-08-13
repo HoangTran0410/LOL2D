@@ -160,7 +160,7 @@ export class Yasuo_Q_Object extends SpellObject {
       ],
     });
 
-    enemies.forEach(p => {
+    enemies.forEach((p: SpellObject['owner']) => {
       const buff = new RootBuff(this.lifeTime / 2, this.owner, p);
       buff.image = AssetManager.getAsset('spell_yasuo_q1');
       p.addBuff(buff);

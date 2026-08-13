@@ -200,6 +200,10 @@ export default class Spell {
   onCancel(_context: CastContext, _reason: CancelReason): void {}
   onComplete(_context: CastContext): void {}
 
+  protected ignoresOwnerInterrupts(): boolean {
+    return false;
+  }
+
   get castSpec(): Readonly<CastSpec> {
     return legacyCastSpec(this.coolDown);
   }
@@ -282,6 +286,7 @@ export default class Spell {
 
   private observeInterrupts(): void {
     if (!['CASTING', 'CHARGING', 'CHANNELING', 'ACTIVE'].includes(this.runtime.state)) return;
+    if (this.ignoresOwnerInterrupts()) return;
     if (this.owner.isDead) {
       this.runtime.cancel('DEATH');
       return;

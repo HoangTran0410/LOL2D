@@ -75,7 +75,7 @@ export class Yasuo_W_Object extends SpellObject {
       ],
     });
 
-    spellObjects.forEach(o => {
+    spellObjects.forEach((o: SpellObject) => {
       o.toRemove = true;
     });
 
