@@ -303,6 +303,10 @@ export default class AttackableUnit extends GameObject {
   takeHeal(heal: number, _healer?: HealSource): void {
     if (this.isDead) return;
 
+    // whole points, for the same reason takeDamage rounds
+    heal = Math.round(heal);
+    if (heal <= 0) return;
+
     let combatText = new CombatText(this);
     combatText.text = '+' + heal;
     combatText.textColor = [0, 255, 0];
@@ -318,11 +322,23 @@ export default class AttackableUnit extends GameObject {
   takeDamage(damage: number, attacker?: AttackableUnit): void {
     if (this.isDead) return;
 
+    // Whole points, in and out. Damage is built from lerps, percentages and
+    // unit-type multipliers, so it arrives as things like 23.799999999999997 —
+    // which then landed in the floating combat text verbatim and left health
+    // pools carrying a tail of binary noise. Rounded before the modifiers so
+    // shields also deal in whole points, and again after, because a partial
+    // absorb reintroduces a fraction.
+    damage = Math.round(damage);
+    if (damage <= 0) return;
+
     // shields and damage modifiers get first look; they may eat all of it
     for (const buff of this.buffs) {
       damage = buff.modifyIncomingDamage(damage, attacker);
       if (damage <= 0) return;
     }
+
+    damage = Math.round(damage);
+    if (damage <= 0) return;
 
     let combatText = new CombatText(this);
     combatText.text = '-' + damage;
