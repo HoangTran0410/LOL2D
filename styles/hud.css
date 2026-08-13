@@ -194,6 +194,17 @@
   border-top: 2px solid #eee;
 }
 
+/*
+ * The basic attack's countdown is its swing interval, not a lockout: it runs
+ * whenever the champion is fighting. The opaque wedge and the seconds-left stamp
+ * would leave that slot unreadable for the whole game, so the rhythm gets a
+ * translucent warm sweep that the icon still shows through.
+ */
+.spell .cooldown-overlay.rhythm {
+  background-color: rgba(255, 208, 132, 0.22);
+  border-top: 2px solid rgba(255, 226, 176, 0.85);
+}
+
 .spell.in-cooldown img {
   filter: grayscale(100%);
 }

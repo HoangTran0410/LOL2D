@@ -332,6 +332,12 @@ describe('BasicAttack, the ability in the A slot', () => {
     expect(spell.coolDown).toBeCloseTo(1_000 / (RANGED.attacksPerSecond * 2));
   });
 
+  it('reads as a rhythm rather than a lockout, so the HUD leaves the icon alone', () => {
+    expect(new BasicAttack(null as never).cooldownLocksOut).toBe(false);
+    // and the flag is opt-in: an ordinary ability still greys out and counts down
+    expect(new Probe(null as never).cooldownLocksOut).toBe(true);
+  });
+
   it('never hands a swing back when a refused cast resets spell cooldowns', () => {
     const world = harness();
     const enemy = champion(world.game, 200);

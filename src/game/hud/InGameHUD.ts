@@ -27,6 +27,8 @@ interface SpellDisplay {
   coolDownText: number;
   coolDownPercent: number;
   showCoolDown: boolean;
+  /** True only for a real wait. A swing rhythm gets the wedge and nothing else. */
+  lockedOut: boolean;
   small: boolean;
   canCast: boolean;
   hotKey: string;
@@ -288,14 +290,15 @@ export default class InGameHUD {
                         @mouseover="mouseover(spell, $event)"
                         @mouseout="mouseout(spell, $event)">
                         <img :src="spell.image" alt="spell"
-                            :style="(spell.disabled || spell.showCoolDown || !spell.canCast || !spell.affordable) ? 'filter: grayscale(100%)' : ''" />
+                            :style="(spell.disabled || spell.lockedOut || !spell.canCast || !spell.affordable) ? 'filter: grayscale(100%)' : ''" />
 
                         <span v-if="spell.hotKey" class="hotKey">{{spell.hotKey}}</span>
                         <span v-if="spell.stackCount !== undefined" class="stacks">{{spell.stackCount}}</span>
                         <span v-if="spell.manaCost > 0" :class="spell.affordable ? 'mana-cost' : 'mana-cost short'">{{spell.manaCost}}</span>
                         <div v-if="spell.showCoolDown">
-                            <div class="cooldown-overlay" :style="'height:'+ spell.coolDownPercent +'%'"></div>
-                            <div class="cooldown">
+                            <div :class="spell.lockedOut ? 'cooldown-overlay' : 'cooldown-overlay rhythm'"
+                                 :style="'height:'+ spell.coolDownPercent +'%'"></div>
+                            <div v-if="spell.lockedOut" class="cooldown">
                                 <p>{{spell.coolDownText}}</p>
                             </div>
                         </div>
@@ -464,6 +467,9 @@ export default class InGameHUD {
           coolDownText: Math.ceil(currentCooldown / 1000),
           coolDownPercent: Math.min((currentCooldown / coolDown) * 100, 100),
           showCoolDown: currentCooldown > 0,
+          // `!== false` so a spell that never heard of the flag still reads as a
+          // lockout, which is what every cooldown but the swing timer is
+          lockedOut: currentCooldown > 0 && spell?.cooldownLocksOut !== false,
           small: isInternalSpell || isSummonerSpell,
           canCast: player.canCast && !player.isDead,
           hotKey,

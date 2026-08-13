@@ -164,6 +164,21 @@ export default class Spell {
   }
 
   /**
+   * Whether this spell's countdown is a lockout — a wait before the ability can
+   * be used at all — or a rhythm the ability keeps on its own.
+   *
+   * Every real cooldown is a lockout, and the HUD says so loudly: it greys the
+   * icon and stamps the seconds left over it. The basic attack's countdown is
+   * its swing interval, which is running whenever the champion is fighting, so
+   * the loud treatment would leave that slot greyed out and covered in a
+   * flickering "2" for the whole game. It gets the sweeping wedge and nothing
+   * else, which is the part that actually reads as a rhythm.
+   */
+  get cooldownLocksOut(): boolean {
+    return true;
+  }
+
+  /**
    * Whether casting this spell drops the caster's standing attack order.
    *
    * True for every ability. BasicAttack overrides it, because casting that one

@@ -108,6 +108,11 @@ export default class BasicAttack extends Spell {
    */
   set currentCooldown(_remainingMs: number) {}
 
+  /** A swing rhythm, not a wait. See `Spell.cooldownLocksOut`. */
+  get cooldownLocksOut(): boolean {
+    return false;
+  }
+
   onSpellCast(context: CastContext): void {
     const target = this.acquire(context.cursorWorld);
     if (target) this.order(target);
