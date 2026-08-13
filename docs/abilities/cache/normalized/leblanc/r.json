@@ -1,0 +1,216 @@
+{
+  "asset": {
+    "key": "spell_leblanc_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e",
+    "sha1": "9a01c24fa8ad5cac0149b2ec98a12f8eb9785c2c"
+  },
+  "champion": "LeBlanc",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_leblanc_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e",
+        "sha1": "9a01c24fa8ad5cac0149b2ec98a12f8eb9785c2c"
+      },
+      "fields": {
+        "cooldown": "45 / 40 / 35 / 30 / 25",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''LeBlanc''' casts a mimicked version of her most recently used basic ability, applying the same effects and dealing <span style=\"color:\n#00B0F0; white-space:normal\">'''modified''' magic damage</span>.",
+          "text": "Active: LeBlanc casts a mimicked version of her most recently used basic ability, applying the same effects and dealing modified magic damage."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Sigil of Malice:'''</span> The orb deals modified damage, while the mark consumption deals double that amount.",
+          "text": "Mimic: Sigil of Malice: The orb deals modified damage, while the mark consumption deals double that amount."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Distortion:'''</span> Deals modified damage.",
+          "text": "Mimic: Distortion: Deals modified damage."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Ethereal Chains:'''</span> The tether's application deals modified damage, while its fracturing deals double that amount.",
+          "text": "Mimic: Ethereal Chains: The tether's application deals modified damage, while its fracturing deals double that amount."
+        },
+        "icon": "Mimic.png",
+        "icon2": "Mimic Sigil of Malice.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Orb Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Mark Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Orb Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Mark Magic Damage:140 / 220 / 300 / 380 / 460 (+ 80% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 120% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>150 / 232.<small>5</small> / 315 / 397.<small>5</small> / 480 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:150 / 232.5 / 315 / 397.5 / 480 (+ 80% AP)"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Application Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Fracture Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 125% AP)</span></dd></dl>",
+          "text": "Application Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Fracture Magic Damage:140 / 220 / 300 / 380 / 460 (+ 85% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 125% AP)"
+        },
+        "name": "Mimic",
+        "notes": {
+          "raw": "* ''Mimic'' will default to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> if ''LeBlanc'' ranks up ''Mimic'' without having used any abilities beforehand (even if she has not yet learned <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Sigil of Malice.png|20xpx|border|link=LeBlanc#Sigil of Malice|An icon for LeBlanc's ability Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Sigil of Malice|Sigil of Malice]]</span></span>).\n* Both <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Ethereal Chains\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Ethereal Chains.png|20xpx|border|link=LeBlanc#Mimic: Ethereal Chains|An icon for LeBlanc's ability Mimic: Ethereal Chains]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Ethereal Chains|Mimic: Ethereal Chains]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> will apply damage twice if the original ability's condition to do so is met.",
+          "text": "Mimic will default to Mimic: Sigil of Malice if LeBlanc ranks up Mimic without having used any abilities beforehand (even if she has not yet learned Sigil of Malice).\nBoth Mimic: Ethereal Chains and Mimic: Sigil of Malice will apply damage twice if the original ability's condition to do so is met."
+        },
+        "targeting": "Varied"
+      },
+      "name": "Mimic"
+    },
+    {
+      "asset": {
+        "key": "spell_leblanc_r2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e",
+        "sha1": "9a01c24fa8ad5cac0149b2ec98a12f8eb9785c2c"
+      },
+      "fields": {
+        "cooldown": "45 / 40 / 35 / 30 / 25",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''LeBlanc''' casts a mimicked version of her most recently used basic ability, applying the same effects and dealing <span style=\"color:\n#00B0F0; white-space:normal\">'''modified''' magic damage</span>.",
+          "text": "Active: LeBlanc casts a mimicked version of her most recently used basic ability, applying the same effects and dealing modified magic damage."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Sigil of Malice:'''</span> The orb deals modified damage, while the mark consumption deals double that amount.",
+          "text": "Mimic: Sigil of Malice: The orb deals modified damage, while the mark consumption deals double that amount."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Distortion:'''</span> Deals modified damage.",
+          "text": "Mimic: Distortion: Deals modified damage."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Ethereal Chains:'''</span> The tether's application deals modified damage, while its fracturing deals double that amount.",
+          "text": "Mimic: Ethereal Chains: The tether's application deals modified damage, while its fracturing deals double that amount."
+        },
+        "icon": "Mimic.png",
+        "icon2": "Mimic Sigil of Malice.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Orb Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Mark Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Orb Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Mark Magic Damage:140 / 220 / 300 / 380 / 460 (+ 80% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 120% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>150 / 232.<small>5</small> / 315 / 397.<small>5</small> / 480 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:150 / 232.5 / 315 / 397.5 / 480 (+ 80% AP)"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Application Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Fracture Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 125% AP)</span></dd></dl>",
+          "text": "Application Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Fracture Magic Damage:140 / 220 / 300 / 380 / 460 (+ 85% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 125% AP)"
+        },
+        "name": "Mimic",
+        "notes": {
+          "raw": "* ''Mimic'' will default to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> if ''LeBlanc'' ranks up ''Mimic'' without having used any abilities beforehand (even if she has not yet learned <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Sigil of Malice.png|20xpx|border|link=LeBlanc#Sigil of Malice|An icon for LeBlanc's ability Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Sigil of Malice|Sigil of Malice]]</span></span>).\n* Both <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Ethereal Chains\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Ethereal Chains.png|20xpx|border|link=LeBlanc#Mimic: Ethereal Chains|An icon for LeBlanc's ability Mimic: Ethereal Chains]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Ethereal Chains|Mimic: Ethereal Chains]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> will apply damage twice if the original ability's condition to do so is met.",
+          "text": "Mimic will default to Mimic: Sigil of Malice if LeBlanc ranks up Mimic without having used any abilities beforehand (even if she has not yet learned Sigil of Malice).\nBoth Mimic: Ethereal Chains and Mimic: Sigil of Malice will apply damage twice if the original ability's condition to do so is met."
+        },
+        "targeting": "Varied"
+      },
+      "name": "Mimic: Sigil of Malice"
+    },
+    {
+      "asset": {
+        "key": "spell_leblanc_r3",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e",
+        "sha1": "9a01c24fa8ad5cac0149b2ec98a12f8eb9785c2c"
+      },
+      "fields": {
+        "cooldown": "45 / 40 / 35 / 30 / 25",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''LeBlanc''' casts a mimicked version of her most recently used basic ability, applying the same effects and dealing <span style=\"color:\n#00B0F0; white-space:normal\">'''modified''' magic damage</span>.",
+          "text": "Active: LeBlanc casts a mimicked version of her most recently used basic ability, applying the same effects and dealing modified magic damage."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Sigil of Malice:'''</span> The orb deals modified damage, while the mark consumption deals double that amount.",
+          "text": "Mimic: Sigil of Malice: The orb deals modified damage, while the mark consumption deals double that amount."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Distortion:'''</span> Deals modified damage.",
+          "text": "Mimic: Distortion: Deals modified damage."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Ethereal Chains:'''</span> The tether's application deals modified damage, while its fracturing deals double that amount.",
+          "text": "Mimic: Ethereal Chains: The tether's application deals modified damage, while its fracturing deals double that amount."
+        },
+        "icon": "Mimic.png",
+        "icon2": "Mimic Sigil of Malice.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Orb Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Mark Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Orb Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Mark Magic Damage:140 / 220 / 300 / 380 / 460 (+ 80% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 120% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>150 / 232.<small>5</small> / 315 / 397.<small>5</small> / 480 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:150 / 232.5 / 315 / 397.5 / 480 (+ 80% AP)"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Application Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Fracture Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 125% AP)</span></dd></dl>",
+          "text": "Application Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Fracture Magic Damage:140 / 220 / 300 / 380 / 460 (+ 85% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 125% AP)"
+        },
+        "name": "Mimic",
+        "notes": {
+          "raw": "* ''Mimic'' will default to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> if ''LeBlanc'' ranks up ''Mimic'' without having used any abilities beforehand (even if she has not yet learned <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Sigil of Malice.png|20xpx|border|link=LeBlanc#Sigil of Malice|An icon for LeBlanc's ability Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Sigil of Malice|Sigil of Malice]]</span></span>).\n* Both <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Ethereal Chains\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Ethereal Chains.png|20xpx|border|link=LeBlanc#Mimic: Ethereal Chains|An icon for LeBlanc's ability Mimic: Ethereal Chains]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Ethereal Chains|Mimic: Ethereal Chains]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> will apply damage twice if the original ability's condition to do so is met.",
+          "text": "Mimic will default to Mimic: Sigil of Malice if LeBlanc ranks up Mimic without having used any abilities beforehand (even if she has not yet learned Sigil of Malice).\nBoth Mimic: Ethereal Chains and Mimic: Sigil of Malice will apply damage twice if the original ability's condition to do so is met."
+        },
+        "targeting": "Varied"
+      },
+      "name": "Mimic: Distortion"
+    },
+    {
+      "asset": {
+        "key": "spell_leblanc_r4",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e",
+        "sha1": "9a01c24fa8ad5cac0149b2ec98a12f8eb9785c2c"
+      },
+      "fields": {
+        "cooldown": "45 / 40 / 35 / 30 / 25",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''LeBlanc''' casts a mimicked version of her most recently used basic ability, applying the same effects and dealing <span style=\"color:\n#00B0F0; white-space:normal\">'''modified''' magic damage</span>.",
+          "text": "Active: LeBlanc casts a mimicked version of her most recently used basic ability, applying the same effects and dealing modified magic damage."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Sigil of Malice:'''</span> The orb deals modified damage, while the mark consumption deals double that amount.",
+          "text": "Mimic: Sigil of Malice: The orb deals modified damage, while the mark consumption deals double that amount."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Distortion:'''</span> Deals modified damage.",
+          "text": "Mimic: Distortion: Deals modified damage."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Mimic: Ethereal Chains:'''</span> The tether's application deals modified damage, while its fracturing deals double that amount.",
+          "text": "Mimic: Ethereal Chains: The tether's application deals modified damage, while its fracturing deals double that amount."
+        },
+        "icon": "Mimic.png",
+        "icon2": "Mimic Sigil of Malice.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Orb Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Mark Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Orb Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Mark Magic Damage:140 / 220 / 300 / 380 / 460 (+ 80% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 120% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>150 / 232.<small>5</small> / 315 / 397.<small>5</small> / 480 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:150 / 232.5 / 315 / 397.5 / 480 (+ 80% AP)"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Application Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Fracture Magic Damage:'''</span></dt><dd>140 / 220 / 300 / 380 / 460 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>210 / 330 / 450 / 570 / 690 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 125% AP)</span></dd></dl>",
+          "text": "Application Magic Damage:70 / 110 / 150 / 190 / 230 (+ 40% AP)Fracture Magic Damage:140 / 220 / 300 / 380 / 460 (+ 85% AP)Total Magic Damage:210 / 330 / 450 / 570 / 690 (+ 125% AP)"
+        },
+        "name": "Mimic",
+        "notes": {
+          "raw": "* ''Mimic'' will default to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> if ''LeBlanc'' ranks up ''Mimic'' without having used any abilities beforehand (even if she has not yet learned <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Sigil of Malice.png|20xpx|border|link=LeBlanc#Sigil of Malice|An icon for LeBlanc's ability Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Sigil of Malice|Sigil of Malice]]</span></span>).\n* Both <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Ethereal Chains\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Ethereal Chains.png|20xpx|border|link=LeBlanc#Mimic: Ethereal Chains|An icon for LeBlanc's ability Mimic: Ethereal Chains]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Ethereal Chains|Mimic: Ethereal Chains]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> will apply damage twice if the original ability's condition to do so is met.",
+          "text": "Mimic will default to Mimic: Sigil of Malice if LeBlanc ranks up Mimic without having used any abilities beforehand (even if she has not yet learned Sigil of Malice).\nBoth Mimic: Ethereal Chains and Mimic: Sigil of Malice will apply damage twice if the original ability's condition to do so is met."
+        },
+        "targeting": "Varied"
+      },
+      "name": "Mimic: Ethereal Chains"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "35a8933909c63316a0e5a20c725b60107a6a094c25c2e4369cd5e456ca29526c",
+    "fetchedAt": "2026-08-13T16:24:13.273Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_LeBlanc/Mimic",
+    "revisionId": 4034699,
+    "sourceTimestamp": "2026-06-23T21:15:25Z"
+  }
+}

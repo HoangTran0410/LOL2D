@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_leblanc_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Sigil_of_Malice.png?f3dfb",
+    "sha1": "56cbbc64c46b9dcad4fd4a19e100d7f86ae8375b"
+  },
+  "champion": "LeBlanc",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_leblanc_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Sigil_of_Malice.png?f3dfb",
+        "sha1": "56cbbc64c46b9dcad4fd4a19e100d7f86ae8375b"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "6",
+        "cost": "50",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''LeBlanc''' projects an orb at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and marks them for 3.<small>5</small> seconds.",
+          "text": "Active: LeBlanc projects an orb at the target enemy that deals magic damage and marks them for 3.5 seconds."
+        },
+        "description2": {
+          "raw": "'''LeBlanc's''' next damaging <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span> against the marked target will consume the mark to deal the [[File:Successfully enhanced damage magic icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\">same <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span></span> again.",
+          "text": "LeBlanc's next damaging ability against the marked target will consume the mark to deal the same magic damage again."
+        },
+        "description3": {
+          "raw": "''Sigil of Malice's'' orb deals <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"2 + 8 * level, capped at level 18\" data-bot-values=\"10;18;26;34;42;50;58;66;74;82;90;98;106;114;122;130;138;146\">10 – 146 (based on level)</span> '''bonus''' magic damage</span> against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and refunds 100% of its <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">mana cost</span></span> and 30% of its remaining <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> if either the orb or its mark's consumption kills the target.",
+          "text": "Sigil of Malice's orb deals 10 – 146 (based on level) bonus magic damage against minions and refunds 100% of its &nbsp;mana cost and 30% of its remaining &nbsp;cooldown if either the orb or its mark's consumption kills the target."
+        },
+        "icon": "Sigil of Malice.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>65 / 90 / 115 / 140 / 165 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Magic Damage:65 / 90 / 115 / 140 / 165 (+ 40% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>130 / 180 / 230 / 280 / 330 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Total Magic Damage:130 / 180 / 230 / 280 / 330 (+ 80% AP)"
+        },
+        "name": "Sigil of Malice",
+        "notes": {
+          "raw": "* ''Sigil of Malice'' and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"LeBlanc\" data-ability=\"Mimic: Sigil of Malice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:LeBlanc Mimic- Sigil of Malice.png|20xpx|border|link=LeBlanc#Mimic: Sigil of Malice|An icon for LeBlanc's ability Mimic: Sigil of Malice]]</span> <span style=\"white-space:normal;\">[[LeBlanc#Mimic: Sigil of Malice|Mimic: Sigil of Malice]]</span></span> can detonate each other's marks.\n* The floating damage text upon the mark's detonation currently displays a real [[File:Critical strike magic icon.png|20px|link=Critical strike|An icon for magic damage critical strikes]] critical strike icon instead of a success indicator.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Sigil of Malice and Mimic: Sigil of Malice can detonate each other's marks.\nThe floating damage text upon the mark's detonation currently displays a real critical strike icon instead of a success indicator.(bug)\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "2000",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Sigil of Malice"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "5fbe42c309c8e5112f3c1edf7d3550624e17780eb02a333f71be3dc47a81a472",
+    "fetchedAt": "2026-08-13T16:24:13.273Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_LeBlanc/Sigil_of_Malice",
+    "revisionId": 3985524,
+    "sourceTimestamp": "2026-01-20T16:21:54Z"
+  }
+}

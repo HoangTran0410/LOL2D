@@ -115,7 +115,12 @@ export const SpellGroups: {
     name: 'Leblanc',
     image: 'champ_leblanc',
     background: 'champ_background_leblanc',
-    spells: [AllSpells.Leblanc_W, AllSpells.Leblanc_E],
+    spells: [
+      AllSpells.Leblanc_Q,
+      AllSpells.Leblanc_W,
+      AllSpells.Leblanc_E,
+      AllSpells.Leblanc_R,
+    ],
   },
   {
     name: 'Malphite',
