@@ -8,7 +8,10 @@ import {
   BALL_SIZE_RATIO,
   FALLBACK_BODY_SIZE,
   Rammus_Q_Object,
+  Rammus_Q_Powerball,
 } from '../../../src/game/gameObject/spells/Rammus_Q';
+import StatusFlags from '../../../src/game/enums/StatusFlags';
+import { createGame, createUnit } from '../spell/fixtures';
 import { MAX_UNIT_SIZE } from '../../../src/game/gameObject/Stats';
 import { TestVector } from '../spell/fixtures';
 
@@ -75,5 +78,45 @@ describe('Rammus Q ball size', () => {
 
     expect(ball.reachTo({ collisionRadius: 25 })).toBe(ball.size / 2 + 25);
     expect(ball.reachTo({ bodyRadius: 90, collisionRadius: 25 })).toBe(ball.size / 2 + 90);
+  });
+});
+
+// The repo owner's rule: curled into a ball he cannot swing. In the real game
+// that is a restriction on attacking, not a channel — casting and Flash keep
+// working — so it needs nothing beyond the Disarmed flag basic attacks added.
+describe('Rammus Q disarms while rolling', () => {
+  beforeEach(() => {
+    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
+    vi.stubGlobal('random', () => 0.5);
+    vi.stubGlobal('TWO_PI', Math.PI * 2);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('raises Disarmed and nothing that would stop a cast or a blink', () => {
+    const game = createGame();
+    const unit = createUnit(game, 0, 'blue');
+    const flags = new Rammus_Q_Powerball(4_000, unit, unit).statusFlagsToEnable;
+
+    expect(flags & StatusFlags.Disarmed).toBe(StatusFlags.Disarmed);
+    expect(flags & StatusFlags.Silenced).toBe(0);
+    expect(flags & StatusFlags.Stunned).toBe(0);
+    expect(flags & StatusFlags.Grounded).toBe(0);
+  });
+
+  it('takes attacking away from a real unit and leaves moving and casting', () => {
+    const game = createGame();
+    const unit = createUnit(game, 0, 'blue');
+    const roll = new Rammus_Q_Powerball(4_000, unit, unit);
+
+    unit.addBuff(roll);
+    unit.updateBuffs();
+
+    expect(unit.canAttack).toBe(false);
+    expect(unit.canCast).toBe(true);
+    expect(unit.canMove).toBe(true);
+
+    roll.deactivateBuff();
+    unit.updateBuffs();
+    expect(unit.canAttack).toBe(true);
   });
 });
