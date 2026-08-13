@@ -22,6 +22,11 @@ interface GameObjectRegion {
   data: GameObject;
 }
 
+type TargetableGameObject = GameObject & { targetable?: unknown };
+
+const hasTargetableProperty = (object: GameObject): object is TargetableGameObject =>
+  'targetable' in object;
+
 const DisplayZIndex: Function[] = [
   //
   TrailSystem,
@@ -80,9 +85,9 @@ export const PredefinedFilters = {
     object instanceof AttackableUnit && object.isDead,
   excludeDead: (object: GameObject): boolean => !(object instanceof AttackableUnit && object.isDead),
   includeUntargetable: (object: GameObject): boolean =>
-    !('targetable' in object && object.targetable),
+    !hasTargetableProperty(object) || !Boolean(object.targetable),
   excludeUntargetable: (object: GameObject): boolean =>
-    object instanceof AttackableUnit && object.targetable,
+    hasTargetableProperty(object) && Boolean(object.targetable),
   attackableUnitInRange:
     (position: p5.Vector, radius: number, includeSize = false): GameObjectTypeGuard<AttackableUnit> =>
     (object): object is AttackableUnit =>

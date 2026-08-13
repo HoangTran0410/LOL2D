@@ -1,15 +1,8 @@
 import GameObject from './GameObject';
-import type GameObjectType from './GameObject';
-import type { QueryOptions } from '../managers/ObjectManager';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
-import type { GameObjectGameContext } from './GameObject';
+import type { GameObjectGameContext, GameObjectRuntimeContext } from './GameObject';
 
-export interface SpellObjectGameContext {
-  objectManager: {
-    addObject?: (object: GameObjectType) => void;
-    queryObjects: (options: QueryOptions) => GameObjectType[];
-  };
-}
+export interface SpellObjectGameContext extends GameObjectGameContext {}
 
 export interface SpellOwner {
   game: SpellObjectGameContext;
@@ -18,7 +11,7 @@ export interface SpellOwner {
 }
 
 type SpellGame<TOwner> = TOwner extends AttackableUnit
-  ? GameObjectGameContext
+  ? GameObjectRuntimeContext
   : TOwner extends SpellOwner
     ? SpellObjectGameContext
     : undefined;

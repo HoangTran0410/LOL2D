@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { Rectangle } from '../../../src/libs/quadtree';
 import GameObject from '../../../src/game/gameObject/GameObject';
+import type { GameObjectGameContext } from '../../../src/game/gameObject/GameObject';
 import SpellObject from '../../../src/game/gameObject/SpellObject';
 import ObjectManager, { PredefinedFilters } from '../../../src/game/managers/ObjectManager';
 import gameObjectSource from '../../../src/game/gameObject/GameObject.ts?raw';
@@ -40,8 +41,31 @@ describe('base object type boundary', () => {
     expect(new SpellObject<undefined>(undefined).owner).toBeUndefined();
   });
 
-  it('preserves includeUntargetable behavior for non-attackable objects', () => {
-    expect(PredefinedFilters.includeUntargetable(new TestObject())).toBe(true);
+  it('accepts only the base game context shape', () => {
+    const objectManager = new ObjectManager({
+      mapSize: 100,
+      camera: { getBoundingBox: () => new Rectangle({ x: 0, y: 0, w: 0, h: 0 }) },
+    });
+    const context: GameObjectGameContext = { objectManager };
+
+    expect(new GameObject({ game: context }).game).toBe(context);
+
+    if (false) {
+      // @ts-expect-error a game context needs an object manager capability
+      new GameObject({ game: {} });
+      // @ts-expect-error arbitrary objects are not game contexts
+      new GameObject({ game: new Date() });
+    }
+  });
+
+  it('preserves targetability filters for arbitrary game objects', () => {
+    const ordinary = new TestObject();
+    const targetable = Object.assign(new TestObject(), { targetable: true });
+
+    expect(PredefinedFilters.includeUntargetable(ordinary)).toBe(true);
+    expect(PredefinedFilters.excludeUntargetable(ordinary)).toBe(false);
+    expect(PredefinedFilters.includeUntargetable(targetable)).toBe(false);
+    expect(PredefinedFilters.excludeUntargetable(targetable)).toBe(true);
   });
 
   it('adds, updates, filters, queries, and removes game objects', () => {

@@ -7,6 +7,10 @@ import type AttackableUnit from './attackableUnits/AttackableUnit';
 import type ObjectManager from '../managers/ObjectManager';
 
 export interface GameObjectGameContext {
+  objectManager: Pick<ObjectManager, 'queryObjects'> & Partial<Pick<ObjectManager, 'addObject'>>;
+}
+
+export interface GameObjectRuntimeContext extends GameObjectGameContext {
   readonly mapSize: number;
   camera: { getBoundingBox(): Rectangle };
   objectManager: ObjectManager;
@@ -18,7 +22,7 @@ export interface GameObjectGameContext {
 }
 
 export interface GameObjectOptions {
-  game?: object;
+  game?: GameObjectGameContext;
   position?: p5.Vector;
   collisionRadius?: number;
   visionRadius?: number;
@@ -43,7 +47,7 @@ export default class GameObject {
    */
   alwaysVisible = false;
 
-  game?: object;
+  game?: GameObjectGameContext;
   position: p5.Vector;
   collisionRadius: number;
   visionRadius: number;
