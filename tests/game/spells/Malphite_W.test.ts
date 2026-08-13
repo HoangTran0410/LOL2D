@@ -103,9 +103,11 @@ describe('Malphite W', () => {
       (o): o is Malphite_W_Armor => o instanceof Malphite_W_Armor
     );
     expect(armor).toBeDefined();
-    // addBuff() must not have handed the armor a different instance than the
-    // one that actually lives in owner.buffs and gets ticked by updateBuffs()
-    expect(armor!.buff).toBe(bulkBuff);
+    // attachTo() must have resolved the instance that actually lives in
+    // owner.buffs and gets ticked by updateBuffs(), not whatever was handed to
+    // addBuff() — those are not always the same object
+    expect(armor!._anchorBuff).toBe(bulkBuff);
+    expect(armor!.attachmentLost).toBe(false);
   });
 
   it('draws a procedural ring of plates rather than a blitted icon', () => {
@@ -113,7 +115,9 @@ describe('Malphite W', () => {
     const game = createGame();
     const owner = unit(game);
     const armor = new Malphite_W_Armor(owner);
-    armor.buff = new StatAmp(DURATION_MS, owner, owner);
+    const buff = new StatAmp(DURATION_MS, owner, owner);
+    owner.buffs.push(buff);
+    armor.attachTo(owner, buff);
     armor.age = 1_000; // well past the slam window, mid-buff
 
     armor.draw();
@@ -135,13 +139,15 @@ describe('Malphite W', () => {
     // in the common case (death clears buffs synchronously, so buff.toRemove
     // and owner.isDead flip together), but they must still agree on their own
     // terms — a future change to how death clears buffs should not be able to
-    // leave a corpse wrapped in stone again.
+    // leave a corpse wrapped in stone again. Both now read the one latched
+    // `attachmentLost`, which is what makes them unable to drift apart.
     const draw = stubDrawGlobals();
     const game = createGame();
     const owner = unit(game);
     const armor = new Malphite_W_Armor(owner);
     const buff = new StatAmp(DURATION_MS, owner, owner);
-    armor.buff = buff;
+    owner.buffs.push(buff);
+    armor.attachTo(owner, buff);
     armor.age = 1_000;
 
     // buff.toRemove is still false here on purpose — this isolates the
@@ -240,36 +246,41 @@ describe('Malphite W', () => {
     expect(armor.toRemove).toBe(true);
   });
 
-  it('stops rendering on owner death even if the watched buff instance is never updated (independent safety net)', () => {
-    // Regression guard for the general failure mode: an armor-style object
-    // that only trusted buff.toRemove would stay "alive" forever if some
-    // future addBuff/stacking change ever handed it an orphaned instance that
-    // never gets ticked. update()'s own `!this.owner.isDead` check must be
-    // enough on its own to stop it, with no dependency on the buff at all.
+  it('treats a buff that never landed as an attachment already over', () => {
+    // The general failure mode this class of object used to have: trusting the
+    // instance handed to addBuff, which is not always the one the unit ends up
+    // ticking (RENEW_EXISTING renews the existing buff and drops the new one).
+    // An orphan never advances timeElapsed and never flips toRemove, so an
+    // object shadowing it waited forever. attachTo resolves what actually
+    // landed, so the orphan case can no longer produce an immortal object — it
+    // produces one that never starts.
     const game = createGame();
     const owner = unit(game);
     const orphanedBuff = new Buff(DURATION_MS, owner, owner); // never added to owner.buffs
     const armor = new Malphite_W_Armor(owner);
-    armor.buff = orphanedBuff;
+    armor.attachTo(owner, orphanedBuff);
+
+    expect(armor.attachmentLost).toBe(true);
 
     tick([armor], 100, 300);
-    expect(armor.toRemove).toBe(false);
     expect(orphanedBuff.toRemove).toBe(false); // confirms it really is orphaned
-
-    owner.die({ reviveAfter: 5_000 });
-    tick([armor], 100, 1_000);
-
     expect(armor.toRemove).toBe(true);
   });
 
-  it('never lingers past the hard stop even if the buff it watches never flips toRemove', () => {
+  it('never lingers past the hard stop even if its anchor stays valid forever', () => {
+    // attachmentLost should always fire first. This is the backstop for the
+    // path nobody has found: a buff that sits in owner.buffs and is never
+    // ticked keeps the attachment perfectly valid, so only the hard stop can
+    // end it. A permanent artefact becomes a few-second one.
     const game = createGame();
     const owner = unit(game);
-    const orphanedBuff = new Buff(DURATION_MS, owner, owner);
+    const neverTicked = new Buff(DURATION_MS, owner, owner);
+    owner.buffs.push(neverTicked);
     const armor = new Malphite_W_Armor(owner);
-    armor.buff = orphanedBuff;
+    armor.attachTo(owner, neverTicked);
 
     tick([armor], 100, HARD_STOP_MS - 100);
+    expect(armor.attachmentLost).toBe(false);
     expect(armor.toRemove).toBe(false);
 
     tick([armor], 100, 200);

@@ -28,11 +28,12 @@ export const DUST_LIFETIME_MS = 550;
 export const BOUNDING_MARGIN = 90;
 /**
  * Belt-and-braces upper bound on how long this purely cosmetic wrapper can
- * live, independent of the buff it watches. The normal exit is `this.buff`
- * flipping `toRemove` (natural expiry) or `this.owner.isDead` going true
- * (death). This just guarantees the object can never survive the caster
- * indefinitely even if a future change to addBuff/stacking ever left it
- * watching a buff instance that stopped being updated.
+ * live. The real exit is `SpellObject.attachmentLost` — the buff expiring or
+ * the caster dying — and that already resolves the buff instance the unit
+ * actually ticks, so this should never fire. It stays because the one report
+ * of this armour surviving forever was never reproduced: if there is a path
+ * nobody has found, an upper bound turns a permanent artefact into a
+ * few-second one.
  */
 export const HARD_STOP_MS = DURATION_MS + DUST_LIFETIME_MS + 1_000;
 
@@ -68,14 +69,13 @@ export default class Malphite_W extends Spell {
     // 4-second self-buff, so wrap him in visible stone for exactly as long as
     // the buff lives (the object watches the buff, it does not time itself)
     const armor = new Malphite_W_Armor(this.owner);
-    armor.buff = bulkBuff;
+    armor.attachTo(this.owner, bulkBuff);
     this.game.objectManager.addObject(armor);
   }
 }
 
 /** Slabs of rock orbiting Malphite while Brutal Strikes is up. */
 export class Malphite_W_Armor extends SpellObject {
-  buff: Buff | null = null;
   age = 0;
   plateCount = PLATE_COUNT;
 
@@ -91,8 +91,11 @@ export class Malphite_W_Armor extends SpellObject {
       return;
     }
 
-    const alive = this.buff && !this.buff.toRemove && !this.owner.isDead;
-    if (alive) {
+    // One question, asked in one place, and it latches: once the shell is gone
+    // it never comes back, so a Malphite who dies and respawns elsewhere does
+    // not arrive still wearing it. The dust already in the air is allowed to
+    // fall rather than popping out of existence with the plates.
+    if (!this.attachmentLost) {
       this._dustTimer += deltaTime;
       if (this._dustTimer >= DUST_SPAWN_INTERVAL_MS && this._dust.length < DUST_MAX_COUNT) {
         this._dustTimer = 0;
@@ -119,12 +122,12 @@ export class Malphite_W_Armor extends SpellObject {
   draw() {
     const size = this.owner.animatedValues.displaySize;
     const radius = size / 2;
-    const buff = this.buff;
-    // must agree with update()'s alive check — a corpse must not keep its
-    // plates or duration ring painted just because the buff hasn't ticked yet
-    const alive = buff !== null && !buff.toRemove && !this.owner.isDead;
+    const buff = this._anchorBuff;
+    // the same latched question update() asks, so the two can no longer drift:
+    // a corpse must not keep its plates or duration ring painted
+    const alive = !this.attachmentLost;
     const left =
-      alive && buff.duration ? constrain(1 - buff.timeElapsed / buff.duration, 0, 1) : 0;
+      alive && buff && buff.duration ? constrain(1 - buff.timeElapsed / buff.duration, 0, 1) : 0;
     // slams on in the first 200ms, so the cast has a moment of impact
     const slam = constrain(this.age / SLAM_MS, 0, 1);
     const spin = frameCount / 90;
