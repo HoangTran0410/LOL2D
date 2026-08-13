@@ -1,0 +1,61 @@
+{
+  "adaptation": {
+    "descriptionVi": "Malphite đập tay xuống đất, gây 25 sát thương phép cho kẻ địch trong bán kính 175px quanh mình và làm chậm chuyển động của họ 30% trong 3 giây.",
+    "gameplayNotes": [
+      "LOL2D không có chỉ số tốc độ đánh, nên hiệu ứng Cripple (giảm tốc độ đánh 30-50%) của bản gốc được đổi thành Làm Chậm tốc độ di chuyển 30% trong 3 giây, dùng lại buff Slow đã có sẵn trong bộ chiêu của Malphite (Q). 60-200 sát thương phép cộng 60% SMPT / 40% Giáp được đổi thành 25 sát thương cố định, phù hợp tướng có 100 máu cơ bản; không áp dụng tăng tiến theo cấp, SMPT hay Giáp.",
+      "Bán kính hiệu ứng 400 (League) quy đổi theo tỉ lệ collision radius của tướng (55/25 so với 65 League) còn 175px; thời gian tung chiêu 0.24s và hồi chiêu 7s giữ nguyên số giây gốc.",
+      "Nguồn cơ chế: revision 3985874, normalized content hash cb8fffbe0177752b6c21102a302a1bfd3589eacebb99ee55860f8da0c510212a."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_malphite_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Ground_Slam.png?f1044",
+    "sha1": "5dac957ab42b77d28d646e790d1d50da20943665"
+  },
+  "champion": "Malphite",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_malphite_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Ground_Slam.png?f1044",
+        "sha1": "5dac957ab42b77d28d646e790d1d50da20943665"
+      },
+      "fields": {
+        "casttime": "0.2419",
+        "cooldown": "7",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Malphite''' slams the ground beneath him, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|crippling]]</span> them for 3 seconds.",
+          "text": "Active: Malphite slams the ground beneath him, dealing magic damage to nearby enemies and crippling them for 3 seconds."
+        },
+        "effectradius": "400",
+        "icon": "Ground Slam.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span> <span style=\"color:yellow; white-space:normal\">(+ 40% armor)</span></dd></dl><dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Cripple Strength:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Magic Damage:60 / 95 / 130 / 165 / 200 (+ 60% AP) (+ 40% armor)Cripple Strength:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Ground Slam",
+        "notes": {
+          "raw": "* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripple]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks multiplicatively\">[[File:Multiple stacking icon.png|20px|link=Stacking#Stacks_multiplicatively|An icon representing the keyword Stacks multiplicatively]] [[:Stacking#Stacks_multiplicatively|stacks multiplicatively]]</span> with other sources of [[Attack_speed#Decreasing_attack_speed|attack speed reductions]].\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "The cripple stacks multiplicatively with other sources of attack speed reductions.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Ground Slam"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "cb8fffbe0177752b6c21102a302a1bfd3589eacebb99ee55860f8da0c510212a",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malphite/Ground_Slam",
+    "revisionId": 3985874,
+    "sourceTimestamp": "2026-01-21T21:27:32Z"
+  }
+}

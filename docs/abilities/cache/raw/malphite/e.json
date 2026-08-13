@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Malphite/Ground Slam",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@\nGround Slam@@icon@@\nGround Slam.png@@icon2@@\n{{{icon2}}}@@description@@\n<span class=\"template_sbc\">'''Active:'''</span> '''Malphite''' slams the ground beneath him, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|crippling]]</span> them for 3 seconds.@@description2@@\n{{{description2}}}@@description3@@\n{{{description3}}}@@description4@@\n{{{description4}}}@@description5@@\n{{{description5}}}@@description6@@\n{{{description6}}}@@leveling@@\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span> <span style=\"color:yellow; white-space:normal\">(+ 40% armor)</span></dd></dl><dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Cripple Strength:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>@@leveling2@@\n{{{leveling2}}}@@leveling3@@\n{{{leveling3}}}@@leveling4@@\n{{{leveling4}}}@@leveling5@@\n{{{leveling5}}}@@leveling6@@\n{{{leveling6}}}@@range@@\n{{{range}}}@@radius@@\n{{{radius}}}@@effectradius@@\n<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 400@@width@@\n{{{width}}}@@speed@@\n{{{speed}}}@@casttime@@\n0.<small>2419</small>@@cost@@\n50 / 55 / 60 / 65 / 70@@cooldown@@\n7@@targeting@@\nAuto@@damagetype@@\nmagic@@spellshield@@\nTrue@@projectile@@\n{{{projectile}}}@@notes@@\n\n* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripple]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks multiplicatively\">[[File:Multiple stacking icon.png|20px|link=Stacking#Stacks_multiplicatively|An icon representing the keyword Stacks multiplicatively]] [[:Stacking#Stacks_multiplicatively|stacks multiplicatively]]</span> with other sources of [[Attack_speed#Decreasing_attack_speed|attack speed reductions]].\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308219,
+                "revisions": [
+                  {
+                    "parentid": 3961653,
+                    "revid": 3985874,
+                    "timestamp": "2026-01-21T21:27:32Z"
+                  }
+                ],
+                "title": "Template:Data Malphite/Ground Slam"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3985874,
+      "timestamp": "2026-01-21T21:27:32Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "5d6b8bf76bc459694a28b591b12e3c2936531b471283117942a29c4b36ff1a07",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malphite/Ground_Slam",
+    "revisionId": 3985874,
+    "sourceTimestamp": "2026-01-21T21:27:32Z"
+  }
+}

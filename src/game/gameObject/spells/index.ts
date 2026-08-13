@@ -50,6 +50,7 @@ export { default as ChoGath_E } from './ChoGath_E';
 export { default as ChoGath_R } from './ChoGath_R';
 export { default as Malphite_Q } from './Malphite_Q';
 export { default as Malphite_W } from './Malphite_W';
+export { default as Malphite_E } from './Malphite_E';
 export { default as Teemo_Q } from './Teemo_Q';
 export { default as Veigar_Q } from './Veigar_Q';
 

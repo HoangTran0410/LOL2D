@@ -1,0 +1,201 @@
+import { Circle, Rectangle } from '../../../libs/quadtree';
+import AssetManager from '../../../managers/AssetManager';
+import { PredefinedFilters } from '../../managers/ObjectManager';
+import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
+import Spell from '../Spell';
+import SpellObject from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import Slow from '../buffs/Slow';
+
+/**
+ * Ground Slam. Malphite slams the ground beneath him: an instant, self-centred
+ * burst rather than a lingering area, so it is built the way `Anivia_Q_Blast`
+ * and `Malphite_R_Object` are — a plain `SpellObject` that pays its damage
+ * once on its first update and then spends a few hundred ms fading out.
+ *
+ * The Wiki's "cripple" (an attack-speed slow) has nothing to bind to: this
+ * game has no attack-speed stat (see `docs/abilities/malphite/e.json`
+ * adaptation notes). It becomes a movement Slow instead, consistent with the
+ * rest of Malphite's kit already doing exactly that on Q.
+ */
+export const COOLDOWN_MS = 7_000;
+export const MANA_COST = 50;
+export const CAST_TIME_MS = 250;
+// Exported so the suite asserts wiring against the real tuning, not a copy of
+// the numbers — retuning a value should not mean editing a test.
+export const RADIUS = 175;
+export const DAMAGE = 25;
+export const SLOW_PERCENT = 0.3;
+export const SLOW_DURATION_MS = 3_000;
+export const FADE_MS = 450;
+
+type SlamTarget = AttackableUnit;
+
+export default class Malphite_E extends Spell {
+  image = AssetManager.get('spell_malphite_e');
+  name = 'Ground Slam (Malphite_E)';
+  description =
+    `Malphite đập tay xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch trong bán kính <span>${RADIUS}px</span> quanh mình và <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
+  coolDown = COOLDOWN_MS;
+  manaCost = MANA_COST;
+
+  radius = RADIUS;
+  damage = DAMAGE;
+  slowPercent = SLOW_PERCENT;
+  slowDuration = SLOW_DURATION_MS;
+
+  get castSpec(): Readonly<CastSpec> {
+    return {
+      activation: 'PRESS',
+      targeting: 'SELF',
+      castTimeMs: CAST_TIME_MS,
+      resource: { commitAt: 'start', refundOn: ['DEATH', 'SILENCE', 'STUN'] },
+      cooldown: { startAt: 'release', durationMs: this.coolDown },
+    };
+  }
+
+  onSpellCast(_context: CastContext): void {
+    const slam = new Malphite_E_Object(this.owner);
+    slam.radius = this.radius;
+    slam.damage = this.damage;
+    slam.slowPercent = this.slowPercent;
+    slam.slowDuration = this.slowDuration;
+    this.game.objectManager.addObject(slam);
+  }
+
+  onCancel(_context: CastContext, _reason: CancelReason): void {
+    // Half-refund on the imported cancel set, matching Varus Q/Pantheon Q.
+    this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
+  }
+
+  drawPreview(): void {
+    super.drawPreview(this.radius);
+  }
+}
+
+/** The slam itself: one instant burst of damage and slow, then a fading shockwave. */
+export class Malphite_E_Object extends SpellObject {
+  position = this.owner.position.copy();
+  radius = RADIUS;
+  damage = DAMAGE;
+  slowPercent = SLOW_PERCENT;
+  slowDuration = SLOW_DURATION_MS;
+
+  age = 0;
+  lifeTime = FADE_MS;
+  hasDealtDamage = false;
+
+  _rocks: { a: number; speed: number; size: number }[] = [];
+
+  onAdded(): void {
+    for (let i = 0; i < 10; i++) {
+      this._rocks.push({
+        a: (i / 10) * TWO_PI + (i % 2) * 0.15,
+        speed: 0.7 + (i % 4) * 0.18,
+        size: 6 + (i % 3) * 3,
+      });
+    }
+  }
+
+  update(): void {
+    if (!this.hasDealtDamage) {
+      this.hasDealtDamage = true;
+
+      const enemies = this.game.objectManager.queryObjects({
+        area: new Circle({ x: this.position.x, y: this.position.y, r: this.radius }),
+        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      });
+
+      for (const enemy of enemies as SlamTarget[]) {
+        if (Math.hypot(enemy.position.x - this.position.x, enemy.position.y - this.position.y) >
+          this.radius + enemy.collisionRadius) {
+          continue;
+        }
+
+        enemy.takeDamage(this.damage, this.owner);
+
+        const slow = new Slow(this.slowDuration, this.owner, enemy);
+        slow.percent = this.slowPercent;
+        // Its own pool: Q's shard already applies a Slow, and the two should
+        // not renew or evict each other's instance.
+        slow.stackId = 'malphite_e_cripple';
+        enemy.addBuff(slow);
+      }
+    }
+
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw(): void {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const flash = 1 - constrain(this.age / 150, 0, 1);
+    const ringT = constrain(this.age / 260, 0, 1);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // impact flash at the moment of landing
+    if (flash > 0) {
+      blendMode(ADD);
+      noStroke();
+      fill(210, 195, 235, 160 * flash);
+      circle(0, 0, this.radius * 0.9 * flash + this.radius * 0.3);
+      blendMode(BLEND);
+    }
+
+    // the actual hit area, filled so the reach of the slam is unmistakable
+    noStroke();
+    fill(150, 140, 175, 60 * fade);
+    circle(0, 0, this.radius * 2);
+
+    // shockwave ring racing out to the true radius, then holding while it fades
+    noFill();
+    stroke(60, 52, 78, 210 * fade);
+    strokeWeight(7 * (1 - ringT) + 2);
+    circle(0, 0, this.radius * 2 * (0.3 + ringT * 0.7));
+    stroke(226, 218, 245, 220 * fade);
+    strokeWeight(2.5);
+    circle(0, 0, this.radius * 2 * (0.3 + ringT * 0.7));
+
+    // ground cracks radiating from the impact point
+    stroke(40, 34, 54, 200 * fade);
+    strokeWeight(2.5 * fade + 1);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * TWO_PI + 0.3;
+      const reach = this.radius * (0.35 + 0.5 * ringT);
+      const wobble = sin(i * 3.7) * this.radius * 0.08;
+      line(0, 0, cos(a) * reach + wobble, sin(a) * reach - wobble);
+    }
+
+    // rock debris thrown outward from the slam
+    stroke(30, 26, 42, 220 * fade);
+    strokeWeight(2);
+    fill(140, 130, 168, 230 * fade);
+    for (const rock of this._rocks) {
+      const d = this.radius * 0.15 + this.age * rock.speed * 0.4;
+      const rx = cos(rock.a) * d;
+      const ry = sin(rock.a) * d * 0.6 - t * 14;
+      push();
+      translate(rx, ry);
+      rotate(rock.a + this.age / 120);
+      triangle(0, -rock.size, rock.size * 0.8, rock.size * 0.6, -rock.size * 0.8, rock.size * 0.6);
+      pop();
+    }
+
+    pop();
+  }
+
+  // the shockwave and debris both reach out to the true radius
+  getDisplayBoundingBox(): Rectangle {
+    const r = this.radius + 30;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}

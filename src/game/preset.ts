@@ -121,7 +121,7 @@ export const SpellGroups: {
     name: 'Malphite',
     image: 'champ_malphite',
     background: 'champ_background_malphite',
-    spells: [AllSpells.Malphite_Q, AllSpells.Malphite_W, AllSpells.Malphite_R],
+    spells: [AllSpells.Malphite_Q, AllSpells.Malphite_W, AllSpells.Malphite_E, AllSpells.Malphite_R],
   },
   {
     name: 'Olaf',
