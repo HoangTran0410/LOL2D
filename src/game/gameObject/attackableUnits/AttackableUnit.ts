@@ -124,7 +124,16 @@ export default class AttackableUnit extends GameObject {
     if (alpha < 255) tint(255, alpha);
     noStroke();
     fill(240, alpha);
+
+    // Avatars arrive in two shapes: pre-cut circles and raw square portraits from
+    // the wiki importer. Clipping here makes every avatar round, so new art does
+    // not have to be cut to a circle before it can be used.
+    drawingContext.save();
+    drawingContext.beginPath();
+    drawingContext.arc(pos.x, pos.y, size / 2, 0, TWO_PI);
+    drawingContext.clip();
     image(AssetManager.renderable(this.avatar), pos.x, pos.y, size, size);
+    drawingContext.restore();
 
     stroke(this.isAllied ? [0, 255, 0, alpha] : [255, 0, 0, alpha]);
     strokeWeight(2);
