@@ -123,3 +123,15 @@ Filter on `attacker === this.owner`: the event is global. Unsubscribe in `onCanc
 An attack only reaches `ON_ATTACK_HIT` if it actually landed, so nothing fires when the victim died, went untargetable, or left reach in the meantime — a passive never has to re-check any of that.
 
 `Stats` carries `attackDamage`, `attackSpeed` (attacks per second, capped at `MAX_ATTACK_SPEED`) and `attackRange`. Buff a swing by adding a `StatsModifier` to those, not by editing the controller. `StatusFlags.Disarmed` is the way to stop one.
+
+## 9. The basic attack is itself a spell
+
+`src/game/gameObject/spells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `willDraw`) and hands it to `BasicAttackController.order()`. Right click still orders directly, and the slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
+
+Three consequences for a new spell:
+
+- **Casting cancels a standing attack order.** `Spell.press` clears it on the accepted branch. A spell that must not — because casting it *is* the order — overrides `cancelsAttackOrder`.
+- **An attack order is dropped by crowd control**, not paused: `BasicAttackController` ends it whenever `canAttack` goes false, with `lastEnd` set to `'DISABLED'`.
+- **`cooldownLocksOut` splits a wait from a rhythm** in the HUD. Leave it alone unless the countdown runs on its own the way the swing timer does.
+
+A champion-specific attack is a subclass of `BasicAttack` in that champion's preset. It must still only issue an order: `landBasicAttack` is the one place a basic attack becomes damage and the only thing that emits `ON_ATTACK_HIT`, so a spell that applies its own damage silently switches every on-hit passive off for that route.
