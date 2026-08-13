@@ -242,6 +242,7 @@
 
 .spell-info .costs {
   gap: 8px;
+  flex-direction: column;
   flex-shrink: 0;
 }
 

@@ -160,9 +160,9 @@ export default class InGameHUD {
           const bots = this.game.objectManager.objects.filter((o: any) => o instanceof AIChampion);
 
           if (this.oneForAll) {
-            this.game.player.replaceSpells(this.game.player.spells.map(
-              () => new spell.spellClass(toRaw(this.game.player))
-            ));
+            this.game.player.replaceSpells(
+              this.game.player.spells.map(() => new spell.spellClass(toRaw(this.game.player)))
+            );
             bots.forEach((bot: any) => {
               bot._respawnWithNewPreset = false;
               bot.replaceSpells(bot.spells.map(() => new spell.spellClass(toRaw(bot))));
@@ -196,8 +196,7 @@ export default class InGameHUD {
           if (this.showSpellsPicker) {
             this.loadSpellPickerAssets();
             this.game.pause();
-          }
-          else this.game.unpause();
+          } else this.game.unpause();
 
           this.spellHover = null;
         },
@@ -269,8 +268,8 @@ export default class InGameHUD {
                 <h4>{{spellHover.name}}</h4>
               </div>
               <div class="costs">
-                <span v-if="spellHover.manaCost > 0" class="mana">{{spellHover.manaCost}} mana</span>
                 <span>{{spellHover.coolDown/1000}}s</span>
+                <span v-if="spellHover.manaCost > 0" class="mana">{{spellHover.manaCost}} mana</span>
               </div>
             </div>
             <p class="body" v-html="spellHover.description"></p>
@@ -414,8 +413,10 @@ export default class InGameHUD {
     this.vueInstance.stats.maxHealth = ~~maxHealth?.value;
     this.vueInstance.stats.mana = ~~mana?.value;
     this.vueInstance.stats.maxMana = ~~maxMana?.value;
-    this.vueInstance.stats.healthPercent = Math.min((health?.value as number) / maxHealth?.value, 1) * 100;
-    this.vueInstance.stats.manaPercent = Math.min((mana?.value as number) / maxMana?.value, 1) * 100;
+    this.vueInstance.stats.healthPercent =
+      Math.min((health?.value as number) / maxHealth?.value, 1) * 100;
+    this.vueInstance.stats.manaPercent =
+      Math.min((mana?.value as number) / maxMana?.value, 1) * 100;
 
     const shield = player.shieldAmount ?? 0;
     const shieldPercent = Math.min(shield / (maxHealth?.value || 1), 1) * 100;

@@ -39,7 +39,7 @@ export const MinionPresets: Record<MinionKind, MinionPresetData> = {
     speed: 2.6,
     size: 34,
     health: 140,
-    damage: 9,
+    damage: 5,
     attackInterval: 1_100,
     attackRange: 40,
     aggroRange: 300,
@@ -50,7 +50,7 @@ export const MinionPresets: Record<MinionKind, MinionPresetData> = {
     speed: 2.6,
     size: 30,
     health: 90,
-    damage: 13,
+    damage: 3,
     attackInterval: 1_500,
     attackRange: 280,
     aggroRange: 340,
@@ -196,8 +196,7 @@ export default class Minion extends AttackableUnit {
     }
 
     const reached =
-      Math.hypot(this.position.x - waypoint.x, this.position.y - waypoint.y) <=
-      WAYPOINT_TOLERANCE;
+      Math.hypot(this.position.x - waypoint.x, this.position.y - waypoint.y) <= WAYPOINT_TOLERANCE;
     if (reached && this.waypointIndex < this.waypoints.length - 1) {
       this.waypointIndex += 1;
     }
@@ -220,9 +219,7 @@ export default class Minion extends AttackableUnit {
     // surface to surface, otherwise a 40px reach can never satisfy its own check
     // against two 34px bodies standing next to each other
     const reach =
-      this.attackRange +
-      this.stats.size.value / 2 +
-      (target.stats?.size?.value ?? 0) / 2;
+      this.attackRange + this.stats.size.value / 2 + (target.stats?.size?.value ?? 0) / 2;
     const distance = p5.Vector.dist(this.position, target.position);
 
     if (distance > reach) {
@@ -403,10 +400,7 @@ export default class Minion extends AttackableUnit {
     const h = 4;
     const x = pos.x - w / 2;
     const y = pos.y - size * 0.72 - h;
-    const percent = Math.max(
-      0,
-      Math.min(1, this.stats.health.value / this.stats.maxHealth.value)
-    );
+    const percent = Math.max(0, Math.min(1, this.stats.health.value / this.stats.maxHealth.value));
 
     push();
     noStroke();
