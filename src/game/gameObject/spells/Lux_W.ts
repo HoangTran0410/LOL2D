@@ -41,7 +41,8 @@ export class Lux_W_Object extends MissileSpellObject {
   // the wand turns around at max range instead of dying there
   removeOnArrive = false;
 
-  shieldAmount = 60;
+  // A champion pool is 100 health, so a shield is sized as a share of that.
+  shieldAmount = 20;
   shieldDuration = 3000;
 
   /** Cleared on the turnaround, so each ally can be shielded once per leg. */
@@ -98,6 +99,8 @@ export class Lux_W_Object extends MissileSpellObject {
       const shield = new Shield(this.shieldDuration, this.owner, ally);
       shield.amount = this.shieldAmount;
       shield.color = [255, 225, 140];
+      // own pool: otherwise it stacks with any other bare Shield on the ally
+      shield.stackId = 'lux_w_shield';
       shield.image = AssetManager.get('spell_lux_w');
       ally.addBuff(shield);
 

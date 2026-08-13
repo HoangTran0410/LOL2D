@@ -24,7 +24,8 @@ export default class Morgana_E extends Spell {
   manaCost = 40;
 
   range = 500;
-  shieldAmount = 90;
+  // A champion pool is 100 health, so a shield is sized as a share of that.
+  shieldAmount = 30;
   shieldTime = 5000;
 
   onSpellCast() {

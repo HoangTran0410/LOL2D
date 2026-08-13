@@ -9,12 +9,13 @@ export default class Malphite_W extends Spell {
   image = AssetManager.get('spell_malphite_w');
   name = 'Sức Mạnh Đá Tảng (Malphite_W)';
   description =
-    'Malphite phình to lớp vỏ đá của mình trong <span class="time">4 giây</span>, nhận <span class="buff">Khiên hấp thụ 80 sát thương</span> và tăng kích thước cơ thể';
+    'Malphite phình to lớp vỏ đá của mình trong <span class="time">4 giây</span>, nhận <span class="buff">Khiên hấp thụ 25 sát thương</span> và tăng kích thước cơ thể';
   coolDown = 10000;
   manaCost = 40;
 
   duration = 4000;
-  shieldAmount = 80;
+  // A champion pool is 100 health, so a shield is sized as a share of that.
+  shieldAmount = 25;
   sizeBonus = 10;
 
   onSpellCast() {
@@ -22,6 +23,8 @@ export default class Malphite_W extends Spell {
     shieldBuff.image = this.image;
     shieldBuff.amount = this.shieldAmount;
     shieldBuff.color = [180, 170, 205];
+    // Without its own id this shares one stack pool with every other bare Shield
+    shieldBuff.stackId = 'malphite_w_shield';
     this.owner.addBuff(shieldBuff);
 
     const bulkBuff = new StatAmp(this.duration, this.owner, this.owner);

@@ -40,7 +40,8 @@ export default class LeeSin_W extends Spell {
 
   range = 400;
   dashSpeed = 14;
-  shieldAmount = 70;
+  // A champion pool is 100 health, so a shield is sized as a share of that.
+  shieldAmount = 22;
   shieldDuration = 3000;
 
   /** How long Iron Will stays available after Safeguard, like the real 3s window. */
