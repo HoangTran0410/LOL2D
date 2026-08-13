@@ -100,3 +100,26 @@ npm run verify
 ```
 
 `verify` checks generated assets, imported abilities, both TypeScript boundaries, every Vitest test, and the production build.
+
+## 8. Hook an on-hit passive onto basic attacks
+
+An ability that triggers off basic attacks (Teemo's Toxic Shot, lifesteal, an attack-speed stack) subscribes to the event, it does not reimplement the swing. Both events come from `src/game/combat/`:
+
+- `EventType.ON_ATTACK` fires when a swing starts. Payload is the attacking unit, nothing else. Use it to react to the commitment — Janna's ultimate breaks its channel on it.
+- `EventType.ON_ATTACK_HIT` fires once per landed attack, after the damage applied. Payload is `BasicAttackHit` — `{ attacker, victim, damage, ranged }`.
+
+```ts
+this.stopWatching = this.game.eventManager.on(
+  EventType.ON_ATTACK_HIT,
+  ({ attacker, victim, damage }: BasicAttackHit) => {
+    if (attacker !== this.owner) return;
+    victim.takeDamage(damage * 0.5, this.owner);
+  }
+);
+```
+
+Filter on `attacker === this.owner`: the event is global. Unsubscribe in `onCancel`, `onComplete`, `deactivate` and `onRemoved`, like every other listener a spell owns.
+
+An attack only reaches `ON_ATTACK_HIT` if it actually landed, so nothing fires when the victim died, went untargetable, or left reach in the meantime — a passive never has to re-check any of that.
+
+`Stats` carries `attackDamage`, `attackSpeed` (attacks per second, capped at `MAX_ATTACK_SPEED`) and `attackRange`. Buff a swing by adding a `StatsModifier` to those, not by editing the controller. `StatusFlags.Disarmed` is the way to stop one.
