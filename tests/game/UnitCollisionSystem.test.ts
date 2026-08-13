@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Rectangle } from '../../src/libs/quadtree';
 import AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Minion from '../../src/game/gameObject/attackableUnits/Minion';
 import Monster from '../../src/game/gameObject/attackableUnits/Monster';
 import Turret from '../../src/game/gameObject/structures/Turret';
+import TeamId from '../../src/game/enums/TeamId';
+import { Lane } from '../../src/game/lanes';
 import ObjectManager from '../../src/game/managers/ObjectManager';
 import UnitCollisionSystem from '../../src/game/managers/UnitCollisionSystem';
 import type { GameObjectRuntimeContext } from '../../src/game/gameObject/GameObject';
@@ -319,5 +322,34 @@ describe('unit body separation', () => {
     manager.update();
     expect(left.position.x).toBeLessThan(700);
     expect(right.position.x).toBeGreaterThan(715);
+  });
+
+  // The separation pass was written against a tree that had no Minion class, so
+  // nothing in it names one. Minions get solid bodies by inheriting the defaults
+  // — which is the point of putting them on AttackableUnit, and worth pinning
+  // down, because a wave is where bodies piling up is most visible.
+  it('gives lane minions solid bodies without naming them', () => {
+    const game = createGame();
+    const wave = [Lane.TOP, Lane.MID].map((lane, index) =>
+      new Minion({
+        game,
+        teamId: TeamId.BLUE,
+        lane,
+        waypoints: [{ x: 0, y: 0 }, { x: 400, y: 0 }],
+        position: createVector(600 + index * 8, 600),
+      } as ConstructorParameters<typeof Minion>[0])
+    );
+
+    for (const minion of wave) {
+      expect(minion.collidesWithUnits).toBe(true);
+      expect(minion.bodyRadius).toBeGreaterThan(0);
+      expect(minion.isImmovable).toBe(false);
+    }
+
+    const gap = () => Math.abs(wave[0].position.x - wave[1].position.x);
+    const before = gap();
+    new UnitCollisionSystem().resolve(wave);
+
+    expect(gap()).toBeGreaterThan(before);
   });
 });
