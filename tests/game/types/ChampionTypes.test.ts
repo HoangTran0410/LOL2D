@@ -258,7 +258,10 @@ describe('champion and direct-subclass type boundary', () => {
     const drawUnit = vi.spyOn(AttackableUnit.prototype, 'draw').mockImplementation(() => {
       order.push('unit');
     });
-    champion.spells = [{ drawVfx: () => order.push('vfx') }] as Spell[];
+    class OverlaySpell extends Spell {
+      drawVfx(): void { order.push('vfx'); }
+    }
+    champion.spells = [new OverlaySpell(champion)];
 
     champion.draw();
 
