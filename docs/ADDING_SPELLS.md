@@ -43,6 +43,26 @@ protected get castSpec(): CastSpec {
 }
 ```
 
+### Targeting mode also decides how a thumb aims your spell
+
+The touch controls (`src/game/input/`) read `castSpec.targeting` and nothing
+else to decide what a press-and-drag on your spell's button means:
+
+| Targeting | What a drag does | What a tap does |
+|---|---|---|
+| `DIRECTION` | picks the direction only, fired at the spell's range | fires at the auto-picked target, else the champion's facing |
+| `POINT` | picks direction *and* distance within range | drops on the auto-picked target, else short of the range in front |
+| `UNIT` | picks the body the drag points at, snapping the cursor onto it | takes the auto-picked target, or refuses the cast |
+| `SELF` | nothing — the cursor is the champion | casts |
+
+You get all of that for free. The one thing worth declaring is **how far your
+spell reaches**, because the aim layer draws a telegraph at that length and
+auto-targets inside it. It looks for `targetingRequest.range`, then a `range`
+field, then `castRange`, and falls back to `DEFAULT_TOUCH_AIM_RANGE` (600) —
+which is a guess, and will be wrong for your spell. A spell that keeps its
+reach as a bare number inside `onSpellCast` gets the guess; one that declares
+it gets a telegraph the player can trust.
+
 ## 3. Define lifecycle policies
 
 The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `COOLDOWN`. Do not assign `state` or `currentCooldown` in migrated spells.
