@@ -43,6 +43,10 @@ import LoadingScene from './scenes/LoadingScene';
   // holding global data
   mgr.gameData = {};
 
+  // Dev-only handle so end-to-end tests can reach the live scene and game.
+  // Stripped from production builds by Vite's import.meta.env.DEV constant.
+  if (import.meta.env.DEV) (window as unknown as Record<string, unknown>).__lol2d = mgr;
+
   // open loading scene
   mgr.showScene(LoadingScene);
 };
