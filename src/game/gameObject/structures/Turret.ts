@@ -3,6 +3,7 @@ import MissileSpellObject from '../MissileSpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import type { AttackableUnitOptions } from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
+import Minion from '../attackableUnits/Minion';
 import TrailSystem from '../helpers/TrailSystem';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
@@ -40,13 +41,17 @@ export interface TurretOptions {
 }
 
 /**
- * A neutral hazard, not a team building: it shoots whichever champion is closest
- * inside `attackRange`, whoever that is. Destroying one opens the ground around
- * it up for `rebuildTime`, then it comes back at full health.
+ * A team building. It carries the TeamId of the base it defends — `turret1` in
+ * summoner_map.json is the blue row, `turret2` the red one — and shoots the
+ * nearest hostile thing inside `attackRange`, preferring minions over champions
+ * the way a real turret does. Destroying one opens the ground around it up for
+ * `rebuildTime`, then it rebuilds where it stood, at full health.
  *
- * The game has no team model (every unit gets its own uuid teamId), so "neutral"
- * costs nothing here — `canTakeDamageFromTeam(this.teamId)` already excludes
- * nothing but the turret itself.
+ * Champions are still free-for-all, each on its own uuid teamId, so every
+ * champion is hostile to both turret rows. That falls out of
+ * `canTakeDamageFromTeam(this.teamId)` on its own and needs no special case;
+ * what the shared team ids buy is that a turret no longer shoots its own side's
+ * minions.
  */
 export default class Turret extends AttackableUnit {
   /** Above plain units, below champions. */
@@ -62,7 +67,7 @@ export default class Turret extends AttackableUnit {
   repairDelay: number;
   repairRate: number;
 
-  target: Champion | null = null;
+  target: AttackableUnit | null = null;
   _attackCooldown = 0;
   /** ms since the last hit taken — gates self-repair. */
   _sinceDamaged = Infinity;
@@ -130,7 +135,15 @@ export default class Turret extends AttackableUnit {
     }
   }
 
-  findTarget(): Champion | null {
+  /**
+   * Nearest hostile minion, else nearest hostile champion. Minions come first
+   * because that is what makes a turret a lane obstacle rather than a champion
+   * tax: a wave under an enemy turret soaks the shots while its champion pushes.
+   *
+   * Still champions and minions only — a turret next to a jungle camp would
+   * otherwise farm it forever, and one next to another turret would shoot that.
+   */
+  findTarget(): AttackableUnit | null {
     const found = this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.position.x,
@@ -138,25 +151,33 @@ export default class Turret extends AttackableUnit {
         r: this.attackRange,
       }),
       filters: [
-        // champions only: a turret next to a camp would otherwise farm the jungle
-        PredefinedFilters.type(Champion),
+        PredefinedFilters.includeTypes([Champion, Minion]),
         PredefinedFilters.canTakeDamageFromTeam(this.teamId),
       ],
     });
 
-    let nearest = null;
-    let nearestDist = Infinity;
-    for (const c of found) {
-      const d = p5.Vector.dist(this.position, c.position);
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearest = c;
+    let nearestMinion: AttackableUnit | null = null;
+    let nearestMinionDist = Infinity;
+    let nearestChampion: AttackableUnit | null = null;
+    let nearestChampionDist = Infinity;
+
+    for (const unit of found) {
+      const d = p5.Vector.dist(this.position, unit.position);
+      if (unit instanceof Minion) {
+        if (d < nearestMinionDist) {
+          nearestMinionDist = d;
+          nearestMinion = unit;
+        }
+      } else if (d < nearestChampionDist) {
+        nearestChampionDist = d;
+        nearestChampion = unit;
       }
     }
-    return nearest;
+
+    return nearestMinion ?? nearestChampion;
   }
 
-  fireAt(target: Champion) {
+  fireAt(target: AttackableUnit) {
     const bolt = new TurretBolt(this);
     bolt.target = target;
     bolt.damage = this.damage;
@@ -328,7 +349,7 @@ export class TurretBolt extends MissileSpellObject {
   maxHitCount = 0;
   removeOnArrive = true;
   damage = 12;
-  target: Champion | null = null;
+  target: AttackableUnit | null = null;
   /** Fizzles if it somehow never arrives. */
   _life = 4000;
 

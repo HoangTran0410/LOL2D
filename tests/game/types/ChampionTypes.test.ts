@@ -151,7 +151,8 @@ describe('champion and direct-subclass type boundary', () => {
     expect(turret.target).toBeNull();
     expect(game.objectManager._objectToBeAdd[0]).toBeInstanceOf(TurretBolt);
     expectTypeOf(monster.targetLock).toEqualTypeOf<Champion | null>();
-    expectTypeOf(turret.target).toEqualTypeOf<Champion | null>();
+    // a turret is a team building now: it shoots minions as well as champions
+    expectTypeOf(turret.target).toEqualTypeOf<AttackableUnit | null>();
   });
 
   it('selects the nearest valid champion and resets monster and turret targets after loss', () => {
