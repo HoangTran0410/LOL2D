@@ -35,6 +35,8 @@ export interface TurretOptions {
   game: AttackableUnitOptions['game'];
   position?: p5.Vector;
   preset?: TurretPresetData;
+  /** The base this turret defends, from TeamId. */
+  teamId?: string;
 }
 
 /**
@@ -76,8 +78,8 @@ export default class Turret extends AttackableUnit {
    */
   _anchor: p5.Vector;
 
-  constructor({ game, position, preset = DEFAULT_TURRET_PRESET }: TurretOptions) {
-    super({ game, position, visionRadius: 0 });
+  constructor({ game, position, preset = DEFAULT_TURRET_PRESET, teamId }: TurretOptions) {
+    super({ game, position, visionRadius: 0, teamId });
 
     this.stats.size.baseValue = preset.size;
     this.stats.speed.baseValue = 0;

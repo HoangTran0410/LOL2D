@@ -1,5 +1,6 @@
 import * as AllSpells from './gameObject/spells/index';
 import AssetManager, { type AssetKey } from '../managers/AssetManager';
+import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
@@ -483,29 +484,50 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
  * The two spawn platforms, in the corners the map's own turret rows point at.
  * Coordinates were picked by scanning the wall polygons in summoner_map.json for
  * the roomiest open spot in each base — both sit ~260px clear of any wall.
+ *
+ * Order matters: index 0 is the bottom-left base and belongs to TeamId.BLUE,
+ * index 1 is the top-right base and belongs to TeamId.RED. Game.spawnFountains()
+ * reads the team straight off this index, and the minion spawner reads it back
+ * off the fountain.
  */
 export const FountainPreset: FountainPresetData[] = [
-  { name: 'Bệ Đá Cổ', x: 400, y: 6075, r: 190 },
-  { name: 'Bệ Đá Cổ', x: 6100, y: 375, r: 190 },
+  { name: 'Bệ Đá Cổ', x: 400, y: 6075, r: 190, teamId: TeamId.BLUE },
+  { name: 'Bệ Đá Cổ', x: 6100, y: 375, r: 190, teamId: TeamId.RED },
 ];
+
+export interface TurretPosition {
+  x: number;
+  y: number;
+  teamId: string;
+}
 
 /**
  * summoner_map.json already ships the two turret rows (`turret1`/`turret2`) as
  * flat [x, y] points — 11 per side, all on open ground at lane chokepoints.
  * They were never read by anything; TerrainMap used to try to parse them as
  * polygons and produced NaN obstacles.
+ *
+ * `turret1` is the bottom-left row and `turret2` the top-right one, so the two
+ * keys already encode which base each turret defends. This used to flatten both
+ * into one list and throw that away, which was fine while turrets were neutral
+ * hazards and is not now that they are team buildings.
  */
-export const getTurretPositions = (): { x: number; y: number }[] => {
+const TURRET_ROW_TEAMS: { key: string; teamId: string }[] = [
+  { key: 'turret1', teamId: TeamId.BLUE },
+  { key: 'turret2', teamId: TeamId.RED },
+];
+
+export const getTurretPositions = (): TurretPosition[] => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapData: any = AssetManager.get('json_summoner_map').data;
-  const positions: { x: number; y: number }[] = [];
+  const positions: TurretPosition[] = [];
 
-  for (const key of ['turret1', 'turret2']) {
+  for (const { key, teamId } of TURRET_ROW_TEAMS) {
     const points = mapData?.[key];
     if (!Array.isArray(points)) continue;
     for (const p of points) {
       if (Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1])) {
-        positions.push({ x: p[0], y: p[1] });
+        positions.push({ x: p[0], y: p[1], teamId });
       }
     }
   }

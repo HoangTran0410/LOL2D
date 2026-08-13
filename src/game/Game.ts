@@ -109,8 +109,8 @@ export default class Game {
   }
 
   spawnTurrets() {
-    for (const { x, y } of getTurretPositions()) {
-      const turret = new Turret({ game: this, position: createVector(x, y) });
+    for (const { x, y, teamId } of getTurretPositions()) {
+      const turret = new Turret({ game: this, position: createVector(x, y), teamId });
       this.turrets.push(turret);
       this.objectManager.addObject(turret);
     }

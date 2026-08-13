@@ -10,6 +10,8 @@ export interface FountainPresetData {
   y: number;
   /** Healing radius, also the drawn platform radius. */
   r: number;
+  /** Which base this platform is, from TeamId. Its minions inherit it. */
+  teamId?: string;
   /** ms between restore ticks. */
   tickInterval?: number;
   /** Fraction of max health restored per tick. */
@@ -32,6 +34,10 @@ interface Mote {
  *
  * Deliberately a plain GameObject, not an AttackableUnit: it has no health, it
  * cannot be attacked, and FogOfWar's willDraw reset only touches units.
+ *
+ * It carries its base's TeamId so the minion spawner can ask a fountain which
+ * side it is, but it still heals whichever champion stands on it — champions are
+ * free-for-all and a platform is a place to retreat to, not a team perk.
  */
 export default class Fountain extends GameObject {
   declare game: GameObjectRuntimeContext;
@@ -50,7 +56,12 @@ export default class Fountain extends GameObject {
   _moteCooldown = 0;
 
   constructor({ game, preset }: { game: GameObjectRuntimeContext; preset: FountainPresetData }) {
-    super({ game, position: createVector(preset.x, preset.y), visionRadius: 0 });
+    super({
+      game,
+      position: createVector(preset.x, preset.y),
+      visionRadius: 0,
+      teamId: preset.teamId,
+    });
 
     this.name = preset.name;
     this.radius = preset.r;
