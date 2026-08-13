@@ -27,6 +27,7 @@ class Janna_R_Knockback extends Dash {
   statusFlagsToEnable = StatusFlags.Immovable | StatusFlags.Silenced;
 
   onActivate(): void {
+    this.targetUnit.markDisplaced?.();
     this.targetUnit.stopMovement?.();
   }
 

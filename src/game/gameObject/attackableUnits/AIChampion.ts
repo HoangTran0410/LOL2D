@@ -5,6 +5,7 @@ import { uuidv4 } from '../../../utils';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type Spell from '../Spell';
 import type { CastContext } from '../../spell/runtime/types';
+import type { Vec2 } from '../../spell/runtime/types';
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -84,8 +85,9 @@ export default class AIChampion extends Champion {
   }
 
   private createSpellContext(spell: Spell): CastContext | undefined {
+    const cursorWorld = this.cursorForSpell(spell);
     if (typeof this.game.createSpellContext === 'function') {
-      return this.game.createSpellContext(spell, this, this.destination);
+      return cursorWorld ? this.game.createSpellContext(spell, this, cursorWorld) : undefined;
     }
     const result = TargetResolver.resolve(spell.castSpec.targeting, {
       spellId: spell.id,
@@ -94,10 +96,28 @@ export default class AIChampion extends Champion {
       caster: this,
       casterTeamId: this.teamId,
       origin: this.position,
-      cursorWorld: this.destination,
+      cursorWorld: cursorWorld ?? this.destination,
       ...spell.targetingRequest,
     });
     return result.ok ? result.context : undefined;
+  }
+
+  private cursorForSpell(spell: Spell): Vec2 | undefined {
+    if (spell.castSpec.targeting !== 'UNIT') return this.destination;
+    const request = spell.targetingRequest;
+    const candidates = request.queryCandidates?.() ?? this.game.objectManager?.objects ?? [];
+    let nearest: { point: Vec2; distance: number } | undefined;
+
+    for (const candidate of candidates) {
+      const info = request.getTargetInfo?.(candidate);
+      if (!info || request.isTargetable?.(candidate) === false) continue;
+      if (request.targetTeam === 'ENEMY' && info.teamId === this.teamId) continue;
+      if (request.targetTeam === 'ALLY' && info.teamId !== this.teamId) continue;
+      const distance = Math.hypot(info.position.x - this.position.x, info.position.y - this.position.y);
+      if (request.range !== undefined && distance > request.range) continue;
+      if (!nearest || distance < nearest.distance) nearest = { point: info.position, distance };
+    }
+    return nearest?.point;
   }
 
   moveToRandomLocation() {

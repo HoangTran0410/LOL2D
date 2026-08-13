@@ -52,6 +52,8 @@ export default class Spell {
   private ownerSnapshot?: {
     position: { x: number; y: number };
     destination?: { x: number; y: number };
+    movementRevision?: number;
+    displacementRevision?: number;
   };
 
   constructor(owner: any) {
@@ -298,6 +300,17 @@ export default class Spell {
     } else if ((status & StatusFlags.Silenced) !== 0 || !this.owner.canCast) {
       this.runtime.cancel('SILENCE');
     } else if (this.ownerSnapshot) {
+      const hasExplicitMovementSignals =
+        typeof this.owner.movementRevision === 'number' &&
+        typeof this.owner.displacementRevision === 'number';
+      if (hasExplicitMovementSignals) {
+        if (this.owner.displacementRevision !== this.ownerSnapshot.displacementRevision) {
+          this.runtime.cancel('DISPLACEMENT');
+        } else if (this.owner.movementRevision !== this.ownerSnapshot.movementRevision) {
+          this.runtime.cancel('MOVE');
+        }
+        return;
+      }
       const { position, destination } = this.ownerSnapshot;
       const currentPosition = this.owner.position;
       const currentDestination = this.owner.destination;
@@ -325,6 +338,8 @@ export default class Spell {
     this.ownerSnapshot = {
       position: { x: position.x, y: position.y },
       ...(destination ? { destination: { x: destination.x, y: destination.y } } : {}),
+      movementRevision: this.owner.movementRevision,
+      displacementRevision: this.owner.displacementRevision,
     };
   }
 

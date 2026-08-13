@@ -19,6 +19,8 @@ export default class AttackableUnit extends GameObject {
 
   avatar: any;
   destination: p5.Vector;
+  movementRevision = 0;
+  displacementRevision = 0;
   stats: Stats;
   isInsideBush = false;
 
@@ -332,12 +334,18 @@ export default class AttackableUnit extends GameObject {
   }
 
   moveTo(x: number, y: number) {
+    if (this.destination.x !== x || this.destination.y !== y) this.movementRevision += 1;
     this.destination.set(x, y);
   }
 
   teleportTo(x: number, y: number) {
+    this.markDisplaced();
     this.position.set(x, y);
     this.destination.set(x, y);
+  }
+
+  markDisplaced() {
+    this.displacementRevision += 1;
   }
 
   stopMovement() {

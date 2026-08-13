@@ -195,6 +195,46 @@ describe('spell aim integration', () => {
     }
   );
 
+  it('aims an AI UNIT cast at an eligible unit instead of its move destination', () => {
+    const target = {
+      position: new TestVector(100, 0), collisionRadius: 25,
+      teamId: 'blue', targetable: true,
+    };
+    const game = Object.assign(gameWithMouse(), {
+      objectManager: { objects: [target], addObject: vi.fn() },
+      createSpellContext: Game.prototype.createSpellContext,
+    });
+    const ai = new AIChampion({
+      game, position: new TestVector(0, 0) as any, teamId: 'red', preset: { spells: [] },
+    });
+    makeResourcesWritable(ai);
+    ai.destination = new TestVector(0, 500) as any;
+    ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
+    class UnitSpell extends Spell {
+      usedTarget?: unknown;
+      get castSpec() { return {
+        activation: 'PRESS' as const, targeting: 'UNIT' as const,
+        resource: { commitAt: 'start' as const, refundOn: [] },
+        cooldown: { startAt: 'start' as const, durationMs: 0 },
+      }; }
+      get targetingRequest() { return {
+        range: 500, targetTeam: 'ENEMY' as const,
+        getTargetInfo: (candidate: any) => ({
+          position: candidate.position, teamId: candidate.teamId,
+          selectionRadius: candidate.collisionRadius,
+        }),
+      }; }
+      onSpellCast(context: CastContext) { this.usedTarget = context.target; }
+    }
+    const spell = new UnitSpell(ai);
+    ai.spells = [spell];
+    vi.stubGlobal('random', vi.fn(() => 0));
+
+    ai.update();
+
+    expect(spell.usedTarget).toBe(target);
+  });
+
   it('creates player contexts from the actual spell targeting mode', () => {
     const caster = ownerFor(gameWithMouse(new TestVector(100, 0)));
     const target = {

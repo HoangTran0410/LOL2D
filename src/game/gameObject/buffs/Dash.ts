@@ -45,6 +45,7 @@ export default class Dash extends Buff {
   }
 
   onActivate(): void {
+    if (this.sourceUnit !== this.targetUnit) this.targetUnit.markDisplaced?.();
     if (this.stayAtDestination && this.dashDestination) {
       this.targetUnit.moveTo(this.dashDestination.x, this.dashDestination.y);
     }

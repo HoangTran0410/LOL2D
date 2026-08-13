@@ -17,6 +17,7 @@ const owner = () => ({
   game: { eventManager: { emit: vi.fn() }, worldMouse: { x: 10, y: 0 } },
   position: { x: 0, y: 0 }, destination: { x: 0, y: 0 },
   isDead: false, canCast: true, status: StatusFlags.CanCast | StatusFlags.CanMove,
+  movementRevision: 0, displacementRevision: 0,
   stats: new Stats(),
 });
 
@@ -55,6 +56,7 @@ describe('Spell runtime production wiring', () => {
     const spell = new RuntimeSpell(caster);
     spell.press(context(caster));
     caster.destination.x = 25;
+    caster.movementRevision += 1;
     spell.update();
     spell.update();
     expect(spell.cancelled).toEqual(['MOVE']);
@@ -64,7 +66,10 @@ describe('Spell runtime production wiring', () => {
     ['DEATH', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
     ['STUN', (caster: ReturnType<typeof owner>) => { caster.status |= StatusFlags.Stunned; }],
     ['SILENCE', (caster: ReturnType<typeof owner>) => { caster.status |= StatusFlags.Silenced; }],
-    ['DISPLACEMENT', (caster: ReturnType<typeof owner>) => { caster.position.x = 25; }],
+    ['DISPLACEMENT', (caster: ReturnType<typeof owner>) => {
+      caster.position.x = 25;
+      caster.displacementRevision += 1;
+    }],
   ] as const)('routes owner state changes through %s policy once', (reason, interrupt) => {
     const caster = owner();
     const spell = new RuntimeSpell(caster);
