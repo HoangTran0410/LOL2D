@@ -18,9 +18,20 @@ export class TestVector {
     return this;
   }
   dist(value: TestVector) { return Math.hypot(this.x - value.x, this.y - value.y); }
+  heading() { return Math.atan2(this.y, this.x); }
+  normalize() { return this.setMag(1); }
+  lerp(target: TestVector, amount: number) {
+    this.x += (target.x - this.x) * amount;
+    this.y += (target.y - this.y) * amount;
+    return this;
+  }
   static add(a: TestVector, b: TestVector) { return a.copy().add(b); }
   static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
   static dist(a: TestVector, b: TestVector) { return a.dist(b); }
+  static fromAngle(angle: number, length = 1) {
+    return new TestVector(Math.cos(angle) * length, Math.sin(angle) * length);
+  }
+  static random2D() { return new TestVector(1, 0); }
 }
 
 export interface TestGame extends GameObjectRuntimeContext {
@@ -31,6 +42,35 @@ export function installSpellObjectGlobals(): void {
   vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
   vi.stubGlobal('p5', { Vector: TestVector });
   vi.stubGlobal('deltaTime', 16);
+}
+
+/**
+ * The p5 sketch globals a spell object touches while it is being driven — the
+ * maths helpers and constants, not the drawing calls. Layer it on top of
+ * `installSpellObjectGlobals` when a test runs real spell code rather than a
+ * hand-built stub.
+ */
+export function installSketchMathGlobals(): void {
+  vi.stubGlobal('random', (low?: number, high?: number) => {
+    if (low === undefined) return 0.5;
+    if (high === undefined) return low / 2;
+    return (low + high) / 2;
+  });
+  vi.stubGlobal('lerp', (start: number, stop: number, amount: number) =>
+    start + (stop - start) * amount
+  );
+  vi.stubGlobal('constrain', (value: number, low: number, high: number) =>
+    Math.min(Math.max(value, low), high)
+  );
+  vi.stubGlobal('map', (value: number, a: number, b: number, c: number, d: number) =>
+    c + ((value - a) / (b - a)) * (d - c)
+  );
+  vi.stubGlobal('sin', Math.sin);
+  vi.stubGlobal('cos', Math.cos);
+  vi.stubGlobal('PI', Math.PI);
+  vi.stubGlobal('TWO_PI', Math.PI * 2);
+  vi.stubGlobal('HALF_PI', Math.PI / 2);
+  vi.stubGlobal('frameCount', 0);
 }
 
 export function createGame(): TestGame {
