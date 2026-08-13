@@ -20,6 +20,8 @@
     "src/game/gameObject/structures/Fountain.ts",
     "src/game/gameObject/buffs/**/*.ts",
     "src/game/managers/ObjectManager.ts",
+    "src/game/managers/UnitCollisionSystem.ts",
+    "tests/game/UnitCollisionSystem.test.ts",
     "src/game/gameObject/spells/Lux_R.ts",
     "src/game/gameObject/spells/Janna_R.ts",
     "src/game/gameObject/spells/Janna_Q.ts",

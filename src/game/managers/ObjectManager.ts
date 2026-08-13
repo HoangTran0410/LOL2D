@@ -6,6 +6,7 @@ import { Circle, Quadtree, Rectangle } from '../../libs/quadtree';
 import TrailSystem from '../gameObject/helpers/TrailSystem';
 import ParticleSystem from '../gameObject/helpers/ParticleSystem';
 import GameObject from '../gameObject/GameObject';
+import UnitCollisionSystem from './UnitCollisionSystem';
 
 export type QueryArea = Circle | Rectangle;
 export type GameObjectConstructor<T extends GameObject = GameObject> = abstract new (
@@ -133,6 +134,7 @@ export default class ObjectManager {
   _objectsTree!: Quadtree;
   _objectsTreeIsUpdating = false;
   _deadBuffer: number[] = [];
+  unitCollision = new UnitCollisionSystem();
   game: ObjectManagerGameContext;
 
   constructor(game: ObjectManagerGameContext) {
@@ -182,6 +184,14 @@ export default class ObjectManager {
       }
       this._objectToBeAdd = [];
     }
+
+    // Bodies push each other apart once everything has moved, and before the
+    // tree is rebuilt so the tree already reflects the settled positions.
+    // Deliberately upstream of TerrainMap.update(), which Game runs next: terrain
+    // gets the last word, so a unit shoved into a wall by a neighbour is back out
+    // of it inside the same frame. The cost is that a wall push-out can leave two
+    // bodies overlapping for one frame near a wall, which the next frame clears.
+    this.unitCollision.resolve(this.objects);
 
     // update quadtree
     this._objectsTreeIsUpdating = true;

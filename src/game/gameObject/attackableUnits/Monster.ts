@@ -90,6 +90,10 @@ export default class Monster extends AttackableUnit {
     this.stats.healthRegen.baseValue = 0;
     this.stats.visionRadius.baseValue = 0;
 
+    // A camp with no speed of its own (Baron) is scenery: it pushes units off
+    // itself and never budges. One with legs takes its half like everyone else.
+    this.isImmovable = preset.speed === 0;
+
     this.attackRange = preset.attackRange;
     this.reviveTime = preset.reviveTime;
     this.camp = preset.camp;

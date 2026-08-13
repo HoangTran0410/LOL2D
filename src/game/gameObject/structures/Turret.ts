@@ -58,6 +58,11 @@ export default class Turret extends AttackableUnit {
   zIndex = 3.5;
   /** A building the player has seen stays drawn through the fog. */
   alwaysVisible = true;
+  /**
+   * Units bounce off a turret, they never shove it. It re-anchors after its
+   * buffs run each frame, so a body that pushed it would only make it snap back.
+   */
+  isImmovable = true;
 
   name = 'Trụ';
   attackRange: number;

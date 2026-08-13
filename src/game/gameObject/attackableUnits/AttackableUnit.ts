@@ -24,6 +24,15 @@ export interface UnitDeathData {
 
 export type HealSource = GameObject;
 
+/**
+ * Frames a displaced unit is left out of body separation for. Displacements
+ * (Flash, a hook, a knockback) write `position` straight, so a push-out fighting
+ * them reads as a stutter. Two frames covers the frame the displacement landed
+ * on and the one after it, which is enough for the one-shot kind; a dash keeps
+ * itself out for its whole duration through the Ghosted flag instead.
+ */
+export const DISPLACEMENT_GRACE_FRAMES = 2;
+
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
   buffs: Buff[] = [];
@@ -40,6 +49,16 @@ export default class AttackableUnit extends GameObject {
   displacementRevision = 0;
   stats: Stats;
   isInsideBush = false;
+
+  /**
+   * Bodies that push but never get pushed: turrets (anchored, and they rewrite
+   * `position` after their buffs run) and camps that stand on their spot for
+   * good. They hand their half of a separation to the other body.
+   */
+  isImmovable = false;
+
+  /** Frames left in which body separation skips this unit. See markDisplaced(). */
+  _separationGrace = 0;
 
   animatedValues: {
     size: number;
@@ -77,6 +96,10 @@ export default class AttackableUnit extends GameObject {
   }
 
   update() {
+    // ticked before the buffs run, so a displacement applied during this frame's
+    // updateBuffs() still gets its full grace afterwards
+    if (this._separationGrace > 0) this._separationGrace -= 1;
+
     this.updateBuffs();
     this.stats.update();
 
@@ -376,6 +399,7 @@ export default class AttackableUnit extends GameObject {
 
   markDisplaced() {
     this.displacementRevision += 1;
+    this._separationGrace = DISPLACEMENT_GRACE_FRAMES;
   }
 
   stopMovement() {
@@ -418,6 +442,31 @@ export default class AttackableUnit extends GameObject {
     let total = 0;
     for (const buff of this.buffs) total += buff.shieldAmount || 0;
     return total;
+  }
+
+  /**
+   * Body radius for unit-on-unit separation. Deliberately `stats.size`, the same
+   * circle TerrainMap pushes out of walls, rather than the lerped
+   * `animatedValues.size` — a body that grows and shrinks while Cho'Gath eats
+   * would make the separation it causes wobble too.
+   */
+  get bodyRadius(): number {
+    return this.stats.size.value / 2;
+  }
+
+  /**
+   * Whether this unit takes part in body separation at all. Corpses do not, and
+   * neither does a unit that is being displaced: a dash, a hook or a knockback
+   * writes `position` directly and must win, so ghosted units are left out
+   * entirely — they neither push nor get pushed. TerrainMap skips ghosted units
+   * for walls on the same grounds.
+   */
+  get collidesWithUnits(): boolean {
+    return (
+      !this.isDead &&
+      this._separationGrace <= 0 &&
+      !hasFlag(this.stats.actionState, ActionState.IS_GHOSTED)
+    );
   }
 
   /** Grounded units keep walking but cannot use their own movement abilities. */
