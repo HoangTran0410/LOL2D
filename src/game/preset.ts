@@ -133,7 +133,7 @@ export const SpellGroups: {
     name: 'Teemo',
     image: 'champ_teemo',
     background: 'champ_background_teemo',
-    spells: [AllSpells.Teemo_Q, AllSpells.Teemo_R],
+    spells: [AllSpells.Teemo_Q, AllSpells.Teemo_W, AllSpells.Teemo_E, AllSpells.Teemo_R],
   },
   {
     name: 'Veigar',

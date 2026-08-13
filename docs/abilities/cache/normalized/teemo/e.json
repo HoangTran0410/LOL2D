@@ -1,0 +1,56 @@
+{
+  "asset": {
+    "key": "spell_teemo_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Toxic_Shot.png?0cef0",
+    "sha1": "0909bff87f0c8ad92b74e95a9fbcd4df3f0bda75"
+  },
+  "champion": "Teemo",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_teemo_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Toxic_Shot.png?0cef0",
+        "sha1": "0909bff87f0c8ad92b74e95a9fbcd4df3f0bda75"
+      },
+      "fields": {
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Teemo's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to deal <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and inflict <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poison]]</span>.<br/><br/>\n<span class=\"template_sbc\">'''<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] poison</span>:'''</span> The target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every second over 4 seconds. Subsequent inflictions refresh the duration.",
+          "text": "Passive: Teemo's basic attacks are empowered to deal bonus magic damage on-hit and inflict poison.\npoison: The target takes magic damage every second over 4 seconds. Subsequent inflictions refresh the duration."
+        },
+        "description2": {
+          "raw": "''Toxic Shot'' deals 160% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Toxic Shot deals 160% damage against monsters."
+        },
+        "icon": "Toxic Shot.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage On-Hit:'''</span></dt><dd>9 / 23 / 37 / 51 / 65 <span style=\"color:orange; white-space:normal\">(+ 5% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Tick:'''</span></dt><dd>6 / 12 / 18 / 24 / 30 <span style=\"color:orange; white-space:normal\">(+ 2.<small>5</small>% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Total Poison Damage:'''</span></dt><dd>24 / 48 / 72 / 96 / 120 <span style=\"color:orange; white-space:normal\">(+ 10% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Magic Damage On-Hit:9 / 23 / 37 / 51 / 65 (+ 5% bonus AD) (+ 30% AP)\nMagic Damage per Tick:6 / 12 / 18 / 24 / 30 (+ 2.5% bonus AD) (+ 10% AP)Total Poison Damage:24 / 48 / 72 / 96 / 120 (+ 10% bonus AD) (+ 40% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Damage On-Hit:'''</span></dt><dd>14.<small>4</small> / 36.<small>8</small> / 59.<small>2</small> / 81.<small>6</small> / 104 <span style=\"color:orange; white-space:normal\">(+ 8% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 48% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Damage per Tick:'''</span></dt><dd>9.<small>6</small> / 19.<small>2</small> / 28.<small>8</small> / 38.<small>4</small> / 48  <span style=\"color:orange; white-space:normal\">(+ 4% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 16% AP)</span></dd><dt><span class=\"template_lc\">'''Total Monster Poison Damage:'''</span></dt><dd>38.<small>4</small> / 76.<small>8</small> / 115.<small>2</small> / 153.<small>6</small> / 192  <span style=\"color:orange; white-space:normal\">(+ 16% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 64% AP)</span></dd></dl>",
+          "text": "Monster Damage On-Hit:14.4 / 36.8 / 59.2 / 81.6 / 104 (+ 8% bonus AD) (+ 48% AP)\nMonster Damage per Tick:9.6 / 19.2 / 28.8 / 38.4 / 48 (+ 4% bonus AD) (+ 16% AP)Total Monster Poison Damage:38.4 / 76.8 / 115.2 / 153.6 / 192 (+ 16% bonus AD) (+ 64% AP)"
+        },
+        "name": "Toxic Shot",
+        "notes": {
+          "raw": "* ''Toxic Shot'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|damage over time]]</span>, and does not trigger <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span>.\n** Despite this, it is special cased to trigger <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Dark Harvest\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Dark Harvest rune.png|20xpx|link=Dark Harvest|An icon representing Dark Harvest]]</span> <span style=\"word-break: keep-all;\">[[Dark Harvest]]</span></span>, but not <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Cheap Shot\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cheap Shot rune.png|20xpx|link=Cheap Shot|An icon representing Cheap Shot]]</span> <span style=\"word-break: keep-all;\">[[Cheap Shot]]</span></span>, <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Conqueror\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Conqueror rune.png|20xpx|link=Conqueror|An icon representing Conqueror]]</span> <span style=\"word-break: keep-all;\">[[Conqueror]]</span></span>, <span class=\"inline-image label-after buff-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-buff=\"Scorchclaw&#39;s Slash\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Scorchclaw's Slash buff.png|20xpx|border|link=Scorchclaw's Slash|An icon representing the Scorchclaw's Slash neutral buff]]</span> <span style=\"white-space:normal;\">[[Scorchclaw's Slash]]</span></span>, <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Summon Aery\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Summon Aery rune.png|20xpx|link=Summon Aery|An icon representing Summon Aery]]</span> <span style=\"word-break: keep-all;\">[[Summon Aery]]</span></span> and <span class=\"inline-image label-after buff-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-buff=\"Ocean Dragon Soul\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ocean Dragon Soul buff.png|20xpx|border|link=Ocean Dragon Soul|An icon representing the Ocean Dragon Soul neutral buff]]</span> <span style=\"white-space:normal;\">[[Ocean Dragon Soul]]</span></span>.\n* The damage per tick is not updated dynamically based on '''Teemo's''' current ability power.\n* The initial hit from ''Toxic Shot'' will consume <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Manaflow Band\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Manaflow Band rune.png|20xpx|link=Manaflow Band|An icon representing Manaflow Band]]</span> <span style=\"word-break: keep-all;\">[[Manaflow Band]]</span></span> if it is available. \n* The attacks do not affect <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span> nor <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.",
+          "text": "Toxic Shot deals proc damage over time, and does not trigger spell effects.\n* Despite this, it is special cased to trigger Dark Harvest, but not Cheap Shot, Conqueror, Scorchclaw's Slash, Summon Aery and Ocean Dragon Soul.\nThe damage per tick is not updated dynamically based on Teemo's current ability power.\nThe initial hit from Toxic Shot will consume Manaflow Band if it is available.\nThe attacks do not affect structures nor wards."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Toxic Shot"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "219e5aa2671590d449159902016433f078271fda02f7478f22dede86dc56db6f",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Teemo/Toxic_Shot",
+    "revisionId": 4022986,
+    "sourceTimestamp": "2026-05-27T21:16:39Z"
+  }
+}

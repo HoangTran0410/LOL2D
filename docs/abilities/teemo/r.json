@@ -1,0 +1,85 @@
+{
+  "asset": {
+    "key": "spell_teemo_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Noxious_Trap.png?9f6f9",
+    "sha1": "331202c0b6439e3f30e5dacde9df9e3031860bdd"
+  },
+  "champion": "Teemo",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_teemo_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Noxious_Trap.png?9f6f9",
+        "sha1": "331202c0b6439e3f30e5dacde9df9e3031860bdd"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "0.25",
+        "cost": "75 / 65 / 55 / 45 / 35",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Teemo''' tosses a poisonous mushroom to the target location that becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealthed trap\">[[File:Noxious Trap.png|20px|link=Stealth#Stealthed_traps_and_wards|An icon representing the keyword Stealthed trap]] [[:Stealth#Stealthed_traps_and_wards|stealthed]]</span> after arming over 1 second, lasting for up to 5 minutes and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of its surroundings. If the mushroom lands on one that has already been placed, it will bounce forward from the placed mushroom for its cast distance, up to a cap, which can <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"In-flight mushrooms can chain into further bounces if they keep landing on subsequent placed mushrooms\">happen repeatedly</span>.",
+          "text": "Active: Teemo tosses a poisonous mushroom to the target location that becomes stealthed after arming over 1 second, lasting for up to 5 minutes and granting sight of its surroundings. If the mushroom lands on one that has already been placed, it will bounce forward from the placed mushroom for its cast distance, up to a cap, which can happen repeatedly."
+        },
+        "description2": {
+          "raw": "'''Teemo''' periodically [[ammunition|stocks]] a ''Noxious Trap'' charge, up to a maximum amount.",
+          "text": "Teemo periodically stocks a Noxious Trap charge, up to a maximum amount."
+        },
+        "description3": {
+          "raw": "The mushroom will explode upon enemy contact, inflicting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poison]]</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them for 4 seconds, as well as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealing]]</span> them.",
+          "text": "The mushroom will explode upon enemy contact, inflicting poison to nearby enemies and slowing them for 4 seconds, as well as revealing them."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] poison</span>:'''</span> The target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every second over 4 seconds. Subsequent inflictions refresh the duration.",
+          "text": "poison: The target takes magic damage every second over 4 seconds. Subsequent inflictions refresh the duration."
+        },
+        "description5": {
+          "raw": "A mushroom has <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">6 '''maximum''' health</span></span> and can only be damaged by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> basic attacks (2 damage from <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ranged\">[[File:Ranged role.png|20px|link=Ranged|An icon representing the keyword Ranged]] [[:Ranged|ranged]]</span> and 3 from <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Melee\">[[File:Melee role.png|20px|link=Melee|An icon representing the keyword Melee]] [[:Melee|melee]]</span>).",
+          "text": "A mushroom has &nbsp;6 maximum health and can only be damaged by champion basic attacks (2 damage from ranged and 3 from melee)."
+        },
+        "description6": {
+          "raw": "''See [[Teemo#Pets|Pets]] for more details about mushroom traps.''",
+          "text": "See Pets for more details about mushroom traps."
+        },
+        "effectradius": "450",
+        "icon": "Noxious Trap.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bounce Distance Cap:'''</span></dt><dd>350 / 400 / 450 / 500 / 550</dd></dl>",
+          "text": "Bounce Distance Cap:350 / 400 / 450 / 500 / 550"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Charges:'''</span></dt><dd>3 / 3.<small>5</small> / 4 / 4.<small>5</small> / 5</dd></dl>",
+          "text": "Maximum Charges:3 / 3.5 / 4 / 4.5 / 5"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Slow:30 / 35 / 40 / 45 / 50%"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Tick:'''</span></dt><dd>50 / 65.<small>625</small> / 81.<small>25</small> / 96.<small>875</small> / 112.<small>5</small> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 12.<small>5</small>% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>200 / 262.<small>5</small> / 325 / 387.<small>5</small> / 450 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>",
+          "text": "Magic Damage per Tick:50 / 65.625 / 81.25 / 96.875 / 112.5 (+ 12.5% AP)Total Magic Damage:200 / 262.5 / 325 / 387.5 / 450 (+ 50% AP)"
+        },
+        "name": "Noxious Trap",
+        "notes": {
+          "raw": "* ''Noxious Trap'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent area damage\">[[File:Poison Trail.png|20px|link=Damage|An icon representing the keyword Persistent area damage]] [[:Damage|persistent area damage]]</span>, additionally tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Indirect damage\">[[File:Irelia Vanguard's Edge.png|20px|link=Damage|An icon representing the keyword Indirect damage]] [[:Damage|indirect damage]]</span>, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span>.\n* The bounce can occur an indefinite amount of times while '''Teemo''' is alive. If '''Teemo''' dies before ''Noxious Trap'' bounces on another, the trap will disappear.\n* <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Rift ScuttlerSquare.png|20xpx|border|link=Rift Scuttler|An icon representing Rift Scuttler]]</span> <span style=\"white-space:normal;\">[[Rift Scuttler]]</span></span> will not trigger ''Noxious Trap's'' explosion if it is not being attacked.\n* Enemies who step on multiple ''Noxious Traps'' will only refresh the duration of the damage over time and slow.\n* ''Noxious Trap's'' damage is determined when it detonates and not when planted, meaning if '''Teemo's''' <span style=\"white-space:nowrap\">[[File:Ability power icon.svg|15px|link=Ability power]]&nbsp;<span style=\"color:\n#7A6DFF; white-space:normal\">ability power</span></span> changes, the scaling is also altered to affect the active damage of all ''Noxious Traps'' so long as they do not explode.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will prevent the damage over time and slow for all units but will not prevent the detonation itself.",
+          "text": "Noxious Trap deals persistent area damage, additionally tagged as indirect damage, and applies spell effects.\nThe bounce can occur an indefinite amount of times while Teemo is alive. If Teemo dies before Noxious Trap bounces on another, the trap will disappear.\nRift Scuttler will not trigger Noxious Trap's explosion if it is not being attacked.\nEnemies who step on multiple Noxious Traps will only refresh the duration of the damage over time and slow.\nNoxious Trap's damage is determined when it detonates and not when planted, meaning if Teemo's &nbsp;ability power changes, the scaling is also altered to affect the active damage of all Noxious Traps so long as they do not explode.\nSpell shield will prevent the damage over time and slow for all units but will not prevent the detonation itself."
+        },
+        "projectile": true,
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Noxious Trap"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "d81f78aa9a32281c8942d6f4498d333c43def397b62b06b0c0d06de997eb92e8",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Teemo/Noxious_Trap",
+    "revisionId": 4015245,
+    "sourceTimestamp": "2026-05-03T21:15:42Z"
+  }
+}

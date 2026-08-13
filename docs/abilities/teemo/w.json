@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_teemo_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Move_Quick.png?c55c8",
+    "sha1": "79c573432c96c4784d9ba6cd0f90f0a453e2c48e"
+  },
+  "champion": "Teemo",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_teemo_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Move_Quick.png?c55c8",
+        "sha1": "79c573432c96c4784d9ba6cd0f90f0a453e2c48e"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "14",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Teemo''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> after 5 seconds without taking non-<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|over time]]</span> damage from enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turrets\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turrets]]</span>.",
+          "text": "Passive: Teemo gains &nbsp;bonus movement speed after 5 seconds without taking non- over time damage from enemy champions or turrets."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Teemo''' doubles the <span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span> for 3 seconds, preventing it from being removed for the duration.",
+          "text": "Active: Teemo doubles the bonus movement speed for 3 seconds, preventing it from being removed for the duration."
+        },
+        "description3": {
+          "raw": "''Casting Move Quick does not interrupt <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Teemo\" data-ability=\"Guerrilla Warfare\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teemo Guerrilla Warfare.png|20xpx|border|link=Teemo#Guerrilla Warfare|An icon for Teemo's ability Guerrilla Warfare]]</span> <span style=\"white-space:normal;\">[[Teemo#Guerrilla Warfare|Guerrilla Warfare]]</span></span>.''",
+          "text": "Casting Move Quick does not interrupt Guerrilla Warfare."
+        },
+        "icon": "false",
+        "icon2": "Move Quick.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>12 / 16 / 20 / 24 / 28%</dd></dl>",
+          "text": "Bonus Movement Speed:12 / 16 / 20 / 24 / 28%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Enhanced Bonus Movement Speed:'''</span></dt><dd>24 / 32 / 40 / 48 / 56%</dd></dl>",
+          "text": "Enhanced Bonus Movement Speed:24 / 32 / 40 / 48 / 56%"
+        },
+        "name": "Move Quick",
+        "notes": {
+          "raw": "* When ''Move Quick's'' active bonus movement speed ends '''Teemo''' will not regain the passive one if he was damaged during the active's duration.\n*''Move Quick's'' passive will be disabled even if the damage is blocked with a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>.",
+          "text": "When Move Quick's active bonus movement speed ends Teemo will not regain the passive one if he was damaged during the active's duration.\nMove Quick's passive will be disabled even if the damage is blocked with a spell shield."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Move Quick"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "968f60231c38a3e727efa10eeb28b4f39fd1635a90da8060589caf21308b15d3",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Teemo/Move_Quick",
+    "revisionId": 4010102,
+    "sourceTimestamp": "2026-04-18T15:10:43Z"
+  }
+}

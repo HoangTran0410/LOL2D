@@ -76,3 +76,5 @@ export { default as Varus_Q } from './Varus_Q';
 export { default as Pantheon_Q } from './Pantheon_Q';
 export { default as Veigar_W } from './Veigar_W';
 export { default as Veigar_R } from './Veigar_R';
+export { default as Teemo_W } from './Teemo_W';
+export { default as Teemo_E } from './Teemo_E';
