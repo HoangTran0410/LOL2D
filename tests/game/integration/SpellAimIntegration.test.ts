@@ -195,6 +195,75 @@ describe('spell aim integration', () => {
     }
   );
 
+  describe.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
+    'Zed shadow mirroring a %s cast',
+    activation => {
+      class ChargedSpell extends Spell {
+        releases = 0;
+        cancels = 0;
+        get castSpec() {
+          return {
+            activation,
+            targeting: 'DIRECTION' as const,
+            charge: { maxDurationMs: 4000, releaseAtMax: false },
+            resource: { commitAt: 'start' as const, refundOn: [] },
+            cooldown: { startAt: 'end' as const, durationMs: 0 },
+            interrupts: { move: false },
+          };
+        }
+        onRelease() { this.releases += 1; }
+        onCancel() { this.cancels += 1; }
+      }
+
+      const chargingShadow = () => {
+        const game = gameWithMouse();
+        const owner = ownerFor(game);
+        const source = new ChargedSpell(owner);
+        source.press(castContext(owner));
+
+        const clone = new Zed_W_Clone({
+          game,
+          position: new TestVector(5, 5),
+          teamId: 'blue',
+        } as any);
+        makeResourcesWritable(clone);
+        clone.owner = owner;
+        clone.onSomeOnePreCastSpell(source);
+        clone.onAdded();
+        clone.buffs[clone.buffs.length - 1].onReachedDestination();
+
+        const entry = clone._mapSpells[source.id];
+        expect((entry.clone as ChargedSpell).state).toBe('CHARGING');
+        return { clone, entry, source, replay: entry.clone as ChargedSpell };
+      };
+
+      it('holds while the player holds, then fires when the player fires', () => {
+        const { clone, entry, source, replay } = chargingShadow();
+
+        clone.mirrorCharge(entry);
+        expect(replay.releases).toBe(0);
+        expect(replay.state).toBe('CHARGING');
+
+        source.release(source.castContext!);
+        clone.onSomeOnePostCastSpell(source);
+        clone.mirrorCharge(entry);
+
+        expect(replay.releases).toBe(1);
+        expect(replay.cancels).toBe(0);
+      });
+
+      it('fizzles with the player instead of casting on its own', () => {
+        const { clone, entry, source, replay } = chargingShadow();
+
+        source.cancel('MAX_DURATION');
+        clone.mirrorCharge(entry);
+
+        expect(replay.releases).toBe(0);
+        expect(replay.cancels).toBe(1);
+      });
+    }
+  );
+
   it('aims an AI UNIT cast at an eligible unit instead of its move destination', () => {
     const untargetable = {
       position: new TestVector(50, 0), collisionRadius: 25,
@@ -297,7 +366,10 @@ describe('spell aim integration', () => {
     expect(replay.usedContext?.direction.y).toBeCloseTo(Math.SQRT1_2);
 
     const coincidentReplay = new MirroredSpell(clone);
-    clone.pressClone(coincidentReplay, castContext(owner, { x: 5, y: 5 }));
+    clone.pressClone(
+      { clone: coincidentReplay, source: coincidentReplay, sourceReleased: false },
+      castContext(owner, { x: 5, y: 5 })
+    );
     expect(coincidentReplay.usedContext?.direction).toEqual({ x: 0, y: 0 });
   });
 
