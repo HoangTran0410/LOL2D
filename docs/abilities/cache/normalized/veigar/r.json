@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_veigar_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Primordial_Burst.png?b2042",
+    "sha1": "16a0a545de36d75a5346c206873abe40d629c5d5"
+  },
+  "champion": "Veigar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_veigar_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Primordial_Burst.png?b2042",
+        "sha1": "16a0a545de36d75a5346c206873abe40d629c5d5"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 105 / 90 / 75 / 60",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' sends a primordial burst at the target enemy champion that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>, increased by <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target's missing health\" data-displayformula=\"1.5% per 1% of target's '''missing''' health. ''This is capped at 66.66% '''missing''' health.''\" data-bot-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-top-values=\"0;6.67;13.33;20;26.67;33.33;40;46.67;53.33;60;66.67\" data-bot-key=\"%\" data-top-key=\"%\">0% – 100% (based on target's '''missing''' health)</span>[[Category:Debug]]</span>.",
+          "text": "Active: Veigar sends a primordial burst at the target enemy champion that deals magic damage, increased by 0% – 100% (based on target's missing health)Category:Debug."
+        },
+        "icon": "Primordial Burst.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Magic Damage:'''</span></dt><dd>175 / 212.<small>5</small> / 250 / 287.<small>5</small> / 325 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65 / 67.<small>5</small> / 70 / 72.<small>5</small> / 75% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Magic Damage:'''</span></dt><dd>350 / 425 / 500 / 575 / 650 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 130 / 135 / 140 / 145 / 150% AP)</span></dd></dl>",
+          "text": "Minimum Magic Damage:175 / 212.5 / 250 / 287.5 / 325 (+ 65 / 67.5 / 70 / 72.5 / 75% AP)Maximum Magic Damage:350 / 425 / 500 / 575 / 650 (+ 130 / 135 / 140 / 145 / 150% AP)"
+        },
+        "name": "Primordial Burst",
+        "notes": {
+          "raw": "* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "If the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Primordial Burst"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "2169d318e76baf20771072b7d0922c8b38f863d67d2edb7874071a3af96f909e",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Primordial_Burst",
+    "revisionId": 4004085,
+    "sourceTimestamp": "2026-03-31T19:59:12Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Veigar/Dark Matter",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Dark Matter@@icon@@Dark Matter.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' casts down a mass of dark matter that strikes the target location after a <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"1.2 seconds, but rounded up to the next game tick.\">1.<small>221</small> seconds</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"from the start of the cast time\">delay</span>, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area during the delay and afterwards dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.@@description2@@''Dark Matter's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced based on stacks of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span>''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>85 / 140 / 195 / 250 / 305 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70 / 80 / 90 / 100 / 110% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 240@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@60 / 65 / 70 / 75 / 80@@cooldown@@<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"[[File:Phenomenal_Evil_Power.png|20px|link=Veigar#Phenomenal_Evil_Power]] [[Veigar#Phenomenal_Evil_Power|Phenomenal Evil]] stacks\" data-displayformula=\"8 * 0.9^N. ''N&nbsp;=&nbsp;Number of times that 50 Phenomenal Evil stacks are earned.''\" data-bot-values=\"8;7.2;6.48;5.83;5.25;4.72;4.25;3.83;3.44;3.1;2.79;2.51;2.26;2.03;1.83;1.65;1.48;1.33;1.2;...;0\" data-top-values=\"0;50;100;150;200;250;300;350;400;450;500;550;600;650;700;750;800;850;900;...;∞\">8 – 0 (based on [[File:Phenomenal_Evil_Power.png|20px|link=Veigar#Phenomenal_Evil_Power]] [[Veigar#Phenomenal_Evil_Power|Phenomenal Evil]] stacks)</span>@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* The delay starts at the beginning of the cast time.\n** If '''Veigar''' dies during the cast time, ''Dark Matter'' will still successfully fall from the sky.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308710,
+                "revisions": [
+                  {
+                    "parentid": 3958112,
+                    "revid": 3991312,
+                    "timestamp": "2026-02-13T07:25:34Z"
+                  }
+                ],
+                "title": "Template:Data Veigar/Dark Matter"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3991312,
+      "timestamp": "2026-02-13T07:25:34Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "7716d851281ddf3d3b1a15f45f40793fff1d0ca277f2602a0295cd94ed623ad7",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Dark_Matter",
+    "revisionId": 3991312,
+    "sourceTimestamp": "2026-02-13T07:25:34Z"
+  }
+}

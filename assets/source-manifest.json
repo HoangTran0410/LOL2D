@@ -122,14 +122,6 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_OriginalSquare.png?81183"
     },
     {
-      "contentHash": "068ef88e44c8cdea006d457bd0a48ebb9923221bbc451151e5d8a9495f5c6c09",
-      "fetchedAt": "2026-08-13T16:18:51.440Z",
-      "localAssetKey": "champ_rammus",
-      "localPath": "assets/images/champions/rammus.png",
-      "revisionId": 4051472,
-      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_OriginalSquare.png?3fbfd"
-    },
-    {
       "contentHash": "ef3d676a150f200b07cd3b575254918e6cbceefb8d951485dc86e138fed96ecb",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_singed",
@@ -138,12 +130,12 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_OriginalSquare.png?e9e6e"
     },
     {
-      "contentHash": "6f9291f1a3c687cc0faa48f6f1228257642d2d1f39449e828349c6e5745d3212",
-      "fetchedAt": "2026-08-13T16:18:51.440Z",
-      "localAssetKey": "champ_thresh",
-      "localPath": "assets/images/champions/thresh.png",
+      "contentHash": "03de2b420118b8eaf84af8b475128095e8e016c6b0f806ebc3d726c5b9d9a60f",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "champ_teemo",
+      "localPath": "assets/images/champions/teemo.png",
       "revisionId": 4051472,
-      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_OriginalSquare.png?9ef1d"
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_OriginalSquare.png?783d6"
     },
     {
       "contentHash": "5ecae2df824f6b044d9d3ce6639d81201a0dd6aa4089d4d3cff8d26c4ec4ccf5",
@@ -346,14 +338,6 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Comet_Spear.png?dfd15"
     },
     {
-      "contentHash": "7cae0507507908894768d78af979d532817ecb01c2d7b925e09f3a9fc4b92c28",
-      "fetchedAt": "2026-08-13T16:18:51.440Z",
-      "localAssetKey": "spell_rammus_q",
-      "localPath": "assets/images/spells/rammus_q.png",
-      "revisionId": 3988570,
-      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Powerball.png?0fd14"
-    },
-    {
       "contentHash": "18b8be81ba86312160d727eef3927712ece9ea20cc6ff16477102a92c522ed07",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_singed_w",
@@ -362,20 +346,28 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Mega_Adhesive.png?01b4c"
     },
     {
-      "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
-      "fetchedAt": "2026-08-13T16:18:51.440Z",
-      "localAssetKey": "spell_thresh_q",
-      "localPath": "assets/images/spells/thresh_q.png",
-      "revisionId": 4008201,
-      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
+      "contentHash": "995105df3702f1b580266d97763604eacfd178c765547a0f8cda4d3f22ba1103",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_teemo_e",
+      "localPath": "assets/images/spells/teemo_e.png",
+      "revisionId": 4022986,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Toxic_Shot.png?0cef0"
     },
     {
-      "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
-      "fetchedAt": "2026-08-13T16:18:51.440Z",
-      "localAssetKey": "spell_thresh_q2",
-      "localPath": "assets/images/spells/thresh_q2.png",
-      "revisionId": 4008201,
-      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
+      "contentHash": "094417b535b0fa13b60adbec096d787dd9102b2f1785696690cc5e317275500a",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_teemo_r",
+      "localPath": "assets/images/spells/teemo_r.png",
+      "revisionId": 4015245,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Noxious_Trap.png?9f6f9"
+    },
+    {
+      "contentHash": "cead68c9024621942e629f979204652f32925d129e7efd430a29884bbc506d67",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_teemo_w",
+      "localPath": "assets/images/spells/teemo_w.png",
+      "revisionId": 4010102,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Move_Quick.png?c55c8"
     },
     {
       "contentHash": "09b910060f0b9388f1c60b330bbbd9905c24485fdc2500485dd753ee9701476e",
@@ -394,12 +386,36 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Piercing_Arrow.png?283ea"
     },
     {
+      "contentHash": "f3273d49229ceb325ab6e7df26b20d68377a79b4bfa8fda3f068d1452bff26a7",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_veigar_e",
+      "localPath": "assets/images/spells/veigar_e.png",
+      "revisionId": 4016714,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Event_Horizon.png?d257d"
+    },
+    {
       "contentHash": "38fa6ec31c72bf2cf0258bba9a2610ee3cbe564b7729388599ad3b1c6ec46b69",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_veigar_q",
       "localPath": "assets/images/spells/veigar_q.png",
       "revisionId": 4050924,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Baleful_Strike.png?46b77"
+    },
+    {
+      "contentHash": "11731e78efbf830d0781c59606159ceac63b2507a02a0620bbf1371c9c1fba85",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_veigar_r",
+      "localPath": "assets/images/spells/veigar_r.png",
+      "revisionId": 4004085,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Primordial_Burst.png?b2042"
+    },
+    {
+      "contentHash": "033f615c2f98390346a0f0d0118f5169fd2e85ee3120da7b73adef55f58c9b7a",
+      "fetchedAt": "2026-08-13T16:23:36.912Z",
+      "localAssetKey": "spell_veigar_w",
+      "localPath": "assets/images/spells/veigar_w.png",
+      "revisionId": 3991312,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Dark_Matter.png?91b6e"
     },
     {
       "contentHash": "94f80d944621c529f631592cf24f2b0f3a532dbe77a97b7fa10a411944f5068d",

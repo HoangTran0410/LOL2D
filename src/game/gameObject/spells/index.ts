@@ -74,3 +74,5 @@ export { default as Fizz_E } from './Fizz_E';
 export { default as Nasus_Q } from './Nasus_Q';
 export { default as Varus_Q } from './Varus_Q';
 export { default as Pantheon_Q } from './Pantheon_Q';
+export { default as Veigar_W } from './Veigar_W';
+export { default as Veigar_R } from './Veigar_R';

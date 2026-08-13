@@ -1,0 +1,56 @@
+{
+  "asset": {
+    "key": "spell_veigar_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Dark_Matter.png?91b6e",
+    "sha1": "40cc48dd396d5d0877f4574f53fc128e1c662d5b"
+  },
+  "champion": "Veigar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_veigar_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Dark_Matter.png?91b6e",
+        "sha1": "40cc48dd396d5d0877f4574f53fc128e1c662d5b"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8 – 0 (based on Phenomenal Evil stacks)",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' casts down a mass of dark matter that strikes the target location after a <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"1.2 seconds, but rounded up to the next game tick.\">1.<small>221</small> seconds</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"from the start of the cast time\">delay</span>, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area during the delay and afterwards dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.",
+          "text": "Active: Veigar casts down a mass of dark matter that strikes the target location after a 1.221 seconds delay, granting sight of the area during the delay and afterwards dealing magic damage to enemies hit."
+        },
+        "description2": {
+          "raw": "''Dark Matter's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced based on stacks of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span>''.",
+          "text": "Dark Matter's &nbsp;cooldown is reduced based on stacks of Phenomenal Evil."
+        },
+        "effectradius": "240",
+        "icon": "Dark Matter.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>85 / 140 / 195 / 250 / 305 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70 / 80 / 90 / 100 / 110% AP)</span></dd></dl>",
+          "text": "Magic Damage:85 / 140 / 195 / 250 / 305 (+ 70 / 80 / 90 / 100 / 110% AP)"
+        },
+        "name": "Dark Matter",
+        "notes": {
+          "raw": "* The delay starts at the beginning of the cast time.\n** If '''Veigar''' dies during the cast time, ''Dark Matter'' will still successfully fall from the sky.",
+          "text": "The delay starts at the beginning of the cast time.\n* If Veigar dies during the cast time, Dark Matter will still successfully fall from the sky."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Dark Matter"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "33a2dea5b003b18494cbd504cad4146f701fd6f2fb30bcb977a48281303282a3",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Dark_Matter",
+    "revisionId": 3991312,
+    "sourceTimestamp": "2026-02-13T07:25:34Z"
+  }
+}

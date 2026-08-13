@@ -168,21 +168,23 @@ import asset165Url from '../../assets/images/spells/twitch_q.png?url';
 import asset166Url from '../../assets/images/spells/varus_q.png?url';
 import asset167Url from '../../assets/images/spells/veigar_e.png?url';
 import asset168Url from '../../assets/images/spells/veigar_q.png?url';
-import asset169Url from '../../assets/images/spells/warwick_q.png?url';
-import asset170Url from '../../assets/images/spells/yasuo_e.png?url';
-import asset171Url from '../../assets/images/spells/yasuo_q1.png?url';
-import asset172Url from '../../assets/images/spells/yasuo_q2.png?url';
-import asset173Url from '../../assets/images/spells/yasuo_q3.png?url';
-import asset174Url from '../../assets/images/spells/yasuo_r.png?url';
-import asset175Url from '../../assets/images/spells/yasuo_w.png?url';
-import asset176Url from '../../assets/images/spells/zed_e.png?url';
-import asset177Url from '../../assets/images/spells/zed_q.png?url';
-import asset178Url from '../../assets/images/spells/zed_r1.png?url';
-import asset179Url from '../../assets/images/spells/zed_r2.png?url';
-import asset180Url from '../../assets/images/spells/zed_w.png?url';
-import asset181Url from '../../assets/images/spells/zed_w2.png?url';
-import asset182Url from '../../assets/json/summoner_map.json?url';
-import asset183Url from '../../assets/source-manifest.json?url';
+import asset169Url from '../../assets/images/spells/veigar_r.png?url';
+import asset170Url from '../../assets/images/spells/veigar_w.png?url';
+import asset171Url from '../../assets/images/spells/warwick_q.png?url';
+import asset172Url from '../../assets/images/spells/yasuo_e.png?url';
+import asset173Url from '../../assets/images/spells/yasuo_q1.png?url';
+import asset174Url from '../../assets/images/spells/yasuo_q2.png?url';
+import asset175Url from '../../assets/images/spells/yasuo_q3.png?url';
+import asset176Url from '../../assets/images/spells/yasuo_r.png?url';
+import asset177Url from '../../assets/images/spells/yasuo_w.png?url';
+import asset178Url from '../../assets/images/spells/zed_e.png?url';
+import asset179Url from '../../assets/images/spells/zed_q.png?url';
+import asset180Url from '../../assets/images/spells/zed_r1.png?url';
+import asset181Url from '../../assets/images/spells/zed_r2.png?url';
+import asset182Url from '../../assets/images/spells/zed_w.png?url';
+import asset183Url from '../../assets/images/spells/zed_w2.png?url';
+import asset184Url from '../../assets/json/summoner_map.json?url';
+import asset185Url from '../../assets/source-manifest.json?url';
 
 export type AssetKind = 'image' | 'json' | 'audio' | 'url';
 
@@ -356,21 +358,23 @@ export const assetManifest = {
   "spell_varus_q": { kind: 'image', url: asset166Url, path: "assets/images/spells/varus_q.png" },
   "spell_veigar_e": { kind: 'image', url: asset167Url, path: "assets/images/spells/veigar_e.png" },
   "spell_veigar_q": { kind: 'image', url: asset168Url, path: "assets/images/spells/veigar_q.png" },
-  "spell_warwick_q": { kind: 'image', url: asset169Url, path: "assets/images/spells/warwick_q.png" },
-  "spell_yasuo_e": { kind: 'image', url: asset170Url, path: "assets/images/spells/yasuo_e.png" },
-  "spell_yasuo_q1": { kind: 'image', url: asset171Url, path: "assets/images/spells/yasuo_q1.png" },
-  "spell_yasuo_q2": { kind: 'image', url: asset172Url, path: "assets/images/spells/yasuo_q2.png" },
-  "spell_yasuo_q3": { kind: 'image', url: asset173Url, path: "assets/images/spells/yasuo_q3.png" },
-  "spell_yasuo_r": { kind: 'image', url: asset174Url, path: "assets/images/spells/yasuo_r.png" },
-  "spell_yasuo_w": { kind: 'image', url: asset175Url, path: "assets/images/spells/yasuo_w.png" },
-  "spell_zed_e": { kind: 'image', url: asset176Url, path: "assets/images/spells/zed_e.png" },
-  "spell_zed_q": { kind: 'image', url: asset177Url, path: "assets/images/spells/zed_q.png" },
-  "spell_zed_r1": { kind: 'image', url: asset178Url, path: "assets/images/spells/zed_r1.png" },
-  "spell_zed_r2": { kind: 'image', url: asset179Url, path: "assets/images/spells/zed_r2.png" },
-  "spell_zed_w": { kind: 'image', url: asset180Url, path: "assets/images/spells/zed_w.png" },
-  "spell_zed_w2": { kind: 'image', url: asset181Url, path: "assets/images/spells/zed_w2.png" },
-  "json_summoner_map": { kind: 'json', url: asset182Url, path: "assets/json/summoner_map.json" },
-  "source_manifest": { kind: 'json', url: asset183Url, path: "assets/source-manifest.json" },
+  "spell_veigar_r": { kind: 'image', url: asset169Url, path: "assets/images/spells/veigar_r.png" },
+  "spell_veigar_w": { kind: 'image', url: asset170Url, path: "assets/images/spells/veigar_w.png" },
+  "spell_warwick_q": { kind: 'image', url: asset171Url, path: "assets/images/spells/warwick_q.png" },
+  "spell_yasuo_e": { kind: 'image', url: asset172Url, path: "assets/images/spells/yasuo_e.png" },
+  "spell_yasuo_q1": { kind: 'image', url: asset173Url, path: "assets/images/spells/yasuo_q1.png" },
+  "spell_yasuo_q2": { kind: 'image', url: asset174Url, path: "assets/images/spells/yasuo_q2.png" },
+  "spell_yasuo_q3": { kind: 'image', url: asset175Url, path: "assets/images/spells/yasuo_q3.png" },
+  "spell_yasuo_r": { kind: 'image', url: asset176Url, path: "assets/images/spells/yasuo_r.png" },
+  "spell_yasuo_w": { kind: 'image', url: asset177Url, path: "assets/images/spells/yasuo_w.png" },
+  "spell_zed_e": { kind: 'image', url: asset178Url, path: "assets/images/spells/zed_e.png" },
+  "spell_zed_q": { kind: 'image', url: asset179Url, path: "assets/images/spells/zed_q.png" },
+  "spell_zed_r1": { kind: 'image', url: asset180Url, path: "assets/images/spells/zed_r1.png" },
+  "spell_zed_r2": { kind: 'image', url: asset181Url, path: "assets/images/spells/zed_r2.png" },
+  "spell_zed_w": { kind: 'image', url: asset182Url, path: "assets/images/spells/zed_w.png" },
+  "spell_zed_w2": { kind: 'image', url: asset183Url, path: "assets/images/spells/zed_w2.png" },
+  "json_summoner_map": { kind: 'json', url: asset184Url, path: "assets/json/summoner_map.json" },
+  "source_manifest": { kind: 'json', url: asset185Url, path: "assets/source-manifest.json" },
 } as const;
 
 export type AssetKey = keyof typeof assetManifest;

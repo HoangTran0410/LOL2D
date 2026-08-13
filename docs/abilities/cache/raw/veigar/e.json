@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Veigar/Event Horizon",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Event Horizon@@icon@@Event Horizon.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' forms a cage at the target location that erects after a 0.<small>5</small> second delay, remaining there for 3 seconds. Enemies that collide with the edges of the cage are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocked down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for a duration.@@description2@@''Event Horizon'' can affect enemies only once per cast.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stun Duration:'''</span></dt><dd>1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> / 2.<small>5</small> seconds</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Outer radius\">411</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Safe zone radius\">290</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Credit marker radius\">390</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@70 / 75 / 80 / 85 / 90@@cooldown@@20 / 18.<small>5</small> / 17 / 15.<small>5</small> / 14@@targeting@@Location@@damagetype@@@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* The stun and the knockdown are applied to units that are within a certain distance interval from the center of the area of effect.\n* An enemy can be affected by ''Event Horizon'' only once every 4.<small>5</small> seconds.\n* Units that negate the stun will still count as passing through the edges. They will become immune to the effects of ''Event Horizon'' for the period even after negating them.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immune\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immune]]</span> enemies will still be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span>, but not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocked down]]</span>.\n* '''Veigar''' marks enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> in a 390-radius from the zone's center in order to gain [[Kill#Credit|kill/assist credit]], lasting for the standard credit timer.\n* ''Event Horizon'' may fail to catch enemies that move very quickly through the boundary distance.\n** More modern area checks such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh OriginalSquare.png|20xpx|border|link=Thresh|An icon representing Thresh]]</span> <span style=\"white-space:normal;\">[[Thresh|Thresh's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-ability=\"The Box\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh The Box.png|20xpx|border|link=Thresh#The Box|An icon for Thresh's ability The Box]]</span> <span style=\"white-space:normal;\">[[Thresh#The Box|The Box]]</span></span></span> or <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn OriginalSquare.png|20xpx|border|link=Caitlyn|An icon representing Caitlyn]]</span> <span style=\"white-space:normal;\">[[Caitlyn|Caitlyn's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Yordle Snap Trap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Yordle Snap Trap.png|20xpx|border|link=Caitlyn#Yordle Snap Trap|An icon for Caitlyn's ability Yordle Snap Trap]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Yordle Snap Trap|Yordle Snap Trap]]</span></span></span> do not have this issue.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308707,
+                "revisions": [
+                  {
+                    "parentid": 4016422,
+                    "revid": 4016714,
+                    "timestamp": "2026-05-12T16:46:37Z"
+                  }
+                ],
+                "title": "Template:Data Veigar/Event Horizon"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4016714,
+      "timestamp": "2026-05-12T16:46:37Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "9fa471a773f1820c60dff0d25b78fad30ada15dc7fe2ac27c12d9891fa21a913",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Event_Horizon",
+    "revisionId": 4016714,
+    "sourceTimestamp": "2026-05-12T16:46:37Z"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "asset": {
+    "key": "spell_veigar_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Event_Horizon.png?d257d",
+    "sha1": "e31126215a94ca0bbd14d26a8300c56a6036e51d"
+  },
+  "champion": "Veigar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_veigar_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Event_Horizon.png?d257d",
+        "sha1": "e31126215a94ca0bbd14d26a8300c56a6036e51d"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "20 / 18.5 / 17 / 15.5 / 14",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' forms a cage at the target location that erects after a 0.<small>5</small> second delay, remaining there for 3 seconds. Enemies that collide with the edges of the cage are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocked down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for a duration.",
+          "text": "Active: Veigar forms a cage at the target location that erects after a 0.5 second delay, remaining there for 3 seconds. Enemies that collide with the edges of the cage are knocked down and stunned for a duration."
+        },
+        "description2": {
+          "raw": "''Event Horizon'' can affect enemies only once per cast.",
+          "text": "Event Horizon can affect enemies only once per cast."
+        },
+        "effectradius": "411 • 290 • 390",
+        "icon": "Event Horizon.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stun Duration:'''</span></dt><dd>1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> / 2.<small>5</small> seconds</dd></dl>",
+          "text": "Stun Duration:1.5 / 1.75 / 2 / 2.25 / 2.5 seconds"
+        },
+        "name": "Event Horizon",
+        "notes": {
+          "raw": "* The stun and the knockdown are applied to units that are within a certain distance interval from the center of the area of effect.\n* An enemy can be affected by ''Event Horizon'' only once every 4.<small>5</small> seconds.\n* Units that negate the stun will still count as passing through the edges. They will become immune to the effects of ''Event Horizon'' for the period even after negating them.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immune\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immune]]</span> enemies will still be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span>, but not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocked down]]</span>.\n* '''Veigar''' marks enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> in a 390-radius from the zone's center in order to gain [[Kill#Credit|kill/assist credit]], lasting for the standard credit timer.\n* ''Event Horizon'' may fail to catch enemies that move very quickly through the boundary distance.\n** More modern area checks such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh OriginalSquare.png|20xpx|border|link=Thresh|An icon representing Thresh]]</span> <span style=\"white-space:normal;\">[[Thresh|Thresh's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-ability=\"The Box\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh The Box.png|20xpx|border|link=Thresh#The Box|An icon for Thresh's ability The Box]]</span> <span style=\"white-space:normal;\">[[Thresh#The Box|The Box]]</span></span></span> or <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn OriginalSquare.png|20xpx|border|link=Caitlyn|An icon representing Caitlyn]]</span> <span style=\"white-space:normal;\">[[Caitlyn|Caitlyn's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Yordle Snap Trap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Yordle Snap Trap.png|20xpx|border|link=Caitlyn#Yordle Snap Trap|An icon for Caitlyn's ability Yordle Snap Trap]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Yordle Snap Trap|Yordle Snap Trap]]</span></span></span> do not have this issue.",
+          "text": "The stun and the knockdown are applied to units that are within a certain distance interval from the center of the area of effect.\nAn enemy can be affected by Event Horizon only once every 4.5 seconds.\nUnits that negate the stun will still count as passing through the edges. They will become immune to the effects of Event Horizon for the period even after negating them.\nDisplacement immune enemies will still be stunned, but not knocked down.\nVeigar marks enemy champions in a 390-radius from the zone's center in order to gain kill/assist credit, lasting for the standard credit timer.\nEvent Horizon may fail to catch enemies that move very quickly through the boundary distance.\n* More modern area checks such as Thresh's The Box or Caitlyn's Yordle Snap Trap do not have this issue."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Event Horizon"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "cc69318df09c3f3588de568b09a7afd1c3dc0df16cad83ced8a1cfca4eb5d740",
+    "fetchedAt": "2026-08-13T16:23:36.912Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Event_Horizon",
+    "revisionId": 4016714,
+    "sourceTimestamp": "2026-05-12T16:46:37Z"
+  }
+}

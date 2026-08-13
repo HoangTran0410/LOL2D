@@ -139,7 +139,7 @@ export const SpellGroups: {
     name: 'Veigar',
     image: 'champ_veigar',
     background: 'champ_background_veigar',
-    spells: [AllSpells.Veigar_Q, AllSpells.Veigar_E],
+    spells: [AllSpells.Veigar_Q, AllSpells.Veigar_W, AllSpells.Veigar_E, AllSpells.Veigar_R],
   },
   {
     name: 'Zed',
