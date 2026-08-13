@@ -103,11 +103,11 @@ export class Ahri_R_Object extends MissileSpellObject {
   });
 
   onBeforeMove() {
-    this.destination = this.targetEnemy.position; // live ref: the orb tracks its target
+    if (this.targetEnemy) this.destination = this.targetEnemy.position; // live ref: the orb tracks its target
   }
 
   onArrive() {
-    this.targetEnemy.takeDamage(this.damage, this.owner);
+    if (this.targetEnemy) this.targetEnemy.takeDamage(this.damage, this.owner);
   }
 
   update() {

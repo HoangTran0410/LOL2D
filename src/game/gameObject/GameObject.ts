@@ -1,5 +1,30 @@
 import { Circle, Line, Rectangle } from '../../libs/quadtree';
 import { uuidv4 } from '../../utils/index';
+import type { CastContext, Vec2 } from '../spell/runtime/types';
+import type EventManager from '../../managers/EventManager';
+import type Spell from './Spell';
+import type AttackableUnit from './attackableUnits/AttackableUnit';
+import type ObjectManager from '../managers/ObjectManager';
+
+export interface GameObjectGameContext {
+  readonly mapSize: number;
+  camera: { getBoundingBox(): Rectangle };
+  objectManager: ObjectManager;
+  player: AttackableUnit;
+  eventManager: EventManager;
+  worldMouse?: p5.Vector;
+  randomSpawnPoint(): p5.Vector;
+  createSpellContext(spell: Spell, caster: AttackableUnit, cursorWorld: Vec2): CastContext | undefined;
+}
+
+export interface GameObjectOptions {
+  game?: GameObjectGameContext;
+  position?: p5.Vector;
+  collisionRadius?: number;
+  visionRadius?: number;
+  teamId?: string;
+  id?: string;
+}
 
 export default class GameObject {
   toRemove = false;
@@ -18,7 +43,7 @@ export default class GameObject {
    */
   alwaysVisible = false;
 
-  game: any;
+  game: GameObjectGameContext;
   position: p5.Vector;
   collisionRadius: number;
   visionRadius: number;
@@ -33,15 +58,8 @@ export default class GameObject {
     visionRadius = 0,
     teamId = uuidv4(),
     id = uuidv4(),
-  }: {
-    game?: any;
-    position?: p5.Vector;
-    collisionRadius?: number;
-    visionRadius?: number;
-    teamId?: string;
-    id?: string;
-  }) {
-    this.game = game;
+  }: GameObjectOptions = {}) {
+    this.game = game!;
     this.position = position ?? createVector();
     this.collisionRadius = collisionRadius;
     this.visionRadius = visionRadius;

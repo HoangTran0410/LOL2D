@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AreaSpellObject, {
   type AreaTarget,
 } from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
+import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -15,7 +16,7 @@ const owner = {
   game: { objectManager: { queryObjects: vi.fn(() => []) } },
   position: vector(0, 0),
   teamId: 'blue',
-};
+} as unknown as AttackableUnit;
 
 interface TestAreaTarget extends AreaTarget {
   position: TestVector;

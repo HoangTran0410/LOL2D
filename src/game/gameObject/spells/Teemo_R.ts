@@ -98,7 +98,7 @@ export class Teemo_R_Object extends SpellObject {
             r: this.size / 2,
           }),
           filters: [
-            (o: any) =>
+            (o): o is Teemo_R_Object =>
               o instanceof Teemo_R_Object &&
               o.phase === Teemo_R_Object.PHASES.INVISIBLE &&
               o !== this &&

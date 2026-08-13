@@ -53,7 +53,11 @@ export class Yasuo_W_Object extends SpellObject {
 
     this.animatedSize = lerp(this.animatedSize, this.size, 0.1);
     this.animatedWidth = lerp(this.animatedWidth, this.width, 0.1);
-    this.animatedPosition = lerp(this.animatedPosition, this.position, 0.1);
+    this.animatedPosition = (lerp as unknown as (
+      start: p5.Vector,
+      stop: p5.Vector,
+      amount: number
+    ) => p5.Vector)(this.animatedPosition, this.position, 0.1);
 
     // check collision with spell objects
     const rx = this.animatedPosition.x;

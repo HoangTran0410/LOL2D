@@ -1,24 +1,34 @@
 import { System } from '../../libs/detect-collisions';
 import SpellObject from '../gameObject/SpellObject';
-import Champion from '../gameObject/attackableUnits/Champion';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 import CombatText from '../gameObject/helpers/CombatText';
-import { Quadtree } from '../../libs/quadtree';
+import { Circle, Quadtree, Rectangle } from '../../libs/quadtree';
 import TrailSystem from '../gameObject/helpers/TrailSystem';
 import ParticleSystem from '../gameObject/helpers/ParticleSystem';
+import GameObject from '../gameObject/GameObject';
 
-const DisplayZIndex: any[] = [
+export type QueryArea = Circle | Rectangle;
+export type GameObjectConstructor<T extends GameObject = GameObject> = abstract new (
+  ...args: never[]
+) => T;
+export type GameObjectFilter = (object: GameObject) => boolean;
+export type GameObjectTypeGuard<T extends GameObject> = (object: GameObject) => object is T;
+export interface ObjectManagerGameContext {
+  readonly mapSize: number;
+  camera: { getBoundingBox(): Rectangle };
+}
+
+const DisplayZIndex: GameObjectConstructor[] = [
   //
   TrailSystem,
   ParticleSystem,
   SpellObject,
   AttackableUnit,
-  Champion,
   CombatText,
 ];
 
 // Precompute Z-index map once at startup — avoids O(n) instanceof search per object per frame
-const Z_INDEX_MAP = new Map<any, number>();
+const Z_INDEX_MAP = new Map<GameObjectConstructor, number>();
 DisplayZIndex.forEach((cls, i) => Z_INDEX_MAP.set(cls, i));
 const DEFAULT_Z_INDEX = 99;
 
@@ -28,57 +38,76 @@ const DEFAULT_Z_INDEX = 99;
  * be imported here (structures import PredefinedFilters from this module) set
  * `zIndex` on themselves instead — e.g. Fountain paints under everything.
  */
-function zIndexOf(o: any): number {
-  return o.zIndex ?? Z_INDEX_MAP.get(o.constructor) ?? DEFAULT_Z_INDEX;
+function zIndexOf(o: GameObject): number {
+  const classZIndex = o.constructor.name === 'Champion'
+    ? 4
+    : Z_INDEX_MAP.get(o.constructor as GameObjectConstructor) ?? DEFAULT_Z_INDEX;
+  return o.zIndex ?? classZIndex;
 }
 
-interface QueryOptions {
-  area?: any;
-  filters?: ((o: any) => boolean)[];
+export interface QueryOptions {
+  area?: QueryArea;
+  filters?: GameObjectFilter[];
   queryByDisplayBoundingBox?: boolean;
 }
 
 export const PredefinedFilters = {
-  id: (id: string) => (o: any): boolean => o.id === id,
-  type: (type: any) => (o: any): boolean => o instanceof type,
-  excludeType: (type: any) => (o: any): boolean => !(o instanceof type),
-  teamId: (teamId: number) => (o: any): boolean => o.teamId === teamId,
-  excludeTeamId: (teamId: number) => (o: any): boolean => o.teamId !== teamId,
-  includeTeamIds: (teamIds: number[]) => (o: any): boolean => teamIds.some((t: number) => o.teamId === t),
-  excludeTeamIds: (teamIds: number[]) => (o: any): boolean => !teamIds.some((t: number) => o.teamId === t),
-  includeTypes: (types: any[]) => (o: any): boolean => types.some((t: any) => o instanceof t),
-  excludeTypes: (types: any[]) => (o: any): boolean => !types.some((t: any) => o instanceof t),
-  excludeObjects: (objects: any[]) => (o: any): boolean => !objects.some((e: any) => e === o),
-  includeDead: (o: any): boolean => o instanceof AttackableUnit && o.isDead,
-  excludeDead: (o: any): boolean => !(o instanceof AttackableUnit && o.isDead),
-  includeUntargetable: (o: any): boolean => !o.targetable,
-  excludeUntargetable: (o: any): boolean => o.targetable,
+  id: (id: string): GameObjectFilter => (object) => object.id === id,
+  type: <T extends GameObject>(type: GameObjectConstructor<T>): GameObjectTypeGuard<T> =>
+    (object): object is T => object instanceof type,
+  excludeType: (type: GameObjectConstructor): GameObjectFilter => (object) => !(object instanceof type),
+  teamId: (teamId: string): GameObjectFilter => (object) => object.teamId === teamId,
+  excludeTeamId: (teamId: string): GameObjectFilter => (object) => object.teamId !== teamId,
+  includeTeamIds: (teamIds: string[]): GameObjectFilter =>
+    (object) => teamIds.some((teamId) => object.teamId === teamId),
+  excludeTeamIds: (teamIds: string[]): GameObjectFilter =>
+    (object) => !teamIds.some((teamId) => object.teamId === teamId),
+  includeTypes: (types: GameObjectConstructor[]): GameObjectFilter =>
+    (object) => types.some((type) => object instanceof type),
+  excludeTypes: (types: GameObjectConstructor[]): GameObjectFilter =>
+    (object) => !types.some((type) => object instanceof type),
+  excludeObjects: (objects: GameObject[]): GameObjectFilter =>
+    (object) => !objects.some((excluded) => excluded === object),
+  includeDead: (object: GameObject): object is AttackableUnit =>
+    object instanceof AttackableUnit && object.isDead,
+  excludeDead: (object: GameObject): boolean => !(object instanceof AttackableUnit && object.isDead),
+  includeUntargetable: (object: GameObject): boolean =>
+    object instanceof AttackableUnit && !object.targetable,
+  excludeUntargetable: (object: GameObject): boolean =>
+    object instanceof AttackableUnit && object.targetable,
   attackableUnitInRange:
-    (pos: any, radius: number, includeSize = false) =>
-    (o: any): boolean =>
-      o instanceof AttackableUnit &&
-      (window as any).p5.Vector.dist(o.position, pos) <=
-        radius + (includeSize ? o.animatedValues.size / 2 : 0),
-  collideWith: (area: any) => (o: any): boolean => {
-    if (typeof o.getCollideBoundingBox !== 'function') return false;
-    return o.getCollideBoundingBox().intersect(area);
+    (position: p5.Vector, radius: number, includeSize = false): GameObjectTypeGuard<AttackableUnit> =>
+    (object): object is AttackableUnit =>
+      object instanceof AttackableUnit &&
+      p5.Vector.dist(object.position, position) <=
+        radius + (includeSize ? object.animatedValues.size / 2 : 0),
+  collideWith: (area: QueryArea): GameObjectFilter => (object) => {
+    if (typeof object.getCollideBoundingBox !== 'function') return false;
+    return object.getCollideBoundingBox().intersect(area);
   },
-  missileSpellObject: (o: any): boolean => o instanceof SpellObject && o.isMissile,
-  canTakeDamage: (o: any): boolean => o instanceof AttackableUnit && o.targetable && !o.isDead,
-  canTakeDamageFromTeam: (teamId: any) => (o: any): boolean =>
-    o instanceof AttackableUnit && o.targetable && !o.isDead && o.teamId !== teamId,
+  missileSpellObject: (object: GameObject): object is SpellObject =>
+    object instanceof SpellObject && object.isMissile,
+  canTakeDamage: (object: GameObject): object is AttackableUnit =>
+    object instanceof AttackableUnit && object.targetable && !object.isDead,
+  canTakeDamageFromTeam: (teamId: string): GameObjectTypeGuard<AttackableUnit> =>
+    (object): object is AttackableUnit =>
+      object instanceof AttackableUnit && object.targetable && !object.isDead && object.teamId !== teamId,
 };
+
+declare global {
+  var objectManager: ObjectManager | undefined;
+}
 
 export default class ObjectManager {
   system = new System();
-  objects: any[] = [];
-  _objectToBeAdd: any[] = [];
+  objects: GameObject[] = [];
+  _objectToBeAdd: GameObject[] = [];
   _objectsTree!: Quadtree;
   _objectsTreeIsUpdating = false;
   _deadBuffer: number[] = [];
-  game: any;
+  game: ObjectManagerGameContext;
 
-  constructor(game: any) {
+  constructor(game: ObjectManagerGameContext) {
     this.game = game;
 
     const mapSize = this.game.mapSize;
@@ -91,7 +120,7 @@ export default class ObjectManager {
       maxLevels: 4,
     });
 
-    (window as any).objectManager = this;
+    globalThis.objectManager = this;
   }
 
   update(): void {
@@ -153,22 +182,30 @@ export default class ObjectManager {
     // pop();
   }
 
-  addObject(object: any): void {
+  addObject(object: GameObject): void {
     this._objectToBeAdd.push(object);
   }
 
-  removeObject(object: any): void {
+  removeObject(object: GameObject): void {
     object.toRemove = true;
   }
 
-  queryObjects({ area, filters, queryByDisplayBoundingBox = false }: QueryOptions): any[] {
+  queryObjects<T extends GameObject>(options: Omit<QueryOptions, 'filters'> & {
+    filters: [GameObjectTypeGuard<T>, ...GameObjectFilter[]];
+  }): T[];
+  queryObjects(options: QueryOptions): GameObject[];
+  queryObjects({
+    area,
+    filters,
+    queryByDisplayBoundingBox = false,
+  }: QueryOptions): GameObject[] {
     if (this._objectsTreeIsUpdating) {
       console.warn('Quadtree is updating, this may cause unexpected result.');
     }
 
-    let objects: any[];
+    let objects: GameObject[];
     if (area) {
-      objects = this._objectsTree.retrieve(area).map((r: any) => r.data);
+      objects = this._objectsTree.retrieve(area).map((region: { data: GameObject }) => region.data);
     } else {
       objects = this.objects;
     }
@@ -178,7 +215,7 @@ export default class ObjectManager {
     }
 
     const resolvedFilters = [...filters];
-    if (!queryByDisplayBoundingBox) resolvedFilters.push(PredefinedFilters.collideWith(area));
-    return objects.filter((o: any) => resolvedFilters.every((filter: (o: any) => boolean) => filter(o)));
+    if (!queryByDisplayBoundingBox) resolvedFilters.push(PredefinedFilters.collideWith(area!));
+    return objects.filter((object) => resolvedFilters.every((filter) => filter(object)));
   }
 }

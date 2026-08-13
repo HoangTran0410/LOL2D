@@ -4,6 +4,7 @@ import HomingMissileSpellObject, {
 } from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import MissileSpellObject from '../../../src/game/gameObject/MissileSpellObject';
 import type TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
+import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -52,7 +53,7 @@ const owner = (queryObjects = () => []) => ({
   game: { objectManager: { queryObjects } },
   position: vector(0, 0),
   teamId: 'blue',
-});
+}) as unknown as AttackableUnit;
 
 const target = (x: number, collisionRadius = 0): TestTarget => ({
   position: new TestVector(x, 0) as unknown as p5.Vector,
