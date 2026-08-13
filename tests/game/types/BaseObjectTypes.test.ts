@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { Rectangle } from '../../../src/libs/quadtree';
 import GameObject from '../../../src/game/gameObject/GameObject';
+import SpellObject from '../../../src/game/gameObject/SpellObject';
 import ObjectManager, { PredefinedFilters } from '../../../src/game/managers/ObjectManager';
 import gameObjectSource from '../../../src/game/gameObject/GameObject.ts?raw';
 import spellObjectSource from '../../../src/game/gameObject/SpellObject.ts?raw';
@@ -32,6 +33,17 @@ describe('base object type boundary', () => {
     }
   });
 
+  it('keeps optional base ownership honest', () => {
+    expect(gameObjectSource).not.toMatch(/game!/);
+    expect(spellObjectSource).not.toMatch(/owner!/);
+    expect(new GameObject().game).toBeUndefined();
+    expect(new SpellObject<undefined>(undefined).owner).toBeUndefined();
+  });
+
+  it('preserves includeUntargetable behavior for non-attackable objects', () => {
+    expect(PredefinedFilters.includeUntargetable(new TestObject())).toBe(true);
+  });
+
   it('adds, updates, filters, queries, and removes game objects', () => {
     const manager = new ObjectManager({
       mapSize: 100,
@@ -54,6 +66,15 @@ describe('base object type boundary', () => {
       filters: [PredefinedFilters.type(TestObject)],
       queryByDisplayBoundingBox: true,
     });
+    const lateGuard = manager.queryObjects({
+      filters: [PredefinedFilters.id('first'), PredefinedFilters.type(TestObject)],
+      queryByDisplayBoundingBox: true,
+    });
+    const broad = manager.queryObjects({ filters: [PredefinedFilters.id('first')] });
+
+    expectTypeOf(broad).toEqualTypeOf<GameObject[]>();
+    expectTypeOf(typed).toEqualTypeOf<TestObject[]>();
+    expectTypeOf(lateGuard).toEqualTypeOf<GameObject[]>();
 
     expect(found).toEqual([first]);
     expect(typed).toEqual([first, second]);

@@ -4,11 +4,13 @@ import ActionState from '../../enums/ActionState';
 import BuffAddType from '../../enums/BuffAddType';
 import StatusFlags from '../../enums/StatusFlags';
 import GameObject from '../GameObject';
+import type { GameObjectGameContext } from '../GameObject';
 import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
 import AssetManager from '../../../managers/AssetManager';
 
 export default class AttackableUnit extends GameObject {
+  declare game: GameObjectGameContext;
   buffs: any[] = [];
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;

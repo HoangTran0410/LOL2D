@@ -1,4 +1,6 @@
 import MissileSpellObject from '../MissileSpellObject';
+import type { SpellOwner } from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export interface HomingTarget {
   position: p5.Vector;
@@ -9,15 +11,17 @@ export interface HomingTarget {
 
 export type TargetLossPolicy = 'remove' | 'continue';
 
-export default abstract class HomingMissileSpellObject<TTarget extends HomingTarget>
-  extends MissileSpellObject {
+export default abstract class HomingMissileSpellObject<
+  TTarget extends HomingTarget,
+  TOwner extends SpellOwner = AttackableUnit,
+> extends MissileSpellObject<TOwner> {
   target: TTarget;
   targetLossPolicy: TargetLossPolicy = 'remove';
   maxHitCount = 0;
   private hasTargetArrived = false;
   private arrivalRadius = 0;
 
-  constructor(owner: MissileSpellObject['owner'], target: TTarget) {
+  constructor(owner: TOwner, target: TTarget) {
     super(owner);
     this.target = target;
     this.destination = target.position.copy();

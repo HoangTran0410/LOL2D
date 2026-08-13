@@ -3,8 +3,8 @@ import BeamSpellObject, {
   type BeamGeometry,
   type BeamTarget,
 } from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
+import type { SpellOwner } from '../../../src/game/gameObject/SpellObject';
 import BeamRenderer from '../../../src/game/vfx/BeamRenderer';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -18,7 +18,7 @@ const owner = {
   game: { objectManager: { queryObjects: vi.fn(() => []) } },
   position: vector(0, 0),
   teamId: 'blue',
-} as unknown as AttackableUnit;
+};
 
 describe('BeamSpellObject', () => {
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('BeamSpellObject', () => {
     };
     const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
     const hitTest = vi.fn(() => true);
-    const beam = new BeamSpellObject(owner, geometry, {
+    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, geometry, {
       candidates: () => [target],
       hitTest,
     });
@@ -51,7 +51,7 @@ describe('BeamSpellObject', () => {
   it('hits each target once when configured as an instant beam', () => {
     const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
     const onHit = vi.fn();
-    const beam = new BeamSpellObject(owner, {
+    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
       start: { x: 0, y: 0 },
       end: { x: 100, y: 0 },
       width: 20,
@@ -72,7 +72,7 @@ describe('BeamSpellObject', () => {
   it('owns the finite lifetime of a duration beam', () => {
     const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
     const onHit = vi.fn();
-    const beam = new BeamSpellObject(owner, {
+    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
       start: { x: 0, y: 0 },
       end: { x: 100, y: 0 },
       width: 20,
@@ -96,7 +96,7 @@ describe('BeamSpellObject', () => {
   it.each([0, Number.NaN, Number.POSITIVE_INFINITY])(
     'rejects invalid duration beam lifetime %s',
     (durationMs) => {
-      expect(() => new BeamSpellObject(owner, {
+      expect(() => new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
         start: { x: 0, y: 0 },
         end: { x: 100, y: 0 },
         width: 20,

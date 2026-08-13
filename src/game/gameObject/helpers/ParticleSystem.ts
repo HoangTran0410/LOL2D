@@ -1,5 +1,5 @@
 import { Rectangle } from '../../../libs/quadtree';
-import SpellObject from '../SpellObject';
+import SpellObject, { type SpellOwner } from '../SpellObject';
 
 interface ParticleSystemOptions {
   isDeadFn: (particle: any) => boolean;
@@ -16,7 +16,7 @@ interface ParticleSystemOptions {
   owner?: any;
 }
 
-export default class ParticleSystem extends SpellObject {
+export default class ParticleSystem extends SpellObject<SpellOwner | undefined> {
   particles: any[] = [];
   _cachedBB: Rectangle | null = null;
 

@@ -17,6 +17,7 @@ export interface ChampionPresetData {
 }
 
 export default class Champion extends AttackableUnit {
+  static displayZIndex = 4;
   score = 0;
   name: string | undefined;
   spells: Spell[] = [];

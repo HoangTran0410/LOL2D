@@ -3,8 +3,8 @@ import HomingMissileSpellObject, {
   type HomingTarget,
 } from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import MissileSpellObject from '../../../src/game/gameObject/MissileSpellObject';
+import type { SpellOwner } from '../../../src/game/gameObject/SpellObject';
 import type TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -24,7 +24,7 @@ class TestVector {
 
 type TestTarget = HomingTarget;
 
-class TestHomingMissile extends HomingMissileSpellObject<TestTarget> {
+class TestHomingMissile extends HomingMissileSpellObject<TestTarget, SpellOwner> {
   speed = 5;
   size = 4;
   arrived: TestTarget[] = [];
@@ -34,7 +34,7 @@ class TestHomingMissile extends HomingMissileSpellObject<TestTarget> {
   }
 }
 
-class TerminalMissile extends MissileSpellObject {
+class TerminalMissile extends MissileSpellObject<SpellOwner> {
   speed = 5;
   arrivals = 0;
   afterMoves = 0;
@@ -53,7 +53,7 @@ const owner = (queryObjects = () => []) => ({
   game: { objectManager: { queryObjects } },
   position: vector(0, 0),
   teamId: 'blue',
-}) as unknown as AttackableUnit;
+});
 
 const target = (x: number, collisionRadius = 0): TestTarget => ({
   position: new TestVector(x, 0) as unknown as p5.Vector,

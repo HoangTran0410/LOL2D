@@ -2,6 +2,8 @@ import { Circle, Rectangle } from '../../libs/quadtree';
 import VectorUtils from '../../utils/vector.utils';
 import { PredefinedFilters } from '../managers/ObjectManager';
 import SpellObject from './SpellObject';
+import type { SpellOwner } from './SpellObject';
+import type AttackableUnit from './attackableUnits/AttackableUnit';
 import TrailSystem from './helpers/TrailSystem';
 
 /**
@@ -16,11 +18,12 @@ import TrailSystem from './helpers/TrailSystem';
  * Declare `trailSystem` in the subclass, not here: subclass field initializers run
  * after this class's, so a trail built here could not read the subclass `size`.
  */
-export default class MissileSpellObject extends SpellObject {
+export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUnit> extends SpellObject<TOwner> {
+  declare owner: TOwner;
   isMissile = true;
 
-  position: p5.Vector = this.owner.position.copy();
-  destination: p5.Vector = this.owner.position.copy();
+  declare position: p5.Vector;
+  declare destination: p5.Vector;
   speed = 7;
   size = 20;
 
@@ -36,8 +39,16 @@ export default class MissileSpellObject extends SpellObject {
   /** Assigned by subclasses that want a trail; registered automatically. */
   trailSystem: TrailSystem | null = null;
 
+  constructor(owner: TOwner) {
+    super(owner);
+    this.position = owner.position.copy();
+    this.destination = owner.position.copy();
+  }
+
   onAdded() {
-    if (this.trailSystem) this.game.objectManager.addObject(this.trailSystem);
+    if (this.trailSystem && this.owner.game.objectManager.addObject) {
+      this.owner.game.objectManager.addObject(this.trailSystem);
+    }
   }
 
   update() {
@@ -79,7 +90,7 @@ export default class MissileSpellObject extends SpellObject {
   }
 
   queryEnemies(): any[] {
-    return this.game.objectManager.queryObjects({
+    return this.owner.game.objectManager.queryObjects?.({
       area: new Circle({
         x: this.position.x,
         y: this.position.y,
@@ -89,7 +100,7 @@ export default class MissileSpellObject extends SpellObject {
         PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.excludeObjects(this.hitTargets),
       ],
-    });
+    }) ?? [];
   }
 
   getDisplayBoundingBox() {

@@ -1,5 +1,5 @@
 import { Rectangle } from '../../../libs/quadtree';
-import SpellObject from '../SpellObject';
+import SpellObject, { type SpellOwner } from '../SpellObject';
 
 interface TrailParticle {
   pos: p5.Vector;
@@ -14,7 +14,7 @@ interface TrailSystemOptions {
   owner?: any;
 }
 
-export default class TrailSystem extends SpellObject {
+export default class TrailSystem extends SpellObject<SpellOwner | undefined> {
   trails: TrailParticle[] = [];
   _cachedBB: Rectangle | null = null;
 

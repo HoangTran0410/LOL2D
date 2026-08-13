@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AreaSpellObject, {
   type AreaTarget,
 } from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import type { SpellOwner } from '../../../src/game/gameObject/SpellObject';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -16,7 +16,7 @@ const owner = {
   game: { objectManager: { queryObjects: vi.fn(() => []) } },
   position: vector(0, 0),
   teamId: 'blue',
-} as unknown as AttackableUnit;
+};
 
 interface TestAreaTarget extends AreaTarget {
   position: TestVector;
@@ -32,7 +32,7 @@ describe('AreaSpellObject', () => {
   it('fires area enter tick and exit callbacks in order', () => {
     const target: TestAreaTarget = { position: new TestVector(5, 0), collisionRadius: 0 };
     const events: string[] = [];
-    const area = new AreaSpellObject(owner, { x: 0, y: 0 }, 10, {
+    const area = new AreaSpellObject<TestAreaTarget, SpellOwner>(owner, { x: 0, y: 0 }, 10, {
       candidates: () => [target],
       tickEveryMs: 100,
       onEnter: () => events.push('enter'),
@@ -49,7 +49,7 @@ describe('AreaSpellObject', () => {
   });
 
   it('grows an area radius over its configured duration', () => {
-    const area = new AreaSpellObject(owner, { x: 10, y: 20 }, 10, {
+    const area = new AreaSpellObject<AreaTarget, SpellOwner>(owner, { x: 10, y: 20 }, 10, {
       candidates: () => [],
       radiusAt: elapsedMs => 10 + elapsedMs / 100,
     });
@@ -64,7 +64,7 @@ describe('AreaSpellObject', () => {
     const target: AreaTarget = { position: { x: 0, y: 0 }, collisionRadius: 0 };
     const onTick = vi.fn();
     const radiusAt = vi.fn((elapsedMs: number) => elapsedMs / 10);
-    const area = new AreaSpellObject(owner, { x: 0, y: 0 }, 0, {
+    const area = new AreaSpellObject<AreaTarget, SpellOwner>(owner, { x: 0, y: 0 }, 0, {
       candidates: () => [target],
       durationMs: 250,
       tickEveryMs: 100,
@@ -87,7 +87,7 @@ describe('AreaSpellObject', () => {
     ['durationMs', { durationMs: Number.NaN }],
     ['durationMs', { durationMs: Number.POSITIVE_INFINITY }],
   ])('rejects a non-finite %s', (_field, options) => {
-    expect(() => new AreaSpellObject(owner, { x: 0, y: 0 }, 10, options))
+    expect(() => new AreaSpellObject<AreaTarget, SpellOwner>(owner, { x: 0, y: 0 }, 10, options))
       .toThrow(`${_field} must be finite and greater than 0`);
   });
 });

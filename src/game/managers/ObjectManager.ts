@@ -18,7 +18,11 @@ export interface ObjectManagerGameContext {
   camera: { getBoundingBox(): Rectangle };
 }
 
-const DisplayZIndex: GameObjectConstructor[] = [
+interface GameObjectRegion {
+  data: GameObject;
+}
+
+const DisplayZIndex: Function[] = [
   //
   TrailSystem,
   ParticleSystem,
@@ -28,7 +32,7 @@ const DisplayZIndex: GameObjectConstructor[] = [
 ];
 
 // Precompute Z-index map once at startup — avoids O(n) instanceof search per object per frame
-const Z_INDEX_MAP = new Map<GameObjectConstructor, number>();
+const Z_INDEX_MAP = new Map<Function, number>();
 DisplayZIndex.forEach((cls, i) => Z_INDEX_MAP.set(cls, i));
 const DEFAULT_Z_INDEX = 99;
 
@@ -39,9 +43,13 @@ const DEFAULT_Z_INDEX = 99;
  * `zIndex` on themselves instead — e.g. Fountain paints under everything.
  */
 function zIndexOf(o: GameObject): number {
-  const classZIndex = o.constructor.name === 'Champion'
-    ? 4
-    : Z_INDEX_MAP.get(o.constructor as GameObjectConstructor) ?? DEFAULT_Z_INDEX;
+  const constructor = o.constructor;
+  const classZIndex =
+    Object.hasOwn(constructor, 'displayZIndex') &&
+    'displayZIndex' in constructor &&
+    typeof constructor.displayZIndex === 'number'
+      ? constructor.displayZIndex
+      : Z_INDEX_MAP.get(constructor) ?? DEFAULT_Z_INDEX;
   return o.zIndex ?? classZIndex;
 }
 
@@ -72,7 +80,7 @@ export const PredefinedFilters = {
     object instanceof AttackableUnit && object.isDead,
   excludeDead: (object: GameObject): boolean => !(object instanceof AttackableUnit && object.isDead),
   includeUntargetable: (object: GameObject): boolean =>
-    object instanceof AttackableUnit && !object.targetable,
+    !('targetable' in object && object.targetable),
   excludeUntargetable: (object: GameObject): boolean =>
     object instanceof AttackableUnit && object.targetable,
   attackableUnitInRange:
@@ -81,7 +89,8 @@ export const PredefinedFilters = {
       object instanceof AttackableUnit &&
       p5.Vector.dist(object.position, position) <=
         radius + (includeSize ? object.animatedValues.size / 2 : 0),
-  collideWith: (area: QueryArea): GameObjectFilter => (object) => {
+  collideWith: (area?: QueryArea): GameObjectFilter => (object) => {
+    if (!area) return false;
     if (typeof object.getCollideBoundingBox !== 'function') return false;
     return object.getCollideBoundingBox().intersect(area);
   },
@@ -205,7 +214,7 @@ export default class ObjectManager {
 
     let objects: GameObject[];
     if (area) {
-      objects = this._objectsTree.retrieve(area).map((region: { data: GameObject }) => region.data);
+      objects = this._objectsTree.retrieve(area).map((region: GameObjectRegion) => region.data);
     } else {
       objects = this.objects;
     }
@@ -215,7 +224,7 @@ export default class ObjectManager {
     }
 
     const resolvedFilters = [...filters];
-    if (!queryByDisplayBoundingBox) resolvedFilters.push(PredefinedFilters.collideWith(area!));
+    if (!queryByDisplayBoundingBox) resolvedFilters.push(PredefinedFilters.collideWith(area));
     return objects.filter((object) => resolvedFilters.every((filter) => filter(object)));
   }
 }

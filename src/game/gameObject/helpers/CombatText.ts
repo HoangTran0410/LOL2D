@@ -1,7 +1,12 @@
 import ColorUtils from '../../../utils/color.utils';
 import SpellObject from '../SpellObject';
+import type { SpellOwner } from '../SpellObject';
 
-export default class CombatText extends SpellObject {
+interface CombatTextOwner extends SpellOwner {
+  stats: { size: { value: number } };
+}
+
+export default class CombatText extends SpellObject<CombatTextOwner> {
   velocity: p5.Vector;
   gravity: p5.Vector;
   movedVector: p5.Vector;
@@ -11,7 +16,7 @@ export default class CombatText extends SpellObject {
   textColor: string | number[];
   text: string;
 
-  constructor(owner: any) {
+  constructor(owner: CombatTextOwner) {
     super(owner);
     this.velocity = createVector(0, -1);
     this.gravity = createVector(random(-0.03, 0.03), 0.05);

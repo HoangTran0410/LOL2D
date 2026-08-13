@@ -1,6 +1,7 @@
 import { Rectangle } from '../../../libs/quadtree';
 import type { Vec2 } from '../../spell/runtime/types';
-import SpellObject from '../SpellObject';
+import SpellObject, { type SpellOwner } from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export interface BeamGeometry {
   readonly start: Vec2;
@@ -37,7 +38,10 @@ export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): bool
     geometry.width / 2 + target.collisionRadius;
 };
 
-export default class BeamSpellObject<TTarget extends BeamTarget = BeamTarget> extends SpellObject {
+export default class BeamSpellObject<
+  TTarget extends BeamTarget = BeamTarget,
+  TOwner extends SpellOwner = AttackableUnit,
+> extends SpellObject<TOwner> {
   readonly hitTargets = new Set<TTarget>();
   readonly geometry: BeamGeometry;
   elapsedMs = 0;
@@ -49,7 +53,7 @@ export default class BeamSpellObject<TTarget extends BeamTarget = BeamTarget> ex
   private readonly durationMs?: number;
 
   constructor(
-    owner: SpellObject['owner'],
+    owner: TOwner,
     geometry: BeamGeometry,
     options: BeamOptions<TTarget> = {}
   ) {

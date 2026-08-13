@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import type { Vec2 } from '../../spell/runtime/types';
-import SpellObject from '../SpellObject';
+import SpellObject, { type SpellOwner } from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export interface AreaTarget {
   readonly position: Vec2;
@@ -18,7 +19,10 @@ interface AreaOptions<TTarget extends AreaTarget> {
   onExit?: (target: TTarget) => void;
 }
 
-export default class AreaSpellObject<TTarget extends AreaTarget = AreaTarget> extends SpellObject {
+export default class AreaSpellObject<
+  TTarget extends AreaTarget = AreaTarget,
+  TOwner extends SpellOwner = AttackableUnit,
+> extends SpellObject<TOwner> {
   readonly center: Vec2;
   readonly members = new Set<TTarget>();
   radius: number;
@@ -34,7 +38,7 @@ export default class AreaSpellObject<TTarget extends AreaTarget = AreaTarget> ex
   private readonly exit: (target: TTarget) => void;
 
   constructor(
-    owner: SpellObject['owner'],
+    owner: TOwner,
     center: Vec2,
     radius: number,
     options: AreaOptions<TTarget> = {}

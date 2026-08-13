@@ -18,7 +18,7 @@ export interface GameObjectGameContext {
 }
 
 export interface GameObjectOptions {
-  game?: GameObjectGameContext;
+  game?: object;
   position?: p5.Vector;
   collisionRadius?: number;
   visionRadius?: number;
@@ -43,7 +43,7 @@ export default class GameObject {
    */
   alwaysVisible = false;
 
-  game: GameObjectGameContext;
+  game?: object;
   position: p5.Vector;
   collisionRadius: number;
   visionRadius: number;
@@ -59,7 +59,7 @@ export default class GameObject {
     teamId = uuidv4(),
     id = uuidv4(),
   }: GameObjectOptions = {}) {
-    this.game = game!;
+    this.game = game;
     this.position = position ?? createVector();
     this.collisionRadius = collisionRadius;
     this.visionRadius = visionRadius;

@@ -1,5 +1,6 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import GameObject from '../GameObject';
+import type { GameObjectGameContext } from '../GameObject';
 import Champion from '../attackableUnits/Champion';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
@@ -33,6 +34,7 @@ interface Mote {
  * cannot be attacked, and FogOfWar's willDraw reset only touches units.
  */
 export default class Fountain extends GameObject {
+  declare game: GameObjectGameContext;
   /** Under everything else — it is a floor. */
   zIndex = -1;
 
