@@ -1,5 +1,6 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange, withinRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
@@ -98,7 +99,7 @@ export default class Leblanc_Q extends Spell {
   }
 
   drawPreview(): void {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 
   private isValidTarget(target: unknown): target is SigilTarget {
@@ -106,7 +107,7 @@ export default class Leblanc_Q extends Spell {
       isSigilTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      this.owner.position.dist(target.position) <= this.range
+      withinRange(this.range, this.owner, target)
     );
   }
 }

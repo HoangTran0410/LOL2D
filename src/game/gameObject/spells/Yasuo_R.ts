@@ -1,5 +1,6 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
@@ -32,7 +33,7 @@ export default class Yasuo_R extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.rangeToFindEnemies,
+        r: effectiveRange(this.rangeToFindEnemies, this.owner),
       }),
       filters: [
         PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
@@ -133,7 +134,7 @@ export default class Yasuo_R extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.rangeToFindEnemies);
+    super.drawPreview(effectiveRange(this.rangeToFindEnemies, this.owner));
   }
 }
 

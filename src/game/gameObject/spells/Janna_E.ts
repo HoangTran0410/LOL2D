@@ -1,5 +1,6 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange, withinRange } from '../../combat/Reach';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -133,7 +134,7 @@ export default class Janna_E extends Spell {
   }
 
   drawPreview(): void {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 
   /** Called by Q/W/R when they land a slow or knock-up on an enemy champion. */
@@ -147,7 +148,7 @@ export default class Janna_E extends Spell {
     return isEyeTarget(target) &&
       target.willDraw &&
       target.teamId === this.owner.teamId &&
-      this.owner.position.dist(target.position) <= this.range;
+      withinRange(this.range, this.owner, target);
   }
 }
 

@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -25,7 +26,7 @@ export default class Alistar_W extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.range,
+        r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -98,7 +99,7 @@ export default class Alistar_W extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 

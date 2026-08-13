@@ -1,6 +1,7 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange, withinRange } from '../../combat/Reach';
 import StatusFlags from '../../enums/StatusFlags';
 import Spell from '../Spell';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -125,14 +126,14 @@ export default class Janna_W extends Spell {
   }
 
   drawPreview(): void {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 
   private isValidTarget(target: unknown): target is ZephyrTarget {
     return isZephyrTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      this.owner.position.dist(target.position) <= this.range;
+      withinRange(this.range, this.owner, target);
   }
 
   /** Always-on passive, independent of this spell's own cooldown/state. */

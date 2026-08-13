@@ -1,5 +1,6 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Buff from '../Buff';
@@ -132,7 +133,7 @@ export default class LeeSin_W extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.range,
+        r: effectiveRange(this.range, this.owner),
       }),
       filters: [
         PredefinedFilters.type(AttackableUnit),
@@ -162,7 +163,7 @@ export default class LeeSin_W extends Spell {
   }
 
   drawPreview() {
-    if (this.phase === 'W1') super.drawPreview(this.range);
+    if (this.phase === 'W1') super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 

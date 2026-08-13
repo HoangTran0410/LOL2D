@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Buff from '../Buff';
 import Spell from '../Spell';
@@ -164,7 +165,7 @@ export default class Zed_R extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.range,
+        r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -183,7 +184,7 @@ export default class Zed_R extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 

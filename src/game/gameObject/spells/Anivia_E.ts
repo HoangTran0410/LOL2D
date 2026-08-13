@@ -1,6 +1,7 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange, withinRange } from '../../combat/Reach';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -110,14 +111,14 @@ export default class Anivia_E extends Spell {
   }
 
   drawPreview(): void {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 
   private isValidTarget(target: unknown): target is FrostbiteTarget {
     return isFrostbiteTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      this.owner.position.dist(target.position) <= this.range;
+      withinRange(this.range, this.owner, target);
   }
 }
 

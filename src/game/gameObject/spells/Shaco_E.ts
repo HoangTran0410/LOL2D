@@ -1,5 +1,6 @@
 import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import { Shaco_W_Bullet_Object } from './Shaco_W';
@@ -19,7 +20,7 @@ export default class Shaco_E extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.range,
+        r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -63,7 +64,7 @@ export default class Shaco_E extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 

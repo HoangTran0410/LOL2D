@@ -1,5 +1,6 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -122,7 +123,7 @@ export default class Nocturne_R extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.leapRange,
+        r: effectiveRange(this.leapRange, this.owner),
       }),
       filters: [
         PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
@@ -152,7 +153,7 @@ export default class Nocturne_R extends Spell {
   }
 
   drawPreview() {
-    if (this.phase === 'R2') super.drawPreview(this.leapRange);
+    if (this.phase === 'R2') super.drawPreview(effectiveRange(this.leapRange, this.owner));
   }
 }
 

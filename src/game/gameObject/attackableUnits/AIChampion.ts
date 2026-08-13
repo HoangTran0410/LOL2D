@@ -5,6 +5,7 @@ import { getChampionPresetRandom } from '../../preset';
 import Champion, { type ChampionOptions } from './Champion';
 import type AttackableUnit from './AttackableUnit';
 import { uuidv4 } from '../../../utils';
+import { effectiveRange } from '../../combat/Reach';
 import TargetResolver, {
   defaultIsTargetable,
   defaultTargetInfo,
@@ -199,7 +200,15 @@ export default class AIChampion extends Champion {
         info.position.x - this.position.x,
         info.position.y - this.position.y
       );
-      if (request.range !== undefined && distance > request.range) continue;
+      // Same size-corrected reach TargetResolver will apply a moment later; a
+      // bot that aimed by the raw number would pick a victim the resolver then
+      // rejects, and simply stop casting once its own body had grown.
+      if (
+        request.range !== undefined &&
+        distance > effectiveRange(request.range, this, candidate)
+      ) {
+        continue;
+      }
       if (!nearest || distance < nearest.distance) nearest = { point: info.position, distance };
     }
     return nearest?.point;

@@ -155,6 +155,14 @@ export class StatsModifier {
 }
 
 /**
+ * Body width of a champion that nothing has resized. Every ability range in the
+ * game was authored against two of these standing next to each other, which is
+ * why `Reach.ts` measures a body's excess against it rather than against zero.
+ * Named so the two places that care read the same number.
+ */
+export const DEFAULT_UNIT_SIZE = 55;
+
+/**
  * Ceiling on how big a unit's body can get, whatever stacks it. A champion is
  * 55 across, Baron is 100 and a turret 92, so three times base already makes a
  * unit the largest thing on the field. Past that the model stops fitting
@@ -175,7 +183,7 @@ export default class Stats {
   maxMana = new Stat(500);
   mana = new Stat(500);
   speed = new Stat(3);
-  size = new Stat(55, MAX_UNIT_SIZE);
+  size = new Stat(DEFAULT_UNIT_SIZE, MAX_UNIT_SIZE);
   height = new Stat(0);
   manaRegen = new Stat(0.1);
   healthRegen = new Stat(0.06);

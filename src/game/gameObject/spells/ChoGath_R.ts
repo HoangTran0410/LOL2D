@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
@@ -54,7 +55,10 @@ export default class ChoGath_R extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.range,
+        // The spell that causes the problem is also subject to it: every stack
+        // grows Cho'Gath, and the next Feast has to reach past the wider gap
+        // his own body now enforces.
+        r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -72,7 +76,7 @@ export default class ChoGath_R extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.range);
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 

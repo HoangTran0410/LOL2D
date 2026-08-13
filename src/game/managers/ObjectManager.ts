@@ -103,6 +103,13 @@ export const PredefinedFilters = {
     !hasTargetableProperty(object) || !Boolean(object.targetable),
   excludeUntargetable: (object: GameObject): boolean =>
     hasTargetableProperty(object) && Boolean(object.targetable),
+  /**
+   * Units within `radius` of a *point*. Not the home of the size-aware reach
+   * rule, and not a substitute for it: this filter is handed a bare position,
+   * so it can widen for the target's body but has no way to know whose body the
+   * measurement started from. Caster-centred ranges go through
+   * `combat/Reach.ts`, which needs both ends.
+   */
   attackableUnitInRange:
     (position: p5.Vector, radius: number, includeSize = false): GameObjectTypeGuard<AttackableUnit> =>
     (object): object is AttackableUnit =>

@@ -1,6 +1,7 @@
 import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
@@ -28,7 +29,7 @@ export default class Yasuo_E extends Spell {
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.rangeToFindEnemies,
+        r: effectiveRange(this.rangeToFindEnemies, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -69,6 +70,6 @@ export default class Yasuo_E extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.rangeToFindEnemies);
+    super.drawPreview(effectiveRange(this.rangeToFindEnemies, this.owner));
   }
 }

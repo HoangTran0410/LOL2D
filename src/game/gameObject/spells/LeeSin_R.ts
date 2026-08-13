@@ -1,6 +1,7 @@
 import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -25,11 +26,15 @@ export default class LeeSin_R extends Spell {
   onSpellCast() {
     const mouse = this.aimPoint;
 
+    // The shortest caster-centred range in the game, and the one body
+    // separation broke first: 80 units cannot be satisfied by an enemy that a
+    // grown Cho'Gath-sized Lee Sin holds 110 units away. effectiveRange gives
+    // back the excess body radius and nothing else.
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
-        r: this.rangeToCheckEnemies,
+        r: effectiveRange(this.rangeToCheckEnemies, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -124,7 +129,7 @@ export default class LeeSin_R extends Spell {
   }
 
   drawPreview() {
-    super.drawPreview(this.rangeToCheckEnemies);
+    super.drawPreview(effectiveRange(this.rangeToCheckEnemies, this.owner));
   }
 }
 

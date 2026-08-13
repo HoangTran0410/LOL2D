@@ -1,3 +1,4 @@
+import { effectiveRange } from '../../combat/Reach';
 import type { CancelReason, CastContext, TargetingMode, Vec2 } from '../runtime/types';
 
 export type TargetTeam = 'ALLY' | 'ENEMY' | 'ANY';
@@ -92,6 +93,9 @@ export class TargetResolver {
   static resolve(mode: TargetingMode, request: TargetRequest): TargetResolution {
     if (mode === 'SELF') return { ok: true, context: createContext(request, request.caster) };
 
+    // POINT deliberately keeps the authored range. Its far end is a spot on the
+    // ground, which has no body to push the caster away from it, so a bigger
+    // caster does not get to nominate a further one.
     if (mode === 'POINT' && request.range !== undefined &&
         distance(request.origin, request.cursorWorld) > request.range) {
       return { ok: false, reason: 'OUT_OF_RANGE' };
@@ -112,7 +116,15 @@ export class TargetResolver {
       if (request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
         continue;
       }
-      if (request.range !== undefined && distance(request.origin, info.position) > request.range) {
+      // UNIT range is measured centre to centre against a body that separation
+      // holds at arm's length, so both ends pay for their excess size here.
+      // Reading it off the candidate rather than off TargetInfo means the
+      // spells that supply their own getTargetInfo stay size-aware for free.
+      if (
+        request.range !== undefined &&
+        distance(request.origin, info.position) >
+          effectiveRange(request.range, request.caster, candidate)
+      ) {
         hadIneligibleByRange = true;
         continue;
       }
