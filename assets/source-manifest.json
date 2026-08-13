@@ -122,6 +122,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_OriginalSquare.png?81183"
     },
     {
+      "contentHash": "068ef88e44c8cdea006d457bd0a48ebb9923221bbc451151e5d8a9495f5c6c09",
+      "fetchedAt": "2026-08-13T16:18:51.440Z",
+      "localAssetKey": "champ_rammus",
+      "localPath": "assets/images/champions/rammus.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_OriginalSquare.png?3fbfd"
+    },
+    {
       "contentHash": "ef3d676a150f200b07cd3b575254918e6cbceefb8d951485dc86e138fed96ecb",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_singed",
@@ -136,6 +144,14 @@
       "localPath": "assets/images/champions/teemo.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_OriginalSquare.png?783d6"
+    },
+    {
+      "contentHash": "6f9291f1a3c687cc0faa48f6f1228257642d2d1f39449e828349c6e5745d3212",
+      "fetchedAt": "2026-08-13T16:18:51.440Z",
+      "localAssetKey": "champ_thresh",
+      "localPath": "assets/images/champions/thresh.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_OriginalSquare.png?9ef1d"
     },
     {
       "contentHash": "5ecae2df824f6b044d9d3ce6639d81201a0dd6aa4089d4d3cff8d26c4ec4ccf5",
@@ -338,6 +354,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Comet_Spear.png?dfd15"
     },
     {
+      "contentHash": "7cae0507507908894768d78af979d532817ecb01c2d7b925e09f3a9fc4b92c28",
+      "fetchedAt": "2026-08-13T16:18:51.440Z",
+      "localAssetKey": "spell_rammus_q",
+      "localPath": "assets/images/spells/rammus_q.png",
+      "revisionId": 3988570,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Powerball.png?0fd14"
+    },
+    {
       "contentHash": "18b8be81ba86312160d727eef3927712ece9ea20cc6ff16477102a92c522ed07",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_singed_w",
@@ -368,6 +392,22 @@
       "localPath": "assets/images/spells/teemo_w.png",
       "revisionId": 4010102,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Move_Quick.png?c55c8"
+    },
+    {
+      "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
+      "fetchedAt": "2026-08-13T16:18:51.440Z",
+      "localAssetKey": "spell_thresh_q",
+      "localPath": "assets/images/spells/thresh_q.png",
+      "revisionId": 4008201,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
+    },
+    {
+      "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
+      "fetchedAt": "2026-08-13T16:18:51.440Z",
+      "localAssetKey": "spell_thresh_q2",
+      "localPath": "assets/images/spells/thresh_q2.png",
+      "revisionId": 4008201,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
     },
     {
       "contentHash": "09b910060f0b9388f1c60b330bbbd9905c24485fdc2500485dd753ee9701476e",
