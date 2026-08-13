@@ -4,6 +4,7 @@ import BeamSpellObject from '../spellObjects/BeamSpellObject';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
+import TrailSystem from '../helpers/TrailSystem';
 import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../vfx/VfxGroup';
@@ -174,12 +175,75 @@ export default class Pantheon_Q extends Spell {
 }
 
 export class Pantheon_Q_Spear extends MissileSpellObject {
-  image = AssetManager.get('spell_pantheon_q');
   speed = 1_400 / 60;
   size = 32;
   visualWidth = 84;
   visualHeight = 30;
   maxHitCount = Infinity;
+
+  trailSystem = new TrailSystem({
+    trailColor: '#FD8A',
+    trailSize: this.visualHeight * 0.4,
+    trailLifeTime: 300,
+  });
+
+  draw(): void {
+    const angle = Math.atan2(
+      this.destination.y - this.position.y,
+      this.destination.x - this.position.x
+    );
+    const half = this.visualWidth / 2;
+    const blade = this.visualHeight * 0.4;
+
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(angle);
+
+    // Starlight burning along the haft only. Extended past the tip with round
+    // caps it painted a gold blob in front of the blade, blunting the spear.
+    blendMode(ADD);
+    strokeCap(SQUARE);
+    noFill();
+    stroke(255, 190, 90, 60);
+    strokeWeight(7);
+    line(-half * 0.95, 0, half * 0.3, 0);
+    stroke(255, 236, 190, 95);
+    strokeWeight(2.5);
+    line(-half * 0.95, 0, half * 0.3, 0);
+    blendMode(BLEND);
+    strokeCap(ROUND);
+
+    // haft: dark wood with a bronze highlight along the top
+    stroke(84, 52, 26, 245);
+    strokeWeight(4.5);
+    line(-half * 0.95, 0, half * 0.34, 0);
+    stroke(206, 160, 92, 220);
+    strokeWeight(1.3);
+    line(-half * 0.95, -1.3, half * 0.34, -1.3);
+
+    noStroke();
+    fill(176, 132, 68, 235);
+    ellipse(-half * 0.95, 0, 6, blade * 0.7);
+
+    // socket collar, kept slim so it does not read as a bead on the shaft
+    fill(198, 150, 78, 240);
+    quad(half * 0.28, -2.6, half * 0.4, -2.2, half * 0.4, 2.2, half * 0.28, 2.6);
+
+    // narrow leaf blade, drawn over the collar so the point stays the far end
+    fill(255, 248, 224, 250);
+    beginShape();
+    vertex(half, 0);
+    bezierVertex(half * 0.72, -blade * 0.85, half * 0.52, -blade * 0.55, half * 0.38, 0);
+    bezierVertex(half * 0.52, blade * 0.55, half * 0.72, blade * 0.85, half, 0);
+    endShape(CLOSE);
+
+    // mid-rib keeps the blade from reading as a flat blob at speed
+    stroke(198, 146, 58, 190);
+    strokeWeight(1);
+    line(half * 0.44, 0, half * 0.93, 0);
+
+    pop();
+  }
 
   onHit(enemy: AttackableUnit): void {
     enemy.takeDamage(spearDamage(enemy, this.hitTargets.length > 1), this.owner);

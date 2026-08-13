@@ -3,6 +3,7 @@ import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/ty
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
+import TrailSystem from '../helpers/TrailSystem';
 import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../vfx/VfxGroup';
@@ -93,6 +94,7 @@ export default class Varus_Q extends Spell {
       origin.y + direction.y * range
     );
     arrow.damage = this.damageAt(this.chargeMs);
+    arrow.chargeRatio = Math.min(1, this.chargeMs / RANGE_CHARGE_MS);
     this.game.objectManager.addObject(arrow);
   }
 
@@ -144,13 +146,78 @@ export default class Varus_Q extends Spell {
 }
 
 export class Varus_Q_Arrow extends MissileSpellObject {
-  image = AssetManager.get('spell_varus_q');
   speed = 1_200 / 60;
   size = 36;
   visualWidth = 90;
   visualHeight = 32;
   maxHitCount = Infinity;
   damage = 20;
+  /** 0..1 — how far the shot was drawn, so a full charge reads as a heavier bolt. */
+  chargeRatio = 0;
+
+  trailSystem = new TrailSystem({
+    trailColor: '#A4FA',
+    trailSize: this.visualHeight * 0.45,
+    trailLifeTime: 320,
+  });
+
+  draw(): void {
+    const angle = Math.atan2(
+      this.destination.y - this.position.y,
+      this.destination.x - this.position.x
+    );
+    const half = this.visualWidth / 2;
+    const barb = this.visualHeight * 0.44;
+    const charge = this.chargeRatio;
+
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(angle);
+
+    // Corruption bleeding off the shaft — heavier the longer the shot was drawn.
+    // Square caps and a glow that stops short of the head keep this reading as a
+    // streak behind the arrow instead of a capsule wrapped around it.
+    blendMode(ADD);
+    strokeCap(SQUARE);
+    noFill();
+    stroke(120, 40, 190, 45 + 45 * charge);
+    strokeWeight(6 + 6 * charge);
+    line(-half * 0.95, 0, half * 0.5, 0);
+    stroke(200, 120, 255, 80);
+    strokeWeight(2 + 2 * charge);
+    line(-half * 0.95, 0, half * 0.5, 0);
+    blendMode(BLEND);
+    strokeCap(ROUND);
+
+    // shaft: dark body with a lit top edge so it reads over pale terrain
+    stroke(46, 20, 66, 240);
+    strokeWeight(4);
+    line(-half * 0.95, 0, half * 0.55, 0);
+    stroke(196, 150, 240, 200);
+    strokeWeight(1.2);
+    line(-half * 0.95, -1.1, half * 0.55, -1.1);
+
+    // Fletching: two feathers swept back along the shaft. Drawn as slanted quads
+    // rather than triangles meeting at the tail, which read as a second arrowhead.
+    noStroke();
+    fill(126, 58, 176, 235);
+    quad(-half * 0.5, -1.6, -half * 0.86, -barb * 0.85, -half, -barb * 0.85, -half * 0.72, -1.6);
+    quad(-half * 0.5, 1.6, -half * 0.86, barb * 0.85, -half, barb * 0.85, -half * 0.72, 1.6);
+
+    // barbed head, notched at the back so the barbs stay legible in motion
+    fill(238, 224, 255, 250);
+    beginShape();
+    vertex(half, 0);
+    vertex(half * 0.45, -barb);
+    vertex(half * 0.63, 0);
+    vertex(half * 0.45, barb);
+    endShape(CLOSE);
+
+    fill(150, 60, 210, 220);
+    triangle(half * 0.92, 0, half * 0.6, -barb * 0.28, half * 0.6, barb * 0.28);
+
+    pop();
+  }
 
   onHit(enemy: { takeDamage(damage: number, owner: unknown): void }): void {
     const reduction = Math.min(

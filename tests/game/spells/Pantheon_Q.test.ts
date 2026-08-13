@@ -59,9 +59,37 @@ const owner = () => {
   };
 };
 
+const stubDrawGlobals = () => {
+  const spies = {
+    image: vi.fn(), line: vi.fn(), ellipse: vi.fn(), quad: vi.fn(),
+    beginShape: vi.fn(), bezierVertex: vi.fn(), vertex: vi.fn(), endShape: vi.fn(),
+  };
+  for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
+  for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight', 'strokeCap']) {
+    vi.stubGlobal(name, vi.fn());
+  }
+  for (const name of ['ADD', 'BLEND', 'CLOSE', 'SQUARE', 'ROUND']) vi.stubGlobal(name, name);
+  return spies;
+};
+
 describe('Pantheon Q', () => {
   beforeEach(() => vi.stubGlobal('createVector', (x = 0, y = 0) => new Vector(x, y)));
   afterEach(() => vi.unstubAllGlobals());
+
+  it('draws a procedural spear rather than blitting the ability icon', () => {
+    const draw = stubDrawGlobals();
+    const spear = new Pantheon_Q_Spear(owner() as never);
+    spear.destination = new Vector(100, 0) as never;
+
+    spear.draw();
+
+    expect(draw.image).not.toHaveBeenCalled();
+    expect(spear.image).toBeUndefined();
+    // haft, counterweight, bezier leaf blade and socket collar
+    expect(draw.ellipse).toHaveBeenCalledTimes(1);
+    expect(draw.bezierVertex).toHaveBeenCalledTimes(2);
+    expect(draw.quad).toHaveBeenCalledTimes(1);
+  });
 
   it('uses fresh key-up aim for the -40 to 560 thrust geometry', () => {
     const caster = owner();
@@ -116,8 +144,8 @@ describe('Pantheon Q', () => {
     expect(caster.objects[0]).toBeInstanceOf(Pantheon_Q_Spear);
     const spear = caster.objects[0] as Pantheon_Q_Spear;
     expect(spear.destination.x).toBe(0);
-    expect(spear.destination.y).toBeCloseTo(740.4);
-    expect(spear.speed).toBe(2_700 / 60);
+    expect(spear.destination.y).toBeCloseTo(240.4);
+    expect(spear.speed).toBe(1_400 / 60);
     expect(spear.size).toBe(32);
     expect(spear).toMatchObject({ visualWidth: 84, visualHeight: 30 });
     const damages: number[] = [];
@@ -173,7 +201,7 @@ describe('Pantheon Q', () => {
     expect(stats.mana.baseValue).toBe(87.5);
   });
 
-  it('tracks live aim and grows held throw range from 600 to 1200', () => {
+  it('tracks live aim and grows held throw range from 100 to 700', () => {
     const caster = owner();
     const spell = new Pantheon_Q(caster);
     spell.press(context);
@@ -184,9 +212,9 @@ describe('Pantheon Q', () => {
     spell.release(releaseContext);
 
     const spear = caster.objects[0] as Pantheon_Q_Spear;
-    expect(middle).toBe(900);
-    expect(spell.currentRange).toBe(1_200);
-    expect(spear.destination).toMatchObject({ x: 0, y: 1_200 });
+    expect(middle).toBe(400);
+    expect(spell.currentRange).toBe(700);
+    expect(spear.destination).toMatchObject({ x: 0, y: 700 });
   });
 
   it('uses fresh key-up aim for a charged throw without a final hold event', () => {
@@ -197,6 +225,6 @@ describe('Pantheon Q', () => {
 
     spell.release(releaseContext);
 
-    expect((caster.objects[0] as Pantheon_Q_Spear).destination).toMatchObject({ x: 0, y: 1_200 });
+    expect((caster.objects[0] as Pantheon_Q_Spear).destination).toMatchObject({ x: 0, y: 700 });
   });
 });

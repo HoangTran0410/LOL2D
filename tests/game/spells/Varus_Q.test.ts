@@ -34,9 +34,52 @@ const owner = () => {
   };
 };
 
+const stubDrawGlobals = () => {
+  const spies = {
+    image: vi.fn(), line: vi.fn(), triangle: vi.fn(), vertex: vi.fn(), quad: vi.fn(),
+    beginShape: vi.fn(), endShape: vi.fn(), strokeWeight: vi.fn(),
+  };
+  for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
+  for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeCap']) {
+    vi.stubGlobal(name, vi.fn());
+  }
+  for (const name of ['ADD', 'BLEND', 'CLOSE', 'SQUARE', 'ROUND']) vi.stubGlobal(name, name);
+  return spies;
+};
+
 describe('Varus Q', () => {
   beforeEach(() => vi.stubGlobal('createVector', (x = 0, y = 0) => new Vector(x, y)));
   afterEach(() => vi.unstubAllGlobals());
+
+  it('draws a procedural arrow rather than blitting the ability icon', () => {
+    const draw = stubDrawGlobals();
+    const arrow = new Varus_Q_Arrow(owner() as never);
+    arrow.destination = new Vector(100, 0) as never;
+
+    arrow.draw();
+
+    expect(draw.image).not.toHaveBeenCalled();
+    expect(arrow.image).toBeUndefined();
+    // barbed head + blight core, plus two swept-back fletching quads. The
+    // fletching must not be triangles meeting at the tail: that reads as a
+    // second arrowhead and is exactly what this replaced.
+    expect(draw.beginShape).toHaveBeenCalled();
+    expect(draw.triangle).toHaveBeenCalledTimes(1);
+    expect(draw.quad).toHaveBeenCalledTimes(2);
+  });
+
+  it('draws a heavier bolt the longer the shot was charged', () => {
+    const widestStroke = (chargeRatio: number) => {
+      const draw = stubDrawGlobals();
+      const arrow = new Varus_Q_Arrow(owner() as never);
+      arrow.destination = new Vector(100, 0) as never;
+      arrow.chargeRatio = chargeRatio;
+      arrow.draw();
+      return Math.max(...draw.strokeWeight.mock.calls.map(([weight]) => weight as number));
+    };
+
+    expect(widestStroke(1)).toBeGreaterThan(widestStroke(0));
+  });
 
   it('enters CHARGING on keydown and releases a missile on keyup', () => {
     const caster = owner();
@@ -48,10 +91,10 @@ describe('Varus Q', () => {
 
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
-    expect(arrow.destination).toMatchObject({ x: 825, y: 0 });
+    expect(arrow.destination).toMatchObject({ x: 100, y: 0 });
     expect(arrow.size).toBe(36);
     expect(arrow).toMatchObject({ visualWidth: 90, visualHeight: 32 });
-    expect(arrow.speed).toBeCloseTo(1_900 / 60);
+    expect(arrow.speed).toBeCloseTo(1_200 / 60);
     expect(spell.coolDown).toBe(5_000);
     expect(spell.state).toBe('COOLDOWN');
   });
@@ -67,7 +110,7 @@ describe('Varus Q', () => {
 
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow.destination).toMatchObject({ x: 0 });
-    expect(arrow.destination.y).toBeCloseTo(1_408.33, 2);
+    expect(arrow.destination.y).toBeCloseTo(600, 2);
     expect(arrow.damage).toBe(30);
   });
 
@@ -78,17 +121,17 @@ describe('Varus Q', () => {
 
     spell.release(context(0, 1));
 
-    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: 825 });
+    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: 100 });
   });
 
-  it('caps missile center travel at 1525 after range finishes charging', () => {
+  it('caps missile center travel at 700 after range finishes charging', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
     spell.press(context(1, 0));
     spell.onChargeUpdate(context(1, 0), 1_500, 1);
     spell.release(context(1, 0));
 
-    expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(1_525);
+    expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(700);
   });
 
   it('exposes a monotonically growing live charge range', () => {
@@ -100,9 +143,9 @@ describe('Varus Q', () => {
     const middle = spell.currentRange;
     spell.onChargeUpdate(context(1, 0), 1_500, 1);
 
-    expect(start).toBe(825);
+    expect(start).toBe(100);
     expect(middle).toBeGreaterThan(start);
-    expect(spell.currentRange).toBe(1_525);
+    expect(spell.currentRange).toBe(700);
   });
 
   it('applies and removes its researched self slow', () => {
