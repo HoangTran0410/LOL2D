@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'v
 import Buff from '../../../src/game/gameObject/Buff';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
+import Nearsight, { type NearsightGameContext } from '../../../src/game/gameObject/buffs/Nearsight';
 import BuffAddType from '../../../src/game/enums/BuffAddType';
 import ObjectManager from '../../../src/game/managers/ObjectManager';
 import EventManager from '../../../src/managers/EventManager';
@@ -81,6 +82,26 @@ function createGame(): GameObjectRuntimeContext {
   };
 }
 
+function createNearsightGame(): NearsightGameContext {
+  const camera = { getBoundingBox: () => new Rectangle({ x: 0, y: 0, w: 0, h: 0 }) };
+  const objectManager = new ObjectManager({ mapSize: 100, camera });
+  let player: AttackableUnit | undefined;
+
+  return {
+    mapSize: 100,
+    camera,
+    objectManager,
+    eventManager: new EventManager(),
+    fogOfWar: { sightChangeLerpSpeed: 0 },
+    get player() {
+      if (!player) throw new Error('Player is not available in this test context.');
+      return player;
+    },
+    randomSpawnPoint: () => createVector(),
+    createSpellContext: () => undefined,
+  };
+}
+
 describe('buff and attackable unit type boundary', () => {
   beforeEach(() => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => ({
@@ -99,6 +120,25 @@ describe('buff and attackable unit type boundary', () => {
       expect(source).not.toMatch(/\bany\b/);
       expect(source).not.toContain('AssetManager.getAsset(');
     }
+  });
+
+  it('uses the generated stasis asset and a required Nearsight fog context', () => {
+    expect(stasisSource).toContain("AssetManager.get('buff_stasis')");
+    expect(nearsightSource).not.toContain('hasFogOfWar');
+    expect(nearsightSource).toContain('fogOfWar: { sightChangeLerpSpeed: number }');
+  });
+
+  it('sets Nearsight fog interpolation speed while active and restores it on deactivation', () => {
+    const game = createNearsightGame();
+    const source = new AttackableUnit({ game });
+    const target = new AttackableUnit({ game });
+    const buff = new Nearsight(500, source, target);
+
+    buff.activateBuff();
+    expect(game.fogOfWar.sightChangeLerpSpeed).toBe(buff.activeLerpSpeed);
+
+    buff.deactivateBuff();
+    expect(game.fogOfWar.sightChangeLerpSpeed).toBe(buff.deactiveLerpSpeed);
   });
 
   it('keeps concrete buff source, target, game, and stack contracts', () => {
@@ -140,6 +180,82 @@ describe('buff and attackable unit type boundary', () => {
     expect(first.activated).toBe(1);
     expect(first.timeElapsed).toBe(0);
     expect(second.created).toBe(0);
+  });
+
+  it('marks an expired buff for removal and removes it on the next buff update', () => {
+    const game = createGame();
+    const source = new AttackableUnit({ game });
+    const target = new AttackableUnit({ game });
+    const buff = new TrackingBuff(1, source, target);
+
+    target.addBuff(buff);
+    target.updateBuffs();
+    expect(buff.toRemove).toBe(true);
+    expect(buff.deactivated).toBe(1);
+
+    target.updateBuffs();
+    expect(target.buffs).toEqual([]);
+  });
+
+  it('preserves the continuing-stack cap by expiring the oldest buff', () => {
+    const game = createGame();
+    const source = new AttackableUnit({ game });
+    const target = new AttackableUnit({ game });
+    const first = new TrackingBuff(500, source, target);
+    const second = new TrackingBuff(500, source, target);
+    const third = new TrackingBuff(500, source, target);
+    for (const buff of [first, second, third]) {
+      buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+      buff.maxStacks = 2;
+    }
+
+    target.addBuff(first);
+    first.timeElapsed = 240;
+    target.addBuff(second);
+    target.addBuff(third);
+
+    expect(first.toRemove).toBe(true);
+    expect(first.deactivated).toBe(1);
+    expect(third.timeElapsed).toBe(240);
+    expect(target.buffs).toEqual([first, second, third]);
+  });
+
+  it('renews existing stacks before expiring the oldest capped renewal stack', () => {
+    const game = createGame();
+    const source = new AttackableUnit({ game });
+    const target = new AttackableUnit({ game });
+    const first = new TrackingBuff(500, source, target);
+    const second = new TrackingBuff(500, source, target);
+    const third = new TrackingBuff(500, source, target);
+    for (const buff of [first, second, third]) {
+      buff.buffAddType = BuffAddType.STACKS_AND_RENEWS;
+      buff.maxStacks = 2;
+    }
+
+    target.addBuff(first);
+    target.addBuff(second);
+    first.timeElapsed = 240;
+    second.timeElapsed = 120;
+    target.addBuff(third);
+
+    expect(first.toRemove).toBe(true);
+    expect(first.deactivated).toBe(1);
+    expect(second.timeElapsed).toBe(0);
+    expect(target.buffs).toEqual([first, second, third]);
+  });
+
+  it('heals only living units without exceeding maximum health', () => {
+    const game = createGame();
+    const source = new AttackableUnit({ game });
+    const target = new AttackableUnit({ game });
+    target.stats.health.baseValue = 40;
+
+    target.takeHeal(80, source);
+    expect(target.stats.health.baseValue).toBe(target.stats.maxHealth.value);
+
+    target.die({ attacker: source, reviveAfter: target.reviveTime });
+    target.takeHeal(10, source);
+    expect(target.stats.health.baseValue).toBe(target.stats.maxHealth.value);
   });
 
   it('applies incoming damage hooks in buff order before recording death data', () => {

@@ -11,7 +11,10 @@ import Buff from '../Buff';
  * out of a fight, not a way to lock someone down.
  */
 export default class Stasis extends Buff {
-  image: Buff['image'] = AssetManager.get('buff_knockdown');
+  // Source: https://ddragon.leagueoflegends.com/cdn/16.16.1/img/item/3157.png
+  // Official Riot Data Dragon item 3157 (Zhonya's Hourglass), SHA-256:
+  // fc0908ad8621e96ad635b5bac67e09f663ec80735efd732b10f07d8c498443aa
+  image: Buff['image'] = AssetManager.get('buff_stasis');
   name = 'Bất Động';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 

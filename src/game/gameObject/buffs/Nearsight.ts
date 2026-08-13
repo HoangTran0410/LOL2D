@@ -6,15 +6,13 @@ import Buff from '../Buff';
 import { StatsModifier } from '../Stats';
 import type { GameObjectRuntimeContext } from '../GameObject';
 
-interface FogOfWarGameContext extends GameObjectRuntimeContext {
+export interface NearsightGameContext extends GameObjectRuntimeContext {
   fogOfWar: { sightChangeLerpSpeed: number };
 }
 
-function hasFogOfWar(game: GameObjectRuntimeContext): game is FogOfWarGameContext {
-  return 'fogOfWar' in game;
-}
-
 export default class Nearsight extends Buff {
+  declare game: NearsightGameContext;
+
   image: Buff['image'] = AssetManager.get('buff_nearsight');
   name = 'Mờ Mắt';
   buffAddType = BuffAddType.REPLACE_EXISTING;
@@ -34,16 +32,12 @@ export default class Nearsight extends Buff {
   }
 
   onActivate(): void {
-    if (hasFogOfWar(this.game)) {
-      this.game.fogOfWar.sightChangeLerpSpeed = this.activeLerpSpeed;
-    }
+    this.game.fogOfWar.sightChangeLerpSpeed = this.activeLerpSpeed;
     this.targetUnit.stats.addModifier(this.statsModifier);
   }
 
   onDeactivate(): void {
-    if (hasFogOfWar(this.game)) {
-      this.game.fogOfWar.sightChangeLerpSpeed = this.deactiveLerpSpeed;
-    }
+    this.game.fogOfWar.sightChangeLerpSpeed = this.deactiveLerpSpeed;
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }
