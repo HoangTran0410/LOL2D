@@ -14,6 +14,33 @@ function ensureVisibleAsset(asset: Pick<AssetHandle, 'key' | 'status'> | undefin
   }
 }
 
+/**
+ * How often the HUD reads the game, in milliseconds.
+ *
+ * It used to run on every animation frame, which meant rebuilding the spell and
+ * buff arrays sixty times a second and handing Vue a fresh identity for every
+ * one of them — style recalculation and patching on a phone that is already
+ * several times slower than the desktop this was written on. Nothing here
+ * changes fast enough to need it: the health bar carries a 0.1s CSS transition
+ * that smooths the gaps, the cooldown numbers are whole seconds, and the wedge
+ * is a percentage nobody can read to the frame. 50ms is twenty reads a second,
+ * which is still four times finer than the fastest thing on screen.
+ */
+const HUD_UPDATE_INTERVAL_MS = 50;
+
+/**
+ * How long a thumb must rest on a spell icon before its description appears.
+ *
+ * The tooltip is opened by hover on the desktop, and a touch screen has no
+ * hover — which left the only place in the game that says what an ability does
+ * unreachable on the device where a player is least likely to know already.
+ * 400ms is the usual long-press: past a tap, short of feeling stuck.
+ */
+const LONG_PRESS_MS = 400;
+
+/** How long the description stays up after the thumb lifts. */
+const LONG_PRESS_DISMISS_MS = 2500;
+
 // Types for Vue component data
 interface SpellDisplay {
   instance: any;
@@ -153,12 +180,24 @@ export default class InGameHUD {
           }),
           backgroundPicker: null as string | null,
           spellHover: null as any,
-          spellInfo: { bottom: '0px', left: '0px' },
+          spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
           isDead: false,
+
+          /** Mirrors game.touchControls.enabled; drives the whole touch layout. */
+          touchUi: false,
+          longPressTimer: 0,
+          longPressDismissTimer: 0,
+          longPressFired: false,
         };
       },
       methods: {
         pick(spell: any) {
+          // Same rule as changeSpell: a long press was a request to read the
+          // description, not to equip the thing.
+          if (this.longPressFired) {
+            this.longPressFired = false;
+            return;
+          }
           const bots = this.game.objectManager.objects.filter((o: any) => o instanceof AIChampion);
 
           if (this.oneForAll) {
@@ -191,7 +230,58 @@ export default class InGameHUD {
 
           this.spellHover = null;
         },
+        toggleTouchUi() {
+          const next = !this.touchUi;
+          this.touchUi = next;
+          this.game.setTouchControlsEnabled(next);
+        },
+        /**
+         * A thumb has landed on a spell icon. The description is armed here and
+         * fires if the thumb is still there 400ms later; anything shorter is a
+         * tap, which opens the picker exactly as a click does.
+         *
+         * `currentTarget` is read now rather than inside the timer: the browser
+         * nulls it the moment the handler returns.
+         */
+        touchSpellStart(spellProxy: any, event: any) {
+          const element = event.currentTarget || event.target;
+          this.cancelLongPress();
+          this.longPressFired = false;
+          this.longPressTimer = window.setTimeout(() => {
+            this.longPressFired = true;
+            this.showSpellInfo(spellProxy, element);
+          }, LONG_PRESS_MS);
+        },
+        touchSpellEnd() {
+          if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = 0;
+          }
+          if (!this.longPressFired) return;
+          // Nothing to hover away from on a touch screen, so the description
+          // times itself out rather than waiting for a gesture nobody will make.
+          this.longPressDismissTimer = window.setTimeout(() => {
+            this.spellHover = null;
+          }, LONG_PRESS_DISMISS_MS);
+        },
+        cancelLongPress() {
+          if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = 0;
+          }
+          if (this.longPressDismissTimer) {
+            clearTimeout(this.longPressDismissTimer);
+            this.longPressDismissTimer = 0;
+          }
+        },
         changeSpell(index: number) {
+          // A long press has already done something with this icon; the click
+          // the browser synthesises when the thumb lifts is not a second
+          // intention, and must not open the picker on top of the tooltip.
+          if (this.longPressFired) {
+            this.longPressFired = false;
+            return;
+          }
           this.spellIndexToSwap = index;
           this.showSpellsPicker = !this.showSpellsPicker;
 
@@ -220,18 +310,51 @@ export default class InGameHUD {
           this.game.unpause();
         },
         mouseover(spellProxy: any, event: any) {
+          // Hover is a mouse gesture. On a touch screen the browser fires one
+          // anyway on the way to a click, which would flash the description for
+          // an instant every time a player opened the picker.
+          if (this.touchUi) return;
           this.showPreview(spellProxy, true);
+          this.showSpellInfo(spellProxy, event.currentTarget || event.target);
+        },
+        /**
+         * Place the description panel next to `element`.
+         *
+         * Above it with a mouse, because the spell bar is along the bottom of
+         * the screen. Below it under a thumb, because in touch mode the bar has
+         * moved to the top and "above" would be off the screen entirely. The
+         * panel also stops being a fixed 300px there — that is most of a phone
+         * held sideways — and is kept inside the viewport on both edges.
+         */
+        showSpellInfo(spellProxy: any, element: any) {
+          if (!element?.getBoundingClientRect) return;
           this.spellHover = spellProxy;
+          const { width, x, y, bottom } = element.getBoundingClientRect();
 
-          const element = event.currentTarget || event.target;
-          const { width, x, y } = element.getBoundingClientRect();
+          if (!this.touchUi) {
+            this.spellInfo = {
+              top: 'auto',
+              bottom: 'calc(100vh - ' + (y - 5) + 'px)',
+              left: Math.max(x + width / 2 - 150, 0) + 'px',
+              width: '300px',
+            };
+            return;
+          }
 
+          const panelWidth = Math.min(300, window.innerWidth * 0.78);
+          const left = Math.min(
+            Math.max(x + width / 2 - panelWidth / 2, 6),
+            Math.max(6, window.innerWidth - panelWidth - 6)
+          );
           this.spellInfo = {
-            bottom: 'calc(100vh - ' + (y - 5) + 'px)',
-            left: Math.max(x + width / 2 - 150, 0) + 'px',
+            top: bottom + 8 + 'px',
+            bottom: 'auto',
+            left: left + 'px',
+            width: panelWidth + 'px',
           };
         },
         mouseout(spellProxy: any) {
+          if (this.touchUi) return;
           this.showPreview(spellProxy, false);
           this.spellHover = null;
         },
@@ -263,7 +386,13 @@ export default class InGameHUD {
       },
       template: /*html*/ `
       <div>
-        <div v-if="spellHover" class="spell-info" :style="'bottom:'+spellInfo.bottom+';left:'+spellInfo.left">
+        <button class="touch-toggle" :class="touchUi ? 'on' : ''" @click="toggleTouchUi()"
+            :title="touchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'">
+          <i class="fa-solid fa-gamepad"></i>
+        </button>
+
+        <div v-if="spellHover" class="spell-info"
+            :style="'top:'+spellInfo.top+';bottom:'+spellInfo.bottom+';left:'+spellInfo.left+';width:'+spellInfo.width">
             <div class="header">
               <div>
                 <img :src="spellHover.image" alt="spell" />
@@ -288,7 +417,11 @@ export default class InGameHUD {
                     <div v-for="(spell, index) of spells" :class="spell.small ? 'spell small' : 'spell'"
                         @click="changeSpell(index)"
                         @mouseover="mouseover(spell, $event)"
-                        @mouseout="mouseout(spell, $event)">
+                        @mouseout="mouseout(spell, $event)"
+                        @touchstart="touchSpellStart(spell, $event)"
+                        @touchend="touchSpellEnd()"
+                        @touchcancel="cancelLongPress()"
+                        @touchmove="cancelLongPress()">
                         <img :src="spell.image" alt="spell"
                             :style="(spell.disabled || spell.lockedOut || !spell.canCast || !spell.affordable) ? 'filter: grayscale(100%)' : ''" />
 
@@ -367,7 +500,11 @@ export default class InGameHUD {
                 <div v-for="spell of group.spells" class="spell"
                   @click="pick(spell, $event)"
                   @mouseover="mouseover(spell, $event)"
-                  @mouseout="mouseout(spell, $event)">
+                  @mouseout="mouseout(spell, $event)"
+                  @touchstart="touchSpellStart(spell, $event)"
+                  @touchend="touchSpellEnd()"
+                  @touchcancel="cancelLongPress()"
+                  @touchmove="cancelLongPress()">
                     <img :src="spell.image" alt="spell" />
                 </div>
               </div>
@@ -398,8 +535,15 @@ export default class InGameHUD {
   }
 
   _startUpdateLoop() {
+    let lastUpdateMs = 0;
     const tick = () => {
-      this.update();
+      const now = performance.now();
+      // Still driven by rAF, so the HUD stops dead when the tab is hidden —
+      // but the work inside is rationed. See HUD_UPDATE_INTERVAL_MS.
+      if (now - lastUpdateMs >= HUD_UPDATE_INTERVAL_MS) {
+        lastUpdateMs = now;
+        this.update();
+      }
       this._rafId = requestAnimationFrame(tick);
     };
     this._rafId = requestAnimationFrame(tick);
@@ -408,6 +552,11 @@ export default class InGameHUD {
   update() {
     const player = this.game?.player;
     if (!player) return;
+
+    // The HUD does not own the flag — the toggle, the query parameter and the
+    // stored preference all reach the controls first — so it reads it back
+    // rather than assuming its own button was the last thing to change it.
+    this.vueInstance.touchUi = this.game.touchControls?.enabled ?? false;
 
     ensureVisibleAsset(player.avatar);
 

@@ -502,3 +502,237 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
+
+/* =====================================================================
+   Touch layout
+   =====================================================================
+
+   Everything below hangs off one class on <body>, set by
+   Game.applyTouchUiClass from the same toggle that switches the controls.
+
+   A mode flag rather than a viewport breakpoint, deliberately. What has to
+   change here is not how much room there is — it is whether the player has a
+   hover, a keyboard and a pixel-accurate pointer. A narrow desktop window has
+   all three and wants the desktop HUD; a wide tablet has none of them and
+   wants this one. Scoping every rule under the class also means the desktop
+   layout is untouched by construction: none of these selectors can match
+   unless the mode is on.
+
+   The shape of the problem: in Wild Rift the bottom band belongs to two
+   thumbs, and this HUD was sitting in the middle of it. So the whole strip
+   moves to the top-left, where nothing covers it, and the canvas controls own
+   the bottom. The strip stops being a cast surface there and becomes a
+   loadout readout — you still tap a slot to change the ability and long-press
+   it to read what it does, which are both deliberate actions rather than
+   things a thumb does by accident mid-fight. */
+
+body.touch-ui .bottom-HUD {
+  top: 6px;
+  bottom: auto;
+  left: 6px;
+  transform: none;
+  margin-bottom: 0;
+  padding: 4px 10px 4px 4px;
+  border-top-left-radius: 6px;
+  background-color: #111e;
+}
+
+body.touch-ui .bottom-HUD .champion-avatar img {
+  width: 46px;
+  height: 46px;
+}
+
+body.touch-ui .champion-avatar .revive-counter {
+  line-height: 46px;
+  font-size: 1.1em;
+}
+
+body.touch-ui .champion-details {
+  margin-left: 6px;
+}
+
+/* Smaller than the desktop icons, not larger: these are no longer the thing
+   you press to cast. The 90px buttons on the canvas are. */
+body.touch-ui .bottom-HUD .spell {
+  width: 2.2em;
+  height: 2.2em;
+}
+
+body.touch-ui .bottom-HUD .spell.small {
+  width: 1.7em !important;
+  height: 1.7em !important;
+}
+
+/* There is no keyboard, so the letter in the corner is noise that only
+   crowds the two badges that still mean something. */
+body.touch-ui .spell .hotKey {
+  display: none;
+}
+
+body.touch-ui .bottom-HUD .spell .stacks,
+body.touch-ui .bottom-HUD .spell .mana-cost {
+  font-size: 0.6em;
+  min-width: 12px;
+  line-height: 13px;
+  padding: 0 2px;
+  border-radius: 7px;
+}
+
+body.touch-ui .bottom-HUD .spell .cooldown p {
+  font-size: 0.8em;
+}
+
+body.touch-ui .health-bar {
+  margin-top: 4px;
+}
+
+body.touch-ui .health-bar .bar {
+  height: 13px;
+}
+
+body.touch-ui .health-bar .bar p {
+  font-size: 0.7em;
+}
+
+/* The buffs hang *above* the bar on the desktop, which is off the top of the
+   screen once the strip has moved there. They drop underneath instead, and
+   wrap rather than running off the side of a 390px-tall phone. */
+body.touch-ui .buffs {
+  top: auto;
+  bottom: -4px;
+  transform: translateY(100%);
+  flex-wrap: wrap;
+  max-width: 55vw;
+  gap: 2px;
+}
+
+body.touch-ui .buffs .buff {
+  width: 30px;
+  height: 30px;
+}
+
+body.touch-ui .buffs .buff span {
+  font-size: 0.65em;
+  padding: 0 3px;
+}
+
+/* The three profiler panels land exactly where the strip now is. */
+body.touch-ui #stats {
+  display: none;
+}
+
+/* =============== Description panel =============== */
+/* Fixed 300px is most of a phone held sideways. The width and the side it
+   opens on are set from InGameHUD.showSpellInfo, which also flips it below
+   the icon — the strip is at the top now, so "above" is off the screen. */
+body.touch-ui .spell-info {
+  font-size: 0.85em;
+  padding: 8px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+body.touch-ui .spell-info img {
+  width: 36px;
+  margin-right: 8px;
+}
+
+/* =============== Spell picker =============== */
+body.touch-ui .spell-picker {
+  width: 96vw;
+  max-width: none;
+  max-height: 90vh;
+  padding: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.touch-ui .spell-picker .title {
+  font-size: 1.1em;
+  margin-bottom: 6px;
+}
+
+body.touch-ui .spell-picker > p {
+  font-size: 0.85em;
+  margin: 4px 0;
+}
+
+/* 44px is the smallest target a thumb hits reliably; the native control is
+   13px, and it is the only way out of one of the two game modes. */
+body.touch-ui .spell-picker input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+
+body.touch-ui .spell-picker .close-btn {
+  width: 44px;
+  height: 44px;
+  font-size: 1.5em;
+  border-radius: 6px;
+}
+
+body.touch-ui .spell-picker .group {
+  margin: 4px;
+  padding: 4px;
+}
+
+body.touch-ui .spell-picker .group-header img {
+  width: 30px;
+  height: 30px;
+}
+
+body.touch-ui .spell-picker .group-header p {
+  font-size: 0.9em;
+}
+
+/* Kept at 48px: in the picker an icon *is* the button. */
+body.touch-ui .spell-picker .spell {
+  width: 3em;
+  height: 3em;
+  margin: 3px;
+}
+
+/* Both of these open on :hover, which a touch screen does not have. The
+   changelog is desktop reading matter; the mode tooltips are explained by the
+   labels beside them. */
+body.touch-ui .change-logs,
+body.touch-ui .spell-picker .tooltip .tooltiptext {
+  display: none;
+}
+
+/* =============== Mode toggle =============== */
+/* The explicit switch. It exists for two reasons: a hybrid device (a laptop
+   with a touch screen, a tablet with a keyboard) guesses wrong either way, and
+   without it none of this could be driven from a desktop Chrome, which is
+   where every end-to-end test runs. */
+.touch-toggle {
+  position: fixed;
+  top: 6px;
+  right: 6px;
+  z-index: 120;
+
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #fff3;
+  background-color: #111c;
+  color: #999;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.touch-toggle:hover {
+  color: #ddd;
+  border-color: #fff6;
+}
+
+.touch-toggle.on {
+  color: #7fd3ff;
+  border-color: #7fd3ff88;
+}
+
+body.touch-ui .touch-toggle {
+  width: 46px;
+  height: 46px;
+  font-size: 1.25em;
+}

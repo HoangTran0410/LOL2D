@@ -345,6 +345,13 @@ export default class Game {
    * TouchControls works out for itself which of them are new, moved or gone.
    */
   syncTouches(points: readonly TouchPoint[]): void {
+    // The spell picker pauses the game and covers the screen. Touches belong to
+    // it while it is open, and a gesture that was running when it opened has to
+    // end without casting rather than sit there half-aimed behind a modal.
+    if (this.paused) {
+      this.touchControls.releaseEverything();
+      return;
+    }
     this.touchControls.syncPointers(points);
   }
 
