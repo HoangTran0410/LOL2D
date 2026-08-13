@@ -47,10 +47,27 @@ GameObject
 ├── AttackableUnit (has stats, buffs, health, movement)
 │   ├── Champion (player-controlled)
 │   ├── AIChampion (AI-controlled)
-│   └── Monster
+│   ├── Monster (jungle camp)
+│   ├── Minion (lane minion, spawned in waves)
+│   └── Turret (team building)
+├── Fountain (spawn platform, not attackable)
 ├── SpellObject (projectile/effect created by spells)
 └── Helpers (ParticleSystem, CombatText, TrailSystem)
 ```
+
+### Teams, lanes and minions
+
+`GameObject.teamId` defaults to a fresh uuid per unit, so by default every unit
+is its own faction. **Champions keep that** — the player and the bots are
+free-for-all and hostile to everyone, including both minion teams.
+
+`src/game/enums/TeamId.ts` adds the two shared ids that a base's fountain, its
+turret row (`turret1` = blue, `turret2` = red in `summoner_map.json`) and the
+minions it spawns all share. `src/game/lanes.ts` holds the three lane waypoint
+paths, ordered blue base → red base; red minions walk them backwards. Those
+coordinates are checked against the map's wall polygons by
+`tests/game/minions/Lanes.test.ts` — edit them and re-run it.
+`src/game/managers/MinionSpawner.ts` is the wave clock and owns the live cap.
 
 ### Spells (`src/game/gameObject/spells/`)
 
