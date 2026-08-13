@@ -3,7 +3,7 @@ import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/ty
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
-import CastBar from '../../vfx/CastBar';
+import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../vfx/VfxGroup';
 
@@ -34,7 +34,7 @@ export default class Varus_Q extends Spell {
       interrupts: { move: false },
       vfx: {
         castLoop: context => new VfxGroup([
-          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => this.owner.position),
+          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => unitCastBarAnchor(this.owner)),
           new ChargeRangeTelegraph(
             () => this.owner.position,
             () => this.aimDirection,
@@ -49,6 +49,11 @@ export default class Varus_Q extends Spell {
   hold(context: CastContext): boolean {
     this.aimContext = context;
     return super.hold(context);
+  }
+
+  release(context: CastContext): boolean {
+    this.aimContext = context;
+    return super.release(context);
   }
 
   onCastStart(context: CastContext): void {

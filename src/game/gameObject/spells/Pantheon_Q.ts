@@ -4,7 +4,7 @@ import BeamSpellObject from '../spellObjects/BeamSpellObject';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
-import CastBar from '../../vfx/CastBar';
+import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../vfx/VfxGroup';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -51,7 +51,7 @@ export default class Pantheon_Q extends Spell {
       interrupts: { move: false },
       vfx: {
         castLoop: context => new VfxGroup([
-          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => this.owner.position),
+          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => unitCastBarAnchor(this.owner)),
           new ChargeRangeTelegraph(
             () => this.owner.position,
             () => this.castDirection,
@@ -82,6 +82,12 @@ export default class Pantheon_Q extends Spell {
     this.aimContext = context;
     this.castDirection = this.directionTo(context);
     return super.hold(context);
+  }
+
+  release(context: CastContext): boolean {
+    this.aimContext = context;
+    this.castDirection = this.directionTo(context);
+    return super.release(context);
   }
 
   onUpdate(): void {

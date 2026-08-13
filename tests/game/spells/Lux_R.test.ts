@@ -87,9 +87,22 @@ describe('Lux R', () => {
     const release = new LuxBeamEffect(geometry, 'release');
     release.draw();
     expect(line).toHaveBeenCalledTimes(8);
+    release.update(0);
     release.update(449);
     expect(release.complete).toBe(false);
     release.update(1);
+    expect(release.complete).toBe(true);
+  });
+
+  it('expires a release flash even when it is never drawn', () => {
+    const release = new LuxBeamEffect(
+      { start: { x: 0, y: 0 }, end: { x: 100, y: 0 }, width: 20 },
+      'release'
+    );
+
+    release.update(0);
+    release.update(450);
+
     expect(release.complete).toBe(true);
   });
 

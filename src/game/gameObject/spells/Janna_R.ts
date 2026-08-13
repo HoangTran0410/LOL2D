@@ -6,7 +6,7 @@ import TerrainType from '../../enums/TerrainType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
-import CastBar from '../../vfx/CastBar';
+import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import VfxGroup from '../../vfx/VfxGroup';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
@@ -66,7 +66,7 @@ export default class Janna_R extends Spell {
       vfx: {
         channelLoop: context => new VfxGroup([
           new CastTelegraph(context, this.radius, undefined, () => this.owner.position),
-          new CastBar(context, () => this.channelElapsedMs / this.channelDurationMs, undefined, () => this.owner.position),
+          new CastBar(context, () => this.channelElapsedMs / this.channelDurationMs, undefined, () => unitCastBarAnchor(this.owner)),
         ]),
       },
     };

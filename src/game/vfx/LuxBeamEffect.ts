@@ -8,7 +8,7 @@ const RELEASE_MS = 450;
 export default class LuxBeamEffect implements VfxHandle {
   private elapsedMs = 0;
   private disposed = false;
-  private drawn = false;
+  private started = false;
 
   constructor(
     readonly geometry: BeamGeometry,
@@ -21,16 +21,18 @@ export default class LuxBeamEffect implements VfxHandle {
   }
 
   update(deltaMs: number): void {
-    if (!this.disposed && this.drawn && this.phase === 'release') {
-      this.elapsedMs = Math.min(RELEASE_MS, this.elapsedMs + Math.max(0, deltaMs));
+    if (this.disposed || this.phase !== 'release') return;
+    if (!this.started) {
+      this.started = true;
+      return;
     }
+    this.elapsedMs = Math.min(RELEASE_MS, this.elapsedMs + Math.max(0, deltaMs));
   }
 
   draw(): void {
     if (this.disposed) return;
     if (this.phase === 'prepare') this.drawPrepare();
     else this.drawRelease();
-    this.drawn = true;
   }
 
   dispose(): void { this.disposed = true; }

@@ -3,6 +3,18 @@ import type { VfxHandle } from './SpellVfx';
 
 type Position = Readonly<{ x: number; y: number }>;
 
+interface CastBarUnit {
+  readonly position: Position;
+  readonly animatedValues: { readonly displaySize: number };
+}
+
+export function unitCastBarAnchor(unit: CastBarUnit): Position {
+  return {
+    x: unit.position.x,
+    y: unit.position.y - unit.animatedValues.displaySize / 2,
+  };
+}
+
 export default class CastBar implements VfxHandle {
   private disposed = false;
 

@@ -251,6 +251,21 @@ describe('champion and direct-subclass type boundary', () => {
     expect(fill).toHaveBeenCalledWith(225, 230, 238, expect.any(Number));
   });
 
+  it('draws spell overlays after the champion body and health UI', () => {
+    const game = createGame();
+    const champion = new Champion({ game });
+    const order: string[] = [];
+    const drawUnit = vi.spyOn(AttackableUnit.prototype, 'draw').mockImplementation(() => {
+      order.push('unit');
+    });
+    champion.spells = [{ drawVfx: () => order.push('vfx') }] as Spell[];
+
+    champion.draw();
+
+    expect(order).toEqual(['unit', 'vfx']);
+    drawUnit.mockRestore();
+  });
+
   it('requires a charge configuration for hold activations', () => {
     const holdSpec: ChargeCastSpec = {
       activation: 'HOLD_RELEASE',

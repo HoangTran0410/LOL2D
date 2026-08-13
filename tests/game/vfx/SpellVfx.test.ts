@@ -4,7 +4,7 @@ import ImpactEffect from '../../../src/game/vfx/ImpactEffect';
 import ParticleEmitter from '../../../src/game/vfx/ParticleEmitter';
 import SpriteEffect from '../../../src/game/vfx/SpriteEffect';
 import SpellVfx, { type VfxHandle } from '../../../src/game/vfx/SpellVfx';
-import CastBar from '../../../src/game/vfx/CastBar';
+import CastBar, { unitCastBarAnchor } from '../../../src/game/vfx/CastBar';
 import CastTelegraph from '../../../src/game/vfx/CastTelegraph';
 import ChargeRangeTelegraph from '../../../src/game/vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../../src/game/vfx/VfxGroup';
@@ -80,6 +80,15 @@ describe('Spell VFX lifecycle', () => {
     expect(renderBar).toHaveBeenCalledWith(context, 0.5, { x: 90, y: 20 });
     expect(renderCircle).toHaveBeenCalledWith(context, 100, { x: 90, y: 20 });
     expect(context.origin).toEqual({ x: 1, y: 2 });
+  });
+
+  it('anchors cast bars above the live unit sprite', () => {
+    const unit = { position: { x: 100, y: 200 }, animatedValues: { displaySize: 80 } };
+
+    expect(unitCastBarAnchor(unit)).toEqual({ x: 100, y: 160 });
+
+    unit.position.y = 260;
+    expect(unitCastBarAnchor(unit)).toEqual({ x: 100, y: 220 });
   });
 
   it('samples live charge geometry and groups VFX lifecycle calls', () => {

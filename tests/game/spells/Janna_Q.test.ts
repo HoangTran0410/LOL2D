@@ -70,7 +70,7 @@ describe('Janna Q', () => {
     spell.press(context(owner, { x: 40, y: 60 }, { x: 40, y: 160 }, { x: 0, y: 1 }));
 
     expect(tornado.position).toMatchObject({ x: 10, y: 20 });
-    expect(tornado.destination).toMatchObject({ x: 536, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 560, y: 20 });
   });
 
   it('allows Janna to move and cast while the tornado remains ACTIVE', () => {
@@ -115,7 +115,7 @@ describe('Janna Q', () => {
 
     tornado.release();
 
-    expect(tornado.destination).toMatchObject({ x: 705, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 735, y: 20 });
     expect(tornado.speed).toBeCloseTo(1_144 / 60);
     expect(tornado.size).toBe(60);
     expect(tornado.getCurrentDamage()).toBe(23);

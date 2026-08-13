@@ -172,7 +172,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     this.charging = false;
     this.size = lerp(this.minSize, this.maxSize, ratio);
     this.speed = lerp(this.minSpeed, this.maxSpeed, ratio);
-    const range = lerp(this.minRange, this.maxRange, ratio) - this.size / 2;
+    const range = lerp(this.minRange, this.maxRange, ratio);
     this.destination = this.position.copy().add(this.releaseDirection.copy().mult(range));
   }
 

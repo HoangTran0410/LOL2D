@@ -52,8 +52,8 @@ export default class Champion extends AttackableUnit {
   }
 
   draw() {
-    this.spells.forEach(spell => spell.drawVfx());
     super.draw();
+    this.spells.forEach(spell => spell.drawVfx());
   }
 
   onRemoved() {

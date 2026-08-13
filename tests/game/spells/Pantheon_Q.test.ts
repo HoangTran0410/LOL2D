@@ -63,7 +63,7 @@ describe('Pantheon Q', () => {
   beforeEach(() => vi.stubGlobal('createVector', (x = 0, y = 0) => new Vector(x, y)));
   afterEach(() => vi.unstubAllGlobals());
 
-  it('snapshots aim and creates the imported -40 to 560 thrust geometry', () => {
+  it('uses fresh key-up aim for the -40 to 560 thrust geometry', () => {
     const caster = owner();
     const spell = new Pantheon_Q(caster);
     spell.press(context);
@@ -72,8 +72,8 @@ describe('Pantheon Q', () => {
     const beam = caster.objects[0] as BeamSpellObject;
     expect(beam).toBeInstanceOf(BeamSpellObject);
     expect(beam.geometry).toEqual({
-      start: { x: -40, y: 0 },
-      end: { x: 560, y: 0 },
+      start: { x: 0, y: -40 },
+      end: { x: 0, y: 560 },
       width: 120,
     });
     expect(spell.currentCooldown).toBe(1_600);
@@ -115,8 +115,8 @@ describe('Pantheon Q', () => {
 
     expect(caster.objects[0]).toBeInstanceOf(Pantheon_Q_Spear);
     const spear = caster.objects[0] as Pantheon_Q_Spear;
-    expect(spear.destination.x).toBeCloseTo(740.4);
-    expect(spear.destination.y).toBe(0);
+    expect(spear.destination.x).toBe(0);
+    expect(spear.destination.y).toBeCloseTo(740.4);
     expect(spear.speed).toBe(2_700 / 60);
     expect(spear.size).toBe(32);
     expect(spear).toMatchObject({ visualWidth: 84, visualHeight: 30 });
@@ -187,5 +187,16 @@ describe('Pantheon Q', () => {
     expect(middle).toBe(900);
     expect(spell.currentRange).toBe(1_200);
     expect(spear.destination).toMatchObject({ x: 0, y: 1_200 });
+  });
+
+  it('uses fresh key-up aim for a charged throw without a final hold event', () => {
+    const caster = owner();
+    const spell = new Pantheon_Q(caster);
+    spell.press(context);
+    spell.onChargeUpdate(context, 1_500, 1);
+
+    spell.release(releaseContext);
+
+    expect((caster.objects[0] as Pantheon_Q_Spear).destination).toMatchObject({ x: 0, y: 1_200 });
   });
 });

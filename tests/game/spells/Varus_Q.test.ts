@@ -71,6 +71,16 @@ describe('Varus Q', () => {
     expect(arrow.damage).toBe(30);
   });
 
+  it('uses the fresh key-up aim even when no final hold event ran', () => {
+    const caster = owner();
+    const spell = new Varus_Q(caster);
+    spell.press(context(1, 0));
+
+    spell.release(context(0, 1));
+
+    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: 825 });
+  });
+
   it('caps missile center travel at 1525 after range finishes charging', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
