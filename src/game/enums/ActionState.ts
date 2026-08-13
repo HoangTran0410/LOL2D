@@ -1,6 +1,7 @@
 const ActionState = {
   CAN_CAST: 1 << 1,
   CAN_MOVE: 1 << 2,
+  CAN_ATTACK: 1 << 3,
   STEALTHED: 1 << 4,
   GROUNDED: 1 << 5,
   FEARED: 1 << 7,

@@ -47,9 +47,13 @@ export class Stat {
 
   /**
    * Ceiling applied to `value`. Defaults to no limit, so only the stats that
-   * genuinely need one pay for it. Clamping the read rather than the modifiers
-   * keeps it reversible: a buff that pushed the total past the cap still
-   * subtracts cleanly when it expires, and the value comes back down.
+   * genuinely need one pay for it. Attack speed is the clearest case: its buffs
+   * multiply, so two or three overlapping ones reach a swing per frame and no
+   * amount of balancing on the buff side can prevent it.
+   *
+   * Clamping the read rather than the modifiers keeps it reversible: a buff that
+   * pushed the total past the cap still subtracts cleanly when it expires, and
+   * the value comes back down instead of sticking.
    */
   maxValue = Infinity;
 
@@ -111,6 +115,9 @@ export class StatsModifier {
   manaRegen = new StatModifier(0);
   healthRegen = new StatModifier(0);
   visionRadius = new StatModifier(0);
+  attackDamage = new StatModifier(0);
+  attackSpeed = new StatModifier(0);
+  attackRange = new StatModifier(0);
 
   addModifier(modifier: StatsModifier) {
     if (!(modifier instanceof StatsModifier)) return;
@@ -124,6 +131,9 @@ export class StatsModifier {
     this.manaRegen.add(modifier.manaRegen);
     this.healthRegen.add(modifier.healthRegen);
     this.visionRadius.add(modifier.visionRadius);
+    this.attackDamage.add(modifier.attackDamage);
+    this.attackSpeed.add(modifier.attackSpeed);
+    this.attackRange.add(modifier.attackRange);
   }
 
   removeModifier(modifier: StatsModifier) {
@@ -138,6 +148,9 @@ export class StatsModifier {
     this.manaRegen.remove(modifier.manaRegen);
     this.healthRegen.remove(modifier.healthRegen);
     this.visionRadius.remove(modifier.visionRadius);
+    this.attackDamage.remove(modifier.attackDamage);
+    this.attackSpeed.remove(modifier.attackSpeed);
+    this.attackRange.remove(modifier.attackRange);
   }
 }
 
@@ -149,6 +162,12 @@ export class StatsModifier {
  * Cho'Gath R — 6 size a stack, 99 stacks, permanent — would reach 649.
  */
 export const MAX_UNIT_SIZE = 165;
+
+/**
+ * Hard ceiling on attacks per second. Attack speed buffs multiply, so two or
+ * three overlapping ones would otherwise reach a swing per frame.
+ */
+export const MAX_ATTACK_SPEED = 2.5;
 
 export default class Stats {
   maxHealth = new Stat(100);
@@ -162,8 +181,24 @@ export default class Stats {
   healthRegen = new Stat(0.06);
   visionRadius = new Stat(500);
 
+  /** Damage of one basic attack. */
+  attackDamage = new Stat(0);
+  /**
+   * Basic attacks per second, not the period between them. A rate is what buffs
+   * actually modify — "+30% attack speed" is a 1.3x on this number and composes
+   * with the existing percentBonus machinery, while the same buff on a period
+   * would have to be written as a division. It is also the direction a ceiling
+   * makes sense in, so MAX_ATTACK_SPEED can be a plain maxValue.
+   */
+  attackSpeed = new Stat(0, MAX_ATTACK_SPEED);
+  /** Surface-to-surface reach of a basic attack; decides melee versus ranged. */
+  attackRange = new Stat(0);
+
   actionState =
-    ActionState.CAN_CAST | ActionState.CAN_MOVE | ActionState.TARGETABLE;
+    ActionState.CAN_CAST |
+    ActionState.CAN_MOVE |
+    ActionState.CAN_ATTACK |
+    ActionState.TARGETABLE;
 
   addModifier(modifier: StatsModifier) {
     if (!(modifier instanceof StatsModifier)) return;
@@ -177,6 +212,9 @@ export default class Stats {
     this.manaRegen.addModifier(modifier.manaRegen);
     this.healthRegen.addModifier(modifier.healthRegen);
     this.visionRadius.addModifier(modifier.visionRadius);
+    this.attackDamage.addModifier(modifier.attackDamage);
+    this.attackSpeed.addModifier(modifier.attackSpeed);
+    this.attackRange.addModifier(modifier.attackRange);
   }
 
   removeModifier(modifier: StatsModifier) {
@@ -191,6 +229,9 @@ export default class Stats {
     this.manaRegen.removeModifier(modifier.manaRegen);
     this.healthRegen.removeModifier(modifier.healthRegen);
     this.visionRadius.removeModifier(modifier.visionRadius);
+    this.attackDamage.removeModifier(modifier.attackDamage);
+    this.attackSpeed.removeModifier(modifier.attackSpeed);
+    this.attackRange.removeModifier(modifier.attackRange);
   }
 
   getActionState(state: number): boolean {
@@ -231,6 +272,20 @@ export default class Stats {
       ActionState.CAN_CAST,
       !(
         hasFlag(statusFlag, StatusFlags.Silenced) ||
+        hasFlag(statusFlag, StatusFlags.Charmed) ||
+        hasFlag(statusFlag, StatusFlags.Feared) ||
+        hasFlag(statusFlag, StatusFlags.Stunned) ||
+        hasFlag(statusFlag, StatusFlags.Suppressed)
+      )
+    );
+
+    // Disarm is the dedicated flag, but everything that takes control of a unit
+    // stops its swings too — a stunned or fleeing champion attacking nothing in
+    // particular would read as a bug.
+    this.setActionState(
+      ActionState.CAN_ATTACK,
+      !(
+        hasFlag(statusFlag, StatusFlags.Disarmed) ||
         hasFlag(statusFlag, StatusFlags.Charmed) ||
         hasFlag(statusFlag, StatusFlags.Feared) ||
         hasFlag(statusFlag, StatusFlags.Stunned) ||

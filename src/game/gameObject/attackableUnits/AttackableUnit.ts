@@ -437,6 +437,11 @@ export default class AttackableUnit extends GameObject {
   get canMove() {
     return !this.isDead && hasFlag(this.stats.actionState, ActionState.CAN_MOVE);
   }
+  /** Gate for basic attacks. Disarm, and every crowd control that takes over a
+   *  unit, clear ActionState.CAN_ATTACK through Stats.updateActionState. */
+  get canAttack() {
+    return !this.isDead && hasFlag(this.stats.actionState, ActionState.CAN_ATTACK);
+  }
   /** Total damage every shield on this unit can still absorb. */
   get shieldAmount(): number {
     let total = 0;

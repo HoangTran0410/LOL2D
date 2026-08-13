@@ -1,6 +1,9 @@
 const EventType = {
   ON_DIE: 'onUnitDie',
+  /** A basic attack has just been launched. Payload: the attacking unit. */
   ON_ATTACK: 'onUnitAttack',
+  /** A basic attack has just landed. Payload: BasicAttackHit. */
+  ON_ATTACK_HIT: 'onUnitAttackHit',
   ON_TAKE_DAMAGE: 'onUnitTakeDamage',
   ON_HEAL: 'onUnitHeal',
   ON_BUFF_ADD: 'onUnitBuffAdd',
