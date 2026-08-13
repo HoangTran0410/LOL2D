@@ -121,7 +121,9 @@ export default class Varus_Q extends Spell {
 export class Varus_Q_Arrow extends MissileSpellObject {
   image = AssetManager.get('spell_varus_q');
   speed = 1_900 / 60;
-  size = 140;
+  size = 36;
+  visualWidth = 90;
+  visualHeight = 32;
   maxHitCount = Infinity;
   damage = 20;
 

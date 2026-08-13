@@ -118,6 +118,8 @@ describe('Pantheon Q', () => {
     expect(spear.destination.x).toBeCloseTo(740.4);
     expect(spear.destination.y).toBe(0);
     expect(spear.speed).toBe(2_700 / 60);
+    expect(spear.size).toBe(32);
+    expect(spear).toMatchObject({ visualWidth: 84, visualHeight: 30 });
     const damages: number[] = [];
     const targets = [
       target('red'),

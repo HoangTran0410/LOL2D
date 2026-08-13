@@ -152,7 +152,9 @@ export default class Pantheon_Q extends Spell {
 export class Pantheon_Q_Spear extends MissileSpellObject {
   image = AssetManager.get('spell_pantheon_q');
   speed = 2_700 / 60;
-  size = 110;
+  size = 32;
+  visualWidth = 84;
+  visualHeight = 30;
   maxHitCount = Infinity;
 
   onHit(enemy: AttackableUnit): void {

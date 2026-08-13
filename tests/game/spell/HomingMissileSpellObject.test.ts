@@ -38,6 +38,49 @@ describe('HomingMissileSpellObject', () => {
   beforeEach(installSpellObjectGlobals);
   afterEach(() => { vi.unstubAllGlobals(); });
 
+  it('draws a ready missile sprite at visual dimensions independent from collision size', () => {
+    const missile = new TerminalMissile(createUnit(createGame()));
+    const drawImage = vi.fn();
+    Object.assign(missile, {
+      image: { status: 'ready', data: { id: 'arrow' }, key: 'spell_varus_q', url: '', path: '' },
+      visualWidth: 80,
+      visualHeight: 28,
+      size: 32,
+      destination: createVector(10, 0),
+    });
+    vi.stubGlobal('push', vi.fn());
+    vi.stubGlobal('pop', vi.fn());
+    vi.stubGlobal('translate', vi.fn());
+    vi.stubGlobal('rotate', vi.fn());
+    vi.stubGlobal('imageMode', vi.fn());
+    vi.stubGlobal('CENTER', 'center');
+    vi.stubGlobal('image', drawImage);
+
+    missile.draw();
+
+    expect(drawImage).toHaveBeenCalledWith({ id: 'arrow' }, 0, 0, 80, 28);
+    expect(missile.size).toBe(32);
+  });
+
+  it('draws a fallback shaft while a missile asset is loading', () => {
+    const missile = new TerminalMissile(createUnit(createGame()));
+    const drawLine = vi.fn();
+    Object.assign(missile, {
+      image: { status: 'loading', data: null, key: 'spell_varus_q', url: '', path: '' },
+      visualWidth: 80,
+      visualHeight: 28,
+      destination: createVector(10, 0),
+    });
+    for (const name of ['push', 'pop', 'translate', 'rotate', 'stroke', 'strokeWeight']) {
+      vi.stubGlobal(name, vi.fn());
+    }
+    vi.stubGlobal('line', drawLine);
+
+    missile.draw();
+
+    expect(drawLine).toHaveBeenCalledWith(-40, 0, 40, 0);
+  });
+
   it('homes toward the target current position each update', () => {
     const game = createGame();
     const missileTarget = target(game, 10);

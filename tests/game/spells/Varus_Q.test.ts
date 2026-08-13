@@ -49,7 +49,8 @@ describe('Varus Q', () => {
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
     expect(arrow.destination).toMatchObject({ x: 825, y: 0 });
-    expect(arrow.size).toBe(140);
+    expect(arrow.size).toBe(36);
+    expect(arrow).toMatchObject({ visualWidth: 90, visualHeight: 32 });
     expect(arrow.speed).toBeCloseTo(1_900 / 60);
     expect(spell.coolDown).toBe(16_000);
     expect(spell.state).toBe('COOLDOWN');

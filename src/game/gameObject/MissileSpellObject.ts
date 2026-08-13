@@ -4,6 +4,7 @@ import { PredefinedFilters } from '../managers/ObjectManager';
 import SpellObject from './SpellObject';
 import AttackableUnit from './attackableUnits/AttackableUnit';
 import TrailSystem from './helpers/TrailSystem';
+import AssetManager, { type AssetHandle } from '../../managers/AssetManager';
 
 /**
  * Base for skillshot projectiles: travels from `position` to `destination`, damages
@@ -24,6 +25,10 @@ export default class MissileSpellObject extends SpellObject {
   declare destination: p5.Vector;
   speed = 7;
   size = 20;
+  image?: AssetHandle;
+  visualWidth = this.size;
+  visualHeight = this.size;
+  visualRotationOffset = 0;
 
   /** Units already hit — excluded from later queries so one unit is hit once. */
   hitTargets: AttackableUnit[] = [];
@@ -109,6 +114,29 @@ export default class MissileSpellObject extends SpellObject {
       h: this.size,
       data: this,
     });
+  }
+
+  draw(): void {
+    if (!this.image) return;
+    const angle = Math.atan2(
+      this.destination.y - this.position.y,
+      this.destination.x - this.position.x
+    );
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(angle + this.visualRotationOffset);
+    if (this.image.status === 'ready') {
+      imageMode(CENTER);
+      image(AssetManager.renderable(this.image), 0, 0, this.visualWidth, this.visualHeight);
+    } else {
+      if (this.image.status === 'idle' && this.image.key) {
+        void AssetManager.ensure(this.image.key).catch(() => undefined);
+      }
+      stroke(235, 225, 170, 230);
+      strokeWeight(Math.max(3, this.visualHeight / 5));
+      line(-this.visualWidth / 2, 0, this.visualWidth / 2, 0);
+    }
+    pop();
   }
 
   // for override
