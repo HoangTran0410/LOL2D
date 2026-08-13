@@ -50,9 +50,41 @@ The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `CO
 - Commit resources at `start`, `release`, or `tick`; list only cancellation reasons that refund them.
 - Start cooldown at `start`, `release`, or `end`.
 - Add `charge`, `channel`, or `active` only when the activation needs it.
-- Override only relevant `interrupts` (`death`, `stun`, `silence`, `displacement`, `move`).
+- Set `interrupts` to one named form from `CancelPolicy` — see the next section.
 
 Use `onCastStart`, `onChargeUpdate`, `onRelease`, `onChannelTick`, `onActivate`, `onRecast`, `onCancel`, and `onComplete`. Cleanup must be idempotent because death, scene exit, removal, and normal completion can converge on the same effect.
+
+## 3a. What cancels your spell
+
+`src/game/spell/runtime/CancelPolicy.ts` is the whole model. The question it answers is not "which interrupts apply" but **where the live effect lives**: a champion drawing a bow is holding the spell in his hands, and a tornado already standing in the world is not. Pick the form that describes yours and the flags follow.
+
+| `interrupts:` | caster dies | stunned, suppressed | silenced | shoved | moves | it is |
+|---|---|---|---|---|---|---|
+| `SpellForm.HELD` *(default)* | ends | ends | ends | ends | ends | the champion performing it right now |
+| `SpellForm.AIMED` | ends | ends | ends | ends | **survives** | held, but walking is part of the gesture |
+| `SpellForm.TETHERED` | ends | ends | ends | **survives** | **survives** | out in the world, still leashed to him |
+| `SpellForm.INDEPENDENT` | ends | **survives** | **survives** | **survives** | **survives** | out of his hands, on its own clock |
+
+Who uses which, today:
+
+- **`HELD`** — everything with a cast time or a channel: Janna R, Anivia E, Malphite E, Morgana R, Veigar R, and every legacy instant press. Omitting `interrupts` means this.
+- **`AIMED`** — Varus Q and Pantheon Q. The champion is physically drawing the shot and strafing while he aims; crowd control still takes it.
+- **`TETHERED`** — Anivia R. The storm stands in the world but is leashed to Anivia and billed to her mana, so she may walk and be knocked about without ending it, and losing control of herself still does.
+- **`INDEPENDENT`** — Janna Q's tornado (summoned, growing on its own clock, fires itself at full charge), Lux R's beam (already called down), Rammus Q's roll (already has its momentum).
+
+Death is on in every form on purpose: nothing in this game should outlive its caster. `SpellObject.attachTo` is the same rule for an effect glued to a body.
+
+Four more knobs, all part of the same model:
+
+- **`suspendedBy: [Stasis]`** — a buff that *pauses* the watcher rather than ending what it guards. Zhonya's reads as a stun and a silence at once, but whatever the champion was sustaining is still his when it ends. Anivia R is the only user; add a buff here rather than reaching for a wholesale opt-out.
+- **`resource.refundOn`** — which cancellations give the mana back. Naming an interrupt your form never fires throws at construction, so a refund cannot quietly be a promise the spell does not keep.
+- **`attackOrder: 'keep'`** — casting drops the caster's standing basic attack order unless the spell says otherwise. `BasicAttack` is the only `keep`, because casting it *is* the order.
+- **`Dash.buffsToCheckCancel`** — the movement half. A dash is not a spell state so it carries no form, but `foreignControlBuff` answers the same question in the same vocabulary. It is a list of buff *classes* rather than status flags because the rule has to know who applied it: a spell that roots its victim and then pulls them must not have its own pull cancelled by its own root. `DASH_INTERRUPT_BUFFS` is the default list.
+
+Two things this model deliberately does not cover, and you should not expect it to:
+
+- **A standing attack order owns the caster's movement.** `BasicAttackController` writes `owner.destination` every frame it has a target — walking into range, then `stopMovement()` once there. A spell whose effect *is* movement (Rammus Q) is not cancelled by that, but it is held still by it, which looks the same. `tests/e2e/drive-rammus-cancel.mjs` measures it.
+- **A buff's own end conditions.** A buff ends on its duration or when something calls `deactivateBuff()`. If a spell's live phase is really the buff's lifetime, give the spell an `active` window of the same length and close it from the effect (`Rammus_Q.endRoll`), so the runtime state and the thing the player can see agree.
 
 ## 4. Choose delivery
 
