@@ -64,6 +64,8 @@ export interface ChargeSpec {
   releaseAtMax: boolean;
 }
 
+export type ChargeActivation = 'HOLD_RELEASE' | 'TAP_OR_HOLD';
+
 export interface ChannelSpec {
   durationMs: number;
   tickEveryMs: number;
@@ -87,3 +89,16 @@ export interface CastSpec {
   vfx?: SpellVfxSpec;
   sfx?: SpellSfxSpec;
 }
+
+export type ChargeCastSpec = CastSpec & { activation: ChargeActivation };
+
+export const isChargeActivation = (activation: ActivationPattern): activation is ChargeActivation =>
+  activation === 'HOLD_RELEASE' || activation === 'TAP_OR_HOLD';
+
+export const requireChargeSpec = (spec: Pick<CastSpec, 'activation' | 'charge'>): ChargeSpec => {
+  if (!isChargeActivation(spec.activation)) {
+    throw new Error(`${spec.activation} activation does not support charge`);
+  }
+  if (!spec.charge) throw new Error(`${spec.activation} activation requires charge`);
+  return spec.charge;
+};

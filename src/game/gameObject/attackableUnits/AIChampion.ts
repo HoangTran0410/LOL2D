@@ -8,7 +8,7 @@ import TargetResolver, {
   defaultTargetInfo,
 } from '../../spell/targeting/TargetResolver';
 import type Spell from '../Spell';
-import type { CastContext } from '../../spell/runtime/types';
+import { isChargeActivation, requireChargeSpec, type CastContext } from '../../spell/runtime/types';
 import type { Vec2 } from '../../spell/runtime/types';
 
 export type AIChampionOptions = ChampionOptions;
@@ -58,14 +58,14 @@ export default class AIChampion extends Champion {
         let spellIndex = floor(random(this.spells.length));
         const spell = this.spells[spellIndex];
         const context = this.createSpellContext(spell);
-        if (context && spell.press(context) &&
-            (spell.castSpec.activation === 'HOLD_RELEASE' ||
-              spell.castSpec.activation === 'TAP_OR_HOLD')) {
+        if (context && spell.press(context)) {
+          const castSpec = spell.castSpec;
+          if (!isChargeActivation(castSpec.activation)) return;
           this.pendingCharge = {
             spell,
             context,
             elapsedMs: 0,
-            releaseAtMs: spell.castSpec.charge!.maxDurationMs / 2,
+            releaseAtMs: requireChargeSpec(castSpec).maxDurationMs / 2,
           };
         }
       }
