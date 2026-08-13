@@ -227,31 +227,53 @@ export async function importAbilities({
         name: forms[index],
         fields: normalizeAbilityFields(template.fields),
       }));
-      const icon = normalizedForms.flatMap(form => [form.fields.icon, form.fields.icon2])
-        .find(value => typeof value === 'string' && value && value.toLowerCase() !== 'false');
-      if (!icon) throw new Error(`${name} ${slot}: icon is missing`);
-      const imageInfo = await client.fetchImageInfo(icon);
-      const bytes = await client.fetchBytes(imageInfo.url);
-      validateImage(bytes, imageInfo.mime);
-      const extension = imageExtension(imageInfo.mime, imageInfo.url);
-      const localAssetKey = `spell_${slug.replaceAll('-', '_')}_${slot.toLowerCase()}`;
-      const localPath = `assets/images/spells/${slug}_${slot.toLowerCase()}${extension}`;
       const source = sourceRecord(templates[0], fetchedAt, normalizedForms);
-      const previousImageSource = sourceEntries.get(localAssetKey);
-      const imageHash = contentHash(bytes);
-      const imageChanged = previousImageSource?.contentHash !== imageHash || previousImageSource?.localPath !== localPath;
+
+      // Each form is its own `Template:Data <Champion>/<Form>` page with its own
+      // `icon`/`icon2` fields, so every form's icon must be resolved and downloaded
+      // independently (falling back from icon -> icon2 within that same form only).
+      const formAssets = [];
+      for (const [formIndex, form] of normalizedForms.entries()) {
+        const icon = [form.fields.icon, form.fields.icon2]
+          .find(value => typeof value === 'string' && value && value.toLowerCase() !== 'false');
+        if (!icon) throw new Error(`${name} ${slot} (${form.name}): icon is missing`);
+        const imageInfo = await client.fetchImageInfo(icon);
+        const bytes = await client.fetchBytes(imageInfo.url);
+        validateImage(bytes, imageInfo.mime);
+        const extension = imageExtension(imageInfo.mime, imageInfo.url);
+        // Form 1 keeps the bare `_<slot>` asset; form 2+ appends the 1-based form
+        // number (`_<slot>2`, `_<slot>3`, ...), matching the hand-added spell art
+        // convention (e.g. thresh_q.png/thresh_q2.png, zed_r1.png/zed_r2.png).
+        const formSuffix = formIndex === 0 ? '' : String(formIndex + 1);
+        const localAssetKey = `spell_${slug.replaceAll('-', '_')}_${slot.toLowerCase()}${formSuffix}`;
+        const localPath = `assets/images/spells/${slug}_${slot.toLowerCase()}${formSuffix}${extension}`;
+        const previousImageSource = sourceEntries.get(localAssetKey);
+        const imageHash = contentHash(bytes);
+        const imageChanged = previousImageSource?.contentHash !== imageHash || previousImageSource?.localPath !== localPath;
+        formAssets.push({ imageInfo, bytes, localAssetKey, localPath, imageHash, imageChanged, previousImageSource });
+      }
+      const recordForms = normalizedForms.map((form, formIndex) => ({
+        ...form,
+        asset: {
+          key: formAssets[formIndex].localAssetKey,
+          originalUrl: formAssets[formIndex].imageInfo.url,
+          mime: formAssets[formIndex].imageInfo.mime,
+          sha1: formAssets[formIndex].imageInfo.sha1,
+        },
+      }));
+      const anyImageChanged = formAssets.some(asset => asset.imageChanged);
       const record = {
         schemaVersion: 1,
         champion: name,
         slot,
-        forms: normalizedForms,
+        forms: recordForms,
         source,
-        asset: { key: localAssetKey, originalUrl: imageInfo.url, mime: imageInfo.mime, sha1: imageInfo.sha1 },
+        asset: recordForms[0].asset,
       };
       if (update && await exists(recordPath)) {
         const previous = await readJson(recordPath, null);
         for (const field of changedFields(previous, record)) log(`${name} ${slot}: ${field} changed`);
-        if (previous.source?.revisionId === record.source.revisionId && previous.source?.contentHash === record.source.contentHash && !imageChanged) {
+        if (previous.source?.revisionId === record.source.revisionId && previous.source?.contentHash === record.source.contentHash && !anyImageChanged) {
           log(`${name} ${slot}: unchanged`);
           continue;
         }
@@ -269,16 +291,18 @@ export async function importAbilities({
       outputs.push([relative(root, recordPath), deterministicJson(record)]);
       outputs.push([`docs/abilities/cache/raw/${slug}/${slot.toLowerCase()}.json`, deterministicJson(rawCache)]);
       outputs.push([`docs/abilities/cache/normalized/${slug}/${slot.toLowerCase()}.json`, deterministicJson(record)]);
-      outputs.push([localPath, bytes]);
-      if (previousImageSource?.localPath && previousImageSource.localPath !== localPath) removals.add(previousImageSource.localPath);
-      sourceEntries.set(localAssetKey, {
-        localAssetKey,
-        localPath,
-        sourceUrl: imageInfo.url,
-        revisionId: templates[0].revisionId,
-        fetchedAt,
-        contentHash: imageHash,
-      });
+      for (const asset of formAssets) {
+        outputs.push([asset.localPath, asset.bytes]);
+        if (asset.previousImageSource?.localPath && asset.previousImageSource.localPath !== asset.localPath) removals.add(asset.previousImageSource.localPath);
+        sourceEntries.set(asset.localAssetKey, {
+          localAssetKey: asset.localAssetKey,
+          localPath: asset.localPath,
+          sourceUrl: asset.imageInfo.url,
+          revisionId: templates[0].revisionId,
+          fetchedAt,
+          contentHash: asset.imageHash,
+        });
+      }
     }
   }
   manifest.sources = [...sourceEntries.values()].sort((a, b) => a.localAssetKey.localeCompare(b.localAssetKey));

@@ -106,6 +106,77 @@ describe('League Wiki importer', () => {
     expect(record.forms[0].fields).toMatchObject({ icon: 'false', icon2: 'Glacial Storm.png' });
   });
 
+  it('downloads a distinct icon per ability form instead of just the first', async () => {
+    const target = await root();
+    // Modeled on the real Fizz E data: each form is its own `Template:Data
+    // Fizz/<Form>` page with its own `name`/`icon` fields, and `icon2` is an
+    // unresolved `{{{icon2}}}` placeholder on both (dropped by normalization).
+    const wiki = {
+      fetchChampionIndex: vi.fn(async () => ({
+        source: 'return { Fizz = { name = "Fizz", image = "FizzSquare.png", skill_e = { "Playful", "Trickster" } } }',
+        revisionId: 200,
+        timestamp: '2026-08-12T00:00:00Z',
+        pageUrl: 'https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data',
+      })),
+      fetchTemplate: vi.fn(async (page: string) => {
+        const isPlayful = page.endsWith('/Playful');
+        return {
+          page,
+          revisionId: isPlayful ? 4008451 : 4007741,
+          timestamp: isPlayful ? '2026-04-14T19:15:38Z' : '2026-04-12T13:45:59Z',
+          fields: isPlayful
+            ? '@@name@@Playful@@icon@@Playful.png@@icon2@@{{{icon2}}}@@description@@Dash to safety.@@'
+            : '@@name@@Trickster@@icon@@Trickster.png@@icon2@@{{{icon2}}}@@description@@Dash and splash early.@@',
+          raw: { revision: {}, expanded: {} },
+          pageUrl: `https://wiki.leagueoflegends.com/en-us/${page.replaceAll(' ', '_')}`,
+        };
+      }),
+      fetchImageInfo: vi.fn(async (file: string) => {
+        if (file.includes('FizzSquare')) return { url: 'https://wiki.leagueoflegends.com/images/FizzSquare.png', sha1: 'champsha1', mime: 'image/png' };
+        if (file === 'Playful.png') return { url: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png', sha1: 'playfulsha1', mime: 'image/png' };
+        if (file === 'Trickster.png') return { url: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png', sha1: 'tricksha1', mime: 'image/png' };
+        throw new Error(`unexpected file request: ${file}`);
+      }),
+      fetchBytes: vi.fn(async (url: string) => {
+        if (url.includes('Playful')) return new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+        if (url.includes('Trickster')) return new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 2]);
+        return new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+      }),
+    };
+
+    await importAbilities({ root: target, champions: ['Fizz'], slots: ['E'], client: wiki, now: () => '2026-08-13T00:00:00.000Z' });
+
+    expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Playful.png');
+    expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Trickster.png');
+
+    const record = JSON.parse(await readFile(join(target, 'docs/abilities/fizz/e.json'), 'utf8'));
+    expect(record.forms).toHaveLength(2);
+    expect(record.forms[0]).toMatchObject({
+      name: 'Playful',
+      asset: { key: 'spell_fizz_e', originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png' },
+    });
+    expect(record.forms[1]).toMatchObject({
+      name: 'Trickster',
+      asset: { key: 'spell_fizz_e2', originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png' },
+    });
+    expect(record.asset).toMatchObject({ key: 'spell_fizz_e' });
+
+    await expect(readFile(join(target, 'assets/images/spells/fizz_e.png'))).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]));
+    await expect(readFile(join(target, 'assets/images/spells/fizz_e2.png'))).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 2]));
+
+    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
+    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e')).toMatchObject({
+      localPath: 'assets/images/spells/fizz_e.png',
+      sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png',
+    });
+    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e2')).toMatchObject({
+      localPath: 'assets/images/spells/fizz_e2.png',
+      sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
+    });
+
+    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+  });
+
   it('writes deterministic raw and normalized caches with source metadata', async () => {
     const data = await fixture();
     const target = await root();

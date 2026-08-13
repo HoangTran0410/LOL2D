@@ -22,7 +22,9 @@ function validateSource(source, path) {
 }
 
 function sourceContent(value, path) {
-  if (value.forms) return value.forms;
+  // Forms carry a per-form `asset` (icon download metadata) that is not part of
+  // the wiki text the record's contentHash tracks, so it is excluded here.
+  if (value.forms) return value.forms.map(form => ({ name: form.name, fields: form.fields }));
   if (value.data) return value.data;
   if (value.champions) return value.champions;
   if (value.payload !== undefined) {
@@ -62,25 +64,30 @@ export async function checkAbilities(root) {
   }
   const referencedAssets = new Set();
 
+  function checkAssetRef(path, asset, recordSource) {
+    if (!sources.has(asset.key)) throw new Error(`${path}: missing source-manifest entry`);
+    const source = sources.get(asset.key);
+    if (source.sourceUrl !== asset.originalUrl || source.revisionId !== recordSource.revisionId) throw new Error(`${path}: source-manifest/record metadata mismatch`);
+    const extension = expectedExtension(asset.mime);
+    if (!extension || extname(source.localPath).toLowerCase() !== extension) throw new Error(`${path}: source-manifest MIME/path mismatch`);
+    referencedAssets.add(asset.key);
+  }
+
   for (const path of allFiles) {
     const value = JSON.parse(await readFile(path, 'utf8'));
     if (value.schemaVersion !== 1) throw new Error(`${path}: unsupported schemaVersion`);
     validateSource(value.source, path);
     if (contentHash(sourceContent(value, path)) !== value.source.contentHash) throw new Error(`${path}: content hash mismatch`);
     if (path.includes('/cache/')) continue;
-    if (value.asset?.key) {
-      if (!sources.has(value.asset.key)) throw new Error(`${path}: missing source-manifest entry`);
-      const source = sources.get(value.asset.key);
-      if (source.sourceUrl !== value.asset.originalUrl || source.revisionId !== value.source.revisionId) throw new Error(`${path}: source-manifest/record metadata mismatch`);
-      const extension = expectedExtension(value.asset.mime);
-      if (!extension || extname(source.localPath).toLowerCase() !== extension) throw new Error(`${path}: source-manifest MIME/path mismatch`);
-      referencedAssets.add(value.asset.key);
-    }
+    if (value.asset?.key) checkAssetRef(path, value.asset, value.source);
     if (!value.champion || !value.slot || !Array.isArray(value.forms) || !value.forms.length) continue;
     for (const form of value.forms) {
       const identity = `${value.champion}:${value.slot}:${form.name}`;
       if (identities.has(identity)) throw new Error(`${path}: duplicate ${identity}`);
       identities.add(identity);
+      // Multi-form abilities download a separate icon per form; validate each one
+      // that the importer attached (older cached records may still be single-icon).
+      if (form.asset?.key) checkAssetRef(path, form.asset, value.source);
     }
     if (!value.asset?.key) throw new Error(`${path}: missing asset metadata`);
   }
