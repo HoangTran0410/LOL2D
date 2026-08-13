@@ -1,13 +1,16 @@
 import type { CastContext } from '../spell/runtime/types';
 import type { VfxHandle } from './SpellVfx';
 
+type Position = Readonly<{ x: number; y: number }>;
+
 export default class CastBar implements VfxHandle {
   private disposed = false;
 
   constructor(
     readonly context: CastContext,
     private readonly getProgress: () => number,
-    private readonly render: (context: CastContext, progress: number) => void = CastBar.renderDefault
+    private readonly render: (context: CastContext, progress: number, anchor: Position) => void = CastBar.renderDefault,
+    private readonly getAnchor: () => Position = () => context.origin
   ) {}
 
   update(_deltaMs: number): void {}
@@ -15,14 +18,16 @@ export default class CastBar implements VfxHandle {
   get complete(): boolean { return this.getProgress() >= 1; }
 
   draw(): void {
-    if (!this.disposed) this.render(this.context, Math.max(0, Math.min(1, this.getProgress())));
+    if (!this.disposed) {
+      this.render(this.context, Math.max(0, Math.min(1, this.getProgress())), this.getAnchor());
+    }
   }
 
   dispose(): void { this.disposed = true; }
 
-  private static renderDefault(context: CastContext, progress: number): void {
-    const x = context.origin.x - 30;
-    const y = context.origin.y - 45;
+  private static renderDefault(_context: CastContext, progress: number, anchor: Position): void {
+    const x = anchor.x - 30;
+    const y = anchor.y - 45;
     push();
     noStroke();
     fill(30, 180);

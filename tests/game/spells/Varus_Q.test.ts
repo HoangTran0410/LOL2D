@@ -80,6 +80,20 @@ describe('Varus Q', () => {
     expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(1_525);
   });
 
+  it('exposes a monotonically growing live charge range', () => {
+    const spell = new Varus_Q(owner());
+
+    spell.onChargeUpdate(context(1, 0), 0, 0);
+    const start = spell.currentRange;
+    spell.onChargeUpdate(context(1, 0), 750, 0.5);
+    const middle = spell.currentRange;
+    spell.onChargeUpdate(context(1, 0), 1_500, 1);
+
+    expect(start).toBe(825);
+    expect(middle).toBeGreaterThan(start);
+    expect(spell.currentRange).toBe(1_525);
+  });
+
   it('applies and removes its researched self slow', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);

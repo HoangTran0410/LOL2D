@@ -4,6 +4,8 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
 import CastBar from '../../vfx/CastBar';
+import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
+import VfxGroup from '../../vfx/VfxGroup';
 
 const MAX_CHARGE_MS = 4_000;
 const RANGE_CHARGE_MS = 1_500;
@@ -30,7 +32,17 @@ export default class Varus_Q extends Spell {
       resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
-      vfx: { castLoop: context => new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS) },
+      vfx: {
+        castLoop: context => new VfxGroup([
+          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => this.owner.position),
+          new ChargeRangeTelegraph(
+            () => this.owner.position,
+            () => this.aimDirection,
+            () => this.currentRange,
+            () => this.chargeMs / RANGE_CHARGE_MS
+          ),
+        ]),
+      },
     };
   }
 
@@ -80,6 +92,13 @@ export default class Varus_Q extends Spell {
   private rangeAt(elapsedMs: number): number {
     return MIN_CENTER_TRAVEL +
       (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * Math.min(1, elapsedMs / RANGE_CHARGE_MS);
+  }
+
+  get currentRange(): number { return this.rangeAt(this.chargeMs); }
+
+  private get aimDirection(): { x: number; y: number } {
+    const aim = this.aimContext;
+    return aim ? this.directionTo(aim, this.owner.position.x, this.owner.position.y) : { x: 0, y: 0 };
   }
 
   private damageAt(elapsedMs: number): number {

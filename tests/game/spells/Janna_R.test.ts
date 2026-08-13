@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const loopDispose = vi.hoisted(() => vi.fn());
 const telegraphContexts = vi.hoisted(() => [] as CastContext[]);
+const telegraphCenters = vi.hoisted(() => [] as Array<() => { x: number; y: number }>);
 
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
@@ -9,7 +10,10 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 
 vi.mock('../../../src/game/vfx/CastTelegraph', () => ({
   default: class {
-    constructor(context: CastContext) { telegraphContexts.push(context); }
+    constructor(context: CastContext, _radius: number, _render: unknown, getCenter: () => { x: number; y: number }) {
+      telegraphContexts.push(context);
+      telegraphCenters.push(getCenter);
+    }
     update() {}
     draw() {}
     dispose() { loopDispose(); }
@@ -88,6 +92,7 @@ describe('Janna R', () => {
     vi.stubGlobal('deltaTime', 16);
     loopDispose.mockClear();
     telegraphContexts.length = 0;
+    telegraphCenters.length = 0;
   });
 
   afterEach(() => vi.unstubAllGlobals());
@@ -100,12 +105,14 @@ describe('Janna R', () => {
     expect(group?.image).toBe('champ_janna');
   });
 
-  it('centers its channel telegraph on the snapshotted caster origin', () => {
+  it('keeps gameplay origin frozen while its channel telegraph follows Janna', () => {
     const { owner } = makeOwner();
 
     new Janna_R(owner).press(context(owner));
 
-    expect(telegraphContexts[0].cursorWorld).toEqual({ x: 0, y: 0 });
+    owner.position.set(90, 40);
+    expect(telegraphContexts[0].origin).toEqual({ x: 0, y: 0 });
+    expect(telegraphCenters[0]()).toEqual({ x: 90, y: 40 });
   });
 
   it('uses imported rank-one resource values', () => {

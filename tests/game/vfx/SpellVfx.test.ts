@@ -4,6 +4,10 @@ import ImpactEffect from '../../../src/game/vfx/ImpactEffect';
 import ParticleEmitter from '../../../src/game/vfx/ParticleEmitter';
 import SpriteEffect from '../../../src/game/vfx/SpriteEffect';
 import SpellVfx, { type VfxHandle } from '../../../src/game/vfx/SpellVfx';
+import CastBar from '../../../src/game/vfx/CastBar';
+import CastTelegraph from '../../../src/game/vfx/CastTelegraph';
+import ChargeRangeTelegraph from '../../../src/game/vfx/ChargeRangeTelegraph';
+import VfxGroup from '../../../src/game/vfx/VfxGroup';
 import type { CastContext, CastSpec } from '../../../src/game/spell/runtime/types';
 
 const context: CastContext = Object.freeze({
@@ -61,6 +65,51 @@ const spec = (vfx: CastSpec['vfx'], sfx?: CastSpec['sfx']): CastSpec => ({
 
 describe('Spell VFX lifecycle', () => {
   afterEach(() => { vi.unstubAllGlobals(); });
+
+  it('reads live anchors without mutating the frozen cast context', () => {
+    const anchor = { x: 10, y: 20 };
+    const renderBar = vi.fn();
+    const renderCircle = vi.fn();
+    const bar = new CastBar(context, () => 0.5, renderBar, () => anchor);
+    const telegraph = new CastTelegraph(context, 100, renderCircle, () => anchor);
+
+    anchor.x = 90;
+    bar.draw();
+    telegraph.draw();
+
+    expect(renderBar).toHaveBeenCalledWith(context, 0.5, { x: 90, y: 20 });
+    expect(renderCircle).toHaveBeenCalledWith(context, 100, { x: 90, y: 20 });
+    expect(context.origin).toEqual({ x: 1, y: 2 });
+  });
+
+  it('samples live charge geometry and groups VFX lifecycle calls', () => {
+    const origin = { x: 5, y: 6 };
+    let range = 100;
+    const render = vi.fn();
+    const rangeEffect = new ChargeRangeTelegraph(
+      () => origin,
+      () => ({ x: 1, y: 0 }),
+      () => range,
+      () => range / 200,
+      render
+    );
+    const sibling = handle();
+    const group = new VfxGroup([rangeEffect, sibling]);
+
+    group.draw();
+    range = 200;
+    group.update(16);
+    group.draw();
+    group.dispose();
+
+    expect(render.mock.calls).toEqual([
+      [{ x: 5, y: 6 }, { x: 1, y: 0 }, 100, 0.5],
+      [{ x: 5, y: 6 }, { x: 1, y: 0 }, 200, 1],
+    ]);
+    expect(sibling.update).toHaveBeenCalledWith(16);
+    expect(sibling.draw).toHaveBeenCalledTimes(2);
+    expect(sibling.dispose).toHaveBeenCalledOnce();
+  });
 
   it('reads subclass castSpec lazily and only once', () => {
     class LazySpecSpell extends Spell {

@@ -115,7 +115,8 @@ describe('Pantheon Q', () => {
 
     expect(caster.objects[0]).toBeInstanceOf(Pantheon_Q_Spear);
     const spear = caster.objects[0] as Pantheon_Q_Spear;
-    expect(spear.destination).toMatchObject({ x: 1_200, y: 0 });
+    expect(spear.destination.x).toBeCloseTo(740.4);
+    expect(spear.destination.y).toBe(0);
     expect(spear.speed).toBe(2_700 / 60);
     const damages: number[] = [];
     const targets = [
@@ -168,5 +169,21 @@ describe('Pantheon Q', () => {
     new Pantheon_Q(caster).onCancel(context, 'MAX_DURATION');
 
     expect(stats.mana.baseValue).toBe(87.5);
+  });
+
+  it('tracks live aim and grows held throw range from 600 to 1200', () => {
+    const caster = owner();
+    const spell = new Pantheon_Q(caster);
+    spell.press(context);
+    spell.onChargeUpdate(context, 750, 0.5);
+    const middle = spell.currentRange;
+    spell.hold(releaseContext);
+    spell.onChargeUpdate(releaseContext, 1_500, 1);
+    spell.release(releaseContext);
+
+    const spear = caster.objects[0] as Pantheon_Q_Spear;
+    expect(middle).toBe(900);
+    expect(spell.currentRange).toBe(1_200);
+    expect(spear.destination).toMatchObject({ x: 0, y: 1_200 });
   });
 });

@@ -6,6 +6,8 @@ import TerrainType from '../../enums/TerrainType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
+import CastBar from '../../vfx/CastBar';
+import VfxGroup from '../../vfx/VfxGroup';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -52,6 +54,7 @@ export default class Janna_R extends Spell {
   private activeArea?: AreaSpellObject;
   private channelOrigin?: { x: number; y: number };
   private stopWatching: (() => void)[] = [];
+  private channelElapsedMs = 0;
 
   get castSpec(): Readonly<CastSpec> {
     return {
@@ -61,15 +64,16 @@ export default class Janna_R extends Spell {
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       vfx: {
-        channelLoop: context => new CastTelegraph(
-          { ...context, cursorWorld: context.origin },
-          this.radius
-        ),
+        channelLoop: context => new VfxGroup([
+          new CastTelegraph(context, this.radius, undefined, () => this.owner.position),
+          new CastBar(context, () => this.channelElapsedMs / this.channelDurationMs, undefined, () => this.owner.position),
+        ]),
       },
     };
   }
 
   onSpellCast(context: CastContext): void {
+    this.channelElapsedMs = 0;
     this.owner.stopMovement?.();
     this.channelOrigin = context.origin;
     this.watchInterrupts();
@@ -103,6 +107,10 @@ export default class Janna_R extends Spell {
       }
       target.takeHeal(this.healPerTick, this.owner);
     }
+  }
+
+  onUpdate(): void {
+    if (this.state === 'CHANNELING') this.channelElapsedMs += deltaTime;
   }
 
   onCancel(): void {

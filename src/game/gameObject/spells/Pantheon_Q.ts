@@ -5,12 +5,16 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
 import CastBar from '../../vfx/CastBar';
+import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
+import VfxGroup from '../../vfx/VfxGroup';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Monster from '../attackableUnits/Monster';
 
 const HOLD_THRESHOLD_MS = 350;
 const MAX_CHARGE_MS = 4_000;
 const RANGE = 1_200;
+const MIN_RANGE = 600;
+const RANGE_CHARGE_MS = 1_500;
 
 type SpearTarget = AttackableUnit & {
   readonly unitType?: 'minion';
@@ -35,6 +39,7 @@ export default class Pantheon_Q extends Spell {
   private chargeSlow?: Slow;
   private wasThrust = false;
   private castDirection: Vec2 = { x: 0, y: 0 };
+  private aimContext?: CastContext;
 
   get castSpec(): Readonly<CastSpec> {
     return {
@@ -44,7 +49,17 @@ export default class Pantheon_Q extends Spell {
       resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
-      vfx: { castLoop: context => new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS) },
+      vfx: {
+        castLoop: context => new VfxGroup([
+          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => this.owner.position),
+          new ChargeRangeTelegraph(
+            () => this.owner.position,
+            () => this.castDirection,
+            () => this.currentRange,
+            () => this.chargeMs / RANGE_CHARGE_MS
+          ),
+        ]),
+      },
     };
   }
 
@@ -52,6 +67,7 @@ export default class Pantheon_Q extends Spell {
     this.chargeMs = 0;
     this.wasThrust = false;
     this.castDirection = context.direction;
+    this.aimContext = context;
     this.chargeSlow = new Slow(MAX_CHARGE_MS, this.owner, this.owner);
     this.chargeSlow.percent = 0.1;
     this.chargeSlow.stackId = 'pantheon_q_charge_slow';
@@ -62,16 +78,22 @@ export default class Pantheon_Q extends Spell {
     this.chargeMs = elapsedMs;
   }
 
+  hold(context: CastContext): boolean {
+    this.aimContext = context;
+    this.castDirection = this.directionTo(context);
+    return super.hold(context);
+  }
+
   onUpdate(): void {
     if (this.state !== 'CHARGING') return;
     if (this.owner.isDead) this.cancel('DEATH');
     else if (!this.owner.canCast) this.cancel('SILENCE');
   }
 
-  onRelease(_context: CastContext): void {
+  onRelease(context: CastContext): void {
     this.removeChargeSlow();
     const start = { x: this.owner.position.x, y: this.owner.position.y };
-    const direction = this.castDirection;
+    const direction = this.directionTo(this.aimContext ?? context);
     if (this.chargeMs <= HOLD_THRESHOLD_MS) {
       this.createThrust(start, direction);
       this.wasThrust = true;
@@ -79,7 +101,7 @@ export default class Pantheon_Q extends Spell {
     }
 
     const spear = new Pantheon_Q_Spear(this.owner);
-    spear.destination = createVector(start.x + direction.x * RANGE, start.y + direction.y * RANGE);
+    spear.destination = createVector(start.x + direction.x * this.currentRange, start.y + direction.y * this.currentRange);
     this.game.objectManager.addObject(spear);
   }
 
@@ -113,6 +135,17 @@ export default class Pantheon_Q extends Spell {
   private removeChargeSlow(): void {
     this.chargeSlow?.deactivateBuff();
     this.chargeSlow = undefined;
+  }
+
+  get currentRange(): number {
+    return MIN_RANGE + (RANGE - MIN_RANGE) * Math.min(1, this.chargeMs / RANGE_CHARGE_MS);
+  }
+
+  private directionTo(context: CastContext): Vec2 {
+    const dx = context.cursorWorld.x - this.owner.position.x;
+    const dy = context.cursorWorld.y - this.owner.position.y;
+    const length = Math.hypot(dx, dy);
+    return length === 0 ? context.direction : { x: dx / length, y: dy / length };
   }
 }
 
