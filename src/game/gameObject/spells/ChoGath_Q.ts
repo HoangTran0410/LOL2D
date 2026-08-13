@@ -68,7 +68,6 @@ export class ChoGath_Q_Object extends SpellObject {
 
           const slowBuff = new Slow(1500, this.owner, enemy);
           slowBuff.percent = 0.6;
-          slowBuff.image = AssetManager.get('spell_chogath_q');
           enemy.addBuff(slowBuff);
           enemy.takeDamage(this.damage, this.owner);
         });

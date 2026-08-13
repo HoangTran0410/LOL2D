@@ -87,7 +87,6 @@ export class Blitzcrank_Q_Object extends MissileSpellObject {
     this.destination = this.owner.position;
 
     this.airborneBuff = new Airborne(7000, this.owner, enemy);
-    this.airborneBuff.image = AssetManager.get('spell_blitzcrank_q');
     enemy.addBuff(this.airborneBuff);
 
     this.dashBuff = new Dash(10000, this.owner, enemy);

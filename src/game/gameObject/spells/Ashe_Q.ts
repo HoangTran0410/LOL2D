@@ -78,7 +78,6 @@ export class Ashe_Q_Object extends MissileSpellObject {
     const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
     slowBuff.percent = this.slowPercent;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-    slowBuff.image = AssetManager.get('spell_ashe_q');
     enemy.addBuff(slowBuff);
 
     enemy.takeDamage(this.damage, this.owner);

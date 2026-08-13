@@ -39,7 +39,6 @@ export class Lux_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
-    stunBuff.image = AssetManager.get('spell_lux_q');
     enemy.addBuff(stunBuff);
     enemy.takeDamage(20, this.owner);
   }

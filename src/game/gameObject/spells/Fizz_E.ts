@@ -176,7 +176,6 @@ export default class Fizz_E extends Spell {
 
       if (withSlow) {
         const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
-        slowBuff.image = AssetManager.get('buff_slow');
         slowBuff.percent = this.slowPercent;
         enemy.addBuff(slowBuff);
       }

@@ -60,7 +60,6 @@ export class Ashe_W_Object extends MissileSpellObject {
     let slowBuff = new Slow(1500, this.owner, enemy);
     slowBuff.percent = 0.75;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-    slowBuff.image = AssetManager.get('spell_ashe_w');
     enemy.addBuff(slowBuff);
     enemy.takeDamage(5, this.owner);
   }

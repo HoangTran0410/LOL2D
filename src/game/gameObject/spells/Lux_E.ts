@@ -108,7 +108,6 @@ export class Lux_E_Object extends SpellObject {
       const enemies = this._getEnemisInRange();
       enemies.forEach((enemy: any) => {
         const slowBuff = new Slow(200, this.owner, enemy);
-        slowBuff.image = AssetManager.get('spell_lux_e');
         slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
         slowBuff.percent = 0.5;
         enemy.addBuff(slowBuff);

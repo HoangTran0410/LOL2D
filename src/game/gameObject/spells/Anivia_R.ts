@@ -270,7 +270,6 @@ export class Anivia_R_Object extends AreaSpellObject {
       const slow = new Slow(slowDuration, this.owner, target);
       slow.percent = empowered ? EMPOWERED_SLOW : NORMAL_SLOW;
       slow.buffAddType = BuffAddType.RENEW_EXISTING;
-      slow.image = AssetManager.get('spell_anivia_r');
       target.addBuff(slow);
     }
   }

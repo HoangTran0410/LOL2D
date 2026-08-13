@@ -110,7 +110,6 @@ export class Anivia_Q_Object extends MissileSpellObject {
     const slowBuff = new Slow(this.slowTime, this.owner, enemy);
     slowBuff.percent = this.slowPercent;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-    slowBuff.image = AssetManager.get('spell_anivia_q');
     enemy.addBuff(slowBuff);
   }
 
@@ -246,7 +245,6 @@ export class Anivia_Q_Blast extends SpellObject {
 
         const stunBuff = new Stun(this.stunTime, this.owner, enemy);
         stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-        stunBuff.image = AssetManager.get('spell_anivia_q');
         enemy.addBuff(stunBuff);
       });
     }

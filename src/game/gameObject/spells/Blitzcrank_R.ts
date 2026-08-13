@@ -55,7 +55,6 @@ export class Blitzcrank_R_Object extends SpellObject {
 
     enemies.forEach((enemy: any) => {
       const silenceBuff = new Silence(this.silenceTime, this.owner, enemy);
-      silenceBuff.image = AssetManager.get('spell_blitzcrank_r');
       enemy.addBuff(silenceBuff);
       enemy.takeDamage(30, this.owner);
     });

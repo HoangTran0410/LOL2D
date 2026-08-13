@@ -91,7 +91,6 @@ export class Amumu_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     this.stunBuff = new Stun(this.stunDuration, this.owner, enemy);
-    this.stunBuff.image = AssetManager.get('spell_amumu_q');
     enemy.addBuff(this.stunBuff);
 
     this.dashBuff = new Dash(3000, this.owner, this.owner);

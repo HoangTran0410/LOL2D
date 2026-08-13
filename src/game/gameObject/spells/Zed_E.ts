@@ -91,7 +91,6 @@ export class Zed_E_Object extends SpellObject {
 
       const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
       slowBuff.percent = this.slowPercent;
-      slowBuff.image = AssetManager.get('spell_zed_e');
       enemy.addBuff(slowBuff);
 
       this.playersEffected.push(enemy);

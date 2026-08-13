@@ -203,7 +203,6 @@ export class Janna_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.getCurrentDamage(), this.owner);
 
     const airborneBuff = new Airborne(this.getCurrentAirborneTime(), this.owner, enemy);
-    airborneBuff.image = AssetManager.get('spell_janna_q');
     airborneBuff.height = 25;
     enemy.addBuff(airborneBuff);
 

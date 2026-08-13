@@ -152,7 +152,6 @@ export class LeeSin_R_Object extends SpellObject {
       enemy.takeDamage(this.collideDamage, this.owner);
 
       const airbornBuff = new Airborne(1000, this.owner, enemy);
-      airbornBuff.image = AssetManager.get('spell_leesin_r');
       enemy.addBuff(airbornBuff);
 
       this.effectedEnemies.push(enemy);

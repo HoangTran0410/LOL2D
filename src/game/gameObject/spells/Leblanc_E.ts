@@ -102,7 +102,6 @@ export class Leblanc_E_Object extends MissileSpellObject {
       this.toRemove = true;
     } else if (this.timeSinceHit >= this.stunAfter) {
       const rootBuff = new RootBuff(this.stunTime, this.owner, this.enemyHit);
-      rootBuff.image = AssetManager.get('spell_leblanc_e');
       rootBuff.effectColor = [255, 255, 0] as any;
       this.enemyHit.addBuff(rootBuff);
       this.enemyHit.takeDamage(this.stunDamage, this.owner);

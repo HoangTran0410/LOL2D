@@ -83,7 +83,6 @@ export class ChoGath_W_Object extends SpellObject {
 
     enemies.forEach((enemy: any) => {
       const stunBuff = new Stun(this.stunTime, this.owner, enemy);
-      stunBuff.image = AssetManager.get('spell_chogath_w');
       enemy.addBuff(stunBuff);
 
       enemy.takeDamage(20, this.owner);

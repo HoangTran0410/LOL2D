@@ -78,7 +78,6 @@ export class Ahri_Q_Object extends MissileSpellObject {
   onHit(enemy: any) {
     const slowBuff = new Slow(500, this.owner, enemy);
     slowBuff.percent = 0.5;
-    slowBuff.image = AssetManager.get('spell_ahri_q');
     enemy.addBuff(slowBuff);
 
     enemy.takeDamage(15, this.owner);

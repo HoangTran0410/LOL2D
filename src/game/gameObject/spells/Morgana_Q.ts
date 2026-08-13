@@ -66,7 +66,6 @@ export class Morgana_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     const rootBuff = new Root(this.rootTime, this.owner, enemy);
-    rootBuff.image = AssetManager.get('spell_morgana_q');
     rootBuff.effectColor = [150, 60, 200, 220];
     enemy.addBuff(rootBuff);
 

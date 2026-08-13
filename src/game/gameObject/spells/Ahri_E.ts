@@ -45,7 +45,6 @@ export class Ahri_E_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const charmBuff = new Charm(this.charmTime, this.owner, enemy);
-    charmBuff.image = AssetManager.get('spell_ahri_e');
     charmBuff.speed = 1;
     enemy.addBuff(charmBuff);
   }

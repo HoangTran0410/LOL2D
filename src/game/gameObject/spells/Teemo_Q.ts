@@ -62,7 +62,6 @@ export class Teemo_Q_Object extends MissileSpellObject {
 
     const blindBuff = new Nearsight(this.blindTime, this.owner, enemy);
     blindBuff.newVisionRadius = this.newVisionRadius;
-    blindBuff.image = AssetManager.get('spell_teemo_q');
     enemy.addBuff(blindBuff);
 
     // the dart vanishes on impact, so the poison burst is its own object

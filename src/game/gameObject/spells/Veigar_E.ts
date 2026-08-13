@@ -103,7 +103,6 @@ export class Veigar_E_Object extends SpellObject {
 
       enemies.forEach((enemy: any) => {
         const stunBuff = new Stun(1500, this.owner, enemy);
-        stunBuff.image = AssetManager.get('spell_veigar_e');
         enemy.addBuff(stunBuff);
 
         this.enemiesEffected.push(enemy);

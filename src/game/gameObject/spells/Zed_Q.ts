@@ -76,7 +76,6 @@ export class Zed_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const slowBuff = new Slow(200, this.owner, enemy);
-    slowBuff.image = AssetManager.get('spell_zed_q');
     slowBuff.percent = 0.5;
     enemy.addBuff(slowBuff);
 

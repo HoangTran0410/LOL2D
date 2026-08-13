@@ -177,7 +177,6 @@ export class Thresh_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     this.stunBuff = new Stun(this.shackleDuration, this.owner, enemy);
-    this.stunBuff.image = AssetManager.get('spell_thresh_q');
     enemy.addBuff(this.stunBuff);
 
     this.onHookLanded?.();

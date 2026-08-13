@@ -108,7 +108,6 @@ export class Olaf_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const slowBuff = new Slow(1000, this.owner, enemy);
-    slowBuff.image = AssetManager.get('spell_olaf_q');
     slowBuff.percent = 0.4;
     enemy.addBuff(slowBuff);
     enemy.takeDamage(this.damage, this.owner);

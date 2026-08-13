@@ -113,7 +113,6 @@ export class Ahri_W_Object extends SpellObject {
       const distance = this.position.dist(this.targetEnemy.position);
       if (distance <= this.targetEnemy.stats.size.value / 2) {
         const slowBuff = new Slow(500, this.owner, this.targetEnemy);
-        slowBuff.image = AssetManager.get('spell_ahri_w');
         slowBuff.percent = 0.2;
         this.targetEnemy.addBuff(slowBuff);
         this.targetEnemy.takeDamage(this.damage, this.owner);

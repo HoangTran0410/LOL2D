@@ -156,7 +156,6 @@ export class Teemo_R_Object extends SpellObject {
 
           enemiesInRange.forEach((enemy: any) => {
             let slowBuff = new Slow(2000, this.owner, enemy);
-            slowBuff.image = AssetManager.get('spell_teemo_r');
             slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
             slowBuff.percent = 0.7;
             enemy.addBuff(slowBuff);

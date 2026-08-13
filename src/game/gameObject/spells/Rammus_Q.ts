@@ -143,11 +143,9 @@ export class Rammus_Q_Object extends SpellObject {
       victim.takeDamage(this.damage, this.owner);
 
       const airborneBuff = new Airborne(this.airborneTime, this.owner, victim);
-      airborneBuff.image = AssetManager.get('spell_rammus_q');
       victim.addBuff(airborneBuff);
 
       const slowBuff = new Slow(this.slowTime, this.owner, victim);
-      slowBuff.image = AssetManager.get('spell_rammus_q');
       slowBuff.percent = this.slowPercent;
       victim.addBuff(slowBuff);
     }
