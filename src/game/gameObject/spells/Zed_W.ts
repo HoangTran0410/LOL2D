@@ -41,7 +41,9 @@ export default class Zed_W extends Spell {
       this.image = AssetManager.get('spell_zed_w2');
     } else {
       const curPos = this.owner.position.copy();
-      this.owner.teleportTo(this.zedWClone.position.x, this.zedWClone.position.y);
+      // Grounded refuses the swap. The shadow stays put and stays swappable, so
+      // the recast is held rather than wasted.
+      if (!this.blinkOwnerTo(this.zedWClone.position.x, this.zedWClone.position.y)) return;
       this.currentCooldown = this.coolDown;
 
       this.zedWClone.teleportTo(curPos.x, curPos.y);

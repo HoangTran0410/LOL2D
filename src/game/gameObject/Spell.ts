@@ -226,6 +226,23 @@ export default class Spell {
     this.spellVfx?.impact(context);
   }
 
+  /**
+   * Moves the caster instantly — Flash, Zed's shadow swap, anything that blinks.
+   *
+   * The single place a champion may relocate itself, so grounding is enforced
+   * once here instead of in each spell. Self-propelled dashes get the same rule
+   * inside the Dash buff; between the two, a spell has to opt into neither and
+   * a new one cannot forget. `tests/game/buffs/Ground.test.ts` fails the build
+   * if a spell reaches for `owner.teleportTo` directly and bypasses this.
+   *
+   * Returns false when the blink was refused, so a recast can tell.
+   */
+  protected blinkOwnerTo(x: number, y: number): boolean {
+    if (this.owner.grounded) return false;
+    this.owner.teleportTo(x, y);
+    return true;
+  }
+
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
       const spec = this.castSpec as CastSpec;

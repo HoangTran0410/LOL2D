@@ -34,9 +34,22 @@ export default class Dash extends Buff {
   /**
    * Whether a unit may dash under its own power. Grounding blocks this, but not
    * displacements applied by someone else — those construct a Dash directly.
+   *
+   * Spells should still call this so a blocked dash fails before it charges the
+   * player mana; `blockedByGround` below is the backstop for the ones that do
+   * not, so grounding holds whether or not a spell remembered to ask.
    */
   static CanDash(targetUnit: AttackableUnit): boolean {
     return targetUnit.canMove && !targetUnit.grounded;
+  }
+
+  /**
+   * Grounding stops a unit moving itself, not being moved. `sourceUnit ===
+   * targetUnit` is how this codebase already tells those apart — it is the same
+   * test `onActivate` uses to decide whether to mark the target as displaced.
+   */
+  private get blockedByGround(): boolean {
+    return this.sourceUnit === this.targetUnit && this.targetUnit.grounded;
   }
 
   onCreate(): void {
@@ -47,6 +60,11 @@ export default class Dash extends Buff {
   }
 
   onActivate(): void {
+    if (this.blockedByGround) {
+      this.dashDestination = null;
+      this.deactivateBuff();
+      return;
+    }
     if (this.sourceUnit !== this.targetUnit) this.targetUnit.markDisplaced?.();
     if (this.stayAtDestination && this.dashDestination) {
       this.targetUnit.moveTo(this.dashDestination.x, this.dashDestination.y);
@@ -55,6 +73,12 @@ export default class Dash extends Buff {
 
   onUpdate(): void {
     if (this.toRemove) return;
+    // Ground can land mid-dash, not just before it starts.
+    if (this.blockedByGround) {
+      this.dashDestination = null;
+      this.deactivateBuff();
+      return;
+    }
 
     // apply dash
     if (this.dashDestination) {

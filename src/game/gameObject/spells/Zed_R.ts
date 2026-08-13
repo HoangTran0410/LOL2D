@@ -137,7 +137,8 @@ export default class Zed_R extends Spell {
     const shadow = this.shadow!;
     const curPos = this.owner.position.copy();
 
-    this.owner.teleportTo(shadow.position.x, shadow.position.y);
+    // Grounded refuses the swap; the shadow keeps standing and stays swappable.
+    if (!this.blinkOwnerTo(shadow.position.x, shadow.position.y)) return;
     shadow.teleportTo(curPos.x, curPos.y);
     shadow.swapable = false;
 

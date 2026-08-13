@@ -12,6 +12,11 @@ export default class Flash extends Spell {
   coolDown = 5000;
   manaCost = 100;
 
+  /** Grounded blocks blinks. Checked here so the cast fails before it costs mana. */
+  checkCastCondition() {
+    return !this.owner.grounded;
+  }
+
   onSpellCast() {
     let maxDistance = 180;
 
@@ -21,7 +26,7 @@ export default class Flash extends Spell {
       this.aimPoint,
       maxDistance
     );
-    this.owner.teleportTo(to.x, to.y);
+    if (!this.blinkOwnerTo(to.x, to.y)) return;
 
     // add smoke effect
     let newPosEffect = new Flash_Object(this.owner);
