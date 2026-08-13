@@ -14,11 +14,20 @@ import Teemo_E, {
   Teemo_E_Object,
   Teemo_E_Splash,
 } from '../../../src/game/gameObject/spells/Teemo_E';
+import BasicAttack from '../../../src/game/gameObject/spells/BasicAttack';
 import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
 import EventManager from '../../../src/managers/EventManager';
 import EventType from '../../../src/game/enums/EventType';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import SpellInputController from '../../../src/game/spell/input/SpellInputController';
+import { HotKeys, SpellHotKeys } from '../../../src/game/constants';
+import {
+  BasicAttackSwing,
+  MELEE_WINDUP_MS,
+} from '../../../src/game/combat/BasicAttack';
 import { TestVector } from '../spell/fixtures';
+import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
 
 const target = (teamId: string) =>
   Object.assign(Object.create(AttackableUnit.prototype) as AttackableUnit, {
@@ -126,6 +135,83 @@ describe('Teemo E passive', () => {
     landAttack(caster, caster, victim);
 
     expect(victim.addBuff).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * The passive's real seam, driven end to end.
+ *
+ * `landBasicAttack` in src/game/combat/BasicAttack.ts is the only place
+ * `ON_ATTACK_HIT` is emitted, and the two delivery objects in that file are its
+ * only callers. Every way of ordering an attack — the A slot spell, a right
+ * click, the AI's own scan — therefore has to arrive at the same
+ * `BasicAttackController.order()` and let the controller swing, or the passive
+ * silently stops firing for that route. The A slot is the newest route and the
+ * one the player will use most, so it gets the regression test: a real key
+ * press through SpellInputController, and a real swing landing on a real unit,
+ * with nothing emitting the event by hand.
+ */
+describe('Teemo E passive, through the A slot', () => {
+  beforeEach(() => {
+    stubGameGlobals();
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('poisons a target attacked by pressing A', () => {
+    const game = createGame();
+    const teemo = new Champion({
+      game,
+      position: createVector(0, 0),
+      teamId: 'blue',
+      preset: {
+        // melee, so one wind-up resolves the swing instead of a bolt flight
+        attack: { damage: 20, attacksPerSecond: 1, range: 100 },
+        spells: [BasicAttack, Teemo_E],
+      },
+    });
+    const victim = new Champion({ game, position: createVector(100, 0), teamId: 'red' });
+    game.setPlayer(teemo);
+    indexObjects(game, [teemo, victim]);
+
+    const input = new SpellInputController({
+      keyBindings: SpellHotKeys,
+      getSpell: slot => teemo.spells[slot],
+      createContext: () =>
+        Object.freeze({
+          spellId: 'basic-attack',
+          activationId: 'activation',
+          startedAtMs: 0,
+          caster: teemo,
+          origin: Object.freeze({ x: 0, y: 0 }),
+          cursorWorld: Object.freeze({ x: victim.position.x, y: victim.position.y }),
+          direction: Object.freeze({ x: 1, y: 0 }),
+        }),
+    });
+
+    // one frame to let Teemo E wire its listener, exactly as Champion.update does
+    teemo.update();
+
+    input.keyDown(HotKeys.A, false);
+    input.keyUp(HotKeys.A);
+    expect(teemo.basicAttack.target).toBe(victim);
+
+    teemo.basicAttack.update();
+    const swing = game.objectManager._objectToBeAdd[0];
+    expect(swing).toBeInstanceOf(BasicAttackSwing);
+
+    vi.stubGlobal('deltaTime', MELEE_WINDUP_MS);
+    (swing as BasicAttackSwing).update();
+
+    const poison = victim.buffs.find(buff => buff instanceof DamageOverTime);
+    expect(poison).toBeInstanceOf(DamageOverTime);
+    expect(poison).toMatchObject({
+      damagePerTick: POISON_DAMAGE_PER_TICK,
+      tickInterval: POISON_TICK_INTERVAL_MS,
+      duration: POISON_DURATION_MS,
+    });
+    // and the swing really landed, so the poison is not the whole of it
+    expect(victim.stats.health.value).toBe(80);
   });
 });
 
