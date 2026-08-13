@@ -94,6 +94,8 @@ describe('champion and direct-subclass type boundary', () => {
     vi.stubGlobal('stroke', vi.fn());
     vi.stubGlobal('strokeWeight', vi.fn());
     vi.stubGlobal('rect', vi.fn());
+    vi.stubGlobal('line', vi.fn());
+    vi.stubGlobal('constrain', (n: number, low: number, high: number) => Math.min(high, Math.max(low, n)));
     vi.stubGlobal('textSize', vi.fn());
     vi.stubGlobal('text', vi.fn());
     vi.stubGlobal('noStroke', vi.fn());
@@ -225,30 +227,56 @@ describe('champion and direct-subclass type boundary', () => {
     expect(text).toHaveBeenCalledWith(2, expect.any(Number), expect.any(Number));
   });
 
-  it('extends health with a silver shield segment while keeping mana at base width', () => {
-    const game = createGame();
+  const shieldedChampion = (game: ReturnType<typeof createGame>, health: number, shieldAmount: number, maxHealth = 100) => {
     const champion = new Champion({ game, position: createVector(100, 100) });
     game.setPlayer(champion);
-    champion.stats.health.baseValue = 100;
-    champion.stats.maxHealth.baseValue = 100;
+    champion.stats.health.baseValue = health;
+    champion.stats.maxHealth.baseValue = maxHealth;
     champion.stats.mana.baseValue = 100;
     champion.stats.maxMana.baseValue = 100;
     const shield = new Shield(1_000, champion, champion);
-    shield.amount = 50;
+    shield.amount = shieldAmount;
     champion.buffs = [shield];
+    return champion;
+  };
+
+  it('draws the shield next to health when there is room for it', () => {
+    const champion = shieldedChampion(createGame(), 50, 25);
+
+    champion.drawHealthBar();
+
+    const [, health, shieldSegment] = vi.mocked(rect).mock.calls;
+    expect(shieldSegment[0]).toBe(health[0] + health[2]);
+    expect(fill).toHaveBeenCalledWith(225, 230, 238, expect.any(Number));
+  });
+
+  it('keeps the frame fixed and the shield inside it however big the shield is', () => {
+    const champion = shieldedChampion(createGame(), 100, 500);
 
     champion.drawHealthBar();
 
     const rectCalls = vi.mocked(rect).mock.calls;
     const frame = rectCalls[0];
-    const health = rectCalls[1];
     const shieldSegment = rectCalls[2];
-    const mana = rectCalls[3];
-    expect(frame[2]).toBe(182);
-    expect(shieldSegment[0]).toBe(health[0] + health[2]);
-    expect(shieldSegment[2]).toBe(54);
-    expect(mana[2]).toBe(108);
-    expect(fill).toHaveBeenCalledWith(225, 230, 238, expect.any(Number));
+    // 125 frame + 3 border, i.e. exactly what an unshielded champion draws
+    expect(frame[2]).toBe(128);
+    expect(shieldSegment[2]).toBe(108);
+    expect(shieldSegment[0] + shieldSegment[2]).toBeLessThanOrEqual(frame[0] + frame[2]);
+    // mana keeps its own full-width track rather than following the shield
+    expect(rectCalls.at(-1)?.[2]).toBe(108);
+  });
+
+  it('ticks the bar by health so two champions can be compared at a glance', () => {
+    const small = shieldedChampion(createGame(), 100, 0, 100);
+    small.drawHealthBar();
+    const smallTicks = vi.mocked(line).mock.calls.length;
+
+    vi.mocked(line).mockClear();
+    const big = shieldedChampion(createGame(), 300, 0, 300);
+    big.drawHealthBar();
+
+    expect(smallTicks).toBe(1);
+    expect(vi.mocked(line).mock.calls.length).toBe(5);
   });
 
   it('draws spell overlays after the champion body and health UI', () => {

@@ -23,6 +23,22 @@ export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
   preset?: ChampionPresetData;
 }
 
+/**
+ * Health per tick mark on a champion's bar. The frame is a fixed width, so the
+ * number of ticks is what communicates pool size: more ticks means more health.
+ * The step widens once a pool would draw more than MAX_TICKS, otherwise a
+ * grown-out Cho'Gath bar turns into a solid block of lines.
+ */
+const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
+const MAX_TICKS = 20;
+
+export const healthTickStep = (maxHealth: number): number => {
+  for (const step of TICK_LADDER) {
+    if (maxHealth / step <= MAX_TICKS) return step;
+  }
+  return TICK_LADDER[TICK_LADDER.length - 1];
+};
+
 export default class Champion extends AttackableUnit {
   static displayZIndex = 4;
   score = 0;
@@ -89,9 +105,18 @@ export default class Champion extends AttackableUnit {
       barHeight = 17,
       manaHeight = 5;
     const healthContainerW = barWidth - barHeight;
-    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
-    const shieldW = map(this.shieldAmount, 0, maxHealth, 0, healthContainerW);
-    const frameWidth = barHeight + Math.max(healthContainerW, healthW + shieldW);
+    // The bar is a fixed frame: a shield is a share of it, never an extension of
+    // it. Growing the frame made a heavily shielded champion bar sprawl across the
+    // screen, and left no way to read how hurt someone actually was.
+    const frameWidth = barWidth;
+    const healthRatio = maxHealth > 0 ? constrain(health / maxHealth, 0, 1) : 0;
+    const shieldRatio = maxHealth > 0 ? constrain(this.shieldAmount / maxHealth, 0, 1) : 0;
+    const healthW = healthRatio * healthContainerW;
+    // Shield sits to the right of current health because it is eaten first. With
+    // no room left it slides back over the health so it can never be invisible.
+    const shieldW = shieldRatio * healthContainerW;
+    const shieldX = Math.min(healthW, healthContainerW - shieldW);
+    const shieldOverflows = this.shieldAmount > maxHealth;
     const topleft = {
       x: pos.x - frameWidth / 2,
       y: pos.y - size / 2 - barHeight - 15,
@@ -120,19 +145,34 @@ export default class Champion extends AttackableUnit {
         ? [67, 196, 29, alpha]
         : [196, 67, 29, alpha]
     );
-    rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
+    const healthRowH = barHeight - manaHeight - 1;
+    rect(topleft.x + barHeight, topleft.y, healthW, healthRowH);
 
     if (shieldW > 0) {
       fill(225, 230, 238, alpha * 0.85);
-      rect(
-        topleft.x + barHeight + healthW,
-        topleft.y,
-        shieldW,
-        barHeight - manaHeight - 1
-      );
+      rect(topleft.x + barHeight + shieldX, topleft.y, shieldW, healthRowH);
+
+      // The bar cannot grow, so a shield larger than the whole health pool is
+      // flagged instead of drawn past the end.
+      if (shieldOverflows) {
+        fill(255, 246, 200, alpha);
+        rect(topleft.x + barHeight + healthContainerW - 2, topleft.y, 2, healthRowH);
+      }
     }
 
-    const manaW = map(mana, 0, maxMana, 0, healthContainerW);
+    // Ticks every `tickStep` health. The frame is fixed, so a champion with a
+    // bigger pool simply shows more of them — that is what makes two bars
+    // comparable at a glance, and it also reads the shield against real health.
+    const tickStep = healthTickStep(maxHealth);
+    stroke(2, 15, 21, alpha * 0.6);
+    strokeWeight(1);
+    for (let mark = tickStep; mark < maxHealth; mark += tickStep) {
+      const tickX = topleft.x + barHeight + (mark / maxHealth) * healthContainerW;
+      line(tickX, topleft.y + 1, tickX, topleft.y + healthRowH - 1);
+    }
+    noStroke();
+
+    const manaW = maxMana > 0 ? constrain(mana / maxMana, 0, 1) * healthContainerW : 0;
     fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 
