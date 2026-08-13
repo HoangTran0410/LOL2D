@@ -20,9 +20,51 @@ export default class GameScene extends Scene {
   game: Game | null = null;
   private _animationFrameId: number | null = null;
 
+  // Bound once so addEventListener/removeEventListener target the same
+  // reference — otherwise the listener added in enter() could never be
+  // removed in exit(), leaking a handler across every scene re-entry.
+  private _handleVisibilityChange = (): void => {
+    if (document.hidden) {
+      // Tab backgrounded: the setTimeout-driven update loop isn't throttled
+      // by the browser the way requestAnimationFrame is, so it would keep
+      // burning CPU/battery in the background (notably on mobile) unless we
+      // stop it ourselves. Stop p5's draw loop too.
+      if (this._animationFrameId !== null) {
+        clearTimeout(this._animationFrameId);
+        this._animationFrameId = null;
+      }
+      noLoop();
+    } else {
+      if (!this.game) return;
+      // p5 computes deltaTime from the wall-clock gap since its last real
+      // frame. After sitting paused for a while, simply calling loop() would
+      // replay that entire gap as one giant deltaTime on the first resumed
+      // frame (breaking cooldowns/buffs/particle lifespans, which all key off
+      // the shared `deltaTime` global). Resetting p5's internal frame
+      // timestamps makes the resumed frame read as "now" instead of a spike.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p5Instance = (window as any).p5?.instance;
+      if (p5Instance) {
+        const now = performance.now();
+        p5Instance._lastRealFrameTime = now;
+        p5Instance._lastTargetFrameTime = now;
+      }
+      // Same idea for our own update loop's elapsed-time tracking, so it
+      // doesn't try to "catch up" the hidden duration in one tick.
+      previousTime = performance.now();
+      loop();
+      this.updateLoop();
+    }
+  };
+
   setup() {
     this.dom = document.querySelector('#game-scene') as HTMLElement;
     this.statsContainer = document.querySelector('#stats') as HTMLElement;
+
+    // No cap anywhere else in the codebase — without one, p5's draw loop
+    // runs as fast as the display allows (120Hz+ on many phones/laptops),
+    // burning CPU/battery for no visual benefit.
+    frameRate(60);
 
     drawAnalys = new Stats();
     drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
@@ -56,6 +98,8 @@ export default class GameScene extends Scene {
     strokeCap(ROUND);
     rectMode(CORNER);
     imageMode(CENTER);
+
+    document.addEventListener('visibilitychange', this._handleVisibilityChange);
 
     this.startGame();
   }
@@ -116,6 +160,7 @@ export default class GameScene extends Scene {
   }
 
   exit() {
+    document.removeEventListener('visibilitychange', this._handleVisibilityChange);
     this.game?.spellInputController.cancelAll('SCENE_EXIT');
     this.stopGame();
     this.dom.style.display = 'none';

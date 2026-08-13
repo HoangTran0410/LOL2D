@@ -144,7 +144,11 @@ export default class ObjectManager {
       y: 0,
       w: mapSize,
       h: mapSize,
-      maxObjects: 2,
+      // maxObjects: 2 forced deep splits and multi-leaf inserts (an object
+      // that spans multiple quadrants near a boundary gets inserted into
+      // each one) on every rebuild, every tick. 12 keeps leaves shallow
+      // without turning every query into a near-linear scan of one big leaf.
+      maxObjects: 12,
       maxLevels: 4,
     });
 
@@ -195,9 +199,13 @@ export default class ObjectManager {
       area: camBound,
     });
 
-    objectsInCamera.sort((a, b) => zIndexOf(a) - zIndexOf(b));
+    // Precompute each object's z-index once (zIndexOf does a Map lookup +
+    // Object.hasOwn) instead of recomputing it on every comparison the sort
+    // makes, then sort the small keyed array and drop the keys.
+    const keyed = objectsInCamera.map((o) => ({ o, z: zIndexOf(o) }));
+    keyed.sort((a, b) => a.z - b.z);
 
-    for (const o of objectsInCamera) {
+    for (const { o } of keyed) {
       if (o.willDraw) o.draw?.();
       // o.drawBoundingBox?.(true);
     }

@@ -343,23 +343,53 @@ export class Quadtree {
   }
 
   retrieve(areaObj: { qtIndex: (bounds: any) => number[]; intersect: (other: any) => boolean }, cleanUp = true): any[] {
-    const indexes = this.getIndex(areaObj);
-    let returnObjects = this.objects;
-    // if we have subnodes, retrieve their objects
-    if (this.nodes.length) {
-      for (let i = 0; i < indexes.length; i++) {
-        returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(areaObj, false));
+    if (!cleanUp) {
+      // Internal recursive step (called by a parent node's cleanUp pass):
+      // just gather this node's + matching children's objects, duplicates
+      // and all. Only the root call below dedupes/filters, so this path is
+      // left as-is for anyone calling retrieve(area, false) directly.
+      const indexes = this.getIndex(areaObj);
+      let returnObjects = this.objects;
+      if (this.nodes.length) {
+        for (let i = 0; i < indexes.length; i++) {
+          returnObjects = returnObjects.concat(this.nodes[indexes[i]].retrieve(areaObj, false));
+        }
       }
+      return returnObjects;
     }
 
-    // only clean up at the root of recursive calls
-    if (cleanUp) {
-      // remove duplicates
-      returnObjects = returnObjects.filter((item, index) => returnObjects.indexOf(item) >= index);
-      // get only objects that really intersect with areaObj
-      returnObjects = returnObjects.filter((item) => areaObj.intersect(item));
+    // Root call: walk the tree once, deduping via a Set (O(n)) instead of the
+    // old O(n^2) `returnObjects.indexOf(item) >= index` filter, and pushing
+    // into a single shared accumulator instead of allocating a fresh array
+    // with `.concat` at every node. The depth-first traversal order below
+    // (this node's own objects, then each matching child in index order)
+    // matches the old concat order exactly, so "keep first occurrence" still
+    // produces the same result in the same order.
+    const seen = new Set<unknown>();
+    const returnObjects: any[] = [];
+    this._collect(areaObj, returnObjects, seen);
+    // get only objects that really intersect with areaObj
+    return returnObjects.filter((item) => areaObj.intersect(item));
+  }
+
+  private _collect(
+    areaObj: { qtIndex: (bounds: any) => number[] },
+    accumulator: any[],
+    seen: Set<unknown>
+  ): void {
+    for (let i = 0; i < this.objects.length; i++) {
+      const obj = this.objects[i];
+      if (!seen.has(obj)) {
+        seen.add(obj);
+        accumulator.push(obj);
+      }
     }
-    return returnObjects;
+    if (this.nodes.length) {
+      const indexes = this.getIndex(areaObj);
+      for (let i = 0; i < indexes.length; i++) {
+        this.nodes[indexes[i]]._collect(areaObj, accumulator, seen);
+      }
+    }
   }
 
   clear(): void {

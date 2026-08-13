@@ -55,6 +55,24 @@ export default class GameObject {
   id: string;
   direction: p5.Vector;
 
+  /**
+   * Bounding boxes are recomputed once per object per frame (plus once per
+   * candidate in every spell targeting query), so a fresh allocation on every
+   * call adds up fast. `position` is a p5.Vector mutated directly all over
+   * the codebase (no setter to hook), so instead of an explicit invalidation
+   * call — like Obstacle/ParticleSystem/TrailSystem use for their own
+   * `_cachedBB` — we memoize by comparing the inputs that produced the box.
+   */
+  private _collideBB: Rectangle | null = null;
+  private _collideBBX = NaN;
+  private _collideBBY = NaN;
+  private _collideBBRadius = NaN;
+
+  private _displayBB: Rectangle | null = null;
+  private _displayBBX = NaN;
+  private _displayBBY = NaN;
+  private _displayBBRadius = NaN;
+
   constructor({
     game,
     position,
@@ -87,23 +105,47 @@ export default class GameObject {
   }
 
   getCollideBoundingBox(): Circle | Line | Rectangle {
-    return new Rectangle({
+    if (
+      this._collideBB &&
+      this._collideBBX === this.position.x &&
+      this._collideBBY === this.position.y &&
+      this._collideBBRadius === this.collisionRadius
+    ) {
+      return this._collideBB;
+    }
+    this._collideBBX = this.position.x;
+    this._collideBBY = this.position.y;
+    this._collideBBRadius = this.collisionRadius;
+    this._collideBB = new Rectangle({
       x: this.position.x - this.collisionRadius,
       y: this.position.y - this.collisionRadius,
       w: this.collisionRadius * 2,
       h: this.collisionRadius * 2,
       data: this,
     });
+    return this._collideBB;
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
+    if (
+      this._displayBB &&
+      this._displayBBX === this.position.x &&
+      this._displayBBY === this.position.y &&
+      this._displayBBRadius === this.visionRadius
+    ) {
+      return this._displayBB;
+    }
+    this._displayBBX = this.position.x;
+    this._displayBBY = this.position.y;
+    this._displayBBRadius = this.visionRadius;
+    this._displayBB = new Rectangle({
       x: this.position.x - this.visionRadius,
       y: this.position.y - this.visionRadius,
       w: this.visionRadius * 2,
       h: this.visionRadius * 2,
       data: this,
     });
+    return this._displayBB;
   }
 
   drawBoundingBox(collide = false) {

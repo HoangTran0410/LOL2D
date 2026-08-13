@@ -6,6 +6,11 @@ export default class Camera {
   scale: number;
   target: p5.Vector | null;
 
+  // Scratch objects reused by getBoundingBox/drawGrid so their once-per-frame
+  // corner lookups don't allocate a p5.Vector via createVector each call.
+  private _scratchTopLeft = { x: 0, y: 0 };
+  private _scratchBottomRight = { x: 0, y: 0 };
+
   constructor() {
     this.position = createVector(0, 0);
     this.currentScale = 0.5;
@@ -34,8 +39,8 @@ export default class Camera {
     stroke(100, 70);
     strokeWeight(2);
 
-    const topLeft = this.screenToWorld(0, 0);
-    const bottomRight = this.screenToWorld(width, height);
+    const topLeft = this.screenToWorldInto(0, 0, this._scratchTopLeft);
+    const bottomRight = this.screenToWorldInto(width, height, this._scratchBottomRight);
 
     const startX = floor(topLeft.x / gridSize) * gridSize;
     const startY = floor(topLeft.y / gridSize) * gridSize;
@@ -49,8 +54,8 @@ export default class Camera {
   }
 
   getBoundingBox(): Rectangle {
-    const topLeft = this.screenToWorld(0, 0);
-    const bottomRight = this.screenToWorld(width, height);
+    const topLeft = this.screenToWorldInto(0, 0, this._scratchTopLeft);
+    const bottomRight = this.screenToWorldInto(width, height, this._scratchBottomRight);
     return new Rectangle({
       x: topLeft.x,
       y: topLeft.y,
@@ -71,6 +76,24 @@ export default class Camera {
       (x - this.position.x) * this.currentScale + width / 2,
       (y - this.position.y) * this.currentScale + height / 2
     );
+  }
+
+  /**
+   * Non-allocating variant of screenToWorld: writes into the caller-supplied
+   * `target` instead of creating a new p5.Vector. Use in hot paths (e.g. a
+   * per-vertex loop) where only the numbers are needed.
+   */
+  screenToWorldInto(x: number, y: number, target: { x: number; y: number }): { x: number; y: number } {
+    target.x = (x - width / 2) / this.currentScale + this.position.x;
+    target.y = (y - height / 2) / this.currentScale + this.position.y;
+    return target;
+  }
+
+  /** Non-allocating variant of worldToScreen — see screenToWorldInto. */
+  worldToScreenInto(x: number, y: number, target: { x: number; y: number }): { x: number; y: number } {
+    target.x = (x - this.position.x) * this.currentScale + width / 2;
+    target.y = (y - this.position.y) * this.currentScale + height / 2;
+    return target;
   }
 
   makeDraw(drawFunc: (() => void) | undefined): void {
