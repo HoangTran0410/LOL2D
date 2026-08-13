@@ -132,8 +132,12 @@ describe('spell aim integration', () => {
     expect(missile.destination.y).toBeCloseTo(350);
   });
 
-  it('aims an AI press at its destination instead of game.worldMouse', () => {
-    const game = gameWithMouse();
+  // Bots fire at the human player's cursor on purpose — that is what makes them
+  // worth fighting. Aiming at `destination` instead looked equivalent only while
+  // `_autoMove` was on: with it off a bot never walks, so its destination stays
+  // on its own feet and every non-unit-targeted spell got cast into the ground
+  // under it.
+  const aimingAI = (game: ReturnType<typeof gameWithMouse>) => {
     const ai = new AIChampion({
       game,
       position: new TestVector(0, 0) as any,
@@ -150,10 +154,36 @@ describe('spell aim integration', () => {
     const spell = new AimSpell(ai);
     ai.spells = [spell];
     vi.stubGlobal('random', vi.fn(() => 0));
+    return { ai, spell };
+  };
+
+  it('aims an AI press at the player cursor, not at its own walk destination', () => {
+    const { ai, spell } = aimingAI(gameWithMouse(new TestVector(300, -40)));
+
+    ai.update();
+
+    expect(spell.usedAim).toMatchObject({ x: 300, y: -40 });
+  });
+
+  it('falls back to the destination when there is no cursor to aim at', () => {
+    const game = gameWithMouse();
+    (game as { worldMouse?: TestVector }).worldMouse = undefined;
+    const { ai, spell } = aimingAI(game);
 
     ai.update();
 
     expect(spell.usedAim).toMatchObject({ x: 0, y: 20 });
+  });
+
+  it('keeps a parked bot from casting into the ground under itself', () => {
+    // _autoMove is off, so position and destination coincide: the old aim would
+    // have produced a cast target identical to the caster's own feet.
+    const { ai, spell } = aimingAI(gameWithMouse(new TestVector(900, 900)));
+    ai.destination = new TestVector(ai.position.x, ai.position.y) as any;
+
+    ai.update();
+
+    expect(spell.usedAim).not.toMatchObject({ x: ai.position.x, y: ai.position.y });
   });
 
   it.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(

@@ -84,14 +84,29 @@ export default class AIChampion extends Champion {
       caster: this,
       casterTeamId: this.teamId,
       origin: this.position,
-      cursorWorld: cursorWorld ?? this.destination,
+      cursorWorld: cursorWorld ?? this.aimPoint(),
       ...spell.targetingRequest,
     });
     return result.ok ? result.context : undefined;
   }
 
+  /**
+   * Where a bot points a spell that is not aimed at a specific unit.
+   *
+   * The human player's cursor, deliberately: firing at the player is what makes
+   * the bots worth fighting, and it is how they behaved before the runtime gave
+   * them an aim of their own. `destination` is only a fallback for when there is
+   * no cursor (headless tests) — on its own it is a bad aim, because with
+   * `_autoMove` off a bot never walks anywhere, so its destination stays parked
+   * on its own feet and every spell gets cast into the ground under it.
+   */
+  private aimPoint(): Vec2 {
+    const cursor = this.game.worldMouse;
+    return cursor ? { x: cursor.x, y: cursor.y } : this.destination;
+  }
+
   private cursorForSpell(spell: Spell): Vec2 | undefined {
-    if (spell.castSpec.targeting !== 'UNIT') return this.destination;
+    if (spell.castSpec.targeting !== 'UNIT') return this.aimPoint();
     const request = spell.targetingRequest;
     const candidates = request.queryCandidates?.() ?? this.game.objectManager?.objects ?? [];
     const getTargetInfo = request.getTargetInfo ?? defaultTargetInfo;
