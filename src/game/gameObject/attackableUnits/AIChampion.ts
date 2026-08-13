@@ -1,4 +1,6 @@
 import AssetManager from '../../../managers/AssetManager';
+import { Circle } from '../../../libs/quadtree';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 import { getChampionPresetRandom } from '../../preset';
 import Champion, { type ChampionOptions } from './Champion';
 import type AttackableUnit from './AttackableUnit';
@@ -13,13 +15,26 @@ import type { Vec2 } from '../../spell/runtime/types';
 
 export type AIChampionOptions = ChampionOptions;
 
+/**
+ * ms between target scans. A bot only re-queries the quadtree four times a
+ * second, and the first interval is jittered per bot so five of them never scan
+ * on the same frame. Scanning every frame per unit is the one thing here that
+ * would cost a full board its frame rate.
+ */
+export const AI_ATTACK_SCAN_INTERVAL_MS = 250;
+/** How far a bot looks for something to attack. Inside its 500 sight radius. */
+export const AI_ATTACK_AGGRO_RANGE = 420;
+
 export default class AIChampion extends Champion {
   _autoMove = false;
   _autoCast = true;
+  _autoAttack = true;
   _autoMoveOnTakeDamage = false;
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
+  /** ms until the next scan, jittered on construction. */
+  _attackScanCooldown = Math.random() * AI_ATTACK_SCAN_INTERVAL_MS;
   private pendingCharge?: {
     spell: Spell;
     context: CastContext;
@@ -34,7 +49,11 @@ export default class AIChampion extends Champion {
   update() {
     super.update();
 
-    if (this._autoMove) {
+    this.updateAttackTargeting();
+
+    // an attack order owns the destination while it is running, so wandering off
+    // to a random point has to wait until the order is done
+    if (this._autoMove && !this.basicAttack.target) {
       let distToDest = this.position.dist(this.destination);
       if (distToDest < this.stats.speed.value) {
         this.moveToRandomLocation();
@@ -70,6 +89,57 @@ export default class AIChampion extends Champion {
         }
       }
     }
+  }
+
+  /**
+   * Picks something to basic attack. Kept separate from spell aiming on purpose:
+   * `cursorForSpell` deliberately reads a live point rather than a locked unit,
+   * and folding the two together would change how bots aim their abilities.
+   */
+  updateAttackTargeting(): void {
+    this._attackScanCooldown -= deltaTime;
+    if (!this._autoAttack || this.isDead) return;
+    if (this._attackScanCooldown > 0) return;
+
+    this._attackScanCooldown = AI_ATTACK_SCAN_INTERVAL_MS;
+    // an order already running is left alone: re-picking every scan would make a
+    // bot flip between two equidistant enemies and never finish either
+    if (this.basicAttack.target) return;
+    this.basicAttack.order(this.findAttackTarget());
+  }
+
+  /**
+   * Nearest hostile champion inside the aggro radius. Champions only — a bot
+   * that wandered into the jungle and started trading with a camp, or parked
+   * itself under a turret, would look broken rather than dangerous.
+   */
+  findAttackTarget(): Champion | null {
+    // optional call for the same reason MissileSpellObject uses one: spell tests
+    // hand in an object manager stub that only knows how to collect added objects
+    const found =
+      this.game.objectManager.queryObjects?.({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: AI_ATTACK_AGGRO_RANGE,
+        }),
+        filters: [
+          PredefinedFilters.type(Champion),
+          PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+        ],
+      }) ?? [];
+
+    let nearest: Champion | null = null;
+    let nearestDistance = Infinity;
+    for (const champion of found) {
+      if (champion === this) continue;
+      const distance = p5.Vector.dist(this.position, champion.position);
+      if (distance <= AI_ATTACK_AGGRO_RANGE && distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = champion;
+      }
+    }
+    return nearest;
   }
 
   private createSpellContext(spell: Spell): CastContext | undefined {
@@ -147,6 +217,12 @@ export default class AIChampion extends Champion {
   takeDamage(damage: number, attacker?: AttackableUnit) {
     super.takeDamage(damage, attacker);
     if (this._autoMoveOnTakeDamage) this.moveToRandomLocation();
+
+    // Hit back. super.takeDamage may have killed us, and an order already
+    // running is kept: a bot that re-targeted on every incoming hit would drop
+    // the champion it was about to finish every time a turret shot it.
+    if (!this._autoAttack || this.isDead || this.basicAttack.target) return;
+    if (attacker instanceof Champion) this.basicAttack.order(attacker);
   }
 
   respawn() {

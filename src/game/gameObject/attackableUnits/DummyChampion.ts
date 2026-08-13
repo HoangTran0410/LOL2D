@@ -8,6 +8,8 @@ export default class DummyChampion extends AIChampion {
   respawnTime = 1000;
   _autoCast = false;
   _autoMove = false;
+  /** A practice dummy stands there and takes it. */
+  _autoAttack = false;
   _autoMoveOnTakeDamage = false;
   _autoMoveOnCollideWall = false;
   _respawnWithNewPreset = false;
