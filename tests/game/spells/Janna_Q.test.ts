@@ -18,6 +18,7 @@ import Janna_Q, {
   MIN_SIZE,
   MIN_SPEED,
 } from '../../../src/game/gameObject/spells/Janna_Q';
+import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -58,6 +59,7 @@ const setup = () => {
     teamId: 'blue',
     isDead: false,
     canCast: true,
+    status: StatusFlags.None,
     stats: { mana: { value: 100 }, health: { value: 100 } },
   };
   const spell = new Janna_Q(owner);
@@ -148,6 +150,38 @@ describe('Janna Q', () => {
     expect(tornado.maxRange).toBe(spell.maxRange);
     expect(tornado.maxChargeTime).toBe(spell.maxChargeTime);
     expect(owner.stats.mana.value).toBe(100 - spell.manaCost);
+  });
+
+  // The funnel is already standing in the world by this point and fires itself
+  // at full charge, so nothing Janna suffers should delete it. A charged cast
+  // she is physically holding — Varus Q, Pantheon Q — is the opposite case and
+  // keeps cancelling.
+  it.each([
+    ['stun', (o: { status: number }) => { o.status = StatusFlags.Stunned; }],
+    ['suppression', (o: { status: number }) => { o.status = StatusFlags.Suppressed; }],
+    ['silence', (o: { status: number }) => { o.status = StatusFlags.Silenced; }],
+    ['a cast-inhibiting state', (o: { canCast: boolean }) => { o.canCast = false; }],
+  ])('keeps the tornado alive through %s on the caster', (_name, applyCrowdControl) => {
+    const { owner, spell, tornado } = setup();
+
+    applyCrowdControl(owner as never);
+    spell.update();
+
+    expect(spell.state).toBe('ACTIVE');
+    expect(tornado.toRemove).toBe(false);
+    expect(tornado.charging).toBe(true);
+  });
+
+  it('still charges toward its own auto-release while the caster is stunned', () => {
+    const { owner, spell, tornado } = setup();
+    (owner as { status: number }).status = StatusFlags.Stunned;
+
+    vi.stubGlobal('deltaTime', MAX_CHARGE_MS + 1);
+    spell.update();
+
+    expect(spell.state).toBe('COOLDOWN');
+    expect(tornado.charging).toBe(false);
+    expect(tornado.toRemove).toBe(false);
   });
 
   it('cleans up and starts cooldown once on caster death', () => {
