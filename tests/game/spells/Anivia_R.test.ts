@@ -118,7 +118,7 @@ describe('Anivia R', () => {
 
     spell.press(context({ x: 100, y: 0 }));
 
-    expect(added[0].radius).toBe(200);
+    expect(added[0].radius).toBe(70);
     expect(enemy.damage).toEqual([2]);
     expect(enemy.buffs).toHaveLength(1);
     expect(enemy.buffs[0]).toMatchObject({ percent: 0.2, duration: 1_000 });
@@ -130,7 +130,7 @@ describe('Anivia R', () => {
     spell.press(context({ x: 100, y: 0 }));
     added[0].update(1_500);
 
-    expect(added[0].radius).toBe(400);
+    expect(added[0].radius).toBe(190);
     expect(enemy.damage).toEqual([2, 2, 2, 12]);
     expect(enemy.buffs).toHaveLength(4);
     expect(enemy.buffs.at(-1)).toMatchObject({ percent: 0.3, duration: 1_500 });
@@ -138,7 +138,7 @@ describe('Anivia R', () => {
 
   it('uses each due tick radius when catching up a long frame', () => {
     const { spell, added, enemy } = setup();
-    enemy.position.x = 450;
+    enemy.position.x = 280;
 
     spell.press(context({ x: 100, y: 0 }));
     added[0].update(1_500);
@@ -147,7 +147,7 @@ describe('Anivia R', () => {
     expect(enemy.buffs).toHaveLength(1);
   });
 
-  it('queries the imported 200 267 333 and 400 radius checkpoints', () => {
+  it('queries the imported 70 110 150 and 190 radius checkpoints', () => {
     const { spell, owner, added } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
@@ -155,10 +155,10 @@ describe('Anivia R', () => {
 
     const radii = owner.game.objectManager.queryObjects.mock.calls
       .map(([query]) => query.area.r as number);
-    expect(radii).toContain(200);
-    expect(radii).toContain(267);
-    expect(radii).toContain(333);
-    expect(radii).toContain(400);
+    expect(radii).toContain(70);
+    expect(radii).toContain(110);
+    expect(radii).toContain(150);
+    expect(radii).toContain(190);
   });
 
   it('pays 60 mana on activation, then 35 mana once per second', () => {

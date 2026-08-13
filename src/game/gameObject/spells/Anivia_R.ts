@@ -15,13 +15,17 @@ const DAMAGE_TICK_MS = 500;
 const UPKEEP_TICK_MS = 1_000;
 const UPKEEP_COST = 35;
 const SLOW_TICK_MS = 250;
-const START_RADIUS = 200;
-const END_RADIUS = 400;
+// Restored from the spell's original tuning (306a1d4). A later refactor onto
+// AreaSpellObject pushed these to 200/400, which made the storm cover an eighth
+// of the map and dwarf every other area spell.
+const START_RADIUS = 70;
+const END_RADIUS = 190;
 const TETHER_RANGE = 450;
 const NORMAL_DAMAGE = 4;
 const EMPOWERED_DAMAGE = 12;
 const NORMAL_SLOW = 0.2;
 const EMPOWERED_SLOW = 0.3;
+const SNOW_COUNT = 14;
 const stormRadiusAt = (elapsedMs: number): number =>
   Math.round(START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS));
 
@@ -187,20 +191,50 @@ export class Anivia_R_Object extends AreaSpellObject {
 
   draw(): void {
     const pulse = 0.65 + 0.35 * sin(this.elapsedMs / 180);
+    const swirl = this.elapsedMs / 900;
+
     push();
     translate(this.center.x, this.center.y);
+
     noStroke();
-    fill(120, 185, 235, 60);
+    fill(120, 185, 235, 55);
     circle(0, 0, this.radius * 2);
-    fill(190, 230, 255, 45);
+    fill(190, 230, 255, 40);
     circle(0, 0, this.radius * 1.15);
+
     noFill();
     stroke(25, 70, 115, 200);
-    strokeWeight(7);
+    strokeWeight(6);
     circle(0, 0, this.radius * 2);
     stroke(225, 248, 255, 185 + 70 * pulse);
-    strokeWeight(3);
+    strokeWeight(2.5);
     circle(0, 0, this.radius * 2);
+
+    // three spiral arms turning around the eye of the storm
+    stroke(255, 170);
+    strokeWeight(2);
+    for (let arm = 0; arm < 3; arm++) {
+      const offset = swirl + (arm / 3) * TWO_PI;
+      beginShape();
+      for (let t = 0; t <= 1.001; t += 0.1) {
+        const r = this.radius * (0.15 + t * 0.85);
+        const a = offset + t * 2.4;
+        vertex(cos(a) * r, sin(a) * r);
+      }
+      endShape();
+    }
+
+    // Snow riding the storm. Placed off elapsedMs rather than random() so the
+    // flecks actually drift instead of flickering to new spots every frame.
+    noStroke();
+    fill(255, 200);
+    for (let i = 0; i < SNOW_COUNT; i++) {
+      const seed = i * 2.399_963;
+      const spin = swirl * (0.6 + (i % 4) * 0.22) + seed;
+      const r = this.radius * (0.18 + ((i * 0.137 + this.elapsedMs / 4_200) % 1) * 0.8);
+      circle(cos(spin) * r, sin(spin) * r, 2 + (i % 3));
+    }
+
     pop();
   }
 
