@@ -10,8 +10,8 @@ import VfxGroup from '../../vfx/VfxGroup';
 const MAX_CHARGE_MS = 4_000;
 const RANGE_CHARGE_MS = 1_500;
 const DAMAGE_CHARGE_MS = 1_250;
-const MIN_CENTER_TRAVEL = 825;
-const MAX_CENTER_TRAVEL = 1_525;
+const MIN_CENTER_TRAVEL = 100;
+const MAX_CENTER_TRAVEL = 700;
 
 export default class Varus_Q extends Spell {
   image = AssetManager.get('spell_varus_q');
@@ -33,15 +33,21 @@ export default class Varus_Q extends Spell {
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
       vfx: {
-        castLoop: context => new VfxGroup([
-          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => unitCastBarAnchor(this.owner)),
-          new ChargeRangeTelegraph(
-            () => this.owner.position,
-            () => this.aimDirection,
-            () => this.currentRange,
-            () => this.chargeMs / RANGE_CHARGE_MS
-          ),
-        ]),
+        castLoop: context =>
+          new VfxGroup([
+            new CastBar(
+              context,
+              () => this.chargeMs / MAX_CHARGE_MS,
+              undefined,
+              () => unitCastBarAnchor(this.owner)
+            ),
+            new ChargeRangeTelegraph(
+              () => this.owner.position,
+              () => this.aimDirection,
+              () => this.currentRange,
+              () => this.chargeMs / RANGE_CHARGE_MS
+            ),
+          ]),
       },
     };
   }
@@ -82,28 +88,42 @@ export default class Varus_Q extends Spell {
     const origin = this.owner.position;
     const direction = this.directionTo(aim, origin.x, origin.y);
     const arrow = new Varus_Q_Arrow(this.owner);
-    arrow.destination = createVector(origin.x + direction.x * range, origin.y + direction.y * range);
+    arrow.destination = createVector(
+      origin.x + direction.x * range,
+      origin.y + direction.y * range
+    );
     arrow.damage = this.damageAt(this.chargeMs);
     this.game.objectManager.addObject(arrow);
   }
 
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
-    if (reason === 'MAX_DURATION' || reason === 'DEATH' || reason === 'SILENCE' || reason === 'STUN') {
+    if (
+      reason === 'MAX_DURATION' ||
+      reason === 'DEATH' ||
+      reason === 'SILENCE' ||
+      reason === 'STUN'
+    ) {
       this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
 
   private rangeAt(elapsedMs: number): number {
-    return MIN_CENTER_TRAVEL +
-      (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * Math.min(1, elapsedMs / RANGE_CHARGE_MS);
+    return (
+      MIN_CENTER_TRAVEL +
+      (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * Math.min(1, elapsedMs / RANGE_CHARGE_MS)
+    );
   }
 
-  get currentRange(): number { return this.rangeAt(this.chargeMs); }
+  get currentRange(): number {
+    return this.rangeAt(this.chargeMs);
+  }
 
   private get aimDirection(): { x: number; y: number } {
     const aim = this.aimContext;
-    return aim ? this.directionTo(aim, this.owner.position.x, this.owner.position.y) : { x: 0, y: 0 };
+    return aim
+      ? this.directionTo(aim, this.owner.position.x, this.owner.position.y)
+      : { x: 0, y: 0 };
   }
 
   private damageAt(elapsedMs: number): number {
@@ -125,7 +145,7 @@ export default class Varus_Q extends Spell {
 
 export class Varus_Q_Arrow extends MissileSpellObject {
   image = AssetManager.get('spell_varus_q');
-  speed = 1_900 / 60;
+  speed = 1_200 / 60;
   size = 36;
   visualWidth = 90;
   visualHeight = 32;
@@ -133,7 +153,10 @@ export class Varus_Q_Arrow extends MissileSpellObject {
   damage = 20;
 
   onHit(enemy: { takeDamage(damage: number, owner: unknown): void }): void {
-    const reduction = Math.min(0.67, this.hitTargets.length > 1 ? (this.hitTargets.length - 1) * 0.15 : 0);
+    const reduction = Math.min(
+      0.67,
+      this.hitTargets.length > 1 ? (this.hitTargets.length - 1) * 0.15 : 0
+    );
     enemy.takeDamage(this.damage * (1 - reduction), this.owner);
   }
 }

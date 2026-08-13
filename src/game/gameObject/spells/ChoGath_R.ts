@@ -18,7 +18,6 @@ export default class ChoGath_R extends Spell {
     'Ngoạm kẻ địch gần nhất trong phạm vi <span>200px</span>, gây <span class="damage">40 sát thương</span>. Mỗi lần ăn, Cho\'Gath <span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+6 kích thước</span> và <span class="buff">+75 máu tối đa</span>';
   coolDown = 10000;
   manaCost = 50;
-  willDrawPreview = true;
 
   range = 200;
   damage = 40;

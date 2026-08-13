@@ -12,7 +12,6 @@ export default class Nasus_Q extends Spell {
     'Chém kẻ địch gần nhất trong phạm vi <span>150px</span>, gây <span class="damage">25 sát thương</span>. Mỗi lần chém trúng, sát thương của chiêu này <span class="buff">vĩnh viễn tăng thêm 5</span>';
   coolDown = 3000;
   manaCost = 10;
-  willDrawPreview = true;
 
   range = 150;
   baseDamage = 25;

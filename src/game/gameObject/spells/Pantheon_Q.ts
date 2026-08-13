@@ -12,8 +12,8 @@ import Monster from '../attackableUnits/Monster';
 
 const HOLD_THRESHOLD_MS = 350;
 const MAX_CHARGE_MS = 4_000;
-const RANGE = 1_200;
-const MIN_RANGE = 600;
+const RANGE = 700;
+const MIN_RANGE = 100;
 const RANGE_CHARGE_MS = 1_500;
 
 type SpearTarget = AttackableUnit & {
@@ -30,7 +30,7 @@ const spearDamage = (target: SpearTarget, subsequent: boolean): number => {
 
 export default class Pantheon_Q extends Spell {
   image = AssetManager.get('spell_pantheon_q');
-  name = 'Ngọn Giá Sao Băng (Pantheon_Q)';
+  name = 'Ngọn Giáo Sao Băng (Pantheon_Q)';
   description = 'Thả sớm để đâm giáo, hoặc giữ để ném một ngọn giáo xuyên.';
   coolDown = 4_000;
   manaCost = 25;
@@ -50,15 +50,21 @@ export default class Pantheon_Q extends Spell {
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       interrupts: { move: false },
       vfx: {
-        castLoop: context => new VfxGroup([
-          new CastBar(context, () => this.chargeMs / MAX_CHARGE_MS, undefined, () => unitCastBarAnchor(this.owner)),
-          new ChargeRangeTelegraph(
-            () => this.owner.position,
-            () => this.castDirection,
-            () => this.currentRange,
-            () => this.chargeMs / RANGE_CHARGE_MS
-          ),
-        ]),
+        castLoop: context =>
+          new VfxGroup([
+            new CastBar(
+              context,
+              () => this.chargeMs / MAX_CHARGE_MS,
+              undefined,
+              () => unitCastBarAnchor(this.owner)
+            ),
+            new ChargeRangeTelegraph(
+              () => this.owner.position,
+              () => this.castDirection,
+              () => this.currentRange,
+              () => this.chargeMs / RANGE_CHARGE_MS
+            ),
+          ]),
       },
     };
   }
@@ -107,13 +113,21 @@ export default class Pantheon_Q extends Spell {
     }
 
     const spear = new Pantheon_Q_Spear(this.owner);
-    spear.destination = createVector(start.x + direction.x * this.currentRange, start.y + direction.y * this.currentRange);
+    spear.destination = createVector(
+      start.x + direction.x * this.currentRange,
+      start.y + direction.y * this.currentRange
+    );
     this.game.objectManager.addObject(spear);
   }
 
   onCancel(_context: CastContext, reason: CancelReason): void {
     this.removeChargeSlow();
-    if (reason === 'MAX_DURATION' || reason === 'DEATH' || reason === 'SILENCE' || reason === 'STUN') {
+    if (
+      reason === 'MAX_DURATION' ||
+      reason === 'DEATH' ||
+      reason === 'SILENCE' ||
+      reason === 'STUN'
+    ) {
       this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
     }
   }
@@ -123,18 +137,22 @@ export default class Pantheon_Q extends Spell {
   }
 
   private createThrust(start: Vec2, direction: Vec2): void {
-    const beam = new BeamSpellObject(this.owner, {
-      start: { x: start.x - direction.x * 40, y: start.y - direction.y * 40 },
-      end: { x: start.x + direction.x * 560, y: start.y + direction.y * 560 },
-      width: 120,
-    }, {
-      candidateFilter: target =>
-        target instanceof AttackableUnit &&
-        target.targetable &&
-        !target.isDead &&
-        target.teamId !== this.owner.teamId,
-      onHit: target => target.takeDamage(spearDamage(target, false), this.owner),
-    });
+    const beam = new BeamSpellObject(
+      this.owner,
+      {
+        start: { x: start.x - direction.x * 40, y: start.y - direction.y * 40 },
+        end: { x: start.x + direction.x * 560, y: start.y + direction.y * 560 },
+        width: 120,
+      },
+      {
+        candidateFilter: target =>
+          target instanceof AttackableUnit &&
+          target.targetable &&
+          !target.isDead &&
+          target.teamId !== this.owner.teamId,
+        onHit: target => target.takeDamage(spearDamage(target, false), this.owner),
+      }
+    );
     this.game.objectManager.addObject(beam);
   }
 
@@ -157,7 +175,7 @@ export default class Pantheon_Q extends Spell {
 
 export class Pantheon_Q_Spear extends MissileSpellObject {
   image = AssetManager.get('spell_pantheon_q');
-  speed = 2_700 / 60;
+  speed = 1_400 / 60;
   size = 32;
   visualWidth = 84;
   visualHeight = 30;

@@ -13,7 +13,6 @@ export default class Blitzcrank_E extends Spell {
     'Vung nắm đấm thành <span>hình nón</span> ngay trước mặt, gây <span class="damage">25 sát thương</span> và <span class="buff">Hất Tung</span> mọi kẻ địch trúng đòn trong <span class="time">0.6 giây</span>';
   coolDown = 6000;
   manaCost = 20;
-  willDrawPreview = true;
 
   range = 170;
   /** Half-width of the cone: PI/4 gives a 90° swing in front of the caster. */

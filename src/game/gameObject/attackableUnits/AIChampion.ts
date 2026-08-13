@@ -14,9 +14,9 @@ import type { Vec2 } from '../../spell/runtime/types';
 export type AIChampionOptions = ChampionOptions;
 
 export default class AIChampion extends Champion {
-  _autoMove = true;
+  _autoMove = false;
   _autoCast = true;
-  _autoMoveOnTakeDamage = true;
+  _autoMoveOnTakeDamage = false;
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
@@ -103,7 +103,10 @@ export default class AIChampion extends Champion {
       if (!info || !isTargetable(candidate)) continue;
       if (request.targetTeam === 'ENEMY' && info.teamId === this.teamId) continue;
       if (request.targetTeam === 'ALLY' && info.teamId !== this.teamId) continue;
-      const distance = Math.hypot(info.position.x - this.position.x, info.position.y - this.position.y);
+      const distance = Math.hypot(
+        info.position.x - this.position.x,
+        info.position.y - this.position.y
+      );
       if (request.range !== undefined && distance > request.range) continue;
       if (!nearest || distance < nearest.distance) nearest = { point: info.position, distance };
     }
