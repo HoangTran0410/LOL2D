@@ -3,6 +3,7 @@ import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import { MAX_UNIT_SIZE } from '../Stats';
 import Airborne from '../buffs/Airborne';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
@@ -85,9 +86,19 @@ export class Rammus_Q_Powerball extends Speedup {
  * The ball is not a projectile: it is glued to the caster and rolls wherever
  * they run, so it reads `owner.position` every frame instead of travelling.
  */
+/**
+ * The ball is Rammus curled up, so it is sized off his own body rather than a
+ * constant. A fixed 46 left it rattling around *inside* a grown Cho'Gath-sized
+ * champion, and — now that bodies are solid — unable to reach anyone at all:
+ * separation holds two units at least `bodyRadius + bodyRadius` apart, which a
+ * 23-unit hit circle can never span.
+ */
+export const BALL_SIZE_RATIO = 1.1;
+/** Fallback body width for a unit with no animated size yet (first frame). */
+export const FALLBACK_BODY_SIZE = 55;
+
 export class Rammus_Q_Object extends SpellObject {
   position = this.owner.position.copy();
-  size = 46;
   lifeTime = 4000;
   age = 0;
   angle = 0;
@@ -108,6 +119,17 @@ export class Rammus_Q_Object extends SpellObject {
     maxLength: 20,
   });
 
+  /** Tracks the caster's live body, so Cho'Gath R grows the ball with him. */
+  get size(): number {
+    const body = this.owner.animatedValues?.displaySize || FALLBACK_BODY_SIZE;
+    return body * BALL_SIZE_RATIO;
+  }
+
+  /** Surface to surface, the same reach rule minions use. */
+  reachTo(victim: { bodyRadius?: number; collisionRadius: number }): number {
+    return this.size / 2 + (victim.bodyRadius ?? victim.collisionRadius);
+  }
+
   onAdded() {
     this.game.objectManager.addObject(this.trailSystem);
   }
@@ -119,6 +141,7 @@ export class Rammus_Q_Object extends SpellObject {
     // spins faster the further the roll has ramped up
     const ramp = this.speedupBuff?.rampProgress ?? 0;
     this.angle += this.rollSpeed * (1 + ramp * 3);
+    this.trailSystem.trailSize = this.size / 2;
     this.trailSystem.addTrail(this.position);
     this._updateDust(ramp);
 
@@ -127,11 +150,13 @@ export class Rammus_Q_Object extends SpellObject {
       return;
     }
 
+    // queried wide, then filtered surface to surface: the query circle has to
+    // clear the largest body it could touch, not just the ball itself
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.position.x,
         y: this.position.y,
-        r: this.size / 2,
+        r: this.size / 2 + MAX_UNIT_SIZE / 2,
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
@@ -140,6 +165,12 @@ export class Rammus_Q_Object extends SpellObject {
 
     // impact: everyone Rammus crashes into is hit, knocked up, then slowed
     for (const victim of enemies) {
+      const gap = Math.hypot(
+        victim.position.x - this.position.x,
+        victim.position.y - this.position.y
+      );
+      if (gap > this.reachTo(victim)) continue;
+
       victim.takeDamage(this.damage, this.owner);
 
       const airborneBuff = new Airborne(this.airborneTime, this.owner, victim);
