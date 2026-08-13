@@ -211,6 +211,16 @@ describe('Anivia R', () => {
     expect(added[0].toRemove).toBe(true);
   });
 
+  it('applies a final damage tick on gameplay cancellation', () => {
+    const { spell, added, enemy } = setup();
+    spell.press(context({ x: 100, y: 0 }));
+
+    spell.cancel('OUT_OF_RANGE');
+
+    expect(added[0].toRemove).toBe(true);
+    expect(enemy.damage).toEqual([2, 2]);
+  });
+
   it('starts cooldown and cleans storm members exactly once', () => {
     const { spell, added, enemy } = setup();
 

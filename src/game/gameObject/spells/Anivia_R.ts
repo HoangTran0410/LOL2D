@@ -1,7 +1,7 @@
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
+import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
 import type SpellObject from '../SpellObject';
 import AreaSpellObject, { type AreaTarget } from '../spellObjects/AreaSpellObject';
@@ -64,8 +64,8 @@ export default class Anivia_R extends Spell {
     this.finishActive(true);
   }
 
-  onCancel(): void {
-    this.finishActive(false);
+  onCancel(_context: CastContext, reason: CancelReason): void {
+    this.finishActive(reason !== 'SCENE_EXIT');
   }
 
   onComplete(): void {
