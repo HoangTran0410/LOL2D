@@ -8,6 +8,7 @@ import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Turret, { TurretBolt } from '../../../src/game/gameObject/structures/Turret';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Buff from '../../../src/game/gameObject/Buff';
+import Shield from '../../../src/game/gameObject/buffs/Shield';
 import ObjectManager from '../../../src/game/managers/ObjectManager';
 import Spell from '../../../src/game/gameObject/Spell';
 import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
@@ -222,6 +223,32 @@ describe('champion and direct-subclass type boundary', () => {
 
     expect(image).toHaveBeenCalledTimes(1);
     expect(text).toHaveBeenCalledWith(2, expect.any(Number), expect.any(Number));
+  });
+
+  it('extends health with a silver shield segment while keeping mana at base width', () => {
+    const game = createGame();
+    const champion = new Champion({ game, position: createVector(100, 100) });
+    game.setPlayer(champion);
+    champion.stats.health.baseValue = 100;
+    champion.stats.maxHealth.baseValue = 100;
+    champion.stats.mana.baseValue = 100;
+    champion.stats.maxMana.baseValue = 100;
+    const shield = new Shield(1_000, champion, champion);
+    shield.amount = 50;
+    champion.buffs = [shield];
+
+    champion.drawHealthBar();
+
+    const rectCalls = vi.mocked(rect).mock.calls;
+    const frame = rectCalls[0];
+    const health = rectCalls[1];
+    const shieldSegment = rectCalls[2];
+    const mana = rectCalls[3];
+    expect(frame[2]).toBe(182);
+    expect(shieldSegment[0]).toBe(health[0] + health[2]);
+    expect(shieldSegment[2]).toBe(54);
+    expect(mana[2]).toBe(108);
+    expect(fill).toHaveBeenCalledWith(225, 230, 238, expect.any(Number));
   });
 
   it('requires a charge configuration for hold activations', () => {

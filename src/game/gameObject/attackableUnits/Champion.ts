@@ -87,11 +87,15 @@ export default class Champion extends AttackableUnit {
     let borderWidth = 3,
       barWidth = 125,
       barHeight = 17,
-      manaHeight = 5,
-      topleft = {
-        x: pos.x - barWidth / 2,
-        y: pos.y - size / 2 - barHeight - 15,
-      };
+      manaHeight = 5;
+    const healthContainerW = barWidth - barHeight;
+    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
+    const shieldW = map(this.shieldAmount, 0, maxHealth, 0, healthContainerW);
+    const frameWidth = barHeight + Math.max(healthContainerW, healthW + shieldW);
+    const topleft = {
+      x: pos.x - frameWidth / 2,
+      y: pos.y - size / 2 - barHeight - 15,
+    };
 
     fill(2, 15, 21, alpha);
     stroke(91, 92, 87, alpha);
@@ -99,7 +103,7 @@ export default class Champion extends AttackableUnit {
     rect(
       topleft.x - borderWidth * 0.5,
       topleft.y - borderWidth * 0.5,
-      barWidth + borderWidth,
+      frameWidth + borderWidth,
       barHeight + borderWidth
     );
 
@@ -109,8 +113,6 @@ export default class Champion extends AttackableUnit {
 
     noStroke();
 
-    const healthContainerW = barWidth - barHeight;
-    const healthW = map(health, 0, maxHealth, 0, healthContainerW);
     fill(
       this.isDead
         ? [153, 153, 153, alpha]
@@ -120,23 +122,17 @@ export default class Champion extends AttackableUnit {
     );
     rect(topleft.x + barHeight, topleft.y, healthW, barHeight - manaHeight - 1);
 
-    // Shields sit to the right of current health, since they are eaten first.
-    // On a healthy champion there is no room there, so the segment slides left
-    // and overlays the health instead — a shield must never be invisible.
-    const shield = this.shieldAmount;
-    if (shield > 0) {
-      const shieldW = Math.min(map(shield, 0, maxHealth, 0, healthContainerW), healthContainerW);
-      const shieldX = Math.min(healthW, healthContainerW - shieldW);
+    if (shieldW > 0) {
       fill(225, 230, 238, alpha * 0.85);
       rect(
-        topleft.x + barHeight + shieldX,
+        topleft.x + barHeight + healthW,
         topleft.y,
         shieldW,
         barHeight - manaHeight - 1
       );
     }
 
-    const manaW = map(mana, 0, maxMana, 0, barWidth - barHeight);
+    const manaW = map(mana, 0, maxMana, 0, healthContainerW);
     fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 
