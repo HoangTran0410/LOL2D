@@ -1,0 +1,136 @@
+{
+  "asset": {
+    "key": "champ_thresh",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_OriginalSquare.png?9ef1d",
+    "sha1": "66517038dba4320ba5e1bd62d93b3ce51dc4e391"
+  },
+  "champion": "Thresh",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Thresh",
+    "be": 1575,
+    "changes": "V25.18",
+    "client_positions": [
+      "Support"
+    ],
+    "client_tags": [
+      "Initiator",
+      "Ally Protection",
+      "Magic"
+    ],
+    "control": 3,
+    "damage": 1,
+    "date": "2013-01-23",
+    "difficulty": 3,
+    "external_positions": [
+      "Support"
+    ],
+    "fullname": "Erlok Grael",
+    "herotype": "Support",
+    "id": 412,
+    "mobility": 1,
+    "patch": "V1.0.0.154",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Catcher"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Flay",
+      "2": "Flay 2",
+      "3": "Flay 3",
+      "4": "Flay 4",
+      "5": "Flay 5"
+    },
+    "skill_i": {
+      "1": "Damnation"
+    },
+    "skill_q": {
+      "1": "Death Sentence",
+      "2": "Deathly Leap"
+    },
+    "skill_r": {
+      "1": "The Box"
+    },
+    "skill_w": {
+      "1": "Dark Passage"
+    },
+    "skills": {
+      "1": "Damnation",
+      "2": "Death Sentence",
+      "3": "Dark Passage",
+      "4": "Flay",
+      "5": "The Box"
+    },
+    "stats": {
+      "acquisition_radius": 475,
+      "ar": {
+        "hp_lvl": 10
+      },
+      "aram": {
+        "dmg_taken": 1.05
+      },
+      "arm_base": 33,
+      "arm_lvl": 0,
+      "as_base": 0.625,
+      "as_lvl": 3.5,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.0604166686534881,
+      "dam_base": 56,
+      "dam_lvl": 2.2,
+      "hp5_base": 7,
+      "hp5_lvl": 0.55,
+      "hp_base": 620,
+      "hp_lvl": 120,
+      "missile_speed": 0,
+      "mp5_base": 6,
+      "mp5_lvl": 0.8,
+      "mp_base": 274,
+      "mp_lvl": 44,
+      "mr_base": 30,
+      "mr_lvl": 1.55,
+      "ms": 330,
+      "nb": {
+        "ability_haste": 20,
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "ofa": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1,
+        "ms_mod": 1.05
+      },
+      "pathing_radius": 36,
+      "range": 450,
+      "selection_height": 150,
+      "selection_radius": 125,
+      "urf": {
+        "dmg_dealt": 1,
+        "dmg_taken": 0.87,
+        "shielding": 1.2
+      },
+      "usb": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1,
+        "ms_mod": 1.2,
+        "shielding": 1
+      },
+      "windup_modifier": 0.25
+    },
+    "style": 75,
+    "title": "The Chain Warden",
+    "toughness": 2,
+    "utility": 3
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "c971ebd372a1d3687a1852a00f7d0267df20cd9fbf776a815eac23ab116b67bd",
+    "fetchedAt": "2026-08-13T16:18:51.440Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}
