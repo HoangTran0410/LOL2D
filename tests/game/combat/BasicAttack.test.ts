@@ -122,7 +122,7 @@ describe('basic attacks', () => {
     stats.attackSpeed.percentBonus = 10;
     expect(stats.attackSpeed.value).toBe(MAX_ATTACK_SPEED);
     // and a stat with no ceiling is untouched by the change
-    expect(stats.attackDamage.maxValue).toBeUndefined();
+    expect(stats.attackDamage.maxValue).toBe(Infinity);
   });
 
   it('gives a champion its attack profile and reads melee or ranged off the range alone', () => {
