@@ -107,8 +107,11 @@ export default class SceneManager {
     // p5.mouseClicked = function() { me.handleEvent("mouseClicked"); }
     for (let i = 0; i < P5Events.length; i++) {
       const sEvent = P5Events[i];
+      // The scene's answer is returned rather than swallowed: p5 reads `false`
+      // from a touch handler as "call preventDefault", which is the only way to
+      // stop a drag across the canvas scrolling and pinch-zooming the page.
       p5[sEvent] = function (...args: any[]) {
-        me.handleEvent(sEvent, args);
+        return me.handleEvent(sEvent, args);
       };
     }
 
@@ -213,11 +216,11 @@ export default class SceneManager {
 
   // Handle a certain even for a scene...
   // It is used by the anonymous functions from the wire() function
-  handleEvent(sEvent: string, args: any[]): void {
-    if (this.scene === null || this.scene.oScene === null) return;
+  handleEvent(sEvent: string, args: any[]): any {
+    if (this.scene === null || this.scene.oScene === null) return undefined;
 
     const fnSceneEvent = (this.scene.oScene as any)[sEvent];
-    if (fnSceneEvent) fnSceneEvent.apply(this.scene.oScene, args);
+    return fnSceneEvent ? fnSceneEvent.apply(this.scene.oScene, args) : undefined;
   }
 
   // Legacy method... preserved for maintaining compatibility

@@ -26,9 +26,39 @@ import TargetResolver, {
   defaultIsTargetable,
   defaultTargetInfo,
 } from './spell/targeting/TargetResolver';
+import AssetManager from '../managers/AssetManager';
+import { findAttackTargetNearPoint } from './combat/AttackTargeting';
+import TouchControls, {
+  touchControlsPreference,
+  rememberTouchControlsPreference,
+  type TouchControlsHost,
+  type TouchPoint,
+  type TouchSpellView,
+} from './input/TouchControls';
+import { touchAimRange } from './input/SpellAim';
+import type { AimCandidate } from './input/SpellAim';
+import type { JoystickVector } from './input/VirtualJoystick';
 import type GameObject from './gameObject/GameObject';
 import type Spell from './gameObject/Spell';
 import type { CastContext, Vec2 } from './spell/runtime/types';
+
+/**
+ * How far ahead of the champion the joystick plants its destination, as frames
+ * of travel at the current move speed.
+ *
+ * The engine walks a unit at `destination`; a stick gives a held direction. The
+ * two meet by re-planting a destination in front of the champion every frame
+ * the stick is held, which keeps every existing modifier — roots, slows, the
+ * `canMove` gate, terrain push-out — working untouched, where steering
+ * `position` directly would bypass all of them.
+ *
+ * It has to be more than one frame of travel or `move()` snaps onto the
+ * destination and the champion stutters in place; 30 frames is half a second of
+ * walking. Nothing coasts when the thumb lifts, because releasing calls
+ * `stopMovement()`, which pins the destination back onto the position.
+ */
+const JOYSTICK_LOOKAHEAD_FRAMES = 30;
+const JOYSTICK_LOOKAHEAD_MIN = 120;
 
 export default class Game {
   readonly mapSize = 6400;
@@ -44,6 +74,16 @@ export default class Game {
   player!: Champion;
   spellInputController!: SpellInputController;
   minionSpawner!: MinionSpawner;
+  touchControls!: TouchControls;
+
+  /**
+   * Where each slot is aimed by a thumb, when one is on it. Empty on the
+   * keyboard, and `createSpellContext` falls back to the cursor — which is what
+   * makes this the only coupling the touch layer needs to the cast path.
+   */
+  private touchAim = new Map<number, Vec2>();
+  /** Last direction the champion was driven, for aiming a tap with no target. */
+  private lastFacing = { x: 1, y: 0 };
 
   fountains: Fountain[] = [];
   turrets: Turret[] = [];
@@ -82,9 +122,16 @@ export default class Game {
       getSpell: slot => this.player.spells[slot],
       createContext: (_spell, slot) => {
         const spell = this.player.spells[slot];
-        return spell ? this.createSpellContext(spell, this.player, this.worldMouse) : undefined;
+        if (!spell) return undefined;
+        // A thumb aims by dragging; a mouse aims by being somewhere. One line
+        // decides which, and every spell downstream sees an ordinary context.
+        const aim = this.touchAim.get(slot) ?? this.worldMouse;
+        return this.createSpellContext(spell, this.player, aim);
       },
     });
+
+    this.touchControls = new TouchControls(this.touchControlsHost(), touchControlsPreference());
+    this.applyTouchUiClass();
 
     for (let i = 0; i < 5; i++) {
       this.objectManager.addObject(
@@ -161,6 +208,10 @@ export default class Game {
     }
     this.clickedPoint.size *= 0.9;
 
+    // Before the spell input controller ticks: a charge held under a thumb must
+    // have this frame's aim in hand before its `hold` runs, or the telegraph
+    // trails the drag by a frame.
+    this.touchControls.update();
     this.spellInputController.update(deltaTime);
   }
 
@@ -220,6 +271,8 @@ export default class Game {
     });
 
     this.fogOfWar.draw();
+    // After the fog: controls you cannot see are not controls.
+    this.touchControls.draw();
   }
 
   /**
@@ -278,7 +331,151 @@ export default class Game {
     );
   }
 
-  resize(w: number, h: number) { this.fogOfWar.resize(w, h); }
+  resize(w: number, h: number) {
+    this.fogOfWar.resize(w, h);
+    this.touchControls.resize(w, h);
+  }
+
+  // ------------------------------------------------------------ touch input
+
+  /**
+   * The fingers currently on the glass, straight from p5's `touches`.
+   *
+   * Called from all three of GameScene's touch handlers with the same list;
+   * TouchControls works out for itself which of them are new, moved or gone.
+   */
+  syncTouches(points: readonly TouchPoint[]): void {
+    this.touchControls.syncPointers(points);
+  }
+
+  /** The on-screen toggle, and the handle Playwright drives. */
+  setTouchControlsEnabled(enabled: boolean, remember = true): void {
+    this.touchControls.setEnabled(enabled);
+    if (remember) rememberTouchControlsPreference(enabled);
+    this.applyTouchUiClass();
+  }
+
+  /**
+   * One class on <body> switches the whole HUD between the two layouts.
+   *
+   * A mode flag rather than a viewport breakpoint, because the thing that has
+   * to change is not how much room there is — it is whether the player has a
+   * hover, a keyboard and a pixel-accurate pointer. A narrow desktop window has
+   * all three and wants the desktop HUD; a wide tablet has none of them and
+   * wants the touch one. It also keeps the two verifiable from one machine:
+   * the same toggle that gives Playwright the controls gives it the HUD.
+   */
+  private applyTouchUiClass(): void {
+    document.body?.classList.toggle('touch-ui', this.touchControls.enabled);
+  }
+
+  /**
+   * Drive the champion from a held stick direction, or stop it when the thumb
+   * lifts.
+   *
+   * `moveTo` rather than `orderMove`/`navigateTo` on purpose. A stick is a
+   * steering input, not a destination: routing it would queue an A* search
+   * sixty times a second toward a point that moves with the champion, and the
+   * route would be fighting the thumb the whole way. `moveTo` *clears*
+   * `pathAgent` on every call, so the first frame of stick input drops whatever
+   * route was running and no route can start while it is held — which is
+   * exactly the takeover this needs, for free.
+   *
+   * Walking into a wall is then the player's own doing and gets the player's
+   * own consequence: `TerrainMap.pushOutOfWalls` already runs over every
+   * champion each frame, so the champion slides along the wall instead of
+   * pathing around it.
+   */
+  private steerPlayer(direction: JoystickVector | null): void {
+    if (!direction) {
+      this.player.stopMovement();
+      return;
+    }
+    // A stick is an order in its own right, and drops a standing attack order
+    // the way a move order does — otherwise the attack controller would be
+    // re-planting its chase destination against the thumb every frame.
+    this.player.basicAttack?.clear();
+    this.lastFacing = { x: direction.x, y: direction.y };
+
+    const lookAhead = Math.max(
+      JOYSTICK_LOOKAHEAD_MIN,
+      Math.max(1, this.player.moveSpeed) * JOYSTICK_LOOKAHEAD_FRAMES
+    );
+    this.player.moveTo(
+      this.player.position.x + direction.x * lookAhead,
+      this.player.position.y + direction.y * lookAhead
+    );
+  }
+
+  /** Unit vector the champion is pointed along; never (0,0). */
+  private facing(): Vec2 {
+    const dx = this.player.destination.x - this.player.position.x;
+    const dy = this.player.destination.y - this.player.position.y;
+    const length = Math.hypot(dx, dy);
+    if (length > 0.01) return { x: dx / length, y: dy / length };
+    return this.lastFacing;
+  }
+
+  private touchSpellView(slot: number): TouchSpellView | null {
+    const spell = this.player.spells[slot];
+    if (!spell?.image) return null;
+
+    const spec = spell.castSpec;
+    const icon = AssetManager.renderable(spell.image);
+    const hotKey = SpellHotKeys[slot];
+    return {
+      targeting: spec.targeting,
+      activation: spec.activation,
+      range: touchAimRange(spell),
+      label: hotKey ? String.fromCharCode(hotKey) : String(slot),
+      // `renderable` hands back a data-URI string while the real icon is still
+      // loading; the button draws its letter rather than a string as an image.
+      icon: typeof icon === 'object' && icon !== null ? icon : null,
+      cooldownRatio:
+        spell.coolDown > 0 ? Math.min(1, Math.max(0, spell.currentCooldown / spell.coolDown)) : 0,
+      onCooldown: spell.currentCooldown > 0 && spell.cooldownLocksOut !== false,
+      affordable: this.player.stats.mana.value >= spell.manaCost,
+      castable: this.player.canCast && !this.player.isDead && !spell.disabled,
+      charging: spell.state === 'CHARGING',
+    };
+  }
+
+  private touchControlsHost(): TouchControlsHost {
+    return {
+      viewport: () => ({ width: windowWidth, height: windowHeight }),
+      slotCount: () => this.player.spells.length,
+      spellView: slot => this.touchSpellView(slot),
+      playerPosition: () => this.player.position,
+      playerFacing: () => this.facing(),
+      // The same acquisition the `A` key already uses, only measured from the
+      // champion instead of the cursor — there is no cursor. It is hostile,
+      // alive, targetable and *visible*: a tap cannot auto-target through fog,
+      // the same refusal a right click into the fog gets.
+      autoTargetWithin: range =>
+        findAttackTargetNearPoint(this.player, this.player.position, range) as AimCandidate | null,
+      pickUnitNear: (point, radius) =>
+        findAttackTargetNearPoint(this.player, point, radius) as AimCandidate | null,
+      steer: direction => this.steerPlayer(direction),
+      setSlotAim: (slot, world) => {
+        if (world) this.touchAim.set(slot, world);
+        else this.touchAim.delete(slot);
+      },
+      beginSlot: slot => {
+        this.spellInputController.pointerDown(slot);
+      },
+      commitSlot: slot => {
+        this.spellInputController.pointerUp(slot);
+      },
+      cancelSlot: slot => {
+        this.spellInputController.pointerCancel(slot);
+      },
+      withWorldTransform: draw => {
+        this.camera.push();
+        draw();
+        this.camera.pop();
+      },
+    };
+  }
 
   createSpellContext(
     spell: Spell,

@@ -1,3 +1,11 @@
+/* A drag across the canvas is a control input, not a scroll, and two thumbs on
+   it are two controls rather than a pinch-zoom. Without this the browser claims
+   both gestures before p5 ever sees them, and preventDefault alone is racy on
+   iOS. */
+#game-scene canvas {
+    touch-action: none;
+}
+
 #stats {
     position: fixed;
     top: 5px;

@@ -32,7 +32,9 @@ function makeGame(getObstacles: (...args: unknown[]) => unknown) {
 
 describe('FogOfWar sight cache', () => {
   beforeEach(() => {
-    vi.stubGlobal('createGraphics', () => ({}));
+    // The real p5.Graphics carries a pixelDensity setter, which FogOfWar pins
+    // to 1 so a retina phone does not allocate a buffer nine times the size.
+    vi.stubGlobal('createGraphics', () => ({ pixelDensity: vi.fn() }));
     vi.stubGlobal('windowWidth', 800);
     vi.stubGlobal('windowHeight', 600);
   });

@@ -1,0 +1,406 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import TouchControls, {
+  type TouchControlsHost,
+  type TouchSpellView,
+} from '../../../src/game/input/TouchControls';
+import { computeTouchLayout } from '../../../src/game/input/TouchLayout';
+import type { TargetingMode } from '../../../src/game/spell/runtime/types';
+
+const PHONE = { width: 844, height: 390 };
+const RANGE = 800;
+const ORIGIN = { x: 1000, y: 1000 };
+
+const view = (targeting: TargetingMode): TouchSpellView => ({
+  targeting,
+  activation: 'PRESS',
+  range: RANGE,
+  label: 'Q',
+  icon: null,
+  cooldownRatio: 0,
+  onCooldown: false,
+  affordable: true,
+  castable: true,
+  charging: false,
+});
+
+interface Harness {
+  controls: TouchControls;
+  host: TouchControlsHost;
+  calls: {
+    begin: number[];
+    commit: number[];
+    cancel: number[];
+    steer: (({ x: number; y: number }) | null)[];
+    aim: { slot: number; world: { x: number; y: number } | null }[];
+  };
+  setTargeting(mode: TargetingMode): void;
+  setAutoTarget(target: { position: { x: number; y: number } } | null): void;
+  setUnitPick(target: { position: { x: number; y: number } } | null): void;
+}
+
+const harness = (): Harness => {
+  let targeting: TargetingMode = 'DIRECTION';
+  let autoTarget: { position: { x: number; y: number } } | null = null;
+  let unitPick: { position: { x: number; y: number } } | null = null;
+
+  const calls: Harness['calls'] = { begin: [], commit: [], cancel: [], steer: [], aim: [] };
+
+  const host: TouchControlsHost = {
+    viewport: () => PHONE,
+    slotCount: () => 7,
+    spellView: () => view(targeting),
+    playerPosition: () => ORIGIN,
+    playerFacing: () => ({ x: 1, y: 0 }),
+    autoTargetWithin: () => autoTarget,
+    pickUnitNear: () => unitPick,
+    steer: direction => {
+      calls.steer.push(direction ? { x: direction.x, y: direction.y } : null);
+    },
+    setSlotAim: (slot, world) => {
+      calls.aim.push({ slot, world: world ? { x: world.x, y: world.y } : null });
+    },
+    beginSlot: slot => calls.begin.push(slot),
+    commitSlot: slot => calls.commit.push(slot),
+    cancelSlot: slot => calls.cancel.push(slot),
+    withWorldTransform: draw => draw(),
+  };
+
+  return {
+    controls: new TouchControls(host, true),
+    host,
+    calls,
+    setTargeting: mode => {
+      targeting = mode;
+    },
+    setAutoTarget: target => {
+      autoTarget = target;
+    },
+    setUnitPick: target => {
+      unitPick = target;
+    },
+  };
+};
+
+const layout = computeTouchLayout(PHONE, 7);
+const attack = layout.buttons[0];
+const qButton = layout.buttons.find(button => button.slot === 1)!;
+/** Somewhere in the stick's band, well clear of every button. */
+const STICK = { x: 140, y: 320 };
+
+const lastAim = (h: Harness, slot: number) =>
+  [...h.calls.aim].reverse().find(entry => entry.slot === slot && entry.world)?.world ?? null;
+
+describe('TouchControls — the joystick', () => {
+  it('drives the champion from a held stick', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, ...STICK }]);
+    h.controls.syncPointers([{ id: 1, x: STICK.x, y: STICK.y - 70 }]);
+    h.controls.update();
+
+    expect(h.calls.steer).toHaveLength(1);
+    expect(h.calls.steer[0]!.x).toBeCloseTo(0, 6);
+    expect(h.calls.steer[0]!.y).toBeCloseTo(-1, 6);
+  });
+
+  it('says nothing while the thumb rests inside the dead zone', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, ...STICK }]);
+    h.controls.syncPointers([{ id: 1, x: STICK.x + 4, y: STICK.y }]);
+    h.controls.update();
+
+    expect(h.calls.steer).toHaveLength(0);
+  });
+
+  it('stops exactly once when the thumb lifts', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, ...STICK }]);
+    h.controls.syncPointers([{ id: 1, x: STICK.x + 70, y: STICK.y }]);
+    h.controls.update();
+    h.controls.syncPointers([]);
+    h.controls.update();
+    h.controls.update();
+
+    expect(h.calls.steer.filter(entry => entry === null)).toHaveLength(1);
+  });
+
+  it('never lets a spell gesture grab the stick', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 90, y: attack.y - 90 }]);
+    h.controls.update();
+
+    expect(h.calls.steer).toHaveLength(0);
+    expect(h.calls.begin).toEqual([0]);
+  });
+
+  it('runs both thumbs at once', () => {
+    const h = harness();
+
+    h.controls.syncPointers([
+      { id: 1, ...STICK },
+      { id: 2, x: qButton.x, y: qButton.y },
+    ]);
+    h.controls.syncPointers([
+      { id: 1, x: STICK.x + 70, y: STICK.y },
+      { id: 2, x: qButton.x, y: qButton.y - 80 },
+    ]);
+    h.controls.update();
+
+    expect(h.calls.steer).toHaveLength(1);
+    expect(h.calls.begin).toEqual([1]);
+  });
+});
+
+describe('TouchControls — tap versus drag', () => {
+  it('commits a tap that never moved, aimed by the auto-target', () => {
+    const h = harness();
+    h.setAutoTarget({ position: { x: 1000, y: 1600 } });
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x + 3, y: attack.y - 2 }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.begin).toEqual([0]);
+    expect(h.calls.commit).toEqual([0]);
+    expect(h.calls.cancel).toEqual([]);
+    // Straight down at the victim, at the spell's own range.
+    const world = lastAim(h, 0)!;
+    expect(world.x).toBeCloseTo(1000, 4);
+    expect(world.y).toBeCloseTo(1000 + RANGE, 4);
+  });
+
+  it('commits a drag aimed where the drag pointed, not at the auto-target', () => {
+    const h = harness();
+    h.setAutoTarget({ position: { x: 1000, y: 1600 } });
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 120, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.commit).toEqual([0]);
+    const world = lastAim(h, 0)!;
+    expect(world.x).toBeCloseTo(1000 - RANGE, 4);
+    expect(world.y).toBeCloseTo(1000, 4);
+  });
+
+  it('treats a wobble under the tap slop as a tap', () => {
+    const h = harness();
+    h.setAutoTarget({ position: { x: 1000, y: 1600 } });
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - layout.tapSlop + 2, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    const world = lastAim(h, 0)!;
+    expect(world.y).toBeCloseTo(1000 + RANGE, 4);
+  });
+
+  it('aims a POINT spell at the drag’s length', () => {
+    const h = harness();
+    h.setTargeting('POINT');
+
+    h.controls.syncPointers([{ id: 1, x: qButton.x, y: qButton.y }]);
+    h.controls.syncPointers([{ id: 1, x: qButton.x, y: qButton.y - layout.dragToRange / 2 }]);
+    h.controls.syncPointers([]);
+
+    const world = lastAim(h, 1)!;
+    expect(world.x).toBeCloseTo(1000, 4);
+    expect(world.y).toBeCloseTo(1000 - RANGE / 2, 4);
+  });
+
+  it('snaps a UNIT spell onto the body the drag points at', () => {
+    const h = harness();
+    h.setTargeting('UNIT');
+    const victim = { position: { x: 1000, y: 400 } };
+    h.setUnitPick(victim);
+
+    h.controls.syncPointers([{ id: 1, x: qButton.x, y: qButton.y }]);
+    h.controls.syncPointers([{ id: 1, x: qButton.x, y: qButton.y - 90 }]);
+    h.controls.syncPointers([]);
+
+    expect(lastAim(h, 1)).toEqual(victim.position);
+  });
+
+  it('casts a SELF spell on itself however the thumb moves', () => {
+    const h = harness();
+    h.setTargeting('SELF');
+
+    h.controls.syncPointers([{ id: 1, x: qButton.x, y: qButton.y }]);
+    h.controls.syncPointers([{ id: 1, x: qButton.x - 200, y: qButton.y - 40 }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.commit).toEqual([1]);
+    expect(lastAim(h, 1)).toEqual(ORIGIN);
+  });
+});
+
+describe('TouchControls — cancel', () => {
+  it('aborts when the thumb comes back to the button it left', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 200, y: attack.y - 60 }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.cancel).toEqual([0]);
+    expect(h.calls.commit).toEqual([]);
+  });
+
+  it('does not arm the abort until the thumb has actually left the button', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x + attack.radius * 0.9, y: attack.y }]);
+    // A short drag that never clears the cancel circle is still an aim, not an
+    // abort — otherwise a thumb landing on the rim could never cast at all.
+    h.controls.syncPointers([{ id: 1, x: attack.x + attack.radius * 1.2, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.cancel).toEqual([]);
+    expect(h.calls.commit).toEqual([0]);
+  });
+
+  it('re-arms if the thumb leaves the button again', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 200, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 200, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.cancel).toEqual([]);
+    expect(h.calls.commit).toEqual([0]);
+  });
+
+  it('clears the slot’s aim when it aborts', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x - 200, y: attack.y }]);
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.aim.at(-1)).toEqual({ slot: 0, world: null });
+  });
+});
+
+describe('TouchControls — lifecycle', () => {
+  it('aims before it presses, so a charge starts pointed somewhere', () => {
+    const h = harness();
+    h.setAutoTarget({ position: { x: 1000, y: 1600 } });
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+
+    const aimIndex = h.calls.aim.findIndex(entry => entry.slot === 0 && entry.world);
+    expect(aimIndex).toBeGreaterThanOrEqual(0);
+    expect(h.calls.begin).toEqual([0]);
+    // Order matters: beginSlot presses a charge, and it builds its context then.
+    expect(h.calls.aim[aimIndex].world).not.toBeNull();
+  });
+
+  it('ignores everything while it is switched off', () => {
+    const h = harness();
+    h.controls.setEnabled(false);
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.syncPointers([]);
+    h.controls.update();
+
+    expect(h.calls.begin).toEqual([]);
+    expect(h.calls.commit).toEqual([]);
+  });
+
+  it('cancels rather than casts when it is switched off mid-gesture', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.setEnabled(false);
+
+    expect(h.calls.cancel).toEqual([0]);
+    expect(h.calls.commit).toEqual([]);
+  });
+
+  it('drops gestures when the viewport changes under them', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    h.controls.resize(390, 844);
+
+    expect(h.calls.cancel).toEqual([0]);
+    expect(h.controls.currentLayout.buttons[0].x).not.toBe(attack.x);
+  });
+
+  it('gives one slot to one thumb', () => {
+    const h = harness();
+
+    h.controls.syncPointers([
+      { id: 1, x: attack.x, y: attack.y },
+      { id: 2, x: attack.x + 4, y: attack.y + 4 },
+    ]);
+
+    expect(h.calls.begin).toEqual([0]);
+  });
+
+  it('ends a gesture whose touchend never arrived', () => {
+    const h = harness();
+
+    h.controls.syncPointers([{ id: 1, x: attack.x, y: attack.y }]);
+    // The finger simply stops appearing in the list.
+    h.controls.syncPointers([]);
+
+    expect(h.calls.commit).toEqual([0]);
+  });
+});
+
+describe('TouchControls — preference', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads an explicit query override before anything else', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '?touch=1' },
+      localStorage: { getItem: () => '0', setItem: () => undefined },
+    });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(true);
+  });
+
+  it('lets the query switch the controls off on a real phone', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '?touch=0' },
+      localStorage: { getItem: () => '1', setItem: () => undefined },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 5 });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(false);
+  });
+
+  it('remembers the on-screen toggle', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => '1', setItem: () => undefined },
+    });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(true);
+  });
+
+  it('falls back to whether the device has a touch screen', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => null, setItem: () => undefined },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 5 });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(true);
+  });
+});

@@ -62,6 +62,16 @@ export default class FogOfWar {
   constructor(game: any) {
     this.game = game;
     this.overlay = createGraphics(windowWidth, windowHeight);
+    // Pinned, not inherited. The overlay is a full-viewport buffer that is
+    // cleared and repainted every frame, so its backing store is the single
+    // largest per-frame cost in the fog. p5.Graphics takes its density from the
+    // sketch, and the sketch's own `pixelDensity(1)` is set in GameScene.enter
+    // — one line away from here, in another file, and nothing fails loudly if
+    // it moves. On a 3x phone an inherited density would be a 9x buffer: a
+    // 900x400 viewport becomes 2700x1200, ten million pixels cleared and
+    // composited per frame for a translucent black shape with soft edges that
+    // nobody can see the resolution of.
+    this.overlay.pixelDensity(1);
     this.outOfViewColor = '#0007';
 
     this.colorStops = [

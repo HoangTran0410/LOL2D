@@ -7,6 +7,12 @@
     "src/types/**/*.d.ts",
     "src/game/spell/**/*.ts",
     "src/game/combat/**/*.ts",
+    // The pure half of the touch layer — geometry, stick maths and aim
+    // resolution. TouchControls.ts is deliberately not here: it draws, so it
+    // reaches for p5 globals, and it is covered by the ordinary typecheck.
+    "src/game/input/TouchLayout.ts",
+    "src/game/input/VirtualJoystick.ts",
+    "src/game/input/SpellAim.ts",
     "tests/game/spell/**/*.ts",
     "tests/game/combat/**/*.ts",
     "src/game/gameObject/spellObjects/**/*.ts",

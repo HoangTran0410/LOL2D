@@ -159,6 +159,38 @@ export default class GameScene extends Scene {
     this.game?.keyReleased(event?.keyCode ?? keyCode);
   }
 
+  /**
+   * All three touch callbacks do the same thing: hand the game the full list of
+   * fingers now on the glass.
+   *
+   * p5 rebuilds `touches` before calling any of them, so a finger that has
+   * lifted is already gone from the list by the time touchEnded runs — which
+   * makes "reconcile against the list" the whole of the bookkeeping, and means
+   * a dropped touchend (a phone call, a notification shade) recovers by itself.
+   *
+   * `false` is p5's signal to preventDefault, without which a drag across the
+   * canvas scrolls the page and a two-thumb gesture pinch-zooms it.
+   */
+  private syncTouches(): boolean {
+    // p5 types `touches` as object[]; its entries carry canvas-relative x/y and
+    // the browser's own identifier.
+    const points = touches as unknown as Array<{ x: number; y: number; id: number }>;
+    this.game?.syncTouches(points.map(point => ({ id: point.id, x: point.x, y: point.y })));
+    return false;
+  }
+
+  touchStarted() {
+    return this.syncTouches();
+  }
+
+  touchMoved() {
+    return this.syncTouches();
+  }
+
+  touchEnded() {
+    return this.syncTouches();
+  }
+
   exit() {
     document.removeEventListener('visibilitychange', this._handleVisibilityChange);
     this.game?.spellInputController.cancelAll('SCENE_EXIT');
