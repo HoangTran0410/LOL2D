@@ -24,6 +24,7 @@ export const HEAL_PER_TICK = 2;
 export const KNOCKBACK_DISTANCE = 875;
 export const KNOCKBACK_DURATION_MS = 500;
 export const MANA_COST = 100;
+export const RADIUS = 700;
 
 type JannaTarget = AttackableUnit;
 
@@ -54,13 +55,13 @@ export default class Janna_R extends Spell {
   coolDown = 10_000;
   manaCost = MANA_COST;
 
-  private readonly radius = 700;
+  private readonly radius = RADIUS;
   private readonly channelDurationMs = CHANNEL_DURATION_MS;
   private readonly tickEveryMs = TICK_EVERY_MS;
   private readonly healPerTick = HEAL_PER_TICK;
   private readonly knockbackDistance = KNOCKBACK_DISTANCE;
   private readonly knockbackDurationMs = KNOCKBACK_DURATION_MS;
-  private activeArea?: AreaSpellObject;
+  private activeArea?: Janna_R_Object;
   private channelOrigin?: { x: number; y: number };
   private stopWatching: (() => void)[] = [];
   private channelElapsedMs = 0;
@@ -87,7 +88,7 @@ export default class Janna_R extends Spell {
     this.channelOrigin = context.origin;
     this.watchInterrupts();
     this.knockEnemies(context);
-    this.activeArea = new AreaSpellObject(this.owner, context.origin, this.radius, {
+    this.activeArea = new Janna_R_Object(this.owner, context.origin, this.radius, {
       durationMs: this.channelDurationMs,
       candidateFilter: target =>
         !target.isDead && target.teamId === this.owner.teamId && typeof target.takeHeal === 'function',
@@ -258,5 +259,97 @@ export default class Janna_R extends Spell {
     return rayRatio >= 0 && rayRatio <= 1 && edgeRatio >= 0 && edgeRatio <= 1
       ? rayRatio
       : undefined;
+  }
+}
+
+// AreaSpellObject on its own inherits GameObject's no-op draw() — it only
+// tracks membership/ticks. Every other area effect (see Anivia_R_Object)
+// subclasses it to actually paint something; Monsoon previously did not,
+// which is why the ultimate fired, knocked back, and healed with nothing
+// drawn on screen. This subclass is that missing visual.
+export class Janna_R_Object extends AreaSpellObject {
+  draw(): void {
+    const radius = this.radius;
+    const t = this.elapsedMs;
+    const spin = t / 700;
+    const pulse = 0.6 + 0.4 * sin(t / 220);
+
+    push();
+    translate(this.center.x, this.center.y);
+
+    // Atmospheric wash filling the whole vortex out to its real radius.
+    noStroke();
+    fill(220, 245, 250, 30);
+    circle(0, 0, radius * 2);
+    fill(190, 230, 245, 26);
+    circle(0, 0, radius * 1.3);
+
+    // Boundary ring, breathing with the channel.
+    noFill();
+    stroke(230, 250, 255, 90 + 55 * pulse);
+    strokeWeight(5);
+    circle(0, 0, radius * 2);
+    stroke(255, 255, 255, 150);
+    strokeWeight(2);
+    circle(0, 0, radius * 2);
+
+    // Four curling arms sweeping toward the eye, echoing the pull-then-fling
+    // shape of the knockback.
+    stroke(210, 240, 250, 150);
+    strokeWeight(3);
+    const ARM_COUNT = 4;
+    for (let arm = 0; arm < ARM_COUNT; arm++) {
+      const offset = spin + (arm / ARM_COUNT) * TWO_PI;
+      beginShape();
+      for (let s = 0; s <= 1.001; s += 0.1) {
+        const r = radius * (0.1 + s * 0.9);
+        const a = offset - s * 2.4;
+        vertex(cos(a) * r, sin(a) * r);
+      }
+      endShape();
+    }
+
+    // Concentric gusts racing from the eye to the edge, looping — the
+    // knockback's outward push made legible instead of implied.
+    const GUST_COUNT = 3;
+    const gustLoopMs = 900;
+    noFill();
+    for (let i = 0; i < GUST_COUNT; i++) {
+      const phase = ((t + (i * gustLoopMs) / GUST_COUNT) % gustLoopMs) / gustLoopMs;
+      stroke(255, 255, 255, 200 * (1 - phase));
+      strokeWeight(2 + 3 * (1 - phase));
+      circle(0, 0, radius * 2 * phase);
+    }
+
+    // Leaves and dust riding the gusts outward. Keyed off elapsedMs (never
+    // random()) so every fleck drifts continuously instead of popping to a
+    // new spot each frame.
+    noStroke();
+    fill(255, 255, 255, 210);
+    const FLECK_COUNT = 20;
+    for (let i = 0; i < FLECK_COUNT; i++) {
+      const seed = i * 2.399_963;
+      const loopMs = 1_600 + (i % 5) * 140;
+      const phase = ((t + seed * 240) % loopMs) / loopMs;
+      const r = radius * (0.08 + phase * 0.92);
+      const a = spin * (0.6 + (i % 4) * 0.18) + seed;
+      circle(cos(a) * r, sin(a) * r, 2 + (i % 3));
+    }
+
+    // Heal pulse over every ally the monsoon is currently ticking.
+    noFill();
+    for (const member of this.members) {
+      const localX = member.position.x - this.center.x;
+      const localY = member.position.y - this.center.y;
+      const healPulse = 0.5 + 0.5 * sin(t / 160 + member.collisionRadius);
+      stroke(150, 255, 190, 120 + 100 * healPulse);
+      strokeWeight(2.5);
+      circle(localX, localY, member.collisionRadius * 2 + 14 + 8 * healPulse);
+      stroke(215, 255, 220, 70 + 70 * healPulse);
+      strokeWeight(1.2);
+      circle(localX, localY, member.collisionRadius * 2 + 24 + 12 * healPulse);
+    }
+
+    pop();
   }
 }

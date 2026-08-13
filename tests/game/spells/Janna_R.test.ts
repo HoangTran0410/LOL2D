@@ -30,15 +30,36 @@ import Ignite from '../../../src/game/gameObject/spells/Ignite';
 import Janna_R, {
   CHANNEL_DURATION_MS,
   HEAL_PER_TICK,
+  Janna_R_Object,
   KNOCKBACK_DISTANCE,
   KNOCKBACK_DURATION_MS,
   MANA_COST,
+  RADIUS,
   TICK_EVERY_MS,
 } from '../../../src/game/gameObject/spells/Janna_R';
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
+import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import { SpellGroups } from '../../../src/game/preset';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+
+const stubDrawGlobals = () => {
+  const spies = {
+    image: vi.fn(),
+    circle: vi.fn(),
+    beginShape: vi.fn(),
+    vertex: vi.fn(),
+    endShape: vi.fn(),
+  };
+  for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
+  for (const name of ['push', 'pop', 'translate', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+    vi.stubGlobal(name, vi.fn());
+  }
+  vi.stubGlobal('sin', Math.sin);
+  vi.stubGlobal('cos', Math.cos);
+  vi.stubGlobal('TWO_PI', Math.PI * 2);
+  return spies;
+};
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -310,5 +331,61 @@ describe('Janna R', () => {
     knockback.deactivateBuff();
     expect(enemy.position).toEqual({ x: 380, y: 0 });
     expect(enemy.destination).toEqual({ x: 380, y: 0 });
+  });
+
+  it('draws a procedural monsoon vortex out to the real spell radius', () => {
+    const draw = stubDrawGlobals();
+    const { owner } = makeOwner();
+    const area = new Janna_R_Object(owner as never, { x: 0, y: 0 }, RADIUS);
+    area.elapsedMs = 1_234;
+
+    area.draw();
+
+    // procedural, not a blitted ability icon
+    expect(draw.image).not.toHaveBeenCalled();
+    // the boundary ring is sized to the spell's own tuning constant, not an
+    // invented display-only number
+    expect(draw.circle).toHaveBeenCalledWith(0, 0, RADIUS * 2);
+    // four curling spiral arms, each its own shape
+    expect(draw.beginShape).toHaveBeenCalledTimes(4);
+    expect(draw.endShape).toHaveBeenCalledTimes(4);
+    // wash + boundary rings + gust rings + drifting flecks
+    expect(draw.circle.mock.calls.length).toBeGreaterThan(20);
+  });
+
+  it('grows a heal-pulse ring around every ally caught in the monsoon', () => {
+    const draw = stubDrawGlobals();
+    const { owner } = makeOwner();
+    const area = new Janna_R_Object(owner as never, { x: 0, y: 0 }, RADIUS);
+    area.elapsedMs = 500;
+    area.draw();
+    const baseline = draw.circle.mock.calls.length;
+
+    const ally = Object.assign(Object.create(AttackableUnit.prototype), {
+      position: { x: 40, y: 0 },
+      collisionRadius: 25,
+    }) as AttackableUnit;
+    area.members.add(ally);
+    draw.circle.mockClear();
+
+    area.draw();
+
+    // two concentric rings drawn per ally inside the vortex
+    expect(draw.circle.mock.calls.length).toBe(baseline + 2);
+  });
+
+  it('sizes its display bounding box to the full monsoon radius so it cannot be culled', () => {
+    const { owner, added } = makeOwner();
+    const spell = new Janna_R(owner);
+
+    spell.press(context(owner));
+
+    const area = added.find(
+      (object): object is Janna_R_Object => object instanceof Janna_R_Object
+    );
+    if (!area) throw new Error('Janna R must create its channel area.');
+    const box = area.getDisplayBoundingBox();
+
+    expect(box).toMatchObject({ x: -RADIUS, y: -RADIUS, w: RADIUS * 2, h: RADIUS * 2 });
   });
 });
