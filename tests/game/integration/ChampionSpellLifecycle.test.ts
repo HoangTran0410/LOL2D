@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: vi.fn(() => undefined) },
+  default: { get: vi.fn(() => undefined) },
 }));
 
 const replacementPreset = vi.hoisted(() => ({

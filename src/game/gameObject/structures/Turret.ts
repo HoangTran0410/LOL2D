@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
+import type { AttackableUnitOptions } from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
 import TrailSystem from '../helpers/TrailSystem';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -30,6 +31,12 @@ export const DEFAULT_TURRET_PRESET: TurretPresetData = {
   repairRate: 0.4,
 };
 
+export interface TurretOptions {
+  game: AttackableUnitOptions['game'];
+  position?: p5.Vector;
+  preset?: TurretPresetData;
+}
+
 /**
  * A neutral hazard, not a team building: it shoots whichever champion is closest
  * inside `attackRange`, whoever that is. Destroying one opens the ground around
@@ -53,7 +60,7 @@ export default class Turret extends AttackableUnit {
   repairDelay: number;
   repairRate: number;
 
-  target: any = null;
+  target: Champion | null = null;
   _attackCooldown = 0;
   /** ms since the last hit taken — gates self-repair. */
   _sinceDamaged = Infinity;
@@ -67,17 +74,9 @@ export default class Turret extends AttackableUnit {
    * Blitzcrank Q and Thresh Q construct) write straight to `position` and never
    * consult canMove, so a hook could otherwise drag a building across the map.
    */
-  _anchor!: p5.Vector;
+  _anchor: p5.Vector;
 
-  constructor({
-    game,
-    position,
-    preset = DEFAULT_TURRET_PRESET,
-  }: {
-    game?: any;
-    position?: p5.Vector;
-    preset?: TurretPresetData;
-  }) {
+  constructor({ game, position, preset = DEFAULT_TURRET_PRESET }: TurretOptions) {
     super({ game, position, visionRadius: 0 });
 
     this.stats.size.baseValue = preset.size;
@@ -129,7 +128,7 @@ export default class Turret extends AttackableUnit {
     }
   }
 
-  findTarget(): any {
+  findTarget(): Champion | null {
     const found = this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.position.x,
@@ -155,7 +154,7 @@ export default class Turret extends AttackableUnit {
     return nearest;
   }
 
-  fireAt(target: any) {
+  fireAt(target: Champion) {
     const bolt = new TurretBolt(this);
     bolt.target = target;
     bolt.damage = this.damage;
@@ -164,7 +163,7 @@ export default class Turret extends AttackableUnit {
     this.game.objectManager.addObject(bolt);
   }
 
-  takeDamage(damage: number, attacker: any) {
+  takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
     super.takeDamage(damage, attacker);
     this._sinceDamaged = 0;
@@ -327,7 +326,7 @@ export class TurretBolt extends MissileSpellObject {
   maxHitCount = 0;
   removeOnArrive = true;
   damage = 12;
-  target: any = null;
+  target: Champion | null = null;
   /** Fizzles if it somehow never arrives. */
   _life = 4000;
 

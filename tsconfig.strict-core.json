@@ -12,6 +12,11 @@
     "src/game/gameObject/SpellObject.ts",
     "src/game/gameObject/Buff.ts",
     "src/game/gameObject/attackableUnits/AttackableUnit.ts",
+    "src/game/gameObject/attackableUnits/Champion.ts",
+    "src/game/gameObject/attackableUnits/AIChampion.ts",
+    "src/game/gameObject/attackableUnits/DummyChampion.ts",
+    "src/game/gameObject/attackableUnits/Monster.ts",
+    "src/game/gameObject/structures/Turret.ts",
     "src/game/gameObject/buffs/**/*.ts",
     "src/game/managers/ObjectManager.ts",
     "src/game/gameObject/spells/Lux_R.ts",
@@ -26,6 +31,7 @@
     "src/managers/AssetManager.ts",
     "tests/game/spells/representative-spells.test.ts",
     "tests/game/types/BaseObjectTypes.test.ts",
-    "tests/game/types/BuffUnitTypes.test.ts"
+    "tests/game/types/BuffUnitTypes.test.ts",
+    "tests/game/types/ChampionTypes.test.ts"
   ]
 }

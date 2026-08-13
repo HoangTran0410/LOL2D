@@ -1,6 +1,7 @@
 import AssetManager from '../../../managers/AssetManager';
 import { getChampionPresetRandom } from '../../preset';
-import Champion, { type ChampionPresetData } from './Champion';
+import Champion, { type ChampionOptions } from './Champion';
+import type AttackableUnit from './AttackableUnit';
 import { uuidv4 } from '../../../utils';
 import TargetResolver, {
   defaultIsTargetable,
@@ -9,6 +10,8 @@ import TargetResolver, {
 import type Spell from '../Spell';
 import type { CastContext } from '../../spell/runtime/types';
 import type { Vec2 } from '../../spell/runtime/types';
+
+export type AIChampionOptions = ChampionOptions;
 
 export default class AIChampion extends Champion {
   _autoMove = true;
@@ -24,26 +27,8 @@ export default class AIChampion extends Champion {
     releaseAtMs: number;
   };
 
-  constructor({
-    game,
-    position,
-    collisionRadius,
-    visionRadius,
-    teamId,
-    stats,
-    avatar,
-    preset,
-  }: {
-    game?: any;
-    position?: p5.Vector;
-    collisionRadius?: number;
-    visionRadius?: number;
-    teamId?: string;
-    stats?: any;
-    avatar?: any;
-    preset?: ChampionPresetData;
-  }) {
-    super({ game, position, collisionRadius, visionRadius, teamId, stats, avatar, preset });
+  constructor(options: AIChampionOptions) {
+    super(options);
   }
 
   update() {
@@ -141,7 +126,7 @@ export default class AIChampion extends Champion {
     if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
   }
 
-  takeDamage(damage: number, attacker: any) {
+  takeDamage(damage: number, attacker?: AttackableUnit) {
     super.takeDamage(damage, attacker);
     if (this._autoMoveOnTakeDamage) this.moveToRandomLocation();
   }
@@ -151,8 +136,8 @@ export default class AIChampion extends Champion {
 
     if (this._respawnWithNewPreset) {
       let newPreset = getChampionPresetRandom();
-      this.avatar = AssetManager.getAsset(newPreset.avatar);
-      this.replaceSpells(newPreset.spells.map((Spell: any) => new Spell(this)));
+      this.avatar = AssetManager.get(newPreset.avatar);
+      this.replaceSpells((newPreset.spells ?? []).map(SpellClass => new SpellClass(this)));
     }
   }
 }

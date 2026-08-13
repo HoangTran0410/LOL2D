@@ -2,6 +2,7 @@ import { Circle } from '../../../libs/quadtree';
 import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
+import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Champion from './Champion';
 
 export interface MonsterPresetData {
@@ -20,6 +21,13 @@ export interface MonsterPresetData {
   /** Champions this close wake the camp up. Defaults to attackRange + 120. */
   aggroRange?: number;
 }
+
+export interface MonsterOptions {
+  game: AttackableUnitOptions['game'];
+  preset?: MonsterPresetData;
+}
+
+export type MonsterPhase = (typeof Monster.PHASES)[keyof typeof Monster.PHASES];
 
 const DEFAULT_PRESET: MonsterPresetData = {
   name: 'Baron',
@@ -48,14 +56,14 @@ export default class Monster extends AttackableUnit {
   zIndex = 3.5;
 
   name: string;
-  phase: string = Monster.PHASES.IDLE;
+  phase: MonsterPhase = Monster.PHASES.IDLE;
   camp: { x: number; y: number; r: number };
   attackRange: number;
   attackInterval: number;
   damage: number;
   aggroRange: number;
   reviveTime = 0;
-  targetLock: any = null;
+  targetLock: Champion | null = null;
 
   /** ms left before the next swing. */
   _attackCooldown = 0;
@@ -67,17 +75,11 @@ export default class Monster extends AttackableUnit {
   _idleRegen: number;
   _leashRegen: number;
 
-  constructor({
-    game,
-    preset = DEFAULT_PRESET,
-  }: {
-    game?: any;
-    preset?: MonsterPresetData;
-  }) {
+  constructor({ game, preset = DEFAULT_PRESET }: MonsterOptions) {
     super({
       game,
       position: createVector(preset.camp.x, preset.camp.y),
-      avatar: AssetManager.getAsset(preset.avatar),
+      avatar: AssetManager.get(preset.avatar),
     });
 
     this.name = preset.name;
@@ -134,7 +136,7 @@ export default class Monster extends AttackableUnit {
 
   updateAttack() {
     const target = this.targetLock;
-    // the original read target.position unconditionally: any damage source with
+    // the original read target.position unconditionally: a damage source with
     // no attacker (a zone tick, a dead owner) put the camp into ATTACK with a
     // null lock and threw on the next frame
     if (!target || target.toRemove || target.isDead || !target.position) {
@@ -177,7 +179,7 @@ export default class Monster extends AttackableUnit {
     }
   }
 
-  findNearestChampion(radius: number): any {
+  findNearestChampion(radius: number): Champion | null {
     const found = this.game.objectManager.queryObjects({
       area: new Circle({ x: this.position.x, y: this.position.y, r: radius }),
       filters: [
@@ -198,8 +200,8 @@ export default class Monster extends AttackableUnit {
     return nearest;
   }
 
-  aggroOn(unit: any) {
-    if (!unit || unit === this || !(unit instanceof Champion)) return;
+  aggroOn(unit?: Champion) {
+    if (!unit || !(unit instanceof Champion)) return;
     this.targetLock = unit;
     this.phase = Monster.PHASES.ATTACK;
   }
@@ -247,14 +249,14 @@ export default class Monster extends AttackableUnit {
     }
   }
 
-  takeDamage(damage: number, attacker: any) {
+  takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
     super.takeDamage(damage, attacker);
     // super.takeDamage may have killed us; a corpse must not hold aggro
-    if (!this.isDead) this.aggroOn(attacker);
+    if (!this.isDead && attacker instanceof Champion) this.aggroOn(attacker);
   }
 
-  die(deathData: { attacker?: any; reviveAfter: number }) {
+  die(deathData: UnitDeathData) {
     super.die(deathData);
     this.targetLock = null;
     this.phase = Monster.PHASES.IDLE;

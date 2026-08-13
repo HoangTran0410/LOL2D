@@ -1,6 +1,7 @@
-import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
+import AssetManager, { type AssetHandle, type AssetKey } from '../../../managers/AssetManager';
 import type Spell from '../Spell';
 import AttackableUnit from './AttackableUnit';
+import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Airborne from '../buffs/Airborne';
 import Charm from '../buffs/Charm';
 import Dash from '../buffs/Dash';
@@ -16,38 +17,26 @@ export interface ChampionPresetData {
   spells?: Array<new (owner: Champion) => Spell>;
 }
 
+export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
+  avatar?: AssetHandle;
+  preset?: ChampionPresetData;
+}
+
 export default class Champion extends AttackableUnit {
   static displayZIndex = 4;
   score = 0;
-  name: string | undefined;
+  name?: string;
   spells: Spell[] = [];
 
-  constructor({
-    game,
-    position,
-    collisionRadius,
-    visionRadius,
-    teamId,
-    stats,
-    avatar,
-    preset,
-  }: {
-    game?: any;
-    position?: p5.Vector;
-    collisionRadius?: number;
-    visionRadius?: number;
-    teamId?: string;
-    stats?: any;
-    avatar?: any;
-    preset?: ChampionPresetData;
-  }) {
+  constructor({ game, position, collisionRadius, visionRadius, teamId, id, stats, avatar, preset }: ChampionOptions) {
     super({
       game,
       position,
       collisionRadius,
       visionRadius,
       teamId,
-      avatar: avatar || AssetManager.getAsset(preset?.avatar),
+      id,
+      avatar: avatar ?? (preset?.avatar ? AssetManager.get(preset.avatar) : undefined),
       stats,
     });
 
@@ -158,7 +147,7 @@ export default class Champion extends AttackableUnit {
     // of icons straight off the side of the screen.
     // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
     // drew every buff twice, and inside this block's tint().)
-    const buffCounts = new Map<any, { image: any; count: number }>();
+    const buffCounts = new Map<Function | string, { image: AssetHandle; count: number }>();
     for (const buff of this.buffs) {
       if (!buff.image) continue;
       const key = buff.stackId ?? buff.constructor;
@@ -186,15 +175,17 @@ export default class Champion extends AttackableUnit {
       fill(200);
       textAlign(CENTER, CENTER);
       textSize(13);
-      text(
-        `Hồi Sinh Sau ${~~(this.deathData!.reviveAfter / 1000)}...`,
-        pos.x,
-        topleft.y + barHeight + 8
-      );
+      if (this.deathData) {
+        text(
+          `Hồi Sinh Sau ${~~(this.deathData.reviveAfter / 1000)}...`,
+          pos.x,
+          topleft.y + barHeight + 8
+        );
+      }
     } else {
       let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
         .map(BuffClass => {
-          let buff = this.buffs.find((b: any) => b instanceof BuffClass);
+          let buff = this.buffs.find(b => b instanceof BuffClass);
           if (buff && buff.sourceUnit !== this) return buff.name;
         })
         .filter(Boolean)
@@ -211,9 +202,9 @@ export default class Champion extends AttackableUnit {
     pop();
   }
 
-  die(deathData: { attacker?: any; reviveAfter: number }) {
+  die(deathData: UnitDeathData) {
     super.die(deathData);
     this.score--;
-    if (deathData.attacker) deathData.attacker.score++;
+    if (deathData.attacker instanceof Champion) deathData.attacker.score++;
   }
 }
