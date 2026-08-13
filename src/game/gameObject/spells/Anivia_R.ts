@@ -1,6 +1,7 @@
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
 import type SpellObject from '../SpellObject';
@@ -55,7 +56,13 @@ export default class Anivia_R extends Spell {
       active: {},
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false, displacement: false },
+      // The storm stands in the world but stays leashed to Anivia and billed to
+      // her mana, so she is free to walk and be shoved about while it runs and
+      // losing control of herself still ends it. Stasis is the exception: it
+      // reads as a stun and a silence at once, but it is a pause, and the storm
+      // is still hers when it ends.
+      interrupts: SpellForm.TETHERED,
+      suspendedBy: [Stasis],
     };
   }
 
@@ -118,10 +125,6 @@ export default class Anivia_R extends Spell {
 
   drawPreview(): void {
     super.drawPreview(this.range);
-  }
-
-  protected ignoresOwnerInterrupts(): boolean {
-    return Boolean(this.owner.hasBuff?.(Stasis));
   }
 
   private pointInRange(point: { x: number; y: number }): { x: number; y: number } {

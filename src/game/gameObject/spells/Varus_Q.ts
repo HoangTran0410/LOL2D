@@ -1,4 +1,5 @@
 import AssetManager from '../../../managers/AssetManager';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
@@ -43,7 +44,9 @@ export default class Varus_Q extends Spell {
       charge: { maxDurationMs: MAX_CHARGE_MS, releaseAtMax: false },
       resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false },
+      // Drawing the bow: Varus keeps walking while he aims, but every piece of
+      // crowd control takes the shot away.
+      interrupts: SpellForm.AIMED,
       vfx: {
         castLoop: context =>
           new VfxGroup([

@@ -6,6 +6,7 @@ import SpellObject from '../SpellObject';
 import Airborne from '../buffs/Airborne';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import TrailSystem from '../helpers/TrailSystem';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 import { notifyJannaControlLanded } from './Janna_E';
 
@@ -58,7 +59,14 @@ export default class Janna_Q extends Spell {
       active: { maxDurationMs: this.maxChargeTime },
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false, displacement: false },
+      // Howling Gale spends its ACTIVE window with the funnel already standing
+      // in the world, growing on its own clock and firing itself at full charge
+      // with no further input. Stunning or silencing Janna cannot delete a storm
+      // that no longer depends on her — only her dying takes it with her. That
+      // is the whole difference between this and a genuinely held cast like
+      // Varus Q or Pantheon Q, where the champion is physically drawing the shot
+      // and an interrupt rightly takes it away.
+      interrupts: SpellForm.INDEPENDENT,
     };
   }
 
@@ -75,29 +83,6 @@ export default class Janna_Q extends Spell {
 
   onRecast(_context: CastContext): void {
     this.releaseStorm();
-  }
-
-  /**
-   * Howling Gale spends its ACTIVE window with the funnel already standing in
-   * the world, growing on its own clock and firing itself at full charge with
-   * no further input. So the usual interrupts must not reach it: stunning or
-   * silencing Janna cannot delete a storm that no longer depends on her. That
-   * is the whole difference between this and a genuinely held cast like
-   * Varus Q or Pantheon Q, where the champion is physically drawing the shot
-   * and an interrupt rightly takes it away.
-   *
-   * Death is the one exception and is handled in onUpdate below, so the storm
-   * still dies with its caster.
-   */
-  protected ignoresOwnerInterrupts(): boolean {
-    return true;
-  }
-
-  onUpdate(): void {
-    // The blanket exemption above also switches off the runtime's own death
-    // check, so re-apply just that one. Runs before observeInterrupts (see
-    // Spell.update), which is why cancelling here is enough.
-    if (this.state === 'ACTIVE' && this.owner.isDead) this.cancel('DEATH');
   }
 
   onComplete(_context: CastContext): void {

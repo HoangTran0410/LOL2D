@@ -1,6 +1,8 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
+import type { CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import { MAX_UNIT_SIZE } from '../Stats';
@@ -30,6 +32,33 @@ export default class Rammus_Q extends Spell {
   slowPercent = 0.6;
   slowTime = 1500;
 
+  rollBuff: Rammus_Q_Powerball | null = null;
+  rollObject: Rammus_Q_Object | null = null;
+
+  /**
+   * The roll is the spell's ACTIVE window, not something the spell fires and
+   * forgets: for four seconds Rammus *is* a ball, and the runtime should say so.
+   *
+   * `INDEPENDENT` is the point. Powerball ends on its own terms — the clock
+   * running out or the ball connecting with somebody — and crowd control is not
+   * one of them: a rolling Rammus who gets stunned is a stunned Rammus who is
+   * still rolling when it wears off. Only his death takes the roll with him,
+   * which is what the ball already did on its own.
+   *
+   * Cooldown still starts at the press, so pressing Q begins the eight seconds
+   * immediately rather than four seconds later when the roll ends.
+   */
+  get castSpec(): Readonly<CastSpec> {
+    return {
+      activation: 'PRESS',
+      targeting: 'DIRECTION',
+      active: { maxDurationMs: this.duration },
+      resource: { commitAt: 'start', refundOn: [] },
+      cooldown: { startAt: 'start', durationMs: this.coolDown },
+      interrupts: SpellForm.INDEPENDENT,
+    };
+  }
+
   onSpellCast() {
     const speedupBuff = new Rammus_Q_Powerball(this.duration, this.owner, this.owner);
     speedupBuff.startPercent = this.startPercent;
@@ -46,7 +75,36 @@ export default class Rammus_Q extends Spell {
     obj.slowPercent = this.slowPercent;
     obj.slowTime = this.slowTime;
     obj.speedupBuff = speedupBuff;
+    obj.spell = this;
+    this.rollBuff = speedupBuff;
+    this.rollObject = obj;
     this.game.objectManager.addObject(obj);
+  }
+
+  /**
+   * The ball's own ends — the lifetime running out, the owner dying, or hitting
+   * somebody — close the ACTIVE window too, so the spell is never still rolling
+   * after the roll stopped. Idempotent: the window closing calls back into the
+   * cleanup below, which finds nothing left to do.
+   */
+  endRoll(): void {
+    if (this.state === 'ACTIVE') this.cancel('EFFECT_ENDED');
+    else this.clearRoll();
+  }
+
+  onCancel(): void {
+    this.clearRoll();
+  }
+
+  onComplete(): void {
+    this.clearRoll();
+  }
+
+  private clearRoll(): void {
+    this.rollBuff?.deactivateBuff();
+    this.rollBuff = null;
+    if (this.rollObject) this.rollObject.toRemove = true;
+    this.rollObject = null;
   }
 }
 
@@ -108,6 +166,8 @@ export class Rammus_Q_Object extends SpellObject {
   slowPercent = 0.6;
   slowTime = 1500;
   speedupBuff: Rammus_Q_Powerball | null = null;
+  /** Told when the roll is over, so the spell's ACTIVE window ends with it. */
+  spell: Rammus_Q | null = null;
 
   /** Cosmetic: dust thrown up by the roll, denser the faster he goes. */
   _dust: { x: number; y: number; age: number; size: number; vx: number; vy: number }[] = [];
@@ -147,6 +207,7 @@ export class Rammus_Q_Object extends SpellObject {
 
     if (this.age >= this.lifeTime || this.owner.isDead) {
       this.toRemove = true;
+      this.spell?.endRoll();
       return;
     }
 
@@ -190,6 +251,7 @@ export class Rammus_Q_Object extends SpellObject {
     // connecting ends the roll early, speed boost included
     this.speedupBuff?.deactivateBuff();
     this.toRemove = true;
+    this.spell?.endRoll();
   }
 
   _updateDust(ramp: number) {

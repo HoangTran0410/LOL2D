@@ -1,5 +1,6 @@
 import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec, Vec2 } from '../../spell/runtime/types';
 import BeamSpellObject from '../spellObjects/BeamSpellObject';
 import MissileSpellObject from '../MissileSpellObject';
@@ -97,7 +98,9 @@ export default class Pantheon_Q extends Spell {
       charge: { maxDurationMs: MAX_CHARGE_MS, releaseAtMax: false },
       resource: { commitAt: 'start', refundOn: ['MAX_DURATION', 'DEATH', 'SILENCE', 'STUN'] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
-      interrupts: { move: false },
+      // Winding up the throw: Pantheon may reposition while he charges, but
+      // every piece of crowd control takes the spear away.
+      interrupts: SpellForm.AIMED,
       vfx: {
         castLoop: context =>
           new VfxGroup([

@@ -1,5 +1,6 @@
 import AssetManager from '../../../managers/AssetManager';
 import StatusFlags from '../../enums/StatusFlags';
+import { SpellForm } from '../../spell/runtime/CancelPolicy';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastBar from '../../vfx/CastBar';
 import LuxBeamEffect from '../../vfx/LuxBeamEffect';
@@ -100,13 +101,10 @@ export default class Lux_R extends Spell {
       castTimeMs: this.castTimeMs,
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
-      interrupts: {
-        death: true,
-        stun: false,
-        silence: false,
-        displacement: false,
-        move: false,
-      },
+      // Once the beam is called down it is in the sky, not in Lux's hands: the
+      // cast time is a wind-up on an effect that is already committed, so only
+      // her dying takes it back.
+      interrupts: SpellForm.INDEPENDENT,
       vfx: {
         castStart: context => new CastBar(context, () => this.castElapsedMs / this.castTimeMs),
         castLoop: context => new LuxBeamEffect(

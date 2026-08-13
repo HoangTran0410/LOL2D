@@ -11,6 +11,25 @@ import TrailSystem from '../helpers/TrailSystem';
 import Fear from './Fear';
 import Charm from './Charm';
 import type { BuffConstructor } from '../Buff';
+import { foreignControlBuff } from '../../spell/runtime/CancelPolicy';
+
+/**
+ * The crowd control that takes a dash off its feet.
+ *
+ * A dash is the movement half of the cancellation model: it is not a spell
+ * state, so it cannot carry a `SpellForm`, but the question is the same one and
+ * `CancelPolicy` answers it in the same vocabulary. Listed as buff classes
+ * rather than status flags because the rule has to know *who* applied it — a
+ * spell that roots its victim and then pulls them must not have its own pull
+ * cancelled by its own root. See the table in docs/ADDING_SPELLS.md.
+ */
+export const DASH_INTERRUPT_BUFFS: readonly BuffConstructor[] = [
+  Airborne,
+  Root,
+  Stun,
+  Fear,
+  Charm,
+];
 
 export default class Dash extends Buff {
   image: Buff['image'] = AssetManager.get('buff_root');
@@ -27,7 +46,7 @@ export default class Dash extends Buff {
   dashDestination: p5.Vector | null = null;
   stayAtDestination = true;
   cancelable = true;
-  buffsToCheckCancel: BuffConstructor[] = [Airborne, Root, Stun, Fear, Charm];
+  buffsToCheckCancel: BuffConstructor[] = [...DASH_INTERRUPT_BUFFS];
 
   statusFlagsToEnable = StatusFlags.Ghosted;
 
@@ -94,14 +113,14 @@ export default class Dash extends Buff {
       }
     }
 
-    // cancel if target unit is have other buffs
+    // somebody else took control of this unit mid-flight
     if (
       this.cancelable &&
-      this.targetUnit.buffs.find(
-        buff =>
-          buff !== this &&
-          buff.sourceUnit !== this.sourceUnit && // cancel if target unit is have other buffs from other source unit
-          this.buffsToCheckCancel.find(buffClass => buff instanceof buffClass)
+      foreignControlBuff(
+        this.targetUnit.buffs,
+        this,
+        this.sourceUnit,
+        this.buffsToCheckCancel
       )
     ) {
       this.onCancelled?.();

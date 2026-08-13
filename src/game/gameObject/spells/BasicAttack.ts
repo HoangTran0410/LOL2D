@@ -66,15 +66,6 @@ export default class BasicAttack extends Spell {
   }
 
   /**
-   * The one spell that must not clear the standing attack order when it is
-   * cast, because casting it *is* the order. Everything else drops it — see
-   * `Spell.press`.
-   */
-  protected get cancelsAttackOrder(): boolean {
-    return false;
-  }
-
-  /**
    * Deliberately not `super.castCancelCheck()`: that gate is `canCast`, and a
    * silence stops abilities without stopping swings. The gate for a swing is
    * `canAttack`, which is what a disarm and every controlling crowd control
@@ -161,4 +152,8 @@ const BASIC_ATTACK_CAST_SPEC: Readonly<CastSpec> = Object.freeze({
   castTimeMs: 0,
   resource: Object.freeze({ commitAt: 'start', refundOn: [] }),
   cooldown: Object.freeze({ startAt: 'start', durationMs: 0 }),
+  // The one spell that must not clear the standing attack order when it is
+  // cast, because casting it *is* the order. Everything else drops it — see
+  // `Spell.press` and the table in docs/ADDING_SPELLS.md.
+  attackOrder: 'keep',
 } as CastSpec);
