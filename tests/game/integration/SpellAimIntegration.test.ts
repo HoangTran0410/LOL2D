@@ -196,12 +196,16 @@ describe('spell aim integration', () => {
   );
 
   it('aims an AI UNIT cast at an eligible unit instead of its move destination', () => {
+    const untargetable = {
+      position: new TestVector(50, 0), collisionRadius: 25,
+      teamId: 'blue', targetable: false,
+    };
     const target = {
       position: new TestVector(100, 0), collisionRadius: 25,
       teamId: 'blue', targetable: true,
     };
     const game = Object.assign(gameWithMouse(), {
-      objectManager: { objects: [target], addObject: vi.fn() },
+      objectManager: { objects: [untargetable, target], addObject: vi.fn() },
       createSpellContext: Game.prototype.createSpellContext,
     });
     const ai = new AIChampion({
@@ -219,10 +223,6 @@ describe('spell aim integration', () => {
       }; }
       get targetingRequest() { return {
         range: 500, targetTeam: 'ENEMY' as const,
-        getTargetInfo: (candidate: any) => ({
-          position: candidate.position, teamId: candidate.teamId,
-          selectionRadius: candidate.collisionRadius,
-        }),
       }; }
       onSpellCast(context: CastContext) { this.usedTarget = context.target; }
     }

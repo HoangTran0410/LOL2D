@@ -18,7 +18,10 @@ import ObjectManager from './managers/ObjectManager';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
-import TargetResolver from './spell/targeting/TargetResolver';
+import TargetResolver, {
+  defaultIsTargetable,
+  defaultTargetInfo,
+} from './spell/targeting/TargetResolver';
 import type Spell from './gameObject/Spell';
 import type { CastContext, Vec2 } from './spell/runtime/types';
 
@@ -196,26 +199,8 @@ export default class Game {
       origin: caster.position,
       cursorWorld,
       queryCandidates: () => this.objectManager.objects,
-      isTargetable: candidate =>
-        typeof candidate === 'object' && candidate !== null &&
-        (candidate as { targetable?: boolean }).targetable !== false,
-      getTargetInfo: candidate => {
-        if (typeof candidate !== 'object' || candidate === null) return null;
-        const target = candidate as {
-          position?: Vec2;
-          teamId?: unknown;
-          selectionRadius?: number;
-          collisionRadius?: number;
-          animatedValues?: { displaySize?: number };
-        };
-        if (!target.position) return null;
-        return {
-          position: target.position,
-          teamId: target.teamId,
-          selectionRadius: target.selectionRadius ?? target.collisionRadius ??
-            (target.animatedValues?.displaySize ?? 0) / 2,
-        };
-      },
+      isTargetable: defaultIsTargetable,
+      getTargetInfo: defaultTargetInfo,
       ...spell.targetingRequest,
     });
     return result.ok ? result.context : undefined;

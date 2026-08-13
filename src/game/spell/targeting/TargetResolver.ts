@@ -8,6 +8,28 @@ export interface TargetInfo {
   readonly selectionRadius?: number;
 }
 
+export const defaultIsTargetable = (candidate: unknown): boolean =>
+  typeof candidate === 'object' && candidate !== null &&
+  (candidate as { targetable?: boolean }).targetable !== false;
+
+export const defaultTargetInfo = (candidate: unknown): TargetInfo | null => {
+  if (typeof candidate !== 'object' || candidate === null) return null;
+  const target = candidate as {
+    position?: Vec2;
+    teamId?: unknown;
+    selectionRadius?: number;
+    collisionRadius?: number;
+    animatedValues?: { displaySize?: number };
+  };
+  if (!target.position) return null;
+  return {
+    position: target.position,
+    teamId: target.teamId,
+    selectionRadius: target.selectionRadius ?? target.collisionRadius ??
+      (target.animatedValues?.displaySize ?? 0) / 2,
+  };
+};
+
 export interface TargetRequest {
   readonly spellId: string;
   readonly activationId: string;

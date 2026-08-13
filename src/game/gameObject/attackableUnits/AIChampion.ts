@@ -2,7 +2,10 @@ import AssetManager from '../../../managers/AssetManager';
 import { getChampionPresetRandom } from '../../preset';
 import Champion, { type ChampionPresetData } from './Champion';
 import { uuidv4 } from '../../../utils';
-import TargetResolver from '../../spell/targeting/TargetResolver';
+import TargetResolver, {
+  defaultIsTargetable,
+  defaultTargetInfo,
+} from '../../spell/targeting/TargetResolver';
 import type Spell from '../Spell';
 import type { CastContext } from '../../spell/runtime/types';
 import type { Vec2 } from '../../spell/runtime/types';
@@ -106,11 +109,13 @@ export default class AIChampion extends Champion {
     if (spell.castSpec.targeting !== 'UNIT') return this.destination;
     const request = spell.targetingRequest;
     const candidates = request.queryCandidates?.() ?? this.game.objectManager?.objects ?? [];
+    const getTargetInfo = request.getTargetInfo ?? defaultTargetInfo;
+    const isTargetable = request.isTargetable ?? defaultIsTargetable;
     let nearest: { point: Vec2; distance: number } | undefined;
 
     for (const candidate of candidates) {
-      const info = request.getTargetInfo?.(candidate);
-      if (!info || request.isTargetable?.(candidate) === false) continue;
+      const info = getTargetInfo(candidate);
+      if (!info || !isTargetable(candidate)) continue;
       if (request.targetTeam === 'ENEMY' && info.teamId === this.teamId) continue;
       if (request.targetTeam === 'ALLY' && info.teamId !== this.teamId) continue;
       const distance = Math.hypot(info.position.x - this.position.x, info.position.y - this.position.y);
