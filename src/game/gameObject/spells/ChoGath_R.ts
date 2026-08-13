@@ -6,16 +6,17 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import StatAmp from '../buffs/StatAmp';
+import { MAX_UNIT_SIZE } from '../Stats';
 
 /** One Feast stack. Kept as constants so the heal matches the max health gained. */
-const SIZE_PER_STACK = 6;
-const MAX_HEALTH_PER_STACK = 75;
+export const SIZE_PER_STACK = 6;
+export const MAX_HEALTH_PER_STACK = 75;
 
 export default class ChoGath_R extends Spell {
   image = AssetManager.get('spell_chogath_r');
   name = "Ăn Thịt (Cho'Gath_R)";
   description =
-    'Ngoạm kẻ địch gần nhất trong phạm vi <span>200px</span>, gây <span class="damage">40 sát thương</span>. Mỗi lần ăn, Cho\'Gath <span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+6 kích thước</span> và <span class="buff">+75 máu tối đa</span>';
+    `Ngoạm kẻ địch gần nhất trong phạm vi <span>200px</span>, gây <span class="damage">40 sát thương</span>. Mỗi lần ăn, Cho'Gath <span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+${SIZE_PER_STACK} kích thước</span> (tối đa <span>${MAX_UNIT_SIZE}</span>) và <span class="buff">+${MAX_HEALTH_PER_STACK} máu tối đa</span> (không giới hạn)`;
   coolDown = 10000;
   manaCost = 50;
 

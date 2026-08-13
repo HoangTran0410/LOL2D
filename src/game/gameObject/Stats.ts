@@ -45,8 +45,17 @@ export class Stat {
   percentBonus = 0;
   percentBaseBonus = 0;
 
-  constructor(baseValue = 0) {
+  /**
+   * Ceiling applied to `value`. Defaults to no limit, so only the stats that
+   * genuinely need one pay for it. Clamping the read rather than the modifiers
+   * keeps it reversible: a buff that pushed the total past the cap still
+   * subtracts cleanly when it expires, and the value comes back down.
+   */
+  maxValue = Infinity;
+
+  constructor(baseValue = 0, maxValue = Infinity) {
     this.baseValue = baseValue;
+    this.maxValue = maxValue;
   }
 
   addModifier(modifier: StatModifier) {
@@ -60,7 +69,10 @@ export class Stat {
   }
 
   get value(): number {
-    return ((this.baseValue + this.baseBonus) * (1 + this.percentBaseBonus) + this.flatBonus) * (1 + this.percentBonus);
+    const total =
+      ((this.baseValue + this.baseBonus) * (1 + this.percentBaseBonus) + this.flatBonus) *
+      (1 + this.percentBonus);
+    return total > this.maxValue ? this.maxValue : total;
   }
 
   add(modifier: StatModifier) {
@@ -129,13 +141,22 @@ export class StatsModifier {
   }
 }
 
+/**
+ * Ceiling on how big a unit's body can get, whatever stacks it. A champion is
+ * 55 across, Baron is 100 and a turret 92, so three times base already makes a
+ * unit the largest thing on the field. Past that the model stops fitting
+ * through lane chokepoints, its fixed-width health bar detaches from it, and
+ * Cho'Gath R — 6 size a stack, 99 stacks, permanent — would reach 649.
+ */
+export const MAX_UNIT_SIZE = 165;
+
 export default class Stats {
   maxHealth = new Stat(100);
   health = new Stat(100);
   maxMana = new Stat(500);
   mana = new Stat(500);
   speed = new Stat(3);
-  size = new Stat(55);
+  size = new Stat(55, MAX_UNIT_SIZE);
   height = new Stat(0);
   manaRegen = new Stat(0.1);
   healthRegen = new Stat(0.06);
