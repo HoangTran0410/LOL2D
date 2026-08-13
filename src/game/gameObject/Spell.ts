@@ -145,9 +145,34 @@ export default class Spell {
     this._castContext = snapshotContext(context);
     this.game.eventManager.emit(EventType.ON_PRE_CAST_SPELL, this);
     const accepted = this.runtime.press(this._castContext);
-    if (accepted) this.snapshotOwner();
+    if (accepted) {
+      this.snapshotOwner();
+      // Casting is the third way to cancel a standing attack order, beside a
+      // move order and crowd control: committing to an ability is a decision to
+      // stop chasing.
+      //
+      // Here rather than on ON_PRE_CAST_SPELL because that event fires before
+      // the runtime has ruled on the cast, so a listener cannot tell a real cast
+      // from a key pressed into a cooldown. That distinction is not cosmetic:
+      // an AI champion attempts a cast several times a second and is refused
+      // almost every time, so cancelling on the attempt would leave the bots
+      // unable to hold an attack order at all. `accepted` is the cast.
+      if (this.cancelsAttackOrder) this.owner?.basicAttack?.clear();
+    }
     this.syncVfxPhase();
     return accepted;
+  }
+
+  /**
+   * Whether casting this spell drops the caster's standing attack order.
+   *
+   * True for every ability. BasicAttack overrides it, because casting that one
+   * *is* the order — and note the ordering this relies on: a PRESS spell runs
+   * `onSpellCast` inside `runtime.press` above, so an order placed there would
+   * be wiped by the line below if the flag were not honoured.
+   */
+  protected get cancelsAttackOrder(): boolean {
+    return true;
   }
 
   hold(context: CastContext): boolean {

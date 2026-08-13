@@ -13,7 +13,12 @@ import Champion, {
 import AIChampion, {
   AI_ATTACK_SCAN_INTERVAL_MS,
 } from '../../../src/game/gameObject/attackableUnits/AIChampion';
+import Charm from '../../../src/game/gameObject/buffs/Charm';
 import Disarm from '../../../src/game/gameObject/buffs/Disarm';
+import Fear from '../../../src/game/gameObject/buffs/Fear';
+import Root from '../../../src/game/gameObject/buffs/Root';
+import Silence from '../../../src/game/gameObject/buffs/Silence';
+import Stun from '../../../src/game/gameObject/buffs/Stun';
 import Stats, { MAX_ATTACK_SPEED } from '../../../src/game/gameObject/Stats';
 import {
   BasicAttackBolt,
@@ -31,6 +36,7 @@ class TestVector {
   copy() { return new TestVector(this.x, this.y); }
   set(x: number, y: number) { this.x = x; this.y = y; return this; }
   add(vector: TestVector) { this.x += vector.x; this.y += vector.y; return this; }
+  sub(vector: TestVector) { this.x -= vector.x; this.y -= vector.y; return this; }
   mult(value: number) { this.x *= value; this.y *= value; return this; }
   mag() { return Math.hypot(this.x, this.y); }
   magSq() { return this.x * this.x + this.y * this.y; }
@@ -154,15 +160,54 @@ describe('basic attacks', () => {
 
     attacker.basicAttack.update();
     expect(pending(game)).toHaveLength(0);
-    // the order survives the disarm; it simply produces nothing while it lasts
-    expect(attacker.basicAttack.target).toBe(target);
+    // crowd control ends the order rather than pausing it, so coming out of a
+    // disarm leaves the unit standing still instead of back on the chase
+    expect(attacker.basicAttack.target).toBeNull();
+    expect(attacker.basicAttack.lastEnd).toBe('DISABLED');
 
     attacker.buffs[0].deactivateBuff();
     attacker.updateBuffs();
     attacker.basicAttack.update();
 
     expect(attacker.canAttack).toBe(true);
+    expect(pending(game)).toHaveLength(0);
+
+    // and it swings again the moment it is ordered to
+    attacker.orderAttack(target);
+    attacker.basicAttack.update();
     expect(pending(game)).toHaveLength(1);
+  });
+
+  it('drops a standing order on every crowd control that takes a unit over', () => {
+    for (const Control of [Stun, Charm, Fear, Disarm]) {
+      const game = createGame();
+      const attacker = champion(game, 0);
+      const target = champion(game, 100);
+      attacker.orderAttack(target);
+
+      attacker.addBuff(new Control(1_000, attacker, attacker));
+      attacker.updateBuffs();
+      attacker.basicAttack.update();
+
+      expect(attacker.basicAttack.target, Control.name).toBeNull();
+      expect(attacker.basicAttack.lastEnd, Control.name).toBe('DISABLED');
+    }
+  });
+
+  it('keeps a standing order through a root or a silence, which stop other things', () => {
+    for (const Control of [Root, Silence]) {
+      const game = createGame();
+      const attacker = champion(game, 0);
+      const target = champion(game, 100);
+      attacker.orderAttack(target);
+
+      attacker.addBuff(new Control(1_000, attacker, attacker));
+      attacker.updateBuffs();
+      attacker.basicAttack.update();
+
+      expect(attacker.basicAttack.target, Control.name).toBe(target);
+      expect(pending(game), Control.name).toHaveLength(1);
+    }
   });
 
   it('clears CAN_ATTACK for the crowd control that takes a unit over', () => {

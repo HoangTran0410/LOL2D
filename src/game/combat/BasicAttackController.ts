@@ -13,7 +13,7 @@ import {
  * Why an attack order stopped. Surfaced so callers (the AI, later an order
  * queue) can tell "it died" from "it walked out of my sight".
  */
-export type AttackOrderEnd = 'KILLED' | 'LOST' | 'CLEARED';
+export type AttackOrderEnd = 'KILLED' | 'LOST' | 'CLEARED' | 'DISABLED';
 
 /**
  * Owns one unit's basic attack: the standing order, the walk into range, the
@@ -102,6 +102,19 @@ export default class BasicAttackController {
 
     const target = this.target;
     if (!target) return;
+
+    // Crowd control ends the order, it does not pause it. A stun, charm, fear,
+    // suppression or disarm all clear ActionState.CAN_ATTACK, and every one of
+    // them is a moment where the unit stopped being the one deciding what it is
+    // doing — coming out of it still glued to whoever it was chasing is how a
+    // sticky order turns into a unit that walks itself into a losing fight. The
+    // player presses again; the AI re-scans within its interval.
+    if (!this.owner.canAttack) {
+      this.lastEnd = 'DISABLED';
+      this.target = null;
+      this.owner.stopMovement();
+      return;
+    }
 
     const reach = this.reachTo(target);
     if (!this.canKeep(target)) {
