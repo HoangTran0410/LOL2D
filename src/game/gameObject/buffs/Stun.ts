@@ -7,7 +7,7 @@ import Buff from '../Buff';
 
 // Làm choáng
 export default class Stun extends Buff {
-  image = AssetManager.getAsset('buff_stun');
+  image: Buff['image'] = AssetManager.get('buff_stun');
   name = 'Choáng';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;
@@ -21,7 +21,7 @@ export default class Stun extends Buff {
     push();
     translate(pos.x, pos.y);
     rotate(-frameCount / 15);
-    image(AssetManager.renderable(this.image), 0, 0, size, size);
+    image(AssetManager.renderable(this.image ?? undefined), 0, 0, size, size);
     pop();
   }
 }

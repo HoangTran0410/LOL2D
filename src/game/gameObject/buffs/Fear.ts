@@ -7,13 +7,13 @@ import StatusFlags from '../../enums/StatusFlags';
 import Buff from '../Buff';
 
 export default class Fear extends Buff {
-  image = AssetManager.getAsset('buff_fear');
+  image: Buff['image'] = AssetManager.get('buff_fear');
   name = 'Sợ Hãi';
   buffAddType = BuffAddType.REPLACE_EXISTING;
   statusFlagsToEnable = StatusFlags.Feared;
 
   speed = 1;
-  sourcePosition: any = null;
+  sourcePosition: p5.Vector | null = null;
 
   onUpdate(): void {
     if (
@@ -39,7 +39,7 @@ export default class Fear extends Buff {
       this.targetUnit.stats.size.value + random(-10, 10)
     );
     image(
-      AssetManager.renderable(this.image),
+      AssetManager.renderable(this.image ?? undefined),
       this.targetUnit.position.x,
       this.targetUnit.position.y,
       Math.min(40, this.targetUnit.stats.size.value),

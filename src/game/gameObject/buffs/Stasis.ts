@@ -11,7 +11,7 @@ import Buff from '../Buff';
  * out of a fight, not a way to lock someone down.
  */
 export default class Stasis extends Buff {
-  image = AssetManager.getAsset('buff_stasis');
+  image: Buff['image'] = AssetManager.get('buff_knockdown');
   name = 'Bất Động';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 

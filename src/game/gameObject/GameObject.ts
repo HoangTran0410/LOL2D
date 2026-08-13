@@ -86,7 +86,7 @@ export default class GameObject {
     this.position.set(x, y);
   }
 
-  getCollideBoundingBox() {
+  getCollideBoundingBox(): Circle | Line | Rectangle {
     return new Rectangle({
       x: this.position.x - this.collisionRadius,
       y: this.position.y - this.collisionRadius,

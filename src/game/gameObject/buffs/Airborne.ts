@@ -6,7 +6,7 @@ import { StatsModifier } from '../Stats';
 
 // Hất tung
 export default class Airborne extends Buff {
-  image = AssetManager.getAsset('buff_airborne');
+  image: Buff['image'] = AssetManager.get('buff_airborne');
   name = 'Hất Tung';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;

@@ -4,7 +4,7 @@ import StatusFlags from '../../enums/StatusFlags';
 import Buff from '../Buff';
 
 export default class Invisible extends Buff {
-  image = AssetManager.getAsset('buff_invisible');
+  image: Buff['image'] = AssetManager.get('buff_invisible');
   name = 'Tàng Hình';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 

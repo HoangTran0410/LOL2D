@@ -1,6 +1,7 @@
 import BuffAddType from '../../enums/BuffAddType';
 import StatusFlags from '../../enums/StatusFlags';
 import Buff from '../Buff';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Airborne from './Airborne';
 import Root from './Root';
 import AssetManager from '../../../managers/AssetManager';
@@ -11,21 +12,21 @@ import Fear from './Fear';
 import Charm from './Charm';
 
 export default class Dash extends Buff {
-  image = AssetManager.getAsset('buff_root');
+  image: Buff['image'] = AssetManager.get('buff_root');
   name = 'Lướt';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 
   // for override
   trailSystem = new TrailSystem({
-    trailColor: [255, 100] as any,
+    trailColor: 'rgba(255, 255, 255, 0.39)',
     maxLength: 20,
   });
   showTrail = true;
   dashSpeed = 13;
-  dashDestination: any = null;
+  dashDestination: p5.Vector | null = null;
   stayAtDestination = true;
   cancelable = true;
-  buffsToCheckCancel: any[] = [Airborne, Root, Stun, Fear, Charm];
+  buffsToCheckCancel: Function[] = [Airborne, Root, Stun, Fear, Charm];
 
   statusFlagsToEnable = StatusFlags.Ghosted;
 
@@ -33,7 +34,7 @@ export default class Dash extends Buff {
    * Whether a unit may dash under its own power. Grounding blocks this, but not
    * displacements applied by someone else — those construct a Dash directly.
    */
-  static CanDash(targetUnit: any): boolean {
+  static CanDash(targetUnit: AttackableUnit): boolean {
     return targetUnit.canMove && !targetUnit.grounded;
   }
 
@@ -72,10 +73,10 @@ export default class Dash extends Buff {
     if (
       this.cancelable &&
       this.targetUnit.buffs.find(
-        (buff: any) =>
+        buff =>
           buff !== this &&
           buff.sourceUnit !== this.sourceUnit && // cancel if target unit is have other buffs from other source unit
-          this.buffsToCheckCancel.find((buffClass: any) => buff instanceof buffClass)
+          this.buffsToCheckCancel.find(buffClass => buff instanceof buffClass)
       )
     ) {
       this.onCancelled?.();

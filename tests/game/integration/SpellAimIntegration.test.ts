@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { getAsset: () => undefined },
+  default: { get: () => undefined, getAsset: () => undefined },
 }));
 
 import ActionState from '../../../src/game/enums/ActionState';

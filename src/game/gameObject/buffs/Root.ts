@@ -6,7 +6,7 @@ import Buff from '../Buff';
 
 // Trói chân
 export default class Root extends Buff {
-  image = AssetManager.getAsset('buff_root');
+  image: Buff['image'] = AssetManager.get('buff_root');
   name = 'Trói';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;

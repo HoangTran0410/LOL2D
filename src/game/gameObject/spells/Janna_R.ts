@@ -7,17 +7,13 @@ import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
-import AreaSpellObject, { type AreaTarget } from '../spellObjects/AreaSpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AreaSpellObject from '../spellObjects/AreaSpellObject';
 import Ghost from './Ghost';
 import Heal from './Heal';
 import Ignite from './Ignite';
 
-interface JannaTarget extends AreaTarget {
-  readonly teamId: string;
-  readonly isDead: boolean;
-  addBuff(buff: unknown): void;
-  takeHeal(amount: number, healer: unknown): void;
-}
+type JannaTarget = AttackableUnit;
 
 interface Wall {
   readonly vertices: readonly { x: number; y: number }[];

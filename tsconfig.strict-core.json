@@ -10,6 +10,9 @@
     "src/game/gameObject/spellObjects/**/*.ts",
     "src/game/gameObject/GameObject.ts",
     "src/game/gameObject/SpellObject.ts",
+    "src/game/gameObject/Buff.ts",
+    "src/game/gameObject/attackableUnits/AttackableUnit.ts",
+    "src/game/gameObject/buffs/**/*.ts",
     "src/game/managers/ObjectManager.ts",
     "src/game/gameObject/spells/Lux_R.ts",
     "src/game/gameObject/spells/Janna_R.ts",
@@ -22,6 +25,7 @@
     "src/generated/**/*.ts",
     "src/managers/AssetManager.ts",
     "tests/game/spells/representative-spells.test.ts",
-    "tests/game/types/BaseObjectTypes.test.ts"
+    "tests/game/types/BaseObjectTypes.test.ts",
+    "tests/game/types/BuffUnitTypes.test.ts"
   ]
 }

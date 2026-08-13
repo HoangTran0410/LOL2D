@@ -26,7 +26,7 @@ export type BonusKind =
   | 'percentBaseBonus';
 
 /**
- * Changes any stats for as long as it lasts, then puts them back. `Slow` and
+ * Changes selected stats for as long as it lasts, then puts them back. `Slow` and
  * `Speedup` are the speed-only special cases of this.
  *
  *   const buff = new StatAmp(5000, caster, target);

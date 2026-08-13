@@ -11,7 +11,7 @@ import Buff from '../Buff';
  * Enforced in `Dash.CanDash`, which spells call before dashing their caster.
  */
 export default class Ground extends Buff {
-  image = AssetManager.getAsset('buff_ground');
+  image: Buff['image'] = AssetManager.get('buff_ground');
   name = 'Ghìm';
   buffAddType = BuffAddType.RENEW_EXISTING;
 

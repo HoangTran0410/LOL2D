@@ -4,7 +4,7 @@ import Buff from '../Buff';
 import { StatsModifier } from '../Stats';
 
 export default class Slow extends Buff {
-  image = AssetManager.getAsset('buff_slow');
+  image: Buff['image'] = AssetManager.get('buff_slow');
   name = 'Chậm';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;

@@ -1,9 +1,20 @@
 import BuffAddType from '../enums/BuffAddType';
+import type { AssetHandle } from '../../managers/AssetManager';
+import type { GameObjectRuntimeContext } from './GameObject';
+import type AttackableUnit from './attackableUnits/AttackableUnit';
+
+export type BuffStackId = string | Function;
+
+export type BuffConstructorArgs = [
+  duration: number,
+  sourceUnit: AttackableUnit,
+  targetUnit: AttackableUnit,
+];
 
 export default class Buff {
   name = this.constructor.name;
-  description: any = null;
-  image: any = null;
+  description: string | null = null;
+  image: AssetHandle | null | undefined = null;
 
   buffAddType = BuffAddType.REPLACE_EXISTING;
   maxStacks = 1;
@@ -17,7 +28,7 @@ export default class Buff {
    * two bare `StatAmp`s or `DamageOverTime`s would otherwise fight over one
    * slot, so each spell should tag its own, e.g. `buff.stackId = 'ignite'`.
    */
-  stackId: any = null;
+  stackId: BuffStackId | null = null;
   timeElapsed = 0;
   toRemove = false;
 
@@ -25,20 +36,20 @@ export default class Buff {
   statusFlagsToDisable = 0;
 
   duration = 0;
-  sourceUnit: any = null;
-  targetUnit: any = null;
-  game: any = null;
+  sourceUnit: AttackableUnit;
+  targetUnit: AttackableUnit;
+  game: GameObjectRuntimeContext;
 
   _deactivateListeners: (() => void)[] = [];
   _created = false;
   _deactivated = false;
   _activated = false;
 
-  constructor(duration?: number, sourceUnit?: any, targetUnit?: any) {
-    this.duration = duration || 0;
+  constructor(...[duration, sourceUnit, targetUnit]: BuffConstructorArgs) {
+    this.duration = duration;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;
-    this.game = targetUnit?.game || sourceUnit?.game;
+    this.game = targetUnit.game;
   }
 
   activateBuff(): void {
@@ -91,7 +102,7 @@ export default class Buff {
    * through: less for shields and damage reduction, more for amplification.
    * Every buff on the unit sees the damage in turn.
    */
-  modifyIncomingDamage(damage: number, _attacker: any): number {
+  modifyIncomingDamage(damage: number, _attacker?: AttackableUnit): number {
     return damage;
   }
 

@@ -33,7 +33,7 @@ const FRAME_MS = 1000 / 60;
  * many times the unit happens to be rendered.
  */
 export default class DamageOverTime extends Buff {
-  image = AssetManager.getAsset('buff_poison');
+  image: Buff['image'] = AssetManager.get('buff_poison');
   name = 'Thiêu Đốt';
   buffAddType = BuffAddType.RENEW_EXISTING;
 

@@ -11,7 +11,7 @@ import Buff from '../Buff';
  * spell that queries for enemies skips the unit for free.
  */
 export default class Untargetable extends Buff {
-  image = AssetManager.getAsset('buff_untargetable');
+  image: Buff['image'] = AssetManager.get('buff_untargetable');
   name = 'Không Thể Chọn';
   buffAddType = BuffAddType.REPLACE_EXISTING;
 

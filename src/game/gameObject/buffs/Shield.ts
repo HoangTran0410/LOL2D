@@ -1,6 +1,7 @@
 import BuffAddType from '../../enums/BuffAddType';
 import Buff from '../Buff';
 import CombatText from '../helpers/CombatText';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 /**
  * Absorbs incoming damage until it runs out, then expires.
@@ -30,7 +31,7 @@ export default class Shield extends Buff {
     this._initialAmount = this.amount;
   }
 
-  modifyIncomingDamage(damage: number, _attacker: any): number {
+  modifyIncomingDamage(damage: number, _attacker?: AttackableUnit): number {
     if (this.toRemove || this.amount <= 0) return damage;
 
     const absorbed = Math.min(this.amount, damage);
@@ -56,7 +57,7 @@ export default class Shield extends Buff {
 
     push();
     noFill();
-    (stroke as any)(...this.color, 80 + 140 * remaining);
+    stroke(this.color[0], this.color[1], this.color[2], 80 + 140 * remaining);
     strokeWeight(2 + 3 * remaining);
     circle(pos.x, pos.y, size + 10);
     pop();

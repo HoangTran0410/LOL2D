@@ -4,6 +4,7 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Airborne from '../buffs/Airborne';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import TrailSystem from '../helpers/TrailSystem';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 
@@ -12,11 +13,7 @@ const WIND: [number, number, number] = [185, 243, 228];
 /** What the funnel turns as it reaches full charge. */
 const WIND_CHARGED: [number, number, number] = [255, 240, 170];
 
-interface JannaTarget {
-  position: p5.Vector;
-  takeDamage(damage: number, source: unknown): void;
-  addBuff(buff: Airborne): void;
-}
+type JannaTarget = AttackableUnit;
 
 /**
  * Howling Gale is a charged spell, not a plain skillshot: the whirlwind is summoned

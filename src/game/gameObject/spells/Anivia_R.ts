@@ -4,7 +4,8 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
 import type SpellObject from '../SpellObject';
-import AreaSpellObject, { type AreaTarget } from '../spellObjects/AreaSpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AreaSpellObject from '../spellObjects/AreaSpellObject';
 import Slow from '../buffs/Slow';
 import Stasis from '../buffs/Stasis';
 import { Circle } from '../../../libs/quadtree';
@@ -24,10 +25,7 @@ const EMPOWERED_SLOW = 0.3;
 const stormRadiusAt = (elapsedMs: number): number =>
   Math.round(START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS));
 
-interface StormTarget extends AreaTarget {
-  addBuff(buff: Slow): void;
-  takeDamage(damage: number, source: SpellObject['owner']): void;
-}
+type StormTarget = AttackableUnit;
 
 export default class Anivia_R extends Spell {
   image = AssetManager.get('spell_anivia_r');

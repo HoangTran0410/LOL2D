@@ -6,22 +6,19 @@ import CastBar from '../../vfx/CastBar';
 import Buff from '../Buff';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import TrueSight from '../buffs/TrueSight';
 import Flash from './Flash';
 import Ghost from './Ghost';
 import Heal from './Heal';
 import Ignite from './Ignite';
 import Lux_E, { Lux_E_Object } from './Lux_E';
-import BeamSpellObject, {
-  type BeamGeometry,
-  type BeamTarget,
-} from '../spellObjects/BeamSpellObject';
+import BeamSpellObject, { type BeamGeometry } from '../spellObjects/BeamSpellObject';
 
-interface LuxTarget extends BeamTarget {
-  readonly teamId: string;
-  readonly isDead: boolean;
-  takeDamage(damage: number, source: unknown): void;
-  addBuff(buff: unknown): void;
+type LuxTarget = AttackableUnit;
+
+function hasSpells(unit: AttackableUnit): unit is AttackableUnit & { spells: Spell[] } {
+  return 'spells' in unit && Array.isArray(unit.spells);
 }
 
 class Lux_R_CastLock extends Buff {
@@ -32,7 +29,8 @@ class Lux_R_CastLock extends Buff {
 
   onActivate(): void {
     this.targetUnit.stopMovement?.();
-    for (const spell of (this.targetUnit.spells ?? []) as Spell[]) {
+    if (!hasSpells(this.targetUnit)) return;
+    for (const spell of this.targetUnit.spells) {
       this.disabledBeforeCast.set(spell, spell.disabled);
       if (!this.isPermitted(spell)) spell.disabled = true;
     }

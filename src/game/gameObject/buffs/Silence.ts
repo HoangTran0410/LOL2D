@@ -6,7 +6,7 @@ import Buff from '../Buff';
 
 // Câm lặng
 export default class Silence extends Buff {
-  image = AssetManager.getAsset('buff_silence');
+  image: Buff['image'] = AssetManager.get('buff_silence');
   name = 'Câm Lặng';
   buffAddType = BuffAddType.RENEW_EXISTING;
   statusFlagsToEnable = StatusFlags.Silenced;

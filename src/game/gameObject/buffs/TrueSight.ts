@@ -6,14 +6,14 @@ import GameObject from '../GameObject';
 
 // Cung cấp tầm nhìn
 export default class TrueSight extends Buff {
-  image = AssetManager.getAsset('buff_truesight');
+  image: Buff['image'] = AssetManager.get('buff_truesight');
   name = 'Lộ Diện';
   buffAddType = BuffAddType.REPLACE_EXISTING;
   statusFlagsToDisable = StatusFlags.Stealthed;
 
   visionRadius = 100;
 
-  sightObj: any = null;
+  sightObj: GameObject | null = null;
 
   onCreate(): void {
     // share the live position vector so the sight follows the unit
@@ -26,10 +26,10 @@ export default class TrueSight extends Buff {
   }
 
   onActivate(): void {
-    this.game.objectManager.addObject(this.sightObj);
+    if (this.sightObj) this.game.objectManager.addObject(this.sightObj);
   }
 
   onDeactivate(): void {
-    this.sightObj.toRemove = true;
+    if (this.sightObj) this.sightObj.toRemove = true;
   }
 }

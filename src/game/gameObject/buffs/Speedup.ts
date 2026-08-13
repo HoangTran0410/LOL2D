@@ -13,7 +13,7 @@ interface SpeedupParticle {
 }
 
 export default class Speedup extends Buff {
-  image = AssetManager.getAsset('spell_ghost');
+  image: Buff['image'] = AssetManager.get('spell_ghost');
   name = 'Tăng Tốc';
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 10;

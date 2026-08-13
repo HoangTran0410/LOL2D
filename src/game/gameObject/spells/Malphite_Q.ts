@@ -3,25 +3,16 @@ import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 import TrailSystem from '../helpers/TrailSystem';
-import HomingMissileSpellObject, {
-  type HomingTarget,
-} from '../spellObjects/HomingMissileSpellObject';
+import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 
-type MalphiteTarget = HomingTarget & {
-  teamId: unknown;
-  targetable?: boolean;
-  willDraw: boolean;
-  stats: { speed: { value: number } };
-  takeDamage(damage: number, attacker: unknown): void;
-  addBuff(buff: Slow): void;
-  animatedValues?: { displaySize?: number };
-};
+type MalphiteTarget = AttackableUnit;
 
 const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
   if (typeof target !== 'object' || target === null) return false;

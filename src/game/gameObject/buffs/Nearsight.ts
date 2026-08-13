@@ -4,9 +4,18 @@ import BuffAddType from '../../enums/BuffAddType';
 import StatusFlags from '../../enums/StatusFlags';
 import Buff from '../Buff';
 import { StatsModifier } from '../Stats';
+import type { GameObjectRuntimeContext } from '../GameObject';
+
+interface FogOfWarGameContext extends GameObjectRuntimeContext {
+  fogOfWar: { sightChangeLerpSpeed: number };
+}
+
+function hasFogOfWar(game: GameObjectRuntimeContext): game is FogOfWarGameContext {
+  return 'fogOfWar' in game;
+}
 
 export default class Nearsight extends Buff {
-  image = AssetManager.getAsset('buff_nearsight');
+  image: Buff['image'] = AssetManager.get('buff_nearsight');
   name = 'Mờ Mắt';
   buffAddType = BuffAddType.REPLACE_EXISTING;
   statusFlagsToEnable = StatusFlags.NearSighted;
@@ -25,12 +34,16 @@ export default class Nearsight extends Buff {
   }
 
   onActivate(): void {
-    this.game.fogOfWar.sightChangeLerpSpeed = this.activeLerpSpeed;
+    if (hasFogOfWar(this.game)) {
+      this.game.fogOfWar.sightChangeLerpSpeed = this.activeLerpSpeed;
+    }
     this.targetUnit.stats.addModifier(this.statsModifier);
   }
 
   onDeactivate(): void {
-    this.game.fogOfWar.sightChangeLerpSpeed = this.deactiveLerpSpeed;
+    if (hasFogOfWar(this.game)) {
+      this.game.fogOfWar.sightChangeLerpSpeed = this.deactiveLerpSpeed;
+    }
     this.targetUnit.stats.removeModifier(this.statsModifier);
   }
 }

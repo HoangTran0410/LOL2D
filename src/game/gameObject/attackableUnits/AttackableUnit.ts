@@ -4,22 +4,34 @@ import ActionState from '../../enums/ActionState';
 import BuffAddType from '../../enums/BuffAddType';
 import StatusFlags from '../../enums/StatusFlags';
 import GameObject from '../GameObject';
-import type { GameObjectRuntimeContext } from '../GameObject';
+import type { GameObjectOptions, GameObjectRuntimeContext } from '../GameObject';
 import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
-import AssetManager from '../../../managers/AssetManager';
+import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
+import type Buff from '../Buff';
+
+export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
+  game: GameObjectRuntimeContext;
+  avatar?: AssetHandle;
+  stats?: Stats;
+}
+
+export interface UnitDeathData {
+  attacker?: AttackableUnit;
+  reviveAfter: number;
+}
 
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
-  buffs: any[] = [];
+  buffs: Buff[] = [];
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;
   _statusBeforeApplyingBuffEfects = 0;
   status = 0;
-  deathData: { attacker?: any; reviveAfter: number } | null = null;
+  deathData: UnitDeathData | null = null;
   reviveTime = 5000;
 
-  avatar: any;
+  avatar: AssetHandle | undefined;
   destination: p5.Vector;
   movementRevision = 0;
   displacementRevision = 0;
@@ -43,18 +55,10 @@ export default class AttackableUnit extends GameObject {
     id,
     avatar,
     stats,
-  }: {
-    game?: any;
-    position?: p5.Vector;
-    collisionRadius?: number;
-    visionRadius?: number;
-    teamId?: string;
-    id?: string;
-    avatar?: any;
-    stats?: Stats;
-  }) {
+  }: AttackableUnitOptions) {
     super({ game, position, collisionRadius, visionRadius, teamId, id });
 
+    this.game = game;
     this.avatar = avatar;
     this.destination = (position ?? createVector()).copy();
     this.stats = stats || new Stats();
@@ -191,15 +195,13 @@ export default class AttackableUnit extends GameObject {
     pop();
   }
 
-  addBuff(buff: any) {
+  addBuff(buff: Buff): void {
     if (this.isDead || !buff) return;
 
     // group by stackId when a buff declares one, so two spells applying the same
     // generic class (StatAmp, DamageOverTime) do not evict each other
     const stackKey = buff.stackId ?? buff.constructor;
-    let preBuffs = this.buffs.filter(
-      (_buff: any) => (_buff.stackId ?? _buff.constructor) === stackKey
-    );
+    const preBuffs = this.buffs.filter(_buff => (_buff.stackId ?? _buff.constructor) === stackKey);
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -248,7 +250,7 @@ export default class AttackableUnit extends GameObject {
     }
   }
 
-  updateBuffs() {
+  updateBuffs(): void {
     this.buffs = this.buffs.filter(buff => !buff.toRemove);
 
     this._buffEffectsToEnable = 0;
@@ -263,7 +265,7 @@ export default class AttackableUnit extends GameObject {
     this.setStatus(StatusFlags.None, true);
   }
 
-  takeHeal(heal: number, healer: any) {
+  takeHeal(heal: number, _healer?: AttackableUnit): void {
     if (this.isDead) return;
 
     let combatText = new CombatText(this);
@@ -278,7 +280,7 @@ export default class AttackableUnit extends GameObject {
     );
   }
 
-  takeDamage(damage: number, attacker: any) {
+  takeDamage(damage: number, attacker?: AttackableUnit): void {
     if (this.isDead) return;
 
     // shields and damage modifiers get first look; they may eat all of it
@@ -298,7 +300,7 @@ export default class AttackableUnit extends GameObject {
     }
   }
 
-  die(deathData: { attacker?: any; reviveAfter: number }) {
+  die(deathData: UnitDeathData): void {
     this.deathData = deathData;
   }
 
@@ -354,11 +356,11 @@ export default class AttackableUnit extends GameObject {
     this.destination.set(this.position.x, this.position.y);
   }
 
-  hasBuff(BuffClass: any) {
-    return this.buffs.some((buff: any) => buff instanceof BuffClass);
+  hasBuff(BuffClass: Function): boolean {
+    return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
-  getCollideBoundingBox(): any {
+  getCollideBoundingBox() {
     let size = this.animatedValues.size;
     return new Circle({
       x: this.position.x,
@@ -368,7 +370,7 @@ export default class AttackableUnit extends GameObject {
     });
   }
 
-  getDisplayBoundingBox(): any {
+  getDisplayBoundingBox() {
     let size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
     return new Rectangle({
       x: this.position.x - size / 2,
