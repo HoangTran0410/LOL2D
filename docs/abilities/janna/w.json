@@ -1,0 +1,71 @@
+{
+  "adaptation": {
+    "descriptionVi": "Nội tại: Janna luôn được Ma Hoá và cộng 8% tốc độ di chuyển. Chủ động: Janna gửi một linh hồn gió vào mục tiêu, gây 20 sát thương phép và làm chậm 35% trong 2 giây.",
+    "gameplayNotes": [
+      "LOL2D thay 55-175 sát thương (+50% SMPT, +30% tốc độ chạy thêm) bằng 20 sát thương cố định, và dải làm chậm 20-36% (+6%/100 SMPT, giới hạn 99%) bằng một mức chậm cố định 35%; không áp dụng tăng tiến theo cấp hay SMPT. Nội tại 6-10% (+2%/100 SMPT) tốc độ chạy được rút gọn thành một mức cố định 8%.",
+      "Nội tại (Ma Hoá + tốc độ chạy) luôn bật, độc lập với hồi chiêu của chiêu chủ động, đúng như bản gốc — không tắt khi Zephyr đang hồi chiêu. Chủ động giữ nguyên việc nhắm mục tiêu đơn và làm chậm 2 giây từ dữ liệu PC nhập; tốc độ đạn 1600 (League) quy đổi thành 1600/60 đơn vị mỗi khung hình.",
+      "Nguồn cơ chế: revision 3971180, normalized content hash bc6cdb518e98817fc9870ef239d4dcb1b6c2f4af1edde82e5b1dc916c8aa09cc."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_janna_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1",
+    "sha1": "934583582048b0f4c6663d934c127a8d5fc4a9c0"
+  },
+  "champion": "Janna",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_janna_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1",
+        "sha1": "934583582048b0f4c6663d934c127a8d5fc4a9c0"
+      },
+      "fields": {
+        "casttime": "0.245",
+        "cooldown": "8 / 7.5 / 7 / 6.5 / 6",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Janna''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>.",
+          "text": "Passive: Janna is ghosted and gains &nbsp;bonus movement speed."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Janna''' sends an air elemental at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds, capped at 99%.",
+          "text": "Active: Janna sends an air elemental at the target enemy that deals magic damage and slows them for 2 seconds, capped at 99%."
+        },
+        "icon": "false",
+        "icon2": "Zephyr.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>6 / 7 / 8 / 9 / 10% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 2% per 100 AP)</span></dd></dl>",
+          "text": "Bonus Movement Speed:6 / 7 / 8 / 9 / 10% (+ 2% per 100 AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 85 / 115 / 145 / 175 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#9FFF4D; white-space:normal\">(+ 30% '''bonus''' movement speed)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>20 / 24 / 28 / 32 / 36% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 6% per 100 AP)</span></dd></dl>",
+          "text": "Magic Damage:55 / 85 / 115 / 145 / 175 (+ 50% AP) (+ 30% bonus movement speed)\nSlow:20 / 24 / 28 / 32 / 36% (+ 6% per 100 AP)"
+        },
+        "name": "Zephyr",
+        "notes": {
+          "raw": "* The maximum slow (99%) is reached with 1316.<small>67</small> / 1250 / 1183.<small>33</small> / 1116.<small>67</small> / 1050 ability power.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The maximum slow (99%) is reached with 1316.67 / 1250 / 1183.33 / 1116.67 / 1050 ability power.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Zephyr"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "bc6cdb518e98817fc9870ef239d4dcb1b6c2f4af1edde82e5b1dc916c8aa09cc",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Zephyr",
+    "revisionId": 3971180,
+    "sourceTimestamp": "2025-12-02T06:12:02Z"
+  }
+}

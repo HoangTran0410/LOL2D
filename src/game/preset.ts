@@ -193,7 +193,7 @@ export const SpellGroups: {
     name: 'Janna',
     image: 'champ_janna',
     background: null,
-    spells: [AllSpells.Janna_Q, AllSpells.Janna_R],
+    spells: [AllSpells.Janna_Q, AllSpells.Janna_W, AllSpells.Janna_E, AllSpells.Janna_R],
   },
   {
     name: 'Alistar',

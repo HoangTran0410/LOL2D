@@ -15,6 +15,7 @@ import AreaSpellObject from '../spellObjects/AreaSpellObject';
 import Ghost from './Ghost';
 import Heal from './Heal';
 import Ignite from './Ignite';
+import { notifyJannaControlLanded } from './Janna_E';
 
 // Exported so the suite asserts the knockback and channel-tick wiring, not a
 // copy of the numbers — retuning a value should not mean editing the test.
@@ -166,6 +167,8 @@ export default class Janna_R extends Spell {
       knockback.cancelable = false;
       knockback.stayAtDestination = false;
       target.addBuff(knockback);
+
+      notifyJannaControlLanded(this.owner, target);
     }
   }
 

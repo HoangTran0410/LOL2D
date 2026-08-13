@@ -7,6 +7,7 @@ import Airborne from '../buffs/Airborne';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import TrailSystem from '../helpers/TrailSystem';
 import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
+import { notifyJannaControlLanded } from './Janna_E';
 
 /** Pale sea-green, the colour of Janna's wind. */
 const WIND: [number, number, number] = [185, 243, 228];
@@ -228,6 +229,8 @@ export class Janna_Q_Object extends MissileSpellObject {
     const airborneBuff = new Airborne(this.getCurrentAirborneTime(), this.owner, enemy);
     airborneBuff.height = 25;
     enemy.addBuff(airborneBuff);
+
+    notifyJannaControlLanded(this.owner, enemy);
 
     // the gust that lifted them, so the knock-up is not a silent hop
     const gust = new Janna_Q_Gust(this.owner);

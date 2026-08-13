@@ -1,0 +1,71 @@
+{
+  "adaptation": {
+    "descriptionVi": "Nội tại: khi một kỹ năng của Janna làm chậm hoặc hất tung ít nhất một tướng địch, hoàn 20% hồi chiêu của Mắt Bão (một lần mỗi chu kỳ hồi chiêu). Chủ động: khiên cho tướng đồng minh (hoặc trụ, hoặc chính Janna) hấp thụ 30 sát thương trong 4 giây.",
+    "gameplayNotes": [
+      "LOL2D không có chỉ số sát thương đánh thường, nên phần thưởng cộng sát thương đánh thường (10-30, +10% SMPT) khi khiên còn hiệu lực của bản gốc bị bỏ, không quy đổi sang chỉ số khác — chỉ giữ lại khiên. 80-240 sát thương khiên (+55% SMPT) được đổi thành 30 sát thương cố định, phù hợp tướng có 100 máu cơ bản; không áp dụng tăng tiến theo cấp hay SMPT. Hồi chiêu 16-12s (theo cấp) được rút gọn còn 12s cố định.",
+      "Giữ nguyên nội tại hoàn 20% hồi chiêu khi một kỹ năng của Janna làm chậm/hất tung tướng địch, giới hạn một lần mỗi chu kỳ hồi chiêu; nối chiêu chủ động này với Q (hất tung), W (làm chậm) và R (đẩy lùi) qua notifyJannaControlLanded thay vì một sự kiện toàn cục, vì engine chưa phát sự kiện buff-add nào. Chủ động vẫn nhắm được cả trụ vì trụ cũng là AttackableUnit đồng minh hợp lệ.",
+      "Nguồn cơ chế: revision 3933659, normalized content hash d8f2de4a24b75a6e80fa097c8099565ab01504358da1c5a9d7129e9160d14570."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_janna_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Eye_of_the_Storm.png?3de43",
+    "sha1": "3c5f9bebd0bff48b5ed793165b4113af8495d4ad"
+  },
+  "champion": "Janna",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_janna_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Eye_of_the_Storm.png?3de43",
+        "sha1": "3c5f9bebd0bff48b5ed793165b4113af8495d4ad"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16 / 15 / 14 / 13 / 12",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> Whenever '''Janna's''' abilities <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span> at least one enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, 20% of ''Eye of the Storm's'' cooldown is refunded. This may occur once per spell cast.",
+          "text": "Passive: Whenever Janna's abilities slow or knock up at least one enemy champion, 20% of Eye of the Storm's cooldown is refunded. This may occur once per spell cast."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Janna''' grants the target allied champion or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turret\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turret]]</span>, or herself, a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 4 seconds.",
+          "text": "Active: Janna grants the target allied champion or turret, or herself, a shield for 4 seconds."
+        },
+        "description3": {
+          "raw": "While the shield holds, the target gains <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span>.",
+          "text": "While the shield holds, the target gains &nbsp;bonus attack damage."
+        },
+        "icon": "false",
+        "icon2": "Eye of the Storm.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>80 / 120 / 160 / 200 / 240 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>",
+          "text": "Shield Strength:80 / 120 / 160 / 200 / 240 (+ 55% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Damage:'''</span></dt><dd>10 / 15 / 20 / 25 / 30 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd></dl>",
+          "text": "Bonus Attack Damage:10 / 15 / 20 / 25 / 30 (+ 10% AP)"
+        },
+        "name": "Eye of the Storm",
+        "notes": {
+          "raw": "* ''Eye of the Storm'' has a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Forgiveness radius\">[[File:Targeting forgiveness.svg|20px|link=Targeting#Targeting_Forgiveness|An icon representing the keyword Targeting forgiveness]] [[:Targeting#Targeting_Forgiveness|forgiveness radius]]</span> of 175 units.\n* '''Janna''' receives kill credit on enemy champions that are killed by turrets shielded by ''Eye of the Storm''.\n* Allied turrets will benefit from the bonus attack damage when targeted by ''Eye of the Storm''.",
+          "text": "Eye of the Storm has a forgiveness radius of 175 units.\nJanna receives kill credit on enemy champions that are killed by turrets shielded by Eye of the Storm.\nAllied turrets will benefit from the bonus attack damage when targeted by Eye of the Storm."
+        },
+        "targeting": "Unit"
+      },
+      "name": "Eye of the Storm"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "d8f2de4a24b75a6e80fa097c8099565ab01504358da1c5a9d7129e9160d14570",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Eye_of_the_Storm",
+    "revisionId": 3933659,
+    "sourceTimestamp": "2025-07-19T20:45:25Z"
+  }
+}

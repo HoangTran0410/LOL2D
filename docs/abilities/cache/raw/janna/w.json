@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Janna/Zephyr",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Zephyr@@icon@@false@@icon2@@Zephyr.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Janna''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Janna''' sends an air elemental at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds, capped at 99%.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>6 / 7 / 8 / 9 / 10% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 2% per 100 AP)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 85 / 115 / 145 / 175 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#9FFF4D; white-space:normal\">(+ 30% '''bonus''' movement speed)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>20 / 24 / 28 / 32 / 36% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 6% per 100 AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@1600@@casttime@@0.<small>245</small>@@cost@@50 / 55 / 60 / 65 / 70@@cooldown@@8 / 7.<small>5</small> / 7 / 6.<small>5</small> / 6@@targeting@@Unit@@damagetype@@magic@@spellshield@@True@@projectile@@true@@notes@@\n* The maximum slow (99%) is reached with 1316.<small>67</small> / 1250 / 1183.<small>33</small> / 1116.<small>67</small> / 1050 ability power.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307560,
+                "revisions": [
+                  {
+                    "parentid": 3845911,
+                    "revid": 3971180,
+                    "timestamp": "2025-12-02T06:12:02Z"
+                  }
+                ],
+                "title": "Template:Data Janna/Zephyr"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3971180,
+      "timestamp": "2025-12-02T06:12:02Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a4a3a8b8cc5c46ceb6c7a69cb2eab73cca2444e839eee1fe839c059acf1faca0",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Zephyr",
+    "revisionId": 3971180,
+    "sourceTimestamp": "2025-12-02T06:12:02Z"
+  }
+}

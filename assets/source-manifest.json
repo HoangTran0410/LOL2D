@@ -202,6 +202,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Bandage_Toss.png?73ee9"
     },
     {
+      "contentHash": "6ce81c5ffd8d07d4760da9c46eb07d95280fb8d831b8d53d044dd9eb8bef68ab",
+      "fetchedAt": "2026-08-13T16:46:52.507Z",
+      "localAssetKey": "spell_anivia_e",
+      "localPath": "assets/images/spells/anivia_e.png",
+      "revisionId": 3958096,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Frostbite.png?a5539"
+    },
+    {
       "contentHash": "1761cd7907dec6b047ac1319c806b7ec41fbaa4dbb372f7b8fbbfdb7c63c2e3a",
       "fetchedAt": "2026-08-12T18:59:22.373Z",
       "localAssetKey": "spell_anivia_r",
@@ -258,6 +266,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Playful.png?4d944"
     },
     {
+      "contentHash": "ff12bbba6e954f118ff6006ffa7e23253bb3d2b6b45c6aca57582af1a573c1b5",
+      "fetchedAt": "2026-08-13T16:46:52.507Z",
+      "localAssetKey": "spell_janna_e",
+      "localPath": "assets/images/spells/janna_e.png",
+      "revisionId": 3933659,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Eye_of_the_Storm.png?3de43"
+    },
+    {
       "contentHash": "c0024c8fab783265d2b415f67453424f10623d11cfbab9ef319a8588642cf922",
       "fetchedAt": "2026-08-12T18:59:09.794Z",
       "localAssetKey": "spell_janna_q",
@@ -272,6 +288,14 @@
       "localPath": "assets/images/spells/janna_r.png",
       "revisionId": 3959332,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Monsoon.png?edd52"
+    },
+    {
+      "contentHash": "b0cf5ca030f711caaea20ef5bca51016e2e92a2bb4fcd89279a3ef7154c28f52",
+      "fetchedAt": "2026-08-13T16:46:52.507Z",
+      "localAssetKey": "spell_janna_w",
+      "localPath": "assets/images/spells/janna_w.png",
+      "revisionId": 3971180,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1"
     },
     {
       "contentHash": "33a3fd80347c41fd09848ee1a5357c0a34dd0c1a6293d2faff2db77a41494fcb",
@@ -296,6 +320,14 @@
       "localPath": "assets/images/spells/lux_w.png",
       "revisionId": 3992656,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_Prismatic_Barrier.png?f9277"
+    },
+    {
+      "contentHash": "027e2d0051dd7c236baa720eb2b00cca73edf689e4703062adeb0dad94e9525b",
+      "fetchedAt": "2026-08-13T16:46:52.507Z",
+      "localAssetKey": "spell_malphite_e",
+      "localPath": "assets/images/spells/malphite_e.png",
+      "revisionId": 3985874,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Ground_Slam.png?f1044"
     },
     {
       "contentHash": "50186d055900490c772881d72730ca6a0be4ba59447d2808ff96d252578d0d32",

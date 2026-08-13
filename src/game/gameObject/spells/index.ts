@@ -65,6 +65,8 @@ export { default as Morgana_Q } from './Morgana_Q';
 export { default as Morgana_E } from './Morgana_E';
 export { default as Janna_Q } from './Janna_Q';
 export { default as Janna_R } from './Janna_R';
+export { default as Janna_W } from './Janna_W';
+export { default as Janna_E } from './Janna_E';
 export { default as Alistar_W } from './Alistar_W';
 export { default as Nocturne_R } from './Nocturne_R';
 export { default as Twitch_Q } from './Twitch_Q';
