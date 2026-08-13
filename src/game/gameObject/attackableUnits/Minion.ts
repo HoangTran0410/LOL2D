@@ -360,6 +360,10 @@ export default class Minion extends AttackableUnit {
     pop();
 
     this.drawSwing();
+    // buffs land on minions like they do on anyone else — a stunned minion with
+    // no visual reads as a stuck one. Free when the list is empty, which it
+    // usually is
+    this.drawBuffs();
     this.drawHealthBar();
   }
 

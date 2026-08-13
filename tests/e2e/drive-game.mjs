@@ -48,6 +48,16 @@ const shutdown = async browser => {
   server?.kill('SIGTERM');
 };
 
+// A dev server left running past a failed run holds its port, and the next run
+// then drives whatever that stale server is serving.
+process.on('exit', () => server?.kill('SIGTERM'));
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    server?.kill('SIGTERM');
+    process.exit(1);
+  });
+}
+
 // Poll for a module this checkout has and an older one does not, rather than
 // trusting the banner: vite answers unknown paths with the index.html fallback,
 // so a wrong-root server looks healthy right up until an import returns HTML.
