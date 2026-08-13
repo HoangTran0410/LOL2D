@@ -4,41 +4,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-LOL2D is a fan-made, browser-based 2D game inspired by League of Legends. It runs entirely in the browser using p5.js for rendering. There is no build system or test framework — the project loads dependencies from CDNs and serves static files directly.
+LOL2D is a fan-made, browser-based 2D game inspired by League of Legends. It runs entirely in the browser: p5.js draws the canvas, Vue 3 drives the HUD, all TypeScript, bundled with Vite. Tests run under Vitest, plus Playwright scripts that drive the real game in Chrome.
+
+p5 itself is the one exception to the bundle: `index.html` loads it from a CDN `<script>` tag because the game uses p5's **global mode**, so `createVector`, `push`, `fill` and the rest are globals with no import. See the comment at the top of `src/main.ts` — all code touching a p5 global must run inside `setup()`, never at module eval time.
 
 ## Running the Project
 
-Serve the project with any static file server, then open `index.html` in a browser:
-
 ```bash
-npx serve .
-# or
-python3 -m http.server 8080
+npm install
+npm run dev      # Vite dev server, http://localhost:5173
+npm run verify   # everything CI runs — do this before declaring work done
 ```
 
+`npm run verify` = `assets:check` + `ability:check` + `typecheck` + `typecheck:core` + full Vitest suite + `build`.
+
 - **Menu** → Click "Chơi" to start the game
-- **In-game controls**: Right-click to move, number keys `1-6` for spells, `Space` to toggle camera follow, `Esc` to return to menu
+- **In-game controls**: Right-click to move, `A` `Q` `W` `E` `R` for abilities and `D` `F` for summoner spells (see `SpellHotKeys` in `src/game/constants.ts`), `Space` to toggle camera follow, `Esc` to return to menu
 
 ## Code Style
 
-- **Formatting**: Prettier (config in `.prettierrc` — 2 spaces, single quotes, trailing commas)
-- **No build tools**: All JS is ES module, loaded via `<script type="module">` from CDN
-- **Polyfills**: Array prototype methods (`map`, `filter`, `forEach`, etc.) are overridden in `src/app.js` with optimized versions from `src/utils/optimized.utils.js`
+- **Formatting**: Prettier (config in `.prettierrc` — 2 spaces, single quotes, trailing commas, 100 columns). Several files predate it and fail `prettier --check` on `main`; do not run `--write` across them as a side effect of an unrelated change.
+- **Polyfills**: Array prototype methods (`map`, `filter`, `forEach`, etc.) are overridden in `src/main.ts` with optimized versions from `src/utils/optimized.utils.ts`, before p5 globals are imported.
+- **Tuning values**: exported as constants from the spell file so tests import them instead of copying numbers. Retuning damage must not mean editing a test.
 
 ## Architecture
 
 ### Scene Flow
 `LoadingScene` → `MenuScene` → `GameScene`
 
-`src/sketch.js` initializes the p5 sketch and `SceneManager`. `src/app.js` overrides global Array methods before p5 globals are imported.
+`src/main.ts` is the only entry point: it installs the Array polyfills, assigns `window.setup`/`window.draw` to boot p5, and creates the `SceneManager`. In dev builds it also exposes the scene manager as `window.__lol2d`, which is how the Playwright scripts in `tests/e2e/` reach the running game.
 
 ### Core Classes (`src/game/`)
 
 | Class | File | Role |
 |---|---|---|
-| `Game` | `Game.js` | Main game loop, owns camera/objectManager/terrainMap/fogOfWar |
-| `ObjectManager` | `managers/ObjectManager.js` | Updates and draws all game objects; uses quadtree for spatial queries |
-| `SceneManager` | `managers/SceneManager.js` | Custom scene manager (not p5's), routes p5 events to active scene |
+| `Game` | `Game.ts` | Main game loop, owns camera/objectManager/terrainMap/fogOfWar |
+| `ObjectManager` | `managers/ObjectManager.ts` | Updates and draws all game objects; uses quadtree for spatial queries |
+| `SceneManager` | `managers/SceneManager.ts` | Custom scene manager (not p5's), routes p5 events to active scene |
+| `MinionSpawner` | `managers/MinionSpawner.ts` | Wave clock for both bases; owns the live minion cap |
 
 ### Game Object Hierarchy
 
@@ -71,7 +74,7 @@ coordinates are checked against the map's wall polygons by
 
 ### Spells (`src/game/gameObject/spells/`)
 
-Each spell is a separate file exporting a class extending `Spell`. `Spell` manages cooldown state machine (READY → COOLDOWN → READY). Spell files reference their champion prefix (e.g., `Ahri_Q.js`, `Yasuo_R.js`). Summoner spells (`Flash`, `Ghost`, `Heal`, `StealthWard`) are at the root of the spells folder.
+Each spell is a separate file exporting a class extending `Spell`. `Spell` manages cooldown state machine (READY → COOLDOWN → READY). Spell files reference their champion prefix (e.g., `Ahri_Q.ts`, `Yasuo_R.ts`). Summoner spells (`Flash`, `Ghost`, `Heal`, `StealthWard`) are at the root of the spells folder.
 
 **Adding a new spell**: read `docs/ADDING_SPELLS.md` first. It covers the three registration points, the `MissileSpellObject` base every skillshot should extend, the buff catalogue and its mandatory `stackId` rule, the engine traps `tsc` cannot catch (dead status flags, double-updated particle systems, the null-owner HUD path), and how to verify a spell by driving the real game.
 
@@ -79,7 +82,7 @@ Each spell is a separate file exporting a class extending `Spell`. `Spell` manag
 
 Each buff extends the base `Buff` class and controls `statusFlagsToEnable`/`statusFlagsToDisable` to apply crowd control effects via `StatusFlags` and `ActionState`.
 
-### Stats System (`Stats.js`, `Stat.js`)
+### Stats System (`Stats.ts`)
 
 Stats use a base + bonus modifier pattern. `ActionState` flags are updated by both status effects and buff system.
 
@@ -89,19 +92,24 @@ Key enums: `ActionState` (movement/combat flags), `StatusFlags` (crowd control),
 
 ### Map & Collision
 
-- `TerrainMap.js` stores map polygon data and handles terrain collision
-- `FogOfWar.js` renders fog of war overlay
-- `Camera.js` handles world-to-screen coordinate transformation
-- QuadTree-based collision in `libs/quadtree.js`; collision algorithms in `libs/detect-collisions.js`
+- `TerrainMap.ts` stores map polygon data and handles terrain collision
+- `FogOfWar.ts` renders fog of war overlay
+- `Camera.ts` handles world-to-screen coordinate transformation
+- QuadTree-based collision in `libs/quadtree.ts`; collision algorithms in `libs/detect-collisions.ts`
 
 ## Tools
 
-- **`tools/shape-maker/`** — Standalone p5 app for creating polygon point arrays (drag to move points, `a` add, `d` delete, `e` export, `i` import). Output is pasted into `TerrainMap.js`
+- **`tools/shape-maker/`** — Standalone p5 app for creating polygon point arrays (drag to move points, `a` add, `d` delete, `e` export, `i` import). Output is pasted into `TerrainMap.ts`
 - **`tools/map-editor/`** — External map editor (linked in its README)
 
 ## Asset Organization
 
 - `assets/images/champions/` — Champion avatar sprites and backgrounds
 - `assets/images/monsters/` — Monster sprites
-- `assets/json/summoner_map.json` — Summoner spell data
-- All assets loaded by `AssetManager` in `src/managers/AssetManager.js`
+- `assets/images/spells/` — Ability icons; `assets/images/buffs/` — crowd-control icons
+- `assets/json/summoner_map.json` — the map itself: `wall`, `bush` and `water` polygons plus the two turret rows (`turret1`, `turret2`). Not summoner spell data.
+- All assets loaded by `AssetManager` in `src/managers/AssetManager.ts`
+
+`npm run assets:generate` walks `assets/` and regenerates `src/generated/assetManifest.ts` with a typed `AssetKey` union, so a mistyped asset name is a compile error rather than a broken image at runtime. Never hand-edit the generated file; add the image and re-run the script. `assets:check` fails the build when the two are out of sync.
+
+Ability data (damage, cooldowns, ranges, icons) is imported from the LoL Wiki by `scripts/wiki/import-abilities.mjs` into `docs/abilities/<champion>/<slot>.json`, with provenance in `assets/source-manifest.json`.
