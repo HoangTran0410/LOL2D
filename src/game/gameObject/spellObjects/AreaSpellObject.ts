@@ -1,47 +1,42 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import type { Vec2 } from '../../spell/runtime/types';
-import SpellObject, { type SpellOwner } from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import SpellObject from '../SpellObject';
+import AttackableUnit from '../attackableUnits/AttackableUnit';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 
-export interface AreaTarget {
-  readonly position: Vec2;
-  readonly collisionRadius: number;
-}
+export type AreaTarget = AttackableUnit;
 
-interface AreaOptions<TTarget extends AreaTarget> {
-  candidates?: () => Iterable<TTarget>;
-  candidateFilter?: (target: TTarget) => boolean;
+interface AreaOptions {
+  candidates?: () => Iterable<AttackableUnit>;
+  candidateFilter?: (target: AttackableUnit) => boolean;
   tickEveryMs?: number;
   durationMs?: number;
   radiusAt?: (elapsedMs: number) => number;
-  onEnter?: (target: TTarget) => void;
-  onTick?: (target: TTarget) => void;
-  onExit?: (target: TTarget) => void;
+  onEnter?: (target: AttackableUnit) => void;
+  onTick?: (target: AttackableUnit) => void;
+  onExit?: (target: AttackableUnit) => void;
 }
 
-export default class AreaSpellObject<
-  TTarget extends AreaTarget = AreaTarget,
-  TOwner extends SpellOwner = AttackableUnit,
-> extends SpellObject<TOwner> {
+export default class AreaSpellObject extends SpellObject {
   readonly center: Vec2;
-  readonly members = new Set<TTarget>();
+  readonly members = new Set<AttackableUnit>();
   radius: number;
   elapsedMs = 0;
   private tickAccumulatorMs = 0;
-  private readonly candidates?: () => Iterable<TTarget>;
-  private readonly candidateFilter: (target: TTarget) => boolean;
+  private readonly candidates?: () => Iterable<AttackableUnit>;
+  private readonly candidateFilter: (target: AttackableUnit) => boolean;
   private readonly tickEveryMs?: number;
   private readonly durationMs?: number;
   private readonly radiusAt?: (elapsedMs: number) => number;
-  private readonly enter: (target: TTarget) => void;
-  private readonly tick: (target: TTarget) => void;
-  private readonly exit: (target: TTarget) => void;
+  private readonly enter: (target: AttackableUnit) => void;
+  private readonly tick: (target: AttackableUnit) => void;
+  private readonly exit: (target: AttackableUnit) => void;
 
   constructor(
-    owner: TOwner,
+    owner: AttackableUnit,
     center: Vec2,
     radius: number,
-    options: AreaOptions<TTarget> = {}
+    options: AreaOptions = {}
   ) {
     super(owner);
     this.validateInterval('tickEveryMs', options.tickEveryMs);
@@ -67,7 +62,7 @@ export default class AreaSpellObject<
     this.elapsedMs += elapsed;
     if (this.radiusAt) this.radius = Math.max(0, this.radiusAt(this.elapsedMs));
 
-    const current = new Set<TTarget>();
+    const current = new Set<AttackableUnit>();
     for (const target of this.queryCandidates()) {
       if (current.has(target) || !this.candidateFilter(target) || !this.contains(target)) continue;
       current.add(target);
@@ -106,18 +101,19 @@ export default class AreaSpellObject<
     });
   }
 
-  private contains(target: TTarget): boolean {
+  private contains(target: AttackableUnit): boolean {
     return Math.hypot(
       target.position.x - this.center.x,
       target.position.y - this.center.y
     ) <= this.radius + target.collisionRadius;
   }
 
-  private queryCandidates(): Iterable<TTarget> {
+  private queryCandidates(): Iterable<AttackableUnit> {
     if (this.candidates) return this.candidates();
     return this.game.objectManager.queryObjects({
       area: new Circle({ x: this.center.x, y: this.center.y, r: this.radius }),
-    }) as unknown as TTarget[];
+      filters: [PredefinedFilters.type(AttackableUnit)],
+    });
   }
 
   private validateInterval(field: string, value: number | undefined): void {

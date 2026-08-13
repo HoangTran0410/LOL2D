@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
-import Buff from '../../../src/game/gameObject/Buff';
-import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Buff, { type BuffConstructor } from '../../../src/game/gameObject/Buff';
+import AttackableUnit, { type HealSource } from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
 import Nearsight, { type NearsightGameContext } from '../../../src/game/gameObject/buffs/Nearsight';
 import BuffAddType from '../../../src/game/enums/BuffAddType';
@@ -27,6 +28,7 @@ import statAmpSource from '../../../src/game/gameObject/buffs/StatAmp.ts?raw';
 import stunSource from '../../../src/game/gameObject/buffs/Stun.ts?raw';
 import trueSightSource from '../../../src/game/gameObject/buffs/TrueSight.ts?raw';
 import untargetableSource from '../../../src/game/gameObject/buffs/Untargetable.ts?raw';
+import fountainSource from '../../../src/game/gameObject/structures/Fountain.ts?raw';
 
 const scopedSources = [
   buffSource,
@@ -49,6 +51,7 @@ const scopedSources = [
   stunSource,
   trueSightSource,
   untargetableSource,
+  fountainSource,
 ];
 
 class TrackingBuff extends Buff {
@@ -150,14 +153,35 @@ describe('buff and attackable unit type boundary', () => {
     expectTypeOf(buff.sourceUnit).toEqualTypeOf<AttackableUnit>();
     expectTypeOf(buff.targetUnit).toEqualTypeOf<AttackableUnit>();
     expectTypeOf(target.buffs).toEqualTypeOf<Buff[]>();
+    expectTypeOf(TrackingBuff).toMatchTypeOf<BuffConstructor>();
     expect(buff.game).toBe(game);
+    expect(buff.stackId).toBe(TrackingBuff);
+    expect(target.hasBuff(TrackingBuff)).toBe(false);
 
     if (false) {
       // @ts-expect-error Buff source must be an attackable unit.
       new TrackingBuff(100, new Date(), target);
       // @ts-expect-error Buff target must be an attackable unit.
       new TrackingBuff(100, source, new Date());
+      // @ts-expect-error Buff lookup requires a constructable Buff class.
+      target.hasBuff(() => true);
     }
+  });
+
+  it('accepts a fountain as an honest heal source', () => {
+    const game = createGame();
+    const target = new AttackableUnit({ game });
+    const fountain = new Fountain({
+      game,
+      preset: { name: 'Blue Fountain', x: 0, y: 0, r: 100 },
+    });
+    const source: HealSource = fountain;
+
+    target.stats.health.baseValue = 50;
+    target.takeHeal(10, source);
+
+    expect(target.stats.health.baseValue).toBe(60);
+    expect(fountain.championsInside()).toEqual([]);
   });
 
   it('renews a matching stack without replacing its lifecycle', () => {

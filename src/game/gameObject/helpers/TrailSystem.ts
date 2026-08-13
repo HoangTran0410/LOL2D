@@ -1,5 +1,5 @@
 import { Rectangle } from '../../../libs/quadtree';
-import SpellObject, { type SpellOwner } from '../SpellObject';
+import GameObject from '../GameObject';
 
 interface TrailParticle {
   pos: p5.Vector;
@@ -11,10 +11,11 @@ interface TrailSystemOptions {
   trailColor?: string;
   trailSize?: number;
   trailLifeTime?: number;
-  owner?: any;
+  owner?: GameObject;
 }
 
-export default class TrailSystem extends SpellObject<SpellOwner | undefined> {
+export default class TrailSystem extends GameObject {
+  owner?: GameObject;
   trails: TrailParticle[] = [];
   _cachedBB: Rectangle | null = null;
 
@@ -32,7 +33,12 @@ export default class TrailSystem extends SpellObject<SpellOwner | undefined> {
       owner,
     } = options;
 
-    super(owner);
+    super({
+      game: owner?.game,
+      position: owner?.position.copy(),
+      teamId: owner?.teamId,
+    });
+    this.owner = owner;
     this.maxLength = maxLength;
     this.trailColor = trailColor;
     this.trailSize = trailSize;

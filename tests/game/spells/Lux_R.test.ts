@@ -119,7 +119,10 @@ describe('Lux R', () => {
 
     expect(disposeCastBar).toHaveBeenCalledOnce();
 
-    const beam = added.find(object => object instanceof BeamSpellObject) as BeamSpellObject<TestTarget>;
+    const beam = added.find(
+      (object): object is BeamSpellObject => object instanceof BeamSpellObject
+    );
+    if (!beam) throw new Error('Lux R must create its beam.');
     expect(beam.geometry).toEqual({
       start: { x: 0, y: 0 },
       end: { x: 3400, y: 0 },

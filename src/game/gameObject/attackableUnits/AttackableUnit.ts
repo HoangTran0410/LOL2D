@@ -9,6 +9,7 @@ import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
 import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
 import type Buff from '../Buff';
+import type { BuffConstructor } from '../Buff';
 
 export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
   game: GameObjectRuntimeContext;
@@ -20,6 +21,8 @@ export interface UnitDeathData {
   attacker?: AttackableUnit;
   reviveAfter: number;
 }
+
+export type HealSource = GameObject;
 
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
@@ -200,8 +203,8 @@ export default class AttackableUnit extends GameObject {
 
     // group by stackId when a buff declares one, so two spells applying the same
     // generic class (StatAmp, DamageOverTime) do not evict each other
-    const stackKey = buff.stackId ?? buff.constructor;
-    const preBuffs = this.buffs.filter(_buff => (_buff.stackId ?? _buff.constructor) === stackKey);
+    const stackKey = buff.stackId;
+    const preBuffs = this.buffs.filter(_buff => _buff.stackId === stackKey);
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -265,7 +268,7 @@ export default class AttackableUnit extends GameObject {
     this.setStatus(StatusFlags.None, true);
   }
 
-  takeHeal(heal: number, _healer?: AttackableUnit): void {
+  takeHeal(heal: number, _healer?: HealSource): void {
     if (this.isDead) return;
 
     let combatText = new CombatText(this);
@@ -356,7 +359,7 @@ export default class AttackableUnit extends GameObject {
     this.destination.set(this.position.x, this.position.y);
   }
 
-  hasBuff(BuffClass: Function): boolean {
+  hasBuff(BuffClass: BuffConstructor): boolean {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 

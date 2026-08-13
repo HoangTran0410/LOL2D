@@ -181,7 +181,10 @@ describe('Janna R', () => {
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
-    const area = added.find(object => object instanceof AreaSpellObject) as AreaSpellObject<TestUnit>;
+    const area = added.find(
+      (object): object is AreaSpellObject => object instanceof AreaSpellObject
+    );
+    if (!area) throw new Error('Janna R must create its channel area.');
     interrupt(owner);
     spell.update();
 

@@ -1,12 +1,20 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { Rectangle } from '../../../src/libs/quadtree';
 import GameObject from '../../../src/game/gameObject/GameObject';
-import type { GameObjectGameContext } from '../../../src/game/gameObject/GameObject';
+import type { GameObjectGameContext, GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
 import SpellObject from '../../../src/game/gameObject/SpellObject';
 import ObjectManager, { PredefinedFilters } from '../../../src/game/managers/ObjectManager';
+import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import CombatText from '../../../src/game/gameObject/helpers/CombatText';
+import ParticleSystem from '../../../src/game/gameObject/helpers/ParticleSystem';
+import TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
+import EventManager from '../../../src/managers/EventManager';
 import gameObjectSource from '../../../src/game/gameObject/GameObject.ts?raw';
 import spellObjectSource from '../../../src/game/gameObject/SpellObject.ts?raw';
 import objectManagerSource from '../../../src/game/managers/ObjectManager.ts?raw';
+import particleSystemSource from '../../../src/game/gameObject/helpers/ParticleSystem.ts?raw';
+import trailSystemSource from '../../../src/game/gameObject/helpers/TrailSystem.ts?raw';
 
 const scopedSources = [gameObjectSource, spellObjectSource, objectManagerSource];
 
@@ -20,10 +28,34 @@ class TestObject extends GameObject {
   update() { this.updates += 1; }
 }
 
+class TestVector {
+  constructor(public x = 0, public y = 0) {}
+  copy() { return new TestVector(this.x, this.y); }
+  set(x: number, y: number) { this.x = x; this.y = y; return this; }
+}
+
+function createGame(): GameObjectRuntimeContext {
+  const camera = { getBoundingBox: () => new Rectangle({ x: -50, y: -50, w: 100, h: 100 }) };
+  const objectManager = new ObjectManager({ mapSize: 100, camera });
+  let player: AttackableUnit | undefined;
+  return {
+    mapSize: 100,
+    camera,
+    objectManager,
+    eventManager: new EventManager(),
+    get player() {
+      if (!player) player = new AttackableUnit({ game: this });
+      return player;
+    },
+    randomSpawnPoint: () => createVector(),
+    createSpellContext: () => undefined,
+  };
+}
+
 describe('base object type boundary', () => {
   beforeEach(() => {
     vi.stubGlobal('window', globalThis);
-    vi.stubGlobal('createVector', (x = 0, y = 0) => ({ x, y, set: vi.fn() }));
+    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
   });
 
   afterEach(() => { vi.unstubAllGlobals(); });
@@ -34,11 +66,22 @@ describe('base object type boundary', () => {
     }
   });
 
-  it('keeps optional base ownership honest', () => {
+  it('keeps base game ownership optional but spell ownership concrete', () => {
     expect(gameObjectSource).not.toMatch(/game!/);
     expect(spellObjectSource).not.toMatch(/owner!/);
+    expect(spellObjectSource).not.toContain('class SpellObject<');
+    expect(spellObjectSource).toContain('owner: AttackableUnit');
     expect(new GameObject().game).toBeUndefined();
-    expect(new SpellObject<undefined>(undefined).owner).toBeUndefined();
+
+    const owner = new AttackableUnit({ game: createGame() });
+    expect(new SpellObject(owner).owner).toBe(owner);
+  });
+
+  it('keeps ownerless particle and trail effects outside the spell hierarchy', () => {
+    expect(particleSystemSource).toContain('extends GameObject');
+    expect(trailSystemSource).toContain('extends GameObject');
+    expect(new ParticleSystem({ isDeadFn: () => true }).owner).toBeUndefined();
+    expect(new TrailSystem().owner).toBeUndefined();
   });
 
   it('accepts only the base game context shape', () => {
@@ -94,11 +137,12 @@ describe('base object type boundary', () => {
       filters: [PredefinedFilters.id('first'), PredefinedFilters.type(TestObject)],
       queryByDisplayBoundingBox: true,
     });
+    const lateTyped: TestObject[] = lateGuard;
     const broad = manager.queryObjects({ filters: [PredefinedFilters.id('first')] });
 
     expectTypeOf(broad).toEqualTypeOf<GameObject[]>();
     expectTypeOf(typed).toEqualTypeOf<TestObject[]>();
-    expectTypeOf(lateGuard).toEqualTypeOf<GameObject[]>();
+    expect(lateTyped).toEqual([first]);
 
     expect(found).toEqual([first]);
     expect(typed).toEqual([first, second]);
@@ -112,5 +156,35 @@ describe('base object type boundary', () => {
     expect(first.updates).toBe(2);
     expect(first.removed).toBe(1);
     expect(manager.objects).toEqual([second]);
+  });
+
+  it('keeps the pre-existing no-area filtered query behavior empty', () => {
+    const manager = new ObjectManager({
+      mapSize: 100,
+      camera: { getBoundingBox: () => new Rectangle({ x: 0, y: 0, w: 0, h: 0 }) },
+    });
+    manager.objects = [new TestObject({ id: 'first' })];
+
+    expect(manager.queryObjects({ filters: [PredefinedFilters.id('first')] })).toEqual([]);
+  });
+
+  it('draws champions in slot four before combat text in slot five', () => {
+    const game = createGame();
+    const champion = new Champion({ game });
+    const combatText = new CombatText(champion);
+    const order: string[] = [];
+    champion.draw = () => { order.push('champion'); };
+    combatText.draw = () => { order.push('combat-text'); };
+    champion.getDisplayBoundingBox = () =>
+      new Rectangle({ x: -5, y: -5, w: 10, h: 10, data: champion });
+    combatText.getDisplayBoundingBox = () =>
+      new Rectangle({ x: -5, y: -5, w: 10, h: 10, data: combatText });
+    game.objectManager.objects = [combatText, champion];
+    game.objectManager._objectsTree.insert(combatText.getDisplayBoundingBox());
+    game.objectManager._objectsTree.insert(champion.getDisplayBoundingBox());
+
+    game.objectManager.draw();
+
+    expect(order).toEqual(['champion', 'combat-text']);
   });
 });

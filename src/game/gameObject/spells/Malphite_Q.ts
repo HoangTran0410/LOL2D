@@ -3,7 +3,7 @@ import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 import TrailSystem from '../helpers/TrailSystem';
@@ -14,31 +14,8 @@ import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 
 type MalphiteTarget = AttackableUnit;
 
-const isMalphiteTarget = (target: unknown): target is MalphiteTarget => {
-  if (typeof target !== 'object' || target === null) return false;
-  const candidate = target as {
-    position?: { copy?: unknown };
-    collisionRadius?: unknown;
-    teamId?: unknown;
-    targetable?: unknown;
-    willDraw?: unknown;
-    isDead?: unknown;
-    toRemove?: unknown;
-    stats?: { speed?: { value?: unknown } };
-    takeDamage?: unknown;
-    addBuff?: unknown;
-  };
-  return typeof candidate.position?.copy === 'function' &&
-    typeof candidate.collisionRadius === 'number' &&
-    candidate.teamId !== undefined &&
-    candidate.targetable !== false &&
-    typeof candidate.willDraw === 'boolean' &&
-    !candidate.isDead &&
-    !candidate.toRemove &&
-    typeof candidate.stats?.speed?.value === 'number' &&
-    typeof candidate.takeDamage === 'function' &&
-    typeof candidate.addBuff === 'function';
-};
+const isMalphiteTarget = (target: unknown): target is MalphiteTarget =>
+  target instanceof AttackableUnit && target.targetable && !target.toRemove;
 
 export default class Malphite_Q extends Spell {
   image = AssetManager.get('spell_malphite_q');
@@ -130,7 +107,7 @@ export default class Malphite_Q extends Spell {
   }
 }
 
-export class Malphite_Q_Object extends HomingMissileSpellObject<MalphiteTarget> {
+export class Malphite_Q_Object extends HomingMissileSpellObject {
   image = AssetManager.get('spell_malphite_q');
   speed = 1_200 / 60;
   size = 24;

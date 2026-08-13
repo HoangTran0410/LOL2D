@@ -17,6 +17,7 @@
     "src/game/gameObject/attackableUnits/DummyChampion.ts",
     "src/game/gameObject/attackableUnits/Monster.ts",
     "src/game/gameObject/structures/Turret.ts",
+    "src/game/gameObject/structures/Fountain.ts",
     "src/game/gameObject/buffs/**/*.ts",
     "src/game/managers/ObjectManager.ts",
     "src/game/gameObject/spells/Lux_R.ts",

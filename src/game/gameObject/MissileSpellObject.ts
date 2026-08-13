@@ -2,8 +2,7 @@ import { Circle, Rectangle } from '../../libs/quadtree';
 import VectorUtils from '../../utils/vector.utils';
 import { PredefinedFilters } from '../managers/ObjectManager';
 import SpellObject from './SpellObject';
-import type { SpellOwner } from './SpellObject';
-import type AttackableUnit from './attackableUnits/AttackableUnit';
+import AttackableUnit from './attackableUnits/AttackableUnit';
 import TrailSystem from './helpers/TrailSystem';
 
 /**
@@ -18,8 +17,7 @@ import TrailSystem from './helpers/TrailSystem';
  * Declare `trailSystem` in the subclass, not here: subclass field initializers run
  * after this class's, so a trail built here could not read the subclass `size`.
  */
-export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUnit> extends SpellObject<TOwner> {
-  declare owner: TOwner;
+export default class MissileSpellObject extends SpellObject {
   isMissile = true;
 
   declare position: p5.Vector;
@@ -28,7 +26,7 @@ export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUn
   size = 20;
 
   /** Units already hit — excluded from later queries so one unit is hit once. */
-  hitTargets: any[] = [];
+  hitTargets: AttackableUnit[] = [];
   /** Stops hitting after this many distinct units. Infinity pierces, 0 never collides. */
   maxHitCount = Infinity;
   /** False for missiles that keep flying after reaching `destination`. */
@@ -39,7 +37,7 @@ export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUn
   /** Assigned by subclasses that want a trail; registered automatically. */
   trailSystem: TrailSystem | null = null;
 
-  constructor(owner: TOwner) {
+  constructor(owner: AttackableUnit) {
     super(owner);
     this.position = owner.position.copy();
     this.destination = owner.position.copy();
@@ -89,7 +87,7 @@ export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUn
     }
   }
 
-  queryEnemies(): any[] {
+  queryEnemies(): AttackableUnit[] {
     return this.owner.game.objectManager.queryObjects?.({
       area: new Circle({
         x: this.position.x,
@@ -124,7 +122,7 @@ export default class MissileSpellObject<TOwner extends SpellOwner = AttackableUn
   /** Homing missiles stop after arrival; ordinary missiles finish their terminal hooks. */
   protected shouldStopAfterArrival(): boolean { return false; }
   onArrive(): void {}
-  onHit(_enemy: any): void {}
+  onHit(_enemy: AttackableUnit): void {}
   getTrailPosition(): p5.Vector {
     return this.position;
   }

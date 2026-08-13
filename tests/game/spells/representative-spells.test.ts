@@ -19,6 +19,7 @@ import type {
   ActivationPattern,
   CastContext,
 } from '../../../src/game/spell/runtime/types';
+import { createGame, createUnit } from '../spell/fixtures';
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -93,19 +94,6 @@ const makeOwner = (mana = 200) => {
   };
   return owner;
 };
-
-const makeTarget = () => ({
-  position: new TestVector(100, 0),
-  collisionRadius: 10,
-  teamId: 'red',
-  isDead: false,
-  toRemove: false,
-  willDraw: true,
-  targetable: true,
-  stats: { speed: { value: 10 } },
-  takeDamage: vi.fn(),
-  addBuff: vi.fn(),
-});
 
 class InspectableLuxR extends Lux_R {
   get activationPattern(): ActivationPattern { return this.castSpec.activation; }
@@ -246,13 +234,16 @@ describe('representative spells through public commands', () => {
   });
 
   it('rejects an absent UNIT target and commits only when a target releases', () => {
-    const owner = makeOwner();
+    const game = createGame();
+    const owner = createUnit(game, 0, 'blue');
+    game.setPlayer(owner);
+    owner.stats.mana.baseValue = 200;
     const spell = new Malphite_Q(owner);
     expect(spell.press(context(owner))).toBe(false);
     expect(owner.stats.mana.value).toBe(200);
     expect(spell.currentCooldown).toBe(0);
 
-    const target = makeTarget();
+    const target = createUnit(game, 100, 'red');
     expect(spell.press(context(owner, target))).toBe(true);
     expect(spell.state).toBe('CASTING');
     expect(owner.stats.mana.value).toBe(200);

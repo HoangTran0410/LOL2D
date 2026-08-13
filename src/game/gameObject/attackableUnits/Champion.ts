@@ -10,6 +10,7 @@ import Root from '../buffs/Root';
 import Silence from '../buffs/Silence';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
+import type { BuffStackId } from '../Buff';
 
 export interface ChampionPresetData {
   name?: string;
@@ -147,10 +148,10 @@ export default class Champion extends AttackableUnit {
     // of icons straight off the side of the screen.
     // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
     // drew every buff twice, and inside this block's tint().)
-    const buffCounts = new Map<Function | string, { image: AssetHandle; count: number }>();
+    const buffCounts = new Map<BuffStackId, { image: AssetHandle; count: number }>();
     for (const buff of this.buffs) {
       if (!buff.image) continue;
-      const key = buff.stackId ?? buff.constructor;
+      const key = buff.stackId;
       const row = buffCounts.get(key);
       if (row) row.count++;
       else buffCounts.set(key, { image: buff.image, count: 1 });

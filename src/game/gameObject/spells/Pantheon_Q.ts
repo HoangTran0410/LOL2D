@@ -1,6 +1,6 @@
 import AssetManager from '../../../managers/AssetManager';
 import type { CancelReason, CastContext, CastSpec, Vec2 } from '../../spell/runtime/types';
-import BeamSpellObject, { type BeamTarget } from '../spellObjects/BeamSpellObject';
+import BeamSpellObject from '../spellObjects/BeamSpellObject';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
@@ -12,11 +12,9 @@ const HOLD_THRESHOLD_MS = 350;
 const MAX_CHARGE_MS = 4_000;
 const RANGE = 1_200;
 
-interface SpearTarget extends BeamTarget {
-  readonly stats: { health: { value: number }; maxHealth: { value: number } };
+type SpearTarget = AttackableUnit & {
   readonly unitType?: 'minion';
-  takeDamage(damage: number, owner: unknown): void;
-}
+};
 
 const damageMultiplier = (target: SpearTarget): number =>
   target instanceof Monster ? 0.8 : target.unitType === 'minion' ? 0.7 : 1;
@@ -97,7 +95,7 @@ export default class Pantheon_Q extends Spell {
   }
 
   private createThrust(start: Vec2, direction: Vec2): void {
-    const beam = new BeamSpellObject<SpearTarget>(this.owner, {
+    const beam = new BeamSpellObject(this.owner, {
       start: { x: start.x - direction.x * 40, y: start.y - direction.y * 40 },
       end: { x: start.x + direction.x * 560, y: start.y + direction.y * 560 },
       width: 120,
@@ -124,7 +122,7 @@ export class Pantheon_Q_Spear extends MissileSpellObject {
   size = 110;
   maxHitCount = Infinity;
 
-  onHit(enemy: SpearTarget): void {
+  onHit(enemy: AttackableUnit): void {
     enemy.takeDamage(spearDamage(enemy, this.hitTargets.length > 1), this.owner);
   }
 }

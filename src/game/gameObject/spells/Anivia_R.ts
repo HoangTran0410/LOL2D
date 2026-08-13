@@ -138,7 +138,7 @@ export default class Anivia_R extends Spell {
   }
 }
 
-export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
+export class Anivia_R_Object extends AreaSpellObject {
   private nextDamageAtMs = DAMAGE_TICK_MS;
   private nextSlowAtMs = DAMAGE_TICK_MS;
 
@@ -148,7 +148,7 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
         this.game.objectManager.queryObjects({
           area: new Circle({ x: center.x, y: center.y, r: END_RADIUS }),
           filters: [PredefinedFilters.canTakeDamageFromTeam(owner.teamId)],
-        }) as unknown as Iterable<StormTarget>,
+        }),
       radiusAt: stormRadiusAt,
     });
   }
@@ -212,7 +212,7 @@ export class Anivia_R_Object extends AreaSpellObject<StormTarget> {
     const candidates = this.game.objectManager.queryObjects({
       area: new Circle({ x: this.center.x, y: this.center.y, r: radius }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-    }) as unknown as StormTarget[];
+    });
     return candidates.filter(target =>
       Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
         radius + target.collisionRadius

@@ -10,92 +10,27 @@ import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
-import type { StatsModifier } from '../../../src/game/gameObject/Stats';
+import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
-class TestVector {
-  constructor(public x = 0, public y = 0) {}
-
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
-  add(value: TestVector) { this.x += value.x; this.y += value.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
-  setMag(value: number) {
-    const length = this.mag();
-    if (length > 0) this.mult(value / length);
-    return this;
-  }
-  dist(value: TestVector) { return Math.hypot(this.x - value.x, this.y - value.y); }
-  static add(a: TestVector, b: TestVector) { return a.copy().add(b); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
+function unit(game: TestGame, x: number, teamId: string, speed = 10): AttackableUnit {
+  const result = createUnit(game, x, teamId);
+  result.collisionRadius = 1;
+  result.stats.speed.baseValue = speed;
+  result.stats.mana.baseValue = 100;
+  result.stats.health.baseValue = 100;
+  result.stats.maxHealth.baseValue = 100;
+  result.animatedValues.displaySize = 20;
+  return result;
 }
 
-const vector = (x: number, y: number): p5.Vector => new TestVector(x, y) as unknown as p5.Vector;
-
-const speedStats = (base = 10) => {
-  let percentBaseBonus = 0;
-  let flatBonus = 0;
-  const speed = {
-    get value() { return base * (1 + percentBaseBonus) + flatBonus; },
-  };
-  return {
-    speed,
-    addModifier(modifier: StatsModifier) {
-      percentBaseBonus += modifier.speed.percentBaseBonus;
-      flatBonus += modifier.speed.flatBonus;
-    },
-    removeModifier(modifier: StatsModifier) {
-      percentBaseBonus -= modifier.speed.percentBaseBonus;
-      flatBonus -= modifier.speed.flatBonus;
-    },
-  };
-};
-
-const unit = (x: number, teamId: string, speed = 10) => {
-  const stats = speedStats(speed);
-  const buffs: unknown[] = [];
-  const result = {
-    position: vector(x, 0),
-    collisionRadius: 1,
-    teamId,
-    isDead: false,
-    canCast: true,
-    toRemove: false,
-    willDraw: true,
-    targetable: true,
-    stats: {
-      ...stats,
-      mana: { value: 100 },
-      health: { value: 100 },
-    },
-    animatedValues: { displaySize: 20 },
-    game: undefined as unknown,
-    buffs,
-    takeDamage: vi.fn(),
-    addBuff: vi.fn((buff: Slow | Speedup) => {
-      buffs.push(buff);
-      buff.activateBuff();
-    }),
-  };
-  return result;
-};
-
-const gameFor = () => {
-  const objects: unknown[] = [];
-  return {
-    worldMouse: vector(0, 0),
-    eventManager: { emit: vi.fn() },
-    objectManager: {
-      objects,
-      addObject: vi.fn((object: unknown) => { objects.push(object); }),
-      queryObjects: vi.fn(() => []),
-    },
-    objects,
-  };
-};
-
 const castContext = (
-  owner: ReturnType<typeof unit>,
+  owner: AttackableUnit,
   target?: unknown,
   cursorWorld = { x: 0, y: 500 }
 ): CastContext =>
@@ -110,21 +45,24 @@ const castContext = (
     ...(target === undefined ? {} : { target }),
   });
 
-const launch = (owner: ReturnType<typeof unit>, target: ReturnType<typeof unit>) => {
+function launch(owner: AttackableUnit, target: AttackableUnit): Malphite_Q_Object {
   const spell = new Malphite_Q(owner);
   expect(spell.press(castContext(owner, target))).toBe(true);
   spell.update();
-  return owner.game.objects[0] as Malphite_Q_Object;
-};
+  const missile = owner.game.objectManager._objectToBeAdd.find(
+    (object): object is Malphite_Q_Object => object instanceof Malphite_Q_Object
+  );
+  if (!missile) throw new Error('Malphite Q must create its homing shard.');
+  return missile;
+}
 
-const arrive = (missile: Malphite_Q_Object) => {
+function arrive(missile: Malphite_Q_Object): void {
   for (let i = 0; i < 100 && !missile.toRemove; i++) missile.update();
-};
+}
 
 describe('Malphite Q', () => {
   beforeEach(() => {
-    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
-    vi.stubGlobal('p5', { Vector: TestVector });
+    installSpellObjectGlobals();
     vi.stubGlobal('deltaTime', 250);
     vi.stubGlobal('random', () => 0.5);
     vi.stubGlobal('TWO_PI', Math.PI * 2);
@@ -133,9 +71,10 @@ describe('Malphite Q', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('requires a valid enemy unit target in range', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const target = unit(100, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    game.setPlayer(owner);
+    const target = unit(game, 100, 'red');
     const resolution = TargetResolver.resolve('UNIT', {
       spellId: 'malphite-q',
       activationId: 'activation',
@@ -151,12 +90,12 @@ describe('Malphite Q', () => {
       isTargetable: candidate => candidate === target && target.targetable,
     });
     const spell = new Malphite_Q(owner);
-    const ally = unit(100, 'blue');
-    const outOfRange = unit(501, 'red');
+    const ally = unit(game, 100, 'blue');
+    const outOfRange = unit(game, 501, 'red');
 
     expect(resolution).toMatchObject({ ok: true, context: { target } });
     expect(spell.press(castContext(owner))).toBe(false);
-    owner.game.objectManager.objects.push(target);
+    game.objectManager.objects.push(target);
     expect(new Malphite_Q(owner).press(castContext(owner))).toBe(false);
     expect(new Malphite_Q(owner).press(castContext(owner, undefined, target.position))).toBe(true);
     expect(new Malphite_Q(owner).press(castContext(owner, ally))).toBe(false);
@@ -164,14 +103,15 @@ describe('Malphite Q', () => {
   });
 
   it('rejects unseen targets and cancels when the target leaves sight during cast time', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const unseen = unit(100, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    game.setPlayer(owner);
+    const unseen = unit(game, 100, 'red');
     unseen.willDraw = false;
 
     expect(new Malphite_Q(owner).press(castContext(owner, unseen))).toBe(false);
 
-    const target = unit(100, 'red');
+    const target = unit(game, 100, 'red');
     const spell = new Malphite_Q(owner);
     const onCancel = vi.spyOn(spell, 'onCancel');
     expect(spell.press(castContext(owner, target))).toBe(true);
@@ -182,13 +122,13 @@ describe('Malphite Q', () => {
     expect(onCancel).toHaveBeenCalledWith(expect.anything(), 'TARGET_INVALID');
     expect(spell.state).toBe('READY');
     expect(owner.stats.mana.value).toBe(100);
-    expect(owner.game.objects).toEqual([]);
+    expect(game.objectManager._objectToBeAdd).toEqual([]);
   });
 
   it('spawns the shard 100 units toward the selected target', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const target = unit(300, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    const target = unit(game, 300, 'red');
 
     const missile = launch(owner, target);
 
@@ -197,9 +137,8 @@ describe('Malphite Q', () => {
   });
 
   it('uses imported rank-one cooldown, mana, and slow values', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const spell = new Malphite_Q(owner);
+    const game = createGame();
+    const spell = new Malphite_Q(unit(game, 0, 'blue'));
 
     expect(spell.coolDown).toBe(8_000);
     expect(spell.manaCost).toBe(70);
@@ -207,9 +146,9 @@ describe('Malphite Q', () => {
   });
 
   it('follows the selected target instead of the cursor line', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const target = unit(20, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    const target = unit(game, 20, 'red');
     const missile = launch(owner, target);
     target.position.set(40, 0);
 
@@ -220,54 +159,59 @@ describe('Malphite Q', () => {
   });
 
   it('damages and slows only the selected target on arrival', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const target = unit(10, 'red', 100);
-    const bystander = unit(10, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    const target = unit(game, 10, 'red', 100);
+    const bystander = unit(game, 10, 'red');
+    const targetDamage = vi.spyOn(target, 'takeDamage');
+    const targetBuff = vi.spyOn(target, 'addBuff');
+    const bystanderDamage = vi.spyOn(bystander, 'takeDamage');
+    const bystanderBuff = vi.spyOn(bystander, 'addBuff');
     const missile = launch(owner, target);
 
     arrive(missile);
 
-    expect(target.takeDamage).toHaveBeenCalledWith(20, owner);
-    expect(target.addBuff).toHaveBeenCalledWith(expect.any(Slow));
-    expect(bystander.takeDamage).not.toHaveBeenCalled();
-    expect(bystander.addBuff).not.toHaveBeenCalled();
+    expect(targetDamage).toHaveBeenCalledWith(20, owner);
+    expect(targetBuff).toHaveBeenCalledWith(expect.any(Slow));
+    expect(bystanderDamage).not.toHaveBeenCalled();
+    expect(bystanderBuff).not.toHaveBeenCalled();
   });
 
   it('steals the researched movement speed amount for the researched duration', () => {
-    const owner = unit(0, 'blue', 10);
-    owner.game = gameFor();
-    const target = unit(10, 'red', 100);
+    const game = createGame();
+    const owner = unit(game, 0, 'blue', 10);
+    const target = unit(game, 10, 'red', 100);
     const missile = launch(owner, target);
 
     arrive(missile);
 
-    const slow = target.buffs.find(buff => buff instanceof Slow) as Slow;
-    const speedup = owner.buffs.find(buff => buff instanceof Speedup) as Speedup;
-    expect(slow.duration).toBe(3000);
-    expect(speedup.duration).toBe(3000);
+    const slow = target.buffs.find((buff): buff is Slow => buff instanceof Slow);
+    const speedup = owner.buffs.find((buff): buff is Speedup => buff instanceof Speedup);
+    expect(slow?.duration).toBe(3000);
+    expect(speedup?.duration).toBe(3000);
     expect(owner.stats.speed.value).toBe(30);
   });
 
   it('applies arrival payload once and handles an invalidated target', () => {
-    const owner = unit(0, 'blue');
-    owner.game = gameFor();
-    const target = unit(10, 'red');
+    const game = createGame();
+    const owner = unit(game, 0, 'blue');
+    const target = unit(game, 10, 'red');
+    const takeDamage = vi.spyOn(target, 'takeDamage');
     const missile = launch(owner, target);
 
     arrive(missile);
     missile.update();
 
-    expect(target.takeDamage).toHaveBeenCalledTimes(1);
+    expect(takeDamage).toHaveBeenCalledTimes(1);
 
-    const invalidOwner = unit(0, 'blue');
-    invalidOwner.game = gameFor();
-    const invalidTarget = unit(30, 'red');
+    const invalidOwner = unit(game, 0, 'blue');
+    const invalidTarget = unit(game, 30, 'red');
+    const invalidDamage = vi.spyOn(invalidTarget, 'takeDamage');
     const invalidMissile = launch(invalidOwner, invalidTarget);
-    invalidTarget.isDead = true;
+    invalidTarget.die({ reviveAfter: 100 });
     invalidMissile.update();
 
     expect(invalidMissile.toRemove).toBe(true);
-    expect(invalidTarget.takeDamage).not.toHaveBeenCalled();
+    expect(invalidDamage).not.toHaveBeenCalled();
   });
 });

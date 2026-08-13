@@ -10,6 +10,7 @@ import Stun from './Stun';
 import TrailSystem from '../helpers/TrailSystem';
 import Fear from './Fear';
 import Charm from './Charm';
+import type { BuffConstructor } from '../Buff';
 
 export default class Dash extends Buff {
   image: Buff['image'] = AssetManager.get('buff_root');
@@ -26,7 +27,7 @@ export default class Dash extends Buff {
   dashDestination: p5.Vector | null = null;
   stayAtDestination = true;
   cancelable = true;
-  buffsToCheckCancel: Function[] = [Airborne, Root, Stun, Fear, Charm];
+  buffsToCheckCancel: BuffConstructor[] = [Airborne, Root, Stun, Fear, Charm];
 
   statusFlagsToEnable = StatusFlags.Ghosted;
 

@@ -1,32 +1,18 @@
 import GameObject from './GameObject';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
-import type { GameObjectGameContext, GameObjectRuntimeContext } from './GameObject';
+import type { GameObjectRuntimeContext } from './GameObject';
 
-export interface SpellObjectGameContext extends GameObjectGameContext {}
-
-export interface SpellOwner {
-  game: SpellObjectGameContext;
-  position: p5.Vector;
-  teamId: string;
-}
-
-type SpellGame<TOwner> = TOwner extends AttackableUnit
-  ? GameObjectRuntimeContext
-  : TOwner extends SpellOwner
-    ? SpellObjectGameContext
-    : undefined;
-
-export default class SpellObject<TOwner extends SpellOwner | undefined = AttackableUnit> extends GameObject {
-  declare game: SpellGame<TOwner>;
+export default class SpellObject extends GameObject {
+  declare game: GameObjectRuntimeContext;
   isMissile = false;
-  owner: TOwner;
+  owner: AttackableUnit;
   destination!: p5.Vector;
 
-  constructor(owner: TOwner) {
+  constructor(owner: AttackableUnit) {
     super({
-      game: owner?.game,
-      position: owner?.position?.copy?.(),
-      teamId: owner?.teamId,
+      game: owner.game,
+      position: owner.position.copy(),
+      teamId: owner.teamId,
     });
     this.owner = owner;
   }

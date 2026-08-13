@@ -15,8 +15,6 @@ import Ignite from './Ignite';
 import Lux_E, { Lux_E_Object } from './Lux_E';
 import BeamSpellObject, { type BeamGeometry } from '../spellObjects/BeamSpellObject';
 
-type LuxTarget = AttackableUnit;
-
 function hasSpells(unit: AttackableUnit): unit is AttackableUnit & { spells: Spell[] } {
   return 'spells' in unit && Array.isArray(unit.spells);
 }
@@ -121,7 +119,7 @@ export default class Lux_R extends Spell {
   onSpellCast(): void {
     if (!this.geometry) return;
 
-    const beam = new BeamSpellObject<LuxTarget>(this.owner, this.geometry, {
+    const beam = new BeamSpellObject(this.owner, this.geometry, {
       candidateFilter: target =>
         typeof target.takeDamage === 'function' &&
         typeof target.addBuff === 'function' &&

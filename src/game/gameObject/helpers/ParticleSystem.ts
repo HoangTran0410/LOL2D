@@ -1,5 +1,5 @@
 import { Rectangle } from '../../../libs/quadtree';
-import SpellObject, { type SpellOwner } from '../SpellObject';
+import GameObject from '../GameObject';
 
 interface ParticleSystemOptions {
   isDeadFn: (particle: any) => boolean;
@@ -13,10 +13,11 @@ interface ParticleSystemOptions {
   getParticleSizeFn?: (particle: any) => number;
   maxParticles?: number;
   autoRemoveIfEmpty?: boolean;
-  owner?: any;
+  owner?: GameObject;
 }
 
-export default class ParticleSystem extends SpellObject<SpellOwner | undefined> {
+export default class ParticleSystem extends GameObject {
+  owner?: GameObject;
   particles: any[] = [];
   _cachedBB: Rectangle | null = null;
 
@@ -48,7 +49,12 @@ export default class ParticleSystem extends SpellObject<SpellOwner | undefined> 
       owner,
     } = options;
 
-    super(owner);
+    super({
+      game: owner?.game,
+      position: owner?.position.copy(),
+      teamId: owner?.teamId,
+    });
+    this.owner = owner;
     this.isDeadFn = isDeadFn;
     this.preUpdateFn = preUpdateFn;
     this.updateFn = updateFn;

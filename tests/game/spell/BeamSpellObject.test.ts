@@ -1,41 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import BeamSpellObject, {
-  type BeamGeometry,
-  type BeamTarget,
-} from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
-import type { SpellOwner } from '../../../src/game/gameObject/SpellObject';
+import BeamSpellObject, { type BeamGeometry } from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import BeamRenderer from '../../../src/game/vfx/BeamRenderer';
-
-class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-}
-
-const vector = (x: number, y: number): p5.Vector =>
-  new TestVector(x, y) as unknown as p5.Vector;
-
-const owner = {
-  game: { objectManager: { queryObjects: vi.fn(() => []) } },
-  position: vector(0, 0),
-  teamId: 'blue',
-};
+import { createGame, createUnit, installSpellObjectGlobals } from './fixtures';
 
 describe('BeamSpellObject', () => {
-  beforeEach(() => {
-    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
-  });
-
+  beforeEach(installSpellObjectGlobals);
   afterEach(() => { vi.unstubAllGlobals(); });
 
   it('uses one capsule geometry for beam hit tests and rendering data', () => {
+    const game = createGame();
+    const owner = createUnit(game);
+    const target = createUnit(game, 50, 'red');
     const geometry: BeamGeometry = {
       start: { x: 0, y: 0 },
       end: { x: 100, y: 0 },
       width: 20,
     };
-    const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
     const hitTest = vi.fn(() => true);
-    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, geometry, {
+    const beam = new BeamSpellObject(owner, geometry, {
       candidates: () => [target],
       hitTest,
     });
@@ -49,9 +31,11 @@ describe('BeamSpellObject', () => {
   });
 
   it('hits each target once when configured as an instant beam', () => {
-    const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
+    const game = createGame();
+    const owner = createUnit(game);
+    const target = createUnit(game, 50, 'red');
     const onHit = vi.fn();
-    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
+    const beam = new BeamSpellObject(owner, {
       start: { x: 0, y: 0 },
       end: { x: 100, y: 0 },
       width: 20,
@@ -70,9 +54,11 @@ describe('BeamSpellObject', () => {
   });
 
   it('owns the finite lifetime of a duration beam', () => {
-    const target: BeamTarget = { position: { x: 50, y: 0 }, collisionRadius: 5 };
+    const game = createGame();
+    const owner = createUnit(game);
+    const target = createUnit(game, 50, 'red');
     const onHit = vi.fn();
-    const beam = new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
+    const beam = new BeamSpellObject(owner, {
       start: { x: 0, y: 0 },
       end: { x: 100, y: 0 },
       width: 20,
@@ -96,7 +82,8 @@ describe('BeamSpellObject', () => {
   it.each([0, Number.NaN, Number.POSITIVE_INFINITY])(
     'rejects invalid duration beam lifetime %s',
     (durationMs) => {
-      expect(() => new BeamSpellObject<BeamTarget, SpellOwner>(owner, {
+      const game = createGame();
+      expect(() => new BeamSpellObject(createUnit(game), {
         start: { x: 0, y: 0 },
         end: { x: 100, y: 0 },
         width: 20,

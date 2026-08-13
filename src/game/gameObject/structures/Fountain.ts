@@ -1,6 +1,6 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import GameObject from '../GameObject';
-import type { GameObjectGameContext } from '../GameObject';
+import type { GameObjectRuntimeContext } from '../GameObject';
 import Champion from '../attackableUnits/Champion';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 
@@ -34,7 +34,7 @@ interface Mote {
  * cannot be attacked, and FogOfWar's willDraw reset only touches units.
  */
 export default class Fountain extends GameObject {
-  declare game: GameObjectGameContext;
+  declare game: GameObjectRuntimeContext;
   /** Under everything else — it is a floor. */
   zIndex = -1;
 
@@ -49,7 +49,7 @@ export default class Fountain extends GameObject {
   _motes: Mote[] = [];
   _moteCooldown = 0;
 
-  constructor({ game, preset }: { game?: any; preset: FountainPresetData }) {
+  constructor({ game, preset }: { game: GameObjectRuntimeContext; preset: FountainPresetData }) {
     super({ game, position: createVector(preset.x, preset.y), visionRadius: 0 });
 
     this.name = preset.name;
@@ -87,7 +87,7 @@ export default class Fountain extends GameObject {
     }
   }
 
-  championsInside(): any[] {
+  championsInside(): Champion[] {
     return this.game.objectManager.queryObjects({
       area: new Circle({ x: this.position.x, y: this.position.y, r: this.radius }),
       filters: [PredefinedFilters.type(Champion), PredefinedFilters.excludeDead],
@@ -189,8 +189,7 @@ export default class Fountain extends GameObject {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getCollideBoundingBox(): any {
+  getCollideBoundingBox(): Circle {
     return new Circle({
       x: this.position.x,
       y: this.position.y,

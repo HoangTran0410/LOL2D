@@ -3,11 +3,12 @@ import AssetManager from '../../../managers/AssetManager';
 import EventType from '../../enums/EventType';
 import StatusFlags from '../../enums/StatusFlags';
 import TerrainType from '../../enums/TerrainType';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
 import Spell from '../Spell';
 import Dash from '../buffs/Dash';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AttackableUnit from '../attackableUnits/AttackableUnit';
 import AreaSpellObject from '../spellObjects/AreaSpellObject';
 import Ghost from './Ghost';
 import Heal from './Heal';
@@ -48,7 +49,7 @@ export default class Janna_R extends Spell {
   private readonly healPerTick = 2;
   private readonly knockbackDistance = 875;
   private readonly knockbackDurationMs = 500;
-  private activeArea?: AreaSpellObject<JannaTarget>;
+  private activeArea?: AreaSpellObject;
   private channelOrigin?: { x: number; y: number };
   private stopWatching: (() => void)[] = [];
 
@@ -73,7 +74,7 @@ export default class Janna_R extends Spell {
     this.channelOrigin = context.origin;
     this.watchInterrupts();
     this.knockEnemies(context);
-    this.activeArea = new AreaSpellObject<JannaTarget>(this.owner, context.origin, this.radius, {
+    this.activeArea = new AreaSpellObject(this.owner, context.origin, this.radius, {
       durationMs: this.channelDurationMs,
       candidateFilter: target =>
         !target.isDead && target.teamId === this.owner.teamId && typeof target.takeHeal === 'function',
@@ -85,7 +86,8 @@ export default class Janna_R extends Spell {
     if (!this.channelOrigin) return;
     const targets = this.game.objectManager.queryObjects({
       area: new Circle({ x: this.channelOrigin.x, y: this.channelOrigin.y, r: this.radius }),
-    }) as unknown as JannaTarget[];
+      filters: [PredefinedFilters.type(AttackableUnit)],
+    });
 
     for (const target of targets) {
       if (
@@ -114,7 +116,8 @@ export default class Janna_R extends Spell {
   private knockEnemies(context: CastContext): void {
     const targets = this.game.objectManager.queryObjects({
       area: new Circle({ x: context.origin.x, y: context.origin.y, r: this.radius }),
-    }) as unknown as JannaTarget[];
+      filters: [PredefinedFilters.type(AttackableUnit)],
+    });
 
     for (const target of targets) {
       if (target.isDead || target.teamId === this.owner.teamId || typeof target.addBuff !== 'function') {

@@ -3,13 +3,15 @@ import type { AssetHandle } from '../../managers/AssetManager';
 import type { GameObjectRuntimeContext } from './GameObject';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
 
-export type BuffStackId = string | Function;
-
 export type BuffConstructorArgs = [
   duration: number,
   sourceUnit: AttackableUnit,
   targetUnit: AttackableUnit,
 ];
+export type BuffConstructor<TBuff extends Buff = Buff> = abstract new (
+  ...args: BuffConstructorArgs
+) => TBuff;
+export type BuffStackId = string | BuffConstructor;
 
 export default class Buff {
   name = this.constructor.name;
@@ -28,7 +30,7 @@ export default class Buff {
    * two bare `StatAmp`s or `DamageOverTime`s would otherwise fight over one
    * slot, so each spell should tag its own, e.g. `buff.stackId = 'ignite'`.
    */
-  stackId: BuffStackId | null = null;
+  stackId: BuffStackId;
   timeElapsed = 0;
   toRemove = false;
 
@@ -46,6 +48,7 @@ export default class Buff {
   _activated = false;
 
   constructor(...[duration, sourceUnit, targetUnit]: BuffConstructorArgs) {
+    this.stackId = new.target;
     this.duration = duration;
     this.sourceUnit = sourceUnit;
     this.targetUnit = targetUnit;

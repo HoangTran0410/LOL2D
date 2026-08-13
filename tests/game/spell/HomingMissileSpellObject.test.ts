@@ -1,40 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import HomingMissileSpellObject, {
-  type HomingTarget,
-} from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
+import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import MissileSpellObject from '../../../src/game/gameObject/MissileSpellObject';
-import type { SpellOwner } from '../../../src/game/gameObject/SpellObject';
-import type TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
+import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
+import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from './fixtures';
 
-class TestVector {
-  constructor(public x = 0, public y = 0) {}
-
-  copy() { return new TestVector(this.x, this.y); }
-  add(value: TestVector) { this.x += value.x; this.y += value.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
-  setMag(value: number) {
-    const length = this.mag();
-    if (length > 0) this.mult(value / length);
-    return this;
-  }
-  dist(value: TestVector) { return Math.hypot(this.x - value.x, this.y - value.y); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
-}
-
-type TestTarget = HomingTarget;
-
-class TestHomingMissile extends HomingMissileSpellObject<TestTarget, SpellOwner> {
+class TestHomingMissile extends HomingMissileSpellObject {
   speed = 5;
   size = 4;
-  arrived: TestTarget[] = [];
+  arrived: AttackableUnit[] = [];
 
-  onTargetArrive(target: TestTarget): void {
+  onTargetArrive(target: AttackableUnit): void {
     this.arrived.push(target);
   }
 }
 
-class TerminalMissile extends MissileSpellObject<SpellOwner> {
+class TerminalMissile extends MissileSpellObject {
   speed = 5;
   arrivals = 0;
   afterMoves = 0;
@@ -47,30 +28,20 @@ class CollisionCheckingHomingMissile extends TestHomingMissile {
   maxHitCount = Infinity;
 }
 
-const vector = (x: number, y: number): p5.Vector => new TestVector(x, y) as unknown as p5.Vector;
-
-const owner = (queryObjects = () => []) => ({
-  game: { objectManager: { queryObjects } },
-  position: vector(0, 0),
-  teamId: 'blue',
-});
-
-const target = (x: number, collisionRadius = 0): TestTarget => ({
-  position: new TestVector(x, 0) as unknown as p5.Vector,
-  collisionRadius,
-});
+function target(game: TestGame, x: number, collisionRadius = 0): AttackableUnit {
+  const unit = createUnit(game, x, 'red');
+  unit.collisionRadius = collisionRadius;
+  return unit;
+}
 
 describe('HomingMissileSpellObject', () => {
-  beforeEach(() => {
-    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
-    vi.stubGlobal('p5', { Vector: TestVector });
-  });
-
+  beforeEach(installSpellObjectGlobals);
   afterEach(() => { vi.unstubAllGlobals(); });
 
   it('homes toward the target current position each update', () => {
-    const missileTarget = target(10);
-    const missile = new TestHomingMissile(owner(), missileTarget);
+    const game = createGame();
+    const missileTarget = target(game, 10);
+    const missile = new TestHomingMissile(createUnit(game), missileTarget);
 
     missile.update();
     missileTarget.position.x = 20;
@@ -81,8 +52,9 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('arrives when a movement segment crosses the target radius', () => {
-    const missileTarget = target(5, 1);
-    const missile = new TestHomingMissile(owner(), missileTarget);
+    const game = createGame();
+    const missileTarget = target(game, 5, 1);
+    const missile = new TestHomingMissile(createUnit(game), missileTarget);
     missile.speed = 10;
 
     missile.update();
@@ -92,8 +64,9 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('does not query generic collision targets in flight', () => {
-    const queryObjects = vi.fn(() => []);
-    const missile = new TestHomingMissile(owner(queryObjects), target(20));
+    const game = createGame();
+    const queryObjects = vi.spyOn(game.objectManager, 'queryObjects');
+    const missile = new TestHomingMissile(createUnit(game), target(game, 20));
 
     missile.update();
 
@@ -101,8 +74,9 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('arrives once and applies its payload once', () => {
-    const missileTarget = target(10, 3);
-    const missile = new TestHomingMissile(owner(), missileTarget);
+    const game = createGame();
+    const missileTarget = target(game, 10, 3);
+    const missile = new TestHomingMissile(createUnit(game), missileTarget);
 
     missile.update();
     missile.update();
@@ -112,11 +86,13 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('preserves ordinary missile strict-step arrival and terminal hooks', () => {
-    const queryObjects = vi.fn(() => []);
-    const missile = new TerminalMissile(owner(queryObjects));
-    const addTrail = vi.fn();
-    missile.destination = vector(10, 0);
-    missile.trailSystem = { addTrail } as unknown as TrailSystem;
+    const game = createGame();
+    const queryObjects = vi.spyOn(game.objectManager, 'queryObjects').mockReturnValue([]);
+    const missile = new TerminalMissile(createUnit(game));
+    const trail = new TrailSystem();
+    const addTrail = vi.spyOn(trail, 'addTrail');
+    missile.destination = createVector(10, 0);
+    missile.trailSystem = trail;
 
     missile.update();
 
@@ -134,8 +110,9 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('suppresses generic collision after a homing arrival', () => {
-    const queryObjects = vi.fn(() => []);
-    const missile = new CollisionCheckingHomingMissile(owner(queryObjects), target(10, 3));
+    const game = createGame();
+    const queryObjects = vi.spyOn(game.objectManager, 'queryObjects').mockReturnValue([]);
+    const missile = new CollisionCheckingHomingMissile(createUnit(game), target(game, 10, 3));
 
     missile.update();
 
@@ -144,8 +121,10 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('removes itself when a target becomes invalid under remove policy', () => {
-    const missileTarget = { ...target(20), isDead: true };
-    const missile = new TestHomingMissile(owner(), missileTarget);
+    const game = createGame();
+    const missileTarget = target(game, 20);
+    missileTarget.die({ reviveAfter: 100 });
+    const missile = new TestHomingMissile(createUnit(game), missileTarget);
 
     missile.update();
 
@@ -154,8 +133,9 @@ describe('HomingMissileSpellObject', () => {
   });
 
   it('continues toward the last position under continue policy', () => {
-    const missileTarget = target(20, 3);
-    const missile = new TestHomingMissile(owner(), missileTarget);
+    const game = createGame();
+    const missileTarget = target(game, 20, 3);
+    const missile = new TestHomingMissile(createUnit(game), missileTarget);
     missile.targetLossPolicy = 'continue';
 
     missile.update();

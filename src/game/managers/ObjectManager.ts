@@ -27,18 +27,15 @@ type TargetableGameObject = GameObject & { targetable?: unknown };
 const hasTargetableProperty = (object: GameObject): object is TargetableGameObject =>
   'targetable' in object;
 
-const DisplayZIndex: Function[] = [
-  //
-  TrailSystem,
-  ParticleSystem,
-  SpellObject,
-  AttackableUnit,
-  CombatText,
-];
-
-// Precompute Z-index map once at startup — avoids O(n) instanceof search per object per frame
-const Z_INDEX_MAP = new Map<Function, number>();
-DisplayZIndex.forEach((cls, i) => Z_INDEX_MAP.set(cls, i));
+// Explicit slots keep the Champion gap even though importing Champion here
+// would create a circular dependency through its targeting filters.
+const Z_INDEX_MAP = new Map<Function, number>([
+  [TrailSystem, 0],
+  [ParticleSystem, 1],
+  [SpellObject, 2],
+  [AttackableUnit, 3],
+  [CombatText, 5],
+]);
 const DEFAULT_Z_INDEX = 99;
 
 /**
@@ -60,9 +57,26 @@ function zIndexOf(o: GameObject): number {
 
 export interface QueryOptions {
   area?: QueryArea;
-  filters?: GameObjectFilter[];
+  filters?: readonly GameObjectFilter[];
   queryByDisplayBoundingBox?: boolean;
 }
+
+type GuardedGameObject<TFilter> = TFilter extends GameObjectTypeGuard<infer TObject>
+  ? TObject
+  : never;
+type IntersectGuardedGameObjects<TFilter> = (
+  GuardedGameObject<TFilter> extends infer TObject
+    ? TObject extends GameObject
+      ? (object: TObject) => void
+      : never
+    : never
+) extends (object: infer TIntersection) => void
+  ? TIntersection
+  : never;
+type QueryResult<TFilters extends readonly GameObjectFilter[]> =
+  [GuardedGameObject<TFilters[number]>] extends [never]
+    ? GameObject
+    : IntersectGuardedGameObjects<TFilters[number]>;
 
 export const PredefinedFilters = {
   id: (id: string): GameObjectFilter => (object) => object.id === id,
@@ -204,9 +218,9 @@ export default class ObjectManager {
     object.toRemove = true;
   }
 
-  queryObjects<T extends GameObject>(options: Omit<QueryOptions, 'filters'> & {
-    filters: [GameObjectTypeGuard<T>, ...GameObjectFilter[]];
-  }): T[];
+  queryObjects<const TFilters extends readonly GameObjectFilter[]>(
+    options: Omit<QueryOptions, 'filters'> & { filters: TFilters }
+  ): QueryResult<TFilters>[];
   queryObjects(options: QueryOptions): GameObject[];
   queryObjects({
     area,

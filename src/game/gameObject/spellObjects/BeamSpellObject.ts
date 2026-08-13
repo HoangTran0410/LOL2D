@@ -1,7 +1,8 @@
 import { Rectangle } from '../../../libs/quadtree';
 import type { Vec2 } from '../../spell/runtime/types';
-import SpellObject, { type SpellOwner } from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import SpellObject from '../SpellObject';
+import AttackableUnit from '../attackableUnits/AttackableUnit';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 
 export interface BeamGeometry {
   readonly start: Vec2;
@@ -9,16 +10,13 @@ export interface BeamGeometry {
   readonly width: number;
 }
 
-export interface BeamTarget {
-  readonly position: Vec2;
-  readonly collisionRadius: number;
-}
+export type BeamTarget = AttackableUnit;
 
-interface BeamOptions<TTarget extends BeamTarget> {
-  candidates?: () => Iterable<TTarget>;
-  candidateFilter?: (target: TTarget) => boolean;
-  hitTest?: (target: TTarget, geometry: BeamGeometry) => boolean;
-  onHit?: (target: TTarget) => void;
+interface BeamOptions {
+  candidates?: () => Iterable<AttackableUnit>;
+  candidateFilter?: (target: AttackableUnit) => boolean;
+  hitTest?: (target: AttackableUnit, geometry: BeamGeometry) => boolean;
+  onHit?: (target: AttackableUnit) => void;
   instant?: boolean;
   durationMs?: number;
 }
@@ -38,24 +36,21 @@ export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): bool
     geometry.width / 2 + target.collisionRadius;
 };
 
-export default class BeamSpellObject<
-  TTarget extends BeamTarget = BeamTarget,
-  TOwner extends SpellOwner = AttackableUnit,
-> extends SpellObject<TOwner> {
-  readonly hitTargets = new Set<TTarget>();
+export default class BeamSpellObject extends SpellObject {
+  readonly hitTargets = new Set<AttackableUnit>();
   readonly geometry: BeamGeometry;
   elapsedMs = 0;
-  private readonly candidates?: () => Iterable<TTarget>;
-  private readonly candidateFilter: (target: TTarget) => boolean;
-  private readonly hitTest: (target: TTarget, geometry: BeamGeometry) => boolean;
-  private readonly onTargetHit: (target: TTarget) => void;
+  private readonly candidates?: () => Iterable<AttackableUnit>;
+  private readonly candidateFilter: (target: AttackableUnit) => boolean;
+  private readonly hitTest: (target: AttackableUnit, geometry: BeamGeometry) => boolean;
+  private readonly onTargetHit: (target: AttackableUnit) => void;
   private readonly instant: boolean;
   private readonly durationMs?: number;
 
   constructor(
-    owner: TOwner,
+    owner: AttackableUnit,
     geometry: BeamGeometry,
-    options: BeamOptions<TTarget> = {}
+    options: BeamOptions = {}
   ) {
     super(owner);
     this.geometry = geometry;
@@ -99,10 +94,11 @@ export default class BeamSpellObject<
     });
   }
 
-  private queryCandidates(): Iterable<TTarget> {
+  private queryCandidates(): Iterable<AttackableUnit> {
     if (this.candidates) return this.candidates();
     return this.game.objectManager.queryObjects({
       area: this.getDisplayBoundingBox(),
-    }) as unknown as TTarget[];
+      filters: [PredefinedFilters.type(AttackableUnit)],
+    });
   }
 }
