@@ -6,7 +6,7 @@ import SpellObject from '../SpellObject';
 import Dash from '../buffs/Dash';
 
 export default class Warwick_Q extends Spell {
-  image = AssetManager.getAsset('spell_warwick_q');
+  image = AssetManager.get('spell_warwick_q');
   name = 'Nanh Vuốt (Warwick_Q)';
   description =
     'Vồ tới kẻ địch gần nhất trong phạm vi, cắn xé gây <span class="damage">30 sát thương</span> và <span class="buff">Hồi 15 máu</span> cho bản thân';

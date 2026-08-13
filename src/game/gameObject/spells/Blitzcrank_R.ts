@@ -7,7 +7,7 @@ import Silence from '../buffs/Silence';
 
 export default class Blitzcrank_R extends Spell {
   name = 'Trường Điện Từ (Blitzcrank_R)';
-  image = AssetManager.getAsset('spell_blitzcrank_r');
+  image = AssetManager.get('spell_blitzcrank_r');
   description =
     'Kích hoạt trường điện từ, gây <span class="damage">30 sát thương</span> lên các kẻ địch xung quanh và làm <span class="buff">Câm Lặng</span> chúng trong <span class="time">3 giây</span>';
   coolDown = 10000;
@@ -55,7 +55,7 @@ export class Blitzcrank_R_Object extends SpellObject {
 
     enemies.forEach((enemy: any) => {
       const silenceBuff = new Silence(this.silenceTime, this.owner, enemy);
-      silenceBuff.image = AssetManager.getAsset('spell_blitzcrank_r');
+      silenceBuff.image = AssetManager.get('spell_blitzcrank_r');
       enemy.addBuff(silenceBuff);
       enemy.takeDamage(30, this.owner);
     });

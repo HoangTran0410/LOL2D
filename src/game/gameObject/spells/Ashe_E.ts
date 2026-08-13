@@ -9,7 +9,7 @@ import TrueSight from '../buffs/TrueSight';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_E extends Spell {
-  image = AssetManager.getAsset('spell_ashe_e');
+  image = AssetManager.get('spell_ashe_e');
   name = 'Chim Ưng Do Thám (Ashe_E)';
   description =
     'Thả một chim ưng bay xa <span>900px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class="buff">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class="buff">Lộ Diện</span> trong <span class="time">3 giây</span>';
@@ -80,7 +80,7 @@ export class Ashe_E_Object extends MissileSpellObject {
 
       const sight = new TrueSight(this.revealDuration, this.owner, enemy);
       sight.visionRadius = this.revealVisionRadius;
-      sight.image = AssetManager.getAsset('spell_ashe_e');
+      sight.image = AssetManager.get('spell_ashe_e');
       enemy.addBuff(sight);
 
       // a ping on the newly spotted enemy, so being revealed is visible

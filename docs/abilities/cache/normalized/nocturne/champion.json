@@ -1,0 +1,113 @@
+{
+  "asset": {
+    "key": "champ_nocturne",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_OriginalSquare.png?3ed03",
+    "sha1": "b0a852733a539fcf5d1e0444c96a9ffce9ba4a4b"
+  },
+  "champion": "Nocturne",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Nocturne",
+    "be": 1575,
+    "changes": "V26.12",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Dive",
+      "Duelist",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2011-03-15",
+    "difficulty": 1,
+    "external_positions": [
+      "Jungle"
+    ],
+    "herotype": "Fighter",
+    "id": 56,
+    "mobility": 2,
+    "patch": "V1.0.0.113",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Assassin"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Unspeakable Horror"
+    },
+    "skill_i": {
+      "1": "Umbra Blades"
+    },
+    "skill_q": {
+      "1": "Duskbringer"
+    },
+    "skill_r": {
+      "1": "Paranoia"
+    },
+    "skill_w": {
+      "1": "Shroud of Darkness"
+    },
+    "skills": {
+      "1": "Umbra Blades",
+      "2": "Duskbringer",
+      "3": "Shroud of Darkness",
+      "4": "Unspeakable Horror",
+      "5": "Paranoia"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1.1,
+        "dmg_taken": 0.9,
+        "healing": 1.2
+      },
+      "arm_base": 38,
+      "arm_lvl": 4.2,
+      "as_base": 0.721,
+      "as_lvl": 2.7,
+      "as_ratio": 0.721,
+      "attack_delay_offset": -0.0994652435183525,
+      "dam_base": 62,
+      "dam_lvl": 2.6,
+      "hp5_base": 7,
+      "hp5_lvl": 0.75,
+      "hp_base": 655,
+      "hp_lvl": 109,
+      "mp5_base": 7,
+      "mp5_lvl": 0.45,
+      "mp_base": 275,
+      "mp_lvl": 35,
+      "mr_base": 32,
+      "mr_lvl": 1.55,
+      "ms": 345,
+      "ofa": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 155,
+      "selection_radius": 120,
+      "urf": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1
+      }
+    },
+    "style": 30,
+    "title": "The Eternal Nightmare",
+    "toughness": 1,
+    "utility": 2
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "75a29bf1abe3be5cc58cb031f77ddad11f3e02fa3ab3b53642f51fa06500e1d5",
+    "fetchedAt": "2026-08-13T10:47:45.536Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

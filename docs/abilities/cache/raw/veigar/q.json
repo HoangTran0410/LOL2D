@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Veigar/Baleful Strike",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Baleful Strike@@icon@@Baleful Strike.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' blasts a dark bolt in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first two enemies hit.@@description2@@If this kills an enemy, it generates 1 stack of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span>'', tripled against large <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 120 / 160 / 200 / 240 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50 / 55 / 60 / 65 / 70% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 140@@speed@@2200@@casttime@@0.<small>25</small>@@cost@@30 / 35 / 40 / 45 / 50@@cooldown@@6 / 5.<small>5</small> / 5 / 4.<small>5</small> / 4@@targeting@@Direction@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* Killing two enemy champions with ''Baleful Strike'' grants <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"+12 from Phenomenal Evil Power and +2 from Baleful Strike\"><span style=\"color:\n#7A6DFF; white-space:normal\">+14 AP</span></span>.\n* ''Baleful Strike'' will only grant stacks of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span> from its bolt, and not any additional effect that would kill other units from the same cast.\n* The stacks are added immediately on enemy kill (on next game tick).\n**If the first target was killed, the second hit may deal 1 damage more on enemies further along the missile's flight path.\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308709,
+                "revisions": [
+                  {
+                    "parentid": 4050923,
+                    "revid": 4050924,
+                    "timestamp": "2026-08-11T02:17:37Z"
+                  }
+                ],
+                "title": "Template:Data Veigar/Baleful Strike"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4050924,
+      "timestamp": "2026-08-11T02:17:37Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a3e6a4855b191514d731d827502a85759eed80e8c264c5aa9f3ea32ef8bbe2c1",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Baleful_Strike",
+    "revisionId": 4050924,
+    "sourceTimestamp": "2026-08-11T02:17:37Z"
+  }
+}

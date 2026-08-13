@@ -9,7 +9,7 @@ import Dash from '../buffs/Dash';
 import Speedup from '../buffs/Speedup';
 
 export default class Yasuo_R extends Spell {
-  image = AssetManager.getAsset('spell_yasuo_r');
+  image = AssetManager.get('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =
     'Lập tức <span class="buff">Dịch chuyển</span> đến các mục tiêu gần nhất bị <span>Hất tung</span>. <span class="buff">Giữ chúng trên không</span> trong <span class="time">1 giây</span> và gây <span class="damage">30 sát thương</span>. Bạn được <span class="buff">Tăng tốc 40%</span> trong <span class="time">2 giây</span> sau đó.';

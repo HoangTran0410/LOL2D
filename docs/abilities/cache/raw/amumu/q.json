@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Amumu/Bandage Toss",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Bandage Toss@@icon@@Bandage Toss.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Amumu''' throws a bandage in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first enemy hit, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> them for 1 second and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|pulling]]</span> him to them, during which they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span>.@@description2@@'''Amumu''' periodically [[stock]]s a ''Bandage Toss'' charge, up to a maximum of 2.@@description3@@''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Amumu\" data-ability=\"Despair\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Amumu Despair.png|20xpx|border|link=Amumu#Despair|An icon for Amumu's ability Despair]]</span> <span style=\"white-space:normal;\">[[Amumu#Despair|Despair]]</span></span> can be cast during the dash.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 95 / 120 / 145 / 170 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 1100@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 160@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Bandage missle speed\">2000</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Dash speed\">1800</span>@@casttime@@0.<small>25</small>@@cost@@50@@cooldown@@{{{cooldown}}}@@targeting@@Direction@@damagetype@@Magic@@spellshield@@special@@projectile@@True@@notes@@\n* '''Amumu''' will track the target if they change locations.\n** He will dash to the target's previous location if the target is 2000 or more units away or moves beyond <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2000</span> units.\n* ''Bandage Toss'' will always be directed towards the target's location even if '''Amumu''' moves while it is in flight.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Immobilize\">[[File:Stun icon.png|20px|link=Crowd_control#Immobilizing|An icon representing the keyword Immobilize]] [[:Crowd_control#Immobilizing|Immobilizing]]</span> effects will not prevent '''Amumu''' from commencing the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span>.\n* ''Bandage Toss'' does not fizzle on '''Amumu's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|death]]</span>, and can still stun and damage enemies.\n* '''Amumu''' is still able to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> even if ''Bandage Toss'' is blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>.\n* '''Amumu''' will be ordered to basic attack the target upon completion of the dash.\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306440,
+                "revisions": [
+                  {
+                    "parentid": 3952554,
+                    "revid": 4007564,
+                    "timestamp": "2026-04-12T06:24:24Z"
+                  }
+                ],
+                "title": "Template:Data Amumu/Bandage Toss"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007564,
+      "timestamp": "2026-04-12T06:24:24Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b387d65b6de5e33ebf87fccaec4e14ea8eb3ce47b887dafb2361b0e9dfb1020d",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Amumu/Bandage_Toss",
+    "revisionId": 4007564,
+    "sourceTimestamp": "2026-04-12T06:24:24Z"
+  }
+}

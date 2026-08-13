@@ -1,0 +1,46 @@
+{
+  "asset": {
+    "key": "spell_singed_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Mega_Adhesive.png?01b4c",
+    "sha1": "a1e35ff147072b4f4563e1e797e9369448311e33"
+  },
+  "champion": "Singed",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "17 / 16 / 15 / 14 / 13",
+        "cost": "60 / 70 / 80 / 90 / 100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' spills a potent adhesive that lands at the target location after 0.<small>375</small> seconds, creating a field for 3 seconds that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounds]]</span> enemies within and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slows\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them.",
+          "text": "Active: Singed spills a potent adhesive that lands at the target location after 0.375 seconds, creating a field for 3 seconds that grounds enemies within and slows them."
+        },
+        "effectradius": "265",
+        "icon": "Mega Adhesive.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>50 / 55 / 60 / 65 / 70%</dd></dl>",
+          "text": "Slow:50 / 55 / 60 / 65 / 70%"
+        },
+        "name": "Mega Adhesive",
+        "notes": {
+          "raw": "* The goo missile is a projectile. It has a fixed travel time but is independent from when the zone is established. It is destructible by effects such as <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and will destroy item spell shields if the goo missile is thrown past an enemy champion.\n* ''Mega Adhesive's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|ground]]</span> debuffs are each marked as non-dispellable, so they are not removed by most <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span>. Each is however allowed to be removed by cleanses that '''also''' grant immunity to the debuff type, such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf OriginalSquare.png|20xpx|border|link=Olaf|An icon representing Olaf]]</span> <span style=\"white-space:normal;\">[[Olaf|Olaf's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Ragnarok\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Ragnarok.png|20xpx|border|link=Olaf#Ragnarok|An icon for Olaf's ability Ragnarok]]</span> <span style=\"white-space:normal;\">[[Olaf#Ragnarok|Ragnarok]]</span></span></span>.",
+          "text": "The goo missile is a projectile. It has a fixed travel time but is independent from when the zone is established. It is destructible by effects such as Wind Wall and will destroy item spell shields if the goo missile is thrown past an enemy champion.\nMega Adhesive's slow and ground debuffs are each marked as non-dispellable, so they are not removed by most cleanses. Each is however allowed to be removed by cleanses that also grant immunity to the debuff type, such as Olaf's Ragnarok."
+        },
+        "projectile": true,
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Mega Adhesive"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "2d8eb3065463a0542521bc8aa619061583496a06cfa489ae7bc3f11450550b9b",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Mega_Adhesive",
+    "revisionId": 4001677,
+    "sourceTimestamp": "2026-03-22T11:27:51Z"
+  }
+}

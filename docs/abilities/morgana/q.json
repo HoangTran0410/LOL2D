@@ -1,0 +1,49 @@
+{
+  "asset": {
+    "key": "spell_morgana_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Dark_Binding.png?a9483",
+    "sha1": "7b61bad2b838b094f46b4a7bdfd38f25ff9415fc"
+  },
+  "champion": "Morgana",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "10",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Morgana''' throws a sphere of dark magic in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first enemy hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|roots]]</span> them for a duration.",
+          "text": "Active: Morgana throws a sphere of dark magic in the target direction that deals magic damage to the first enemy hit and roots them for a duration."
+        },
+        "icon": "Dark Binding.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 135 / 190 / 245 / 300 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>2 / 2.<small>25</small> / 2.<small>5</small> / 2.<small>75</small> / 3 seconds</dd></dl>",
+          "text": "Magic Damage:80 / 135 / 190 / 245 / 300 (+ 90% AP)\nRoot Duration:2 / 2.25 / 2.5 / 2.75 / 3 seconds"
+        },
+        "name": "Dark Binding",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the start of the cast time.",
+          "text": "This ability will cast from wherever the caster is at the start of the cast time."
+        },
+        "projectile": true,
+        "range": "1300",
+        "speed": "1200",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "140"
+      },
+      "name": "Dark Binding"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "3e8a1793f1b6feb37793d77bfea97589760f04d616a5dd82acb8de037fb27df6",
+    "fetchedAt": "2026-08-13T10:47:30.447Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Morgana/Dark_Binding",
+    "revisionId": 3936353,
+    "sourceTimestamp": "2025-07-24T13:34:46Z"
+  }
+}

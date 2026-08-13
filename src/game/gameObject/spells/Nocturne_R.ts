@@ -19,8 +19,10 @@ import Nearsight from '../buffs/Nearsight';
  */
 export default class Nocturne_R extends Spell {
   static PHASES = {
-    R1: { image: AssetManager.getAsset('spell_nocturne_r') },
-    R2: { image: AssetManager.getAsset('spell_nocturne_r2') },
+    R1: { image: AssetManager.get('spell_nocturne_r') },
+    // The wiki carries no separate icon for the second form, so the recast
+    // reuses the base icon rather than falling back to a blank placeholder.
+    R2: { image: AssetManager.get('spell_nocturne_r') },
   };
   phase: 'R1' | 'R2' = 'R1';
 

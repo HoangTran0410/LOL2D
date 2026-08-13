@@ -9,7 +9,7 @@ import Slow from '../buffs/Slow';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_Q extends Spell {
-  image = AssetManager.getAsset('spell_ashe_q');
+  image = AssetManager.get('spell_ashe_q');
   name = 'Mưa Tên Băng Giá (Ashe_Q)';
   description =
     'Bắn liên tiếp <span>3 mũi tên băng</span> theo hình nón hẹp. Mỗi mũi tên gây <span class="damage">8 sát thương</span> và <span class="buff">Làm Chậm 30%</span> kẻ địch trúng chiêu trong <span class="time">1 giây</span>';
@@ -78,7 +78,7 @@ export class Ashe_Q_Object extends MissileSpellObject {
     const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
     slowBuff.percent = this.slowPercent;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-    slowBuff.image = AssetManager.getAsset('spell_ashe_q');
+    slowBuff.image = AssetManager.get('spell_ashe_q');
     enemy.addBuff(slowBuff);
 
     enemy.takeDamage(this.damage, this.owner);

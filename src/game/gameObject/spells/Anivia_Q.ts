@@ -19,7 +19,7 @@ import TrailSystem from '../helpers/TrailSystem';
  * spell back to Q1 (on full cooldown) once the missile is gone.
  */
 export default class Anivia_Q extends Spell {
-  image = AssetManager.getAsset('spell_anivia_q');
+  image = AssetManager.get('spell_anivia_q');
   name = 'Sương Băng (Anivia_Q)';
   description =
     'Phóng một khối băng bay chậm <b>xuyên qua</b> mọi kẻ địch trên đường đi, gây <span class="damage">15 sát thương</span> và <span class="buff">Làm Chậm 40%</span> trong <span class="time">2 giây</span>. <b>Bấm lại phím chiêu</b> để cho khối băng nổ sớm: vụ nổ bán kính 150px gây thêm <span class="damage">25 sát thương</span> và <span class="buff">Làm Choáng</span> trong <span class="time">1.2 giây</span>. Nếu không bấm lại, khối băng tự nổ khi bay hết tầm';
@@ -110,7 +110,7 @@ export class Anivia_Q_Object extends MissileSpellObject {
     const slowBuff = new Slow(this.slowTime, this.owner, enemy);
     slowBuff.percent = this.slowPercent;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-    slowBuff.image = AssetManager.getAsset('spell_anivia_q');
+    slowBuff.image = AssetManager.get('spell_anivia_q');
     enemy.addBuff(slowBuff);
   }
 
@@ -246,7 +246,7 @@ export class Anivia_Q_Blast extends SpellObject {
 
         const stunBuff = new Stun(this.stunTime, this.owner, enemy);
         stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-        stunBuff.image = AssetManager.getAsset('spell_anivia_q');
+        stunBuff.image = AssetManager.get('spell_anivia_q');
         enemy.addBuff(stunBuff);
       });
     }

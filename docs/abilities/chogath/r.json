@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_chogath_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_Feast.png?bedd6",
+    "sha1": "5c67066f826648e8d9d49ee74e278ef6533d535f"
+  },
+  "champion": "Cho'Gath",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "80 / 75 / 70 / 65 / 60",
+        "cost": "100",
+        "damagetype": "True",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Cho'Gath''' attempts to eat the target enemy, dealing them <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">true damage</span></span>. Against non-<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>, the '''base''' damage is modified.",
+          "text": "Active: Cho'Gath attempts to eat the target enemy, dealing them &nbsp;true damage. Against non- champions, the base damage is modified."
+        },
+        "description2": {
+          "raw": "If the target is killed, '''Cho'Gath''' gains a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Feast''. Only 6 stacks can be gained from non-epic <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span>.",
+          "text": "If the target is killed, Cho'Gath gains a stack of Feast. Only 6 stacks can be gained from non-epic monsters or minions."
+        },
+        "description3": {
+          "raw": "Each stack of ''Feast'' increases the cast range of the ability by 2.<small>5</small>, for a maximum increase of 25 at 10 stacks, and grants '''Cho'Gath''' <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;'''bonus''' health</span></span> as well as <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;'''bonus''' attack range</span> and increased <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Size\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|size]]</span>, capping at <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;75 '''bonus''' attack range</span> and 100% increased size.",
+          "text": "Each stack of Feast increases the cast range of the ability by 2.5, for a maximum increase of 25 at 10 stacks, and grants Cho'Gath &nbsp;bonus health as well as &nbsp;bonus attack range and increased size, capping at &nbsp;75 bonus attack range and 100% increased size."
+        },
+        "icon": "Feast.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Champion True Damage:'''</span></dt><dd>300 / 475 / 650 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 10% '''bonus''' health)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Non-Champion True Damage:'''</span></dt><dd>1200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 10% '''bonus''' health)</span></dd></dl>",
+          "text": "Champion True Damage:300 / 475 / 650 (+ 50% AP) (+ 10% bonus health)\nNon-Champion True Damage:1200 (+ 50% AP) (+ 10% bonus health)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Health Per Stack:'''</span></dt><dd>80 / 100 / 120 / 140 / 160</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Range Per Stack:'''</span></dt><dd>4.<small>7</small> / 5.<small>45</small> / 6.<small>2</small> / 6.<small>95</small> / 7.<small>7</small></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Size Per Stack:'''</span></dt><dd>6 / 7 / 8 / 9 / 10%</dd></dl>",
+          "text": "Bonus Health Per Stack:80 / 100 / 120 / 140 / 160\nBonus Attack Range Per Stack:4.7 / 5.45 / 6.2 / 6.95 / 7.7\nBonus Size Per Stack:6 / 7 / 8 / 9 / 10%"
+        },
+        "name": "Feast",
+        "notes": {
+          "raw": "* The increased size stacks additively with other size increases.\n* The name of the bonus health buff is ''\"Feast\"''.\n* The bonus attack range and increase size cap at respectively 16.<small>25</small> / 13.<small>93</small> / 12.<small>19</small> / 10.<small>83</small> / 9.<small>75</small> and 16.<small>67</small> / 14.<small>29</small> / 12.<small>5</small> / 11.<small>11</small> / 10 stacks, with the last stack being effective as the decimal part of the value (no decimal meaning 100% as effective).\n* Each stack of ''Feast'' increases the damage by 8 / 12 / 16.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).\n\n* If an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> has health below the amount of <span style=\"color:\n#F9966B; white-space:normal\">true damage</span> ''Feast'' deals, they will be marked for execution. This indicator does not consider <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shields]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invulnerability\">[[File:Cosmic Radiance.png|20px|link=Invulnerability|An icon representing the keyword Invulnerability]] [[:Invulnerability|invulnerability]]</span>.  \n* Consuming any additional <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:VoidgrubSquare.png|20xpx|border|link=Voidgrub|An icon representing Voidgrub]]</span> <span style=\"white-space:normal;\">[[Voidgrub|Voidgrubs]]</span></span> from the same spawn group will be tracked as a \"monster eaten\" for ''Feast's'' buff, but will neither grant any bonuses nor count towards the 6-stack limit.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* While not on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span>, ''Feast's'' ability icon on the HUD can be [[ping|pinged]] to announce its damage to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> in the ally chat.\n[[File:Feast_Execute_Indicator.png|thumb|left|150px|This indicator is only visible to '''Cho'Gath'''.]]",
+          "text": "The increased size stacks additively with other size increases.\nThe name of the bonus health buff is \"Feast\".\nThe bonus attack range and increase size cap at respectively 16.25 / 13.93 / 12.19 / 10.83 / 9.75 and 16.67 / 14.29 / 12.5 / 11.11 / 10 stacks, with the last stack being effective as the decimal part of the value (no decimal meaning 100% as effective).\nEach stack of Feast increases the damage by 8 / 12 / 16.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable).\nIf an enemy champion has health below the amount of true damage Feast deals, they will be marked for execution. This indicator does not consider shields or invulnerability.\nConsuming any additional Voidgrubs from the same spawn group will be tracked as a \"monster eaten\" for Feast's buff, but will neither grant any bonuses nor count towards the 6-stack limit.(bug)\nWhile not on &nbsp;cooldown, Feast's ability icon on the HUD can be pinged to announce its damage to monsters in the ally chat."
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Feast"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "711739a0a9470f2d9ece4b9c6b0493843bb1be8a0b786f7232360bd1063ecf57",
+    "fetchedAt": "2026-08-13T10:47:38.253Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Cho'Gath/Feast",
+    "revisionId": 3932267,
+    "sourceTimestamp": "2025-07-18T21:20:14Z"
+  }
+}

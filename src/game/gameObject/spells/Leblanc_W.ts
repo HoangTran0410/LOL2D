@@ -9,10 +9,10 @@ import SpellObject from '../SpellObject';
 export default class Leblanc_W extends Spell {
   PHASES = {
     W1: {
-      image: AssetManager.getAsset('spell_leblanc_w1'),
+      image: AssetManager.get('spell_leblanc_w1'),
     },
     W2: {
-      image: AssetManager.getAsset('spell_leblanc_w2'),
+      image: AssetManager.get('spell_leblanc_w2'),
     },
   };
   phase = this.PHASES.W1;
@@ -53,7 +53,7 @@ export default class Leblanc_W extends Spell {
       );
 
       const dashBuff = new Dash(2000, this.owner, this.owner);
-      dashBuff.image = AssetManager.getAsset('spell_leblanc_w1');
+      dashBuff.image = AssetManager.get('spell_leblanc_w1');
       dashBuff.dashSpeed = 10;
       dashBuff.dashDestination = destination;
       dashBuff.onReachedDestination = () => {

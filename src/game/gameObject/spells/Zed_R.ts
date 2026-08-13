@@ -24,10 +24,10 @@ const SHADOW_COLOR: [number, number, number] = [215, 120, 255];
 export default class Zed_R extends Spell {
   static PHASES = {
     R1: {
-      image: AssetManager.getAsset('spell_zed_r1'),
+      image: AssetManager.get('spell_zed_r1'),
     },
     R2: {
-      image: AssetManager.getAsset('spell_zed_r2'),
+      image: AssetManager.get('spell_zed_r2'),
     },
   };
   phase: 'R1' | 'R2' = 'R1';

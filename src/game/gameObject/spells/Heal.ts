@@ -8,7 +8,7 @@ import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export default class Heal extends Spell {
   name = 'Hồi Máu (Heal)';
-  image = AssetManager.getAsset('spell_heal');
+  image = AssetManager.get('spell_heal');
   description =
     '<span class="buff">Hồi Máu</span> một lượng bằng <span>30% máu tối đa</span> và <span class="buff">Tăng Tốc 50%</span> trong <span class="time">1 giây</span>';
   coolDown = 10000;

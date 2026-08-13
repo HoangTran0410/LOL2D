@@ -8,7 +8,7 @@ import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 
 export default class Teemo_R extends Spell {
-  image = AssetManager.getAsset('spell_teemo_r');
+  image = AssetManager.get('spell_teemo_r');
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =
     'Đặt 1 bẫy độc tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>, phát nổ khi kẻ địch dẫm phải, <span class="buff">Làm Chậm 70%</span> các kẻ địch trong <span class="time">2 giây</span> và gây <span class="damage">30 sát thương</span> <i>(sẽ nảy nếu đặt trên bẫy độc khác)</i>';
@@ -40,7 +40,7 @@ export default class Teemo_R extends Spell {
 }
 
 export class Teemo_R_Buff extends Slow {
-  image = AssetManager.getAsset('spell_teemo_r');
+  image = AssetManager.get('spell_teemo_r');
   buffAddType = BuffAddType.RENEW_EXISTING;
   percent = 0.7;
 }
@@ -156,7 +156,7 @@ export class Teemo_R_Object extends SpellObject {
 
           enemiesInRange.forEach((enemy: any) => {
             let slowBuff = new Slow(2000, this.owner, enemy);
-            slowBuff.image = AssetManager.getAsset('spell_teemo_r');
+            slowBuff.image = AssetManager.get('spell_teemo_r');
             slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
             slowBuff.percent = 0.7;
             enemy.addBuff(slowBuff);

@@ -24,8 +24,10 @@ import Shield from '../buffs/Shield';
  */
 export default class LeeSin_W extends Spell {
   static PHASES = {
-    W1: { image: AssetManager.getAsset('spell_leesin_w') },
-    W2: { image: AssetManager.getAsset('spell_leesin_w2') },
+    W1: { image: AssetManager.get('spell_leesin_w') },
+    // The wiki carries no separate icon for the second form, so the recast
+    // reuses the base icon rather than falling back to a blank placeholder.
+    W2: { image: AssetManager.get('spell_leesin_w') },
   };
   phase: 'W1' | 'W2' = 'W1';
 

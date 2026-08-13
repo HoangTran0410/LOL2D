@@ -1,0 +1,110 @@
+{
+  "asset": {
+    "key": "champ_veigar",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_OriginalSquare.png?2add0",
+    "sha1": "ce6ac52c5e1b31e57c661d55aabcfcd2526268ba"
+  },
+  "champion": "Veigar",
+  "data": {
+    "adaptivetype": "Magic",
+    "apiname": "Veigar",
+    "be": 675,
+    "changes": "V26.07",
+    "client_positions": [
+      "Middle"
+    ],
+    "client_tags": [
+      "Hypercarry",
+      "Burst",
+      "Magic"
+    ],
+    "control": 3,
+    "damage": 3,
+    "date": "2009-07-24",
+    "difficulty": 2,
+    "external_positions": [
+      "Middle",
+      "Support"
+    ],
+    "herotype": "Mage",
+    "id": 45,
+    "mobility": 1,
+    "patch": "V0.8.22.115",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Burst"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Event Horizon"
+    },
+    "skill_i": {
+      "1": "Phenomenal Evil Power"
+    },
+    "skill_q": {
+      "1": "Baleful Strike"
+    },
+    "skill_r": {
+      "1": "Primordial Burst"
+    },
+    "skill_w": {
+      "1": "Dark Matter"
+    },
+    "skills": {
+      "1": "Phenomenal Evil Power",
+      "2": "Baleful Strike",
+      "3": "Dark Matter",
+      "4": "Event Horizon",
+      "5": "Primordial Burst"
+    },
+    "stats": {
+      "acquisition_radius": 525,
+      "aram": {
+        "dmg_dealt": 0.93,
+        "dmg_taken": 1.1
+      },
+      "arm_base": 18,
+      "arm_lvl": 5.2,
+      "as_base": 0.625,
+      "as_lvl": 2.24,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.109062500298023,
+      "dam_base": 52,
+      "dam_lvl": 2.7,
+      "gameplay_radius": 55,
+      "hp5_base": 6.5,
+      "hp5_lvl": 0.6,
+      "hp_base": 580,
+      "hp_lvl": 108,
+      "missile_speed": 1500,
+      "mp5_base": 8,
+      "mp5_lvl": 0.8,
+      "mp_base": 490,
+      "mp_lvl": 26,
+      "mr_base": 32,
+      "mr_lvl": 1.3,
+      "ms": 340,
+      "pathing_radius": 30,
+      "range": 550,
+      "selection_height": 140,
+      "selection_radius": 100,
+      "urf": {
+        "dmg_dealt": 0.9
+      }
+    },
+    "style": 100,
+    "title": "The Tiny Master of Evil",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f2647f9b2ffa971f57c99103334688e101469abcacc69af52c799862fea7c142",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Lee Sin/Safeguard",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Safeguard@@icon@@Safeguard.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Lee Sin''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target allied unit's location. If the ally is a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> upon arrival, both they and '''Lee Sin''' gain a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 2 seconds.<br/>If the target is a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minion]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ward\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|ward]]</span>, '''Lee Sin''' also shields himself.<br/>'''Lee Sin''' can [[self-targeted|self-cast]] ''Safeguard'' to shield himself.@@description2@@After ''Safeguard'' is cast, '''Lee Sin''' can cast ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Iron Will\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Iron Will.png|20xpx|border|link=Lee Sin#Iron Will|An icon for Lee Sin's ability Iron Will]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Iron Will|Iron Will]]</span></span>'' within the next 3 seconds.@@description3@@''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Iron Will\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Iron Will.png|20xpx|border|link=Lee Sin#Iron Will|An icon for Lee Sin's ability Iron Will]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Iron Will|Iron Will]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Cripple\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Cripple.png|20xpx|border|link=Lee Sin#Cripple|An icon for Lee Sin's ability Cripple]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Cripple|Cripple]]</span></span> can be cast during the dash.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>60 / 105 / 150 / 195 / 240 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@1350 + <span style=\"color:\n#9FFF4D; white-space:normal\">100% movement speed</span>@@casttime@@none@@cost@@50@@cooldown@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Starts on first cast\">7</span>@@targeting@@Unit@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* '''Lee Sin''' cannot self-cast ''Safeguard'' while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span>.\n* ''Safeguard'' can be used on any targetable allied unit excluding [[structures]].\n** This includes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ward\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>, and [[champion summoned units]] (e.g. <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Teemo\" data-ability=\"Noxious Trap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teemo Noxious Trap.png|20xpx|border|link=Teemo#Noxious Trap|An icon for Teemo's ability Noxious Trap]]</span> <span style=\"white-space:normal;\">[[Teemo#Noxious Trap|Noxious Trap]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Demacian Standard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Demacian Standard.png|20xpx|border|link=Jarvan IV#Demacian Standard|An icon for Jarvan IV's ability Demacian Standard]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Demacian Standard|Demacian Standard]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-ability=\"Dark Passage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh Dark Passage.png|20xpx|border|link=Thresh#Dark Passage|An icon for Thresh's ability Dark Passage]]</span> <span style=\"white-space:normal;\">[[Thresh#Dark Passage|Dark Passage]]</span></span>).\n* If no unit is directly targeted, ''Safeguard'' will search for wards in a 100 radius to target.\n** This aids '''Lee Sin''' in performing the dash to a ward he just placed.\n* ''Safeguard'' will not grant its <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> if the dash is interrupted.\n** If the dash overrides or is overridden by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Resonating Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Resonating Strike.png|20xpx|border|link=Lee Sin#Resonating Strike|An icon for Lee Sin's ability Resonating Strike]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Resonating Strike|Resonating Strike]]</span></span>, he will grant the shield immediately rather than on arrival.\n* If ''Safeguard's'' dash interrupts another dash, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Tempest\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Tempest.png|20xpx|border|link=Lee Sin#Tempest|An icon for Lee Sin's ability Tempest]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Tempest|Tempest]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Dragon&#39;s Rage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Dragon's Rage.png|20xpx|border|link=Lee Sin#Dragon's Rage|An icon for Lee Sin's ability Dragon's Rage]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Dragon's Rage|Dragon's Rage]]</span></span> can be cast during it (both otherwise cannot be cast).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1331710,
+                "revisions": [
+                  {
+                    "parentid": 4024313,
+                    "revid": 4024314,
+                    "timestamp": "2026-05-30T23:34:12Z"
+                  }
+                ],
+                "title": "Template:Data Lee Sin/Safeguard"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4024314,
+      "timestamp": "2026-05-30T23:34:12Z"
+    },
+    {
+      "page": "Template:Data Lee Sin/Iron Will",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Iron Will@@icon@@Iron Will.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Lee Sin''' gains <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Omnivamp icon.svg|15px|link=Omnivamp]]&nbsp;omnivamp</span></span> for 4 seconds.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Omnivamp:'''</span></dt><dd>10 / 14 / 18 / 22 / 26%</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@25@@cooldown@@{{{cooldown}}}@@targeting@@Auto@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* No additional details.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1331711,
+                "revisions": [
+                  {
+                    "parentid": 3948967,
+                    "revid": 3992654,
+                    "timestamp": "2026-02-18T20:40:57Z"
+                  }
+                ],
+                "title": "Template:Data Lee Sin/Iron Will"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3992654,
+      "timestamp": "2026-02-18T20:40:57Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b8f86a9b3f76fefd93bf580872edbe10a34f09a7f644e3fe44c3dce7527a0f4a",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Lee_Sin/Safeguard",
+    "revisionId": 4024314,
+    "sourceTimestamp": "2026-05-30T23:34:12Z"
+  }
+}

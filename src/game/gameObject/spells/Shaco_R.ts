@@ -8,7 +8,7 @@ import ParticleSystem from '../helpers/ParticleSystem';
 import { Shaco_W_Object } from './Shaco_W';
 
 export default class Shaco_R extends Spell {
-  image = AssetManager.getAsset('spell_shaco_r');
+  image = AssetManager.get('spell_shaco_r');
   name = 'Phân Thân (Shaco_R)';
   description =
     'Tạo ra một <span>phân thân</span> tồn tại trong <span class="time">10 giây</span>. Tái kích hoạt để điều khiển phân thân di chuyển. Khi chết, nó phát nổ, gây <span class="damage">30 sát thương</span> và gây <span class="buff">Hoảng Sợ</span> các kẻ địch xunh quanh trong <span class="time">1 giây</span> và để lại <span>3 Hộp Hề Ma Quái</span> nhỏ';
@@ -46,14 +46,14 @@ export default class Shaco_R extends Spell {
     this.game.objectManager.addObject(clone);
 
     this.clonePlayer = clone;
-    this.image = AssetManager.getAsset('spell_shaco_r2');
+    this.image = AssetManager.get('spell_shaco_r2');
     this.resetCoolDown();
   }
 
   onUpdate() {
     if (this.clonePlayer?.toRemove) {
       this.clonePlayer = null;
-      this.image = AssetManager.getAsset('spell_shaco_r');
+      this.image = AssetManager.get('spell_shaco_r');
       this.currentCooldown = this.coolDown;
     }
   }

@@ -8,7 +8,7 @@ import Stun from '../buffs/Stun';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_R extends Spell {
-  image = AssetManager.getAsset('spell_ashe_r');
+  image = AssetManager.get('spell_ashe_r');
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
     'Bắn mũi tên băng bay xuyên bản đồ, <span class="buff">Làm Choáng</span> diện rộng những kẻ địch trúng chiêu trong <span class="time">2.5 giây</span> và gây <span class="damage">30 sát thương</span>';
@@ -86,7 +86,7 @@ export class Ashe_R_Object extends SpellObject {
         enemiesInRange.forEach((p: any) => {
           let stunBuff = new Stun(2500, this.owner, p);
           stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-          stunBuff.image = AssetManager.getAsset('spell_ashe_r');
+          stunBuff.image = AssetManager.get('spell_ashe_r');
           p.addBuff(stunBuff);
           p.takeDamage(30, this.owner);
         });

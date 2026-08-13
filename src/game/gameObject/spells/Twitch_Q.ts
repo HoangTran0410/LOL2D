@@ -6,7 +6,7 @@ import Invisible from '../buffs/Invisible';
 import Speedup from '../buffs/Speedup';
 
 export default class Twitch_Q extends Spell {
-  image = AssetManager.getAsset('spell_twitch_q');
+  image = AssetManager.get('spell_twitch_q');
   name = 'Ẩn Mình (Twitch_Q)';
   description =
     '<span class="buff">Tàng Hình</span> và <span class="buff">Tăng Tốc 25%</span> trong <span class="time">4 giây</span>';

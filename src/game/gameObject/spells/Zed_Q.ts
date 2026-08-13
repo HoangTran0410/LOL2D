@@ -7,7 +7,7 @@ import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
 
 export default class Zed_Q extends Spell {
-  image = AssetManager.getAsset('spell_zed_q');
+  image = AssetManager.get('spell_zed_q');
   name = 'Phi tiêu sắc lẻm (Zed_Q)';
   description =
     'Phóng 1 phi tiêu về phía trước, gây <span class="damage">15 sát thương</span> và <span class="buff">làm chậm 50%</span> trong <span class="time">0.2 giây</span> cho mỗi kẻ địch bị xuyên qua.';
@@ -76,7 +76,7 @@ export class Zed_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const slowBuff = new Slow(200, this.owner, enemy);
-    slowBuff.image = AssetManager.getAsset('spell_zed_q');
+    slowBuff.image = AssetManager.get('spell_zed_q');
     slowBuff.percent = 0.5;
     enemy.addBuff(slowBuff);
 

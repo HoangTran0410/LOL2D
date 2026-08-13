@@ -10,7 +10,7 @@ import Shield from '../buffs/Shield';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Lux_W extends Spell {
-  image = AssetManager.getAsset('spell_lux_w');
+  image = AssetManager.get('spell_lux_w');
   name = 'Lá Chắn Lăng Kính (Lux_W)';
   description =
     'Ném cây đũa ánh sáng theo hướng chỉ định rồi thu về, tạo <span class="buff">Lá Chắn</span> hấp thụ <span class="damage">60 sát thương</span> trong <span class="time">3 giây</span> cho bản thân và mọi đồng minh nó đi xuyên qua, ở cả lượt đi lẫn lượt về';
@@ -98,7 +98,7 @@ export class Lux_W_Object extends MissileSpellObject {
       const shield = new Shield(this.shieldDuration, this.owner, ally);
       shield.amount = this.shieldAmount;
       shield.color = [255, 225, 140];
-      shield.image = AssetManager.getAsset('spell_lux_w');
+      shield.image = AssetManager.get('spell_lux_w');
       ally.addBuff(shield);
 
       // the shield ring alone is easy to miss, so flash the moment it lands

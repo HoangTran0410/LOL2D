@@ -12,7 +12,7 @@ const SIZE_PER_STACK = 6;
 const MAX_HEALTH_PER_STACK = 75;
 
 export default class ChoGath_R extends Spell {
-  image = AssetManager.getAsset('spell_chogath_r');
+  image = AssetManager.get('spell_chogath_r');
   name = "Ăn Thịt (Cho'Gath_R)";
   description =
     'Ngoạm kẻ địch gần nhất trong phạm vi <span>200px</span>, gây <span class="damage">40 sát thương</span>. Mỗi lần ăn, Cho\'Gath <span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+6 kích thước</span> và <span class="buff">+75 máu tối đa</span>';

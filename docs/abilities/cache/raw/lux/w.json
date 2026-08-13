@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Lux/Prismatic Barrier",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Prismatic Barrier@@icon@@Prismatic Barrier.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Lux''' throws her wand in the target direction that homes back to her after reaching maximum range. Allied champions hit by the wand gain a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 2.<small>5</small> seconds, which can stack up to 2 times, stacking with the previous shield and refreshing its duration.@@description2@@'''Lux''' gains the shield upon throwing and upon retrieving the wand.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>40 / 55 / 70 / 85 / 100 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Shield:'''</span></dt><dd>80 / 110 / 140 / 170 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 1175@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Circle check upon commencing of direction reversal\">110</span>@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Both outgoing and returning, homing missile\">220</span>@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Original speed; decelerates/accelerates depending on travel time, see notes\">2400</span>@@casttime@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Effect starts at beginning of cast time\">0.<small>25</small></span>@@cost@@60 / 65 / 70 / 75 / 80@@cooldown@@12 / 11.<small>5</small> / 11 / 10.<small>5</small> / 10@@targeting@@Direction@@damagetype@@@@spellshield@@@@projectile@@special@@notes@@\n* Each pass of the wand grants a shield to each target once.\n* ''Prismatic Barrier'' may only stack up to 2 times. Subsequent instances of passing through the wand have no effect on the shield's strength nor duration.\n* The shield will also be granted to allies near the wand's return location.\n* Both passes of ''Prismatic Barrier'' cannot hit units whose <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Center range\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]] [[:Range|center]]</span> is beyond the missile range or behind its origin, even if their <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Edge range\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]] [[:Range|hitbox radius]]</span> overlaps.\n** At the return location, this behaviour is overridden by an additional center check with the same diameter as the missile width.\n* If '''Lux''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span> before her wand returns it will fizzle upon reaching maximum range.\n* There is an additional circle check at the end of the missile's length that allows it to hit the edge of an ally's radius. This is intended.\n* '''Lux's''' wand decelerates on the way out and accelerates on the way back.\n* This ability will cast from wherever the caster is at the start of the cast time.\n* ''Prismatic Barrier'' is destroyed by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Samira\" data-ability=\"Blade Whirl\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Samira Blade Whirl.png|20xpx|border|link=Samira#Blade Whirl|An icon for Samira's ability Blade Whirl]]</span> <span style=\"white-space:normal;\">[[Samira#Blade Whirl|Blade Whirl]]</span></span>, and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Mel\" data-ability=\"Rebuttal\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Mel Rebuttal.png|20xpx|border|link=Mel#Rebuttal|An icon for Mel's ability Rebuttal]]</span> <span style=\"white-space:normal;\">[[Mel#Rebuttal|Rebuttal]]</span></span> but not <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308052,
+                "revisions": [
+                  {
+                    "parentid": 3966124,
+                    "revid": 3992656,
+                    "timestamp": "2026-02-18T20:41:20Z"
+                  }
+                ],
+                "title": "Template:Data Lux/Prismatic Barrier"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3992656,
+      "timestamp": "2026-02-18T20:41:20Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6dc2f60892d09d3238a288e5be5e2a2b17416cfac1b985946071efcb39849258",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Lux/Prismatic_Barrier",
+    "revisionId": 3992656,
+    "sourceTimestamp": "2026-02-18T20:41:20Z"
+  }
+}

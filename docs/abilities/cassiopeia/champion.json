@@ -1,0 +1,110 @@
+{
+  "asset": {
+    "key": "champ_cassiopeia",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_OriginalSquare.png?56ef7",
+    "sha1": "9f12a769d612c155b581520c1a037c51f12fbf55"
+  },
+  "champion": "Cassiopeia",
+  "data": {
+    "adaptivetype": "Magic",
+    "apiname": "Cassiopeia",
+    "be": 2400,
+    "changes": "V26.15",
+    "client_positions": [
+      "Middle"
+    ],
+    "client_tags": [
+      "Crowd Control",
+      "Sustained Damage",
+      "Magic"
+    ],
+    "control": 3,
+    "damage": 3,
+    "date": "2010-12-14",
+    "difficulty": 2,
+    "external_positions": [
+      "Middle"
+    ],
+    "fullname": "Cassiopeia Du Couteau",
+    "herotype": "Mage",
+    "id": 69,
+    "mobility": 1,
+    "patch": "V1.0.0.107",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Battlemage"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Twin Fang"
+    },
+    "skill_i": {
+      "1": "Serpentine Grace",
+      "2": "Serpentine Grace 2"
+    },
+    "skill_q": {
+      "1": "Noxious Blast"
+    },
+    "skill_r": {
+      "1": "Petrifying Gaze"
+    },
+    "skill_w": {
+      "1": "Miasma"
+    },
+    "skills": {
+      "1": "Serpentine Grace",
+      "2": "Noxious Blast",
+      "3": "Miasma",
+      "4": "Twin Fang",
+      "5": "Petrifying Gaze"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "ar": {
+        "hp_lvl": -10
+      },
+      "arm_base": 18,
+      "arm_lvl": 4.7,
+      "as_base": 0.647,
+      "as_lvl": 1.5,
+      "as_ratio": 0.647000014781951,
+      "attack_delay_offset": -0.108000002801418,
+      "dam_base": 53,
+      "dam_lvl": 3,
+      "hp5_base": 5.5,
+      "hp5_lvl": 0.5,
+      "hp_base": 630,
+      "hp_lvl": 98,
+      "missile_speed": 1500,
+      "mp5_base": 8,
+      "mp5_lvl": 0.8,
+      "mp_base": 480,
+      "mp_lvl": 40,
+      "mr_base": 32,
+      "mr_lvl": 1.3,
+      "ms": 335,
+      "pathing_radius": 35,
+      "range": 550,
+      "selection_height": 120,
+      "selection_radius": 120,
+      "urf": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      }
+    },
+    "style": 100,
+    "title": "The Serpent's Embrace",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6c8590574ed394820a0234760ab2ac4377aa7807ff2ec53516c96a5956b59149",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "asset": {
+    "key": "spell_ashe_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Hawkshot.png?eea42",
+    "sha1": "146c58b5a58a9fb4de97d8ecc2d6db460fac1eb6"
+  },
+  "champion": "Ashe",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "5",
+        "cost": "1",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ashe''' sends a hawk spirit to a location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area along its path<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;repeatedly for 0.<small>5</small> seconds after every 100 units traveled&nbsp;」</span><span class=\"flipText2\">「&nbsp;for effectively up-to 1.<small>8</small> seconds at any location&nbsp;」</span></span>and at its destination for 5 seconds.",
+          "text": "Active: Ashe sends a hawk spirit to a location, granting sight of the area along its path「&nbsp;repeatedly for 0.5 seconds after every 100 units traveled&nbsp;」「&nbsp;for effectively up-to 1.8 seconds at any location&nbsp;」and at its destination for 5 seconds."
+        },
+        "description2": {
+          "raw": "'''Ashe''' periodically [[ammunition|stocks]] a ''Hawkshot'' charge, up to a maximum of 2.",
+          "text": "Ashe periodically stocks a Hawkshot charge, up to a maximum of 2."
+        },
+        "effectradius": "1000",
+        "icon": "Hawkshot.png",
+        "name": "Hawkshot",
+        "notes": {
+          "raw": "* ''Hawkshot's'' recharge timer seems to start at the beginning of the game, even prior to ranking the ability, but upon actually ranking the ability, it starts with one charge and the recharge timer starts from 0.\n* ''Hawkshot'' will ping enemy champions it spots if allies didn't already have vision of them, and put a 'revealed' visual effect on them for <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2.<small>75</small> seconds</span>, but does not actually reveal the units in particular, and is removed if the champion leaves the area.\n* '''Ashe''' marks enemy champions who were previously unseen but were revealed ''Hawkshot'' in order to gain [[assist]] credit, lasting for the standard credit timer.\n* ''Hawkshot'' will trigger upon colliding with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Samira\" data-ability=\"Blade Whirl\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Samira Blade Whirl.png|20xpx|border|link=Samira#Blade Whirl|An icon for Samira's ability Blade Whirl]]</span> <span style=\"white-space:normal;\">[[Samira#Blade Whirl|Blade Whirl]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> but not <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* ''Hawkshot'' will grant 0.33 points of [[vision score]] for each champion revealed.",
+          "text": "Hawkshot's recharge timer seems to start at the beginning of the game, even prior to ranking the ability, but upon actually ranking the ability, it starts with one charge and the recharge timer starts from 0.\nHawkshot will ping enemy champions it spots if allies didn't already have vision of them, and put a 'revealed' visual effect on them for 2.75 seconds, but does not actually reveal the units in particular, and is removed if the champion leaves the area.\nAshe marks enemy champions who were previously unseen but were revealed Hawkshot in order to gain assist credit, lasting for the standard credit timer.\nHawkshot will trigger upon colliding with Blade Whirl or Wind Wall but not Unbreakable.\nHawkshot will grant 0.33 points of vision score for each champion revealed."
+        },
+        "projectile": false,
+        "speed": "1400",
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Hawkshot"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "24cc96d9db174d16dd47fbeabac5412d86578936aaa45bfc4c185e872597bf27",
+    "fetchedAt": "2026-08-13T10:47:30.447Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ashe/Hawkshot",
+    "revisionId": 3936951,
+    "sourceTimestamp": "2025-07-27T11:52:18Z"
+  }
+}

@@ -23,10 +23,12 @@ import Untargetable from '../buffs/Untargetable';
 export default class Fizz_E extends Spell {
   static PHASES = {
     GROUND: {
-      image: AssetManager.getAsset('spell_fizz_e'),
+      image: AssetManager.get('spell_fizz_e'),
     },
     AIR: {
-      image: AssetManager.getAsset('spell_fizz_e2'),
+      // The wiki carries no separate icon for the second form, so the recast
+      // reuses the base icon rather than falling back to a blank placeholder.
+      image: AssetManager.get('spell_fizz_e'),
     },
   };
   phase: 'GROUND' | 'AIR' = 'GROUND';
@@ -174,7 +176,7 @@ export default class Fizz_E extends Spell {
 
       if (withSlow) {
         const slowBuff = new Slow(this.slowDuration, this.owner, enemy);
-        slowBuff.image = AssetManager.getAsset('buff_slow');
+        slowBuff.image = AssetManager.get('buff_slow');
         slowBuff.percent = this.slowPercent;
         enemy.addBuff(slowBuff);
       }

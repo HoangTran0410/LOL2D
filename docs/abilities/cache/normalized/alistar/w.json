@@ -1,0 +1,46 @@
+{
+  "asset": {
+    "key": "spell_alistar_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Headbutt.png?54c2d",
+    "sha1": "853af106d277d0f9656f69c1651762d27285abdc"
+  },
+  "champion": "Alistar",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "none",
+        "cooldown": "14 / 13 / 12 / 11 / 10",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Alistar''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target enemy's location. If they are within 400 units upon arrival, he deals them <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocks them back]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Reduced to 200 units if Pulverize was buffered during the dash\">700 units</span> over 0.<small>5</small> seconds while also <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> them for 0.<small>75</small> seconds.",
+          "text": "Active: Alistar dashes to the target enemy's location. If they are within 400 units upon arrival, he deals them magic damage and knocks them back 700 units over 0.5 seconds while also stunning them for 0.75 seconds."
+        },
+        "icon": "Headbutt.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 110 / 165 / 220 / 275 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>",
+          "text": "Magic Damage:55 / 110 / 165 / 220 / 275 (+ 100% AP)"
+        },
+        "name": "Headbutt",
+        "notes": {
+          "raw": "* The dash speed depends on the inverse of the distance to the target:\n** If '''Alistar's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Size\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|radius]]</span> overlaps with his target's, he will dash with <span style=\"color:\n#9FFF4D; white-space:normal\">1200 speed</span>.\n** If '''Alistar''' is further from his target than the previous condition, he will dash with (1200 &nbsp;&times;&nbsp; dash distance) / (dash distance - sum of radiuses).\n*** At maximum target range, against an enemy with a 65 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Gameplay radius\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|gameplay radius]]</span> (median of all champions), '''Alistar''' will dash with <span style=\"color:\n#9FFF4D; white-space:normal\">1544 speed</span> (reaching his target within <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"rounded to next game tick\">0.<small>429</small> seconds</span>).\n*** Both the lower the dash distance and the larger '''Alistar''' and/or his target, the faster the dash becomes; this scales hyperbolically (dash speed can theoretically scale up to ∞).\n* When <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Alistar\" data-ability=\"Pulverize\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Alistar Pulverize.png|20xpx|border|link=Alistar#Pulverize|An icon for Alistar's ability Pulverize]]</span> <span style=\"white-space:normal;\">[[Alistar#Pulverize|Pulverize]]</span></span> is buffered during the dash, the knock back distance is reduced to 200 units.\n* The CC duration of the ability can be reduced by up to 33.<small>33</small>% <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Tenacity\">[[File:Tenacity icon.png|20px|link=Tenacity|An icon representing the keyword Tenacity]] [[:Tenacity|Tenacity]]</span>, due to airborne not being reducible while the stun is.\n* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockback]]</span> direction is in a straight line from '''Alistar's''' original location at start of cast and the enemy when '''Alistar's''' dash ends.\n* ''Headbutt'' can knock enemies through terrain. The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockback]]</span> stops short on walls that cannot be surpassed but the disable duration is not changed.\n* The [[spell indicator]] for this ability also displays the direction for the knock back relative to '''Alistar's''' position.\n* '''Alistar's''' <span style=\"color:inherit; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;attack range</span></span> is reduced<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;to -375&nbsp;」</span><span class=\"flipText2\">「&nbsp;by 500&nbsp;」</span></span>during ''Headbutt'', to prevent him from being able to attack the target when he completes the dash.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immunity]]</span> will not resist the application of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span>.",
+          "text": "The dash speed depends on the inverse of the distance to the target:\n* If Alistar's radius overlaps with his target's, he will dash with 1200 speed.\n* If Alistar is further from his target than the previous condition, he will dash with (1200 &nbsp;&times;&nbsp; dash distance) / (dash distance - sum of radiuses).\n** At maximum target range, against an enemy with a 65 gameplay radius (median of all champions), Alistar will dash with 1544 speed (reaching his target within 0.429 seconds).\n** Both the lower the dash distance and the larger Alistar and/or his target, the faster the dash becomes; this scales hyperbolically (dash speed can theoretically scale up to ∞).\nWhen Pulverize is buffered during the dash, the knock back distance is reduced to 200 units.\nThe CC duration of the ability can be reduced by up to 33.33% Tenacity, due to airborne not being reducible while the stun is.\nThe knockback direction is in a straight line from Alistar's original location at start of cast and the enemy when Alistar's dash ends.\nHeadbutt can knock enemies through terrain. The knockback stops short on walls that cannot be surpassed but the disable duration is not changed.\nThe spell indicator for this ability also displays the direction for the knock back relative to Alistar's position.\nAlistar's &nbsp;attack range is reduced「&nbsp;to -375&nbsp;」「&nbsp;by 500&nbsp;」during Headbutt, to prevent him from being able to attack the target when he completes the dash.\nDisplacement immunity will not resist the application of the stun."
+        },
+        "speed": "1200 • 1544",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Headbutt"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "275429f909431b460ac2cd9bad9f39cc7d3a0c8995b2e98c71fd06ed5a4a2681",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Alistar/Headbutt",
+    "revisionId": 4007563,
+    "sourceTimestamp": "2026-04-12T06:23:23Z"
+  }
+}

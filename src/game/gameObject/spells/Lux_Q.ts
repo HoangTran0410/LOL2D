@@ -6,7 +6,7 @@ import RootBuff from '../buffs/Root';
 
 export default class Lux_Q extends Spell {
   name = 'Khóa Ánh Sáng (Lux_Q)';
-  image = AssetManager.getAsset('spell_lux_q');
+  image = AssetManager.get('spell_lux_q');
   description =
     'Lux phóng ra một quả cầu ánh sáng theo đường thẳng, gây <span class="damage">20 sát thương</span> và <span class="buff">Trói Chân</span> 2 kẻ địch đầu tiên trúng phải trong <span class="time">2 giây</span>';
   coolDown = 5000;
@@ -39,7 +39,7 @@ export class Lux_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const stunBuff = new RootBuff(this.stunTime, this.owner, enemy);
-    stunBuff.image = AssetManager.getAsset('spell_lux_q');
+    stunBuff.image = AssetManager.get('spell_lux_q');
     enemy.addBuff(stunBuff);
     enemy.takeDamage(20, this.owner);
   }

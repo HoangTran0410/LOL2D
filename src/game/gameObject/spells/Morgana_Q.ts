@@ -11,7 +11,7 @@ import TrailSystem from '../helpers/TrailSystem';
 const BINDING_COLOR: [number, number, number] = [186, 96, 240];
 
 export default class Morgana_Q extends Spell {
-  image = AssetManager.getAsset('spell_morgana_q');
+  image = AssetManager.get('spell_morgana_q');
   name = 'Xiềng Xích Bóng Tối (Morgana_Q)';
   description =
     'Phóng một xiềng xích bóng tối đi rất xa theo hướng chỉ định, gây <span class="damage">25 sát thương</span> và <span class="buff">Trói Chân</span> kẻ địch đầu tiên trúng phải trong <span class="time">2 giây</span>';
@@ -66,7 +66,7 @@ export class Morgana_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     const rootBuff = new Root(this.rootTime, this.owner, enemy);
-    rootBuff.image = AssetManager.getAsset('spell_morgana_q');
+    rootBuff.image = AssetManager.get('spell_morgana_q');
     rootBuff.effectColor = [150, 60, 200, 220];
     enemy.addBuff(rootBuff);
 

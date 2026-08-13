@@ -16,7 +16,7 @@ import SpellObject from '../SpellObject';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class SpellName extends Spell {
-  image = AssetManager.getAsset('spell_name');
+  image = AssetManager.placeholder('spell_name');
   name = '';
   description = 'Spell description';
   coolDown = 1000;
@@ -31,7 +31,7 @@ export default class SpellName extends Spell {
  * normal projectile is just tuning fields plus `onHit` and `draw`.
  */
 export class SpellName_Skillshot extends Spell {
-  image = AssetManager.getAsset('spell_name');
+  image = AssetManager.placeholder('spell_name');
   name = '';
   description = '';
   coolDown = 5000;
@@ -87,7 +87,7 @@ export class SpellName_Missile extends MissileSpellObject {
 }
 
 export class SpellName_Buff extends Buff {
-  image = AssetManager.getAsset('buff_name');
+  image = AssetManager.placeholder('buff_name');
   description = '';
   buffAddType = BuffAddType.REPLACE_EXISTING;
   maxStacks = 1;

@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_veigar_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Baleful_Strike.png?46b77",
+    "sha1": "3a2ce7dd6026bc13414da87aeb559c7c42babaa4"
+  },
+  "champion": "Veigar",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "6 / 5.5 / 5 / 4.5 / 4",
+        "cost": "30 / 35 / 40 / 45 / 50",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Veigar''' blasts a dark bolt in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first two enemies hit.",
+          "text": "Active: Veigar blasts a dark bolt in the target direction that deals magic damage to the first two enemies hit."
+        },
+        "description2": {
+          "raw": "If this kills an enemy, it generates 1 stack of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span>'', tripled against large <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "If this kills an enemy, it generates 1 stack of Phenomenal Evil, tripled against large minions and monsters."
+        },
+        "icon": "Baleful Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 120 / 160 / 200 / 240 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50 / 55 / 60 / 65 / 70% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 120 / 160 / 200 / 240 (+ 50 / 55 / 60 / 65 / 70% AP)"
+        },
+        "name": "Baleful Strike",
+        "notes": {
+          "raw": "* Killing two enemy champions with ''Baleful Strike'' grants <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"+12 from Phenomenal Evil Power and +2 from Baleful Strike\"><span style=\"color:\n#7A6DFF; white-space:normal\">+14 AP</span></span>.\n* ''Baleful Strike'' will only grant stacks of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Veigar\" data-ability=\"Phenomenal Evil Power\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Veigar Phenomenal Evil Power.png|20xpx|border|link=Veigar#Phenomenal Evil Power|An icon for Veigar's ability Phenomenal Evil Power]]</span> <span style=\"white-space:normal;\">[[Veigar#Phenomenal Evil Power|Phenomenal Evil]]</span></span> from its bolt, and not any additional effect that would kill other units from the same cast.\n* The stacks are added immediately on enemy kill (on next game tick).\n**If the first target was killed, the second hit may deal 1 damage more on enemies further along the missile's flight path.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "Killing two enemy champions with Baleful Strike grants +14 AP.\nBaleful Strike will only grant stacks of Phenomenal Evil from its bolt, and not any additional effect that would kill other units from the same cast.\nThe stacks are added immediately on enemy kill (on next game tick).\n*If the first target was killed, the second hit may deal 1 damage more on enemies further along the missile's flight path.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": true,
+        "speed": "2200",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "140"
+      },
+      "name": "Baleful Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "9c9cec995a33df87e655ad85531eaf9667d4346e45267e8168557bd800a00cc5",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Veigar/Baleful_Strike",
+    "revisionId": 4050924,
+    "sourceTimestamp": "2026-08-11T02:17:37Z"
+  }
+}

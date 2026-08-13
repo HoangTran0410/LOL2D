@@ -24,10 +24,10 @@ const CHAIN_DARK: [number, number, number] = [20, 70, 45];
 export default class Thresh_Q extends Spell {
   static PHASES = {
     Q1: {
-      image: AssetManager.getAsset('spell_thresh_q'),
+      image: AssetManager.get('spell_thresh_q'),
     },
     Q2: {
-      image: AssetManager.getAsset('spell_thresh_q2'),
+      image: AssetManager.get('spell_thresh_q2'),
     },
   };
   phase: 'Q1' | 'Q2' = 'Q1';
@@ -177,7 +177,7 @@ export class Thresh_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     this.stunBuff = new Stun(this.shackleDuration, this.owner, enemy);
-    this.stunBuff.image = AssetManager.getAsset('spell_thresh_q');
+    this.stunBuff.image = AssetManager.get('spell_thresh_q');
     enemy.addBuff(this.stunBuff);
 
     this.onHookLanded?.();
@@ -230,7 +230,7 @@ export class Thresh_Q_Object extends MissileSpellObject {
     this.tugBuff?.deactivateBuff?.();
 
     const tug = new Dash(500, this.owner, this.champHooked);
-    tug.image = AssetManager.getAsset('spell_thresh_q');
+    tug.image = AssetManager.get('spell_thresh_q');
     tug.dashDestination = to;
     tug.dashSpeed = this.tugSpeed;
     tug.showTrail = false;

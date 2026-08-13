@@ -30,7 +30,11 @@ export function championSlug(name) {
   if (typeof name !== 'string' || !name || !/^[\p{L}\p{N} .'-]+$/u.test(name)) {
     throw new Error(`Invalid champion name: ${name}`);
   }
-  const slug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  // Separators are dropped, not turned into '-': the repo names champion art
+  // `chogath.png` / `leesin.png`, and a '-' here would import Cho'Gath and Lee
+  // Sin under a second slug, duplicating their avatars and producing asset keys
+  // (spell_cho_gath_e) that no spell references.
+  const slug = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '');
   if (!slug) throw new Error(`Invalid champion name: ${name}`);
   return slug;
 }

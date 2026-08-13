@@ -9,7 +9,7 @@ import Slow from '../buffs/Slow';
 
 export default class Lux_E extends Spell {
   name = 'Quả Cầu Ánh Sáng (Lux_E)';
-  image = AssetManager.getAsset('spell_lux_e');
+  image = AssetManager.get('spell_lux_e');
   description =
     'Phóng ra 1 xoáy ánh sáng tới vị trí chỉ định, <span class="buff">Làm Chậm 50%</span> các kẻ địch đi vào. Tái kích hoạt hoặc sau <span class="time">5 giây</span> sẽ phát nổ, gây <span class="damage">20 sát thương</span> cho các kẻ địch trong vùng';
   coolDown = 5000;
@@ -108,7 +108,7 @@ export class Lux_E_Object extends SpellObject {
       const enemies = this._getEnemisInRange();
       enemies.forEach((enemy: any) => {
         const slowBuff = new Slow(200, this.owner, enemy);
-        slowBuff.image = AssetManager.getAsset('spell_lux_e');
+        slowBuff.image = AssetManager.get('spell_lux_e');
         slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
         slowBuff.percent = 0.5;
         enemy.addBuff(slowBuff);

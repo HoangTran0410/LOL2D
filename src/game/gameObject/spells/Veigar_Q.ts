@@ -9,7 +9,7 @@ import StatAmp from '../buffs/StatAmp';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Veigar_Q extends Spell {
-  image = AssetManager.getAsset('spell_veigar_q');
+  image = AssetManager.get('spell_veigar_q');
   name = 'Quả Cầu Bóng Tối (Veigar_Q)';
   description =
     'Bắn ra một quả cầu năng lượng hắc ám xuyên qua mọi kẻ địch, gây <span class="damage">22 sát thương</span>. Mỗi kẻ địch trúng chiêu giúp Veigar <span class="buff">cộng dồn vĩnh viễn +20 năng lượng tối đa</span>';
@@ -103,7 +103,7 @@ export class Veigar_Q_Power extends StatAmp {
 }
 
 export class Veigar_Q_Object extends MissileSpellObject {
-  image = AssetManager.getAsset('spell_veigar_q');
+  image = AssetManager.get('spell_veigar_q');
   speed = 8;
   size = 26;
   // pierces everything, and every victim feeds the stacking

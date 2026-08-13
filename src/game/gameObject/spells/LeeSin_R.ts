@@ -10,7 +10,7 @@ import Stun from '../buffs/Stun';
 import ParticleSystem from '../helpers/ParticleSystem';
 
 export default class LeeSin_R extends Spell {
-  image = AssetManager.getAsset('spell_leesin_r');
+  image = AssetManager.get('spell_leesin_r');
   name = 'Nộ Long Cước (LeeSin_R)';
   description =
     'Tung cước đá mục tiêu <span class="buff">Văng ra xa</span>, gây <span class="damage">30 sát thương</span> và <span class="buff">Làm Choáng</span> mục tiêu trong <span class="time">0.5 giây</span>. Những kẻ địch khác bị mục tiêu va trúng sẽ bị <span class="buff">Hất Tung</span> trong <span class="time">1 giây</span> và nhận <span class="damage">30 sát thương</span>';
@@ -152,7 +152,7 @@ export class LeeSin_R_Object extends SpellObject {
       enemy.takeDamage(this.collideDamage, this.owner);
 
       const airbornBuff = new Airborne(1000, this.owner, enemy);
-      airbornBuff.image = AssetManager.getAsset('spell_leesin_r');
+      airbornBuff.image = AssetManager.get('spell_leesin_r');
       enemy.addBuff(airbornBuff);
 
       this.effectedEnemies.push(enemy);

@@ -30,6 +30,7 @@ describe('AssetManager loader routing', () => {
     expect(loaders.json).toHaveBeenCalledWith('/map.json');
     expect(loaders.audio).toHaveBeenCalledWith('/flash.ogg');
     expect(AssetManager.get('cursor_normal')).toMatchObject({ status: 'ready', data: '/normal.cur' });
-    expect(AssetManager.getAsset('champ_ahri')).toBe(AssetManager.get('champ_ahri'));
+    // handles are memoised, so callers can hold one and watch it flip to ready
+    expect(AssetManager.get('champ_ahri')).toBe(AssetManager.get('champ_ahri'));
   });
 });

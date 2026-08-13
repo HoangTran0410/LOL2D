@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Singed/Mega Adhesive",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Mega Adhesive@@icon@@Mega Adhesive.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' spills a potent adhesive that lands at the target location after 0.<small>375</small> seconds, creating a field for 3 seconds that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounds]]</span> enemies within and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slows\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>50 / 55 / 60 / 65 / 70%</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 265@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@60 / 70 / 80 / 90 / 100@@cooldown@@17 / 16 / 15 / 14 / 13@@targeting@@Location@@damagetype@@@@spellshield@@false@@projectile@@true@@notes@@\n* The goo missile is a projectile. It has a fixed travel time but is independent from when the zone is established. It is destructible by effects such as <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and will destroy item spell shields if the goo missile is thrown past an enemy champion.\n* ''Mega Adhesive's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|ground]]</span> debuffs are each marked as non-dispellable, so they are not removed by most <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span>. Each is however allowed to be removed by cleanses that '''also''' grant immunity to the debuff type, such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf OriginalSquare.png|20xpx|border|link=Olaf|An icon representing Olaf]]</span> <span style=\"white-space:normal;\">[[Olaf|Olaf's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Ragnarok\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Ragnarok.png|20xpx|border|link=Olaf#Ragnarok|An icon for Olaf's ability Ragnarok]]</span> <span style=\"white-space:normal;\">[[Olaf#Ragnarok|Ragnarok]]</span></span></span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309548,
+                "revisions": [
+                  {
+                    "parentid": 4001676,
+                    "revid": 4001677,
+                    "timestamp": "2026-03-22T11:27:51Z"
+                  }
+                ],
+                "title": "Template:Data Singed/Mega Adhesive"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4001677,
+      "timestamp": "2026-03-22T11:27:51Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f9411b67d4d822583402c8aba4c12c66627b5ccd74f18bce58274eeff97bfb21",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Mega_Adhesive",
+    "revisionId": 4001677,
+    "sourceTimestamp": "2026-03-22T11:27:51Z"
+  }
+}

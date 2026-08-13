@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Morgana/Dark Binding",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Dark Binding@@icon@@Dark Binding.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Morgana''' throws a sphere of dark magic in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first enemy hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|roots]]</span> them for a duration.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 135 / 190 / 245 / 300 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>2 / 2.<small>25</small> / 2.<small>5</small> / 2.<small>75</small> / 3 seconds</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 1300@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 140@@speed@@1200@@casttime@@0.<small>25</small>@@cost@@50 / 55 / 60 / 65 / 70@@cooldown@@10@@targeting@@Direction@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* This ability will cast from wherever the caster is at the start of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308064,
+                "revisions": [
+                  {
+                    "parentid": 3907259,
+                    "revid": 3936353,
+                    "timestamp": "2025-07-24T13:34:46Z"
+                  }
+                ],
+                "title": "Template:Data Morgana/Dark Binding"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3936353,
+      "timestamp": "2025-07-24T13:34:46Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "050a4dc2817d0d96ea41bdec84de07222c2ed84367f9b66cac4058e593d1f520",
+    "fetchedAt": "2026-08-13T10:47:30.447Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Morgana/Dark_Binding",
+    "revisionId": 3936353,
+    "sourceTimestamp": "2025-07-24T13:34:46Z"
+  }
+}

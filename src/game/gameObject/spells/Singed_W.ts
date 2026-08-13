@@ -15,7 +15,7 @@ import Slow from '../buffs/Slow';
  * dashes or blinks their way out of the glue.
  */
 export default class Singed_W extends Spell {
-  image = AssetManager.getAsset('spell_singed_w');
+  image = AssetManager.get('spell_singed_w');
   name = 'Keo Dính (Singed_W)';
   description =
     'Đổ một vũng keo dính xuống khu vực chỉ định, tồn tại trong <span class="time">5 giây</span>. Chiêu này <b>không gây bất kỳ sát thương nào</b>. Kẻ địch đứng trong vũng keo bị <span class="buff">Làm Chậm 60%</span> và bị <span class="buff">Ghìm</span> — vẫn đi được nhưng không thể dùng kỹ năng lướt hay dịch chuyển để thoát ra';
@@ -60,7 +60,7 @@ const MAX_BLOBS = 18;
 const EDGE_SEGMENTS = 24;
 
 export class Singed_W_Object extends SpellObject {
-  image = AssetManager.getAsset('spell_singed_w');
+  image = AssetManager.get('spell_singed_w');
   position: p5.Vector = this.owner.position.copy();
 
   /**

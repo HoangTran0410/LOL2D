@@ -6,7 +6,7 @@ import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export default class Flash extends Spell {
   name = 'Tốc Biến (Flash)';
-  image = AssetManager.getAsset('spell_flash');
+  image = AssetManager.get('spell_flash');
   description =
     '<span class="buff">Lập tức dich chuyển</span> tới vị trí con trỏ, tối đa 180px khoảng cách';
   coolDown = 5000;

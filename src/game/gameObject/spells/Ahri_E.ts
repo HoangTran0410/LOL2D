@@ -6,7 +6,7 @@ import Charm from '../buffs/Charm';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_E extends Spell {
-  image = AssetManager.getAsset('spell_ahri_e');
+  image = AssetManager.get('spell_ahri_e');
   name = 'Hôn Gió (Ahri_E)';
   description =
     'Hôn gió theo hướng chỉ định, gây <span class="damage">15 sát thương</span> và <span class="buff">Mê Hoặc</span> kẻ địch trong <span class="time">1.5 giây</span>';
@@ -45,7 +45,7 @@ export class Ahri_E_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const charmBuff = new Charm(this.charmTime, this.owner, enemy);
-    charmBuff.image = AssetManager.getAsset('spell_ahri_e');
+    charmBuff.image = AssetManager.get('spell_ahri_e');
     charmBuff.speed = 1;
     enemy.addBuff(charmBuff);
   }

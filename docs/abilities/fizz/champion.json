@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "key": "champ_fizz",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_OriginalSquare.png?44c3d",
+    "sha1": "72dfdc1d89d4b771c9b8aafa436feebbd546df4f"
+  },
+  "champion": "Fizz",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Fighter",
+    "apiname": "Fizz",
+    "be": 675,
+    "changes": "V26.04",
+    "client_positions": [
+      "Middle"
+    ],
+    "client_tags": [
+      "Burst",
+      "Mobile",
+      "Magic"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2011-11-15",
+    "difficulty": 2,
+    "external_positions": [
+      "Middle"
+    ],
+    "herotype": "Assassin",
+    "id": 105,
+    "mobility": 3,
+    "patch": "V1.0.0.129",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Assassin"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Playful",
+      "2": "Trickster"
+    },
+    "skill_i": {
+      "1": "Nimble Fighter"
+    },
+    "skill_q": {
+      "1": "Urchin Strike"
+    },
+    "skill_r": {
+      "1": "Chum the Waters"
+    },
+    "skill_w": {
+      "1": "Seastone Trident"
+    },
+    "skills": {
+      "1": "Nimble Fighter",
+      "2": "Urchin Strike",
+      "3": "Seastone Trident",
+      "4": "Playful",
+      "5": "Trickster",
+      "6": "Chum the Waters"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "ar": {
+        "hp_lvl": 15
+      },
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.95,
+        "tenacity": 1.1
+      },
+      "arm_base": 26,
+      "arm_lvl": 4.6,
+      "as_base": 0.658,
+      "as_lvl": 3.1,
+      "as_ratio": 0.657999992370605,
+      "attack_delay_offset": -0.0970000028610229,
+      "dam_base": 58,
+      "dam_lvl": 3,
+      "gameplay_radius": 55,
+      "hp5_base": 8,
+      "hp5_lvl": 0.7,
+      "hp_base": 640,
+      "hp_lvl": 106,
+      "mp5_base": 6,
+      "mp5_lvl": 0.8,
+      "mp_base": 317,
+      "mp_lvl": 52,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 335,
+      "pathing_radius": 30,
+      "range": 175,
+      "selection_height": 138.88890075683594,
+      "selection_radius": 108.333297729492,
+      "urf": {
+        "dmg_dealt": 0.9,
+        "dmg_taken": 1.1
+      }
+    },
+    "style": 90,
+    "title": "The Tidal Trickster",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "e4eb67a385f7261465cbacf4ba270b55c4dd16b93cd038af726e02db73550416",
+    "fetchedAt": "2026-08-13T10:47:42.485Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

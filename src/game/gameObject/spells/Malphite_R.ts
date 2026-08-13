@@ -8,7 +8,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Malphite_R extends Spell {
-  image = AssetManager.getAsset('spell_malphite_r');
+  image = AssetManager.get('spell_malphite_r');
   name = 'Không Thể Cản Phá (Malphite_R)';
   description =
     '<span class="buff">Lướt</span> tới khu vực chỉ định với tốc độ cao, gây <span class="damage">30 sát thương</span> và <span class="buff">Hất Tung</span> các kẻ địch trong <span class="time">1 giây</span> xung quanh điểm đến. <i>(Không thể cản phá bởi các hiệu ứng khống chế)</i>';

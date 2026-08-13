@@ -7,7 +7,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Yasuo_W extends Spell {
-  image = AssetManager.getAsset('spell_yasuo_w');
+  image = AssetManager.get('spell_yasuo_w');
   name = 'Tường Gió (Yasuo_W)';
   description =
     'Tạo ra một bức tường gió theo hướng chỉ định, <span class="buff">Chặn</span> toàn bộ đạn đạo từ kẻ địch trong <span class="time">3.75 giây</span>';

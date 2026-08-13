@@ -9,7 +9,7 @@ import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
 
 export default class Olaf_Q extends Spell {
-  image = AssetManager.getAsset('spell_olaf_q');
+  image = AssetManager.get('spell_olaf_q');
   name = 'Phóng Rìu (Olaf_Q)';
   description =
     'Ném rìu đến điểm chỉ định, gây <span class="damage">15 sát thương</span> và <span class="buff">Làm chậm 40%</span> trong <span class="time">1 giây</span> cho những kẻ địch trúng chiêu. Bạn được <span class="buff">Tăng Tốc 30%</span> trong <span class="time">1 giây</span> cho mỗi kẻ địch trúng chiêu. Rìu tồn tại trong <span class="time">4 giây</span>, nếu nhặt được rìu <span>thời gian hồi chiêu</span> được <span class="buff">Giảm 60%</span>.';
@@ -108,7 +108,7 @@ export class Olaf_Q_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const slowBuff = new Slow(1000, this.owner, enemy);
-    slowBuff.image = AssetManager.getAsset('spell_olaf_q');
+    slowBuff.image = AssetManager.get('spell_olaf_q');
     slowBuff.percent = 0.4;
     enemy.addBuff(slowBuff);
     enemy.takeDamage(this.damage, this.owner);
@@ -128,7 +128,7 @@ export class Olaf_Q_Object extends MissileSpellObject {
     if (this.hitTargets.length > hitCountBefore) {
       const speedUpBuff = new Speedup(1000, this.owner, this.owner);
       speedUpBuff.maxStacks = 3;
-      speedUpBuff.image = AssetManager.getAsset('spell_olaf_q');
+      speedUpBuff.image = AssetManager.get('spell_olaf_q');
       speedUpBuff.percent = 0.3;
       this.owner.addBuff(speedUpBuff);
     }

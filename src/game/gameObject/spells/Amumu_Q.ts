@@ -13,7 +13,7 @@ const LINEN: [number, number, number] = [235, 222, 172];
 const LINEN_DARK: [number, number, number] = [125, 108, 66];
 
 export default class Amumu_Q extends Spell {
-  image = AssetManager.getAsset('spell_amumu_q');
+  image = AssetManager.get('spell_amumu_q');
   name = 'Băng Quấn Hận Thù (Amumu_Q)';
   description =
     'Ném một dải băng về hướng chỉ định. Khi trúng kẻ địch đầu tiên, gây <span class="damage">20 sát thương</span>, <span class="buff">Choáng</span> chúng trong <span class="time">1 giây</span> và <span class="buff">Kéo</span> chính bạn tới chỗ chúng <i>(các hiệu ứng khống chế lên Amumu không ngăn được cú kéo này)</i>';
@@ -91,11 +91,11 @@ export class Amumu_Q_Object extends MissileSpellObject {
     enemy.takeDamage(this.damage, this.owner);
 
     this.stunBuff = new Stun(this.stunDuration, this.owner, enemy);
-    this.stunBuff.image = AssetManager.getAsset('spell_amumu_q');
+    this.stunBuff.image = AssetManager.get('spell_amumu_q');
     enemy.addBuff(this.stunBuff);
 
     this.dashBuff = new Dash(3000, this.owner, this.owner);
-    this.dashBuff.image = AssetManager.getAsset('spell_amumu_q');
+    this.dashBuff.image = AssetManager.get('spell_amumu_q');
     this.dashBuff.dashDestination = enemy.position; // live ref: the rope follows them
     this.dashBuff.dashSpeed = 14;
     // CC on Amumu must not interrupt the reel-in, so the dash is uncancellable

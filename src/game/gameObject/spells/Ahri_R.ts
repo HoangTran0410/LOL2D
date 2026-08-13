@@ -9,7 +9,7 @@ import Dash from '../buffs/Dash';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_R extends Spell {
-  image = AssetManager.getAsset('spell_ahri_r');
+  image = AssetManager.get('spell_ahri_r');
   name = 'Phi Hồ (Ahri_R)';
   description =
     '<span class="buff">Lướt</span> tới trước theo hướng chỉ định, bắn tối đa 3 quả cầu vào 3 kẻ địch gần nhất trong phạm vi, gây <span class="damage">20 sát thương</span> mỗi quả cầu. Có thể sử dụng tối đa <span>3 lần</span> lướt trong vòng <span class="time">10 giây</span>';

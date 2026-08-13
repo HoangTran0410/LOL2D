@@ -8,7 +8,7 @@ import Nearsight from '../buffs/Nearsight';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Teemo_Q extends Spell {
-  image = AssetManager.getAsset('spell_teemo_q');
+  image = AssetManager.get('spell_teemo_q');
   name = 'Phi Tiêu Bịt Mắt (Teemo_Q)';
   description =
     'Phóng một phi tiêu tẩm độc về hướng chỉ định, gây <span class="damage">20 sát thương</span> và <span class="buff">Mờ Mắt</span> kẻ địch đầu tiên trúng phải trong <span class="time">2 giây</span>';
@@ -62,7 +62,7 @@ export class Teemo_Q_Object extends MissileSpellObject {
 
     const blindBuff = new Nearsight(this.blindTime, this.owner, enemy);
     blindBuff.newVisionRadius = this.newVisionRadius;
-    blindBuff.image = AssetManager.getAsset('spell_teemo_q');
+    blindBuff.image = AssetManager.get('spell_teemo_q');
     enemy.addBuff(blindBuff);
 
     // the dart vanishes on impact, so the poison burst is its own object

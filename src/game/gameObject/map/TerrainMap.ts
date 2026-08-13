@@ -34,7 +34,7 @@ export default class TerrainMap {
     });
 
     const polygons: { vertices: number[][]; type: string }[] = [];
-    const terrains: any = AssetManager.getAsset('json_summoner_map')?.data;
+    const terrains: any = AssetManager.get('json_summoner_map').data;
     // summoner_map.json also carries `turret1`/`turret2`, which are flat [x, y]
     // points rather than polygons. Feeding those through arrayToVertices built 22
     // obstacles with NaN bounds and pushed them into the terrain quadtree; only

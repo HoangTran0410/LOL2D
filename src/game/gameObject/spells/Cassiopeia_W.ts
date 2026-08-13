@@ -15,7 +15,7 @@ import Slow from '../buffs/Slow';
  * walk out but cannot dash or blink out.
  */
 export default class Cassiopeia_W extends Spell {
-  image = AssetManager.getAsset('spell_cassiopeia_w');
+  image = AssetManager.get('spell_cassiopeia_w');
   name = 'Bãi Độc (Cassiopeia_W)';
   description =
     'Phun ra một đám mây độc tồn tại <span class="time">5 giây</span>. Kẻ địch bên trong nhiễm độc, mất <span class="damage">2 sát thương</span> mỗi <span class="time">0.4 giây</span>, bị <span class="buff">Làm Chậm</span> (giảm dần từ 50% theo thời gian tồn tại của bãi độc) và bị <span class="buff">Ghìm</span> — vẫn đi được nhưng không thể dùng kỹ năng lướt hay dịch chuyển để thoát ra';
@@ -56,7 +56,7 @@ interface VenomCloud {
 const CLOUD_COUNT = 14;
 
 export class Cassiopeia_W_Object extends SpellObject {
-  image = AssetManager.getAsset('spell_cassiopeia_w');
+  image = AssetManager.get('spell_cassiopeia_w');
   position: p5.Vector = this.owner.position.copy();
 
   /** A pool of venom on the floor: painted under the units wading through it. */

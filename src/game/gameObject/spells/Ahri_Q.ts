@@ -7,7 +7,7 @@ import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_Q extends Spell {
-  image = AssetManager.getAsset('spell_ahri_q');
+  image = AssetManager.get('spell_ahri_q');
   name = 'Quả Cầu Ma Thuật (Ahri_Q)';
   description =
     'Phóng quả cầu theo hướng chỉ định, khi tới giới hạn 350px, quả cầu sẽ quay lại. Gây <span class="damage">15 sát thương</span> và <span class="buff">Làm Chậm 50%</span> trong <span class="time">0.5 giây</span> trên cả đường đi và đường về của quả cầu';
@@ -78,7 +78,7 @@ export class Ahri_Q_Object extends MissileSpellObject {
   onHit(enemy: any) {
     const slowBuff = new Slow(500, this.owner, enemy);
     slowBuff.percent = 0.5;
-    slowBuff.image = AssetManager.getAsset('spell_ahri_q');
+    slowBuff.image = AssetManager.get('spell_ahri_q');
     enemy.addBuff(slowBuff);
 
     enemy.takeDamage(15, this.owner);

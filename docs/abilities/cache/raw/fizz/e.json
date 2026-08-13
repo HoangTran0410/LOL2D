@@ -1,0 +1,74 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Fizz/Playful",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Playful@@icon@@Playful.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Fizz''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target location while becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, balancing on his trident for 0.<small>75</small> seconds, during which he can cast ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Trickster\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Trickster.png|20xpx|border|link=Fizz#Trickster|An icon for Fizz's ability Trickster]]</span> <span style=\"white-space:normal;\">[[Fizz#Trickster|Trickster]]</span></span>'' after 0.<small>15</small> seconds into the duration.@@description2@@He then begins to hop off of his trident over 0.<small>5</small> seconds, during which he gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">50% '''bonus''' movement speed</span></span>, and afterwards becoming targetable and landing to create a splash that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds.@@description3@@''While hopping off of the trident, '''Fizz''' may input movement commands to direct his landing.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 130 / 180 / 230 / 280 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 95% AP)</span></dd></dl><dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 375@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@75 / 80 / 85 / 90 / 95@@cooldown@@16 / 14 / 12 / 10 / 8@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* This ability always employs [[Quick cast]].\n*''Playful'' counts as an ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n**Detonating the ability early for <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Trickster\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Trickster.png|20xpx|border|link=Fizz#Trickster|An icon for Fizz's ability Trickster]]</span> <span style=\"white-space:normal;\">[[Fizz#Trickster|Trickster]]</span></span> does not.\n* The distance covered during ''Playful's'' directed splash is equal to half of '''Fizz's''' movement speed.\n* ''Playful'' cannot be used for approximately 0.<small>5</small> seconds after using <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Urchin Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Urchin Strike.png|20xpx|border|link=Fizz#Urchin Strike|An icon for Fizz's ability Urchin Strike]]</span> <span style=\"white-space:normal;\">[[Fizz#Urchin Strike|Urchin Strike]]</span></span>.\n* <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> can be used while hopping off the trident, but not while balanced on it.\n* '''Fizz''' can receive aggro while hopping off the trident, but not while balanced on it\n\n* If the first dash is interrupted, '''Fizz''' initiates the hop immediately, and if the second one is, the splash will not occur.\n** In either cases, '''Fizz''' loses the untargetability. [https://youtu.be/Zjtcee-OvUQ] <sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>[[Category:Unexpected behaviours]]\n* If ''Playful'' is cast while under the effect of a move block, '''Fizz''' will not become untargetable and will initiate the hop instantly.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n** If <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Trickster\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Trickster.png|20xpx|border|link=Fizz#Trickster|An icon for Fizz's ability Trickster]]</span> <span style=\"white-space:normal;\">[[Fizz#Trickster|Trickster]]</span></span> is cast, the splash will not occur.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If '''Fizz''' casts ''Playful'' on top of himself after <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blink\">[[File:Flash.png|20px|link=Blink|An icon representing the keyword Blink]] [[:Blink|blinking]]</span> and not moving from the blinked-to spot, the minimum dash distance of 25 units will not apply (casts at 0 range).<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If '''Fizz''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis (buff)\">[[File:Stasis icon.png|20px|link=Invulnerability#Stasis|An icon representing the keyword Stasis (buff)]] [[:Invulnerability#Stasis|stasis]]</span> during either ''Playful'' or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Trickster\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Trickster.png|20xpx|border|link=Fizz#Trickster|An icon for Fizz's ability Trickster]]</span> <span style=\"white-space:normal;\">[[Fizz#Trickster|Trickster]]</span></span>, the splash occurs after the stasis ends.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307194,
+                "revisions": [
+                  {
+                    "parentid": 4007740,
+                    "revid": 4008451,
+                    "timestamp": "2026-04-14T19:15:38Z"
+                  }
+                ],
+                "title": "Template:Data Fizz/Playful"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4008451,
+      "timestamp": "2026-04-14T19:15:38Z"
+    },
+    {
+      "page": "Template:Data Fizz/Trickster",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Trickster@@icon@@Trickster.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Fizz''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target location, hopping down and splashing onto the ground prematurely upon arrival to deal the same <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> in a smaller radius but not applying the slow.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 130 / 180 / 230 / 280 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 95% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 225@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* This ability always employs [[Quick cast]].\n* ''Trickster'' does not count as an ability activation.\n* Both <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Playful\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Playful.png|20xpx|border|link=Fizz#Playful|An icon for Fizz's ability Playful]]</span> <span style=\"white-space:normal;\">[[Fizz#Playful|Playful's]]</span></span> and ''Trickster's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> may be directed separately.\n* <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> cannot be used during the dash.\n* The splash occurs immediately if '''Fizz''' encounters terrain that cannot be dashed through (he has to be particularly close to the wall).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307193,
+                "revisions": [
+                  {
+                    "parentid": 3959321,
+                    "revid": 4007741,
+                    "timestamp": "2026-04-12T13:45:59Z"
+                  }
+                ],
+                "title": "Template:Data Fizz/Trickster"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007741,
+      "timestamp": "2026-04-12T13:45:59Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "9e4abd3af787c8d02450dfb5964eef265e37f79cc090715a80ea688222a54631",
+    "fetchedAt": "2026-08-13T10:47:42.485Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Fizz/Playful",
+    "revisionId": 4008451,
+    "sourceTimestamp": "2026-04-14T19:15:38Z"
+  }
+}

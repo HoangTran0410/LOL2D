@@ -8,7 +8,7 @@ import Stun from '../buffs/Stun';
 import ParticleSystem from '../helpers/ParticleSystem';
 
 export default class Veigar_E extends Spell {
-  image = AssetManager.getAsset('spell_veigar_e');
+  image = AssetManager.get('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
   description =
     'Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong <span class="time">3 giây</span>. <span class="buff">Làm Choáng</span> <span class="time">1.5 giây</span> những kẻ địch dám bước qua.';
@@ -103,7 +103,7 @@ export class Veigar_E_Object extends SpellObject {
 
       enemies.forEach((enemy: any) => {
         const stunBuff = new Stun(1500, this.owner, enemy);
-        stunBuff.image = AssetManager.getAsset('spell_veigar_e');
+        stunBuff.image = AssetManager.get('spell_veigar_e');
         enemy.addBuff(stunBuff);
 
         this.enemiesEffected.push(enemy);

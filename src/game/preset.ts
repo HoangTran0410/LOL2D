@@ -497,7 +497,7 @@ export const FountainPreset: FountainPresetData[] = [
  */
 export const getTurretPositions = (): { x: number; y: number }[] => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapData: any = AssetManager.getAsset('json_summoner_map')?.data;
+  const mapData: any = AssetManager.get('json_summoner_map').data;
   const positions: { x: number; y: number }[] = [];
 
   for (const key of ['turret1', 'turret2']) {

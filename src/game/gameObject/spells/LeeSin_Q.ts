@@ -10,10 +10,10 @@ import { Rectangle } from '../../../libs/quadtree';
 export default class LeeSin_Q extends Spell {
   static PHASES = {
     Q1: {
-      image: AssetManager.getAsset('spell_leesin_q1'),
+      image: AssetManager.get('spell_leesin_q1'),
     },
     Q2: {
-      image: AssetManager.getAsset('spell_leesin_q2'),
+      image: AssetManager.get('spell_leesin_q2'),
     },
   };
   phase: 'Q1' | 'Q2' = 'Q1';

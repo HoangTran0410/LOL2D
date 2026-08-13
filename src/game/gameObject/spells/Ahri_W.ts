@@ -8,7 +8,7 @@ import Slow from '../buffs/Slow';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_W extends Spell {
-  image = AssetManager.getAsset('spell_ahri_w');
+  image = AssetManager.get('spell_ahri_w');
   name = 'Lửa Hồ Ly (Ahri_W)';
   description =
     'Tạo ra <span>3 ngọn lửa</span> quay xung quanh bản thân trong <span class="time">5 giây</span>. Mỗi ngọn lửa sẽ tự động tấn công mục tiêu gần nhất trong tầm, gây <span class="damage">10 sát thương</span> và <span class="buff">Làm Châm 20%</span> tốc chạy kẻ địch trong <span class="time">0.5 giây</span>';
@@ -113,7 +113,7 @@ export class Ahri_W_Object extends SpellObject {
       const distance = this.position.dist(this.targetEnemy.position);
       if (distance <= this.targetEnemy.stats.size.value / 2) {
         const slowBuff = new Slow(500, this.owner, this.targetEnemy);
-        slowBuff.image = AssetManager.getAsset('spell_ahri_w');
+        slowBuff.image = AssetManager.get('spell_ahri_w');
         slowBuff.percent = 0.2;
         this.targetEnemy.addBuff(slowBuff);
         this.targetEnemy.takeDamage(this.damage, this.owner);

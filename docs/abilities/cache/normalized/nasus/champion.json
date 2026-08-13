@@ -1,0 +1,112 @@
+{
+  "asset": {
+    "key": "champ_nasus",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_OriginalSquare.png?9a2f8",
+    "sha1": "84ee7500efecd51726010fd372d7f0949b404d4a"
+  },
+  "champion": "Nasus",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Nasus",
+    "be": 675,
+    "changes": "V25.24",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Durable",
+      "Hypercarry",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2009-10-01",
+    "difficulty": 1,
+    "external_positions": [
+      "Top"
+    ],
+    "herotype": "Fighter",
+    "id": 75,
+    "mobility": 1,
+    "patch": "V0.9.25.24",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Juggernaut"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Spirit Fire"
+    },
+    "skill_i": {
+      "1": "Soul Eater"
+    },
+    "skill_q": {
+      "1": "Siphoning Strike"
+    },
+    "skill_r": {
+      "1": "Fury of the Sands"
+    },
+    "skill_w": {
+      "1": "Wither"
+    },
+    "skills": {
+      "1": "Soul Eater",
+      "2": "Siphoning Strike",
+      "3": "Wither",
+      "4": "Spirit Fire",
+      "5": "Fury of the Sands"
+    },
+    "stats": {
+      "acquisition_radius": 350,
+      "aram": {
+        "dmg_dealt": 0.9,
+        "dmg_taken": 1.05
+      },
+      "arm_base": 34,
+      "arm_lvl": 4.7,
+      "as_base": 0.638,
+      "as_lvl": 3.48,
+      "as_ratio": 0.638000011444091,
+      "attack_delay_offset": -0.0986036509275436,
+      "dam_base": 67,
+      "dam_lvl": 4,
+      "gameplay_radius": 80,
+      "hp5_base": 9,
+      "hp5_lvl": 0.9,
+      "hp_base": 650,
+      "hp_lvl": 104,
+      "mp5_base": 7.45,
+      "mp5_lvl": 0.5,
+      "mp_base": 326,
+      "mp_lvl": 62,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 350,
+      "nb": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 50,
+      "range": 125,
+      "selection_height": 170,
+      "selection_radius": 135,
+      "usb": {
+        "dmg_taken": 0.95
+      }
+    },
+    "style": 20,
+    "title": "The Curator of the Sands",
+    "toughness": 3,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "2c85cb43f5a9d53b62b6b6720a7554c2e4b38a5532cb2292ea3abfc2d99b3713",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

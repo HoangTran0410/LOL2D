@@ -1,0 +1,112 @@
+{
+  "asset": {
+    "key": "champ_warwick",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_OriginalSquare.png?cc8c7",
+    "sha1": "c14e4e7dfbb5c6916c86edf3c47ee4fd7386f96e"
+  },
+  "champion": "Warwick",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Warwick",
+    "be": 225,
+    "changes": "V26.09",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Self Healing",
+      "Duelist",
+      "Mixed"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2009-02-21",
+    "difficulty": 1,
+    "external_positions": [
+      "Top",
+      "Jungle"
+    ],
+    "fullname": "Vander",
+    "herotype": "Fighter",
+    "id": 19,
+    "mobility": 1,
+    "patch": "Alpha Week 2",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Primal Howl"
+    },
+    "skill_i": {
+      "1": "Eternal Hunger"
+    },
+    "skill_q": {
+      "1": "Jaws of the Beast"
+    },
+    "skill_r": {
+      "1": "Infinite Duress"
+    },
+    "skill_w": {
+      "1": "Blood Hunt"
+    },
+    "skills": {
+      "1": "Eternal Hunger",
+      "2": "Jaws of the Beast",
+      "3": "Blood Hunt",
+      "4": "Primal Howl",
+      "5": "Infinite Duress"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.95,
+        "healing": 1
+      },
+      "arm_base": 33,
+      "arm_lvl": 4.4,
+      "as_base": 0.638,
+      "as_lvl": 2,
+      "as_ratio": 0.638000011444091,
+      "attack_delay_offset": -0.125,
+      "dam_base": 65,
+      "dam_lvl": 2.5,
+      "gameplay_radius": 74.75,
+      "hp5_base": 4,
+      "hp5_lvl": 0.75,
+      "hp_base": 620,
+      "hp_lvl": 99,
+      "mp5_base": 7.45,
+      "mp5_lvl": 0.6,
+      "mp_base": 280,
+      "mp_lvl": 35,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 335,
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 191.6667022705078,
+      "selection_radius": 120,
+      "usb": {
+        "dmg_dealt": 0.95
+      }
+    },
+    "style": 30,
+    "title": "The Uncaged Wrath of Zaun",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "7e48952012ee29bb4f92bf48edfc2bbc2557ab78c564e6b2bbf2eedef1089f67",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

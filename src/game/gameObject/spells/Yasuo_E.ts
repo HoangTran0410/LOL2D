@@ -6,7 +6,7 @@ import Spell from '../Spell';
 import Dash from '../buffs/Dash';
 
 export default class Yasuo_E extends Spell {
-  image = AssetManager.getAsset('spell_yasuo_e');
+  image = AssetManager.get('spell_yasuo_e');
   name = 'Quét Kiếm (Yasuo_E)';
   description =
     '<span class="buff">Lướt</span> một khoảng ngắn về hướng địch trong tầm. Gây <span class="damage">10 sát thương</span>';

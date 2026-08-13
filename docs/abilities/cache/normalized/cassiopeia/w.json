@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_cassiopeia_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Miasma.png?4b29e",
+    "sha1": "f008e25d24b6620ef7d6d06ba91e562a62b5c790"
+  },
+  "champion": "Cassiopeia",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "24 / 22 / 20 / 18 / 16",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Cassiopeia''' spews forth 7 bolts of venom in an arc at the target location, creating toxic clouds at the area for 5 seconds.",
+          "text": "Active: Cassiopeia spews forth 7 bolts of venom in an arc at the target location, creating toxic clouds at the area for 5 seconds."
+        },
+        "description2": {
+          "raw": "Enemies within the clouds are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poisoned]]</span> to take <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>263</small> seconds and become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by an amount that decays over the area's duration.",
+          "text": "Enemies within the clouds are poisoned to take magic damage every 0.263 seconds and become grounded and slowed by an amount that decays over the area's duration."
+        },
+        "effectradius": "200",
+        "icon": "Miasma.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Second:'''</span></dt><dd>20 / 25 / 30 / 35 / 40 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>100 / 125 / 150 / 175 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 50 / 60 / 70 / 80%</dd></dl>",
+          "text": "Magic Damage Per Second:20 / 25 / 30 / 35 / 40 (+ 10% AP)Total Magic Damage:100 / 125 / 150 / 175 / 200 (+ 50% AP)\nSlow:40 / 50 / 60 / 70 / 80%"
+        },
+        "name": "Miasma",
+        "notes": {
+          "raw": "* ''Miasma's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|ground]]</span> debuffs are each marked as non-dispellable, so they are not removed by most <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span>. Each is however allowed to be removed by cleanses that '''also''' grant immunity to the debuff type, such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf OriginalSquare.png|20xpx|border|link=Olaf|An icon representing Olaf]]</span> <span style=\"white-space:normal;\">[[Olaf|Olaf's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Ragnarok\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Ragnarok.png|20xpx|border|link=Olaf#Ragnarok|An icon for Olaf's ability Ragnarok]]</span> <span style=\"white-space:normal;\">[[Olaf#Ragnarok|Ragnarok]]</span></span></span>.\n* If a target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> while affected by the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|ground]]</span>, the debuff will refresh to 0.<small>25</small> seconds.\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> will block the portion of ''Miasma'' it destroys.\n* ''Miasma'' inflicts <span style=\"color:\n#00B0F0; white-space:normal\">5 / 6.<small>25</small> / 7.<small>5</small> / 8.<small>75</small> / 10</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 2.<small>5</small>% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> per tick, and in fact because there is 19 ticks and not 20 ticks, the <span style=\"color:\n#00B0F0; white-space:normal\">'''total''' magic damage</span> is currently not <span style=\"color:\n#00B0F0; white-space:normal\">100 / 125 / 150 / 175 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></span> but <span style=\"color:\n#00B0F0; white-space:normal\">95 / 118.<small>75</small> / 142.<small>5</small> / 166.<small>25</small> / 190</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 47.<small>5</small>% AP)</span>.\n** Sometimes ''Miasma'' randomly inflicts only 18 ticks of damage.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Miasma's slow and ground debuffs are each marked as non-dispellable, so they are not removed by most cleanses. Each is however allowed to be removed by cleanses that also grant immunity to the debuff type, such as Olaf's Ragnarok.\nIf a target becomes untargetable while affected by the ground, the debuff will refresh to 0.25 seconds.\nWind Wall will block the portion of Miasma it destroys.\nMiasma inflicts 5 / 6.25 / 7.5 / 8.75 / 10 (+ 2.5% AP) magic damage per tick, and in fact because there is 19 ticks and not 20 ticks, the total magic damage is currently not 100 / 125 / 150 / 175 / 200 (+ 50% AP) but 95 / 118.75 / 142.5 / 166.25 / 190 (+ 47.5% AP).\n* Sometimes Miasma randomly inflicts only 18 ticks of damage.(bug)"
+        },
+        "projectile": true,
+        "speed": "3000",
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Miasma"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "ac160e143c8bec54b6712bbb0691e1e9db34152cf1b598cfc5faeb64446a5698",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Cassiopeia/Miasma",
+    "revisionId": 3936292,
+    "sourceTimestamp": "2025-07-24T12:30:58Z"
+  }
+}

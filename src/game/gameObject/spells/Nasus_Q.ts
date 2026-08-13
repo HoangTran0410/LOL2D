@@ -6,7 +6,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Nasus_Q extends Spell {
-  image = AssetManager.getAsset('spell_nasus_q');
+  image = AssetManager.get('spell_nasus_q');
   name = 'Chém Hủy Diệt (Nasus_Q)';
   description =
     'Chém kẻ địch gần nhất trong phạm vi <span>150px</span>, gây <span class="damage">25 sát thương</span>. Mỗi lần chém trúng, sát thương của chiêu này <span class="buff">vĩnh viễn tăng thêm 5</span>';

@@ -13,13 +13,13 @@ import RootBuff from '../buffs/Root';
 export default class Yasuo_Q extends Spell {
   PHASES = {
     Q1: {
-      image: AssetManager.getAsset('spell_yasuo_q1'),
+      image: AssetManager.get('spell_yasuo_q1'),
     },
     Q2: {
-      image: AssetManager.getAsset('spell_yasuo_q2'),
+      image: AssetManager.get('spell_yasuo_q2'),
     },
     Q3: {
-      image: AssetManager.getAsset('spell_yasuo_q3'),
+      image: AssetManager.get('spell_yasuo_q3'),
     },
   };
   phase = this.PHASES.Q1;
@@ -162,7 +162,7 @@ export class Yasuo_Q_Object extends SpellObject {
 
     enemies.forEach((p: SpellObject['owner']) => {
       const buff = new RootBuff(this.lifeTime / 2, this.owner, p);
-      buff.image = AssetManager.getAsset('spell_yasuo_q1');
+      buff.image = AssetManager.get('spell_yasuo_q1');
       p.addBuff(buff);
       p.takeDamage(10, this.owner);
 
@@ -211,7 +211,7 @@ export class Yasuo_Q3_Object extends MissileSpellObject {
   angle = 0;
   originalLength = 0;
 
-  image = AssetManager.getAsset('obj_yasuo_q3');
+  image = AssetManager.get('obj_yasuo_q3');
 
   onAfterMove() {
     const distance = this.position.dist(this.destination);
@@ -224,7 +224,7 @@ export class Yasuo_Q3_Object extends MissileSpellObject {
 
   onHit(enemy: any) {
     const buff = new Airborne(this.airBorneTime, this.owner, enemy);
-    buff.image = AssetManager.getAsset('spell_yasuo_q3');
+    buff.image = AssetManager.get('spell_yasuo_q3');
     enemy.addBuff(buff);
     enemy.takeDamage(20, this.owner);
   }

@@ -1,0 +1,140 @@
+{
+  "asset": {
+    "key": "spell_twitch_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Ambush.png?f924b",
+    "sha1": "2fcf088fb97f32dbf3c1133c4a6d520217224943"
+  },
+  "champion": "Twitch",
+  "forms": [
+    {
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> After a 1-second delay, '''Twitch''' becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflaged]]</span> for a duration. Attacking or casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Venom Cask\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Venom Cask.png|20xpx|border|link=Twitch#Venom Cask|An icon for Twitch's ability Venom Cask]]</span> <span style=\"white-space:normal;\">[[Twitch#Venom Cask|Venom Cask]]</span></span>'' or ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Contaminate\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Contaminate.png|20xpx|border|link=Twitch#Contaminate|An icon for Twitch's ability Contaminate]]</span> <span style=\"white-space:normal;\">[[Twitch#Contaminate|Contaminate]]</span></span>'' ends ''Ambush'' immediately.",
+          "text": "Active: After a 1-second delay, Twitch becomes camouflaged for a duration. Attacking or casting Venom Cask or Contaminate ends Ambush immediately."
+        },
+        "description2": {
+          "raw": "During this time, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">10% '''bonus''' movement speed</span></span>, increased to <span style=\"color:\n#9FFF4D; white-space:normal\">30%</span> while facing enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within a 1000-unit radius who cannot see him.",
+          "text": "During this time, Twitch gains &nbsp;10% bonus movement speed, increased to 30% while facing enemy champions within a 1000-unit radius who cannot see him."
+        },
+        "description3": {
+          "raw": "Upon breaking stealth, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 6 seconds.",
+          "text": "Upon breaking stealth, Twitch gains &nbsp;bonus attack speed for 6 seconds."
+        },
+        "description4": {
+          "raw": "When an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> dies while afflicted with ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'', ''Ambush's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reset.",
+          "text": "When an enemy champion dies while afflicted with Deadly Venom, Ambush's &nbsp;cooldown is reset."
+        },
+        "icon": "Ambush.png",
+        "icon2": "Ambush 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stealth Duration:'''</span></dt><dd>10 / 11 / 12 / 13 / 14 seconds</dd></dl>",
+          "text": "Stealth Duration:10 / 11 / 12 / 13 / 14 seconds"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>",
+          "text": "Bonus Attack Speed:40 / 45 / 50 / 55 / 60%"
+        },
+        "name": "Ambush",
+        "notes": {
+          "raw": "* Entering stealth cancels '''Twitch's''' current basic attack.\n* ''Ambush'' follows the same rules as stealth but he can still perform actions normally before entering <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span>. Activating <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Recall\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Recall.png|20xpx|border|link=Recall|An icon representing Recall]]</span> <span style=\"white-space:normal;\">[[Recall]]</span></span> during the 1-second delay allows him to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Channel\">[[File:Channeling icon.svg|20px|link=Channel|An icon representing the keyword Channel]] [[:Channel|channel]]</span> it while stealthed.\n* If '''Twitch''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis\">[[File:Stasis icon.png|20px|link=Types_of_Crowd_Control#Stasis|An icon representing the keyword Stasis]] [[:Types_of_Crowd_Control#Stasis|stasis]]</span> during the delay, he will gain the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span> after the stasis ends.\n* Using a basic attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Breaks stealth\">[[File:Breaking stealth icon.png|20px|link=Stealth#Breaking_stealth|An icon representing the keyword Break stealth]] [[:Stealth#Breaking_stealth|breaks the stealth]]</span> at the start of the attack windup.",
+          "text": "Entering stealth cancels Twitch's current basic attack.\nAmbush follows the same rules as stealth but he can still perform actions normally before entering camouflage. Activating Recall during the 1-second delay allows him to channel it while stealthed.\nIf Twitch enters stasis during the delay, he will gain the camouflage after the stasis ends.\nUsing a basic attack breaks the stealth at the start of the attack windup."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Ambush"
+    },
+    {
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> After a 1-second delay, '''Twitch''' becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflaged]]</span> for a duration. Attacking or casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Venom Cask\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Venom Cask.png|20xpx|border|link=Twitch#Venom Cask|An icon for Twitch's ability Venom Cask]]</span> <span style=\"white-space:normal;\">[[Twitch#Venom Cask|Venom Cask]]</span></span>'' or ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Contaminate\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Contaminate.png|20xpx|border|link=Twitch#Contaminate|An icon for Twitch's ability Contaminate]]</span> <span style=\"white-space:normal;\">[[Twitch#Contaminate|Contaminate]]</span></span>'' ends ''Ambush'' immediately.",
+          "text": "Active: After a 1-second delay, Twitch becomes camouflaged for a duration. Attacking or casting Venom Cask or Contaminate ends Ambush immediately."
+        },
+        "description2": {
+          "raw": "During this time, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">10% '''bonus''' movement speed</span></span>, increased to <span style=\"color:\n#9FFF4D; white-space:normal\">30%</span> while facing enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within a 1000-unit radius who cannot see him.",
+          "text": "During this time, Twitch gains &nbsp;10% bonus movement speed, increased to 30% while facing enemy champions within a 1000-unit radius who cannot see him."
+        },
+        "description3": {
+          "raw": "Upon breaking stealth, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 6 seconds.",
+          "text": "Upon breaking stealth, Twitch gains &nbsp;bonus attack speed for 6 seconds."
+        },
+        "description4": {
+          "raw": "When an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> dies while afflicted with ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'', ''Ambush's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reset.",
+          "text": "When an enemy champion dies while afflicted with Deadly Venom, Ambush's &nbsp;cooldown is reset."
+        },
+        "icon": "Ambush.png",
+        "icon2": "Ambush 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stealth Duration:'''</span></dt><dd>10 / 11 / 12 / 13 / 14 seconds</dd></dl>",
+          "text": "Stealth Duration:10 / 11 / 12 / 13 / 14 seconds"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>",
+          "text": "Bonus Attack Speed:40 / 45 / 50 / 55 / 60%"
+        },
+        "name": "Ambush",
+        "notes": {
+          "raw": "* Entering stealth cancels '''Twitch's''' current basic attack.\n* ''Ambush'' follows the same rules as stealth but he can still perform actions normally before entering <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span>. Activating <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Recall\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Recall.png|20xpx|border|link=Recall|An icon representing Recall]]</span> <span style=\"white-space:normal;\">[[Recall]]</span></span> during the 1-second delay allows him to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Channel\">[[File:Channeling icon.svg|20px|link=Channel|An icon representing the keyword Channel]] [[:Channel|channel]]</span> it while stealthed.\n* If '''Twitch''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis\">[[File:Stasis icon.png|20px|link=Types_of_Crowd_Control#Stasis|An icon representing the keyword Stasis]] [[:Types_of_Crowd_Control#Stasis|stasis]]</span> during the delay, he will gain the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span> after the stasis ends.\n* Using a basic attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Breaks stealth\">[[File:Breaking stealth icon.png|20px|link=Stealth#Breaking_stealth|An icon representing the keyword Break stealth]] [[:Stealth#Breaking_stealth|breaks the stealth]]</span> at the start of the attack windup.",
+          "text": "Entering stealth cancels Twitch's current basic attack.\nAmbush follows the same rules as stealth but he can still perform actions normally before entering camouflage. Activating Recall during the 1-second delay allows him to channel it while stealthed.\nIf Twitch enters stasis during the delay, he will gain the camouflage after the stasis ends.\nUsing a basic attack breaks the stealth at the start of the attack windup."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Ambush 2"
+    },
+    {
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> After a 1-second delay, '''Twitch''' becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflaged]]</span> for a duration. Attacking or casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Venom Cask\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Venom Cask.png|20xpx|border|link=Twitch#Venom Cask|An icon for Twitch's ability Venom Cask]]</span> <span style=\"white-space:normal;\">[[Twitch#Venom Cask|Venom Cask]]</span></span>'' or ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Contaminate\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Contaminate.png|20xpx|border|link=Twitch#Contaminate|An icon for Twitch's ability Contaminate]]</span> <span style=\"white-space:normal;\">[[Twitch#Contaminate|Contaminate]]</span></span>'' ends ''Ambush'' immediately.",
+          "text": "Active: After a 1-second delay, Twitch becomes camouflaged for a duration. Attacking or casting Venom Cask or Contaminate ends Ambush immediately."
+        },
+        "description2": {
+          "raw": "During this time, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">10% '''bonus''' movement speed</span></span>, increased to <span style=\"color:\n#9FFF4D; white-space:normal\">30%</span> while facing enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within a 1000-unit radius who cannot see him.",
+          "text": "During this time, Twitch gains &nbsp;10% bonus movement speed, increased to 30% while facing enemy champions within a 1000-unit radius who cannot see him."
+        },
+        "description3": {
+          "raw": "Upon breaking stealth, '''Twitch''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 6 seconds.",
+          "text": "Upon breaking stealth, Twitch gains &nbsp;bonus attack speed for 6 seconds."
+        },
+        "description4": {
+          "raw": "When an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> dies while afflicted with ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'', ''Ambush's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reset.",
+          "text": "When an enemy champion dies while afflicted with Deadly Venom, Ambush's &nbsp;cooldown is reset."
+        },
+        "icon": "Ambush.png",
+        "icon2": "Ambush 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stealth Duration:'''</span></dt><dd>10 / 11 / 12 / 13 / 14 seconds</dd></dl>",
+          "text": "Stealth Duration:10 / 11 / 12 / 13 / 14 seconds"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>",
+          "text": "Bonus Attack Speed:40 / 45 / 50 / 55 / 60%"
+        },
+        "name": "Ambush",
+        "notes": {
+          "raw": "* Entering stealth cancels '''Twitch's''' current basic attack.\n* ''Ambush'' follows the same rules as stealth but he can still perform actions normally before entering <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span>. Activating <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Recall\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Recall.png|20xpx|border|link=Recall|An icon representing Recall]]</span> <span style=\"white-space:normal;\">[[Recall]]</span></span> during the 1-second delay allows him to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Channel\">[[File:Channeling icon.svg|20px|link=Channel|An icon representing the keyword Channel]] [[:Channel|channel]]</span> it while stealthed.\n* If '''Twitch''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis\">[[File:Stasis icon.png|20px|link=Types_of_Crowd_Control#Stasis|An icon representing the keyword Stasis]] [[:Types_of_Crowd_Control#Stasis|stasis]]</span> during the delay, he will gain the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Camouflage\">[[File:Ambush_3.png|20px|link=Stealth#Camouflage|An icon representing the keyword Camouflage]] [[:Stealth#Camouflage|camouflage]]</span> after the stasis ends.\n* Using a basic attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Breaks stealth\">[[File:Breaking stealth icon.png|20px|link=Stealth#Breaking_stealth|An icon representing the keyword Break stealth]] [[:Stealth#Breaking_stealth|breaks the stealth]]</span> at the start of the attack windup.",
+          "text": "Entering stealth cancels Twitch's current basic attack.\nAmbush follows the same rules as stealth but he can still perform actions normally before entering camouflage. Activating Recall during the 1-second delay allows him to channel it while stealthed.\nIf Twitch enters stasis during the delay, he will gain the camouflage after the stasis ends.\nUsing a basic attack breaks the stealth at the start of the attack windup."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Ambush 3"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "e4e13db0d0b6eb0ad8b4653c83d29e506891ac4dbbb3864488c7bc32180ba6d0",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Twitch/Ambush",
+    "revisionId": 3982645,
+    "sourceTimestamp": "2026-01-09T14:39:30Z"
+  }
+}

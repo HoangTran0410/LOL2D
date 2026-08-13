@@ -1,0 +1,118 @@
+{
+  "asset": {
+    "key": "champ_alistar",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_OriginalSquare.png?12536",
+    "sha1": "a1649c6313cdbc5f0deff15522d4720907a2ceaf"
+  },
+  "champion": "Alistar",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Support",
+    "apiname": "Alistar",
+    "be": 675,
+    "changes": "V26.15",
+    "client_positions": [
+      "Support"
+    ],
+    "client_tags": [
+      "Crowd Control",
+      "Initiator",
+      "Magic"
+    ],
+    "control": 3,
+    "damage": 1,
+    "date": "2009-02-21",
+    "difficulty": 1,
+    "external_positions": [
+      "Support"
+    ],
+    "herotype": "Tank",
+    "id": 12,
+    "mobility": 1,
+    "patch": "Alpha Week 2",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Vanguard"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Trample"
+    },
+    "skill_i": {
+      "1": "Triumphant Roar"
+    },
+    "skill_q": {
+      "1": "Pulverize"
+    },
+    "skill_r": {
+      "1": "Unbreakable Will"
+    },
+    "skill_w": {
+      "1": "Headbutt"
+    },
+    "skills": {
+      "1": "Triumphant Roar",
+      "2": "Pulverize",
+      "3": "Headbutt",
+      "4": "Trample",
+      "5": "Unbreakable Will"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05,
+        "healing": 0.8
+      },
+      "arm_base": 40,
+      "arm_lvl": 4.7,
+      "as_base": 0.625,
+      "as_lvl": 2.125,
+      "as_ratio": 0.625,
+      "dam_base": 62,
+      "dam_lvl": 3.75,
+      "gameplay_radius": 80,
+      "hp5_base": 8.5,
+      "hp5_lvl": 0.85,
+      "hp_base": 685,
+      "hp_lvl": 120,
+      "mp5_base": 8.5,
+      "mp5_lvl": 0.8,
+      "mp_base": 350,
+      "mp_lvl": 40,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 335,
+      "ofa": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.97
+      },
+      "pathing_radius": 50,
+      "range": 125,
+      "selection_height": 170,
+      "selection_radius": 140,
+      "urf": {
+        "dmg_dealt": 1,
+        "dmg_taken": 0.95
+      },
+      "usb": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1
+      }
+    },
+    "style": 65,
+    "title": "The Minotaur",
+    "toughness": 3,
+    "utility": 2
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6c7a8d005efb288bcd10c94e48131610a2d640987391c2a7cfeec1b0c4b56373",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

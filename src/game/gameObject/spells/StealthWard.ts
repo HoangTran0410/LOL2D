@@ -4,7 +4,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class StealthWard extends Spell {
-  image = AssetManager.getAsset('spell_stealthward');
+  image = AssetManager.get('spell_stealthward');
   name = 'Mắt Xanh (Stealth Ward)';
   description =
     'Cắm một mắt xanh, cung cấp <span class="buff">Tầm Nhìn</span> 700px, tồn tại trong <span class="time">20 giây</span>';

@@ -26,7 +26,7 @@ import AttackableUnit from '../attackableUnits/AttackableUnit';
  * "knocks units away from it, though not through terrain".
  */
 export default class Anivia_W extends Spell {
-  image = AssetManager.getAsset('spell_anivia_w');
+  image = AssetManager.get('spell_anivia_w');
   name = 'Tường Băng (Anivia_W)';
   description =
     'Dựng một bức tường băng <b>đặc</b> chắn ngang hướng chỉ định, tồn tại <span class="time">5 giây</span>. Tường <b>không gây sát thương</b> và không gây hiệu ứng khống chế — nó chặn đường đi thật sự: mọi tướng (kể cả đồng minh và chính Anivia) đều bị đẩy ra và không thể đi xuyên qua. Kỹ năng lướt/dịch chuyển vẫn vượt được tường, và tường <b>không chặn tầm nhìn</b>';

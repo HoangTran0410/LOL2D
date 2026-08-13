@@ -22,9 +22,6 @@ export interface AssetLoaders {
   audio: (url: string) => Promise<unknown>;
 }
 
-/** @deprecated Prefer AssetHandle through get/ensure. */
-export interface LoadedAsset extends AssetHandle<unknown> {}
-
 const PLACEHOLDER_SIZE = 64;
 
 function placeholderStyle(key: string): { label: string; hue: number } {
@@ -129,7 +126,6 @@ export default class AssetManager {
   private static handles = new Map<AssetKey, AssetHandle>();
   private static loads = new Map<AssetKey, Promise<AssetHandle>>();
   private static placeholders = new Map<string, AssetHandle>();
-  private static warnedPlaceholders = new Set<string>();
 
   static configureLoaders(loaders: AssetLoaders): void {
     this.loaders = loaders;
@@ -223,22 +219,10 @@ export default class AssetManager {
     return handle;
   }
 
-  static getRandomChampion(): LoadedAsset {
+  static getRandomChampion(): AssetHandle {
     const keys = Object.keys(assetManifest).filter(
       key => key.startsWith('champ_') && !key.startsWith('champ_background_')
     ) as AssetKey[];
-    return this.get(keys[Math.floor(Math.random() * keys.length)]) as LoadedAsset;
-  }
-
-  /** @deprecated Use get with an AssetKey, or placeholder with an explicit label. */
-  static getAsset(key: string | null | undefined): LoadedAsset | undefined {
-    if (!key) return undefined;
-    if (key in assetManifest) return this.get(key as AssetKey) as LoadedAsset;
-
-    if (!this.warnedPlaceholders.has(key)) {
-      this.warnedPlaceholders.add(key);
-      console.warn(`[AssetManager] unknown legacy asset "${key}", using a placeholder`);
-    }
-    return this.placeholder(key) as LoadedAsset;
+    return this.get(keys[Math.floor(Math.random() * keys.length)]);
   }
 }

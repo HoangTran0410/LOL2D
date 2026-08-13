@@ -1,0 +1,124 @@
+{
+  "asset": {
+    "key": "champ_leesin",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Lee_Sin_OriginalSquare.png?f1618",
+    "sha1": "34f911021615a6385ae4a45e2fc0232211dcd158"
+  },
+  "champion": "Lee Sin",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "LeeSin",
+    "be": 675,
+    "changes": "V26.12",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Mobile",
+      "Duelist",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2011-04-01",
+    "difficulty": 3,
+    "external_positions": [
+      "Jungle"
+    ],
+    "herotype": "Fighter",
+    "id": 64,
+    "mobility": 3,
+    "patch": "V1.0.0.114",
+    "rangetype": "Melee",
+    "resource": "Energy",
+    "role": [
+      "Diver"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Tempest",
+      "2": "Cripple"
+    },
+    "skill_i": {
+      "1": "Flurry"
+    },
+    "skill_q": {
+      "1": "Sonic Wave",
+      "2": "Resonating Strike"
+    },
+    "skill_r": {
+      "1": "Dragon's Rage"
+    },
+    "skill_w": {
+      "1": "Safeguard",
+      "2": "Iron Will"
+    },
+    "skills": {
+      "1": "Flurry",
+      "2": "Sonic Wave",
+      "3": "Resonating Strike",
+      "4": "Safeguard",
+      "5": "Iron Will",
+      "6": "Tempest",
+      "7": "Cripple",
+      "8": "Dragon's Rage"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "ar": {
+        "hp_base": 80,
+        "hp_lvl": 15
+      },
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.95,
+        "energyregen_mod": 1.2,
+        "healing": 1.1,
+        "shielding": 1.2
+      },
+      "arm_base": 36,
+      "arm_lvl": 4.5,
+      "as_base": 0.651,
+      "as_lvl": 3,
+      "as_ratio": 0.651000022888183,
+      "attack_delay_offset": -0.104687497019767,
+      "dam_base": 66,
+      "dam_lvl": 3.4,
+      "hp5_base": 7.5,
+      "hp5_lvl": 0.7,
+      "hp_base": 645,
+      "hp_lvl": 108,
+      "mp5_base": 50,
+      "mp5_lvl": 0,
+      "mp_base": 200,
+      "mp_lvl": 0,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 345,
+      "ofa": {
+        "dmg_taken": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 225,
+      "selection_radius": 102.777801513671,
+      "urf": {
+        "dmg_dealt": 1.05
+      }
+    },
+    "style": 55,
+    "title": "The Blind Monk",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "586bb02124d6780ac94a49b1b564dfbcf3bdfbd91db3b6cd2220ca4ce4404f5f",
+    "fetchedAt": "2026-08-13T10:47:04.843Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

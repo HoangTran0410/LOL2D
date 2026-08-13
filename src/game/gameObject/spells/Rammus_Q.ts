@@ -14,7 +14,7 @@ import TrailSystem from '../helpers/TrailSystem';
  * something — knocking the enemies he crashes into up, then slowing them.
  */
 export default class Rammus_Q extends Spell {
-  image = AssetManager.getAsset('spell_rammus_q');
+  image = AssetManager.get('spell_rammus_q');
   name = 'Nhím Lăn (Rammus_Q)';
   description =
     'Cuộn tròn lăn đi trong <span class="time">4 giây</span>, <span class="buff">Tăng Tốc</span> tăng dần từ <span class="buff">20%</span> lên tới <span class="buff">120%</span> theo thời gian lăn. Kẻ địch va phải nhận <span class="damage">30 sát thương</span>, bị <span class="buff">Hất Tung</span> trong <span class="time">0.5 giây</span> rồi <span class="buff">Làm Chậm 60%</span> trong <span class="time">1.5 giây</span>, đồng thời kết thúc cú lăn.';
@@ -143,11 +143,11 @@ export class Rammus_Q_Object extends SpellObject {
       victim.takeDamage(this.damage, this.owner);
 
       const airborneBuff = new Airborne(this.airborneTime, this.owner, victim);
-      airborneBuff.image = AssetManager.getAsset('spell_rammus_q');
+      airborneBuff.image = AssetManager.get('spell_rammus_q');
       victim.addBuff(airborneBuff);
 
       const slowBuff = new Slow(this.slowTime, this.owner, victim);
-      slowBuff.image = AssetManager.getAsset('spell_rammus_q');
+      slowBuff.image = AssetManager.get('spell_rammus_q');
       slowBuff.percent = this.slowPercent;
       victim.addBuff(slowBuff);
     }

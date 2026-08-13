@@ -7,7 +7,7 @@ import Airborne from '../buffs/Airborne';
 import Slow from '../buffs/Slow';
 
 export default class ChoGath_Q extends Spell {
-  image = AssetManager.getAsset('spell_chogath_q');
+  image = AssetManager.get('spell_chogath_q');
   name = "Rạn Nứt (Cho'Gath_Q)";
   description =
     'Tạo một vụ địa chấn tại vùng đã chọn, gây <span class="damage">15 sát thương</span> và <span class="buff">Hất Tung</span> các kẻ địch trong <span class="time">1 giây</span> và <span class="buff">Làm Chậm 60%</span> chúng trong <span class="time">1.5 giây</span>';
@@ -68,7 +68,7 @@ export class ChoGath_Q_Object extends SpellObject {
 
           const slowBuff = new Slow(1500, this.owner, enemy);
           slowBuff.percent = 0.6;
-          slowBuff.image = AssetManager.getAsset('spell_chogath_q');
+          slowBuff.image = AssetManager.get('spell_chogath_q');
           enemy.addBuff(slowBuff);
           enemy.takeDamage(this.damage, this.owner);
         });

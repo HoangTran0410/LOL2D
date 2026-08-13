@@ -1,0 +1,113 @@
+{
+  "asset": {
+    "key": "champ_amumu",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_OriginalSquare.png?3fa85",
+    "sha1": "ac2f68c98d73e9d5f9b0db2c310607f3f3c1afe1"
+  },
+  "champion": "Amumu",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Support",
+    "apiname": "Amumu",
+    "be": 225,
+    "changes": "V25.18",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Crowd Control",
+      "Initiator",
+      "Magic"
+    ],
+    "control": 3,
+    "damage": 2,
+    "date": "2009-06-26",
+    "difficulty": 1,
+    "external_positions": [
+      "Jungle",
+      "Support"
+    ],
+    "herotype": "Tank",
+    "id": 32,
+    "mobility": 1,
+    "patch": "June 26, 2009 Patch",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Vanguard"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Tantrum"
+    },
+    "skill_i": {
+      "1": "Cursed Touch"
+    },
+    "skill_q": {
+      "1": "Bandage Toss"
+    },
+    "skill_r": {
+      "1": "Curse of the Sad Mummy"
+    },
+    "skill_w": {
+      "1": "Despair"
+    },
+    "skills": {
+      "1": "Cursed Touch",
+      "2": "Bandage Toss",
+      "3": "Despair",
+      "4": "Tantrum",
+      "5": "Curse of the Sad Mummy"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_taken": 1
+      },
+      "arm_base": 33,
+      "arm_lvl": 4,
+      "as_base": 0.736,
+      "as_lvl": 2.18,
+      "as_ratio": 0.638000011444091,
+      "attack_delay_offset": -0.0661564618349075,
+      "dam_base": 57,
+      "dam_lvl": 3.8,
+      "gameplay_radius": 55,
+      "hp5_base": 9,
+      "hp5_lvl": 0.85,
+      "hp_base": 685,
+      "hp_lvl": 94,
+      "mp5_base": 7.4,
+      "mp5_lvl": 0.55,
+      "mp_base": 285,
+      "mp_lvl": 40,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 335,
+      "ofa": {
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 30,
+      "range": 125,
+      "selection_height": 130,
+      "selection_radius": 100,
+      "urf": {
+        "dmg_dealt": 1.1,
+        "dmg_taken": 0.9
+      }
+    },
+    "style": 90,
+    "title": "The Sad Mummy",
+    "toughness": 3,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "291f0f984c1936d3b78ed9bae187606a2e118248ab7a82ed52ce1df9025f3be8",
+    "fetchedAt": "2026-08-13T10:47:18.264Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4051472,
+    "sourceTimestamp": "2026-08-12T18:33:05Z"
+  }
+}

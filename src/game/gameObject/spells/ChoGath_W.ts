@@ -9,7 +9,7 @@ import Root from '../buffs/Root';
 import Stun from '../buffs/Stun';
 
 export default class ChoGath_W extends Spell {
-  image = AssetManager.getAsset('spell_chogath_w');
+  image = AssetManager.get('spell_chogath_w');
   name = "Tiếng Gầm Hoang Dã (Cho'Gath_W)";
   description =
     'Gầm vào hướng đã chọn theo <span>hình nón</span>, <span class="buff">Làm Choáng</span> <span class="time">1 giây</span> và gây <span class="damage">15 sát thương</span> cho các kẻ địch trong tầm.';
@@ -83,7 +83,7 @@ export class ChoGath_W_Object extends SpellObject {
 
     enemies.forEach((enemy: any) => {
       const stunBuff = new Stun(this.stunTime, this.owner, enemy);
-      stunBuff.image = AssetManager.getAsset('spell_chogath_w');
+      stunBuff.image = AssetManager.get('spell_chogath_w');
       enemy.addBuff(stunBuff);
 
       enemy.takeDamage(20, this.owner);

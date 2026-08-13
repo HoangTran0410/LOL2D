@@ -8,7 +8,7 @@ import Airborne from '../buffs/Airborne';
 import Dash from '../buffs/Dash';
 
 export default class Alistar_W extends Spell {
-  image = AssetManager.getAsset('spell_alistar_w');
+  image = AssetManager.get('spell_alistar_w');
   name = 'Húc Bay (Alistar_W)';
   description =
     '<span class="buff">Lướt</span> tới kẻ địch gần nhất trong phạm vi rồi húc chúng bay ra xa, gây <span class="damage">30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.7 giây</span>';

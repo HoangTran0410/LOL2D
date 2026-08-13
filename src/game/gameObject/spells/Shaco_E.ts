@@ -5,7 +5,7 @@ import Spell from '../Spell';
 import { Shaco_W_Bullet_Object } from './Shaco_W';
 
 export default class Shaco_E extends Spell {
-  image = AssetManager.getAsset('spell_shaco_e');
+  image = AssetManager.get('spell_shaco_e');
   name = 'Dao Độc (Shaco_E)';
   description =
     'Ném dao tới kẻ địch, <span class="buff">Làm Chậm 40%</span> và gây <span class="damage">15 sát thương</span>, gây thêm <span class="damage">10 sát thương</span> nếu mục tiêu <span>dưới 30% máu</span>';

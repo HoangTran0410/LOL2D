@@ -6,7 +6,7 @@ import Shield from '../buffs/Shield';
 import StatAmp from '../buffs/StatAmp';
 
 export default class Malphite_W extends Spell {
-  image = AssetManager.getAsset('spell_malphite_w');
+  image = AssetManager.get('spell_malphite_w');
   name = 'Sức Mạnh Đá Tảng (Malphite_W)';
   description =
     'Malphite phình to lớp vỏ đá của mình trong <span class="time">4 giây</span>, nhận <span class="buff">Khiên hấp thụ 80 sát thương</span> và tăng kích thước cơ thể';

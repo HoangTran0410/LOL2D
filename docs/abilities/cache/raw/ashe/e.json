@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ashe/Hawkshot",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Hawkshot@@icon@@Hawkshot.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Ashe''' sends a hawk spirit to a location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area along its path<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;repeatedly for 0.<small>5</small> seconds after every 100 units traveled&nbsp;」</span><span class=\"flipText2\">「&nbsp;for effectively up-to 1.<small>8</small> seconds at any location&nbsp;」</span></span>and at its destination for 5 seconds.@@description2@@'''Ashe''' periodically [[ammunition|stocks]] a ''Hawkshot'' charge, up to a maximum of 2.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Vision bubble radiuses\">1000</span>@@width@@{{{width}}}@@speed@@1400@@casttime@@0.<small>25</small>@@cost@@1@@cooldown@@5@@targeting@@Location@@damagetype@@{{{damagetype}}}@@spellshield@@false@@projectile@@special@@notes@@\n* ''Hawkshot's'' recharge timer seems to start at the beginning of the game, even prior to ranking the ability, but upon actually ranking the ability, it starts with one charge and the recharge timer starts from 0.\n* ''Hawkshot'' will ping enemy champions it spots if allies didn't already have vision of them, and put a 'revealed' visual effect on them for <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2.<small>75</small> seconds</span>, but does not actually reveal the units in particular, and is removed if the champion leaves the area.\n* '''Ashe''' marks enemy champions who were previously unseen but were revealed ''Hawkshot'' in order to gain [[assist]] credit, lasting for the standard credit timer.\n* ''Hawkshot'' will trigger upon colliding with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Samira\" data-ability=\"Blade Whirl\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Samira Blade Whirl.png|20xpx|border|link=Samira#Blade Whirl|An icon for Samira's ability Blade Whirl]]</span> <span style=\"white-space:normal;\">[[Samira#Blade Whirl|Blade Whirl]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> but not <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* ''Hawkshot'' will grant 0.33 points of [[vision score]] for each champion revealed.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306809,
+                "revisions": [
+                  {
+                    "parentid": 3907269,
+                    "revid": 3936951,
+                    "timestamp": "2025-07-27T11:52:18Z"
+                  }
+                ],
+                "title": "Template:Data Ashe/Hawkshot"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3936951,
+      "timestamp": "2025-07-27T11:52:18Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "26a218ae357b8d84897448f56f60e2bf7a1753b60fe1b6d1ebc3a4f49d57e136",
+    "fetchedAt": "2026-08-13T10:47:30.447Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ashe/Hawkshot",
+    "revisionId": 3936951,
+    "sourceTimestamp": "2025-07-27T11:52:18Z"
+  }
+}
