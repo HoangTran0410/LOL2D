@@ -8,6 +8,7 @@ import type { GameObjectOptions, GameObjectRuntimeContext } from '../GameObject'
 import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
 import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
+import PathAgent from '../../nav/PathAgent';
 import type Buff from '../Buff';
 import type { BuffConstructor } from '../Buff';
 
@@ -60,6 +61,13 @@ export default class AttackableUnit extends GameObject {
   /** Frames left in which body separation skips this unit. See markDisplaced(). */
   _separationGrace = 0;
 
+  /**
+   * The route this unit is walking, when it has one. Built on first use, so a
+   * unit that never takes a `navigateTo` — turrets, fountains, every unit in a
+   * headless spell test — never allocates one.
+   */
+  pathAgent: PathAgent | null = null;
+
   animatedValues: {
     size: number;
     height: number;
@@ -103,6 +111,10 @@ export default class AttackableUnit extends GameObject {
     this.updateBuffs();
     this.stats.update();
 
+    // The route picks this frame's destination before the step is taken, so a
+    // unit rounding a corner turns on the frame it arrives rather than the one
+    // after it.
+    this.pathAgent?.update(deltaTime);
     if (this.canMove) this.move();
 
     if (this.deathData) {
@@ -353,6 +365,7 @@ export default class AttackableUnit extends GameObject {
 
   die(deathData: UnitDeathData): void {
     this.deathData = deathData;
+    this.pathAgent?.clear();
     this.clearBuffs();
   }
 
@@ -372,6 +385,8 @@ export default class AttackableUnit extends GameObject {
   respawn() {
     this.stats.health.baseValue = this.stats.maxHealth.value;
     this.deathData = null;
+    // a route planned from where the corpse fell means nothing at the fountain
+    this.pathAgent?.clear();
 
     let spawnPoint = this.game.randomSpawnPoint();
     this.position.set(spawnPoint.x, spawnPoint.y);
@@ -402,13 +417,46 @@ export default class AttackableUnit extends GameObject {
     return true;
   }
 
+  /**
+   * Walk at a point in a straight line, ignoring terrain. Unchanged, and still
+   * the right call for a dash, a hook, a displacement or a spell that writes a
+   * destination — each of those means "go here now", not "plan a route". It
+   * therefore *cancels* whatever route was running, so the two never fight.
+   */
   moveTo(x: number, y: number) {
+    this.pathAgent?.clear();
     if (this.destination.x !== x || this.destination.y !== y) this.movementRevision += 1;
     this.destination.set(x, y);
   }
 
+  /**
+   * Walk to a point, around terrain. This is the move *order*: what a right
+   * click, a chase and a leash all want.
+   *
+   * With no navigation in the game context it is `moveTo` exactly, so a unit
+   * built for a headless test behaves as it always did. `urgent` puts the
+   * request at the front of the search queue — the local player's own orders
+   * use it, because one frame of latency is invisible on a bot and is not on a
+   * click.
+   */
+  navigateTo(x: number, y: number, urgent = false) {
+    const navigation = this.game?.navigation;
+    if (!navigation) {
+      this.moveTo(x, y);
+      return;
+    }
+
+    if (!this.pathAgent) this.pathAgent = new PathAgent(this, navigation);
+    // A route is an order in its own right, so it bumps the same revision a
+    // channelled spell watches for. Following the route does not — rounding a
+    // corner is not a second order.
+    if (this.destination.x !== x || this.destination.y !== y) this.movementRevision += 1;
+    this.pathAgent.order(x, y, urgent);
+  }
+
   teleportTo(x: number, y: number) {
     this.markDisplaced();
+    this.pathAgent?.clear();
     this.position.set(x, y);
     this.destination.set(x, y);
   }
@@ -419,7 +467,13 @@ export default class AttackableUnit extends GameObject {
   }
 
   stopMovement() {
+    this.pathAgent?.clear();
     this.destination.set(this.position.x, this.position.y);
+  }
+
+  /** Speed in world units per frame. Read by the route follower. */
+  get moveSpeed(): number {
+    return this.stats.speed.value;
   }
 
   hasBuff(BuffClass: BuffConstructor): boolean {

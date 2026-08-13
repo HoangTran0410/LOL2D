@@ -130,7 +130,11 @@ export default class BasicAttackController {
 
     const distance = p5.Vector.dist(this.owner.position, target.position);
     if (distance > reach) {
-      this.owner.moveTo(target.position.x, target.position.y);
+      // Routed, not straight: a chase across a wall used to end with the
+      // attacker pressed into it. This is called every frame at a target that
+      // keeps moving, which PathAgent collapses into one plan re-checked a few
+      // times a second — see the throttles there.
+      this.owner.navigateTo(target.position.x, target.position.y);
       return;
     }
 

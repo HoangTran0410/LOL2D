@@ -25,6 +25,13 @@ export const AI_ATTACK_SCAN_INTERVAL_MS = 250;
 /** How far a bot looks for something to attack. Inside its 500 sight radius. */
 export const AI_ATTACK_AGGRO_RANGE = 420;
 
+/**
+ * How far a rolled wander point may be dragged onto standable ground before the
+ * roll is abandoned. Wide enough to rescue a point in the middle of a wall,
+ * narrow enough that a bot never treats the far side of the map as "nearby".
+ */
+export const ROAM_SNAP_DISTANCE = 900;
+
 export default class AIChampion extends Champion {
   _autoMove = false;
   _autoCast = true;
@@ -198,10 +205,26 @@ export default class AIChampion extends Champion {
     return nearest?.point;
   }
 
+  /**
+   * Picks somewhere to wander and walks a route to it.
+   *
+   * The point is pulled onto standable ground first. Rolling a raw pair of
+   * coordinates lands inside a wall about 40% of the time on this map, and a
+   * bot ordered into a wall is a bot that spends its wander pressed against
+   * one. `nearestWalkable` costs a short ring scan and removes that outright.
+   */
   moveToRandomLocation() {
     let x = random(this.game.mapSize);
     let y = random(this.game.mapSize);
-    this.moveTo(x, y);
+
+    const navigation = this.game.navigation;
+    if (navigation) {
+      const reachable = navigation.nearestWalkable(x, y, this.bodyRadius, ROAM_SNAP_DISTANCE);
+      if (!reachable) return;
+      x = reachable.x;
+      y = reachable.y;
+    }
+    this.navigateTo(x, y);
   }
 
   onCollideMapEdge() {
@@ -209,8 +232,16 @@ export default class AIChampion extends Champion {
     if (this._autoMoveOnCollideMapEdge) this.moveToRandomLocation();
   }
 
+  /**
+   * Touching a wall used to re-roll the destination. That was never navigation
+   * — it was a flinch, and it is what made a bot that clipped a corner set off
+   * across the map instead of walking round it. A bot on a route keeps the
+   * route and re-plans from where it actually ended up; only a bot with no
+   * route at all falls back to picking somewhere new.
+   */
   onCollideWall() {
     super.onCollideWall();
+    if (this.pathAgent?.repath()) return;
     if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
   }
 

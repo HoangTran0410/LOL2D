@@ -122,10 +122,17 @@ export default class Champion extends AttackableUnit {
     this.basicAttack.order(target);
   }
 
-  /** A move order is also the cancel for an attack order. */
-  orderMove(x: number, y: number): void {
+  /**
+   * A move order is also the cancel for an attack order. It routes around
+   * terrain: clicking across a wall walks around the wall rather than into it.
+   *
+   * `urgent` puts the route at the front of the search queue. Game passes it
+   * for the local player's own clicks, because a frame of search latency on a
+   * bot is invisible and a frame of it on a click is not.
+   */
+  orderMove(x: number, y: number, urgent = false): void {
     this.basicAttack.clear();
-    this.moveTo(x, y);
+    this.navigateTo(x, y, urgent);
   }
 
   /**

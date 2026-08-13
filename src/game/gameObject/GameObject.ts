@@ -5,6 +5,7 @@ import type EventManager from '../../managers/EventManager';
 import type Spell from './Spell';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
 import type ObjectManager from '../managers/ObjectManager';
+import type NavigationSystem from '../nav/NavigationSystem';
 
 export interface GameObjectGameContext {
   objectManager: Pick<ObjectManager, 'queryObjects'> & Partial<Pick<ObjectManager, 'addObject'>>;
@@ -16,6 +17,13 @@ export interface GameObjectRuntimeContext extends GameObjectGameContext {
   objectManager: ObjectManager;
   player: AttackableUnit;
   eventManager: EventManager;
+  /**
+   * Terrain routing. Optional because a unit must still work in a context that
+   * has no map at all — the spell suites build one of those by the hundred —
+   * and because `AttackableUnit.navigateTo` degrades to a straight-line
+   * `moveTo` without it, which is exactly what the game did before.
+   */
+  navigation?: NavigationSystem;
   worldMouse?: p5.Vector;
   randomSpawnPoint(): p5.Vector;
   createSpellContext(spell: Spell, caster: AttackableUnit, cursorWorld: Vec2): CastContext | undefined;

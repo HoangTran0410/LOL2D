@@ -59,6 +59,26 @@ export default class TerrainMap {
     }
   }
 
+  /**
+   * The wall layer as world-space polygons, for the navigation grid to
+   * rasterize. Obstacles are built at the origin with their vertices already in
+   * world coordinates, so this is a view of the same objects the wall push-out
+   * uses rather than a second parse of the map file — the two can never drift.
+   */
+  wallPolygons(): { x: number; y: number }[][] {
+    const polygons: { x: number; y: number }[][] = [];
+    for (const obstacle of this.obstacles) {
+      if (obstacle.type !== TerrainType.WALL) continue;
+      polygons.push(
+        obstacle.vertices.map(vertex => ({
+          x: obstacle.position.x + vertex.x,
+          y: obstacle.position.y + vertex.y,
+        }))
+      );
+    }
+    return polygons;
+  }
+
   update(): void {
     this.rippleEffect.update();
 

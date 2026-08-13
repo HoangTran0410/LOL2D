@@ -162,7 +162,9 @@ export default class Monster extends AttackableUnit {
     const distance = p5.Vector.dist(pos, target.position);
 
     if (distance > reach) {
-      this.moveTo(target.position.x, target.position.y);
+      // routed: a camp whose champion stepped behind the wall of its own pit
+      // used to grind into that wall until the leash radius saved it
+      this.navigateTo(target.position.x, target.position.y);
     } else {
       this.stopMovement();
       if (this._attackCooldown <= 0) {
@@ -174,7 +176,9 @@ export default class Monster extends AttackableUnit {
   }
 
   updateBackToCamp() {
-    this.moveTo(this.camp.x, this.camp.y);
+    // leashing home is the one walk a camp does with nothing chasing it, and
+    // the one it must not fail: routed, so a pit wall cannot strand it outside
+    this.navigateTo(this.camp.x, this.camp.y);
     // the original never left this phase, so a leashed camp stayed on 'walking
     // home' regen forever and never re-aggroed on proximity
     if (Math.hypot(this.position.x - this.camp.x, this.position.y - this.camp.y) < 10) {
@@ -213,7 +217,7 @@ export default class Monster extends AttackableUnit {
   goBackToCamp() {
     this.targetLock = null;
     this.phase = Monster.PHASES.BACK_TO_CAMP;
-    this.moveTo(this.camp.x, this.camp.y);
+    this.navigateTo(this.camp.x, this.camp.y);
   }
 
   draw() {

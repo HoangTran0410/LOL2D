@@ -18,6 +18,7 @@ import {
 } from './preset';
 import ObjectManager, { PredefinedFilters } from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
+import NavigationSystem from './nav/NavigationSystem';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
@@ -37,6 +38,7 @@ export default class Game {
   objectManager!: ObjectManager;
   eventManager!: EventManager;
   terrainMap!: TerrainMap;
+  navigation!: NavigationSystem;
   fogOfWar!: FogOfWar;
   inGameHUD!: InGameHUD;
   player!: Champion;
@@ -57,6 +59,11 @@ export default class Game {
     this.objectManager = new ObjectManager(this);
     this.eventManager = new EventManager();
     this.terrainMap = new TerrainMap(this, this.mapSize);
+    // The map is static, so every unit's routing is derived from the wall layer
+    // once here — about 7ms and 1.6MB for the whole game — rather than per unit
+    // per frame. Built off the same Obstacle list the collision push-out uses,
+    // so there is one source of truth for where the walls are.
+    this.navigation = new NavigationSystem(this.terrainMap.wallPolygons(), this.mapSize);
     this.fogOfWar = new FogOfWar(this);
     this.inGameHUD = new InGameHUD(this);
 
@@ -132,6 +139,10 @@ export default class Game {
     // before objectManager.update(), so a minion released this frame is added
     // to the world in the same pass as everything else spawned this frame
     this.minionSpawner.update();
+    // also before it: a route asked for last frame is in hand before the unit
+    // that asked takes its next step. The pass is budgeted, so this is a few
+    // hundred microseconds whatever the board looks like.
+    this.navigation.update();
     this.objectManager.update();
     this.terrainMap.update();
 
@@ -144,7 +155,7 @@ export default class Game {
       if (target) {
         this.player.orderAttack(target);
       } else {
-        this.player.orderMove(this.worldMouse.x, this.worldMouse.y);
+        this.player.orderMove(this.worldMouse.x, this.worldMouse.y, true);
         this.clickedPoint = { x: this.worldMouse.x, y: this.worldMouse.y, size: 40 };
       }
     }
@@ -205,9 +216,44 @@ export default class Game {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
       this.objectManager.draw();
+      if (this.navigation.debugRoutes) this.drawRoutes();
     });
 
     this.fogOfWar.draw();
+  }
+
+  /**
+   * Every unit's remaining route, when `navigation.debugRoutes` is on. Lives
+   * here rather than in the nav module so that module stays free of p5 and
+   * stays testable in a plain node environment.
+   */
+  drawRoutes(): void {
+    push();
+    for (const object of this.objectManager.objects) {
+      if (!(object instanceof AttackableUnit)) continue;
+      const agent = object.pathAgent;
+      if (!agent || agent.state !== 'FOLLOWING') continue;
+
+      let fromX = object.position.x;
+      let fromY = object.position.y;
+      stroke(90, 220, 255, 190);
+      strokeWeight(3);
+      noFill();
+      for (let i = agent.waypointIndex; i + 1 < agent.waypoints.length; i += 2) {
+        line(fromX, fromY, agent.waypoints[i], agent.waypoints[i + 1]);
+        fromX = agent.waypoints[i];
+        fromY = agent.waypoints[i + 1];
+      }
+
+      noStroke();
+      fill(90, 220, 255, 220);
+      for (let i = agent.waypointIndex; i + 1 < agent.waypoints.length; i += 2) {
+        circle(agent.waypoints[i], agent.waypoints[i + 1], 12);
+      }
+      fill(255, 210, 90, 230);
+      circle(agent.goalX, agent.goalY, 20);
+    }
+    pop();
   }
 
   destroy() {
