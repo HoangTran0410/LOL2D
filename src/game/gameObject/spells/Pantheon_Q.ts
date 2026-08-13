@@ -1,7 +1,9 @@
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import type { CancelReason, CastContext, CastSpec, Vec2 } from '../../spell/runtime/types';
 import BeamSpellObject from '../spellObjects/BeamSpellObject';
 import MissileSpellObject from '../MissileSpellObject';
+import SpellObject from '../SpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
 import TrailSystem from '../helpers/TrailSystem';
@@ -16,6 +18,12 @@ const MAX_CHARGE_MS = 4_000;
 const RANGE = 700;
 const MIN_RANGE = 100;
 const RANGE_CHARGE_MS = 1_500;
+// The tap-cast is a melee stab: short, wide, and nothing like the thrown spear.
+// Exported so tests assert the geometry is wired from these, not a copy of the
+// numbers — retuning a value should not mean editing the suite.
+export const THRUST_REACH = 210;
+export const THRUST_WIDTH = 100;
+export const THRUST_BACKSWING = 40;
 
 type SpearTarget = AttackableUnit & {
   readonly unitType?: 'minion';
@@ -27,6 +35,46 @@ const damageMultiplier = (target: SpearTarget): number =>
 const spearDamage = (target: SpearTarget, subsequent: boolean): number => {
   const executeMultiplier = target.stats.health.value < target.stats.maxHealth.value * 0.2 ? 2 : 1;
   return 20 * damageMultiplier(target) * executeMultiplier * (subsequent ? 0.5 : 1);
+};
+
+/**
+ * Draws the spear pointing along +x in already-translated local coordinates.
+ * Shared so the thrown spear and the melee thrust show the same weapon.
+ */
+const drawSpearBody = (half: number, blade: number): void => {
+  // haft: dark wood with a bronze highlight along the top
+  stroke(84, 52, 26, 245);
+  strokeWeight(blade * 0.34);
+  line(-half * 0.95, 0, half * 0.34, 0);
+  stroke(206, 160, 92, 220);
+  strokeWeight(blade * 0.1);
+  line(-half * 0.95, -blade * 0.09, half * 0.34, -blade * 0.09);
+
+  noStroke();
+  fill(176, 132, 68, 235);
+  ellipse(-half * 0.95, 0, blade * 0.36, blade * 0.7);
+
+  // socket collar, kept slim so it does not read as a bead on the shaft
+  fill(198, 150, 78, 240);
+  quad(
+    half * 0.28, -blade * 0.22,
+    half * 0.4, -blade * 0.18,
+    half * 0.4, blade * 0.18,
+    half * 0.28, blade * 0.22
+  );
+
+  // narrow leaf blade, drawn over the collar so the point stays the far end
+  fill(255, 248, 224, 250);
+  beginShape();
+  vertex(half, 0);
+  bezierVertex(half * 0.72, -blade * 0.85, half * 0.52, -blade * 0.55, half * 0.38, 0);
+  bezierVertex(half * 0.52, blade * 0.55, half * 0.72, blade * 0.85, half, 0);
+  endShape(CLOSE);
+
+  // mid-rib keeps the blade from reading as a flat blob at speed
+  stroke(198, 146, 58, 190);
+  strokeWeight(blade * 0.08);
+  line(half * 0.44, 0, half * 0.93, 0);
 };
 
 export default class Pantheon_Q extends Spell {
@@ -114,6 +162,7 @@ export default class Pantheon_Q extends Spell {
     }
 
     const spear = new Pantheon_Q_Spear(this.owner);
+    spear.chargeRatio = Math.min(1, this.chargeMs / RANGE_CHARGE_MS);
     spear.destination = createVector(
       start.x + direction.x * this.currentRange,
       start.y + direction.y * this.currentRange
@@ -141,9 +190,9 @@ export default class Pantheon_Q extends Spell {
     const beam = new BeamSpellObject(
       this.owner,
       {
-        start: { x: start.x - direction.x * 40, y: start.y - direction.y * 40 },
-        end: { x: start.x + direction.x * 560, y: start.y + direction.y * 560 },
-        width: 120,
+        start: { x: start.x - direction.x * THRUST_BACKSWING, y: start.y - direction.y * THRUST_BACKSWING },
+        end: { x: start.x + direction.x * THRUST_REACH, y: start.y + direction.y * THRUST_REACH },
+        width: THRUST_WIDTH,
       },
       {
         candidateFilter: target =>
@@ -155,6 +204,15 @@ export default class Pantheon_Q extends Spell {
       }
     );
     this.game.objectManager.addObject(beam);
+
+    // BeamSpellObject is hit detection only, and instant beams are removed the
+    // frame they resolve — without this the tap-cast landed damage with no
+    // visual at all.
+    const thrust = new Pantheon_Q_Thrust(this.owner);
+    thrust.aimDirection = direction;
+    thrust.reach = THRUST_REACH;
+    thrust.laneWidth = THRUST_WIDTH;
+    this.game.objectManager.addObject(thrust);
   }
 
   private removeChargeSlow(): void {
@@ -177,9 +235,11 @@ export default class Pantheon_Q extends Spell {
 export class Pantheon_Q_Spear extends MissileSpellObject {
   speed = 1_400 / 60;
   size = 32;
-  visualWidth = 84;
-  visualHeight = 30;
+  visualWidth = 126;
+  visualHeight = 42;
   maxHitCount = Infinity;
+  /** 0..1 — how long the throw was wound up; drives glow and speed streaks. */
+  chargeRatio = 0;
 
   trailSystem = new TrailSystem({
     trailColor: '#FD8A',
@@ -194,58 +254,117 @@ export class Pantheon_Q_Spear extends MissileSpellObject {
     );
     const half = this.visualWidth / 2;
     const blade = this.visualHeight * 0.4;
+    const charge = this.chargeRatio;
 
     push();
     translate(this.position.x, this.position.y);
     rotate(angle);
 
-    // Starlight burning along the haft only. Extended past the tip with round
-    // caps it painted a gold blob in front of the blade, blunting the spear.
+    // Starlight burning along the haft, heavier the longer the throw was wound
+    // up. It stops short of the tip: extended past the blade with round caps it
+    // painted a gold blob in front of the point and blunted the spear.
     blendMode(ADD);
     strokeCap(SQUARE);
     noFill();
-    stroke(255, 190, 90, 60);
-    strokeWeight(7);
-    line(-half * 0.95, 0, half * 0.3, 0);
-    stroke(255, 236, 190, 95);
-    strokeWeight(2.5);
-    line(-half * 0.95, 0, half * 0.3, 0);
+    stroke(255, 170, 70, 55 + 60 * charge);
+    strokeWeight(10 + 12 * charge);
+    line(-half * 1.05, 0, half * 0.3, 0);
+    stroke(255, 236, 190, 90 + 70 * charge);
+    strokeWeight(3.5 + 4 * charge);
+    line(-half * 1.05, 0, half * 0.3, 0);
+
+    // speed streaks trailing the haft, so a full charge reads as a hard throw
+    if (charge > 0.05) {
+      stroke(255, 220, 150, 90 * charge);
+      strokeWeight(1.5);
+      for (const offset of [-blade * 0.5, blade * 0.5]) {
+        line(-half * (1.1 + 0.5 * charge), offset, -half * 0.5, offset * 0.45);
+      }
+    }
     blendMode(BLEND);
     strokeCap(ROUND);
 
-    // haft: dark wood with a bronze highlight along the top
-    stroke(84, 52, 26, 245);
-    strokeWeight(4.5);
-    line(-half * 0.95, 0, half * 0.34, 0);
-    stroke(206, 160, 92, 220);
-    strokeWeight(1.3);
-    line(-half * 0.95, -1.3, half * 0.34, -1.3);
-
-    noStroke();
-    fill(176, 132, 68, 235);
-    ellipse(-half * 0.95, 0, 6, blade * 0.7);
-
-    // socket collar, kept slim so it does not read as a bead on the shaft
-    fill(198, 150, 78, 240);
-    quad(half * 0.28, -2.6, half * 0.4, -2.2, half * 0.4, 2.2, half * 0.28, 2.6);
-
-    // narrow leaf blade, drawn over the collar so the point stays the far end
-    fill(255, 248, 224, 250);
-    beginShape();
-    vertex(half, 0);
-    bezierVertex(half * 0.72, -blade * 0.85, half * 0.52, -blade * 0.55, half * 0.38, 0);
-    bezierVertex(half * 0.52, blade * 0.55, half * 0.72, blade * 0.85, half, 0);
-    endShape(CLOSE);
-
-    // mid-rib keeps the blade from reading as a flat blob at speed
-    stroke(198, 146, 58, 190);
-    strokeWeight(1);
-    line(half * 0.44, 0, half * 0.93, 0);
+    drawSpearBody(half, blade);
 
     pop();
   }
 
   onHit(enemy: AttackableUnit): void {
     enemy.takeDamage(spearDamage(enemy, this.hitTargets.length > 1), this.owner);
+  }
+}
+
+/** The melee tap-cast: a spear lunge down the lane BeamSpellObject just hit. */
+export class Pantheon_Q_Thrust extends SpellObject {
+  position = this.owner.position.copy();
+  aimDirection: Vec2 = { x: 1, y: 0 };
+  reach = 560;
+  laneWidth = 120;
+  age = 0;
+  lifeTime = 280;
+
+  update(): void {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw(): void {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    // Punch out over the first third, then drift back: a thrust reads as a
+    // stab, where a constant-length beam reads as a laser.
+    const reach = t < 0.33 ? Math.pow(t / 0.33, 0.55) : 1 - ((t - 0.33) / 0.67) * 0.22;
+    const tip = this.reach * reach;
+    const halfLane = this.laneWidth / 2;
+    const spearHalf = 63;
+    const blade = 21;
+
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(Math.atan2(this.aimDirection.y, this.aimDirection.x));
+
+    blendMode(ADD);
+    strokeCap(SQUARE);
+
+    // the lane that was actually hit, so the tap has readable range
+    noStroke();
+    fill(255, 186, 88, 40 * fade);
+    quad(0, -halfLane * 0.4, tip, -halfLane, tip, halfLane, 0, halfLane * 0.4);
+
+    // white-hot core along the lunge
+    noFill();
+    stroke(255, 208, 128, 150 * fade);
+    strokeWeight(halfLane * 0.5 * fade + 3);
+    line(0, 0, tip * 0.9, 0);
+    stroke(255, 250, 226, 230 * fade);
+    strokeWeight(halfLane * 0.16 * fade + 2);
+    line(0, 0, tip, 0);
+
+    // shock ring where the point lands
+    stroke(255, 236, 190, 200 * fade);
+    strokeWeight(3 * fade + 1);
+    circle(tip, 0, halfLane * (0.5 + t * 1.6));
+    blendMode(BLEND);
+    strokeCap(ROUND);
+
+    // the weapon itself, riding the leading edge
+    push();
+    translate(tip - spearHalf, 0);
+    drawSpearBody(spearHalf, blade);
+    pop();
+
+    pop();
+  }
+
+  // the lunge reaches far past `position`, so the box must cover the whole lane
+  getDisplayBoundingBox(): Rectangle {
+    const pad = this.reach + this.laneWidth;
+    return new Rectangle({
+      x: this.position.x - pad,
+      y: this.position.y - pad,
+      w: pad * 2,
+      h: pad * 2,
+      data: this,
+    });
   }
 }

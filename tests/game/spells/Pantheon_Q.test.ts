@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
-import Pantheon_Q, { Pantheon_Q_Spear } from '../../../src/game/gameObject/spells/Pantheon_Q';
+import Pantheon_Q, {
+  Pantheon_Q_Spear,
+  Pantheon_Q_Thrust,
+  THRUST_BACKSWING,
+  THRUST_REACH,
+  THRUST_WIDTH,
+} from '../../../src/game/gameObject/spells/Pantheon_Q';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import ActionState from '../../../src/game/enums/ActionState';
@@ -91,7 +97,7 @@ describe('Pantheon Q', () => {
     expect(draw.quad).toHaveBeenCalledTimes(1);
   });
 
-  it('uses fresh key-up aim for the -40 to 560 thrust geometry', () => {
+  it('builds the thrust geometry from the tuning constants and fresh key-up aim', () => {
     const caster = owner();
     const spell = new Pantheon_Q(caster);
     spell.press(context);
@@ -100,12 +106,31 @@ describe('Pantheon Q', () => {
     const beam = caster.objects[0] as BeamSpellObject;
     expect(beam).toBeInstanceOf(BeamSpellObject);
     expect(beam.geometry).toEqual({
-      start: { x: 0, y: -40 },
-      end: { x: 0, y: 560 },
-      width: 120,
+      start: { x: 0, y: -THRUST_BACKSWING },
+      end: { x: 0, y: THRUST_REACH },
+      width: THRUST_WIDTH,
     });
     expect(spell.currentCooldown).toBe(1_600);
     expect(spell.coolDown).toBe(4_000);
+  });
+
+  it('gives the tap-cast a visual, since the beam is hit detection only', () => {
+    const caster = owner();
+    const spell = new Pantheon_Q(caster);
+    spell.press(context);
+    spell.release(releaseContext);
+
+    const thrust = caster.objects.find(o => o instanceof Pantheon_Q_Thrust) as Pantheon_Q_Thrust;
+    expect(thrust).toBeInstanceOf(Pantheon_Q_Thrust);
+    // matches the lane the BeamSpellObject actually hit
+    expect(thrust.reach).toBe(THRUST_REACH);
+    expect(thrust.laneWidth).toBe(THRUST_WIDTH);
+    expect(thrust.aimDirection).toEqual({ x: 0, y: 1 });
+
+    // and it must expire on its own rather than linger for the whole game
+    vi.stubGlobal('deltaTime', thrust.lifeTime + 1);
+    thrust.update();
+    expect(thrust.toRemove).toBe(true);
   });
 
   it('thrust hits only enemy damageable units and applies unit multipliers before execute', () => {
@@ -147,7 +172,7 @@ describe('Pantheon Q', () => {
     expect(spear.destination.y).toBeCloseTo(240.4);
     expect(spear.speed).toBe(1_400 / 60);
     expect(spear.size).toBe(32);
-    expect(spear).toMatchObject({ visualWidth: 84, visualHeight: 30 });
+    expect(spear).toMatchObject({ visualWidth: 126, visualHeight: 42 });
     const damages: number[] = [];
     const targets = [
       target('red'),
