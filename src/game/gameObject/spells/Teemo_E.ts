@@ -5,6 +5,8 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import DamageOverTime from '../buffs/DamageOverTime';
+import EventType from '../../enums/EventType';
+import type { BasicAttackHit } from '../../combat/BasicAttack';
 import TrailSystem from '../helpers/TrailSystem';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
@@ -19,28 +21,73 @@ export const POISON_TICK_INTERVAL_MS = 1_000;
 export const POISON_DURATION_MS = 4_000;
 export const MANA_COST = 25;
 
+/** Poisons `victim`, from whichever of the two deliveries applied it. */
+export function applyToxicShot(source: AttackableUnit, victim: AttackableUnit): void {
+  const poison = new DamageOverTime(POISON_DURATION_MS, source, victim);
+  poison.stackId = 'teemo_e_toxicshot';
+  poison.image = AssetManager.get('spell_teemo_e');
+  poison.name = 'Trúng Độc';
+  poison.damagePerTick = POISON_DAMAGE_PER_TICK;
+  poison.tickInterval = POISON_TICK_INTERVAL_MS;
+  poison.flameColor = [210, 255, 110];
+  poison.emberColor = [55, 120, 20];
+  victim.addBuff(poison);
+}
+
 /**
- * The real Toxic Shot is a passive that piggybacks on basic attacks. This
- * project has no auto-attack system for a passive to hang off, so it becomes
- * an active poison dart instead of a self-buff that waits for another
- * ability to land: a self-buff would have to reach into Teemo_Q/Teemo_R's
- * `onHit` to know when "the next ability" connects, coupling three spell
- * files together for one effect. A dedicated dart is self-contained, reads
- * immediately on cast like the rest of the kit (Q's dart, R's trap), and
- * gives Teemo a sustained-damage tool his kit is otherwise missing. It reuses
- * `DamageOverTime` for the poison rather than a second damage-over-time buff.
+ * Toxic Shot is a passive in the real game: every basic attack poisons. It was
+ * first written here as an active dart only because this project had no basic
+ * attacks for a passive to hang off. It has them now, so the passive is the
+ * real thing — every landed attack applies the poison, through the
+ * `ON_ATTACK_HIT` seam.
+ *
+ * The dart stays as the active. It is one poison with two deliveries rather
+ * than two abilities: without it the slot has nothing to press, which reads as
+ * broken in a game built around pressing keys, and it gives Teemo a way to
+ * apply the poison from outside attack range.
  */
 export default class Teemo_E extends Spell {
   image = AssetManager.get('spell_teemo_e');
   name = 'Phi Tiêu Độc (Teemo_E)';
   description =
-    'Chủ động: Teemo bắn một mũi tẩm độc đậm đặc về hướng chỉ định, gây <span class="damage">9 sát thương</span> tức thì và khiến mục tiêu <span class="buff">Trúng Độc</span>, mất thêm <span class="damage">6 sát thương mỗi giây</span> trong <span class="time">4 giây</span>.';
+    `Nội tại: mỗi đòn <span class="buff">đánh thường</span> của Teemo khiến mục tiêu <span class="buff">Trúng Độc</span>. Chủ động: bắn một mũi tẩm độc về hướng chỉ định, gây <span class="damage">${ON_HIT_DAMAGE} sát thương</span> tức thì và gây độc tương tự. Độc gây <span class="damage">${POISON_DAMAGE_PER_TICK} sát thương mỗi giây</span> trong <span class="time">${POISON_DURATION_MS / 1000} giây</span>.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade
   // cooldown-cap scan in tests/game/spells/cooldowns.test.ts can see it
   coolDown = 4_000;
   manaCost = MANA_COST;
 
   range = RANGE;
+
+  /** Unsubscribes the passive; `undefined` until the first update wires it. */
+  private stopWatching?: () => void;
+
+  onUpdate(): void {
+    // Wired here, not in the constructor: every spell is instantiated once with
+    // a null owner to build the picker, and that instance has no game to
+    // subscribe to and must never react to a real fight.
+    if (this.stopWatching || !this.owner || !this.game?.eventManager) return;
+
+    this.stopWatching = this.game.eventManager.on(
+      EventType.ON_ATTACK_HIT,
+      ({ attacker, victim }: BasicAttackHit) => {
+        // the event is global; every Teemo on the map hears every attack
+        if (attacker !== this.owner || !victim || victim.isDead) return;
+        applyToxicShot(this.owner, victim);
+      }
+    );
+  }
+
+  onRemoved(): void {
+    this.stopWatching?.();
+    this.stopWatching = undefined;
+    super.onRemoved();
+  }
+
+  deactivate(): void {
+    this.stopWatching?.();
+    this.stopWatching = undefined;
+    super.deactivate();
+  }
 
   onSpellCast() {
     const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
@@ -81,16 +128,7 @@ export class Teemo_E_Object extends MissileSpellObject {
 
   onHit(enemy: AttackableUnit) {
     enemy.takeDamage(this.onHitDamage, this.owner);
-
-    const poison = new DamageOverTime(this.poisonDuration, this.owner, enemy);
-    poison.stackId = 'teemo_e_toxicshot';
-    poison.image = AssetManager.get('spell_teemo_e');
-    poison.name = 'Trúng Độc';
-    poison.damagePerTick = this.poisonDamagePerTick;
-    poison.tickInterval = this.poisonTickInterval;
-    poison.flameColor = [210, 255, 110];
-    poison.emberColor = [55, 120, 20];
-    enemy.addBuff(poison);
+    applyToxicShot(this.owner, enemy);
 
     // the vial shatters on impact, so the poison burst is its own object
     const splash = new Teemo_E_Splash(this.owner);

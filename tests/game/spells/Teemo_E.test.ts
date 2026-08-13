@@ -15,6 +15,8 @@ import Teemo_E, {
   Teemo_E_Splash,
 } from '../../../src/game/gameObject/spells/Teemo_E';
 import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
+import EventManager from '../../../src/managers/EventManager';
+import EventType from '../../../src/game/enums/EventType';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import { TestVector } from '../spell/fixtures';
 
@@ -23,6 +25,9 @@ const target = (teamId: string) =>
     position: new TestVector(100, 0),
     animatedValues: { displaySize: 40 },
     teamId,
+    // AttackableUnit.isDead is a getter over deathData, so leaving it unset
+    // makes a fresh fixture read as already dead
+    deathData: null,
     takeDamage: vi.fn(),
     addBuff: vi.fn(),
   });
@@ -41,12 +46,88 @@ const owner = () => {
     canCast: true,
     stats: { mana: manaStat, health: { value: 100 } },
     game: {
-      eventManager: { emit: vi.fn() },
+      eventManager: new EventManager(),
       objectManager: { addObject: (object: unknown) => objects.push(object) },
     },
     objects,
   };
 };
+
+// Toxic Shot is a passive in the real game. It was an active-only dart here
+// while the project had no basic attacks; now that it does, the passive is the
+// real thing and the dart is the second way to deliver the same poison.
+describe('Teemo E passive', () => {
+  beforeEach(() => {
+    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
+    vi.stubGlobal('p5', { Vector: TestVector });
+    vi.stubGlobal('deltaTime', 16);
+    vi.stubGlobal('random', () => 0.5);
+    vi.stubGlobal('TWO_PI', Math.PI * 2);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  const landAttack = (caster: ReturnType<typeof owner>, attacker: unknown, victim: unknown) =>
+    caster.game.eventManager.emit(EventType.ON_ATTACK_HIT, {
+      attacker,
+      victim,
+      damage: 16,
+      ranged: true,
+    });
+
+  it('poisons whatever a basic attack from its owner lands on', () => {
+    const caster = owner();
+    const spell = new Teemo_E(caster);
+    const victim = target('red');
+
+    spell.onUpdate(); // wires the listener on the first frame
+    landAttack(caster, caster, victim);
+
+    expect(victim.addBuff).toHaveBeenCalledTimes(1);
+    const poison = (victim.addBuff as ReturnType<typeof vi.fn>).mock.calls[0][0] as DamageOverTime;
+    expect(poison).toBeInstanceOf(DamageOverTime);
+    expect(poison).toMatchObject({
+      damagePerTick: POISON_DAMAGE_PER_TICK,
+      tickInterval: POISON_TICK_INTERVAL_MS,
+      duration: POISON_DURATION_MS,
+    });
+  });
+
+  it('ignores attacks by anyone else, since the event is global', () => {
+    const caster = owner();
+    const spell = new Teemo_E(caster);
+    const victim = target('red');
+
+    spell.onUpdate();
+    landAttack(caster, target('red'), victim);
+
+    expect(victim.addBuff).not.toHaveBeenCalled();
+  });
+
+  it('subscribes once however many frames run', () => {
+    const caster = owner();
+    const spell = new Teemo_E(caster);
+    const victim = target('red');
+
+    spell.onUpdate();
+    spell.onUpdate();
+    spell.onUpdate();
+    landAttack(caster, caster, victim);
+
+    expect(victim.addBuff).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops poisoning once the spell is removed from the champion', () => {
+    const caster = owner();
+    const spell = new Teemo_E(caster);
+    const victim = target('red');
+
+    spell.onUpdate();
+    spell.onRemoved();
+    landAttack(caster, caster, victim);
+
+    expect(victim.addBuff).not.toHaveBeenCalled();
+  });
+});
 
 describe('Teemo E', () => {
   beforeEach(() => {
