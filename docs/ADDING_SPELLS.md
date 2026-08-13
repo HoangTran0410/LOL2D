@@ -133,7 +133,40 @@ npm run verify
 
 `verify` checks generated assets, imported abilities, both TypeScript boundaries, every Vitest test, and the production build.
 
-## 8. Hook an on-hit passive onto basic attacks
+## 8. Measure a caster-centred range through `Reach`
+
+A range written from the caster's centre has to clear the caster's own body.
+`UnitCollisionSystem` holds two units at least `bodyRadius(a) + bodyRadius(b)`
+apart, and Cho'Gath R takes a champion to `MAX_UNIT_SIZE` — radius 82.5 — so an
+enemy's centre can never come nearer than 110. A range shorter than that stops
+working outright, not partially.
+
+`src/game/combat/Reach.ts` is the only place that answers it. It gives back the
+**excess** over a default champion body at each end and nothing more, so it is
+exactly a no-op while both bodies are default-sized:
+
+```ts
+// a query keeps its implicit collideWith filter, which already tests the
+// target's own body circle — so it takes the caster term alone
+area: new Circle({ x: owner.position.x, y: owner.position.y,
+                   r: effectiveRange(this.range, this.owner) })
+
+// a hand-rolled distance test has no target term at all, so it takes both
+withinRange(this.range, this.owner, target)
+```
+
+Handing both ends to a query that already collides would count the target
+twice. `drawPreview` takes the same corrected number, or the circle tells the
+player a different story from the cast. `TargetResolver` applies the rule for
+you on `UNIT` targeting; `POINT` stays on the authored number, because the far
+end of a point cast is ground and ground has no body.
+
+What is **not** a reach: how far a missile flies, how far away a point may be
+nominated, how big a blast is where it lands, how far a dash carries. And basic
+attacks are their own thing — `attackRange` is authored surface to surface, so
+`BasicAttackController.reachTo` adds whole radii on purpose.
+
+## 9. Hook an on-hit passive onto basic attacks
 
 An ability that triggers off basic attacks (Teemo's Toxic Shot, lifesteal, an attack-speed stack) subscribes to the event, it does not reimplement the swing. Both events come from `src/game/combat/`:
 
@@ -156,7 +189,7 @@ An attack only reaches `ON_ATTACK_HIT` if it actually landed, so nothing fires w
 
 `Stats` carries `attackDamage`, `attackSpeed` (attacks per second, capped at `MAX_ATTACK_SPEED`) and `attackRange`. Buff a swing by adding a `StatsModifier` to those, not by editing the controller. `StatusFlags.Disarmed` is the way to stop one.
 
-## 9. The basic attack is itself a spell
+## 10. The basic attack is itself a spell
 
 `src/game/gameObject/spells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `willDraw`) and hands it to `BasicAttackController.order()`. Right click still orders directly, and the slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
 
