@@ -4,7 +4,16 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
 
-import Malphite_Q, { Malphite_Q_Object } from '../../../src/game/gameObject/spells/Malphite_Q';
+import Malphite_Q, {
+  DAMAGE,
+  Malphite_Q_Object,
+  MISSILE_SPEED,
+  RANGE,
+  SLOW_DURATION_MS,
+  SLOW_PERCENT,
+  SPAWN_OFFSET_DISTANCE,
+  SPEEDUP_DURATION_MS,
+} from '../../../src/game/gameObject/spells/Malphite_Q';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
@@ -83,7 +92,7 @@ describe('Malphite Q', () => {
       casterTeamId: owner.teamId,
       origin: owner.position,
       cursorWorld: target.position,
-      range: 500,
+      range: RANGE,
       targetTeam: 'ENEMY',
       queryCandidates: () => [target],
       getTargetInfo: candidate => candidate === target ? target : null,
@@ -91,7 +100,7 @@ describe('Malphite Q', () => {
     });
     const spell = new Malphite_Q(owner);
     const ally = unit(game, 100, 'blue');
-    const outOfRange = unit(game, 501, 'red');
+    const outOfRange = unit(game, RANGE + 1, 'red');
 
     expect(resolution).toMatchObject({ ok: true, context: { target } });
     expect(spell.press(castContext(owner))).toBe(false);
@@ -125,24 +134,34 @@ describe('Malphite Q', () => {
     expect(game.objectManager._objectToBeAdd).toEqual([]);
   });
 
-  it('spawns the shard 100 units toward the selected target', () => {
+  it('spawns the shard offset toward the selected target', () => {
     const game = createGame();
     const owner = unit(game, 0, 'blue');
     const target = unit(game, 300, 'red');
 
     const missile = launch(owner, target);
 
-    expect(missile.position).toMatchObject({ x: 100, y: 0 });
-    expect(missile.speed).toBe(1_200 / 60);
+    expect(missile.position).toMatchObject({ x: SPAWN_OFFSET_DISTANCE, y: 0 });
+    expect(missile.speed).toBe(MISSILE_SPEED);
   });
 
-  it('uses imported rank-one cooldown, mana, and slow values', () => {
+  it('copies its declared damage and slow tuning onto the shard before it fires', () => {
     const game = createGame();
-    const spell = new Malphite_Q(unit(game, 0, 'blue'));
+    const owner = unit(game, 0, 'blue');
+    const target = unit(game, 300, 'red');
+    const spell = new Malphite_Q(owner);
 
-    expect(spell.coolDown).toBe(8_000);
-    expect(spell.manaCost).toBe(70);
-    expect(spell.slowPercent).toBe(0.2);
+    expect(spell.press(castContext(owner, target))).toBe(true);
+    spell.update();
+    const missile = owner.game.objectManager._objectToBeAdd.find(
+      (object): object is Malphite_Q_Object => object instanceof Malphite_Q_Object
+    );
+    if (!missile) throw new Error('Malphite Q must create its homing shard.');
+
+    expect(missile.damage).toBe(spell.damage);
+    expect(missile.slowPercent).toBe(spell.slowPercent);
+    expect(missile.slowDuration).toBe(spell.slowDuration);
+    expect(missile.speedupDuration).toBe(spell.speedupDuration);
   });
 
   it('follows the selected target instead of the cursor line', () => {
@@ -171,7 +190,7 @@ describe('Malphite Q', () => {
 
     arrive(missile);
 
-    expect(targetDamage).toHaveBeenCalledWith(20, owner);
+    expect(targetDamage).toHaveBeenCalledWith(DAMAGE, owner);
     expect(targetBuff).toHaveBeenCalledWith(expect.any(Slow));
     expect(bystanderDamage).not.toHaveBeenCalled();
     expect(bystanderBuff).not.toHaveBeenCalled();
@@ -179,17 +198,21 @@ describe('Malphite Q', () => {
 
   it('steals the researched movement speed amount for the researched duration', () => {
     const game = createGame();
-    const owner = unit(game, 0, 'blue', 10);
-    const target = unit(game, 10, 'red', 100);
+    const ownerBaseSpeed = 10;
+    const targetBaseSpeed = 100;
+    const owner = unit(game, 0, 'blue', ownerBaseSpeed);
+    const target = unit(game, 10, 'red', targetBaseSpeed);
     const missile = launch(owner, target);
 
     arrive(missile);
 
     const slow = target.buffs.find((buff): buff is Slow => buff instanceof Slow);
     const speedup = owner.buffs.find((buff): buff is Speedup => buff instanceof Speedup);
-    expect(slow?.duration).toBe(3000);
-    expect(speedup?.duration).toBe(3000);
-    expect(owner.stats.speed.value).toBe(30);
+    expect(slow?.duration).toBe(SLOW_DURATION_MS);
+    expect(speedup?.duration).toBe(SPEEDUP_DURATION_MS);
+    // the target's speed is cut by SLOW_PERCENT, and Malphite gains exactly
+    // what was taken away
+    expect(owner.stats.speed.value).toBeCloseTo(ownerBaseSpeed + targetBaseSpeed * SLOW_PERCENT);
   });
 
   it('applies arrival payload once and handles an invalidated target', () => {

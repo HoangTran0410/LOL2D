@@ -4,7 +4,20 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
 
-import Janna_Q, { Janna_Q_Object } from '../../../src/game/gameObject/spells/Janna_Q';
+import Janna_Q, {
+  Janna_Q_Object,
+  MAX_AIRBORNE_MS,
+  MAX_CHARGE_MS,
+  MAX_DAMAGE,
+  MAX_RANGE,
+  MAX_SIZE,
+  MAX_SPEED,
+  MIN_AIRBORNE_MS,
+  MIN_DAMAGE,
+  MIN_RANGE,
+  MIN_SIZE,
+  MIN_SPEED,
+} from '../../../src/game/gameObject/spells/Janna_Q';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -70,7 +83,7 @@ describe('Janna Q', () => {
     spell.press(context(owner, { x: 40, y: 60 }, { x: 40, y: 160 }, { x: 0, y: 1 }));
 
     expect(tornado.position).toMatchObject({ x: 10, y: 20 });
-    expect(tornado.destination).toMatchObject({ x: 560, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 10 + MIN_RANGE, y: 20 });
   });
 
   it('allows Janna to move and cast while the tornado remains ACTIVE', () => {
@@ -100,7 +113,7 @@ describe('Janna Q', () => {
 
   it('auto-releases at maximum active charge duration', () => {
     const { spell, tornado } = setup();
-    vi.stubGlobal('deltaTime', 3_000);
+    vi.stubGlobal('deltaTime', MAX_CHARGE_MS);
 
     spell.update();
 
@@ -111,28 +124,30 @@ describe('Janna Q', () => {
 
   it('scales range speed damage and knockup from the stored charge ratio', () => {
     const { tornado } = setup();
-    tornado.chargeTime = 1_500;
+    const ratio = 0.5;
+    tornado.chargeTime = MAX_CHARGE_MS * ratio;
 
     tornado.release();
 
-    expect(tornado.destination).toMatchObject({ x: 735, y: 20 });
-    expect(tornado.speed).toBeCloseTo(1_144 / 60);
-    expect(tornado.size).toBe(60);
-    expect(tornado.getCurrentDamage()).toBe(23);
-    expect(tornado.getCurrentAirborneTime()).toBe(875);
+    expect(tornado.destination).toMatchObject({
+      x: 10 + MIN_RANGE + (MAX_RANGE - MIN_RANGE) * ratio,
+      y: 20,
+    });
+    expect(tornado.speed).toBeCloseTo(MIN_SPEED + (MAX_SPEED - MIN_SPEED) * ratio);
+    expect(tornado.size).toBe(MIN_SIZE + (MAX_SIZE - MIN_SIZE) * ratio);
+    expect(tornado.getCurrentDamage()).toBe(Math.round(MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * ratio));
+    expect(tornado.getCurrentAirborneTime()).toBe(
+      Math.round(MIN_AIRBORNE_MS + (MAX_AIRBORNE_MS - MIN_AIRBORNE_MS) * ratio)
+    );
   });
 
-  it('uses imported rank-one cooldown, mana, edge range, and speed', () => {
-    const { spell, tornado } = setup();
+  it('copies its declared range and charge window onto the tornado, and spends mana on cast', () => {
+    const { owner, spell, tornado } = setup();
 
-    expect(spell.coolDown).toBe(5_000);
-    expect(spell.manaCost).toBe(90);
-    expect(spell.minRange).toBe(550);
-    expect(spell.maxRange).toBe(900);
-    expect(tornado.minSize).toBe(48);
-    expect(tornado.maxSize).toBe(72);
-    expect(tornado.minSpeed).toBeCloseTo(880 / 60);
-    expect(tornado.maxSpeed).toBeCloseTo(1_408 / 60);
+    expect(tornado.minRange).toBe(spell.minRange);
+    expect(tornado.maxRange).toBe(spell.maxRange);
+    expect(tornado.maxChargeTime).toBe(spell.maxChargeTime);
+    expect(owner.stats.mana.value).toBe(100 - spell.manaCost);
   });
 
   it('cleans up and starts cooldown once on caster death', () => {

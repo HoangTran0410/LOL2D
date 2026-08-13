@@ -10,23 +10,28 @@ import Slow from '../buffs/Slow';
 import Stasis from '../buffs/Stasis';
 import { Circle } from '../../../libs/quadtree';
 
-const GROWTH_MS = 1_500;
-const DAMAGE_TICK_MS = 500;
-const UPKEEP_TICK_MS = 1_000;
-const UPKEEP_COST = 35;
+export const GROWTH_MS = 1_500;
+export const DAMAGE_TICK_MS = 500;
+export const UPKEEP_TICK_MS = 1_000;
+export const UPKEEP_COST = 35;
 const SLOW_TICK_MS = 250;
 // Restored from the spell's original tuning (306a1d4). A later refactor onto
 // AreaSpellObject pushed these to 200/400, which made the storm cover an eighth
 // of the map and dwarf every other area spell.
-const START_RADIUS = 70;
-const END_RADIUS = 190;
-const TETHER_RANGE = 450;
-const NORMAL_DAMAGE = 4;
-const EMPOWERED_DAMAGE = 12;
-const NORMAL_SLOW = 0.2;
-const EMPOWERED_SLOW = 0.3;
+export const START_RADIUS = 70;
+export const END_RADIUS = 190;
+export const TETHER_RANGE = 450;
+export const NORMAL_DAMAGE = 4;
+export const EMPOWERED_DAMAGE = 12;
+export const NORMAL_SLOW = 0.2;
+export const EMPOWERED_SLOW = 0.3;
+export const NORMAL_SLOW_DURATION_MS = 1_000;
+export const EMPOWERED_SLOW_DURATION_MS = 1_500;
+export const MANA_COST = 60;
 const SNOW_COUNT = 14;
-const stormRadiusAt = (elapsedMs: number): number =>
+// Exported so the suite can compute the exact radius checkpoint a given tick
+// resolves to, instead of restating the rounded numbers it produces.
+export const stormRadiusAt = (elapsedMs: number): number =>
   Math.round(START_RADIUS + Math.min(1, elapsedMs / GROWTH_MS) * (END_RADIUS - START_RADIUS));
 
 type StormTarget = AttackableUnit;
@@ -37,7 +42,7 @@ export default class Anivia_R extends Spell {
   description =
     'Tạo một cơn bão tuyết có thể bật/tắt tại vị trí chỉ định. Bão lớn dần trong <span class="time">1.5 giây</span>, gây <span class="damage">4 sát thương mỗi 0.5 giây</span> và làm chậm kẻ địch trong vùng.';
   coolDown = 4_000;
-  manaCost = 60;
+  manaCost = MANA_COST;
   range = TETHER_RANGE;
   activeStorm?: Anivia_R_Object;
   private upkeepElapsedMs = 0;
@@ -261,7 +266,8 @@ export class Anivia_R_Object extends AreaSpellObject {
   private applySlow(atMs: number, targets: Iterable<StormTarget>): void {
     const empowered = atMs >= GROWTH_MS;
     for (const target of targets) {
-      const slow = new Slow(empowered ? 1_500 : 1_000, this.owner, target);
+      const slowDuration = empowered ? EMPOWERED_SLOW_DURATION_MS : NORMAL_SLOW_DURATION_MS;
+      const slow = new Slow(slowDuration, this.owner, target);
       slow.percent = empowered ? EMPOWERED_SLOW : NORMAL_SLOW;
       slow.buffAddType = BuffAddType.RENEW_EXISTING;
       slow.image = AssetManager.get('spell_anivia_r');

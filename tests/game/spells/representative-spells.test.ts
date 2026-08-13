@@ -6,9 +6,15 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 
 import Anivia_R from '../../../src/game/gameObject/spells/Anivia_R';
 import Janna_Q from '../../../src/game/gameObject/spells/Janna_Q';
-import Janna_R from '../../../src/game/gameObject/spells/Janna_R';
-import Lux_R from '../../../src/game/gameObject/spells/Lux_R';
-import Malphite_Q from '../../../src/game/gameObject/spells/Malphite_Q';
+import Janna_R, {
+  CHANNEL_DURATION_MS as JANNA_R_CHANNEL_DURATION_MS,
+} from '../../../src/game/gameObject/spells/Janna_R';
+import Lux_R, {
+  CAST_TIME_MS as LUX_R_CAST_TIME_MS,
+} from '../../../src/game/gameObject/spells/Lux_R';
+import Malphite_Q, {
+  CAST_TIME_MS as MALPHITE_CAST_TIME_MS,
+} from '../../../src/game/gameObject/spells/Malphite_Q';
 import Pantheon_Q, {
   Pantheon_Q_Spear,
 } from '../../../src/game/gameObject/spells/Pantheon_Q';
@@ -162,7 +168,7 @@ describe('representative spells through public commands', () => {
     expect(luxR.state).toBe('CASTING');
     expect(luxOwner.stats.mana.value).toBe(200 - luxR.manaCost);
     expect(luxR.currentCooldown).toBe(0);
-    vi.stubGlobal('deltaTime', 1_000);
+    vi.stubGlobal('deltaTime', LUX_R_CAST_TIME_MS);
     luxR.update();
     expect(luxR.currentCooldown).toBe(luxR.coolDown);
 
@@ -172,7 +178,7 @@ describe('representative spells through public commands', () => {
     expect(jannaR.state).toBe('CHANNELING');
     expect(jannaROwner.stats.mana.value).toBe(200 - jannaR.manaCost);
     expect(jannaR.currentCooldown).toBe(0);
-    vi.stubGlobal('deltaTime', 3_000);
+    vi.stubGlobal('deltaTime', JANNA_R_CHANNEL_DURATION_MS);
     jannaR.update();
     expect(jannaR.currentCooldown).toBe(jannaR.coolDown);
 
@@ -248,7 +254,7 @@ describe('representative spells through public commands', () => {
     expect(spell.state).toBe('CASTING');
     expect(owner.stats.mana.value).toBe(200);
     expect(spell.currentCooldown).toBe(0);
-    vi.stubGlobal('deltaTime', 250);
+    vi.stubGlobal('deltaTime', MALPHITE_CAST_TIME_MS);
     spell.update();
     expect(owner.stats.mana.value).toBe(200 - spell.manaCost);
     expect(spell.currentCooldown).toBe(spell.coolDown);

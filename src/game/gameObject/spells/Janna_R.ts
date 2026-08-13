@@ -16,6 +16,15 @@ import Ghost from './Ghost';
 import Heal from './Heal';
 import Ignite from './Ignite';
 
+// Exported so the suite asserts the knockback and channel-tick wiring, not a
+// copy of the numbers — retuning a value should not mean editing the test.
+export const CHANNEL_DURATION_MS = 3_000;
+export const TICK_EVERY_MS = 250;
+export const HEAL_PER_TICK = 2;
+export const KNOCKBACK_DISTANCE = 875;
+export const KNOCKBACK_DURATION_MS = 500;
+export const MANA_COST = 100;
+
 type JannaTarget = AttackableUnit;
 
 interface Wall {
@@ -43,14 +52,14 @@ export default class Janna_R extends Spell {
   description =
     'Đẩy lùi kẻ địch gần đó, rồi vận sức tối đa <span class="time">3 giây</span>, hồi <span class="damage">2 máu mỗi 0.25 giây</span> cho bản thân và đồng minh trong vùng';
   coolDown = 10_000;
-  manaCost = 100;
+  manaCost = MANA_COST;
 
   private readonly radius = 700;
-  private readonly channelDurationMs = 3_000;
-  private readonly tickEveryMs = 250;
-  private readonly healPerTick = 2;
-  private readonly knockbackDistance = 875;
-  private readonly knockbackDurationMs = 500;
+  private readonly channelDurationMs = CHANNEL_DURATION_MS;
+  private readonly tickEveryMs = TICK_EVERY_MS;
+  private readonly healPerTick = HEAL_PER_TICK;
+  private readonly knockbackDistance = KNOCKBACK_DISTANCE;
+  private readonly knockbackDurationMs = KNOCKBACK_DURATION_MS;
   private activeArea?: AreaSpellObject;
   private channelOrigin?: { x: number; y: number };
   private stopWatching: (() => void)[] = [];

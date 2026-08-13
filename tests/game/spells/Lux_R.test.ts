@@ -4,7 +4,16 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
-import Lux_R from '../../../src/game/gameObject/spells/Lux_R';
+import Lux_R, {
+  CAST_TIME_MS,
+  DAMAGE,
+  MANA_COST,
+  RANGE,
+  REVEAL_DURATION_MS,
+  REVEAL_VISION_RADIUS,
+  VISION_LIFETIME_MS,
+  WIDTH,
+} from '../../../src/game/gameObject/spells/Lux_R';
 import Flash from '../../../src/game/gameObject/spells/Flash';
 import Ghost from '../../../src/game/gameObject/spells/Ghost';
 import Heal from '../../../src/game/gameObject/spells/Heal';
@@ -144,9 +153,7 @@ describe('Lux R', () => {
     spell.press(context(owner));
 
     expect(spell.state).toBe('CASTING');
-    expect(spell.coolDown).toBe(10_000);
-    expect(spell.manaCost).toBe(100);
-    expect(owner.stats.mana.value).toBe(100);
+    expect(owner.stats.mana.value).toBe(200 - MANA_COST);
     expect(owner.stopMovement).toHaveBeenCalledOnce();
     expect(ownerBuffs).toHaveLength(1);
     expect(ownerBuffs[0].statusFlagsToEnable & StatusFlags.Stunned).toBeFalsy();
@@ -156,7 +163,7 @@ describe('Lux R', () => {
     expect(spell.cancel('STUN')).toBe(false);
 
     owner.position.x = 50;
-    vi.stubGlobal('deltaTime', 1_000);
+    vi.stubGlobal('deltaTime', CAST_TIME_MS);
     spell.update();
     spell.drawVfx();
 
@@ -170,16 +177,16 @@ describe('Lux R', () => {
     expect(added.filter(object => object instanceof BeamSpellObject)).toHaveLength(1);
     expect(beam.geometry).toEqual({
       start: { x: 0, y: 0 },
-      end: { x: 3400, y: 0 },
-      width: 200,
+      end: { x: RANGE, y: 0 },
+      width: WIDTH,
     });
     expect(target.takeDamage).not.toHaveBeenCalled();
 
     beam.update();
 
-    expect(target.takeDamage).toHaveBeenCalledWith(30, owner);
+    expect(target.takeDamage).toHaveBeenCalledWith(DAMAGE, owner);
     expect(targetBuffs).toHaveLength(1);
-    expect(targetBuffs[0]).toMatchObject({ duration: 1_500, visionRadius: 150 });
+    expect(targetBuffs[0]).toMatchObject({ duration: REVEAL_DURATION_MS, visionRadius: REVEAL_VISION_RADIUS });
     expect(ownerBuffs[0].toRemove).toBe(true);
   });
 
@@ -277,9 +284,9 @@ describe('Lux R', () => {
     expect(sight.length).toBeGreaterThan(1);
     expect(sight.every(object => object.teamId === 'blue')).toBe(true);
     expect(Math.min(...sight.map(object => object.position!.x))).toBe(0);
-    expect(Math.max(...sight.map(object => object.position!.x))).toBe(3_400);
+    expect(Math.max(...sight.map(object => object.position!.x))).toBe(RANGE);
 
-    sight.forEach(object => object.update?.(1_499));
+    sight.forEach(object => object.update?.(VISION_LIFETIME_MS - 1));
     expect(sight.every(object => object.toRemove === false)).toBe(true);
     sight.forEach(object => object.update?.(1));
     expect(sight.every(object => object.toRemove === true)).toBe(true);

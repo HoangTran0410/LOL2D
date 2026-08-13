@@ -17,6 +17,17 @@ type MalphiteTarget = AttackableUnit;
 const isMalphiteTarget = (target: unknown): target is MalphiteTarget =>
   target instanceof AttackableUnit && target.targetable && !target.toRemove;
 
+// Exported so the suite asserts the shard's wiring, not a copy of the
+// numbers — retuning a value should not mean editing the test.
+export const RANGE = 500;
+export const DAMAGE = 20;
+export const SLOW_PERCENT = 0.2;
+export const SLOW_DURATION_MS = 3000;
+export const SPEEDUP_DURATION_MS = 3000;
+export const CAST_TIME_MS = 250;
+export const SPAWN_OFFSET_DISTANCE = 100;
+export const MISSILE_SPEED = 1_200 / 60;
+
 export default class Malphite_Q extends Spell {
   image = AssetManager.get('spell_malphite_q');
   name = 'Mảnh Vỡ Kết Tinh (Malphite_Q)';
@@ -25,17 +36,17 @@ export default class Malphite_Q extends Spell {
   coolDown = 8_000;
   manaCost = 70;
 
-  range = 500;
-  damage = 20;
-  slowPercent = 0.2;
-  slowDuration = 3000;
-  speedupDuration = 3000;
+  range = RANGE;
+  damage = DAMAGE;
+  slowPercent = SLOW_PERCENT;
+  slowDuration = SLOW_DURATION_MS;
+  speedupDuration = SPEEDUP_DURATION_MS;
 
   get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
       targeting: 'UNIT',
-      castTimeMs: 250,
+      castTimeMs: CAST_TIME_MS,
       resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
@@ -84,7 +95,7 @@ export default class Malphite_Q extends Spell {
     obj.position = VectorUtils.getVectorWithRange(
       this.owner.position,
       context.target.position,
-      100,
+      SPAWN_OFFSET_DISTANCE,
       false
     ).to;
     obj.damage = this.damage;
@@ -109,12 +120,12 @@ export default class Malphite_Q extends Spell {
 
 export class Malphite_Q_Object extends HomingMissileSpellObject {
   image = AssetManager.get('spell_malphite_q');
-  speed = 1_200 / 60;
+  speed = MISSILE_SPEED;
   size = 24;
-  damage = 20;
-  slowPercent = 0.2;
-  slowDuration = 3000;
-  speedupDuration = 3000;
+  damage = DAMAGE;
+  slowPercent = SLOW_PERCENT;
+  slowDuration = SLOW_DURATION_MS;
+  speedupDuration = SPEEDUP_DURATION_MS;
 
   trailSystem = new TrailSystem({
     trailColor: '#D7CDF566',

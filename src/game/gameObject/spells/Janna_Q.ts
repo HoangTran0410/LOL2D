@@ -13,6 +13,21 @@ const WIND: [number, number, number] = [185, 243, 228];
 /** What the funnel turns as it reaches full charge. */
 const WIND_CHARGED: [number, number, number] = [255, 240, 170];
 
+// Charge-scaled tuning, shared between the spell (which copies them onto the
+// storm on activation) and the storm's own defaults. Exported so the suite
+// asserts the wiring and the lerp shape, not a copy of the numbers.
+export const MIN_RANGE = 550;
+export const MAX_RANGE = 900;
+export const MAX_CHARGE_MS = 3_000;
+export const MIN_SIZE = 48;
+export const MAX_SIZE = 72;
+export const MIN_SPEED = 880 / 60;
+export const MAX_SPEED = 1_408 / 60;
+export const MIN_DAMAGE = 15;
+export const MAX_DAMAGE = 30;
+export const MIN_AIRBORNE_MS = 500;
+export const MAX_AIRBORNE_MS = 1_250;
+
 type JannaTarget = AttackableUnit;
 
 /**
@@ -29,9 +44,9 @@ export default class Janna_Q extends Spell {
   coolDown = 5_000;
   manaCost = 90;
 
-  minRange = 550;
-  maxRange = 900;
-  maxChargeTime = 3000;
+  minRange = MIN_RANGE;
+  maxRange = MAX_RANGE;
+  maxChargeTime = MAX_CHARGE_MS;
 
   spellObject: Janna_Q_Object | null = null;
 
@@ -93,25 +108,25 @@ export default class Janna_Q extends Spell {
 }
 
 export class Janna_Q_Object extends MissileSpellObject {
-  maxChargeTime = 3000;
+  maxChargeTime = MAX_CHARGE_MS;
   chargeTime = 0;
   charging = true;
 
-  minSize = 48;
-  maxSize = 72;
+  minSize = MIN_SIZE;
+  maxSize = MAX_SIZE;
   size = this.minSize;
 
-  minSpeed = 880 / 60;
-  maxSpeed = 1_408 / 60;
+  minSpeed = MIN_SPEED;
+  maxSpeed = MAX_SPEED;
   speed = this.minSpeed;
 
-  minRange = 550;
-  maxRange = 900;
+  minRange = MIN_RANGE;
+  maxRange = MAX_RANGE;
 
-  minDamage = 15;
-  maxDamage = 30;
-  minAirborneTime = 500;
-  maxAirborneTime = 1250;
+  minDamage = MIN_DAMAGE;
+  maxDamage = MAX_DAMAGE;
+  minAirborneTime = MIN_AIRBORNE_MS;
+  maxAirborneTime = MAX_AIRBORNE_MS;
 
   angle = 0;
   releaseDirection = createVector();

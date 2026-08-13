@@ -27,7 +27,14 @@ import Spell from '../../../src/game/gameObject/Spell';
 import Ghost from '../../../src/game/gameObject/spells/Ghost';
 import Heal from '../../../src/game/gameObject/spells/Heal';
 import Ignite from '../../../src/game/gameObject/spells/Ignite';
-import Janna_R from '../../../src/game/gameObject/spells/Janna_R';
+import Janna_R, {
+  CHANNEL_DURATION_MS,
+  HEAL_PER_TICK,
+  KNOCKBACK_DISTANCE,
+  KNOCKBACK_DURATION_MS,
+  MANA_COST,
+  TICK_EVERY_MS,
+} from '../../../src/game/gameObject/spells/Janna_R';
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
 import { SpellGroups } from '../../../src/game/preset';
@@ -115,15 +122,13 @@ describe('Janna R', () => {
     expect(telegraphCenters[0]()).toEqual({ x: 90, y: 40 });
   });
 
-  it('uses imported rank-one resource values', () => {
+  it('spends its resource cost on cast', () => {
     const { owner } = makeOwner();
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
 
-    expect(spell.coolDown).toBe(10_000);
-    expect(spell.manaCost).toBe(100);
-    expect(owner.stats.mana.value).toBe(100);
+    expect(owner.stats.mana.value).toBe(200 - MANA_COST);
   });
 
   it('knocks enemies back once then heals allies on runtime channel ticks', () => {
@@ -161,15 +166,17 @@ describe('Janna R', () => {
       dashDestination: { x: number; y: number };
       dashSpeed: number;
     };
-    expect(knockback.dashDestination).toEqual({ x: 875, y: 0 });
-    expect(knockback.dashSpeed).toBeCloseTo(775 / 30);
+    expect(knockback.dashDestination).toEqual({ x: KNOCKBACK_DISTANCE, y: 0 });
+    // enemy started 100 units from the origin, along the same axis
+    const displacement = KNOCKBACK_DISTANCE - 100;
+    expect(knockback.dashSpeed).toBeCloseTo(displacement / (KNOCKBACK_DURATION_MS / (1000 / 60)));
 
-    vi.stubGlobal('deltaTime', 250);
+    vi.stubGlobal('deltaTime', TICK_EVERY_MS);
     spell.update();
     spell.update();
 
     expect(ally.takeHeal).toHaveBeenCalledTimes(2);
-    expect(ally.takeHeal).toHaveBeenLastCalledWith(2, owner);
+    expect(ally.takeHeal).toHaveBeenLastCalledWith(HEAL_PER_TICK, owner);
     expect(enemy.takeHeal).not.toHaveBeenCalled();
   });
 
@@ -233,7 +240,7 @@ describe('Janna R', () => {
     expect(spell.state).toBe('COOLDOWN');
   });
 
-  it('includes the twelfth heal tick at its imported maximum channel duration', () => {
+  it('ticks the heal once per interval across the full channel duration', () => {
     const ally: TestUnit = {
       position: new TestVector(200, 0),
       destination: new TestVector(200, 0),
@@ -249,10 +256,10 @@ describe('Janna R', () => {
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
-    vi.stubGlobal('deltaTime', 3_000);
+    vi.stubGlobal('deltaTime', CHANNEL_DURATION_MS);
     spell.update();
 
-    expect(ally.takeHeal).toHaveBeenCalledTimes(12);
+    expect(ally.takeHeal).toHaveBeenCalledTimes(CHANNEL_DURATION_MS / TICK_EVERY_MS);
     expect(spell.state).toBe('COOLDOWN');
   });
 

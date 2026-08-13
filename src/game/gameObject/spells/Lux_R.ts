@@ -50,6 +50,17 @@ class Lux_R_CastLock extends Buff {
   }
 }
 
+// Exported so the suite asserts the beam and reveal wiring, not a copy of the
+// numbers — retuning a value should not mean editing the test.
+export const CAST_TIME_MS = 1_000;
+export const RANGE = 3_400;
+export const WIDTH = 200;
+export const DAMAGE = 30;
+export const REVEAL_DURATION_MS = 1_500;
+export const REVEAL_VISION_RADIUS = 150;
+export const VISION_LIFETIME_MS = 1_500;
+export const MANA_COST = 100;
+
 class Lux_R_Vision extends SpellObject {
   visionRadius = 250;
   private elapsedMs = 0;
@@ -61,7 +72,7 @@ class Lux_R_Vision extends SpellObject {
 
   update(deltaMs = deltaTime): void {
     this.elapsedMs += Math.max(0, deltaMs);
-    if (this.elapsedMs >= 1_500) this.toRemove = true;
+    if (this.elapsedMs >= VISION_LIFETIME_MS) this.toRemove = true;
   }
 }
 
@@ -71,12 +82,12 @@ export default class Lux_R extends Spell {
   description =
     'Niệm <span class="time">1 giây</span> rồi bắn một dải sáng theo hướng đã chốt, gây <span class="damage">30 sát thương</span> lên mọi kẻ địch trúng phải';
   coolDown = 10_000;
-  manaCost = 100;
+  manaCost = MANA_COST;
 
-  private readonly castTimeMs = 1_000;
-  private readonly range = 3_400;
-  private readonly width = 200;
-  private readonly damage = 30;
+  private readonly castTimeMs = CAST_TIME_MS;
+  private readonly range = RANGE;
+  private readonly width = WIDTH;
+  private readonly damage = DAMAGE;
   private castElapsedMs = 0;
   private geometry?: BeamGeometry;
   private castLock?: Lux_R_CastLock;
@@ -132,8 +143,8 @@ export default class Lux_R extends Spell {
         target.teamId !== this.owner.teamId,
       onHit: target => {
         target.takeDamage(this.damage, this.owner);
-        const reveal = new TrueSight(1_500, this.owner, target);
-        reveal.visionRadius = 150;
+        const reveal = new TrueSight(REVEAL_DURATION_MS, this.owner, target);
+        reveal.visionRadius = REVEAL_VISION_RADIUS;
         reveal.image = this.image;
         target.addBuff(reveal);
       },

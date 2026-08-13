@@ -8,18 +8,29 @@ import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
 import VfxGroup from '../../vfx/VfxGroup';
 
-const MAX_CHARGE_MS = 4_000;
-const RANGE_CHARGE_MS = 1_500;
-const DAMAGE_CHARGE_MS = 1_250;
-const MIN_CENTER_TRAVEL = 100;
-const MAX_CENTER_TRAVEL = 700;
+export const MAX_CHARGE_MS = 4_000;
+export const RANGE_CHARGE_MS = 1_500;
+export const DAMAGE_CHARGE_MS = 1_250;
+export const MIN_CENTER_TRAVEL = 100;
+export const MAX_CENTER_TRAVEL = 700;
+// Damage scales linearly with charge, same MIN + (MAX - MIN) * ratio shape as
+// the range growth below. Exported so the suite asserts the wiring, not a copy
+// of the numbers — retuning a value should not mean editing the test.
+export const MIN_DAMAGE = 20;
+export const MAX_DAMAGE = 30;
+export const SELF_SLOW_PERCENT = 0.2;
+export const MANA_COST = 50;
+export const ARROW_SPEED = 1_200 / 60;
+export const ARROW_SIZE = 36;
+export const ARROW_VISUAL_WIDTH = 90;
+export const ARROW_VISUAL_HEIGHT = 32;
 
 export default class Varus_Q extends Spell {
   image = AssetManager.get('spell_varus_q');
   name = 'Mũi Tên Xuyên Phá (Varus_Q)';
   description = 'Giữ để tích lực rồi bắn một mũi tên xuyên theo hướng con trỏ.';
   coolDown = 5_000;
-  manaCost = 50;
+  manaCost = MANA_COST;
 
   private chargeMs = 0;
   private aimContext?: CastContext;
@@ -67,7 +78,7 @@ export default class Varus_Q extends Spell {
     this.chargeMs = 0;
     this.aimContext = context;
     this.chargeSlow = new Slow(MAX_CHARGE_MS, this.owner, this.owner);
-    this.chargeSlow.percent = 0.2;
+    this.chargeSlow.percent = SELF_SLOW_PERCENT;
     this.chargeSlow.stackId = 'varus_q_charge_slow';
     this.owner.addBuff(this.chargeSlow);
   }
@@ -129,7 +140,7 @@ export default class Varus_Q extends Spell {
   }
 
   private damageAt(elapsedMs: number): number {
-    return 20 + 10 * Math.min(1, elapsedMs / DAMAGE_CHARGE_MS);
+    return MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * Math.min(1, elapsedMs / DAMAGE_CHARGE_MS);
   }
 
   private directionTo(context: CastContext, x: number, y: number): { x: number; y: number } {
@@ -146,12 +157,12 @@ export default class Varus_Q extends Spell {
 }
 
 export class Varus_Q_Arrow extends MissileSpellObject {
-  speed = 1_200 / 60;
-  size = 36;
-  visualWidth = 90;
-  visualHeight = 32;
+  speed = ARROW_SPEED;
+  size = ARROW_SIZE;
+  visualWidth = ARROW_VISUAL_WIDTH;
+  visualHeight = ARROW_VISUAL_HEIGHT;
   maxHitCount = Infinity;
-  damage = 20;
+  damage = MIN_DAMAGE;
   /** 0..1 — how far the shot was drawn, so a full charge reads as a heavier bolt. */
   chargeRatio = 0;
 

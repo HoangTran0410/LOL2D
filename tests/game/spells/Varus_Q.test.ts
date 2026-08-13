@@ -1,5 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
+import Varus_Q, {
+  ARROW_SIZE,
+  ARROW_SPEED,
+  ARROW_VISUAL_HEIGHT,
+  ARROW_VISUAL_WIDTH,
+  DAMAGE_CHARGE_MS,
+  MANA_COST,
+  MAX_CENTER_TRAVEL,
+  MAX_CHARGE_MS,
+  MAX_DAMAGE,
+  MIN_CENTER_TRAVEL,
+  RANGE_CHARGE_MS,
+  SELF_SLOW_PERCENT,
+  Varus_Q_Arrow,
+} from '../../../src/game/gameObject/spells/Varus_Q';
 import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
@@ -92,10 +106,9 @@ describe('Varus Q', () => {
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
     expect(arrow.destination).toMatchObject({ x: 100, y: 0 });
-    expect(arrow.size).toBe(36);
-    expect(arrow).toMatchObject({ visualWidth: 90, visualHeight: 32 });
-    expect(arrow.speed).toBeCloseTo(1_200 / 60);
-    expect(spell.coolDown).toBe(5_000);
+    expect(arrow.size).toBe(ARROW_SIZE);
+    expect(arrow).toMatchObject({ visualWidth: ARROW_VISUAL_WIDTH, visualHeight: ARROW_VISUAL_HEIGHT });
+    expect(arrow.speed).toBeCloseTo(ARROW_SPEED);
     expect(spell.state).toBe('COOLDOWN');
   });
 
@@ -103,15 +116,18 @@ describe('Varus Q', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
     spell.press(context(1, 0));
-    vi.stubGlobal('deltaTime', 1_250);
+    vi.stubGlobal('deltaTime', DAMAGE_CHARGE_MS);
     spell.update();
     spell.hold(context(0, 1));
     spell.release(context(0, 1));
 
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow.destination).toMatchObject({ x: 0 });
-    expect(arrow.destination.y).toBeCloseTo(600, 2);
-    expect(arrow.damage).toBe(30);
+    expect(arrow.destination.y).toBeCloseTo(
+      MIN_CENTER_TRAVEL + (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * (DAMAGE_CHARGE_MS / RANGE_CHARGE_MS),
+      2
+    );
+    expect(arrow.damage).toBe(MAX_DAMAGE);
   });
 
   it('uses the fresh key-up aim even when no final hold event ran', () => {
@@ -121,17 +137,17 @@ describe('Varus Q', () => {
 
     spell.release(context(0, 1));
 
-    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: 100 });
+    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: MIN_CENTER_TRAVEL });
   });
 
-  it('caps missile center travel at 700 after range finishes charging', () => {
+  it('caps missile center travel once range finishes charging', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
     spell.press(context(1, 0));
-    spell.onChargeUpdate(context(1, 0), 1_500, 1);
+    spell.onChargeUpdate(context(1, 0), RANGE_CHARGE_MS, 1);
     spell.release(context(1, 0));
 
-    expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(700);
+    expect((caster.objects[0] as Varus_Q_Arrow).destination.x).toBe(MAX_CENTER_TRAVEL);
   });
 
   it('exposes a monotonically growing live charge range', () => {
@@ -139,20 +155,20 @@ describe('Varus Q', () => {
 
     spell.onChargeUpdate(context(1, 0), 0, 0);
     const start = spell.currentRange;
-    spell.onChargeUpdate(context(1, 0), 750, 0.5);
+    spell.onChargeUpdate(context(1, 0), RANGE_CHARGE_MS / 2, 0.5);
     const middle = spell.currentRange;
-    spell.onChargeUpdate(context(1, 0), 1_500, 1);
+    spell.onChargeUpdate(context(1, 0), RANGE_CHARGE_MS, 1);
 
-    expect(start).toBe(100);
+    expect(start).toBe(MIN_CENTER_TRAVEL);
     expect(middle).toBeGreaterThan(start);
-    expect(spell.currentRange).toBe(700);
+    expect(spell.currentRange).toBe(MAX_CENTER_TRAVEL);
   });
 
   it('applies and removes its researched self slow', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
     spell.press(context(1, 0));
-    expect(caster.buffs[0].percent).toBe(0.2);
+    expect(caster.buffs[0].percent).toBe(SELF_SLOW_PERCENT);
 
     spell.release(context(1, 0));
     expect(caster.buffs[0].toRemove).toBe(true);
@@ -162,11 +178,11 @@ describe('Varus Q', () => {
     const caster = owner();
     const spell = new Varus_Q(caster);
     spell.press(context(1, 0));
-    vi.stubGlobal('deltaTime', 4_000);
+    vi.stubGlobal('deltaTime', MAX_CHARGE_MS);
     spell.update();
 
     expect(caster.objects).toHaveLength(0);
-    expect(caster.stats.mana.value).toBe(75);
+    expect(caster.stats.mana.value).toBe(100 - MANA_COST / 2);
     expect(spell.state).toBe('COOLDOWN');
   });
 
@@ -183,7 +199,7 @@ describe('Varus Q', () => {
     spell.update();
 
     expect(spell.state).toBe('COOLDOWN');
-    expect(caster.stats.mana.value).toBe(75);
+    expect(caster.stats.mana.value).toBe(100 - MANA_COST / 2);
   });
 
   it('applies its direct half-cost adjustment to a real Stat base value', () => {
@@ -194,6 +210,6 @@ describe('Varus Q', () => {
 
     new Varus_Q(caster).onCancel(context(1, 0), 'MAX_DURATION');
 
-    expect(stats.mana.baseValue).toBe(75);
+    expect(stats.mana.baseValue).toBe(100 - MANA_COST / 2);
   });
 });

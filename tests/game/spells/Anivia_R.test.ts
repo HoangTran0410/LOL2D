@@ -4,7 +4,24 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
-import Anivia_R, { Anivia_R_Object } from '../../../src/game/gameObject/spells/Anivia_R';
+import Anivia_R, {
+  Anivia_R_Object,
+  DAMAGE_TICK_MS,
+  EMPOWERED_DAMAGE,
+  EMPOWERED_SLOW,
+  EMPOWERED_SLOW_DURATION_MS,
+  END_RADIUS,
+  GROWTH_MS,
+  MANA_COST,
+  NORMAL_DAMAGE,
+  NORMAL_SLOW,
+  NORMAL_SLOW_DURATION_MS,
+  START_RADIUS,
+  stormRadiusAt,
+  TETHER_RANGE,
+  UPKEEP_COST,
+  UPKEEP_TICK_MS,
+} from '../../../src/game/gameObject/spells/Anivia_R';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -118,22 +135,22 @@ describe('Anivia R', () => {
 
     spell.press(context({ x: 100, y: 0 }));
 
-    expect(added[0].radius).toBe(70);
-    expect(enemy.damage).toEqual([2]);
+    expect(added[0].radius).toBe(START_RADIUS);
+    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2]);
     expect(enemy.buffs).toHaveLength(1);
-    expect(enemy.buffs[0]).toMatchObject({ percent: 0.2, duration: 1_000 });
+    expect(enemy.buffs[0]).toMatchObject({ percent: NORMAL_SLOW, duration: NORMAL_SLOW_DURATION_MS });
   });
 
-  it('grows and empowers damage and slow at exactly 1500ms', () => {
+  it('grows and empowers damage and slow once the storm finishes growing', () => {
     const { spell, added, enemy } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
-    added[0].update(1_500);
+    added[0].update(GROWTH_MS);
 
-    expect(added[0].radius).toBe(190);
-    expect(enemy.damage).toEqual([2, 2, 2, 12]);
+    expect(added[0].radius).toBe(END_RADIUS);
+    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, EMPOWERED_DAMAGE]);
     expect(enemy.buffs).toHaveLength(4);
-    expect(enemy.buffs.at(-1)).toMatchObject({ percent: 0.3, duration: 1_500 });
+    expect(enemy.buffs.at(-1)).toMatchObject({ percent: EMPOWERED_SLOW, duration: EMPOWERED_SLOW_DURATION_MS });
   });
 
   it('uses each due tick radius when catching up a long frame', () => {
@@ -141,36 +158,37 @@ describe('Anivia R', () => {
     enemy.position.x = 280;
 
     spell.press(context({ x: 100, y: 0 }));
-    added[0].update(1_500);
+    added[0].update(GROWTH_MS);
 
-    expect(enemy.damage).toEqual([12]);
+    expect(enemy.damage).toEqual([EMPOWERED_DAMAGE]);
     expect(enemy.buffs).toHaveLength(1);
   });
 
-  it('queries the imported 70 110 150 and 190 radius checkpoints', () => {
+  it('queries the radius checkpoints the storm actually grows through', () => {
     const { spell, owner, added } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
-    added[0].update(1_500);
+    added[0].update(GROWTH_MS);
 
     const radii = owner.game.objectManager.queryObjects.mock.calls
       .map(([query]) => query.area.r as number);
-    expect(radii).toContain(70);
-    expect(radii).toContain(110);
-    expect(radii).toContain(150);
-    expect(radii).toContain(190);
+    expect(radii).toContain(stormRadiusAt(0));
+    expect(radii).toContain(stormRadiusAt(DAMAGE_TICK_MS));
+    expect(radii).toContain(stormRadiusAt(DAMAGE_TICK_MS * 2));
+    expect(radii).toContain(stormRadiusAt(GROWTH_MS));
   });
 
-  it('pays 60 mana on activation, then 35 mana once per second', () => {
+  it('pays mana on activation, then upkeep mana once per second', () => {
     const { spell, owner } = setup();
+    const startingMana = owner.stats.mana.value;
 
     spell.press(context({ x: 100, y: 0 }));
-    expect(owner.stats.mana.value).toBe(180);
-    updateSpell(spell, 999);
-    expect(owner.stats.mana.value).toBe(180);
+    expect(owner.stats.mana.value).toBe(startingMana - MANA_COST);
+    updateSpell(spell, UPKEEP_TICK_MS - 1);
+    expect(owner.stats.mana.value).toBe(startingMana - MANA_COST);
     updateSpell(spell, 1);
 
-    expect(owner.stats.mana.value).toBe(145);
+    expect(owner.stats.mana.value).toBe(startingMana - MANA_COST - UPKEEP_COST);
   });
 
   it('does not mistake Stasis for interrupting crowd control', () => {
@@ -193,13 +211,13 @@ describe('Anivia R', () => {
 
     expect(spell.state).toBe('COOLDOWN');
     expect(added[0].toRemove).toBe(true);
-    expect(enemy.damage).toEqual([2, 2]);
+    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2]);
   });
 
   it.each([
     ['death', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.isDead = true; spell.update(); }],
-    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.baseValue = 0; updateSpell(spell, 1_000); }],
-    ['tether violation', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.position.x = 600; spell.update(); }],
+    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.baseValue = 0; updateSpell(spell, UPKEEP_TICK_MS); }],
+    ['tether violation', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.position.x = TETHER_RANGE + 150; spell.update(); }],
     ['silence', (_owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { spell.cancel('SILENCE'); }],
   ])('ends on %s', (_reason, end) => {
     const { spell, owner, added } = setup();
@@ -218,14 +236,14 @@ describe('Anivia R', () => {
     spell.cancel('OUT_OF_RANGE');
 
     expect(added[0].toRemove).toBe(true);
-    expect(enemy.damage).toEqual([2, 2]);
+    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2]);
   });
 
   it('starts cooldown and cleans storm members exactly once', () => {
     const { spell, added, enemy } = setup();
 
     spell.press(context({ x: 100, y: 0 }));
-    added[0].update(500);
+    added[0].update(DAMAGE_TICK_MS);
     spell.press(context({ x: 100, y: 0 }));
     spell.press(context({ x: 100, y: 0 }));
     added[0].onRemoved();
@@ -233,7 +251,7 @@ describe('Anivia R', () => {
 
     expect(spell.currentCooldown).toBe(spell.coolDown);
     expect(added[0].members?.size).toBe(0);
-    expect(enemy.damage).toEqual([2, 2, 2]);
+    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2]);
   });
 
   it('tears down its active area idempotently on deactivate and removal', () => {
