@@ -314,6 +314,20 @@ export default class AttackableUnit extends GameObject {
 
   die(deathData: UnitDeathData): void {
     this.deathData = deathData;
+    this.clearBuffs();
+  }
+
+  /**
+   * Drops every buff on death instead of letting them ride the corpse (and
+   * then respawn): each one is deactivated so `onDeactivate` hooks unwind
+   * status flags and every spell-held reference (Twitch's stealth cloak,
+   * Thresh's shackle, Blitzcrank's airborne) sees `toRemove` flip. Iterate a
+   * copy — `deactivateBuff()` calls out to listeners that must not mutate
+   * `this.buffs` out from under this loop.
+   */
+  private clearBuffs(): void {
+    for (const buff of this.buffs.slice()) buff.deactivateBuff();
+    this.buffs = [];
   }
 
   respawn() {

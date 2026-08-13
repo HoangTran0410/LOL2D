@@ -1,0 +1,70 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import Twitch_Q, { Twitch_Q_Object } from '../../../src/game/gameObject/spells/Twitch_Q';
+import type { CastContext } from '../../../src/game/spell/runtime/types';
+
+const context: CastContext = Object.freeze({
+  spellId: 'twitch-q',
+  activationId: 'activation',
+  startedAtMs: 0,
+  caster: {},
+  origin: Object.freeze({ x: 0, y: 0 }),
+  cursorWorld: Object.freeze({ x: 1, y: 0 }),
+  direction: Object.freeze({ x: 1, y: 0 }),
+});
+
+describe('Twitch Q stealth VFX does not survive death', () => {
+  beforeEach(() => installSpellObjectGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('drops the cloak the instant the caster dies mid-stealth, and stays dropped through a respawn elsewhere', () => {
+    const game = createGame();
+    const twitch = createUnit(game, 0, 'blue');
+    twitch.animatedValues.displaySize = 20;
+    const spawned: unknown[] = [];
+    game.objectManager.addObject = ((object: unknown) => spawned.push(object)) as typeof game.objectManager.addObject;
+
+    const spell = new Twitch_Q(twitch);
+    spell.press(context);
+
+    expect(twitch.buffs).toHaveLength(2); // Invisible + Speedup
+    const cloak = spawned.find((o): o is Twitch_Q_Object => o instanceof Twitch_Q_Object)!;
+    expect(cloak).toBeInstanceOf(Twitch_Q_Object);
+    expect(cloak._cloaked).toBe(true);
+
+    // Killed well inside the 4s stealth window — the old bug relied on the
+    // buff's own duration to expire it, which only happened to work because
+    // the base 5s respawn timer outlasts a 4s Q. Any death mid-stealth must
+    // clear it immediately, not "eventually if the timer allows it".
+    twitch.die({ reviveAfter: 5_000 });
+
+    expect(cloak._cloaked).toBe(false);
+    expect(twitch.buffs).toHaveLength(0);
+
+    // Respawning elsewhere must not bring the cloak back to life.
+    twitch.respawn();
+    twitch.position.set(999, 999);
+    expect(cloak._cloaked).toBe(false);
+    expect(twitch.buffs).toHaveLength(0);
+  });
+
+  it('self-removes shortly after a mid-stealth death instead of parking on screen forever', () => {
+    const game = createGame();
+    const twitch = createUnit(game, 0, 'blue');
+    twitch.animatedValues.displaySize = 20;
+    const spawned: unknown[] = [];
+    game.objectManager.addObject = ((object: unknown) => spawned.push(object)) as typeof game.objectManager.addObject;
+
+    const spell = new Twitch_Q(twitch);
+    spell.press(context);
+    const cloak = spawned.find((o): o is Twitch_Q_Object => o instanceof Twitch_Q_Object)!;
+
+    twitch.die({ reviveAfter: 5_000 });
+
+    // one big tick past both the smoke's own lifetime and the mote decay window
+    vi.stubGlobal('deltaTime', cloak.lifeTime + 700);
+    cloak.update();
+
+    expect(cloak.toRemove).toBe(true);
+  });
+});
