@@ -36,7 +36,7 @@ export default class Zed_R extends Spell {
   name = 'Cái Chết Đến Gần (Zed_R)';
   description =
     '<span class="buff">Lướt</span> ra sau kẻ địch gần nhất trong tầm 500px, <span class="buff">Không thể bị chọn</span> trong lúc lướt và để lại 1 <span>phân thân</span> tại chỗ cũ. Mục tiêu bị đánh dấu trong <span class="time">3 giây</span>: <b>35%</b> toàn bộ sát thương Zed và phân thân gây lên nó được tích lại và <span class="damage">kích nổ</span> khi dấu ấn kết thúc. Có thể tái kích hoạt để <span class="buff">Đổi chỗ</span> với phân thân';
-  coolDown = 14000;
+  coolDown = 10000;
   manaCost = 50;
 
   range = 500;

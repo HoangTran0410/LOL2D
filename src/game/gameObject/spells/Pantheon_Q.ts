@@ -32,7 +32,7 @@ export default class Pantheon_Q extends Spell {
   image = AssetManager.get('spell_pantheon_q');
   name = 'Ngọn Giá Sao Băng (Pantheon_Q)';
   description = 'Thả sớm để đâm giáo, hoặc giữ để ném một ngọn giáo xuyên.';
-  coolDown = 11_000;
+  coolDown = 4_000;
   manaCost = 25;
 
   private chargeMs = 0;

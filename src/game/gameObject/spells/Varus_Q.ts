@@ -17,7 +17,7 @@ export default class Varus_Q extends Spell {
   image = AssetManager.get('spell_varus_q');
   name = 'Mũi Tên Xuyên Phá (Varus_Q)';
   description = 'Giữ để tích lực rồi bắn một mũi tên xuyên theo hướng con trỏ.';
-  coolDown = 16_000;
+  coolDown = 5_000;
   manaCost = 50;
 
   private chargeMs = 0;

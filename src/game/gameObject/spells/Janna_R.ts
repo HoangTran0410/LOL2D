@@ -42,7 +42,7 @@ export default class Janna_R extends Spell {
   name = 'Gió Mùa (Janna_R)';
   description =
     'Đẩy lùi kẻ địch gần đó, rồi vận sức tối đa <span class="time">3 giây</span>, hồi <span class="damage">2 máu mỗi 0.25 giây</span> cho bản thân và đồng minh trong vùng';
-  coolDown = 130_000;
+  coolDown = 10_000;
   manaCost = 100;
 
   private readonly radius = 700;

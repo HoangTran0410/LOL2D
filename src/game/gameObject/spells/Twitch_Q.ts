@@ -10,7 +10,7 @@ export default class Twitch_Q extends Spell {
   name = 'Ẩn Mình (Twitch_Q)';
   description =
     '<span class="buff">Tàng Hình</span> và <span class="buff">Tăng Tốc 25%</span> trong <span class="time">4 giây</span>';
-  coolDown = 14000;
+  coolDown = 6000;
   manaCost = 40;
 
   duration = 4000;

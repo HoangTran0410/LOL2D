@@ -20,7 +20,7 @@ export default class Morgana_E extends Spell {
   name = 'Lá Chắn Đen (Morgana_E)';
   description =
     'Ban cho đồng minh có ít máu nhất trong phạm vi (hoặc chính mình) một <span class="buff">Lá Chắn Đen</span> hấp thụ <span class="damage">90 sát thương</span> trong <span class="time">5 giây</span>. Khi lá chắn còn tồn tại, mục tiêu <span class="buff">miễn nhiễm mọi hiệu ứng khống chế</span> của kẻ địch (choáng, trói, câm lặng, làm chậm, hất tung, mê hoặc, khiếp sợ, ghìm, kéo/đẩy) — mỗi hiệu ứng bị chặn sẽ bị xoá ngay lập tức. Không chặn được <span class="buff">Mờ Mắt</span>, cũng không chặn khống chế từ chính mình hoặc đồng đội. Game không phân biệt sát thương phép và vật lý nên lá chắn hấp thụ mọi loại sát thương.';
-  coolDown = 12000;
+  coolDown = 6000;
   manaCost = 40;
 
   range = 500;

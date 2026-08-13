@@ -70,7 +70,7 @@ export default class Lux_R extends Spell {
   name = 'Cầu Vồng Tối Thượng (Lux_R)';
   description =
     'Niệm <span class="time">1 giây</span> rồi bắn một dải sáng theo hướng đã chốt, gây <span class="damage">30 sát thương</span> lên mọi kẻ địch trúng phải';
-  coolDown = 60_000;
+  coolDown = 10_000;
   manaCost = 100;
 
   private readonly castTimeMs = 1_000;

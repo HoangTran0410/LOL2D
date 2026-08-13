@@ -76,8 +76,8 @@ describe('Pantheon Q', () => {
       end: { x: 560, y: 0 },
       width: 120,
     });
-    expect(spell.currentCooldown).toBe(4_400);
-    expect(spell.coolDown).toBe(11_000);
+    expect(spell.currentCooldown).toBe(1_600);
+    expect(spell.coolDown).toBe(4_000);
   });
 
   it('thrust hits only enemy damageable units and applies unit multipliers before execute', () => {
@@ -143,7 +143,7 @@ describe('Pantheon Q', () => {
     spell.release(context);
 
     expect(caster.stats.mana.value).toBe(75);
-    expect(spell.currentCooldown).toBe(4_400);
+    expect(spell.currentCooldown).toBe(1_600);
   });
 
   it.each([

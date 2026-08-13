@@ -13,7 +13,7 @@ export default class Ashe_E extends Spell {
   name = 'Chim Ưng Do Thám (Ashe_E)';
   description =
     'Thả một chim ưng bay xa <span>900px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class="buff">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class="buff">Lộ Diện</span> trong <span class="time">3 giây</span>';
-  coolDown = 18000;
+  coolDown = 6000;
   manaCost = 30;
 
   range = 900;

@@ -70,7 +70,7 @@ describe('Janna Q', () => {
     spell.press(context(owner, { x: 40, y: 60 }, { x: 40, y: 160 }, { x: 0, y: 1 }));
 
     expect(tornado.position).toMatchObject({ x: 10, y: 20 });
-    expect(tornado.destination).toMatchObject({ x: 990, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 536, y: 20 });
   });
 
   it('allows Janna to move and cast while the tornado remains ACTIVE', () => {
@@ -115,9 +115,9 @@ describe('Janna Q', () => {
 
     tornado.release();
 
-    expect(tornado.destination).toMatchObject({ x: 1_320, y: 20 });
+    expect(tornado.destination).toMatchObject({ x: 705, y: 20 });
     expect(tornado.speed).toBeCloseTo(1_144 / 60);
-    expect(tornado.size).toBe(240);
+    expect(tornado.size).toBe(60);
     expect(tornado.getCurrentDamage()).toBe(23);
     expect(tornado.getCurrentAirborneTime()).toBe(875);
   });
@@ -125,10 +125,12 @@ describe('Janna Q', () => {
   it('uses imported rank-one cooldown, mana, edge range, and speed', () => {
     const { spell, tornado } = setup();
 
-    expect(spell.coolDown).toBe(14_000);
+    expect(spell.coolDown).toBe(5_000);
     expect(spell.manaCost).toBe(90);
-    expect(spell.minRange).toBe(1_100);
-    expect(spell.maxRange).toBe(1_760);
+    expect(spell.minRange).toBe(550);
+    expect(spell.maxRange).toBe(900);
+    expect(tornado.minSize).toBe(48);
+    expect(tornado.maxSize).toBe(72);
     expect(tornado.minSpeed).toBeCloseTo(880 / 60);
     expect(tornado.maxSpeed).toBeCloseTo(1_408 / 60);
   });

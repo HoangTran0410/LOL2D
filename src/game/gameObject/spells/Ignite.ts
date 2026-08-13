@@ -10,7 +10,7 @@ export default class Ignite extends Spell {
   name = 'Thiêu Đốt (Ignite)';
   description =
     'Thiêu đốt kẻ địch gần nhất trong phạm vi <span>350px</span>, gây <span class="damage">6 sát thương</span> mỗi <span class="time">0.5 giây</span> trong <span class="time">5 giây</span> (tổng <span class="damage">60 sát thương</span>)';
-  coolDown = 15000;
+  coolDown = 6000;
   willDrawPreview = true;
 
   range = 350;

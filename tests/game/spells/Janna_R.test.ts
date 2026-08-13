@@ -121,7 +121,7 @@ describe('Janna R', () => {
 
     spell.press(context(owner));
 
-    expect(spell.coolDown).toBe(130_000);
+    expect(spell.coolDown).toBe(10_000);
     expect(spell.manaCost).toBe(100);
     expect(owner.stats.mana.value).toBe(100);
   });

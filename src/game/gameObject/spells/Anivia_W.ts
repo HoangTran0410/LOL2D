@@ -30,7 +30,7 @@ export default class Anivia_W extends Spell {
   name = 'Tường Băng (Anivia_W)';
   description =
     'Dựng một bức tường băng <b>đặc</b> chắn ngang hướng chỉ định, tồn tại <span class="time">5 giây</span>. Tường <b>không gây sát thương</b> và không gây hiệu ứng khống chế — nó chặn đường đi thật sự: mọi tướng (kể cả đồng minh và chính Anivia) đều bị đẩy ra và không thể đi xuyên qua. Kỹ năng lướt/dịch chuyển vẫn vượt được tường, và tường <b>không chặn tầm nhìn</b>';
-  coolDown = 12000;
+  coolDown = 6000;
   manaCost = 40;
 
   range = 400;

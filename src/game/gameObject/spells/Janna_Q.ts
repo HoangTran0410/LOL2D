@@ -26,11 +26,11 @@ export default class Janna_Q extends Spell {
   name = 'Bão Tố (Janna_Q)';
   description =
     'Triệu hồi một cơn lốc tại chỗ và <span class="buff">tích luỹ sức mạnh</span> trong tối đa <span class="time">3 giây</span>. Tái kích hoạt để phóng cơn lốc về hướng con trỏ, hoặc nó tự phóng khi tích đầy. Tích càng lâu thì tầm bay, tốc độ, sát thương và thời gian hất tung càng lớn: gây <span class="damage">15 - 30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.5 - 1.25 giây</span>, xuyên qua mọi kẻ địch trên đường đi';
-  coolDown = 14_000;
+  coolDown = 5_000;
   manaCost = 90;
 
-  minRange = 1_100;
-  maxRange = 1_760;
+  minRange = 550;
+  maxRange = 900;
   maxChargeTime = 3000;
 
   spellObject: Janna_Q_Object | null = null;
@@ -97,16 +97,16 @@ export class Janna_Q_Object extends MissileSpellObject {
   chargeTime = 0;
   charging = true;
 
-  minSize = 240;
-  maxSize = 240;
+  minSize = 48;
+  maxSize = 72;
   size = this.minSize;
 
   minSpeed = 880 / 60;
   maxSpeed = 1_408 / 60;
   speed = this.minSpeed;
 
-  minRange = 1_100;
-  maxRange = 1_760;
+  minRange = 550;
+  maxRange = 900;
 
   minDamage = 15;
   maxDamage = 30;
@@ -170,6 +170,7 @@ export class Janna_Q_Object extends MissileSpellObject {
     if (atMaxCharge) this.chargeTime = this.maxChargeTime;
     const ratio = this.chargeRatio;
     this.charging = false;
+    this.size = lerp(this.minSize, this.maxSize, ratio);
     this.speed = lerp(this.minSpeed, this.maxSpeed, ratio);
     const range = lerp(this.minRange, this.maxRange, ratio) - this.size / 2;
     this.destination = this.position.copy().add(this.releaseDirection.copy().mult(range));

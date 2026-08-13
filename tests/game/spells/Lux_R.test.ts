@@ -102,7 +102,7 @@ describe('Lux R', () => {
     spell.press(context(owner));
 
     expect(spell.state).toBe('CASTING');
-    expect(spell.coolDown).toBe(60_000);
+    expect(spell.coolDown).toBe(10_000);
     expect(spell.manaCost).toBe(100);
     expect(owner.stats.mana.value).toBe(100);
     expect(owner.stopMovement).toHaveBeenCalledOnce();
