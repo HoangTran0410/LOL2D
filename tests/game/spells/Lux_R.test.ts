@@ -14,6 +14,7 @@ import Spell from '../../../src/game/gameObject/Spell';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import CastBar from '../../../src/game/vfx/CastBar';
+import LuxBeamEffect from '../../../src/game/vfx/LuxBeamEffect';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -61,12 +62,40 @@ describe('Lux R', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     vi.stubGlobal('p5', { Vector: TestVector });
+    for (const name of ['push', 'pop', 'noFill', 'stroke', 'strokeWeight']) {
+      vi.stubGlobal(name, vi.fn());
+    }
+    vi.stubGlobal('line', vi.fn());
   });
 
   afterEach(() => vi.unstubAllGlobals());
 
+  it('grows its prepare lane and keeps a layered release flash alive for 450ms', () => {
+    const geometry = { start: { x: 0, y: 0 }, end: { x: 100, y: 0 }, width: 20 };
+    let progress = 0.25;
+    const prepare = new LuxBeamEffect(geometry, 'prepare', () => progress);
+
+    prepare.draw();
+    const earlyWidth = Math.max(...vi.mocked(strokeWeight).mock.calls.map(([weight]) => weight));
+    vi.mocked(strokeWeight).mockClear();
+    progress = 1;
+    prepare.draw();
+    const fullWidth = Math.max(...vi.mocked(strokeWeight).mock.calls.map(([weight]) => weight));
+    expect(fullWidth).toBeGreaterThan(earlyWidth);
+
+    vi.mocked(line).mockClear();
+    const release = new LuxBeamEffect(geometry, 'release');
+    release.draw();
+    expect(line).toHaveBeenCalledTimes(8);
+    release.update(449);
+    expect(release.complete).toBe(false);
+    release.update(1);
+    expect(release.complete).toBe(true);
+  });
+
   it('snapshots its beam and deals damage only after cast completion', () => {
     const disposeCastBar = vi.spyOn(CastBar.prototype, 'dispose');
+    const releaseDraw = vi.spyOn(LuxBeamEffect.prototype, 'draw');
     const added: unknown[] = [];
     const targetBuffs: unknown[] = [];
     const ownerBuffs: Array<{ toRemove: boolean; statusFlagsToEnable: number }> = [];
@@ -116,13 +145,16 @@ describe('Lux R', () => {
     owner.position.x = 50;
     vi.stubGlobal('deltaTime', 1_000);
     spell.update();
+    spell.drawVfx();
 
     expect(disposeCastBar).toHaveBeenCalledOnce();
+    expect(releaseDraw).toHaveBeenCalled();
 
     const beam = added.find(
       (object): object is BeamSpellObject => object instanceof BeamSpellObject
     );
     if (!beam) throw new Error('Lux R must create its beam.');
+    expect(added.filter(object => object instanceof BeamSpellObject)).toHaveLength(1);
     expect(beam.geometry).toEqual({
       start: { x: 0, y: 0 },
       end: { x: 3400, y: 0 },

@@ -1,8 +1,8 @@
 import AssetManager from '../../../managers/AssetManager';
 import StatusFlags from '../../enums/StatusFlags';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import BeamRenderer from '../../vfx/BeamRenderer';
 import CastBar from '../../vfx/CastBar';
+import LuxBeamEffect from '../../vfx/LuxBeamEffect';
 import Buff from '../Buff';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -98,7 +98,12 @@ export default class Lux_R extends Spell {
       },
       vfx: {
         castStart: context => new CastBar(context, () => this.castElapsedMs / this.castTimeMs),
-        castLoop: context => new BeamRenderer(this.beamGeometry(context)),
+        castLoop: context => new LuxBeamEffect(
+          this.beamGeometry(context),
+          'prepare',
+          () => this.castElapsedMs / this.castTimeMs
+        ),
+        release: context => new LuxBeamEffect(this.beamGeometry(context), 'release'),
       },
     };
   }
