@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_morgana_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Tormented_Shadow.png?27aaa",
+    "sha1": "5b32e55ac248135ea01a111e21e06a42fd1d3ad5"
+  },
+  "champion": "Morgana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_morgana_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Tormented_Shadow.png?27aaa",
+        "sha1": "5b32e55ac248135ea01a111e21e06a42fd1d3ad5"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "12",
+        "cost": "70 / 80 / 90 / 100 / 110",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> ''Tormented Shadow's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced by 5% of its '''total''' cooldown whenever ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Morgana\" data-ability=\"Soul Siphon\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Morgana Soul Siphon.png|20xpx|border|link=Morgana#Soul Siphon|An icon for Morgana's ability Soul Siphon]]</span> <span style=\"white-space:normal;\">[[Morgana#Soul Siphon|Soul Siphon]]</span></span>'' triggers. Simultaneous triggers from multiple targets will stack the cooldown reduction.",
+          "text": "Passive: Tormented Shadow's &nbsp;current cooldown is reduced by 5% of its total cooldown whenever Soul Siphon triggers. Simultaneous triggers from multiple targets will stack the cooldown reduction."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Morgana''' torments the soil at the target location, causing the area to become desecrated for 5 seconds. Enemies within take <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> on-cast and every 0.<small>5</small> seconds thereafter, increased by <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target's missing health\" data-displayformula=\"1% per 1% of target's '''missing''' health\" data-bot-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-top-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-bot-key=\"%\" data-top-key=\"%\">0% – 100% (based on target's '''missing''' health)</span>[[Category:Debug]]</span>. ''Tormented Shadow'' deals 170% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Active: Morgana torments the soil at the target location, causing the area to become desecrated for 5 seconds. Enemies within take magic damage on-cast and every 0.5 seconds thereafter, increased by 0% – 100% (based on target's missing health)Category:Debug. Tormented Shadow deals 170% damage against monsters."
+        },
+        "effectradius": "280",
+        "icon": "false",
+        "icon2": "Tormented Shadow.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Damage Per Tick:'''</span></dt><dd>9 / 15.<small>5</small> / 22 / 28.<small>5</small> / 35 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Damage Per Tick:'''</span></dt><dd>18 / 31 / 44 / 57 / 70 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 20% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Total Damage:'''</span></dt><dd>90 / 155 / 220 / 285 / 350 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Total Damage:'''</span></dt><dd>180 / 310 / 440 / 570 / 700 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 200% AP)</span></dd></dl>",
+          "text": "Minimum Damage Per Tick:9 / 15.5 / 22 / 28.5 / 35 (+ 10% AP)Maximum Damage Per Tick:18 / 31 / 44 / 57 / 70 (+ 20% AP)\nMinimum Total Damage:90 / 155 / 220 / 285 / 350 (+ 100% AP)Maximum Total Damage:180 / 310 / 440 / 570 / 700 (+ 200% AP)"
+        },
+        "name": "Tormented Shadow",
+        "notes": {
+          "raw": "* Damage from multiple ''Tormented Shadows'' does not stack.",
+          "text": "Damage from multiple Tormented Shadows does not stack."
+        },
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Tormented Shadow"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "646d26927b1ae1225e98451bd276dd6aa1897e0267c2cb040201930a9a5988ff",
+    "fetchedAt": "2026-08-13T16:24:07.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Morgana/Tormented_Shadow",
+    "revisionId": 3949929,
+    "sourceTimestamp": "2025-08-27T00:10:27Z"
+  }
+}

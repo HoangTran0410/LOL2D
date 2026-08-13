@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Morgana/Tormented Shadow",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Tormented Shadow@@icon@@false@@icon2@@Tormented Shadow.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> ''Tormented Shadow's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced by 5% of its '''total''' cooldown whenever ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Morgana\" data-ability=\"Soul Siphon\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Morgana Soul Siphon.png|20xpx|border|link=Morgana#Soul Siphon|An icon for Morgana's ability Soul Siphon]]</span> <span style=\"white-space:normal;\">[[Morgana#Soul Siphon|Soul Siphon]]</span></span>'' triggers. Simultaneous triggers from multiple targets will stack the cooldown reduction.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Morgana''' torments the soil at the target location, causing the area to become desecrated for 5 seconds. Enemies within take <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> on-cast and every 0.<small>5</small> seconds thereafter, increased by <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target's missing health\" data-displayformula=\"1% per 1% of target's '''missing''' health\" data-bot-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-top-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-bot-key=\"%\" data-top-key=\"%\">0% – 100% (based on target's '''missing''' health)</span>[[Category:Debug]]</span>. ''Tormented Shadow'' deals 170% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Damage Per Tick:'''</span></dt><dd>9 / 15.<small>5</small> / 22 / 28.<small>5</small> / 35 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Damage Per Tick:'''</span></dt><dd>18 / 31 / 44 / 57 / 70 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 20% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Total Damage:'''</span></dt><dd>90 / 155 / 220 / 285 / 350 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Total Damage:'''</span></dt><dd>180 / 310 / 440 / 570 / 700 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 200% AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@280@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@70 / 80 / 90 / 100 / 110@@cooldown@@12@@targeting@@Location@@damagetype@@Magic@@spellshield@@False@@projectile@@@@notes@@\n* Damage from multiple ''Tormented Shadows'' does not stack.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1389810,
+                "revisions": [
+                  {
+                    "parentid": 3949881,
+                    "revid": 3949929,
+                    "timestamp": "2025-08-27T00:10:27Z"
+                  }
+                ],
+                "title": "Template:Data Morgana/Tormented Shadow"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3949929,
+      "timestamp": "2025-08-27T00:10:27Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "ebcaf1209a999558e09d83d6db48fb10886250f36902b3b893e2838a1aaeb686",
+    "fetchedAt": "2026-08-13T16:24:07.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Morgana/Tormented_Shadow",
+    "revisionId": 3949929,
+    "sourceTimestamp": "2025-08-27T00:10:27Z"
+  }
+}

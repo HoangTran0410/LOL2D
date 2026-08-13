@@ -187,7 +187,12 @@ export const SpellGroups: {
     name: 'Morgana',
     image: 'champ_morgana',
     background: null,
-    spells: [AllSpells.Morgana_Q, AllSpells.Morgana_E],
+    spells: [
+      AllSpells.Morgana_Q,
+      AllSpells.Morgana_W,
+      AllSpells.Morgana_E,
+      AllSpells.Morgana_R,
+    ],
   },
   {
     name: 'Janna',

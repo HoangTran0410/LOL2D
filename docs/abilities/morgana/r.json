@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_morgana_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Soul_Shackles.png?22c17",
+    "sha1": "bb8a2e1f81f4a41dfb0cfd49ddca23a40b8168d1"
+  },
+  "champion": "Morgana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_morgana_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Soul_Shackles.png?22c17",
+        "sha1": "bb8a2e1f81f4a41dfb0cfd49ddca23a40b8168d1"
+      },
+      "fields": {
+        "casttime": "0.35",
+        "cooldown": "120 / 115 / 110 / 105 / 100",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Morgana''' latches chains of energy onto nearby enemy champions over the cast time, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and forming a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Tether\">[[File:Focused Resolve.png|20px|link=Tether|An icon representing the keyword Tether]] [[:Tether|tether]]</span> between herself and each target for 3 seconds, during which she gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> and the targets are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealed]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by 20%.",
+          "text": "Active: Morgana latches chains of energy onto nearby enemy champions over the cast time, dealing magic damage and forming a tether between herself and each target for 3 seconds, during which she gains &nbsp;bonus movement speed and the targets are revealed and slowed by 20%."
+        },
+        "description2": {
+          "raw": "If a target does not break their tether by the end of its duration, they are dealt the same <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> again and become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for a duration, during which they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealed]]</span>.",
+          "text": "If a target does not break their tether by the end of its duration, they are dealt the same magic damage again and become stunned for a duration, during which they are revealed."
+        },
+        "description3": {
+          "raw": "''An enemy champion within <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 575 units is required to cast this ability. The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> to be tethered by this ability.''",
+          "text": "An enemy champion within 575 units is required to cast this ability. The target does not have to be visible to be tethered by this ability."
+        },
+        "effectradius": "625",
+        "icon": "Soul Shackles.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>200 / 237.<small>5</small> / 275 / 312.<small>5</small> / 350 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>400 / 475 / 550 / 625 / 700 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 160% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>20 / 30 / 40 / 50 / 60%</dd></dl>",
+          "text": "Magic Damage:200 / 237.5 / 275 / 312.5 / 350 (+ 80% AP)Total Magic Damage:400 / 475 / 550 / 625 / 700 (+ 160% AP)\nBonus Movement Speed:20 / 30 / 40 / 50 / 60%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stun Duration:'''</span></dt><dd>1.<small>5</small> / 1.<small>625</small> / 1.<small>75</small> / 1.<small>875</small> / 2 seconds</dd></dl>",
+          "text": "Stun Duration:1.5 / 1.625 / 1.75 / 1.875 / 2 seconds"
+        },
+        "name": "Soul Shackles",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the tether's application and initial damage but not the aftereffects of one already applied.\n* '''Morgana''' will turn to face southeast upon casting ''Soul Shackles''.\n* ''Soul Shackles'' checks for nearby valid targets around a location that is '''Morgana's''' exact location at the start of the cast time.\n** In other words, the latch-on radius is from a fixed location around ''Soul Shackles' '' cast point in which targets are acquired; targets around '''Morgana's''' location at the end of the cast time that are not within this radius will not be targeted, since her location after the cast starts is not considered.\n*** Enemies that were outside of the latch-on radius at the time of cast that enter it afterwards, during the cast time, will be targeted.\n* A circle indicator for <i>Soul Shackles'</i> maximum tether range is visible to '''Morgana''' and her tethered targets only.",
+          "text": "Spell shield will block the tether's application and initial damage but not the aftereffects of one already applied.\nMorgana will turn to face southeast upon casting Soul Shackles.\nSoul Shackles checks for nearby valid targets around a location that is Morgana's exact location at the start of the cast time.\n* In other words, the latch-on radius is from a fixed location around Soul Shackles' cast point in which targets are acquired; targets around Morgana's location at the end of the cast time that are not within this radius will not be targeted, since her location after the cast starts is not considered.\n** Enemies that were outside of the latch-on radius at the time of cast that enter it afterwards, during the cast time, will be targeted.\nA circle indicator for Soul Shackles' maximum tether range is visible to Morgana and her tethered targets only."
+        },
+        "projectile": false,
+        "spellshield": false,
+        "targeting": "Proximity"
+      },
+      "name": "Soul Shackles"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "86ab91629c0c3ab3bcec5aa7683f5bb47a371ee235ff2f5e9197004117e5ab37",
+    "fetchedAt": "2026-08-13T16:24:07.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Morgana/Soul_Shackles",
+    "revisionId": 4020315,
+    "sourceTimestamp": "2026-05-19T22:43:58Z"
+  }
+}

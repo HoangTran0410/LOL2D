@@ -66,6 +66,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_OriginalSquare.png?ec2a0"
     },
     {
+      "contentHash": "a56c0dc2b5b6f2d4d90bd1867a506ce780691efbd6529ef643fc5dd44076273c",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "champ_leblanc",
+      "localPath": "assets/images/champions/leblanc.png",
+      "revisionId": 4051472,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_OriginalSquare.png?4031b"
+    },
+    {
       "contentHash": "cb1e8b3e7995bcfd6775680c0d4fec7a07baae209b781ad8b34eb12105abf4b7",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_leesin",
@@ -298,6 +306,46 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1"
     },
     {
+      "contentHash": "14006d6a3cf95b9b7456e93af99a294be5bdda773abb003c9a5d1a8d67e1a30c",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "spell_leblanc_q",
+      "localPath": "assets/images/spells/leblanc_q.png",
+      "revisionId": 3985524,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Sigil_of_Malice.png?f3dfb"
+    },
+    {
+      "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "spell_leblanc_r",
+      "localPath": "assets/images/spells/leblanc_r.png",
+      "revisionId": 4034699,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
+    },
+    {
+      "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "spell_leblanc_r2",
+      "localPath": "assets/images/spells/leblanc_r2.png",
+      "revisionId": 4034699,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
+    },
+    {
+      "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "spell_leblanc_r3",
+      "localPath": "assets/images/spells/leblanc_r3.png",
+      "revisionId": 4034699,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
+    },
+    {
+      "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
+      "fetchedAt": "2026-08-13T16:24:13.273Z",
+      "localAssetKey": "spell_leblanc_r4",
+      "localPath": "assets/images/spells/leblanc_r4.png",
+      "revisionId": 4034699,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
+    },
+    {
       "contentHash": "33a3fd80347c41fd09848ee1a5357c0a34dd0c1a6293d2faff2db77a41494fcb",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_leesin_w",
@@ -360,6 +408,22 @@
       "localPath": "assets/images/spells/morgana_q.png",
       "revisionId": 3936353,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Dark_Binding.png?a9483"
+    },
+    {
+      "contentHash": "87910a24e2f814687a14d595176468cd2f4c68717436a75087096d8234dc7089",
+      "fetchedAt": "2026-08-13T16:24:07.519Z",
+      "localAssetKey": "spell_morgana_r",
+      "localPath": "assets/images/spells/morgana_r.png",
+      "revisionId": 4020315,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Soul_Shackles.png?22c17"
+    },
+    {
+      "contentHash": "6d2d5fa6d17865410cfcfc7ecff7b18d775c48d16c15b8375969e14a2346849d",
+      "fetchedAt": "2026-08-13T16:24:07.519Z",
+      "localAssetKey": "spell_morgana_w",
+      "localPath": "assets/images/spells/morgana_w.png",
+      "revisionId": 3949929,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Tormented_Shadow.png?27aaa"
     },
     {
       "contentHash": "87f4c1db87f75daddd89d8592c119c6b8dd85a55d63c43dd8205716a93fd262c",
