@@ -59,6 +59,7 @@ export { default as Rammus_Q } from './Rammus_Q';
 export { default as Anivia_Q } from './Anivia_Q';
 export { default as Anivia_W } from './Anivia_W';
 export { default as Anivia_R } from './Anivia_R';
+export { default as Anivia_E } from './Anivia_E';
 export { default as Thresh_Q } from './Thresh_Q';
 export { default as Morgana_Q } from './Morgana_Q';
 export { default as Morgana_E } from './Morgana_E';

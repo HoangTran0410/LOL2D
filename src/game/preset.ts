@@ -157,7 +157,7 @@ export const SpellGroups: {
     name: 'Anivia',
     image: 'champ_anivia',
     background: null,
-    spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_R],
+    spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_E, AllSpells.Anivia_R],
   },
   {
     name: 'Varus',

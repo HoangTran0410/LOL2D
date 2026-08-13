@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Anivia/Frostbite",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Frostbite@@icon@@false@@icon2@@Frostbite.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> Enemies hit by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Flash Frost\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Flash Frost.png|20xpx|border|link=Anivia#Flash Frost|An icon for Anivia's ability Flash Frost]]</span> <span style=\"white-space:normal;\">[[Anivia#Flash Frost|Flash Frost]]</span></span>'' or a fully formed ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Glacial Storm\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Glacial Storm.png|20xpx|border|link=Anivia#Glacial Storm|An icon for Anivia's ability Glacial Storm]]</span> <span style=\"white-space:normal;\">[[Anivia#Glacial Storm|Glacial Storm]]</span></span>'' become ''Chilled'' for 3 seconds, refreshing on subsequent hits.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Anivia''' blasts a freezing wind at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>, [[File:Successfully enhanced damage magic icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\">doubled</span> if they were ''Chilled''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 80 / 105 / 130 / 155 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd><dt><span class=\"template_lc\">'''Enhanced Damage:'''</span></dt><dd>110 / 160 / 210 / 260 / 310 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 110% AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@1600@@casttime@@0.<small>25</small>@@cost@@50@@cooldown@@4@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* The damage of ''Frostbite'' is calculated once it hits. If the target's mark from being hit by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Flash Frost\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Flash Frost.png|20xpx|border|link=Anivia#Flash Frost|An icon for Anivia's ability Flash Frost]]</span> <span style=\"white-space:normal;\">[[Anivia#Flash Frost|Flash Frost]]</span></span> or a fully formed <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Glacial Storm\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Glacial Storm.png|20xpx|border|link=Anivia#Glacial Storm|An icon for Anivia's ability Glacial Storm]]</span> <span style=\"white-space:normal;\">[[Anivia#Glacial Storm|Glacial Storm]]</span></span> wears off while the projectile is traveling, the damage is not doubled.\n* ''Frostbite'' has a different sound effect when it hits a target for double damage.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306453,
+                "revisions": [
+                  {
+                    "parentid": 3906520,
+                    "revid": 3958096,
+                    "timestamp": "2025-10-07T17:34:56Z"
+                  }
+                ],
+                "title": "Template:Data Anivia/Frostbite"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3958096,
+      "timestamp": "2025-10-07T17:34:56Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "9713adc25ccfaa70272e460cfe73a15b4eb6059b217d06e12b39b7d444425eea",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Anivia/Frostbite",
+    "revisionId": 3958096,
+    "sourceTimestamp": "2025-10-07T17:34:56Z"
+  }
+}

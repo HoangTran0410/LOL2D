@@ -1,0 +1,67 @@
+{
+  "adaptation": {
+    "descriptionVi": "Nội tại: kẻ địch bị Sương Băng (Q) hoặc Bão Tuyết (R) đã hình thành đầy đủ đánh trúng sẽ Nhiễm Lạnh trong 3 giây, làm mới khi bị đánh trúng thêm. Chủ động: Anivia bắn một mũi băng vào mục tiêu, gây 20 sát thương phép, tăng gấp đôi thành 40 nếu mục tiêu đang Nhiễm Lạnh.",
+    "gameplayNotes": [
+      "LOL2D thay 55-155 sát thương (+55% SMPT) / 110-310 sát thương tăng cường (+110% SMPT) bằng 20/40 sát thương cố định (đúng tỉ lệ gấp đôi của bản gốc); không áp dụng tăng tiến theo cấp hay SMPT.",
+      "Giữ nguyên cơ chế đánh dấu Nhiễm Lạnh từ Q và Bão Tuyết đã hình thành đầy đủ, làm mới khi trúng thêm, và mức sát thương gấp đôi khi trúng mục tiêu đang nhiễm lạnh. Tầm bắn giữ bằng tầm Sương Băng (Q, 450px) để phối hợp combo; tốc độ đạn 1600 (League) quy đổi thành 1600/60 đơn vị mỗi khung hình theo quy ước tốc độ đạn của dự án.",
+      "Nguồn cơ chế: revision 3958096, normalized content hash f4f3cb5fcbc7432804e36fd171a65e6a2de55d8963a45dfd2f61c71730b03643."
+    ],
+    "implementationStatus": "planned"
+  },
+  "asset": {
+    "key": "spell_anivia_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Frostbite.png?a5539",
+    "sha1": "6b443fed725d4ca4da77772155da7d6f0ce2bd1f"
+  },
+  "champion": "Anivia",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_anivia_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Frostbite.png?a5539",
+        "sha1": "6b443fed725d4ca4da77772155da7d6f0ce2bd1f"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "4",
+        "cost": "50",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> Enemies hit by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Flash Frost\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Flash Frost.png|20xpx|border|link=Anivia#Flash Frost|An icon for Anivia's ability Flash Frost]]</span> <span style=\"white-space:normal;\">[[Anivia#Flash Frost|Flash Frost]]</span></span>'' or a fully formed ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Glacial Storm\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Glacial Storm.png|20xpx|border|link=Anivia#Glacial Storm|An icon for Anivia's ability Glacial Storm]]</span> <span style=\"white-space:normal;\">[[Anivia#Glacial Storm|Glacial Storm]]</span></span>'' become ''Chilled'' for 3 seconds, refreshing on subsequent hits.",
+          "text": "Passive: Enemies hit by Flash Frost or a fully formed Glacial Storm become Chilled for 3 seconds, refreshing on subsequent hits."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Anivia''' blasts a freezing wind at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>, [[File:Successfully enhanced damage magic icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\">doubled</span> if they were ''Chilled''.",
+          "text": "Active: Anivia blasts a freezing wind at the target enemy that deals magic damage, doubled if they were Chilled."
+        },
+        "icon": "false",
+        "icon2": "Frostbite.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 80 / 105 / 130 / 155 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd><dt><span class=\"template_lc\">'''Enhanced Damage:'''</span></dt><dd>110 / 160 / 210 / 260 / 310 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 110% AP)</span></dd></dl>",
+          "text": "Magic Damage:55 / 80 / 105 / 130 / 155 (+ 55% AP)Enhanced Damage:110 / 160 / 210 / 260 / 310 (+ 110% AP)"
+        },
+        "name": "Frostbite",
+        "notes": {
+          "raw": "* The damage of ''Frostbite'' is calculated once it hits. If the target's mark from being hit by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Flash Frost\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Flash Frost.png|20xpx|border|link=Anivia#Flash Frost|An icon for Anivia's ability Flash Frost]]</span> <span style=\"white-space:normal;\">[[Anivia#Flash Frost|Flash Frost]]</span></span> or a fully formed <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Anivia\" data-ability=\"Glacial Storm\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Anivia Glacial Storm.png|20xpx|border|link=Anivia#Glacial Storm|An icon for Anivia's ability Glacial Storm]]</span> <span style=\"white-space:normal;\">[[Anivia#Glacial Storm|Glacial Storm]]</span></span> wears off while the projectile is traveling, the damage is not doubled.\n* ''Frostbite'' has a different sound effect when it hits a target for double damage.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The damage of Frostbite is calculated once it hits. If the target's mark from being hit by Flash Frost or a fully formed Glacial Storm wears off while the projectile is traveling, the damage is not doubled.\nFrostbite has a different sound effect when it hits a target for double damage.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Frostbite"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "f4f3cb5fcbc7432804e36fd171a65e6a2de55d8963a45dfd2f61c71730b03643",
+    "fetchedAt": "2026-08-13T16:46:52.507Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Anivia/Frostbite",
+    "revisionId": 3958096,
+    "sourceTimestamp": "2025-10-07T17:34:56Z"
+  }
+}

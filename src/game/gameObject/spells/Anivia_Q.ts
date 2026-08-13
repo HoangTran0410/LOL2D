@@ -6,6 +6,7 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import Chilled, { CHILL_DURATION_MS } from '../buffs/Chilled';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 import TrailSystem from '../helpers/TrailSystem';
@@ -111,6 +112,9 @@ export class Anivia_Q_Object extends MissileSpellObject {
     slowBuff.percent = this.slowPercent;
     slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
     enemy.addBuff(slowBuff);
+
+    // Frostbite (E) reads this to double its damage — see Chilled.ts.
+    enemy.addBuff(new Chilled(CHILL_DURATION_MS, this.owner, enemy));
   }
 
   /** Shatter now. Safe to call twice: only the first call spawns the blast. */

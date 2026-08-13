@@ -149,7 +149,9 @@ describe('Anivia R', () => {
 
     expect(added[0].radius).toBe(END_RADIUS);
     expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, EMPOWERED_DAMAGE]);
-    expect(enemy.buffs).toHaveLength(4);
+    // 4 Slow ticks (0/500/1000/1500ms) plus one Chilled mark, applied once the
+    // storm's damage tick lands empowered — see Anivia_E's Frostbite passive.
+    expect(enemy.buffs).toHaveLength(5);
     expect(enemy.buffs.at(-1)).toMatchObject({ percent: EMPOWERED_SLOW, duration: EMPOWERED_SLOW_DURATION_MS });
   });
 
@@ -161,7 +163,9 @@ describe('Anivia R', () => {
     added[0].update(GROWTH_MS);
 
     expect(enemy.damage).toEqual([EMPOWERED_DAMAGE]);
-    expect(enemy.buffs).toHaveLength(1);
+    // the one empowered tick that reaches it applies both the Slow and the
+    // Chilled mark Frostbite reads.
+    expect(enemy.buffs).toHaveLength(2);
   });
 
   it('queries the radius checkpoints the storm actually grows through', () => {

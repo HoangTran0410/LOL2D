@@ -6,6 +6,7 @@ import Spell from '../Spell';
 import type SpellObject from '../SpellObject';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import AreaSpellObject from '../spellObjects/AreaSpellObject';
+import Chilled, { CHILL_DURATION_MS } from '../buffs/Chilled';
 import Slow from '../buffs/Slow';
 import Stasis from '../buffs/Stasis';
 import { Circle } from '../../../libs/quadtree';
@@ -275,7 +276,13 @@ export class Anivia_R_Object extends AreaSpellObject {
   }
 
   private applyDamage(atMs: number, targets: Iterable<StormTarget>): void {
-    const damage = atMs >= GROWTH_MS ? EMPOWERED_DAMAGE : NORMAL_DAMAGE / 2;
-    for (const target of targets) target.takeDamage(damage, this.owner);
+    // "or a fully formed Glacial Storm" — Frostbite's passive only reads the
+    // storm once it has finished growing, matching Anivia_Q's own hit.
+    const empowered = atMs >= GROWTH_MS;
+    const damage = empowered ? EMPOWERED_DAMAGE : NORMAL_DAMAGE / 2;
+    for (const target of targets) {
+      target.takeDamage(damage, this.owner);
+      if (empowered) target.addBuff(new Chilled(CHILL_DURATION_MS, this.owner, target));
+    }
   }
 }
