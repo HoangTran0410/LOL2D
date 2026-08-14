@@ -275,15 +275,15 @@
 }
 
 .spell-info .body .damage {
-  color: #ff5858;
+  color: var(--spell-damage);
 }
 
 .spell-info .body .buff {
-  color: #88f;
+  color: var(--spell-buff);
 }
 
 .spell-info .body .time {
-  color: #c1ffb6;
+  color: var(--spell-time);
 }
 
 /* =============== Healthbar =============== */

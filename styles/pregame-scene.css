@@ -404,9 +404,10 @@
 }
 
 /* ---------------------------------------------------------- spell detail —
-   a duplicate of a few rules from styles/hud.css's .spell-info, kept in sync
-   by hand rather than shared: the HUD (InGameHUD.ts + hud.css) is owned by a
-   different in-flight change and this screen must not touch either. */
+   the same description markup the in-game HUD renders, so the colours come
+   from the shared --spell-* custom properties in styles/main.css. The selector
+   stays local because the element it hangs off differs; only the palette is
+   shared, which is the part that would otherwise drift. */
 
 .pregame-overlay-bottom {
     align-items: flex-end;
@@ -476,15 +477,15 @@
 }
 
 .spell-detail-body .damage {
-    color: #ff5858;
+    color: var(--spell-damage);
 }
 
 .spell-detail-body .buff {
-    color: #88f;
+    color: var(--spell-buff);
 }
 
 .spell-detail-body .time {
-    color: #c1ffb6;
+    color: var(--spell-time);
 }
 
 /* ------------------------------------------------------------- bot list */

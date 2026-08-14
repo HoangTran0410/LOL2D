@@ -1,3 +1,15 @@
+/* Spell description palette.
+   Descriptions are authored once, on the spell class, as Vietnamese HTML with
+   <span class="damage|buff|time"> markup — and rendered in two unrelated places:
+   the in-game HUD (hud.css) and the pregame setup screen (pregame-scene.css).
+   The colours live here so those two cannot drift apart; each keeps its own
+   selector, because the element they hang off differs. */
+:root {
+    --spell-damage: #ff5858;
+    --spell-buff: #88f;
+    --spell-time: #c1ffb6;
+}
+
 body {
     margin: 0;
     padding: 0;
