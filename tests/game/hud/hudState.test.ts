@@ -156,3 +156,57 @@ describe('HUD_UPDATE_INTERVAL_MS', () => {
     expect(HUD_UPDATE_INTERVAL_MS).toBeGreaterThan(0);
   });
 });
+
+/**
+ * Cooldown reduction and URF are applied at one seam in `Spell` and surfaced as
+ * `effectiveCoolDownMs` / `effectiveManaCost`. The HUD has to read *those*, not
+ * the spell's own tuning fields — two separate passes over this code each
+ * reached for the raw fields independently, which is exactly why this is
+ * pinned down here rather than left to review.
+ */
+describe('computeHudState honours match rules', () => {
+  const ruled = (overrides: Record<string, unknown> = {}) =>
+    fakeSpell({
+      coolDown: 6000,
+      manaCost: 40,
+      effectiveCoolDownMs: 3000, // 50% CDR
+      effectiveManaCost: 0, // URF
+      ...overrides,
+    });
+
+  it('shows the reduced cooldown and the URF mana cost, not the raw ones', () => {
+    const state = computeHudState({ player: fakePlayer({ spells: [ruled()] }) } as never);
+    expect(state?.spells[0].coolDown).toBe(3000);
+    expect(state?.spells[0].manaCost).toBe(0);
+  });
+
+  it('fills the sweep against the reduced duration', () => {
+    // half of the *reduced* 3000ms cooldown remains, so the sweep is half full.
+    // Measured against the raw 6000 it would read 25% and drain at half speed.
+    const state = computeHudState({
+      player: fakePlayer({ spells: [ruled({ currentCooldown: 1500 })] }),
+    } as never);
+    expect(state?.spells[0].coolDownPercent).toBe(50);
+  });
+
+  it('never greys an icon against a cost URF does not charge', () => {
+    const state = computeHudState({
+      player: fakePlayer({
+        spells: [ruled()],
+        stats: {
+          health: { value: 60 },
+          maxHealth: { value: 100 },
+          mana: { value: 0 },
+          maxMana: { value: 100 },
+        },
+      }),
+    } as never);
+    expect(state?.spells[0].affordable).toBe(true);
+  });
+
+  it('falls back to the raw fields for a spell that has no effective accessors', () => {
+    const state = computeHudState({ player: fakePlayer() } as never);
+    expect(state?.spells[0].coolDown).toBe(6000);
+    expect(state?.spells[0].manaCost).toBe(40);
+  });
+});

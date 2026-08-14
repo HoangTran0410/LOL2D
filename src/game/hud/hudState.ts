@@ -118,14 +118,24 @@ function buildSpells(player: any): SpellDisplay[] {
       const {
         disabled,
         image,
-        coolDown,
         state,
         currentCooldown,
         name,
         description,
         stackCount,
-        manaCost,
       } = spell || {};
+
+      // The *effective* numbers, not the spell's own tuning fields: under a
+      // cooldown-reduction or URF match those differ, and the icon has to agree
+      // with what the cast path actually charges and waits. `currentCooldown`
+      // already counts down from the reduced duration, so using the raw
+      // `coolDown` as the denominator would also under-fill the sweep.
+      // These are equipped spells, so an owner and its match rules always
+      // exist — the ownerless instances the picker builds cannot see match
+      // rules at all and stay on raw numbers in `hudInteractions.ts`.
+      const coolDown = spell?.effectiveCoolDownMs ?? spell?.coolDown ?? 0;
+      const manaCost = spell?.effectiveManaCost ?? spell?.manaCost ?? 0;
+
       return {
         instance: spell,
         image: image?.path,
@@ -136,7 +146,7 @@ function buildSpells(player: any): SpellDisplay[] {
         name,
         description,
         coolDownText: Math.ceil(currentCooldown / 1000),
-        coolDownPercent: Math.min((currentCooldown / coolDown) * 100, 100),
+        coolDownPercent: coolDown > 0 ? Math.min((currentCooldown / coolDown) * 100, 100) : 0,
         showCoolDown: currentCooldown > 0,
         // `!== false` so a spell that never heard of the flag still reads as a
         // lockout, which is what every cooldown but the swing timer is.
@@ -145,8 +155,8 @@ function buildSpells(player: any): SpellDisplay[] {
         canCast: player.canCast && !player.isDead,
         hotKey,
         stackCount,
-        manaCost: manaCost ?? 0,
-        affordable: (mana?.value ?? 0) >= (manaCost ?? 0),
+        manaCost,
+        affordable: (mana?.value ?? 0) >= manaCost,
       };
     });
 }
