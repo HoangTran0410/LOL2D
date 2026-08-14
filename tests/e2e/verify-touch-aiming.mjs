@@ -357,7 +357,14 @@ try {
   });
   await page.screenshot({ path: `${OUT}-04-unit-highlight-right.png` });
   await touchEnd();
-  await settle(250);
+  // Wait for the object rather than sleeping at it. Malphite Q has a cast time,
+  // so a fixed pause here is a race against it — and it is one this assertion
+  // lost about one run in three, reporting `spawned: 0` for a cast that was
+  // merely still in flight. Polling for the observable turns a coin flip into
+  // either a pass or a real, legible timeout.
+  await page
+    .waitForFunction(() => window.__spawned.length >= 1, { timeout: 3_000 })
+    .catch(() => {});
 
   report.unitCast = await page.evaluate(() => {
     const context = window.__lol2d.scene.oScene.game.player.spells[2].castContext;
