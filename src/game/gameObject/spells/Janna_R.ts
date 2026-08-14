@@ -22,7 +22,7 @@ import { notifyJannaControlLanded } from './Janna_E';
 export const CHANNEL_DURATION_MS = 3_000;
 export const TICK_EVERY_MS = 250;
 export const HEAL_PER_TICK = 2;
-export const KNOCKBACK_DISTANCE = 875;
+export const KNOCKBACK_DISTANCE = 450;
 export const KNOCKBACK_DURATION_MS = 500;
 export const MANA_COST = 100;
 export const RADIUS = 700;
@@ -75,10 +75,16 @@ export default class Janna_R extends Spell {
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'end', durationMs: this.coolDown },
       vfx: {
-        channelLoop: context => new VfxGroup([
-          new CastTelegraph(context, this.radius, undefined, () => this.owner.position),
-          new CastBar(context, () => this.channelElapsedMs / this.channelDurationMs, undefined, () => unitCastBarAnchor(this.owner)),
-        ]),
+        channelLoop: context =>
+          new VfxGroup([
+            new CastTelegraph(context, this.radius, undefined, () => this.owner.position),
+            new CastBar(
+              context,
+              () => this.channelElapsedMs / this.channelDurationMs,
+              undefined,
+              () => unitCastBarAnchor(this.owner)
+            ),
+          ]),
       },
     };
   }
@@ -92,7 +98,9 @@ export default class Janna_R extends Spell {
     this.activeArea = new Janna_R_Object(this.owner, context.origin, this.radius, {
       durationMs: this.channelDurationMs,
       candidateFilter: target =>
-        !target.isDead && target.teamId === this.owner.teamId && typeof target.takeHeal === 'function',
+        !target.isDead &&
+        target.teamId === this.owner.teamId &&
+        typeof target.takeHeal === 'function',
     });
     this.game.objectManager.addObject(this.activeArea);
   }
@@ -112,7 +120,8 @@ export default class Janna_R extends Spell {
         Math.hypot(
           target.position.x - this.channelOrigin.x,
           target.position.y - this.channelOrigin.y
-        ) > this.radius + target.collisionRadius
+        ) >
+          this.radius + target.collisionRadius
       ) {
         continue;
       }
@@ -139,7 +148,11 @@ export default class Janna_R extends Spell {
     });
 
     for (const target of targets) {
-      if (target.isDead || target.teamId === this.owner.teamId || typeof target.addBuff !== 'function') {
+      if (
+        target.isDead ||
+        target.teamId === this.owner.teamId ||
+        typeof target.addBuff !== 'function'
+      ) {
         continue;
       }
 
@@ -176,11 +189,7 @@ export default class Janna_R extends Spell {
     this.stopWatching.forEach(stop => stop());
     this.stopWatching = [
       this.game.eventManager.on(EventType.ON_POST_CAST_SPELL, (spell: Spell) => {
-        if (
-          spell !== this &&
-          spell.owner === this.owner &&
-          !this.isPermittedDuringChannel(spell)
-        ) {
+        if (spell !== this && spell.owner === this.owner && !this.isPermittedDuringChannel(spell)) {
           this.cancel('PLAYER_CANCEL');
         }
       }),
