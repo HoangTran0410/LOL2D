@@ -1,4 +1,5 @@
 import type { SpellDisplay } from '../../game/preset';
+import type { AssetKey } from '../../managers/AssetManager';
 
 /**
  * Shared across the pregame setup components. A spell class is one of the ~85
@@ -26,5 +27,7 @@ export interface SelectorEntry {
 /** One heading + its entries in the catalogue pane. `name: null` renders no heading (the flat summoner list). */
 export interface SelectorGroup {
   name: string | null;
+  /** Champion avatar (or the ability's own icon) shown beside the heading — see `SpellGroups[i].image`. `null` renders text only. */
+  icon?: AssetKey | null;
   entries: SelectorEntry[];
 }

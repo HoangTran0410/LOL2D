@@ -1,283 +1,283 @@
 #pregame-scene {
-    width: 100vw;
-    height: 100vh;
-    align-items: center;
-    justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
 }
 
 .pregame-panel {
-    width: min(920px, 92vw);
-    max-height: 88vh;
-    overflow-y: auto;
-    background: #1e2328;
-    border: 3px solid transparent;
-    border-image: linear-gradient(#08abac, #01698b) 1;
-    color: #f0e6d2;
-    padding: 1.5rem 2rem 2rem;
-    box-shadow: 0 0 30px 6px rgba(0, 0, 0, .5);
+  width: min(920px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: #1e2328;
+  border: 3px solid transparent;
+  border-image: linear-gradient(#08abac, #01698b) 1;
+  color: #f0e6d2;
+  padding: 1.5rem 2rem 2rem;
+  box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
 }
 
 .pregame-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .pregame-header h1 {
-    flex: 1;
-    font-size: 1.4em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 0;
-    color: #c8aa6e;
+  flex: 1;
+  font-size: 1.4em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  color: #c8aa6e;
 }
 
 .pregame-icon-btn {
-    background: transparent;
-    border: none;
-    color: #bbb;
-    font-size: 1.1em;
-    cursor: pointer;
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 1.1em;
+  cursor: pointer;
 }
 
 .pregame-icon-btn:hover {
-    color: #f0e6d2;
+  color: #f0e6d2;
 }
 
 /* =============== Tabs =============== */
 
 .pregame-tabs {
-    display: flex;
-    gap: .5rem;
-    margin-bottom: 1.2rem;
-    border-bottom: 1px solid #3c3c41;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid #3c3c41;
 }
 
 .pregame-tab {
-    flex: 1;
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    color: #a09b8c;
-    padding: .6rem .4rem;
-    font-size: .95em;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    cursor: pointer;
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #a09b8c;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.95em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
 }
 
 .pregame-tab:hover {
-    color: #f0e6d2;
+  color: #f0e6d2;
 }
 
 .pregame-tab.selected {
-    color: #c8aa6e;
-    border-bottom-color: #08abac;
+  color: #c8aa6e;
+  border-bottom-color: #08abac;
 }
 
 .pregame-hint {
-    font-size: .8em;
-    color: #a09b8c;
-    margin: 0 0 .8rem;
+  font-size: 0.8em;
+  color: #a09b8c;
+  margin: 0 0 0.8rem;
 }
 
 /* =============== Players tab: participant list =============== */
 
 .participant-list {
-    display: flex;
-    flex-direction: column;
-    gap: .6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .participant-card {
-    display: flex;
-    align-items: stretch;
-    background: #23282e;
-    border: 2px solid #3c3c41;
+  display: flex;
+  align-items: stretch;
+  background: #23282e;
+  border: 2px solid #3c3c41;
 }
 
 .participant-card-player {
-    border-color: #785a2888;
+  border-color: #785a2888;
 }
 
 .participant-card-main {
-    position: relative;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: .8rem;
-    padding: .6rem .8rem;
-    text-align: left;
-    min-width: 0;
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  min-width: 0;
 }
 
 .participant-card-main:has(.participant-card-open:hover) {
-    background: #2a2f36;
+  background: #2a2f36;
 }
 
 /* Invisible, covers the whole row — opens the loadout editor. The kit-icon
    buttons below are real, visible buttons stacked above it, same pattern as
    `.champion-card-pick` in ChampionCard.vue; see that file's comment. */
 .participant-card-open {
-    position: absolute;
-    inset: 0;
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
 
 .participant-portrait {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #14171c;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #14171c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .participant-portrait img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .participant-portrait-random {
-    font-size: 1.3em;
-    color: #08abac;
+  font-size: 1.3em;
+  color: #08abac;
 }
 
 .participant-info {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .participant-name {
-    font-weight: bold;
-    color: #c8aa6e;
-    font-size: .95em;
+  font-weight: bold;
+  color: #c8aa6e;
+  font-size: 0.95em;
 }
 
 .participant-summary {
-    font-size: .82em;
-    color: #ddd;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  font-size: 0.82em;
+  color: #ddd;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .participant-kit-icons {
-    display: flex;
-    gap: 3px;
-    margin-top: .3rem;
+  display: flex;
+  gap: 3px;
+  margin-top: 0.3rem;
 }
 
 /* Real, visible buttons — see `.participant-card-open` above and
    ParticipantCard.vue's file comment: `position: relative` is what lets
    these win the click instead of opening the loadout editor underneath. */
 .kit-icon-btn {
-    position: relative;
-    background: transparent;
-    border: 1px solid #3c3c41;
-    border-radius: 3px;
-    padding: 0;
-    cursor: pointer;
-    line-height: 0;
+  position: relative;
+  background: transparent;
+  border: 1px solid #3c3c41;
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
 }
 
 .kit-icon-btn:hover {
-    border-color: #7fd3ff;
+  border-color: #7fd3ff;
 }
 
 .kit-icon-btn img,
 .kit-icon-btn .fa-random {
-    width: 18px;
-    height: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .participant-chevron {
-    align-self: center;
-    color: #999;
-    flex-shrink: 0;
+  align-self: center;
+  color: #999;
+  flex-shrink: 0;
 }
 
 .participant-remove {
-    flex-shrink: 0;
-    width: 44px;
-    background: transparent;
-    border: none;
-    border-left: 2px solid #3c3c41;
-    color: #d98a8a;
-    cursor: pointer;
-    font-size: 1em;
+  flex-shrink: 0;
+  width: 44px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid #3c3c41;
+  color: #d98a8a;
+  cursor: pointer;
+  font-size: 1em;
 }
 
 .participant-remove:hover {
-    background: #3a2222;
+  background: #3a2222;
 }
 
 .participant-add-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    background: #23282e;
-    border: 2px dashed #3c3c41;
-    color: #08abac;
-    padding: .7rem;
-    cursor: pointer;
-    font-size: .9em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #23282e;
+  border: 2px dashed #3c3c41;
+  color: #08abac;
+  padding: 0.7rem;
+  cursor: pointer;
+  font-size: 0.9em;
 }
 
 .participant-add-btn:hover {
-    border-color: #08abac;
+  border-color: #08abac;
 }
 
 /* =============== Settings tab =============== */
 
 .pregame-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
 .pregame-column h2 {
-    font-size: 0.95em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #a09b8c;
-    border-bottom: 1px solid #3c3c41;
-    padding-bottom: .4rem;
-    margin-bottom: .8rem;
+  font-size: 0.95em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #a09b8c;
+  border-bottom: 1px solid #3c3c41;
+  padding-bottom: 0.4rem;
+  margin-bottom: 0.8rem;
 }
 
 .pregame-field {
-    display: block;
-    margin-bottom: .8rem;
-    font-size: .85em;
+  display: block;
+  margin-bottom: 0.8rem;
+  font-size: 0.85em;
 }
 
 .pregame-field span {
-    display: block;
-    margin-bottom: .3rem;
+  display: block;
+  margin-bottom: 0.3rem;
 }
 
-.pregame-field input[type="range"] {
-    width: 100%;
+.pregame-field input[type='range'] {
+  width: 100%;
 }
 
 .pregame-toggle {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    font-size: .85em;
-    margin-bottom: .6rem;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85em;
+  margin-bottom: 0.6rem;
+  cursor: pointer;
 }
 
 /* =============== Input mode (InputModePanel.vue) =============== */
@@ -286,45 +286,45 @@
    game/input/TouchControls.ts. See that component's file comment. */
 
 .input-mode-row {
-    display: flex;
-    gap: .5rem;
-    margin-bottom: .6rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .input-mode-btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .4rem;
-    background: #23282e;
-    border: 2px solid #3c3c41;
-    color: #bbb;
-    padding: .5rem .4rem;
-    font-size: .78em;
-    cursor: pointer;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: #23282e;
+  border: 2px solid #3c3c41;
+  color: #bbb;
+  padding: 0.5rem 0.4rem;
+  font-size: 0.78em;
+  cursor: pointer;
 }
 
 .input-mode-btn:hover {
-    border-color: #785a28;
+  border-color: #785a28;
 }
 
 .input-mode-btn.selected {
-    border-color: #08abac;
-    color: #f0e6d2;
-    background: #102426;
+  border-color: #08abac;
+  color: #f0e6d2;
+  background: #102426;
 }
 
 .input-mode-btn:disabled {
-    opacity: .45;
-    cursor: not-allowed;
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 @media (max-width: 640px) {
-    .pregame-columns {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
+  .pregame-columns {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 /* =============== Loadout editor modal =============== */
@@ -333,17 +333,17 @@
    `activeSlot`) the spell selector. Only one dialog is ever on screen. */
 
 .pregame-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .65);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
 }
 
 .pregame-modal {
-    /* Without this, `height: 100dvh` + `padding` (see the `@media
+  /* Without this, `height: 100dvh` + `padding` (see the `@media
        (max-width: 640px)` block below) renders ~22px taller than the
        viewport — no scroll region involved, just the default `content-box`
        sizing model adding padding *on top of* an already-100%-of-viewport
@@ -351,27 +351,27 @@
        button) below the fold on a real phone even before this pass;
        `border-box` is what makes `height: 100dvh` actually mean "100dvh,
        padding included." */
-    box-sizing: border-box;
-    width: min(760px, 92vw);
-    max-height: 85vh;
-    /* The frame itself never scrolls — exactly one region inside it does.
+  box-sizing: border-box;
+  width: min(760px, 92vw);
+  max-height: 90vh;
+  /* The frame itself never scrolls — exactly one region inside it does.
        See `.pregame-modal-body` just below. */
-    overflow: hidden;
-    background: #1e2328;
-    border: 3px solid transparent;
-    border-image: linear-gradient(#08abac, #01698b) 1;
-    color: #f0e6d2;
-    padding: 1rem 1.2rem 1.2rem;
-    box-shadow: 0 0 30px 6px rgba(0, 0, 0, .5);
-    display: flex;
-    flex-direction: column;
+  overflow: hidden;
+  background: #1e2328;
+  border: 3px solid transparent;
+  border-image: linear-gradient(#08abac, #01698b) 1;
+  color: #f0e6d2;
+  padding: 1rem 1.2rem 1.2rem;
+  box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 /* Narrower than the loadout editor — one spell's icon, name, cost and
    description, not a grid or a catalogue. */
 .spell-preview-modal {
-    width: min(480px, 92vw);
-    max-height: 70vh;
+  width: min(480px, 92vw);
+  max-height: 70vh;
 }
 
 /* The single scrolling region a `.pregame-modal` ever has, in either the
@@ -383,86 +383,88 @@
    see that section below for why it needs its own rule instead of reusing
    this one. */
 .pregame-modal-body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: .3rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.3rem;
 }
 
 .pregame-modal-header {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    margin-bottom: .8rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
 }
 
 .pregame-modal-header h3 {
-    flex: 1;
-    margin: 0;
-    font-size: 1.05em;
-    color: #c8aa6e;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  flex: 1;
+  margin: 0;
+  font-size: 1.05em;
+  color: #c8aa6e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* -------------------------------------------------------- mode + champions */
 
 .kit-mode-toggle {
-    flex-shrink: 0;
-    display: flex;
-    gap: .5rem;
-    margin-bottom: .8rem;
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .kit-mode-btn {
-    flex: 1;
-    background: #23282e;
-    border: 2px solid #3c3c41;
-    color: #bbb;
-    padding: .5rem .6rem;
-    font-size: .8em;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    cursor: pointer;
+  flex: 1;
+  background: #23282e;
+  border: 2px solid #3c3c41;
+  color: #bbb;
+  padding: 0.5rem 0.6rem;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
 }
 
 .kit-mode-btn:hover {
-    border-color: #785a28;
+  border-color: #785a28;
 }
 
 .kit-mode-btn.selected {
-    border-color: #08abac;
-    color: #f0e6d2;
-    background: #102426;
+  border-color: #08abac;
+  color: #f0e6d2;
+  background: #102426;
 }
 
 .champion-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: .6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.6rem;
 }
 
 .champion-card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .3rem;
-    background: #23282e;
-    border: 2px solid #3c3c41;
-    padding: .5rem .4rem;
-    color: #f0e6d2;
-    transition: border-color .15s ease, background .15s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #23282e;
+  border: 2px solid #3c3c41;
+  padding: 0.5rem 0.4rem;
+  color: #f0e6d2;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .champion-card:has(.champion-card-pick:hover) {
-    border-color: #785a28;
+  border-color: #785a28;
 }
 
 .champion-card.selected {
-    border-color: #c8aa6e;
-    background: #2c2418;
+  border-color: #c8aa6e;
+  background: #2c2418;
 }
 
 /* Invisible, covers the whole card — picks the champion. Ability icons
@@ -471,57 +473,58 @@
    `z-index: auto` sibling regardless of DOM order — see ChampionCard.vue's
    file comment) so they intercept their own clicks instead of picking. */
 .champion-card-pick {
-    position: absolute;
-    inset: 0;
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
 
 .champion-portrait {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #14171c;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #14171c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .champion-portrait img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .champion-portrait-random {
-    font-size: 1.4em;
-    color: #08abac;
+  font-size: 1.4em;
+  color: #08abac;
 }
 
 .champion-name {
-    font-size: .78em;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 90px;
+  font-size: 0.78em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
 }
 
-/* Wraps rather than overflowing: a champion has four ability icons and the
-   card is only ~100px wide, so four 44px touch targets (see the body.touch-ui
-   block) cannot sit in one row — without `wrap` they spilled out the right
-   edge into the neighbouring card. Wrapped and centred, they fall to a tidy
-   2×2 block that stays inside the card at any card width. */
+/* A single centred row that shrinks to fit rather than wrapping: a champion
+   has four small ability icons and the card is only ~100px wide, so instead
+   of forcing 44px touch targets (which overflowed) or wrapping to a 2×2 block
+   (which made every card taller and harder to scan), each icon button may
+   shrink below its natural size — `min-width: 0` on the button plus
+   `max-width: 100%` on its image — so four always sit on one line at any card
+   width without spilling out. */
 .champion-spells {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 3px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
 }
 
 /* A real, visible button per ability — see ChampionCard.vue's file comment
@@ -529,35 +532,39 @@
    it is what lets this win the click over the invisible pick button
    underneath, without nesting a <button> inside a <button>. */
 .champion-spell-btn {
-    position: relative;
-    background: transparent;
-    border: 1px solid #3c3c41;
-    border-radius: 3px;
-    padding: 0;
-    cursor: pointer;
-    line-height: 0;
+  position: relative;
+  flex: 0 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid #3c3c41;
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
 }
 
 .champion-spell-btn:hover {
-    border-color: #7fd3ff;
+  border-color: #7fd3ff;
 }
 
 .champion-spell-btn img,
 .champion-spell-btn .fa-random {
-    width: 18px;
-    height: 18px;
+  width: 20px;
+  height: 20px;
+  max-width: 100%;
 }
 
-/* A fixed footer now (sibling of `.pregame-modal-body`, not inside it — see
-   LoadoutEditorModal.vue) — always reachable without scrolling, not just
-   whatever happened to fit under the champion grid. */
+/* The D/F summoner slots, sitting at the end of the champion grid *inside*
+   the scrolling body (see LoadoutEditorModal.vue). It used to be a fixed
+   footer pinned below the body, but on a short screen that reserved footer
+   left the grid almost no room — so it scrolls with the grid now, divided
+   off by a top border. */
 .summoner-row {
-    display: flex;
-    gap: 1.5rem;
-    flex-shrink: 0;
-    margin-top: .8rem;
-    padding-top: .8rem;
-    border-top: 1px solid #3c3c41;
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #3c3c41;
 }
 
 /* -------------------------------------------------------------- kit slots
@@ -567,68 +574,68 @@
    ambiguity on top of the picker's. */
 
 .custom-slot-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: .6rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.6rem;
 }
 
 .kit-slot {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .3rem;
-    background: #23282e;
-    border: 2px solid #3c3c41;
-    padding: .5rem .3rem;
-    cursor: pointer;
-    color: #f0e6d2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: #23282e;
+  border: 2px solid #3c3c41;
+  padding: 0.5rem 0.3rem;
+  cursor: pointer;
+  color: #f0e6d2;
 }
 
 .kit-slot:hover {
-    border-color: #785a28;
+  border-color: #785a28;
 }
 
 .kit-slot-hotkey {
-    font-weight: bold;
-    color: #c8aa6e;
-    font-size: .75em;
+  font-weight: bold;
+  color: #c8aa6e;
+  font-size: 0.75em;
 }
 
 .kit-slot-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 4px;
-    background: #14171c;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  background: #14171c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .kit-slot-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .kit-slot-icon .fa-random {
-    color: #08abac;
+  color: #08abac;
 }
 
 .kit-slot-name {
-    font-size: .68em;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 76px;
+  font-size: 0.68em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 76px;
 }
 
 .custom-slot-hint {
-    font-size: .75em;
-    color: #a09b8c;
-    margin: .4rem 0 .8rem;
-    font-style: italic;
+  font-size: 0.75em;
+  color: #a09b8c;
+  margin: 0.4rem 0 0.8rem;
+  font-style: italic;
 }
 
 /* ---------------------------------------------------------- spell selector
@@ -642,133 +649,163 @@
    regardless of scroll position or whether the touch sheet is open. */
 
 .selector-pane {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Pointer: this is the single scroller for the whole view (the
    single-scroller rule applies here too, not only under body.touch-ui —
-   see the file comment above and SpellSelectorPane.vue's). Neither column
-   below has its own `overflow` on pointer; both are laid out at their
-   natural height and scroll together as one unit. Touch overrides this
-   entirely further down: there, `.selector-catalogue` or the detail sheet's
-   own description area is the scroller, one at a time, and this element
-   does not scroll itself. */
+   see the file comment above and SpellSelectorPane.vue's). The catalogue is
+   the tall column that scrolls; the detail column beside it is `sticky` (see
+   below) so the description of the highlighted spell stays in view instead of
+   scrolling off the top when you browse further down the catalogue. Touch
+   overrides this entirely further down: there, `.selector-catalogue` or the
+   detail sheet's own description area is the scroller, one at a time. */
 .selector-body {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    flex: 1;
-    min-height: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
 }
 
 body:not(.touch-ui) .selector-body {
-    overflow-y: auto;
+  overflow-y: auto;
+}
+
+/* Pins the description beside the catalogue as it scrolls (see the comment
+   above). `align-self: flex-start` stops the column from stretching to the
+   catalogue's full height — a stretched, taller-than-viewport element has no
+   room to stick. Pointer only; touch reflows this to a bottom sheet. */
+body:not(.touch-ui) .selector-detail {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
 }
 
 .selector-catalogue {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-right: .3rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 0.3rem;
 }
 
 .selector-detail {
-    flex: 0 0 260px;
-    border-left: 1px solid #3c3c41;
-    padding-left: 1rem;
+  flex: 0 0 260px;
+  border-left: 1px solid #3c3c41;
+  padding-left: 1rem;
 }
 
 .selector-detail-placeholder {
-    color: #a09b8c;
-    font-size: .85em;
-    font-style: italic;
+  color: #a09b8c;
+  font-size: 0.85em;
+  font-style: italic;
 }
 
+/* Overrides `.hextech-btn`'s menu-scale sizing (18px uppercase, .75rem 2rem
+   padding) — that button headlines the main menu; here it is one action in a
+   cramped picker, so it is toned down to a normal-height footer instead of
+   eating a third of a short screen. */
 .selector-commit {
-    flex-shrink: 0;
-    margin-top: .8rem;
-    width: 100%;
+  flex-shrink: 0;
+  margin-top: 0.8rem;
+  width: 100%;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
 }
 
 .selector-commit:disabled {
-    opacity: .5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .catalog-group-heading {
-    font-size: .8em;
-    color: #a09b8c;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-    margin: .8rem 0 .4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8em;
+  color: #a09b8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.8rem 0 0.4rem;
 }
 
 .catalog-group-heading:first-child {
-    margin-top: 0;
+  margin-top: 0;
+}
+
+/* The champion's portrait (or the ability's own icon for single-spell
+   groups) beside the group name — see SpellGroups[i].image. */
+.catalog-group-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #14171c;
+  flex-shrink: 0;
 }
 
 .catalog-group-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-    gap: .5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 0.5rem;
 }
 
 .catalog-spell-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .25rem;
-    background: #23282e;
-    border: 2px solid #3c3c41;
-    padding: .4rem .3rem;
-    cursor: pointer;
-    color: #f0e6d2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: #23282e;
+  border: 2px solid #3c3c41;
+  padding: 0.4rem 0.3rem;
+  cursor: pointer;
+  color: #f0e6d2;
 }
 
 .catalog-spell-card:hover {
-    border-color: #785a28;
+  border-color: #785a28;
 }
 
 .catalog-spell-card.selected {
-    border-color: #c8aa6e;
-    background: #2c2418;
+  border-color: #c8aa6e;
+  background: #2c2418;
 }
 
 .catalog-spell-card img {
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    pointer-events: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  pointer-events: none;
 }
 
 .catalog-spell-card .catalog-spell-name {
-    font-size: .68em;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 76px;
+  font-size: 0.68em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 76px;
 }
 
 .catalog-random-card {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    background: #23282e;
-    border: 2px dashed #3c3c41;
-    padding: .5rem;
-    cursor: pointer;
-    color: #08abac;
-    margin-bottom: .6rem;
-    font-size: .85em;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #23282e;
+  border: 2px dashed #3c3c41;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #08abac;
+  margin-bottom: 0.6rem;
+  font-size: 0.85em;
+  width: 100%;
 }
 
 .catalog-random-card:hover,
 .catalog-random-card.selected {
-    border-color: #08abac;
+  border-color: #08abac;
 }
 
 /* ---------------------------------------------------------- spell detail —
@@ -776,37 +813,37 @@ body:not(.touch-ui) .selector-body {
    from the shared --spell-* custom properties in styles/main.css. */
 
 .spell-detail-header {
-    display: flex;
-    gap: .8rem;
-    align-items: flex-start;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
 }
 
 .spell-detail-header img {
-    width: 56px;
-    height: 56px;
-    border-radius: 6px;
-    border: 2px solid #9999;
-    flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  border: 2px solid #9999;
+  flex-shrink: 0;
 }
 
 .spell-detail-header h3 {
-    margin: 0 0 .4rem;
-    font-size: 1em;
+  margin: 0 0 0.4rem;
+  font-size: 1em;
 }
 
 .spell-detail-costs {
-    display: flex;
-    gap: 1rem;
-    font-size: .85em;
-    font-weight: bold;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85em;
+  font-weight: bold;
 }
 
 .spell-detail-cooldown {
-    color: #e8c17d;
+  color: #e8c17d;
 }
 
 .spell-detail-mana {
-    color: #9ed4ff;
+  color: #9ed4ff;
 }
 
 /* Only rendered when `SpellDetailPane.vue` is `collapsible` (touch — see the
@@ -814,55 +851,55 @@ body:not(.touch-ui) .selector-body {
    asked for in place of a swipe: a full-width row with a chevron and a
    Vietnamese label, not a hit-target split on the header above it. */
 .spell-detail-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .4rem;
-    width: 100%;
-    margin-top: .6rem;
-    background: #23282e;
-    border: 1px solid #3c3c41;
-    color: #7fd3ff;
-    padding: .4rem;
-    font-size: .8em;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-top: 0.6rem;
+  background: #23282e;
+  border: 1px solid #3c3c41;
+  color: #7fd3ff;
+  padding: 0.4rem;
+  font-size: 0.8em;
+  cursor: pointer;
 }
 
 .spell-detail-toggle:hover {
-    border-color: #7fd3ff88;
+  border-color: #7fd3ff88;
 }
 
 .spell-detail-body {
-    margin-top: .8rem;
-    color: #eee;
-    font-size: .9em;
-    line-height: 1.5;
-    flex: 1;
+  margin-top: 0.8rem;
+  color: #eee;
+  font-size: 0.9em;
+  line-height: 1.5;
+  flex: 1;
 }
 
 .spell-detail-body span {
-    font-style: italic;
+  font-style: italic;
 }
 
 .spell-detail-body .damage {
-    color: var(--spell-damage);
+  color: var(--spell-damage);
 }
 
 .spell-detail-body .buff {
-    color: var(--spell-buff);
+  color: var(--spell-buff);
 }
 
 .spell-detail-body .time {
-    color: var(--spell-time);
+  color: var(--spell-time);
 }
 
 /* ------------------------------------------------------------------ nav */
 
 .pregame-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* ================================================================
@@ -889,34 +926,35 @@ body.touch-ui .champion-card,
 body.touch-ui .input-mode-btn,
 body.touch-ui .spell-detail-toggle,
 body.touch-ui .selector-commit {
-    min-height: 44px;
+  min-height: 44px;
 }
 
-/* Small icon buttons (champion-card abilities, participant kit icons) keep
-   their visual size but get a full 44px tap target via centred padding,
-   rather than growing the icon itself. */
-body.touch-ui .champion-spell-btn,
+/* Participant kit icons keep their visual size but get a full 44px tap
+   target via centred padding, rather than growing the icon itself. The
+   champion-card ability row is deliberately left out: four of them share one
+   ~100px card, where 44px targets overflowed — they stay small, single-row
+   preview icons (see `.champion-spells`). */
 body.touch-ui .kit-icon-btn {
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 body.touch-ui .participant-portrait {
-    width: 56px;
-    height: 56px;
+  width: 56px;
+  height: 56px;
 }
 
 body.touch-ui .kit-slot-icon {
-    width: 52px;
-    height: 52px;
+  width: 52px;
+  height: 52px;
 }
 
 body.touch-ui .catalog-spell-card img {
-    width: 40px;
-    height: 40px;
+  width: 40px;
+  height: 40px;
 }
 
 /* Catalogue on top, a collapsible detail sheet pinned below within thumb
@@ -929,31 +967,31 @@ body.touch-ui .catalog-spell-card img {
    underneath meanwhile. Never both at once — that simultaneous double
    scroll is the exact bug this screen shipped with. */
 body.touch-ui .selector-body {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 body.touch-ui .selector-catalogue {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 body.touch-ui .selector-body.detail-expanded .selector-catalogue {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 body.touch-ui .selector-detail {
-    flex: 0 0 auto;
-    border-left: none;
-    border-top: 1px solid #3c3c41;
-    padding-left: 0;
-    padding-top: .6rem;
-    margin-top: .6rem;
+  flex: 0 0 auto;
+  border-left: none;
+  border-top: 1px solid #3c3c41;
+  padding-left: 0;
+  padding-top: 0.6rem;
+  margin-top: 0.6rem;
 }
 
 body.touch-ui .selector-detail .spell-detail-body {
-    max-height: 42vh;
-    overflow-y: auto;
+  max-height: 42vh;
+  overflow-y: auto;
 }
 
 /* ================================================================
@@ -967,31 +1005,31 @@ body.touch-ui .selector-detail .spell-detail-body {
    ================================================================ */
 
 @media (max-width: 640px) {
-    /* Applies to both `.pregame-modal` (below) and `.spell-preview-modal`,
+  /* Applies to both `.pregame-modal` (below) and `.spell-preview-modal`,
        whose own explicit width (see the "Loadout editor modal" section
        above) still wins over this — a single spell's description does not
        need to go edge to edge just because the viewport is a phone's. */
-    .pregame-modal-backdrop {
-        align-items: stretch;
-        justify-content: stretch;
-    }
+  .pregame-modal-backdrop {
+    align-items: stretch;
+    justify-content: stretch;
+  }
 
-    .pregame-modal {
-        width: 100vw;
-        max-width: none;
-        /* `100vh` on a real phone is the *layout* viewport — taller than
+  .pregame-modal {
+    width: 100vw;
+    max-width: none;
+    /* `100vh` on a real phone is the *layout* viewport — taller than
            what's actually visible above the address bar — which clipped the
            footer (summoner row / commit button) below the fold. `100dvh`
            (dynamic viewport height) tracks the address bar and is what
            actually fits; `100vh` stays first as a fallback for a browser
            that doesn't parse `dvh` (that declaration is simply invalid and
            dropped there, leaving `100vh` in effect). */
-        height: 100vh;
-        height: 100dvh;
-        max-height: none;
-        border-width: 0;
-        padding: .7rem;
-    }
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-width: 0;
+    padding: 0.7rem;
+  }
 }
 
 /* ================================================================
@@ -1009,48 +1047,48 @@ body.touch-ui .selector-detail .spell-detail-body {
    treated the same way.
    ================================================================ */
 @media (max-height: 480px) {
-    .pregame-modal-header {
-        margin-bottom: .4rem;
-    }
+  .pregame-modal-header {
+    margin-bottom: 0.4rem;
+  }
 
-    .kit-mode-toggle {
-        margin-bottom: .4rem;
-    }
+  .kit-mode-toggle {
+    margin-bottom: 0.4rem;
+  }
 
-    /* Champion/custom view: shrink the D/F summoner footer and floor the
+  /* Champion/custom view: shrink the D/F summoner footer and floor the
        scrolling body so the grid always shows at least a couple of rows. */
-    .summoner-row {
-        margin-top: .4rem;
-        padding-top: .4rem;
-    }
+  .summoner-row {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+  }
 
-    body.touch-ui .kit-slot-icon {
-        width: 40px;
-        height: 40px;
-    }
+  body.touch-ui .kit-slot-icon {
+    width: 40px;
+    height: 40px;
+  }
 
-    .pregame-modal-body {
-        min-height: 96px;
-    }
+  .pregame-modal-body {
+    min-height: 96px;
+  }
 
-    /* Spell selector: shrink the detail portrait, tighten the detail
+  /* Spell selector: shrink the detail portrait, tighten the detail
        divider and the commit footer, and floor the catalogue — the exact
        three things that were squeezing it to a clipped single strip. */
-    body.touch-ui .selector-detail .spell-detail-header img {
-        width: 40px;
-        height: 40px;
-    }
+  body.touch-ui .selector-detail .spell-detail-header img {
+    width: 40px;
+    height: 40px;
+  }
 
-    body.touch-ui .selector-detail {
-        padding-top: .4rem;
-        margin-top: .4rem;
-    }
+  body.touch-ui .selector-detail {
+    padding-top: 0.4rem;
+    margin-top: 0.4rem;
+  }
 
-    .selector-commit {
-        margin-top: .4rem;
-    }
+  .selector-commit {
+    margin-top: 0.4rem;
+  }
 
-    body.touch-ui .selector-catalogue {
-        min-height: 84px;
-    }
+  body.touch-ui .selector-catalogue {
+    min-height: 84px;
+  }
 }

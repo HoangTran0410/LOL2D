@@ -47,6 +47,7 @@ import { ref, computed } from 'vue';
 import { getSpellDisplay } from '../../game/preset';
 import type { MatchRules } from '../../game/config/PregameConfig';
 import type { SelectorEntry, SelectorGroup } from './types';
+import AssetManager from '../../managers/AssetManager';
 import SpellIcon from './SpellIcon.vue';
 import SpellDetailPane from './SpellDetailPane.vue';
 
@@ -119,7 +120,15 @@ const commit = (): void => {
         </button>
 
         <template v-for="group in groups" :key="group.name ?? '_flat'">
-          <div v-if="group.name" class="catalog-group-heading">{{ group.name }}</div>
+          <div v-if="group.name" class="catalog-group-heading">
+            <img
+              v-if="group.icon"
+              class="catalog-group-avatar"
+              :src="AssetManager.get(group.icon).url"
+              :alt="group.name"
+            />
+            {{ group.name }}
+          </div>
           <div class="catalog-group-row">
             <button
               v-for="entry in group.entries"

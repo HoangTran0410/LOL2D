@@ -74,6 +74,7 @@ const pickChampion = (championName: string): void => {
 const summonerGroups: SelectorGroup[] = [{ name: null, entries: summoners }];
 const catalogGroups: SelectorGroup[] = SpellGroups.map(group => ({
   name: group.name,
+  icon: group.image,
   entries: (group.spells as SpellClass[])
     .map(spellClass => catalogByClass.get(spellClass))
     .filter((entry): entry is SpellCatalogEntry => !!entry),
@@ -160,12 +161,30 @@ const slotIcon = (choice: SlotChoice) =>
           </button>
         </div>
 
-        <!-- The one scrolling region in this view — see pregame-scene.css's
-             file comment on `.pregame-modal-body` for why the summoner row
-             below sits outside it instead of inside `.kit-mode-panel`. -->
+        <!-- The one scrolling region in this view. The D/F summoner row now
+             sits *inside* it, at the end of the champion grid, rather than as
+             a fixed footer below it: on a short screen a fixed footer stole
+             too much height from the grid it sat under. Scrolling to reach
+             D/F is the accepted cost of giving the champion picker that space
+             back (see `.summoner-row` in pregame-scene.css). -->
         <div class="pregame-modal-body">
           <div v-if="loadout.mode === 'champion'" class="kit-mode-panel">
             <ChampionGrid :selected="loadout.championName" @pick="pickChampion" @preview="openPreview" />
+
+            <div class="summoner-row">
+              <SlotButton
+                label="D"
+                hotkey-title="Phím D"
+                :icon="summonerIcon(loadout.summonerD)"
+                @open="openSummonerSlot('D')"
+              />
+              <SlotButton
+                label="F"
+                hotkey-title="Phím F"
+                :icon="summonerIcon(loadout.summonerF)"
+                @open="openSummonerSlot('F')"
+              />
+            </div>
           </div>
 
           <div v-else class="kit-mode-panel">
@@ -184,21 +203,6 @@ const slotIcon = (choice: SlotChoice) =>
               />
             </div>
           </div>
-        </div>
-
-        <div v-if="loadout.mode === 'champion'" class="summoner-row">
-          <SlotButton
-            label="D"
-            hotkey-title="Phím D"
-            :icon="summonerIcon(loadout.summonerD)"
-            @open="openSummonerSlot('D')"
-          />
-          <SlotButton
-            label="F"
-            hotkey-title="Phím F"
-            :icon="summonerIcon(loadout.summonerF)"
-            @open="openSummonerSlot('F')"
-          />
         </div>
       </template>
 
