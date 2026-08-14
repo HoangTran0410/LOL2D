@@ -412,6 +412,123 @@ describe('TouchControls — preference', () => {
   });
 });
 
+describe('TouchControls — tri-state mode preference', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('defaults to auto with nothing stored', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => null, setItem: () => undefined },
+    });
+    const { touchModePreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchModePreference()).toBe('auto');
+  });
+
+  it('reads a tri-state value back as-is', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => 'touch', setItem: () => undefined },
+    });
+    const { touchModePreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchModePreference()).toBe('touch');
+  });
+
+  it("migrates the old toggle's '1' to 'touch'", async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => '1', setItem: () => undefined },
+    });
+    const { touchModePreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchModePreference()).toBe('touch');
+  });
+
+  it("migrates the old toggle's '0' to 'pointer'", async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => '0', setItem: () => undefined },
+    });
+    const { touchModePreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchModePreference()).toBe('pointer');
+  });
+
+  it('setTouchModePreference writes the tri-state value, not the legacy one', async () => {
+    const setItem = vi.fn();
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => null, setItem },
+    });
+    const { setTouchModePreference } = await import('../../../src/game/input/TouchControls');
+
+    setTouchModePreference('pointer');
+
+    expect(setItem).toHaveBeenCalledWith('lol2d.touchControls', 'pointer');
+  });
+
+  it("'auto' still falls through to capability detection", async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => 'auto', setItem: () => undefined },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 0 });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(false);
+  });
+
+  it("an explicit 'touch' preference wins over a mouse-only device", async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => 'touch', setItem: () => undefined },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 0 });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(true);
+  });
+
+  it("an explicit 'pointer' preference wins over a touch-capable device", async () => {
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => 'pointer', setItem: () => undefined },
+    });
+    vi.stubGlobal('navigator', { maxTouchPoints: 5 });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(false);
+  });
+
+  it('the query parameter still overrides a stored tri-state preference', async () => {
+    vi.stubGlobal('window', {
+      location: { search: '?touch=1' },
+      localStorage: { getItem: () => 'pointer', setItem: () => undefined },
+    });
+    const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchControlsPreference()).toBe(true);
+  });
+
+  it('rememberTouchControlsPreference still resolves to the equivalent tri-state value', async () => {
+    const setItem = vi.fn();
+    vi.stubGlobal('window', {
+      location: { search: '' },
+      localStorage: { getItem: () => null, setItem },
+    });
+    const { rememberTouchControlsPreference } = await import('../../../src/game/input/TouchControls');
+
+    rememberTouchControlsPreference(true);
+    expect(setItem).toHaveBeenCalledWith('lol2d.touchControls', 'touch');
+
+    rememberTouchControlsPreference(false);
+    expect(setItem).toHaveBeenCalledWith('lol2d.touchControls', 'pointer');
+  });
+});
+
 describe('TouchControls — button visual', () => {
   const withView = (overrides: Partial<TouchSpellView>): TouchSpellView => ({
     ...view('DIRECTION'),

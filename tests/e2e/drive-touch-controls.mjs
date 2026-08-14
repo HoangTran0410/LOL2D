@@ -141,41 +141,36 @@ try {
     };
   });
 
-  // What a thumb can and cannot reach: where the HUD strip sits, how big its
-  // targets are, and which badges survive. Compared against the desktop
-  // numbers at the end of the run.
+  // What a thumb can and cannot reach. The bottom-HUD strip that used to sit
+  // here does not render in touch mode at all any more (see
+  // MobileHudView.vue's file comment: health, mana, buff stacks, CC and the
+  // revive countdown all already draw on the canvas over the champion), so
+  // the only DOM control left is the corner button into the spell picker.
+  // Compared against the desktop numbers at the end of the run.
   report.hudTouch = await page.evaluate(() => {
-    const box = document.querySelector('.bottom-HUD')?.getBoundingClientRect();
-    const icon = document.querySelectorAll('.bottom-HUD .spell')[1]?.getBoundingClientRect();
-    const avatar = document.querySelector('.bottom-HUD .champion-avatar img')?.getBoundingClientRect();
-    const toggle = document.querySelector('.touch-toggle')?.getBoundingClientRect();
+    const btn = document.querySelector('.spell-picker-btn')?.getBoundingClientRect();
     const round = n => (n == null ? null : Math.round(n));
     return {
-      strip: box ? { top: round(box.top), left: round(box.left), width: round(box.width), height: round(box.height) } : null,
-      iconSize: round(icon?.width),
-      avatarSize: round(avatar?.width),
-      toggle: toggle ? { right: round(window.innerWidth - toggle.right), size: round(toggle.width) } : null,
-      // querySelector finds a display:none element perfectly well, so this has
-      // to ask the cascade rather than the DOM.
-      hotKeyVisible: (() => {
-        const badge = document.querySelector('.bottom-HUD .spell .hotKey');
-        return !!badge && getComputedStyle(badge).display !== 'none';
-      })(),
+      bottomHudPresent: !!document.querySelector('.bottom-HUD'),
+      pickerBtn: btn
+        ? { top: round(btn.top), right: round(window.innerWidth - btn.right), size: round(btn.width) }
+        : null,
       statsPanelsVisible: getComputedStyle(document.querySelector('#stats')).display !== 'none',
     };
   });
+  check('the bottom-HUD strip does not render in touch mode', report.hudTouch.bottomHudPresent === false);
   check(
-    'the HUD strip is out of both thumbs’ way, at the top',
-    report.hudTouch.strip !== null &&
-      report.hudTouch.strip.top < 20 &&
-      report.hudTouch.strip.left < 20 &&
-      report.hudTouch.strip.top + report.hudTouch.strip.height < VIEWPORT.height * 0.45,
-    JSON.stringify(report.hudTouch.strip)
+    'the spell-picker corner button is up top, out of both thumbs’ way, and at least the 44px thumb target',
+    report.hudTouch.pickerBtn !== null &&
+      report.hudTouch.pickerBtn.top < 20 &&
+      report.hudTouch.pickerBtn.right < 20 &&
+      report.hudTouch.pickerBtn.size >= 44,
+    JSON.stringify(report.hudTouch.pickerBtn)
   );
   check(
-    'the keyboard hint is gone and the profiler is out of the way',
-    report.hudTouch.hotKeyVisible === false && report.hudTouch.statsPanelsVisible === false,
-    `hotkey ${report.hudTouch.hotKeyVisible}, stats ${report.hudTouch.statsPanelsVisible}`
+    'the profiler is out of the way in touch mode',
+    report.hudTouch.statsPanelsVisible === false,
+    `stats ${report.hudTouch.statsPanelsVisible}`
   );
 
   await page.screenshot({ path: `${OUT}-01-layout.png` });
@@ -619,22 +614,24 @@ try {
   // ---------------------------------------------------- HUD in a phone view
 
   await page.evaluate(() => {
-    // `changeSpell`/`closeSpellPicker` live on the shared `HudInteractions`
-    // object now (see src/game/hud/hudInteractions.ts), injected into both
-    // DesktopHudView and MobileHudView rather than owned by the root Vue
-    // instance directly.
-    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.changeSpell(1);
+    // `openSpellPicker`/`closeSpellPicker` live on the shared
+    // `HudInteractions` object (see src/game/hud/hudInteractions.ts),
+    // injected into both DesktopHudView and MobileHudView rather than owned
+    // by the root Vue instance directly. `openSpellPicker` is the touch
+    // corner button's own entry point (`changeSpell` needs an equipped-icon
+    // index the removed bottom-HUD strip used to supply).
+    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker();
   });
   await page.waitForTimeout(700);
   await page.screenshot({ path: `${OUT}-07-spell-picker.png` });
-  await page.evaluate(() => {
-    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.closeSpellPicker();
-  });
-  await page.waitForTimeout(400);
 
-  // The description panel, reached the way a thumb reaches it.
+  // The description panel, reached the way a thumb reaches it — long-
+  // pressing a roster icon inside the now-open picker. There is no
+  // equipped-spell strip icon to long-press any more (see
+  // MobileHudView.vue's file comment), but the picker's own roster always
+  // supported this, independent of the strip.
   const iconBox = await page.evaluate(() => {
-    const icon = document.querySelectorAll('.bottom-HUD .spell')[1];
+    const icon = document.querySelector('.spell-picker .group .spell');
     if (!icon) return null;
     const box = icon.getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
@@ -656,14 +653,21 @@ try {
     await page.screenshot({ path: `${OUT}-08-tooltip.png` });
     await touchEnd();
     check(
-      'long-pressing a spell icon opens its description, on screen',
+      'long-pressing a picker roster icon opens its description, on screen',
       report.longPressTooltip.visible && report.longPressTooltip.onScreen,
       JSON.stringify(report.longPressTooltip)
     );
   }
 
-  // The desktop layout, from the same build, through the same toggle — the
-  // regression check that both live in one HUD.
+  await page.evaluate(() => {
+    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.closeSpellPicker();
+  });
+  await page.waitForTimeout(400);
+
+  // The desktop layout, from the same build, through the same Game API the
+  // (now pregame-Settings-tab-owned) mode preference will eventually call —
+  // the regression check that both live in one HUD. `setTouchControlsEnabled`
+  // stays a plain method on `Game` regardless of what UI calls it.
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.waitForTimeout(500);
   await page.evaluate(() => {
@@ -689,14 +693,13 @@ try {
   });
   await page.screenshot({ path: `${OUT}-09-desktop.png` });
   check(
-    'toggling back restores the desktop HUD',
+    'switching back restores the desktop HUD, unaffected by anything in touch mode',
     report.desktopAfterToggle.controlsEnabled === false &&
       report.desktopAfterToggle.bodyClass === false &&
       report.desktopAfterToggle.hudCentred === true &&
       report.desktopAfterToggle.hudBottomGap < 20 &&
       // 3em plus the 2px padding either side, which is what main has.
       report.desktopAfterToggle.iconSize === 52 &&
-      report.desktopAfterToggle.iconSize > report.hudTouch.iconSize &&
       report.desktopAfterToggle.hotKeyVisible === true,
     JSON.stringify(report.desktopAfterToggle)
   );

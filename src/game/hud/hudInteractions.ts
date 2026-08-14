@@ -129,9 +129,14 @@ export interface HudInteractions {
   filteredSpells(): SpellItemDisplay[];
   pick(spell: SpellItemDisplay): void;
   changeSpell(index: number): void;
+  /**
+   * Opens the picker without a specific icon having been tapped to reach it
+   * — the mobile corner button's entry point, now that the bottom-HUD strip
+   * (and its per-slot tap targets) no longer exists in touch mode.
+   */
+  openSpellPicker(): void;
   closeSpellPicker(): void;
   loadSpellPickerAssets(): void;
-  toggleTouchUi(): void;
 
   /** Armed by a touch landing on a spell icon; fires the description on a hold. */
   touchSpellStart(spellProxy: any, event: any): void;
@@ -228,12 +233,6 @@ export function createHudInteractions(game: Game): HudInteractions {
       state.spellHover = null;
     },
 
-    toggleTouchUi(): void {
-      const next = !state.touchUi;
-      state.touchUi = next;
-      (game as any).setTouchControlsEnabled(next);
-    },
-
     touchSpellStart(spellProxy: any, event: any): void {
       const element = event.currentTarget || event.target;
       state.cancelLongPress();
@@ -303,6 +302,24 @@ export function createHudInteractions(game: Game): HudInteractions {
       state.spellHover = null;
     },
 
+    /**
+     * The mobile corner button's entry point: unlike `changeSpell`, it does
+     * not toggle (there is only one way in, so there is nothing to toggle
+     * against) and it does not arrive already knowing which slot the player
+     * wants — the strip used to answer that by which icon was tapped, and
+     * that per-icon surface is exactly what got removed. Defaults to the
+     * first ability; `SpellPickerModal`'s slot selector (touch-ui only) lets
+     * the player switch to any other slot, including the basic attack and
+     * the summoners, without leaving the modal.
+     */
+    openSpellPicker(): void {
+      state.spellIndexToSwap = 1;
+      state.showSpellsPicker = true;
+      state.loadSpellPickerAssets();
+      game.pause();
+      state.spellHover = null;
+    },
+
     loadSpellPickerAssets(): void {
       const keys = new Set<AssetKey>();
       const add = (key: AssetKey | null) => {
@@ -335,10 +352,21 @@ export function createHudInteractions(game: Game): HudInteractions {
      * Place the description panel next to `element`.
      *
      * Above it with a mouse, because the spell bar is along the bottom of the
-     * screen. Below it under a thumb, because in touch mode the bar has moved
-     * to the top and "above" would be off the screen entirely. The panel also
+     * screen. Below it under a thumb, because in touch mode the bar used to
+     * be at the top and "above" would have been off the screen entirely —
+     * the bar is gone now (see `MobileHudView.vue`), but the picker's own
+     * roster this is reached from is still anchored near the top of a
+     * viewport-filling modal, so the reasoning still holds. The panel also
      * stops being a fixed 300px there — that is most of a phone held sideways
-     * — and is kept inside the viewport on both edges.
+     * — and is kept inside the viewport on all four edges, not just the two
+     * sides: an icon long-pressed near the top of the picker's roster (the
+     * basic attack, first in the list, is the easy way to hit this) used to
+     * push the panel's bottom edge past the bottom of the screen, because
+     * only `left` was ever clamped. Caught by retargeting
+     * `drive-touch-controls.mjs`'s long-press check from the strip (always
+     * near the very top, so "below" always had the whole screen to work
+     * with) to a picker roster icon after the strip came out — a case that
+     * was always reachable, just never exercised.
      */
     showSpellInfo(spellProxy: any, element: any): void {
       if (!element?.getBoundingClientRect) return;
@@ -360,8 +388,14 @@ export function createHudInteractions(game: Game): HudInteractions {
         Math.max(x + width / 2 - panelWidth / 2, 6),
         Math.max(6, window.innerWidth - panelWidth - 6)
       );
+      // Matches body.touch-ui .spell-info's `max-height: 60vh` in
+      // styles/hud.css — the panel scrolls its own overflow past that, but
+      // nothing stopped its *top* from landing so low the whole box, or most
+      // of it, sat below the viewport.
+      const maxPanelHeight = window.innerHeight * 0.6;
+      const top = Math.min(bottom + 8, Math.max(6, window.innerHeight - maxPanelHeight - 6));
       state.spellInfo = {
-        top: bottom + 8 + 'px',
+        top: top + 'px',
         bottom: 'auto',
         left: left + 'px',
         width: panelWidth + 'px',

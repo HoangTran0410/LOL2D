@@ -14,6 +14,17 @@
  * even with the underlying bug still in place, which is exactly how the bug
  * shipped the first time.
  *
+ * The bottom-HUD strip this used to tap into no longer renders in touch
+ * mode at all (see `MobileHudView.vue`'s file comment): health, mana, buff
+ * stacks, CC and the revive countdown all already draw on the canvas over
+ * the champion, and the loadout row duplicated the canvas spell buttons. The
+ * one entry point left into the picker is the corner button
+ * (`.spell-picker-btn`), and since it no longer knows which slot the player
+ * wants — the strip used to answer that by which icon was tapped — the
+ * picker gained its own slot selector (`.slot-picker .slot-pill`). Both are
+ * new surfaces this script has to prove work under a real thumb, not a
+ * synthetic click, for the same reason as everything else here.
+ *
  *   node tests/e2e/drive-mobile-hud.mjs [outPrefix]
  *
  * Requires a system Chrome install.
@@ -79,33 +90,73 @@ try {
   });
   await page.waitForTimeout(1_500);
 
+  // ------------------------------------------------- 0. the strip is gone
+
+  report.bottomHudPresent = await page.evaluate(() => !!document.querySelector('.bottom-HUD'));
+  check('the bottom-HUD strip does not render in touch mode', report.bottomHudPresent === false);
+  await page.screenshot({ path: `${OUT}-00-no-strip.png` });
+
   // ---------------------------------------------------- 1. real tap opens it
 
-  const iconBox = await page.evaluate(() => {
-    const icon = document.querySelectorAll('.bottom-HUD .spell')[1];
-    const box = icon.getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const pickerBtnBox = await page.evaluate(() => {
+    const box = document.querySelector('.spell-picker-btn').getBoundingClientRect();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
   });
+  check(
+    'the corner spell-picker button is at least the 44px thumb target',
+    pickerBtnBox.w >= 44 && pickerBtnBox.h >= 44,
+    `${pickerBtnBox.w}x${pickerBtnBox.h}`
+  );
 
   const pickerBeforeTap = await page.evaluate(
     () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker
   );
-  await tap(iconBox.x, iconBox.y);
+  await tap(pickerBtnBox.x, pickerBtnBox.y);
   await page.waitForTimeout(300);
   report.pickerAfterRealTap = await page.evaluate(
     () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker
   );
   check(
-    'a real touch tap on the strip opens the spell picker',
+    'a real touch tap on the corner button opens the spell picker',
     pickerBeforeTap === false && report.pickerAfterRealTap === true,
     `before ${pickerBeforeTap}, after ${report.pickerAfterRealTap}`
   );
+  report.slotOnOpen = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.spellIndexToSwap
+  );
+  check('opening from the corner button defaults to slot 1 (Q)', report.slotOnOpen === 1);
   await page.screenshot({ path: `${OUT}-01-picker-open.png` });
 
-  // ------------------------------------------- 2. picking one under a thumb
+  // -------------------------------------------- 2. the in-modal slot selector
+
+  const slotPills = await page.evaluate(() =>
+    [...document.querySelectorAll('.slot-picker .slot-pill')].map(el => {
+      const box = el.getBoundingClientRect();
+      return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
+    })
+  );
+  check('the slot selector has one pill per equipped slot', slotPills.length === 7, `${slotPills.length}`);
+  check(
+    'each slot pill is at least the 44px thumb target',
+    slotPills.every(p => p.w >= 44 && p.h >= 44),
+    JSON.stringify(slotPills.map(p => `${p.w}x${p.h}`))
+  );
+  // Slot 2 (W) under a real tap, not a direct field write.
+  await tap(slotPills[2].x, slotPills[2].y, 40);
+  await page.waitForTimeout(150);
+  report.slotAfterPillTap = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.spellIndexToSwap
+  );
+  check(
+    'a real touch tap on a slot pill retargets which slot gets replaced',
+    report.slotAfterPillTap === 2,
+    `${report.slotOnOpen} -> ${report.slotAfterPillTap}`
+  );
+
+  // ------------------------------------------- 3. picking one under a thumb
 
   const beforePick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[1]?.constructor.name
+    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
   );
   // Shaco is in the roster (see the desktop picker screenshot); his kit is
   // distinct from whatever the random preset gave the player, so a real
@@ -124,19 +175,19 @@ try {
     await page.waitForTimeout(250);
   }
   const afterPick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[1]?.constructor.name
+    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
   );
   report.pick = { beforePick, afterPick };
   check(
-    'a real touch tap on a picker entry equips it',
+    'a real touch tap on a picker entry equips it into the slot the pill selected (slot 2, not the slot-1 default)',
     afterPick !== beforePick && afterPick?.startsWith('Shaco'),
     `${beforePick} -> ${afterPick}`
   );
   // pick() closes the picker itself; reopen for the rest of the checks.
-  await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.changeSpell(1));
+  await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker());
   await page.waitForTimeout(300);
 
-  // --------------------------------------------------- 3. checkboxes toggle
+  // --------------------------------------------------- 4. checkboxes toggle
 
   const checkboxBox = await page.evaluate(() => {
     const box = document.querySelector('#oneForAll').getBoundingClientRect();
@@ -156,7 +207,7 @@ try {
     `${before1ForAll} -> ${after1ForAll}`
   );
 
-  // ----------------------------------------------------------- 4. scrolling
+  // ----------------------------------------------------------- 5. scrolling
 
   const scrollBefore = await page.evaluate(() => document.querySelector('.spell-picker').scrollTop);
   const pickerBox = await page.evaluate(() => {
@@ -178,11 +229,11 @@ try {
     `scrollTop ${scrollBefore} -> ${scrollDuring}`
   );
 
-  // ------------------------------- 5. a drag that starts on an icon scrolls,
+  // ------------------------------- 6. a drag that starts on an icon scrolls,
   //                                    it does not also pick that icon
 
   const beforeDragPick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[1]?.constructor.name
+    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
   );
   const firstVisibleIcon = await page.evaluate(() => {
     const icon = document.querySelector('.spell-picker .group .spell');
@@ -197,7 +248,7 @@ try {
   await touchEnd();
   await page.waitForTimeout(200);
   const afterDragPick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[1]?.constructor.name
+    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
   );
   check(
     'a drag that starts on a picker icon (scrolling) does not equip it',
@@ -205,7 +256,7 @@ try {
     `${beforeDragPick} -> ${afterDragPick}`
   );
 
-  // ---------------------------------------------------------- 6. close button
+  // ---------------------------------------------------------- 7. close button
 
   const closeBox = await page.evaluate(() => {
     const box = document.querySelector('.spell-picker .close-btn').getBoundingClientRect();
@@ -223,14 +274,42 @@ try {
   );
   check('a real touch tap on the close button closes the picker', report.pickerAfterClose === false);
 
-  // --------------------------------------------- 7. high-DPI overlap check
+  // --------------------------------------------- 8. high-DPI overlap checks
 
-  report.badgeOverlap = await page.evaluate(() => {
-    const icons = [...document.querySelectorAll('.bottom-HUD .spell')];
+  // The corner button must clear the ability/summoner arc's topmost point —
+  // the geometry `InGameHUD.vue`'s file comment says this was checked
+  // against via `computeTouchLayout`, read back here from the same
+  // `currentLayout` the canvas buttons themselves use, at the real viewport
+  // this test runs at (not a hand-picked one).
+  report.cornerVsArc = await page.evaluate(() => {
+    const btn = document.querySelector('.spell-picker-btn')?.getBoundingClientRect();
+    const layout = window.__lol2d.scene.oScene.game.touchControls.currentLayout;
+    if (!btn) return { missing: true };
+    let minButtonTop = Infinity;
+    for (const b of layout.buttons) minButtonTop = Math.min(minButtonTop, b.y - b.radius);
+    return { buttonBottom: btn.bottom, arcTop: minButtonTop, clears: btn.bottom < minButtonTop };
+  });
+  check(
+    'the corner button sits above the ability/summoner arc, not overlapping it',
+    report.cornerVsArc.clears === true,
+    JSON.stringify(report.cornerVsArc)
+  );
+  await page.screenshot({
+    path: `${OUT}-02-corner-zoom.png`,
+    clip: { x: VIEWPORT.width - 140, y: 0, width: 140, height: 70 },
+  });
+
+  // Reopen to screenshot and check the slot pills' hotkey badges the same
+  // way the old strip's edit-badges were checked: nothing bleeds into the
+  // next pill at 3x device scale.
+  await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker());
+  await page.waitForTimeout(300);
+  report.slotPillBadgeOverlap = await page.evaluate(() => {
+    const pills = [...document.querySelectorAll('.slot-picker .slot-pill')];
     const overlaps = [];
-    for (let i = 0; i < icons.length - 1; i++) {
-      const a = icons[i].querySelector('.edit-badge')?.getBoundingClientRect();
-      const b = icons[i + 1].getBoundingClientRect();
+    for (let i = 0; i < pills.length - 1; i++) {
+      const a = pills[i].querySelector('.slot-pill-key')?.getBoundingClientRect();
+      const b = pills[i + 1].getBoundingClientRect();
       if (a && a.right > b.left + 2) {
         overlaps.push({ i, badgeRight: a.right, nextLeft: b.left });
       }
@@ -238,11 +317,11 @@ try {
     return overlaps;
   });
   check(
-    'no icon\'s edit badge overlaps the next icon (checked at 3x device scale)',
-    report.badgeOverlap.length === 0,
-    JSON.stringify(report.badgeOverlap)
+    "no slot pill's hotkey badge overlaps the next pill (checked at 3x device scale)",
+    report.slotPillBadgeOverlap.length === 0,
+    JSON.stringify(report.slotPillBadgeOverlap)
   );
-  await page.screenshot({ path: `${OUT}-02-strip-zoom.png`, clip: { x: 0, y: 0, width: 260, height: 60 } });
+  await page.screenshot({ path: `${OUT}-03-slot-picker-zoom.png`, clip: { x: 0, y: 30, width: 400, height: 80 } });
 } catch (error) {
   failures.push(`threw: ${error.stack ?? error}`);
 } finally {

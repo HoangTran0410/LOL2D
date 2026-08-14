@@ -400,6 +400,55 @@
 .spell-picker .list {
 }
 
+/* Touch-ui only — see SpellPickerModal.vue's file comment. Picks which
+   equipped slot the next tap in the roster below will replace; 44px
+   matches the close button and checkboxes as the smallest reliable thumb
+   target. */
+.slot-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.slot-pill {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 8px;
+  border: 2px solid #fff3;
+  background-color: #0002;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.slot-pill img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slot-pill.active {
+  border-color: #7fd3ff;
+  box-shadow: 0 0 0 2px #7fd3ff55;
+}
+
+.slot-pill-key {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  min-width: 14px;
+  padding: 0 2px;
+  line-height: 14px;
+  font-size: 0.65em;
+  text-align: center;
+  color: #eee;
+  background: #000c;
+  border-radius: 4px 0 4px 0;
+}
+
 .spell-picker .spell {
   margin: 2px;
   display: inline-block;
@@ -532,128 +581,19 @@
    layout is untouched by construction: none of these selectors can match
    unless the mode is on.
 
-   The shape of the problem: in Wild Rift the bottom band belongs to two
-   thumbs, and this HUD was sitting in the middle of it. So the whole strip
-   moves to the top-left, where nothing covers it, and the canvas controls own
-   the bottom. The strip stops being a cast surface there and becomes a
-   loadout readout — you still tap a slot to change the ability and long-press
-   it to read what it does, which are both deliberate actions rather than
-   things a thumb does by accident mid-fight. */
+   The bottom-HUD used to move up to the top-left in touch mode — a compact
+   loadout readout instead of a cast surface, since the bottom band belongs
+   to two thumbs in a Wild Rift-shaped control scheme. It does not render in
+   touch mode at all any more (see `MobileHudView.vue`'s file comment for
+   the audit behind that: health, mana, buff stacks, CC and the revive
+   countdown all already draw on the canvas over the champion's own head).
+   `.bottom-HUD` and its children stay unscoped below — `DesktopHudView`
+   still renders them, unconditionally, exactly as before — so nothing here
+   needs a `body.touch-ui` override any more. */
 
-body.touch-ui .bottom-HUD {
-  top: 6px;
-  bottom: auto;
-  left: 6px;
-  transform: none;
-  margin-bottom: 0;
-  padding: 4px 10px 4px 4px;
-  border-top-left-radius: 6px;
-  background-color: #111e;
-}
-
-body.touch-ui .bottom-HUD .champion-avatar img {
-  width: 46px;
-  height: 46px;
-}
-
-body.touch-ui .champion-avatar .revive-counter {
-  line-height: 46px;
-  font-size: 1.1em;
-}
-
-body.touch-ui .champion-details {
-  margin-left: 6px;
-}
-
-/* Smaller than the desktop icons, but not as small as the old "cast surface
-   moved away, so shrink it" sizing: these are still the *only* way to reach
-   the spell picker on a touch device (see MobileHudView's touchend
-   handlers), so they stay close to 44px — the smallest target a thumb hits
-   reliably, same number the picker's own close button and checkboxes use. */
-body.touch-ui .bottom-HUD .spell {
-  width: 2.75em;
-  height: 2.75em;
-}
-
-body.touch-ui .bottom-HUD .spell.small {
-  width: 2.3em !important;
-  height: 2.3em !important;
-}
-
-/* There is no keyboard, so the letter in the corner is noise that only
-   crowds the two badges that still mean something. */
-body.touch-ui .spell .hotKey {
-  display: none;
-}
-
-body.touch-ui .bottom-HUD .spell .stacks,
-body.touch-ui .bottom-HUD .spell .mana-cost {
-  font-size: 0.6em;
-  min-width: 12px;
-  line-height: 13px;
-  padding: 0 2px;
-  border-radius: 7px;
-}
-
-/* The pencil badge: cooldown itself lives on the canvas buttons now (see
-   TouchControls.describeButtonVisual), so nothing on this strip is a live
-   combat readout any more — it is a loadout list, and tapping an icon swaps
-   that slot. The badge is what tells a thumb these small icons are still
-   buttons and not just decoration. Bottom-right, the corner the (hidden,
-   touch has no keyboard) hotkey letter leaves free — `.stacks` owns
-   top-left and `.mana-cost` sits inset at bottom-left, so this is the one
-   corner nothing else on the icon already claims. */
-body.touch-ui .bottom-HUD .spell .edit-badge {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 14px;
-  height: 14px;
-  line-height: 14px;
-  text-align: center;
-  font-size: 8px;
-  color: #cfe8ff;
-  background: #0b1e3899;
-  border: 1px solid #3d7fb8;
-  border-radius: 50%;
-  z-index: 11;
-}
-
-body.touch-ui .health-bar {
-  margin-top: 4px;
-}
-
-body.touch-ui .health-bar .bar {
-  height: 13px;
-}
-
-body.touch-ui .health-bar .bar p {
-  font-size: 0.7em;
-}
-
-/* The buffs hang *above* the bar on the desktop, which is off the top of the
-   screen once the strip has moved there. They drop underneath instead, and
-   wrap rather than running off the side of a 390px-tall phone. */
-body.touch-ui .buffs {
-  top: auto;
-  bottom: -4px;
-  transform: translateY(100%);
-  flex-wrap: wrap;
-  max-width: 55vw;
-  gap: 2px;
-}
-
-body.touch-ui .buffs .buff {
-  width: 30px;
-  height: 30px;
-}
-
-body.touch-ui .buffs .buff span {
-  font-size: 0.65em;
-  padding: 0 3px;
-}
-
-/* The three profiler panels land exactly where the strip now is. */
+/* The three profiler panels are hidden in touch mode independently of the
+   strip's old position — they are a dev tool, not sized or meant for a
+   thumb either way. */
 body.touch-ui #stats {
   display: none;
 }
@@ -737,12 +677,15 @@ body.touch-ui .spell-picker .tooltip .tooltiptext {
   display: none;
 }
 
-/* =============== Mode toggle =============== */
-/* The explicit switch. It exists for two reasons: a hybrid device (a laptop
-   with a touch screen, a tablet with a keyboard) guesses wrong either way, and
-   without it none of this could be driven from a desktop Chrome, which is
-   where every end-to-end test runs. */
-.touch-toggle {
+/* =============== Corner control =============== */
+/* The spell-picker entry point — touch-ui only. On the desktop each
+   equipped icon on the bottom-HUD is already its own way into the picker;
+   in touch mode that strip does not render at all (see MobileHudView.vue),
+   so this is the one entry point left. Anchored top-right like the old
+   mode toggle was, but alone now: the toggle moved to the pregame setup
+   screen's Settings tab, a global preference rather than a permanent
+   in-game control (see InGameHUD.vue's file comment). */
+.corner-btn {
   position: fixed;
   top: 6px;
   right: 6px;
@@ -758,17 +701,21 @@ body.touch-ui .spell-picker .tooltip .tooltiptext {
   cursor: pointer;
 }
 
-.touch-toggle:hover {
+.corner-btn:hover {
   color: #ddd;
   border-color: #fff6;
 }
 
-.touch-toggle.on {
-  color: #7fd3ff;
-  border-color: #7fd3ff88;
+.spell-picker-btn {
+  color: #d9b568;
 }
 
-body.touch-ui .touch-toggle {
+.spell-picker-btn:hover {
+  color: #f0cf8a;
+  border-color: #d9b56888;
+}
+
+body.touch-ui .corner-btn {
   width: 46px;
   height: 46px;
   font-size: 1.25em;

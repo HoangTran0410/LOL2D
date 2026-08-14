@@ -127,5 +127,5 @@ const hud = inject<HudInteractions>('hud')!;
     </div>
   </div>
 
-  <SpellPickerModal v-if="hud.showSpellsPicker" />
+  <SpellPickerModal v-if="hud.showSpellsPicker" :state="state" />
 </template>

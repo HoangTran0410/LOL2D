@@ -1,10 +1,25 @@
 <script setup lang="ts">
 /**
- * The HUD app's root component: the always-visible touch/mouse mode toggle,
- * plus a switch between `DesktopHudView` and `MobileHudView` on `hud.touchUi`
- * — the same flag the on-screen toggle and `Game.applyTouchUiClass` already
- * use, not a viewport breakpoint (see `styles/hud.css`'s "Touch layout"
- * section for why).
+ * The HUD app's root component: the corner control, plus a switch between
+ * `DesktopHudView` and `MobileHudView` on `hud.touchUi` — the same flag
+ * `Game.applyTouchUiClass` uses, not a viewport breakpoint (see
+ * `styles/hud.css`'s "Touch layout" section for why).
+ *
+ * There used to be a second, always-visible button here — an in-game
+ * mouse/touch mode toggle. It moved to the pregame setup screen's Settings
+ * tab: a global preference a player sets roughly once does not earn
+ * permanent on-screen real estate, doubly so right after the bottom-HUD
+ * strip came out specifically to reclaim screen space. See
+ * `TouchControls.ts`'s `touchModePreference`/`setTouchModePreference` for
+ * the tri-state ('auto' | 'touch' | 'pointer') that setting now reads and
+ * writes, and `?touch=1` for how this HUD's own touch-mode e2e coverage
+ * keeps working without that button — the query parameter resolves ahead of
+ * the stored preference, independent of any UI control.
+ *
+ * The one control left is touch-only: since `MobileHudView` no longer
+ * renders a bottom-HUD strip (each equipped icon used to be its own tap
+ * target into the spell picker), this corner button is the one entry point
+ * left to reach it.
  *
  * `hud` (the shared `HudInteractions`, created once per game) arrives as a
  * prop from `InGameHUD.ts` rather than being constructed here, because it
@@ -45,18 +60,17 @@ defineExpose({
 </script>
 
 <template>
-  <!-- Hidden behind the picker: both live in the top-right corner, and the
-       toggle would otherwise sit on top of the picker's close button, which
-       is the only way out of it. -->
+  <!-- Hidden behind the picker: it lives in the top-right corner too (its
+       own close button), and this would otherwise sit on top of it — the
+       only way out of the modal. -->
   <button
-    v-if="!hud.showSpellsPicker"
-    class="touch-toggle"
-    :class="hud.touchUi ? 'on' : ''"
-    @click="hud.toggleTouchUi()"
-    @touchend.prevent="hud.toggleTouchUi()"
-    :title="hud.touchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'"
+    v-if="hud.touchUi && !hud.showSpellsPicker"
+    class="corner-btn spell-picker-btn"
+    @click="hud.openSpellPicker()"
+    @touchend.prevent="hud.openSpellPicker()"
+    title="Đổi chiêu thức"
   >
-    <i class="fa-solid fa-gamepad"></i>
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
   </button>
 
   <DesktopHudView v-if="state && !hud.touchUi" :state="state" />

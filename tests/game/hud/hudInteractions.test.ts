@@ -81,7 +81,6 @@ describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
       objectManager: { objects: [] },
       pause: vi.fn(),
       unpause: vi.fn(),
-      setTouchControlsEnabled: vi.fn(),
     } as any;
   };
 
@@ -141,5 +140,27 @@ describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
     hud.touchSpellMove(touchAt(100, 100 + TAP_MOVE_TOLERANCE_PX + 5));
     vi.advanceTimersByTime(LONG_PRESS_MS + 10);
     expect(hud.spellHover).toBeNull();
+  });
+
+  describe('openSpellPicker', () => {
+    // The mobile corner button's entry point: it does not arrive already
+    // knowing which slot the player wants, unlike changeSpell(index), so it
+    // has to pick a sensible default for the in-modal slot selector to
+    // start from.
+    it('opens the picker targeting the first ability slot (index 1) by default', () => {
+      const game = fakeGame();
+      const hud = createHudInteractions(game);
+      hud.openSpellPicker();
+      expect(hud.showSpellsPicker).toBe(true);
+      expect(hud.spellIndexToSwap).toBe(1);
+      expect(game.pause).toHaveBeenCalledOnce();
+    });
+
+    it('always opens, unlike changeSpell it does not toggle an already-open picker shut', () => {
+      const hud = createHudInteractions(fakeGame());
+      hud.openSpellPicker();
+      hud.openSpellPicker();
+      expect(hud.showSpellsPicker).toBe(true);
+    });
   });
 });

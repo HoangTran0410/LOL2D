@@ -38,9 +38,21 @@
  * alone. `position: sticky` sidesteps the whole question: it needs nothing
  * from its container but *a* scrolling ancestor, which `.spell-picker`
  * (unchanged, still just `overflow-y: auto` on itself) already is.
+ *
+ * The slot selector (`.slot-picker`, touch-ui only) is the other mode-
+ * specific piece. On the desktop it is redundant — the bottom-HUD strip has
+ * one tap target per equipped spell, so which slot you are replacing is
+ * already decided by which icon you clicked before the picker even opened.
+ * That strip does not exist in touch mode any more (see `InGameHUD.vue`),
+ * so its one entry point — the corner button, `hud.openSpellPicker()` —
+ * cannot know which slot the player wants either. This row is how they
+ * choose, without leaving the modal.
  */
 import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
+import type { HudState } from './hudState';
+
+defineProps<{ state: HudState }>();
 
 const hud = inject<HudInteractions>('hud')!;
 
@@ -77,6 +89,23 @@ function scrollTouchMove(event: TouchEvent): void {
       </button>
     </div>
     <p class="title">Chọn chiêu thức</p>
+
+    <!-- Touch-only: picks which equipped slot the tap below will replace.
+         See the file comment for why this only exists in touch mode. -->
+    <div class="slot-picker" v-if="hud.touchUi">
+      <button
+        v-for="(spell, index) of state.spells"
+        :key="index"
+        type="button"
+        class="slot-pill"
+        :class="{ active: hud.spellIndexToSwap === index }"
+        @click="hud.spellIndexToSwap = index"
+        @touchend.prevent="hud.spellIndexToSwap = index"
+      >
+        <img :src="spell.image" alt="spell" />
+        <span class="slot-pill-key">{{ spell.hotKey }}</span>
+      </button>
+    </div>
 
     <p>
       Chế độ (mới):
