@@ -100,7 +100,10 @@ export const AI_COUNT_MAX = 10;
 export const CDR_PERCENT_MIN = 0;
 export const CDR_PERCENT_MAX = 90;
 
-const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze({
+/** The value every bot slot starts at, and what a freed slot is refilled with
+ *  when a bot is removed from the middle of the list — see `removeBotAt` in
+ *  usePregameConfig.ts. */
+export const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze({
   mode: 'champion',
   championName: 'random',
   summonerD: 'Flash',

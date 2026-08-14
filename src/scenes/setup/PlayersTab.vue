@@ -3,17 +3,14 @@
  * "Tướng" tab: the player first (clearly marked — `label="Bạn"` and its own
  * accent, see `.participant-card-player` in pregame-scene.css), then every
  * active bot, then the bot-count control as direct manipulation on the list
- * itself — "+ Thêm Bot" appends one, and only the *last* bot's card offers
- * removal.
+ * itself — "+ Thêm Bot" appends one, and every bot's card offers removal.
  *
- * Removal is deliberately only offered on the last card, not on every one:
- * `PregameConfig.AIConfig.bots` is a fixed-length, positional array (`count`
- * just says how many of its first entries are active — see the type's own
- * doc comment), so "remove bot 2" while bot 5 stays active would have to
- * either reorder every bot after it or leave a hole, both of which would
- * silently discard configuration the player never touched. Removing the last
- * one is the only operation that has no such side effect, so it is the only
- * one offered.
+ * Removal is offered on every card, not just the last: removing "Bot 2"
+ * shifts Bot 3 up into its place (see `removeBotAt` in usePregameConfig.ts).
+ * The remaining bots keep their loadouts — they just move down a slot — which
+ * is what a player expects when they delete a *specific* opponent from the
+ * list, rather than only ever being able to lop off whichever one happens to
+ * be last.
  */
 import { AI_COUNT_MAX } from '../../game/config/PregameConfig';
 import type { PregameConfig } from '../../game/config/PregameConfig';
@@ -25,7 +22,7 @@ const emit = defineEmits<{
   openPlayer: [];
   openBot: [index: number];
   addBot: [];
-  removeBot: [];
+  removeBot: [index: number];
   previewAbility: [spellClass: SpellClass];
 }>();
 </script>
@@ -45,9 +42,9 @@ const emit = defineEmits<{
       :key="index"
       :label="`Bot ${index + 1}`"
       :loadout="loadout"
-      :removable="index === config.ai.count - 1"
+      removable
       @open="emit('openBot', index)"
-      @remove="emit('removeBot')"
+      @remove="emit('removeBot', index)"
       @preview-ability="spellClass => emit('previewAbility', spellClass)"
     />
 

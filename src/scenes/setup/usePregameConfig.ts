@@ -5,6 +5,8 @@ import {
   sanitizePregameConfig,
   toMatchRules,
   DEFAULT_PREGAME_CONFIG,
+  DEFAULT_CHAMPION_LOADOUT,
+  AI_COUNT_MIN,
   type PregameConfig,
   type ChampionLoadout,
   type MatchRules,
@@ -17,6 +19,8 @@ export interface PregameConfigController {
   setPlayerLoadout(loadout: ChampionLoadout): void;
   setBotLoadout(index: number, loadout: ChampionLoadout): void;
   setAiCount(count: number): void;
+  /** Remove one bot by list position (not just the last), shifting the rest up. */
+  removeBotAt(index: number): void;
   setAiFlag(flag: 'autoMove' | 'autoAttack' | 'autoCast', value: boolean): void;
   setCooldownReduction(percent: number): void;
   setManaFree(value: boolean): void;
@@ -62,6 +66,24 @@ export const usePregameConfig = (): PregameConfigController => {
     persist();
   };
 
+  /**
+   * Remove the bot at `index` from the active list, shifting every bot after
+   * it up one and dropping `count` by one. The remaining active bots keep
+   * their loadouts — they just move down a slot — which is the whole point of
+   * removing a *specific* bot rather than only the last one. The fixed-length
+   * `bots` array (always `AI_COUNT_MAX` entries — see the type's doc comment)
+   * is preserved by refilling the freed tail slot with a default loadout.
+   */
+  const removeBotAt = (index: number): void => {
+    if (index < 0 || index >= config.value.ai.count) return;
+    const bots = config.value.ai.bots.slice();
+    bots.splice(index, 1);
+    bots.push(DEFAULT_CHAMPION_LOADOUT);
+    const count = Math.max(AI_COUNT_MIN, config.value.ai.count - 1);
+    config.value = { ...config.value, ai: { ...config.value.ai, count, bots } };
+    persist();
+  };
+
   const setAiFlag = (flag: 'autoMove' | 'autoAttack' | 'autoCast', value: boolean): void => {
     config.value = { ...config.value, ai: { ...config.value.ai, [flag]: value } };
     persist();
@@ -93,6 +115,7 @@ export const usePregameConfig = (): PregameConfigController => {
     setPlayerLoadout,
     setBotLoadout,
     setAiCount,
+    removeBotAt,
     setAiFlag,
     setCooldownReduction,
     setManaFree,

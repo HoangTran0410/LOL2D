@@ -25,7 +25,7 @@
 import { ref, computed } from 'vue';
 import { usePregameConfig } from './setup/usePregameConfig';
 import { useTouchUi } from './setup/useTouchUi';
-import { AI_COUNT_MIN, AI_COUNT_MAX, type ChampionLoadout } from '../game/config/PregameConfig';
+import { AI_COUNT_MAX, type ChampionLoadout } from '../game/config/PregameConfig';
 import { getSpellDisplay, type SpellDisplay } from '../game/preset';
 import type { SpellClass } from './setup/types';
 import PlayersTab from './setup/PlayersTab.vue';
@@ -41,6 +41,7 @@ const {
   setPlayerLoadout,
   setBotLoadout,
   setAiCount,
+  removeBotAt,
   setAiFlag,
   setCooldownReduction,
   setManaFree,
@@ -86,7 +87,7 @@ const changeEditingLoadout = (loadout: ChampionLoadout): void => {
 };
 
 const addBot = (): void => setAiCount(Math.min(AI_COUNT_MAX, config.value.ai.count + 1));
-const removeBot = (): void => setAiCount(Math.max(AI_COUNT_MIN, config.value.ai.count - 1));
+const removeBot = (index: number): void => removeBotAt(index);
 
 // --------------------------------------------------------- ability preview
 // Reachable only from the Players tab's participant list (`ParticipantCard`'s

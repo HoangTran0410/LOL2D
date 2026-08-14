@@ -28,7 +28,7 @@ const props = defineProps<{
   label: string;
   loadout: ChampionLoadout;
   isPlayer?: boolean;
-  /** Only the last bot can be removed without reordering every other bot's saved config — see `PlayersTab.vue`. */
+  /** Shows the per-card delete button — every bot has one; removing it shifts the rest up (see `PlayersTab.vue`). */
   removable?: boolean;
 }>();
 const emit = defineEmits<{ open: []; remove: []; previewAbility: [spellClass: SpellClass] }>();
@@ -106,7 +106,7 @@ const kitIcons = computed<KitIcon[]>(() => {
       title="Xoá bot này"
       @click="emit('remove')"
     >
-      <i class="fas fa-minus"></i>
+      <i class="fas fa-times"></i>
     </button>
   </div>
 </template>
