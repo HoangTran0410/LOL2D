@@ -106,6 +106,10 @@ describe('Champion spell presentation lifecycle', () => {
       '../../../src/game/gameObject/attackableUnits/AIChampion.ts',
       '../../../src/game/gameObject/spells/Shaco_R.ts',
       '../../../src/game/hud/InGameHUD.ts',
+      // The spell picker's `pick()` — what used to be InGameHUD's own
+      // spell-swap logic — moved here when the HUD split into a shared
+      // state/interaction layer plus desktop/mobile views.
+      '../../../src/game/hud/hudInteractions.ts',
     ];
     const directAssignments = files.flatMap(relativePath =>
       readFileSync(fileURLToPath(new URL(relativePath, import.meta.url)), 'utf8')

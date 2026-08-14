@@ -437,6 +437,14 @@ export default class Game {
           ? Math.min(1, Math.max(0, spell.currentCooldown / spell.effectiveCoolDownMs))
           : 0,
       onCooldown: spell.currentCooldown > 0 && spell.cooldownLocksOut !== false,
+      // Whole seconds left, the same rounding the corner HUD uses for its own
+      // cooldown stamp — so the two never disagree if they are ever visible
+      // at once (the toggle mid-transition, a screenshot).
+      remainingSeconds: Math.ceil(spell.currentCooldown / 1000),
+      // `effectiveManaCost`, not the raw field: under URF this is 0, and a
+      // button that greys itself out against a cost the cast path does not
+      // charge would be lying about why it cannot be pressed.
+      manaCost: spell.effectiveManaCost,
       affordable: this.player.stats.mana.value >= spell.effectiveManaCost,
       castable: this.player.canCast && !this.player.isDead && !spell.disabled,
       charging: spell.state === 'CHARGING',

@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import TouchControls, {
+  describeButtonVisual,
+  LOCKOUT_WEDGE_COLOR,
+  RHYTHM_WEDGE_COLOR,
+  MANA_BADGE_COLOR,
+  MANA_BADGE_SHORT_COLOR,
   type TouchControlsHost,
   type TouchSpellView,
 } from '../../../src/game/input/TouchControls';
@@ -18,6 +23,8 @@ const view = (targeting: TargetingMode): TouchSpellView => ({
   icon: null,
   cooldownRatio: 0,
   onCooldown: false,
+  remainingSeconds: 0,
+  manaCost: 0,
   affordable: true,
   castable: true,
   charging: false,
@@ -402,5 +409,56 @@ describe('TouchControls — preference', () => {
     const { touchControlsPreference } = await import('../../../src/game/input/TouchControls');
 
     expect(touchControlsPreference()).toBe(true);
+  });
+});
+
+describe('TouchControls — button visual', () => {
+  const withView = (overrides: Partial<TouchSpellView>): TouchSpellView => ({
+    ...view('DIRECTION'),
+    ...overrides,
+  });
+
+  it('a real lockout dims the icon, draws the dark wedge, and shows seconds', () => {
+    const visual = describeButtonVisual(
+      withView({ onCooldown: true, remainingSeconds: 4, cooldownRatio: 0.4 })
+    );
+    expect(visual.dim).toBe(true);
+    expect(visual.wedgeColor).toEqual(LOCKOUT_WEDGE_COLOR);
+    expect(visual.showSeconds).toBe(true);
+  });
+
+  it('the swing rhythm never dims and never shows seconds, only the warm sweep', () => {
+    // The basic attack: cooldownRatio ticks the whole game, onCooldown never does.
+    const visual = describeButtonVisual(
+      withView({ onCooldown: false, remainingSeconds: 0, cooldownRatio: 0.7, affordable: true, castable: true })
+    );
+    expect(visual.dim).toBe(false);
+    expect(visual.wedgeColor).toEqual(RHYTHM_WEDGE_COLOR);
+    expect(visual.showSeconds).toBe(false);
+  });
+
+  it('not enough mana dims the icon and turns the mana badge red, even off cooldown', () => {
+    const visual = describeButtonVisual(
+      withView({ onCooldown: false, affordable: false, manaCost: 50 })
+    );
+    expect(visual.dim).toBe(true);
+    expect(visual.manaBadge).toEqual({ color: MANA_BADGE_SHORT_COLOR });
+  });
+
+  it('an affordable spell gets the quiet blue mana badge', () => {
+    const visual = describeButtonVisual(withView({ manaCost: 40, affordable: true }));
+    expect(visual.manaBadge).toEqual({ color: MANA_BADGE_COLOR });
+  });
+
+  it('a free spell (no mana cost) gets no badge at all', () => {
+    const visual = describeButtonVisual(withView({ manaCost: 0 }));
+    expect(visual.manaBadge).toBeNull();
+  });
+
+  it('an uncastable spell dims even at full mana and off cooldown', () => {
+    const visual = describeButtonVisual(
+      withView({ onCooldown: false, affordable: true, castable: false })
+    );
+    expect(visual.dim).toBe(true);
   });
 });

@@ -619,12 +619,16 @@ try {
   // ---------------------------------------------------- HUD in a phone view
 
   await page.evaluate(() => {
-    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.changeSpell(1);
+    // `changeSpell`/`closeSpellPicker` live on the shared `HudInteractions`
+    // object now (see src/game/hud/hudInteractions.ts), injected into both
+    // DesktopHudView and MobileHudView rather than owned by the root Vue
+    // instance directly.
+    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.changeSpell(1);
   });
   await page.waitForTimeout(700);
   await page.screenshot({ path: `${OUT}-07-spell-picker.png` });
   await page.evaluate(() => {
-    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.closeSpellPicker();
+    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.closeSpellPicker();
   });
   await page.waitForTimeout(400);
 

@@ -1,0 +1,145 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  createHudInteractions,
+  filterSpells,
+  LONG_PRESS_MS,
+  LONG_PRESS_DISMISS_MS,
+  TAP_MOVE_TOLERANCE_PX,
+  type SpellItemDisplay,
+} from '../../../src/game/hud/hudInteractions';
+
+const spell = (overrides: Partial<SpellItemDisplay>): SpellItemDisplay => ({
+  name: 'Quả Cầu Ma Thuật',
+  image: '',
+  description: 'Phóng quả cầu theo hướng chỉ định',
+  coolDown: 6000,
+  manaCost: 40,
+  spellClass: class {},
+  assetKey: null,
+  ...overrides,
+});
+
+describe('filterSpells', () => {
+  const spells = [
+    spell({ name: 'Ahri Q', description: 'a magic orb' }),
+    spell({ name: 'Yasuo Q', description: 'steel tempest, a sword slash' }),
+    spell({ name: 'Ném Băng', description: 'làm chậm mục tiêu' }),
+  ];
+
+  it('returns everything when the search is empty', () => {
+    expect(filterSpells(spells, '')).toHaveLength(3);
+  });
+
+  it('matches on the name, case-insensitively', () => {
+    expect(filterSpells(spells, 'yasuo').map(s => s.name)).toEqual(['Yasuo Q']);
+  });
+
+  it('matches on the description', () => {
+    expect(filterSpells(spells, 'sword').map(s => s.name)).toEqual(['Yasuo Q']);
+  });
+
+  it('is accent-insensitive, the way removeAccents\' NFD stripping supports', () => {
+    // "Ném Băng" without the diacritics should still find it — the same
+    // normalize('NFD') + combining-mark strip that `removeAccents` (and this
+    // search) is built on. Note this does *not* cover every Vietnamese
+    // letter: 'Đ'/'đ' is a distinct base letter, not a decomposable accent,
+    // so a search for it has the same limitation the rest of the app already
+    // has via `removeAccents` — not a regression introduced here.
+    expect(filterSpells(spells, 'nem bang').map(s => s.name)).toEqual(['Ném Băng']);
+  });
+
+  it('returns nothing when nothing matches', () => {
+    expect(filterSpells(spells, 'nonexistent-champion')).toEqual([]);
+  });
+});
+
+describe('hudInteractions tuning constants', () => {
+  it('holds a long press well past a tap and well short of feeling stuck', () => {
+    expect(LONG_PRESS_MS).toBeGreaterThan(200);
+    expect(LONG_PRESS_MS).toBeLessThan(800);
+  });
+
+  it('dismisses the description some time after the long press', () => {
+    expect(LONG_PRESS_DISMISS_MS).toBeGreaterThan(LONG_PRESS_MS);
+  });
+
+  it('the drag tolerance is wider than jitter, narrower than a deliberate move', () => {
+    expect(TAP_MOVE_TOLERANCE_PX).toBeGreaterThan(4);
+    expect(TAP_MOVE_TOLERANCE_PX).toBeLessThan(40);
+  });
+});
+
+describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
+  const fakeGame = () => {
+    const player: any = {
+      spells: [{}, {}],
+      replaceSpell: vi.fn(),
+      replaceSpells: vi.fn(),
+    };
+    return {
+      player,
+      objectManager: { objects: [] },
+      pause: vi.fn(),
+      unpause: vi.fn(),
+      setTouchControlsEnabled: vi.fn(),
+    } as any;
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // `window.setTimeout`/`clearTimeout` are called explicitly rather than
+    // the bare globals, so the tests need *a* window object; the real
+    // timers underneath are the same fake ones vitest installed above.
+    vi.stubGlobal('window', globalThis);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  const touchAt = (x: number, y: number) => ({ touches: [{ clientX: x, clientY: y }] });
+
+  it('a short tap that never moves fires onTap', () => {
+    const hud = createHudInteractions(fakeGame());
+    const onTap = vi.fn();
+    hud.touchSpellStart({}, touchAt(100, 100));
+    hud.touchSpellEnd(onTap);
+    expect(onTap).toHaveBeenCalledOnce();
+  });
+
+  it('a hold past the long-press window does not fire onTap on release', () => {
+    const hud = createHudInteractions(fakeGame());
+    const onTap = vi.fn();
+    hud.touchSpellStart({}, touchAt(100, 100));
+    vi.advanceTimersByTime(LONG_PRESS_MS + 10);
+    hud.touchSpellEnd(onTap);
+    expect(onTap).not.toHaveBeenCalled();
+  });
+
+  it('a drag past the tolerance does not fire onTap, even released quickly', () => {
+    const hud = createHudInteractions(fakeGame());
+    const onTap = vi.fn();
+    hud.touchSpellStart({}, touchAt(100, 100));
+    hud.touchSpellMove(touchAt(100, 100 + TAP_MOVE_TOLERANCE_PX + 5));
+    hud.touchSpellEnd(onTap);
+    expect(onTap).not.toHaveBeenCalled();
+  });
+
+  it('jitter inside the tolerance still counts as a tap', () => {
+    const hud = createHudInteractions(fakeGame());
+    const onTap = vi.fn();
+    hud.touchSpellStart({}, touchAt(100, 100));
+    hud.touchSpellMove(touchAt(100 + TAP_MOVE_TOLERANCE_PX / 2, 100));
+    hud.touchSpellEnd(onTap);
+    expect(onTap).toHaveBeenCalledOnce();
+  });
+
+  it('a drag cancels the pending long-press timer, so it cannot still fire later', () => {
+    const hud = createHudInteractions(fakeGame());
+    hud.touchSpellStart({}, touchAt(100, 100));
+    hud.touchSpellMove(touchAt(100, 100 + TAP_MOVE_TOLERANCE_PX + 5));
+    vi.advanceTimersByTime(LONG_PRESS_MS + 10);
+    expect(hud.spellHover).toBeNull();
+  });
+});

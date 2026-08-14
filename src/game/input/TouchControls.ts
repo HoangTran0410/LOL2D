@@ -55,10 +55,67 @@ export interface TouchSpellView {
   readonly icon: unknown;
   /** Fraction of the cooldown still to run, 0 when ready. */
   readonly cooldownRatio: number;
+  /**
+   * A real lockout — currentCooldown > 0 *and* it actually blocks casting.
+   * False for the basic attack's swing timer, which counts down the same way
+   * but never stops the player from swinging again: see `Spell.cooldownLocksOut`.
+   */
   readonly onCooldown: boolean;
+  /** Whole seconds left, only meaningful (and only drawn) while `onCooldown`. */
+  readonly remainingSeconds: number;
+  readonly manaCost: number;
   readonly affordable: boolean;
   readonly castable: boolean;
   readonly charging: boolean;
+}
+
+/**
+ * What a button should look like, computed once as data so it can be tested
+ * without a canvas — `drawButtons` below turns this into three or four p5
+ * calls and nothing else.
+ *
+ * This is the thing the owner actually asked for: cooldown belongs on the
+ * button a thumb is already resting on, not a panel in the corner the eye has
+ * to travel to. It mirrors the three states the desktop HUD already drew for
+ * that same reason (`InGameHUD`'s `.cooldown`, `.cooldown-overlay.rhythm` and
+ * `.mana-cost.short`) so a player reads the same picture in both layouts:
+ *
+ *   - a real lockout: dark wedge, greyed icon, seconds counting down;
+ *   - the basic attack's swing timer: a translucent warm sweep and nothing
+ *     else — it is not a wait, and greying it out for the whole game (its
+ *     "cooldown" runs constantly) would make the slot unreadable;
+ *   - not enough mana: the icon dims the same as a lockout, and the mana
+ *     badge — normally a quiet blue pill — turns red so *why* is legible at a
+ *     glance, the way the corner HUD's short-mana badge already does.
+ */
+export interface ButtonVisual {
+  /** Icon gets the dark disc: on a real cooldown, unaffordable, or uncastable. */
+  readonly dim: boolean;
+  readonly wedgeColor: readonly [number, number, number, number];
+  /** Seconds-left stamp: only for a real lockout, never for the swing rhythm. */
+  readonly showSeconds: boolean;
+  readonly manaBadge: { readonly color: readonly [number, number, number, number] } | null;
+}
+
+/** A real lockout's wedge: dark and near-opaque, same weight as the desktop's `.cooldown`. */
+export const LOCKOUT_WEDGE_COLOR = [6, 10, 18, 170] as const;
+/** The swing timer's wedge: translucent warm, matching the desktop's `.cooldown-overlay.rhythm`. */
+export const RHYTHM_WEDGE_COLOR = [255, 208, 132, 56] as const;
+/** Mana badge, affordable: a quiet blue pill, matching the desktop's `.mana-cost`. */
+export const MANA_BADGE_COLOR = [11, 30, 55, 225] as const;
+/** Mana badge, short: red, matching the desktop's `.mana-cost.short`. */
+export const MANA_BADGE_SHORT_COLOR = [70, 16, 16, 225] as const;
+
+export function describeButtonVisual(view: TouchSpellView): ButtonVisual {
+  return {
+    dim: view.onCooldown || !view.affordable || !view.castable,
+    wedgeColor: view.onCooldown ? LOCKOUT_WEDGE_COLOR : RHYTHM_WEDGE_COLOR,
+    showSeconds: view.onCooldown && view.remainingSeconds > 0,
+    manaBadge:
+      view.manaCost > 0
+        ? { color: view.affordable ? MANA_BADGE_COLOR : MANA_BADGE_SHORT_COLOR }
+        : null,
+  };
 }
 
 export interface TouchControlsHost {
@@ -493,7 +550,7 @@ export class TouchControls {
       if (!view) continue;
       const gesture = this.gestureFor(button.slot);
       const cancelling = gesture?.phase === 'CANCEL';
-      const dim = view.onCooldown || !view.affordable || !view.castable;
+      const visual = describeButtonVisual(view);
       const diameter = button.radius * 2;
 
       noStroke();
@@ -509,21 +566,23 @@ export class TouchControls {
         const size = button.radius * 1.36;
         image(view.icon as p5.Image, button.x, button.y, size, size);
       } else {
-        fill(230, 230, 230, dim ? 120 : 230);
+        fill(230, 230, 230, visual.dim ? 120 : 230);
         textSize(button.radius * 0.8);
         text(view.label, button.x, button.y);
       }
 
-      if (dim) {
+      if (visual.dim) {
         noStroke();
         fill(8, 12, 20, 130);
         circle(button.x, button.y, diameter);
       }
 
-      // The cooldown wedge: a dark cap sweeping round what is left to run.
+      // The cooldown wedge: a cap sweeping round what is left to run. Dark and
+      // near-opaque for a real lockout; a translucent warm sweep for the basic
+      // attack's swing rhythm, which never stops the player from swinging.
       if (view.cooldownRatio > 0) {
         noStroke();
-        fill(6, 10, 18, 170);
+        fill(...visual.wedgeColor);
         arc(
           button.x,
           button.y,
@@ -535,12 +594,38 @@ export class TouchControls {
         );
       }
 
+      // Seconds left: only for a real lockout. The swing rhythm has no number
+      // for the same reason the desktop HUD never stamps one on it — it would
+      // be counting down for the whole game.
+      if (visual.showSeconds) {
+        noStroke();
+        fill(240, 240, 240, 235);
+        textSize(button.radius * 0.62);
+        text(String(view.remainingSeconds), button.x, button.y);
+      }
+
+      // Mana badge, bottom-left of the ring — the one corner the seconds
+      // stamp (centre) and the cancel cross (also centre) never reach. Blue
+      // normally, red when the pool cannot afford it, same convention as the
+      // corner HUD's `.mana-cost` / `.mana-cost.short`.
+      if (visual.manaBadge) {
+        const badgeX = button.x - button.radius * 0.62;
+        const badgeY = button.y + button.radius * 0.62;
+        const badgeR = Math.max(9, button.radius * 0.34);
+        noStroke();
+        fill(...visual.manaBadge.color);
+        circle(badgeX, badgeY, badgeR * 2);
+        fill(200, 226, 255, 255);
+        textSize(badgeR * 0.95);
+        text(String(view.manaCost), badgeX, badgeY);
+      }
+
       noFill();
       strokeWeight(button.primary ? 5 : 3);
       if (cancelling) stroke(235, 70, 70, 240);
       else if (view.charging) stroke(255, 208, 120, 240);
       else if (gesture) stroke(120, 220, 255, 240);
-      else stroke(210, 210, 210, dim ? 90 : 160);
+      else stroke(210, 210, 210, visual.dim ? 90 : 160);
       circle(button.x, button.y, diameter);
 
       if (cancelling) {

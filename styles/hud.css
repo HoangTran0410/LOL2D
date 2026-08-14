@@ -373,6 +373,20 @@
   overflow-y: auto;
 }
 
+/* A zero-height, `position: sticky` anchor for .close-btn — sticky only
+   needs *a* scrolling ancestor, which .spell-picker already is, so this
+   pins the button to the top-right of the modal's viewport regardless of
+   scroll position without touching how the rest of the modal sizes or
+   scrolls. See SpellPickerModal.ts's file comment for the flex-based attempt
+   that looked simpler and silently broke the whole list instead. */
+.close-btn-anchor {
+  position: sticky;
+  top: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 12;
+}
+
 .spell-picker .title {
   margin: 0;
   padding: 0;
@@ -551,16 +565,19 @@ body.touch-ui .champion-details {
   margin-left: 6px;
 }
 
-/* Smaller than the desktop icons, not larger: these are no longer the thing
-   you press to cast. The 90px buttons on the canvas are. */
+/* Smaller than the desktop icons, but not as small as the old "cast surface
+   moved away, so shrink it" sizing: these are still the *only* way to reach
+   the spell picker on a touch device (see MobileHudView's touchend
+   handlers), so they stay close to 44px — the smallest target a thumb hits
+   reliably, same number the picker's own close button and checkboxes use. */
 body.touch-ui .bottom-HUD .spell {
-  width: 2.2em;
-  height: 2.2em;
+  width: 2.75em;
+  height: 2.75em;
 }
 
 body.touch-ui .bottom-HUD .spell.small {
-  width: 1.7em !important;
-  height: 1.7em !important;
+  width: 2.3em !important;
+  height: 2.3em !important;
 }
 
 /* There is no keyboard, so the letter in the corner is noise that only
@@ -578,8 +595,28 @@ body.touch-ui .bottom-HUD .spell .mana-cost {
   border-radius: 7px;
 }
 
-body.touch-ui .bottom-HUD .spell .cooldown p {
-  font-size: 0.8em;
+/* The pencil badge: cooldown itself lives on the canvas buttons now (see
+   TouchControls.describeButtonVisual), so nothing on this strip is a live
+   combat readout any more — it is a loadout list, and tapping an icon swaps
+   that slot. The badge is what tells a thumb these small icons are still
+   buttons and not just decoration. Bottom-right, the corner the (hidden,
+   touch has no keyboard) hotkey letter leaves free — `.stacks` owns
+   top-left and `.mana-cost` sits inset at bottom-left, so this is the one
+   corner nothing else on the icon already claims. */
+body.touch-ui .bottom-HUD .spell .edit-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  line-height: 14px;
+  text-align: center;
+  font-size: 8px;
+  color: #cfe8ff;
+  background: #0b1e3899;
+  border: 1px solid #3d7fb8;
+  border-radius: 50%;
+  z-index: 11;
 }
 
 body.touch-ui .health-bar {
