@@ -26,6 +26,7 @@ import AttackableUnit from '../attackableUnits/AttackableUnit';
  * "knocks units away from it, though not through terrain".
  */
 export default class Anivia_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_anivia_w');
   name = 'Tường Băng (Anivia_W)';
   description =

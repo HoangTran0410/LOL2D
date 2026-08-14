@@ -5,6 +5,7 @@ import SpellObject from '../SpellObject';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export default class Flash extends Spell {
+  targetingMode = 'POINT' as const;
   name = 'Tốc Biến (Flash)';
   image = AssetManager.get('spell_flash');
   description =

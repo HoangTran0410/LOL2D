@@ -8,6 +8,7 @@ import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 
 export default class Lux_E extends Spell {
+  targetingMode = 'POINT' as const;
   name = 'Quả Cầu Ánh Sáng (Lux_E)';
   image = AssetManager.get('spell_lux_e');
   description =

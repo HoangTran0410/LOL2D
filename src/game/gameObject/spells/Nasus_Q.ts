@@ -17,6 +17,8 @@ const describe = (stacks: number): string =>
   `<span class="buff">vĩnh viễn tăng thêm ${DAMAGE_PER_STACK}</span>`;
 
 export default class Nasus_Q extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nasus_q');
   name = 'Chém Hủy Diệt (Nasus_Q)';
   // Rebuilt on every stack so the tooltip states the damage the next strike

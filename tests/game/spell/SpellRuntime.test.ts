@@ -215,6 +215,7 @@ describe('SpellRuntime', () => {
       stats: { mana: { value: 100 }, health: { value: 100 } },
     };
     class LegacySpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
       coolDown = 500;
       manaCost = 20;
       healthCost = 10;
@@ -256,6 +257,7 @@ describe('SpellRuntime', () => {
       stats: { mana: { value: 100 }, health: { value: 100 } },
     };
     class DirectSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
       coolDown = 500;
     }
     const spell = new DirectSpell(owner);

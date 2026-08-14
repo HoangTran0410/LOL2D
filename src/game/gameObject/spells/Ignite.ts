@@ -7,6 +7,8 @@ import SpellObject from '../SpellObject';
 import DamageOverTime from '../buffs/DamageOverTime';
 
 export default class Ignite extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_ignite');
   name = 'Thiêu Đốt (Ignite)';
   description =

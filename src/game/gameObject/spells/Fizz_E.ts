@@ -21,6 +21,7 @@ import Untargetable from '../buffs/Untargetable';
  * does not slow.
  */
 export default class Fizz_E extends Spell {
+  targetingMode = 'POINT' as const;
   static PHASES = {
     GROUND: {
       image: AssetManager.get('spell_fizz_e'),

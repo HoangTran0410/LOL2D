@@ -17,6 +17,8 @@ import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 
 export default class Morgana_E extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_morgana_e');
   name = 'Lá Chắn Đen (Morgana_E)';
   description =

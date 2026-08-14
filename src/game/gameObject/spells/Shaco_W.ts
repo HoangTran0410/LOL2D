@@ -8,6 +8,7 @@ import Fear from '../buffs/Fear';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Shaco_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_shaco_w');
   name = 'Hộp Hề Ma Quái (Shaco_W)';
   description =

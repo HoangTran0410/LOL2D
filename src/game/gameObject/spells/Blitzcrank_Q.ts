@@ -9,6 +9,7 @@ import VectorUtils from '../../../utils/vector.utils';
 import { Rectangle } from '../../../libs/quadtree';
 
 export default class Blitzcrank_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   name = 'Bàn Tay Hỏa Tiễn (Blitzcrank_Q)';
   image = AssetManager.get('spell_blitzcrank_q');
   description =

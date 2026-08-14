@@ -7,6 +7,7 @@ import CombatText from '../helpers/CombatText';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export default class Heal extends Spell {
+  targetingMode = 'SELF' as const;
   name = 'Hồi Máu (Heal)';
   image = AssetManager.get('spell_heal');
   description =

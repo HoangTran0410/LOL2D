@@ -4,6 +4,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class StealthWard extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_stealthward');
   name = 'Mắt Xanh (Stealth Ward)';
   description =

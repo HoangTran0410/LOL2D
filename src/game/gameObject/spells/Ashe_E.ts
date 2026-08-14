@@ -9,6 +9,7 @@ import TrueSight from '../buffs/TrueSight';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_E extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_e');
   name = 'Chim Ưng Do Thám (Ashe_E)';
   description =

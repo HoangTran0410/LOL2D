@@ -6,6 +6,7 @@ import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
 
 export default class Leblanc_E extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_leblanc_e');
   name = 'Sợi Xích Siêu Phàm (Leblanc_E)';
   description =

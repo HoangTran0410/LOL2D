@@ -8,6 +8,7 @@ import Nearsight from '../buffs/Nearsight';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Teemo_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_teemo_q');
   name = 'Phi Tiêu Bịt Mắt (Teemo_Q)';
   description =

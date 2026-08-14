@@ -47,6 +47,7 @@ export function applyToxicShot(source: AttackableUnit, victim: AttackableUnit): 
  * apply the poison from outside attack range.
  */
 export default class Teemo_E extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_teemo_e');
   name = 'Phi Tiêu Độc (Teemo_E)';
   description =

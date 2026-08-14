@@ -6,6 +6,7 @@ import Invisible from '../buffs/Invisible';
 import Speedup from '../buffs/Speedup';
 
 export default class Twitch_Q extends Spell {
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_twitch_q');
   name = 'Ẩn Mình (Twitch_Q)';
   description =

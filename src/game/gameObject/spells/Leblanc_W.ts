@@ -7,6 +7,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Leblanc_W extends Spell {
+  targetingMode = 'POINT' as const;
   PHASES = {
     W1: {
       image: AssetManager.get('spell_leblanc_w1'),

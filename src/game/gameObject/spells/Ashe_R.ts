@@ -19,6 +19,7 @@ export const EXPLODE_ANIMATION_MS = 1_000;
 export const RANGE = 2_400;
 
 export default class Ashe_R extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_r');
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =

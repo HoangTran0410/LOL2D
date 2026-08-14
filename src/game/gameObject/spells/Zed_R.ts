@@ -23,6 +23,8 @@ const SHADOW_COLOR: [number, number, number] = [215, 120, 255];
  * damage when it expires. Recast swaps Zed with the Shadow.
  */
 export default class Zed_R extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   static PHASES = {
     R1: {
       image: AssetManager.get('spell_zed_r1'),

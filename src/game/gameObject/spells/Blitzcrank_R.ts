@@ -6,6 +6,7 @@ import SpellObject from '../SpellObject';
 import Silence from '../buffs/Silence';
 
 export default class Blitzcrank_R extends Spell {
+  targetingMode = 'SELF' as const;
   name = 'Trường Điện Từ (Blitzcrank_R)';
   image = AssetManager.get('spell_blitzcrank_r');
   description =

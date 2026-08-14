@@ -7,6 +7,9 @@ import SpellObject from '../SpellObject';
 import Airborne from '../buffs/Airborne';
 
 export default class Blitzcrank_E extends Spell {
+  // Not a projectile, but the drag still only picks direction: the cone is
+  // always the fixed `range` regardless of where the thumb lets go.
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_blitzcrank_e');
   name = 'Nắm Đấm Thép (Blitzcrank_E)';
   description =

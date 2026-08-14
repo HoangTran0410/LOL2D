@@ -7,6 +7,7 @@ import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
 
 export default class Zed_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_zed_q');
   name = 'Phi tiêu sắc lẻm (Zed_Q)';
   description =

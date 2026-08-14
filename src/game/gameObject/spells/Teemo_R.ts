@@ -8,6 +8,7 @@ import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 
 export default class Teemo_R extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_teemo_r');
   name = 'Bẫy Độc Noxus (Teemo_R)';
   description =

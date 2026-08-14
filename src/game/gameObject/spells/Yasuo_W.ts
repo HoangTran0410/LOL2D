@@ -7,6 +7,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Yasuo_W extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_yasuo_w');
   name = 'Tường Gió (Yasuo_W)';
   description =

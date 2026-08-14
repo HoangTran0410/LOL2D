@@ -99,9 +99,12 @@ describe('spell aim integration', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('publishes an immutable context before pre-cast and returns fresh aim vectors', () => {
+    class ProbeSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
+    }
     const game = gameWithMouse();
     const owner = ownerFor(game);
-    const spell = new Spell(owner);
+    const spell = new ProbeSpell(owner);
     let contextSeenAtPreCast: CastContext | undefined;
     game.eventManager.emit.mockImplementation(() => {
       contextSeenAtPreCast = spell.castContext;
@@ -148,6 +151,7 @@ describe('spell aim integration', () => {
     ai.destination = new TestVector(0, 20) as any;
     ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
     class AimSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
       usedAim?: p5.Vector;
       onSpellCast() { this.usedAim = this.aimPoint; }
     }
@@ -369,6 +373,7 @@ describe('spell aim integration', () => {
     const game = gameWithMouse(worldMouse);
     const owner = ownerFor(game);
     class MirroredSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
       usedContext?: CastContext;
       onSpellCast(context: CastContext) { this.usedContext = context; }
     }

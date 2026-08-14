@@ -11,6 +11,7 @@ import Airborne from '../buffs/Airborne';
 import RootBuff from '../buffs/Root';
 
 export default class Yasuo_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   PHASES = {
     Q1: {
       image: AssetManager.get('spell_yasuo_q1'),

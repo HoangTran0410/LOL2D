@@ -17,11 +17,12 @@ import type {
   CastSpec,
   ResourceCommitPoint,
   SpellRuntimeState,
+  TargetingMode,
 } from '../spell/runtime/types';
 
-const legacyCastSpec = (durationMs: number): CastSpec => ({
+const legacyCastSpec = (durationMs: number, targeting: TargetingMode): CastSpec => ({
   activation: 'PRESS',
-  targeting: 'DIRECTION',
+  targeting,
   castTimeMs: 0,
   resource: { commitAt: 'start', refundOn: [] },
   cooldown: { startAt: 'start', durationMs },
@@ -242,8 +243,34 @@ export default class Spell {
   onCancel(_context: CastContext, _reason: CancelReason): void {}
   onComplete(_context: CastContext): void {}
 
+  /**
+   * How a thumb (or the mouse) aims this spell — see `docs/ADDING_SPELLS.md`.
+   * Only read by the default `castSpec` below; a spell that overrides
+   * `castSpec` itself (the typed-lifecycle spells) puts `targeting` straight
+   * into its own spec and this field is never consulted for it.
+   *
+   * There used to be no such field: the default `castSpec` simply hardcoded
+   * `targeting: 'DIRECTION'`, silently, for every one of the ~69 spells that
+   * had not been migrated onto their own `castSpec`. DIRECTION is the one
+   * mode that discards a drag's distance, so on touch every one of those
+   * spells flew to its absolute maximum range no matter where the thumb let
+   * go — including placed effects like Zed W, which should have stopped
+   * wherever it was aimed. `castSpec` now throws instead of guessing, so a
+   * legacy spell subclass must set this explicitly to what it actually does.
+   * `tests/game/spells/TargetingModeDeclared.test.ts` fails the build for any
+   * spell file that doesn't (mirrors `tests/game/buffs/Ground.test.ts`, which
+   * does the same for `owner.teleportTo`).
+   */
+  protected targetingMode?: TargetingMode;
+
   get castSpec(): Readonly<CastSpec> {
-    return legacyCastSpec(this.coolDown);
+    if (!this.targetingMode) {
+      throw new Error(
+        `${this.constructor.name} has no targeting mode. Set \`targetingMode\` to 'SELF' | ` +
+          "'DIRECTION' | 'POINT' | 'UNIT', or override `castSpec` yourself — see docs/ADDING_SPELLS.md."
+      );
+    }
+    return legacyCastSpec(this.coolDown, this.targetingMode);
   }
 
   /**

@@ -7,6 +7,8 @@ import Spell from '../Spell';
 import Dash from '../buffs/Dash';
 
 export default class Yasuo_E extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_yasuo_e');
   name = 'Quét Kiếm (Yasuo_E)';
   description =

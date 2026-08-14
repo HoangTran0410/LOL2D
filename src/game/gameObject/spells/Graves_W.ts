@@ -9,6 +9,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Graves_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_graves_w');
   name = 'Bom mù (Graves_W)';
   description =

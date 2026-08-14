@@ -7,6 +7,7 @@ import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 
 export default class LeeSin_E extends Spell {
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_leesin_e');
   name = 'Địa Chấn / Dư Chấn (LeeSin_E)';
   description =

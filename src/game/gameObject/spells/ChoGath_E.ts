@@ -8,6 +8,7 @@ import DamageOverTime from '../buffs/DamageOverTime';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class ChoGath_E extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_chogath_e');
   name = "Gai Xương (Cho'Gath_E)";
   description =

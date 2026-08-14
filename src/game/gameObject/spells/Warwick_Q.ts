@@ -7,6 +7,8 @@ import SpellObject from '../SpellObject';
 import Dash from '../buffs/Dash';
 
 export default class Warwick_Q extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_warwick_q');
   name = 'Nanh Vuốt (Warwick_Q)';
   description =

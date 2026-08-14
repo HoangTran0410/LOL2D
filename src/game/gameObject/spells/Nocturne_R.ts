@@ -19,6 +19,10 @@ import Nearsight from '../buffs/Nearsight';
  * Letting the window lapse without leaping puts the ultimate on full cooldown.
  */
 export default class Nocturne_R extends Spell {
+  // Both phases auto-lock their own target (R1 hits every enemy champion, R2
+  // leaps at whichever is nearest the cursor among those in range) and never
+  // read context.target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   static PHASES = {
     R1: { image: AssetManager.get('spell_nocturne_r') },
     // The wiki carries no separate icon for the second form, so the recast

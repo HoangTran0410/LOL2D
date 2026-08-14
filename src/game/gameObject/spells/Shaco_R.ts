@@ -8,6 +8,7 @@ import ParticleSystem from '../helpers/ParticleSystem';
 import { Shaco_W_Object } from './Shaco_W';
 
 export default class Shaco_R extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_shaco_r');
   name = 'Phân Thân (Shaco_R)';
   description =

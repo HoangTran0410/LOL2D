@@ -38,6 +38,7 @@ export const BOUNDING_MARGIN = 90;
 export const HARD_STOP_MS = DURATION_MS + DUST_LIFETIME_MS + 1_000;
 
 export default class Malphite_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_malphite_w');
   name = 'Sức Mạnh Đá Tảng (Malphite_W)';
   description =

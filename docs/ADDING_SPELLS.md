@@ -63,6 +63,49 @@ which is a guess, and will be wrong for your spell. A spell that keeps its
 reach as a bare number inside `onSpellCast` gets the guess; one that declares
 it gets a telegraph the player can trust.
 
+### A legacy spell (no `castSpec` override) still has to declare this
+
+A spell that only implements `onSpellCast()` and never overrides `castSpec`
+gets `castSpec` from `Spell`'s own default, which now **requires** a
+`targetingMode` field — it throws instead of guessing:
+
+```ts
+export default class MySpell extends Spell {
+  coolDown = 5000;
+  targetingMode = 'POINT' as const; // 'as const', not `: TargetingMode`, so
+                                     // TS narrows the literal without an import
+  onSpellCast() { /* ... */ }
+}
+```
+
+There used to be no such field, and the default was a silent `'DIRECTION'` for
+every legacy spell — the one mode that discards a drag's distance, so on touch
+every one of them flew to its absolute maximum range regardless of where the
+thumb let go. `tests/game/spells/TargetingModeDeclared.test.ts` fails the
+build for a spell file that sets neither this nor its own `castSpec`.
+
+**Auto-locking spells.** Several legacy spells (Ignite, Nasus Q, Warwick Q,
+Zed R, Yasuo E/R, Shaco E, Lee Sin R/W, Cho'Gath R, Alistar W, Morgana E,
+Nocturne R) pick their own target from inside `onSpellCast`/
+`checkCastCondition` — nearest enemy or ally within a fixed radius of the
+caster, occasionally broken among several candidates by whichever is closest
+to the cursor — and never read `context.target`. That reads like `UNIT`, but
+declaring it `UNIT` hands the *cast itself* to `TargetResolver`, which (unlike
+these spells' own lookup) requires the cursor to be sitting almost on top of a
+body before it will resolve at all — see `TargetResolver.resolve`'s `UNIT`
+branch. None of these spells supply the `targetingRequest` + `press()`
+override that the real `UNIT` spells do (`Malphite_Q`, `Janna_E`/`W`,
+`Anivia_E`, `Leblanc_Q`, `Veigar_R` all override both — see any of them for
+the pattern); without that, `UNIT` would silently swallow the key press
+whenever the mouse is not precisely on a target, which none of them do today.
+They are declared `targetingMode = 'SELF'` instead: it is the only mode that
+changes nothing about when the cast is allowed to start, on touch or on
+desktop. Turning one of these into a true `UNIT` spell — so a drag can
+deliberately choose among several candidates and the touch layer can
+highlight who is about to get hit — is a real improvement, but it is a
+target-acquisition feature, not a targeting-mode correction; give it the
+`targetingRequest`/`press()` treatment and its own test when you do.
+
 ## 3. Define lifecycle policies
 
 The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `COOLDOWN`. Do not assign `state` or `currentCooldown` in migrated spells.

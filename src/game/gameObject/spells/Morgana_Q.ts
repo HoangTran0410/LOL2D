@@ -11,6 +11,7 @@ import TrailSystem from '../helpers/TrailSystem';
 const BINDING_COLOR: [number, number, number] = [186, 96, 240];
 
 export default class Morgana_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_morgana_q');
   name = 'Xiềng Xích Bóng Tối (Morgana_Q)';
   description =

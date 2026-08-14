@@ -6,6 +6,7 @@ import Charm from '../buffs/Charm';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_E extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ahri_e');
   name = 'Hôn Gió (Ahri_E)';
   description =

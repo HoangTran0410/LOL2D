@@ -5,6 +5,7 @@ import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 
 export default class Blitzcrank_W extends Spell {
+  targetingMode = 'SELF' as const;
   name = 'Tăng Tốc (Blitzcrank_W)';
   image = AssetManager.get('spell_blitzcrank_w');
   description =

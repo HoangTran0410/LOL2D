@@ -3,6 +3,7 @@ import AssetManager from '../../../managers/AssetManager';
 import Speedup from '../buffs/Speedup';
 
 export default class Ghost extends Spell {
+  targetingMode = 'SELF' as const;
   name = 'Tốc Hành (Ghost)';
   image = AssetManager.get('spell_ghost');
   description = '<span class="buff">Tăng tốc 40%</span> trong <span class="time">5 giây</span>';

@@ -10,6 +10,7 @@ import Shield from '../buffs/Shield';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Lux_W extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_lux_w');
   name = 'Lá Chắn Lăng Kính (Lux_W)';
   description =

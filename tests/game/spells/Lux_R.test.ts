@@ -191,7 +191,9 @@ describe('Lux R', () => {
   });
 
   it('locks only prohibited actions and restores their prior state exactly once', () => {
-    class ProhibitedSpell extends Spell {}
+    class ProhibitedSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
+    }
 
     const added: unknown[] = [];
     const ownerBuffs: Array<{

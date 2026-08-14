@@ -8,6 +8,7 @@ import Stun from '../buffs/Stun';
 import ParticleSystem from '../helpers/ParticleSystem';
 
 export default class Veigar_E extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
   description =

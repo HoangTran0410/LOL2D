@@ -7,6 +7,7 @@ import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ahri_q');
   name = 'Quả Cầu Ma Thuật (Ahri_Q)';
   description =

@@ -6,6 +6,8 @@ import Spell from '../Spell';
 import { Shaco_W_Bullet_Object } from './Shaco_W';
 
 export default class Shaco_E extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_shaco_e');
   name = 'Dao Độc (Shaco_E)';
   description =

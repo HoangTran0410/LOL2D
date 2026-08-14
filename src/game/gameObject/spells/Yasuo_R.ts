@@ -10,6 +10,8 @@ import Dash from '../buffs/Dash';
 import Speedup from '../buffs/Speedup';
 
 export default class Yasuo_R extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_yasuo_r');
   name = 'Trăn Trối (Yasuo_R)';
   description =

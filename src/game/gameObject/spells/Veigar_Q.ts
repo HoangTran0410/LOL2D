@@ -9,6 +9,7 @@ import StatAmp from '../buffs/StatAmp';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Veigar_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_veigar_q');
   name = 'Quả Cầu Bóng Tối (Veigar_Q)';
   description =

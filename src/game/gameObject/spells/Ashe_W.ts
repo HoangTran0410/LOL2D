@@ -7,6 +7,7 @@ import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_W extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_w');
   name = 'Tán Xạ Tiễn (Ashe_W)';
   description =

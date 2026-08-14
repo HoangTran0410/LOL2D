@@ -7,6 +7,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Zed_E extends Spell {
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_zed_e');
   name = 'Đường kiếm bóng tối (Zed_E)';
   description =

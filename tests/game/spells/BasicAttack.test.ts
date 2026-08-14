@@ -24,6 +24,7 @@ import type { CastContext, Vec2 } from '../../../src/game/spell/runtime/types';
 /** A spell that is not the basic attack, cheap enough to always go off. */
 class Probe extends Spell {
   name = 'Probe';
+  targetingMode = 'DIRECTION' as const;
   coolDown = 0;
   manaCost = 0;
 }

@@ -15,6 +15,7 @@ import Slow from '../buffs/Slow';
  * dashes or blinks their way out of the glue.
  */
 export default class Singed_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_singed_w');
   name = 'Keo Dính (Singed_W)';
   description =

@@ -8,6 +8,7 @@ import TrueSight from '../buffs/TrueSight';
 import { Rectangle } from '../../../libs/quadtree';
 
 export default class LeeSin_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   static PHASES = {
     Q1: {
       image: AssetManager.get('spell_leesin_q1'),

@@ -8,6 +8,7 @@ import Slow from '../buffs/Slow';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_W extends Spell {
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_ahri_w');
   name = 'Lửa Hồ Ly (Ahri_W)';
   description =

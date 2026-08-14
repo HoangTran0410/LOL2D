@@ -15,6 +15,7 @@ import Slow from '../buffs/Slow';
  * walk out but cannot dash or blink out.
  */
 export default class Cassiopeia_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_cassiopeia_w');
   name = 'Bãi Độc (Cassiopeia_W)';
   description =

@@ -22,6 +22,7 @@ const CHAIN_DARK: [number, number, number] = [20, 70, 45];
  * recast to leap to the shackled victim himself.
  */
 export default class Thresh_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   static PHASES = {
     Q1: {
       image: AssetManager.get('spell_thresh_q'),

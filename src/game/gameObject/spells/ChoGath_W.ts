@@ -9,6 +9,7 @@ import Root from '../buffs/Root';
 import Stun from '../buffs/Stun';
 
 export default class ChoGath_W extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_chogath_w');
   name = "Tiếng Gầm Hoang Dã (Cho'Gath_W)";
   description =

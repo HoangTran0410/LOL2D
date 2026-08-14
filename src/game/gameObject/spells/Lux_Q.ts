@@ -5,6 +5,7 @@ import Spell from '../Spell';
 import RootBuff from '../buffs/Root';
 
 export default class Lux_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   name = 'Khóa Ánh Sáng (Lux_Q)';
   image = AssetManager.get('spell_lux_q');
   description =

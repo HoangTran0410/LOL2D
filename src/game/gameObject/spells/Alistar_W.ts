@@ -9,6 +9,8 @@ import Airborne from '../buffs/Airborne';
 import Dash from '../buffs/Dash';
 
 export default class Alistar_W extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_alistar_w');
   name = 'Húc Bay (Alistar_W)';
   description =

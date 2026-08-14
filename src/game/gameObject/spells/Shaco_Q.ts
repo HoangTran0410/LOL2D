@@ -7,6 +7,7 @@ import Speedup from '../buffs/Speedup';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export default class Shaco_Q extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_shaco_q');
   name = 'Lừa Gạt (Shaco_Q)';
   description =

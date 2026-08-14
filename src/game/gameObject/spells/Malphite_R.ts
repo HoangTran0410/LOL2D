@@ -8,6 +8,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
 export default class Malphite_R extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_malphite_r');
   name = 'Không Thể Cản Phá (Malphite_R)';
   description =

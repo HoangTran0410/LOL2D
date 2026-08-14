@@ -9,6 +9,7 @@ import Slow from '../buffs/Slow';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ashe_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_q');
   name = 'Mưa Tên Băng Giá (Ashe_Q)';
   description =

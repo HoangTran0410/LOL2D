@@ -9,6 +9,7 @@ import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
 
 export default class Olaf_Q extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_olaf_q');
   name = 'Phóng Rìu (Olaf_Q)';
   description =

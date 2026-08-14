@@ -11,6 +11,8 @@ import Stun from '../buffs/Stun';
 import ParticleSystem from '../helpers/ParticleSystem';
 
 export default class LeeSin_R extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_leesin_r');
   name = 'Nộ Long Cước (LeeSin_R)';
   description =

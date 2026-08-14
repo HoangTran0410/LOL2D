@@ -19,6 +19,7 @@ export const MANA_COST = 40;
  * rule does not apply to it.
  */
 export default class Teemo_W extends Spell {
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_teemo_w');
   name = 'Chạy Nhanh (Teemo_W)';
   description =

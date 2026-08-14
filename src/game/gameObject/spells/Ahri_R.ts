@@ -9,6 +9,7 @@ import Dash from '../buffs/Dash';
 import TrailSystem from '../helpers/TrailSystem';
 
 export default class Ahri_R extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_ahri_r');
   name = 'Phi Hồ (Ahri_R)';
   description =

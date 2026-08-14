@@ -14,6 +14,8 @@ export const SIZE_PER_STACK = 6;
 export const MAX_HEALTH_PER_STACK = 75;
 
 export default class ChoGath_R extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_chogath_r');
   name = "Ăn Thịt (Cho'Gath_R)";
   description =

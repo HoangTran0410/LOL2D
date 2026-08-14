@@ -13,6 +13,7 @@ const LINEN: [number, number, number] = [235, 222, 172];
 const LINEN_DARK: [number, number, number] = [125, 108, 66];
 
 export default class Amumu_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_amumu_q');
   name = 'Băng Quấn Hận Thù (Amumu_Q)';
   description =

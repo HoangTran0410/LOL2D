@@ -231,6 +231,7 @@ describe('Janna R', () => {
 
   it('keeps channeling after rejected casts and imported-permitted summoner casts', () => {
     class RejectedSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
       checkCastCondition(): boolean { return false; }
     }
 
@@ -250,7 +251,9 @@ describe('Janna R', () => {
   });
 
   it('cancels only after a prohibited spell successfully casts', () => {
-    class ProhibitedSpell extends Spell {}
+    class ProhibitedSpell extends Spell {
+      targetingMode = 'DIRECTION' as const;
+    }
 
     const { owner } = makeOwner();
     const spell = new Janna_R(owner);

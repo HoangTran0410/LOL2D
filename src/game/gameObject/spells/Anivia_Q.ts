@@ -20,6 +20,7 @@ import TrailSystem from '../helpers/TrailSystem';
  * spell back to Q1 (on full cooldown) once the missile is gone.
  */
 export default class Anivia_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_anivia_q');
   name = 'Sương Băng (Anivia_Q)';
   description =

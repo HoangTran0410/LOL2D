@@ -24,6 +24,8 @@ import Shield from '../buffs/Shield';
  * it is adapted into a heal-over-time of the same "sustain in a fight" shape.
  */
 export default class LeeSin_W extends Spell {
+  // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
+  targetingMode = 'SELF' as const;
   static PHASES = {
     W1: { image: AssetManager.get('spell_leesin_w') },
     // The wiki carries no separate icon for the second form, so the recast

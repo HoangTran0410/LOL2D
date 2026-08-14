@@ -7,6 +7,7 @@ import Airborne from '../buffs/Airborne';
 import Slow from '../buffs/Slow';
 
 export default class ChoGath_Q extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_chogath_q');
   name = "Rạn Nứt (Cho'Gath_Q)";
   description =

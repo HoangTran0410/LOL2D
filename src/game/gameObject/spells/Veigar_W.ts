@@ -21,6 +21,7 @@ const CRACK_COUNT = 10;
 const RUSH_MS = 250;
 
 export default class Veigar_W extends Spell {
+  targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_veigar_w');
   name = 'Vật Chất Hắc Ám (Veigar_W)';
   description =
