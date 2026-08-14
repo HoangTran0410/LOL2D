@@ -356,6 +356,12 @@
 }
 
 /* ===================== Spell Picker ===================== */
+/* One compact layout for both modes now. It used to be a wide (80vw, up to
+   1000px) multi-column grid on the desktop and a narrow vertical scroll under
+   `body.touch-ui`; the narrow one reads better, so it is the only one — a
+   centred column that is near-full-width on a phone and a tidy ~560px sheet on
+   a monitor. The former `body.touch-ui .spell-picker*` overrides are folded
+   into these base rules. */
 .spell-picker {
   position: fixed;
   top: 50%;
@@ -364,13 +370,13 @@
   background-color: #111;
   border-radius: 5px;
   border: solid 2px #fff3;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  width: 80vw;
-  max-width: 1000px;
-  max-height: 95vh;
+  width: min(96vw, 560px);
+  max-height: 90vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* A zero-height, `position: sticky` anchor for .close-btn — sticky only
@@ -390,11 +396,24 @@
 .spell-picker .title {
   margin: 0;
   padding: 0;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   color: #eee;
   text-align: center;
-  font-size: 1.4em;
+  font-size: 1.1em;
   font-weight: bold;
+}
+
+.spell-picker > p {
+  font-size: 0.85em;
+  margin: 4px 0;
+}
+
+/* 22px so the mode checkboxes are a real tap target (the native control is
+   ~13px), a size that reads fine with a mouse too. */
+.spell-picker input[type='checkbox'] {
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
 }
 
 .spell-picker .list {
@@ -435,6 +454,16 @@
   box-shadow: 0 0 0 2px #7fd3ff55;
 }
 
+/* A slot with a pending, not-yet-confirmed pick — a gold tint so the player
+   can see at a glance which slots the "Xác nhận" button will change. */
+.slot-pill.staged {
+  border-color: #d9b568;
+}
+
+.slot-pill.staged.active {
+  border-color: #7fd3ff;
+}
+
 .slot-pill-key {
   position: absolute;
   bottom: -1px;
@@ -449,19 +478,26 @@
   border-radius: 4px 0 4px 0;
 }
 
+/* The icon *is* the button in the picker; 3em keeps it a comfortable target
+   in either mode. */
 .spell-picker .spell {
-  margin: 2px;
+  width: 3em;
+  height: 3em;
+  margin: 3px;
   display: inline-block;
 }
 
 .spell-picker .close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
+  width: 44px;
+  height: 44px;
   color: white;
   font-size: 1.5em;
   cursor: pointer;
   border: none;
+  border-radius: 6px;
   background-color: #ddd2;
 }
 
@@ -474,8 +510,8 @@
   display: inline-block;
   border: 1px solid #fff3;
   border-radius: 5px;
-  margin: 10px;
-  padding: 5px;
+  margin: 4px;
+  padding: 4px;
   transition: all 0.1s ease;
 }
 
@@ -492,8 +528,8 @@
 }
 
 .spell-picker .group-header img {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   margin-right: 5px;
   background-color: #fff5;
   border-radius: 50%;
@@ -504,6 +540,7 @@
   margin: 0;
   padding: 0;
   font-weight: bold;
+  font-size: 0.9em;
   color: #ddd;
 }
 
@@ -511,29 +548,54 @@
   color: #eee;
 }
 
-.background-picker {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  filter: blur(3px);
-  opacity: 0.2;
-  object-fit: cover;
+/* Sticky footer, the mirror of the sticky close button at the top: the
+   Huỷ / Xác nhận actions stay pinned to the bottom of the modal's viewport so
+   they are reachable however far the roster is scrolled. Nothing is applied to
+   the game until "Xác nhận" (see SpellPickerModal.vue). */
+.picker-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 12;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  background: #111;
 }
 
+.picker-btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 2px solid #fff3;
+  background-color: #1b1b1b;
+  color: #eee;
+  font-size: 0.95em;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.picker-btn.cancel:hover {
+  border-color: #b50000;
+  color: #fff;
+}
+
+.picker-btn.confirm {
+  border-color: #d9b56888;
+  color: #d9b568;
+}
+
+.picker-btn.confirm:hover {
+  border-color: #d9b568;
+  color: #f0cf8a;
+  background-color: #221d12;
+}
+
+/* The changelog was desktop reading matter opened on hover; the unified
+   compact layout drops it (it never showed under `body.touch-ui` anyway). */
 .change-logs {
-  max-height: 30px;
-  overflow: hidden;
-  transition: all 0.2s 0s;
-}
-
-.change-logs:hover {
-  max-height: 200px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  transition: all 0.2s 0.5s;
+  display: none;
 }
 
 /* Tooltip container */
@@ -615,64 +677,11 @@ body.touch-ui .spell-info img {
 }
 
 /* =============== Spell picker =============== */
-body.touch-ui .spell-picker {
-  width: 96vw;
-  max-width: none;
-  max-height: 90vh;
-  padding: 6px;
-  -webkit-overflow-scrolling: touch;
-}
-
-body.touch-ui .spell-picker .title {
-  font-size: 1.1em;
-  margin-bottom: 6px;
-}
-
-body.touch-ui .spell-picker > p {
-  font-size: 0.85em;
-  margin: 4px 0;
-}
-
-/* 44px is the smallest target a thumb hits reliably; the native control is
-   13px, and it is the only way out of one of the two game modes. */
-body.touch-ui .spell-picker input[type='checkbox'] {
-  width: 22px;
-  height: 22px;
-  vertical-align: middle;
-}
-
-body.touch-ui .spell-picker .close-btn {
-  width: 44px;
-  height: 44px;
-  font-size: 1.5em;
-  border-radius: 6px;
-}
-
-body.touch-ui .spell-picker .group {
-  margin: 4px;
-  padding: 4px;
-}
-
-body.touch-ui .spell-picker .group-header img {
-  width: 30px;
-  height: 30px;
-}
-
-body.touch-ui .spell-picker .group-header p {
-  font-size: 0.9em;
-}
-
-/* Kept at 48px: in the picker an icon *is* the button. */
-body.touch-ui .spell-picker .spell {
-  width: 3em;
-  height: 3em;
-  margin: 3px;
-}
-
-/* Both of these open on :hover, which a touch screen does not have. The
-   changelog is desktop reading matter; the mode tooltips are explained by the
-   labels beside them. */
-body.touch-ui .change-logs,
+/* The picker's sizing is now one shared compact layout (see `.spell-picker`
+   above), so the old touch-only size overrides are gone. The only thing still
+   mode-specific is the mode-checkbox tooltips: they open on :hover, which a
+   touch screen has no way to trigger, and the labels beside them already say
+   what they do. */
 body.touch-ui .spell-picker .tooltip .tooltiptext {
   display: none;
 }

@@ -117,17 +117,29 @@ export interface HudInteractions {
   searchSpellText: string;
   showSpellsPicker: boolean;
   spellIndexToSwap: number;
+  /**
+   * The staged loadout, one entry per equipped slot, parallel to
+   * `HudState.spells`. `null` means "this slot is unchanged from what the
+   * player has equipped"; a `SpellItemDisplay` is a pending pick not yet
+   * applied to the game. Picking edits this; `confirmPicks` flushes it to the
+   * real champion and `closeSpellPicker` throws it away — the point of the
+   * whole draft is that a player can try several spells before committing,
+   * instead of every tap applying and closing the modal. See `pick`.
+   */
+  draftSpells: (SpellItemDisplay | null)[];
   /** Used for pre-loading every spell icon's asset before the picker opens. */
   allSpells: SpellItemDisplay[];
   spellGroups: SpellGroupDisplay[];
-  backgroundPicker: string | null;
   spellHover: any;
   spellInfo: { top: string; bottom: string; left: string; width: string };
   /** Mirrors game.touchControls.enabled; both views read it, neither owns it. */
   touchUi: boolean;
 
   filteredSpells(): SpellItemDisplay[];
+  /** Stages `spell` into the active slot (or every slot, under `oneForAll`). Does not apply or close — see `draftSpells`. */
   pick(spell: SpellItemDisplay): void;
+  /** Flushes the staged `draftSpells` to the player (and bots, per the two mode flags), then closes the picker. */
+  confirmPicks(): void;
   changeSpell(index: number): void;
   /**
    * Opens the picker without a specific icon having been tapped to reach it
@@ -157,8 +169,6 @@ export interface HudInteractions {
   mouseover(spellProxy: any, event: any): void;
   mouseout(spellProxy: any): void;
   showSpellInfo(spellProxy: any, element: any): void;
-  mouseoverGroup(group: SpellGroupDisplay): void;
-  mouseoutGroup(): void;
   showPreview(spellProxy: any, show: boolean): void;
 }
 
@@ -195,7 +205,7 @@ export function createHudInteractions(game: Game): HudInteractions {
       backgroundKey: group.background,
       spells: group.spells.map(buildSpellItem),
     })),
-    backgroundPicker: null as string | null,
+    draftSpells: [] as (SpellItemDisplay | null)[],
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
@@ -204,33 +214,63 @@ export function createHudInteractions(game: Game): HudInteractions {
       return filterSpells(state.allSpells, state.searchSpellText);
     },
 
+    /**
+     * Stage a pick into `draftSpells` — nothing touches the game until
+     * `confirmPicks`. `oneForAll` fills every slot so the slot-picker previews
+     * the "one spell everywhere" effect; otherwise only the active slot
+     * changes. The player can keep re-picking any slot until they are happy,
+     * then commit the lot at once, which is the whole point of the draft (the
+     * old behaviour applied and closed on the first tap).
+     */
     pick(spell: SpellItemDisplay): void {
+      if (state.oneForAll) {
+        state.draftSpells = state.draftSpells.map(() => spell);
+      } else if (state.spellIndexToSwap >= 0 && state.spellIndexToSwap < state.draftSpells.length) {
+        const next = state.draftSpells.slice();
+        next[state.spellIndexToSwap] = spell;
+        state.draftSpells = next;
+      }
+      state.spellHover = null;
+    },
+
+    /**
+     * Apply the whole staged draft in one go, then close. The per-slot and the
+     * `oneForAll` branches mirror what `pick` used to do immediately; the bot
+     * handling (`cloneMySpell` vs. the respawn flag) is unchanged, just run
+     * once per changed slot at commit time instead of on every tap.
+     */
+    confirmPicks(): void {
       const player = (game as any).player;
       const bots = game.objectManager.objects.filter((o: any) => o instanceof AIChampion);
 
       if (state.oneForAll) {
-        player.replaceSpells(player.spells.map(() => new spell.spellClass(player)));
-        bots.forEach((bot: any) => {
-          bot._respawnWithNewPreset = false;
-          bot.replaceSpells(bot.spells.map(() => new spell.spellClass(bot)));
-        });
-      } else if (state.spellIndexToSwap >= 0 && state.spellIndexToSwap <= player.spells.length) {
-        const spellInstance = new spell.spellClass(player);
-        player.replaceSpell(state.spellIndexToSwap, spellInstance);
-
-        bots.forEach((bot: any) => {
-          if (state.cloneMySpell) {
+        const chosen = state.draftSpells.find(Boolean);
+        if (chosen) {
+          player.replaceSpells(player.spells.map(() => new chosen.spellClass(player)));
+          bots.forEach((bot: any) => {
             bot._respawnWithNewPreset = false;
-            const botSpellInstance = new spell.spellClass(bot);
-            bot.replaceSpell(state.spellIndexToSwap, botSpellInstance);
-          } else {
-            bot._respawnWithNewPreset = true;
-          }
+            bot.replaceSpells(bot.spells.map(() => new chosen.spellClass(bot)));
+          });
+        }
+      } else {
+        state.draftSpells.forEach((item, index) => {
+          if (!item || index < 0 || index > player.spells.length) return;
+          player.replaceSpell(index, new item.spellClass(player));
+          bots.forEach((bot: any) => {
+            if (state.cloneMySpell) {
+              bot._respawnWithNewPreset = false;
+              bot.replaceSpell(index, new item.spellClass(bot));
+            } else {
+              bot._respawnWithNewPreset = true;
+            }
+          });
         });
       }
+
       state.showSpellsPicker = false;
       game.unpause();
       state.spellHover = null;
+      state.draftSpells = [];
     },
 
     touchSpellStart(spellProxy: any, event: any): void {
@@ -295,6 +335,10 @@ export function createHudInteractions(game: Game): HudInteractions {
       state.showSpellsPicker = !state.showSpellsPicker;
 
       if (state.showSpellsPicker) {
+        state.draftSpells = Array.from(
+          { length: (game as any).player?.spells?.length ?? 0 },
+          () => null
+        );
         state.loadSpellPickerAssets();
         game.pause();
       } else game.unpause();
@@ -315,6 +359,10 @@ export function createHudInteractions(game: Game): HudInteractions {
     openSpellPicker(): void {
       state.spellIndexToSwap = 1;
       state.showSpellsPicker = true;
+      state.draftSpells = Array.from(
+        { length: (game as any).player?.spells?.length ?? 0 },
+        () => null
+      );
       state.loadSpellPickerAssets();
       game.pause();
       state.spellHover = null;
@@ -337,6 +385,7 @@ export function createHudInteractions(game: Game): HudInteractions {
     closeSpellPicker(): void {
       state.showSpellsPicker = false;
       game.unpause();
+      state.draftSpells = [];
     },
 
     mouseover(spellProxy: any, event: any): void {
@@ -406,14 +455,6 @@ export function createHudInteractions(game: Game): HudInteractions {
       if (state.touchUi) return;
       state.showPreview(spellProxy, false);
       state.spellHover = null;
-    },
-
-    mouseoverGroup(group: SpellGroupDisplay): void {
-      if (group.background) state.backgroundPicker = group.background;
-    },
-
-    mouseoutGroup(): void {
-      state.backgroundPicker = null;
     },
 
     showPreview(spellProxy: any, show: boolean): void {

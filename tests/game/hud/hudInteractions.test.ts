@@ -163,4 +163,58 @@ describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
       expect(hud.showSpellsPicker).toBe(true);
     });
   });
+
+  describe('pick / confirmPicks — batched apply', () => {
+    // Opening seeds `draftSpells` to the player's slot count, which every
+    // pick then edits. The whole point of the draft: a pick stages, and
+    // nothing reaches the game until confirmPicks.
+    const openWithDraft = (game: any) => {
+      const hud = createHudInteractions(game);
+      hud.openSpellPicker();
+      return hud;
+    };
+
+    it('pick stages into the draft without applying or closing the picker', () => {
+      const game = fakeGame();
+      const hud = openWithDraft(game);
+      hud.spellIndexToSwap = 1;
+      hud.pick(spell({ name: 'Chọn Thử' }));
+      expect(hud.draftSpells[1]?.name).toBe('Chọn Thử');
+      expect(game.player.replaceSpell).not.toHaveBeenCalled();
+      expect(hud.showSpellsPicker).toBe(true);
+    });
+
+    it('confirmPicks applies each staged slot, then closes and clears the draft', () => {
+      const game = fakeGame();
+      const hud = openWithDraft(game);
+      hud.spellIndexToSwap = 1;
+      hud.pick(spell({ name: 'Chốt Hạ' }));
+      hud.confirmPicks();
+      expect(game.player.replaceSpell).toHaveBeenCalledOnce();
+      expect(game.player.replaceSpell.mock.calls[0][0]).toBe(1);
+      expect(hud.showSpellsPicker).toBe(false);
+      expect(hud.draftSpells).toEqual([]);
+      expect(game.unpause).toHaveBeenCalled();
+    });
+
+    it('closeSpellPicker discards staged picks without applying them', () => {
+      const game = fakeGame();
+      const hud = openWithDraft(game);
+      hud.pick(spell({ name: 'Bỏ Đi' }));
+      hud.closeSpellPicker();
+      expect(game.player.replaceSpell).not.toHaveBeenCalled();
+      expect(hud.draftSpells).toEqual([]);
+    });
+
+    it('oneForAll stages into every slot and confirm replaces them all at once', () => {
+      const game = fakeGame();
+      const hud = openWithDraft(game);
+      hud.oneForAll = true;
+      hud.pick(spell({ name: 'Một Cho Tất Cả' }));
+      expect(hud.draftSpells.every(s => s?.name === 'Một Cho Tất Cả')).toBe(true);
+      hud.confirmPicks();
+      expect(game.player.replaceSpells).toHaveBeenCalledOnce();
+      expect(game.player.replaceSpell).not.toHaveBeenCalled();
+    });
+  });
 });

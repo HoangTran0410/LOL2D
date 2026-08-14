@@ -166,6 +166,10 @@ try {
     const shaco = groups.find(g => g.querySelector('.group-header p')?.textContent?.trim() === 'Shaco');
     const icon = shaco?.querySelectorAll('.spell')[0];
     if (!icon) return null;
+    // The unified compact layout is a vertical scroll; on a short landscape
+    // viewport Shaco sits below the fold, so bring it into view before we read
+    // its coordinates and tap them.
+    icon.scrollIntoView({ block: 'center' });
     const box = icon.getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   });
@@ -174,16 +178,37 @@ try {
     await tap(shacoIcon.x, shacoIcon.y);
     await page.waitForTimeout(250);
   }
-  const afterPick = await page.evaluate(
+  // Picks are batched now: the tap only *stages* into slot 2's draft; the live
+  // loadout must not change until "Xác nhận".
+  const stagedAfterTap = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name
+  );
+  const liveAfterTap = await page.evaluate(
     () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
   );
-  report.pick = { beforePick, afterPick };
+  report.pick = { beforePick, stagedAfterTap, liveAfterTap };
   check(
-    'a real touch tap on a picker entry equips it into the slot the pill selected (slot 2, not the slot-1 default)',
-    afterPick !== beforePick && afterPick?.startsWith('Shaco'),
-    `${beforePick} -> ${afterPick}`
+    'a real touch tap stages the pick into the selected slot (2) without applying it',
+    stagedAfterTap?.startsWith('Shaco') && liveAfterTap === beforePick,
+    `staged=${stagedAfterTap}, live ${beforePick} -> ${liveAfterTap}`
   );
-  // pick() closes the picker itself; reopen for the rest of the checks.
+  // Confirm flushes the draft to the live loadout and closes the picker.
+  const confirmBox = await page.evaluate(() => {
+    const box = document.querySelector('.picker-btn.confirm').getBoundingClientRect();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  });
+  await tap(confirmBox.x, confirmBox.y, 40);
+  await page.waitForTimeout(250);
+  const afterConfirm = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
+  );
+  report.confirm = { afterConfirm };
+  check(
+    '"Xác nhận" applies the staged pick to slot 2 (and only then)',
+    afterConfirm !== beforePick && afterConfirm?.startsWith('Shaco'),
+    `${beforePick} -> ${afterConfirm}`
+  );
+  // Confirm closed the picker; reopen for the rest of the checks.
   await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker());
   await page.waitForTimeout(300);
 
@@ -232,8 +257,10 @@ try {
   // ------------------------------- 6. a drag that starts on an icon scrolls,
   //                                    it does not also pick that icon
 
-  const beforeDragPick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
+  // The reopen above reset the draft, so slot 2 starts unstaged; a scroll drag
+  // that begins on an icon must not stage it either.
+  const beforeDragStaged = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name ?? null
   );
   const firstVisibleIcon = await page.evaluate(() => {
     const icon = document.querySelector('.spell-picker .group .spell');
@@ -247,13 +274,13 @@ try {
   await page.waitForTimeout(100);
   await touchEnd();
   await page.waitForTimeout(200);
-  const afterDragPick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
+  const afterDragStaged = await page.evaluate(
+    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name ?? null
   );
   check(
-    'a drag that starts on a picker icon (scrolling) does not equip it',
-    afterDragPick === beforeDragPick,
-    `${beforeDragPick} -> ${afterDragPick}`
+    'a drag that starts on a picker icon (scrolling) does not stage it',
+    afterDragStaged === beforeDragStaged,
+    `${beforeDragStaged} -> ${afterDragStaged}`
   );
 
   // ---------------------------------------------------------- 7. close button

@@ -39,14 +39,19 @@
  * from its container but *a* scrolling ancestor, which `.spell-picker`
  * (unchanged, still just `overflow-y: auto` on itself) already is.
  *
- * The slot selector (`.slot-picker`, touch-ui only) is the other mode-
- * specific piece. On the desktop it is redundant — the bottom-HUD strip has
- * one tap target per equipped spell, so which slot you are replacing is
- * already decided by which icon you clicked before the picker even opened.
- * That strip does not exist in touch mode any more (see `InGameHUD.vue`),
- * so its one entry point — the corner button, `hud.openSpellPicker()` —
- * cannot know which slot the player wants either. This row is how they
- * choose, without leaving the modal.
+ * The slot selector (`.slot-picker`) is shown in both modes now. The desktop
+ * bottom-HUD strip still pre-selects a slot by which icon opened the picker,
+ * but picks are batched — you can retarget a different slot and try another
+ * spell any number of times before committing — so the in-modal row has to be
+ * there on the desktop too, not just as the touch corner button's only way to
+ * choose a slot. Each pill previews the *staged* choice (`hud.draftSpells`)
+ * over what is currently equipped.
+ *
+ * Nothing is applied to the game on a pick any more: `hud.pick` only stages
+ * into `draftSpells`, and the sticky `.picker-actions` footer commits the lot
+ * (`hud.confirmPicks`) or discards it (`hud.closeSpellPicker`, same as the X).
+ * This is what lets a player keep changing their mind — the old picker applied
+ * and closed on the first tap. See `hudInteractions.ts`.
  */
 import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
@@ -78,7 +83,6 @@ function scrollTouchMove(event: TouchEvent): void {
 
 <template>
   <div class="spell-picker" @touchstart="scrollTouchStart" @touchmove="scrollTouchMove">
-    <img alt="background" class="background-picker" :src="hud.backgroundPicker ?? undefined" />
     <div class="close-btn-anchor">
       <button
         class="close-btn"
@@ -90,19 +94,22 @@ function scrollTouchMove(event: TouchEvent): void {
     </div>
     <p class="title">Chọn chiêu thức</p>
 
-    <!-- Touch-only: picks which equipped slot the tap below will replace.
-         See the file comment for why this only exists in touch mode. -->
-    <div class="slot-picker" v-if="hud.touchUi">
+    <!-- Picks which equipped slot the next tap in the roster replaces. Shown
+         in both modes now (it used to be touch-only): with batched picks the
+         desktop needs it too, so a player can retarget slots without closing.
+         The icon previews the *staged* choice (`draftSpells`) when there is
+         one, falling back to what is currently equipped. -->
+    <div class="slot-picker">
       <button
         v-for="(spell, index) of state.spells"
         :key="index"
         type="button"
         class="slot-pill"
-        :class="{ active: hud.spellIndexToSwap === index }"
+        :class="{ active: hud.spellIndexToSwap === index, staged: !!hud.draftSpells[index] }"
         @click="hud.spellIndexToSwap = index"
         @touchend.prevent="hud.spellIndexToSwap = index"
       >
-        <img :src="spell.image" alt="spell" />
+        <img :src="hud.draftSpells[index]?.image ?? spell.image" alt="spell" />
         <span class="slot-pill-key">{{ spell.hotKey }}</span>
       </button>
     </div>
@@ -135,12 +142,7 @@ function scrollTouchMove(event: TouchEvent): void {
     </p>
 
     <div class="list">
-      <div
-        class="group"
-        v-for="group of hud.spellGroups"
-        :key="group.name"
-        @mouseover="hud.mouseoverGroup(group)"
-      >
+      <div class="group" v-for="group of hud.spellGroups" :key="group.name">
         <div class="group-header">
           <img v-if="group.image" :src="group.image" alt="spell" />
           <p>{{ group.name }}</p>
@@ -160,6 +162,30 @@ function scrollTouchMove(event: TouchEvent): void {
           <img :src="spell.image" alt="spell" />
         </div>
       </div>
+    </div>
+
+    <!-- Sticky footer: nothing is applied to the game until "Xác nhận" flushes
+         the staged draft (see hudInteractions.pick/confirmPicks). "Huỷ" throws
+         the draft away and closes, same as the X. Pinned to the bottom of the
+         modal's viewport so it stays reachable however far the roster is
+         scrolled, the mirror of the sticky close button at the top. -->
+    <div class="picker-actions">
+      <button
+        type="button"
+        class="picker-btn cancel"
+        @click="hud.closeSpellPicker()"
+        @touchend.prevent="hud.closeSpellPicker()"
+      >
+        Huỷ
+      </button>
+      <button
+        type="button"
+        class="picker-btn confirm"
+        @click="hud.confirmPicks()"
+        @touchend.prevent="hud.confirmPicks()"
+      >
+        Xác nhận
+      </button>
     </div>
 
     <div class="change-logs">
