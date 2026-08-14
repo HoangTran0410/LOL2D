@@ -126,13 +126,27 @@ const commitSlot = (choice: string): void => {
   activeSlot.value = null;
 };
 
+/**
+ * The backdrop dismisses one layer at a time, matching the header's back
+ * arrow: from the ability preview or the spell selector it returns to the
+ * loadout editor; only from the editor's own root view does it close the
+ * modal. Without this, a backdrop tap while previewing an ability closed the
+ * whole editor — inconsistent with the back arrow sitting right beside it,
+ * which only steps back to the champion grid.
+ */
+const onBackdrop = (): void => {
+  if (previewDisplay.value) closePreview();
+  else if (activeSlot.value) cancelSlot();
+  else emit('close');
+};
+
 const summonerIcon = (id: string) => summoners.find(s => s.id === id)?.display ?? null;
 const slotIcon = (choice: SlotChoice) =>
   (choice !== 'random' ? (spellCatalog.find(e => e.id === choice)?.display ?? null) : null);
 </script>
 
 <template>
-  <div class="pregame-modal-backdrop" @click.self="emit('close')">
+  <div class="pregame-modal-backdrop" @click.self="onBackdrop">
     <div class="pregame-modal loadout-modal">
       <template v-if="!activeSlot && !previewDisplay">
         <header class="pregame-modal-header">
