@@ -88,83 +88,51 @@ function scrollTouchMove(event: TouchEvent): void {
            the two buttons live here rather than a separate footer to save
            vertical space. -->
       <div class="slot-picker">
-        <button
-          v-for="(spell, index) of state.spells"
-          :key="index"
-          type="button"
-          class="slot-pill"
+        <button v-for="(spell, index) of state.spells" :key="index" type="button" class="slot-pill"
           :class="{ active: hud.spellIndexToSwap === index, staged: !!hud.draftSpells[index] }"
-          @click="hud.spellIndexToSwap = index"
-          @touchend.prevent="hud.spellIndexToSwap = index"
-        >
+          @click="hud.spellIndexToSwap = index" @touchend.prevent="hud.spellIndexToSwap = index">
           <img :src="hud.draftSpells[index]?.image ?? spell.image" alt="spell" />
           <span class="slot-pill-key">{{ spell.hotKey }}</span>
         </button>
 
-        <button
-          type="button"
-          class="picker-btn cancel"
-          @click="hud.closeSpellPicker()"
-          @touchend.prevent="hud.closeSpellPicker()"
-        >
+        <button type="button" class="picker-btn cancel" @click="hud.closeSpellPicker()"
+          @touchend.prevent="hud.closeSpellPicker()">
           Huỷ
         </button>
-        <button
-          type="button"
-          class="picker-btn confirm"
-          @click="hud.confirmPicks()"
-          @touchend.prevent="hud.confirmPicks()"
-        >
+        <button type="button" class="picker-btn confirm" @click="hud.confirmPicks()"
+          @touchend.prevent="hud.confirmPicks()">
           Xác nhận
         </button>
       </div>
 
+    </div>
+
+    <div class="list">
       <p class="picker-modes">
-        Chế độ (mới):
+        Chế độ:
         <span class="tooltip">
-          <input
-            type="checkbox"
-            id="oneForAll"
-            :checked="hud.oneForAll"
-            @click="hud.oneForAll = !hud.oneForAll"
-            @touchend.prevent="hud.oneForAll = !hud.oneForAll"
-          />
+          <input type="checkbox" id="oneForAll" :checked="hud.oneForAll" @click="hud.oneForAll = !hud.oneForAll"
+            @touchend.prevent="hud.oneForAll = !hud.oneForAll" />
           <label for="oneForAll">ONE spell for ALL</label>
           <span class="tooltiptext">Tất cả đều chỉ dùng 1 chiêu thức</span>
         </span>
 
         <span class="tooltip">
-          <input
-            type="checkbox"
-            id="cloneMySpell"
-            :checked="hud.cloneMySpell"
-            @click="hud.cloneMySpell = !hud.cloneMySpell"
-            @touchend.prevent="hud.cloneMySpell = !hud.cloneMySpell"
-          />
+          <input type="checkbox" id="cloneMySpell" :checked="hud.cloneMySpell"
+            @click="hud.cloneMySpell = !hud.cloneMySpell" @touchend.prevent="hud.cloneMySpell = !hud.cloneMySpell" />
           <label for="cloneMySpell">Clone my spells</label>
           <span class="tooltiptext">Tất cả đều dùng bộ chiêu thức giống bạn</span>
         </span>
       </p>
-    </div>
-
-    <div class="list">
       <div class="group" v-for="group of hud.spellGroups" :key="group.name">
         <div class="group-header">
           <img v-if="group.image" :src="group.image" alt="spell" />
           <p>{{ group.name }}</p>
         </div>
-        <div
-          v-for="spell of group.spells"
-          :key="spell.name"
-          class="spell"
-          @click="hud.pick(spell)"
-          @mouseover="hud.mouseover(spell, $event)"
-          @mouseout="hud.mouseout(spell)"
-          @touchstart="hud.touchSpellStart(spell, $event)"
-          @touchmove="hud.touchSpellMove($event)"
-          @touchend.prevent="hud.touchSpellEnd(() => hud.pick(spell))"
-          @touchcancel="hud.cancelLongPress()"
-        >
+        <div v-for="spell of group.spells" :key="spell.name" class="spell" @click="hud.pick(spell)"
+          @mouseover="hud.mouseover(spell, $event)" @mouseout="hud.mouseout(spell)"
+          @touchstart="hud.touchSpellStart(spell, $event)" @touchmove="hud.touchSpellMove($event)"
+          @touchend.prevent="hud.touchSpellEnd(() => hud.pick(spell))" @touchcancel="hud.cancelLongPress()">
           <img :src="spell.image" alt="spell" />
         </div>
       </div>
