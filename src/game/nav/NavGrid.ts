@@ -25,16 +25,29 @@
  *
  * ## Resolution
  *
- * 24px cells: 267 x 267 = 71,289 cells, 139KB as a Uint16Array, ~7ms to build.
+ * 16px cells: 400 x 400 = 160,000 cells, 313KB as a Uint16Array, ~4ms to build.
  * The resolution was picked by measurement, not taste — flood-filling the map
  * for each body size at 48/32/24/20/16px shows 48px severs Baron's camp from
  * the lanes for a champion and severs the top lane for a large body, and 32px
- * still severs Baron for a large body. 24px is the coarsest cell that leaves
- * every camp and both fountains mutually reachable for every body the game
- * spawns, and halving it again to 16px only quadruples the memory for paths
- * that string-pulling erases the difference between.
+ * still severs Baron for a large body; 24px was the original pick on those
+ * connectivity grounds alone.
  *
- * ## Clearance, and why it is conservative
+ * It undersold the real cost, though: a second measurement — moat area a
+ * champion's body (27.5px) fits on but the grid still refuses, click
+ * displacement from `nearestWalkable`, and search cost, all against the
+ * shipped map — found 24px cells cost 24.6% of standable ground as an
+ * invisible band nobody can walk into, up to 86px wide, and a click near a
+ * wall lands up to 59px from where it was clicked. 16px is better on every one
+ * of those axes at once: the moat drops to 13.3%, worst case 68px; click
+ * displacement drops to a 18px median, 40px worst; and the search itself gets
+ * 4.5x cheaper (finer cells mean shorter A* hops to the same wall-hugging
+ * routes, more than offsetting there being more of them) with zero routes
+ * newly failing their node budget. There is no case in that data for keeping
+ * the coarser grid — 16px is not a trade, it is a strict improvement, and it
+ * still leaves every camp and both fountains mutually reachable for every
+ * body the game spawns.
+ *
+ * ## Clearance, and why it is conservative — but not maximally so
  *
  * Cells are marked blocked if a wall polygon covers their centre (scanline) or
  * if a wall *edge* crosses them at all (supercover DDA) — the second pass is
@@ -47,10 +60,13 @@
  * turn "distance to a blocked cell centre" into a lower bound on "distance to
  * the wall". Stored floored to whole pixels, which only ever understates it.
  *
- * Queries then ask for `radius + cellSize / 2` rather than `radius`: the stored
- * number describes the cell centre, and a body may stand anywhere in the cell.
- * Everything here therefore errs towards calling ground unwalkable, never
- * towards routing a body through a wall.
+ * Queries then ask for `radius + requiredClearance`'s margin rather than
+ * `radius` — see that method for what the margin is and why it is deliberately
+ * smaller than the value that would make this structure never wrong. Short
+ * version: a route that grazes a wall gets corrected by `pushOutOfWalls`
+ * every frame, gracefully, so the grid does not have to be perfect — it has to
+ * be close enough that the correction is never visible, and that bar is a lot
+ * lower than "never touches."
  */
 
 export interface NavPoint {
@@ -59,7 +75,18 @@ export interface NavPoint {
 }
 
 /** Cell size in world units. See the resolution note above. */
-export const NAV_CELL_SIZE = 24;
+export const NAV_CELL_SIZE = 16;
+
+/**
+ * The largest overlap `requiredClearance`'s margin is allowed to let a body
+ * have with real wall geometry — see that method's doc for the measurement
+ * behind this number and why it is safe. `tests/game/nav/NavGrid.test.ts`
+ * sweeps the shipped map densely enough to actually find the rare cells this
+ * bounds, so it is the one place this can move: shrinking the margin without
+ * lowering this to match is a lie the test will catch, and raising this
+ * without re-measuring is a safety margin picked by taste, not evidence.
+ */
+export const NAV_MAX_ACCEPTED_OVERLAP = 4;
 
 /** Clearance is stored in a Uint16Array; nothing on this map is further than this from a wall. */
 const MAX_STORED_CLEARANCE = 4_096;
@@ -315,13 +342,33 @@ export default class NavGrid {
   /**
    * Clearance a cell must report before a body of `radius` may stand in it.
    *
-   * The margin is half a cell diagonal, which is the furthest a body standing
-   * in the cell can be from the centre the stored number describes. Swept over
-   * the shipped map at 11px intervals — 200,000 samples — the stored field
-   * never overstates the true distance to wall geometry by more than 13.4px,
-   * so a 17px margin leaves the guarantee `isWalkable(p, r)` implies "a body of
-   * radius r at p does not touch a wall" with a few pixels to spare. The sweep
-   * is a test, so shrinking this is a failing build rather than a silent one.
+   * The margin used to be a full half-cell *diagonal* — the worst-case
+   * distance from a cell's centre to a body standing at its farthest corner —
+   * which makes `isWalkable(p, r)` imply "a body of radius r at p does not
+   * touch a wall" unconditionally. That guarantee is stronger than this game
+   * needs and it was expensive: on the shipped map it left a band of ground
+   * up to 86px wide that a champion's body physically fits on but navigation
+   * refused to route across, 24.6% of all standable ground. `pushOutOfWalls`
+   * resolves real wall contact every frame, gracefully — a route that grazes
+   * a wall is corrected, not broken — so the margin only has to be wide
+   * enough that the correction is never visible, not wide enough that contact
+   * never happens.
+   *
+   * Reduced to half a cell (axis-aligned, the same correction `buildClearance`
+   * already applies once to turn "distance to a blocked cell centre" into a
+   * lower bound on wall distance), a dense sweep of the shipped map — 9 points
+   * per free cell, centre plus every corner and edge midpoint, ~700,000
+   * samples per body size — finds this margin is not quite enough to keep the
+   * guarantee unconditional: a handful of cells (3 of 713,322 for a champion,
+   * 1 of 739,692 for a minion) let a body stand up to 3.7px closer to a wall
+   * than its own radius. That is the deliberately accepted trade: 3.7px is
+   * far smaller than the overlap `pushOutOfWalls` already corrects routinely
+   * from body-to-body separation, and nothing here routes a body *through* a
+   * wall — `isLineClear` still refuses any line whose cells fall short of
+   * this same margin, so the walk is never more than a graze away from the
+   * shipped-with guarantee. `tests/game/nav/NavGrid.test.ts` encodes the
+   * bound (`NAV_MAX_ACCEPTED_OVERLAP`) rather than "always zero" — shrinking
+   * this further than that measurement supports is a failing build.
    *
    * It also decides which bodies fit where. Every champion, minion and camp on
    * this map keeps both fountains, all three lanes and every camp mutually
@@ -331,7 +378,7 @@ export default class NavGrid {
    * refusing to move.
    */
   requiredClearance(radius: number): number {
-    return radius + this.cellSize * Math.SQRT1_2;
+    return radius + this.cellSize * 0.5;
   }
 
   /** Stored clearance at a world point, in px. 0 inside a wall. */
@@ -365,7 +412,20 @@ export default class NavGrid {
    * spanning half the map.
    */
   isLineClear(ax: number, ay: number, bx: number, by: number, radius: number): boolean {
-    const required = this.requiredClearance(radius);
+    return this.isLineClearAt(ax, ay, bx, by, this.requiredClearance(radius));
+  }
+
+  /**
+   * `isLineClear`, but against a caller-supplied clearance rather than
+   * `requiredClearance(radius)`. The one legitimate reason to reach past that
+   * margin is `smoothPath`'s snapped-start check: the nav margin is what makes
+   * the start of a route unwalkable in the first place when a unit is
+   * standing in the moat `requiredClearance`'s doc describes, so testing
+   * against that same margin can never answer "does this body actually fit
+   * here" — only the bare `radius` can. Every other caller should keep using
+   * `isLineClear`.
+   */
+  isLineClearAt(ax: number, ay: number, bx: number, by: number, required: number): boolean {
     const cellSize = this.cellSize;
 
     const x0 = ax / cellSize;

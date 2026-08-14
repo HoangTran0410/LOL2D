@@ -268,6 +268,35 @@ export default class PathAgent {
       const remaining = Math.hypot(position.x - this.goalX, position.y - this.goalY);
 
       if (remaining <= NAV_GOAL_TOLERANCE) {
+        // goalX/goalY are not necessarily what this route was planned towards:
+        // order() keeps them tracking the latest order even while a route is
+        // FOLLOWING or PENDING, replanning only on a jump past the tolerance
+        // or a stale plan. A held, dragged order creeps the goal forward one
+        // small step a frame, well under that tolerance every time, so by the
+        // time a (possibly one-waypoint) route finishes near it, the goal can
+        // have drifted onto the far side of a wall the route was never asked
+        // to cross. Unlike a brand new order, there is no distance here to
+        // spend "walk at the goal while a search runs" on -- the unit is
+        // already standing at the last point that *was* validated, so a
+        // drifted goal gets checked before being trusted, and the unit holds
+        // there rather than snapping straight at it.
+        if (
+          this.navigation.enabled &&
+          !this.navigation.isLineClear(
+            position.x,
+            position.y,
+            this.goalX,
+            this.goalY,
+            this.host.bodyRadius
+          )
+        ) {
+          this.state = 'PENDING';
+          destination.set(position.x, position.y);
+          this.planStartDistance = remaining;
+          this.replanCooldownMs = NAV_REPLAN_INTERVAL_MS;
+          this.navigation.request(this, this.urgent);
+          return;
+        }
         this.state = 'DIRECT';
         destination.set(this.goalX, this.goalY);
         return;

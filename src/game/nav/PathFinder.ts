@@ -248,7 +248,18 @@ export default class PathFinder {
 
     // the *snapped* goal, not the raw one: a click inside a wall must land on
     // the ground it was pulled onto, never back in the wall
-    const waypoints = this.reconstruct(bestIndex, generation, fromX, fromY, goal.x, goal.y, reached, radius);
+    const startWasSnapped = start.x !== fromX || start.y !== fromY;
+    const waypoints = this.reconstruct(
+      bestIndex,
+      generation,
+      fromX,
+      fromY,
+      goal.x,
+      goal.y,
+      reached,
+      radius,
+      startWasSnapped
+    );
     return { ok: reached, waypoints, expanded, elapsedMs: navNow() - startedAt };
   }
 
@@ -265,12 +276,17 @@ export default class PathFinder {
    *
    * The start cell centre is deliberately *kept* rather than overwritten with
    * the unit's position: when the start was snapped — a unit standing inside a
-   * wall — that cell is the way out, and dropping it would aim the first
-   * segment straight back through the wall. When the start was not snapped the
-   * unit is already standing on that cell, so the smoother drops the point on
-   * its own at no cost. The goal end is the reverse: on success the real goal
-   * replaces its cell centre, so an order lands where it was given rather than
-   * up to 17px off it.
+   * wall, or merely in the moat `NavGrid.requiredClearance` describes — that
+   * cell is A way out, and dropping it unconditionally would aim the first
+   * segment straight back through real geometry when the snap was for an
+   * actual wall. When the start was not snapped the unit is already standing
+   * on that cell, so the smoother drops the point on its own at no cost.
+   * `smoothPath` gets `startWasSnapped` so it can go further for the moat
+   * case specifically — see its own doc for why keeping the point there is
+   * often a needless, visible backwards step rather than a safety net. The
+   * goal end is the reverse: on success the real goal replaces its cell
+   * centre, so an order lands where it was given rather than up to a cell off
+   * it.
    */
   private reconstruct(
     endIndex: number,
@@ -280,7 +296,8 @@ export default class PathFinder {
     toX: number,
     toY: number,
     reached: boolean,
-    radius: number
+    radius: number,
+    startWasSnapped: boolean
   ): number[] {
     const grid = this.grid;
     const cols = grid.cols;
@@ -309,7 +326,7 @@ export default class PathFinder {
       raw[raw.length - 1] = toY;
     }
 
-    return smoothPath(fromX, fromY, raw, grid, radius);
+    return smoothPath(fromX, fromY, raw, grid, radius, startWasSnapped);
   }
 
   // ------------------------------------------------------------ binary heap
@@ -368,13 +385,36 @@ export default class PathFinder {
  *
  * `points` is the flat list of grid cell centres, start-first. The anchor is
  * never emitted — the unit is already standing on it.
+ *
+ * `startWasSnapped` marks the case where `points[0]` is not a real routing
+ * decision at all: it is `nearestWalkable`'s answer to "the origin itself
+ * fails `requiredClearance`", which is true both deep inside a wall *and*
+ * anywhere in the moat that margin deliberately leaves around one (see
+ * `NavGrid.requiredClearance`). `nearestWalkable` picks by raw distance, with
+ * no notion of which way the route is headed, so on this map it sends a
+ * unit's very first step backwards about three times out of four when the
+ * goal is short and the origin is in that moat — a step the unit visibly
+ * takes before turning round, which reads as freezing at a gap between two
+ * walls. The fix does not touch `nearestWalkable` — it is exactly right for
+ * its other callers, a click on a wall and a unit squeezed into one by
+ * separation, which have no "wrong direction" to avoid. Instead, when the
+ * start was snapped and the *next* point is directly reachable from the
+ * unit's real position at its bare `radius` — no nav margin, because the nav
+ * margin is what made the origin's own cell fail in the first place — the
+ * snapped point is dropped outright: a body that actually fits along that
+ * line has no reason to detour through a cell that only existed to give the
+ * search a legal start node. `isLineClearAt` still refuses the line outright
+ * when the origin is genuinely inside a wall (its own cell fails even the
+ * bare-radius check), so this never cuts a corner through real geometry —
+ * see `tests/game/nav/PathFinder.test.ts`.
  */
 export function smoothPath(
   originX: number,
   originY: number,
   points: readonly number[],
   grid: NavGrid,
-  radius: number
+  radius: number,
+  startWasSnapped = false
 ): number[] {
   const out: number[] = [];
   if (points.length < 2) return out;
@@ -399,11 +439,16 @@ export function smoothPath(
     candidate = furthest + 2;
   }
 
-  // The first grid cell is the one the unit is standing in whenever the start
-  // was not snapped, so an order that needed no detour would otherwise begin by
-  // walking on the spot.
-  if (out.length >= 4 && Math.hypot(out[0] - originX, out[1] - originY) < grid.cellSize * 0.75) {
-    out.splice(0, 2);
+  if (out.length >= 4) {
+    // The first grid cell is the one the unit is standing in whenever the
+    // start was not snapped, so an order that needed no detour would
+    // otherwise begin by walking on the spot.
+    const stoodOnAlready = Math.hypot(out[0] - originX, out[1] - originY) < grid.cellSize * 0.75;
+    // The snapped-start case above: the body fits the line to the next point
+    // for real, so the detour through the snap cell buys nothing.
+    const snapWasUnnecessary =
+      startWasSnapped && grid.isLineClearAt(originX, originY, out[2], out[3], radius);
+    if (stoodOnAlready || snapWasUnnecessary) out.splice(0, 2);
   }
   return out;
 }

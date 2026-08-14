@@ -19,6 +19,7 @@ import { loadPregameConfig, toMatchRules, type MatchRules } from './config/Prega
 import ObjectManager from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
 import NavigationSystem from './nav/NavigationSystem';
+import { drawNavDebug } from './nav/NavDebugOverlay';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
@@ -269,46 +270,12 @@ export default class Game {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
       this.objectManager.draw();
-      if (this.navigation.debugRoutes) this.drawRoutes();
+      drawNavDebug(this);
     });
 
     this.fogOfWar.draw();
     // After the fog: controls you cannot see are not controls.
     this.touchControls.draw();
-  }
-
-  /**
-   * Every unit's remaining route, when `navigation.debugRoutes` is on. Lives
-   * here rather than in the nav module so that module stays free of p5 and
-   * stays testable in a plain node environment.
-   */
-  drawRoutes(): void {
-    push();
-    for (const object of this.objectManager.objects) {
-      if (!(object instanceof AttackableUnit)) continue;
-      const agent = object.pathAgent;
-      if (!agent || agent.state !== 'FOLLOWING') continue;
-
-      let fromX = object.position.x;
-      let fromY = object.position.y;
-      stroke(90, 220, 255, 190);
-      strokeWeight(3);
-      noFill();
-      for (let i = agent.waypointIndex; i + 1 < agent.waypoints.length; i += 2) {
-        line(fromX, fromY, agent.waypoints[i], agent.waypoints[i + 1]);
-        fromX = agent.waypoints[i];
-        fromY = agent.waypoints[i + 1];
-      }
-
-      noStroke();
-      fill(90, 220, 255, 220);
-      for (let i = agent.waypointIndex; i + 1 < agent.waypoints.length; i += 2) {
-        circle(agent.waypoints[i], agent.waypoints[i + 1], 12);
-      }
-      fill(255, 210, 90, 230);
-      circle(agent.goalX, agent.goalY, 20);
-    }
-    pop();
   }
 
   destroy() {
@@ -520,6 +487,12 @@ export default class Game {
   keyPressed(keyCode: number, repeated = false) {
     if (keyCode === 32 && !repeated) {
       this.camera.target = this.camera.target ? null! : this.player.position;
+    }
+    // N: toggle the nav debug overlay (src/game/nav/NavDebugOverlay.ts) --
+    // the clearance field, active routes and every agent's state. Not one of
+    // SpellHotKeys' letters, so it never steals a cast.
+    if (keyCode === 78 && !repeated) {
+      this.navigation.debugRoutes = !this.navigation.debugRoutes;
     }
     this.spellInputController.keyDown(keyCode, repeated);
   }

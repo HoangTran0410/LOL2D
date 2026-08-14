@@ -87,10 +87,12 @@ export default class NavigationSystem {
   enabled = true;
 
   /**
-   * Draws every unit's remaining route. Off by default and never bound to a
-   * key — it is reached through `window.__lol2d` in dev builds, which is how
-   * the Playwright harness screenshots a walk, and how a change to the routing
-   * can be looked at rather than reasoned about.
+   * Draws the nav debug overlay (`src/game/nav/NavDebugOverlay.ts`): the
+   * clearance field at the player's own body radius, every unit's remaining
+   * route, and every agent's state. Off by default, toggled in-game with `N`
+   * (`Game.keyPressed`), and also reachable through `window.__lol2d` in dev
+   * builds — which is how the Playwright harness screenshots a walk, and how
+   * a change to the routing can be looked at rather than reasoned about.
    */
   debugRoutes = false;
 

@@ -130,7 +130,13 @@ describe('PathFinder on the shipped map', () => {
       { size: 4_096 }
     );
     const finder = new PathFinder(sealed);
-    const result = finder.search(300, 1_600, 1_600, 1_600, { radius: 20 });
+    // The goal sits just inside the west wall, not centred in the room: a
+    // goal equidistant from all four walls (as the room's centre is from a
+    // west-approaching start) leaves A* a genuine tie for "closest reachable
+    // node" between the west, north and south exterior, and which of those
+    // wins is an artifact of heap tie-breaking, not something this test
+    // should pin to one cell size's tie-breaking over another's.
+    const result = finder.search(300, 1_600, 1_050, 1_600, { radius: 20 });
 
     expect(result.ok).toBe(false);
     // it produced a real route towards the box rather than an empty list

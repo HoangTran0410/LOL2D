@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import NavGrid, { NAV_CELL_SIZE } from '../../../src/game/nav/NavGrid';
+import NavGrid, { NAV_CELL_SIZE, NAV_MAX_ACCEPTED_OVERLAP } from '../../../src/game/nav/NavGrid';
 import { pointInPolygon, wallClearance, wallPolygons } from './geometry';
 
 const MAP_SIZE = 6_400;
@@ -25,37 +25,65 @@ describe('NavGrid', () => {
     expect(realGrid.cols * realGrid.cellSize).toBeGreaterThanOrEqual(MAP_SIZE);
     expect(realGrid.rows).toBe(realGrid.cols);
     // one Uint16 per cell and nothing else: the static structure has to be
-    // small enough that holding it is never a question
+    // small enough that holding it is never a question. 16px cells put this
+    // at ~313KB (400x400 cells) against 24px's ~139KB — the cap moved up
+    // with the resolution, not because the old bound stopped being cheap.
     expect(realGrid.memoryBytes).toBe(realGrid.cols * realGrid.rows * 2);
-    expect(realGrid.memoryBytes).toBeLessThan(256 * 1024);
+    expect(realGrid.memoryBytes).toBeLessThan(384 * 1024);
   });
 
-  it('never calls a spot walkable that a body would not fit in', () => {
-    // The safety invariant, swept over the shipped map against the raw polygons:
-    // if the grid says a body of radius r fits at a point, the nearest wall is
-    // at least r away. Nothing else in the system is allowed to assume this —
-    // the search, the smoother and the straight-line check all go through
-    // isWalkable, so this one property is what keeps every one of them honest.
+  it('never calls a spot walkable more than NAV_MAX_ACCEPTED_OVERLAP into a wall', () => {
+    // The safety invariant, swept over the shipped map against the raw
+    // polygons: if the grid says a body of radius r fits at a point, the
+    // nearest wall is at least `r - NAV_MAX_ACCEPTED_OVERLAP` away. Every
+    // free cell is checked at its centre, all four corners and all four edge
+    // midpoints — not just centres — because `requiredClearance`'s margin is
+    // sized against exactly that "body anywhere in the cell" case, and a
+    // centre-only sweep would never see the corners it is meant to cover.
+    // The search, the smoother and the straight-line check all go through
+    // isWalkable, so this one property is what keeps every one of them
+    // honest — and NAV_MAX_ACCEPTED_OVERLAP (not zero) is what they are
+    // honest *to*. See NavGrid.requiredClearance for the reasoning and the
+    // measurement behind that bound.
+    const offsets: Array<[number, number]> = [
+      [0.5, 0.5],
+      [0.02, 0.02],
+      [0.98, 0.02],
+      [0.02, 0.98],
+      [0.98, 0.98],
+      [0.5, 0.02],
+      [0.5, 0.98],
+      [0.02, 0.5],
+      [0.98, 0.5],
+    ];
     let checked = 0;
     let tightest = Infinity;
     let tightestAt = '';
 
     for (const radius of [MINION_RADIUS, CHAMPION_RADIUS]) {
-      for (let y = 7; y < MAP_SIZE; y += 43) {
-        for (let x = 7; x < MAP_SIZE; x += 43) {
-          if (!realGrid.isWalkable(x, y, radius)) continue;
-          checked++;
-          const slack = wallClearance(x, y, 400) - radius;
-          if (slack < tightest) {
-            tightest = slack;
-            tightestAt = `(${x}, ${y}) r=${radius}`;
+      const required = realGrid.requiredClearance(radius);
+      for (let cy = 0; cy < realGrid.rows; cy++) {
+        for (let cx = 0; cx < realGrid.cols; cx++) {
+          if (realGrid.clearance[cy * realGrid.cols + cx] < required) continue;
+          for (const [ox, oy] of offsets) {
+            const x = (cx + ox) * realGrid.cellSize;
+            const y = (cy + oy) * realGrid.cellSize;
+            checked++;
+            const slack = wallClearance(x, y, 200) - radius;
+            if (slack < tightest) {
+              tightest = slack;
+              tightestAt = `(${x}, ${y}) r=${radius}`;
+            }
           }
         }
       }
     }
 
-    expect(checked).toBeGreaterThan(10_000);
-    expect(tightest, `tightest walkable spot was ${tightest.toFixed(2)}px inside its own radius at ${tightestAt}`).toBeGreaterThanOrEqual(0);
+    expect(checked).toBeGreaterThan(500_000);
+    expect(
+      tightest,
+      `tightest walkable spot was ${tightest.toFixed(2)}px inside its own radius at ${tightestAt}, past the accepted ${NAV_MAX_ACCEPTED_OVERLAP}px`
+    ).toBeGreaterThanOrEqual(-NAV_MAX_ACCEPTED_OVERLAP);
   });
 
   it('marks the inside of a wall unwalkable for every body size', () => {
