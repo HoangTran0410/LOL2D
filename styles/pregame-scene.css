@@ -196,8 +196,8 @@
 
 .kit-icon-btn img,
 .kit-icon-btn .fa-random {
-  width: 18px;
-  height: 18px;
+  width: 40px;
+  height: 40px;
 }
 
 .participant-chevron {
@@ -374,14 +374,26 @@
   max-height: 70vh;
 }
 
+/* The champion/custom editor's own flex column, wrapping its header,
+   `.kit-mode-toggle` and `.pregame-modal-body`. It exists so the editor can
+   be a single `v-show` toggle kept mounted (scroll preserved) while the
+   preview/selector layer over it — see LoadoutEditorModal.vue. It stands in
+   for what `.pregame-modal` used to do directly for those children, so it
+   must fill the modal and lay them out the same way. */
+.loadout-editor-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
 /* The single scrolling region a `.pregame-modal` ever has, in either the
    loadout editor's champion/custom view or a read-only ability preview
    (`LoadoutEditorModal.vue`, `SpellPreviewModal.vue`). Everything around it
-   — header, `.kit-mode-toggle`, `.summoner-row` — is a fixed sibling, not a
-   child, so it never scrolls out of reach. `SpellSelectorPane.vue`'s own
-   body (`.selector-body`) is the equivalent for the spell-selector view;
-   see that section below for why it needs its own rule instead of reusing
-   this one. */
+   — header, `.kit-mode-toggle` — is a fixed sibling within the same column,
+   so it never scrolls out of reach. `SpellSelectorPane.vue`'s own body
+   (`.selector-body`) is the equivalent for the spell-selector view; see that
+   section below for why it needs its own rule instead of reusing this one. */
 .pregame-modal-body {
   flex: 1;
   min-height: 0;
@@ -1071,12 +1083,15 @@ body.touch-ui .selector-detail .spell-detail-body {
     min-height: 96px;
   }
 
-  /* Spell selector: shrink the detail portrait, tighten the detail
-       divider and the commit footer, and floor the catalogue — the exact
-       three things that were squeezing it to a clipped single strip. */
+  /* Spell selector: on a short screen the detail strip, the "Xem mô tả"
+     toggle and the commit button stack up below the catalogue and, at full
+     touch size, leave it only a clipped sliver. Everything below the
+     catalogue is compacted — a smaller detail portrait, a slimmer toggle,
+     random card and commit button, tighter margins — so the catalogue (with
+     its own floor) keeps enough height to show real rows. */
   body.touch-ui .selector-detail .spell-detail-header img {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
   }
 
   body.touch-ui .selector-detail {
@@ -1084,11 +1099,33 @@ body.touch-ui .selector-detail .spell-detail-body {
     margin-top: 0.4rem;
   }
 
+  .spell-detail-header h3 {
+    margin-bottom: 0.2rem;
+  }
+
+  body.touch-ui .spell-detail-toggle {
+    min-height: 34px;
+    padding: 0.2rem;
+    margin-top: 0.3rem;
+  }
+
+  body.touch-ui .catalog-random-card {
+    min-height: 34px;
+    padding: 0.3rem 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  body.touch-ui .selector-commit {
+    min-height: 38px;
+  }
+
   .selector-commit {
     margin-top: 0.4rem;
+    padding: 0.3rem 1rem;
+    font-size: 0.85rem;
   }
 
   body.touch-ui .selector-catalogue {
-    min-height: 84px;
+    min-height: 96px;
   }
 }

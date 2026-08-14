@@ -148,7 +148,13 @@ const slotIcon = (choice: SlotChoice) =>
 <template>
   <div class="pregame-modal-backdrop" @click.self="onBackdrop">
     <div class="pregame-modal loadout-modal">
-      <template v-if="!activeSlot && !previewDisplay">
+      <!-- The champion/custom editor. Kept mounted and merely hidden
+           (`v-show`, not `v-if`) while the ability preview or spell selector
+           is layered over it, so a long champion grid the player has scrolled
+           deep into keeps its scroll position through a look at an ability and
+           back — a `v-if` here remounts it fresh and snaps it back to the top,
+           which is the bug this addresses. -->
+      <div v-show="!activeSlot && !previewDisplay" class="loadout-editor-view">
         <header class="pregame-modal-header">
           <h3>{{ title }}</h3>
           <button type="button" class="pregame-icon-btn" title="Đóng" @click="emit('close')">
@@ -218,11 +224,12 @@ const slotIcon = (choice: SlotChoice) =>
             </div>
           </div>
         </div>
-      </template>
+      </div>
 
-      <!-- Read-only ability preview, swapped in the same way `activeSlot`
-           swaps in `SpellSelectorPane` below — see the file comment. -->
-      <template v-else-if="previewDisplay">
+      <!-- Read-only ability preview, layered over the (hidden) editor above.
+           `previewDisplay` and `activeSlot` are mutually exclusive (opening
+           one clears the other), so only ever one of these two mounts. -->
+      <template v-if="previewDisplay">
         <header class="pregame-modal-header">
           <button type="button" class="pregame-icon-btn" title="Quay lại" @click="closePreview">
             <i class="fas fa-arrow-left"></i>
@@ -235,7 +242,7 @@ const slotIcon = (choice: SlotChoice) =>
       </template>
 
       <SpellSelectorPane
-        v-else
+        v-else-if="activeSlot"
         :title="selectorTitle"
         :groups="selectorGroups"
         :allow-random="selectorAllowRandom"
