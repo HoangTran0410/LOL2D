@@ -511,9 +511,16 @@
     max-width: 90px;
 }
 
+/* Wraps rather than overflowing: a champion has four ability icons and the
+   card is only ~100px wide, so four 44px touch targets (see the body.touch-ui
+   block) cannot sit in one row — without `wrap` they spilled out the right
+   edge into the neighbouring card. Wrapped and centred, they fall to a tidy
+   2×2 block that stays inside the card at any card width. */
 .champion-spells {
     position: relative;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 3px;
 }
 
@@ -984,5 +991,66 @@ body.touch-ui .selector-detail .spell-detail-body {
         max-height: none;
         border-width: 0;
         padding: .7rem;
+    }
+}
+
+/* ================================================================
+   Short viewport — a landscape phone (~360–430px tall), the natural way
+   to hold a game. The touch chrome above is sized for a *tall* portrait
+   screen: a 52px slot icon, a 56px detail portrait, 44px footers each with
+   .8rem margins. Stacked inside a landscape-height modal they crushed the
+   one region that must stay usable and scroll — the champion grid in the
+   loadout editor, the spell catalogue in the selector — down to a ~40–80px
+   sliver (see the measurements in tests/e2e/_repro screenshots that
+   prompted this). This reclaims the vertical space they were wasting:
+   tighter margins around the fixed chrome, smaller fixed icons, and a
+   floor under the scroll region so it can never collapse to a sliver
+   again. Keyed on height, not orientation, so a short desktop window is
+   treated the same way.
+   ================================================================ */
+@media (max-height: 480px) {
+    .pregame-modal-header {
+        margin-bottom: .4rem;
+    }
+
+    .kit-mode-toggle {
+        margin-bottom: .4rem;
+    }
+
+    /* Champion/custom view: shrink the D/F summoner footer and floor the
+       scrolling body so the grid always shows at least a couple of rows. */
+    .summoner-row {
+        margin-top: .4rem;
+        padding-top: .4rem;
+    }
+
+    body.touch-ui .kit-slot-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .pregame-modal-body {
+        min-height: 96px;
+    }
+
+    /* Spell selector: shrink the detail portrait, tighten the detail
+       divider and the commit footer, and floor the catalogue — the exact
+       three things that were squeezing it to a clipped single strip. */
+    body.touch-ui .selector-detail .spell-detail-header img {
+        width: 40px;
+        height: 40px;
+    }
+
+    body.touch-ui .selector-detail {
+        padding-top: .4rem;
+        margin-top: .4rem;
+    }
+
+    .selector-commit {
+        margin-top: .4rem;
+    }
+
+    body.touch-ui .selector-catalogue {
+        min-height: 84px;
     }
 }
