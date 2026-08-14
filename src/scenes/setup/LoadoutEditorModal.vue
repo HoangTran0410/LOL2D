@@ -16,22 +16,33 @@
  * `activeSlot` and the loadout is untouched, so "closing without committing
  * leaves the slot as it was" falls out of the data flow rather than needing
  * an explicit undo.
+ *
+ * `previewDisplay` is the same swap-the-body idea applied to a third view: a
+ * champion's Q/W/E/R icon (see `ChampionGrid.vue`/`ChampionCard.vue`) has no
+ * selector to open — the four abilities are bundled, not chosen slot by
+ * slot — but a player choosing between champions still needs to read what
+ * each one does. Opening a *second* modal on top of this one for that would
+ * violate the same "one dialog at a time" rule `activeSlot` exists to keep,
+ * so it swaps the body instead, exactly like `activeSlot` does, and the two
+ * are mutually exclusive by construction (opening one clears the other).
  */
 import { ref, computed } from 'vue';
 import type { ChampionLoadout, MatchRules, SlotChoice } from '../../game/config/PregameConfig';
 import { SLOT_COUNT } from '../../game/config/PregameConfig';
 import { SpellHotKeys } from '../../game/constants';
-import { SpellGroups, type SpellCatalogEntry } from '../../game/preset';
+import { SpellGroups, getSpellDisplay, type SpellCatalogEntry, type SpellDisplay } from '../../game/preset';
 import { getPregameCatalog } from './pregameCatalog';
 import type { SelectorGroup, SpellClass } from './types';
 import ChampionGrid from './ChampionGrid.vue';
 import SlotButton from './SlotButton.vue';
 import SpellSelectorPane from './SpellSelectorPane.vue';
+import SpellDetailPane from './SpellDetailPane.vue';
 
 const props = defineProps<{
   title: string;
   loadout: ChampionLoadout;
   matchRules: MatchRules;
+  isTouchUi: boolean;
 }>();
 const emit = defineEmits<{ change: [ChampionLoadout]; close: [] }>();
 
@@ -42,6 +53,16 @@ const SLOT_LABELS = SpellHotKeys.map(code => String.fromCharCode(code));
 
 type ActiveSlot = { kind: 'summoner'; slot: 'D' | 'F' } | { kind: 'custom'; index: number } | null;
 const activeSlot = ref<ActiveSlot>(null);
+
+/** The read-only ability preview swapped into the body — see the file comment. Mutually exclusive with `activeSlot`. */
+const previewDisplay = ref<SpellDisplay | null>(null);
+const openPreview = (spellClass: SpellClass): void => {
+  activeSlot.value = null;
+  previewDisplay.value = getSpellDisplay(spellClass, props.matchRules);
+};
+const closePreview = (): void => {
+  previewDisplay.value = null;
+};
 
 const setMode = (mode: 'champion' | 'custom'): void => {
   emit('change', { ...props.loadout, mode });
@@ -80,9 +101,11 @@ const selectorCurrentChoice = computed<string>(() => {
 });
 
 const openSummonerSlot = (slot: 'D' | 'F'): void => {
+  previewDisplay.value = null;
   activeSlot.value = { kind: 'summoner', slot };
 };
 const openCustomSlot = (index: number): void => {
+  previewDisplay.value = null;
   activeSlot.value = { kind: 'custom', index };
 };
 const cancelSlot = (): void => {
@@ -110,7 +133,7 @@ const slotIcon = (choice: SlotChoice) =>
 <template>
   <div class="pregame-modal-backdrop" @click.self="emit('close')">
     <div class="pregame-modal loadout-modal">
-      <template v-if="!activeSlot">
+      <template v-if="!activeSlot && !previewDisplay">
         <header class="pregame-modal-header">
           <h3>{{ title }}</h3>
           <button type="button" class="pregame-icon-btn" title="Đóng" @click="emit('close')">
@@ -137,39 +160,59 @@ const slotIcon = (choice: SlotChoice) =>
           </button>
         </div>
 
-        <div v-if="loadout.mode === 'champion'" class="kit-mode-panel">
-          <ChampionGrid :selected="loadout.championName" @pick="pickChampion" />
-          <div class="summoner-row">
-            <SlotButton
-              label="D"
-              hotkey-title="Phím D"
-              :icon="summonerIcon(loadout.summonerD)"
-              @open="openSummonerSlot('D')"
-            />
-            <SlotButton
-              label="F"
-              hotkey-title="Phím F"
-              :icon="summonerIcon(loadout.summonerF)"
-              @open="openSummonerSlot('F')"
-            />
+        <!-- The one scrolling region in this view — see pregame-scene.css's
+             file comment on `.pregame-modal-body` for why the summoner row
+             below sits outside it instead of inside `.kit-mode-panel`. -->
+        <div class="pregame-modal-body">
+          <div v-if="loadout.mode === 'champion'" class="kit-mode-panel">
+            <ChampionGrid :selected="loadout.championName" @pick="pickChampion" @preview="openPreview" />
+          </div>
+
+          <div v-else class="kit-mode-panel">
+            <p class="custom-slot-hint">
+              Ô A là đòn đánh thường: đổi ô này đổi luôn phím tấn công và nhịp đánh của tướng, không chỉ thêm
+              một chiêu mới.
+            </p>
+            <div class="custom-slot-row">
+              <SlotButton
+                v-for="index in SLOT_COUNT"
+                :key="index - 1"
+                :label="slotLabel(index - 1)"
+                :hotkey-title="slotHotkeyTitle(index - 1)"
+                :icon="slotIcon(loadout.customSlots[index - 1] ?? 'random')"
+                @open="openCustomSlot(index - 1)"
+              />
+            </div>
           </div>
         </div>
 
-        <div v-else class="kit-mode-panel">
-          <p class="custom-slot-hint">
-            Ô A là đòn đánh thường: đổi ô này đổi luôn phím tấn công và nhịp đánh của tướng, không chỉ thêm
-            một chiêu mới.
-          </p>
-          <div class="custom-slot-row">
-            <SlotButton
-              v-for="index in SLOT_COUNT"
-              :key="index - 1"
-              :label="slotLabel(index - 1)"
-              :hotkey-title="slotHotkeyTitle(index - 1)"
-              :icon="slotIcon(loadout.customSlots[index - 1] ?? 'random')"
-              @open="openCustomSlot(index - 1)"
-            />
-          </div>
+        <div v-if="loadout.mode === 'champion'" class="summoner-row">
+          <SlotButton
+            label="D"
+            hotkey-title="Phím D"
+            :icon="summonerIcon(loadout.summonerD)"
+            @open="openSummonerSlot('D')"
+          />
+          <SlotButton
+            label="F"
+            hotkey-title="Phím F"
+            :icon="summonerIcon(loadout.summonerF)"
+            @open="openSummonerSlot('F')"
+          />
+        </div>
+      </template>
+
+      <!-- Read-only ability preview, swapped in the same way `activeSlot`
+           swaps in `SpellSelectorPane` below — see the file comment. -->
+      <template v-else-if="previewDisplay">
+        <header class="pregame-modal-header">
+          <button type="button" class="pregame-icon-btn" title="Quay lại" @click="closePreview">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h3>{{ previewDisplay.name }}</h3>
+        </header>
+        <div class="pregame-modal-body">
+          <SpellDetailPane :display="previewDisplay" placeholder="" />
         </div>
       </template>
 
@@ -180,6 +223,7 @@ const slotIcon = (choice: SlotChoice) =>
         :allow-random="selectorAllowRandom"
         :current-choice="selectorCurrentChoice"
         :match-rules="matchRules"
+        :is-touch-ui="isTouchUi"
         @commit="commitSlot"
         @cancel="cancelSlot"
       />

@@ -21,17 +21,34 @@
  *
  * Layout is one template, reflowed by CSS alone on `body.touch-ui` (see
  * `.selector-body` in pregame-scene.css) — side-by-side catalogue/detail for
- * a pointer, a full-height catalogue with the detail pane (and the commit
- * button inside it) pinned below for a thumb. Same reasoning
- * `SpellPickerModal.vue`'s file comment gives for the in-game HUD picker:
- * forking this into two components would just be two places to keep the
- * catalogue markup in sync.
+ * a pointer, a full-height catalogue with the detail pane pinned below for a
+ * thumb. Same reasoning `SpellPickerModal.vue`'s file comment gives for the
+ * in-game HUD picker: forking this into two components would just be two
+ * places to keep the catalogue markup in sync.
+ *
+ * The commit button lives here, as a sibling *after* `.selector-body`, not
+ * inside the detail pane any more — a fixed footer outside whatever region
+ * scrolls, so it stays reachable in every state (collapsed or expanded
+ * detail sheet, catalogue scrolled to any position) without needing its own
+ * "pin to the bottom of a flex column" trick. See `SpellDetailPane.vue` for
+ * why the detail block itself is a separate, reusable component.
+ *
+ * `isTouchUi` decides whether the detail pane is a collapsible bottom sheet
+ * (touch — see `detailExpanded` below) or the always-open side column
+ * (pointer, unchanged). `detailExpanded` lives here rather than inside
+ * `SpellDetailPane` because the single-scroller rule needs it *here* too:
+ * `.selector-body.detail-expanded` in pregame-scene.css is what freezes the
+ * catalogue's own scroll while the sheet is open, so only the sheet's
+ * description scrolls — never both at once. Deliberately not reset when
+ * `highlighted` changes, so switching between catalogue entries never
+ * re-collapses a sheet the player already opened.
  */
 import { ref, computed } from 'vue';
 import { getSpellDisplay } from '../../game/preset';
 import type { MatchRules } from '../../game/config/PregameConfig';
 import type { SelectorEntry, SelectorGroup } from './types';
 import SpellIcon from './SpellIcon.vue';
+import SpellDetailPane from './SpellDetailPane.vue';
 
 const props = defineProps<{
   title: string;
@@ -41,6 +58,7 @@ const props = defineProps<{
   /** The slot's stored value: an entry id, or `'random'`. */
   currentChoice: string;
   matchRules: MatchRules;
+  isTouchUi: boolean;
 }>();
 const emit = defineEmits<{ commit: [choice: string]; cancel: [] }>();
 
@@ -64,6 +82,15 @@ const detail = computed(() =>
     : null
 );
 
+const detailPlaceholder = computed(() =>
+  highlighted.value === 'random'
+    ? 'Chiêu sẽ được chọn ngẫu nhiên khi vào trận.'
+    : 'Chọn một chiêu để xem mô tả.'
+);
+
+/** Collapsed by default; stays open for the rest of this pane's lifetime once opened (see file comment). */
+const detailExpanded = ref(false);
+
 const commit = (): void => {
   if (highlighted.value === null) return;
   emit('commit', highlighted.value === 'random' ? 'random' : highlighted.value.id);
@@ -79,7 +106,7 @@ const commit = (): void => {
       <h3>{{ title }}</h3>
     </header>
 
-    <div class="selector-body">
+    <div class="selector-body" :class="{ 'detail-expanded': isTouchUi && detailExpanded }">
       <div class="selector-catalogue">
         <button
           v-if="allowRandom"
@@ -110,37 +137,18 @@ const commit = (): void => {
       </div>
 
       <div class="selector-detail">
-        <template v-if="detail">
-          <div class="spell-detail-header">
-            <SpellIcon :display="detail" />
-            <div>
-              <h3>{{ detail.name }}</h3>
-              <div class="spell-detail-costs">
-                <span class="spell-detail-cooldown">
-                  <i class="fas fa-clock"></i> {{ (detail.effectiveCoolDownMs / 1000).toFixed(1) }}s
-                </span>
-                <span class="spell-detail-mana">
-                  <i class="fas fa-tint"></i> {{ Math.round(detail.effectiveManaCost) }}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="spell-detail-body" v-html="detail.description || '<em>Không có mô tả.</em>'"></div>
-        </template>
-        <p v-else-if="highlighted === 'random'" class="selector-detail-placeholder">
-          Chiêu sẽ được chọn ngẫu nhiên khi vào trận.
-        </p>
-        <p v-else class="selector-detail-placeholder">Chọn một chiêu để xem mô tả.</p>
-
-        <button
-          type="button"
-          class="hextech-btn selector-commit"
-          :disabled="highlighted === null"
-          @click="commit"
-        >
-          Dùng chiêu này
-        </button>
+        <SpellDetailPane
+          :display="detail"
+          :placeholder="detailPlaceholder"
+          :collapsible="isTouchUi"
+          :expanded="detailExpanded"
+          @update:expanded="v => (detailExpanded = v)"
+        />
       </div>
     </div>
+
+    <button type="button" class="hextech-btn selector-commit" :disabled="highlighted === null" @click="commit">
+      Dùng chiêu này
+    </button>
   </div>
 </template>

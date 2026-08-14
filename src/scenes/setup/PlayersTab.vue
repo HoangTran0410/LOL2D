@@ -17,6 +17,7 @@
  */
 import { AI_COUNT_MAX } from '../../game/config/PregameConfig';
 import type { PregameConfig } from '../../game/config/PregameConfig';
+import type { SpellClass } from './types';
 import ParticipantCard from './ParticipantCard.vue';
 
 const props = defineProps<{ config: PregameConfig }>();
@@ -25,12 +26,19 @@ const emit = defineEmits<{
   openBot: [index: number];
   addBot: [];
   removeBot: [];
+  previewAbility: [spellClass: SpellClass];
 }>();
 </script>
 
 <template>
   <div class="participant-list" id="pregame-participant-list">
-    <ParticipantCard label="Bạn" is-player :loadout="config.player" @open="emit('openPlayer')" />
+    <ParticipantCard
+      label="Bạn"
+      is-player
+      :loadout="config.player"
+      @open="emit('openPlayer')"
+      @preview-ability="spellClass => emit('previewAbility', spellClass)"
+    />
 
     <ParticipantCard
       v-for="(loadout, index) in config.ai.bots.slice(0, config.ai.count)"
@@ -40,6 +48,7 @@ const emit = defineEmits<{
       :removable="index === config.ai.count - 1"
       @open="emit('openBot', index)"
       @remove="emit('removeBot')"
+      @preview-ability="spellClass => emit('previewAbility', spellClass)"
     />
 
     <p v-if="config.ai.count === 0" class="pregame-hint">

@@ -310,6 +310,281 @@ try {
     };
   });
 
+  // Step 8 started a live match on `page` — back out to the setup screen
+  // before driving it further (steps 14-16 below reuse this same page).
+  await evaluate(() => window.__lol2d.scene.oScene.stopGame());
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  await page.click('#config-btn');
+  await page.waitForSelector('#pregame-scene', { state: 'visible' });
+  await page.click('#pregame-tab-players');
+  await page.waitForSelector('#pregame-participant-list', { state: 'visible' });
+  await page.waitForTimeout(100);
+
+  // ---------------------------------------------------------------------
+  // 12. Exactly one scroller in the loadout modal — this is precisely the
+  // regression the modal shipped with (a scrollable champion grid nested
+  // inside an independently-scrollable modal, and, in the spell selector,
+  // a scrollable catalogue next to a scrollable detail pane): two touch
+  // regions fighting over the same drag gesture. Checked in both the
+  // champion-mode kit view and the spell-selector view, in both the touch
+  // and the pointer layout, so a panel added later that reintroduces a
+  // second `overflow-y: auto` region with real overflow trips this
+  // immediately instead of waiting for another user report.
+  // ---------------------------------------------------------------------
+  const countActiveScrollers = () =>
+    Array.from(document.querySelectorAll('.pregame-modal, .pregame-modal *')).filter(el => {
+      const cs = getComputedStyle(el);
+      return (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
+    }).length;
+
+  const openSetupPage = async ({ hasTouch, viewport }) => {
+    const context = await browser.newContext({ viewport, hasTouch });
+    const setupPage = await context.newPage();
+    setupPage.on('pageerror', e => errors.push(`pageerror(${hasTouch ? 'touch' : 'pointer'}): ${e.message}`));
+    setupPage.on('console', m => {
+      if (m.type() === 'error') errors.push(`console(${hasTouch ? 'touch' : 'pointer'}): ${m.text()}`);
+    });
+    await setupPage.goto(url, { waitUntil: 'load' });
+    await setupPage.evaluate(() => {
+      localStorage.removeItem('lol2d:pregameConfig:v1');
+      localStorage.removeItem('lol2d.touchControls');
+    });
+    await setupPage.reload({ waitUntil: 'load' });
+    await setupPage.click('#config-btn');
+    await setupPage.waitForSelector('#pregame-scene', { state: 'visible' });
+    await setupPage.waitForTimeout(150);
+    return { context, page: setupPage };
+  };
+
+  const singleScrollerCheck = async (setupPage, isTouchUiExpected) => {
+    const result = {};
+    result.isTouchUi = await setupPage.evaluate(() => document.body.classList.contains('touch-ui'));
+
+    await setupPage.click('#pregame-participant-list .participant-card:nth-child(1) .participant-card-main');
+    await setupPage.waitForSelector('.loadout-modal', { state: 'visible' });
+    await setupPage.waitForTimeout(80);
+    result.championScrollerCount = await setupPage.evaluate(countActiveScrollers);
+    // the footer (D/F summoner slots) must be reachable without scrolling
+    result.summonerRowReachable = await setupPage.evaluate(() => {
+      const row = document.querySelector('.summoner-row');
+      const r = row.getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= window.innerHeight;
+    });
+
+    // switch to the free-form catalogue (85 entries) and open Q — plenty of
+    // content to force real overflow in either layout.
+    await setupPage.click('.loadout-modal .kit-mode-btn:nth-child(2)');
+    await setupPage.waitForTimeout(50);
+    await setupPage.click('.custom-slot-row .kit-slot:nth-child(2)');
+    await setupPage.waitForSelector('.selector-pane', { state: 'visible' });
+    await setupPage.waitForTimeout(80);
+    result.selectorScrollerCountCollapsed = await setupPage.evaluate(countActiveScrollers);
+    result.commitReachableCollapsed = await setupPage.evaluate(() => {
+      const r = document.querySelector('.selector-commit').getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= window.innerHeight && r.height >= 44;
+    });
+
+    // highlight an entry with a real description; on touch this expands the
+    // collapsible sheet (if the toggle is present) — still exactly one
+    // scroller either way, just potentially a different element.
+    await setupPage.evaluate(() =>
+      document
+        .querySelector('.selector-catalogue .catalog-spell-card')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    );
+    await setupPage.waitForTimeout(80);
+    const toggle = await setupPage.$('.spell-detail-toggle');
+    if (toggle) await toggle.click();
+    await setupPage.waitForTimeout(80);
+    result.selectorScrollerCountExpanded = await setupPage.evaluate(countActiveScrollers);
+    result.commitReachableExpanded = await setupPage.evaluate(() => {
+      const r = document.querySelector('.selector-commit').getBoundingClientRect();
+      return r.top >= 0 && r.bottom <= window.innerHeight && r.height >= 44;
+    });
+
+    if (result.isTouchUi !== isTouchUiExpected) {
+      errors.push(`singleScrollerCheck: expected isTouchUi=${isTouchUiExpected}, got ${result.isTouchUi}`);
+    }
+    if (result.championScrollerCount !== 1) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): champion view has ${result.championScrollerCount} active scrollers, expected exactly 1`);
+    }
+    if (!result.summonerRowReachable) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): summoner row not reachable without scrolling`);
+    }
+    if (result.selectorScrollerCountCollapsed > 1) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): selector view (collapsed) has ${result.selectorScrollerCountCollapsed} active scrollers, expected at most 1`);
+    }
+    if (!result.commitReachableCollapsed) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): commit button not reachable (collapsed)`);
+    }
+    if (result.selectorScrollerCountExpanded > 1) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): selector view (expanded) has ${result.selectorScrollerCountExpanded} active scrollers, expected at most 1`);
+    }
+    if (isTouchUiExpected && result.selectorScrollerCountExpanded !== 1) {
+      // On touch specifically, the expanded sheet's own description is
+      // *meant* to be a real, working scroller (see the file comment on
+      // `body.touch-ui .selector-detail .spell-detail-body` in
+      // pregame-scene.css) — 0 here would mean the mechanism never actually
+      // engages, not just that this particular spell's text happened to
+      // fit. The viewport below is small enough that even the shortest
+      // catalogue entry's description overflows the sheet's cap.
+      errors.push(`singleScrollerCheck(touch): expanded sheet has ${result.selectorScrollerCountExpanded} active scrollers, expected exactly 1 (the sheet's own description)`);
+    }
+    if (!result.commitReachableExpanded) {
+      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): commit button not reachable (expanded)`);
+    }
+    return result;
+  };
+
+  {
+    // Small enough that the expanded detail sheet's description genuinely
+    // overflows its cap even for the shortest catalogue entry — see the
+    // note on `selectorScrollerCountExpanded` above.
+    const { context, page: touchPage } = await openSetupPage({ hasTouch: true, viewport: { width: 320, height: 480 } });
+    report.singleScrollerTouch = await singleScrollerCheck(touchPage, true);
+    await context.close();
+  }
+  {
+    // Shorter than the usual 1280x900 test viewport on purpose: at 900px
+    // tall the champion grid comfortably fits under `.pregame-modal`'s 85vh
+    // cap and nothing scrolls at all, which "at most one scroller" would
+    // pass vacuously. 700px reliably pushes real content past that cap, so
+    // this actually exercises the single-scroller mechanism instead of
+    // just failing to contradict it.
+    const { context, page: pointerPage } = await openSetupPage({ hasTouch: false, viewport: { width: 1280, height: 700 } });
+    report.singleScrollerPointer = await singleScrollerCheck(pointerPage, false);
+    await context.close();
+  }
+
+  // ---------------------------------------------------------------------
+  // 13. Dialog width in touch mode is driven by the viewport, not the mode
+  // flag — a touch-capable desktop still gets the bounded, centred dialog;
+  // only a phone-width viewport goes edge to edge.
+  // ---------------------------------------------------------------------
+  {
+    const widths = {};
+    for (const [label, viewport] of [
+      ['desktop', { width: 1920, height: 1080 }],
+      ['tablet', { width: 820, height: 1180 }],
+      ['phone', { width: 390, height: 844 }],
+    ]) {
+      const { context, page: p } = await openSetupPage({ hasTouch: true, viewport });
+      await p.click('#pregame-participant-list .participant-card:nth-child(1) .participant-card-main');
+      await p.waitForSelector('.loadout-modal', { state: 'visible' });
+      widths[label] = await p.evaluate(() => document.querySelector('.pregame-modal').getBoundingClientRect().width);
+      await context.close();
+    }
+    report.touchModalWidthByViewport = widths;
+    if (widths.desktop > 800) {
+      errors.push(`touch modal width at 1920x1080 is ${widths.desktop}px — expected a bounded dialog (~760px), not full-bleed`);
+    }
+    if (Math.abs(widths.phone - 390) > 1) {
+      errors.push(`touch modal width at a phone viewport is ${widths.phone}px — expected edge-to-edge (390px)`);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // 14. Read-only ability preview: a champion card's Q/W/E/R icon opens a
+  // description without picking the champion, and without opening a second
+  // dialog on top of the loadout modal.
+  // ---------------------------------------------------------------------
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  report.abilityPreview = await evaluate(() => {
+    const before = document.querySelector('.champion-card.selected')?.dataset.champion ?? null;
+    document.querySelector('.champion-card[data-champion="Yasuo"] .champion-spell-btn')?.click();
+    return { selectedBefore: before };
+  });
+  await page.waitForTimeout(80);
+  // The champion grid is not in the DOM at all while the preview pane is
+  // swapped in (see LoadoutEditorModal.vue's `previewDisplay`) — that alone
+  // is part of the proof nothing got picked. The stronger proof is below:
+  // after backing out, the grid's selection must read exactly as it did
+  // before the ability icon was ever clicked.
+  report.abilityPreview.afterClick = await evaluate(() => ({
+    title: document.querySelector('.loadout-modal .pregame-modal-header h3')?.textContent,
+    descriptionNonEmpty: !!document.querySelector('.spell-detail-pane .spell-detail-body')?.textContent?.trim(),
+    dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
+    championGridGoneWhilePreviewOpen: document.querySelector('.champion-grid') === null,
+  }));
+  await page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn'); // back to the edit view
+  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
+  report.abilityPreview.selectedAfterBackingOut = await evaluate(
+    () => document.querySelector('.champion-card.selected')?.dataset.champion ?? null
+  );
+  if (report.abilityPreview.selectedAfterBackingOut !== report.abilityPreview.selectedBefore) {
+    errors.push(
+      `abilityPreview: opening the ability preview changed the champion pick (${report.abilityPreview.selectedBefore} -> ${report.abilityPreview.selectedAfterBackingOut})`
+    );
+  }
+
+  // sample descriptions + CDR-aware costs across several champions directly
+  // from preset.ts, the same function the preview button calls.
+  report.abilityPreviewSample = await evaluate(async () => {
+    const preset = await import('/src/game/preset.ts');
+    const champs = preset.listSelectableChampions().slice(0, 5);
+    const noRules = { cooldownMultiplier: 1, manaFree: false };
+    const cdrRules = { cooldownMultiplier: 0.5, manaFree: false };
+    return champs.map(c => ({
+      name: c.name,
+      allDescriptionsNonEmpty: c.spells.every(s => !!preset.getSpellDisplay(s.spellClass, noRules).description?.trim()),
+      allRespectCdr: c.spells.every(s => {
+        const base = preset.getSpellDisplay(s.spellClass, noRules).effectiveCoolDownMs;
+        const withCdr = preset.getSpellDisplay(s.spellClass, cdrRules).effectiveCoolDownMs;
+        return withCdr < base;
+      }),
+    }));
+  });
+  if (report.abilityPreviewSample.some(c => !c.allDescriptionsNonEmpty)) {
+    errors.push(`abilityPreviewSample: some champion has an empty ability description: ${JSON.stringify(report.abilityPreviewSample)}`);
+  }
+  if (report.abilityPreviewSample.some(c => !c.allRespectCdr)) {
+    errors.push(`abilityPreviewSample: some champion's ability cooldown does not shrink under CDR: ${JSON.stringify(report.abilityPreviewSample)}`);
+  }
+  await closeLoadoutModal();
+  await page.waitForTimeout(80);
+
+  // 15. Same preview, reached from the participant list's kit-icon row —
+  // must NOT open the loadout editor, and must stay "one dialog at a time".
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  await page.click('.champion-card[data-champion="Yasuo"] .champion-card-pick');
+  await page.waitForTimeout(80);
+  await closeLoadoutModal();
+  await page.waitForTimeout(80);
+  report.kitIconPreview = await evaluate(() => {
+    document.querySelector('#pregame-participant-list .participant-card:nth-child(1) .kit-icon-btn')?.click();
+    return null;
+  });
+  await page.waitForTimeout(80);
+  report.kitIconPreview = await evaluate(() => ({
+    openedPreview: !!document.querySelector('.spell-preview-modal'),
+    openedEditor: !!document.querySelector('.loadout-modal'),
+    dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
+  }));
+  await page.click('.spell-preview-modal .pregame-modal-header .pregame-icon-btn');
+  await page.waitForTimeout(80);
+
+  // 16. The touch/pointer control lives in the Settings tab now, shaped as
+  // a three-option row (a disabled "Tự động" placeholder plus the two wired
+  // options), and a manual choice actually persists to localStorage.
+  await page.click('#pregame-tab-settings');
+  await page.waitForSelector('.input-mode-row', { state: 'visible' });
+  report.inputModePanel = await evaluate(() => ({
+    autoOptionDisabled: document.querySelector('.input-mode-btn[disabled]') !== null,
+    optionCount: document.querySelectorAll('.input-mode-btn').length,
+  }));
+  await page.click('#pregame-input-mode-touch');
+  await page.waitForTimeout(80);
+  report.inputModePanel.afterChoosingTouch = await evaluate(() => ({
+    bodyHasTouchUi: document.body.classList.contains('touch-ui'),
+    stored: localStorage.getItem('lol2d.touchControls'),
+    selectedLabel: document.querySelector('.input-mode-btn.selected')?.textContent?.trim(),
+  }));
+  await page.click('#pregame-input-mode-pointer'); // leave it back in pointer mode for a clean re-run
+  await page.waitForTimeout(80);
+
   report.errors = errors;
   console.log(JSON.stringify(report, null, 2));
 } finally {

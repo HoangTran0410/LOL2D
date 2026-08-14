@@ -5,12 +5,23 @@
  * anywhere on the card opens `LoadoutEditorModal` bound to this participant's
  * loadout — the same editor, the same gesture, for the player and every bot;
  * only which loadout it is bound to differs (see `SetupScene.vue`).
+ *
+ * The kit-icon row is a second, explicit click target for a read-only
+ * preview of that spell — same reasoning as `ChampionCard.vue`'s ability
+ * row: `.participant-card-open` is an invisible full-card button that opens
+ * the editor, and each kit icon is a real, visibly bordered button
+ * (`.kit-icon-btn`, `position:relative` so it wins the click) stacked above
+ * it. `SetupScene.vue` owns the preview surface (there is no modal open yet
+ * at this point in the screen, so it gets its own small one — see
+ * `SpellPreviewModal.vue`), the same way `LoadoutEditorModal.vue` owns it for
+ * `ChampionCard.vue`'s abilities; this component only relays *which* spell.
  */
 import { computed } from 'vue';
 import AssetManager from '../../managers/AssetManager';
 import type { ChampionLoadout } from '../../game/config/PregameConfig';
-import type { SpellDisplay } from '../../game/preset';
+import type { SpellCatalogEntry } from '../../game/preset';
 import { getPregameCatalog } from './pregameCatalog';
+import type { SpellClass } from './types';
 import SpellIcon from './SpellIcon.vue';
 
 const props = defineProps<{
@@ -20,7 +31,7 @@ const props = defineProps<{
   /** Only the last bot can be removed without reordering every other bot's saved config — see `PlayersTab.vue`. */
   removable?: boolean;
 }>();
-const emit = defineEmits<{ open: []; remove: [] }>();
+const emit = defineEmits<{ open: []; remove: []; previewAbility: [spellClass: SpellClass] }>();
 
 const { champions, spellCatalog } = getPregameCatalog();
 
@@ -39,19 +50,33 @@ const summaryLabel = computed(() => {
 /** No stable avatar for a random champion or a custom kit — both resolve a fresh random portrait per spawn (see `preset.ts`). */
 const avatarKey = computed(() => pickedChampion.value?.avatar ?? null);
 
-const kitIcons = computed<SpellDisplay[]>(() => {
+/** Just the fields a kit-icon button needs — `champions[i].spells` (`SelectableChampionSpell`) and
+ * `spellCatalog` (`SpellCatalogEntry`) both carry more than this, and structurally satisfy it either way. */
+interface KitIcon {
+  spellClass: SpellClass;
+  display: SpellCatalogEntry['display'];
+}
+
+const kitIcons = computed<KitIcon[]>(() => {
   if (props.loadout.mode === 'champion') {
-    return pickedChampion.value?.spells.map(s => s.display) ?? [];
+    return pickedChampion.value?.spells ?? [];
   }
   return props.loadout.customSlots
-    .map(choice => (choice !== 'random' ? spellCatalog.find(e => e.id === choice)?.display : undefined))
-    .filter((display): display is SpellDisplay => !!display);
+    .map(choice => (choice !== 'random' ? spellCatalog.find(e => e.id === choice) : undefined))
+    .filter((entry): entry is SpellCatalogEntry => !!entry);
 });
 </script>
 
 <template>
   <div class="participant-card" :class="{ 'participant-card-player': isPlayer }">
-    <button type="button" class="participant-card-main" @click="emit('open')">
+    <div class="participant-card-main">
+      <button
+        type="button"
+        class="participant-card-open"
+        :aria-label="`Chỉnh trang bị của ${label}`"
+        @click="emit('open')"
+      ></button>
+
       <div class="participant-portrait" :class="{ 'participant-portrait-random': !avatarKey }">
         <img v-if="avatarKey" :src="AssetManager.get(avatarKey).url" :alt="label" />
         <i v-else class="fas fa-random"></i>
@@ -60,11 +85,20 @@ const kitIcons = computed<SpellDisplay[]>(() => {
         <div class="participant-name">{{ label }}</div>
         <div class="participant-summary">{{ summaryLabel }}</div>
         <div v-if="kitIcons.length" class="participant-kit-icons">
-          <SpellIcon v-for="(display, idx) in kitIcons" :key="idx" :display="display" />
+          <button
+            v-for="(entry, idx) in kitIcons"
+            :key="idx"
+            type="button"
+            class="kit-icon-btn"
+            title="Xem mô tả chiêu"
+            @click="emit('previewAbility', entry.spellClass)"
+          >
+            <SpellIcon :display="entry.display" />
+          </button>
         </div>
       </div>
       <i class="fas fa-chevron-right participant-chevron"></i>
-    </button>
+    </div>
     <button
       v-if="removable"
       type="button"

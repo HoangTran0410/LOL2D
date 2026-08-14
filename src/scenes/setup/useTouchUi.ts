@@ -6,6 +6,14 @@ const TOUCH_UI_CLASS = 'touch-ui';
 export interface TouchUiController {
   isTouchUi: Ref<boolean>;
   toggle(): void;
+  /**
+   * Sets the mode explicitly rather than flipping it — what the Settings
+   * tab's three-option row needs (`SettingsTab.vue`'s "Chạm tay" / "Chuột &
+   * bàn phím" buttons each pick a specific side, not toggle relative to
+   * whatever the current side happens to be). `toggle()` is kept as a thin
+   * wrapper over this for anything that only ever flips.
+   */
+  set(value: boolean): void;
 }
 
 /**
@@ -43,12 +51,12 @@ export const useTouchUi = (): TouchUiController => {
   const isTouchUi = ref(initial);
   document.body?.classList.toggle(TOUCH_UI_CLASS, initial);
 
-  const toggle = (): void => {
-    const next = !isTouchUi.value;
-    isTouchUi.value = next;
-    rememberTouchControlsPreference(next);
-    document.body?.classList.toggle(TOUCH_UI_CLASS, next);
+  const set = (value: boolean): void => {
+    isTouchUi.value = value;
+    rememberTouchControlsPreference(value);
+    document.body?.classList.toggle(TOUCH_UI_CLASS, value);
   };
+  const toggle = (): void => set(!isTouchUi.value);
 
-  return { isTouchUi, toggle };
+  return { isTouchUi, toggle, set };
 };

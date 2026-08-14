@@ -26,9 +26,12 @@ import { ref, computed } from 'vue';
 import { usePregameConfig } from './setup/usePregameConfig';
 import { useTouchUi } from './setup/useTouchUi';
 import { AI_COUNT_MIN, AI_COUNT_MAX, type ChampionLoadout } from '../game/config/PregameConfig';
+import { getSpellDisplay, type SpellDisplay } from '../game/preset';
+import type { SpellClass } from './setup/types';
 import PlayersTab from './setup/PlayersTab.vue';
 import SettingsTab from './setup/SettingsTab.vue';
 import LoadoutEditorModal from './setup/LoadoutEditorModal.vue';
+import SpellPreviewModal from './setup/SpellPreviewModal.vue';
 
 const emit = defineEmits<{ back: []; start: [] }>();
 
@@ -44,7 +47,7 @@ const {
   resetToDefault,
 } = usePregameConfig();
 
-const { isTouchUi, toggle: toggleTouchUi } = useTouchUi();
+const { isTouchUi, set: setTouchUi } = useTouchUi();
 
 type Tab = 'players' | 'settings';
 const activeTab = ref<Tab>('players');
@@ -85,6 +88,19 @@ const changeEditingLoadout = (loadout: ChampionLoadout): void => {
 const addBot = (): void => setAiCount(Math.min(AI_COUNT_MAX, config.value.ai.count + 1));
 const removeBot = (): void => setAiCount(Math.max(AI_COUNT_MIN, config.value.ai.count - 1));
 
+// --------------------------------------------------------- ability preview
+// Reachable only from the Players tab's participant list (`ParticipantCard`'s
+// kit-icon row), which is never visible while the loadout modal is open —
+// see `SpellPreviewModal.vue`'s file comment for why that already guarantees
+// "one dialog at a time" without needing to coordinate with `editTarget`.
+const previewSpell = ref<SpellDisplay | null>(null);
+const openPreview = (spellClass: SpellClass): void => {
+  previewSpell.value = getSpellDisplay(spellClass, matchRules.value);
+};
+const closePreview = (): void => {
+  previewSpell.value = null;
+};
+
 // "Mặc Định" lives in the footer, which the loadout modal's full-viewport
 // backdrop covers whenever it is open — so there is never a stale
 // `editTarget` to clean up here; reset only ever runs with the modal closed.
@@ -100,16 +116,6 @@ const onReset = (): void => {
         <i class="fas fa-arrow-left"></i>
       </button>
       <h1>Cấu Hình Trận Đấu</h1>
-      <button
-        type="button"
-        id="pregame-touch-toggle"
-        class="pregame-icon-btn touch-ui-toggle"
-        :class="{ on: isTouchUi }"
-        :title="isTouchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'"
-        @click="toggleTouchUi"
-      >
-        <i class="fa-solid fa-gamepad"></i>
-      </button>
     </header>
 
     <div class="pregame-tabs" role="tablist">
@@ -141,6 +147,7 @@ const onReset = (): void => {
         @open-bot="openBotEditor"
         @add-bot="addBot"
         @remove-bot="removeBot"
+        @preview-ability="openPreview"
       />
       <SettingsTab
         v-else
@@ -148,6 +155,8 @@ const onReset = (): void => {
         :set-ai-flag="setAiFlag"
         :set-cooldown-reduction="setCooldownReduction"
         :set-mana-free="setManaFree"
+        :is-touch-ui="isTouchUi"
+        :set-touch-ui="setTouchUi"
       />
     </div>
 
@@ -162,7 +171,10 @@ const onReset = (): void => {
     :title="editTitle"
     :loadout="editLoadout"
     :match-rules="matchRules"
+    :is-touch-ui="isTouchUi"
     @change="changeEditingLoadout"
     @close="closeEditor"
   />
+
+  <SpellPreviewModal v-if="previewSpell" :display="previewSpell" @close="closePreview" />
 </template>

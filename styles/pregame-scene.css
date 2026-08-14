@@ -45,23 +45,6 @@
     color: #f0e6d2;
 }
 
-/* =============== Mode toggle =============== */
-/* Same explicit switch the in-game HUD uses (styles/hud.css's ".touch-toggle"):
-   a hybrid device guesses wrong either way, and without it none of this
-   could be driven or screenshotted from a desktop Chrome. */
-.touch-ui-toggle {
-    border: 1px solid #fff3;
-    border-radius: 8px;
-    width: 34px;
-    height: 34px;
-    font-size: 1em;
-}
-
-.touch-ui-toggle.on {
-    color: #7fd3ff;
-    border-color: #7fd3ff88;
-}
-
 /* =============== Tabs =============== */
 
 .pregame-tabs {
@@ -119,21 +102,31 @@
 }
 
 .participant-card-main {
+    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
     gap: .8rem;
-    background: transparent;
-    border: none;
-    color: #f0e6d2;
     padding: .6rem .8rem;
-    cursor: pointer;
     text-align: left;
     min-width: 0;
 }
 
-.participant-card-main:hover {
+.participant-card-main:has(.participant-card-open:hover) {
     background: #2a2f36;
+}
+
+/* Invisible, covers the whole row — opens the loadout editor. The kit-icon
+   buttons below are real, visible buttons stacked above it, same pattern as
+   `.champion-card-pick` in ChampionCard.vue; see that file's comment. */
+.participant-card-open {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
 }
 
 .participant-portrait {
@@ -184,11 +177,27 @@
     margin-top: .3rem;
 }
 
-.participant-kit-icons img {
+/* Real, visible buttons — see `.participant-card-open` above and
+   ParticipantCard.vue's file comment: `position: relative` is what lets
+   these win the click instead of opening the loadout editor underneath. */
+.kit-icon-btn {
+    position: relative;
+    background: transparent;
+    border: 1px solid #3c3c41;
+    border-radius: 3px;
+    padding: 0;
+    cursor: pointer;
+    line-height: 0;
+}
+
+.kit-icon-btn:hover {
+    border-color: #7fd3ff;
+}
+
+.kit-icon-btn img,
+.kit-icon-btn .fa-random {
     width: 18px;
     height: 18px;
-    border-radius: 3px;
-    border: 1px solid #3c3c41;
 }
 
 .participant-chevron {
@@ -271,6 +280,46 @@
     cursor: pointer;
 }
 
+/* =============== Input mode (InputModePanel.vue) =============== */
+/* A three-way row rather than a two-state switch on purpose — "Tự động" is
+   shaped in from day one, disabled until the tri-state preference lands in
+   game/input/TouchControls.ts. See that component's file comment. */
+
+.input-mode-row {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .6rem;
+}
+
+.input-mode-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    color: #bbb;
+    padding: .5rem .4rem;
+    font-size: .78em;
+    cursor: pointer;
+}
+
+.input-mode-btn:hover {
+    border-color: #785a28;
+}
+
+.input-mode-btn.selected {
+    border-color: #08abac;
+    color: #f0e6d2;
+    background: #102426;
+}
+
+.input-mode-btn:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
     .pregame-columns {
         grid-template-columns: 1fr;
@@ -294,9 +343,20 @@
 }
 
 .pregame-modal {
+    /* Without this, `height: 100dvh` + `padding` (see the `@media
+       (max-width: 640px)` block below) renders ~22px taller than the
+       viewport — no scroll region involved, just the default `content-box`
+       sizing model adding padding *on top of* an already-100%-of-viewport
+       height. That was quietly clipping the footer (summoner row / commit
+       button) below the fold on a real phone even before this pass;
+       `border-box` is what makes `height: 100dvh` actually mean "100dvh,
+       padding included." */
+    box-sizing: border-box;
     width: min(760px, 92vw);
     max-height: 85vh;
-    overflow-y: auto;
+    /* The frame itself never scrolls — exactly one region inside it does.
+       See `.pregame-modal-body` just below. */
+    overflow: hidden;
     background: #1e2328;
     border: 3px solid transparent;
     border-image: linear-gradient(#08abac, #01698b) 1;
@@ -307,7 +367,30 @@
     flex-direction: column;
 }
 
+/* Narrower than the loadout editor — one spell's icon, name, cost and
+   description, not a grid or a catalogue. */
+.spell-preview-modal {
+    width: min(480px, 92vw);
+    max-height: 70vh;
+}
+
+/* The single scrolling region a `.pregame-modal` ever has, in either the
+   loadout editor's champion/custom view or a read-only ability preview
+   (`LoadoutEditorModal.vue`, `SpellPreviewModal.vue`). Everything around it
+   — header, `.kit-mode-toggle`, `.summoner-row` — is a fixed sibling, not a
+   child, so it never scrolls out of reach. `SpellSelectorPane.vue`'s own
+   body (`.selector-body`) is the equivalent for the spell-selector view;
+   see that section below for why it needs its own rule instead of reusing
+   this one. */
+.pregame-modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: .3rem;
+}
+
 .pregame-modal-header {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     gap: .6rem;
@@ -326,6 +409,7 @@
 /* -------------------------------------------------------- mode + champions */
 
 .kit-mode-toggle {
+    flex-shrink: 0;
     display: flex;
     gap: .5rem;
     margin-bottom: .8rem;
@@ -357,12 +441,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
     gap: .6rem;
-    max-height: 280px;
-    overflow-y: auto;
-    padding-right: .3rem;
 }
 
 .champion-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -370,18 +452,32 @@
     background: #23282e;
     border: 2px solid #3c3c41;
     padding: .5rem .4rem;
-    cursor: pointer;
     color: #f0e6d2;
     transition: border-color .15s ease, background .15s ease;
 }
 
-.champion-card:hover {
+.champion-card:has(.champion-card-pick:hover) {
     border-color: #785a28;
 }
 
 .champion-card.selected {
     border-color: #c8aa6e;
     background: #2c2418;
+}
+
+/* Invisible, covers the whole card — picks the champion. Ability icons
+   below (`.champion-spell-btn`) are real, visible buttons stacked above it
+   (`position: relative` wins the paint order over an absolutely-positioned,
+   `z-index: auto` sibling regardless of DOM order — see ChampionCard.vue's
+   file comment) so they intercept their own clicks instead of picking. */
+.champion-card-pick {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
 }
 
 .champion-portrait {
@@ -416,24 +512,45 @@
 }
 
 .champion-spells {
+    position: relative;
     display: flex;
     gap: 3px;
 }
 
-.champion-spells img {
-    width: 18px;
-    height: 18px;
-    border-radius: 3px;
+/* A real, visible button per ability — see ChampionCard.vue's file comment
+   and `.champion-card-pick` above for why `position: relative` matters here:
+   it is what lets this win the click over the invisible pick button
+   underneath, without nesting a <button> inside a <button>. */
+.champion-spell-btn {
+    position: relative;
+    background: transparent;
     border: 1px solid #3c3c41;
-    /* Decorative only — see ChampionCard.vue's file comment for why these no
-       longer have their own click handler. */
-    pointer-events: none;
+    border-radius: 3px;
+    padding: 0;
+    cursor: pointer;
+    line-height: 0;
 }
 
+.champion-spell-btn:hover {
+    border-color: #7fd3ff;
+}
+
+.champion-spell-btn img,
+.champion-spell-btn .fa-random {
+    width: 18px;
+    height: 18px;
+}
+
+/* A fixed footer now (sibling of `.pregame-modal-body`, not inside it — see
+   LoadoutEditorModal.vue) — always reachable without scrolling, not just
+   whatever happened to fit under the champion grid. */
 .summoner-row {
     display: flex;
     gap: 1.5rem;
+    flex-shrink: 0;
     margin-top: .8rem;
+    padding-top: .8rem;
+    border-top: 1px solid #3c3c41;
 }
 
 /* -------------------------------------------------------------- kit slots
@@ -509,11 +626,13 @@
 
 /* ---------------------------------------------------------- spell selector
    One pane, both halves always visible together: a catalogue to browse and a
-   detail pane describing whatever is highlighted, plus the one commit
-   action. CSS alone reflows it between the pointer layout (side by side) and
-   the touch layout (catalogue on top, detail+commit pinned below, within
-   thumb reach) — see the body.touch-ui block below and
-   SpellSelectorPane.vue's file comment. */
+   detail pane describing whatever is highlighted. CSS alone reflows it
+   between the pointer layout (side by side) and the touch layout (catalogue
+   on top, a collapsible detail sheet pinned below within thumb reach) — see
+   the body.touch-ui block below and SpellSelectorPane.vue's file comment.
+   `.selector-commit` is a fixed footer *outside* `.selector-body` in both
+   layouts, not part of either column any more, so it is reachable
+   regardless of scroll position or whether the touch sheet is open. */
 
 .selector-pane {
     display: flex;
@@ -522,6 +641,14 @@
     min-height: 0;
 }
 
+/* Pointer: this is the single scroller for the whole view (the
+   single-scroller rule applies here too, not only under body.touch-ui —
+   see the file comment above and SpellSelectorPane.vue's). Neither column
+   below has its own `overflow` on pointer; both are laid out at their
+   natural height and scroll together as one unit. Touch overrides this
+   entirely further down: there, `.selector-catalogue` or the detail sheet's
+   own description area is the scroller, one at a time, and this element
+   does not scroll itself. */
 .selector-body {
     display: flex;
     flex-direction: row;
@@ -530,20 +657,20 @@
     min-height: 0;
 }
 
+body:not(.touch-ui) .selector-body {
+    overflow-y: auto;
+}
+
 .selector-catalogue {
     flex: 1 1 auto;
-    overflow-y: auto;
     min-width: 0;
     padding-right: .3rem;
 }
 
 .selector-detail {
     flex: 0 0 260px;
-    overflow-y: auto;
     border-left: 1px solid #3c3c41;
     padding-left: 1rem;
-    display: flex;
-    flex-direction: column;
 }
 
 .selector-detail-placeholder {
@@ -553,7 +680,8 @@
 }
 
 .selector-commit {
-    margin-top: auto;
+    flex-shrink: 0;
+    margin-top: .8rem;
     width: 100%;
 }
 
@@ -674,6 +802,29 @@
     color: #9ed4ff;
 }
 
+/* Only rendered when `SpellDetailPane.vue` is `collapsible` (touch — see the
+   body.touch-ui block below). The obvious, labelled affordance the owner
+   asked for in place of a swipe: a full-width row with a chevron and a
+   Vietnamese label, not a hit-target split on the header above it. */
+.spell-detail-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    width: 100%;
+    margin-top: .6rem;
+    background: #23282e;
+    border: 1px solid #3c3c41;
+    color: #7fd3ff;
+    padding: .4rem;
+    font-size: .8em;
+    cursor: pointer;
+}
+
+.spell-detail-toggle:hover {
+    border-color: #7fd3ff88;
+}
+
 .spell-detail-body {
     margin-top: .8rem;
     color: #eee;
@@ -708,11 +859,16 @@
 }
 
 /* ================================================================
-   Touch layout — body.touch-ui, not a viewport breakpoint. What differs is
-   whether the player has a hover, a keyboard and a precise pointer, not how
-   wide the window is; see Game.applyTouchUiClass's file comment and
-   useTouchUi.ts. 44px is the smallest target a thumb hits reliably, the same
-   number styles/hud.css's touch layout uses throughout.
+   Touch layout — body.touch-ui, not a viewport breakpoint. What differs
+   here is *interaction*: whether the player has a hover, a keyboard and a
+   precise pointer — hit-target sizes, the collapsible sheet vs. the side
+   column, tap-driven affordances instead of hover. Not how wide the window
+   is, and not the dialog's own size: a touch-capable laptop with a wide
+   screen still gets a bounded, centred dialog (see the `@media (max-width:
+   640px)` block further down) — only *interaction* rides on this flag. See
+   Game.applyTouchUiClass's file comment and useTouchUi.ts. 44px is the
+   smallest target a thumb hits reliably, the same number styles/hud.css's
+   touch layout uses throughout.
    ================================================================ */
 
 body.touch-ui .pregame-tab,
@@ -722,14 +878,23 @@ body.touch-ui .participant-add-btn,
 body.touch-ui .kit-slot,
 body.touch-ui .catalog-spell-card,
 body.touch-ui .catalog-random-card,
-body.touch-ui .champion-card {
+body.touch-ui .champion-card,
+body.touch-ui .input-mode-btn,
+body.touch-ui .spell-detail-toggle,
+body.touch-ui .selector-commit {
     min-height: 44px;
 }
 
-body.touch-ui .touch-ui-toggle {
-    width: 44px;
-    height: 44px;
-    font-size: 1.2em;
+/* Small icon buttons (champion-card abilities, participant kit icons) keep
+   their visual size but get a full 44px tap target via centred padding,
+   rather than growing the icon itself. */
+body.touch-ui .champion-spell-btn,
+body.touch-ui .kit-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body.touch-ui .participant-portrait {
@@ -747,31 +912,31 @@ body.touch-ui .catalog-spell-card img {
     height: 40px;
 }
 
-/* Full-screen sheet rather than a centred dialog — applies to both views the
-   modal shows (edit and select), since they share one shell. */
-body.touch-ui .pregame-modal-backdrop {
-    align-items: stretch;
-    justify-content: stretch;
-}
-
-body.touch-ui .pregame-modal {
-    width: 100vw;
-    max-width: none;
-    height: 100vh;
-    max-height: none;
-    border-width: 0;
-    padding: .7rem;
-}
-
-/* Catalogue as a grid that scrolls, detail pane (and the commit button
-   inside it) pinned below within thumb reach, instead of a side column. */
+/* Catalogue on top, a collapsible detail sheet pinned below within thumb
+   reach, instead of a side column — see SpellDetailPane.vue and
+   SpellSelectorPane.vue's file comments. Exactly one of the two ever
+   scrolls: the catalogue while the sheet is collapsed (the common case —
+   the sheet's description isn't even in the DOM then, see
+   SpellDetailPane.vue's `v-if`), the sheet's own description while expanded
+   (bounded by `max-height` below), with the catalogue's scroll frozen
+   underneath meanwhile. Never both at once — that simultaneous double
+   scroll is the exact bug this screen shipped with. */
 body.touch-ui .selector-body {
     flex-direction: column;
 }
 
+body.touch-ui .selector-catalogue {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+body.touch-ui .selector-body.detail-expanded .selector-catalogue {
+    overflow: hidden;
+}
+
 body.touch-ui .selector-detail {
     flex: 0 0 auto;
-    max-height: 46vh;
     border-left: none;
     border-top: 1px solid #3c3c41;
     padding-left: 0;
@@ -779,6 +944,45 @@ body.touch-ui .selector-detail {
     margin-top: .6rem;
 }
 
-body.touch-ui .champion-grid {
-    max-height: none;
+body.touch-ui .selector-detail .spell-detail-body {
+    max-height: 42vh;
+    overflow-y: auto;
+}
+
+/* ================================================================
+   Dialog size — driven by the viewport, not the interaction mode. A
+   touch-capable desktop monitor in touch mode still gets the bounded,
+   centred 760px dialog above; only a viewport this narrow gets the
+   edge-to-edge sheet. 640px matches `.pregame-columns`' own breakpoint
+   above — the width this file already treats as "too small to keep a
+   bordered dialog with margin around it" for the two-column settings grid,
+   reused here so the screen has one definition of "small", not two.
+   ================================================================ */
+
+@media (max-width: 640px) {
+    /* Applies to both `.pregame-modal` (below) and `.spell-preview-modal`,
+       whose own explicit width (see the "Loadout editor modal" section
+       above) still wins over this — a single spell's description does not
+       need to go edge to edge just because the viewport is a phone's. */
+    .pregame-modal-backdrop {
+        align-items: stretch;
+        justify-content: stretch;
+    }
+
+    .pregame-modal {
+        width: 100vw;
+        max-width: none;
+        /* `100vh` on a real phone is the *layout* viewport — taller than
+           what's actually visible above the address bar — which clipped the
+           footer (summoner row / commit button) below the fold. `100dvh`
+           (dynamic viewport height) tracks the address bar and is what
+           actually fits; `100vh` stays first as a fallback for a browser
+           that doesn't parse `dvh` (that declaration is simply invalid and
+           dropped there, leaving `100vh` in effect). */
+        height: 100vh;
+        height: 100dvh;
+        max-height: none;
+        border-width: 0;
+        padding: .7rem;
+    }
 }
