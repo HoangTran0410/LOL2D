@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/loading-scene.css">
     <link rel="stylesheet" href="styles/menu-scene.css">
+    <link rel="stylesheet" href="styles/pregame-scene.css">
     <link rel="stylesheet" href="styles/game-scene.css">
     <link rel="stylesheet" href="styles/hud.css">
 
@@ -61,10 +62,82 @@
             </div>
 
             <button id="play-btn" class="hextech-btn">Chơi</button>
+            <button id="config-btn" class="hextech-btn secondary">Cấu Hình Trận Đấu</button>
 
             <button id="fullscreen-btn">
                 <i class="fas fa-expand"></i>
             </button>
+        </div>
+
+        <div id="pregame-scene">
+            <div class="pregame-panel">
+                <header class="pregame-header">
+                    <button id="pregame-back-btn" class="pregame-icon-btn" title="Quay lại">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h1>Cấu Hình Trận Đấu</h1>
+                </header>
+
+                <div class="pregame-body">
+                    <section class="pregame-section">
+                        <h2>Tướng Của Bạn</h2>
+                        <div class="champion-grid" id="pregame-champion-grid"></div>
+                    </section>
+
+                    <section class="pregame-section">
+                        <h2>Phép Bổ Trợ</h2>
+                        <div class="summoner-row">
+                            <div class="summoner-slot">
+                                <span class="summoner-slot-label">D</span>
+                                <div class="summoner-options" id="pregame-summoner-d"></div>
+                            </div>
+                            <div class="summoner-slot">
+                                <span class="summoner-slot-label">F</span>
+                                <div class="summoner-options" id="pregame-summoner-f"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="pregame-section pregame-columns">
+                        <div class="pregame-column">
+                            <h2>Tướng Địch (AI)</h2>
+                            <label class="pregame-field">
+                                <span>Số lượng tướng AI: <strong id="pregame-ai-count-value">5</strong></span>
+                                <input type="range" id="pregame-ai-count" min="0" max="10" step="1">
+                            </label>
+                            <label class="pregame-toggle">
+                                <input type="checkbox" id="pregame-ai-automove">
+                                <span>AI tự di chuyển</span>
+                            </label>
+                            <label class="pregame-toggle">
+                                <input type="checkbox" id="pregame-ai-autoattack">
+                                <span>AI tự tấn công</span>
+                            </label>
+                            <label class="pregame-toggle">
+                                <input type="checkbox" id="pregame-ai-autocast">
+                                <span>AI tự dùng kỹ năng</span>
+                            </label>
+                        </div>
+
+                        <div class="pregame-column">
+                            <h2>Luật Đấu</h2>
+                            <label class="pregame-field">
+                                <span>Giảm hồi chiêu: <strong id="pregame-cdr-value">0%</strong></span>
+                                <input type="range" id="pregame-cdr" min="0" max="90" step="10">
+                            </label>
+                            <label class="pregame-toggle">
+                                <input type="checkbox" id="pregame-urf">
+                                <span>URF (không tốn mana)</span>
+                            </label>
+                        </div>
+                    </section>
+                </div>
+
+                <footer class="pregame-actions">
+                    <button id="pregame-reset-btn" class="hextech-btn secondary">Mặc Định</button>
+                    <button id="pregame-start-btn" class="hextech-btn">Bắt Đầu</button>
+                </footer>
+            </div>
         </div>
     </div>
 </body>

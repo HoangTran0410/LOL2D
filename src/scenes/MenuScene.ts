@@ -1,6 +1,7 @@
 import { Scene } from '../managers/SceneManager';
 import DomUtils from '../utils/dom.utils';
 import GameScene from './GameScene';
+import SetupScene from './SetupScene';
 import AssetManager, { type AssetKey } from '../managers/AssetManager';
 
 const MENU_BACKGROUNDS: AssetKey[] = [
@@ -16,6 +17,7 @@ export default class MenuScene extends Scene {
   menuSceneDiv!: HTMLElement;
   background!: HTMLElement;
   playBtn!: HTMLElement;
+  configBtn!: HTMLElement;
   fullscreenBtn!: HTMLElement;
   interval: ReturnType<typeof setInterval> | null = null;
   currentBgIndex?: number;
@@ -24,12 +26,19 @@ export default class MenuScene extends Scene {
     this.menuSceneDiv = document.querySelector('#menu-scene') as HTMLElement;
     this.background = document.querySelector('#menu-scene .background') as HTMLElement;
     this.playBtn = document.querySelector('#play-btn') as HTMLElement;
+    this.configBtn = document.querySelector('#config-btn') as HTMLElement;
     this.fullscreenBtn = document.querySelector('#fullscreen-btn') as HTMLElement;
     (document.querySelector('#menu-logo') as HTMLImageElement).src =
       AssetManager.get('other_newlogo_vi').url;
 
+    // "Chơi" stays a single click into a match, with whatever config is
+    // already persisted (defaults, if the player has never opened the setup
+    // screen) — the setup screen is additive, never a gate in front of Play.
     this.playBtn.addEventListener('click', () => {
       this.sceneManager.showScene(GameScene);
+    });
+    this.configBtn.addEventListener('click', () => {
+      this.sceneManager.showScene(SetupScene);
     });
     this.fullscreenBtn.addEventListener('click', () => {
       const isFullscreen = DomUtils.toggleFullscreen();

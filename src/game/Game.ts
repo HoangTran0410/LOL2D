@@ -13,8 +13,10 @@ import {
   FountainPreset,
   MonsterPreset,
   getChampionPresetRandom,
+  getChampionPresetFromLoadout,
   getTurretPositions,
 } from './preset';
+import { loadPregameConfig, toMatchRules, type MatchRules } from './config/PregameConfig';
 import ObjectManager from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
 import NavigationSystem from './nav/NavigationSystem';
@@ -75,6 +77,17 @@ export default class Game {
   touchControls!: TouchControls;
 
   /**
+   * Cooldown reduction and URF, resolved once from the pregame config at
+   * construction. `Spell.ts` reads this off `owner.game.matchRules` — see
+   * `Spell.applyMatchRules` — rather than this class pushing the numbers into
+   * every spell it creates, so a spell built at any point in a match (a
+   * respawn's fresh kit, a champion swap) picks the same rules up on its own.
+   * Fixed for the whole match: these are pregame settings, not a mid-match
+   * toggle, so nothing here needs to react to a later change.
+   */
+  matchRules!: MatchRules;
+
+  /**
    * Where each slot is aimed by a thumb, when one is on it. Empty on the
    * keyboard, and `createSpellContext` falls back to the cursor — which is what
    * makes this the only coupling the touch layer needs to the cast path.
@@ -92,6 +105,14 @@ export default class Game {
   paused = false;
 
   constructor() {
+    // Read once, before anything that might construct a Champion or a Spell:
+    // `matchRules` has to be in place the moment the player's own kit is
+    // built a few lines down. Validated/defaulted by `loadPregameConfig`
+    // itself, so a corrupt or missing stored blob never reaches this
+    // constructor as anything other than a playable config.
+    const pregameConfig = loadPregameConfig();
+    this.matchRules = toMatchRules(pregameConfig.rules);
+
     this.worldMouse = createVector(0, 0);
     this.camera = new Camera();
     this.objectManager = new ObjectManager(this);
@@ -112,7 +133,7 @@ export default class Game {
     this.player = new Champion({
       game: this,
       position: this.randomSpawnPoint(),
-      preset: getChampionPresetRandom(),
+      preset: getChampionPresetFromLoadout(pregameConfig.player),
     });
     this.objectManager.addObject(this.player);
     this.spellInputController = new SpellInputController({
@@ -131,12 +152,19 @@ export default class Game {
     this.touchControls = new TouchControls(this.touchControlsHost(), touchControlsPreference());
     this.applyTouchUiClass();
 
-    for (let i = 0; i < 5; i++) {
+    // AI champions always get a random kit, same as before this config
+    // existed — the player's own pick only ever applies to the player. Count
+    // and behaviour come from the pregame config; `loadPregameConfig` has
+    // already clamped `count` to [AI_COUNT_MIN, AI_COUNT_MAX].
+    for (let i = 0; i < pregameConfig.ai.count; i++) {
       this.objectManager.addObject(
         new AIChampion({
           game: this,
           position: this.randomSpawnPoint(),
           preset: getChampionPresetRandom(),
+          autoMove: pregameConfig.ai.autoMove,
+          autoAttack: pregameConfig.ai.autoAttack,
+          autoCast: pregameConfig.ai.autoCast,
         })
       );
     }
@@ -405,9 +433,11 @@ export default class Game {
       // loading; the button draws its letter rather than a string as an image.
       icon: typeof icon === 'object' && icon !== null ? icon : null,
       cooldownRatio:
-        spell.coolDown > 0 ? Math.min(1, Math.max(0, spell.currentCooldown / spell.coolDown)) : 0,
+        spell.effectiveCoolDownMs > 0
+          ? Math.min(1, Math.max(0, spell.currentCooldown / spell.effectiveCoolDownMs))
+          : 0,
       onCooldown: spell.currentCooldown > 0 && spell.cooldownLocksOut !== false,
-      affordable: this.player.stats.mana.value >= spell.manaCost,
+      affordable: this.player.stats.mana.value >= spell.effectiveManaCost,
       castable: this.player.canCast && !this.player.isDead && !spell.disabled,
       charging: spell.state === 'CHARGING',
     };

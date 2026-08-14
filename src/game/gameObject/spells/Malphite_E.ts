@@ -69,7 +69,7 @@ export default class Malphite_E extends Spell {
 
   onCancel(_context: CastContext, _reason: CancelReason): void {
     // Half-refund on the imported cancel set, matching Varus Q/Pantheon Q.
-    this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
+    this.changeResource(this.owner.stats.mana, -this.effectiveManaCost / 2);
   }
 
   drawPreview(): void {

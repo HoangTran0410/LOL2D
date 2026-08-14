@@ -14,7 +14,18 @@ import type Spell from '../Spell';
 import { isChargeActivation, requireChargeSpec, type CastContext } from '../../spell/runtime/types';
 import type { Vec2 } from '../../spell/runtime/types';
 
-export type AIChampionOptions = ChampionOptions;
+export interface AIChampionOptions extends ChampionOptions {
+  /**
+   * Overrides for this bot's behaviour flags, resolved by the caller (`Game`,
+   * from its pregame config) before construction — the flags themselves stay
+   * plain instance fields other code already reads and flips directly (see
+   * `tests/e2e/drive-basic-attacks.mjs` pinning `bot._autoAttack` etc.), and
+   * an omitted field here just keeps that field's class default.
+   */
+  autoMove?: boolean;
+  autoAttack?: boolean;
+  autoCast?: boolean;
+}
 
 /**
  * ms between target scans. A bot only re-queries the quadtree four times a
@@ -52,6 +63,9 @@ export default class AIChampion extends Champion {
 
   constructor(options: AIChampionOptions) {
     super(options);
+    if (options.autoMove !== undefined) this._autoMove = options.autoMove;
+    if (options.autoAttack !== undefined) this._autoAttack = options.autoAttack;
+    if (options.autoCast !== undefined) this._autoCast = options.autoCast;
   }
 
   update() {

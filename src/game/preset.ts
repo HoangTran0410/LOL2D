@@ -4,6 +4,7 @@ import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
+import type { PlayerLoadout } from './config/PregameConfig';
 
 // Workaround: AllSpells is a namespace of named Spell class exports.
 // Filter out string exports by excluding values whose prototype chain doesn't lead to Spell.
@@ -295,6 +296,143 @@ export const SpellGroups: {
     ],
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Pregame setup screen data
+//
+// The pregame screen (src/scenes/SetupScene.ts) is a standalone UI built
+// directly on this module — it does not reuse or import the in-game
+// spell-picker modal (src/game/hud/InGameHUD.ts), which is being rewritten
+// separately. `new SpellClass(null)` for a throwaway display instance below
+// is the same technique that modal already uses to read a spell's icon/name
+// without a real champion to own it.
+// ---------------------------------------------------------------------------
+
+export interface SpellDisplay {
+  /**
+   * A spell's `image` field (unlike `SpellGroups[i].image`, which is a bare
+   * `AssetKey`) is already a *resolved* `AssetHandle` — every spell sets it
+   * with `image = AssetManager.get('spell_x')` in its own field initializer.
+   * This is that handle's `.url`, ready for an `<img src>` with no second
+   * `AssetManager.get` lookup (which would fail: an `AssetHandle` object is
+   * not a valid manifest key).
+   */
+  iconUrl: string | null;
+  name: string;
+}
+
+const spellDisplay = (SpellClass: SpellClass): SpellDisplay => {
+  try {
+    const instance = new SpellClass(null);
+    const handle = instance.image as { url?: string } | null | undefined;
+    return { iconUrl: handle?.url ?? null, name: instance.name ?? SpellClass.name };
+  } catch {
+    return { iconUrl: null, name: SpellClass.name };
+  }
+};
+
+export interface SelectableChampion {
+  /** Matches `PlayerLoadout.championName` and a `SpellGroups[i].name`. */
+  name: string;
+  avatar: AssetKey;
+  background: AssetKey | null;
+  spells: SpellDisplay[];
+}
+
+/**
+ * Champions the pregame screen can offer as a coherent kit: a real portrait
+ * and all four of Q/W/E/R implemented. `SpellGroups` also carries
+ * single-ability stubs (Olaf, Graves, Thresh, ...) used to fill the random
+ * pool — picking one of those directly would leave three of its four ability
+ * slots empty, so they're left out of the picker and stay reachable only
+ * through "Ngẫu nhiên" (which mixes single abilities from the whole catalog,
+ * exactly like `getChampionPresetRandom` always has).
+ */
+export const listSelectableChampions = (): SelectableChampion[] => {
+  const champions: SelectableChampion[] = [];
+  for (const group of SpellGroups) {
+    if (!group.image || group.spells.length !== 4) continue;
+    champions.push({
+      name: group.name,
+      avatar: group.image,
+      background: group.background,
+      spells: group.spells.map(spellDisplay),
+    });
+  }
+  return champions;
+};
+
+export interface SummonerSpellOption {
+  id: string;
+  spellClass: SpellClass;
+  display: SpellDisplay;
+}
+
+/**
+ * The `SpellGroups` "Phép Bổ Trợ" shelf, given stable string ids so a choice
+ * can round-trip through `localStorage` (a class reference cannot). Written
+ * out explicitly rather than derived from the class's own `.name` at
+ * runtime — a minified production build does not preserve identifier names
+ * on `Function.prototype.name`, so that would silently stop round-tripping
+ * the moment `npm run build` minifies the bundle. Kept in the same order as
+ * the shelf so the two are easy to eyeball against each other.
+ *
+ * Ids and classes only — no display data — so this can sit at module scope
+ * without instantiating a single spell at import time.
+ */
+const SUMMONER_SPELLS: { id: string; spellClass: SpellClass }[] = [
+  { id: 'Flash', spellClass: AllSpells.Flash },
+  { id: 'Ghost', spellClass: AllSpells.Ghost },
+  { id: 'Heal', spellClass: AllSpells.Heal },
+  { id: 'Ignite', spellClass: AllSpells.Ignite },
+  { id: 'StealthWard', spellClass: AllSpells.StealthWard },
+];
+
+/**
+ * Same list with each spell's icon/name attached. A function, not a
+ * constant, for the same reason as `listSelectableChampions`: it calls
+ * `new SpellClass(null)` per entry, and that has to wait until whatever
+ * imports `preset.ts` is good and ready for it — not fire the moment this
+ * module is first evaluated, which for a spell whose display fields turn out
+ * to depend on a p5 global could be before p5 has finished booting.
+ */
+export const listSummonerSpells = (): SummonerSpellOption[] =>
+  SUMMONER_SPELLS.map(({ id, spellClass }) => ({ id, spellClass, display: spellDisplay(spellClass) }));
+
+const findSummoner = (id: string): SpellClass =>
+  SUMMONER_SPELLS.find(option => option.id === id)?.spellClass ?? AllSpells.Flash;
+
+/**
+ * Turns a `PregameConfig.player` (plain, serializable data) into the same
+ * shape `getChampionPresetRandom` returns, so `Game.ts` doesn't need to know
+ * which of the two produced it. `'random'`, or a `championName` that no
+ * longer names a full-kit champion — a stale save from before a champion was
+ * removed, or corruption `PregameConfig`'s own sanitizer can't catch because
+ * it doesn't know this catalog — both fall back to the exact existing
+ * random-kit behaviour, which is what makes this safe to call with whatever
+ * `loadPregameConfig()` handed back.
+ */
+export const getChampionPresetFromLoadout = (
+  loadout: PlayerLoadout
+): ChampionPresetData & { avatar: AssetKey } => {
+  const champion =
+    loadout.championName === 'random'
+      ? undefined
+      : listSelectableChampions().find(entry => entry.name === loadout.championName);
+  if (!champion) return getChampionPresetRandom();
+
+  const group = SpellGroups.find(g => g.name === champion.name)!;
+  return {
+    name: champion.name,
+    avatar: champion.avatar,
+    spells: [
+      AllSpells.BasicAttack,
+      ...(group.spells as SpellClass[]),
+      findSummoner(loadout.summonerD),
+      findSummoner(loadout.summonerF),
+    ],
+  };
+};
 
 export const MonsterPreset: Record<string, MonsterPresetData> = {
   baron: {

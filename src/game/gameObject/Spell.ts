@@ -199,7 +199,7 @@ export default class Spell {
       this.disabled ||
       this.owner.isDead ||
       !this.owner.canCast ||
-      this.owner.stats.mana.value < this.manaCost ||
+      this.owner.stats.mana.value < this.effectiveManaCost ||
       this.owner.stats.health.value < this.healthCost ||
       !this.checkCastCondition()
     ) {
@@ -257,6 +257,58 @@ export default class Spell {
     return this.resolvedSpec as CastSpec;
   }
 
+  /**
+   * Cooldown reduction's seam. Every spell's cooldown — whether it comes from
+   * the base `castSpec` (`legacyCastSpec(this.coolDown)`) or from a spell's
+   * own `get castSpec()` override, which invariably still writes
+   * `durationMs: this.coolDown` itself — passes through here exactly once,
+   * right before the runtime that actually counts it down is built. That
+   * makes this the one place a match-wide cooldown-reduction rule can apply
+   * without editing a single spell file.
+   *
+   * It cannot instead be a `coolDown` getter/setter pair on this class: about
+   * a third of spells declare `coolDown = SOME_CONSTANT;` as a class field in
+   * their own subclass body, and native class fields use *define* semantics —
+   * that assignment creates its own own-property on the instance and quietly
+   * shadows any accessor `Spell` declares under the same name, so a parent
+   * getter would simply never run for them. Operating on the already-resolved
+   * `CastSpec` object sidesteps that trap entirely.
+   */
+  private applyMatchRules(spec: CastSpec): CastSpec {
+    const multiplier = this.game?.matchRules?.cooldownMultiplier ?? 1;
+    if (multiplier === 1) return spec;
+    return {
+      ...spec,
+      cooldown: { ...spec.cooldown, durationMs: spec.cooldown.durationMs * multiplier },
+    };
+  }
+
+  /**
+   * The cooldown this spell will actually run, after match rules (cooldown
+   * reduction) are applied. `coolDown` stays the spell's own tuning number —
+   * retuning it is still "edit the constant", not "edit a formula" — so
+   * anything that displays a cooldown to the player (a HUD ring, a tooltip)
+   * should read this instead.
+   */
+  get effectiveCoolDownMs(): number {
+    return this.applyMatchRules(this.castSpec as CastSpec).cooldown.durationMs;
+  }
+
+  /**
+   * The mana this spell actually charges, after match rules (URF: `manaFree`)
+   * are applied. `manaCost` stays the spell's own tuning number; every
+   * consumption/refund path below reads through here instead, which is what
+   * makes URF a single flip rather than a per-spell edit.
+   *
+   * Three spells (Pantheon Q, Malphite E, Varus Q) deduct a second,
+   * cancel-triggered half-refund of their own mana cost outside this base
+   * class's commit/refund path; they read this getter directly rather than
+   * `manaCost` for the same reason.
+   */
+  get effectiveManaCost(): number {
+    return this.game?.matchRules?.manaFree ? 0 : this.manaCost;
+  }
+
   get targetingRequest(): Readonly<TargetingRequest> { return {}; }
 
   protected playImpactVfx(context: CastContext): void {
@@ -282,7 +334,7 @@ export default class Spell {
 
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
-      const spec = this.castSpec as CastSpec;
+      const spec = this.applyMatchRules(this.castSpec as CastSpec);
       this.resolvedSpec = spec;
       this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
@@ -327,18 +379,18 @@ export default class Spell {
 
   private commitResource(_context: CastContext, _point: ResourceCommitPoint): boolean {
     if (
-      this.owner.stats.mana.value < this.manaCost ||
+      this.owner.stats.mana.value < this.effectiveManaCost ||
       this.owner.stats.health.value < this.healthCost
     ) {
       return false;
     }
-    this.changeResource(this.owner.stats.mana, -this.manaCost);
+    this.changeResource(this.owner.stats.mana, -this.effectiveManaCost);
     this.changeResource(this.owner.stats.health, -this.healthCost);
     return true;
   }
 
   private refundResource(_context: CastContext, _reason: CancelReason): void {
-    this.changeResource(this.owner.stats.mana, this.manaCost);
+    this.changeResource(this.owner.stats.mana, this.effectiveManaCost);
     this.changeResource(this.owner.stats.health, this.healthCost);
   }
 

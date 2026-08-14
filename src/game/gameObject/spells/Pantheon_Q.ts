@@ -181,7 +181,7 @@ export default class Pantheon_Q extends Spell {
       reason === 'SILENCE' ||
       reason === 'STUN'
     ) {
-      this.changeResource(this.owner.stats.mana, -this.manaCost / 2);
+      this.changeResource(this.owner.stats.mana, -this.effectiveManaCost / 2);
     }
   }
 

@@ -1,0 +1,230 @@
+#pregame-scene {
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.pregame-panel {
+    width: min(920px, 92vw);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: #1e2328;
+    border: 3px solid transparent;
+    border-image: linear-gradient(#08abac, #01698b) 1;
+    color: #f0e6d2;
+    padding: 1.5rem 2rem 2rem;
+    box-shadow: 0 0 30px 6px rgba(0, 0, 0, .5);
+}
+
+.pregame-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pregame-header h1 {
+    font-size: 1.4em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    color: #c8aa6e;
+}
+
+.pregame-icon-btn {
+    background: transparent;
+    border: none;
+    color: #bbb;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+.pregame-icon-btn:hover {
+    color: #f0e6d2;
+}
+
+.pregame-section {
+    margin-bottom: 1.5rem;
+}
+
+.pregame-section h2 {
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a09b8c;
+    border-bottom: 1px solid #3c3c41;
+    padding-bottom: .4rem;
+    margin-bottom: .8rem;
+}
+
+.pregame-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+/* -------------------------------------------------------------- champions */
+
+.champion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: .6rem;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: .3rem;
+}
+
+.champion-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    padding: .5rem .4rem;
+    cursor: pointer;
+    color: #f0e6d2;
+    transition: border-color .15s ease, background .15s ease;
+}
+
+.champion-card:hover {
+    border-color: #785a28;
+}
+
+.champion-card.selected {
+    border-color: #c8aa6e;
+    background: #2c2418;
+}
+
+.champion-portrait {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #14171c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.champion-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.champion-portrait-random {
+    font-size: 1.4em;
+    color: #08abac;
+}
+
+.champion-name {
+    font-size: .78em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+}
+
+.champion-spells {
+    display: flex;
+    gap: 3px;
+}
+
+.champion-spells img {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid #3c3c41;
+}
+
+/* -------------------------------------------------------------- summoners */
+
+.summoner-row {
+    display: flex;
+    gap: 2rem;
+}
+
+.summoner-slot {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.summoner-slot-label {
+    font-weight: bold;
+    color: #c8aa6e;
+    width: 1.2em;
+    text-align: center;
+}
+
+.summoner-options {
+    display: flex;
+    gap: .4rem;
+}
+
+.summoner-option {
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    padding: 2px;
+    cursor: pointer;
+    line-height: 0;
+}
+
+.summoner-option:hover {
+    border-color: #785a28;
+}
+
+.summoner-option.selected {
+    border-color: #c8aa6e;
+}
+
+.summoner-option img {
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+
+/* --------------------------------------------------------------- AI/rules */
+
+.pregame-field {
+    display: block;
+    margin-bottom: .8rem;
+    font-size: .85em;
+}
+
+.pregame-field span {
+    display: block;
+    margin-bottom: .3rem;
+}
+
+.pregame-field input[type="range"] {
+    width: 100%;
+}
+
+.pregame-toggle {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .85em;
+    margin-bottom: .6rem;
+    cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ nav */
+
+.pregame-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: .5rem;
+}
+
+@media (max-width: 640px) {
+    .pregame-columns {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
