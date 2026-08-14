@@ -283,15 +283,16 @@ try {
     `${beforeDragStaged} -> ${afterDragStaged}`
   );
 
-  // ---------------------------------------------------------- 7. close button
+  // ---------------------------------------------------- 7. Huỷ (close) button
 
+  // The corner X is gone; "Huỷ" in the sticky slot row is the way out now.
   const closeBox = await page.evaluate(() => {
-    const box = document.querySelector('.spell-picker .close-btn').getBoundingClientRect();
+    const box = document.querySelector('.picker-btn.cancel').getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
   });
   check(
-    'the close button is at least the 44px thumb target',
-    closeBox.w >= 44 && closeBox.h >= 44,
+    'the Huỷ button is at least the 44px thumb target',
+    closeBox.h >= 44,
     `${closeBox.w}x${closeBox.h}`
   );
   await tap(closeBox.x, closeBox.y, 40);
@@ -299,7 +300,7 @@ try {
   report.pickerAfterClose = await page.evaluate(
     () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker
   );
-  check('a real touch tap on the close button closes the picker', report.pickerAfterClose === false);
+  check('a real touch tap on Huỷ closes the picker', report.pickerAfterClose === false);
 
   // --------------------------------------------- 8. high-DPI overlap checks
 

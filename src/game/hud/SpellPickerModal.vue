@@ -17,27 +17,18 @@
  *     `preventDefault()` on touch — also suppresses the browser's native
  *     touch-scroll, everywhere on the page, not just on the canvas.
  *
- * The close button sits in a `.close-btn-anchor` — a zero-height,
- * `position: sticky` wrapper — rather than directly in `.spell-picker`.
- * It used to be a plain `position: absolute` child of the scrolling
- * `.spell-picker` itself, which meant scrolling down through the roster
- * scrolled the close button away with it: the one way out of the modal
- * became unreachable exactly when a long roster gave a player the most
- * reason to want it. Caught by driving a real scroll gesture in
- * `tests/e2e/drive-mobile-hud.mjs` and then trying to tap the button
- * afterwards, not by reading the markup.
- *
- * A first fix split the modal into a fixed shell plus a `flex: 1 1 0`
- * scrolling body — the standard "sticky header" flex pattern. It does not
- * work here: `.spell-picker`'s height is `max-height`-capped but otherwise
- * intrinsic (auto), and `flex-grow` only has space to distribute once a flex
- * container is *already* pinned to a size larger than its content demands.
- * With nothing forcing that, the `flex-basis: 0` body resolved to zero
- * height and the whole list disappeared — worse than the bug it was meant to
- * fix, and only visible by actually loading the page, not from the CSS
- * alone. `position: sticky` sidesteps the whole question: it needs nothing
- * from its container but *a* scrolling ancestor, which `.spell-picker`
- * (unchanged, still just `overflow-y: auto` on itself) already is.
+ * Everything above the roster — the title, the slot row and the mode toggles
+ * — lives in a `position: sticky` `.picker-header`, so it stays pinned to the
+ * top of the modal while the roster scrolls beneath it. `position: sticky`
+ * needs nothing from its container but *a* scrolling ancestor, which
+ * `.spell-picker` (just `overflow-y: auto` on itself) already is — a flex
+ * "sticky header" shell was tried first and silently collapsed the list,
+ * because `.spell-picker`'s height is `max-height`-capped but otherwise
+ * intrinsic, so a `flex: 1 1 0` body had no pinned size to grow into.
+ * Keeping the slot row on screen matters most: it is where you choose which
+ * slot to replace and (now) the way out, so scrolling a long roster must not
+ * carry it off. Regressions here are caught by scrolling for real in
+ * `tests/e2e/drive-mobile-hud.mjs`, not by reading the markup.
  *
  * The slot selector (`.slot-picker`) is shown in both modes now. The desktop
  * bottom-HUD strip still pre-selects a slot by which icon opened the picker,
@@ -45,13 +36,16 @@
  * spell any number of times before committing — so the in-modal row has to be
  * there on the desktop too, not just as the touch corner button's only way to
  * choose a slot. Each pill previews the *staged* choice (`hud.draftSpells`)
- * over what is currently equipped.
+ * over what is currently equipped. The Huỷ / Xác nhận buttons sit at the end
+ * of this same row rather than a separate footer, to spend as little vertical
+ * space on chrome as possible — "Huỷ" is also the only close affordance now
+ * (the old corner X was redundant with it).
  *
  * Nothing is applied to the game on a pick any more: `hud.pick` only stages
- * into `draftSpells`, and the sticky `.picker-actions` footer commits the lot
- * (`hud.confirmPicks`) or discards it (`hud.closeSpellPicker`, same as the X).
- * This is what lets a player keep changing their mind — the old picker applied
- * and closed on the first tap. See `hudInteractions.ts`.
+ * into `draftSpells`; "Xác nhận" (`hud.confirmPicks`) commits the lot, "Huỷ"
+ * (`hud.closeSpellPicker`) discards it. This is what lets a player keep
+ * changing their mind — the old picker applied and closed on the first tap.
+ * See `hudInteractions.ts`.
  */
 import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
@@ -83,63 +77,75 @@ function scrollTouchMove(event: TouchEvent): void {
 
 <template>
   <div class="spell-picker" @touchstart="scrollTouchStart" @touchmove="scrollTouchMove">
-    <div class="close-btn-anchor">
-      <button
-        class="close-btn"
-        @click="hud.closeSpellPicker()"
-        @touchend.prevent="hud.closeSpellPicker()"
-      >
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+    <!-- Sticky header (see the file comment): stays pinned while the roster
+         scrolls under it, so the slot row — and the way out — never scrolls
+         off. -->
+    <div class="picker-header">
+      <p class="title">Chọn chiêu thức</p>
+
+      <!-- Slot selector + the commit/discard actions in one row. Each pill
+           previews its *staged* choice (`draftSpells`) over what is equipped;
+           the two buttons live here rather than a separate footer to save
+           vertical space. -->
+      <div class="slot-picker">
+        <button
+          v-for="(spell, index) of state.spells"
+          :key="index"
+          type="button"
+          class="slot-pill"
+          :class="{ active: hud.spellIndexToSwap === index, staged: !!hud.draftSpells[index] }"
+          @click="hud.spellIndexToSwap = index"
+          @touchend.prevent="hud.spellIndexToSwap = index"
+        >
+          <img :src="hud.draftSpells[index]?.image ?? spell.image" alt="spell" />
+          <span class="slot-pill-key">{{ spell.hotKey }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="picker-btn cancel"
+          @click="hud.closeSpellPicker()"
+          @touchend.prevent="hud.closeSpellPicker()"
+        >
+          Huỷ
+        </button>
+        <button
+          type="button"
+          class="picker-btn confirm"
+          @click="hud.confirmPicks()"
+          @touchend.prevent="hud.confirmPicks()"
+        >
+          Xác nhận
+        </button>
+      </div>
+
+      <p class="picker-modes">
+        Chế độ (mới):
+        <span class="tooltip">
+          <input
+            type="checkbox"
+            id="oneForAll"
+            :checked="hud.oneForAll"
+            @click="hud.oneForAll = !hud.oneForAll"
+            @touchend.prevent="hud.oneForAll = !hud.oneForAll"
+          />
+          <label for="oneForAll">ONE spell for ALL</label>
+          <span class="tooltiptext">Tất cả đều chỉ dùng 1 chiêu thức</span>
+        </span>
+
+        <span class="tooltip">
+          <input
+            type="checkbox"
+            id="cloneMySpell"
+            :checked="hud.cloneMySpell"
+            @click="hud.cloneMySpell = !hud.cloneMySpell"
+            @touchend.prevent="hud.cloneMySpell = !hud.cloneMySpell"
+          />
+          <label for="cloneMySpell">Clone my spells</label>
+          <span class="tooltiptext">Tất cả đều dùng bộ chiêu thức giống bạn</span>
+        </span>
+      </p>
     </div>
-    <p class="title">Chọn chiêu thức</p>
-
-    <!-- Picks which equipped slot the next tap in the roster replaces. Shown
-         in both modes now (it used to be touch-only): with batched picks the
-         desktop needs it too, so a player can retarget slots without closing.
-         The icon previews the *staged* choice (`draftSpells`) when there is
-         one, falling back to what is currently equipped. -->
-    <div class="slot-picker">
-      <button
-        v-for="(spell, index) of state.spells"
-        :key="index"
-        type="button"
-        class="slot-pill"
-        :class="{ active: hud.spellIndexToSwap === index, staged: !!hud.draftSpells[index] }"
-        @click="hud.spellIndexToSwap = index"
-        @touchend.prevent="hud.spellIndexToSwap = index"
-      >
-        <img :src="hud.draftSpells[index]?.image ?? spell.image" alt="spell" />
-        <span class="slot-pill-key">{{ spell.hotKey }}</span>
-      </button>
-    </div>
-
-    <p>
-      Chế độ (mới):
-      <span class="tooltip">
-        <input
-          type="checkbox"
-          id="oneForAll"
-          :checked="hud.oneForAll"
-          @click="hud.oneForAll = !hud.oneForAll"
-          @touchend.prevent="hud.oneForAll = !hud.oneForAll"
-        />
-        <label for="oneForAll">ONE spell for ALL</label>
-        <span class="tooltiptext">Tất cả đều chỉ dùng 1 chiêu thức</span>
-      </span>
-
-      <span class="tooltip">
-        <input
-          type="checkbox"
-          id="cloneMySpell"
-          :checked="hud.cloneMySpell"
-          @click="hud.cloneMySpell = !hud.cloneMySpell"
-          @touchend.prevent="hud.cloneMySpell = !hud.cloneMySpell"
-        />
-        <label for="cloneMySpell">Clone my spells</label>
-        <span class="tooltiptext">Tất cả đều dùng bộ chiêu thức giống bạn</span>
-      </span>
-    </p>
 
     <div class="list">
       <div class="group" v-for="group of hud.spellGroups" :key="group.name">
@@ -162,30 +168,6 @@ function scrollTouchMove(event: TouchEvent): void {
           <img :src="spell.image" alt="spell" />
         </div>
       </div>
-    </div>
-
-    <!-- Sticky footer: nothing is applied to the game until "Xác nhận" flushes
-         the staged draft (see hudInteractions.pick/confirmPicks). "Huỷ" throws
-         the draft away and closes, same as the X. Pinned to the bottom of the
-         modal's viewport so it stays reachable however far the roster is
-         scrolled, the mirror of the sticky close button at the top. -->
-    <div class="picker-actions">
-      <button
-        type="button"
-        class="picker-btn cancel"
-        @click="hud.closeSpellPicker()"
-        @touchend.prevent="hud.closeSpellPicker()"
-      >
-        Huỷ
-      </button>
-      <button
-        type="button"
-        class="picker-btn confirm"
-        @click="hud.confirmPicks()"
-        @touchend.prevent="hud.confirmPicks()"
-      >
-        Xác nhận
-      </button>
     </div>
 
     <div class="change-logs">

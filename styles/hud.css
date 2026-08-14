@@ -379,18 +379,20 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* A zero-height, `position: sticky` anchor for .close-btn — sticky only
-   needs *a* scrolling ancestor, which .spell-picker already is, so this
-   pins the button to the top-right of the modal's viewport regardless of
-   scroll position without touching how the rest of the modal sizes or
-   scrolls. See SpellPickerModal.ts's file comment for the flex-based attempt
-   that looked simpler and silently broke the whole list instead. */
-.close-btn-anchor {
+/* `position: sticky` needs nothing but *a* scrolling ancestor, which
+   `.spell-picker` already is, so this pins the title, slot row and mode
+   toggles to the top of the modal while the roster scrolls beneath — the slot
+   selector (and the Huỷ / Xác nhận actions inside it) never scrolls out of
+   reach. See SpellPickerModal.vue's file comment for the flex "sticky header"
+   attempt that looked simpler and silently broke the whole list instead. */
+.picker-header {
   position: sticky;
   top: 0;
-  height: 0;
-  overflow: visible;
   z-index: 12;
+  background: #111;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #fff2;
 }
 
 .spell-picker .title {
@@ -403,9 +405,9 @@
   font-weight: bold;
 }
 
-.spell-picker > p {
+.picker-modes {
   font-size: 0.85em;
-  margin: 4px 0;
+  margin: 4px 0 0;
 }
 
 /* 22px so the mode checkboxes are a real tap target (the native control is
@@ -419,15 +421,16 @@
 .spell-picker .list {
 }
 
-/* Touch-ui only — see SpellPickerModal.vue's file comment. Picks which
-   equipped slot the next tap in the roster below will replace; 44px
-   matches the close button and checkboxes as the smallest reliable thumb
-   target. */
+/* Picks which equipped slot the next roster tap replaces, and (at its end)
+   the Huỷ / Xác nhận actions. Wraps when there is not room for the pills and
+   both buttons on one line; 44px pills are the smallest reliable thumb target.
+   See SpellPickerModal.vue's file comment. */
 .slot-picker {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
-  margin: 8px 0;
+  margin: 6px 0 0;
 }
 
 .slot-pill {
@@ -487,24 +490,6 @@
   display: inline-block;
 }
 
-.spell-picker .close-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 44px;
-  height: 44px;
-  color: white;
-  font-size: 1.5em;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background-color: #ddd2;
-}
-
-.spell-picker .close-btn:hover {
-  background-color: #b50000;
-}
-
 /* ====================== group ====================== */
 .spell-picker .group {
   display: inline-block;
@@ -548,32 +533,27 @@
   color: #eee;
 }
 
-/* Sticky footer, the mirror of the sticky close button at the top: the
-   Huỷ / Xác nhận actions stay pinned to the bottom of the modal's viewport so
-   they are reachable however far the roster is scrolled. Nothing is applied to
-   the game until "Xác nhận" (see SpellPickerModal.vue). */
-.picker-actions {
-  position: sticky;
-  bottom: 0;
-  z-index: 12;
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 8px;
-  background: #111;
-}
-
+/* The Huỷ / Xác nhận actions are the last two children of `.slot-picker`, on
+   the same row as the slot pills (see SpellPickerModal.vue) — no separate
+   footer. `margin-left: auto` on the first one pushes the pair to the right
+   end of the row; when the row wraps, they drop to their own line, still
+   right-aligned. 44px tall to match the pills. Nothing is applied to the game
+   until "Xác nhận". */
 .picker-btn {
-  flex: 1;
-  min-height: 40px;
-  padding: 8px 12px;
+  min-height: 44px;
+  padding: 0 12px;
   border-radius: 6px;
   border: 2px solid #fff3;
   background-color: #1b1b1b;
   color: #eee;
-  font-size: 0.95em;
+  font-size: 0.9em;
   font-weight: bold;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.picker-btn.cancel {
+  margin-left: auto;
 }
 
 .picker-btn.cancel:hover {
