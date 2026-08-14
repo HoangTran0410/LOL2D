@@ -3,6 +3,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   root: '.',
+  base: './',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
