@@ -1,40 +1,28 @@
 <script setup lang="ts">
-/** The "Tướng Địch (AI)" column: bot count and the three AI behaviour flags shared by every bot. */
-import { AI_COUNT_MIN, AI_COUNT_MAX } from '../../game/config/PregameConfig';
-
+/**
+ * The "Tướng Địch (AI)" panel: the three AI behaviour flags shared by every
+ * bot. How *many* bots there are lives in the Players tab now, as direct
+ * manipulation on the participant list (`PlayersTab.vue`'s "Thêm Bot" and
+ * per-row remove) rather than a slider here — a count control in a tab you
+ * can't see silently changing a list in a tab you can was exactly the
+ * indirection this screen's redesign removes. This panel does not duplicate
+ * it.
+ */
 defineProps<{
-  count: number;
   autoMove: boolean;
   autoAttack: boolean;
   autoCast: boolean;
 }>();
 const emit = defineEmits<{
-  'update:count': [number];
   'update:autoMove': [boolean];
   'update:autoAttack': [boolean];
   'update:autoCast': [boolean];
 }>();
-
-const onCountInput = (event: Event): void => {
-  emit('update:count', Number((event.target as HTMLInputElement).value));
-};
 </script>
 
 <template>
   <div class="pregame-column">
     <h2>Tướng Địch (AI)</h2>
-    <label class="pregame-field">
-      <span>Số lượng tướng AI: <strong id="pregame-ai-count-value">{{ count }}</strong></span>
-      <input
-        type="range"
-        id="pregame-ai-count"
-        :min="AI_COUNT_MIN"
-        :max="AI_COUNT_MAX"
-        step="1"
-        :value="count"
-        @input="onCountInput"
-      />
-    </label>
     <label class="pregame-toggle">
       <input
         type="checkbox"

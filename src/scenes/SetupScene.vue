@@ -1,38 +1,34 @@
 <script setup lang="ts">
 /**
- * The pregame setup screen: pick a champion (bundled Q/W/E/R kit) or build a
- * kit slot by slot from the whole spell catalogue, pick summoner spells,
- * configure each AI bot's champion/kit individually (plus the AI behaviour
- * flags shared by all of them), and set match-wide rules (cooldown
- * reduction, URF).
+ * The pregame setup screen. Two tabs:
  *
- * All state lives here, in `usePregameConfig` — every control writes
- * straight through to `localStorage` on change (no separate "Save" step) via
- * the same `savePregameConfig` the pre-Vue version used. `SetupScene.ts`
- * owns only the two scene transitions ("Quay lại" and "Bắt Đầu"/"Mặc Định"
- * doesn't transition), passed in as `onBack`/`onStart` props — a running game
- * never reaches back into this screen, and this screen never reaches into
- * `sceneManager` directly.
+ *   - "Tướng" (`PlayersTab`) — one list of participants, the player first and
+ *     clearly marked, then every active bot, then the "add a bot" control as
+ *     direct manipulation on that same list. Tapping any participant opens
+ *     `LoadoutEditorModal` bound to their loadout — the *same* modal either
+ *     way, which is what removes the old duplication (an always-visible
+ *     player editor plus a second copy inline in whichever bot row was
+ *     expanded).
+ *   - "Cấu hình" (`SettingsTab`) — AI behaviour and match rules. Nothing
+ *     about who is playing lives here any more.
  *
- * Decomposed along the seams the original hand-built version already named
- * in its own comments: the champion grid (`ChampionGrid`/`ChampionCard`),
- * the loadout/slot editor shared by the player and every bot
- * (`LoadoutEditor`, `SummonerSlot`, `CustomSlotButton`), the spell catalogue
- * picker (`SpellCatalogPicker`) and spell detail panel (`SpellDetailPanel`)
- * — both singletons shared across the whole tree via `usePregameOverlays` —
- * the per-bot accordion (`BotAccordion`/`BotRow`), and the match-rules /
- * AI-config sliders (`MatchRulesPanel`/`AiConfigPanel`).
+ * Defaulting to the Players tab is what makes the screen "read cleanly on
+ * first open" (the owner's stated goal): a participant list plus two tab
+ * buttons, not every control this screen has all at once.
+ *
+ * All persisted state lives in `usePregameConfig` — every control writes
+ * straight through to `localStorage` on change, same as before this
+ * redesign. `SetupScene.ts` owns only the two scene transitions ("Quay lại",
+ * "Bắt Đầu" — "Mặc Định" doesn't transition), passed in as `onBack`/`onStart`
+ * props, because a Vue component has no access to `sceneManager` itself.
  */
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { usePregameConfig } from './setup/usePregameConfig';
-import { providePregameOverlays } from './setup/pregameOverlays';
-import type { SpellClass } from './setup/types';
-import LoadoutEditor from './setup/LoadoutEditor.vue';
-import AiConfigPanel from './setup/AiConfigPanel.vue';
-import MatchRulesPanel from './setup/MatchRulesPanel.vue';
-import BotAccordion from './setup/BotAccordion.vue';
-import SpellCatalogPicker from './setup/SpellCatalogPicker.vue';
-import SpellDetailPanel from './setup/SpellDetailPanel.vue';
+import { useTouchUi } from './setup/useTouchUi';
+import { AI_COUNT_MIN, AI_COUNT_MAX, type ChampionLoadout } from '../game/config/PregameConfig';
+import PlayersTab from './setup/PlayersTab.vue';
+import SettingsTab from './setup/SettingsTab.vue';
+import LoadoutEditorModal from './setup/LoadoutEditorModal.vue';
 
 const emit = defineEmits<{ back: []; start: [] }>();
 
@@ -48,45 +44,52 @@ const {
   resetToDefault,
 } = usePregameConfig();
 
-// ------------------------------------------------------------ shared overlays
-// One spell-detail panel and one catalogue picker, opened from anywhere in
-// the tree below (see pregameOverlays.ts for why this is provide/inject
-// rather than an emit relayed through every intermediate component).
+const { isTouchUi, toggle: toggleTouchUi } = useTouchUi();
 
-const detailSpellClass = ref<SpellClass | null>(null);
-let catalogOnPick: ((choice: string) => void) | null = null;
-const catalogOpen = ref(false);
+type Tab = 'players' | 'settings';
+const activeTab = ref<Tab>('players');
 
-providePregameOverlays({
-  openSpellDetail(spellClass) {
-    detailSpellClass.value = spellClass;
-  },
-  openCatalogPicker(onPick) {
-    catalogOnPick = onPick;
-    catalogOpen.value = true;
-  },
+// ------------------------------------------------------------ loadout modal
+// Which participant's loadout editor is open, if any. Only one is ever
+// mounted at a time — see the file comment above for why that is the point.
+type EditTarget = { kind: 'player' } | { kind: 'bot'; index: number } | null;
+const editTarget = ref<EditTarget>(null);
+
+const editTitle = computed(() => {
+  const target = editTarget.value;
+  if (!target) return '';
+  return target.kind === 'player' ? 'Tướng Của Bạn' : `Bot ${target.index + 1}`;
+});
+const editLoadout = computed<ChampionLoadout | null>(() => {
+  const target = editTarget.value;
+  if (!target) return null;
+  return target.kind === 'player' ? config.value.player : config.value.ai.bots[target.index];
 });
 
-const closeSpellDetail = (): void => {
-  detailSpellClass.value = null;
+const openPlayerEditor = (): void => {
+  editTarget.value = { kind: 'player' };
 };
-const closeCatalogPicker = (): void => {
-  catalogOpen.value = false;
+const openBotEditor = (index: number): void => {
+  editTarget.value = { kind: 'bot', index };
 };
-const pickFromCatalog = (choice: string): void => {
-  catalogOnPick?.(choice);
-  catalogOnPick = null;
-  catalogOpen.value = false;
+const closeEditor = (): void => {
+  editTarget.value = null;
+};
+const changeEditingLoadout = (loadout: ChampionLoadout): void => {
+  const target = editTarget.value;
+  if (!target) return;
+  if (target.kind === 'player') setPlayerLoadout(loadout);
+  else setBotLoadout(target.index, loadout);
 };
 
-// ------------------------------------------------------------ reset
-// `resetToken` forces BotAccordion to remount (via :key) so the accordion
-// collapses along with the config, matching the old
-// `this.expandedBotIndex = null` in the reset handler.
-const resetToken = ref(0);
+const addBot = (): void => setAiCount(Math.min(AI_COUNT_MAX, config.value.ai.count + 1));
+const removeBot = (): void => setAiCount(Math.max(AI_COUNT_MIN, config.value.ai.count - 1));
+
+// "Mặc Định" lives in the footer, which the loadout modal's full-viewport
+// backdrop covers whenever it is open — so there is never a stale
+// `editTarget` to clean up here; reset only ever runs with the modal closed.
 const onReset = (): void => {
   resetToDefault();
-  resetToken.value += 1;
 };
 </script>
 
@@ -97,42 +100,55 @@ const onReset = (): void => {
         <i class="fas fa-arrow-left"></i>
       </button>
       <h1>Cấu Hình Trận Đấu</h1>
+      <button
+        type="button"
+        id="pregame-touch-toggle"
+        class="pregame-icon-btn touch-ui-toggle"
+        :class="{ on: isTouchUi }"
+        :title="isTouchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'"
+        @click="toggleTouchUi"
+      >
+        <i class="fa-solid fa-gamepad"></i>
+      </button>
     </header>
 
+    <div class="pregame-tabs" role="tablist">
+      <button
+        type="button"
+        id="pregame-tab-players"
+        class="pregame-tab"
+        :class="{ selected: activeTab === 'players' }"
+        @click="activeTab = 'players'"
+      >
+        <i class="fas fa-users"></i> Tướng
+      </button>
+      <button
+        type="button"
+        id="pregame-tab-settings"
+        class="pregame-tab"
+        :class="{ selected: activeTab === 'settings' }"
+        @click="activeTab = 'settings'"
+      >
+        <i class="fas fa-sliders-h"></i> Cấu Hình
+      </button>
+    </div>
+
     <div class="pregame-body">
-      <section class="pregame-section">
-        <h2>Tướng Của Bạn</h2>
-        <div class="loadout-editor" id="pregame-player-editor">
-          <LoadoutEditor :loadout="config.player" @change="setPlayerLoadout" />
-        </div>
-      </section>
-
-      <section class="pregame-section pregame-columns">
-        <AiConfigPanel
-          :count="config.ai.count"
-          :auto-move="config.ai.autoMove"
-          :auto-attack="config.ai.autoAttack"
-          :auto-cast="config.ai.autoCast"
-          @update:count="setAiCount"
-          @update:auto-move="v => setAiFlag('autoMove', v)"
-          @update:auto-attack="v => setAiFlag('autoAttack', v)"
-          @update:auto-cast="v => setAiFlag('autoCast', v)"
-        />
-        <MatchRulesPanel
-          :cooldown-reduction-percent="config.rules.cooldownReductionPercent"
-          :mana-free="config.rules.manaFree"
-          @update:cooldown-reduction-percent="setCooldownReduction"
-          @update:mana-free="setManaFree"
-        />
-      </section>
-
-      <section class="pregame-section">
-        <h2>Cấu Hình Từng Bot AI</h2>
-        <p class="pregame-hint">
-          Mỗi bot mặc định Ngẫu Nhiên — bấm vào một bot để đổi tướng/chiêu riêng cho nó.
-        </p>
-        <BotAccordion :key="resetToken" :bots="config.ai.bots" :count="config.ai.count" @change="setBotLoadout" />
-      </section>
+      <PlayersTab
+        v-if="activeTab === 'players'"
+        :config="config"
+        @open-player="openPlayerEditor"
+        @open-bot="openBotEditor"
+        @add-bot="addBot"
+        @remove-bot="removeBot"
+      />
+      <SettingsTab
+        v-else
+        :config="config"
+        :set-ai-flag="setAiFlag"
+        :set-cooldown-reduction="setCooldownReduction"
+        :set-mana-free="setManaFree"
+      />
     </div>
 
     <footer class="pregame-actions">
@@ -141,6 +157,12 @@ const onReset = (): void => {
     </footer>
   </div>
 
-  <SpellCatalogPicker :open="catalogOpen" @close="closeCatalogPicker" @pick="pickFromCatalog" />
-  <SpellDetailPanel :spell-class="detailSpellClass" :match-rules="matchRules" @close="closeSpellDetail" />
+  <LoadoutEditorModal
+    v-if="editLoadout"
+    :title="editTitle"
+    :loadout="editLoadout"
+    :match-rules="matchRules"
+    @change="changeEditingLoadout"
+    @close="closeEditor"
+  />
 </template>

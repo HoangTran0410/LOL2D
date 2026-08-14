@@ -1,19 +1,36 @@
 /**
- * End-to-end drive of the free-form kit builder and per-bot AI config added
- * to the pregame setup screen. Boots its own Vite dev server, opens the game
- * in system Chrome through Playwright, and reaches the live scene through
- * the DEV-only `window.__lol2d` handle — same pattern as the other
+ * End-to-end drive of the free-form kit builder and per-bot AI config on the
+ * pregame setup screen. Boots its own Vite dev server, opens the game in
+ * system Chrome through Playwright, and reaches the live scene through the
+ * DEV-only `window.__lol2d` handle — same pattern as the other
  * tests/e2e/*.mjs scripts.
+ *
+ * The kit-slot picker used to be two separate overlays (a catalogue and a
+ * spell-detail panel), disambiguated by *which pixels of a slot you tapped* —
+ * the icon opened one, the rest of the slot opened the other. It is now one
+ * pane (`SpellSelectorPane.vue`) with both halves always visible together,
+ * opened by a slot's only click target. Tapping a catalogue entry only
+ * highlights it (updates the description, changes nothing stored); a
+ * separate "Dùng chiêu này" button commits it; the back arrow or the
+ * backdrop cancels, leaving the slot as it was. This script drives exactly
+ * that sequence rather than the old single-click-to-pick one.
  *
  * What it proves, in order:
  *   1. the free-form picker exposes the whole spell catalogue (85 spells),
  *      including standalone abilities (Olaf_Q) the champion picker leaves
  *      out entirely;
- *   2. a spell's description/cooldown/mana can be read from inside the
- *      picker without committing it (tap icon = preview, tap card = pick);
- *   3. the description panel's cooldown number honours the CDR slider live;
- *   4. per-bot rows are an accordion (expanding one collapses another) and
- *      reuse the exact same champion/custom editor as the player section;
+ *   2. highlighting a catalogue entry shows its description and does *not*
+ *      commit it — the stored slot is untouched, and cancelling (the back
+ *      arrow) leaves it that way;
+ *   3. committing (Dùng chiêu này) does write it, and re-opening the slot
+ *      shows that choice already highlighted and described — the same
+ *      gesture answers "what is this" and "change it";
+ *   4. opening the player's card and a bot's card opens the *same*
+ *      loadout-editor modal, and the screen never has more than one dialog
+ *      open at once (there is no more accordion to collapse — the modal
+ *      makes two loadout editors on screen simultaneously structurally
+ *      impossible, which is the fix for the layout duplication this
+ *      screen's redesign was asked for);
  *   5. a pre-existing v1 stored blob (no mode/customSlots/ai.bots) loads
  *      into the UI with every old field preserved and no error;
  *   6. a hand-built custom kit spawns exactly the chosen spells in exactly
@@ -44,20 +61,34 @@ page.on('console', m => {
 const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
 
-/** Clicks a spell card's icon (preview) or body (pick) inside a group by heading text. */
-const clickCatalogSpell = (groupName, spellIndex, target) =>
+const openParticipantAt = n =>
+  page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
+const closeLoadoutModal = () => page.click('.pregame-modal-header .pregame-icon-btn');
+const openCustomSlot = index => page.click(`.custom-slot-row .kit-slot:nth-child(${index + 1})`);
+const backFromSelector = () => page.click('.selector-pane .pregame-modal-header .pregame-icon-btn');
+const commitSlot = () => page.click('.selector-commit');
+
+/** Highlights (does not commit) a catalogue entry in a named group, by index within that group's row. */
+const highlightCatalogEntry = (groupName, spellIndex) =>
   page.evaluate(
-    ({ groupName, spellIndex, target }) => {
+    ({ groupName, spellIndex }) => {
       const heading = Array.from(document.querySelectorAll('.catalog-group-heading')).find(
         h => h.textContent === groupName
       );
       const row = heading.nextElementSibling;
-      const card = row.querySelectorAll('.catalog-spell-card')[spellIndex];
-      const el = target === 'icon' ? card.querySelector('img') : card;
-      el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      row.querySelectorAll('.catalog-spell-card')[spellIndex].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     },
-    { groupName, spellIndex, target }
+    { groupName, spellIndex }
   );
+
+/** Opens a custom slot, highlights + commits one catalogue entry, and waits for the editor view to return. */
+const pickSlot = async (slotIndex, groupName, spellIndex) => {
+  await openCustomSlot(slotIndex);
+  await page.waitForSelector('.selector-pane', { state: 'visible' });
+  await highlightCatalogEntry(groupName, spellIndex);
+  await commitSlot();
+  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
+};
 
 try {
   await page.goto(url, { waitUntil: 'load' });
@@ -67,79 +98,117 @@ try {
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.waitForTimeout(150);
 
-  // 1 & 2. free-form picker: full catalogue, standalone spell reachable,
-  // preview-without-committing
-  await page.click('#pregame-player-editor .kit-mode-btn:nth-child(2)'); // "Tự Ghép Chiêu"
-  await page.click('#pregame-player-editor .custom-slot:nth-child(2)'); // slot 1 = Q
-  await page.waitForSelector('#pregame-catalog-picker', { state: 'visible' });
+  // 1. free-form picker: full catalogue, standalone spell reachable
+  await openParticipantAt(1); // the player
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  await page.click('.loadout-modal .kit-mode-btn:nth-child(2)'); // "Tự Ghép Chiêu"
+  await openCustomSlot(1); // Q
+  await page.waitForSelector('.selector-pane', { state: 'visible' });
   report.catalogCardCount = await evaluate(() => document.querySelectorAll('.catalog-spell-card').length);
 
-  await clickCatalogSpell('Olaf', 0, 'icon');
-  await page.waitForTimeout(120);
-  report.previewWithoutCommitting = await evaluate(() => ({
-    detailVisible: !document.querySelector('#pregame-spell-detail').hidden,
-    detailName: document.querySelector('#pregame-detail-name').textContent,
-    pickerStillOpen: !document.querySelector('#pregame-catalog-picker').hidden,
+  // 2. highlighting shows the description and does not commit; cancelling leaves the slot unchanged
+  await highlightCatalogEntry('Olaf', 0); // Olaf_Q — a standalone ability with no champion card of its own
+  await page.waitForTimeout(100);
+  report.highlightShowsDescriptionWithoutCommitting = await evaluate(() => ({
+    highlightedName: document.querySelector('.catalog-spell-card.selected .catalog-spell-name')?.textContent,
+    detailName: document.querySelector('.selector-detail .spell-detail-header h3')?.textContent,
+    detailHasDescription: !!document.querySelector('.selector-detail .spell-detail-body')?.textContent.trim(),
   }));
   await page.screenshot({ path: `${OUT}-picker-with-detail.png` });
 
-  // 3. CDR slider live-updates the open detail panel's cooldown
-  const cooldownAt0 = await evaluate(() => document.querySelector('#pregame-detail-cooldown').textContent);
+  await backFromSelector(); // cancel, not commit
+  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
+  report.slotUnchangedAfterCancel = await evaluate(
+    () => JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1') ?? 'null')?.player.customSlots[1] ?? 'random'
+  );
+
+  // Re-opening the same slot starts with 'random' highlighted again — the
+  // cancelled highlight did not leak into the next open.
+  await openCustomSlot(1);
+  await page.waitForSelector('.selector-pane', { state: 'visible' });
+  report.reopenedSlotHighlightsCurrentChoice = await evaluate(
+    () => document.querySelector('.catalog-random-card.selected')?.textContent.trim()
+  );
+
+  // 3. committing does write it, and shows description live from the CDR the
+  // player already set — set CDR to 50% first: unlike the old two-overlay
+  // picker, the loadout modal is a full-screen dialog, so the Settings tab's
+  // CDR slider is not reachable *while* this pane is open any more (that is
+  // the "no two overlays open at once" fix, at the layout level). The
+  // description pane still honours whatever matchRules it is opened with —
+  // proven here by setting CDR before opening rather than sliding it live.
+  await backFromSelector();
+  await closeLoadoutModal();
+  await page.click('#pregame-tab-settings');
+  await page.waitForSelector('#pregame-cdr', { state: 'visible' });
   await evaluate(() => {
     const range = document.querySelector('#pregame-cdr');
     range.value = '50';
     range.dispatchEvent(new Event('input', { bubbles: true }));
   });
+  await page.click('#pregame-tab-players');
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  await openCustomSlot(1);
+  await page.waitForSelector('.selector-pane', { state: 'visible' });
+  await highlightCatalogEntry('Olaf', 0);
   await page.waitForTimeout(80);
-  const cooldownAt50 = await evaluate(() => document.querySelector('#pregame-detail-cooldown').textContent);
-  report.liveCdrOnOpenDetail = { cooldownAt0, cooldownAt50 };
+  report.cooldownReflectsCdrSetBeforeOpening = await evaluate(
+    () => document.querySelector('.selector-detail .spell-detail-cooldown')?.textContent.trim()
+  );
+  await commitSlot();
+  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
+  report.slotChangedAfterCommit = await evaluate(
+    () => JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1')).player.customSlots[1]
+  );
+  // reset CDR back to 0 so it doesn't leak into later steps
+  await closeLoadoutModal();
+  await page.click('#pregame-tab-settings');
+  await page.waitForSelector('#pregame-cdr', { state: 'visible' });
   await evaluate(() => {
     const range = document.querySelector('#pregame-cdr');
     range.value = '0';
     range.dispatchEvent(new Event('input', { bubbles: true }));
   });
-  await page.click('#pregame-detail-close');
+  await page.click('#pregame-tab-players');
 
-  // commit the Olaf_Q pick, then fill the rest of the kit
-  await clickCatalogSpell('Olaf', 0, 'card');
-  await page.waitForTimeout(80);
-  const pick = async (slotIndex, groupName, spellIndex) => {
-    await page.click(`#pregame-player-editor .custom-slot:nth-child(${slotIndex + 1})`);
-    await page.waitForSelector('#pregame-catalog-picker', { state: 'visible' });
-    await clickCatalogSpell(groupName, spellIndex, 'card');
-    await page.waitForTimeout(80);
-  };
-  await pick(2, 'Yasuo', 1); // W
-  await pick(3, 'Yasuo', 2); // E
-  await pick(4, 'Yasuo', 3); // R
-  await pick(5, 'Phép Bổ Trợ', 1); // D -> Ghost
-  await pick(6, 'Phép Bổ Trợ', 3); // F -> Ignite
+  // fill the rest of the kit
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  await pickSlot(2, 'Yasuo', 1); // W
+  await pickSlot(3, 'Yasuo', 2); // E
+  await pickSlot(4, 'Yasuo', 3); // R
+  await pickSlot(5, 'Phép Bổ Trợ', 1); // D -> Ghost
+  await pickSlot(6, 'Phép Bổ Trợ', 3); // F -> Ignite
   await page.screenshot({ path: `${OUT}-custom-mode.png` });
-  report.persistedCustomKit = await evaluate(
-    () => JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1')).player
-  );
+  report.persistedCustomKit = await evaluate(() => JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1')).player);
+  await closeLoadoutModal();
+  await page.waitForTimeout(80);
 
-  // 4. per-bot accordion
-  await evaluate(() => {
-    const range = document.querySelector('#pregame-ai-count');
-    range.value = '3';
-    range.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  // 4. the player's card and a bot's card open the identical modal, and only
+  // one is ever open — there is no accordion state to collapse any more; the
+  // full-viewport backdrop makes a second one structurally unreachable while
+  // the first is up (confirmed here: exactly one backdrop exists, and the
+  // player's own card behind it is not an actionable target).
+  await openParticipantAt(2); // Bot 1
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  report.bot1EditorIsSameComponent = await evaluate(() => ({
+    title: document.querySelector('.pregame-modal-header h3')?.textContent,
+    hasKitModeToggle: !!document.querySelector('.kit-mode-toggle'),
+    backdropCount: document.querySelectorAll('.pregame-modal-backdrop').length,
+  }));
+  report.playerCardNotClickableBehindModal = await page
+    .click('.participant-card-player .participant-card-main', { timeout: 500 })
+    .then(() => 'click went through (bug)')
+    .catch(() => 'blocked, as expected');
+
+  await page.click('.champion-card[data-champion="Ahri"]');
   await page.waitForTimeout(80);
-  report.botRowCount = await evaluate(() => document.querySelectorAll('.bot-row').length);
-  await page.click('.bot-row:nth-child(1) .bot-row-header');
-  await page.waitForTimeout(80);
-  await page.click('.bot-row:nth-child(1) .champion-card[data-champion="Ahri"]');
+  await closeLoadoutModal();
   await page.waitForTimeout(80);
   report.bot1SummaryAfterPick = await evaluate(
-    () => document.querySelector('.bot-row:nth-child(1) .bot-row-summary').textContent
+    () => document.querySelector('#pregame-participant-list .participant-card:nth-child(2) .participant-summary')?.textContent
   );
-  await page.click('.bot-row:nth-child(2) .bot-row-header');
-  await page.waitForTimeout(80);
-  report.accordionCollapsesOthers = await evaluate(() => ({
-    bot1Expanded: document.querySelector('.bot-row:nth-child(1)').classList.contains('expanded'),
-    bot2Expanded: document.querySelector('.bot-row:nth-child(2)').classList.contains('expanded'),
-  }));
   await page.screenshot({ path: `${OUT}-bot-config.png` });
 
   // 5. a pre-existing v1 blob (no mode/customSlots/ai.bots) loads cleanly
@@ -157,15 +226,22 @@ try {
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.waitForTimeout(150);
-  report.legacyV1BlobLoaded = await evaluate(() => ({
-    selectedChampion: document.querySelector('#pregame-player-editor .champion-card.selected')?.dataset
-      .champion,
-    aiCount: document.querySelector('#pregame-ai-count').value,
-    cdr: document.querySelector('#pregame-cdr').value,
-    urf: document.querySelector('#pregame-urf').checked,
-    botRowCount: document.querySelectorAll('.bot-row').length,
-    bot1Summary: document.querySelector('.bot-row:nth-child(1) .bot-row-summary')?.textContent,
-  }));
+  const legacyBotCount = await evaluate(
+    () => document.querySelectorAll('.participant-card:not(.participant-card-player)').length
+  );
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  const legacySelectedChampion = await evaluate(() => document.querySelector('.champion-card.selected')?.dataset.champion);
+  await closeLoadoutModal();
+  await page.waitForTimeout(80);
+  await page.click('#pregame-tab-settings');
+  await page.waitForSelector('#pregame-cdr', { state: 'visible' });
+  report.legacyV1BlobLoaded = {
+    selectedChampion: legacySelectedChampion,
+    botCount: legacyBotCount,
+    cdr: await evaluate(() => document.querySelector('#pregame-cdr').value),
+    urf: await evaluate(() => document.querySelector('#pregame-urf').checked),
+  };
   await page.screenshot({ path: `${OUT}-legacy-blob-loaded.png` });
 
   // 6. start a real match with a custom kit and one fixed-champion bot
@@ -219,9 +295,7 @@ try {
     return {
       playerSpellNames: game.player.spells.map(s => s.constructor.name),
       botCount: bots.length,
-      ahriBotSpellNames: bots
-        .map(b => b.spells.map(s => s.constructor.name))
-        .find(names => names.includes('Ahri_Q')),
+      ahriBotSpellNames: bots.map(b => b.spells.map(s => s.constructor.name)).find(names => names.includes('Ahri_Q')),
     };
   });
   await page.screenshot({ path: `${OUT}-live-match.png` });
