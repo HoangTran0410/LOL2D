@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * The HUD's whole job, now: read the game on a timer, hand the result to
  * whichever view is showing, mount/unmount the Vue app.
  *
- * Everything that used to live in this one 26KB file has moved to three
+ * Everything that used to live in this one 26KB file has moved to four
  * places that can now be worked on independently, which was the point of
  * splitting it:
  *
@@ -14,73 +13,66 @@
  *     `provide()`d to every view, so opening the picker from the mobile
  *     strip is visible to the modal without the two needing to be the same
  *     component.
- *   - `DesktopHudView.ts` / `MobileHudView.ts` — the two layouts. Neither
+ *   - `InGameHUD.vue` — the app root: the always-visible touch/mouse toggle
+ *     and the switch between the two layouts on `hud.touchUi`, the same flag
+ *     the on-screen toggle and `Game.applyTouchUiClass` already use — not a
+ *     viewport breakpoint, see `styles/hud.css`'s "Touch layout" section for
+ *     why.
+ *   - `DesktopHudView.vue` / `MobileHudView.vue` — the two layouts. Neither
  *     computes anything; both just read `state` (a prop) and `hud`
- *     (injected) and lay them out differently. This file picks between them
- *     on `hud.touchUi`, the same flag the on-screen toggle and
- *     `Game.applyTouchUiClass` already use — not a viewport breakpoint, see
- *     `styles/hud.css`'s "Touch layout" section for why.
+ *     (injected) and lay them out differently.
+ *
+ * This class is the lifecycle half, same shape as `LoadingScene.ts`: the
+ * markup and the state live in the `.vue` components, this owns mounting,
+ * the game/asset wiring the components cannot reach on their own (`hud`
+ * needs a `Game` to be constructed), and the update loop.
  */
-import { createApp } from 'vue';
+import { createApp, type App } from 'vue';
 import Game from '../Game';
 import { computeHudState, HUD_UPDATE_INTERVAL_MS, type HudState } from './hudState';
 import { createHudInteractions, type HudInteractions } from './hudInteractions';
-import DesktopHudView from './DesktopHudView';
-import MobileHudView from './MobileHudView';
+import InGameHUDView from './InGameHUD.vue';
+
+/** What `InGameHUD.vue` exposes back to the class driving it. */
+interface HudView {
+  hud: HudInteractions;
+  setState(next: HudState | null): void;
+}
 
 export default class InGameHUD {
   private game: Game;
   private _rafId: number | null = null;
-  private app: any;
-  private vueInstance: any;
-  private hud: HudInteractions;
+  private app: App | null = null;
+  private view: HudView | null = null;
+  /**
+   * Kept public under this exact name: `tests/e2e/drive-mobile-hud.mjs` and
+   * `drive-touch-controls.mjs` reach `game.inGameHUD.vueInstance.hud`
+   * directly to read/drive the picker with real CDP touch events, rather
+   * than calling a method on this class — the same touch-vs-click
+   * distinction that caught the original bug those scripts guard, so the
+   * scripts deliberately do not go through a friendlier API.
+   */
+  vueInstance: HudView | null = null;
 
   constructor(game: Game) {
     this.game = game;
     this._rafId = null;
-    this.hud = createHudInteractions(game);
     this.initVue(game);
     this._startUpdateLoop();
   }
 
-  initVue(game: Game) {
-    const hud = this.hud;
+  private initVue(game: Game) {
+    const hud = createHudInteractions(game);
+    const host = document.querySelector('#InGameHUD') as HTMLElement;
 
-    this.app = createApp({
-      data() {
-        return {
-          hud,
-          state: null as HudState | null,
-        };
-      },
-      provide() {
-        return { hud: this.hud };
-      },
-      components: { DesktopHudView, MobileHudView },
-      template: /*html*/ `
-      <div>
-        <!-- Hidden behind the picker: both live in the top-right corner, and
-             the toggle would otherwise sit on top of the picker's close
-             button, which is the only way out of it. -->
-        <button v-if="!hud.showSpellsPicker" class="touch-toggle" :class="hud.touchUi ? 'on' : ''"
-            @click="hud.toggleTouchUi()"
-            @touchend.prevent="hud.toggleTouchUi()"
-            :title="hud.touchUi ? 'Chuyển sang chuột và bàn phím' : 'Chuyển sang điều khiển cảm ứng'">
-          <i class="fa-solid fa-gamepad"></i>
-        </button>
+    this.app = createApp(InGameHUDView, { hud });
+    this.view = this.app.mount(host) as unknown as HudView;
+    this.vueInstance = this.view;
 
-        <desktop-hud-view v-if="state && !hud.touchUi" :state="state" />
-        <mobile-hud-view v-if="state && hud.touchUi" :state="state" />
-      </div>
-      `,
-    });
-
-    this.vueInstance = this.app.mount('#InGameHUD');
-
-    (document.querySelector('#InGameHUD') as any).oncontextmenu = () => false;
+    host.oncontextmenu = () => false;
   }
 
-  _startUpdateLoop() {
+  private _startUpdateLoop() {
     let lastUpdateMs = 0;
     const tick = () => {
       const now = performance.now();
@@ -95,12 +87,13 @@ export default class InGameHUD {
     this._rafId = requestAnimationFrame(tick);
   }
 
-  update() {
+  private update() {
+    if (!this.view) return;
     // The HUD does not own the flag — the toggle, the query parameter and the
     // stored preference all reach the controls first — so it reads it back
     // rather than assuming its own button was the last thing to change it.
-    this.hud.touchUi = this.game.touchControls?.enabled ?? false;
-    this.vueInstance.state = computeHudState(this.game);
+    this.view.hud.touchUi = this.game.touchControls?.enabled ?? false;
+    this.view.setState(computeHudState(this.game));
   }
 
   destroy() {
@@ -108,7 +101,9 @@ export default class InGameHUD {
       cancelAnimationFrame(this._rafId);
       this._rafId = null;
     }
-    this.app.unmount();
+    this.app?.unmount();
     this.app = null;
+    this.view = null;
+    this.vueInstance = null;
   }
 }
