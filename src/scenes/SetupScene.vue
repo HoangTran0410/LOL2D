@@ -47,7 +47,7 @@ const {
   resetToDefault,
 } = usePregameConfig();
 
-const { isTouchUi, set: setTouchUi } = useTouchUi();
+const { isTouchUi, mode: inputMode, setMode: setInputMode } = useTouchUi();
 
 type Tab = 'players' | 'settings';
 const activeTab = ref<Tab>('players');
@@ -156,7 +156,8 @@ const onReset = (): void => {
         :set-cooldown-reduction="setCooldownReduction"
         :set-mana-free="setManaFree"
         :is-touch-ui="isTouchUi"
-        :set-touch-ui="setTouchUi"
+        :input-mode="inputMode"
+        :set-input-mode="setInputMode"
       />
     </div>
 

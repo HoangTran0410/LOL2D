@@ -566,23 +566,36 @@ try {
   await page.click('.spell-preview-modal .pregame-modal-header .pregame-icon-btn');
   await page.waitForTimeout(80);
 
-  // 16. The touch/pointer control lives in the Settings tab now, shaped as
-  // a three-option row (a disabled "Tự động" placeholder plus the two wired
-  // options), and a manual choice actually persists to localStorage.
+  // 16. The touch/pointer control lives in the Settings tab, as a three-option
+  // row. All three are live: the point of the third one is that it is the only
+  // way back out of a manual override, so it is asserted as a round trip —
+  // pin a mode, then hand the decision back to the device and prove the stored
+  // value really is 'auto' again.
   await page.click('#pregame-tab-settings');
   await page.waitForSelector('.input-mode-row', { state: 'visible' });
-  report.inputModePanel = await evaluate(() => ({
-    autoOptionDisabled: document.querySelector('.input-mode-btn[disabled]') !== null,
-    optionCount: document.querySelectorAll('.input-mode-btn').length,
-  }));
+  const modeState = () =>
+    evaluate(() => ({
+      stored: localStorage.getItem('lol2d.touchControls'),
+      bodyHasTouchUi: document.body.classList.contains('touch-ui'),
+      selectedLabel: document.querySelector('.input-mode-btn.selected')?.textContent?.trim(),
+      selectedCount: document.querySelectorAll('.input-mode-btn.selected').length,
+      disabledCount: document.querySelectorAll('.input-mode-btn[disabled]').length,
+      optionCount: document.querySelectorAll('.input-mode-btn').length,
+    }));
+
+  report.inputModePanel = { initial: await modeState() };
+
   await page.click('#pregame-input-mode-touch');
   await page.waitForTimeout(80);
-  report.inputModePanel.afterChoosingTouch = await evaluate(() => ({
-    bodyHasTouchUi: document.body.classList.contains('touch-ui'),
-    stored: localStorage.getItem('lol2d.touchControls'),
-    selectedLabel: document.querySelector('.input-mode-btn.selected')?.textContent?.trim(),
-  }));
-  await page.click('#pregame-input-mode-pointer'); // leave it back in pointer mode for a clean re-run
+  report.inputModePanel.afterChoosingTouch = await modeState();
+
+  await page.click('#pregame-input-mode-auto');
+  await page.waitForTimeout(80);
+  // On this desktop Chrome, 'auto' must detect *pointer* — which is what makes
+  // it a real escape from the pinned touch mode above rather than a no-op.
+  report.inputModePanel.afterChoosingAuto = await modeState();
+
+  await page.click('#pregame-input-mode-pointer'); // leave it pinned for a clean re-run
   await page.waitForTimeout(80);
 
   report.errors = errors;

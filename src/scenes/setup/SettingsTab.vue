@@ -11,6 +11,7 @@ import type { PregameConfig } from '../../game/config/PregameConfig';
 import AiConfigPanel from './AiConfigPanel.vue';
 import MatchRulesPanel from './MatchRulesPanel.vue';
 import InputModePanel from './InputModePanel.vue';
+import type { TouchModePreference } from '../../game/input/TouchControls';
 
 defineProps<{
   config: PregameConfig;
@@ -18,7 +19,8 @@ defineProps<{
   setCooldownReduction: (percent: number) => void;
   setManaFree: (value: boolean) => void;
   isTouchUi: boolean;
-  setTouchUi: (value: boolean) => void;
+  inputMode: TouchModePreference;
+  setInputMode: (preference: TouchModePreference) => void;
 }>();
 </script>
 
@@ -38,6 +40,6 @@ defineProps<{
       @update:cooldown-reduction-percent="setCooldownReduction"
       @update:mana-free="setManaFree"
     />
-    <InputModePanel :is-touch-ui="isTouchUi" @update:is-touch-ui="setTouchUi" />
+    <InputModePanel :is-touch-ui="isTouchUi" :mode="inputMode" @update:mode="setInputMode" />
   </div>
 </template>
