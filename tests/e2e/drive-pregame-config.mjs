@@ -43,6 +43,11 @@ page.on('console', message => {
 
 const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
+/** Dispatches a click directly on the matched element, bypassing Playwright's
+ * coordinate-based hit test — needed wherever a clickable element is mostly
+ * filled by a child that has its own (`stopPropagation`d) click handler. */
+const clickButton = selector =>
+  page.evaluate(sel => document.querySelector(sel).dispatchEvent(new MouseEvent('click', { bubbles: true })), selector);
 
 try {
   await page.goto(url, { waitUntil: 'load' });
@@ -74,10 +79,10 @@ try {
   report.defaultsOnFirstOpen = await evaluate(() => ({
     selectedChampion: document.querySelector('.champion-card.selected')?.dataset.champion,
     selectedSummonerD: document
-      .querySelector('#pregame-summoner-d .summoner-option.selected')
+      .querySelector('.summoner-slot-d .summoner-option.selected')
       ?.dataset.summoner,
     selectedSummonerF: document
-      .querySelector('#pregame-summoner-f .summoner-option.selected')
+      .querySelector('.summoner-slot-f .summoner-option.selected')
       ?.dataset.summoner,
     aiCount: document.querySelector('#pregame-ai-count').value,
     aiAutoMove: document.querySelector('#pregame-ai-automove').checked,
@@ -106,8 +111,13 @@ try {
   });
   await page.click('#pregame-urf');
   await page.click('.champion-card[data-champion="Yasuo"]');
-  await page.click('#pregame-summoner-d .summoner-option[data-summoner="Ghost"]');
-  await page.click('#pregame-summoner-f .summoner-option[data-summoner="Ignite"]');
+  // A summoner option is just its 32x32 icon plus 2px of padding, so a
+  // coordinate-based click (page.click's default) always lands on the <img>
+  // and previews instead of picking — same as tapping any other spell icon.
+  // Dispatching the click on the <button> itself (as clickCatalogSpell()
+  // does for the same reason in drive-kit-builder.mjs) picks it instead.
+  await clickButton('.summoner-slot-d .summoner-option[data-summoner="Ghost"]');
+  await clickButton('.summoner-slot-f .summoner-option[data-summoner="Ignite"]');
   await page.waitForTimeout(100);
 
   report.persistedAfterEditing = await evaluate(() =>
