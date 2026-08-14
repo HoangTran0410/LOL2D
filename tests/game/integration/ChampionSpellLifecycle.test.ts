@@ -68,6 +68,10 @@ describe('Champion spell presentation lifecycle', () => {
     const champion = Object.assign(Object.create(AIChampion.prototype) as AIChampion, {
       spells: [{ deactivate }] as unknown as Spell[],
       _respawnWithNewPreset: true,
+      // Hand-built via Object.create, so the constructor never ran and never
+      // defaulted this to getChampionPresetRandom — set directly to what
+      // that default would have resolved to under the mock above.
+      presetFactory: () => replacementPreset.value,
       stats: { health: { baseValue: 0 }, maxHealth: { value: 100 } },
       deathData: { reviveAfter: 0 },
       game: { randomSpawnPoint: () => ({ x: 5, y: 6 }) },

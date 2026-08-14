@@ -12,7 +12,6 @@ import InGameHUD from './hud/InGameHUD';
 import {
   FountainPreset,
   MonsterPreset,
-  getChampionPresetRandom,
   getChampionPresetFromLoadout,
   getTurretPositions,
 } from './preset';
@@ -152,16 +151,25 @@ export default class Game {
     this.touchControls = new TouchControls(this.touchControlsHost(), touchControlsPreference());
     this.applyTouchUiClass();
 
-    // AI champions always get a random kit, same as before this config
-    // existed — the player's own pick only ever applies to the player. Count
-    // and behaviour come from the pregame config; `loadPregameConfig` has
-    // already clamped `count` to [AI_COUNT_MIN, AI_COUNT_MAX].
+    // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
+    // by default (today's behaviour, unchanged), or a specific loadout the
+    // player configured for that bot. Behaviour flags (autoMove/autoAttack/
+    // autoCast) stay global across every bot, same as before per-bot config
+    // existed. Count clamped to [AI_COUNT_MIN, AI_COUNT_MAX] by
+    // `loadPregameConfig`; `ai.bots` always has AI_COUNT_MAX entries.
     for (let i = 0; i < pregameConfig.ai.count; i++) {
+      const botLoadout = pregameConfig.ai.bots[i];
       this.objectManager.addObject(
         new AIChampion({
           game: this,
           position: this.randomSpawnPoint(),
-          preset: getChampionPresetRandom(),
+          preset: getChampionPresetFromLoadout(botLoadout),
+          // Re-resolving the same loadout on every respawn is what makes a
+          // bot configured with a fixed champion keep that identity across
+          // deaths, while a bot left on 'random' keeps re-rolling exactly as
+          // it always has (getChampionPresetFromLoadout falls through to
+          // getChampionPresetRandom for 'random').
+          presetFactory: () => getChampionPresetFromLoadout(botLoadout),
           autoMove: pregameConfig.ai.autoMove,
           autoAttack: pregameConfig.ai.autoAttack,
           autoCast: pregameConfig.ai.autoCast,

@@ -4,7 +4,8 @@ import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
-import type { PlayerLoadout } from './config/PregameConfig';
+import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameConfig';
+import { SLOT_COUNT } from './config/PregameConfig';
 
 // Workaround: AllSpells is a namespace of named Spell class exports.
 // Filter out string exports by excluding values whose prototype chain doesn't lead to Spell.
@@ -13,23 +14,32 @@ type SpellClass = Exclude<(typeof AllSpells)[keyof typeof AllSpells], string> | 
 
 const random = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
+/**
+ * Portraits used for a fully random loadout — 'random' champion mode and
+ * every free-form custom kit, which has no single champion identity to draw
+ * an avatar from. A curated subset (not "every `champ_*` key") because a few
+ * champions in the catalogue never got a matching background/portrait pair.
+ */
+const RANDOM_AVATAR_POOL: AssetKey[] = [
+  'champ_yasuo',
+  'champ_lux',
+  'champ_blitzcrank',
+  'champ_ashe',
+  'champ_teemo',
+  'champ_leblanc',
+  'champ_leesin',
+  'champ_chogath',
+  'champ_ahri',
+  'champ_shaco',
+  'champ_olaf',
+  'champ_graves',
+];
+const randomAvatar = (): AssetKey => random(RANDOM_AVATAR_POOL);
+
 export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetKey } => {
   return {
     name: 'Random',
-    avatar: random([
-      'champ_yasuo',
-      'champ_lux',
-      'champ_blitzcrank',
-      'champ_ashe',
-      'champ_teemo',
-      'champ_leblanc',
-      'champ_leesin',
-      'champ_chogath',
-      'champ_ahri',
-      'champ_shaco',
-      'champ_olaf',
-      'champ_graves',
-    ]),
+    avatar: randomAvatar(),
     spells: [
       // Slot 0 is the internal slot and SpellHotKeys[0] is `A`, so whatever
       // sits here is what `A` presses. The basic attack lives there: it is an
@@ -303,10 +313,19 @@ export const SpellGroups: {
 // The pregame screen (src/scenes/SetupScene.ts) is a standalone UI built
 // directly on this module — it does not reuse or import the in-game
 // spell-picker modal (src/game/hud/InGameHUD.ts), which is being rewritten
-// separately. `new SpellClass(null)` for a throwaway display instance below
+// separately. `new SpellClass(owner)` for a throwaway display instance below
 // is the same technique that modal already uses to read a spell's icon/name
-// without a real champion to own it.
+// without a real champion to own it — extended here with a stub `owner.game.
+// matchRules` so the same instance can also report its *effective* (CDR/URF
+// -adjusted) cooldown and mana cost. Audited (all 85 exports in `AllSpells`,
+// see `listSpellCatalog`) with the fallback `catch` disabled: none of them
+// throw, and none produce a suspicious (`undefined`/`NaN`/`[object`)
+// description, so the `catch` below is defence against a *future* spell
+// breaking that contract, not a mask over a live bug.
 // ---------------------------------------------------------------------------
+
+/** No cooldown reduction, no URF — what a spell shows outside any pregame context. */
+const NO_MATCH_RULES: MatchRules = { cooldownMultiplier: 1, manaFree: false };
 
 export interface SpellDisplay {
   /**
@@ -319,24 +338,72 @@ export interface SpellDisplay {
    */
   iconUrl: string | null;
   name: string;
+  /** Vietnamese HTML — `<span class="damage">`/`.buff`/`.time`/plain `<span>`. */
+  description: string;
+  /** The spell's own tuning number, unaffected by match rules. */
+  coolDownMs: number;
+  /** The spell's own tuning number, unaffected by match rules. */
+  manaCost: number;
+  /** `coolDownMs` after cooldown reduction — equal to it under `NO_MATCH_RULES`. */
+  effectiveCoolDownMs: number;
+  /** `manaCost`, zeroed under URF — equal to `manaCost` under `NO_MATCH_RULES`. */
+  effectiveManaCost: number;
 }
 
-const spellDisplay = (SpellClass: SpellClass): SpellDisplay => {
+/**
+ * Builds a throwaway instance to read a spell's display fields — including,
+ * given `matchRules`, the same `effectiveCoolDownMs`/`effectiveManaCost`
+ * getters `Spell.ts` uses for the real cast path (`applyMatchRules`), so a
+ * number shown here is provably the number the engine will actually use.
+ */
+export const getSpellDisplay = (SpellClass: SpellClass, matchRules: MatchRules = NO_MATCH_RULES): SpellDisplay => {
   try {
-    const instance = new SpellClass(null);
+    const instance = new SpellClass({ game: { matchRules } });
     const handle = instance.image as { url?: string } | null | undefined;
-    return { iconUrl: handle?.url ?? null, name: instance.name ?? SpellClass.name };
-  } catch {
-    return { iconUrl: null, name: SpellClass.name };
+    return {
+      iconUrl: handle?.url ?? null,
+      name: instance.name ?? SpellClass.name,
+      description: typeof instance.description === 'string' ? instance.description : '',
+      coolDownMs: typeof instance.coolDown === 'number' ? instance.coolDown : 0,
+      manaCost: typeof instance.manaCost === 'number' ? instance.manaCost : 0,
+      effectiveCoolDownMs:
+        typeof instance.effectiveCoolDownMs === 'number' ? instance.effectiveCoolDownMs : 0,
+      effectiveManaCost: typeof instance.effectiveManaCost === 'number' ? instance.effectiveManaCost : 0,
+    };
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(`preset.ts: a spell failed to construct for display (${SpellClass?.name ?? '?'})`, error);
+    return {
+      iconUrl: null,
+      name: SpellClass?.name ?? '?',
+      description: '',
+      coolDownMs: 0,
+      manaCost: 0,
+      effectiveCoolDownMs: 0,
+      effectiveManaCost: 0,
+    };
   }
 };
 
+export interface SelectableChampionSpell {
+  spellClass: SpellClass;
+  display: SpellDisplay;
+}
+
 export interface SelectableChampion {
-  /** Matches `PlayerLoadout.championName` and a `SpellGroups[i].name`. */
+  /** Matches `ChampionLoadout.championName` and a `SpellGroups[i].name`. */
   name: string;
   avatar: AssetKey;
   background: AssetKey | null;
-  spells: SpellDisplay[];
+  /**
+   * Carries `spellClass` alongside its `display`, not just the display data:
+   * `getSpellDisplay` builds a fresh object on every call, so two calls for
+   * the same spell (one here, one in `listSpellCatalog`) never produce
+   * `===`-equal `SpellDisplay`s — a consumer that needs to identify *which*
+   * spell an icon is (say, to open its detail panel) needs the class
+   * reference itself, not a copy of its display fields.
+   */
+  spells: SelectableChampionSpell[];
 }
 
 /**
@@ -344,9 +411,9 @@ export interface SelectableChampion {
  * and all four of Q/W/E/R implemented. `SpellGroups` also carries
  * single-ability stubs (Olaf, Graves, Thresh, ...) used to fill the random
  * pool — picking one of those directly would leave three of its four ability
- * slots empty, so they're left out of the picker and stay reachable only
- * through "Ngẫu nhiên" (which mixes single abilities from the whole catalog,
- * exactly like `getChampionPresetRandom` always has).
+ * slots empty, so they're left out of *this* picker and stay reachable
+ * through "Ngẫu nhiên", and — since the free-form kit builder shipped —
+ * through `listSpellCatalog` too, slot by slot.
  */
 export const listSelectableChampions = (): SelectableChampion[] => {
   const champions: SelectableChampion[] = [];
@@ -356,7 +423,10 @@ export const listSelectableChampions = (): SelectableChampion[] => {
       name: group.name,
       avatar: group.image,
       background: group.background,
-      spells: group.spells.map(spellDisplay),
+      spells: (group.spells as SpellClass[]).map(spellClass => ({
+        spellClass,
+        display: getSpellDisplay(spellClass),
+      })),
     });
   }
   return champions;
@@ -391,30 +461,113 @@ const SUMMONER_SPELLS: { id: string; spellClass: SpellClass }[] = [
 /**
  * Same list with each spell's icon/name attached. A function, not a
  * constant, for the same reason as `listSelectableChampions`: it calls
- * `new SpellClass(null)` per entry, and that has to wait until whatever
+ * `new SpellClass(...)` per entry, and that has to wait until whatever
  * imports `preset.ts` is good and ready for it — not fire the moment this
  * module is first evaluated, which for a spell whose display fields turn out
  * to depend on a p5 global could be before p5 has finished booting.
  */
 export const listSummonerSpells = (): SummonerSpellOption[] =>
-  SUMMONER_SPELLS.map(({ id, spellClass }) => ({ id, spellClass, display: spellDisplay(spellClass) }));
+  SUMMONER_SPELLS.map(({ id, spellClass }) => ({ id, spellClass, display: getSpellDisplay(spellClass) }));
 
 const findSummoner = (id: string): SpellClass =>
   SUMMONER_SPELLS.find(option => option.id === id)?.spellClass ?? AllSpells.Flash;
 
+// ---------------------------------------------------------------------------
+// The full spell catalogue — every export in the `AllSpells` barrel, for the
+// free-form kit builder ("Tự Ghép Chiêu"). `SpellGroups` above is curated for
+// the champion picker (only full 4-ability kits get a card); this is the
+// opposite: everything, including the standalone abilities that curation
+// deliberately leaves out, plus the summoner spells and the basic attack —
+// because a builder that assembles a kit "slot by slot" needs every slot to
+// be able to hold anything.
+//
+// Ids are the `AllSpells` barrel's own export names (`Object.keys(AllSpells)`
+// — e.g. `'Yasuo_Q'`), not `SpellClass.name`. Both are ostensibly the same
+// string today, but only the barrel key is guaranteed stable: a bundler's
+// minifier can rename the *runtime* `Function.prototype.name` of a class
+// declaration, but never the *property key* of a namespace object — every
+// other module in this codebase reaches into `AllSpells` by that exact key
+// (`AllSpells.Yasuo_Q`), so the bundler cannot rename it without breaking the
+// build. This is the same reasoning `SUMMONER_SPELLS` above already used;
+// this just generalises it to the other 80 exports instead of hand-listing
+// them a second time.
+// ---------------------------------------------------------------------------
+
+const SPELL_CLASS_BY_ID = new Map<string, SpellClass>(Object.entries(AllSpells));
+
+/** `SpellGroups[i].name` for the first group a spell class appears in — used as a "thuộc bộ: X" tag in the catalogue picker. Every spell in `AllSpells` appears in some group (see the module's catalogue-completeness audit), so this is `null` only for a spell added to `AllSpells` and never given a `SpellGroups` entry. */
+const groupNameByClass = (): Map<SpellClass, string> => {
+  const map = new Map<SpellClass, string>();
+  for (const group of SpellGroups) {
+    for (const spellClass of group.spells as SpellClass[]) {
+      if (!map.has(spellClass)) map.set(spellClass, group.name);
+    }
+  }
+  return map;
+};
+
+export interface SpellCatalogEntry {
+  id: string;
+  spellClass: SpellClass;
+  display: SpellDisplay;
+  groupName: string | null;
+}
+
+/** Every spell in `AllSpells`, for the free-form kit builder's per-slot picker. */
+export const listSpellCatalog = (): SpellCatalogEntry[] => {
+  const groupNames = groupNameByClass();
+  return Array.from(SPELL_CLASS_BY_ID.entries()).map(([id, spellClass]) => ({
+    id,
+    spellClass,
+    display: getSpellDisplay(spellClass),
+    groupName: groupNames.get(spellClass) ?? null,
+  }));
+};
+
+/** A slot's stored choice (a catalogue id, or `'random'`) resolved to a spell class, falling back to a random pick from the whole catalogue for `'random'` or a stale/unknown id. */
+const resolveSpellChoice = (choice: SlotChoice): SpellClass => {
+  if (choice !== 'random') {
+    const found = SPELL_CLASS_BY_ID.get(choice);
+    if (found) return found;
+  }
+  return random(Array.from(SPELL_CLASS_BY_ID.values()));
+};
+
 /**
- * Turns a `PregameConfig.player` (plain, serializable data) into the same
- * shape `getChampionPresetRandom` returns, so `Game.ts` doesn't need to know
- * which of the two produced it. `'random'`, or a `championName` that no
- * longer names a full-kit champion — a stale save from before a champion was
- * removed, or corruption `PregameConfig`'s own sanitizer can't catch because
- * it doesn't know this catalog — both fall back to the exact existing
- * random-kit behaviour, which is what makes this safe to call with whatever
- * `loadPregameConfig()` handed back.
+ * Turns a `ChampionLoadout` (plain, serializable data — the player's or one
+ * AI bot's) into the same shape `getChampionPresetRandom` returns, so
+ * `Game.ts` doesn't need to know which of the three paths produced it:
+ *
+ * - `mode: 'custom'` resolves each of the 7 stored `customSlots` choices
+ *   independently through `resolveSpellChoice`.
+ * - `mode: 'champion'` with a real `championName` bundles that champion's
+ *   real Q/W/E/R plus the chosen summoners, as before.
+ * - `mode: 'champion'` with `championName: 'random'`, or a `championName`
+ *   that no longer names a full-kit champion — a stale save from before a
+ *   champion was removed, or corruption `PregameConfig`'s own sanitizer
+ *   can't catch because it doesn't know this catalog — falls back to the
+ *   exact existing random-kit behaviour.
+ *
+ * A custom kit has no single champion identity to draw a portrait from, so
+ * it gets the same random-avatar treatment as `getChampionPresetRandom` —
+ * consistent with how 'random' champion mode already decouples the avatar
+ * from the kit.
  */
 export const getChampionPresetFromLoadout = (
-  loadout: PlayerLoadout
+  loadout: ChampionLoadout
 ): ChampionPresetData & { avatar: AssetKey } => {
+  if (loadout.mode === 'custom') {
+    const slots = Array.from(
+      { length: SLOT_COUNT },
+      (_, i) => loadout.customSlots[i] ?? 'random'
+    );
+    return {
+      name: 'Tự Ghép Chiêu',
+      avatar: randomAvatar(),
+      spells: slots.map(resolveSpellChoice),
+    };
+  }
+
   const champion =
     loadout.championName === 'random'
       ? undefined

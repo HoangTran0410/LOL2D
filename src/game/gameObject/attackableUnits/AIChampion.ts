@@ -2,7 +2,8 @@ import AssetManager from '../../../managers/AssetManager';
 import { Circle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { getChampionPresetRandom } from '../../preset';
-import Champion, { type ChampionOptions } from './Champion';
+import type { AssetKey } from '../../../managers/AssetManager';
+import Champion, { type ChampionOptions, type ChampionPresetData } from './Champion';
 import type AttackableUnit from './AttackableUnit';
 import { uuidv4 } from '../../../utils';
 import { effectiveRange } from '../../combat/Reach';
@@ -13,6 +14,8 @@ import TargetResolver, {
 import type Spell from '../Spell';
 import { isChargeActivation, requireChargeSpec, type CastContext } from '../../spell/runtime/types';
 import type { Vec2 } from '../../spell/runtime/types';
+
+export type ChampionPresetFactory = () => ChampionPresetData & { avatar: AssetKey };
 
 export interface AIChampionOptions extends ChampionOptions {
   /**
@@ -25,6 +28,18 @@ export interface AIChampionOptions extends ChampionOptions {
   autoMove?: boolean;
   autoAttack?: boolean;
   autoCast?: boolean;
+  /**
+   * What `respawn()` rebuilds this bot's kit from, when `_respawnWithNewPreset`
+   * is on. Defaults to `getChampionPresetRandom`, i.e. today's behaviour
+   * unchanged: a fresh random champion and kit every life. `Game.ts` passes a
+   * closure over one specific `ChampionLoadout` for a bot the player
+   * configured with a fixed champion — calling the *same* resolver again on
+   * every respawn is what makes that bot's identity stick across deaths,
+   * while a bot left on "random" keeps re-rolling exactly as before, since
+   * `getChampionPresetFromLoadout({ championName: 'random', ... })` calls
+   * through to `getChampionPresetRandom` internally too.
+   */
+  presetFactory?: ChampionPresetFactory;
 }
 
 /**
@@ -60,12 +75,14 @@ export default class AIChampion extends Champion {
     elapsedMs: number;
     releaseAtMs: number;
   };
+  private presetFactory: ChampionPresetFactory;
 
   constructor(options: AIChampionOptions) {
     super(options);
     if (options.autoMove !== undefined) this._autoMove = options.autoMove;
     if (options.autoAttack !== undefined) this._autoAttack = options.autoAttack;
     if (options.autoCast !== undefined) this._autoCast = options.autoCast;
+    this.presetFactory = options.presetFactory ?? getChampionPresetRandom;
   }
 
   update() {
@@ -283,7 +300,7 @@ export default class AIChampion extends Champion {
     super.respawn();
 
     if (this._respawnWithNewPreset) {
-      let newPreset = getChampionPresetRandom();
+      let newPreset = this.presetFactory();
       this.avatar = AssetManager.get(newPreset.avatar);
       this.replaceSpells((newPreset.spells ?? []).map(SpellClass => new SpellClass(this)));
     }

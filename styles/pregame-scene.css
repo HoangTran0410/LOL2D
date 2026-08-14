@@ -64,6 +64,42 @@
     gap: 2rem;
 }
 
+/* ---------------------------------------------------------- loadout editor
+   Shared by the player's own section and by whichever AI bot row is
+   currently expanded — see SetupScene.mountLoadoutEditor(). */
+
+.kit-mode-toggle {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: .8rem;
+}
+
+.kit-mode-btn {
+    flex: 1;
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    color: #bbb;
+    padding: .5rem .6rem;
+    font-size: .8em;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    cursor: pointer;
+}
+
+.kit-mode-btn:hover {
+    border-color: #785a28;
+}
+
+.kit-mode-btn.selected {
+    border-color: #08abac;
+    color: #f0e6d2;
+    background: #102426;
+}
+
+.kit-mode-panel[hidden] {
+    display: none;
+}
+
 /* -------------------------------------------------------------- champions */
 
 .champion-grid {
@@ -185,6 +221,345 @@
     width: 32px;
     height: 32px;
     display: block;
+}
+
+/* ------------------------------------------------------------ custom slots */
+
+.custom-slot-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: .6rem;
+}
+
+.custom-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .3rem;
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    padding: .5rem .3rem;
+    cursor: pointer;
+    color: #f0e6d2;
+}
+
+.custom-slot:hover {
+    border-color: #785a28;
+}
+
+.custom-slot-hotkey {
+    font-weight: bold;
+    color: #c8aa6e;
+    font-size: .75em;
+}
+
+.custom-slot-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    background: #14171c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.custom-slot-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.custom-slot-icon .fa-random {
+    color: #08abac;
+}
+
+.custom-slot-name {
+    font-size: .68em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 76px;
+}
+
+.custom-slot-hint {
+    font-size: .75em;
+    color: #a09b8c;
+    margin: .4rem 0 .8rem;
+    font-style: italic;
+}
+
+/* -------------------------------------------------------- overlays: shared
+   skeleton for the catalogue picker and the spell-detail panel. */
+
+.pregame-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.pregame-overlay[hidden] {
+    display: none;
+}
+
+.pregame-overlay-panel {
+    width: min(760px, 92vw);
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #1e2328;
+    border: 3px solid transparent;
+    border-image: linear-gradient(#08abac, #01698b) 1;
+    color: #f0e6d2;
+    padding: 1rem 1.2rem 1.2rem;
+    box-shadow: 0 0 30px 6px rgba(0, 0, 0, .5);
+}
+
+.pregame-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .8rem;
+}
+
+.pregame-overlay-header h3 {
+    margin: 0;
+    font-size: 1.05em;
+    color: #c8aa6e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* -------------------------------------------------------- catalogue picker */
+
+.catalog-group-heading {
+    font-size: .8em;
+    color: #a09b8c;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin: .8rem 0 .4rem;
+}
+
+.catalog-group-heading:first-child {
+    margin-top: 0;
+}
+
+.catalog-group-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: .5rem;
+}
+
+.catalog-spell-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .25rem;
+    background: #23282e;
+    border: 2px solid #3c3c41;
+    padding: .4rem .3rem;
+    cursor: pointer;
+    color: #f0e6d2;
+}
+
+.catalog-spell-card:hover {
+    border-color: #785a28;
+}
+
+.catalog-spell-card img {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.catalog-spell-card .catalog-spell-name {
+    font-size: .68em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 76px;
+}
+
+.catalog-random-card {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    background: #23282e;
+    border: 2px dashed #3c3c41;
+    padding: .5rem;
+    cursor: pointer;
+    color: #08abac;
+    margin-bottom: .6rem;
+    font-size: .85em;
+}
+
+.catalog-random-card:hover {
+    border-color: #08abac;
+}
+
+/* ---------------------------------------------------------- spell detail —
+   a duplicate of a few rules from styles/hud.css's .spell-info, kept in sync
+   by hand rather than shared: the HUD (InGameHUD.ts + hud.css) is owned by a
+   different in-flight change and this screen must not touch either. */
+
+.pregame-overlay-bottom {
+    align-items: flex-end;
+}
+
+@media (min-width: 720px) {
+    .pregame-overlay-bottom {
+        align-items: center;
+    }
+}
+
+.spell-detail-panel {
+    position: relative;
+    width: min(520px, 100vw);
+}
+
+.spell-detail-close {
+    position: absolute;
+    top: .4rem;
+    right: .4rem;
+}
+
+.spell-detail-header {
+    display: flex;
+    gap: .8rem;
+    align-items: flex-start;
+    padding-right: 1.6rem;
+}
+
+.spell-detail-header img {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    border: 2px solid #9999;
+    flex-shrink: 0;
+}
+
+.spell-detail-header h3 {
+    margin: 0 0 .4rem;
+    font-size: 1em;
+}
+
+.spell-detail-costs {
+    display: flex;
+    gap: 1rem;
+    font-size: .85em;
+    font-weight: bold;
+}
+
+.spell-detail-cooldown {
+    color: #e8c17d;
+}
+
+.spell-detail-mana {
+    color: #9ed4ff;
+}
+
+.spell-detail-body {
+    margin-top: .8rem;
+    color: #eee;
+    font-size: .9em;
+    line-height: 1.5;
+}
+
+.spell-detail-body span {
+    font-style: italic;
+}
+
+.spell-detail-body .damage {
+    color: #ff5858;
+}
+
+.spell-detail-body .buff {
+    color: #88f;
+}
+
+.spell-detail-body .time {
+    color: #c1ffb6;
+}
+
+/* ------------------------------------------------------------- bot list */
+
+.pregame-hint {
+    font-size: .8em;
+    color: #a09b8c;
+    margin: -.4rem 0 .8rem;
+}
+
+.bot-list {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: .3rem;
+}
+
+.bot-row {
+    background: #23282e;
+    border: 2px solid #3c3c41;
+}
+
+.bot-row-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    background: transparent;
+    border: none;
+    color: #f0e6d2;
+    padding: .55rem .7rem;
+    cursor: pointer;
+    text-align: left;
+}
+
+.bot-row-header:hover {
+    background: #2a2f36;
+}
+
+.bot-row.expanded .bot-row-header {
+    border-bottom: 2px solid #3c3c41;
+}
+
+.bot-row-label {
+    font-weight: bold;
+    color: #c8aa6e;
+    flex-shrink: 0;
+}
+
+.bot-row-summary {
+    flex: 1;
+    font-size: .85em;
+    color: #ddd;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bot-row-header i {
+    transition: transform .15s ease;
+    color: #999;
+}
+
+.bot-row.expanded .bot-row-header i {
+    transform: rotate(180deg);
+}
+
+.bot-row-editor {
+    padding: .8rem;
+}
+
+.bot-row-editor[hidden] {
+    display: none;
 }
 
 /* --------------------------------------------------------------- AI/rules */

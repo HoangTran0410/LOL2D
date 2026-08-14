@@ -81,21 +81,7 @@
                 <div class="pregame-body">
                     <section class="pregame-section">
                         <h2>Tướng Của Bạn</h2>
-                        <div class="champion-grid" id="pregame-champion-grid"></div>
-                    </section>
-
-                    <section class="pregame-section">
-                        <h2>Phép Bổ Trợ</h2>
-                        <div class="summoner-row">
-                            <div class="summoner-slot">
-                                <span class="summoner-slot-label">D</span>
-                                <div class="summoner-options" id="pregame-summoner-d"></div>
-                            </div>
-                            <div class="summoner-slot">
-                                <span class="summoner-slot-label">F</span>
-                                <div class="summoner-options" id="pregame-summoner-f"></div>
-                            </div>
-                        </div>
+                        <div class="loadout-editor" id="pregame-player-editor"></div>
                     </section>
 
                     <section class="pregame-section pregame-columns">
@@ -131,12 +117,57 @@
                             </label>
                         </div>
                     </section>
+
+                    <section class="pregame-section">
+                        <h2>Cấu Hình Từng Bot AI</h2>
+                        <p class="pregame-hint">Mỗi bot mặc định Ngẫu Nhiên — bấm vào một bot để đổi tướng/chiêu riêng cho nó.</p>
+                        <div class="bot-list" id="pregame-bot-list"></div>
+                    </section>
                 </div>
 
                 <footer class="pregame-actions">
                     <button id="pregame-reset-btn" class="hextech-btn secondary">Mặc Định</button>
                     <button id="pregame-start-btn" class="hextech-btn">Bắt Đầu</button>
                 </footer>
+            </div>
+
+            <!-- Full spell catalogue picker for a free-form kit-builder slot. One
+                 shared overlay, reused for the player and for whichever bot row is
+                 expanded — never ten copies of the same picker. -->
+            <div id="pregame-catalog-picker" class="pregame-overlay" hidden>
+                <div class="pregame-overlay-panel">
+                    <header class="pregame-overlay-header">
+                        <h3 id="pregame-catalog-title">Chọn Chiêu</h3>
+                        <button type="button" id="pregame-catalog-close" class="pregame-icon-btn" title="Đóng">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </header>
+                    <div class="pregame-catalog-content" id="pregame-catalog-content"></div>
+                </div>
+            </div>
+
+            <!-- Spell description panel — tap any spell icon anywhere on this
+                 screen to open it. Touch-friendly by design (tap, not hover), and
+                 recomputed from the *current* CDR/URF sliders every time it opens
+                 or those sliders move, so the numbers it shows are always the
+                 numbers the engine will actually use. -->
+            <div id="pregame-spell-detail" class="pregame-overlay pregame-overlay-bottom" hidden>
+                <div class="pregame-overlay-panel spell-detail-panel">
+                    <button type="button" id="pregame-detail-close" class="pregame-icon-btn spell-detail-close" title="Đóng">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="spell-detail-header">
+                        <img id="pregame-detail-icon" alt="">
+                        <div>
+                            <h3 id="pregame-detail-name"></h3>
+                            <div class="spell-detail-costs">
+                                <span class="spell-detail-cooldown"><i class="fas fa-clock"></i> <span id="pregame-detail-cooldown"></span></span>
+                                <span class="spell-detail-mana"><i class="fas fa-tint"></i> <span id="pregame-detail-mana"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spell-detail-body" id="pregame-detail-description"></div>
+                </div>
             </div>
         </div>
     </div>

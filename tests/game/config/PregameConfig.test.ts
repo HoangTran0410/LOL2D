@@ -5,10 +5,13 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_PREGAME_CONFIG,
+  SLOT_COUNT,
   loadPregameConfig,
+  sanitizeChampionLoadout,
   sanitizePregameConfig,
   savePregameConfig,
   toMatchRules,
+  type ChampionLoadout,
   type PregameConfig,
 } from '../../../src/game/config/PregameConfig';
 
@@ -35,15 +38,30 @@ afterEach(() => {
 
 describe('DEFAULT_PREGAME_CONFIG', () => {
   it('reproduces the game exactly as it behaved before this config existed', () => {
-    // Random champion + kit, 5 AI champions with AIChampion's own hardcoded
-    // defaults (autoMove off, autoAttack/autoCast on), no cooldown reduction,
-    // full mana costs. Changing any of these is a behaviour change for every
-    // player who has never opened the setup screen.
-    expect(DEFAULT_PREGAME_CONFIG).toEqual({
-      player: { championName: 'random', summonerD: 'Flash', summonerF: 'Heal' },
-      ai: { count: 5, autoMove: false, autoAttack: true, autoCast: true },
-      rules: { cooldownReductionPercent: 0, manaFree: false },
+    // Random champion + kit, 5 AI champions each also random with
+    // AIChampion's own hardcoded defaults (autoMove off, autoAttack/autoCast
+    // on), no cooldown reduction, full mana costs. Changing any of these is a
+    // behaviour change for every player who has never opened the setup
+    // screen.
+    expect(DEFAULT_PREGAME_CONFIG.player).toEqual({
+      mode: 'champion',
+      championName: 'random',
+      summonerD: 'Flash',
+      summonerF: 'Heal',
+      customSlots: Array(SLOT_COUNT).fill('random'),
     });
+    expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(5);
+    expect(DEFAULT_PREGAME_CONFIG.ai.autoMove).toBe(false);
+    expect(DEFAULT_PREGAME_CONFIG.ai.autoAttack).toBe(true);
+    expect(DEFAULT_PREGAME_CONFIG.ai.autoCast).toBe(true);
+    expect(DEFAULT_PREGAME_CONFIG.rules).toEqual({ cooldownReductionPercent: 0, manaFree: false });
+  });
+
+  it('gives every AI bot slot the same random-champion default as the player', () => {
+    expect(DEFAULT_PREGAME_CONFIG.ai.bots).toHaveLength(AI_COUNT_MAX);
+    for (const bot of DEFAULT_PREGAME_CONFIG.ai.bots) {
+      expect(bot).toEqual(DEFAULT_PREGAME_CONFIG.player);
+    }
   });
 
   it('produces a no-op match-rules multiplier', () => {
@@ -51,6 +69,70 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
       cooldownMultiplier: 1,
       manaFree: false,
     });
+  });
+});
+
+describe('sanitizeChampionLoadout', () => {
+  it('falls back to a full default loadout for non-object input', () => {
+    expect(sanitizeChampionLoadout(undefined)).toEqual(DEFAULT_PREGAME_CONFIG.player);
+    expect(sanitizeChampionLoadout(null)).toEqual(DEFAULT_PREGAME_CONFIG.player);
+    expect(sanitizeChampionLoadout('garbage')).toEqual(DEFAULT_PREGAME_CONFIG.player);
+  });
+
+  it('accepts a valid champion-mode loadout unchanged', () => {
+    const loadout: ChampionLoadout = {
+      mode: 'champion',
+      championName: 'Yasuo',
+      summonerD: 'Ghost',
+      summonerF: 'Ignite',
+      customSlots: Array(SLOT_COUNT).fill('random'),
+    };
+    expect(sanitizeChampionLoadout(loadout)).toEqual(loadout);
+  });
+
+  it('accepts a valid custom-mode loadout unchanged', () => {
+    const loadout: ChampionLoadout = {
+      mode: 'custom',
+      championName: 'random',
+      summonerD: 'Flash',
+      summonerF: 'Heal',
+      customSlots: ['BasicAttack', 'Yasuo_Q', 'random', 'Lux_R', 'random', 'Ghost', 'Heal'],
+    };
+    expect(sanitizeChampionLoadout(loadout)).toEqual(loadout);
+  });
+
+  it('falls back to "champion" for an unrecognized mode', () => {
+    expect(sanitizeChampionLoadout({ mode: 'anything-else' }).mode).toBe('champion');
+    expect(sanitizeChampionLoadout({}).mode).toBe('champion');
+  });
+
+  it('pads a short customSlots array with "random" up to SLOT_COUNT', () => {
+    const result = sanitizeChampionLoadout({ customSlots: ['Yasuo_Q'] });
+    expect(result.customSlots).toHaveLength(SLOT_COUNT);
+    expect(result.customSlots[0]).toBe('Yasuo_Q');
+    expect(result.customSlots.slice(1)).toEqual(Array(SLOT_COUNT - 1).fill('random'));
+  });
+
+  it('truncates a long customSlots array to SLOT_COUNT', () => {
+    const result = sanitizeChampionLoadout({
+      customSlots: Array.from({ length: SLOT_COUNT + 5 }, (_, i) => `Spell_${i}`),
+    });
+    expect(result.customSlots).toHaveLength(SLOT_COUNT);
+    expect(result.customSlots[0]).toBe('Spell_0');
+  });
+
+  it('replaces a non-string customSlots entry with "random" rather than crashing', () => {
+    const result = sanitizeChampionLoadout({
+      customSlots: ['Yasuo_Q', 42, null, undefined, {}, [], 'Lux_R', 'extra-ignored'],
+    });
+    expect(result.customSlots).toEqual(['Yasuo_Q', 'random', 'random', 'random', 'random', 'random', 'Lux_R']);
+  });
+
+  it('falls back per-field for wrong-typed championName/summoners', () => {
+    const result = sanitizeChampionLoadout({ championName: 42, summonerD: null, summonerF: {} });
+    expect(result.championName).toBe('random');
+    expect(result.summonerD).toBe('Flash');
+    expect(result.summonerF).toBe('Heal');
   });
 });
 
@@ -114,11 +196,64 @@ describe('sanitizePregameConfig', () => {
 
   it('keeps a fully valid custom config unchanged', () => {
     const custom: PregameConfig = {
-      player: { championName: 'Yasuo', summonerD: 'Ghost', summonerF: 'Ignite' },
-      ai: { count: 3, autoMove: true, autoAttack: false, autoCast: false },
+      player: {
+        mode: 'champion',
+        championName: 'Yasuo',
+        summonerD: 'Ghost',
+        summonerF: 'Ignite',
+        customSlots: Array(SLOT_COUNT).fill('random'),
+      },
+      ai: {
+        count: 3,
+        autoMove: true,
+        autoAttack: false,
+        autoCast: false,
+        bots: Array.from({ length: AI_COUNT_MAX }, () => ({
+          mode: 'champion' as const,
+          championName: 'random' as const,
+          summonerD: 'Flash',
+          summonerF: 'Heal',
+          customSlots: Array(SLOT_COUNT).fill('random'),
+        })),
+      },
       rules: { cooldownReductionPercent: 40, manaFree: true },
     };
     expect(sanitizePregameConfig(custom)).toEqual(custom);
+  });
+
+  it('always produces exactly AI_COUNT_MAX bot slots, padding or truncating a mismatched ai.bots array', () => {
+    expect(sanitizePregameConfig({ ai: { bots: [{ championName: 'Ahri' }] } }).ai.bots).toHaveLength(
+      AI_COUNT_MAX
+    );
+    expect(
+      sanitizePregameConfig({
+        ai: { bots: Array.from({ length: AI_COUNT_MAX + 4 }, () => ({ championName: 'Ahri' })) },
+      }).ai.bots
+    ).toHaveLength(AI_COUNT_MAX);
+  });
+
+  it('sanitizes each bot loadout independently, same rules as the player', () => {
+    const result = sanitizePregameConfig({
+      ai: {
+        bots: [
+          { championName: 'Ahri', summonerD: 'Ghost', summonerF: 'Ignite' },
+          { mode: 'custom', customSlots: ['Yasuo_Q'] },
+          'not an object',
+        ],
+      },
+    });
+    expect(result.ai.bots[0]).toEqual({
+      mode: 'champion',
+      championName: 'Ahri',
+      summonerD: 'Ghost',
+      summonerF: 'Ignite',
+      customSlots: Array(SLOT_COUNT).fill('random'),
+    });
+    expect(result.ai.bots[1].mode).toBe('custom');
+    expect(result.ai.bots[1].customSlots[0]).toBe('Yasuo_Q');
+    expect(result.ai.bots[2]).toEqual(DEFAULT_PREGAME_CONFIG.player);
+    // slots never explicitly provided still default to "today's behaviour"
+    expect(result.ai.bots[3]).toEqual(DEFAULT_PREGAME_CONFIG.player);
   });
 });
 
@@ -144,11 +279,29 @@ describe('loadPregameConfig / savePregameConfig', () => {
     expect(loadPregameConfig()).toEqual(DEFAULT_PREGAME_CONFIG);
   });
 
-  it('round-trips a saved config', () => {
+  it('round-trips a saved config, including per-bot loadouts', () => {
     vi.stubGlobal('localStorage', new MemoryStorage());
     const custom: PregameConfig = {
-      player: { championName: 'Ahri', summonerD: 'Flash', summonerF: 'Heal' },
-      ai: { count: 8, autoMove: true, autoAttack: true, autoCast: false },
+      player: {
+        mode: 'custom',
+        championName: 'random',
+        summonerD: 'Flash',
+        summonerF: 'Heal',
+        customSlots: ['BasicAttack', 'Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R', 'Ghost', 'Ignite'],
+      },
+      ai: {
+        count: 8,
+        autoMove: true,
+        autoAttack: true,
+        autoCast: false,
+        bots: Array.from({ length: AI_COUNT_MAX }, (_, i) => ({
+          mode: 'champion' as const,
+          championName: i === 0 ? 'Ahri' : ('random' as const),
+          summonerD: 'Flash',
+          summonerF: 'Heal',
+          customSlots: Array(SLOT_COUNT).fill('random'),
+        })),
+      },
       rules: { cooldownReductionPercent: 30, manaFree: true },
     };
     savePregameConfig(custom);
@@ -182,10 +335,54 @@ describe('loadPregameConfig / savePregameConfig', () => {
     const storage = new MemoryStorage();
     vi.stubGlobal('localStorage', storage);
     savePregameConfig({
-      player: { championName: 'random', summonerD: 'Flash', summonerF: 'Heal' },
-      ai: { count: 999, autoMove: false, autoAttack: true, autoCast: true },
-      rules: { cooldownReductionPercent: 0, manaFree: false },
+      player: DEFAULT_PREGAME_CONFIG.player,
+      ai: { ...DEFAULT_PREGAME_CONFIG.ai, count: 999 },
+      rules: DEFAULT_PREGAME_CONFIG.rules,
     });
     expect(loadPregameConfig().ai.count).toBe(AI_COUNT_MAX);
+  });
+
+  // The schema-migration contract explicitly asked for: a config saved by
+  // the version of this screen that shipped before per-bot configuration and
+  // the free-form kit builder existed (no `player.mode`, no
+  // `player.customSlots`, no `ai.bots`) must still load — with its old
+  // fields honoured exactly as they meant before, and the new fields
+  // defaulting to today's actual behaviour — not throw, and not silently
+  // reset to defaults. This is why the storage key stayed
+  // `lol2d:pregameConfig:v1` rather than bumping to v2: bumping the key
+  // would have made this blob invisible instead of readable.
+  it('loads a pre-existing v1 blob (no mode, no customSlots, no ai.bots) without error, preserving every old field', () => {
+    const legacyV1Blob = {
+      player: { championName: 'Zed', summonerD: 'Ghost', summonerF: 'Ignite' },
+      ai: { count: 7, autoMove: true, autoAttack: false, autoCast: true },
+      rules: { cooldownReductionPercent: 20, manaFree: true },
+    };
+    const storage = new MemoryStorage();
+    storage.setItem('lol2d:pregameConfig:v1', JSON.stringify(legacyV1Blob));
+    vi.stubGlobal('localStorage', storage);
+
+    let loaded!: PregameConfig;
+    expect(() => {
+      loaded = loadPregameConfig();
+    }).not.toThrow();
+
+    // every old field preserved with its old meaning
+    expect(loaded.player.championName).toBe('Zed');
+    expect(loaded.player.summonerD).toBe('Ghost');
+    expect(loaded.player.summonerF).toBe('Ignite');
+    expect(loaded.ai.count).toBe(7);
+    expect(loaded.ai.autoMove).toBe(true);
+    expect(loaded.ai.autoAttack).toBe(false);
+    expect(loaded.ai.autoCast).toBe(true);
+    expect(loaded.rules.cooldownReductionPercent).toBe(20);
+    expect(loaded.rules.manaFree).toBe(true);
+
+    // new fields default to today's actual behaviour, not an error state
+    expect(loaded.player.mode).toBe('champion');
+    expect(loaded.player.customSlots).toEqual(Array(SLOT_COUNT).fill('random'));
+    expect(loaded.ai.bots).toHaveLength(AI_COUNT_MAX);
+    expect(loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')).toBe(
+      true
+    );
   });
 });
