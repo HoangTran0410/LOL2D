@@ -8,10 +8,12 @@ import type { Vec2 } from '../spell/runtime/types';
  * Target acquisition for an attack *order* — as opposed to the delivery in
  * BasicAttack.ts and the standing order in BasicAttackController.ts.
  *
- * Right click already picks the body under the cursor
- * (Game.findAttackTargetUnderCursor). This is the keyboard half: the nearest
- * enemy to the cursor rather than to the champion, so the gesture is "point
- * roughly at him and press" instead of "hit a 55-pixel circle".
+ * This is the only way an attack order is issued now. Right click used to also
+ * pick the body directly under the cursor, which meant a move order and an
+ * attack order shared one gesture and the game guessed between them; that guess
+ * is gone. The rule here is the nearest enemy to the cursor rather than to the
+ * champion, so the gesture is "point roughly at him and press" instead of "hit
+ * a 55-pixel circle".
  */
 
 /**

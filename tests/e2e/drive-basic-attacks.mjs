@@ -265,9 +265,6 @@ try {
       cursorToDecoy: decoy ? Math.round(game.worldMouse.dist(decoy.position)) : null,
       playerToBot: Math.round(player.position.dist(bot.position)),
       playerToDecoy: decoy ? Math.round(player.position.dist(decoy.position)) : null,
-      // proof the cursor was not sitting on a body: a right click here would
-      // have been a move order
-      cursorOnABody: !!game.findAttackTargetUnderCursor(),
     };
   });
   await page.screenshot({ path: `${OUT}-a-key.png` });

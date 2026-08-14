@@ -1,4 +1,3 @@
-import { Circle } from '../libs/quadtree';
 import { SpellHotKeys } from './constants';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
@@ -16,7 +15,7 @@ import {
   getChampionPresetRandom,
   getTurretPositions,
 } from './preset';
-import ObjectManager, { PredefinedFilters } from './managers/ObjectManager';
+import ObjectManager from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
 import NavigationSystem from './nav/NavigationSystem';
 import EventManager from '../managers/EventManager';
@@ -38,7 +37,6 @@ import TouchControls, {
 import { touchAimRange } from './input/SpellAim';
 import type { AimCandidate } from './input/SpellAim';
 import type { JoystickVector } from './input/VirtualJoystick';
-import type GameObject from './gameObject/GameObject';
 import type Spell from './gameObject/Spell';
 import type { CastContext, Vec2 } from './spell/runtime/types';
 
@@ -194,17 +192,15 @@ export default class Game {
     this.terrainMap.update();
 
     if (mouseIsPressed && mouseButton === RIGHT) {
-      // Right click is one gesture with two meanings: on an enemy body it is an
-      // attack order, on empty ground it is a move order (which also cancels any
-      // attack order). One quadtree query per frame while the button is held,
-      // for the local player only — the AI scans on an interval instead.
-      const target = this.findAttackTargetUnderCursor();
-      if (target) {
-        this.player.orderAttack(target);
-      } else {
-        this.player.orderMove(this.worldMouse.x, this.worldMouse.y, true);
-        this.clickedPoint = { x: this.worldMouse.x, y: this.worldMouse.y, size: 40 };
-      }
+      // Right click means one thing only: move here. It used to also issue an
+      // attack order when the cursor happened to be over an enemy body, which
+      // made a walk past a fight silently turn into a commitment to it — the
+      // click that was meant to retreat instead planted the champion in range.
+      // Attacking now has its own key (slot 0, `A`), which picks the enemy
+      // nearest the cursor rather than the one under it, so the two orders can
+      // no longer be confused with each other.
+      this.player.orderMove(this.worldMouse.x, this.worldMouse.y, true);
+      this.clickedPoint = { x: this.worldMouse.x, y: this.worldMouse.y, size: 40 };
     }
     this.clickedPoint.size *= 0.9;
 
@@ -218,36 +214,6 @@ export default class Game {
   update() {
     if (this.paused) return;
     this.fixedUpdate();
-  }
-
-  /**
-   * The enemy body under the cursor, or null for empty ground. `willDraw` is
-   * the fog of war's own visibility flag, so a unit hidden in the fog cannot be
-   * ordered onto — you can only attack what you can see.
-   *
-   * The click has a few pixels of slack around it; the implicit collide filter
-   * in queryObjects then requires the cursor circle to actually touch the body.
-   */
-  findAttackTargetUnderCursor(): AttackableUnit | null {
-    const found = this.objectManager.queryObjects({
-      area: new Circle({ x: this.worldMouse.x, y: this.worldMouse.y, r: 10 }),
-      filters: [
-        PredefinedFilters.type(AttackableUnit),
-        PredefinedFilters.canTakeDamageFromTeam(this.player.teamId),
-        (object: GameObject) => object.willDraw,
-      ],
-    });
-
-    let nearest: AttackableUnit | null = null;
-    let nearestDistance = Infinity;
-    for (const unit of found) {
-      const distance = p5.Vector.dist(this.worldMouse, unit.position);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = unit;
-      }
-    }
-    return nearest;
   }
 
   draw() {
