@@ -78,16 +78,13 @@ export default class ParticleSystem extends GameObject {
 
   update(): void {
     this.preUpdateFn?.(this.particles);
-    let i = 0;
-    while (i < this.particles.length) {
-      const particle = this.particles[i];
+    let write = 0;
+    for (let read = 0; read < this.particles.length; read++) {
+      const particle = this.particles[read];
       this.updateFn?.(particle);
-      if (this.isDeadFn?.(particle)) {
-        this.particles.splice(i, 1);
-      } else {
-        i++;
-      }
+      if (!this.isDeadFn(particle)) this.particles[write++] = particle;
     }
+    this.particles.length = write;
     this._cachedBB = null;
     if (this.autoRemoveIfEmpty && this.particles.length === 0) {
       this.toRemove = true;
@@ -95,11 +92,18 @@ export default class ParticleSystem extends GameObject {
     this.postUpdateFn?.(this.particles);
   }
 
-  draw(): void {
+  draw(limit = Infinity): void {
     push();
     this.preDrawFn?.(this.particles);
-    for (const particle of this.particles) {
-      this.drawFn?.(particle);
+    const length = this.particles.length;
+    const count = Number.isFinite(limit)
+      ? Math.min(length, Math.max(0, Math.floor(limit)))
+      : length;
+    for (let i = 0; i < count; i++) {
+      const index = count === length
+        ? i
+        : Math.floor(((i + 0.5) * length) / count);
+      this.drawFn?.(this.particles[index]);
     }
     this.postDrawFn?.(this.particles);
     pop();

@@ -143,6 +143,7 @@ export default class Game {
   clickedPoint = { x: 0, y: 0, size: 0 };
   worldMouse!: p5.Vector;
   paused = false;
+  touchUi: boolean;
 
   constructor() {
     // Read once, before anything that might construct a Champion or a Spell:
@@ -152,14 +153,14 @@ export default class Game {
     // constructor as anything other than a playable config.
     const pregameConfig = loadPregameConfig();
     this.matchRules = toMatchRules(pregameConfig.rules);
-    const touchUi = touchControlsPreference();
+    this.touchUi = touchControlsPreference();
 
     this.worldMouse = createVector(0, 0);
     this.camera = new Camera();
     // Before anything reads a world position from the screen. `width`/`height`
     // are valid here: `Game` is constructed from `GameScene.enter()`, after
     // `createCanvas`.
-    this.camera.setZoomFactor(zoomFactorPreference(touchUi));
+    this.camera.setZoomFactor(zoomFactorPreference(this.touchUi));
     this.camera.fitTo(width, height);
     // A match that boots and is never resized must not sit at the constructed
     // 0.5 default, and the opening lerp from it would now zoom a phone *out*.
@@ -199,7 +200,7 @@ export default class Game {
       },
     });
 
-    this.touchControls = new TouchControls(this.touchControlsHost(), touchUi);
+    this.touchControls = new TouchControls(this.touchControlsHost(), this.touchUi);
     this.applyTouchUiClass();
 
     // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
@@ -501,6 +502,7 @@ export default class Game {
   /** The on-screen toggle, and the handle Playwright drives. */
   setTouchControlsEnabled(enabled: boolean, remember = true): void {
     this.touchControls.setEnabled(enabled);
+    this.touchUi = enabled;
     if (remember) rememberTouchControlsPreference(enabled);
     this.applyTouchUiClass();
   }

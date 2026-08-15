@@ -157,7 +157,6 @@ export default class AttackableUnit extends GameObject {
     let { displaySize: size, alpha } = this.animatedValues;
 
     push();
-    if (alpha < 255) tint(255, alpha);
     noStroke();
     fill(240, alpha);
 
@@ -165,6 +164,7 @@ export default class AttackableUnit extends GameObject {
     // the wiki importer. Clipping here makes every avatar round, so new art does
     // not have to be cut to a circle before it can be used.
     drawingContext.save();
+    drawingContext.globalAlpha = alpha / 255;
     drawingContext.beginPath();
     drawingContext.arc(pos.x, pos.y, size / 2, 0, TWO_PI);
     drawingContext.clip();

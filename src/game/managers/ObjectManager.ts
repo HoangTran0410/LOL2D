@@ -16,7 +16,8 @@ export type GameObjectFilter = (object: GameObject) => boolean;
 export type GameObjectTypeGuard<T extends GameObject> = (object: GameObject) => object is T;
 export interface ObjectManagerGameContext {
   readonly mapSize: number;
-  camera: { getBoundingBox(): Rectangle };
+  readonly touchUi?: boolean;
+  camera: { getBoundingBox(): Rectangle; constantSize?(pixels: number): number };
 }
 
 interface GameObjectRegion {
@@ -38,6 +39,8 @@ const Z_INDEX_MAP = new Map<Function, number>([
   [CombatText, 5],
 ]);
 const DEFAULT_Z_INDEX = 99;
+export const MOBILE_PARTICLE_DRAW_BUDGET = 800;
+const ATTACKABLE_DRAW_MARGIN_PX = 100;
 
 /**
  * The table above is keyed by exact constructor, so a subclass it does not list
@@ -242,8 +245,32 @@ export default class ObjectManager {
     const keyed = objectsInCamera.map((o) => ({ o, z: zIndexOf(o) }));
     keyed.sort((a, b) => a.z - b.z);
 
-    for (const { o } of keyed) {
-      if (o.willDraw) o.draw?.();
+    const margin = this.game.camera.constantSize?.(ATTACKABLE_DRAW_MARGIN_PX)
+      ?? ATTACKABLE_DRAW_MARGIN_PX;
+    const visualBound = new Rectangle({
+      x: camBound.x - margin,
+      y: camBound.y - margin,
+      w: camBound.w + margin * 2,
+      h: camBound.h + margin * 2,
+    });
+    const drawables = keyed.filter(({ o }) =>
+      o.willDraw &&
+      (!(o instanceof AttackableUnit) || o.getCollideBoundingBox().intersect(visualBound))
+    );
+    let particleCount = 0;
+    for (const { o } of drawables) {
+      if (o instanceof ParticleSystem) particleCount += o.particles.length;
+    }
+    const particleScale = this.game.touchUi && particleCount > MOBILE_PARTICLE_DRAW_BUDGET
+      ? MOBILE_PARTICLE_DRAW_BUDGET / particleCount
+      : 1;
+
+    for (const { o } of drawables) {
+      if (o instanceof ParticleSystem) {
+        o.draw(Math.floor(o.particles.length * particleScale));
+      } else {
+        o.draw?.();
+      }
       // o.drawBoundingBox?.(true);
     }
 
