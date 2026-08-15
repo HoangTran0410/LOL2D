@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import Camera from '../../../src/game/gameObject/map/Camera';
 
@@ -33,5 +34,15 @@ describe('Camera under resize', () => {
     expect(c.currentScale).toBe(0.5); // the constructed default, un-lerped
     c.snapToScale();
     expect(c.currentScale).toBeCloseTo(0.39, 5);
+  });
+
+  it('the paused settings slider snaps live zoom and persists only the committed mode', () => {
+    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+
+    expect(source).toMatch(
+      /const setZoom[\s\S]*camera\.setZoomFactor\(factor\);[\s\S]*camera\.snapToScale\(\);/
+    );
+    expect(source).toContain('setZoomFactorPreference(camera.zoomFactor, hud.touchUi)');
+    expect(source).toContain('@change="persistZoom"');
   });
 });

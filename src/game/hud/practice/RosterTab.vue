@@ -40,7 +40,6 @@ import type { BotBehaviour, RosterEntry } from '../../MatchDirector';
 import type { ChampionLoadout } from '../../config/PregameConfig';
 import { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } from '../../config/PregameConfig';
 import AIChampion from '../../gameObject/attackableUnits/AIChampion';
-import { TAP_MOVE_TOLERANCE_PX } from '../hudInteractions';
 import LoadoutEditorModal from '../../../scenes/setup/LoadoutEditorModal.vue';
 
 const hud = inject<HudInteractions>('hud')!;
@@ -205,122 +204,10 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
  * is `display: contents` so it adds no box of its own.
  */
 
-/**
- * ## Touch, twice over: the scroll the browser will not perform and the click
- * it will not send
- *
- * `GameScene`'s p5 touch handlers `preventDefault()` every touch on the *page*
- * (needed so a drag across the canvas is a control input rather than a scroll),
- * and a gesture that has had `preventDefault()` called on it gets neither the
- * browser's native scrolling nor the trailing synthetic `click` — anywhere on
- * the page, not just over the canvas. Both halves bite here, in two places:
- *
- *   - **This tab's own body.** `.practice-tab-body` is `overflow-y: auto`, and
- *     six units at two lines each overflow a 390px-tall landscape phone by
- *     several hundred pixels. Untouched, the list would not scroll under a
- *     thumb and the add button — last in the flow — would be unreachable.
- *     (`RulesTab` never hits this: five short controls, no overflow.)
- *   - **The loadout editor.** `LoadoutEditorModal` and `KitRoster` drive every
- *     action from `@click` and let the browser scroll their roster, which is
- *     right where they were written — `useSpellPeek.ts` says in as many words
- *     that the setup screen is a plain DOM overlay where a tap synthesises a
- *     click. Opened from *inside a match*, neither assumption survives.
- *
- * So one gesture tracker serves both: it scrolls whatever the finger went down
- * in, and it distinguishes a tap from a drag with the same
- * `TAP_MOVE_TOLERANCE_PX` a browser's own click-vs-drag heuristic would have
- * applied for free — the shape the deleted spell picker used for its own
- * list and its icons. The two differ only in what a tap then does: this tab's controls have real handlers
- * and go through `onTap`, while the editor has none of its own and gets the
- * missing click synthesised at the point the finger lifted. That bridge lives
- * here rather than in the editor because the editor is not what is broken —
- * this host is, and only this host.
- *
- * Deliberately *not* conditional on `hud.touchUi`: that flag is a rendering
- * preference (it can be forced on for a mouse), while this is about which
- * events actually arrive. A browser that did synthesise its own click would
- * double-fire the editor's, which is survivable because every action reachable
- * through the bridge is idempotent — picking the same spell into the same slot,
- * selecting the selected slot, applying the applied kit — and the two that are
- * not (Huỷ, Xác nhận) unmount the editor on the first, leaving the second
- * nothing to land on.
- *
- * One tracker for both surfaces is safe because they are mutually exclusive: a
- * finger is on the editor or on the tab under it, never on both, and the
- * editor's backdrop covers the panel while it is open.
- */
-let tapX = 0;
-let tapY = 0;
-let tapMoved = false;
-let scroller: HTMLElement | null = null;
-let scrollStartTop = 0;
-
-/**
- * The nearest ancestor that can actually scroll — `.practice-tab-body` here,
- * `.pregame-modal-body` in the editor — found rather than named, so a change to
- * either layout cannot silently leave this scrolling nothing.
- */
-const scrollerOf = (start: EventTarget | null): HTMLElement | null => {
-  let node = start instanceof Element ? (start as HTMLElement) : null;
-  while (node && node !== document.body) {
-    const overflow = getComputedStyle(node).overflowY;
-    if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
-      return node;
-    }
-    node = node.parentElement;
-  }
-  return null;
-};
-
-const onTouchStart = (event: TouchEvent): void => {
-  const touch = event.touches[0];
-  tapMoved = false;
-  tapX = touch?.clientX ?? 0;
-  tapY = touch?.clientY ?? 0;
-  scroller = scrollerOf(event.target);
-  scrollStartTop = scroller?.scrollTop ?? 0;
-};
-
-const onTouchMove = (event: TouchEvent): void => {
-  const touch = event.touches[0];
-  if (!touch) return;
-  // Measured from where the finger went down, not from the last frame, so the
-  // list cannot drift away from the thumb over a long drag.
-  if (scroller) scroller.scrollTop = scrollStartTop - (touch.clientY - tapY);
-  if (tapMoved) return;
-  if (Math.hypot(touch.clientX - tapX, touch.clientY - tapY) <= TAP_MOVE_TOLERANCE_PX) return;
-  // Past here the gesture is that scroll, not a tap on whatever happened to be
-  // under the finger when it started.
-  tapMoved = true;
-};
-
-/** What a `click` would have done, for this tab's own controls. */
-const onTap = (action: () => void): void => {
-  scroller = null;
-  if (tapMoved) return;
-  action();
-};
-
-/** The same, for an editor whose controls only listen for `click`. */
-const onEditorTouchEnd = (event: TouchEvent): void => {
-  scroller = null;
-  if (tapMoved) return;
-  const touch = event.changedTouches[0];
-  if (!touch) return;
-  // Where the finger *lifted*, resolved against the live document, so a list
-  // that scrolled or re-rendered mid-gesture cannot hand the click to the
-  // element that used to be there.
-  const element = document.elementFromPoint(touch.clientX, touch.clientY);
-  (element as HTMLElement | null)?.click?.();
-};
 </script>
 
 <template>
-  <div
-    class="practice-tab-body practice-roster-body"
-    @touchstart="onTouchStart"
-    @touchmove="onTouchMove"
-  >
+  <div class="practice-tab-body practice-roster-body">
     <div
       v-for="(entry, index) in roster"
       :key="index"
@@ -333,7 +220,6 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
           class="practice-roster-open"
           :aria-label="`Đổi tướng của ${labelOf(index)}`"
           @click="openEditor(entry, index)"
-          @touchend.prevent="onTap(() => openEditor(entry, index))"
         >
           <span
             class="practice-roster-portrait"
@@ -357,7 +243,6 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
           :aria-label="`Xoá ${labelOf(index)}`"
           title="Xoá bot này"
           @click="removeBot(entry)"
-          @touchend.prevent="onTap(() => removeBot(entry))"
         >
           <i class="fas fa-times"></i>
         </button>
@@ -370,7 +255,6 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
           v-for="flag of BEHAVIOUR_FLAGS"
           :key="flag.key"
           class="pregame-toggle practice-flag"
-          @touchend.prevent="onTap(() => setFlag(entry, flag.key, !entry.behaviour![flag.key]))"
         >
           <input
             type="checkbox"
@@ -395,7 +279,6 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
       class="practice-add-bot"
       :disabled="atCap"
       @click="addBot"
-      @touchend.prevent="onTap(() => !atCap && addBot())"
     >
       <i class="fas fa-plus"></i>
       <span>{{ atCap ? `Đã đủ ${AI_COUNT_MAX} bot — xoá bớt để thêm` : 'Thêm bot' }}</span>
@@ -406,9 +289,6 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
       <div
         v-if="editing"
         class="practice-editor-host"
-        @touchstart="onTouchStart"
-        @touchmove="onTouchMove"
-        @touchend="onEditorTouchEnd"
       >
         <LoadoutEditorModal
           :title="`Đổi tướng — ${labelOf(editingIndex)}`"

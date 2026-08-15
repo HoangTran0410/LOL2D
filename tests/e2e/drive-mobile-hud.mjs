@@ -3,16 +3,9 @@
  * owner actually reported broken: "bấm hud ko hiện modal" (tapping the HUD
  * does not show the modal).
  *
- * The root cause: `GameScene`'s p5 touch handlers call `preventDefault()` on
- * every touch on the page (needed so a drag across the *canvas* does not
- * scroll or pinch-zoom it), and a browser that has had `preventDefault()`
- * called anywhere in a touch gesture will not synthesise the trailing
- * `click` for that gesture — not just on the canvas, on the DOM HUD sitting
- * on top of it too. So this drives everything with *real* CDP touch events,
- * never a synthetic click and never a direct method call on the Vue
- * instance — a script that called `hud.openSpellPicker()` directly would pass
- * even with the underlying bug still in place, which is exactly how the bug
- * shipped the first time.
+ * `GameScene` must cancel gestures on the game canvas without cancelling the
+ * native click/scroll behavior of DOM HUD overlays. This drives everything
+ * with real CDP touch events, never a direct method call on the Vue instance.
  *
  * The bottom-HUD strip this used to tap into no longer renders in touch
  * mode at all (see `MobileHudView.vue`'s file comment): health, mana, buff
@@ -21,10 +14,8 @@
  * one entry point left is the corner button (`.spell-picker-btn`), which
  * opens the practice panel on Đấu thủ. The loadout it used to reach directly
  * is now one tap further in — a roster row opens `LoadoutEditorModal`, which
- * is a *setup-screen* component written against a browser that synthesises
- * clicks and scrolls lists by itself, neither of which happens inside a
- * match. That bridge (`RosterTab.vue`) is the surface this script has to
- * prove works under a real thumb.
+ * is a setup-screen component that relies on native clicks and list scrolling;
+ * this script proves those browser behaviors survive inside a match.
  *
  *   node tests/e2e/drive-mobile-hud.mjs [outPrefix]
  *
@@ -180,7 +171,7 @@ try {
   await page.waitForTimeout(150);
   report.scroll = { scrollBefore, scrollDuring };
   check(
-    'a touch drag inside the editor scrolls it (native scroll is suppressed page-wide, so this is hand-rolled)',
+    'a native touch drag inside the editor scrolls it',
     scrollDuring > scrollBefore + 20,
     `scrollTop ${scrollBefore} -> ${scrollDuring}`
   );

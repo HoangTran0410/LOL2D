@@ -58,17 +58,24 @@ const rules = ref<MatchRulesConfig>(hud.director.getRules());
  * rounds and clamps to `CDR_PERCENT_MIN`/`MAX`, so the label shows the
  * percentage the match actually got and not the one the control asked for.
  */
-const apply = (next: MatchRulesConfig): void => {
+const apply = (next: MatchRulesConfig, persist: boolean): void => {
+  if (!persist) {
+    hud.director.seedRules(next);
+    rules.value = hud.director.getRules();
+    return;
+  }
   hud.director.setRules(next);
   rules.value = hud.director.getRules();
 };
 
-const setCdr = (percent: number): void =>
-  apply({ ...rules.value, cooldownReductionPercent: percent });
+const setCdr = (percent: number, persist: boolean): void =>
+  apply({ ...rules.value, cooldownReductionPercent: percent }, persist);
 
-const setUrf = (on: boolean): void => apply({ ...rules.value, manaFree: on });
+const setUrf = (on: boolean): void => apply({ ...rules.value, manaFree: on }, true);
 
-const onCdrInput = (event: Event): void => setCdr(Number((event.target as HTMLInputElement).value));
+const cdrValue = (event: Event): number => Number((event.target as HTMLInputElement).value);
+const onCdrInput = (event: Event): void => setCdr(cdrValue(event), false);
+const onCdrChange = (event: Event): void => setCdr(cdrValue(event), true);
 
 const onUrfChange = (event: Event): void => setUrf((event.target as HTMLInputElement).checked);
 
@@ -92,17 +99,9 @@ const onUrfChange = (event: Event): void => setUrf((event.target as HTMLInputEle
  * refreshed from it, so a rejected or no-op write cannot leave the tick box
  * disagreeing with the match.
  *
- * ## Why a `touchend` handler as well as `change`
- *
- * A checkbox's `change` fires from the click the browser synthesises after a
- * tap — and there is no such click here. `GameScene`'s p5 touch handlers
- * `preventDefault()` every touch on the *page* (see `hudInteractions.ts`'s
- * file comment), which suppresses the synthetic click everywhere, not just on
- * the canvas. Wired to `change` alone these two toggles were verifiably inert
- * under a real thumb while working perfectly under a mouse. The handler sits
- * on the `<label>`, not the `<input>`, so tapping the word also counts; on a
- * mouse the label's click reaches the input and `change` does the work, and
- * the two paths cannot both fire for one gesture.
+ * `GameScene` cancels only canvas touches, so these checkboxes deliberately use
+ * the browser's native label click and `change` behavior on both pointer and
+ * touch devices.
  */
 const jungle = ref(hud.director.jungleEnabled);
 const minions = ref(hud.director.minionsEnabled);
@@ -123,39 +122,10 @@ const onJungleChange = (event: Event): void =>
 const onMinionsChange = (event: Event): void =>
   setMinions((event.target as HTMLInputElement).checked);
 
-/**
- * Both controls again, for a thumb. `GameScene`'s p5 touch handlers
- * `preventDefault()` every touch on the *page* (see `hudInteractions.ts`'s
- * file comment), which kills the browser's own response to a touch on a form
- * control along with the synthetic click: verified here, not assumed — wired
- * to `@input`/`@change` alone, the slider would not move and the checkbox
- * would not tick under a real `Input.dispatchTouchEvent`, while both worked
- * under a mouse. So the drag is computed from where the finger is across the
- * track, the same hand-rolled shape as `RosterTab.vue`'s own touch
- * scrolling.
- *
- * Snapped to `CDR_PERCENT_STEP`, which is `MatchRulesPanel.vue`'s `step="10"`
- * — one definition, so a finger and a mouse cannot reach different values on
- * the same control. The track's full width is used without allowing for the
- * thumb's own width, which biases the middle of the slider by a few pixels;
- * the snap swallows that, and both ends clamp, so 0% and 90% stay reachable.
- */
 const CDR_PERCENT_STEP = 10;
 
-const onCdrTouch = (event: TouchEvent): void => {
-  const touch = event.touches[0] ?? event.changedTouches[0];
-  if (!touch) return;
-  const track = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  if (!track.width) return;
-
-  const ratio = Math.min(1, Math.max(0, (touch.clientX - track.left) / track.width));
-  const raw = CDR_PERCENT_MIN + ratio * (CDR_PERCENT_MAX - CDR_PERCENT_MIN);
-  setCdr(Math.round(raw / CDR_PERCENT_STEP) * CDR_PERCENT_STEP);
-};
-
 /**
- * Zoom, the same shape as the CDR slider above — including the hand-rolled
- * touch drag, and for the same reason written out there.
+ * Zoom, driven by the native range input for both mouse and touch.
  *
  * A phone has no wheel, and a phone is who the viewport-scaling work exists
  * for; `GameScene.mouseWheel` is the other way in. The control writes the
@@ -173,22 +143,17 @@ const zoom = ref(camera.zoomFactor);
 
 const setZoom = (factor: number): void => {
   camera.setZoomFactor(factor);
-  setZoomFactorPreference(camera.zoomFactor);
+  // The match is paused while this panel is open, so Camera.update() cannot
+  // lerp currentScale toward the new target before the first visible frame.
+  camera.snapToScale();
   zoom.value = camera.zoomFactor; // read back: setZoomFactor clamps
 };
+
+const persistZoom = (): void => setZoomFactorPreference(camera.zoomFactor, hud.touchUi);
 
 const onZoomInput = (event: Event): void =>
   setZoom(Number((event.target as HTMLInputElement).value));
 
-const onZoomTouch = (event: TouchEvent): void => {
-  const touch = event.touches[0] ?? event.changedTouches[0];
-  if (!touch) return;
-  const track = (event.currentTarget as HTMLElement).getBoundingClientRect();
-  if (!track.width) return;
-  const ratio = Math.min(1, Math.max(0, (touch.clientX - track.left) / track.width));
-  const raw = ZOOM_FACTOR_MIN + ratio * (ZOOM_FACTOR_MAX - ZOOM_FACTOR_MIN);
-  setZoom(Math.round(raw / ZOOM_STEP) * ZOOM_STEP);
-};
 /**
  * ## The way out of the match
  *
@@ -263,8 +228,7 @@ const resetDefaults = (): void => {
         :step="CDR_PERCENT_STEP"
         :value="rules.cooldownReductionPercent"
         @input="onCdrInput"
-        @touchstart.prevent="onCdrTouch"
-        @touchmove.prevent="onCdrTouch"
+        @change="onCdrChange"
       />
     </label>
 
@@ -281,22 +245,21 @@ const resetDefaults = (): void => {
         :step="ZOOM_STEP"
         :value="zoom"
         @input="onZoomInput"
-        @touchstart.prevent="onZoomTouch"
-        @touchmove.prevent="onZoomTouch"
+        @change="persistZoom"
       />
     </label>
 
-    <label class="pregame-toggle" @touchend.prevent="setUrf(!rules.manaFree)">
+    <label class="pregame-toggle">
       <input type="checkbox" id="practice-urf" :checked="rules.manaFree" @change="onUrfChange" />
       <span>URF (không tốn mana)</span>
     </label>
 
-    <label class="pregame-toggle" @touchend.prevent="setJungle(!jungle)">
+    <label class="pregame-toggle">
       <input type="checkbox" id="practice-jungle" :checked="jungle" @change="onJungleChange" />
       <span>Quái rừng</span>
     </label>
 
-    <label class="pregame-toggle" @touchend.prevent="setMinions(!minions)">
+    <label class="pregame-toggle">
       <input type="checkbox" id="practice-minions" :checked="minions" @change="onMinionsChange" />
       <span>Lính</span>
     </label>
@@ -317,7 +280,6 @@ const resetDefaults = (): void => {
         :class="{ confirming: confirmingReset }"
         id="practice-reset"
         @click="resetDefaults"
-        @touchend.prevent="resetDefaults"
       >
         <i class="fas fa-rotate-left" aria-hidden="true"></i>
         <span>{{ confirmingReset ? 'Chắc chưa?' : 'Đặt lại mặc định' }}</span>
@@ -329,7 +291,6 @@ const resetDefaults = (): void => {
         :class="{ confirming: confirmingExit }"
         id="practice-exit"
         @click="exitMatch"
-        @touchend.prevent="exitMatch"
       >
         <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
         <span>{{ confirmingExit ? 'Chắc chưa?' : 'Thoát trận' }}</span>

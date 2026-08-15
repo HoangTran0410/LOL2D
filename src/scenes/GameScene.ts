@@ -209,7 +209,11 @@ export default class GameScene extends Scene {
    * `false` is p5's signal to preventDefault, without which a drag across the
    * canvas scrolls the page and a two-thumb gesture pinch-zooms it.
    */
-  private syncTouches(): boolean {
+  private syncTouches(event?: TouchEvent): boolean | undefined {
+    // p5 wires these callbacks on `window`, so they also receive touches from
+    // Vue's settings overlay. Only the game canvas owns/cancels gestures;
+    // overlay controls and scroll containers keep the browser's native path.
+    if (event?.target !== this.canvas?.elt) return undefined;
     // p5 types `touches` as object[]; its entries carry canvas-relative x/y and
     // the browser's own identifier.
     const points = touches as unknown as Array<{ x: number; y: number; id: number }>;
@@ -217,16 +221,16 @@ export default class GameScene extends Scene {
     return false;
   }
 
-  touchStarted() {
-    return this.syncTouches();
+  touchStarted(event?: TouchEvent) {
+    return this.syncTouches(event);
   }
 
-  touchMoved() {
-    return this.syncTouches();
+  touchMoved(event?: TouchEvent) {
+    return this.syncTouches(event);
   }
 
-  touchEnded() {
-    return this.syncTouches();
+  touchEnded(event?: TouchEvent) {
+    return this.syncTouches(event);
   }
 
   exit() {

@@ -28,20 +28,14 @@
  * `@keydown.stop`/`@keyup.stop`/`@keypress.stop`, and that is a cost worth
  * paying for a name and not for a number four buttons can express.
  *
- * ## Touch, twice over
- *
- * `GameScene` `preventDefault()`s every touch on the *page*, which suppresses
- * both the synthetic `click` and native scrolling everywhere — so every
- * control below carries a `touchend` handler beside its `click` one, and this
- * tab scrolls by hand the way `RosterTab` does. Eleven units and four stack
- * rows overflow a 390px-tall landscape phone easily.
+ * The tab uses native DOM click, checkbox and scrolling behavior. `GameScene`
+ * cancels touch gestures only when their target is the game canvas.
  */
 import { computed, inject, ref } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
 import type { RosterEntry } from '../../MatchDirector';
 import type Spell from '../../gameObject/Spell';
 import type { DebugFlags } from '../../debug/DebugOverlay';
-import { TAP_MOVE_TOLERANCE_PX } from '../hudInteractions';
 
 const hud = inject<HudInteractions>('hud')!;
 
@@ -183,57 +177,10 @@ const clearStacks = (spell: Spell): void => {
 
 const STACK_STEPS = [1, 10, 100];
 
-/**
- * The hand-rolled scroll, the same shape and for the same reason as
- * `RosterTab.vue`'s — a gesture the canvas has already `preventDefault()`ed
- * gets neither native scrolling nor a trailing click, so both have to be done
- * here. `onTap` is what a `click` would have been.
- */
-let tapX = 0;
-let tapY = 0;
-let tapMoved = false;
-let scroller: HTMLElement | null = null;
-let scrollStartTop = 0;
-
-const scrollerOf = (start: EventTarget | null): HTMLElement | null => {
-  let node = start instanceof Element ? (start as HTMLElement) : null;
-  while (node && node !== document.body) {
-    const overflow = getComputedStyle(node).overflowY;
-    if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) {
-      return node;
-    }
-    node = node.parentElement;
-  }
-  return null;
-};
-
-const onTouchStart = (event: TouchEvent): void => {
-  const touch = event.touches[0];
-  tapMoved = false;
-  tapX = touch?.clientX ?? 0;
-  tapY = touch?.clientY ?? 0;
-  scroller = scrollerOf(event.target);
-  scrollStartTop = scroller?.scrollTop ?? 0;
-};
-
-const onTouchMove = (event: TouchEvent): void => {
-  const touch = event.touches[0];
-  if (!touch) return;
-  if (scroller) scroller.scrollTop = scrollStartTop - (touch.clientY - tapY);
-  if (tapMoved) return;
-  if (Math.hypot(touch.clientX - tapX, touch.clientY - tapY) <= TAP_MOVE_TOLERANCE_PX) return;
-  tapMoved = true;
-};
-
-const onTap = (action: () => void): void => {
-  scroller = null;
-  if (tapMoved) return;
-  action();
-};
 </script>
 
 <template>
-  <div class="practice-tab-body" @touchstart="onTouchStart" @touchmove="onTouchMove">
+  <div class="practice-tab-body">
     <!-- Who the cheats apply to. One row per unit, the same order and the same
          labels as Đấu thủ, so "Bot 2" means the same unit on both tabs. -->
     <div class="practice-cheat-units">
@@ -245,14 +192,13 @@ const onTap = (action: () => void): void => {
         :class="{ selected: selected === entry }"
         :id="`practice-cheat-unit-${index}`"
         @click="selectUnit(index)"
-        @touchend.prevent="onTap(() => selectUnit(index))"
       >
         <span class="practice-cheat-unit-label">{{ labelOf(index) }}</span>
         <span class="practice-cheat-unit-name">{{ entry.unit.name || 'Không tên' }}</span>
       </button>
     </div>
 
-    <label class="pregame-toggle" @touchend.prevent="onTap(() => setInvulnerable(!invulnerable))">
+    <label class="pregame-toggle">
       <input
         type="checkbox"
         id="practice-cheat-invuln"
@@ -262,7 +208,7 @@ const onTap = (action: () => void): void => {
       <span>Bất tử</span>
     </label>
 
-    <label class="pregame-toggle" @touchend.prevent="onTap(() => setRevealMap(!revealMap))">
+    <label class="pregame-toggle">
       <input
         type="checkbox"
         id="practice-cheat-reveal-map"
@@ -281,7 +227,6 @@ const onTap = (action: () => void): void => {
           v-for="layer of DEBUG_LAYERS"
           :key="layer.key"
           class="pregame-toggle practice-debug-toggle"
-          @touchend.prevent="onTap(() => setDebug(layer.key, !debugOn(layer.key)))"
         >
           <input
             type="checkbox"
@@ -300,7 +245,6 @@ const onTap = (action: () => void): void => {
         class="practice-cheat-btn"
         id="practice-cheat-refill"
         @click="refill"
-        @touchend.prevent="onTap(refill)"
       >
         Hồi đầy
       </button>
@@ -309,7 +253,6 @@ const onTap = (action: () => void): void => {
         class="practice-cheat-btn"
         id="practice-cheat-cooldowns"
         @click="clearCooldowns"
-        @touchend.prevent="onTap(clearCooldowns)"
       >
         Xoá hồi chiêu
       </button>
@@ -334,7 +277,6 @@ const onTap = (action: () => void): void => {
           type="button"
           class="practice-cheat-btn"
           @click="addStacks(spell, step)"
-          @touchend.prevent="onTap(() => addStacks(spell, step))"
         >
           +{{ step }}
         </button>
@@ -342,7 +284,6 @@ const onTap = (action: () => void): void => {
           type="button"
           class="practice-cheat-btn"
           @click="clearStacks(spell)"
-          @touchend.prevent="onTap(() => clearStacks(spell))"
         >
           Xoá
         </button>

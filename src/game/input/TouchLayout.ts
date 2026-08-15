@@ -78,9 +78,9 @@ const onArc = (
  * vertical, which is the arc a right thumb travels without the hand leaving
  * the phone. Summoners take a second ring outside it.
  */
-const ABILITY_ARC_START = 178;
-const ABILITY_ARC_END = 278;
-const SUMMONER_ARC = [196, 252];
+const ABILITY_ARC_START = 160;
+const ABILITY_ARC_END = 290;
+const SUMMONER_ARC = [184, 266];
 
 /**
  * Clear space between neighbouring buttons, as a fraction of an ability's

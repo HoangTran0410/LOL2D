@@ -131,9 +131,8 @@ function buildSpells(player: any): SpellDisplay[] {
       // already counts down from the reduced duration, so using the raw
       // `coolDown` as the denominator would also under-fill the sweep.
       // These are equipped spells, so an owner and its match rules always
-      // exist — the ownerless instances built for a catalogue listing
-      // (`hudInteractions.buildSpellItem`, `pregameCatalog`) cannot see match
-      // rules at all and stay on raw numbers.
+      // exist — ownerless instances built by `pregameCatalog` cannot see match
+      // rules and stay on raw numbers.
       const coolDown = spell?.effectiveCoolDownMs ?? spell?.coolDown ?? 0;
       const manaCost = spell?.effectiveManaCost ?? spell?.manaCost ?? 0;
 

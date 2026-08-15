@@ -17,45 +17,15 @@
  * here is the way *in*: `openSpellPicker` for the corner button and
  * `openPlayerLoadout` for the desktop strip's per-slot shortcut.
  *
- * Touch has no `click`. `GameScene`'s p5 touch handlers call
- * `preventDefault()` on every touch on the page (needed so a drag across the
- * *canvas* does not scroll or pinch-zoom it), and a browser that has had
- * `preventDefault()` called anywhere in a touch gesture will not synthesise
- * the trailing `click` for that gesture — not just on the canvas, on anything.
- * That is a real, verified difference from a desktop click, not a guess: a
- * real touch dispatched at a HUD icon leaves `showSpellsPicker` false, while
- * the same coordinates dispatched as a mouse click open it. So nothing here
- * that has to work under a thumb is wired to `@click` alone — the actions are
- * driven from `touchend` directly, and `@click` stays only for the mouse.
+ * `GameScene` now cancels only touches whose target is the game canvas. DOM
+ * controls layered above it retain native click, input and scroll behavior.
  */
 import { markRaw, reactive, toRaw } from 'vue';
 import type Game from '../Game';
 import type MatchDirector from '../MatchDirector';
 import type Camera from '../gameObject/map/Camera';
 import { removeAccents } from '../../utils/index';
-import * as AllSpells from '../gameObject/spells/index';
-import { SpellGroups } from '../preset';
-import AssetManager, { type AssetKey } from '../../managers/AssetManager';
-
-/**
- * Past this many CSS pixels of travel, a touch is a drag — most often a thumb
- * scrolling a long list (the practice panel's roster, the loadout editor's
- * shelves) — and its `touchend` must not also act on whichever control
- * happened to be under the finger when the gesture started.
- * Same order of magnitude as `TouchLayout.TAP_SLOP` on the canvas controls,
- * for the same reason: wider than the jitter a still thumb produces, narrower
- * than a deliberate movement.
- */
-export const TAP_MOVE_TOLERANCE_PX = 16;
-
-export interface SpellGroupDisplay {
-  name: string;
-  image: string;
-  background: string;
-  imageKey: AssetKey | null;
-  backgroundKey: AssetKey | null;
-  spells: SpellItemDisplay[];
-}
+import type { AssetKey } from '../../managers/AssetManager';
 
 export interface SpellItemDisplay {
   name: string;
@@ -85,34 +55,6 @@ export function filterSpells(spells: SpellItemDisplay[], searchText: string): Sp
     const desc = removeAccents(spell.description.toLowerCase());
     return name.includes(search) || desc.includes(search);
   });
-}
-
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-function buildSpellGroup(group: any): SpellGroupDisplay {
-  const spells: SpellItemDisplay[] = group.spells.map(buildSpellItem);
-  return {
-    name: group.name,
-    image: group.image
-      ? AssetManager.get(group.image).url
-      : AssetManager.placeholder(group.name).url,
-    background: group.background ? AssetManager.get(group.background).url : '',
-    imageKey: group.image,
-    backgroundKey: group.background,
-    spells,
-  };
-}
-
-function buildSpellItem(SpellClass: any): SpellItemDisplay {
-  const spellInstance = new SpellClass(null);
-  return {
-    name: spellInstance.name,
-    image: spellInstance.image?.path,
-    description: spellInstance.description,
-    coolDown: spellInstance.coolDown,
-    manaCost: spellInstance.manaCost,
-    spellClass: SpellClass,
-    assetKey: spellInstance.image?.key ?? null,
-  };
 }
 
 export interface HudInteractions {
@@ -146,9 +88,6 @@ export interface HudInteractions {
    * travels through the object both of them already inject.
    */
   editPlayerSlot: number | null;
-  /** Every spell icon there is, for the preload below. */
-  allSpells: SpellItemDisplay[];
-  spellGroups: SpellGroupDisplay[];
   spellHover: any;
   spellInfo: { top: string; bottom: string; left: string; width: string };
   /** Mirrors game.touchControls.enabled; both views read it, neither owns it. */
@@ -191,13 +130,6 @@ export interface HudInteractions {
    */
   openPlayerLoadout(index: number): void;
   closeSpellPicker(): void;
-  /**
-   * Warms every spell icon's asset when the panel opens. Still worth doing
-   * with the picker gone: `RosterTab`'s loadout editor (`KitRoster`) renders
-   * the same roster from the same `AssetManager` keys, one tap further in.
-   */
-  preloadSpellIcons(): void;
-
   mouseover(spellProxy: any, event: any): void;
   mouseout(spellProxy: any): void;
   showSpellInfo(spellProxy: any, element: any): void;
@@ -241,8 +173,6 @@ export function createHudInteractions(game: Game): HudInteractions {
     showSpellsPicker: false,
     editPlayerSlot: null as number | null,
     onEscapeInner: null as (() => boolean) | null,
-    allSpells: Object.values<any>(AllSpells).map(buildSpellItem),
-    spellGroups: (SpellGroups as any[]).map(buildSpellGroup),
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
@@ -272,7 +202,6 @@ export function createHudInteractions(game: Game): HudInteractions {
     openSpellPicker(): void {
       state.editPlayerSlot = null;
       state.showSpellsPicker = true;
-      state.preloadSpellIcons();
       game.pause();
       state.spellHover = null;
     },
@@ -287,23 +216,8 @@ export function createHudInteractions(game: Game): HudInteractions {
     openPlayerLoadout(index: number): void {
       state.editPlayerSlot = index;
       state.showSpellsPicker = true;
-      state.preloadSpellIcons();
       game.pause();
       state.spellHover = null;
-    },
-
-    preloadSpellIcons(): void {
-      const keys = new Set<AssetKey>();
-      const add = (key: AssetKey | null) => {
-        if (key) keys.add(key);
-      };
-      for (const spell of state.allSpells) add(spell.assetKey);
-      for (const group of state.spellGroups) {
-        add(group.imageKey);
-        add(group.backgroundKey);
-        for (const spell of group.spells) add(spell.assetKey);
-      }
-      void AssetManager.ensureMany([...keys]).catch(error => console.warn(error));
     },
 
     closeSpellPicker(): void {

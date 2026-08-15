@@ -19,9 +19,8 @@ import { context } from '../practice/helpers';
  * `setStackCount` is the one call that covers both, and it is absolute rather
  * than incremental so "give me 100" and "back to zero" are the same method.
  *
- * These first four need no owner at all — the catalogue already builds
- * ownerless spell instances (`hudInteractions.buildSpellItem`), and the stack
- * field and the description are the spell's own.
+ * These first four need no owner at all — `pregameCatalog` builds ownerless
+ * spell instances too, and the stack field and description are the spell's own.
  */
 const nasusQ = (): Nasus_Q => new Nasus_Q(null);
 

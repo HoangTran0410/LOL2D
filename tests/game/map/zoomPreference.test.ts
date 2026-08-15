@@ -4,9 +4,10 @@ import {
   zoomFactorPreference,
 } from '../../../src/game/gameObject/map/Camera';
 
-const withEnv = (search: string, stored: string | null) => {
+const withEnv = (search: string, stored: string | null, touchStored: string | null = null) => {
   const store = new Map<string, string>();
   if (stored !== null) store.set('lol2d.zoomFactor', stored);
+  if (touchStored !== null) store.set('lol2d.zoomFactor.touch', touchStored);
   vi.stubGlobal('window', {
     location: { search },
     localStorage: {
@@ -56,5 +57,27 @@ describe('zoomFactorPreference', () => {
     setZoomFactorPreference(1.2);
     expect(store.get('lol2d.zoomFactor')).toBe('1.2');
     expect(zoomFactorPreference()).toBeCloseTo(1.2, 5);
+  });
+
+  it('uses a separate 100% default for touch instead of inheriting an old desktop zoom', () => {
+    withEnv('', '0.6');
+
+    expect(zoomFactorPreference(true)).toBe(1);
+  });
+
+  it('round-trips the touch preference through its own key', () => {
+    const store = withEnv('', '0.8');
+
+    setZoomFactorPreference(1.3, true);
+
+    expect(store.get('lol2d.zoomFactor.touch')).toBe('1.3');
+    expect(store.get('lol2d.zoomFactor')).toBe('0.8');
+    expect(zoomFactorPreference(true)).toBeCloseTo(1.3, 5);
+  });
+
+  it('keeps the query override highest-priority in touch mode', () => {
+    withEnv('?zoom=1.4', '0.7', '0.9');
+
+    expect(zoomFactorPreference(true)).toBeCloseTo(1.4, 5);
   });
 });

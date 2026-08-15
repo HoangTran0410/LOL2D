@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { computeHudState, HUD_UPDATE_INTERVAL_MS } from '../../../src/game/hud/hudState';
+import InGameHUD from '../../../src/game/hud/InGameHUD';
 
 /**
  * `computeHudState` only ever reads `game.player` — a fake shaped like the
@@ -154,6 +155,22 @@ describe('HUD_UPDATE_INTERVAL_MS', () => {
   it('is finer than the whole-second cooldown text it feeds', () => {
     expect(HUD_UPDATE_INTERVAL_MS).toBeLessThan(1000);
     expect(HUD_UPDATE_INTERVAL_MS).toBeGreaterThan(0);
+  });
+
+  it('skips state snapshots while the practice panel has paused the game', () => {
+    const setState = vi.fn();
+    const hud = Object.create(InGameHUD.prototype) as {
+      game: { paused: boolean; touchControls: { enabled: boolean } };
+      view: { hud: { touchUi: boolean }; setState: typeof setState };
+      update(): void;
+    };
+    hud.game = { paused: true, touchControls: { enabled: true } };
+    hud.view = { hud: { touchUi: false }, setState };
+
+    hud.update();
+
+    expect(hud.view.hud.touchUi).toBe(true);
+    expect(setState).not.toHaveBeenCalled();
   });
 });
 

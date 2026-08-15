@@ -194,7 +194,11 @@ export default class Camera {
 }
 
 /** Mirrors `TouchControls.ts:160`'s `'lol2d.touchControls'`. */
-const ZOOM_STORAGE_KEY = 'lol2d.zoomFactor';
+const POINTER_ZOOM_STORAGE_KEY = 'lol2d.zoomFactor';
+const TOUCH_ZOOM_STORAGE_KEY = 'lol2d.zoomFactor.touch';
+
+const zoomStorageKey = (touchUi: boolean): string =>
+  touchUi ? TOUCH_ZOOM_STORAGE_KEY : POINTER_ZOOM_STORAGE_KEY;
 
 const finiteAbove = (value: number, floor: number): boolean =>
   Number.isFinite(value) && value > floor;
@@ -205,7 +209,7 @@ const finiteAbove = (value: number, floor: number): boolean =>
  * same reason: the query parameter is what makes this verifiable from a
  * Playwright run, independent of whatever the developer has stored.
  */
-export function zoomFactorPreference(): number {
+export function zoomFactorPreference(touchUi = false): number {
   try {
     const query = new URLSearchParams(window.location.search).get('zoom');
     if (query !== null) {
@@ -216,7 +220,7 @@ export function zoomFactorPreference(): number {
     /* no location: fall through to the stored preference */
   }
   try {
-    const stored = Number(window.localStorage.getItem(ZOOM_STORAGE_KEY));
+    const stored = Number(window.localStorage.getItem(zoomStorageKey(touchUi)));
     if (finiteAbove(stored, 0)) return clampZoomFactor(stored);
   } catch {
     /* storage blocked: fall through to the default */
@@ -224,9 +228,9 @@ export function zoomFactorPreference(): number {
   return 1;
 }
 
-export function setZoomFactorPreference(factor: number): void {
+export function setZoomFactorPreference(factor: number, touchUi = false): void {
   try {
-    window.localStorage.setItem(ZOOM_STORAGE_KEY, String(clampZoomFactor(factor)));
+    window.localStorage.setItem(zoomStorageKey(touchUi), String(clampZoomFactor(factor)));
   } catch {
     /* storage blocked: the setting still works for this session */
   }

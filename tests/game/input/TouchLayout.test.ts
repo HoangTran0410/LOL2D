@@ -59,6 +59,30 @@ describe('computeTouchLayout', () => {
     expect(abilities[3].y).toBeLessThan(abilities[0].y);
   });
 
+  it('keeps every ability compact around attack without crowding touch targets', () => {
+    const layout = computeTouchLayout(PHONE, SLOTS);
+    const attack = layout.buttons.find(button => button.slot === 0)!;
+    const abilities = [1, 2, 3, 4].map(slot => layout.buttons.find(button => button.slot === slot)!);
+    const summoners = [5, 6].map(slot => layout.buttons.find(button => button.slot === slot)!);
+
+    for (const ability of abilities) {
+      const edgeGap =
+        Math.hypot(ability.x - attack.x, ability.y - attack.y) - ability.radius - attack.radius;
+      expect(edgeGap, `slot ${ability.slot} is too far from attack`).toBeLessThanOrEqual(32);
+      expect(edgeGap, `slot ${ability.slot} crowds attack`).toBeGreaterThanOrEqual(8);
+      expect(ability.radius * 2).toBeGreaterThanOrEqual(44);
+    }
+
+    const furthestAbilityCentre = Math.max(
+      ...abilities.map(ability => Math.hypot(ability.x - attack.x, ability.y - attack.y))
+    );
+    for (const summoner of summoners) {
+      expect(Math.hypot(summoner.x - attack.x, summoner.y - attack.y)).toBeGreaterThan(
+        furthestAbilityCentre
+      );
+    }
+  });
+
   it('never lets two buttons overlap, at any viewport', () => {
     for (const viewport of [
       PHONE,

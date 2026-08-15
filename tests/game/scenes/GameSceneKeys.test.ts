@@ -108,3 +108,34 @@ describe('the way out that replaces Escape', () => {
     expect(hud.showSpellsPicker).toBe(false);
   });
 });
+
+describe('GameScene touch ownership', () => {
+  it('forwards canvas touches to the game and cancels browser gestures', () => {
+    const canvas = {};
+    const syncTouches = vi.fn();
+    const scene = new GameScene({} as never);
+    scene.canvas = { elt: canvas };
+    scene.game = { syncTouches } as never;
+    vi.stubGlobal('touches', [{ id: 7, x: 120, y: 240 }]);
+
+    const handled = scene.touchStarted({ target: canvas } as TouchEvent);
+
+    expect(handled).toBe(false);
+    expect(syncTouches).toHaveBeenCalledWith([{ id: 7, x: 120, y: 240 }]);
+  });
+
+  it('leaves settings-overlay touches to native DOM scrolling and controls', () => {
+    const canvas = {};
+    const overlay = {};
+    const syncTouches = vi.fn();
+    const scene = new GameScene({} as never);
+    scene.canvas = { elt: canvas };
+    scene.game = { syncTouches } as never;
+    vi.stubGlobal('touches', [{ id: 8, x: 320, y: 180 }]);
+
+    const handled = scene.touchMoved({ target: overlay } as TouchEvent);
+
+    expect(handled).toBeUndefined();
+    expect(syncTouches).not.toHaveBeenCalled();
+  });
+});

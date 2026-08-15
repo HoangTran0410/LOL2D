@@ -9,18 +9,10 @@
  *
  * ## Why so much of this is dispatched as a real touch
  *
- * `GameScene`'s p5 touch callbacks return `false`, i.e. `preventDefault()` on
- * every touch on the *page* — needed so a drag across the canvas is a control
- * input rather than a scroll. A browser that has had `preventDefault()` called
- * anywhere in a touch gesture synthesises neither the trailing `click` nor its
- * own scrolling, and not just over the canvas: over the DOM HUD sitting on top
- * of it too. Every tab of this panel was built against that, and three separate
- * controls (the CDR slider, the world toggles, the whole loadout editor
- * teleported out of the roster tab) were verifiably dead under a thumb while
- * working perfectly under a mouse. So each control *family* here is driven at
- * least once with a real `Input.dispatchTouchEvent` through CDP — a mouse-only
- * script would have gone green over a feature that did not work on the device
- * this game is mostly played on.
+ * `GameScene` cancels gestures only when they originate on the game canvas.
+ * The DOM panel must retain native clicks, range dragging, checkboxes and
+ * momentum scrolling, so each control family here is driven at least once
+ * with a real `Input.dispatchTouchEvent` through CDP.
  *
  * ## What it proves, in order
  *
@@ -82,6 +74,7 @@ import { chromium } from 'playwright';
 const OUT = process.argv[2] ?? '/tmp/lol2d-practice-panel';
 /** Roomy enough that neither of `styles/hud.css`'s full-bleed media queries applies. */
 const VIEWPORT = { width: 1280, height: 900 };
+const MOBILE_VIEWPORT = { width: 844, height: 390 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
@@ -491,6 +484,68 @@ try {
 
   await openPanel();
   await selectTab('rules', true); // one tab switch under a thumb
+  await page.setViewportSize(MOBILE_VIEWPORT);
+  await page.waitForTimeout(100);
+  const rulesBody = await page.locator('.practice-tab-body').boundingBox();
+  if (!rulesBody) throw new Error('Trận đấu body has no bounding box');
+  await gameEval(() => {
+    document.querySelector('.practice-tab-body').scrollTop = 0;
+  });
+  await touchStart([{ x: rulesBody.x + rulesBody.width / 2, y: rulesBody.y + rulesBody.height - 24 }]);
+  await page.waitForTimeout(80);
+  await touchMove([{ x: rulesBody.x + rulesBody.width / 2, y: rulesBody.y + 24 }]);
+  await page.waitForTimeout(80);
+  await touchEnd();
+  await page.waitForTimeout(200);
+  report.rulesScrollTop = await gameEval(
+    () => document.querySelector('.practice-tab-body')?.scrollTop ?? 0
+  );
+  check(
+    'Trận đấu: native touch drag scrolls the modal body',
+    report.rulesScrollTop > 0,
+    `scrollTop=${report.rulesScrollTop}`
+  );
+  await gameEval(() => {
+    document.querySelector('.practice-tab-body').scrollTop = 0;
+  });
+  await page.setViewportSize(VIEWPORT);
+  await page.waitForTimeout(100);
+  report.zoomInitial = await gameEval(() => {
+    const camera = window.__lol2d.scene.oScene.game.camera;
+    return {
+      factor: camera.zoomFactor,
+      scale: camera.scale,
+      currentScale: camera.currentScale,
+      storedTouch: localStorage.getItem('lol2d.zoomFactor.touch'),
+    };
+  });
+  check(
+    'Trận đấu: a fresh touch game starts at 100% zoom',
+    report.zoomInitial.factor === 1 && report.zoomInitial.storedTouch === null,
+    JSON.stringify(report.zoomInitial)
+  );
+  await page.locator('#practice-zoom').evaluate(element => {
+    element.value = '1.3';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await page.waitForTimeout(100);
+  report.zoomWhilePaused = await gameEval(() => {
+    const camera = window.__lol2d.scene.oScene.game.camera;
+    return {
+      factor: camera.zoomFactor,
+      scale: camera.scale,
+      currentScale: camera.currentScale,
+      storedTouch: localStorage.getItem('lol2d.zoomFactor.touch'),
+    };
+  });
+  check(
+    'Trận đấu: zoom snaps immediately while paused and stores the touch preference',
+    report.zoomWhilePaused.factor === 1.3 &&
+      report.zoomWhilePaused.storedTouch === '1.3' &&
+      Math.abs(report.zoomWhilePaused.currentScale - report.zoomWhilePaused.scale) < 1e-9,
+    JSON.stringify(report.zoomWhilePaused)
+  );
   const beforeCdr = await gameEval(() => ({
     multiplier: window.__lol2d.scene.oScene.game.matchRules.cooldownMultiplier,
     probeCooldownMs: window.__practiceProbe.effectiveCoolDownMs,
@@ -498,9 +553,7 @@ try {
       window.__practiceProbe === window.__lol2d.scene.oScene.game.player.spells[1],
     label: document.querySelector('#practice-cdr-value')?.textContent ?? null,
   }));
-  // A real drag across the track: `RulesTab` computes the percentage from the
-  // finger's x, because a range input gets neither the browser's own drag nor a
-  // synthetic click once p5 has called preventDefault on the gesture.
+  // A real native drag across the range track.
   const track = await boxOf('#practice-cdr');
   await touchStart([{ x: track.x, y: track.y }]);
   await page.waitForTimeout(80);
@@ -542,6 +595,16 @@ try {
   await page.screenshot({ path: `${OUT}-05-rules-world.png` });
   await closePanel();
   await runMatch();
+  report.zoomAfterClose = await gameEval(() => {
+    const camera = window.__lol2d.scene.oScene.game.camera;
+    return { factor: camera.zoomFactor, scale: camera.scale, currentScale: camera.currentScale };
+  });
+  check(
+    'closing settings keeps the chosen zoom with no stale-scale jump',
+    report.zoomAfterClose.factor === 1.3 &&
+      Math.abs(report.zoomAfterClose.currentScale - report.zoomAfterClose.scale) < 1e-6,
+    JSON.stringify(report.zoomAfterClose)
+  );
   const monstersAfter = await monsterCensus();
   report.jungle = { monstersBefore, jungleFlag, monstersAfter };
   check(
@@ -650,8 +713,9 @@ try {
     JSON.stringify(report.debugLayers)
   );
 
-  // The stack row: +10 has to move the spell itself *and* the HUD badge, which
-  // reads `Spell.stackCount` off the live spell on the 20Hz HUD tick.
+  // The stack row updates the live spell and the visible tab immediately. The
+  // covered HUD deliberately stays on its last snapshot while the panel has
+  // paused the match; rebuilding it at 20Hz under the modal was wasted work.
   const stackId = cheatShape.stackRows[0];
   const stacksBefore = await gameEval(
     () => window.__lol2d.scene.oScene.game.player.spells[1].stackCount
@@ -681,12 +745,12 @@ try {
   await page.waitForTimeout(300);
   report.stacks = { stacksBefore, stacksAfter, hudBadge };
   check(
-    "Gian lận: +10 moves the spell's own count, the tab's badge and the HUD badge together",
+    "Gian lận: +10 updates the live spell/tab while the covered HUD snapshot stays paused",
     stacksBefore === 0 &&
       stacksAfter.spell === 10 &&
       stacksAfter.tabBadge === '10' &&
       hudBadge.icons > 1 &&
-      hudBadge.badge === '10',
+      hudBadge.badge === '0',
     JSON.stringify(report.stacks)
   );
 
@@ -803,6 +867,9 @@ try {
       jungleEnabled: game.director.jungleEnabled,
       monsters: game.monsters.length,
       bots: game.director.bots().length,
+      zoomFactor: game.camera.zoomFactor,
+      zoomScale: game.camera.scale,
+      zoomCurrentScale: game.camera.currentScale,
     };
   });
   await openPanel();
@@ -896,6 +963,12 @@ try {
       matchAfterReload.jungleEnabled === false &&
       matchAfterReload.monsters === 0 &&
       matchAfterReload.bots === 2,
+    JSON.stringify(matchAfterReload)
+  );
+  check(
+    'the touch zoom preference survives a full reload at the snapped scale',
+    matchAfterReload.zoomFactor === 1.3 &&
+      Math.abs(matchAfterReload.zoomCurrentScale - matchAfterReload.zoomScale) < 1e-9,
     JSON.stringify(matchAfterReload)
   );
 

@@ -141,13 +141,13 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       <button v-if="shelf.kit.length" type="button" class="kit-shelf-heading kit-shelf-apply"
         :title="`Dùng cả bộ chiêu ${shelf.name}`" @click="emit('applyKit', shelf)">
         <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name" />
+          :alt="shelf.name" loading="lazy" decoding="async" />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
         <span class="kit-apply-chip">Dùng bộ</span>
       </button>
       <div v-else class="kit-shelf-heading">
         <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name" />
+          :alt="shelf.name" loading="lazy" decoding="async" />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
       </div>
 
@@ -162,7 +162,7 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
                they are, and the spell's own name is a hover or a hold away
                (`useSpellPeek`) — spelling all of them out is what made this
                roster twice as tall as the in-game one. -->
-          <SpellIcon :display="item.entry.display" />
+          <SpellIcon :display="item.entry.display" lazy />
         </button>
       </div>
     </section>

@@ -8,7 +8,10 @@
  */
 import AssetManager from '../../managers/AssetManager';
 
-defineProps<{ display: { iconUrl: string | null; name: string } | null }>();
+defineProps<{
+  display: { iconUrl: string | null; name: string } | null;
+  lazy?: boolean;
+}>();
 </script>
 
 <template>
@@ -17,6 +20,8 @@ defineProps<{ display: { iconUrl: string | null; name: string } | null }>();
     :src="display.iconUrl ?? AssetManager.placeholder(display.name).url"
     :alt="display.name"
     :title="display.name"
+    :loading="lazy ? 'lazy' : 'eager'"
+    decoding="async"
   />
   <i v-else class="fas fa-random"></i>
 </template>

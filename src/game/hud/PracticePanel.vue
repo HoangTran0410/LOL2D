@@ -92,7 +92,6 @@ const tab = activePracticeTab;
         :class="{ selected: tab === item.id }"
         :id="`practice-tab-${item.id}`"
         @click="tab = item.id"
-        @touchend.prevent="tab = item.id"
       >
         {{ item.label }}
       </button>
@@ -105,7 +104,6 @@ const tab = activePracticeTab;
         id="practice-close"
         title="Đóng"
         @click="hud.closeSpellPicker()"
-        @touchend.prevent="hud.closeSpellPicker()"
       >
         <i class="fas fa-times"></i>
       </button>

@@ -93,6 +93,7 @@ export default class InGameHUD {
     // stored preference all reach the controls first — so it reads it back
     // rather than assuming its own button was the last thing to change it.
     this.view.hud.touchUi = this.game.touchControls?.enabled ?? false;
+    if (this.game.paused) return;
     this.view.setState(computeHudState(this.game));
   }
 

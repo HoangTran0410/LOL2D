@@ -1,8 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createHudInteractions,
   filterSpells,
-  TAP_MOVE_TOLERANCE_PX,
   type SpellItemDisplay,
 } from '../../../src/game/hud/hudInteractions';
 
@@ -51,10 +51,21 @@ describe('filterSpells', () => {
   });
 });
 
-describe('hudInteractions tuning constants', () => {
-  it('the drag tolerance is wider than jitter, narrower than a deliberate move', () => {
-    expect(TAP_MOVE_TOLERANCE_PX).toBeGreaterThan(4);
-    expect(TAP_MOVE_TOLERANCE_PX).toBeLessThan(40);
+describe('practice range controls', () => {
+  it('applies CDR live without persisting every input event, then commits on change', () => {
+    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+
+    expect(source).toContain('hud.director.seedRules(next)');
+    expect(source).toContain('@change="onCdrChange"');
+  });
+
+  it('lazy-loads below-fold catalogue art instead of decoding it all on modal open', () => {
+    const roster = readFileSync('src/scenes/setup/KitRoster.vue', 'utf8');
+    const icon = readFileSync('src/scenes/setup/SpellIcon.vue', 'utf8');
+
+    expect(roster).toContain('loading="lazy"');
+    expect(roster).toContain('<SpellIcon :display="item.entry.display" lazy />');
+    expect(icon).toContain(':loading="lazy ? \'lazy\' : \'eager\'"');
   });
 });
 
@@ -82,6 +93,14 @@ describe('createHudInteractions — the ways into the practice panel', () => {
     expect(hud.showSpellsPicker).toBe(true);
     expect(hud.editPlayerSlot).toBeNull();
     expect(game.pause).toHaveBeenCalledOnce();
+  });
+
+  it('does not build or expose an unused full spell catalogue', () => {
+    const hud = createHudInteractions(fakeGame());
+
+    expect('allSpells' in hud).toBe(false);
+    expect('spellGroups' in hud).toBe(false);
+    expect('preloadSpellIcons' in hud).toBe(false);
   });
 
   it('always opens: a second press cannot toggle an open panel shut', () => {

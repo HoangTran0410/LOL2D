@@ -158,6 +158,17 @@ interface SlotGesture {
 }
 
 const STORAGE_KEY = 'lol2d.touchControls';
+const TOUCH_HAPTIC_MS = 10;
+
+const pulseTouchHaptic = (): void => {
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate(TOUCH_HAPTIC_MS);
+    }
+  } catch {
+    // Vibration is optional and may be denied by the browser or device policy.
+  }
+};
 
 /**
  * The player's stored choice: run capability detection, or force one side.
@@ -398,6 +409,7 @@ export class TouchControls {
       gesture.aim = this.aimFor(gesture);
       this.host.setSlotAim(button.slot, gesture.aim ? gesture.aim.cursorWorld : null);
       this.host.beginSlot(button.slot);
+      pulseTouchHaptic();
       return;
     }
 

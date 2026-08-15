@@ -466,6 +466,8 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -634,9 +636,8 @@
    `position: sticky` against the tab body, which is the panel's scroll region
    (`.practice-tab-body` above): ten two-line rows are ~1100px and the panel is
    90vh, so a button at the end of that flow is off screen in every viewport
-   this game runs on — and the tab body's touch scrolling is hand-rolled
-   (RosterTab.vue), which is a lot of gesture to ask for before the primary
-   action of the tab is even reachable. */
+   this game runs on, so native scrolling should not be required before the
+   primary action is reachable. */
 .practice-add-bot {
   position: sticky;
   bottom: 0;
@@ -672,18 +673,13 @@
    backdrop resolves against the viewport rather than against `.practice-panel`
    (which is a transformed element, and so the containing block for any fixed
    descendant — see RosterTab.vue). `display: contents` keeps that wrapper out
-   of the layout entirely while leaving it in the DOM tree, which is what the
-   touch→click bridge listens on. */
+   of the layout entirely while leaving native DOM events intact. */
 .practice-editor-host {
   display: contents;
 }
 
-/* The CDR slider is dragged by hand under a thumb (see `RulesTab.vue`: the
-   canvas's page-wide `preventDefault()` kills the native drag), so it also has
-   to *be* a thumb target — the native control is ~16px tall, and a 16px-tall
-   strip is the one thing a finger cannot land on. 44px, the same minimum the
-   slot pills and the corner button are held to. The track stays centred in the
-   taller box; only the hit area grows. */
+/* Native range controls still need a generous hit box: the browser track is
+   ~16px tall, while a thumb target should be at least 44px. */
 .practice-tab-body input[type='range'] {
   height: 44px;
 }

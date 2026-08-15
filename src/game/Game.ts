@@ -152,13 +152,14 @@ export default class Game {
     // constructor as anything other than a playable config.
     const pregameConfig = loadPregameConfig();
     this.matchRules = toMatchRules(pregameConfig.rules);
+    const touchUi = touchControlsPreference();
 
     this.worldMouse = createVector(0, 0);
     this.camera = new Camera();
     // Before anything reads a world position from the screen. `width`/`height`
     // are valid here: `Game` is constructed from `GameScene.enter()`, after
     // `createCanvas`.
-    this.camera.setZoomFactor(zoomFactorPreference());
+    this.camera.setZoomFactor(zoomFactorPreference(touchUi));
     this.camera.fitTo(width, height);
     // A match that boots and is never resized must not sit at the constructed
     // 0.5 default, and the opening lerp from it would now zoom a phone *out*.
@@ -198,7 +199,7 @@ export default class Game {
       },
     });
 
-    this.touchControls = new TouchControls(this.touchControlsHost(), touchControlsPreference());
+    this.touchControls = new TouchControls(this.touchControlsHost(), touchUi);
     this.applyTouchUiClass();
 
     // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
