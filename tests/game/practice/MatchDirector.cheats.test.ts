@@ -122,3 +122,38 @@ describe('MatchDirector — cheats', () => {
     expect(player.spells[0].currentCooldown).toBe(attackBefore);
   });
 });
+
+/**
+ * The debug hub's state. Plain fields on the director, deliberately: the panel
+ * holds the match paused while a tab is open, so `ObjectManager.update()` never
+ * runs, and anything a tab reads has to be readable without it.
+ */
+describe('debug flags', () => {
+  it('starts every layer off', () => {
+    const { context: ctx } = context();
+    const director = new MatchDirector(ctx);
+
+    expect(director.debug).toMatchObject({
+      routes: false,
+      terrain: false,
+      collision: false,
+      vision: false,
+      quadtree: false,
+    });
+  });
+
+  it('routes and navigation.debugRoutes are one value, so N and the panel agree', () => {
+    const { context: ctx } = context();
+    const navigation = { debugRoutes: false };
+    (ctx as { navigation?: unknown }).navigation = navigation;
+    const director = new MatchDirector(ctx);
+
+    // The N key's side (`Game.keyPressed` flips the navigation field).
+    navigation.debugRoutes = true;
+    expect(director.debug.routes).toBe(true);
+
+    // The panel's side.
+    director.debug.routes = false;
+    expect(navigation.debugRoutes).toBe(false);
+  });
+});

@@ -28,6 +28,7 @@ import MinionSpawner from './managers/MinionSpawner';
 import MatchDirector from './MatchDirector';
 import NavigationSystem from './nav/NavigationSystem';
 import { drawNavDebug } from './nav/NavDebugOverlay';
+import { drawDebugOverlay } from './debug/DebugOverlay';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
 import SpellInputController from './spell/input/SpellInputController';
@@ -348,6 +349,10 @@ export default class Game {
       });
       this.objectManager.draw();
       drawNavDebug(this);
+      // The rest of the debug layers (terrain, collision, vision, quadtree),
+      // toggled in the Gian lận tab. Each checks its flag before iterating, so
+      // this line costs a handful of property reads with everything off.
+      drawDebugOverlay(this);
     });
 
     this.fogOfWar.draw();

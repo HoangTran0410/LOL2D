@@ -50,6 +50,7 @@ import { getChampionPresetFromLoadout } from './preset';
 import type GameObject from './gameObject/GameObject';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
 import type Monster from './gameObject/attackableUnits/Monster';
+import { createDebugFlags, type DebugFlags } from './debug/DebugOverlay';
 
 /**
  * A bot's three "does it act on its own" switches. Plain instance fields on
@@ -129,7 +130,25 @@ export default class MatchDirector {
    */
   private readonly loadouts = new WeakMap<Champion, ChampionLoadout>();
 
-  constructor(private readonly game: MatchDirectorContext) {}
+  /**
+   * Which debug layers are on. Plain fields, on purpose: the panel holds the
+   * match paused while a tab is open, so `ObjectManager.update()` and
+   * `AttackableUnit.update()` do not run, and a toggle that needed the update
+   * loop to take effect would appear dead for as long as it is visible.
+   *
+   * `routes` is not stored here — `createDebugFlags` aliases it onto
+   * `navigation.debugRoutes`, so the `N` key and the panel's checkbox are two
+   * views of one boolean rather than two booleans that can disagree.
+   *
+   * Assigned in the constructor rather than as a field initializer because it
+   * needs `game`, and a parameter property is not assigned until the
+   * constructor body under `useDefineForClassFields`.
+   */
+  readonly debug: DebugFlags;
+
+  constructor(private readonly game: MatchDirectorContext) {
+    this.debug = createDebugFlags(game);
+  }
 
   /**
    * The derived rules every spell reads at cast time, exposed read-only.
