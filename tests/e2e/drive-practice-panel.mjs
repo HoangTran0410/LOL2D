@@ -161,8 +161,7 @@ const gameEval = (fn, arg) => page.evaluate(fn, arg);
 const hudFlag = () =>
   gameEval(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker);
 const isPaused = () => gameEval(() => window.__lol2d.scene.oScene.game.paused);
-const rosterCount = () =>
-  gameEval(() => window.__lol2d.scene.oScene.game.director.roster().length);
+const rosterCount = () => gameEval(() => window.__lol2d.scene.oScene.game.director.roster().length);
 const directorBotCount = () =>
   gameEval(() => window.__lol2d.scene.oScene.game.director.bots().length);
 
@@ -230,9 +229,13 @@ const runMatch = (ms = 700) => page.waitForTimeout(ms);
 
 const startMatch = async () => {
   await page.click('#play-btn');
-  await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.inGameHUD?.vueInstance, null, {
-    timeout: 30_000,
-  });
+  await page.waitForFunction(
+    () => window.__lol2d?.scene?.oScene?.game?.inGameHUD?.vueInstance,
+    null,
+    {
+      timeout: 30_000,
+    }
+  );
   await page.waitForTimeout(1_200);
 };
 
@@ -496,9 +499,7 @@ try {
   await selectTab('world');
   const monstersBefore = await monsterCensus();
   await tapSelector('#practice-jungle'); // real thumb on the checkbox
-  const jungleFlag = await gameEval(
-    () => window.__lol2d.scene.oScene.game.director.jungleEnabled
-  );
+  const jungleFlag = await gameEval(() => window.__lol2d.scene.oScene.game.director.jungleEnabled);
   await page.screenshot({ path: `${OUT}-05-world.png` });
   await closePanel();
   await runMatch();
@@ -669,10 +670,10 @@ try {
       keys => keys.forEach(key => localStorage.removeItem(key)),
       [KITS_KEY, CFG_KEY]
     );
-    report.storageAfterCleanup = await page.evaluate(keys => keys.map(key => localStorage.getItem(key)), [
-      KITS_KEY,
-      CFG_KEY,
-    ]);
+    report.storageAfterCleanup = await page.evaluate(
+      keys => keys.map(key => localStorage.getItem(key)),
+      [KITS_KEY, CFG_KEY]
+    );
   } catch (error) {
     failures.push(`cleanup failed: ${error.message}`);
   }
