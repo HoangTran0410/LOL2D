@@ -24,6 +24,43 @@ export default class Veigar_Q extends Spell {
   stackDuration = 600000;
   maxStacks = 999;
 
+  /**
+   * How many stacks Veigar is carrying, for the HUD badge and for the practice
+   * panel. Deactivated buffs are skipped: `deactivateBuff()` only marks
+   * `toRemove`, and `AttackableUnit.update()` — which is what drops it off the
+   * list — cannot run while the panel holds the match paused, so counting the
+   * marked ones would report stacks that no longer apply.
+   */
+  get stackCount(): number {
+    return liveStacks(this.owner).length;
+  }
+
+  /**
+   * The practice panel's write side. Adds or removes whole buffs to reach
+   * `count` — the stacks *are* the buffs, so there is no separate number to
+   * keep honest.
+   */
+  setStackCount(count: number): boolean {
+    if (!this.owner) return false;
+    const target = Math.max(0, Math.floor(count));
+    const current = liveStacks(this.owner);
+
+    for (let i = current.length; i < target; i++) {
+      this.owner.addBuff(
+        createPowerStack(this.owner, {
+          image: this.image,
+          manaPerStack: this.manaPerStack,
+          stackDuration: this.stackDuration,
+          maxStacks: this.maxStacks,
+        })
+      );
+    }
+    // Oldest first, so what is left is the stacks that have been there longest
+    // — the same ones a player who had stopped short would be holding.
+    for (const buff of current.slice(target)) buff.deactivateBuff();
+    return true;
+  }
+
   onSpellCast() {
     const { to } = VectorUtils.getVectorWithRange(
       this.owner.position,
@@ -44,6 +81,33 @@ export default class Veigar_Q extends Spell {
   drawPreview() {
     super.drawPreview(this.range);
   }
+}
+
+/** The live stacks on `owner` — see `Veigar_Q.stackCount` on why `toRemove` is skipped. */
+export const liveStacks = (owner: any): Veigar_Q_Power[] =>
+  (owner?.buffs ?? []).filter((buff: any) => buff instanceof Veigar_Q_Power && !buff.toRemove);
+
+/**
+ * One stack, configured the one way it is ever configured.
+ *
+ * Called from `Veigar_Q_Object.onHit` (a real hit) and from
+ * `Veigar_Q.setStackCount` (the practice panel), so the cheat cannot drift
+ * from the real thing — the `stackId`, the add type and the bonus are what
+ * make a stack stack, and a second copy of them is a second definition of the
+ * spell.
+ */
+export function createPowerStack(
+  owner: any,
+  options: { image: any; manaPerStack: number; stackDuration: number; maxStacks: number }
+): Veigar_Q_Power {
+  const buff = new Veigar_Q_Power(options.stackDuration, owner, owner);
+  buff.stackId = 'veigar_q_power';
+  buff.image = options.image;
+  buff.name = 'Sức Mạnh Hắc Ám';
+  buff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
+  buff.maxStacks = options.maxStacks;
+  buff.bonuses = { maxMana: { baseBonus: options.manaPerStack } };
+  return buff;
 }
 
 /**
@@ -131,14 +195,14 @@ export class Veigar_Q_Object extends MissileSpellObject {
   onHit(enemy: any) {
     enemy.takeDamage(this.damage, this.owner);
 
-    const powerBuff = new Veigar_Q_Power(this.stackDuration, this.owner, this.owner);
-    powerBuff.stackId = 'veigar_q_power';
-    powerBuff.image = this.image;
-    powerBuff.name = 'Sức Mạnh Hắc Ám';
-    powerBuff.buffAddType = BuffAddType.STACKS_AND_CONTINUE;
-    powerBuff.maxStacks = this.maxStacks;
-    powerBuff.bonuses = { maxMana: { baseBonus: this.manaPerStack } };
-    this.owner.addBuff(powerBuff);
+    this.owner.addBuff(
+      createPowerStack(this.owner, {
+        image: this.image,
+        manaPerStack: this.manaPerStack,
+        stackDuration: this.stackDuration,
+        maxStacks: this.maxStacks,
+      })
+    );
 
     // the orb flies on through, so the hit gets its own collapse
     const implode = new Veigar_Q_Implode(this.owner);

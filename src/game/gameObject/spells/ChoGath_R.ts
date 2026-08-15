@@ -28,6 +28,47 @@ export default class ChoGath_R extends Spell {
   /** Effectively permanent — long enough that a match ends before it reverts. */
   growthDuration = 600000;
 
+  /**
+   * How many Feast stacks Cho'Gath is carrying, for the HUD badge and for the
+   * practice panel. Deactivated buffs are skipped: `deactivateBuff()` only
+   * marks `toRemove`, and `AttackableUnit.update()` — which is what drops it
+   * off the list — cannot run while the panel holds the match paused.
+   */
+  get stackCount(): number {
+    return liveStacks(this.owner).length;
+  }
+
+  /**
+   * The practice panel's write side. Raising heals the health it just added,
+   * exactly as `onSpellCast` does — 50 stacks that left Cho'Gath at a few
+   * percent of a huge pool would look like a bug rather than a cheat.
+   * Lowering does not heal, and has to clamp: see the note in the body.
+   */
+  setStackCount(count: number): boolean {
+    if (!this.owner) return false;
+    const target = Math.max(0, Math.floor(count));
+    const current = liveStacks(this.owner);
+
+    for (let i = current.length; i < target; i++) {
+      this.owner.addBuff(createGrowthStack(this.owner, this.growthDuration, this.image));
+    }
+    const added = Math.max(0, target - current.length);
+    if (added > 0) this.owner.takeHeal(MAX_HEALTH_PER_STACK * added, this.owner);
+
+    for (const buff of current.slice(target)) buff.deactivateBuff();
+    if (target < current.length) {
+      // `Stats.update()` does constrain health to `maxHealth.value` — but only
+      // when it runs, and it cannot: the panel that drives this holds the
+      // match paused. Without this line Cho'Gath sits above his own maximum,
+      // with a health bar past the end of itself, until the panel closes.
+      this.owner.stats.health.baseValue = Math.min(
+        this.owner.stats.health.baseValue,
+        this.owner.stats.maxHealth.value
+      );
+    }
+    return true;
+  }
+
   checkCastCondition() {
     return !!this._findNearestEnemy();
   }
@@ -38,9 +79,7 @@ export default class ChoGath_R extends Spell {
 
     target.takeDamage(this.damage, this.owner);
 
-    const growth = new ChoGath_R_Growth(this.growthDuration, this.owner, this.owner);
-    growth.image = this.image;
-    this.owner.addBuff(growth);
+    this.owner.addBuff(createGrowthStack(this.owner, this.growthDuration, this.image));
 
     // the extra max health is only worth something if it comes filled in
     this.owner.takeHeal(MAX_HEALTH_PER_STACK, this.owner);
@@ -80,6 +119,21 @@ export default class ChoGath_R extends Spell {
   drawPreview() {
     super.drawPreview(effectiveRange(this.range, this.owner));
   }
+}
+
+/** The live stacks on `owner` — see `ChoGath_R.stackCount` on why `toRemove` is skipped. */
+export const liveStacks = (owner: any): ChoGath_R_Growth[] =>
+  (owner?.buffs ?? []).filter((buff: any) => buff instanceof ChoGath_R_Growth && !buff.toRemove);
+
+/**
+ * One Feast stack, configured the one way it is ever configured. Called from
+ * `onSpellCast` (a real bite) and from `setStackCount` (the practice panel),
+ * so the cheat cannot drift from the real thing.
+ */
+export function createGrowthStack(owner: any, duration: number, image: any): ChoGath_R_Growth {
+  const growth = new ChoGath_R_Growth(duration, owner, owner);
+  growth.image = image;
+  return growth;
 }
 
 /**
