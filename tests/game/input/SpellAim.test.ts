@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   BLIND_POINT_FRACTION,
   DEFAULT_TOUCH_AIM_RANGE,
+  UNIT_SNAP_RADIUS,
   resolveSpellAim,
   touchAimRange,
   type SpellAimInput,
@@ -104,6 +105,32 @@ describe('resolveSpellAim — UNIT', () => {
     expect(result.cursorWorld).toEqual(victim.position);
     expect(result.target).toBe(victim);
     expect(pickUnitNear).toHaveBeenCalled();
+  });
+
+  it('searches the full aim ray even after a short deliberate drag', () => {
+    const pickUnitNear = vi.fn(() => null);
+
+    aim('UNIT', { drag: { x: 20, y: 0 }, pickUnitNear });
+
+    expect(pickUnitNear).toHaveBeenCalledWith(
+      { x: ORIGIN.x + RANGE, y: ORIGIN.y },
+      UNIT_SNAP_RADIUS,
+      null
+    );
+  });
+
+  it('hands the previous lock back to acquisition so close targets do not flicker', () => {
+    const lockedTarget = { position: { x: 1500, y: 1010 } };
+    const pickUnitNear = vi.fn(() => lockedTarget);
+
+    const result = aim('UNIT', {
+      drag: { x: 30, y: 1 },
+      lockedTarget,
+      pickUnitNear,
+    });
+
+    expect(pickUnitNear).toHaveBeenCalledWith(expect.any(Object), UNIT_SNAP_RADIUS, lockedTarget);
+    expect(result.target).toBe(lockedTarget);
   });
 
   it('leaves the cursor on the drag when the drag finds nobody', () => {

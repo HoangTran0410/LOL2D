@@ -280,6 +280,7 @@ try {
   const stick = layout.joystick;
   const slot1 = layout.buttons.find(b => b.slot === 1);
   const slot2 = layout.buttons.find(b => b.slot === 2);
+  const slot3 = layout.buttons.find(b => b.slot === 3);
 
   // ------------------------------------------------------------ 2/3. stick
 
@@ -512,6 +513,47 @@ try {
     report.tap.direction
       ? `direction (${report.tap.direction.x.toFixed(3)}, ${report.tap.direction.y.toFixed(3)}), victim ${report.tap.victim ? 'visible' : 'missing'}`
       : 'no cast context'
+  );
+
+  // A UNIT spell starts with the nearest tap target, then a deliberately short
+  // eastward drag must release it and lock the enemy along that aim ray. This
+  // is the thumb case an endpoint-only picker made unnecessarily precise.
+  const unitAimSetup = await page.evaluate(async () => {
+    const AllSpells = await import('/src/game/gameObject/spells/index.ts');
+    const game = window.__lol2d.scene.oScene.game;
+    const player = game.player;
+    const bots = game.objectManager.objects.filter(o => o.constructor.name === 'AIChampion');
+    const nearest = bots[0];
+    const intended = bots[1];
+    player.replaceSpell(3, new AllSpells.Leblanc_Q(player));
+    nearest.position.set(player.position.x, player.position.y + 180);
+    nearest.destination.set(nearest.position.x, nearest.position.y);
+    intended.position.set(player.position.x + 500, player.position.y + 40);
+    intended.destination.set(intended.position.x, intended.position.y);
+    nearest.deathData = null;
+    intended.deathData = null;
+    return { nearestId: nearest.id, intendedId: intended.id };
+  });
+  await page.waitForTimeout(400);
+
+  await touchStart([{ x: slot3.x, y: slot3.y }]);
+  await settle(80);
+  await touchMove([{ x: slot3.x + 30, y: slot3.y }]);
+  await settle(140);
+  await touchEnd();
+  await page.waitForTimeout(300);
+
+  report.unitDrag = await page.evaluate(() => {
+    const spell = window.__lol2d.scene.oScene.game.player.spells[3];
+    return {
+      targetId: spell.castContext?.target?.id ?? null,
+      cooldown: Math.round(spell.currentCooldown),
+    };
+  });
+  check(
+    'a short UNIT drag releases the nearest auto-lock and selects along the aim ray',
+    report.unitDrag.targetId === unitAimSetup.intendedId && report.unitDrag.cooldown > 0,
+    JSON.stringify({ ...unitAimSetup, ...report.unitDrag })
   );
 
   // --------------------------------------------------------- 7. cancelling

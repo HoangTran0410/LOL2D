@@ -105,6 +105,20 @@ describe('computeTouchLayout', () => {
     }
   });
 
+  it('keeps a real thumb gap between buttons on short landscape phones', () => {
+    for (const viewport of [PHONE, { width: 667, height: 375 }]) {
+      const buttons = computeTouchLayout(viewport, SLOTS).buttons;
+      for (let i = 0; i < buttons.length; i++) {
+        for (let j = i + 1; j < buttons.length; j++) {
+          const a = buttons[i];
+          const b = buttons[j];
+          const gap = Math.hypot(a.x - b.x, a.y - b.y) - a.radius - b.radius;
+          expect(gap, `${viewport.width}x${viewport.height}: slots ${a.slot}/${b.slot}`).toBeGreaterThanOrEqual(10);
+        }
+      }
+    }
+  });
+
   it('keeps the stick clear of every spell button', () => {
     const layout = computeTouchLayout(PHONE, SLOTS);
     for (const button of layout.buttons) {

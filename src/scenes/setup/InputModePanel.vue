@@ -18,7 +18,13 @@
  * selecting on the resolved layout would light the wrong button. `mode` is the
  * choice; `isTouchUi` is the result, and only the hint line below reports it.
  */
-import type { TouchModePreference } from '../../game/input/TouchControls';
+import { ref } from 'vue';
+import {
+  setTouchTargetPriorityPreference,
+  touchTargetPriorityPreference,
+  type TouchModePreference,
+  type TouchTargetPriority,
+} from '../../game/input/TouchControls';
 
 defineProps<{ isTouchUi: boolean; mode: TouchModePreference }>();
 const emit = defineEmits<{ 'update:mode': [TouchModePreference] }>();
@@ -28,6 +34,12 @@ const OPTIONS: { value: TouchModePreference; label: string; icon: string }[] = [
   { value: 'touch', label: 'Chạm tay', icon: 'fa-solid fa-hand-pointer' },
   { value: 'pointer', label: 'Chuột & bàn phím', icon: 'fa-solid fa-computer-mouse' },
 ];
+
+const targetPriority = ref<TouchTargetPriority>(touchTargetPriorityPreference());
+const setTargetPriority = (priority: TouchTargetPriority): void => {
+  setTouchTargetPriorityPreference(priority);
+  targetPriority.value = priority;
+};
 </script>
 
 <template>
@@ -59,5 +71,28 @@ const OPTIONS: { value: TouchModePreference; label: string; icon: string }[] = [
         chọn <strong>Tự động</strong> để trả lại cho thiết bị quyết định.
       </template>
     </p>
+    <h3>Ưu tiên mục tiêu khi chạm nhanh</h3>
+    <div class="input-mode-row" role="group" aria-label="Ưu tiên mục tiêu">
+      <button
+        id="pregame-target-priority-nearest"
+        type="button"
+        class="input-mode-btn"
+        :class="{ selected: targetPriority === 'nearest' }"
+        :aria-pressed="targetPriority === 'nearest'"
+        @click="setTargetPriority('nearest')"
+      >
+        <i class="fa-solid fa-location-crosshairs"></i> Gần nhất
+      </button>
+      <button
+        id="pregame-target-priority-lowest-health"
+        type="button"
+        class="input-mode-btn"
+        :class="{ selected: targetPriority === 'lowest-health' }"
+        :aria-pressed="targetPriority === 'lowest-health'"
+        @click="setTargetPriority('lowest-health')"
+      >
+        <i class="fa-solid fa-heart-crack"></i> Ít máu nhất
+      </button>
+    </div>
   </div>
 </template>

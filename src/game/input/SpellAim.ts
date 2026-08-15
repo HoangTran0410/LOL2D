@@ -35,8 +35,14 @@ export interface SpellAimInput {
   readonly facing: Vec2;
   /** The tap's auto-picked victim, or null when nothing is in reach. */
   readonly autoTarget: AimCandidate | null;
+  /** UNIT mode only: the previous frame's lock, retained with hysteresis. */
+  readonly lockedTarget?: AimCandidate | null;
   /** UNIT mode only: the body nearest a world point, within a world radius. */
-  readonly pickUnitNear?: (point: Vec2, radius: number) => AimCandidate | null;
+  readonly pickUnitNear?: (
+    point: Vec2,
+    radius: number,
+    preferred: AimCandidate | null
+  ) => AimCandidate | null;
 }
 
 export interface SpellAimResult {
@@ -130,9 +136,8 @@ export function resolveSpellAim(input: SpellAimInput): SpellAimResult {
         ? finish(origin, { x: auto.position.x, y: auto.position.y }, auto, false)
         : finish(origin, { x: origin.x, y: origin.y }, null, false);
     }
-    const reach = Math.min(1, dragLength / Math.max(1, input.dragToRange)) * range;
-    const probe = project(origin, direction, Math.max(reach, range * 0.25));
-    const picked = input.pickUnitNear?.(probe, UNIT_SNAP_RADIUS) ?? null;
+    const probe = project(origin, direction, range);
+    const picked = input.pickUnitNear?.(probe, UNIT_SNAP_RADIUS, input.lockedTarget ?? null) ?? null;
     return picked
       ? finish(origin, { x: picked.position.x, y: picked.position.y }, picked, true)
       : finish(origin, probe, null, true);

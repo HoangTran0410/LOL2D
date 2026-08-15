@@ -35,6 +35,7 @@ import {
 import { VirtualJoystick, type JoystickVector } from './VirtualJoystick';
 import { resolveSpellAim, type AimCandidate, type SpellAimResult } from './SpellAim';
 import type { ActivationPattern, TargetingMode, Vec2 } from '../spell/runtime/types';
+import type { AttackTargetPriority } from '../combat/AttackTargeting';
 
 /** One finger, in canvas coordinates. */
 export interface TouchPoint {
@@ -126,8 +127,12 @@ export interface TouchControlsHost {
   /** Unit vector the champion is pointed along. Never (0,0). */
   playerFacing(): Vec2;
   /** The tap's victim: nearest visible hostile body within `range`. */
-  autoTargetWithin(range: number): AimCandidate | null;
-  pickUnitNear(point: Vec2, radius: number): AimCandidate | null;
+  autoTargetWithin(range: number, priority: AttackTargetPriority): AimCandidate | null;
+  pickUnitNear(
+    point: Vec2,
+    radius: number,
+    preferred: AimCandidate | null
+  ): AimCandidate | null;
   /** Held stick direction, or null the frame the thumb lifts. */
   steer(direction: JoystickVector | null): void;
   /** Where slot `slot` is currently aimed, or null once the gesture is over. */
@@ -158,7 +163,28 @@ interface SlotGesture {
 }
 
 const STORAGE_KEY = 'lol2d.touchControls';
+const TARGET_PRIORITY_STORAGE_KEY = 'lol2d.touchTargetPriority';
 const TOUCH_HAPTIC_MS = 10;
+
+export type TouchTargetPriority = AttackTargetPriority;
+
+export function touchTargetPriorityPreference(): TouchTargetPriority {
+  try {
+    return window.localStorage.getItem(TARGET_PRIORITY_STORAGE_KEY) === 'lowest-health'
+      ? 'lowest-health'
+      : 'nearest';
+  } catch {
+    return 'nearest';
+  }
+}
+
+export function setTouchTargetPriorityPreference(priority: TouchTargetPriority): void {
+  try {
+    window.localStorage.setItem(TARGET_PRIORITY_STORAGE_KEY, priority);
+  } catch {
+    /* storage blocked: the default remains playable */
+  }
+}
 
 const pulseTouchHaptic = (): void => {
   try {
@@ -263,9 +289,11 @@ export class TouchControls {
   private steering = false;
   private viewportWidth = 0;
   private viewportHeight = 0;
+  private readonly targetPriority: TouchTargetPriority;
 
   constructor(private readonly host: TouchControlsHost, enabled = false) {
     this._enabled = enabled;
+    this.targetPriority = touchTargetPriorityPreference();
     const viewport = host.viewport();
     this.viewportWidth = viewport.width;
     this.viewportHeight = viewport.height;
@@ -470,8 +498,10 @@ export class TouchControls {
       drag: gesture.phase === 'CANCEL' ? null : drag,
       dragToRange: this.layout.dragToRange,
       facing: this.host.playerFacing(),
-      autoTarget: this.host.autoTargetWithin(view.range),
-      pickUnitNear: (point, radius) => this.host.pickUnitNear(point, radius),
+      autoTarget: gesture.moved ? null : this.host.autoTargetWithin(view.range, this.targetPriority),
+      lockedTarget: gesture.aim?.target ?? null,
+      pickUnitNear: (point, radius, preferred) =>
+        this.host.pickUnitNear(point, radius, preferred),
     });
   }
 

@@ -560,6 +560,36 @@ describe('TouchControls — tri-state mode preference', () => {
   });
 });
 
+describe('TouchControls — tap target preference', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('defaults to the nearest target', async () => {
+    vi.stubGlobal('window', {
+      localStorage: { getItem: () => null, setItem: () => undefined },
+    });
+    const { touchTargetPriorityPreference } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchTargetPriorityPreference()).toBe('nearest');
+  });
+
+  it('persists the lowest-health option', async () => {
+    const setItem = vi.fn();
+    vi.stubGlobal('window', {
+      localStorage: { getItem: () => 'lowest-health', setItem },
+    });
+    const {
+      setTouchTargetPriorityPreference,
+      touchTargetPriorityPreference,
+    } = await import('../../../src/game/input/TouchControls');
+
+    expect(touchTargetPriorityPreference()).toBe('lowest-health');
+    setTouchTargetPriorityPreference('lowest-health');
+    expect(setItem).toHaveBeenCalledWith('lol2d.touchTargetPriority', 'lowest-health');
+  });
+});
+
 describe('TouchControls — button visual', () => {
   const withView = (overrides: Partial<TouchSpellView>): TouchSpellView => ({
     ...view('DIRECTION'),

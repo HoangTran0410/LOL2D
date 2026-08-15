@@ -37,7 +37,10 @@ import TargetResolver, {
   defaultTargetInfo,
 } from './spell/targeting/TargetResolver';
 import AssetManager from '../managers/AssetManager';
-import { findAttackTargetNearPoint } from './combat/AttackTargeting';
+import {
+  findAttackTargetAlongRay,
+  findAttackTargetNearPoint,
+} from './combat/AttackTargeting';
 import TouchControls, {
   touchControlsPreference,
   rememberTouchControlsPreference,
@@ -674,10 +677,20 @@ export default class Game {
       // champion instead of the cursor — there is no cursor. It is hostile,
       // alive, targetable and *visible*: a tap cannot auto-target through fog,
       // the same refusal a right click into the fog gets.
-      autoTargetWithin: range =>
-        findAttackTargetNearPoint(this.player, this.player.position, range) as AimCandidate | null,
-      pickUnitNear: (point, radius) =>
-        findAttackTargetNearPoint(this.player, point, radius) as AimCandidate | null,
+      autoTargetWithin: (range, priority) =>
+        findAttackTargetNearPoint(
+          this.player,
+          this.player.position,
+          range,
+          priority
+        ) as AimCandidate | null,
+      pickUnitNear: (point, radius, preferred) =>
+        findAttackTargetAlongRay(
+          this.player,
+          point,
+          radius,
+          preferred as AttackableUnit | null
+        ) as AimCandidate | null,
       steer: direction => this.steerPlayer(direction),
       setSlotAim: (slot, world) => {
         if (world) this.touchAim.set(slot, world);

@@ -28,6 +28,8 @@ import type { Vec2 } from '../spell/runtime/types';
  */
 export const CURSOR_ACQUISITION_RADIUS = 250;
 
+export type AttackTargetPriority = 'nearest' | 'lowest-health';
+
 const distanceTo = (point: Vec2, unit: AttackableUnit): number =>
   Math.hypot(unit.position.x - point.x, unit.position.y - point.y);
 
@@ -51,7 +53,8 @@ const distanceTo = (point: Vec2, unit: AttackableUnit): number =>
 export function findAttackTargetNearPoint(
   attacker: AttackableUnit,
   point: Vec2,
-  radius: number = CURSOR_ACQUISITION_RADIUS
+  radius: number = CURSOR_ACQUISITION_RADIUS,
+  priority: AttackTargetPriority = 'nearest'
 ): AttackableUnit | null {
   // optional call for the same reason AIChampion.findAttackTarget uses one:
   // spell tests hand in an object manager stub that only collects added objects
@@ -71,12 +74,77 @@ export function findAttackTargetNearPoint(
 
   let nearest: AttackableUnit | null = null;
   let nearestDistance = Infinity;
+  let lowestHealth = Infinity;
   for (const unit of found) {
     if (unit === attacker) continue;
     const distance = distanceTo(point, unit);
-    if (distance > radius || distance >= nearestDistance) continue;
+    if (distance > radius) continue;
+    const health = unit.stats?.health?.value ?? Infinity;
+    if (
+      priority === 'lowest-health' &&
+      (health > lowestHealth || (health === lowestHealth && distance >= nearestDistance))
+    ) {
+      continue;
+    }
+    if (priority === 'nearest' && distance >= nearestDistance) continue;
+    lowestHealth = health;
     nearestDistance = distance;
     nearest = unit;
   }
   return nearest;
+}
+
+/**
+ * The hostile body closest to a thumb's aim ray. A short drag therefore says
+ * "that direction" instead of forcing the player to also encode the target's
+ * exact distance in a few centimetres of glass.
+ */
+export function findAttackTargetAlongRay(
+  attacker: AttackableUnit,
+  endpoint: Vec2,
+  snapRadius: number,
+  preferred: AttackableUnit | null = null
+): AttackableUnit | null {
+  const dx = endpoint.x - attacker.position.x;
+  const dy = endpoint.y - attacker.position.y;
+  const reach = Math.hypot(dx, dy);
+  if (reach === 0) return null;
+  const ux = dx / reach;
+  const uy = dy / reach;
+  const aimSlope = Math.max(snapRadius / reach, Math.tan((28 * Math.PI) / 180));
+  const stickySlope = Math.max(aimSlope * 1.25, Math.tan((38 * Math.PI) / 180));
+  const found =
+    attacker.game?.objectManager?.queryObjects?.({
+      area: new Circle({ x: attacker.position.x, y: attacker.position.y, r: reach }),
+      queryByDisplayBoundingBox: true,
+      filters: [
+        PredefinedFilters.type(AttackableUnit),
+        PredefinedFilters.canTakeDamageFromTeam(attacker.teamId),
+        (object: GameObject) => object.willDraw,
+      ],
+    }) ?? [];
+
+  let sticky: AttackableUnit | null = null;
+  let best: AttackableUnit | null = null;
+  let bestAngle = Infinity;
+  let bestDistance = Infinity;
+  for (const unit of found) {
+    if (unit === attacker) continue;
+    const rx = unit.position.x - attacker.position.x;
+    const ry = unit.position.y - attacker.position.y;
+    const distance = Math.hypot(rx, ry);
+    const along = rx * ux + ry * uy;
+    const perpendicular = Math.abs(rx * uy - ry * ux);
+    const bodyRadius = (unit.animatedValues?.displaySize ?? 0) / 2;
+    const limit = bodyRadius + Math.max(0, along) * (unit === preferred ? stickySlope : aimSlope);
+    if (along < -bodyRadius || along > reach + bodyRadius || perpendicular > limit) continue;
+    if (unit === preferred) sticky = unit;
+
+    const angle = perpendicular / Math.max(1, distance);
+    if (angle > bestAngle || (angle === bestAngle && distance >= bestDistance)) continue;
+    bestAngle = angle;
+    bestDistance = distance;
+    best = unit;
+  }
+  return sticky ?? best;
 }

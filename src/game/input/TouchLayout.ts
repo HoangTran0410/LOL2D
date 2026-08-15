@@ -104,8 +104,10 @@ export function computeTouchLayout(
   const summonerRadius = attackRadius * 0.56;
   const joystickRadius = clamp(unit * 0.17, 54, 92);
 
-  const attackX = viewport.width - margin - attackRadius;
-  const attackY = viewport.height - margin - attackRadius;
+  const attackX = viewport.width - margin - attackRadius - abilityRadius * 0.35;
+  // Lift the whole fan enough that the bottom ability is not clamped into its
+  // neighbour on short landscape phones.
+  const attackY = viewport.height - margin - attackRadius - abilityRadius * 0.35;
 
   const abilityCount = Math.max(0, Math.min(4, slotCount - 1));
   // The arc's radius is derived from how many buttons have to fit on it, not
