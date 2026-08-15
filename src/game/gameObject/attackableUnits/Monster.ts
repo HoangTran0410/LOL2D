@@ -29,6 +29,14 @@ export interface MonsterOptions {
 
 export type MonsterPhase = (typeof Monster.PHASES)[keyof typeof Monster.PHASES];
 
+/**
+ * Floor on how close a camp has to get to its camp point to count as home.
+ * The real threshold is this or the body's own radius, whichever is larger —
+ * see `updateBackToCamp` for why a flat number is not reachable by a camp that
+ * shares its clearing with two others.
+ */
+export const MONSTER_HOME_TOLERANCE = 12;
+
 const DEFAULT_PRESET: MonsterPresetData = {
   name: 'Baron',
   avatar: 'monster_Baron_Nashor',
@@ -176,15 +184,31 @@ export default class Monster extends AttackableUnit {
   }
 
   updateBackToCamp() {
-    // leashing home is the one walk a camp does with nothing chasing it, and
-    // the one it must not fail: routed, so a pit wall cannot strand it outside
-    this.navigateTo(this.camp.x, this.camp.y);
-    // the original never left this phase, so a leashed camp stayed on 'walking
-    // home' regen forever and never re-aggroed on proximity
-    if (Math.hypot(this.position.x - this.camp.x, this.position.y - this.camp.y) < 10) {
+    // Checked before the order, so the frame a camp gets home does not also
+    // spend an order it is about to drop.
+    //
+    // "Home" scales with the body instead of being a flat 10px bullseye. Camp
+    // points sit ~100px apart (the three wolves, the four raptors) while
+    // `UnitCollisionSystem` holds two bodies `bodyRadius + bodyRadius` apart —
+    // 55px for a greater wolf beside a wolf — so the small ones physically
+    // cannot reach the exact point their preset names. A camp that never
+    // arrives never leaves this phase, which means it keeps the walking-home
+    // regen rate and, far worse, never runs `updateIdle` again: it stops
+    // re-aggroing on proximity for the rest of the match while standing on its
+    // own camp.
+    const home = Math.max(MONSTER_HOME_TOLERANCE, this.stats.size.value / 2);
+    if (Math.hypot(this.position.x - this.camp.x, this.position.y - this.camp.y) <= home) {
       this.phase = Monster.PHASES.IDLE;
       this.stopMovement();
+      return;
     }
+
+    // leashing home is the one walk a camp does with nothing chasing it, and
+    // the one it must not fail: routed, so a pit wall cannot strand it outside.
+    // `PathAgent.order` deliberately re-plans a BLOCKED agent rather than
+    // swallowing this repeat, which is what stopped a dragged camp freezing
+    // mid-jungle — see that method.
+    this.navigateTo(this.camp.x, this.camp.y);
   }
 
   findNearestChampion(radius: number): Champion | null {
@@ -193,6 +217,8 @@ export default class Monster extends AttackableUnit {
       filters: [
         PredefinedFilters.type(Champion),
         PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+        // a camp does not wake up for a champion hidden in a bush
+        PredefinedFilters.visibleTo(this),
       ],
     });
 
