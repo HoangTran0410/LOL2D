@@ -7,7 +7,7 @@ import { teamBodyColor } from './gameObject/attackableUnits/Minion';
 import Camera, { zoomFactorPreference } from './gameObject/map/Camera';
 import FogOfWar from './gameObject/map/FogOfWar';
 import TerrainMap from './gameObject/map/TerrainMap';
-import Minimap, { type MinimapBlip, type MinimapHost } from './gameObject/map/Minimap';
+import Minimap, { hitTest, type MinimapBlip, type MinimapHost } from './gameObject/map/Minimap';
 import Fountain from './gameObject/structures/Fountain';
 import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
@@ -125,6 +125,13 @@ export default class Game {
    * makes this the only coupling the touch layer needs to the cast path.
    */
   private touchAim = new Map<number, Vec2>();
+  /**
+   * Every finger currently on the glass, and the subset of them the minimap
+   * claimed. Both live here rather than in `TouchControls` because the whole
+   * point is to decide *before* the controls are told anything.
+   */
+  private seenTouches = new Set<number>();
+  private minimapTouches = new Set<number>();
   /** Last direction the champion was driven, for aiming a tap with no target. */
   private lastFacing = { x: 1, y: 0 };
 
@@ -292,7 +299,13 @@ export default class Game {
     this.objectManager.update();
     this.terrainMap.update();
 
-    if (mouseIsPressed && mouseButton === RIGHT) {
+    // Not through the minimap: a right click on the overlay would otherwise
+    // walk the champion to whatever the map happens to be covering.
+    if (
+      mouseIsPressed &&
+      mouseButton === RIGHT &&
+      !hitTest({ x: mouseX, y: mouseY }, this.minimap.rect)
+    ) {
       // Right click means one thing only: move here. It used to also issue an
       // attack order when the cursor happened to be over an enemy body, which
       // made a walk past a fight silently turn into a commitment to it — the
@@ -389,9 +402,70 @@ export default class Game {
     // end without casting rather than sit there half-aimed behind a modal.
     if (this.paused) {
       this.touchControls.releaseEverything();
+      this.seenTouches.clear();
+      this.minimapTouches.clear();
       return;
     }
-    this.touchControls.syncPointers(points);
+
+    // The minimap gets first refusal, and only on a finger's *first* frame.
+    // Deciding per frame instead would let a spell gesture dragged over the
+    // minimap be stolen mid-aim; deciding once and remembering the claim for
+    // the finger's whole life is what keeps the two systems from ever seeing
+    // the same finger. A claimed finger is filtered out of the list the
+    // controls are reconciled against, so as far as they are concerned it
+    // never happened.
+    const live = new Set<number>();
+    const forwarded: TouchPoint[] = [];
+    for (const point of points) {
+      live.add(point.id);
+      if (!this.seenTouches.has(point.id)) {
+        this.seenTouches.add(point.id);
+        if (this.pressMinimap(point)) this.minimapTouches.add(point.id);
+      }
+      if (!this.minimapTouches.has(point.id)) forwarded.push(point);
+    }
+    for (const id of this.seenTouches) {
+      if (!live.has(id)) {
+        this.seenTouches.delete(id);
+        this.minimapTouches.delete(id);
+      }
+    }
+
+    this.touchControls.syncPointers(forwarded);
+  }
+
+  /**
+   * Route one press through the minimap. Returns true when the minimap took it
+   * — i.e. when nothing else may see it.
+   *
+   * A dismissing tap (`'collapse'`) is handled here but *not* claimed: it
+   * closes the expanded map and still reaches whatever it landed on.
+   */
+  private pressMinimap(point: { x: number; y: number }): boolean {
+    switch (this.minimap.route(point)) {
+      case 'expand':
+        this.minimap.expanded = true;
+        return true;
+      case 'teleport':
+        this.minimap.expanded = false;
+        return true;
+      case 'collapse':
+        this.minimap.expanded = false;
+        return false;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * The mouse's half of the same routing. Left button only: the right button is
+   * the move order, and `fixedUpdate` already refuses to issue one from inside
+   * the minimap's rect.
+   */
+  mousePressed(): void {
+    if (this.paused) return;
+    if (mouseButton === RIGHT) return;
+    this.pressMinimap({ x: mouseX, y: mouseY });
   }
 
   /** The on-screen toggle, and the handle Playwright drives. */

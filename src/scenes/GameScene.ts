@@ -189,6 +189,15 @@ export default class GameScene extends Scene {
   }
 
   /**
+   * The minimap's half of the click routing; the right-button move order still
+   * runs off `mouseIsPressed` inside `Game.fixedUpdate`, which now refuses to
+   * fire through the minimap's rect.
+   */
+  mousePressed(): void {
+    this.game?.mousePressed();
+  }
+
+  /**
    * All three touch callbacks do the same thing: hand the game the full list of
    * fingers now on the glass.
    *

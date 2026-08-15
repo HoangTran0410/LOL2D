@@ -89,6 +89,30 @@ describe('minimap rect', () => {
   });
 });
 
+describe('tap routing', () => {
+  it('collapsed: a tap inside expands, a tap outside is not ours', () => {
+    const minimap = makeMinimap(1280, 720);
+    expect(minimap.route({ x: 60, y: 60 })).toBe('expand');
+    expect(minimap.route({ x: 640, y: 400 })).toBe('pass');
+  });
+
+  it('expanded: a tap inside teleports, a tap outside dismisses', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    expect(minimap.route({ x: 640, y: 360 })).toBe('teleport');
+    // There must be a dismiss that is not a teleport, or opening it by
+    // accident forces you to teleport somewhere.
+    expect(minimap.route({ x: 20, y: 700 })).toBe('collapse');
+  });
+
+  it('expanded: the collapsed corner is no longer a special case', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    // (60,60) is inside the collapsed rect but outside the expanded one.
+    expect(minimap.route({ x: 60, y: 60 })).toBe('collapse');
+  });
+});
+
 describe('hitTest', () => {
   it('inside hits, one pixel outside does not', () => {
     expect(hitTest({ x: 13, y: 13 }, rect)).toBe(true);

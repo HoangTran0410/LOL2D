@@ -80,6 +80,9 @@ export interface MinimapHost {
   cameraBox(): { x: number; y: number; w: number; h: number };
 }
 
+/** What a press on the screen means to the minimap. See `Minimap.route`. */
+export type MinimapAction = 'expand' | 'collapse' | 'teleport' | 'pass';
+
 /** What a dot is, which decides its shape and size — never its world size. */
 export type BlipKind = 'champion' | 'unit' | 'structure';
 
@@ -152,6 +155,20 @@ export class Minimap {
       width: this.viewportWidth,
       height: this.viewportHeight,
     });
+  }
+
+  /**
+   * What a press at this screen point means, given the current state. The whole
+   * decision, and it needs no canvas — which is what lets the ordering that
+   * `Game.syncTouches` depends on be checked in a plain node test.
+   *
+   * `'collapse'` deliberately does *not* claim the press: a tap outside the
+   * expanded map dismisses it **and** still reaches the controls underneath,
+   * so an accidental expand costs nothing. `'pass'` is "not mine at all".
+   */
+  route(point: Point): MinimapAction {
+    if (!this.expanded) return hitTest(point, this.rect) ? 'expand' : 'pass';
+    return hitTest(point, this.rect) ? 'teleport' : 'collapse';
   }
 
   resize(width: number, height: number): void {
