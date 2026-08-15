@@ -235,6 +235,26 @@ Both screens render the library as a shelf at the top of `KitRoster`, beside
 the existing "Ngẫu Nhiên" card, so saving in a match and using it in the next
 one is one roster away in both directions.
 
+**Correction, from implementing Task 11.** An earlier draft of this paragraph
+justified the above with "`KitRoster` is already shared between the pregame
+editor and the in-game panel". That is not what Task 8 built. `KitRoster` is
+mounted by `LoadoutEditorModal`; the panel's **Chiêu thức** tab is
+`SpellPickerModal`, which carries its own roster markup and has never imported
+`KitRoster` at all. So in a match the library is not on the tab that looks like
+a roster — it is at **Đấu thủ → a unit's row → the editor**, which is the same
+editor the setup screen opens. The conclusion survives (one component, both
+screens, no duplication); the route to it in-game does not match what this
+paragraph implied, and any test written from that implication would look for
+the shelf in the wrong place.
+
+One hazard this feature introduced that nothing above anticipated: **a text
+input inside a running match is not free.** p5 registers `keydown` on `window`,
+and `GameScene.keyPressed` maps A/Q/W/E/R/D/F to casts and Escape to "leave the
+match". Typing a kit's name would fire abilities, and one Escape would end the
+match. The name field stops `keydown`/`keyup`/`keypress` for that reason. Any
+future tab that takes typed input — a search box, a bot's name — inherits the
+same requirement.
+
 ## UI
 
 `SpellPickerModal.vue` stops being the modal root and becomes the Chiêu thức
@@ -253,8 +273,28 @@ New components under `src/game/hud/practice/`:
 - `RulesTab.vue` — CDR slider + URF toggle, driven by `MatchRulesPanel`'s markup
 - `WorldTab.vue` — jungle and minion toggles
 
-The existing draft/commit contract holds for the whole panel: the slot row's
-Huỷ / Xác nhận stay, and every tab's edits are staged until Xác nhận.
+**Correction, from implementing Task 9.** This section originally said "the
+existing draft/commit contract holds for the whole panel: the slot row's Huỷ /
+Xác nhận stay, and every tab's edits are staged until Xác nhận." That is false
+as built, and it contradicts this spec's own verification section, which asserts
+on `game.matchRules` while the panel is still open.
+
+What is actually true: **only the Chiêu thức tab stages.** Rules and world
+changes apply the moment you make them. Two reasons, and neither is laziness.
+Staging them would need a second draft layer with nothing to gain — a slider is
+undone by dragging it back, and a checkbox by clicking it again, so "cancel"
+adds a concept the controls already provide. And Huỷ / Xác nhận live inside
+`SpellPickerModal`'s slot row, not in the panel shell, so they only render on
+the tab whose picks they govern; there is no button on the Rules tab implying a
+promise it does not keep.
+
+The consequence to know: **Huỷ does not undo a rules or world change.** It
+discards staged spell picks and closes the panel. A player who sets CDR to 90
+and then presses Huỷ keeps CDR at 90.
+
+Note this is orthogonal to *when a change becomes visible*: every world change —
+staged or not — only reaches the canvas on the first unpaused tick, because
+`ObjectManager.update()` does not run while the panel is open.
 
 ## Verification
 

@@ -48,9 +48,17 @@ Learned the hard way in Task 1. Every code block below that calls
 
 ## Working-tree hygiene — read before your first commit
 
-This branch is **dirty before any of this work started**. About 45 files carry
-uncommitted changes, and four `src/scenes/setup/*.vue` deletions sit **staged in
-the index**. Two rules follow, and the second has already caused one near-miss:
+> **Updated after Task 7.** The 44 files of uncommitted work that made this
+> section necessary have been reviewed and committed as `7ac4b85`, `06e29d8`,
+> `116ea3a`, `e8eab22`, `e077e3a` and `eebd0f5`, and the four staged `.vue`
+> deletions went with them. **The working tree is clean.** Rule 2 below no
+> longer applies to anything — Tasks 8-11 commit normally, one checkpoint each.
+> Rule 1 stands on its own merits: keep using the pathspec form so a commit
+> contains what you meant and nothing else.
+
+This branch was **dirty before any of this work started**. About 45 files carried
+uncommitted changes, and four `src/scenes/setup/*.vue` deletions sat **staged in
+the index**. Two rules followed, and the second caused one near-miss:
 
 1. **`git add <paths>` followed by a bare `git commit` commits the whole index,
    not just the paths you added.** Always use the pathspec form, which commits
@@ -85,9 +93,9 @@ the index**. Two rules follow, and the second has already caused one near-miss:
    `src/game/hud/SpellPickerModal.vue`,
    `src/scenes/setup/LoadoutEditorModal.vue`, `src/scenes/setup/KitRoster.vue`
 
-   This makes Tasks 8, 9, 10 and 11 **no-commit tasks** — their "Commit" steps
-   are superseded by this rule. Task 7 may commit `src/game/Game.ts` (clean) but
-   not `hudInteractions.ts`. Files you *create* are yours to commit normally.
+   ~~This makes Tasks 8, 9, 10 and 11 no-commit tasks.~~ **Obsolete — see the
+   note at the top of this section. All of those files are committed; commit
+   your work normally.**
 
 ## Dependency order
 
