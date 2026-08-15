@@ -185,6 +185,31 @@ const onZoomTouch = (event: TouchEvent): void => {
   const raw = ZOOM_FACTOR_MIN + ratio * (ZOOM_FACTOR_MAX - ZOOM_FACTOR_MIN);
   setZoom(Math.round(raw / ZOOM_STEP) * ZOOM_STEP);
 };
+/**
+ * ## The way out of the match
+ *
+ * Escape used to be it, and one mis-hit ended the match with no confirmation
+ * and no way back (`GameScene.keyPressed`). Escape now opens this panel, so
+ * the exit has to live somewhere findable — and this is the tab that means
+ * *this match*, which is what is being quit.
+ *
+ * Deliberately **not** beside the shell's close button in the tab row: two
+ * adjacent controls whose outcomes differ by an entire match is exactly the
+ * mis-hit being designed out.
+ *
+ * Two steps, and it is the only control in the panel that confirms. Bots,
+ * saved kits, champion swaps and every cheat are one press each, on purpose,
+ * because each is cheap to redo. This one is not.
+ */
+const confirmingExit = ref(false);
+
+const exitMatch = (): void => {
+  if (!confirmingExit.value) {
+    confirmingExit.value = true;
+    return;
+  }
+  hud.requestExit();
+};
 </script>
 
 <template>
@@ -245,5 +270,19 @@ const onZoomTouch = (event: TouchEvent): void => {
     <p class="practice-note">
       Quái rừng và lính: thay đổi có hiệu lực khi bạn đóng bảng và trận chạy tiếp.
     </p>
+
+    <!-- Last in the flow and visually apart: the one irreversible thing in the
+         panel. See the file comment on why it is here and why it confirms. -->
+    <button
+      type="button"
+      class="practice-exit"
+      :class="{ confirming: confirmingExit }"
+      id="practice-exit"
+      @click="exitMatch"
+      @touchend.prevent="exitMatch"
+    >
+      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+      <span>{{ confirmingExit ? 'Chắc chưa?' : 'Thoát trận' }}</span>
+    </button>
   </div>
 </template>

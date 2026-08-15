@@ -110,6 +110,10 @@ export default class GameScene extends Scene {
 
   startGame() {
     this.game = new Game();
+    // The match's own way out, since Escape is no longer one. `Game` holds no
+    // reference to the scene manager and must not gain one — see
+    // `Game.onExitRequested`.
+    this.game.onExitRequested = () => this.sceneManager.showScene(MenuScene);
     previousTime = performance.now();
     this.updateLoop();
   }
@@ -152,9 +156,16 @@ export default class GameScene extends Scene {
 
   keyPressed(event?: KeyboardEvent) {
     const pressedKeyCode = event?.keyCode ?? keyCode;
-    // ESC
+    // ESC. It used to be `showScene(MenuScene)` — one mis-hit ended the match,
+    // with no confirmation and nothing built up in it recoverable. It now
+    // opens the practice panel (or closes the innermost thing that is open),
+    // and the exit lives at the bottom of that panel's Trận đấu tab behind a
+    // two-step confirm. `Game.keyPressed` binds only 32 and 78, so nothing
+    // else wanted 27 — and it stops here rather than falling through, so a
+    // future binding cannot fire underneath the panel it just opened.
     if (pressedKeyCode === 27) {
-      this.sceneManager.showScene(MenuScene);
+      this.game?.escape();
+      return;
     }
     this.game?.keyPressed(pressedKeyCode, event?.repeat ?? false);
   }

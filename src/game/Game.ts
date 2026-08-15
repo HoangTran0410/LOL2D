@@ -92,6 +92,17 @@ export default class Game {
   director!: MatchDirector;
 
   /**
+   * How the match asks to be left. `GameScene` sets it to its own
+   * `sceneManager.showScene(MenuScene)` right after constructing this.
+   *
+   * A callback rather than a scene-manager reference because the dependency
+   * runs the other way everywhere else: scenes know about games, games do not
+   * know about scenes. Left `null` in a bench that never built a scene, where
+   * "leave the match" has no meaning.
+   */
+  onExitRequested: (() => void) | null = null;
+
+  /**
    * Cooldown reduction and URF, resolved from the pregame config at
    * construction. `Spell.ts` reads this off `owner.game.matchRules` — see
    * `Spell.applyMatchRules` — rather than this class pushing the numbers into
@@ -533,6 +544,15 @@ export default class Game {
       ...spell.targetingRequest,
     });
     return result.ok ? result.context : undefined;
+  }
+
+  /**
+   * Escape, routed from `GameScene`. The HUD owns what it means — innermost
+   * layer, then the practice panel — and this is the one line that gets the
+   * key to it, since `GameScene` holds a `Game` and not a Vue app.
+   */
+  escape(): void {
+    this.inGameHUD?.vueInstance?.hud.escape();
   }
 
   keyPressed(keyCode: number, repeated = false) {

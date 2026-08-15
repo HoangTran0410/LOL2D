@@ -807,6 +807,47 @@
   gap: 0.3rem;
 }
 
+/* The way out of the match, at the bottom of Trận đấu (RulesTab.vue).
+   Deliberately not in the tab row beside `.practice-close`: two adjacent
+   controls whose outcomes differ by an entire match is the mis-hit this whole
+   change exists to design out, so this one is far from that one, danger-red,
+   and confirms.
+
+   `margin-top: auto` would need a flex column; the tab body is a plain block,
+   so the separation is a rule and a wide gap instead. */
+.practice-exit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 1.6rem;
+  padding: 0.7rem;
+  background: transparent;
+  border: 2px solid rgba(190, 70, 70, 0.5);
+  color: rgba(230, 130, 130, 0.9);
+  font: inherit;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.practice-exit:hover {
+  border-color: rgba(220, 90, 90, 0.9);
+  color: rgb(245, 165, 165);
+}
+
+/* Armed. Filled rather than merely brighter, so "one more press and the match
+   is gone" is a different *kind* of button, not a shade of the same one. */
+.practice-exit.confirming {
+  background: rgba(150, 40, 40, 0.35);
+  border-color: rgb(220, 90, 90);
+  color: rgb(255, 210, 210);
+  font-weight: bold;
+}
+
 /* 22px so a checkbox is a real tap target (the native control is ~13px), a
    size that reads fine with a mouse too. */
 .practice-tab-body input[type='checkbox'] {

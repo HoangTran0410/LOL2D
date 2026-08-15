@@ -34,7 +34,7 @@
  * at the bottom is about the *world*, and is `RulesTab`'s jungle/minion note
  * for the same reason.
  */
-import { computed, inject, ref, shallowRef } from 'vue';
+import { computed, inject, onUnmounted, ref, shallowRef } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
 import type { BotBehaviour, RosterEntry } from '../../MatchDirector';
 import type { ChampionLoadout } from '../../config/PregameConfig';
@@ -158,6 +158,24 @@ if (requestedSlot !== null) {
   if (index >= 0) openEditor(roster.value[index], index, requestedSlot);
   hud.editPlayerSlot = null;
 }
+
+/**
+ * Escape closes the innermost layer first — the editor over this tab, not the
+ * panel under it — which is the rule commit `b48ef7d` set for the setup
+ * screen's own nested modals. The handler lives on the shared `hud` object
+ * because the key never reaches the DOM: p5 binds `keydown` on `window` and
+ * `GameScene` routes it. Returning `false` when nothing is open lets Escape
+ * fall through to the panel.
+ */
+hud.onEscapeInner = () => {
+  if (!editing.value) return false;
+  editing.value = null;
+  return true;
+};
+
+onUnmounted(() => {
+  hud.onEscapeInner = null;
+});
 
 const editingLoadout = computed<ChampionLoadout>(() =>
   editing.value ? hud.director.loadoutOf(editing.value.unit) : DEFAULT_CHAMPION_LOADOUT

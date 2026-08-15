@@ -155,6 +155,30 @@ export interface HudInteractions {
   touchUi: boolean;
 
   /**
+   * Set by whichever component has a layer open *over* the panel — today only
+   * `RosterTab`, while its loadout editor is up. Returns whether it consumed
+   * the Escape. `null` when there is no inner layer, which is the usual case.
+   *
+   * It lives here rather than in the component because the key never reaches
+   * the DOM: p5 binds `keydown` on `window` and `GameScene` routes it, so the
+   * only thing the two ends share is this object.
+   */
+  onEscapeInner: (() => boolean) | null;
+
+  /**
+   * What Escape means now. Innermost layer first — the same "the backdrop
+   * steps back one layer" rule the setup screen follows — then the panel:
+   * closed opens it, open closes it the way the close button does.
+   */
+  escape(): void;
+  /**
+   * Leave the match. Calls `Game.onExitRequested`, which `GameScene` set to
+   * its own `showScene(MenuScene)`: quitting is a scene transition, not a
+   * mutation of the running match, so it is deliberately not a
+   * `MatchDirector` method.
+   */
+  requestExit(): void;
+  /**
    * Opens the panel with no slot in mind — the corner button's entry point,
    * in both modes.
    */
@@ -216,11 +240,29 @@ export function createHudInteractions(game: Game): HudInteractions {
     },
     showSpellsPicker: false,
     editPlayerSlot: null as number | null,
+    onEscapeInner: null as (() => boolean) | null,
     allSpells: Object.values<any>(AllSpells).map(buildSpellItem),
     spellGroups: (SpellGroups as any[]).map(buildSpellGroup),
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
+
+    escape(): void {
+      // The innermost layer gets it first, and only it: closing a modal and
+      // the panel under it on one keypress is the mis-hit this whole change
+      // exists to design out.
+      if (state.onEscapeInner?.()) return;
+      if (state.showSpellsPicker) state.closeSpellPicker();
+      else state.openSpellPicker();
+    },
+
+    requestExit(): void {
+      // Closed first so the panel is not left standing over a scene that is
+      // about to be torn down.
+      state.showSpellsPicker = false;
+      state.editPlayerSlot = null;
+      game.onExitRequested?.();
+    },
 
     /**
      * The corner button's entry point, in both modes. It does not toggle:
