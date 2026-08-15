@@ -73,14 +73,32 @@ export const usePregameConfig = (): PregameConfigController => {
    * removing a *specific* bot rather than only the last one. The fixed-length
    * `bots` array (always `AI_COUNT_MAX` entries — see the type's doc comment)
    * is preserved by refilling the freed tail slot with a default loadout.
+   *
+   * `botBehaviours` is spliced in exactly the same step, because the two arrays
+   * are index-aligned by definition: shift the kits without the flags and the
+   * bot that moved down a slot inherits the behaviour of the bot that used to
+   * be there. The freed tail slot is refilled from the *global* flags rather
+   * than from `DEFAULT_BOT_BEHAVIOUR` — that is what a slot nobody has
+   * configured means everywhere else (see `sanitizePregameConfig`'s migration
+   * and `MatchDirector.addBot`), and this screen is where those flags are set.
    */
   const removeBotAt = (index: number): void => {
     if (index < 0 || index >= config.value.ai.count) return;
+    const { autoMove, autoAttack, autoCast } = config.value.ai;
+
     const bots = config.value.ai.bots.slice();
     bots.splice(index, 1);
     bots.push(DEFAULT_CHAMPION_LOADOUT);
+
+    const botBehaviours = config.value.ai.botBehaviours.slice();
+    botBehaviours.splice(index, 1);
+    botBehaviours.push({ autoMove, autoAttack, autoCast });
+
     const count = Math.max(AI_COUNT_MIN, config.value.ai.count - 1);
-    config.value = { ...config.value, ai: { ...config.value.ai, count, bots } };
+    config.value = {
+      ...config.value,
+      ai: { ...config.value.ai, count, bots, botBehaviours },
+    };
     persist();
   };
 
