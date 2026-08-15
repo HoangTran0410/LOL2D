@@ -48,10 +48,18 @@
  *      and `=== 0.1` fails on correct code;
  *   8. the same tab's jungle switch empties `game.monsters` and the camps are
  *      gone from the world after one tick;
- *   9. a kit saved mid-match survives a reload into a new match. Note *where*:
+ *   9. Gian lận: the invulnerability toggle survives a close and reopen, and a
+ *      stack button moves the spell's own count *and* the HUD badge;
+ *  10. an invulnerable bot stops losing health across unpaused frames while a
+ *      second bot, hit identically, does not — the only check here that proves
+ *      the buff works in the real loop rather than in a fixture;
+ *  11. a kit saved mid-match survives a reload into a new match. Note *where*:
  *      the saved-kit shelf is not on the panel itself — it is at Đấu thủ → a
  *      unit's row → the loadout editor, which teleports out of the panel.
- *      Asserted both ways.
+ *      Asserted both ways;
+ *  12. Escape leaves you *in* the match with the panel open — never in the menu
+ *      — and the exit button's first press does not leave either. Both are
+ *      regressions a player would discover by losing a match.
  *
  *   node tests/e2e/drive-practice-panel.mjs [outPrefix]
  *
@@ -71,15 +79,17 @@ const TAB_LABELS = ['Đấu thủ', 'Trận đấu', 'Gian lận'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
- * in check 7 has a real spell in slot Q, and `ai.count` is 0 so the only bots
- * in the match are the ones this script adds — a bot rolls a random kit, and
+ * in check 7 has a real spell in slot Q — Veigar specifically, because his Q
+ * is one of the three spells that accumulate stacks and check 9 needs a stack
+ * row to press. `ai.count` is 0 so the only bots in the match are the ones
+ * this script adds — a bot rolls a random kit, and
  * every earlier task in this plan that let one into an assertion got an
  * intermittent failure out of it.
  */
 const MATCH_CONFIG = {
   player: {
     mode: 'champion',
-    championName: 'Ahri',
+    championName: 'Veigar',
     summonerD: 'Flash',
     summonerF: 'Heal',
     customSlots: Array(7).fill('random'),
@@ -513,7 +523,174 @@ try {
     JSON.stringify(report.jungle)
   );
 
-  // ---------------------------- 9. a kit saved mid-match survives a new match
+  // ------------------------------- 9. Gian lận: the toggle and the stack rows
+
+  await openPanel();
+  await selectTab('cheats', true); // one of the three switched by thumb
+  const cheatShape = await gameEval(() => ({
+    units: document.querySelectorAll('[id^="practice-cheat-unit-"]').length,
+    stackRows: [...document.querySelectorAll('[data-cheat-stack]')].map(
+      row => row.dataset.cheatStack
+    ),
+  }));
+  await page.screenshot({ path: `${OUT}-06-cheats.png` });
+  check(
+    'Gian lận: one row per unit, and one stack row for the one stacking spell in the kit',
+    cheatShape.units === (await rosterCount()) && cheatShape.stackRows.length === 1,
+    JSON.stringify(cheatShape)
+  );
+
+  // The toggle, on the player (row 0, which is what the tab opens on).
+  await tapSelector('#practice-cheat-invuln');
+  const invulnAfterTap = await gameEval(() =>
+    window.__lol2d.scene.oScene.game.director.isInvulnerable(
+      window.__lol2d.scene.oScene.game.player
+    )
+  );
+  await closePanel();
+  await openPanel();
+  await selectTab('cheats');
+  const invulnAfterReopen = await gameEval(() => ({
+    checkbox: document.querySelector('#practice-cheat-invuln').checked,
+    director: window.__lol2d.scene.oScene.game.director.isInvulnerable(
+      window.__lol2d.scene.oScene.game.player
+    ),
+  }));
+  // And off again, on the reopened panel. Both directions, because
+  // `deactivateBuff()` only *marks* the buff and `AttackableUnit.update()`
+  // cannot run while the panel holds the match paused — a toggle that only
+  // ever counted buffs would report "still on" here and refuse to come back
+  // on afterwards.
+  await tapSelector('#practice-cheat-invuln');
+  const invulnAfterSecondTap = await gameEval(() => ({
+    checkbox: document.querySelector('#practice-cheat-invuln').checked,
+    director: window.__lol2d.scene.oScene.game.director.isInvulnerable(
+      window.__lol2d.scene.oScene.game.player
+    ),
+  }));
+  report.invulnToggle = { invulnAfterTap, invulnAfterReopen, invulnAfterSecondTap };
+  check(
+    'Gian lận: the invulnerability toggle survives a close and reopen, and still switches off',
+    invulnAfterTap === true &&
+      invulnAfterReopen.director === true &&
+      invulnAfterReopen.checkbox === true &&
+      invulnAfterSecondTap.director === false &&
+      invulnAfterSecondTap.checkbox === false,
+    JSON.stringify(report.invulnToggle)
+  );
+
+  // The stack row: +10 has to move the spell itself *and* the HUD badge, which
+  // reads `Spell.stackCount` off the live spell on the 20Hz HUD tick.
+  const stackId = cheatShape.stackRows[0];
+  const stacksBefore = await gameEval(
+    () => window.__lol2d.scene.oScene.game.player.spells[1].stackCount
+  );
+  await tapSelector(`[data-cheat-stack="${stackId}"] .practice-cheat-btn:nth-child(2)`);
+  await page.waitForTimeout(250);
+  const stacksAfter = await gameEval(() => ({
+    spell: window.__lol2d.scene.oScene.game.player.spells[1].stackCount,
+    tabBadge: document.querySelector('.practice-cheat-stack-count')?.textContent?.trim() ?? null,
+  }));
+  // The HUD badge lives on the *desktop* strip (`DesktopHudView.vue`), and this
+  // page is a touch context, so `MobileHudView` — which has no strip — is what
+  // renders. Flip the mode for the read and flip it straight back. Note the
+  // flip remounts the panel with it (both views own one), which is why the tab
+  // badge is read *before* this and the roster tab is re-selected after.
+  await gameEval(() => window.__lol2d.scene.oScene.game.setTouchControlsEnabled(false, false));
+  await page.waitForTimeout(300);
+  const hudBadge = await gameEval(() => ({
+    icons: document.querySelectorAll('.bottom-HUD .spells .spell').length,
+    badge:
+      document
+        .querySelectorAll('.bottom-HUD .spells .spell')[1]
+        ?.querySelector('.stacks')
+        ?.textContent?.trim() ?? null,
+  }));
+  await gameEval(() => window.__lol2d.scene.oScene.game.setTouchControlsEnabled(true, false));
+  await page.waitForTimeout(300);
+  report.stacks = { stacksBefore, stacksAfter, hudBadge };
+  check(
+    "Gian lận: +10 moves the spell's own count, the tab's badge and the HUD badge together",
+    stacksBefore === 0 &&
+      stacksAfter.spell === 10 &&
+      stacksAfter.tabBadge === '10' &&
+      hudBadge.icons > 1 &&
+      hudBadge.badge === '10',
+    JSON.stringify(report.stacks)
+  );
+
+  // ---------------------- 10. an invulnerable bot really stops taking damage
+
+  // Two bots, added through the roster tab and flushed into the world by a
+  // tick — check 6 cleared the field, and this check needs a pair.
+  await selectTab('roster');
+  await tapSelector('.practice-add-bot');
+  await tapSelector('.practice-add-bot');
+  await closePanel();
+  await runMatch();
+  await openPanel();
+  await selectTab('cheats');
+
+  // Row 1 is the first bot; row 2 is the control, hit identically with no buff.
+  // The paired control is the point: "health unchanged" on its own would pass
+  // against a takeDamage that dropped everything.
+  await tapSelector('#practice-cheat-unit-1');
+  await tapSelector('#practice-cheat-invuln');
+  const immuneId = await gameEval(
+    () => window.__lol2d.scene.oScene.game.director.roster()[1].unit.id
+  );
+  const controlId = await gameEval(
+    () => window.__lol2d.scene.oScene.game.director.roster()[2].unit.id
+  );
+  await closePanel();
+
+  // Unpaused from here: `Game.update()` runs, which is the loop the fixture
+  // tests cannot exercise.
+  const beatenUp = await gameEval(
+    ids => {
+      const game = window.__lol2d.scene.oScene.game;
+      const find = id => game.objectManager.objects.find(object => object.id === id);
+      const immune = find(ids.immuneId);
+      const control = find(ids.controlId);
+      if (!immune || !control) return null;
+      const before = {
+        immune: immune.stats.health.baseValue,
+        control: control.stats.health.baseValue,
+      };
+      for (let i = 0; i < 5; i++) {
+        immune.takeDamage(50);
+        control.takeDamage(50);
+      }
+      return before;
+    },
+    { immuneId, controlId }
+  );
+  await runMatch(700);
+  const afterFrames = await gameEval(
+    ids => {
+      const game = window.__lol2d.scene.oScene.game;
+      const find = id => game.objectManager.objects.find(object => object.id === id);
+      const immune = find(ids.immuneId);
+      const control = find(ids.controlId);
+      return {
+        immune: immune ? immune.stats.health.baseValue : null,
+        control: control ? control.stats.health.baseValue : null,
+        immuneDead: immune ? immune.isDead : null,
+      };
+    },
+    { immuneId, controlId }
+  );
+  report.invulnInLoop = { beatenUp, afterFrames };
+  check(
+    'an invulnerable bot keeps its health across unpaused frames, and the control bot does not',
+    beatenUp !== null &&
+      afterFrames.immune >= beatenUp.immune &&
+      afterFrames.immuneDead === false &&
+      afterFrames.control < beatenUp.control,
+    JSON.stringify(report.invulnInLoop)
+  );
+
+  // --------------------------- 11. a kit saved mid-match survives a new match
 
   await openPanel();
   const shelfOnPanelOpen = await gameEval(
@@ -600,6 +777,78 @@ try {
     'saving a kit does not write through to the pregame config',
     report.savedKit.pregameConfigUntouched === true,
     JSON.stringify(report.savedKit.storedPregame)
+  );
+
+  // ------------------ 12. Escape stays in the match; the exit button confirms
+  //
+  // Last, because the second half of it leaves the match on purpose. The
+  // regression both halves guard is a player losing a match to one keypress —
+  // which is what Escape did until this change.
+
+  await tapSelector('.kit-bar-btn.secondary'); // close the editor the check above left open
+  await page.waitForTimeout(200);
+  await closePanel();
+
+  const beforeEscape = await gameEval(() => ({
+    scene: window.__lol2d.scene.oScene.constructor.name,
+    panel: !!document.querySelector('.practice-panel'),
+  }));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(350);
+  const afterEscape = await gameEval(() => ({
+    scene: window.__lol2d.scene.oScene.constructor.name,
+    gameAlive: !!window.__lol2d.scene.oScene.game,
+    panel: !!document.querySelector('.practice-panel'),
+    paused: window.__lol2d.scene.oScene.game?.paused ?? null,
+  }));
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(350);
+  const afterSecondEscape = await gameEval(() => ({
+    scene: window.__lol2d.scene.oScene.constructor.name,
+    gameAlive: !!window.__lol2d.scene.oScene.game,
+    panel: !!document.querySelector('.practice-panel'),
+  }));
+  report.escape = { beforeEscape, afterEscape, afterSecondEscape };
+  check(
+    'Escape opens the panel and leaves you in the match — it never returns to the menu',
+    beforeEscape.scene === 'GameScene' &&
+      beforeEscape.panel === false &&
+      afterEscape.scene === 'GameScene' &&
+      afterEscape.gameAlive === true &&
+      afterEscape.panel === true &&
+      afterEscape.paused === true &&
+      afterSecondEscape.scene === 'GameScene' &&
+      afterSecondEscape.gameAlive === true &&
+      afterSecondEscape.panel === false,
+    JSON.stringify(report.escape)
+  );
+
+  await openPanel();
+  await selectTab('rules');
+  await tapSelector('#practice-exit');
+  const afterFirstPress = await gameEval(() => ({
+    scene: window.__lol2d.scene.oScene.constructor.name,
+    gameAlive: !!window.__lol2d.scene.oScene.game,
+    label: document.querySelector('#practice-exit')?.textContent?.trim() ?? null,
+  }));
+  await page.screenshot({ path: `${OUT}-08-exit-confirm.png` });
+  await tapSelector('#practice-exit');
+  await page.waitForTimeout(600);
+  const afterConfirm = await gameEval(() => ({
+    scene: window.__lol2d.scene.oScene.constructor.name,
+    gameAlive: !!window.__lol2d.scene.oScene.game,
+    panel: !!document.querySelector('.practice-panel'),
+  }));
+  report.exitButton = { afterFirstPress, afterConfirm };
+  check(
+    'the exit button asks first: one press only arms it, the second leaves',
+    afterFirstPress.scene === 'GameScene' &&
+      afterFirstPress.gameAlive === true &&
+      afterFirstPress.label === 'Chắc chưa?' &&
+      afterConfirm.scene === 'MenuScene' &&
+      !afterConfirm.gameAlive &&
+      afterConfirm.panel === false,
+    JSON.stringify(report.exitButton)
   );
 } catch (error) {
   failures.push(`threw: ${error.stack ?? error}`);

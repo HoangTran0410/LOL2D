@@ -104,7 +104,7 @@ try {
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
   });
   check(
-    'the corner spell-picker button is at least the 44px thumb target',
+    'the corner practice-panel button is at least the 44px thumb target',
     pickerBtnBox.w >= 44 && pickerBtnBox.h >= 44,
     `${pickerBtnBox.w}x${pickerBtnBox.h}`
   );
@@ -118,7 +118,7 @@ try {
     () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker
   );
   check(
-    'a real touch tap on the corner button opens the spell picker',
+    'a real touch tap on the corner button opens the practice panel',
     pickerBeforeTap === false && report.pickerAfterRealTap === true,
     `before ${pickerBeforeTap}, after ${report.pickerAfterRealTap}`
   );
@@ -146,12 +146,10 @@ try {
       .getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, h: box.height };
   });
-  check('the player\'s roster row is at least the 44px thumb target', rowBox.h >= 44, `${rowBox.h}`);
+  check("the player's roster row is at least the 44px thumb target", rowBox.h >= 44, `${rowBox.h}`);
   await tap(rowBox.x, rowBox.y);
   await page.waitForTimeout(350);
-  report.editorAfterRowTap = await page.evaluate(
-    () => !!document.querySelector('.loadout-modal')
-  );
+  report.editorAfterRowTap = await page.evaluate(() => !!document.querySelector('.loadout-modal'));
   check(
     'a real touch tap on a roster row opens the loadout editor',
     report.editorAfterRowTap === true
@@ -190,7 +188,9 @@ try {
   // ------------------------------------------------ 4. the way back out, twice
 
   const cancelBox = await page.evaluate(() => {
-    const box = document.querySelector('.loadout-modal .kit-bar-btn.secondary').getBoundingClientRect();
+    const box = document
+      .querySelector('.loadout-modal .kit-bar-btn.secondary')
+      .getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, h: box.height };
   });
   await tap(cancelBox.x, cancelBox.y, 40);
