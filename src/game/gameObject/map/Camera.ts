@@ -1,5 +1,47 @@
 import { Rectangle } from '../../../libs/quadtree';
 
+/**
+ * The world span every screen must show. A champion's `visionRadius` is 500
+ * (`Stats.ts:190`), so what a player is permitted to know is a circle 1000
+ * units across; everything past it is fog. Deriving the camera from that
+ * rather than from an invented number is what makes "one world unit is one
+ * pixel" — a 11x area advantage for a desktop over a phone — go away.
+ *
+ * A constant, never a live read of the player's current vision: a buff that
+ * grants sight must not make the camera lurch.
+ */
+export const VISION_SPAN = 1000;
+
+/**
+ * Bounds on the final scale. The floor is deliberately below a landscape
+ * phone's 0.39 — the shipped code clamped at 0.5, which would silently clip
+ * the one device this whole feature exists for and leave the bug in a form
+ * much harder to see.
+ */
+export const SCALE_MIN = 0.3;
+export const SCALE_MAX = 2.5;
+
+/** Bounds on the player's manual multiplier over the balanced base. */
+export const ZOOM_FACTOR_MIN = 0.6;
+export const ZOOM_FACTOR_MAX = 1.6;
+
+/**
+ * `Math.min`, not p5's `constrain`: this is called from `zoomFactorPreference`
+ * before any p5 global exists, and from Vitest's `environment: 'node'` with
+ * nothing stubbed.
+ */
+export const clampZoomFactor = (factor: number): number =>
+  Math.min(ZOOM_FACTOR_MAX, Math.max(ZOOM_FACTOR_MIN, factor));
+
+/**
+ * The shorter side, so an ultrawide gets more horizontal world rather than a
+ * penalty. The consequence is intended: a 2.16-aspect phone ends up seeing
+ * more horizontal world than a 1.78-aspect desktop. Aspect ratio decides
+ * horizontal extent, and that is not something to normalise away.
+ */
+export const baseScaleFor = (viewportWidth: number, viewportHeight: number): number =>
+  Math.min(viewportWidth, viewportHeight) / VISION_SPAN;
+
 export default class Camera {
   position: p5.Vector;
   currentScale: number;
@@ -18,14 +60,41 @@ export default class Camera {
     this.target = null;
   }
 
-  zoomBy(delta: number): void {
-    this.scale += delta;
-    this.scale = constrain(this.scale, 0.5, 2);
+  /** The balanced scale for this viewport, before the player's preference. */
+  baseScale = 1;
+  /** The player's multiplier over `baseScale`. Persisted; see `zoomFactorPreference`. */
+  zoomFactor = 1;
+
+  /**
+   * Recompute for a viewport size. Takes explicit numbers rather than reading
+   * the `width`/`height` globals so it is callable from a headless test.
+   */
+  fitTo(viewportWidth: number, viewportHeight: number): void {
+    this.baseScale = baseScaleFor(viewportWidth, viewportHeight);
+    this.applyZoom();
   }
 
-  zoomTo(zoom: number): void {
-    this.scale = zoom;
-    this.scale = constrain(this.scale, 0.5, 2);
+  /**
+   * A factor over the base, never an absolute scale. That is what lets the two
+   * inputs compose: with an absolute scale, resizing the window would discard
+   * the player's zoom and choosing a zoom would discard the balance.
+   */
+  setZoomFactor(factor: number): void {
+    this.zoomFactor = clampZoomFactor(factor);
+    this.applyZoom();
+  }
+
+  zoomBy(delta: number): void {
+    this.setZoomFactor(this.zoomFactor + delta);
+  }
+
+  /** Drop the opening lerp and start where we mean to be. */
+  snapToScale(): void {
+    this.currentScale = this.scale;
+  }
+
+  private applyZoom(): void {
+    this.scale = Math.min(SCALE_MAX, Math.max(SCALE_MIN, this.baseScale * this.zoomFactor));
   }
 
   update(): void {
