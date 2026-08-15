@@ -117,6 +117,7 @@ export default class Zed_R extends Spell {
 
     this.phase = 'R2';
     this.image = Zed_R.PHASES.R2.image;
+    // recast window, not a cooldown — deliberately not reduced
     this.currentCooldown = this.coolDownBeforeSwap;
   }
 
@@ -148,7 +149,7 @@ export default class Zed_R extends Spell {
     this.shadow = null;
     this.phase = 'R1';
     this.image = Zed_R.PHASES.R1.image;
-    this.currentCooldown = this.coolDown;
+    this.currentCooldown = this.reducedCooldown(this.coolDown);
   }
 
   onUpdate() {
@@ -157,7 +158,7 @@ export default class Zed_R extends Spell {
       this.shadow = null;
       this.phase = 'R1';
       this.image = Zed_R.PHASES.R1.image;
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 

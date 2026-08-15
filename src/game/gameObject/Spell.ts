@@ -302,12 +302,45 @@ export default class Spell {
    * `CastSpec` object sidesteps that trap entirely.
    */
   private applyMatchRules(spec: CastSpec): CastSpec {
-    const multiplier = this.game?.matchRules?.cooldownMultiplier ?? 1;
+    const multiplier = this.cooldownMultiplier;
     if (multiplier === 1) return spec;
     return {
       ...spec,
       cooldown: { ...spec.cooldown, durationMs: spec.cooldown.durationMs * multiplier },
     };
+  }
+
+  /**
+   * The one expression in the codebase that reads the match's cooldown rule.
+   * Both ways a cooldown can start — the runtime's (`applyMatchRules`) and a
+   * spell's own (`reducedCooldown`) — go through it, so there is a single
+   * thing to change when the rule changes.
+   */
+  private get cooldownMultiplier(): number {
+    return this.game?.matchRules?.cooldownMultiplier ?? 1;
+  }
+
+  /**
+   * The other half of the cooldown-reduction seam, for spells that set their
+   * own cooldown mid-cast rather than letting the runtime start it from the
+   * `CastSpec`: a recast phase ending (Lee Sin Q2, Zed R's swap, Anivia Q's
+   * detonation), a hit-shortened cooldown (Yasuo Q), a partial refund (Janna
+   * E, Pantheon Q).
+   *
+   * Those spells write `this.currentCooldown = <some tuning number>` directly,
+   * which goes around `applyMatchRules` entirely — the runtime resolved its
+   * spec once, at construction, and never sees the assignment. Left raw, a
+   * multi-phase spell would ignore cooldown reduction completely while its
+   * single-phase neighbours honoured it. Wrapping the number here puts the
+   * assignment back on the seam.
+   *
+   * Not every mid-cast countdown is a cooldown: a recast window ("you have N
+   * ms to press the key again") is a fixed input window and must stay raw, or
+   * cooldown reduction would silently shorten the player's reaction time.
+   * `tests/game/spells/MatchRules.test.ts` audits which is which.
+   */
+  protected reducedCooldown(durationMs: number): number {
+    return durationMs * this.cooldownMultiplier;
   }
 
   /**

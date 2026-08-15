@@ -93,7 +93,8 @@ export default class LeeSin_W extends Spell {
     this.image = LeeSin_W.PHASES.W2.image;
     this._ironWillTimeLeft = this.ironWillWindow;
     // Iron Will has to become castable right away; the real cooldown only
-    // starts once the recast window is used up or has lapsed
+    // starts once the recast window is used up or has lapsed — so this is a
+    // recast window, not a cooldown, and is deliberately not reduced
     this.currentCooldown = 300;
   }
 
@@ -127,7 +128,7 @@ export default class LeeSin_W extends Spell {
     this.phase = 'W1';
     this.image = LeeSin_W.PHASES.W1.image;
     this._ironWillTimeLeft = 0;
-    this.currentCooldown = this._cooldownAfterSafeguard;
+    this.currentCooldown = this.reducedCooldown(this._cooldownAfterSafeguard);
   }
 
   findNearestAlly(): any {

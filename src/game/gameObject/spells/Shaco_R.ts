@@ -55,7 +55,7 @@ export default class Shaco_R extends Spell {
     if (this.clonePlayer?.toRemove) {
       this.clonePlayer = null;
       this.image = AssetManager.get('spell_shaco_r');
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 }

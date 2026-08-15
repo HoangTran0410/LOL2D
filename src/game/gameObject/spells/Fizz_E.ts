@@ -105,6 +105,7 @@ export default class Fizz_E extends Spell {
     this.image = Fizz_E.PHASES.AIR.image;
     this._hoverTimeLeft = this.hoverDuration;
     this._landing = false;
+    // recast window, not a cooldown — deliberately not reduced
     this.currentCooldown = this.recastDelay;
   }
 
@@ -161,7 +162,7 @@ export default class Fizz_E extends Spell {
     this._landing = false;
     this.phase = 'GROUND';
     this.image = Fizz_E.PHASES.GROUND.image;
-    this.currentCooldown = this.coolDown;
+    this.currentCooldown = this.reducedCooldown(this.coolDown);
 
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({

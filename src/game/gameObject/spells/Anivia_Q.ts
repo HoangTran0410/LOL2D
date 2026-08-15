@@ -58,12 +58,13 @@ export default class Anivia_Q extends Spell {
       this.spellObject = obj;
       this.phase = 'Q2';
       // hand the recast back to the player almost immediately
+      // recast window, not a cooldown — deliberately not reduced
       this.currentCooldown = this.recastDelay;
     } else {
       this.spellObject?.detonate();
       this.spellObject = null;
       this.phase = 'Q1';
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 
@@ -72,7 +73,7 @@ export default class Anivia_Q extends Spell {
     if (this.phase === 'Q2' && (!this.spellObject || this.spellObject.toRemove)) {
       this.spellObject = null;
       this.phase = 'Q1';
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 

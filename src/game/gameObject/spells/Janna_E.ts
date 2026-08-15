@@ -141,7 +141,14 @@ export default class Janna_E extends Spell {
   notifyCrowdControlLanded(): void {
     if (!this.refundArmed || this.currentCooldown <= 0) return;
     this.refundArmed = false;
-    this.currentCooldown = Math.max(0, this.currentCooldown - this.coolDown * REFUND_RATIO);
+    // A fraction of the *reduced* cooldown, not the raw one: under cooldown
+    // reduction the running cooldown is already shorter, so refunding a slice
+    // of the raw number would hand back proportionally more than the refund is
+    // meant to be — enough to zero it outright at high CDR.
+    this.currentCooldown = Math.max(
+      0,
+      this.currentCooldown - this.reducedCooldown(this.coolDown) * REFUND_RATIO
+    );
   }
 
   private isValidTarget(target: unknown): target is EyeTarget {

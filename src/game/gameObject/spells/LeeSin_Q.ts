@@ -67,6 +67,7 @@ export default class LeeSin_Q extends Spell {
 
         this.phase = 'Q2';
         this.image = LeeSin_Q.PHASES[this.phase].image;
+        // recast window, not a cooldown — deliberately not reduced
         this.currentCooldown = this.collDownAfterQ1;
       };
       this.spellObject = obj;
@@ -99,7 +100,7 @@ export default class LeeSin_Q extends Spell {
       this.enemyHit = null;
       this.phase = 'Q1';
       this.image = LeeSin_Q.PHASES[this.phase].image;
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 }

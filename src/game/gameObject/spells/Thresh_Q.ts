@@ -77,6 +77,7 @@ export default class Thresh_Q extends Spell {
     this.threshObj.range = this.range;
     this.threshObj.onHookLanded = () => {
       // shackled: the recast becomes available once the short lockout passes
+      // recast window, not a cooldown — deliberately not reduced
       this.phase = 'Q2';
       this.image = Thresh_Q.PHASES.Q2.image;
       this.currentCooldown = this.coolDownAfterHook;
@@ -122,7 +123,7 @@ export default class Thresh_Q extends Spell {
       if (this.phase === 'Q2') {
         this.phase = 'Q1';
         this.image = Thresh_Q.PHASES.Q1.image;
-        this.currentCooldown = this.coolDown;
+        this.currentCooldown = this.reducedCooldown(this.coolDown);
       }
     }
   }

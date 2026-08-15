@@ -186,7 +186,7 @@ export default class Pantheon_Q extends Spell {
   }
 
   onComplete(_context: CastContext): void {
-    if (this.wasThrust) this.currentCooldown = this.coolDown * 0.4;
+    if (this.wasThrust) this.currentCooldown = this.reducedCooldown(this.coolDown * 0.4);
   }
 
   private createThrust(start: Vec2, direction: Vec2): void {

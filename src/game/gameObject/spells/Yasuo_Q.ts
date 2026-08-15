@@ -60,7 +60,7 @@ export default class Yasuo_Q extends Spell {
       obj.onHit = (champ: any) => {
         this.hitStackCount++;
         this.lastHitTime = Date.now();
-        this.currentCooldown = this.coolDownIfHit;
+        this.currentCooldown = this.reducedCooldown(this.coolDownIfHit);
       };
 
       this.game.objectManager.addObject(obj);

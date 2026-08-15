@@ -42,6 +42,7 @@ export default class Zed_W extends Spell {
       this.zedWClone.destination = to;
       this.game.objectManager.addObject(this.zedWClone);
 
+      // recast window, not a cooldown — deliberately not reduced
       this.currentCooldown = 500;
       this.image = AssetManager.get('spell_zed_w2');
     } else {
@@ -49,7 +50,7 @@ export default class Zed_W extends Spell {
       // Grounded refuses the swap. The shadow stays put and stays swappable, so
       // the recast is held rather than wasted.
       if (!this.blinkOwnerTo(this.zedWClone.position.x, this.zedWClone.position.y)) return;
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
 
       this.zedWClone.teleportTo(curPos.x, curPos.y);
       this.zedWClone.swapable = false;
@@ -61,7 +62,7 @@ export default class Zed_W extends Spell {
   onUpdate() {
     if (this.zedWClone?.toRemove) {
       this.zedWClone = null;
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
       this.image = AssetManager.get('spell_zed_w');
     }
   }

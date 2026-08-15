@@ -90,6 +90,7 @@ export default class Nocturne_R extends Spell {
     this.phase = 'R2';
     this.image = Nocturne_R.PHASES.R2.image;
     this._recastTimeLeft = this.nearsightTime;
+    // recast window, not a cooldown — deliberately not reduced
     this.currentCooldown = this.recastDelay;
   }
 
@@ -118,7 +119,7 @@ export default class Nocturne_R extends Spell {
     this.phase = 'R1';
     this.image = Nocturne_R.PHASES.R1.image;
     this._recastTimeLeft = 0;
-    this.currentCooldown = this.coolDown;
+    this.currentCooldown = this.reducedCooldown(this.coolDown);
   }
 
   /** The enemy champion closest to the cursor, so the player picks the victim. */

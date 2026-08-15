@@ -85,6 +85,7 @@ export default class Leblanc_W extends Spell {
       this.w1Object.lifeTime = this.w1LifeTime;
       this.game.objectManager.addObject(this.w1Object);
 
+      // recast window, not a cooldown — deliberately not reduced
       this.swtichPhase(this.PHASES.W2, this.waitTimeBeforeRecast);
     } else {
       if (this.w1Object) {
@@ -92,14 +93,14 @@ export default class Leblanc_W extends Spell {
         this.w1Object.toRemove = true;
       }
 
-      this.swtichPhase(this.PHASES.W1, this.coolDown);
+      this.swtichPhase(this.PHASES.W1, this.reducedCooldown(this.coolDown));
     }
   }
 
   onUpdate() {
     if (this.phase == this.PHASES.W2) {
       if (this.w1Object?.toRemove) {
-        this.swtichPhase(this.PHASES.W1, this.coolDown);
+        this.swtichPhase(this.PHASES.W1, this.reducedCooldown(this.coolDown));
       }
     }
   }

@@ -69,6 +69,7 @@ export default class Ahri_R extends Spell {
 
     this.dashCount++;
     this.timeSinceLastDash = 0;
+    // recast window, not a cooldown — deliberately not reduced
     this.currentCooldown = this.timeWaitForNextDash;
   }
 
@@ -85,7 +86,7 @@ export default class Ahri_R extends Spell {
       this.dashCount = 0;
       this.timeSinceFirstDash = 0;
       this.timeSinceLastDash = 0;
-      this.currentCooldown = this.coolDown;
+      this.currentCooldown = this.reducedCooldown(this.coolDown);
     }
   }
 }
