@@ -3,10 +3,11 @@ import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
 import Monster from './gameObject/attackableUnits/Monster';
+import { teamBodyColor } from './gameObject/attackableUnits/Minion';
 import Camera, { zoomFactorPreference } from './gameObject/map/Camera';
 import FogOfWar from './gameObject/map/FogOfWar';
 import TerrainMap from './gameObject/map/TerrainMap';
-import Minimap, { type MinimapHost } from './gameObject/map/Minimap';
+import Minimap, { type MinimapBlip, type MinimapHost } from './gameObject/map/Minimap';
 import Fountain from './gameObject/structures/Fountain';
 import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
@@ -495,11 +496,49 @@ export default class Game {
     };
   }
 
+  /**
+   * One dot per thing worth knowing about, rebuilt each frame.
+   *
+   * Visibility is read off `willDraw`, never recomputed: `FogOfWar.
+   * calculateSight()` already sets it every frame and `ObjectManager.draw`
+   * already consumes it, so the minimap is a second reader of one answer.
+   * Structures keep `willDraw` true for good (turrets are `alwaysVisible`, and
+   * a fountain is not an `AttackableUnit` at all, so the fog's per-frame reset
+   * never touches either) — which is exactly the "static and always known"
+   * the minimap wants, with no special case here.
+   */
+  private minimapBlips(): MinimapBlip[] {
+    const blips: MinimapBlip[] = [];
+    for (const object of this.objectManager.objects) {
+      // The player is drawn separately, always, in its own colour.
+      if (object === this.player) continue;
+      const unit = object as AttackableUnit & { isDead?: boolean };
+      const isStructure = object instanceof Turret || object instanceof Fountain;
+      if (!isStructure && !(object instanceof AttackableUnit)) continue;
+      if (unit.isDead) continue;
+      if (!isStructure && !object.willDraw) continue;
+      blips.push({
+        x: object.position.x,
+        y: object.position.y,
+        kind: isStructure
+          ? 'structure'
+          : object instanceof Champion || object instanceof AIChampion
+            ? 'champion'
+            : 'unit',
+        color: teamBodyColor(String(object.teamId)),
+      });
+    }
+    return blips;
+  }
+
   private minimapHost(): MinimapHost {
     return {
       viewport: () => ({ width: windowWidth, height: windowHeight }),
       mapSize: () => this.mapSize,
       wallPolygons: () => this.terrainMap.wallPolygons(),
+      blips: () => this.minimapBlips(),
+      playerPosition: () => this.player.position,
+      cameraBox: () => this.camera.getBoundingBox(),
     };
   }
 

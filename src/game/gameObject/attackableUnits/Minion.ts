@@ -103,6 +103,14 @@ const TEAM_COLORS: Record<string, { body: number[]; trim: number[]; bar: number[
 };
 const NEUTRAL_COLORS = { body: [150, 150, 160], trim: [40, 40, 48], bar: [200, 200, 210] };
 
+/**
+ * The body colour for a team, for anything that has to agree with a minion
+ * about what a team looks like — the minimap's dots, today. Exported rather
+ * than copied so a colour means the same thing in both places.
+ */
+export const teamBodyColor = (teamId: string): number[] =>
+  (TEAM_COLORS[teamId] ?? NEUTRAL_COLORS).body;
+
 export interface MinionOptions {
   game: AttackableUnitOptions['game'];
   position?: p5.Vector;

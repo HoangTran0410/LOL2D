@@ -72,12 +72,54 @@ export interface MinimapHost {
   mapSize(): number;
   /** World-space wall polygons; read once per buffer build, never per frame. */
   wallPolygons(): Point[][];
+  /** Everything worth a dot this frame, fog already applied. See `MinimapBlip`. */
+  blips(): readonly MinimapBlip[];
+  /** Where the player is, always drawn — you can always see yourself. */
+  playerPosition(): Point;
+  /** `Camera.getBoundingBox()`: the one element that answers "where am I looking". */
+  cameraBox(): { x: number; y: number; w: number; h: number };
+}
+
+/** What a dot is, which decides its shape and size — never its world size. */
+export type BlipKind = 'champion' | 'unit' | 'structure';
+
+/**
+ * One dot. The host resolves the colour because the host is the one that knows
+ * the game's team palette (`teamBodyColor` in `Minion.ts`); the minimap only
+ * knows where to put it.
+ */
+export interface MinimapBlip {
+  x: number;
+  y: number;
+  kind: BlipKind;
+  color: readonly number[];
 }
 
 /** Ground under the walls, and the walls themselves. */
 const GROUND_COLOR = [16, 20, 28, 242] as const;
 const WALL_COLOR = [72, 82, 100, 255] as const;
 const BORDER_COLOR = [190, 205, 230, 200] as const;
+/** The player, in a colour no team can be. */
+export const PLAYER_COLOR = [255, 236, 140] as const;
+const CAMERA_BOX_COLOR = [235, 240, 250, 190] as const;
+
+/**
+ * Dot diameters in minimap pixels at the collapsed size, by kind.
+ *
+ * Deliberately not derived from `stats.size`: a dot is an icon, not a scale
+ * model, and a 165-unit Cho'Gath must not become a blob covering four other
+ * units. The expanded map multiplies these by its rect ratio only so the same
+ * icons stay the same *apparent* size — that ratio is a property of the rect,
+ * never of the unit.
+ */
+const BLIP_DIAMETER: Record<BlipKind | 'player', number> = {
+  player: 7,
+  champion: 6,
+  unit: 3.5,
+  structure: 5,
+};
+/** Past this the expanded map's icons would be blobs of their own. */
+const BLIP_SCALE_MAX = 2.2;
 
 export class Minimap {
   /** Collapsed until tapped. */
@@ -137,11 +179,48 @@ export class Minimap {
     imageMode(CORNER);
     rectMode(CORNER);
     image(buffer, bounds.x, bounds.y, bounds.size, bounds.size);
+    this.drawLiveLayer(bounds);
     noFill();
     stroke(BORDER_COLOR[0], BORDER_COLOR[1], BORDER_COLOR[2], BORDER_COLOR[3]);
     strokeWeight(2);
     rect(bounds.x, bounds.y, bounds.size, bounds.size);
     pop();
+  }
+
+  /** Everything that moves: the camera's view, the dots, and the player. */
+  private drawLiveLayer(bounds: MinimapRect): void {
+    const mapSize = this.host.mapSize();
+    const dotScale = Math.min(BLIP_SCALE_MAX, bounds.size / MINIMAP_SIZE);
+
+    // The view rectangle first, so no dot is hidden under its outline.
+    const box = this.host.cameraBox();
+    const topLeft = worldToMinimap({ x: box.x, y: box.y }, bounds, mapSize);
+    const span = { w: (box.w / mapSize) * bounds.size, h: (box.h / mapSize) * bounds.size };
+    noFill();
+    stroke(CAMERA_BOX_COLOR[0], CAMERA_BOX_COLOR[1], CAMERA_BOX_COLOR[2], CAMERA_BOX_COLOR[3]);
+    strokeWeight(1);
+    rect(topLeft.x, topLeft.y, span.w, span.h);
+
+    noStroke();
+    for (const blip of this.host.blips()) {
+      const at = worldToMinimap(blip, bounds, mapSize);
+      const diameter = BLIP_DIAMETER[blip.kind] * dotScale;
+      fill(blip.color[0], blip.color[1], blip.color[2]);
+      if (blip.kind === 'structure') {
+        rect(at.x - diameter / 2, at.y - diameter / 2, diameter, diameter);
+      } else {
+        circle(at.x, at.y, diameter);
+      }
+    }
+
+    // Last, and outlined: the player is the one dot that must never be lost
+    // under another, and is drawn whatever the fog says.
+    const player = worldToMinimap(this.host.playerPosition(), bounds, mapSize);
+    const playerDiameter = BLIP_DIAMETER.player * dotScale;
+    stroke(20, 24, 32, 220);
+    strokeWeight(1.5);
+    fill(PLAYER_COLOR[0], PLAYER_COLOR[1], PLAYER_COLOR[2]);
+    circle(player.x, player.y, playerDiameter);
   }
 
   private bufferFor(size: number): any {
