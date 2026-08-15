@@ -29,6 +29,10 @@ In:
 
 Applies to **the player or any bot**, selected the way `RosterTab` selects.
 
+Also in, and not a cheat — it arrived with this work because the panel is where
+it belongs: **Escape stops ending the match**, and the match gets a real exit
+button. See "Escape stops ending the match" below.
+
 Out, and why:
 
 - **Teleport.** Deferred to the minimap spec, on the user's reasoning: the
@@ -230,6 +234,60 @@ handler: `GameScene` calls `preventDefault()` on every touch page-wide, which
 during the practice panel work killed a checkbox `change`, a range drag and a
 plain `@click` on three separate occasions.
 
+### 5. Escape stops ending the match
+
+`GameScene.keyPressed` (`GameScene.ts:150-154`) sends keycode 27 straight to
+`sceneManager.showScene(MenuScene)`. One mis-hit ends the match — no
+confirmation, no way back, and everything built up in it is gone. That is the
+worst possible thing for a panel whose entire purpose is a long practice
+session you keep tuning.
+
+Two changes, and they only work as a pair:
+
+**Escape toggles the practice panel instead.** Closed → open it; open → close
+it, the same discard-and-close `closeSpellPicker` already does. `Game.keyPressed`
+binds only Space (32) and N (78), so 27 is free. This keeps the reflex — Escape
+still means "get me to the menu" — while making the menu the match's own.
+
+**The exit moves into the panel, at the bottom of the Trận đấu tab.**
+Deliberately not beside the shell's close button in the tab row: two adjacent
+buttons whose outcomes differ by an entire match is exactly the mis-hit being
+designed out, and that row is already tight enough that five tabs may not fit
+(see Known risks). "Trận đấu" is the tab that means *this match*, which is what
+is being quit.
+
+It needs a **two-step confirm** — press once for "Chắc chưa?", again to leave.
+Nothing else in this panel confirms (bots, saved kits and champion swaps are all
+one press, on purpose, because each is cheap to redo); this one is not
+recoverable, which is the whole reason it is being moved.
+
+**Plumbing.** `Game` holds no reference to the scene manager and should not
+gain one — the dependency runs the other way everywhere else. `GameScene` sets
+a callback on the game it just constructed:
+
+```ts
+this.game.onExitRequested = () => this.sceneManager.showScene(MenuScene);
+```
+
+`hudInteractions` exposes it to the panel the way it exposes `director`. Not a
+`MatchDirector` method: quitting is a scene transition, not a mutation of the
+running match, and the director's contract is the latter.
+
+**Discoverability matters more than usual here.** `src/game/hud/` contains no
+`showScene`, no `MenuScene` import, no "Thoát" — Escape is currently the *only*
+way out of a match. Removing it without a findable replacement traps the player
+in the game.
+
+**Nested modals.** `RosterTab` can have `LoadoutEditorModal` open over it. Escape
+must close the innermost layer first rather than the whole panel — the same
+"backdrop steps back one layer" rule commit `b48ef7d` established for the setup
+screen.
+
+**Verified not to break the e2e suite.** Three scripts press Escape
+(`drive-kit-builder.mjs:345`, `drive-pregame-config.mjs:106,348`) and all three
+are in `SetupScene`, closing setup-screen modals. No script uses Escape to leave
+a match.
+
 ## Known risks
 
 **Five tabs will not fit.** `.pregame-tab` is `flex: 1`, so on a 390px-wide
@@ -257,6 +315,8 @@ Vitest, in `tests/game/`:
 - Cho'Gath's heal on raise, and health clamped on lower.
 - `clearCooldowns` leaves the basic attack's swing timer alone.
 - `refill` from a damaged, mana-drained unit.
+- `GameScene.keyPressed(27)` no longer calls `showScene`, and does call the
+  panel toggle. Assert on the scene manager, not on a flag the handler sets.
 
 **Every test must be shown to fail first, and the failure message read.** The
 practice panel plan shipped six tests that could never fail, all the same
@@ -270,6 +330,12 @@ fifth tab forces changes to that file anyway. New checks: the toggle survives a
 close/reopen, a bot set invulnerable actually stops losing health across
 unpaused frames, and a stack button moves both the spell and the HUD badge.
 
+Two more, for the Escape change, and these are the ones worth most: **pressing
+Escape mid-match leaves you in the match** (`GameScene` still current, game
+still alive) with the panel open, and **the exit button's first press does not
+leave** — only the confirm does. Both are regressions a player would discover
+by losing a match, which is the failure this whole section exists to prevent.
+
 ## Files
 
 - Create: `src/game/gameObject/buffs/Invulnerable.ts`,
@@ -280,5 +346,10 @@ unpaused frames, and a stack button moves both the spell and the HUD badge.
   `src/game/gameObject/spells/ChoGath_R.ts` (overrides + buff factories +
   the two missing `stackCount` getters), `src/game/MatchDirector.ts`
   (four methods), `src/game/hud/PracticePanel.vue` (fifth tab),
-  `styles/hud.css` (tab row at phone width),
+  `styles/hud.css` (tab row at phone width, exit button),
   `tests/e2e/drive-practice-panel.mjs` (`TAB_LABELS`, `TAB_IDS`, new checks)
+- Modify, for the Escape change: `src/scenes/GameScene.ts` (drop the
+  `showScene` on 27, set `onExitRequested`), `src/game/Game.ts`
+  (`onExitRequested` field), `src/game/hud/hudInteractions.ts` (expose it, and
+  the panel toggle Escape calls),
+  `src/game/hud/practice/RulesTab.vue` (the exit button and its confirm)
