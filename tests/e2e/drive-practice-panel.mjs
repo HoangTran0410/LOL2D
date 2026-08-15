@@ -1,5 +1,5 @@
 /**
- * End-to-end drive of the in-game practice panel — the three-tab modal that
+ * End-to-end drive of the in-game practice panel — the two-tab modal that
  * reshapes a *running* match (`src/game/hud/PracticePanel.vue` over
  * `src/game/MatchDirector.ts`).
  *
@@ -24,7 +24,7 @@
  *
  * ## What it proves, in order
  *
- *   1. the corner button opens a panel with three tabs, and `#practice-close`
+ *   1. the corner button opens a panel with two tabs, and `#practice-close`
  *      closes it from *every* one of them — no tab owns an exit, and the one
  *      that used to (the deleted picker's Huỷ) left the others with no way out
  *      of a modal covering a paused match;
@@ -46,7 +46,7 @@
  *      `effectiveCoolDownMs` — the claim the whole "rules are live" design
  *      rests on. Compared with an epsilon: 90% CDR is `0.09999999999999998`,
  *      and `=== 0.1` fails on correct code;
- *   8. Thế giới: the jungle switch empties `game.monsters` and the camps are
+ *   8. the same tab's jungle switch empties `game.monsters` and the camps are
  *      gone from the world after one tick;
  *   9. a kit saved mid-match survives a reload into a new match. Note *where*:
  *      the saved-kit shelf is not on the panel itself — it is at Đấu thủ → a
@@ -66,8 +66,8 @@ const VIEWPORT = { width: 1280, height: 900 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
-const TAB_IDS = ['roster', 'rules', 'world'];
-const TAB_LABELS = ['Đấu thủ', 'Trận đấu', 'Thế giới'];
+const TAB_IDS = ['roster', 'rules'];
+const TAB_LABELS = ['Đấu thủ', 'Trận đấu'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
@@ -267,7 +267,7 @@ try {
     paused: window.__lol2d.scene.oScene.game.paused,
   }));
   check(
-    'a real touch on the corner button opens a panel with four tabs, over a paused match',
+    'a real touch on the corner button opens the panel and its tabs, over a paused match',
     JSON.stringify(report.panelShape.tabs) === JSON.stringify(TAB_LABELS) &&
       report.panelShape.hasClose &&
       report.panelShape.paused === true,
@@ -281,7 +281,7 @@ try {
   report.closeFromEveryTab = {};
   for (const [index, id] of TAB_IDS.entries()) {
     if (index > 0) await openPanel();
-    await selectTab(id, id === 'roster'); // one of the three switched by thumb
+    await selectTab(id, id === 'roster'); // one of the two switched by thumb
     await closePanel();
     report.closeFromEveryTab[id] = {
       pickerFlag: await hudFlag(),
@@ -301,7 +301,7 @@ try {
     return state.pickerFlag === false && state.panelInDom === false && state.paused === false;
   });
   check(
-    '#practice-close closes the panel — and unpauses the match — from every one of the four tabs',
+    '#practice-close closes the panel — and unpauses the match — from every one of its tabs',
     closedEverywhere,
     JSON.stringify(report.closeFromEveryTab)
   );
@@ -491,19 +491,20 @@ try {
     `${beforeCdr.probeCooldownMs}ms -> ${afterCdr.probeCooldownMs}ms`
   );
 
-  // ------------------------------------------------ 8. Thế giới: jungle off
+  // ------------------------------------- 8. the same tab's jungle switch off
 
-  await selectTab('world');
+  // No tab change: the world toggles moved onto Trận đấu, under the three
+  // rules controls check 7 just drove.
   const monstersBefore = await monsterCensus();
   await tapSelector('#practice-jungle'); // real thumb on the checkbox
   const jungleFlag = await gameEval(() => window.__lol2d.scene.oScene.game.director.jungleEnabled);
-  await page.screenshot({ path: `${OUT}-05-world.png` });
+  await page.screenshot({ path: `${OUT}-05-rules-world.png` });
   await closePanel();
   await runMatch();
   const monstersAfter = await monsterCensus();
   report.jungle = { monstersBefore, jungleFlag, monstersAfter };
   check(
-    'Thế giới: unchecking the jungle empties game.monsters and clears the camps out of the world',
+    'Trận đấu: unchecking the jungle empties game.monsters and clears the camps out of the world',
     monstersBefore.listed > 0 &&
       monstersBefore.inWorld > 0 &&
       jungleFlag === false &&

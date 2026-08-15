@@ -688,7 +688,7 @@
   height: 44px;
 }
 
-/* "Takes effect when you close the panel" (WorldTab.vue). An aside under the
+/* "Takes effect when you close the panel" (RulesTab.vue). An aside under the
    controls it qualifies, not a warning: the delay is the design (the match is
    paused, so `ObjectManager.update()` cannot sweep), and the note is only
    there so an empty jungle that has not moved yet does not read as a broken

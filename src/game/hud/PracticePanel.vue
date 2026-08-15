@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The in-game practice panel: three tabs over one paused match.
+ * The in-game practice panel: two tabs over one paused match.
  *
  * This grew out of the old `SpellPickerModal`, which was the only thing in the
  * game you could change without quitting to the setup screen, and could change
@@ -58,14 +58,12 @@ import { inject, ref } from 'vue';
 import type { HudInteractions } from './hudInteractions';
 import RosterTab from './practice/RosterTab.vue';
 import RulesTab from './practice/RulesTab.vue';
-import WorldTab from './practice/WorldTab.vue';
 
 const hud = inject<HudInteractions>('hud')!;
 
 const TABS = [
   { id: 'roster', label: 'Đấu thủ' },
   { id: 'rules', label: 'Trận đấu' },
-  { id: 'world', label: 'Thế giới' },
 ] as const;
 
 const tab = ref<(typeof TABS)[number]['id']>('roster');
@@ -103,6 +101,5 @@ const tab = ref<(typeof TABS)[number]['id']>('roster');
 
     <RosterTab v-if="tab === 'roster'" />
     <RulesTab v-if="tab === 'rules'" />
-    <WorldTab v-if="tab === 'world'" />
   </div>
 </template>

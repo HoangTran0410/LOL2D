@@ -31,8 +31,8 @@
  * `ObjectManager.update()`, which flushes `_objectToBeAdd` and sweeps
  * `toRemove`, and that cannot run until the panel closes. The roster shows them
  * immediately anyway, because `MatchDirector.bots()` counts both sets; the note
- * at the bottom is about the *world*, and is `WorldTab`'s note for the same
- * reason.
+ * at the bottom is about the *world*, and is `RulesTab`'s jungle/minion note
+ * for the same reason.
  */
 import { computed, inject, ref, shallowRef } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
@@ -201,7 +201,7 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
  *     six units at two lines each overflow a 390px-tall landscape phone by
  *     several hundred pixels. Untouched, the list would not scroll under a
  *     thumb and the add button — last in the flow — would be unreachable.
- *     (`RulesTab`/`WorldTab` never hit this: two controls each, no overflow.)
+ *     (`RulesTab` never hits this: five short controls, no overflow.)
  *   - **The loadout editor.** `LoadoutEditorModal` and `KitRoster` drive every
  *     action from `@click` and let the browser scroll their roster, which is
  *     right where they were written — `useSpellPeek.ts` says in as many words

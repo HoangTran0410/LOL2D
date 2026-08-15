@@ -1,5 +1,14 @@
 <script setup lang="ts">
 /**
+ * Everything about *this match* that is not a participant: CDR, zoom, URF, and
+ * whether the jungle and the lane minions exist. The last two came from a
+ * separate Thế giới tab, which held two controls and answered the same
+ * question this one does — settings for the match you are in.
+ *
+ * The first three apply on the spot; the last two apply on the first unpaused
+ * tick, which is what the note at the bottom is for. See "Two kinds of
+ * control" below.
+ *
  * CDR and URF, mid-match. `Spell.ts` reads `game.matchRules` at cast time
  * rather than capturing it at construction (`:320` for the cooldown
  * multiplier, `:369` for `manaFree`), so moving this slider changes the
@@ -58,6 +67,57 @@ const setUrf = (on: boolean): void => apply({ ...rules.value, manaFree: on });
 const onCdrInput = (event: Event): void => setCdr(Number((event.target as HTMLInputElement).value));
 
 const onUrfChange = (event: Event): void => setUrf((event.target as HTMLInputElement).checked);
+
+/**
+ * ## Two kinds of control, and why the world's two need a note
+ *
+ * The jungle and minion switches take effect on the first unpaused tick, not
+ * while you are looking at them — the panel opens paused and
+ * `ObjectManager.update()` is what sweeps removed units out and flushes new
+ * ones in (see `MatchDirector`'s file comment). Hence the note under them:
+ * without it the panel looks broken, because the honest answer to "I turned
+ * the jungle off and nothing happened" is "the match is not running". Turning
+ * the jungle back on re-runs `Game.spawnJungle()`, so the camps return at
+ * their `MonsterPreset` positions rather than wherever they had wandered.
+ *
+ * The director is the single source of truth for both, not this component:
+ * `minionsEnabled` is a view of `MinionSpawner.enabled` and `jungleEnabled` is
+ * the director's own flag (an empty jungle is also what a cleared map looks
+ * like, which must not read as "switched off"). The refs below are only what
+ * the checkboxes render; every write goes through the director and the ref is
+ * refreshed from it, so a rejected or no-op write cannot leave the tick box
+ * disagreeing with the match.
+ *
+ * ## Why a `touchend` handler as well as `change`
+ *
+ * A checkbox's `change` fires from the click the browser synthesises after a
+ * tap — and there is no such click here. `GameScene`'s p5 touch handlers
+ * `preventDefault()` every touch on the *page* (see `hudInteractions.ts`'s
+ * file comment), which suppresses the synthetic click everywhere, not just on
+ * the canvas. Wired to `change` alone these two toggles were verifiably inert
+ * under a real thumb while working perfectly under a mouse. The handler sits
+ * on the `<label>`, not the `<input>`, so tapping the word also counts; on a
+ * mouse the label's click reaches the input and `change` does the work, and
+ * the two paths cannot both fire for one gesture.
+ */
+const jungle = ref(hud.director.jungleEnabled);
+const minions = ref(hud.director.minionsEnabled);
+
+const setJungle = (on: boolean): void => {
+  hud.director.jungleEnabled = on;
+  jungle.value = hud.director.jungleEnabled;
+};
+
+const setMinions = (on: boolean): void => {
+  hud.director.minionsEnabled = on;
+  minions.value = hud.director.minionsEnabled;
+};
+
+const onJungleChange = (event: Event): void =>
+  setJungle((event.target as HTMLInputElement).checked);
+
+const onMinionsChange = (event: Event): void =>
+  setMinions((event.target as HTMLInputElement).checked);
 
 /**
  * Both controls again, for a thumb. `GameScene`'s p5 touch handlers
@@ -169,5 +229,21 @@ const onZoomTouch = (event: TouchEvent): void => {
       <input type="checkbox" id="practice-urf" :checked="rules.manaFree" @change="onUrfChange" />
       <span>URF (không tốn mana)</span>
     </label>
+
+    <label class="pregame-toggle" @touchend.prevent="setJungle(!jungle)">
+      <input type="checkbox" id="practice-jungle" :checked="jungle" @change="onJungleChange" />
+      <span>Quái rừng</span>
+    </label>
+
+    <label class="pregame-toggle" @touchend.prevent="setMinions(!minions)">
+      <input type="checkbox" id="practice-minions" :checked="minions" @change="onMinionsChange" />
+      <span>Lính</span>
+    </label>
+
+    <!-- Scoped to the two switches above it, not to the whole tab: CDR, zoom
+         and URF are immediate. -->
+    <p class="practice-note">
+      Quái rừng và lính: thay đổi có hiệu lực khi bạn đóng bảng và trận chạy tiếp.
+    </p>
   </div>
 </template>
