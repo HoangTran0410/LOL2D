@@ -31,6 +31,13 @@ const releaseContext: CastContext = Object.freeze({
   direction: Object.freeze({ x: 0, y: 1 }),
 });
 
+/** An aim that landed exactly on Pantheon: no distance, so no direction. */
+const degenerateContext: CastContext = Object.freeze({
+  ...context,
+  cursorWorld: Object.freeze({ x: 0, y: 0 }),
+  direction: Object.freeze({ x: 0, y: 0 }),
+});
+
 const target = (
   teamId: string,
   health = 100,
@@ -58,7 +65,7 @@ const owner = () => {
     set value(value: number) { this.baseValue = value; },
   };
   return {
-    position: new Vector(), teamId: 'blue', isDead: false, canCast: true,
+    position: new Vector(), destination: new Vector(), teamId: 'blue', isDead: false, canCast: true,
     stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
     game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
     addBuff: vi.fn(), objects,
@@ -95,6 +102,32 @@ describe('Pantheon Q', () => {
     expect(draw.ellipse).toHaveBeenCalledTimes(1);
     expect(draw.bezierVertex).toHaveBeenCalledTimes(2);
     expect(draw.quad).toHaveBeenCalledTimes(1);
+  });
+
+  it('still thrusts down a real lane when the aim landed on Pantheon', () => {
+    const thrustFrom = (destination: Vector) => {
+      const caster = owner();
+      caster.destination = destination;
+      const spell = new Pantheon_Q(caster);
+      spell.press(degenerateContext);
+      spell.release(degenerateContext);
+      return (caster.objects[0] as BeamSpellObject).geometry;
+    };
+
+    // Walking south, so the spear goes south: `Game.facing()` already states
+    // the rule this follows — a direction is never (0,0).
+    expect(thrustFrom(new Vector(0, 200))).toEqual({
+      start: { x: 0, y: -THRUST_BACKSWING },
+      end: { x: 0, y: THRUST_REACH },
+      width: THRUST_WIDTH,
+    });
+    // Standing still with nothing left to point at. It still has to be a lane:
+    // a start equal to its end hits nothing and draws nothing.
+    expect(thrustFrom(new Vector(0, 0))).toEqual({
+      start: { x: -THRUST_BACKSWING, y: 0 },
+      end: { x: THRUST_REACH, y: 0 },
+      width: THRUST_WIDTH,
+    });
   });
 
   it('builds the thrust geometry from the tuning constants and fresh key-up aim', () => {

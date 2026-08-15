@@ -124,7 +124,9 @@ export default class Pantheon_Q extends Spell {
   onCastStart(context: CastContext): void {
     this.chargeMs = 0;
     this.wasThrust = false;
-    this.castDirection = context.direction;
+    // Not `context.direction` raw: a press whose aim landed on Pantheon would
+    // leave the telegraph pointing nowhere until the first `hold` corrected it.
+    this.castDirection = this.firingDirection(context);
     this.aimContext = context;
     this.chargeSlow = new Slow(MAX_CHARGE_MS, this.owner, this.owner);
     this.chargeSlow.percent = 0.1;
@@ -227,11 +229,22 @@ export default class Pantheon_Q extends Spell {
     return MIN_RANGE + (RANGE - MIN_RANGE) * Math.min(1, this.chargeMs / RANGE_CHARGE_MS);
   }
 
+  /**
+   * Live aim off the cursor, falling back to a direction that is never (0,0).
+   *
+   * The old fallback was `context.direction`, which is itself (0,0) whenever
+   * the aim landed on Pantheon — a cursor on top of him, or a bot with no
+   * cursor at all aiming at a `destination` parked on its own feet. That threw
+   * a spear nowhere: a lane whose start equals its end hits nothing and draws
+   * nothing. `firingDirection` resolves it off his own heading, which is the
+   * rule `Game.facing()` states for the touch layer.
+   */
   private directionTo(context: CastContext): Vec2 {
     const dx = context.cursorWorld.x - this.owner.position.x;
     const dy = context.cursorWorld.y - this.owner.position.y;
     const length = Math.hypot(dx, dy);
-    return length === 0 ? context.direction : { x: dx / length, y: dy / length };
+    if (length === 0) return this.firingDirection(context);
+    return { x: dx / length, y: dy / length };
   }
 }
 

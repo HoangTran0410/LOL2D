@@ -38,7 +38,7 @@ const owner = () => {
     set value(value: number) { this.baseValue = value; },
   };
   return {
-    position: new Vector(), teamId: 'blue', isDead: false, canCast: true,
+    position: new Vector(), destination: new Vector(), teamId: 'blue', isDead: false, canCast: true,
     stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
     game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
     addBuff: (buff: { percent: number; toRemove: boolean; activateBuff(): void }) => {
@@ -128,6 +128,31 @@ describe('Varus Q', () => {
       2
     );
     expect(arrow.damage).toBe(MAX_DAMAGE);
+  });
+
+  it('still looses a real shot when the aim landed on Varus', () => {
+    // Same degenerate aim both ways: cursor on the archer, so no distance and
+    // no direction to take from it.
+    const degenerate = context(0, 0);
+    const shotFrom = (destination: Vector) => {
+      const caster = owner();
+      caster.destination = destination;
+      const spell = new Varus_Q(caster);
+      spell.press(degenerate);
+      spell.release(degenerate);
+      const arrow = caster.objects.find(
+        (object): object is Varus_Q_Arrow => object instanceof Varus_Q_Arrow
+      );
+      if (!arrow) throw new Error('Varus Q must loose an arrow.');
+      return { x: arrow.destination.x, y: arrow.destination.y };
+    };
+
+    // Walking south, so the arrow goes south: `Game.facing()` already states
+    // the rule this follows — a direction is never (0,0).
+    expect(shotFrom(new Vector(0, 200))).toEqual({ x: 0, y: MIN_CENTER_TRAVEL });
+    // Standing still with nothing left to point at. It still has to travel:
+    // an arrow whose destination is its origin is a shot that never happened.
+    expect(shotFrom(new Vector(0, 0))).toEqual({ x: MIN_CENTER_TRAVEL, y: 0 });
   });
 
   it('uses the fresh key-up aim even when no final hold event ran', () => {

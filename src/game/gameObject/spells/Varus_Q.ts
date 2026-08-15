@@ -146,11 +146,22 @@ export default class Varus_Q extends Spell {
     return MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * Math.min(1, elapsedMs / DAMAGE_CHARGE_MS);
   }
 
+  /**
+   * Live aim off the cursor, falling back to a direction that is never (0,0).
+   *
+   * The old fallback was `context.direction`, which is itself (0,0) whenever
+   * the aim landed on Varus — a cursor on top of him, or a bot with no cursor
+   * at all aiming at a `destination` parked on its own feet. That loosed an
+   * arrow whose destination was its origin, which is a shot that never
+   * happened. `firingDirection` resolves it off his own heading, which is the
+   * rule `Game.facing()` states for the touch layer.
+   */
   private directionTo(context: CastContext, x: number, y: number): { x: number; y: number } {
     const dx = context.cursorWorld.x - x;
     const dy = context.cursorWorld.y - y;
     const length = Math.hypot(dx, dy);
-    return length === 0 ? context.direction : { x: dx / length, y: dy / length };
+    if (length === 0) return this.firingDirection(context);
+    return { x: dx / length, y: dy / length };
   }
 
   private removeChargeSlow(): void {
