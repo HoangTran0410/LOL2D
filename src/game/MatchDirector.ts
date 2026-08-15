@@ -418,6 +418,21 @@ export default class MatchDirector {
     return unit.buffs.filter(buff => buff instanceof Invulnerable && !buff.toRemove);
   }
 
+  /**
+   * Show the whole map on the minimap, fog or no fog.
+   *
+   * A plain public field, deliberately: the panel holds the match paused, so
+   * `ObjectManager.update()` and `AttackableUnit.update()` do not run while a
+   * tab is open, and anything a tab reads that depends on the update loop
+   * having run reads a stale answer (see `invulnerableBuffs` above for what
+   * that costs). A flag has no such dependency — it is true the instant it is
+   * set, and `Game.minimapBlips()` is the only reader.
+   *
+   * It lives here rather than on the minimap because it is a cheat, and putting
+   * it in Gian lận means the minimap never has to reason about balance.
+   */
+  revealMap = false;
+
   /** Whether `unit` is currently carrying the invulnerability buff. */
   isInvulnerable(unit: Champion): boolean {
     return this.invulnerableBuffs(unit).length > 0;

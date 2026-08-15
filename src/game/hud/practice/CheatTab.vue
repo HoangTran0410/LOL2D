@@ -94,6 +94,24 @@ const stackSpells = computed<Spell[]>(() => {
   );
 });
 
+/**
+ * Show the whole map on the minimap. A plain flag on the director, read once
+ * per frame by `Game.minimapBlips()` — nothing about it depends on the update
+ * loop, which the panel has paused for as long as this tab is open.
+ */
+const revealMap = computed<boolean>(() => {
+  void version.value;
+  return hud.director.revealMap;
+});
+
+const setRevealMap = (on: boolean): void => {
+  hud.director.revealMap = on;
+  invalidate();
+};
+
+const onRevealMapChange = (event: Event): void =>
+  setRevealMap((event.target as HTMLInputElement).checked);
+
 const setInvulnerable = (on: boolean): void => {
   const entry = selected.value;
   if (!entry) return;
@@ -208,6 +226,16 @@ const onTap = (action: () => void): void => {
         @change="onInvulnerableChange"
       />
       <span>Bất tử</span>
+    </label>
+
+    <label class="pregame-toggle" @touchend.prevent="onTap(() => setRevealMap(!revealMap))">
+      <input
+        type="checkbox"
+        id="practice-cheat-reveal-map"
+        :checked="revealMap"
+        @change="onRevealMapChange"
+      />
+      <span>Hiện toàn bản đồ</span>
     </label>
 
     <div class="practice-cheat-actions">

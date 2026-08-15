@@ -589,9 +589,13 @@ export default class Game {
    * a fountain is not an `AttackableUnit` at all, so the fog's per-frame reset
    * never touches either) — which is exactly the "static and always known"
    * the minimap wants, with no special case here.
+   *
+   * `director.revealMap` is the practice panel's cheat, and it is the only
+   * thing here that can override the fog.
    */
   private minimapBlips(): MinimapBlip[] {
     const blips: MinimapBlip[] = [];
+    const reveal = this.director.revealMap;
     for (const object of this.objectManager.objects) {
       // The player is drawn separately, always, in its own colour.
       if (object === this.player) continue;
@@ -599,7 +603,7 @@ export default class Game {
       const isStructure = object instanceof Turret || object instanceof Fountain;
       if (!isStructure && !(object instanceof AttackableUnit)) continue;
       if (unit.isDead) continue;
-      if (!isStructure && !object.willDraw) continue;
+      if (!isStructure && !reveal && !object.willDraw) continue;
       blips.push({
         x: object.position.x,
         y: object.position.y,
