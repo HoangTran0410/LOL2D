@@ -42,10 +42,31 @@
  * on "Xác nhận" reaches `usePregameConfig`. "Huỷ", the X and the backdrop all
  * discard it. That is the in-game picker's contract, and it is what makes
  * "take Ahri's kit, then swap her R" a thing you can back out of.
+ *
+ * ## Saving is a third act, next to those two
+ *
+ * "Lưu bộ" copies the draft into the saved-kit library
+ * (`src/game/config/savedKits.ts`, its own storage key) and does nothing else:
+ * it neither closes the editor nor commits the draft to the match, because
+ * "keep this kit for later" and "play this kit now" are different answers and
+ * a player will often want both, in either order. The library comes back as
+ * the shelf at the top of the roster, and applying one from there replaces the
+ * draft wholesale.
+ *
+ * This editor is shared with the in-game practice panel (`RosterTab.vue`
+ * mounts it over a paused match), so both screens get the library and the same
+ * kit crosses between them.
  */
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import type { ChampionLoadout, MatchRules, SlotChoice } from '../../game/config/PregameConfig';
 import { SLOT_COUNT } from '../../game/config/PregameConfig';
+import {
+  deleteKit,
+  loadSavedKits,
+  saveKit,
+  SAVED_KIT_NAME_MAX,
+  type SavedKit,
+} from '../../game/config/savedKits';
 import { SpellHotKeys } from '../../game/constants';
 import { BASIC_ATTACK_ID, type SpellCatalogEntry } from '../../game/preset';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
@@ -198,6 +219,112 @@ const randomizeSlot = (): void => {
 
 const activeSlotIsRandom = computed(() => draftSlots.value[activeSlot.value] === null);
 
+/* ------------------------------------------------------------ saved kits */
+
+/**
+ * ## An inline row, not `window.prompt`
+ *
+ * `prompt` would be three lines and does work over a paused canvas, but it is
+ * a Chrome-chrome dialog dropped on top of a hextech screen, it cannot be
+ * styled, tested through the touch path the rest of this modal uses, or
+ * dismissed by the same gestures — and in the in-game copy of this editor
+ * (`RosterTab.vue`'s teleported host) the surrounding UI is reached by
+ * synthesised clicks, which a modal native dialog would sit outside of
+ * entirely. The row costs a `v-if` and stays inside the editor's own idiom.
+ *
+ * Two things it has to get right that a `prompt` would have got for free:
+ *
+ *   - **A blank name.** `saveKit` throws on one (an unnamed kit is
+ *     unfindable), so the confirm button is disabled until the name has
+ *     something in it once trimmed, and the call is wrapped anyway — a
+ *     library write is not worth an unhandled error in the console.
+ *   - **Keystrokes belong to the game.** p5 listens for `keydown` on `window`
+ *     and `GameScene.keyPressed` turns A/Q/W/E/R/D/F into casts and Escape
+ *     into "leave the match". Typing "Ahri quái" into an unguarded input
+ *     mid-match would fire four abilities, and one Escape would drop the
+ *     player to the menu. `@keydown.stop` (plus keyup/keypress, which p5 also
+ *     listens for) keeps the letters in the field. The setup screen never
+ *     needed this — there is no `GameScene` under it — but the editor is
+ *     shared, so the guard lives with the input rather than with the caller.
+ */
+const savedKits = ref<SavedKit[]>(loadSavedKits());
+const naming = ref(false);
+const kitName = ref('');
+const saveError = ref('');
+const nameInput = ref<HTMLInputElement | null>(null);
+const rosterBody = ref<HTMLElement | null>(null);
+
+const toggleSave = (): void => {
+  if (naming.value) {
+    naming.value = false;
+    return;
+  }
+  saveError.value = '';
+  // Prefilled with the champion the draft is, when it is one: most saves are
+  // "Ahri, but…", and a name is easier to edit than to invent.
+  kitName.value =
+    draft.value.mode === 'champion' && draft.value.championName !== 'random'
+      ? draft.value.championName
+      : '';
+  naming.value = true;
+  void nextTick(() => nameInput.value?.focus());
+};
+
+const cancelSave = (): void => {
+  naming.value = false;
+  saveError.value = '';
+};
+
+const commitSave = (): void => {
+  try {
+    saveKit(kitName.value, draft.value);
+  } catch {
+    saveError.value = 'Bộ chiêu cần một cái tên.';
+    return;
+  }
+  savedKits.value = loadSavedKits();
+  naming.value = false;
+  kitName.value = '';
+  // The shelf is the top row of the roster and the roster is what scrolls, so
+  // sending it back to the top *is* the "it saved" feedback: the new kit
+  // appears where the player is looking instead of somewhere above it.
+  if (rosterBody.value) rosterBody.value.scrollTop = 0;
+};
+
+const onNameKey = (event: KeyboardEvent): void => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    if (kitName.value.trim()) commitSave();
+  } else if (event.key === 'Escape') {
+    event.preventDefault();
+    cancelSave();
+  }
+};
+
+/**
+ * A real tap focuses a text field on its own; the synthetic click that
+ * `RosterTab`'s touch bridge sends in place of the one the browser suppresses
+ * does not. One line, and the field is typable under a thumb in a match.
+ */
+const focusName = (): void => nameInput.value?.focus();
+
+/**
+ * Wholesale, never merged into what is already there. A saved kit is all seven
+ * slots plus the mode and the champion name, so replacing the draft is what
+ * makes the slot row, the highlighted card and the selected shelf all move
+ * together — a field-by-field merge would leave, say, a champion pick's
+ * portrait standing over a custom kit's slots. Copied, not aliased: `draft` is
+ * about to be edited and the stored kit must not follow it.
+ */
+const applySavedKit = (kit: SavedKit): void => {
+  draft.value = { ...kit.loadout, customSlots: kit.loadout.customSlots.slice() };
+};
+
+const removeSavedKit = (kit: SavedKit): void => {
+  deleteKit(kit.id);
+  savedKits.value = loadSavedKits();
+};
+
 const confirm = (): void => {
   emit('change', draft.value);
   emit('close');
@@ -256,22 +383,74 @@ const hint = computed(() => {
           <i class="fas fa-random"></i>
         </button>
 
+        <!-- Third in the row and first of the three actions, because it is the
+             one that does not end the editing session. Deliberately not a
+             `.kit-bar-btn`: that class is how the e2e drives address Huỷ
+             (`.kit-bar-btn.secondary`) and Xác nhận
+             (`.kit-bar-btn:not(.secondary)`), and a third member would make
+             both selectors ambiguous. It borrows the same sizing in CSS
+             instead. -->
+        <button
+          type="button"
+          class="hextech-btn secondary saved-kit-save"
+          :class="{ open: naming }"
+          title="Lưu bộ chiêu này để dùng lại ở trận khác"
+          @click="toggleSave"
+        >
+          Lưu bộ
+        </button>
         <button type="button" class="hextech-btn secondary kit-bar-btn" @click="cancel">Huỷ</button>
         <button type="button" class="hextech-btn kit-bar-btn" @click="confirm">Xác nhận</button>
       </div>
 
+      <div v-if="naming" class="saved-kit-form">
+        <input
+          ref="nameInput"
+          v-model="kitName"
+          type="text"
+          class="saved-kit-input"
+          :maxlength="SAVED_KIT_NAME_MAX"
+          placeholder="Tên bộ chiêu"
+          aria-label="Tên bộ chiêu"
+          @keydown.stop="onNameKey"
+          @keyup.stop
+          @keypress.stop
+          @click="focusName"
+        />
+        <button
+          type="button"
+          class="hextech-btn saved-kit-confirm"
+          :disabled="!kitName.trim()"
+          @click="commitSave"
+        >
+          Lưu
+        </button>
+        <button
+          type="button"
+          class="pregame-icon-btn saved-kit-close"
+          title="Thôi"
+          @click="cancelSave"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+        <span v-if="saveError" class="saved-kit-error">{{ saveError }}</span>
+      </div>
+
       <p class="kit-hint">{{ hint }}</p>
 
-      <div class="pregame-modal-body">
+      <div ref="rosterBody" class="pregame-modal-body">
         <KitRoster
           :shelves="kitShelves"
           :active-entry-id="activeEntryId"
           :selected-champion="selectedChampion"
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
+          :saved-kits="savedKits"
           @pick="pickSpell"
           @apply-kit="applyKit"
           @pick-random="pickRandom"
+          @apply-saved-kit="applySavedKit"
+          @delete-saved-kit="removeSavedKit"
         />
       </div>
     </div>

@@ -25,9 +25,19 @@
  * Reading a description is a hover or a hold on the same icon, not a second
  * click target beside it — see `useSpellPeek.ts` for that contract and for
  * why `pick` has to ignore the click that follows a hold.
+ *
+ * ## The saved-kit shelf leads the list
+ *
+ * Above both of those sits whatever the player has saved before
+ * (`src/game/config/savedKits.ts`): the shortest path of all to a whole
+ * loadout, and the only one in here they built themselves. It is a prop, not
+ * a `loadSavedKits()` call of its own — the parent is the thing that *writes*
+ * the library, so it is also the thing that knows when the list changed, and
+ * this component stays what it already was: a view of what it is handed.
  */
 import { getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
 import type { MatchRules } from '../../game/config/PregameConfig';
+import type { SavedKit } from '../../game/config/savedKits';
 import AssetManager from '../../managers/AssetManager';
 import type { KitShelf } from './pregameCatalog';
 import SpellIcon from './SpellIcon.vue';
@@ -48,11 +58,15 @@ const props = defineProps<{
    */
   matchRules: MatchRules;
   isTouchUi: boolean;
+  /** The library, newest first — see `loadSavedKits`. Empty renders no shelf at all. */
+  savedKits: readonly SavedKit[];
 }>();
 const emit = defineEmits<{
   pick: [entry: SpellCatalogEntry];
   applyKit: [shelf: KitShelf];
   pickRandom: [];
+  applySavedKit: [kit: SavedKit];
+  deleteSavedKit: [kit: SavedKit];
 }>();
 
 // Destructured so `peekDisplay`/`peekStyle` are top-level refs the template
@@ -87,6 +101,32 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
 
 <template>
   <div class="kit-roster">
+    <!-- Deliberately its own class prefix rather than `.kit-shelf`: a
+         champion's shelf is a fixed part of the catalogue and a saved kit is
+         a row the player can delete, they carry different actions, and the
+         e2e drives (`drive-kit-builder.mjs`) count `.kit-shelf` expecting
+         exactly the catalogue. -->
+    <section v-if="savedKits.length" class="saved-kit-shelf">
+      <h4 class="saved-kit-heading">Bộ đã lưu</h4>
+      <div class="saved-kit-list">
+        <div v-for="kit in savedKits" :key="kit.id" class="saved-kit" :data-kit="kit.name">
+          <button type="button" class="saved-kit-apply" :title="`Dùng bộ ${kit.name}`"
+            @click="emit('applySavedKit', kit)">
+            <span class="saved-kit-name">{{ kit.name }}</span>
+            <span class="kit-apply-chip">Dùng</span>
+          </button>
+          <!-- No confirm step, like `.participant-remove` and
+               `.practice-remove-bot`: a saved kit is a shortcut, not the
+               loadout itself, and re-saving one is the same two taps that
+               made it. -->
+          <button type="button" class="saved-kit-delete" :title="`Xoá bộ ${kit.name}`"
+            :aria-label="`Xoá bộ ${kit.name}`" @click="emit('deleteSavedKit', kit)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <button type="button" class="catalog-random-card" :class="{ selected: selectedChampion === 'random' }"
       @click="emit('pickRandom')">
       <i class="fas fa-random"></i> Ngẫu Nhiên — tướng và bộ chiêu bốc thăm khi vào trận
