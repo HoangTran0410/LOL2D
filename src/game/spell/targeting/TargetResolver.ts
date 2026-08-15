@@ -1,3 +1,4 @@
+import { CURSOR_ACQUISITION_RADIUS } from '../../combat/AttackTargeting';
 import { effectiveRange } from '../../combat/Reach';
 import type { CancelReason, CastContext, TargetingMode, Vec2 } from '../runtime/types';
 
@@ -41,13 +42,25 @@ export interface TargetRequest {
   readonly cursorWorld: Vec2;
   readonly range?: number;
   readonly targetTeam?: TargetTeam;
+  /**
+   * How far from the cursor UNIT mode reaches for a body, in world units.
+   *
+   * Defaults to `CURSOR_ACQUISITION_RADIUS` — deliberately the *same* number an
+   * attack order acquires with, so "point roughly at him and press" means one
+   * thing in this game rather than one thing per spell. A spell that genuinely
+   * needs the cursor on the body can ask for a smaller one; none currently do.
+   *
+   * The unit's own `selectionRadius` still counts, so a body larger than the
+   * acquisition circle is never harder to click than a small one.
+   */
+  readonly acquisitionRadius?: number;
   readonly queryCandidates?: () => readonly unknown[];
   readonly isTargetable?: (candidate: unknown) => boolean;
   readonly getTargetInfo?: (candidate: unknown) => TargetInfo | null;
 }
 
 export type TargetingRequest = Partial<Pick<TargetRequest,
-  'range' | 'targetTeam' | 'queryCandidates' | 'isTargetable' | 'getTargetInfo'
+  'range' | 'targetTeam' | 'acquisitionRadius' | 'queryCandidates' | 'isTargetable' | 'getTargetInfo'
 >>;
 
 export type TargetResolution =
@@ -104,6 +117,7 @@ export class TargetResolver {
     if (mode !== 'UNIT') return { ok: true, context: createContext(request) };
 
     const candidates = request.queryCandidates?.() ?? [];
+    const acquisitionRadius = Math.max(0, request.acquisitionRadius ?? CURSOR_ACQUISITION_RADIUS);
     let hadIneligibleByRange = false;
     let bestTarget: unknown;
     let bestCursorDistance = Number.POSITIVE_INFINITY;
@@ -112,7 +126,12 @@ export class TargetResolver {
       const info = request.getTargetInfo?.(candidate);
       if (!info) continue;
       const cursorDistance = distance(request.cursorWorld, info.position);
-      if (cursorDistance > Math.max(0, info.selectionRadius ?? 0)) continue;
+      // The cursor acquires a body the way an attack order does, rather than
+      // demanding a hit on the ~27px selection circle. Before this, Janna E and
+      // W refused to fire unless you were exactly on a body, while Lee Sin W
+      // looked like it had smarter targeting — it does not; it declares
+      // `targeting: 'SELF'`, a mode that never consults the cursor at all.
+      if (cursorDistance > Math.max(info.selectionRadius ?? 0, acquisitionRadius)) continue;
       if (request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
         continue;
       }

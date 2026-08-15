@@ -59,7 +59,7 @@ describe('TargetResolver', () => {
     expect(result).toMatchObject({ ok: true, context: { target: nearer } });
   });
 
-  it('requires the cursor to intersect a UNIT selection radius before eligibility checks', () => {
+  it('honours a spell that asks for a tighter acquisition radius than the shared one', () => {
     const enemy = {
       position: { x: 30, y: 20 },
       teamId: 'red',
@@ -71,10 +71,83 @@ describe('TargetResolver', () => {
       cursorWorld: { x: 10, y: 20 },
       range: 100,
       targetTeam: 'ENEMY',
+      acquisitionRadius: 0,
       queryCandidates: () => [enemy],
       getTargetInfo: candidate => candidate as typeof enemy,
       isTargetable: candidate => (candidate as typeof enemy).targetable,
     }))).toEqual({ ok: false, reason: 'TARGET_INVALID' });
+  });
+
+  it('acquires a unit the cursor is merely near, the way an attack order does', () => {
+    const enemy = {
+      position: { x: 210, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      selectionRadius: 5,
+    };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 10, y: 20 },
+      range: 500,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [enemy],
+      getTargetInfo: candidate => candidate as typeof enemy,
+      isTargetable: candidate => (candidate as typeof enemy).targetable,
+    }))).toMatchObject({ ok: true, context: { target: enemy } });
+  });
+
+  it('still refuses when every unit is beyond the acquisition radius', () => {
+    const enemy = {
+      position: { x: 400, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      selectionRadius: 5,
+    };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 10, y: 20 },
+      range: 900,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [enemy],
+      getTargetInfo: candidate => candidate as typeof enemy,
+      isTargetable: candidate => (candidate as typeof enemy).targetable,
+    }))).toEqual({ ok: false, reason: 'TARGET_INVALID' });
+  });
+
+  it('keeps picking the unit nearest the cursor when both are inside the acquisition radius', () => {
+    const farther = { position: { x: 210, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+    const nearer = { position: { x: 110, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 10, y: 20 },
+      range: 500,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [farther, nearer],
+      getTargetInfo: candidate => candidate as typeof nearer,
+      isTargetable: candidate => (candidate as typeof nearer).targetable,
+    }))).toMatchObject({ ok: true, context: { target: nearer } });
+  });
+
+  it('reports OUT_OF_RANGE for a unit the cursor acquires but the spell cannot reach', () => {
+    const enemy = {
+      position: { x: 600, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      selectionRadius: 5,
+    };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 500, y: 20 },
+      range: 200,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [enemy],
+      getTargetInfo: candidate => candidate as typeof enemy,
+      isTargetable: candidate => (candidate as typeof enemy).targetable,
+    }))).toEqual({ ok: false, reason: 'OUT_OF_RANGE' });
   });
 
   it('rejects enemy, range, or targetability violations', () => {

@@ -364,7 +364,9 @@ describe('spell aim integration', () => {
     const spell = new UnitSpell(caster);
 
     expect(game.createSpellContext(spell, caster, game.worldMouse)).toMatchObject({ target });
-    game.worldMouse.x = 200;
+    // Past CURSOR_ACQUISITION_RADIUS, not merely off the 20px body: UNIT mode
+    // now reaches for a target as far as an attack order does.
+    game.worldMouse.x = 400;
     expect(game.createSpellContext(spell, caster, game.worldMouse)).toBeUndefined();
   });
 
