@@ -56,8 +56,19 @@
  *  11. a kit saved mid-match survives a reload into a new match. Note *where*:
  *      the saved-kit shelf is not on the panel itself — it is at Đấu thủ → a
  *      unit's row → the loadout editor, which teleports out of the panel.
- *      Asserted both ways;
- *  12. Escape leaves you *in* the match with the panel open — never in the menu
+ *      Asserted both ways. The same reload closes the persistence round trip:
+ *      everything checks 7, 8 and 10 changed is in `lol2d:pregameConfig:v1`,
+ *      *and* the new match boots from it — 90% CDR, no jungle, two bots, none
+ *      of which `MATCH_CONFIG` describes. This check asserted the exact
+ *      opposite until the panel started persisting ("chỉ sửa trận hiện tại",
+ *      reversed by `2026-08-16-panel-persistence-design`), and the half that
+ *      did not reverse is asserted beside it: none of check 9's cheats or
+ *      debug layers reaches storage, and the blob has only the four
+ *      match-configuration sections;
+ *  12. "Đặt lại mặc định" arms on the first press and, on the second, puts the
+ *      running match *and* storage back to `DEFAULT_PREGAME_CONFIG` — the
+ *      clean slate persistence took away;
+ *  13. Escape leaves you *in* the match with the panel open — never in the menu
  *      — and the exit button's first press does not leave either. Both are
  *      regressions a player would discover by losing a match.
  *
@@ -782,6 +793,18 @@ try {
 
   await page.reload({ waitUntil: 'load' });
   await startMatch();
+  // Read before anything is touched: this is the match the *stored* config
+  // booted, which is the second half of the persistence round trip (the first
+  // half — what got written — is asserted below).
+  const matchAfterReload = await gameEval(() => {
+    const game = window.__lol2d.scene.oScene.game;
+    return {
+      cooldownMultiplier: game.matchRules.cooldownMultiplier,
+      jungleEnabled: game.director.jungleEnabled,
+      monsters: game.monsters.length,
+      bots: game.director.bots().length,
+    };
+  });
   await openPanel();
   const shelfOnPanelOpenAfterReload = await gameEval(
     () => !!document.querySelector('.practice-panel .saved-kit-shelf')
@@ -795,10 +818,10 @@ try {
     applyButtons: document.querySelectorAll('.saved-kit-apply').length,
   }));
   await page.screenshot({ path: `${OUT}-07-kit-after-reload.png` });
-  // Field by field rather than a string compare: this asserts that nothing the
-  // panel did leaked into the setup screen's stored match, and CDR 90 is the
-  // one that would show up if it had.
-  const storedRules = JSON.parse(storedConfig ?? 'null');
+  // Field by field rather than a string compare: what the panel changed is in
+  // the stored config, what it did not is untouched, and what must never be
+  // stored is absent.
+  const storedParsed = JSON.parse(storedConfig ?? 'null');
   report.savedKit = {
     shelfOnPanelOpen,
     shelfBeforeSaving,
@@ -806,18 +829,14 @@ try {
     storedKitNames: JSON.parse(storedKits ?? '[]').map(kit => kit.name),
     shelfOnPanelOpenAfterReload,
     shelfAfterReload,
-    storedPregame: storedRules && {
-      championName: storedRules.player?.championName,
-      aiCount: storedRules.ai?.count,
-      rules: storedRules.rules,
+    storedPregame: storedParsed && {
+      championName: storedParsed.player?.championName,
+      aiCount: storedParsed.ai?.count,
+      rules: storedParsed.rules,
+      world: storedParsed.world,
+      sections: Object.keys(storedParsed).sort(),
     },
   };
-  report.savedKit.pregameConfigUntouched =
-    report.savedKit.storedPregame?.championName === MATCH_CONFIG.player.championName &&
-    report.savedKit.storedPregame?.aiCount === MATCH_CONFIG.ai.count &&
-    report.savedKit.storedPregame?.rules?.cooldownReductionPercent ===
-      MATCH_CONFIG.rules.cooldownReductionPercent &&
-    report.savedKit.storedPregame?.rules?.manaFree === MATCH_CONFIG.rules.manaFree;
   check(
     'a kit saved mid-match is still on the shelf after a reload into a new match',
     nameFieldFocused === true &&
@@ -833,20 +852,115 @@ try {
     shelfOnPanelOpen === false && shelfOnPanelOpenAfterReload === false,
     `panel before ${shelfOnPanelOpen}, after reload ${shelfOnPanelOpenAfterReload}`
   );
+  // The reversal, asserted where its opposite used to be. This check read
+  // `pregameConfigUntouched` until the panel started persisting: the panel
+  // wrote nothing, and CDR 90 in the stored config was the symptom of a leak.
+  // It is now the proof — the CDR drag from check 7, the jungle switch from
+  // check 8 and the two bots from check 10 are all in storage, while the
+  // player's champion, which nothing committed a change to, is not disturbed.
   check(
-    'saving a kit does not write through to the pregame config',
-    report.savedKit.pregameConfigUntouched === true,
+    'the panel writes what it changed through to the pregame config',
+    report.savedKit.storedPregame?.rules?.cooldownReductionPercent === 90 &&
+      report.savedKit.storedPregame?.rules?.manaFree === false &&
+      report.savedKit.storedPregame?.world?.jungle === false &&
+      report.savedKit.storedPregame?.world?.minions === true &&
+      report.savedKit.storedPregame?.aiCount === 2 &&
+      report.savedKit.storedPregame?.championName === MATCH_CONFIG.player.championName,
     JSON.stringify(report.savedKit.storedPregame)
   );
+  // The other half of the line, and the one worth having a real browser for:
+  // check 9 turned on invulnerability, reveal-map and two debug layers, and
+  // check 9's stack row moved a spell's count. None of that is a match setting,
+  // and none of it may reach storage — a player who reloads into an invulnerable
+  // champion they don't remember asking for has found a bug, not a setting.
+  report.savedKit.cheatWordsInBlob = ['invulnerab', 'reveal', 'debug', 'stack'].filter(word =>
+    (storedConfig ?? '').toLowerCase().includes(word)
+  );
+  check(
+    'no cheat and no debug flag reaches the stored config',
+    report.savedKit.cheatWordsInBlob.length === 0 &&
+      JSON.stringify(report.savedKit.storedPregame?.sections) ===
+        JSON.stringify(['ai', 'player', 'rules', 'world']),
+    JSON.stringify({
+      words: report.savedKit.cheatWordsInBlob,
+      sections: report.savedKit.storedPregame?.sections,
+    })
+  );
+  // And the round trip closes: the reload above booted a *new* `Game` from that
+  // stored config, so the match now running has to be the match check 7, 8 and
+  // 10 shaped — 90% CDR, no jungle, two bots — rather than the one
+  // `MATCH_CONFIG` describes (0% CDR, a jungle, no bots at all).
+  check(
+    'the reloaded match boots from the persisted config, not from the config the run started with',
+    Math.abs(matchAfterReload.cooldownMultiplier - 0.1) < 1e-9 &&
+      matchAfterReload.jungleEnabled === false &&
+      matchAfterReload.monsters === 0 &&
+      matchAfterReload.bots === 2,
+    JSON.stringify(matchAfterReload)
+  );
 
-  // ------------------ 12. Escape stays in the match; the exit button confirms
+  // ------------------------- 12. "Đặt lại mặc định" — the clean slate, back
+  //
+  // Persisting everything took the fresh match away; this is what hands it
+  // back, and it has to do it *now* rather than at the next match. Driven here,
+  // on the reloaded match, because that match is the persisted one — 90% CDR,
+  // no jungle, two bots — so there is something real to reset.
+
+  await tapSelector('.kit-bar-btn.secondary'); // close the editor check 11 left open
+  await page.waitForTimeout(200);
+  await selectTab('rules');
+  await tapSelector('#practice-reset');
+  const afterFirstReset = await gameEval(() => ({
+    label: document.querySelector('#practice-reset')?.textContent?.trim() ?? null,
+    cdr: window.__lol2d.scene.oScene.game.director.getRules().cooldownReductionPercent,
+  }));
+  await page.screenshot({ path: `${OUT}-08-reset-confirm.png` });
+  await tapSelector('#practice-reset');
+  await page.waitForTimeout(300);
+  const afterReset = await gameEval(key => {
+    const game = window.__lol2d.scene.oScene.game;
+    return {
+      cdrLabel: document.querySelector('#practice-cdr-value')?.textContent ?? null,
+      jungleChecked: document.querySelector('#practice-jungle')?.checked ?? null,
+      cooldownMultiplier: game.matchRules.cooldownMultiplier,
+      jungleEnabled: game.director.jungleEnabled,
+      // The camps are back in `game.monsters` at once — `spawnJungle()` fills
+      // it synchronously — even though the world does not see them until the
+      // match unpauses. That is the "applies now" half of the button.
+      monsters: game.monsters.length,
+      bots: game.director.bots().length,
+      stored: JSON.parse(localStorage.getItem(key) ?? 'null'),
+    };
+  }, CFG_KEY);
+  await page.screenshot({ path: `${OUT}-09-reset-done.png` });
+  report.reset = { afterFirstReset, afterReset };
+  check(
+    'the reset button asks first: one press only arms it',
+    afterFirstReset.label === 'Chắc chưa?' && afterFirstReset.cdr === 90,
+    JSON.stringify(afterFirstReset)
+  );
+  check(
+    'Đặt lại mặc định restores the defaults in the running match and in storage',
+    afterReset.cooldownMultiplier === 1 &&
+      afterReset.jungleEnabled === true &&
+      afterReset.monsters > 0 &&
+      afterReset.bots === 5 &&
+      afterReset.stored?.rules?.cooldownReductionPercent === 0 &&
+      afterReset.stored?.world?.jungle === true &&
+      afterReset.stored?.ai?.count === 5 &&
+      // The tab re-reads the director after resetting, so the controls show the
+      // match rather than the settings that are gone.
+      afterReset.cdrLabel === '0%' &&
+      afterReset.jungleChecked === true,
+    JSON.stringify(report.reset)
+  );
+
+  // ------------------ 13. Escape stays in the match; the exit button confirms
   //
   // Last, because the second half of it leaves the match on purpose. The
   // regression both halves guard is a player losing a match to one keypress —
   // which is what Escape did until this change.
 
-  await tapSelector('.kit-bar-btn.secondary'); // close the editor the check above left open
-  await page.waitForTimeout(200);
   await closePanel();
 
   const beforeEscape = await gameEval(() => ({
@@ -891,7 +1005,7 @@ try {
     gameAlive: !!window.__lol2d.scene.oScene.game,
     label: document.querySelector('#practice-exit')?.textContent?.trim() ?? null,
   }));
-  await page.screenshot({ path: `${OUT}-08-exit-confirm.png` });
+  await page.screenshot({ path: `${OUT}-10-exit-confirm.png` });
   await tapSelector('#practice-exit');
   await page.waitForTimeout(600);
   const afterConfirm = await gameEval(() => ({
