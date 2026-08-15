@@ -284,6 +284,55 @@ describe('MatchDirector persistence', () => {
     });
   });
 
+  /**
+   * Persisting everything takes away the clean slate every new match used to
+   * be, so the panel has to hand it back explicitly. The button is on the Trận
+   * đấu tab beside the exit, behind the same two-step confirm — and it has to
+   * do what it says *now*, not at the next match, which is why this asserts the
+   * running match as well as the storage.
+   */
+  describe('resetToDefaults', () => {
+    it('restores the defaults in storage and in the running match', () => {
+      const { director, ctx } = bench();
+      ctx.spawnJungle = vi.fn();
+      const bot = director.addBot(loadoutNamed('Ahri'))!;
+      director.setBotBehaviour(bot, { autoMove: true });
+      director.applyLoadout(ctx.player, loadoutNamed('Zed'));
+      director.setRules({ cooldownReductionPercent: 90, manaFree: true });
+      director.jungleEnabled = false;
+      director.minionsEnabled = false;
+
+      director.resetToDefaults();
+
+      // storage
+      expect(loadPregameConfig()).toEqual(DEFAULT_PREGAME_CONFIG);
+      // and the match, which is the half a "write the defaults" implementation
+      // would skip
+      expect(director.getRules()).toEqual(DEFAULT_PREGAME_CONFIG.rules);
+      expect(ctx.matchRules.cooldownMultiplier).toBe(1);
+      expect(ctx.matchRules.manaFree).toBe(false);
+      expect(director.jungleEnabled).toBe(true);
+      expect(ctx.spawnJungle).toHaveBeenCalled(); // the camps come back now
+      expect(director.minionsEnabled).toBe(true);
+      expect(director.loadoutOf(ctx.player)).toEqual(DEFAULT_PREGAME_CONFIG.player);
+      expect(bot.toRemove).toBe(true);
+      expect(director.bots()).toHaveLength(DEFAULT_PREGAME_CONFIG.ai.count);
+      expect(director.bots().every(b => b !== bot)).toBe(true);
+    });
+
+    it('clears the setup screen’s global AI flags too — it is a reset, not a partial one', () => {
+      savePregameConfig({
+        ...DEFAULT_PREGAME_CONFIG,
+        ai: { ...DEFAULT_PREGAME_CONFIG.ai, autoMove: true },
+      });
+      const { director } = bench();
+
+      director.resetToDefaults();
+
+      expect(loadPregameConfig().ai.autoMove).toBe(false);
+    });
+  });
+
   it('survives localStorage being unavailable rather than breaking the match', () => {
     vi.unstubAllGlobals();
     const { director } = bench();

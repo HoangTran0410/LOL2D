@@ -64,6 +64,7 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_CHAMPION_LOADOUT,
+  DEFAULT_PREGAME_CONFIG,
   loadPregameConfig,
   savePregameConfig,
   toMatchRules,
@@ -556,6 +557,39 @@ export default class MatchDirector {
   seedWorld(world: WorldConfig): void {
     this._jungleEnabled = world.jungle;
     this.game.minionSpawner.enabled = world.minions;
+  }
+
+  /**
+   * The clean slate back.
+   *
+   * Persisting everything took away the fresh match every restart used to be,
+   * so it has to be handed back explicitly — and it applies to the *running*
+   * match as well as to storage, because a button labelled "reset" that only
+   * took effect next time would be the same broken-looking silence the world
+   * toggles needed a note for.
+   *
+   * Storage is written first and then again at the end, and the first write is
+   * not redundant: `addBot` seeds a new bot's behaviour from the stored global
+   * flags, so the defaults have to be in place before the default bots are
+   * built. The last write is what makes the whole thing atomic from the
+   * player's side — every step in between persists its own partial roster.
+   */
+  resetToDefaults(): void {
+    const config = DEFAULT_PREGAME_CONFIG;
+    savePregameConfig(config);
+
+    for (const bot of this.bots()) this.removeBot(bot);
+    this.applyLoadout(this.game.player, config.player);
+    for (let i = 0; i < config.ai.count; i++) this.addBot(config.ai.bots[i]);
+
+    this.seedRules(config.rules);
+    // The public setters here, unlike at boot: these have to *act* — respawn
+    // the camps through `Game.spawnJungle()`, restart the wave clock — not just
+    // record a flag. Both no-op when the value already matches.
+    this.jungleEnabled = config.world.jungle;
+    this.minionsEnabled = config.world.minions;
+
+    this.persist();
   }
 
   // ------------------------------------------------------------------ cheats

@@ -214,6 +214,38 @@ const exitMatch = (): void => {
   }
   hud.requestExit();
 };
+
+/**
+ * ## And the way back to a clean slate
+ *
+ * The panel persists everything it changes now (see `MatchDirector`'s file
+ * comment), which quietly took away the fresh match every restart used to be:
+ * a player who spent an evening at 90% CDR with nine bots and no jungle had no
+ * way back except editing `localStorage`. This is that way back — it writes
+ * `DEFAULT_PREGAME_CONFIG` *and* applies it to the running match, so the
+ * button does what it says while you are looking at it.
+ *
+ * The second control in the panel that confirms, and for both of the exit's
+ * reasons: it is not recoverable — the roster, kits and rules it discards were
+ * built up over many presses — and it sits next to another irreversible
+ * control, where a mis-hit is exactly what a confirm is for. The two arm
+ * independently, so arming one and pressing the other cannot fire it.
+ */
+const confirmingReset = ref(false);
+
+const resetDefaults = (): void => {
+  if (!confirmingReset.value) {
+    confirmingReset.value = true;
+    return;
+  }
+  confirmingReset.value = false;
+  hud.director.resetToDefaults();
+  // Every control on this tab is seeded from the director at mount, so the ones
+  // this just moved have to be re-read rather than left showing the old match.
+  rules.value = hud.director.getRules();
+  jungle.value = hud.director.jungleEnabled;
+  minions.value = hud.director.minionsEnabled;
+};
 </script>
 
 <template>
@@ -275,18 +307,33 @@ const exitMatch = (): void => {
       Quái rừng và lính: thay đổi có hiệu lực khi bạn đóng bảng và trận chạy tiếp.
     </p>
 
-    <!-- Last in the flow and visually apart: the one irreversible thing in the
-         panel. See the file comment on why it is here and why it confirms. -->
-    <button
-      type="button"
-      class="practice-exit"
-      :class="{ confirming: confirmingExit }"
-      id="practice-exit"
-      @click="exitMatch"
-      @touchend.prevent="exitMatch"
-    >
-      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-      <span>{{ confirmingExit ? 'Chắc chưa?' : 'Thoát trận' }}</span>
-    </button>
+    <!-- Last in the flow and visually apart: the two irreversible things in the
+         panel, side by side because they are the same kind of control. See the
+         file comment on why each is here and why both confirm. -->
+    <div class="practice-tab-actions">
+      <button
+        type="button"
+        class="practice-reset"
+        :class="{ confirming: confirmingReset }"
+        id="practice-reset"
+        @click="resetDefaults"
+        @touchend.prevent="resetDefaults"
+      >
+        <i class="fas fa-rotate-left" aria-hidden="true"></i>
+        <span>{{ confirmingReset ? 'Chắc chưa?' : 'Đặt lại mặc định' }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="practice-exit"
+        :class="{ confirming: confirmingExit }"
+        id="practice-exit"
+        @click="exitMatch"
+        @touchend.prevent="exitMatch"
+      >
+        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+        <span>{{ confirmingExit ? 'Chắc chưa?' : 'Thoát trận' }}</span>
+      </button>
+    </div>
   </div>
 </template>

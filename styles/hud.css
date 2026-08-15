@@ -839,22 +839,33 @@
   min-height: 28px;
 }
 
-/* The way out of the match, at the bottom of Trận đấu (RulesTab.vue).
-   Deliberately not in the tab row beside `.practice-close`: two adjacent
-   controls whose outcomes differ by an entire match is the mis-hit this whole
-   change exists to design out, so this one is far from that one, danger-red,
-   and confirms.
+/* The two irreversible controls, at the bottom of Trận đấu (RulesTab.vue):
+   reset the configuration, and leave the match.
+
+   Deliberately not in the tab row beside `.practice-close`: adjacent controls
+   whose outcomes differ by an entire match are the mis-hit this whole change
+   exists to design out, so these are far from that one, danger-coloured, and
+   both confirm.
 
    `margin-top: auto` would need a flex column; the tab body is a plain block,
-   so the separation is a rule and a wide gap instead. */
-.practice-exit {
+   so the separation is a wide gap instead. They wrap to a column on a narrow
+   phone rather than shrinking below a thumb's width — `Đặt lại mặc định` is a
+   long label and a squeezed 44px target is not a target. */
+.practice-tab-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.6rem;
+}
+
+.practice-exit,
+.practice-reset {
+  display: flex;
+  flex: 1 1 11rem;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 100%;
   min-height: 44px;
-  margin-top: 1.6rem;
   padding: 0.7rem;
   background: transparent;
   border: 2px solid rgba(190, 70, 70, 0.5);
@@ -866,17 +877,36 @@
   cursor: pointer;
 }
 
+/* Amber, not red: this one costs you a configuration, the one beside it costs
+   you the match. Same shape, different weight of consequence. */
+.practice-reset {
+  border-color: rgba(190, 145, 60, 0.5);
+  color: rgba(226, 190, 120, 0.9);
+}
+
 .practice-exit:hover {
   border-color: rgba(220, 90, 90, 0.9);
   color: rgb(245, 165, 165);
 }
 
-/* Armed. Filled rather than merely brighter, so "one more press and the match
-   is gone" is a different *kind* of button, not a shade of the same one. */
+.practice-reset:hover {
+  border-color: rgba(220, 175, 80, 0.9);
+  color: rgb(245, 215, 150);
+}
+
+/* Armed. Filled rather than merely brighter, so "one more press and it is
+   gone" is a different *kind* of button, not a shade of the same one. */
 .practice-exit.confirming {
   background: rgba(150, 40, 40, 0.35);
   border-color: rgb(220, 90, 90);
   color: rgb(255, 210, 210);
+  font-weight: bold;
+}
+
+.practice-reset.confirming {
+  background: rgba(150, 110, 30, 0.35);
+  border-color: rgb(220, 175, 80);
+  color: rgb(255, 235, 195);
   font-weight: bold;
 }
 
