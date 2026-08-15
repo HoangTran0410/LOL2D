@@ -807,6 +807,38 @@
   gap: 0.3rem;
 }
 
+/* The debug layers (src/game/debug/DebugOverlay.ts), on the Gian lận tab
+   because the panel is deliberately at three tabs — see the tab row above.
+
+   Two columns: five of these plus the two cheat toggles above them is more
+   than a landscape phone shows at once, and none of the labels is long enough
+   to need the full width. */
+.practice-debug {
+  margin-bottom: 0.8rem;
+}
+
+.practice-debug-title {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--hextech-muted);
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.practice-debug-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 0.6rem;
+}
+
+/* `.pregame-toggle`'s own bottom margin is sized for a stack of full-width
+   rows; inside the grid the row gap does that job. */
+.practice-debug-toggle {
+  margin-bottom: 0.3rem;
+  min-height: 28px;
+}
+
 /* The way out of the match, at the bottom of Trận đấu (RulesTab.vue).
    Deliberately not in the tab row beside `.practice-close`: two adjacent
    controls whose outcomes differ by an entire match is the mis-hit this whole

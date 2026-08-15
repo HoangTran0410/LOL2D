@@ -579,6 +579,46 @@ try {
     JSON.stringify(report.invulnToggle)
   );
 
+  // The debug layers, on the same tab. `routes` is the one worth driving: the
+  // checkbox and the `N` key must write one field, not two — so this taps the
+  // checkbox and reads `navigation.debugRoutes`, the field the key flips.
+  await tapSelector('#practice-debug-routes');
+  await tapSelector('#practice-debug-terrain');
+  const debugAfterTaps = await gameEval(() => {
+    const game = window.__lol2d.scene.oScene.game;
+    return {
+      routes: game.director.debug.routes,
+      navigation: game.navigation.debugRoutes,
+      terrain: game.director.debug.terrain,
+      collision: game.director.debug.collision,
+    };
+  });
+  // Off again, so nothing after this point renders through a debug overlay.
+  await tapSelector('#practice-debug-routes');
+  await tapSelector('#practice-debug-terrain');
+  const debugAfterOff = await gameEval(() => {
+    const game = window.__lol2d.scene.oScene.game;
+    return {
+      routes: game.director.debug.routes,
+      navigation: game.navigation.debugRoutes,
+      terrain: game.director.debug.terrain,
+      checkbox: document.querySelector('#practice-debug-terrain').checked,
+    };
+  });
+  report.debugLayers = { debugAfterTaps, debugAfterOff };
+  check(
+    'Gian lận: the debug toggles switch their layer, and routes is the same field the N key flips',
+    debugAfterTaps.routes === true &&
+      debugAfterTaps.navigation === true &&
+      debugAfterTaps.terrain === true &&
+      debugAfterTaps.collision === false &&
+      debugAfterOff.routes === false &&
+      debugAfterOff.navigation === false &&
+      debugAfterOff.terrain === false &&
+      debugAfterOff.checkbox === false,
+    JSON.stringify(report.debugLayers)
+  );
+
   // The stack row: +10 has to move the spell itself *and* the HUD badge, which
   // reads `Spell.stackCount` off the live spell on the 20Hz HUD tick.
   const stackId = cheatShape.stackRows[0];

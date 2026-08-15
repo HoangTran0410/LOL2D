@@ -40,6 +40,7 @@ import { computed, inject, ref } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
 import type { RosterEntry } from '../../MatchDirector';
 import type Spell from '../../gameObject/Spell';
+import type { DebugFlags } from '../../debug/DebugOverlay';
 import { TAP_MOVE_TOLERANCE_PX } from '../hudInteractions';
 
 const hud = inject<HudInteractions>('hud')!;
@@ -111,6 +112,39 @@ const setRevealMap = (on: boolean): void => {
 
 const onRevealMapChange = (event: Event): void =>
   setRevealMap((event.target as HTMLInputElement).checked);
+
+/**
+ * The debug layers (`src/game/debug/DebugOverlay.ts`). Not cheats, but they
+ * live on this tab for the same reason `revealMap` does — they show you what
+ * the match is hiding — and because the panel is deliberately at three tabs: at
+ * 390px a fourth leaves each one about 63px.
+ *
+ * `routes` is the overlay the `N` key has always toggled, and the checkbox and
+ * the key write the same field: `director.debug.routes` is an accessor onto
+ * `NavigationSystem.debugRoutes`, so neither can be stale relative to the
+ * other.
+ */
+const DEBUG_LAYERS: { key: keyof DebugFlags; label: string }[] = [
+  { key: 'routes', label: 'Đường đi' },
+  { key: 'terrain', label: 'Địa hình' },
+  { key: 'collision', label: 'Va chạm' },
+  { key: 'vision', label: 'Tầm nhìn' },
+  { key: 'quadtree', label: 'Quadtree' },
+];
+
+const debugOn = (key: keyof DebugFlags): boolean => {
+  // Read for the dependency, not for the value. See the file comment.
+  void version.value;
+  return hud.director.debug[key];
+};
+
+const setDebug = (key: keyof DebugFlags, on: boolean): void => {
+  hud.director.debug[key] = on;
+  invalidate();
+};
+
+const onDebugChange = (key: keyof DebugFlags, event: Event): void =>
+  setDebug(key, (event.target as HTMLInputElement).checked);
 
 const setInvulnerable = (on: boolean): void => {
   const entry = selected.value;
@@ -237,6 +271,28 @@ const onTap = (action: () => void): void => {
       />
       <span>Hiện toàn bản đồ</span>
     </label>
+
+    <!-- The debug layers. Two columns because five full-width rows would push
+         the stack rows off a landscape phone on their own. -->
+    <div class="practice-debug">
+      <span class="practice-debug-title">Lớp gỡ lỗi</span>
+      <div class="practice-debug-grid">
+        <label
+          v-for="layer of DEBUG_LAYERS"
+          :key="layer.key"
+          class="pregame-toggle practice-debug-toggle"
+          @touchend.prevent="onTap(() => setDebug(layer.key, !debugOn(layer.key)))"
+        >
+          <input
+            type="checkbox"
+            :id="`practice-debug-${layer.key}`"
+            :checked="debugOn(layer.key)"
+            @change="onDebugChange(layer.key, $event)"
+          />
+          <span>{{ layer.label }}</span>
+        </label>
+      </div>
+    </div>
 
     <div class="practice-cheat-actions">
       <button
