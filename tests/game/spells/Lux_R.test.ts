@@ -89,6 +89,17 @@ const drawWorld = (objects: readonly WorldObject[], camera: Rectangle): void => 
   }
 };
 
+/** An aim that landed exactly on the caster: no distance, so no direction. */
+const degenerateContext = (caster: unknown): CastContext => Object.freeze({
+  spellId: 'lux-r',
+  activationId: 'cast',
+  startedAtMs: 0,
+  caster,
+  origin: Object.freeze({ x: 0, y: 0 }),
+  cursorWorld: Object.freeze({ x: 0, y: 0 }),
+  direction: Object.freeze({ x: 0, y: 0 }),
+});
+
 const beamOwner = (added: unknown[]) => ({
   game: {
     eventManager: { emit: vi.fn() },
@@ -98,6 +109,7 @@ const beamOwner = (added: unknown[]) => ({
     },
   },
   position: new TestVector(0, 0),
+  destination: new TestVector(0, 0),
   teamId: 'blue',
   isDead: false,
   canCast: true,
@@ -185,6 +197,33 @@ describe('Lux R', () => {
     beamDraw.mockClear();
     drawWorld(added, camera);
     expect(beamDraw).toHaveBeenCalled();
+  });
+
+  it('still fires a full beam when the aim landed on Lux herself', () => {
+    const firedFrom = (destination: TestVector) => {
+      const added: unknown[] = [];
+      const owner = beamOwner(added);
+      owner.destination = destination;
+      const spell = new Lux_R(owner);
+
+      spell.press(degenerateContext(owner));
+      vi.stubGlobal('deltaTime', CAST_TIME_MS);
+      spell.update();
+
+      const beam = added.find(
+        (object): object is BeamSpellObject => object instanceof BeamSpellObject
+      );
+      if (!beam) throw new Error('Lux R must create its beam.');
+      return beam.geometry;
+    };
+
+    // Walking south, so that is where the beam goes: `Game.facing()` already
+    // states the rule this follows — a direction is never (0,0).
+    expect(firedFrom(new TestVector(0, 200)).end).toEqual({ x: 0, y: RANGE });
+    // Standing perfectly still, with nothing left to point at: it still has to
+    // be a beam, because a start equal to its end draws nothing at all and
+    // hit-tests as a dot on Lux's own feet.
+    expect(firedFrom(new TestVector(0, 0)).end).toEqual({ x: RANGE, y: 0 });
   });
 
   it('snapshots its beam and deals damage only after cast completion', () => {

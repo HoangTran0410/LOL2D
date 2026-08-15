@@ -244,11 +244,12 @@ export default class Lux_R extends Spell {
   }
 
   private beamGeometry(context: CastContext): BeamGeometry {
+    const direction = this.firingDirection(context);
     return {
       start: context.origin,
       end: {
-        x: context.origin.x + context.direction.x * this.range,
-        y: context.origin.y + context.direction.y * this.range,
+        x: context.origin.x + direction.x * this.range,
+        y: context.origin.y + direction.y * this.range,
       },
       width: this.width,
     };

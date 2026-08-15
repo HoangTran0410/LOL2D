@@ -18,7 +18,11 @@ import type {
   ResourceCommitPoint,
   SpellRuntimeState,
   TargetingMode,
+  Vec2,
 } from '../spell/runtime/types';
+
+/** Where a spell fires when neither the aim nor the caster points anywhere. */
+const DEFAULT_FACING: Vec2 = Object.freeze({ x: 1, y: 0 });
 
 const legacyCastSpec = (durationMs: number, targeting: TargetingMode): CastSpec => ({
   activation: 'PRESS',
@@ -237,6 +241,33 @@ export default class Spell {
 
   resetCoolDown(): void {
     this.currentCooldown = 0;
+  }
+
+  /**
+   * The unit vector to fire along; never (0,0).
+   *
+   * Both context builders — `cast()` above and `TargetResolver.createContext`
+   * — resolve an aim that landed exactly on the caster to a zero direction,
+   * and every consumer then multiplies it by a range and gets nothing. It is
+   * not a rare case: `AIChampion.aimPoint` falls back to `destination` when
+   * there is no cursor, and a bot with `_autoMove` off leaves that parked on
+   * its own feet, so it aims every spell into the ground under it. Measured on
+   * a live Lux R: a beam whose start and end were the same coordinate, which
+   * paints nothing and hit-tests as a dot at the caster's feet.
+   *
+   * The fallback is the caster's own heading and then a fixed vector, which is
+   * the rule `Game.facing()` already states for the touch layer, in the same
+   * words: never (0,0).
+   */
+  protected firingDirection(context: CastContext): Vec2 {
+    const aim = context.direction;
+    if (aim.x !== 0 || aim.y !== 0) return aim;
+
+    const dx = (this.owner?.destination?.x ?? 0) - (this.owner?.position?.x ?? 0);
+    const dy = (this.owner?.destination?.y ?? 0) - (this.owner?.position?.y ?? 0);
+    const length = Math.hypot(dx, dy);
+    if (length > 0.01) return { x: dx / length, y: dy / length };
+    return DEFAULT_FACING;
   }
 
   // for override
