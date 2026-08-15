@@ -10,10 +10,12 @@ import { ref } from 'vue';
  * place in a `.vue` component's orbit whose state genuinely outlives the
  * instance.
  *
- * Deliberately not persisted to `localStorage`. Which tab you had open is a
- * fact about the last few seconds, not a setting, and the practice panel's
- * standing rule is that it writes nothing to storage except the saved-kit
- * library (see `MatchDirector`'s file comment).
+ * Deliberately not persisted to `localStorage`, even though the panel does
+ * persist now: `MatchDirector` writes the *match* — the roster, the rules, the
+ * world — after every mutation, and which tab you had open is not one of
+ * those. It is a fact about the last few seconds, not a setting (see
+ * `MatchDirector`'s file comment for where that line is drawn, and why cheats
+ * sit on this side of it too).
  *
  * It does outlive a whole match — quit to the menu, start a new game, and the
  * panel opens where you left it. That is intended rather than a leak: it is

@@ -13,11 +13,32 @@
  * splice on one side and, on this one, marking a unit for the sweep and letting
  * everything it owns unwind on the next tick.
  *
- * Serving both through one interface is where this would have gone wrong, and
- * it is why the practice panel deliberately never writes
- * `lol2d:pregameConfig:v1`: the panel reshapes *this* match, and leaving it
- * returns you to whatever the setup screen has stored. A practice tool you can
- * flail around in without wrecking your real configuration.
+ * Serving both through one interface is where this would have gone wrong. The
+ * two still are not interchangeable — but they are now connected, in one
+ * direction and at one seam: **every mutating method here persists the match to
+ * `lol2d:pregameConfig:v1` afterwards**, so the match you shaped is the match
+ * you get back on reload.
+ *
+ * ## The rule this reverses, and why
+ *
+ * The panel was built to "chỉ sửa trận hiện tại" — mutate the running match,
+ * never write storage, so you could flail around in a practice tool without
+ * wrecking your real configuration. That rule is reversed for match
+ * configuration (`2026-08-16-panel-persistence-design`): the panel turned out
+ * to be a strict superset of the setup screen for everything except input mode
+ * — it edits every unit's loadout and sets behaviour *per bot* where the screen
+ * only sets it globally — so the surface whose work was thrown away on reload
+ * was the better of the two. The clean slate a new match used to be is now the
+ * "Đặt lại mặc định" button on the Trận đấu tab.
+ *
+ * What did *not* reverse is the line under it. Cheats — invulnerability,
+ * reveal-map, stack counts — and the debug layers are session state and are
+ * never written. They are things a player switches on to try something, and
+ * inheriting one silently into the next visit would read as the game being
+ * broken rather than as a restored setting. `persist()` is called from the
+ * roster, loadout, rules and world methods and from nowhere else; the test that
+ * holds that line is `MatchDirector.persistence.test.ts`'s "cheats and debug
+ * flags do not leak into storage".
  *
  * Written against `MatchDirectorContext`, not `Game`, so it unit-tests under
  * plain Vitest with no p5 globals and no scene. `Game` satisfies the interface
@@ -43,6 +64,8 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_CHAMPION_LOADOUT,
+  loadPregameConfig,
+  savePregameConfig,
   toMatchRules,
 } from './config/PregameConfig';
 import type {
@@ -50,6 +73,8 @@ import type {
   ChampionLoadout,
   MatchRules,
   MatchRulesConfig,
+  PregameConfig,
+  WorldConfig,
 } from './config/PregameConfig';
 import { getChampionPresetFromLoadout } from './preset';
 import type GameObject from './gameObject/GameObject';
@@ -250,6 +275,66 @@ export default class MatchDirector {
   }
 
   /**
+   * This match, written as the config that would boot it again.
+   *
+   * **Derived from live state, whole, rather than patched field by field.** A
+   * patch-per-field scheme would have to be kept in step with the panel's
+   * controls forever — add a control, forget its patch, and the panel silently
+   * stops persisting one thing. What the roster and the rules actually *are*
+   * cannot drift from what the player is looking at.
+   *
+   * Two things here are not derivable and so are read back from storage rather
+   * than invented. The global `ai.autoMove`/`autoAttack`/`autoCast` are the
+   * setup screen's control (`AiConfigPanel`) and the panel has no view of them
+   * — writing a derived value would let the panel quietly overwrite a screen it
+   * does not edit. The bot slots past the live bot count are the same promise
+   * `AIConfig.bots` already makes: lower the count, raise it again, and slot 4
+   * is still the Zed you configured.
+   *
+   * Note `bots()` and not `objectManager.objects`. That is the paused-panel
+   * trap, and it is a data-loss bug rather than a nicety: the panel holds the
+   * match paused, `ObjectManager.update()` is what flushes `_objectToBeAdd`, so
+   * a bot the player just added is queued and not in `objects` yet. Derived
+   * from `objects` alone, "add a bot, close, reload" loses the bot. See
+   * `bots()`'s own comment, and the test named for it.
+   */
+  toPregameConfig(): PregameConfig {
+    const stored = loadPregameConfig();
+    const live = this.bots();
+
+    const bots = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+      i < live.length ? this.loadoutOf(live[i]) : stored.ai.bots[i]
+    );
+    const botBehaviours = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+      i < live.length ? behaviourOf(live[i]) : stored.ai.botBehaviours[i]
+    );
+
+    return {
+      player: this.loadoutOf(this.game.player),
+      ai: {
+        count: live.length,
+        autoMove: stored.ai.autoMove,
+        autoAttack: stored.ai.autoAttack,
+        autoCast: stored.ai.autoCast,
+        bots,
+        botBehaviours,
+      },
+      rules: this.getRules(),
+      world: { jungle: this.jungleEnabled, minions: this.minionsEnabled },
+    };
+  }
+
+  /**
+   * Called at the end of every method that changes what the match *is*, and
+   * from none of the cheats. `savePregameConfig` swallows a full quota, a
+   * disabled `localStorage` and private-mode Safari on its own, so this can
+   * never be the thing that breaks a mutation the player already saw happen.
+   */
+  private persist(): void {
+    savePregameConfig(this.toPregameConfig());
+  }
+
+  /**
    * Spawns a bot at a fountain spawn point, capped at the same `AI_COUNT_MAX`
    * the pregame screen enforces — hence the nullable return: the cap is real
    * and a caller that cannot see it would silently drop the player's click.
@@ -266,6 +351,13 @@ export default class MatchDirector {
   addBot(loadout: ChampionLoadout): AIChampion | null {
     if (this.bots().length >= AI_COUNT_MAX) return null;
 
+    // The setup screen's global flags are the *default* behaviour for a bot
+    // nobody has chosen one for, which is exactly what a bot added mid-match
+    // is. Without this it would get `AIChampion`'s hardcoded defaults instead,
+    // and a player who set "bots wander" on the setup screen would find that
+    // every bot they add in the panel stands still.
+    const behaviour = loadPregameConfig().ai;
+
     const spawn = this.game.randomSpawnPoint();
     const bot = new AIChampion({
       game: this.game,
@@ -275,9 +367,13 @@ export default class MatchDirector {
       position: createVector(spawn.x, spawn.y),
       preset: getChampionPresetFromLoadout(loadout),
       presetFactory: () => getChampionPresetFromLoadout(loadout),
+      autoMove: behaviour.autoMove,
+      autoAttack: behaviour.autoAttack,
+      autoCast: behaviour.autoCast,
     });
     this.game.objectManager.addObject(bot);
     this.loadouts.set(bot, loadout);
+    this.persist();
     return bot;
   }
 
@@ -290,6 +386,9 @@ export default class MatchDirector {
     if (unit === this.game.player) return;
     if (!(unit instanceof AIChampion)) return;
     unit.toRemove = true;
+    // After the mark, never before: `bots()` skips `toRemove` units, so the
+    // config this derives is the roster the player is now looking at.
+    this.persist();
   }
 
   /**
@@ -321,6 +420,7 @@ export default class MatchDirector {
       unit.setPresetFactory(() => getChampionPresetFromLoadout(loadout));
       unit.setRespawnRollsNewPreset(true);
     }
+    this.persist();
   }
 
   /**
@@ -331,6 +431,7 @@ export default class MatchDirector {
     if (flags.autoMove !== undefined) bot._autoMove = flags.autoMove;
     if (flags.autoAttack !== undefined) bot._autoAttack = flags.autoAttack;
     if (flags.autoCast !== undefined) bot._autoCast = flags.autoCast;
+    this.persist();
   }
 
   get jungleEnabled(): boolean {
@@ -356,6 +457,7 @@ export default class MatchDirector {
 
     if (on) {
       this.game.spawnJungle();
+      this.persist();
       return;
     }
     for (const monster of this.game.monsters) monster.toRemove = true;
@@ -363,6 +465,7 @@ export default class MatchDirector {
     // spawn-side list and nothing prunes it, so a jungle switched off and on
     // again would otherwise carry every dead camp's corpse into the new list.
     this.game.monsters.length = 0;
+    this.persist();
   }
 
   /** The spawner owns this flag; the director is a view of it, not a copy. */
@@ -379,11 +482,15 @@ export default class MatchDirector {
    * No `monsters.length = 0` counterpart here: the spawner prunes `toRemove`
    * minions on its own update whether it is enabled or not, so the list empties
    * itself on the first unpaused tick.
+   *
+   * Setting it to what it already is does nothing, mirroring the jungle's own
+   * guard — so a no-op does not write storage either.
    */
   set minionsEnabled(on: boolean) {
+    if (on === this.game.minionSpawner.enabled) return;
     this.game.minionSpawner.enabled = on;
-    if (on) return;
-    for (const minion of this.game.minionSpawner.minions) minion.toRemove = true;
+    if (!on) for (const minion of this.game.minionSpawner.minions) minion.toRemove = true;
+    this.persist();
   }
 
   /** A copy, so a caller editing the object it got back cannot retune the match. */
@@ -409,6 +516,21 @@ export default class MatchDirector {
    * `toMatchRules` clamps privately on its way to a multiplier.
    */
   setRules(rules: MatchRulesConfig): void {
+    this.seedRules(rules);
+    this.persist();
+  }
+
+  /**
+   * `setRules` without the write — for `Game`'s constructor, which is telling
+   * the director what the match it just built *started* as, not changing it.
+   *
+   * The distinction matters now that every setter persists: boot-time seeding
+   * that went through the public setters would write storage on every match
+   * start, and — worse — `setRules` runs before the world is seeded, so the
+   * config it derived would carry a jungle flag the match had not been told
+   * about yet. Same split as `seedLoadout` / `applyLoadout`.
+   */
+  seedRules(rules: MatchRulesConfig): void {
     this._rules = {
       cooldownReductionPercent: clampPercent(rules.cooldownReductionPercent),
       manaFree: !!rules.manaFree,
@@ -417,6 +539,23 @@ export default class MatchDirector {
     const derived = toMatchRules(this._rules);
     this.game.matchRules.cooldownMultiplier = derived.cooldownMultiplier;
     this.game.matchRules.manaFree = derived.manaFree;
+  }
+
+  /**
+   * The world the match booted with, again without writing — the counterpart of
+   * `seedRules`, and the reason `Game` can skip spawning a jungle the config
+   * switched off rather than spawning one and clearing it a frame later.
+   *
+   * Assigns the backing fields directly instead of going through the two
+   * setters: at boot there is nothing to clear (no camps were spawned, no
+   * minions exist yet), and the jungle setter's "already on" guard would
+   * otherwise make `seedWorld({ jungle: true })` and a real toggle indis-
+   * tinguishable in the one case where they differ — a re-spawn of camps that
+   * are already standing.
+   */
+  seedWorld(world: WorldConfig): void {
+    this._jungleEnabled = world.jungle;
+    this.game.minionSpawner.enabled = world.minions;
   }
 
   // ------------------------------------------------------------------ cheats

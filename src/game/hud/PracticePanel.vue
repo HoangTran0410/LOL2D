@@ -9,9 +9,13 @@
  * meant abandoning the match and rebuilding it.
  *
  * Every tab writes through `hud.director` (`MatchDirector`), never into
- * `localStorage`: the panel reshapes *this* match and leaves the setup
- * screen's stored configuration alone. The one exception is the saved-kit
- * library, which the player fills on purpose, by name.
+ * `localStorage` directly: a tab reshapes *this* match, and the director
+ * persists what it changed to `lol2d:pregameConfig:v1` afterwards, so the
+ * match you shaped is the one you get back on reload. That is a reversal of
+ * the rule this panel was built to — see `MatchDirector`'s file comment for
+ * what changed and what did not. What did not: cheats and debug layers are
+ * session state and are never stored. The saved-kit library is the one thing
+ * a tab stores on its own, because the player fills it on purpose, by name.
  *
  * The tab bar is `.pregame-tabs` from styles/pregame-scene.css, not a copy of
  * it — both stylesheets load globally (index.html:22-27) and the two screens

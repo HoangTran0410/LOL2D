@@ -261,17 +261,15 @@ export default class Game {
     // would silently reset the match to whatever the slider was showing.
     // Re-derives the same numbers line 114 already wrote, so this changes no
     // behaviour; it only tells the director what the match started with.
-    this.director.setRules(pregameConfig.rules);
+    this.director.seedRules(pregameConfig.rules);
     for (const { unit, loadout } of loadoutsInPlay) this.director.seedLoadout(unit, loadout);
-    // The world the config asked for, through the director rather than around
-    // it, so "the jungle is off" has one definition. Both setters are no-ops
-    // when the value already matches (the jungle's guards against a second set
-    // of camps), so a default config costs nothing here. Jungle *off* still has
-    // to be said out loud: the flag starts on, and a director that disagreed
-    // with the match would show a ticked box over an empty jungle — and then
-    // persist that lie over the player's own setting.
-    this.director.jungleEnabled = pregameConfig.world.jungle;
-    this.director.minionsEnabled = pregameConfig.world.minions;
+    // And the world the config asked for. `seed*` rather than the public
+    // setters throughout: those persist, and a match *booting* has nothing to
+    // save — it is being told what it already is. The jungle flag has to be
+    // said out loud even so, because it starts on and the camps above were
+    // skipped: a director that disagreed with the match would show a ticked box
+    // over an empty jungle, and then write that lie over the player's setting.
+    this.director.seedWorld(pregameConfig.world);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();

@@ -19,8 +19,12 @@
  * Same two controls, same markup and the same copy as `MatchRulesPanel.vue`
  * on the setup screen — including `step="10"`, so a percentage means the same
  * thing and lands on the same values in both places. Pointed at the live match
- * (`hud.director`) instead of at `localStorage`: the practice panel never
- * writes `lol2d:pregameConfig:v1` (see `MatchDirector`'s file comment).
+ * (`hud.director`) rather than at `localStorage`, which is still the whole
+ * difference between the two screens: the setup screen edits a config, this
+ * edits a running match. The config is written all the same — by
+ * `MatchDirector`, after it has applied the change, so a match retuned here
+ * comes back retuned. Nothing in this file touches storage itself; there is
+ * one write path and it is not here (see `MatchDirector`'s file comment).
  *
  * Unlike the spell picker's slot row, these two apply on the spot rather than
  * staging behind Huỷ / Xác nhận. There is nothing to stage: `setRules` is one
