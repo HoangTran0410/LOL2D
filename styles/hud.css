@@ -398,7 +398,25 @@
   display: flex;
   flex-direction: column;
   width: min(760px, 92vw);
-  max-height: 90vh;
+  /* A *fixed* height, not `max-height`, and this is the whole of the fix for a
+     panel that jumped under the cursor. Content-sized, the box was 855px tall
+     on the Chiêu thức tab (its roster overflows, so it pinned to the old
+     `max-height: 90vh`) and 92px tall on Trận đấu — and because it is centred
+     with `translate(-50%, -50%)`, the shrink also re-centred it, moving its top
+     edge from y=48 to y=429. Switching tabs moved the tab bar you had just
+     clicked, out from under the pointer.
+     `height` over the alternatives on purpose:
+       - `min-height` fixes nothing on its own: the jump is content *growing*
+         past the floor, which is the same jump.
+       - "size to the tallest tab" is what this already is. The tallest tab is
+         the twenty-champion picker, which overflows any screen this game runs
+         on, so its height is 90vh whatever else is in the panel — a measured
+         px value would only be that number, stale.
+     90vh, so the tab the panel opens on keeps exactly the geometry it had; the
+     three short tabs stop shrinking to fit and fill the frame instead. The two
+     media queries below replace this with `100dvh` full-bleed, where the panel
+     was already stable for the same reason. */
+  height: 90vh;
 }
 
 /* The tab bar. `.pregame-tabs`/`.pregame-tab` in styles/pregame-scene.css do
@@ -444,11 +462,33 @@
   padding: 0.8rem;
 }
 
-/* Placeholder copy for the three tabs Tasks 9 and 10 fill in. */
+/* Placeholder copy for the tab Task 10 fills in. */
 .practice-placeholder {
   margin: 0;
   color: var(--hextech-muted);
   font-size: 0.9em;
+}
+
+/* The CDR slider is dragged by hand under a thumb (see `RulesTab.vue`: the
+   canvas's page-wide `preventDefault()` kills the native drag), so it also has
+   to *be* a thumb target — the native control is ~16px tall, and a 16px-tall
+   strip is the one thing a finger cannot land on. 44px, the same minimum the
+   slot pills and the corner button are held to. The track stays centred in the
+   taller box; only the hit area grows. */
+.practice-tab-body input[type='range'] {
+  height: 44px;
+}
+
+/* "Takes effect when you close the panel" (WorldTab.vue). An aside under the
+   controls it qualifies, not a warning: the delay is the design (the match is
+   paused, so `ObjectManager.update()` cannot sweep), and the note is only
+   there so an empty jungle that has not moved yet does not read as a broken
+   switch. */
+.practice-note {
+  margin: 0.8rem 0 0;
+  color: var(--hextech-muted);
+  font-size: 0.75em;
+  font-style: italic;
 }
 
 /* `position: sticky` needs nothing but *a* scrolling ancestor, which
@@ -489,8 +529,11 @@
 }
 
 /* 22px so the mode checkboxes are a real tap target (the native control is
-   ~13px), a size that reads fine with a mouse too. */
-.spell-picker input[type='checkbox'] {
+   ~13px), a size that reads fine with a mouse too. The practice tabs' toggles
+   are the same control in the same modal under the same thumb — one rule
+   rather than a second copy of the number. */
+.spell-picker input[type='checkbox'],
+.practice-tab-body input[type='checkbox'] {
   width: 22px;
   height: 22px;
   vertical-align: middle;
@@ -751,7 +794,6 @@
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    max-height: none;
     border-width: 0;
   }
 }
@@ -767,7 +809,6 @@
   .practice-panel {
     height: 100vh;
     height: 100dvh;
-    max-height: none;
     border-width: 0;
   }
 
