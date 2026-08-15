@@ -72,7 +72,15 @@ describe('Champion spell presentation lifecycle', () => {
       // defaulted this to getChampionPresetRandom — set directly to what
       // that default would have resolved to under the mock above.
       presetFactory: () => replacementPreset.value,
-      stats: { health: { baseValue: 0 }, maxHealth: { value: 100 } },
+      // respawn() now restores the whole preset through Champion.applyPreset,
+      // not just the spells, so the attack stats have to be here too.
+      stats: {
+        health: { baseValue: 0 },
+        maxHealth: { value: 100 },
+        attackDamage: { baseValue: 0 },
+        attackSpeed: { baseValue: 0 },
+        attackRange: { baseValue: 0 },
+      },
       deathData: { reviveAfter: 0 },
       game: { randomSpawnPoint: () => ({ x: 5, y: 6 }) },
       position,

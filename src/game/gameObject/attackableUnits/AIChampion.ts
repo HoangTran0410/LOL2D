@@ -1,4 +1,3 @@
-import AssetManager from '../../../managers/AssetManager';
 import { Circle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { getChampionPresetRandom } from '../../preset';
@@ -259,7 +258,7 @@ export default class AIChampion extends Champion {
 
     const navigation = this.game.navigation;
     if (navigation) {
-      const reachable = navigation.nearestWalkable(x, y, this.bodyRadius, ROAM_SNAP_DISTANCE);
+      const reachable = navigation.nearestWalkable(x, y, this.terrainRadius, ROAM_SNAP_DISTANCE);
       if (!reachable) return;
       x = reachable.x;
       y = reachable.y;
@@ -298,11 +297,26 @@ export default class AIChampion extends Champion {
 
   respawn() {
     super.respawn();
+    if (this._respawnWithNewPreset) this.applyPreset(this.presetFactory());
+  }
 
-    if (this._respawnWithNewPreset) {
-      let newPreset = this.presetFactory();
-      this.avatar = AssetManager.get(newPreset.avatar);
-      this.replaceSpells((newPreset.spells ?? []).map(SpellClass => new SpellClass(this)));
-    }
+  /**
+   * Whether the next respawn rolls this bot's champion again. On by default —
+   * a bot left on "random" re-rolls every life, which is the game's own
+   * behaviour. Turning it off is how a bot handed a specific kit keeps it (see
+   * the picker's "clone my spells" in `hudInteractions.ts`).
+   */
+  setRespawnRollsNewPreset(on: boolean): void {
+    this._respawnWithNewPreset = on;
+  }
+
+  /**
+   * What the next respawn would roll from. `presetFactory` is private, so this
+   * is the only way to rewrite it after construction — which is what makes a
+   * champion swap performed mid-match survive the bot's next death instead of
+   * being re-rolled back to whatever it was configured with.
+   */
+  setPresetFactory(factory: ChampionPresetFactory): void {
+    this.presetFactory = factory;
   }
 }

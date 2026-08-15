@@ -93,10 +93,36 @@ export default class Champion extends AttackableUnit {
     });
 
     this.score = 0;
-    this.name = preset?.name;
-    this.spells = preset?.spells?.map(spell => new spell(this)) || [];
+    // A champion with no preset at all is still a champion: it gets the default
+    // attack profile rather than a unit that cannot swing.
+    if (preset) this.applyPreset(preset);
+    else this.applyAttackTuning(DEFAULT_CHAMPION_ATTACK);
+  }
 
-    const attack = preset?.attack ?? DEFAULT_CHAMPION_ATTACK;
+  /**
+   * Everything a `ChampionPresetData` decides about a champion, in one place.
+   *
+   * Written as a method rather than left in the constructor because a champion
+   * takes a preset in more than one situation: at construction, and on a
+   * respawn that rolls a new champion (`AIChampion.respawn`). Those used to be
+   * two partial copies of this, and the respawn copy restored only `avatar`
+   * and `spells` — so a bot that respawned as a new champion kept the old
+   * one's name and its attack damage, speed and range for the rest of the
+   * match.
+   *
+   * Deliberately does NOT touch health or mana. The constructor must not (the
+   * unit is still being built) and `respawn()` must not (`super.respawn()` has
+   * already refilled). Refilling the bars belongs to whoever swaps a champion
+   * under a unit that is standing there, which is a different act entirely.
+   */
+  applyPreset(preset: ChampionPresetData): void {
+    this.name = preset.name;
+    if (preset.avatar) this.avatar = AssetManager.get(preset.avatar);
+    this.replaceSpells((preset.spells ?? []).map(SpellClass => new SpellClass(this)));
+    this.applyAttackTuning(preset.attack ?? DEFAULT_CHAMPION_ATTACK);
+  }
+
+  private applyAttackTuning(attack: ChampionAttackTuning): void {
     this.stats.attackDamage.baseValue = attack.damage;
     this.stats.attackSpeed.baseValue = attack.attacksPerSecond;
     this.stats.attackRange.baseValue = attack.range;
