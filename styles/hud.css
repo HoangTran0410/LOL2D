@@ -700,6 +700,113 @@
   font-style: italic;
 }
 
+/* --------------------------------------------- Gian lận tab (CheatTab.vue)
+   The unit picker: one row per participant, the same order and labels the
+   roster tab uses. Rows rather than pills because a name has to fit — "Bot 3"
+   alone does not say which unit you are about to make immortal — and rows
+   stack down the one axis this panel already scrolls. */
+.practice-cheat-units {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.practice-cheat-unit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.3rem 0.6rem;
+  background: var(--hextech-panel);
+  border: 2px solid var(--hextech-line);
+  color: var(--hextech-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.practice-cheat-unit:hover {
+  border-color: var(--hextech-gold-dim);
+}
+
+/* Teal for the selected unit, the same mark `.slot-pill.active` used to carry
+   and `.pregame-tab.selected` still does — one colour means "this is the one
+   you are acting on" across both screens. */
+.practice-cheat-unit.selected {
+  border-color: var(--hextech-teal);
+  color: var(--hextech-text);
+}
+
+.practice-cheat-unit-label {
+  flex: none;
+  min-width: 3.5em;
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.practice-cheat-unit-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-cheat-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+/* The one button style this tab needs, held to the 44px thumb minimum the rest
+   of the panel is held to. Quieter than `.hextech-btn` on purpose: these fire
+   on a single press with no confirm, and a row of loud buttons over a paused
+   match reads like a commitment. */
+.practice-cheat-btn {
+  min-height: 44px;
+  padding: 0.3rem 0.8rem;
+  background: var(--hextech-sunken);
+  border: 2px solid var(--hextech-line);
+  color: var(--hextech-text);
+  font: inherit;
+  font-size: 0.85em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.practice-cheat-btn:hover {
+  border-color: var(--hextech-teal);
+}
+
+/* One row per stacking spell: what it is and how many, then the four setters.
+   Wraps rather than shrinking the buttons — on a narrow phone the name takes
+   the first line and the buttons the second, both still full-size targets. */
+.practice-cheat-stack {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--hextech-line);
+}
+
+.practice-cheat-stack-name {
+  font-size: 0.85em;
+  color: var(--hextech-muted);
+}
+
+.practice-cheat-stack-count {
+  margin-left: 0.4rem;
+  color: var(--hextech-gold);
+}
+
+.practice-cheat-stack-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
 /* 22px so a checkbox is a real tap target (the native control is ~13px), a
    size that reads fine with a mouse too. */
 .practice-tab-body input[type='checkbox'] {

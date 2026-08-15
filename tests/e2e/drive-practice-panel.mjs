@@ -1,5 +1,5 @@
 /**
- * End-to-end drive of the in-game practice panel — the two-tab modal that
+ * End-to-end drive of the in-game practice panel — the three-tab modal that
  * reshapes a *running* match (`src/game/hud/PracticePanel.vue` over
  * `src/game/MatchDirector.ts`).
  *
@@ -24,7 +24,7 @@
  *
  * ## What it proves, in order
  *
- *   1. the corner button opens a panel with two tabs, and `#practice-close`
+ *   1. the corner button opens a panel with three tabs, and `#practice-close`
  *      closes it from *every* one of them — no tab owns an exit, and the one
  *      that used to (the deleted picker's Huỷ) left the others with no way out
  *      of a modal covering a paused match;
@@ -66,8 +66,8 @@ const VIEWPORT = { width: 1280, height: 900 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
-const TAB_IDS = ['roster', 'rules'];
-const TAB_LABELS = ['Đấu thủ', 'Trận đấu'];
+const TAB_IDS = ['roster', 'rules', 'cheats'];
+const TAB_LABELS = ['Đấu thủ', 'Trận đấu', 'Gian lận'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
@@ -281,7 +281,7 @@ try {
   report.closeFromEveryTab = {};
   for (const [index, id] of TAB_IDS.entries()) {
     if (index > 0) await openPanel();
-    await selectTab(id, id === 'roster'); // one of the two switched by thumb
+    await selectTab(id, id === 'roster'); // one of the three switched by thumb
     await closePanel();
     report.closeFromEveryTab[id] = {
       pickerFlag: await hudFlag(),
