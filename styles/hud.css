@@ -436,6 +436,27 @@
   font-size: 0.85em;
 }
 
+/* The shell's close, at the end of the tab row (see PracticePanel.vue). Not a
+   `.pregame-tab`: it does not select anything, so it must not take the
+   selected-tab underline or a tab's `flex: 1` share of the row. 44px square so
+   a thumb hits it, which also matches the height `body.touch-ui .pregame-tab`
+   gives its neighbours. */
+.practice-close {
+  flex: none;
+  width: 44px;
+  align-self: stretch;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--hextech-muted);
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.practice-close:hover {
+  color: var(--hextech-text);
+}
+
 /* Each tab's body is the panel's one scroll region: `flex: 1 1 auto` with
    `min-height: 0`, so it takes whatever height the tab bar left and scrolls
    inside it. `flex-basis: auto` (not `0`) on purpose — the body's

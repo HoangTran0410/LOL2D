@@ -43,8 +43,23 @@
  * roster tab mid-pick must come back to the picks they had. The other three
  * read their state from the director when they mount, so they cost nothing to
  * rebuild and gain nothing from being kept alive.
+ *
+ * ## The close button belongs to the shell, not to a tab
+ *
+ * Huỷ / Xác nhận live inside `SpellPickerModal`'s slot row, because that is
+ * what they act on — staged spell picks. `v-show` takes them off screen with
+ * the rest of that tab, which for three of the four tabs left the panel with
+ * **no way out at all**: it covers the match, the match is paused under it,
+ * and the only exit was to work out that you must first switch back to Chiêu
+ * thức. So the shell carries its own close, always visible, on the tab row.
+ *
+ * It calls `closeSpellPicker`, the same discard-and-close that Huỷ does. That
+ * is the honest verb: leaving via this button abandons staged picks exactly as
+ * Huỷ would. It does not undo a rules or world change, because those never
+ * staged in the first place — see the spec's Task 9 correction.
  */
-import { ref } from 'vue';
+import { inject, ref } from 'vue';
+import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
 import SpellPickerModal from './SpellPickerModal.vue';
 import RosterTab from './practice/RosterTab.vue';
@@ -52,6 +67,8 @@ import RulesTab from './practice/RulesTab.vue';
 import WorldTab from './practice/WorldTab.vue';
 
 defineProps<{ state: HudState }>();
+
+const hud = inject<HudInteractions>('hud')!;
 
 const TABS = [
   { id: 'spells', label: 'Chiêu thức' },
@@ -77,6 +94,20 @@ const tab = ref<(typeof TABS)[number]['id']>('spells');
         @touchend.prevent="tab = item.id"
       >
         {{ item.label }}
+      </button>
+
+      <!-- The shell's own way out, on every tab. See the file comment: the
+           picker's Huỷ disappears with its tab, and three of the four tabs
+           had no exit from a panel that covers a paused match. -->
+      <button
+        type="button"
+        class="practice-close"
+        id="practice-close"
+        title="Đóng"
+        @click="hud.closeSpellPicker()"
+        @touchend.prevent="hud.closeSpellPicker()"
+      >
+        <i class="fas fa-times"></i>
       </button>
     </div>
 
