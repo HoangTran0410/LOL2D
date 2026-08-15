@@ -36,6 +36,8 @@
  */
 import AIChampion from './gameObject/attackableUnits/AIChampion';
 import type Champion from './gameObject/attackableUnits/Champion';
+import type Buff from './gameObject/Buff';
+import Invulnerable from './gameObject/buffs/Invulnerable';
 import {
   AI_COUNT_MAX,
   CDR_PERCENT_MAX,
@@ -285,8 +287,7 @@ export default class MatchDirector {
    */
   applyLoadout(unit: Champion, loadout: ChampionLoadout): void {
     unit.applyPreset(getChampionPresetFromLoadout(loadout));
-    unit.stats.health.baseValue = unit.stats.maxHealth.value;
-    unit.stats.mana.baseValue = unit.stats.maxMana.value;
+    this.refill(unit);
     // For the player as readily as for a bot: the editor has to reopen on
     // whatever it last committed, whoever it was committed to.
     this.loadouts.set(unit, loadout);
@@ -392,7 +393,77 @@ export default class MatchDirector {
     this.game.matchRules.cooldownMultiplier = derived.cooldownMultiplier;
     this.game.matchRules.manaFree = derived.manaFree;
   }
+
+  // ------------------------------------------------------------------ cheats
+  //
+  // The practice tool's own half: state of a unit *inside* the match, rather
+  // than which units are in it. They live here for the same reason everything
+  // else does — this is the one seam that mutates a running match — and the
+  // mechanisms live where this codebase already puts that kind of work: a
+  // `Buff` for damage immunity, a method on `Spell` for stacks.
+
+  /**
+   * The live invulnerability buffs on `unit` — deactivated ones excluded, and
+   * that exclusion is the whole subtlety here.
+   *
+   * `deactivateBuff()` only marks: `AttackableUnit.update()` is what filters
+   * `toRemove` buffs out of the list, and it cannot run while the panel holds
+   * the match paused. Counting the marked ones would make the toggle report
+   * "still on" for as long as the panel that turned it off stays open, and
+   * turning it back on inside that same window would find a buff already there
+   * and do nothing — a switch stuck in whichever position it was last flipped
+   * to.
+   */
+  private invulnerableBuffs(unit: Champion): Buff[] {
+    return unit.buffs.filter(buff => buff instanceof Invulnerable && !buff.toRemove);
+  }
+
+  /** Whether `unit` is currently carrying the invulnerability buff. */
+  isInvulnerable(unit: Champion): boolean {
+    return this.invulnerableBuffs(unit).length > 0;
+  }
+
+  /**
+   * The sticky toggle. The buff is constructed here and nowhere else, so the
+   * tab never has to know what invulnerability is made of.
+   */
+  setInvulnerable(unit: Champion, on: boolean): void {
+    const existing = this.invulnerableBuffs(unit);
+    if (on) {
+      if (existing.length === 0) {
+        unit.addBuff(new Invulnerable(INVULNERABLE_DURATION_MS, unit, unit));
+      }
+      return;
+    }
+    for (const buff of existing) buff.deactivateBuff();
+  }
+
+  /** Health and mana to full. The same two lines `applyLoadout` runs after a champion swap. */
+  refill(unit: Champion): void {
+    unit.stats.health.baseValue = unit.stats.maxHealth.value;
+    unit.stats.mana.baseValue = unit.stats.maxMana.value;
+  }
+
+  /**
+   * Every ability off cooldown.
+   *
+   * `BasicAttack` overrides `currentCooldown`'s setter with an empty one on
+   * purpose, so the swing timer this does not reach is the swing timer it
+   * should not reach — a reset that handed back an attack mid-swing would be
+   * a different cheat than the one asked for.
+   */
+  clearCooldowns(unit: Champion): void {
+    for (const spell of unit.spells) if (spell) spell.currentCooldown = 0;
+  }
 }
+
+/**
+ * Effectively permanent, matching the other never-expiring buffs in this
+ * codebase (`Veigar_Q_Power`, `ChoGath_R_Growth`). The toggle turns
+ * invulnerability off with `deactivateBuff()`, so this is a backstop rather
+ * than the mechanism.
+ */
+const INVULNERABLE_DURATION_MS = 600_000;
 
 /**
  * Same bounds and the same rounding the pregame screen's validator applies
