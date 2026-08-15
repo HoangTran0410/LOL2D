@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import {
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import Camera, {
   baseScaleFor,
   clampZoomFactor,
   SCALE_MIN,
@@ -40,5 +40,25 @@ describe('clampZoomFactor', () => {
     expect(clampZoomFactor(1)).toBe(1);
     expect(clampZoomFactor(0.1)).toBe(0.6);
     expect(clampZoomFactor(99)).toBe(1.6);
+  });
+});
+
+describe('constantSize', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('returns a world size that renders as `px` on screen, at any scale', () => {
+    vi.stubGlobal('createVector', (x = 0, y = 0) => ({ x, y }));
+    const c = new Camera();
+    for (const scale of [0.39, 1, 1.44]) {
+      c.currentScale = scale;
+      expect(c.constantSize(12) * scale).toBeCloseTo(12, 5);
+    }
+  });
+
+  it('does not divide by zero', () => {
+    vi.stubGlobal('createVector', (x = 0, y = 0) => ({ x, y }));
+    const c = new Camera();
+    c.currentScale = 0;
+    expect(Number.isFinite(c.constantSize(12))).toBe(true);
   });
 });

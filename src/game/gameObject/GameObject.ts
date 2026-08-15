@@ -13,7 +13,12 @@ export interface GameObjectGameContext {
 
 export interface GameObjectRuntimeContext extends GameObjectGameContext {
   readonly mapSize: number;
-  camera: { getBoundingBox(): Rectangle };
+  /**
+   * `constantSize` is optional because a headless test context — and every
+   * spell test in `tests/game/spells/` — builds a camera that only answers
+   * `getBoundingBox`. Overlay code calls it as `constantSize?.(1) ?? 1`.
+   */
+  camera: { getBoundingBox(): Rectangle; constantSize?(px: number): number };
   objectManager: ObjectManager;
   player: AttackableUnit;
   eventManager: EventManager;

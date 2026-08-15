@@ -97,6 +97,16 @@ export default class Camera {
     this.scale = Math.min(SCALE_MAX, Math.max(SCALE_MIN, this.baseScale * this.zoomFactor));
   }
 
+  /**
+   * The world size a `px`-sized thing must be drawn at to occupy `px` on
+   * screen. Information overlays — health bars, damage numbers, stack tallies —
+   * are a HUD that happens to be positioned in world coordinates, so they use
+   * this; a champion sprite is the world, and does not.
+   */
+  constantSize(px: number): number {
+    return this.currentScale > 0 ? px / this.currentScale : px;
+  }
+
   update(): void {
     if (this.target) {
       this.position.lerp(this.target, 0.1);

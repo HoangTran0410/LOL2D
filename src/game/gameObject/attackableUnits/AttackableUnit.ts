@@ -207,10 +207,16 @@ export default class AttackableUnit extends GameObject {
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;
 
-    let healthBarHeight = 6;
-    let healthBarWidth = 100;
+    // Overlay, not world: see Camera.constantSize. The bar and its text
+    // compensate together — 12px digits over a 39px bar is worse than either
+    // extreme. `size` stays in world units: the bar hangs off a sprite that
+    // really is that big.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
+
+    let healthBarHeight = 6 * k;
+    let healthBarWidth = 100 * k;
     let healthBarX = pos.x - healthBarWidth / 2;
-    let healthBarY = pos.y - size / 2 - healthBarHeight - 15;
+    let healthBarY = pos.y - size / 2 - healthBarHeight - 15 * k;
     let healthBarColor = this.isAllied ? [67, 196, 29, alpha] : [196, 67, 29, alpha];
     let healthBarBgColor = [242, 242, 242, alpha];
     let healthBarValue = ~~this.stats.health.value;
@@ -238,8 +244,8 @@ export default class AttackableUnit extends GameObject {
 
     fill(180, alpha);
     textAlign(CENTER, CENTER);
-    textSize(12);
-    text(`${healthBarValue} / ${healthBarMaxValue}`, pos.x, healthBarY - 10);
+    textSize(12 * k);
+    text(`${healthBarValue} / ${healthBarMaxValue}`, pos.x, healthBarY - 10 * k);
     pop();
   }
 
