@@ -17,10 +17,41 @@ const REAL_WALLS = wallPolygons.map(polygon => polygon.map(([x, y]) => ({ x, y }
 
 const createNavigation = () => new NavigationSystem(REAL_WALLS, MAP_SIZE);
 
+/** One sealed box: the inside is perfectly standable and perfectly unreachable. */
+const sealedRoomWalls = [
+  [
+    { x: 900, y: 900 },
+    { x: 1_500, y: 900 },
+    { x: 1_500, y: 940 },
+    { x: 900, y: 940 },
+  ],
+  [
+    { x: 900, y: 900 },
+    { x: 940, y: 900 },
+    { x: 940, y: 1_500 },
+    { x: 900, y: 1_500 },
+  ],
+  [
+    { x: 900, y: 1_460 },
+    { x: 1_500, y: 1_460 },
+    { x: 1_500, y: 1_500 },
+    { x: 900, y: 1_500 },
+  ],
+  [
+    { x: 1_460, y: 900 },
+    { x: 1_500, y: 900 },
+    { x: 1_500, y: 1_500 },
+    { x: 1_460, y: 1_500 },
+  ],
+];
+
 class TestHost implements PathAgentHost {
   position: { x: number; y: number };
   destination: { x: number; y: number; set(x: number, y: number): unknown };
-  bodyRadius = CHAMPION_RADIUS;
+  // A champion is under NAV_MAX_TERRAIN_RADIUS, so for this host the capped
+  // terrain radius and the real body radius are the same number — see
+  // AttackableUnit.terrainRadius for the two that differ.
+  terrainRadius = CHAMPION_RADIUS;
   moveSpeed = 3;
 
   constructor(x: number, y: number) {
@@ -210,35 +241,7 @@ describe('NavigationSystem', () => {
     // a map that is one sealed box: the inside is perfectly standable and
     // perfectly unreachable, which is the case A* can only settle by
     // exhausting the outside
-    const navigation = new NavigationSystem(
-      [
-        [
-          { x: 900, y: 900 },
-          { x: 1_500, y: 900 },
-          { x: 1_500, y: 940 },
-          { x: 900, y: 940 },
-        ],
-        [
-          { x: 900, y: 900 },
-          { x: 940, y: 900 },
-          { x: 940, y: 1_500 },
-          { x: 900, y: 1_500 },
-        ],
-        [
-          { x: 900, y: 1_460 },
-          { x: 1_500, y: 1_460 },
-          { x: 1_500, y: 1_500 },
-          { x: 900, y: 1_500 },
-        ],
-        [
-          { x: 1_460, y: 900 },
-          { x: 1_500, y: 900 },
-          { x: 1_500, y: 1_500 },
-          { x: 1_460, y: 1_500 },
-        ],
-      ],
-      2_048
-    );
+    const navigation = new NavigationSystem(sealedRoomWalls, 2_048);
 
     // the room's inside is standable, which is what makes it a fair test of
     // "unreachable" rather than of "unwalkable"
@@ -298,6 +301,43 @@ describe('NavigationSystem', () => {
     // most of the way there on a budget a twentieth of the shipped one
     expect(navigation.stats.totalSearches).toBeGreaterThan(1);
     expect(closest).toBeLessThan(startDistance * 0.3);
+  });
+
+  /**
+   * A blocked agent has parked the unit and will never move again on its own,
+   * so `order` must not swallow a repeated order the way it does for a unit
+   * already following a route. `Monster.updateBackToCamp` re-issues the same
+   * goal every frame; with the order swallowed, a camp dragged off its pit was
+   * observed 1695px from home, phase BACK_TO_CAMP, agent BLOCKED, goal set
+   * correctly and motionless for the rest of the match.
+   */
+  it('keeps retrying a repeated order while blocked, instead of freezing on it', () => {
+    const navigation = new NavigationSystem(sealedRoomWalls, 2_048);
+    const host = new TestHost(400, 1_200);
+    const agent = new PathAgent(host, navigation);
+
+    agent.order(1_200, 1_200);
+    for (let frame = 0; frame < 600 && agent.state !== 'BLOCKED'; frame++) {
+      navigation.update();
+      agent.update(16);
+      host.step();
+    }
+    expect(agent.state).toBe('BLOCKED');
+
+    // exactly what a caller like Monster.updateBackToCamp does: same goal,
+    // every frame, forever
+    const searchesWhenBlocked = navigation.stats.totalSearches;
+    for (let frame = 0; frame < 120; frame++) {
+      agent.order(1_200, 1_200);
+      navigation.update();
+      agent.update(16);
+      host.step();
+    }
+
+    expect(navigation.stats.totalSearches).toBeGreaterThan(searchesWhenBlocked);
+    // ...but throttled, not one per frame: 120 frames x 16ms is under 8 windows
+    const windows = Math.ceil((120 * 16) / NAV_REPLAN_INTERVAL_MS);
+    expect(navigation.stats.totalSearches - searchesWhenBlocked).toBeLessThanOrEqual(windows + 1);
   });
 
   it('degrades to a straight line when navigation is switched off', () => {

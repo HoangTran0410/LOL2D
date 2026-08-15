@@ -66,8 +66,12 @@ export type PathAgentState =
 export interface PathAgentHost {
   position: { x: number; y: number };
   destination: { x: number; y: number; set(x: number, y: number): unknown };
-  /** Body radius the route must fit through. */
-  readonly bodyRadius: number;
+  /**
+   * Radius the route must fit through — `AttackableUnit.terrainRadius`, not
+   * `bodyRadius`. The two differ for a grown body, and this is the one that
+   * has to match what `TerrainMap.pushOutOfWalls` will actually enforce.
+   */
+  readonly terrainRadius: number;
   /** World units travelled per frame. */
   readonly moveSpeed: number;
 }
@@ -123,7 +127,18 @@ export default class PathAgent {
    * this every frame from chase code affordable.
    */
   order(x: number, y: number, urgent = false): void {
-    if (this.hasGoal && this.state !== 'IDLE') {
+    // 'BLOCKED' is deliberately not in the swallow below. A blocked agent has
+    // already parked the unit (`destination` is its own position) and will
+    // never move again on its own, so swallowing a repeated order — which is
+    // exactly what a caller that re-issues every frame sends, e.g.
+    // `Monster.updateBackToCamp` — leaves it standing there for the rest of
+    // the match with a goal it never retries. A camp dragged off its pit was
+    // observed 1695px from home, phase BACK_TO_CAMP, agent BLOCKED, goal set
+    // correctly, motionless. Retrying is cheap: `plan()` throttles a BLOCKED
+    // agent to one search per `NAV_REPLAN_INTERVAL_MS`, and what blocked it
+    // (a body in a chokepoint, a route that ran out of expansions) is usually
+    // gone seconds later.
+    if (this.hasGoal && this.state !== 'IDLE' && this.state !== 'BLOCKED') {
       const goalMoved = Math.hypot(x - this.goalX, y - this.goalY);
       const remaining = Math.hypot(
         this.host.position.x - this.goalX,
@@ -163,7 +178,7 @@ export default class PathAgent {
    */
   private plan(): void {
     const { position } = this.host;
-    const radius = this.host.bodyRadius;
+    const radius = this.host.terrainRadius;
     // Only written where a plan is actually committed. Writing it up here would
     // reset the running route's progress every time a throttled chase order
     // bounced off the check below, and a route that has not moved since it was
@@ -219,7 +234,7 @@ export default class PathAgent {
       position.y,
       this.goalX,
       this.goalY,
-      this.host.bodyRadius,
+      this.host.terrainRadius,
       nodeBudget
     );
 
@@ -287,7 +302,7 @@ export default class PathAgent {
             position.y,
             this.goalX,
             this.goalY,
-            this.host.bodyRadius
+            this.host.terrainRadius
           )
         ) {
           this.state = 'PENDING';
@@ -336,7 +351,7 @@ export default class PathAgent {
         position.y,
         this.waypoints[this.waypointIndex],
         this.waypoints[this.waypointIndex + 1],
-        this.host.bodyRadius
+        this.host.terrainRadius
       )
     ) {
       this.repath();

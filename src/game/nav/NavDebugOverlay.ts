@@ -46,7 +46,10 @@ export function drawNavDebug(host: NavDebugHost): void {
 }
 
 /**
- * The clearance field, thresholded at the player's own body radius: which
+ * The clearance field, thresholded at the player's own *terrain* radius —
+ * the capped one navigation and wall push-out actually use, so the band this
+ * paints is the band the player is really held out of rather than one derived
+ * from a drawn size terrain stopped taking literally. Which
  * cells are wall, which are the moat `NavGrid.requiredClearance` leaves
  * around one (ground a body this size physically fits on but navigation
  * still refuses), and — implicitly, left undecorated — which are genuinely
@@ -56,7 +59,7 @@ export function drawNavDebug(host: NavDebugHost): void {
 function drawClearanceField(host: NavDebugHost): void {
   const { grid } = host.navigation;
   const bounds = host.camera.getBoundingBox();
-  const radius = host.player.bodyRadius;
+  const radius = host.player.terrainRadius;
   const required = grid.requiredClearance(radius);
 
   const fromX = grid.cellX(bounds.x);

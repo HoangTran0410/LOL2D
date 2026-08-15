@@ -88,6 +88,41 @@ export const NAV_CELL_SIZE = 16;
  */
 export const NAV_MAX_ACCEPTED_OVERLAP = 4;
 
+/**
+ * The largest body radius terrain is asked to respect — see
+ * `AttackableUnit.terrainRadius`, which is where it is applied.
+ *
+ * Clearance serves every body size from one build, which is the whole point of
+ * this structure, but it also means a growing body loses ground to stand on
+ * quadratically. Flood-filling the shipped map from the blue fountain, by body
+ * size:
+ *
+ *   size  standable cells  reachable from blue
+ *     55 (champion)  79,258   100%
+ *     80             70,795    99.8%
+ *    110             60,895    97.9%
+ *    165 (MAX_UNIT_SIZE) 45,216  93.5%
+ *
+ * The map never actually severs — a fully stacked Cho'Gath can still reach
+ * 93.5% of what he can stand on. What collapses is the *number of gaps he
+ * fits through*: 43% of standable ground is gone, so routes that were a
+ * straight line for a champion become long detours, which is what a player
+ * sees and reports as broken pathfinding. It is not broken; the body genuinely
+ * does not fit, and `TerrainMap.pushOutOfWalls` would refuse the shortcut even
+ * with navigation switched off entirely.
+ *
+ * So terrain stops taking the body literally past this radius. 40 (size 80) is
+ * the knee of that table: it keeps 99.8% reachability and cuts the standable
+ * loss from 43% to 11%, while still being large enough that a grown champion
+ * is visibly clumsier in a corridor than a minion. Above it, the body keeps
+ * growing everywhere it is *not* a pathing problem — its drawn size, its
+ * hitbox, its attack reach (`combat/Reach.ts`) and how hard it shoves other
+ * units (`UnitCollisionSystem`) all still read the real `bodyRadius`. The
+ * visible cost is at the top of the range: at MAX_UNIT_SIZE the drawn body
+ * overlaps a wall edge by up to 42px.
+ */
+export const NAV_MAX_TERRAIN_RADIUS = 40;
+
 /** Clearance is stored in a Uint16Array; nothing on this map is further than this from a wall. */
 const MAX_STORED_CLEARANCE = 4_096;
 

@@ -9,6 +9,7 @@ import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
 import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
 import PathAgent from '../../nav/PathAgent';
+import { NAV_MAX_TERRAIN_RADIUS } from '../../nav/NavGrid';
 import type Buff from '../Buff';
 import type { BuffConstructor } from '../Buff';
 
@@ -527,6 +528,21 @@ export default class AttackableUnit extends GameObject {
    */
   get bodyRadius(): number {
     return this.stats.size.value / 2;
+  }
+
+  /**
+   * The radius *terrain* treats this body as — wall push-out
+   * (`TerrainMap.pushOutOfWalls`) and route planning (`PathAgent`,
+   * `NavGrid`), which have to agree or a route gets planned through a gap the
+   * push-out then refuses.
+   *
+   * Capped at `NAV_MAX_TERRAIN_RADIUS`; see that constant for the measured
+   * reason. Everything that is not terrain — the drawn body, the hitbox,
+   * `combat/Reach.ts`, `UnitCollisionSystem`'s shove — deliberately keeps
+   * reading `bodyRadius` and keeps scaling with the real size.
+   */
+  get terrainRadius(): number {
+    return Math.min(this.bodyRadius, NAV_MAX_TERRAIN_RADIUS);
   }
 
   /**

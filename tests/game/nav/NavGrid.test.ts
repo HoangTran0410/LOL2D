@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import NavGrid, { NAV_CELL_SIZE, NAV_MAX_ACCEPTED_OVERLAP } from '../../../src/game/nav/NavGrid';
+import NavGrid, {
+  NAV_CELL_SIZE,
+  NAV_MAX_ACCEPTED_OVERLAP,
+  NAV_MAX_TERRAIN_RADIUS,
+} from '../../../src/game/nav/NavGrid';
+import { MAX_UNIT_SIZE } from '../../../src/game/gameObject/Stats';
 import { pointInPolygon, wallClearance, wallPolygons } from './geometry';
 
 const MAP_SIZE = 6_400;
@@ -166,5 +171,58 @@ describe('NavGrid', () => {
     ]) {
       expect(realGrid.isWalkable(x, y, CHAMPION_RADIUS), `not standable at ${x},${y}`).toBe(true);
     }
+  });
+
+  /**
+   * The cap `AttackableUnit.terrainRadius` applies. A body may grow to
+   * `MAX_UNIT_SIZE` (radius 82.5), at which the map keeps only 57% of the
+   * ground a champion can stand on and three of six sampled cross-map routes
+   * stop reaching their goal at all — the search returns a best-effort stub a
+   * few dozen pixels long, which is what a player sees as a giant refusing to
+   * path. `NAV_MAX_TERRAIN_RADIUS` is the radius terrain stops taking the body
+   * literally at; these are the two properties that choice rests on, so
+   * raising it is a failing build rather than a silent regression.
+   */
+  describe('NAV_MAX_TERRAIN_RADIUS', () => {
+    const standableCells = (radius: number): number => {
+      const required = realGrid.requiredClearance(radius);
+      let count = 0;
+      for (let i = 0; i < realGrid.clearance.length; i++) {
+        if (realGrid.clearance[i] >= required) count++;
+      }
+      return count;
+    };
+
+    it('leaves a champion untouched — it is a ceiling, not a resize', () => {
+      expect(NAV_MAX_TERRAIN_RADIUS).toBeGreaterThan(CHAMPION_RADIUS);
+      expect(NAV_MAX_TERRAIN_RADIUS).toBeGreaterThan(MINION_RADIUS);
+    });
+
+    it('keeps the landmarks a champion can reach standable for a capped body', () => {
+      for (const [x, y] of [
+        [400, 6_075],
+        [6_100, 375],
+        [3_423, 595],
+        [3_885, 2_723],
+        [2_995, 5_775],
+        [2_147, 1_876],
+      ]) {
+        expect(
+          realGrid.isWalkable(x, y, NAV_MAX_TERRAIN_RADIUS),
+          `not standable at ${x},${y} for a capped body`
+        ).toBe(true);
+      }
+    });
+
+    it('keeps most of a champion’s ground, where an uncapped max body keeps barely half', () => {
+      const champion = standableCells(CHAMPION_RADIUS);
+      const capped = standableCells(NAV_MAX_TERRAIN_RADIUS);
+      const uncapped = standableCells(MAX_UNIT_SIZE / 2);
+
+      expect(capped / champion, 'the cap must keep most of a champion’s standable ground').toBeGreaterThan(0.85);
+      // the measurement the cap exists for: without it, a maxed body loses
+      // nearly half the map's standable ground and detours around the rest
+      expect(uncapped / champion).toBeLessThan(0.65);
+    });
   });
 });

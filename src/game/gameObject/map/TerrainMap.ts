@@ -162,7 +162,12 @@ export default class TerrainMap {
     // hoisted out of the wall loop: one circle per unit, one reused Response
     const pSAT = new SAT.Circle(
       new SAT.Vector(unit.position.x, unit.position.y),
-      unit.stats.size.value / 2
+      // `terrainRadius`, not the drawn body: it is capped for a grown unit so a
+      // giant keeps fitting through the map's gaps, and it must be the same
+      // radius `PathAgent` planned the route with — a route planned at one
+      // radius and enforced at a larger one is a unit walking into a wall it
+      // was told it could pass. See NAV_MAX_TERRAIN_RADIUS.
+      unit.terrainRadius
     );
     const response = new SAT.Response();
     for (const wall of nearbyWalls) {
