@@ -54,21 +54,27 @@
  * rules, world and roster edits all apply on the spot, and the one staged edit
  * left (the loadout editor's) is unreachable while this button is.
  */
-import { inject, ref } from 'vue';
+import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
 import RosterTab from './practice/RosterTab.vue';
 import RulesTab from './practice/RulesTab.vue';
 import CheatTab from './practice/CheatTab.vue';
+import { activePracticeTab, type PracticeTabId } from './practice/panelTab';
 
 const hud = inject<HudInteractions>('hud')!;
 
-const TABS = [
+const TABS: { id: PracticeTabId; label: string }[] = [
   { id: 'roster', label: 'Đấu thủ' },
   { id: 'rules', label: 'Trận đấu' },
   { id: 'cheats', label: 'Gian lận' },
-] as const;
+];
 
-const tab = ref<(typeof TABS)[number]['id']>('roster');
+/**
+ * Held in `practice/panelTab.ts` rather than here, so the selected tab
+ * survives the panel being closed — see that file for why a `ref` at the top
+ * of `<script setup>` would not have.
+ */
+const tab = activePracticeTab;
 </script>
 
 <template>

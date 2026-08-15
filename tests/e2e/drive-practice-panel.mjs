@@ -316,6 +316,26 @@ try {
     JSON.stringify(report.closeFromEveryTab)
   );
 
+  // Both HUD views mount the panel with `v-if`, so closing it unmounts the
+  // component. The selected tab lives in `practice/panelTab.ts` for that
+  // reason — a `ref` at the top of `<script setup>` is rebuilt on every mount,
+  // which looks like module scope and is not. Asserted on the *last* tab, not
+  // the first: `'roster'` is the default, so a check that opened on it would
+  // pass against a panel that had forgotten everything.
+  await openPanel();
+  await selectTab('cheats');
+  await closePanel();
+  await openPanel();
+  report.tabPersisted = await gameEval(
+    () => document.querySelector('.practice-tab.selected')?.id ?? null
+  );
+  await closePanel();
+  check(
+    'the selected tab survives closing and reopening the panel',
+    report.tabPersisted === 'practice-tab-cheats',
+    String(report.tabPersisted)
+  );
+
   // ------------------------------------------------- 2. Đấu thủ: add a bot
 
   await openPanel();
