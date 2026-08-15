@@ -46,6 +46,14 @@
  * (`hud.closeSpellPicker`) discards it. This is what lets a player keep
  * changing their mind — the old picker applied and closed on the first tap.
  * See `hudInteractions.ts`.
+ *
+ * A champion's shelf header is itself a button: it stages that champion's
+ * whole kit into Q/W/E/R in one tap (`hud.pickKit`), which is the four taps
+ * plus four slot changes it used to take. Only shelves that *are* a champion
+ * get it — see `SpellGroupDisplay.kit`. The same picker is now reachable with
+ * a mouse as well as a thumb: `InGameHUD.vue`'s corner button is no longer
+ * touch-only, so this modal is the one loadout screen in both modes rather
+ * than the desktop's bottom-strip icons being a separate way in.
  */
 import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
@@ -124,16 +132,36 @@ function scrollTouchMove(event: TouchEvent): void {
           <span class="tooltiptext">Tất cả đều dùng bộ chiêu thức giống bạn</span>
         </span>
       </p>
-      <div class="group" v-for="group of hud.spellGroups" :key="group.name">
-        <div class="group-header">
+      <div class="group" v-for="group of hud.spellGroups" :key="group.name" :data-champion="group.name">
+        <!-- The shelf header is the "give me this whole champion" button
+             wherever the shelf *is* a champion (`group.kit`, see
+             `hudInteractions.ts`). The two shelves that aren't — the basic
+             attack and the summoner spells — render the same header as an
+             inert div, and so does every shelf under `oneForAll`, whose one
+             -spell-everywhere meaning a kit contradicts. -->
+        <button v-if="group.kit.length && !hud.oneForAll" type="button" class="group-header group-header-btn"
+          :title="'Dùng cả bộ chiêu ' + group.name" @click="hud.pickKit(group)"
+          @touchend.prevent="hud.pickKit(group)">
+          <img v-if="group.image" :src="group.image" alt="spell" />
+          <p>{{ group.name }}</p>
+          <span class="kit-apply-hint">Dùng bộ</span>
+        </button>
+        <div v-else class="group-header">
           <img v-if="group.image" :src="group.image" alt="spell" />
           <p>{{ group.name }}</p>
         </div>
-        <div v-for="spell of group.spells" :key="spell.name" class="spell" @click="hud.pick(spell)"
-          @mouseover="hud.mouseover(spell, $event)" @mouseout="hud.mouseout(spell)"
-          @touchstart="hud.touchSpellStart(spell, $event)" @touchmove="hud.touchSpellMove($event)"
-          @touchend.prevent="hud.touchSpellEnd(() => hud.pick(spell))" @touchcancel="hud.cancelLongPress()">
-          <img :src="spell.image" alt="spell" />
+        <!-- The icons wrap inside the shelf rather than being direct children
+             of it, so the shelf can be a fixed-width cell in `.list`'s grid
+             (see `.spell-picker .list` in styles/hud.css) with the heading
+             above the icons instead of beside them. `.catalog-group-row` in
+             the pregame roster is the same wrapper for the same reason. -->
+        <div class="group-row">
+          <div v-for="spell of group.spells" :key="spell.name" class="spell" @click="hud.pick(spell)"
+            @mouseover="hud.mouseover(spell, $event)" @mouseout="hud.mouseout(spell)"
+            @touchstart="hud.touchSpellStart(spell, $event)" @touchmove="hud.touchSpellMove($event)"
+            @touchend.prevent="hud.touchSpellEnd(() => hud.pick(spell))" @touchcancel="hud.cancelLongPress()">
+            <img :src="spell.image" alt="spell" />
+          </div>
         </div>
       </div>
     </div>

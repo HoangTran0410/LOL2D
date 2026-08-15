@@ -23,12 +23,12 @@
  * that has to work under a thumb is wired to `@click` alone — the actions are
  * driven from `touchend` directly, and `@click` stays only for the mouse.
  */
-import { reactive, toRaw } from 'vue';
+import { markRaw, reactive, toRaw } from 'vue';
 import type Game from '../Game';
-import AIChampion from '../gameObject/attackableUnits/AIChampion';
+import type MatchDirector from '../MatchDirector';
 import { removeAccents } from '../../utils/index';
 import * as AllSpells from '../gameObject/spells/index';
-import { SpellGroups } from '../preset';
+import { SpellGroups, abilitySlotOfClass } from '../preset';
 import AssetManager, { type AssetKey } from '../../managers/AssetManager';
 
 /**
@@ -61,6 +61,19 @@ export interface SpellGroupDisplay {
   imageKey: AssetKey | null;
   backgroundKey: AssetKey | null;
   spells: SpellItemDisplay[];
+  /**
+   * The subset of `spells` that names a Q/W/E/R slot, paired with that slot —
+   * everything `pick`ing the whole shelf at once writes. Empty for the two
+   * shelves that are not a champion (the basic attack, the summoner spells),
+   * which is exactly what stops the header of those two offering an action
+   * that would have nowhere sensible to put five summoner spells.
+   *
+   * A champion with only part of a kit implemented (Graves is `Graves_W`
+   * alone) gets a one-entry kit aimed at W, not at Q — see
+   * `abilitySlotOfClass` in `preset.ts` for why the slot is read off the
+   * spell's name rather than its position on the shelf.
+   */
+  kit: { slotIndex: number; spell: SpellItemDisplay }[];
 }
 
 export interface SpellItemDisplay {
@@ -89,6 +102,24 @@ export function filterSpells(spells: SpellItemDisplay[], searchText: string): Sp
   });
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+function buildSpellGroup(group: any): SpellGroupDisplay {
+  const spells: SpellItemDisplay[] = group.spells.map(buildSpellItem);
+  return {
+    name: group.name,
+    image: group.image
+      ? AssetManager.get(group.image).url
+      : AssetManager.placeholder(group.name).url,
+    background: group.background ? AssetManager.get(group.background).url : '',
+    imageKey: group.image,
+    backgroundKey: group.background,
+    spells,
+    kit: spells
+      .map(spell => ({ slotIndex: abilitySlotOfClass(spell.spellClass), spell }))
+      .filter((entry): entry is { slotIndex: number; spell: SpellItemDisplay } => entry.slotIndex !== null),
+  };
+}
+
 function buildSpellItem(SpellClass: any): SpellItemDisplay {
   const spellInstance = new SpellClass(null);
   return {
@@ -103,6 +134,14 @@ function buildSpellItem(SpellClass: any): SpellItemDisplay {
 }
 
 export interface HudInteractions {
+  /**
+   * Every mutation of the running match — roster, world, rules — so the panel's
+   * tabs never reach into `objectManager` or `minionSpawner` themselves. Read
+   * off `game` on access rather than captured: `Game` builds its `InGameHUD`
+   * (and so this object) part-way through its own constructor, before
+   * `game.director` exists.
+   */
+  readonly director: MatchDirector;
   oneForAll: boolean;
   cloneMySpell: boolean;
   /**
@@ -138,6 +177,18 @@ export interface HudInteractions {
   filteredSpells(): SpellItemDisplay[];
   /** Stages `spell` into the active slot (or every slot, under `oneForAll`). Does not apply or close — see `draftSpells`. */
   pick(spell: SpellItemDisplay): void;
+  /**
+   * Stages a whole champion's kit at once — every ability on `group` goes to
+   * the slot its name claims (`SpellGroupDisplay.kit`), the rest of the
+   * loadout untouched. Same draft as `pick`: nothing reaches the game until
+   * "Xác nhận".
+   *
+   * The one gesture that used to take four: tap Q, find Ahri, tap her Q, tap
+   * W, find Ahri again, ... The shelf header is right there above the four
+   * icons, so this is where a player already looks when they want "that
+   * champion", not "that ability".
+   */
+  pickKit(group: SpellGroupDisplay): void;
   /** Flushes the staged `draftSpells` to the player (and bots, per the two mode flags), then closes the picker. */
   confirmPicks(): void;
   changeSpell(index: number): void;
@@ -187,24 +238,32 @@ export function createHudInteractions(game: Game): HudInteractions {
   let touchStartX = 0;
   let touchStartY = 0;
   let touchMoved = false;
+  let director: MatchDirector | null = null;
 
   const state = reactive({
+    /**
+     * Resolved on first read, not here: `Game` constructs its `InGameHUD` —
+     * which is what calls this factory — some 60 lines before it assigns
+     * `this.director`, so a value captured at this point would be `undefined`
+     * for the rest of the match.
+     *
+     * `markRaw` because everything below is inside a `reactive()`, and Vue
+     * deep-proxies any object a reactive getter returns. A proxied director
+     * would hand back a proxied `objectManager`, proxied units, proxied
+     * position vectors — the whole game graph — on every roster read. See this
+     * function's own doc comment: `game` is deliberately un-proxied here.
+     */
+    get director(): MatchDirector {
+      if (!director && game.director) director = markRaw(game.director);
+      return director as MatchDirector;
+    },
     oneForAll: false,
     cloneMySpell: false,
     searchSpellText: '',
     showSpellsPicker: false,
     spellIndexToSwap: 0,
     allSpells: Object.values<any>(AllSpells).map(buildSpellItem),
-    spellGroups: (SpellGroups as any[]).map((group: any) => ({
-      name: group.name,
-      image: group.image
-        ? AssetManager.get(group.image).url
-        : AssetManager.placeholder(group.name).url,
-      background: group.background ? AssetManager.get(group.background).url : '',
-      imageKey: group.image,
-      backgroundKey: group.background,
-      spells: group.spells.map(buildSpellItem),
-    })),
+    spellGroups: (SpellGroups as any[]).map(buildSpellGroup),
     draftSpells: [] as (SpellItemDisplay | null)[],
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
@@ -234,6 +293,27 @@ export function createHudInteractions(game: Game): HudInteractions {
     },
 
     /**
+     * Stage every ability on one shelf into the slot its name claims. Slots
+     * the shelf says nothing about — the basic attack, both summoners, and
+     * Q/W/E/R for a champion with only part of a kit implemented — keep
+     * whatever was already staged or equipped.
+     *
+     * Not reachable while `oneForAll` is on (the modal hides the action then):
+     * that mode's whole meaning is one spell in every slot, which a kit
+     * contradicts, and `confirmPicks`'s `oneForAll` branch would in any case
+     * collapse the kit down to whichever ability it happened to find first.
+     */
+    pickKit(group: SpellGroupDisplay): void {
+      if (state.oneForAll) return;
+      const next = state.draftSpells.slice();
+      for (const { slotIndex, spell } of group.kit) {
+        if (slotIndex >= 0 && slotIndex < next.length) next[slotIndex] = spell;
+      }
+      state.draftSpells = next;
+      state.spellHover = null;
+    },
+
+    /**
      * Apply the whole staged draft in one go, then close. The per-slot and the
      * `oneForAll` branches mirror what `pick` used to do immediately; the bot
      * handling (`cloneMySpell` vs. the respawn flag) is unchanged, just run
@@ -241,14 +321,16 @@ export function createHudInteractions(game: Game): HudInteractions {
      */
     confirmPicks(): void {
       const player = (game as any).player;
-      const bots = game.objectManager.objects.filter((o: any) => o instanceof AIChampion);
+      // One definition of "who is in this match", and a typed one — this used
+      // to filter the object list for `AIChampion` through an `any`.
+      const bots = game.director.bots();
 
       if (state.oneForAll) {
         const chosen = state.draftSpells.find(Boolean);
         if (chosen) {
           player.replaceSpells(player.spells.map(() => new chosen.spellClass(player)));
-          bots.forEach((bot: any) => {
-            bot._respawnWithNewPreset = false;
+          bots.forEach(bot => {
+            bot.setRespawnRollsNewPreset(false);
             bot.replaceSpells(bot.spells.map(() => new chosen.spellClass(bot)));
           });
         }
@@ -256,12 +338,12 @@ export function createHudInteractions(game: Game): HudInteractions {
         state.draftSpells.forEach((item, index) => {
           if (!item || index < 0 || index > player.spells.length) return;
           player.replaceSpell(index, new item.spellClass(player));
-          bots.forEach((bot: any) => {
+          bots.forEach(bot => {
             if (state.cloneMySpell) {
-              bot._respawnWithNewPreset = false;
+              bot.setRespawnRollsNewPreset(false);
               bot.replaceSpell(index, new item.spellClass(bot));
             } else {
-              bot._respawnWithNewPreset = true;
+              bot.setRespawnRollsNewPreset(true);
             }
           });
         });

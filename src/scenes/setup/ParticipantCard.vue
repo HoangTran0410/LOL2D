@@ -7,14 +7,16 @@
  * only which loadout it is bound to differs (see `SetupScene.vue`).
  *
  * The kit-icon row is a second, explicit click target for a read-only
- * preview of that spell — same reasoning as `ChampionCard.vue`'s ability
- * row: `.participant-card-open` is an invisible full-card button that opens
- * the editor, and each kit icon is a real, visibly bordered button
- * (`.kit-icon-btn`, `position:relative` so it wins the click) stacked above
- * it. `SetupScene.vue` owns the preview surface (there is no modal open yet
- * at this point in the screen, so it gets its own small one — see
- * `SpellPreviewModal.vue`), the same way `LoadoutEditorModal.vue` owns it for
- * `ChampionCard.vue`'s abilities; this component only relays *which* spell.
+ * preview of that spell: `.participant-card-open` is an invisible full-card
+ * button that opens the editor, and each kit icon is a real, visibly
+ * bordered button (`.kit-icon-btn`, `position:relative` so it wins the
+ * click) stacked above it. `SetupScene.vue` owns the preview surface (there
+ * is no modal open yet at this point in the screen, so it gets its own small
+ * one — see `SpellPreviewModal.vue`); this component only relays *which*
+ * spell. Inside the editor the same question is answered differently — by
+ * hovering or holding an icon whose tap already means "equip this" (see
+ * `KitRoster.vue`) — because there every icon has a job, while out here the
+ * only competing target is "open the editor".
  */
 import { computed } from 'vue';
 import AssetManager from '../../managers/AssetManager';

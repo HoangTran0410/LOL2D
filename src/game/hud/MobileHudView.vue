@@ -39,6 +39,7 @@
  * button and the slot selector at the top of `SpellPickerModal.vue`.
  */
 import { inject } from 'vue';
+import FormatUtils from '../../utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
 import SpellPickerModal from './SpellPickerModal.vue';
@@ -73,7 +74,7 @@ const hud = inject<HudInteractions>('hud')!;
         <h4>{{ hud.spellHover.name }}</h4>
       </div>
       <div class="costs">
-        <span>{{ hud.spellHover.coolDown / 1000 }}s</span>
+        <span>{{ FormatUtils.spellSeconds(hud.spellHover.coolDown) }}s</span>
         <span v-if="hud.spellHover.manaCost > 0" class="mana">{{ hud.spellHover.manaCost }} mana</span>
       </div>
     </div>

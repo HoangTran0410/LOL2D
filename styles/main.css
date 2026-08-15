@@ -8,6 +8,33 @@
     --spell-damage: #ff5858;
     --spell-buff: #88f;
     --spell-time: #c1ffb6;
+
+    /* Hextech palette. Same story as the three above, for the same reason:
+       the loadout picker exists twice — before the match (pregame-scene.css)
+       and during it (hud.css) — and the two are meant to be the same screen,
+       so the colours cannot live in one file and be retyped in the other.
+       These are the values the pregame screen already wore, lifted out of it
+       verbatim; the in-game picker used to have a palette of its own (#111 /
+       #fff3 / #7fd3ff), and that is what made the two read as different
+       features even after they were given the same layout and the same
+       gestures. Anything that is one screen's alone still belongs in that
+       screen's file — only what both wear is here. */
+    --hextech-bg: #1e2328;
+    /* a card or a shelf sitting on top of --hextech-bg */
+    --hextech-panel: #23282e;
+    /* an empty slot: reads as a hole, not a tile */
+    --hextech-sunken: #14171c;
+    --hextech-line: #3c3c41;
+    /* gold means "chosen"; teal means "active" or "left to chance" */
+    --hextech-gold: #c8aa6e;
+    --hextech-gold-dim: #785a28;
+    /* gold at a fraction of itself, for the ground under a pressed chip */
+    --hextech-gold-wash: #2c2418;
+    --hextech-teal: #08abac;
+    --hextech-teal-deep: #01698b;
+    /* body text, and what gold turns into on hover */
+    --hextech-text: #f0e6d2;
+    --hextech-muted: #a09b8c;
 }
 
 body {

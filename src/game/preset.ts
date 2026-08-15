@@ -495,6 +495,52 @@ const findSummoner = (id: string): SpellClass =>
 
 const SPELL_CLASS_BY_ID = new Map<string, SpellClass>(Object.entries(AllSpells));
 
+/** The reverse of `SPELL_CLASS_BY_ID`. Same key stability argument — see the block comment above. */
+const SPELL_ID_BY_CLASS = new Map<SpellClass, string>(
+  Object.entries(AllSpells).map(([id, spellClass]) => [spellClass as SpellClass, id])
+);
+
+/** The `AllSpells` barrel key of the basic attack — the A slot's default, and the way back to it. */
+export const BASIC_ATTACK_ID = 'BasicAttack';
+
+/** A catalogue id's `AllSpells` class, or `null` for an id no build of the barrel has. */
+export const spellIdOf = (spellClass: SpellClass): string | null =>
+  SPELL_ID_BY_CLASS.get(spellClass) ?? null;
+
+/**
+ * Which kit slot a spell's *name* claims: `Yasuo_Q` → 1 (Q), `Zed_R` → 4 (R).
+ * Slot order is A(0), Q(1), W(2), E(3), R(4), D(5), F(6) — `SLOT_COUNT` and
+ * `SpellHotKeys`.
+ *
+ * This exists so "apply this champion's whole kit" can put each ability where
+ * it belongs even when the champion only has some of them: `SpellGroups`
+ * carries single-ability shelves (Graves is `Graves_W` alone, Fizz is
+ * `Fizz_E`) and dropping those into Q just because they are first in their
+ * shelf would be wrong. Full four-ability shelves are always listed in
+ * Q/W/E/R order, so for those this agrees with position — it only ever
+ * *disagrees* for the partial shelves, which is the case it is here for.
+ *
+ * Reads the barrel key, never `SpellClass.name`: a minifier rewrites the
+ * latter, which would silently turn every lookup into `null` in a production
+ * build. Same reasoning as `SUMMONER_SPELLS` and `listSpellCatalog` above.
+ * `null` for anything without one of those four suffixes — `BasicAttack`,
+ * `Flash`, `StealthWard` — which is also how the basic-attack and summoner
+ * shelves end up with no "apply the kit" action at all.
+ */
+const ABILITY_SLOT_BY_SUFFIX: Record<string, number> = { Q: 1, W: 2, E: 3, R: 4 };
+
+export const abilitySlotOfId = (id: string): number | null => {
+  const underscore = id.lastIndexOf('_');
+  if (underscore < 0) return null;
+  return ABILITY_SLOT_BY_SUFFIX[id.slice(underscore + 1)] ?? null;
+};
+
+/** `abilitySlotOfId` for a class reference — what the in-game picker holds. */
+export const abilitySlotOfClass = (spellClass: SpellClass): number | null => {
+  const id = spellIdOf(spellClass);
+  return id === null ? null : abilitySlotOfId(id);
+};
+
 /** `SpellGroups[i].name` for the first group a spell class appears in — used as a "thuộc bộ: X" tag in the catalogue picker. Every spell in `AllSpells` appears in some group (see the module's catalogue-completeness audit), so this is `null` only for a spell added to `AllSpells` and never given a `SpellGroups` entry. */
 const groupNameByClass = (): Map<SpellClass, string> => {
   const map = new Map<SpellClass, string>();
@@ -572,7 +618,25 @@ export const getChampionPresetFromLoadout = (
     loadout.championName === 'random'
       ? undefined
       : listSelectableChampions().find(entry => entry.name === loadout.championName);
-  if (!champion) return getChampionPresetRandom();
+  if (!champion) {
+    // Random decides the portrait and the four abilities — not D and F. Those
+    // two are an explicit choice on every loadout, this one included, and the
+    // random preset's own hardcoded Flash/Heal used to silently overwrite them:
+    // a player who set Ignite on a random champion got Heal. Harmless while the
+    // pregame screen only offered summoner slots inside champion mode with a
+    // *named* champion; now that one picker shows all seven slots side by side
+    // for every loadout, the D/F pills would have been lying about the match
+    // they were about to start.
+    const preset = getChampionPresetRandom();
+    return {
+      ...preset,
+      spells: [
+        ...(preset.spells ?? []).slice(0, SLOT_COUNT - 2),
+        findSummoner(loadout.summonerD),
+        findSummoner(loadout.summonerF),
+      ],
+    };
+  }
 
   const group = SpellGroups.find(g => g.name === champion.name)!;
   return {

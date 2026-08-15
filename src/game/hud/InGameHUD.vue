@@ -16,10 +16,16 @@
  * keeps working without that button — the query parameter resolves ahead of
  * the stored preference, independent of any UI control.
  *
- * The one control left is touch-only: since `MobileHudView` no longer
- * renders a bottom-HUD strip (each equipped icon used to be its own tap
- * target into the spell picker), this corner button is the one entry point
- * left to reach it.
+ * The one control left is the way into the spell picker, and it renders in
+ * both modes. It started touch-only, because `MobileHudView` has no
+ * bottom-HUD strip (each equipped icon used to be its own tap target into
+ * the picker) while `DesktopHudView` still does. But the strip's icons open
+ * the picker *pre-aimed at one slot* — they are a shortcut into it, not an
+ * announcement that it exists, and a mouse player who never thought to click
+ * their own spell bar had no way to find the picker at all. It is also the
+ * only place the roster's champion shelves (and their one-tap whole-kit
+ * headers) live. So: same button, same entry point, both modes. It still
+ * hides behind the picker itself, which occupies the same corner.
  *
  * `hud` (the shared `HudInteractions`, created once per game) arrives as a
  * prop from `InGameHUD.ts` rather than being constructed here, because it
@@ -64,7 +70,7 @@ defineExpose({
        own close button), and this would otherwise sit on top of it — the
        only way out of the modal. -->
   <button
-    v-if="hud.touchUi && !hud.showSpellsPicker"
+    v-if="!hud.showSpellsPicker"
     class="corner-btn spell-picker-btn"
     @click="hud.openSpellPicker()"
     @touchend.prevent="hud.openSpellPicker()"

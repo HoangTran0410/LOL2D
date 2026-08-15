@@ -9,10 +9,10 @@
   width: min(920px, 92vw);
   max-height: 88vh;
   overflow-y: auto;
-  background: #1e2328;
+  background: var(--hextech-bg);
   border: 3px solid transparent;
-  border-image: linear-gradient(#08abac, #01698b) 1;
-  color: #f0e6d2;
+  border-image: linear-gradient(var(--hextech-teal), var(--hextech-teal-deep)) 1;
+  color: var(--hextech-text);
   padding: 1.5rem 2rem 2rem;
   box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
 }
@@ -30,7 +30,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0;
-  color: #c8aa6e;
+  color: var(--hextech-gold);
 }
 
 .pregame-icon-btn {
@@ -42,7 +42,7 @@
 }
 
 .pregame-icon-btn:hover {
-  color: #f0e6d2;
+  color: var(--hextech-text);
 }
 
 /* =============== Tabs =============== */
@@ -51,7 +51,7 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1.2rem;
-  border-bottom: 1px solid #3c3c41;
+  border-bottom: 1px solid var(--hextech-line);
 }
 
 .pregame-tab {
@@ -59,7 +59,7 @@
   background: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: #a09b8c;
+  color: var(--hextech-muted);
   padding: 0.6rem 0.4rem;
   font-size: 0.95em;
   text-transform: uppercase;
@@ -68,17 +68,17 @@
 }
 
 .pregame-tab:hover {
-  color: #f0e6d2;
+  color: var(--hextech-text);
 }
 
 .pregame-tab.selected {
-  color: #c8aa6e;
-  border-bottom-color: #08abac;
+  color: var(--hextech-gold);
+  border-bottom-color: var(--hextech-teal);
 }
 
 .pregame-hint {
   font-size: 0.8em;
-  color: #a09b8c;
+  color: var(--hextech-muted);
   margin: 0 0 0.8rem;
 }
 
@@ -93,12 +93,12 @@
 .participant-card {
   display: flex;
   align-items: stretch;
-  background: #23282e;
-  border: 2px solid #3c3c41;
+  background: var(--hextech-panel);
+  border: 2px solid var(--hextech-line);
 }
 
 .participant-card-player {
-  border-color: #785a2888;
+  border-color: rgba(120, 90, 40, 0.53);
 }
 
 .participant-card-main {
@@ -117,8 +117,10 @@
 }
 
 /* Invisible, covers the whole row — opens the loadout editor. The kit-icon
-   buttons below are real, visible buttons stacked above it, same pattern as
-   `.champion-card-pick` in ChampionCard.vue; see that file's comment. */
+   buttons below are real, visible buttons stacked above it (`position:
+   relative` wins the paint order over an absolutely-positioned, `z-index:
+   auto` sibling regardless of DOM order), so they intercept their own clicks
+   and open a description instead. See ParticipantCard.vue's file comment. */
 .participant-card-open {
   position: absolute;
   inset: 0;
@@ -135,7 +137,7 @@
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: #14171c;
+  background: var(--hextech-sunken);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,7 +151,7 @@
 
 .participant-portrait-random {
   font-size: 1.3em;
-  color: #08abac;
+  color: var(--hextech-teal);
 }
 
 .participant-info {
@@ -159,7 +161,7 @@
 
 .participant-name {
   font-weight: bold;
-  color: #c8aa6e;
+  color: var(--hextech-gold);
   font-size: 0.95em;
 }
 
@@ -183,7 +185,7 @@
 .kit-icon-btn {
   position: relative;
   background: transparent;
-  border: 1px solid #3c3c41;
+  border: 1px solid var(--hextech-line);
   border-radius: 3px;
   padding: 0;
   cursor: pointer;
@@ -211,7 +213,7 @@
   width: 44px;
   background: transparent;
   border: none;
-  border-left: 2px solid #3c3c41;
+  border-left: 2px solid var(--hextech-line);
   color: #d98a8a;
   cursor: pointer;
   font-size: 1em;
@@ -226,16 +228,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: #23282e;
-  border: 2px dashed #3c3c41;
-  color: #08abac;
+  background: var(--hextech-panel);
+  border: 2px dashed var(--hextech-line);
+  color: var(--hextech-teal);
   padding: 0.7rem;
   cursor: pointer;
   font-size: 0.9em;
 }
 
 .participant-add-btn:hover {
-  border-color: #08abac;
+  border-color: var(--hextech-teal);
 }
 
 /* =============== Settings tab =============== */
@@ -250,8 +252,8 @@
   font-size: 0.95em;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #a09b8c;
-  border-bottom: 1px solid #3c3c41;
+  color: var(--hextech-muted);
+  border-bottom: 1px solid var(--hextech-line);
   padding-bottom: 0.4rem;
   margin-bottom: 0.8rem;
 }
@@ -297,8 +299,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  background: #23282e;
-  border: 2px solid #3c3c41;
+  background: var(--hextech-panel);
+  border: 2px solid var(--hextech-line);
   color: #bbb;
   padding: 0.5rem 0.4rem;
   font-size: 0.78em;
@@ -306,12 +308,12 @@
 }
 
 .input-mode-btn:hover {
-  border-color: #785a28;
+  border-color: var(--hextech-gold-dim);
 }
 
 .input-mode-btn.selected {
-  border-color: #08abac;
-  color: #f0e6d2;
+  border-color: var(--hextech-teal);
+  color: var(--hextech-text);
   background: #102426;
 }
 
@@ -328,9 +330,10 @@
 }
 
 /* =============== Loadout editor modal =============== */
-/* Shared shell for both views this modal shows: the mode-toggle/slots editor,
-   and (swapped in over the same body — see LoadoutEditorModal.vue's
-   `activeSlot`) the spell selector. Only one dialog is ever on screen. */
+/* One dialog, one view: a header, the pinned slot bar, a hint line and the
+   scrolling roster. There is no second view to swap in and no dialog on a
+   dialog — see LoadoutEditorModal.vue's file comment for what this replaced.
+   `.spell-preview-modal` shares the shell. */
 
 .pregame-modal-backdrop {
   position: fixed;
@@ -357,10 +360,10 @@
   /* The frame itself never scrolls — exactly one region inside it does.
        See `.pregame-modal-body` just below. */
   overflow: hidden;
-  background: #1e2328;
+  background: var(--hextech-bg);
   border: 3px solid transparent;
-  border-image: linear-gradient(#08abac, #01698b) 1;
-  color: #f0e6d2;
+  border-image: linear-gradient(var(--hextech-teal), var(--hextech-teal-deep)) 1;
+  color: var(--hextech-text);
   padding: 1rem 1.2rem 1.2rem;
   box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
   display: flex;
@@ -374,26 +377,13 @@
   max-height: 70vh;
 }
 
-/* The champion/custom editor's own flex column, wrapping its header,
-   `.kit-mode-toggle` and `.pregame-modal-body`. It exists so the editor can
-   be a single `v-show` toggle kept mounted (scroll preserved) while the
-   preview/selector layer over it — see LoadoutEditorModal.vue. It stands in
-   for what `.pregame-modal` used to do directly for those children, so it
-   must fill the modal and lay them out the same way. */
-.loadout-editor-view {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-}
-
-/* The single scrolling region a `.pregame-modal` ever has, in either the
-   loadout editor's champion/custom view or a read-only ability preview
-   (`LoadoutEditorModal.vue`, `SpellPreviewModal.vue`). Everything around it
-   — header, `.kit-mode-toggle` — is a fixed sibling within the same column,
-   so it never scrolls out of reach. `SpellSelectorPane.vue`'s own body
-   (`.selector-body`) is the equivalent for the spell-selector view; see that
-   section below for why it needs its own rule instead of reusing this one. */
+/* The single scrolling region a `.pregame-modal` ever has — the loadout
+   picker's roster, or a read-only ability preview (`LoadoutEditorModal.vue`,
+   `SpellPreviewModal.vue`). Everything around it — the header, the slot bar,
+   the hint line — is a fixed sibling within the same column, so it never
+   scrolls out of reach. There is exactly one scroller per dialog and no
+   second view to swap in that would need its own: the picker is one screen
+   now (see LoadoutEditorModal.vue's file comment). */
 .pregame-modal-body {
   flex: 1;
   min-height: 0;
@@ -413,323 +403,262 @@
   flex: 1;
   margin: 0;
   font-size: 1.05em;
-  color: #c8aa6e;
+  color: var(--hextech-gold);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-/* -------------------------------------------------------- mode + champions */
+/* ------------------------------------------------------------- slot bar
+   The seven kit slots plus the two actions, pinned above the roster and
+   never scrolling — this is the control the whole screen is organised
+   around: which slot the next tap in the roster fills, what has changed so
+   far, and the way out. Modelled on `.slot-picker` in styles/hud.css (the
+   in-game HUD picker's identical row) and wrapping the same way when there
+   is no room for pills and buttons on one line, so the two screens read as
+   one system.
 
-.kit-mode-toggle {
+   Compact on purpose. The old editor spent this space on a mode toggle, a
+   96px champion-card grid and a separate summoner footer; on a landscape
+   phone that left the list it sat above almost nothing. */
+
+.kit-slot-bar {
   flex-shrink: 0;
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-}
-
-.kit-mode-btn {
-  flex: 1;
-  background: #23282e;
-  border: 2px solid #3c3c41;
-  color: #bbb;
-  padding: 0.5rem 0.6rem;
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-}
-
-.kit-mode-btn:hover {
-  border-color: #785a28;
-}
-
-.kit-mode-btn.selected {
-  border-color: #08abac;
-  color: #f0e6d2;
-  background: #102426;
-}
-
-.champion-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 0.6rem;
-}
-
-.champion-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.3rem;
-  background: #23282e;
-  border: 2px solid #3c3c41;
-  padding: 0.5rem 0.4rem;
-  color: #f0e6d2;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
 }
 
-.champion-card:has(.champion-card-pick:hover) {
-  border-color: #785a28;
-}
-
-.champion-card.selected {
-  border-color: #c8aa6e;
-  background: #2c2418;
-}
-
-/* Invisible, covers the whole card — picks the champion. Ability icons
-   below (`.champion-spell-btn`) are real, visible buttons stacked above it
-   (`position: relative` wins the paint order over an absolutely-positioned,
-   `z-index: auto` sibling regardless of DOM order — see ChampionCard.vue's
-   file comment) so they intercept their own clicks instead of picking. */
-.champion-card-pick {
-  position: absolute;
-  inset: 0;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-}
-
-.champion-portrait {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #14171c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.champion-portrait img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.champion-portrait-random {
-  font-size: 1.4em;
-  color: #08abac;
-}
-
-.champion-name {
-  font-size: 0.78em;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 90px;
-}
-
-/* A single centred row that shrinks to fit rather than wrapping: a champion
-   has four small ability icons and the card is only ~100px wide, so instead
-   of forcing 44px touch targets (which overflowed) or wrapping to a 2×2 block
-   (which made every card taller and harder to scan), each icon button may
-   shrink below its natural size — `min-width: 0` on the button plus
-   `max-width: 100%` on its image — so four always sit on one line at any card
-   width without spilling out. */
-.champion-spells {
+.kit-slot-pill {
   position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 3px;
-}
-
-/* A real, visible button per ability — see ChampionCard.vue's file comment
-   and `.champion-card-pick` above for why `position: relative` matters here:
-   it is what lets this win the click over the invisible pick button
-   underneath, without nesting a <button> inside a <button>. */
-.champion-spell-btn {
-  position: relative;
-  flex: 0 1 auto;
-  min-width: 0;
-  background: transparent;
-  border: 1px solid #3c3c41;
-  border-radius: 3px;
+  width: 42px;
+  height: 42px;
   padding: 0;
+  background: var(--hextech-sunken);
+  border: 2px solid var(--hextech-line);
+  color: var(--hextech-text);
   cursor: pointer;
+  overflow: hidden;
   line-height: 0;
 }
 
-.champion-spell-btn:hover {
-  border-color: #7fd3ff;
-}
-
-.champion-spell-btn img,
-.champion-spell-btn .fa-random {
-  width: 20px;
-  height: 20px;
-  max-width: 100%;
-}
-
-/* The D/F summoner slots, sitting at the end of the champion grid *inside*
-   the scrolling body (see LoadoutEditorModal.vue). It used to be a fixed
-   footer pinned below the body, but on a short screen that reserved footer
-   left the grid almost no room — so it scrolls with the grid now, divided
-   off by a top border. */
-.summoner-row {
-  display: flex;
-  gap: 1.5rem;
-  margin-top: 0.8rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid #3c3c41;
-}
-
-/* -------------------------------------------------------------- kit slots
-   One control for both a custom-mode A/Q/W/E/R/D/F slot and a champion-mode
-   D/F summoner slot — see SlotButton.vue. Replaces the old
-   .custom-slot/.summoner-option split, which had its own icon-vs-body click
-   ambiguity on top of the picker's. */
-
-.custom-slot-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-  gap: 0.6rem;
-}
-
-.kit-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  background: #23282e;
-  border: 2px solid #3c3c41;
-  padding: 0.5rem 0.3rem;
-  cursor: pointer;
-  color: #f0e6d2;
-}
-
-.kit-slot:hover {
-  border-color: #785a28;
-}
-
-.kit-slot-hotkey {
-  font-weight: bold;
-  color: #c8aa6e;
-  font-size: 0.75em;
-}
-
-.kit-slot-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 4px;
-  background: #14171c;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.kit-slot-icon img {
+.kit-slot-pill img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.kit-slot-icon .fa-random {
-  color: #08abac;
+.kit-slot-pill .fa-random {
+  font-size: 1em;
+  line-height: 38px;
+  color: var(--hextech-teal);
 }
 
-.kit-slot-name {
-  font-size: 0.68em;
+.kit-slot-pill:hover {
+  border-color: var(--hextech-gold-dim);
+}
+
+/* The slot the roster is currently filling. */
+.kit-slot-pill.active {
+  border-color: var(--hextech-teal);
+  box-shadow: 0 0 0 2px rgba(8, 171, 172, 0.3);
+}
+
+/* Differs from what the player walked in with — the visible scope of "Xác
+   nhận", in the same gold the rest of this screen uses for a chosen thing. */
+.kit-slot-pill.changed {
+  border-color: var(--hextech-gold);
+}
+
+.kit-slot-pill.changed.active {
+  border-color: var(--hextech-teal);
+}
+
+.kit-slot-pill-key {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  min-width: 13px;
+  padding: 0 2px;
+  line-height: 13px;
+  font-size: 0.62em;
+  font-weight: bold;
   text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 76px;
+  color: var(--hextech-text);
+  background: rgba(0, 0, 0, 0.8);
 }
 
-.custom-slot-hint {
-  font-size: 0.75em;
-  color: #a09b8c;
-  margin: 0.4rem 0 0.8rem;
-  font-style: italic;
+/* Leaves the selected slot to chance. Sized like a slot pill because it sits
+   in the same group and acts on the same thing, but dashed and glyph-only so
+   it never reads as an eighth slot — the same dashed-teal "random" language
+   `.catalog-random-card` and `.participant-portrait-random` already use. */
+.kit-slot-random {
+  border-style: dashed;
+  color: var(--hextech-teal);
+  line-height: 0;
 }
 
-/* ---------------------------------------------------------- spell selector
-   One pane, both halves always visible together: a catalogue to browse and a
-   detail pane describing whatever is highlighted. CSS alone reflows it
-   between the pointer layout (side by side) and the touch layout (catalogue
-   on top, a collapsible detail sheet pinned below within thumb reach) — see
-   the body.touch-ui block below and SpellSelectorPane.vue's file comment.
-   `.selector-commit` is a fixed footer *outside* `.selector-body` in both
-   layouts, not part of either column any more, so it is reachable
-   regardless of scroll position or whether the touch sheet is open. */
-
-.selector-pane {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
+.kit-slot-random:hover:not(:disabled) {
+  border-color: var(--hextech-teal);
 }
 
-/* Pointer: this is the single scroller for the whole view (the
-   single-scroller rule applies here too, not only under body.touch-ui —
-   see the file comment above and SpellSelectorPane.vue's). The catalogue is
-   the tall column that scrolls; the detail column beside it is `sticky` (see
-   below) so the description of the highlighted spell stays in view instead of
-   scrolling off the top when you browse further down the catalogue. Touch
-   overrides this entirely further down: there, `.selector-catalogue` or the
-   detail sheet's own description area is the scroller, one at a time. */
-.selector-body {
-  display: flex;
-  flex-direction: row;
-  gap: 1rem;
-  flex: 1;
-  min-height: 0;
+.kit-slot-random:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
-body:not(.touch-ui) .selector-body {
-  overflow-y: auto;
-}
-
-/* Pins the description beside the catalogue as it scrolls (see the comment
-   above). `align-self: flex-start` stops the column from stretching to the
-   catalogue's full height — a stretched, taller-than-viewport element has no
-   room to stick. Pointer only; touch reflows this to a bottom sheet. */
-body:not(.touch-ui) .selector-detail {
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-}
-
-.selector-catalogue {
-  flex: 1 1 auto;
-  min-width: 0;
-  padding-right: 0.3rem;
-}
-
-.selector-detail {
-  flex: 0 0 260px;
-  border-left: 1px solid #3c3c41;
-  padding-left: 1rem;
-}
-
-.selector-detail-placeholder {
-  color: #a09b8c;
-  font-size: 0.85em;
-  font-style: italic;
+.kit-slot-random .fa-random {
+  line-height: 38px;
 }
 
 /* Overrides `.hextech-btn`'s menu-scale sizing (18px uppercase, .75rem 2rem
-   padding) — that button headlines the main menu; here it is one action in a
-   cramped picker, so it is toned down to a normal-height footer instead of
-   eating a third of a short screen. */
-.selector-commit {
-  flex-shrink: 0;
-  margin-top: 0.8rem;
-  width: 100%;
-  font-size: 0.9rem;
-  padding: 0.5rem 1rem;
+   padding) — that button headlines the main menu; here two of them share a
+   row with seven slot pills. `margin-left: auto` on the first pushes the
+   pair to the right end, and lets them drop to their own line together when
+   the row wraps. */
+.kit-bar-btn {
+  min-height: 42px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.8rem;
+  border-width: 2px;
 }
 
-.selector-commit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.kit-bar-btn.secondary {
+  margin-left: auto;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.9rem;
+}
+
+.kit-hint {
+  flex-shrink: 0;
+  margin: 0 0 0.5rem;
+  font-size: 0.72em;
+  color: var(--hextech-muted);
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- roster
+   Every spell in the game, shelved by champion — see KitRoster.vue.
+
+   Shelves sit side by side, several to a row, rather than one champion per
+   full-width row: a twenty-champion roster is a few flicks that way and
+   twenty rows the other. The ability icons under a heading are the buttons
+   themselves at 48px, not 32px thumbnails inside 84px cards — the layout
+   the in-game picker has always had, which is why that one was the quicker
+   of the two to read. `.spell-picker .list` / `.group` / `.spell` in
+   styles/hud.css are now the same three rules; change one, change both.
+
+   A grid rather than a wrapping flex row on purpose: a flex container sizes
+   its items from their max-content, and a shelf's max-content is "the
+   champion's name and every one of its icons on a single line" — wide,
+   ragged, and different for a four-ability shelf than for the five-summoner
+   one. A fixed track means every shelf is the same width whatever is in it,
+   with long names ellipsised inside it (`.kit-shelf-name`). 220px is four
+   48px icons plus their gaps and the shelf's own padding, so a champion's
+   kit never wraps to a second line. */
+
+.kit-roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  align-items: start;
+  gap: 0.4rem;
+}
+
+.kit-shelf {
+  border: 1px solid var(--hextech-line);
+  background: var(--hextech-panel);
+  padding: 0.35rem;
+}
+
+.kit-shelf:hover {
+  border-color: var(--hextech-gold-dim);
+}
+
+/* The loadout is currently a whole-champion pick of this shelf. */
+.kit-shelf.selected {
+  background: rgba(200, 170, 110, 0.08);
+  border-color: var(--hextech-gold);
+}
+
+.kit-shelf-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 0.35rem;
+  font-size: 0.8em;
+  color: var(--hextech-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* The same row, as a button. No chrome of its own — what marks it pressable
+   is the `Dùng bộ` chip and the hover colour, not a box drawn around a
+   heading. Full width so the whole row is the target. */
+.kit-shelf-apply {
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.8em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.kit-shelf-apply:hover {
+  color: var(--hextech-text);
+}
+
+.kit-shelf-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kit-apply-chip {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border: 1px solid rgba(200, 170, 110, 0.4);
+  color: var(--hextech-gold);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.kit-shelf-apply:hover .kit-apply-chip {
+  border-color: var(--hextech-gold);
+  background: var(--hextech-gold-wash);
+  color: var(--hextech-text);
+}
+
+/* --------------------------------------------------------- description
+   Hover with a mouse, hold with a thumb — the second gesture on an icon
+   whose first one equips it (see useSpellPeek.ts). `position: fixed` and
+   above `.pregame-modal-backdrop`'s z-index 200, because it is anchored to
+   an icon inside the modal's own scroller and must not be clipped by it.
+   Never a click target: a description that could swallow the tap meant for
+   the icon underneath it would recreate the exact ambiguity this screen was
+   rebuilt to remove. */
+.spell-peek {
+  position: fixed;
+  z-index: 300;
+  overflow-y: auto;
+  pointer-events: none;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  background: var(--hextech-bg);
+  border: 2px solid var(--hextech-gold-dim);
+  box-shadow: 0 0 20px 4px rgba(0, 0, 0, 0.6);
+  color: var(--hextech-text);
+}
+
+/* The pane is a panel here, not a column inside a bordered dialog, so it
+   drops the top rule/padding it uses in `SpellPreviewModal`. */
+.spell-peek .spell-detail-header {
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .catalog-group-heading {
@@ -737,7 +666,7 @@ body:not(.touch-ui) .selector-detail {
   align-items: center;
   gap: 0.4rem;
   font-size: 0.8em;
-  color: #a09b8c;
+  color: var(--hextech-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0.8rem 0 0.4rem;
@@ -754,70 +683,69 @@ body:not(.touch-ui) .selector-detail {
   height: 22px;
   border-radius: 50%;
   object-fit: cover;
-  background: #14171c;
+  background: var(--hextech-sunken);
   flex-shrink: 0;
 }
 
+/* The icons under a shelf's heading, wrapping within its track. */
 .catalog-group-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-  gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
+/* The icon *is* the button — 48px of picture with a border around it and
+   nothing else. It used to be a 32px thumbnail centred in an 84px card, which
+   spent most of a crowded screen on padding and made a champion's four
+   abilities hard to tell apart at a glance. Comfortably over the 44px thumb
+   target in every mode, so the touch overrides below no longer resize it. */
 .catalog-spell-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  background: #23282e;
-  border: 2px solid #3c3c41;
-  padding: 0.4rem 0.3rem;
+  box-sizing: border-box;
+  display: block;
+  width: 48px;
+  height: 48px;
+  background: var(--hextech-sunken);
+  border: 2px solid var(--hextech-line);
+  padding: 0;
   cursor: pointer;
-  color: #f0e6d2;
+  color: var(--hextech-text);
+  line-height: 0;
 }
 
 .catalog-spell-card:hover {
-  border-color: #785a28;
+  border-color: var(--hextech-gold-dim);
 }
 
 .catalog-spell-card.selected {
-  border-color: #c8aa6e;
-  background: #2c2418;
+  border-color: var(--hextech-gold);
+  background: var(--hextech-gold-wash);
 }
 
 .catalog-spell-card img {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   pointer-events: none;
 }
 
-.catalog-spell-card .catalog-spell-name {
-  font-size: 0.68em;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 76px;
-}
-
+/* The one full-width row in the roster's grid. */
 .catalog-random-card {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #23282e;
-  border: 2px dashed #3c3c41;
+  background: var(--hextech-panel);
+  border: 2px dashed var(--hextech-line);
   padding: 0.5rem;
   cursor: pointer;
-  color: #08abac;
-  margin-bottom: 0.6rem;
+  color: var(--hextech-teal);
   font-size: 0.85em;
   width: 100%;
 }
 
 .catalog-random-card:hover,
 .catalog-random-card.selected {
-  border-color: #08abac;
+  border-color: var(--hextech-teal);
 }
 
 /* ---------------------------------------------------------- spell detail —
@@ -858,29 +786,6 @@ body:not(.touch-ui) .selector-detail {
   color: #9ed4ff;
 }
 
-/* Only rendered when `SpellDetailPane.vue` is `collapsible` (touch — see the
-   body.touch-ui block below). The obvious, labelled affordance the owner
-   asked for in place of a swipe: a full-width row with a chevron and a
-   Vietnamese label, not a hit-target split on the header above it. */
-.spell-detail-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  width: 100%;
-  margin-top: 0.6rem;
-  background: #23282e;
-  border: 1px solid #3c3c41;
-  color: #7fd3ff;
-  padding: 0.4rem;
-  font-size: 0.8em;
-  cursor: pointer;
-}
-
-.spell-detail-toggle:hover {
-  border-color: #7fd3ff88;
-}
-
 .spell-detail-body {
   margin-top: 0.8rem;
   color: #eee;
@@ -917,8 +822,8 @@ body:not(.touch-ui) .selector-detail {
 /* ================================================================
    Touch layout — body.touch-ui, not a viewport breakpoint. What differs
    here is *interaction*: whether the player has a hover, a keyboard and a
-   precise pointer — hit-target sizes, the collapsible sheet vs. the side
-   column, tap-driven affordances instead of hover. Not how wide the window
+   precise pointer — hit-target sizes, and tap-driven affordances instead
+   of hover. Not how wide the window
    is, and not the dialog's own size: a touch-capable laptop with a wide
    screen still gets a bounded, centred dialog (see the `@media (max-width:
    640px)` block further down) — only *interaction* rides on this flag. See
@@ -927,25 +832,21 @@ body:not(.touch-ui) .selector-detail {
    touch layout uses throughout.
    ================================================================ */
 
+/* `.catalog-spell-card` is not in this list: it is a 48px square in every
+   mode now, already over the thumb target, and a `min-height` on it would
+   only stretch it out of square. */
 body.touch-ui .pregame-tab,
 body.touch-ui .participant-card-main,
 body.touch-ui .participant-remove,
 body.touch-ui .participant-add-btn,
-body.touch-ui .kit-slot,
-body.touch-ui .catalog-spell-card,
 body.touch-ui .catalog-random-card,
-body.touch-ui .champion-card,
 body.touch-ui .input-mode-btn,
-body.touch-ui .spell-detail-toggle,
-body.touch-ui .selector-commit {
+body.touch-ui .kit-bar-btn {
   min-height: 44px;
 }
 
 /* Participant kit icons keep their visual size but get a full 44px tap
-   target via centred padding, rather than growing the icon itself. The
-   champion-card ability row is deliberately left out: four of them share one
-   ~100px card, where 44px targets overflowed — they stay small, single-row
-   preview icons (see `.champion-spells`). */
+   target via centred padding, rather than growing the icon itself. */
 body.touch-ui .kit-icon-btn {
   min-width: 44px;
   min-height: 44px;
@@ -959,50 +860,28 @@ body.touch-ui .participant-portrait {
   height: 56px;
 }
 
-body.touch-ui .kit-slot-icon {
-  width: 52px;
-  height: 52px;
+/* Seven of these share one wrapping row above the roster, so they grow to a
+   thumb-sized square rather than only gaining height. */
+body.touch-ui .kit-slot-pill {
+  width: 46px;
+  height: 46px;
 }
 
-body.touch-ui .catalog-spell-card img {
-  width: 40px;
-  height: 40px;
+body.touch-ui .kit-slot-pill .fa-random {
+  line-height: 42px;
 }
 
-/* Catalogue on top, a collapsible detail sheet pinned below within thumb
-   reach, instead of a side column — see SpellDetailPane.vue and
-   SpellSelectorPane.vue's file comments. Exactly one of the two ever
-   scrolls: the catalogue while the sheet is collapsed (the common case —
-   the sheet's description isn't even in the DOM then, see
-   SpellDetailPane.vue's `v-if`), the sheet's own description while expanded
-   (bounded by `max-height` below), with the catalogue's scroll frozen
-   underneath meanwhile. Never both at once — that simultaneous double
-   scroll is the exact bug this screen shipped with. */
-body.touch-ui .selector-body {
-  flex-direction: column;
+/* The description panel is opened by a hold here, not a hover, and lands
+   over a roster the thumb is already scrolling — so it is capped tighter
+   than the pointer default and scrolls its own overflow. The `max-height`
+   `useSpellPeek.place()` writes inline is the same 50vh; this only bounds
+   the prose inside it. */
+body.touch-ui .spell-peek {
+  font-size: 0.92em;
 }
 
-body.touch-ui .selector-catalogue {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-body.touch-ui .selector-body.detail-expanded .selector-catalogue {
-  overflow: hidden;
-}
-
-body.touch-ui .selector-detail {
-  flex: 0 0 auto;
-  border-left: none;
-  border-top: 1px solid #3c3c41;
-  padding-left: 0;
-  padding-top: 0.6rem;
-  margin-top: 0.6rem;
-}
-
-body.touch-ui .selector-detail .spell-detail-body {
-  max-height: 42vh;
+body.touch-ui .spell-peek .spell-detail-body {
+  max-height: 34vh;
   overflow-y: auto;
 }
 
@@ -1047,85 +926,114 @@ body.touch-ui .selector-detail .spell-detail-body {
 /* ================================================================
    Short viewport — a landscape phone (~360–430px tall), the natural way
    to hold a game. The touch chrome above is sized for a *tall* portrait
-   screen: a 52px slot icon, a 56px detail portrait, 44px footers each with
-   .8rem margins. Stacked inside a landscape-height modal they crushed the
-   one region that must stay usable and scroll — the champion grid in the
-   loadout editor, the spell catalogue in the selector — down to a ~40–80px
-   sliver (see the measurements in tests/e2e/_repro screenshots that
-   prompted this). This reclaims the vertical space they were wasting:
-   tighter margins around the fixed chrome, smaller fixed icons, and a
-   floor under the scroll region so it can never collapse to a sliver
-   again. Keyed on height, not orientation, so a short desktop window is
-   treated the same way.
+   screen: 46px slot pills, 44px buttons, each with its own margin. Stacked
+   inside a landscape-height modal they crush the one region that must stay
+   usable and scroll — the picker's roster — down to a sliver (see the
+   measurements in the tests/e2e/_repro screenshots that prompted this).
+   This reclaims the vertical space they waste: tighter margins around the
+   fixed chrome, smaller fixed icons, and a floor under the scroll region
+   so it can never collapse to a sliver again. Keyed on height, not
+   orientation, so a short desktop window is treated the same way.
+
+   There is far less to compact than there used to be: the mode toggle, the
+   96px champion-card grid, the separate D/F footer and the selector's
+   detail sheet + commit button are all gone, replaced by one slot bar and
+   one hint line above one list.
    ================================================================ */
 @media (max-height: 480px) {
+  /* The narrow-viewport block above, applied to the other axis and for the
+     same reason: at this height the dialog's 3px border, its 1.2rem padding
+     and the 10vh of backdrop margin around it add up to about a full row of
+     the roster — more than the framing is worth on a screen this short. The
+     width stays bounded (`min(760px, 92vw)`), so a short *desktop* window
+     gets a wide, edge-to-edge-in-height sheet rather than a phone layout.
+
+     Scoped to `.loadout-modal`, not `.pregame-modal`: the other dialog
+     sharing that shell is a single spell's description
+     (`SpellPreviewModal.vue`), which has no scroll region begging for room
+     and would just be a mostly-empty full-height panel. The explicit height
+     needs no `align-items: stretch` on the backdrop to take effect — a flex
+     item with a set cross-size keeps it while still being centred, which is
+     what leaves the preview dialog alone. */
+  .loadout-modal {
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-width: 0;
+    padding: 0.6rem 0.8rem;
+  }
+
   .pregame-modal-header {
     margin-bottom: 0.4rem;
   }
 
-  .kit-mode-toggle {
-    margin-bottom: 0.4rem;
+  .kit-slot-bar {
+    gap: 0.3rem;
+    margin-bottom: 0.3rem;
   }
 
-  /* Champion/custom view: shrink the D/F summoner footer and floor the
-       scrolling body so the grid always shows at least a couple of rows. */
-  .summoner-row {
-    margin-top: 0.4rem;
-    padding-top: 0.4rem;
+  .kit-slot-pill,
+  body.touch-ui .kit-slot-pill {
+    width: 38px;
+    height: 38px;
   }
 
-  body.touch-ui .kit-slot-icon {
-    width: 40px;
-    height: 40px;
+  body.touch-ui .kit-slot-pill .fa-random {
+    line-height: 34px;
   }
 
-  .pregame-modal-body {
-    min-height: 96px;
+  .kit-bar-btn,
+  .kit-bar-btn.secondary,
+  body.touch-ui .kit-bar-btn {
+    min-height: 38px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.75rem;
   }
 
-  /* Spell selector: on a short screen the detail strip, the "Xem mô tả"
-     toggle and the commit button stack up below the catalogue and, at full
-     touch size, leave it only a clipped sliver. Everything below the
-     catalogue is compacted — a smaller detail portrait, a slimmer toggle,
-     random card and commit button, tighter margins — so the catalogue (with
-     its own floor) keeps enough height to show real rows. */
-  body.touch-ui .selector-detail .spell-detail-header img {
-    width: 34px;
-    height: 34px;
-  }
-
-  body.touch-ui .selector-detail {
-    padding-top: 0.4rem;
-    margin-top: 0.4rem;
+  /* The hint is the first thing to go: it is one line of prose above a list
+     that has none to spare, and everything it says is also said by which
+     slot pill is lit. */
+  .kit-hint {
+    display: none;
   }
 
   .spell-detail-header h3 {
     margin-bottom: 0.2rem;
   }
 
-  body.touch-ui .spell-detail-toggle {
-    min-height: 34px;
-    padding: 0.2rem;
-    margin-top: 0.3rem;
-  }
-
   body.touch-ui .catalog-random-card {
     min-height: 34px;
     padding: 0.3rem 0.5rem;
-    margin-bottom: 0.4rem;
   }
 
-  body.touch-ui .selector-commit {
-    min-height: 38px;
+  /* The roster's own rows, compacted. A landscape phone has ~210px of list;
+     the shelves are side by side now, so what buys back a row here is a
+     narrower track (three to a row instead of two on an 844px-wide phone)
+     and a smaller icon — 44px, still exactly a thumb target, rather than the
+     48px a roomier screen gets. */
+  .kit-roster {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
 
-  .selector-commit {
-    margin-top: 0.4rem;
-    padding: 0.3rem 1rem;
-    font-size: 0.85rem;
+  .catalog-spell-card {
+    width: 44px;
+    height: 44px;
   }
 
-  body.touch-ui .selector-catalogue {
-    min-height: 96px;
+  .kit-shelf {
+    padding: 0.25rem;
+  }
+
+  .kit-shelf-heading {
+    margin-bottom: 0.25rem;
+  }
+
+  /* The roster is the scroller — it always shows real rows, never a sliver. */
+  .pregame-modal-body {
+    min-height: 120px;
+  }
+
+  body.touch-ui .spell-peek .spell-detail-body {
+    max-height: 26vh;
   }
 }

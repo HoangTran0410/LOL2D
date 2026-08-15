@@ -70,7 +70,18 @@ describe('hudInteractions tuning constants', () => {
 });
 
 describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
-  const fakeGame = () => {
+  /**
+   * A bot as `confirmPicks` uses one: two slots and the typed respawn switch
+   * `MatchDirector`/`AIChampion` expose, which is what "clone my spells" flips.
+   */
+  const fakeBot = () => ({
+    spells: [{}, {}],
+    replaceSpell: vi.fn(),
+    replaceSpells: vi.fn(),
+    setRespawnRollsNewPreset: vi.fn(),
+  });
+
+  const fakeGame = (bots: ReturnType<typeof fakeBot>[] = []) => {
     const player: any = {
       spells: [{}, {}],
       replaceSpell: vi.fn(),
@@ -79,6 +90,9 @@ describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
     return {
       player,
       objectManager: { objects: [] },
+      // `confirmPicks` asks the director who is in the match rather than
+      // filtering the object list itself — see `MatchDirector.bots()`.
+      director: { bots: () => bots },
       pause: vi.fn(),
       unpause: vi.fn(),
     } as any;
@@ -215,6 +229,54 @@ describe('createHudInteractions — touch tap vs. drag vs. long-press', () => {
       hud.confirmPicks();
       expect(game.player.replaceSpells).toHaveBeenCalledOnce();
       expect(game.player.replaceSpell).not.toHaveBeenCalled();
+    });
+
+    /**
+     * The bots come from `game.director.bots()`, and the respawn switch is a
+     * method now, not a raw `_respawnWithNewPreset` field reached through
+     * `any`. Both halves are asserted here because both changed shape at once.
+     */
+    it('clone my spells copies the pick to every bot and pins its respawn roll off', () => {
+      const bot = fakeBot();
+      const game = fakeGame([bot]);
+      const hud = openWithDraft(game);
+      hud.cloneMySpell = true;
+      hud.spellIndexToSwap = 1;
+      hud.pick(spell({ name: 'Nhân Bản' }));
+      hud.confirmPicks();
+
+      expect(bot.replaceSpell).toHaveBeenCalledOnce();
+      expect(bot.replaceSpell.mock.calls[0][0]).toBe(1);
+      expect(bot.setRespawnRollsNewPreset).toHaveBeenCalledWith(false);
+    });
+
+    /**
+     * Without the clone, a bot keeps its own kit — and gets its roll armed, so
+     * it comes back as a fresh champion rather than the one the player just
+     * left it holding.
+     */
+    it('without the clone a bot is left alone but its respawn roll is armed', () => {
+      const bot = fakeBot();
+      const game = fakeGame([bot]);
+      const hud = openWithDraft(game);
+      hud.spellIndexToSwap = 1;
+      hud.pick(spell({ name: 'Không Nhân Bản' }));
+      hud.confirmPicks();
+
+      expect(bot.replaceSpell).not.toHaveBeenCalled();
+      expect(bot.setRespawnRollsNewPreset).toHaveBeenCalledWith(true);
+    });
+
+    it('one spell for all reaches the bots too, with the roll pinned off', () => {
+      const bot = fakeBot();
+      const game = fakeGame([bot]);
+      const hud = openWithDraft(game);
+      hud.oneForAll = true;
+      hud.pick(spell({ name: 'Một Cho Tất Cả' }));
+      hud.confirmPicks();
+
+      expect(bot.replaceSpells).toHaveBeenCalledOnce();
+      expect(bot.setRespawnRollsNewPreset).toHaveBeenCalledWith(false);
     });
   });
 });

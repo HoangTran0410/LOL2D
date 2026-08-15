@@ -1,6 +1,3 @@
-import type { SpellDisplay } from '../../game/preset';
-import type { AssetKey } from '../../managers/AssetManager';
-
 /**
  * Shared across the pregame setup components. A spell class is one of the ~85
  * named exports of `src/game/gameObject/spells/index.ts` — see the comment on
@@ -11,23 +8,3 @@ import type { AssetKey } from '../../managers/AssetManager';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SpellClass = any;
-
-/**
- * What `SpellSelectorPane.vue` picks from — structurally satisfied by both
- * `SpellCatalogEntry` (the full catalogue, for a custom kit slot) and
- * `SummonerSpellOption` (the 5-entry summoner list, for a D/F slot), so
- * either can be passed in without reshaping.
- */
-export interface SelectorEntry {
-  id: string;
-  spellClass: SpellClass;
-  display: SpellDisplay;
-}
-
-/** One heading + its entries in the catalogue pane. `name: null` renders no heading (the flat summoner list). */
-export interface SelectorGroup {
-  name: string | null;
-  /** Champion avatar (or the ability's own icon) shown beside the heading — see `SpellGroups[i].image`. `null` renders text only. */
-  icon?: AssetKey | null;
-  entries: SelectorEntry[];
-}

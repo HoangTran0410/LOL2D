@@ -12,6 +12,13 @@
  * has a `.stop`-guarded child handler competing with its own, so this script
  * uses plain `page.click()` throughout (no coordinate workarounds needed).
  *
+ * The editor inside that modal is one screen: seven slot pills pinned above
+ * the whole spell roster, a shelf header to take a champion's entire kit, and
+ * every pick held as a draft until "Xác nhận" ("Huỷ", the X and the backdrop
+ * all discard it) — see LoadoutEditorModal.vue / KitRoster.vue. The mode
+ * toggle, the champion grid and the per-slot drill-down catalogue it replaced
+ * are gone, and so are the selectors that named them.
+ *
  * What it proves, in order:
  *   1. the menu's "Chơi" button is still a one-click path into a match (no
  *      gate in front of Play);
@@ -26,7 +33,7 @@
  *   5. the Settings tab's AI behaviour + match-rule controls round-trip
  *      through real DOM interaction into localStorage;
  *   6. picking a champion + both summoners for the player, through the
- *      modal, persists;
+ *      modal, persists — and only once "Xác nhận" is pressed;
  *   7. the whole edited config survives a reload;
  *   8. a non-default AI count actually spawns that many AIChampion instances;
  *   9. the AI auto-move / auto-attack toggles actually change bot behaviour,
@@ -62,19 +69,21 @@ const evaluate = (fn, arg) => page.evaluate(fn, arg);
 const openTab = tab => page.click(`#pregame-tab-${tab}`);
 /** The nth participant card (1 = the player, 2 = Bot 1, 3 = Bot 2, ...). */
 const openParticipantAt = n => page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
-/** Only valid while the modal's *editor* view (not the slot selector) is showing. */
-const closeLoadoutModal = () => page.click('.pregame-modal-header .pregame-icon-btn');
-/** The D or F summoner slot inside the currently-open editor view. */
-const openSummonerSlot = which => page.click(`.summoner-row .kit-slot:nth-child(${which === 'D' ? 1 : 2})`);
-/** The Nth custom slot (0 = A, 1 = Q, ...), inside the currently-open editor view. */
-const openCustomSlot = index => page.click(`.custom-slot-row .kit-slot:nth-child(${index + 1})`);
-/** Highlights (does not commit) a catalogue entry among the flat summoner list. */
-const highlightFlatEntry = index =>
-  page.evaluate(
-    i => document.querySelectorAll('.selector-catalogue .catalog-spell-card')[i].dispatchEvent(new MouseEvent('click', { bubbles: true })),
-    index
-  );
-const commitSlot = () => page.click('.selector-commit');
+/** The header X. It discards the draft now, exactly like "Huỷ" — see LoadoutEditorModal.vue. */
+const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+const cancelLoadout = () => page.click('.kit-bar-btn.secondary'); // Huỷ
+const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
+/**
+ * Which slot the next roster tap fills. 0 = A, 1 = Q, ... 5 = D, 6 = F.
+ * `.kit-slot-random` shares the `.kit-slot-pill` class but is the *eighth*
+ * child of the bar, so `:nth-child` still addresses only the seven slots —
+ * anything that *counts* pills has to say `:not(.kit-slot-random)` though.
+ */
+const selectSlot = index => page.click(`.kit-slot-bar .kit-slot-pill:nth-child(${index + 1})`);
+/** Puts one catalogue entry (an `AllSpells` barrel key) into the selected slot. */
+const pickSpell = id => page.click(`.catalog-spell-card[data-spell="${id}"]`);
+/** Takes a whole shelf's kit in one tap — the shelf header doubles as the button. */
+const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-shelf-apply`);
 
 try {
   await page.goto(url, { waitUntil: 'load' });
@@ -121,24 +130,32 @@ try {
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
   report.playerEditor = await evaluate(() => ({
     title: document.querySelector('.pregame-modal-header h3')?.textContent,
-    selectedChampion: document.querySelector('.champion-card.selected')?.dataset.champion,
-    summonerD: document.querySelector('.summoner-row .kit-slot:nth-child(1) .kit-slot-name')?.textContent,
-    summonerF: document.querySelector('.summoner-row .kit-slot:nth-child(2) .kit-slot-name')?.textContent,
-    championCardCount: document.querySelectorAll('.champion-card').length,
+    // A fresh config is a random champion, so that is what reads as picked —
+    // the roster's own "Ngẫu Nhiên" card, not a shelf.
+    selectedChampion: document.querySelector('.kit-shelf.selected')?.dataset.champion ?? null,
+    randomCardSelected: !!document.querySelector('.catalog-random-card.selected'),
+    slotKeys: [...document.querySelectorAll('.kit-slot-pill-key')].map(e => e.textContent),
+    // D and F carry the summoners the config already holds (Flash / Heal).
+    summonerD: document.querySelector('.kit-slot-pill:nth-child(6) img')?.getAttribute('title'),
+    summonerF: document.querySelector('.kit-slot-pill:nth-child(7) img')?.getAttribute('title'),
+    catalogCardCount: document.querySelectorAll('.catalog-spell-card').length,
   }));
-  await closeLoadoutModal();
-  await page.waitForTimeout(100);
+  await dismissLoadoutModal();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
 
   await openParticipantAt(2); // Bot 1
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
   report.sameModalForBot = await evaluate(() => ({
     title: document.querySelector('.pregame-modal-header h3')?.textContent,
-    hasKitModeToggle: !!document.querySelector('.kit-mode-toggle'),
-    hasChampionGrid: !!document.querySelector('.champion-grid'),
-    hasSummonerSlots: document.querySelectorAll('.summoner-row .kit-slot').length,
+    slotPills: document.querySelectorAll('.kit-slot-pill:not(.kit-slot-random)').length,
+    hasRandomSlotButton: !!document.querySelector('.kit-slot-random'),
+    catalogCardCount: document.querySelectorAll('.catalog-spell-card').length,
+    wholeKitActions: document.querySelectorAll('.kit-shelf-apply').length,
+    barActions: [...document.querySelectorAll('.kit-bar-btn')].map(b => b.textContent.trim()),
+    backdropCount: document.querySelectorAll('.pregame-modal-backdrop').length,
   }));
-  await closeLoadoutModal();
-  await page.waitForTimeout(100);
+  await dismissLoadoutModal();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
 
   // 4. "Thêm Bot" and the last bot's remove control actually change AI count
   await page.click('#pregame-add-bot-btn');
@@ -163,25 +180,40 @@ try {
   await page.click('#pregame-urf');
   await page.waitForTimeout(80);
 
-  // 6. pick a champion + both summoners for the player through the modal
+  // 6. pick a champion + both summoners for the player through the modal —
+  // one tap on the shelf header for the whole kit, then one roster tap per
+  // summoner slot. All three are a draft until "Xác nhận": nothing below is
+  // stored yet at `draftBeforeConfirm`.
   await openTab('players');
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
-  await page.click('.champion-card[data-champion="Yasuo"]');
-  await openSummonerSlot('D');
-  await page.waitForSelector('.selector-pane', { state: 'visible' });
-  await highlightFlatEntry(1); // Flash(0), Ghost(1), Heal(2), Ignite(3), StealthWard(4)
-  await commitSlot();
-  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
-  await openSummonerSlot('F');
-  await page.waitForSelector('.selector-pane', { state: 'visible' });
-  await highlightFlatEntry(3);
-  await commitSlot();
-  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
-  await closeLoadoutModal();
+  await applyShelf('Yasuo');
+  await selectSlot(5); // D
+  await pickSpell('Ghost');
+  await selectSlot(6); // F
+  await pickSpell('Ignite');
   await page.waitForTimeout(100);
+  report.draftBeforeConfirm = await evaluate(() => ({
+    changedPills: [...document.querySelectorAll('.kit-slot-pill.changed .kit-slot-pill-key')].map(e => e.textContent),
+    selectedShelf: document.querySelector('.kit-shelf.selected')?.dataset.champion ?? null,
+    storedPlayer: JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1') ?? 'null')?.player ?? null,
+  }));
+  if (report.draftBeforeConfirm.storedPlayer?.championName === 'Yasuo') {
+    errors.push('draftBeforeConfirm: the pick reached localStorage before "Xác nhận" was pressed');
+  }
+  await confirmLoadout();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
 
   report.persistedAfterEditing = await evaluate(() => JSON.parse(localStorage.getItem('lol2d:pregameConfig:v1')));
+  if (
+    report.persistedAfterEditing.player.championName !== 'Yasuo' ||
+    report.persistedAfterEditing.player.summonerD !== 'Ghost' ||
+    report.persistedAfterEditing.player.summonerF !== 'Ignite'
+  ) {
+    errors.push(
+      `persistedAfterEditing: expected Yasuo + Ghost/Ignite, got ${JSON.stringify(report.persistedAfterEditing.player)}`
+    );
+  }
   await page.screenshot({ path: `${OUT}-setup-customized.png` });
 
   // 7. reload the screen from scratch and confirm the edits survived
@@ -192,10 +224,10 @@ try {
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
   const selectedChampionAfterReload = await evaluate(
-    () => document.querySelector('.champion-card.selected')?.dataset.champion
+    () => document.querySelector('.kit-shelf.selected')?.dataset.champion
   );
-  await closeLoadoutModal();
-  await page.waitForTimeout(80);
+  await dismissLoadoutModal();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
   // botCount must be read while the Players tab's DOM actually exists —
   // PlayersTab/SettingsTab are `v-if`/`v-else`, so only one is mounted at a
   // time (see SetupScene.vue).
@@ -326,17 +358,54 @@ try {
   // regression the modal shipped with (a scrollable champion grid nested
   // inside an independently-scrollable modal, and, in the spell selector,
   // a scrollable catalogue next to a scrollable detail pane): two touch
-  // regions fighting over the same drag gesture. Checked in both the
-  // champion-mode kit view and the spell-selector view, in both the touch
-  // and the pointer layout, so a panel added later that reintroduces a
-  // second `overflow-y: auto` region with real overflow trips this
-  // immediately instead of waiting for another user report.
+  // regions fighting over the same drag gesture. The rebuilt editor has one
+  // view and one scroller by construction (`.pregame-modal-body`, holding the
+  // roster; the header, slot bar and hint line are fixed siblings), so this
+  // now checks that single view — in both the touch and the pointer layout,
+  // and both with and without the description panel open — so a panel added
+  // later that reintroduces a second `overflow-y: auto` region with real
+  // overflow trips this immediately instead of waiting for another user
+  // report.
+  //
+  // `.spell-peek` is excluded on purpose: it is `position: fixed` and
+  // `pointer-events: none`, it floats *over* the dialog rather than being a
+  // region inside it, and scrolling its own long prose on touch is
+  // deliberate (see `body.touch-ui .spell-peek .spell-detail-body` in
+  // pregame-scene.css). What must stay singular is the dialog's own chrome.
   // ---------------------------------------------------------------------
-  const countActiveScrollers = () =>
-    Array.from(document.querySelectorAll('.pregame-modal, .pregame-modal *')).filter(el => {
-      const cs = getComputedStyle(el);
-      return (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
-    }).length;
+  const activeScrollers = () =>
+    Array.from(document.querySelectorAll('.pregame-modal, .pregame-modal *'))
+      .filter(el => !el.closest('.spell-peek'))
+      .filter(el => {
+        const cs = getComputedStyle(el);
+        return (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 2;
+      })
+      .map(el => el.className);
+
+  /**
+   * Opens the description panel on a roster card the way that layout's user
+   * would: a hover with a mouse, a 400ms hold with a thumb. `touchscreen.tap()`
+   * is over in a few milliseconds, well under `PEEK_LONG_PRESS_MS`, so the
+   * touch path holds a synthetic finger still through CDP instead.
+   */
+  const openSpellPeek = async (target, isTouch) => {
+    const card = await target.$('.catalog-spell-card[data-spell="Lux_Q"]');
+    await card.scrollIntoViewIfNeeded();
+    await target.waitForTimeout(150);
+    if (!isTouch) {
+      await card.hover();
+    } else {
+      const box = await card.boundingBox();
+      const cdp = await target.context().newCDPSession(target);
+      const finger = { x: box.x + box.width / 2, y: box.y + box.height / 2, radiusX: 6, radiusY: 6, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger] });
+      await target.waitForTimeout(600);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await cdp.detach();
+    }
+    await target.waitForTimeout(200);
+    return target.evaluate(() => !!document.querySelector('.spell-peek .spell-detail-body')?.textContent.trim());
+  };
 
   const openSetupPage = async ({ hasTouch, viewport }) => {
     const context = await browser.newContext({ viewport, hasTouch });
@@ -359,99 +428,76 @@ try {
 
   const singleScrollerCheck = async (setupPage, isTouchUiExpected) => {
     const result = {};
+    const label = `singleScrollerCheck(touch=${isTouchUiExpected})`;
     result.isTouchUi = await setupPage.evaluate(() => document.body.classList.contains('touch-ui'));
 
     await setupPage.click('#pregame-participant-list .participant-card:nth-child(1) .participant-card-main');
     await setupPage.waitForSelector('.loadout-modal', { state: 'visible' });
-    await setupPage.waitForTimeout(80);
-    result.championScrollerCount = await setupPage.evaluate(countActiveScrollers);
-    // the footer (D/F summoner slots) must be reachable without scrolling
-    result.summonerRowReachable = await setupPage.evaluate(() => {
-      const row = document.querySelector('.summoner-row');
-      const r = row.getBoundingClientRect();
-      return r.top >= 0 && r.bottom <= window.innerHeight;
+    await setupPage.waitForTimeout(120);
+    result.scrollers = await setupPage.evaluate(activeScrollers);
+    // ...and the one scroller must genuinely be scrolling: 85 cards past the
+    // roster's cap in either layout, so "exactly one" is not passing vacuously.
+    result.rosterOverflows = await setupPage.evaluate(() => {
+      const body = document.querySelector('.pregame-modal-body');
+      return body.scrollHeight > body.clientHeight + 2;
+    });
+    // The pinned chrome — every slot pill and both actions — must be reachable
+    // without scrolling, which is the whole point of it not being in the
+    // scroller. (38px is the short-viewport floor; see the `max-height: 480px`
+    // block in pregame-scene.css.)
+    result.slotBarReachable = await setupPage.evaluate(() => {
+      const inView = el => {
+        const r = el.getBoundingClientRect();
+        return r.top >= -1 && r.bottom <= innerHeight + 1 && r.right <= innerWidth + 1 && r.width > 0 && r.height >= 36;
+      };
+      return [
+        document.querySelector('.kit-slot-bar'),
+        ...document.querySelectorAll('.kit-slot-pill'),
+        ...document.querySelectorAll('.kit-bar-btn'),
+      ].every(inView);
     });
 
-    // switch to the free-form catalogue (85 entries) and open Q — plenty of
-    // content to force real overflow in either layout.
-    await setupPage.click('.loadout-modal .kit-mode-btn:nth-child(2)');
-    await setupPage.waitForTimeout(50);
-    await setupPage.click('.custom-slot-row .kit-slot:nth-child(2)');
-    await setupPage.waitForSelector('.selector-pane', { state: 'visible' });
-    await setupPage.waitForTimeout(80);
-    result.selectorScrollerCountCollapsed = await setupPage.evaluate(countActiveScrollers);
-    result.commitReachableCollapsed = await setupPage.evaluate(() => {
-      const r = document.querySelector('.selector-commit').getBoundingClientRect();
-      return r.top >= 0 && r.bottom <= window.innerHeight && r.height >= 44;
-    });
-
-    // highlight an entry with a real description; on touch this expands the
-    // collapsible sheet (if the toggle is present) — still exactly one
-    // scroller either way, just potentially a different element.
-    await setupPage.evaluate(() =>
-      document
-        .querySelector('.selector-catalogue .catalog-spell-card')
-        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    );
-    await setupPage.waitForTimeout(80);
-    const toggle = await setupPage.$('.spell-detail-toggle');
-    if (toggle) await toggle.click();
-    await setupPage.waitForTimeout(80);
-    result.selectorScrollerCountExpanded = await setupPage.evaluate(countActiveScrollers);
-    result.commitReachableExpanded = await setupPage.evaluate(() => {
-      const r = document.querySelector('.selector-commit').getBoundingClientRect();
-      return r.top >= 0 && r.bottom <= window.innerHeight && r.height >= 44;
-    });
+    // Open the description panel — the only surface that floats over the
+    // roster now — and confirm it did not add a second region to the dialog.
+    result.peekOpened = await openSpellPeek(setupPage, isTouchUiExpected);
+    result.scrollersWithPeek = await setupPage.evaluate(activeScrollers);
 
     if (result.isTouchUi !== isTouchUiExpected) {
       errors.push(`singleScrollerCheck: expected isTouchUi=${isTouchUiExpected}, got ${result.isTouchUi}`);
     }
-    if (result.championScrollerCount !== 1) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): champion view has ${result.championScrollerCount} active scrollers, expected exactly 1`);
+    if (result.scrollers.length !== 1 || result.scrollers[0] !== 'pregame-modal-body') {
+      errors.push(`${label}: active scrollers are ${JSON.stringify(result.scrollers)}, expected exactly ['pregame-modal-body']`);
     }
-    if (!result.summonerRowReachable) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): summoner row not reachable without scrolling`);
+    if (!result.rosterOverflows) {
+      errors.push(`${label}: the roster does not overflow at this viewport, so the single-scroller check proves nothing`);
     }
-    if (result.selectorScrollerCountCollapsed > 1) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): selector view (collapsed) has ${result.selectorScrollerCountCollapsed} active scrollers, expected at most 1`);
+    if (!result.slotBarReachable) {
+      errors.push(`${label}: the slot bar / actions are not fully reachable without scrolling`);
     }
-    if (!result.commitReachableCollapsed) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): commit button not reachable (collapsed)`);
+    if (!result.peekOpened) {
+      errors.push(`${label}: ${isTouchUiExpected ? 'a long press' : 'a hover'} did not open the description panel`);
     }
-    if (result.selectorScrollerCountExpanded > 1) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): selector view (expanded) has ${result.selectorScrollerCountExpanded} active scrollers, expected at most 1`);
-    }
-    if (isTouchUiExpected && result.selectorScrollerCountExpanded !== 1) {
-      // On touch specifically, the expanded sheet's own description is
-      // *meant* to be a real, working scroller (see the file comment on
-      // `body.touch-ui .selector-detail .spell-detail-body` in
-      // pregame-scene.css) — 0 here would mean the mechanism never actually
-      // engages, not just that this particular spell's text happened to
-      // fit. The viewport below is small enough that even the shortest
-      // catalogue entry's description overflows the sheet's cap.
-      errors.push(`singleScrollerCheck(touch): expanded sheet has ${result.selectorScrollerCountExpanded} active scrollers, expected exactly 1 (the sheet's own description)`);
-    }
-    if (!result.commitReachableExpanded) {
-      errors.push(`singleScrollerCheck(touch=${isTouchUiExpected}): commit button not reachable (expanded)`);
+    if (result.scrollersWithPeek.length !== 1 || result.scrollersWithPeek[0] !== 'pregame-modal-body') {
+      errors.push(`${label}: with the description open, active scrollers are ${JSON.stringify(result.scrollersWithPeek)}, expected exactly ['pregame-modal-body']`);
     }
     return result;
   };
 
   {
-    // Small enough that the expanded detail sheet's description genuinely
-    // overflows its cap even for the shortest catalogue entry — see the
-    // note on `selectorScrollerCountExpanded` above.
+    // A landscape-ish phone: short enough that the `max-height: 480px`
+    // compaction rules are in play and the roster is a real scroll region
+    // squeezed under the pinned slot bar.
     const { context, page: touchPage } = await openSetupPage({ hasTouch: true, viewport: { width: 320, height: 480 } });
     report.singleScrollerTouch = await singleScrollerCheck(touchPage, true);
     await context.close();
   }
   {
     // Shorter than the usual 1280x900 test viewport on purpose: at 900px
-    // tall the champion grid comfortably fits under `.pregame-modal`'s 85vh
-    // cap and nothing scrolls at all, which "at most one scroller" would
-    // pass vacuously. 700px reliably pushes real content past that cap, so
-    // this actually exercises the single-scroller mechanism instead of
-    // just failing to contradict it.
+    // tall a smaller roster could fit under `.pregame-modal`'s 90vh cap with
+    // nothing scrolling at all, which "at most one scroller" would pass
+    // vacuously. 700px reliably pushes real content past that cap, so this
+    // actually exercises the single-scroller mechanism instead of just
+    // failing to contradict it.
     const { context, page: pointerPage } = await openSetupPage({ hasTouch: false, viewport: { width: 1280, height: 700 } });
     report.singleScrollerPointer = await singleScrollerCheck(pointerPage, false);
     await context.close();
@@ -485,42 +531,60 @@ try {
   }
 
   // ---------------------------------------------------------------------
-  // 14. Read-only ability preview: a champion card's Q/W/E/R icon opens a
-  // description without picking the champion, and without opening a second
-  // dialog on top of the loadout modal.
+  // 14. Read-only ability preview, inside the editor: hovering a roster card
+  // describes it without equipping it and without opening a second dialog.
+  // There is no second click target beside the icon any more (the old
+  // "icon describes / border picks" ambiguity is what the rebuild removed) —
+  // reading is a *second gesture* on the same icon, and the panel it opens is
+  // `position: fixed`, `pointer-events: none`, floating over the dialog
+  // rather than being one.
   // ---------------------------------------------------------------------
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
-  report.abilityPreview = await evaluate(() => {
-    const before = document.querySelector('.champion-card.selected')?.dataset.champion ?? null;
-    document.querySelector('.champion-card[data-champion="Yasuo"] .champion-spell-btn')?.click();
-    return { selectedBefore: before };
-  });
-  await page.waitForTimeout(80);
-  // The champion grid is not in the DOM at all while the preview pane is
-  // swapped in (see LoadoutEditorModal.vue's `previewDisplay`) — that alone
-  // is part of the proof nothing got picked. The stronger proof is below:
-  // after backing out, the grid's selection must read exactly as it did
-  // before the ability icon was ever clicked.
-  report.abilityPreview.afterClick = await evaluate(() => ({
-    title: document.querySelector('.loadout-modal .pregame-modal-header h3')?.textContent,
-    descriptionNonEmpty: !!document.querySelector('.spell-detail-pane .spell-detail-body')?.textContent?.trim(),
-    dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
-    championGridGoneWhilePreviewOpen: document.querySelector('.champion-grid') === null,
+  report.abilityPreview = await evaluate(() => ({
+    // The player is Yasuo, and the picker opens on Q — so Yasuo_Q is the card
+    // the roster marks as "what is in the selected slot".
+    selectedBefore: document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null,
+    changedPillsBefore: document.querySelectorAll('.kit-slot-pill.changed').length,
   }));
-  await page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn'); // back to the edit view
-  await page.waitForSelector('.loadout-modal .kit-mode-toggle', { state: 'visible' });
+  await page.hover('.catalog-spell-card[data-spell="Lux_Q"]'); // deliberately not in the kit
+  await page.waitForTimeout(250);
+  report.abilityPreview.whileHovering = await evaluate(() => {
+    const peek = document.querySelector('.spell-peek');
+    return {
+      title: peek?.querySelector('.spell-detail-header h3')?.textContent ?? null,
+      descriptionNonEmpty: !!peek?.querySelector('.spell-detail-body')?.textContent?.trim(),
+      pointerEvents: peek ? getComputedStyle(peek).pointerEvents : null,
+      // Still one dialog: the description is not a second one.
+      dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
+    };
+  });
+  // Backing out with "Huỷ" is the strong proof nothing got picked: the draft
+  // is discarded, and the roster must read exactly as it did before.
+  await cancelLoadout();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
   report.abilityPreview.selectedAfterBackingOut = await evaluate(
-    () => document.querySelector('.champion-card.selected')?.dataset.champion ?? null
+    () => document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null
   );
+  if (report.abilityPreview.whileHovering.dialogCount !== 1) {
+    errors.push(`abilityPreview: the description opened ${report.abilityPreview.whileHovering.dialogCount} dialogs, expected the loadout modal alone`);
+  }
+  if (!report.abilityPreview.whileHovering.descriptionNonEmpty) {
+    errors.push('abilityPreview: hovering a roster card did not open a description');
+  }
+  if (report.abilityPreview.whileHovering.pointerEvents !== 'none') {
+    errors.push(`abilityPreview: the description panel is a click target (pointer-events: ${report.abilityPreview.whileHovering.pointerEvents})`);
+  }
   if (report.abilityPreview.selectedAfterBackingOut !== report.abilityPreview.selectedBefore) {
     errors.push(
-      `abilityPreview: opening the ability preview changed the champion pick (${report.abilityPreview.selectedBefore} -> ${report.abilityPreview.selectedAfterBackingOut})`
+      `abilityPreview: opening the description changed the pick (${report.abilityPreview.selectedBefore} -> ${report.abilityPreview.selectedAfterBackingOut})`
     );
   }
 
   // sample descriptions + CDR-aware costs across several champions directly
-  // from preset.ts, the same function the preview button calls.
+  // from preset.ts, the same function every description surface calls.
   report.abilityPreviewSample = await evaluate(async () => {
     const preset = await import('/src/game/preset.ts');
     const champs = preset.listSelectableChampions().slice(0, 5);
@@ -542,17 +606,14 @@ try {
   if (report.abilityPreviewSample.some(c => !c.allRespectCdr)) {
     errors.push(`abilityPreviewSample: some champion's ability cooldown does not shrink under CDR: ${JSON.stringify(report.abilityPreviewSample)}`);
   }
-  await closeLoadoutModal();
-  await page.waitForTimeout(80);
+  await dismissLoadoutModal();
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
 
-  // 15. Same preview, reached from the participant list's kit-icon row —
-  // must NOT open the loadout editor, and must stay "one dialog at a time".
-  await openParticipantAt(1);
-  await page.waitForSelector('.loadout-modal', { state: 'visible' });
-  await page.click('.champion-card[data-champion="Yasuo"] .champion-card-pick');
-  await page.waitForTimeout(80);
-  await closeLoadoutModal();
-  await page.waitForTimeout(80);
+  // 15. A description reached from the participant list's kit-icon row
+  // instead — there is no editor open at that point in the screen, so this
+  // one is a small dialog of its own (`SpellPreviewModal.vue`). It must NOT
+  // open the loadout editor, and must stay "one dialog at a time". The
+  // player's card carries kit icons because step 6 gave it Yasuo's kit.
   report.kitIconPreview = await evaluate(() => {
     document.querySelector('#pregame-participant-list .participant-card:nth-child(1) .kit-icon-btn')?.click();
     return null;
@@ -563,6 +624,9 @@ try {
     openedEditor: !!document.querySelector('.loadout-modal'),
     dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
   }));
+  if (!report.kitIconPreview.openedPreview || report.kitIconPreview.openedEditor || report.kitIconPreview.dialogCount !== 1) {
+    errors.push(`kitIconPreview: ${JSON.stringify(report.kitIconPreview)} — expected the preview alone, one dialog, no editor`);
+  }
   await page.click('.spell-preview-modal .pregame-modal-header .pregame-icon-btn');
   await page.waitForTimeout(80);
 
@@ -598,11 +662,13 @@ try {
   await page.click('#pregame-input-mode-pointer'); // leave it pinned for a clean re-run
   await page.waitForTimeout(80);
 
+} catch (error) {
+  report.FAILURE = `${error.message}\n${error.stack}`;
+} finally {
   report.errors = errors;
   console.log(JSON.stringify(report, null, 2));
-} finally {
   await browser.close();
   await server.close();
 }
 
-if (errors.length) process.exitCode = 1;
+if (errors.length || report.FAILURE) process.exitCode = 1;
