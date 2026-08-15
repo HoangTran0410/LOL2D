@@ -3,7 +3,7 @@ import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
 import Monster from './gameObject/attackableUnits/Monster';
-import Camera from './gameObject/map/Camera';
+import Camera, { zoomFactorPreference } from './gameObject/map/Camera';
 import FogOfWar from './gameObject/map/FogOfWar';
 import TerrainMap from './gameObject/map/TerrainMap';
 import Fountain from './gameObject/structures/Fountain';
@@ -133,6 +133,14 @@ export default class Game {
 
     this.worldMouse = createVector(0, 0);
     this.camera = new Camera();
+    // Before anything reads a world position from the screen. `width`/`height`
+    // are valid here: `Game` is constructed from `GameScene.enter()`, after
+    // `createCanvas`.
+    this.camera.setZoomFactor(zoomFactorPreference());
+    this.camera.fitTo(width, height);
+    // A match that boots and is never resized must not sit at the constructed
+    // 0.5 default, and the opening lerp from it would now zoom a phone *out*.
+    this.camera.snapToScale();
     this.objectManager = new ObjectManager(this);
     this.eventManager = new EventManager();
     this.terrainMap = new TerrainMap(this, this.mapSize);
@@ -342,6 +350,8 @@ export default class Game {
   }
 
   resize(w: number, h: number) {
+    // First: both of the others derive from the camera's view of the world.
+    this.camera.fitTo(w, h);
     this.fogOfWar.resize(w, h);
     this.touchControls.resize(w, h);
   }

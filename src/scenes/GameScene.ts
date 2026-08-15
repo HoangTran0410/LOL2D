@@ -3,6 +3,7 @@ import Game from '../game/Game';
 import MenuScene from './MenuScene';
 import DomUtils from '../utils/dom.utils';
 import AssetManager from '../managers/AssetManager';
+import { setZoomFactorPreference } from '../game/gameObject/map/Camera';
 
 // Stats.js is loaded via CDN — declare it as a global
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,6 +13,9 @@ let drawAnalys: typeof Stats;
 let checkUpdateAnalys: typeof Stats;
 let realUpdateAnalys: typeof Stats;
 let previousTime: number;
+
+/** One wheel notch, as a step on the manual zoom factor. */
+const ZOOM_WHEEL_STEP = 0.1;
 
 export default class GameScene extends Scene {
   dom!: HTMLElement;
@@ -157,6 +161,20 @@ export default class GameScene extends Scene {
 
   keyReleased(event?: KeyboardEvent) {
     this.game?.keyReleased(event?.keyCode ?? keyCode);
+  }
+
+  /**
+   * `SceneManager` has always routed this; nothing ever overrode it, which is
+   * why `Camera.zoomBy` sat uncalled. One notch is 10% of the manual range.
+   *
+   * Adjusts the *factor*, not the scale, so the choice survives a resize —
+   * see `Camera.setZoomFactor`.
+   */
+  mouseWheel(event?: WheelEvent): void {
+    const delta = event?.deltaY ?? 0;
+    if (!delta || !this.game) return;
+    this.game.camera.zoomBy(delta < 0 ? ZOOM_WHEEL_STEP : -ZOOM_WHEEL_STEP);
+    setZoomFactorPreference(this.game.camera.zoomFactor);
   }
 
   /**
