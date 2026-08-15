@@ -203,9 +203,11 @@ export default class Game {
 
     // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
     // by default (today's behaviour, unchanged), or a specific loadout the
-    // player configured for that bot. Behaviour flags (autoMove/autoAttack/
-    // autoCast) stay global across every bot, same as before per-bot config
-    // existed. Count clamped to [AI_COUNT_MIN, AI_COUNT_MAX] by
+    // player configured for that bot. Behaviour flags come from the matching
+    // slot in ai.botBehaviours, which the practice panel writes per bot; a
+    // config saved before that array existed has every slot seeded from the
+    // global flags, so this is unchanged for anyone who never opened the
+    // panel. Count clamped to [AI_COUNT_MIN, AI_COUNT_MAX] by
     // `loadPregameConfig`; `ai.bots` always has AI_COUNT_MAX entries.
     // Which loadout each unit built above is carrying, kept until the director
     // exists to be told. `getChampionPresetFromLoadout` is one-way — a bot on
@@ -219,6 +221,7 @@ export default class Game {
 
     for (let i = 0; i < pregameConfig.ai.count; i++) {
       const botLoadout = pregameConfig.ai.bots[i];
+      const botBehaviour = pregameConfig.ai.botBehaviours[i];
       const bot = new AIChampion({
         game: this,
         position: this.randomSpawnPoint(),
@@ -229,16 +232,21 @@ export default class Game {
         // it always has (getChampionPresetFromLoadout falls through to
         // getChampionPresetRandom for 'random').
         presetFactory: () => getChampionPresetFromLoadout(botLoadout),
-        autoMove: pregameConfig.ai.autoMove,
-        autoAttack: pregameConfig.ai.autoAttack,
-        autoCast: pregameConfig.ai.autoCast,
+        autoMove: botBehaviour.autoMove,
+        autoAttack: botBehaviour.autoAttack,
+        autoCast: botBehaviour.autoCast,
       });
       this.objectManager.addObject(bot);
       loadoutsInPlay.push({ unit: bot, loadout: botLoadout });
     }
 
-    // anything reading `isAllied` needs this.player, so these come after it
-    this.spawnJungle();
+    // anything reading `isAllied` needs this.player, so these come after it.
+    // The jungle is spawned only if the config wants one — the director is told
+    // below, and skipping the spawn is not the same as spawning and then
+    // clearing: the camps would be flushed into the world by the first
+    // `ObjectManager.update()` and only swept by the second, i.e. one frame of
+    // camps a player who switched the jungle off never asked to see.
+    if (pregameConfig.world.jungle) this.spawnJungle();
     this.spawnTurrets();
     // the spawner reads teams off the fountains, so it comes after them
     this.minionSpawner = new MinionSpawner(this);
@@ -255,6 +263,15 @@ export default class Game {
     // behaviour; it only tells the director what the match started with.
     this.director.setRules(pregameConfig.rules);
     for (const { unit, loadout } of loadoutsInPlay) this.director.seedLoadout(unit, loadout);
+    // The world the config asked for, through the director rather than around
+    // it, so "the jungle is off" has one definition. Both setters are no-ops
+    // when the value already matches (the jungle's guards against a second set
+    // of camps), so a default config costs nothing here. Jungle *off* still has
+    // to be said out loud: the flag starts on, and a director that disagreed
+    // with the match would show a ticked box over an empty jungle — and then
+    // persist that lie over the player's own setting.
+    this.director.jungleEnabled = pregameConfig.world.jungle;
+    this.director.minionsEnabled = pregameConfig.world.minions;
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();

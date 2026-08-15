@@ -215,8 +215,14 @@ describe('sanitizePregameConfig', () => {
           summonerF: 'Heal',
           customSlots: Array(SLOT_COUNT).fill('random'),
         })),
+        botBehaviours: Array.from({ length: AI_COUNT_MAX }, () => ({
+          autoMove: true,
+          autoAttack: false,
+          autoCast: false,
+        })),
       },
       rules: { cooldownReductionPercent: 40, manaFree: true },
+      world: { jungle: false, minions: true },
     };
     expect(sanitizePregameConfig(custom)).toEqual(custom);
   });
@@ -301,8 +307,14 @@ describe('loadPregameConfig / savePregameConfig', () => {
           summonerF: 'Heal',
           customSlots: Array(SLOT_COUNT).fill('random'),
         })),
+        botBehaviours: Array.from({ length: AI_COUNT_MAX }, (_, i) => ({
+          autoMove: i === 0,
+          autoAttack: true,
+          autoCast: false,
+        })),
       },
       rules: { cooldownReductionPercent: 30, manaFree: true },
+      world: { jungle: true, minions: false },
     };
     savePregameConfig(custom);
     expect(loadPregameConfig()).toEqual(custom);
@@ -384,5 +396,110 @@ describe('loadPregameConfig / savePregameConfig', () => {
     expect(loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')).toBe(
       true
     );
+  });
+});
+
+/**
+ * Per-bot behaviour, added when the practice panel started persisting what it
+ * edits: the panel sets `autoMove`/`autoAttack`/`autoCast` per bot, where the
+ * setup screen only ever set them globally, so the config needs somewhere to
+ * put a per-bot answer.
+ */
+describe('ai.botBehaviours', () => {
+  it('defaults to one entry per slot carrying AIChampion’s own defaults', () => {
+    expect(DEFAULT_PREGAME_CONFIG.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
+    for (const behaviour of DEFAULT_PREGAME_CONFIG.ai.botBehaviours) {
+      expect(behaviour).toEqual({ autoMove: false, autoAttack: true, autoCast: true });
+    }
+  });
+
+  // The migration decision, and the one that is easy to get wrong: a stored
+  // config written before this array existed must hand every slot *the
+  // player's own* global choice. Seeding from DEFAULT_PREGAME_CONFIG instead
+  // would look like it works — the defaults are a plausible answer — while
+  // silently discarding a setting the player really made on the setup screen.
+  it('seeds a missing array from the stored global flags, not from DEFAULT_PREGAME_CONFIG', () => {
+    const globals = { autoMove: true, autoAttack: false, autoCast: false };
+    const result = sanitizePregameConfig({ ai: { count: 3, ...globals } });
+
+    expect(result.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
+    for (const behaviour of result.ai.botBehaviours) expect(behaviour).toEqual(globals);
+    // Stated as its own assertion because it is the actual regression: every
+    // one of these differs from the default.
+    expect(result.ai.botBehaviours[0]).not.toEqual(DEFAULT_PREGAME_CONFIG.ai.botBehaviours[0]);
+  });
+
+  it('pads a short array from the global flags and truncates a long one', () => {
+    const globals = { autoMove: true, autoAttack: false, autoCast: true };
+    const result = sanitizePregameConfig({
+      ai: { ...globals, botBehaviours: [{ autoMove: false, autoAttack: true, autoCast: false }] },
+    });
+
+    expect(result.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
+    expect(result.ai.botBehaviours[0]).toEqual({
+      autoMove: false,
+      autoAttack: true,
+      autoCast: false,
+    });
+    expect(result.ai.botBehaviours[1]).toEqual(globals);
+
+    expect(
+      sanitizePregameConfig({
+        ai: { botBehaviours: Array.from({ length: AI_COUNT_MAX + 4 }, () => globals) },
+      }).ai.botBehaviours
+    ).toHaveLength(AI_COUNT_MAX);
+  });
+
+  it('falls back per field, to the global flag, for a wrong-typed entry', () => {
+    const globals = { autoMove: true, autoAttack: false, autoCast: true };
+    const result = sanitizePregameConfig({
+      ai: { ...globals, botBehaviours: [{ autoMove: 'yes', autoCast: false }, 'not an object'] },
+    });
+
+    expect(result.ai.botBehaviours[0]).toEqual({
+      autoMove: true, // 'yes' is not a boolean -> the global
+      autoAttack: false, // absent -> the global
+      autoCast: false, // a real boolean -> kept
+    });
+    expect(result.ai.botBehaviours[1]).toEqual(globals);
+  });
+});
+
+/**
+ * The world section: whether the jungle and the lane minions exist. New here
+ * because the practice panel is the only screen that has ever had these
+ * switches, and persisting the panel means the config needs a home for them.
+ */
+describe('world', () => {
+  it('defaults to both on, i.e. the match every version before this one booted', () => {
+    expect(DEFAULT_PREGAME_CONFIG.world).toEqual({ jungle: true, minions: true });
+  });
+
+  it('reads a stored world section and falls back per field', () => {
+    expect(sanitizePregameConfig({ world: { jungle: false, minions: false } }).world).toEqual({
+      jungle: false,
+      minions: false,
+    });
+    expect(sanitizePregameConfig({ world: { jungle: false } }).world).toEqual({
+      jungle: false,
+      minions: true,
+    });
+    expect(sanitizePregameConfig({ world: 'garbage' }).world).toEqual(DEFAULT_PREGAME_CONFIG.world);
+  });
+
+  it('gives a config saved before this section existed a full jungle and lane minions', () => {
+    expect(sanitizePregameConfig({ ai: { count: 2 } }).world).toEqual({
+      jungle: true,
+      minions: true,
+    });
+  });
+
+  it('round-trips through storage', () => {
+    vi.stubGlobal('localStorage', new MemoryStorage());
+    savePregameConfig({
+      ...DEFAULT_PREGAME_CONFIG,
+      world: { jungle: false, minions: true },
+    });
+    expect(loadPregameConfig().world).toEqual({ jungle: false, minions: true });
   });
 });

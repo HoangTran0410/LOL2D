@@ -1,14 +1,29 @@
 /**
- * The pregame setup screen's settings: player loadout, per-bot AI loadouts,
- * AI behaviour, and match-wide rules (cooldown reduction, URF). Pure data —
- * no p5 globals, no knowledge of `SpellGroups`/spell classes — so it is safe
- * to import from anywhere (including `MenuScene.setup()`) and to unit test
- * in plain node.
+ * A match's settings: player loadout, per-bot AI loadouts, AI behaviour,
+ * match-wide rules (cooldown reduction, URF) and the world it runs in
+ * (jungle, lane minions). Pure data — no p5 globals, no knowledge of
+ * `SpellGroups`/spell classes — so it is safe to import from anywhere
+ * (including `MenuScene.setup()`) and to unit test in plain node.
  *
  * `Game` reads this once, at construction (see `Game.ts`), and turns it into
  * the concrete objects (a `ChampionPresetData`, an `AIChampion` behaviour, a
- * `MatchRules`) other code actually consumes — nothing downstream reaches
- * back into this module or into `localStorage` on its own.
+ * `MatchRules`) other code actually consumes.
+ *
+ * ## Two writers, one key
+ *
+ * The pregame setup screen writes this, and so does the in-game practice
+ * panel — through `MatchDirector`, which derives the whole config from the
+ * live match after every mutation it makes (see its file comment). The panel
+ * used to write nothing at all; persisting it is the reversal the
+ * `2026-08-16-panel-persistence-design` spec asked for, on the grounds that
+ * the panel is a strict superset of the setup screen for match configuration
+ * and was the surface whose work got thrown away on reload.
+ *
+ * `MatchDirector` reads a stored config on its way to writing one, because
+ * two fields here have no live counterpart for it to derive: the *global*
+ * `ai.autoMove`/`autoAttack`/`autoCast` (which only the setup screen edits)
+ * and the bot slots past the live bot count (kept so lowering the count and
+ * raising it back does not lose a bot's customisation).
  *
  * ## Schema versioning
  *
@@ -25,6 +40,18 @@
  * — and missing `ai.bots` gets a full array of default (random) bot
  * loadouts, i.e. today's actual behaviour for every bot. Both are lossless
  * reads of what an old config meant, not resets.
+ *
+ * `ai.botBehaviours` (added with the practice panel's persistence) follows
+ * exactly that pattern, and it is worth spelling out because the obvious
+ * shortcut is wrong: a config with no `botBehaviours` gets a full array
+ * seeded **from that config's own global flags**, not from
+ * `DEFAULT_PREGAME_CONFIG`. Before this array existed, the global flags were
+ * what every bot in the match ran on — so they *are* what an old blob meant
+ * per bot. Seeding from the defaults would look right (the defaults are a
+ * plausible answer) while silently discarding a setting the player really
+ * made on the setup screen. `world` is the same story with a simpler answer:
+ * a config saved before it existed meant a match with a full jungle and lane
+ * minions, because that is the only match the game could boot.
  */
 
 /** A `SpellGroups` champion name (see `preset.ts`), or the random-kit default. */
@@ -61,10 +88,30 @@ export interface ChampionLoadout {
 /** @deprecated Renamed to `ChampionLoadout` — a bot uses the same shape. Kept as an alias so older call sites still type-check. */
 export type PlayerLoadout = ChampionLoadout;
 
+/**
+ * One bot's three "does it act on its own" switches.
+ *
+ * Lives here rather than next to the code that applies it (`MatchDirector`,
+ * which re-exports this type) because it is now a *stored* shape: the
+ * practice panel sets these per bot and the config has to hold the answer.
+ * `MatchDirector` imports this module; this module importing it back would be
+ * a cycle.
+ */
+export interface BotBehaviour {
+  autoMove: boolean;
+  autoAttack: boolean;
+  autoCast: boolean;
+}
+
 export interface AIConfig {
   /** How many AI champions spawn alongside the player. */
   count: number;
-  /** Whether an idle bot wanders on its own. Off by default, same as today. */
+  /**
+   * The behaviour a bot gets when nobody has chosen one for it: what the
+   * setup screen's `AiConfigPanel` edits, what an old config's every bot ran
+   * on (hence the `botBehaviours` migration), and what `MatchDirector.addBot`
+   * gives a bot added mid-match. Off by default, same as today.
+   */
   autoMove: boolean;
   /** Whether a bot picks fights on its own. */
   autoAttack: boolean;
@@ -80,6 +127,26 @@ export interface AIConfig {
    * before per-bot configuration existed.
    */
   bots: readonly ChampionLoadout[];
+  /**
+   * One behaviour per bot *slot*, the same `AI_COUNT_MAX`-long, index-aligned
+   * shape as `bots` and for the same reasons. Parallel to `bots` rather than a
+   * field inside a loadout because a loadout is a *kit* — the saved-kit
+   * library stores those by name, and a saved kit has no business carrying
+   * "and this one wanders".
+   */
+  botBehaviours: readonly BotBehaviour[];
+}
+
+/**
+ * Which of the match's ambient populations exist. Only the practice panel has
+ * ever had switches for these; the setup screen has none, and does not need
+ * any for the config to carry them.
+ */
+export interface WorldConfig {
+  /** Whether the jungle camps are spawned. */
+  jungle: boolean;
+  /** Whether the lane minion waves run. */
+  minions: boolean;
 }
 
 export interface MatchRulesConfig {
@@ -93,6 +160,7 @@ export interface PregameConfig {
   player: ChampionLoadout;
   ai: AIConfig;
   rules: MatchRulesConfig;
+  world: WorldConfig;
 }
 
 export const AI_COUNT_MIN = 0;
@@ -112,24 +180,39 @@ export const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze
 });
 
 /**
+ * `AIChampion`'s own hardcoded defaults, which is what makes this the value a
+ * bot slot nobody has configured must carry.
+ */
+export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
+  autoMove: false,
+  autoAttack: true,
+  autoCast: true,
+});
+
+/**
  * Reproduces the game's behaviour before this config existed: a fully random
  * champion and kit, 5 AI champions — each also random — that fight back and
  * cast on their own but don't wander (AIChampion's own hardcoded defaults:
  * autoAttack=true, autoCast=true, autoMove=false), no cooldown reduction,
- * full mana costs.
+ * full mana costs, a full jungle and lane minions running.
  */
 export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
   player: DEFAULT_CHAMPION_LOADOUT,
   ai: Object.freeze({
     count: 5,
-    autoMove: false,
-    autoAttack: true,
-    autoCast: true,
+    autoMove: DEFAULT_BOT_BEHAVIOUR.autoMove,
+    autoAttack: DEFAULT_BOT_BEHAVIOUR.autoAttack,
+    autoCast: DEFAULT_BOT_BEHAVIOUR.autoCast,
     bots: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => DEFAULT_CHAMPION_LOADOUT)),
+    botBehaviours: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => DEFAULT_BOT_BEHAVIOUR)),
   }),
   rules: Object.freeze({
     cooldownReductionPercent: 0,
     manaFree: false,
+  }),
+  world: Object.freeze({
+    jungle: true,
+    minions: true,
   }),
 });
 
@@ -175,6 +258,22 @@ export const sanitizeChampionLoadout = (raw: unknown): ChampionLoadout => {
 };
 
 /**
+ * Sanitizes one bot's behaviour, falling back **per field** to `fallback` —
+ * which callers pass as the config's own global flags, never as
+ * `DEFAULT_BOT_BEHAVIOUR`. See the migration note in the file header: the
+ * global flags are what an old config meant for every bot, and defaulting
+ * past them would drop a real setting.
+ */
+export const sanitizeBotBehaviour = (raw: unknown, fallback: BotBehaviour): BotBehaviour => {
+  const source = (raw && typeof raw === 'object' ? raw : {}) as Partial<BotBehaviour>;
+  return {
+    autoMove: asBoolean(source.autoMove, fallback.autoMove),
+    autoAttack: asBoolean(source.autoAttack, fallback.autoAttack),
+    autoCast: asBoolean(source.autoCast, fallback.autoCast),
+  };
+};
+
+/**
  * Turns whatever came back from `JSON.parse` (or nothing at all) into a
  * config that is safe to hand to `Game`. Every field is validated
  * independently and falls back to its own default, so a config that is
@@ -195,20 +294,35 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
   const rules = (source.rules && typeof source.rules === 'object'
     ? source.rules
     : {}) as Partial<MatchRulesConfig>;
+  const world = (source.world && typeof source.world === 'object'
+    ? source.world
+    : {}) as Partial<WorldConfig>;
 
   const rawBots = Array.isArray(ai.bots) ? ai.bots : [];
   const bots: ChampionLoadout[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
     sanitizeChampionLoadout(rawBots[i])
   );
 
+  // Resolved before the per-bot array so it can seed it — the migration this
+  // module's header spells out. Note the order: the *global* flags fall back to
+  // the defaults, and every per-bot entry falls back to the globals.
+  const globalBehaviour: BotBehaviour = {
+    autoMove: asBoolean(ai.autoMove, DEFAULT_PREGAME_CONFIG.ai.autoMove),
+    autoAttack: asBoolean(ai.autoAttack, DEFAULT_PREGAME_CONFIG.ai.autoAttack),
+    autoCast: asBoolean(ai.autoCast, DEFAULT_PREGAME_CONFIG.ai.autoCast),
+  };
+  const rawBehaviours = Array.isArray(ai.botBehaviours) ? ai.botBehaviours : [];
+  const botBehaviours: BotBehaviour[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+    sanitizeBotBehaviour(rawBehaviours[i], globalBehaviour)
+  );
+
   return {
     player: sanitizeChampionLoadout(source.player),
     ai: {
       count: clampInt(ai.count, AI_COUNT_MIN, AI_COUNT_MAX, DEFAULT_PREGAME_CONFIG.ai.count),
-      autoMove: asBoolean(ai.autoMove, DEFAULT_PREGAME_CONFIG.ai.autoMove),
-      autoAttack: asBoolean(ai.autoAttack, DEFAULT_PREGAME_CONFIG.ai.autoAttack),
-      autoCast: asBoolean(ai.autoCast, DEFAULT_PREGAME_CONFIG.ai.autoCast),
+      ...globalBehaviour,
       bots,
+      botBehaviours,
     },
     rules: {
       cooldownReductionPercent: clampInt(
@@ -218,6 +332,10 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
         DEFAULT_PREGAME_CONFIG.rules.cooldownReductionPercent
       ),
       manaFree: asBoolean(rules.manaFree, DEFAULT_PREGAME_CONFIG.rules.manaFree),
+    },
+    world: {
+      jungle: asBoolean(world.jungle, DEFAULT_PREGAME_CONFIG.world.jungle),
+      minions: asBoolean(world.minions, DEFAULT_PREGAME_CONFIG.world.minions),
     },
   };
 };

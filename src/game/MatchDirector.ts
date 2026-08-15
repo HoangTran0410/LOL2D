@@ -45,7 +45,12 @@ import {
   DEFAULT_CHAMPION_LOADOUT,
   toMatchRules,
 } from './config/PregameConfig';
-import type { ChampionLoadout, MatchRules, MatchRulesConfig } from './config/PregameConfig';
+import type {
+  BotBehaviour,
+  ChampionLoadout,
+  MatchRules,
+  MatchRulesConfig,
+} from './config/PregameConfig';
 import { getChampionPresetFromLoadout } from './preset';
 import type GameObject from './gameObject/GameObject';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
@@ -57,12 +62,13 @@ import { createDebugFlags, type DebugFlags } from './debug/DebugOverlay';
  * `AIChampion` rather than a typed sub-object because other code — the e2e
  * scripts included — already reads and flips them directly; this is a view of
  * them, not a second home for them.
+ *
+ * Defined in `PregameConfig` and re-exported here, where every caller already
+ * imports it from: the panel now *persists* a per-bot behaviour, so the stored
+ * schema and the live one have to be the same type, and the config module is
+ * the one of the two that can't import the other.
  */
-export interface BotBehaviour {
-  autoMove: boolean;
-  autoAttack: boolean;
-  autoCast: boolean;
-}
+export type { BotBehaviour };
 
 export interface RosterEntry {
   unit: Champion;
