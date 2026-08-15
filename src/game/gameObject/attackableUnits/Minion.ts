@@ -61,6 +61,23 @@ export const MinionPresets: Record<MinionKind, MinionPresetData> = {
 
 /** World units from a waypoint that count as having reached it. */
 export const WAYPOINT_TOLERANCE = 40;
+
+/**
+ * How far off its lane a minion will step to fight before giving the chase up.
+ *
+ * Without a leash a chase never ends: `findTarget` re-scans within `aggroRange`
+ * of wherever the minion has got to, and chasing is precisely what keeps the
+ * target inside that radius, so one champion could tow a whole wave across the
+ * map. Measured from the lane itself (`distanceToLane`), not from the minion's
+ * spawn or its current waypoint — waypoints are up to ~1500px apart, so
+ * "distance to the next waypoint" is 750px in the middle of a normal segment
+ * and cannot tell walking from wandering.
+ *
+ * 500 is comfortably past `aggroRange` (300 melee, 340 ranged), so a minion
+ * still commits to anything it can legitimately see from its lane, and still
+ * finishes a fight that drifts a little.
+ */
+export const MINION_LEASH_RANGE = 500;
 /** ms between aggro scans. Re-querying the quadtree per minion per frame is the
  *  one thing on this class that would actually cost a full board its frame rate. */
 export const AGGRO_SCAN_INTERVAL_MS = 200;
@@ -194,12 +211,75 @@ export default class Minion extends AttackableUnit {
     this._scanCooldown -= deltaTime;
     if (this._scanCooldown <= 0) {
       this._scanCooldown = AGGRO_SCAN_INTERVAL_MS;
-      this.targetLock = this.findTarget();
+      const wasAttacking = this.phase === Minion.PHASES.ATTACK;
+      // Leashed: too far off the lane to still be fighting, whatever is in
+      // range. Checked before the scan so a minion already out of position
+      // cannot re-acquire the target that dragged it there.
+      const leashed = this.distanceToLane() > MINION_LEASH_RANGE;
+      this.targetLock = leashed ? null : this.findTarget();
       this.phase = this.targetLock ? Minion.PHASES.ATTACK : Minion.PHASES.WALK;
+      if (wasAttacking && this.phase === Minion.PHASES.WALK) this.resyncWaypoint();
     }
 
     if (this.phase === Minion.PHASES.ATTACK) this.updateAttack();
     else this.updateWalk();
+  }
+
+  /**
+   * Shortest distance from this minion to the lane polyline it walks — the
+   * segments between consecutive waypoints, not the waypoints themselves. See
+   * `MINION_LEASH_RANGE` for why the distinction matters.
+   */
+  distanceToLane(): number {
+    const path = this.waypoints;
+    if (path.length === 0) return 0;
+    if (path.length === 1) return Math.hypot(this.position.x - path[0].x, this.position.y - path[0].y);
+
+    const { x, y } = this.position;
+    let best = Infinity;
+    for (let i = 0; i + 1 < path.length; i++) {
+      const ax = path[i].x;
+      const ay = path[i].y;
+      const dx = path[i + 1].x - ax;
+      const dy = path[i + 1].y - ay;
+      const lengthSq = dx * dx + dy * dy;
+      const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / lengthSq));
+      const d = Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
+      if (d < best) best = d;
+    }
+    return best;
+  }
+
+  /**
+   * Re-aims at the nearest waypoint *ahead of* the one already reached, after
+   * a chase has moved the minion somewhere its stored index no longer
+   * describes.
+   *
+   * `waypointIndex` only advances when the minion gets within
+   * `WAYPOINT_TOLERANCE` of a waypoint, so a minion pulled off its lane at
+   * index 1 comes back still aiming at index 1 — which, for a minion dragged
+   * to mid, means walking all the way back past its own fountain before
+   * setting off again. That is the reported bug, reproduced: a minion parked
+   * at (3100,3400) headed for (350,4710), 3046px behind it, while waypoint 3
+   * sat 2472px ahead.
+   *
+   * Never searches backwards from the current index: the lane is a route from
+   * one base to the other, and a minion that has passed a waypoint has passed
+   * it. Picking the global nearest would let a minion shoved back down its own
+   * lane un-walk progress it had already made.
+   */
+  resyncWaypoint(): void {
+    const { x, y } = this.position;
+    let best = this.waypointIndex;
+    let bestDist = Infinity;
+    for (let i = this.waypointIndex; i < this.waypoints.length; i++) {
+      const d = Math.hypot(x - this.waypoints[i].x, y - this.waypoints[i].y);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    this.waypointIndex = best;
   }
 
   updateWalk() {
@@ -296,6 +376,9 @@ export default class Minion extends AttackableUnit {
       filters: [
         PredefinedFilters.canTakeDamageFromTeam(this.teamId),
         PredefinedFilters.excludeType(Monster),
+        // a champion in a bush is not a target a minion can pick — see the
+        // filter's own comment for the rule and its one deliberate looseness
+        PredefinedFilters.visibleTo(this),
       ],
     });
 

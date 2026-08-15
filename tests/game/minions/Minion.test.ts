@@ -8,6 +8,7 @@ import Minion, {
   MinionSwing,
   RANGED_BOLT_SPEED,
   WAYPOINT_TOLERANCE,
+  MINION_LEASH_RANGE,
 } from '../../../src/game/gameObject/attackableUnits/Minion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
@@ -184,6 +185,126 @@ describe('Minion', () => {
       indexObjects(game, [minion, distant]);
 
       expect(minion.findTarget()).toBeNull();
+    });
+  });
+
+  describe('giving a chase up', () => {
+    /**
+     * Without a leash a chase never ends: `findTarget` re-scans within
+     * `aggroRange` of wherever the minion has got to, and chasing is exactly
+     * what keeps the target inside that radius. One champion could tow a whole
+     * wave off its lane and across the map, which is what was reported.
+     */
+    it('drops the target once it has been pulled too far off its lane', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other' });
+      // both sit well off the lane (which starts at 0,0), but within each
+      // other's aggro range
+      minion.position.set(-(MINION_LEASH_RANGE + 100), 0);
+      champion.position.set(-(MINION_LEASH_RANGE + 40), 0);
+      indexObjects(game, [minion, champion]);
+
+      expect(minion.distanceToLane()).toBeGreaterThan(MINION_LEASH_RANGE);
+      // in range, and would be picked if the leash were not consulted
+      expect(minion.findTarget()).toBe(champion);
+
+      minion.targetLock = champion;
+      minion.phase = Minion.PHASES.ATTACK;
+      forceScan(minion);
+      minion.update();
+
+      expect(minion.targetLock).toBeNull();
+      expect(minion.phase).toBe(Minion.PHASES.WALK);
+    });
+
+    it('keeps fighting while it is still near its lane', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other' });
+      minion.position.set(200, 40);
+      champion.position.set(240, 40);
+      indexObjects(game, [minion, champion]);
+
+      expect(minion.distanceToLane()).toBeLessThan(MINION_LEASH_RANGE);
+      forceScan(minion);
+      minion.update();
+
+      expect(minion.targetLock).toBe(champion);
+      expect(minion.phase).toBe(Minion.PHASES.ATTACK);
+    });
+
+    /**
+     * `waypointIndex` only advances on arrival, so a minion dragged away at
+     * index 0 comes back still aiming at index 0 — for a real lane that means
+     * walking back past its own fountain before setting off again. Reproduced
+     * in the live game before the fix: a minion parked at (3100,3400) headed
+     * for (350,4710), 3046px behind it, while waypoint 3 sat 2472px ahead.
+     */
+    it('resumes at the nearest waypoint ahead, not the last one it touched', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other' });
+      indexObjects(game, [minion, champion]);
+
+      expect(minion.waypointIndex).toBe(0);
+      // dragged out beside the *last* waypoint (400,400), far off the lane
+      minion.position.set(400 + MINION_LEASH_RANGE + 100, 400);
+      champion.position.set(9_000, 9_000); // and the target is long gone
+
+      minion.targetLock = champion;
+      minion.phase = Minion.PHASES.ATTACK;
+      forceScan(minion);
+      minion.update();
+
+      expect(minion.phase).toBe(Minion.PHASES.WALK);
+      expect(minion.waypointIndex).toBe(2);
+    });
+
+    it('never re-aims backwards down the lane', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other', position: createVector(9_000, 9_000) });
+      indexObjects(game, [minion, champion]);
+
+      minion.waypointIndex = 2;
+      // shoved back beside waypoint 0, which it has already walked past
+      minion.position.set(-(MINION_LEASH_RANGE + 100), 0);
+
+      minion.targetLock = champion;
+      minion.phase = Minion.PHASES.ATTACK;
+      forceScan(minion);
+      minion.update();
+
+      expect(minion.waypointIndex).toBe(2);
+    });
+
+    it('measures distance to the lane itself, not to its waypoints', () => {
+      const minion = makeMinion();
+      // halfway along the first segment: 200px from either waypoint, but on the lane
+      minion.position.set(200, 0);
+      expect(minion.distanceToLane()).toBe(0);
+      minion.position.set(200, 90);
+      expect(minion.distanceToLane()).toBeCloseTo(90, 5);
+    });
+  });
+
+  describe('bushes', () => {
+    it('cannot target a champion hiding in a bush', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other', position: createVector(100, 0) });
+      indexObjects(game, [minion, champion]);
+
+      expect(minion.findTarget()).toBe(champion);
+
+      champion.isInsideBush = true;
+      expect(minion.findTarget()).toBeNull();
+    });
+
+    it('still sees a bushed champion when it is in a bush itself', () => {
+      const minion = makeMinion();
+      const champion = new Champion({ game, teamId: 'other', position: createVector(100, 0) });
+      indexObjects(game, [minion, champion]);
+
+      champion.isInsideBush = true;
+      minion.isInsideBush = true;
+      expect(minion.findTarget()).toBe(champion);
     });
   });
 
