@@ -182,3 +182,42 @@ export default class Camera {
     pop();
   }
 }
+
+/** Mirrors `TouchControls.ts:160`'s `'lol2d.touchControls'`. */
+const ZOOM_STORAGE_KEY = 'lol2d.zoomFactor';
+
+const finiteAbove = (value: number, floor: number): boolean =>
+  Number.isFinite(value) && value > floor;
+
+/**
+ * The player's zoom multiplier. Three sources, most explicit first — the same
+ * shape as `touchControlsPreference` (`TouchControls.ts:220`), and for the
+ * same reason: the query parameter is what makes this verifiable from a
+ * Playwright run, independent of whatever the developer has stored.
+ */
+export function zoomFactorPreference(): number {
+  try {
+    const query = new URLSearchParams(window.location.search).get('zoom');
+    if (query !== null) {
+      const parsed = Number(query);
+      if (finiteAbove(parsed, 0)) return clampZoomFactor(parsed);
+    }
+  } catch {
+    /* no location: fall through to the stored preference */
+  }
+  try {
+    const stored = Number(window.localStorage.getItem(ZOOM_STORAGE_KEY));
+    if (finiteAbove(stored, 0)) return clampZoomFactor(stored);
+  } catch {
+    /* storage blocked: fall through to the default */
+  }
+  return 1;
+}
+
+export function setZoomFactorPreference(factor: number): void {
+  try {
+    window.localStorage.setItem(ZOOM_STORAGE_KEY, String(clampZoomFactor(factor)));
+  } catch {
+    /* storage blocked: the setting still works for this session */
+  }
+}

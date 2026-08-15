@@ -10,7 +10,7 @@ describe('baseScaleFor', () => {
   // The spec's table. A landscape phone is the case the whole feature exists
   // for, and 0.39 is below the clamp floor the old code shipped (0.5) — which
   // is why SCALE_MIN is asserted here rather than left implicit.
-  it.each([
+  it.each<[string, number, number, number]>([
     ['phone landscape', 844, 390, 0.39],
     ['phone portrait', 390, 844, 0.39],
     ['tablet', 1180, 820, 0.82],
