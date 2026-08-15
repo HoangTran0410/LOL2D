@@ -462,11 +462,210 @@
   padding: 0.8rem;
 }
 
-/* Placeholder copy for the tab Task 10 fills in. */
-.practice-placeholder {
-  margin: 0;
+/* ---------------------------------------------- Đấu thủ tab (RosterTab.vue)
+   One row per live unit, following `.participant-card` in
+   styles/pregame-scene.css — the setup screen's Players tab answers the same
+   question about a match that has not started, and the two are meant to read
+   as one control. Same panel/line colours, same 44px delete column, same
+   dashed add button. What differs is the row's second line: the three
+   per-bot behaviour toggles, which the setup screen has no per-row equivalent
+   of (its three flags are global, in the Settings tab), so the card grows a
+   `flex-direction: column` and a flag strip under the main row rather than
+   trying to fit six controls across a 760px modal. */
+/* The roster's own body drops the shared bottom padding, and the sticky add
+   button below wants it gone: a sticky box is clamped to its containing block's
+   *content* box, so with the padding in place the pinned button stopped 12.8px
+   short of the frame and left a strip of whichever row was scrolling underneath
+   showing through. Measured — a negative bottom margin on the button was tried
+   first and does not move the clamp, only the scroll height. */
+.practice-roster-body {
+  padding-bottom: 0;
+}
+
+.practice-roster-row {
+  display: flex;
+  flex-direction: column;
+  background: var(--hextech-panel);
+  border: 2px solid var(--hextech-line);
+  margin-bottom: 0.6rem;
+}
+
+/* Same gold-ish tint `.participant-card-player` uses to mark the human. */
+.practice-roster-row.is-player {
+  border-color: rgba(120, 90, 40, 0.53);
+}
+
+.practice-roster-main {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+/* A real, laid-out button rather than `.participant-card-open`'s invisible
+   `position: absolute; inset: 0` overlay: that trick works there because the
+   only things stacked over it are the kit icons, while a row here also
+   carries three checkboxes and a delete, and an invisible sheet across all of
+   them is the kind of overlapping tap target this screen's redesign removed. */
+.practice-roster-open {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.6rem 0.8rem;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.practice-roster-open:hover {
+  background: #2a2f36;
+}
+
+.practice-roster-portrait {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--hextech-gold-dim);
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.practice-roster-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A unit with no avatar handle yet — the same teal die
+   `.participant-portrait-random` uses for a loadout left to chance. */
+.practice-roster-portrait.is-empty {
+  border-style: dashed;
+  border-color: var(--hextech-teal);
+  color: var(--hextech-teal);
+}
+
+.practice-roster-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.practice-roster-label {
+  color: var(--hextech-gold);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* The champion standing on the map right now, not the loadout behind it — see
+   RosterTab.vue's file comment on why those are two different facts. */
+.practice-roster-name {
   color: var(--hextech-muted);
-  font-size: 0.9em;
+  font-size: 0.85em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-roster-chevron {
+  flex-shrink: 0;
+  color: #999;
+}
+
+/* `.participant-remove`'s column, to the pixel: 44px wide, ruled off from the
+   row by the same border, and the same muted red. */
+.practice-remove-bot {
+  flex-shrink: 0;
+  width: 44px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid var(--hextech-line);
+  color: #d98a8a;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.practice-remove-bot:hover {
+  background: #3a2222;
+}
+
+.practice-roster-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1rem;
+  padding: 0 0.8rem 0.5rem;
+  border-top: 1px solid var(--hextech-line);
+  padding-top: 0.5rem;
+}
+
+/* `.pregame-toggle` supplies the layout and the type; this only stops the
+   three from stretching across the row and holds them to the 44px thumb
+   minimum the rest of this modal is held to (the label is the tap target —
+   see RosterTab.vue on why `change` alone is not enough here). */
+.practice-flag {
+  margin-bottom: 0;
+  min-height: 44px;
+}
+
+/* `.participant-add-btn`'s dashed teal call to action, plus a live count:
+   `MatchDirector.addBot` returns null at AI_COUNT_MAX, and a disabled button
+   that never says why is how a cap becomes a bug report.
+
+   `position: sticky` against the tab body, which is the panel's scroll region
+   (`.practice-tab-body` above): ten two-line rows are ~1100px and the panel is
+   90vh, so a button at the end of that flow is off screen in every viewport
+   this game runs on — and the tab body's touch scrolling is hand-rolled
+   (RosterTab.vue), which is a lot of gesture to ask for before the primary
+   action of the tab is even reachable. Same trick, same reason, as
+   `.picker-header` pinning the slot row on the tab next door. */
+.practice-add-bot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.7rem;
+  background: var(--hextech-panel);
+  border: 2px dashed var(--hextech-line);
+  color: var(--hextech-teal);
+  font: inherit;
+  cursor: pointer;
+}
+
+.practice-add-bot:hover:not(:disabled) {
+  border-color: var(--hextech-teal);
+}
+
+.practice-add-bot:disabled {
+  color: var(--hextech-muted);
+  cursor: not-allowed;
+}
+
+.practice-add-bot-count {
+  color: var(--hextech-muted);
+  font-size: 0.85em;
+}
+
+/* The loadout editor is teleported to <body> so its `position: fixed`
+   backdrop resolves against the viewport rather than against `.practice-panel`
+   (which is a transformed element, and so the containing block for any fixed
+   descendant — see RosterTab.vue). `display: contents` keeps that wrapper out
+   of the layout entirely while leaving it in the DOM tree, which is what the
+   touch→click bridge listens on. */
+.practice-editor-host {
+  display: contents;
 }
 
 /* The CDR slider is dragged by hand under a thumb (see `RulesTab.vue`: the

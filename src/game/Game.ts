@@ -15,7 +15,12 @@ import {
   getChampionPresetFromLoadout,
   getTurretPositions,
 } from './preset';
-import { loadPregameConfig, toMatchRules, type MatchRules } from './config/PregameConfig';
+import {
+  loadPregameConfig,
+  toMatchRules,
+  type ChampionLoadout,
+  type MatchRules,
+} from './config/PregameConfig';
 import ObjectManager from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
 import MatchDirector from './MatchDirector';
@@ -171,24 +176,34 @@ export default class Game {
     // autoCast) stay global across every bot, same as before per-bot config
     // existed. Count clamped to [AI_COUNT_MIN, AI_COUNT_MAX] by
     // `loadPregameConfig`; `ai.bots` always has AI_COUNT_MAX entries.
+    // Which loadout each unit built above is carrying, kept until the director
+    // exists to be told. `getChampionPresetFromLoadout` is one-way — a bot on
+    // 'random' has already become one particular champion by the time it is
+    // constructed — so this is the only moment the mapping is knowable, and the
+    // practice panel's editor needs it to open on a unit's real kit rather than
+    // on a default (see `MatchDirector.loadoutOf`).
+    const loadoutsInPlay: { unit: Champion; loadout: ChampionLoadout }[] = [
+      { unit: this.player, loadout: pregameConfig.player },
+    ];
+
     for (let i = 0; i < pregameConfig.ai.count; i++) {
       const botLoadout = pregameConfig.ai.bots[i];
-      this.objectManager.addObject(
-        new AIChampion({
-          game: this,
-          position: this.randomSpawnPoint(),
-          preset: getChampionPresetFromLoadout(botLoadout),
-          // Re-resolving the same loadout on every respawn is what makes a
-          // bot configured with a fixed champion keep that identity across
-          // deaths, while a bot left on 'random' keeps re-rolling exactly as
-          // it always has (getChampionPresetFromLoadout falls through to
-          // getChampionPresetRandom for 'random').
-          presetFactory: () => getChampionPresetFromLoadout(botLoadout),
-          autoMove: pregameConfig.ai.autoMove,
-          autoAttack: pregameConfig.ai.autoAttack,
-          autoCast: pregameConfig.ai.autoCast,
-        })
-      );
+      const bot = new AIChampion({
+        game: this,
+        position: this.randomSpawnPoint(),
+        preset: getChampionPresetFromLoadout(botLoadout),
+        // Re-resolving the same loadout on every respawn is what makes a
+        // bot configured with a fixed champion keep that identity across
+        // deaths, while a bot left on 'random' keeps re-rolling exactly as
+        // it always has (getChampionPresetFromLoadout falls through to
+        // getChampionPresetRandom for 'random').
+        presetFactory: () => getChampionPresetFromLoadout(botLoadout),
+        autoMove: pregameConfig.ai.autoMove,
+        autoAttack: pregameConfig.ai.autoAttack,
+        autoCast: pregameConfig.ai.autoCast,
+      });
+      this.objectManager.addObject(bot);
+      loadoutsInPlay.push({ unit: bot, loadout: botLoadout });
     }
 
     // anything reading `isAllied` needs this.player, so these come after it
@@ -208,6 +223,7 @@ export default class Game {
     // Re-derives the same numbers line 114 already wrote, so this changes no
     // behaviour; it only tells the director what the match started with.
     this.director.setRules(pregameConfig.rules);
+    for (const { unit, loadout } of loadoutsInPlay) this.director.seedLoadout(unit, loadout);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();

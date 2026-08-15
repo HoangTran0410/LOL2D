@@ -33,15 +33,54 @@ describe('MatchDirector roster', () => {
     expect(bot.behaviour).toEqual({ autoMove: false, autoAttack: true, autoCast: true });
   });
 
-  it('a new bot is not in the world until the paused match ticks again', () => {
+  it('lists a new bot at once, before the paused match has ticked', () => {
     const { context: ctx, game } = context();
     const director = new MatchDirector(ctx);
 
     director.addBot(DEFAULT_CHAMPION_LOADOUT);
-    expect(director.roster()).toHaveLength(1);
+
+    // The panel that calls `addBot` holds the match paused, so the flush that
+    // moves the bot from `_objectToBeAdd` into `objects` cannot run until the
+    // player closes it. A roster built from `objects` alone therefore did not
+    // change as the player pressed "Thêm bot" — it showed them the pause rather
+    // than their own edit, which is the exact argument the removal case already
+    // makes below. Mirrored here.
+    expect(director.roster()).toHaveLength(2);
+    expect(game.objectManager.objects).toHaveLength(1);
 
     game.objectManager.update();
     expect(director.roster()).toHaveLength(2);
+    expect(game.objectManager.objects).toHaveLength(2);
+  });
+
+  it('caps a paused session too, where no tick ever moves a bot into the world', () => {
+    const { context: ctx } = context();
+    const director = new MatchDirector(ctx);
+
+    let added = 0;
+    for (let i = 0; i < AI_COUNT_MAX + 15; i++) {
+      if (director.addBot(DEFAULT_CHAMPION_LOADOUT)) added++;
+    }
+
+    // The whole of a practice-panel session runs between two ticks. Counting
+    // only the units the sweep had already delivered made `AI_COUNT_MAX`
+    // unreachable here: 25 presses returned 25 bots and all of them arrived at
+    // once on close.
+    expect(added).toBe(AI_COUNT_MAX);
+    expect(director.roster().filter(entry => !entry.isPlayer)).toHaveLength(AI_COUNT_MAX);
+  });
+
+  it('drops a queued bot that is removed before it ever reaches the world', () => {
+    const { context: ctx, game } = context();
+    const director = new MatchDirector(ctx);
+    const bot = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+
+    director.removeBot(bot);
+
+    expect(director.roster()).toHaveLength(1);
+    game.objectManager.update();
+    game.objectManager.update();
+    expect(director.roster()).toHaveLength(1);
   });
 
   it('removeBot marks the unit and it leaves on the next tick', () => {

@@ -40,10 +40,12 @@ import {
   AI_COUNT_MAX,
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
+  DEFAULT_CHAMPION_LOADOUT,
   toMatchRules,
 } from './config/PregameConfig';
 import type { ChampionLoadout, MatchRules, MatchRulesConfig } from './config/PregameConfig';
 import { getChampionPresetFromLoadout } from './preset';
+import type GameObject from './gameObject/GameObject';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
 import type Monster from './gameObject/attackableUnits/Monster';
 
@@ -107,7 +109,65 @@ export default class MatchDirector {
    */
   private _rules: MatchRulesConfig = { cooldownReductionPercent: CDR_PERCENT_MIN, manaFree: false };
 
+  /**
+   * Which `ChampionLoadout` each unit is currently carrying.
+   *
+   * A unit does not remember this on its own and cannot be asked: by the time
+   * `getChampionPresetFromLoadout` has run, a loadout is seven resolved spell
+   * classes and an avatar, and `'random'` — the default for the player and
+   * every bot — has already collapsed into one particular champion. So
+   * `Champion` → `ChampionLoadout` is not recoverable by inspection; a bot on
+   * `'random'` that spawned as Yasuo would read back as "the Yasuo loadout",
+   * which is a different match setting from the one the player chose.
+   *
+   * A `WeakMap` rather than a field on `Champion` because this is the *panel's*
+   * bookkeeping, not the unit's: nothing in the simulation reads it, and a bot
+   * swept off the roster must not be kept alive by the director's own record of
+   * it.
+   */
+  private readonly loadouts = new WeakMap<Champion, ChampionLoadout>();
+
   constructor(private readonly game: MatchDirectorContext) {}
+
+  /**
+   * The derived rules every spell reads at cast time, exposed read-only.
+   *
+   * `getRules()` is the *editable* view (percentages, what the Trận đấu tab's
+   * slider binds to); this is the applied one (`{ cooldownMultiplier,
+   * manaFree }`), which is what a spell description needs to quote the
+   * cooldown and mana cost this match will actually charge. The loadout editor
+   * takes exactly this type — see `RosterTab.vue`, which is why the getter
+   * exists at all rather than the tab reaching for `game.matchRules` past the
+   * director.
+   */
+  get matchRules(): MatchRules {
+    return this.game.matchRules;
+  }
+
+  /**
+   * Records what a unit `Game` built for itself is carrying, so the panel opens
+   * on the unit's real kit. `addBot` and `applyLoadout` do this on their own;
+   * this is only for the player and the bots that existed before the director
+   * did (`Game`'s constructor builds them ~60 lines before it builds this).
+   */
+  seedLoadout(unit: Champion, loadout: ChampionLoadout): void {
+    this.loadouts.set(unit, loadout);
+  }
+
+  /**
+   * What `unit` is carrying, for an editor that has to open on the current kit
+   * rather than on a default.
+   *
+   * Falls back to `DEFAULT_CHAMPION_LOADOUT` — never `undefined` — for a unit
+   * nobody recorded: a match booted by something other than `Game` (a test
+   * bench, a future scenario loader) still has to be editable, and "a random
+   * champion" is the honest description of a unit the director was never told
+   * about. Returning `undefined` would have pushed that same decision into
+   * every caller, where it would have been made differently each time.
+   */
+  loadoutOf(unit: Champion): ChampionLoadout {
+    return this.loadouts.get(unit) ?? DEFAULT_CHAMPION_LOADOUT;
+  }
 
   /**
    * The player first, then every live bot in spawn order. One definition of
@@ -125,10 +185,23 @@ export default class MatchDirector {
   }
 
   /**
-   * Live bots, in spawn order. `toRemove` units are already gone as far as the
-   * panel is concerned: the sweep that deletes them cannot run until the match
-   * unpauses, and a roster still listing a bot the player just removed would be
-   * showing them the pause rather than their own edit.
+   * Every bot this match has, in spawn order — which is not the same set as
+   * "every bot the object manager has finished processing", and the difference
+   * is the whole of what the panel means by a roster.
+   *
+   * `toRemove` units are already gone as far as the panel is concerned: the
+   * sweep that deletes them cannot run until the match unpauses, and a roster
+   * still listing a bot the player just removed would be showing them the pause
+   * rather than their own edit.
+   *
+   * Queued units are already *here* for exactly the same reason, and leaving
+   * them out was a real bug rather than a nicety. `addObject` only pushes to
+   * `_objectToBeAdd`, and the flush is in `ObjectManager.update()`, which
+   * cannot run while the panel that calls `addBot` holds the match paused. So a
+   * roster built from `objects` alone never changed as the player pressed "Thêm
+   * bot" — and worse, `addBot`'s `AI_COUNT_MAX` guard reads this method, so the
+   * cap was unreachable too: 25 presses in one paused session all returned a
+   * bot, and all 25 arrived at once on close. Measured, not reasoned about.
    */
   bots(): AIChampion[] {
     // A hand-rolled loop rather than `objects.filter((o): o is AIChampion => …)`
@@ -138,9 +211,14 @@ export default class MatchDirector {
     // gets a look in and the result comes back as `GameObject[]`. The narrowing
     // is real, so the alternative would have been a cast asserting it.
     const bots: AIChampion[] = [];
-    for (const object of this.game.objectManager.objects) {
-      if (object instanceof AIChampion && !object.toRemove) bots.push(object);
-    }
+    const collect = (objects: GameObject[]): void => {
+      for (const object of objects) {
+        if (object instanceof AIChampion && !object.toRemove) bots.push(object);
+      }
+    };
+    collect(this.game.objectManager.objects);
+    // Second, so spawn order still reads oldest-first across the join.
+    collect(this.game.objectManager._objectToBeAdd);
     return bots;
   }
 
@@ -149,8 +227,9 @@ export default class MatchDirector {
    * the pregame screen enforces — hence the nullable return: the cap is real
    * and a caller that cannot see it would silently drop the player's click.
    *
-   * The bot enters the world on the next unpaused tick; a caller that needs it
-   * in `roster()` right away is asking the wrong question (see the file
+   * The bot is on the roster immediately and in the *world* on the next
+   * unpaused tick — two different things, and `bots()` explains why it counts
+   * both. Nothing it does is visible on the canvas until then (see the file
    * comment). `presetFactory` closes over the same loadout so the bot's
    * identity survives its own deaths — a bot the player configured as Zed
    * comes back as Zed, while one left on 'random' keeps re-rolling exactly as
@@ -171,6 +250,7 @@ export default class MatchDirector {
       presetFactory: () => getChampionPresetFromLoadout(loadout),
     });
     this.game.objectManager.addObject(bot);
+    this.loadouts.set(bot, loadout);
     return bot;
   }
 
@@ -207,6 +287,9 @@ export default class MatchDirector {
     unit.applyPreset(getChampionPresetFromLoadout(loadout));
     unit.stats.health.baseValue = unit.stats.maxHealth.value;
     unit.stats.mana.baseValue = unit.stats.maxMana.value;
+    // For the player as readily as for a bot: the editor has to reopen on
+    // whatever it last committed, whoever it was committed to.
+    this.loadouts.set(unit, loadout);
 
     if (unit instanceof AIChampion) {
       unit.setPresetFactory(() => getChampionPresetFromLoadout(loadout));
