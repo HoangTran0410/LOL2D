@@ -28,6 +28,17 @@ const hurtable = (): AttackableUnit => {
 };
 
 describe('Invulnerable', () => {
+  // It shipped once wearing `buff_stasis`, the Zhonya's hourglass. `Stasis`
+  // exists in this game and means something else entirely — golden, cannot
+  // act, cannot be targeted — so the buff bar was naming the wrong mechanic.
+  // `hudState.ts:173` skips any buff with no image, which is how this one
+  // stays out of the bar; the ring in `draw()` is the indicator instead.
+  it('wears no icon, so it cannot be mistaken for another mechanic', () => {
+    const unit = hurtable();
+    const buff = new Invulnerable(600000, unit, unit);
+    expect(buff.image).toBeFalsy();
+  });
+
   it('eats all damage — and the same unit without it does not', () => {
     const control = hurtable();
     control.takeDamage(40);
