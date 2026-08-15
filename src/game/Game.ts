@@ -18,6 +18,7 @@ import {
 import { loadPregameConfig, toMatchRules, type MatchRules } from './config/PregameConfig';
 import ObjectManager from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
+import MatchDirector from './MatchDirector';
 import NavigationSystem from './nav/NavigationSystem';
 import { drawNavDebug } from './nav/NavDebugOverlay';
 import EventManager from '../managers/EventManager';
@@ -77,13 +78,25 @@ export default class Game {
   touchControls!: TouchControls;
 
   /**
-   * Cooldown reduction and URF, resolved once from the pregame config at
+   * Every mutation of this match once it is running — roster, world, rules —
+   * goes through here, so the HUD never reaches into `objectManager` or
+   * `minionSpawner` on its own. Nothing in this constructor uses it; it is the
+   * entry point for changes made *during* the match. See `MatchDirector`'s
+   * file comment.
+   */
+  director!: MatchDirector;
+
+  /**
+   * Cooldown reduction and URF, resolved from the pregame config at
    * construction. `Spell.ts` reads this off `owner.game.matchRules` — see
    * `Spell.applyMatchRules` — rather than this class pushing the numbers into
    * every spell it creates, so a spell built at any point in a match (a
    * respawn's fresh kit, a champion swap) picks the same rules up on its own.
-   * Fixed for the whole match: these are pregame settings, not a mid-match
-   * toggle, so nothing here needs to react to a later change.
+   *
+   * Not fixed for the match any more: the practice panel retunes them through
+   * `director.setRules()`, which *mutates this object in place* for exactly the
+   * reason above — every spell already holds this reference, so replacing it
+   * would leave all of them reading the old numbers.
    */
   matchRules!: MatchRules;
 
@@ -183,6 +196,18 @@ export default class Game {
     this.spawnTurrets();
     // the spawner reads teams off the fountains, so it comes after them
     this.minionSpawner = new MinionSpawner(this);
+
+    // Last: it reads the roster, the spawner and the rules, so all three have
+    // to exist.
+    this.director = new MatchDirector(this);
+    // The director keeps the panel's view of the rules as percentages, and it
+    // starts at "nobody has retuned this match". `matchRules` above came from
+    // `pregameConfig.rules`, so without this a match booted at 40% CDR would
+    // open the panel showing 0% — and the player's first nudge of the slider
+    // would silently reset the match to whatever the slider was showing.
+    // Re-derives the same numbers line 114 already wrote, so this changes no
+    // behaviour; it only tells the director what the match started with.
+    this.director.setRules(pregameConfig.rules);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();

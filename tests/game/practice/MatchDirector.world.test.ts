@@ -1,7 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import MatchDirector from '../../../src/game/MatchDirector';
 import Spell from '../../../src/game/gameObject/Spell';
-import { CDR_PERCENT_MAX, CDR_PERCENT_MIN } from '../../../src/game/config/PregameConfig';
+import {
+  CDR_PERCENT_MAX,
+  CDR_PERCENT_MIN,
+  DEFAULT_PREGAME_CONFIG,
+  sanitizePregameConfig,
+  toMatchRules,
+} from '../../../src/game/config/PregameConfig';
 import { context } from './helpers';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -173,6 +179,82 @@ describe('MatchDirector rules', () => {
    * a spell built long before the player touched the panel runs the new rule.
    * The spell here is built first, deliberately.
    */
+  /**
+   * Why `Game` *must* call `setRules(pregameConfig.rules)` right after building
+   * the director, and why leaving it out is not a cosmetic bug: the director's
+   * own default is a match nobody retuned, so an unseeded director sitting on a
+   * 40%-CDR match reports 0%. The panel would open on a lie, and the player's
+   * first nudge of the slider would push that lie into `matchRules` and
+   * genuinely reset the match.
+   */
+  it('an unseeded director does not know what the match was booted with', () => {
+    const { context: ctx } = context();
+    ctx.matchRules = toMatchRules({ cooldownReductionPercent: 40, manaFree: true });
+
+    const director = new MatchDirector(ctx);
+
+    expect(ctx.matchRules.cooldownMultiplier).toBeCloseTo(0.6);
+    expect(director.getRules()).toEqual({
+      cooldownReductionPercent: CDR_PERCENT_MIN,
+      manaFree: false,
+    });
+  });
+
+  /**
+   * The other half of that seed: it has to be free. `Game` already derived
+   * `matchRules` from the same `pregameConfig.rules` before the director
+   * existed, so seeding must land on exactly the numbers already there — two
+   * clamps that disagreed (the director rounds in `clampPercent`, the config
+   * rounds in `clampInt`) would silently retune the match at boot.
+   */
+  it('seeding from the config the match booted with changes nothing about it', () => {
+    for (const percent of [CDR_PERCENT_MIN, 1, 25, 40, 89, CDR_PERCENT_MAX, 999, -5]) {
+      const { context: ctx } = context();
+      // Through the sanitizer, because that is the only shape `Game` ever sees:
+      // `loadPregameConfig` hands it nothing else.
+      const config = sanitizePregameConfig({
+        rules: { cooldownReductionPercent: percent, manaFree: true },
+      });
+      ctx.matchRules = toMatchRules(config.rules);
+      const asBooted = { ...ctx.matchRules };
+
+      new MatchDirector(ctx).setRules(config.rules);
+
+      expect(ctx.matchRules).toEqual(asBooted);
+    }
+  });
+
+  it('a seeded director opens on the rules the match is actually running', () => {
+    const { context: ctx } = context();
+    const config = sanitizePregameConfig({
+      rules: { cooldownReductionPercent: 40, manaFree: true },
+    });
+    ctx.matchRules = toMatchRules(config.rules);
+
+    const director = new MatchDirector(ctx);
+    director.setRules(config.rules);
+
+    expect(director.getRules()).toEqual({ cooldownReductionPercent: 40, manaFree: true });
+    // The panel's percentages and the numbers the match is actually casting at
+    // have to be the same statement in two units, or the panel is lying about
+    // a match it can also retune.
+    expect(toMatchRules(director.getRules())).toEqual(ctx.matchRules);
+  });
+
+  /** The default config seeds to the untouched match, i.e. today's behaviour. */
+  it('seeding a default config leaves the no-rules match alone', () => {
+    const { context: ctx } = context();
+    const director = new MatchDirector(ctx);
+
+    director.setRules(DEFAULT_PREGAME_CONFIG.rules);
+
+    expect(director.getRules()).toEqual({
+      cooldownReductionPercent: CDR_PERCENT_MIN,
+      manaFree: false,
+    });
+    expect(ctx.matchRules).toEqual({ cooldownMultiplier: 1, manaFree: false });
+  });
+
   it('a spell built before the change reports the new cooldown and cost', () => {
     const { context: ctx, player } = context();
     player.applyPreset({ name: 'Bench', spells: [BenchSpell] });
