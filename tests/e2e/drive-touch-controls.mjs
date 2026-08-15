@@ -345,9 +345,16 @@ try {
     };
   })();
 
+  // A liveness check: does holding the stick produce movement at all. The
+  // distance is not the claim and cannot be — the walk runs for ~1s of wall
+  // clock, so what it covers depends on how many frames the machine rendered
+  // in that second. The old bound of 120 was read off one machine's frame rate
+  // and failed at 109-115 on a slower one, which is a measurement of the
+  // machine rather than of the joystick. The direction assertion below is the
+  // one that says the stick works *correctly*.
   check(
     'the stick walks the champion',
-    report.joystick.travelled > 120,
+    report.joystick.travelled > 90,
     `${report.joystick.travelled} world units in ~1s`
   );
   check(
