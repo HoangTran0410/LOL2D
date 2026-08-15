@@ -142,11 +142,13 @@ export class ChoGath_R_Growth extends StatAmp {
     // the tally, under the model: above it belongs to the health bar
     noStroke();
     textAlign(CENTER, CENTER);
+    // Overlay, not world — see Camera.constantSize.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
     fill(30, 8, 12, 185);
-    rect(-24, radius + 8, 48, 23, 6);
+    rect(-24 * k, radius + 8 * k, 48 * k, 23 * k, 6 * k);
     fill(255, 228, 205, 245);
-    textSize(17);
-    text(String(n), 0, radius + 20);
+    textSize(17 * k);
+    text(String(n), 0, radius + 20 * k);
     pop();
   }
 }

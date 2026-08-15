@@ -301,8 +301,11 @@ export default class FogOfWar {
     rRing: number
   ): { x: number; y: number; r: number; gradient: CanvasGradient } {
     const pos = this.game.camera.worldToScreen(x, y);
-    const radius = r * this.game.camera.scale;
-    const innerR = max(0, radius - rRing * this.game.camera.scale);
+    // `currentScale`, not `scale`: the latter is the target the camera is
+    // lerping toward, so reading it makes the fog snap to a new zoom while the
+    // world is still sliding into it.
+    const radius = r * this.game.camera.currentScale;
+    const innerR = max(0, radius - rRing * this.game.camera.currentScale);
     const gradient = this.getRadialGradient(innerR, radius);
 
     return { x: pos.x, y: pos.y, r: radius, gradient };

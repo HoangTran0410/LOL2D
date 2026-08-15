@@ -211,10 +211,13 @@ export default class Champion extends AttackableUnit {
     let maxMana = this.stats.maxMana.value;
 
     push();
-    let borderWidth = 3,
-      barWidth = 125,
-      barHeight = 17,
-      manaHeight = 5;
+    // Overlay, not world: the whole frame — bar, ticks, buff icons and their
+    // text — compensates for the camera scale together. See Camera.constantSize.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
+    let borderWidth = 3 * k,
+      barWidth = 125 * k,
+      barHeight = 17 * k,
+      manaHeight = 5 * k;
     const healthContainerW = barWidth - barHeight;
     // The bar is a fixed frame: a shield is a share of it, never an extension of
     // it. Growing the frame made a heavily shielded champion bar sprawl across the
@@ -230,7 +233,7 @@ export default class Champion extends AttackableUnit {
     const shieldOverflows = this.shieldAmount > maxHealth;
     const topleft = {
       x: pos.x - frameWidth / 2,
-      y: pos.y - size / 2 - barHeight - 15,
+      y: pos.y - size / 2 - barHeight - 15 * k,
     };
 
     fill(2, 15, 21, alpha);
@@ -244,8 +247,8 @@ export default class Champion extends AttackableUnit {
     );
 
     fill(242, 242, 242, alpha);
-    textSize(12);
-    text(this.score, topleft.x + 3, topleft.y + 12);
+    textSize(12 * k);
+    text(this.score, topleft.x + 3 * k, topleft.y + 12 * k);
 
     noStroke();
 
@@ -256,7 +259,7 @@ export default class Champion extends AttackableUnit {
         ? [67, 196, 29, alpha]
         : [196, 67, 29, alpha]
     );
-    const healthRowH = barHeight - manaHeight - 1;
+    const healthRowH = barHeight - manaHeight - 1 * k;
     rect(topleft.x + barHeight, topleft.y, healthW, healthRowH);
 
     if (shieldW > 0) {
@@ -267,7 +270,7 @@ export default class Champion extends AttackableUnit {
       // flagged instead of drawn past the end.
       if (shieldOverflows) {
         fill(255, 246, 200, alpha);
-        rect(topleft.x + barHeight + healthContainerW - 2, topleft.y, 2, healthRowH);
+        rect(topleft.x + barHeight + healthContainerW - 2 * k, topleft.y, 2 * k, healthRowH);
       }
     }
 
@@ -279,7 +282,7 @@ export default class Champion extends AttackableUnit {
     strokeWeight(1);
     for (let mark = tickStep; mark < maxHealth; mark += tickStep) {
       const tickX = topleft.x + barHeight + (mark / maxHealth) * healthContainerW;
-      line(tickX, topleft.y + 1, tickX, topleft.y + healthRowH - 1);
+      line(tickX, topleft.y + 1 * k, tickX, topleft.y + healthRowH - 1 * k);
     }
     noStroke();
 
@@ -288,7 +291,7 @@ export default class Champion extends AttackableUnit {
     rect(topleft.x + barHeight, topleft.y + barHeight - manaHeight, manaW, manaHeight);
 
     push();
-    let x = topleft.x + 10;
+    let x = topleft.x + 10 * k;
     if (alpha < 255) tint(255, alpha);
     // One icon per kind of buff with a stack count, not one per instance:
     // Veigar Q can hold hundreds of StatAmp stacks, which used to draw hundreds
@@ -305,16 +308,16 @@ export default class Champion extends AttackableUnit {
     }
 
     for (const { image: buffImage, count } of buffCounts.values()) {
-      image(AssetManager.renderable(buffImage), x, topleft.y - 13, 20, 20);
+      image(AssetManager.renderable(buffImage), x, topleft.y - 13 * k, 20 * k, 20 * k);
       if (count > 1) {
         noStroke();
         fill(255, alpha);
         textAlign(RIGHT, BOTTOM);
-        textSize(10);
-        text(count, x + 10, topleft.y - 3);
+        textSize(10 * k);
+        text(count, x + 10 * k, topleft.y - 3 * k);
         textAlign(LEFT, BASELINE);
       }
-      x += 20;
+      x += 20 * k;
     }
     pop();
 
@@ -322,12 +325,12 @@ export default class Champion extends AttackableUnit {
       noStroke();
       fill(200);
       textAlign(CENTER, CENTER);
-      textSize(13);
+      textSize(13 * k);
       if (this.deathData) {
         text(
           `Hồi Sinh Sau ${~~(this.deathData.reviveAfter / 1000)}...`,
           pos.x,
-          topleft.y + barHeight + 8
+          topleft.y + barHeight + 8 * k
         );
       }
     } else {
@@ -343,8 +346,8 @@ export default class Champion extends AttackableUnit {
         noStroke();
         fill(200);
         textAlign(CENTER, CENTER);
-        textSize(13);
-        text(statusString, pos.x, topleft.y + barHeight + 8);
+        textSize(13 * k);
+        text(statusString, pos.x, topleft.y + barHeight + 8 * k);
       }
     }
     pop();

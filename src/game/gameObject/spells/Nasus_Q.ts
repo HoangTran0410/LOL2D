@@ -171,13 +171,16 @@ export class Nasus_Q_Object extends SpellObject {
     // --- the tally ---------------------------------------------------------
     // below the unit: the health bar and buff icons already own the space above
     push();
-    const ty = this.targetPosition.y + this.targetSize * 0.6 + 16 + t * 10;
+    // Overlay, not world — see Camera.constantSize. The plate and its number
+    // compensate together, or the digits float off the plate at a small scale.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
+    const ty = this.targetPosition.y + this.targetSize * 0.6 + (16 + t * 10) * k;
     textAlign(CENTER, CENTER);
     noStroke();
     fill(20, 12, 0, 150 * fade);
-    rect(this.targetPosition.x - 24, ty - 10, 48, 20, 5);
+    rect(this.targetPosition.x - 24 * k, ty - 10 * k, 48 * k, 20 * k, 5 * k);
     fill(255, 225, 165, 245 * fade);
-    textSize(15 + 7 * (1 - Math.min(1, t * 4)));
+    textSize((15 + 7 * (1 - Math.min(1, t * 4))) * k);
     text(`Q ${this.stacks}`, this.targetPosition.x, ty);
     pop();
   }

@@ -297,7 +297,8 @@ export default class Turret extends AttackableUnit {
     noStroke();
     fill(190, 190, 200, 200);
     textAlign(CENTER, CENTER);
-    textSize(13);
+    // Overlay, not world — see Camera.constantSize.
+    textSize(13 * (this.game?.camera?.constantSize?.(1) ?? 1));
     text(
       `Xây lại sau ${Math.ceil((this.deathData?.reviveAfter ?? 0) / 1000)}s`,
       pos.x,
@@ -310,8 +311,11 @@ export default class Turret extends AttackableUnit {
   drawHealthBar() {
     const pos = this.position;
     const size = this.stats.size.value;
-    const w = 84;
-    const h = 7;
+    // Overlay, not world: the bar and its text compensate together, so a
+    // turret's health reads the same on a phone as on a desktop.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
+    const w = 84 * k;
+    const h = 7 * k;
     const x = pos.x - w / 2;
     const y = pos.y - size * 0.75;
     const percent = Math.max(0, this.stats.health.value / this.stats.maxHealth.value);
@@ -319,13 +323,13 @@ export default class Turret extends AttackableUnit {
     push();
     noStroke();
     fill(12, 14, 18, 220);
-    rect(x - 2, y - 2, w + 4, h + 4);
+    rect(x - 2 * k, y - 2 * k, w + 4 * k, h + 4 * k);
     fill(220, 170, 60);
     rect(x, y, w * percent, h);
     fill(200, 200, 210);
     textAlign(CENTER, CENTER);
-    textSize(11);
-    text(`${~~this.stats.health.value} / ${~~this.stats.maxHealth.value}`, pos.x, y - 9);
+    textSize(11 * k);
+    text(`${~~this.stats.health.value} / ${~~this.stats.maxHealth.value}`, pos.x, y - 9 * k);
     pop();
   }
 

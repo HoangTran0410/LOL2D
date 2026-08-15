@@ -47,7 +47,9 @@ export default class CombatText extends SpellObject {
     stroke(strokeColor);
     fill(colorAlpha);
     textStyle(BOLD);
-    textSize(this.textSize);
+    // An overlay, not the world: a damage number is the same size on screen at
+    // every zoom. See Camera.constantSize.
+    textSize(this.textSize * (this.game?.camera?.constantSize?.(1) ?? 1));
     text(this.text, x, y);
     pop();
   }

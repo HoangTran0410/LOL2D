@@ -23,7 +23,7 @@ import type { PathAgentState } from './PathAgent';
 export interface NavDebugHost {
   navigation: NavigationSystem;
   objectManager: { objects: GameObject[] };
-  camera: { getBoundingBox(): Rectangle };
+  camera: { getBoundingBox(): Rectangle; constantSize?(px: number): number };
   player: AttackableUnit;
 }
 
@@ -131,6 +131,8 @@ function drawRoutes(host: NavDebugHost): void {
 function drawAgentStates(host: NavDebugHost): void {
   push();
   textAlign(CENTER, BOTTOM);
+  // Overlay, not world — see Camera.constantSize.
+  const k = host.camera?.constantSize?.(1) ?? 1;
   for (const object of host.objectManager.objects) {
     if (!(object instanceof AttackableUnit) || !object.pathAgent) continue;
 
@@ -138,12 +140,12 @@ function drawAgentStates(host: NavDebugHost): void {
     const [r, g, b] = STATE_COLOR[object.pathAgent.state];
     noStroke();
     fill(r, g, b, 255);
-    textSize(isPlayer ? 16 : 11);
+    textSize((isPlayer ? 16 : 11) * k);
     const size = object.animatedValues.displaySize;
     text(
       object.pathAgent.state,
       object.position.x,
-      object.position.y - size / 2 - (isPlayer ? 34 : 18)
+      object.position.y - size / 2 - (isPlayer ? 34 : 18) * k
     );
   }
   pop();

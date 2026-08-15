@@ -94,11 +94,13 @@ export class Veigar_Q_Power extends StatAmp {
     // the tally, under the model: above it belongs to the health bar
     noStroke();
     textAlign(CENTER, CENTER);
+    // Overlay, not world — see Camera.constantSize.
+    const k = this.game?.camera?.constantSize?.(1) ?? 1;
     fill(18, 6, 32, 185);
-    rect(-24, radius + 4, 48, 23, 6);
+    rect(-24 * k, radius + 4 * k, 48 * k, 23 * k, 6 * k);
     fill(220, 185, 255, 245);
-    textSize(17);
-    text(String(n), 0, radius + 16);
+    textSize(17 * k);
+    text(String(n), 0, radius + 16 * k);
     pop();
   }
 }
