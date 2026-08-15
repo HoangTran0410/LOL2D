@@ -113,6 +113,27 @@ describe('tap routing', () => {
   });
 });
 
+describe('teleport destination', () => {
+  // The destination the tap predicts, before any teleport happens.
+  it('the centre of the expanded map is the centre of the world', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    const target = minimap.worldAt({ x: 640, y: 360 });
+    expect(target.x).toBeCloseTo(MAP / 2, 6);
+    expect(target.y).toBeCloseTo(MAP / 2, 6);
+  });
+
+  it('a tap below centre is south of centre, not north of it', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    const size = 720 * EXPANDED_FRACTION;
+    const top = minimap.worldAt({ x: 640, y: (720 - size) / 2 });
+    const bottom = minimap.worldAt({ x: 640, y: (720 + size) / 2 });
+    expect(top.y).toBeCloseTo(0, 6);
+    expect(bottom.y).toBeCloseTo(MAP, 6);
+  });
+});
+
 describe('hitTest', () => {
   it('inside hits, one pixel outside does not', () => {
     expect(hitTest({ x: 13, y: 13 }, rect)).toBe(true);

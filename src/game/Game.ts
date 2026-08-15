@@ -446,9 +446,18 @@ export default class Game {
       case 'expand':
         this.minimap.expanded = true;
         return true;
-      case 'teleport':
+      case 'teleport': {
+        // Read the destination before collapsing — the transform is
+        // parameterised by the rect, and collapsing changes it.
+        const target = this.minimap.worldAt(point);
+        // `teleportTo` is the whole job: markDisplaced(), pathAgent.clear(),
+        // and both position and destination. It does not check terrain and
+        // does not need to — `TerrainMap.update()` pushes a body out of a wall
+        // on the next tick.
+        this.player.teleportTo(target.x, target.y);
         this.minimap.expanded = false;
         return true;
+      }
       case 'collapse':
         this.minimap.expanded = false;
         return false;

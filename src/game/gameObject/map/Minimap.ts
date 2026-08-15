@@ -2,6 +2,12 @@
  * The minimap: a fog-respecting map of the whole world, drawn on the canvas in
  * screen space beside the touch controls.
  *
+ * **A tap on the expanded map teleports the player there.** That makes this a
+ * practice tool, not a neutral HUD element — say so plainly, because a reader
+ * who assumes "minimap" means "the LoL minimap" will expect a move order. A
+ * move order from the minimap is a different gesture on the same surface and
+ * can be added later without redesigning anything here.
+ *
  * Geometry and hit-testing live at module level, free of p5 globals, so they
  * run in a plain node test with no canvas — the shape `TouchControls` already
  * uses. Only `draw()` and the buffer builder may touch p5.
@@ -169,6 +175,14 @@ export class Minimap {
   route(point: Point): MinimapAction {
     if (!this.expanded) return hitTest(point, this.rect) ? 'expand' : 'pass';
     return hitTest(point, this.rect) ? 'teleport' : 'collapse';
+  }
+
+  /**
+   * The world point a press lands on. Read *before* collapsing: the rect is
+   * what the transform is parameterised by, and collapsing changes it.
+   */
+  worldAt(point: Point): Point {
+    return minimapToWorld(point, this.rect, this.host.mapSize());
   }
 
   resize(width: number, height: number): void {
