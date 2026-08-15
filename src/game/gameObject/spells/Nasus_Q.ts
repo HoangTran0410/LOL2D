@@ -38,6 +38,17 @@ export default class Nasus_Q extends Spell {
     return this.stacks;
   }
 
+  /**
+   * The write side, for the practice panel. Whole stacks only and never
+   * negative — `stacks` is a count of strikes that landed, and the tooltip is
+   * rebuilt from it here exactly as `onSpellCast` rebuilds it.
+   */
+  setStackCount(count: number): boolean {
+    this.stacks = Math.max(0, Math.floor(count));
+    this.description = describe(this.stacks);
+    return true;
+  }
+
   checkCastCondition() {
     return !!this._findNearestEnemy();
   }

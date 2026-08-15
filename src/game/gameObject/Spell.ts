@@ -96,6 +96,18 @@ export default class Spell {
     return undefined;
   }
 
+  /**
+   * Set this spell's accumulated stacks. Absolute rather than incremental so
+   * one method covers both "give me 100" and "back to zero"; symmetric with
+   * `stackCount`, which is the read side.
+   *
+   * Default: this spell has none, so the call is refused rather than silently
+   * doing nothing. Returns whether the spell accepted it.
+   */
+  setStackCount(_count: number): boolean {
+    return false;
+  }
+
   get aimPoint(): p5.Vector {
     const aim = this._castContext?.cursorWorld ?? this.game.worldMouse;
     return createVector(aim.x, aim.y);
