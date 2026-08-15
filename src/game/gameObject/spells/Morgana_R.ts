@@ -9,7 +9,7 @@ import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 import Speedup from '../buffs/Speedup';
-import TrueSight from '../buffs/TrueSight';
+import { createReveal } from '../buffs/TrueSight';
 
 // Exported so the suite asserts the tether's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.
@@ -26,6 +26,8 @@ export const STUN_DURATION_MS = 1_500;
 export const SLOW_PERCENT = 0.2;
 export const SELF_HASTE_PERCENT = 0.2;
 export const MANA_COST = 100;
+/** Morgana's own reveal slot, so hers neither evicts nor is evicted by another spell's. */
+export const REVEAL_STACK_ID = 'morgana_r_reveal';
 
 type ShackleTarget = AttackableUnit;
 
@@ -80,7 +82,12 @@ export default class Morgana_R extends Spell {
     slow.percent = SLOW_PERCENT;
     target.addBuff(slow);
 
-    const reveal = new TrueSight(TETHER_DURATION_MS, this.owner, target);
+    const reveal = createReveal({
+      stackId: REVEAL_STACK_ID,
+      durationMs: TETHER_DURATION_MS,
+      source: this.owner,
+      target,
+    });
     target.addBuff(reveal);
 
     const mark = new Morgana_R_Tether(TETHER_DURATION_MS, this.owner, target);

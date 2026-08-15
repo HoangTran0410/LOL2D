@@ -4,8 +4,12 @@ import MissileSpellObject from '../MissileSpellObject';
 import Dash from '../buffs/Dash';
 import VectorUtils from '../../../utils/vector.utils';
 import TrailSystem from '../helpers/TrailSystem';
-import TrueSight from '../buffs/TrueSight';
+import { createReveal } from '../buffs/TrueSight';
 import { Rectangle } from '../../../libs/quadtree';
+
+/** Lee Sin's own reveal slot, so his neither evicts nor is evicted by another spell's. */
+export const REVEAL_STACK_ID = 'leesin_q_reveal';
+export const REVEAL_DURATION_MS = 1_000;
 
 export default class LeeSin_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
@@ -62,8 +66,14 @@ export default class LeeSin_Q extends Spell {
         this.enemyHit = enemy;
         enemy.takeDamage(hitDamage, this.owner);
 
-        const trueSightBuff = new TrueSight(1000, this.owner, enemy);
-        enemy.addBuff(trueSightBuff);
+        enemy.addBuff(
+          createReveal({
+            stackId: REVEAL_STACK_ID,
+            durationMs: REVEAL_DURATION_MS,
+            source: this.owner,
+            target: enemy,
+          })
+        );
 
         this.phase = 'Q2';
         this.image = LeeSin_Q.PHASES[this.phase].image;

@@ -16,12 +16,14 @@ export class TestVector {
   div(value: number) { this.x /= value; this.y /= value; return this; }
   normalize() { return this.setMag(1); }
   magSq() { return this.x * this.x + this.y * this.y; }
+  mag() { return Math.hypot(this.x, this.y); }
   setMag(value: number) {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > 0) this.mult(value / magnitude);
     return this;
   }
   dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
+  static add(a: TestVector, b: TestVector) { return new TestVector(a.x + b.x, a.y + b.y); }
   static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
   static dist(a: TestVector, b: TestVector) { return a.dist(b); }
 }

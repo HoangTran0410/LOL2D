@@ -72,7 +72,9 @@ describe('crowd-control buffs keep their own CC icon', () => {
     ['Zed_W.ts', "this.image = AssetManager.get('spell_zed_w2')"],
     ['Thresh_Q.ts', "tug.image = AssetManager.get('spell_thresh_q')"],
     ['Shaco_R.ts', "this.image = AssetManager.get('spell_shaco_r2')"],
-    ['Ashe_E.ts', "sight.image = AssetManager.get('spell_ashe_e')"],
+    // The reveal now goes through `createReveal`, so the art rides in as an
+    // option rather than as an assignment. Same override, same reason.
+    ['Ashe_E.ts', "image: AssetManager.get('spell_ashe_e')"],
     ['Yasuo_Q.ts', "buff.image = AssetManager.get('spell_yasuo_q1')"],
     ['Amumu_Q.ts', "this.dashBuff.image = AssetManager.get('spell_amumu_q')"],
   ];

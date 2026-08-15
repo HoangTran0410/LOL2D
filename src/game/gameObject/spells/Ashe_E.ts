@@ -5,8 +5,11 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
-import TrueSight from '../buffs/TrueSight';
+import { createReveal } from '../buffs/TrueSight';
 import TrailSystem from '../helpers/TrailSystem';
+
+/** Ashe's own reveal slot, so hers neither evicts nor is evicted by another spell's. */
+export const REVEAL_STACK_ID = 'ashe_e_reveal';
 
 export default class Ashe_E extends Spell {
   targetingMode = 'DIRECTION' as const;
@@ -79,10 +82,16 @@ export class Ashe_E_Object extends MissileSpellObject {
     for (const enemy of enemies) {
       this.revealedTargets.push(enemy);
 
-      const sight = new TrueSight(this.revealDuration, this.owner, enemy);
-      sight.visionRadius = this.revealVisionRadius;
-      sight.image = AssetManager.get('spell_ashe_e');
-      enemy.addBuff(sight);
+      enemy.addBuff(
+        createReveal({
+          stackId: REVEAL_STACK_ID,
+          durationMs: this.revealDuration,
+          source: this.owner,
+          target: enemy,
+          visionRadius: this.revealVisionRadius,
+          image: AssetManager.get('spell_ashe_e'),
+        })
+      );
 
       // a ping on the newly spotted enemy, so being revealed is visible
       const ping = new Ashe_E_Ping(this.owner);

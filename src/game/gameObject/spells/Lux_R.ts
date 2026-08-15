@@ -8,7 +8,7 @@ import Buff from '../Buff';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import TrueSight from '../buffs/TrueSight';
+import { createReveal } from '../buffs/TrueSight';
 import Flash from './Flash';
 import Ghost from './Ghost';
 import Heal from './Heal';
@@ -62,6 +62,8 @@ export const RANGE = 3_400;
 export const WIDTH = 200;
 export const DAMAGE = 30;
 export const REVEAL_DURATION_MS = 1_500;
+/** Lux's own reveal slot, so hers neither evicts nor is evicted by another spell's. */
+export const REVEAL_STACK_ID = 'lux_r_reveal';
 export const REVEAL_VISION_RADIUS = 150;
 export const VISION_LIFETIME_MS = 1_500;
 export const MANA_COST = 100;
@@ -214,10 +216,16 @@ export default class Lux_R extends Spell {
         target.teamId !== this.owner.teamId,
       onHit: target => {
         target.takeDamage(this.damage, this.owner);
-        const reveal = new TrueSight(REVEAL_DURATION_MS, this.owner, target);
-        reveal.visionRadius = REVEAL_VISION_RADIUS;
-        reveal.image = this.image;
-        target.addBuff(reveal);
+        target.addBuff(
+          createReveal({
+            stackId: REVEAL_STACK_ID,
+            durationMs: REVEAL_DURATION_MS,
+            source: this.owner,
+            target,
+            visionRadius: REVEAL_VISION_RADIUS,
+            image: this.image,
+          })
+        );
       },
     });
     this.game.objectManager.addObject(beam);
