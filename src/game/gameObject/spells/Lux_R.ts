@@ -14,7 +14,11 @@ import Ghost from './Ghost';
 import Heal from './Heal';
 import Ignite from './Ignite';
 import Lux_E, { Lux_E_Object } from './Lux_E';
-import BeamSpellObject, { type BeamGeometry } from '../spellObjects/BeamSpellObject';
+import BeamSpellObject, {
+  beamBoundingBox,
+  type BeamGeometry,
+} from '../spellObjects/BeamSpellObject';
+import type { Rectangle } from '../../../libs/quadtree';
 
 function hasSpells(unit: AttackableUnit): unit is AttackableUnit & { spells: Spell[] } {
   return 'spells' in unit && Array.isArray(unit.spells);
@@ -62,6 +66,61 @@ export const REVEAL_VISION_RADIUS = 150;
 export const VISION_LIFETIME_MS = 1_500;
 export const MANA_COST = 100;
 
+/**
+ * The beam the player actually sees, as a world object rather than as
+ * `castSpec.vfx`.
+ *
+ * `castSpec.vfx` is drawn from `Champion.draw()`, so it inherits the caster's
+ * visibility twice over: `ObjectManager.draw()` only reaches objects whose
+ * *own* display box is on camera, and `FogOfWar` clears `willDraw` on every
+ * unit the player cannot see. A 3400px beam hung off a 40px champion therefore
+ * vanished outright whenever Lux was off screen or in fog, while still doing
+ * its damage and stamping its reveal on the victim — measured on a real match:
+ * `LuxBeamEffect.draw` never ran, the player lost health, and the Lux R icon
+ * appeared on their bar with no beam ever painted.
+ *
+ * Out here it is culled by its own bounds and fog never touches it, which is
+ * how every other spell's effect in this game already behaves — they are all
+ * world objects, which is why only this one went missing. This is deliberately
+ * not a general rule for `castSpec.vfx`: Pantheon Q's and Varus Q's
+ * `ChargeRangeTelegraph` show where the *caster* is aiming, and hiding those
+ * along with a caster nobody can see is correct. The beam is the effect, not a
+ * telegraph of one, and only effects belong in the world.
+ */
+class Lux_R_Beam extends SpellObject {
+  private readonly effect: LuxBeamEffect;
+
+  constructor(
+    owner: SpellObject['owner'],
+    private readonly geometry: BeamGeometry,
+    phase: 'prepare' | 'release',
+    getProgress?: () => number
+  ) {
+    super(owner);
+    this.effect = new LuxBeamEffect(geometry, phase, getProgress);
+  }
+
+  update(deltaMs = deltaTime): void {
+    if (this.dropIfAttachmentLost()) return;
+    this.effect.update(deltaMs);
+    if (this.effect.complete) this.toRemove = true;
+  }
+
+  draw(): void {
+    this.effect.draw();
+  }
+
+  getDisplayBoundingBox(): Rectangle {
+    return beamBoundingBox(this.geometry, this);
+  }
+
+  /** Ends the beam now, for a cast that never reached its release. */
+  dispose(): void {
+    this.effect.dispose();
+    this.toRemove = true;
+  }
+}
+
 class Lux_R_Vision extends SpellObject {
   visionRadius = 250;
   private elapsedMs = 0;
@@ -92,6 +151,7 @@ export default class Lux_R extends Spell {
   private castElapsedMs = 0;
   private geometry?: BeamGeometry;
   private castLock?: Lux_R_CastLock;
+  private prepareBeam?: Lux_R_Beam;
   private sightObjects: Lux_R_Vision[] = [];
 
   get castSpec(): Readonly<CastSpec> {
@@ -105,14 +165,11 @@ export default class Lux_R extends Spell {
       // cast time is a wind-up on an effect that is already committed, so only
       // her dying takes it back.
       interrupts: SpellForm.INDEPENDENT,
+      // The cast bar only, on purpose. It hangs over Lux's head and means
+      // nothing without her, so inheriting her visibility is right. The beam
+      // does not — see `Lux_R_Beam`.
       vfx: {
         castStart: context => new CastBar(context, () => this.castElapsedMs / this.castTimeMs),
-        castLoop: context => new LuxBeamEffect(
-          this.beamGeometry(context),
-          'prepare',
-          () => this.castElapsedMs / this.castTimeMs
-        ),
-        release: context => new LuxBeamEffect(this.beamGeometry(context), 'release'),
       },
     };
   }
@@ -124,6 +181,19 @@ export default class Lux_R extends Spell {
     this.castLock.image = this.image;
     this.owner.addBuff(this.castLock);
     this.addBeamSight(this.geometry);
+
+    this.prepareBeam = new Lux_R_Beam(
+      this.owner,
+      this.geometry,
+      'prepare',
+      () => this.castElapsedMs / this.castTimeMs
+    );
+    // The wind-up is a telegraph of a cast still in progress, so it rides Lux:
+    // if she dies the beam never arrives and the lane must go with her. The
+    // release flash below does not, because by then the beam is already in the
+    // sky and out of her hands.
+    this.prepareBeam.attachTo(this.owner);
+    this.game.objectManager.addObject(this.prepareBeam);
   }
 
   onUpdate(): void {
@@ -132,6 +202,9 @@ export default class Lux_R extends Spell {
 
   onSpellCast(): void {
     if (!this.geometry) return;
+
+    this.endPrepareBeam();
+    this.game.objectManager.addObject(new Lux_R_Beam(this.owner, this.geometry, 'release'));
 
     const beam = new BeamSpellObject(this.owner, this.geometry, {
       candidateFilter: target =>
@@ -152,12 +225,14 @@ export default class Lux_R extends Spell {
 
   onCancel(): void {
     this.releaseCastLock();
+    this.endPrepareBeam();
     for (const sight of this.sightObjects) sight.toRemove = true;
     this.sightObjects = [];
   }
 
   onComplete(): void {
     this.releaseCastLock();
+    this.endPrepareBeam();
   }
 
   private beamGeometry(context: CastContext): BeamGeometry {
@@ -188,5 +263,10 @@ export default class Lux_R extends Spell {
   private releaseCastLock(): void {
     this.castLock?.deactivateBuff();
     this.castLock = undefined;
+  }
+
+  private endPrepareBeam(): void {
+    this.prepareBeam?.dispose();
+    this.prepareBeam = undefined;
   }
 }

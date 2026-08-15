@@ -21,6 +21,22 @@ interface BeamOptions {
   durationMs?: number;
 }
 
+/**
+ * The rectangle a beam occupies, padded by its half-width. Shared so anything
+ * that has to be culled by the beam rather than by its caster — the damage
+ * volume here, Lux R's visual — measures the same box.
+ */
+export const beamBoundingBox = (geometry: BeamGeometry, data: unknown): Rectangle => {
+  const padding = geometry.width / 2;
+  return new Rectangle({
+    x: Math.min(geometry.start.x, geometry.end.x) - padding,
+    y: Math.min(geometry.start.y, geometry.end.y) - padding,
+    w: Math.abs(geometry.end.x - geometry.start.x) + padding * 2,
+    h: Math.abs(geometry.end.y - geometry.start.y) + padding * 2,
+    data,
+  });
+};
+
 export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): boolean => {
   const dx = geometry.end.x - geometry.start.x;
   const dy = geometry.end.y - geometry.start.y;
@@ -82,16 +98,7 @@ export default class BeamSpellObject extends SpellObject {
   }
 
   getDisplayBoundingBox(): Rectangle {
-    const padding = this.geometry.width / 2;
-    const minX = Math.min(this.geometry.start.x, this.geometry.end.x) - padding;
-    const minY = Math.min(this.geometry.start.y, this.geometry.end.y) - padding;
-    return new Rectangle({
-      x: minX,
-      y: minY,
-      w: Math.abs(this.geometry.end.x - this.geometry.start.x) + padding * 2,
-      h: Math.abs(this.geometry.end.y - this.geometry.start.y) + padding * 2,
-      data: this,
-    });
+    return beamBoundingBox(this.geometry, this);
   }
 
   private queryCandidates(): Iterable<AttackableUnit> {

@@ -24,6 +24,7 @@ import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpell
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import CastBar from '../../../src/game/vfx/CastBar';
 import LuxBeamEffect from '../../../src/game/vfx/LuxBeamEffect';
+import { Rectangle } from '../../../src/libs/quadtree';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
@@ -66,12 +67,53 @@ const context = (caster: unknown): CastContext => Object.freeze({
   direction: Object.freeze({ x: 1, y: 0 }),
 });
 
+interface WorldObject {
+  willDraw?: boolean;
+  toRemove?: boolean;
+  getDisplayBoundingBox?: () => Rectangle;
+  draw?: () => void;
+}
+
+/**
+ * The world draw pass, as `ObjectManager.draw()` runs it: every live object
+ * whose *own* display bounding box is on camera and whose `willDraw` is still
+ * set. The caster is deliberately not in this list — she is off camera, and
+ * `FogOfWar` clears `willDraw` on every unit the player cannot see — because
+ * that is the frame the beam has to survive.
+ */
+const drawWorld = (objects: readonly WorldObject[], camera: Rectangle): void => {
+  for (const object of objects) {
+    if (object.toRemove || object.willDraw === false) continue;
+    if (!object.getDisplayBoundingBox?.().intersect(camera)) continue;
+    object.draw?.();
+  }
+};
+
+const beamOwner = (added: unknown[]) => ({
+  game: {
+    eventManager: { emit: vi.fn() },
+    objectManager: {
+      addObject: (object: unknown) => added.push(object),
+      queryObjects: () => [],
+    },
+  },
+  position: new TestVector(0, 0),
+  teamId: 'blue',
+  isDead: false,
+  canCast: true,
+  stopMovement: vi.fn(),
+  addBuff: (buff: { activateBuff(): void }) => buff.activateBuff(),
+  stats: { mana: { value: 200 }, health: { value: 100 } },
+});
+
 describe('Lux R', () => {
   beforeEach(() => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     vi.stubGlobal('p5', { Vector: TestVector });
-    for (const name of ['push', 'pop', 'noFill', 'stroke', 'strokeWeight']) {
+    const p5Globals =
+      ['push', 'pop', 'noFill', 'stroke', 'strokeWeight', 'noStroke', 'fill', 'rect'];
+    for (const name of p5Globals) {
       vi.stubGlobal(name, vi.fn());
     }
     vi.stubGlobal('line', vi.fn());
@@ -113,6 +155,36 @@ describe('Lux R', () => {
     release.update(450);
 
     expect(release.complete).toBe(true);
+  });
+
+  it('draws its beam from the world, so a caster nobody can see still shows one', () => {
+    const beamDraw = vi.spyOn(LuxBeamEffect.prototype, 'draw');
+    const added: WorldObject[] = [];
+    const owner = beamOwner(added);
+    const spell = new Lux_R(owner);
+
+    spell.press(context(owner));
+
+    // A screen at the far end of the beam: Lux stands at the origin, RANGE
+    // away, so she is off camera and in fog, and nothing on her body draws.
+    const camera = new Rectangle({ x: RANGE - 1_000, y: -450, w: 1_280, h: 900 });
+
+    beamDraw.mockClear();
+    drawWorld(added, camera);
+    expect(beamDraw).toHaveBeenCalled();
+
+    // and it is the world that draws it, not the champion: hanging it off both
+    // would paint the lane twice for anyone who can see her.
+    beamDraw.mockClear();
+    spell.drawVfx();
+    expect(beamDraw).not.toHaveBeenCalled();
+
+    vi.stubGlobal('deltaTime', CAST_TIME_MS);
+    spell.update();
+
+    beamDraw.mockClear();
+    drawWorld(added, camera);
+    expect(beamDraw).toHaveBeenCalled();
   });
 
   it('snapshots its beam and deals damage only after cast completion', () => {
@@ -168,6 +240,9 @@ describe('Lux R', () => {
     spell.drawVfx();
 
     expect(disposeCastBar).toHaveBeenCalledOnce();
+    // The release flash lives in the world now, not on the champion, so it is
+    // the world pass that paints it — see the beam-visibility test above.
+    drawWorld(added as WorldObject[], new Rectangle({ x: 0, y: -450, w: 1_280, h: 900 }));
     expect(releaseDraw).toHaveBeenCalled();
 
     const beam = added.find(
