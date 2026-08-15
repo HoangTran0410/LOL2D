@@ -36,8 +36,13 @@
  */
 import AIChampion from './gameObject/attackableUnits/AIChampion';
 import type Champion from './gameObject/attackableUnits/Champion';
-import { AI_COUNT_MAX } from './config/PregameConfig';
-import type { ChampionLoadout, MatchRules } from './config/PregameConfig';
+import {
+  AI_COUNT_MAX,
+  CDR_PERCENT_MAX,
+  CDR_PERCENT_MIN,
+  toMatchRules,
+} from './config/PregameConfig';
+import type { ChampionLoadout, MatchRules, MatchRulesConfig } from './config/PregameConfig';
 import { getChampionPresetFromLoadout } from './preset';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
 import type Monster from './gameObject/attackableUnits/Monster';
@@ -86,6 +91,22 @@ export interface MatchDirectorContext extends GameObjectRuntimeContext {
 }
 
 export default class MatchDirector {
+  private _jungleEnabled = true;
+
+  /**
+   * The panel's view of the rules, kept alongside `game.matchRules` rather than
+   * derived back out of it: `matchRules` holds the *derived* numbers (a 0.6
+   * multiplier), and inverting one into "40%" would be a second, subtly
+   * different definition of a mapping that already has exactly one
+   * (`toMatchRules`).
+   *
+   * It starts where `DEFAULT_PREGAME_CONFIG.rules` does, i.e. a match nobody
+   * has retuned. A `Game` booted from a config that *did* set a rule has to
+   * seed this by calling `setRules(config.rules)` — otherwise the panel would
+   * open showing 0% over a match running at 40%.
+   */
+  private _rules: MatchRulesConfig = { cooldownReductionPercent: CDR_PERCENT_MIN, manaFree: false };
+
   constructor(private readonly game: MatchDirectorContext) {}
 
   /**
@@ -202,7 +223,106 @@ export default class MatchDirector {
     if (flags.autoAttack !== undefined) bot._autoAttack = flags.autoAttack;
     if (flags.autoCast !== undefined) bot._autoCast = flags.autoCast;
   }
+
+  get jungleEnabled(): boolean {
+    return this._jungleEnabled;
+  }
+
+  /**
+   * Off marks every camp for the sweep and forgets them; on respawns the lot
+   * through `Game.spawnJungle()`, which stays the one definition of where a
+   * camp lives and what is in it.
+   *
+   * Setting it to what it already is does nothing — flipping "on" twice must
+   * not stack a second set of camps on the first, and this is the only guard
+   * against that: `spawnJungle` appends unconditionally.
+   *
+   * The director's own flag rather than `monsters.length > 0`, because an empty
+   * jungle is also what a match looks like ten minutes in with every camp
+   * cleared, and that must not read as "the player switched the jungle off".
+   */
+  set jungleEnabled(on: boolean) {
+    if (on === this._jungleEnabled) return;
+    this._jungleEnabled = on;
+
+    if (on) {
+      this.game.spawnJungle();
+      return;
+    }
+    for (const monster of this.game.monsters) monster.toRemove = true;
+    // Emptied here rather than left to a sweep: `Game.monsters` is the
+    // spawn-side list and nothing prunes it, so a jungle switched off and on
+    // again would otherwise carry every dead camp's corpse into the new list.
+    this.game.monsters.length = 0;
+  }
+
+  /** The spawner owns this flag; the director is a view of it, not a copy. */
+  get minionsEnabled(): boolean {
+    return this.game.minionSpawner.enabled;
+  }
+
+  /**
+   * Off stops the wave clock and clears the field; on restarts the clock from a
+   * full interval (`MinionSpawner` freezes its countdown rather than draining
+   * it) and leaves whatever is standing alone — the player asked for waves
+   * again, not for the field to be swept first.
+   *
+   * No `monsters.length = 0` counterpart here: the spawner prunes `toRemove`
+   * minions on its own update whether it is enabled or not, so the list empties
+   * itself on the first unpaused tick.
+   */
+  set minionsEnabled(on: boolean) {
+    this.game.minionSpawner.enabled = on;
+    if (on) return;
+    for (const minion of this.game.minionSpawner.minions) minion.toRemove = true;
+  }
+
+  /** A copy, so a caller editing the object it got back cannot retune the match. */
+  getRules(): MatchRulesConfig {
+    return { ...this._rules };
+  }
+
+  /**
+   * `Spell.ts` reads `game.matchRules` at cast time (`:320` for the cooldown
+   * multiplier, `:369` for `manaFree`) and never at construction, so this is
+   * the whole of applying a rule change mid-match: every spell already built,
+   * on every unit, picks it up on its next cast.
+   *
+   * Mutates the existing `matchRules` rather than replacing it. `Game` handed
+   * that reference to every spell as `spell.game.matchRules` before the panel
+   * ever opened; assigning a new object here would leave all of them reading
+   * the old one forever.
+   *
+   * The derived numbers come from `toMatchRules` — the same function the
+   * pregame screen uses — so there is exactly one definition of what a CDR
+   * percentage means. The clamp is repeated only because
+   * `getRules()` has to report the number the player will see clamped, and
+   * `toMatchRules` clamps privately on its way to a multiplier.
+   */
+  setRules(rules: MatchRulesConfig): void {
+    this._rules = {
+      cooldownReductionPercent: clampPercent(rules.cooldownReductionPercent),
+      manaFree: !!rules.manaFree,
+    };
+
+    const derived = toMatchRules(this._rules);
+    this.game.matchRules.cooldownMultiplier = derived.cooldownMultiplier;
+    this.game.matchRules.manaFree = derived.manaFree;
+  }
 }
+
+/**
+ * Same bounds and the same rounding the pregame screen's validator applies
+ * (`sanitizePregameConfig`), so a percentage typed into the panel and the same
+ * percentage typed into setup cannot mean two different matches. A junk value
+ * lands on `CDR_PERCENT_MIN`, i.e. no reduction, because a rules panel that
+ * silently applies `NaN` would leave every spell on a `NaN` cooldown.
+ */
+const clampPercent = (percent: number): number => {
+  const rounded = Math.round(percent);
+  if (!Number.isFinite(rounded)) return CDR_PERCENT_MIN;
+  return Math.min(CDR_PERCENT_MAX, Math.max(CDR_PERCENT_MIN, rounded));
+};
 
 const behaviourOf = (bot: AIChampion): BotBehaviour => ({
   autoMove: bot._autoMove,
