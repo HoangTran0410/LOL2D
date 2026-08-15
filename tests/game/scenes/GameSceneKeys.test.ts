@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import Game from '../../../src/game/Game';
+import InGameHUD from '../../../src/game/hud/InGameHUD';
 import GameScene from '../../../src/scenes/GameScene';
 import { createHudInteractions } from '../../../src/game/hud/hudInteractions';
 
@@ -13,7 +16,156 @@ import { createHudInteractions } from '../../../src/game/hud/hudInteractions';
  * `this.sceneManager` and `this.game` and nothing else, so no p5 canvas, no
  * DOM and no real `Game` are involved.
  */
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+describe('Game pause lifecycle', () => {
+  it('notifies the runtime once for each real pause state change', () => {
+    const onPauseChanged = vi.fn();
+    const game = { paused: false, onPauseChanged };
+
+    Game.prototype.pause.call(game as unknown as Game);
+    Game.prototype.pause.call(game as unknown as Game);
+    Game.prototype.unpause.call(game as unknown as Game);
+    Game.prototype.unpause.call(game as unknown as Game);
+
+    expect(onPauseChanged.mock.calls).toEqual([[true], [false]]);
+  });
+
+  it('wires the game pause callback to the scene runtime owner', () => {
+    const source = readFileSync('src/scenes/GameScene.ts', 'utf8');
+
+    expect(source).toContain('this.game.onPauseChanged = this._handleGamePause');
+    expect(source).toContain('this.game?.inGameHUD.setUpdatesPaused(paused)');
+  });
+});
+
+describe('GameScene paused runtime', () => {
+  const runtime = (scene: GameScene) => scene as unknown as {
+    _animationFrameId: number | null;
+    _handleGamePause?: (paused: boolean) => void;
+  };
+
+  it('stops both game loops while the modal owns pause', () => {
+    const clearTimeout = vi.fn();
+    const noLoop = vi.fn();
+    vi.stubGlobal('clearTimeout', clearTimeout);
+    vi.stubGlobal('noLoop', noLoop);
+    vi.stubGlobal('document', { hidden: false });
+    const scene = new GameScene({} as never);
+    const setUpdatesPaused = vi.fn();
+    scene.game = { paused: true, inGameHUD: { setUpdatesPaused } } as never;
+    runtime(scene)._animationFrameId = 42;
+
+    const handlePause = runtime(scene)._handleGamePause;
+    expect(handlePause).toBeTypeOf('function');
+    handlePause?.(true);
+
+    expect(clearTimeout).toHaveBeenCalledWith(42);
+    expect(runtime(scene)._animationFrameId).toBeNull();
+    expect(noLoop).toHaveBeenCalledOnce();
+    expect(setUpdatesPaused).toHaveBeenCalledWith(true);
+  });
+
+  it('resets both clocks before restarting after the modal closes', () => {
+    const p5Instance: Record<string, number> = {};
+    const loop = vi.fn();
+    vi.stubGlobal('document', { hidden: false });
+    vi.stubGlobal('performance', { now: () => 321 });
+    vi.stubGlobal('window', { p5: { instance: p5Instance } });
+    vi.stubGlobal('loop', loop);
+    const scene = new GameScene({} as never);
+    const setUpdatesPaused = vi.fn();
+    scene.game = { paused: false, inGameHUD: { setUpdatesPaused } } as never;
+    scene.updateLoop = vi.fn();
+
+    const handlePause = runtime(scene)._handleGamePause;
+    expect(handlePause).toBeTypeOf('function');
+    handlePause?.(false);
+
+    expect(p5Instance._lastRealFrameTime).toBe(321);
+    expect(p5Instance._lastTargetFrameTime).toBe(321);
+    expect(loop).toHaveBeenCalledOnce();
+    expect(scene.updateLoop).toHaveBeenCalledOnce();
+    expect(setUpdatesPaused).toHaveBeenCalledWith(false);
+  });
+
+  it('restarts p5 for the next scene when leaving through the paused panel', () => {
+    const loop = vi.fn();
+    vi.stubGlobal('loop', loop);
+    vi.stubGlobal('document', { hidden: false, removeEventListener: vi.fn() });
+    const scene = new GameScene({} as never);
+    scene.game = {
+      paused: true,
+      onPauseChanged: vi.fn(),
+      spellInputController: { cancelAll: vi.fn() },
+      destroy: vi.fn(),
+    } as never;
+    scene.dom = { style: {} } as HTMLElement;
+    scene.canvas = { remove: vi.fn() };
+
+    scene.exit();
+
+    expect(loop).toHaveBeenCalledOnce();
+  });
+});
+
+describe('paused HUD polling', () => {
+  it('cancels while paused and restarts only once on resume', () => {
+    const cancelAnimationFrame = vi.fn();
+    vi.stubGlobal('cancelAnimationFrame', cancelAnimationFrame);
+    const startUpdateLoop = vi.fn(function (this: { _rafId: number | null }) {
+      this._rafId = 8;
+    });
+    const hud: { _rafId: number | null; _startUpdateLoop: typeof startUpdateLoop } = {
+      _rafId: 7,
+      _startUpdateLoop: startUpdateLoop,
+    };
+    const setUpdatesPaused = (InGameHUD.prototype as unknown as {
+      setUpdatesPaused?: (paused: boolean) => void;
+    }).setUpdatesPaused;
+
+    expect(setUpdatesPaused).toBeTypeOf('function');
+    setUpdatesPaused?.call(hud, true);
+
+    expect(cancelAnimationFrame).toHaveBeenCalledWith(7);
+    expect(hud._rafId).toBeNull();
+
+    setUpdatesPaused?.call(hud, false);
+    setUpdatesPaused?.call(hud, false);
+
+    expect(hud._rafId).toBe(8);
+    expect(startUpdateLoop).toHaveBeenCalledOnce();
+  });
+
+  it('syncs the touch layout directly while polling is paused', () => {
+    const hud = { view: { hud: { touchUi: true } } };
+    const setTouchUi = (InGameHUD.prototype as unknown as {
+      setTouchUi?: (enabled: boolean) => void;
+    }).setTouchUi;
+
+    expect(setTouchUi).toBeTypeOf('function');
+    setTouchUi?.call(hud, false);
+
+    expect(hud.view.hud.touchUi).toBe(false);
+  });
+
+  it('pushes touch mode changes to the HUD without waiting for its timer', () => {
+    const setTouchUi = vi.fn();
+    const game = {
+      touchControls: { setEnabled: vi.fn(), enabled: false },
+      touchUi: true,
+      inGameHUD: { setTouchUi },
+      applyTouchUiClass: vi.fn(),
+    };
+
+    Game.prototype.setTouchControlsEnabled.call(game as unknown as Game, false, false);
+
+    expect(setTouchUi).toHaveBeenCalledWith(false);
+  });
+});
 
 const gameScene = () => {
   const sceneManager = { showScene: vi.fn() };

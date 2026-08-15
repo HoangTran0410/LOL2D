@@ -24,41 +24,40 @@ export default class GameScene extends Scene {
   game: Game | null = null;
   private _animationFrameId: number | null = null;
 
+  private suspendRuntime(): void {
+    if (this._animationFrameId !== null) {
+      clearTimeout(this._animationFrameId);
+      this._animationFrameId = null;
+    }
+    noLoop();
+  }
+
+  private resumeRuntime(): void {
+    if (!this.game || document.hidden || this.game.paused || this._animationFrameId !== null) return;
+    const now = performance.now();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p5Instance = (window as any).p5?.instance;
+    if (p5Instance) {
+      p5Instance._lastRealFrameTime = now;
+      p5Instance._lastTargetFrameTime = now;
+    }
+    previousTime = now;
+    loop();
+    this.updateLoop();
+  }
+
+  private _handleGamePause = (paused: boolean): void => {
+    this.game?.inGameHUD.setUpdatesPaused(paused);
+    if (paused) this.suspendRuntime();
+    else this.resumeRuntime();
+  };
+
   // Bound once so addEventListener/removeEventListener target the same
   // reference — otherwise the listener added in enter() could never be
   // removed in exit(), leaking a handler across every scene re-entry.
   private _handleVisibilityChange = (): void => {
-    if (document.hidden) {
-      // Tab backgrounded: the setTimeout-driven update loop isn't throttled
-      // by the browser the way requestAnimationFrame is, so it would keep
-      // burning CPU/battery in the background (notably on mobile) unless we
-      // stop it ourselves. Stop p5's draw loop too.
-      if (this._animationFrameId !== null) {
-        clearTimeout(this._animationFrameId);
-        this._animationFrameId = null;
-      }
-      noLoop();
-    } else {
-      if (!this.game) return;
-      // p5 computes deltaTime from the wall-clock gap since its last real
-      // frame. After sitting paused for a while, simply calling loop() would
-      // replay that entire gap as one giant deltaTime on the first resumed
-      // frame (breaking cooldowns/buffs/particle lifespans, which all key off
-      // the shared `deltaTime` global). Resetting p5's internal frame
-      // timestamps makes the resumed frame read as "now" instead of a spike.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const p5Instance = (window as any).p5?.instance;
-      if (p5Instance) {
-        const now = performance.now();
-        p5Instance._lastRealFrameTime = now;
-        p5Instance._lastTargetFrameTime = now;
-      }
-      // Same idea for our own update loop's elapsed-time tracking, so it
-      // doesn't try to "catch up" the hidden duration in one tick.
-      previousTime = performance.now();
-      loop();
-      this.updateLoop();
-    }
+    if (document.hidden) this.suspendRuntime();
+    else this.resumeRuntime();
   };
 
   setup() {
@@ -114,17 +113,21 @@ export default class GameScene extends Scene {
     // reference to the scene manager and must not gain one — see
     // `Game.onExitRequested`.
     this.game.onExitRequested = () => this.sceneManager.showScene(MenuScene);
+    this.game.onPauseChanged = this._handleGamePause;
     previousTime = performance.now();
     this.updateLoop();
   }
 
   stopGame() {
+    const resumeP5ForNextScene = !!this.game?.paused && !document.hidden;
     if (this._animationFrameId !== null) {
       clearTimeout(this._animationFrameId);
       this._animationFrameId = null;
     }
+    if (this.game) this.game.onPauseChanged = null;
     this.game?.destroy();
     this.game = null;
+    if (resumeP5ForNextScene) loop();
   }
 
   updateLoop() {

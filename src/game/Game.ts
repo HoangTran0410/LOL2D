@@ -105,6 +105,7 @@ export default class Game {
    * "leave the match" has no meaning.
    */
   onExitRequested: (() => void) | null = null;
+  onPauseChanged: ((paused: boolean) => void) | null = null;
 
   /**
    * Cooldown reduction and URF, resolved from the pregame config at
@@ -301,8 +302,17 @@ export default class Game {
     }
   }
 
-  pause() { this.paused = true; }
-  unpause() { this.paused = false; }
+  pause() {
+    if (this.paused) return;
+    this.paused = true;
+    this.onPauseChanged?.(true);
+  }
+
+  unpause() {
+    if (!this.paused) return;
+    this.paused = false;
+    this.onPauseChanged?.(false);
+  }
 
   fixedUpdate() {
     this.camera.update();
@@ -503,6 +513,7 @@ export default class Game {
   setTouchControlsEnabled(enabled: boolean, remember = true): void {
     this.touchControls.setEnabled(enabled);
     this.touchUi = enabled;
+    this.inGameHUD?.setTouchUi(enabled);
     if (remember) rememberTouchControlsPreference(enabled);
     this.applyTouchUiClass();
   }

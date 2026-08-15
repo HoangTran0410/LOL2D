@@ -97,6 +97,19 @@ export default class InGameHUD {
     this.view.setState(computeHudState(this.game));
   }
 
+  setUpdatesPaused(paused: boolean): void {
+    if (paused) {
+      if (this._rafId !== null) cancelAnimationFrame(this._rafId);
+      this._rafId = null;
+    } else if (this._rafId === null) {
+      this._startUpdateLoop();
+    }
+  }
+
+  setTouchUi(enabled: boolean): void {
+    if (this.view) this.view.hud.touchUi = enabled;
+  }
+
   destroy() {
     if (this._rafId !== null) {
       cancelAnimationFrame(this._rafId);
