@@ -6,6 +6,7 @@ import Monster from './gameObject/attackableUnits/Monster';
 import Camera, { zoomFactorPreference } from './gameObject/map/Camera';
 import FogOfWar from './gameObject/map/FogOfWar';
 import TerrainMap from './gameObject/map/TerrainMap';
+import Minimap, { type MinimapHost } from './gameObject/map/Minimap';
 import Fountain from './gameObject/structures/Fountain';
 import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
@@ -81,6 +82,7 @@ export default class Game {
   spellInputController!: SpellInputController;
   minionSpawner!: MinionSpawner;
   touchControls!: TouchControls;
+  minimap!: Minimap;
 
   /**
    * Every mutation of this match once it is running — roster, world, rules —
@@ -161,6 +163,7 @@ export default class Game {
     // so there is one source of truth for where the walls are.
     this.navigation = new NavigationSystem(this.terrainMap.wallPolygons(), this.mapSize);
     this.fogOfWar = new FogOfWar(this);
+    this.minimap = new Minimap(this.minimapHost());
     this.inGameHUD = new InGameHUD(this);
 
     // fountains first: randomSpawnPoint() is defined in terms of them, and both
@@ -334,12 +337,15 @@ export default class Game {
     });
 
     this.fogOfWar.draw();
-    // After the fog: controls you cannot see are not controls.
+    // After the fog, outside camera.makeDraw: both of these are screen space,
+    // and an overlay you cannot see is not an overlay.
+    this.minimap.draw();
     this.touchControls.draw();
   }
 
   destroy() {
     this.fogOfWar.destroy();
+    this.minimap.destroy();
     this.inGameHUD.destroy();
   }
 
@@ -364,6 +370,7 @@ export default class Game {
     // First: both of the others derive from the camera's view of the world.
     this.camera.fitTo(w, h);
     this.fogOfWar.resize(w, h);
+    this.minimap.resize(w, h);
     this.touchControls.resize(w, h);
   }
 
@@ -485,6 +492,14 @@ export default class Game {
       affordable: this.player.stats.mana.value >= spell.effectiveManaCost,
       castable: this.player.canCast && !this.player.isDead && !spell.disabled,
       charging: spell.state === 'CHARGING',
+    };
+  }
+
+  private minimapHost(): MinimapHost {
+    return {
+      viewport: () => ({ width: windowWidth, height: windowHeight }),
+      mapSize: () => this.mapSize,
+      wallPolygons: () => this.terrainMap.wallPolygons(),
     };
   }
 

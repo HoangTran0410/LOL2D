@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { hitTest, minimapToWorld, worldToMinimap } from '../../../src/game/gameObject/map/Minimap';
+import {
+  EXPANDED_FRACTION,
+  MINIMAP_MARGIN,
+  MINIMAP_SIZE,
+  Minimap,
+  hitTest,
+  minimapToWorld,
+  worldToMinimap,
+} from '../../../src/game/gameObject/map/Minimap';
 
 const MAP = 6400;
 const rect = { x: 12, y: 12, size: 150 };
@@ -39,6 +47,45 @@ describe('minimap transform', () => {
     const top = worldToMinimap({ x: 0, y: 0 }, rect, MAP);
     const bottom = worldToMinimap({ x: 0, y: MAP }, rect, MAP);
     expect(bottom.y).toBeGreaterThan(top.y);
+  });
+});
+
+// No canvas anywhere in here: the buffers are built lazily inside draw(), so
+// everything that decides *where* things are runs headlessly.
+const makeMinimap = (width: number, height: number) =>
+  new Minimap({
+    viewport: () => ({ width, height }),
+    mapSize: () => MAP,
+    wallPolygons: () => [],
+  });
+
+describe('minimap rect', () => {
+  it('collapses into the top-left corner at the fixed size', () => {
+    expect(makeMinimap(1280, 720).rect).toEqual({
+      x: MINIMAP_MARGIN,
+      y: MINIMAP_MARGIN,
+      size: MINIMAP_SIZE,
+    });
+  });
+
+  it('expands to a fraction of the shorter side, centred', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    const size = 720 * EXPANDED_FRACTION;
+    expect(minimap.rect).toEqual({ x: (1280 - size) / 2, y: (720 - size) / 2, size });
+  });
+
+  it('takes the shorter side on a portrait viewport too', () => {
+    const minimap = makeMinimap(420, 900);
+    minimap.expanded = true;
+    expect(minimap.rect.size).toBeCloseTo(420 * EXPANDED_FRACTION, 6);
+  });
+
+  it('follows a resize', () => {
+    const minimap = makeMinimap(1280, 720);
+    minimap.expanded = true;
+    minimap.resize(800, 800);
+    expect(minimap.rect.size).toBeCloseTo(800 * EXPANDED_FRACTION, 6);
   });
 });
 
