@@ -29,9 +29,13 @@ In:
 
 Applies to **the player or any bot**, selected the way `RosterTab` selects.
 
-Also in, and not a cheat — it arrived with this work because the panel is where
-it belongs: **Escape stops ending the match**, and the match gets a real exit
-button. See "Escape stops ending the match" below.
+Also in, and neither is a cheat — both arrived with this work because the panel
+is where they belong:
+
+- **The panel drops from four tabs to three.** The Chiêu thức tab is deleted
+  outright, and Trận đấu absorbs Thế giới. See "The panel loses a tab" below.
+- **Escape stops ending the match**, and the match gets a real exit button. See
+  "Escape stops ending the match" below.
 
 Out, and why:
 
@@ -234,7 +238,66 @@ handler: `GameScene` calls `preventDefault()` on every touch page-wide, which
 during the practice panel work killed a checkbox `change`, a range drag and a
 plain `@click` on three separate occasions.
 
-### 5. Escape stops ending the match
+### 5. The panel loses a tab, and gains no width problem
+
+The Chiêu thức tab existed because it was once the *only* thing in the game you
+could change without quitting. It is now the smaller half of something the
+Đấu thủ tab does better: `RosterTab.vue:302` opens `LoadoutEditorModal` for
+**every** roster row including the player's (the `v-if="!entry.isPlayer"` on
+line 321 guards only the remove button and the behaviour flags), and that editor
+sets all seven slots, from the catalogue or from a saved kit.
+
+So: **delete the Chiêu thức tab**, and **fold Thế giới into Trận đấu** — CDR,
+URF, jungle and minions are all "settings for this match", and the two tabs hold
+two controls each. The panel becomes **Đấu thủ | Trận đấu | Gian lận**.
+
+That is worth stating twice, because it deletes a risk this spec was carrying:
+at three tabs, the "five tabs will not fit at 390px" problem does not arise.
+
+**What goes with the tab.** `oneForAll` and `cloneMySpell` (both read in
+`hudInteractions.confirmPicks`) are the two mode toggles the user called out;
+they have no meaning once picks are per-unit through the roster. With them go
+`SpellPickerModal.vue` and, from `hudInteractions.ts`, `draftSpells`, `pick`,
+`pickKit`, `confirmPicks`, `changeSpell`, `spellIndexToSwap`, `filteredSpells`
+and the touch handlers that served the picker's icons — a large part of a 22KB
+file, and `styles/hud.css`'s `.spell-picker` section with it.
+
+**Check before deleting, do not assume:** `allSpells`, `spellGroups` and
+`loadSpellPickerAssets` exist to pre-load spell icons. `LoadoutEditorModal` /
+`KitRoster` need icons too and build their shelves from
+`src/scenes/setup/pregameCatalog.ts`. Whether the HUD-side asset preload is
+still doing useful work after the picker is gone is a question to answer by
+reading, not by guessing in either direction.
+
+**The desktop fast path must survive.** `DesktopHudView.vue:67` binds a click on
+a spell icon to `changeSpell(index)`, which opened the picker focused on that
+slot. Its replacement: open the panel on Đấu thủ with the player's loadout
+editor open, on that slot — the editor has a pinned slot row already, so the
+gesture keeps its meaning.
+
+**One real behaviour change, stated rather than slipped in.** `confirmPicks`
+applied picks with `replaceSpell`, which does not touch health or mana.
+`MatchDirector.applyLoadout` goes through `Champion.applyPreset` and then
+refills both to maximum. After this deletion, changing a spell mid-match heals
+the unit to full. In a practice panel that is arguably a feature, but it is a
+change, and it should be in the commit message rather than discovered later.
+
+**Blast radius, measured.** `tests/game/hud/hudInteractions.test.ts` is 282
+lines and its whole `pick / confirmPicks — batched apply` block (~100 lines,
+including the `oneForAll` and `cloneMySpell` cases) goes with the feature.
+Three e2e scripts reference picker internals: `drive-mobile-hud.mjs` (15
+references — it scrolls `.spell-picker` by hand and asserts on it),
+`drive-touch-controls.mjs` (7) and `drive-practice-panel.mjs` (7).
+
+**Do this before the cheat tab.** Both change `PracticePanel.vue`, and it is
+cheaper to add a third tab to a two-tab panel than to add a fifth and then
+delete two.
+
+`PracticePanel.vue`'s default tab is `'spells'` and must become `'roster'`.
+`state.showSpellsPicker` keeps its name for now: renaming it reaches into all
+three e2e scripts for no behaviour, and this change already touches them enough.
+
+### 6. Escape stops ending the match
 
 `GameScene.keyPressed` (`GameScene.ts:150-154`) sends keycode 27 straight to
 `sceneManager.showScene(MenuScene)`. One mis-hit ends the match — no
@@ -290,17 +353,22 @@ a match.
 
 ## Known risks
 
-**Five tabs will not fit.** `.pregame-tab` is `flex: 1`, so on a 390px-wide
-portrait phone each tab gets roughly 63px once the close button takes its
-share, and "Chiêu thức" does not fit at `0.95em`. The fix is not chosen here on
-purpose — **measure at phone width first**, then pick between a font-size step
-under a media query and a horizontally scrolling tab row. Committing to a fix
-before measuring is how the picker's collapsed roster happened.
-
-**`tests/e2e/drive-practice-panel.mjs` will go red.** It asserts
+**`tests/e2e/drive-practice-panel.mjs` will go red twice** — once when the tab
+count drops to two, once when it returns to three. It asserts
 `tabs === TAB_LABELS` exactly (line ~270) and iterates `TAB_IDS`. This is the
-script doing its job, and updating both constants belongs in the same task as
-the tab, not a follow-up.
+script doing its job; updating both constants belongs in the same task as the
+tab change that caused it, never a follow-up.
+
+**Deleting the picker is the largest piece of this work, and it is a deletion
+across four kinds of file** — a component, a slice of `hudInteractions.ts`, a
+stylesheet section, a unit-test block and three e2e scripts. The failure mode is
+a half-removal that leaves dead exports type-checking cleanly. `npm run verify`
+catches unused *files* only if nothing imports them, so the check that matters
+is grepping for each removed name after removing it.
+
+**The five-tab width problem is designed out, not solved.** It would return the
+moment a fourth tab is proposed. At 390px with `.pregame-tab { flex: 1 }` plus
+the close button, four is the practical ceiling.
 
 ## Testing
 
@@ -340,6 +408,8 @@ by losing a match, which is the failure this whole section exists to prevent.
 
 - Create: `src/game/gameObject/buffs/Invulnerable.ts`,
   `src/game/hud/practice/CheatTab.vue`
+- Delete: `src/game/hud/SpellPickerModal.vue`,
+  `src/game/hud/practice/WorldTab.vue` (merged into `RulesTab.vue`)
 - Modify: `src/game/gameObject/Spell.ts` (`setStackCount` default),
   `src/game/gameObject/spells/Nasus_Q.ts`,
   `src/game/gameObject/spells/Veigar_Q.ts`,
@@ -348,6 +418,11 @@ by losing a match, which is the failure this whole section exists to prevent.
   (four methods), `src/game/hud/PracticePanel.vue` (fifth tab),
   `styles/hud.css` (tab row at phone width, exit button),
   `tests/e2e/drive-practice-panel.mjs` (`TAB_LABELS`, `TAB_IDS`, new checks)
+- Modify, for the tab deletion: `src/game/hud/hudInteractions.ts` (remove the
+  picker surface), `src/game/hud/DesktopHudView.vue` (redirect the spell-icon
+  click), `src/game/hud/practice/RulesTab.vue` (absorb `WorldTab`),
+  `tests/game/hud/hudInteractions.test.ts` (drop the `pick / confirmPicks`
+  block), `tests/e2e/drive-mobile-hud.mjs`, `tests/e2e/drive-touch-controls.mjs`
 - Modify, for the Escape change: `src/scenes/GameScene.ts` (drop the
   `showScene` on 27, set `onExitRequested`), `src/game/Game.ts`
   (`onExitRequested` field), `src/game/hud/hudInteractions.ts` (expose it, and
