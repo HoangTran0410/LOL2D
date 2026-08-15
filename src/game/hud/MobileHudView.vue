@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
  * The touch HUD: whatever `TouchControls` draws on the canvas (joystick,
- * spell buttons with their own cooldown/mana) plus the spell-picker modal
- * and its long-press description tooltip. Nothing else.
+ * spell buttons with their own cooldown/mana) plus the practice panel (whose
+ * first tab is the spell picker) and its long-press description tooltip.
+ * Nothing else.
  *
  * There used to be a bottom-HUD strip here too — avatar, health/mana bars,
  * a loadout row, buffs — the same markup `DesktopHudView` still renders.
@@ -42,7 +43,7 @@ import { inject } from 'vue';
 import FormatUtils from '../../utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
-import SpellPickerModal from './SpellPickerModal.vue';
+import PracticePanel from './PracticePanel.vue';
 
 defineProps<{ state: HudState }>();
 
@@ -81,5 +82,5 @@ const hud = inject<HudInteractions>('hud')!;
     <p class="body" v-html="hud.spellHover.description"></p>
   </div>
 
-  <SpellPickerModal v-if="hud.showSpellsPicker" :state="state" />
+  <PracticePanel v-if="hud.showSpellsPicker" :state="state" />
 </template>

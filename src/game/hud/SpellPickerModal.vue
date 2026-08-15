@@ -1,11 +1,18 @@
 <script setup lang="ts">
 /**
- * The "pick a spell" modal. One component, shared by `DesktopHudView` and
- * `MobileHudView` — the loadout it lets you assemble is the same game feature
- * in both modes, and CSS alone (`body.touch-ui .spell-picker` in
- * `styles/hud.css`) already does the resizing a phone needs. Forking this
- * into two copies would just be two places to keep the champion roster
- * markup in sync for no reason.
+ * The "pick a spell" screen — the Chiêu thức tab of `PracticePanel.vue`, and
+ * no longer a modal in its own right. The panel owns the framing (the fixed
+ * centred `.practice-panel` box, its hextech border, the tab bar that names
+ * this tab); `.spell-picker` kept `overflow-y: auto` and is still the element
+ * that scrolls. That division is load-bearing, not tidiness — see the sticky
+ * header note below.
+ *
+ * One component, shared by `DesktopHudView` and `MobileHudView` (through the
+ * panel) — the loadout it lets you assemble is the same game feature in both
+ * modes, and CSS alone (`body.touch-ui .spell-picker` in `styles/hud.css`)
+ * already does the resizing a phone needs. Forking this into two copies would
+ * just be two places to keep the champion roster markup in sync for no
+ * reason.
  *
  * What *is* mode-specific is reachability, and all of it is handled here:
  *
@@ -17,18 +24,29 @@
  *     `preventDefault()` on touch — also suppresses the browser's native
  *     touch-scroll, everywhere on the page, not just on the canvas.
  *
- * Everything above the roster — the title, the slot row and the mode toggles
- * — lives in a `position: sticky` `.picker-header`, so it stays pinned to the
- * top of the modal while the roster scrolls beneath it. `position: sticky`
+ * The slot row lives in a `position: sticky` `.picker-header`, so it stays
+ * pinned to the top while the roster scrolls beneath it. `position: sticky`
  * needs nothing from its container but *a* scrolling ancestor, which
  * `.spell-picker` (just `overflow-y: auto` on itself) already is — a flex
  * "sticky header" shell was tried first and silently collapsed the list,
- * because `.spell-picker`'s height is `max-height`-capped but otherwise
+ * because `.spell-picker`'s height was `max-height`-capped but otherwise
  * intrinsic, so a `flex: 1 1 0` body had no pinned size to grow into.
  * Keeping the slot row on screen matters most: it is where you choose which
  * slot to replace and (now) the way out, so scrolling a long roster must not
  * carry it off. Regressions here are caught by scrolling for real in
  * `tests/e2e/drive-mobile-hud.mjs`, not by reading the markup.
+ *
+ * The tab shell does *not* repeat that mistake, and is the other shape of it:
+ * the flex column is `.practice-panel`, one level up, and `.spell-picker` is
+ * a `flex: 1 1 auto; min-height: 0` item inside it. `flex-basis: auto` means
+ * its hypothetical size is still its (huge) content height, so the panel
+ * grows to its own `max-height` and the picker shrinks into what is left —
+ * ending up with a *definite* height to scroll inside, which is exactly what
+ * the collapsed version never had.
+ *
+ * The title row that used to sit above the slot row is gone: the tab bar's
+ * selected "Chiêu thức" says the same thing, and on a landscape phone two
+ * rows of chrome above the roster costs a shelf.
  *
  * The slot selector (`.slot-picker`) is shown in both modes now. The desktop
  * bottom-HUD strip still pre-selects a slot by which icon opened the picker,
@@ -89,8 +107,6 @@ function scrollTouchMove(event: TouchEvent): void {
          scrolls under it, so the slot row — and the way out — never scrolls
          off. -->
     <div class="picker-header">
-      <p class="title">Chọn chiêu thức</p>
-
       <!-- Slot selector + the commit/discard actions in one row. Each pill
            previews its *staged* choice (`draftSpells`) over what is equipped;
            the two buttons live here rather than a separate footer to save

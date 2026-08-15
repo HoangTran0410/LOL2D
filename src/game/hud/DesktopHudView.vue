@@ -5,7 +5,7 @@
  *
  * Reads `HudState` (via the `state` prop, recomputed at `HUD_UPDATE_INTERVAL_MS`
  * by `InGameHUD`) and `HudInteractions` (via `inject('hud')`, shared with
- * `MobileHudView` and `SpellPickerModal`) — it owns neither. Its whole job is
+ * `MobileHudView` and the practice panel) — it owns neither. Its whole job is
  * this layout; the desktop-specific behaviour in it is `mouseover`/`mouseout`
  * for the tooltip, everything else is the shared interaction layer.
  */
@@ -13,7 +13,7 @@ import { inject } from 'vue';
 import FormatUtils from '../../utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
-import SpellPickerModal from './SpellPickerModal.vue';
+import PracticePanel from './PracticePanel.vue';
 
 defineProps<{ state: HudState }>();
 
@@ -128,5 +128,5 @@ const hud = inject<HudInteractions>('hud')!;
     </div>
   </div>
 
-  <SpellPickerModal v-if="hud.showSpellsPicker" :state="state" />
+  <PracticePanel v-if="hud.showSpellsPicker" :state="state" />
 </template>

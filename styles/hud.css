@@ -360,13 +360,13 @@
   font-weight: bold;
 }
 
-/* ===================== Spell Picker ===================== */
-/* One compact layout for both modes now. It used to be a wide (80vw, up to
-   1000px) multi-column grid on the desktop and a narrow vertical scroll under
-   `body.touch-ui`; the narrow one reads better, so it is the only one — a
-   centred column that is near-full-width on a phone and a bounded sheet on a
-   monitor. The former `body.touch-ui .spell-picker*` overrides are folded
-   into these base rules.
+/* ============== Practice panel & spell picker ============== */
+/* The modal box: one compact layout for both modes. It used to be a wide
+   (80vw, up to 1000px) multi-column grid on the desktop and a narrow vertical
+   scroll under `body.touch-ui`; the narrow one reads better, so it is the only
+   one — a centred column that is near-full-width on a phone and a bounded
+   sheet on a monitor. The former `body.touch-ui .spell-picker*` overrides are
+   folded into these base rules.
  *
  * Everything below wears the hextech skin (`--hextech-*` in styles/main.css),
  * not the dark grey the rest of the HUD does, because this modal is the
@@ -377,8 +377,14 @@
  * the two screens were unrelated, and that was the only thing still making
  * them look like two different features. Sizes are matched to
  * `.pregame-modal` / `.kit-shelf` / `.catalog-spell-card` in
- * styles/pregame-scene.css deliberately — change one, change both. */
-.spell-picker {
+ * styles/pregame-scene.css deliberately — change one, change both.
+ *
+ * All of that used to live on `.spell-picker`, which was the modal root. It
+ * is on the panel now because the picker is one of four tabs inside the same
+ * box (PracticePanel.vue) — but only the *chrome* moved. `.spell-picker`
+ * keeps `overflow-y: auto` and stays the element that scrolls, which
+ * `tests/e2e/drive-mobile-hud.mjs` scrolls by hand and asserts on. */
+.practice-panel {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -389,21 +395,68 @@
   border-image: linear-gradient(var(--hextech-teal), var(--hextech-teal-deep)) 1;
   color: var(--hextech-text);
   box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
-  padding: 0 0.8rem 0.8rem;
   display: flex;
   flex-direction: column;
   width: min(760px, 92vw);
   max-height: 90vh;
+}
+
+/* The tab bar. `.pregame-tabs`/`.pregame-tab` in styles/pregame-scene.css do
+   the work — including `body.touch-ui`'s 44px minimum on the buttons; these
+   two rules only fit that control into a modal with less vertical room than a
+   full setup screen, and sit it flush above the tab body instead of 1.2rem
+   clear of it. `flex: none` so it keeps its height while the body below
+   absorbs everything left over. */
+.practice-tabs {
+  flex: none;
+  margin-bottom: 0;
+  padding: 0.5rem 0.8rem 0;
+}
+
+.practice-tab {
+  padding: 0.5rem 0.3rem;
+  font-size: 0.85em;
+}
+
+/* Each tab's body is the panel's one scroll region: `flex: 1 1 auto` with
+   `min-height: 0`, so it takes whatever height the tab bar left and scrolls
+   inside it. `flex-basis: auto` (not `0`) on purpose — the body's
+   hypothetical size stays its full content height, the panel therefore grows
+   to its own `max-height`, and the body shrinks into the remainder with a
+   *definite* height to scroll in. `flex: 1 1 0` is the version that collapses
+   (see SpellPickerModal.vue's file comment, which has the story). */
+.spell-picker,
+.practice-tab-body {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+.spell-picker {
+  display: flex;
+  flex-direction: column;
+  padding: 0 0.8rem 0.8rem;
+}
+
+.practice-tab-body {
+  padding: 0.8rem;
+}
+
+/* Placeholder copy for the three tabs Tasks 9 and 10 fill in. */
+.practice-placeholder {
+  margin: 0;
+  color: var(--hextech-muted);
+  font-size: 0.9em;
+}
+
 /* `position: sticky` needs nothing but *a* scrolling ancestor, which
-   `.spell-picker` already is, so this pins the title, slot row and mode
-   toggles to the top of the modal while the roster scrolls beneath — the slot
-   selector (and the Huỷ / Xác nhận actions inside it) never scrolls out of
-   reach. See SpellPickerModal.vue's file comment for the flex "sticky header"
-   attempt that looked simpler and silently broke the whole list instead. */
+   `.spell-picker` already is, so this pins the slot row to the top of the tab
+   while the roster scrolls beneath — the slot selector (and the Huỷ / Xác
+   nhận actions inside it) never scrolls out of reach. See
+   SpellPickerModal.vue's file comment for the flex "sticky header" attempt
+   that looked simpler and silently broke the whole list instead. */
 .picker-header {
   position: sticky;
   top: 0;
@@ -694,7 +747,7 @@
    covering the canvas costs the player nothing — there is nothing moving
    under it to watch. */
 @media (max-width: 640px) {
-  .spell-picker {
+  .practice-panel {
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -711,12 +764,35 @@
    phone instead of two) and a 44px icon — still exactly a thumb target —
    rather than the 48px a roomier screen gets. */
 @media (max-height: 480px) {
-  .spell-picker {
+  .practice-panel {
     height: 100vh;
     height: 100dvh;
     max-height: none;
     border-width: 0;
+  }
+
+  .spell-picker {
     padding: 0 0.8rem 0.6rem;
+  }
+
+  /* The tab bar buys back a row of the roster the same way
+     `.kit-bar-btn`/`.kit-slot-pill` do in styles/pregame-scene.css's own
+     `@media (max-height: 480px)` block: below the 44px thumb minimum, because
+     a screen this short has ~210px of list and four labels across the top are
+     a wide target even when they are a short one. */
+  .practice-tabs {
+    padding-top: 0.25rem;
+  }
+
+  .practice-tab,
+  body.touch-ui .practice-tab {
+    min-height: 34px;
+    padding: 0.25rem 0.3rem;
+    font-size: 0.78em;
+  }
+
+  .picker-header {
+    padding-top: 0.4rem;
   }
 
   .spell-picker .list {
