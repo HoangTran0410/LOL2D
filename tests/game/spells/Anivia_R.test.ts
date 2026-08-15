@@ -23,6 +23,9 @@ import Anivia_R, {
   UPKEEP_TICK_MS,
 } from '../../../src/game/gameObject/spells/Anivia_R';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import type { MatchRules } from '../../../src/game/config/PregameConfig';
+
+const URF: MatchRules = { cooldownMultiplier: 1, manaFree: true };
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -65,7 +68,7 @@ const context = (cursorWorld: { x: number; y: number }): CastContext => ({
   direction: { x: 1, y: 0 },
 });
 
-const setup = (mana = 240) => {
+const setup = (mana = 240, matchRules?: MatchRules) => {
   const added: Anivia_R_Object[] = [];
   const enemy = {
     position: new TestVector(100, 0),
@@ -83,6 +86,7 @@ const setup = (mana = 240) => {
   const owner = {
     game: {
       worldMouse: { x: 100, y: 0 },
+      matchRules,
       eventManager: { emit: vi.fn() },
       objectManager: {
         addObject: (object: Anivia_R_Object) => added.push(object),
@@ -193,6 +197,31 @@ describe('Anivia R', () => {
     updateSpell(spell, 1);
 
     expect(owner.stats.mana.value).toBe(startingMana - MANA_COST - UPKEEP_COST);
+  });
+
+  // The storm bills its own upkeep outside the base class's commit path, which
+  // is exactly how it used to miss URF: both the deduction *and* the
+  // affordability check that precedes it have to read the rule, or the channel
+  // still shuts off at low mana while costing nothing.
+  it('charges neither the cast nor the upkeep under URF', () => {
+    const { spell, owner } = setup(240, URF);
+    const startingMana = owner.stats.mana.value;
+
+    spell.press(context({ x: 100, y: 0 }));
+    expect(owner.stats.mana.value).toBe(startingMana);
+    updateSpell(spell, UPKEEP_TICK_MS * 3);
+
+    expect(owner.stats.mana.value).toBe(startingMana);
+  });
+
+  it('keeps the storm up on an empty mana pool under URF', () => {
+    const { spell, added } = setup(0, URF);
+
+    spell.press(context({ x: 100, y: 0 }));
+    updateSpell(spell, UPKEEP_TICK_MS * 2);
+
+    expect(spell.state).toBe('ACTIVE');
+    expect(added[0].toRemove).toBe(false);
   });
 
   it('does not mistake Stasis for interrupting crowd control', () => {

@@ -104,11 +104,14 @@ export default class Anivia_R extends Spell {
 
     this.upkeepElapsedMs += Math.max(0, deltaTime);
     while (this.upkeepElapsedMs >= UPKEEP_TICK_MS) {
-      if (this.owner.stats.mana.value < UPKEEP_COST) {
+      // Through `Spell.spendMana`, never `stats.mana` directly: it prices the
+      // tick by the match rules, so under URF the storm neither pays upkeep
+      // nor runs out of it. Checking and deducting in one call is what stops
+      // one of the two halves from being written without the rule again.
+      if (!this.spendMana(UPKEEP_COST)) {
         this.cancel('OUT_OF_RESOURCE');
         return;
       }
-      this.owner.stats.mana.baseValue -= UPKEEP_COST;
       this.upkeepElapsedMs -= UPKEEP_TICK_MS;
     }
   }

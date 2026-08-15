@@ -216,7 +216,7 @@ export default class Spell {
       this.disabled ||
       this.owner.isDead ||
       !this.owner.canCast ||
-      this.owner.stats.mana.value < this.effectiveManaCost ||
+      !this.canAffordMana(this.manaCost) ||
       this.owner.stats.health.value < this.healthCost ||
       !this.checkCastCondition()
     ) {
@@ -398,10 +398,24 @@ export default class Spell {
   }
 
   /**
-   * The mana this spell actually charges, after match rules (URF: `manaFree`)
-   * are applied. `manaCost` stays the spell's own tuning number; every
-   * consumption/refund path below reads through here instead, which is what
-   * makes URF a single flip rather than a per-spell edit.
+   * What any mana amount actually costs, after match rules (URF: `manaFree`).
+   * The single expression of that rule in the codebase — `effectiveManaCost`
+   * below and `spendMana` further down are both this function, so URF stays a
+   * single flip rather than a per-spell edit.
+   *
+   * Takes an amount rather than reading `manaCost` because a spell's own cost
+   * is not the only mana it charges: an upkeep tick (Anivia R) or a half
+   * refund (Pantheon Q, Malphite E, Varus Q) has to run through the same rule,
+   * and before this existed the upkeep quietly did not.
+   */
+  effectiveMana(amount: number): number {
+    return this.game?.matchRules?.manaFree ? 0 : amount;
+  }
+
+  /**
+   * The mana this spell actually charges for one cast, after match rules.
+   * `manaCost` stays the spell's own tuning number; every consumption/refund
+   * path below reads through here instead.
    *
    * Three spells (Pantheon Q, Malphite E, Varus Q) deduct a second,
    * cancel-triggered half-refund of their own mana cost outside this base
@@ -409,7 +423,36 @@ export default class Spell {
    * `manaCost` for the same reason.
    */
   get effectiveManaCost(): number {
-    return this.game?.matchRules?.manaFree ? 0 : this.manaCost;
+    return this.effectiveMana(this.manaCost);
+  }
+
+  /**
+   * Whether the caster can pay `amount` mana, priced by the rules in force.
+   * Under URF everything is affordable, including on an empty pool — a channel
+   * that costs nothing must not end for lack of what it is not spending.
+   */
+  protected canAffordMana(amount: number): boolean {
+    return this.owner.stats.mana.value >= this.effectiveMana(amount);
+  }
+
+  /**
+   * Bill the caster `amount` mana. The only sanctioned way for a spell to
+   * spend mana outside the base class's own commit path, and the reason
+   * `tests/game/spells/mana-spend-seam.test.ts` can forbid spell files from
+   * touching a mana stat at all: check and deduction are one call, both priced
+   * through `effectiveMana`, so neither half can be written without the rule.
+   * Returns false — having spent nothing — when the pool is short.
+   *
+   * A sibling of `changeResource` rather than a change to it: that one is the
+   * raw writer, shared with health (which URF does not touch) and with the
+   * refund direction, and its three existing callers hand it an amount they
+   * have already priced. Folding the rule in there would apply it twice on one
+   * path and wrongly on another.
+   */
+  protected spendMana(amount: number): boolean {
+    if (!this.canAffordMana(amount)) return false;
+    this.changeResource(this.owner.stats.mana, -this.effectiveMana(amount));
+    return true;
   }
 
   get targetingRequest(): Readonly<TargetingRequest> { return {}; }
@@ -481,10 +524,9 @@ export default class Spell {
   }
 
   private commitResource(_context: CastContext, _point: ResourceCommitPoint): boolean {
-    if (
-      this.owner.stats.mana.value < this.effectiveManaCost ||
-      this.owner.stats.health.value < this.healthCost
-    ) {
+    // Not `spendMana` + a health check: the two resources commit atomically,
+    // so both have to clear before either moves.
+    if (!this.canAffordMana(this.manaCost) || this.owner.stats.health.value < this.healthCost) {
       return false;
     }
     this.changeResource(this.owner.stats.mana, -this.effectiveManaCost);
