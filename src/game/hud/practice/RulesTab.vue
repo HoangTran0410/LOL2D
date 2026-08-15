@@ -25,6 +25,11 @@ import { inject, ref } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
 import type { MatchRulesConfig } from '../../config/PregameConfig';
 import { CDR_PERCENT_MAX, CDR_PERCENT_MIN } from '../../config/PregameConfig';
+import {
+  ZOOM_FACTOR_MAX,
+  ZOOM_FACTOR_MIN,
+  setZoomFactorPreference,
+} from '../../gameObject/map/Camera';
 
 const hud = inject<HudInteractions>('hud')!;
 
@@ -83,6 +88,43 @@ const onCdrTouch = (event: TouchEvent): void => {
   const raw = CDR_PERCENT_MIN + ratio * (CDR_PERCENT_MAX - CDR_PERCENT_MIN);
   setCdr(Math.round(raw / CDR_PERCENT_STEP) * CDR_PERCENT_STEP);
 };
+
+/**
+ * Zoom, the same shape as the CDR slider above — including the hand-rolled
+ * touch drag, and for the same reason written out there.
+ *
+ * A phone has no wheel, and a phone is who the viewport-scaling work exists
+ * for; `GameScene.mouseWheel` is the other way in. The control writes the
+ * *factor* over the camera's balanced base, never an absolute scale, so the
+ * choice survives a resize or an orientation change — see
+ * `Camera.setZoomFactor`.
+ *
+ * Note that `Game.draw()` returns early while the panel has the match paused,
+ * so the canvas does not repaint until the panel closes. The zoom has still
+ * been applied; it becomes visible on close.
+ */
+const ZOOM_STEP = 0.1;
+const camera = hud.camera;
+const zoom = ref(camera.zoomFactor);
+
+const setZoom = (factor: number): void => {
+  camera.setZoomFactor(factor);
+  setZoomFactorPreference(camera.zoomFactor);
+  zoom.value = camera.zoomFactor; // read back: setZoomFactor clamps
+};
+
+const onZoomInput = (event: Event): void =>
+  setZoom(Number((event.target as HTMLInputElement).value));
+
+const onZoomTouch = (event: TouchEvent): void => {
+  const touch = event.touches[0] ?? event.changedTouches[0];
+  if (!touch) return;
+  const track = (event.currentTarget as HTMLElement).getBoundingClientRect();
+  if (!track.width) return;
+  const ratio = Math.min(1, Math.max(0, (touch.clientX - track.left) / track.width));
+  const raw = ZOOM_FACTOR_MIN + ratio * (ZOOM_FACTOR_MAX - ZOOM_FACTOR_MIN);
+  setZoom(Math.round(raw / ZOOM_STEP) * ZOOM_STEP);
+};
 </script>
 
 <template>
@@ -102,6 +144,24 @@ const onCdrTouch = (event: TouchEvent): void => {
         @input="onCdrInput"
         @touchstart.prevent="onCdrTouch"
         @touchmove.prevent="onCdrTouch"
+      />
+    </label>
+
+    <label class="pregame-field">
+      <span
+        >Thu phóng:
+        <strong id="practice-zoom-value">{{ Math.round(zoom * 100) }}%</strong></span
+      >
+      <input
+        type="range"
+        id="practice-zoom"
+        :min="ZOOM_FACTOR_MIN"
+        :max="ZOOM_FACTOR_MAX"
+        :step="ZOOM_STEP"
+        :value="zoom"
+        @input="onZoomInput"
+        @touchstart.prevent="onZoomTouch"
+        @touchmove.prevent="onZoomTouch"
       />
     </label>
 

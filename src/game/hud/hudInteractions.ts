@@ -26,6 +26,7 @@
 import { markRaw, reactive, toRaw } from 'vue';
 import type Game from '../Game';
 import type MatchDirector from '../MatchDirector';
+import type Camera from '../gameObject/map/Camera';
 import { removeAccents } from '../../utils/index';
 import * as AllSpells from '../gameObject/spells/index';
 import { SpellGroups, abilitySlotOfClass } from '../preset';
@@ -142,6 +143,13 @@ export interface HudInteractions {
    * `game.director` exists.
    */
   readonly director: MatchDirector;
+  /**
+   * The live camera, for the zoom slider. Same lazy `markRaw` shape as
+   * `director` and for the same two reasons: the HUD is built part-way through
+   * `Game`'s constructor, and a `reactive()` camera would hand back proxied p5
+   * vectors on every read, every frame.
+   */
+  readonly camera: Camera;
   oneForAll: boolean;
   cloneMySpell: boolean;
   /**
@@ -239,6 +247,7 @@ export function createHudInteractions(game: Game): HudInteractions {
   let touchStartY = 0;
   let touchMoved = false;
   let director: MatchDirector | null = null;
+  let camera: Camera | null = null;
 
   const state = reactive({
     /**
@@ -256,6 +265,11 @@ export function createHudInteractions(game: Game): HudInteractions {
     get director(): MatchDirector {
       if (!director && game.director) director = markRaw(game.director);
       return director as MatchDirector;
+    },
+    /** Same lazy `markRaw` getter as `director` above, for the same reasons. */
+    get camera(): Camera {
+      if (!camera && game.camera) camera = markRaw(game.camera);
+      return camera as Camera;
     },
     oneForAll: false,
     cloneMySpell: false,
