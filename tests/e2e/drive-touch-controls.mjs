@@ -145,7 +145,7 @@ try {
   // here does not render in touch mode at all any more (see
   // MobileHudView.vue's file comment: health, mana, buff stacks, CC and the
   // revive countdown all already draw on the canvas over the champion), so
-  // the only DOM control left is the corner button into the spell picker.
+  // the only DOM control left is the corner button into the practice panel.
   // Compared against the desktop numbers at the end of the run.
   report.hudTouch = await page.evaluate(() => {
     const btn = document.querySelector('.spell-picker-btn')?.getBoundingClientRect();
@@ -160,7 +160,7 @@ try {
   });
   check('the bottom-HUD strip does not render in touch mode', report.hudTouch.bottomHudPresent === false);
   check(
-    'the spell-picker corner button is up top, out of both thumbs’ way, and at least the 44px thumb target',
+    'the practice-panel corner button is up top, out of both thumbs’ way, and at least the 44px thumb target',
     report.hudTouch.pickerBtn !== null &&
       report.hudTouch.pickerBtn.top < 20 &&
       report.hudTouch.pickerBtn.right < 20 &&
@@ -618,46 +618,39 @@ try {
     // `HudInteractions` object (see src/game/hud/hudInteractions.ts),
     // injected into both DesktopHudView and MobileHudView rather than owned
     // by the root Vue instance directly. `openSpellPicker` is the touch
-    // corner button's own entry point (`changeSpell` needs an equipped-icon
-    // index the removed bottom-HUD strip used to supply).
+    // corner button's own entry point (`openPlayerLoadout` is the desktop
+    // strip's, and needs an equipped-icon index no touch surface supplies).
     window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker();
   });
   await page.waitForTimeout(700);
-  await page.screenshot({ path: `${OUT}-07-spell-picker.png` });
+  await page.screenshot({ path: `${OUT}-07-practice-panel.png` });
 
-  // The description panel, reached the way a thumb reaches it — long-
-  // pressing a roster icon inside the now-open picker. There is no
-  // equipped-spell strip icon to long-press any more (see
-  // MobileHudView.vue's file comment), but the picker's own roster always
-  // supported this, independent of the strip.
-  const iconBox = await page.evaluate(() => {
-    const icon = document.querySelector('.spell-picker .group .spell');
-    if (!icon) return null;
-    const box = icon.getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  // The panel is the whole DOM HUD in touch mode, so what this view has to
+  // prove is that it came up on a tab and inside the viewport. The long-press
+  // description that used to be checked here went with the deleted picker's
+  // icons — its replacement is the loadout editor's own spell peek, one tap
+  // further in, driven under a real thumb by drive-mobile-hud.mjs.
+  report.panelInPhoneView = await page.evaluate(() => {
+    const panel = document.querySelector('.practice-panel');
+    if (!panel) return { visible: false };
+    const box = panel.getBoundingClientRect();
+    return {
+      visible: true,
+      selectedTab: document.querySelector('.practice-tab.selected')?.id ?? null,
+      onScreen:
+        box.top >= 0 &&
+        box.left >= 0 &&
+        box.right <= window.innerWidth + 1 &&
+        box.bottom <= window.innerHeight + 1,
+    };
   });
-  if (iconBox) {
-    await touchStart([{ x: iconBox.x, y: iconBox.y }]);
-    await page.waitForTimeout(650);
-    report.longPressTooltip = await page.evaluate(() => {
-      const panel = document.querySelector('.spell-info');
-      if (!panel) return { visible: false };
-      const box = panel.getBoundingClientRect();
-      return {
-        visible: true,
-        width: Math.round(box.width),
-        onScreen:
-          box.top >= 0 && box.left >= 0 && box.right <= window.innerWidth && box.bottom <= window.innerHeight,
-      };
-    });
-    await page.screenshot({ path: `${OUT}-08-tooltip.png` });
-    await touchEnd();
-    check(
-      'long-pressing a picker roster icon opens its description, on screen',
-      report.longPressTooltip.visible && report.longPressTooltip.onScreen,
-      JSON.stringify(report.longPressTooltip)
-    );
-  }
+  check(
+    'the practice panel opens on Đấu thủ and fits the phone viewport',
+    report.panelInPhoneView.visible &&
+      report.panelInPhoneView.onScreen &&
+      report.panelInPhoneView.selectedTab === 'practice-tab-roster',
+    JSON.stringify(report.panelInPhoneView)
+  );
 
   await page.evaluate(() => {
     window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.closeSpellPicker();

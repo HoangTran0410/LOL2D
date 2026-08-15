@@ -1,5 +1,5 @@
 /**
- * End-to-end drive of the in-game practice panel — the four-tab modal that
+ * End-to-end drive of the in-game practice panel — the three-tab modal that
  * reshapes a *running* match (`src/game/hud/PracticePanel.vue` over
  * `src/game/MatchDirector.ts`).
  *
@@ -24,10 +24,10 @@
  *
  * ## What it proves, in order
  *
- *   1. the corner button opens a panel with four tabs, and `#practice-close`
- *      closes it from *every* one of them — the picker's own Huỷ lives inside
- *      the Chiêu thức tab and disappears with it, which once left three tabs
- *      with no way out of a modal covering a paused match;
+ *   1. the corner button opens a panel with three tabs, and `#practice-close`
+ *      closes it from *every* one of them — no tab owns an exit, and the one
+ *      that used to (the deleted picker's Huỷ) left the others with no way out
+ *      of a modal covering a paused match;
  *   2. Đấu thủ: a bot added while paused is on the roster at once and in
  *      `objectManager.objects` on the first unpaused tick, not before;
  *   3. swapping that bot's champion changes its name and leaves it standing
@@ -48,12 +48,10 @@
  *      and `=== 0.1` fails on correct code;
  *   8. Thế giới: the jungle switch empties `game.monsters` and the camps are
  *      gone from the world after one tick;
- *   9. Chiêu thức still scrolls and still commits a pick behind Xác nhận (the
- *      regression guard on the tab shell that wrapped it);
- *  10. a kit saved mid-match survives a reload into a new match. Note *where*:
- *      the saved-kit shelf is not on the Chiêu thức tab — that tab is
- *      `SpellPickerModal`, which has never imported `KitRoster` — it is at
- *      Đấu thủ → a unit's row → the loadout editor. Asserted both ways.
+ *   9. a kit saved mid-match survives a reload into a new match. Note *where*:
+ *      the saved-kit shelf is not on the panel itself — it is at Đấu thủ → a
+ *      unit's row → the loadout editor, which teleports out of the panel.
+ *      Asserted both ways.
  *
  *   node tests/e2e/drive-practice-panel.mjs [outPrefix]
  *
@@ -68,8 +66,8 @@ const VIEWPORT = { width: 1280, height: 900 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
-const TAB_IDS = ['spells', 'roster', 'rules', 'world'];
-const TAB_LABELS = ['Chiêu thức', 'Đấu thủ', 'Trận đấu', 'Thế giới'];
+const TAB_IDS = ['roster', 'rules', 'world'];
+const TAB_LABELS = ['Đấu thủ', 'Trận đấu', 'Thế giới'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
@@ -278,13 +276,12 @@ try {
   await page.screenshot({ path: `${OUT}-01-panel.png` });
 
   // The close button is the shell's, not a tab's, and that is exactly what has
-  // to be guarded: Huỷ lives inside the Chiêu thức tab and `v-show` takes it
-  // away with the rest of that tab, so on three of four tabs this button is the
-  // only exit from a modal covering a paused match.
+  // to be guarded: no tab carries an exit of its own, so on every tab this
+  // button is the only way out of a modal covering a paused match.
   report.closeFromEveryTab = {};
   for (const [index, id] of TAB_IDS.entries()) {
     if (index > 0) await openPanel();
-    await selectTab(id, id === 'roster'); // one of the four switched by thumb
+    await selectTab(id, id === 'roster'); // one of the three switched by thumb
     await closePanel();
     report.closeFromEveryTab[id] = {
       pickerFlag: await hudFlag(),
@@ -515,68 +512,10 @@ try {
     JSON.stringify(report.jungle)
   );
 
-  // ------------------------------ 9. Chiêu thức still scrolls and still commits
+  // ---------------------------- 9. a kit saved mid-match survives a new match
 
   await openPanel();
-  const scrollBefore = await gameEval(() => document.querySelector('.spell-picker').scrollTop);
-  const pickerBox = await gameEval(() => {
-    const box = document.querySelector('.spell-picker').getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height * 0.7 };
-  });
-  await touchStart([{ x: pickerBox.x, y: pickerBox.y }]);
-  await touchMove([{ x: pickerBox.x, y: pickerBox.y - 150 }]);
-  await page.waitForTimeout(80);
-  await touchMove([{ x: pickerBox.x, y: pickerBox.y - 280 }]);
-  await page.waitForTimeout(120);
-  const scrollDuring = await gameEval(() => document.querySelector('.spell-picker').scrollTop);
-  await touchEnd();
-  await page.waitForTimeout(150);
-  report.pickerScroll = { scrollBefore, scrollDuring };
-  check(
-    'Chiêu thức: the roster still scrolls under a thumb inside the tab shell',
-    scrollDuring > scrollBefore + 20,
-    `scrollTop ${scrollBefore} -> ${scrollDuring}`
-  );
-
-  const slot = await gameEval(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.spellIndexToSwap
-  );
-  const spellBeforePick = await gameEval(
-    index => window.__lol2d.scene.oScene.game.player.spells[index]?.constructor.name,
-    slot
-  );
-  await tapSelector('.spell-picker .group[data-champion="Shaco"] .spell');
-  const staged = await gameEval(
-    index =>
-      window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[index]?.spellClass
-        ?.name ?? null,
-    slot
-  );
-  const liveWhileStaged = await gameEval(
-    index => window.__lol2d.scene.oScene.game.player.spells[index]?.constructor.name,
-    slot
-  );
-  await tapSelector('.picker-btn.confirm');
-  await page.waitForTimeout(250);
-  const spellAfterConfirm = await gameEval(
-    index => window.__lol2d.scene.oScene.game.player.spells[index]?.constructor.name,
-    slot
-  );
-  report.pickerCommit = { slot, spellBeforePick, staged, liveWhileStaged, spellAfterConfirm };
-  check(
-    'Chiêu thức: a pick still stages behind Xác nhận, and Xác nhận still applies it',
-    staged?.startsWith('Shaco') &&
-      liveWhileStaged === spellBeforePick &&
-      spellAfterConfirm !== spellBeforePick &&
-      spellAfterConfirm?.startsWith('Shaco') &&
-      (await hudFlag()) === false,
-    JSON.stringify(report.pickerCommit)
-  );
-
-  // --------------------------- 10. a kit saved mid-match survives a new match
-
-  await openPanel();
-  const shelfOnSpellsTab = await gameEval(
+  const shelfOnPanelOpen = await gameEval(
     () => !!document.querySelector('.practice-panel .saved-kit-shelf')
   );
   await selectTab('roster');
@@ -606,7 +545,7 @@ try {
   await page.reload({ waitUntil: 'load' });
   await startMatch();
   await openPanel();
-  const shelfOnSpellsTabAfterReload = await gameEval(
+  const shelfOnPanelOpenAfterReload = await gameEval(
     () => !!document.querySelector('.practice-panel .saved-kit-shelf')
   );
   await selectTab('roster');
@@ -623,11 +562,11 @@ try {
   // one that would show up if it had.
   const storedRules = JSON.parse(storedConfig ?? 'null');
   report.savedKit = {
-    shelfOnSpellsTab,
+    shelfOnPanelOpen,
     shelfBeforeSaving,
     nameFieldFocused,
     storedKitNames: JSON.parse(storedKits ?? '[]').map(kit => kit.name),
-    shelfOnSpellsTabAfterReload,
+    shelfOnPanelOpenAfterReload,
     shelfAfterReload,
     storedPregame: storedRules && {
       championName: storedRules.player?.championName,
@@ -652,9 +591,9 @@ try {
     JSON.stringify(report.savedKit)
   );
   check(
-    'the shelf lives in the loadout editor off Đấu thủ, never on the Chiêu thức tab (spec, Task 11 correction)',
-    shelfOnSpellsTab === false && shelfOnSpellsTabAfterReload === false,
-    `spells tab before ${shelfOnSpellsTab}, after reload ${shelfOnSpellsTabAfterReload}`
+    'the shelf lives in the loadout editor off Đấu thủ, never on the panel itself',
+    shelfOnPanelOpen === false && shelfOnPanelOpenAfterReload === false,
+    `panel before ${shelfOnPanelOpen}, after reload ${shelfOnPanelOpenAfterReload}`
   );
   check(
     'saving a kit does not write through to the pregame config',

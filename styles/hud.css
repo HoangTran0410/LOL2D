@@ -69,10 +69,9 @@
 }
 
 /* The grey mat and its hover flash belong to the cast strip's tiles, not to
-   every `.spell` on the page: the picker's roster uses the same class and
-   wears the hextech shelf chrome instead (`.spell-picker .spell` below).
-   Scoped rather than overridden because the hover was `!important`, which no
-   amount of specificity in the picker's own rule could have beaten. */
+   every `.spell` on the page. Scoped rather than left global because the
+   hover was `!important`, which no rule elsewhere could have beaten — the
+   deleted picker's roster reused this class and had to fight it. */
 .spells .spell {
   margin-right: 5px;
 
@@ -360,18 +359,18 @@
   font-weight: bold;
 }
 
-/* ============== Practice panel & spell picker ============== */
+/* ============== Practice panel ============== */
 /* The modal box: one compact layout for both modes. It used to be a wide
    (80vw, up to 1000px) multi-column grid on the desktop and a narrow vertical
    scroll under `body.touch-ui`; the narrow one reads better, so it is the only
    one — a centred column that is near-full-width on a phone and a bounded
-   sheet on a monitor. The former `body.touch-ui .spell-picker*` overrides are
-   folded into these base rules.
+   sheet on a monitor. The former `body.touch-ui` overrides are folded into
+   these base rules.
  *
  * Everything below wears the hextech skin (`--hextech-*` in styles/main.css),
- * not the dark grey the rest of the HUD does, because this modal is the
- * pregame loadout editor — same slot row, same roster, same two gestures,
- * same batched Huỷ / Xác nhận (see SpellPickerModal.vue and
+ * not the dark grey the rest of the HUD does, because this modal opens the
+ * pregame loadout editor itself — same slot row, same roster, same two
+ * gestures, same batched Huỷ / Xác nhận (see
  * src/scenes/setup/LoadoutEditorModal.vue). It carried its own palette
  * (`#111` / `#fff3` / `#7fd3ff`) and its own roster density for as long as
  * the two screens were unrelated, and that was the only thing still making
@@ -379,11 +378,9 @@
  * `.pregame-modal` / `.kit-shelf` / `.catalog-spell-card` in
  * styles/pregame-scene.css deliberately — change one, change both.
  *
- * All of that used to live on `.spell-picker`, which was the modal root. It
- * is on the panel now because the picker is one of four tabs inside the same
- * box (PracticePanel.vue) — but only the *chrome* moved. `.spell-picker`
- * keeps `overflow-y: auto` and stays the element that scrolls, which
- * `tests/e2e/drive-mobile-hud.mjs` scrolls by hand and asserts on. */
+ * All of that used to live on `.spell-picker`, which was the modal root
+ * before the panel wrapped it in a tab bar and that tab was deleted.
+ * `.practice-tab-body` is the element that scrolls now. */
 .practice-panel {
   position: fixed;
   top: 50%;
@@ -400,7 +397,7 @@
   width: min(760px, 92vw);
   /* A *fixed* height, not `max-height`, and this is the whole of the fix for a
      panel that jumped under the cursor. Content-sized, the box was 855px tall
-     on the Chiêu thức tab (its roster overflows, so it pinned to the old
+     on the tallest tab (a roster that overflows, so it pinned to the old
      `max-height: 90vh`) and 92px tall on Trận đấu — and because it is centred
      with `translate(-50%, -50%)`, the shrink also re-centred it, moving its top
      edge from y=48 to y=429. Switching tabs moved the tab bar you had just
@@ -409,11 +406,11 @@
        - `min-height` fixes nothing on its own: the jump is content *growing*
          past the floor, which is the same jump.
        - "size to the tallest tab" is what this already is. The tallest tab is
-         the twenty-champion picker, which overflows any screen this game runs
+         the roster, which at the bot cap overflows any screen this game runs
          on, so its height is 90vh whatever else is in the panel — a measured
          px value would only be that number, stale.
      90vh, so the tab the panel opens on keeps exactly the geometry it had; the
-     three short tabs stop shrinking to fit and fill the frame instead. The two
+     short tabs stop shrinking to fit and fill the frame instead. The two
      media queries below replace this with `100dvh` full-bleed, where the panel
      was already stable for the same reason. */
   height: 90vh;
@@ -463,20 +460,13 @@
    hypothetical size stays its full content height, the panel therefore grows
    to its own `max-height`, and the body shrinks into the remainder with a
    *definite* height to scroll in. `flex: 1 1 0` is the version that collapses
-   (see SpellPickerModal.vue's file comment, which has the story). */
-.spell-picker,
+   (see PracticePanel.vue's file comment, which has the story). */
 .practice-tab-body {
   box-sizing: border-box;
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.spell-picker {
-  display: flex;
-  flex-direction: column;
-  padding: 0 0.8rem 0.8rem;
 }
 
 .practice-tab-body {
@@ -646,8 +636,7 @@
    90vh, so a button at the end of that flow is off screen in every viewport
    this game runs on — and the tab body's touch scrolling is hand-rolled
    (RosterTab.vue), which is a lot of gesture to ask for before the primary
-   action of the tab is even reachable. Same trick, same reason, as
-   `.picker-header` pinning the slot row on the tab next door. */
+   action of the tab is even reachable. */
 .practice-add-bot {
   position: sticky;
   bottom: 0;
@@ -711,295 +700,12 @@
   font-style: italic;
 }
 
-/* `position: sticky` needs nothing but *a* scrolling ancestor, which
-   `.spell-picker` already is, so this pins the slot row to the top of the tab
-   while the roster scrolls beneath — the slot selector (and the Huỷ / Xác
-   nhận actions inside it) never scrolls out of reach. See
-   SpellPickerModal.vue's file comment for the flex "sticky header" attempt
-   that looked simpler and silently broke the whole list instead. */
-.picker-header {
-  position: sticky;
-  top: 0;
-  z-index: 12;
-  background: var(--hextech-bg);
-  padding: 0.8rem 0 6px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--hextech-line);
-}
-
-/* Same type as `.pregame-modal-header h3` — gold, uppercase, tracked out. */
-.spell-picker .title {
-  margin: 0 0 6px;
-  padding: 0;
-  color: var(--hextech-gold);
-  text-align: center;
-  font-size: 1.05em;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* The one full-width row in `.list`, which is otherwise a grid of shelves —
-   the same role `.catalog-random-card` plays in the pregame roster. */
-.picker-modes {
-  grid-column: 1 / -1;
-  font-size: 0.85em;
-  margin: 4px 0 0;
-  color: var(--hextech-muted);
-}
-
-/* 22px so the mode checkboxes are a real tap target (the native control is
-   ~13px), a size that reads fine with a mouse too. The practice tabs' toggles
-   are the same control in the same modal under the same thumb — one rule
-   rather than a second copy of the number. */
-.spell-picker input[type='checkbox'],
+/* 22px so a checkbox is a real tap target (the native control is ~13px), a
+   size that reads fine with a mouse too. */
 .practice-tab-body input[type='checkbox'] {
   width: 22px;
   height: 22px;
   vertical-align: middle;
-}
-
-/* The roster: shelves side by side, three-ish to a row on a monitor and one
-   on a phone, rather than one champion per full-width row — which is what
-   keeps a twenty-champion list a few flicks long instead of twenty.
-   `.kit-roster` in styles/pregame-scene.css is the same grid.
-
-   A grid rather than a wrapping flex row on purpose: a flex container sizes
-   its items from their max-content, and a shelf's max-content is "the
-   champion's name and every one of its icons on a single line" — wide,
-   ragged, and different for a four-ability shelf than for the five-summoner
-   one. A fixed track means every shelf is the same width whatever is in it,
-   with long names ellipsised inside it (`.group-header p`). 220px is four
-   48px icons plus their gaps and the shelf's own padding, so a champion's kit
-   never wraps to a second line. */
-.spell-picker .list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  align-items: start;
-  gap: 0.4rem;
-}
-
-/* Picks which equipped slot the next roster tap replaces, and (at its end)
-   the Huỷ / Xác nhận actions. Wraps when there is not room for the pills and
-   both buttons on one line; 44px pills are the smallest reliable thumb target.
-   See SpellPickerModal.vue's file comment. */
-.slot-picker {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 6px 0 0;
-}
-
-/* The twin of `.kit-slot-pill` in styles/pregame-scene.css: square, sunken,
-   teal when it is the slot the roster is filling, gold when it holds a pick
-   that "Xác nhận" has not committed yet. */
-.slot-pill {
-  position: relative;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 2px solid var(--hextech-line);
-  background: var(--hextech-sunken);
-  color: var(--hextech-text);
-  cursor: pointer;
-  overflow: hidden;
-  line-height: 0;
-}
-
-.slot-pill img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.slot-pill:hover {
-  border-color: var(--hextech-gold-dim);
-}
-
-.slot-pill.active {
-  border-color: var(--hextech-teal);
-  box-shadow: 0 0 0 2px rgba(8, 171, 172, 0.3);
-}
-
-/* A slot with a pending, not-yet-confirmed pick — gold, the colour this
-   screen uses for a chosen thing, so the player can see at a glance which
-   slots "Xác nhận" will change. */
-.slot-pill.staged {
-  border-color: var(--hextech-gold);
-}
-
-.slot-pill.staged.active {
-  border-color: var(--hextech-teal);
-}
-
-.slot-pill-key {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  min-width: 13px;
-  padding: 0 2px;
-  line-height: 13px;
-  font-size: 0.62em;
-  font-weight: bold;
-  text-align: center;
-  color: var(--hextech-text);
-  background: rgba(0, 0, 0, 0.8);
-}
-
-/* The icon *is* the button in the picker — 48px of picture with a border
-   around it and nothing else, no card padding it down to a thumbnail. Same
-   size and same chrome as `.catalog-spell-card`. */
-.spell-picker .spell {
-  box-sizing: border-box;
-  width: 48px;
-  height: 48px;
-  display: block;
-  border: 2px solid var(--hextech-line);
-  background: var(--hextech-sunken);
-  cursor: pointer;
-  line-height: 0;
-}
-
-.spell-picker .spell:hover {
-  border-color: var(--hextech-gold-dim);
-}
-
-/* ====================== group ====================== */
-/* One champion's shelf: a heading that is also the "dùng cả bộ" button, and
-   the abilities under it. `.kit-shelf` in styles/pregame-scene.css is the
-   same box. */
-.spell-picker .group {
-  border: 1px solid var(--hextech-line);
-  background: var(--hextech-panel);
-  padding: 0.35rem;
-}
-
-.spell-picker .group:hover {
-  border-color: var(--hextech-gold-dim);
-}
-
-/* The icons under the heading, wrapping within the shelf's track. */
-.spell-picker .group-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-/* Uppercase on the row, not on the name inside it, so the `Dùng bộ` chip is
-   set the same way — `.kit-shelf-heading` puts it here for the same reason. */
-.spell-picker .group-header {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.35rem;
-  font-size: 0.8em;
-  color: var(--hextech-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* The same header, as the "dùng cả bộ chiêu này" button (see
-   SpellPickerModal.vue). Stripped back to the div it replaces — no button
-   chrome of its own — because the shelf's border already frames it; what
-   marks it as pressable is the `Dùng bộ` chip on the right and the hover
-   colour, not a second box inside a box. `width: 100%` so the whole header
-   row is the target, not just the text. */
-/* `font-family: inherit` rather than the `font: inherit` shorthand this used
-   to carry: the shorthand resets `font-size` too, which would undo the 0.8em
-   `.group-header` sets on the very same element and leave the two kinds of
-   shelf heading — button and inert div — at different sizes. Colour is left
-   alone for the same reason. `.kit-shelf-apply` is written this way already. */
-.spell-picker .group-header-btn {
-  width: 100%;
-  padding: 0;
-  background: none;
-  border: none;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-/* `.kit-apply-chip`'s twin in styles/pregame-scene.css. */
-.kit-apply-hint {
-  margin-left: auto;
-  flex-shrink: 0;
-  padding: 2px 6px;
-  border: 1px solid rgba(200, 170, 110, 0.4);
-  color: var(--hextech-gold);
-  font-size: 0.9em;
-  white-space: nowrap;
-}
-
-.spell-picker .group-header-btn:hover .kit-apply-hint {
-  border-color: var(--hextech-gold);
-  background: var(--hextech-gold-wash);
-  color: var(--hextech-text);
-}
-
-.spell-picker .group-header img {
-  width: 22px;
-  height: 22px;
-  flex-shrink: 0;
-  object-fit: cover;
-  background: var(--hextech-sunken);
-  border-radius: 50%;
-}
-
-/* Ellipsised rather than allowed to widen the shelf's grid track — the same
-   thing `.kit-shelf-name` does. Type comes from `.group-header` above. */
-.spell-picker .group-header p {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.spell-picker .group:hover .group-header p {
-  color: var(--hextech-text);
-}
-
-/* The Huỷ / Xác nhận actions are the last two children of `.slot-picker`, on
-   the same row as the slot pills (see SpellPickerModal.vue) — no separate
-   footer. `margin-left: auto` on the first one pushes the pair to the right
-   end of the row; when the row wraps, they drop to their own line, still
-   right-aligned. 44px tall to match the pills. Nothing is applied to the game
-   until "Xác nhận". */
-.picker-btn {
-  min-height: 44px;
-  padding: 0.3rem 0.9rem;
-  border: 2px solid transparent;
-  border-image: linear-gradient(var(--hextech-teal), var(--hextech-teal-deep)) 1;
-  background: var(--hextech-bg);
-  color: var(--hextech-text);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.picker-btn:hover {
-  box-shadow: 0 0 10px 4px rgba(192, 252, 253, 0.4), inset 0 0 5px 2px rgba(192, 252, 253, 0.3);
-}
-
-/* The secondary of the pair, the way `.hextech-btn.secondary` is on the
-   pregame screen — quieter, and pushed with its partner to the right end of
-   the slot row. */
-.picker-btn.cancel {
-  margin-left: auto;
-  opacity: 0.85;
-  font-weight: normal;
-}
-
-/* The changelog was desktop reading matter opened on hover; the unified
-   compact layout drops it (it never showed under `body.touch-ui` anyway). */
-.change-logs {
-  display: none;
 }
 
 /* A narrow phone held upright. The twin of `@media (max-width: 640px)` in
@@ -1019,12 +725,11 @@
 }
 
 /* A landscape phone — the natural way to hold this game, and the shape the
-   picker most has to survive. Keyed on height, not orientation, so a short
+   panel most has to survive. Keyed on height, not orientation, so a short
    desktop window is treated the same way. The twin of the `@media
    (max-height: 480px)` block at the end of styles/pregame-scene.css: full
-   height, no frame, a narrower track (three shelves to a row on an 844px-wide
-   phone instead of two) and a 44px icon — still exactly a thumb target —
-   rather than the 48px a roomier screen gets. */
+   height, no frame, and a tab row shortened below the usual thumb minimum to
+   buy back a row of whatever the tab is listing. */
 @media (max-height: 480px) {
   .practice-panel {
     height: 100vh;
@@ -1032,14 +737,10 @@
     border-width: 0;
   }
 
-  .spell-picker {
-    padding: 0 0.8rem 0.6rem;
-  }
-
   /* The tab bar buys back a row of the roster the same way
      `.kit-bar-btn`/`.kit-slot-pill` do in styles/pregame-scene.css's own
      `@media (max-height: 480px)` block: below the 44px thumb minimum, because
-     a screen this short has ~210px of list and four labels across the top are
+     a screen this short has ~210px of list and the labels across the top are
      a wide target even when they are a short one. */
   .practice-tabs {
     padding-top: 0.25rem;
@@ -1051,57 +752,6 @@
     padding: 0.25rem 0.3rem;
     font-size: 0.78em;
   }
-
-  .picker-header {
-    padding-top: 0.4rem;
-  }
-
-  .spell-picker .list {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
-
-  .spell-picker .spell {
-    width: 44px;
-    height: 44px;
-  }
-
-  .spell-picker .group {
-    padding: 0.25rem;
-  }
-
-  .spell-picker .group-header {
-    margin-bottom: 0.25rem;
-  }
-}
-
-/* Tooltip container */
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-}
-
-/* Tooltip text */
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px;
-}
-
-/* Show the tooltip text when you mouse over the tooltip container */
-.tooltip:hover .tooltiptext {
-  visibility: visible;
 }
 
 /* =====================================================================
@@ -1152,21 +802,11 @@ body.touch-ui .spell-info img {
   margin-right: 8px;
 }
 
-/* =============== Spell picker =============== */
-/* The picker's sizing is now one shared compact layout (see `.spell-picker`
-   above), so the old touch-only size overrides are gone. The only thing still
-   mode-specific is the mode-checkbox tooltips: they open on :hover, which a
-   touch screen has no way to trigger, and the labels beside them already say
-   what they do. */
-body.touch-ui .spell-picker .tooltip .tooltiptext {
-  display: none;
-}
-
 /* =============== Corner control =============== */
-/* The spell-picker entry point, in both modes. The desktop's bottom-HUD
-   icons still open the picker pre-aimed at the slot that was clicked, but
-   that is a shortcut for someone who already knows the picker exists — this
-   is how they find out. In touch mode the strip does not render at all (see
+/* The practice panel's entry point, in both modes. The desktop's bottom-HUD
+   icons still open it pre-aimed at the slot that was clicked (straight into
+   the loadout editor on that slot), but that is a shortcut for someone who
+   already knows the panel exists — this is how they find out. In touch mode the strip does not render at all (see
    MobileHudView.vue), so there it is the only way in. Anchored top-right
    like the old mode toggle was, but alone now: the toggle moved to the
    pregame setup screen's Settings tab, a global preference rather than a

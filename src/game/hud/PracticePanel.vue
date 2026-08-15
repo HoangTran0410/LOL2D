@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /**
- * The in-game practice panel: four tabs over one paused match.
+ * The in-game practice panel: three tabs over one paused match.
  *
- * This is the old `SpellPickerModal` grown a tab bar. That modal was the only
- * thing in the game you could change without quitting to the setup screen, and
- * it could change exactly one thing — your own seven slots. Everything else
- * that shapes a match (who you are fighting, how many, cooldowns, whether the
- * jungle exists) meant abandoning the match and rebuilding it.
+ * This grew out of the old `SpellPickerModal`, which was the only thing in the
+ * game you could change without quitting to the setup screen, and could change
+ * exactly one thing — your own seven slots. Everything else that shapes a
+ * match (who you are fighting, how many, cooldowns, whether the jungle exists)
+ * meant abandoning the match and rebuilding it.
  *
  * Every tab writes through `hud.director` (`MatchDirector`), never into
  * `localStorage`: the panel reshapes *this* match and leaves the setup
@@ -21,63 +21,54 @@
  *
  * ## This component owns the modal shell; the tabs own only their bodies
  *
- * `.practice-panel` is the fixed, centred, hextech-framed box that
- * `.spell-picker` used to be. The picker kept `overflow-y: auto` and its
- * `position: sticky` `.picker-header`, and gave up only the chrome — because
- * it is still the element that scrolls, which
- * `tests/e2e/drive-mobile-hud.mjs` scrolls by hand and asserts on. Read
- * `SpellPickerModal.vue`'s file comment before touching either: a "sticky
- * header" flex shell *inside* the picker was tried once and silently
- * collapsed the roster. What is here is the other shape — the flex column is
- * the shell around the scroller, so the scroller is a flex *item* with a
- * definite height to fill rather than a container with an intrinsic one.
+ * `.practice-panel` is the fixed, centred, hextech-framed box; each tab body
+ * (`.practice-tab-body`) is the flex *item* that scrolls inside it, with a
+ * definite height to fill rather than an intrinsic one. That division is
+ * load-bearing: the deleted picker once tried the other shape — a "sticky
+ * header" flex shell *inside* the scroller — and silently collapsed its own
+ * list, because a `flex: 1 1 0` body inside a `max-height`-capped, otherwise
+ * intrinsic box has no pinned size to grow into.
  *
- * There is no separate title row. The selected tab is the title: a "CHIÊU
- * THỨC" tab above a heading that read "Chọn chiêu thức" was the same word
- * twice, and on the 390px-tall landscape phone this panel has to survive,
- * two rows of chrome above the roster is most of a shelf.
+ * There is no separate title row. The selected tab is the title: a tab label
+ * above a heading repeating it was the same word twice, and on the 390px-tall
+ * landscape phone this panel has to survive, two rows of chrome above the
+ * content is most of a shelf.
  *
- * `v-show` on the spell tab, `v-if` on the other three. The picker owns two
- * pieces of state a re-mount would throw away — its scroll position and the
- * staged `draftSpells` behind Huỷ / Xác nhận — and a player who checks the
- * roster tab mid-pick must come back to the picks they had. The other three
- * read their state from the director when they mount, so they cost nothing to
- * rebuild and gain nothing from being kept alive.
+ * `v-if` on every tab, with nothing kept alive. Each reads its state from the
+ * director (or the camera) when it mounts, so a re-mount costs nothing and
+ * loses nothing — there is no staged, uncommitted edit that survives a tab
+ * switch now that the picker's draft is gone. `RosterTab`'s loadout editor
+ * does stage a champion swap behind its own Huỷ / Xác nhận, but it covers the
+ * tab row while it is open, so there is no way to switch tabs out from under
+ * it.
  *
  * ## The close button belongs to the shell, not to a tab
  *
- * Huỷ / Xác nhận live inside `SpellPickerModal`'s slot row, because that is
- * what they act on — staged spell picks. `v-show` takes them off screen with
- * the rest of that tab, which for three of the four tabs left the panel with
- * **no way out at all**: it covers the match, the match is paused under it,
- * and the only exit was to work out that you must first switch back to Chiêu
- * thức. So the shell carries its own close, always visible, on the tab row.
+ * The panel covers the match and the match is paused under it, so every tab
+ * needs a way out and no tab owns one. The shell carries its own close,
+ * always visible, at the end of the tab row. (It used to be the picker's own
+ * "Huỷ", which disappeared with its tab and left the other three with no exit
+ * at all.)
  *
- * It calls `closeSpellPicker`, the same discard-and-close that Huỷ does. That
- * is the honest verb: leaving via this button abandons staged picks exactly as
- * Huỷ would. It does not undo a rules or world change, because those never
- * staged in the first place — see the spec's Task 9 correction.
+ * It calls `closeSpellPicker`, which discards nothing the panel is holding —
+ * rules, world and roster edits all apply on the spot, and the one staged edit
+ * left (the loadout editor's) is unreachable while this button is.
  */
 import { inject, ref } from 'vue';
 import type { HudInteractions } from './hudInteractions';
-import type { HudState } from './hudState';
-import SpellPickerModal from './SpellPickerModal.vue';
 import RosterTab from './practice/RosterTab.vue';
 import RulesTab from './practice/RulesTab.vue';
 import WorldTab from './practice/WorldTab.vue';
 
-defineProps<{ state: HudState }>();
-
 const hud = inject<HudInteractions>('hud')!;
 
 const TABS = [
-  { id: 'spells', label: 'Chiêu thức' },
   { id: 'roster', label: 'Đấu thủ' },
   { id: 'rules', label: 'Trận đấu' },
   { id: 'world', label: 'Thế giới' },
 ] as const;
 
-const tab = ref<(typeof TABS)[number]['id']>('spells');
+const tab = ref<(typeof TABS)[number]['id']>('roster');
 </script>
 
 <template>
@@ -96,9 +87,8 @@ const tab = ref<(typeof TABS)[number]['id']>('spells');
         {{ item.label }}
       </button>
 
-      <!-- The shell's own way out, on every tab. See the file comment: the
-           picker's Huỷ disappears with its tab, and three of the four tabs
-           had no exit from a panel that covers a paused match. -->
+      <!-- The shell's own way out, on every tab. See the file comment: no tab
+           owns an exit from a panel that covers a paused match. -->
       <button
         type="button"
         class="practice-close"
@@ -111,7 +101,6 @@ const tab = ref<(typeof TABS)[number]['id']>('spells');
       </button>
     </div>
 
-    <SpellPickerModal v-show="tab === 'spells'" :state="state" />
     <RosterTab v-if="tab === 'roster'" />
     <RulesTab v-if="tab === 'rules'" />
     <WorldTab v-if="tab === 'world'" />

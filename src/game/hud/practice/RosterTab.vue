@@ -137,11 +137,27 @@ const BEHAVIOUR_FLAGS: { key: keyof BotBehaviour; label: string }[] = [
  */
 const editing = shallowRef<RosterEntry | null>(null);
 const editingIndex = shallowRef(0);
+/** Which slot the editor opens on. Q by default, the way the editor itself defaults. */
+const editingSlot = shallowRef(1);
 
-const openEditor = (entry: RosterEntry, index: number): void => {
+const openEditor = (entry: RosterEntry, index: number, slot = 1): void => {
   editing.value = entry;
   editingIndex.value = index;
+  editingSlot.value = slot;
 };
+
+/**
+ * The desktop strip's per-icon shortcut lands here: clicking your own Q used
+ * to open the picker aimed at that slot, and now opens this tab's editor on
+ * the player's row, aimed at that slot. Consumed once — the flag is cleared
+ * immediately, so switching tabs and coming back does not re-open the editor.
+ */
+const requestedSlot = hud.editPlayerSlot;
+if (requestedSlot !== null) {
+  const index = roster.value.findIndex(entry => entry.isPlayer);
+  if (index >= 0) openEditor(roster.value[index], index, requestedSlot);
+  hud.editPlayerSlot = null;
+}
 
 const editingLoadout = computed<ChampionLoadout>(() =>
   editing.value ? hud.director.loadoutOf(editing.value.unit) : DEFAULT_CHAMPION_LOADOUT
@@ -195,9 +211,8 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
  * So one gesture tracker serves both: it scrolls whatever the finger went down
  * in, and it distinguishes a tap from a drag with the same
  * `TAP_MOVE_TOLERANCE_PX` a browser's own click-vs-drag heuristic would have
- * applied for free — the shape `SpellPickerModal.vue` already uses for the
- * picker's list and `hudInteractions.touchSpellEnd` for its icons. The two
- * differ only in what a tap then does: this tab's controls have real handlers
+ * applied for free — the shape the deleted spell picker used for its own
+ * list and its icons. The two differ only in what a tap then does: this tab's controls have real handlers
  * and go through `onTap`, while the editor has none of its own and gets the
  * missing click synthesised at the point the finger lifted. That bridge lives
  * here rather than in the editor because the editor is not what is broken —
@@ -380,6 +395,7 @@ const onEditorTouchEnd = (event: TouchEvent): void => {
         <LoadoutEditorModal
           :title="`Đổi tướng — ${labelOf(editingIndex)}`"
           :loadout="editingLoadout"
+          :initial-slot="editingSlot"
           :match-rules="hud.director.matchRules"
           :is-touch-ui="hud.touchUi"
           @change="applyLoadout"

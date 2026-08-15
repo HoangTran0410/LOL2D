@@ -6,9 +6,10 @@
  * This is the whole of what used to be three screens — the champion grid, the
  * mode toggle that hid it behind "Tự Ghép Chiêu", and the per-slot catalogue
  * you drilled into and committed out of. It is modelled on the in-game HUD
- * picker (`src/game/hud/SpellPickerModal.vue`), which browses the same
- * `SpellGroups` roster in the same order, because that one is fast in exactly
- * the way this screen was not: no drill-down, no dialog on a dialog, and the
+ * picker that used to browse the same `SpellGroups` roster in the same order
+ * (deleted with the practice panel's Chiêu thức tab, which this component now
+ * serves in both places), because that one was fast in exactly the way this
+ * screen was not: no drill-down, no dialog on a dialog, and the
  * slot you are filling stays pinned above the list the whole time (the parent
  * owns that row — see `LoadoutEditorModal.vue`).
  *

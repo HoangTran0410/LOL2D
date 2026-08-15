@@ -67,8 +67,8 @@ const onUrfChange = (event: Event): void => setUrf((event.target as HTMLInputEle
  * to `@input`/`@change` alone, the slider would not move and the checkbox
  * would not tick under a real `Input.dispatchTouchEvent`, while both worked
  * under a mouse. So the drag is computed from where the finger is across the
- * track, the same hand-rolled shape as the picker's own touch scrolling in
- * `SpellPickerModal.vue`.
+ * track, the same hand-rolled shape as `RosterTab.vue`'s own touch
+ * scrolling.
  *
  * Snapped to `CDR_PERCENT_STEP`, which is `MatchRulesPanel.vue`'s `step="10"`
  * — one definition, so a finger and a mouse cannot reach different values on

@@ -8,7 +8,7 @@
  * round trips through a dialog inside a dialog, and choosing a champion in
  * "Chọn Tướng" and then changing one ability meant starting over in "Tự Ghép
  * Chiêu". This replaces all of it with the shape the in-game HUD picker
- * already had (`src/game/hud/SpellPickerModal.vue`): the slot row pinned at
+ * already had: the slot row pinned at
  * the top, the whole roster scrolling underneath it, and picks batched behind
  * Huỷ / Xác nhận so a player can keep changing their mind. Same roster, same
  * order, same two gestures — see `KitRoster.vue`.
@@ -78,6 +78,13 @@ const props = defineProps<{
   loadout: ChampionLoadout;
   matchRules: MatchRules;
   isTouchUi: boolean;
+  /**
+   * Which slot the editor opens on, when the gesture that opened it already
+   * named one. The practice panel's `RosterTab` passes it through from the
+   * in-game HUD strip, where clicking your own Q means "change *this*". The
+   * setup screen omits it: a row there is opened as a whole loadout.
+   */
+  initialSlot?: number;
 }>();
 const emit = defineEmits<{ change: [ChampionLoadout]; close: [] }>();
 
@@ -90,8 +97,8 @@ const SLOT_D = SLOT_COUNT - 2;
 const SLOT_F = SLOT_COUNT - 1;
 
 const draft = ref<ChampionLoadout>({ ...props.loadout, customSlots: props.loadout.customSlots.slice() });
-/** Which slot the next roster tap fills. Q, like the in-game picker's default — the first slot anyone changes. */
-const activeSlot = ref(1);
+/** Which slot the next roster tap fills. Q unless the caller named one — the first slot anyone changes. */
+const activeSlot = ref(props.initialSlot ?? 1);
 
 const entryById = (id: string): SpellCatalogEntry | null =>
   id === 'random' ? null : (catalogById.get(id) ?? null);

@@ -16,21 +16,20 @@
  * keeps working without that button — the query parameter resolves ahead of
  * the stored preference, independent of any UI control.
  *
- * The one control left is the way into the spell picker, and it renders in
+ * The one control left is the way into the practice panel, and it renders in
  * both modes. It started touch-only, because `MobileHudView` has no
- * bottom-HUD strip (each equipped icon used to be its own tap target into
- * the picker) while `DesktopHudView` still does. But the strip's icons open
- * the picker *pre-aimed at one slot* — they are a shortcut into it, not an
- * announcement that it exists, and a mouse player who never thought to click
- * their own spell bar had no way to find the picker at all. It is also the
- * only place the roster's champion shelves (and their one-tap whole-kit
- * headers) live. So: same button, same entry point, both modes. It still
- * hides behind the picker itself, which occupies the same corner.
+ * bottom-HUD strip (each equipped icon is its own tap target into the panel)
+ * while `DesktopHudView` still does. But the strip's icons open the panel
+ * *pre-aimed at one slot* — they are a shortcut into it, not an announcement
+ * that it exists, and a mouse player who never thought to click their own
+ * spell bar had no way to find the panel at all. So: same button, same entry
+ * point, both modes. It still hides behind the panel itself, which occupies
+ * the same corner.
  *
  * `hud` (the shared `HudInteractions`, created once per game) arrives as a
  * prop from `InGameHUD.ts` rather than being constructed here, because it
  * needs the `Game` instance the lifecycle wrapper owns. It is `provide()`d
- * from here so `DesktopHudView`, `MobileHudView` and `SpellPickerModal` can
+ * from here so `DesktopHudView`, `MobileHudView` and the practice panel can
  * all `inject('hud')` the same reactive object instead of three independent
  * copies that could drift.
  *
@@ -66,7 +65,7 @@ defineExpose({
 </script>
 
 <template>
-  <!-- Hidden behind the picker: it lives in the top-right corner too (its
+  <!-- Hidden behind the panel: it lives in the top-right corner too (its
        own close button), and this would otherwise sit on top of it — the
        only way out of the modal. -->
   <button
@@ -74,11 +73,11 @@ defineExpose({
     class="corner-btn spell-picker-btn"
     @click="hud.openSpellPicker()"
     @touchend.prevent="hud.openSpellPicker()"
-    title="Đổi chiêu thức"
+    title="Bảng luyện tập"
   >
     <i class="fa-solid fa-wand-magic-sparkles"></i>
   </button>
 
   <DesktopHudView v-if="state && !hud.touchUi" :state="state" />
-  <MobileHudView v-if="state && hud.touchUi" :state="state" />
+  <MobileHudView v-if="state && hud.touchUi" />
 </template>

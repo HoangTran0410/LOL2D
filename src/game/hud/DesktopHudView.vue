@@ -64,7 +64,8 @@ const hud = inject<HudInteractions>('hud')!;
           v-for="(spell, index) of state.spells"
           :key="index"
           :class="spell.small ? 'spell small' : 'spell'"
-          @click="hud.changeSpell(index)"
+          @click="hud.openPlayerLoadout(index)"
+          @touchend.prevent="hud.openPlayerLoadout(index)"
           @mouseover="hud.mouseover(spell, $event)"
           @mouseout="hud.mouseout(spell)"
         >
@@ -128,5 +129,5 @@ const hud = inject<HudInteractions>('hud')!;
     </div>
   </div>
 
-  <PracticePanel v-if="hud.showSpellsPicker" :state="state" />
+  <PracticePanel v-if="hud.showSpellsPicker" />
 </template>

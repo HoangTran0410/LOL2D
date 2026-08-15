@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**
  * The touch HUD: whatever `TouchControls` draws on the canvas (joystick,
- * spell buttons with their own cooldown/mana) plus the practice panel (whose
- * first tab is the spell picker) and its long-press description tooltip.
+ * spell buttons with their own cooldown/mana) plus the practice panel.
  * Nothing else.
  *
  * There used to be a bottom-HUD strip here too — avatar, health/mana bars,
@@ -36,51 +35,22 @@
  *     centred on screen by the same camera follow.
  *
  * The one thing genuinely lost — a direct, per-slot tap target for "change
- * this spell" — moved into the picker itself: see `InGameHUD.vue`'s corner
- * button and the slot selector at the top of `SpellPickerModal.vue`.
+ * this spell" — moved into the practice panel: see `InGameHUD.vue`'s corner
+ * button, and `RosterTab`'s loadout editor, which sets all seven slots for
+ * every unit in the match rather than only the player's.
+ *
+ * The long-press description panel that used to render here went with the
+ * picker's icons, which were the only thing on this screen that fired it. Its
+ * replacement is one tap further in and is the editor's own: `useSpellPeek.ts`
+ * behind `KitRoster`'s icons.
  */
 import { inject } from 'vue';
-import FormatUtils from '../../utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
-import type { HudState } from './hudState';
 import PracticePanel from './PracticePanel.vue';
-
-defineProps<{ state: HudState }>();
 
 const hud = inject<HudInteractions>('hud')!;
 </script>
 
 <template>
-  <!-- The long-press description panel, driven by SpellPickerModal's own
-       touchSpellStart/End — it has no per-slot strip icon to hover any
-       more, but it still needs somewhere to render when the picker's
-       roster fires it. -->
-  <div
-    v-if="hud.spellHover"
-    class="spell-info"
-    :style="
-      'top:' +
-      hud.spellInfo.top +
-      ';bottom:' +
-      hud.spellInfo.bottom +
-      ';left:' +
-      hud.spellInfo.left +
-      ';width:' +
-      hud.spellInfo.width
-    "
-  >
-    <div class="header">
-      <div>
-        <img :src="hud.spellHover.image" alt="spell" />
-        <h4>{{ hud.spellHover.name }}</h4>
-      </div>
-      <div class="costs">
-        <span>{{ FormatUtils.spellSeconds(hud.spellHover.coolDown) }}s</span>
-        <span v-if="hud.spellHover.manaCost > 0" class="mana">{{ hud.spellHover.manaCost }} mana</span>
-      </div>
-    </div>
-    <p class="body" v-html="hud.spellHover.description"></p>
-  </div>
-
-  <PracticePanel v-if="hud.showSpellsPicker" :state="state" />
+  <PracticePanel v-if="hud.showSpellsPicker" />
 </template>

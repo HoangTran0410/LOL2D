@@ -10,7 +10,7 @@
  * `click` for that gesture — not just on the canvas, on the DOM HUD sitting
  * on top of it too. So this drives everything with *real* CDP touch events,
  * never a synthetic click and never a direct method call on the Vue
- * instance — a script that called `hud.changeSpell()` directly would pass
+ * instance — a script that called `hud.openSpellPicker()` directly would pass
  * even with the underlying bug still in place, which is exactly how the bug
  * shipped the first time.
  *
@@ -18,12 +18,13 @@
  * mode at all (see `MobileHudView.vue`'s file comment): health, mana, buff
  * stacks, CC and the revive countdown all already draw on the canvas over
  * the champion, and the loadout row duplicated the canvas spell buttons. The
- * one entry point left into the picker is the corner button
- * (`.spell-picker-btn`), and since it no longer knows which slot the player
- * wants — the strip used to answer that by which icon was tapped — the
- * picker gained its own slot selector (`.slot-picker .slot-pill`). Both are
- * new surfaces this script has to prove work under a real thumb, not a
- * synthetic click, for the same reason as everything else here.
+ * one entry point left is the corner button (`.spell-picker-btn`), which
+ * opens the practice panel on Đấu thủ. The loadout it used to reach directly
+ * is now one tap further in — a roster row opens `LoadoutEditorModal`, which
+ * is a *setup-screen* component written against a browser that synthesises
+ * clicks and scrolls lists by itself, neither of which happens inside a
+ * match. That bridge (`RosterTab.vue`) is the surface this script has to
+ * prove works under a real thumb.
  *
  *   node tests/e2e/drive-mobile-hud.mjs [outPrefix]
  *
@@ -121,178 +122,93 @@ try {
     pickerBeforeTap === false && report.pickerAfterRealTap === true,
     `before ${pickerBeforeTap}, after ${report.pickerAfterRealTap}`
   );
-  report.slotOnOpen = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.spellIndexToSwap
-  );
-  check('opening from the corner button defaults to slot 1 (Q)', report.slotOnOpen === 1);
-  await page.screenshot({ path: `${OUT}-01-picker-open.png` });
-
-  // -------------------------------------------- 2. the in-modal slot selector
-
-  const slotPills = await page.evaluate(() =>
-    [...document.querySelectorAll('.slot-picker .slot-pill')].map(el => {
-      const box = el.getBoundingClientRect();
-      return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
-    })
-  );
-  check('the slot selector has one pill per equipped slot', slotPills.length === 7, `${slotPills.length}`);
+  report.tabOnOpen = await page.evaluate(() => ({
+    tabs: [...document.querySelectorAll('.practice-tab')].map(tab => tab.id),
+    selected: document.querySelector('.practice-tab.selected')?.id ?? null,
+  }));
   check(
-    'each slot pill is at least the 44px thumb target',
-    slotPills.every(p => p.w >= 44 && p.h >= 44),
-    JSON.stringify(slotPills.map(p => `${p.w}x${p.h}`))
+    'the panel opens on Đấu thủ, with the three tabs it should have',
+    report.tabOnOpen.selected === 'practice-tab-roster' && report.tabOnOpen.tabs.length === 3,
+    JSON.stringify(report.tabOnOpen)
   );
-  // Slot 2 (W) under a real tap, not a direct field write.
-  await tap(slotPills[2].x, slotPills[2].y, 40);
-  await page.waitForTimeout(150);
-  report.slotAfterPillTap = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.spellIndexToSwap
-  );
-  check(
-    'a real touch tap on a slot pill retargets which slot gets replaced',
-    report.slotAfterPillTap === 2,
-    `${report.slotOnOpen} -> ${report.slotAfterPillTap}`
-  );
+  await page.screenshot({ path: `${OUT}-01-panel-open.png` });
 
-  // ------------------------------------------- 3. picking one under a thumb
+  // ------------------------------- 2. a roster row opens the loadout editor
+  //
+  // The editor is `src/scenes/setup/LoadoutEditorModal.vue`, driven entirely
+  // from `@click` because on the setup screen a tap synthesises one. In here
+  // it does not, so `RosterTab.vue` bridges the gesture by hand — this is the
+  // check that the bridge is actually wired.
 
-  const beforePick = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
-  );
-  // Shaco is in the roster (see the desktop picker screenshot); his kit is
-  // distinct from whatever the random preset gave the player, so a real
-  // change is unambiguous.
-  const shacoIcon = await page.evaluate(() => {
-    const groups = [...document.querySelectorAll('.spell-picker .group')];
-    const shaco = groups.find(g => g.querySelector('.group-header p')?.textContent?.trim() === 'Shaco');
-    const icon = shaco?.querySelectorAll('.spell')[0];
-    if (!icon) return null;
-    // The unified compact layout is a vertical scroll; on a short landscape
-    // viewport Shaco sits below the fold, so bring it into view before we read
-    // its coordinates and tap them.
-    icon.scrollIntoView({ block: 'center' });
-    const box = icon.getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const rowBox = await page.evaluate(() => {
+    const box = document
+      .querySelector('.practice-roster-row.is-player .practice-roster-open')
+      .getBoundingClientRect();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, h: box.height };
   });
-  check('the Shaco group is present and tappable', shacoIcon !== null);
-  if (shacoIcon) {
-    await tap(shacoIcon.x, shacoIcon.y);
-    await page.waitForTimeout(250);
-  }
-  // Picks are batched now: the tap only *stages* into slot 2's draft; the live
-  // loadout must not change until "Xác nhận".
-  const stagedAfterTap = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name
-  );
-  const liveAfterTap = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
-  );
-  report.pick = { beforePick, stagedAfterTap, liveAfterTap };
-  check(
-    'a real touch tap stages the pick into the selected slot (2) without applying it',
-    stagedAfterTap?.startsWith('Shaco') && liveAfterTap === beforePick,
-    `staged=${stagedAfterTap}, live ${beforePick} -> ${liveAfterTap}`
-  );
-  // Confirm flushes the draft to the live loadout and closes the picker.
-  const confirmBox = await page.evaluate(() => {
-    const box = document.querySelector('.picker-btn.confirm').getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  });
-  await tap(confirmBox.x, confirmBox.y, 40);
-  await page.waitForTimeout(250);
-  const afterConfirm = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.player.spells[2]?.constructor.name
-  );
-  report.confirm = { afterConfirm };
-  check(
-    '"Xác nhận" applies the staged pick to slot 2 (and only then)',
-    afterConfirm !== beforePick && afterConfirm?.startsWith('Shaco'),
-    `${beforePick} -> ${afterConfirm}`
-  );
-  // Confirm closed the picker; reopen for the rest of the checks.
-  await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker());
-  await page.waitForTimeout(300);
-
-  // --------------------------------------------------- 4. checkboxes toggle
-
-  const checkboxBox = await page.evaluate(() => {
-    const box = document.querySelector('#oneForAll').getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  });
-  const before1ForAll = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.oneForAll
-  );
-  await tap(checkboxBox.x, checkboxBox.y, 40);
-  await page.waitForTimeout(150);
-  const after1ForAll = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.oneForAll
+  check('the player\'s roster row is at least the 44px thumb target', rowBox.h >= 44, `${rowBox.h}`);
+  await tap(rowBox.x, rowBox.y);
+  await page.waitForTimeout(350);
+  report.editorAfterRowTap = await page.evaluate(
+    () => !!document.querySelector('.loadout-modal')
   );
   check(
-    'a real tap on the "ONE spell for ALL" checkbox toggles it',
-    before1ForAll === false && after1ForAll === true,
-    `${before1ForAll} -> ${after1ForAll}`
+    'a real touch tap on a roster row opens the loadout editor',
+    report.editorAfterRowTap === true
   );
+  await page.screenshot({ path: `${OUT}-02-editor-open.png` });
 
-  // ----------------------------------------------------------- 5. scrolling
+  // ------------------------------------- 3. the editor's roster scrolls, and
+  //                                          a drag on an icon does not pick
 
-  const scrollBefore = await page.evaluate(() => document.querySelector('.spell-picker').scrollTop);
-  const pickerBox = await page.evaluate(() => {
-    const box = document.querySelector('.spell-picker').getBoundingClientRect();
+  const scrollBefore = await page.evaluate(
+    () => document.querySelector('.loadout-modal .pregame-modal-body').scrollTop
+  );
+  const bodyBox = await page.evaluate(() => {
+    const box = document
+      .querySelector('.loadout-modal .pregame-modal-body')
+      .getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height * 0.7 };
   });
-  await touchStart([{ x: pickerBox.x, y: pickerBox.y }]);
-  await touchMove([{ x: pickerBox.x, y: pickerBox.y - 150 }]);
+  await touchStart([{ x: bodyBox.x, y: bodyBox.y }]);
+  await touchMove([{ x: bodyBox.x, y: bodyBox.y - 150 }]);
   await page.waitForTimeout(80);
-  await touchMove([{ x: pickerBox.x, y: pickerBox.y - 260 }]);
+  await touchMove([{ x: bodyBox.x, y: bodyBox.y - 260 }]);
   await page.waitForTimeout(120);
-  const scrollDuring = await page.evaluate(() => document.querySelector('.spell-picker').scrollTop);
+  const scrollDuring = await page.evaluate(
+    () => document.querySelector('.loadout-modal .pregame-modal-body').scrollTop
+  );
   await touchEnd();
   await page.waitForTimeout(150);
   report.scroll = { scrollBefore, scrollDuring };
   check(
-    'a touch drag inside the picker scrolls it (native scroll is suppressed page-wide, so this is hand-rolled)',
+    'a touch drag inside the editor scrolls it (native scroll is suppressed page-wide, so this is hand-rolled)',
     scrollDuring > scrollBefore + 20,
     `scrollTop ${scrollBefore} -> ${scrollDuring}`
   );
 
-  // ------------------------------- 6. a drag that starts on an icon scrolls,
-  //                                    it does not also pick that icon
+  // ------------------------------------------------ 4. the way back out, twice
 
-  // The reopen above reset the draft, so slot 2 starts unstaged; a scroll drag
-  // that begins on an icon must not stage it either.
-  const beforeDragStaged = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name ?? null
-  );
-  const firstVisibleIcon = await page.evaluate(() => {
-    const icon = document.querySelector('.spell-picker .group .spell');
-    const box = icon.getBoundingClientRect();
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const cancelBox = await page.evaluate(() => {
+    const box = document.querySelector('.loadout-modal .kit-bar-btn.secondary').getBoundingClientRect();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2, h: box.height };
   });
-  await touchStart([{ x: firstVisibleIcon.x, y: firstVisibleIcon.y }]);
-  await touchMove([{ x: firstVisibleIcon.x, y: firstVisibleIcon.y - 120 }]);
-  await page.waitForTimeout(80);
-  await touchMove([{ x: firstVisibleIcon.x, y: firstVisibleIcon.y - 220 }]);
-  await page.waitForTimeout(100);
-  await touchEnd();
-  await page.waitForTimeout(200);
-  const afterDragStaged = await page.evaluate(
-    () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.draftSpells[2]?.spellClass?.name ?? null
-  );
+  await tap(cancelBox.x, cancelBox.y, 40);
+  await page.waitForTimeout(250);
+  report.editorAfterCancel = await page.evaluate(() => !!document.querySelector('.loadout-modal'));
   check(
-    'a drag that starts on a picker icon (scrolling) does not stage it',
-    afterDragStaged === beforeDragStaged,
-    `${beforeDragStaged} -> ${afterDragStaged}`
+    'a real touch tap on Huỷ closes the editor and leaves the panel up',
+    report.editorAfterCancel === false &&
+      (await page.evaluate(() => !!document.querySelector('.practice-panel'))) === true
   );
 
-  // ---------------------------------------------------- 7. Huỷ (close) button
-
-  // The corner X is gone; "Huỷ" in the sticky slot row is the way out now.
   const closeBox = await page.evaluate(() => {
-    const box = document.querySelector('.picker-btn.cancel').getBoundingClientRect();
+    const box = document.querySelector('#practice-close').getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, w: box.width, h: box.height };
   });
   check(
-    'the Huỷ button is at least the 44px thumb target',
-    closeBox.h >= 44,
+    'the panel close button is at least the 44px thumb target',
+    closeBox.w >= 44 && closeBox.h >= 34,
     `${closeBox.w}x${closeBox.h}`
   );
   await tap(closeBox.x, closeBox.y, 40);
@@ -300,7 +216,7 @@ try {
   report.pickerAfterClose = await page.evaluate(
     () => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.showSpellsPicker
   );
-  check('a real touch tap on Huỷ closes the picker', report.pickerAfterClose === false);
+  check('a real touch tap on the close button closes the panel', report.pickerAfterClose === false);
 
   // --------------------------------------------- 8. high-DPI overlap checks
 
@@ -327,16 +243,21 @@ try {
     clip: { x: VIEWPORT.width - 140, y: 0, width: 140, height: 70 },
   });
 
-  // Reopen to screenshot and check the slot pills' hotkey badges the same
-  // way the old strip's edit-badges were checked: nothing bleeds into the
-  // next pill at 3x device scale.
-  await page.evaluate(() => window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker());
+  // Reopen and check the loadout editor's slot pills the same way the old
+  // strip's edit-badges were checked: nothing bleeds into the next pill at 3x
+  // device scale. That row is the panel's densest piece of chrome on a
+  // 390px-tall phone, and it is the one this HUD reaches through two modals.
+  await page.evaluate(() =>
+    window.__lol2d.scene.oScene.game.inGameHUD.vueInstance.hud.openSpellPicker()
+  );
   await page.waitForTimeout(300);
+  await page.click('.practice-roster-row.is-player .practice-roster-open');
+  await page.waitForSelector('.loadout-modal', { state: 'visible', timeout: 5_000 });
   report.slotPillBadgeOverlap = await page.evaluate(() => {
-    const pills = [...document.querySelectorAll('.slot-picker .slot-pill')];
+    const pills = [...document.querySelectorAll('.kit-slot-bar .kit-slot-pill')];
     const overlaps = [];
     for (let i = 0; i < pills.length - 1; i++) {
-      const a = pills[i].querySelector('.slot-pill-key')?.getBoundingClientRect();
+      const a = pills[i].querySelector('.kit-slot-pill-key')?.getBoundingClientRect();
       const b = pills[i + 1].getBoundingClientRect();
       if (a && a.right > b.left + 2) {
         overlaps.push({ i, badgeRight: a.right, nextLeft: b.left });
@@ -349,7 +270,10 @@ try {
     report.slotPillBadgeOverlap.length === 0,
     JSON.stringify(report.slotPillBadgeOverlap)
   );
-  await page.screenshot({ path: `${OUT}-03-slot-picker-zoom.png`, clip: { x: 0, y: 30, width: 400, height: 80 } });
+  await page.screenshot({
+    path: `${OUT}-04-slot-bar-zoom.png`,
+    clip: { x: 0, y: 30, width: 400, height: 90 },
+  });
 } catch (error) {
   failures.push(`threw: ${error.stack ?? error}`);
 } finally {

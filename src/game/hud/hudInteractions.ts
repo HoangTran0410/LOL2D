@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * The other half of the shared layer: not display data but what a thumb or a
- * cursor *does* — picking a spell, hovering a description, holding a finger
- * down long enough to ask what an icon means.
+ * cursor *does* — opening the practice panel, hovering a description.
  *
  * One `HudInteractions` object is created once per game and `provide()`d to
- * the whole HUD Vue app, so `DesktopHudView`, `MobileHudView` and
- * `SpellPickerModal` all read and mutate the same reactive state instead of
- * three independent copies that could drift — opening the picker from the
- * mobile strip has to be visible to the modal, which is a different
- * component. See `docs/ADDING_SPELLS.md` for the spell registration this
- * drives.
+ * the whole HUD Vue app, so `DesktopHudView`, `MobileHudView` and the practice
+ * panel all read and mutate the same reactive state instead of three
+ * independent copies that could drift — opening the panel from the corner
+ * button has to be visible to the panel, which is a different component. See
+ * `docs/ADDING_SPELLS.md` for the spell registration this drives.
+ *
+ * The spell-picking surface that used to live here — `draftSpells`, `pick`,
+ * `confirmPicks`, the two mode flags and the icon long-press handlers — went
+ * with the Chiêu thức tab. `RosterTab`'s loadout editor is a superset of it
+ * (every unit, not just the player, and whole saved kits), so what is left
+ * here is the way *in*: `openSpellPicker` for the corner button and
+ * `openPlayerLoadout` for the desktop strip's per-slot shortcut.
  *
  * Touch has no `click`. `GameScene`'s p5 touch handlers call
  * `preventDefault()` on every touch on the page (needed so a drag across the
@@ -29,26 +34,14 @@ import type MatchDirector from '../MatchDirector';
 import type Camera from '../gameObject/map/Camera';
 import { removeAccents } from '../../utils/index';
 import * as AllSpells from '../gameObject/spells/index';
-import { SpellGroups, abilitySlotOfClass } from '../preset';
+import { SpellGroups } from '../preset';
 import AssetManager, { type AssetKey } from '../../managers/AssetManager';
 
 /**
- * How long a thumb must rest on a spell icon before its description appears.
- *
- * The tooltip is opened by hover on the desktop, and a touch screen has no
- * hover — which left the only place in the game that says what an ability does
- * unreachable on the device where a player is least likely to know already.
- * 400ms is the usual long-press: past a tap, short of feeling stuck.
- */
-export const LONG_PRESS_MS = 400;
-
-/** How long the description stays up after the thumb lifts. */
-export const LONG_PRESS_DISMISS_MS = 2500;
-
-/**
  * Past this many CSS pixels of travel, a touch is a drag — most often a thumb
- * scrolling the spell picker's list — and its `touchend` must not also pick
- * whichever icon happened to be under the finger when the gesture started.
+ * scrolling a long list (the practice panel's roster, the loadout editor's
+ * shelves) — and its `touchend` must not also act on whichever control
+ * happened to be under the finger when the gesture started.
  * Same order of magnitude as `TouchLayout.TAP_SLOP` on the canvas controls,
  * for the same reason: wider than the jitter a still thumb produces, narrower
  * than a deliberate movement.
@@ -62,19 +55,6 @@ export interface SpellGroupDisplay {
   imageKey: AssetKey | null;
   backgroundKey: AssetKey | null;
   spells: SpellItemDisplay[];
-  /**
-   * The subset of `spells` that names a Q/W/E/R slot, paired with that slot —
-   * everything `pick`ing the whole shelf at once writes. Empty for the two
-   * shelves that are not a champion (the basic attack, the summoner spells),
-   * which is exactly what stops the header of those two offering an action
-   * that would have nowhere sensible to put five summoner spells.
-   *
-   * A champion with only part of a kit implemented (Graves is `Graves_W`
-   * alone) gets a one-entry kit aimed at W, not at Q — see
-   * `abilitySlotOfClass` in `preset.ts` for why the slot is read off the
-   * spell's name rather than its position on the shelf.
-   */
-  kit: { slotIndex: number; spell: SpellItemDisplay }[];
 }
 
 export interface SpellItemDisplay {
@@ -88,10 +68,14 @@ export interface SpellItemDisplay {
 }
 
 /**
- * Pulled out as a plain function of its inputs so the search matching itself
- * — case/accent-insensitive, name or description — is testable without
- * building a whole `HudInteractions` (which needs a `Game`, `AssetManager`,
- * the real spell classes, ...).
+ * Case/accent-insensitive matching over a spell list, by name or description.
+ *
+ * A plain function of its inputs so the matching is testable without building
+ * a whole `HudInteractions` (which needs a `Game`, `AssetManager`, the real
+ * spell classes, ...). Nothing in the HUD renders a search box today — the
+ * picker that would have grown one is gone, and the loadout editor searches
+ * `pregameCatalog` instead — so this is a ready seam rather than a live path,
+ * kept because it is the one piece of the picker that was never picker-shaped.
  */
 export function filterSpells(spells: SpellItemDisplay[], searchText: string): SpellItemDisplay[] {
   const search = removeAccents(searchText.toLowerCase());
@@ -115,9 +99,6 @@ function buildSpellGroup(group: any): SpellGroupDisplay {
     imageKey: group.image,
     backgroundKey: group.background,
     spells,
-    kit: spells
-      .map(spell => ({ slotIndex: abilitySlotOfClass(spell.spellClass), spell }))
-      .filter((entry): entry is { slotIndex: number; spell: SpellItemDisplay } => entry.slotIndex !== null),
   };
 }
 
@@ -150,31 +131,22 @@ export interface HudInteractions {
    * vectors on every read, every frame.
    */
   readonly camera: Camera;
-  oneForAll: boolean;
-  cloneMySpell: boolean;
   /**
-   * `searchSpellText`/`filteredSpells()` are carried over from the
-   * pre-split `InGameHUD` unchanged — including that neither view renders a
-   * search box, there or here. Kept (and unit-tested, see
-   * `filterSpells` below) as a ready seam for one, not wired up now: a
-   * search box for the picker is a real improvement as the roster grows, but
-   * it is not one of the four things this pass was asked to fix, and this
-   * split's job is not to grow the feature list.
+   * Whether the practice panel is up. Keeps the `SpellsPicker` name it was
+   * born with: it is read by all three e2e scripts off
+   * `game.inGameHUD.vueInstance.hud`, and renaming it would reach into every
+   * one of them for no behaviour.
    */
-  searchSpellText: string;
   showSpellsPicker: boolean;
-  spellIndexToSwap: number;
   /**
-   * The staged loadout, one entry per equipped slot, parallel to
-   * `HudState.spells`. `null` means "this slot is unchanged from what the
-   * player has equipped"; a `SpellItemDisplay` is a pending pick not yet
-   * applied to the game. Picking edits this; `confirmPicks` flushes it to the
-   * real champion and `closeSpellPicker` throws it away — the point of the
-   * whole draft is that a player can try several spells before committing,
-   * instead of every tap applying and closing the modal. See `pick`.
+   * Which of the player's slots the panel should open the loadout editor on,
+   * or `null` for "just open the panel". Set by the desktop strip's per-icon
+   * shortcut (`openPlayerLoadout`) and consumed once, on mount, by
+   * `RosterTab` — the gesture crosses two components that never meet, so it
+   * travels through the object both of them already inject.
    */
-  draftSpells: (SpellItemDisplay | null)[];
-  /** Used for pre-loading every spell icon's asset before the picker opens. */
+  editPlayerSlot: number | null;
+  /** Every spell icon there is, for the preload below. */
   allSpells: SpellItemDisplay[];
   spellGroups: SpellGroupDisplay[];
   spellHover: any;
@@ -182,48 +154,25 @@ export interface HudInteractions {
   /** Mirrors game.touchControls.enabled; both views read it, neither owns it. */
   touchUi: boolean;
 
-  filteredSpells(): SpellItemDisplay[];
-  /** Stages `spell` into the active slot (or every slot, under `oneForAll`). Does not apply or close — see `draftSpells`. */
-  pick(spell: SpellItemDisplay): void;
   /**
-   * Stages a whole champion's kit at once — every ability on `group` goes to
-   * the slot its name claims (`SpellGroupDisplay.kit`), the rest of the
-   * loadout untouched. Same draft as `pick`: nothing reaches the game until
-   * "Xác nhận".
-   *
-   * The one gesture that used to take four: tap Q, find Ahri, tap her Q, tap
-   * W, find Ahri again, ... The shelf header is right there above the four
-   * icons, so this is where a player already looks when they want "that
-   * champion", not "that ability".
-   */
-  pickKit(group: SpellGroupDisplay): void;
-  /** Flushes the staged `draftSpells` to the player (and bots, per the two mode flags), then closes the picker. */
-  confirmPicks(): void;
-  changeSpell(index: number): void;
-  /**
-   * Opens the picker without a specific icon having been tapped to reach it
-   * — the mobile corner button's entry point, now that the bottom-HUD strip
-   * (and its per-slot tap targets) no longer exists in touch mode.
+   * Opens the panel with no slot in mind — the corner button's entry point,
+   * in both modes.
    */
   openSpellPicker(): void;
-  closeSpellPicker(): void;
-  loadSpellPickerAssets(): void;
-
-  /** Armed by a touch landing on a spell icon; fires the description on a hold. */
-  touchSpellStart(spellProxy: any, event: any): void;
-  /** A finger moving while down on a spell icon — arms the drag-not-tap escape. */
-  touchSpellMove(event: any): void;
   /**
-   * A touch lifted off a spell icon. `onTap` is what a `click` would have
-   * done — passed in rather than assumed, because the strip wants
-   * `changeSpell` and the picker's own list wants `pick`. Runs only when the
-   * long press never fired and the finger never travelled past
-   * `TAP_MOVE_TOLERANCE_PX` — the second guard is what a synthesised click
-   * gets for free from the browser's own click-vs-drag heuristic, and has to
-   * be done by hand here since nothing here is wired to `click`.
+   * The desktop strip's shortcut: open the panel on Đấu thủ with the player's
+   * loadout editor already open, aimed at the slot whose icon was clicked.
+   * The gesture the old picker's `changeSpell(index)` had, pointed at the
+   * editor that replaced it.
    */
-  touchSpellEnd(onTap?: () => void): void;
-  cancelLongPress(): void;
+  openPlayerLoadout(index: number): void;
+  closeSpellPicker(): void;
+  /**
+   * Warms every spell icon's asset when the panel opens. Still worth doing
+   * with the picker gone: `RosterTab`'s loadout editor (`KitRoster`) renders
+   * the same roster from the same `AssetManager` keys, one tap further in.
+   */
+  preloadSpellIcons(): void;
 
   mouseover(spellProxy: any, event: any): void;
   mouseout(spellProxy: any): void;
@@ -240,12 +189,6 @@ export interface HudInteractions {
  * reactive `data()`, so it is Vue-proxied by the time it reaches here.
  */
 export function createHudInteractions(game: Game): HudInteractions {
-  let longPressTimer = 0;
-  let longPressDismissTimer = 0;
-  let longPressFired = false;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchMoved = false;
   let director: MatchDirector | null = null;
   let camera: Camera | null = null;
 
@@ -271,200 +214,43 @@ export function createHudInteractions(game: Game): HudInteractions {
       if (!camera && game.camera) camera = markRaw(game.camera);
       return camera as Camera;
     },
-    oneForAll: false,
-    cloneMySpell: false,
-    searchSpellText: '',
     showSpellsPicker: false,
-    spellIndexToSwap: 0,
+    editPlayerSlot: null as number | null,
     allSpells: Object.values<any>(AllSpells).map(buildSpellItem),
     spellGroups: (SpellGroups as any[]).map(buildSpellGroup),
-    draftSpells: [] as (SpellItemDisplay | null)[],
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
 
-    filteredSpells(): SpellItemDisplay[] {
-      return filterSpells(state.allSpells, state.searchSpellText);
-    },
-
     /**
-     * Stage a pick into `draftSpells` — nothing touches the game until
-     * `confirmPicks`. `oneForAll` fills every slot so the slot-picker previews
-     * the "one spell everywhere" effect; otherwise only the active slot
-     * changes. The player can keep re-picking any slot until they are happy,
-     * then commit the lot at once, which is the whole point of the draft (the
-     * old behaviour applied and closed on the first tap).
-     */
-    pick(spell: SpellItemDisplay): void {
-      if (state.oneForAll) {
-        state.draftSpells = state.draftSpells.map(() => spell);
-      } else if (state.spellIndexToSwap >= 0 && state.spellIndexToSwap < state.draftSpells.length) {
-        const next = state.draftSpells.slice();
-        next[state.spellIndexToSwap] = spell;
-        state.draftSpells = next;
-      }
-      state.spellHover = null;
-    },
-
-    /**
-     * Stage every ability on one shelf into the slot its name claims. Slots
-     * the shelf says nothing about — the basic attack, both summoners, and
-     * Q/W/E/R for a champion with only part of a kit implemented — keep
-     * whatever was already staged or equipped.
-     *
-     * Not reachable while `oneForAll` is on (the modal hides the action then):
-     * that mode's whole meaning is one spell in every slot, which a kit
-     * contradicts, and `confirmPicks`'s `oneForAll` branch would in any case
-     * collapse the kit down to whichever ability it happened to find first.
-     */
-    pickKit(group: SpellGroupDisplay): void {
-      if (state.oneForAll) return;
-      const next = state.draftSpells.slice();
-      for (const { slotIndex, spell } of group.kit) {
-        if (slotIndex >= 0 && slotIndex < next.length) next[slotIndex] = spell;
-      }
-      state.draftSpells = next;
-      state.spellHover = null;
-    },
-
-    /**
-     * Apply the whole staged draft in one go, then close. The per-slot and the
-     * `oneForAll` branches mirror what `pick` used to do immediately; the bot
-     * handling (`cloneMySpell` vs. the respawn flag) is unchanged, just run
-     * once per changed slot at commit time instead of on every tap.
-     */
-    confirmPicks(): void {
-      const player = (game as any).player;
-      // One definition of "who is in this match", and a typed one — this used
-      // to filter the object list for `AIChampion` through an `any`.
-      const bots = game.director.bots();
-
-      if (state.oneForAll) {
-        const chosen = state.draftSpells.find(Boolean);
-        if (chosen) {
-          player.replaceSpells(player.spells.map(() => new chosen.spellClass(player)));
-          bots.forEach(bot => {
-            bot.setRespawnRollsNewPreset(false);
-            bot.replaceSpells(bot.spells.map(() => new chosen.spellClass(bot)));
-          });
-        }
-      } else {
-        state.draftSpells.forEach((item, index) => {
-          if (!item || index < 0 || index > player.spells.length) return;
-          player.replaceSpell(index, new item.spellClass(player));
-          bots.forEach(bot => {
-            if (state.cloneMySpell) {
-              bot.setRespawnRollsNewPreset(false);
-              bot.replaceSpell(index, new item.spellClass(bot));
-            } else {
-              bot.setRespawnRollsNewPreset(true);
-            }
-          });
-        });
-      }
-
-      state.showSpellsPicker = false;
-      game.unpause();
-      state.spellHover = null;
-      state.draftSpells = [];
-    },
-
-    touchSpellStart(spellProxy: any, event: any): void {
-      const element = event.currentTarget || event.target;
-      state.cancelLongPress();
-      longPressFired = false;
-      touchMoved = false;
-      const touch = event.touches?.[0];
-      touchStartX = touch?.clientX ?? 0;
-      touchStartY = touch?.clientY ?? 0;
-      longPressTimer = window.setTimeout(() => {
-        longPressFired = true;
-        state.showSpellInfo(spellProxy, element);
-      }, LONG_PRESS_MS);
-    },
-
-    touchSpellMove(event: any): void {
-      if (touchMoved) return;
-      const touch = event.touches?.[0];
-      if (!touch) return;
-      const travelled = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
-      if (travelled <= TAP_MOVE_TOLERANCE_PX) return;
-      touchMoved = true;
-      // Past this point the gesture is a drag (most often scrolling the
-      // picker's list), not a hold — the description must not pop up under a
-      // finger that is on its way somewhere else.
-      state.cancelLongPress();
-    },
-
-    touchSpellEnd(onTap?: () => void): void {
-      if (longPressTimer) {
-        clearTimeout(longPressTimer);
-        longPressTimer = 0;
-      }
-      if (longPressFired) {
-        // Nothing to hover away from on a touch screen, so the description
-        // times itself out rather than waiting for a gesture nobody will make.
-        longPressDismissTimer = window.setTimeout(() => {
-          state.spellHover = null;
-        }, LONG_PRESS_DISMISS_MS);
-        return;
-      }
-      // A drag that started on an icon (typically scrolling the picker) must
-      // not also pick or swap that icon on release.
-      if (touchMoved) return;
-      onTap?.();
-    },
-
-    cancelLongPress(): void {
-      if (longPressTimer) {
-        clearTimeout(longPressTimer);
-        longPressTimer = 0;
-      }
-      if (longPressDismissTimer) {
-        clearTimeout(longPressDismissTimer);
-        longPressDismissTimer = 0;
-      }
-    },
-
-    changeSpell(index: number): void {
-      state.spellIndexToSwap = index;
-      state.showSpellsPicker = !state.showSpellsPicker;
-
-      if (state.showSpellsPicker) {
-        state.draftSpells = Array.from(
-          { length: (game as any).player?.spells?.length ?? 0 },
-          () => null
-        );
-        state.loadSpellPickerAssets();
-        game.pause();
-      } else game.unpause();
-
-      state.spellHover = null;
-    },
-
-    /**
-     * The mobile corner button's entry point: unlike `changeSpell`, it does
-     * not toggle (there is only one way in, so there is nothing to toggle
-     * against) and it does not arrive already knowing which slot the player
-     * wants — the strip used to answer that by which icon was tapped, and
-     * that per-icon surface is exactly what got removed. Defaults to the
-     * first ability; `SpellPickerModal`'s slot selector (touch-ui only) lets
-     * the player switch to any other slot, including the basic attack and
-     * the summoners, without leaving the modal.
+     * The corner button's entry point, in both modes. It does not toggle:
+     * there is one way in and the panel carries its own close, so a second
+     * press on a button that is hidden behind the panel cannot happen.
      */
     openSpellPicker(): void {
-      state.spellIndexToSwap = 1;
+      state.editPlayerSlot = null;
       state.showSpellsPicker = true;
-      state.draftSpells = Array.from(
-        { length: (game as any).player?.spells?.length ?? 0 },
-        () => null
-      );
-      state.loadSpellPickerAssets();
+      state.preloadSpellIcons();
       game.pause();
       state.spellHover = null;
     },
 
-    loadSpellPickerAssets(): void {
+    /**
+     * The desktop strip's per-icon shortcut. It used to open the picker
+     * pre-aimed at the clicked slot; it now opens the panel on Đấu thủ with
+     * the player's loadout editor open on that slot, which is the same
+     * gesture pointed at the editor that replaced the picker. `RosterTab`
+     * reads `editPlayerSlot` once on mount and clears it.
+     */
+    openPlayerLoadout(index: number): void {
+      state.editPlayerSlot = index;
+      state.showSpellsPicker = true;
+      state.preloadSpellIcons();
+      game.pause();
+      state.spellHover = null;
+    },
+
+    preloadSpellIcons(): void {
       const keys = new Set<AssetKey>();
       const add = (key: AssetKey | null) => {
         if (key) keys.add(key);
@@ -480,8 +266,8 @@ export function createHudInteractions(game: Game): HudInteractions {
 
     closeSpellPicker(): void {
       state.showSpellsPicker = false;
+      state.editPlayerSlot = null;
       game.unpause();
-      state.draftSpells = [];
     },
 
     mouseover(spellProxy: any, event: any): void {
