@@ -128,6 +128,26 @@ export const PredefinedFilters = {
   canTakeDamageFromTeam: (teamId: string): GameObjectTypeGuard<AttackableUnit> =>
     (object): object is AttackableUnit =>
       object instanceof AttackableUnit && object.targetable && !object.isDead && object.teamId !== teamId,
+  /**
+   * Drops what `observer` cannot see. Bushes were previously cosmetic — the
+   * only thing that ever read `isInsideBush` was the sprite's alpha — so a
+   * player standing in one was still picked up by every minion and camp scan
+   * that came within aggro range, and chased out the other side.
+   *
+   * The rule is the simple one: a unit inside a bush is hidden from an
+   * observer that is not itself in a bush. Two units in *different* bushes can
+   * still see each other, which real League would not allow, but
+   * `AttackableUnit.isInsideBush` is a boolean rather than a bush identity and
+   * the case (a jungler and a laner in adjacent brush) is rare enough not to
+   * be worth widening that field for.
+   *
+   * Deliberately not applied to `AIChampion`'s own target scan: a bot that can
+   * be broken line-of-sight with is a difficulty change, not a bug fix, and
+   * this is the same reasoning that leaves `AIChampion.aimPoint` alone.
+   */
+  visibleTo: (observer: { isInsideBush?: boolean }): GameObjectFilter =>
+    (object) =>
+      !(object instanceof AttackableUnit) || !object.isInsideBush || !!observer.isInsideBush,
 };
 
 declare global {
