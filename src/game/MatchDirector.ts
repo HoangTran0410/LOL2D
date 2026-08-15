@@ -165,6 +165,35 @@ export default class MatchDirector {
   }
 
   /**
+   * Swaps a champion under a unit that is standing there — the whole point of
+   * a practice tool, and the reason `Champion.applyPreset` exists as its own
+   * method. Position, team and any orders in flight are untouched; the kit,
+   * name, avatar and attack profile all come from the new loadout.
+   *
+   * The bars are refilled here and *only* here. `applyPreset` deliberately
+   * leaves them alone because its other two callers must not touch them (a
+   * champion under construction, and a respawn that has already refilled), so
+   * "the unit keeps standing where it is but starts the try-out at full" is
+   * this method's own contract: a Yasuo on 12 HP that becomes a Zed on 12 HP
+   * is not what "try this champion now" means.
+   *
+   * For a bot this also rewrites `presetFactory` and re-arms the respawn roll,
+   * so the identity the player just chose survives the bot's next death
+   * instead of coming back as whatever it was configured with — including when
+   * the roll had been pinned off by the picker's "clone my spells".
+   */
+  applyLoadout(unit: Champion, loadout: ChampionLoadout): void {
+    unit.applyPreset(getChampionPresetFromLoadout(loadout));
+    unit.stats.health.baseValue = unit.stats.maxHealth.value;
+    unit.stats.mana.baseValue = unit.stats.maxMana.value;
+
+    if (unit instanceof AIChampion) {
+      unit.setPresetFactory(() => getChampionPresetFromLoadout(loadout));
+      unit.setRespawnRollsNewPreset(true);
+    }
+  }
+
+  /**
    * Writes only the flags it is handed, so a UI that owns one toggle can send
    * one field without having to restate the other two.
    */
