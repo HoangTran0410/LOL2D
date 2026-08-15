@@ -59,6 +59,17 @@ export default class MinionSpawner {
   /** Waves released so far, across both bases. */
   waveCount = 0;
 
+  /**
+   * The wave clock. Off stops queueing and releasing; it does not stop pruning,
+   * so minions already dead still leave the list and a field cleared by another
+   * system stays cleared rather than filling back up with corpses.
+   *
+   * The countdown freezes rather than draining while off, for the same reason
+   * `_nextWaveIn` resets below instead of subtracting: switching minions back
+   * on should mean a full interval of quiet, not a burst of backdated waves.
+   */
+  enabled = true;
+
   _nextWaveIn = FIRST_WAVE_DELAY_MS;
   _queue: QueuedMinion[] = [];
 
@@ -77,6 +88,7 @@ export default class MinionSpawner {
 
   update() {
     this.prune();
+    if (!this.enabled) return;
 
     this._nextWaveIn -= deltaTime;
     if (this._nextWaveIn <= 0) {

@@ -5,21 +5,18 @@ import MinionSpawner, {
   MINION_RELEASE_INTERVAL_MS,
   WAVE_COMPOSITION,
   WAVE_INTERVAL_MS,
-  type MinionSpawnerContext,
 } from '../../../src/game/managers/MinionSpawner';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
-import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import TeamId from '../../../src/game/enums/TeamId';
 import { LANES, getLaneWaypoints } from '../../../src/game/lanes';
-import { FountainPreset } from '../../../src/game/preset';
-import { createGame, stubGameGlobals, type TestGame } from '../fixtures';
+import { createSpawnerContext, type SpawnerGame } from './helpers';
 
 const FRAME_MS = 16;
 /** Minions released per wave, across both bases. */
 const WAVE_SIZE = 2 * LANES.length * WAVE_COMPOSITION.length;
 
-let game: TestGame & { fountains: Fountain[] };
+let game: SpawnerGame;
 let spawner: MinionSpawner;
 
 /** Advances the clock by `ms` in 16ms frames, the way the game loop does. */
@@ -33,11 +30,8 @@ const spawned = () =>
 
 describe('MinionSpawner', () => {
   beforeEach(() => {
-    stubGameGlobals();
-    game = createGame() as typeof game;
-    game.setPlayer(new Champion({ game, teamId: 'player-uuid' }));
-    game.fountains = FountainPreset.map(preset => new Fountain({ game, preset }));
-    spawner = new MinionSpawner(game as MinionSpawnerContext);
+    game = createSpawnerContext();
+    spawner = new MinionSpawner(game);
   });
   afterEach(() => vi.unstubAllGlobals());
 
