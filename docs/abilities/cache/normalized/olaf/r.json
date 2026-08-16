@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_olaf_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Ragnarok.png?834a4",
+    "sha1": "8ac5e593ca5faadb02887edca2ab19feb8b4effe"
+  },
+  "champion": "Olaf",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_olaf_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Ragnarok.png?834a4",
+        "sha1": "8ac5e593ca5faadb02887edca2ab19feb8b4effe"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "100 / 95 / 90 / 85 / 80",
+        "cost": "100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Olaf''' gains <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span> and <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span>.",
+          "text": "Passive: Olaf gains &nbsp;bonus armor and &nbsp;bonus magic resistance."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Olaf''' becomes enraged for 3 seconds, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleansing]]</span> himself of all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Crowd control\">[[File:Stun icon.png|20px|link=Crowd control|An icon representing the keyword Crowd control]] [[:Crowd control|crowd control]]</span> and becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cc-immune\">[[File:Cc-immune_icon.png|20px|link=Crowd control#Immunity|An icon representing the keyword Cc-Immune]] [[:Crowd control#Immunity|immune to them]]</span>, as well as gaining <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> and 10% increased [[size]]. For the first second of ''Ragnarok'', he also gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> while facing <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within 2000 units.",
+          "text": "Active: Olaf becomes enraged for 3 seconds, cleansing himself of all crowd control and becoming immune to them, as well as gaining &nbsp;bonus attack damage and 10% increased size. For the first second of Ragnarok, he also gains &nbsp;bonus movement speed while facing visible enemy champions within 2000 units."
+        },
+        "description3": {
+          "raw": "''Ragnarok's'' duration is increased by and up to 2.<small>5</small> seconds for each basic attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> or cast of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Reckless Swing\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Reckless Swing.png|20xpx|border|link=Olaf#Reckless Swing|An icon for Olaf's ability Reckless Swing]]</span> <span style=\"white-space:normal;\">[[Olaf#Reckless Swing|Reckless Swing]]</span></span>'' against an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>.",
+          "text": "Ragnarok's duration is increased by and up to 2.5 seconds for each basic attack on-hit or cast of Reckless Swing against an enemy champion."
+        },
+        "icon": "false",
+        "icon2": "Ragnarok.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Resistances:'''</span></dt><dd>10 / 12.<small>5</small> / 15 / 17.<small>5</small> / 20</dd></dl>",
+          "text": "Bonus Resistances:10 / 12.5 / 15 / 17.5 / 20"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Damage:'''</span></dt><dd>10 / 15 / 20 / 25 / 30 <span style=\"color:orange; white-space:normal\">(+ 25% AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>20 / 45 / 70%</dd></dl>",
+          "text": "Bonus Attack Damage:10 / 15 / 20 / 25 / 30 (+ 25% AD)\nBonus Movement Speed:20 / 45 / 70%"
+        },
+        "name": "Ragnarok",
+        "notes": {
+          "raw": "* ''Ragnarok'' removes the underlying <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> from <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|airborne]]</span> effects, but not the forced displacement, which requires him to use a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blink\">[[File:Flash.png|20px|link=Blink|An icon representing the keyword Blink]] [[:Blink|blink]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> ability to override it.\n* ''Ragnarok'' does not negate any [[debuff]]s other than <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Crowd control\">[[File:Stun icon.png|20px|link=Crowd control|An icon representing the keyword Crowd control]] [[:Crowd control|crowd control]]</span> from being applied unless absolutely necessary.\n* The <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> updates dynamically over the duration; Increases or reductions in <span style=\"color:orange; white-space:normal\">attack damage</span> after the effect has been applied will still be amplified.\n* The <span style=\"color:orange; white-space:normal\">25% attack damage</span> scaling amplifies the flat <span style=\"color:orange; white-space:normal\">attack damage '''bonus'''</span> as well.\n* ''Ragnarok'' will not expire during <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Reckless Swing\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Reckless Swing.png|20xpx|border|link=Olaf#Reckless Swing|An icon for Olaf's ability Reckless Swing]]</span> <span style=\"white-space:normal;\">[[Olaf#Reckless Swing|Reckless Swing's]]</span></span> cast time.\n* ''Ragnarok's'' duration will not be increased if the basic attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>.\n* ''Ragnarok's'' duration will be increased if the basic attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>.",
+          "text": "Ragnarok removes the underlying stun from airborne effects, but not the forced displacement, which requires him to use a blink or dash ability to override it.\nRagnarok does not negate any debuffs other than crowd control from being applied unless absolutely necessary.\nThe bonus attack damage updates dynamically over the duration; Increases or reductions in attack damage after the effect has been applied will still be amplified.\nThe 25% attack damage scaling amplifies the flat attack damage bonus as well.\nRagnarok will not expire during Reckless Swing's cast time.\nRagnarok's duration will not be increased if the basic attack is dodged.\nRagnarok's duration will be increased if the basic attack is blocked."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Ragnarok"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "c2b97eae7b99aa55e92693e130cdccd6c10845315f8f6aa20e2933ac1766ad24",
+    "fetchedAt": "2026-08-16T06:56:08.637Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Olaf/Ragnarok",
+    "revisionId": 3939795,
+    "sourceTimestamp": "2025-07-31T07:57:40Z"
+  }
+}

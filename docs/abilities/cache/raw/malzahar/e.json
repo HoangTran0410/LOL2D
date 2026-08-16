@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Malzahar/Malefic Visions",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Malefic Visions@@icon@@Malefic Visions.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Malzahar''' infects the target enemy's mind, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>25</small> seconds over 4 seconds, which refreshes upon damaging them with ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Call of the Void\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Call of the Void.png|20xpx|border|link=Malzahar#Call of the Void|An icon for Malzahar's ability Call of the Void]]</span> <span style=\"white-space:normal;\">[[Malzahar#Call of the Void|Call of the Void]]</span></span>'' or ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Nether Grasp\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Nether Grasp.png|20xpx|border|link=Malzahar#Nether Grasp|An icon for Malzahar's ability Nether Grasp]]</span> <span style=\"white-space:normal;\">[[Malzahar#Nether Grasp|Nether Grasp]]</span></span>''. ''Malefic Visions'' executes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> if they would be damaged below <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"10;\" data-finish=\"30;\" data-top-fill=\"11\" data-bot-values=\"10;12;14;16;18;20;22;24;26;28;30\">10 – 30 (based on level)</span> health</span></span>.@@description2@@If the target dies while infected, they spread ''Malefic Visions'' onto the closest nearby enemy and '''Malzahar''' restores <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">2% of his '''maximum''' mana</span></span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>80 / 115 / 150 / 185 / 220 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>5 / 7.<small>1875</small> / 9.<small>375</small> / 11.<small>5625</small> / 13.<small>75</small> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 5% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Bounce range\">500</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@60 / 70 / 80 / 90 / 100@@cooldown@@11 / 10 / 9 / 8 / 7@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@false@@notes@@\n* ''Malefic Visions'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|persistent damage]]</span>, additionally tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Indirect damage\">[[File:Irelia Vanguard's Edge.png|20px|link=Damage|An icon representing the keyword Indirect damage]] [[:Damage|indirect damage]]</span>, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span>.\n* ''Malefic Vision's'' cast is special cased to not be cancelled if the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time.\n** The debuff is not applied if the target is untargetable by the time the cast completes.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308233,
+                "revisions": [
+                  {
+                    "parentid": 3980507,
+                    "revid": 4015185,
+                    "timestamp": "2026-05-03T16:59:57Z"
+                  }
+                ],
+                "title": "Template:Data Malzahar/Malefic Visions"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4015185,
+      "timestamp": "2026-05-03T16:59:57Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "bc3aee876b8b9dc4a29505fbfcc375660fdff4dd7033d4ead11f898f3d2d3279",
+    "fetchedAt": "2026-08-16T08:46:46.579Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malzahar/Malefic_Visions",
+    "revisionId": 4015185,
+    "sourceTimestamp": "2026-05-03T16:59:57Z"
+  }
+}

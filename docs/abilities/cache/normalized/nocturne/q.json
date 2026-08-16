@@ -1,0 +1,64 @@
+{
+  "asset": {
+    "key": "spell_nocturne_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Duskbringer.png?72c30",
+    "sha1": "352474cddd735e5b3f159cdd750c238613e32ae2"
+  },
+  "champion": "Nocturne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nocturne_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Duskbringer.png?72c30",
+        "sha1": "352474cddd735e5b3f159cdd750c238613e32ae2"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nocturne''' casts out a shadow blade in the target direction that leaves a ''Dusk Trail'' in its wake, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit. Enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> and large <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> hit will leave a ''Dusk Trail'' behind while moving. ''Dusk Trails'' last 5 seconds and will slowly disappear afterwards.",
+          "text": "Active: Nocturne casts out a shadow blade in the target direction that leaves a Dusk Trail in its wake, dealing physical damage to enemies hit. Enemy champions and large monsters hit will leave a Dusk Trail behind while moving. Dusk Trails last 5 seconds and will slowly disappear afterwards."
+        },
+        "description2": {
+          "raw": "While on the ''Dusk Trail'', '''Nocturne''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and gains <span style=\"color:orange; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;'''bonus''' attack damage</span></span> and <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus total''' movement speed</span></span>.",
+          "text": "While on the Dusk Trail, Nocturne is ghosted and gains &nbsp;bonus attack damage and &nbsp;bonus total movement speed."
+        },
+        "effectradius": "150",
+        "icon": "Duskbringer.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical damage:'''</span></dt><dd>65 / 105 / 145 / 185 / 225 <span style=\"color:orange; white-space:normal\">(+ 85% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical damage:65 / 105 / 145 / 185 / 225 (+ 85% bonus AD)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Damage:'''</span></dt><dd>15 / 25 / 35 / 45 / 55</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>20 / 25 / 30 / 35 / 40%</dd></dl>",
+          "text": "Bonus Attack Damage:15 / 25 / 35 / 45 / 55\nBonus Movement Speed:20 / 25 / 30 / 35 / 40%"
+        },
+        "name": "Duskbringer",
+        "notes": {
+          "raw": "* ''Duskbringer'' checks for and hits targets 25 units outside of the missile's maximum range.\n* ''Duskbringer's'' damage is not increased by the <span style=\"color:orange; white-space:normal\">'''bonus''' AD</span> gained from its trail, meaning that casting it again while on the trail from the last cast will not result in higher damage.\n** It is observed from seasons ago that this is intentionally hard-coded into the ability to avoid the projectile increasing its own damage. This feature is somewhat deprecated as it also limits chain-casting ''Duskbringer''.\n* ''Duskbringer's Dusk Trail'' will expose the path of affected units until its duration ends. It is a form of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Obscured vision\">[[File:Sweeper Drone icon.png|20px|link=Sight#Obscured vision|An icon representing the keyword Obscured vision]] [[:Sight#Obscured vision|obscured vision]]</span>; the trail indirectly reveals the location of enemy units even in the fog of war, including those shrouded by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealth\">[[File:Guerrilla Warfare.png|20px|link=Stealth|An icon representing the keyword Stealth]] [[:Stealth|stealth]]</span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the damage and also prevents the ''Dusk Trail'' from following the target.\n* The formed ''Dusk Trail'' does not disappear if ''Duskbringer'' is intercepted by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* This ability will cast from wherever the caster is at the start of the cast time.\n* The <span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks multiplicatively\">[[File:Multiple stacking icon.png|20px|link=Stacking#Stacks_multiplicatively|An icon representing the keyword Stacks multiplicatively]] [[:Stacking#Stacks_multiplicatively|stacks multiplicatively]]</span> with other sources of movement speed boosts.",
+          "text": "Duskbringer checks for and hits targets 25 units outside of the missile's maximum range.\nDuskbringer's damage is not increased by the bonus AD gained from its trail, meaning that casting it again while on the trail from the last cast will not result in higher damage.\n* It is observed from seasons ago that this is intentionally hard-coded into the ability to avoid the projectile increasing its own damage. This feature is somewhat deprecated as it also limits chain-casting Duskbringer.\nDuskbringer's Dusk Trail will expose the path of affected units until its duration ends. It is a form of obscured vision; the trail indirectly reveals the location of enemy units even in the fog of war, including those shrouded by stealth.\nSpell shield will block the damage and also prevents the Dusk Trail from following the target.\nThe formed Dusk Trail does not disappear if Duskbringer is intercepted by Wind Wall or Unbreakable.\nThis ability will cast from wherever the caster is at the start of the cast time.\nThe bonus movement speed stacks multiplicatively with other sources of movement speed boosts."
+        },
+        "projectile": true,
+        "range": "1200",
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "120"
+      },
+      "name": "Duskbringer"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "8816fd0ca9ef98ac47ac46637dcd1d41a20c7f1f6e64c478fa4718b6cbf51fb0",
+    "fetchedAt": "2026-08-16T06:56:36.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nocturne/Duskbringer",
+    "revisionId": 4026429,
+    "sourceTimestamp": "2026-06-09T21:53:27Z"
+  }
+}

@@ -28,6 +28,25 @@ import type { Vec2 } from '../spell/runtime/types';
  */
 export const CURSOR_ACQUISITION_RADIUS = 250;
 
+/**
+ * How far past its own reach a champion looks when the cursor found nobody.
+ *
+ * The cursor is not where the enemy is. It is where the player is *going* —
+ * right click moves, every skillshot aims through it — and while kiting it
+ * points the opposite way from the thing chasing you. Acquisition measured only
+ * from the cursor therefore made the attack key unusable in exactly the moment
+ * it matters: turn to shoot and you have to sweep the mouse back across the
+ * fight, which is the same mouse you need pointed away to keep running.
+ *
+ * So a press that finds nothing under the cursor falls back to the nearest
+ * visible enemy to the champion. This margin is what "nearest" is allowed to
+ * cost: reach plus a step and a half, so the fallback can turn and fire at
+ * something already on top of you but can never *start* a chase across open
+ * ground. Widen it and the attack key becomes a charge command — the failure
+ * mode a kiting player can least afford.
+ */
+export const FALLBACK_CHASE_MARGIN = 150;
+
 export type AttackTargetPriority = 'nearest' | 'lowest-health';
 
 const distanceTo = (point: Vec2, unit: AttackableUnit): number =>

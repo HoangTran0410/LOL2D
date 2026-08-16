@@ -1,0 +1,249 @@
+import { Rectangle } from '../../../libs/quadtree';
+import AssetManager from '../../../managers/AssetManager';
+import VectorUtils from '../../../utils/vector.utils';
+import BuffAddType from '../../enums/BuffAddType';
+import StatusFlags from '../../enums/StatusFlags';
+import Buff from '../Buff';
+import MissileSpellObject from '../MissileSpellObject';
+import Spell from '../Spell';
+import SpellObject from '../SpellObject';
+import { StatsModifier } from '../Stats';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
+
+export const RANGE = 620;
+export const DAMAGE = 26;
+/** Wiki: "Dusk Trails last 5 seconds and will slowly disappear afterwards." */
+export const TRAIL_MS = 5000;
+export const TRAIL_RADIUS = 55;
+/** How far the source travels before it drops another patch of trail. */
+export const TRAIL_STEP = 22;
+export const SPEED_PERCENT = 0.35;
+export const BONUS_ATTACK_DAMAGE = 8;
+/** How long the buff outlives the last frame Nocturne was on the trail. */
+export const DUSK_GRACE_MS = 250;
+
+/**
+ * Duskbringer.
+ *
+ * `docs/abilities/nocturne/q.json`: the blade *"leaves a Dusk Trail in its
+ * wake"*, enemy champions it hits *"leave a Dusk Trail behind while moving"*,
+ * the trails last 5 seconds, and — the part that matters —
+ * **"while on the Dusk Trail, Nocturne is ghosted and gains bonus attack
+ * damage and bonus movement speed."**
+ *
+ * The first version read the tooltip as "casting gives Nocturne speed" and
+ * just applied a `Speedup` on cast. That is a different ability: it deleted
+ * the trail, deleted the ghosting and the attack damage, and deleted the whole
+ * point — that Duskbringer is a *lane* Nocturne carves and then has to stand
+ * in, and that hitting a champion paints one wherever they run.
+ */
+export default class Nocturne_Q extends Spell {
+  targetingMode = 'DIRECTION' as const;
+  image = AssetManager.get('spell_nocturne_q');
+  name = 'Lưỡi Hái Hoàng Hôn (Nocturne_Q)';
+  description =
+    `Phóng lưỡi hái xuyên thẳng <span>${RANGE}px</span>, gây <span class="damage">${DAMAGE} sát thương</span>` +
+    ` và <span class="buff">để lại Vệt Hoàng Hôn</span> dọc đường bay trong` +
+    ` <span class="time">${TRAIL_MS / 1000} giây</span>. Tướng địch trúng chiêu cũng <span class="buff">rớt vệt</span>` +
+    ` khi di chuyển. <span class="buff">Khi đứng trên vệt</span>, Nocturne` +
+    ` <span class="buff">+${SPEED_PERCENT * 100}% tốc chạy</span>,` +
+    ` <span class="buff">+${BONUS_ATTACK_DAMAGE} sát thương đánh thường</span> và` +
+    ` <span class="buff">đi xuyên qua mọi đơn vị</span>`;
+  coolDown = 8000;
+  manaCost = 30;
+
+  range = RANGE;
+
+  onSpellCast() {
+    const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
+    const blade = new Nocturne_Q_Object(this.owner);
+    blade.destination = to;
+    this.game.objectManager.addObject(blade);
+
+    // The blade's own trail, laid down as it flies. Nothing is granted here:
+    // the buff is the trail's to give, and only while he is standing on it.
+    const trail = new Nocturne_Q_Trail(this.owner);
+    trail.source = blade;
+    this.game.objectManager.addObject(trail);
+    blade.trail = trail;
+  }
+
+  drawPreview() {
+    super.drawPreview(this.range);
+  }
+}
+
+export class Nocturne_Q_Object extends MissileSpellObject {
+  speed = 15;
+  size = 24;
+  maxHitCount = Infinity;
+  trail: Nocturne_Q_Trail | null = null;
+
+  onHit(enemy: AttackableUnit) {
+    enemy.takeDamage(DAMAGE, this.owner);
+
+    // "Enemy champions hit will leave a Dusk Trail behind while moving" — the
+    // victim becomes a second source, so running paints Nocturne a road.
+    const painted = new Nocturne_Q_Trail(this.owner);
+    painted.source = enemy;
+    painted.sourceLifeMs = TRAIL_MS;
+    this.game.objectManager.addObject(painted);
+  }
+
+  draw() {
+    const angle = Math.atan2(
+      this.destination.y - this.position.y,
+      this.destination.x - this.position.x
+    );
+    push();
+    translate(this.position.x, this.position.y);
+    rotate(angle);
+    noStroke();
+    fill(40, 20, 70, 190);
+    ellipse(-16, 0, 44, 20);
+    fill(190, 120, 255, 235);
+    arc(0, 0, 34, 30, -1.1, 1.1);
+    pop();
+  }
+}
+
+/** One patch of ground the trail covers, with its own clock. */
+interface DuskPatch {
+  x: number;
+  y: number;
+  age: number;
+}
+
+/**
+ * A Dusk Trail: a line of ground that outlives whatever drew it.
+ *
+ * Its `source` is whatever is currently painting — the blade in flight, or a
+ * champion who was hit and is running. When the source is gone the trail keeps
+ * living on its own until its last patch has aged out, which is what makes it
+ * terrain rather than an attachment.
+ */
+export class Nocturne_Q_Trail extends SpellObject {
+  source: SpellObject | AttackableUnit | null = null;
+  /** For a painted champion: how long they keep dropping patches. */
+  sourceLifeMs = Infinity;
+  sourceAge = 0;
+  patches: DuskPatch[] = [];
+  visionRadius = TRAIL_RADIUS;
+
+  update() {
+    const step = deltaTime;
+    for (const patch of this.patches) patch.age += step;
+    // A trail is a queue: the oldest end fades first, so it retreats rather
+    // than blinking out all at once.
+    while (this.patches.length && this.patches[0].age >= TRAIL_MS) this.patches.shift();
+
+    this.paint(step);
+    this.grantDusk();
+
+    if (!this.patches.length && !this.source) this.toRemove = true;
+  }
+
+  /** Drops a patch every `TRAIL_STEP` the source covers, not every frame. */
+  paint(step: number) {
+    const source = this.source as { position?: p5.Vector; toRemove?: boolean; isDead?: boolean };
+    if (!source?.position || source.toRemove || source.isDead) {
+      this.source = null;
+      return;
+    }
+
+    this.sourceAge += step;
+    if (this.sourceAge >= this.sourceLifeMs) {
+      this.source = null;
+      return;
+    }
+
+    const last = this.patches[this.patches.length - 1];
+    const { x, y } = source.position;
+    if (last && Math.hypot(x - last.x, y - last.y) < TRAIL_STEP) return;
+    this.patches.push({ x, y, age: 0 });
+    this.position.set(x, y);
+  }
+
+  /** True while Nocturne's body is over any live patch. */
+  get ownerIsOnTrail(): boolean {
+    const { x, y } = this.owner.position;
+    for (const patch of this.patches) {
+      if (Math.hypot(x - patch.x, y - patch.y) <= TRAIL_RADIUS) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Refreshed every frame he is on it rather than applied once: the buff is a
+   * *state*, and `DUSK_GRACE_MS` is only long enough that stepping between two
+   * patches does not flicker it off.
+   */
+  grantDusk() {
+    if (this.owner.isDead || !this.ownerIsOnTrail) return;
+    const dusk = new Nocturne_Dusk(DUSK_GRACE_MS, this.owner, this.owner);
+    dusk.image = AssetManager.get('spell_nocturne_q');
+    this.owner.addBuff(dusk);
+  }
+
+  draw() {
+    push();
+    noStroke();
+    for (const patch of this.patches) {
+      const left = 1 - patch.age / TRAIL_MS;
+      // Two layers: a wide bruise on the ground and a brighter core, so the
+      // walkable band is unambiguous at a glance.
+      fill(60, 20, 100, 90 * left);
+      circle(patch.x, patch.y, TRAIL_RADIUS * 2);
+      fill(160, 90, 240, 120 * left);
+      circle(patch.x, patch.y, TRAIL_RADIUS * 1.1);
+    }
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    if (!this.patches.length) {
+      return new Rectangle({ x: this.position.x, y: this.position.y, w: 1, h: 1, data: this });
+    }
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const patch of this.patches) {
+      if (patch.x < minX) minX = patch.x;
+      if (patch.y < minY) minY = patch.y;
+      if (patch.x > maxX) maxX = patch.x;
+      if (patch.y > maxY) maxY = patch.y;
+    }
+    return new Rectangle({
+      x: minX - TRAIL_RADIUS,
+      y: minY - TRAIL_RADIUS,
+      w: maxX - minX + TRAIL_RADIUS * 2,
+      h: maxY - minY + TRAIL_RADIUS * 2,
+      data: this,
+    });
+  }
+}
+
+/** Ghosted, faster, hitting harder — the three things the trail is worth. */
+export class Nocturne_Dusk extends Buff {
+  name = 'Vệt Hoàng Hôn';
+  buffAddType = BuffAddType.RENEW_EXISTING;
+  maxStacks = 1;
+
+  statusFlagsToEnable = StatusFlags.Ghosted;
+  statsModifier: StatsModifier = new StatsModifier();
+
+  onCreate(): void {
+    this.statsModifier = new StatsModifier();
+    this.statsModifier.speed.percentBaseBonus = SPEED_PERCENT;
+    this.statsModifier.attackDamage.baseBonus = BONUS_ATTACK_DAMAGE;
+  }
+
+  onActivate(): void {
+    this.targetUnit.stats.addModifier(this.statsModifier);
+  }
+
+  onDeactivate(): void {
+    this.targetUnit.stats.removeModifier(this.statsModifier);
+  }
+}

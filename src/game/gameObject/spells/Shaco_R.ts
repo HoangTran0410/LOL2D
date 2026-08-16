@@ -2,10 +2,10 @@ import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
-import Champion from '../attackableUnits/Champion';
+import Pet from '../attackableUnits/Pet';
 import Fear from '../buffs/Fear';
 import ParticleSystem from '../helpers/ParticleSystem';
-import { Shaco_W_Object } from './Shaco_W';
+import { ATTACK_DAMAGE, ATTACK_RANGE, Shaco_W_Box } from './Shaco_W';
 
 export default class Shaco_R extends Spell {
   targetingMode = 'POINT' as const;
@@ -23,7 +23,9 @@ export default class Shaco_R extends Spell {
     if (this.clonePlayer) {
       // move clone to mouse position
       const aim = this.aimPoint;
-      this.clonePlayer.moveTo(aim.x, aim.y);
+      // `commandTo`, not `moveTo`: it routes around walls and it outranks the
+      // clone's own target scan, which would otherwise overwrite the order.
+      this.clonePlayer.commandTo(aim);
 
       return false;
     }
@@ -37,11 +39,13 @@ export default class Shaco_R extends Spell {
       position: this.owner.position.copy(),
       avatar: this.owner.avatar,
       teamId: this.owner.teamId,
+      ownerUnit: this.owner,
+      lifeTimeMs: this.cloneLifeTime,
+      // Steered by the recast, so it must not walk itself back to Shaco.
+      followsOwner: false,
     });
     clone.replaceSpells([]);
-    clone.shacoR_championOwner = this.owner;
     clone.shacoR_maxRange = this.maxRange;
-    clone.shacoR_lifeTime = this.cloneLifeTime;
     const aim = this.aimPoint;
     clone.moveTo(aim.x, aim.y);
     this.game.objectManager.addObject(clone);
@@ -60,33 +64,38 @@ export default class Shaco_R extends Spell {
   }
 }
 
-class Shaco_R_Clone extends Champion {
-  shacoR_lifeTime = 10000;
-  shacoR_age = 0;
-  shacoR_championOwner: any = null;
+/**
+ * Hallucinate's clone. A `Pet` rather than a plain `Champion` since the pet
+ * system landed: it now picks its own fights and swings at whatever is nearest
+ * (which is what made the real Shaco's clone worth casting — it was inert art
+ * that walked around), while the recast keeps steering it, and it dies with
+ * Shaco like every other summon.
+ */
+class Shaco_R_Clone extends Pet {
   shacoR_maxRange = 1000;
+
+  /** The clone is a copy of Shaco, so it fights at his reach rather than a pet's. */
+  aggroRadius = 500;
 
   update() {
     super.update();
+    if (this.toRemove) return;
 
-    // move clone to owner position if too far away
-    const ownerPos = this.shacoR_championOwner.position;
+    // Snapped back rather than leashed: the clone is a decoy, and one left
+    // stranded across the map fools nobody.
+    const ownerPos = this.ownerUnit.position;
     if (this.position.dist(ownerPos) > this.shacoR_maxRange) {
       this.teleportTo(ownerPos.x, ownerPos.y);
-    }
-
-    this.shacoR_age += deltaTime;
-    if (this.shacoR_age >= this.shacoR_lifeTime || this.isDead) {
-      this.shacoR_explode();
     }
   }
 
   draw() {
     super.draw();
+    if (this.toRemove) return;
 
     // draw circle if clone too far away from owner
-    if (this.shacoR_championOwner != this.game.player) return;
-    const distance = this.position.dist(this.shacoR_championOwner.position);
+    if (this.ownerUnit != this.game.player) return;
+    const distance = this.position.dist(this.ownerUnit.position);
     if (distance > this.shacoR_maxRange / 2) {
       const alpha = map(distance, this.shacoR_maxRange / 2, this.shacoR_maxRange, 0, 255);
       noFill();
@@ -95,8 +104,12 @@ class Shaco_R_Clone extends Champion {
     }
   }
 
+  /** The parting gift: `Pet.expire()` calls this, whatever ended the clone. */
+  onExpire() {
+    this.shacoR_explode();
+  }
+
   shacoR_explode() {
-    this.toRemove = true;
 
     const explodeRadius = 100;
     const clonePos = this.position.copy();
@@ -140,23 +153,39 @@ class Shaco_R_Clone extends Champion {
     });
 
     enemies.forEach((e: any) => {
-      const fearBuff = new Fear(1000, this.shacoR_championOwner, e);
+      const fearBuff = new Fear(1000, this.ownerUnit, e);
       fearBuff.sourcePosition = clonePos;
       e.addBuff(fearBuff);
-      e.takeDamage(30, this.shacoR_championOwner);
+      e.takeDamage(30, this.ownerUnit);
     });
 
-    // create 3 shaco W objects, place around dead clone
+    // three boxes scattered around the corpse, each a real one: hidden and
+    // untargetable until something walks into it, killable once it pops.
     const count = 3;
     for (let i = 0; i < count; i++) {
-      const obj = new Shaco_W_Object(this.shacoR_championOwner);
-      obj.lifeTime = 3000;
-      obj.position = clonePos.copy();
-      obj.destination = clonePos.copy().add(
-        Math.cos((i * 2 * Math.PI) / count) * 100, // 100 is the radius
-        Math.sin((i * 2 * Math.PI) / count) * 100
-      );
-      this.game.objectManager.addObject(obj);
+      const spot = clonePos
+        .copy()
+        .add(
+          Math.cos((i * 2 * Math.PI) / count) * 100, // 100 is the radius
+          Math.sin((i * 2 * Math.PI) / count) * 100
+        );
+      const box = new Shaco_W_Box({
+        game: this.game,
+        position: clonePos.copy(),
+        teamId: this.teamId,
+        ownerUnit: this.ownerUnit,
+        lifeTimeMs: 3000,
+        stationary: true,
+        followsOwner: false,
+        aggroRadius: ATTACK_RANGE,
+        preset: {
+          name: 'Hộp Hề Ma Quái',
+          spells: [],
+          attack: { damage: ATTACK_DAMAGE, attacksPerSecond: 2, range: ATTACK_RANGE },
+        },
+      });
+      box.slideTo = spot;
+      this.game.objectManager.addObject(box);
     }
   }
 }

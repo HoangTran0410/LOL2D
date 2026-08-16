@@ -230,11 +230,19 @@ export async function importAbilities({
       const source = sourceRecord(templates[0], fetchedAt, normalizedForms);
 
       // Each form is its own `Template:Data <Champion>/<Form>` page with its own
-      // `icon`/`icon2` fields, so every form's icon must be resolved and downloaded
-      // independently (falling back from icon -> icon2 within that same form only).
+      // icon fields, so every form's icon must be resolved and downloaded
+      // independently (falling back within that same form only).
+      //
+      // The chain runs to `icon4` because the wiki does not use these slots as
+      // "first choice, then alternates" — it uses them positionally, and a
+      // template is free to leave the earlier ones as the literal string
+      // `false`. `Template:Data Garen/Courage` is exactly that: `icon = false`
+      // with the real art sitting in `icon3`. Stopping at `icon2` read that as
+      // "no art exists" and refused the slot, which is why Garen W and
+      // Warwick W shipped with placeholder icons for art the wiki had all along.
       const formAssets = [];
       for (const [formIndex, form] of normalizedForms.entries()) {
-        const icon = [form.fields.icon, form.fields.icon2]
+        const icon = [form.fields.icon, form.fields.icon2, form.fields.icon3, form.fields.icon4]
           .find(value => typeof value === 'string' && value && value.toLowerCase() !== 'false');
         if (!icon) throw new Error(`${name} ${slot} (${form.name}): icon is missing`);
         const imageInfo = await client.fetchImageInfo(icon);

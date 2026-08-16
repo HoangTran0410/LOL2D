@@ -1,0 +1,96 @@
+{
+  "asset": {
+    "key": "spell_jinx_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Flame_Chompers%21.png?e0b49",
+    "sha1": "dec50d28b664768f6f11294104ec020a99d17a70"
+  },
+  "champion": "Jinx",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jinx_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Flame_Chompers%21.png?e0b49",
+        "sha1": "dec50d28b664768f6f11294104ec020a99d17a70"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "24 / 20.5 / 17 / 13.5 / 10",
+        "cost": "90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' tosses out 3 ''Chompers'' centered at the target location, landing after 0.<small>4</small> seconds, arming after 0.<small>5</small> seconds, and exploding after 5 seconds to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.",
+          "text": "Active: Jinx tosses out 3 Chompers centered at the target location, landing after 0.4 seconds, arming after 0.5 seconds, and exploding after 5 seconds to deal magic damage to nearby enemies."
+        },
+        "description2": {
+          "raw": "Each ''Chomper'' explodes on contact with an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocking them down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooting]]</span> them for 1.<small>5</small> seconds. Enemy champions can be affected by only one ''Chomper''.",
+          "text": "Each Chomper explodes on contact with an enemy champion, knocking them down and rooting them for 1.5 seconds. Enemy champions can be affected by only one Chomper."
+        },
+        "effectradius": "225",
+        "icon": "Flame Chompers!.png",
+        "icon2": "Flame Chompers! 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 140 / 190 / 240 / 290 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>",
+          "text": "Magic Damage:90 / 140 / 190 / 240 / 290 (+ 100% AP)"
+        },
+        "name": "Flame Chompers!",
+        "notes": {
+          "raw": "* ''Chompers'' will halt when encountering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> does not negate the explosion.\n* Each ''Chomper'' gives vision of its surrounding area.",
+          "text": "Chompers will halt when encountering Wind Wall and Unbreakable.\nSpell shield does not negate the explosion.\nEach Chomper gives vision of its surrounding area."
+        },
+        "projectile": false,
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Flame Chompers!"
+    },
+    {
+      "asset": {
+        "key": "spell_jinx_e2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Flame_Chompers%21.png?e0b49",
+        "sha1": "dec50d28b664768f6f11294104ec020a99d17a70"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "24 / 20.5 / 17 / 13.5 / 10",
+        "cost": "90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' tosses out 3 ''Chompers'' centered at the target location, landing after 0.<small>4</small> seconds, arming after 0.<small>5</small> seconds, and exploding after 5 seconds to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.",
+          "text": "Active: Jinx tosses out 3 Chompers centered at the target location, landing after 0.4 seconds, arming after 0.5 seconds, and exploding after 5 seconds to deal magic damage to nearby enemies."
+        },
+        "description2": {
+          "raw": "Each ''Chomper'' explodes on contact with an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocking them down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooting]]</span> them for 1.<small>5</small> seconds. Enemy champions can be affected by only one ''Chomper''.",
+          "text": "Each Chomper explodes on contact with an enemy champion, knocking them down and rooting them for 1.5 seconds. Enemy champions can be affected by only one Chomper."
+        },
+        "effectradius": "225",
+        "icon": "Flame Chompers!.png",
+        "icon2": "Flame Chompers! 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 140 / 190 / 240 / 290 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>",
+          "text": "Magic Damage:90 / 140 / 190 / 240 / 290 (+ 100% AP)"
+        },
+        "name": "Flame Chompers!",
+        "notes": {
+          "raw": "* ''Chompers'' will halt when encountering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> does not negate the explosion.\n* Each ''Chomper'' gives vision of its surrounding area.",
+          "text": "Chompers will halt when encountering Wind Wall and Unbreakable.\nSpell shield does not negate the explosion.\nEach Chomper gives vision of its surrounding area."
+        },
+        "projectile": false,
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Flame Chompers! 2"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "89dcc1d38197118b19a36ef5bff2db93d210683817ca13672c79104b19806d1f",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jinx/Flame_Chompers!",
+    "revisionId": 3993368,
+    "sourceTimestamp": "2026-02-21T15:35:19Z"
+  }
+}

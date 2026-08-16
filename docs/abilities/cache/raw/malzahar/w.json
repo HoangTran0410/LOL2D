@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Malzahar/Void Swarm",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Void Swarm@@icon@@false@@icon2@@Void Swarm.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Malzahar''' generates a stack of ''Zz'Rot Swarm'' when he casts another <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span>, up to a maximum of 2.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Malzahar''' consumes all ''Zz'Rot Swarm'' stacks and, after a 0.<small>5</small>-second delay, summons a <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:VoidlingSquare.png|20xpx|border|link=Voidling|An icon representing Voidling]]</span> <span style=\"white-space:normal;\">[[Voidling]]</span></span> at the target location. Additional ''Voidlings'' are then summoned for each ''Zz'Rot Swarm'' stack consumed, with each ''Voidling'' being summoned 0.<small>5</small> seconds after the previous one.@@description3@@''Voidlings'' deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> with their attacks, reduced by 50% against epic <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> and increased by 200% to enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> infected by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions]]</span></span>''.@@description4@@''See [[Malzahar#Pets|Pets]] for more details about Voidlings.''@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Voidling Duration:'''</span></dt><dd>8 / 8 / 9 / 9 / 10 seconds</dd></dl>@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"5 + 10.5 growth\" data-bot-values=\"5;7.52;10.16;12.93;15.82;18.83;21.96;25.21;28.59;32.09;35.71;39.46;43.33;47.32;51.43;55.66;60.02;64.5\">5 – 64.<small>5</small> (based on level)</span> (+ 12 / 14 / 16 / 18 / 20) <span style=\"color:orange; white-space:normal\">(+ 40% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 20% AP)</span></dd><dt><span class=\"template_lc\">'''Minion Damage:'''</span></dt><dd><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"15 + 3.5 growth\" data-bot-values=\"15;22.56;30.49;38.78;47.45;56.48;65.87;75.64;85.77;96.27;107.14;118.37;129.98;141.95;154.28;166.99;180.06;193.5\">15 – 193.<small>5</small> (based on level)</span> (+ 36 / 42 / 48 / 54 / 60) <span style=\"color:orange; white-space:normal\">(+ 120% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@40 / 45 / 50 / 55 / 60@@cooldown@@8@@targeting@@Location@@damagetype@@Magic@@spellshield@@@@projectile@@@@notes@@\n* '''Malzahar''' loses all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stacks]]</span> upon <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|death]]</span>.\n* ''Zz'Rot Swarm'' stacks are gained per cast and not per ability activation. For example, if <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions]]</span></span> is cast and the ability cancels under certain circumstances, a ''Zz'Rot Swarm'' stack will still be granted despite the ability's failure to complete.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308231,
+                "revisions": [
+                  {
+                    "parentid": 3932511,
+                    "revid": 4041818,
+                    "timestamp": "2026-07-11T20:17:53Z"
+                  }
+                ],
+                "title": "Template:Data Malzahar/Void Swarm"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4041818,
+      "timestamp": "2026-07-11T20:17:53Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "38c4ae56944ae0438319deeb377ddeded581e3cb145d315fa46af6ef4c3d1aaf",
+    "fetchedAt": "2026-08-16T08:46:46.579Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malzahar/Void_Swarm",
+    "revisionId": 4041818,
+    "sourceTimestamp": "2026-07-11T20:17:53Z"
+  }
+}

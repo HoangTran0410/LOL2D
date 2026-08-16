@@ -1,0 +1,76 @@
+{
+  "asset": {
+    "key": "spell_fizz_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Seastone_Trident.png?c6cbe",
+    "sha1": "214989dd2aff9495b199d72aef3e5f0e4d4468e8"
+  },
+  "champion": "Fizz",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_fizz_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Seastone_Trident.png?c6cbe",
+        "sha1": "214989dd2aff9495b199d72aef3e5f0e4d4468e8"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "7 / 6 / 5 / 4 / 3",
+        "cost": "30 / 40 / 50 / 60 / 70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Fizz's''' basic attacks rend enemies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds over 3 seconds, refreshing on subsequent hits.",
+          "text": "Passive: Fizz's basic attacks rend enemies on-hit, dealing magic damage every 0.5 seconds over 3 seconds, refreshing on subsequent hits."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Fizz''' empowers his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> within 4 seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span>, and deal <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>.",
+          "text": "Active: Fizz empowers his next basic attack within 4 seconds to have an uncancellable windup, gain &nbsp;50 bonus range, and deal bonus magic damage."
+        },
+        "description3": {
+          "raw": "If ''Seastone Trident'' kills its target, the <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced to 1 second and the <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">mana cost</span></span> is refunded. Otherwise, if the target is not killed, '''Fizz's''' basic attacks deal <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> for the next 5 seconds.",
+          "text": "If Seastone Trident kills its target, the &nbsp;cooldown is reduced to 1 second and the &nbsp;mana cost is refunded. Otherwise, if the target is not killed, Fizz's basic attacks deal bonus magic damage on-hit for the next 5 seconds."
+        },
+        "description4": {
+          "raw": "''Seastone Trident's'' active damage can be applied against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span> at 50% effectiveness. Active and on-hit damage deal an additional <span style=\"color:\n#00B0F0; white-space:normal\">90 '''bonus''' magic damage</span> against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Seastone Trident's active damage can be applied against structures at 50% effectiveness. Active and on-hit damage deal an additional 90 bonus magic damage against monsters."
+        },
+        "description5": {
+          "raw": "''Seastone Trident <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Fizz's''' basic attack timer.''",
+          "text": "Seastone Trident resets Fizz's basic attack timer."
+        },
+        "icon": "false",
+        "icon2": "Seastone Trident.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Passive Magic Damage:'''</span></dt><dd>30 / 45 / 60 / 75 / 90 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 25% AP)</span></dd><dt><span class=\"template_lc\">'''Passive Magic Damage per Tick:'''</span></dt><dd>5 / 7.<small>5</small> / 10 / 12.<small>5</small> / 15 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 4.<small>17</small>% AP)</span></dd></dl>",
+          "text": "Total Passive Magic Damage:30 / 45 / 60 / 75 / 90 (+ 25% AP)Passive Magic Damage per Tick:5 / 7.5 / 10 / 12.5 / 15 (+ 4.17% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Active Magic Damage:'''</span></dt><dd>50 / 75 / 100 / 125 / 150 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 45% AP)</span></dd></dl>",
+          "text": "Active Magic Damage:50 / 75 / 100 / 125 / 150 (+ 45% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Active On-Hit Magic Damage:'''</span></dt><dd>20 / 25 / 30 / 35 / 40 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd></dl>",
+          "text": "Active On-Hit Magic Damage:20 / 25 / 30 / 35 / 40 (+ 30% AP)"
+        },
+        "name": "Seastone Trident",
+        "notes": {
+          "raw": "* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> on the empowered attack, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|persistent damage]]</span> additionally tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Indirect damage\">[[File:Irelia Vanguard's Edge.png|20px|link=Damage|An icon representing the keyword Indirect damage]] [[:Damage|indirect damage]]</span> on the damage over time effect, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc damage]]</span> on the bonus damage on-hit.\n* ''Seastone Trident's '' interactions with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodging]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocking]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinding]]</span> effects.\n** The passive bonus damage gets negated by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodging]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocking]]</span> the attack, or if '''Fizz''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n** The active:\n*** If the attacked enemy is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodging]]</span> or if '''Fizz''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>, the empowered attack won't deal any damage, but the empowered attack won't be consumed.\n*** If the attacked enemy is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocking]]</span>, the empowered attack won't deal any damage despite being consumed. But the attack will apply the passive bonus damage of ''Seastone Trident''.\n* The empowered attack will trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.",
+          "text": "Applies spell damage on the empowered attack, persistent damage additionally tagged as indirect damage on the damage over time effect, and proc damage on the bonus damage on-hit.\nSeastone Trident's interactions with dodging, blocking, and blinding effects.\n* The passive bonus damage gets negated by dodging or blocking the attack, or if Fizz is blinded.\n* The active:\n** If the attacked enemy is dodging or if Fizz is blinded, the empowered attack won't deal any damage, but the empowered attack won't be consumed.\n** If the attacked enemy is blocking, the empowered attack won't deal any damage despite being consumed. But the attack will apply the passive bonus damage of Seastone Trident.\nThe empowered attack will trigger against structures."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Seastone Trident"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "20f014c353a1406d0f88ce876a1442ae7fd124fde2a6349b030b10f37eb77eb1",
+    "fetchedAt": "2026-08-16T06:56:48.369Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Fizz/Seastone_Trident",
+    "revisionId": 4015181,
+    "sourceTimestamp": "2026-05-03T16:22:19Z"
+  }
+}

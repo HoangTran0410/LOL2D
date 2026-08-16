@@ -1,0 +1,66 @@
+{
+  "asset": {
+    "key": "spell_nocturne_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Unspeakable_Horror.png?17aaf",
+    "sha1": "f3a6dc6fbdf42495fa41d916556ec723b20ba12e"
+  },
+  "champion": "Nocturne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nocturne_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Unspeakable_Horror.png?17aaf",
+        "sha1": "f3a6dc6fbdf42495fa41d916556ec723b20ba12e"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "15 / 14 / 13 / 12 / 11",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Nocturne''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">90% '''bonus''' movement speed</span></span> while facing nearby <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fear\">[[File:Flee icon.png|20px|link=Flee|An icon representing the keyword Flee]] [[:Flee|feared]]</span> targets.",
+          "text": "Passive: Nocturne gains &nbsp;90% bonus movement speed while facing nearby feared targets."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nocturne''' torments the target, forming a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Tether\">[[File:Focused Resolve.png|20px|link=Tether|An icon representing the keyword Tether]] [[:Tether|tether]]</span> between himself and the target for 2 seconds, during which the target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds over the duration.",
+          "text": "Active: Nocturne torments the target, forming a tether between himself and the target for 2 seconds, during which the target takes magic damage every 0.5 seconds over the duration."
+        },
+        "description3": {
+          "raw": "If the tether is not broken by the end of its duration, the target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fear\">[[File:Flee icon.png|20px|link=Flee|An icon representing the keyword Flee]] [[:Flee|feared]]</span> for a duration while being <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by 90%.",
+          "text": "If the tether is not broken by the end of its duration, the target is feared for a duration while being slowed by 90%."
+        },
+        "effectradius": "1000",
+        "icon": "false",
+        "icon2": "Unspeakable Horror.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>80 / 125 / 170 / 215 / 260 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Magic Damage per Tick:'''</span></dt><dd>20 / 31.<small>25</small> / 42.<small>5</small> / 53.<small>75</small> / 65 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 25% AP)</span></dd></dl>",
+          "text": "Total Magic Damage:80 / 125 / 170 / 215 / 260 (+ 100% AP)Magic Damage per Tick:20 / 31.25 / 42.5 / 53.75 / 65 (+ 25% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Disable Duration:'''</span></dt><dd>1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> seconds</dd></dl>",
+          "text": "Disable Duration:1.25 / 1.5 / 1.75 / 2 / 2.25 seconds"
+        },
+        "name": "Unspeakable Horror",
+        "notes": {
+          "raw": "* ''Unspeakable Horror'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|persistent damage]]</span>, additionally tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Indirect damage\">[[File:Irelia Vanguard's Edge.png|20px|link=Damage|An icon representing the keyword Indirect damage]] [[:Damage|indirect damage]]</span>, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span>.\n* Feared enemies in a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 180° total angle within '''Nocturne's''' facing direction will trigger ''Unspeakable Horror's'' passive.\n* Casting ''Unspeakable Horror'' may grant '''Nocturne''' permanent <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosting]]</span> until he has [[death|died]].<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the tether's application but not the damage and aftereffects of one already applied.",
+          "text": "Unspeakable Horror deals persistent damage, additionally tagged as indirect damage, and applies spell effects.\nFeared enemies in a 180° total angle within Nocturne's facing direction will trigger Unspeakable Horror's passive.\nCasting Unspeakable Horror may grant Nocturne permanent ghosting until he has died.(bug)\nSpell shield will block the tether's application but not the damage and aftereffects of one already applied."
+        },
+        "projectile": false,
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Unspeakable Horror"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "897525fb014acf02e986eb70f4229777b7ddb473ab8cbffdfa0d70469678c904",
+    "fetchedAt": "2026-08-16T06:56:36.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nocturne/Unspeakable_Horror",
+    "revisionId": 4015219,
+    "sourceTimestamp": "2026-05-03T19:25:43Z"
+  }
+}

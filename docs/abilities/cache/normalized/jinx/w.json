@@ -1,0 +1,55 @@
+{
+  "asset": {
+    "key": "spell_jinx_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Zap%21.png?03784",
+    "sha1": "3abed18c2a3258a23209e6a12a6859e1fb7bbc28"
+  },
+  "champion": "Jinx",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jinx_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Zap%21.png?03784",
+        "sha1": "3abed18c2a3258a23209e6a12a6859e1fb7bbc28"
+      },
+      "fields": {
+        "casttime": "0.6 – 0.4 (based on bonus attack speed)Category:Debug",
+        "cooldown": "8 / 7 / 6 / 5 / 4",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' fires a shock blast in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy it hits and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|reveals]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds.",
+          "text": "Active: Jinx fires a shock blast in the target direction that deals physical damage to the first enemy it hits and reveals and slows them for 2 seconds."
+        },
+        "icon": "Zap!.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>10 / 60 / 110 / 160 / 210 <span style=\"color:orange; white-space:normal\">(+ 140% AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 50 / 60 / 70 / 80%</dd></dl>",
+          "text": "Physical Damage:10 / 60 / 110 / 160 / 210 (+ 140% AD)\nSlow:40 / 50 / 60 / 70 / 80%"
+        },
+        "name": "Zap!",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the start of the cast time.",
+          "text": "This ability will cast from wherever the caster is at the start of the cast time."
+        },
+        "projectile": true,
+        "range": "1500",
+        "speed": "3300",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "120"
+      },
+      "name": "Zap!"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "bc48fc4a6353f2127f12c2cffb1ecc71c3c2fe7d9cbf9dce86112d32a337854c",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jinx/Zap!",
+    "revisionId": 3907092,
+    "sourceTimestamp": "2025-06-06T17:47:18Z"
+  }
+}

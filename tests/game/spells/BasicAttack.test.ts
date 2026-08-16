@@ -122,17 +122,104 @@ describe('BasicAttack, the ability in the A slot', () => {
 
   it('reaches only as far as the acquisition radius around the cursor', () => {
     const world = harness();
-    const inside = champion(world.game, CURSOR_ACQUISITION_RADIUS - 10);
+    // Well outside the champion's own reach, so the fallback below cannot
+    // reach it and this stays a test of the circle around the cursor alone.
+    const inside = champion(world.game, 2_000);
     world.world([inside]);
 
-    world.press(HotKeys.A, { x: 0, y: 0 });
+    world.press(HotKeys.A, { x: 2_000 - (CURSOR_ACQUISITION_RADIUS - 10), y: 0 });
     expect(world.player.basicAttack.target).toBe(inside);
 
     world.player.basicAttack.clear();
-    inside.position.set(CURSOR_ACQUISITION_RADIUS + 40, 0);
-    indexObjects(world.game, [world.player, inside]);
+    world.press(HotKeys.A, { x: 2_000 - (CURSOR_ACQUISITION_RADIUS + 40), y: 0 });
+    expect(world.player.basicAttack.target).toBeNull();
+  });
 
-    world.press(HotKeys.A, { x: 0, y: 0 });
+  // ------------------------------------------------------ the kiting fallback
+
+  /**
+   * The cursor is a *movement* control: right click walks there and every
+   * skillshot aims through it. Running away therefore points it away from the
+   * fight, and an acquisition measured only from the cursor left the attack key
+   * dead in exactly that moment — the one where hit-and-run lives.
+   */
+  it('attacks the nearest visible enemy when the cursor is over empty ground', () => {
+    const world = harness();
+    // Kiting: the player is running west, the enemy is chasing from the east.
+    const chaser = champion(world.game, 150);
+    world.world([chaser]);
+
+    world.press(HotKeys.A, { x: -600, y: 0 });
+
+    expect(world.player.basicAttack.target).toBe(chaser);
+  });
+
+  it('lets the cursor overrule the fallback whenever it is pointing at somebody', () => {
+    const world = harness();
+    const underCursor = champion(world.game, 600);
+    const closer = champion(world.game, 120);
+    world.world([underCursor, closer]);
+
+    world.press(HotKeys.A, { x: 620, y: 0 });
+
+    // Aim is never second-guessed; the fallback only answers an absent aim.
+    expect(world.player.basicAttack.target).toBe(underCursor);
+  });
+
+  it('picks the nearest body to the champion, not the nearest to the dead cursor', () => {
+    const world = harness();
+    const near = champion(world.game, 0, 120);
+    const far = champion(world.game, 0, 400);
+    world.world([near, far]);
+
+    world.press(HotKeys.A, { x: -900, y: 0 });
+
+    expect(world.player.basicAttack.target).toBe(near);
+  });
+
+  /**
+   * The bound is what stops this becoming a charge command. An enemy the
+   * champion cannot shoot from where it stands — and could not hold an order on
+   * anyway, `BasicAttackController.leashTo` gives up at `visionRadius` — is not
+   * a target a blind press is allowed to volunteer for.
+   */
+  it('will not start a chase: the fallback stops at reach plus a step', () => {
+    const world = harness();
+    const spell = world.player.spells[0] as BasicAttack;
+    const justOutside = champion(world.game, spell.fallbackRadius + 60);
+    world.world([justOutside]);
+
+    world.press(HotKeys.A, { x: -900, y: 0 });
+    expect(world.player.basicAttack.target).toBeNull();
+
+    // ...and a step closer it is fair game.
+    justOutside.position.set(spell.fallbackRadius - 60, 0);
+    indexObjects(world.game, [world.player, justOutside]);
+    world.press(HotKeys.A, { x: -900, y: 0 });
+    expect(world.player.basicAttack.target).toBe(justOutside);
+  });
+
+  it('grows the fallback with the champion’s reach rather than a fixed number', () => {
+    const world = harness();
+    const spell = world.player.spells[0] as BasicAttack;
+    const short = spell.fallbackRadius;
+
+    // Jinx Q is exactly this: +200 attack range for six seconds.
+    world.player.stats.attackRange.baseBonus = 100;
+
+    expect(spell.fallbackRadius).toBeGreaterThan(short);
+    // ...but never past the leash the standing order itself plays by.
+    expect(spell.fallbackRadius).toBeLessThanOrEqual(world.player.stats.visionRadius.value);
+  });
+
+  it('respects the fog on the way out, the same as the cursor pass', () => {
+    const world = harness();
+    const hidden = champion(world.game, 120);
+    hidden.willDraw = false;
+    world.world([hidden]);
+
+    world.press(HotKeys.A, { x: -900, y: 0 });
+
     expect(world.player.basicAttack.target).toBeNull();
   });
 
@@ -168,13 +255,15 @@ describe('BasicAttack, the ability in the A slot', () => {
 
   it('leaves a standing order alone when a later press finds nothing', () => {
     const world = harness();
-    const enemy = champion(world.game, 200);
+    // Out past both circles, so the second press really does come up empty on
+    // both passes rather than quietly re-acquiring the same body.
+    const enemy = champion(world.game, 3_000);
     world.world([enemy]);
 
-    world.press(HotKeys.A, { x: 200, y: 0 });
+    world.press(HotKeys.A, { x: 3_000, y: 0 });
     expect(world.player.basicAttack.target).toBe(enemy);
 
-    world.press(HotKeys.A, { x: 4_000, y: 4_000 });
+    world.press(HotKeys.A, { x: 0, y: 0 });
     expect(world.player.basicAttack.target).toBe(enemy);
   });
 

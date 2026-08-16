@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_cassiopeia_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Twin_Fang.png?16f82",
+    "sha1": "bb3d446d8fb197a44419c8fc091d0ecf03e96719"
+  },
+  "champion": "Cassiopeia",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_cassiopeia_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Twin_Fang.png?16f82",
+        "sha1": "bb3d446d8fb197a44419c8fc091d0ecf03e96719"
+      },
+      "fields": {
+        "casttime": "0.125",
+        "cooldown": "0.75",
+        "cost": "40",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Cassiopeia''' launches her fangs at the target enemy that deal <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-start=\"52;\" data-finish=\"120;\" data-top-fill=\"18\" data-bot-values=\"52;56;60;64;68;72;76;80;84;88;92;96;100;104;108;112;116;120;124;128;132;136;140;144;148;152;156;160;164;168;172;176;180;184;188;192;196;200;204;208;212|displayMaxColumn=18\">52 – 120 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. If this kills the target, ''Twin Fang's'' <span style=\"color:\n#0099CC; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;mana cost</span></span> is refunded.",
+          "text": "Active: Cassiopeia launches her fangs at the target enemy that deal 52 – 120 (based on level) (+ 10% AP) magic damage. If this kills the target, Twin Fang's &nbsp;mana cost is refunded."
+        },
+        "description2": {
+          "raw": "Against a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poisoned]]</span> target, ''Twin Fang'' deals <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heals\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> '''Cassiopeia'''. The heal is reduced by 75% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and small and medium <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Against a poisoned target, Twin Fang deals bonus magic damage and heals Cassiopeia. The heal is reduced by 75% against minions and small and medium monsters."
+        },
+        "icon": "Twin Fang.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Damage:'''</span></dt><dd>20 / 45 / 70 / 95 / 120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd><dt><span class=\"template_lc\">'''Total Enhanced Damage:'''</span></dt><dd><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"52;\" data-finish=\"120;\" data-top-fill=\"18\" data-bot-values=\"52;56;60;64;68;72;76;80;84;88;92;96;100;104;108;112;116;120\">52 – 120 (based on level)</span> (+ 20 / 45 / 70 / 95 / 120) <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Heal:'''</span></dt><dd><span style=\"color:\n#7A6DFF; white-space:normal\">10 / 11.<small>5</small> / 13 / 14.<small>5</small> / 16% AP</span></dd><dt><span class=\"template_lc\">'''Reduced Heal:'''</span></dt><dd><span style=\"color:\n#7A6DFF; white-space:normal\">2.<small>5</small> / 2.<small>875</small> / 3.<small>25</small> / 3.<small>625</small> / 4% AP</span></dd></dl>",
+          "text": "Bonus Magic Damage:20 / 45 / 70 / 95 / 120 (+ 55% AP)Total Enhanced Damage:52 – 120 (based on level) (+ 20 / 45 / 70 / 95 / 120) (+ 65% AP)\nHeal:10 / 11.5 / 13 / 14.5 / 16% APReduced Heal:2.5 / 2.875 / 3.25 / 3.625 / 4% AP"
+        },
+        "name": "Twin Fang",
+        "notes": {
+          "raw": "* Upon reaching the target, ''Twin Fang'' will wait for an ongoing <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Cassiopeia\" data-ability=\"Noxious Blast\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cassiopeia Noxious Blast.png|20xpx|border|link=Cassiopeia#Noxious Blast|An icon for Cassiopeia's ability Noxious Blast]]</span> <span style=\"white-space:normal;\">[[Cassiopeia#Noxious Blast|Noxious Blast]]</span></span> to explode before dealing its damage.\n* ''Twin Fang's'' damage against poisoned targets:\n** When maxed first: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;100;104;128;132;156;160;184;188;192;196;200;204;208;212;216;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n** When maxed second: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;80;84;88;92;96;120;124;148;152;176;200;204;208;212;216;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n** When maxed last: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;80;84;88;92;96;100;104;108;112;116;120;144;168;172;196;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n* ''Twin Fang's'' cast indicator is incorrectly adding her own radius to the range like an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Edge range\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]] [[:Range|edge range]]</span> ability, and is therefore slightly larger than the actual cast range ''Twin Fang'' can cast at.\n* Using ''Twin Fang'' on an out-of-range target after completing a movement order causes '''Cassiopeia''' to move back to her original location after casting, if no other order is issued during the entire process.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n** This may be a consequence of ''Twing Fang'' being a \"Walk in range of the target\" ability that does not interrupt movement commands.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Upon reaching the target, Twin Fang will wait for an ongoing Noxious Blast to explode before dealing its damage.\nTwin Fang's damage against poisoned targets:\n* When maxed first: 72 – 220 (based on level) (+ 65% AP).\n* When maxed second: 72 – 220 (based on level) (+ 65% AP).\n* When maxed last: 72 – 220 (based on level) (+ 65% AP).\nTwin Fang's cast indicator is incorrectly adding her own radius to the range like an edge range ability, and is therefore slightly larger than the actual cast range Twin Fang can cast at.\nUsing Twin Fang on an out-of-range target after completing a movement order causes Cassiopeia to move back to her original location after casting, if no other order is issued during the entire process.(unexpected)\n* This may be a consequence of Twing Fang being a \"Walk in range of the target\" ability that does not interrupt movement commands.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "2500",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Twin Fang"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "a0d626dadaa429121fdbf19c0c252122de5d7806b59248d00ada91e4c785d895",
+    "fetchedAt": "2026-08-16T06:56:43.442Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Cassiopeia/Twin_Fang",
+    "revisionId": 4038296,
+    "sourceTimestamp": "2026-06-30T08:36:02Z"
+  }
+}

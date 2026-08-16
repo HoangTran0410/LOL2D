@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Cassiopeia/Petrifying Gaze",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Petrifying Gaze@@icon@@Petrifying Gaze.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Cassiopeia''' blasts enemies in a cone in the target direction, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies struck within and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 40% for 2 seconds. Enemies with their facing direction towards her are instead <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for the same duration.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>150 / 200 / 250 / 300 / 350 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"950 but starts 100 units behind Cassiopeia. Because of this, range is slightly greater laterally\">850</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>5</small>@@cost@@100@@cooldown@@120 / 110 / 100 / 90 / 80@@targeting@@Direction@@damagetype@@Magic@@spellshield@@True@@projectile@@False@@notes@@\n* This ability will cast from wherever the caster is at the end of the cast time.\n* '''Cassiopeia''' will turn to face the target direction over the cast time.\n** ''Petrifying Gaze's'' target direction will change if '''Cassiopeia's''' facing direction changes during the cast time (i.e. through <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockbacks]]</span>).\n*** The visual effect will not follow changes in '''Cassiopeia's''' facing direction and may not portray ''Petrifying Gaze's'' target direction accurately.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* The facing direction of champions whose abilities/animations cause them to lock their facing or spin is always the direction they are moving in. For abilities that cause the champion to spin in place (e.g. <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Death Lotus\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Death Lotus.png|20xpx|border|link=Katarina#Death Lotus|An icon for Katarina's ability Death Lotus]]</span> <span style=\"white-space:normal;\">[[Katarina#Death Lotus|Death Lotus]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Garen\" data-ability=\"Judgment\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Garen Judgment.png|20xpx|border|link=Garen#Judgment|An icon for Garen's ability Judgment]]</span> <span style=\"white-space:normal;\">[[Garen#Judgment|Judgment]]</span></span>) it will factor the direction they were facing on cast.\n** <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lucian\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lucian OriginalSquare.png|20xpx|border|link=Lucian|An icon representing Lucian]]</span> <span style=\"white-space:normal;\">[[Lucian|Lucian's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lucian\" data-ability=\"The Culling\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lucian The Culling.png|20xpx|border|link=Lucian#The Culling|An icon for Lucian's ability The Culling]]</span> <span style=\"white-space:normal;\">[[Lucian#The Culling|The Culling]]</span></span></span> is an exception and his facing direction is actually considered to be the direction he is facing.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306928,
+                "revisions": [
+                  {
+                    "parentid": 3871514,
+                    "revid": 3906603,
+                    "timestamp": "2025-06-06T04:36:27Z"
+                  }
+                ],
+                "title": "Template:Data Cassiopeia/Petrifying Gaze"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3906603,
+      "timestamp": "2025-06-06T04:36:27Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a960b33bbb5ba37bb03ed4a4447d2d11545d8b2519680a716ab289b454418168",
+    "fetchedAt": "2026-08-16T06:56:43.442Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Cassiopeia/Petrifying_Gaze",
+    "revisionId": 3906603,
+    "sourceTimestamp": "2025-06-06T04:36:27Z"
+  }
+}

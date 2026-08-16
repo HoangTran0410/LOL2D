@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Malzahar/Call of the Void",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Call of the Void@@icon@@Call of the Void.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Malzahar''' opens two portals to the void centered at the target location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area in between. After 0.<small>4</small> seconds, enemies between the portals are dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silenced]]</span> for a duration.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Silence Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@200@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@60 / 65 / 70 / 75 / 80@@cooldown@@6@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will prevent ''Call of the Void's'' refresh on <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions]]</span></span>.\n** <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions']]</span></span> debuff will also be removed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308229,
+                "revisions": [
+                  {
+                    "parentid": 3716530,
+                    "revid": 3906985,
+                    "timestamp": "2025-06-06T16:14:26Z"
+                  }
+                ],
+                "title": "Template:Data Malzahar/Call of the Void"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3906985,
+      "timestamp": "2025-06-06T16:14:26Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "501e62ccce6be063c30ffb05fb5fe489e739e81119435b3fe7c4057b2b40fb29",
+    "fetchedAt": "2026-08-16T08:46:46.579Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malzahar/Call_of_the_Void",
+    "revisionId": 3906985,
+    "sourceTimestamp": "2025-06-06T16:14:26Z"
+  }
+}

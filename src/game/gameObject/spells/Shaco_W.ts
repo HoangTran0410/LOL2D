@@ -1,174 +1,180 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import Pet from '../attackableUnits/Pet';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Fear from '../buffs/Fear';
 import TrailSystem from '../helpers/TrailSystem';
+import { Rectangle } from '../../../libs/quadtree';
+
+export const ARM_TIME_MS = 1000;
+export const LIFETIME_MS = 20000;
+export const FEAR_RANGE = 70;
+export const FEAR_DURATION_MS = 1000;
+export const ATTACK_WINDOW_MS = 3000;
+export const ATTACK_RANGE = 160;
+export const ATTACK_DAMAGE = 7;
+export const ATTACKS_PER_SECOND = 2;
+export const BOX_HEALTH = 30;
 
 export default class Shaco_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_shaco_w');
   name = 'Hộp Hề Ma Quái (Shaco_W)';
   description =
-    'Tạo một Hộp Hề Ma Quái tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>. Khi kẻ địch tới gần, nó sẽ gây <span class="buff">Hoảng Sợ</span> và tấn công các kẻ địch xung quanh trong <span class="time">3 giây</span>, gây <span class="damage">7 sát thương</span> mỗi lần tấn công';
+    `Đặt một Hộp Hề Ma Quái, tàng hình sau <span class="time">${ARM_TIME_MS / 1000} giây</span> và tồn tại` +
+    ` <span class="time">${LIFETIME_MS / 1000} giây</span>. Khi kẻ địch tới gần, hộp bật ra:` +
+    ` <span class="buff">Hoảng Sợ</span> chúng rồi bắn trong <span class="time">${ATTACK_WINDOW_MS / 1000} giây</span>,` +
+    ` <span class="damage">${ATTACK_DAMAGE} sát thương</span> mỗi phát. Lúc tàng hình <span class="buff">không thể bị chọn</span>,` +
+    ` nhưng khi đã bật ra thì <span class="damage">có thể bị phá</span> (${BOX_HEALTH} máu)`;
   coolDown = 5000;
 
   onSpellCast() {
-    const { from, to } = VectorUtils.getVectorWithMaxRange(
-      this.owner.position,
-      this.aimPoint,
-      100
-    );
+    const { from, to } = VectorUtils.getVectorWithMaxRange(this.owner.position, this.aimPoint, 100);
 
-    const obj = new Shaco_W_Object(this.owner);
-    obj.position = from;
-    obj.destination = to;
-    this.game.objectManager.addObject(obj);
+    const box = new Shaco_W_Box({
+      game: this.game,
+      position: from,
+      teamId: this.owner.teamId,
+      ownerUnit: this.owner,
+      lifeTimeMs: LIFETIME_MS,
+      stationary: true,
+      followsOwner: false,
+      aggroRadius: ATTACK_RANGE,
+      preset: {
+        name: 'Hộp Hề Ma Quái',
+        spells: [],
+        attack: { damage: ATTACK_DAMAGE, attacksPerSecond: ATTACKS_PER_SECOND, range: ATTACK_RANGE },
+      },
+    });
+    box.slideTo = to;
+    this.game.objectManager.addObject(box);
   }
 }
 
-export class Shaco_W_Object extends SpellObject {
-  isMissile = true;
-  position: p5.Vector = this.owner.position.copy();
-  destination: p5.Vector = this.owner.position.copy();
-  invisibleAfter = 1000;
-  moveSpeed = 6;
-  lifeTime = 20000;
-  age = 0;
-
+/**
+ * The box, as a unit.
+ *
+ * It used to be a `SpellObject` that ran its own attack loop and could not be
+ * touched — an enemy walking into a Shaco box had no answer except to leave.
+ * As a `Pet` it is a real body: it shows up in queries, it has 30 health, and
+ * once it has popped out and started shooting, killing it is the answer.
+ *
+ * What it must *not* be is targetable while it is still hidden — a trap you
+ * can right-click before it triggers is not a trap. `Pet.setHidden` pairs
+ * `Invisible` with `Untargetable` for exactly this, and the reveal takes both
+ * off in the same call the fear goes out in.
+ */
+export class Shaco_W_Box extends Pet {
+  /** Where it is being lobbed to; it slides there over the arming second. */
+  slideTo: p5.Vector | null = null;
+  slideSpeed = 6;
+  armed = false;
+  triggered = false;
+  /** Cosmetic: the radius circle grows into whichever range is live. */
   rangeToDraw = 0;
-  fearRange = 70;
-  attackRange = 100;
-  attackCooldown = 500;
-  attackDamage = 7;
-  attackMaxCount = 3;
-  timeSinceLastAttack = this.attackCooldown;
-  attackLifeTime = 3000;
 
-  static PHASES = {
-    WAIT_FOR_INVISIBLE: 0,
-    INVISIBLE: 1,
-    ATTACKING: 2,
-  } as const;
-  phase: (typeof Shaco_W_Object.PHASES)[keyof typeof Shaco_W_Object.PHASES] =
-    Shaco_W_Object.PHASES.WAIT_FOR_INVISIBLE;
+  constructor(options: ConstructorParameters<typeof Pet>[0]) {
+    super(options);
+    this.stats.maxHealth.baseValue = BOX_HEALTH;
+    this.stats.health.baseValue = BOX_HEALTH;
+  }
 
-  update() {
-    this.age += deltaTime;
-    if (this.age > this.lifeTime) {
-      this.toRemove = true;
+  update(): void {
+    // The slide happens before anything else so the box is at its resting spot
+    // by the time it arms — a box that armed mid-flight would fear from the
+    // wrong place.
+    if (this.slideTo && this.position.dist(this.slideTo) > this.slideSpeed) {
+      VectorUtils.moveVectorToVector(this.position, this.slideTo, this.slideSpeed);
     }
 
-    // wait for invisible phase
-    if (this.phase === Shaco_W_Object.PHASES.WAIT_FOR_INVISIBLE) {
-      if (this.position.dist(this.destination) > this.moveSpeed) {
-        VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
-      }
+    super.update();
+    if (this.toRemove || this.isDead) return;
 
-      this.rangeToDraw = lerp(this.rangeToDraw, this.fearRange, 0.1);
-
-      if (this.age > this.invisibleAfter) {
-        this.isMissile = false;
-        this.phase = Shaco_W_Object.PHASES.INVISIBLE;
-      }
+    if (!this.armed && this.age >= ARM_TIME_MS) {
+      this.armed = true;
+      this.setHidden(true);
     }
 
-    // invisible phase
-    else if (this.phase === Shaco_W_Object.PHASES.INVISIBLE) {
-      // query nearby enemies
-      const enemies = this.game.objectManager.queryObjects({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: this.fearRange,
-        }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
-      });
-
-      if (enemies.length > 0) {
-        // fear all nearby enemies
-        enemies.forEach((enemy: any) => {
-          const fearBuff = new Fear(1000, this.owner, enemy);
-          fearBuff.sourcePosition = this.position.copy();
-          enemy.addBuff(fearBuff);
-        });
-
-        this.phase = Shaco_W_Object.PHASES.ATTACKING;
-        this.lifeTime = this.attackLifeTime;
-        this.age = 0;
-        this.visionRadius = this.attackRange;
-      }
+    if (this.armed && !this.triggered) {
+      this.rangeToDraw = lerp(this.rangeToDraw, FEAR_RANGE, 0.1);
+      this.checkTrigger();
+      return;
     }
+    if (this.triggered) this.rangeToDraw = lerp(this.rangeToDraw, ATTACK_RANGE, 0.1);
+  }
 
-    // attacking phase
-    else if (this.phase === Shaco_W_Object.PHASES.ATTACKING) {
-      this.rangeToDraw = lerp(this.rangeToDraw, this.attackRange, 0.1);
+  /** Someone stepped on it: fear the room, come out of hiding, start the clock. */
+  checkTrigger(): void {
+    const enemies = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.position.x, y: this.position.y, r: FEAR_RANGE }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
+    }) as AttackableUnit[];
+    if (enemies.length === 0) return;
 
-      this.timeSinceLastAttack += deltaTime;
-      if (this.timeSinceLastAttack >= this.attackCooldown) {
-        // attack nearby enemies
-        const enemies = this.game.objectManager.queryObjects({
-          area: new Circle({
-            x: this.position.x,
-            y: this.position.y,
-            r: this.attackRange,
-          }),
-          filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-        });
+    this.triggered = true;
+    this.setHidden(false);
+    // Its whole remaining life is the shooting window — the box is spent once
+    // it has popped, whether or not the 20 seconds were up.
+    this.lifeTimeMs = this.age + ATTACK_WINDOW_MS;
 
-        if (enemies.length > 0) {
-          enemies.forEach((enemy: any) => {
-            const bullet = new Shaco_W_Bullet_Object(this.owner);
-            bullet.position = this.position.copy();
-            bullet.targetEnemy = enemy;
-            bullet.damage = this.attackDamage;
-            this.game.objectManager.addObject(bullet);
-          });
-
-          this.timeSinceLastAttack = 0;
-        }
-      }
+    for (const enemy of enemies) {
+      const fear = new Fear(FEAR_DURATION_MS, this.ownerUnit, enemy);
+      fear.sourcePosition = this.position.copy();
+      enemy.addBuff(fear);
     }
   }
 
-  draw() {
-    push();
-
-    // moving phase
-    if (this.phase === Shaco_W_Object.PHASES.WAIT_FOR_INVISIBLE) {
-      noStroke();
-      fill(255);
-      circle(this.position.x, this.position.y, 30);
-
-      // draw range
-      stroke(100, 150);
-      noFill();
-      circle(this.position.x, this.position.y, this.rangeToDraw * 2);
-    }
-
-    // invisible phase
-    else if (this.phase === Shaco_W_Object.PHASES.INVISIBLE) {
+  /** The box, not a champion portrait. Everything else — health bar, buffs — is the base's. */
+  drawAvatar(): void {
+    if (this.hidden) {
+      // A hint only its owner can act on; enemies see nothing at all because
+      // `Stealthed` keeps the whole unit out of their render pass.
       noStroke();
       fill(255, 30);
       circle(this.position.x, this.position.y, 35);
+      return;
     }
 
-    // attacking phase
-    else if (this.phase === Shaco_W_Object.PHASES.ATTACKING) {
-      const size = Math.min(map(this.timeSinceLastAttack, 0, this.attackCooldown, 0, 10), 30);
-      stroke(200, 150);
-      fill(200, 100, 50, 100 + size * 10);
-      ellipse(this.position.x, this.position.y, 25 + size, 25 + size);
-
-      // draw range
-      stroke(100, 150);
+    const spring = this.triggered ? 6 + 4 * Math.sin(this.age / 90) : 0;
+    push();
+    translate(this.position.x, this.position.y);
+    stroke(120, 70, 40);
+    strokeWeight(2);
+    fill(190, 120, 60);
+    rect(-14, -14 + spring * 0.3, 28, 28, 4);
+    if (this.triggered) {
+      // the jester springing out of the lid
+      stroke(200, 60, 60);
+      strokeWeight(3);
       noFill();
-      circle(this.position.x, this.position.y, this.rangeToDraw * 2);
+      line(0, -14, 0, -20 - spring);
+      fill(230, 90, 90);
+      noStroke();
+      circle(0, -24 - spring, 14);
     }
-
     pop();
+
+    if (this.rangeToDraw <= 1) return;
+    push();
+    noFill();
+    stroke(120, this.triggered ? 150 : 60);
+    circle(this.position.x, this.position.y, this.rangeToDraw * 2);
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const span = Math.max(60, this.rangeToDraw);
+    return new Rectangle({
+      x: this.position.x - span,
+      y: this.position.y - span,
+      w: span * 2,
+      h: span * 2,
+      data: this,
+    });
   }
 }
 

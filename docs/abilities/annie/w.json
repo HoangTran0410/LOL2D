@@ -1,0 +1,53 @@
+{
+  "asset": {
+    "key": "spell_annie_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Incinerate.png?7fceb",
+    "sha1": "44cdf5d9f68147131be745e8640b72f4f923c6b4"
+  },
+  "champion": "Annie",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_annie_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Incinerate.png?7fceb",
+        "sha1": "44cdf5d9f68147131be745e8640b72f4f923c6b4"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "7",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Annie''' releases fire in a cone in the target direction, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.",
+          "text": "Active: Annie releases fire in a cone in the target direction, dealing magic damage to enemies hit."
+        },
+        "effectradius": "600",
+        "icon": "Incinerate.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 110 / 150 / 190 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:70 / 110 / 150 / 190 / 230 (+ 80% AP)"
+        },
+        "name": "Incinerate",
+        "notes": {
+          "raw": "* ''Incinerate'' can hit targets behind '''Annie''', provided their radius intersects with the cone hitbox.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "Incinerate can hit targets behind Annie, provided their radius intersects with the cone hitbox.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Direction"
+      },
+      "name": "Incinerate"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "d6b77e430bd73bdcff711e3179718599c0c2033f5dd08285678f7b4cac5fc61c",
+    "fetchedAt": "2026-08-16T08:46:36.640Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Annie/Incinerate",
+    "revisionId": 3952555,
+    "sourceTimestamp": "2025-09-09T20:02:26Z"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Jinx/Flame Chompers!",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Flame Chompers!@@icon@@Flame Chompers!.png@@icon2@@Flame Chompers! 2.png@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' tosses out 3 ''Chompers'' centered at the target location, landing after 0.<small>4</small> seconds, arming after 0.<small>5</small> seconds, and exploding after 5 seconds to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.@@description2@@Each ''Chomper'' explodes on contact with an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocking them down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooting]]</span> them for 1.<small>5</small> seconds. Enemy champions can be affected by only one ''Chomper''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 140 / 190 / 240 / 290 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage radius\">225</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@90@@cooldown@@24 / 20.<small>5</small> / 17 / 13.<small>5</small> / 10@@targeting@@Location@@damagetype@@Magic@@spellshield@@special@@projectile@@Special@@notes@@\n* ''Chompers'' will halt when encountering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> does not negate the explosion.\n* Each ''Chomper'' gives vision of its surrounding area.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307600,
+                "revisions": [
+                  {
+                    "parentid": 3955228,
+                    "revid": 3993368,
+                    "timestamp": "2026-02-21T15:35:19Z"
+                  }
+                ],
+                "title": "Template:Data Jinx/Flame Chompers!"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3993368,
+      "timestamp": "2026-02-21T15:35:19Z"
+    },
+    {
+      "page": "Template:Data Jinx/Flame Chompers! 2",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Flame Chompers!@@icon@@Flame Chompers!.png@@icon2@@Flame Chompers! 2.png@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' tosses out 3 ''Chompers'' centered at the target location, landing after 0.<small>4</small> seconds, arming after 0.<small>5</small> seconds, and exploding after 5 seconds to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.@@description2@@Each ''Chomper'' explodes on contact with an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocking them down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooting]]</span> them for 1.<small>5</small> seconds. Enemy champions can be affected by only one ''Chomper''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 140 / 190 / 240 / 290 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage radius\">225</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@90@@cooldown@@24 / 20.<small>5</small> / 17 / 13.<small>5</small> / 10@@targeting@@Location@@damagetype@@Magic@@spellshield@@special@@projectile@@Special@@notes@@\n* ''Chompers'' will halt when encountering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> does not negate the explosion.\n* Each ''Chomper'' gives vision of its surrounding area.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1317277,
+                "revisions": [
+                  {
+                    "parentid": 0,
+                    "revid": 2508850,
+                    "timestamp": "2017-03-02T12:01:13Z"
+                  }
+                ],
+                "title": "Template:Data Jinx/Flame Chompers! 2"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 2508850,
+      "timestamp": "2017-03-02T12:01:13Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "e0c6647776f281d2e2b660b5a4ca69dea2132f4e1f995779631665cb60dcb5aa",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jinx/Flame_Chompers!",
+    "revisionId": 3993368,
+    "sourceTimestamp": "2026-02-21T15:35:19Z"
+  }
+}

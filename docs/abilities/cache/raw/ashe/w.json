@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ashe/Volley",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Volley@@icon@@Volley.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Ashe''' shoots a volley of arrows in a cone in the target direction, each dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy hit, and applying ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ashe\" data-ability=\"Frost Shot 2\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ashe Frost Shot 2.png|20xpx|border|link=Ashe#Frost Shot 2|An icon for Ashe's ability Frost Shot 2]]</span> <span style=\"white-space:normal;\">[[Ashe#Frost Shot 2|Critical Slow]]</span></span>'' to enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> hit.@@description2@@Enemies can intercept multiple arrows but do not take damage from any beyond the first.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Arrows:'''</span></dt><dd>7 / 8 / 9 / 10 / 11</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Not including the offset, see notes\">1200</span>@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Each missile\">20</span>@@speed@@2000@@casttime@@0.<small>25</small>@@cost@@75 / 70 / 65 / 60 / 55@@cooldown@@18 / 14.<small>5</small> / 11 / 7.<small>5</small> / 4@@targeting@@Direction@@damagetype@@Physical@@spellshield@@True@@projectile@@True@@notes@@\n* The missiles are spawned in a straight horizontal line 75 units in front of '''Ashe''', with a total width of 75/100/100/123/123 units.\n** Between each missile spawn location is a distance of 12.<small>5</small> units, except for the two outermost ones at the last two ranks (which are 11.<small>5</small> units from the closest other one), and the two centermost missiles at ranks 2 and 4 (which have 20 units between them and 15 units to the next missile, respectively).\n** This inconsistent behaviour of spawn locations means the angle between each missile can vary off of 4.<small>625</small>&#176; slighty.\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306807,
+                "revisions": [
+                  {
+                    "parentid": 3982559,
+                    "revid": 4007430,
+                    "timestamp": "2026-04-11T18:11:13Z"
+                  }
+                ],
+                "title": "Template:Data Ashe/Volley"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007430,
+      "timestamp": "2026-04-11T18:11:13Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "28693df800262b3a374fadb6f86e78f4b2dcda16a33f7a9256b99bdfd1df62c5",
+    "fetchedAt": "2026-08-16T08:26:29.785Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ashe/Volley",
+    "revisionId": 4007430,
+    "sourceTimestamp": "2026-04-11T18:11:13Z"
+  }
+}

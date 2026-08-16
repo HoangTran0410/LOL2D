@@ -1,0 +1,114 @@
+{
+  "asset": {
+    "key": "champ_garen",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_OriginalSquare.png?37153",
+    "sha1": "b34dd2aae5c125860b48292f0e57760a7f3f8a9a"
+  },
+  "champion": "Garen",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Garen",
+    "be": 225,
+    "changes": "V26.14",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Durable",
+      "Sustained Damage",
+      "Physical"
+    ],
+    "control": 1,
+    "damage": 2,
+    "date": "2010-04-27",
+    "difficulty": 1,
+    "external_positions": [
+      "Top"
+    ],
+    "fullname": "Garen Crownguard",
+    "herotype": "Fighter",
+    "id": 86,
+    "mobility": 1,
+    "patch": "V1.0.0.83",
+    "rangetype": "Melee",
+    "resource": "None",
+    "role": [
+      "Juggernaut"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Judgment",
+      "2": "Judgment 2"
+    },
+    "skill_i": {
+      "1": "Perseverance"
+    },
+    "skill_q": {
+      "1": "Decisive Strike"
+    },
+    "skill_r": {
+      "1": "Demacian Justice"
+    },
+    "skill_w": {
+      "1": "Courage"
+    },
+    "skills": {
+      "1": "Perseverance",
+      "2": "Decisive Strike",
+      "3": "Courage",
+      "4": "Judgment",
+      "5": "Demacian Justice"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_taken": 0.95
+      },
+      "arm_base": 38,
+      "arm_lvl": 4.2,
+      "as_base": 0.625,
+      "as_lvl": 3.65,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.11999999731779,
+      "dam_base": 69,
+      "dam_lvl": 4.5,
+      "hp5_base": 8,
+      "hp5_lvl": 0.5,
+      "hp_base": 690,
+      "hp_lvl": 98,
+      "mp5_base": 0,
+      "mp5_lvl": 0,
+      "mp_base": 0,
+      "mp_lvl": 0,
+      "mr_base": 32,
+      "mr_lvl": 1.55,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 175,
+      "selection_height": 188.88890075683594,
+      "selection_radius": 120,
+      "urf": {
+        "dmg_dealt": 1.1,
+        "dmg_taken": 0.95
+      },
+      "windup_modifier": 0.5
+    },
+    "style": 75,
+    "title": "The Might of Demacia",
+    "toughness": 3,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "1d657cea17b59b532c44dfc86a4ce9312fee28c87a4b7a05395b0874dc23f029",
+    "fetchedAt": "2026-08-16T08:47:10.053Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

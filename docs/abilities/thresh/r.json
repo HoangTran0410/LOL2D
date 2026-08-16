@@ -1,0 +1,56 @@
+{
+  "asset": {
+    "key": "spell_thresh_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_The_Box.png?451f0",
+    "sha1": "2a923a9915b121de7ee88fc0b49cf339c5c35c8d"
+  },
+  "champion": "Thresh",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_thresh_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_The_Box.png?451f0",
+        "sha1": "2a923a9915b121de7ee88fc0b49cf339c5c35c8d"
+      },
+      "fields": {
+        "casttime": "0.45",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Thresh''' erects a pentagon of spectral walls around him that each last for 5 seconds. A wall will break upon enemy champion contact, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 99% for 2 seconds. After the first wall breaks, the rest will deal no damage and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> for only 1 second.",
+          "text": "Active: Thresh erects a pentagon of spectral walls around him that each last for 5 seconds. A wall will break upon enemy champion contact, dealing magic damage and slowing them by 99% for 2 seconds. After the first wall breaks, the rest will deal no damage and slow for only 1 second."
+        },
+        "description2": {
+          "raw": "Enemies that break a wall cannot do so again for 1 second.",
+          "text": "Enemies that break a wall cannot do so again for 1 second."
+        },
+        "icon": "The Box.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>250 / 325 / 400 / 475 / 550 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>",
+          "text": "Magic Damage:250 / 325 / 400 / 475 / 550 (+ 100% AP)"
+        },
+        "name": "The Box",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the start of the cast time.\n** Additionally, ''The Box'' cannot be interrupted by any means, including death or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Resurrection\">[[File:Revival icon.png|20px|link=Death#Ways to prevent death when reaching zero health|An icon representing the keyword Resurrection]] [[:Death#Ways to prevent death when reaching zero health|resurrection]]</span>. ''The Box'' will complete its effect so long as '''Thresh''' has initiated its cast.\n* ''The Box'' always faces the same direction Thresh is facing on cast, placing a corner directly in front of him.\n** The cast indicator displays the opposite of the true behavior.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If ''The Box'' hits multiple champions with different walls on cast, only one of the walls will deal damage and apply the extended slow duration. This wall is chosen by starting at the wall in front of and to the right of Thresh's facing direction on cast, and progressing clockwise.\n* The corners of ''The Box'' are placed 400 units around '''Thresh'''.\n** Each wall is 470.<small>228</small> units long.\n** Each wall passes 323.<small>607</small> units from the center of ''The Box'' at the closest approach (ignoring its width).\n** As a regular pentagon, ''The Box'' has an angle of 72&#176; between each corner.\n* '''Thresh''' can see if the walls of ''The Box'' are broken even if they are not within <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span>.",
+          "text": "This ability will cast from wherever the caster is at the start of the cast time.\n* Additionally, The Box cannot be interrupted by any means, including death or resurrection. The Box will complete its effect so long as Thresh has initiated its cast.\nThe Box always faces the same direction Thresh is facing on cast, placing a corner directly in front of him.\n* The cast indicator displays the opposite of the true behavior.(bug)\nIf The Box hits multiple champions with different walls on cast, only one of the walls will deal damage and apply the extended slow duration. This wall is chosen by starting at the wall in front of and to the right of Thresh's facing direction on cast, and progressing clockwise.\nThe corners of The Box are placed 400 units around Thresh.\n* Each wall is 470.228 units long.\n* Each wall passes 323.607 units from the center of The Box at the closest approach (ignoring its width).\n* As a regular pentagon, The Box has an angle of 72&#176; between each corner.\nThresh can see if the walls of The Box are broken even if they are not within sight."
+        },
+        "spellshield": true,
+        "targeting": "Auto",
+        "width": "30"
+      },
+      "name": "The Box"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "a9d392b8cc233a2472c9dca42f0ceba60b579135d1a14a7db15f5d3e20cbecaa",
+    "fetchedAt": "2026-08-16T06:56:28.042Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Thresh/The_Box",
+    "revisionId": 4024674,
+    "sourceTimestamp": "2026-06-02T17:06:59Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Thresh/The Box",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@The Box@@icon@@The Box.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Thresh''' erects a pentagon of spectral walls around him that each last for 5 seconds. A wall will break upon enemy champion contact, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 99% for 2 seconds. After the first wall breaks, the rest will deal no damage and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> for only 1 second.@@description2@@Enemies that break a wall cannot do so again for 1 second.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>250 / 325 / 400 / 475 / 550 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 30@@speed@@{{{speed}}}@@casttime@@0.<small>45</small>@@cost@@100@@cooldown@@120 / 110 / 100 / 90 / 80@@targeting@@Auto@@damagetype@@Magic@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* This ability will cast from wherever the caster is at the start of the cast time.\n** Additionally, ''The Box'' cannot be interrupted by any means, including death or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Resurrection\">[[File:Revival icon.png|20px|link=Death#Ways to prevent death when reaching zero health|An icon representing the keyword Resurrection]] [[:Death#Ways to prevent death when reaching zero health|resurrection]]</span>. ''The Box'' will complete its effect so long as '''Thresh''' has initiated its cast.\n* ''The Box'' always faces the same direction Thresh is facing on cast, placing a corner directly in front of him.\n** The cast indicator displays the opposite of the true behavior.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If ''The Box'' hits multiple champions with different walls on cast, only one of the walls will deal damage and apply the extended slow duration. This wall is chosen by starting at the wall in front of and to the right of Thresh's facing direction on cast, and progressing clockwise.\n* The corners of ''The Box'' are placed 400 units around '''Thresh'''.\n** Each wall is 470.<small>228</small> units long.\n** Each wall passes 323.<small>607</small> units from the center of ''The Box'' at the closest approach (ignoring its width).\n** As a regular pentagon, ''The Box'' has an angle of 72&#176; between each corner.\n* '''Thresh''' can see if the walls of ''The Box'' are broken even if they are not within <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308763,
+                "revisions": [
+                  {
+                    "parentid": 3965165,
+                    "revid": 4024674,
+                    "timestamp": "2026-06-02T17:06:59Z"
+                  }
+                ],
+                "title": "Template:Data Thresh/The Box"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4024674,
+      "timestamp": "2026-06-02T17:06:59Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "868aa4f80b382df52761e13d8b979cbd6b2a1a619a1dafa5bb7d5bfb08b5abf6",
+    "fetchedAt": "2026-08-16T06:56:28.042Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Thresh/The_Box",
+    "revisionId": 4024674,
+    "sourceTimestamp": "2026-06-02T17:06:59Z"
+  }
+}

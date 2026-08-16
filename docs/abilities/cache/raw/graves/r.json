@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Graves/Collateral Damage",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Collateral Damage@@icon@@Collateral Damage.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Graves''' fires an explosive shell in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit and causes him to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|recoil]]</span> 400 units in the opposite direction.@@description2@@Upon hitting an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> or reaching the end of its range, the shell explodes in a cone to deal reduced damage to additional enemies.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>275 / 350 / 425 / 500 / 575 <span style=\"color:orange; white-space:normal\">(+ 150% '''bonus''' AD)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>200 / 260 / 320 / 380 / 440 <span style=\"color:orange; white-space:normal\">(+ 120% '''bonus''' AD)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Shell missile range\">1100</span> • <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Maximum range including collateral cone, estimated\">1690</span>@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Collateral end cone width, estimated\">740</span>@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Shell missile width\">200</span>@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Shell missile speed. The explosion is instantaneous\">2100</span>@@casttime@@0.<small>25</small>@@cost@@100@@cooldown@@100 / 90 / 80 / 70 / 60@@targeting@@Direction@@damagetype@@Physical@@spellshield@@special@@projectile@@True@@notes@@\n* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> to the target hit by the shell (including to non-champions struck before exploding<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>) and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to targets within the explosion cone.\n* The projectile will still explode early if the champion hit by the shell is protected by a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>.\n* The explosion cone is anchored on the location of the shell missile when it collided with a champion, or otherwise its maximum cast range.\n* The cone damage is always located 150 units behind, based off its direction\n* ''Collateral Damage'' is not disabled while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span>, but '''Graves''' will not dash after the cast time while affected by them.\n* '''Graves''' will not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> after the cast time if he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|airborne]]</span>.\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307373,
+                "revisions": [
+                  {
+                    "parentid": 3907071,
+                    "revid": 4007499,
+                    "timestamp": "2026-04-11T22:21:36Z"
+                  }
+                ],
+                "title": "Template:Data Graves/Collateral Damage"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007499,
+      "timestamp": "2026-04-11T22:21:36Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a3b014675734e295d96bbaae953851f196e8f3d5c6744652aadc2bd811e5a9ef",
+    "fetchedAt": "2026-08-16T06:56:13.524Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Graves/Collateral_Damage",
+    "revisionId": 4007499,
+    "sourceTimestamp": "2026-04-11T22:21:36Z"
+  }
+}

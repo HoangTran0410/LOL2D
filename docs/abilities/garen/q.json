@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_garen_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Decisive_Strike.png?7c7d3",
+    "sha1": "28f1b71ad688527121392cd207999b51d6d313d0"
+  },
+  "champion": "Garen",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_garen_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Decisive_Strike.png?7c7d3",
+        "sha1": "28f1b71ad688527121392cd207999b51d6d313d0"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "8",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Garen''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span> himself of all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> and gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">35% '''bonus''' movement speed</span></span> for a duration.",
+          "text": "Active: Garen cleanses himself of all slows and gains &nbsp;35% bonus movement speed for a duration."
+        },
+        "description2": {
+          "raw": "Additionally, '''Garen''' empowers his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> within 4.<small>5</small> seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Lunge\">[[File:Bear Stance.png|20px|link=Dash#Lunge|An icon representing the keyword Lunge]] [[:Dash#Lunge|lunge]]</span> at the target, deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silence]]</span> them for 1.<small>5</small> seconds.",
+          "text": "Additionally, Garen empowers his next basic attack within 4.5 seconds to have an uncancellable windup, lunge at the target, deal bonus physical damage, and silence them for 1.5 seconds."
+        },
+        "description3": {
+          "raw": "''Decisive Strike <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Garen's''' basic attack timer.''",
+          "text": "Decisive Strike resets Garen's basic attack timer."
+        },
+        "icon": "Decisive Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Movement Speed Duration:'''</span></dt><dd>1.<small>4</small> / 1.<small>95</small> / 2.<small>5</small> / 3.<small>05</small> / 3.<small>6</small></dd></dl>",
+          "text": "Movement Speed Duration:1.4 / 1.95 / 2.5 / 3.05 / 3.6"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd>30 / 60 / 90 / 120 / 150 <span style=\"color:orange; white-space:normal\">(+ 50% AD)</span></dd></dl>",
+          "text": "Bonus Physical Damage:30 / 60 / 90 / 120 / 150 (+ 50% AD)"
+        },
+        "name": "Decisive Strike",
+        "notes": {
+          "raw": "* The enhanced attack will apply other <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects and can <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> as normal (the bonus damage does not).\n** The bonus damage will also apply <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span></span>.\n** The bonus damage is applied to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.\n* ''Decisive Strike'' locks '''Garen''' out of using basic attacks for a short period of time. This is shortened with <span style=\"color:\n#F5EE99; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;attack speed</span></span>.\n* The enhanced attack will still complete and hit the target even if they become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> during the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack's windup]]</span>.\n* ''Decisive Strike'' will not prevent the reapplication of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> (e.g. the persistent slow from <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Trundle\" data-ability=\"Pillar of Ice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Trundle Pillar of Ice.png|20xpx|border|link=Trundle#Pillar of Ice|An icon for Trundle's ability Pillar of Ice]]</span> <span style=\"white-space:normal;\">[[Trundle#Pillar of Ice|Pillar of Ice]]</span></span> will be immediately reapplied after removal if '''Garen''' is still within its [[area of effect]]).\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will only negate the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silence]]</span>.\n* ''Decisive Strike's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Lunge\">[[File:Bear Stance.png|20px|link=Dash#Lunge|An icon representing the keyword Lunge]] [[:Dash#Lunge|lunge]]</span> can pass very thin terrain and will otherwise not be able to. In any case, '''Garen''' will still hit his target.[https://www.youtube.com/watch?v=0qi54mu_gxg]",
+          "text": "The enhanced attack will apply other on-hit effects and can critically strike as normal (the bonus damage does not).\n* The bonus damage will also apply &nbsp;life steal.\n* The bonus damage is applied to structures.\nDecisive Strike locks Garen out of using basic attacks for a short period of time. This is shortened with &nbsp;attack speed.\nThe enhanced attack will still complete and hit the target even if they become untargetable during the attack's windup.\nDecisive Strike will not prevent the reapplication of slows (e.g. the persistent slow from Pillar of Ice will be immediately reapplied after removal if Garen is still within its area of effect).\nSpell shield will only negate the silence.\nDecisive Strike's lunge can pass very thin terrain and will otherwise not be able to. In any case, Garen will still hit his target.[https://www.youtube.com/watch?v=0qi54mu_gxg]"
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Decisive Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "d6b98d81f55121f02ac570b3651c70ae8fa02a4dfd63c202347a0fd3c3492664",
+    "fetchedAt": "2026-08-16T08:47:10.053Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Garen/Decisive_Strike",
+    "revisionId": 4004895,
+    "sourceTimestamp": "2026-04-02T16:52:46Z"
+  }
+}

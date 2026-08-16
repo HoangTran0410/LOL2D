@@ -1,0 +1,104 @@
+{
+  "asset": {
+    "key": "champ_olaf",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_OriginalSquare.png?4841d",
+    "sha1": "930c443cf046c6a37053b444aaa23ef87f60dee0"
+  },
+  "champion": "Olaf",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Olaf",
+    "be": 1575,
+    "changes": "V26.13",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Duelist",
+      "Self Healing",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2010-06-09",
+    "difficulty": 2,
+    "external_positions": [
+      "Top"
+    ],
+    "herotype": "Fighter",
+    "id": 2,
+    "mobility": 1,
+    "patch": "V1.0.0.87",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Reckless Swing"
+    },
+    "skill_i": {
+      "1": "Berserker Rage"
+    },
+    "skill_q": {
+      "1": "Undertow"
+    },
+    "skill_r": {
+      "1": "Ragnarok"
+    },
+    "skill_w": {
+      "1": "Tough It Out"
+    },
+    "skills": {
+      "1": "Berserker Rage",
+      "2": "Undertow",
+      "3": "Tough It Out",
+      "4": "Reckless Swing",
+      "5": "Ragnarok"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "aram": {
+        "dmg_dealt": 1.05
+      },
+      "arm_base": 35,
+      "arm_lvl": 4.2,
+      "as_base": 0.72,
+      "as_lvl": 2.7,
+      "as_ratio": 0.694,
+      "attack_delay_offset": -0.0656249970197677,
+      "dam_base": 68,
+      "dam_lvl": 4.7,
+      "hp5_base": 6.5,
+      "hp5_lvl": 0.6,
+      "hp_base": 645,
+      "hp_lvl": 119,
+      "mp5_base": 7.5,
+      "mp5_lvl": 0.6,
+      "mp_base": 316,
+      "mp_lvl": 50,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 350,
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 191.6667022705078,
+      "selection_radius": 111.111099243164
+    },
+    "style": 30,
+    "title": "The Berserker",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "9859de22d294c99e38aba4f6318438b32b773a52b42e2b6b783cb25530af962d",
+    "fetchedAt": "2026-08-16T06:56:08.637Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

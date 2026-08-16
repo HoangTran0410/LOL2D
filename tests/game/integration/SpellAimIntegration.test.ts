@@ -414,12 +414,22 @@ describe('spell aim integration', () => {
     const spellsDir = fileURLToPath(
       new URL('../../../src/game/gameObject/spells/', import.meta.url)
     );
+    // Code, not prose — the same `codeOnly` split `mana-spend-seam` uses. A
+    // scan that matches its own documentation punishes the one thing that
+    // makes the rule survive: a comment saying why a file does not do this.
+    const codeOnly = (line: string): string => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+        return '';
+      }
+      return line.split('//')[0];
+    };
     const reads = readdirSync(spellsDir)
       .filter(file => file.endsWith('.ts'))
       .flatMap(file =>
         readFileSync(`${spellsDir}/${file}`, 'utf8')
           .split('\n')
-          .filter(line => line.includes('this.game.worldMouse'))
+          .filter(line => codeOnly(line).includes('this.game.worldMouse'))
           .map(line => `${file}:${line.trim()}`)
       );
 

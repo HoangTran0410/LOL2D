@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_olaf_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Tough_It_Out.png?ee498",
+    "sha1": "e84e057f67abba2e9a8768131f3f010433db7511"
+  },
+  "champion": "Olaf",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_olaf_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Tough_It_Out.png?ee498",
+        "sha1": "e84e057f67abba2e9a8768131f3f010433db7511"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16 / 15 / 14 / 13 / 12",
+        "cost": "50",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Olaf''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 5 seconds.",
+          "text": "Active: Olaf gains &nbsp;bonus attack speed for 5 seconds."
+        },
+        "description2": {
+          "raw": "He also grants himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 2.<small>5</small> seconds for an amount that is capped at <span style=\"color:\n#21B053; white-space:normal\">70% '''missing''' health</span>.",
+          "text": "He also grants himself a shield for 2.5 seconds for an amount that is capped at 70% missing health."
+        },
+        "description3": {
+          "raw": "''Tough It Out <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Olaf's''' basic attack timer.''",
+          "text": "Tough It Out resets Olaf's basic attack timer."
+        },
+        "icon": "Olaf Tough It Out.png",
+        "icon2": "Olaf Tough It Out 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>40 / 50 / 60 / 70 / 80%</dd></dl>",
+          "text": "Bonus Attack Speed:40 / 50 / 60 / 70 / 80%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>10 / 40 / 70 / 100 / 130 <span style=\"color:\n#21B053; white-space:normal\">(+ 17.<small>5</small>% '''missing''' health)</span></dd></dl>",
+          "text": "Shield Strength:10 / 40 / 70 / 100 / 130 (+ 17.5% missing health)"
+        },
+        "name": "Tough It Out",
+        "notes": {
+          "raw": "* ''Tough It Out's'' <span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span> value is updated when it is cast, even if it was already active.\n* At <span style=\"color:\n#21B053; white-space:normal\">70% '''missing''' health</span>, the health ratio portion of the shield is capped at the equivalent of <span style=\"color:\n#21B053; white-space:normal\">12.<small>5</small>% '''maximum''' health</span>.",
+          "text": "Tough It Out's bonus attack speed value is updated when it is cast, even if it was already active.\nAt 70% missing health, the health ratio portion of the shield is capped at the equivalent of 12.5% maximum health."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Tough It Out"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "d75032b5de6cc3eaed3cba6553a9a4189e6369b7744f1a5a472437319a4679e4",
+    "fetchedAt": "2026-08-16T06:56:08.637Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Olaf/Tough_It_Out",
+    "revisionId": 4033201,
+    "sourceTimestamp": "2026-06-21T16:57:34Z"
+  }
+}

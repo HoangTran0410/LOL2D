@@ -2,6 +2,7 @@ import EventType from '../enums/EventType';
 import MissileSpellObject from '../gameObject/MissileSpellObject';
 import SpellObject from '../gameObject/SpellObject';
 import TrailSystem from '../gameObject/helpers/TrailSystem';
+import AoePulse from '../gameObject/spellObjects/AoePulse';
 import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 
 /**
@@ -55,6 +56,8 @@ export interface BasicAttackHit {
   damage: number;
   /** True for a bolt, false for a melee swing. */
   ranged: boolean;
+  /** True when the crit roll came up. Absent on anything that predates the roll. */
+  crit?: boolean;
 }
 
 /** A unit that can still be hit right now. */
@@ -74,14 +77,48 @@ export function landBasicAttack(
 ): boolean {
   if (attacker.isDead || !canBeHit(victim)) return false;
 
-  victim.takeDamage(damage, attacker);
+  // On-hit first, then the crit multiplier over the total — the order League
+  // uses, and the one that makes stacking the two feel worth it. Both stats
+  // sit at 0 by default, so a unit nobody has buffed swings for exactly what
+  // it swung for before these existed.
+  const bonus = attacker.stats?.onHitDamage?.value ?? 0;
+  const crit = rollCrit(attacker);
+  const total = (damage + bonus) * (crit ? (attacker.stats?.critDamage?.value ?? 1) : 1);
+
+  victim.takeDamage(total, attacker);
+  if (crit) showCritSpark(attacker, victim);
   attacker.game?.eventManager?.emit(EventType.ON_ATTACK_HIT, {
     attacker,
     victim,
-    damage,
+    damage: total,
     ranged,
+    crit,
   } satisfies BasicAttackHit);
   return true;
+}
+
+/**
+ * The dice, in one place. `critChance` defaults to 0 and nothing in the base
+ * game grants it, so this returns false — deterministically — for every unit
+ * that has not been handed the stat, which is what keeps the combat tests from
+ * having to seed a random.
+ */
+function rollCrit(attacker: AttackableUnit): boolean {
+  const chance = attacker.stats?.critChance?.value ?? 0;
+  return chance > 0 && Math.random() < chance;
+}
+
+/** A crit that looks like every other hit is not a crit. */
+function showCritSpark(attacker: AttackableUnit, victim: AttackableUnit): void {
+  const spark = new AoePulse(attacker);
+  spark.position = victim.position.copy();
+  spark.radius = 55;
+  spark.lifeTime = 300;
+  spark.color = [255, 205, 90];
+  spark.style = 'shards';
+  spark.spokes = 8;
+  spark.fillAlpha = 0;
+  attacker.game?.objectManager?.addObject?.(spark);
 }
 
 /**

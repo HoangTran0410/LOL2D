@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_annie_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Disintegrate.png?bbde6",
+    "sha1": "95a9b263cea02d8104aabe024e11367300b36daf"
+  },
+  "champion": "Annie",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_annie_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Disintegrate.png?bbde6",
+        "sha1": "95a9b263cea02d8104aabe024e11367300b36daf"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "4",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Annie''' hurls a fireball at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>.",
+          "text": "Active: Annie hurls a fireball at the target enemy that deals magic damage."
+        },
+        "description2": {
+          "raw": "If this kills the target, ''Disintegrate's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by 50% and its <span style=\"color:\n#0099CC; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;mana cost</span></span> is refunded.",
+          "text": "If this kills the target, Disintegrate's &nbsp;cooldown is reduced by 50% and its &nbsp;mana cost is refunded."
+        },
+        "icon": "Disintegrate.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 125 / 170 / 215 / 260 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 125 / 170 / 215 / 260 (+ 80% AP)"
+        },
+        "name": "Disintegrate",
+        "notes": {
+          "raw": "* ''Disintegrate'' will also grant the cooldown reduction and mana cost refund if the target is dead upon the missile's arrival.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Disintegrate will also grant the cooldown reduction and mana cost refund if the target is dead upon the missile's arrival.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1400",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Disintegrate"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "cc805ca1ac679cfcc80c3f0f1bcd2d111c16da56515adbd964d06311c1040397",
+    "fetchedAt": "2026-08-16T08:46:36.640Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Annie/Disintegrate",
+    "revisionId": 3992633,
+    "sourceTimestamp": "2026-02-18T20:26:40Z"
+  }
+}

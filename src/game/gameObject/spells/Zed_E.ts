@@ -111,11 +111,34 @@ export class Zed_E_Object extends SpellObject {
   draw() {
     push();
     translate(this.position.x, this.position.y);
+
+    // The shuriken sweeps as a *bar through the centre* — both ends land at
+    // once, which is what `update` actually tests. A plain grey rectangle said
+    // none of that; these are the two arcs the two ends are cutting.
+    noFill();
+    for (let i = 1; i <= 4; i++) {
+      const trail = this.angle - i * 0.22;
+      stroke(190, 90, 230, 150 - i * 30);
+      strokeWeight(6 - i);
+      arc(0, 0, this.radius * 2, this.radius * 2, trail - 0.22, trail);
+      arc(0, 0, this.radius * 2, this.radius * 2, trail - 0.22 + PI, trail + PI);
+    }
+
     rotate(this.angle);
 
-    fill(200);
-    rect(-this.radius, -5, this.radius * 2, 10);
-
+    // the blade itself: a dark bar with a lit leading edge at each end
+    noStroke();
+    fill(45, 25, 70, 230);
+    rect(-this.radius, -6, this.radius * 2, 12, 6);
+    fill(215, 150, 255, 245);
+    rect(-this.radius, -6, this.radius * 2, 3, 3);
+    // the two cutting tips
+    fill(240, 220, 255);
+    triangle(this.radius - 16, -9, this.radius + 6, 0, this.radius - 16, 9);
+    triangle(-this.radius + 16, -9, -this.radius - 6, 0, -this.radius + 16, 9);
+    // the hub it spins on
+    fill(120, 60, 170, 220);
+    circle(0, 0, 16);
     pop();
   }
 

@@ -2,6 +2,7 @@ import AssetManager from '../../../managers/AssetManager';
 import Spell from '../Spell';
 import {
   CURSOR_ACQUISITION_RADIUS,
+  FALLBACK_CHASE_MARGIN,
   findAttackTargetNearPoint,
 } from '../../combat/AttackTargeting';
 import { DEFAULT_CHAMPION_ATTACK } from '../attackableUnits/Champion';
@@ -36,6 +37,8 @@ export default class BasicAttack extends Spell {
   description =
     `Ra lệnh <span class="buff">đánh thường</span> mục tiêu địch <span>gần con trỏ chuột nhất</span> ` +
     `(trong vòng <span>${CURSOR_ACQUISITION_RADIUS}</span> đơn vị quanh con trỏ, và phải nhìn thấy được). ` +
+    `Nếu <span class="buff">quanh con trỏ không có ai</span>, tự động đánh <span>kẻ địch gần bản thân nhất</span> ` +
+    `trong <span class="buff">tầm với</span> — để vừa chạy vừa quay lại bắn (con trỏ vẫn dùng để chỉ hướng chạy). ` +
     `Tướng sẽ <span class="buff">tự đuổi theo và đánh liên tục</span> cho tới khi mục tiêu chết, ` +
     `chạy khỏi tầm nhìn, hoặc lệnh bị huỷ — bởi <span class="debuff">hiệu ứng khống chế</span>, ` +
     `bởi lệnh di chuyển (chuột phải xuống đất), hoặc khi bạn dùng một chiêu thức khác. ` +
@@ -53,6 +56,27 @@ export default class BasicAttack extends Spell {
   /** How far from the cursor a press reaches. Override for a per-champion feel. */
   get acquisitionRadius(): number {
     return CURSOR_ACQUISITION_RADIUS;
+  }
+
+  /**
+   * How far from the *champion* a press reaches once the cursor came up empty.
+   *
+   * Derived rather than tuned, from the two numbers that already bound an
+   * attack order:
+   *
+   *   - the champion's own reach, so the fallback is "someone I can shoot",
+   *     which is what makes this a kiting key and not a charge key. It is the
+   *     live stat, so Jinx's rocket launcher lengthens the fallback the same
+   *     frame it lengthens the swing;
+   *   - `visionRadius`, because `BasicAttackController.leashTo` gives the order
+   *     up past exactly that. Acquiring beyond it would hand the controller a
+   *     target it drops on the next frame — an order that visibly does nothing.
+   */
+  get fallbackRadius(): number {
+    const owner = this.owner as AttackableUnit | undefined;
+    if (!owner) return 0;
+    const reach = owner.stats.attackRange.value + owner.stats.size.value / 2;
+    return Math.min(reach + FALLBACK_CHASE_MARGIN, owner.stats.visionRadius.value);
   }
 
   /**
@@ -109,11 +133,20 @@ export default class BasicAttack extends Spell {
     if (target) this.order(target);
   }
 
-  /** The enemy this press picked, or null for "nothing there" — a no-op. */
+  /**
+   * The enemy this press picked, or null for "nothing there" — a no-op.
+   *
+   * Two passes, in this order, and the order is the whole design: whatever the
+   * player is pointing at wins, and only when they are pointing at empty ground
+   * does the champion pick for itself. Aim is never overruled — it is only
+   * answered when there was none.
+   */
   protected acquire(cursor: Vec2): AttackableUnit | null {
     const owner = this.owner as AttackableUnit | undefined;
     if (!owner) return null;
-    return findAttackTargetNearPoint(owner, cursor, this.acquisitionRadius);
+    const aimed = findAttackTargetNearPoint(owner, cursor, this.acquisitionRadius);
+    if (aimed) return aimed;
+    return findAttackTargetNearPoint(owner, owner.position, this.fallbackRadius);
   }
 
   /** Hands the target to the champion, which owns the standing order. */

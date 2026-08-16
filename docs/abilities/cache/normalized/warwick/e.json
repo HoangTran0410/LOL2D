@@ -1,0 +1,63 @@
+{
+  "asset": {
+    "key": "spell_warwick_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Primal_Howl.png?81bfa",
+    "sha1": "8969e0474cb8471417afdc33a5109e3103523883"
+  },
+  "champion": "Warwick",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_warwick_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Primal_Howl.png?81bfa",
+        "sha1": "8969e0474cb8471417afdc33a5109e3103523883"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "15 / 14 / 13 / 12 / 11",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Warwick''' gains damage reduction for up to 2.<small>75</small> seconds. ''Primal Howl'' can be recast after 1 second, and does so automatically after the duration.",
+          "text": "Active: Warwick gains damage reduction for up to 2.75 seconds. Primal Howl can be recast after 1 second, and does so automatically after the duration."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Recast:'''</span> '''Warwick''' howls, ending ''Primal Howl's'' effects and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fear\">[[File:Flee icon.png|20px|link=Flee|An icon representing the keyword Flee]] [[:Flee|fearing]]</span> nearby enemies for 1 second, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 90%.",
+          "text": "Recast: Warwick howls, ending Primal Howl's effects and fearing nearby enemies for 1 second, slowing them by 90%."
+        },
+        "description4": {
+          "raw": "Starting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Warwick\" data-ability=\"Infinite Duress\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Warwick Infinite Duress.png|20xpx|border|link=Warwick#Infinite Duress|An icon for Warwick's ability Infinite Duress]]</span> <span style=\"white-space:normal;\">[[Warwick#Infinite Duress|Infinite Duress']]</span></span>'' channel while ''Primal Howl'' is active will initiate the recast without ending the damage reduction buff prematurely.",
+          "text": "Starting Infinite Duress' channel while Primal Howl is active will initiate the recast without ending the damage reduction buff prematurely."
+        },
+        "description5": {
+          "raw": "''Primal Howl's recast <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Warwick's''' basic attack timer.''",
+          "text": "Primal Howl's recast resets Warwick's basic attack timer."
+        },
+        "effectradius": "375",
+        "icon": "Primal Howl.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Damage Reduction:'''</span></dt><dd>35 / 40 / 45 / 50 / 55%</dd></dl>",
+          "text": "Damage Reduction:35 / 40 / 45 / 50 / 55%"
+        },
+        "name": "Primal Howl",
+        "notes": {
+          "raw": "*The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n**If the ability is not manually recasted, the secondary effect will trigger without being considered as an ability activation.\n* The basic attack reset is not considered one for <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Hail of Blades\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Hail of Blades rune.png|20xpx|link=Hail of Blades|An icon representing Hail of Blades]]</span> <span style=\"word-break: keep-all;\">[[Hail of Blades]]</span></span>.\n* The recast's howling animation has a 0.<small>25</small>-second <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Lockout\">[[File:Lockout icon 2.png|20px|link=Terminology#Lockout|An icon representing the keyword Lockout]] [[:Terminology#Lockout|lockout]]</span> time.\n** This will also cancel '''Warwick's''' basic attack.\n** '''Warwick''' cannot attack or cast abilities during the animation, instead the last input will be buffered to play after it ends.\n* '''Warwick''' will automatically recast if he enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Resurrection\">[[File:Revival icon.png|20px|link=Death#Ways to prevent death when reaching zero health|An icon representing the keyword Resurrection]] [[:Death#Ways to prevent death when reaching zero health|resurrection]]</span>.",
+          "text": "The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\n*If the ability is not manually recasted, the secondary effect will trigger without being considered as an ability activation.\nThe basic attack reset is not considered one for Hail of Blades.\nThe recast's howling animation has a 0.25-second lockout time.\n* This will also cancel Warwick's basic attack.\n* Warwick cannot attack or cast abilities during the animation, instead the last input will be buffered to play after it ends.\nWarwick will automatically recast if he enters resurrection."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Primal Howl"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "424dd881d8ba67bb956282f069004807df46da6c9c1f154cd46e8058870276ad",
+    "fetchedAt": "2026-08-16T06:56:59.377Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Warwick/Primal_Howl",
+    "revisionId": 4047663,
+    "sourceTimestamp": "2026-07-30T08:58:13Z"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "asset": {
+    "key": "champ_graves",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_OriginalSquare.png?1d234",
+    "sha1": "15b4e6e983691a9c33c1790c043784c0ef5fa2bf"
+  },
+  "champion": "Graves",
+  "data": {
+    "adaptivetype": "Physical",
+    "apiname": "Graves",
+    "be": 2400,
+    "changes": "V26.07",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Burst",
+      "Auto-attack",
+      "Physical"
+    ],
+    "control": 1,
+    "damage": 3,
+    "date": "2011-10-19",
+    "difficulty": 2,
+    "external_positions": [
+      "Jungle"
+    ],
+    "fullname": "Malcolm Graves",
+    "herotype": "Marksman",
+    "id": 104,
+    "mobility": 2,
+    "patch": "V1.0.0.127",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Specialist"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Quickdraw"
+    },
+    "skill_i": {
+      "1": "New Destiny"
+    },
+    "skill_q": {
+      "1": "End of the Line"
+    },
+    "skill_r": {
+      "1": "Collateral Damage"
+    },
+    "skill_w": {
+      "1": "Smoke Screen"
+    },
+    "skills": {
+      "1": "New Destiny",
+      "2": "End of the Line",
+      "3": "Smoke Screen",
+      "4": "Quickdraw",
+      "5": "Collateral Damage"
+    },
+    "stats": {
+      "arm_base": 33,
+      "arm_lvl": 4.6,
+      "as_base": 0.475,
+      "as_lvl": 3,
+      "as_ratio": 0.490000009536743,
+      "attack_delay_offset": -0.294999986886978,
+      "dam_base": 66,
+      "dam_lvl": 4,
+      "hp5_base": 8,
+      "hp5_lvl": 0.7,
+      "hp_base": 625,
+      "hp_lvl": 106,
+      "missile_speed": 3800,
+      "mp5_base": 8,
+      "mp5_lvl": 0.7,
+      "mp_base": 325,
+      "mp_lvl": 40,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.98,
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 10,
+      "range": 425,
+      "selection_height": 140,
+      "selection_radius": 110,
+      "usb": {
+        "dmg_dealt": 0.95
+      },
+      "windup_modifier": 0.100000001490116
+    },
+    "style": 20,
+    "title": "The Outlaw",
+    "toughness": 2,
+    "utility": 2
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "d5507ad8c682d53e7da5343cb264101673570a543cce0cfb2cecafce9c7c2598",
+    "fetchedAt": "2026-08-16T06:56:13.524Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

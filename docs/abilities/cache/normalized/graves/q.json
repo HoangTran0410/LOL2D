@@ -1,0 +1,66 @@
+{
+  "asset": {
+    "key": "spell_graves_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_End_of_the_Line.png?86f15",
+    "sha1": "6543e7c33b3e6fed3ef478092f4b7c00e1f7d2e1"
+  },
+  "champion": "Graves",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_graves_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_End_of_the_Line.png?86f15",
+        "sha1": "6543e7c33b3e6fed3ef478092f4b7c00e1f7d2e1"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "13 / 11.25 / 9.5 / 7.75 / 6",
+        "cost": "80",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Graves''' fires a round in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies it passes through and leaves behind a powder trail.",
+          "text": "Active: Graves fires a round in the target direction that deals physical damage to enemies it passes through and leaves behind a powder trail."
+        },
+        "description2": {
+          "raw": "After 2 seconds, or <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.2 seconds, but rounded up to the next game tick.\">0.<small>231</small> seconds</span> upon colliding with terrain, the round detonates to deal <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies within a wide perpendicular area and in a reverse wave along the powder trail.",
+          "text": "After 2 seconds, or 0.231 seconds upon colliding with terrain, the round detonates to deal physical damage to enemies within a wide perpendicular area and in a reverse wave along the powder trail."
+        },
+        "description3": {
+          "raw": "''Enemies can only be hit once per pass.''",
+          "text": "Enemies can only be hit once per pass."
+        },
+        "icon": "End of the Line.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>50 / 75 / 100 / 125 / 150 <span style=\"color:orange; white-space:normal\">(+ 65% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:50 / 75 / 100 / 125 / 150 (+ 65% bonus AD)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>80 / 125 / 170 / 215 / 260 <span style=\"color:orange; white-space:normal\">(+ 55 / 70 / 85 / 100 / 115% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Physical Damage:'''</span></dt><dd>130 / 200 / 270 / 340 / 410 <span style=\"color:orange; white-space:normal\">(+ 120 / 135 / 150 / 165 / 180% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:80 / 125 / 170 / 215 / 260 (+ 55 / 70 / 85 / 100 / 115% bonus AD)Total Physical Damage:130 / 200 / 270 / 340 / 410 (+ 120 / 135 / 150 / 165 / 180% bonus AD)"
+        },
+        "name": "End of the Line",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shields]]</span> can only block one instance of the ability's damage.\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> will destroy the projectile entirely and mitigate all effects, including the trail on the ground. \n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span> is considered to be terrain for the purposes of the projectile, triggering its second effect.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "Spell shields can only block one instance of the ability's damage.\nWind Wall will destroy the projectile entirely and mitigate all effects, including the trail on the ground.\nUnbreakable is considered to be terrain for the purposes of the projectile, triggering its second effect.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": false,
+        "range": "800 • 900",
+        "spellshield": false,
+        "targeting": "Direction",
+        "width": "80 • 500 • 200"
+      },
+      "name": "End of the Line"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "242641133708c813e83f2893d0104ba98632c131a3ec14558d93ca603c2cec5b",
+    "fetchedAt": "2026-08-16T06:56:13.524Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Graves/End_of_the_Line",
+    "revisionId": 4007501,
+    "sourceTimestamp": "2026-04-11T22:23:57Z"
+  }
+}

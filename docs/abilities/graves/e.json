@@ -1,0 +1,61 @@
+{
+  "asset": {
+    "key": "spell_graves_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_Quickdraw.png?56982",
+    "sha1": "bbddc31eb0d72499ca55bb1ab15d5054c631edb1"
+  },
+  "champion": "Graves",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_graves_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_Quickdraw.png?56982",
+        "sha1": "bbddc31eb0d72499ca55bb1ab15d5054c631edb1"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "16 / 15 / 14 / 13 / 12",
+        "cost": "40",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Graves''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target location, reloading one <span style=\"color:\n#E34D4C; white-space:normal\">shell</span> while generating a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''True Grit'' for 4 seconds, stacking up to 8 times. Dashing towards an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> generates 2 stacks of ''True Grit''.",
+          "text": "Active: Graves dashes to the target location, reloading one shell while generating a stack of True Grit for 4 seconds, stacking up to 8 times. Dashing towards an enemy champion generates 2 stacks of True Grit."
+        },
+        "description2": {
+          "raw": "''Quickdraw's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced by 0.<small>5</small> seconds for every <span style=\"color:\n#56C456; white-space:normal\">pellet</span> impacting an enemy.",
+          "text": "Quickdraw's &nbsp;current cooldown is reduced by 0.5 seconds for every pellet impacting an enemy."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''True Grit:'''</span> For each stack, '''Graves''' gains <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span>, and <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span> equal to 50% of that amount. Subsequent casts of ''Quickdraw'' and damage versus non-<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> will refresh the duration of ''True Grit''.",
+          "text": "True Grit: For each stack, Graves gains &nbsp;bonus armor, and &nbsp;bonus magic resistance equal to 50% of that amount. Subsequent casts of Quickdraw and damage versus non- minions will refresh the duration of True Grit."
+        },
+        "description4": {
+          "raw": "''Quickdraw <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Graves'''' basic attack timer.''",
+          "text": "Quickdraw resets Graves' basic attack timer."
+        },
+        "icon": "Quickdraw.png",
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Armor:'''</span></dt><dd>7 / 10 / 13 / 16 / 19</dd><dt><span class=\"template_lc\">'''Maximum Bonus Armor:'''</span></dt><dd>56 / 80 / 104 / 128 / 152</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Resistance:'''</span></dt><dd>3.<small>5</small> / 5 / 6.<small>5</small> / 8 / 9.<small>5</small></dd><dt><span class=\"template_lc\">'''Maximum Bonus MR:'''</span></dt><dd>28 / 40 / 52 / 64 / 76</dd></dl>",
+          "text": "Bonus Armor:7 / 10 / 13 / 16 / 19Maximum Bonus Armor:56 / 80 / 104 / 128 / 152\nBonus Magic Resistance:3.5 / 5 / 6.5 / 8 / 9.5Maximum Bonus MR:28 / 40 / 52 / 64 / 76"
+        },
+        "name": "Quickdraw",
+        "notes": {
+          "raw": "* If '''Graves''' dashes while reloading, he can cast any of his <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span> during the dash.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* '''Graves''' gains the one additional stack of ''True Grit'' from ''Quickdraw'' if at any point during the dash a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> enemy champion is in front of ''Graves'' within <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 1300 distance.\n** Enemy champions have to be targetable to grant the additional stack.\n** The additional stack of ''True Grit'' is gained when dashing towards <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clone\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|clones]]</span> just like actual champions.\n** This check never happens if '''Graves''' dashes 0 distance (impossible outside of bugs), and will not always repeat a final time at the very end of the dash. Otherwise, it occurs continously while '''Graves''' is dashing.\n** This works for a 180 degree sector from Graves to the Champion, as such dashing parallel to the champ will also give a bonus stack.",
+          "text": "If Graves dashes while reloading, he can cast any of his abilities during the dash.(bug)\nGraves gains the one additional stack of True Grit from Quickdraw if at any point during the dash a visible enemy champion is in front of Graves within 1300 distance.\n* Enemy champions have to be targetable to grant the additional stack.\n* The additional stack of True Grit is gained when dashing towards clones just like actual champions.\n* This check never happens if Graves dashes 0 distance (impossible outside of bugs), and will not always repeat a final time at the very end of the dash. Otherwise, it occurs continously while Graves is dashing.\n* This works for a 180 degree sector from Graves to the Champion, as such dashing parallel to the champ will also give a bonus stack."
+        },
+        "targeting": "Location"
+      },
+      "name": "Quickdraw"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "41fcbcded78997927a08bd67a0986a584b901acbf1dd437116eda9ccbc411675",
+    "fetchedAt": "2026-08-16T06:56:13.524Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Graves/Quickdraw",
+    "revisionId": 4049953,
+    "sourceTimestamp": "2026-08-04T00:46:56Z"
+  }
+}

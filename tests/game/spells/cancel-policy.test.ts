@@ -1,7 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { get: () => undefined, getAsset: () => undefined, ensure: () => Promise.resolve() },
+  default: {
+    get: () => undefined,
+    getAsset: () => undefined,
+    ensure: () => Promise.resolve(),
+    // Garen W has no icon on the Wiki, so it declares a placeholder rather
+    // than borrowing someone else's art — see docs/ADDING_SPELLS.md §6.
+    placeholder: () => ({ url: '', status: 'ready' }),
+  },
 }));
 
 import * as AllSpells from '../../../src/game/gameObject/spells/index';

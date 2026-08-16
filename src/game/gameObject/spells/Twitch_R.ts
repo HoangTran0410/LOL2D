@@ -13,6 +13,7 @@ export const BONUS_RANGE = 250;
 export const BONUS_DAMAGE = 8;
 export const BOLT_DAMAGE = 7;
 export const BOLT_RANGE = 700;
+export const ON_HIT_DAMAGE = 6;
 export const STACK_ID = 'twitch_r';
 
 /**
@@ -38,6 +39,7 @@ export default class Twitch_R extends Spell {
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+${BONUS_RANGE} tầm đánh</span>,` +
     ` <span class="buff">+${BONUS_DAMAGE} sát thương đánh thường</span>, <span class="buff">+25% tốc độ đánh</span>,` +
+    ` <span class="buff">+${ON_HIT_DAMAGE} sát thương mỗi đòn đánh</span>,` +
     ` và mỗi đòn đánh thường <span class="damage">xuyên qua mục tiêu</span> bắn tiếp` +
     ` <span class="damage">${BOLT_DAMAGE} sát thương</span> cho mọi kẻ địch phía sau`;
   coolDown = 10000;
@@ -109,6 +111,7 @@ export default class Twitch_R extends Spell {
       attackRange: { baseBonus: BONUS_RANGE },
       attackDamage: { baseBonus: BONUS_DAMAGE },
       attackSpeed: { percentBaseBonus: 0.25 },
+      onHitDamage: { baseBonus: ON_HIT_DAMAGE },
     };
     this.owner.addBuff(amp);
   }

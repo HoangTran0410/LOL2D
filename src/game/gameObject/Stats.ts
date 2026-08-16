@@ -137,6 +137,10 @@ export class StatsModifier {
   attackDamage = new StatModifier(0);
   attackSpeed = new StatModifier(0);
   attackRange = new StatModifier(0);
+  omnivamp = new StatModifier(0);
+  onHitDamage = new StatModifier(0);
+  critChance = new StatModifier(0);
+  critDamage = new StatModifier(0);
 
   addModifier(modifier: StatsModifier) {
     if (!(modifier instanceof StatsModifier)) return;
@@ -153,6 +157,10 @@ export class StatsModifier {
     this.attackDamage.add(modifier.attackDamage);
     this.attackSpeed.add(modifier.attackSpeed);
     this.attackRange.add(modifier.attackRange);
+    this.omnivamp.add(modifier.omnivamp);
+    this.onHitDamage.add(modifier.onHitDamage);
+    this.critChance.add(modifier.critChance);
+    this.critDamage.add(modifier.critDamage);
   }
 
   removeModifier(modifier: StatsModifier) {
@@ -170,6 +178,10 @@ export class StatsModifier {
     this.attackDamage.remove(modifier.attackDamage);
     this.attackSpeed.remove(modifier.attackSpeed);
     this.attackRange.remove(modifier.attackRange);
+    this.omnivamp.remove(modifier.omnivamp);
+    this.onHitDamage.remove(modifier.onHitDamage);
+    this.critChance.remove(modifier.critChance);
+    this.critDamage.remove(modifier.critDamage);
   }
 }
 
@@ -195,6 +207,8 @@ export const MAX_UNIT_SIZE = 165;
  * three overlapping ones would otherwise reach a swing per frame.
  */
 export const MAX_ATTACK_SPEED = 2.5;
+/** Default crit multiplier — League's, so "+75%" reads the way a player expects. */
+export const CRIT_MULTIPLIER = 1.75;
 
 export default class Stats {
   maxHealth = new Stat(100);
@@ -222,6 +236,29 @@ export default class Stats {
   /** Surface-to-surface reach of a basic attack; decides melee versus ranged. */
   attackRange = new Stat(0);
 
+  /* ------------------------------------------------ making a swing matter
+     Four stats that exist so a basic attack is a build, not a filler action
+     between cooldowns. They are read in exactly one place each —
+     `landBasicAttack` for the three attack ones, `takeDamage` for the vamp —
+     so an ability grants them the way it grants any other stat (a `StatAmp`
+     with `omnivamp: { baseBonus: 0.3 }`) instead of hand-rolling its own
+     `ON_ATTACK_HIT` listener. Four spells used to do exactly that, each with
+     its own copy of the same subscribe/unsubscribe bookkeeping. */
+
+  /**
+   * Fraction of *all* damage this unit deals that returns as health — League's
+   * omnivamp rather than its lifesteal, so a damage-over-time tick and a spell
+   * feed it as readily as a swing does. Capped at 1: a unit may not profit
+   * from hitting something.
+   */
+  omnivamp = new Stat(0, 1, 0);
+  /** Flat damage added to every basic attack that lands, before the crit roll. */
+  onHitDamage = new Stat(0);
+  /** 0..1. Left at 0 by default, so nothing in the game rolls dice unless something granted this. */
+  critChance = new Stat(0, 1, 0);
+  /** What a crit multiplies the swing by. 1.75 is +75%, League's own number. */
+  critDamage = new Stat(CRIT_MULTIPLIER);
+
   actionState =
     ActionState.CAN_CAST |
     ActionState.CAN_MOVE |
@@ -243,6 +280,10 @@ export default class Stats {
     this.attackDamage.addModifier(modifier.attackDamage);
     this.attackSpeed.addModifier(modifier.attackSpeed);
     this.attackRange.addModifier(modifier.attackRange);
+    this.omnivamp.addModifier(modifier.omnivamp);
+    this.onHitDamage.addModifier(modifier.onHitDamage);
+    this.critChance.addModifier(modifier.critChance);
+    this.critDamage.addModifier(modifier.critDamage);
   }
 
   removeModifier(modifier: StatsModifier) {
@@ -260,6 +301,10 @@ export default class Stats {
     this.attackDamage.removeModifier(modifier.attackDamage);
     this.attackSpeed.removeModifier(modifier.attackSpeed);
     this.attackRange.removeModifier(modifier.attackRange);
+    this.omnivamp.removeModifier(modifier.omnivamp);
+    this.onHitDamage.removeModifier(modifier.onHitDamage);
+    this.critChance.removeModifier(modifier.critChance);
+    this.critDamage.removeModifier(modifier.critDamage);
   }
 
   getActionState(state: number): boolean {

@@ -156,7 +156,7 @@ export const SpellGroups: {
     name: 'Olaf',
     image: 'champ_olaf',
 
-    spells: [AllSpells.Olaf_Q],
+    spells: [AllSpells.Olaf_Q, AllSpells.Olaf_W, AllSpells.Olaf_E, AllSpells.Olaf_R],
   },
   {
     name: 'Teemo',
@@ -180,7 +180,7 @@ export const SpellGroups: {
     name: 'Graves',
     image: 'champ_graves',
 
-    spells: [AllSpells.Graves_W],
+    spells: [AllSpells.Graves_Q, AllSpells.Graves_W, AllSpells.Graves_E, AllSpells.Graves_R],
   },
   {
     name: 'Anivia',
@@ -192,19 +192,19 @@ export const SpellGroups: {
     name: 'Varus',
     image: 'champ_varus',
 
-    spells: [AllSpells.Varus_Q],
+    spells: [AllSpells.Varus_Q, AllSpells.Varus_W, AllSpells.Varus_E, AllSpells.Varus_R],
   },
   {
     name: 'Pantheon',
     image: 'champ_pantheon',
 
-    spells: [AllSpells.Pantheon_Q],
+    spells: [AllSpells.Pantheon_Q, AllSpells.Pantheon_W, AllSpells.Pantheon_E, AllSpells.Pantheon_R],
   },
   {
     name: 'Thresh',
     image: 'champ_thresh',
 
-    spells: [AllSpells.Thresh_Q],
+    spells: [AllSpells.Thresh_Q, AllSpells.Thresh_W, AllSpells.Thresh_E, AllSpells.Thresh_R],
   },
   {
     name: 'Rammus',
@@ -234,7 +234,7 @@ export const SpellGroups: {
     name: 'Nocturne',
     image: 'champ_nocturne',
 
-    spells: [AllSpells.Nocturne_R],
+    spells: [AllSpells.Nocturne_Q, AllSpells.Nocturne_W, AllSpells.Nocturne_E, AllSpells.Nocturne_R],
   },
   {
     name: 'Twitch',
@@ -252,7 +252,7 @@ export const SpellGroups: {
     name: 'Warwick',
     image: 'champ_warwick',
 
-    spells: [AllSpells.Warwick_Q],
+    spells: [AllSpells.Warwick_Q, AllSpells.Warwick_W, AllSpells.Warwick_E, AllSpells.Warwick_R],
   },
   {
     name: 'Singed',
@@ -264,13 +264,31 @@ export const SpellGroups: {
     name: 'Cassiopeia',
     image: 'champ_cassiopeia',
 
-    spells: [AllSpells.Cassiopeia_W],
+    spells: [AllSpells.Cassiopeia_Q, AllSpells.Cassiopeia_W, AllSpells.Cassiopeia_E, AllSpells.Cassiopeia_R],
   },
   {
     name: 'Fizz',
     image: 'champ_fizz',
 
-    spells: [AllSpells.Fizz_E],
+    spells: [AllSpells.Fizz_Q, AllSpells.Fizz_W, AllSpells.Fizz_E, AllSpells.Fizz_R],
+  },
+  {
+    name: 'Annie',
+    image: 'champ_annie',
+
+    spells: [AllSpells.Annie_Q, AllSpells.Annie_W, AllSpells.Annie_E, AllSpells.Annie_R],
+  },
+  {
+    name: 'Garen',
+    image: 'champ_garen',
+
+    spells: [AllSpells.Garen_Q, AllSpells.Garen_W, AllSpells.Garen_E, AllSpells.Garen_R],
+  },
+  {
+    name: 'Jinx',
+    image: 'champ_jinx',
+
+    spells: [AllSpells.Jinx_Q, AllSpells.Jinx_W, AllSpells.Jinx_E, AllSpells.Jinx_R],
   },
   {
     name: 'Nasus',

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Annie/Disintegrate",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Disintegrate@@icon@@Disintegrate.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Annie''' hurls a fireball at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>.@@description2@@If this kills the target, ''Disintegrate's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by 50% and its <span style=\"color:\n#0099CC; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;mana cost</span></span> is refunded.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 125 / 170 / 215 / 260 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@1400@@casttime@@0.<small>25</small>@@cost@@60 / 65 / 70 / 75 / 80@@cooldown@@4@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* ''Disintegrate'' will also grant the cooldown reduction and mana cost refund if the target is dead upon the missile's arrival.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306799,
+                "revisions": [
+                  {
+                    "parentid": 3936349,
+                    "revid": 3992633,
+                    "timestamp": "2026-02-18T20:26:40Z"
+                  }
+                ],
+                "title": "Template:Data Annie/Disintegrate"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3992633,
+      "timestamp": "2026-02-18T20:26:40Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b167215808bfba85742bfa631b9b513b6e33674d5168a2daca9a56bd88a21726",
+    "fetchedAt": "2026-08-16T08:46:36.640Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Annie/Disintegrate",
+    "revisionId": 3992633,
+    "sourceTimestamp": "2026-02-18T20:26:40Z"
+  }
+}

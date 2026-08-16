@@ -373,6 +373,19 @@ export default class AttackableUnit extends GameObject {
     this.game.objectManager.addObject(combatText);
 
     this.stats.health.baseValue -= damage;
+
+    // Omnivamp, and the only place it is paid. `takeDamage` is the one funnel
+    // every source of damage already goes through — a swing, a spell, a poison
+    // tick — so the stat covers all of them without a single one of them
+    // knowing it exists. Paid on the damage that actually landed, i.e. after
+    // shields ate their share, and before the death check so the kill still
+    // heals. Self-damage (Olaf E) is excluded: a cost that refunds itself is
+    // not a cost.
+    if (attacker && attacker !== this && !attacker.isDead) {
+      const vamp = attacker.stats?.omnivamp?.value ?? 0;
+      if (vamp > 0) attacker.takeHeal(damage * vamp, attacker);
+    }
+
     if (this.stats.health.baseValue <= 0) {
       this.die({ attacker, reviveAfter: this.reviveTime });
     }

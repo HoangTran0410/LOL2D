@@ -4,10 +4,13 @@ import Ashe_R, {
   Ashe_R_Object,
   DAMAGE,
   EXPLODE_RADIUS,
-  RANGE,
+  FULL_POWER_DISTANCE,
+  MAX_SPEED,
+  MAX_STUN_MS,
+  MAX_TRAVEL,
+  MIN_STUN_MS,
   SIZE,
   SPEED,
-  STUN_DURATION_MS,
 } from '../../../src/game/gameObject/spells/Ashe_R';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
@@ -106,22 +109,42 @@ describe('Ashe R', () => {
     expect(arrow.toRemove).toBe(false);
   });
 
-  it('expires at its tuned range instead of crossing the whole 6400px map', () => {
+  /**
+   * `docs/abilities/ashe/r.json` says range **Global**. This used to fizzle at
+   * a tuned 2400px, which made the champion's signature shot a long poke
+   * instead of the thing you fire from your own jungle at a fight across the
+   * map. `MAX_TRAVEL` is not a range — it is a leash so an arrow into empty
+   * map is eventually collected.
+   */
+  it('crosses the map instead of expiring at a tuned range', () => {
     const caster = owner();
     const spell = new Ashe_R(caster);
     spell.press(context(100, 0));
     const arrow = findArrow(caster);
 
-    const framesToRange = RANGE / SPEED;
-    for (let i = 0; i < framesToRange - 1; i++) {
-      arrow.update();
-      expect(arrow.toRemove).toBe(false);
-    }
-    arrow.update();
+    for (let i = 0; i < 400; i++) arrow.update();
 
-    expect(arrow.toRemove).toBe(true);
-    expect(arrow.exploding).toBe(false);
-    expect(arrow.position.dist(new Vector(0, 0))).toBeCloseTo(RANGE, 5);
+    expect(arrow.toRemove).toBe(false);
+    // Well past the 2400px the old version died at, and past the far side of
+    // the 6400px map.
+    expect(arrow.distanceTravelled).toBeGreaterThan(6_400);
+  });
+
+  it('speeds up the longer it is in the air, and is eventually collected', () => {
+    const caster = owner();
+    const spell = new Ashe_R(caster);
+    spell.press(context(100, 0));
+    const arrow = findArrow(caster);
+
+    arrow.update();
+    const muzzleSpeed = arrow.speed;
+    for (let i = 0; i < 300; i++) arrow.update();
+
+    expect(muzzleSpeed).toBeCloseTo(SPEED, 5);
+    expect(arrow.speed).toBeCloseTo(MAX_SPEED, 5);
+
+    while (!arrow.toRemove) arrow.update();
+    expect(arrow.distanceTravelled).toBeGreaterThanOrEqual(MAX_TRAVEL);
   });
 
   it('stuns and damages on the first enemy it touches, using the stun icon rather than its own ability art', () => {
@@ -165,6 +188,37 @@ describe('Ashe R', () => {
     spell.press(context(100, 0));
     findArrow(caster).update();
 
-    expect(enemyBuffs[0].duration).toBe(STUN_DURATION_MS);
+    // Point blank. Not exactly the floor — one frame of flight has already
+    // earned a sliver of the ramp — but nowhere near what a real shot pays.
+    expect(enemyBuffs[0].duration).toBeGreaterThanOrEqual(MIN_STUN_MS);
+    expect(enemyBuffs[0].duration).toBeLessThan(MIN_STUN_MS + 50);
+  });
+
+  /**
+   * The other half of "global": the stun is what the flight earned. 1s at the
+   * muzzle, 3.5s once it has gone the distance — the reason a cross-map arrow
+   * is worth the cooldown and a point-blank one is not.
+   */
+  it('pays a longer stun the further the arrow flew', () => {
+    const caster = owner();
+    const enemyBuffs: Array<{ duration: number }> = [];
+    const enemy = {
+      addBuff: (buff: { duration: number; activateBuff?: () => void }) => {
+        enemyBuffs.push(buff);
+        buff.activateBuff?.();
+      },
+      takeDamage: vi.fn(),
+    };
+    const spell = new Ashe_R(caster);
+    spell.press(context(100, 0));
+    const arrow = findArrow(caster);
+
+    // Fly it the full ramp with nothing in the way, then put a body in front.
+    caster.game.objectManager.queryObjects = vi.fn(() => []);
+    while (arrow.distanceTravelled < FULL_POWER_DISTANCE) arrow.update();
+    caster.game.objectManager.queryObjects = vi.fn(() => [enemy]);
+    arrow.update();
+
+    expect(enemyBuffs[0].duration).toBeCloseTo(MAX_STUN_MS, 5);
   });
 });

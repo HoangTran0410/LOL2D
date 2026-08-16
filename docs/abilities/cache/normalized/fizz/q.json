@@ -1,0 +1,56 @@
+{
+  "asset": {
+    "key": "spell_fizz_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Urchin_Strike.png?3bc1b",
+    "sha1": "52e7e2fbe4c0dcc834a1d2fccc85bd43f4dceace"
+  },
+  "champion": "Fizz",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_fizz_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Urchin_Strike.png?3bc1b",
+        "sha1": "52e7e2fbe4c0dcc834a1d2fccc85bd43f4dceace"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "8 / 7.5 / 7 / 6.5 / 6",
+        "cost": "50",
+        "damagetype": "Physical Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Fizz''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> a fixed distance in the direction of the target enemy. If they are in range upon arrival, he deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> plus <span style=\"color:orange; white-space:normal\">100% AD</span> <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects.",
+          "text": "Active: Fizz dashes a fixed distance in the direction of the target enemy. If they are in range upon arrival, he deals magic damage plus 100% AD physical damage and applies on-hit effects."
+        },
+        "description2": {
+          "raw": "''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Seastone Trident\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Seastone Trident.png|20xpx|border|link=Fizz#Seastone Trident|An icon for Fizz's ability Seastone Trident]]</span> <span style=\"white-space:normal;\">[[Fizz#Seastone Trident|Seastone Trident]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Fizz\" data-ability=\"Chum the Waters\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Fizz Chum the Waters.png|20xpx|border|link=Fizz#Chum the Waters|An icon for Fizz's ability Chum the Waters]]</span> <span style=\"white-space:normal;\">[[Fizz#Chum the Waters|Chum the Waters]]</span></span> can be cast during the dash.''",
+          "text": "Seastone Trident and Chum the Waters can be cast during the dash."
+        },
+        "icon": "Urchin Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>10 / 25 / 40 / 55 / 70 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>",
+          "text": "Magic Damage:10 / 25 / 40 / 55 / 70 (+ 55% AP)"
+        },
+        "name": "Urchin Strike",
+        "notes": {
+          "raw": "* ''Urchin Strike'' can only go through walls if the target is on the other side.\n* ''Urchin Strike'' only damages targets if within 200 units of their original location upon completion of the dash.\n* '''Fizz''' will be automatically ordered to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> the target after ''Urchin Strike''.\n* ''Urchin Strike'' does not deal damage if the target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>.\n* <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;Life steal</span></span> applies only on the physical damage component. <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell vamp\">[[File:Spell vamp icon.svg|20px|link=Vamp#Spell vamp|An icon representing the keyword Spell vamp]] [[:Vamp#Spell vamp|Spell vamp]]</span> applies to both the physical damage and bonus magic damage.",
+          "text": "Urchin Strike can only go through walls if the target is on the other side.\nUrchin Strike only damages targets if within 200 units of their original location upon completion of the dash.\nFizz will be automatically ordered to basic attack the target after Urchin Strike.\nUrchin Strike does not deal damage if the target is untargetable.\n&nbsp;Life steal applies only on the physical damage component. Spell vamp applies to both the physical damage and bonus magic damage."
+        },
+        "range": "550",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Urchin Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "feba1dea306b20aad3b3fb4ce6a8286219fda023b6f35851d2a755e2c173df0d",
+    "fetchedAt": "2026-08-16T06:56:48.369Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Fizz/Urchin_Strike",
+    "revisionId": 3948968,
+    "sourceTimestamp": "2025-08-20T15:07:12Z"
+  }
+}

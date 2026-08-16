@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Varus/Hail of Arrows",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Hail of Arrows@@icon@@Hail of Arrows.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Varus''' fires a hail of arrows at the target location that land after 0.<small>5</small> seconds, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit.@@description2@@The area then becomes desecrated for 4 seconds, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> enemies within and inflicting them with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 90 / 120 / 150 / 180 <span style=\"color:orange; white-space:normal\">(+ 90% '''bonus''' AD)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 300@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>2419</small>@@cost@@90@@cooldown@@18 / 16 / 14 / 12 / 10@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@true@@notes@@\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|Slow]]</span> lingers for 0.<small>25</small> seconds after leaving the marked area.\n* ''Hail of Arrows'' consumes <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Varus\" data-ability=\"Blighted Quiver\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Varus Blighted Quiver.png|20xpx|border|link=Varus#Blighted Quiver|An icon for Varus's ability Blighted Quiver]]</span> <span style=\"white-space:normal;\">[[Varus#Blighted Quiver|Blighted Quiver]]</span></span> stacks for bonus damage a second time after ~0.<small>3</small> seconds of hitting, allowing stacks applied during this time to be triggered.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309978,
+                "revisions": [
+                  {
+                    "parentid": 3951335,
+                    "revid": 3969402,
+                    "timestamp": "2025-11-24T16:03:58Z"
+                  }
+                ],
+                "title": "Template:Data Varus/Hail of Arrows"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3969402,
+      "timestamp": "2025-11-24T16:03:58Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "839cc4545e3662cdfb0198e65a4c8bd869f85fa8b05a673bdbfa5d225e2e5d14",
+    "fetchedAt": "2026-08-16T06:56:18.650Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Varus/Hail_of_Arrows",
+    "revisionId": 3969402,
+    "sourceTimestamp": "2025-11-24T16:03:58Z"
+  }
+}

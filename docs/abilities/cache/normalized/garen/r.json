@@ -1,0 +1,50 @@
+{
+  "asset": {
+    "key": "spell_garen_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Demacian_Justice.png?5d849",
+    "sha1": "839b8061c5d6d7b960297d0aadd62d5ab1f7df87"
+  },
+  "champion": "Garen",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_garen_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Demacian_Justice.png?5d849",
+        "sha1": "839b8061c5d6d7b960297d0aadd62d5ab1f7df87"
+      },
+      "fields": {
+        "casttime": "0.435",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "damagetype": "True",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Garen''' calls upon the might of ''Demacia'' onto the target enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, dealing them <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">true damage</span></span> as well as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealing]]</span> them for 1 second at the start of the cast time.",
+          "text": "Active: Garen calls upon the might of Demacia onto the target enemy champion, dealing them &nbsp;true damage as well as revealing them for 1 second at the start of the cast time."
+        },
+        "icon": "Demacian Justice.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''True Damage:'''</span></dt><dd>125 / 162.<small>5</small> / 200 / 237.<small>5</small> / 275 <span style=\"color:\n#21B053; white-space:normal\">(+ 25 / 27.<small>5</small> / 30 / 32.<small>5</small> / 35% of target's '''missing''' health)</span></dd></dl>",
+          "text": "True Damage:125 / 162.5 / 200 / 237.5 / 275 (+ 25 / 27.5 / 30 / 32.5 / 35% of target's missing health)"
+        },
+        "name": "Demacian Justice",
+        "notes": {
+          "raw": "* The target will die if they're at least under <span style=\"color:\n#21B053; white-space:normal\">20 / 21.<small>57</small> / 23.<small>08</small> / 24.<small>53</small> / 25.<small>93</small>% '''maximum''' health</span> + <span style=\"color:\n#21B053; white-space:normal\">100 / 127.<small>45</small> / 153.<small>85</small> / 179.<small>25</small> / 203.<small>7</small> '''flat''' health</span> on top of that. This does not count effects that mitigate <span style=\"color:\n#F9966B; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;true damage</span></span>, such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shields]]</span>.\n* If '''Garen''' dies during ''Demacian Justice's'' cast time, it will visually appear as on cooldown and he won't be able to cast it until the cooldown has elapsed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n** This is fixed by clicking ''Demacian Justice's'' icon on the UI at the bottom of the screen.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The target will die if they're at least under 20 / 21.57 / 23.08 / 24.53 / 25.93% maximum health + 100 / 127.45 / 153.85 / 179.25 / 203.7 flat health on top of that. This does not count effects that mitigate &nbsp;true damage, such as shields.\nIf Garen dies during Demacian Justice's cast time, it will visually appear as on cooldown and he won't be able to cast it until the cooldown has elapsed.(bug)\n* This is fixed by clicking Demacian Justice's icon on the UI at the bottom of the screen.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Demacian Justice"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "c0ccc698e28902390d04d8c166a5cf5e409e3af90cacc5bdeb5e25f6d4b6a5c9",
+    "fetchedAt": "2026-08-16T08:47:10.053Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Garen/Demacian_Justice",
+    "revisionId": 4042864,
+    "sourceTimestamp": "2026-07-14T19:35:45Z"
+  }
+}

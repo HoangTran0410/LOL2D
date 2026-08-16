@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Jinx/Zap!",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Zap!@@icon@@Zap!.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' fires a shock blast in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy it hits and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|reveals]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>10 / 60 / 110 / 160 / 210 <span style=\"color:orange; white-space:normal\">(+ 140% AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 50 / 60 / 70 / 80%</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"standard missile end collision behaviour\">1500</span>@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 120@@speed@@3300@@casttime@@<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#F5EE99;\" data-top-label=\"bonus attack speed\" data-start=\"0.6;0\" data-finish=\"0.4;250\" data-top-fill=\"11\" data-bot-values=\"0.6;0.58;0.56;0.54;0.52;0.5;0.48;0.46;0.44;0.42;0.4\" data-top-values=\"0;25;50;75;100;125;150;175;200;225;250\" data-top-key=\"%\">0.<small>6</small> – 0.<small>4</small> (based on '''bonus''' attack speed)</span>[[Category:Debug]]@@cost@@40 / 45 / 50 / 55 / 60@@cooldown@@8 / 7 / 6 / 5 / 4@@targeting@@Direction@@damagetype@@Physical@@spellshield@@True@@projectile@@True@@notes@@\n* This ability will cast from wherever the caster is at the start of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307598,
+                "revisions": [
+                  {
+                    "parentid": 3817526,
+                    "revid": 3907092,
+                    "timestamp": "2025-06-06T17:47:18Z"
+                  }
+                ],
+                "title": "Template:Data Jinx/Zap!"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3907092,
+      "timestamp": "2025-06-06T17:47:18Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "c23a8c0dc687150c6113e9f2f66a7cbfd876ae905b9f16794ad292b771744a84",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jinx/Zap!",
+    "revisionId": 3907092,
+    "sourceTimestamp": "2025-06-06T17:47:18Z"
+  }
+}

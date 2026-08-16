@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_malzahar_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Call_of_the_Void.png?9c204",
+    "sha1": "f67a660d7373ad7c1dd05921bdac364f431ede97"
+  },
+  "champion": "Malzahar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_malzahar_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Call_of_the_Void.png?9c204",
+        "sha1": "f67a660d7373ad7c1dd05921bdac364f431ede97"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "6",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Malzahar''' opens two portals to the void centered at the target location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area in between. After 0.<small>4</small> seconds, enemies between the portals are dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silenced]]</span> for a duration.",
+          "text": "Active: Malzahar opens two portals to the void centered at the target location, granting sight of the area in between. After 0.4 seconds, enemies between the portals are dealt magic damage and silenced for a duration."
+        },
+        "effectradius": "200",
+        "icon": "Call of the Void.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Silence Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Magic Damage:70 / 105 / 140 / 175 / 210 (+ 55% AP)\nSilence Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "name": "Call of the Void",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will prevent ''Call of the Void's'' refresh on <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions]]</span></span>.\n** <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Malefic Visions\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Malefic Visions.png|20xpx|border|link=Malzahar#Malefic Visions|An icon for Malzahar's ability Malefic Visions]]</span> <span style=\"white-space:normal;\">[[Malzahar#Malefic Visions|Malefic Visions']]</span></span> debuff will also be removed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>",
+          "text": "Spell shield will prevent Call of the Void's refresh on Malefic Visions.\n* Malefic Visions' debuff will also be removed.(unexpected)"
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Call of the Void"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "3a9c64fb0b3d2e3a13a5f4452c11ecbc6f2b8ac8ae4a1b879b1e2c2f2671d802",
+    "fetchedAt": "2026-08-16T08:46:46.579Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Malzahar/Call_of_the_Void",
+    "revisionId": 3906985,
+    "sourceTimestamp": "2025-06-06T16:14:26Z"
+  }
+}

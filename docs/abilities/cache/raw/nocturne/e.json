@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Nocturne/Unspeakable Horror",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Unspeakable Horror@@icon@@false@@icon2@@Unspeakable Horror.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Nocturne''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">90% '''bonus''' movement speed</span></span> while facing nearby <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fear\">[[File:Flee icon.png|20px|link=Flee|An icon representing the keyword Flee]] [[:Flee|feared]]</span> targets.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Nocturne''' torments the target, forming a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Tether\">[[File:Focused Resolve.png|20px|link=Tether|An icon representing the keyword Tether]] [[:Tether|tether]]</span> between himself and the target for 2 seconds, during which the target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds over the duration.@@description3@@If the tether is not broken by the end of its duration, the target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fear\">[[File:Flee icon.png|20px|link=Flee|An icon representing the keyword Flee]] [[:Flee|feared]]</span> for a duration while being <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by 90%.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>80 / 125 / 170 / 215 / 260 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Magic Damage per Tick:'''</span></dt><dd>20 / 31.<small>25</small> / 42.<small>5</small> / 53.<small>75</small> / 65 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 25% AP)</span></dd></dl>@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Disable Duration:'''</span></dt><dd>1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> seconds</dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Fear MS radius\">1000</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@60 / 65 / 70 / 75 / 80@@cooldown@@15 / 14 / 13 / 12 / 11@@targeting@@Unit@@damagetype@@Magic@@spellshield@@Special@@projectile@@False@@notes@@\n* ''Unspeakable Horror'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|persistent damage]]</span>, additionally tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Indirect damage\">[[File:Irelia Vanguard's Edge.png|20px|link=Damage|An icon representing the keyword Indirect damage]] [[:Damage|indirect damage]]</span>, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span>.\n* Feared enemies in a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 180° total angle within '''Nocturne's''' facing direction will trigger ''Unspeakable Horror's'' passive.\n* Casting ''Unspeakable Horror'' may grant '''Nocturne''' permanent <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosting]]</span> until he has [[death|died]].<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the tether's application but not the damage and aftereffects of one already applied.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308584,
+                "revisions": [
+                  {
+                    "parentid": 3885373,
+                    "revid": 4015219,
+                    "timestamp": "2026-05-03T19:25:43Z"
+                  }
+                ],
+                "title": "Template:Data Nocturne/Unspeakable Horror"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4015219,
+      "timestamp": "2026-05-03T19:25:43Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "d8a14ed64bd2b6d203185eabb13892d6ca11e7fd234228c4669e5ba754b349d3",
+    "fetchedAt": "2026-08-16T06:56:36.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nocturne/Unspeakable_Horror",
+    "revisionId": 4015219,
+    "sourceTimestamp": "2026-05-03T19:25:43Z"
+  }
+}

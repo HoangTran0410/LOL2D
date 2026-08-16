@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Cassiopeia/Twin Fang",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Twin Fang@@icon@@Twin Fang.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Cassiopeia''' launches her fangs at the target enemy that deal <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-start=\"52;\" data-finish=\"120;\" data-top-fill=\"18\" data-bot-values=\"52;56;60;64;68;72;76;80;84;88;92;96;100;104;108;112;116;120;124;128;132;136;140;144;148;152;156;160;164;168;172;176;180;184;188;192;196;200;204;208;212|displayMaxColumn=18\">52 – 120 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. If this kills the target, ''Twin Fang's'' <span style=\"color:\n#0099CC; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;mana cost</span></span> is refunded.@@description2@@Against a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poisoned]]</span> target, ''Twin Fang'' deals <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heals\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> '''Cassiopeia'''. The heal is reduced by 75% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and small and medium <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Damage:'''</span></dt><dd>20 / 45 / 70 / 95 / 120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd><dt><span class=\"template_lc\">'''Total Enhanced Damage:'''</span></dt><dd><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"52;\" data-finish=\"120;\" data-top-fill=\"18\" data-bot-values=\"52;56;60;64;68;72;76;80;84;88;92;96;100;104;108;112;116;120\">52 – 120 (based on level)</span> (+ 20 / 45 / 70 / 95 / 120) <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Heal:'''</span></dt><dd><span style=\"color:\n#7A6DFF; white-space:normal\">10 / 11.<small>5</small> / 13 / 14.<small>5</small> / 16% AP</span></dd><dt><span class=\"template_lc\">'''Reduced Heal:'''</span></dt><dd><span style=\"color:\n#7A6DFF; white-space:normal\">2.<small>5</small> / 2.<small>875</small> / 3.<small>25</small> / 3.<small>625</small> / 4% AP</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@2500@@casttime@@0.<small>125</small>@@cost@@40@@cooldown@@0.<small>75</small>@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* Upon reaching the target, ''Twin Fang'' will wait for an ongoing <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Cassiopeia\" data-ability=\"Noxious Blast\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cassiopeia Noxious Blast.png|20xpx|border|link=Cassiopeia#Noxious Blast|An icon for Cassiopeia's ability Noxious Blast]]</span> <span style=\"white-space:normal;\">[[Cassiopeia#Noxious Blast|Noxious Blast]]</span></span> to explode before dealing its damage.\n* ''Twin Fang's'' damage against poisoned targets:\n** When maxed first: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;100;104;128;132;156;160;184;188;192;196;200;204;208;212;216;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n** When maxed second: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;80;84;88;92;96;120;124;148;152;176;200;204;208;212;216;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n** When maxed last: <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"72;76;80;84;88;92;96;100;104;108;112;116;120;144;168;172;196;220;224;228;232;236;240;244;248;252;256;260;264;268;272;276;280;284;288;292;296;300;304;308;312|displayMaxColumn=18\">72 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span>.\n* ''Twin Fang's'' cast indicator is incorrectly adding her own radius to the range like an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Edge range\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]] [[:Range|edge range]]</span> ability, and is therefore slightly larger than the actual cast range ''Twin Fang'' can cast at.\n* Using ''Twin Fang'' on an out-of-range target after completing a movement order causes '''Cassiopeia''' to move back to her original location after casting, if no other order is issued during the entire process.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n** This may be a consequence of ''Twing Fang'' being a \"Walk in range of the target\" ability that does not interrupt movement commands.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306926,
+                "revisions": [
+                  {
+                    "parentid": 4000224,
+                    "revid": 4038296,
+                    "timestamp": "2026-06-30T08:36:02Z"
+                  }
+                ],
+                "title": "Template:Data Cassiopeia/Twin Fang"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4038296,
+      "timestamp": "2026-06-30T08:36:02Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "9ce7287a787be1138cfa56c568a20a3fac9e956fd3587bf5ca936bb5b4d71aba",
+    "fetchedAt": "2026-08-16T06:56:43.442Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Cassiopeia/Twin_Fang",
+    "revisionId": 4038296,
+    "sourceTimestamp": "2026-06-30T08:36:02Z"
+  }
+}

@@ -29,7 +29,7 @@ export default class Twitch_E extends Spell {
       enemy.takeDamage(DAMAGE, this.owner);
       // Consumed, not merely expired: the poison is what paid for the burst.
       for (const buff of enemy.buffs) {
-        if (buff.stackId === 'twitch_poison') buff.deactivate();
+        if (buff.stackId === 'twitch_poison') buff.deactivateBuff();
       }
 
       const pop = new AoePulse(this.owner);

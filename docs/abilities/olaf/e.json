@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_olaf_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Reckless_Swing.png?834a4",
+    "sha1": "75a5266e7eb87763ebd73950c52f5a5b04fe2e77"
+  },
+  "champion": "Olaf",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_olaf_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Reckless_Swing.png?834a4",
+        "sha1": "75a5266e7eb87763ebd73950c52f5a5b04fe2e77"
+      },
+      "fields": {
+        "casttime": "0.25 – 0.175 (based on bonus attack speed)Category:Debug",
+        "cooldown": "11 / 10 / 9 / 8 / 7",
+        "cost": "28 / 46 / 64 / 82 / 100 (+ 20% AD)",
+        "damagetype": "True",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Olaf''' strikes thunder onto the target enemy, dealing <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">true damage</span></span>.",
+          "text": "Active: Olaf strikes thunder onto the target enemy, dealing &nbsp;true damage."
+        },
+        "description2": {
+          "raw": "If ''Reckless Swing'' kills the target, '''Olaf''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heals\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> himself equal to the <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;health cost</span></span>.",
+          "text": "If Reckless Swing kills the target, Olaf heals himself equal to the &nbsp;health cost."
+        },
+        "description3": {
+          "raw": "Basic attacks reduce ''Reckless Swing's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> by 1 second, increased to 2 against monsters.",
+          "text": "Basic attacks reduce Reckless Swing's &nbsp;cooldown by 1 second, increased to 2 against monsters."
+        },
+        "icon": "Reckless Swing.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''True Damage:'''</span></dt><dd>70 / 115 / 160 / 205 / 250 <span style=\"color:orange; white-space:normal\">(+ 50% AD)</span></dd></dl>",
+          "text": "True Damage:70 / 115 / 160 / 205 / 250 (+ 50% AD)"
+        },
+        "name": "Reckless Swing",
+        "notes": {
+          "raw": "* The health cost is equal to 40% of ''Reckless Swing's'' <span style=\"color:\n#F9966B; white-space:normal\">true damage</span> value.\n* ''Reckless Swing'' can be cast even if '''Olaf''' doesn't have the sufficient amount of health to pay for the health cost.\n** As with all abilities with health costs, ''Reckless Swing'' will not reduce '''Olaf's''' health below <span style=\"color:\n#21B053; white-space:normal\">1</span>.\n* ''Reckless Swing's'' health refund is considered a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heal]]</span> therefore it is affected by healing modifiers.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).\n** '''Olaf''' will also not receive the benefits from killing an enemy if this canceling takes place very shortly before the attack hits the invalidated target, but ''Reckless Swing's'' effect will be consumed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "The health cost is equal to 40% of Reckless Swing's true damage value.\nReckless Swing can be cast even if Olaf doesn't have the sufficient amount of health to pay for the health cost.\n* As with all abilities with health costs, Reckless Swing will not reduce Olaf's health below 1.\nReckless Swing's health refund is considered a heal therefore it is affected by healing modifiers.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable).\n* Olaf will also not receive the benefits from killing an enemy if this canceling takes place very shortly before the attack hits the invalidated target, but Reckless Swing's effect will be consumed.(bug)"
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Reckless Swing"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "41c790d714285e47beff588b74a9667ed6261a89e197cf3fe9262206c643c26b",
+    "fetchedAt": "2026-08-16T06:56:08.637Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Olaf/Reckless_Swing",
+    "revisionId": 4001134,
+    "sourceTimestamp": "2026-03-19T16:43:56Z"
+  }
+}

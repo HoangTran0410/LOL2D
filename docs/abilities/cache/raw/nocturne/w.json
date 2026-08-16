@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Nocturne/Shroud of Darkness",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Shroud of Darkness@@icon@@false@@icon2@@Shroud of Darkness.png@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Nocturne''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span>.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Nocturne''' gains a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> for 1.<small>5</small> seconds. Upon successfully blocking a hostile effect, ''Shroud of Darkness' ''<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span> is doubled for 5 seconds.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Enhanced Bonus Attack Speed:'''</span></dt><dd>60 / 70 / 80 / 90 / 100%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@50@@cooldown@@20 / 18 / 16 / 14 / 12@@targeting@@Auto@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* If ''Shroud of Darkness'' is active when '''Nocturne''' re-casts ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nocturne\" data-ability=\"Paranoia\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nocturne Paranoia.png|20xpx|border|link=Nocturne#Paranoia|An icon for Nocturne's ability Paranoia]]</span> <span style=\"white-space:normal;\">[[Nocturne#Paranoia|Paranoia]]</span></span>'' to dash to a target, its duration is refreshed every 0.<small>25</small> seconds during the dash.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308583,
+                "revisions": [
+                  {
+                    "parentid": 3455473,
+                    "revid": 3948584,
+                    "timestamp": "2025-08-19T17:40:10Z"
+                  }
+                ],
+                "title": "Template:Data Nocturne/Shroud of Darkness"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3948584,
+      "timestamp": "2025-08-19T17:40:10Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "ab49d99d13fd9a3bb066a559a8584b96b3e3ce6fabadde46eab58f065217b84a",
+    "fetchedAt": "2026-08-16T06:56:36.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nocturne/Shroud_of_Darkness",
+    "revisionId": 3948584,
+    "sourceTimestamp": "2025-08-19T17:40:10Z"
+  }
+}

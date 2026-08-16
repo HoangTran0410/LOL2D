@@ -2,7 +2,11 @@ const RAW_FIELDS = /^(description[2-6]?|leveling[2-6]?|notes)$/;
 const SOURCE_FIELDS = { name: '1', casttime: 'cast time', effectradius: 'effect radius' };
 
 export const ABILITY_FIELDS = [
-  'name', 'icon', 'icon2',
+  // Icon slots run to 4 because the wiki fills them positionally rather than
+  // as fallbacks: `Template:Data Garen/Courage` has `icon = false` and the
+  // real art in `icon3`. Dropping the later slots here made the importer
+  // report those abilities as having no icon at all.
+  'name', 'icon', 'icon2', 'icon3', 'icon4',
   'description', 'description2', 'description3', 'description4', 'description5', 'description6',
   'leveling', 'leveling2', 'leveling3', 'leveling4', 'leveling5', 'leveling6',
   'range', 'radius', 'effectradius', 'width', 'speed', 'casttime', 'cost', 'cooldown',

@@ -1,0 +1,61 @@
+{
+  "asset": {
+    "key": "spell_varus_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Hail_of_Arrows.png?ffc8d",
+    "sha1": "2071453a283bf69afb24062a8c5b076792fbcd58"
+  },
+  "champion": "Varus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_varus_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Hail_of_Arrows.png?ffc8d",
+        "sha1": "2071453a283bf69afb24062a8c5b076792fbcd58"
+      },
+      "fields": {
+        "casttime": "0.2419",
+        "cooldown": "18 / 16 / 14 / 12 / 10",
+        "cost": "90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Varus''' fires a hail of arrows at the target location that land after 0.<small>5</small> seconds, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit.",
+          "text": "Active: Varus fires a hail of arrows at the target location that land after 0.5 seconds, dealing physical damage to enemies hit."
+        },
+        "description2": {
+          "raw": "The area then becomes desecrated for 4 seconds, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> enemies within and inflicting them with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span>.",
+          "text": "The area then becomes desecrated for 4 seconds, slowing enemies within and inflicting them with Grievous Wounds."
+        },
+        "effectradius": "300",
+        "icon": "Hail of Arrows.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 90 / 120 / 150 / 180 <span style=\"color:orange; white-space:normal\">(+ 90% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:60 / 90 / 120 / 150 / 180 (+ 90% bonus AD)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Slow:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Hail of Arrows",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|Slow]]</span> lingers for 0.<small>25</small> seconds after leaving the marked area.\n* ''Hail of Arrows'' consumes <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Varus\" data-ability=\"Blighted Quiver\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Varus Blighted Quiver.png|20xpx|border|link=Varus#Blighted Quiver|An icon for Varus's ability Blighted Quiver]]</span> <span style=\"white-space:normal;\">[[Varus#Blighted Quiver|Blighted Quiver]]</span></span> stacks for bonus damage a second time after ~0.<small>3</small> seconds of hitting, allowing stacks applied during this time to be triggered.",
+          "text": "Slow lingers for 0.25 seconds after leaving the marked area.\nHail of Arrows consumes Blighted Quiver stacks for bonus damage a second time after ~0.3 seconds of hitting, allowing stacks applied during this time to be triggered."
+        },
+        "projectile": true,
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Hail of Arrows"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "21e6e9e7d7560b55780a6daaea2c8f33a10e2ed2ddaa2fd3bf7d3dd610ec2628",
+    "fetchedAt": "2026-08-16T06:56:18.650Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Varus/Hail_of_Arrows",
+    "revisionId": 3969402,
+    "sourceTimestamp": "2025-11-24T16:03:58Z"
+  }
+}

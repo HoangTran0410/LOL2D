@@ -1,0 +1,77 @@
+{
+  "asset": {
+    "key": "spell_fizz_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Chum_the_Waters.png?4b68f",
+    "sha1": "d6b3b0099935fed939e34bc21fff092b6a85597b"
+  },
+  "champion": "Fizz",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_fizz_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Chum_the_Waters.png?4b68f",
+        "sha1": "d6b3b0099935fed939e34bc21fff092b6a85597b"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Fizz''' throws down a lure at the target location that attracts a shark, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area before it emerges to chomp at the lure after 2 seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking them back]]</span>, though not through terrain, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them for 2 seconds. The further the lure travels in its initial flight, the larger the shark that is attracted; increasing ''Chum the Waters' '' damage, slow, eruption radius and knock back distance.",
+          "text": "Active: Fizz throws down a lure at the target location that attracts a shark, granting sight of the area before it emerges to chomp at the lure after 2 seconds, dealing magic damage to nearby enemies, knocking them back, though not through terrain, and slowing them for 2 seconds. The further the lure travels in its initial flight, the larger the shark that is attracted; increasing Chum the Waters' damage, slow, eruption radius and knock back distance."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Guppy (<455):'''</span> 40% slow, 200 eruption radius and 150 unit knock back distance.",
+          "text": "Guppy ( 40% slow, 200 eruption radius and 150 unit knock back distance."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Chomper (455-910):'''</span> 125% damage, 60% slow, 325 eruption radius and 250 unit knock back distance.",
+          "text": "Chomper (455-910): 125% damage, 60% slow, 325 eruption radius and 250 unit knock back distance."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Gigalodon (>910):'''</span> 150% damage, 80% slow, 450 eruption radius and 350 unit knock back distance.",
+          "text": "Gigalodon (>910): 150% damage, 80% slow, 450 eruption radius and 350 unit knock back distance."
+        },
+        "description5": {
+          "raw": "Enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> can intercept the lure while it is in flight, which attaches to them upon contact and causes the shark to emerge at their position after the same delay. The lure's holder is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealed]]</span> for the duration and afterwards is impacted by the eruption but is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked up]]</span> for 1 second instead of knocked back.",
+          "text": "Enemy champions can intercept the lure while it is in flight, which attaches to them upon contact and causes the shark to emerge at their position after the same delay. The lure's holder is slowed and revealed for the duration and afterwards is impacted by the eruption but is knocked up for 1 second instead of knocked back."
+        },
+        "icon": "Chum the Waters.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Guppy Damage:'''</span></dt><dd>180 / 240 / 300 / 360 / 420 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Guppy Damage:180 / 240 / 300 / 360 / 420 (+ 60% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Chomper Damage:'''</span></dt><dd>225 / 300 / 375 / 450 / 525 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 75% AP)</span></dd></dl>",
+          "text": "Chomper Damage:225 / 300 / 375 / 450 / 525 (+ 75% AP)"
+        },
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Gigalodon Damage:'''</span></dt><dd>270 / 360 / 450 / 540 / 630 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>",
+          "text": "Gigalodon Damage:270 / 360 / 450 / 540 / 630 (+ 90% AP)"
+        },
+        "name": "Chum the Waters",
+        "notes": {
+          "raw": "* ''Chum the Waters'' will not attach the lure to an enemy champion if they have a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> as well as against an enemy <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar OriginalSquare.png|20xpx|border|link=Malzahar|An icon representing Malzahar]]</span> <span style=\"white-space:normal;\">[[Malzahar]]</span></span> with his <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Malzahar\" data-ability=\"Void Shift\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Malzahar Void Shift.png|20xpx|border|link=Malzahar#Void Shift|An icon for Malzahar's ability Void Shift]]</span> <span style=\"white-space:normal;\">[[Malzahar#Void Shift|Void Shift]]</span></span> active (mitigation effect is consumed in both cases).\n** The area of effect for the eruption will be at the target's location at the time of the attachment being blocked; the target will intercept the lure without getting attached to it.\n* ''Chum the Waters' '' lure missile will stop its movement upon colliding with <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Samira\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Samira OriginalSquare.png|20xpx|border|link=Samira|An icon representing Samira]]</span> <span style=\"white-space:normal;\">[[Samira|Samira's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Samira\" data-ability=\"Blade Whirl\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Samira Blade Whirl.png|20xpx|border|link=Samira#Blade Whirl|An icon for Samira's ability Blade Whirl]]</span> <span style=\"white-space:normal;\">[[Samira#Blade Whirl|Blade Whirl]]</span></span></span> or <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo OriginalSquare.png|20xpx|border|link=Yasuo|An icon representing Yasuo]]</span> <span style=\"white-space:normal;\">[[Yasuo|Yasuo's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span></span> specifically, creating the area of effect for the eruption prematurely without destroying the missile. Collision with <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Mel\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Mel OriginalSquare.png|20xpx|border|link=Mel|An icon representing Mel]]</span> <span style=\"white-space:normal;\">[[Mel|Mel's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Mel\" data-ability=\"Rebuttal\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Mel Rebuttal.png|20xpx|border|link=Mel#Rebuttal|An icon for Mel's ability Rebuttal]]</span> <span style=\"white-space:normal;\">[[Mel#Rebuttal|Rebuttal]]</span></span></span> will destroy it altogether, however.\n* This ability will cast from wherever the caster is at the end of the cast time.\n** The targeted area does not change unless the ability was cast beyond maximum range.\n* If the lure attaches to an enemy champion, a countdown will appear at their position to signify when the shark is about to emerge. The countdown begins from 4, and ticks down by one every 0.<small>5</small> seconds.",
+          "text": "Chum the Waters will not attach the lure to an enemy champion if they have a spell shield as well as against an enemy Malzahar with his Void Shift active (mitigation effect is consumed in both cases).\n* The area of effect for the eruption will be at the target's location at the time of the attachment being blocked; the target will intercept the lure without getting attached to it.\nChum the Waters' lure missile will stop its movement upon colliding with Samira's Blade Whirl or Yasuo's Wind Wall specifically, creating the area of effect for the eruption prematurely without destroying the missile. Collision with Mel's Rebuttal will destroy it altogether, however.\nThis ability will cast from wherever the caster is at the end of the cast time.\n* The targeted area does not change unless the ability was cast beyond maximum range.\nIf the lure attaches to an enemy champion, a countdown will appear at their position to signify when the shark is about to emerge. The countdown begins from 4, and ticks down by one every 0.5 seconds."
+        },
+        "projectile": false,
+        "speed": "1300",
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Chum the Waters"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "604b347afef1a4abb3eb7d1939d92a7ce91fa4e9c171ac6fc125dd9910f0ea00",
+    "fetchedAt": "2026-08-16T06:56:48.369Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Fizz/Chum_the_Waters",
+    "revisionId": 4010638,
+    "sourceTimestamp": "2026-04-19T21:45:27Z"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_ashe_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Volley.png?46b01",
+    "sha1": "7b4671a137865368b6ca922f09470b7e97aa6f3c"
+  },
+  "champion": "Ashe",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ashe_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Volley.png?46b01",
+        "sha1": "7b4671a137865368b6ca922f09470b7e97aa6f3c"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "18 / 14.5 / 11 / 7.5 / 4",
+        "cost": "75 / 70 / 65 / 60 / 55",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ashe''' shoots a volley of arrows in a cone in the target direction, each dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy hit, and applying ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ashe\" data-ability=\"Frost Shot 2\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ashe Frost Shot 2.png|20xpx|border|link=Ashe#Frost Shot 2|An icon for Ashe's ability Frost Shot 2]]</span> <span style=\"white-space:normal;\">[[Ashe#Frost Shot 2|Critical Slow]]</span></span>'' to enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> hit.",
+          "text": "Active: Ashe shoots a volley of arrows in a cone in the target direction, each dealing physical damage to the first enemy hit, and applying Critical Slow to enemy champions hit."
+        },
+        "description2": {
+          "raw": "Enemies can intercept multiple arrows but do not take damage from any beyond the first.",
+          "text": "Enemies can intercept multiple arrows but do not take damage from any beyond the first."
+        },
+        "effectradius": "1200",
+        "icon": "Volley.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Arrows:'''</span></dt><dd>7 / 8 / 9 / 10 / 11</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span></dd></dl>",
+          "text": "Arrows:7 / 8 / 9 / 10 / 11\nPhysical Damage:60 / 95 / 130 / 165 / 200 (+ 100% bonus AD)"
+        },
+        "name": "Volley",
+        "notes": {
+          "raw": "* The missiles are spawned in a straight horizontal line 75 units in front of '''Ashe''', with a total width of 75/100/100/123/123 units.\n** Between each missile spawn location is a distance of 12.<small>5</small> units, except for the two outermost ones at the last two ranks (which are 11.<small>5</small> units from the closest other one), and the two centermost missiles at ranks 2 and 4 (which have 20 units between them and 15 units to the next missile, respectively).\n** This inconsistent behaviour of spawn locations means the angle between each missile can vary off of 4.<small>625</small>&#176; slighty.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "The missiles are spawned in a straight horizontal line 75 units in front of Ashe, with a total width of 75/100/100/123/123 units.\n* Between each missile spawn location is a distance of 12.5 units, except for the two outermost ones at the last two ranks (which are 11.5 units from the closest other one), and the two centermost missiles at ranks 2 and 4 (which have 20 units between them and 15 units to the next missile, respectively).\n* This inconsistent behaviour of spawn locations means the angle between each missile can vary off of 4.625&#176; slighty.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": true,
+        "speed": "2000",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "20"
+      },
+      "name": "Volley"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "f1224c2f97e99b04c9460e3bd96f9cab92ac8e2d7eb0053f087c4db93ed98b14",
+    "fetchedAt": "2026-08-16T08:26:29.785Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ashe/Volley",
+    "revisionId": 4007430,
+    "sourceTimestamp": "2026-04-11T18:11:13Z"
+  }
+}

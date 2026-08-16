@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_thresh_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Dark_Passage.png?c606e",
+    "sha1": "0ce9173c9e1c7647b72b097e13ecd1ba7fd50b74"
+  },
+  "champion": "Thresh",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_thresh_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Dark_Passage.png?c606e",
+        "sha1": "0ce9173c9e1c7647b72b097e13ecd1ba7fd50b74"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "21 / 20 / 19 / 18 / 17",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Thresh''' throws his lantern to the target location over 0.<small>5</small> seconds, lasting for 6 seconds while he remains nearby and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of its surroundings. If '''Thresh''' moves too far away from the lantern, it returns back to him immediately.",
+          "text": "Active: Thresh throws his lantern to the target location over 0.5 seconds, lasting for 6 seconds while he remains nearby and granting sight of its surroundings. If Thresh moves too far away from the lantern, it returns back to him immediately."
+        },
+        "description2": {
+          "raw": "'''Thresh''' and the first allied champion to come near the lantern are granted a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 4 seconds. An ally can select the lantern while in proximity of it, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashing]]</span> to '''Thresh''' and gaining the shield.",
+          "text": "Thresh and the first allied champion to come near the lantern are granted a shield for 4 seconds. An ally can select the lantern while in proximity of it, dashing to Thresh and gaining the shield."
+        },
+        "description3": {
+          "raw": "''An ally cannot select the lantern while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Immobilize\">[[File:Stun icon.png|20px|link=Crowd_control#Immobilizing|An icon representing the keyword Immobilize]] [[:Crowd_control#Immobilizing|immobilized]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span>, or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silenced]]</span>. The lantern will not expire from '''Thresh''' moving too far away if he is dashing with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-ability=\"Deathly Leap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh Deathly Leap.png|20xpx|border|link=Thresh#Deathly Leap|An icon for Thresh's ability Deathly Leap]]</span> <span style=\"white-space:normal;\">[[Thresh#Deathly Leap|Deathly Leap]]</span></span>.''",
+          "text": "An ally cannot select the lantern while immobilized, grounded, or silenced. The lantern will not expire from Thresh moving too far away if he is dashing with Deathly Leap."
+        },
+        "effectradius": "350 • 150",
+        "icon": "Dark Passage.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>50 / 70 / 90 / 110 / 130 (+ 2 per <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Thresh\" data-ability=\"Damnation\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Thresh Damnation.png|20xpx|border|link=Thresh#Damnation|An icon for Thresh's ability Damnation]]</span> <span style=\"white-space:normal;\">[[Thresh#Damnation|Soul]]</span></span> collected)</dd></dl>",
+          "text": "Shield Strength:50 / 70 / 90 / 110 / 130 (+ 2 per Soul collected)"
+        },
+        "name": "Dark Passage",
+        "notes": {
+          "raw": "* The dashing ally will track '''Thresh''' if he changes locations.\n** They will dash to '''Thresh's''' previous location if he is too far away or moves beyond <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2200</span> units.\n* The lantern is considered a unit and can be targeted by an allied <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Teleport\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teleport.png|20xpx|border|link=Teleport|An icon representing Teleport]]</span> <span style=\"white-space:normal;\">[[Teleport]]</span></span>, ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jax\" data-ability=\"Leap Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jax Leap Strike.png|20xpx|border|link=Jax#Leap Strike|An icon for Jax's ability Leap Strike]]</span> <span style=\"white-space:normal;\">[[Jax#Leap Strike|Leap Strike]]</span></span>'', ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Shunpo\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Shunpo.png|20xpx|border|link=Katarina#Shunpo|An icon for Katarina's ability Shunpo]]</span> <span style=\"white-space:normal;\">[[Katarina#Shunpo|Shunpo]]</span></span>'', and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Safeguard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Safeguard.png|20xpx|border|link=Lee Sin#Safeguard|An icon for Lee Sin's ability Safeguard]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Safeguard|Safeguard]]</span></span>''.\n** It is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> to enemies.\n** The lantern blocks pathing of units like minions and champions.\n* The lantern's duration and maximum leash range are each displayed as a circle on the ground.\n* '''Thresh''' will gain ''Dark Passage's'' shield from moving out of leash range of the lantern.\n** When the lantern returns to '''Thresh''', the first ally champion to come in contact with '''Thresh''' while he has ''Dark Passage's'' shield will also gain a shield as long as no other ally has the shield.\n* ''Dark Passage'' is special cased to trigger <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Guardian\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Guardian rune.png|20xpx|link=Guardian|An icon representing Guardian]]</span> <span style=\"word-break: keep-all;\">[[Guardian]]</span></span>.",
+          "text": "The dashing ally will track Thresh if he changes locations.\n* They will dash to Thresh's previous location if he is too far away or moves beyond 2200 units.\nThe lantern is considered a unit and can be targeted by an allied Teleport, Leap Strike, Shunpo, and Safeguard.\n* It is untargetable to enemies.\n* The lantern blocks pathing of units like minions and champions.\nThe lantern's duration and maximum leash range are each displayed as a circle on the ground.\nThresh will gain Dark Passage's shield from moving out of leash range of the lantern.\n* When the lantern returns to Thresh, the first ally champion to come in contact with Thresh while he has Dark Passage's shield will also gain a shield as long as no other ally has the shield.\nDark Passage is special cased to trigger Guardian."
+        },
+        "projectile": true,
+        "targeting": "Location"
+      },
+      "name": "Dark Passage"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "2e4a9ca341b17b2aa5feac0a4f278bfb3aa7794dd8bf96129fafd4eb9b452e6d",
+    "fetchedAt": "2026-08-16T06:56:28.042Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Thresh/Dark_Passage",
+    "revisionId": 4017821,
+    "sourceTimestamp": "2026-05-13T20:01:08Z"
+  }
+}

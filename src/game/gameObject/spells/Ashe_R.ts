@@ -6,24 +6,42 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Stun from '../buffs/Stun';
 import TrailSystem from '../helpers/TrailSystem';
+import { acceleratedSpeed, enemyChampionsOnly, travelRamp } from '../../combat/GlobalShot';
 
-export const SPEED = 10;
 export const SIZE = 35;
 export const DAMAGE = 30;
-export const STUN_DURATION_MS = 2_500;
 export const EXPLODE_RADIUS = 250;
 export const EXPLODE_ANIMATION_MS = 1_000;
-// Long enough to read as a global ultimate without literally crossing the
-// 6400px map like the old lifeTime-based flight (10000ms * speed 10 = 6000px)
-// did — this covers most of the map without ever quite reaching edge to edge.
-export const RANGE = 2_400;
+
+/**
+ * `docs/abilities/ashe/r.json`: range **Global**, speed 1500 rising to 2100,
+ * stun 1s rising to 3.5s with the distance travelled, and it shatters on an
+ * enemy *champion* — a lane full of minions is not what stops it.
+ *
+ * The previous version fizzled at 2400px and stunned for a flat 2.5s, which
+ * made it a long poke rather than the ultimate the whole champion is known
+ * for: the shot you take from your own jungle at a fight on the other side of
+ * the map.
+ */
+export const SPEED = 14;
+export const MAX_SPEED = 26;
+/** Distance over which the arrow reaches full speed and full stun. */
+export const FULL_POWER_DISTANCE = 2_000;
+export const MIN_STUN_MS = 1_000;
+export const MAX_STUN_MS = 3_500;
+/** Not a range limit — a leash on the object, so a shot into empty map is collected. */
+export const MAX_TRAVEL = 12_000;
 
 export default class Ashe_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_r');
   name = 'Đại Băng Tiễn (Ashe_R)';
   description =
-    'Bắn mũi tên băng bay xuyên bản đồ, <span class="buff">Làm Choáng</span> diện rộng những kẻ địch trúng chiêu trong <span class="time">2.5 giây</span> và gây <span class="damage">30 sát thương</span>';
+    `Bắn mũi tên băng <span class="buff">bay khắp bản đồ</span>, chỉ vỡ khi trúng <span class="damage">tướng địch</span>` +
+    ` (đi xuyên qua lính). Bay càng xa càng nhanh và càng mạnh:` +
+    ` <span class="buff">Làm Choáng</span> từ <span class="time">${MIN_STUN_MS / 1000}</span> tới` +
+    ` <span class="time">${MAX_STUN_MS / 1000} giây</span> theo quãng đường, gây` +
+    ` <span class="damage">${DAMAGE} sát thương</span> cho mục tiêu và mọi kẻ địch xung quanh`;
   coolDown = 10000;
 
   onSpellCast() {
@@ -68,24 +86,26 @@ export class Ashe_R_Object extends SpellObject {
   update() {
     // moving phase
     if (!this.exploding) {
+      this.speed = acceleratedSpeed(this.distanceTravelled, SPEED, MAX_SPEED, FULL_POWER_DISTANCE);
       this.position.add(this.direction.copy().mult(this.speed));
       this.distanceTravelled += this.speed;
       this.trailSystem.addTrail(this.position);
 
-      // out of range: the arrow fizzles out rather than crossing the whole map
-      if (this.distanceTravelled >= RANGE) {
+      // Not a range: the arrow is global. This only collects a shot fired into
+      // empty map so the object does not live forever.
+      if (this.distanceTravelled >= MAX_TRAVEL) {
         this.toRemove = true;
         return;
       }
 
-      // check collide enemy
+      // Enemy champions only — it flies straight through a minion wave.
       let enemies = this.game.objectManager.queryObjects({
         area: new Circle({
           x: this.position.x,
           y: this.position.y,
           r: this.size / 4,
         }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+        filters: enemyChampionsOnly(this.owner.teamId),
       });
 
       if (enemies?.length > 0) {
@@ -101,8 +121,12 @@ export class Ashe_R_Object extends SpellObject {
           }),
           filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
         });
+        // The stun the flight earned, paid to everyone the shatter catches.
+        const stunMs =
+          MIN_STUN_MS +
+          (MAX_STUN_MS - MIN_STUN_MS) * travelRamp(this.distanceTravelled, FULL_POWER_DISTANCE);
         enemiesInRange.forEach((p: any) => {
-          let stunBuff = new Stun(STUN_DURATION_MS, this.owner, p);
+          let stunBuff = new Stun(stunMs, this.owner, p);
           stunBuff.buffAddType = BuffAddType.RENEW_EXISTING;
           p.addBuff(stunBuff);
           p.takeDamage(DAMAGE, this.owner);

@@ -1,0 +1,118 @@
+{
+  "asset": {
+    "key": "champ_jinx",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_OriginalSquare.png?95e74",
+    "sha1": "b8eb771720c499b7341a258e4d191472c86d56b8"
+  },
+  "champion": "Jinx",
+  "data": {
+    "adaptivetype": "Physical",
+    "apiname": "Jinx",
+    "be": 1575,
+    "changes": "V26.04",
+    "client_positions": [
+      "Bottom"
+    ],
+    "client_tags": [
+      "Auto-attack",
+      "Hypercarry",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2013-10-10",
+    "difficulty": 2,
+    "external_positions": [
+      "Bottom"
+    ],
+    "fullname": "Powder",
+    "herotype": "Marksman",
+    "id": 222,
+    "mobility": 1,
+    "patch": "V3.12",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Marksman"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Flame Chompers!",
+      "2": "Flame Chompers! 2"
+    },
+    "skill_i": {
+      "1": "Get Excited!"
+    },
+    "skill_q": {
+      "1": "Switcheroo!",
+      "2": "Pow-Pow",
+      "3": "Rev'd up",
+      "4": "Fishbones"
+    },
+    "skill_r": {
+      "1": "Super Mega Death Rocket!"
+    },
+    "skill_w": {
+      "1": "Zap!"
+    },
+    "skills": {
+      "1": "Get Excited!",
+      "2": "Switcheroo!",
+      "3": "Zap!",
+      "4": "Flame Chompers!",
+      "5": "Super Mega Death Rocket!"
+    },
+    "stats": {
+      "acquisition_radius": 550,
+      "ar": {
+        "dam_lvl": 0.6,
+        "hp_lvl": 10
+      },
+      "aram": {
+        "dmg_dealt": 0.9,
+        "dmg_taken": 1.05
+      },
+      "arm_base": 26,
+      "arm_lvl": 4.2,
+      "as_base": 0.625,
+      "as_lvl": 1,
+      "as_ratio": 0.625,
+      "attack_cast_time": 0.270000010728836,
+      "attack_total_time": 1.60000002384185,
+      "dam_base": 59,
+      "dam_lvl": 3.25,
+      "hp5_base": 3.75,
+      "hp5_lvl": 0.5,
+      "hp_base": 630,
+      "hp_lvl": 105,
+      "mp5_base": 6.7,
+      "mp5_lvl": 1,
+      "mp_base": 260,
+      "mp_lvl": 50,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 325,
+      "nb": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 35,
+      "range": 525,
+      "selection_height": 155,
+      "selection_radius": 120
+    },
+    "style": 10,
+    "title": "The Loose Cannon",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "17842f1def1f4d933a37bf6bddf0c8b4a472551ea77d07729c08b88c9724f19e",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

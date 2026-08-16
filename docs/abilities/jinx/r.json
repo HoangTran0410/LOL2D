@@ -1,0 +1,67 @@
+{
+  "asset": {
+    "key": "spell_jinx_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Super_Mega_Death_Rocket%21.png?7db52",
+    "sha1": "a6af4aa38400f869f73b199943ec64f36996c95b"
+  },
+  "champion": "Jinx",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jinx_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Super_Mega_Death_Rocket%21.png?7db52",
+        "sha1": "a6af4aa38400f869f73b199943ec64f36996c95b"
+      },
+      "fields": {
+        "casttime": "0.6",
+        "cooldown": "85 / 75 / 65 / 55 / 45",
+        "cost": "100",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jinx''' fires a massive rocket in the target direction, briefly granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of its <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cannot grant sight into brush nor through terrain\">surroundings</span> and exploding upon colliding with an enemy champion. The explosion deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"centered on the initial target\">nearby</span> enemies and grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Can grant sight into brush and through terrain\">area</span> for 2 seconds.",
+          "text": "Active: Jinx fires a massive rocket in the target direction, briefly granting sight of its surroundings and exploding upon colliding with an enemy champion. The explosion deals physical damage to nearby enemies and grants sight of the area for 2 seconds."
+        },
+        "description2": {
+          "raw": "''Super Mega Death Rocket!'' deals <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"distance traveled\" data-start=\"10;0\" data-finish=\"100;1500\" data-top-fill=\"16\" data-bot-values=\"10;16;22;28;34;40;46;52;58;64;70;76;82;88;94;100\" data-top-values=\"0;100;200;300;400;500;600;700;800;900;1000;1100;1200;1300;1400;1500\" data-bot-key=\"%\">10% – 100% (based on distance traveled)</span>[[Category:Debug]] damage. This does not affect the '''bonus''' damage based on the <span style=\"color:\n#21B053; white-space:normal\">target's '''missing''' health</span>.",
+          "text": "Super Mega Death Rocket! deals 10% – 100% (based on distance traveled)Category:Debug damage. This does not affect the bonus damage based on the target's missing health."
+        },
+        "description3": {
+          "raw": "Enemies surrounding the primary target take 80% damage. The '''bonus''' damage based on the <span style=\"color:\n#21B053; white-space:normal\">target's '''missing''' health</span> is capped at 1200 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Enemies surrounding the primary target take 80% damage. The bonus damage based on the target's missing health is capped at 1200 against monsters."
+        },
+        "effectradius": "400 • 1000 • 1000",
+        "icon": "Super Mega Death Rocket!.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Physical Damage:'''</span></dt><dd>200 / 275 / 350 / 425 / 500 <span style=\"color:orange; white-space:normal\">(+ 120% '''bonus''' AD)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 25 / 27.<small>5</small> / 30 / 32.<small>5</small> / 35% of target's '''missing''' health)</span></dd><dt><span class=\"template_lc\">'''Minimum Physical Damage:'''</span></dt><dd>20 / 27.<small>5</small> / 35 / 42.<small>5</small> / 50 <span style=\"color:orange; white-space:normal\">(+ 12% '''bonus''' AD)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 25 / 27.<small>5</small> / 30 / 32.<small>5</small> / 35% of target's '''missing''' health)</span></dd></dl>",
+          "text": "Maximum Physical Damage:200 / 275 / 350 / 425 / 500 (+ 120% bonus AD) (+ 25 / 27.5 / 30 / 32.5 / 35% of target's missing health)Minimum Physical Damage:20 / 27.5 / 35 / 42.5 / 50 (+ 12% bonus AD) (+ 25 / 27.5 / 30 / 32.5 / 35% of target's missing health)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Secondary Damage:'''</span></dt><dd>160 / 220 / 280 / 340 / 400 <span style=\"color:orange; white-space:normal\">(+ 96% '''bonus''' AD)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 20 / 22 / 24 / 26 / 28% of target's '''missing''' health)</span></dd><dt><span class=\"template_lc\">'''Minimum Secondary Damage:'''</span></dt><dd>16 / 22 / 28 / 34 / 40 <span style=\"color:orange; white-space:normal\">(+ 9.<small>6</small>% '''bonus''' AD)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 20 / 22 / 24 / 26 / 28% of target's '''missing''' health)</span></dd></dl>",
+          "text": "Maximum Secondary Damage:160 / 220 / 280 / 340 / 400 (+ 96% bonus AD) (+ 20 / 22 / 24 / 26 / 28% of target's missing health)Minimum Secondary Damage:16 / 22 / 28 / 34 / 40 (+ 9.6% bonus AD) (+ 20 / 22 / 24 / 26 / 28% of target's missing health)"
+        },
+        "name": "Super Mega Death Rocket!",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will not prevent the explosion.\n* ''Super Mega Death Rocket's'' projectile has an [[File:Super Mega Death Rocket! Minimap.png|40px|link=]] icon on the mini-map while it is in flight. It can be seen by only '''Jinx''' and her allies.\n* The bonus damage based on missing health is based on each unit's own missing health and not the primary target's.\n* Unlike similar spells, ''Super Mega Death Rocket'' will not increase it's damage when ranked up while the missile is in flight.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n** This is because the base damage is fixed at a multiple of the damage the rocket initially started with.\n** The <span style=\"color:orange; white-space:normal\">'''bonus''' AD</span> ratio will still update when <span style=\"color:orange; white-space:normal\">AD</span> is gained or lost between the cast and hit of the missile.\n* This ability will cast from wherever the caster is at the start of the cast time.",
+          "text": "Spell shield will not prevent the explosion.\nSuper Mega Death Rocket's projectile has an icon on the mini-map while it is in flight. It can be seen by only Jinx and her allies.\nThe bonus damage based on missing health is based on each unit's own missing health and not the primary target's.\nUnlike similar spells, Super Mega Death Rocket will not increase it's damage when ranked up while the missile is in flight.(unexpected)\n* This is because the base damage is fixed at a multiple of the damage the rocket initially started with.\n* The bonus AD ratio will still update when AD is gained or lost between the cast and hit of the missile.\nThis ability will cast from wherever the caster is at the start of the cast time."
+        },
+        "projectile": true,
+        "speed": "1700 • 2200",
+        "spellshield": false,
+        "targeting": "Direction",
+        "width": "280"
+      },
+      "name": "Super Mega Death Rocket!"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "34832ff988c653b44d0bf1cb8599b81b677968ecb9b6517e832f9a814bd8e663",
+    "fetchedAt": "2026-08-16T08:10:14.032Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jinx/Super_Mega_Death_Rocket!",
+    "revisionId": 4007616,
+    "sourceTimestamp": "2026-04-12T07:29:07Z"
+  }
+}

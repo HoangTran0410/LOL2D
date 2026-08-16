@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_annie_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Molten_Shield.png?23e2d",
+    "sha1": "19e1edb51ac978eb29fc78b23fcde5646adbb717"
+  },
+  "champion": "Annie",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_annie_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Molten_Shield.png?23e2d",
+        "sha1": "19e1edb51ac978eb29fc78b23fcde5646adbb717"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "10",
+        "cost": "60 / 65 / 70 / 75 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Annie''' grants herself or the target allied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> and <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:TibbersSquare.png|20xpx|border|link=Tibbers|An icon representing Tibbers]]</span> <span style=\"white-space:normal;\">[[Tibbers]]</span></span> a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 3 seconds and <span style=\"color:\n#9FFF4D; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"20;\" data-finish=\"50;\" data-top-fill=\"18\" data-bot-values=\"20;21.76;23.53;25.29;27.06;28.82;30.59;32.35;34.12;35.88;37.65;39.41;41.18;42.94;44.71;46.47;48.24;50;51.76;53.53;55.29;57.06;58.82;60.59;62.35;64.12;65.88;67.65;69.41;71.18;72.94;74.71;76.47;78.24;80;81.76;83.53;85.29;87.06;88.82;90.59|displayMaxColumn=18\" data-bot-key=\"%\">20% – 50% (based on level)</span></span> <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> that decays over 1.<small>5</small> seconds.",
+          "text": "Active: Annie grants herself or the target allied champion and Tibbers a shield for 3 seconds and 20% – 50% (based on level) &nbsp;bonus movement speed that decays over 1.5 seconds."
+        },
+        "description2": {
+          "raw": "While ''Molten Shield'' is active, enemies that deal damage to it take <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. This may only occur once per enemy per cast for each active ''Molten Shield''.",
+          "text": "While Molten Shield is active, enemies that deal damage to it take magic damage. This may only occur once per enemy per cast for each active Molten Shield."
+        },
+        "icon": "Molten Shield.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Shield Strength:60 / 95 / 130 / 165 / 200 (+ 40% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>25 / 35 / 45 / 55 / 65 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Magic Damage:25 / 35 / 45 / 55 / 65 (+ 40% AP)"
+        },
+        "name": "Molten Shield",
+        "notes": {
+          "raw": "* ''Molten Shield'' casts on ally if targeted or if very close to targeting them (within a range of 225); otherwise self casts.\n* ''Molten Shield'' does not deal damage to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turret\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turrets]]</span> when attacked by them.\n* ''Molten Shield'' has a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Forgiveness radius\">[[File:Targeting forgiveness.svg|20px|link=Targeting#Targeting_Forgiveness|An icon representing the keyword Targeting forgiveness]] [[:Targeting#Targeting_Forgiveness|forgiveness radius]]</span> of 175 units.\n* Attacks that are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|miss]]</span> against the shielded target will not cause the shield to deal damage, while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> attacks still deal damage to the attacker.\n* The reaction damage does not trigger from <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Teemo\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teemo OriginalSquare.png|20xpx|border|link=Teemo|An icon representing Teemo]]</span> <span style=\"white-space:normal;\">[[Teemo|Teemo's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Teemo\" data-ability=\"Noxious Trap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teemo Noxious Trap.png|20xpx|border|link=Teemo#Noxious Trap|An icon for Teemo's ability Noxious Trap]]</span> <span style=\"white-space:normal;\">[[Teemo#Noxious Trap|Noxious Trap]]</span></span></span> and <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Shaco\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Shaco OriginalSquare.png|20xpx|border|link=Shaco|An icon representing Shaco]]</span> <span style=\"white-space:normal;\">[[Shaco|Shaco's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Shaco\" data-ability=\"Jack in the Box\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Shaco Jack in the Box.png|20xpx|border|link=Shaco#Jack in the Box|An icon for Shaco's ability Jack in the Box]]</span> <span style=\"white-space:normal;\">[[Shaco#Jack in the Box|Jack in the Box]]</span></span></span>.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Molten Shield casts on ally if targeted or if very close to targeting them (within a range of 225); otherwise self casts.\nMolten Shield does not deal damage to turrets when attacked by them.\nMolten Shield has a forgiveness radius of 175 units.\nAttacks that are dodged or miss against the shielded target will not cause the shield to deal damage, while blocked attacks still deal damage to the attacker.\nThe reaction damage does not trigger from Teemo's Noxious Trap and Shaco's Jack in the Box.(bug)"
+        },
+        "targeting": "Unit / Auto"
+      },
+      "name": "Molten Shield"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "555ce92aa5cf95a9a41b90d577a7d0229f30089b82995800fc58312cd5b60d64",
+    "fetchedAt": "2026-08-16T08:46:36.640Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Annie/Molten_Shield",
+    "revisionId": 4038214,
+    "sourceTimestamp": "2026-06-30T07:20:06Z"
+  }
+}

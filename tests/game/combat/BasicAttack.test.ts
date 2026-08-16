@@ -455,6 +455,9 @@ describe('basic attacks', () => {
       victim: target,
       damage: DEFAULT_CHAMPION_ATTACK.damage,
       ranged: true,
+      // `crit` joined the payload with the crit roll. False, not absent: this
+      // champion has no `critChance`, so the roll never happens.
+      crit: false,
     });
   });
 

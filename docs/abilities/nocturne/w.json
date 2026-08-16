@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_nocturne_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Shroud_of_Darkness.png?24249",
+    "sha1": "4bea3a8e3ae4c9585a0406b57bb7e7e718f57e16"
+  },
+  "champion": "Nocturne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nocturne_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Shroud_of_Darkness.png?24249",
+        "sha1": "4bea3a8e3ae4c9585a0406b57bb7e7e718f57e16"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "20 / 18 / 16 / 14 / 12",
+        "cost": "50",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Nocturne''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span>.",
+          "text": "Passive: Nocturne gains &nbsp;bonus attack speed."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nocturne''' gains a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> for 1.<small>5</small> seconds. Upon successfully blocking a hostile effect, ''Shroud of Darkness' ''<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span> is doubled for 5 seconds.",
+          "text": "Active: Nocturne gains a spell shield for 1.5 seconds. Upon successfully blocking a hostile effect, Shroud of Darkness' bonus attack speed is doubled for 5 seconds."
+        },
+        "icon": "false",
+        "icon2": "Shroud of Darkness.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Bonus Attack Speed:30 / 35 / 40 / 45 / 50%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Enhanced Bonus Attack Speed:'''</span></dt><dd>60 / 70 / 80 / 90 / 100%</dd></dl>",
+          "text": "Enhanced Bonus Attack Speed:60 / 70 / 80 / 90 / 100%"
+        },
+        "name": "Shroud of Darkness",
+        "notes": {
+          "raw": "* If ''Shroud of Darkness'' is active when '''Nocturne''' re-casts ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nocturne\" data-ability=\"Paranoia\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nocturne Paranoia.png|20xpx|border|link=Nocturne#Paranoia|An icon for Nocturne's ability Paranoia]]</span> <span style=\"white-space:normal;\">[[Nocturne#Paranoia|Paranoia]]</span></span>'' to dash to a target, its duration is refreshed every 0.<small>25</small> seconds during the dash.",
+          "text": "If Shroud of Darkness is active when Nocturne re-casts Paranoia to dash to a target, its duration is refreshed every 0.25 seconds during the dash."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Shroud of Darkness"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "c3a707f280aa3abfe66b227913fd404e9349a7cfb0c434e39b8d0a590bb97d03",
+    "fetchedAt": "2026-08-16T06:56:36.519Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nocturne/Shroud_of_Darkness",
+    "revisionId": 3948584,
+    "sourceTimestamp": "2025-08-19T17:40:10Z"
+  }
+}

@@ -15,6 +15,7 @@ export class TestVector {
   mult(value: number) { this.x *= value; this.y *= value; return this; }
   mag() { return Math.hypot(this.x, this.y); }
   magSq() { return this.x * this.x + this.y * this.y; }
+  limit(max: number) { return this.mag() > max ? this.setMag(max) : this; }
   setMag(value: number) {
     const length = this.mag();
     if (length > 0) this.mult(value / length);

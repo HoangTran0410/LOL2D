@@ -1,0 +1,77 @@
+{
+  "asset": {
+    "key": "spell_warwick_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Blood_Hunt.png?3dce3",
+    "sha1": "0ed75406fe5ac467f32e5d1538707b2ccea5fe5f"
+  },
+  "champion": "Warwick",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_warwick_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Blood_Hunt.png?3dce3",
+        "sha1": "0ed75406fe5ac467f32e5d1538707b2ccea5fe5f"
+      },
+      "fields": {
+        "casttime": "0.5",
+        "cooldown": "80 / 70 / 60 / 50 / 40",
+        "cost": "55",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Warwick''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 1.<small>25</small> seconds upon damaging a target to or while they are below <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;50% of their '''maximum''' health</span></span> with a basic attack or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability damage\">[[File:Lay Waste.png|20px|link=Ability damage|An icon representing the keyword Ability damage]] [[:Ability damage|ability damage]]</span>, refreshing with subsequent damaging basic attacks or ability damage to enemies below the threshold. If '''Warwick''' does not have the <span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span> already, he also gains it upon initiating an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack windup]]</span> against an enemy below the threshold.",
+          "text": "Passive: Warwick gains &nbsp;bonus attack speed for 1.25 seconds upon damaging a target to or while they are below &nbsp;50% of their maximum health with a basic attack or ability damage, refreshing with subsequent damaging basic attacks or ability damage to enemies below the threshold. If Warwick does not have the bonus attack speed already, he also gains it upon initiating an attack windup against an enemy below the threshold."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Warwick''' senses all enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> on the map who are damaged below <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;50% of their '''maximum''' health</span></span> by him or an allied source, marking them with ''Blood Hunt'' until they <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health regeneration icon.svg|15px|link=Health regeneration]]&nbsp;regenerate</span></span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heal]]</span> above this threshold again. He sees trails leading toward them and gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> while following a trail. This bonus is lost for 0.<small>5</small> seconds upon [[Combat status|entering champion combat]], but will build up again over 3.<small>5</small> seconds.",
+          "text": "Passive: Warwick senses all enemy champions on the map who are damaged below &nbsp;50% of their maximum health by him or an allied source, marking them with Blood Hunt until they &nbsp;regenerate or heal above this threshold again. He sees trails leading toward them and gains &nbsp;bonus movement speed while following a trail. This bonus is lost for 0.5 seconds upon entering champion combat, but will build up again over 3.5 seconds."
+        },
+        "description3": {
+          "raw": "The <span style=\"color:\n#F5EE99; white-space:normal\">attack speed</span> and <span style=\"color:\n#9FFF4D; white-space:normal\">movement speed</span> bonuses granted by both passives are doubled against enemies who are below <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;25% of their '''maximum''' health</span></span>.",
+          "text": "The attack speed and movement speed bonuses granted by both passives are doubled against enemies who are below &nbsp;25% of their maximum health."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Warwick''' senses the nearest enemy champion in the area at the start of the cast time, marking them with ''Blood Hunt'' for 8 seconds, gaining both passive bonuses against them regardless of their <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;'''current''' health</span></span>.",
+          "text": "Active: Warwick senses the nearest enemy champion in the area at the start of the cast time, marking them with Blood Hunt for 8 seconds, gaining both passive bonuses against them regardless of their &nbsp;current health."
+        },
+        "description5": {
+          "raw": "''Blood Hunt's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by 30% if no enemy champions are found within range.",
+          "text": "Blood Hunt's &nbsp;cooldown is reduced by 30% if no enemy champions are found within range."
+        },
+        "effectradius": "4000",
+        "icon": "false",
+        "icon4": "Blood Hunt.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>70 / 80 / 90 / 100 / 110%</dd></dl>",
+          "text": "Bonus Attack Speed:70 / 80 / 90 / 100 / 110%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>35 / 42.<small>5</small> / 50 / 57.<small>5</small> / 65%</dd></dl>",
+          "text": "Bonus Movement Speed:35 / 42.5 / 50 / 57.5 / 65%"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Attack Speed:'''</span></dt><dd>140 / 160 / 180 / 200 / 220%</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Movement Speed:'''</span></dt><dd>70 / 85 / 100 / 115 / 130%</dd></dl>",
+          "text": "Increased Attack Speed:140 / 160 / 180 / 200 / 220%\nIncreased Movement Speed:70 / 85 / 100 / 115 / 130%"
+        },
+        "name": "Blood Hunt",
+        "notes": {
+          "raw": "* The initiation of the attack windup to gain the bonus attack speed is only for ''gaining'' the bonus; it does not refresh the duration of the attack speed buff if '''Warwick''' has it already.\n* ''Blood Hunt'' is a form of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Obscured vision\">[[File:Sweeper Drone icon.png|20px|link=Sight#Obscured vision|An icon representing the keyword Obscured vision]] [[:Sight#Obscured vision|obscured vision]]</span>.\n* If ''Blood Hunt'' was cast with no enemy champions within range, the ability incurs its cast time then goes on cooldown without marking any target.\n* As mentioned by the description, ''Blood Hunt'' only marks enemy champions if they are damaged below the thresholds by an allied source. This includes '''Warwick''' himself, champions, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turret\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turrets]]</span>.\n** The only exception is the allied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Nexus obelisk\">[[File:Nexus Obelisk.png|20px|link=Nexus Obelisk|An icon representing the keyword Nexus Obelisk]] [[:Nexus Obelisk|Nexus Obelisk]]</span>, because that deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Raw damage\">[[File:Fear Beyond Death 2.png|20px|link=Damage|An icon representing the keyword Raw damage]] [[:Damage|internalraw]]</span> damage, which does not trigger damage-related events such as ''Blood Hunt's'' marking.\n* Note that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> are neutral units.\n* ''Blood Hunt'' can detect and target [[Champion_summoned_units#decoys|decoys]].\n* ''Blood Hunt'' will occur from wherever '''Warwick''' was at the start of the cast time.\n* ''Blood Hunt'' has an indicator that appears above the target(s) when they are being hunted. Some skins have a unique indicator.\n<gallery navigation=true widths=\"128px\">\nWarwick Blood Hunt Mark.png                |[[File:Warwick OriginalCircle.png|32px]] Classic\nPROJECT Warwick Blood Hunt Mark.png        |[[File:Warwick PROJECTCircle.png|32px]] PROJECT\nLunar Guardian Warwick Blood Hunt Mark.png |[[File:Warwick LunarGuardianCircle.png|32px]] Lunar Guardian\nOld God Warwick Blood Hunt Mark.png        |[[File:Warwick OldGodCircle.png|32px]] Old God\nWinterblessed Warwick Blood Hunt Mark.png  |[[File:Warwick WinterblessedCircle.png|32px]] Winterblessed\nPrestige Winterblessed Warwick Blood Hunt Mark.png  |[[File:Warwick PrestigeWinterblessedCircle.png|32px]] Prestige Winterblessed\nArcane Vander Warwick Blood Hunt Mark.png  |[[File:Warwick ArcaneVanderCircle.png|32px]] Arcane Vander\n</gallery>\n* Some of Warwick's <span style=\"color:\n#FFFFFF; \">[[File:Chromaskins.png|20px|link=]]&nbsp;'''Chromas'''</span> have a unique color variation:\n<tabber>\nOld God=\n<gallery navigation=true widths=\"128px\">\nOld God Warwick Ruby Blood Hunt Mark.png        | Ruby\nOld God Warwick Citrine Blood Hunt Mark.png     | Citrine\nOld God Warwick Emerald Blood Hunt Mark.png     | Emerald\nOld God Warwick Sapphire Blood Hunt Mark.png    | Sapphire\nOld God Warwick Rose Quartz Blood Hunt Mark.png | Rose Quartz\nOld God Warwick Obsidian Blood Hunt Mark.png    | Obsidian\nOld God Warwick Aquamarine Blood Hunt Mark.png  | Aquamarine\nOld God Warwick Pearl Blood Hunt Mark.png       | Pearl\nOld God Warwick Dark Ritual Blood Hunt Mark.png | Dark Ritual\n</gallery>\n|-|\nArcane Vander=\n<gallery navigation=true widths=\"128px\">\nArcane Vander Warwick Paragon Blood Hunt Mark.png | Paragon\n</gallery>\n</tabber>\n* <span style=\"color:#D53D3D;font-weight:bold;\">Editor's Note:</span> It should be noted that as of right now, skins that use the [[File:Warwick OriginalCircle.png|32px]] original's assets are all using a purple-blueish indicator that was undocumentedly introduced. It was possibly meant for color blind mode, based on the color. It is unknown whether the change was intentional or is a wrongly implemented feature.\n<gallery navigation=true widths=\"128px\">\nWarwick Blood Hunt Mark Alternative.png\n</gallery>",
+          "text": "The initiation of the attack windup to gain the bonus attack speed is only for gaining the bonus; it does not refresh the duration of the attack speed buff if Warwick has it already.\nBlood Hunt is a form of obscured vision.\nIf Blood Hunt was cast with no enemy champions within range, the ability incurs its cast time then goes on cooldown without marking any target.\nAs mentioned by the description, Blood Hunt only marks enemy champions if they are damaged below the thresholds by an allied source. This includes Warwick himself, champions, minions, and turrets.\n* The only exception is the allied Nexus Obelisk, because that deals internalraw damage, which does not trigger damage-related events such as Blood Hunt's marking.\nNote that monsters are neutral units.\nBlood Hunt can detect and target decoys.\nBlood Hunt will occur from wherever Warwick was at the start of the cast time.\nBlood Hunt has an indicator that appears above the target(s) when they are being hunted. Some skins have a unique indicator.\nWarwick Blood Hunt Mark.png | Classic\nPROJECT Warwick Blood Hunt Mark.png | PROJECT\nLunar Guardian Warwick Blood Hunt Mark.png | Lunar Guardian\nOld God Warwick Blood Hunt Mark.png | Old God\nWinterblessed Warwick Blood Hunt Mark.png | Winterblessed\nPrestige Winterblessed Warwick Blood Hunt Mark.png | Prestige Winterblessed\nArcane Vander Warwick Blood Hunt Mark.png | Arcane Vander\nSome of Warwick's &nbsp;Chromas have a unique color variation:\nOld God=\nOld God Warwick Ruby Blood Hunt Mark.png | Ruby\nOld God Warwick Citrine Blood Hunt Mark.png | Citrine\nOld God Warwick Emerald Blood Hunt Mark.png | Emerald\nOld God Warwick Sapphire Blood Hunt Mark.png | Sapphire\nOld God Warwick Rose Quartz Blood Hunt Mark.png | Rose Quartz\nOld God Warwick Obsidian Blood Hunt Mark.png | Obsidian\nOld God Warwick Aquamarine Blood Hunt Mark.png | Aquamarine\nOld God Warwick Pearl Blood Hunt Mark.png | Pearl\nOld God Warwick Dark Ritual Blood Hunt Mark.png | Dark Ritual\n|-|\nArcane Vander=\nArcane Vander Warwick Paragon Blood Hunt Mark.png | Paragon\nEditor's Note: It should be noted that as of right now, skins that use the original's assets are all using a purple-blueish indicator that was undocumentedly introduced. It was possibly meant for color blind mode, based on the color. It is unknown whether the change was intentional or is a wrongly implemented feature.\nWarwick Blood Hunt Mark Alternative.png"
+        },
+        "range": "Global",
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Blood Hunt"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "75025495226427426b9a2d6cf6dff0d037c2945d3373c02018f7bdf1afbf46a2",
+    "fetchedAt": "2026-08-16T08:58:31.769Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Warwick/Blood_Hunt",
+    "revisionId": 3980738,
+    "sourceTimestamp": "2026-01-01T18:33:20Z"
+  }
+}
