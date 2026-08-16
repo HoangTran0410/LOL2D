@@ -10,7 +10,7 @@ export default class Warwick_Q extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_warwick_q');
-  name = 'Nanh Vuốt (Warwick_Q)';
+  name = 'Cắn Xé (Warwick_Q)';
   description =
     'Vồ tới kẻ địch gần nhất trong phạm vi, cắn xé gây <span class="damage">30 sát thương</span> và <span class="buff">Hồi 15 máu</span> cho bản thân';
   coolDown = 7000;
@@ -27,7 +27,10 @@ export default class Warwick_Q extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     let nearestEnemy: any = null;

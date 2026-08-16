@@ -14,7 +14,7 @@ import ChoGath_R from '../../../src/game/gameObject/spells/ChoGath_R';
 import Nasus_Q from '../../../src/game/gameObject/spells/Nasus_Q';
 import Flash from '../../../src/game/gameObject/spells/Flash';
 import SpellState from '../../../src/game/enums/SpellState';
-import { executeMarkTargets } from '../../../src/game/combat/ExecuteMarks';
+import { executeMarks, executeMarkTargets } from '../../../src/game/combat/ExecuteMarks';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 let game: TestGame;
@@ -65,27 +65,55 @@ describe('executeMarkTargets', () => {
     expect(executeMarkTargets(nasus)).toEqual([]);
   });
 
-  it('goes quiet while the spell is on cooldown', () => {
+  it('stays on through the cooldown, and says the key is not live', () => {
+    // Measured, not argued: gating the mark on `isCastableNow` left it visible
+    // for 7 frames out of 481 while Q was being spammed, every blank frame down
+    // to `state === COOLDOWN`. "Who can I finish next" is the question you are
+    // asking *while* the ability is down.
     const nasus = caster();
     const doomed = enemy(60, 8);
     const spell = new Nasus_Q(nasus);
     nasus.spells = [spell];
     indexObjects(game, [nasus, doomed]);
 
+    expect(executeMarks(nasus)).toEqual([{ unit: doomed, ready: true }]);
+
     spell.state = SpellState.COOLDOWN;
-    expect(executeMarkTargets(nasus)).toEqual([]);
+    expect(executeMarks(nasus)).toEqual([{ unit: doomed, ready: false }]);
   });
 
-  it('goes quiet when the pool cannot pay for the cast', () => {
+  it('does the same when the pool cannot pay for the cast', () => {
     const chogath = caster();
     const doomed = enemy(80, 8);
     const spell = new ChoGath_R(chogath);
     chogath.spells = [spell];
     indexObjects(game, [chogath, doomed]);
 
-    expect(executeMarkTargets(chogath)).toEqual([doomed]);
+    expect(executeMarks(chogath)).toEqual([{ unit: doomed, ready: true }]);
     chogath.stats.mana.baseValue = spell.manaCost - 1;
-    expect(executeMarkTargets(chogath)).toEqual([]);
+    expect(executeMarks(chogath)).toEqual([{ unit: doomed, ready: false }]);
+  });
+
+  it('drops a spell the match has switched off entirely', () => {
+    const nasus = caster();
+    const doomed = enemy(60, 8);
+    const spell = new Nasus_Q(nasus);
+    spell.disabled = true;
+    nasus.spells = [spell];
+    indexObjects(game, [nasus, doomed]);
+
+    expect(executeMarks(nasus)).toEqual([]);
+  });
+
+  it('reports one mark as live when either spell that finds it is up', () => {
+    const hybrid = caster();
+    const doomed = enemy(70, 8);
+    const down = new Nasus_Q(hybrid);
+    down.state = SpellState.COOLDOWN;
+    hybrid.spells = [down, new ChoGath_R(hybrid)];
+    indexObjects(game, [hybrid, doomed]);
+
+    expect(executeMarks(hybrid)).toEqual([{ unit: doomed, ready: true }]);
   });
 
   it('marks a unit once even when two spells could finish it', () => {

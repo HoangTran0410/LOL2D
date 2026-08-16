@@ -28,7 +28,7 @@ export default class Singed_E extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_singed_e');
-  name = 'Quăng Người (Singed_E)';
+  name = 'Hất (Singed_E)';
   description =
     `Túm kẻ địch gần nhất trong <span>${RANGE}px</span> và quăng qua đầu mình,` +
     ` <span class="buff">Hất Tung</span> chúng và đáp xuống <span>${THROW_DISTANCE}px</span> phía sau lưng Singed.` +
@@ -106,7 +106,10 @@ export default class Singed_E extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     }) as AttackableUnit[];
 
     let nearest: AttackableUnit | null = null;

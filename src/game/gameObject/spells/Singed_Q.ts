@@ -14,7 +14,7 @@ export const POISON_PER_TICK = 3;
 export default class Singed_Q extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_singed_q');
-  name = 'Độc Dược (Singed_Q)';
+  name = 'Phun Khói Độc (Singed_Q)';
   description =
     `Rải khí độc phía sau trong <span class="time">${DURATION / 1000} giây</span>. Kẻ địch đi qua vệt độc bị` +
     ` <span class="damage">nhiễm độc ${POISON_PER_TICK} sát thương</span> mỗi nhịp`;

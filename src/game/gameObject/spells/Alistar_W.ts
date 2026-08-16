@@ -12,7 +12,7 @@ export default class Alistar_W extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_alistar_w');
-  name = 'Húc Bay (Alistar_W)';
+  name = 'Bò Húc (Alistar_W)';
   description =
     '<span class="buff">Lướt</span> tới kẻ địch gần nhất trong phạm vi rồi húc chúng bay ra xa, gây <span class="damage">30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.7 giây</span>';
   coolDown = 10000;
@@ -30,7 +30,10 @@ export default class Alistar_W extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     let nearestEnemy: any = null;

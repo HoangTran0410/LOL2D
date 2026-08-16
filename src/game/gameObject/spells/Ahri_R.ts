@@ -62,7 +62,10 @@ export default class Ahri_R extends Spell {
           y: this.owner.position.y,
           r: this.rangeToFindEnemies,
         }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+        filters: [
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+          PredefinedFilters.visibleTo(this.owner),
+        ],
       });
 
       for (let i = 0; i < Math.min(3, enemies.length); i++) {

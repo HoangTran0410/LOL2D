@@ -7,6 +7,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import { landBasicAttack } from '../../../src/game/combat/BasicAttack';
 import EventType from '../../../src/game/enums/EventType';
 import type { BasicAttackHit } from '../../../src/game/combat/BasicAttack';
+import Shield from '../../../src/game/gameObject/buffs/Shield';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
 
 installSpellObjectGlobals();
@@ -90,13 +91,13 @@ describe('omnivamp', () => {
     const { attacker, victim } = pair();
     attacker.stats.health.baseValue = 100;
     attacker.stats.omnivamp.baseValue = 1;
-    // A shield that eats 30 of whatever arrives.
-    victim.buffs.push({
-      modifyIncomingDamage: (damage: number) => damage - 30,
-      update: () => undefined,
-      statusFlagsToEnable: 0,
-      statusFlagsToDisable: 0,
-    } as never);
+    // The real thing rather than a stub of it: a hand-rolled object with only
+    // `modifyIncomingDamage` on it stops being a `Buff` the moment the base
+    // class grows a hook, which is exactly what happened when reflection moved
+    // onto `onDamageTaken`.
+    const shield = new Shield(10_000, victim, victim);
+    shield.amount = 30;
+    victim.addBuff(shield);
 
     victim.takeDamage(50, attacker);
 

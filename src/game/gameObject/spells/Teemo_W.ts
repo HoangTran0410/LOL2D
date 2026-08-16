@@ -21,7 +21,7 @@ export const MANA_COST = 40;
 export default class Teemo_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_teemo_w');
-  name = 'Chạy Nhanh (Teemo_W)';
+  name = 'Chạy Lẹ (Teemo_W)';
   description =
     'Chủ động: Teemo <span class="buff">tăng 30% tốc chạy</span> trong <span class="time">3 giây</span>, hiệu ứng không thể bị gỡ bỏ trong thời gian này.';
   // kept as a literal (not an exported constant) so the repo-wide arcade

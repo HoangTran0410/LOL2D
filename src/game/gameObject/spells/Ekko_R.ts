@@ -114,13 +114,13 @@ export default class Ekko_R extends Spell {
     const dx = snap.x - this.owner.position.x;
     const dy = snap.y - this.owner.position.y;
     const span = Math.hypot(dx, dy);
-    const marks = Math.max(2, Math.min(24, Math.floor(span / 22)));
+    const marks = Math.max(2, Math.min(10, Math.floor(span / 40)));
     stroke(0, 220, 255, 110);
-    strokeWeight(2);
+    strokeWeight(1);
     for (let i = 1; i < marks; i++) {
       const t = i / marks;
       // the ticks crawl backwards along the line: the direction he will travel
-      const k = (t + 1 - ((frameCount / 60) % 1)) % 1;
+      const k = 1 - ((t + 1 - ((frameCount / 160) % 1)) % 1);
       circle(this.owner.position.x + dx * k, this.owner.position.y + dy * k, 3);
     }
 
@@ -137,7 +137,7 @@ export default class Ekko_R extends Spell {
     // clock hand on the ghost: this is the position 4 seconds back
     push();
     translate(snap.x, snap.y);
-    rotate(-HALF_PI - (frameCount * 0.03) % TWO_PI);
+    rotate(-HALF_PI - ((frameCount * 0.03) % TWO_PI));
     stroke(180, 250, 255, 190);
     strokeWeight(2);
     line(0, 0, size * 0.32, 0);

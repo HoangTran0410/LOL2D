@@ -13,7 +13,7 @@ export const TICK_INTERVAL = 500;
 export default class Nasus_E extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_nasus_e');
-  name = 'Ngọn Lửa Linh Hồn (Nasus_E)';
+  name = 'Lửa Tâm Linh (Nasus_E)';
   description =
     `Gọi một vùng lửa bán kính <span>${RADIUS}px</span> tồn tại <span class="time">${DURATION / 1000} giây</span>,` +
     ` gây <span class="damage">${DAMAGE_PER_TICK} sát thương</span> mỗi <span class="time">${TICK_INTERVAL / 1000} giây</span>` +

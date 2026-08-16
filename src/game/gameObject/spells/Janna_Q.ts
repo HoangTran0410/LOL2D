@@ -40,7 +40,7 @@ type JannaTarget = AttackableUnit;
  */
 export default class Janna_Q extends Spell {
   image = AssetManager.get('spell_janna_q');
-  name = 'Bão Tố (Janna_Q)';
+  name = 'Gió Lốc (Janna_Q)';
   description =
     'Triệu hồi một cơn lốc tại chỗ và <span class="buff">tích luỹ sức mạnh</span> trong tối đa <span class="time">3 giây</span>. Tái kích hoạt để phóng cơn lốc về hướng con trỏ, hoặc nó tự phóng khi tích đầy. Tích càng lâu thì tầm bay, tốc độ, sát thương và thời gian hất tung càng lớn: gây <span class="damage">15 - 30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.5 - 1.25 giây</span>, xuyên qua mọi kẻ địch trên đường đi';
   coolDown = 5_000;

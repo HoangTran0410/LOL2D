@@ -23,7 +23,7 @@ export default class ChoGath_R extends Spell implements ExecuteSpell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_chogath_r');
-  name = "Ăn Thịt (Cho'Gath_R)";
+  name = "Xơi Tái (Cho'Gath_R)";
   description =
     `Ngoạm một kẻ địch trong phạm vi <span>200px</span> — <span class="buff">ưu tiên kẻ sẽ chết vì cú ngoạm này</span>, ` +
     `nếu không có thì kẻ gần nhất — gây <span class="damage">40 sát thương</span>. ` +

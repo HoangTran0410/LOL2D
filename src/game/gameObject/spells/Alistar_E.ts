@@ -13,7 +13,7 @@ export const TICK_INTERVAL = 500;
 export default class Alistar_E extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_alistar_e');
-  name = 'Giẫm Đạp (Alistar_E)';
+  name = 'Giày Xéo (Alistar_E)';
   description =
     `Lồng lên trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+30% tốc chạy</span>` +
     ` và gây <span class="damage">${DAMAGE_PER_TICK} sát thương</span> mỗi` +

@@ -106,6 +106,21 @@ highlight who is about to get hit — is a real improvement, but it is a
 target-acquisition feature, not a targeting-mode correction; give it the
 `targetingRequest`/`press()` treatment and its own test when you do.
 
+**Whichever mode you pick, a spell that chooses a unit must pass
+`PredefinedFilters.visibleTo(this.owner)` to the query it chooses from.** A true
+`UNIT` spell gets this free — `TargetResolver` applies it to every candidate —
+but a `SELF` spell doing its own lookup does not, and every one of them shipped
+without it: Warwick R found the blue camp through a jungle wall, on a screen
+showing nothing but fog, and leaped through the wall to bite it. The filter asks
+`combat/Vision.ts`, which answers walls, bushes and friendly wards the same way
+`FogOfWar` paints them, and is a no-op for allies. `tests/game/spells/
+target-vision-seam.test.ts` scans for the missing line.
+
+The gate is on **acquisition, never on damage**. An area effect still hits
+everyone it overlaps — Amumu W ticking on the champion hiding in the bush is
+correct, and adding the filter there would be the bug. The question to ask of a
+query is whether picking a unit out of it means the caster *chose* that unit.
+
 ## 3. Define lifecycle policies
 
 The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `COOLDOWN`. Do not assign `state` or `currentCooldown` in migrated spells.

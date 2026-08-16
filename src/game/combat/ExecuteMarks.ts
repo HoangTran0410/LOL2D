@@ -28,6 +28,23 @@ interface SpellCarrier {
   isDead?: boolean;
 }
 
+/** One enemy the player could finish, and whether the key is live right now. */
+export interface ExecuteMark {
+  unit: AttackableUnit;
+  /**
+   * `Spell.isCastableNow` — off cooldown, paid for, caster free to act.
+   *
+   * Deliberately *not* a condition for being marked at all. It was, and the
+   * result was measured rather than argued about: spamming Veigar Q left the
+   * ring on for 7 frames out of 481, every blank frame down to
+   * `state === COOLDOWN`. A mark that blinks off the instant you use the
+   * ability is at its least useful exactly when you are using it — the whole
+   * question is "who can I finish next". So the mark persists and the *style*
+   * carries the readiness instead.
+   */
+  ready: boolean;
+}
+
 /**
  * Every enemy the caster could finish this instant, each listed once.
  *
@@ -35,17 +52,27 @@ interface SpellCarrier {
  * Cho'Gath R both reach it); it still gets one mark, because the mark means
  * "dies to something you have", not "dies twice".
  */
-export function executeMarkTargets(caster: SpellCarrier | null | undefined): AttackableUnit[] {
+export function executeMarks(caster: SpellCarrier | null | undefined): ExecuteMark[] {
   if (!caster || caster.isDead || !caster.spells) return [];
 
-  const marked: AttackableUnit[] = [];
+  const marks: ExecuteMark[] = [];
   for (const spell of caster.spells) {
-    if (!isExecuteSpell(spell) || !spell.isCastableNow) continue;
+    // A disabled spell is not an ability the player has; a spell on cooldown is.
+    if (!isExecuteSpell(spell) || spell.disabled) continue;
+    const ready = spell.isCastableNow;
     for (const target of lethalTargets(spell)) {
-      if (marked.indexOf(target) === -1) marked.push(target);
+      const existing = marks.find(mark => mark.unit === target);
+      // Marked by two spells and live on either one: the brighter answer wins.
+      if (existing) existing.ready ||= ready;
+      else marks.push({ unit: target, ready });
     }
   }
-  return marked;
+  return marks;
+}
+
+/** Just the units, for callers that do not care which key is up. */
+export function executeMarkTargets(caster: SpellCarrier | null | undefined): AttackableUnit[] {
+  return executeMarks(caster).map(mark => mark.unit);
 }
 
 /**
@@ -55,24 +82,30 @@ export function executeMarkTargets(caster: SpellCarrier | null | undefined): Att
  * player's mana and the target's health are what turn it on and off.
  */
 export function drawExecuteMarks(game: { player?: SpellCarrier; camera?: any }): void {
-  const targets = executeMarkTargets(game.player);
-  if (targets.length === 0) return;
+  const marks = executeMarks(game.player);
+  if (marks.length === 0) return;
 
-  const pulse = (Math.sin(frameCount / 7) + 1) / 2;
+  const beat = (Math.sin(frameCount / 7) + 1) / 2;
   const [r, g, b] = MARK_COLOR;
 
   push();
   noFill();
-  for (const target of targets) {
+  for (const { unit: target, ready } of marks) {
+    // Waiting on the cooldown: a thin steady outline that says "still killable"
+    // and nothing more. Live: it breathes and grows the arrowheads. One state
+    // is a note, the other is an invitation, and they must not be confusable.
+    const pulse = ready ? beat : 0;
     const radius = (target.animatedValues?.displaySize ?? 50) / 2 + 10 + pulse * 5;
     const { x, y } = target.position;
 
-    stroke(20, 12, 0, 150);
-    strokeWeight(5);
+    stroke(20, 12, 0, ready ? 150 : 80);
+    strokeWeight(ready ? 5 : 3);
     circle(x, y, radius * 2);
-    stroke(r, g, b, 200 + 55 * pulse);
-    strokeWeight(2.5);
+    stroke(r, g, b, ready ? 200 + 55 * beat : 95);
+    strokeWeight(ready ? 2.5 : 1.5);
     circle(x, y, radius * 2);
+
+    if (!ready) continue;
 
     // four arrowheads closing on the body — the "finish it" read, and the part
     // that survives being one of six rings on a crowded screen

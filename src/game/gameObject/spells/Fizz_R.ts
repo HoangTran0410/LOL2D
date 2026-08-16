@@ -24,7 +24,7 @@ export const ERUPT_MS = 700;
 export default class Fizz_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_fizz_r');
-  name = 'Mồi Cá Mập (Fizz_R)';
+  name = 'Triệu Hồi Thủy Quái (Fizz_R)';
   description =
     `Ném một con cá mồi <span>${RANGE}px</span>. Nó dính vào mục tiêu đầu tiên trúng phải (hoặc rơi xuống đất),` +
     ` và sau <span class="time">${FUSE_MS / 1000} giây</span> một con cá mập trồi lên:` +

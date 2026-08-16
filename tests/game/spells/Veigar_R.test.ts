@@ -109,7 +109,12 @@ describe('Veigar R', () => {
     expect(resolution).toMatchObject({ ok: true, context: { target } });
     expect(new Veigar_R(owner).press(castContext(owner))).toBe(false);
     game.objectManager.objects.push(target);
-    expect(new Veigar_R(owner).press(castContext(owner))).toBe(false);
+    // Cursor parked far away (0, 500) and the enemy still in range: this used
+    // to refuse, because the acquisition circle was a filter rather than a
+    // preference. Range decides what a spell may hit; the cursor only decides
+    // which of those it takes. The refusals below are the ones that still mean
+    // something — wrong team, and genuinely out of reach.
+    expect(new Veigar_R(owner).press(castContext(owner))).toBe(true);
     expect(new Veigar_R(owner).press(castContext(owner, undefined, target.position))).toBe(true);
     expect(new Veigar_R(owner).press(castContext(owner, ally))).toBe(false);
     expect(new Veigar_R(owner).press(castContext(owner, outOfRange))).toBe(false);

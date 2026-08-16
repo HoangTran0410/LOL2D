@@ -36,7 +36,7 @@ const INDIGO_BRIGHT: [number, number, number] = [150, 110, 240];
 export default class Nocturne_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nocturne_w');
-  name = 'Màn Đêm Bao Phủ (Nocturne_W)';
+  name = 'Bóng Đen Bao Phủ (Nocturne_W)';
   description =
     `Nhận <span class="buff">Khiên ${SHIELD_AMOUNT}</span>, <span class="buff">+${ATTACK_SPEED_PERCENT * 100}% tốc độ đánh</span>` +
     ` và <span class="buff">hút ${OMNIVAMP * 100}% máu</span> trong <span class="time">${DURATION / 1000} giây</span>`;

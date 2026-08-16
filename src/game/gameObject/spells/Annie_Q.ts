@@ -1,5 +1,6 @@
-import { Rectangle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 import { withinRange } from '../../combat/Reach';
 import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
 import SpellObject from '../SpellObject';
@@ -7,6 +8,7 @@ import Spell from '../Spell';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import type { CastSpec } from '../../spell/runtime/types';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { effectiveHealth, isLethal, type ExecuteSpell } from '../../combat/ExecuteTargeting';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export const RANGE = 500;
@@ -38,9 +40,9 @@ const isAnnieTarget = (target: unknown): target is AttackableUnit =>
  * kills the target, the cooldown is reduced by 50% and the mana cost is
  * refunded"* — the reason Annie farms with it.
  */
-export default class Annie_Q extends Spell {
+export default class Annie_Q extends Spell implements ExecuteSpell {
   image = AssetManager.get('spell_annie_q');
-  name = 'Huỷ Diệt (Annie_Q)';
+  name = 'Hỏa Cầu (Annie_Q)';
   description =
     `Ném cầu lửa vào một mục tiêu trong <span>${RANGE}px</span>, gây` +
     ` <span class="damage">${DAMAGE} sát thương</span>. Nếu <span class="buff">hạ gục</span> mục tiêu,` +
@@ -54,6 +56,32 @@ export default class Annie_Q extends Spell {
     return {
       range: this.range,
       targetTeam: 'ENEMY',
+      /**
+       * With the cursor on empty ground, take whoever the fireball finishes.
+       *
+       * This is the ring on screen and the cast finally agreeing. The mark says
+       * "this one dies"; before this the press then went to whoever happened to
+       * be nearest the cursor, which on a wave is almost never the one that was
+       * marked. Only consulted when the player is *not* pointing at anybody —
+       * aim is never overruled, and a deliberate click on a champion still
+       * beats a lethal minion.
+       *
+       * Lowest effective health among the lethal ones, the same tie-break
+       * `pickExecuteTarget` uses: the fireball travels, and the one with least
+       * left is the one fewest heals can save.
+       */
+      pickWithoutAim: (candidates, nearestToCursor) => {
+        let best: unknown;
+        let lowest = Infinity;
+        for (const candidate of candidates) {
+          if (!isAnnieTarget(candidate) || !isLethal(DAMAGE, candidate)) continue;
+          const health = effectiveHealth(candidate);
+          if (health >= lowest) continue;
+          lowest = health;
+          best = candidate;
+        }
+        return best ?? nearestToCursor;
+      },
       queryCandidates: () => this.game.objectManager.objects,
       isTargetable: candidate => isAnnieTarget(candidate) && candidate.willDraw,
       getTargetInfo: candidate =>
@@ -99,6 +127,40 @@ export default class Annie_Q extends Spell {
     // URF's `manaFree` honest, and it refunds exactly what was charged (see
     // the source scan in tests/game/spells/mana-spend-seam.test.ts).
     this.changeResource(this.owner.stats.mana, this.effectiveMana(this.manaCost));
+  }
+
+  /**
+   * Everyone in range, for the on-screen "this one dies" ring.
+   *
+   * Annie Q stays point-and-click — it is the whole character, and nothing here
+   * picks a target for the player, so there is no `executeFallback`. The mark
+   * is what the ability was missing: a kill refunds the mana *and* halves the
+   * cooldown, which makes "will this one die" the single question Annie asks
+   * all game, and until now it had to be answered by squinting at a health bar.
+   *
+   * `withinRange` rather than a raw distance, and the same body-aware reach the
+   * cast itself is gated on — a ring on someone the cast would refuse is worse
+   * than no ring.
+   */
+  executeCandidates(): AttackableUnit[] {
+    const found = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.range + this.owner.stats.size.value,
+      }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+    }) as AttackableUnit[];
+
+    const reachable: AttackableUnit[] = [];
+    for (const candidate of found) {
+      if (withinRange(this.range, this.owner, candidate)) reachable.push(candidate);
+    }
+    return reachable;
+  }
+
+  executeDamageAgainst(_target: AttackableUnit): number {
+    return DAMAGE;
   }
 
   drawPreview() {

@@ -24,6 +24,13 @@ export class TestVector {
   }
   dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
   heading() { return Math.atan2(this.y, this.x); }
+  /** In place, like p5's — `Obstacle.getBoundingBox` rotates and then reads x/y. */
+  rotate(angle: number) {
+    const { x, y } = this;
+    this.x = x * Math.cos(angle) - y * Math.sin(angle);
+    this.y = x * Math.sin(angle) + y * Math.cos(angle);
+    return this;
+  }
   static add(a: TestVector, b: TestVector) { return new TestVector(a.x + b.x, a.y + b.y); }
   static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
   static dist(a: TestVector, b: TestVector) { return a.dist(b); }

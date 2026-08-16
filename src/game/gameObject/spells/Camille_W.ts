@@ -18,7 +18,7 @@ export const CAMILLE_W_WINDUP_MS = 200;
 export default class Camille_W extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_camille_w');
-  name = 'Quét Bán Nguyệt (Camille_W)';
+  name = 'Đá Quét Chiến Thuật (Camille_W)';
   description =
     'Quét chân theo hình nón trước mặt. Kẻ địch ở viền ngoài chịu <span class="damage">40 sát thương</span>, bị <span class="buff">Làm Chậm 80%</span> trong <span class="time">2 giây</span> và hồi máu cho Camille.';
   coolDown = 10000;

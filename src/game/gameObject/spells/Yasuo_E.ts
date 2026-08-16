@@ -51,7 +51,10 @@ export default class Yasuo_E extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.rangeToFindEnemies, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
     if (enemiesInRange.length == 0) {
       this.resetCoolDown();

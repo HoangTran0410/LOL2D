@@ -35,7 +35,7 @@ export const MISSILE_SIZE = 30;
 
 export default class Veigar_R extends Spell {
   image = AssetManager.get('spell_veigar_r');
-  name = 'Bùng Nổ Nguyên Thủy (Veigar_R)';
+  name = 'Vụ Nổ Vũ Trụ (Veigar_R)';
   description =
     `Gửi một luồng năng lượng nguyên thủy đến kẻ địch mục tiêu, gây <span class="damage">${BASE_DAMAGE} sát thương</span>,` +
     ` tăng lên tối đa <span class="damage">${BASE_DAMAGE * (1 + MAX_MISSING_HEALTH_MULTIPLIER)} sát thương</span> dựa trên lượng máu đã mất của mục tiêu.`;

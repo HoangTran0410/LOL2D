@@ -50,7 +50,10 @@ export default class Ignite extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     let nearest = null;

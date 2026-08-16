@@ -37,7 +37,7 @@ export const HARD_STOP_MS = DURATION + 1200;
 export default class Varus_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_varus_w');
-  name = 'Ống Tên Bệnh Dịch (Varus_W)';
+  name = 'Tên Độc (Varus_W)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>, mỗi đòn đánh thường bám thêm` +
     ` <span class="damage">${BLIGHT_PER_TICK} sát thương mỗi nhịp</span> trong` +

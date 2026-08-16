@@ -15,7 +15,7 @@ export default class Nasus_W extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nasus_w');
-  name = 'Suy Yếu (Nasus_W)';
+  name = 'Lão Hóa (Nasus_W)';
   description =
     `Nguyền rủa kẻ địch gần nhất trong <span>${RANGE}px</span>, <span class="buff">Làm Chậm ${SLOW_PERCENT * 100}%</span>` +
     ` và giảm tốc độ đánh của chúng trong <span class="time">${DURATION / 1000} giây</span>`;
@@ -60,7 +60,10 @@ export default class Nasus_W extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     let nearest = null;

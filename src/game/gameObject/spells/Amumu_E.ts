@@ -17,7 +17,7 @@ export const LINEN: [number, number, number] = [235, 222, 172];
 export default class Amumu_E extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_amumu_e');
-  name = 'Nổi Giận (Amumu_E)';
+  name = 'Giận Dữ (Amumu_E)';
   description =
     `Đập xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho mọi kẻ địch trong` +
     ` <span>${RADIUS}px</span> quanh mình`;

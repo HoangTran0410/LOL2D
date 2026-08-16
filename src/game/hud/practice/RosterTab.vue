@@ -36,6 +36,7 @@
  */
 import { computed, inject, onUnmounted, ref, shallowRef } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
+import { scoreLine, statGroups } from './participantStats';
 import type { BotBehaviour, RosterEntry } from '../../MatchDirector';
 import type { ChampionLoadout } from '../../config/PregameConfig';
 import { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } from '../../config/PregameConfig';
@@ -119,6 +120,29 @@ const setFlag = (entry: RosterEntry, flag: keyof BotBehaviour, on: boolean): voi
 
 const onFlagChange = (entry: RosterEntry, flag: keyof BotBehaviour, event: Event): void =>
   setFlag(entry, flag, (event.target as HTMLInputElement).checked);
+
+/**
+ * Which cards have their stat sheet open, keyed by unit id rather than by row
+ * index — removing Bot 1 shifts every index below it, and an open sheet would
+ * jump to a different bot instead of closing.
+ *
+ * Not persisted anywhere. The panel mounts every tab with `v-if` and keeps
+ * nothing alive, so this resets on a tab switch, which is right for a peek and
+ * also what keeps the numbers fresh: a remount re-reads them. Nothing has to
+ * invalidate them while the sheet is open, because the panel holds the match
+ * paused — see the trap in CLAUDE.md.
+ */
+const expanded = ref(new Set<string>());
+
+const isExpanded = (entry: RosterEntry): boolean => expanded.value.has(entry.unit.id);
+
+const toggleStats = (entry: RosterEntry): void => {
+  // A new Set rather than mutating in place: `ref` tracks the reference, and a
+  // `Set` mutated through it does not notify.
+  const next = new Set(expanded.value);
+  if (!next.delete(entry.unit.id)) next.add(entry.unit.id);
+  expanded.value = next;
+};
 
 const BEHAVIOUR_FLAGS: { key: keyof BotBehaviour; label: string }[] = [
   // Same three settings, same order and the same words as `AiConfigPanel.vue`
@@ -246,6 +270,45 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
         >
           <i class="fas fa-times"></i>
         </button>
+      </div>
+
+      <!-- The scoreboard line, always on the card, and the way into the rest.
+           Three numbers is what fits at 390px beside a chevron; everything else
+           is one tap away rather than eleven rows taller. -->
+      <button
+        type="button"
+        class="practice-stat-toggle"
+        :aria-expanded="isExpanded(entry)"
+        :aria-label="`Chỉ số của ${labelOf(index)}`"
+        @click="toggleStats(entry)"
+      >
+        <span class="practice-score">
+          <span class="practice-score-k">{{ scoreLine(entry.unit).kills }}</span>
+          <span class="practice-score-sep">/</span>
+          <span class="practice-score-d">{{ scoreLine(entry.unit).deaths }}</span>
+          <span class="practice-score-sep">/</span>
+          <span class="practice-score-cs">{{ scoreLine(entry.unit).cs }}</span>
+        </span>
+        <span class="practice-score-legend">hạ gục / bị hạ / lính</span>
+        <i
+          class="fas practice-stat-caret"
+          :class="isExpanded(entry) ? 'fa-chevron-up' : 'fa-chevron-down'"
+          aria-hidden="true"
+        ></i>
+      </button>
+
+      <div v-if="isExpanded(entry)" class="practice-stat-sheet">
+        <section
+          v-for="group of statGroups(entry.unit)"
+          :key="group.title"
+          class="practice-stat-group"
+        >
+          <h4 class="practice-stat-title">{{ group.title }}</h4>
+          <div v-for="row of group.rows" :key="row.label" class="practice-stat-row">
+            <span class="practice-stat-label">{{ row.label }}</span>
+            <span class="practice-stat-value">{{ row.value }}</span>
+          </div>
+        </section>
       </div>
 
       <!-- Bots only: the player's own movement, attacks and casts are the

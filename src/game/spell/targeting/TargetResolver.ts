@@ -1,5 +1,6 @@
 import { CURSOR_ACQUISITION_RADIUS } from '../../combat/AttackTargeting';
 import { effectiveRange } from '../../combat/Reach';
+import { canSee, type Seeable } from '../../combat/Vision';
 import type { CancelReason, CastContext, TargetingMode, Vec2 } from '../runtime/types';
 
 export type TargetTeam = 'ALLY' | 'ENEMY' | 'ANY';
@@ -54,13 +55,35 @@ export interface TargetRequest {
    * acquisition circle is never harder to click than a small one.
    */
   readonly acquisitionRadius?: number;
+
+  /**
+   * Which of the in-range candidates to take when the cursor is not on anybody.
+   * Handed everything the spell could legally hit, plus the one this resolver
+   * would have chosen by itself (the nearest to the cursor) so an opinionated
+   * spell only has to state the part it cares about.
+   *
+   * Never consulted while the player *is* aiming at someone: aim is not
+   * overruled, only answered when there was none — the rule
+   * `BasicAttack.acquire` already follows.
+   */
+  readonly pickWithoutAim?: (
+    candidates: readonly unknown[],
+    nearestToCursor: unknown
+  ) => unknown | undefined;
+
   readonly queryCandidates?: () => readonly unknown[];
   readonly isTargetable?: (candidate: unknown) => boolean;
   readonly getTargetInfo?: (candidate: unknown) => TargetInfo | null;
 }
 
 export type TargetingRequest = Partial<Pick<TargetRequest,
-  'range' | 'targetTeam' | 'acquisitionRadius' | 'queryCandidates' | 'isTargetable' | 'getTargetInfo'
+  | 'range'
+  | 'targetTeam'
+  | 'acquisitionRadius'
+  | 'pickWithoutAim'
+  | 'queryCandidates'
+  | 'isTargetable'
+  | 'getTargetInfo'
 >>;
 
 export type TargetResolution =
@@ -119,19 +142,23 @@ export class TargetResolver {
     const candidates = request.queryCandidates?.() ?? [];
     const acquisitionRadius = Math.max(0, request.acquisitionRadius ?? CURSOR_ACQUISITION_RADIUS);
     let hadIneligibleByRange = false;
-    let bestTarget: unknown;
-    let bestCursorDistance = Number.POSITIVE_INFINITY;
+
+    // Two tiers, and the split is the whole of this method.
+    //
+    // The acquisition circle used to be a *filter*: a unit further from the
+    // cursor than `acquisitionRadius` was dropped outright, so a minion well
+    // inside the spell's range but on the far side of the caster from the
+    // cursor made the key do nothing at all. Range is the only thing that
+    // decides what a spell may hit; the cursor decides which of those it takes.
+    const inRange: unknown[] = [];
+    let aimedAt: unknown;
+    let aimedDistance = Number.POSITIVE_INFINITY;
+    let nearestToCursor: unknown;
+    let nearestDistance = Number.POSITIVE_INFINITY;
 
     for (const candidate of candidates) {
       const info = request.getTargetInfo?.(candidate);
       if (!info) continue;
-      const cursorDistance = distance(request.cursorWorld, info.position);
-      // The cursor acquires a body the way an attack order does, rather than
-      // demanding a hit on the ~27px selection circle. Before this, Janna E and
-      // W refused to fire unless you were exactly on a body, while Lee Sin W
-      // looked like it had smarter targeting — it does not; it declares
-      // `targeting: 'SELF'`, a mode that never consults the cursor at all.
-      if (cursorDistance > Math.max(info.selectionRadius ?? 0, acquisitionRadius)) continue;
       if (request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
         continue;
       }
@@ -139,6 +166,10 @@ export class TargetResolver {
       // holds at arm's length, so both ends pay for their excess size here.
       // Reading it off the candidate rather than off TargetInfo means the
       // spells that supply their own getTargetInfo stay size-aware for free.
+      //
+      // Checked before the cursor now rather than after: it is what sets
+      // `hadIneligibleByRange`, and behind the old cursor filter an out-of-range
+      // enemy the player was pointing away from reported TARGET_INVALID.
       if (
         request.range !== undefined &&
         distance(request.origin, info.position) >
@@ -148,14 +179,39 @@ export class TargetResolver {
         continue;
       }
 
-      if (cursorDistance < bestCursorDistance) {
-        bestTarget = candidate;
-        bestCursorDistance = cursorDistance;
+      // You cannot nominate what you cannot see. One gate covering every
+      // UNIT-mode spell at once: each of them feeds its own `queryCandidates`
+      // and not one of those queries had ever asked about the fog.
+      //
+      // Below the range check on purpose. An enemy who is both out of range and
+      // out of sight is out of *range* as far as the player is concerned — put
+      // above, this would swallow `hadIneligibleByRange` and turn every such
+      // press into TARGET_INVALID.
+      if (!canSee(request.caster as Seeable, candidate as Seeable)) continue;
+
+      inRange.push(candidate);
+      const cursorDistance = distance(request.cursorWorld, info.position);
+      if (cursorDistance < nearestDistance) {
+        nearestToCursor = candidate;
+        nearestDistance = cursorDistance;
+      }
+
+      // "The player is pointing at this one" — the same reach an attack order
+      // acquires with, so aiming means one thing in this game rather than one
+      // thing per spell. A body bigger than the circle is never harder to click.
+      if (cursorDistance > Math.max(info.selectionRadius ?? 0, acquisitionRadius)) continue;
+      if (cursorDistance < aimedDistance) {
+        aimedAt = candidate;
+        aimedDistance = cursorDistance;
       }
     }
 
-    if (bestTarget !== undefined) {
-      return { ok: true, context: createContext(request, bestTarget) };
+    if (aimedAt !== undefined) {
+      return { ok: true, context: createContext(request, aimedAt) };
+    }
+    if (inRange.length > 0) {
+      const chosen = request.pickWithoutAim?.(inRange, nearestToCursor) ?? nearestToCursor;
+      return { ok: true, context: createContext(request, chosen) };
     }
     return {
       ok: false,

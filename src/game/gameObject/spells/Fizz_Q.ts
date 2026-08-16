@@ -24,7 +24,7 @@ export default class Fizz_Q extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_fizz_q');
-  name = 'Đâm Xuyên (Fizz_Q)';
+  name = 'Đâm Lao (Fizz_Q)';
   description =
     `Lướt xuyên qua kẻ địch gần nhất trong <span>${RANGE}px</span>, gây` +
     ` <span class="damage">${DAMAGE} sát thương</span> và dừng lại phía sau lưng chúng`;
@@ -84,7 +84,10 @@ export default class Fizz_Q extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
     let nearest = null;
     let nearestDistance = Infinity;

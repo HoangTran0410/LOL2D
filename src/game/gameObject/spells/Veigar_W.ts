@@ -26,7 +26,7 @@ const RUSH_MS = 250;
 export default class Veigar_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_veigar_w');
-  name = 'Vật Chất Hắc Ám (Veigar_W)';
+  name = 'Thiên Thạch Đen (Veigar_W)';
   description =
     `Gọi một khối vật chất hắc ám giáng xuống vị trí chỉ định. Vùng đất bị ảnh hưởng hiện rõ trong <span class="time">${WINDUP_MS / 1000} giây</span> trước khi nổ, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch còn đứng trong vùng.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade

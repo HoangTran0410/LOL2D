@@ -701,6 +701,120 @@
   display: contents;
 }
 
+/* ------------------------------------------- Stat sheet (participantStats.ts)
+   The scoreboard strip under each roster row, and the sheet it opens.
+
+   The strip is a button spanning the card rather than a chevron at one end:
+   three digits are a small target, and this modal holds everything else to the
+   44px thumb minimum. It is also the only row here that is *read-only*, so it
+   is deliberately quieter than the loadout button above it — no border of its
+   own, muted legend, the numbers doing the talking. */
+.practice-stat-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 40px;
+  padding: 0.35rem 0.8rem;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--hextech-line);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.practice-stat-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.practice-score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05em;
+}
+
+/* Killed / died / farmed, coloured the way the health bars already are: the
+   game's green is "yours and healthy", its red is "someone took damage". */
+.practice-score-k {
+  color: #43c41d;
+}
+.practice-score-d {
+  color: #c4431d;
+}
+.practice-score-cs {
+  color: var(--hextech-gold);
+}
+
+.practice-score-sep {
+  color: #666;
+}
+
+.practice-score-legend {
+  flex: 1;
+  min-width: 0;
+  color: var(--hextech-muted);
+  font-size: 0.7em;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-stat-caret {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 0.8em;
+}
+
+/* Two columns at panel width, one on a phone. `auto-fit` rather than a media
+   query so it collapses on the narrow *panel* too, which is what actually
+   varies — the modal is 760px on desktop and near-viewport on a handset. */
+.practice-stat-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.2rem 1.2rem;
+  padding: 0.5rem 0.8rem 0.7rem;
+  border-top: 1px solid var(--hextech-line);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.practice-stat-title {
+  margin: 0.4rem 0 0.2rem;
+  color: var(--hextech-gold);
+  font-size: 0.72em;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.practice-stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1px 0;
+  font-size: 0.8em;
+}
+
+.practice-stat-label {
+  color: var(--hextech-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tabular figures so a column of numbers lines up on the decimal point rather
+   than wandering with the glyph widths. */
+.practice-stat-value {
+  flex-shrink: 0;
+  color: #ddd;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Native range controls still need a generous hit box: the browser track is
    ~16px tall, while a thumb target should be at least 44px. */
 .practice-tab-body input[type='range'] {

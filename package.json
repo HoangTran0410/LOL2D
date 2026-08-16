@@ -9,6 +9,8 @@
     "ability:import": "node scripts/wiki/import-abilities.mjs",
     "ability:update": "node scripts/wiki/import-abilities.mjs --update",
     "ability:check": "node scripts/wiki/check-abilities.mjs",
+    "names:sync": "node scripts/wiki/sync-spell-names.mjs",
+    "names:apply": "node scripts/wiki/sync-spell-names.mjs --apply",
     "predev": "npm run assets:generate",
     "dev": "vite",
     "prebuild": "npm run assets:generate",

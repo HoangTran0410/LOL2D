@@ -110,6 +110,19 @@ export default class Buff {
   }
 
   /**
+   * Called once damage has been mitigated and applied, whatever the outcome —
+   * including a hit a shield swallowed whole.
+   *
+   * `swung` is what arrived before anything ate it; `landed` is what actually
+   * reached health. It cannot change either, and that is the point: a buff that
+   * *reacts* to being hit (Rammus W's spikes, Annie E's shield burn) has no
+   * business being a link in the mitigation chain, where the answer depends on
+   * whether some other buff was added before or after it. Two shields on one
+   * unit put a reflect behind them and it silently stopped firing.
+   */
+  onDamageTaken(_swung: number, _landed: number, _attacker?: AttackableUnit): void {}
+
+  /**
    * Damage this buff can still absorb, drawn as a grey overlay on the health
    * bar. Anything that soaks damage should report it here so the player can see
    * how much cushion is left; the health bar never has to know the class.

@@ -11,7 +11,7 @@ import TrailSystem from '../helpers/TrailSystem';
 export default class Ashe_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_q');
-  name = 'Mưa Tên Băng Giá (Ashe_Q)';
+  name = 'Chú Tâm Tiễn (Ashe_Q)';
   description =
     'Bắn liên tiếp <span>3 mũi tên băng</span> theo hình nón hẹp. Mỗi mũi tên gây <span class="damage">8 sát thương</span> và <span class="buff">Làm Chậm 30%</span> kẻ địch trúng chiêu trong <span class="time">1 giây</span>';
   coolDown = 4000;

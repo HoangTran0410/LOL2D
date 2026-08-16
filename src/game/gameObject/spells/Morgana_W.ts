@@ -21,9 +21,68 @@ export const MANA_COST = 50;
 
 type ShadowTarget = AttackableUnit;
 
+/**
+ * 137.5°, the angle successive seeds sit at in a sunflower head. Stepping by it
+ * is the standard way to scatter N points over a disc without any two lining
+ * up, for *any* N — which is the property that was missing here.
+ */
+const GOLDEN_ANGLE = 2.399963;
+
+/** Deterministic [0,1) noise, so the layout is stable across frames and casts. */
+const hash = (i: number, salt: number): number => {
+  const x = Math.sin(i * 12.9898 + salt) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+export interface Spike {
+  /** Radians around the zone centre. */
+  angle: number;
+  /** 0..1 of the zone radius. */
+  radiusRatio: number;
+  /** How long one rise-and-sink takes. */
+  loopMs: number;
+  /** Where in that loop this spike starts, so they do not pump in unison. */
+  phaseOffsetMs: number;
+}
+
+/**
+ * Where the spikes stand.
+ *
+ * The old layout put spike `i` at `angle = i * 3.171 * 2` — that is `i * 6.342`
+ * against a circle of `6.28318`, so consecutive spikes were **0.06 radians**
+ * apart and all ten crowded into a 30° sliver of a 220px zone. The rest of the
+ * cursed ground had nothing growing out of it.
+ *
+ * Deterministic rather than `random()` for the same reason the motes below are:
+ * `draw()` runs every frame, so a random layout would re-roll 60 times a second
+ * and the spikes would strobe instead of rise. It also makes the spread
+ * something a test can state, which a `random()` table is not.
+ */
+export function spikeLayout(count: number): Spike[] {
+  const spikes: Spike[] = [];
+  for (let i = 0; i < count; i++) {
+    // sqrt, so the points are even by *area* — a linear ramp crowds the middle.
+    const radiusRatio = (0.18 + 0.74 * Math.sqrt((i + 0.5) / count)) * (0.92 + hash(i, 7.1) * 0.16);
+    const loopMs = 780 + hash(i, 3.3) * 520;
+    spikes.push({
+      // the jitter is small enough to keep the coverage even and large enough
+      // that the result does not read as a spiral
+      angle: i * GOLDEN_ANGLE + (hash(i, 1.7) - 0.5) * 0.4,
+      radiusRatio: Math.min(radiusRatio, 0.97),
+      loopMs,
+      phaseOffsetMs: hash(i, 5.9) * loopMs,
+    });
+  }
+  return spikes;
+}
+
+/** 220px of cursed ground carries more than the ten it used to try to. */
+export const SPIKE_COUNT = 18;
+const SPIKES = spikeLayout(SPIKE_COUNT);
+
 export default class Morgana_W extends Spell {
   image = AssetManager.get('spell_morgana_w');
-  name = 'Bóng Tối Hành Hạ (Morgana_W)';
+  name = 'Vùng Đất Chết (Morgana_W)';
   description =
     'Nguyền rủa mặt đất tại vị trí chỉ định trong <span class="time">5 giây</span>, gây <span class="damage">3-5 sát thương phép mỗi 0.5 giây</span> cho kẻ địch đứng trong đó — sát thương tăng theo phần trăm máu đã mất của mục tiêu, và tăng 70% khi nhắm vào quái rừng.';
   coolDown = 9_000;
@@ -116,17 +175,13 @@ export class Morgana_W_Object extends AreaSpellObject {
     circle(0, 0, this.radius * 2);
 
     // corrupted spikes rising and sinking back into the ground
-    const SPIKE_COUNT = 10;
-    for (let i = 0; i < SPIKE_COUNT; i++) {
-      const seed = i * 3.171;
-      const loopMs = 900 + (i % 4) * 160;
-      const phase = ((this.elapsedMs + seed * 260) % loopMs) / loopMs;
+    for (const spike of SPIKES) {
+      const phase = ((this.elapsedMs + spike.phaseOffsetMs) % spike.loopMs) / spike.loopMs;
       const rise = sin(phase * PI);
       if (rise <= 0.02) continue;
-      const a = seed * 2;
-      const r = this.radius * (0.15 + ((i * 0.181) % 1) * 0.78);
-      const px = cos(a) * r;
-      const py = sin(a) * r;
+      const r = this.radius * spike.radiusRatio;
+      const px = cos(spike.angle) * r;
+      const py = sin(spike.angle) * r;
       const spikeHeight = 10 + rise * 26;
 
       push();

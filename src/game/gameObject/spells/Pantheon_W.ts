@@ -35,10 +35,10 @@ export default class Pantheon_W extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_pantheon_w');
-  name = 'Khiên Xung Kích (Pantheon_W)';
+  name = 'Khiên Trời Giáng (Pantheon_W)';
   description =
-    `Lao tới kẻ địch gần nhất trong <span>${RANGE}px</span>. <i>Khi đáp xuống</i>, đập khiên gây` +
-    ` <span class="damage">${DAMAGE} sát thương</span>` +
+    `Lao tới kẻ địch <i>gần con trỏ chuột nhất</i> trong <span>${RANGE}px</span>.` +
+    ` <i>Khi đáp xuống</i>, đập khiên gây <span class="damage">${DAMAGE} sát thương</span>` +
     ` và <span class="buff">Choáng</span> trong <span class="time">${STUN_DURATION / 1000} giây</span>`;
   coolDown = 9000;
   manaCost = 30;
@@ -118,19 +118,38 @@ export default class Pantheon_W extends Spell {
     target.addBuff(new Stun(STUN_DURATION, this.owner, target));
   }
 
+  /**
+   * Who the vault picks: every enemy inside `RANGE` of Pantheon is a candidate,
+   * and the one nearest the **cursor** wins.
+   *
+   * It used to take whoever stood closest to *him*, which made the ability
+   * unaimable — in a lane fight the front minion is always nearer than the
+   * champion behind it, so the gap-closer spent itself on the wrong body and
+   * there was nothing the player could do about it. Breaking the tie with the
+   * cursor is the documented shape for these auto-locking `SELF` spells (see
+   * "Auto-locking spells" in docs/ADDING_SPELLS.md, and Yasuo E, which picks
+   * the same way).
+   *
+   * On touch, `SELF` gives no aim and the cursor sits on the champion, so this
+   * degrades back to nearest-to-Pantheon rather than to nothing.
+   */
   _findTarget(): AttackableUnit | null {
+    const aim = this.aimPoint;
     const enemies = this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     }) as AttackableUnit[];
     let nearest: AttackableUnit | null = null;
     let nearestDistance = Infinity;
     for (const enemy of enemies) {
-      const distance = this.owner.position.dist(enemy.position);
+      const distance = enemy.position.dist(aim);
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearest = enemy;
@@ -139,13 +158,39 @@ export default class Pantheon_W extends Spell {
     return nearest;
   }
 
+  /**
+   * The reach, plus a lock ring on whoever the cursor has currently chosen.
+   * An aimed auto-lock has to show its pick, or the player is guessing which of
+   * two bodies the vault is about to take.
+   */
   drawPreview() {
     super.drawPreview(effectiveRange(this.range, this.owner));
+
+    const target = this._findTarget();
+    if (!target) return;
+
+    const size = target.stats.size.value + 16 + Math.sin(frameCount / 8) * 3;
+    push();
+    noFill();
+    stroke(20, 25, 40, 130);
+    strokeWeight(5);
+    circle(target.position.x, target.position.y, size);
+    stroke(248, 226, 176, 220);
+    strokeWeight(2.5);
+    circle(target.position.x, target.position.y, size);
+    pop();
   }
 }
 
-/** Bronze aegis outline, drawn pointing along +x in an already-rotated frame. */
-const drawAegis = (size: number, alpha: number): void => {
+/**
+ * Bronze aegis outline, drawn pointing along +x in an already-rotated frame.
+ *
+ * Exported because the whole kit is this shield: W leads the leap with it, E
+ * plants it in the dirt and R rides it down out of the sky. One silhouette
+ * across four abilities is what makes the champion readable at a glance, which
+ * is the first rule in docs/VFX_STANDARD.md.
+ */
+export const drawAegis = (size: number, alpha: number): void => {
   // A kite shield: wide at the shoulder, tapering to a point that leads the
   // leap. Shared by the flight and the landing so it is recognisably one object.
   noStroke();

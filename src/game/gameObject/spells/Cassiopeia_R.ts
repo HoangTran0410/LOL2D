@@ -39,7 +39,7 @@ const MARK_LIFETIME = 340;
 export default class Cassiopeia_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_cassiopeia_r');
-  name = 'Ánh Nhìn Hóa Đá (Cassiopeia_R)';
+  name = 'Cái Nhìn Hóa Đá (Cassiopeia_R)';
   description =
     `Quét một hình nón <span>${REACH}px</span> theo hướng chỉ định trong` +
     ` <span class="time">${SWEEP_DURATION / 1000} giây</span>: <span class="damage">${DAMAGE} sát thương</span>,` +

@@ -24,7 +24,7 @@ const CROWD_CONTROL = [Stun, Root, Slow, Silence, Fear, Charm, Airborne];
 export default class Olaf_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_olaf_r');
-  name = 'Ragnarok (Olaf_R)';
+  name = 'Tận Thế Ragnarok (Olaf_R)';
   description =
     `Gỡ bỏ <span class="buff">mọi hiệu ứng khống chế</span> đang dính, và trong` +
     ` <span class="time">${DURATION / 1000} giây</span> nhận <span class="buff">+${BONUS_DAMAGE} sát thương đánh thường</span>` +

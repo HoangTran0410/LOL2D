@@ -38,7 +38,7 @@ export const SPAWN_OFFSET_DISTANCE = 60;
 
 export default class Anivia_E extends Spell {
   image = AssetManager.get('spell_anivia_e');
-  name = 'Frostbite (Anivia_E)';
+  name = 'Tê Cóng (Anivia_E)';
   description = `Anivia bắn một mũi băng vào mục tiêu, gây <span class="damage">${BASE_DAMAGE} sát thương</span>, tăng gấp đôi thành <span class="damage">${CHILLED_DAMAGE}</span> nếu mục tiêu đang <span class="buff">Nhiễm Lạnh</span> (bị Sương Băng hoặc Bão Tuyết đã hình thành đầy đủ đánh trúng gần đây).`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;

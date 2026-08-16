@@ -44,7 +44,7 @@ export const STACK_ID = 'twitch_r';
 export default class Twitch_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_twitch_r');
-  name = 'Vãi Đạn (Twitch_R)';
+  name = 'Nhắm Mắt Bắn Bừa (Twitch_R)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+${BONUS_RANGE} tầm đánh</span>,` +
     ` <span class="buff">+${BONUS_DAMAGE} sát thương đánh thường</span>,` +

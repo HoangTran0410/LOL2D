@@ -7,6 +7,7 @@ import type {
   AttackableUnitRenderOptions,
   UnitDeathData,
 } from './AttackableUnit';
+import type { KillCredit } from '../../combat/MatchTally';
 import Airborne from '../buffs/Airborne';
 import Charm from '../buffs/Charm';
 import Dash from '../buffs/Dash';
@@ -83,7 +84,17 @@ export const healthTickStep = (maxHealth: number): number => {
 
 export default class Champion extends AttackableUnit {
   static displayZIndex = 4;
-  score = 0;
+  killCredit: KillCredit = 'champion';
+
+  /**
+   * The number on the health bar, now a view of the ledger rather than its own
+   * counter. It means exactly what it always did — kills minus deaths — but the
+   * two halves are separately readable, which is what a scoreboard needs.
+   */
+  get score(): number {
+    return this.tally.score;
+  }
+
   name?: string;
   spells: Spell[] = [];
 
@@ -102,7 +113,6 @@ export default class Champion extends AttackableUnit {
       stats,
     });
 
-    this.score = 0;
     // A champion with no preset at all is still a champion: it gets the default
     // attack profile rather than a unit that cannot swing.
     if (preset) this.applyPreset(preset);
@@ -442,9 +452,9 @@ export default class Champion extends AttackableUnit {
   }
 
   die(deathData: UnitDeathData) {
+    // The ledger is `AttackableUnit.die`'s: it is the one place that knows
+    // whether a death was already counted, and a turret's kill is a kill.
     super.die(deathData);
     this.basicAttack.clear();
-    this.score--;
-    if (deathData.attacker instanceof Champion) deathData.attacker.score++;
   }
 }

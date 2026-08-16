@@ -1,0 +1,73 @@
+import { describe, expect, it } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
+ * A spell that picks an enemy for you must first be able to see them.
+ *
+ * Two dozen abilities auto-lock — they take the nearest body out of a
+ * `queryObjects` circle and commit to it — and every one of those queries knew
+ * about teams, death and targetability and nothing about the fog. Warwick R
+ * found the blue camp through a jungle wall, on a screen showing nothing but
+ * black, and leaped through the wall to bite it. `PredefinedFilters.visibleTo`
+ * is the gate; `combat/Vision.ts` is what it asks.
+ *
+ * A source scan rather than a behaviour test, for the usual reason: the mistake
+ * is a *missing* line, so there is no shape for `tsc` to reject and no single
+ * place to test — but "picks one unit out of a query" has a recognisable
+ * fingerprint, and ruling it out across every spell at once costs a
+ * millisecond. It is a net, not a proof: an auto-lock written some other way
+ * slips through, and the standing rule (any query whose result is *narrowed to
+ * a chosen unit* carries the filter) is what actually governs.
+ *
+ * Area effects are deliberately out of scope, and that is the whole distinction
+ * this module rests on: vision gates target *acquisition*, never damage
+ * application. Amumu W ticking on everyone inside its ring hits the champion
+ * hiding in the bush, exactly as it should.
+ */
+const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+
+/** Comments describe the rule; matching them would flag the documentation. */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
+/**
+ * The auto-lock fingerprint: a running "best so far" distance, which is what
+ * every one of these spells uses to narrow a query down to a single victim.
+ */
+const PICKS_ONE_UNIT = /nearestDistance|closestDistance|nearestDist\b|minD\b/;
+
+/**
+ * Exempt: a query restricted to the caster's own team. `canSee` returns true
+ * for an ally unconditionally, so the filter there would be a line of noise
+ * rather than a rule — Lee Sin W dashing to a friend is the live example.
+ */
+const ALLIES_ONLY = /PredefinedFilters\.teamId\(/;
+
+describe('an auto-locking spell cannot pick a target it cannot see', () => {
+  it('every nearest-enemy picker passes visibleTo to its query', () => {
+    const offenders: string[] = [];
+
+    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
+      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+      if (!source.includes('queryObjects')) continue;
+      if (!PICKS_ONE_UNIT.test(source)) continue;
+      if (ALLIES_ONLY.test(source)) continue;
+      if (!source.includes('PredefinedFilters.visibleTo')) offenders.push(file);
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('the scan is looking at a real population, not an empty one', () => {
+    // A fingerprint that matched nothing would pass forever while the rule rots.
+    let scanned = 0;
+    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
+      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+      if (source.includes('queryObjects') && PICKS_ONE_UNIT.test(source)) scanned++;
+    }
+
+    expect(scanned).toBeGreaterThan(15);
+  });
+});

@@ -12,7 +12,7 @@ import type AttackableUnit from '../attackableUnits/AttackableUnit';
 export const RANGE = 550;
 export const LEAP_SPEED = 24;
 export const SUPPRESS_MS = 1500;
-export const DAMAGE_PER_TICK = 9;
+export const DAMAGE_PER_TICK = 10;
 export const TICK_INTERVAL = 300;
 
 /** How long one claw streak dropped by the leap stays in the air. */
@@ -39,9 +39,9 @@ export default class Warwick_R extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_warwick_r');
-  name = 'Trói Buộc Vô Tận (Warwick_R)';
+  name = 'Khóa Chết (Warwick_R)';
   description =
-    `Nhảy tới kẻ địch gần nhất trong <span>${RANGE}px</span>, ghim chúng` +
+    `Nhảy tới kẻ địch gần con trỏ nhất trong <span>${RANGE}px</span>, ghim chúng` +
     ` <span class="buff">Choáng</span> trong <span class="time">${SUPPRESS_MS / 1000} giây</span>` +
     ` và cắn <span class="damage">${DAMAGE_PER_TICK} sát thương</span> mỗi nhịp`;
   coolDown = 10000;
@@ -89,12 +89,21 @@ export default class Warwick_R extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
+    // Range is measured from Warwick — that is what the ultimate can reach —
+    // but *which* of those he takes is measured from the cursor. Nearest-to-
+    // caster picked for you, and it picked wrong in the only fight that
+    // matters: the minion at your feet instead of the champion you are looking
+    // at. Same rule as Zed R, Yasuo E/R, Ekko E and Lee Sin R.
+    const aim = this.aimPoint;
     let nearest = null;
     let nearestDistance = Infinity;
     for (const enemy of enemies) {
-      const distance = this.owner.position.dist(enemy.position);
+      const distance = enemy.position.dist(aim);
       if (distance < nearestDistance) {
         nearestDistance = distance;
         nearest = enemy;

@@ -13,7 +13,7 @@ const BINDING_COLOR: [number, number, number] = [186, 96, 240];
 export default class Morgana_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_morgana_q');
-  name = 'Xiềng Xích Bóng Tối (Morgana_Q)';
+  name = 'Khóa Bóng Tối (Morgana_Q)';
   description =
     'Phóng một xiềng xích bóng tối đi rất xa theo hướng chỉ định, gây <span class="damage">25 sát thương</span> và <span class="buff">Trói Chân</span> kẻ địch đầu tiên trúng phải trong <span class="time">2 giây</span>';
   coolDown = 8000;

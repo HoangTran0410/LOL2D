@@ -57,7 +57,7 @@ export const SMOKE_RADIUS = 40;
 export default class Jinx_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_jinx_r');
-  name = 'Siêu Tên Lửa Hủy Diệt! (Jinx_R)';
+  name = 'Tên Lửa Đạn Đạo Siêu Khủng Khiếp! (Jinx_R)';
   description =
     `Phóng một quả tên lửa <span class="buff">bay khắp bản đồ</span>, chỉ nổ khi trúng` +
     ` <span class="damage">tướng địch</span> (đi xuyên qua lính). Bay càng xa càng nhanh và càng mạnh:` +

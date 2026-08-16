@@ -38,7 +38,7 @@ export const HARD_STOP_MS = DURATION + 1200;
 export default class Warwick_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_warwick_w');
-  name = 'Săn Máu (Warwick_W)';
+  name = 'Mùi Máu (Warwick_W)';
   description =
     `Đánh hơi trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+${SPEED_PERCENT * 100}% tốc chạy</span>` +
     `, <span class="buff">hút ${OMNIVAMP * 100}% máu từ mọi sát thương</span>,` +

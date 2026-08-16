@@ -198,6 +198,8 @@ describe('Morgana R (Soul Shackles)', () => {
     for (const name of [
       'push', 'pop', 'translate', 'fill', 'noFill', 'stroke', 'noStroke',
       'strokeWeight', 'blendMode', 'ADD', 'BLEND',
+      // the chain draws rotated links, so the tether needs these two as well
+      'rotate', 'ellipse',
     ]) {
       vi.stubGlobal(name, name === 'ADD' || name === 'BLEND' ? name : vi.fn());
     }

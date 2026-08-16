@@ -15,7 +15,7 @@ const LINEN_DARK: [number, number, number] = [125, 108, 66];
 export default class Amumu_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_amumu_q');
-  name = 'Băng Quấn Hận Thù (Amumu_Q)';
+  name = 'Quăng Dải Băng (Amumu_Q)';
   description =
     'Ném một dải băng về hướng chỉ định. Khi trúng kẻ địch đầu tiên, gây <span class="damage">20 sát thương</span>, <span class="buff">Choáng</span> chúng trong <span class="time">1 giây</span> và <span class="buff">Kéo</span> chính bạn tới chỗ chúng <i>(các hiệu ứng khống chế lên Amumu không ngăn được cú kéo này)</i>';
   coolDown = 8000;

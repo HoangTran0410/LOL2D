@@ -38,7 +38,10 @@ export default class LeeSin_R extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.rangeToCheckEnemies, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     if (!enemies?.length) {

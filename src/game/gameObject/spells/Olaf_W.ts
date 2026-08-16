@@ -76,7 +76,7 @@ export const RUNES: number[][][] = [
 export default class Olaf_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_olaf_w');
-  name = 'Đòn Hiểm (Olaf_W)';
+  name = 'Nổi Khùng (Olaf_W)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+${ATTACK_SPEED_PERCENT * 100}% tốc độ đánh</span>,` +
     ` <span class="buff">+${ON_HIT_DAMAGE} sát thương mỗi đòn đánh</span> và` +

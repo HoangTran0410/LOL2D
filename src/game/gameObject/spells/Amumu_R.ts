@@ -12,7 +12,7 @@ export const ROOT_DURATION = 1500;
 export default class Amumu_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_amumu_r');
-  name = 'Lời Nguyền Xác Ướp (Amumu_R)';
+  name = 'Lời Nguyền Xác Ướp U Sầu (Amumu_R)';
   description =
     `Băng quấn bung ra <span>${RADIUS}px</span>, gây <span class="damage">${DAMAGE} sát thương</span>` +
     ` và <span class="buff">Trói Chân</span> mọi kẻ địch trúng phải trong` +

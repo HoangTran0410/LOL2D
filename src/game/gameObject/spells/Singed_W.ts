@@ -17,7 +17,7 @@ import Slow from '../buffs/Slow';
 export default class Singed_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_singed_w');
-  name = 'Keo Dính (Singed_W)';
+  name = 'Keo Siêu Dính (Singed_W)';
   description =
     'Đổ một vũng keo dính xuống khu vực chỉ định, tồn tại trong <span class="time">5 giây</span>. Chiêu này <b>không gây bất kỳ sát thương nào</b>. Kẻ địch đứng trong vũng keo bị <span class="buff">Làm Chậm 60%</span> và bị <span class="buff">Ghìm</span> — vẫn đi được nhưng không thể dùng kỹ năng lướt hay dịch chuyển để thoát ra';
   coolDown = 8000;

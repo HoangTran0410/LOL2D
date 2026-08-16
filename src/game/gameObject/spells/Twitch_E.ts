@@ -11,7 +11,7 @@ export const DAMAGE = 26;
 export default class Twitch_E extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_twitch_e');
-  name = 'Kích Độc (Twitch_E)';
+  name = 'Nhiễm Khuẩn (Twitch_E)';
   description =
     `Kích nổ chất độc: mọi kẻ địch <span class="damage">đang nhiễm độc</span> trong <span>${RANGE}px</span>` +
     ` nhận <span class="damage">${DAMAGE} sát thương</span> và mất hiệu ứng độc`;

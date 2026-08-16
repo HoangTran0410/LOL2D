@@ -50,7 +50,7 @@ export class Janna_W_Passive extends StatAmp {
 
 export default class Janna_W extends Spell {
   image = AssetManager.get('spell_janna_w');
-  name = 'Phù Vân (Janna_W)';
+  name = 'Gió Tây (Janna_W)';
   description = `Nội tại: Janna luôn được <span class="buff">Ma Hoá</span> và <span class="buff">+${Math.round(PASSIVE_SPEED_PERCENT * 100)}% Tốc Độ Di Chuyển</span>. Chủ động: gửi một linh hồn gió vào mục tiêu, gây <span class="damage">${DAMAGE} sát thương</span> và <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;

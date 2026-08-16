@@ -1,19 +1,29 @@
-import { Rectangle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import CollideUtils from '../../../utils/collide.utils';
 import VectorUtils from '../../../utils/vector.utils';
+import { PredefinedFilters } from '../../managers/ObjectManager';
 import BuffAddType from '../../enums/BuffAddType';
 import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import StatAmp from '../buffs/StatAmp';
 import TrailSystem from '../helpers/TrailSystem';
+import type { ExecuteSpell } from '../../combat/ExecuteTargeting';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
-export default class Veigar_Q extends Spell {
+/** Diameter of the orb, shared by the missile, the aim line and the preview. */
+export const ORB_SIZE = 26;
+
+export default class Veigar_Q extends Spell implements ExecuteSpell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_veigar_q');
-  name = 'Quả Cầu Bóng Tối (Veigar_Q)';
+  name = 'Điềm Gở (Veigar_Q)';
   description =
-    'Bắn ra một quả cầu năng lượng hắc ám xuyên qua mọi kẻ địch, gây <span class="damage">22 sát thương</span>. Mỗi kẻ địch trúng chiêu giúp Veigar <span class="buff">cộng dồn vĩnh viễn +20 năng lượng tối đa</span>';
+    'Bắn ra một quả cầu năng lượng hắc ám xuyên qua mọi kẻ địch, gây <span class="damage">22 sát thương</span>.' +
+    ' Mỗi kẻ địch <span class="buff">bị tiêu diệt</span> bởi quả cầu giúp Veigar' +
+    ' <span class="buff">cộng dồn vĩnh viễn +20 năng lượng tối đa</span>, và hồi lại' +
+    ' <span class="buff">20 năng lượng</span> ngay lập tức';
   coolDown = 5000;
   manaCost = 20;
 
@@ -78,8 +88,86 @@ export default class Veigar_Q extends Spell {
     this.game.objectManager.addObject(obj);
   }
 
+  /**
+   * Who the orb would hit *if fired this instant*, which for an aimed spell is
+   * the only honest reading of `ExecuteSpell.executeCandidates`.
+   *
+   * `ExecuteMarks` promises "press the key and this one dies". For a spell that
+   * picks its own victim that is unconditional; here it is conditional on the
+   * cursor — and the cursor is known every frame, so the promise still holds at
+   * the moment it is drawn. What makes it hold is testing the *line*: marking
+   * everyone within 550px would light up a whole wave the shot cannot reach,
+   * which is a promise the cast would break immediately.
+   *
+   * The line is the segment the orb really flies (always the full `range`,
+   * wherever the cursor is), and the width is the same overlap the missile
+   * resolves with — its own radius plus the body's. One `lineCircle` per
+   * candidate, on a query that already had to happen.
+   */
+  executeCandidates(): AttackableUnit[] {
+    const { from, to } = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      this.aimPoint,
+      this.range
+    );
+
+    // A disc around the caster wide enough to contain the whole shot; the line
+    // test below is what actually narrows it.
+    const nearby = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: this.range + ORB_SIZE,
+      }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+    }) as AttackableUnit[];
+
+    const inTheWay: AttackableUnit[] = [];
+    for (const enemy of nearby) {
+      const reach = (enemy.stats?.size?.value ?? 0) / 2 + ORB_SIZE / 2;
+      if (CollideUtils.lineCircle(from.x, from.y, to.x, to.y, enemy.position.x, enemy.position.y, reach)) {
+        inTheWay.push(enemy);
+      }
+    }
+    return inTheWay;
+  }
+
+  /** Flat, and it pierces — so every body on the line is measured against it. */
+  executeDamageAgainst(_target: AttackableUnit): number {
+    return this.damage;
+  }
+
+  /**
+   * The path, not a ring. `Spell.drawPreview`'s circle is right for a spell
+   * with a radius and a lie for one that travels in a straight line: it showed
+   * a 550px disc for a shot that only ever threatens a 26px-wide corridor.
+   * `Blitzcrank_E` overrides it for the same reason, with its cone.
+   */
   drawPreview() {
-    super.drawPreview(this.range);
+    const { from, to } = VectorUtils.getVectorWithRange(
+      this.owner.position,
+      this.aimPoint,
+      this.range
+    );
+
+    push();
+    // the corridor the orb sweeps, at the width it actually hits
+    stroke(120, 60, 190, 55);
+    strokeWeight(ORB_SIZE);
+    line(from.x, from.y, to.x, to.y);
+    // a hard centre line, so the aim reads at a glance over pale ground
+    stroke(20, 8, 34, 120);
+    strokeWeight(4);
+    line(from.x, from.y, to.x, to.y);
+    stroke(200, 150, 255, 170);
+    strokeWeight(2);
+    line(from.x, from.y, to.x, to.y);
+    // where it stops
+    noFill();
+    stroke(200, 150, 255, 150);
+    strokeWeight(2);
+    circle(to.x, to.y, ORB_SIZE);
+    pop();
   }
 }
 
@@ -90,7 +178,7 @@ export const liveStacks = (owner: any): Veigar_Q_Power[] =>
 /**
  * One stack, configured the one way it is ever configured.
  *
- * Called from `Veigar_Q_Object.onHit` (a real hit) and from
+ * Called from `Veigar_Q_Object.onHit` (a real kill) and from
  * `Veigar_Q.setStackCount` (the practice panel), so the cheat cannot drift
  * from the real thing — the `stackId`, the add type and the bonus are what
  * make a stack stack, and a second copy of them is a second definition of the
@@ -169,8 +257,8 @@ export class Veigar_Q_Power extends StatAmp {
 export class Veigar_Q_Object extends MissileSpellObject {
   image = AssetManager.get('spell_veigar_q');
   speed = 8;
-  size = 26;
-  // pierces everything, and every victim feeds the stacking
+  size = ORB_SIZE;
+  // pierces everything, and every victim it *finishes* feeds the stacking
   maxHitCount = Infinity;
 
   damage = 22;
@@ -190,16 +278,26 @@ export class Veigar_Q_Object extends MissileSpellObject {
   }
 
   onHit(enemy: any) {
+    // The power is paid for by the corpse. The orb pierces, so stacking per
+    // body it touched made one cast into a wave five permanent points of max
+    // mana — the same "landed, not killed" mistake Nasus Q and Cho'Gath R had.
+    const wasAlive = !enemy.isDead;
     enemy.takeDamage(this.damage, this.owner);
 
-    this.owner.addBuff(
-      createPowerStack(this.owner, {
-        image: this.image,
-        manaPerStack: this.manaPerStack,
-        stackDuration: this.stackDuration,
-        maxStacks: this.maxStacks,
-      })
-    );
+    if (wasAlive && enemy.isDead) {
+      this.owner.addBuff(
+        createPowerStack(this.owner, {
+          image: this.image,
+          manaPerStack: this.manaPerStack,
+          stackDuration: this.stackDuration,
+          maxStacks: this.maxStacks,
+        })
+      );
+      // The room is worth nothing empty — `ChoGath_R` heals its new max health
+      // for the same reason. `restoreMana` is the granting seam; a spell may
+      // not name `stats.mana` itself (see the mana-spend seam test).
+      this.owner.restoreMana(this.manaPerStack);
+    }
 
     // the orb flies on through, so the hit gets its own collapse
     const implode = new Veigar_Q_Implode(this.owner);

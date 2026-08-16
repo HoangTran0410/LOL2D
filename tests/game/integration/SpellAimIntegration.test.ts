@@ -364,10 +364,12 @@ describe('spell aim integration', () => {
     const spell = new UnitSpell(caster);
 
     expect(game.createSpellContext(spell, caster, game.worldMouse)).toMatchObject({ target });
-    // Past CURSOR_ACQUISITION_RADIUS, not merely off the 20px body: UNIT mode
-    // now reaches for a target as far as an attack order does.
+    // Past CURSOR_ACQUISITION_RADIUS and still acquired: the circle around the
+    // cursor ranks candidates, it no longer excludes them. A unit inside the
+    // spell's range is always castable at — pointing away from it used to make
+    // the key do nothing at all, which read as the ability being broken.
     game.worldMouse.x = 400;
-    expect(game.createSpellContext(spell, caster, game.worldMouse)).toBeUndefined();
+    expect(game.createSpellContext(spell, caster, game.worldMouse)).toMatchObject({ target });
   });
 
   it('replays a pending Zed shadow cast without mutating worldMouse', () => {

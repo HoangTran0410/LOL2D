@@ -60,9 +60,16 @@ const distanceTo = (point: Vec2, unit: AttackableUnit): number =>
  * - hostile, alive and targetable — `canTakeDamageFromTeam` covers all three,
  *   and it drops the attacker itself along the way, because every champion
  *   carries its own team id;
- * - visible — `willDraw` is the fog of war's own flag, so an order cannot be
- *   given onto something that cannot be seen, the same refusal a right click
- *   into the fog gets;
+ * - visible — an order cannot be given onto something that cannot be seen, the
+ *   same refusal a right click into the fog gets. This used to read `willDraw`,
+ *   which is the fog's own flag and therefore answers one question only: is it
+ *   lit *for the player*. `FogOfWar.calculateSight` clears the flag on every
+ *   unit and re-lights it from `game.player.teamId`'s eyes, so a bot's attack
+ *   order was gated on the player's vision — a bot could not order onto an
+ *   enemy standing next to it in a bush the player happened not to see, and
+ *   could order onto one across the map that the player did. It is also a
+ *   *draw* flag, so it says nothing at all until the first frame is painted.
+ *   `visibleTo` asks `combat/Vision.ts` on the attacker's own behalf;
  * - nearest to the *cursor*, not to the attacker.
  *
  * Empty is a normal answer rather than a failure: `BasicAttackController.order`
@@ -87,7 +94,7 @@ export function findAttackTargetNearPoint(
       filters: [
         PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.canTakeDamageFromTeam(attacker.teamId),
-        (object: GameObject) => object.willDraw,
+        PredefinedFilters.visibleTo(attacker),
       ],
     }) ?? [];
 
@@ -139,7 +146,7 @@ export function findAttackTargetAlongRay(
       filters: [
         PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.canTakeDamageFromTeam(attacker.teamId),
-        (object: GameObject) => object.willDraw,
+        PredefinedFilters.visibleTo(attacker),
       ],
     }) ?? [];
 

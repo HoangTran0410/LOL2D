@@ -37,7 +37,7 @@ const SHELL_LIGHT: [number, number, number] = [226, 194, 136];
 export default class Rammus_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_rammus_w');
-  name = 'Cuộn Mình (Rammus_W)';
+  name = 'Thế Thủ (Rammus_W)';
   description =
     `Cuộn tròn trong <span class="time">${DURATION / 1000} giây</span>: nhận <span class="buff">Khiên ${SHIELD_AMOUNT}</span>` +
     ` và <span class="buff">phản ${REFLECT_PERCENT * 100}% sát thương</span> về kẻ đã gây ra nó (tính trên đòn đánh gốc,` +

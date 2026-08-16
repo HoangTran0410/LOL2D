@@ -55,7 +55,7 @@ function shieldHalfWidth(y: number): number {
 export default class Garen_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_garen_w');
-  name = 'Dũng Khí (Garen_W)';
+  name = 'Lòng Can Đảm (Garen_W)';
   description =
     `Nhận <span class="buff">Khiên ${SHIELD_AMOUNT}</span> và <span class="buff">hút ${OMNIVAMP * 100}% máu</span>` +
     ` từ mọi sát thương gây ra, trong <span class="time">${DURATION / 1000} giây</span>`;

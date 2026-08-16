@@ -12,7 +12,7 @@ export const JARVAN_E_DROP_HEIGHT = 400;
 export default class JarvanIV_E extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_jarvaniv_e');
-  name = 'Hoàng Kim Kỳ (JarvanIV_E)';
+  name = 'Hoàng Kỳ Demacia (JarvanIV_E)';
   description =
     'Cắm lá cờ Demacia tại điểm chỉ định tồn tại <span class="time">8 giây</span>. Kết hợp với chiêu Q để kéo Jarvan IV tới lá cờ và <span class="buff">Hất Tung</span> kẻ địch.';
   coolDown = 10000;

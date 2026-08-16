@@ -31,7 +31,7 @@ export const MISSILE_SPEED = 5;
 
 export default class Malphite_Q extends Spell {
   image = AssetManager.get('spell_malphite_q');
-  name = 'Mảnh Vỡ Kết Tinh (Malphite_Q)';
+  name = 'Mảnh Vỡ Địa Chấn (Malphite_Q)';
   description =
     'Ném một mảnh đá tự bám theo mục tiêu, gây <span class="damage">20 sát thương</span> và <span class="buff">Làm Chậm 20%</span> trong <span class="time">3 giây</span>. Malphite nhận lượng <span class="buff">Tốc Độ Di Chuyển</span> mà mục tiêu thực sự mất trong cùng thời gian';
   coolDown = 8_000;

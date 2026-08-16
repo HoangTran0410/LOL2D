@@ -20,7 +20,7 @@ export const SPREAD_RADIUS = 220;
 export default class Varus_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_varus_r');
-  name = 'Xích Sắt Hư Không (Varus_R)';
+  name = 'Sợi Xích Tội Lỗi (Varus_R)';
   description =
     `Phóng một dây leo: mục tiêu đầu tiên trúng phải nhận <span class="damage">${DAMAGE} sát thương</span>` +
     ` và bị <span class="buff">Trói Chân</span> trong <span class="time">${ROOT_DURATION / 1000} giây</span>,` +

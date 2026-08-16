@@ -9,7 +9,7 @@ import ParticleSystem from '../helpers/ParticleSystem';
 
 export const CAST_RANGE = 300;
 export const PREPARE_MS = 1000;
-export const CAGE_LIFETIME_MS = 3000;
+export const CAGE_LIFETIME_MS = 5000;
 /** Outer diameter of the cage; the wall is `WALL_THICKNESS` either side of it. */
 export const CAGE_SIZE = 300;
 export const WALL_THICKNESS = 30;
@@ -23,6 +23,7 @@ export const RUNE_COUNT = 12;
 export const COLLAPSE_MS = 300;
 /** How often a mote of dark matter peels off the wall. */
 export const MOTE_INTERVAL_MS = 60;
+export const STUN_TIME = 2000;
 
 const VOID: [number, number, number] = [28, 12, 52];
 const ARCANE: [number, number, number] = [70, 40, 162];
@@ -32,8 +33,7 @@ export default class Veigar_E extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_veigar_e');
   name = 'Bẻ Cong Không Gian (Veigar_E)';
-  description =
-    'Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong <span class="time">3 giây</span>. <span class="buff">Làm Choáng</span> <span class="time">1.5 giây</span> những kẻ địch dám bước qua.';
+  description = `Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong <span class="time">${CAGE_LIFETIME_MS / 1000} giây</span>. <span class="buff">Làm Choáng</span> <span class="time">${STUN_TIME / 1000} giây</span> những kẻ địch dám bước qua.`;
   coolDown = 5000;
 
   onSpellCast() {
@@ -168,7 +168,7 @@ export class Veigar_E_Object extends SpellObject {
       });
 
       enemies.forEach((enemy: any) => {
-        const stunBuff = new Stun(1500, this.owner, enemy);
+        const stunBuff = new Stun(STUN_TIME, this.owner, enemy);
         enemy.addBuff(stunBuff);
 
         this.enemiesEffected.push(enemy);
@@ -258,11 +258,7 @@ export class Veigar_E_Object extends SpellObject {
 
   /** The standing cage: nine arcane pillars with lightning strung between them. */
   _drawCage() {
-    const t = constrain(
-      (this.age - this.prepairTime) / (this.lifeTime - this.prepairTime),
-      0,
-      1
-    );
+    const t = constrain((this.age - this.prepairTime) / (this.lifeTime - this.prepairTime), 0, 1);
     // it sinks back where it came from rather than blinking out
     const collapse = constrain((this.age - (this.lifeTime - COLLAPSE_MS)) / COLLAPSE_MS, 0, 1);
     const standing = 1 - collapse;

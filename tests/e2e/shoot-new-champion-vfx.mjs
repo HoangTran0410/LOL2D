@@ -1,5 +1,6 @@
 /**
- * Screenshot rig for the Camille / Ekko / Jarvan IV kits.
+ * Screenshot rig for kits whose VFX has been rebuilt — Camille, Ekko,
+ * Jarvan IV, and now Pantheon.
  *
  * Not an assertion script — a *look at it* script. The complaint these spells
  * were rebuilt against ("visual effect của nó dở quá") is not a property any
@@ -12,7 +13,11 @@
  *   - every cast produced at least one spell object (nothing silently no-oped);
  *   - dashes actually travelled, which is the `onDashUpdate` regression.
  *
- *   node tests/e2e/shoot-new-champion-vfx.mjs [outDir]
+ *   node tests/e2e/shoot-new-champion-vfx.mjs [outDir] [championFilter]
+ *
+ * The filter is a substring of the champion name, and it is the point of the
+ * argument: a full run is twelve casts and several minutes, which is far more
+ * than a change to one kit needs.
  *
  * Requires a system Chrome install.
  */
@@ -39,7 +44,7 @@ const MATCH_CONFIG = {
 };
 
 /** Which slot each ability sits in, and where to aim it relative to the player. */
-const CASTS = [
+const ALL_CASTS = [
   { champion: 'Camille', slot: 'Q', aim: [220, 0], frames: [80, 260, 900] },
   { champion: 'Camille', slot: 'W', aim: [320, 0], frames: [90, 240, 420] },
   { champion: 'Camille', slot: 'E', aim: [520, 0], frames: [120, 380, 700] },
@@ -52,9 +57,37 @@ const CASTS = [
   { champion: 'Jarvan IV', slotName: 'JarvanIV', slot: 'W', aim: [0, 0], frames: [110, 400, 1600] },
   { champion: 'Jarvan IV', slotName: 'JarvanIV', slot: 'E', aim: [300, 0], frames: [90, 240, 900] },
   { champion: 'Jarvan IV', slotName: 'JarvanIV', slot: 'R', aim: [300, 0], frames: [420, 700, 1600] },
+  // Pantheon: W locks onto the body nearest the cursor, E works behind a
+  // planted aegis for 1.6s, and R spends 1.4s off the map — so the frame lists
+  // follow those clocks rather than a common one. Q is missing on purpose: it
+  // is `TAP_OR_HOLD`, and `spell.cast()` only opens the charge, so this rig
+  // cannot fire it and would report a working ability as broken.
+  { champion: 'Pantheon', slot: 'W', aim: [300, 0], frames: [90, 260, 520] },
+  { champion: 'Pantheon', slot: 'E', aim: [260, 0], frames: [140, 520, 1100] },
+  { champion: 'Pantheon', slot: 'R', aim: [600, 0], frames: [260, 900, 1250, 1500] },
+  // Morgana W: the spikes rise on ~1s loops, so the frames straddle two of them.
+  { champion: 'Morgana', slot: 'W', aim: [260, 0], frames: [400, 1200, 2600] },
+  // Morgana R: 350ms windup, then a 3s tether that resolves. The frames are the
+  // gather, the shackles slamming shut, the middle of the tether, and the burst.
+  { champion: 'Morgana', slot: 'R', aim: [300, 0], frames: [220, 480, 1800, 3500] },
 ];
 
-const server = await createServer({ server: { port: 0, strictPort: false } });
+// Substring match, so "Jarvan" and "Pantheon" both work without quoting.
+const ONLY = process.argv[3];
+const CASTS = ONLY
+  ? ALL_CASTS.filter(cast => cast.champion.toLowerCase().includes(ONLY.toLowerCase()))
+  : ALL_CASTS;
+if (!CASTS.length) {
+  console.error(`no casts match "${ONLY}"`);
+  process.exit(1);
+}
+
+// `hmr: false`: this repo is worked on by several agents in one tree, and a
+// stray save anywhere in `src/` makes Vite reload the page mid-run, which wipes
+// `window.__lol2d` and takes the whole script down with a bare "cannot read
+// properties of undefined". The rig has no use for hot reload — it loads the
+// page once and drives it.
+const server = await createServer({ server: { port: 0, strictPort: false, hmr: false } });
 await server.listen();
 const url = server.resolvedUrls.local[0];
 
@@ -151,6 +184,30 @@ for (const cast of CASTS) {
         dummy.stats.maxHealth.baseValue = dummy.stats.maxHealth.value * 10;
       }
 
+      window.__stage = { game, subject, home, dummy };
+      return { ok: true };
+    },
+    [cast.champion, cast.slotName ?? cast.champion, cast.slot, cast.aim[0], cast.aim[1]]
+  );
+
+  const label = `${cast.slotName ?? cast.champion}_${cast.slot}`;
+  if (!staged.ok) {
+    check(`${label} staged`, false, staged.reason);
+    continue;
+  }
+
+  // A frame has to run between standing the dummy up and pressing the key.
+  // `queryObjects` answers out of the quadtree, which is rebuilt once per
+  // update — cast in the same tick and an auto-locking spell (Pantheon W,
+  // Yasuo E, Nasus Q) looks for bodies at the positions they were spawned at
+  // and finds nothing in range, which reads as a broken ability rather than a
+  // stale index.
+  await page.waitForTimeout(120);
+
+  const fired = await page.evaluate(
+    ([classPrefix, slot, aimX, aimY]) => {
+      const { game, subject, home } = window.__stage;
+
       // the preset's display name and the spell class prefix differ for the
       // champions whose names carry a space ("Jarvan IV" -> JarvanIV_Q)
       const wanted = `${classPrefix}_${slot}`;
@@ -176,12 +233,11 @@ for (const cast of CASTS) {
       window.__cast = { game, subject, objectsBefore, startPos, spawned: 0, moved: 0 };
       return { ok: true };
     },
-    [cast.champion, cast.slotName ?? cast.champion, cast.slot, cast.aim[0], cast.aim[1]]
+    [cast.slotName ?? cast.champion, cast.slot, cast.aim[0], cast.aim[1]]
   );
 
-  const label = `${cast.slotName ?? cast.champion}_${cast.slot}`;
-  if (!staged.ok) {
-    check(`${label} staged`, false, staged.reason);
+  if (!fired.ok) {
+    check(`${label} staged`, false, fired.reason);
     continue;
   }
 

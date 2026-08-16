@@ -17,7 +17,7 @@ export const THROW_SPEED = 9;
 export default class Twitch_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_twitch_w');
-  name = 'Bình Độc (Twitch_W)';
+  name = 'Độc Suy Nhược (Twitch_W)';
   description =
     `Ném một bình độc bay tới vị trí chỉ định; <span class="damage">khi chạm đất</span> bình vỡ thành vũng` +
     ` bán kính <span>${RADIUS}px</span> trong <span class="time">${DURATION / 1000} giây</span>,` +

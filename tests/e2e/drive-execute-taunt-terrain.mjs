@@ -334,6 +334,95 @@ const stackRun = async (championName, spellName, distance) => {
   );
 }
 
+// ── 5. The marks on an aimed spell, and Annie's shield burning a spell ───────
+{
+  // Asserted rather than assumed: one run lost `window.__rig` between sections
+  // and the next `evaluate` died on a destructure, which reports as a crash
+  // rather than as the flake it was. This turns that into a legible failure.
+  const rig = await page.evaluate(() => ({
+    alive: !!window.__rig,
+    scene: window.__lol2d?.scene?.oScene?.constructor?.name ?? 'none',
+  }));
+  check('the harness survived the earlier sections', rig.alive, `scene=${rig.scene}`);
+  if (!rig.alive) {
+    console.error('\nharness lost — skipping the remaining checks');
+    await browser.close();
+    await server.close();
+    process.exit(1);
+  }
+
+  await page.evaluate(() => {
+    const { become, dummyAt, clear } = window.__rig;
+    clear();
+    become('Veigar');
+    // One doomed body on the line east, one healthy body the same distance
+    // south — the shot can only threaten one of them at a time.
+    window.__stage = { east: dummyAt(300, 0, 8), south: dummyAt(0, 300, 8) };
+  });
+  await frames(300);
+
+  const aimed = await page.evaluate(() => {
+    const { spellNamed, game, home } = window.__rig;
+    const q = spellNamed('Veigar_Q');
+    const marksWhenAimedAt = (dx, dy) => {
+      game.worldMouse = createVector(home.x + dx, home.y + dy);
+      return q.executeCandidates().map(u => u.id);
+    };
+    const east = marksWhenAimedAt(500, 0);
+    const south = marksWhenAimedAt(0, 500);
+    return {
+      east: east.length,
+      south: south.length,
+      swapped: east.length === 1 && south.length === 1 && east[0] !== south[0],
+    };
+  });
+  await shot('5-veigar-aim-mark');
+  check(
+    'Veigar Q marks by where the cursor points, not by what is in range',
+    aimed.swapped,
+    `aimed east -> ${aimed.east} target(s), aimed south -> ${aimed.south}, different unit=${aimed.swapped}`
+  );
+
+  await page.evaluate(() => {
+    const { become, dummyAt, clear } = window.__rig;
+    clear();
+    become('Annie');
+    window.__stage = { attacker: dummyAt(120, 0, 200), doomed: dummyAt(-140, 0, 8) };
+  });
+  await frames(300);
+
+  const annie = await page.evaluate(() => {
+    const { spellNamed, fire, game } = window.__rig;
+    const { attacker, doomed } = window.__stage;
+    const q = spellNamed('Annie_Q');
+    const marked = q.executeCandidates().filter(u => u.stats.health.value <= 26).length;
+
+    fire('Annie_E', 0, 0);
+    game.objectManager.update();
+    const before = attacker.stats.health.value;
+    // Three spell hits — no basic attacks anywhere near this, which is the
+    // whole point: the old burn only ever fired on ON_ATTACK_HIT.
+    for (let i = 0; i < 3; i++) game.player.takeDamage(10, attacker);
+    return {
+      marked,
+      doomedHealth: Math.round(doomed.stats.health.value),
+      burned: before - attacker.stats.health.value,
+      annieHealth: Math.round(game.player.stats.health.value),
+    };
+  });
+  await shot('6-annie-shield-burn');
+  check(
+    'Annie Q marks the enemy its fireball would finish',
+    annie.marked === 1,
+    `marked=${annie.marked} doomed=${annie.doomedHealth}hp`
+  );
+  check(
+    'Annie E burns spell damage, every hit, even through a full shield',
+    annie.burned === 42 && annie.annieHealth === 100,
+    `attacker lost ${annie.burned} to 3 pokes of 10; Annie at ${annie.annieHealth}hp`
+  );
+}
+
 check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
 
 await browser.close();

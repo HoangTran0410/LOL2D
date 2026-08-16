@@ -70,7 +70,7 @@ const isInFlight = (state: string): boolean =>
  */
 export default class Leblanc_R extends Spell {
   image = AssetManager.get('spell_leblanc_r');
-  name = 'Bắt Chước (Leblanc_R)';
+  name = 'Mô Phỏng (Leblanc_R)';
   description =
     'Tái hiện <span class="buff">kỹ năng gần nhất</span> mà LeBlanc đã dùng (bất kỳ chiêu nào ở ô Q, W, E, R —' +
     ' không tính phép bổ trợ), <span class="buff">bỏ qua thời gian hồi chiêu</span> của kỹ năng đó và' +

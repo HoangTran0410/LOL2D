@@ -109,7 +109,17 @@ describe('Malphite Q', () => {
     expect(resolution).toMatchObject({ ok: true, context: { target } });
     expect(spell.press(castContext(owner))).toBe(false);
     game.objectManager.objects.push(target);
-    expect(new Malphite_Q(owner).press(castContext(owner))).toBe(false);
+    // This case is about *who* a cast may take, not what it costs. The first
+    // press below now succeeds where it used to be refused, and a successful
+    // Malphite Q bills 70 of the fixture's 100 mana — which would make the
+    // second press fail for a reason this test is not asking about.
+    owner.stats.mana.baseValue = 500;
+    // Cursor parked far away (0, 500) and the enemy still in range: this used
+    // to refuse, because the acquisition circle was a filter rather than a
+    // preference. Range decides what a spell may hit; the cursor only decides
+    // which of those it takes. The refusals below are the ones that still mean
+    // something — wrong team, and genuinely out of reach.
+    expect(new Malphite_Q(owner).press(castContext(owner))).toBe(true);
     expect(new Malphite_Q(owner).press(castContext(owner, undefined, target.position))).toBe(true);
     expect(new Malphite_Q(owner).press(castContext(owner, ally))).toBe(false);
     expect(new Malphite_Q(owner).press(castContext(owner, outOfRange))).toBe(false);

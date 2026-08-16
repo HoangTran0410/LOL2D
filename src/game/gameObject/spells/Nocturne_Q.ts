@@ -40,7 +40,7 @@ export const DUSK_GRACE_MS = 250;
 export default class Nocturne_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_nocturne_q');
-  name = 'Lưỡi Hái Hoàng Hôn (Nocturne_Q)';
+  name = 'Thanh Gươm Bóng Tối (Nocturne_Q)';
   description =
     `Phóng lưỡi hái xuyên thẳng <span>${RANGE}px</span>, gây <span class="damage">${DAMAGE} sát thương</span>` +
     ` và <span class="buff">để lại Vệt Hoàng Hôn</span> dọc đường bay trong` +

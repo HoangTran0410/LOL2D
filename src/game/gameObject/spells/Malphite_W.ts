@@ -40,7 +40,7 @@ export const HARD_STOP_MS = DURATION_MS + DUST_LIFETIME_MS + 1_000;
 export default class Malphite_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_malphite_w');
-  name = 'Sức Mạnh Đá Tảng (Malphite_W)';
+  name = 'Nắm Đấm Chấn Động (Malphite_W)';
   description =
     'Malphite phình to lớp vỏ đá của mình trong <span class="time">4 giây</span>, nhận <span class="buff">Khiên hấp thụ 25 sát thương</span> và tăng kích thước cơ thể';
   coolDown = COOLDOWN_MS;

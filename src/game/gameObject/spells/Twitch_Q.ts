@@ -9,7 +9,7 @@ import Phasing from '../buffs/Phasing';
 export default class Twitch_Q extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_twitch_q');
-  name = 'Ẩn Mình (Twitch_Q)';
+  name = 'Đột Kích (Twitch_Q)';
   description =
     '<span class="buff">Tàng Hình</span> và <span class="buff">Tăng Tốc 25%</span> trong <span class="time">4 giây</span>';
   coolDown = 6000;

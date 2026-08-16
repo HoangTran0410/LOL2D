@@ -17,7 +17,7 @@ export const DELAY_MS = 400;
 export default class Cassiopeia_Q extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_cassiopeia_q');
-  name = 'Nổ Độc (Cassiopeia_Q)';
+  name = 'Vụ Nổ Độc Hại (Cassiopeia_Q)';
   description =
     `Nổ một đám độc bán kính <span>${RADIUS}px</span> sau <span class="time">${DELAY_MS / 1000} giây</span>:` +
     ` <span class="damage">${IMPACT_DAMAGE} sát thương</span> và <span class="damage">nhiễm độc</span>` +

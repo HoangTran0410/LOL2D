@@ -47,7 +47,7 @@ function cubic(p0: number, p1: number, p2: number, p3: number, u: number): numbe
 export default class Alistar_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_alistar_r');
-  name = 'Ý Chí Bất Diệt (Alistar_R)';
+  name = 'Bất Khuất (Alistar_R)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>: nhận <span class="buff">Khiên ${SHIELD_AMOUNT}</span>` +
     ` và <span class="buff">+8 sát thương đánh thường</span>`;

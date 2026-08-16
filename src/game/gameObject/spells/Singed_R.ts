@@ -26,7 +26,7 @@ export const HARD_STOP_MS = DURATION + 1500;
 export default class Singed_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_singed_r');
-  name = 'Thuốc Điên (Singed_R)';
+  name = 'Thuốc Hóa Điên (Singed_R)';
   description =
     `Uống thuốc trong <span class="time">${DURATION / 1000} giây</span>:` +
     ` <span class="buff">+${BONUS_HEALTH} máu tối đa</span>, <span class="buff">+${SPEED_PERCENT * 100}% tốc chạy</span>` +

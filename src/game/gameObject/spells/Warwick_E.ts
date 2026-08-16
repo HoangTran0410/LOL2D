@@ -15,7 +15,7 @@ export const FEAR_DURATION = 1200;
 export default class Warwick_E extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_warwick_e');
-  name = 'Tiếng Hú Nguyên Thủy (Warwick_E)';
+  name = 'Gầm Thét (Warwick_E)';
   description =
     `Nhận <span class="buff">Khiên ${SHIELD_AMOUNT}</span> trong <span class="time">${SHIELD_DURATION / 1000} giây</span>` +
     ` và <span class="buff">Khiếp Sợ</span> mọi kẻ địch trong <span>${RADIUS}px</span> trong` +

@@ -28,7 +28,7 @@ export const CASING_COUNT = 2;
 export default class Graves_R extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_graves_r');
-  name = 'Tổn Thất Ngoài Dự Kiến (Graves_R)';
+  name = 'Đạn Nổ Thần Công (Graves_R)';
   description =
     `Nã một phát đại bác xuyên thẳng <span>${RANGE}px</span>: <span class="damage">${DAMAGE} sát thương</span>` +
     ` cho mục tiêu đầu tiên, <span class="damage">giảm ${FALLOFF}</span> cho mỗi mục tiêu tiếp theo,` +
@@ -95,10 +95,7 @@ export class Graves_R_Object extends MissileSpellObject {
   }
 
   _heading() {
-    return Math.atan2(
-      this.destination.y - this.position.y,
-      this.destination.x - this.position.x
-    );
+    return Math.atan2(this.destination.y - this.position.y, this.destination.x - this.position.x);
   }
 
   update() {

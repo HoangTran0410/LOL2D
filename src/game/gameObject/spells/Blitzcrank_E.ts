@@ -11,7 +11,7 @@ export default class Blitzcrank_E extends Spell {
   // always the fixed `range` regardless of where the thumb lets go.
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_blitzcrank_e');
-  name = 'Nắm Đấm Thép (Blitzcrank_E)';
+  name = 'Đấm Móc (Blitzcrank_E)';
   description =
     'Vung nắm đấm thành <span>hình nón</span> ngay trước mặt, gây <span class="damage">25 sát thương</span> và <span class="buff">Hất Tung</span> mọi kẻ địch trúng đòn trong <span class="time">0.6 giây</span>';
   coolDown = 6000;

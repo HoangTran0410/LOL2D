@@ -34,7 +34,7 @@ export default class Yasuo_R extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_yasuo_r');
-  name = 'Trăn Trối (Yasuo_R)';
+  name = 'Trăng Trối (Yasuo_R)';
   description =
     'Lao tới các mục tiêu gần nhất đang bị <span>Hất tung</span>. <span class="buff">Giữ chúng trên không</span> trong <span class="time">1 giây</span> và gây <span class="damage">30 sát thương</span>. Bạn được <span class="buff">Tăng tốc 40%</span> trong <span class="time">2 giây</span> sau đó.';
   coolDown = 10000;
@@ -60,6 +60,7 @@ export default class Yasuo_R extends Spell {
       }),
       filters: [
         PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
         (p: any) =>
           p.buffs.filter((buff: any) => buff.sourceUnit != p && buff instanceof Airborne)
             ?.length > 0,

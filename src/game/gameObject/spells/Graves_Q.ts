@@ -8,7 +8,7 @@ import AoePulse from '../spellObjects/AoePulse';
 import TrailSystem from '../helpers/TrailSystem';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
-export const RANGE = 550;
+export const RANGE = 420;
 export const TRAVEL_DAMAGE = 12;
 export const BLAST_DAMAGE = 26;
 export const BLAST_RADIUS = 130;
@@ -19,7 +19,7 @@ export const SHELL_LENGTH = 40;
 export default class Graves_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_graves_q');
-  name = 'Tới Bến (Graves_Q)';
+  name = 'Đạn Xuyên Mục Tiêu (Graves_Q)';
   description =
     `Bắn một viên đạn xuyên qua kẻ địch (<span class="damage">${TRAVEL_DAMAGE} sát thương</span>)` +
     ` rồi <span class="damage">phát nổ</span> ở cuối đường bay, gây thêm` +

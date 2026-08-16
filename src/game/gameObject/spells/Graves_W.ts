@@ -20,7 +20,7 @@ export const PUFF_INTERVAL_MS = 120;
 export default class Graves_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_graves_w');
-  name = 'Bom mù (Graves_W)';
+  name = 'Bom Mù (Graves_W)';
   description =
     'Tạo một làn khói tại khu vực chỉ định trong <span class="time">5 giây</span>, <span class="buff">Giảm tầm nhìn</span> và <span class="buff">Làm chậm 40%</span> tất cả kẻ địch / đồng minh trong khu vực';
   coolDown = 5000;

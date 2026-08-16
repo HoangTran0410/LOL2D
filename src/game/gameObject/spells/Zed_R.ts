@@ -36,7 +36,7 @@ export default class Zed_R extends Spell {
   phase: 'R1' | 'R2' = 'R1';
 
   image = Zed_R.PHASES[this.phase].image;
-  name = 'Cái Chết Đến Gần (Zed_R)';
+  name = 'Dấu Ấn Tử Thần (Zed_R)';
   description =
     '<span class="buff">Lướt</span> ra sau kẻ địch gần nhất trong tầm 500px, <span class="buff">Không thể bị chọn</span> trong lúc lướt và để lại 1 <span>phân thân</span> tại chỗ cũ. Mục tiêu bị đánh dấu trong <span class="time">3 giây</span>: <b>35%</b> toàn bộ sát thương Zed và phân thân gây lên nó được tích lại và <span class="damage">kích nổ</span> khi dấu ấn kết thúc. Có thể tái kích hoạt để <span class="buff">Đổi chỗ</span> với phân thân';
   coolDown = 10000;
@@ -170,7 +170,10 @@ export default class Zed_R extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
 
     let nearest: any = null;

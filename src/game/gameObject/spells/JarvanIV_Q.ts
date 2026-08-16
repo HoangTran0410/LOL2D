@@ -19,7 +19,7 @@ export const JARVAN_Q_FLAG_SNAP = 60;
 export default class JarvanIV_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_jarvaniv_q');
-  name = 'Đâm Ngọn Giáo Hoàng Gia (JarvanIV_Q)';
+  name = 'Giáng Long Kích (JarvanIV_Q)';
   description =
     'Đâm giáo theo hướng chỉ định gây <span class="damage">25 sát thương</span>. Nếu giáo chạm vào <span class="buff">Hoàng Kim Kỳ (E)</span>, Jarvan IV sẽ <span class="buff">Lướt</span> tới lá cờ và <span class="buff">Hất Tung</span> kẻ địch trên đường lướt.';
   coolDown = 8000;

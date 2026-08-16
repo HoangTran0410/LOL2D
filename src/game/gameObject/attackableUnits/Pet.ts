@@ -1,6 +1,7 @@
 import { Circle } from '../../../libs/quadtree';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Champion, { type ChampionOptions } from './Champion';
+import type { KillCredit } from '../../combat/MatchTally';
 import type AttackableUnit from './AttackableUnit';
 import type { UnitDeathData } from './AttackableUnit';
 import Invisible from '../buffs/Invisible';
@@ -66,6 +67,13 @@ export interface PetOptions extends ChampionOptions {
  * killing it is worth something.
  */
 export default class Pet extends Champion {
+  /**
+   * Overrides `Champion`'s `'champion'`. A summon is not a takedown: without
+   * this, every Shaco clone and Zed shadow killed would land on someone's kill
+   * count, because a `Pet` *is* a `Champion` as far as `instanceof` goes.
+   */
+  killCredit: KillCredit = 'none';
+
   ownerUnit: AttackableUnit;
   lifeTimeMs: number;
   aggroRadius: number;
@@ -238,7 +246,10 @@ export default class Pet extends Champion {
         y: this.position.y,
         r: this.aggroRadius,
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+        PredefinedFilters.visibleTo(this),
+      ],
     }) as AttackableUnit[];
 
     let nearest: AttackableUnit | null = null;

@@ -24,7 +24,7 @@ export const JARVAN_R_RECAST_DELAY_MS = 400;
 export default class JarvanIV_R extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_jarvaniv_r');
-  name = 'Đại Địa Dữ Dội (JarvanIV_R)';
+  name = 'Đại Địa Chấn (JarvanIV_R)';
   description =
     'Nhảy vào điểm chỉ định gây <span class="damage">45 sát thương</span> diện rộng và <span class="buff">Dựng Đấu Trường Tường Đá</span> tạo chướng ngại vật xung quanh trong <span class="time">3.5 giây</span>.';
   coolDown = 10000;

@@ -35,7 +35,7 @@ export default class LeeSin_W extends Spell {
   phase: 'W1' | 'W2' = 'W1';
 
   image = LeeSin_W.PHASES[this.phase].image;
-  name = 'Kim Cương Bất Hoại / Ý Chí Sắt Đá (LeeSin_W)';
+  name = 'Hộ Thể / Kiên Định (LeeSin_W)';
   description =
     'Lee Sin <span class="buff">Lướt</span> tới đồng minh gần nhất trong phạm vi, khi tới nơi cả hai nhận <span class="buff">Lá Chắn</span> hấp thụ <span class="damage">70 sát thương</span> trong <span class="time">3 giây</span> (không có đồng minh thì tự khoác lá chắn tại chỗ; nếu cú lướt bị chặn thì không có lá chắn). Lướt tới đồng minh là tướng sẽ giảm một nửa thời gian hồi. Có thể tái kích hoạt trong <span class="time">3 giây</span> để dùng <span class="buff">Ý Chí Sắt Đá</span>: game không có đòn đánh thường nên hút máu được chuyển thành <span class="buff">hồi 60 máu</span> trong <span class="time">4 giây</span>';
   coolDown = 9000;

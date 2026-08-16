@@ -91,6 +91,47 @@ describe('NavGrid', () => {
     ).toBeGreaterThanOrEqual(-NAV_MAX_ACCEPTED_OVERLAP);
   });
 
+  it('never refuses a spot for any reason but the stated margin', () => {
+    // The mirror of the sweep above, and the property `refineNearWalls` exists
+    // to create. That one bounds how wrong the grid may be in the *permissive*
+    // direction; this one bounds the refusals, which is what a player feels.
+    //
+    // Before the refinement pass a cell could be refused with 19px of room to
+    // spare on top of the margin, because clearance was measured to the nearest
+    // blocked cell *centre* and a blocked cell's centre can be a half-diagonal
+    // from the wall that blocked it. Per side that asks ~93px of corridor for a
+    // 55px body, which on this map's 60-90px jungle gaps meant closed
+    // passages, not wasted ground.
+    //
+    // So: if the grid says no, the wall really is inside `requiredClearance`.
+    // The +1 is the stored value being floored to whole pixels.
+    const radius = CHAMPION_RADIUS;
+    const required = realGrid.requiredClearance(radius);
+    let refused = 0;
+    let loosest = 0;
+    let loosestAt = '';
+
+    for (let cy = 0; cy < realGrid.rows; cy++) {
+      for (let cx = 0; cx < realGrid.cols; cx++) {
+        if (realGrid.clearance[cy * realGrid.cols + cx] >= required) continue;
+        refused++;
+        const x = (cx + 0.5) * realGrid.cellSize;
+        const y = (cy + 0.5) * realGrid.cellSize;
+        const actual = wallClearance(x, y, 200);
+        if (actual > loosest) {
+          loosest = actual;
+          loosestAt = `(${x}, ${y})`;
+        }
+      }
+    }
+
+    expect(refused).toBeGreaterThan(10_000);
+    expect(
+      loosest,
+      `a refused cell had ${loosest.toFixed(2)}px of wall clearance at ${loosestAt}, past the ${required}px it was asked for`
+    ).toBeLessThan(required + 1);
+  });
+
   it('marks the inside of a wall unwalkable for every body size', () => {
     let insideSamples = 0;
     for (const polygon of wallPolygons) {

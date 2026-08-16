@@ -27,7 +27,7 @@ export default class Nasus_Q extends Spell implements ExecuteSpell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nasus_q');
-  name = 'Chém Hủy Diệt (Nasus_Q)';
+  name = 'Quyền Trượng Linh Hồn (Nasus_Q)';
   // Rebuilt on every stack so the tooltip states the damage the next strike
   // will actually deal, not the value it had at level one.
   description = describe(0);

@@ -22,7 +22,7 @@ export default class Nocturne_E extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nocturne_e');
-  name = 'Nỗi Kinh Hoàng (Nocturne_E)';
+  name = 'Nỗi Kinh Hoàng Tột Độ (Nocturne_E)';
   description =
     `Nối một sợi xích với kẻ địch gần nhất trong <span>${RANGE}px</span>, gây` +
     ` <span class="damage">${DAMAGE} sát thương</span>. Nếu sau <span class="time">${CHANNEL_MS / 1000} giây</span>` +
@@ -55,7 +55,10 @@ export default class Nocturne_E extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
     let nearest = null;
     let nearestDistance = Infinity;

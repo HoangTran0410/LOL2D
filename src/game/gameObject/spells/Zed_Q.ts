@@ -9,7 +9,7 @@ import MissileSpellObject from '../MissileSpellObject';
 export default class Zed_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_zed_q');
-  name = 'Phi tiêu sắc lẻm (Zed_Q)';
+  name = 'Phi Tiêu Sắc Lẻm (Zed_Q)';
   description =
     'Phóng 1 phi tiêu về phía trước, gây <span class="damage">15 sát thương</span> và <span class="buff">làm chậm 50%</span> trong <span class="time">0.2 giây</span> cho mỗi kẻ địch bị xuyên qua.';
   coolDown = 3000;

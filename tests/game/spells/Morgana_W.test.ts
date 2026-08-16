@@ -9,6 +9,8 @@ import Morgana_W, {
   Morgana_W_Object,
   RADIUS,
   RANGE,
+  SPIKE_COUNT,
+  spikeLayout,
   TICK_EVERY_MS,
 } from '../../../src/game/gameObject/spells/Morgana_W';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
@@ -163,5 +165,45 @@ describe('Morgana W (Tormented Shadow)', () => {
     expect(box.y).toBeLessThanOrEqual(500 - RADIUS);
     expect(box.w).toBeGreaterThanOrEqual(RADIUS * 2);
     expect(box.h).toBeGreaterThanOrEqual(RADIUS * 2);
+  });
+});
+
+/**
+ * The spikes used to be placed at `angle = i * 3.171 * 2`. That is `i * 6.342`
+ * against a full circle of 6.28318, so consecutive spikes sat 0.06 radians
+ * apart: every one of them grew inside a 30° sliver and the other 330° of a
+ * 220px zone was bare ground.
+ *
+ * Stated as coverage rather than as the formula, so retuning the count or the
+ * jitter cannot mean editing this test — only breaking the spread can.
+ */
+describe('Morgana W spikes cover the whole zone', () => {
+  const TAU = Math.PI * 2;
+  const norm = (angle: number): number => ((angle % TAU) + TAU) % TAU;
+  const layout = spikeLayout(SPIKE_COUNT);
+
+  it('puts a spike in every octant of the circle', () => {
+    const octants = new Set(layout.map(spike => Math.floor((norm(spike.angle) / TAU) * 8)));
+    expect([...octants].sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+  });
+
+  it('leaves no wedge of bare ground wider than a quarter turn', () => {
+    const angles = layout.map(spike => norm(spike.angle)).sort((a, b) => a - b);
+    const gaps = angles.map((angle, i) =>
+      i === 0 ? angle + TAU - angles[angles.length - 1] : angle - angles[i - 1]
+    );
+    expect(Math.max(...gaps)).toBeLessThan(TAU / 4);
+  });
+
+  it('grows them from near the centre out to near the rim, without leaving it', () => {
+    const radii = layout.map(spike => spike.radiusRatio);
+    expect(Math.min(...radii)).toBeLessThan(0.35);
+    expect(Math.max(...radii)).toBeGreaterThan(0.8);
+    expect(Math.max(...radii)).toBeLessThanOrEqual(1);
+  });
+
+  it('gives each spike its own clock, so they do not pump in unison', () => {
+    const phases = new Set(layout.map(spike => Math.round(spike.phaseOffsetMs / spike.loopMs * 8)));
+    expect(phases.size).toBeGreaterThan(3);
   });
 });

@@ -10,7 +10,7 @@ import TrailSystem from '../helpers/TrailSystem';
 export default class ChoGath_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_chogath_e');
-  name = "Gai Xương (Cho'Gath_E)";
+  name = "Phóng Gai (Cho'Gath_E)";
   description =
     'Phóng một chùm gai xương <span>xuyên qua mọi kẻ địch</span> trên đường bay, gây <span class="damage">12 sát thương</span> và khiến chúng <span class="buff">Chảy Máu</span> <span class="damage">4 sát thương</span> mỗi <span class="time">0.5 giây</span> trong <span class="time">3 giây</span>';
   coolDown = 6000;

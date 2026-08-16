@@ -7,6 +7,7 @@ import TrailSystem from '../gameObject/helpers/TrailSystem';
 import ParticleSystem from '../gameObject/helpers/ParticleSystem';
 import GameObject from '../gameObject/GameObject';
 import UnitCollisionSystem from './UnitCollisionSystem';
+import { canSee, type Seeable as VisionObserver } from '../combat/Vision';
 
 export type QueryArea = Circle | Rectangle;
 export type RenderQuality = 'auto' | 'low' | 'high';
@@ -163,25 +164,29 @@ export const PredefinedFilters = {
   excludeStealthed: (object: GameObject): boolean =>
     !(object instanceof AttackableUnit) || !object.isStealthed,
   /**
-   * Drops what `observer` cannot see. Bushes were previously cosmetic — the
-   * only thing that ever read `isInsideBush` was the sprite's alpha — so a
-   * player standing in one was still picked up by every minion and camp scan
-   * that came within aggro range, and chased out the other side.
+   * Drops what `observer`'s team cannot see — the gate every scan that *picks*
+   * a target needs, and the one `combat/Vision.ts` defines.
    *
-   * The rule is the simple one: a unit inside a bush is hidden from an
-   * observer that is not itself in a bush. Two units in *different* bushes can
-   * still see each other, which real League would not allow, but
-   * `AttackableUnit.isInsideBush` is a boolean rather than a bush identity and
-   * the case (a jungler and a laner in adjacent brush) is rare enough not to
-   * be worth widening that field for.
+   * It started as the bush rule alone, because bushes were cosmetic (the only
+   * thing that ever read `isInsideBush` was the sprite's alpha) and a player
+   * standing in one was picked up by every minion and camp scan that came
+   * within aggro range. Terrain was the other half and was missing entirely:
+   * nothing that acquired a target had ever asked whether it could *see* it, so
+   * Warwick R found the blue camp through a jungle wall on a screen showing
+   * nothing but fog. `canSee` answers walls, bushes, sight range and friendly
+   * wards in one place, matching what `FogOfWar` paints.
+   *
+   * Only `AttackableUnit`s are gated: a query that also returns spell objects
+   * or terrain is not asking about vision, and every caller's own filters have
+   * already narrowed the units to the ones it may hit.
    *
    * Deliberately not applied to `AIChampion`'s own target scan: a bot that can
    * be broken line-of-sight with is a difficulty change, not a bug fix, and
-   * this is the same reasoning that leaves `AIChampion.aimPoint` alone.
+   * this is the same reasoning that leaves `AIChampion.aimPoint` alone. A bot
+   * *casting a spell* is gated like anyone else — that is the spell's rule.
    */
-  visibleTo: (observer: { isInsideBush?: boolean }): GameObjectFilter =>
-    (object) =>
-      !(object instanceof AttackableUnit) || !object.isInsideBush || !!observer.isInsideBush,
+  visibleTo: (observer: VisionObserver): GameObjectFilter =>
+    (object) => !(object instanceof AttackableUnit) || canSee(observer, object),
 };
 
 declare global {

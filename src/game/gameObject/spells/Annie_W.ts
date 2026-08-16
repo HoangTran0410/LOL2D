@@ -5,7 +5,7 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import AoePulse from '../spellObjects/AoePulse';
 
-export const REACH = 420;
+export const REACH = 290;
 export const HALF_ANGLE = 0.55;
 export const DAMAGE = 30;
 
@@ -17,7 +17,7 @@ export const DAMAGE = 30;
 export default class Annie_W extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_annie_w');
-  name = 'Thiêu Đốt (Annie_W)';
+  name = 'Thiêu Cháy (Annie_W)';
   description =
     `Phun lửa thành hình nón dài <span>${REACH}px</span> theo hướng chỉ định, gây` +
     ` <span class="damage">${DAMAGE} sát thương</span> cho mọi kẻ địch trong đó`;

@@ -29,7 +29,7 @@ const TOXIC_BRIGHT: [number, number, number] = [225, 255, 140];
 export default class Teemo_R extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_teemo_r');
-  name = 'Bẫy Độc Noxus (Teemo_R)';
+  name = 'Bẫy Độc (Teemo_R)';
   description =
     'Đặt 1 bẫy độc tàng hình sau <span class="time">1 giây</span>, tồn tại trong <span class="time">20 giây</span>, phát nổ khi kẻ địch dẫm phải, <span class="buff">Làm Chậm 70%</span> các kẻ địch trong <span class="time">2 giây</span> và gây <span class="damage">30 sát thương</span> <i>(sẽ nảy nếu đặt trên bẫy độc khác)</i>';
 

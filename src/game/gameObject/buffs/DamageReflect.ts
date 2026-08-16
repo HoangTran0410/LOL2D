@@ -5,15 +5,26 @@ import type AttackableUnit from '../attackableUnits/AttackableUnit';
 /**
  * Sends a share of every hit straight back at whoever landed it.
  *
- * ## Why it is measured before mitigation
+ * ## Why it is not a damage modifier
  *
- * `modifyIncomingDamage` runs once per buff, in the order the buffs were added,
- * and each one hands the next what is left. So *where* this sits decides what
- * it reflects: added before a shield it sees the swing, added after it sees
- * only the leftovers. It is meant to be the swing — "he hit me for 50, he takes
- * 40" is the sentence a player says about spikes — so `Rammus_W` adds this
- * first and says so. The buff itself changes nothing about the damage passing
- * through: it returns exactly what it was given.
+ * It was one at first, and that was wrong twice. `modifyIncomingDamage` runs in
+ * insertion order with each buff handing the next what is left, so *where* the
+ * reflect sat decided what it reflected — behind a shield it only ever saw the
+ * overflow. Making the caster add it first fixed one cast and not the next:
+ * recast Annie E while the old shield is still up (90% CDR makes that routine)
+ * and the *old* shield sits in front of the *new* burn, which then never fires.
+ *
+ * `Buff.onDamageTaken` runs after the whole mitigation chain and is handed both
+ * numbers, so order stopped being part of the answer. The reflect is measured
+ * on `swung` — what was aimed at the wearer — because "he hit me for 50, he
+ * takes 40" is the sentence, and a shield eating the 50 does not make the swing
+ * smaller.
+ *
+ * Every hit is paid for. Annie E carried a "once per enemy per cast" ledger
+ * for a while — the wiki's own wording — and it was dropped on purpose: a
+ * reflect that fires once and then goes quiet reads as broken rather than as
+ * limited, which is exactly how it was reported. What stops it doubling is not
+ * a ledger but the `stackId`: two casts overlapping replace rather than stack.
  *
  * ## The re-entrancy guard
  *
@@ -32,19 +43,28 @@ let reflecting = false;
 export default class DamageReflect extends Buff {
   name = 'Phản Đòn';
 
-  /** Share of the incoming hit sent back, 0–1. */
+  /** Share of the incoming hit sent back, 0–1. Rammus W's whole effect. */
   percent = 0.8;
+
+  /**
+   * A fixed return on top of the share. Annie E is the flat kind — a shield
+   * that burns whoever touches it for the same amount however hard they hit.
+   * Additive rather than a mode switch, so a spell that wants both just sets
+   * both and nothing here has to branch.
+   */
+  flat = 0;
+
   color: [number, number, number] = [255, 190, 110];
 
-  modifyIncomingDamage(damage: number, attacker?: AttackableUnit): number {
-    if (this.toRemove || !attacker || damage <= 0) return damage;
+  onDamageTaken(swung: number, _landed: number, attacker?: AttackableUnit): void {
+    if (this.toRemove || !attacker || swung <= 0) return;
     // Self-damage is not an attack, and a cost that refunds itself is not a
     // cost — the same rule `takeDamage` applies to omnivamp.
-    if (attacker === this.targetUnit || attacker.isDead) return damage;
-    if (reflecting) return damage;
+    if (attacker === this.targetUnit || attacker.isDead) return;
+    if (reflecting) return;
 
-    const payload = Math.round(damage * this.percent);
-    if (payload <= 0) return damage;
+    const payload = Math.round(this.flat + swung * this.percent);
+    if (payload <= 0) return;
 
     reflecting = true;
     try {
@@ -57,7 +77,5 @@ export default class DamageReflect extends Buff {
     } finally {
       reflecting = false;
     }
-
-    return damage;
   }
 }

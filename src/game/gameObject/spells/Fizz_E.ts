@@ -35,7 +35,7 @@ export default class Fizz_E extends Spell {
   phase: 'GROUND' | 'AIR' = 'GROUND';
 
   image = Fizz_E.PHASES[this.phase].image;
-  name = 'Nghịch Ngợm / Tinh Quái (Fizz_E)';
+  name = 'Tung Tăng / Nhảy Múa (Fizz_E)';
   description =
     'Fizz chống đinh ba nhảy lên không, <span class="buff">Không thể bị chọn làm mục tiêu</span> trong <span class="time">0.75 giây</span>. Khi đáp xuống, gây <span class="damage">30 sát thương</span> quanh mình và <span class="buff">Làm Chậm</span> 50% trong <span class="time">2 giây</span>. Có thể tái kích hoạt lúc đang lơ lửng (<b>Tinh Quái</b>) để nhảy xuống sớm ở vị trí khác: phạm vi nhỏ hơn và <i>không làm chậm</i>';
   coolDown = 8000;

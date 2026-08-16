@@ -60,22 +60,22 @@ describe('TargetResolver', () => {
   });
 
   it('honours a spell that asks for a tighter acquisition radius than the shared one', () => {
-    const enemy = {
-      position: { x: 30, y: 20 },
-      teamId: 'red',
-      targetable: true,
-      selectionRadius: 5,
-    };
+    // `acquisitionRadius` decides when the player counts as *aiming at* someone,
+    // which is when aim wins outright. It no longer decides whether the cast is
+    // allowed at all — that is range's job. With a radius of 0 only a direct hit
+    // counts as aim, so the far enemy loses to the one under the cursor.
+    const under = { position: { x: 10, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 0 };
+    const away = { position: { x: 30, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
 
     expect(TargetResolver.resolve('UNIT', baseRequest({
       cursorWorld: { x: 10, y: 20 },
       range: 100,
       targetTeam: 'ENEMY',
       acquisitionRadius: 0,
-      queryCandidates: () => [enemy],
-      getTargetInfo: candidate => candidate as typeof enemy,
-      isTargetable: candidate => (candidate as typeof enemy).targetable,
-    }))).toEqual({ ok: false, reason: 'TARGET_INVALID' });
+      queryCandidates: () => [away, under],
+      getTargetInfo: candidate => candidate as typeof under,
+      isTargetable: candidate => (candidate as typeof under).targetable,
+    }))).toMatchObject({ ok: true, context: { target: under } });
   });
 
   it('acquires a unit the cursor is merely near, the way an attack order does', () => {
@@ -97,7 +97,10 @@ describe('TargetResolver', () => {
     }))).toMatchObject({ ok: true, context: { target: enemy } });
   });
 
-  it('still refuses when every unit is beyond the acquisition radius', () => {
+  it('reaches a unit in range that the cursor is nowhere near', () => {
+    // The reported bug: a minion well inside the spell's range but on the far
+    // side of the caster from the cursor was dropped by the acquisition circle,
+    // so the key did nothing at all. Range is the gate; the cursor only ranks.
     const enemy = {
       position: { x: 400, y: 20 },
       teamId: 'red',
@@ -107,13 +110,90 @@ describe('TargetResolver', () => {
 
     expect(TargetResolver.resolve('UNIT', baseRequest({
       origin: { x: 10, y: 20 },
-      cursorWorld: { x: 10, y: 20 },
+      cursorWorld: { x: -300, y: 20 },
       range: 900,
       targetTeam: 'ENEMY',
       queryCandidates: () => [enemy],
       getTargetInfo: candidate => candidate as typeof enemy,
       isTargetable: candidate => (candidate as typeof enemy).targetable,
-    }))).toEqual({ ok: false, reason: 'TARGET_INVALID' });
+    }))).toMatchObject({ ok: true, context: { target: enemy } });
+  });
+
+  it('still refuses when the only unit in the world is out of range', () => {
+    const enemy = {
+      position: { x: 4_000, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      selectionRadius: 5,
+    };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 10, y: 20 },
+      range: 500,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [enemy],
+      getTargetInfo: candidate => candidate as typeof enemy,
+      isTargetable: candidate => (candidate as typeof enemy).targetable,
+    }))).toEqual({ ok: false, reason: 'OUT_OF_RANGE' });
+  });
+
+  it('never lets the fallback overrule a unit the player is actually pointing at', () => {
+    const aimedAt = { position: { x: 60, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+    const behind = { position: { x: -400, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+
+    expect(TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 70, y: 20 },
+      range: 900,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [behind, aimedAt],
+      getTargetInfo: candidate => candidate as typeof aimedAt,
+      isTargetable: candidate => (candidate as typeof aimedAt).targetable,
+    }))).toMatchObject({ ok: true, context: { target: aimedAt } });
+  });
+
+  it('lets a spell choose for itself when the cursor is on nobody', () => {
+    const near = { position: { x: 60, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+    const far = { position: { x: 800, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+    const pickWithoutAim = vi.fn(
+      (candidates: readonly unknown[], _nearestToCursor: unknown) => candidates[1]
+    );
+
+    const result = TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: -900, y: 20 },
+      range: 2_000,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [near, far],
+      getTargetInfo: candidate => candidate as typeof near,
+      isTargetable: candidate => (candidate as typeof near).targetable,
+      pickWithoutAim,
+    }));
+
+    expect(pickWithoutAim).toHaveBeenCalledTimes(1);
+    // handed everything in range, plus the answer it would have got by default
+    expect(pickWithoutAim.mock.calls[0][0]).toEqual([near, far]);
+    expect(pickWithoutAim.mock.calls[0][1]).toBe(near);
+    expect(result).toMatchObject({ ok: true, context: { target: far } });
+  });
+
+  it('does not consult that choice when the player is aiming at someone', () => {
+    const aimedAt = { position: { x: 60, y: 20 }, teamId: 'red', targetable: true, selectionRadius: 5 };
+    const pickWithoutAim = vi.fn(() => undefined);
+
+    TargetResolver.resolve('UNIT', baseRequest({
+      origin: { x: 10, y: 20 },
+      cursorWorld: { x: 65, y: 20 },
+      range: 900,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [aimedAt],
+      getTargetInfo: candidate => candidate as typeof aimedAt,
+      isTargetable: candidate => (candidate as typeof aimedAt).targetable,
+      pickWithoutAim,
+    }));
+
+    expect(pickWithoutAim).not.toHaveBeenCalled();
   });
 
   it('keeps picking the unit nearest the cursor when both are inside the acquisition radius', () => {

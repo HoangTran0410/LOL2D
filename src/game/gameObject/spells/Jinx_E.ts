@@ -12,8 +12,7 @@ import AoePulse from '../spellObjects/AoePulse';
 export const MAX_RANGE = 500;
 export const COUNT = 3;
 export const SPREAD = 70;
-/** Wiki: lands after 0.4s, arms after 0.5s, explodes after 5s. */
-export const LAND_TIME_MS = 400;
+export const LAND_TIME_MS = 1000;
 export const ARM_TIME_MS = 500;
 export const FUSE_MS = 5000;
 export const TRIGGER_RADIUS = 60;
@@ -48,7 +47,7 @@ export const CHOMPED_STACK_ID = 'jinx_e_chomped';
 export default class Jinx_E extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_jinx_e');
-  name = 'Bẫy Răng Lửa! (Jinx_E)';
+  name = 'Lựu Đạn Ma Hỏa! (Jinx_E)';
   description =
     `Ném <span>${COUNT} chiếc bẫy</span> xuống vị trí chỉ định. Bẫy <span class="buff">kích hoạt sau</span>` +
     ` <span class="time">${ARM_TIME_MS / 1000} giây</span>: <span class="damage">tướng địch</span> giẫm phải bị` +

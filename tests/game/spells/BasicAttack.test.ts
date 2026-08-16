@@ -214,8 +214,10 @@ describe('BasicAttack, the ability in the A slot', () => {
 
   it('respects the fog on the way out, the same as the cursor pass', () => {
     const world = harness();
+    // Hidden the way the game hides people, not by clearing the draw flag:
+    // acquisition asks `combat/Vision.ts` on the attacker's own behalf now.
     const hidden = champion(world.game, 120);
-    hidden.willDraw = false;
+    hidden.isInsideBush = true;
     world.world([hidden]);
 
     world.press(HotKeys.A, { x: -900, y: 0 });
@@ -231,7 +233,7 @@ describe('BasicAttack, the ability in the A slot', () => {
     const untargetable = champion(world.game, 80);
     untargetable.setStatus(StatusFlags.Targetable, false);
     const hidden = champion(world.game, 90);
-    hidden.willDraw = false;
+    hidden.isInsideBush = true;
     const real = champion(world.game, 200);
     world.world([ally, corpse, untargetable, hidden, real]);
 

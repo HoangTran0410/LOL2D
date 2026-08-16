@@ -30,7 +30,7 @@ export const LAUNCHER_MARGIN = 80;
 export default class Jinx_Q extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_jinx_q');
-  name = 'Đổi Súng! (Jinx_Q)';
+  name = 'Tráo Hàng! (Jinx_Q)';
   description =
     `Đổi sang súng phóng lựu trong <span class="time">${DURATION / 1000} giây</span>:` +
     ` <span class="buff">+${BONUS_RANGE} tầm đánh</span>, <span class="buff">+${ON_HIT_DAMAGE} sát thương mỗi đòn</span>,` +

@@ -15,7 +15,7 @@ export const STACK_ID = 'fizz_w';
 export default class Fizz_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_fizz_w');
-  name = 'Đinh Ba Biển Sâu (Fizz_W)';
+  name = 'Đinh Ba Hải Thạch (Fizz_W)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>, mỗi đòn đánh thường gây thêm` +
     ` <span class="damage">${BLEED_PER_TICK} sát thương mỗi nhịp</span> trong` +

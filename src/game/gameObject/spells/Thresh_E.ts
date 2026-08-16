@@ -98,7 +98,7 @@ export function enemiesInSweptBox(
 export default class Thresh_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_thresh_e');
-  name = 'Quét Xích (Thresh_E)';
+  name = 'Lưỡi Hái Xoáy (Thresh_E)';
   description =
     `Quất xích thành một <span class="buff">vệt quét hình chữ nhật</span> dài <span>${HALF_LENGTH * 2}px</span>` +
     ` rộng <span>${HALF_WIDTH * 2}px</span>, tâm ở Thresh và xoay theo hướng con trỏ. Xích quét qua trong` +

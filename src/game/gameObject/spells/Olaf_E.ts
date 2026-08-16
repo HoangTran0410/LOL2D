@@ -21,7 +21,7 @@ export default class Olaf_E extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_olaf_e');
-  name = 'Chém Liều Mạng (Olaf_E)';
+  name = 'Bổ Củi (Olaf_E)';
   description =
     `Bổ rìu vào kẻ địch gần nhất trong <span>${RANGE}px</span>: <span class="damage">${DAMAGE} sát thương</span>,` +
     ` đổi lại Olaf <span class="damage">tự mất ${HEALTH_COST} máu</span>`;
@@ -60,7 +60,10 @@ export default class Olaf_E extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     });
     let nearest = null;
     let nearestDistance = Infinity;

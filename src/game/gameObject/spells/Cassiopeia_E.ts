@@ -44,7 +44,7 @@ export default class Cassiopeia_E extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_cassiopeia_e');
-  name = 'Song Nha (Cassiopeia_E)';
+  name = 'Nanh Độc (Cassiopeia_E)';
   description =
     `Phun nọc vào kẻ địch gần nhất trong <span>${RANGE}px</span>: <span class="damage">${BASE_DAMAGE} sát thương</span>,` +
     ` hoặc <span class="damage">${POISONED_DAMAGE} sát thương</span> nếu mục tiêu <span class="damage">đang trúng độc</span>` +
@@ -76,7 +76,10 @@ export default class Cassiopeia_E extends Spell {
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
     }) as AttackableUnit[];
     let nearest: AttackableUnit | null = null;
     let nearestDistance = Infinity;

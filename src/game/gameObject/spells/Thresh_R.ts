@@ -43,7 +43,7 @@ const SPECTRE: [number, number, number] = [130, 255, 180];
 export default class Thresh_R extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_thresh_r');
-  name = 'Chiếc Hộp (Thresh_R)';
+  name = 'Đóng Hộp (Thresh_R)';
   description =
     `Dựng một chiếc lồng bán kính <span>${RADIUS}px</span> quanh mình trong` +
     ` <span class="time">${DURATION / 1000} giây</span>. Kẻ địch <span class="damage">bước ra khỏi lồng</span>` +

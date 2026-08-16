@@ -1,5 +1,6 @@
 import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 import type Spell from '../gameObject/Spell';
+import { canSee, type Seeable } from './Vision';
 
 /**
  * Last-hitting, for a game that cannot click a unit.
@@ -45,8 +46,16 @@ export interface ExecuteSpell {
    */
   executeDamageAgainst(target: AttackableUnit): number;
 
-  /** Who to hit when `executeDamageAgainst` kills nobody in range. */
-  readonly executeFallback: ExecuteFallback;
+  /**
+   * Who to hit when `executeDamageAgainst` kills nobody in range.
+   *
+   * Optional, and omitted by every *aimed* spell: nothing picks a target for a
+   * skillshot, so it has no fallback to state. Those implement the interface
+   * only to be marked — `executeCandidates` answers "who is on the line I am
+   * pointing at right now" and `pickExecuteTarget` is never called on them.
+   * Absent behaves as `'nearest'`.
+   */
+  readonly executeFallback?: ExecuteFallback;
 }
 
 /**
@@ -71,6 +80,33 @@ export const isLethal = (damage: number, unit: AttackableUnit): boolean =>
 const distanceFrom = (origin: { x: number; y: number }, unit: AttackableUnit): number =>
   Math.hypot(unit.position.x - origin.x, unit.position.y - origin.y);
 
+/**
+ * The caster, when the spell knows one. Every execute spell is a `Spell` and so
+ * has an `owner`; the type stays loose because `lethalTargets` is also handed
+ * bare fixtures by the mark tests.
+ */
+type ExecuteCaster = { owner?: Seeable & { position?: { x: number; y: number } } };
+
+/**
+ * Everyone the spell could hit *and* the caster can actually see.
+ *
+ * The candidate queries are per-spell and every one of them was blind: Garen R
+ * would sentence a champion through a wall, and the mark promising the kill was
+ * painted on a body the player could not see. Filtering here rather than in each
+ * `executeCandidates` means the targeting and the mark cannot disagree, which is
+ * this module's whole reason for existing.
+ */
+const visibleCandidates = (spell: ExecuteSpell & ExecuteCaster): AttackableUnit[] => {
+  const candidates = spell.executeCandidates();
+  const owner = spell.owner;
+  if (!owner) return candidates;
+  const seen: AttackableUnit[] = [];
+  for (const candidate of candidates) {
+    if (candidate && canSee(owner, candidate)) seen.push(candidate);
+  }
+  return seen;
+};
+
 /** A spell that carries the two methods, whether or not it declares the interface. */
 export function isExecuteSpell(spell: unknown): spell is Spell & ExecuteSpell {
   const candidate = spell as Partial<ExecuteSpell> | null | undefined;
@@ -81,9 +117,9 @@ export function isExecuteSpell(spell: unknown): spell is Spell & ExecuteSpell {
 }
 
 /** Everyone in range the spell would kill right now. Drives the on-screen mark. */
-export function lethalTargets(spell: ExecuteSpell): AttackableUnit[] {
+export function lethalTargets(spell: ExecuteSpell & ExecuteCaster): AttackableUnit[] {
   const found: AttackableUnit[] = [];
-  for (const candidate of spell.executeCandidates()) {
+  for (const candidate of visibleCandidates(spell)) {
     if (!candidate || candidate.isDead) continue;
     if (isLethal(spell.executeDamageAgainst(candidate), candidate)) found.push(candidate);
   }
@@ -104,9 +140,7 @@ export function lethalTargets(spell: ExecuteSpell): AttackableUnit[] {
  * Distance only breaks a tie. With nobody killable the spell's own fallback
  * decides, which is what keeps Nasus Q usable as a plain damage button.
  */
-export function pickExecuteTarget(
-  spell: ExecuteSpell & { owner?: { position?: { x: number; y: number } } }
-): AttackableUnit | null {
+export function pickExecuteTarget(spell: ExecuteSpell & ExecuteCaster): AttackableUnit | null {
   const origin = spell.owner?.position;
   if (!origin) return null;
 
@@ -116,7 +150,7 @@ export function pickExecuteTarget(
   let fallbackPick: AttackableUnit | null = null;
   let fallbackScore = Infinity;
 
-  for (const candidate of spell.executeCandidates()) {
+  for (const candidate of visibleCandidates(spell)) {
     if (!candidate || candidate.isDead) continue;
 
     const health = effectiveHealth(candidate);

@@ -26,7 +26,7 @@ export const SLOW_DURATION = 2000;
 export default class Jinx_W extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_jinx_w');
-  name = 'Chích Điện! (Jinx_W)';
+  name = 'Giật Bắn! (Jinx_W)';
   description =
     `Bắn một tia điện xa <span>${RANGE}px</span>: mục tiêu đầu tiên trúng phải nhận` +
     ` <span class="damage">${DAMAGE} sát thương</span> và bị <span class="buff">Làm Chậm ${SLOW_PERCENT * 100}%</span>` +

@@ -141,6 +141,9 @@ describe('the visual causes the hit', () => {
     const pantheon = at(game, 0, 0, 'blue');
     const victim = at(game, 300, 0, 'red');
     game.objectManager.queryObjects = vi.fn(() => [victim]) as never;
+    // The vault takes whoever is nearest the *cursor*, so a cast needs one:
+    // `aimPoint` falls back to the live mouse when there is no cast context.
+    (game as unknown as { worldMouse: unknown }).worldMouse = victim.position.copy();
 
     new Pantheon_W(pantheon).onSpellCast();
     expect(hp(victim), 'still airborne').toBe(500);
@@ -159,6 +162,9 @@ describe('the visual causes the hit', () => {
     const pantheon = at(game, 0, 0, 'blue');
     const victim = at(game, 300, 0, 'red');
     game.objectManager.queryObjects = vi.fn(() => [victim]) as never;
+    // The vault takes whoever is nearest the *cursor*, so a cast needs one:
+    // `aimPoint` falls back to the live mouse when there is no cast context.
+    (game as unknown as { worldMouse: unknown }).worldMouse = victim.position.copy();
 
     new Pantheon_W(pantheon).onSpellCast();
     const dash = pantheon.buffs.find(b => b instanceof Dash) as Dash;
@@ -178,6 +184,9 @@ describe('the visual causes the hit', () => {
     const pantheon = at(game, 0, 0, 'blue');
     const victim = at(game, 300, 0, 'red');
     game.objectManager.queryObjects = vi.fn(() => [victim]) as never;
+    // The vault takes whoever is nearest the *cursor*, so a cast needs one:
+    // `aimPoint` falls back to the live mouse when there is no cast context.
+    (game as unknown as { worldMouse: unknown }).worldMouse = victim.position.copy();
 
     new Pantheon_W(pantheon).onSpellCast();
     const dash = pantheon.buffs.find(b => b instanceof Dash) as Dash;

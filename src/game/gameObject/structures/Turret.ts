@@ -1,6 +1,7 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
+import type { KillCredit } from '../../combat/MatchTally';
 import type { AttackableUnitOptions } from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
 import Minion from '../attackableUnits/Minion';
@@ -54,6 +55,9 @@ export interface TurretOptions {
  * minions.
  */
 export default class Turret extends AttackableUnit {
+  /** A building is not farm — killing one moves nobody's CS. */
+  killCredit: KillCredit = 'none';
+
   /** Above plain units, below champions. */
   zIndex = 3.5;
   /** A building the player has seen stays drawn through the fog. */
@@ -161,6 +165,7 @@ export default class Turret extends AttackableUnit {
       filters: [
         PredefinedFilters.includeTypes([Champion, Minion]),
         PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+        PredefinedFilters.visibleTo(this),
         PredefinedFilters.excludeStealthed,
       ],
     });

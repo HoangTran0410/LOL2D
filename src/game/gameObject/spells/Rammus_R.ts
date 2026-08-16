@@ -35,7 +35,7 @@ export const LEAP_TIMEOUT_MS = 2000;
 export default class Rammus_R extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_rammus_r');
-  name = 'Nhảy Bổ (Rammus_R)';
+  name = 'Cú Nhảy Chấn Động (Rammus_R)';
   description =
     `Bay tới vị trí chỉ định, <span class="buff">Không Thể Bị Chọn</span> suốt đường bay, rồi giáng xuống` +
     ` bán kính <span>${RADIUS}px</span>: <span class="damage">${DAMAGE} sát thương</span>,` +

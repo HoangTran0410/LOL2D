@@ -20,7 +20,7 @@ export const THROW_SPEED = 11;
 export default class Thresh_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_thresh_w');
-  name = 'Lối Đi Hắc Ám (Thresh_W)';
+  name = 'Con Đường Tăm Tối (Thresh_W)';
   description =
     `Ném chiếc đèn bay tới vị trí chỉ định; <span class="damage">khi đáp xuống</span> nó treo ở đó` +
     ` <span class="time">${DURATION / 1000} giây</span>: mọi đồng minh <span class="buff">đứng trong</span>` +

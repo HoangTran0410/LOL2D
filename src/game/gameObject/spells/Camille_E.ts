@@ -22,7 +22,7 @@ export const CAMILLE_E_CC_MS = 750;
 export default class Camille_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_camille_e');
-  name = 'Bắn Dây Móc / Nhảy Tường (Camille_E)';
+  name = 'Bắn Dây Móc (Camille_E)';
   description =
     'Bắn dây móc theo hướng chỉ định. Nếu trúng tường, kéo Camille tới tường và cho phép tái kích hoạt <span class="buff">Nhảy Tường</span> lướt tới va chạm tướng địch đầu tiên.';
   coolDown = 10000;

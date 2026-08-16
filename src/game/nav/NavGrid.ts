@@ -60,6 +60,25 @@
  * turn "distance to a blocked cell centre" into a lower bound on "distance to
  * the wall". Stored floored to whole pixels, which only ever understates it.
  *
+ * That correction fixes the average and leaves the spread, and the spread was
+ * the whole problem: a blocked cell's centre can be a half-*diagonal* from the
+ * geometry that blocked it, so cells were refused with as much as 19px of room
+ * to spare on top of the margin. Per side, that asked ~93px of corridor for a
+ * body 55px across — and this map's jungle is built out of 60-90px gaps, so it
+ * did not cost a band of wasted ground, it closed passages. A fully stacked
+ * champion saw the walkable map break into five disconnected pieces.
+ *
+ * So `refineNearWalls` replaces the transform's estimate with the *measured*
+ * distance to the wall for every cell close enough for it to decide anything —
+ * about a tenth of the map, a few milliseconds. Measured against the shipped
+ * map that halves the moat (10.4% of standable ground to 5.5% for a champion),
+ * drops the worst overshoot from 19px to 8px — which is `requiredClearance`'s
+ * margin exactly, i.e. nothing but the deliberate part is left — and puts every
+ * body size back on one connected map. Being exact is also strictly safer: the
+ * transform could overstate clearance, a measurement cannot, and the sweep in
+ * `tests/game/nav/NavGrid.test.ts` moved from 3.7px of accepted overlap to
+ * 2.84px on the same bound.
+ *
  * Queries then ask for `radius + requiredClearance`'s margin rather than
  * `radius` — see that method for what the margin is and why it is deliberately
  * smaller than the value that would make this structure never wrong. Short
@@ -85,6 +104,12 @@ export const NAV_CELL_SIZE = 16;
  * bounds, so it is the one place this can move: shrinking the margin without
  * lowering this to match is a lie the test will catch, and raising this
  * without re-measuring is a safety margin picked by taste, not evidence.
+ *
+ * The sweep measures 2.84px against this 4px bound since `refineNearWalls`
+ * landed (it was 3.7px when the clearance field was rasterization-derived).
+ * What is left is not rasterization at all and will not go away by measuring
+ * harder: the margin is half a cell, a body standing at a cell *corner* is
+ * half a diagonal from its centre, and the difference is this number.
  */
 export const NAV_MAX_ACCEPTED_OVERLAP = 4;
 
@@ -125,6 +150,33 @@ export const NAV_MAX_TERRAIN_RADIUS = 40;
 
 /** Clearance is stored in a Uint16Array; nothing on this map is further than this from a wall. */
 const MAX_STORED_CLEARANCE = 4_096;
+
+/**
+ * How far from a wall `refineNearWalls` replaces the transform's estimate with
+ * a measured distance.
+ *
+ * Comfortably past the largest margin any body asks for —
+ * `requiredClearance(NAV_MAX_TERRAIN_RADIUS)` is 48 at the shipped cell size —
+ * with room on top for the worst the transform understates by, so a cell left
+ * unrefined cannot be sitting near a threshold.
+ */
+const REFINE_BAND = 64;
+
+/**
+ * Bucket edge for the segment index. Must be at least `REFINE_BAND` — see
+ * `buildSegmentIndex` for why the 3x3 lookup depends on it.
+ */
+const SEGMENT_BUCKET = 128;
+
+/** Wall edges bucketed for exact nearest-distance queries. */
+interface SegmentIndex {
+  /** Buckets per axis. */
+  cols: number;
+  /** Indices into `coords`, one list per bucket. */
+  buckets: number[][];
+  /** x1, y1, x2, y2 per segment. */
+  coords: Float64Array;
+}
 
 /** Sub-millisecond clock where there is one, so a ~7ms build is not reported as 7 or 8. */
 export const navNow = (): number =>
@@ -211,14 +263,21 @@ export default class NavGrid {
     const cols = Math.max(1, Math.ceil(size / cellSize));
     const rows = cols;
     const blocked = new Uint8Array(cols * rows);
+    // Kept apart from `blocked`, which is the union of the two passes. A cell an
+    // edge merely clips has its centre out in the open; only a cell the scanline
+    // filled is genuinely inside the wall, and `refineNearWalls` needs to tell
+    // those two apart to know which centres it may measure from.
+    const interior = new Uint8Array(cols * rows);
 
     for (const polygon of polygons) {
       if (polygon.length < 2) continue;
       NavGrid.rasterizeEdges(polygon, blocked, cols, rows, cellSize);
-      NavGrid.rasterizeInterior(polygon, blocked, cols, rows, cellSize);
+      NavGrid.rasterizeInterior(polygon, interior, cols, rows, cellSize);
     }
+    for (let i = 0; i < blocked.length; i++) if (interior[i] === 1) blocked[i] = 1;
 
     const clearance = NavGrid.buildClearance(blocked, cols, rows, cellSize);
+    NavGrid.refineNearWalls(clearance, interior, polygons, cols, rows, cellSize);
     return new NavGrid(cellSize, cols, rows, clearance, navNow() - startedAt);
   }
 
@@ -351,6 +410,140 @@ export default class NavGrid {
       clearance[i] = px <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(px));
     }
     return clearance;
+  }
+
+  /**
+   * Replaces the transform's answer with the *exact* distance to the wall, for
+   * every cell close enough to a wall for the difference to decide anything.
+   *
+   * `buildClearance` measures to the nearest blocked cell *centre*, and a
+   * blocked cell's centre can be a half-diagonal away from the geometry that
+   * blocked it. Subtracting a half-cell corrects the average and leaves the
+   * spread: measured against the shipped map, a cell could be refused with as
+   * much as 19px of room to spare on top of the margin. Per side, that is a
+   * corridor needing ~93px of width for a body 55px across — and the jungle is
+   * built out of gaps in the 60-90px range, so the error was not a band of
+   * wasted ground, it was *closed passages*. The overlay drew them: an orange
+   * moat meeting in the middle of a gap the champion visibly fits through.
+   *
+   * There are two sources and this pass removes both. Free cells stop
+   * inheriting a neighbour's rasterization, and cells an edge merely clipped —
+   * blocked to keep a wall thinner than a cell visible, but with their centres
+   * out in the open — stop being worth nothing. A thin wall stays impassable
+   * regardless, because the true distance *around* a thin wall is small in
+   * every direction, which is the honest reason rather than a rasterization
+   * artefact standing in for one.
+   *
+   * Only the decision band is refined. `REFINE_BAND` is well past the largest
+   * `requiredClearance` any body can ask for (`NAV_MAX_TERRAIN_RADIUS` plus a
+   * half-cell), by more than the transform's own worst understatement, so no
+   * cell left alone can be near a threshold. That keeps this to roughly a
+   * tenth of the map and a few milliseconds.
+   *
+   * Being exact is also strictly *safer*: the transform could overstate
+   * clearance by a few pixels, which is what `NAV_MAX_ACCEPTED_OVERLAP` exists
+   * to bound. A measured distance never overstates.
+   */
+  private static refineNearWalls(
+    clearance: Uint16Array,
+    interior: Uint8Array,
+    polygons: readonly (readonly NavPoint[])[],
+    cols: number,
+    rows: number,
+    cellSize: number
+  ): void {
+    const index = NavGrid.buildSegmentIndex(polygons, cols * cellSize);
+    if (index === null) return;
+
+    for (let cy = 0; cy < rows; cy++) {
+      for (let cx = 0; cx < cols; cx++) {
+        const i = cy * cols + cx;
+        if (interior[i] === 1) continue;
+        if (clearance[i] > REFINE_BAND) continue;
+
+        const exact = NavGrid.nearestWallDistance(index, (cx + 0.5) * cellSize, (cy + 0.5) * cellSize);
+        if (exact === Infinity) continue;
+        clearance[i] = exact <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(exact));
+      }
+    }
+  }
+
+  /**
+   * Wall edges bucketed by their bounding boxes.
+   *
+   * `SEGMENT_BUCKET` is at least `REFINE_BAND`, which is what lets
+   * `nearestWallDistance` look at a fixed 3x3 of buckets instead of searching
+   * outward: the closest point of any segment within `REFINE_BAND` of a query
+   * lies in a bucket at most one step away, and bbox bucketing always registers
+   * a segment in the bucket holding any point of it.
+   */
+  private static buildSegmentIndex(
+    polygons: readonly (readonly NavPoint[])[],
+    size: number
+  ): SegmentIndex | null {
+    const coordinates: number[] = [];
+    for (const polygon of polygons) {
+      if (polygon.length < 2) continue;
+      for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        coordinates.push(polygon[j].x, polygon[j].y, polygon[i].x, polygon[i].y);
+      }
+    }
+    if (coordinates.length === 0) return null;
+
+    const cols = Math.max(1, Math.ceil(size / SEGMENT_BUCKET));
+    const buckets: number[][] = [];
+    for (let i = 0; i < cols * cols; i++) buckets.push([]);
+
+    const coords = Float64Array.from(coordinates);
+    for (let s = 0; s < coords.length; s += 4) {
+      const fromX = Math.max(0, Math.floor(Math.min(coords[s], coords[s + 2]) / SEGMENT_BUCKET));
+      const toX = Math.min(cols - 1, Math.floor(Math.max(coords[s], coords[s + 2]) / SEGMENT_BUCKET));
+      const fromY = Math.max(0, Math.floor(Math.min(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET));
+      const toY = Math.min(cols - 1, Math.floor(Math.max(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET));
+      for (let by = fromY; by <= toY; by++) {
+        for (let bx = fromX; bx <= toX; bx++) buckets[by * cols + bx].push(s);
+      }
+    }
+    return { cols, buckets, coords };
+  }
+
+  /**
+   * Distance from a point to the nearest wall edge, or Infinity past a bucket
+   * step. Kept squared until the last line: this is the inner loop of the build
+   * and `Math.hypot` per segment per cell costs more than everything else here
+   * put together.
+   */
+  private static nearestWallDistance(index: SegmentIndex, px: number, py: number): number {
+    const { cols, buckets, coords } = index;
+    const bx = Math.floor(px / SEGMENT_BUCKET);
+    const by = Math.floor(py / SEGMENT_BUCKET);
+    let best = Infinity;
+
+    const fromY = by - 1 < 0 ? 0 : by - 1;
+    const toY = by + 1 >= cols ? cols - 1 : by + 1;
+    const fromX = bx - 1 < 0 ? 0 : bx - 1;
+    const toX = bx + 1 >= cols ? cols - 1 : bx + 1;
+
+    for (let y = fromY; y <= toY; y++) {
+      for (let x = fromX; x <= toX; x++) {
+        const bucket = buckets[y * cols + x];
+        for (let k = 0; k < bucket.length; k++) {
+          const s = bucket[k];
+          const x1 = coords[s];
+          const y1 = coords[s + 1];
+          const dx = coords[s + 2] - x1;
+          const dy = coords[s + 3] - y1;
+          const lengthSquared = dx * dx + dy * dy;
+          let t = lengthSquared === 0 ? 0 : ((px - x1) * dx + (py - y1) * dy) / lengthSquared;
+          t = t < 0 ? 0 : t > 1 ? 1 : t;
+          const ox = px - (x1 + t * dx);
+          const oy = py - (y1 + t * dy);
+          const squared = ox * ox + oy * oy;
+          if (squared < best) best = squared;
+        }
+      }
+    }
+    return best === Infinity ? Infinity : Math.sqrt(best);
   }
 
   // ------------------------------------------------------------------ queries

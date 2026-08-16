@@ -14,7 +14,7 @@ export const REVEAL_STACK_ID = 'ashe_e_reveal';
 export default class Ashe_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_e');
-  name = 'Chim Ưng Do Thám (Ashe_E)';
+  name = 'Ưng Tiễn (Ashe_E)';
   description =
     'Thả một chim ưng bay xa <span>900px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class="buff">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class="buff">Lộ Diện</span> trong <span class="time">3 giây</span>';
   coolDown = 6000;

@@ -89,6 +89,18 @@ export default class PathAgent {
   goalX = 0;
   goalY = 0;
   private hasGoal = false;
+  /**
+   * Where the goal was when the running plan was committed.
+   *
+   * `order()` measures drift against *this*, not against last frame's goal. The
+   * difference is the whole bug below: a goal that walks away one pixel a frame
+   * never moves far enough in any single frame to trip a per-frame comparison,
+   * so the order was swallowed forever and `destination` — which only `plan()`
+   * writes — was left pointing at wherever the goal had been when the button
+   * went down.
+   */
+  private planGoalX = 0;
+  private planGoalY = 0;
 
   private replanCooldownMs = 0;
   private pathCheckCooldownMs: number;
@@ -139,7 +151,19 @@ export default class PathAgent {
     // (a body in a chokepoint, a route that ran out of expansions) is usually
     // gone seconds later.
     if (this.hasGoal && this.state !== 'IDLE' && this.state !== 'BLOCKED') {
-      const goalMoved = Math.hypot(x - this.goalX, y - this.goalY);
+      // Measured from the *planned* goal, not from last frame's. Held orders
+      // creep: `Game.update` re-issues the cursor's world position every frame
+      // while the right button is down, and the camera rides the champion, so
+      // the world point under a stationary cursor walks forward at exactly the
+      // champion's own speed. Frame to frame that is three pixels — under the
+      // tolerance, every time, forever — while `remaining` stays pinned at
+      // whatever the cursor's screen offset is and so never falls under the
+      // "nearly there" escape either. The champion walked to wherever the
+      // cursor had been when the button went down, arrived, and stood still
+      // with the button still held. Against the planned goal the same drift
+      // trips the tolerance after ~120px of travel and the order is re-planned,
+      // which is both correct and roughly one plan every forty frames.
+      const goalMoved = Math.hypot(x - this.planGoalX, y - this.planGoalY);
       const remaining = Math.hypot(
         this.host.position.x - this.goalX,
         this.host.position.y - this.goalY
@@ -188,7 +212,7 @@ export default class PathAgent {
     if (!this.navigation.enabled) {
       this.state = 'DIRECT';
       this.waypoints.length = 0;
-      this.planStartDistance = distance;
+      this.commitGoal(distance);
       this.host.destination.set(this.goalX, this.goalY);
       return;
     }
@@ -198,7 +222,7 @@ export default class PathAgent {
       this.state = 'DIRECT';
       this.waypoints.length = 0;
       this.waypointIndex = 0;
-      this.planStartDistance = distance;
+      this.commitGoal(distance);
       this.host.destination.set(this.goalX, this.goalY);
       return;
     }
@@ -209,7 +233,12 @@ export default class PathAgent {
     // buy a fresh search to replace a route that is at most 250ms stale, which
     // over that window is under 50px of target movement. Walking the route it
     // already has is the better trade by a wide margin.
-    if (this.replanCooldownMs > 0 && (this.state === 'FOLLOWING' || this.state === 'BLOCKED')) {
+    // Every state but IDLE: a fresh order always gets its search, and every
+    // other caller is re-issuing one. PENDING and DIRECT are in the list
+    // because a held order now reaches `plan()` regularly rather than being
+    // swallowed forever, and a held order over a line that has just become
+    // blocked must not buy a search on each of those visits.
+    if (this.replanCooldownMs > 0 && this.state !== 'IDLE') {
       return;
     }
 
@@ -219,7 +248,7 @@ export default class PathAgent {
     // push-out still has the last word.
     this.host.destination.set(this.goalX, this.goalY);
     this.state = 'PENDING';
-    this.planStartDistance = distance;
+    this.commitGoal(distance);
     this.replanCooldownMs = NAV_REPLAN_INTERVAL_MS;
     this.navigation.request(this, this.urgent);
   }
@@ -307,7 +336,7 @@ export default class PathAgent {
         ) {
           this.state = 'PENDING';
           destination.set(position.x, position.y);
-          this.planStartDistance = remaining;
+          this.commitGoal(remaining);
           this.replanCooldownMs = NAV_REPLAN_INTERVAL_MS;
           this.navigation.request(this, this.urgent);
           return;
@@ -356,6 +385,18 @@ export default class PathAgent {
     ) {
       this.repath();
     }
+  }
+
+  /**
+   * Marks the current goal as the one the running plan was made for. Every
+   * place that commits a plan goes through here, so `order()`'s drift check and
+   * the truncated-route progress check can never disagree about which goal the
+   * plan belongs to.
+   */
+  private commitGoal(distance: number): void {
+    this.planStartDistance = distance;
+    this.planGoalX = this.goalX;
+    this.planGoalY = this.goalY;
   }
 
   /**

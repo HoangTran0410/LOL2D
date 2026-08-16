@@ -18,7 +18,7 @@ export const EKKO_Q_FIELD_RADIUS = 100;
 export default class Ekko_Q extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ekko_q');
-  name = 'Dây Thần Kinh Gia Tốc (Ekko_Q)';
+  name = 'Dây Cót Thời Gian (Ekko_Q)';
   description =
     'Bắn ra một bẫy thời gian theo hướng chỉ định gây <span class="damage">20 sát thương</span>. Khi trúng tướng hoặc bay hết tầm, bẫy mở rộng làm chậm kẻ địch <span class="buff">40%</span>. Sau đó quay về Ekko gây <span class="damage">30 sát thương</span>.';
   coolDown = 7000;
@@ -239,12 +239,7 @@ export class Ekko_Q_Object extends MissileSpellObject {
 
     // outer blades
     noFill();
-    stroke(
-      returning ? 255 : 90,
-      returning ? 120 : 235,
-      returning ? 220 : 255,
-      235
-    );
+    stroke(returning ? 255 : 90, returning ? 120 : 235, returning ? 220 : 255, 235);
     strokeWeight(3);
     for (let i = 0; i < 3; i++) {
       push();

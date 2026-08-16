@@ -9,7 +9,7 @@ import SpellObject from '../SpellObject';
 export default class Zed_E extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_zed_e');
-  name = 'Đường kiếm bóng tối (Zed_E)';
+  name = 'Đường Kiếm Bóng Tối (Zed_E)';
   description =
     'Xoay lưỡi kiếm xung quanh bản thân. Gây <span class="damage">15 sát thương</span> và <span class="buff">Làm chậm 30%</span> các kẻ địch trong <span class="time">1 giây</span>';
   coolDown = 1000;

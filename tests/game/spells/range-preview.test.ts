@@ -56,7 +56,19 @@ describe('every spell with a declared reach previews it', () => {
     vi.stubGlobal('stroke', () => {});
     vi.stubGlobal('noStroke', () => {});
     vi.stubGlobal('strokeWeight', () => {});
-    vi.stubGlobal('line', () => {});
+    // A line preview states its reach with its far end rather than with a ring:
+    // Veigar Q draws the corridor the orb sweeps, stopping exactly at `range`.
+    // Recorded as a shape of that radius so the rule below — *something* at the
+    // declared reach — applies to it unchanged, the same accommodation `arc`
+    // gets for Blitzcrank's cone.
+    vi.stubGlobal('line', (x1: number, y1: number, x2: number, y2: number) => {
+      const from = owner.position;
+      const far = Math.max(
+        Math.hypot(x1 - from.x, y1 - from.y),
+        Math.hypot(x2 - from.x, y2 - from.y)
+      );
+      circles.push({ x: from.x, y: from.y, d: far * 2 });
+    });
     // A preview does not have to be a disc. Blitzcrank E deliberately draws a
     // wedge because it hits a cone, and a circle there would overstate it. What
     // the test cares about is that *something* is drawn at the declared reach.

@@ -7,6 +7,7 @@ import GameObject from '../GameObject';
 import type { GameObjectOptions, GameObjectRuntimeContext } from '../GameObject';
 import Stats from '../Stats';
 import CombatText from '../helpers/CombatText';
+import MatchTally, { type KillCredit } from '../../combat/MatchTally';
 import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
 import PathAgent from '../../nav/PathAgent';
 import { NAV_MAX_TERRAIN_RADIUS } from '../../nav/NavGrid';
@@ -41,6 +42,17 @@ export const DISPLACEMENT_GRACE_FRAMES = 2;
 
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
+
+  /** Kills, deaths, farm and damage — the scoreboard. See `combat/MatchTally.ts`. */
+  readonly tally = new MatchTally();
+
+  /**
+   * What killing this unit is worth to whoever did it. A lane minion and a
+   * jungle camp are farm, which is the default; `Champion` is a kill, and
+   * `Pet`/`Turret` are neither.
+   */
+  killCredit: KillCredit = 'minion';
+
   buffs: Buff[] = [];
   _buffEffectsToEnable = 0;
   _buffEffectsToDisable = 0;
@@ -342,6 +354,32 @@ export default class AttackableUnit extends GameObject {
     this.setStatus(StatusFlags.None, true);
   }
 
+  /**
+   * Give mana back. `takeHeal`'s counterpart, and the seam a spell has to use.
+   *
+   * `tests/game/spells/mana-spend-seam.test.ts` forbids anything under
+   * `spells/`, `spellObjects/` or `buffs/` from naming `stats.mana` at all,
+   * because URF's `manaFree` has to be one flip rather than a per-spell edit.
+   * That rule is about *billing* a caster, and it is right that a refill is not
+   * subject to it — the seam test's own header says a refill must not be zeroed
+   * by URF. So the granting side lives out here on the unit, next to the health
+   * equivalent, where nothing about `MatchRules` applies.
+   *
+   * Clamped to the pool rather than allowed to overfill, and rounded to whole
+   * points for the same reason `takeHeal` rounds.
+   */
+  restoreMana(amount: number): void {
+    if (this.isDead) return;
+
+    amount = Math.round(amount);
+    if (amount <= 0) return;
+
+    const max = this.stats.maxMana.value;
+    if (max <= 0) return;
+
+    this.stats.mana.baseValue = constrain(this.stats.mana.baseValue + amount, 0, max);
+  }
+
   takeHeal(heal: number, _healer?: HealSource): void {
     if (this.isDead) return;
 
@@ -373,19 +411,38 @@ export default class AttackableUnit extends GameObject {
     damage = Math.round(damage);
     if (damage <= 0) return;
 
+    // What was aimed at this unit, before anything ate it. Retaliation is
+    // measured on this rather than on what got through: "he hit me for 50, he
+    // takes 40" is the sentence, and a shield eating the 50 does not make the
+    // swing smaller.
+    const swung = damage;
+
     // shields and damage modifiers get first look; they may eat all of it
     for (const buff of this.buffs) {
       damage = buff.modifyIncomingDamage(damage, attacker);
-      if (damage <= 0) return;
+      if (damage <= 0) break;
     }
 
-    damage = Math.round(damage);
-    if (damage <= 0) return;
+    damage = Math.max(0, Math.round(damage));
+    // Nothing reached health — but something was still swung, so the reaction
+    // pass below still owes an answer. Only the health side is skipped.
+    if (damage <= 0) {
+      this.reactToDamage(swung, 0, attacker);
+      return;
+    }
 
     let combatText = new CombatText(this);
     combatText.text = '-' + damage;
     combatText.textColor = [255, 0, 0];
     this.game.objectManager.addObject(combatText);
+
+    // What actually landed, for the scoreboard: capped at the pool that was
+    // there to take it, so a 200-damage execute on a 12-health minion is 12
+    // damage dealt rather than 200. Read before the subtraction, because after
+    // it the pool is already negative.
+    const landed = Math.min(damage, Math.max(0, this.stats.health.baseValue));
+    this.tally.damageTaken += landed;
+    if (attacker && attacker !== this) attacker.tally.damageDealt += landed;
 
     this.stats.health.baseValue -= damage;
 
@@ -401,12 +458,42 @@ export default class AttackableUnit extends GameObject {
       if (vamp > 0) attacker.takeHeal(damage * vamp, attacker);
     }
 
+    // Before the death check, for the same reason omnivamp is: a hit that kills
+    // still happened, and Rammus dying to the swing still returns it.
+    this.reactToDamage(swung, damage, attacker);
+
     if (this.stats.health.baseValue <= 0) {
       this.die({ attacker, reviveAfter: this.reviveTime });
     }
   }
 
+  /**
+   * Hands every live buff the hit that just resolved. Separate from the
+   * mitigation loop above so a buff that only *reacts* is not sensitive to
+   * where it sits in `buffs` — see `Buff.onDamageTaken`.
+   *
+   * Iterated over a copy: a reflect re-enters `takeDamage` on the attacker, and
+   * a buff that expires during the pass would otherwise mutate the list being
+   * walked.
+   */
+  private reactToDamage(swung: number, landed: number, attacker?: AttackableUnit): void {
+    for (const buff of [...this.buffs]) {
+      if (buff.toRemove) continue;
+      buff.onDamageTaken(swung, landed, attacker);
+    }
+  }
+
   die(deathData: UnitDeathData): void {
+    // `die` is reachable on a corpse — `Champion.die` runs cleanup that is safe
+    // to repeat — so the ledger is only touched on the transition.
+    if (!this.isDead) {
+      this.tally.deaths++;
+      const killer = deathData.attacker;
+      if (killer && killer !== this) {
+        if (this.killCredit === 'champion') killer.tally.kills++;
+        else if (this.killCredit === 'minion') killer.tally.minionsKilled++;
+      }
+    }
     this.deathData = deathData;
     this.pathAgent?.clear();
     this.clearBuffs();

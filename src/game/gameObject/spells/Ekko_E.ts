@@ -34,7 +34,10 @@ export default class Ekko_E extends Spell {
       const mouse = this.aimPoint;
       const enemies = this.game.objectManager.queryObjects({
         area: new Circle({ x: mouse.x, y: mouse.y, r: EKKO_E_SEEK_RADIUS }),
-        filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+        filters: [
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+          PredefinedFilters.visibleTo(this.owner),
+        ],
       });
 
       if (enemies.length > 0) {
