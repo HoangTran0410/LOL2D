@@ -12,6 +12,8 @@ import Minion, {
 } from '../../../src/game/gameObject/attackableUnits/Minion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
+import Airborne from '../../../src/game/gameObject/buffs/Airborne';
+import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane, getLaneWaypoints, type LaneWaypoint } from '../../../src/game/lanes';
 import minionSource from '../../../src/game/gameObject/attackableUnits/Minion.ts?raw';
@@ -305,6 +307,71 @@ describe('Minion', () => {
       champion.isInsideBush = true;
       minion.isInsideBush = true;
       expect(minion.findTarget()).toBe(champion);
+    });
+  });
+
+  /**
+   * A minion swings on its own timer rather than through
+   * `BasicAttackController`, which is where the `canAttack` gate lives for
+   * champions. Left ungated, a wave walked into a Yasuo tornado or a Janna Q,
+   * rose into the air on the knock-up — the buff, the status flags and the
+   * height all applied correctly — and kept swinging on the beat the whole way
+   * up, which is what made the crowd control read as doing nothing at all.
+   */
+  describe('crowd control', () => {
+    const engage = (minion: Minion, enemy: Minion) => {
+      minion.targetLock = enemy;
+      minion.phase = Minion.PHASES.ATTACK;
+      minion._attackCooldown = 0;
+    };
+
+    const swingsOf = (minion: Minion) =>
+      minion.game.objectManager._objectToBeAdd.filter(
+        o => o instanceof MinionSwing || o instanceof MinionBolt
+      ).length;
+
+    it('launches nothing while it is knocked up', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(30, 0) });
+      indexObjects(game, [minion, enemy]);
+      engage(minion, enemy);
+
+      minion.addBuff(new Airborne(2_000, enemy, minion));
+      minion.updateBuffs();
+      minion.updateAttack();
+
+      expect(swingsOf(minion)).toBe(0);
+    });
+
+    it('launches nothing while it is stunned', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(30, 0) });
+      indexObjects(game, [minion, enemy]);
+      engage(minion, enemy);
+
+      minion.addBuff(new Stun(2_000, enemy, minion));
+      minion.updateBuffs();
+      minion.updateAttack();
+
+      expect(swingsOf(minion)).toBe(0);
+    });
+
+    it('swings the moment it lands again, with nothing banked', () => {
+      const minion = makeMinion();
+      const enemy = makeMinion({ teamId: TeamId.RED, position: createVector(30, 0) });
+      indexObjects(game, [minion, enemy]);
+      engage(minion, enemy);
+
+      const buff = new Airborne(2_000, enemy, minion);
+      minion.addBuff(buff);
+      minion.updateBuffs();
+      minion.updateAttack();
+
+      buff.deactivateBuff();
+      minion.updateBuffs();
+      minion.updateAttack();
+
+      expect(swingsOf(minion)).toBe(1);
     });
   });
 

@@ -316,7 +316,11 @@ export default class Minion extends AttackableUnit {
     // a lock can go stale between scans: the target dies, gets removed, or is
     // made untargetable by a buff. Monster hit exactly this and threw on the
     // next frame reading target.position off a corpse.
-    if (!target || target.toRemove || target.isDead || !target.position) {
+    // `isStealthed` alongside the stale-lock checks, not only in the scan: the
+    // scan runs every AGGRO_SCAN_INTERVAL_MS, so vanishing in front of a wave
+    // still bought a fifth of a second of being hit by something that could no
+    // longer see you.
+    if (!target || target.toRemove || target.isDead || !target.position || target.isStealthed) {
       this.targetLock = null;
       this.phase = Minion.PHASES.WALK;
       return;
@@ -333,7 +337,14 @@ export default class Minion extends AttackableUnit {
       this.moveTo(target.position.x, target.position.y);
     } else {
       this.stopMovement();
-      if (this._attackCooldown <= 0) {
+      // `canAttack` because a minion swings on its own timer instead of through
+      // `BasicAttackController`, which is where champions get this gate. Without
+      // it a wave lifted by a Yasuo tornado or a Janna Q kept swinging on the
+      // beat all the way up — the buff and its status flags applied correctly,
+      // so the crowd control simply read as doing nothing. The cooldown is only
+      // spent on a swing that actually happens, so the wave resumes the frame it
+      // lands rather than firing a banked volley.
+      if (this.canAttack && this._attackCooldown <= 0) {
         this._attackCooldown = this.attackInterval;
         this.launchAttack(target, reach);
       }
@@ -390,6 +401,7 @@ export default class Minion extends AttackableUnit {
         PredefinedFilters.excludeType(Monster),
         // a champion in a bush is not a target a minion can pick — see the
         // filter's own comment for the rule and its one deliberate looseness
+        PredefinedFilters.excludeStealthed,
         PredefinedFilters.visibleTo(this),
       ],
     });

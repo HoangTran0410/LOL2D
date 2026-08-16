@@ -19,13 +19,18 @@ import type { SpellDisplay } from '../../game/preset';
  * is a plain DOM overlay with no `preventDefault()` on touch, so `click`
  * fires normally under a thumb and staging a spell stays wired to `@click`.
  * The one consequence of that is `touchEnd`'s return value — see below.
+ *
+ * ## Closing it is the second half of opening it
+ *
+ * A hover closes itself; a hold does not, and for a while nothing else did
+ * either — see `heldOpen`. The composable answers "is this panel waiting on a
+ * deliberate dismissal?" and the caller renders the layer that provides one
+ * (`.spell-peek-scrim` in `LoadoutEditorModal.vue`). The panel itself stays
+ * `pointer-events: none` in both modes: it is a description, never a target.
  */
 
 /** How long a thumb rests before the description opens. Matches `LONG_PRESS_MS` in `hudInteractions.ts`. */
 export const PEEK_LONG_PRESS_MS = 400;
-
-/** How long it stays up after the thumb lifts — there is no hover to end it. */
-export const PEEK_DISMISS_MS = 3000;
 
 /** Past this much travel the gesture is a scroll, not a hold. Matches `TAP_MOVE_TOLERANCE_PX`. */
 const TAP_MOVE_TOLERANCE_PX = 16;
@@ -42,6 +47,18 @@ export type PeekStyle = CSSProperties & {
 export interface SpellPeek {
   display: Ref<SpellDisplay | null>;
   style: Ref<PeekStyle>;
+  /**
+   * True while the panel on screen was opened by a hold rather than a hover.
+   * A hover ends itself — the cursor moves off the icon and `mouseleave`
+   * closes it. A hold has no such end, so the caller renders a dismiss layer
+   * over the screen for exactly as long as this is true, and *that* is what
+   * takes the panel down. This used to be a 3-second timer instead, which was
+   * both too short to read a description and too fragile to rely on: it was
+   * armed from the `click` the browser synthesises after a hold, and a hold
+   * that raises the platform's own image/context menu synthesises no click at
+   * all, leaving the panel up with nothing able to close it.
+   */
+  heldOpen: Ref<boolean>;
   hoverStart(display: SpellDisplay, event: MouseEvent): void;
   hoverEnd(): void;
   touchStart(display: SpellDisplay, event: TouchEvent): void;
@@ -52,6 +69,10 @@ export interface SpellPeek {
    * player did not intend as a tap — the caller drops that one click. (The
    * in-game picker has the opposite problem: there, `preventDefault()` on the
    * canvas means no `click` is synthesised at all.)
+   *
+   * Call it from `touchend` *and* from the click handler: the click is the
+   * one that has to be dropped, but it is also the one that may never come.
+   * Both paths are idempotent.
    */
   touchEnd(): boolean;
   close(): void;
@@ -82,6 +103,7 @@ const place = (element: HTMLElement): PeekStyle => {
 
 export const useSpellPeek = (): SpellPeek => {
   const display = ref<SpellDisplay | null>(null);
+  const heldOpen = ref(false);
   const style = ref<PeekStyle>({
     top: 'auto',
     bottom: 'auto',
@@ -91,7 +113,6 @@ export const useSpellPeek = (): SpellPeek => {
   });
 
   let longPressTimer = 0;
-  let dismissTimer = 0;
   let longPressFired = false;
   let startX = 0;
   let startY = 0;
@@ -101,10 +122,6 @@ export const useSpellPeek = (): SpellPeek => {
     if (longPressTimer) {
       clearTimeout(longPressTimer);
       longPressTimer = 0;
-    }
-    if (dismissTimer) {
-      clearTimeout(dismissTimer);
-      dismissTimer = 0;
     }
   };
 
@@ -116,11 +133,17 @@ export const useSpellPeek = (): SpellPeek => {
   const close = (): void => {
     clearTimers();
     display.value = null;
+    heldOpen.value = false;
+    // Cleared with the panel, not left standing until the next `touchstart`:
+    // otherwise the first plain click after a dismissed hold reads as that
+    // hold's leftover click and gets dropped.
+    longPressFired = false;
   };
 
   return {
     display,
     style,
+    heldOpen,
 
     hoverStart(next, event): void {
       const element = (event.currentTarget ?? event.target) as HTMLElement | null;
@@ -136,6 +159,13 @@ export const useSpellPeek = (): SpellPeek => {
 
     touchStart(next, event): void {
       const element = (event.currentTarget ?? event.target) as HTMLElement | null;
+      // Belt and braces for a panel that somehow outlived its gesture. In the
+      // normal run this never fires: a held-open description has the dismiss
+      // layer over it, so this `touchstart` would have landed there instead.
+      // It only matters on a device that swallowed the `touchend` — the shape
+      // of the bug this whole path exists to answer — where it keeps a stale
+      // description from following the player down the roster.
+      if (display.value) close();
       clearTimers();
       longPressFired = false;
       moved = false;
@@ -166,9 +196,10 @@ export const useSpellPeek = (): SpellPeek => {
         longPressTimer = 0;
       }
       if (!longPressFired) return false;
-      dismissTimer = window.setTimeout(() => {
-        display.value = null;
-      }, PEEK_DISMISS_MS);
+      // The thumb is off the icon and the description is staying: hand it its
+      // dismiss layer. Set here rather than in `open()` so it never covers the
+      // screen while the finger that opened it is still down.
+      heldOpen.value = true;
       return true;
     },
 

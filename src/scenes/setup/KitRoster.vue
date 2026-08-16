@@ -25,7 +25,9 @@
  *
  * Reading a description is a hover or a hold on the same icon, not a second
  * click target beside it — see `useSpellPeek.ts` for that contract and for
- * why `pick` has to ignore the click that follows a hold.
+ * why `pick` has to ignore the click that follows a hold. The panel itself is
+ * the parent's (`peek`), because the slot bar above this roster opens the same
+ * one for the spells already in the kit.
  *
  * ## The saved-kit shelf leads the list
  *
@@ -42,8 +44,7 @@ import type { SavedKit } from '../../game/config/savedKits';
 import AssetManager from '../../managers/AssetManager';
 import type { KitShelf } from './pregameCatalog';
 import SpellIcon from './SpellIcon.vue';
-import SpellDetailPane from './SpellDetailPane.vue';
-import { useSpellPeek } from './useSpellPeek';
+import type { SpellPeek } from './useSpellPeek';
 
 const props = defineProps<{
   shelves: KitShelf[];
@@ -61,6 +62,14 @@ const props = defineProps<{
   isTouchUi: boolean;
   /** The library, newest first — see `loadSavedKits`. Empty renders no shelf at all. */
   savedKits: readonly SavedKit[];
+  /**
+   * The editor's one description panel, owned by the parent because the slot
+   * bar above this roster shows the same panel for the same spells — two
+   * instances would be two panels, and on touch the second would open behind
+   * the first one's dismiss layer. The parent renders it; this component only
+   * drives it. See `useSpellPeek.ts`.
+   */
+  peek: SpellPeek;
 }>();
 const emit = defineEmits<{
   pick: [entry: SpellCatalogEntry];
@@ -70,18 +79,11 @@ const emit = defineEmits<{
   deleteSavedKit: [kit: SavedKit];
 }>();
 
-// Destructured so `peekDisplay`/`peekStyle` are top-level refs the template
-// unwraps on its own — reached through the object they'd each need `.value`.
-const {
-  display: peekDisplay,
-  style: peekStyle,
-  hoverStart,
-  hoverEnd,
-  touchStart,
-  touchMove,
-  touchEnd,
-  close: closePeek,
-} = useSpellPeek();
+// Destructured off the prop rather than reached through it: `props.peek` is
+// one stable object for the life of the editor, and the handlers read better
+// bare in the template. (Nothing reactive is lost — the refs inside it are
+// the reactive part, and the parent, not this component, renders them.)
+const { hoverStart, hoverEnd, touchStart, touchMove, touchEnd, close: closePeek } = props.peek;
 
 /**
  * A hold has already answered "what is this"; the click the browser sends
@@ -152,11 +154,16 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       </div>
 
       <div class="catalog-group-row">
+        <!-- `@contextmenu.prevent`: a card is an icon inside a button, and a
+             long press on one is Chrome's own "open image / download image"
+             menu unless something says otherwise. That menu both hides the
+             description the hold just opened and cancels the touch that would
+             have finished the gesture. The hold belongs to the app. -->
         <button v-for="item in shelf.entries" :key="item.entry.id" type="button" class="catalog-spell-card"
           :class="{ selected: activeEntryId === item.entry.id }" :data-spell="item.entry.id" @click="pick(item.entry)"
           @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)" @mouseleave="!isTouchUi && hoverEnd()"
           @touchstart="touchStart(detailOf(item.entry), $event)" @touchmove="touchMove($event)"
-          @touchcancel="closePeek()">
+          @touchend="touchEnd()" @touchcancel="closePeek()" @contextmenu.prevent>
           <!-- The icon is the whole card. No name under it: at four abilities
                to a shelf the champion's name above them already says what
                they are, and the spell's own name is a hover or a hold away
@@ -166,11 +173,5 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
         </button>
       </div>
     </section>
-  </div>
-
-  <!-- `position: fixed`, above the modal it floats over (see
-       `.spell-peek` in pregame-scene.css). -->
-  <div v-if="peekDisplay" class="spell-peek" :style="peekStyle">
-    <SpellDetailPane :display="peekDisplay" placeholder="" />
   </div>
 </template>

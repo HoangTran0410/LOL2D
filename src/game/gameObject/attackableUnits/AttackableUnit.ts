@@ -412,9 +412,21 @@ export default class AttackableUnit extends GameObject {
     if (enabled) this._statusBeforeApplyingBuffEfects |= status;
     else this._statusBeforeApplyingBuffEfects &= ~status;
 
+    // Disable wins. It used to be the other way round — enable was OR'd on last,
+    // so a flag one buff turned on could not be turned off by another — which
+    // made `TrueSight` unable to do the one thing it exists for: `Invisible`
+    // enables `Stealthed`, `TrueSight` disables it, and the reveal simply lost.
+    // Nobody noticed while stealth had no effect on anything; it does now.
+    //
+    // Safe in the other direction because nothing in the tree *enables* a
+    // permission — `statusFlagsToEnable` is always a condition being applied
+    // (Stealthed, Stunned, Suppressed, Ghosted) and `statusFlagsToDisable` is
+    // always a permission being taken away (CanMove, CanCast, Targetable) or
+    // this one reveal. So the two sets never met before, and this is what they
+    // should do when they do.
     this.status =
-      (this._statusBeforeApplyingBuffEfects & ~this._buffEffectsToDisable) |
-      this._buffEffectsToEnable;
+      (this._statusBeforeApplyingBuffEfects | this._buffEffectsToEnable) &
+      ~this._buffEffectsToDisable;
 
     this.stats.updateActionState(this.status);
   }
@@ -577,6 +589,17 @@ export default class AttackableUnit extends GameObject {
   /** Grounded units keep walking but cannot use their own movement abilities. */
   get grounded() {
     return hasFlag(this.stats.actionState, ActionState.GROUNDED);
+  }
+  /**
+   * Hidden by an active stealth. Nothing that picks targets on its own may
+   * acquire one of these — see `PredefinedFilters.excludeStealthed`.
+   *
+   * There is no observer side to this: a reveal is `TrueSight`, which strips
+   * `StatusFlags.Stealthed` from the hidden unit itself, so a revealed champion
+   * is simply no longer stealthed.
+   */
+  get isStealthed() {
+    return hasFlag(this.stats.actionState, ActionState.STEALTHED);
   }
   get targetable() {
     return !this.isDead && hasFlag(this.stats.actionState, ActionState.TARGETABLE);

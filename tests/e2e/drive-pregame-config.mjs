@@ -492,6 +492,77 @@ try {
     await context.close();
   }
   {
+    // 12b. A description a thumb opened is one a thumb can close.
+    //
+    // The hover path ends itself: the cursor leaves the icon and `mouseleave`
+    // takes the panel down. A hold has no such end, and `.spell-peek` is
+    // `pointer-events: none` on purpose, so for a while the only thing that
+    // ever closed one was a 3-second timer armed from the *click* the browser
+    // synthesises after a hold — a click that a long press raising the
+    // platform's own image menu never sends at all. When it didn't come, the
+    // description stayed up for the rest of the session with nothing able to
+    // dismiss it.
+    //
+    // What replaces it: `.spell-peek-scrim`, a full-screen layer under the
+    // panel, alive for exactly as long as the panel is (see `heldOpen` in
+    // useSpellPeek.ts). Three things have to hold, and only a real finger can
+    // show any of them.
+    const { context, page: touchPage } = await openSetupPage({ hasTouch: true, viewport: { width: 390, height: 844 } });
+    const tap = async (x, y) => {
+      const cdp = await touchPage.context().newCDPSession(touchPage);
+      const finger = { x, y, radiusX: 6, radiusY: 6, force: 1 };
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [finger] });
+      await touchPage.waitForTimeout(60);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await cdp.detach();
+    };
+    await touchPage.click('#pregame-participant-list .participant-card:nth-child(1) .participant-card-main');
+    await touchPage.waitForSelector('.loadout-modal', { state: 'visible' });
+    const held = { opened: await openSpellPeek(touchPage, true) };
+    // (i) it survives the lift, and keeps surviving: the old 3s dismissal took
+    // it away mid-read, which is why the panel now waits to be dismissed.
+    await touchPage.waitForTimeout(3500);
+    Object.assign(held, await touchPage.evaluate(() => ({
+      stillOpen: !!document.querySelector('.spell-peek .spell-detail-body')?.textContent.trim(),
+      scrims: document.querySelectorAll('.spell-peek-scrim').length,
+      // The panel is over the layer that dismisses it, so a tap on the panel
+      // itself dismisses too rather than being the one dead spot on screen.
+      scrimBelowPanel:
+        Number(getComputedStyle(document.querySelector('.spell-peek-scrim')).zIndex) <
+        Number(getComputedStyle(document.querySelector('.spell-peek')).zIndex),
+      changedPills: document.querySelectorAll('.kit-slot-pill.changed').length,
+    })));
+    await touchPage.screenshot({ path: `${OUT}-held-description.png` });
+    // (ii) the dismissing tap closes it, and (iii) does nothing else on the
+    // way — the target here is a roster card, which a tap that fell through
+    // the scrim would equip into the selected slot.
+    const card = await touchPage.$('.catalog-spell-card[data-spell="Lux_W"]');
+    await card.scrollIntoViewIfNeeded();
+    const box = await card.boundingBox();
+    await tap(box.x + box.width / 2, box.y + box.height / 2);
+    await touchPage.waitForTimeout(250);
+    Object.assign(held, await touchPage.evaluate(() => ({
+      openAfterTap: !!document.querySelector('.spell-peek'),
+      scrimsAfterTap: document.querySelectorAll('.spell-peek-scrim').length,
+      changedPillsAfterTap: document.querySelectorAll('.kit-slot-pill.changed').length,
+      dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
+    })));
+    report.heldDescriptionIsDismissible = held;
+    if (!held.opened) errors.push('heldDescription: a hold did not open a description');
+    if (!held.stillOpen) errors.push('heldDescription: the description closed itself 3.5s after the thumb lifted');
+    if (held.scrims !== 1) errors.push(`heldDescription: ${held.scrims} dismiss layers, expected exactly 1`);
+    if (!held.scrimBelowPanel) errors.push('heldDescription: the dismiss layer is not under the panel it dismisses');
+    if (held.openAfterTap) errors.push('heldDescription: a tap did not close the description');
+    if (held.scrimsAfterTap !== 0) errors.push('heldDescription: the dismiss layer outlived the description');
+    if (held.changedPillsAfterTap !== held.changedPills) {
+      errors.push(
+        `heldDescription: the dismissing tap fell through and changed the kit (${held.changedPills} -> ${held.changedPillsAfterTap} changed pills)`
+      );
+    }
+    if (held.dialogCount !== 1) errors.push(`heldDescription: ${held.dialogCount} dialogs after dismissing, expected the editor alone`);
+    await context.close();
+  }
+  {
     // Shorter than the usual 1280x900 test viewport on purpose: at 900px
     // tall a smaller roster could fit under `.pregame-modal`'s 90vh cap with
     // nothing scrolling at all, which "at most one scroller" would pass

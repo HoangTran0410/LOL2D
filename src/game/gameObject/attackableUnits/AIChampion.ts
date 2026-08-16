@@ -164,6 +164,7 @@ export default class AIChampion extends Champion {
         filters: [
           PredefinedFilters.type(Champion),
           PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+          PredefinedFilters.excludeStealthed,
         ],
       }) ?? [];
 

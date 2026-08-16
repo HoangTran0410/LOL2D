@@ -31,7 +31,9 @@
  *      the *selected* slot to chance (disabled when that slot already is) and
  *      whose `'random'` really does resolve to a spell at spawn;
  *   4. hovering a card describes it — with this match's CDR already applied —
- *      without picking it and without opening a second dialog;
+ *      without picking it and without opening a second dialog, and hovering a
+ *      *slot pill* gives the same answer for the spell already in that slot,
+ *      out of the same single panel, without selecting the slot;
  *   5. the player's card and a bot's card open the *same* modal, and the
  *      screen never has more than one dialog open at once (the full-viewport
  *      backdrop makes two loadout editors structurally impossible, which is
@@ -434,6 +436,48 @@ try {
       `hoverDescribesWithoutPicking.cooldown: "${peeked.cooldown}" does not show the 50% CDR value ${report.cooldownUnderCdr.halvedLabel} (raw ${report.cooldownUnderCdr.rawLabel})`
     );
   }
+
+  // 4b. The slot bar answers the same question for the spell already in a
+  // slot — the one a player is most likely to be asking about, and the one
+  // this screen used to answer only by making them find that spell again down
+  // in an 85-card roster.
+  //
+  // The expected text is not typed here: it is whatever the *roster card* for
+  // the same spell says, read a moment earlier. Two independent surfaces, one
+  // answer — and nothing in the check recomputes the answer itself.
+  const peekTitle = () =>
+    evaluate(() => document.querySelector('.spell-peek .spell-detail-header h3')?.textContent ?? null);
+  await page.hover('.catalog-spell-card[data-spell="Yasuo_W"]');
+  await page.waitForTimeout(250);
+  const cardTitle = await peekTitle();
+  // W, not the active slot (Q): hovering has to describe without selecting.
+  await page.hover('.kit-slot-bar .kit-slot-pill:nth-child(3)');
+  await page.waitForTimeout(250);
+  report.slotPillDescribes = await evaluate(() => ({
+    title: document.querySelector('.spell-peek .spell-detail-header h3')?.textContent ?? null,
+    hasDescription: !!document.querySelector('.spell-peek .spell-detail-body')?.textContent.trim(),
+    // One editor, one panel: the slot bar and the roster share an instance.
+    panels: document.querySelectorAll('.spell-peek').length,
+    // A hover ends itself on `mouseleave`, so it must not raise the
+    // full-screen dismiss layer the touch path needs.
+    scrims: document.querySelectorAll('.spell-peek-scrim').length,
+    activeSlot: document.querySelector('.kit-slot-pill.active .kit-slot-pill-key')?.textContent ?? null,
+    changedPills: document.querySelectorAll('.kit-slot-pill.changed').length,
+  }));
+  expect('slotPillDescribes.title', report.slotPillDescribes.title, cardTitle);
+  expect('slotPillDescribes.hasDescription', report.slotPillDescribes.hasDescription, true);
+  expect('slotPillDescribes.panels', report.slotPillDescribes.panels, 1);
+  expect('slotPillDescribes.scrims', report.slotPillDescribes.scrims, 0);
+  expect('slotPillDescribes.activeSlot', report.slotPillDescribes.activeSlot, 'Q');
+  expect('slotPillDescribes.changedPills', report.slotPillDescribes.changedPills, peeked.changedPills);
+  if (!cardTitle) {
+    errors.push('slotPillDescribes: the roster card it is compared against described nothing');
+  }
+  // Off the pill: a hover ends itself, and the panel must not linger.
+  await page.hover('.kit-hint');
+  await page.waitForTimeout(150);
+  expect('slotPillDescribes.closedOnLeave', await peekTitle(), null);
+
   await cancelLoadout();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
   report.storedUnchangedByHover = (await storedPlayer())?.customSlots?.join(',') === beforeHover?.customSlots?.join(',');

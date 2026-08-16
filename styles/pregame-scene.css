@@ -813,6 +813,33 @@
   margin-top: 0;
 }
 
+/* The dismiss layer for a description a thumb opened, and the only thing
+   that closes one — see `heldOpen` in useSpellPeek.ts and the comment on
+   `.spell-peek-scrim` in LoadoutEditorModal.vue. One below the panel it
+   dismisses, so a tap on the panel closes it too; above everything else, so
+   the tap that closes it does nothing else on the way. The dim is what makes
+   it legible as a thing to tap out of rather than a dead screen. */
+.spell-peek-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 299;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* Says out loud what the scrim behind it does, since a tap-anywhere target
+   is invisible by construction. Only rendered with the scrim — a hover
+   description says nothing, because moving the mouse already ends it. */
+.spell-peek-dismiss {
+  margin: 0.5rem 0 0;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--hextech-line);
+  font-size: 0.78em;
+  text-align: center;
+  color: var(--hextech-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .catalog-group-heading {
   display: flex;
   align-items: center;

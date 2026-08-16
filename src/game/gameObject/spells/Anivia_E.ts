@@ -28,7 +28,7 @@ const isFrostbiteTarget = (target: unknown): target is FrostbiteTarget =>
 // numbers — retuning a value should not mean editing the test.
 export const COOLDOWN_MS = 4_000;
 export const MANA_COST = 50;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const RANGE = 450;
 export const MISSILE_SPEED = 1_600 / 60;
 export const SIZE = 22;
@@ -39,8 +39,7 @@ export const SPAWN_OFFSET_DISTANCE = 60;
 export default class Anivia_E extends Spell {
   image = AssetManager.get('spell_anivia_e');
   name = 'Frostbite (Anivia_E)';
-  description =
-    `Anivia bắn một mũi băng vào mục tiêu, gây <span class="damage">${BASE_DAMAGE} sát thương</span>, tăng gấp đôi thành <span class="damage">${CHILLED_DAMAGE}</span> nếu mục tiêu đang <span class="buff">Nhiễm Lạnh</span> (bị Sương Băng hoặc Bão Tuyết đã hình thành đầy đủ đánh trúng gần đây).`;
+  description = `Anivia bắn một mũi băng vào mục tiêu, gây <span class="damage">${BASE_DAMAGE} sát thương</span>, tăng gấp đôi thành <span class="damage">${CHILLED_DAMAGE}</span> nếu mục tiêu đang <span class="buff">Nhiễm Lạnh</span> (bị Sương Băng hoặc Bão Tuyết đã hình thành đầy đủ đánh trúng gần đây).`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -64,13 +63,16 @@ export default class Anivia_E extends Spell {
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
       isTargetable: candidate => isFrostbiteTarget(candidate) && candidate.willDraw,
-      getTargetInfo: candidate => isFrostbiteTarget(candidate) ? {
-        position: candidate.position,
-        teamId: candidate.teamId,
-        selectionRadius: candidate.animatedValues?.displaySize
-          ? candidate.animatedValues.displaySize / 2
-          : candidate.collisionRadius,
-      } : null,
+      getTargetInfo: candidate =>
+        isFrostbiteTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
     };
   }
 
@@ -115,10 +117,12 @@ export default class Anivia_E extends Spell {
   }
 
   private isValidTarget(target: unknown): target is FrostbiteTarget {
-    return isFrostbiteTarget(target) &&
+    return (
+      isFrostbiteTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      withinRange(this.range, this.owner, target);
+      withinRange(this.range, this.owner, target)
+    );
   }
 }
 

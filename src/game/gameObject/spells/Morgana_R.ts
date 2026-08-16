@@ -13,7 +13,7 @@ import { createReveal } from '../buffs/TrueSight';
 
 // Exported so the suite asserts the tether's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.
-export const CAST_TIME_MS = 350;
+export const CAST_TIME_MS = 0;
 export const LATCH_RADIUS = 500;
 // Wider than LATCH_RADIUS on purpose: once caught, a target can roam a bit
 // further than the acquire range before the tether actually snaps, mirroring

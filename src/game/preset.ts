@@ -2,6 +2,7 @@ import * as AllSpells from './gameObject/spells/index';
 import AssetManager, { type AssetKey } from '../managers/AssetManager';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
+import { BARON_ABILITIES } from './gameObject/monsters/Baron';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
 import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameConfig';
@@ -661,10 +662,13 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
     attackRange: 400,
     reviveTime: 3000,
     health: 1000,
-    // rooted in place with a long reach, so it hits hard but slowly
-    damage: 25,
+    // Rooted in place with a long reach. The bite is small because it is the
+    // one part of the fight nobody can dodge — the damage that makes Baron
+    // frightening lives in `BARON_ABILITIES`, and all of it is avoidable.
+    damage: 12,
     attackInterval: 2000,
     aggroRange: 480,
+    abilities: BARON_ABILITIES,
   },
   blue1: {
     name: 'Blue',

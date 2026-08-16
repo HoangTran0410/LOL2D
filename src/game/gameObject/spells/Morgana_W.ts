@@ -11,7 +11,7 @@ import AreaSpellObject from '../spellObjects/AreaSpellObject';
 // numbers — retuning a value should not mean editing the test.
 export const RANGE = 600;
 export const RADIUS = 220;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const DURATION_MS = 5_000;
 export const TICK_EVERY_MS = 500;
 export const MIN_TICK_DAMAGE = 3;

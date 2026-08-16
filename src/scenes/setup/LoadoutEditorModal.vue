@@ -68,10 +68,12 @@ import {
   type SavedKit,
 } from '../../game/config/savedKits';
 import { SpellHotKeys } from '../../game/constants';
-import { BASIC_ATTACK_ID, type SpellCatalogEntry } from '../../game/preset';
+import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
 import KitRoster from './KitRoster.vue';
+import SpellDetailPane from './SpellDetailPane.vue';
 import SpellIcon from './SpellIcon.vue';
+import { useSpellPeek } from './useSpellPeek';
 
 const props = defineProps<{
   title: string;
@@ -145,6 +147,44 @@ const slots = computed(() =>
         : `Phím ${SLOT_LABELS[index]}${index >= SLOT_D ? ' (phép bổ trợ)' : ''}`,
   }))
 );
+
+/* ------------------------------------------------- the description panel */
+
+/**
+ * One `useSpellPeek` for the whole editor, driven from two places: the slot
+ * pills in the bar below, and the roster's cards (`KitRoster` takes it as a
+ * prop rather than making its own — two instances would be two panels).
+ *
+ * The pills carry the same spells the roster does, so leaving them mute meant
+ * the one question a player is most likely to have — "what is already in my
+ * Q?" — was the one the screen would not answer without first finding that
+ * spell again among 85 cards.
+ */
+const peek = useSpellPeek();
+const {
+  display: peekDisplay,
+  style: peekStyle,
+  heldOpen: peekHeldOpen,
+  hoverStart,
+  hoverEnd,
+  touchStart,
+  touchMove,
+  touchEnd,
+  close: closePeek,
+} = peek;
+
+/** The panel's copy of a spell, rebuilt under this match's CDR/URF — same as `KitRoster.detailOf`. */
+const detailOf = (entry: SpellCatalogEntry) => getSpellDisplay(entry.spellClass, props.matchRules);
+
+/**
+ * Same rule the roster's `pick` follows: a hold has already answered "what is
+ * this", and the click the browser sends afterwards must not also move the
+ * selection out from under the description that just opened.
+ */
+const selectSlot = (index: number): void => {
+  if (touchEnd()) return;
+  activeSlot.value = index;
+};
 
 const activeEntryId = computed(() => draftSlots.value[activeSlot.value]?.id ?? null);
 const selectedChampion = computed(() =>
@@ -365,6 +405,11 @@ const hint = computed(() => {
            the way the in-game picker's do — on a landscape phone that row is
            most of the chrome the modal can afford. -->
       <div class="kit-slot-bar">
+        <!-- Hover or hold describes the spell in the slot; the tap still
+             selects it. Same two gestures on the same icon as the roster
+             below, so "what does this do" is asked the same way wherever the
+             icon happens to be. A slot left to chance has nothing to
+             describe, hence the `slot.entry &&` guard on both openers. -->
         <button
           v-for="slot in slots"
           :key="slot.index"
@@ -372,7 +417,14 @@ const hint = computed(() => {
           class="kit-slot-pill"
           :class="{ active: activeSlot === slot.index, changed: slot.changed }"
           :title="slot.title"
-          @click="activeSlot = slot.index"
+          @click="selectSlot(slot.index)"
+          @mouseenter="!isTouchUi && slot.entry && hoverStart(detailOf(slot.entry), $event)"
+          @mouseleave="!isTouchUi && hoverEnd()"
+          @touchstart="slot.entry && touchStart(detailOf(slot.entry), $event)"
+          @touchmove="touchMove($event)"
+          @touchend="touchEnd()"
+          @touchcancel="closePeek()"
+          @contextmenu.prevent
         >
           <SpellIcon :display="slot.entry ? slot.entry.display : null" />
           <span class="kit-slot-pill-key">{{ slot.label }}</span>
@@ -453,12 +505,46 @@ const hint = computed(() => {
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
           :saved-kits="savedKits"
+          :peek="peek"
           @pick="pickSpell"
           @apply-kit="applyKit"
           @pick-random="pickRandom"
           @apply-saved-kit="applySavedKit"
           @delete-saved-kit="removeSavedKit"
         />
+      </div>
+
+      <!-- The way out of a description a thumb opened. A hover ends itself on
+           `mouseleave`; a hold has no such end, and the panel cannot provide
+           one itself — it is `pointer-events: none` on purpose, so that under
+           a cursor it never steals the hover that is keeping it open or the
+           click meant for the icon underneath it.
+
+           So dismissal is this: a full-screen layer under the panel and over
+           everything else, alive only while `peekHeldOpen`. `touchstart`
+           rather than `click`, and `.prevent` with it, for two reasons the
+           gesture forces:
+
+             - the *lift* of the hold that opened the panel synthesises a
+               click at that same point, which by then lands on this layer. A
+               `@click` here would close the panel in the same motion that
+               opened it.
+             - `.prevent` on `touchstart` cancels the compatibility mouse
+               events for the dismissing tap, so it closes the description and
+               nothing else — it does not fall through and equip whatever
+               spell happened to be under the player's thumb. -->
+      <div
+        v-if="peekHeldOpen"
+        class="spell-peek-scrim"
+        aria-hidden="true"
+        @touchstart.prevent="closePeek()"
+      ></div>
+
+      <!-- `position: fixed`, above the modal it floats over (see
+           `.spell-peek` in pregame-scene.css). -->
+      <div v-if="peekDisplay" class="spell-peek" :style="peekStyle">
+        <SpellDetailPane :display="peekDisplay" placeholder="" />
+        <p v-if="peekHeldOpen" class="spell-peek-dismiss">Chạm để đóng</p>
       </div>
     </div>
   </div>

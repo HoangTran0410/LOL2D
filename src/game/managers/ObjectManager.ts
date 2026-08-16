@@ -142,6 +142,27 @@ export const PredefinedFilters = {
     (object): object is AttackableUnit =>
       object instanceof AttackableUnit && object.targetable && !object.isDead && object.teamId !== teamId,
   /**
+   * Drops units hidden by an active stealth (Twitch Q).
+   *
+   * Applied to every scan that acquires a target on its own — the wave, the
+   * camps, the turrets and the bots. Before this, `ActionState.STEALTHED` was
+   * read in exactly one place in the engine (`BasicAttackController`, so a
+   * player could not *order* an attack on a stealthed unit), which meant
+   * stealth dimmed the sprite and changed nothing else: everything on the map
+   * kept chasing and hitting a champion nobody could see.
+   *
+   * Unlike `visibleTo` below this *is* applied to `AIChampion`. Bush cover is
+   * terrain and leaving the bots blind to it would be a difficulty change;
+   * stealth is an ability with a cast and a cooldown behind it, and a bot that
+   * ignores it makes that ability worthless against the only real opponents in
+   * the match.
+   *
+   * No observer side: a reveal is `TrueSight`, which strips the flag from the
+   * hidden unit, so a revealed champion is simply no longer stealthed.
+   */
+  excludeStealthed: (object: GameObject): boolean =>
+    !(object instanceof AttackableUnit) || !object.isStealthed,
+  /**
    * Drops what `observer` cannot see. Bushes were previously cosmetic — the
    * only thing that ever read `isInsideBush` was the sprite's alpha — so a
    * player standing in one was still picked up by every minion and camp scan

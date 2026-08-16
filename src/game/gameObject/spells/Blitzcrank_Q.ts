@@ -93,6 +93,10 @@ export class Blitzcrank_Q_Object extends MissileSpellObject {
     this.dashBuff = new Dash(10000, this.owner, enemy);
     this.dashBuff.showTrail = false;
     this.dashBuff.cancelable = false;
+    // Same speed the hand itself retracts at, because the hand no longer drags
+    // the victim onto itself — they travel side by side from the same point to
+    // the same point, which is what keeps the two looking attached.
+    this.dashBuff.dashSpeed = this.grabSpeed;
     enemy.addBuff(this.dashBuff);
 
     enemy.takeDamage(20, this.owner);
@@ -101,13 +105,24 @@ export class Blitzcrank_Q_Object extends MissileSpellObject {
   update() {
     super.update();
 
-    if (this.champToGrab) {
-      this.dashBuff!.dashDestination = this.owner.position.copy();
-      this.champToGrab.position.set(this.position.x, this.position.y);
+    if (!this.champToGrab) return;
 
-      if (this.champToGrab.isDead) {
-        this.toRemove = true;
-      }
+    // The Dash is the only thing that moves the victim. This used to write
+    // `champToGrab.position` directly as well, every frame, on top of the Dash
+    // it had already applied for the same pull — and a raw write to `position`
+    // answers to nothing. Morgana's Black Shield killed the Dash exactly as it
+    // is meant to and then watched the hand haul the champion in regardless,
+    // which is what "E chặn mọi khống chế nhưng vẫn bị Blitz kéo" was.
+    if (!this.dashBuff || this.dashBuff.toRemove) {
+      this.champToGrab = null;
+      this.toRemove = true;
+      return;
+    }
+
+    this.dashBuff.dashDestination = this.owner.position.copy();
+
+    if (this.champToGrab.isDead) {
+      this.toRemove = true;
     }
   }
 

@@ -3,6 +3,7 @@ import Turret, { DEFAULT_TURRET_PRESET, TurretBolt } from '../../../src/game/gam
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
+import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
 import AssetManager from '../../../src/managers/AssetManager';
 import { getTurretPositions } from '../../../src/game/preset';
@@ -115,6 +116,44 @@ describe('Turret as a team building', () => {
       bolt.onArrive();
       expect(damage).toHaveBeenCalledWith(DEFAULT_TURRET_PRESET.damage, turret);
       expect(collateral).not.toHaveBeenCalled();
+    });
+  });
+
+  /**
+   * A turret fires on its own timer rather than through
+   * `BasicAttackController`, so it never consulted the gate every champion
+   * respects. It is the same hole minions and jungle camps had: crowd control
+   * landed, the status flags applied, and the building kept shooting through it.
+   */
+  describe('crowd control', () => {
+    const boltsOf = () =>
+      game.objectManager._objectToBeAdd.filter(o => o instanceof TurretBolt).length;
+
+    it('holds its fire while it is stunned', () => {
+      const turret = makeTurret(TeamId.BLUE);
+      const minion = makeMinion(TeamId.RED, 200);
+      indexObjects(game, [turret, minion]);
+      turret._attackCooldown = 0;
+
+      turret.addBuff(new Stun(2_000, minion, turret));
+      turret.update();
+
+      expect(boltsOf()).toBe(0);
+    });
+
+    it('resumes the moment the stun ends, with nothing banked', () => {
+      const turret = makeTurret(TeamId.BLUE);
+      const minion = makeMinion(TeamId.RED, 200);
+      indexObjects(game, [turret, minion]);
+      turret._attackCooldown = 0;
+
+      const buff = new Stun(2_000, minion, turret);
+      turret.addBuff(buff);
+      turret.update();
+      buff.deactivateBuff();
+      turret.update();
+
+      expect(boltsOf()).toBe(1);
     });
   });
 

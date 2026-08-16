@@ -22,7 +22,7 @@ import StatAmp from '../buffs/StatAmp';
  */
 export const COOLDOWN_MS = 7_000;
 export const MANA_COST = 50;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 // Exported so the suite asserts wiring against the real tuning, not a copy of
 // the numbers — retuning a value should not mean editing a test.
 export const RADIUS = 175;
@@ -38,8 +38,7 @@ type SlamTarget = AttackableUnit;
 export default class Malphite_E extends Spell {
   image = AssetManager.get('spell_malphite_e');
   name = 'Ground Slam (Malphite_E)';
-  description =
-    `Malphite đập tay xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch trong bán kính <span>${RADIUS}px</span> quanh mình, <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> và <span class="buff">Giảm ${Math.round(CRIPPLE_PERCENT * 100)}% tốc độ đánh</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
+  description = `Malphite đập tay xuống đất, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch trong bán kính <span>${RADIUS}px</span> quanh mình, <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> và <span class="buff">Giảm ${Math.round(CRIPPLE_PERCENT * 100)}% tốc độ đánh</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -111,8 +110,10 @@ export class Malphite_E_Object extends SpellObject {
       });
 
       for (const enemy of enemies as SlamTarget[]) {
-        if (Math.hypot(enemy.position.x - this.position.x, enemy.position.y - this.position.y) >
-          this.radius + enemy.collisionRadius) {
+        if (
+          Math.hypot(enemy.position.x - this.position.x, enemy.position.y - this.position.y) >
+          this.radius + enemy.collisionRadius
+        ) {
           continue;
         }
 

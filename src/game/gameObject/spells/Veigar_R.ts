@@ -24,7 +24,7 @@ export const BASE_DAMAGE = 90;
 // double — the imported wiki value ("increased by 0%-100% based on missing health").
 export const MAX_MISSING_HEALTH_MULTIPLIER = 1;
 export const MANA_COST = 100;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const MISSILE_SPEED = 1_500 / 60;
 export const MISSILE_SIZE = 30;
 

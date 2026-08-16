@@ -32,7 +32,7 @@ const isZephyrTarget = (target: unknown): target is ZephyrTarget =>
 export const PASSIVE_SPEED_PERCENT = 0.08;
 export const COOLDOWN_MS = 8_000;
 export const MANA_COST = 50;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const RANGE = 550;
 export const MISSILE_SPEED = 1_600 / 60;
 export const SIZE = 26;
@@ -51,8 +51,7 @@ export class Janna_W_Passive extends StatAmp {
 export default class Janna_W extends Spell {
   image = AssetManager.get('spell_janna_w');
   name = 'Phù Vân (Janna_W)';
-  description =
-    `Nội tại: Janna luôn được <span class="buff">Ma Hoá</span> và <span class="buff">+${Math.round(PASSIVE_SPEED_PERCENT * 100)}% Tốc Độ Di Chuyển</span>. Chủ động: gửi một linh hồn gió vào mục tiêu, gây <span class="damage">${DAMAGE} sát thương</span> và <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
+  description = `Nội tại: Janna luôn được <span class="buff">Ma Hoá</span> và <span class="buff">+${Math.round(PASSIVE_SPEED_PERCENT * 100)}% Tốc Độ Di Chuyển</span>. Chủ động: gửi một linh hồn gió vào mục tiêu, gây <span class="damage">${DAMAGE} sát thương</span> và <span class="buff">Làm Chậm ${Math.round(SLOW_PERCENT * 100)}%</span> trong <span class="time">${SLOW_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -77,13 +76,16 @@ export default class Janna_W extends Spell {
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
       isTargetable: candidate => isZephyrTarget(candidate) && candidate.willDraw,
-      getTargetInfo: candidate => isZephyrTarget(candidate) ? {
-        position: candidate.position,
-        teamId: candidate.teamId,
-        selectionRadius: candidate.animatedValues?.displaySize
-          ? candidate.animatedValues.displaySize / 2
-          : candidate.collisionRadius,
-      } : null,
+      getTargetInfo: candidate =>
+        isZephyrTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
     };
   }
 
@@ -130,10 +132,12 @@ export default class Janna_W extends Spell {
   }
 
   private isValidTarget(target: unknown): target is ZephyrTarget {
-    return isZephyrTarget(target) &&
+    return (
+      isZephyrTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      withinRange(this.range, this.owner, target);
+      withinRange(this.range, this.owner, target)
+    );
   }
 
   /** Always-on passive, independent of this spell's own cooldown/state. */

@@ -19,7 +19,7 @@ const isSigilTarget = (target: unknown): target is SigilTarget =>
 // Exported so the suite asserts the orb's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.
 export const RANGE = 620;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const MANA_COST = 40;
 export const DAMAGE = 24;
 export const MARK_DURATION_MS = 3_500;

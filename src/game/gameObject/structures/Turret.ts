@@ -133,7 +133,10 @@ export default class Turret extends AttackableUnit {
 
     this._attackCooldown -= deltaTime;
     this.target = this.findTarget();
-    if (this.target && this._attackCooldown <= 0) {
+    // `canAttack` for the same reason minions and camps need it: a building
+    // fires on its own timer and never went through `BasicAttackController`, so
+    // crowd control spent on a turret bought nothing at all.
+    if (this.target && this.canAttack && this._attackCooldown <= 0) {
       this._attackCooldown = this.attackInterval;
       this._fireFlash = 220;
       this.fireAt(this.target);
@@ -158,6 +161,7 @@ export default class Turret extends AttackableUnit {
       filters: [
         PredefinedFilters.includeTypes([Champion, Minion]),
         PredefinedFilters.canTakeDamageFromTeam(this.teamId),
+        PredefinedFilters.excludeStealthed,
       ],
     });
 

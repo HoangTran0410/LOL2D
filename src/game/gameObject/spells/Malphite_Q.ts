@@ -25,7 +25,7 @@ export const DAMAGE = 20;
 export const SLOW_PERCENT = 0.2;
 export const SLOW_DURATION_MS = 3000;
 export const SPEEDUP_DURATION_MS = 3000;
-export const CAST_TIME_MS = 250;
+export const CAST_TIME_MS = 0;
 export const SPAWN_OFFSET_DISTANCE = 100;
 export const MISSILE_SPEED = 1_200 / 60;
 
@@ -59,13 +59,16 @@ export default class Malphite_Q extends Spell {
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
       isTargetable: candidate => isMalphiteTarget(candidate) && candidate.willDraw,
-      getTargetInfo: candidate => isMalphiteTarget(candidate) ? {
-        position: candidate.position,
-        teamId: candidate.teamId,
-        selectionRadius: candidate.animatedValues?.displaySize
-          ? candidate.animatedValues.displaySize / 2
-          : candidate.collisionRadius,
-      } : null,
+      getTargetInfo: candidate =>
+        isMalphiteTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
     };
   }
 
@@ -112,10 +115,12 @@ export default class Malphite_Q extends Spell {
   }
 
   private isValidTarget(target: unknown): target is MalphiteTarget {
-    return isMalphiteTarget(target) &&
+    return (
+      isMalphiteTarget(target) &&
       target.willDraw &&
       target.teamId !== this.owner.teamId &&
-      withinRange(this.range, this.owner, target);
+      withinRange(this.range, this.owner, target)
+    );
   }
 }
 

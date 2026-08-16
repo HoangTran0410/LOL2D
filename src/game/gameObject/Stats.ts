@@ -57,9 +57,27 @@ export class Stat {
    */
   maxValue = Infinity;
 
-  constructor(baseValue = 0, maxValue = Infinity) {
+  /**
+   * Floor applied to `value`, for the same reasons and with the same reversible
+   * read-time clamp as `maxValue`. Movement speed is the case that needs one:
+   * `AttackableUnit.move()` steps along `destination - position` scaled by
+   * speed, so a negative speed does not stop a unit, it walks it *backwards,
+   * away from where it was sent*.
+   *
+   * That is one typo away at all times. `Slow.percent` is a fraction — 0.5 is
+   * fifty percent — and a single caller writing `35` for "35%" turns a champion
+   * into something that cannot walk towards the thing slowing it. Baron's
+   * poison pool shipped with exactly that and read in game as the pool
+   * physically shoving people out. Both values are numbers, so nothing in `tsc`
+   * or in a type test can catch the next one; the floor is what makes it a
+   * balance mistake instead of a physics one.
+   */
+  minValue = -Infinity;
+
+  constructor(baseValue = 0, maxValue = Infinity, minValue = -Infinity) {
     this.baseValue = baseValue;
     this.maxValue = maxValue;
+    this.minValue = minValue;
   }
 
   addModifier(modifier: StatModifier) {
@@ -76,7 +94,8 @@ export class Stat {
     const total =
       ((this.baseValue + this.baseBonus) * (1 + this.percentBaseBonus) + this.flatBonus) *
       (1 + this.percentBonus);
-    return total > this.maxValue ? this.maxValue : total;
+    if (total > this.maxValue) return this.maxValue;
+    return total < this.minValue ? this.minValue : total;
   }
 
   add(modifier: StatModifier) {
@@ -182,7 +201,8 @@ export default class Stats {
   health = new Stat(100);
   maxMana = new Stat(500);
   mana = new Stat(500);
-  speed = new Stat(3);
+  // Floored at 0: a slow may root you, it may never reverse you. See `minValue`.
+  speed = new Stat(3, Infinity, 0);
   size = new Stat(DEFAULT_UNIT_SIZE, MAX_UNIT_SIZE);
   height = new Stat(0);
   manaRegen = new Stat(0.1);

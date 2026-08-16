@@ -35,6 +35,59 @@ describe('Stat ceiling', () => {
   });
 });
 
+/**
+ * `move()` walks along `destination - position` scaled by `speed`, so a negative
+ * speed does not mean "stopped", it means the unit walks *backwards, away from
+ * where it was told to go* — it reads in game as being shoved, and as being
+ * unable to enter wherever the slow is coming from.
+ *
+ * The way in is a unit mix-up nothing else catches: `Slow.percent` is a fraction
+ * (0.5 is fifty percent) and every caller in the tree passes one, so a single
+ * `percent = 35` writes `percentBaseBonus = -35` and the champion reverses.
+ * Baron's poison pool shipped exactly that. `tsc` cannot see it — both are
+ * numbers — so the floor is what makes the whole class of it survivable: the
+ * worst a mis-scaled slow can now do is root you.
+ */
+describe('speed floor', () => {
+  it('never lets a slow reverse a unit, however badly scaled', () => {
+    const stats = new Stats();
+    stats.speed.baseValue = 3;
+
+    stats.speed.percentBaseBonus = -35;
+
+    expect(stats.speed.value).toBe(0);
+  });
+
+  it('still slows normally for a slow that is scaled right', () => {
+    const stats = new Stats();
+    stats.speed.baseValue = 3;
+
+    stats.speed.percentBaseBonus = -0.35;
+
+    expect(stats.speed.value).toBeCloseTo(1.95);
+  });
+
+  it('comes back cleanly when the bad modifier is removed', () => {
+    const stats = new Stats();
+    stats.speed.baseValue = 3;
+    const modifier = new StatModifier(0, 0, 0, 0, -35);
+
+    stats.speed.addModifier(modifier);
+    expect(stats.speed.value).toBe(0);
+
+    stats.speed.removeModifier(modifier);
+    expect(stats.speed.value).toBe(3);
+  });
+
+  it('leaves stats that are allowed to go negative alone', () => {
+    const stat = new Stat(10);
+    stat.baseBonus = -50;
+
+    expect(stat.value).toBe(-40);
+    expect(stat.minValue).toBe(-Infinity);
+  });
+});
+
 describe('unit size ceiling', () => {
   it('caps body size, and only body size', () => {
     const stats = new Stats();
