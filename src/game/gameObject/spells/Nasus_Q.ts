@@ -1,22 +1,29 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import {
+  pickExecuteTarget,
+  type ExecuteFallback,
+  type ExecuteSpell,
+} from '../../combat/ExecuteTargeting';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export const RANGE = 150;
 export const BASE_DAMAGE = 25;
 export const DAMAGE_PER_STACK = 5;
 
 const describe = (stacks: number): string =>
-  `Chém kẻ địch gần nhất trong phạm vi <span>${RANGE}px</span>, gây ` +
+  `Chém một kẻ địch trong phạm vi <span>${RANGE}px</span> — ` +
+  `<span class="buff">ưu tiên kẻ sẽ chết vì nhát này</span>, nếu không có thì kẻ gần nhất — gây ` +
   `<span class="damage">${BASE_DAMAGE + stacks * DAMAGE_PER_STACK} sát thương</span>` +
-  ` <i>(${stacks} cộng dồn)</i>. Mỗi lần chém trúng, sát thương của chiêu này ` +
-  `<span class="buff">vĩnh viễn tăng thêm ${DAMAGE_PER_STACK}</span>`;
+  ` <i>(${stacks} cộng dồn)</i>. Mỗi lần <span class="buff">hạ gục</span> bằng chiêu này, ` +
+  `sát thương của nó <span class="buff">vĩnh viễn tăng thêm ${DAMAGE_PER_STACK}</span>`;
 
-export default class Nasus_Q extends Spell {
+export default class Nasus_Q extends Spell implements ExecuteSpell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_nasus_q');
@@ -49,47 +56,62 @@ export default class Nasus_Q extends Spell {
     return true;
   }
 
+  /** Nothing killable in range is still worth a swing: this is his damage key. */
+  readonly executeFallback: ExecuteFallback = 'nearest';
+
   checkCastCondition() {
-    return !!this._findNearestEnemy();
+    return !!this.findVictim();
   }
 
   onSpellCast() {
-    const target = this._findNearestEnemy();
+    const target = this.findVictim();
     if (!target) return;
 
-    target.takeDamage(this.baseDamage + this.stacks * this.damagePerStack, this.owner);
-    this.stacks++;
-    this.description = describe(this.stacks);
+    // Read once: the swing that follows is drawn from the same number, and
+    // `stacks` may be about to change.
+    const damage = this.executeDamageAgainst(target);
+    // `canTakeDamageFromTeam` already excludes corpses, so this can only be
+    // false through some future filter change — but a stack is permanent, and
+    // "was it alive before I hit it" is the whole condition for earning one.
+    const wasAlive = !target.isDead;
+    target.takeDamage(damage, this.owner);
+
+    const slain = wasAlive && target.isDead;
+    if (slain) {
+      this.stacks++;
+      this.description = describe(this.stacks);
+    }
 
     const obj = new Nasus_Q_Object(this.owner);
     obj.targetPosition = target.position.copy();
     obj.angle = VectorUtils.getAngle(this.owner.position, target.position);
     obj.targetSize = target.animatedValues?.displaySize ?? 50;
     obj.stacks = this.stacks;
+    // The tally plate is a receipt for a stack, so it only prints when one was
+    // earned. On an ordinary swing the claw marks say everything there is.
+    obj.slain = slain;
     obj.range = this.range;
     this.game.objectManager.addObject(obj);
   }
 
-  _findNearestEnemy() {
-    const enemies = this.game.objectManager.queryObjects({
+  /** The one it should hit: killable first, otherwise nearest. */
+  findVictim(): AttackableUnit | null {
+    return pickExecuteTarget(this);
+  }
+
+  executeDamageAgainst(_target: AttackableUnit): number {
+    return this.baseDamage + this.stacks * this.damagePerStack;
+  }
+
+  executeCandidates(): AttackableUnit[] {
+    return this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
         r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-    });
-
-    let nearest = null;
-    let nearestDistance = Infinity;
-    for (const enemy of enemies) {
-      const distance = this.owner.position.dist(enemy.position);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = enemy;
-      }
-    }
-    return nearest;
+    }) as AttackableUnit[];
   }
 
   drawPreview() {
@@ -109,6 +131,8 @@ export class Nasus_Q_Object extends SpellObject {
   targetSize = 50;
   stacks = 1;
   range = 150;
+  /** Whether this swing actually banked a stack; see `Nasus_Q.onSpellCast`. */
+  slain = false;
 
   update() {
     this.age += deltaTime;
@@ -180,7 +204,9 @@ export class Nasus_Q_Object extends SpellObject {
     pop();
 
     // --- the tally ---------------------------------------------------------
-    // below the unit: the health bar and buff icons already own the space above
+    // Only on a kill, because only a kill moves the number. Below the unit: the
+    // health bar and buff icons already own the space above.
+    if (!this.slain) return;
     push();
     // Overlay, not world — see Camera.constantSize. The plate and its number
     // compensate together, or the digits float off the plate at a small scale.

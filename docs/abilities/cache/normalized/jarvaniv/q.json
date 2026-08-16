@@ -1,0 +1,61 @@
+{
+  "asset": {
+    "key": "spell_jarvaniv_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Dragon_Strike.png?a8e88",
+    "sha1": "4d211313bbbfc2c174ce64fad090c29238fbb602"
+  },
+  "champion": "Jarvan IV",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jarvaniv_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Dragon_Strike.png?a8e88",
+        "sha1": "4d211313bbbfc2c174ce64fad090c29238fbb602"
+      },
+      "fields": {
+        "casttime": "0.4",
+        "cooldown": "10 / 9 / 8 / 7 / 6",
+        "cost": "45 / 50 / 55 / 60 / 65",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jarvan IV''' extends his lance in the target direction, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit and inflicting them with <span style=\"white-space:nowrap\">[[File:Armor penetration icon.svg|15px|link=Armor penetration]]&nbsp;<span style=\"color:yellow; white-space:normal\">armor reduction</span></span> for 3 seconds.",
+          "text": "Active: Jarvan IV extends his lance in the target direction, dealing physical damage to enemies hit and inflicting them with &nbsp;armor reduction for 3 seconds."
+        },
+        "description2": {
+          "raw": "If the lance connects with a deployed ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Demacian Standard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Demacian Standard.png|20xpx|border|link=Jarvan IV#Demacian Standard|An icon for Jarvan IV's ability Demacian Standard]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Demacian Standard|Demacian Standard]]</span></span>'', '''Jarvan IV''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to its location, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking up]]</span> nearby enemies around him and along his path for 0.<small>75</small> seconds.",
+          "text": "If the lance connects with a deployed Demacian Standard, Jarvan IV dashes to its location, knocking up nearby enemies around him and along his path for 0.75 seconds."
+        },
+        "description3": {
+          "raw": "'''''Jarvan IV''' can cast any of his [[champion ability|abilities]] during the dash.''",
+          "text": "Jarvan IV can cast any of his abilities during the dash."
+        },
+        "icon": "Dragon Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>90 / 130 / 170 / 210 / 250 <span style=\"color:orange; white-space:normal\">(+ 145% '''bonus''' AD)</span></dd></dl><dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Armor Reduction:'''</span></dt><dd><span style=\"color:yellow; white-space:normal\">10 / 14 / 18 / 22 / 26% of target's armor</span></dd></dl>",
+          "text": "Physical Damage:90 / 130 / 170 / 210 / 250 (+ 145% bonus AD)Armor Reduction:10 / 14 / 18 / 22 / 26% of target's armor"
+        },
+        "name": "Dragon Strike",
+        "notes": {
+          "raw": "* The armor reduction is applied after the damage. The damage dealt does not benefit from it in this case.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* ''Dragon Strike'' will still pull '''Jarvan IV''' to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Demacian Standard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Demacian Standard.png|20xpx|border|link=Jarvan IV#Demacian Standard|An icon for Jarvan IV's ability Demacian Standard]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Demacian Standard|Demacian Standard]]</span></span> even if he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Immobilize\">[[File:Stun icon.png|20px|link=Crowd_control#Immobilizing|An icon representing the keyword Immobilize]] [[:Crowd_control#Immobilizing|immobilized]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span>.\n* <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> will interrupt the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> to a <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Demacian Standard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Demacian Standard.png|20xpx|border|link=Jarvan IV#Demacian Standard|An icon for Jarvan IV's ability Demacian Standard]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Demacian Standard|Demacian Standard]]</span></span> but '''Jarvan IV''' will still <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span> at the new location.\n** Casting ''Flash'' right before the ''dash'' begins will cause '''Jarvan IV''' to be pulled to the flag from the new position.\n** Enemies already hit by ''Dragon Strike'' cannot be affected more than once.\n* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockup]]</span> also slightly moves the target, landing 50–100 units in a random direction.\n* If ''Dragon Strike'' hits multiple ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Demacian Standard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Demacian Standard.png|20xpx|border|link=Jarvan IV#Demacian Standard|An icon for Jarvan IV's ability Demacian Standard]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Demacian Standard|Demacian Standards]]</span></span>'' in the range, it will pull '''Jarvan IV''' to the one furthest from his position.",
+          "text": "The armor reduction is applied after the damage. The damage dealt does not benefit from it in this case.\nThis ability will cast from wherever the caster is at the end of the cast time.\nDragon Strike will still pull Jarvan IV to Demacian Standard even if he is immobilized or grounded.\nFlash will interrupt the dash to a Demacian Standard but Jarvan IV will still knock up at the new location.\n* Casting Flash right before the dash begins will cause Jarvan IV to be pulled to the flag from the new position.\n* Enemies already hit by Dragon Strike cannot be affected more than once.\nThe knockup also slightly moves the target, landing 50–100 units in a random direction.\nIf Dragon Strike hits multiple Demacian Standards in the range, it will pull Jarvan IV to the one furthest from his position."
+        },
+        "range": "65 – 785 • 0 – 850",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "136 • 300"
+      },
+      "name": "Dragon Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "dfa1b56c2cd32b807b75cd2a0cac695dfa8940fe484891a96ef82cae62452395",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Dragon_Strike",
+    "revisionId": 4042687,
+    "sourceTimestamp": "2026-07-14T09:58:33Z"
+  }
+}

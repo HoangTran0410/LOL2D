@@ -1,6 +1,11 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
+import {
+  pickExecuteTarget,
+  type ExecuteFallback,
+  type ExecuteSpell,
+} from '../../combat/ExecuteTargeting';
 import { effectiveRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -8,18 +13,23 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import StatAmp from '../buffs/StatAmp';
 import { MAX_UNIT_SIZE } from '../Stats';
+import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 /** One Feast stack. Kept as constants so the heal matches the max health gained. */
 export const SIZE_PER_STACK = 6;
 export const MAX_HEALTH_PER_STACK = 75;
 
-export default class ChoGath_R extends Spell {
+export default class ChoGath_R extends Spell implements ExecuteSpell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_chogath_r');
   name = "Ăn Thịt (Cho'Gath_R)";
   description =
-    `Ngoạm kẻ địch gần nhất trong phạm vi <span>200px</span>, gây <span class="damage">40 sát thương</span>. Mỗi lần ăn, Cho'Gath <span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+${SIZE_PER_STACK} kích thước</span> (tối đa <span>${MAX_UNIT_SIZE}</span>) và <span class="buff">+${MAX_HEALTH_PER_STACK} máu tối đa</span> (không giới hạn)`;
+    `Ngoạm một kẻ địch trong phạm vi <span>200px</span> — <span class="buff">ưu tiên kẻ sẽ chết vì cú ngoạm này</span>, ` +
+    `nếu không có thì kẻ gần nhất — gây <span class="damage">40 sát thương</span>. ` +
+    `Chỉ khi <span class="buff">ăn tươi nuốt sống</span> (hạ gục bằng chiêu này), Cho'Gath mới ` +
+    `<span class="buff">To Lên Vĩnh Viễn</span>: cộng dồn <span>+${SIZE_PER_STACK} kích thước</span> ` +
+    `(tối đa <span>${MAX_UNIT_SIZE}</span>) và <span class="buff">+${MAX_HEALTH_PER_STACK} máu tối đa</span> (không giới hạn)`;
   coolDown = 10000;
   manaCost = 50;
 
@@ -69,30 +79,49 @@ export default class ChoGath_R extends Spell {
     return true;
   }
 
+  /** A bite that kills nobody is still a bite: 40 damage on the nearest body. */
+  readonly executeFallback: ExecuteFallback = 'nearest';
+
   checkCastCondition() {
-    return !!this._findNearestEnemy();
+    return !!this.findVictim();
   }
 
   onSpellCast() {
-    const target = this._findNearestEnemy();
+    const target = this.findVictim();
     if (!target) return;
 
+    // The growth is paid for by the meal, not by the bite. Before this, holding
+    // R next to anything at all bought permanent max health and size — the one
+    // uncapped stat in the game, farmed off targets that never died.
+    const wasAlive = !target.isDead;
     target.takeDamage(this.damage, this.owner);
+    const devoured = wasAlive && target.isDead;
 
-    this.owner.addBuff(createGrowthStack(this.owner, this.growthDuration, this.image));
-
-    // the extra max health is only worth something if it comes filled in
-    this.owner.takeHeal(MAX_HEALTH_PER_STACK, this.owner);
+    if (devoured) {
+      this.owner.addBuff(createGrowthStack(this.owner, this.growthDuration, this.image));
+      // the extra max health is only worth something if it comes filled in
+      this.owner.takeHeal(MAX_HEALTH_PER_STACK, this.owner);
+    }
 
     const obj = new ChoGath_R_Object(this.owner);
     obj.position = target.position.copy();
     obj.angle = VectorUtils.getAngle(this.owner.position, target.position);
     obj.targetSize = target.animatedValues?.displaySize ?? 50;
+    obj.devoured = devoured;
     this.game.objectManager.addObject(obj);
   }
 
-  _findNearestEnemy() {
-    const enemies = this.game.objectManager.queryObjects({
+  /** The one he should eat: killable first, otherwise nearest. */
+  findVictim(): AttackableUnit | null {
+    return pickExecuteTarget(this);
+  }
+
+  executeDamageAgainst(_target: AttackableUnit): number {
+    return this.damage;
+  }
+
+  executeCandidates(): AttackableUnit[] {
+    return this.game.objectManager.queryObjects({
       area: new Circle({
         x: this.owner.position.x,
         y: this.owner.position.y,
@@ -102,18 +131,7 @@ export default class ChoGath_R extends Spell {
         r: effectiveRange(this.range, this.owner),
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-    });
-
-    let nearest = null;
-    let nearestDistance = Infinity;
-    for (const enemy of enemies) {
-      const distance = this.owner.position.dist(enemy.position);
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = enemy;
-      }
-    }
-    return nearest;
+    }) as AttackableUnit[];
   }
 
   drawPreview() {
@@ -155,6 +173,14 @@ export class ChoGath_R_Growth extends StatAmp {
    * A permanent stack that only makes the model bigger is impossible to count.
    * One stack draws the whole crown of horns for all of them — doing it per
    * stack would redraw the same ring N times.
+   *
+   * The horns are the *feel* of the count, not the count. The exact number is
+   * already on the buff-icon row above the health bar, which `Champion`
+   * assembles for every champion on screen by grouping buffs on `stackId` —
+   * one place, every stacking ability, friend and enemy alike. This used to
+   * paint its own number plate under the model as well; so did Veigar Q, and
+   * every future stacking spell would have had to invent a third. Nothing
+   * world-space prints a tally any more.
    */
   draw(): void {
     if (this.targetUnit.isDead) return;
@@ -192,17 +218,6 @@ export class ChoGath_R_Growth extends StatAmp {
     stroke(150, 45, 60, Math.min(190, 70 + n * 16));
     strokeWeight(3);
     circle(0, 0, (radius + 20) * 2 * beat);
-
-    // the tally, under the model: above it belongs to the health bar
-    noStroke();
-    textAlign(CENTER, CENTER);
-    // Overlay, not world — see Camera.constantSize.
-    const k = this.game?.camera?.constantSize?.(1) ?? 1;
-    fill(30, 8, 12, 185);
-    rect(-24 * k, radius + 8 * k, 48 * k, 23 * k, 6 * k);
-    fill(255, 228, 205, 245);
-    textSize(17 * k);
-    text(String(n), 0, radius + 20 * k);
     pop();
   }
 }
@@ -214,6 +229,8 @@ export class ChoGath_R_Object extends SpellObject {
   age = 0;
   angle = 0;
   targetSize = 50;
+  /** The bite that actually fed him. Only difference is how hard it reads. */
+  devoured = false;
 
   update() {
     this.age += deltaTime;
@@ -231,12 +248,14 @@ export class ChoGath_R_Object extends SpellObject {
     translate(this.position.x, this.position.y);
     rotate(this.angle);
 
-    // flash of the bite landing
+    // flash of the bite landing — bigger and hotter when the jaws close on a
+    // kill, which is the only bite that feeds him
     if (t < 0.4) {
+      const bite = this.devoured ? 1.6 : 1.1;
       blendMode(ADD);
       noStroke();
-      fill(255, 120, 110, 110 * (1 - t / 0.4));
-      circle(0, 0, this.size * 1.1);
+      fill(255, 120, 110, (this.devoured ? 190 : 110) * (1 - t / 0.4));
+      circle(0, 0, this.size * bite);
       blendMode(BLEND);
     }
 

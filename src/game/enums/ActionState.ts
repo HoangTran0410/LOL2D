@@ -7,7 +7,10 @@ const ActionState = {
   FEARED: 1 << 7,
   IS_NEAR_SIGHTED: 1 << 11,
   IS_GHOSTED: 1 << 12,
+  /** Walks through bodies; terrain still applies. See StatusFlags.PhasesUnits. */
+  PHASES_UNITS: 1 << 24,
   CHARMED: 1 << 15,
+  TAUNTED: 1 << 6,
   NO_RENDER: 1 << 16,
   TARGETABLE: 1 << 23,
 };

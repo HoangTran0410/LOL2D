@@ -8,6 +8,13 @@ import Champion from '../attackableUnits/Champion';
 import Dash from '../buffs/Dash';
 import Nearsight from '../buffs/Nearsight';
 
+// Exported so the suite asserts the wiring, not a copy of the number —
+// retuning a value should not mean editing the test.
+// Scaled to the ~1600x1600 canvas: the raw PC value (1200) let Paranoia cross
+// most of the map in one leap, half again as far as the longest reach anything
+// else in the game has (900). 800 still makes it the longest gap-closer here.
+export const LEAP_RANGE = 800;
+
 /**
  * Paranoia, in two activations like the real ultimate:
  *
@@ -34,13 +41,13 @@ export default class Nocturne_R extends Spell {
   image = Nocturne_R.PHASES[this.phase].image;
   name = 'Hoàng Hôn Kinh Hoàng (Nocturne_R)';
   description =
-    'Bao trùm bản đồ trong bóng tối: <span>mọi tướng địch</span> bị <span class="buff">Mờ Mắt</span> (tầm nhìn giảm còn 200) trong <span class="time">6 giây</span>. Trong khoảng thời gian đó, tái kích hoạt để <span class="buff">Lao</span> tới một <span>tướng địch</span> trong phạm vi <span>1200</span> (chọn tướng gần con trỏ chuột nhất), bám theo mục tiêu và gây <span class="damage">35 sát thương</span> khi tới nơi. Cú lao không thể bị chặn. Nếu không tái kích hoạt, kỹ năng vào thời gian hồi đầy đủ.';
+    `Bao trùm bản đồ trong bóng tối: <span>mọi tướng địch</span> bị <span class="buff">Mờ Mắt</span> (tầm nhìn giảm còn 200) trong <span class="time">6 giây</span>. Trong khoảng thời gian đó, tái kích hoạt để <span class="buff">Lao</span> tới một <span>tướng địch</span> trong phạm vi <span>${LEAP_RANGE}</span> (chọn tướng gần con trỏ chuột nhất), bám theo mục tiêu và gây <span class="damage">35 sát thương</span> khi tới nơi. Cú lao không thể bị chặn. Nếu không tái kích hoạt, kỹ năng vào thời gian hồi đầy đủ.`;
   coolDown = 10000;
   manaCost = 100;
 
   nearsightTime = 6000;
   newVisionRadius = 200;
-  leapRange = 1200;
+  leapRange = LEAP_RANGE;
   leapSpeed = 18;
   damage = 35;
   /** The wiki's 0.25s delay before Paranoia may be recast. */

@@ -1,0 +1,66 @@
+{
+  "asset": {
+    "key": "spell_ekko_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Parallel_Convergence.png?a6cf9",
+    "sha1": "c991be5d0e3449535f2477d90271169714ba3616"
+  },
+  "champion": "Ekko",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ekko_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Parallel_Convergence.png?a6cf9",
+        "sha1": "c991be5d0e3449535f2477d90271169714ba3616"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "22 / 20 / 18 / 16 / 14",
+        "cost": "30 / 35 / 40 / 45 / 50",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Ekko's''' basic attacks deal <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span> equal to <span style=\"color:\n#21B053; white-space:normal\">3% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 3% per 100 AP)</span> of the target's '''missing''' health</span> against enemies below <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">30% of their '''maximum''' health</span></span>. The damage has a minimum threshold of 15 and is capped at 150 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Passive: Ekko's basic attacks deal bonus magic damage equal to 3% (+ 3% per 100 AP) of the target's missing health against enemies below &nbsp;30% of their maximum health. The damage has a minimum threshold of 15 and is capped at 150 against minions and monsters."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ekko''' creates an afterimage of himself that, after 2 seconds, bats a device to the target location and grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area for 2.<small>5</small> seconds. After travelling over 1.<small>25</small> seconds, the device expands into a chronosphere that lasts for 1.<small>5</small> seconds and which <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> enemies within by 40%.",
+          "text": "Active: Ekko creates an afterimage of himself that, after 2 seconds, bats a device to the target location and grants sight of the area for 2.5 seconds. After travelling over 1.25 seconds, the device expands into a chronosphere that lasts for 1.5 seconds and which slows enemies within by 40%."
+        },
+        "description3": {
+          "raw": "If '''Ekko''' enters the sphere before it expires, it detonates to grant him a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 2 seconds and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> enemies within for 2.<small>25</small> seconds.",
+          "text": "If Ekko enters the sphere before it expires, it detonates to grant him a shield for 2 seconds and stun enemies within for 2.25 seconds."
+        },
+        "description4": {
+          "raw": "''Enemies can see the indicator for Parallel Convergence 2 seconds after casting.''",
+          "text": "Enemies can see the indicator for Parallel Convergence 2 seconds after casting."
+        },
+        "effectradius": "375",
+        "icon": "false",
+        "icon2": "Parallel Convergence.png",
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>100 / 120 / 140 / 160 / 180 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 150% AP)</span></dd></dl>",
+          "text": "Shield Strength:100 / 120 / 140 / 160 / 180 (+ 150% AP)"
+        },
+        "name": "Parallel Convergence",
+        "notes": {
+          "raw": "* The passive will proc with the attack that triggers the final stack of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ekko\" data-ability=\"Z-Drive Resonance\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ekko Z-Drive Resonance.png|20xpx|border|link=Ekko#Z-Drive Resonance|An icon for Ekko's ability Z-Drive Resonance]]</span> <span style=\"white-space:normal;\">[[Ekko#Z-Drive Resonance|Resonance]]</span></span> if it reduces a target's health below the 30% threshold.\n* '''Ekko''' can detonate the expansion even while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> (i.e. <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ekko\" data-ability=\"Chronobreak\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ekko Chronobreak.png|20xpx|border|link=Ekko#Chronobreak|An icon for Ekko's ability Chronobreak]]</span> <span style=\"white-space:normal;\">[[Ekko#Chronobreak|Chronobreak's]]</span></span> dash), but not if he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Resurrection\">[[File:Revival icon.png|20px|link=Death#Ways to prevent death when reaching zero health|An icon representing the keyword Resurrection]] [[:Death#Ways to prevent death when reaching zero health|resurrecting]]</span>.\n* ''Parallel Convergence'' will continue to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> enemies even if its expansion is detonated.",
+          "text": "The passive will proc with the attack that triggers the final stack of Resonance if it reduces a target's health below the 30% threshold.\nEkko can detonate the expansion even while untargetable (i.e. Chronobreak's dash), but not if he is resurrecting.\nParallel Convergence will continue to slow enemies even if its expansion is detonated."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Parallel Convergence"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "48c468841880fff2c48db8e2222c7414c73e44457c50df44f526f0771d3bb52b",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ekko/Parallel_Convergence",
+    "revisionId": 3956502,
+    "sourceTimestamp": "2025-09-29T02:43:12Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Jarvan IV/Martial Cadence",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Martial Cadence@@icon@@Martial Cadence.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Jarvan IV's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> equal to <span style=\"color:\n#21B053; white-space:normal\">8% of the target's '''current''' health</span>, with a minimum threshold of 20 and capped at 400 against non-<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> targets.@@description2@@This effect cannot occur on the same target more than once every few seconds.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@Physical@@spellshield@@False@@projectile@@{{{projectile}}}@@notes@@\n* ''Martial Cadence's'' damage is based on the current health of the target before any damage of the attack has been dealt.\n* ''Martial Cadence's'' damage is dealt after the main attack damage.\n** If the target dies to the main attack damage, the additional damage will not be dealt.\n* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307566,
+                "revisions": [
+                  {
+                    "parentid": 4003789,
+                    "revid": 4003791,
+                    "timestamp": "2026-03-31T00:19:20Z"
+                  }
+                ],
+                "title": "Template:Data Jarvan IV/Martial Cadence"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4003791,
+      "timestamp": "2026-03-31T00:19:20Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "5d14cdb5fb805805e1ef2c21ba6d1caa408c5302f3cb921529716751c8b790a4",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Martial_Cadence",
+    "revisionId": 4003791,
+    "sourceTimestamp": "2026-03-31T00:19:20Z"
+  }
+}

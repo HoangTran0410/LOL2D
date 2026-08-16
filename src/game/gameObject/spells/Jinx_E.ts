@@ -177,13 +177,17 @@ export class Jinx_E_Chomper extends Pet {
     });
     enemies.forEach((enemy: any) => enemy.takeDamage(DAMAGE, this.ownerUnit));
 
+    // Frag, the shape shared by Jinx's whole kit: hard chunks of casing thrown
+    // out through rolling smoke. `shards` was rock splinters and was doing duty
+    // for four other champions at once — a chomper going off is an *explosive*,
+    // and it has to look like the rocket and the zap it comes packaged with.
     const snap = new AoePulse(this.ownerUnit);
     snap.position = this.position.copy();
     snap.radius = BLAST_RADIUS;
     snap.lifeTime = 380;
     snap.color = [255, 140, 60];
-    snap.style = 'shards';
-    snap.spokes = 8;
+    snap.style = 'frag';
+    snap.spokes = 10;
     this.game.objectManager.addObject(snap);
 
     // Spent. The blast animation gets a beat before the body is retired.

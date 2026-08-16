@@ -23,6 +23,7 @@ export class TestVector {
     return this;
   }
   dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
+  heading() { return Math.atan2(this.y, this.x); }
   static add(a: TestVector, b: TestVector) { return new TestVector(a.x + b.x, a.y + b.y); }
   static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
   static dist(a: TestVector, b: TestVector) { return a.dist(b); }

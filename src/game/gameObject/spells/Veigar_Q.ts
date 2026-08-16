@@ -116,6 +116,12 @@ export function createPowerStack(
  * drawing, the stacking behaviour is untouched.
  */
 export class Veigar_Q_Power extends StatAmp {
+  /**
+   * The orbit says "a lot of stacks"; the exact figure is on the buff-icon row
+   * above the health bar, which `Champion.drawHealthBar` builds for every
+   * champion by grouping buffs on `stackId`. See the same note on
+   * `ChoGath_R_Growth.draw` — one convention, no per-spell number plates.
+   */
   draw(): void {
     if (this.targetUnit.isDead) return;
 
@@ -137,7 +143,8 @@ export class Veigar_Q_Power extends StatAmp {
     circle(0, 0, radius * 2.2);
     blendMode(BLEND);
 
-    // one dark mote in orbit per stack, up to a dozen; then the number carries it
+    // one dark mote in orbit per stack, up to a dozen; past that the ring is
+    // simply "full" and the icon badge carries the exact count
     for (let i = 0; i < shown; i++) {
       const a = (i / shown) * TWO_PI + frameCount / 55;
       const r = radius + sin(frameCount / 30 + i) * 4;
@@ -155,16 +162,6 @@ export class Veigar_Q_Power extends StatAmp {
       circle(x, y, 7);
     }
 
-    // the tally, under the model: above it belongs to the health bar
-    noStroke();
-    textAlign(CENTER, CENTER);
-    // Overlay, not world — see Camera.constantSize.
-    const k = this.game?.camera?.constantSize?.(1) ?? 1;
-    fill(18, 6, 32, 185);
-    rect(-24 * k, radius + 4 * k, 48 * k, 23 * k, 6 * k);
-    fill(220, 185, 255, 245);
-    textSize(17 * k);
-    text(String(n), 0, radius + 16 * k);
     pop();
   }
 }

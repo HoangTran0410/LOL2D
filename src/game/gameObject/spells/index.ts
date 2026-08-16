@@ -1,4 +1,3 @@
-// the champion's own attack, as an ability — see BasicAttack.ts
 export { default as BasicAttack } from './BasicAttack';
 
 export { default as Ghost } from './Ghost';
@@ -44,8 +43,6 @@ export { default as Graves_W } from './Graves_W';
 export { default as Zed_Q } from './Zed_Q';
 export { default as Zed_E } from './Zed_E';
 export { default as Zed_R } from './Zed_R';
-
-// kits completed on existing champions
 export { default as Ashe_Q } from './Ashe_Q';
 export { default as Ashe_E } from './Ashe_E';
 export { default as Lux_W } from './Lux_W';
@@ -58,8 +55,6 @@ export { default as Malphite_W } from './Malphite_W';
 export { default as Malphite_E } from './Malphite_E';
 export { default as Teemo_Q } from './Teemo_Q';
 export { default as Veigar_Q } from './Veigar_Q';
-
-// new champions
 export { default as Rammus_Q } from './Rammus_Q';
 export { default as Anivia_Q } from './Anivia_Q';
 export { default as Anivia_W } from './Anivia_W';
@@ -146,3 +141,18 @@ export { default as Garen_Q } from './Garen_Q';
 export { default as Garen_W } from './Garen_W';
 export { default as Garen_E } from './Garen_E';
 export { default as Garen_R } from './Garen_R';
+
+export { default as Ekko_Q } from './Ekko_Q';
+export { default as Ekko_W } from './Ekko_W';
+export { default as Ekko_E } from './Ekko_E';
+export { default as Ekko_R } from './Ekko_R';
+
+export { default as JarvanIV_Q } from './JarvanIV_Q';
+export { default as JarvanIV_W } from './JarvanIV_W';
+export { default as JarvanIV_E } from './JarvanIV_E';
+export { default as JarvanIV_R } from './JarvanIV_R';
+
+export { default as Camille_Q } from './Camille_Q';
+export { default as Camille_W } from './Camille_W';
+export { default as Camille_E } from './Camille_E';
+export { default as Camille_R } from './Camille_R';

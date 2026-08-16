@@ -6,6 +6,25 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+
+export const THROW_RANGE = 100;
+export const INVISIBLE_AFTER_MS = 1000;
+export const SHROOM_LIFETIME_MS = 20000;
+export const EXPLODE_RANGE = 200;
+export const EXPLODE_LIFETIME_MS = 1500;
+export const DAMAGE = 30;
+export const SLOW_PERCENT = 0.7;
+export const SLOW_MS = 2000;
+
+/** Spore puffs thrown by the burst. Seeded once — see `_spores`. */
+export const SPORE_COUNT = 16;
+/** Fraction of the burst spent on the white flash. */
+export const FLASH_FRACTION = 0.18;
+
+const TOXIC_DARK: [number, number, number] = [78, 118, 34];
+const TOXIC: [number, number, number] = [150, 205, 60];
+const TOXIC_BRIGHT: [number, number, number] = [225, 255, 140];
 
 export default class Teemo_R extends Spell {
   targetingMode = 'POINT' as const;
@@ -17,24 +36,19 @@ export default class Teemo_R extends Spell {
   coolDown = 3000;
 
   onSpellCast() {
-    let throwRange = 100,
-      invisibleAfter = 1000,
-      lifeTime = 20000,
-      explodeRange = 200;
-
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.aimPoint,
-      throwRange
+      THROW_RANGE
     );
 
     let obj = new Teemo_R_Object(this.owner);
     obj.position = from;
     obj.destination = to;
-    obj.invisibleAfter = invisibleAfter;
-    obj.lifeTime = lifeTime;
-    obj.explodeRange = explodeRange;
-    obj.throwRange = throwRange;
+    obj.invisibleAfter = INVISIBLE_AFTER_MS;
+    obj.lifeTime = SHROOM_LIFETIME_MS;
+    obj.explodeRange = EXPLODE_RANGE;
+    obj.throwRange = THROW_RANGE;
 
     this.game.objectManager.addObject(obj);
   }
@@ -43,7 +57,19 @@ export default class Teemo_R extends Spell {
 export class Teemo_R_Buff extends Slow {
   image = AssetManager.get('spell_teemo_r');
   buffAddType = BuffAddType.RENEW_EXISTING;
-  percent = 0.7;
+  percent = SLOW_PERCENT;
+}
+
+/** One puff of spores thrown out by the burst, with its own fixed trajectory. */
+interface Spore {
+  angle: number;
+  /** Share of the blast radius this one covers. */
+  speed: number;
+  size: number;
+  /** Puffs arc up and settle, so each carries its own hop height. */
+  hop: number;
+  /** Radians of tumble over the whole burst. */
+  spin: number;
 }
 
 export class Teemo_R_Object extends SpellObject {
@@ -51,13 +77,13 @@ export class Teemo_R_Object extends SpellObject {
   position = createVector();
   destination = createVector();
   originalPosition!: p5.Vector;
-  invisibleAfter = 1000;
-  lifeTime = 30000;
+  invisibleAfter = INVISIBLE_AFTER_MS;
+  lifeTime = SHROOM_LIFETIME_MS;
   age = 0;
   moveSpeed = 6;
-  explodeRange = 200;
-  explodeLifeTime = 1500;
-  throwRange = 100;
+  explodeRange = EXPLODE_RANGE;
+  explodeLifeTime = EXPLODE_LIFETIME_MS;
+  throwRange = THROW_RANGE;
   bouncedOn: Teemo_R_Object[] = [];
 
   size = 50;
@@ -71,12 +97,53 @@ export class Teemo_R_Object extends SpellObject {
     { x: -20, y: 14, r: 14 },
   ];
 
+  /**
+   * Rolled once, in `onAdded`, and never again.
+   *
+   * This used to be `random()` and `p5.Vector.random2D()` called from inside
+   * `draw()`, which meant every spore was somewhere else on every frame: the
+   * burst flickered like static instead of expanding. Anything an effect wants
+   * to *animate* has to be fixed data driven by progress — here `t`, below —
+   * not a fresh roll each time the frame comes round.
+   */
+  _spores: Spore[] = [];
+
+  /** Toxic motes: the cloud that hangs after the puffs have landed. */
+  particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize(
+    'rgba(178, 226, 84, 0.62)',
+    0.16
+  );
+
   static PHASES = {
     MOVING: 0,
     INVISIBLE: 1,
     exploding: 2,
   };
   phase = Teemo_R_Object.PHASES.MOVING;
+
+  onAdded() {
+    for (let i = 0; i < SPORE_COUNT; i++) {
+      this._spores.push({
+        // evenly spread, then nudged, so the burst is a ring with character
+        // rather than either a clock face or a clump
+        angle: (TWO_PI * i) / SPORE_COUNT + random(-0.18, 0.18),
+        speed: random(0.62, 1.05),
+        size: random(9, 19),
+        hop: random(8, 26),
+        spin: random(-2.4, 2.4),
+      });
+    }
+
+    this.game.objectManager.addObject(this.particleSystem);
+    // The shroom can sit armed for twenty seconds before it has a single mote
+    // to show; an empty system removes itself on its first update, so draining
+    // it is this object's job.
+    this.particleSystem.autoRemoveIfEmpty = false;
+  }
+
+  onRemoved() {
+    this.particleSystem.autoRemoveIfEmpty = true;
+  }
 
   update() {
     if (!this.originalPosition) {
@@ -88,6 +155,9 @@ export class Teemo_R_Object extends SpellObject {
 
     // moving phase
     if (this.phase === Teemo_R_Object.PHASES.MOVING) {
+      // it tumbles through the air, which is what sells it as thrown rather
+      // than slid along the ground
+      this.angle += 0.08;
       VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
 
       if (this.position.dist(this.destination) < this.moveSpeed) {
@@ -120,6 +190,7 @@ export class Teemo_R_Object extends SpellObject {
           this.position = this.destination.copy();
           this.isMissile = false; // yasuo W cant block this
           this.phase = Teemo_R_Object.PHASES.INVISIBLE;
+          this._puff(5, 6, 3); // it bites into the ground
         }
       }
     }
@@ -156,17 +227,18 @@ export class Teemo_R_Object extends SpellObject {
           });
 
           enemiesInRange.forEach((enemy: any) => {
-            let slowBuff = new Slow(2000, this.owner, enemy);
+            let slowBuff = new Slow(SLOW_MS, this.owner, enemy);
             slowBuff.buffAddType = BuffAddType.RENEW_EXISTING;
-            slowBuff.percent = 0.7;
+            slowBuff.percent = SLOW_PERCENT;
             enemy.addBuff(slowBuff);
-            enemy.takeDamage(30, this.owner);
+            enemy.takeDamage(DAMAGE, this.owner);
           });
 
           this.phase = Teemo_R_Object.PHASES.exploding;
           this.age = 0; // reset age
           this.size = this.explodeRange;
           this.visionRadius = this.explodeRange;
+          this._puff(22, this.explodeRange / 2, 9);
         }
       }
     }
@@ -174,9 +246,27 @@ export class Teemo_R_Object extends SpellObject {
     // exploding phase
     else if (this.phase === Teemo_R_Object.PHASES.exploding) {
       this.age += deltaTime;
+      // a second, slower wave of motes so the cloud keeps breathing while the
+      // slow it applied is still running
+      if (this.age < this.explodeLifeTime * 0.5 && random() < 0.35) {
+        this._puff(1, this.explodeRange / 2, 7);
+      }
       if (this.age > this.explodeLifeTime) {
         this.toRemove = true;
       }
+    }
+  }
+
+  /** `count` motes scattered within `spread` of the shroom. */
+  _puff(count: number, spread: number, maxSize: number) {
+    for (let i = 0; i < count; i++) {
+      const a = random(TWO_PI);
+      const d = random(0, spread);
+      this.particleSystem.addParticle({
+        x: this.position.x + cos(a) * d,
+        y: this.position.y + sin(a) * d,
+        r: random(maxSize * 0.4, maxSize),
+      });
     }
   }
 
@@ -207,27 +297,99 @@ export class Teemo_R_Object extends SpellObject {
 
     // exploding phase
     else if (this.phase === Teemo_R_Object.PHASES.exploding) {
-      let alpha = map(this.age, 0, this.explodeLifeTime, 255, 0);
-      stroke(150, alpha + 50);
-      strokeWeight(2);
-      fill(114, 63, 127, alpha);
-      circle(this.position.x, this.position.y, this.size);
-
-      // draw random circle
-      stroke(100);
-      fill(150, 100, 160);
-      let delta = p5.Vector.random2D().mult(random(0, this.size / 2));
-      let r = random(10, 20);
-      circle(this.position.x + delta.x, this.position.y + delta.y, r);
+      this._drawBurst();
     }
   }
 
+  /**
+   * The burst, every value driven off one normalized progress.
+   *
+   * What the player has to read here is a radius: everything inside the rim
+   * just took 30 damage and a 70% slow, and standing in the cloud for the next
+   * two seconds is what that slow feels like. So the rim is hard-edged and the
+   * gas inside it is soft.
+   */
+  _drawBurst() {
+    const t = constrain(this.age / this.explodeLifeTime, 0, 1);
+    const fade = 1 - t;
+    // decelerating: the gas leaves fast and then settles, which is how a puff
+    // of spores behaves and how a linear expansion never does
+    const ease = 1 - (1 - t) * (1 - t) * (1 - t);
+    const radius = this.explodeRange / 2;
+    const flash = 1 - constrain(t / FLASH_FRACTION, 0, 1);
+    const [dr, dg, db] = TOXIC_DARK;
+    const [mr, mg, mb] = TOXIC;
+    const [br, bg, bb] = TOXIC_BRIGHT;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // the gas filling the blast, growing into the rim it will settle at
+    noStroke();
+    fill(mr, mg, mb, 95 * fade);
+    circle(0, 0, radius * 2 * (0.35 + 0.65 * ease));
+    fill(dr, dg, db, 70 * fade);
+    circle(0, 0, radius * 2 * (0.2 + 0.5 * ease));
+
+    // the rim: exactly the radius that was damaged, so nobody has to guess
+    noFill();
+    stroke(dr, dg, db, 210 * fade);
+    strokeWeight(8 * fade + 2);
+    circle(0, 0, radius * 2);
+    stroke(br, bg, bb, 235 * fade);
+    strokeWeight(3 * fade + 1.5);
+    circle(0, 0, radius * 2);
+
+    // the wave racing out to that rim
+    stroke(mr, mg, mb, 220 * fade);
+    strokeWeight(9 * fade + 2);
+    circle(0, 0, radius * 2 * (0.15 + 0.85 * ease));
+
+    // the spore puffs themselves, on the trajectories rolled in onAdded
+    for (const spore of this._spores) {
+      const distance = radius * ease * spore.speed;
+      // parabola: up out of the cap, then down into the cloud
+      const lift = sin(t * PI) * spore.hop;
+      const scale = (1 - t * 0.65) * (0.4 + 0.6 * constrain(t / 0.15, 0, 1));
+      push();
+      translate(cos(spore.angle) * distance, sin(spore.angle) * distance - lift);
+      rotate(spore.spin * t);
+      noStroke();
+      fill(dr, dg, db, 230 * fade);
+      circle(0, 0, spore.size * scale);
+      fill(mr, mg, mb, 240 * fade);
+      circle(0, -spore.size * 0.12 * scale, spore.size * 0.72 * scale);
+      fill(br, bg, bb, 220 * fade);
+      circle(-spore.size * 0.15 * scale, -spore.size * 0.2 * scale, spore.size * 0.3 * scale);
+      pop();
+    }
+
+    // the pop itself, gone almost before it registers
+    if (flash > 0) {
+      noStroke();
+      fill(245, 255, 205, 235 * flash);
+      circle(0, 0, radius * 0.85 * flash + 22);
+      noFill();
+      stroke(255, 255, 230, 250 * flash);
+      strokeWeight(5);
+      circle(0, 0, radius * 1.5 * (1 - flash) + 20);
+    }
+
+    pop();
+  }
+
   getDisplayBoundingBox() {
+    // the burst throws puffs a little past its own rim and the flash ring
+    // overshoots it too, so the box is the blast plus a margin
+    const reach =
+      this.phase === Teemo_R_Object.PHASES.exploding
+        ? this.explodeRange / 2 + 45
+        : this.size / 2 + 12;
     return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
+      x: this.position.x - reach,
+      y: this.position.y - reach,
+      w: reach * 2,
+      h: reach * 2,
       data: this,
     });
   }

@@ -1,11 +1,8 @@
-import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
+import AssetManager from '../../../managers/AssetManager';
 import EventType from '../../enums/EventType';
 import { uuidv4 } from '../../../utils/index';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import Spell from '../Spell';
-import Leblanc_Q from './Leblanc_Q';
-import Leblanc_W from './Leblanc_W';
-import Leblanc_E from './Leblanc_E';
 
 // Exported so the suite asserts Mimic's wiring, not a copy of the numbers —
 // retuning a value should not mean editing the test.
@@ -13,24 +10,28 @@ export const MANA_COST = 0;
 export const COOLDOWN_MS = 9_000;
 
 /**
- * The three abilities Mimic is allowed to recast. An explicit allowlist
- * rather than "everything but the ultimate" — the summoner spells also
- * fire `ON_POST_CAST_SPELL` on this same owner and must never be captured.
+ * The slots Mimic may copy from: the four ability slots, never the summoner
+ * ones and never the basic attack.
+ *
+ * It used to be a hard list of `Leblanc_Q | Leblanc_W | Leblanc_E`, which is the
+ * right rule for the game this ability comes from and the wrong one for this
+ * one: LOL2D has a kit builder, so LeBlanc's Q slot may be holding Ahri's orb.
+ * Keyed on *where the spell sits* rather than what class it is, Mimic copies
+ * whatever the champion actually cast — which is what the ability says it does.
+ *
+ * `SpellHotKeys` is the layout: index 0 is the basic attack, 1-4 are Q/W/E/R,
+ * 5-6 are the summoner spells. Summoners are excluded because they fire the
+ * same event on the same owner and are not abilities; the basic attack because
+ * copying it is a swing, not a spell.
  */
-const MIMICABLE_SPELLS = [Leblanc_Q, Leblanc_W, Leblanc_E] as const;
-type MimicableSpellClass = (typeof MIMICABLE_SPELLS)[number];
+export const FIRST_ABILITY_SLOT = 1;
+export const LAST_ABILITY_SLOT = 4;
 
 interface TrackedCast {
-  SpellClass: MimicableSpellClass;
-  context: CastContext;
+  SpellClass: new (owner: any) => Spell;
+  image: unknown;
+  name: string;
 }
-
-/** The wiki ships one Mimic icon per mimicked form; show whichever is live. */
-const MIMIC_ICON_BY_SPELL = new Map<MimicableSpellClass, AssetKey>([
-  [Leblanc_Q, 'spell_leblanc_r2'],
-  [Leblanc_W, 'spell_leblanc_r3'],
-  [Leblanc_E, 'spell_leblanc_r4'],
-]);
 
 const isInFlight = (state: string): boolean =>
   state === 'CASTING' || state === 'CHARGING' || state === 'CHANNELING';
@@ -71,7 +72,9 @@ export default class Leblanc_R extends Spell {
   image = AssetManager.get('spell_leblanc_r');
   name = 'Bắt Chước (Leblanc_R)';
   description =
-    'Tái hiện kỹ năng thường gần nhất mà LeBlanc đã dùng (Q, W hoặc E), bỏ qua thời gian hồi chiêu của kỹ năng đó. Nếu chưa dùng kỹ năng nào, mặc định tái hiện Ấn Ký Ác Ý (Q).';
+    'Tái hiện <span class="buff">kỹ năng gần nhất</span> mà LeBlanc đã dùng (bất kỳ chiêu nào ở ô Q, W, E, R —' +
+    ' không tính phép bổ trợ), <span class="buff">bỏ qua thời gian hồi chiêu</span> của kỹ năng đó và' +
+    ' <span class="buff">nhắm lại theo con trỏ hiện tại</span>. Biểu tượng R đổi theo chiêu sẽ được tái hiện.';
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -105,34 +108,58 @@ export default class Leblanc_R extends Spell {
   }
 
   onSpellCast(context: CastContext): void {
-    const entry = this.lastCast;
-    const SpellClass = entry?.SpellClass ?? Leblanc_Q;
-    const source = entry?.context;
+    const SpellClass = this.lastCast?.SpellClass ?? this.defaultMimicClass();
+    if (!SpellClass) return;
 
+    const clone = new SpellClass(this.owner);
+    // Mimic already paid its own cost; the mimicked ability must not charge again.
+    clone.manaCost = 0;
+    clone.healthCost = 0;
+
+    /**
+     * Aimed *now*, not replayed.
+     *
+     * The old version reused the original cast's `cursorWorld`, `direction` and
+     * `target`, so Mimic fired at wherever the first cast had been pointed —
+     * which looks like the ability ignoring your mouse, because it was. It also
+     * meant walking between the two casts left the copy shooting at empty
+     * ground, and a mimicked unit-target spell chasing a body that may have
+     * died. Building the context through `createSpellContext` re-runs the same
+     * `TargetResolver` a fresh press does, so UNIT spells re-acquire and
+     * DIRECTION spells take the live cursor.
+     */
+    const resolved = this.game.createSpellContext?.(clone, this.owner, context.cursorWorld);
+    if (resolved) {
+      if (clone.press(resolved)) this.activeMimic = clone;
+      return;
+    }
+
+    // No resolver, or nothing valid under the cursor: fall back to a direction
+    // built from the live cursor rather than a stale one.
     const origin = Object.freeze({ x: this.owner.position.x, y: this.owner.position.y });
-    const cursorWorld = source ? source.cursorWorld : context.cursorWorld;
-    const dx = cursorWorld.x - origin.x;
-    const dy = cursorWorld.y - origin.y;
+    const dx = context.cursorWorld.x - origin.x;
+    const dy = context.cursorWorld.y - origin.y;
     const length = Math.hypot(dx, dy);
-
     const mimicContext: CastContext = Object.freeze({
       spellId: `${this.id}-mimic`,
       activationId: uuidv4(),
       startedAtMs: context.startedAtMs,
       caster: this.owner,
       origin,
-      cursorWorld,
-      direction: source
-        ? source.direction
-        : Object.freeze({ x: length === 0 ? 0 : dx / length, y: length === 0 ? 0 : dy / length }),
-      ...(source?.target !== undefined ? { target: source.target } : {}),
+      cursorWorld: Object.freeze({ ...context.cursorWorld }),
+      direction: Object.freeze({
+        x: length === 0 ? 0 : dx / length,
+        y: length === 0 ? 0 : dy / length,
+      }),
     });
-
-    const clone = new SpellClass(this.owner);
-    // Mimic already paid its own cost; the mimicked ability must not charge again.
-    clone.manaCost = 0;
-    clone.healthCost = 0;
     if (clone.press(mimicContext)) this.activeMimic = clone;
+  }
+
+  /** With nothing cast yet, Mimic falls back to whatever sits in the Q slot. */
+  private defaultMimicClass(): (new (owner: any) => Spell) | null {
+    const first = (this.owner.spells as Spell[])?.[FIRST_ABILITY_SLOT];
+    if (!first || first === this) return null;
+    return first.constructor as new (owner: any) => Spell;
   }
 
   onRemoved(): void {
@@ -150,9 +177,17 @@ export default class Leblanc_R extends Spell {
 
   private handleCast = (spell: Spell): void => {
     if (spell === this || spell.owner !== this.owner) return;
-    const SpellClass = MIMICABLE_SPELLS.find(Class => spell instanceof Class);
-    if (!SpellClass || !spell.castContext) return;
-    this.lastCast = { SpellClass, context: spell.castContext };
-    this.image = AssetManager.get(MIMIC_ICON_BY_SPELL.get(SpellClass)!);
+
+    const slot = (this.owner.spells as Spell[])?.indexOf(spell) ?? -1;
+    if (slot < FIRST_ABILITY_SLOT || slot > LAST_ABILITY_SLOT) return;
+
+    this.lastCast = {
+      SpellClass: spell.constructor as new (owner: any) => Spell,
+      image: spell.image,
+      name: spell.name,
+    };
+    // The icon becomes the ability it will replay, so the slot answers "what
+    // does pressing R do right now?" without the player having to remember.
+    this.image = spell.image;
   };
 }

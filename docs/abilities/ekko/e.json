@@ -1,0 +1,55 @@
+{
+  "asset": {
+    "key": "spell_ekko_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Phase_Dive.png?e356d",
+    "sha1": "e9f0e3dd4d5c6c9e7f7515faac77c42038ab86c9"
+  },
+  "champion": "Ekko",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ekko_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Phase_Dive.png?e356d",
+        "sha1": "e9f0e3dd4d5c6c9e7f7515faac77c42038ab86c9"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "9 / 8.5 / 8 / 7.5 / 7",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ekko''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> in the target direction, then empowers his next basic attack within 3 seconds to have a 0.<small>25</small>-second cast time, gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;300 '''bonus''' range</span>, cause him to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blink\">[[File:Flash.png|20px|link=Blink|An icon representing the keyword Blink]] [[:Blink|blink]]</span> within <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">125</span> range of the target, and deal <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>.",
+          "text": "Active: Ekko dashes in the target direction, then empowers his next basic attack within 3 seconds to have a 0.25-second cast time, gain &nbsp;300 bonus range, cause him to blink within 125 range of the target, and deal bonus magic damage."
+        },
+        "description2": {
+          "raw": "''Phase Dive <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Ekko's''' basic attack timer. '''Ekko''' can cast any of his abilities during the dash.''",
+          "text": "Phase Dive resets Ekko's basic attack timer. Ekko can cast any of his abilities during the dash."
+        },
+        "icon": "Phase Dive.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Damage:'''</span></dt><dd>50 / 75 / 100 / 125 / 150 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Bonus Magic Damage:50 / 75 / 100 / 125 / 150 (+ 40% AP)"
+        },
+        "name": "Phase Dive",
+        "notes": {
+          "raw": "* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> distance can be extended to up-to 550 units when targeting across terrain. It will only extend for the distance needed to cross the wall.\n* While <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span>, '''Ekko''' loses the <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;'''bonus''' attack range</span> from ''Phase Dive''.\n* ''Phase Dive's'' attack can <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|miss]]</span> and be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>, consuming the basic attack without dealing any damage.\n* ''Phase Dive's'' attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Break stealth\">[[File:Breaking stealth icon.png|20px|link=Stealth#Breaking_stealth|An icon representing the keyword Break stealth]] [[:Stealth#Breaking_stealth|breaks stealth]]</span> at the start of its cast time.\n** This is relevant for external sources of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealth\">[[File:Guerrilla Warfare.png|20px|link=Stealth|An icon representing the keyword Stealth]] [[:Stealth|stealth]]</span> such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Senna\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Senna OriginalSquare.png|20xpx|border|link=Senna|An icon representing Senna]]</span> <span style=\"white-space:normal;\">[[Senna|Senna's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Senna\" data-ability=\"Curse of the Black Mist\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Senna Curse of the Black Mist.png|20xpx|border|link=Senna#Curse of the Black Mist|An icon for Senna's ability Curse of the Black Mist]]</span> <span style=\"white-space:normal;\">[[Senna#Curse of the Black Mist|Curse of the Black Mist]]</span></span></span>.\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away during the empowered attack's cast time, it is cancelled but not consumed.",
+          "text": "The dash distance can be extended to up-to 550 units when targeting across terrain. It will only extend for the distance needed to cross the wall.\nWhile grounded or rooted, Ekko loses the &nbsp;bonus attack range from Phase Dive.\nPhase Dive's attack can miss and be blocked and dodged, consuming the basic attack without dealing any damage.\nPhase Dive's attack breaks stealth at the start of its cast time.\n* This is relevant for external sources of stealth such as Senna's Curse of the Black Mist.\nIf the target becomes untargetable, dies, or is too far away during the empowered attack's cast time, it is cancelled but not consumed."
+        },
+        "spellshield": true,
+        "targeting": "Direction"
+      },
+      "name": "Phase Dive"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "a295e9fbbfb75446d9bb8cb20c8d0ee7508b4a7ea1b7542196355e9e9ad27ef8",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ekko/Phase_Dive",
+    "revisionId": 4025604,
+    "sourceTimestamp": "2026-06-06T15:08:47Z"
+  }
+}

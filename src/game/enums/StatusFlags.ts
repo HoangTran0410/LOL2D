@@ -7,8 +7,28 @@ const StatusFlags = {
   CanCast: 1 << 2,
   CanMove: 1 << 3,
   Charmed: 1 << 5,
+  /**
+   * Forced to attack whoever applied it. Deliberately does NOT clear
+   * `CAN_ATTACK` or `CAN_MOVE` the way every other control effect does — a
+   * taunt *directs* the swings and the walking, it does not stop them. Casting
+   * is the only thing it takes away. See `Stats.updateActionState`.
+   */
+  Taunted: 1 << 6,
   Feared: 1 << 8,
+  /**
+   * Passes through everything: bodies AND terrain. Right for a dash, which is
+   * short and ends on a point already chosen; wrong for anything that lasts,
+   * because a unit that can stand inside a wall can leave the map.
+   */
   Ghosted: 1 << 11,
+  /**
+   * Passes through *bodies only* — terrain still stops it. The one a sustained
+   * effect wants: Garen spinning through a wave, Ghost shouldering past, a
+   * Powerball ploughing through. Split out of `Ghosted` because that flag also
+   * disables the wall push-out, and a three-second spin with it on lets Garen
+   * walk out of the world.
+   */
+  PhasesUnits: 1 << 30,
   Grounded: 1 << 9,
   Immovable: 1 << 13,
   Invulnerable: 1 << 14,

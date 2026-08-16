@@ -1,4 +1,4 @@
-import { Circle } from '../../../libs/quadtree';
+import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -7,6 +7,15 @@ import SpellObject from '../SpellObject';
 import MissileSpellObject from '../MissileSpellObject';
 import Dash from '../buffs/Dash';
 import TrailSystem from '../helpers/TrailSystem';
+
+/** Nine tails again — the ultimate's orbs and its burst both carry the count. */
+export const ESSENCE_POINTS = 9;
+/** Windup: the orbs unfurl out of the dash instead of being there already. */
+export const ORB_SPAWN_MS = 160;
+/** How long the arcane star left where an orb landed stays up. */
+export const R_BURST_MS = 420;
+/** How far past its hitbox an orb paints, as a multiple of `size`. */
+export const ORB_PAINT_REACH = 2;
 
 export default class Ahri_R extends Spell {
   targetingMode = 'POINT' as const;
@@ -62,6 +71,11 @@ export default class Ahri_R extends Spell {
         const obj = new Ahri_R_Object(this.owner);
         obj.targetEnemy = enemy;
         obj.damage = this.damage;
+        // purely cosmetic: the three orbs unfurl and spin out of step, so a
+        // triple hit reads as three shots instead of one sprite drawn thrice.
+        // Their flight is untouched — staggering that would move the damage.
+        obj.unfurlScale = 1 + i * 0.4;
+        obj.spinOffset = i * 0.8;
         this.game.objectManager.addObject(obj);
       }
     };
@@ -98,18 +112,33 @@ export class Ahri_R_Object extends MissileSpellObject {
   size = 20;
   // locked onto one enemy, so it passes harmlessly through everyone else
   maxHitCount = 0;
+  /** Cosmetic: stretches this orb's unfurl so the volley does not bloom as one. */
+  unfurlScale = 1;
+  /** Cosmetic: phase offset for the tail spin, same reason. */
+  spinOffset = 0;
 
   trailSystem = new TrailSystem({
-    trailColor: [150, 150, 255, 100] as any,
+    trailColor: '#6AA5D666',
     trailSize: this.size,
   });
+
+  /** Cosmetic: drives the unfurl and the spin. */
+  _age = 0;
 
   onBeforeMove() {
     if (this.targetEnemy) this.destination = this.targetEnemy.position; // live ref: the orb tracks its target
   }
 
   onArrive() {
-    if (this.targetEnemy) this.targetEnemy.takeDamage(this.damage, this.owner);
+    if (!this.targetEnemy) return;
+    this.targetEnemy.takeDamage(this.damage, this.owner);
+
+    // the orb vanishes on arrival, so the landing is its own object — without
+    // it an ultimate's three hits are three sprites silently switching off
+    const burst = new Ahri_R_Burst(this.owner);
+    burst.position = this.targetEnemy.position.copy();
+    burst.targetSize = this.targetEnemy.animatedValues?.displaySize ?? 40;
+    this.game.objectManager.addObject(burst);
   }
 
   update() {
@@ -118,18 +147,177 @@ export class Ahri_R_Object extends MissileSpellObject {
       return;
     }
 
+    this._age += deltaTime;
+
     super.update();
   }
 
   draw() {
+    // ease-out unfurl: the orb blooms open fast then holds, which is what makes
+    // the stagger between the three shots readable
+    const grow = constrain(this._age / (ORB_SPAWN_MS * this.unfurlScale), 0, 1);
+    const scaleUp = 1 - (1 - grow) * (1 - grow);
+
+    const spin = this._age / 200 + this.spinOffset;
+    const r = (this.size / 2) * scaleUp;
+    const heading = Math.atan2(
+      this.destination.y - this.position.y,
+      this.destination.x - this.position.x
+    );
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // arcane halo, additive: three orbs converging on one target should pool
+    // into a brighter core rather than stack as three flat discs
+    blendMode(ADD);
+    noStroke();
+    fill(70, 139, 195, 85);
+    circle(0, 0, r * 4.2);
+    blendMode(BLEND);
+
+    // nine spirit tails wheeling around the orb, alternating long and short so
+    // the star reads as fox-fire rather than as a gear
+    push();
+    rotate(spin);
+    noStroke();
+    for (let i = 0; i < ESSENCE_POINTS; i++) {
+      const a = (TWO_PI * i) / ESSENCE_POINTS;
+      const len = r * (i % 2 ? 1.6 : 2.3) * (1 + sin(spin * 3 + i) * 0.12);
+      push();
+      rotate(a);
+      fill(125, 180, 225, 190);
+      triangle(r * 0.45, -r * 0.3, r * 0.45, r * 0.3, len, 0);
+      pop();
+    }
+    pop();
+
+    // the body: an outer shell of pink essence around a white-hot heart
+    noStroke();
+    fill(82, 150, 205, 200);
+    circle(0, 0, r * 1.9);
+    fill(200, 225, 245, 240);
+    circle(0, 0, r * 1.15);
+    fill(255, 255, 255, 250);
+    circle(0, 0, r * 0.6);
+
+    // a lance of light out the leading edge, so the orb points at the enemy it
+    // has locked onto — this ultimate homes, and the art should say so
+    push();
+    rotate(heading);
+    fill(210, 232, 250, 150);
+    triangle(r * 2.6, 0, r * 0.6, -r * 0.4, r * 0.6, r * 0.4);
+    pop();
+
+    pop();
+  }
+
+  // tails and halo paint well past the 20px hitbox
+  getDisplayBoundingBox() {
+    const r = this.size * ORB_PAINT_REACH;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/**
+ * Where an orb landed. A nine-pointed arcane star, then wisps of stolen essence
+ * drifting back towards Ahri — the ultimate's whole fantasy in one beat, and the
+ * reason the burst is drawn relative to her rather than only to the victim.
+ */
+export class Ahri_R_Burst extends SpellObject {
+  targetSize = 40;
+  age = 0;
+  lifeTime = R_BURST_MS;
+  maxRadius = 62;
+
+  _wisps: { offset: number; drift: number; size: number }[] = [];
+
+  onAdded() {
+    for (let i = 0; i < 4; i++) {
+      this._wisps.push({
+        offset: random(-26, 26),
+        drift: random(0.55, 1),
+        size: random(4, 8),
+      });
+    }
+  }
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const flash = 1 - constrain(t / 0.25, 0, 1);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    if (flash > 0) {
+      blendMode(ADD);
+      noStroke();
+      fill(175, 214, 245, 200 * flash);
+      circle(0, 0, this.targetSize + t * 70);
+      blendMode(BLEND);
+    }
+
+    // hard ring on the victim, so the ultimate's hit is unmistakable even in a
+    // fight where several things are landing at once
+    noFill();
+    stroke(130, 185, 230, 230 * fade);
+    strokeWeight(4 * fade + 1.5);
+    circle(0, 0, this.targetSize * 0.7 + this.maxRadius * t);
+
+    // nine-pointed star snapping open — the same count as the orb's tails
+    stroke(225, 240, 252, 235 * fade);
+    strokeWeight(3 * fade + 0.8);
+    for (let i = 0; i < ESSENCE_POINTS; i++) {
+      const a = (TWO_PI * i) / ESSENCE_POINTS + t * 0.5;
+      const inner = 6 + this.maxRadius * 0.25 * t;
+      const outer = inner + (this.maxRadius * 0.7) * t * fade + 6;
+      line(cos(a) * inner, sin(a) * inner, cos(a) * outer, sin(a) * outer);
+    }
+
+    pop();
+
+    // stolen essence pulled home. Drawn in world space because it spans the gap
+    // between the corpse and Ahri, which is the whole point of the beat.
+    const owner = this.owner.position;
     push();
     noStroke();
-    fill(150, 150, 255);
-    circle(
-      this.position.x + random(-3, 3),
-      this.position.y + random(-3, 3),
-      this.size
-    );
+    for (const w of this._wisps) {
+      const p = constrain(t * w.drift, 0, 1);
+      const x = lerp(this.position.x, owner.x, p) + w.offset * (1 - p);
+      const y = lerp(this.position.y, owner.y, p) + w.offset * (1 - p) * 0.5;
+      fill(190, 220, 245, 210 * fade);
+      circle(x, y, w.size * fade + 2);
+    }
     pop();
+  }
+
+  getDisplayBoundingBox() {
+    // deliberately spans caster and victim: the essence wisps travel between the
+    // two, and a box around the victim alone would cull them mid-flight
+    const owner = this.owner.position;
+    const pad = this.targetSize + this.maxRadius + 30;
+    const minX = Math.min(this.position.x, owner.x) - pad;
+    const minY = Math.min(this.position.y, owner.y) - pad;
+    const maxX = Math.max(this.position.x, owner.x) + pad;
+    const maxY = Math.max(this.position.y, owner.y) + pad;
+    return new Rectangle({
+      x: minX,
+      y: minY,
+      w: maxX - minX,
+      h: maxY - minY,
+      data: this,
+    });
   }
 }

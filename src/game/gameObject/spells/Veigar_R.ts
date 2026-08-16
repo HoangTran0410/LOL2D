@@ -18,11 +18,16 @@ const isVeigarRTarget = (target: unknown): target is VeigarRTarget =>
 // Exported so the suite asserts the wiring, not a copy of the numbers —
 // retuning a value should not mean editing the test.
 export const RANGE = 750;
-export const BASE_DAMAGE = 90;
+// A LOL2D champion pool is ~100 health, so the raw wiki number (90, doubling to
+// 180 on a low target) was a guaranteed one-shot on a full-health champion and
+// then some. Scaled to half a health bar on a healthy target: this stays the
+// hardest-hitting ultimate in the game without deleting anyone from full.
+export const BASE_DAMAGE = 50;
 // Damage is multiplied by (1 + MAX_MISSING_HEALTH_MULTIPLIER * missingHealthRatio),
-// so a full-health target takes BASE_DAMAGE and a target at 0 health would take
-// double — the imported wiki value ("increased by 0%-100% based on missing health").
-export const MAX_MISSING_HEALTH_MULTIPLIER = 1;
+// so a full-health target takes BASE_DAMAGE and a nearly-dead one takes 75. The
+// wiki's "up to +100% based on missing health" is halved for the same reason as
+// BASE_DAMAGE — a full doubling on a 100-health pool leaves nothing to execute.
+export const MAX_MISSING_HEALTH_MULTIPLIER = 0.5;
 export const MANA_COST = 100;
 export const CAST_TIME_MS = 0;
 export const MISSILE_SPEED = 1_500 / 60;
@@ -32,7 +37,8 @@ export default class Veigar_R extends Spell {
   image = AssetManager.get('spell_veigar_r');
   name = 'Bùng Nổ Nguyên Thủy (Veigar_R)';
   description =
-    'Gửi một luồng năng lượng nguyên thủy đến kẻ địch mục tiêu, gây <span class="damage">90 sát thương</span>, tăng lên tối đa <span class="damage">gấp đôi</span> dựa trên lượng máu đã mất của mục tiêu.';
+    `Gửi một luồng năng lượng nguyên thủy đến kẻ địch mục tiêu, gây <span class="damage">${BASE_DAMAGE} sát thương</span>,` +
+    ` tăng lên tối đa <span class="damage">${BASE_DAMAGE * (1 + MAX_MISSING_HEALTH_MULTIPLIER)} sát thương</span> dựa trên lượng máu đã mất của mục tiêu.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade
   // cooldown-cap scan in tests/game/spells/cooldowns.test.ts can see it
   coolDown = 10_000;

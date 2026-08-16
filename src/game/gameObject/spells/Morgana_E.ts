@@ -16,20 +16,28 @@ import Silence from '../buffs/Silence';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 
+// Exported so the suite asserts the wiring, not a copy of the numbers —
+// retuning a value should not mean editing the test.
+// A LOL2D champion pool is ~100 health, so a shield is sized as a share of that:
+// ~a third of a health bar, in line with the other shields in the game (Malphite
+// W 25, Janna E 30, LeeSin W 22). The tooltip used to advertise 90 — the raw
+// wiki figure — against code that only ever granted 30.
+export const SHIELD_AMOUNT = 35;
+export const SHIELD_DURATION_MS = 5_000;
+
 export default class Morgana_E extends Spell {
   // Auto-locks its own target; see "auto-locking spells" in docs/ADDING_SPELLS.md.
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_morgana_e');
   name = 'Lá Chắn Đen (Morgana_E)';
   description =
-    'Ban cho đồng minh có ít máu nhất trong phạm vi (hoặc chính mình) một <span class="buff">Lá Chắn Đen</span> hấp thụ <span class="damage">90 sát thương</span> trong <span class="time">5 giây</span>. Khi lá chắn còn tồn tại, mục tiêu <span class="buff">miễn nhiễm mọi hiệu ứng khống chế</span> của kẻ địch (choáng, trói, câm lặng, làm chậm, hất tung, mê hoặc, khiếp sợ, ghìm, kéo/đẩy) — mỗi hiệu ứng bị chặn sẽ bị xoá ngay lập tức. Không chặn được <span class="buff">Mờ Mắt</span>, cũng không chặn khống chế từ chính mình hoặc đồng đội. Game không phân biệt sát thương phép và vật lý nên lá chắn hấp thụ mọi loại sát thương.';
+    `Ban cho đồng minh có ít máu nhất trong phạm vi (hoặc chính mình) một <span class="buff">Lá Chắn Đen</span> hấp thụ <span class="damage">${SHIELD_AMOUNT} sát thương</span> trong <span class="time">${SHIELD_DURATION_MS / 1000} giây</span>. Khi lá chắn còn tồn tại, mục tiêu <span class="buff">miễn nhiễm mọi hiệu ứng khống chế</span> của kẻ địch (choáng, trói, câm lặng, làm chậm, hất tung, mê hoặc, khiếp sợ, ghìm, kéo/đẩy) — mỗi hiệu ứng bị chặn sẽ bị xoá ngay lập tức. Không chặn được <span class="buff">Mờ Mắt</span>, cũng không chặn khống chế từ chính mình hoặc đồng đội. Game không phân biệt sát thương phép và vật lý nên lá chắn hấp thụ mọi loại sát thương.`;
   coolDown = 6000;
   manaCost = 40;
 
   range = 500;
-  // A champion pool is 100 health, so a shield is sized as a share of that.
-  shieldAmount = 30;
-  shieldTime = 5000;
+  shieldAmount = SHIELD_AMOUNT;
+  shieldTime = SHIELD_DURATION_MS;
 
   onSpellCast() {
     const allies = this.game.objectManager.queryObjects({

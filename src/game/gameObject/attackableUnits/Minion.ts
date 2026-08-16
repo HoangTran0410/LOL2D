@@ -429,6 +429,16 @@ export default class Minion extends AttackableUnit {
     return nearestMinion ?? nearestOther;
   }
 
+  /**
+   * A minion fights whatever `targetLock` names, and `update` re-picks that
+   * every retarget tick — so a taunt has to keep writing it, which `Taunt` does.
+   */
+  forceAttackTarget(attacker: AttackableUnit): void {
+    if (this.isDead || attacker.isDead) return;
+    this.targetLock = attacker;
+    this.phase = Minion.PHASES.ATTACK;
+  }
+
   takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
     super.takeDamage(damage, attacker);

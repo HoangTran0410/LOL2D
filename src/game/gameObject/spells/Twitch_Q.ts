@@ -4,6 +4,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Invisible from '../buffs/Invisible';
 import Speedup from '../buffs/Speedup';
+import Phasing from '../buffs/Phasing';
 
 export default class Twitch_Q extends Spell {
   targetingMode = 'SELF' as const;
@@ -21,6 +22,12 @@ export default class Twitch_Q extends Spell {
     const invisibleBuff = new Invisible(this.duration, this.owner, this.owner);
     invisibleBuff.image = this.image;
     this.owner.addBuff(invisibleBuff);
+
+    // A rat slipping through the wave rather than bouncing off it. Stealth that
+    // still gets body-blocked by the thing it is hiding from is not stealth.
+    const phase = new Phasing(this.duration, this.owner, this.owner);
+    phase.image = this.image;
+    this.owner.addBuff(phase);
 
     const speedupBuff = new Speedup(this.duration, this.owner, this.owner);
     speedupBuff.image = this.image;

@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_jarvaniv_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Demacian_Standard.png?a8e88",
+    "sha1": "18dec326cb2bc9f4c7360262f4865d13535a8a52"
+  },
+  "champion": "Jarvan IV",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jarvaniv_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Demacian_Standard.png?a8e88",
+        "sha1": "18dec326cb2bc9f4c7360262f4865d13535a8a52"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12 / 11.5 / 11 / 10.5 / 10",
+        "cost": "55",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Jarvan IV''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span>.",
+          "text": "Passive: Jarvan IV gains &nbsp;bonus attack speed."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jarvan IV''' throws a Demacian flag to the target location, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies within the area.",
+          "text": "Active: Jarvan IV throws a Demacian flag to the target location, dealing magic damage to enemies within the area."
+        },
+        "description3": {
+          "raw": "The flag then remains for 8 seconds, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of its surroundings and providing an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Aura\">[[File:Aria of Perseverance.png|20px|link=Aura|An icon representing the keyword Aura]] [[:Aura|aura]]</span> that grants ''Demacian Standard's'' passive <span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span> to all nearby allied champions as well as '''Jarvan IV''' <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"See notes\">himself</span>.",
+          "text": "The flag then remains for 8 seconds, granting sight of its surroundings and providing an aura that grants Demacian Standard's passive bonus attack speed to all nearby allied champions as well as Jarvan IV himself."
+        },
+        "effectradius": "200 • 1000 • 700",
+        "icon": "false",
+        "icon2": "Demacian Standard.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>20 / 22.<small>5</small> / 25 / 27.<small>5</small> / 30%</dd></dl>",
+          "text": "Bonus Attack Speed:20 / 22.5 / 25 / 27.5 / 30%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 120 / 160 / 200 / 240 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 120 / 160 / 200 / 240 (+ 80% AP)"
+        },
+        "name": "Demacian Standard",
+        "notes": {
+          "raw": "* The attack speed granted from a deployed ''Demacian Standard'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks additively\">[[File:Additive stacking icon.png|20px|link=Stacking#Stacks_additively|An icon representing the keyword Stacks additively]] [[:Stacking#Stacks_additively|stacks additively]]</span> with ''Demacian Standard's'' passive permanent bonus attack speed to '''Jarvan IV''', but the aura from multiple ''Demacian Standards'' does not stack.\n** '''Jarvan IV''' gains a total of 40 / 45 / 50 / 55 / 60% bonus attack speed from ''Demacian Standard'' while near the flag.\n* The flag has a 13.<small>6</small> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Pathing radius\">[[File:Pathing radius.png|20px|link=Unit collision|An icon representing the keyword Pathing radius]] [[:Unit collision|pathing radius]]</span> and a 65 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Gameplay radius\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|gameplay radius]]</span>.\n** The gameplay radius matters to <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jarvan IV\" data-ability=\"Dragon Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jarvan IV Dragon Strike.png|20xpx|border|link=Jarvan IV#Dragon Strike|An icon for Jarvan IV's ability Dragon Strike]]</span> <span style=\"white-space:normal;\">[[Jarvan IV#Dragon Strike|Dragon Strike]]</span></span>.\n* ''Demacian Standard'' can be targeted by allied abilities (<span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Teleport\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teleport.png|20xpx|border|link=Teleport|An icon representing Teleport]]</span> <span style=\"white-space:normal;\">[[Teleport]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Lee Sin\" data-ability=\"Safeguard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Lee Sin Safeguard.png|20xpx|border|link=Lee Sin#Safeguard|An icon for Lee Sin's ability Safeguard]]</span> <span style=\"white-space:normal;\">[[Lee Sin#Safeguard|Safeguard]]</span></span>). The target type is the same as a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minion]]</span>.\n* ''Demacian Standard'' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> to enemies.",
+          "text": "The attack speed granted from a deployed Demacian Standard stacks additively with Demacian Standard's passive permanent bonus attack speed to Jarvan IV, but the aura from multiple Demacian Standards does not stack.\n* Jarvan IV gains a total of 40 / 45 / 50 / 55 / 60% bonus attack speed from Demacian Standard while near the flag.\nThe flag has a 13.6 pathing radius and a 65 gameplay radius.\n* The gameplay radius matters to Dragon Strike.\nDemacian Standard can be targeted by allied abilities ( Teleport, Safeguard). The target type is the same as a minion.\nDemacian Standard is untargetable to enemies."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Demacian Standard"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "598c89752cc84e1bd703d6170055379d5429cdf696bf9d78aac22b1d03fc30f2",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Demacian_Standard",
+    "revisionId": 4013709,
+    "sourceTimestamp": "2026-04-29T23:42:36Z"
+  }
+}

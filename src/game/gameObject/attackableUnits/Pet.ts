@@ -300,4 +300,22 @@ export default class Pet extends Champion {
     rect(this.position.x - width / 2, this.position.y + width * 0.62, width * left, 4, 2);
     pop();
   }
+
+  /**
+   * A summon always wears the compact frame, whatever the zoom.
+   *
+   * `Champion`'s full frame is 125px wide and paints a score box, a mana strip,
+   * level ticks, buff icons and status text around the bar. A pet has none of
+   * that to say: it inherits `score = 0` and never changes it, it casts nothing
+   * so its mana pool stays empty, and it is gone in seconds. On a Tibbers or a
+   * row of Shaco boxes that frame is almost entirely empty chrome, and several
+   * at once cover the fight they exist to explain.
+   *
+   * The compact frame was built for mobile, where the reason was the camera. The
+   * reason here is the unit, so this ignores the `compact` argument rather than
+   * passing it through — zooming in must not put a score box on a box.
+   */
+  drawHealthBar(_compact = false): void {
+    super.drawHealthBar(true);
+  }
 }

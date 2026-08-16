@@ -107,10 +107,19 @@ export default class Dash extends Buff {
         this.dashSpeed
       );
 
-      if (p5.Vector.dist(this.targetUnit.position, this.dashDestination) < this.dashSpeed) {
+      // The owning spell gets the frame *after* the step, so a pass that damages
+      // what it flies through tests the ground it has actually covered.
+      this.onDashUpdate?.();
+
+      if (
+        this.dashDestination &&
+        p5.Vector.dist(this.targetUnit.position, this.dashDestination) < this.dashSpeed
+      ) {
         this.onReachedDestination?.();
         this.deactivateBuff();
       }
+    } else {
+      this.onDashUpdate?.();
     }
 
     // somebody else took control of this unit mid-flight
@@ -136,4 +145,18 @@ export default class Dash extends Buff {
   // for override
   onCancelled?(): void {}
   onReachedDestination?(): void {}
+
+  /**
+   * Per-frame hook for the spell that owns this dash — a pass that damages what
+   * it flies through, an afterimage dropped every other frame.
+   *
+   * Use this, never `dashBuff.onUpdate = …`. `Buff.update()` calls `onUpdate()`,
+   * and `Dash` puts the movement itself in `Dash.prototype.onUpdate`, so an
+   * instance-level assignment does not *hook* the frame, it *replaces* it: the
+   * step, the arrival check and the interrupt check all disappear and the
+   * champion plays the dash standing still. It reads exactly like a callback,
+   * which is why three separate champions shipped with it.
+   * `tests/game/spells/dash-onupdate-seam.test.ts` forbids the assignment.
+   */
+  onDashUpdate?(): void {}
 }

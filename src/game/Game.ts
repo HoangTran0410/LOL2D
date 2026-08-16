@@ -29,6 +29,7 @@ import MinionSpawner from './managers/MinionSpawner';
 import MatchDirector from './MatchDirector';
 import NavigationSystem from './nav/NavigationSystem';
 import { drawNavDebug } from './nav/NavDebugOverlay';
+import { drawExecuteMarks } from './combat/ExecuteMarks';
 import { drawDebugOverlay } from './debug/DebugOverlay';
 import EventManager from '../managers/EventManager';
 import { uuidv4 } from '../utils';
@@ -424,6 +425,9 @@ export default class Game {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
       this.objectManager.draw();
+      // After the units, so the ring sits on top of the body it is marking, and
+      // at game level rather than on the caster: see combat/ExecuteMarks.ts.
+      drawExecuteMarks(this);
       drawNavDebug(this);
       // The rest of the debug layers (terrain, collision, vision, quadtree),
       // toggled in the Gian lận tab. Each checks its flag before iterating, so

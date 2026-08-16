@@ -15,6 +15,8 @@ export const TIBBERS_DAMAGE = 12;
 export const TIBBERS_ATTACK_RANGE = 130;
 export const AURA_RADIUS = 150;
 export const AURA_DAMAGE_PER_TICK = 3;
+/** Tongues of flame drawn around the burn radius. Cosmetic only. */
+export const AURA_TONGUES = 14;
 
 /**
  * Summon: Tibbers.
@@ -76,13 +78,19 @@ export default class Annie_R extends Spell {
     });
     enemies.forEach((enemy: any) => enemy.takeDamage(SUMMON_DAMAGE, this.owner));
 
+    // Tibbers arrives in a pillar of fire, so the impact has to be fire-shaped:
+    // tongues that lick outward and taper, not slabs of rock heaved out of the
+    // ground. `columns` was doing duty for Alistar and Garen as well, which is
+    // exactly the confusion the styles exist to prevent.
     const burst = new AoePulse(this.owner);
     burst.position = spot.copy();
     burst.radius = SUMMON_RADIUS;
     burst.lifeTime = 550;
     burst.color = [255, 150, 60];
-    burst.style = 'columns';
-    burst.spokes = 12;
+    burst.style = 'flame';
+    burst.spokes = 14;
+    // Hotter fill than the default: this is a bonfire, not a shockwave.
+    burst.fillAlpha = 80;
     this.game.objectManager.addObject(burst);
 
     const tibbers = new Tibbers({
@@ -154,23 +162,108 @@ export class Tibbers extends Pet {
 
   drawAvatar(): void {
     const size = this.animatedValues?.displaySize ?? 60;
+    // One clock for the whole bear, so the fur, the flames and the eyes breathe
+    // together instead of each running on its own loop.
+    const beat = this.age / 1000;
+    const flare = 0.7 + 0.3 * Math.sin(beat * 6);
+
     push();
     translate(this.position.x, this.position.y);
-    // the fire he stands in
     noStroke();
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * TWO_PI + this.age / 400;
-      fill(255, 150 + i * 8, 50, 120);
-      circle(cos(a) * AURA_RADIUS * 0.9, sin(a) * AURA_RADIUS * 0.9, 14);
+
+    // The burn radius, drawn as the thing that is actually dangerous. Eight
+    // beads on a circle said "a decoration orbits him"; a ring of licking
+    // tongues says "do not stand here", which is the only reason to draw it.
+    blendMode(ADD);
+    for (let i = 0; i < AURA_TONGUES; i++) {
+      const a = (i / AURA_TONGUES) * TWO_PI + beat * 0.55;
+      // Each tongue has its own phase, so the rim churns rather than pulsing
+      // as one solid band.
+      const lick = 0.62 + 0.38 * Math.sin(beat * 7 + i * 1.7);
+      for (let k = 0; k < 4; k++) {
+        const p = k / 3;
+        const reach = AURA_RADIUS * (0.86 + 0.16 * lick * p);
+        fill(255, 120 + 110 * (1 - p), 40, (90 - 60 * p) * flare);
+        circle(cos(a) * reach, sin(a) * reach, (16 - 9 * p) * lick + 4);
+      }
     }
-    // the bear
-    fill(120, 70, 40);
-    circle(0, 0, size);
-    circle(-size * 0.34, -size * 0.34, size * 0.34);
-    circle(size * 0.34, -size * 0.34, size * 0.34);
-    fill(255, 200, 90);
-    circle(-size * 0.16, -size * 0.08, size * 0.16);
-    circle(size * 0.16, -size * 0.08, size * 0.16);
+    // A dim boundary line under the tongues: the tongues wander, the edge does
+    // not, and the player needs the edge to judge a step backwards.
+    noFill();
+    stroke(255, 130, 50, 55 + 30 * flare);
+    strokeWeight(2);
+    circle(0, 0, AURA_RADIUS * 2);
+    blendMode(BLEND);
+
+    // Shaggy silhouette: an irregular outline is what separates a bear from a
+    // brown ball, and it costs one loop.
+    noStroke();
+    fill(58, 32, 18);
+    beginShape();
+    for (let i = 0; i < 22; i++) {
+      const a = (i / 22) * TWO_PI;
+      const shag = 1 + 0.09 * Math.sin(i * 3.1 + beat * 2) + 0.05 * Math.sin(i * 7.3);
+      const rr = size * 0.56 * shag;
+      vertex(cos(a) * rr, sin(a) * rr);
+    }
+    endShape(CLOSE);
+
+    // Ears, sitting proud of the shag line.
+    fill(78, 44, 24);
+    circle(-size * 0.36, -size * 0.38, size * 0.3);
+    circle(size * 0.36, -size * 0.38, size * 0.3);
+    fill(150, 66, 40);
+    circle(-size * 0.36, -size * 0.37, size * 0.14);
+    circle(size * 0.36, -size * 0.37, size * 0.14);
+
+    // Body, lit from the fire he is standing in — warm on top, dark underneath.
+    fill(112, 64, 34);
+    circle(0, 0, size * 0.96);
+    fill(140, 82, 42);
+    arc(0, 0, size * 0.96, size * 0.96, PI, TWO_PI, CHORD);
+
+    // Muzzle and jaw.
+    fill(74, 42, 22);
+    ellipse(0, size * 0.2, size * 0.42, size * 0.3);
+    fill(26, 14, 10);
+    ellipse(0, size * 0.12, size * 0.12, size * 0.09);
+    fill(250, 246, 240);
+    for (let i = 0; i < 3; i++) {
+      const x = (i - 1) * size * 0.1;
+      triangle(x - size * 0.03, size * 0.24, x + size * 0.03, size * 0.24, x, size * 0.32);
+    }
+
+    // Eyes: embers, and they brighten on the same beat as the aura, so the pet
+    // visibly *burns* rather than merely standing in a fire.
+    blendMode(ADD);
+    fill(255, 200, 90, 200 * flare);
+    circle(-size * 0.18, -size * 0.1, size * 0.22 * flare + 4);
+    circle(size * 0.18, -size * 0.1, size * 0.22 * flare + 4);
+    blendMode(BLEND);
+    fill(255, 236, 170);
+    circle(-size * 0.18, -size * 0.1, size * 0.13);
+    circle(size * 0.18, -size * 0.1, size * 0.13);
+    fill(120, 20, 10);
+    circle(-size * 0.18, -size * 0.1, size * 0.06);
+    circle(size * 0.18, -size * 0.1, size * 0.06);
+
+    // Claws on the near paws, rising and falling as he lumbers.
+    fill(238, 232, 220);
+    for (let side = -1; side <= 1; side += 2) {
+      const paw = size * 0.4 * side;
+      const step = Math.sin(beat * 5 + (side > 0 ? PI : 0)) * size * 0.04;
+      for (let i = 0; i < 3; i++) {
+        const x = paw + (i - 1) * size * 0.07;
+        triangle(
+          x - size * 0.02,
+          size * 0.4 + step,
+          x + size * 0.02,
+          size * 0.4 + step,
+          x,
+          size * 0.5 + step
+        );
+      }
+    }
     pop();
   }
 }

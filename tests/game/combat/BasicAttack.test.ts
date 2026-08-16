@@ -123,7 +123,9 @@ describe('basic attacks', () => {
   it('caps attack speed at the stat ceiling however many buffs stack on it', () => {
     const stats = new Stats();
     stats.attackSpeed.baseValue = DEFAULT_CHAMPION_ATTACK.attacksPerSecond;
-    expect(stats.attackSpeed.value).toBeCloseTo(0.8);
+    // read off the constant, not copied from it: retuning the default rate is a
+    // balance call and must never mean editing this file
+    expect(stats.attackSpeed.value).toBeCloseTo(DEFAULT_CHAMPION_ATTACK.attacksPerSecond);
 
     stats.attackSpeed.percentBonus = 10;
     expect(stats.attackSpeed.value).toBe(MAX_ATTACK_SPEED);
@@ -139,7 +141,11 @@ describe('basic attacks', () => {
     expect(ranged.stats.attackDamage.value).toBe(DEFAULT_CHAMPION_ATTACK.damage);
     expect(ranged.stats.attackRange.value).toBe(DEFAULT_CHAMPION_ATTACK.range);
     expect(ranged.basicAttack.isRanged).toBe(true);
-    expect(ranged.basicAttack.intervalMs).toBeCloseTo(1_250);
+    // the swing interval is the reciprocal of the rate, which is the thing
+    // actually under test here — not the particular number it comes out at
+    expect(ranged.basicAttack.intervalMs).toBeCloseTo(
+      1_000 / DEFAULT_CHAMPION_ATTACK.attacksPerSecond
+    );
     expect(melee.basicAttack.isRanged).toBe(false);
   });
 

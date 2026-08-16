@@ -164,7 +164,11 @@ export class Jinx_R_Object extends MissileSpellObject {
     fireball.radius = BLAST_RADIUS * 1.15;
     fireball.lifeTime = 340;
     fireball.color = [255, 205, 120];
-    fireball.style = 'shards';
+    // Fragmentation, the shape the whole Jinx kit detonates in: casing chunks
+    // tumbling out through smoke. `shards` read as rock splinters and was
+    // shared with four other champions, so the ultimate that ends a teamfight
+    // looked like somebody's ground slam.
+    fireball.style = 'frag';
     fireball.spokes = 18;
     // Hot, but not opaque: a 400px disc at full alpha hides the fight it just
     // decided, and the player has to be able to see who survived it.

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ekko/Z-Drive Resonance",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Z-Drive Resonance@@icon@@Z-Drive Resonance.png@@icon2@@{{{icon2}}}@@icon3@@Z-Drive Resonance 2.png@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate - Resonance:'''</span> '''Ekko's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and damaging <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span> apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Resonance'' to enemies hit for 4 seconds, refreshing on subsequent hits and stacking up to 3 times. The third stack consumes them all to deal <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-bot-values=\"30;40;50;60;70;80;85;90;95;100;105;110;115;120;125;130;135;140;145;150\">30 – 150 (based on level)</span>[[Category:Debug]] <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>. ''Z-Drive Resonance'' deals 270% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description2@@''Resonance'' cannot affect the same target more than once every few seconds.@@description3@@<span class=\"template_sbc\">'''Innate - Stolen Time:'''</span> Triggering ''Resonance'' against a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> grants '''Ekko''' <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#9FFF4D;\" data-start=\"50;1\" data-finish=\"80;16\" data-top-fill=\"4\" data-bot-values=\"50;60;70;80\" data-top-values=\"1;6;11;16\" data-bot-key=\"%\">50% / 60% / 70% / 80% (based on level)</span> <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> for <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"2;1\" data-finish=\"3;11\" data-top-fill=\"3\" data-bot-values=\"2;2.5;3\" data-top-values=\"1;6;11\">2 / 2.<small>5</small> / 3 (based on level)</span> seconds.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* '''Ekko's''' basic attacks have different animations based on how many stacks his target has. His attack pattern is as follows: \n** <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"first stack\">Downwards</span> → <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"second stack\">Upwards</span> → <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"third stack to consume all stacks\">Sideways</span>\n*** If the target has already been affected by ''Resonance'', '''Ekko's''' basic attack animations will kick or attack the target sideways.\n* ''Resonance'' stacks will not be applied nor consumed if the basic attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> or if the attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|misses]]</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307084,
+                "revisions": [
+                  {
+                    "parentid": 3989861,
+                    "revid": 4022978,
+                    "timestamp": "2026-05-27T21:09:50Z"
+                  }
+                ],
+                "title": "Template:Data Ekko/Z-Drive Resonance"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4022978,
+      "timestamp": "2026-05-27T21:09:50Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a858b2f8659cab7baf35bc904f482a9b27803cd251324f7837da61a06e7bbf46",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ekko/Z-Drive_Resonance",
+    "revisionId": 4022978,
+    "sourceTimestamp": "2026-05-27T21:09:50Z"
+  }
+}

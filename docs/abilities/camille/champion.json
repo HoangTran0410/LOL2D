@@ -1,0 +1,119 @@
+{
+  "asset": {
+    "key": "champ_camille",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_OriginalSquare.png?aba4a",
+    "sha1": "9f6ae90bc3d2902d2e013ed0184b3b39f8f0c203"
+  },
+  "champion": "Camille",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Camille",
+    "be": 2400,
+    "changes": "V26.04",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Dive",
+      "Duelist",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2016-12-07",
+    "difficulty": 2,
+    "external_positions": [
+      "Top",
+      "Support"
+    ],
+    "fullname": "Camille Ferros",
+    "herotype": "Fighter",
+    "id": 164,
+    "mobility": 3,
+    "patch": "V6.24",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Hookshot",
+      "2": "Wall Dive"
+    },
+    "skill_i": {
+      "1": "Adaptive Defenses"
+    },
+    "skill_q": {
+      "1": "Precision Protocol",
+      "2": "Precision Protocol 2",
+      "3": "Precision Protocol 3"
+    },
+    "skill_r": {
+      "1": "The Hextech Ultimatum"
+    },
+    "skill_w": {
+      "1": "Tactical Sweep"
+    },
+    "skills": {
+      "1": "Adaptive Defenses",
+      "2": "Precision Protocol",
+      "3": "Tactical Sweep",
+      "4": "Hookshot",
+      "5": "Wall Dive",
+      "6": "The Hextech Ultimatum"
+    },
+    "stats": {
+      "acquisition_radius": 550,
+      "aram": {
+        "ability_haste": 10,
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.95,
+        "healing": 1.2,
+        "shielding": 1.1
+      },
+      "arm_base": 35,
+      "arm_lvl": 4.5,
+      "as_base": 0.644,
+      "as_lvl": 2.5,
+      "as_ratio": 0.643999993801116,
+      "attack_cast_time": 0.300000011920928,
+      "attack_total_time": 1.55200004577636,
+      "dam_base": 68,
+      "dam_lvl": 3.8,
+      "hp5_base": 8.5,
+      "hp5_lvl": 0.8,
+      "hp_base": 650,
+      "hp_lvl": 99,
+      "mp5_base": 8.15,
+      "mp5_lvl": 0.75,
+      "mp_base": 339,
+      "mp_lvl": 52,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "nb": {
+        "dmg_dealt": 1,
+        "dmg_taken": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 280,
+      "selection_radius": 100
+    },
+    "style": 40,
+    "title": "The Steel Shadow",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "2760516e40ee79201e5be320cf3b450eb6b9199d0dcff765f0412528e869fb7d",
+    "fetchedAt": "2026-08-16T14:45:22.975Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

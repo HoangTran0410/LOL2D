@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Jarvan IV/Golden Aegis",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Golden Aegis@@icon@@Golden Aegis.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Jarvan IV''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> all nearby enemies for 2 seconds.@@description2@@'''Jarvan IV''' also grants himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 4 seconds, increased by <span style=\"color:\n#21B053; white-space:normal\">1.<small>3</small>% of his '''maximum''' health</span> for each enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> hit by ''Golden Aegis''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>15 / 20 / 25 / 30 / 35%</dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>60 / 80 / 100 / 120 / 140 <span style=\"color:orange; white-space:normal\">(+ 70% '''bonus''' AD)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 600@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@30@@cooldown@@9@@targeting@@Auto@@damagetype@@{{{damagetype}}}@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Golden Aegis''  deals no damage and thus does '''not''' trigger <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turret\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turret]]</span> aggro, or effects such as <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Elixir of Sorcery\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Elixir of Sorcery item.png|20xpx|border|link=Elixir of Sorcery|An icon for the item Elixir of Sorcery]]</span> <span style=\"white-space:normal;\">[[Elixir of Sorcery]]</span></span> and <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Sudden Impact\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sudden Impact rune.png|20xpx|link=Sudden Impact|An icon representing Sudden Impact]]</span> <span style=\"word-break: keep-all;\">[[Sudden Impact|Sudden Impact's]]</span></span> activation.\n* ''Golden Aegis'' will activate [[combat status]] despite not dealing any damage.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307570,
+                "revisions": [
+                  {
+                    "parentid": 3885643,
+                    "revid": 3906940,
+                    "timestamp": "2025-06-06T15:47:51Z"
+                  }
+                ],
+                "title": "Template:Data Jarvan IV/Golden Aegis"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3906940,
+      "timestamp": "2025-06-06T15:47:51Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f386fbf97ef5c5d6a79246372825783a84947082629adc764f576e68c9774ffd",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Golden_Aegis",
+    "revisionId": 3906940,
+    "sourceTimestamp": "2025-06-06T15:47:51Z"
+  }
+}

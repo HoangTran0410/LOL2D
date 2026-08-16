@@ -1,7 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
+  default: {
+    get: vi.fn(() => undefined),
+    getAsset: vi.fn(() => undefined),
+    placeholder: vi.fn(() => undefined),
+  },
 }));
 
 import {

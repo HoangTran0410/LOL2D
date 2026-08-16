@@ -42,6 +42,14 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_OriginalSquare.png?55e1d"
     },
     {
+      "contentHash": "004ad765c94f14149b04d217c4b306a9d602cffd907d489e69224d5b4a7b2896",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "champ_camille",
+      "localPath": "assets/images/champions/camille.png",
+      "revisionId": 4052219,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_OriginalSquare.png?aba4a"
+    },
+    {
       "contentHash": "61b91628353f08c0f9648167130f9b1186334e596dab6901ea3dc2a535c80206",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_cassiopeia",
@@ -56,6 +64,14 @@
       "localPath": "assets/images/champions/chogath.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_OriginalSquare.png?70f42"
+    },
+    {
+      "contentHash": "27e299151a104d7f6a9894087050c5e98e3a75174ef04d07961ccb47ba439d59",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "champ_ekko",
+      "localPath": "assets/images/champions/ekko.png",
+      "revisionId": 4052219,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_OriginalSquare.png?15376"
     },
     {
       "contentHash": "b55045fd48cd17cfb795f703d3ab95ed95fd7acce79dce72d7d38ce673f4fc0a",
@@ -88,6 +104,14 @@
       "localPath": "assets/images/champions/janna.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_OriginalSquare.png?ec2a0"
+    },
+    {
+      "contentHash": "b871f2fc64a31f8cefe7e22c6d1428479822531d16e47553ef778391a5bc7361",
+      "fetchedAt": "2026-08-16T14:46:30.773Z",
+      "localAssetKey": "champ_jarvaniv",
+      "localPath": "assets/images/champions/jarvaniv.png",
+      "revisionId": 4052219,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_OriginalSquare.png?74a73"
     },
     {
       "contentHash": "e5750b955a9369305443f762200f5f19814e858ec40f3e95ee7dd2a5b97c75f4",
@@ -394,6 +418,70 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Volley.png?46b01"
     },
     {
+      "contentHash": "64c817e82340a932b851d04a04b6f99044dddf3fc7d0dabb7e87c0b72654510c",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_e",
+      "localPath": "assets/images/spells/camille_e.png",
+      "revisionId": 3922084,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Hookshot.png?4e69f"
+    },
+    {
+      "contentHash": "b3651df005c9fcd46314a664f9acf5da0db3fa675b849206dfb6ae633aad021a",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_e2",
+      "localPath": "assets/images/spells/camille_e2.png",
+      "revisionId": 3922084,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Wall_Dive.png?50265"
+    },
+    {
+      "contentHash": "799aed730bd513e4d7726d49794c2710a9ba3ffe66558ffeaf41e82a649a3d92",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_i",
+      "localPath": "assets/images/spells/camille_i.png",
+      "revisionId": 4051341,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Adaptive_Defenses.png?3ad68"
+    },
+    {
+      "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_q",
+      "localPath": "assets/images/spells/camille_q.png",
+      "revisionId": 3972807,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
+    },
+    {
+      "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_q2",
+      "localPath": "assets/images/spells/camille_q2.png",
+      "revisionId": 3972807,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
+    },
+    {
+      "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_q3",
+      "localPath": "assets/images/spells/camille_q3.png",
+      "revisionId": 3972807,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
+    },
+    {
+      "contentHash": "917dc0c97207c87347c2ffccbba9b5574e530968b943f8d6555602c37fdf37a5",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_r",
+      "localPath": "assets/images/spells/camille_r.png",
+      "revisionId": 4037519,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_The_Hextech_Ultimatum.png?33599"
+    },
+    {
+      "contentHash": "c2e5824c15680e52556c9cb8c3b98903ce783a28f8330eb7f7d2be684c860d49",
+      "fetchedAt": "2026-08-16T14:45:22.975Z",
+      "localAssetKey": "spell_camille_w",
+      "localPath": "assets/images/spells/camille_w.png",
+      "revisionId": 4051342,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Tactical_Sweep.png?e76eb"
+    },
+    {
       "contentHash": "2af2f3b852bbc486595147872494e733a4e95452a514a9ec1fc444d5fc38bd24",
       "fetchedAt": "2026-08-16T06:56:43.442Z",
       "localAssetKey": "spell_cassiopeia_e",
@@ -440,6 +528,46 @@
       "localPath": "assets/images/spells/chogath_r.png",
       "revisionId": 3932267,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_Feast.png?bedd6"
+    },
+    {
+      "contentHash": "b8b88cbec45fa9114cb4081ffd45a3be2e094c99f853b31645f7584a0dbe9956",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "spell_ekko_e",
+      "localPath": "assets/images/spells/ekko_e.png",
+      "revisionId": 4025604,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Phase_Dive.png?e356d"
+    },
+    {
+      "contentHash": "af89d085e2273652c7af462a9f8dc7fa8252f294646a6d0dfc39d96ca06b112d",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "spell_ekko_i",
+      "localPath": "assets/images/spells/ekko_i.png",
+      "revisionId": 4022978,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Z-Drive_Resonance.png?ba317"
+    },
+    {
+      "contentHash": "8c6b69cdd155cde74d6bad06b7de3c25b2828a4a72b030bab5968ad4e1de97d8",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "spell_ekko_q",
+      "localPath": "assets/images/spells/ekko_q.png",
+      "revisionId": 4007479,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Timewinder.png?f55f8"
+    },
+    {
+      "contentHash": "ba20ece8af15076b2d64413418a6b4e8bf43dab7e625faa830fa21324af75465",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "spell_ekko_r",
+      "localPath": "assets/images/spells/ekko_r.png",
+      "revisionId": 4012189,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Chronobreak.png?c3329"
+    },
+    {
+      "contentHash": "8d83ac09cffd232fec5e8d38c729fc88931c5c649889c3d979b9b5fc6f8049e3",
+      "fetchedAt": "2026-08-16T14:45:07.816Z",
+      "localAssetKey": "spell_ekko_w",
+      "localPath": "assets/images/spells/ekko_w.png",
+      "revisionId": 3956502,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Parallel_Convergence.png?a6cf9"
     },
     {
       "contentHash": "ed65b73d811d9afcef9f3b9be33fbbde60809169400f090b856e7fa83e48eccd",
@@ -568,6 +696,46 @@
       "localPath": "assets/images/spells/janna_w.png",
       "revisionId": 3971180,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1"
+    },
+    {
+      "contentHash": "cd370fcd98fe41c5e174d7300e7961e31b4a25ca44de6ebd6522a2e5be70fda5",
+      "fetchedAt": "2026-08-16T14:45:15.197Z",
+      "localAssetKey": "spell_jarvaniv_e",
+      "localPath": "assets/images/spells/jarvaniv_e.png",
+      "revisionId": 4013709,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Demacian_Standard.png?a8e88"
+    },
+    {
+      "contentHash": "1106fc6ee4d9cbff08190f939ad992b89854905630d72c06ff007f59cabc5e43",
+      "fetchedAt": "2026-08-16T14:45:15.197Z",
+      "localAssetKey": "spell_jarvaniv_i",
+      "localPath": "assets/images/spells/jarvaniv_i.png",
+      "revisionId": 4003791,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Martial_Cadence.png?5c092"
+    },
+    {
+      "contentHash": "8c560a01a7b4d7ee1a10ff31e8526039f14e36c00e10ccb1501706c9ac1f8288",
+      "fetchedAt": "2026-08-16T14:45:15.197Z",
+      "localAssetKey": "spell_jarvaniv_q",
+      "localPath": "assets/images/spells/jarvaniv_q.png",
+      "revisionId": 4042687,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Dragon_Strike.png?a8e88"
+    },
+    {
+      "contentHash": "e4b13aa14579bbe972f1238407b97514b3ae95d13e139002662b452a4ff47989",
+      "fetchedAt": "2026-08-16T14:45:15.197Z",
+      "localAssetKey": "spell_jarvaniv_r",
+      "localPath": "assets/images/spells/jarvaniv_r.png",
+      "revisionId": 4017869,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Cataclysm.png?9a194"
+    },
+    {
+      "contentHash": "43fb51ebf03694b77b591f27927791c5c0b7e6fa5cd4f404ea93a08d1d3a0316",
+      "fetchedAt": "2026-08-16T14:45:15.197Z",
+      "localAssetKey": "spell_jarvaniv_w",
+      "localPath": "assets/images/spells/jarvaniv_w.png",
+      "revisionId": 3906940,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Golden_Aegis.png?9da7e"
     },
     {
       "contentHash": "8e8734f89e18e2c1ff8ad2e6a2bf83ed71f1086043fd44f99ae6381e4b38b43e",

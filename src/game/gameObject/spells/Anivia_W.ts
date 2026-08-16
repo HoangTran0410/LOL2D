@@ -8,6 +8,7 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
+import { slabVertices, type DynamicWall } from '../map/DynamicTerrain';
 
 /**
  * Crystallize. A genuinely solid wall: it deals no damage and applies no
@@ -62,7 +63,7 @@ export default class Anivia_W extends Spell {
 }
 
 /** A solid, impassable slab of ice. No damage, no debuffs — just geometry. */
-export class Anivia_W_Object extends SpellObject {
+export class Anivia_W_Object extends SpellObject implements DynamicWall {
   position = this.owner.position.copy();
   angle = 0;
   length = 260;
@@ -144,6 +145,19 @@ export class Anivia_W_Object extends SpellObject {
 
   _boundingRadius() {
     return Math.sqrt(this.length * this.length + this.thickness * this.thickness) / 2 + 60;
+  }
+
+  /**
+   * `DynamicWall`: the ice is terrain for its whole life. It has no windup —
+   * `growth` is the slab rising on screen, and it blocks from the first frame
+   * because a barrier you can walk through while it animates is not a barrier.
+   */
+  get blocksMovement(): boolean {
+    return !this.toRemove;
+  }
+
+  wallVertices() {
+    return slabVertices(this.position, this.angle, this.length, this.thickness);
   }
 
   draw() {

@@ -143,6 +143,21 @@ export default class AttackableUnit extends GameObject {
     this.visionRadius = av.visionRadius;
   }
 
+  /**
+   * Make this unit fight `attacker`, overruling whatever it had decided.
+   *
+   * The seam a taunt needs, and the reason it is here rather than inside the
+   * `Taunt` buff: "who am I attacking" is stored somewhere different in every
+   * subclass — a `Champion` has a `BasicAttackController` holding a standing
+   * order, a `Minion` and a `Monster` each have a `targetLock` plus a phase.
+   * A buff that reached into all three would have to know all three, and the
+   * next unit type would silently be immune to taunts.
+   *
+   * The base does nothing: a unit with no notion of a target cannot be taunted,
+   * and that is a fact about the unit rather than a failure.
+   */
+  forceAttackTarget(_attacker: AttackableUnit): void {}
+
   // hook called by TerrainMap when this unit hits a wall
   onCollideWall() {}
 
@@ -595,7 +610,10 @@ export default class AttackableUnit extends GameObject {
     return (
       !this.isDead &&
       this._separationGrace <= 0 &&
-      !hasFlag(this.stats.actionState, ActionState.IS_GHOSTED)
+      // Either phasing flag clears bodies. Only IS_GHOSTED clears terrain, and
+      // that split lives in TerrainMap.pushOutOfWalls, not here.
+      !hasFlag(this.stats.actionState, ActionState.IS_GHOSTED) &&
+      !hasFlag(this.stats.actionState, ActionState.PHASES_UNITS)
     );
   }
 

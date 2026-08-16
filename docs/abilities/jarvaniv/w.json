@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_jarvaniv_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Golden_Aegis.png?9da7e",
+    "sha1": "5f6b438d1b047e3296ab2a9178ead28c2e6ef3c9"
+  },
+  "champion": "Jarvan IV",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jarvaniv_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Golden_Aegis.png?9da7e",
+        "sha1": "5f6b438d1b047e3296ab2a9178ead28c2e6ef3c9"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "9",
+        "cost": "30",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jarvan IV''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> all nearby enemies for 2 seconds.",
+          "text": "Active: Jarvan IV slows all nearby enemies for 2 seconds."
+        },
+        "description2": {
+          "raw": "'''Jarvan IV''' also grants himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 4 seconds, increased by <span style=\"color:\n#21B053; white-space:normal\">1.<small>3</small>% of his '''maximum''' health</span> for each enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> hit by ''Golden Aegis''.",
+          "text": "Jarvan IV also grants himself a shield for 4 seconds, increased by 1.3% of his maximum health for each enemy champion hit by Golden Aegis."
+        },
+        "effectradius": "600",
+        "icon": "Golden Aegis.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>15 / 20 / 25 / 30 / 35%</dd></dl>",
+          "text": "Slow:15 / 20 / 25 / 30 / 35%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>60 / 80 / 100 / 120 / 140 <span style=\"color:orange; white-space:normal\">(+ 70% '''bonus''' AD)</span></dd></dl>",
+          "text": "Shield Strength:60 / 80 / 100 / 120 / 140 (+ 70% bonus AD)"
+        },
+        "name": "Golden Aegis",
+        "notes": {
+          "raw": "* ''Golden Aegis''  deals no damage and thus does '''not''' trigger <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turret\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turret]]</span> aggro, or effects such as <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Elixir of Sorcery\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Elixir of Sorcery item.png|20xpx|border|link=Elixir of Sorcery|An icon for the item Elixir of Sorcery]]</span> <span style=\"white-space:normal;\">[[Elixir of Sorcery]]</span></span> and <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Sudden Impact\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sudden Impact rune.png|20xpx|link=Sudden Impact|An icon representing Sudden Impact]]</span> <span style=\"word-break: keep-all;\">[[Sudden Impact|Sudden Impact's]]</span></span> activation.\n* ''Golden Aegis'' will activate [[combat status]] despite not dealing any damage.",
+          "text": "Golden Aegis deals no damage and thus does not trigger turret aggro, or effects such as Elixir of Sorcery and Sudden Impact's activation.\nGolden Aegis will activate combat status despite not dealing any damage."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Golden Aegis"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "11e820999b76b12f66f201ad134d625837ee1c1118c3e5e336ef5b4db3fe82ec",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Golden_Aegis",
+    "revisionId": 3906940,
+    "sourceTimestamp": "2025-06-06T15:47:51Z"
+  }
+}

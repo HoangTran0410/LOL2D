@@ -117,14 +117,14 @@ const selectionSpells: readonly {
     name: 'ChoGath_R',
     build: owner => {
       const spell = new ChoGath_R(owner);
-      return { range: spell.range, select: () => spell._findNearestEnemy() };
+      return { range: spell.range, select: () => spell.findVictim() };
     },
   },
   {
     name: 'Nasus_Q',
     build: owner => {
       const spell = new Nasus_Q(owner);
-      return { range: spell.range, select: () => spell._findNearestEnemy() };
+      return { range: spell.range, select: () => spell.findVictim() };
     },
   },
   {

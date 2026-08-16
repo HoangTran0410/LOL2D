@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "key": "champ_jarvaniv",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_OriginalSquare.png?74a73",
+    "sha1": "5c31e47b3e98f45d9438a7d1175aef87395d31b4"
+  },
+  "champion": "Jarvan IV",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "JarvanIV",
+    "be": 1575,
+    "changes": "V25.19",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Dive",
+      "Crowd Control",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2011-03-01",
+    "difficulty": 1,
+    "external_positions": [
+      "Jungle"
+    ],
+    "fullname": "Jarvan Lightshield IV",
+    "herotype": "Fighter",
+    "id": 59,
+    "mobility": 2,
+    "nickname": "J4",
+    "patch": "V1.0.0.112",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Demacian Standard"
+    },
+    "skill_i": {
+      "1": "Martial Cadence"
+    },
+    "skill_q": {
+      "1": "Dragon Strike"
+    },
+    "skill_r": {
+      "1": "Cataclysm"
+    },
+    "skill_w": {
+      "1": "Golden Aegis"
+    },
+    "skills": {
+      "1": "Martial Cadence",
+      "2": "Dragon Strike",
+      "3": "Golden Aegis",
+      "4": "Demacian Standard",
+      "5": "Cataclysm"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "arm_base": 36,
+      "arm_lvl": 4.6,
+      "as_base": 0.658,
+      "as_lvl": 2.5,
+      "as_ratio": 0.657999992370605,
+      "attack_delay_offset": -0.124559998512268,
+      "dam_base": 64,
+      "dam_lvl": 3,
+      "hp5_base": 8,
+      "hp5_lvl": 0.7,
+      "hp_base": 640,
+      "hp_lvl": 104,
+      "mp5_base": 6.5,
+      "mp5_lvl": 0.45,
+      "mp_base": 300,
+      "mp_lvl": 55,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 175,
+      "selection_height": 100,
+      "selection_radius": 125,
+      "swift": {
+        "arm_lvl": -0.5
+      },
+      "usb": {
+        "dmg_dealt": 0.95
+      }
+    },
+    "style": 55,
+    "title": "The Exemplar of Demacia",
+    "toughness": 2,
+    "utility": 2
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "3e4bb793b5e7d81954d97bf555812d952aa567b107e7f2e1e0f95f5a65a2a0c8",
+    "fetchedAt": "2026-08-16T14:46:30.773Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

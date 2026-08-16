@@ -11,6 +11,7 @@ import Airborne from '../buffs/Airborne';
 import Slow from '../buffs/Slow';
 import Speedup from '../buffs/Speedup';
 import TrailSystem from '../helpers/TrailSystem';
+import Phasing from '../buffs/Phasing';
 
 /**
  * Powerball. The real spell accelerates: Rammus gains bonus movement speed every
@@ -68,6 +69,13 @@ export default class Rammus_Q extends Spell {
     speedupBuff.percent = this.startPercent;
     speedupBuff.image = this.image;
     this.owner.addBuff(speedupBuff);
+
+    // Powerball ploughs. Being body-blocked by a single minion is the one thing
+    // a rolling armordillo must not do, and it is why the roll so often ended
+    // against the wave it was meant to go through.
+    const phase = new Phasing(this.duration, this.owner, this.owner);
+    phase.image = this.image;
+    this.owner.addBuff(phase);
 
     const obj = new Rammus_Q_Object(this.owner);
     obj.lifeTime = this.duration;

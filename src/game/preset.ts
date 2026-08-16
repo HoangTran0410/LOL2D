@@ -3,6 +3,7 @@ import AssetManager, { type AssetKey } from '../managers/AssetManager';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
+import type { ChampionAttackTuning } from './gameObject/attackableUnits/Champion';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
 import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameConfig';
@@ -34,6 +35,9 @@ const RANDOM_AVATAR_POOL: AssetKey[] = [
   'champ_shaco',
   'champ_olaf',
   'champ_graves',
+  'champ_ekko',
+  'champ_jarvaniv',
+  'champ_camille',
 ];
 const randomAvatar = (): AssetKey => random(RANDOM_AVATAR_POOL);
 
@@ -65,10 +69,46 @@ export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetK
   };
 };
 
+/**
+ * Basic-attack profiles by role.
+ *
+ * Every champion in the game shared `DEFAULT_CHAMPION_ATTACK` — the same 16
+ * damage at 0.8/s from the same 300 range — so a marksman's autos were a tank's
+ * autos, and a kit built to be carried by attack speed had no attack speed to be
+ * carried by. Two consequences fall out of fixing that:
+ *
+ *  - **Melee is finally melee.** `MELEE_RANGE_THRESHOLD` is 140 and everyone sat
+ *    at 300, so Garen and Malphite were quietly *shooting bolts*. The melee
+ *    profiles drop under the threshold, which is what makes `BasicAttackController`
+ *    swing instead, and they are paid for it in damage per hit.
+ *  - **Reach costs dps.** The ranged profiles hit softer per swing than the melee
+ *    ones; a marksman's payoff is that it never has to close, and that its dps
+ *    rises fastest under an attack-speed buff.
+ *
+ * Numbers are stated as dps against the ~100 champion pool so the trade is
+ * checkable at a glance rather than buried in two multiplied fields.
+ */
+export const ATTACK = {
+  /** 16.5 dps at the longest reach in the roster, and the best buff scaling. */
+  MARKSMAN: { damage: 10, attacksPerSecond: 1.65, range: 410 },
+  /** 12.6 dps. Autos are chip damage between cooldowns, not the plan. */
+  MAGE: { damage: 12, attacksPerSecond: 1.05, range: 385 },
+  /** 10.0 dps. The lowest in the game on purpose; the kit is the contribution. */
+  SUPPORT: { damage: 10, attacksPerSecond: 1.0, range: 385 },
+  /** 18.8 dps, melee. Burst kits that still want to finish with their hands. */
+  ASSASSIN: { damage: 15, attacksPerSecond: 1.25, range: 130 },
+  /** 18.7 dps, melee. The sustained-damage end of the roster. */
+  BRUISER: { damage: 17, attacksPerSecond: 1.1, range: 130 },
+  /** 14.3 dps, melee. Slowest swing; the body is the point, not the axe. */
+  TANK: { damage: 15, attacksPerSecond: 0.95, range: 125 },
+} as const;
+
 export const SpellGroups: {
   name: string;
   image: AssetKey | null;
   spells: SpellClass[];
+  /** The champion's basic-attack profile; see `ATTACK` above. */
+  attack?: ChampionAttackTuning;
 }[] = [
   // First, and a shelf of its own rather than a line on the summoner spell
   // shelf: it belongs to no champion and it is not a summoner spell, it is the
@@ -84,30 +124,35 @@ export const SpellGroups: {
   },
   {
     name: 'Yasuo',
+    attack: ATTACK.BRUISER,
     image: 'champ_yasuo',
 
     spells: [AllSpells.Yasuo_Q, AllSpells.Yasuo_W, AllSpells.Yasuo_E, AllSpells.Yasuo_R],
   },
   {
     name: 'Shaco',
+    attack: ATTACK.ASSASSIN,
     image: 'champ_shaco',
 
     spells: [AllSpells.Shaco_Q, AllSpells.Shaco_W, AllSpells.Shaco_E, AllSpells.Shaco_R],
   },
   {
     name: 'Ahri',
+    attack: ATTACK.MAGE,
     image: 'champ_ahri',
 
     spells: [AllSpells.Ahri_Q, AllSpells.Ahri_W, AllSpells.Ahri_E, AllSpells.Ahri_R],
   },
   {
     name: 'Lee Sin',
+    attack: ATTACK.BRUISER,
     image: 'champ_leesin',
 
     spells: [AllSpells.LeeSin_Q, AllSpells.LeeSin_W, AllSpells.LeeSin_E, AllSpells.LeeSin_R],
   },
   {
     name: 'Blitzcrank',
+    attack: ATTACK.TANK,
     image: 'champ_blitzcrank',
 
     spells: [
@@ -119,30 +164,35 @@ export const SpellGroups: {
   },
   {
     name: 'Lux',
+    attack: ATTACK.MAGE,
     image: 'champ_lux',
 
     spells: [AllSpells.Lux_Q, AllSpells.Lux_W, AllSpells.Lux_E, AllSpells.Lux_R],
   },
   {
     name: 'Ashe',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_ashe',
 
     spells: [AllSpells.Ashe_Q, AllSpells.Ashe_W, AllSpells.Ashe_E, AllSpells.Ashe_R],
   },
   {
     name: "Cho'Gath",
+    attack: ATTACK.BRUISER,
     image: 'champ_chogath',
 
     spells: [AllSpells.ChoGath_Q, AllSpells.ChoGath_W, AllSpells.ChoGath_E, AllSpells.ChoGath_R],
   },
   {
     name: 'Leblanc',
+    attack: ATTACK.MAGE,
     image: 'champ_leblanc',
 
     spells: [AllSpells.Leblanc_Q, AllSpells.Leblanc_W, AllSpells.Leblanc_E, AllSpells.Leblanc_R],
   },
   {
     name: 'Malphite',
+    attack: ATTACK.TANK,
     image: 'champ_malphite',
 
     spells: [
@@ -154,147 +204,192 @@ export const SpellGroups: {
   },
   {
     name: 'Olaf',
+    attack: ATTACK.BRUISER,
     image: 'champ_olaf',
 
     spells: [AllSpells.Olaf_Q, AllSpells.Olaf_W, AllSpells.Olaf_E, AllSpells.Olaf_R],
   },
   {
     name: 'Teemo',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_teemo',
 
     spells: [AllSpells.Teemo_Q, AllSpells.Teemo_W, AllSpells.Teemo_E, AllSpells.Teemo_R],
   },
   {
     name: 'Veigar',
+    attack: ATTACK.MAGE,
     image: 'champ_veigar',
 
     spells: [AllSpells.Veigar_Q, AllSpells.Veigar_W, AllSpells.Veigar_E, AllSpells.Veigar_R],
   },
   {
     name: 'Zed',
+    attack: ATTACK.ASSASSIN,
     image: 'champ_zed',
 
     spells: [AllSpells.Zed_Q, AllSpells.Zed_W, AllSpells.Zed_E, AllSpells.Zed_R],
   },
   {
     name: 'Graves',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_graves',
 
     spells: [AllSpells.Graves_Q, AllSpells.Graves_W, AllSpells.Graves_E, AllSpells.Graves_R],
   },
   {
     name: 'Anivia',
+    attack: ATTACK.MAGE,
     image: 'champ_anivia',
 
     spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_E, AllSpells.Anivia_R],
   },
   {
     name: 'Varus',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_varus',
 
     spells: [AllSpells.Varus_Q, AllSpells.Varus_W, AllSpells.Varus_E, AllSpells.Varus_R],
   },
   {
     name: 'Pantheon',
+    attack: ATTACK.BRUISER,
     image: 'champ_pantheon',
 
     spells: [AllSpells.Pantheon_Q, AllSpells.Pantheon_W, AllSpells.Pantheon_E, AllSpells.Pantheon_R],
   },
   {
     name: 'Thresh',
+    attack: ATTACK.SUPPORT,
     image: 'champ_thresh',
 
     spells: [AllSpells.Thresh_Q, AllSpells.Thresh_W, AllSpells.Thresh_E, AllSpells.Thresh_R],
   },
   {
     name: 'Rammus',
+    attack: ATTACK.TANK,
     image: 'champ_rammus',
 
     spells: [AllSpells.Rammus_Q, AllSpells.Rammus_W, AllSpells.Rammus_E, AllSpells.Rammus_R],
   },
   {
     name: 'Morgana',
+    attack: ATTACK.SUPPORT,
     image: 'champ_morgana',
 
     spells: [AllSpells.Morgana_Q, AllSpells.Morgana_W, AllSpells.Morgana_E, AllSpells.Morgana_R],
   },
   {
     name: 'Janna',
+    attack: ATTACK.SUPPORT,
     image: 'champ_janna',
 
     spells: [AllSpells.Janna_Q, AllSpells.Janna_W, AllSpells.Janna_E, AllSpells.Janna_R],
   },
   {
     name: 'Alistar',
+    attack: ATTACK.TANK,
     image: 'champ_alistar',
 
     spells: [AllSpells.Alistar_Q, AllSpells.Alistar_W, AllSpells.Alistar_E, AllSpells.Alistar_R],
   },
   {
     name: 'Nocturne',
+    attack: ATTACK.ASSASSIN,
     image: 'champ_nocturne',
 
     spells: [AllSpells.Nocturne_Q, AllSpells.Nocturne_W, AllSpells.Nocturne_E, AllSpells.Nocturne_R],
   },
   {
     name: 'Twitch',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_twitch',
 
     spells: [AllSpells.Twitch_Q, AllSpells.Twitch_W, AllSpells.Twitch_E, AllSpells.Twitch_R],
   },
   {
     name: 'Amumu',
+    attack: ATTACK.TANK,
     image: 'champ_amumu',
 
     spells: [AllSpells.Amumu_Q, AllSpells.Amumu_W, AllSpells.Amumu_E, AllSpells.Amumu_R],
   },
   {
     name: 'Warwick',
+    attack: ATTACK.BRUISER,
     image: 'champ_warwick',
 
     spells: [AllSpells.Warwick_Q, AllSpells.Warwick_W, AllSpells.Warwick_E, AllSpells.Warwick_R],
   },
   {
     name: 'Singed',
+    attack: ATTACK.BRUISER,
     image: 'champ_singed',
 
     spells: [AllSpells.Singed_Q, AllSpells.Singed_W, AllSpells.Singed_E, AllSpells.Singed_R],
   },
   {
     name: 'Cassiopeia',
+    attack: ATTACK.MAGE,
     image: 'champ_cassiopeia',
 
     spells: [AllSpells.Cassiopeia_Q, AllSpells.Cassiopeia_W, AllSpells.Cassiopeia_E, AllSpells.Cassiopeia_R],
   },
   {
     name: 'Fizz',
+    attack: ATTACK.ASSASSIN,
     image: 'champ_fizz',
 
     spells: [AllSpells.Fizz_Q, AllSpells.Fizz_W, AllSpells.Fizz_E, AllSpells.Fizz_R],
   },
   {
     name: 'Annie',
+    attack: ATTACK.MAGE,
     image: 'champ_annie',
 
     spells: [AllSpells.Annie_Q, AllSpells.Annie_W, AllSpells.Annie_E, AllSpells.Annie_R],
   },
   {
     name: 'Garen',
+    attack: ATTACK.BRUISER,
     image: 'champ_garen',
 
     spells: [AllSpells.Garen_Q, AllSpells.Garen_W, AllSpells.Garen_E, AllSpells.Garen_R],
   },
   {
     name: 'Jinx',
+    attack: ATTACK.MARKSMAN,
     image: 'champ_jinx',
 
     spells: [AllSpells.Jinx_Q, AllSpells.Jinx_W, AllSpells.Jinx_E, AllSpells.Jinx_R],
   },
   {
     name: 'Nasus',
+    attack: ATTACK.BRUISER,
     image: 'champ_nasus',
 
     spells: [AllSpells.Nasus_Q, AllSpells.Nasus_W, AllSpells.Nasus_E, AllSpells.Nasus_R],
+  },
+  {
+    name: 'Ekko',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_ekko',
+
+    spells: [AllSpells.Ekko_Q, AllSpells.Ekko_W, AllSpells.Ekko_E, AllSpells.Ekko_R],
+  },
+  {
+    name: 'Jarvan IV',
+    attack: ATTACK.BRUISER,
+    image: 'champ_jarvaniv',
+
+    spells: [AllSpells.JarvanIV_Q, AllSpells.JarvanIV_W, AllSpells.JarvanIV_E, AllSpells.JarvanIV_R],
+  },
+  {
+    name: 'Camille',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_camille',
+
+    spells: [AllSpells.Camille_Q, AllSpells.Camille_W, AllSpells.Camille_E, AllSpells.Camille_R],
   },
   {
     name: 'Phép Bổ Trợ',

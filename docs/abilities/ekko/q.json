@@ -1,0 +1,75 @@
+{
+  "asset": {
+    "key": "spell_ekko_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Timewinder.png?f55f8",
+    "sha1": "03a46c0102f7468a75abbdbafbb695b5ff835df2"
+  },
+  "champion": "Ekko",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ekko_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Timewinder.png?f55f8",
+        "sha1": "03a46c0102f7468a75abbdbafbb695b5ff835df2"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "9 / 8.5 / 8 / 7.5 / 7",
+        "cost": "50 / 60 / 70 / 80 / 90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ekko''' throws a temporal grenade in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.",
+          "text": "Active: Ekko throws a temporal grenade in the target direction that deals magic damage to enemies hit."
+        },
+        "description2": {
+          "raw": "At 700 units or upon hitting an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, the grenade slows down for 1.<small>75</small> seconds to gradually expand into a ''Temporal Sickness'' field that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slows\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> nearby enemies, travelling for another 190 units.",
+          "text": "At 700 units or upon hitting an enemy champion, the grenade slows down for 1.75 seconds to gradually expand into a Temporal Sickness field that slows nearby enemies, travelling for another 190 units."
+        },
+        "description3": {
+          "raw": "Afterwards, the grenade contracts and homes back to '''Ekko''' at an increased speed, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.",
+          "text": "Afterwards, the grenade contracts and homes back to Ekko at an increased speed, dealing magic damage to enemies hit."
+        },
+        "description4": {
+          "raw": "''Enemies can be hit only once per pass.''",
+          "text": "Enemies can be hit only once per pass."
+        },
+        "effectradius": "160 – 210",
+        "icon": "Timewinder.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Initial Magic Damage:'''</span></dt><dd>80 / 95 / 110 / 125 / 140 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd></dl>",
+          "text": "Initial Magic Damage:80 / 95 / 110 / 125 / 140 (+ 30% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>",
+          "text": "Slow:40 / 45 / 50 / 55 / 60%"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Return Magic Damage:'''</span></dt><dd>40 / 65 / 90 / 115 / 140 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>120 / 160 / 200 / 240 / 280 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>",
+          "text": "Return Magic Damage:40 / 65 / 90 / 115 / 140 (+ 60% AP)Total Magic Damage:120 / 160 / 200 / 240 / 280 (+ 90% AP)"
+        },
+        "name": "Timewinder",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block only a single instance of damage.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "Spell shield will block only a single instance of damage.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": true,
+        "speed": "1650 • 200 • 2300",
+        "spellshield": false,
+        "targeting": "Direction",
+        "width": "120 • 200"
+      },
+      "name": "Timewinder"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "80ea4b96287a191e57a9f140362a95ddf570f34ba0776b26da7c04be491f6532",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ekko/Timewinder",
+    "revisionId": 4007479,
+    "sourceTimestamp": "2026-04-11T20:51:17Z"
+  }
+}

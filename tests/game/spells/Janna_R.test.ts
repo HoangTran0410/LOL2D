@@ -301,12 +301,17 @@ describe('Janna R', () => {
       takeHeal: vi.fn(),
     };
     const { owner } = makeOwner([enemy]);
+    // The wall face is placed 50 short of where the knockback wants to end, so
+    // the clamp is exercised whatever KNOCKBACK_DISTANCE is retuned to. The
+    // enemy is then stopped a collisionRadius (20) shy of the face.
+    const wallFaceX = KNOCKBACK_DISTANCE - 50;
+    const clampedX = wallFaceX - 20;
     owner.game.terrainMap.getObstaclesInArea.mockReturnValue([{
       vertices: [
-        { x: 400, y: -100 },
-        { x: 500, y: -100 },
-        { x: 500, y: 100 },
-        { x: 400, y: 100 },
+        { x: wallFaceX, y: -100 },
+        { x: wallFaceX + 100, y: -100 },
+        { x: wallFaceX + 100, y: 100 },
+        { x: wallFaceX, y: 100 },
       ],
     }]);
     const spell = new Janna_R(owner);
@@ -321,7 +326,7 @@ describe('Janna R', () => {
       statusFlagsToEnable: number;
     };
     expect(knockback).toMatchObject({
-      dashDestination: { x: 380, y: 0 },
+      dashDestination: { x: clampedX, y: 0 },
     });
     expect(knockback.statusFlagsToEnable & StatusFlags.Immovable).toBeTruthy();
     expect(knockback.statusFlagsToEnable & StatusFlags.Silenced).toBeTruthy();
@@ -332,8 +337,8 @@ describe('Janna R', () => {
     expect(enemy.destination).toEqual({ x: 100, y: 0 });
 
     knockback.deactivateBuff();
-    expect(enemy.position).toEqual({ x: 380, y: 0 });
-    expect(enemy.destination).toEqual({ x: 380, y: 0 });
+    expect(enemy.position).toEqual({ x: clampedX, y: 0 });
+    expect(enemy.destination).toEqual({ x: clampedX, y: 0 });
   });
 
   it('draws a procedural monsoon vortex out to the real spell radius', () => {

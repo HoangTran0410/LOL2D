@@ -75,14 +75,12 @@ export default class LeeSin_R extends Spell {
     const dashBuff = new Dash(3000, this.owner, closestEnemyToMouse);
     dashBuff.dashDestination = destination;
     dashBuff.dashSpeed = this.dashSpeed;
-    dashBuff.image = this.image;
     dashBuff.cancelable = false;
     dashBuff.onReachedDestination = () => {
       airborneBuff.deactivateBuff();
       obj.toRemove = true;
 
       const stunBuff = new Stun(500, this.owner, closestEnemyToMouse);
-      stunBuff.image = this.image;
       closestEnemyToMouse.addBuff(stunBuff);
     };
     dashBuff.addDeactivateListener(() => {

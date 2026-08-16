@@ -1,4 +1,5 @@
 import { uuidv4 } from '../../utils/index';
+import { effectiveRange } from '../combat/Reach';
 import EventType from '../enums/EventType';
 import SpellState from '../enums/SpellState';
 import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
@@ -131,6 +132,28 @@ export default class Spell {
 
   drawVfx(): void {
     this.spellVfx?.draw();
+  }
+
+  /**
+   * Off cooldown, paid for, and nothing about the caster in the way — "press
+   * this key right now and something happens".
+   *
+   * The same gate `castCancelCheck` applies, minus two things it does that a
+   * read-only question must not: it calls `resetCoolDown()`, and it calls
+   * `checkCastCondition()`, which for the auto-locking spells means a fresh
+   * quadtree scan. Callers that ask every frame (`ExecuteMarks`) do their own
+   * scan anyway and would otherwise pay for two.
+   */
+  get isCastableNow(): boolean {
+    return (
+      !this.disabled &&
+      this.state === SpellState.READY &&
+      !!this.owner &&
+      !this.owner.isDead &&
+      this.owner.canCast &&
+      this.canAffordMana(this.manaCost) &&
+      this.owner.stats.health.value >= this.healthCost
+    );
   }
 
   cast(): void {
@@ -565,14 +588,55 @@ export default class Spell {
     }
   }
 
+  /**
+   * The reach this spell should draw as its preview when nobody passes one.
+   *
+   * Same resolution order as `touchAimRange` in `src/game/input/SpellAim.ts`, on
+   * purpose: the ring the mouse player reads and the telegraph the thumb player
+   * drags must be the same number, or one of them is lying. The difference is the
+   * fallback — the touch layer guesses `DEFAULT_TOUCH_AIM_RANGE` because a drag
+   * has to go *somewhere*, while a preview that has nothing to state is better
+   * off drawing nothing than drawing a confident 600px circle that is wrong.
+   *
+   * `UNIT` casts go through `TargetResolver`, which applies the body-size
+   * correction from `Reach`; the ring has to take the same correction or it
+   * shows a reach the cast will refuse. `POINT` and `DIRECTION` keep the authored
+   * number — the far end of a point cast is ground, and ground has no body.
+   */
+  protected get previewRadius(): number | undefined {
+    const declared =
+      this.targetingRequest?.range ??
+      (this as { range?: number }).range ??
+      (this as { castRange?: number }).castRange;
+    if (typeof declared !== 'number' || declared <= 0) return undefined;
+    return this.castSpec.targeting === 'UNIT'
+      ? effectiveRange(declared, this.owner)
+      : declared;
+  }
+
+  /**
+   * The range ring under the caster.
+   *
+   * Called with no argument from `Game.draw`, and it used to draw nothing at all
+   * in that case — so every spell that did not override this (about seventy of
+   * them, including eleven of the twelve in the Camille/Ekko/Jarvan kits) gave
+   * the player no way to know how far it reached short of casting it and
+   * watching. Falling back to the declared reach makes the ring the default
+   * rather than an opt-in.
+   */
   drawPreview(radius?: number): void {
-    if (radius) {
-      push();
-      strokeWeight(2);
-      stroke(200, 100);
-      noFill();
-      circle(this.owner.position.x, this.owner.position.y, radius * 2);
-      pop();
-    }
+    const r = radius ?? this.previewRadius;
+    if (!r) return;
+
+    push();
+    noFill();
+    // a dark backing stroke so the ring survives being drawn over pale ground
+    stroke(20, 25, 40, 120);
+    strokeWeight(4);
+    circle(this.owner.position.x, this.owner.position.y, r * 2);
+    stroke(225, 235, 255, 150);
+    strokeWeight(2);
+    circle(this.owner.position.x, this.owner.position.y, r * 2);
+    pop();
   }
 }

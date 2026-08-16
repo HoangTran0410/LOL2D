@@ -2,7 +2,9 @@ import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import EventType from '../../enums/EventType';
 import type { BasicAttackHit } from '../../combat/BasicAttack';
+import { Rectangle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
+import SpellObject from '../SpellObject';
 import Spell from '../Spell';
 import StatAmp from '../buffs/StatAmp';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -10,10 +12,17 @@ import type Buff from '../Buff';
 
 export const DURATION = 7000;
 export const BONUS_RANGE = 250;
-export const BONUS_DAMAGE = 8;
-export const BOLT_DAMAGE = 7;
+export const BONUS_DAMAGE = 12;
+/**
+ * The pierce. It was 7 — barely a third of the basic attack that spawned it —
+ * so a shot that cut through three bodies read as a rounding error rather than
+ * as the reason the ultimate exists. At 15 a line of three is 45, which is
+ * ultimate-tier without touching the single-target case at all.
+ */
+export const BOLT_DAMAGE = 15;
 export const BOLT_RANGE = 700;
-export const ON_HIT_DAMAGE = 6;
+export const ON_HIT_DAMAGE = 9;
+export const ATTACK_SPEED_PERCENT = 0.45;
 export const STACK_ID = 'twitch_r';
 
 /**
@@ -38,7 +47,8 @@ export default class Twitch_R extends Spell {
   name = 'Vãi Đạn (Twitch_R)';
   description =
     `Trong <span class="time">${DURATION / 1000} giây</span>: <span class="buff">+${BONUS_RANGE} tầm đánh</span>,` +
-    ` <span class="buff">+${BONUS_DAMAGE} sát thương đánh thường</span>, <span class="buff">+25% tốc độ đánh</span>,` +
+    ` <span class="buff">+${BONUS_DAMAGE} sát thương đánh thường</span>,` +
+    ` <span class="buff">+${Math.round(ATTACK_SPEED_PERCENT * 100)}% tốc độ đánh</span>,` +
     ` <span class="buff">+${ON_HIT_DAMAGE} sát thương mỗi đòn đánh</span>,` +
     ` và mỗi đòn đánh thường <span class="damage">xuyên qua mục tiêu</span> bắn tiếp` +
     ` <span class="damage">${BOLT_DAMAGE} sát thương</span> cho mọi kẻ địch phía sau`;
@@ -110,7 +120,7 @@ export default class Twitch_R extends Spell {
     amp.bonuses = {
       attackRange: { baseBonus: BONUS_RANGE },
       attackDamage: { baseBonus: BONUS_DAMAGE },
-      attackSpeed: { percentBaseBonus: 0.25 },
+      attackSpeed: { percentBaseBonus: ATTACK_SPEED_PERCENT },
       onHitDamage: { baseBonus: ON_HIT_DAMAGE },
     };
     this.owner.addBuff(amp);
@@ -118,14 +128,17 @@ export default class Twitch_R extends Spell {
 }
 
 export class Twitch_R_Bolt extends MissileSpellObject {
-  speed = 18;
-  size = 14;
+  speed = 26;
+  /**
+   * The hitbox, and what it is drawn at. 14 was thinner than the champion body
+   * it was supposed to punch through, so the signature of the ultimate — one
+   * shot skewering a whole line — was invisible unless you already knew to look
+   * for it.
+   */
+  size = 30;
   /** Infinity is the whole point: the bolt does not stop at the first body. */
   maxHitCount = Infinity;
 
-  onHit(enemy: AttackableUnit) {
-    enemy.takeDamage(BOLT_DAMAGE, this.owner);
-  }
 
   draw() {
     const angle = Math.atan2(
@@ -135,12 +148,95 @@ export class Twitch_R_Bolt extends MissileSpellObject {
     push();
     translate(this.position.x, this.position.y);
     rotate(angle);
-    // a stubby tracer, not a ball: it reads as a bullet passing through
+
+    // A heavy round, and it gets heavier-looking the more it has already gone
+    // through — the pierce count is the one thing the player wants to read off
+    // this ability, so the bolt itself reports it.
+    const heat = Math.min(this.hitTargets.length, 4) / 4;
+
     noStroke();
-    fill(200, 255, 150, 90);
-    rect(-26, -3, 34, 6, 3);
-    fill(240, 255, 200, 240);
-    rect(-8, -1.6, 16, 3.2, 2);
+    // long muzzle-lit tracer
+    fill(150, 240, 90, 70 + 60 * heat);
+    rect(-74 - 24 * heat, -8, 86 + 24 * heat, 16, 8);
+    fill(210, 255, 140, 150 + 60 * heat);
+    rect(-52 - 18 * heat, -4.5, 64 + 18 * heat, 9, 5);
+    // the slug
+    fill(255, 255, 235, 250);
+    rect(-14, -3.5, 30, 7, 4);
+    // a hot nose cone, so the leading edge is unmistakable
+    fill(190, 255, 120, 245);
+    triangle(16, -6, 32, 0, 16, 6);
+
+    // toxic wash bleeding off the flanks: this is Twitch, not a rifle round
+    fill(120, 220, 70, 60 + 70 * heat);
+    ellipse(-30, 0, 60 + 30 * heat, 22 + 12 * heat);
     pop();
+  }
+
+  onHit(enemy: AttackableUnit) {
+    enemy.takeDamage(BOLT_DAMAGE, this.owner);
+    // the burst is drawn per body, so a pierce through four is four separate
+    // punches rather than one smear
+    const splash = new Twitch_R_Pierce(this.owner, this.position.x, this.position.y);
+    this.game.objectManager.addObject(splash);
+  }
+
+  getDisplayBoundingBox() {
+    const r = 110;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/** One body punched through: a hard ring and a spray out the far side. */
+export class Twitch_R_Pierce extends SpellObject {
+  age = 0;
+  lifeTime = 260;
+
+  constructor(owner: AttackableUnit, x: number, y: number) {
+    super(owner);
+    this.position = createVector(x, y);
+  }
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    push();
+    translate(this.position.x, this.position.y);
+    const flash = 1 - constrain(t / 0.3, 0, 1);
+    if (flash > 0) {
+      noStroke();
+      fill(240, 255, 210, 235 * flash);
+      circle(0, 0, 26 * (1 - flash) + 10);
+    }
+    noFill();
+    stroke(170, 250, 110, 235 * fade);
+    strokeWeight(5 * fade + 1.5);
+    circle(0, 0, 18 + 54 * t);
+    stroke(90, 190, 60, 180 * fade);
+    strokeWeight(2);
+    circle(0, 0, 10 + 34 * t);
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = 60;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }

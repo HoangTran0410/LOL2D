@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ekko/Chronobreak",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Chronobreak@@icon@@false@@icon2@@Chronobreak.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Passive:'''</span> Upon learning ''Chronobreak'' or if its '''current''' cooldown is lower than 4 seconds, '''Ekko''' reveals a time-delayed ''afterimage'' of himself that constantly tracks where he was 4 seconds ago.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Ekko''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis (buff)\">[[File:Stasis icon.png|20px|link=Invulnerability#Stasis|An icon representing the keyword Stasis (buff)]] [[:Invulnerability#Stasis|stasis]]</span> at the start of the cast time, and afterwards <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heals\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> himself, increased by <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"health lost\" data-displayformula=\"3% per 1% of health lost in the last 4 seconds\" data-bot-values=\"0;30;60;90;120;150;180;210;240;270;300\" data-top-values=\"0;10;20;30;40;50;60;70;80;90;100\" data-bot-key=\"%\" data-top-key=\"%\">0% – 300% (based on health lost in the last 4 seconds)</span>[[Category:Debug]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to his ''afterimage's'' location at the time of cast over 0.<small>5</small> seconds. Upon arrival, the stasis ends and he creates an explosion that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.@@description3@@'''''Ekko''' is immune to all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|displacements]]</span> during Chronobreak.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>200 / 275 / 350 / 425 / 500 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 175% AP)</span></dd></dl><dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Heal:'''</span></dt><dd>100 / 125 / 150 / 175 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Heal:'''</span></dt><dd>400 / 500 / 600 / 700 / 800 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 240% AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage radius\">375</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Dash to afterimage range\">Global</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>5</small>@@cost@@100@@cooldown@@110 / 95 / 80 / 65 / 50@@targeting@@Auto@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* '''Ekko''' will attempt to basic attack the closest target after appearing at the cast location, but can do so quicker if he manually attack commands after the dash, except if <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ekko\" data-ability=\"Phase Dive\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ekko Phase Dive.png|20xpx|border|link=Ekko#Phase Dive|An icon for Ekko's ability Phase Dive]]</span> <span style=\"white-space:normal;\">[[Ekko#Phase Dive|Phase Dive]]</span></span> is primed.\n* The ''afterimage's'' location will explode even if '''Ekko's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> is interrupted.\n* A ''link'' can also be seen between the ''afterimage'' and '''Ekko''' that traces along his path.\n** The ''link'' follows the same visibility rules as the ''afterimage''.\n** Upon activation, '''Ekko''' travels full distance through the ''link'', and thus will detonate <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ekko\" data-ability=\"Parallel Convergence\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ekko Parallel Convergence.png|20xpx|border|link=Ekko#Parallel Convergence|An icon for Ekko's ability Parallel Convergence]]</span> <span style=\"white-space:normal;\">[[Ekko#Parallel Convergence|Parallel Convergence]]</span></span> that the ''link'' passes through.\n* <span class=\"inline-image item-icon item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Quicksilver Sash\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Quicksilver Sash item.png|20xpx|border|link=Quicksilver Sash|An icon for the item Quicksilver Sash]]</span></span> [[Named item effect#Quicksilver|Quicksilver]] incurs a 1-second <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> upon casting ''Chronobreak''.\n* '''Ekko's''' dash cannot be interrupted by forced movement displacements since he is immune to them.\n** This is not to be confused with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|displacement immunity]]</span>, which resists <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|airborne]]</span> displacements plus a number of other cases. ''Chronobreak'' provides immunity only to displacements that apply <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|airborne]]</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307076,
+                "revisions": [
+                  {
+                    "parentid": 4011206,
+                    "revid": 4012189,
+                    "timestamp": "2026-04-25T09:25:23Z"
+                  }
+                ],
+                "title": "Template:Data Ekko/Chronobreak"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4012189,
+      "timestamp": "2026-04-25T09:25:23Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "754563cf004e1ea80668f69a0d9f3e0f581a07d1950cd244a70a69c3fee11979",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ekko/Chronobreak",
+    "revisionId": 4012189,
+    "sourceTimestamp": "2026-04-25T09:25:23Z"
+  }
+}

@@ -27,7 +27,10 @@ describe('Twitch Q stealth VFX does not survive death', () => {
     const spell = new Twitch_Q(twitch);
     spell.press(context);
 
-    expect(twitch.buffs).toHaveLength(2); // Invisible + Speedup
+    // named rather than counted: a bare length silently asserts the whole kit,
+    // so adding a buff to Ambush reads as a regression in an unrelated file
+    const applied = twitch.buffs.map(buff => buff.constructor.name).sort();
+    expect(applied).toEqual(['Invisible', 'Phasing', 'Speedup']);
     const cloak = spawned.find((o): o is Twitch_Q_Object => o instanceof Twitch_Q_Object)!;
     expect(cloak).toBeInstanceOf(Twitch_Q_Object);
     expect(cloak._cloaked).toBe(true);

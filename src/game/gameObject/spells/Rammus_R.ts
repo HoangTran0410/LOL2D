@@ -13,7 +13,7 @@ import Untargetable from '../buffs/Untargetable';
 export const MAX_RANGE = 500;
 export const RADIUS = 210;
 export const DAMAGE = 32;
-export const LEAP_SPEED = 17;
+export const LEAP_SPEED = 13;
 /** Ceiling on the flight, so a leap that never arrives still lands. */
 export const LEAP_TIMEOUT_MS = 2000;
 
@@ -159,7 +159,8 @@ export class Rammus_R_Leap extends SpellObject {
     // ...and the ball itself, spinning and casting a shrinking shadow as it
     // rises over the midpoint of the jump.
     const total = Math.max(1, this.landing.dist(this.owner.position) + this.age * 0.001);
-    const lift = Math.sin(constrain(1 - this.owner.position.dist(this.landing) / total, 0, 1) * PI) * 34;
+    const lift =
+      Math.sin(constrain(1 - this.owner.position.dist(this.landing) / total, 0, 1) * PI) * 34;
     push();
     noStroke();
     fill(0, 0, 0, 80);

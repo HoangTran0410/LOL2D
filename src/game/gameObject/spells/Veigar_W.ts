@@ -12,7 +12,10 @@ export const RANGE = 650;
 export const RADIUS = 115;
 export const WINDUP_MS = 1_300;
 export const IMPACT_LIFETIME_MS = 450;
-export const DAMAGE = 60;
+// The raw wiki number (60) was more than half a LOL2D champion's ~100 health
+// pool off a basic ability. Sits at the top of the 15-35 band a normal spell
+// gets here, which the 1.3s telegraph and the walk-out radius both pay for.
+export const DAMAGE = 32;
 export const MANA_COST = 60;
 
 const CRACK_COUNT = 10;
@@ -25,7 +28,7 @@ export default class Veigar_W extends Spell {
   image = AssetManager.get('spell_veigar_w');
   name = 'Vật Chất Hắc Ám (Veigar_W)';
   description =
-    'Gọi một khối vật chất hắc ám giáng xuống vị trí chỉ định. Vùng đất bị ảnh hưởng hiện rõ trong <span class="time">1.3 giây</span> trước khi nổ, gây <span class="damage">60 sát thương</span> cho kẻ địch còn đứng trong vùng.';
+    `Gọi một khối vật chất hắc ám giáng xuống vị trí chỉ định. Vùng đất bị ảnh hưởng hiện rõ trong <span class="time">${WINDUP_MS / 1000} giây</span> trước khi nổ, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch còn đứng trong vùng.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade
   // cooldown-cap scan in tests/game/spells/cooldowns.test.ts can see it
   coolDown = 6_000;

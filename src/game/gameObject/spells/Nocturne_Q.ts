@@ -130,6 +130,18 @@ export class Nocturne_Q_Trail extends SpellObject {
   patches: DuskPatch[] = [];
   visionRadius = TRAIL_RADIUS;
 
+  /**
+   * Under the units standing on it.
+   *
+   * `Z_INDEX_MAP` is keyed by *exact* constructor, so a `SpellObject` subclass
+   * does not inherit SpellObject's slot of 2 — it falls through to
+   * `DEFAULT_Z_INDEX`, which is 99 and paints over champions. That is right for
+   * a missile and wrong for a stain on the floor: the trail was covering the
+   * feet of everyone walking down it. Same value `Singed_W` and `Cassiopeia_W`
+   * set, for the same reason.
+   */
+  zIndex = 2;
+
   update() {
     const step = deltaTime;
     for (const patch of this.patches) patch.age += step;
@@ -186,17 +198,72 @@ export class Nocturne_Q_Trail extends SpellObject {
   }
 
   draw() {
+    if (!this.patches.length) return;
+
     push();
-    noStroke();
-    for (const patch of this.patches) {
-      const left = 1 - patch.age / TRAIL_MS;
-      // Two layers: a wide bruise on the ground and a brighter core, so the
-      // walkable band is unambiguous at a glance.
+    // A path, not a string of beads.
+    //
+    // Each patch used to be drawn as its own circle, so a trail read as a row
+    // of overlapping discs with scalloped edges — the one shape it must not
+    // have, because the thing the player needs to judge is *where the band is*
+    // and a scalloped edge makes its boundary a guess. Stroking segment by
+    // segment with round caps gives one continuous ribbon that still fades from
+    // the oldest end, which a single stroked polyline could not do.
+    strokeCap(ROUND);
+    strokeJoin(ROUND);
+    noFill();
+
+    // one patch and there is no segment to stroke yet
+    if (this.patches.length === 1) {
+      const only = this.patches[0];
+      const left = 1 - only.age / TRAIL_MS;
+      noStroke();
       fill(60, 20, 100, 90 * left);
-      circle(patch.x, patch.y, TRAIL_RADIUS * 2);
+      circle(only.x, only.y, TRAIL_RADIUS * 2);
       fill(160, 90, 240, 120 * left);
-      circle(patch.x, patch.y, TRAIL_RADIUS * 1.1);
+      circle(only.x, only.y, TRAIL_RADIUS * 1.1);
+      pop();
+      return;
     }
+
+    // pass one: the wide bruise, so no segment's edge cuts across another
+    for (let i = 1; i < this.patches.length; i++) {
+      const a = this.patches[i - 1];
+      const b = this.patches[i];
+      const left = 1 - b.age / TRAIL_MS;
+      stroke(60, 20, 100, 90 * left);
+      strokeWeight(TRAIL_RADIUS * 2);
+      line(a.x, a.y, b.x, b.y);
+    }
+
+    // pass two: the brighter core down the middle of it
+    for (let i = 1; i < this.patches.length; i++) {
+      const a = this.patches[i - 1];
+      const b = this.patches[i];
+      const left = 1 - b.age / TRAIL_MS;
+      stroke(160, 90, 240, 120 * left);
+      strokeWeight(TRAIL_RADIUS * 1.1);
+      line(a.x, a.y, b.x, b.y);
+    }
+
+    // pass three: shadow crawling along it toward the leading end, so a live
+    // trail is visibly different from one that has stopped being painted
+    const head = this.patches[this.patches.length - 1];
+    stroke(220, 180, 255, 150);
+    strokeWeight(3);
+    for (let i = 1; i < this.patches.length; i++) {
+      const b = this.patches[i];
+      const left = 1 - b.age / TRAIL_MS;
+      const wave = (i / this.patches.length + (frameCount % 90) / 90) % 1;
+      if (wave > 0.12) continue;
+      const a = this.patches[i - 1];
+      stroke(220, 180, 255, 170 * left);
+      line(a.x, a.y, b.x, b.y);
+    }
+    // and a soft head where the paint is being laid down
+    noStroke();
+    fill(200, 150, 255, 90);
+    circle(head.x, head.y, TRAIL_RADIUS * 1.3);
     pop();
   }
 

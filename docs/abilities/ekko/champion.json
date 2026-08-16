@@ -1,0 +1,115 @@
+{
+  "asset": {
+    "key": "champ_ekko",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_OriginalSquare.png?15376",
+    "sha1": "52e7345348d6404f89b71af74f59586b345d8954"
+  },
+  "champion": "Ekko",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Mage",
+    "apiname": "Ekko",
+    "be": 1575,
+    "changes": "V26.11",
+    "client_positions": [
+      "Jungle",
+      "Middle"
+    ],
+    "client_tags": [
+      "Burst",
+      "Mobile",
+      "Magic"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2015-05-29",
+    "difficulty": 2,
+    "external_positions": [
+      "Jungle",
+      "Middle"
+    ],
+    "herotype": "Assassin",
+    "id": 245,
+    "mobility": 3,
+    "patch": "V5.10",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Assassin"
+    ],
+    "rp": 790,
+    "skill_e": {
+      "1": "Phase Dive"
+    },
+    "skill_i": {
+      "1": "Z-Drive Resonance"
+    },
+    "skill_q": {
+      "1": "Timewinder"
+    },
+    "skill_r": {
+      "1": "Chronobreak"
+    },
+    "skill_w": {
+      "1": "Parallel Convergence"
+    },
+    "skills": {
+      "1": "Z-Drive Resonance",
+      "2": "Timewinder",
+      "3": "Parallel Convergence",
+      "4": "Phase Dive",
+      "5": "Chronobreak"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "ar": {
+        "hp_lvl": 22
+      },
+      "aram": {
+        "dmg_dealt": 1.1,
+        "dmg_taken": 1,
+        "tenacity": 1.2
+      },
+      "arm_base": 32,
+      "arm_lvl": 4.2,
+      "as_base": 0.688,
+      "as_lvl": 3.3,
+      "as_ratio": 0.625,
+      "attack_cast_time": 0.259999990463256,
+      "attack_total_time": 1.60000002384185,
+      "dam_base": 58,
+      "dam_lvl": 3,
+      "hp5_base": 9,
+      "hp5_lvl": 0.9,
+      "hp_base": 655,
+      "hp_lvl": 99,
+      "mp5_base": 7,
+      "mp5_lvl": 0.8,
+      "mp_base": 280,
+      "mp_lvl": 70,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 155,
+      "selection_radius": 120
+    },
+    "style": 75,
+    "title": "The Boy Who Shattered Time",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "0e18d2527b4bc8f0aad2ed72ea8dfbb6249db75b8b6df05cf96965657a9e4352",
+    "fetchedAt": "2026-08-16T14:45:07.816Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

@@ -2,13 +2,13 @@ import { Circle, Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import EventType from '../../enums/EventType';
 import StatusFlags from '../../enums/StatusFlags';
-import TerrainType from '../../enums/TerrainType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import CastTelegraph from '../../vfx/CastTelegraph';
 import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
 import VfxGroup from '../../vfx/VfxGroup';
 import Spell from '../Spell';
+import { wallOutlinesInArea } from '../map/DynamicTerrain';
 import Dash from '../buffs/Dash';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import AreaSpellObject from '../spellObjects/AreaSpellObject';
@@ -22,16 +22,16 @@ import { notifyJannaControlLanded } from './Janna_E';
 export const CHANNEL_DURATION_MS = 3_000;
 export const TICK_EVERY_MS = 250;
 export const HEAL_PER_TICK = 2;
-export const KNOCKBACK_DISTANCE = 450;
+// Both scaled to the ~1600x1600 canvas rather than carried over from the PC
+// values: at 700 the vortex covered nearly half the map's width and the 450
+// knockback threw a champion most of a lane away. 420/260 keeps Monsoon the
+// largest AoE in the game while leaving room to walk out of it.
+export const KNOCKBACK_DISTANCE = 260;
 export const KNOCKBACK_DURATION_MS = 500;
 export const MANA_COST = 100;
-export const RADIUS = 700;
+export const RADIUS = 420;
 
 type JannaTarget = AttackableUnit;
-
-interface Wall {
-  readonly vertices: readonly { x: number; y: number }[];
-}
 
 class Janna_R_Knockback extends Dash {
   statusFlagsToEnable = StatusFlags.Immovable | StatusFlags.Silenced;
@@ -217,24 +217,27 @@ export default class Janna_R extends Spell {
   ): { x: number; y: number } {
     const start = target.position;
     const padding = target.collisionRadius;
-    const walls = (this.game.terrainMap?.getObstaclesInArea?.(
+    // Walls of both kinds: the monsoon used to blow people straight through an
+    // Anivia wall and through Jarvan's arena, because only the map's own
+    // polygons were consulted. See map/DynamicTerrain.ts.
+    const walls = wallOutlinesInArea(
+      this.game,
       new Rectangle({
         x: Math.min(start.x, desired.x) - padding,
         y: Math.min(start.y, desired.y) - padding,
         w: Math.abs(desired.x - start.x) + padding * 2,
         h: Math.abs(desired.y - start.y) + padding * 2,
-      }),
-      [TerrainType.WALL]
-    ) ?? []) as Wall[];
+      })
+    );
 
     let nearestRatio = 1;
-    for (const wall of walls) {
-      for (let index = 0; index < wall.vertices.length; index++) {
+    for (const vertices of walls) {
+      for (let index = 0; index < vertices.length; index++) {
         const ratio = this.intersectionRatio(
           start,
           desired,
-          wall.vertices[index],
-          wall.vertices[(index + 1) % wall.vertices.length]
+          vertices[index],
+          vertices[(index + 1) % vertices.length]
         );
         if (ratio !== undefined) nearestRatio = Math.min(nearestRatio, ratio);
       }

@@ -2,6 +2,7 @@ import GameObject from './GameObject';
 import type Buff from './Buff';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
 import type { GameObjectRuntimeContext } from './GameObject';
+import type ParticleSystem from './helpers/ParticleSystem';
 
 export default class SpellObject extends GameObject {
   declare game: GameObjectRuntimeContext;
@@ -94,5 +95,38 @@ export default class SpellObject extends GameObject {
   /** Effects with no update of their own still honour their attachment. */
   update(): void {
     this.dropIfAttachmentLost();
+  }
+
+  /** Particle systems whose lifetime this effect has taken responsibility for. */
+  _ownedParticles: ParticleSystem[] = [];
+
+  /**
+   * Registers a particle system for the whole of this effect's life, instead of
+   * only for as long as it happens to hold particles.
+   *
+   * `ParticleSystem.autoRemoveIfEmpty` defaults to true and `update()` applies it
+   * on the very first frame, which is right for a burst emitted at the moment of
+   * spawn and wrong for every effect that emits *later*: Jarvan's standard throws
+   * its dust when the pole lands ~180ms in, Camille's sweep on the strike at
+   * 200ms, Ekko's sphere when it arms two seconds later. All of those deleted
+   * their own system before reaching their emit point, so the impact they exist
+   * for never appeared — silently, because nothing errors and the damage lands.
+   *
+   * Ownership is handed back in `onRemoved`, so whatever is still in the air when
+   * the effect ends drains and then removes itself as normal.
+   *
+   *   particleSystem = PredefinedParticleSystems.smoke([150, 115, 65]);
+   *   onAdded() { this.useParticles(this.particleSystem); }
+   */
+  useParticles<T extends ParticleSystem>(system: T): T {
+    system.autoRemoveIfEmpty = false;
+    this._ownedParticles.push(system);
+    this.game.objectManager.addObject(system);
+    return system;
+  }
+
+  onRemoved(): void {
+    for (const system of this._ownedParticles) system.autoRemoveIfEmpty = true;
+    this._ownedParticles.length = 0;
   }
 }

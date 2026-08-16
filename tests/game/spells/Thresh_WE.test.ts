@@ -46,6 +46,21 @@ describe('Thresh E sweeps a box, in one direction', () => {
     return { game, thresh, spell: new Thresh_E(thresh) };
   };
 
+  /**
+   * The chain is what hits, and it takes SWEEP_DURATION to cross the box, so a
+   * cast on its own lands nothing — the swing has to be driven. That is the
+   * point of the ability: the art and the damage are the same line.
+   */
+  const swingThrough = (game: ReturnType<typeof createGame>) => {
+    const swing = game.objectManager._objectToBeAdd.find(
+      (object: unknown): object is Thresh_E_Object => object instanceof Thresh_E_Object
+    )!;
+    vi.stubGlobal('deltaTime', 40);
+    for (let i = 0; i < 12; i++) swing.update(); // 480ms: well past the far edge
+    vi.stubGlobal('deltaTime', 16);
+    return swing;
+  };
+
   it('catches what is in the box and misses what is beside it', () => {
     const { game, spell } = cast();
     const inFront = at(HALF_LENGTH - 20, 0, 'red', game);
@@ -71,6 +86,10 @@ describe('Thresh E sweeps a box, in one direction', () => {
     game.objectManager.queryObjects = vi.fn(() => [north, south]) as never;
 
     spell.onSpellCast();
+    // The chain starts behind him and has to get there: casting alone hits
+    // nobody, which is the difference between the swing and a flash of art.
+    expect(north.buffs.some(buff => buff instanceof Dash), 'not on the cast frame').toBe(false);
+    swingThrough(game);
 
     for (const victim of [north, south]) {
       const dash = victim.buffs.find(buff => buff instanceof Dash) as Dash | undefined;
@@ -90,11 +109,9 @@ describe('Thresh E sweeps a box, in one direction', () => {
     game.objectManager.queryObjects = vi.fn(() => [south, east]) as never;
 
     spell.onSpellCast();
+    const swing = swingThrough(game);
 
-    const swing = game.objectManager._objectToBeAdd.find(
-      (object: unknown): object is Thresh_E_Object => object instanceof Thresh_E_Object
-    );
-    expect(swing!.heading).toBeCloseTo(Math.PI / 2, 3);
+    expect(swing.heading).toBeCloseTo(Math.PI / 2, 3);
     expect(south.buffs.some(buff => buff instanceof Dash)).toBe(true);
     expect(east.buffs.some(buff => buff instanceof Dash), 'now out of the box').toBe(false);
   });

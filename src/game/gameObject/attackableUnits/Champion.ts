@@ -15,6 +15,7 @@ import Root from '../buffs/Root';
 import Silence from '../buffs/Silence';
 import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
+import Taunt from '../buffs/Taunt';
 import type { BuffStackId } from '../Buff';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
@@ -31,17 +32,22 @@ export interface ChampionAttackTuning {
  * Basic attack numbers for a champion with no profile of its own.
  *
  * A champion pool is 100 health, a minion 140, a turret 400 dealing 12 per
- * 1.3s (9.2 dps). 16 per swing at 0.8/s is 12.8 dps, so autos alone take about
- * six and a quarter connected swings — roughly ten seconds once regeneration is
+ * 1.3s (9.2 dps). 14 per swing at 1.1/s is 15.4 dps, so autos alone take about
+ * seven connected swings — a little over six seconds once regeneration is
  * counted — to end a champion. That is long enough that a duel is a fight with
  * room for spells and disengages, and short enough that autoing is worth doing.
+ *
+ * 0.8/s was the previous rate, and it was the same rate for every champion in
+ * the game: a kit designed to be carried by attack speed had none to be carried
+ * by. Roles now declare their own profile — see `ATTACK` in `src/game/preset.ts`
+ * — and this is only the fallback for anything that names no role.
  *
  * The range is 300, comfortably inside the 500 sight radius (so you can attack
  * what you can see and the leash never fires first) and below a turret's 430.
  */
 export const DEFAULT_CHAMPION_ATTACK: ChampionAttackTuning = {
-  damage: 16,
-  attacksPerSecond: 0.8,
+  damage: 14,
+  attacksPerSecond: 1.1,
   range: 300,
 };
 
@@ -227,6 +233,11 @@ export default class Champion extends AttackableUnit {
     spell?.onRemoved?.();
   }
 
+  /** A champion fights through its standing order, so a taunt writes that. */
+  forceAttackTarget(attacker: AttackableUnit): void {
+    this.basicAttack.order(attacker);
+  }
+
   drawHealthBar(compact = false) {
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;
@@ -250,10 +261,20 @@ export default class Champion extends AttackableUnit {
       const healthRatio = maxHealth > 0 ? constrain(health / maxHealth, 0, 1) : 0;
       const shieldRatio = maxHealth > 0 ? constrain(this.shieldAmount / maxHealth, 0, 1) : 0;
 
+      // A unit with no mana pool gets no mana strip, and the backing shrinks to
+      // match. An empty channel under the health bar reads as a resource the
+      // unit has and has spent, which for a summon is simply false.
+      const hasMana = maxMana > 0;
+
       push();
       noStroke();
       fill(2, 15, 21, alpha);
-      rect(x - k, y - k, barWidth + 2 * k, healthHeight + manaHeight + 3 * k);
+      rect(
+        x - k,
+        y - k,
+        barWidth + 2 * k,
+        healthHeight + (hasMana ? manaHeight + 3 * k : 2 * k)
+      );
       fill(
         this.isDead
           ? [153, 153, 153, alpha]
@@ -268,9 +289,11 @@ export default class Champion extends AttackableUnit {
         fill(225, 230, 238, alpha * 0.85);
         rect(x + shieldX, y, shieldWidth, healthHeight);
       }
-      fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
-      const manaRatio = maxMana > 0 ? constrain(mana / maxMana, 0, 1) : 0;
-      rect(x, y + healthHeight + k, barWidth * manaRatio, manaHeight);
+      if (hasMana) {
+        fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
+        const manaRatio = constrain(mana / maxMana, 0, 1);
+        rect(x, y + healthHeight + k, barWidth * manaRatio, manaHeight);
+      }
       pop();
       return;
     }
@@ -399,7 +422,7 @@ export default class Champion extends AttackableUnit {
         );
       }
     } else {
-      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear]
+      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear, Taunt]
         .map(BuffClass => {
           let buff = this.buffs.find(b => b instanceof BuffClass);
           if (buff && buff.sourceUnit !== this) return buff.name;

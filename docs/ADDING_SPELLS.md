@@ -165,6 +165,55 @@ Add optional `vfx` and `sfx` factories to `castSpec` for `castStart`, `castLoop`
 
 Looping effects are disposed by lifecycle transitions. Any spell-owned object or listener still needs idempotent cleanup in `onCancel`, `onComplete`, `deactivate`, and `onRemoved` as applicable.
 
+`CastBar`, `CastTelegraph`, `BeamRenderer`, `SpriteEffect`, `ParticleEmitter` and `ImpactEffect` all live in `src/game/vfx/` and are reachable **only through `castSpec.vfx`** — they take a `Vec2` and are driven by `SpellVfx`, not by the object manager. A legacy `onSpellCast` spell cannot use them; its tool is `PredefinedParticleSystems` from `src/game/gameObject/helpers/ParticleSystem.ts`, added to the world with `objectManager.addObject`. Reach for the right one for the path you are on rather than assuming the guideline's name exists in your file's world.
+
+### An effect that paints past its own centre owes the quadtree a box
+
+`ObjectManager.draw` decides what to draw by querying the display quadtree with
+the camera rectangle. `GameObject.getDisplayBoundingBox` derives that box from
+`visionRadius`, which is **0** for a plain `SpellObject` — a zero-area box
+sitting on the object's own centre. So an effect that paints a 400px cone but
+inherits the default is drawn only while its *centre point* is on screen, and
+vanishes at the screen edge while its damage lands normally.
+
+```ts
+getDisplayBoundingBox() {
+  const r = this.radius + 40; // everything the draw actually touches
+  return new Rectangle({
+    x: this.position.x - r, y: this.position.y - r, w: r * 2, h: r * 2, data: this,
+  });
+}
+```
+
+`MissileSpellObject` already supplies one sized to `size`; override it if you
+paint wider than the missile, or if you draw back to the caster (a tether, a
+cable) rather than only around yourself. Six of the twelve effects added with
+Camille/Ekko/Jarvan shipped without it. `tests/game/spells/aoe-display-bounds.test.ts`
+pins the ones that exist.
+
+### Hook a dash frame with `onDashUpdate`, never by assigning `onUpdate`
+
+`Buff.update()` calls `this.onUpdate()`, and `Dash` implements the movement
+itself in `Dash.prototype.onUpdate` — the step toward `dashDestination`, the
+arrival test that fires `onReachedDestination`, the interrupt check. Writing
+`dashBuff.onUpdate = () => {…}` installs an own property that shadows the
+prototype, so it does not *hook* the frame, it *replaces* it: the champion plays
+the spell's own per-frame logic standing perfectly still.
+
+```ts
+// WRONG — deletes the dash
+dashBuff.onUpdate = () => { /* damage everything I pass through */ };
+
+// RIGHT — runs after each movement step
+dashBuff.onDashUpdate = () => { /* damage everything I pass through */ };
+```
+
+It reads exactly like a callback, which is why Camille E, Ekko E and Jarvan Q
+all shipped with it and none was caught: each still dealt its damage — to
+whatever happened to be standing next to the caster — and still ended on time.
+`tests/game/spells/dash-onupdate-seam.test.ts` scans every spell file for the
+assignment.
+
 ## 6. Use typed assets
 
 After adding an image, run `npm run assets:generate` and use its generated key:

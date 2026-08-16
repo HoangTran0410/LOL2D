@@ -1,0 +1,73 @@
+{
+  "asset": {
+    "key": "spell_camille_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Tactical_Sweep.png?e76eb",
+    "sha1": "150f164ae136cc2183c211f0a5127ed4275ea244"
+  },
+  "champion": "Camille",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_camille_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Tactical_Sweep.png?e76eb",
+        "sha1": "150f164ae136cc2183c211f0a5127ed4275ea244"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12 / 11.5 / 11 / 10.5 / 10",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Camille''' sweeps her leg in a cone in the target direction over 1.<small>1</small> seconds, during which she is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and unable to declare basic attacks. Afterwards, she deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to all enemies within.",
+          "text": "Active: Camille sweeps her leg in a cone in the target direction over 1.1 seconds, during which she is ghosted and unable to declare basic attacks. Afterwards, she deals physical damage to all enemies within."
+        },
+        "description2": {
+          "raw": "Enemies hit by the outer half of the cone take <span style=\"color:\n#FF8C34; white-space:normal\">'''additional''' physical damage</span>, capped at 300 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>, and are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> by 80% decaying over 2 seconds. '''Camille''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Healing\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|healed]]</span> for 100% of this '''additional''' damage <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"After modifiers such as resistances\">post-mitigation</span> against enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> in the outer half.",
+          "text": "Enemies hit by the outer half of the cone take additional physical damage, capped at 300 against monsters, and are slowed by 80% decaying over 2 seconds. Camille is healed for 100% of this additional damage post-mitigation against enemy champions in the outer half."
+        },
+        "description3": {
+          "raw": "Non-epic monsters take 50% damage from ''Tactical Sweep''.",
+          "text": "Non-epic monsters take 50% damage from Tactical Sweep."
+        },
+        "description4": {
+          "raw": "''Other abilities can be cast during the animation without cancelling it.''",
+          "text": "Other abilities can be cast during the animation without cancelling it."
+        },
+        "effectradius": "325 • 650",
+        "icon": "Tactical Sweep.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 85 / 110 / 135 / 160 <span style=\"color:orange; white-space:normal\">(+ 60% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:60 / 85 / 110 / 135 / 160 (+ 60% bonus AD)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Outer Cone Additional Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">7 / 7.<small>5</small> / 8 / 8.<small>5</small> / 9% <span style=\"color:orange; white-space:normal\">(+ 2.<small>5</small>% per 100 '''bonus''' AD)</span> of target's '''maximum''' health</span></dd></dl>",
+          "text": "Outer Cone Additional Damage:7 / 7.5 / 8 / 8.5 / 9% (+ 2.5% per 100 bonus AD) of target's maximum health"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Non-Epic Monster Damage:'''</span></dt><dd>30 / 42.<small>5</small> / 55 / 67.<small>5</small> / 80 <span style=\"color:orange; white-space:normal\">(+ 30% '''bonus''' AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Non-Epic Monster Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">3.<small>5</small> / 3.<small>75</small> / 4 / 4.<small>25</small> / 4.<small>5</small>% <span style=\"color:orange; white-space:normal\">(+ 1.<small>25</small>% per 100 '''bonus''' AD)</span> of target's '''maximum''' health</span></dd></dl>",
+          "text": "Non-Epic Monster Damage:30 / 42.5 / 55 / 67.5 / 80 (+ 30% bonus AD)\nBonus Non-Epic Monster Damage:3.5 / 3.75 / 4 / 4.25 / 4.5% (+ 1.25% per 100 bonus AD) of target's maximum health"
+        },
+        "name": "Tactical Sweep",
+        "notes": {
+          "raw": "* '''Camille''' can move during the delay, but the hitbox and '''Camille's''' visuals are fixed to the initial target direction.\n** '''Camille's''' facing-direction, for effects such as <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Cassiopeia\" data-ability=\"Petrifying Gaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cassiopeia Petrifying Gaze.png|20xpx|border|link=Cassiopeia#Petrifying Gaze|An icon for Cassiopeia's ability Petrifying Gaze]]</span> <span style=\"white-space:normal;\">[[Cassiopeia#Petrifying Gaze|Petrifying Gaze]]</span></span>, is the direction she is moving, and not the direction the model is facing.\n* The damage modifier against non-epic monsters applies after the cap.\n* Because the increased damage in the outer range of the cone is dealt as an '''additional''' instance of damage (as opposed to '''bonus''' damage to the original instance), it will trigger effects twice such as being reduced by <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Bone Plating\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Bone Plating rune.png|20xpx|link=Bone Plating|An icon representing Bone Plating]]</span> <span style=\"word-break: keep-all;\">[[Bone Plating]]</span></span> an extra time.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n** It still belongs to the same <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cast instance\">[[:Champion ability|cast instance]]</span>, therefore it does not trigger additional stacks of <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Conqueror\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Conqueror rune.png|20xpx|link=Conqueror|An icon representing Conqueror]]</span> <span style=\"word-break: keep-all;\">[[Conqueror]]</span></span> or <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Electrocute\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Electrocute rune.png|20xpx|link=Electrocute|An icon representing Electrocute]]</span> <span style=\"word-break: keep-all;\">[[Electrocute]]</span></span>.",
+          "text": "Camille can move during the delay, but the hitbox and Camille's visuals are fixed to the initial target direction.\n* Camille's facing-direction, for effects such as Petrifying Gaze, is the direction she is moving, and not the direction the model is facing.\nThe damage modifier against non-epic monsters applies after the cap.\nBecause the increased damage in the outer range of the cone is dealt as an additional instance of damage (as opposed to bonus damage to the original instance), it will trigger effects twice such as being reduced by Bone Plating an extra time.(unexpected)\n* It still belongs to the same cast instance, therefore it does not trigger additional stacks of Conqueror or Electrocute."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Direction"
+      },
+      "name": "Tactical Sweep"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "16afc7609e2de9b74ac0c9647f277e7cb59d1381e772464c6b774aa407824b00",
+    "fetchedAt": "2026-08-16T14:45:22.975Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Camille/Tactical_Sweep",
+    "revisionId": 4051342,
+    "sourceTimestamp": "2026-08-12T12:01:13Z"
+  }
+}

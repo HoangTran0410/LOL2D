@@ -4,8 +4,9 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Disarm from '../buffs/Disarm';
+import Phasing from '../buffs/Phasing';
 
-export const RADIUS = 230;
+export const RADIUS = 180;
 export const DURATION = 3000;
 export const HITS = 7;
 export const DAMAGE_PER_HIT = 7;
@@ -25,7 +26,8 @@ export default class Garen_E extends Spell {
   description =
     `Xoay kiếm quanh mình <span class="time">${DURATION / 1000} giây</span>, chém` +
     ` <span>${HITS} lần</span> × <span class="damage">${DAMAGE_PER_HIT} sát thương</span> cho kẻ địch trong` +
-    ` <span>${RADIUS}px</span>. Trong lúc xoay, Garen <span class="damage">không thể đánh thường</span>`;
+    ` <span>${RADIUS}px</span>. Trong lúc xoay, Garen <span class="buff">đi xuyên qua kẻ địch</span> nhưng` +
+    ` <span class="damage">không thể đánh thường</span>`;
   coolDown = 9000;
   manaCost = 30;
 
@@ -35,6 +37,14 @@ export default class Garen_E extends Spell {
     const spinLock = new Disarm(DURATION, this.owner, this.owner);
     spinLock.image = this.image;
     this.owner.addBuff(spinLock);
+
+    // A man turning himself into a blender walks through a minion wave rather
+    // than politely queueing behind it. Bodies only — three seconds of terrain
+    // phasing would let him spin out of the map, which is why `Phasing` exists
+    // separately from the `Ghosted` a dash uses.
+    const phase = new Phasing(DURATION, this.owner, this.owner);
+    phase.image = this.image;
+    this.owner.addBuff(phase);
 
     this.game.objectManager.addObject(new Garen_E_Object(this.owner));
   }
@@ -121,17 +131,25 @@ export class Garen_E_Object extends SpellObject {
     noStroke();
     fill(235, 243, 255);
     quad(
-      this.radius * 0.42, -7,
-      this.radius * 0.99, -3,
-      this.radius * 0.99, 3,
-      this.radius * 0.42, 7
+      this.radius * 0.42,
+      -7,
+      this.radius * 0.99,
+      -3,
+      this.radius * 0.99,
+      3,
+      this.radius * 0.42,
+      7
     );
     fill(255, 255, 255, 220);
     quad(
-      this.radius * 0.42, -7,
-      this.radius * 0.99, -3,
-      this.radius * 0.99, -1,
-      this.radius * 0.42, -3
+      this.radius * 0.42,
+      -7,
+      this.radius * 0.99,
+      -3,
+      this.radius * 0.99,
+      -1,
+      this.radius * 0.42,
+      -3
     );
     // crossguard and pommel, so the near end reads as a hilt
     fill(215, 175, 90);

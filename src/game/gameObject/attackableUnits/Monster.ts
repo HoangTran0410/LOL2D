@@ -429,6 +429,19 @@ export default class Monster extends AttackableUnit {
     }
   }
 
+  /**
+   * A camp can only hold a champion: `targetLock` is typed that way because a
+   * jungle monster chasing a minion down a lane is not a thing this game has.
+   * So a taunt from anything else is simply not something a camp can obey —
+   * which today is no restriction at all, since the only taunt in the game is
+   * Rammus E.
+   */
+  forceAttackTarget(attacker: AttackableUnit): void {
+    if (this.isDead || attacker.isDead || !(attacker instanceof Champion)) return;
+    this.targetLock = attacker;
+    this.phase = Monster.PHASES.ATTACK;
+  }
+
   takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
     super.takeDamage(damage, attacker);

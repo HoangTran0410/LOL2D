@@ -6,6 +6,11 @@ import Dash from '../buffs/Dash';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 
+/** The illusion resolves into focus over this long, rather than appearing. */
+export const MIRROR_ASSEMBLE_MS = 300;
+/** Fraction of the marker's life spent visibly coming apart, as a warning. */
+export const MIRROR_DECAY = 0.25;
+
 export default class Leblanc_W extends Spell {
   targetingMode = 'POINT' as const;
   PHASES = {
@@ -106,10 +111,34 @@ export default class Leblanc_W extends Spell {
   }
 }
 
+/**
+ * The return marker: LeBlanc, standing where she was.
+ *
+ * It has two jobs that pull in opposite directions, and the resolution is *who
+ * is looking*.
+ *
+ * To LeBlanc it is a countdown — *how long do I still have to blink back?* — so
+ * she gets a floor sigil and an arc spending clockwise from the top.
+ *
+ * To everyone else it has to be a lie worth falling for. A ring of spinning
+ * glass around a violet-washed disc is not a lie: it is a clearly-labelled
+ * marker that says "the real one is elsewhere", which makes the ability a
+ * mobility tool and nothing more. So the enemy is shown the avatar and almost
+ * nothing else — the tells are a faint rim and a slow shimmer, and the honest
+ * giveaway is the one the game cannot hide, that it does not move or fight.
+ *
+ * That asymmetry is the ability. `isAllied` is read from the *viewer's* side
+ * because everything is drawn from the local player's point of view.
+ */
 export class Leblanc_W_Object extends SpellObject {
   position = createVector();
   lifeTime = 3000;
   age = 0;
+
+  /** Whether the local player is the one being fooled by this. */
+  get foolsViewer(): boolean {
+    return !(this.owner as { isAllied?: boolean }).isAllied;
+  }
 
   update() {
     this.age += deltaTime;
@@ -117,47 +146,180 @@ export class Leblanc_W_Object extends SpellObject {
   }
 
   draw() {
-    push();
     const { stats, avatar } = this.owner as any;
     const size = stats.size.value;
-    image(AssetManager.renderable(avatar), this.position.x, this.position.y, size, size);
+    const r = size / 2;
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    // ease-out assembly, then a long hold, then the decay: three states the
+    // player can tell apart without reading a number
+    const grow = constrain(this.age / MIRROR_ASSEMBLE_MS, 0, 1);
+    const born = 1 - (1 - grow) * (1 - grow);
+    const decay = constrain((t - (1 - MIRROR_DECAY)) / MIRROR_DECAY, 0, 1);
+    const solid = born * (1 - decay);
+    const left = 1 - t;
 
-    const alpha = map(this.age, 0, this.lifeTime, 0, 255);
-    stroke('yellow');
-    fill(180, 180, 120, alpha);
-    circle(this.position.x, this.position.y, size);
+    const fooling = this.foolsViewer;
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // LeBlanc's own instrumentation. Withheld from the enemy on purpose: a
+    // countdown ring under the copy is a label reading "this one is fake", and
+    // an illusion that announces itself is not an illusion.
+    if (!fooling) {
+      noFill();
+      stroke(168, 96, 240, 150 * solid + 40);
+      strokeWeight(2);
+      circle(0, 0, size * 1.5);
+      strokeWeight(1.2);
+      circle(0, 0, size * 1.22);
+
+      // countdown: the recast window, spent clockwise from the top
+      stroke(214, 168, 255, 230 * (born - decay * 0.4));
+      strokeWeight(4);
+      arc(0, 0, size * 1.5, size * 1.5, -HALF_PI, -HALF_PI + TWO_PI * left);
+    }
+
+    // The illusion itself, drawn at full strength — this is the whole ability.
+    // It used to be buried under a violet disc at ~150 alpha, which turned a
+    // decoy into a purple blob nobody could mistake for a champion.
+    if (born > 0.05) {
+      // resolving into focus: a chromatic double that converges as it forms and
+      // separates again as it dies. Both are the same tell, run in reverse, and
+      // both are subtle enough to miss in a fight.
+      const split = ((1 - born) * 0.5 + decay * 0.65) * r * 0.55;
+      if (split > 0.4) {
+        push();
+        blendMode(ADD);
+        tint(150, 90, 255, 120);
+        image(AssetManager.renderable(avatar), -split, 0, size, size);
+        tint(120, 220, 255, 110);
+        image(AssetManager.renderable(avatar), split, 0, size, size);
+        noTint();
+        blendMode(BLEND);
+        pop();
+      }
+
+      // the copy, essentially as she really looks
+      push();
+      tint(255, 255, 255, 255 * (0.55 + 0.45 * solid));
+      image(AssetManager.renderable(avatar), 0, 0, size, size);
+      noTint();
+      pop();
+
+      // the only permanent tell an enemy gets: a thin violet rim, and a slow
+      // shimmer crossing her. Enough to reward someone who looks twice.
+      noFill();
+      stroke(178, 120, 246, (fooling ? 90 : 150) * solid);
+      strokeWeight(1.5);
+      circle(0, 0, size * 1.02);
+
+      const sweep = ((this.age % 1600) / 1600) * 2 - 1;
+      noStroke();
+      fill(226, 196, 255, (fooling ? 34 : 62) * solid);
+      push();
+      rotate(-0.6);
+      ellipse(sweep * r, 0, r * 0.42, size * 0.92);
+      pop();
+    }
+
     pop();
   }
 
   getDisplayBoundingBox() {
+    // the sigil and countdown arc sit well outside the avatar
+    const r = this.owner.stats.size.value * 2;
     return new Rectangle({
-      x: this.position.x - this.owner.stats.size.value / 2,
-      y: this.position.y - this.owner.stats.size.value / 2,
-      w: this.owner.stats.size.value,
-      h: this.owner.stats.size.value,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }
 }
 
+/**
+ * The arrival: the surface she stepped out of, still ringing.
+ *
+ * Deliberately not a shatter. Flying glass is the impact half the roster
+ * already throws, and it tells the wrong story anyway — nothing was broken
+ * here, something was passed through.
+ */
 export class Leblanc_W_Object2 extends Leblanc_W_Object {
   size = 200;
 
   draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const flash = 1 - constrain(t / 0.2, 0, 1);
+
     push();
-    const alpha = map(this.age, 0, this.lifeTime, 200, 0);
-    stroke(100, alpha + 50);
-    fill(200, 200, 50, alpha);
-    circle(this.position.x, this.position.y, this.size);
+    translate(this.position.x, this.position.y);
+
+    // the flash of arrival, gone almost immediately
+    if (flash > 0) {
+      blendMode(ADD);
+      noStroke();
+      fill(206, 160, 255, 210 * flash);
+      circle(0, 0, this.size * 0.55 * flash + 30);
+      blendMode(BLEND);
+    }
+
+    // hard rim on the damage radius: everyone inside this took the 20
+    noFill();
+    stroke(120, 60, 200, 190 * fade);
+    strokeWeight(8 * fade + 2);
+    circle(0, 0, this.size);
+    stroke(226, 198, 255, 235 * fade);
+    strokeWeight(3 * fade + 1);
+    circle(0, 0, this.size);
+
+    // the wave racing out to that rim, so the boundary is arrived at, not stated
+    stroke(190, 140, 250, 210 * fade);
+    strokeWeight(9 * fade + 2);
+    circle(0, 0, this.size * (0.15 + t * 0.85));
+
+    // Ripples rather than debris. Breaking glass says a solid object was
+    // destroyed here, which is the wrong story for a woman stepping out of her
+    // own reflection — and it is the same triangle burst half the roster
+    // already throws. Concentric rings crossing each other read as a surface
+    // disturbed, and they are hers alone.
+    noFill();
+    for (let i = 0; i < 3; i++) {
+      const phase = constrain(t * 1.5 - i * 0.18, 0, 1);
+      if (phase <= 0) continue;
+      stroke(196, 156, 250, 200 * (1 - phase) * fade);
+      strokeWeight(3 * (1 - phase) + 1);
+      // squashed and counter-rotated, so the rings read as a plane being
+      // crossed rather than a second shockwave
+      push();
+      rotate(i * 0.7 - t * 0.5);
+      ellipse(0, 0, this.size * phase, this.size * phase * 0.55);
+      pop();
+    }
+
+    // the seam she came through, closing vertically
+    const seam = 1 - constrain(t / 0.55, 0, 1);
+    if (seam > 0) {
+      blendMode(ADD);
+      noStroke();
+      fill(224, 200, 255, 190 * seam);
+      ellipse(0, 0, this.size * 0.1 * seam + 4, this.size * 0.9 * seam);
+      blendMode(BLEND);
+    }
+
     pop();
   }
 
   getDisplayBoundingBox() {
+    // the ripples overshoot the rim, so the box is wider than the damage radius
+    const r = this.size * 0.85;
     return new Rectangle({
-      x: this.position.x - this.size / 2,
-      y: this.position.y - this.size / 2,
-      w: this.size,
-      h: this.size,
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
       data: this,
     });
   }

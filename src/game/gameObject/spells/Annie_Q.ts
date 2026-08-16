@@ -1,7 +1,10 @@
+import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { withinRange } from '../../combat/Reach';
 import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
+import SpellObject from '../SpellObject';
 import Spell from '../Spell';
+import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import type { CastSpec } from '../../spell/runtime/types';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -12,6 +15,17 @@ export const COOLDOWN_MS = 4_000;
 export const MANA_COST = 25;
 /** Wiki: a kill refunds the mana and halves the cooldown. */
 export const KILL_COOLDOWN_SCALE = 0.5;
+
+/**
+ * Tongues on the fireball. Annie's fire is drawn with hard corners rather than
+ * soft gradients — a child's idea of a flame — so it never gets mistaken for
+ * one of the game's several round magic orbs.
+ */
+export const FLAME_TONGUES = 7;
+/** Windup: the fireball is struck out of nothing over this long. */
+export const FIREBALL_SPAWN_MS = 90;
+/** How long the scorch left where the fireball landed stays up. */
+export const Q_BURST_MS = 380;
 
 const isAnnieTarget = (target: unknown): target is AttackableUnit =>
   !!target && typeof (target as AttackableUnit).takeDamage === 'function';
@@ -97,20 +111,187 @@ export class Annie_Q_Object extends HomingMissileSpellObject {
   size = 22;
   spell: Annie_Q | null = null;
 
+  /** Embers shedding off the fireball as it flies. */
+  particleSystem = PredefinedParticleSystems.randomMovingParticlesDecreaseSize('#FFA23CCC', 0.35);
+
+  /** Cosmetic: drives the spawn flare, the roll and the flicker. */
+  _age = 0;
+
+  onAdded() {
+    super.onAdded();
+    this.game.objectManager.addObject(this.particleSystem);
+  }
+
   onTargetArrive(target: AttackableUnit) {
     const before = target.isDead;
     target.takeDamage(DAMAGE, this.owner);
     if (!before && target.isDead) this.spell?.rewardKill();
+
+    // the fireball is removed on arrival, so the detonation has to be its own
+    // object — otherwise Annie's signature spell ends by simply switching off
+    const burst = new Annie_Q_Burst(this.owner);
+    burst.position = target.position.copy();
+    burst.targetSize = target.animatedValues?.displaySize ?? 40;
+    this.game.objectManager.addObject(burst);
+  }
+
+  update() {
+    this._age += deltaTime;
+
+    // embers fall off the back of the ball rather than out of its centre
+    if (random() < 0.8) {
+      const r = this.size / 2;
+      this.particleSystem.addParticle({
+        x: this.position.x + random(-r, r),
+        y: this.position.y + random(-r, r),
+        r: random(3, 8),
+      });
+    }
+
+    super.update();
   }
 
   draw() {
+    // ease-out: struck alight fast, because a slow bloom would make a 16px/frame
+    // fireball look like it was dropped rather than thrown
+    const grow = constrain(this._age / FIREBALL_SPAWN_MS, 0, 1);
+    const born = 1 - (1 - grow) * (1 - grow);
+    const roll = this._age / 260;
+    const r = (this.size / 2) * born;
+
     push();
     translate(this.position.x, this.position.y);
+
+    // heat glow. Additive so the ball washes out whatever it passes over,
+    // which is what sells it as burning rather than as a painted disc.
+    blendMode(ADD);
     noStroke();
-    fill(255, 140, 40, 90);
-    circle(0, 0, this.size * 1.8);
-    fill(255, 210, 120, 245);
-    circle(0, 0, this.size * 0.8);
+    fill(255, 110, 20, 80);
+    circle(0, 0, r * 4.4);
+    blendMode(BLEND);
+
+    // sharp tongues of flame, each on its own flicker so the silhouette never
+    // settles. Irregular lengths — an even star would read as a cog.
+    noStroke();
+    rotate(roll);
+    for (let i = 0; i < FLAME_TONGUES; i++) {
+      const a = (TWO_PI * i) / FLAME_TONGUES;
+      const lick = 1 + sin(this._age / 70 + i * 1.7) * 0.3;
+      const len = r * (i % 3 === 0 ? 2.6 : 1.9) * lick;
+      push();
+      rotate(a);
+      fill(214, 52, 22, 220);
+      triangle(r * 0.6, -r * 0.62, r * 0.6, r * 0.62, len, 0);
+      fill(255, 138, 34, 235);
+      triangle(r * 0.7, -r * 0.34, r * 0.7, r * 0.34, len * 0.78, 0);
+      pop();
+    }
+
+    // the ball: red shell, orange body, white-yellow heart
+    fill(212, 48, 20, 235);
+    circle(0, 0, r * 2);
+    fill(255, 132, 34, 245);
+    circle(0, 0, r * 1.5);
+    fill(255, 214, 96, 250);
+    circle(0, 0, r * 0.95);
+    fill(255, 252, 224, 255);
+    circle(0, 0, r * (0.45 + sin(this._age / 55) * 0.06));
+
     pop();
+  }
+
+  // tongues and heat glow both paint well past the 22px hitbox
+  getDisplayBoundingBox() {
+    const r = this.size * 1.8;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
+  }
+}
+
+/** The detonation: a hard flash, a scorch ring, and flame shrapnel. */
+export class Annie_Q_Burst extends SpellObject {
+  targetSize = 40;
+  age = 0;
+  lifeTime = Q_BURST_MS;
+  maxRadius = 58;
+
+  _shards: { a: number; speed: number; len: number; width: number }[] = [];
+
+  onAdded() {
+    for (let i = 0; i < FLAME_TONGUES + 3; i++) {
+      this._shards.push({
+        a: random(0, TWO_PI),
+        speed: random(0.6, 1.3),
+        len: random(12, 26),
+        width: random(3, 7),
+      });
+    }
+  }
+
+  update() {
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw() {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const fade = 1 - t;
+    const flash = 1 - constrain(t / 0.25, 0, 1);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // the blast itself, white at the centre and gone in a quarter of the life
+    if (flash > 0) {
+      blendMode(ADD);
+      noStroke();
+      fill(255, 220, 140, 220 * flash);
+      circle(0, 0, this.targetSize * 0.9 + t * 70);
+      fill(255, 255, 255, 200 * flash);
+      circle(0, 0, this.targetSize * 0.5 * flash + 12);
+      blendMode(BLEND);
+    }
+
+    // scorch ring: the footprint of the hit, so a target burned in a crowd is
+    // identifiable after the flash has gone
+    noFill();
+    stroke(226, 74, 26, 225 * fade);
+    strokeWeight(5 * fade + 1.5);
+    circle(0, 0, this.targetSize * 0.7 + this.maxRadius * t);
+    stroke(255, 190, 90, 235 * fade);
+    strokeWeight(2 * fade + 0.8);
+    circle(0, 0, this.targetSize * 0.7 + this.maxRadius * t * 0.82);
+
+    // shrapnel of flame thrown outward, angular the whole way out
+    noStroke();
+    for (const s of this._shards) {
+      const d = 8 + this.maxRadius * t * s.speed;
+      push();
+      translate(cos(s.a) * d, sin(s.a) * d);
+      rotate(s.a);
+      fill(232, 84, 24, 230 * fade);
+      triangle(s.len * fade, 0, -s.len * 0.3, -s.width * fade, -s.len * 0.3, s.width * fade);
+      fill(255, 206, 110, 235 * fade);
+      triangle(s.len * fade * 0.7, 0, -s.len * 0.2, -s.width * fade * 0.5, -s.len * 0.2, s.width * fade * 0.5);
+      pop();
+    }
+
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    const r = this.targetSize + this.maxRadius + 30;
+    return new Rectangle({
+      x: this.position.x - r,
+      y: this.position.y - r,
+      w: r * 2,
+      h: r * 2,
+      data: this,
+    });
   }
 }

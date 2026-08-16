@@ -206,7 +206,13 @@ export const MAX_UNIT_SIZE = 165;
  * Hard ceiling on attacks per second. Attack speed buffs multiply, so two or
  * three overlapping ones would otherwise reach a swing per frame.
  */
-export const MAX_ATTACK_SPEED = 2.5;
+/**
+ * The ceiling. Raised from 2.5 once roles got their own profiles: a marksman
+ * base of 1.65 plus Twitch R (+45%) is already 2.39, so at 2.5 a second
+ * attack-speed source — Olaf W, an ally's buff — bought almost nothing, and
+ * stacking them is meant to be a real decision rather than a wasted cast.
+ */
+export const MAX_ATTACK_SPEED = 3.0;
 /** Default crit multiplier — League's, so "+75%" reads the way a player expects. */
 export const CRIT_MULTIPLIER = 1.75;
 
@@ -322,7 +328,12 @@ export default class Stats {
   updateActionState(statusFlag: number) {
     this.setActionState(ActionState.CHARMED, hasFlag(statusFlag, StatusFlags.Charmed));
     this.setActionState(ActionState.FEARED, hasFlag(statusFlag, StatusFlags.Feared));
+    this.setActionState(ActionState.TAUNTED, hasFlag(statusFlag, StatusFlags.Taunted));
     this.setActionState(ActionState.IS_GHOSTED, hasFlag(statusFlag, StatusFlags.Ghosted));
+    this.setActionState(
+      ActionState.PHASES_UNITS,
+      hasFlag(statusFlag, StatusFlags.PhasesUnits)
+    );
     this.setActionState(ActionState.GROUNDED, hasFlag(statusFlag, StatusFlags.Grounded));
     this.setActionState(ActionState.IS_NEAR_SIGHTED, hasFlag(statusFlag, StatusFlags.NearSighted));
     this.setActionState(ActionState.NO_RENDER, hasFlag(statusFlag, StatusFlags.NoRender));
@@ -347,6 +358,11 @@ export default class Stats {
         hasFlag(statusFlag, StatusFlags.Silenced) ||
         hasFlag(statusFlag, StatusFlags.Charmed) ||
         hasFlag(statusFlag, StatusFlags.Feared) ||
+        // A taunt takes the decision away, not the weapon: `CAN_ATTACK` and
+        // `CAN_MOVE` stay on deliberately, because `Taunt` spends both of them
+        // on Rammus every frame. It is the only control effect in this list
+        // that appears in exactly one of the three.
+        hasFlag(statusFlag, StatusFlags.Taunted) ||
         hasFlag(statusFlag, StatusFlags.Stunned) ||
         hasFlag(statusFlag, StatusFlags.Suppressed)
       )

@@ -7,7 +7,7 @@ import SpellObject from '../SpellObject';
 import Fear from '../buffs/Fear';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
-export const RANGE = 350;
+export const RANGE = 150;
 export const DAMAGE = 22;
 export const CHANNEL_MS = 1500;
 export const FEAR_DURATION = 1500;
@@ -102,21 +102,76 @@ export class Nocturne_E_Object extends SpellObject {
   draw() {
     const victim = this.victim as any;
     if (!victim) return;
+
     const t = constrain(this.age / CHANNEL_MS, 0, 1);
-    push();
-    // the chain, tightening as the channel completes
-    stroke(150, 90, 230, 140 + 100 * t);
-    strokeWeight(2 + 3 * t);
-    noFill();
     const from = this.owner.position;
     const to = victim.position;
-    beginShape();
-    for (let i = 0; i <= 8; i++) {
-      const p = i / 8;
-      const sag = Math.sin(p * PI) * (1 - t) * 26;
-      vertex(from.x + (to.x - from.x) * p, from.y + (to.y - from.y) * p + sag);
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const span = Math.hypot(dx, dy) || 1;
+    // unit normal, for offsetting the strands off the centre line
+    const nx = -dy / span;
+    const ny = dx / span;
+
+    push();
+    noFill();
+
+    /**
+     * A channel, drawn as one.
+     *
+     * It was a single violet polyline that appeared complete on frame one, so
+     * the ability read as "a line exists" rather than as a fear being wound up
+     * — and the one number the victim needs, *how long until this lands*, was
+     * nowhere on screen. Three strands now braid tighter and brighten as the
+     * channel fills, dread crawls up the tether toward the victim, and the
+     * victim wears a closing ring that is literally the countdown.
+     */
+    const SEGMENTS = 22;
+    for (let strand = -1; strand <= 1; strand++) {
+      // the braid closes onto the centre line as the channel completes
+      const spread = (1 - t) * 16 + 3;
+      stroke(120 + 60 * t, 60 + 40 * t, 200 + 40 * t, 90 + 140 * t);
+      strokeWeight(1.5 + 2.5 * t);
+      beginShape();
+      for (let i = 0; i <= SEGMENTS; i++) {
+        const p = i / SEGMENTS;
+        // pinned at both ends, widest in the middle
+        const belly = Math.sin(p * PI);
+        const twist = Math.sin(p * 7 - this.age / 90 + strand * 2.1);
+        const off = belly * spread * (strand + twist * 0.45);
+        const sag = belly * (1 - t) * 22;
+        vertex(from.x + dx * p + nx * off, from.y + dy * p + ny * off + sag);
+      }
+      endShape();
     }
-    endShape();
+
+    // dread crawling from Nocturne to the victim: the direction says who is
+    // doing this to whom
+    noStroke();
+    for (let i = 0; i < 3; i++) {
+      const crawl = ((this.age / 620 + i / 3) % 1);
+      fill(210, 170, 255, 200 * (1 - crawl) * (0.4 + 0.6 * t));
+      circle(from.x + dx * crawl, from.y + dy * crawl, 5 + 6 * t);
+    }
+
+    // the countdown, worn by the victim rather than by the caster — they are
+    // the one who has to decide whether to break it
+    const size = victim.animatedValues?.displaySize ?? 40;
+    noFill();
+    stroke(40, 16, 70, 150);
+    strokeWeight(3);
+    circle(to.x, to.y, size * 1.25);
+    stroke(200, 150, 255, 235);
+    strokeWeight(3);
+    arc(to.x, to.y, size * 1.25, size * 1.25, -HALF_PI, -HALF_PI + TWO_PI * t);
+
+    // and a hard flare on the last fifth, so the landing is not a surprise
+    if (t > 0.8) {
+      const bite = (t - 0.8) / 0.2;
+      noStroke();
+      fill(190, 130, 255, 120 * bite);
+      circle(to.x, to.y, size * (1.3 + bite * 0.7));
+    }
     pop();
   }
 

@@ -26,8 +26,8 @@ export const SLOW_PERCENT = 0.2;
 export const SLOW_DURATION_MS = 3000;
 export const SPEEDUP_DURATION_MS = 3000;
 export const CAST_TIME_MS = 0;
-export const SPAWN_OFFSET_DISTANCE = 100;
-export const MISSILE_SPEED = 1_200 / 60;
+export const SPAWN_OFFSET_DISTANCE = 0;
+export const MISSILE_SPEED = 5;
 
 export default class Malphite_Q extends Spell {
   image = AssetManager.get('spell_malphite_q');

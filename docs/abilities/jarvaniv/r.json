@@ -1,0 +1,61 @@
+{
+  "asset": {
+    "key": "spell_jarvaniv_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Cataclysm.png?9a194",
+    "sha1": "b53bb5fbf990f9a52b617af410f86445ff4c4181"
+  },
+  "champion": "Jarvan IV",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jarvaniv_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Cataclysm.png?9a194",
+        "sha1": "b53bb5fbf990f9a52b617af410f86445ff4c4181"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "120 / 112.5 / 105 / 97.5 / 90",
+        "cost": "100",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jarvan IV''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|leaps]]</span> with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|displacement immunity]]</span> to the target enemy champion's location over 0.<small>35</small> seconds, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to all nearby enemies upon arrival.",
+          "text": "Active: Jarvan IV leaps with displacement immunity to the target enemy champion's location over 0.35 seconds, dealing physical damage to all nearby enemies upon arrival."
+        },
+        "description2": {
+          "raw": "Upon impact, he creates a circle of impassable terrain that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocks aside]]</span> enemies within the perimeter over 0.<small>15</small> seconds, knocking them out of the circle if they are on the outer edge and pulling them in otherwise. The terrain lasts for 3.<small>5</small> seconds and grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area. ''Cataclysm'' can be recast after 0.<small>75</small> seconds while the terrain is present.",
+          "text": "Upon impact, he creates a circle of impassable terrain that knocks aside enemies within the perimeter over 0.15 seconds, knocking them out of the circle if they are on the outer edge and pulling them in otherwise. The terrain lasts for 3.5 seconds and grants sight of the area. Cataclysm can be recast after 0.75 seconds while the terrain is present."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Recast:'''</span> '''Jarvan IV''' destroys the terrain created by ''Cataclysm''.",
+          "text": "Recast: Jarvan IV destroys the terrain created by Cataclysm."
+        },
+        "effectradius": "350 • 1700",
+        "icon": "Cataclysm.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>200 / 262.<small>5</small> / 325 / 387.<small>5</small> / 450 <span style=\"color:orange; white-space:normal\">(+ 180% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:200 / 262.5 / 325 / 387.5 / 450 (+ 180% bonus AD)"
+        },
+        "name": "Cataclysm",
+        "notes": {
+          "raw": "* The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n** If the ability is not manually recasted, the secondary effect will trigger without being considered as an ability activation.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the damage but not the terrain generation.\n* If '''Jarvan IV's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|leap]]</span> is interrupted by another by another forced movement (eg. old <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Skarner\" data-skin=\"Original\" data-variant=\"old\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Skarner OriginalSquare old.png|20xpx|border|link=Skarner|An icon representing Skarner]]</span> <span style=\"white-space:normal;\">[[Skarner|Skarner's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Skarner\" data-ability=\"Impale old2\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Skarner Impale old2.png|20xpx|border|link=Skarner#Impale old2|An icon for Skarner's ability Impale old2]]</span> <span style=\"white-space:normal;\">[[Skarner#Impale old2|Impale]]</span></span></span><ref>[https://www.reddit.com/r/leagueoflegends/comments/njwmqn/skarners_ultimate_ignores_unstoppability/ Jarvan IV R vs old Skarner R]</ref>), the terrain will be generated at '''Jarvan IV's''' location when the forced movement ends.\n* ''Cataclysm'' will not deal damage, generate terrain, nor refund its cooldown if '''Jarvan IV''' is killed while leaping.\n* The perimeter is made up of 24 units with 95 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Pathing radius\">[[File:Pathing radius.png|20px|link=Unit collision|An icon representing the keyword Pathing radius]] [[:Unit collision|pathing radius]]</span>, 65 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Gameplay radius\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|gameplay radius]]</span> and 1350 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> radius each. Only every other unit is rendered visible.\n* <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ornn\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ornn OriginalSquare.png|20xpx|border|link=Ornn|An icon representing Ornn]]</span> <span style=\"white-space:normal;\">[[Ornn|Ornn's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ornn\" data-ability=\"Searing Charge\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ornn Searing Charge.png|20xpx|border|link=Ornn#Searing Charge|An icon for Ornn's ability Searing Charge]]</span> <span style=\"white-space:normal;\">[[Ornn#Searing Charge|Searing Charge]]</span></span></span> will not destroy the whole ring but only the part that <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ornn\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ornn OriginalSquare.png|20xpx|border|link=Ornn|An icon representing Ornn]]</span> <span style=\"white-space:normal;\">[[Ornn]]</span></span> collides with.",
+          "text": "The initial cast and the manual recast count as ability activations for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\n* If the ability is not manually recasted, the secondary effect will trigger without being considered as an ability activation.\nSpell shield will block the damage but not the terrain generation.\nIf Jarvan IV's leap is interrupted by another by another forced movement (eg. old Skarner's Impale[https://www.reddit.com/r/leagueoflegends/comments/njwmqn/skarners_ultimate_ignores_unstoppability/ Jarvan IV R vs old Skarner R]), the terrain will be generated at Jarvan IV's location when the forced movement ends.\nCataclysm will not deal damage, generate terrain, nor refund its cooldown if Jarvan IV is killed while leaping.\nThe perimeter is made up of 24 units with 95 pathing radius, 65 gameplay radius and 1350 sight radius each. Only every other unit is rendered visible.\nOrnn's Searing Charge will not destroy the whole ring but only the part that Ornn collides with."
+        },
+        "speed": "Distance to target&nbsp;&divide;&nbsp;0.35 s",
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Cataclysm"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "9326ca3d19bd1e9148518c80be57fa7e65ae1c8d5a2a7e4ddc1a70745313271d",
+    "fetchedAt": "2026-08-16T14:45:15.197Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jarvan_IV/Cataclysm",
+    "revisionId": 4017869,
+    "sourceTimestamp": "2026-05-13T21:20:16Z"
+  }
+}

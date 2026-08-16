@@ -8,12 +8,21 @@ import AoePulse from '../spellObjects/AoePulse';
 import TrailSystem from '../helpers/TrailSystem';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
-export const RANGE = 850;
+/**
+ * Reach of the bolt.
+ *
+ * 850 was read straight off the wiki and never scaled. The map here is about
+ * 1600x1600 and the rest of the skillshot roster sits between 350 and 500, so a
+ * single 850px line covered better than half the world from a standing start —
+ * a poke that could not be walked out of and did not have to be aimed. 620
+ * keeps Zap! the longest shot Jinx owns without letting it cross the map.
+ */
+export const RANGE = 620;
 export const DAMAGE = 30;
 export const SLOW_PERCENT = 0.6;
 export const SLOW_DURATION = 2000;
 
-/** Zap!: the longest skillshot in the game, and it stops whoever it finds. */
+/** Zap!: her longest skillshot, and it stops whoever it finds. */
 export default class Jinx_W extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_jinx_w');
@@ -64,12 +73,18 @@ export class Jinx_W_Object extends MissileSpellObject {
     // A single-target shot with no impact reads as a miss. `fillAlpha = 0` on
     // purpose: this is a spark on one body, not an area, and a filled disc
     // would promise a splash that never happens.
+    //
+    // `frag` is Jinx's shape across the whole kit — the chunks are small and
+    // fast here because it is a hit on one body rather than a bomb, but a
+    // player who has learned that tumbling debris means Jinx should not have to
+    // relearn it per ability. `shards` said "rock" and belonged to four other
+    // champions besides.
     const zap = new AoePulse(this.owner);
     zap.position = enemy.position.copy();
     zap.radius = 70;
     zap.lifeTime = 260;
     zap.color = [170, 240, 255];
-    zap.style = 'shards';
+    zap.style = 'frag';
     zap.spokes = 9;
     zap.fillAlpha = 0;
     this.game.objectManager.addObject(zap);
