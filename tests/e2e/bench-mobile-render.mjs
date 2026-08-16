@@ -11,6 +11,8 @@ import { chromium } from 'playwright';
 const PORT = process.env.LOL2D_PORT ?? String(5_800 + Math.floor(Math.random() * 200));
 const URL = process.env.LOL2D_URL ?? `http://localhost:${PORT}/?touch=1&zoom=0.6`;
 const OWN_SERVER = !process.env.LOL2D_URL;
+const ACTIVE_AI = process.env.LOL2D_ACTIVE_AI === '1';
+const CPU_THROTTLE = Number(process.env.LOL2D_CPU_THROTTLE ?? 4);
 
 let server;
 let serverLog = '';
@@ -59,7 +61,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 const client = await context.newCDPSession(page);
 await client.send('Emulation.setCPUThrottlingRate', {
-  rate: Number(process.env.LOL2D_CPU_THROTTLE ?? 4),
+  rate: CPU_THROTTLE,
 });
 
 const errors = [];
@@ -74,7 +76,7 @@ await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.director, 
   timeout: 30_000,
 });
 
-const setup = await page.evaluate(async () => {
+const setup = await page.evaluate(async ({ activeAi, cpuThrottle }) => {
   const game = window.__lol2d.scene.oScene.game;
   const { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } = await import(
     '/src/game/config/PregameConfig.ts'
@@ -106,9 +108,9 @@ const setup = await page.evaluate(async () => {
     );
     unit.destination.set(unit.position.x, unit.position.y);
     unit.alwaysVisible = true;
-    unit._autoMove = false;
-    unit._autoAttack = false;
-    unit._autoCast = false;
+    unit._autoMove = activeAi && index > 0;
+    unit._autoAttack = activeAi && index > 0;
+    unit._autoCast = activeAi && index > 0;
   });
 
   for (let systemIndex = 0; systemIndex < 4; systemIndex++) {
@@ -136,8 +138,10 @@ const setup = await page.evaluate(async () => {
     champions: champions.length,
     objects: game.objectManager.objects.length + game.objectManager._objectToBeAdd.length,
     scale: game.camera.currentScale,
+    activeAi,
+    cpuThrottle,
   };
-});
+}, { activeAi: ACTIVE_AI, cpuThrottle: CPU_THROTTLE });
 
 await page.waitForTimeout(2_000);
 await page.screenshot({
@@ -151,6 +155,9 @@ const result = await page.evaluate(async () => {
   );
   const { default: Champion } = await import(
     '/src/game/gameObject/attackableUnits/Champion.ts'
+  );
+  const { default: AIChampion } = await import(
+    '/src/game/gameObject/attackableUnits/AIChampion.ts'
   );
   const { default: ParticleSystem } = await import(
     '/src/game/gameObject/helpers/ParticleSystem.ts'
@@ -174,6 +181,10 @@ const result = await page.evaluate(async () => {
   };
 
   wrap(game, 'fixedUpdate', 'update');
+  wrap(game.navigation, 'update', 'navigationUpdate');
+  wrap(game.objectManager, 'update', 'objectUpdate');
+  wrap(game.objectManager.unitCollision, 'resolve', 'collisionUpdate');
+  wrap(game.terrainMap, 'update', 'terrainUpdate');
   wrap(game.terrainMap, 'draw', 'terrain');
   wrap(game.objectManager, 'draw', 'objects');
   wrap(game.fogOfWar, 'draw', 'fog');
@@ -185,6 +196,7 @@ const result = await page.evaluate(async () => {
   wrap(AttackableUnit.prototype, 'drawHealthBar', 'unitHealth');
   wrap(Champion.prototype, 'drawHealthBar', 'championHealth');
   wrap(Champion.prototype, 'drawAttackOrder', 'championAttackOrder');
+  wrap(AIChampion.prototype, 'update', 'aiUpdate');
   wrap(ParticleSystem.prototype, 'draw', 'particles');
 
   const frameTimes = [];
