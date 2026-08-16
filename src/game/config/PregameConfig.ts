@@ -184,7 +184,7 @@ export const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze
  * bot slot nobody has configured must carry.
  */
 export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
-  autoMove: false,
+  autoMove: true,
   autoAttack: true,
   autoCast: true,
 });
@@ -291,12 +291,12 @@ export const sanitizeBotBehaviour = (raw: unknown, fallback: BotBehaviour): BotB
 export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
   const source = (raw && typeof raw === 'object' ? raw : {}) as Partial<PregameConfig>;
   const ai = (source.ai && typeof source.ai === 'object' ? source.ai : {}) as Partial<AIConfig>;
-  const rules = (source.rules && typeof source.rules === 'object'
-    ? source.rules
-    : {}) as Partial<MatchRulesConfig>;
-  const world = (source.world && typeof source.world === 'object'
-    ? source.world
-    : {}) as Partial<WorldConfig>;
+  const rules = (
+    source.rules && typeof source.rules === 'object' ? source.rules : {}
+  ) as Partial<MatchRulesConfig>;
+  const world = (
+    source.world && typeof source.world === 'object' ? source.world : {}
+  ) as Partial<WorldConfig>;
 
   const rawBots = Array.isArray(ai.bots) ? ai.bots : [];
   const bots: ChampionLoadout[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
@@ -374,6 +374,7 @@ export interface MatchRules {
 }
 
 export const toMatchRules = (rules: MatchRulesConfig): MatchRules => ({
-  cooldownMultiplier: 1 - clampInt(rules.cooldownReductionPercent, CDR_PERCENT_MIN, CDR_PERCENT_MAX, 0) / 100,
+  cooldownMultiplier:
+    1 - clampInt(rules.cooldownReductionPercent, CDR_PERCENT_MIN, CDR_PERCENT_MAX, 0) / 100,
   manaFree: rules.manaFree,
 });

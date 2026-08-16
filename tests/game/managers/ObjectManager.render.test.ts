@@ -15,9 +15,9 @@ const camera = {
   currentScale: 1,
 };
 
-const drawParticles = (touchUi: boolean): number => {
+const drawParticles = (touchUi: boolean, renderQuality?: string): number => {
   let drawn = 0;
-  const manager = new ObjectManager({ mapSize: 1_000, camera, touchUi });
+  const manager = new ObjectManager({ mapSize: 1_000, camera, touchUi, renderQuality } as any);
   manager.objects = Array.from({ length: 2 }, () => {
     const system = new ParticleSystem({
       isDeadFn: () => false,
@@ -63,6 +63,14 @@ describe('ObjectManager mobile rendering', () => {
 
   it('keeps pointer rendering unlimited', () => {
     expect(drawParticles(false)).toBe(2_000);
+  });
+
+  it('lets low quality force the smaller particle budget', () => {
+    expect(drawParticles(true, 'low')).toBe(400);
+  });
+
+  it('lets high quality disable the mobile particle cap', () => {
+    expect(drawParticles(true, 'high')).toBe(2_000);
   });
 
   it('halves the particle budget in a crowded zoomed-out mobile fight', () => {
@@ -137,6 +145,45 @@ describe('ObjectManager mobile rendering', () => {
     manager.draw();
 
     expect(units[0].draw).toHaveBeenCalledWith({ compactUnits: true });
+  });
+
+  it('lets low quality force compact rendering without a crowd', () => {
+    const host = { mapSize: 1_000, camera, touchUi: true, renderQuality: 'low' } as any;
+    const manager = new ObjectManager(host);
+    host.objectManager = manager;
+    const unit = new AttackableUnit({ game: host, position: createVector(50, 50) });
+    unit.draw = vi.fn();
+    host.player = unit;
+    manager.objects = [unit];
+    manager._objectsTree.insert(unit.getDisplayBoundingBox());
+
+    manager.draw();
+
+    expect(unit.draw).toHaveBeenCalledWith({ compactUnits: true });
+  });
+
+  it('lets high quality disable automatic compact rendering', () => {
+    const mobileCamera = { ...camera, currentScale: 0.3 };
+    const host = {
+      mapSize: 1_000,
+      camera: mobileCamera,
+      touchUi: true,
+      renderQuality: 'high',
+    } as any;
+    const manager = new ObjectManager(host);
+    host.objectManager = manager;
+    const units = Array.from({ length: 8 }, (_, index) => {
+      const unit = new AttackableUnit({ game: host, position: createVector(20 + index * 8, 50) });
+      unit.draw = vi.fn();
+      return unit;
+    });
+    host.player = units[0];
+    manager.objects = units;
+    for (const unit of units) manager._objectsTree.insert(unit.getDisplayBoundingBox());
+
+    manager.draw();
+
+    expect(units[0].draw).toHaveBeenCalledWith({ compactUnits: false });
   });
 
   it('keeps state-changing buff VFX but skips cosmetic buff VFX in compact mode', () => {

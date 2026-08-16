@@ -118,11 +118,25 @@ export default class Champion extends AttackableUnit {
    * unit is still being built) and `respawn()` must not (`super.respawn()` has
    * already refilled). Refilling the bars belongs to whoever swaps a champion
    * under a unit that is standing there, which is a different act entirely.
+   *
+   * A slot still holding the same spell class keeps its *instance*, rather than
+   * being rebuilt into an identical-looking new one. The practice panel's
+   * loadout editor commits a whole loadout even when the player changed a
+   * single slot, so rebuilding unconditionally charged every edit the state
+   * that lives on a spell instance and nowhere else: Nasus Q's stacks went to
+   * zero when the player swapped W. Running cooldowns and active phases went
+   * the same way.
    */
   applyPreset(preset: ChampionPresetData): void {
     this.name = preset.name;
     if (preset.avatar) this.avatar = AssetManager.get(preset.avatar);
-    this.replaceSpells((preset.spells ?? []).map(SpellClass => new SpellClass(this)));
+    const previous = this.spells;
+    this.replaceSpells(
+      (preset.spells ?? []).map((SpellClass, index) => {
+        const standing = previous[index];
+        return standing?.constructor === SpellClass ? standing : new SpellClass(this);
+      })
+    );
     this.applyAttackTuning(preset.attack ?? DEFAULT_CHAMPION_ATTACK);
   }
 
@@ -191,8 +205,15 @@ export default class Champion extends AttackableUnit {
     this.spells.forEach(spell => this.removeSpell(spell));
   }
 
+  /**
+   * Retires whatever the incoming kit does not carry over. A spell present in
+   * both lists is being *kept*, not replaced, so it must not be deactivated —
+   * `applyPreset` hands back the instances of the slots it did not change.
+   */
   replaceSpells(spells: Spell[]) {
-    this.spells.forEach(spell => this.removeSpell(spell));
+    this.spells.forEach(spell => {
+      if (spells.indexOf(spell) === -1) this.removeSpell(spell);
+    });
     this.spells = spells;
   }
 

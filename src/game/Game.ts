@@ -24,6 +24,7 @@ import {
   type MatchRules,
 } from './config/PregameConfig';
 import ObjectManager from './managers/ObjectManager';
+import type { RenderQuality } from './managers/ObjectManager';
 import MinionSpawner from './managers/MinionSpawner';
 import MatchDirector from './MatchDirector';
 import NavigationSystem from './nav/NavigationSystem';
@@ -72,9 +73,54 @@ import type { CastContext, Vec2 } from './spell/runtime/types';
 const JOYSTICK_LOOKAHEAD_FRAMES = 30;
 const JOYSTICK_LOOKAHEAD_MIN = 120;
 
+export type RenderFps = 30 | 60;
+
+const RENDER_QUALITY_STORAGE_KEY = 'lol2d.renderQuality';
+const RENDER_FPS_STORAGE_KEY = 'lol2d.renderFps';
+
+export function renderQualityPreference(): RenderQuality {
+  try {
+    const stored = window.localStorage.getItem(RENDER_QUALITY_STORAGE_KEY);
+    if (stored === 'low' || stored === 'high') return stored;
+  } catch {
+    /* storage blocked: use automatic quality */
+  }
+  return 'auto';
+}
+
+export function setRenderQualityPreference(quality: RenderQuality): void {
+  try {
+    window.localStorage.setItem(
+      RENDER_QUALITY_STORAGE_KEY,
+      quality === 'low' || quality === 'high' ? quality : 'auto'
+    );
+  } catch {
+    /* storage blocked: the live setting still works */
+  }
+}
+
+export function renderFpsPreference(): RenderFps {
+  try {
+    if (window.localStorage.getItem(RENDER_FPS_STORAGE_KEY) === '30') return 30;
+  } catch {
+    /* storage blocked: use 60 FPS */
+  }
+  return 60;
+}
+
+export function setRenderFpsPreference(fps: RenderFps): void {
+  try {
+    window.localStorage.setItem(RENDER_FPS_STORAGE_KEY, fps === 30 ? '30' : '60');
+  } catch {
+    /* storage blocked: the live setting still works */
+  }
+}
+
 export default class Game {
   readonly mapSize = 6400;
   readonly fps = 60;
+  renderFps: RenderFps = renderFpsPreference();
+  renderQuality: RenderQuality = renderQualityPreference();
 
   camera!: Camera;
   objectManager!: ObjectManager;
@@ -113,7 +159,7 @@ export default class Game {
   /**
    * Cooldown reduction and URF, resolved from the pregame config at
    * construction. `Spell.ts` reads this off `owner.game.matchRules` — see
-   * `Spell.applyMatchRules` — rather than this class pushing the numbers into
+   * `Spell.reducedCooldown` — rather than this class pushing the numbers into
    * every spell it creates, so a spell built at any point in a match (a
    * respawn's fresh kit, a champion swap) picks the same rules up on its own.
    *
@@ -519,6 +565,17 @@ export default class Game {
     this.inGameHUD?.setTouchUi(enabled);
     if (remember) rememberTouchControlsPreference(enabled);
     this.applyTouchUiClass();
+  }
+
+  setRenderQuality(quality: RenderQuality): void {
+    this.renderQuality = quality === 'low' || quality === 'high' ? quality : 'auto';
+    setRenderQualityPreference(this.renderQuality);
+  }
+
+  setRenderFps(fps: RenderFps): void {
+    this.renderFps = fps === 30 ? 30 : 60;
+    frameRate(this.renderFps);
+    setRenderFpsPreference(this.renderFps);
   }
 
   /**

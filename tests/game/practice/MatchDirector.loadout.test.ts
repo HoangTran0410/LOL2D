@@ -92,10 +92,16 @@ describe('MatchDirector.applyLoadout', () => {
     bot.setRespawnRollsNewPreset(false);
 
     director.applyLoadout(bot, ZED);
-    const swapped = bot.spells[0];
+    const swapped = bot.spells.map(spell => spell.name);
+    // Not "the instances are new": `applyPreset` keeps the instance of a slot
+    // whose spell class is unchanged, so re-applying the same loadout hands
+    // back the same objects on purpose. Wrecking the kit first is what tells a
+    // respawn that reapplied the loadout from one that skipped it entirely.
+    bot.replaceSpells([]);
+    bot.name = 'not-zed';
     bot.respawn();
 
-    expect(bot.spells[0]).not.toBe(swapped);
+    expect(bot.spells.map(spell => spell.name)).toEqual(swapped);
     expect(bot.name).toBe('Zed');
   });
 });

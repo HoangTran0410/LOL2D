@@ -353,7 +353,7 @@ export interface SpellDisplay {
 /**
  * Builds a throwaway instance to read a spell's display fields — including,
  * given `matchRules`, the same `effectiveCoolDownMs`/`effectiveManaCost`
- * getters `Spell.ts` uses for the real cast path (`applyMatchRules`), so a
+ * getters `Spell.ts` uses for the real cast path (`reducedCooldown`), so a
  * number shown here is provably the number the engine will actually use.
  */
 export const getSpellDisplay = (SpellClass: SpellClass, matchRules: MatchRules = NO_MATCH_RULES): SpellDisplay => {

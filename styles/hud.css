@@ -475,6 +475,29 @@
   padding: 0.8rem;
 }
 
+.practice-render-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.practice-render-settings select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 2.2rem 0 0.7rem;
+  border: 1px solid var(--hextech-line);
+  border-radius: 3px;
+  color: var(--hextech-text);
+  background: rgb(10, 20, 28);
+  font: inherit;
+}
+
+.practice-render-settings select:focus-visible {
+  outline: 2px solid var(--hextech-gold);
+  outline-offset: 2px;
+}
+
 /* ---------------------------------------------- Đấu thủ tab (RosterTab.vue)
    One row per live unit, following `.participant-card` in
    styles/pregame-scene.css — the setup screen's Players tab answers the same
@@ -927,6 +950,11 @@
     height: 100vh;
     height: 100dvh;
     border-width: 0;
+  }
+
+  .practice-render-settings {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
 

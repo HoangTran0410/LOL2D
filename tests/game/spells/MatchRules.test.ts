@@ -1,8 +1,9 @@
 /**
  * Proves the single seam cooldown reduction and URF (mana-free) run through:
- * `Spell.applyMatchRules` (cooldown) and `Spell.effectiveManaCost` (mana),
- * both reading `owner.game.matchRules` — set once by `Game.ts` from the
- * pregame config, never touched by an individual spell file.
+ * `Spell.reducedCooldown` (cooldown) and `Spell.effectiveManaCost` (mana),
+ * both reading `owner.game.matchRules` — seeded by `Game.ts` from the pregame
+ * config, retuned mid-match by `MatchDirector`, never touched by an individual
+ * spell file.
  *
  * Two real spells stand in for the two ways a spell's cooldown reaches the
  * runtime: `Ahri_Q` never overrides `castSpec` (its cooldown comes from the
@@ -138,12 +139,95 @@ describe('cooldown reduction runs through the resolved CastSpec, for both castSp
 });
 
 /**
- * The seam's other half. A multi-phase spell does not get its second cooldown
- * from the runtime: it writes `this.currentCooldown = <its own number>` when a
- * recast phase ends, which never passes through `applyMatchRules` — the
- * runtime resolved its spec once, at construction. Left raw, Lee Sin's Q went
- * on its full 9s no matter what cooldown reduction the pregame screen was set
- * to, while single-phase spells honoured it.
+ * The rule is read at cast time, not at construction time.
+ *
+ * `MatchDirector.seedRules` mutates the *same* `matchRules` object every spell
+ * already holds, precisely so a slider drag mid-match reaches spells that were
+ * built before the panel opened. That only works if nothing caches the derived
+ * cooldown: the runtime resolves its `CastSpec` once, on first cast, so a
+ * multiplier baked into that spec is the multiplier the spell keeps for the
+ * rest of the match no matter what the player does to the slider afterwards.
+ *
+ * The player-visible shape of that bug: the HUD ring (which reads
+ * `effectiveCoolDownMs`, recomputed every frame) shows the new cooldown while
+ * the spell keeps coming back on the old one, and picking a different spell —
+ * which builds a *new* instance — is the only thing that "fixes" it.
+ */
+describe('a cooldown rule changed mid-match reaches spells that already exist', () => {
+  beforeEach(() => {
+    vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
+    vi.stubGlobal('p5', { Vector: TestVector });
+    vi.stubGlobal('deltaTime', 16);
+    vi.stubGlobal('random', () => 0.5);
+    vi.stubGlobal('TWO_PI', Math.PI * 2);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  /** Runs the spell forward until its cooldown is spent, so it can cast again. */
+  const waitOutCooldown = (spell: Spell) => {
+    vi.stubGlobal('deltaTime', spell.currentCooldown);
+    spell.update();
+    vi.stubGlobal('deltaTime', 16);
+    expect(spell.currentCooldown).toBe(0);
+  };
+
+  it('drops 90% reduction back to none on the next cast', () => {
+    const rules: MatchRules = { cooldownMultiplier: 0.1, manaFree: false };
+    const owner = makeOwner(rules);
+    const spell = new Ahri_Q(owner as never);
+
+    expect(spell.press(context(owner))).toBe(true);
+    expect(spell.currentCooldown).toBeCloseTo(500);
+    waitOutCooldown(spell);
+
+    // The player drags the slider back to 0%: MatchDirector mutates in place.
+    rules.cooldownMultiplier = 1;
+    expect(spell.effectiveCoolDownMs).toBe(5_000); // what the HUD already shows
+
+    expect(spell.press(context(owner))).toBe(true);
+    expect(spell.currentCooldown).toBe(5_000);
+  });
+
+  it('picks up reduction switched on mid-match, the same way', () => {
+    const rules: MatchRules = { cooldownMultiplier: 1, manaFree: false };
+    const owner = makeOwner(rules);
+    const spell = new Ahri_Q(owner as never);
+
+    expect(spell.press(context(owner))).toBe(true);
+    expect(spell.currentCooldown).toBe(5_000);
+    waitOutCooldown(spell);
+
+    rules.cooldownMultiplier = 0.1;
+    expect(spell.press(context(owner))).toBe(true);
+    expect(spell.currentCooldown).toBeCloseTo(500);
+  });
+
+  it('gives a spell whose cooldown starts at release the same live read', () => {
+    const rules: MatchRules = { cooldownMultiplier: 0.5, manaFree: false };
+    const owner = makeOwner(rules);
+    const spell = new Lux_R(owner as never);
+
+    expect(spell.press(context(owner))).toBe(true);
+    vi.stubGlobal('deltaTime', CAST_TIME_MS);
+    spell.update();
+    expect(spell.currentCooldown).toBe(5_000);
+    waitOutCooldown(spell);
+
+    rules.cooldownMultiplier = 1;
+    expect(spell.press(context(owner))).toBe(true);
+    vi.stubGlobal('deltaTime', CAST_TIME_MS);
+    spell.update();
+    expect(spell.currentCooldown).toBe(10_000);
+  });
+});
+
+/**
+ * The other way a cooldown starts. A multi-phase spell does not get its second
+ * cooldown from the runtime: it writes `this.currentCooldown = <its own
+ * number>` when a recast phase ends, which the runtime never sees, so it has
+ * to call `reducedCooldown` by hand. Left raw, Lee Sin's Q went on its full 9s
+ * no matter what cooldown reduction the pregame screen was set to, while
+ * single-phase spells honoured it.
  */
 describe('a spell that sets its own cooldown mid-cast still gets cooldown reduction', () => {
   /** Exposes the protected seam so it can be checked without a whole cast. */
@@ -261,11 +345,11 @@ describe('no spell file reaches for matchRules on its own', () => {
 });
 
 /**
- * The same guard for the seam's other half. A spell that sets its own cooldown
- * mid-cast writes `this.currentCooldown = ...` directly, which never reaches
- * `applyMatchRules`; such an assignment has to route through
- * `Spell.reducedCooldown` or the spell silently ignores cooldown reduction
- * from its second phase onward — the Lee Sin Q bug this exists to keep fixed.
+ * The same guard for a self-set cooldown. A spell that sets its own cooldown
+ * mid-cast writes `this.currentCooldown = ...` directly, which the runtime
+ * never sees; such an assignment has to route through `Spell.reducedCooldown`
+ * or the spell silently ignores cooldown reduction from its second phase
+ * onward — the Lee Sin Q bug this exists to keep fixed.
  *
  * Only assignments naming a cooldown *field* are required to wrap. A recast
  * window ("you have N ms to press the key again") is a fixed input window, not

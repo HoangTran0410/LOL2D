@@ -1,5 +1,5 @@
 import { Scene } from '../managers/SceneManager';
-import Game from '../game/Game';
+import Game, { renderFpsPreference } from '../game/Game';
 import MenuScene from './MenuScene';
 import DomUtils from '../utils/dom.utils';
 import AssetManager from '../managers/AssetManager';
@@ -67,7 +67,7 @@ export default class GameScene extends Scene {
     // No cap anywhere else in the codebase — without one, p5's draw loop
     // runs as fast as the display allows (120Hz+ on many phones/laptops),
     // burning CPU/battery for no visual benefit.
-    frameRate(60);
+    frameRate(renderFpsPreference());
 
     drawAnalys = new Stats();
     drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom

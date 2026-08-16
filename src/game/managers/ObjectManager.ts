@@ -9,6 +9,7 @@ import GameObject from '../gameObject/GameObject';
 import UnitCollisionSystem from './UnitCollisionSystem';
 
 export type QueryArea = Circle | Rectangle;
+export type RenderQuality = 'auto' | 'low' | 'high';
 export type GameObjectConstructor<T extends GameObject = GameObject> = abstract new (
   ...args: never[]
 ) => T;
@@ -17,6 +18,7 @@ export type GameObjectTypeGuard<T extends GameObject> = (object: GameObject) => 
 export interface ObjectManagerGameContext {
   readonly mapSize: number;
   readonly touchUi?: boolean;
+  readonly renderQuality?: RenderQuality;
   camera: {
     getBoundingBox(): Rectangle;
     constantSize?(pixels: number): number;
@@ -273,15 +275,20 @@ export default class ObjectManager {
       if (o instanceof ParticleSystem) particleCount += o.particles.length;
       if (o instanceof AttackableUnit) attackableCount++;
     }
-    const compactUnits = Boolean(
+    const quality = this.game.renderQuality ?? 'auto';
+    const automaticCompact = Boolean(
       this.game.touchUi &&
       (this.game.camera.currentScale ?? Infinity) <= MOBILE_COMPACT_UNIT_SCALE &&
       attackableCount >= MOBILE_COMPACT_UNIT_COUNT
     );
-    const particleBudget = compactUnits && drawables.length > MOBILE_CROWDED_DRAWABLE_COUNT
-      ? MOBILE_CROWDED_PARTICLE_DRAW_BUDGET
-      : MOBILE_PARTICLE_DRAW_BUDGET;
-    const particleScale = this.game.touchUi && particleCount > particleBudget
+    const compactUnits = quality === 'low' || (quality === 'auto' && automaticCompact);
+    const particleBudget = quality === 'high'
+      ? Infinity
+      : quality === 'low' || (compactUnits && drawables.length > MOBILE_CROWDED_DRAWABLE_COUNT)
+        ? MOBILE_CROWDED_PARTICLE_DRAW_BUDGET
+        : MOBILE_PARTICLE_DRAW_BUDGET;
+    const limitParticles = quality === 'low' || (quality === 'auto' && this.game.touchUi);
+    const particleScale = limitParticles && particleCount > particleBudget
       ? particleBudget / particleCount
       : 1;
 

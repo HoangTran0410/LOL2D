@@ -59,10 +59,10 @@ export const AI_ATTACK_AGGRO_RANGE = 420;
 export const ROAM_SNAP_DISTANCE = 900;
 
 export default class AIChampion extends Champion {
-  _autoMove = false;
+  _autoMove = true;
   _autoCast = true;
   _autoAttack = true;
-  _autoMoveOnTakeDamage = false;
+  _autoMoveOnTakeDamage = true;
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;

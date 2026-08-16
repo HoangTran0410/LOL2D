@@ -36,6 +36,8 @@
  */
 import { inject, ref } from 'vue';
 import type { HudInteractions } from '../hudInteractions';
+import type { RenderFps } from '../../Game';
+import type { RenderQuality } from '../../managers/ObjectManager';
 import type { MatchRulesConfig } from '../../config/PregameConfig';
 import { CDR_PERCENT_MAX, CDR_PERCENT_MIN } from '../../config/PregameConfig';
 import {
@@ -45,6 +47,20 @@ import {
 } from '../../gameObject/map/Camera';
 
 const hud = inject<HudInteractions>('hud')!;
+const renderQuality = ref<RenderQuality>(hud.renderQuality);
+const renderFps = ref<RenderFps>(hud.renderFps);
+
+const onRenderQualityChange = (event: Event): void => {
+  const quality = (event.target as HTMLSelectElement).value as RenderQuality;
+  hud.setRenderQuality(quality);
+  renderQuality.value = hud.renderQuality;
+};
+
+const onRenderFpsChange = (event: Event): void => {
+  const fps = Number((event.target as HTMLSelectElement).value) as RenderFps;
+  hud.setRenderFps(fps);
+  renderFps.value = hud.renderFps;
+};
 
 /**
  * Seeded from the director, which is the match's own view of its rules — a
@@ -215,6 +231,29 @@ const resetDefaults = (): void => {
 
 <template>
   <div class="practice-tab-body">
+    <div class="practice-render-settings">
+      <label class="pregame-field">
+        <span>Chất lượng hình ảnh</span>
+        <select
+          id="practice-render-quality"
+          :value="renderQuality"
+          @change="onRenderQualityChange"
+        >
+          <option value="auto">Tự động</option>
+          <option value="low">Thấp — mượt hơn</option>
+          <option value="high">Cao — đẹp hơn</option>
+        </select>
+      </label>
+
+      <label class="pregame-field">
+        <span>Giới hạn FPS</span>
+        <select id="practice-render-fps" :value="renderFps" @change="onRenderFpsChange">
+          <option :value="30">30 FPS — tiết kiệm pin</option>
+          <option :value="60">60 FPS — mượt hơn</option>
+        </select>
+      </label>
+    </div>
+
     <label class="pregame-field">
       <span
         >Giảm hồi chiêu:

@@ -22,8 +22,10 @@
  */
 import { markRaw, reactive, toRaw } from 'vue';
 import type Game from '../Game';
+import type { RenderFps } from '../Game';
 import type MatchDirector from '../MatchDirector';
 import type Camera from '../gameObject/map/Camera';
+import type { RenderQuality } from '../managers/ObjectManager';
 import { removeAccents } from '../../utils/index';
 import type { AssetKey } from '../../managers/AssetManager';
 
@@ -92,6 +94,10 @@ export interface HudInteractions {
   spellInfo: { top: string; bottom: string; left: string; width: string };
   /** Mirrors game.touchControls.enabled; both views read it, neither owns it. */
   touchUi: boolean;
+  readonly renderQuality: RenderQuality;
+  readonly renderFps: RenderFps;
+  setRenderQuality(quality: RenderQuality): void;
+  setRenderFps(fps: RenderFps): void;
 
   /**
    * Set by whichever component has a layer open *over* the panel — today only
@@ -176,6 +182,18 @@ export function createHudInteractions(game: Game): HudInteractions {
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
+    get renderQuality(): RenderQuality {
+      return game.renderQuality;
+    },
+    get renderFps(): RenderFps {
+      return game.renderFps;
+    },
+    setRenderQuality(quality: RenderQuality): void {
+      game.setRenderQuality(quality);
+    },
+    setRenderFps(fps: RenderFps): void {
+      game.setRenderFps(fps);
+    },
 
     escape(): void {
       // The innermost layer gets it first, and only it: closing a modal and

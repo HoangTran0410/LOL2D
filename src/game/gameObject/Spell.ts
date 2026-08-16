@@ -328,54 +328,47 @@ export default class Spell {
   }
 
   /**
-   * Cooldown reduction's seam. Every spell's cooldown — whether it comes from
-   * the base `castSpec` (`legacyCastSpec(this.coolDown)`) or from a spell's
-   * own `get castSpec()` override, which invariably still writes
-   * `durationMs: this.coolDown` itself — passes through here exactly once,
-   * right before the runtime that actually counts it down is built. That
-   * makes this the one place a match-wide cooldown-reduction rule can apply
-   * without editing a single spell file.
-   *
-   * It cannot instead be a `coolDown` getter/setter pair on this class: about
-   * a third of spells declare `coolDown = SOME_CONSTANT;` as a class field in
-   * their own subclass body, and native class fields use *define* semantics —
-   * that assignment creates its own own-property on the instance and quietly
-   * shadows any accessor `Spell` declares under the same name, so a parent
-   * getter would simply never run for them. Operating on the already-resolved
-   * `CastSpec` object sidesteps that trap entirely.
-   */
-  private applyMatchRules(spec: CastSpec): CastSpec {
-    const multiplier = this.cooldownMultiplier;
-    if (multiplier === 1) return spec;
-    return {
-      ...spec,
-      cooldown: { ...spec.cooldown, durationMs: spec.cooldown.durationMs * multiplier },
-    };
-  }
-
-  /**
    * The one expression in the codebase that reads the match's cooldown rule.
-   * Both ways a cooldown can start — the runtime's (`applyMatchRules`) and a
-   * spell's own (`reducedCooldown`) — go through it, so there is a single
-   * thing to change when the rule changes.
+   * Read through `reducedCooldown` every time a countdown starts, never cached:
+   * `MatchDirector.seedRules` mutates this same object mid-match so a slider
+   * drag reaches spells that already exist, and anything holding a copy of the
+   * multiplier would keep the rule the match was booted with.
    */
   private get cooldownMultiplier(): number {
     return this.game?.matchRules?.cooldownMultiplier ?? 1;
   }
 
   /**
-   * The other half of the cooldown-reduction seam, for spells that set their
-   * own cooldown mid-cast rather than letting the runtime start it from the
-   * `CastSpec`: a recast phase ending (Lee Sin Q2, Zed R's swap, Anivia Q's
-   * detonation), a hit-shortened cooldown (Yasuo Q), a partial refund (Janna
-   * E, Pantheon Q).
+   * Cooldown reduction's seam — the only place a match-wide rule turns a
+   * spell's tuning number into the number that actually gets counted down.
    *
-   * Those spells write `this.currentCooldown = <some tuning number>` directly,
-   * which goes around `applyMatchRules` entirely — the runtime resolved its
-   * spec once, at construction, and never sees the assignment. Left raw, a
-   * multi-phase spell would ignore cooldown reduction completely while its
-   * single-phase neighbours honoured it. Wrapping the number here puts the
-   * assignment back on the seam.
+   * Both ways a cooldown can start pass through it:
+   *
+   * - The runtime's. Whether the duration comes from the base `castSpec`
+   *   (`legacyCastSpec(this.coolDown)`) or from a spell's own `get castSpec()`
+   *   override — which invariably still writes `durationMs: this.coolDown` —
+   *   `SpellRuntime` asks for it through the `cooldownDurationMs` delegate hook
+   *   at the moment the countdown starts. It has to be asked *then* rather than
+   *   folded into the spec: the runtime resolves its spec exactly once, on the
+   *   first cast, so a multiplier baked in there is the multiplier that spell
+   *   would keep for the rest of the match. The HUD reads `effectiveCoolDownMs`
+   *   fresh every frame, so that bug showed as a ring counting down a duration
+   *   the spell no longer used, curable only by picking a different spell —
+   *   which builds a new instance.
+   * - A spell's own, for the ones that set a cooldown mid-cast rather than
+   *   letting the runtime start it: a recast phase ending (Lee Sin Q2, Zed R's
+   *   swap, Anivia Q's detonation), a hit-shortened cooldown (Yasuo Q), a
+   *   partial refund (Janna E, Pantheon Q). Those write
+   *   `this.currentCooldown = this.reducedCooldown(<tuning number>)`, which is
+   *   the same call by hand.
+   *
+   * It cannot instead be a `coolDown` getter/setter pair on this class: about
+   * a third of spells declare `coolDown = SOME_CONSTANT;` as a class field in
+   * their own subclass body, and native class fields use *define* semantics —
+   * that assignment creates its own own-property on the instance and quietly
+   * shadows any accessor `Spell` declares under the same name, so a parent
+   * getter would simply never run for them. Taking the duration as an argument
+   * sidesteps that trap entirely.
    *
    * Not every mid-cast countdown is a cooldown: a recast window ("you have N
    * ms to press the key again") is a fixed input window and must stay raw, or
@@ -394,7 +387,7 @@ export default class Spell {
    * should read this instead.
    */
   get effectiveCoolDownMs(): number {
-    return this.applyMatchRules(this.castSpec as CastSpec).cooldown.durationMs;
+    return this.reducedCooldown(this.castSpec.cooldown.durationMs);
   }
 
   /**
@@ -480,7 +473,7 @@ export default class Spell {
 
   private get runtime(): SpellRuntime {
     if (!this.spellRuntime) {
-      const spec = this.applyMatchRules(this.castSpec as CastSpec);
+      const spec = this.castSpec as CastSpec;
       this.resolvedSpec = spec;
       this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
@@ -513,6 +506,7 @@ export default class Spell {
           this.spellVfx?.complete();
           this.onComplete(context);
         },
+        cooldownDurationMs: (durationMs) => this.reducedCooldown(durationMs),
       };
       this.spellRuntime = new SpellRuntime(spec, delegate);
     }

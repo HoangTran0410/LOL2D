@@ -19,6 +19,18 @@ export interface SpellRuntimeDelegate {
   onRecast(context: CastContext): void;
   onCancel(context: CastContext, reason: CancelReason): void;
   onComplete(context: CastContext): void;
+  /**
+   * The cooldown a countdown starting *now* should run, given the spec's own
+   * number. Omitted means "the spec's number", which is what a runtime driven
+   * by nothing but its spec wants.
+   *
+   * It exists because the spec is resolved once, on the first cast, and a
+   * match-wide cooldown-reduction rule can change after that — see
+   * `Spell.reducedCooldown`. A multiplier folded into `spec.cooldown.durationMs`
+   * at construction would be the multiplier that spell keeps for the rest of
+   * the match.
+   */
+  cooldownDurationMs?(specDurationMs: number): number;
 }
 
 const snapshotContext = (context: CastContext): CastContext =>
@@ -331,7 +343,11 @@ export class SpellRuntime {
   private startCooldown(point: CastSpec['cooldown']['startAt']): void {
     if (this.cooldownStarted || this.spec.cooldown.startAt !== point) return;
     this.cooldownStarted = true;
-    this._cooldownRemainingMs = Math.max(0, this.spec.cooldown.durationMs);
+    const durationMs = this.spec.cooldown.durationMs;
+    this._cooldownRemainingMs = Math.max(
+      0,
+      this.delegate.cooldownDurationMs?.(durationMs) ?? durationMs
+    );
   }
 
   private updateCooldown(deltaMs: number): void {

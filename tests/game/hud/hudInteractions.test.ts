@@ -67,6 +67,15 @@ describe('practice range controls', () => {
     expect(roster).toContain('<SpellIcon :display="item.entry.display" lazy />');
     expect(icon).toContain(':loading="lazy ? \'lazy\' : \'eager\'"');
   });
+
+  it('exposes persistent quality and FPS controls in the match tab', () => {
+    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+
+    expect(source).toContain('id="practice-render-quality"');
+    expect(source).toContain('id="practice-render-fps"');
+    expect(source).toContain('hud.setRenderQuality');
+    expect(source).toContain('hud.setRenderFps');
+  });
 });
 
 describe('createHudInteractions — the ways into the practice panel', () => {
@@ -74,6 +83,10 @@ describe('createHudInteractions — the ways into the practice panel', () => {
     ({
       player: { spells: [{}, {}] },
       objectManager: { objects: [] },
+      renderQuality: 'auto',
+      renderFps: 60,
+      setRenderQuality: vi.fn(),
+      setRenderFps: vi.fn(),
       pause: vi.fn(),
       unpause: vi.fn(),
     }) as any;
@@ -101,6 +114,19 @@ describe('createHudInteractions — the ways into the practice panel', () => {
     expect('allSpells' in hud).toBe(false);
     expect('spellGroups' in hud).toBe(false);
     expect('preloadSpellIcons' in hud).toBe(false);
+  });
+
+  it('routes render preferences to the live game', () => {
+    const game = fakeGame();
+    const hud = createHudInteractions(game);
+
+    expect((hud as any).setRenderQuality).toBeTypeOf('function');
+    expect((hud as any).setRenderFps).toBeTypeOf('function');
+    (hud as any).setRenderQuality('low');
+    (hud as any).setRenderFps(30);
+
+    expect(game.setRenderQuality).toHaveBeenCalledWith('low');
+    expect(game.setRenderFps).toHaveBeenCalledWith(30);
   });
 
   it('always opens: a second press cannot toggle an open panel shut', () => {

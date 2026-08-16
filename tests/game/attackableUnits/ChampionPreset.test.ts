@@ -13,11 +13,27 @@ class RedSpell extends Spell {
   name = 'Red';
   targetingMode = 'SELF' as const;
   coolDown = 1000;
+
+  // Stands in for Nasus Q: state that lives on the instance and nowhere else,
+  // so keeping the instance is the only way to keep it.
+  private stacks = 0;
+  get stackCount(): number {
+    return this.stacks;
+  }
+  setStackCount(count: number): boolean {
+    this.stacks = count;
+    return true;
+  }
 }
 class BlueSpell extends Spell {
   name = 'Blue';
   targetingMode = 'SELF' as const;
   coolDown = 2000;
+}
+class GreenSpell extends Spell {
+  name = 'Green';
+  targetingMode = 'SELF' as const;
+  coolDown = 3000;
 }
 
 const RED: ChampionPresetData = {
@@ -95,5 +111,67 @@ describe('Champion.applyPreset', () => {
     champion.applyPreset(BLUE);
 
     expect(deactivate).toHaveBeenCalledOnce();
+  });
+});
+
+/**
+ * Editing one slot must not cost the player the other three.
+ *
+ * The practice panel's loadout editor commits a whole `ChampionLoadout` even
+ * when the player changed a single slot, and `applyLoadout` hands it straight
+ * to `applyPreset`. Rebuilding every slot from that throws away per-instance
+ * state that has nothing to do with the edit — Nasus Q's stacks are the case
+ * that shows it, but a running cooldown and an active phase go the same way.
+ *
+ * Identity is per slot *and* per class: same class in the same slot is the
+ * same spell, so the instance stays.
+ */
+describe('Champion.applyPreset keeps the slots the preset did not change', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  const RED_BLUE: ChampionPresetData = { name: 'RedBlue', spells: [RedSpell, BlueSpell] };
+  const RED_GREEN: ChampionPresetData = { name: 'RedGreen', spells: [RedSpell, GreenSpell] };
+
+  it('keeps the instance — and its stacks — of a slot whose spell is unchanged', () => {
+    const champion = makeChampion(RED_BLUE);
+    const q = champion.spells[0] as RedSpell;
+    q.setStackCount(120);
+
+    champion.applyPreset(RED_GREEN);
+
+    expect(champion.spells[0]).toBe(q);
+    expect(champion.spells[0].stackCount).toBe(120);
+  });
+
+  it('never deactivates a spell it is keeping', () => {
+    const champion = makeChampion(RED_BLUE);
+    const kept = vi.spyOn(champion.spells[0], 'deactivate');
+    const swapped = vi.spyOn(champion.spells[1], 'deactivate');
+
+    champion.applyPreset(RED_GREEN);
+
+    expect(kept).not.toHaveBeenCalled();
+    expect(swapped).toHaveBeenCalledOnce();
+  });
+
+  it('rebuilds a slot that moved, because a slot is a different spell', () => {
+    const champion = makeChampion(RED_BLUE);
+    const red = champion.spells[0];
+
+    champion.applyPreset({ name: 'BlueRed', spells: [BlueSpell, RedSpell] });
+
+    expect(champion.spells[1]).not.toBe(red);
+    expect(champion.spells.map(s => s.name)).toEqual(['Blue', 'Red']);
+  });
+
+  it('still rebuilds everything on a real champion swap', () => {
+    const champion = makeChampion(RED_BLUE);
+    const before = [...champion.spells];
+
+    champion.applyPreset({ name: 'Green', spells: [GreenSpell] });
+
+    expect(champion.spells).toHaveLength(1);
+    expect(before.includes(champion.spells[0])).toBe(false);
   });
 });
