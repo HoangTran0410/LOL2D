@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Nasus/Wither",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Wither@@icon@@Wither.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Nasus''' ages the target enemy champion for 5 seconds, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 35% and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|crippling]]</span> them by<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;75% of that amount,&nbsp;」</span><span class=\"flipText2\">「&nbsp;26.<small>25</small>%,&nbsp;」</span></span>both increasing every second over the duration.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Slow:'''</span></dt><dd>47 / 59 / 71 / 83 / 95%</dd><dt><span class=\"template_lc\">'''Additional Slow Per Second:'''</span></dt><dd>3 / 6 / 9 / 12 / 15%</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Cripple:'''</span></dt><dd>35.<small>25</small> / 44.<small>25</small> / 53.<small>25</small> / 62.<small>25</small> / 71.<small>25</small>%</dd><dt><span class=\"template_lc\">'''Additional Cripple Per Second:'''</span></dt><dd>2.<small>25</small> / 4.<small>5</small> / 6.<small>75</small> / 9 / 11.<small>25</small>%</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@80@@cooldown@@15 / 14 / 13 / 12 / 11@@targeting@@Unit@@damagetype@@{{{damagetype}}}@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Wither'' interrupts the target's <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack windup]]</span> when it is first applied. <sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* If ''Wither's'' duration is affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Tenacity\">[[File:Tenacity icon.png|20px|link=Tenacity|An icon representing the keyword Tenacity]] [[:Tenacity|Tenacity]]</span> the effects will apply slower (negative tenacity percentage) or faster (positive tenacity percentage) so the maximum values are still reached when the modified duration ends.\n* ''Wither's'' cripple effectiveness calculates from its slow's base values, thus <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow resist\">[[File:Slow immune icon.png|20px|link=Slow resist|An icon representing the keyword Slow resist]] [[:Slow resist|slow resist]]</span> will not interact with the attack speed modifier indirectly.\n* Both <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripple]]</span> from ''Wither'' are considered to be a single <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Debuff\">[[File:Malefic Visions.png|20px|link=Debuff|An icon representing the keyword Debuff]] [[:Debuff|debuff]]</span>. <sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n** Therefore, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow immunity\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|slow immunity]]</span> will prevent both, even without technical <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple immunity\">[[File:Cripple immune.png|20px|link=Slow_resist#Cripple Immunity|An icon representing the keyword Cripple-immune]] [[:Slow_resist#Cripple Immunity|cripple immunity]]</span>.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308491,
+                "revisions": [
+                  {
+                    "parentid": 3907198,
+                    "revid": 3993736,
+                    "timestamp": "2026-02-23T13:58:35Z"
+                  }
+                ],
+                "title": "Template:Data Nasus/Wither"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3993736,
+      "timestamp": "2026-02-23T13:58:35Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "e1a118e27ba74c306b2dee1897d05cd26f9cbd3e8ba343e8c7206edb19cb3fe4",
+    "fetchedAt": "2026-08-16T06:18:31.354Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nasus/Wither",
+    "revisionId": 3993736,
+    "sourceTimestamp": "2026-02-23T13:58:35Z"
+  }
+}

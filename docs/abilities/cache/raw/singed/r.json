@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Singed/Insanity Potion",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Insanity Potion@@icon@@Insanity Potion.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' empowers himself for 25 seconds with <span style=\"white-space:nowrap\">[[File:Ability power icon.svg|15px|link=Ability power]]&nbsp;<span style=\"color:\n#7A6DFF; white-space:normal\">ability power</span></span>, <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span>, <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span>, <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>, <span style=\"white-space:nowrap\">[[File:Health regeneration icon.svg|15px|link=Health regeneration]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">'''bonus''' health regeneration</span></span>, and <span style=\"white-space:nowrap\">[[File:Mana regeneration icon.svg|15px|link=Mana regeneration]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">'''bonus''' mana regeneration</span></span>.@@description2@@During this time, ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Poison Trail\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Poison Trail.png|20xpx|border|link=Singed#Poison Trail|An icon for Singed's ability Poison Trail]]</span> <span style=\"white-space:normal;\">[[Singed#Poison Trail|Poison Trail]]</span></span>'' additionally applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span> for 1 second, which refreshes every 0.<small>25</small> seconds while the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poison]]</span> persists.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Stats:'''</span></dt><dd>25 / 40 / 55 / 70 / 85</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''HP/Mana Regenerated per 0.<small>5</small> Seconds:'''</span></dt><dd>2.<small>5</small> / 4 / 5.<small>5</small> / 7 / 8.<small>5</small></dd><dt><span class=\"template_lc\">'''Total HP/Mana Regenerated over the duration:'''</span></dt><dd>125 / 200 / 275 / 350 / 425</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@100@@cooldown@@100@@targeting@@Auto@@damagetype@@@@spellshield@@@@projectile@@@@notes@@\n* No additional notes.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309545,
+                "revisions": [
+                  {
+                    "parentid": 4004967,
+                    "revid": 4005000,
+                    "timestamp": "2026-04-03T16:01:54Z"
+                  }
+                ],
+                "title": "Template:Data Singed/Insanity Potion"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4005000,
+      "timestamp": "2026-04-03T16:01:54Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "20945d54b70c01c591de616e5b6e790afa2f74cd0b8ac9541e0fec073bb119f7",
+    "fetchedAt": "2026-08-16T06:19:00.109Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Insanity_Potion",
+    "revisionId": 4005000,
+    "sourceTimestamp": "2026-04-03T16:01:54Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Singed/Poison Trail",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Poison Trail@@icon@@Poison Trail.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Toggle:'''</span> '''Singed''' continually creates a toxic cloud in his wake that lingers for 3.<small>25</small> seconds. The cloud inflicts <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poison]]</span> to enemies within.<br><br>''Poison Trail'' is toggled off automatically if '''Singed''' becomes unable to pay its <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">mana</span></span> cost.@@description2@@<span class=\"template_sbc\">'''<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] poison</span>:'''</span> The target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>25</small> seconds over 2 seconds as well as upon being hit if not currently affected. Subsequent inflictions refresh the duration.@@description3@@'''Singed''' earns the kill credit of enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> that are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poisoned]]</span> and would die to the damage of allied minions within the time before the next damage instance.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Tick:'''</span></dt><dd>5 / 7.<small>5</small> / 10 / 12.<small>5</small> / 15 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10.<small>625</small>% AP)</span></dd><dt><span class=\"template_lc\">'''Magic Damage per Second:'''</span></dt><dd>20 / 30 / 40 / 50 / 60 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 42.<small>5</small>% AP)</span></dd><dt><span class=\"template_lc\">'''Minimum Magic Damage:'''</span></dt><dd>40 / 60 / 80 / 100 / 120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 85% AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Individual gas clouds\">180</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@13@@cooldown@@{{{cooldown}}}@@targeting@@Auto@@damagetype@@Magic@@spellshield@@@@projectile@@@@notes@@\n* Toggled abilities do not count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* When ''Poison Trail's'' debuff is applied instead of refreshed, the target is dealt one additional instance of the debuff at the same time as the application. This is done by delaying the actual debuff by 0.<small>1</small> seconds.\n** If the target is already affected by the debuff, its duration is refreshed to the maximum (2 seconds).\n* While active after spawning, a cloud checks for valid targets who remain in or re-enter a cloud every 0.<small>25</small> seconds.\n** Valid targets already afflicted with the poison will have their debuff's duration refreshed every 0.<small>25</small> seconds if applicable.\n* If '''Singed''' has moved fewer than 90 units since spawning the last poison cloud, it will spawn 35 units in front of him. They also only spawn every 1 second in this case. \n** When '''Singed''' is moving faster than that, the poison clouds spawn more frequently and on top of himself.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309549,
+                "revisions": [
+                  {
+                    "parentid": 3949903,
+                    "revid": 4006737,
+                    "timestamp": "2026-04-07T16:37:19Z"
+                  }
+                ],
+                "title": "Template:Data Singed/Poison Trail"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4006737,
+      "timestamp": "2026-04-07T16:37:19Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f50dbe0e7330982cc6f8eacee21ced6ebb74166a24bf1fe6119589f2f5ac1896",
+    "fetchedAt": "2026-08-16T06:19:00.109Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Poison_Trail",
+    "revisionId": 4006737,
+    "sourceTimestamp": "2026-04-07T16:37:19Z"
+  }
+}

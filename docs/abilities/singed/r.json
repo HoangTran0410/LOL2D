@@ -1,0 +1,53 @@
+{
+  "asset": {
+    "key": "spell_singed_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Insanity_Potion.png?dd930",
+    "sha1": "d7938cfe61c9268438b90e4901872176336efbdf"
+  },
+  "champion": "Singed",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_singed_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Insanity_Potion.png?dd930",
+        "sha1": "d7938cfe61c9268438b90e4901872176336efbdf"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "100",
+        "cost": "100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' empowers himself for 25 seconds with <span style=\"white-space:nowrap\">[[File:Ability power icon.svg|15px|link=Ability power]]&nbsp;<span style=\"color:\n#7A6DFF; white-space:normal\">ability power</span></span>, <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span>, <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span>, <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>, <span style=\"white-space:nowrap\">[[File:Health regeneration icon.svg|15px|link=Health regeneration]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">'''bonus''' health regeneration</span></span>, and <span style=\"white-space:nowrap\">[[File:Mana regeneration icon.svg|15px|link=Mana regeneration]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">'''bonus''' mana regeneration</span></span>.",
+          "text": "Active: Singed empowers himself for 25 seconds with &nbsp;ability power, &nbsp;bonus armor, &nbsp;bonus magic resistance, &nbsp;bonus movement speed, &nbsp;bonus health regeneration, and &nbsp;bonus mana regeneration."
+        },
+        "description2": {
+          "raw": "During this time, ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Poison Trail\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Poison Trail.png|20xpx|border|link=Singed#Poison Trail|An icon for Singed's ability Poison Trail]]</span> <span style=\"white-space:normal;\">[[Singed#Poison Trail|Poison Trail]]</span></span>'' additionally applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span> for 1 second, which refreshes every 0.<small>25</small> seconds while the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Poison\">[[File:Poison icon.png|20px|link=Cassiopeia/LoL|An icon representing the keyword Poison]] [[:Cassiopeia/LoL|poison]]</span> persists.",
+          "text": "During this time, Poison Trail additionally applies Grievous Wounds for 1 second, which refreshes every 0.25 seconds while the poison persists."
+        },
+        "icon": "Insanity Potion.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Stats:'''</span></dt><dd>25 / 40 / 55 / 70 / 85</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''HP/Mana Regenerated per 0.<small>5</small> Seconds:'''</span></dt><dd>2.<small>5</small> / 4 / 5.<small>5</small> / 7 / 8.<small>5</small></dd><dt><span class=\"template_lc\">'''Total HP/Mana Regenerated over the duration:'''</span></dt><dd>125 / 200 / 275 / 350 / 425</dd></dl>",
+          "text": "Bonus Stats:25 / 40 / 55 / 70 / 85\nHP/Mana Regenerated per 0.5 Seconds:2.5 / 4 / 5.5 / 7 / 8.5Total HP/Mana Regenerated over the duration:125 / 200 / 275 / 350 / 425"
+        },
+        "name": "Insanity Potion",
+        "notes": {
+          "raw": "* No additional notes.",
+          "text": "No additional notes."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Insanity Potion"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "3e61a870a83df047eb760ec1c2f4ca96723bf646eea556f4ed0ffcd7bed106f3",
+    "fetchedAt": "2026-08-16T06:19:00.109Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Insanity_Potion",
+    "revisionId": 4005000,
+    "sourceTimestamp": "2026-04-03T16:01:54Z"
+  }
+}

@@ -1,8 +1,4 @@
-import {
-  assetManifest,
-  type AssetKey,
-  type AssetKind,
-} from '../generated/assetManifest';
+import { assetManifest, type AssetKey, type AssetKind } from '../generated/assetManifest';
 
 export type { AssetKey, AssetKind } from '../generated/assetManifest';
 
@@ -87,26 +83,29 @@ function drawPlaceholderGraphics(label: string, hue: number): PlaceholderGraphic
 }
 
 function p5Loader(name: 'loadImage' | 'loadJSON'): (url: string) => Promise<unknown> {
-  return url => new Promise((resolve, reject) => {
-    const candidate = (globalThis as unknown as Record<string, unknown>)[name];
-    if (typeof candidate !== 'function') {
-      reject(new Error(`${name} is not available`));
-      return;
-    }
-    const loader = candidate as (
-      path: string,
-      success: (data: unknown) => void,
-      failure: (error: unknown) => void
-    ) => void;
-    loader(url, resolve, error => reject(toError(error)));
-  });
+  return url =>
+    new Promise((resolve, reject) => {
+      const candidate = (globalThis as unknown as Record<string, unknown>)[name];
+      if (typeof candidate !== 'function') {
+        reject(new Error(`${name} is not available`));
+        return;
+      }
+      const loader = candidate as (
+        path: string,
+        success: (data: unknown) => void,
+        failure: (error: unknown) => void
+      ) => void;
+      loader(url, resolve, error => reject(toError(error)));
+    });
 }
 
 function audioLoader(url: string): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const audio = new Audio();
     audio.addEventListener('canplaythrough', () => resolve(audio), { once: true });
-    audio.addEventListener('error', () => reject(new Error(`Failed to load ${url}`)), { once: true });
+    audio.addEventListener('error', () => reject(new Error(`Failed to load ${url}`)), {
+      once: true,
+    });
     audio.src = url;
   });
 }
@@ -220,9 +219,7 @@ export default class AssetManager {
   }
 
   static getRandomChampion(): AssetHandle {
-    const keys = Object.keys(assetManifest).filter(
-      key => key.startsWith('champ_') && !key.startsWith('champ_background_')
-    ) as AssetKey[];
+    const keys = Object.keys(assetManifest).filter(key => key.startsWith('champ_')) as AssetKey[];
     return this.get(keys[Math.floor(Math.random() * keys.length)]);
   }
 }

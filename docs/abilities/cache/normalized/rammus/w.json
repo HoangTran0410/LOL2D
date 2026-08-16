@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_rammus_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Defensive_Ball_Curl.png?be053",
+    "sha1": "84cd59fed76a34187a4679e98ba07bfbcd84d567"
+  },
+  "champion": "Rammus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_rammus_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Defensive_Ball_Curl.png?be053",
+        "sha1": "84cd59fed76a34187a4679e98ba07bfbcd84d567"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "7",
+        "cost": "40",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Rammus''' enters a defensive stance for 7 seconds, gaining <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span> and <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span>. While active, enemies that use a basic attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> against '''Rammus''' are dealt <span style=\"color:\n#00B0F0; white-space:normal\">15</span> <span style=\"color:yellow; white-space:normal\">(+ 10% '''total''' armor)</span> <span style=\"color:\n#00FFFF; white-space:normal\">(+ 10% '''total''' magic resistance)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>.",
+          "text": "Active: Rammus enters a defensive stance for 7 seconds, gaining &nbsp;bonus armor and &nbsp;bonus magic resistance. While active, enemies that use a basic attack on-hit against Rammus are dealt 15 (+ 10% total armor) (+ 10% total magic resistance) magic damage."
+        },
+        "description2": {
+          "raw": "''Defensive Ball Curl'' can be recast after 1 second within the duration, and does so automatically upon casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Rammus\" data-ability=\"Powerball\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Rammus Powerball.png|20xpx|border|link=Rammus#Powerball|An icon for Rammus's ability Powerball]]</span> <span style=\"white-space:normal;\">[[Rammus#Powerball|Powerball]]</span></span>'' or ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Rammus\" data-ability=\"Soaring Slam\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Rammus Soaring Slam.png|20xpx|border|link=Rammus#Soaring Slam|An icon for Rammus's ability Soaring Slam]]</span> <span style=\"white-space:normal;\">[[Rammus#Soaring Slam|Soaring Slam]]</span></span>''.",
+          "text": "Defensive Ball Curl can be recast after 1 second within the duration, and does so automatically upon casting Powerball or Soaring Slam."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Recast:'''</span> '''Rammus''' ends ''Defensive Ball Curl''.",
+          "text": "Recast: Rammus ends Defensive Ball Curl."
+        },
+        "icon": "Defensive Ball Curl.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Armor:'''</span></dt><dd>27 / 32 / 37 / 42 / 47 <span style=\"color:yellow; white-space:normal\">(+ 30 / 37.<small>5</small> / 45 / 52.<small>5</small> / 60% '''total''' armor)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Resistance:'''</span></dt><dd>20 / 25 / 30 / 35 / 40 <span style=\"color:\n#00FFFF; white-space:normal\">(+ 30 / 37.<small>5</small> / 45 / 52.<small>5</small> / 60% '''total''' magic resistance)</span></dd></dl>",
+          "text": "Bonus Armor:27 / 32 / 37 / 42 / 47 (+ 30 / 37.5 / 45 / 52.5 / 60% total armor)\nBonus Magic Resistance:20 / 25 / 30 / 35 / 40 (+ 30 / 37.5 / 45 / 52.5 / 60% total magic resistance)"
+        },
+        "name": "Defensive Ball Curl",
+        "notes": {
+          "raw": "*The initial cast counts as an ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n**Deactivating the ability manually does not.\n* ''Defensive Ball Curl'' ends immediately if <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Rammus\" data-ability=\"Powerball\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Rammus Powerball.png|20xpx|border|link=Rammus#Powerball|An icon for Rammus's ability Powerball]]</span> <span style=\"white-space:normal;\">[[Rammus#Powerball|Powerball]]</span></span> is cast.\n* ''Defensive Ball Curl'' will return damage from attacks and/or abilities that apply [[on-hit effect]]s (<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ezreal\" data-ability=\"Mystic Shot\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ezreal Mystic Shot.png|20xpx|border|link=Ezreal#Mystic Shot|An icon for Ezreal's ability Mystic Shot]]</span> <span style=\"white-space:normal;\">[[Ezreal#Mystic Shot|Mystic Shot]]</span></span>) as well as from <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Runaan&#39;s Hurricane\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Runaan's Hurricane item.png|20xpx|border|link=Runaan's Hurricane|An icon for the item Runaan's Hurricane]]</span> <span style=\"white-space:normal;\">[[Runaan's Hurricane|Runaan's Hurricane's]]</span></span> [[Named item effect#Wind's Fury|Wind's Fury]] (will not return damage from [[turret]]s, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Heimerdinger\" data-ability=\"H-28G Evolution Turret\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Heimerdinger H-28G Evolution Turret.png|20xpx|border|link=Heimerdinger#H-28G Evolution Turret|An icon for Heimerdinger's ability H-28G Evolution Turret]]</span> <span style=\"white-space:normal;\">[[Heimerdinger#H-28G Evolution Turret|H-28G Evolution Turret]]</span></span>, or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Shaco\" data-ability=\"Jack in the Box\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Shaco Jack in the Box.png|20xpx|border|link=Shaco#Jack in the Box|An icon for Shaco's ability Jack in the Box]]</span> <span style=\"white-space:normal;\">[[Shaco#Jack in the Box|Jack in the Box]]</span></span>).\n* The resistance scaling will factor from all sources, including ''Defensive Ball Curl's'' flat bonus. This will recalculate over the duration.",
+          "text": "The initial cast counts as an ability activation for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\n*Deactivating the ability manually does not.\nDefensive Ball Curl ends immediately if Powerball is cast.\nDefensive Ball Curl will return damage from attacks and/or abilities that apply on-hit effects ( Mystic Shot) as well as from Runaan's Hurricane's Wind's Fury (will not return damage from turrets, H-28G Evolution Turret, or Jack in the Box).\nThe resistance scaling will factor from all sources, including Defensive Ball Curl's flat bonus. This will recalculate over the duration."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Defensive Ball Curl"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "920cf0ab4678fbb7c3960fd38e61c38ce87e083b8e9f317005eb2c2aa2e84a18",
+    "fetchedAt": "2026-08-16T06:19:09.913Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Rammus/Defensive_Ball_Curl",
+    "revisionId": 3982827,
+    "sourceTimestamp": "2026-01-10T01:22:52Z"
+  }
+}

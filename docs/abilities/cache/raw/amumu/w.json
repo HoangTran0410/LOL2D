@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Amumu/Despair",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Despair@@icon@@Despair.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Toggle:'''</span> '''Amumu''' cries a continuous pool of tears, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds to nearby enemies.@@description2@@''Despair'' is toggled off automatically if '''Amumu''' becomes unable to pay its <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">mana</span></span> cost.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>5 <span style=\"color:\n#21B053; white-space:normal\">(+ 0.<small>5</small> / 0.<small>625</small> / 0.<small>75</small> / 0.<small>875</small> / 1% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 0.<small>25</small>% per 100 AP)</span> of target's '''maximum''' health)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 350@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@8@@cooldown@@{{{cooldown}}}@@targeting@@Auto@@damagetype@@Magic@@spellshield@@False@@projectile@@{{{projectile}}}@@notes@@\n* Toggle abilities do not count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* Despite the rounding in ''Despair's'' tooltip, it will deal increased damage for every point of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"+0.0025% per 1 AP\">ability power</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306442,
+                "revisions": [
+                  {
+                    "parentid": 3906514,
+                    "revid": 4006735,
+                    "timestamp": "2026-04-07T16:34:08Z"
+                  }
+                ],
+                "title": "Template:Data Amumu/Despair"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4006735,
+      "timestamp": "2026-04-07T16:34:08Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "ceab0a7180e6ed3ab5bad20ec86b02b591472504f31239c86c7bd6819530adb8",
+    "fetchedAt": "2026-08-16T06:18:35.945Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Amumu/Despair",
+    "revisionId": 4006735,
+    "sourceTimestamp": "2026-04-07T16:34:08Z"
+  }
+}

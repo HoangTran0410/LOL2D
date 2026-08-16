@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_singed_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Fling.png?1de00",
+    "sha1": "6aadb1d72f12c4f4198f566a6553703076960e76"
+  },
+  "champion": "Singed",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_singed_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Fling.png?1de00",
+        "sha1": "6aadb1d72f12c4f4198f566a6553703076960e76"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "10 / 9.5 / 9 / 8.5 / 8",
+        "cost": "60 / 70 / 80 / 90 / 100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|flings]]</span> the target enemy 550 units over himself over <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.666 seconds, but rounded up to the next game tick.\">0.<small>693</small> seconds</span>, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. The damage based on the target's health ratio is capped at 300 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Active: Singed flings the target enemy 550 units over himself over 0.693 seconds, dealing magic damage. The damage based on the target's health ratio is capped at 300 against minions and monsters."
+        },
+        "description2": {
+          "raw": "If the target lands on ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Mega Adhesive\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Mega Adhesive.png|20xpx|border|link=Singed#Mega Adhesive|An icon for Singed's ability Mega Adhesive]]</span> <span style=\"white-space:normal;\">[[Singed#Mega Adhesive|Mega Adhesive's]]</span></span>'' area of effect after the displacement, they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span> for a duration.",
+          "text": "If the target lands on Mega Adhesive's area of effect after the displacement, they are rooted for a duration."
+        },
+        "icon": "Fling.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 60 / 70 / 80 / 90 <span style=\"color:\n#21B053; white-space:normal\">(+ 6 / 6.<small>5</small> / 7 / 7.<small>5</small> / 8% of target's '''maximum''' health)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>",
+          "text": "Magic Damage:50 / 60 / 70 / 80 / 90 (+ 6 / 6.5 / 7 / 7.5 / 8% of target's maximum health) (+ 55% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Root Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "name": "Fling",
+        "notes": {
+          "raw": "* During ''Fling'' cast time (the windup not during the actual fling) the enemy's flash is already locked, making it a non reactable spell.\n* ''Fling'' can throw enemies over walls (circumstances permitting).\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow-immune\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|Slow-immune]]</span> enemies will not be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span> when ''flung'' into <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Mega Adhesive\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Mega Adhesive.png|20xpx|border|link=Singed#Mega Adhesive|An icon for Singed's ability Mega Adhesive]]</span> <span style=\"white-space:normal;\">[[Singed#Mega Adhesive|Mega Adhesive]]</span></span>.\n* ''Fling'' is special cased to not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|fling]]</span> <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Warwick\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Warwick OriginalSquare.png|20xpx|border|link=Warwick|An icon representing Warwick]]</span> <span style=\"white-space:normal;\">[[Warwick]]</span></span> while '''Singed''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Suppression\">[[File:Suppression icon.png|20px|link=Types of Crowd Control#Suppression|An icon representing the keyword Suppression]] [[:Types of Crowd Control#Suppression|suppressed]]</span> by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Warwick\" data-ability=\"Infinite Duress\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Warwick Infinite Duress.png|20xpx|border|link=Warwick#Infinite Duress|An icon for Warwick's ability Infinite Duress]]</span> <span style=\"white-space:normal;\">[[Warwick#Infinite Duress|Infinite Duress]]</span></span> after the cast time.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "During Fling cast time (the windup not during the actual fling) the enemy's flash is already locked, making it a non reactable spell.\nFling can throw enemies over walls (circumstances permitting).\nSlow-immune enemies will not be rooted when flung into Mega Adhesive.\nFling is special cased to not fling Warwick while Singed is suppressed by Infinite Duress after the cast time.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Fling"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "96ae1080cafe9820e0e3876cd4b006e64c30296bf8628406c7cf62ea83b7702d",
+    "fetchedAt": "2026-08-16T06:19:00.109Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Fling",
+    "revisionId": 4026605,
+    "sourceTimestamp": "2026-06-10T02:27:22Z"
+  }
+}

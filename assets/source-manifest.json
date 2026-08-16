@@ -194,6 +194,30 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_OriginalSquare.png?cc8c7"
     },
     {
+      "contentHash": "2ea70d9c8bd1c8b1fa9868750f6c68a6eff562bd74495aac803eea824136e606",
+      "fetchedAt": "2026-08-16T06:19:05.066Z",
+      "localAssetKey": "spell_alistar_e",
+      "localPath": "assets/images/spells/alistar_e.png",
+      "revisionId": 4038209,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Trample.png?2dc6f"
+    },
+    {
+      "contentHash": "c0c3334f1748507111389c9a1fb7de8e5fc568b250b57fc54edab0e40e90da3b",
+      "fetchedAt": "2026-08-16T06:19:05.066Z",
+      "localAssetKey": "spell_alistar_q",
+      "localPath": "assets/images/spells/alistar_q.png",
+      "revisionId": 4007562,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Pulverize.png?82123"
+    },
+    {
+      "contentHash": "34c511f54d66f9337dcbd14024dda1c5a1c527c56b6ee9a210e9158b09e6c348",
+      "fetchedAt": "2026-08-16T06:19:05.066Z",
+      "localAssetKey": "spell_alistar_r",
+      "localPath": "assets/images/spells/alistar_r.png",
+      "revisionId": 3956937,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Unbreakable_Will.png?f9bce"
+    },
+    {
       "contentHash": "df9fdcf7b0ea44c6443a64f554fe2d480e7178ace3677354b7e41d0143a4da02",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_alistar_w",
@@ -202,12 +226,36 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Headbutt.png?54c2d"
     },
     {
+      "contentHash": "2c2a6642587fcd8b1991a7ce8b84c8483bfa4100a27f4d9da895edb82c125e59",
+      "fetchedAt": "2026-08-16T06:18:35.945Z",
+      "localAssetKey": "spell_amumu_e",
+      "localPath": "assets/images/spells/amumu_e.png",
+      "revisionId": 3996197,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Tantrum.png?7cb6b"
+    },
+    {
       "contentHash": "81b1088ba9c094ac86e63e67513c9af7328b10e8e33523b59d2bc1ae3a0afca9",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_amumu_q",
       "localPath": "assets/images/spells/amumu_q.png",
       "revisionId": 4007564,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Bandage_Toss.png?73ee9"
+    },
+    {
+      "contentHash": "b53d5158faf91b0ee5e50813da2547bd4ae393d496a8f0c2ac72193b1c624c46",
+      "fetchedAt": "2026-08-16T06:18:35.945Z",
+      "localAssetKey": "spell_amumu_r",
+      "localPath": "assets/images/spells/amumu_r.png",
+      "revisionId": 3953818,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Curse_of_the_Sad_Mummy.png?d2979"
+    },
+    {
+      "contentHash": "46e8fbb577e57667a7f9f5e765abb2dd85d2733a6206f8454c9b8b21e6a701ca",
+      "fetchedAt": "2026-08-16T06:18:35.945Z",
+      "localAssetKey": "spell_amumu_w",
+      "localPath": "assets/images/spells/amumu_w.png",
+      "revisionId": 4006735,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Despair.png?ab7b0"
     },
     {
       "contentHash": "6ce81c5ffd8d07d4760da9c46eb07d95280fb8d831b8d53d044dd9eb8bef68ab",
@@ -426,12 +474,36 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Tormented_Shadow.png?27aaa"
     },
     {
+      "contentHash": "21df4e5e50109f78ab4657e924aca4b2ad6e53c079691e6c061f1ab5e9efd095",
+      "fetchedAt": "2026-08-16T06:18:31.354Z",
+      "localAssetKey": "spell_nasus_e",
+      "localPath": "assets/images/spells/nasus_e.png",
+      "revisionId": 4035787,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Spirit_Fire.png?d0f15"
+    },
+    {
       "contentHash": "87f4c1db87f75daddd89d8592c119c6b8dd85a55d63c43dd8205716a93fd262c",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_nasus_q",
       "localPath": "assets/images/spells/nasus_q.png",
       "revisionId": 4051347,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Siphoning_Strike.png?6a6bb"
+    },
+    {
+      "contentHash": "f5fd82d5efedb74095de574607090c981cf32b72e9b7446a89824ce2b2e5bb9a",
+      "fetchedAt": "2026-08-16T06:18:31.354Z",
+      "localAssetKey": "spell_nasus_r",
+      "localPath": "assets/images/spells/nasus_r.png",
+      "revisionId": 4007699,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Fury_of_the_Sands.png?7a113"
+    },
+    {
+      "contentHash": "421584da3f7420ba5c08e3a9a67e26f7b04d7d3c9a5de3f4b36178445c9bf92f",
+      "fetchedAt": "2026-08-16T06:18:31.354Z",
+      "localAssetKey": "spell_nasus_w",
+      "localPath": "assets/images/spells/nasus_w.png",
+      "revisionId": 3993736,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Wither.png?604e3"
     },
     {
       "contentHash": "8d675f45ca2b23074ab9d5b18cf39351c6fd55340d0c17bb1c18022203d094fa",
@@ -450,12 +522,60 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Comet_Spear.png?dfd15"
     },
     {
+      "contentHash": "efcf1105459f7fb76803a9a87bedfe457e569b7c467712a89531885075fb98e9",
+      "fetchedAt": "2026-08-16T06:19:09.913Z",
+      "localAssetKey": "spell_rammus_e",
+      "localPath": "assets/images/spells/rammus_e.png",
+      "revisionId": 3910038,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Frenzying_Taunt.png?da9b7"
+    },
+    {
       "contentHash": "7cae0507507908894768d78af979d532817ecb01c2d7b925e09f3a9fc4b92c28",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "spell_rammus_q",
       "localPath": "assets/images/spells/rammus_q.png",
       "revisionId": 3988570,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Powerball.png?0fd14"
+    },
+    {
+      "contentHash": "c76ecc560248f351a2f1a974bd81ef4207c459480fcf6670702c4a44f454880a",
+      "fetchedAt": "2026-08-16T06:19:09.913Z",
+      "localAssetKey": "spell_rammus_r",
+      "localPath": "assets/images/spells/rammus_r.png",
+      "revisionId": 4008005,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Soaring_Slam.png?12e92"
+    },
+    {
+      "contentHash": "7a8ec5629d457a9ee3d82855cab17b17ba8ba24ee10ec103535855c9339f6e3e",
+      "fetchedAt": "2026-08-16T06:19:09.913Z",
+      "localAssetKey": "spell_rammus_w",
+      "localPath": "assets/images/spells/rammus_w.png",
+      "revisionId": 3982827,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Defensive_Ball_Curl.png?be053"
+    },
+    {
+      "contentHash": "a0efcc7a62762d512facbaa07a9e8ee7b69b41cf07b6028342e75ad3b12bbb2e",
+      "fetchedAt": "2026-08-16T06:19:00.109Z",
+      "localAssetKey": "spell_singed_e",
+      "localPath": "assets/images/spells/singed_e.png",
+      "revisionId": 4026605,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Fling.png?1de00"
+    },
+    {
+      "contentHash": "360e49cbcbb049e6d7a01d2d3ee25ff85a71500b618fc7ff04bce2013273c0f5",
+      "fetchedAt": "2026-08-16T06:19:00.109Z",
+      "localAssetKey": "spell_singed_q",
+      "localPath": "assets/images/spells/singed_q.png",
+      "revisionId": 4006737,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Poison_Trail.png?e7701"
+    },
+    {
+      "contentHash": "a080fbd58274eb25009b23e57e577cadf3b97f440efdff6fc88c9a52da96aced",
+      "fetchedAt": "2026-08-16T06:19:00.109Z",
+      "localAssetKey": "spell_singed_r",
+      "localPath": "assets/images/spells/singed_r.png",
+      "revisionId": 4005000,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Insanity_Potion.png?dd930"
     },
     {
       "contentHash": "18b8be81ba86312160d727eef3927712ece9ea20cc6ff16477102a92c522ed07",
@@ -506,12 +626,36 @@
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
     },
     {
+      "contentHash": "b06c549ae84d17bc25a7ca4663f954122aabe9f55094a1f255e488a99969190d",
+      "fetchedAt": "2026-08-16T06:18:55.180Z",
+      "localAssetKey": "spell_twitch_e",
+      "localPath": "assets/images/spells/twitch_e.png",
+      "revisionId": 3907215,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Contaminate.png?960a8"
+    },
+    {
       "contentHash": "09b910060f0b9388f1c60b330bbbd9905c24485fdc2500485dd753ee9701476e",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_twitch_q",
       "localPath": "assets/images/spells/twitch_q.png",
       "revisionId": 3982645,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Ambush.png?f924b"
+    },
+    {
+      "contentHash": "96c0388c698d65d93939966f14b0a9e859d10120505d4eb07e80649dfa794dca",
+      "fetchedAt": "2026-08-16T06:18:55.180Z",
+      "localAssetKey": "spell_twitch_r",
+      "localPath": "assets/images/spells/twitch_r.png",
+      "revisionId": 3993607,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Spray_and_Pray.png?10b61"
+    },
+    {
+      "contentHash": "33e342c45979c57370b09cb8c0cdb286deafc3f01de2a73d31aa87bf3c921385",
+      "fetchedAt": "2026-08-16T06:18:55.180Z",
+      "localAssetKey": "spell_twitch_w",
+      "localPath": "assets/images/spells/twitch_w.png",
+      "revisionId": 4012250,
+      "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Venom_Cask.png?ad8a1"
     },
     {
       "contentHash": "31cea3a7a80aed2016ddd07c6f0ec4fc8530ae6baff684ef55b3141a216d7335",

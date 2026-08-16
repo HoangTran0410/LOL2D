@@ -1,0 +1,55 @@
+{
+  "asset": {
+    "key": "spell_amumu_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Despair.png?ab7b0",
+    "sha1": "3c74866d11676022c69ba931f3e61a1d221ec14c"
+  },
+  "champion": "Amumu",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_amumu_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Despair.png?ab7b0",
+        "sha1": "3c74866d11676022c69ba931f3e61a1d221ec14c"
+      },
+      "fields": {
+        "casttime": "none",
+        "cost": "8",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Toggle:'''</span> '''Amumu''' cries a continuous pool of tears, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds to nearby enemies.",
+          "text": "Toggle: Amumu cries a continuous pool of tears, dealing magic damage every 0.5 seconds to nearby enemies."
+        },
+        "description2": {
+          "raw": "''Despair'' is toggled off automatically if '''Amumu''' becomes unable to pay its <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">mana</span></span> cost.",
+          "text": "Despair is toggled off automatically if Amumu becomes unable to pay its &nbsp;mana cost."
+        },
+        "effectradius": "350",
+        "icon": "Despair.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>5 <span style=\"color:\n#21B053; white-space:normal\">(+ 0.<small>5</small> / 0.<small>625</small> / 0.<small>75</small> / 0.<small>875</small> / 1% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 0.<small>25</small>% per 100 AP)</span> of target's '''maximum''' health)</span></dd></dl>",
+          "text": "Magic Damage Per Tick:5 (+ 0.5 / 0.625 / 0.75 / 0.875 / 1% (+ 0.25% per 100 AP) of target's maximum health)"
+        },
+        "name": "Despair",
+        "notes": {
+          "raw": "* Toggle abilities do not count as ability activations for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* Despite the rounding in ''Despair's'' tooltip, it will deal increased damage for every point of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"+0.0025% per 1 AP\">ability power</span>.",
+          "text": "Toggle abilities do not count as ability activations for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\nDespite the rounding in Despair's tooltip, it will deal increased damage for every point of ability power."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Despair"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "ba3f0508d3b0a6688d51e83f1757ac2430de0b4f1f6bc9907fae7d717b76a991",
+    "fetchedAt": "2026-08-16T06:18:35.945Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Amumu/Despair",
+    "revisionId": 4006735,
+    "sourceTimestamp": "2026-04-07T16:34:08Z"
+  }
+}

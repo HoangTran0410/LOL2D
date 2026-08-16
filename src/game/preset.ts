@@ -68,7 +68,6 @@ export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetK
 export const SpellGroups: {
   name: string;
   image: AssetKey | null;
-  background: AssetKey | null;
   spells: SpellClass[];
 }[] = [
   // First, and a shelf of its own rather than a line on the summoner spell
@@ -80,42 +79,37 @@ export const SpellGroups: {
   {
     name: 'Đánh Thường',
     image: 'spell_basic_attack',
-    background: null,
+
     spells: [AllSpells.BasicAttack],
   },
   {
     name: 'Yasuo',
     image: 'champ_yasuo',
-    background: 'champ_background_yasuo',
+
     spells: [AllSpells.Yasuo_Q, AllSpells.Yasuo_W, AllSpells.Yasuo_E, AllSpells.Yasuo_R],
   },
   {
     name: 'Shaco',
     image: 'champ_shaco',
-    background: 'champ_background_shaco',
+
     spells: [AllSpells.Shaco_Q, AllSpells.Shaco_W, AllSpells.Shaco_E, AllSpells.Shaco_R],
   },
   {
     name: 'Ahri',
     image: 'champ_ahri',
-    background: 'champ_background_ahri',
+
     spells: [AllSpells.Ahri_Q, AllSpells.Ahri_W, AllSpells.Ahri_E, AllSpells.Ahri_R],
   },
   {
     name: 'Lee Sin',
     image: 'champ_leesin',
-    background: 'champ_background_leesin',
-    spells: [
-      AllSpells.LeeSin_Q,
-      AllSpells.LeeSin_W,
-      AllSpells.LeeSin_E,
-      AllSpells.LeeSin_R,
-    ],
+
+    spells: [AllSpells.LeeSin_Q, AllSpells.LeeSin_W, AllSpells.LeeSin_E, AllSpells.LeeSin_R],
   },
   {
     name: 'Blitzcrank',
     image: 'champ_blitzcrank',
-    background: 'champ_background_blitzcrank',
+
     spells: [
       AllSpells.Blitzcrank_Q,
       AllSpells.Blitzcrank_W,
@@ -126,178 +120,168 @@ export const SpellGroups: {
   {
     name: 'Lux',
     image: 'champ_lux',
-    background: 'champ_background_lux',
+
     spells: [AllSpells.Lux_Q, AllSpells.Lux_W, AllSpells.Lux_E, AllSpells.Lux_R],
   },
   {
     name: 'Ashe',
     image: 'champ_ashe',
-    background: 'champ_background_ashe',
+
     spells: [AllSpells.Ashe_Q, AllSpells.Ashe_W, AllSpells.Ashe_E, AllSpells.Ashe_R],
   },
   {
     name: "Cho'Gath",
     image: 'champ_chogath',
-    background: 'champ_background_chogath',
-    spells: [
-      AllSpells.ChoGath_Q,
-      AllSpells.ChoGath_W,
-      AllSpells.ChoGath_E,
-      AllSpells.ChoGath_R,
-    ],
+
+    spells: [AllSpells.ChoGath_Q, AllSpells.ChoGath_W, AllSpells.ChoGath_E, AllSpells.ChoGath_R],
   },
   {
     name: 'Leblanc',
     image: 'champ_leblanc',
-    background: 'champ_background_leblanc',
-    spells: [
-      AllSpells.Leblanc_Q,
-      AllSpells.Leblanc_W,
-      AllSpells.Leblanc_E,
-      AllSpells.Leblanc_R,
-    ],
+
+    spells: [AllSpells.Leblanc_Q, AllSpells.Leblanc_W, AllSpells.Leblanc_E, AllSpells.Leblanc_R],
   },
   {
     name: 'Malphite',
     image: 'champ_malphite',
-    background: 'champ_background_malphite',
-    spells: [AllSpells.Malphite_Q, AllSpells.Malphite_W, AllSpells.Malphite_E, AllSpells.Malphite_R],
+
+    spells: [
+      AllSpells.Malphite_Q,
+      AllSpells.Malphite_W,
+      AllSpells.Malphite_E,
+      AllSpells.Malphite_R,
+    ],
   },
   {
     name: 'Olaf',
     image: 'champ_olaf',
-    background: 'champ_background_olaf',
+
     spells: [AllSpells.Olaf_Q],
   },
   {
     name: 'Teemo',
     image: 'champ_teemo',
-    background: 'champ_background_teemo',
+
     spells: [AllSpells.Teemo_Q, AllSpells.Teemo_W, AllSpells.Teemo_E, AllSpells.Teemo_R],
   },
   {
     name: 'Veigar',
     image: 'champ_veigar',
-    background: 'champ_background_veigar',
+
     spells: [AllSpells.Veigar_Q, AllSpells.Veigar_W, AllSpells.Veigar_E, AllSpells.Veigar_R],
   },
   {
     name: 'Zed',
     image: 'champ_zed',
-    background: 'champ_background_zed',
+
     spells: [AllSpells.Zed_Q, AllSpells.Zed_W, AllSpells.Zed_E, AllSpells.Zed_R],
   },
   {
     name: 'Graves',
     image: 'champ_graves',
-    background: 'champ_background_graves',
+
     spells: [AllSpells.Graves_W],
   },
   {
     name: 'Anivia',
     image: 'champ_anivia',
-    background: null,
+
     spells: [AllSpells.Anivia_Q, AllSpells.Anivia_W, AllSpells.Anivia_E, AllSpells.Anivia_R],
   },
   {
     name: 'Varus',
     image: 'champ_varus',
-    background: null,
+
     spells: [AllSpells.Varus_Q],
   },
   {
     name: 'Pantheon',
     image: 'champ_pantheon',
-    background: null,
+
     spells: [AllSpells.Pantheon_Q],
   },
   {
     name: 'Thresh',
     image: 'champ_thresh',
-    background: null,
+
     spells: [AllSpells.Thresh_Q],
   },
   {
     name: 'Rammus',
     image: 'champ_rammus',
-    background: null,
-    spells: [AllSpells.Rammus_Q],
+
+    spells: [AllSpells.Rammus_Q, AllSpells.Rammus_W, AllSpells.Rammus_E, AllSpells.Rammus_R],
   },
   {
     name: 'Morgana',
     image: 'champ_morgana',
-    background: null,
-    spells: [
-      AllSpells.Morgana_Q,
-      AllSpells.Morgana_W,
-      AllSpells.Morgana_E,
-      AllSpells.Morgana_R,
-    ],
+
+    spells: [AllSpells.Morgana_Q, AllSpells.Morgana_W, AllSpells.Morgana_E, AllSpells.Morgana_R],
   },
   {
     name: 'Janna',
     image: 'champ_janna',
-    background: null,
+
     spells: [AllSpells.Janna_Q, AllSpells.Janna_W, AllSpells.Janna_E, AllSpells.Janna_R],
   },
   {
     name: 'Alistar',
     image: 'champ_alistar',
-    background: null,
-    spells: [AllSpells.Alistar_W],
+
+    spells: [AllSpells.Alistar_Q, AllSpells.Alistar_W, AllSpells.Alistar_E, AllSpells.Alistar_R],
   },
   {
     name: 'Nocturne',
     image: 'champ_nocturne',
-    background: null,
+
     spells: [AllSpells.Nocturne_R],
   },
   {
     name: 'Twitch',
     image: 'champ_twitch',
-    background: null,
-    spells: [AllSpells.Twitch_Q],
+
+    spells: [AllSpells.Twitch_Q, AllSpells.Twitch_W, AllSpells.Twitch_E, AllSpells.Twitch_R],
   },
   {
     name: 'Amumu',
     image: 'champ_amumu',
-    background: null,
-    spells: [AllSpells.Amumu_Q],
+
+    spells: [AllSpells.Amumu_Q, AllSpells.Amumu_W, AllSpells.Amumu_E, AllSpells.Amumu_R],
   },
   {
     name: 'Warwick',
     image: 'champ_warwick',
-    background: null,
+
     spells: [AllSpells.Warwick_Q],
   },
   {
     name: 'Singed',
     image: 'champ_singed',
-    background: null,
-    spells: [AllSpells.Singed_W],
+
+    spells: [AllSpells.Singed_Q, AllSpells.Singed_W, AllSpells.Singed_E, AllSpells.Singed_R],
   },
   {
     name: 'Cassiopeia',
     image: 'champ_cassiopeia',
-    background: null,
+
     spells: [AllSpells.Cassiopeia_W],
   },
   {
     name: 'Fizz',
     image: 'champ_fizz',
-    background: null,
+
     spells: [AllSpells.Fizz_E],
   },
   {
     name: 'Nasus',
     image: 'champ_nasus',
-    background: null,
-    spells: [AllSpells.Nasus_Q],
+
+    spells: [AllSpells.Nasus_Q, AllSpells.Nasus_W, AllSpells.Nasus_E, AllSpells.Nasus_R],
   },
   {
     name: 'Phép Bổ Trợ',
     image: null,
-    background: null,
+
     spells: [
       AllSpells.Flash,
       AllSpells.Ghost,
@@ -357,7 +341,10 @@ export interface SpellDisplay {
  * getters `Spell.ts` uses for the real cast path (`reducedCooldown`), so a
  * number shown here is provably the number the engine will actually use.
  */
-export const getSpellDisplay = (SpellClass: SpellClass, matchRules: MatchRules = NO_MATCH_RULES): SpellDisplay => {
+export const getSpellDisplay = (
+  SpellClass: SpellClass,
+  matchRules: MatchRules = NO_MATCH_RULES
+): SpellDisplay => {
   try {
     const instance = new SpellClass({ game: { matchRules } });
     const handle = instance.image as { url?: string } | null | undefined;
@@ -369,11 +356,15 @@ export const getSpellDisplay = (SpellClass: SpellClass, matchRules: MatchRules =
       manaCost: typeof instance.manaCost === 'number' ? instance.manaCost : 0,
       effectiveCoolDownMs:
         typeof instance.effectiveCoolDownMs === 'number' ? instance.effectiveCoolDownMs : 0,
-      effectiveManaCost: typeof instance.effectiveManaCost === 'number' ? instance.effectiveManaCost : 0,
+      effectiveManaCost:
+        typeof instance.effectiveManaCost === 'number' ? instance.effectiveManaCost : 0,
     };
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(`preset.ts: a spell failed to construct for display (${SpellClass?.name ?? '?'})`, error);
+    console.error(
+      `preset.ts: a spell failed to construct for display (${SpellClass?.name ?? '?'})`,
+      error
+    );
     return {
       iconUrl: null,
       name: SpellClass?.name ?? '?',
@@ -395,7 +386,6 @@ export interface SelectableChampion {
   /** Matches `ChampionLoadout.championName` and a `SpellGroups[i].name`. */
   name: string;
   avatar: AssetKey;
-  background: AssetKey | null;
   /**
    * Carries `spellClass` alongside its `display`, not just the display data:
    * `getSpellDisplay` builds a fresh object on every call, so two calls for
@@ -423,7 +413,6 @@ export const listSelectableChampions = (): SelectableChampion[] => {
     champions.push({
       name: group.name,
       avatar: group.image,
-      background: group.background,
       spells: (group.spells as SpellClass[]).map(spellClass => ({
         spellClass,
         display: getSpellDisplay(spellClass),
@@ -468,7 +457,11 @@ const SUMMONER_SPELLS: { id: string; spellClass: SpellClass }[] = [
  * to depend on a p5 global could be before p5 has finished booting.
  */
 export const listSummonerSpells = (): SummonerSpellOption[] =>
-  SUMMONER_SPELLS.map(({ id, spellClass }) => ({ id, spellClass, display: getSpellDisplay(spellClass) }));
+  SUMMONER_SPELLS.map(({ id, spellClass }) => ({
+    id,
+    spellClass,
+    display: getSpellDisplay(spellClass),
+  }));
 
 const findSummoner = (id: string): SpellClass =>
   SUMMONER_SPELLS.find(option => option.id === id)?.spellClass ?? AllSpells.Flash;
@@ -604,10 +597,7 @@ export const getChampionPresetFromLoadout = (
   loadout: ChampionLoadout
 ): ChampionPresetData & { avatar: AssetKey } => {
   if (loadout.mode === 'custom') {
-    const slots = Array.from(
-      { length: SLOT_COUNT },
-      (_, i) => loadout.customSlots[i] ?? 'random'
-    );
+    const slots = Array.from({ length: SLOT_COUNT }, (_, i) => loadout.customSlots[i] ?? 'random');
     return {
       name: 'Tự Ghép Chiêu',
       avatar: randomAvatar(),

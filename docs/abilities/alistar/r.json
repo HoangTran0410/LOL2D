@@ -1,0 +1,49 @@
+{
+  "asset": {
+    "key": "spell_alistar_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Unbreakable_Will.png?f9bce",
+    "sha1": "7a21367a1c3ebb69fcfd1f1dd3bc155181815eb3"
+  },
+  "champion": "Alistar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_alistar_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Unbreakable_Will.png?f9bce",
+        "sha1": "7a21367a1c3ebb69fcfd1f1dd3bc155181815eb3"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Alistar''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span> himself of all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Crowd control\">[[File:Stun icon.png|20px|link=Crowd control|An icon representing the keyword Crowd control]] [[:Crowd control|crowd control]]</span>. For the next 7 seconds, he reduces incoming damage taken.",
+          "text": "Active: Alistar cleanses himself of all crowd control. For the next 7 seconds, he reduces incoming damage taken."
+        },
+        "icon": "Unbreakable Will.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Damage Reduction:'''</span></dt><dd>55 / 60 / 65 / 70 / 75%</dd></dl>",
+          "text": "Damage Reduction:55 / 60 / 65 / 70 / 75%"
+        },
+        "name": "Unbreakable Will",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True damage\">[[File:Hybrid penetration.png|20px|link=True damage|An icon representing the keyword True damage]] [[:True damage|True damage]]</span> cannot be reduced by any means and will deal full damage to '''Alistar''' during ''Unbreakable Will''.\n* ''Unbreakable Will's'' modifier to incoming damage stacks additively with <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vladimir\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vladimir OriginalSquare.png|20xpx|border|link=Vladimir|An icon representing Vladimir]]</span> <span style=\"white-space:normal;\">[[Vladimir|Vladimir's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vladimir\" data-ability=\"Hemoplague\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vladimir Hemoplague.png|20xpx|border|link=Vladimir#Hemoplague|An icon for Vladimir's ability Hemoplague]]</span> <span style=\"white-space:normal;\">[[Vladimir#Hemoplague|Hemoplague]]</span></span></span> for a total reduction of 45/55/65%.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>",
+          "text": "True damage cannot be reduced by any means and will deal full damage to Alistar during Unbreakable Will.\nUnbreakable Will's modifier to incoming damage stacks additively with Vladimir's Hemoplague for a total reduction of 45/55/65%.(unexpected)"
+        },
+        "targeting": "Auto"
+      },
+      "name": "Unbreakable Will"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "94f13a14eb6c26785caee7d05af28d8424e83074c9119182c8e3d42a11777cb3",
+    "fetchedAt": "2026-08-16T06:19:05.066Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Alistar/Unbreakable_Will",
+    "revisionId": 3956937,
+    "sourceTimestamp": "2025-10-03T15:26:22Z"
+  }
+}

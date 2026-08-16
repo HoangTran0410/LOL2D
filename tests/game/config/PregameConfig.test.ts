@@ -51,7 +51,7 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
       customSlots: Array(SLOT_COUNT).fill('random'),
     });
     expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(5);
-    expect(DEFAULT_PREGAME_CONFIG.ai.autoMove).toBe(false);
+    expect(DEFAULT_PREGAME_CONFIG.ai.autoMove).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoAttack).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoCast).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.rules).toEqual({ cooldownReductionPercent: 0, manaFree: false });
@@ -125,7 +125,15 @@ describe('sanitizeChampionLoadout', () => {
     const result = sanitizeChampionLoadout({
       customSlots: ['Yasuo_Q', 42, null, undefined, {}, [], 'Lux_R', 'extra-ignored'],
     });
-    expect(result.customSlots).toEqual(['Yasuo_Q', 'random', 'random', 'random', 'random', 'random', 'Lux_R']);
+    expect(result.customSlots).toEqual([
+      'Yasuo_Q',
+      'random',
+      'random',
+      'random',
+      'random',
+      'random',
+      'Lux_R',
+    ]);
   });
 
   it('falls back per-field for wrong-typed championName/summoners', () => {
@@ -228,9 +236,9 @@ describe('sanitizePregameConfig', () => {
   });
 
   it('always produces exactly AI_COUNT_MAX bot slots, padding or truncating a mismatched ai.bots array', () => {
-    expect(sanitizePregameConfig({ ai: { bots: [{ championName: 'Ahri' }] } }).ai.bots).toHaveLength(
-      AI_COUNT_MAX
-    );
+    expect(
+      sanitizePregameConfig({ ai: { bots: [{ championName: 'Ahri' }] } }).ai.bots
+    ).toHaveLength(AI_COUNT_MAX);
     expect(
       sanitizePregameConfig({
         ai: { bots: Array.from({ length: AI_COUNT_MAX + 4 }, () => ({ championName: 'Ahri' })) },
@@ -265,13 +273,15 @@ describe('sanitizePregameConfig', () => {
 
 describe('toMatchRules', () => {
   it('turns a percentage into a multiplier', () => {
-    expect(toMatchRules({ cooldownReductionPercent: 0, manaFree: false }).cooldownMultiplier).toBe(1);
+    expect(toMatchRules({ cooldownReductionPercent: 0, manaFree: false }).cooldownMultiplier).toBe(
+      1
+    );
     expect(toMatchRules({ cooldownReductionPercent: 50, manaFree: false }).cooldownMultiplier).toBe(
       0.5
     );
-    expect(toMatchRules({ cooldownReductionPercent: 90, manaFree: false }).cooldownMultiplier).toBeCloseTo(
-      0.1
-    );
+    expect(
+      toMatchRules({ cooldownReductionPercent: 90, manaFree: false }).cooldownMultiplier
+    ).toBeCloseTo(0.1);
   });
 
   it('passes manaFree through unchanged', () => {
@@ -393,9 +403,9 @@ describe('loadPregameConfig / savePregameConfig', () => {
     expect(loaded.player.mode).toBe('champion');
     expect(loaded.player.customSlots).toEqual(Array(SLOT_COUNT).fill('random'));
     expect(loaded.ai.bots).toHaveLength(AI_COUNT_MAX);
-    expect(loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')).toBe(
-      true
-    );
+    expect(
+      loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')
+    ).toBe(true);
   });
 });
 
@@ -409,7 +419,7 @@ describe('ai.botBehaviours', () => {
   it('defaults to one entry per slot carrying AIChampion’s own defaults', () => {
     expect(DEFAULT_PREGAME_CONFIG.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
     for (const behaviour of DEFAULT_PREGAME_CONFIG.ai.botBehaviours) {
-      expect(behaviour).toEqual({ autoMove: false, autoAttack: true, autoCast: true });
+      expect(behaviour).toEqual({ autoMove: true, autoAttack: true, autoCast: true });
     }
   });
 

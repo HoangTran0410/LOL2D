@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_nasus_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Spirit_Fire.png?d0f15",
+    "sha1": "ffea8720e34fcf509ab59a5e28ae27b8fcdf2937"
+  },
+  "champion": "Nasus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nasus_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Spirit_Fire.png?d0f15",
+        "sha1": "ffea8720e34fcf509ab59a5e28ae27b8fcdf2937"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "12",
+        "cost": "60 / 70 / 80 / 90 / 100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nasus''' unleashes a spirit fire at the target location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"centered at the location\">area</span> for <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2.<small>5</small> seconds</span> and, after a <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.25 seconds, but rounded up to the next game tick.\">0.<small>264</small> seconds</span> delay, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies within.",
+          "text": "Active: Nasus unleashes a spirit fire at the target location, granting sight of the area for 2.5 seconds and, after a 0.264 seconds delay, dealing magic damage to enemies within."
+        },
+        "description2": {
+          "raw": "The fire then remains for 5 seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> each second to enemies within and inflicting them with <span style=\"white-space:nowrap\">[[File:Armor penetration icon.svg|15px|link=Armor penetration]]&nbsp;<span style=\"color:yellow; white-space:normal\">armor reduction</span></span>, lingering for 1 second.",
+          "text": "The fire then remains for 5 seconds, dealing magic damage each second to enemies within and inflicting them with &nbsp;armor reduction, lingering for 1 second."
+        },
+        "effectradius": "400 • 200",
+        "icon": "Spirit Fire.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 80 / 110 / 140 / 170 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Magic Damage:50 / 80 / 110 / 140 / 170 (+ 60% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>10 / 16 / 22 / 28 / 34 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 12% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>100 / 160 / 220 / 280 / 340 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Armor Reduction:'''</span></dt><dd><span style=\"color:yellow; white-space:normal\">30 / 35 / 40 / 45 / 50% of target's armor</span></dd></dl>",
+          "text": "Magic Damage Per Tick:10 / 16 / 22 / 28 / 34 (+ 12% AP)Total Magic Damage:100 / 160 / 220 / 280 / 340 (+ 120% AP)\nArmor Reduction:30 / 35 / 40 / 45 / 50% of target's armor"
+        },
+        "name": "Spirit Fire",
+        "notes": {
+          "raw": "* No additional details.",
+          "text": "No additional details."
+        },
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Spirit Fire"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "86a47224d653373c016eec9808de820ec91853d6e4803eaebe7dd94eee8163ef",
+    "fetchedAt": "2026-08-16T06:18:31.354Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nasus/Spirit_Fire",
+    "revisionId": 4035787,
+    "sourceTimestamp": "2026-06-26T00:36:47Z"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_alistar_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Pulverize.png?82123",
+    "sha1": "08a32f8b0ce0baed3d11fd987c1d98176b6925d6"
+  },
+  "champion": "Alistar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_alistar_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Pulverize.png?82123",
+        "sha1": "08a32f8b0ce0baed3d11fd987c1d98176b6925d6"
+      },
+      "fields": {
+        "casttime": "0.25 • 0.15",
+        "cooldown": "14 / 13 / 12 / 11 / 10",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Alistar''' smashes the ground beneath him, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking them up]]</span> simultaneously for 1 second.",
+          "text": "Active: Alistar smashes the ground beneath him, dealing magic damage to nearby enemies and stunning and knocking them up simultaneously for 1 second."
+        },
+        "effectradius": "375",
+        "icon": "Pulverize.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>60 / 100 / 140 / 180 / 220 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:60 / 100 / 140 / 180 / 220 (+ 80% AP)"
+        },
+        "name": "Pulverize",
+        "notes": {
+          "raw": "* ''Pulverize'' can be buffered during <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Alistar\" data-ability=\"Headbutt\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Alistar Headbutt.png|20xpx|border|link=Alistar#Headbutt|An icon for Alistar's ability Headbutt]]</span> <span style=\"white-space:normal;\">[[Alistar#Headbutt|Headbutt]]</span></span> to cast with reduced cast time when the dash ends.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immunity]]</span> will also resist the application of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span>.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "Pulverize can be buffered during Headbutt to cast with reduced cast time when the dash ends.\nDisplacement immunity will also resist the application of the stun.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Pulverize"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "f5995a3c5dbaea728f80f94943ea4bace2ad2199da76ae762fd99f226ad0c431",
+    "fetchedAt": "2026-08-16T06:19:05.066Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Alistar/Pulverize",
+    "revisionId": 4007562,
+    "sourceTimestamp": "2026-04-12T06:22:14Z"
+  }
+}

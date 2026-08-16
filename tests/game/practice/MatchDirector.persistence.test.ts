@@ -329,7 +329,7 @@ describe('MatchDirector persistence', () => {
 
       director.resetToDefaults();
 
-      expect(loadPregameConfig().ai.autoMove).toBe(false);
+      expect(loadPregameConfig().ai.autoMove).toBe(true);
     });
   });
 

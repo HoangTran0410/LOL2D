@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Rammus/Frenzying Taunt",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Frenzying Taunt@@icon@@Frenzying Taunt.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Rammus''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Taunt\">[[File:Taunt icon.png|20px|link=Taunt|An icon representing the keyword Taunt]] [[:Taunt|taunts]]</span> the target enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monster]]</span> for a duration. Monsters are additionally dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> upon being affected.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Taunt Duration:'''</span></dt><dd>1.<small>2</small> / 1.<small>4</small> / 1.<small>6</small> / 1.<small>8</small> / 2 seconds</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Magic Damage:'''</span></dt><dd>80 / 100 / 120 / 140 / 160 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@50@@cooldown@@12@@targeting@@Unit@@damagetype@@{{{damagetype}}}@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Frenzying Taunt'', despite being usable on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>, does not force them to attack '''Rammus'''. He does not draw aggro since the ability does not deal damage.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1325955,
+                "revisions": [
+                  {
+                    "parentid": 3910036,
+                    "revid": 3910038,
+                    "timestamp": "2025-06-11T22:22:30Z"
+                  }
+                ],
+                "title": "Template:Data Rammus/Frenzying Taunt"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3910038,
+      "timestamp": "2025-06-11T22:22:30Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "3b5a90254872fc47e5d27bebe632a2500407aaa5d48aa2d0d82828bc2346d60f",
+    "fetchedAt": "2026-08-16T06:19:09.913Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Rammus/Frenzying_Taunt",
+    "revisionId": 3910038,
+    "sourceTimestamp": "2025-06-11T22:22:30Z"
+  }
+}

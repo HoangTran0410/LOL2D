@@ -1,7 +1,6 @@
 # League of Legends - 2D (Fan-made)
 
 [![Build](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml/badge.svg)](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml)
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FHoangTran0410%2FLOL2D&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=views&edge_flat=true)](https://hits.seeyoufarm.com)
 
 Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 30+ champions, bot fights, and spells you can swap mid-match.
 
@@ -15,16 +14,18 @@ Play your favourite League of Legends champions right in the browser — a 2D Su
 
 ## Contents
 
-- [Introduction](#introduction)
-- [Controls](#controls)
-- [Getting started](#getting-started)
-- [npm scripts](#npm-scripts)
-- [Project layout](#project-layout)
-- [Architecture](#architecture)
-- [Assets and ability data](#assets-and-ability-data)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [Disclaimer](#disclaimer)
+- [League of Legends - 2D (Fan-made)](#league-of-legends---2d-fan-made)
+  - [Contents](#contents)
+  - [Introduction](#introduction)
+  - [Controls](#controls)
+  - [Getting started](#getting-started)
+  - [npm scripts](#npm-scripts)
+  - [Project layout](#project-layout)
+  - [Architecture](#architecture)
+  - [Assets and ability data](#assets-and-ability-data)
+  - [Testing](#testing)
+  - [Contributing](#contributing)
+  - [Disclaimer](#disclaimer)
 
 ## Introduction
 

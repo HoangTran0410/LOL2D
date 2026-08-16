@@ -8,7 +8,6 @@ import {
 describe('asset manifest generator', () => {
   it.each([
     ['assets/images/champions/janna.png', 'champ_janna'],
-    ['assets/images/champions/background/janna.png', 'champ_background_janna'],
     ['assets/images/spells/janna_q.png', 'spell_janna_q'],
     ['assets/images/buffs/stun.png', 'buff_stun'],
     ['assets/images/monsters/Blue_Sentinel.png', 'monster_Blue_Sentinel'],
@@ -19,10 +18,9 @@ describe('asset manifest generator', () => {
   });
 
   it('rejects duplicate generated keys', () => {
-    expect(() => buildManifestEntries([
-      'assets/images/others/menu-bg.png',
-      'assets/images/others/menu_bg.jpg',
-    ])).toThrow(/duplicate asset key "other_menu_bg"/i);
+    expect(() =>
+      buildManifestEntries(['assets/images/others/menu-bg.png', 'assets/images/others/menu_bg.jpg'])
+    ).toThrow(/duplicate asset key "other_menu_bg"/i);
   });
 
   it('generates static ?url imports for every supported file', () => {

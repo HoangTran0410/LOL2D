@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_twitch_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Venom_Cask.png?ad8a1",
+    "sha1": "fd40327ca33f92ace52b1de3fff27d464ff2f972"
+  },
+  "champion": "Twitch",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_twitch_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Venom_Cask.png?ad8a1",
+        "sha1": "fd40327ca33f92ace52b1de3fff27d464ff2f972"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "13 / 12 / 11 / 10 / 9",
+        "cost": "70",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Twitch''' hurls a cask of corrosive mixture at the target location that breaks upon landing, applying ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'' to enemies in the area and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of it.",
+          "text": "Active: Twitch hurls a cask of corrosive mixture at the target location that breaks upon landing, applying Deadly Venom to enemies in the area and granting sight of it."
+        },
+        "description2": {
+          "raw": "The area then becomes contaminated for 3 seconds, applying a ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'' stack each second to enemies within and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them.",
+          "text": "The area then becomes contaminated for 3 seconds, applying a Deadly Venom stack each second to enemies within and slowing them."
+        },
+        "effectradius": "300",
+        "icon": "Venom Cask.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 6% per 100 AP)</span></dd></dl>",
+          "text": "Slow:30 / 35 / 40 / 45 / 50% (+ 6% per 100 AP)"
+        },
+        "name": "Venom Cask",
+        "notes": {
+          "raw": "* ''Venom Cask'' can apply a maximum of 4 <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span> stacks per enemy per cast.\n* ''Venom Cask's'' missile will fail to fire if '''Twitch''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Suppression\">[[File:Suppression icon.png|20px|link=Types of Crowd Control#Suppression|An icon representing the keyword Suppression]] [[:Types of Crowd Control#Suppression|suppressed]]</span> during the cast time.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>",
+          "text": "Venom Cask can apply a maximum of 4 Deadly Venom stacks per enemy per cast.\nVenom Cask's missile will fail to fire if Twitch is suppressed during the cast time.(unexpected)"
+        },
+        "projectile": true,
+        "speed": "1400",
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Venom Cask"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "3502189f6dbac23c56258728fb84c4a26c29f54a05d775ffb68c1ab0efe59e6c",
+    "fetchedAt": "2026-08-16T06:18:55.180Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Twitch/Venom_Cask",
+    "revisionId": 4012250,
+    "sourceTimestamp": "2026-04-25T15:16:19Z"
+  }
+}

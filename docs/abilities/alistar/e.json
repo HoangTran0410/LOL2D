@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_alistar_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Trample.png?2dc6f",
+    "sha1": "2f8e5a70b225781577472e1b5456a6cadeee492d"
+  },
+  "champion": "Alistar",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_alistar_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Trample.png?2dc6f",
+        "sha1": "2f8e5a70b225781577472e1b5456a6cadeee492d"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12 / 11.5 / 11 / 10.5 / 10",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Alistar''' tramples the ground around him every 0.<small>5</small> seconds over 5 seconds, becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies. Each time this damages at least one enemy champion, he generates a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Trample'' that lasts for the remaining duration, stacking up to 5 times.",
+          "text": "Active: Alistar tramples the ground around him every 0.5 seconds over 5 seconds, becoming ghosted and dealing magic damage to nearby enemies. Each time this damages at least one enemy champion, he generates a stack of Trample that lasts for the remaining duration, stacking up to 5 times."
+        },
+        "description2": {
+          "raw": "At 5 stacks, '''Alistar's''' next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> against a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> within 6 seconds ends ''Trample's'' effects to deal <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"20;\" data-finish=\"275;\" data-top-fill=\"18\" data-bot-values=\"20;35;50;65;80;95;110;125;140;155;170;185;200;215;230;245;260;275;290;305;320;335;350;365;380;395;410;425;440;455;470;485;500;515;530;545;560;575;590;605;620|displayMaxColumn=18\">20 – 275 (based on level)</span> '''bonus''' magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> the target for 1 second.",
+          "text": "At 5 stacks, Alistar's next basic attack on-hit against a champion within 6 seconds ends Trample's effects to deal 20 – 275 (based on level) bonus magic damage and stun the target for 1 second."
+        },
+        "effectradius": "350",
+        "icon": "Trample.png",
+        "icon2": "Alistar Trample Indicator.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>8 / 11 / 14 / 17 / 20 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 7% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>80 / 110 / 140 / 170 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>",
+          "text": "Magic Damage Per Tick:8 / 11 / 14 / 17 / 20 (+ 7% AP)Total Magic Damage:80 / 110 / 140 / 170 / 200 (+ 70% AP)"
+        },
+        "name": "Trample",
+        "notes": {
+          "raw": "* ''Trample'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent area damage\">[[File:Poison Trail.png|20px|link=Damage|An icon representing the keyword Persistent area damage]] [[:Damage|persistent area damage]]</span> damage around '''Alistar''', while the bonus damage on the resulting attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc damage]]</span>.\n* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> and '''bonus''' damage are blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shields]]</span> but the base attack damage is not.\n* The on-hit effect is consumed if the attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>, but not if it is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> or missed while '''Alistar''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>. In all cases, the attack's effects are negated as normal.\n* The bonus damage and stun can be applied by <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Guinsoo&#39;s Rageblade\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Guinsoo's Rageblade item.png|20xpx|border|link=Guinsoo's Rageblade|An icon for the item Guinsoo's Rageblade]]</span> <span style=\"white-space:normal;\">[[Guinsoo's Rageblade|Guinsoo's Rageblade's]]</span></span> Phantom Hit if the triggering attack did not.\n** If the triggering attack does however apply the bonus damage and stun already, then Phantom Hit cannot apply them a subsequent time by triggering on-hit effects, despite ''Trample's'' empowered attack being an on-hit effect.",
+          "text": "Trample deals persistent area damage damage around Alistar, while the bonus damage on the resulting attack is proc damage.\nThe stun and bonus damage are blocked by spell shields but the base attack damage is not.\nThe on-hit effect is consumed if the attack blocked, but not if it is dodged or missed while Alistar is blinded. In all cases, the attack's effects are negated as normal.\nThe bonus damage and stun can be applied by Guinsoo's Rageblade's Phantom Hit if the triggering attack did not.\n* If the triggering attack does however apply the bonus damage and stun already, then Phantom Hit cannot apply them a subsequent time by triggering on-hit effects, despite Trample's empowered attack being an on-hit effect."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Trample"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "b2e61586c72fea26f515b20cabe25eed09f6fd457ba763416dfff44dd840006d",
+    "fetchedAt": "2026-08-16T06:19:05.066Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Alistar/Trample",
+    "revisionId": 4038209,
+    "sourceTimestamp": "2026-06-30T07:16:44Z"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "asset": {
+    "key": "spell_rammus_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Frenzying_Taunt.png?da9b7",
+    "sha1": "df24585f6fec8f780e5aecb7665010e50dc2f71d"
+  },
+  "champion": "Rammus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_rammus_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Frenzying_Taunt.png?da9b7",
+        "sha1": "df24585f6fec8f780e5aecb7665010e50dc2f71d"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "12",
+        "cost": "50",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Rammus''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Taunt\">[[File:Taunt icon.png|20px|link=Taunt|An icon representing the keyword Taunt]] [[:Taunt|taunts]]</span> the target enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monster]]</span> for a duration. Monsters are additionally dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> upon being affected.",
+          "text": "Active: Rammus taunts the target enemy champion or monster for a duration. Monsters are additionally dealt magic damage upon being affected."
+        },
+        "icon": "Frenzying Taunt.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Taunt Duration:'''</span></dt><dd>1.<small>2</small> / 1.<small>4</small> / 1.<small>6</small> / 1.<small>8</small> / 2 seconds</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Magic Damage:'''</span></dt><dd>80 / 100 / 120 / 140 / 160 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>",
+          "text": "Taunt Duration:1.2 / 1.4 / 1.6 / 1.8 / 2 seconds\nMonster Magic Damage:80 / 100 / 120 / 140 / 160 (+ 70% AP)"
+        },
+        "name": "Frenzying Taunt",
+        "notes": {
+          "raw": "* ''Frenzying Taunt'', despite being usable on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>, does not force them to attack '''Rammus'''. He does not draw aggro since the ability does not deal damage.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Frenzying Taunt, despite being usable on monsters, does not force them to attack Rammus. He does not draw aggro since the ability does not deal damage.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Frenzying Taunt"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "428ec610db7d804f19b2602ff28695ef5bdc5de359ba8ddfeb0750dcbdbb433a",
+    "fetchedAt": "2026-08-16T06:19:09.913Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Rammus/Frenzying_Taunt",
+    "revisionId": 3910038,
+    "sourceTimestamp": "2025-06-11T22:22:30Z"
+  }
+}

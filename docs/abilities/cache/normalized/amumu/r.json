@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_amumu_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Curse_of_the_Sad_Mummy.png?d2979",
+    "sha1": "d8aad9bb12ed20e92194422d382e5e03d87822dd"
+  },
+  "champion": "Amumu",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_amumu_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Curse_of_the_Sad_Mummy.png?d2979",
+        "sha1": "d8aad9bb12ed20e92194422d382e5e03d87822dd"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "150 / 137.5 / 125 / 112.5 / 100",
+        "cost": "100 / 125 / 150 / 175 / 200",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Amumu''' entangles nearby enemies in bandages, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> as well as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|knocking them down]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> them for 1.<small>5</small> seconds.",
+          "text": "Active: Amumu entangles nearby enemies in bandages, dealing magic damage as well as knocking them down and stunning them for 1.5 seconds."
+        },
+        "effectradius": "550",
+        "icon": "Curse of the Sad Mummy.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>200 / 250 / 300 / 350 / 400 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:200 / 250 / 300 / 350 / 400 (+ 80% AP)"
+        },
+        "name": "Curse of the Sad Mummy",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "This ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Curse of the Sad Mummy"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "372695249e8261460696223b5e21596cb299ad9d1606bc0cbe3ce21c5df31127",
+    "fetchedAt": "2026-08-16T06:18:35.945Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Amumu/Curse_of_the_Sad_Mummy",
+    "revisionId": 3953818,
+    "sourceTimestamp": "2025-09-15T09:42:57Z"
+  }
+}

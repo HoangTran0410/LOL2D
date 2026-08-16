@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_twitch_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Contaminate.png?960a8",
+    "sha1": "cc91201b4e812ba93b161b4a87e6f49cb015c157"
+  },
+  "champion": "Twitch",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_twitch_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Contaminate.png?960a8",
+        "sha1": "cc91201b4e812ba93b161b4a87e6f49cb015c157"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "12 / 11 / 10 / 9 / 8",
+        "cost": "50 / 60 / 70 / 80 / 90",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Twitch''' sends out a lethal toxin to each nearby enemy afflicted by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'', dealing them <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span>.",
+          "text": "Active: Twitch sends out a lethal toxin to each nearby enemy afflicted by Deadly Venom, dealing them physical damage."
+        },
+        "description2": {
+          "raw": "''Contaminate'' deals additional <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> and <span style=\"color:\n#7A6DFF; white-space:normal\">35% AP</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> for each stack of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span>'' on the target.",
+          "text": "Contaminate deals additional physical damage and 35% AP magic damage for each stack of Deadly Venom on the target."
+        },
+        "description3": {
+          "raw": "''A nearby enemy with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span> is required to cast this ability. The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> to be targeted by this ability.''",
+          "text": "A nearby enemy with Deadly Venom is required to cast this ability. The target does not have to be visible to be targeted by this ability."
+        },
+        "effectradius": "1200",
+        "icon": "Contaminate.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Base Physical Damage:'''</span></dt><dd>20 / 30 / 40 / 50 / 60</dd></dl>",
+          "text": "Base Physical Damage:20 / 30 / 40 / 50 / 60"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage Per Stack:'''</span></dt><dd>15 / 20 / 25 / 30 / 35 <span style=\"color:orange; white-space:normal\">(+ 35% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Minimum Mixed Damage:'''</span></dt><dd>35 / 50 / 65 / 80 / 95 <span style=\"color:orange; white-space:normal\">(+ 35% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 35% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Mixed Damage:'''</span></dt><dd>110 / 150 / 190 / 230 / 270 <span style=\"color:orange; white-space:normal\">(+ 210% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 210% AP)</span></dd></dl>",
+          "text": "Physical Damage Per Stack:15 / 20 / 25 / 30 / 35 (+ 35% bonus AD)Minimum Mixed Damage:35 / 50 / 65 / 80 / 95 (+ 35% bonus AD) (+ 35% AP)Maximum Mixed Damage:110 / 150 / 190 / 230 / 270 (+ 210% bonus AD) (+ 210% AP)"
+        },
+        "name": "Contaminate",
+        "notes": {
+          "raw": "* ''Contaminate'' will deal the additional damage to targets based on the number of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span> stacks they had at the start of the cast time.\n* '''Twitch''' is given a range indicator for ''Contaminate's'' radius upon infecting an enemy champion with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Twitch\" data-ability=\"Deadly Venom\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Twitch Deadly Venom.png|20xpx|border|link=Twitch#Deadly Venom|An icon for Twitch's ability Deadly Venom]]</span> <span style=\"white-space:normal;\">[[Twitch#Deadly Venom|Deadly Venom]]</span></span> (actual range is slightly larger than shown by the indicator).\n* ''Contaminate'' will not deal damage to enemies that are not within range of the ability before the cast time completes.\n** If the target moves out of range after the cast time, they are still dealt the damage.",
+          "text": "Contaminate will deal the additional damage to targets based on the number of Deadly Venom stacks they had at the start of the cast time.\nTwitch is given a range indicator for Contaminate's radius upon infecting an enemy champion with Deadly Venom (actual range is slightly larger than shown by the indicator).\nContaminate will not deal damage to enemies that are not within range of the ability before the cast time completes.\n* If the target moves out of range after the cast time, they are still dealt the damage."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Proximity"
+      },
+      "name": "Contaminate"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "c7a397bab54d0539ab189b0735222f39a46115ecc22f5e67e17ee0a41b16069e",
+    "fetchedAt": "2026-08-16T06:18:55.180Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Twitch/Contaminate",
+    "revisionId": 3907215,
+    "sourceTimestamp": "2025-06-06T20:15:29Z"
+  }
+}

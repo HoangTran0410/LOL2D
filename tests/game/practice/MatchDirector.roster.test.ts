@@ -30,7 +30,7 @@ describe('MatchDirector roster', () => {
 
     const [player, bot] = director.roster();
     expect(player.behaviour).toBeUndefined();
-    expect(bot.behaviour).toEqual({ autoMove: false, autoAttack: true, autoCast: true });
+    expect(bot.behaviour).toEqual({ autoMove: true, autoAttack: true, autoCast: true });
   });
 
   it('lists a new bot at once, before the paused match has ticked', () => {
@@ -179,6 +179,6 @@ describe('MatchDirector roster', () => {
     director.setBotBehaviour(bot, { autoAttack: false, autoCast: false });
 
     const entry = director.roster().find(e => e.unit === bot)!;
-    expect(entry.behaviour).toEqual({ autoMove: false, autoAttack: false, autoCast: false });
+    expect(entry.behaviour).toEqual({ autoMove: true, autoAttack: false, autoCast: false });
   });
 });

@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_amumu_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Tantrum.png?7cb6b",
+    "sha1": "59bbf2250be3e887a6e094a34c5323f2a411e839"
+  },
+  "champion": "Amumu",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_amumu_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Tantrum.png?7cb6b",
+        "sha1": "59bbf2250be3e887a6e094a34c5323f2a411e839"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "9 / 8 / 7 / 6 / 5",
+        "cost": "35",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Amumu''' reduces every instance of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage calculated before modifiers\">pre-mitigation</span> <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> taken, capped at 50% of the damage instance.",
+          "text": "Passive: Amumu reduces every instance of pre-mitigation physical damage taken, capped at 50% of the damage instance."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Amumu''' releases his anger, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.",
+          "text": "Active: Amumu releases his anger, dealing magic damage to nearby enemies."
+        },
+        "description3": {
+          "raw": "''Tantrum's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced by 0.<small>75</small> seconds whenever '''Amumu''' is hit by a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>.",
+          "text": "Tantrum's &nbsp;current cooldown is reduced by 0.75 seconds whenever Amumu is hit by a basic attack on-hit."
+        },
+        "effectradius": "350",
+        "icon": "false",
+        "icon2": "Tantrum.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage Reduction:'''</span></dt><dd>5 / 7 / 9 / 11 / 13 <span style=\"color:yellow; white-space:normal\">(+ 3% '''bonus''' armor)</span> <span style=\"color:\n#00FFFF; white-space:normal\">(+ 3% '''bonus''' magic resistance)</span></dd></dl>",
+          "text": "Physical Damage Reduction:5 / 7 / 9 / 11 / 13 (+ 3% bonus armor) (+ 3% bonus magic resistance)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>65 / 95 / 125 / 155 / 185 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>",
+          "text": "Magic Damage:65 / 95 / 125 / 155 / 185 (+ 50% AP)"
+        },
+        "name": "Tantrum",
+        "notes": {
+          "raw": "* A <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span>'s <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span> and each <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effect are all separate damage instances, and may be reduced each if they deal <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span>.\n* ''Tantrum's'' cooldown reduction will trigger multiple times for effects such as <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Master Yi\" data-ability=\"Double Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Master Yi Double Strike.png|20xpx|border|link=Master Yi#Double Strike|An icon for Master Yi's ability Double Strike]]</span> <span style=\"white-space:normal;\">[[Master Yi#Double Strike|Double Strike]]</span></span> and <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Guinsoo&#39;s Rageblade\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Guinsoo's Rageblade item.png|20xpx|border|link=Guinsoo's Rageblade|An icon for the item Guinsoo's Rageblade]]</span> <span style=\"white-space:normal;\">[[Guinsoo's Rageblade|Guinsoo's Rageblade's]]</span></span> ''Phantom Hit''.\n** The cooldown will be reduced, even if the incoming attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>.\n** The cooldown will not be reduced, if the incoming attack misses due to the enemy being <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "A basic attack's basic damage and each on-hit effect are all separate damage instances, and may be reduced each if they deal physical damage.\nTantrum's cooldown reduction will trigger multiple times for effects such as Double Strike and Guinsoo's Rageblade's Phantom Hit.\n* The cooldown will be reduced, even if the incoming attack is blocked.\n* The cooldown will not be reduced, if the incoming attack misses due to the enemy being blinded.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Tantrum"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "c26c77f90b0bd8839d88d0ae1dbdf6de09381672701ff30e5c25377c2d510c6c",
+    "fetchedAt": "2026-08-16T06:18:35.945Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Amumu/Tantrum",
+    "revisionId": 3996197,
+    "sourceTimestamp": "2026-03-04T03:07:18Z"
+  }
+}

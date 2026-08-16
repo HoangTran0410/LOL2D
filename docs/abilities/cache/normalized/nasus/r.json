@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_nasus_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Fury_of_the_Sands.png?7a113",
+    "sha1": "715aeacc01a9dd63315034de2e3d08ccc02095e3"
+  },
+  "champion": "Nasus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nasus_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Fury_of_the_Sands.png?7a113",
+        "sha1": "715aeacc01a9dd63315034de2e3d08ccc02095e3"
+      },
+      "fields": {
+        "casttime": "0.2",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nasus''' empowers himself for 15 seconds, gaining <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">'''bonus''' health</span></span>, <span style=\"white-space:nowrap\">[[File:Armor icon.svg|15px|link=Armor]]&nbsp;<span style=\"color:yellow; white-space:normal\">'''bonus''' armor</span></span>, <span style=\"white-space:nowrap\">[[File:Magic resistance icon.svg|15px|link=Magic resistance]]&nbsp;<span style=\"color:\n#00FFFF; white-space:normal\">'''bonus''' magic resistance</span></span>, increased [[size]], and <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' attack range</span> for the duration.",
+          "text": "Active: Nasus empowers himself for 15 seconds, gaining &nbsp;bonus health, &nbsp;bonus armor, &nbsp;bonus magic resistance, increased size, and &nbsp;50 bonus attack range for the duration."
+        },
+        "description2": {
+          "raw": "While '''Nasus''' is empowered, he deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds to nearby enemies, capped at 240 per second, and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nasus\" data-ability=\"Siphoning Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nasus Siphoning Strike.png|20xpx|border|link=Nasus#Siphoning Strike|An icon for Nasus's ability Siphoning Strike]]</span> <span style=\"white-space:normal;\">[[Nasus#Siphoning Strike|Siphoning Strike's]]</span></span>'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is halved.",
+          "text": "While Nasus is empowered, he deals magic damage every 0.5 seconds to nearby enemies, capped at 240 per second, and Siphoning Strike's &nbsp;cooldown is halved."
+        },
+        "effectradius": "400&nbsp;+&nbsp;0.8 per 1% bonus size",
+        "icon": "Fury of the Sands.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Health:'''</span></dt><dd>300 / 375 / 450 / 525 / 600</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Resistances:'''</span></dt><dd>40 / 47.<small>5</small> / 55 / 62.<small>5</small> / 70</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Size:'''</span></dt><dd>30 / 32.<small>5</small> / 35 / 37.<small>5</small> / 40%</dd></dl>",
+          "text": "Bonus Health:300 / 375 / 450 / 525 / 600\nBonus Resistances:40 / 47.5 / 55 / 62.5 / 70\nIncreased Size:30 / 32.5 / 35 / 37.5 / 40%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> / 2.<small>5</small>% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 0.<small>5</small>% per 100 AP)</span> of target's '''maximum''' health</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">45 / 52.<small>5</small> / 60 / 67.<small>5</small> / 75% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 15% per 100 AP)</span> of target's '''maximum''' health</span></dd></dl>",
+          "text": "Magic Damage Per Tick:1.5 / 1.75 / 2 / 2.25 / 2.5% (+ 0.5% per 100 AP) of target's maximum healthTotal Magic Damage:45 / 52.5 / 60 / 67.5 / 75% (+ 15% per 100 AP) of target's maximum health"
+        },
+        "name": "Fury of the Sands",
+        "notes": {
+          "raw": "* ''Fury of the Sands' ''bonus health is not affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span> and '''Nasus''' retains it once the duration ends.",
+          "text": "Fury of the Sands' bonus health is not affected by Grievous Wounds and Nasus retains it once the duration ends."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Fury of the Sands"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "b6cdaac801dd50093379c42efadae3fb2d149c994d92095cd416b87345070061",
+    "fetchedAt": "2026-08-16T06:18:31.354Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nasus/Fury_of_the_Sands",
+    "revisionId": 4007699,
+    "sourceTimestamp": "2026-04-12T12:12:24Z"
+  }
+}

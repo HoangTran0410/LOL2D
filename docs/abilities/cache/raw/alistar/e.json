@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Alistar/Trample",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Trample@@icon@@Trample.png@@icon2@@Alistar Trample Indicator.png@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Alistar''' tramples the ground around him every 0.<small>5</small> seconds over 5 seconds, becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> and dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies. Each time this damages at least one enemy champion, he generates a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Trample'' that lasts for the remaining duration, stacking up to 5 times.@@description2@@At 5 stacks, '''Alistar's''' next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> against a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> within 6 seconds ends ''Trample's'' effects to deal <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"20;\" data-finish=\"275;\" data-top-fill=\"18\" data-bot-values=\"20;35;50;65;80;95;110;125;140;155;170;185;200;215;230;245;260;275;290;305;320;335;350;365;380;395;410;425;440;455;470;485;500;515;530;545;560;575;590;605;620|displayMaxColumn=18\">20 – 275 (based on level)</span> '''bonus''' magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> the target for 1 second.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>8 / 11 / 14 / 17 / 20 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 7% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>80 / 110 / 140 / 170 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 350@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@50 / 55 / 60 / 65 / 70@@cooldown@@12 / 11.<small>5</small> / 11 / 10.<small>5</small> / 10@@targeting@@Auto@@damagetype@@Magic@@spellshield@@Special@@projectile@@{{{projectile}}}@@notes@@\n* ''Trample'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent area damage\">[[File:Poison Trail.png|20px|link=Damage|An icon representing the keyword Persistent area damage]] [[:Damage|persistent area damage]]</span> damage around '''Alistar''', while the bonus damage on the resulting attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc damage]]</span>.\n* The <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> and '''bonus''' damage are blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shields]]</span> but the base attack damage is not.\n* The on-hit effect is consumed if the attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>, but not if it is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> or missed while '''Alistar''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>. In all cases, the attack's effects are negated as normal.\n* The bonus damage and stun can be applied by <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Guinsoo&#39;s Rageblade\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Guinsoo's Rageblade item.png|20xpx|border|link=Guinsoo's Rageblade|An icon for the item Guinsoo's Rageblade]]</span> <span style=\"white-space:normal;\">[[Guinsoo's Rageblade|Guinsoo's Rageblade's]]</span></span> Phantom Hit if the triggering attack did not.\n** If the triggering attack does however apply the bonus damage and stun already, then Phantom Hit cannot apply them a subsequent time by triggering on-hit effects, despite ''Trample's'' empowered attack being an on-hit effect.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306279,
+                "revisions": [
+                  {
+                    "parentid": 3985280,
+                    "revid": 4038209,
+                    "timestamp": "2026-06-30T07:16:44Z"
+                  }
+                ],
+                "title": "Template:Data Alistar/Trample"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4038209,
+      "timestamp": "2026-06-30T07:16:44Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "df52e661ba68ca66536f8fe93824b5470495447346c3622178877901bb4cf52d",
+    "fetchedAt": "2026-08-16T06:19:05.066Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Alistar/Trample",
+    "revisionId": 4038209,
+    "sourceTimestamp": "2026-06-30T07:16:44Z"
+  }
+}

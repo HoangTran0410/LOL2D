@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Singed/Fling",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Fling@@icon@@Fling.png@@icon2@@{{{icon2}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Singed''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|flings]]</span> the target enemy 550 units over himself over <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.666 seconds, but rounded up to the next game tick.\">0.<small>693</small> seconds</span>, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. The damage based on the target's health ratio is capped at 300 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description2@@If the target lands on ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Mega Adhesive\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Mega Adhesive.png|20xpx|border|link=Singed#Mega Adhesive|An icon for Singed's ability Mega Adhesive]]</span> <span style=\"white-space:normal;\">[[Singed#Mega Adhesive|Mega Adhesive's]]</span></span>'' area of effect after the displacement, they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span> for a duration.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 60 / 70 / 80 / 90 <span style=\"color:\n#21B053; white-space:normal\">(+ 6 / 6.<small>5</small> / 7 / 7.<small>5</small> / 8% of target's '''maximum''' health)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 55% AP)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@60 / 70 / 80 / 90 / 100@@cooldown@@10 / 9.<small>5</small> / 9 / 8.<small>5</small> / 8@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@@@notes@@\n* During ''Fling'' cast time (the windup not during the actual fling) the enemy's flash is already locked, making it a non reactable spell.\n* ''Fling'' can throw enemies over walls (circumstances permitting).\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow-immune\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|Slow-immune]]</span> enemies will not be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span> when ''flung'' into <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Singed\" data-ability=\"Mega Adhesive\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Singed Mega Adhesive.png|20xpx|border|link=Singed#Mega Adhesive|An icon for Singed's ability Mega Adhesive]]</span> <span style=\"white-space:normal;\">[[Singed#Mega Adhesive|Mega Adhesive]]</span></span>.\n* ''Fling'' is special cased to not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|fling]]</span> <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Warwick\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Warwick OriginalSquare.png|20xpx|border|link=Warwick|An icon representing Warwick]]</span> <span style=\"white-space:normal;\">[[Warwick]]</span></span> while '''Singed''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Suppression\">[[File:Suppression icon.png|20px|link=Types of Crowd Control#Suppression|An icon representing the keyword Suppression]] [[:Types of Crowd Control#Suppression|suppressed]]</span> by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Warwick\" data-ability=\"Infinite Duress\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Warwick Infinite Duress.png|20xpx|border|link=Warwick#Infinite Duress|An icon for Warwick's ability Infinite Duress]]</span> <span style=\"white-space:normal;\">[[Warwick#Infinite Duress|Infinite Duress]]</span></span> after the cast time.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309546,
+                "revisions": [
+                  {
+                    "parentid": 4026604,
+                    "revid": 4026605,
+                    "timestamp": "2026-06-10T02:27:22Z"
+                  }
+                ],
+                "title": "Template:Data Singed/Fling"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4026605,
+      "timestamp": "2026-06-10T02:27:22Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b29ba4928a2cbdbc1a0d8b5c62f0e86471240059c33f884ebc57891ed1d81545",
+    "fetchedAt": "2026-08-16T06:19:00.109Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Singed/Fling",
+    "revisionId": 4026605,
+    "sourceTimestamp": "2026-06-10T02:27:22Z"
+  }
+}
