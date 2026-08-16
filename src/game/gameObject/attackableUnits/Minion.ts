@@ -5,7 +5,11 @@ import { PredefinedFilters } from '../../managers/ObjectManager';
 import MissileSpellObject from '../MissileSpellObject';
 import SpellObject from '../SpellObject';
 import AttackableUnit from './AttackableUnit';
-import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
+import type {
+  AttackableUnitOptions,
+  AttackableUnitRenderOptions,
+  UnitDeathData,
+} from './AttackableUnit';
 import Monster from './Monster';
 
 export type MinionKind = 'melee' | 'ranged';
@@ -463,7 +467,7 @@ export default class Minion extends AttackableUnit {
    * be four dozen of these on screen and each one has to stay a handful of
    * draw calls.
    */
-  draw() {
+  draw({ compactUnits = false }: AttackableUnitRenderOptions = {}) {
     if (this.isDead) return;
 
     const pos = this.position;
@@ -495,7 +499,7 @@ export default class Minion extends AttackableUnit {
     // buffs land on minions like they do on anyone else — a stunned minion with
     // no visual reads as a stuck one. Free when the list is empty, which it
     // usually is
-    this.drawBuffs();
+    this.drawBuffs(compactUnits);
     this.drawHealthBar();
   }
 

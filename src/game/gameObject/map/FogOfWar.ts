@@ -36,12 +36,13 @@ interface SightCacheEntry {
   // buildSegments/obstacleSignature.
   segments: SightSegment[];
   // Fingerprint of the obstacle set `segments` was built from: sorted
-  // obstacle ids, after the "bush I'm standing in" filter, plus the vision
-  // radius that defined the query range (see buildObstacleSignature). A bush
+  // obstacle ids, after the "bush I'm standing in" filter. A bush
   // entering/leaving containment changes which ids survive that filter, so
   // it doesn't need its own field here — it already changes this string.
   obstacleSignature: string;
 }
+
+type SightResult = { object: any; sightPoly: { x: number; y: number }[] };
 
 export default class FogOfWar {
   game: any;
@@ -58,6 +59,11 @@ export default class FogOfWar {
   // (innerR, radius) pair that defines their stops; screen position is applied
   // separately via context translate (see prepareRadialGradient).
   gradientCache: Map<string, CanvasGradient>;
+  lastSightCalculation?: {
+    revision: number;
+    cameraKey: string;
+    result: SightResult[];
+  };
 
   constructor(game: any) {
     this.game = game;
@@ -104,8 +110,18 @@ export default class FogOfWar {
     image(this.overlay, width / 2, height / 2, width, height);
   }
 
-  calculateSight(): { object: any; sightPoly: { x: number; y: number }[] }[] {
+  calculateSight(): SightResult[] {
     const { x, y, w, h } = this.game.camera.getBoundingBox();
+    const revision = this.game.objectManager.revision;
+    const cameraKey = `${x}:${y}:${w}:${h}`;
+    if (
+      typeof revision === 'number' &&
+      this.lastSightCalculation?.revision === revision &&
+      this.lastSightCalculation.cameraKey === cameraKey
+    ) {
+      return this.lastSightCalculation.result;
+    }
+
     const allyObjects = this.game.objectManager.queryObjects({
       queryByDisplayBoundingBox: true,
       filters: [
@@ -122,7 +138,7 @@ export default class FogOfWar {
       ],
     });
 
-    const allSightPoly: { object: any; sightPoly: { x: number; y: number }[] }[] = [];
+    const allSightPoly: SightResult[] = [];
     const visiblePlayers: any[] = [];
 
     allyObjects.forEach((obj: any) => {
@@ -143,6 +159,9 @@ export default class FogOfWar {
     // enable willDraw for all visible players
     visiblePlayers.forEach((p: any) => (p.willDraw = true));
 
+    if (typeof revision === 'number') {
+      this.lastSightCalculation = { revision, cameraKey, result: allSightPoly };
+    }
     return allSightPoly;
   }
 
@@ -214,7 +233,7 @@ export default class FogOfWar {
         !CollideUtils.pointPolygon(obj.position.x, obj.position.y, o.vertices)
     );
 
-    const obstacleSignature = this.buildObstacleSignature(obstaclesInSight, obj.visionRadius);
+    const obstacleSignature = this.buildObstacleSignature(obstaclesInSight);
     const segments =
       entry && entry.obstacleSignature === obstacleSignature
         ? entry.segments
@@ -249,15 +268,17 @@ export default class FogOfWar {
   }
 
   // Cheap fingerprint for "which obstacles are in range right now": sorted
-  // obstacle ids plus the vision radius that defined the query. Obstacle
+  // obstacle ids. The radius is deliberately absent: the range query already
+  // expresses a radius change by returning a different obstacle set, while the
+  // same set always produces the same static segments. Obstacle
   // counts in range are small (a handful of walls/bushes at most), so
   // sorting/joining every frame is far cheaper than the segment break it
   // guards, and a plain string compare is enough to detect any change in the
   // obstacle set — new obstacle entering range, one leaving, or a bush
   // flipping in/out of the containment filter.
-  buildObstacleSignature(obstacles: { id: string }[], visionRadius: number): string {
+  buildObstacleSignature(obstacles: { id: string }[]): string {
     const ids = obstacles.map(o => o.id).sort();
-    return `${visionRadius}|${ids.join(',')}`;
+    return ids.join(',');
   }
 
   drawVisions(): void {

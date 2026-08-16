@@ -162,6 +162,9 @@ const result = await page.evaluate(async () => {
   const { default: ParticleSystem } = await import(
     '/src/game/gameObject/helpers/ParticleSystem.ts'
   );
+  const { default: TrailSystem } = await import(
+    '/src/game/gameObject/helpers/TrailSystem.ts'
+  );
   const timings = {};
   const wrap = (owner, key, label) => {
     const original = owner[key];
@@ -188,6 +191,13 @@ const result = await page.evaluate(async () => {
   wrap(game.terrainMap, 'draw', 'terrain');
   wrap(game.objectManager, 'draw', 'objects');
   wrap(game.fogOfWar, 'draw', 'fog');
+  wrap(game.fogOfWar, 'drawVisions', 'fogDrawVisions');
+  wrap(game.fogOfWar, 'calculateSight', 'fogCalculateSight');
+  wrap(game.fogOfWar, 'calculateSightForObject', 'fogSightForObject');
+  wrap(game.fogOfWar, 'getSightPoly', 'fogGetSightPoly');
+  wrap(game.fogOfWar, 'computeSightPoly', 'fogComputeSightPoly');
+  wrap(game.fogOfWar, 'buildSegments', 'fogBuildSegments');
+  wrap(game.fogOfWar, 'prepareRadialGradient', 'fogPrepareGradient');
   wrap(game.minimap, 'draw', 'minimap');
   wrap(game.touchControls, 'draw', 'touch');
   wrap(AttackableUnit.prototype, 'drawAvatar', 'unitAvatar');
@@ -198,6 +208,7 @@ const result = await page.evaluate(async () => {
   wrap(Champion.prototype, 'drawAttackOrder', 'championAttackOrder');
   wrap(AIChampion.prototype, 'update', 'aiUpdate');
   wrap(ParticleSystem.prototype, 'draw', 'particles');
+  wrap(TrailSystem.prototype, 'draw', 'trails');
 
   const frameTimes = [];
   let previous = performance.now();

@@ -70,17 +70,23 @@ export default class TrailSystem extends GameObject {
     if (this.trails.length === 0) this.toRemove = true;
   }
 
-  draw(): void {
+  draw(compact = false): void {
     if (this.trails.length > 0) {
       push();
       noFill();
       stroke(this.trailColor);
       strokeWeight(this.trailSize);
-      beginShape();
-      for (const trail of this.trails) {
-        vertex(trail.pos.x, trail.pos.y);
+      if (compact && this.trails.length > 1) {
+        const first = this.trails[0].pos;
+        const last = this.trails[this.trails.length - 1].pos;
+        line(first.x, first.y, last.x, last.y);
+      } else {
+        beginShape();
+        for (const trail of this.trails) {
+          vertex(trail.pos.x, trail.pos.y);
+        }
+        endShape();
       }
-      endShape();
       pop();
     }
   }

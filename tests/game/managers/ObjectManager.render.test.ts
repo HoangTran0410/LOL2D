@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Game from '../../../src/game/Game';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
 import ParticleSystem from '../../../src/game/gameObject/helpers/ParticleSystem';
+import TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
+import GameObject from '../../../src/game/gameObject/GameObject';
 import ObjectManager from '../../../src/game/managers/ObjectManager';
 import { Rectangle } from '../../../src/libs/quadtree';
 import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
@@ -62,6 +65,41 @@ describe('ObjectManager mobile rendering', () => {
     expect(drawParticles(false)).toBe(2_000);
   });
 
+  it('halves the particle budget in a crowded zoomed-out mobile fight', () => {
+    let drawn = 0;
+    const mobileCamera = { ...camera, currentScale: 0.3 };
+    const host = { mapSize: 1_000, camera: mobileCamera, touchUi: true } as any;
+    const manager = new ObjectManager(host);
+    host.objectManager = manager;
+    const units = Array.from({ length: 8 }, (_, index) => {
+      const unit = new AttackableUnit({ game: host, position: createVector(20 + index * 8, 50) });
+      unit.draw = vi.fn();
+      return unit;
+    });
+    host.player = units[0];
+    const particles = Array.from({ length: 2 }, () => {
+      const system = new ParticleSystem({
+        isDeadFn: () => false,
+        drawFn: () => drawn++,
+        getParticlePosFn: particle => particle,
+        getParticleSizeFn: () => 4,
+      });
+      system.particles = Array.from({ length: 1_000 }, () => ({ x: 50, y: 50 }));
+      return system;
+    });
+    const effects = Array.from({ length: 31 }, () =>
+      new GameObject({ position: createVector(50, 50) })
+    );
+    manager.objects = [...units, ...particles, ...effects];
+    for (const object of manager.objects) {
+      manager._objectsTree.insert(object.getDisplayBoundingBox());
+    }
+
+    manager.draw();
+
+    expect(drawn).toBe(400);
+  });
+
   it('does not draw an allied body whose vision box alone intersects the camera', () => {
     const game = createGame();
     Object.assign(game.camera, camera);
@@ -99,5 +137,67 @@ describe('ObjectManager mobile rendering', () => {
     manager.draw();
 
     expect(units[0].draw).toHaveBeenCalledWith({ compactUnits: true });
+  });
+
+  it('keeps state-changing buff VFX but skips cosmetic buff VFX in compact mode', () => {
+    const host = { mapSize: 1_000, camera, touchUi: true } as any;
+    const unit = new AttackableUnit({ game: host });
+    const cosmeticDraw = vi.fn();
+    const crowdControlDraw = vi.fn();
+    unit.buffs = [
+      { statusFlagsToEnable: 0, statusFlagsToDisable: 0, draw: cosmeticDraw },
+      { statusFlagsToEnable: 1, statusFlagsToDisable: 0, draw: crowdControlDraw },
+    ] as any;
+
+    unit.drawBuffs(true);
+
+    expect(cosmeticDraw).not.toHaveBeenCalled();
+    expect(crowdControlDraw).toHaveBeenCalledOnce();
+  });
+
+  it('applies compact buff VFX rendering to minions too', () => {
+    const host = { mapSize: 1_000, camera, touchUi: true } as any;
+    const minion = new Minion({
+      game: host,
+      teamId: 'blue',
+      waypoints: [{ x: 0, y: 0 }],
+    });
+    const cosmeticDraw = vi.fn();
+    minion.buffs = [
+      { statusFlagsToEnable: 0, statusFlagsToDisable: 0, draw: cosmeticDraw },
+    ] as any;
+
+    minion.draw({ compactUnits: true } as any);
+
+    expect(cosmeticDraw).not.toHaveBeenCalled();
+  });
+
+  it('reduces crowded mobile trails to one line segment', () => {
+    const draw = stubGameGlobals();
+    const mobileCamera = { ...camera, currentScale: 0.3 };
+    const host = { mapSize: 1_000, camera: mobileCamera, touchUi: true } as any;
+    const manager = new ObjectManager(host);
+    host.objectManager = manager;
+    const units = Array.from({ length: 8 }, (_, index) => {
+      const unit = new AttackableUnit({ game: host, position: createVector(20 + index * 8, 50) });
+      unit.draw = vi.fn();
+      return unit;
+    });
+    host.player = units[0];
+    const trail = new TrailSystem();
+    trail.trails = [
+      { pos: createVector(20, 20), lifeSpan: 100 },
+      { pos: createVector(30, 30), lifeSpan: 100 },
+      { pos: createVector(40, 40), lifeSpan: 100 },
+    ];
+    manager.objects = [...units, trail];
+    for (const object of manager.objects) {
+      manager._objectsTree.insert(object.getDisplayBoundingBox());
+    }
+
+    manager.draw();
+
+    expect(draw.line).toHaveBeenCalledWith(20, 20, 40, 40);
+    expect(draw.beginShape).not.toHaveBeenCalled();
   });
 });

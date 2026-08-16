@@ -2,6 +2,7 @@ import { Circle } from '../../../libs/quadtree';
 import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
+import type { AttackableUnitRenderOptions } from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
 import Champion from './Champion';
 
@@ -246,9 +247,9 @@ export default class Monster extends AttackableUnit {
     this.navigateTo(this.camp.x, this.camp.y);
   }
 
-  draw() {
+  draw(options: AttackableUnitRenderOptions = {}) {
     if (this.isDead) return;
-    super.draw();
+    super.draw(options);
 
     // swing flash
     if (this._attackFlash > 0 && this.targetLock?.position) {

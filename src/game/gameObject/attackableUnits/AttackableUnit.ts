@@ -152,7 +152,7 @@ export default class AttackableUnit extends GameObject {
   draw({ compactUnits = false }: AttackableUnitRenderOptions = {}) {
     this.drawAvatar();
     if (!compactUnits) this.drawDir();
-    this.drawBuffs();
+    this.drawBuffs(compactUnits);
     this.drawHealthBar(compactUnits);
   }
 
@@ -202,8 +202,12 @@ export default class AttackableUnit extends GameObject {
     }
   }
 
-  drawBuffs() {
-    this.buffs.forEach(buff => buff.draw?.());
+  drawBuffs(compact = false) {
+    for (const buff of this.buffs) {
+      if (!compact || (buff.statusFlagsToEnable | buff.statusFlagsToDisable) !== 0) {
+        buff.draw?.();
+      }
+    }
   }
 
   drawHealthBar(_compact = false) {

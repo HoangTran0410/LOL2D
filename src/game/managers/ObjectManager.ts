@@ -44,6 +44,8 @@ const Z_INDEX_MAP = new Map<Function, number>([
 ]);
 const DEFAULT_Z_INDEX = 99;
 export const MOBILE_PARTICLE_DRAW_BUDGET = 800;
+export const MOBILE_CROWDED_PARTICLE_DRAW_BUDGET = 400;
+export const MOBILE_CROWDED_DRAWABLE_COUNT = 40;
 export const MOBILE_COMPACT_UNIT_COUNT = 8;
 export const MOBILE_COMPACT_UNIT_SCALE = 0.45;
 const ATTACKABLE_DRAW_MARGIN_PX = 100;
@@ -170,6 +172,7 @@ export default class ObjectManager {
   _objectsTree!: Quadtree;
   _objectsTreeIsUpdating = false;
   _deadBuffer: number[] = [];
+  revision = 0;
   unitCollision = new UnitCollisionSystem();
   game: ObjectManagerGameContext;
 
@@ -236,6 +239,7 @@ export default class ObjectManager {
       this._objectsTree.insert(o.getDisplayBoundingBox());
     }
     this._objectsTreeIsUpdating = false;
+    this.revision++;
   }
 
   draw(): void {
@@ -269,18 +273,23 @@ export default class ObjectManager {
       if (o instanceof ParticleSystem) particleCount += o.particles.length;
       if (o instanceof AttackableUnit) attackableCount++;
     }
-    const particleScale = this.game.touchUi && particleCount > MOBILE_PARTICLE_DRAW_BUDGET
-      ? MOBILE_PARTICLE_DRAW_BUDGET / particleCount
-      : 1;
     const compactUnits = Boolean(
       this.game.touchUi &&
       (this.game.camera.currentScale ?? Infinity) <= MOBILE_COMPACT_UNIT_SCALE &&
       attackableCount >= MOBILE_COMPACT_UNIT_COUNT
     );
+    const particleBudget = compactUnits && drawables.length > MOBILE_CROWDED_DRAWABLE_COUNT
+      ? MOBILE_CROWDED_PARTICLE_DRAW_BUDGET
+      : MOBILE_PARTICLE_DRAW_BUDGET;
+    const particleScale = this.game.touchUi && particleCount > particleBudget
+      ? particleBudget / particleCount
+      : 1;
 
     for (const { o } of drawables) {
       if (o instanceof ParticleSystem) {
         o.draw(Math.floor(o.particles.length * particleScale));
+      } else if (o instanceof TrailSystem) {
+        o.draw(compactUnits);
       } else if (o instanceof AttackableUnit) {
         o.draw({ compactUnits });
       } else {
