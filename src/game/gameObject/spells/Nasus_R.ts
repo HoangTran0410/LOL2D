@@ -69,19 +69,24 @@ export class Nasus_R_Object extends SpellObject {
   }
 
   draw() {
+    const spin = this.age / 420;
     push();
     translate(this.owner.position.x, this.owner.position.y);
+
+    // A sandstorm reads as sweeping arcs, not as a ring of beads — the ring
+    // is what every other aura in the game already is.
     noFill();
-    stroke(255, 190, 80, 120);
-    strokeWeight(3);
-    circle(0, 0, this.radius * 2);
-    // sand orbiting the giant
-    noStroke();
-    for (let i = 0; i < 14; i++) {
-      const a = (i / 14) * TWO_PI + this.age / 500;
-      fill(240, 200, 120, 150);
-      circle(cos(a) * this.radius * 0.92, sin(a) * this.radius * 0.92, 7);
+    for (let i = 0; i < 3; i++) {
+      const a = spin + (i / 3) * TWO_PI;
+      stroke(255, 190 - i * 20, 80, 170);
+      strokeWeight(11 - i * 2.5);
+      arc(0, 0, this.radius * (1.9 - i * 0.28), this.radius * (1.9 - i * 0.28), a, a + 1.5);
     }
+
+    // heat haze pooling at his feet
+    noStroke();
+    fill(255, 150, 50, 30 + 12 * Math.sin(this.age / 200));
+    circle(0, 0, this.radius * 1.1);
     pop();
   }
 

@@ -18,7 +18,16 @@ import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  withCastTime,
+  type TestGame,
+} from '../spell/fixtures';
+
+/** The cast window this suite drives the runtime through — see `withCastTime`. */
+const TEST_CAST_TIME_MS = 250;
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);
@@ -111,14 +120,17 @@ describe('Veigar R', () => {
     const owner = unit(game, 0, 'blue');
     game.setPlayer(owner);
     const target = unit(game, 100, 'red');
-    const spell = new Veigar_R(owner);
+    // The cast window is the test's, not Veigar's: the ability ships instant
+    // (`CAST_TIME_MS = 0`), and "the target died before the burst left" is a
+    // runtime rule that needs a window to happen in. See `withCastTime`.
+    const spell = new (withCastTime(Veigar_R, TEST_CAST_TIME_MS))(owner);
     const onCancel = vi.spyOn(spell, 'onCancel');
 
     expect(spell.press(castContext(owner, target))).toBe(true);
     expect(owner.stats.mana.value).toBe(200); // committed at release, not start
     target.die({ reviveAfter: 100 });
 
-    vi.stubGlobal('deltaTime', CAST_TIME_MS);
+    vi.stubGlobal('deltaTime', TEST_CAST_TIME_MS);
     spell.update();
 
     expect(onCancel).toHaveBeenCalledWith(expect.anything(), 'TARGET_INVALID');

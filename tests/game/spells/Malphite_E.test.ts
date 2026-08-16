@@ -5,6 +5,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import Malphite_E, {
+  CAST_TIME_MS,
   COOLDOWN_MS,
   DAMAGE,
   FADE_MS,
@@ -87,7 +88,12 @@ describe('Malphite E', () => {
     const spell = new Malphite_E(owner);
 
     expect(spell.press(castContext(owner))).toBe(true);
-    spell.update();
+    // Read off the tuning rather than assuming a cast to finish: at
+    // `CAST_TIME_MS = 0` the press has already released and the cooldown is
+    // running, so the stubbed 250ms frame this used to spend here would eat a
+    // quarter second of it and the assertion below would be about the frame,
+    // not about the cooldown the spell starts.
+    if (CAST_TIME_MS > 0) spell.update();
 
     expect(owner.stats.mana.value).toBe(100 - spell.manaCost);
     expect(spell.state).toBe('COOLDOWN');

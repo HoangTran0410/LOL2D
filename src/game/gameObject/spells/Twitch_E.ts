@@ -37,6 +37,8 @@ export default class Twitch_E extends Spell {
       pop.radius = 70;
       pop.lifeTime = 320;
       pop.color = [150, 230, 90];
+      pop.style = 'shards';
+      pop.spokes = 8;
       this.game.objectManager.addObject(pop);
     }
   }

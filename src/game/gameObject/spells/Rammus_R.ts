@@ -52,9 +52,10 @@ export default class Rammus_R extends Spell {
     const ring = new AoePulse(this.owner);
     ring.position = landing.copy();
     ring.radius = RADIUS;
-    ring.lifeTime = 520;
-    ring.color = [200, 200, 140];
-    ring.rings = 3;
+    ring.lifeTime = 560;
+    ring.color = [205, 200, 135];
+    ring.style = 'crater';
+    ring.spokes = 12;
     this.game.objectManager.addObject(ring);
   }
 

@@ -24,8 +24,12 @@ import {
   createGame,
   createUnit,
   installSpellObjectGlobals,
+  withCastTime,
   type TestGame,
 } from '../spell/fixtures';
+
+/** The cast window this suite drives the runtime through — see `withCastTime`. */
+const TEST_CAST_TIME_MS = 250;
 
 function unit(game: TestGame, x: number, teamId: string, speed = 10): AttackableUnit {
   const result = createUnit(game, x, teamId);
@@ -121,7 +125,12 @@ describe('Malphite Q', () => {
     expect(new Malphite_Q(owner).press(castContext(owner, unseen))).toBe(false);
 
     const target = unit(game, 100, 'red');
-    const spell = new Malphite_Q(owner);
+    // The cast window is the test's, not Malphite's: the ability ships
+    // instant (`CAST_TIME_MS = 0`) and the rule being checked here — a UNIT
+    // spell drops its cast the moment its target stops being a legal one —
+    // belongs to the runtime and must stay covered either way. See
+    // `withCastTime`.
+    const spell = new (withCastTime(Malphite_Q, TEST_CAST_TIME_MS))(owner);
     const onCancel = vi.spyOn(spell, 'onCancel');
     expect(spell.press(castContext(owner, target))).toBe(true);
     target.willDraw = false;

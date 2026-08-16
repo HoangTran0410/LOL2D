@@ -4,14 +4,17 @@ import EventManager from '../../../src/managers/EventManager';
 import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import ObjectManager from '../../../src/game/managers/ObjectManager';
+import type Spell from '../../../src/game/gameObject/Spell';
 
 export class TestVector {
   constructor(public x = 0, public y = 0) {}
   copy() { return new TestVector(this.x, this.y); }
   set(x: number, y: number) { this.x = x; this.y = y; return this; }
   add(value: TestVector) { this.x += value.x; this.y += value.y; return this; }
+  sub(value: TestVector) { this.x -= value.x; this.y -= value.y; return this; }
   mult(value: number) { this.x *= value; this.y *= value; return this; }
   mag() { return Math.hypot(this.x, this.y); }
+  magSq() { return this.x * this.x + this.y * this.y; }
   setMag(value: number) {
     const length = this.mag();
     if (length > 0) this.mult(value / length);
@@ -94,4 +97,31 @@ export function createGame(): TestGame {
 
 export function createUnit(game: TestGame, x = 0, teamId = 'blue'): AttackableUnit {
   return new AttackableUnit({ game, position: createVector(x, 0), teamId });
+}
+
+/**
+ * The same spell, with a cast time the test chooses.
+ *
+ * Several abilities ship with `CAST_TIME_MS = 0` — an instant press is a
+ * deliberate feel choice, and retuning it must not mean editing a test. But
+ * the runtime rules that only exist *while a cast is in flight* — a UNIT
+ * target going invalid mid-cast, a resource committed at release rather than
+ * at start — have no window to happen in at zero, so a test that drives them
+ * through the shipped number stops covering anything the day someone zeroes
+ * it. That is exactly what happened: four suites went red the moment five
+ * spells were made instant, and none of them was actually asserting anything
+ * about Malphite or Veigar. The rule under test belongs to the runtime.
+ *
+ *   const spell = new (withCastTime(Malphite_Q, 250))(owner);
+ */
+export function withCastTime<T extends Spell>(
+  SpellClass: new (owner: AttackableUnit) => T,
+  castTimeMs: number
+): new (owner: AttackableUnit) => T {
+  const Base = SpellClass as unknown as new (owner: AttackableUnit) => Spell;
+  return class extends Base {
+    get castSpec() {
+      return { ...super.castSpec, castTimeMs };
+    }
+  } as unknown as new (owner: AttackableUnit) => T;
 }

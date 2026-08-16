@@ -31,6 +31,7 @@ export class Amumu_W_Object extends SpellObject {
   lifeTime = DURATION;
   age = 0;
   sinceTick = 0;
+  seed = Math.random() * Math.PI * 2;
 
   update() {
     this.position = this.owner.position.copy();
@@ -51,24 +52,28 @@ export class Amumu_W_Object extends SpellObject {
   }
 
   draw() {
-    const pulse = 0.9 + 0.1 * Math.sin(this.age / 180);
     push();
     translate(this.owner.position.x, this.owner.position.y);
+
+    // A wavering blob rather than a circle: grief has no hard edge, and the
+    // wobble is what tells it apart from the disciplined rings around it.
     noStroke();
-    fill(90, 60, 140, 45);
-    circle(0, 0, this.radius * 2 * pulse);
-    noFill();
-    stroke(150, 110, 220, 150);
-    strokeWeight(2);
-    circle(0, 0, this.radius * 2 * pulse);
-    // tears falling inside the aura
-    noStroke();
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * TWO_PI + this.age / 900;
-      const d = this.radius * 0.5;
-      const drop = (this.age / 6 + i * 30) % (this.radius * 0.7);
-      fill(170, 200, 255, 170);
-      ellipse(cos(a) * d, sin(a) * d + drop, 5, 9);
+    fill(90, 60, 140, 50);
+    beginShape();
+    for (let i = 0; i <= 28; i++) {
+      const a = (i / 28) * TWO_PI;
+      const wobble = 1 + 0.08 * Math.sin(a * 3 + this.age / 260) + 0.05 * Math.sin(a * 5 - this.age / 190);
+      vertex(cos(a) * this.radius * wobble, sin(a) * this.radius * wobble);
+    }
+    endShape(CLOSE);
+
+    // tears falling all the way through it, each on its own clock
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * TWO_PI + this.seed;
+      const d = this.radius * (0.25 + 0.5 * ((i * 37) % 10) / 10);
+      const drop = ((this.age / 5) + i * 47) % (this.radius * 1.2) - this.radius * 0.6;
+      fill(170, 200, 255, 200);
+      ellipse(cos(a) * d, sin(a) * d + drop, 5, 10);
     }
     pop();
   }

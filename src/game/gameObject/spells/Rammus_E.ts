@@ -50,6 +50,7 @@ export default class Rammus_E extends Spell {
     ring.radius = 65;
     ring.lifeTime = 450;
     ring.color = [255, 150, 90];
+    ring.rings = 3;
     this.game.objectManager.addObject(ring);
   }
 

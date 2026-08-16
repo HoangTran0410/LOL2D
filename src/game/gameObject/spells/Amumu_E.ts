@@ -26,8 +26,10 @@ export default class Amumu_E extends Spell {
 
     const ring = new AoePulse(this.owner);
     ring.radius = RADIUS;
-    ring.color = [200, 120, 90];
-    ring.rings = 3;
+    ring.color = [210, 110, 70];
+    ring.style = 'shards';
+    ring.spokes = 14;
+    ring.lifeTime = 420;
     this.game.objectManager.addObject(ring);
   }
 

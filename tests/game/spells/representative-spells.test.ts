@@ -25,7 +25,10 @@ import type {
   ActivationPattern,
   CastContext,
 } from '../../../src/game/spell/runtime/types';
-import { createGame, createUnit } from '../spell/fixtures';
+import { createGame, createUnit, withCastTime } from '../spell/fixtures';
+
+/** The cast window this suite drives the runtime through — see `withCastTime`. */
+const TEST_CAST_TIME_MS = 250;
 
 class TestVector {
   constructor(public x = 0, public y = 0) {}
@@ -244,7 +247,10 @@ describe('representative spells through public commands', () => {
     const owner = createUnit(game, 0, 'blue');
     game.setPlayer(owner);
     owner.stats.mana.baseValue = 200;
-    const spell = new Malphite_Q(owner);
+    // Malphite Q ships instant; "commits only when a target releases" is a
+    // runtime rule about the gap between press and release, so this suite
+    // supplies the gap rather than borrowing the ability's tuning.
+    const spell = new (withCastTime(Malphite_Q, TEST_CAST_TIME_MS))(owner);
     expect(spell.press(context(owner))).toBe(false);
     expect(owner.stats.mana.value).toBe(200);
     expect(spell.currentCooldown).toBe(0);
@@ -254,7 +260,7 @@ describe('representative spells through public commands', () => {
     expect(spell.state).toBe('CASTING');
     expect(owner.stats.mana.value).toBe(200);
     expect(spell.currentCooldown).toBe(0);
-    vi.stubGlobal('deltaTime', MALPHITE_CAST_TIME_MS);
+    vi.stubGlobal('deltaTime', TEST_CAST_TIME_MS);
     spell.update();
     expect(owner.stats.mana.value).toBe(200 - spell.manaCost);
     expect(spell.currentCooldown).toBe(spell.coolDown);

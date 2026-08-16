@@ -32,8 +32,10 @@ export default class Alistar_Q extends Spell {
 
     const ring = new AoePulse(this.owner);
     ring.radius = RADIUS;
-    ring.color = [255, 230, 160];
-    ring.rings = 3;
+    ring.color = [255, 225, 150];
+    ring.style = 'columns';
+    ring.spokes = 12;
+    ring.lifeTime = 480;
     this.game.objectManager.addObject(ring);
   }
 
