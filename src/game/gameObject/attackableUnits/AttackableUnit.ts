@@ -19,6 +19,10 @@ export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
   stats?: Stats;
 }
 
+export interface AttackableUnitRenderOptions {
+  compactUnits?: boolean;
+}
+
 export interface UnitDeathData {
   attacker?: AttackableUnit;
   reviveAfter: number;
@@ -145,11 +149,11 @@ export default class AttackableUnit extends GameObject {
   // hook for units colliding with the map edge (old JS: super.onCollideMapEdge?.())
   onCollideMapEdge() {}
 
-  draw() {
+  draw({ compactUnits = false }: AttackableUnitRenderOptions = {}) {
     this.drawAvatar();
-    this.drawDir();
+    if (!compactUnits) this.drawDir();
     this.drawBuffs();
-    this.drawHealthBar();
+    this.drawHealthBar(compactUnits);
   }
 
   drawAvatar() {
@@ -202,7 +206,7 @@ export default class AttackableUnit extends GameObject {
     this.buffs.forEach(buff => buff.draw?.());
   }
 
-  drawHealthBar() {
+  drawHealthBar(_compact = false) {
     push();
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;

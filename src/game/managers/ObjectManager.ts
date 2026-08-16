@@ -17,7 +17,11 @@ export type GameObjectTypeGuard<T extends GameObject> = (object: GameObject) => 
 export interface ObjectManagerGameContext {
   readonly mapSize: number;
   readonly touchUi?: boolean;
-  camera: { getBoundingBox(): Rectangle; constantSize?(pixels: number): number };
+  camera: {
+    getBoundingBox(): Rectangle;
+    constantSize?(pixels: number): number;
+    currentScale?: number;
+  };
 }
 
 interface GameObjectRegion {
@@ -40,6 +44,8 @@ const Z_INDEX_MAP = new Map<Function, number>([
 ]);
 const DEFAULT_Z_INDEX = 99;
 export const MOBILE_PARTICLE_DRAW_BUDGET = 800;
+export const MOBILE_COMPACT_UNIT_COUNT = 8;
+export const MOBILE_COMPACT_UNIT_SCALE = 0.45;
 const ATTACKABLE_DRAW_MARGIN_PX = 100;
 
 /**
@@ -258,16 +264,25 @@ export default class ObjectManager {
       (!(o instanceof AttackableUnit) || o.getCollideBoundingBox().intersect(visualBound))
     );
     let particleCount = 0;
+    let attackableCount = 0;
     for (const { o } of drawables) {
       if (o instanceof ParticleSystem) particleCount += o.particles.length;
+      if (o instanceof AttackableUnit) attackableCount++;
     }
     const particleScale = this.game.touchUi && particleCount > MOBILE_PARTICLE_DRAW_BUDGET
       ? MOBILE_PARTICLE_DRAW_BUDGET / particleCount
       : 1;
+    const compactUnits = Boolean(
+      this.game.touchUi &&
+      (this.game.camera.currentScale ?? Infinity) <= MOBILE_COMPACT_UNIT_SCALE &&
+      attackableCount >= MOBILE_COMPACT_UNIT_COUNT
+    );
 
     for (const { o } of drawables) {
       if (o instanceof ParticleSystem) {
         o.draw(Math.floor(o.particles.length * particleScale));
+      } else if (o instanceof AttackableUnit) {
+        o.draw({ compactUnits });
       } else {
         o.draw?.();
       }

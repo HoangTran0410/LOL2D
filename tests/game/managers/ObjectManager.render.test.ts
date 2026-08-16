@@ -9,6 +9,7 @@ import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
 const camera = {
   getBoundingBox: () => new Rectangle({ x: 0, y: 0, w: 100, h: 100 }),
   constantSize: (pixels: number) => pixels,
+  currentScale: 1,
 };
 
 const drawParticles = (touchUi: boolean): number => {
@@ -76,5 +77,27 @@ describe('ObjectManager mobile rendering', () => {
     game.objectManager.draw();
 
     expect(unit.draw).not.toHaveBeenCalled();
+  });
+
+  it('requests compact unit rendering when a zoomed-out mobile view is crowded', () => {
+    const mobileCamera = { ...camera, currentScale: 0.3 };
+    const host = { mapSize: 1_000, camera: mobileCamera, touchUi: true } as any;
+    const manager = new ObjectManager(host);
+    host.objectManager = manager;
+    const units = Array.from({ length: 8 }, (_, index) => {
+      const unit = new AttackableUnit({
+        game: host,
+        position: createVector(20 + index * 8, 50),
+      });
+      unit.draw = vi.fn();
+      return unit;
+    });
+    host.player = units[0];
+    manager.objects = units;
+    for (const unit of units) manager._objectsTree.insert(unit.getDisplayBoundingBox());
+
+    manager.draw();
+
+    expect(units[0].draw).toHaveBeenCalledWith({ compactUnits: true });
   });
 });

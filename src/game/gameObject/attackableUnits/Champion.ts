@@ -2,7 +2,11 @@ import AssetManager, { type AssetHandle, type AssetKey } from '../../../managers
 import type Spell from '../Spell';
 import BasicAttackController from '../../combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
-import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
+import type {
+  AttackableUnitOptions,
+  AttackableUnitRenderOptions,
+  UnitDeathData,
+} from './AttackableUnit';
 import Airborne from '../buffs/Airborne';
 import Charm from '../buffs/Charm';
 import Dash from '../buffs/Dash';
@@ -134,8 +138,8 @@ export default class Champion extends AttackableUnit {
     this.spells.forEach(spell => spell.update());
   }
 
-  draw() {
-    super.draw();
+  draw(options: AttackableUnitRenderOptions = {}) {
+    super.draw(options);
     this.drawAttackOrder();
     this.spells.forEach(spell => spell.drawVfx());
   }
@@ -202,13 +206,53 @@ export default class Champion extends AttackableUnit {
     spell?.onRemoved?.();
   }
 
-  drawHealthBar() {
+  drawHealthBar(compact = false) {
     let pos = this.position;
     let { displaySize: size, alpha } = this.animatedValues;
     let health = this.stats.health.value;
     let maxHealth = this.stats.maxHealth.value;
     let mana = this.stats.mana.value;
     let maxMana = this.stats.maxMana.value;
+
+    // At minimum mobile zoom a champion body is only ~10–15 screen pixels, but
+    // the normal health frame deliberately stays 125px and also paints score,
+    // ticks, buff icons and status text. Eight of those cost more than the
+    // terrain pass and cover the fight they are meant to explain. The compact
+    // path keeps the three combat signals that still read at that scale.
+    if (compact) {
+      const k = this.game?.camera?.constantSize?.(1) ?? 1;
+      const barWidth = 52 * k;
+      const healthHeight = 6 * k;
+      const manaHeight = 2 * k;
+      const x = pos.x - barWidth / 2;
+      const y = pos.y - size / 2 - 12 * k;
+      const healthRatio = maxHealth > 0 ? constrain(health / maxHealth, 0, 1) : 0;
+      const shieldRatio = maxHealth > 0 ? constrain(this.shieldAmount / maxHealth, 0, 1) : 0;
+
+      push();
+      noStroke();
+      fill(2, 15, 21, alpha);
+      rect(x - k, y - k, barWidth + 2 * k, healthHeight + manaHeight + 3 * k);
+      fill(
+        this.isDead
+          ? [153, 153, 153, alpha]
+          : this.isAllied
+            ? [67, 196, 29, alpha]
+            : [196, 67, 29, alpha]
+      );
+      rect(x, y, barWidth * healthRatio, healthHeight);
+      if (shieldRatio > 0) {
+        const shieldWidth = barWidth * shieldRatio;
+        const shieldX = Math.min(barWidth * healthRatio, barWidth - shieldWidth);
+        fill(225, 230, 238, alpha * 0.85);
+        rect(x + shieldX, y, shieldWidth, healthHeight);
+      }
+      fill(this.isDead ? [153, 153, 153, alpha] : [108, 179, 213, alpha]);
+      const manaRatio = maxMana > 0 ? constrain(mana / maxMana, 0, 1) : 0;
+      rect(x, y + healthHeight + k, barWidth * manaRatio, manaHeight);
+      pop();
+      return;
+    }
 
     push();
     // Overlay, not world: the whole frame — bar, ticks, buff icons and their
