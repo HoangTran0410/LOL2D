@@ -62,6 +62,17 @@ export default class AIChampion extends Champion {
   _autoMove = true;
   _autoCast = true;
   _autoAttack = true;
+  /**
+   * The three reflexes below are *kinds* of auto-move, not siblings of it, so
+   * they are read through `wandersOnReflex()` and never on their own.
+   *
+   * Switching movement off used to leave all three on, and a bot the player had
+   * parked took one hit and set off across the map — a flinch is still a
+   * wander. Gating at the read sites rather than mirroring `_autoMove` into
+   * the fields keeps one writer: `MatchDirector.setBotBehaviour`, the pregame
+   * config and the e2e scripts all set `_autoMove` directly, and turning
+   * movement back on restores exactly the reflexes the bot had.
+   */
   _autoMoveOnTakeDamage = true;
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
@@ -267,9 +278,14 @@ export default class AIChampion extends Champion {
     this.navigateTo(x, y);
   }
 
+  /** Whether a reflex may re-roll this bot's destination. See the flags above. */
+  private wandersOnReflex(reflex: boolean): boolean {
+    return this._autoMove && reflex;
+  }
+
   onCollideMapEdge() {
     super.onCollideMapEdge();
-    if (this._autoMoveOnCollideMapEdge) this.moveToRandomLocation();
+    if (this.wandersOnReflex(this._autoMoveOnCollideMapEdge)) this.moveToRandomLocation();
   }
 
   /**
@@ -282,12 +298,12 @@ export default class AIChampion extends Champion {
   onCollideWall() {
     super.onCollideWall();
     if (this.pathAgent?.repath()) return;
-    if (this._autoMoveOnCollideWall) this.moveToRandomLocation();
+    if (this.wandersOnReflex(this._autoMoveOnCollideWall)) this.moveToRandomLocation();
   }
 
   takeDamage(damage: number, attacker?: AttackableUnit) {
     super.takeDamage(damage, attacker);
-    if (this._autoMoveOnTakeDamage) this.moveToRandomLocation();
+    if (this.wandersOnReflex(this._autoMoveOnTakeDamage)) this.moveToRandomLocation();
 
     // Hit back. super.takeDamage may have killed us, and an order already
     // running is kept: a bot that re-targeted on every incoming hit would drop
