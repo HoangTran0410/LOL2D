@@ -36,8 +36,8 @@ await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.navigation
 });
 await page.waitForTimeout(1_000);
 
-// Clear the battlefield and make the player immortal, the same way
-// bench-pathfinding.mjs does, so a bot or a minion wave cannot end the demo.
+// Clear the battlefield and make the player immortal, so a bot or a minion
+// wave cannot end the demo before the navigation run this script is watching.
 await page.evaluate(() => {
   const game = window.__lol2d.scene.oScene.game;
   const hostile = new Set(['AIChampion', 'Minion']);

@@ -98,7 +98,7 @@ npm run preview   # serve the built output
 | `npm run names:apply` | Rewrite spell names in place from that diff |
 | `npm run e2e` | Drive the real game in Chrome via Playwright and screenshot it |
 | `npm run e2e:pwa` | Build, then verify the PWA boots offline in a real browser |
-| `npm run e2e:hud` / `e2e:attacks` / `e2e:collision` / `e2e:pathfinding` / `e2e:champions` | Narrower Playwright scripts — see `tests/e2e/` for the full list |
+| `npm run e2e:hud` / `e2e:attacks` / `e2e:champions` | Narrower Playwright scripts — see `tests/e2e/` for the full list |
 
 ## Project layout
 
