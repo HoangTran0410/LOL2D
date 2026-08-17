@@ -2,9 +2,10 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
 import { resolve } from 'path';
-import { createRequire } from 'module';
+// @ts-expect-error — a build script, deliberately plain .mjs with no types.
+import { buildVersion } from './scripts/version.mjs';
 
-const { version } = createRequire(import.meta.url)('./package.json') as { version: string };
+const version: string = buildVersion();
 
 export default defineConfig({
   root: '.',
@@ -107,7 +108,11 @@ export default defineConfig({
     __VUE_OPTIONS_API__: true,
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
-    /** Single source of truth for the build's version: package.json. */
+    /**
+     * The commit's own clock — `2026.8.17.15.0`. See `scripts/version.mjs` for
+     * why it is not `package.json`'s version, and why it is computed here
+     * rather than written to a file.
+     */
     __APP_VERSION__: JSON.stringify(version),
   },
   assetsInclude: ['**/*.json'],

@@ -31,6 +31,7 @@
     "e2e:profile": "node tests/e2e/profile-cpu.mjs",
     "e2e:attacks": "node tests/e2e/drive-basic-attacks.mjs",
     "vendor:copy": "node scripts/copy-vendor.mjs",
+    "version:show": "node scripts/version.mjs",
     "e2e:pwa": "npm run build && node tests/e2e/verify-pwa-offline.mjs",
     "e2e:champions": "node tests/e2e/smoke-new-champions.mjs"
   },
