@@ -1,0 +1,15 @@
+# Generated, and compared byte-for-byte. `npm run assets:check` regenerates the
+# manifest and throws if it differs from what is on disk, so a reformat here
+# fails `npm run verify` on the next run. Regenerate it with
+# `npm run assets:generate`, never format it.
+src/generated/
+
+# Copied out of node_modules by scripts/copy-vendor.mjs at predev/prebuild.
+public/vendor/
+dist/
+
+# Imported from the LoL Wiki by scripts/wiki/import-abilities.mjs and validated
+# against a schema by `ability:check`; the importer writes the formatting.
+docs/abilities/
+docs/spell-names-vi.json
+assets/source-manifest.json
