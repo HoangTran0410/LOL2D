@@ -63,11 +63,20 @@ export default class Renekton_R extends Spell {
     rage.name = 'Cuồng Nộ';
     rage.bonuses = {
       maxHealth: { baseBonus: BONUS_HEALTH },
-      health: { baseBonus: BONUS_HEALTH },
       size: { percentBaseBonus: SIZE_BONUS },
       attackRange: { baseBonus: BONUS_ATTACK_RANGE },
     };
     this.owner.addBuff(rage);
+
+    // Granting the health is a heal, not a stat. `health` is a resource that
+    // `takeDamage`/`takeHeal` move directly, so a modifier on it was never an
+    // offset the way `maxHealth` is — and until Stats.update() stopped folding
+    // its own read back into the base, `health: { baseBonus }` re-granted
+    // itself every frame and made this ultimate literal immortality.
+    //
+    // After `addBuff`, so the larger maxHealth is already in place and the heal
+    // is not clipped to the old ceiling.
+    this.owner.takeHeal(BONUS_HEALTH, this.owner);
 
     const aura = new Renekton_R_Object(this.owner);
     // The aura is the buff's shadow: it ends when the transformation does,

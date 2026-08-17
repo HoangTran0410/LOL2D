@@ -8,6 +8,7 @@ import SpellObject from '../SpellObject';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import Slow from '../buffs/Slow';
 import { applyHemorrhage } from './Darius_Q';
+import { drawDariusAxe } from '../../vfx/DariusAxe';
 
 /** How long the empowered swing waits to be spent. */
 export const WINDOW_MS = 4_000;
@@ -112,8 +113,10 @@ export class Darius_W_Buff extends Buff {
   }
 }
 
-/** How far off his body the hooked blade rides while the swing is armed. */
+/** How far off his body the blade rides while the swing is armed. */
 const HOOK_ORBIT = 30;
+/** Hip scale: big enough to read as his axe, small enough not to hide him. */
+const AXE_LENGTH = 52;
 
 /**
  * The armed blade: a hooked Noxian cleaver hanging at his hip, dripping.
@@ -173,31 +176,14 @@ export class Darius_W_Object extends SpellObject {
     push();
     translate(this.owner.position.x, this.owner.position.y);
 
-    // the cleaver, held low and to his right
+    // The axe, carried low and to his right, blade hanging forward and already
+    // wet — the same weapon Q swings and E hooks with, at hip scale. It used to
+    // be a five-vertex blob that shared nothing with either.
     push();
-    translate(HOOK_ORBIT * out, bob);
-    rotate(0.5 + (1 - out) * 1.2);
-    // haft
-    stroke(94, 62, 40);
-    strokeWeight(5);
-    line(-14, 0, 10, 0);
-    // hooked head — the hook is the read: this cut catches and holds
-    noStroke();
-    fill(198, 204, 216);
-    beginShape();
-    vertex(8, -12);
-    vertex(26, -16);
-    vertex(30, 2);
-    vertex(16, 14);
-    vertex(8, 6);
-    endShape(CLOSE);
-    fill(168, 26, 28);
-    beginShape();
-    vertex(12, -8);
-    vertex(23, -10);
-    vertex(24, 0);
-    vertex(15, 7);
-    endShape(CLOSE);
+    translate(HOOK_ORBIT * out - AXE_LENGTH * 0.3, bob);
+    // Nearly nose-down while sheathed, tipping up to ready as it is drawn.
+    rotate(1.15 - out * 0.5);
+    drawDariusAxe(AXE_LENGTH, { alpha: 255 * out, bloodied: true });
     pop();
 
     // blood running off the edge, one drip per seeded slot
@@ -205,7 +191,11 @@ export class Darius_W_Object extends SpellObject {
     for (const drip of this.drips) {
       const fall = ((this.age / 9 + drip.phase * 30) % 40) / 40;
       fill(180, 25, 25, 220 * (1 - fall) * out);
-      circle(HOOK_ORBIT * out + drip.offset, 10 + fall * drip.length + bob, 3.5 * (1 - fall * 0.5));
+      circle(
+        HOOK_ORBIT * out + drip.offset,
+        AXE_LENGTH * 0.42 + fall * drip.length + bob,
+        3.5 * (1 - fall * 0.5)
+      );
     }
     pop();
 

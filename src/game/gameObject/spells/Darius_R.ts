@@ -15,7 +15,7 @@ import Dash from '../buffs/Dash';
 import Fear from '../buffs/Fear';
 import { HEMORRHAGE_MAX_STACKS, hemorrhageStacks } from './Darius_Q';
 
-export const RANGE = 480;
+export const RANGE = 200;
 export const BASE_DAMAGE = 35;
 /** What each stack of Hemorrhage on the victim is worth to the blade. */
 export const DAMAGE_PER_STACK = 5;

@@ -26,6 +26,7 @@
     "e2e:hud": "node tests/e2e/hud-mana.mjs",
     "e2e:collision": "node tests/e2e/bench-collision.mjs",
     "e2e:pathfinding": "node tests/e2e/bench-pathfinding.mjs",
+    "e2e:profile": "node tests/e2e/profile-cpu.mjs",
     "e2e:attacks": "node tests/e2e/drive-basic-attacks.mjs",
     "vendor:copy": "node scripts/copy-vendor.mjs",
     "e2e:pwa": "npm run build && node tests/e2e/verify-pwa-offline.mjs",

@@ -77,6 +77,14 @@ export default class FogOfWar {
     // 900x400 viewport becomes 2700x1200, ten million pixels cleared and
     // composited per frame for a translucent black shape with soft edges that
     // nobody can see the resolution of.
+    // 1 is also the floor, which is not obvious: going *below* screen
+    // resolution is slower, not faster. A CPU profile charges 82% of every
+    // drawImage in the game to the `image()` call at the end of draw(), so a
+    // quarter-area buffer looks like an easy win — but it turns that blit from
+    // a 1:1 copy into a scaled resample of every destination pixel, and a
+    // 422x195 overlay measured 4.61ms per frame against 2.09ms at 844x390.
+    // (Measured under software rasterisation; a GPU-composited canvas may
+    // trade differently, so re-measure on a device before revisiting.)
     this.overlay.pixelDensity(1);
     this.outOfViewColor = '#0007';
 

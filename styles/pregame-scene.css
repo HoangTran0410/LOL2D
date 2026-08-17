@@ -858,8 +858,8 @@
 /* The champion's portrait (or the ability's own icon for single-spell
    groups) beside the group name — see SpellGroups[i].image. */
 .catalog-group-avatar {
-  width: 22px;
-  height: 22px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   object-fit: cover;
   background: var(--hextech-sunken);

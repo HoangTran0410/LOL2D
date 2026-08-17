@@ -10,7 +10,7 @@ import Dash from '../buffs/Dash';
 import StatAmp from '../buffs/StatAmp';
 import { isEnraged } from './Renekton_R';
 
-export const DASH_DISTANCE = 380;
+export const DASH_DISTANCE = 250;
 export const DASH_SPEED = 18;
 export const DAMAGE = 24;
 /** Reign of Anger only pays out on Dice, the recast — the reward for landing Slice. */

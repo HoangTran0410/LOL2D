@@ -410,35 +410,20 @@ const hint = computed(() => {
              below, so "what does this do" is asked the same way wherever the
              icon happens to be. A slot left to chance has nothing to
              describe, hence the `slot.entry &&` guard on both openers. -->
-        <button
-          v-for="slot in slots"
-          :key="slot.index"
-          type="button"
-          class="kit-slot-pill"
-          :class="{ active: activeSlot === slot.index, changed: slot.changed }"
-          :title="slot.title"
+        <button v-for="slot in slots" :key="slot.index" type="button" class="kit-slot-pill"
+          :class="{ active: activeSlot === slot.index, changed: slot.changed }" :title="slot.title"
           @click="selectSlot(slot.index)"
           @mouseenter="!isTouchUi && slot.entry && hoverStart(detailOf(slot.entry), $event)"
-          @mouseleave="!isTouchUi && hoverEnd()"
-          @touchstart="slot.entry && touchStart(detailOf(slot.entry), $event)"
-          @touchmove="touchMove($event)"
-          @touchend="touchEnd()"
-          @touchcancel="closePeek()"
-          @contextmenu.prevent
-        >
+          @mouseleave="!isTouchUi && hoverEnd()" @touchstart="slot.entry && touchStart(detailOf(slot.entry), $event)"
+          @touchmove="touchMove($event)" @touchend="touchEnd()" @touchcancel="closePeek()" @contextmenu.prevent>
           <SpellIcon :display="slot.entry ? slot.entry.display : null" />
           <span class="kit-slot-pill-key">{{ slot.label }}</span>
         </button>
 
         <!-- The eighth control in the slot group, and it belongs there: it
              acts on the selected slot, not on a spell. -->
-        <button
-          type="button"
-          class="kit-slot-pill kit-slot-random"
-          :disabled="activeSlotIsRandom"
-          :title="`Bốc thăm ô ${SLOT_LABELS[activeSlot]} khi vào trận`"
-          @click="randomizeSlot"
-        >
+        <button type="button" class="kit-slot-pill kit-slot-random" :disabled="activeSlotIsRandom"
+          :title="`Bốc thăm ô ${SLOT_LABELS[activeSlot]} khi vào trận`" @click="randomizeSlot">
           <i class="fas fa-random"></i>
         </button>
 
@@ -449,13 +434,8 @@ const hint = computed(() => {
              (`.kit-bar-btn:not(.secondary)`), and a third member would make
              both selectors ambiguous. It borrows the same sizing in CSS
              instead. -->
-        <button
-          type="button"
-          class="hextech-btn secondary saved-kit-save"
-          :class="{ open: naming }"
-          title="Lưu bộ chiêu này để dùng lại ở trận khác"
-          @click="toggleSave"
-        >
+        <button type="button" class="hextech-btn secondary saved-kit-save" :class="{ open: naming }"
+          title="Lưu bộ chiêu này để dùng lại ở trận khác" @click="toggleSave">
           Lưu bộ
         </button>
         <button type="button" class="hextech-btn secondary kit-bar-btn" @click="cancel">Huỷ</button>
@@ -463,33 +443,13 @@ const hint = computed(() => {
       </div>
 
       <div v-if="naming" class="saved-kit-form">
-        <input
-          ref="nameInput"
-          v-model="kitName"
-          type="text"
-          class="saved-kit-input"
-          :maxlength="SAVED_KIT_NAME_MAX"
-          placeholder="Tên bộ chiêu"
-          aria-label="Tên bộ chiêu"
-          @keydown.stop="onNameKey"
-          @keyup.stop
-          @keypress.stop
-          @click="focusName"
-        />
-        <button
-          type="button"
-          class="hextech-btn saved-kit-confirm"
-          :disabled="!kitName.trim()"
-          @click="commitSave"
-        >
+        <input ref="nameInput" v-model="kitName" type="text" class="saved-kit-input" :maxlength="SAVED_KIT_NAME_MAX"
+          placeholder="Tên bộ chiêu" aria-label="Tên bộ chiêu" @keydown.stop="onNameKey" @keyup.stop @keypress.stop
+          @click="focusName" />
+        <button type="button" class="hextech-btn saved-kit-confirm" :disabled="!kitName.trim()" @click="commitSave">
           Lưu
         </button>
-        <button
-          type="button"
-          class="pregame-icon-btn saved-kit-close"
-          title="Thôi"
-          @click="cancelSave"
-        >
+        <button type="button" class="pregame-icon-btn saved-kit-close" title="Thôi" @click="cancelSave">
           <i class="fas fa-times"></i>
         </button>
         <span v-if="saveError" class="saved-kit-error">{{ saveError }}</span>
@@ -498,20 +458,10 @@ const hint = computed(() => {
       <p class="kit-hint">{{ hint }}</p>
 
       <div ref="rosterBody" class="pregame-modal-body">
-        <KitRoster
-          :shelves="kitShelves"
-          :active-entry-id="activeEntryId"
-          :selected-champion="selectedChampion"
-          :match-rules="matchRules"
-          :is-touch-ui="isTouchUi"
-          :saved-kits="savedKits"
-          :peek="peek"
-          @pick="pickSpell"
-          @apply-kit="applyKit"
-          @pick-random="pickRandom"
-          @apply-saved-kit="applySavedKit"
-          @delete-saved-kit="removeSavedKit"
-        />
+        <KitRoster :shelves="kitShelves" :active-entry-id="activeEntryId" :selected-champion="selectedChampion"
+          :match-rules="matchRules" :is-touch-ui="isTouchUi" :saved-kits="savedKits" :peek="peek" @pick="pickSpell"
+          @apply-kit="applyKit" @pick-random="pickRandom" @apply-saved-kit="applySavedKit"
+          @delete-saved-kit="removeSavedKit" />
       </div>
 
       <!-- The way out of a description a thumb opened. A hover ends itself on
@@ -533,18 +483,13 @@ const hint = computed(() => {
                events for the dismissing tap, so it closes the description and
                nothing else — it does not fall through and equip whatever
                spell happened to be under the player's thumb. -->
-      <div
-        v-if="peekHeldOpen"
-        class="spell-peek-scrim"
-        aria-hidden="true"
-        @touchstart.prevent="closePeek()"
-      ></div>
+      <div v-if="peekHeldOpen" class="spell-peek-scrim" aria-hidden="true" @touchstart.prevent="closePeek()"></div>
 
       <!-- `position: fixed`, above the modal it floats over (see
            `.spell-peek` in pregame-scene.css). -->
       <div v-if="peekDisplay" class="spell-peek" :style="peekStyle">
         <SpellDetailPane :display="peekDisplay" placeholder="" />
-        <p v-if="peekHeldOpen" class="spell-peek-dismiss">Chạm để đóng</p>
+        <!-- <p v-if="peekHeldOpen" class="spell-peek-dismiss">Chạm để đóng</p> -->
       </div>
     </div>
   </div>

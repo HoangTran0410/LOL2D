@@ -7,6 +7,8 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Darius_Q, {
   BLADE_DAMAGE,
   HANDLE_DAMAGE,
+  HEAL_PERCENT_CHAMPION,
+  HEAL_PERCENT_UNIT,
   HEMORRHAGE_MAX_STACKS,
   INNER_RADIUS,
   OUTER_RADIUS,
@@ -23,6 +25,8 @@ import Darius_R, {
 } from '../../../src/game/gameObject/spells/Darius_R';
 import { pickExecuteTarget } from '../../../src/game/combat/ExecuteTargeting';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
+import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -32,6 +36,15 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+
+const makeMinion = (game: TestGame, x: number, y: number): Minion =>
+  new Minion({
+    game,
+    teamId: 'red',
+    position: createVector(x, y),
+    waypoints: getLaneWaypoints(Lane.MID, 'red'),
+    lane: Lane.MID,
+  } as never);
 
 const champion = (game: TestGame, x: number, y: number, teamId: string): AttackableUnit => {
   const unit = new Champion({ game, teamId } as never) as unknown as AttackableUnit;
@@ -152,5 +165,76 @@ describe('Darius E only hauls in what the wedge covered', () => {
     const haul = ahead.buffs.find(buff => buff instanceof Dash) as Dash | undefined;
     expect(haul?.dashDestination?.x).toBeCloseTo(PULL_STOP_DISTANCE, 5);
     expect(behind.buffs.some(buff => buff instanceof Dash)).toBe(false);
+  });
+});
+
+/**
+ * Decimate's sustain used to be a step per champion caught: a flat 10 whether
+ * the swing took someone from full health or finished one sitting on 4, and
+ * the same 10 whether the hit landed on flesh or was eaten whole by a shield.
+ * It is a share of the damage actually dealt now, which is what makes all
+ * three of those different numbers.
+ */
+describe('Darius Q heals for a share of the damage it lands', () => {
+  const swingAt = (victims: AttackableUnit[]) => {
+    const game = createGame();
+    const darius = champion(game, 0, 0, 'blue');
+    darius.stats.health.baseValue = 10;
+    game.objectManager.queryObjects = vi.fn(() => victims) as never;
+
+    const before = darius.stats.health.baseValue;
+    new Darius_Q(darius).onSpellCast();
+    return darius.stats.health.baseValue - before;
+  };
+
+  const bladeRange = (INNER_RADIUS + OUTER_RADIUS) / 2;
+
+  it('takes its cut of the full blade against a healthy champion', () => {
+    const game = createGame();
+    const victim = champion(game, bladeRange, 0, 'red');
+    expect(swingAt([victim])).toBe(Math.round(BLADE_DAMAGE * HEAL_PERCENT_CHAMPION));
+  });
+
+  it('heals far less off a champion who only had a sliver left', () => {
+    const game = createGame();
+    const dying = champion(game, bladeRange, 0, 'red');
+    dying.stats.health.baseValue = 4;
+
+    // 4 health there to take, so 4 damage dealt — not the 30 the blade swung
+    // for. This is the case the old per-champion count could not express.
+    expect(swingAt([dying])).toBe(Math.round(4 * HEAL_PERCENT_CHAMPION));
+  });
+
+  it('scales with the number of champions because it scales with the damage', () => {
+    const game = createGame();
+    const one = champion(game, bladeRange, 0, 'red');
+    const two = champion(game, -bladeRange, 0, 'red');
+    const three = champion(game, 0, bladeRange, 'red');
+    // Parenthesised the way the ability adds it up — a share per victim, summed,
+    // rounded once at the end. `3 * BLADE_DAMAGE * HEAL_PERCENT_CHAMPION`
+    // associates the other way and is 31.499999999999996 rather than 31.5, so it
+    // rounds to 31 and disagrees with correct code by one.
+    expect(swingAt([one, two, three])).toBe(
+      Math.round(3 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION))
+    );
+  });
+
+  it('pays only the trickle rate for minions, so a wave is not a heal button', () => {
+    const game = createGame();
+    const wave = [0, 1, 2, 3, 4, 5].map(index =>
+      makeMinion(game, bladeRange, index * 10)
+    );
+    const healed = swingAt(wave as unknown as AttackableUnit[]);
+
+    expect(healed).toBe(Math.round(6 * (BLADE_DAMAGE * HEAL_PERCENT_UNIT)));
+    // The whole point of the second rate: the same damage off champions would
+    // have been most of a health bar.
+    expect(healed).toBeLessThan(Math.round(6 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION)));
+  });
+
+  it('pays nothing for the one standing on his feet', () => {
+    const game = createGame();
+    const hugging = champion(game, INNER_RADIUS - 20, 0, 'red');
+    expect(swingAt([hugging])).toBe(0);
   });
 });

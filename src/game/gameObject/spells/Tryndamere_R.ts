@@ -13,7 +13,7 @@ import type AttackableUnit from '../attackableUnits/AttackableUnit';
  * floor of 1 health, and this game's cooldown ceiling is ten seconds — a window
  * that comes back that often has to be one an enemy can wait out.
  */
-export const TRYNDAMERE_R_DURATION_MS = 2_500;
+export const TRYNDAMERE_R_DURATION_MS = 5000;
 export const TRYNDAMERE_R_ATTACK_SPEED_BONUS = 0.3;
 export const TRYNDAMERE_R_ATTACK_DAMAGE_BONUS = 8;
 export const TRYNDAMERE_R_STACK_ID = 'tryndamere-undying-rage';

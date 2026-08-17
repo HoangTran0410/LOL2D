@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { SpellForm } from '../../spell/runtime/CancelPolicy';
@@ -8,6 +8,7 @@ import SpellObject from '../SpellObject';
 import Champion from '../attackableUnits/Champion';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 import DamageOverTime from '../buffs/DamageOverTime';
+import { drawAxeArc, drawDariusAxe } from '../../vfx/DariusAxe';
 
 /** He hefts the axe this long before it comes round; the whole telegraph. */
 export const WINDUP_MS = 550;
@@ -18,9 +19,23 @@ export const INNER_RADIUS = 95;
 export const BLADE_DAMAGE = 30;
 /** 35% of the blade, the PC ratio, kept because it is the whole point of the shape. */
 export const HANDLE_DAMAGE = Math.round(BLADE_DAMAGE * 0.35);
-/** Per champion caught by the blade, so a swing into a fight is a sustain button. */
-export const HEAL_PER_CHAMPION = 6;
-export const HEAL_MAX = 18;
+/**
+ * The blade's sustain is a share of the damage it actually lands, not a step
+ * per body caught.
+ *
+ * Counting bodies made the heal a flat 10 whether the swing took a champion
+ * from full health or finished one sitting on 4, and a target who ate the whole
+ * hit on a shield paid Darius exactly as much as one who took it on the chin.
+ * A share of the damage answers all three, and lands on the same number it used
+ * to for the ordinary case: 35% of a 30-damage blade is 10.5.
+ *
+ * Two rates, because "damage dealt" over a minion wave is a different quantity
+ * entirely — six minions is 180 damage against a ~100 health pool, so a single
+ * rate would turn Decimate into a full heal on every wave. Champions are the
+ * sustain the ability is for; the wave is a trickle.
+ */
+export const HEAL_PERCENT_CHAMPION = 0.5;
+export const HEAL_PERCENT_UNIT = 0.7;
 
 // ---------------------------------------------------------------------------
 // Hemorrhage — the bleed the whole kit is built around.
@@ -33,7 +48,7 @@ export const HEAL_MAX = 18;
 // bleed column instead of five overlapping ones, and needs no new buff class.
 // ---------------------------------------------------------------------------
 export const HEMORRHAGE_STACK_ID = 'darius_hemorrhage';
-export const HEMORRHAGE_DAMAGE_PER_STACK = 1;
+export const HEMORRHAGE_DAMAGE_PER_STACK = 3;
 export const HEMORRHAGE_MAX_STACKS = 5;
 export const HEMORRHAGE_TICK_MS = 1_000;
 export const HEMORRHAGE_DURATION_MS = 5_000;
@@ -93,8 +108,8 @@ export default class Darius_Q extends Spell {
     `Vung rìu quanh mình sau <span class="time">${WINDUP_MS / 1000} giây</span> vung tay:` +
     ` <span class="damage">${BLADE_DAMAGE} sát thương</span> ở vành ngoài (<span>${INNER_RADIUS}px – ${OUTER_RADIUS}px</span>),` +
     ` chỉ <span class="damage">${HANDLE_DAMAGE} sát thương</span> cho kẻ đứng sát người.` +
-    ` Mỗi tướng trúng lưỡi rìu <span class="buff">hồi ${HEAL_PER_CHAMPION} máu</span> (tối đa ${HEAL_MAX})` +
-    ` và bị <span class="damage">Chảy Máu</span>`;
+    ` Lưỡi rìu <span class="buff">hút ${HEAL_PERCENT_CHAMPION * 100}% sát thương gây lên tướng</span>` +
+    ` (<span class="buff">${HEAL_PERCENT_UNIT * 100}%</span> lên lính và quái) và gây <span class="damage">Chảy Máu</span>`;
   coolDown = 7_000;
   manaCost = 30;
 
@@ -137,29 +152,59 @@ export default class Darius_Q extends Spell {
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     }) as AttackableUnit[];
 
-    let championsBladed = 0;
+    let healOwed = 0;
+    const landed: QHit[] = [];
     for (const victim of victims) {
       const bladed = this.owner.position.dist(victim.position) > INNER_RADIUS;
+      // Where the cut happened, relative to the caster at the moment of the
+      // swing. The art is centred on his live position and he may walk during
+      // it, so an offset travels with the swing where a world point would not.
+      landed.push({
+        dx: victim.position.x - this.owner.position.x,
+        dy: victim.position.y - this.owner.position.y,
+        bladed,
+      });
+
+      // What the swing *deals* is not what it swings for: shields eat their
+      // share inside takeDamage, and a 30-damage blade on a target holding 4
+      // health deals 4. `takeDamage` already resolves both and books the answer
+      // as `landed` on the victim's ledger, so read it there rather than
+      // predicting it here — a second guess at the mitigation chain would be
+      // wrong the first time a new shield type shipped.
+      const takenBefore = victim.tally.damageTaken;
       victim.takeDamage(bladed ? BLADE_DAMAGE : HANDLE_DAMAGE, this.owner);
+      const dealt = victim.tally.damageTaken - takenBefore;
+
       // The haft is a consolation prize on purpose: it neither bleeds nor heals,
       // which is what stops "stand on top of him" from being the safe answer.
       if (!bladed) continue;
       applyHemorrhage(this.owner, victim);
-      if (victim instanceof Champion) championsBladed++;
+      healOwed += dealt * (victim instanceof Champion ? HEAL_PERCENT_CHAMPION : HEAL_PERCENT_UNIT);
     }
 
-    const heal = Math.min(HEAL_MAX, championsBladed * HEAL_PER_CHAMPION);
+    // Rounded here rather than left to takeHeal, so the sweep's "it healed"
+    // flag below agrees with whether anything was actually restored.
+    const heal = Math.round(healOwed);
     if (heal > 0) this.owner.takeHeal(heal, this.owner);
 
     // The object outlives the cast by the length of its own sweep animation, so
     // it is handed the strike and then let go rather than removed here.
-    this.sweep?.strike(heal > 0);
+    this.sweep?.strike(heal > 0, landed);
     this.sweep = null;
   }
 
   drawPreview() {
     super.drawPreview(OUTER_RADIUS);
   }
+}
+
+/** One cut, recorded at the swing so the sweep can show where it landed. */
+export interface QHit {
+  /** Offset from the caster, not a world point — see `onSpellCast`. */
+  dx: number;
+  dy: number;
+  /** Outer band or handle; the two hits look different because they are different. */
+  bladed: boolean;
 }
 
 /** Grit thrown off the edge, seeded once so it animates instead of flickering. */
@@ -188,10 +233,14 @@ export class Darius_Q_Object extends SpellObject {
     }
   }
 
+  /** Every cut this swing made, in the order the query returned them. */
+  hits: QHit[] = [];
+
   /** The wind-up is over: damage has already landed, now show it landing. */
-  strike(healed: boolean): void {
+  strike(healed: boolean, hits: QHit[] = []): void {
     this.struck = true;
     this.healed = healed;
+    this.hits = hits;
   }
 
   update(): void {
@@ -238,19 +287,15 @@ export class Darius_Q_Object extends SpellObject {
     strokeWeight(2 + 4 * wind);
     circle(0, 0, OUTER_RADIUS * 2);
 
-    // the axe, hauled up over his shoulder and back
+    // The axe, hauled up over his shoulder and wound back. It is the same
+    // silhouette W hangs at his hip and E hooks with — see `vfx/DariusAxe.ts`
+    // for why all three call one function.
     push();
     rotate(-HALF_PI - wind * 2.4);
-    // haft
-    stroke(120, 84, 52);
-    strokeWeight(7);
-    line(0, 0, OUTER_RADIUS * 0.62, 0);
-    // head — a heavy crescent, Noxian iron, nothing like Garen's straight blade
-    noStroke();
-    fill(210, 214, 224);
-    arc(OUTER_RADIUS * 0.62, 0, 74, 96, -HALF_PI, HALF_PI, PIE);
-    fill(160, 30, 32);
-    arc(OUTER_RADIUS * 0.62, 0, 46, 62, -HALF_PI, HALF_PI, PIE);
+    // Never fully cold: dark iron on the dark-red telegraph disc is the one
+    // place this weapon can disappear, so it keeps a floor of heat and comes up
+    // to a full glow as the swing charges.
+    drawDariusAxe(OUTER_RADIUS * 0.82, { heat: 0.4 + wind * 0.6 });
     pop();
 
     // four ticks counting the wind-up down around the rim
@@ -275,30 +320,43 @@ export class Darius_Q_Object extends SpellObject {
     const out = 1 - (1 - t) * (1 - t);
     const fade = 1 - t;
 
-    // the cut itself: a band between the two radii, not a filled disc, because
-    // the hole in the middle is what the ability is about
-    noFill();
-    stroke(255, 235, 225, 220 * fade);
-    strokeWeight((OUTER_RADIUS - INNER_RADIUS) * 0.22 * fade + 2);
-    arc(
-      0,
-      0,
-      (INNER_RADIUS + OUTER_RADIUS) * 0.95,
-      (INNER_RADIUS + OUTER_RADIUS) * 0.95,
-      -HALF_PI,
-      -HALF_PI + TWO_PI * out
+    // The two zones, still two zones while the blade is coming round: the outer
+    // band is the one that bleeds and heals, the hole is the consolation prize,
+    // and a player standing in one has to be able to tell which. A thin line
+    // between them was not enough — they are painted as separate regions.
+    noStroke();
+    fill(150, 20, 25, 40 * fade);
+    circle(0, 0, OUTER_RADIUS * 2);
+    fill(20, 18, 22, 105 * fade);
+    circle(0, 0, INNER_RADIUS * 2);
+
+    const lead = -HALF_PI + TWO_PI * out;
+
+    // The blade's own trail, hottest right behind the edge, so the eye follows
+    // the weapon round rather than watching a ring fill in.
+    drawAxeArc(
+      (INNER_RADIUS + OUTER_RADIUS) * 0.5,
+      lead,
+      Math.min(TWO_PI * out, 1.5),
+      240 * fade,
+      (OUTER_RADIUS - INNER_RADIUS) * 0.3
     );
 
-    // the leading edge, still travelling
-    const lead = -HALF_PI + TWO_PI * out;
-    stroke(255, 120, 80, 240 * fade);
-    strokeWeight(9 * fade + 2);
-    line(
-      cos(lead) * INNER_RADIUS,
-      sin(lead) * INNER_RADIUS,
-      cos(lead) * OUTER_RADIUS,
-      sin(lead) * OUTER_RADIUS
-    );
+    // The axe itself, out at the end of his arms. The wind-up showed the weapon
+    // and the swing used to replace it with an anonymous orange line; carrying
+    // the same silhouette through the swing is the whole point of the rewrite.
+    // Grip sits inside the dead zone and the head reaches exactly OUTER_RADIUS,
+    // so the hitbox is drawn by the thing that makes it.
+    const grip = INNER_RADIUS * 0.34;
+    push();
+    rotate(lead);
+    translate(grip, 0);
+    drawDariusAxe(OUTER_RADIUS - grip, {
+      alpha: 255 * fade,
+      heat: 1,
+      bloodied: this.healed,
+    });
+    pop();
 
     // hard rim on the real hit radius: the hitbox must never be a guess
     stroke(255, 70, 60, 200 * fade);
@@ -308,11 +366,54 @@ export class Darius_Q_Object extends SpellObject {
     strokeWeight(2);
     circle(0, 0, INNER_RADIUS * 2);
 
+    // Every cut, on the body that took it, appearing as the edge reaches it.
+    // The grit below is decoration — it is thrown at seeded angles and says
+    // nothing about whether the swing connected. These say exactly that, and
+    // say which of the two zones caught them.
+    for (const hit of this.hits) {
+      // How far round the swing this body sits, measured from the same start
+      // angle the blade uses, so the mark cannot appear before the edge arrives.
+      let turn = (Math.atan2(hit.dy, hit.dx) + HALF_PI) % TWO_PI;
+      if (turn < 0) turn += TWO_PI;
+      const since = out - turn / TWO_PI;
+      if (since <= 0) continue;
+      // Opens fast, then stays for the rest of the swing and fades out with it.
+      // On its own short clock (it expired 0.4 of the way round) every mark was
+      // gone before the blade had finished the circle, so the one thing that
+      // tells a player they connected was invisible for most of the ability.
+      // Not named `pop` — that is p5's, and a local would shadow the `pop()`
+      // that closes this very block. See the p5-globals trap in CLAUDE.md.
+      const opened = constrain(since / 0.1, 0, 1);
+      const flash = fade;
+      if (flash <= 0) continue;
+
+      push();
+      translate(hit.dx, hit.dy);
+      rotate(Math.atan2(hit.dy, hit.dx) + HALF_PI);
+      noFill();
+      if (hit.bladed) {
+        // A cut, opening along the direction the edge travelled.
+        stroke(255, 240, 232, 245 * flash);
+        strokeWeight(4 * flash + 1);
+        line(-16 - 12 * opened, 0, 16 + 12 * opened, 0);
+        stroke(206, 32, 34, 230 * flash);
+        strokeWeight(2 * flash + 1);
+        line(-11 - 8 * opened, 5, 11 + 8 * opened, 5);
+      } else {
+        // The handle: a dull thud ring, no cut and no blood, because it does
+        // neither. Two hits that behave differently must not look the same.
+        stroke(178, 176, 182, 190 * flash);
+        strokeWeight(2 * flash + 1);
+        circle(0, 0, 16 + 22 * opened);
+      }
+      pop();
+    }
+
     // grit knocked loose along the cut
     noStroke();
     for (const chip of this.chips) {
       const d = chip.distance + chip.drift * 40 * out;
-      fill(190, 40, 38, 220 * fade);
+      fill(190, 40, 38, 160 * fade);
       circle(cos(chip.angle) * d, sin(chip.angle) * d, chip.size * fade + 1);
     }
 
@@ -326,12 +427,6 @@ export class Darius_Q_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = OUTER_RADIUS + 60;
-    return new Rectangle({
-      x: this.owner.position.x - r,
-      y: this.owner.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

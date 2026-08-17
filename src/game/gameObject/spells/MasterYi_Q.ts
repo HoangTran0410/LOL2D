@@ -11,12 +11,12 @@ import type AttackableUnit from '../attackableUnits/AttackableUnit';
 // numbers — retuning a value must not mean editing a test.
 export const SEARCH_RADIUS = 420;
 /** Distinct bodies one cast may visit. Each is struck at most once. */
-export const MAX_STRIKES = 4;
+export const MAX_STRIKES = 6;
 export const FIRST_STRIKE_DAMAGE = 22;
 /** Every body after the first: the flurry spreads, it does not focus. */
-export const EXTRA_STRIKE_DAMAGE = 10;
+export const EXTRA_STRIKE_DAMAGE = 15;
 /** How long he is simply gone before the first blade lands. */
-export const VANISH_MS = 200;
+export const VANISH_MS = 100;
 export const STRIKE_INTERVAL_MS = 150;
 /** How far past the last victim he ends up, so he is never inside a body. */
 export const REAPPEAR_OFFSET = 70;

@@ -384,13 +384,31 @@ export default class Stats {
   }
 
   update() {
+    // `baseValue`, not `value`, on the right-hand side of both of these.
+    //
+    // These two lines are the only place a stat's *read* is written back into
+    // its own base, which makes them the one place a modifier can compound.
+    // Sourcing the write from `.value` folded every modifier on `health` into
+    // the base once per frame, and the modifier then re-applied itself on the
+    // next read — so a buff granting +50 health granted +50 *again* every
+    // frame, +3000 a second at 60fps, and simply re-pinned its owner to full
+    // health no matter what was hitting them. Singed R, Nasus R and Renekton R
+    // all shipped `health: { baseBonus: N }` on a StatAmp and all three were
+    // effectively unkillable for the duration.
+    //
+    // Current health and current mana are resources, not stats: they are moved
+    // by `takeDamage`, `takeHeal`, `spendMana` and `restoreMana`, which all
+    // write `baseValue` directly. Nothing should be modifying them through the
+    // stat pipeline at all, and `stat-resource-modifier.test.ts` enforces that
+    // — but the write-back is what turned a merely meaningless modifier into a
+    // game-breaking one, so it is fixed here as well.
     this.health.baseValue = constrain(
-      this.health.value + this.healthRegen.value,
+      this.health.baseValue + this.healthRegen.value,
       0,
       this.maxHealth.value
     );
     this.mana.baseValue = constrain(
-      this.mana.value + this.manaRegen.value,
+      this.mana.baseValue + this.manaRegen.value,
       0,
       this.maxMana.value
     );

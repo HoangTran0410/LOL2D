@@ -9,7 +9,7 @@ import Champion from '../attackableUnits/Champion';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
-export const TRYNDAMERE_E_RANGE = 400;
+export const TRYNDAMERE_E_RANGE = 300;
 export const TRYNDAMERE_E_DAMAGE = 28;
 /** How wide the whirling blade reaches off his body while he travels. */
 export const TRYNDAMERE_E_HIT_RADIUS = 70;

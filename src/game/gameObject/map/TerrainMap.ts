@@ -188,19 +188,50 @@ export default class TerrainMap {
     }
   }
 
+  /**
+   * Reused across frames: the three buckets below are rebuilt every frame at
+   * 60fps and their contents never outlive the call.
+   */
+  private _waters: Obstacle[] = [];
+  private _walls: Obstacle[] = [];
+  private _bushes: Obstacle[] = [];
+
   draw(): void {
     push();
     const obstacles = this.getObstaclesInView();
 
-    const waters = obstacles.filter((o: Obstacle) => o.type === TerrainType.WATER);
-    const walls = obstacles.filter((o: Obstacle) => o.type === TerrainType.WALL);
-    const bushes = obstacles.filter((o: Obstacle) => o.type === TerrainType.BUSH);
+    // One pass into three reused buckets, rather than three `filter` calls
+    // walking the whole list and allocating a fresh array each. Order within a
+    // bucket is the order they came out of the quadtree, exactly as before.
+    const waters = this._waters;
+    const walls = this._walls;
+    const bushes = this._bushes;
+    waters.length = 0;
+    walls.length = 0;
+    bushes.length = 0;
+    for (const o of obstacles) {
+      if (o.type === TerrainType.WATER) waters.push(o);
+      else if (o.type === TerrainType.WALL) walls.push(o);
+      else if (o.type === TerrainType.BUSH) bushes.push(o);
+    }
 
-    for (const w of waters) w.draw();
+    // The paint order — water, ripples, bushes, walls — is what it always was;
+    // only the style setting moved out of the loop. Each group keeps its own
+    // push/pop so `rippleEffect.draw()` still runs in the environment it used
+    // to, rather than inheriting whatever colour the water left behind.
+    this.drawObstacleGroup(waters, TerrainType.WATER);
     this.rippleEffect.draw();
 
-    for (const b of bushes) b.draw();
-    for (const w of walls) w.draw();
+    this.drawObstacleGroup(bushes, TerrainType.BUSH);
+    this.drawObstacleGroup(walls, TerrainType.WALL);
+    pop();
+  }
+
+  private drawObstacleGroup(group: Obstacle[], type: string): void {
+    if (group.length === 0) return;
+    push();
+    Obstacle.applyStyle(type);
+    for (const o of group) o.drawShape();
     pop();
   }
 

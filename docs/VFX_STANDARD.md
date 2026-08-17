@@ -23,6 +23,38 @@ when you want one — read it once, not once per task.
 5. **Multi-hit protection.** A dash or continuous pass hits each unit at most
    once, tracked in a `Set` or array.
 
+## The animation is the tooltip
+
+Nobody reads the description mid-fight. Whatever the ability does, the player
+has to learn it from the picture — so these five are about **legibility**, and
+they outrank looking good. Every one of them was written after shipping the
+opposite.
+
+1. **Draw what the ability actually is: its reach and its area.** A spell with
+   a cast range draws that range; a spell with an area of effect draws that
+   area, at the radius the damage really uses. If the player has to guess where
+   the edge is, the effect has failed no matter how it looks.
+2. **Every zone that behaves differently must look different.** Darius Q deals
+   full damage in the outer band and a fraction in the inner one — and bleeds
+   and heals off the outer only — so the two have to be two visibly separate
+   regions, not one disc with a faint line in it. One rule, one region.
+3. **Landing a hit has to show on the victim.** An impact belongs *where the
+   hit landed*, on the unit that took it. Grit thrown at seeded random angles
+   is decoration; it tells the player nothing about whether they connected.
+4. **The motion has to agree with the effect.** If the buff pulls a victim
+   toward the caster, the weapon travels inward — outward-sweeping art over an
+   inward pull reads as a bug, because it is telling the player the opposite of
+   what the game just did. Same for a knock-back, a dash, a channel that grows.
+5. **Prefer few, clear layers over many pretty ones.** Effects stacked for
+   beauty end up hiding each other: a swing carrying a wide white band, a heat
+   trail, the weapon, two rims and fourteen chips has no subject. If two layers
+   say the same thing, delete one — the one that survives should be the one
+   that also carries information.
+
+The test for all five: at minimum zoom, in a fight, could a player who has never
+seen this champion tell where it hits and who it hit? If not, simplify until
+they can.
+
 ## The shape of a good `draw()`
 
 - One normalized `t = age / lifeTime`, and every value derived from it. No bare

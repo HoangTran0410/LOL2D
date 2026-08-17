@@ -40,11 +40,20 @@ export default class Singed_R extends Spell {
     amp.name = 'Thuốc Điên';
     amp.bonuses = {
       maxHealth: { baseBonus: BONUS_HEALTH },
-      health: { baseBonus: BONUS_HEALTH },
       speed: { percentBaseBonus: SPEED_PERCENT },
       attackDamage: { baseBonus: 6 },
     };
     this.owner.addBuff(amp);
+
+    // Granting the health is a heal, not a stat. `health` is a resource that
+    // `takeDamage`/`takeHeal` move directly, so a modifier on it was never an
+    // offset the way `maxHealth` is — and until Stats.update() stopped folding
+    // its own read back into the base, `health: { baseBonus }` re-granted
+    // itself every frame and made this ultimate literal immortality.
+    //
+    // After `addBuff`, so the larger maxHealth is already in place and the heal
+    // is not clipped to the old ceiling.
+    this.owner.takeHeal(BONUS_HEALTH, this.owner);
 
     // Nine seconds of +50 health and +30% move speed is the longest self-buff in
     // the game, and chasing a Singed who drank it is a losing proposition. That

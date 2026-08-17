@@ -10,7 +10,7 @@ import Root from '../buffs/Root';
 import { createReveal } from '../buffs/TrueSight';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
-export const CAITLYN_W_PLACE_RANGE = 380;
+export const CAITLYN_W_PLACE_RANGE = 500;
 /** The window in which a trap can be walked over for free. */
 export const CAITLYN_W_ARM_DELAY_MS = 1000;
 export const CAITLYN_W_LIFETIME_MS = 14000;

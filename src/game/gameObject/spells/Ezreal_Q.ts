@@ -81,7 +81,7 @@ export class Ezreal_Q_Object extends MissileSpellObject {
   maxHitCount = 1;
 
   trailSystem = new TrailSystem({
-    trailColor: 'rgba(255, 231, 150, 0.5)',
+    trailColor: 'rgba(200, 231, 200, 0.5)',
     trailSize: EZREAL_Q_BOLT_SIZE * 0.5,
     trailLifeTime: 240,
     maxLength: 16,

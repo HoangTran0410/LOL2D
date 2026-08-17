@@ -117,3 +117,69 @@ describe('unit size ceiling', () => {
     expect(MAX_UNIT_SIZE).toBeGreaterThan(100);
   });
 });
+
+/**
+ * `update()` writes the regenerated value back into `health.baseValue`, and it
+ * used to source that write from `health.value` — the *modified* read. Any buff
+ * holding a modifier on `health` therefore had its bonus folded into the base
+ * once per frame and then re-added by the modifier on the next read, so the
+ * bonus compounded at the frame rate instead of being an offset.
+ *
+ * Three ultimates shipped with `health: { baseBonus: N }` on a StatAmp
+ * (Singed R, Nasus R, Renekton R) and all three made their champion
+ * unkillable: at 60fps a +50 bonus is +3000 health a second, which re-pinned
+ * them to full every frame no matter how much damage they were taking.
+ *
+ * Regen itself is untouched by this: with no modifier on `health`, `value` and
+ * `baseValue` are equal by definition, so every unit in the game reads the
+ * same as before.
+ */
+describe('health and mana regeneration', () => {
+  const settle = (stats: Stats, frames: number) => {
+    for (let i = 0; i < frames; i++) stats.update();
+  };
+
+  it('does not fold a health modifier back into the base each frame', () => {
+    const stats = new Stats();
+    stats.maxHealth.baseValue = 1_000;
+    stats.health.baseValue = 100;
+    stats.healthRegen.baseValue = 0;
+
+    const modifier = new StatModifier(0);
+    modifier.baseBonus = 50;
+    stats.health.addModifier(modifier);
+
+    settle(stats, 30);
+
+    expect(stats.health.baseValue).toBe(100);
+    // The modifier is still doing its job on the read, just not on the base.
+    expect(stats.health.value).toBe(150);
+  });
+
+  it('does not fold a mana modifier back into the base each frame', () => {
+    const stats = new Stats();
+    stats.maxMana.baseValue = 1_000;
+    stats.mana.baseValue = 100;
+    stats.manaRegen.baseValue = 0;
+
+    const modifier = new StatModifier(0);
+    modifier.baseBonus = 50;
+    stats.mana.addModifier(modifier);
+
+    settle(stats, 30);
+
+    expect(stats.mana.baseValue).toBe(100);
+    expect(stats.mana.value).toBe(150);
+  });
+
+  it('still regenerates normally when nothing modifies health', () => {
+    const stats = new Stats();
+    stats.maxHealth.baseValue = 1_000;
+    stats.health.baseValue = 100;
+    stats.healthRegen.baseValue = 2;
+
+    settle(stats, 10);
+
+    expect(stats.health.baseValue).toBe(120);
+  });
+});

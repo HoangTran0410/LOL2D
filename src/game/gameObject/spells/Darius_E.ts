@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
@@ -9,9 +9,10 @@ import Airborne from '../buffs/Airborne';
 import Dash from '../buffs/Dash';
 import Slow from '../buffs/Slow';
 import { applyHemorrhage } from './Darius_Q';
+import { drawAxeArc, drawDariusAxe } from '../../vfx/DariusAxe';
 
 export const CAST_TIME_MS = 250;
-export const CONE_RANGE = 430;
+export const CONE_RANGE = 300;
 /** Half the opening of the sweep, in radians — about a 55° wedge either side. */
 export const CONE_HALF_ANGLE = 0.95;
 export const DAMAGE = 15;
@@ -146,7 +147,20 @@ export default class Darius_E extends Spell {
   }
 }
 
-export const SWEEP_LIFETIME_MS = 460;
+/**
+ * Long enough to show the haul, not just the swing.
+ *
+ * At 460ms the art was gone while the `Dash` on the victims was still dragging
+ * them (`PULL_MAX_MS` is 900), so the pull the ability is named for happened
+ * off-screen. The wedge still fades early — it marks where the hit landed, and
+ * has nothing to say once it has said that — while the axe and the chains
+ * carry the rest.
+ */
+export const SWEEP_LIFETIME_MS = 700;
+/** How much of that life is the reach out; the rest is the haul back in. */
+const REACH_FRACTION = 0.32;
+/** How far the axe comes back toward him over the haul, as a fraction of reach. */
+const HAUL_RETRACTION = 0.72;
 /** Barbs of the sweep — seeded once, then animated. */
 const BARB_COUNT = 9;
 
@@ -187,6 +201,9 @@ export class Darius_E_Object extends SpellObject {
     // snap-out: the wedge is at full reach almost immediately, then fades
     const out = 1 - (1 - Math.min(1, t * 3)) * (1 - Math.min(1, t * 3));
     const fade = 1 - t;
+    // The wedge has said everything it has to say by the time the haul starts,
+    // so it fades on its own clock rather than hanging around behind the axe.
+    const wedgeFade = constrain(1 - t / 0.55, 0, 1);
     const reach = CONE_RANGE * out;
 
     push();
@@ -197,18 +214,20 @@ export class Darius_E_Object extends SpellObject {
     push();
     rotate(this.heading);
     noStroke();
-    fill(150, 30, 34, 70 * fade);
+    fill(150, 30, 34, 70 * wedgeFade);
     arc(0, 0, reach * 2, reach * 2, -CONE_HALF_ANGLE, CONE_HALF_ANGLE, PIE);
     noFill();
-    stroke(235, 200, 190, 200 * fade);
+    stroke(235, 200, 190, 200 * wedgeFade);
     strokeWeight(3);
     arc(0, 0, reach * 2, reach * 2, -CONE_HALF_ANGLE, CONE_HALF_ANGLE);
     line(0, 0, cos(-CONE_HALF_ANGLE) * reach, sin(-CONE_HALF_ANGLE) * reach);
     line(0, 0, cos(CONE_HALF_ANGLE) * reach, sin(CONE_HALF_ANGLE) * reach);
 
-    // barbs raking back toward him, so the direction of the pull is legible
-    stroke(255, 120, 90, 220 * fade);
-    strokeWeight(3);
+    // Ground raked back toward him. Dull and thin on purpose: these used to be
+    // bright orange spikes across the whole wedge, which read as a claw or a
+    // net — the one thing on screen that should be bright is the axe below.
+    stroke(122, 96, 84, 130 * wedgeFade);
+    strokeWeight(2);
     for (const barb of this.barbs) {
       const far = Math.min(reach, barb.distance);
       const near = Math.max(0, far - barb.length * (0.4 + out));
@@ -219,6 +238,34 @@ export class Darius_E_Object extends SpellObject {
         sin(barb.spread) * near
       );
     }
+
+    // The axe goes out, catches, and comes back — in that order, because that
+    // is the order the ability happens in. It used to sweep outward across the
+    // wedge for its whole life while the `Dash` on every victim hauled them the
+    // other way, so the art was telling the player the opposite of what the
+    // game had just done. Reach on the first third, haul for the rest.
+    const reachT = constrain(t / REACH_FRACTION, 0, 1);
+    const haulT = constrain((t - REACH_FRACTION) / (1 - REACH_FRACTION), 0, 1);
+    // ease-in on the way back: the haul starts slow and snaps him in
+    const hauled = haulT * haulT;
+    const swing = -CONE_HALF_ANGLE + CONE_HALF_ANGLE * 2 * reachT;
+    // Never shorter than the grip, or the head would pass through his own body.
+    const armReach = Math.max(
+      CONE_RANGE * 0.28,
+      reach * (1 - HAUL_RETRACTION * hauled)
+    );
+
+    // The trail sweeps with him on the way out and drops away on the way in:
+    // a hot arc still travelling outward while the bodies move inward is the
+    // same contradiction, one layer down.
+    drawAxeArc(armReach * 0.78, swing, CONE_HALF_ANGLE * 1.6 * reachT, 210 * fade * (1 - hauled), 16);
+
+    const grip = CONE_RANGE * 0.16;
+    push();
+    rotate(swing);
+    translate(grip, 0);
+    drawDariusAxe(Math.max(1, armReach - grip), { alpha: 255 * fade, heat: 1 - hauled * 0.6 });
+    pop();
     pop();
 
     // one chain per body still being reeled in
@@ -240,12 +287,6 @@ export class Darius_E_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = CONE_RANGE + 60;
-    return new Rectangle({
-      x: this.owner.position.x - r,
-      y: this.owner.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

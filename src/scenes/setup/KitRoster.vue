@@ -145,7 +145,7 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
         <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
           :alt="shelf.name" loading="lazy" decoding="async" />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
-        <span class="kit-apply-chip">Dùng bộ</span>
+        <span class="kit-apply-chip">Chọn</span>
       </button>
       <div v-else class="kit-shelf-heading">
         <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
@@ -162,8 +162,8 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
         <button v-for="item in shelf.entries" :key="item.entry.id" type="button" class="catalog-spell-card"
           :class="{ selected: activeEntryId === item.entry.id }" :data-spell="item.entry.id" @click="pick(item.entry)"
           @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)" @mouseleave="!isTouchUi && hoverEnd()"
-          @touchstart="touchStart(detailOf(item.entry), $event)" @touchmove="touchMove($event)"
-          @touchend="touchEnd()" @touchcancel="closePeek()" @contextmenu.prevent>
+          @touchstart="touchStart(detailOf(item.entry), $event)" @touchmove="touchMove($event)" @touchend="touchEnd()"
+          @touchcancel="closePeek()" @contextmenu.prevent>
           <!-- The icon is the whole card. No name under it: at four abilities
                to a shelf the champion's name above them already says what
                they are, and the spell's own name is a hover or a hold away
