@@ -89,7 +89,8 @@ const openParticipantAt = n =>
  * which is the same `cancel` handler the button called. The backdrop is a
  * third path and is deliberately still untested: it is one `@click.self`.
  */
-const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+const dismissLoadoutModal = () =>
+  page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
 const cancelLoadout = dismissLoadoutModal;
 /** The one `.kit-bar-btn` left, and `:not(.secondary)` is what says so. */
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
@@ -105,7 +106,8 @@ const pickSpell = id => page.click(`.catalog-spell-card[data-spell="${id}"]`);
 /** Takes a whole shelf's kit in one tap — the shelf header doubles as the button. */
 const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-shelf-apply`);
 
-const storedPlayer = () => evaluate(k => JSON.parse(localStorage.getItem(k) ?? 'null')?.player ?? null, CFG);
+const storedPlayer = () =>
+  evaluate(k => JSON.parse(localStorage.getItem(k) ?? 'null')?.player ?? null, CFG);
 
 /**
  * The roster's shape, read out of the catalogue the component itself renders
@@ -196,16 +198,21 @@ try {
     selectedShelf: document.querySelector('.kit-shelf.selected')?.dataset.champion ?? null,
   }));
   report.catalog = await catalogShape();
-  expect('rosterShape.catalogCardCount', report.rosterShape.catalogCardCount, report.catalog.entries);
+  expect(
+    'rosterShape.catalogCardCount',
+    report.rosterShape.catalogCardCount,
+    report.catalog.entries
+  );
   expect('rosterShape.shelfCount', report.rosterShape.shelfCount, report.catalog.shelves);
   expect('rosterShape.wholeKitActions', report.rosterShape.wholeKitActions, report.catalog.withKit);
   // A roster of nothing would satisfy all three of those. This is the floor
   // that keeps them meaning "the whole catalogue is on screen".
   expect('catalog is not empty', report.catalog.entries > 50 && report.catalog.shelves > 10, true);
-  expect('rosterShape.shelvesWithoutWholeKitAction', report.rosterShape.shelvesWithoutWholeKitAction, [
-    'Đánh Thường',
-    'Phép Bổ Trợ',
-  ]);
+  expect(
+    'rosterShape.shelvesWithoutWholeKitAction',
+    report.rosterShape.shelvesWithoutWholeKitAction,
+    ['Đánh Thường', 'Phép Bổ Trợ']
+  );
   expect('rosterShape.slotKeys', report.rosterShape.slotKeys, ['A', 'Q', 'W', 'E', 'R', 'D', 'F']);
   expect('rosterShape.slotBarButtons', report.rosterShape.slotBarButtons, 8);
   await page.screenshot({ path: `${OUT}-roster.png` });
@@ -218,9 +225,13 @@ try {
   await page.waitForTimeout(120);
   report.draftIsNotStored = {
     changedPills: await evaluate(() =>
-      [...document.querySelectorAll('.kit-slot-pill.changed .kit-slot-pill-key')].map(e => e.textContent)
+      [...document.querySelectorAll('.kit-slot-pill.changed .kit-slot-pill-key')].map(
+        e => e.textContent
+      )
     ),
-    selectedCard: await evaluate(() => document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null),
+    selectedCard: await evaluate(
+      () => document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null
+    ),
     storedWhileDrafting: await storedPlayer(),
   };
   expect('draftIsNotStored.changedPills', report.draftIsNotStored.changedPills, ['Q']);
@@ -302,10 +313,11 @@ try {
     summonerF: 'Heal',
     customSlots: [...yasuoKit.slice(0, 4), 'Zed_R', 'Ghost', 'Heal'],
   });
-  expect('gestureDecidesMode.backToChampion.mode', [g.backToChampion.mode, g.backToChampion.championName], [
-    'champion',
-    'Ahri',
-  ]);
+  expect(
+    'gestureDecidesMode.backToChampion.mode',
+    [g.backToChampion.mode, g.backToChampion.championName],
+    ['champion', 'Ahri']
+  );
   expect('gestureDecidesMode.nonSummonerIntoF', g.nonSummonerIntoF, {
     mode: 'custom',
     championName: 'Ahri',
@@ -329,10 +341,11 @@ try {
   // worth restoring for it. A silent skip would have let that rot unnoticed.
   const partial = report.catalog.partialShelfNames;
   expect('no shelf is partial, so the partial-shelf drive has no subject', partial, []);
-  expect('gestureDecidesMode.randomCard.mode', [g.randomCard.mode, g.randomCard.championName], [
-    'champion',
-    'random',
-  ]);
+  expect(
+    'gestureDecidesMode.randomCard.mode',
+    [g.randomCard.mode, g.randomCard.championName],
+    ['champion', 'random']
+  );
 
   // ...and one slot left to chance. `.kit-slot-random` is the eighth control
   // in the slot group because it acts on the *selected slot*, not on a spell:
@@ -343,7 +356,8 @@ try {
   const randomSlotState = () =>
     evaluate(() => ({
       disabled: document.querySelector('.kit-slot-random').disabled,
-      activeSlot: document.querySelector('.kit-slot-pill.active .kit-slot-pill-key')?.textContent ?? null,
+      activeSlot:
+        document.querySelector('.kit-slot-pill.active .kit-slot-pill-key')?.textContent ?? null,
     }));
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
@@ -360,7 +374,10 @@ try {
   await confirmLoadout();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
   report.randomSlotButton.stored = await storedPlayer();
-  expect('randomSlotButton.onARandomSlot', report.randomSlotButton.onARandomSlot, { disabled: true, activeSlot: 'Q' });
+  expect('randomSlotButton.onARandomSlot', report.randomSlotButton.onARandomSlot, {
+    disabled: true,
+    activeSlot: 'Q',
+  });
   expect('randomSlotButton.afterTakingAKit', report.randomSlotButton.afterTakingAKit, {
     disabled: false,
     activeSlot: 'Q',
@@ -381,22 +398,23 @@ try {
   // ...and that `'random'` is resolved at spawn, not dropped: six fixed slots
   // and one real, arbitrary spell where R was left open.
   await page.click('#pregame-start-btn');
-  await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.player, null, { timeout: 30_000 });
+  await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.player, null, {
+    timeout: 30_000,
+  });
   await page.waitForTimeout(400);
   report.randomSlotButton.spawnedSpells = await evaluate(() =>
     window.__lol2d.scene.oScene.game.player.spells.map(s => s?.constructor?.name ?? null)
   );
   const spawned = report.randomSlotButton.spawnedSpells;
-  expect('randomSlotButton.spawnedSpells (fixed slots)', [...spawned.slice(0, 4), ...spawned.slice(5)], [
-    'BasicAttack',
-    'Yasuo_Q',
-    'Yasuo_W',
-    'Yasuo_E',
-    'Ghost',
-    'Heal',
-  ]);
+  expect(
+    'randomSlotButton.spawnedSpells (fixed slots)',
+    [...spawned.slice(0, 4), ...spawned.slice(5)],
+    ['BasicAttack', 'Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Ghost', 'Heal']
+  );
   if (typeof spawned[4] !== 'string' || spawned[4].length === 0) {
-    errors.push(`randomSlotButton.spawnedSpells: the R slot rolled ${JSON.stringify(spawned[4])}, expected a real spell`);
+    errors.push(
+      `randomSlotButton.spawnedSpells: the R slot rolled ${JSON.stringify(spawned[4])}, expected a real spell`
+    );
   }
   // back out to the setup screen — the rest of this script drives it further
   // Back out to the menu the way the game itself does. This was `stopGame()`
@@ -465,7 +483,12 @@ try {
       cooldown: peek?.querySelector('.spell-detail-cooldown')?.textContent.trim() ?? null,
       hasDescription: !!peek?.querySelector('.spell-detail-body')?.textContent.trim(),
       pointerEvents: peek ? getComputedStyle(peek).pointerEvents : null,
-      insideViewport: !!rect && rect.left >= 0 && rect.top >= 0 && rect.right <= innerWidth + 1 && rect.bottom <= innerHeight + 1,
+      insideViewport:
+        !!rect &&
+        rect.left >= 0 &&
+        rect.top >= 0 &&
+        rect.right <= innerWidth + 1 &&
+        rect.bottom <= innerHeight + 1,
       dialogCount: document.querySelectorAll('.pregame-modal-backdrop').length,
       changedPills: document.querySelectorAll('.kit-slot-pill.changed').length,
       selectedCard: document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null,
@@ -477,8 +500,14 @@ try {
   report.cooldownUnderCdr = await evaluate(async () => {
     const preset = await import('/src/game/preset.ts');
     const entry = preset.listSpellCatalog().find(e => e.id === 'Lux_Q');
-    const raw = preset.getSpellDisplay(entry.spellClass, { cooldownMultiplier: 1, manaFree: false });
-    const halved = preset.getSpellDisplay(entry.spellClass, { cooldownMultiplier: 0.5, manaFree: false });
+    const raw = preset.getSpellDisplay(entry.spellClass, {
+      cooldownMultiplier: 1,
+      manaFree: false,
+    });
+    const halved = preset.getSpellDisplay(entry.spellClass, {
+      cooldownMultiplier: 0.5,
+      manaFree: false,
+    });
     return {
       rawLabel: `${(raw.effectiveCoolDownMs / 1000).toFixed(1)}s`,
       halvedLabel: `${(halved.effectiveCoolDownMs / 1000).toFixed(1)}s`,
@@ -506,7 +535,9 @@ try {
   // the same spell says, read a moment earlier. Two independent surfaces, one
   // answer — and nothing in the check recomputes the answer itself.
   const peekTitle = () =>
-    evaluate(() => document.querySelector('.spell-peek .spell-detail-header h3')?.textContent ?? null);
+    evaluate(
+      () => document.querySelector('.spell-peek .spell-detail-header h3')?.textContent ?? null
+    );
   await page.hover('.catalog-spell-card[data-spell="Yasuo_W"]');
   await page.waitForTimeout(250);
   const cardTitle = await peekTitle();
@@ -521,7 +552,8 @@ try {
     // A hover ends itself on `mouseleave`, so it must not raise the
     // full-screen dismiss layer the touch path needs.
     scrims: document.querySelectorAll('.spell-peek-scrim').length,
-    activeSlot: document.querySelector('.kit-slot-pill.active .kit-slot-pill-key')?.textContent ?? null,
+    activeSlot:
+      document.querySelector('.kit-slot-pill.active .kit-slot-pill-key')?.textContent ?? null,
     changedPills: document.querySelectorAll('.kit-slot-pill.changed').length,
   }));
   expect('slotPillDescribes.title', report.slotPillDescribes.title, cardTitle);
@@ -529,7 +561,11 @@ try {
   expect('slotPillDescribes.panels', report.slotPillDescribes.panels, 1);
   expect('slotPillDescribes.scrims', report.slotPillDescribes.scrims, 0);
   expect('slotPillDescribes.activeSlot', report.slotPillDescribes.activeSlot, 'Q');
-  expect('slotPillDescribes.changedPills', report.slotPillDescribes.changedPills, peeked.changedPills);
+  expect(
+    'slotPillDescribes.changedPills',
+    report.slotPillDescribes.changedPills,
+    peeked.changedPills
+  );
   if (!cardTitle) {
     errors.push('slotPillDescribes: the roster card it is compared against described nothing');
   }
@@ -540,7 +576,8 @@ try {
 
   await cancelLoadout();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
-  report.storedUnchangedByHover = (await storedPlayer())?.customSlots?.join(',') === beforeHover?.customSlots?.join(',');
+  report.storedUnchangedByHover =
+    (await storedPlayer())?.customSlots?.join(',') === beforeHover?.customSlots?.join(',');
   expect('storedUnchangedByHover', report.storedUnchangedByHover, true);
   await setCdr(0); // don't let it leak into the live match below
 
@@ -573,15 +610,20 @@ try {
     .click('.participant-card-player .participant-card-main', { timeout: 500 })
     .then(() => 'click went through (bug)')
     .catch(() => 'blocked, as expected');
-  expect('playerCardNotClickableBehindModal', report.playerCardNotClickableBehindModal, 'blocked, as expected');
+  expect(
+    'playerCardNotClickableBehindModal',
+    report.playerCardNotClickableBehindModal,
+    'blocked, as expected'
+  );
 
   await applyShelf('Ahri');
   await confirmLoadout();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
   report.bot1SummaryAfterPick = await evaluate(
     () =>
-      document.querySelector('#pregame-participant-list .participant-card:nth-child(2) .participant-summary')
-        ?.textContent
+      document.querySelector(
+        '#pregame-participant-list .participant-card:nth-child(2) .participant-summary'
+      )?.textContent
   );
   expect('bot1SummaryAfterPick', report.bot1SummaryAfterPick, 'Ahri');
   await page.screenshot({ path: `${OUT}-bot-config.png` });
@@ -613,7 +655,9 @@ try {
     slotsStillRandom: [...document.querySelectorAll('.kit-slot-pill:not(.kit-slot-random)')].filter(
       p => !p.querySelector('img')
     ).length,
-    pillTitles: [...document.querySelectorAll('.kit-slot-pill img')].map(i => i.getAttribute('title')),
+    pillTitles: [...document.querySelectorAll('.kit-slot-pill img')].map(i =>
+      i.getAttribute('title')
+    ),
   }));
   await dismissLoadoutModal();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
@@ -642,7 +686,15 @@ try {
           championName: 'random',
           summonerD: 'Flash',
           summonerF: 'Heal',
-          customSlots: ['BasicAttack', 'Olaf_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R', 'Ghost', 'Ignite'],
+          customSlots: [
+            'BasicAttack',
+            'Olaf_Q',
+            'Yasuo_W',
+            'Yasuo_E',
+            'Yasuo_R',
+            'Ghost',
+            'Ignite',
+          ],
         },
         ai: {
           count: 2,
@@ -683,7 +735,9 @@ try {
     return {
       playerSpellNames: game.player.spells.map(s => s.constructor.name),
       botCount: bots.length,
-      ahriBotSpellNames: bots.map(b => b.spells.map(s => s.constructor.name)).find(names => names.includes('Ahri_Q')),
+      ahriBotSpellNames: bots
+        .map(b => b.spells.map(s => s.constructor.name))
+        .find(names => names.includes('Ahri_Q')),
     };
   });
   expect('liveMatch.playerSpellNames', report.liveMatch.playerSpellNames, [
@@ -748,8 +802,16 @@ try {
   expect('compactRoster.cardsInDom', report.compactRoster.cardsInDom, report.catalog.entries);
   // Every shelf that has a kit, and only those: the two that are not a
   // champion have no kit to apply, so compact has nothing to show for them.
-  expect('compactRoster.shelvesVisible', report.compactRoster.shelvesVisible, report.catalog.withKit);
-  expect('compactRoster.nonChampionShelvesVisible', report.compactRoster.nonChampionShelvesVisible, 0);
+  expect(
+    'compactRoster.shelvesVisible',
+    report.compactRoster.shelvesVisible,
+    report.catalog.withKit
+  );
+  expect(
+    'compactRoster.nonChampionShelvesVisible',
+    report.compactRoster.nonChampionShelvesVisible,
+    0
+  );
   expect('compactRoster.cardsVisible', report.compactRoster.cardsVisible, 0);
   // Ngẫu Nhiên stays: it is a whole-loadout action, which is what compact is for.
   expect('compactRoster.randomCardVisible', report.compactRoster.randomCardVisible, 1);
@@ -761,6 +823,67 @@ try {
   expect('compactRoster.labelsVisible', report.compactRoster.labelsVisible, 1);
 
   await page.screenshot({ path: `${OUT}-compact-roster.png` });
+
+  // ## The one shelf compact lets through
+  //
+  // Taking a whole kit is compact's only gesture, which leaves A, D and F —
+  // the three slots no champion ability fills — unreachable. Selecting one
+  // brings its shelf back expanded, and nothing else with it. The roster is
+  // ordered for this too: both non-champion shelves are pinned ahead of the
+  // champions, which are sorted by name.
+  const compactShown = () =>
+    evaluate(() => {
+      const shown = s => [...document.querySelectorAll(s)].filter(e => e.offsetParent !== null);
+      return {
+        revealed: document.querySelector('.kit-shelf.revealed')?.dataset.champion ?? null,
+        cardIds: shown('.catalog-spell-card').map(e => e.dataset.spell),
+      };
+    });
+
+  report.compactOrder = await evaluate(() =>
+    [...document.querySelectorAll('.kit-shelf')].slice(0, 3).map(e => e.dataset.champion)
+  );
+  // The third is whichever champion sorts first, read off the catalogue rather
+  // than named here — a new champion beginning with "A" must not break this.
+  const firstChampion = await evaluate(async () => {
+    const { getPregameCatalog } = await import('/src/scenes/setup/pregameCatalog.ts');
+    return (
+      getPregameCatalog()
+        .kitShelves.filter(shelf => shelf.kit.length > 0)
+        .map(shelf => shelf.name)[0] ?? null
+    );
+  });
+  expect('compactOrder', report.compactOrder, ['Đánh Thường', 'Phép Bổ Trợ', firstChampion]);
+
+  await selectSlot(1); // Q — an ability slot, so nothing is revealed
+  report.compactOnAbilitySlot = await compactShown();
+  expect('compactOnAbilitySlot', report.compactOnAbilitySlot, { revealed: null, cardIds: [] });
+
+  await selectSlot(5); // D
+  report.compactOnD = await compactShown();
+  expect('compactOnD.revealed', report.compactOnD.revealed, 'Phép Bổ Trợ');
+  // Exactly the summoner spells, from the catalogue rather than a hand list.
+  const summonerIds = await evaluate(async () => {
+    const { getPregameCatalog } = await import('/src/scenes/setup/pregameCatalog.ts');
+    return getPregameCatalog()
+      .summoners.map(option => option.id)
+      .sort();
+  });
+  expect('compactOnD.cardIds', [...report.compactOnD.cardIds].sort(), summonerIds);
+
+  // Picked while D is the selected slot, so it lands in a summoner field and
+  // leaves the loadout a champion pick — the same rule section 3 proves in
+  // expanded mode, now reachable without leaving compact.
+  await pickSpell('Ignite');
+
+  await selectSlot(0); // A
+  report.compactOnA = await compactShown();
+  expect('compactOnA', report.compactOnA, {
+    revealed: 'Đánh Thường',
+    cardIds: ['BasicAttack'],
+  });
+
+  await selectSlot(1);
 
   // A tile applies the champion's whole kit, which is compact's one gesture.
   await applyShelf('Ahri');

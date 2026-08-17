@@ -72,6 +72,15 @@ const props = defineProps<{
    * `.kit-roster.compact` in pregame-scene.css.
    */
   compact: boolean;
+  /**
+   * The one shelf compact lets through anyway, or `null`.
+   *
+   * Compared by identity, not by name: `getPregameCatalog()` builds once and
+   * caches, so the parent hands back one of the very objects in `shelves`.
+   * The parent decides which — it is the one that knows what the selected slot
+   * means. See `LoadoutEditorModal.revealShelf`.
+   */
+  revealShelf: KitShelf | null;
   /** The library, newest first — see `loadSavedKits`. Empty renders no shelf at all. */
   savedKits: readonly SavedKit[];
   /**
@@ -164,7 +173,11 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       v-for="shelf in shelves"
       :key="shelf.name"
       class="kit-shelf"
-      :class="{ selected: isSelectedShelf(shelf), 'has-kit': shelf.kit.length > 0 }"
+      :class="{
+        selected: isSelectedShelf(shelf),
+        'has-kit': shelf.kit.length > 0,
+        revealed: shelf === revealShelf,
+      }"
       :data-champion="shelf.name"
     >
       <!-- `has-kit` is the same predicate that decides whether the header is a

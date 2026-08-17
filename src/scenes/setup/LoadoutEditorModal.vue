@@ -40,10 +40,12 @@
  * Every other control on this screen writes straight to `localStorage` on
  * change. This one doesn't: `draft` is edited freely and only `emit('change')`
  * on "Xác nhận" reaches `usePregameConfig`. The X and the backdrop both
- * discard it — there was a "Huỷ" button beside Xác nhận too, dropped once the
- * slot bar had to hold the view toggle as well; two adjacent buttons whose
- * outcomes differ by the whole edit was the mis-hit worth removing anyway. That is the in-game picker's contract, and it is what makes
+ * discard it. That is the in-game picker's contract, and it is what makes
  * "take Ahri's kit, then swap her R" a thing you can back out of.
+ *
+ * There was a "Huỷ" button beside Xác nhận too, dropped once the slot bar had
+ * to hold the roster's view toggle as well — two adjacent buttons whose
+ * outcomes differ by the whole edit was a mis-hit worth designing out anyway.
  *
  * ## Saving is a third act, next to those two
  *
@@ -400,6 +402,29 @@ const compact = computed(() => kitRosterView.value === 'compact');
 
 const toggleView = (): void => setKitRosterView(compact.value ? 'expanded' : 'compact');
 
+/**
+ * The one shelf compact brings back, and only while a slot no champion ability
+ * can fill is selected.
+ *
+ * Compact shows champion tiles because taking a whole kit is its only gesture,
+ * which leaves A, D and F unfillable — and those three are the slots a player
+ * most often wants to change *without* rebuilding a kit ("Ahri, but Ghost
+ * instead of Flash"). Making them work meant either sending the player out to
+ * expanded and back, or bringing back the one shelf that serves the selected
+ * slot. This is the second.
+ *
+ * `nonChampionKind` rather than the shelf's name, so a retranslated label
+ * cannot quietly break it. Identity is what the roster compares against — the
+ * catalogue is built once and cached, so these are the same objects it renders.
+ */
+const revealShelf = computed<KitShelf | null>(() => {
+  if (!compact.value) return null;
+  const kind =
+    activeSlot.value === 0 ? 'basicAttack' : activeSlot.value >= SLOT_D ? 'summoner' : null;
+  if (!kind) return null;
+  return kitShelves.find(shelf => shelf.nonChampionKind === kind) ?? null;
+});
+
 const confirm = (): void => {
   emit('change', draft.value);
   emit('close');
@@ -410,7 +435,14 @@ const hint = computed(() => {
   // Compact has no ability cards to tap, so the slot the roster would fill is
   // not what the screen is about — saying "đang chọn chiêu cho ô Q" over a grid
   // that cannot fill one is the hint pointing at the wrong gesture.
-  if (compact.value) return 'Bấm một tướng để lấy cả bộ chiêu — mở rộng để chọn từng chiêu.';
+  if (compact.value) {
+    // A revealed shelf changes what the screen is offering, so it changes what
+    // the line says: there *is* something to pick now.
+    if (revealShelf.value) {
+      return `Đang chọn cho ô ${SLOT_LABELS[activeSlot.value]} — ${revealShelf.value.name} ở đầu danh sách.`;
+    }
+    return 'Bấm một tướng để lấy cả bộ chiêu — mở rộng để chọn từng chiêu.';
+  }
   if (activeSlot.value === 0) {
     return 'Ô A là đòn đánh thường — đổi ô này là đổi luôn nhịp đánh của tướng.';
   }
@@ -546,6 +578,7 @@ const hint = computed(() => {
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
           :compact="compact"
+          :reveal-shelf="revealShelf"
           :saved-kits="savedKits"
           :peek="peek"
           @pick="pickSpell"

@@ -706,6 +706,45 @@
   display: none;
 }
 
+/* ...except the one shelf that serves the selected slot.
+
+   Compact's gesture is "take a whole kit", which leaves A, D and F unfillable
+   — and those are the slots a player most often changes without wanting to
+   rebuild anything. So when one of them is selected, its shelf comes back
+   expanded and full width while the champion tiles stay as they are. The
+   parent picks which shelf; see `LoadoutEditorModal.revealShelf`.
+
+   Placed immediately after the hide rules, and that is load-bearing: both
+   selectors carry four classes, so they have equal specificity and the later
+   one wins. Moving this block above them silently turns the feature off. */
+.kit-roster.compact .kit-shelf.revealed {
+  display: block;
+  grid-column: 1 / -1;
+  border-color: var(--hextech-gold-dim);
+}
+
+.kit-roster.compact .kit-shelf.revealed .catalog-group-row {
+  display: flex;
+}
+
+/* Back to the ordinary horizontal heading — the column layout below is for a
+   tile, and this one is a row again. */
+.kit-roster.compact .kit-shelf.revealed .kit-shelf-heading {
+  flex-direction: row;
+  margin-bottom: 0.35rem;
+  text-align: left;
+}
+
+.kit-roster.compact .kit-shelf.revealed .kit-shelf-name {
+  width: auto;
+  text-align: left;
+}
+
+.kit-roster.compact .kit-shelf.revealed .catalog-group-avatar {
+  width: 35px;
+  height: 35px;
+}
+
 /* The whole tile is the button, so the chip that used to advertise it is one
    label too many; the portrait goes on top of the name instead of beside it,
    which is what lets the track be 132px. */
