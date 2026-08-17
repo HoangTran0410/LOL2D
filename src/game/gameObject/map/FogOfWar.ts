@@ -4,6 +4,7 @@ import CollideUtils from '../../../utils/collide.utils';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { Circle } from '../../../libs/quadtree';
+import { removeGraphics } from '../../../utils/graphics.utils';
 
 // The fog polygon is recomputed at the unit's live position every frame — no
 // throttle, no interpolation — so the gradient (drawn every frame at the
@@ -370,6 +371,9 @@ export default class FogOfWar {
   }
 
   destroy(): void {
-    this.overlay.remove();
+    // Never `overlay.remove()` — p5 1.11's own Graphics.remove throws on a 2D
+    // buffer, and this is the second line of Game.destroy(). See
+    // `utils/graphics.utils.ts`.
+    removeGraphics(this.overlay);
   }
 }

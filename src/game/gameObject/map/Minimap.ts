@@ -12,6 +12,7 @@
  * run in a plain node test with no canvas — the shape `TouchControls` already
  * uses. Only `draw()` and the buffer builder may touch p5.
  */
+import { removeGraphics } from '../../../utils/graphics.utils';
 
 export interface MinimapRect {
   x: number;
@@ -192,7 +193,7 @@ export class Minimap {
     // The expanded buffer is sized off the viewport, so it is now the wrong
     // pixel size. Dropped rather than resized: rebuilding is one trace of a
     // static layer, and it happens on the next frame that needs it.
-    this.expandedBuffer?.remove();
+    removeGraphics(this.expandedBuffer);
     this.expandedBuffer = null;
   }
 
@@ -261,7 +262,7 @@ export class Minimap {
     }
     const pixels = Math.max(1, Math.round(size));
     if (!this.expandedBuffer || this.expandedBufferSize !== pixels) {
-      this.expandedBuffer?.remove();
+      removeGraphics(this.expandedBuffer);
       this.expandedBuffer = this.buildBuffer(pixels);
       this.expandedBufferSize = pixels;
     }
@@ -294,8 +295,8 @@ export class Minimap {
   }
 
   destroy(): void {
-    this.collapsedBuffer?.remove();
-    this.expandedBuffer?.remove();
+    removeGraphics(this.collapsedBuffer);
+    removeGraphics(this.expandedBuffer);
     this.collapsedBuffer = null;
     this.expandedBuffer = null;
   }
