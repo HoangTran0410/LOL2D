@@ -1,0 +1,71 @@
+{
+  "asset": {
+    "key": "spell_renekton_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Cull_the_Meek.png?367c9",
+    "sha1": "a98b915dde0667b5c843799f105c58499f8ac200"
+  },
+  "champion": "Renekton",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_renekton_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Cull_the_Meek.png?367c9",
+        "sha1": "a98b915dde0667b5c843799f105c58499f8ac200"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "7",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Renekton''' cleaves around himself, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|healing]]</span> himself for each enemy hit, up to a cap.",
+          "text": "Active: Renekton cleaves around himself, dealing physical damage to nearby enemies and healing himself for each enemy hit, up to a cap."
+        },
+        "description2": {
+          "raw": "Against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>, the healing is increased.",
+          "text": "Against champions, the healing is increased."
+        },
+        "description3": {
+          "raw": "'''Renekton''' generates <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">2.<small>5</small> Fury</span>]]</span> for each non-champion hit and <span style=\"color:\n#FA6533; white-space:normal\">10 Fury</span> for each champion hit, up to <span style=\"color:\n#FA6533; white-space:normal\">30</span> total per cast.",
+          "text": "Renekton generates 2.5 Fury for each non-champion hit and 10 Fury for each champion hit, up to 30 total per cast."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Reign of Anger\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Reign of Anger.png|20xpx|border|link=Renekton#Reign of Anger|An icon for Renekton's ability Reign of Anger]]</span> <span style=\"white-space:normal;\">[[Renekton#Reign of Anger|Reign of Anger]]</span></span> Bonus:'''</span> ''Cull the Meek'' has increased damage, tripled '''total''' healing, and a quadrupled healing cap.",
+          "text": "Reign of Anger Bonus: Cull the Meek has increased damage, tripled total healing, and a quadrupled healing cap."
+        },
+        "description5": {
+          "raw": "'''''Renekton''' cannot basic attack nor cast <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Slice and Dice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Slice and Dice.png|20xpx|border|link=Renekton#Slice and Dice|An icon for Renekton's ability Slice and Dice]]</span> <span style=\"white-space:normal;\">[[Renekton#Slice and Dice|Slice and Dice]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Dominus\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Dominus.png|20xpx|border|link=Renekton#Dominus|An icon for Renekton's ability Dominus]]</span> <span style=\"white-space:normal;\">[[Renekton#Dominus|Dominus]]</span></span> for 0.<small>25</small> seconds after Cull the Meek's activation.''",
+          "text": "Renekton cannot basic attack nor cast Slice and Dice or Dominus for 0.25 seconds after Cull the Meek's activation."
+        },
+        "effectradius": "400 • 480",
+        "icon": "Cull the Meek.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 90 / 120 / 150 / 180 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Damage:'''</span></dt><dd>90 / 135 / 180 / 225 / 270 <span style=\"color:orange; white-space:normal\">(+ 140% '''bonus''' AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Healing Cap:'''</span></dt><dd>50 / 75 / 100 / 125 / 150</dd><dt><span class=\"template_lc\">'''Enhanced Healing Cap:'''</span></dt><dd>200 / 300 / 400 / 500 / 600</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Non-Champion Healing:'''</span></dt><dd>2 / 3 / 4 / 5 / 6 <span style=\"color:orange; white-space:normal\">(+ 2% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Non-Champion Healing:'''</span></dt><dd>6 / 9 / 12 / 15 / 18 <span style=\"color:orange; white-space:normal\">(+ 6% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:60 / 90 / 120 / 150 / 180 (+ 100% bonus AD)Enhanced Damage:90 / 135 / 180 / 225 / 270 (+ 140% bonus AD)\nHealing Cap:50 / 75 / 100 / 125 / 150Enhanced Healing Cap:200 / 300 / 400 / 500 / 600\nNon-Champion Healing:2 / 3 / 4 / 5 / 6 (+ 2% bonus AD)Enhanced Non-Champion Healing:6 / 9 / 12 / 15 / 18 (+ 6% bonus AD)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Champion Healing:'''</span></dt><dd>12 / 20 / 28 / 36 / 44 <span style=\"color:orange; white-space:normal\">(+ 17% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Champion Healing:'''</span></dt><dd>36 / 60 / 84 / 108 / 132 <span style=\"color:orange; white-space:normal\">(+ 51% '''bonus''' AD)</span></dd></dl>",
+          "text": "Champion Healing:12 / 20 / 28 / 36 / 44 (+ 17% bonus AD)Enhanced Champion Healing:36 / 60 / 84 / 108 / 132 (+ 51% bonus AD)"
+        },
+        "name": "Cull the Meek",
+        "notes": {
+          "raw": "* Healing modifiers such as <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Spirit Visage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Spirit Visage item.png|20xpx|border|link=Spirit Visage|An icon for the item Spirit Visage]]</span> <span style=\"white-space:normal;\">[[Spirit Visage]]</span></span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span> take effect after ''Cull the Meek's'' healing cap.",
+          "text": "Healing modifiers such as Spirit Visage and Grievous Wounds take effect after Cull the Meek's healing cap."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Cull the Meek"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "512811605471264d232f8a9a28f326a4e45992ccd9075f7f58de8bfbd752cbbe",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Cull_the_Meek",
+    "revisionId": 4008014,
+    "sourceTimestamp": "2026-04-13T03:35:33Z"
+  }
+}

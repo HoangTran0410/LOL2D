@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_brand_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Conflagration.png?679f1",
+    "sha1": "a87dc264ad30ef76429c25066803110020fe3507"
+  },
+  "champion": "Brand",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_brand_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Conflagration.png?679f1",
+        "sha1": "a87dc264ad30ef76429c25066803110020fe3507"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "13 / 12 / 11 / 10 / 9",
+        "cost": "90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Brand''' sets the target enemy aflame, which creates a blast that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to them and causes the flame to spread from the target to nearby enemies, dealing them the same damage.",
+          "text": "Active: Brand sets the target enemy aflame, which creates a blast that deals magic damage to them and causes the flame to spread from the target to nearby enemies, dealing them the same damage."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> ''Conflagration's'' spread range is doubled.",
+          "text": "Ablaze Bonus: Conflagration's spread range is doubled."
+        },
+        "effectradius": "300 • 600",
+        "icon": "Conflagration.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 80 / 105 / 130 / 155 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Magic Damage:55 / 80 / 105 / 130 / 155 (+ 60% AP)"
+        },
+        "name": "Conflagration",
+        "notes": {
+          "raw": "* The flame spreads to enemies near the primary target at the time of cast.\n** Enemies that move out of range after the fact will still be hit, as the flame is spread as homing missiles to each of its targets.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The flame spreads to enemies near the primary target at the time of cast.\n* Enemies that move out of range after the fact will still be hit, as the flame is spread as homing missiles to each of its targets.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": false,
+        "speed": "900",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Conflagration"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "962a9fc9d86be82c0d7084bad0b32145e91557125de9d6c370046fd16fecaf2e",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Conflagration",
+    "revisionId": 4034693,
+    "sourceTimestamp": "2026-06-23T21:12:38Z"
+  }
+}

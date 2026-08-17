@@ -1,0 +1,109 @@
+{
+  "asset": {
+    "key": "champ_tryndamere",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_OriginalSquare.png?3eb36",
+    "sha1": "4a85806c652ecd1ec2082defcc0fa1ca4e416dcf"
+  },
+  "champion": "Tryndamere",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Tryndamere",
+    "be": 675,
+    "changes": "V26.06",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Duelist",
+      "Auto-attack",
+      "Physical"
+    ],
+    "control": 1,
+    "damage": 3,
+    "date": "2009-05-01",
+    "difficulty": 1,
+    "external_positions": [
+      "Top"
+    ],
+    "herotype": "Fighter",
+    "id": 23,
+    "mobility": 2,
+    "patch": "May 1, 2009 Patch",
+    "rangetype": "Melee",
+    "resource": "Fury",
+    "role": [
+      "Skirmisher"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Spinning Slash"
+    },
+    "skill_i": {
+      "1": "Battle Fury"
+    },
+    "skill_q": {
+      "1": "Bloodlust"
+    },
+    "skill_r": {
+      "1": "Undying Rage"
+    },
+    "skill_w": {
+      "1": "Mocking Shout"
+    },
+    "skills": {
+      "1": "Battle Fury",
+      "2": "Bloodlust",
+      "3": "Mocking Shout",
+      "4": "Spinning Slash",
+      "5": "Undying Rage"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "ar": {
+        "dam_lvl": -1
+      },
+      "aram": {
+        "dmg_dealt": 1.1,
+        "dmg_taken": 0.9,
+        "healing": 1.2
+      },
+      "arm_base": 33,
+      "arm_lvl": 4.8,
+      "as_base": 0.67,
+      "as_lvl": 3.4,
+      "as_ratio": 0.725,
+      "attack_delay_offset": -0.109999999403953,
+      "dam_base": 66,
+      "dam_lvl": 4.5,
+      "hp5_base": 8.5,
+      "hp5_lvl": 0.9,
+      "hp_base": 696,
+      "hp_lvl": 108,
+      "mp5_base": 0,
+      "mp5_lvl": 0,
+      "mp_base": 100,
+      "mp_lvl": 0,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 345,
+      "pathing_radius": 35,
+      "range": 175,
+      "selection_height": 180,
+      "selection_radius": 135
+    },
+    "style": 10,
+    "title": "The Barbarian King",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "c7b6410724ae6e8e99a2e42fac4b39dd2f558540ed4d81b3b96c3b7638e6a6ba",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

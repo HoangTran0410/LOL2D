@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Renekton/Reign of Anger",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Reign of Anger@@icon@@Reign of Anger.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Renekton's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> generate <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">5 Fury</span>]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>. After 12 seconds of being out of combat and not basic attacking, he loses <span style=\"color:\n#FA6533; white-space:normal\">1 Fury</span> every 0.<small>25</small> seconds.<br><br>Entering combat or using an attack will stop the <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> loss and refresh the timer. Additionally, while ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Dominus\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Dominus.png|20xpx|border|link=Renekton#Dominus|An icon for Renekton's ability Dominus]]</span> <span style=\"white-space:normal;\">[[Renekton#Dominus|Dominus]]</span></span>'' is active, the timer is continuously refreshed.@@description2@@While '''Renekton''' has at least <span style=\"color:\n#FA6533; white-space:normal\">50 Fury</span>, his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|basic ability]]</span>, excluding ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Slice and Dice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Slice and Dice.png|20xpx|border|link=Renekton#Slice and Dice|An icon for Renekton's ability Slice and Dice]]</span> <span style=\"white-space:normal;\">[[Renekton#Slice and Dice|Slice]]</span></span>'', consumes <span style=\"color:\n#FA6533; white-space:normal\">50 Fury</span> to become empowered with an additional effect. Empowered abilities do not generate <span style=\"color:\n#FA6533; white-space:normal\">Fury</span>.@@description3@@'''Renekton''' generates <span style=\"color:\n#FA6533; white-space:normal\">50% '''bonus''' Fury</span> from all sources while <span style=\"color:\n#21B053; white-space:normal\">below 50% of his '''maximum''' health</span>.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@@@spellshield@@@@projectile@@@@notes@@\n* Basic attacks against any enemy that is not a structure will generate the Fury.\n** '''Renekton''' can generate Fury by collecting <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:HoneyfruitSquare.png|20xpx|border|link=Honeyfruit|An icon representing Honeyfruit]]</span> <span style=\"white-space:normal;\">[[Honeyfruit]]</span></span> and [[Health Relic]]s (interacts with ''Reign of Anger's'' bonus generation).\n* <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span> Fury generation with parrying effects (<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blind]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodge]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|block]]</span>)@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309204,
+                "revisions": [
+                  {
+                    "parentid": 3961766,
+                    "revid": 3961774,
+                    "timestamp": "2025-10-29T04:36:45Z"
+                  }
+                ],
+                "title": "Template:Data Renekton/Reign of Anger"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3961774,
+      "timestamp": "2025-10-29T04:36:45Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "2a4aba0f14783459dfd01efab4060607f5d1fe43398fa16e571c7b14757a1d19",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Reign_of_Anger",
+    "revisionId": 3961774,
+    "sourceTimestamp": "2025-10-29T04:36:45Z"
+  }
+}

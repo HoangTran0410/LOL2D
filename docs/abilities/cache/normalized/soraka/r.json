@@ -1,0 +1,50 @@
+{
+  "asset": {
+    "key": "spell_soraka_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Wish.png?0cd6d",
+    "sha1": "f76d565530fd8d10aa1f438591a37c9f7d630f27"
+  },
+  "champion": "Soraka",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_soraka_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Wish.png?0cd6d",
+        "sha1": "f76d565530fd8d10aa1f438591a37c9f7d630f27"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "150 / 142.5 / 135 / 127.5 / 120",
+        "cost": "100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Soraka''' calls upon the stars, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|healing]]</span> herself and all allied champions, increased by 50% on targets <span style=\"color:\n#21B053; white-space:normal\">below 40% of their '''maximum''' health</span>.",
+          "text": "Active: Soraka calls upon the stars, healing herself and all allied champions, increased by 50% on targets below 40% of their maximum health."
+        },
+        "effectradius": "Global",
+        "icon": "Wish.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Heal:'''</span></dt><dd>150 / 200 / 250 / 300 / 350 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd><dt><span class=\"template_lc\">'''Increased Heal:'''</span></dt><dd>225 / 300 / 375 / 450 / 525 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 75% AP)</span></dd></dl>",
+          "text": "Heal:150 / 200 / 250 / 300 / 350 (+ 50% AP)Increased Heal:225 / 300 / 375 / 450 / 525 (+ 75% AP)"
+        },
+        "name": "Wish",
+        "notes": {
+          "raw": "* Due to several character stats needing to be recalculated each time a character spawns, casting ''Wish'' immediately upon respawning will cause its cooldown to be unaffected by ability haste, and the healing will not be increased by '''Soraka's''' <span style=\"color:\n#7A6DFF; white-space:normal\">ability power</span>. <sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|Untargetability]]</span> does not invalidate the targeting of the heal.\n* ''Wish'' will not credit '''Soraka''' for [[assist]]ing in a [[kill|champion kill]] if the target ally is at full health.\n* ''Wish'' will apply heal effects (such as <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Summon Aery\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Summon Aery rune.png|20xpx|link=Summon Aery|An icon representing Summon Aery]]</span> <span style=\"word-break: keep-all;\">[[Summon Aery]]</span></span>) prioritizing targets based on the ''Spawn ID'', which is the order in which units were added to an ongoing game. For <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>, this is the order they appear in from left to right in the loading screen.\n* ''Wish's'' effects occur before the cast time.\n* ''Wish'' will apply to units that are affected by '''Mordekaiser''''s R even if '''Soraka''' is not in the same realm.",
+          "text": "Due to several character stats needing to be recalculated each time a character spawns, casting Wish immediately upon respawning will cause its cooldown to be unaffected by ability haste, and the healing will not be increased by Soraka's ability power. (bug)\nUntargetability does not invalidate the targeting of the heal.\nWish will not credit Soraka for assisting in a champion kill if the target ally is at full health.\nWish will apply heal effects (such as Summon Aery) prioritizing targets based on the Spawn ID, which is the order in which units were added to an ongoing game. For champions, this is the order they appear in from left to right in the loading screen.\nWish's effects occur before the cast time.\nWish will apply to units that are affected by Mordekaiser's R even if Soraka is not in the same realm."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Wish"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "7e413ff7440d235d4bcfeeeb7f81ae3c981aef16f67f865ea085523a91baa232",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Wish",
+    "revisionId": 3907154,
+    "sourceTimestamp": "2025-06-06T18:24:13Z"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_tryndamere_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Mocking_Shout.png?e3366",
+    "sha1": "acd56bc5a361c166a265b19784962bce8eb4efc6"
+  },
+  "champion": "Tryndamere",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_tryndamere_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Mocking_Shout.png?e3366",
+        "sha1": "acd56bc5a361c166a265b19784962bce8eb4efc6"
+      },
+      "fields": {
+        "casttime": "0.3",
+        "cooldown": "14",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Tryndamere''' reduces the <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> of nearby enemy champions for 4 seconds.",
+          "text": "Active: Tryndamere reduces the &nbsp;bonus attack damage of nearby enemy champions for 4 seconds."
+        },
+        "description2": {
+          "raw": "'''Tryndamere''' also applies a curse to all nearby enemy champions for 3.<small>25</small> seconds. While accursed, they become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> while facing in the opposite direction of '''Tryndamere'''.",
+          "text": "Tryndamere also applies a curse to all nearby enemy champions for 3.25 seconds. While accursed, they become slowed while facing in the opposite direction of Tryndamere."
+        },
+        "description3": {
+          "raw": "''A nearby enemy champion is required to cast this ability. The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> to be targeted by this ability.''",
+          "text": "A nearby enemy champion is required to cast this ability. The target does not have to be visible to be targeted by this ability."
+        },
+        "effectradius": "850",
+        "icon": "Mocking Shout.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Attack Damage Reduction:'''</span></dt><dd>20 / 35 / 50 / 65 / 80</dd></dl>",
+          "text": "Attack Damage Reduction:20 / 35 / 50 / 65 / 80"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Slow:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Mocking Shout",
+        "notes": {
+          "raw": "* ''Mocking Shout'' very briefly <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|reveals]]</span> '''Tryndamere''' if he uses it while in the fog of war to enemies.\n* ''Mocking Shout'' prevents '''Tryndamere''' from using ''Undying Rage'' during its cast time. \n* If the attack damage reduction would reduce the target's <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> below <span style=\"color:orange; white-space:normal\">0</span>, the target's <span style=\"color:orange; white-space:normal\">'''base''' attack damage</span> value is unaffected, but their <span style=\"color:orange; white-space:normal\">'''total''' attack damage</span> will still be reduced. The target will however retain a <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> value of 0.\n** Effects that scale with <span style=\"color:orange; white-space:normal\">'''total''' attack damage</span>, such as basic attacks, will take the attack damage reduction into account for their calculations.\n** Those that have a ratio for <span style=\"color:orange; white-space:normal\">'''base''' attack damage</span> or <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> do not take the reduction into account.\n* ''Mocking Shout's'' <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;attack damage</span> reduction is worth <span class=\"inline-image label-after\" style=\"display:inline;color:#E2BA3D&#59;white-space:pre&#59;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Gold colored icon.svg|20xpx|link=Gold|An icon representing Gold]]</span> <span style=\"white-space:normal;\">&nbsp;&minus;&nbsp;700 / 1225 / 1750 / 2275 / 2800</span></span> per enemy hit.",
+          "text": "Mocking Shout very briefly reveals Tryndamere if he uses it while in the fog of war to enemies.\nMocking Shout prevents Tryndamere from using Undying Rage during its cast time.\nIf the attack damage reduction would reduce the target's bonus attack damage below 0, the target's base attack damage value is unaffected, but their total attack damage will still be reduced. The target will however retain a bonus attack damage value of 0.\n* Effects that scale with total attack damage, such as basic attacks, will take the attack damage reduction into account for their calculations.\n* Those that have a ratio for base attack damage or bonus attack damage do not take the reduction into account.\nMocking Shout's &nbsp;attack damage reduction is worth &nbsp;&minus;&nbsp;700 / 1225 / 1750 / 2275 / 2800 per enemy hit."
+        },
+        "spellshield": true,
+        "targeting": "Proximity"
+      },
+      "name": "Mocking Shout"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "bd4ccc2e95a8bac3b36bdd161efc6b1a2c5aea93400c1fff473122a531f00c53",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Tryndamere/Mocking_Shout",
+    "revisionId": 3983173,
+    "sourceTimestamp": "2026-01-10T21:52:10Z"
+  }
+}

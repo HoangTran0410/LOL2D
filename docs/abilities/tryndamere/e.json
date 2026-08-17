@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_tryndamere_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Spinning_Slash.png?37aff",
+    "sha1": "a7fa9d2937c9afbcd689d5e53bc791706a21eaeb"
+  },
+  "champion": "Tryndamere",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_tryndamere_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Spinning_Slash.png?37aff",
+        "sha1": "a7fa9d2937c9afbcd689d5e53bc791706a21eaeb"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12 / 11 / 10 / 9 / 8",
+        "damagetype": "physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Tryndamere''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target location, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit and generating <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">2 Fury</span>]]</span> per enemy hit, increased to <span style=\"color:\n#FA6533; white-space:normal\">5 Fury</span> against champions.",
+          "text": "Active: Tryndamere dashes to the target location, dealing physical damage to enemies hit and generating 2 Fury per enemy hit, increased to 5 Fury against champions."
+        },
+        "description2": {
+          "raw": "<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strikes\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|Critical strikes]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> reduce ''Spinning Slash's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> by 0.<small>75</small> seconds, doubled to 1.<small>5</small> seconds against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>.",
+          "text": "Critical strikes on-hit reduce Spinning Slash's &nbsp;current cooldown by 0.75 seconds, doubled to 1.5 seconds against champions."
+        },
+        "description3": {
+          "raw": "''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tryndamere\" data-ability=\"Bloodlust\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tryndamere Bloodlust.png|20xpx|border|link=Tryndamere#Bloodlust|An icon for Tryndamere's ability Bloodlust]]</span> <span style=\"white-space:normal;\">[[Tryndamere#Bloodlust|Bloodlust]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tryndamere\" data-ability=\"Undying Rage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tryndamere Undying Rage.png|20xpx|border|link=Tryndamere#Undying Rage|An icon for Tryndamere's ability Undying Rage]]</span> <span style=\"white-space:normal;\">[[Tryndamere#Undying Rage|Undying Rage]]</span></span> can be cast during the dash.''",
+          "text": "Bloodlust and Undying Rage can be cast during the dash."
+        },
+        "effectradius": "225",
+        "icon": "Spinning Slash.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>80 / 120 / 160 / 200 / 240 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Physical Damage:80 / 120 / 160 / 200 / 240 (+ 100% bonus AD) (+ 80% AP)"
+        },
+        "name": "Spinning Slash",
+        "notes": {
+          "raw": "* ''Spinning Slash'''s <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">Fury</span>]]</span> generation stacks additively with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tryndamere\" data-ability=\"Battle Fury\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tryndamere Battle Fury.png|20xpx|border|link=Tryndamere#Battle Fury|An icon for Tryndamere's ability Battle Fury]]</span> <span style=\"white-space:normal;\">[[Tryndamere#Battle Fury|Battle Fury]]</span></span>'s <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> generation on kill.\n** Killing an minion with ''Spinning Slash'' grants <span style=\"color:\n#FA6533; white-space:normal\">12 Fury</span> (<span style=\"color:\n#FA6533; white-space:normal\">2 Fury</span> from enemy hit + <span style=\"color:\n#FA6533; white-space:normal\">10 Fury</span> from the kill).\n** Killing an champion with ''Spinning Slash'' grants <span style=\"color:\n#FA6533; white-space:normal\">15 Fury</span> (<span style=\"color:\n#FA6533; white-space:normal\">5 Fury</span> from champion hit + <span style=\"color:\n#FA6533; white-space:normal\">10 Fury</span> from the kill).\n* There is no cooldown on <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> generation on kill with ''Spinning Slash''.\n* ''Spinning Slash'' has no minimum dash range.\n* <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> will interrupt the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> but ''Spinning Slash'' will deal damage to enemies at the new location instantly.\n** Enemies already hit by ''Spinning Slash'' cannot be damaged more than once.\n* To ensure ''Spinning Slash'' deals damage when dashing away from an enemy champion, '''Tryndamere''' needs to move ''r-35'' units towards the enemy beyond the distance he can basic attack at, where ''r'' represents the enemy's radius and ''35'' is the distance in units beyond '''Tryndamere's''' basic attack range that ''Spinning Slash'' can reach.\n* The cooldown reduction upon <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically striking]]</span> triggers on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span> and [[jungle plants]] and even if the attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>, but not if it misses due to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blind]]</span>.\n* <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span>: Cooldown reduction on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strike]]</span> interaction with ''parrying'' effects (<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodge]]</span>).",
+          "text": "Spinning Slashs Fury generation stacks additively with Battle Fury's Fury generation on kill.\n* Killing an minion with Spinning Slash grants 12 Fury (2 Fury from enemy hit + 10 Fury from the kill).\n* Killing an champion with Spinning Slash grants 15 Fury (5 Fury from champion hit + 10 Fury from the kill).\nThere is no cooldown on Fury generation on kill with Spinning Slash.\nSpinning Slash has no minimum dash range.\nFlash will interrupt the dash but Spinning Slash will deal damage to enemies at the new location instantly.\n* Enemies already hit by Spinning Slash cannot be damaged more than once.\nTo ensure Spinning Slash deals damage when dashing away from an enemy champion, Tryndamere needs to move r-35 units towards the enemy beyond the distance he can basic attack at, where r represents the enemy's radius and 35 is the distance in units beyond Tryndamere's basic attack range that Spinning Slash can reach.\nThe cooldown reduction upon critically striking triggers on wards and jungle plants and even if the attack is blocked, but not if it misses due to blind.\nPENDING FOR TEST:: Cooldown reduction on critical strike interaction with parrying effects ( dodge)."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Spinning Slash"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "8f984eddfa463abd43b6aaed3188c4a2af532294175ebc94b98d2c973457e08e",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Tryndamere/Spinning_Slash",
+    "revisionId": 4007759,
+    "sourceTimestamp": "2026-04-12T14:14:27Z"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_darius_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Crippling_Strike.png?cadc4",
+    "sha1": "98a3fd8ae6cc8d07fe522cd07fb07c8ca2f0f190"
+  },
+  "champion": "Darius",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_darius_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Crippling_Strike.png?cadc4",
+        "sha1": "98a3fd8ae6cc8d07fe522cd07fb07c8ca2f0f190"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "5",
+        "cost": "40",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Darius''' empowers his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> within 4 seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;25 '''bonus''' range</span>, deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> the target by 90% for 1 second. This damage is affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strike]]</span> modifiers.",
+          "text": "Active: Darius empowers his next basic attack within 4 seconds to have an uncancellable windup, gain &nbsp;25 bonus range, deal bonus physical damage and slow the target by 90% for 1 second. This damage is affected by critical strike modifiers."
+        },
+        "description2": {
+          "raw": "If this attack kills the target, half of ''Crippling Strike's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced and its <span style=\"color:\n#0099CC; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;mana cost</span></span> is refunded.",
+          "text": "If this attack kills the target, half of Crippling Strike's &nbsp;cooldown is reduced and its &nbsp;mana cost is refunded."
+        },
+        "description3": {
+          "raw": "''Crippling Strike <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Darius' ''' basic attack timer.''",
+          "text": "Crippling Strike resets Darius' basic attack timer."
+        },
+        "icon": "Crippling Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd><span style=\"color:orange; white-space:normal\">40 / 45 / 50 / 55 / 60% AD</span></dd></dl>",
+          "text": "Bonus Physical Damage:40 / 45 / 50 / 55 / 60% AD"
+        },
+        "name": "Crippling Strike",
+        "notes": {
+          "raw": "* ''Crippling Strike'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span> but will also trigger <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell effects\">[[File:Blackfire Torch item.png|20px|link=Ability effects|An icon representing the keyword Ability effects]] [[:Ability effects|spell effects]]</span> by also being tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span>.\n** This includes the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> itself.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shields]]</span> will negate all effects of ''Crippling Strike'', including the damage of the basic attack itself.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n* The attack's animation can be cancelled by casting <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Darius\" data-ability=\"Decimate\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Darius Decimate.png|20xpx|border|link=Darius#Decimate|An icon for Darius's ability Decimate]]</span> <span style=\"white-space:normal;\">[[Darius#Decimate|Decimate]]</span></span>, but the attack will still land.\n* The cooldown reduction and mana refund will not trigger when killing [[jungle plants]].",
+          "text": "Crippling Strike deals basic damage but will also trigger spell effects by also being tagged as spell damage.\n* This includes the basic attack itself.\nSpell shields will negate all effects of Crippling Strike, including the damage of the basic attack itself.(unexpected)\nThe attack's animation can be cancelled by casting Decimate, but the attack will still land.\nThe cooldown reduction and mana refund will not trigger when killing jungle plants."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Crippling Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "a006a5563dff7dc0c01a4a677c64f7d3a738090113dff9d3f1d0aa6443bb3f17",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Darius/Crippling_Strike",
+    "revisionId": 4013692,
+    "sourceTimestamp": "2026-04-29T23:15:35Z"
+  }
+}

@@ -13,6 +13,7 @@ import { every, filter, forEach, map, some } from './utils/optimized.utils';
 import { System } from './libs/detect-collisions';
 import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
+import { registerServiceWorker } from './pwa/updates';
 
 // Expose detect-collisions System globally for code that accesses window.ABC
 (window as any).ABC = { System };
@@ -49,4 +50,8 @@ import LoadingScene from './scenes/LoadingScene';
 
   // open loading scene
   mgr.showScene(LoadingScene);
+
+  // Last, and fire-and-forget: caching the app must never be on the path
+  // between the player and a running game. See src/pwa/updates.ts.
+  registerServiceWorker();
 };

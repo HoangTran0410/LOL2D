@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ezreal/Arcane Shift",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Arcane Shift@@icon@@Arcane Shift.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Ezreal''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blinks\">[[File:Flash.png|20px|link=Blink|An icon representing the keyword Blink]] [[:Blink|blinks]]</span> from his current location to up to 475 units towards the target location, then fires a homing bolt towards the nearest enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|reveals]]</span> them for 1 second.@@description2@@''Arcane Shift'' prioritizes firing at the nearest enemy marked by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Ezreal\" data-ability=\"Essence Flux\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Ezreal Essence Flux.png|20xpx|border|link=Ezreal#Essence Flux|An icon for Ezreal's ability Essence Flux]]</span> <span style=\"white-space:normal;\">[[Ezreal#Essence Flux|Essence Flux]]</span></span>''.@@description3@@''The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> to be hit by this ability.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 130 / 180 / 230 / 280 <span style=\"color:orange; white-space:normal\">(+ 60% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 75% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Homing missile range\">750</span>@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Homing missile speed\">2000</span>@@casttime@@0.<small>25</small>@@cost@@70@@cooldown@@26 / 23 / 20 / 17 / 14@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* If '''Ezreal''' is moved during the cast time, his range to blink will update accordingly. This does not exceed the maximum target range.\n* The target is revealed as soon as '''Ezreal''' fires the missile at them.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307111,
+                "revisions": [
+                  {
+                    "parentid": 3936309,
+                    "revid": 3989862,
+                    "timestamp": "2026-02-03T23:19:20Z"
+                  }
+                ],
+                "title": "Template:Data Ezreal/Arcane Shift"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3989862,
+      "timestamp": "2026-02-03T23:19:20Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "798fcae93dffc8170096cd068c490a7610984fe8cac15c7be9b552f22778fd7d",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ezreal/Arcane_Shift",
+    "revisionId": 3989862,
+    "sourceTimestamp": "2026-02-03T23:19:20Z"
+  }
+}

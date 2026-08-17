@@ -1,0 +1,117 @@
+{
+  "asset": {
+    "key": "champ_soraka",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_OriginalSquare.png?0c2df",
+    "sha1": "9656e52607ab5443d07ad3300b41a91551f39dd8"
+  },
+  "champion": "Soraka",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Mage",
+    "apiname": "Soraka",
+    "be": 225,
+    "changes": "V25.20",
+    "client_positions": [
+      "Support"
+    ],
+    "client_tags": [
+      "Ally Protection",
+      "Crowd Control",
+      "Magic"
+    ],
+    "control": 2,
+    "damage": 1,
+    "date": "2009-02-21",
+    "difficulty": 1,
+    "external_positions": [
+      "Support"
+    ],
+    "herotype": "Support",
+    "id": 16,
+    "mobility": 1,
+    "patch": "Alpha Week 2",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Enchanter"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Equinox"
+    },
+    "skill_i": {
+      "1": "Salvation"
+    },
+    "skill_q": {
+      "1": "Starcall"
+    },
+    "skill_r": {
+      "1": "Wish"
+    },
+    "skill_w": {
+      "1": "Astral Infusion"
+    },
+    "skills": {
+      "1": "Salvation",
+      "2": "Starcall",
+      "3": "Astral Infusion",
+      "4": "Equinox",
+      "5": "Wish"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "ability_haste": 10,
+        "dmg_dealt": 1,
+        "dmg_taken": 1,
+        "healing": 1
+      },
+      "arm_base": 32,
+      "arm_lvl": 5,
+      "as_base": 0.625,
+      "as_lvl": 2.14,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.112999998033046,
+      "dam_base": 50,
+      "dam_lvl": 3,
+      "hp5_base": 2.5,
+      "hp5_lvl": 0.5,
+      "hp_base": 605,
+      "hp_lvl": 88,
+      "missile_speed": 1000,
+      "mp5_base": 11.5,
+      "mp5_lvl": 0.4,
+      "mp_base": 425,
+      "mp_lvl": 40,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 325,
+      "ofa": {
+        "dmg_dealt": 1.03,
+        "dmg_taken": 0.97,
+        "healing": 1.1
+      },
+      "pathing_radius": 44.2000007629394,
+      "range": 550,
+      "selection_height": 145,
+      "selection_radius": 110,
+      "urf": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.92
+      }
+    },
+    "style": 100,
+    "title": "The Starchild",
+    "toughness": 1,
+    "utility": 3
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "4f6ba3e7ffebe26b72a782823f1633cd6476c473eaf6eb1988116f47acbcb998",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

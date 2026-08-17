@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_ezreal_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Mystic_Shot.png?00b17",
+    "sha1": "0103dab0f02c85e9bf5f857c0c3e3b554940adce"
+  },
+  "champion": "Ezreal",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ezreal_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Mystic_Shot.png?00b17",
+        "sha1": "0103dab0f02c85e9bf5f857c0c3e3b554940adce"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "5.5 / 5.25 / 5 / 4.75 / 4.5",
+        "cost": "28 / 31 / 34 / 37 / 40",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ezreal''' fires a bolt of energy in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy hit, applying <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects and triggering <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-attack\">[[File:On-attack icon.svg|20px|link=Attack_effects#On_Attacking|An icon representing the keyword On-attack]] [[:Attack_effects#On_Attacking|on-attack]]</span> effects.",
+          "text": "Active: Ezreal fires a bolt of energy in the target direction that deals physical damage to the first enemy hit, applying on-hit effects and triggering on-attack effects."
+        },
+        "description2": {
+          "raw": "If ''Mystic Shot'' successfully hits an enemy, the <span style=\"white-space:nowrap\">'''current''' cooldowns</span> of '''Ezreal's''' abilities, including ''Mystic Shot's'', are reduced by 1.<small>5</small> seconds.",
+          "text": "If Mystic Shot successfully hits an enemy, the current cooldowns of Ezreal's abilities, including Mystic Shot's, are reduced by 1.5 seconds."
+        },
+        "icon": "Mystic Shot.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>20 / 45 / 70 / 95 / 120 <span style=\"color:orange; white-space:normal\">(+ 130% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Physical Damage:20 / 45 / 70 / 95 / 120 (+ 130% AD) (+ 40% AP)"
+        },
+        "name": "Mystic Shot",
+        "notes": {
+          "raw": "* ''Mystic Shot'' deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span>, but also triggers spell effects by also being tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span>.\n* ''Mystic Shot'' benefits from <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span></span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Omnivamp\">[[File:Omnivamp colored icon.svg|20px|link=Vamp#Omnivamp|An icon representing the keyword Omnivamp]] [[:Vamp#Omnivamp|omnivamp]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Physical vamp\">[[File:Life steal icon.svg|20px|link=Vamp#Physical vamp|An icon representing the keyword Physical vamp]] [[:Vamp#Physical vamp|physical vamp]]</span>, but not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell vamp\">[[File:Spell vamp icon.svg|20px|link=Vamp#Spell vamp|An icon representing the keyword Spell vamp]] [[:Vamp#Spell vamp|spell vamp]]</span>.\n* Even if the ability is blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> it will still trigger the cooldown reduction.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* ''Mystic Shot'' will be buffered and cast when the cooldown ends if the player attempts to cast it within 0.<small>05</small> seconds of the cooldown ending.",
+          "text": "Mystic Shot deals basic damage, but also triggers spell effects by also being tagged as spell damage.\nMystic Shot benefits from &nbsp;life steal, omnivamp, and physical vamp, but not spell vamp.\nEven if the ability is blocked by spell shield it will still trigger the cooldown reduction.\nThis ability will cast from wherever the caster is at the end of the cast time.\nMystic Shot will be buffered and cast when the cooldown ends if the player attempts to cast it within 0.05 seconds of the cooldown ending."
+        },
+        "projectile": true,
+        "speed": "2000",
+        "spellshield": false,
+        "targeting": "Location",
+        "width": "120"
+      },
+      "name": "Mystic Shot"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "3dce1615d4b33a645ae5d9d8069688bc3d6287f67c848e287547e785ab4896eb",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ezreal/Mystic_Shot",
+    "revisionId": 4013233,
+    "sourceTimestamp": "2026-04-28T21:19:30Z"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_caitlyn_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Piltover_Peacemaker.png?fdac7",
+    "sha1": "a1051463f9f48eceb4ccbc484a5d8e94e7d422ff"
+  },
+  "champion": "Caitlyn",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_caitlyn_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Piltover_Peacemaker.png?fdac7",
+        "sha1": "a1051463f9f48eceb4ccbc484a5d8e94e7d422ff"
+      },
+      "fields": {
+        "casttime": "0.625",
+        "cooldown": "10 / 9 / 8 / 7 / 6",
+        "cost": "55 / 60 / 65 / 70 / 75",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Caitlyn''' fires a piercing shot in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to the first enemy it passes through, after which it expands in width but deals only 60% damage to enemies it hits thereafter.",
+          "text": "Active: Caitlyn fires a piercing shot in the target direction that deals physical damage to the first enemy it passes through, after which it expands in width but deals only 60% damage to enemies it hits thereafter."
+        },
+        "description2": {
+          "raw": "Enemies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealed]]</span> by ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Yordle Snap Trap\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Yordle Snap Trap.png|20xpx|border|link=Caitlyn#Yordle Snap Trap|An icon for Caitlyn's ability Yordle Snap Trap]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Yordle Snap Trap|Yordle Snap Trap]]</span></span>'' always take [[File:Successfully enhanced damage physical icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\">full damage</span> from ''Piltover Peacemaker''.",
+          "text": "Enemies revealed by Yordle Snap Trap always take full damage from Piltover Peacemaker."
+        },
+        "icon": "Piltover Peacemaker.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>50 / 90 / 130 / 170 / 210 <span style=\"color:orange; white-space:normal\">(+ 125 / 145 / 165 / 185 / 205% AD)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>30 / 54 / 78 / 102 / 126 <span style=\"color:orange; white-space:normal\">(+ 75 / 87 / 99 / 111 / 123% AD)</span></dd></dl>",
+          "text": "Physical Damage:50 / 90 / 130 / 170 / 210 (+ 125 / 145 / 165 / 185 / 205% AD)Reduced Damage:30 / 54 / 78 / 102 / 126 (+ 75 / 87 / 99 / 111 / 123% AD)"
+        },
+        "name": "Piltover Peacemaker",
+        "notes": {
+          "raw": "* Upon ''Piltover Peacemaker'' dealing damage to an enemy, '''Caitlyn's''' [[attack timer]] is forcibly <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|reset]]</span>.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup> \n* Enemies hit while protected by a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> will still be considered a target for calculating damage for subsequent hits.\n* This ability will cast from wherever the caster is at the start of the cast time.",
+          "text": "Upon Piltover Peacemaker dealing damage to an enemy, Caitlyn's attack timer is forcibly reset.(bug)\nEnemies hit while protected by a spell shield will still be considered a target for calculating damage for subsequent hits.\nThis ability will cast from wherever the caster is at the start of the cast time."
+        },
+        "projectile": true,
+        "range": "1300 • 1240",
+        "speed": "2200",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "120 • 180"
+      },
+      "name": "Piltover Peacemaker"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "9edc417df79e4bc6f2f91d9ded473ae439a8ac76a96d2b0f22ba48b469aff991",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Caitlyn/Piltover_Peacemaker",
+    "revisionId": 4007583,
+    "sourceTimestamp": "2026-04-12T06:47:12Z"
+  }
+}

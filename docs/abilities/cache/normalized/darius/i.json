@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_darius_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Hemorrhage.png?dffa1",
+    "sha1": "f2f35a34b209a230da596935bc4e9df909b9dbcc"
+  },
+  "champion": "Darius",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_darius_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Hemorrhage.png?dffa1",
+        "sha1": "f2f35a34b209a230da596935bc4e9df909b9dbcc"
+      },
+      "fields": {
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Darius' ''' damaging <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span> apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Hemorrhage'' to enemies for 5 seconds, refreshing on subsequent applications and stacking up to 5 times.",
+          "text": "Innate: Darius' damaging basic attacks and abilities apply a stack of Hemorrhage to enemies for 5 seconds, refreshing on subsequent applications and stacking up to 5 times."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Hemorrhage:'''</span> For each stack, the target is dealt<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;<span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"13;\" data-finish=\"30;\" data-top-fill=\"18\" data-bot-values=\"13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53|displayMaxColumn=18\">13 – 30 (based on level)</span></span> <span style=\"color:orange; white-space:normal\">(+ 30% '''bonus''' AD)</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''total''' physical damage</span> over the duration,&nbsp;」</span><span class=\"flipText2\">「&nbsp;<span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"3.25;\" data-finish=\"7.5;\" data-top-fill=\"18\" data-bot-values=\"3.25;3.5;3.75;4;4.25;4.5;4.75;5;5.25;5.5;5.75;6;6.25;6.5;6.75;7;7.25;7.5;7.75;8;8.25;8.5;8.75;9;9.25;9.5;9.75;10;10.25;10.5;10.75;11;11.25;11.5;11.75;12;12.25;12.5;12.75;13;13.25|displayMaxColumn=18\">3.<small>25</small> – 7.<small>5</small> (based on level)</span></span> <span style=\"color:orange; white-space:normal\">(+ 7.<small>5</small>% '''bonus''' AD)</span> <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> every 1.<small>25</small> seconds over the duration,&nbsp;」</span></span>up to a maximum of<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;<span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"65;\" data-finish=\"150;\" data-top-fill=\"18\" data-bot-values=\"65;70;75;80;85;90;95;100;105;110;115;120;125;130;135;140;145;150;155;160;165;170;175;180;185;190;195;200;205;210;215;220;225;230;235;240;245;250;255;260;265|displayMaxColumn=18\">65 – 150 (based on level)</span></span> <span style=\"color:orange; white-space:normal\">(+ 150% '''bonus''' AD)</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''total''' physical damage</span> over the duration.&nbsp;」</span><span class=\"flipText2\">「&nbsp;<span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"16.25;\" data-finish=\"37.5;\" data-top-fill=\"18\" data-bot-values=\"16.25;17.5;18.75;20;21.25;22.5;23.75;25;26.25;27.5;28.75;30;31.25;32.5;33.75;35;36.25;37.5;38.75;40;41.25;42.5;43.75;45;46.25;47.5;48.75;50;51.25;52.5;53.75;55;56.25;57.5;58.75;60;61.25;62.5;63.75;65;66.25|displayMaxColumn=18\">16.<small>25</small> – 37.<small>5</small> (based on level)</span></span> <span style=\"color:orange; white-space:normal\">(+ 37.<small>5</small>% '''bonus''' AD)</span> <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> with each tick.&nbsp;」</span></span>''Hemorrhage'' deals 250% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Hemorrhage: For each stack, the target is dealt「&nbsp;13 – 30 (based on level) (+ 30% bonus AD) total physical damage over the duration,&nbsp;」「&nbsp;3.25 – 7.5 (based on level) (+ 7.5% bonus AD) physical damage every 1.25 seconds over the duration,&nbsp;」up to a maximum of「&nbsp;65 – 150 (based on level) (+ 150% bonus AD) total physical damage over the duration.&nbsp;」「&nbsp;16.25 – 37.5 (based on level) (+ 37.5% bonus AD) physical damage with each tick.&nbsp;」Hemorrhage deals 250% damage against monsters."
+        },
+        "description3": {
+          "raw": "When '''Darius''' kills a champion with ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Darius\" data-ability=\"Noxian Guillotine\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Darius Noxian Guillotine.png|20xpx|border|link=Darius#Noxian Guillotine|An icon for Darius's ability Noxian Guillotine]]</span> <span style=\"white-space:normal;\">[[Darius#Noxian Guillotine|Noxian Guillotine]]</span></span>'', or applies 5 stacks on an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, he becomes empowered with ''Noxian Might'' for 5 seconds.",
+          "text": "When Darius kills a champion with Noxian Guillotine, or applies 5 stacks on an enemy champion, he becomes empowered with Noxian Might for 5 seconds."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Noxian Might:'''</span> '''Darius''' gains <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:orange;\" data-displayformula=\"30 + 5 per level until level 10, then + 10 per level until level 13, then + 25 per level\" data-bot-values=\"30;35;40;45;50;55;60;65;70;75;85;95;105;130;155;180;205;230;255;280;305;330;355;380;405;430;455;480;505;530;555;580;605;630;655;680;705;730;755;780;805|displayMaxColumn=18\">30 – 230 (based on level)</span> <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> and instantly applies 5 ''Hemorrhage'' stacks through his usual means.",
+          "text": "Noxian Might: Darius gains 30 – 230 (based on level) &nbsp;bonus attack damage and instantly applies 5 Hemorrhage stacks through his usual means."
+        },
+        "icon": "false",
+        "icon2": "Hemorrhage.png",
+        "icon3": "Hemorrhage 3.png",
+        "icon4": "Hemorrhage 2.png",
+        "name": "Hemorrhage",
+        "notes": {
+          "raw": "* If Hemorrhage's '''total''' <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage calculated after modifiers\">post-mitigation</span> damage is higher than the <span style=\"color:\n#21B053; white-space:normal\">target's '''current''' health</span>, a small area of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> is granted around the target for the duration of Hemorrhage and for another 2 seconds after it ends.\n* ''Hemorrhage'' does not apply to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span> nor <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.\n* '''Darius'''' attacks and abilities have to deal damage to apply ''Hemorrhage''.\n** ''Hemorrhage'' cannot be applied to/refreshed against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invulnerable\">[[File:Cosmic Radiance.png|20px|link=Invulnerability|An icon representing the keyword Invulnerability]] [[:Invulnerability|invulnerable]]</span> targets.\n** ''Hemorrhage'' '''can''' be applied to and refreshed against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shielded]]</span> targets.\n** ''Hemorrhage'' can also be applied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>, but will specifically not do so if the target is invulnerable.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> prevents ''Hemorrhage's'' application from abilities only.",
+          "text": "If Hemorrhage's total post-mitigation damage is higher than the target's current health, a small area of sight is granted around the target for the duration of Hemorrhage and for another 2 seconds after it ends.\nHemorrhage does not apply to structures nor wards.\nDarius' attacks and abilities have to deal damage to apply Hemorrhage.\n* Hemorrhage cannot be applied to/refreshed against invulnerable targets.\n* Hemorrhage can be applied to and refreshed against shielded targets.\n* Hemorrhage can also be applied on-hit, but will specifically not do so if the target is invulnerable.\nSpell shield prevents Hemorrhage's application from abilities only."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Hemorrhage"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "5d48ab2a35be1766425c71fecf4c57a28e8a0c056bae2b8e2eea89043e33d864",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Darius/Hemorrhage",
+    "revisionId": 4043706,
+    "sourceTimestamp": "2026-07-16T00:19:44Z"
+  }
+}

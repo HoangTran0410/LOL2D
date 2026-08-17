@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_soraka_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Starcall.png?c94fb",
+    "sha1": "2c24be830e614c0a87486e27c3555efcb94867f1"
+  },
+  "champion": "Soraka",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_soraka_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Starcall.png?c94fb",
+        "sha1": "2c24be830e614c0a87486e27c3555efcb94867f1"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8 / 7 / 6 / 5 / 4",
+        "cost": "45 / 50 / 55 / 60 / 65",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Soraka''' calls down a star upon the target location that grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area before landing after <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target range\" data-start=\"0.25;50\" data-finish=\"1;800\" data-top-fill=\"16\" data-bot-values=\"0.25;0.3;0.35;0.4;0.45;0.5;0.55;0.6;0.65;0.7;0.75;0.8;0.85;0.9;0.95;1\" data-top-values=\"50;100;150;200;250;300;350;400;450;500;550;600;650;700;750;800\">0.<small>25</small> – 1 (based on target range)</span> seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 30% for 1.<small>5</small> seconds.",
+          "text": "Active: Soraka calls down a star upon the target location that grants sight of the area before landing after 0.25 – 1 (based on target range) seconds, dealing magic damage to enemies hit and slowing them by 30% for 1.5 seconds."
+        },
+        "description2": {
+          "raw": "If this hits at least one enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, star dust returns to '''Soraka''', granting her ''Rejuvenation'' for 2.<small>5</small> seconds. While '''Soraka''' has ''Rejuvenation'', casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Astral Infusion\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Astral Infusion.png|20xpx|border|link=Soraka#Astral Infusion|An icon for Soraka's ability Astral Infusion]]</span> <span style=\"white-space:normal;\">[[Soraka#Astral Infusion|Astral Infusion]]</span></span>'' will also grant ''Rejuvenation'' to the target for the same duration.",
+          "text": "If this hits at least one enemy champion, star dust returns to Soraka, granting her Rejuvenation for 2.5 seconds. While Soraka has Rejuvenation, casting Astral Infusion will also grant Rejuvenation to the target for the same duration."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Rejuvenation'''</span>: <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|Heal]]</span> every 0.<small>2</small> seconds and gain <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> that decays over the duration.",
+          "text": "Rejuvenation: Heal every 0.2 seconds and gain &nbsp;bonus movement speed that decays over the duration."
+        },
+        "effectradius": "265",
+        "icon": "Starcall.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>85 / 120 / 155 / 190 / 225 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 35% AP)</span></dd></dl>",
+          "text": "Magic Damage:85 / 120 / 155 / 190 / 225 (+ 35% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Heal:'''</span></dt><dd>60 / 75 / 90 / 105 / 120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd><dt><span class=\"template_lc\">'''Heal per Tick:'''</span></dt><dd>5 / 6.<small>25</small> / 7.<small>5</small> / 8.<small>75</small> / 10 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 2.<small>5</small>% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>20 / 22.<small>5</small> / 25 / 27.<small>5</small> / 30%</dd></dl>",
+          "text": "Total Heal:60 / 75 / 90 / 105 / 120 (+ 30% AP)Heal per Tick:5 / 6.25 / 7.5 / 8.75 / 10 (+ 2.5% AP)\nBonus Movement Speed:20 / 22.5 / 25 / 27.5 / 30%"
+        },
+        "name": "Starcall",
+        "notes": {
+          "raw": "* ''Starcall'' counts as hitting even if it gets blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>, granting ''Rejuvenation''.\n* Both the initial hit and the ''Rejuvenation'' projectile can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Projectile\">[[File:Projectile.png|20px|link=Projectile|An icon representing the keyword Projectile]] [[:Projectile|intercepted]]</span>.\n* ''Rejuvenation'' heals over 12 ticks, with the first 4 each healing for about 15% of the heal, the next 4 ticks for about 5.<small>5</small>% each, and the last 4 for about 4.<small>5</small>% each.\n* ''Rejuvenation'' won't be granted to '''Soraka''' and she won't be able to make use of the health cost reduction on <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Astral Infusion\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Astral Infusion.png|20xpx|border|link=Soraka#Astral Infusion|An icon for Soraka's ability Astral Infusion]]</span> <span style=\"white-space:normal;\">[[Soraka#Astral Infusion|Astral Infusion]]</span></span> until the projectile gets to her, but she is able to ''Rejuvenate'' allies as soon as the target is hit.",
+          "text": "Starcall counts as hitting even if it gets blocked by spell shield, granting Rejuvenation.\nBoth the initial hit and the Rejuvenation projectile can be intercepted.\nRejuvenation heals over 12 ticks, with the first 4 each healing for about 15% of the heal, the next 4 ticks for about 5.5% each, and the last 4 for about 4.5% each.\nRejuvenation won't be granted to Soraka and she won't be able to make use of the health cost reduction on Astral Infusion until the projectile gets to her, but she is able to Rejuvenate allies as soon as the target is hit."
+        },
+        "projectile": true,
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Starcall"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "b6293bc21d07c8ed8ad86dad95660275a88aaf961285d8f6e3c813f6d55fed48",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Starcall",
+    "revisionId": 3953362,
+    "sourceTimestamp": "2025-09-11T19:22:43Z"
+  }
+}

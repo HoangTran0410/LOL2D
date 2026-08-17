@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Renekton/Slice and Dice",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Slice and Dice@@icon@@Slice and Dice.png@@icon2@@{{{icon2}}}@@icon3@@Slice and Dice 2.png@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active - Slice:'''</span> '''Renekton''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> a fixed distance in the target direction, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies he passes through.@@description2@@If '''Renekton''' hits an enemy, he can recast ''Slice and Dice'' within the next 4 seconds.@@description3@@<span class=\"template_sbc\">'''Recast - Dice:'''</span> '''Renekton''' repeats the first cast's effects.@@description4@@Both casts generate <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">2 Fury</span>]]</span> for each non-champion hit and <span style=\"color:\n#FA6533; white-space:normal\">10 Fury</span> for each champion hit, up to <span style=\"color:\n#FA6533; white-space:normal\">30</span> total per cast.@@description5@@<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Reign of Anger\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Reign of Anger.png|20xpx|border|link=Renekton#Reign of Anger|An icon for Renekton's ability Reign of Anger]]</span> <span style=\"white-space:normal;\">[[Renekton#Reign of Anger|Reign of Anger]]</span></span> Bonus:'''</span> ''Dice'', the recast, deals <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> and inflicts <span style=\"white-space:nowrap\">[[File:Armor penetration icon.svg|15px|link=Armor penetration]]&nbsp;<span style=\"color:yellow; white-space:normal\">armor reduction</span></span> to enemies hit for 4 seconds.@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>40 / 70 / 100 / 130 / 160 <span style=\"color:orange; white-space:normal\">(+ 90% '''bonus''' AD)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Physical Damage:'''</span></dt><dd>80 / 140 / 200 / 260 / 320 <span style=\"color:orange; white-space:normal\">(+ 180% '''bonus''' AD)</span></dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Enhanced Physical Damage:'''</span></dt><dd>70 / 115 / 160 / 205 / 250 <span style=\"color:orange; white-space:normal\">(+ 135% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Enhanced Damage:'''</span></dt><dd>110 / 185 / 260 / 335 / 410 <span style=\"color:orange; white-space:normal\">(+ 225% '''bonus''' AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Armor Reduction:'''</span></dt><dd><span style=\"color:yellow; white-space:normal\">25 / 27.<small>5</small> / 30 / 32.<small>5</small> / 35%</span></dd></dl>@@leveling6@@{{{leveling6}}}@@range@@450@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@760 + <span style=\"color:\n#9FFF4D; white-space:normal\">100% movement speed</span>@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@16 / 14.<small>5</small> / 13 / 11.<small>5</small> / 10@@targeting@@Direction@@damagetype@@Physical@@spellshield@@True@@projectile@@@@notes@@\n* No additional details.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1706967,
+                "revisions": [
+                  {
+                    "parentid": 3943175,
+                    "revid": 3943397,
+                    "timestamp": "2025-08-08T18:04:56Z"
+                  }
+                ],
+                "title": "Template:Data Renekton/Slice and Dice"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3943397,
+      "timestamp": "2025-08-08T18:04:56Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "dd34293cb41af890696555efedf3383dc58753b8af5fa424a85a1d6b78a30cc1",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Slice_and_Dice",
+    "revisionId": 3943397,
+    "sourceTimestamp": "2025-08-08T18:04:56Z"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_caitlyn_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_90_Caliber_Net.png?799e5",
+    "sha1": "8269bb2f25940ad497ab8eb342b7a2bf354a779c"
+  },
+  "champion": "Caitlyn",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_caitlyn_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_90_Caliber_Net.png?799e5",
+        "sha1": "8269bb2f25940ad497ab8eb342b7a2bf354a779c"
+      },
+      "fields": {
+        "casttime": "0.15",
+        "cooldown": "16 / 14 / 12 / 10 / 8",
+        "cost": "75",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Caitlyn''' fires a net in the target direction and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|recoils]]</span> 390 units in the opposite direction. The net deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first enemy hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them by 50% for 1 second.",
+          "text": "Active: Caitlyn fires a net in the target direction and recoils 390 units in the opposite direction. The net deals magic damage to the first enemy hit and slows them by 50% for 1 second."
+        },
+        "description2": {
+          "raw": "'''''Caitlyn''' will not recoil after the cast time if she was <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Immobilize\">[[File:Stun icon.png|20px|link=Crowd_control#Immobilizing|An icon representing the keyword Immobilize]] [[:Crowd_control#Immobilizing|immobilized]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span> during it. She can cast any of her [[champion ability|abilities]] during the recoil dash.''",
+          "text": "Caitlyn will not recoil after the cast time if she was immobilized or grounded during it. She can cast any of her abilities during the recoil dash."
+        },
+        "effectradius": "140",
+        "icon": "90 Caliber Net.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 130 / 180 / 230 / 280 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 130 / 180 / 230 / 280 (+ 80% AP)"
+        },
+        "name": "90 Caliber Net",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the end of the cast time.\n* The recoil can be used to pass through terrain. \n* If '''Caitlyn''' buffers <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Piltover Peacemaker\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Piltover Peacemaker.png|20xpx|border|link=Caitlyn#Piltover Peacemaker|An icon for Caitlyn's ability Piltover Peacemaker]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Piltover Peacemaker|Piltover Peacemaker]]</span></span> during ''90 Caliber Net's'' cast time, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Piltover Peacemaker\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Piltover Peacemaker.png|20xpx|border|link=Caitlyn#Piltover Peacemaker|An icon for Caitlyn's ability Piltover Peacemaker]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Piltover Peacemaker|Piltover Peacemaker]]</span></span> will start after the cast time.\n** If '''Caitlyn''' buffers an ability or [[basic attack]] during this ability's cast time, the buffered ability or basic attack will instead start after the dash ends.\n** Other abilities can be cast while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashing]]</span> if they are input after the cast time.\n* ''90 Caliber Net's'' missile will fail to fire if '''Caitlyn''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Suppression\">[[File:Suppression icon.png|20px|link=Types of Crowd Control#Suppression|An icon representing the keyword Suppression]] [[:Types of Crowd Control#Suppression|suppressed]]</span> during the cast time.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>",
+          "text": "This ability will cast from wherever the caster is at the end of the cast time.\nThe recoil can be used to pass through terrain.\nIf Caitlyn buffers Piltover Peacemaker during 90 Caliber Net's cast time, Piltover Peacemaker will start after the cast time.\n* If Caitlyn buffers an ability or basic attack during this ability's cast time, the buffered ability or basic attack will instead start after the dash ends.\n* Other abilities can be cast while dashing if they are input after the cast time.\n90 Caliber Net's missile will fail to fire if Caitlyn is suppressed during the cast time.(unexpected)"
+        },
+        "projectile": true,
+        "range": "800 • 740",
+        "speed": "1600 • 1000",
+        "spellshield": true,
+        "targeting": "Direction"
+      },
+      "name": "90 Caliber Net"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "2e187ef666a28edad09874034c5c72195f92df80129752204943da58a79eaf5e",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Caitlyn/90_Caliber_Net",
+    "revisionId": 4007584,
+    "sourceTimestamp": "2026-04-12T06:47:56Z"
+  }
+}

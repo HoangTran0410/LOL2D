@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Brand/Pyroclasm",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Pyroclasm@@icon@@Pyroclasm.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Brand''' launches a fireball at the target enemy that bounces between nearby enemies and '''Brand''' up to four times, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies each time and having a 0.<small>15</small>-second delay between bounces.@@description2@@''Pyroclasm'' prioritizes ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span>'' enemy champions, then other enemy champions, then any valid bounce target, then '''Brand'''.@@description3@@<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> The target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> for 0.<small>25</small> seconds. This can affect the same enemy more than once.@@description4@@''The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> for the fireball to bounce to them.''@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>100 / 137.<small>5</small> / 175 / 212.<small>5</small> / 250 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd><dt><span class=\"template_lc\">'''Total Single-Target Damage:'''</span></dt><dd>300 / 412.<small>5</small> / 525 / 637.<small>5</small> / 750 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 37.<small>5</small> / 45 / 52.<small>5</small> / 60%</dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Bounce range, checked when fireball arrives at a target\">600</span>@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Acceleration 500u/s\">750 - 3000</span>@@casttime@@0.<small>25</small>@@cost@@100@@cooldown@@100 / 95 / 90 / 85 / 80@@targeting@@Unit@@damagetype@@Magic@@spellshield@@special@@projectile@@True@@notes@@\n* The fireball acquires a new valid, bounce target once the bounce delay finishes.\n* If the target the fireball is in flight towards becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, the fireball missile will be destroyed but a new missile will be formed at the target's location that is able to bounce for up to the remaining bounces of the previous fireball.\n** The new missile is only formed if there is a valid target to bounce to at the time of the previous missile being destroyed.\n** This does not apply if the target is '''Brand''', as the missile would not be destroyed and would bounce from him even if he is untargetable.\n* The fireball will still bounce from the target even if they were dead upon arrival.\n* The fireball may only bounce to valid targets, including '''Brand'''.\n* If the initial cast target uses <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>, ''Pyroclasm'' will not bounce. If the bounce is blocked by an enemy's ''spell shield'' it will not deal any damage, but it will keep on bouncing.\n* ''Pyroclasm's'' damage against enemy champions will not aggro nearby enemy minions.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306893,
+                "revisions": [
+                  {
+                    "parentid": 3945254,
+                    "revid": 3955099,
+                    "timestamp": "2025-09-23T19:42:50Z"
+                  }
+                ],
+                "title": "Template:Data Brand/Pyroclasm"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3955099,
+      "timestamp": "2025-09-23T19:42:50Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "df5a1201ce310444f5fe9e067a0c9dc04aa9b85c813288a63b80e5c14a222d58",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Pyroclasm",
+    "revisionId": 3955099,
+    "sourceTimestamp": "2025-09-23T19:42:50Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Soraka/Starcall",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Starcall@@icon@@Starcall.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Soraka''' calls down a star upon the target location that grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area before landing after <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target range\" data-start=\"0.25;50\" data-finish=\"1;800\" data-top-fill=\"16\" data-bot-values=\"0.25;0.3;0.35;0.4;0.45;0.5;0.55;0.6;0.65;0.7;0.75;0.8;0.85;0.9;0.95;1\" data-top-values=\"50;100;150;200;250;300;350;400;450;500;550;600;650;700;750;800\">0.<small>25</small> – 1 (based on target range)</span> seconds, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them by 30% for 1.<small>5</small> seconds.@@description2@@If this hits at least one enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, star dust returns to '''Soraka''', granting her ''Rejuvenation'' for 2.<small>5</small> seconds. While '''Soraka''' has ''Rejuvenation'', casting ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Astral Infusion\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Astral Infusion.png|20xpx|border|link=Soraka#Astral Infusion|An icon for Soraka's ability Astral Infusion]]</span> <span style=\"white-space:normal;\">[[Soraka#Astral Infusion|Astral Infusion]]</span></span>'' will also grant ''Rejuvenation'' to the target for the same duration.@@description3@@<span class=\"template_sbc\">'''Rejuvenation'''</span>: <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|Heal]]</span> every 0.<small>2</small> seconds and gain <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> that decays over the duration.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>85 / 120 / 155 / 190 / 225 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 35% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Heal:'''</span></dt><dd>60 / 75 / 90 / 105 / 120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd><dt><span class=\"template_lc\">'''Heal per Tick:'''</span></dt><dd>5 / 6.<small>25</small> / 7.<small>5</small> / 8.<small>75</small> / 10 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 2.<small>5</small>% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>20 / 22.<small>5</small> / 25 / 27.<small>5</small> / 30%</dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 265@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@45 / 50 / 55 / 60 / 65@@cooldown@@8 / 7 / 6 / 5 / 4@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* ''Starcall'' counts as hitting even if it gets blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>, granting ''Rejuvenation''.\n* Both the initial hit and the ''Rejuvenation'' projectile can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Projectile\">[[File:Projectile.png|20px|link=Projectile|An icon representing the keyword Projectile]] [[:Projectile|intercepted]]</span>.\n* ''Rejuvenation'' heals over 12 ticks, with the first 4 each healing for about 15% of the heal, the next 4 ticks for about 5.<small>5</small>% each, and the last 4 for about 4.<small>5</small>% each.\n* ''Rejuvenation'' won't be granted to '''Soraka''' and she won't be able to make use of the health cost reduction on <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Astral Infusion\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Astral Infusion.png|20xpx|border|link=Soraka#Astral Infusion|An icon for Soraka's ability Astral Infusion]]</span> <span style=\"white-space:normal;\">[[Soraka#Astral Infusion|Astral Infusion]]</span></span> until the projectile gets to her, but she is able to ''Rejuvenate'' allies as soon as the target is hit.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308749,
+                "revisions": [
+                  {
+                    "parentid": 3948783,
+                    "revid": 3953362,
+                    "timestamp": "2025-09-11T19:22:43Z"
+                  }
+                ],
+                "title": "Template:Data Soraka/Starcall"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3953362,
+      "timestamp": "2025-09-11T19:22:43Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "82dbebafeb84571ebebb78584f5b8b9d200e0f75b2a33efd186c61e333119998",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Starcall",
+    "revisionId": 3953362,
+    "sourceTimestamp": "2025-09-11T19:22:43Z"
+  }
+}

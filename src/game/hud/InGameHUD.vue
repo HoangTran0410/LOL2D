@@ -43,6 +43,7 @@ import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
 import DesktopHudView from './DesktopHudView.vue';
 import MobileHudView from './MobileHudView.vue';
+import OrientationHint from './OrientationHint.vue';
 
 const props = defineProps<{ hud: HudInteractions }>();
 
@@ -80,4 +81,9 @@ defineExpose({
 
   <DesktopHudView v-if="state && !hud.touchUi" :state="state" />
   <MobileHudView v-if="state && hud.touchUi" />
+
+  <!-- Unconditional on purpose: it decides for itself whether to show, and a
+       `v-if` here would remount it — and reset its dismissal — on every turn
+       of the phone. -->
+  <OrientationHint />
 </template>

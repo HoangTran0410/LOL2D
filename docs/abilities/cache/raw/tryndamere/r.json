@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Tryndamere/Undying Rage",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Undying Rage@@icon@@Undying Rage.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Tryndamere''' becomes enraged, instantly gaining <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">Fury</span>]]</span> and a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minimum health threshold\">[[File:Unkillable icon.png|20px|link=Death#Ways_to_prevent_dying_by_not_losing_health|An icon representing the keyword Minimum health threshold]] [[:Death#Ways_to_prevent_dying_by_not_losing_health|minimum health threshold]]</span> for 5 seconds.@@description2@@''Undying Rage can be used while affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cast-inhibiting crowd control\">[[File:Silence icon.png|20px|link=Crowd_control#Disrupting|An icon representing the keyword Cast-inhibiting crowd control]] [[:Crowd_control#Disrupting|cast-inhibiting crowd control]]</span>.''@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Fury Gained:'''</span></dt><dd><span style=\"color:\n#FA6533; white-space:normal\">50 / 75 / 100</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Health Threshold:'''</span></dt><dd>30 / 50 / 70</dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@120 / 110 / 100 / 90 / 80@@targeting@@Auto@@damagetype@@@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* ''Undying Rage'' will prevent <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Mel\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Mel OriginalSquare.png|20xpx|border|link=Mel|An icon representing Mel]]</span> <span style=\"white-space:normal;\">[[Mel|Mel's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Mel\" data-ability=\"Searing Brilliance\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Mel Searing Brilliance.png|20xpx|border|link=Mel#Searing Brilliance|An icon for Mel's ability Searing Brilliance]]</span> <span style=\"white-space:normal;\">[[Mel#Searing Brilliance|Overwhelm's]]</span></span></span> stacks from being consumed.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308418,
+                "revisions": [
+                  {
+                    "parentid": 4018941,
+                    "revid": 4018945,
+                    "timestamp": "2026-05-16T02:23:17Z"
+                  }
+                ],
+                "title": "Template:Data Tryndamere/Undying Rage"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4018945,
+      "timestamp": "2026-05-16T02:23:17Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b8cc43beb4a2dbc6aea566aa0cb153413af96ffe254416c886e015cfae156997",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Tryndamere/Undying_Rage",
+    "revisionId": 4018945,
+    "sourceTimestamp": "2026-05-16T02:23:17Z"
+  }
+}

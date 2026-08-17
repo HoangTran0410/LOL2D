@@ -1,0 +1,109 @@
+{
+  "asset": {
+    "key": "champ_ezreal",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_OriginalSquare.png?fc667",
+    "sha1": "47416bed86a22091d3d2a714c86076877cfc2539"
+  },
+  "champion": "Ezreal",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Mage",
+    "apiname": "Ezreal",
+    "be": 675,
+    "changes": "V26.09",
+    "client_positions": [
+      "Bottom"
+    ],
+    "client_tags": [
+      "Long Range",
+      "Mobile",
+      "Physical"
+    ],
+    "control": 1,
+    "damage": 3,
+    "date": "2010-03-16",
+    "difficulty": 3,
+    "external_positions": [
+      "Bottom"
+    ],
+    "herotype": "Marksman",
+    "id": 81,
+    "mobility": 3,
+    "patch": "V1.0.0.79",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Marksman"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Arcane Shift"
+    },
+    "skill_i": {
+      "1": "Rising Spell Force"
+    },
+    "skill_q": {
+      "1": "Mystic Shot"
+    },
+    "skill_r": {
+      "1": "Trueshot Barrage"
+    },
+    "skill_w": {
+      "1": "Essence Flux"
+    },
+    "skills": {
+      "1": "Rising Spell Force",
+      "2": "Mystic Shot",
+      "3": "Essence Flux",
+      "4": "Arcane Shift",
+      "5": "Trueshot Barrage"
+    },
+    "stats": {
+      "acquisition_radius": 550,
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "arm_base": 24,
+      "arm_lvl": 4.2,
+      "as_base": 0.625,
+      "as_lvl": 2.5,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.111613474786281,
+      "dam_base": 60,
+      "dam_lvl": 3.75,
+      "hp5_base": 4,
+      "hp5_lvl": 0.65,
+      "hp_base": 600,
+      "hp_lvl": 102,
+      "missile_speed": 2000,
+      "mp5_base": 8.5,
+      "mp5_lvl": 1,
+      "mp_base": 375,
+      "mp_lvl": 70,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 325,
+      "pathing_radius": 35,
+      "range": 550,
+      "selection_height": 170,
+      "selection_radius": 115,
+      "urf": {
+        "dmg_dealt": 0.95
+      }
+    },
+    "style": 45,
+    "title": "The Prodigal Explorer",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "965fa1f840ef9e716195c69f5a0dd4a6c14f531a9b798205a5dd217105b5d931",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

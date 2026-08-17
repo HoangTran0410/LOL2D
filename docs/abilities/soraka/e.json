@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_soraka_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Equinox.png?52b29",
+    "sha1": "15cfe3c7ff5d372372e333be15aabc21628db34c"
+  },
+  "champion": "Soraka",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_soraka_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Equinox.png?52b29",
+        "sha1": "15cfe3c7ff5d372372e333be15aabc21628db34c"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "20 / 19 / 18 / 17 / 16",
+        "cost": "70 / 75 / 80 / 85 / 90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Soraka''' creates a celestial zone at the target location that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemy champions within at the time of cast. The zone then persists for 1.<small>5</small> seconds and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silences]]</span> enemies within.",
+          "text": "Active: Soraka creates a celestial zone at the target location that deals magic damage to enemy champions within at the time of cast. The zone then persists for 1.5 seconds and silences enemies within."
+        },
+        "description2": {
+          "raw": "Afterwards, the zone erupts to deal the same damage to enemy champions within and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> them for a duration.",
+          "text": "Afterwards, the zone erupts to deal the same damage to enemy champions within and root them for a duration."
+        },
+        "effectradius": "260",
+        "icon": "Equinox.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 95 / 120 / 145 / 170 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Magic Damage:70 / 95 / 120 / 145 / 170 (+ 40% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>140 / 190 / 240 / 290 / 340 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Total Magic Damage:140 / 190 / 240 / 290 / 340 (+ 80% AP)\nRoot Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "name": "Equinox",
+        "notes": {
+          "raw": "* ''Equinox's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silence]]</span> is marked as non-dispellable, so it is not removed by most <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span>. It is however allowed to be removed by cleanses that '''also''' grant immunity to it, such as <span class=\"champion-ability-icon\"><span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf OriginalSquare.png|20xpx|border|link=Olaf|An icon representing Olaf]]</span> <span style=\"white-space:normal;\">[[Olaf|Olaf's]]</span></span> <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Olaf\" data-ability=\"Ragnarok\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Olaf Ragnarok.png|20xpx|border|link=Olaf#Ragnarok|An icon for Olaf's ability Ragnarok]]</span> <span style=\"white-space:normal;\">[[Olaf#Ragnarok|Ragnarok]]</span></span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will not block the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Silence\">[[File:Silence icon.png|20px|link=Silence|An icon representing the keyword Silence]] [[:Silence|silence]]</span>.",
+          "text": "Equinox's silence is marked as non-dispellable, so it is not removed by most cleanses. It is however allowed to be removed by cleanses that also grant immunity to it, such as Olaf's Ragnarok.\nSpell shield will not block the silence."
+        },
+        "spellshield": false,
+        "targeting": "Location"
+      },
+      "name": "Equinox"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "136fbe67d8db5d1a1a7cf5809c9c0b84b7520f03ba7899977481a9955fb48f24",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Equinox",
+    "revisionId": 3907153,
+    "sourceTimestamp": "2025-06-06T18:23:34Z"
+  }
+}

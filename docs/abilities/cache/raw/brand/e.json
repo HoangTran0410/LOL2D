@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Brand/Conflagration",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Conflagration@@icon@@Conflagration.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Brand''' sets the target enemy aflame, which creates a blast that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to them and causes the flame to spread from the target to nearby enemies, dealing them the same damage.@@description2@@<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> ''Conflagration's'' spread range is doubled.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 80 / 105 / 130 / 155 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Secondary target spread radius\">300</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Secondary target spread radius if primary target was Ablaze\">600</span>@@width@@{{{width}}}@@speed@@900@@casttime@@0.<small>25</small>@@cost@@90@@cooldown@@13 / 12 / 11 / 10 / 9@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@False@@notes@@\n* The flame spreads to enemies near the primary target at the time of cast.\n** Enemies that move out of range after the fact will still be hit, as the flame is spread as homing missiles to each of its targets.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306890,
+                "revisions": [
+                  {
+                    "parentid": 4007577,
+                    "revid": 4034693,
+                    "timestamp": "2026-06-23T21:12:38Z"
+                  }
+                ],
+                "title": "Template:Data Brand/Conflagration"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4034693,
+      "timestamp": "2026-06-23T21:12:38Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "c4b2d9d9b0d4679b6e31ff5bc94f9aa5546338344884bc213c0f0f4d834f8a5a",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Conflagration",
+    "revisionId": 4034693,
+    "sourceTimestamp": "2026-06-23T21:12:38Z"
+  }
+}

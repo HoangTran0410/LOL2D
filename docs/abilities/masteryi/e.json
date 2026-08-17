@@ -1,0 +1,49 @@
+{
+  "asset": {
+    "key": "spell_masteryi_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Wuju_Style.png?7a97c",
+    "sha1": "8ca82ec75480ac31c15985345c9b7cad918cd917"
+  },
+  "champion": "Master Yi",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_masteryi_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Wuju_Style.png?7a97c",
+        "sha1": "8ca82ec75480ac31c15985345c9b7cad918cd917"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "14",
+        "damagetype": "True",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Master Yi''' empowers his basic attacks within the next 5 seconds to deal <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">'''bonus''' true damage</span></span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>.",
+          "text": "Active: Master Yi empowers his basic attacks within the next 5 seconds to deal &nbsp;bonus true damage on-hit."
+        },
+        "icon": "Wuju Style.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus True Damage:'''</span></dt><dd>20 / 25 / 30 / 35 / 40 <span style=\"color:orange; white-space:normal\">(+ 35% '''bonus''' AD)</span></dd></dl>",
+          "text": "Bonus True Damage:20 / 25 / 30 / 35 / 40 (+ 35% bonus AD)"
+        },
+        "name": "Wuju Style",
+        "notes": {
+          "raw": "* ''Wuju Style'' can be cast during ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Master Yi\" data-ability=\"Alpha Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Master Yi Alpha Strike.png|20xpx|border|link=Master Yi#Alpha Strike|An icon for Master Yi's ability Alpha Strike]]</span> <span style=\"white-space:normal;\">[[Master Yi#Alpha Strike|Alpha Strike]]</span></span>''.\n* ''Wuju Style'' cannot be cast while it is already active.\n* ''Wuju Style's'' bonus true damage does not interact with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strikes]]</span>.\n* ''Wuju Style's'' bonus true damage cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> but can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> and/or missed if '''Master Yi''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The attacks do not deal the '''bonus''' damage against [[structures]].\n* While ''Wuju Style'' is active, the damage will dynamically update its calculations.",
+          "text": "Wuju Style can be cast during Alpha Strike.\nWuju Style cannot be cast while it is already active.\nWuju Style's bonus true damage does not interact with critical strikes.\nWuju Style's bonus true damage cannot be blocked but can be dodged and/or missed if Master Yi is blinded.\nThe attacks do not deal the bonus damage against structures.\nWhile Wuju Style is active, the damage will dynamically update its calculations."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Wuju Style"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "f751f582e5b11b041477b5e88a0f0383012ebeeaa809ffa7384be68c46f69f32",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Master_Yi/Wuju_Style",
+    "revisionId": 3959670,
+    "sourceTimestamp": "2025-10-15T06:23:00Z"
+  }
+}

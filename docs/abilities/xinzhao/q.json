@@ -1,0 +1,63 @@
+{
+  "asset": {
+    "key": "spell_xinzhao_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Three_Talon_Strike.png?ff562",
+    "sha1": "a0b39325995fdad7b765f3224b5cebede14044d3"
+  },
+  "champion": "Xin Zhao",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_xinzhao_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Three_Talon_Strike.png?ff562",
+        "sha1": "a0b39325995fdad7b765f3224b5cebede14044d3"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "7 / 6.5 / 6 / 5.5 / 5",
+        "cost": "30",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Xin Zhao''' empowers his next three <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-attack\">[[File:On-attack icon.svg|20px|link=Attack_effects#On_Attacking|An icon representing the keyword On-attack]] [[:Attack_effects#On_Attacking|on-attack]]</span> within 5 seconds to each have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> and reduce his other <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities']]</span> <span style=\"white-space:nowrap\">'''current''' cooldowns</span> by 1 second. Each attack refreshes the duration.",
+          "text": "Active: Xin Zhao empowers his next three basic attacks on-attack within 5 seconds to each have an uncancellable windup, deal bonus physical damage and reduce his other abilities' current cooldowns by 1 second. Each attack refreshes the duration."
+        },
+        "description2": {
+          "raw": "The third attack <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocks up]]</span> the target for 0.<small>75</small> seconds.",
+          "text": "The third attack knocks up the target for 0.75 seconds."
+        },
+        "description3": {
+          "raw": "''Three Talon Strike's'' '''bonus''' damage is affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strike]]</span> modifiers.",
+          "text": "Three Talon Strike's bonus damage is affected by critical strike modifiers."
+        },
+        "description4": {
+          "raw": "''Three Talon Strike <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Xin Zhao's''' basic attack timer.''",
+          "text": "Three Talon Strike resets Xin Zhao's basic attack timer."
+        },
+        "icon": "Three Talon Strike.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd>15 / 30 / 45 / 60 / 75 <span style=\"color:orange; white-space:normal\">(+ 40% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Bonus Physical Damage:'''</span></dt><dd>45 / 90 / 135 / 180 / 225 <span style=\"color:orange; white-space:normal\">(+ 120% '''bonus''' AD)</span></dd></dl>",
+          "text": "Bonus Physical Damage:15 / 30 / 45 / 60 / 75 (+ 40% bonus AD)Total Bonus Physical Damage:45 / 90 / 135 / 180 / 225 (+ 120% bonus AD)"
+        },
+        "name": "Three Talon Strike",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will only block the knock up.\n* The enhanced attacks present input buffering during their wind-up animation ('''Xin Zhao''' cannot be issued any commands until after it ends).\n* The attack counter displayed on '''Xin Zhao's''' status bar is incremented on-hit.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Spell shield will only block the knock up.\nThe enhanced attacks present input buffering during their wind-up animation (Xin Zhao cannot be issued any commands until after it ends).\nThe attack counter displayed on Xin Zhao's status bar is incremented on-hit.(bug)"
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Three Talon Strike"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "b161c90d732892d1cba58e8e227b5289ff1450943e2c948c3afab4ec4fe786a8",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Xin_Zhao/Three_Talon_Strike",
+    "revisionId": 3986754,
+    "sourceTimestamp": "2026-01-23T03:45:52Z"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_tryndamere_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Bloodlust.png?433a2",
+    "sha1": "c98db03d115eaefdef25d16ca2e70328d38b3fef"
+  },
+  "champion": "Tryndamere",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_tryndamere_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Bloodlust.png?433a2",
+        "sha1": "c98db03d115eaefdef25d16ca2e70328d38b3fef"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12",
+        "cost": "100%",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Tryndamere''' gains <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> based on his <span style=\"color:\n#21B053; white-space:normal\">'''missing''' health</span>, up to a maximum amount at <span style=\"color:\n#21B053; white-space:normal\">90% '''missing''' health</span>.",
+          "text": "Passive: Tryndamere gains &nbsp;bonus attack damage based on his missing health, up to a maximum amount at 90% missing health."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Tryndamere''' consumes all of his <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">Fury</span>]]</span> to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heal]]</span> himself, increased for every point of <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> consumed.",
+          "text": "Active: Tryndamere consumes all of his Fury to heal himself, increased for every point of Fury consumed."
+        },
+        "icon": "false",
+        "icon2": "Bloodlust.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Bonus Attack Damage:'''</span></dt><dd>20 / 35 / 50 / 65 / 80</dd><dt><span class=\"template_lc\">'''Bonus Attack Damage per 1% missing health:'''</span></dt><dd>0.<small>22</small> / 0.<small>3875</small> / 0.<small>555</small> / 0.<small>7225</small> / 0.<small>89</small></dd></dl>",
+          "text": "Maximum Bonus Attack Damage:20 / 35 / 50 / 65 / 80Bonus Attack Damage per 1% missing health:0.22 / 0.3875 / 0.555 / 0.7225 / 0.89"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Heal:'''</span></dt><dd>30 / 40 / 50 / 60 / 70 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd><dt><span class=\"template_lc\">'''Heal Per 1 Fury:'''</span></dt><dd>0.<small>5</small> / 0.<small>95</small> / 1.<small>4</small> / 1.<small>85</small> / 2.<small>3</small> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 1.<small>2</small>% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Heal:'''</span></dt><dd>80 / 135 / 190 / 245 / 300 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 150% AP)</span></dd></dl>",
+          "text": "Minimum Heal:30 / 40 / 50 / 60 / 70 (+ 30% AP)Heal Per 1 Fury:0.5 / 0.95 / 1.4 / 1.85 / 2.3 (+ 1.2% AP)Maximum Heal:80 / 135 / 190 / 245 / 300 (+ 150% AP)"
+        },
+        "name": "Bloodlust",
+        "notes": {
+          "raw": "* ''Bloodlust'' can still be activated even if '''Tryndamere''' does not have any '''Fury'''.\n* ''Bloodlust'' can be activated at any point of '''Tryndamere's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span>.\n** Note that if an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> will <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critically strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> is determined when the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack windup]]</span> starts. \n*** This means that if <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tryndamere\" data-ability=\"Bloodlust\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tryndamere Bloodlust.png|20xpx|border|link=Tryndamere#Bloodlust|An icon for Tryndamere's ability Bloodlust]]</span> <span style=\"white-space:normal;\">[[Tryndamere#Bloodlust|Bloodlust]]</span></span> is cast during Tryndamere's <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack windup]]</span> windup, the attack will use the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strike]]</span> chance given by the <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> '''before''' the <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tryndamere\" data-ability=\"Bloodlust\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tryndamere Bloodlust.png|20xpx|border|link=Tryndamere#Bloodlust|An icon for Tryndamere's ability Bloodlust]]</span> <span style=\"white-space:normal;\">[[Tryndamere#Bloodlust|Bloodlust]]</span></span> cast.\n*** Furthermore, the <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> for that <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> will be given once the windup completes. This lets '''Tryndamere''' start building <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> immediately.\n* ''Bloodlust's'' <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;attack damage</span> <span class=\"inline-image label-after\" style=\"display:inline;color:#E2BA3D&#59;white-space:pre&#59;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Gold colored icon.svg|20xpx|link=Gold|An icon representing Gold]]</span> <span style=\"white-space:normal;\">[[gold]] value</span></span>:\n** At <span style=\"color:\n#21B053; white-space:normal\">90% '''missing''' health</span>, it is worth <span class=\"inline-image label-after\" style=\"display:inline;color:#E2BA3D&#59;white-space:pre&#59;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Gold colored icon.svg|20xpx|link=Gold|An icon representing Gold]]</span> <span style=\"white-space:normal;\">700 / 1225 / 1750 / 2275 / 2800</span></span>.\n** The bonus is worth <span class=\"inline-image label-after\" style=\"display:inline;color:#E2BA3D&#59;white-space:pre&#59;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Gold colored icon.svg|20xpx|link=Gold|An icon representing Gold]]</span> <span style=\"white-space:normal;\">7.<small></small><small>78</small> / 13.<small>6125</small> / 19.<small>445</small> / 25.<small>2775</small> / 31.<small>11</small></span></span> more per <span style=\"color:\n#21B053; white-space:normal\">1% '''missing''' health</span>.",
+          "text": "Bloodlust can still be activated even if Tryndamere does not have any Fury.\nBloodlust can be activated at any point of Tryndamere's basic attack.\n* Note that if an basic attack will critically strike is determined when the attack windup starts.\n** This means that if Bloodlust is cast during Tryndamere's attack windup windup, the attack will use the critical strike chance given by the Fury before the Bloodlust cast.\n** Furthermore, the Fury for that basic attack will be given once the windup completes. This lets Tryndamere start building Fury immediately.\nBloodlust's &nbsp;attack damage gold value:\n* At 90% missing health, it is worth 700 / 1225 / 1750 / 2275 / 2800.\n* The bonus is worth 7.78 / 13.6125 / 19.445 / 25.2775 / 31.11 more per 1% missing health."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Bloodlust"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "807785e05a07ce1b90454f10cc89212b6d137a91c5f3dd77c5460c32693e6392",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Tryndamere/Bloodlust",
+    "revisionId": 4019656,
+    "sourceTimestamp": "2026-05-18T14:29:01Z"
+  }
+}

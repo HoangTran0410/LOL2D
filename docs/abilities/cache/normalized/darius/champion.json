@@ -1,0 +1,114 @@
+{
+  "asset": {
+    "key": "champ_darius",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_OriginalSquare.png?aca4c",
+    "sha1": "a78e34d2d322bbbd737358b225262074f0e53c1b"
+  },
+  "champion": "Darius",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Darius",
+    "be": 225,
+    "changes": "V26.04",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Duelist",
+      "Self Healing",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2012-05-23",
+    "difficulty": 2,
+    "external_positions": [
+      "Top"
+    ],
+    "herotype": "Fighter",
+    "id": 122,
+    "mobility": 1,
+    "patch": "V1.0.0.140",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Juggernaut"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Apprehend"
+    },
+    "skill_i": {
+      "1": "Hemorrhage"
+    },
+    "skill_q": {
+      "1": "Decimate"
+    },
+    "skill_r": {
+      "1": "Noxian Guillotine"
+    },
+    "skill_w": {
+      "1": "Crippling Strike"
+    },
+    "skills": {
+      "1": "Hemorrhage",
+      "2": "Decimate",
+      "3": "Crippling Strike",
+      "4": "Apprehend",
+      "5": "Noxian Guillotine"
+    },
+    "stats": {
+      "acquisition_radius": 400,
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 1
+      },
+      "arm_base": 37,
+      "arm_lvl": 5.2,
+      "as_base": 0.625,
+      "as_lvl": 1,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.100000001490116,
+      "dam_base": 64,
+      "dam_lvl": 5,
+      "hp5_base": 10,
+      "hp5_lvl": 0.95,
+      "hp_base": 652,
+      "hp_lvl": 114,
+      "mp5_base": 6.6,
+      "mp5_lvl": 0.35,
+      "mp_base": 263,
+      "mp_lvl": 58,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.9,
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 25.7665996551513,
+      "range": 175,
+      "selection_height": 155,
+      "selection_radius": 120,
+      "urf": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.85
+      },
+      "windup_modifier": 0.5
+    },
+    "style": 55,
+    "title": "The Hand of Noxus",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "668571ca9a4dcf4efdb92c63c1d1803a937c5c0132129bea0b5f8f6846d9fd05",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

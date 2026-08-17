@@ -1,0 +1,58 @@
+{
+  "asset": {
+    "key": "spell_masteryi_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Highlander.png?2ebf6",
+    "sha1": "c942760a7801f11a925b0ad2ba35d6fb754124a3"
+  },
+  "champion": "Master Yi",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_masteryi_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Highlander.png?2ebf6",
+        "sha1": "c942760a7801f11a925b0ad2ba35d6fb754124a3"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "85",
+        "cost": "100",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> Scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> reduces the <span style=\"white-space:nowrap\">'''current''' cooldowns</span> of '''Master Yi's''' basic [[Champion ability|abilities]] by 70%.",
+          "text": "Passive: Scoring a champion takedown reduces the current cooldowns of Master Yi's basic abilities by 70%."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Master Yi''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span> himself from all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripples]]</span>. For the next 7 seconds, he gains <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosting]]</span>, <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span>, <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow-immune\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|slow immunity]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple-immune\">[[File:Cripple immune.png|20px|link=Slow_resist#Cripple Immunity|An icon representing the keyword Cripple-immune]] [[:Slow_resist#Cripple Immunity|cripple immunity]]</span>.",
+          "text": "Active: Master Yi cleanses himself from all slows and cripples. For the next 7 seconds, he gains ghosting, &nbsp;bonus attack speed, &nbsp;bonus movement speed, slow immunity, and cripple immunity."
+        },
+        "description3": {
+          "raw": "While active, scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> extends ''Highlander's'' duration by 7 seconds.",
+          "text": "While active, scoring a champion takedown extends Highlander's duration by 7 seconds."
+        },
+        "icon": "false",
+        "icon2": "Highlander.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>25 / 35 / 45 / 55 / 65%</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>35 / 40 / 45 / 50 / 55%</dd></dl>",
+          "text": "Bonus Attack Speed:25 / 35 / 45 / 55 / 65%\nBonus Movement Speed:35 / 40 / 45 / 50 / 55%"
+        },
+        "name": "Highlander",
+        "notes": {
+          "raw": "* ''Highlander'' can be cast during <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Master Yi\" data-ability=\"Alpha Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Master Yi Alpha Strike.png|20xpx|border|link=Master Yi#Alpha Strike|An icon for Master Yi's ability Alpha Strike]]</span> <span style=\"white-space:normal;\">[[Master Yi#Alpha Strike|Alpha Strike]]</span></span>.",
+          "text": "Highlander can be cast during Alpha Strike."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Highlander"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "80868e5dda56961f880115e70431ee61bbf0997f8a020615fbe29c15e038aed4",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Master_Yi/Highlander",
+    "revisionId": 4001544,
+    "sourceTimestamp": "2026-03-21T09:12:44Z"
+  }
+}

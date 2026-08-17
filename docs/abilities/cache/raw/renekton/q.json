@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Renekton/Cull the Meek",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Cull the Meek@@icon@@Cull the Meek.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Renekton''' cleaves around himself, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|healing]]</span> himself for each enemy hit, up to a cap.@@description2@@Against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span>, the healing is increased.@@description3@@'''Renekton''' generates <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">2.<small>5</small> Fury</span>]]</span> for each non-champion hit and <span style=\"color:\n#FA6533; white-space:normal\">10 Fury</span> for each champion hit, up to <span style=\"color:\n#FA6533; white-space:normal\">30</span> total per cast.@@description4@@<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Reign of Anger\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Reign of Anger.png|20xpx|border|link=Renekton#Reign of Anger|An icon for Renekton's ability Reign of Anger]]</span> <span style=\"white-space:normal;\">[[Renekton#Reign of Anger|Reign of Anger]]</span></span> Bonus:'''</span> ''Cull the Meek'' has increased damage, tripled '''total''' healing, and a quadrupled healing cap.@@description5@@'''''Renekton''' cannot basic attack nor cast <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Slice and Dice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Slice and Dice.png|20xpx|border|link=Renekton#Slice and Dice|An icon for Renekton's ability Slice and Dice]]</span> <span style=\"white-space:normal;\">[[Renekton#Slice and Dice|Slice and Dice]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Dominus\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Dominus.png|20xpx|border|link=Renekton#Dominus|An icon for Renekton's ability Dominus]]</span> <span style=\"white-space:normal;\">[[Renekton#Dominus|Dominus]]</span></span> for 0.<small>25</small> seconds after Cull the Meek's activation.''@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>60 / 90 / 120 / 150 / 180 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Damage:'''</span></dt><dd>90 / 135 / 180 / 225 / 270 <span style=\"color:orange; white-space:normal\">(+ 140% '''bonus''' AD)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Healing Cap:'''</span></dt><dd>50 / 75 / 100 / 125 / 150</dd><dt><span class=\"template_lc\">'''Enhanced Healing Cap:'''</span></dt><dd>200 / 300 / 400 / 500 / 600</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Non-Champion Healing:'''</span></dt><dd>2 / 3 / 4 / 5 / 6 <span style=\"color:orange; white-space:normal\">(+ 2% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Non-Champion Healing:'''</span></dt><dd>6 / 9 / 12 / 15 / 18 <span style=\"color:orange; white-space:normal\">(+ 6% '''bonus''' AD)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Champion Healing:'''</span></dt><dd>12 / 20 / 28 / 36 / 44 <span style=\"color:orange; white-space:normal\">(+ 17% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Enhanced Champion Healing:'''</span></dt><dd>36 / 60 / 84 / 108 / 132 <span style=\"color:orange; white-space:normal\">(+ 51% '''bonus''' AD)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Standard cleave radius\">400</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Enhanced cleave radius during Dominus\">480</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@7@@targeting@@Auto@@damagetype@@Physical@@spellshield@@True@@projectile@@@@notes@@\n* Healing modifiers such as <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Spirit Visage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Spirit Visage item.png|20xpx|border|link=Spirit Visage|An icon for the item Spirit Visage]]</span> <span style=\"white-space:normal;\">[[Spirit Visage]]</span></span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span> take effect after ''Cull the Meek's'' healing cap.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309205,
+                "revisions": [
+                  {
+                    "parentid": 3943113,
+                    "revid": 4008014,
+                    "timestamp": "2026-04-13T03:35:33Z"
+                  }
+                ],
+                "title": "Template:Data Renekton/Cull the Meek"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4008014,
+      "timestamp": "2026-04-13T03:35:33Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6a061250babb916fcad3700566b93e51c2976a68c29e25fc3a0f8e1337a95d81",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Cull_the_Meek",
+    "revisionId": 4008014,
+    "sourceTimestamp": "2026-04-13T03:35:33Z"
+  }
+}

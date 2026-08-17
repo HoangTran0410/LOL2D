@@ -34,7 +34,8 @@
  * for exactly that reason — replacing the object would leave every existing
  * spell reading the old one.)
  */
-import { inject, ref } from 'vue';
+import { inject, onBeforeUnmount, onMounted, ref } from 'vue';
+import DomUtils from '../../../utils/dom.utils';
 import type { HudInteractions } from '../hudInteractions';
 import type { RenderFps } from '../../Game';
 import type { RenderQuality } from '../../managers/ObjectManager';
@@ -169,6 +170,40 @@ const persistZoom = (): void => setZoomFactorPreference(camera.zoomFactor, hud.t
 
 const onZoomInput = (event: Event): void =>
   setZoom(Number((event.target as HTMLInputElement).value));
+
+/**
+ * ## Fullscreen, and why it is in here
+ *
+ * The menu has a fullscreen button and the game had none, so a phone that
+ * pressed Chơi was stuck with the browser's address bar over the match for the
+ * rest of the session — the one place the screen is worth the most. It is in
+ * this tab rather than as a second always-visible corner control because
+ * `InGameHUD.vue` deliberately cut the last one of those to reclaim phone
+ * screen space, and because opening this panel pauses the match: you are not
+ * being ganked while you fiddle with the viewport.
+ *
+ * `goFullscreen` chains an orientation lock onto the request, so on Android
+ * this button *is* the auto-rotate. Elsewhere `OrientationHint.vue` asks the
+ * player to turn the phone, which is all a browser can do on an iPhone.
+ *
+ * The button hides itself where the API does not exist rather than sitting
+ * there dead. `fullscreenchange` is what keeps the label honest: the browser
+ * leaves fullscreen on its own for reasons this component never hears about —
+ * a swipe down, a notification, Escape.
+ */
+const isFullscreen = ref(DomUtils.isFullscreen());
+const fullscreenSupported = DomUtils.fullscreenSupported();
+
+const syncFullscreen = (): void => {
+  isFullscreen.value = DomUtils.isFullscreen();
+};
+
+const toggleFullscreen = (): void => {
+  isFullscreen.value = DomUtils.toggleFullscreen();
+};
+
+onMounted(() => document.addEventListener('fullscreenchange', syncFullscreen));
+onBeforeUnmount(() => document.removeEventListener('fullscreenchange', syncFullscreen));
 
 /**
  * ## The way out of the match
@@ -308,6 +343,21 @@ const resetDefaults = (): void => {
     <p class="practice-note">
       Quái rừng và lính: thay đổi có hiệu lực khi bạn đóng bảng và trận chạy tiếp.
     </p>
+
+    <!-- Reversible, so it sits above the confirming pair rather than among
+         them — and full width, because it is the one control here a phone
+         reaches for first. -->
+    <button
+      v-if="fullscreenSupported"
+      type="button"
+      class="practice-fullscreen"
+      id="practice-fullscreen"
+      @click="toggleFullscreen"
+      @touchend.prevent="toggleFullscreen"
+    >
+      <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'" aria-hidden="true"></i>
+      <span>{{ isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình' }}</span>
+    </button>
 
     <!-- Last in the flow and visually apart: the two irreversible things in the
          panel, side by side because they are the same kind of control. See the

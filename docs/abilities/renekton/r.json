@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_renekton_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Dominus.png?3a147",
+    "sha1": "26e4be75dbde3671b735caf35478234dcf287310"
+  },
+  "champion": "Renekton",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_renekton_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Dominus.png?3a147",
+        "sha1": "26e4be75dbde3671b735caf35478234dcf287310"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Renekton''' empowers himself for 15 seconds, gaining <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;'''bonus''' health</span></span>, 20% increased [[size]], <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;25 '''bonus''' attack range</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">20 Fury</span>]]</span>, as well as increasing ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Cull the Meek\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Cull the Meek.png|20xpx|border|link=Renekton#Cull the Meek|An icon for Renekton's ability Cull the Meek]]</span> <span style=\"white-space:normal;\">[[Renekton#Cull the Meek|Cull the Meek's]]</span></span>'' effect radius.",
+          "text": "Active: Renekton empowers himself for 15 seconds, gaining &nbsp;bonus health, 20% increased size, &nbsp;25 bonus attack range, and 20 Fury, as well as increasing Cull the Meek's effect radius."
+        },
+        "description2": {
+          "raw": "During this time, he deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> every 0.<small>5</small> seconds to nearby enemies and generates <span style=\"color:\n#FA6533; white-space:normal\">5 Fury</span> per second, up to a maximum of <span style=\"color:\n#FA6533; white-space:normal\">75 Fury</span>.",
+          "text": "During this time, he deals magic damage every 0.5 seconds to nearby enemies and generates 5 Fury per second, up to a maximum of 75 Fury."
+        },
+        "effectradius": "375",
+        "icon": "Dominus.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Health:'''</span></dt><dd>300 / 400 / 500 / 600 / 700</dd></dl>",
+          "text": "Bonus Health:300 / 400 / 500 / 600 / 700"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage Per Tick:'''</span></dt><dd>30 / 52.<small>5</small> / 75 / 97.<small>5</small> / 120 <span style=\"color:orange; white-space:normal\">(+ 5% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 5% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>900 / 1575 / 2250 / 2925 / 3600 <span style=\"color:orange; white-space:normal\">(+ 150% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 150% AP)</span></dd></dl>",
+          "text": "Magic Damage Per Tick:30 / 52.5 / 75 / 97.5 / 120 (+ 5% bonus AD) (+ 5% AP)Total Magic Damage:900 / 1575 / 2250 / 2925 / 3600 (+ 150% bonus AD) (+ 150% AP)"
+        },
+        "name": "Dominus",
+        "notes": {
+          "raw": "* ''Dominus' ''<span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is not refunded if '''Renekton''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span> during the cast animation.\n* ''Dominus' ''bonus health gain does not interact with <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Spirit Visage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Spirit Visage item.png|20xpx|border|link=Spirit Visage|An icon for the item Spirit Visage]]</span> <span style=\"white-space:normal;\">[[Spirit Visage]]</span></span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Grievous wounds\">[[File:Grievous Wounds icon.png|20px|link=Grievous Wounds|An icon representing the keyword Grievous wounds]] [[:Grievous Wounds|Grievous Wounds]]</span>.\n** '''Renekton''' retains ''Dominus' ''bonus health (if not over his normal maximum) once the duration ends.",
+          "text": "Dominus' &nbsp;cooldown is not refunded if Renekton dies during the cast animation.\nDominus' bonus health gain does not interact with Spirit Visage or Grievous Wounds.\n* Renekton retains Dominus' bonus health (if not over his normal maximum) once the duration ends."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Dominus"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "900b9af7a77f1a43303a9c643a75c486e6da5ec470eb7738b62d6c80c965a76f",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Dominus",
+    "revisionId": 3963895,
+    "sourceTimestamp": "2025-11-07T10:15:32Z"
+  }
+}

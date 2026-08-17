@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_ezreal_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Essence_Flux.png?61864",
+    "sha1": "254abbd24c92fabe893535ec2c8a774e379178c8"
+  },
+  "champion": "Ezreal",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ezreal_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Essence_Flux.png?61864",
+        "sha1": "254abbd24c92fabe893535ec2c8a774e379178c8"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8",
+        "cost": "50",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ezreal''' fires an orb in the target direction that marks the first enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, epic <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monster]]</span>, or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structure\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structure]]</span> hit for 4 seconds.",
+          "text": "Active: Ezreal fires an orb in the target direction that marks the first enemy champion, epic monster, or structure hit for 4 seconds."
+        },
+        "description2": {
+          "raw": "His next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span> against the target detonates the mark to deal them <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>.",
+          "text": "His next basic attack or ability against the target detonates the mark to deal them bonus magic damage."
+        },
+        "description3": {
+          "raw": "If the mark was detonated with an ability, '''Ezreal''' restores <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\">60 mana</span></span> plus the <span style=\"color:\n#0099CC; white-space:normal\">mana cost</span> of that ability.",
+          "text": "If the mark was detonated with an ability, Ezreal restores &nbsp;60 mana plus the mana cost of that ability."
+        },
+        "icon": "Essence Flux.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Magic Damage:'''</span></dt><dd>80 / 135 / 190 / 245 / 300 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>",
+          "text": "Bonus Magic Damage:80 / 135 / 190 / 245 / 300 (+ 100% bonus AD) (+ 90% AP)"
+        },
+        "name": "Essence Flux",
+        "notes": {
+          "raw": "* The application of ''Essence Flux'' deals 0 <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc damage]]</span>.\n** This triggers [[combat status|in-combat]] effects such as drawing turret aggro and drawing [[Monster#Monster_Behavior|monster aggression]].\n** It also triggers <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Sudden Impact\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sudden Impact rune.png|20xpx|link=Sudden Impact|An icon representing Sudden Impact]]</span> <span style=\"word-break: keep-all;\">[[Sudden Impact]]</span></span> and applies <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Elixir of Sorcery\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Elixir of Sorcery item.png|20xpx|border|link=Elixir of Sorcery|An icon for the item Elixir of Sorcery]]</span> <span style=\"white-space:normal;\">[[Elixir of Sorcery]]</span></span>.\n** It does not trigger <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Cheap Shot\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cheap Shot rune.png|20xpx|link=Cheap Shot|An icon representing Cheap Shot]]</span> <span style=\"word-break: keep-all;\">[[Cheap Shot]]</span></span>, however, as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Proc damage\">[[File:Wit's End item.png|20px|link=Damage|An icon representing the keyword Proc damage]] [[:Damage|proc damage]]</span> doesn't trigger <span class=\"inline-image label-after rune-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-rune=\"Cheap Shot\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Cheap Shot rune.png|20xpx|link=Cheap Shot|An icon representing Cheap Shot]]</span> <span style=\"word-break: keep-all;\">[[Cheap Shot]]</span></span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|Block]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|Dodge]]</span> prevents the mark from being triggered by a basic attack.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> prevents the mark from being triggered by an ability. If the mark is triggered by a basic attack, spell shield will prevent ''Essence Flux's'' damage.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "The application of Essence Flux deals 0 proc damage.\n* This triggers in-combat effects such as drawing turret aggro and drawing monster aggression.\n* It also triggers Sudden Impact and applies Elixir of Sorcery.\n* It does not trigger Cheap Shot, however, as proc damage doesn't trigger Cheap Shot.\nBlock and Dodge prevents the mark from being triggered by a basic attack.\nSpell shield prevents the mark from being triggered by an ability. If the mark is triggered by a basic attack, spell shield will prevent Essence Flux's damage.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": true,
+        "speed": "1700",
+        "spellshield": false,
+        "targeting": "Location",
+        "width": "160"
+      },
+      "name": "Essence Flux"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "256fbb2c1d44a8f8dd6dc6855f16d25fc4bf2b3d4a592d4e15b0235587445c0e",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ezreal/Essence_Flux",
+    "revisionId": 4013234,
+    "sourceTimestamp": "2026-04-28T21:19:49Z"
+  }
+}

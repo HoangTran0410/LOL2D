@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Master Yi/Highlander",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Highlander@@icon@@false@@icon2@@Highlander.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Passive:'''</span> Scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> reduces the <span style=\"white-space:nowrap\">'''current''' cooldowns</span> of '''Master Yi's''' basic [[Champion ability|abilities]] by 70%.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Master Yi''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|cleanses]]</span> himself from all <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripples]]</span>. For the next 7 seconds, he gains <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosting\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosting]]</span>, <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span>, <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow-immune\">[[File:Slow immune 2.png|20px|link=Slow_resist#Slow Immunity|An icon representing the keyword Slow-immune]] [[:Slow_resist#Slow Immunity|slow immunity]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple-immune\">[[File:Cripple immune.png|20px|link=Slow_resist#Cripple Immunity|An icon representing the keyword Cripple-immune]] [[:Slow_resist#Cripple Immunity|cripple immunity]]</span>.@@description3@@While active, scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> extends ''Highlander's'' duration by 7 seconds.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>25 / 35 / 45 / 55 / 65%</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement Speed:'''</span></dt><dd>35 / 40 / 45 / 50 / 55%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@100@@cooldown@@85@@targeting@@Auto@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* ''Highlander'' can be cast during <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Master Yi\" data-ability=\"Alpha Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Master Yi Alpha Strike.png|20xpx|border|link=Master Yi#Alpha Strike|An icon for Master Yi's ability Alpha Strike]]</span> <span style=\"white-space:normal;\">[[Master Yi#Alpha Strike|Alpha Strike]]</span></span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308380,
+                "revisions": [
+                  {
+                    "parentid": 3885441,
+                    "revid": 4001544,
+                    "timestamp": "2026-03-21T09:12:44Z"
+                  }
+                ],
+                "title": "Template:Data Master Yi/Highlander"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4001544,
+      "timestamp": "2026-03-21T09:12:44Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "3a5904fb680ea9aa3b8e65a45c544eb3336130bff04261ee592981766c960d3c",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Master_Yi/Highlander",
+    "revisionId": 4001544,
+    "sourceTimestamp": "2026-03-21T09:12:44Z"
+  }
+}

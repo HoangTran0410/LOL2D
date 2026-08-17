@@ -1,202 +1,126 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code (claude.ai/code) when working in this repository.
 
-## Project Overview
+## Project
 
-LOL2D is a fan-made, browser-based 2D game inspired by League of Legends. It runs entirely in the browser: p5.js draws the canvas, Vue 3 drives the HUD, all TypeScript, bundled with Vite. Tests run under Vitest, plus Playwright scripts that drive the real game in Chrome.
+LOL2D — a fan-made browser 2D game inspired by League of Legends. TypeScript + Vite; p5.js draws the canvas, Vue 3 drives the HUD. Vitest for tests, Playwright scripts (`tests/e2e/`) drive the real game in Chrome.
 
-p5 itself is the one exception to the bundle: `index.html` loads it from a CDN `<script>` tag because the game uses p5's **global mode**, so `createVector`, `push`, `fill` and the rest are globals with no import. See the comment at the top of `src/main.ts` — all code touching a p5 global must run inside `setup()`, never at module eval time.
+p5 runs in **global mode** — `createVector`, `push`, `fill` and the rest are globals from a CDN `<script>` in `index.html`, not bundled. All code touching a p5 global must run inside `setup()`, never at module eval time. See the header of `src/main.ts`, the only entry point; in dev it also exposes `window.__lol2d`, which is how the e2e scripts reach the running game.
 
-## Running the Project
+## Running
 
 ```bash
-npm install
-npm run dev      # Vite dev server, http://localhost:5173
+npm run dev      # http://localhost:5173
 npm run verify   # everything CI runs — do this before declaring work done
 ```
 
-`npm run verify` = `assets:check` + `ability:check` + `typecheck` + `typecheck:core` + full Vitest suite + `build`.
+`verify` = `assets:check` + `ability:check` + `typecheck` + `typecheck:core` + Vitest + `build`.
 
-- **Menu** → Click "Chơi" to start the game
-- **In-game controls**: Right-click to move, `A` `Q` `W` `E` `R` for abilities and `D` `F` for summoner spells (see `SpellHotKeys` in `src/game/constants.ts`), `Space` to toggle camera follow, `N` for the nav debug overlay, mouse wheel to zoom, `Esc` to open the practice panel. **`Esc` no longer leaves the match** — one mis-hit used to end it outright; the way out is the exit button at the bottom of the panel's Trận đấu tab, behind a two-step confirm.
+**The app is an installable PWA**, so two build-time facts are load-bearing. `predev`/`prebuild` copy p5 and stats.js out of `node_modules` into `public/vendor/` (gitignored, `scripts/copy-vendor.mjs`) and `index.html` loads them from there rather than a CDN: both are globals the game cannot boot without — `GameScene` calls `new Stats()` unguarded — and a service worker can only cache a cross-origin script it has already seen fetched, so the first offline launch would otherwise be a white screen. And `public/` is the only directory Vite copies verbatim, which is why `favicon/` lives there: the generated manifest points at those icons by path. `npm run e2e:pwa` builds and checks the whole thing in a real browser with the network cut — including clearing Chromium's own HTTP cache first, without which a missing precache entry still appears to work.
 
-## Code Style
+In-game: right-click moves, `A Q W E R` abilities, `D F` summoners (`SpellHotKeys` in `src/game/constants.ts`), `Space` toggles camera follow, `N` the nav debug overlay, wheel zooms, `Esc` opens the practice panel. **`Esc` does not leave the match** — one mis-hit used to end it outright; the way out is the exit button in the panel's Trận đấu tab, behind a two-step confirm.
 
-- **Formatting**: Prettier (config in `.prettierrc` — 2 spaces, single quotes, trailing commas, 100 columns). Several files predate it and fail `prettier --check` on `main`; do not run `--write` across them as a side effect of an unrelated change.
-- **Polyfills**: Array prototype methods (`map`, `filter`, `forEach`, etc.) are overridden in `src/main.ts` with optimized versions from `src/utils/optimized.utils.ts`, before p5 globals are imported.
-- **Tuning values**: exported as constants from the spell file so tests import them instead of copying numbers. Retuning damage must not mean editing a test.
-- **Spell Design & Visual Guidelines** (the whole bar, distilled for briefing an agent without making it read a 400-line spell: `docs/VFX_STANDARD.md`):
-  1. **Visual Distinction & Animation**: Each champion must have unique, recognizable VFX. Never pop spells in instantly without windups, travel animations, or cast times. Never reuse artwork/geometry across champions (e.g. Jarvan R must use earthen walls/crags, NOT Anivia's ice walls).
-  2. **Physics & On-Hit Effects**: Use `ParticleSystem` or `ImpactEffect` on impacts — `ParticleSystem` (`gameObject/helpers/`) for a legacy `onSpellCast` spell, `ImpactEffect` (`game/vfx/`) only from a `castSpec.vfx` factory; they are not interchangeable. Ground shockwaves/beams must trigger ONLY upon landing (e.g. Jarvan E flag landing on ground). Ekko R ghost/afterimage must ONLY render when Ekko R is ready (`state === 'READY'`).
-  3. **Damage Scaling**: Scale damage numbers relative to LOL2D base health (~100 health pools; normal spells ~15-35, ultimates ~40-60). Never copy raw League PC wiki numbers directly without scaling.
-  4. **Range & Velocity Scaling**: Scale spell ranges and missile speeds to LOL2D canvas dimensions rather than raw PC values.
-  5. **Multi-hit Protection**: A dash or continuous spell pass must hit each target unit at most ONCE using a hit tracking set (`hitTargets`).
-- **`Array.prototype.filter` cannot narrow types here.** `src/types/global.d.ts` re-declares it with the optimized `(value, index) => boolean` signature, and the merged interface puts that overload first, so the type-predicate overload never applies — `objects.filter((o): o is Foo => …)` still comes back as the wide type. Write a plain loop (see `MatchDirector.bots()`), not a cast.
-- **`<script setup>` *is* the setup function.** A `const x = ref(…)` at its top level looks like module scope and is not — it is rebuilt on every mount. State that must outlive an unmount belongs in a plain `.ts` module (see `src/game/hud/practice/panelTab.ts`).
+## Code style
+
+- **Prettier** (`.prettierrc`, 2 spaces, single quotes, 100 columns). Several files predate it and fail `--check` on `main`; never run `--write` across them as a side effect of an unrelated change.
+- **Tuning values** are exported constants in the spell file so tests import them. Retuning damage must not mean editing a test.
+- **Array prototypes are polyfilled** in `src/main.ts` from `src/utils/optimized.utils.ts`, before p5 loads. Consequence: **`Array.prototype.filter` cannot narrow types.** `src/types/global.d.ts` re-declares it and the merged interface puts the non-predicate overload first, so `objects.filter((o): o is Foo => …)` still comes back wide. Write a plain loop (see `MatchDirector.bots()`), not a cast.
+- **`<script setup>` *is* the setup function.** A `const x = ref(…)` at its top level looks like module scope and is not — it is rebuilt on every mount. State that must outlive an unmount belongs in a plain `.ts` module (`src/game/hud/practice/panelTab.ts`).
+- **Spell design and VFX**: `docs/VFX_STANDARD.md` is the whole bar, distilled so an agent can be briefed with a link instead of a 400-line spell. In short: every champion's VFX is its own artwork with a real windup, damage scales to a ~100 health pool (spells 15-35, ultimates 40-60) and ranges to this canvas rather than raw wiki numbers, and a dash or sweep hits each unit at most once via a `hitTargets` set.
 
 ## Testing
 
-`npm run verify` is the gate. Beyond it, pick the cheapest tool that can see the bug:
+`verify` is the gate. Beyond it, pick the cheapest tool that can see the bug:
 
-1. **Vitest by default.** 1500 tests run in about a second.
-2. **A source-scan test** for any "nobody may do X" rule — it runs in milliseconds and closes a whole class permanently. `tests/game/spells/mana-spend-seam.test.ts` (no file may write `stats.mana` directly) and `tests/game/spells/cc-buff-icons.test.ts` are the models. Strip comments before matching, or the scan flags its own documentation.
-3. **Playwright (`tests/e2e/drive-*.mjs`) only for what Vitest structurally cannot see**, which is three things: a real finger, a real renderer, and the paused/unpaused frame boundary. Each run costs minutes. Do not re-run neighbouring scripts for a change that does not touch their area.
+1. **Vitest by default** — 2500 tests in about ten seconds, most of that the nav sweeps.
+2. **A source-scan test** for any "nobody may do X" rule: milliseconds, and it closes a whole class permanently. Models: `tests/game/spells/mana-spend-seam.test.ts`, `dash-onupdate-seam.test.ts`. Strip comments before matching, or the scan flags its own documentation.
+3. **Playwright only for what Vitest structurally cannot see** — a real finger, a real renderer, the paused/unpaused frame boundary. Minutes per run; do not re-run neighbouring scripts for a change that does not touch their area.
+
+**Every test must be shown to fail.** Write it first, run it, and *read* the message. Two failure shapes have shipped repeatedly here: asserting on state the code under test has already produced (checking `game.monsters` is empty when the setter emptied it synchronously), and a check that computes its own expected value by calling the thing it checks — a transform asked to verify itself agrees with itself however wrong it is; one inverted axis was off by 3468 against arithmetic written out by hand. Prove an e2e script falsifiable **once, when it is new**; repeating that on every later change is the single most expensive habit available.
+
+Known flakes, not worth chasing: `drive-new-spells.mjs` (~1 in 4, `oScene` undefined during scene boot) and `drive-touch-controls.mjs` (rare freeze). A stray dev server holding port 5173 makes both far likelier.
 
 ### Keeping a pass cheap
 
-`verify` is not the expensive part — ten seconds, thirty lines of signal. What actually burns a context window here was measured on the Camille/Ekko/Jarvan pass:
+`verify` is not the expensive part. What actually burns a context window, measured on the Camille/Ekko/Jarvan pass:
 
-- **Fanning out agents that share a briefing.** Seven agents each told to "read `Fizz_E.ts` first" read the same 400-line file seven times before writing a line. `docs/VFX_STANDARD.md` is that briefing distilled, so the instruction is a link. Fan out when the work is independent *and* the shared context is small; when N files all need one standard, one agent doing all N reads it once. An audit agent should report `file:line` plus a sentence and **never quote code back** — that part scaled fine across 150 files.
-- **Reading screenshots.** A 1280x900 PNG costs about what 600 lines of source costs. Make the e2e script end in a numeric summary and trust it — `tests/e2e/shoot-new-champion-vfx.mjs` prints `objects=+3 moved=296px` per cast precisely so the run is legible without opening a frame. Open one or two to judge a *look*; never a whole run's worth.
-- **Piping whole command output.** `npm run verify` ends with vite's asset table, forty lines of PNG sizes. `npm run verify 2>&1 | grep -E "Tests |Test Files |error|FAIL"` is the entire signal, and `npx tsc --noEmit -p tsconfig.json 2>&1 | grep -v "\.vue'"` drops the four pre-existing SFC-resolution errors that are not yours.
-
-**Every test must be shown to fail.** Write it first, run it, and *read* the message. Two failure shapes have shipped repeatedly here:
-
-- Asserting on state *after* the code under test has already produced it — e.g. checking `game.monsters` is empty when the setter emptied it synchronously.
-- A check that computes its own expected value by calling the thing it is checking. A transform asked to verify itself agrees with itself however wrong it is; inverting an axis moved a result by 94 units through the round trip and by 3468 against arithmetic written out by hand.
-
-Prove an e2e script falsifiable **once, when it is new** — break the source, confirm the right check goes red, revert. Do not repeat that on every later change; it is the single most expensive habit available.
-
-Two known flakes, not worth chasing: `drive-new-spells.mjs` (~1 in 4, `oScene` undefined during scene boot) and `drive-touch-controls.mjs` (rare full freeze). A stray `npm run dev` server holding port 5173 makes both far more likely.
+- **Fanning out agents that share a briefing.** Seven agents each told to "read `Fizz_E.ts` first" read the same 400-line file seven times before writing a line. Fan out when the work is independent *and* the shared context is small; when N files need one standard, one agent reads it once. An audit agent should report `file:line` plus a sentence and **never quote code back** — that part scaled fine across 150 files.
+- **Reading screenshots.** A 1280x900 PNG costs about what 600 lines of source costs. Make the e2e script end in a numeric summary and trust it. Open one or two to judge a *look*, never a whole run's worth.
+- **Piping whole command output.** `npm run verify 2>&1 | grep -E "Tests |Test Files |error|FAIL"` is the entire signal, and `npx tsc --noEmit -p tsconfig.json 2>&1 | grep -v "\.vue'"` drops the pre-existing SFC-resolution errors that are not yours.
 
 ## Architecture
 
-### Scene Flow
-`LoadingScene` → `MenuScene` → `GameScene`
+`LoadingScene` → `MenuScene` → `GameScene`, routed by a custom `managers/SceneManager.ts` (not p5's).
 
-`src/main.ts` is the only entry point: it installs the Array polyfills, assigns `window.setup`/`window.draw` to boot p5, and creates the `SceneManager`. In dev builds it also exposes the scene manager as `window.__lol2d`, which is how the Playwright scripts in `tests/e2e/` reach the running game.
+| File | Role |
+|---|---|
+| `Game.ts` | game loop; owns camera / objectManager / terrainMap / fogOfWar |
+| `managers/ObjectManager.ts` | updates and draws every object; quadtree for spatial queries |
+| `MatchDirector.ts` | every mutation of a *running* match, and the only thing that persists them |
+| `managers/MinionSpawner.ts` | wave clock for both bases; owns the live minion cap |
+| `gameObject/map/Minimap.ts` | screen-space map; tap expands it, tapping the expanded map teleports |
 
-### Core Classes (`src/game/`)
+Objects: `GameObject` → `AttackableUnit` (`Champion`, `AIChampion`, `Minion`, `Monster`, `Turret`), plus `Fountain`, `SpellObject` and helpers (`ParticleSystem`, `CombatText`, `TrailSystem`). Key enums in `game/enums/`: `ActionState` (movement/combat flags), `StatusFlags` (crowd control), `SpellState`, `EventType`.
 
-| Class | File | Role |
-|---|---|---|
-| `Game` | `Game.ts` | Main game loop, owns camera/objectManager/terrainMap/fogOfWar |
-| `ObjectManager` | `managers/ObjectManager.ts` | Updates and draws all game objects; uses quadtree for spatial queries |
-| `SceneManager` | `managers/SceneManager.ts` | Custom scene manager (not p5's), routes p5 events to active scene |
-| `MinionSpawner` | `managers/MinionSpawner.ts` | Wave clock for both bases; owns the live minion cap |
-| `MatchDirector` | `MatchDirector.ts` | Every mutation of a *running* match — roster, loadouts, rules, world, cheats — and the only thing that persists them |
-| `Minimap` | `gameObject/map/Minimap.ts` | Screen-space map, top-left; tap expands it, tapping the expanded map teleports |
-
-### The practice panel
-
-`src/game/hud/PracticePanel.vue` — three tabs (Đấu thủ / Trận đấu / Gian lận) over a paused match, opened by `Esc` or the corner button. It is a **superset of the pregame setup screen** for match configuration: the setup screen sets AI behaviour globally, the panel sets it per bot.
-
-Tabs never touch `localStorage` themselves. They call `MatchDirector`, which mutates the live match and then writes `lol2d:pregameConfig:v1`, so the match you shaped is the one you get back on reload. **Cheats, debug layers and stack counts are session state and are deliberately never stored** — there is a test asserting the stored blob is byte-for-byte unchanged after every cheat is switched on. The saved-kit library (`config/savedKits.ts`) is the one thing a tab stores on its own, because the player fills it by name.
-
-Four tabs will not fit: `.pregame-tab` is `flex: 1`, and at 390px three plus the close button is the ceiling.
-
-### Game Object Hierarchy
-
-```
-GameObject
-├── AttackableUnit (has stats, buffs, health, movement)
-│   ├── Champion (player-controlled)
-│   ├── AIChampion (AI-controlled)
-│   ├── Monster (jungle camp)
-│   ├── Minion (lane minion, spawned in waves)
-│   └── Turret (team building)
-├── Fountain (spawn platform, not attackable)
-├── SpellObject (projectile/effect created by spells)
-└── Helpers (ParticleSystem, CombatText, TrailSystem)
-```
+**Adding a spell**: read `docs/ADDING_SPELLS.md` first — the three registration points, the `MissileSpellObject` base every skillshot should extend, the buff catalogue's mandatory `stackId`, the engine traps `tsc` cannot catch, and how to verify against the real game.
 
 ### Teams, lanes and minions
 
-`GameObject.teamId` defaults to a fresh uuid per unit, so by default every unit
-is its own faction. **Champions keep that** — the player and the bots are
-free-for-all and hostile to everyone, including both minion teams.
+`GameObject.teamId` defaults to a fresh uuid per unit, so **every unit is its own faction, and champions keep that** — player and bots are free-for-all, hostile to everyone including both minion teams. `enums/TeamId.ts` adds the two shared ids that a base's fountain, its turret row (`turret1` blue, `turret2` red in `summoner_map.json`) and its minions share. `lanes.ts` holds three waypoint paths ordered blue → red; red minions walk them backwards, and `tests/game/minions/Lanes.test.ts` checks the coordinates against the wall polygons — edit them and re-run it.
 
-`src/game/enums/TeamId.ts` adds the two shared ids that a base's fountain, its
-turret row (`turret1` = blue, `turret2` = red in `summoner_map.json`) and the
-minions it spawns all share. `src/game/lanes.ts` holds the three lane waypoint
-paths, ordered blue base → red base; red minions walk them backwards. Those
-coordinates are checked against the map's wall polygons by
-`tests/game/minions/Lanes.test.ts` — edit them and re-run it.
-`src/game/managers/MinionSpawner.ts` is the wave clock and owns the live cap.
+### The practice panel
 
-### Spells (`src/game/gameObject/spells/`)
-
-Each spell is a separate file exporting a class extending `Spell`. `Spell` manages cooldown state machine (READY → COOLDOWN → READY). Spell files reference their champion prefix (e.g., `Ahri_Q.ts`, `Yasuo_R.ts`). Summoner spells (`Flash`, `Ghost`, `Heal`, `StealthWard`) are at the root of the spells folder.
-
-**Adding a new spell**: read `docs/ADDING_SPELLS.md` first. It covers the three registration points, the `MissileSpellObject` base every skillshot should extend, the buff catalogue and its mandatory `stackId` rule, the engine traps `tsc` cannot catch (dead status flags, double-updated particle systems, the null-owner HUD path), and how to verify a spell by driving the real game.
-
-### Buffs (`src/game/gameObject/buffs/`)
-
-Each buff extends the base `Buff` class and controls `statusFlagsToEnable`/`statusFlagsToDisable` to apply crowd control effects via `StatusFlags` and `ActionState`.
-
-### Stats System (`Stats.ts`)
-
-Stats use a base + bonus modifier pattern. `ActionState` flags are updated by both status effects and buff system.
-
-### Enums (`src/game/enums/`)
-
-Key enums: `ActionState` (movement/combat flags), `StatusFlags` (crowd control), `SpellState` (cooldown states), `EventType` (game events via EventManager).
-
-### Map & Collision
-
-- `TerrainMap.ts` stores map polygon data and handles terrain collision
-- `FogOfWar.ts` renders fog of war overlay
-- `Camera.ts` handles world-to-screen coordinate transformation
-- QuadTree-based collision in `libs/quadtree.ts`; collision algorithms in `libs/detect-collisions.ts`
+`hud/PracticePanel.vue` — three tabs over a paused match, opened by `Esc`. A **superset of the pregame setup screen**: setup sets AI behaviour globally, the panel sets it per bot. Tabs never touch `localStorage`; they call `MatchDirector`, which mutates the live match and then writes `lol2d:pregameConfig:v1`, so the match you shaped is the one you get back. **Cheats, debug layers and stack counts are session state and deliberately never stored** — a test asserts the blob is byte-identical after every cheat is switched on. `config/savedKits.ts` is the one thing a tab stores on its own. A fourth tab will not fit: `.pregame-tab` is `flex: 1` and 390px holds three plus the close button.
 
 ## Traps that have cost real time
 
-Each of these was found by measurement, more than once. None is visible from reading the file you are editing.
+Each was found by measurement, more than once, and none is visible from the file you are editing. The seams named here carry the long version in their own doc comments.
 
-**The practice panel holds the match paused.** `Game.update()` and `Game.draw()` both return early while `paused`, so `ObjectManager.update()` and `AttackableUnit.update()` do not run while any tab is open — and every `MatchDirector` method runs in exactly that window. Four bugs so far: `bots()` counted only `objectManager.objects` (adds sit in `_objectToBeAdd` until the flush, so the `AI_COUNT_MAX` guard never tripped); `isInvulnerable` trusted `buffs` (`deactivateBuff()` only sets `toRemove`); `Stats.update()`'s health clamp never ran after a max-health drop; and config derivation wrote a just-added bot out as absent. **Rule:** read both `objects` and `_objectToBeAdd`, skip `toRemove` and deactivated entries, and clamp derived stats at the point of change rather than trusting `update()`.
+**The practice panel holds the match paused.** `Game.update()`/`draw()` return early while `paused`, and every `MatchDirector` method runs in exactly that window — so nothing has settled. Four bugs so far. **Read both `objects` and `_objectToBeAdd`, skip `toRemove` and deactivated entries, and clamp derived stats at the point of change rather than trusting `update()`.**
 
-**`GameScene` calls `preventDefault()` on every touch on the page**, so a browser synthesises neither the trailing `click` nor its own scrolling — anywhere, not just over the canvas. A checkbox `change`, a range drag and a plain `@click` were each verifiably dead under a thumb while working perfectly under a mouse. **Every HUD control needs a touch handler beside its click handler**, and a scrollable panel body needs its scroll hand-rolled. `RulesTab.vue` and `RosterTab.vue` carry the working shapes.
+**`GameScene` calls `preventDefault()` on every touch on the page**, so the browser synthesises neither the trailing `click` nor its own scrolling — anywhere, not just over the canvas. A checkbox, a range drag and a plain `@click` were each dead under a thumb and perfect under a mouse. **Every HUD control needs a touch handler beside its click handler**, and a scrollable panel body needs hand-rolled scroll. `RulesTab.vue` and `RosterTab.vue` carry the shapes.
 
-**Spell VFX is drawn from `Champion.draw()`**, which `ObjectManager.draw` skips when `willDraw` is false or the champion is outside the camera. So VFX vanishes whenever its caster is unrendered, while damage — a `SpellObject` with its own bounds — lands normally. Lux R's beam crossed the screen and hit the player invisibly for exactly this reason. **An effect that reaches beyond its caster's body must be a `SpellObject`, not `castSpec.vfx`.** Aim telegraphs (Pantheon Q, Varus Q) are the deliberate exception — they *should* disappear with an invisible caster.
+**An effect that reaches beyond its caster's body must be a `SpellObject`, not `castSpec.vfx`.** VFX drawn from `Champion.draw()` disappears whenever `ObjectManager.draw` skips the caster, while the damage — with bounds of its own — lands normally. Lux R's beam crossed the screen invisibly. Aim telegraphs (Pantheon Q, Varus Q) are the deliberate exception.
 
-**Match rules are read live, and only through their seam.** `Spell.effectiveMana(amount)` is the single expression of URF's `manaFree`, and `spendMana(amount)` is the only sanctioned way to charge a caster; `cooldownMultiplier` is the same idea for CDR. A spell that touches `stats.mana` directly silently opts out of URF — Anivia R's per-tick upkeep did, in both the deduction *and* the affordability check. The source-scan test now forbids it.
+**A `SpellObject` that paints past its own centre needs `getDisplayBoundingBox()`.** The default derives it from `visionRadius`, which is 0 for a plain `SpellObject` — a zero-area box — so a 400px cone vanishes when its *centre* leaves the camera. Six of twelve new effects had it. `aoe-display-bounds.test.ts`.
 
-**`dashBuff.onUpdate = …` deletes the dash.** `Buff.update()` calls `this.onUpdate()`, and `Dash` puts the movement itself — the step toward `dashDestination`, the arrival check that fires `onReachedDestination`, the interrupt check — in `Dash.prototype.onUpdate`. An instance assignment does not *hook* the frame, it *replaces* it, so the champion plays the spell's own per-frame logic standing perfectly still. It reads exactly like a callback, which is why Camille E, Ekko E and Jarvan Q all shipped with it and none was noticed: each still dealt its damage, to whatever happened to be next to the caster, and still ended on time. **Use `Dash.onDashUpdate`**, which the base calls after the step. `tests/game/spells/dash-onupdate-seam.test.ts` scans for the assignment.
+**Ground art must set `zIndex = 2`.** `Z_INDEX_MAP` is keyed by *exact constructor*, so a `SpellObject` subclass does not inherit its slot of 2 and falls through to 99 — above `Champion`'s 4, covering the feet of everyone standing on it. `ground-decal-zindex.test.ts`.
 
-**A `SpellObject` that paints past its own centre needs `getDisplayBoundingBox()`.** `GameObject`'s default derives the box from `visionRadius`, which is **0** for a plain `SpellObject` — a zero-area box on the object's own centre. `ObjectManager.draw` picks what to draw by querying the tree with that box, so a 400px cone or a 220px cage vanishes the moment its *centre* leaves the camera, while its damage lands normally. Same failure as the Lux R beam, one layer down, and it hit six of the twelve effects added with Camille/Ekko/Jarvan. `tests/game/spells/aoe-display-bounds.test.ts` pins it.
+**Match rules are read live, and only through their seam.** `Spell.effectiveMana()` is the single expression of URF's `manaFree`, `spendMana()` the only way to charge a caster, `cooldownMultiplier` the same for CDR. Touching `stats.mana` directly silently opts out; `mana-spend-seam.test.ts` bans the name from `spells/`, `spellObjects/` and `buffs/`. **Granting is not billing** — a refill must not be zeroed by URF, so it lives on the unit as `AttackableUnit.restoreMana()`, beside `takeHeal()`.
 
-**Every `SpellObject` subclass draws at z-index 99 unless it says otherwise.** `ObjectManager`'s `Z_INDEX_MAP` is keyed by *exact constructor*, so a subclass does not inherit `SpellObject`'s slot of 2 — it falls through to `DEFAULT_Z_INDEX`, which is 99, above `Champion.displayZIndex` of 4. Right for a missile or a blast; wrong for anything painted on the floor, which then covers the feet of everyone standing on it. Nocturne's Dusk Trail shipped that way. Ground art sets `zIndex = 2` explicitly — `Singed_W_Object` and `Cassiopeia_W` already do, and `tests/game/spells/ground-decal-zindex.test.ts` pins the rule against the unit z-indices rather than against the number.
+**Use `Dash.onDashUpdate`, never `dashBuff.onUpdate = …`.** `Dash` puts the movement itself in `Dash.prototype.onUpdate`, so an instance assignment replaces the frame instead of hooking it and the champion plays the spell's logic standing still. It reads exactly like a callback — Camille E, Ekko E and Jarvan Q all shipped with it unnoticed, because each still dealt its damage to whatever was next to the caster. `dash-onupdate-seam.test.ts`.
 
-**A query that picks a unit must ask whether the caster can see it.** `queryObjects` knows about teams, death and targetability and nothing about the fog, so every auto-locking spell in the game chose its victim out of solid black: Warwick R found the blue camp through a jungle wall and leaped through the wall to bite it, and two dozen others did the same. The seam is `PredefinedFilters.visibleTo(observer)` over `combat/Vision.ts`, and it answers the *same* rule `FogOfWar` paints — walls and bushes block, the bush you stand in does not, a friendly ward is an eye. `TargetResolver` and `pickExecuteTarget`/`lethalTargets` apply it centrally, so `UNIT` spells and the execute marks are covered; a `SELF` spell running its own lookup must add the filter itself, and `tests/game/spells/target-vision-seam.test.ts` scans for the omission. Two boundaries hold the design up. **Vision gates acquisition, never damage** — an area effect must still hit the champion in the bush, so only a query whose result narrows to a *chosen* unit gets the filter. And **distance is not vision's business**: `Reach.ts` owns range, every caller arrives already bounded by its own radius, and a sight-radius cap on top would have quietly trimmed Warwick R from 550 to the 500 the camera happens to use. Sight radius counts in exactly one place, a *borrowed* eye, because a ward sees the circle it lights and no further. Note `Minion`, `Monster` and `Turret` all zero `visionRadius` on purpose — they paint no fog — which is why granted vision and being able to see are two different questions in that module.
+**A query that picks a unit must ask whether the caster can see it.** `queryObjects` knows teams, death and targetability, not the fog — Warwick R found the blue camp through a jungle wall and leaped through it. The seam is `PredefinedFilters.visibleTo(observer)` over `combat/Vision.ts`, which answers the same rule `FogOfWar` paints. `TargetResolver` and `pickExecuteTarget`/`lethalTargets` apply it centrally; a `SELF` spell doing its own lookup must add it, and `target-vision-seam.test.ts` scans for the omission. Two boundaries: **vision gates acquisition, never damage** (an area effect must still hit the champion in the bush, so only a query narrowing to a *chosen* unit gets the filter), and **distance is not vision's business** — `Reach.ts` owns range, and a sight-radius cap on top would have trimmed Warwick R from 550 to the camera's 500. `Minion`/`Monster`/`Turret` zero `visionRadius` on purpose, so granting vision and being able to see are separate questions there.
 
-**`CollideUtils.lineRect` misses a segment that lies wholly inside the rectangle.** It tests the four edges for crossings and nothing else, so a segment with both endpoints in the box crosses none of them and reads as "no intersection". `Rectangle.intersect(Line)` is that function, which makes a `Line` a lossy quadtree query area: any object whose bounding box swallows the segment is dropped from the retrieve. `Vision.hasLineOfSight` hit it first — every short sightline drawn beside a big wall, which is a jungler's whole world — and works around it with a bounding-box query instead, because `collide.utils.ts` is shared with the spell hitboxes and says at the top not to change its semantics. The gap is still there for the next caller.
+**Ask `wallOutlinesInArea(game, area)`, not `terrainMap`.** Anivia W and Jarvan R are genuinely impassable but are `SpellObject`s, so `terrainMap` shows holes exactly where a player just built something — Camille's grapple flew through an ice wall, Janna R blew people through Cataclysm. A new slab implements `DynamicWall` and is picked up free. Deliberately not folded into `getObstaclesInArea`: `FogOfWar` must keep not seeing them and `NavigationSystem` rasterizes once at match start. `DynamicTerrain.test.ts`.
 
-**Rasterizing terrain conservatively closes passages, it does not merely narrow them.** `NavGrid` measured clearance to the nearest *blocked cell centre*, and a blocked cell's centre can be a half-diagonal from the wall that blocked it, so cells were refused with up to 19px of room to spare on top of the deliberate margin. Per side that asks ~93px of corridor for a 55px body, and this map's jungle is built out of 60-90px gaps: a fully stacked champion saw the walkable map break into five disconnected pieces. `NavGrid.refineNearWalls` replaces the estimate with the measured distance to the wall for the ~10% of cells near enough to decide anything, which halves the moat, leaves the margin as the only refusal reason, and is strictly *safer* because a measurement cannot overstate the way the transform could. The lesson generalises: a conservative approximation whose error is comparable to the feature size is not conservative, it is wrong. `tests/game/nav/NavGrid.test.ts` now bounds the error in both directions — one sweep for false positives, one for false negatives.
+**`CollideUtils.lineRect` misses a segment lying wholly inside the rectangle** — four edge crossings and nothing else. `Rectangle.intersect(Line)` is that function, so a `Line` is a lossy quadtree query area: anything whose bounding box swallows the segment is dropped. `Vision.hasLineOfSight` uses a bounding box instead, because `collide.utils.ts` is shared with the spell hitboxes and says not to change its semantics. Still there for the next caller.
 
-**A direction must never be `(0,0)`.** `Game.facing()` is the convention: fall back to the body's heading, then a fixed vector. `context.direction` is itself `(0,0)` when the cursor sits on the origin, so falling back to *it* is the bug rather than a guard against it.
+**A conservative approximation whose error matches the feature size is not conservative, it is wrong.** `NavGrid` measured clearance to the nearest blocked cell *centre*, up to a half-diagonal off, so cells were refused with 19px to spare — ~93px of corridor demanded for a 55px body, on a map whose jungle is 60-90px gaps, and a stacked champion's walkable map broke into five pieces. `refineNearWalls` measures the real distance where it decides anything; `NavGrid.test.ts` now bounds the error in both directions.
 
-**`TerrainMap` is only the map file.** Anivia W and Jarvan R put genuinely impassable slabs on the ground — both run the same SAT push-out `TerrainMap.pushOutOfWalls` runs — but they are `SpellObject`s in the object manager, so anything that *asks* `terrainMap` about walls sees a map with holes exactly where a player just built something. Camille's grapple flew through an ice wall; Janna R blew people through Cataclysm. **Ask `wallOutlinesInArea(game, area)`** (`gameObject/map/DynamicTerrain.ts`), which merges both; a new solid slab implements `DynamicWall` (`blocksMovement` + `wallVertices()`) and is picked up for free. Deliberately *not* folded into `getObstaclesInArea`: `FogOfWar` must keep not seeing them (a player wall does not block vision) and `NavigationSystem` rasterizes once at match start. `tests/game/map/DynamicTerrain.test.ts` scans for spells going back to the half-answer.
+**A direction must never be `(0,0)`.** `Game.facing()` is the convention: body heading, then a fixed vector. `context.direction` is itself `(0,0)` when the cursor sits on the origin, so falling back to *it* is the bug rather than a guard.
 
-**A permanent stack is paid for by the corpse, not the hit.** Nasus Q, Cho'Gath R and Veigar Q all banked one per *landed* cast, so the uncapped stats in this game were farmed off targets that never died — worst on Veigar, whose orb pierces, making one cast into a wave five permanent points of max mana. The kill test is `takeDamage` being synchronous: latch `wasAlive` before, read `target.isDead` after. Picking the victim is `pickExecuteTarget(this)` (`combat/ExecuteTargeting.ts`) — a spell implements `executeCandidates()` / `executeDamageAgainst()` / `executeFallback`, and gets lethal-first targeting plus the on-screen "this one dies" ring (`combat/ExecuteMarks.ts`, drawn from `Game.draw`, never as caster VFX) with no code of its own. Lethality counts shields: `health.value + shieldAmount`. Skillshots stay out of it on purpose: the mark promises "this one dies if you press the key", which an aimed spell cannot keep.
+**A permanent stack is paid for by the corpse, not the hit.** Nasus Q, Cho'Gath R and Veigar Q banked one per *landed* cast, farming uncapped stats off targets that never died. The kill test is `takeDamage` being synchronous: latch `wasAlive` before, read `isDead` after. Implement `executeCandidates()` / `executeDamageAgainst()` / `executeFallback` and `combat/ExecuteTargeting.ts` gives lethal-first targeting plus the "this one dies" ring (`ExecuteMarks.ts`, drawn from `Game.draw`, never as caster VFX). Lethality counts shields. Skillshots stay out: the mark promises a kill an aimed spell cannot keep.
 
-**Granting a resource is not billing for one.** `tests/game/spells/mana-spend-seam.test.ts` forbids `spells/`, `spellObjects/` and `buffs/` from naming `stats.mana` at all, because URF's `manaFree` must be one flip. That rule is about charging a caster — a refill must *not* be zeroed by URF — so the giving side lives on the unit as `AttackableUnit.restoreMana()`, next to `takeHeal()`, where `MatchRules` does not apply. Veigar Q's on-kill mana uses it.
+**`Champion.score` is a getter** over `combat/MatchTally.ts`, so `score++` no longer compiles; the ledger is written in `AttackableUnit.die` and `takeDamage`. What a kill is worth is `killCredit` on the victim, not an `instanceof` at the crediting site: `'champion'`, `'minion'` (default, so camps are CS) or `'none'`. **`Pet` needs `'none'` explicitly because `Pet extends Champion`** — otherwise every Shaco clone killed lands on someone's KDA.
 
-**`Champion.score` is a getter now.** It reads `tally.kills - tally.deaths` off `combat/MatchTally.ts`, so `score++` no longer compiles — the ledger is written in `AttackableUnit.die` and `AttackableUnit.takeDamage`, which are the only two funnels every kill and every point of damage already pass through. What a kill is worth is `killCredit` on the victim rather than an `instanceof` at the crediting site: `'champion'`, `'minion'` (the default, so minions and camps are CS) or `'none'`. `Pet` needs `'none'` explicitly **because `Pet extends Champion`** — without it every Shaco clone killed would land on someone's KDA.
+**A taunt must leave `CAN_ATTACK` and `CAN_MOVE` alone** — the one control effect that does. `BasicAttackController.update` drops its standing order the moment `canAttack` goes false, so clearing it orders a swing and cancels it on the same frame; clearing `CAN_MOVE` roots the victim out of reach. `StatusFlags.Taunted` is in exactly one of the three lists in `Stats.updateActionState` (CAN_CAST). The buff writes through `AttackableUnit.forceAttackTarget` and re-issues every frame, because the AI re-scans and the player can press keys.
 
-**A taunt is the one control effect that must leave `CAN_ATTACK` and `CAN_MOVE` alone.** `BasicAttackController.update` drops its standing order the moment `canAttack` goes false, so a `Taunt` that cleared the bit the way `Stun`/`Charm`/`Fear` do would order a swing and cancel it on the same frame; clearing `CAN_MOVE` would leave the victim rooted out of reach instead of walking in. `StatusFlags.Taunted` therefore appears in exactly one of the three lists in `Stats.updateActionState` (CAN_CAST). Who a unit is fighting lives somewhere different per subclass, so the buff writes through `AttackableUnit.forceAttackTarget` — `Champion` orders its `basicAttack`, `Minion`/`Monster` set `targetLock` + phase — and re-issues it every frame, because the victim's AI re-scans and the player can press keys.
+**Reacting to a hit is not modifying it.** `Buff.modifyIncomingDamage` runs in insertion order, each buff handing the next what is left, so a reflect written as a modifier only sees what reaches it — behind a shield, the overflow — and ordering it first fixes one cast and not the next. `Buff.onDamageTaken(swung, landed, attacker)` runs after the whole chain and cannot change either number; `DamageReflect` lives there with a re-entrancy latch, because the payout re-enters `takeDamage` on the attacker and two curled Rammuses would ping-pong one hit.
 
-**Reacting to a hit is not modifying it.** `Buff.modifyIncomingDamage` runs in insertion order with each buff handing the next what is left, so a reflect written as a modifier reflects whatever happens to reach it — behind a shield, only the overflow. Adding it first fixes one cast and not the next: recast Annie E while the old shield is up (90% CDR makes that routine) and the *old* shield sits in front of the *new* burn, which then never fires. `Buff.onDamageTaken(swung, landed, attacker)` runs after the whole chain, is handed both numbers, and cannot change either — order stopped being part of the answer. `DamageReflect` (Rammus W's 80%, Annie E's flat burn) lives there. Anything that deals damage from inside it needs the re-entrancy latch that module carries: the payout re-enters `takeDamage` on the attacker, whose own buffs include their reflect, and two curled Rammuses ping-pong one hit until the stack runs out.
+**`ON_ATTACK_HIT` is basic attacks only** — `combat/BasicAttack.ts` is the sole emitter, so an effect hung there is invisible to every spell. Annie E's shield burn shipped that way and punished nobody. For "someone damaged me", use `Buff.onDamageTaken`.
 
-**`ON_ATTACK_HIT` is basic attacks only.** `combat/BasicAttack.ts` is the only emitter, so an effect hung there is invisible to every spell in the game. Annie E's shield burn shipped that way and read as broken — it was a "punish whoever damages this" that did nothing to anyone casting anything. Use it for genuine on-hit passives (Teemo E, Twitch R, Varus W); for "someone damaged me", the seam is `Buff.onDamageTaken`.
+**Concurrent agents share one working tree.** `git stash` takes another agent's uncommitted work with it. Use `git worktree`, and commit with explicit paths — never `git add -A`, never `.`, never a bare `git commit`.
 
-**Concurrent agents share one working tree.** `git stash` takes another agent's uncommitted work with it. Use `git worktree` instead, and commit with explicit paths — never `git add -A`, never `.`, never a bare `git commit`.
+## Assets and data
 
-## Tools
+`assets/json/summoner_map.json` is the **map** — `wall`, `bush` and `water` polygons plus the two turret rows. Not summoner spell data. Everything else loads through `AssetManager` (`src/managers/AssetManager.ts`).
 
-- **`tools/shape-maker/`** — Standalone p5 app for creating polygon point arrays (drag to move points, `a` add, `d` delete, `e` export, `i` import). Output is pasted into `TerrainMap.ts`
-- **`tools/map-editor/`** — External map editor (linked in its README)
-
-## Asset Organization
-
-- `assets/images/champions/` — Champion avatar sprites and backgrounds
-- `assets/images/monsters/` — Monster sprites
-- `assets/images/spells/` — Ability icons; `assets/images/buffs/` — crowd-control icons
-- `assets/json/summoner_map.json` — the map itself: `wall`, `bush` and `water` polygons plus the two turret rows (`turret1`, `turret2`). Not summoner spell data.
-- All assets loaded by `AssetManager` in `src/managers/AssetManager.ts`
-
-`npm run assets:generate` walks `assets/` and regenerates `src/generated/assetManifest.ts` with a typed `AssetKey` union, so a mistyped asset name is a compile error rather than a broken image at runtime. Never hand-edit the generated file; add the image and re-run the script. `assets:check` fails the build when the two are out of sync.
+`npm run assets:generate` walks `assets/` and regenerates `src/generated/assetManifest.ts` with a typed `AssetKey` union, so a mistyped asset name is a compile error rather than a broken image at runtime. Never hand-edit the generated file; add the image and re-run. `assets:check` fails the build when the two drift.
 
 Ability data (damage, cooldowns, ranges, icons) is imported from the LoL Wiki by `scripts/wiki/import-abilities.mjs` into `docs/abilities/<champion>/<slot>.json`, with provenance in `assets/source-manifest.json`.
 
-**Spell names are Riot's, not ours.** `Spell.name` is `'<tên tiếng Việt> (Champion_Slot)'`, and the Vietnamese half must be the string the Vietnamese client ships — 97 of them had drifted into hand-written approximations (Pantheon W read "Khiên Xung Kích" against the official "Khiên Trời Giáng"). `npm run names:sync` reads Data Dragon's `vi_VN` locale into `docs/spell-names-vi.json` and reports the drift; `npm run names:apply` rewrites the name line in place, touching nothing else in the file. **Descriptions stay hand-written** — the official ones carry no numbers and ours are scaled to a ~100 health pool. The cache lives outside `docs/abilities/` because `ability:check` validates every JSON in that tree against a different schema, and `tests/game/spells/vi-spell-names.test.ts` asserts the code against it offline, so only the sync script ever touches the network.
+**Spell names are Riot's, not ours.** `Spell.name` is `'<tên tiếng Việt> (Champion_Slot)'`, and the Vietnamese half must be the string the Vietnamese client ships — 97 had drifted into hand-written approximations. `npm run names:sync` reads Data Dragon's `vi_VN` locale into `docs/spell-names-vi.json` and reports the drift; `npm run names:apply` rewrites the name line in place. **Descriptions stay hand-written** — the official ones carry no numbers and ours are scaled to a ~100 health pool. The cache lives outside `docs/abilities/` because `ability:check` validates that tree against a different schema, and only the sync script touches the network; `vi-spell-names.test.ts` checks the code against the cache offline.
+
+`tools/shape-maker/` is a standalone p5 app for drawing polygon point arrays (`a` add, `d` delete, `e` export, `i` import); `tools/map-editor/` is linked from its own README.

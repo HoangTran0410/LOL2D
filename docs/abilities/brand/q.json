@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_brand_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Sear.png?587d5",
+    "sha1": "e4256b00f37361b61889396bd641c5801cdef68b"
+  },
+  "champion": "Brand",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_brand_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Sear.png?587d5",
+        "sha1": "e4256b00f37361b61889396bd641c5801cdef68b"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "8 / 7.5 / 7 / 6.5 / 6",
+        "cost": "70",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Brand''' launches a fireball in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to the first enemy hit.",
+          "text": "Active: Brand launches a fireball in the target direction that deals magic damage to the first enemy hit."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> The target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for 1.<small>75</small> seconds.",
+          "text": "Ablaze Bonus: The target is stunned for 1.75 seconds."
+        },
+        "icon": "Sear.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 100 / 130 / 160 / 190 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>",
+          "text": "Magic Damage:70 / 100 / 130 / 160 / 190 (+ 65% AP)"
+        },
+        "name": "Sear",
+        "notes": {
+          "raw": "* With an ability haste value of 81 / 70 / 58 / 47 / 36 to 162 / 145 / 129 / 113 / 96 based on the ranges of applications from the target, it is possible to apply the stun without having to use other abilities. ''Sear'' will apply before the duration of the pre-applied <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Blaze]]</span></span> times out.\n** The needed ability haste value if you remained at the same range from the target for both casts would be 114 / 100 / 87 / 74 / 60.\n* This ability will cast from wherever the caster is at the end of the cast time.",
+          "text": "With an ability haste value of 81 / 70 / 58 / 47 / 36 to 162 / 145 / 129 / 113 / 96 based on the ranges of applications from the target, it is possible to apply the stun without having to use other abilities. Sear will apply before the duration of the pre-applied Blaze times out.\n* The needed ability haste value if you remained at the same range from the target for both casts would be 114 / 100 / 87 / 74 / 60.\nThis ability will cast from wherever the caster is at the end of the cast time."
+        },
+        "projectile": true,
+        "range": "1100 • 1040",
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "120"
+      },
+      "name": "Sear"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "ae11e6c4ad6fe1ff218470049554101f3a2afb1c25b40b4ef5b72b44f6d1ca8f",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Sear",
+    "revisionId": 4007576,
+    "sourceTimestamp": "2026-04-12T06:42:01Z"
+  }
+}

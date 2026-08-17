@@ -1,0 +1,65 @@
+{
+  "asset": {
+    "key": "spell_xinzhao_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Audacious_Charge.png?71fca",
+    "sha1": "1a38994cdbeb96365c5881d0838355910a12460d"
+  },
+  "champion": "Xin Zhao",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_xinzhao_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Audacious_Charge.png?71fca",
+        "sha1": "1a38994cdbeb96365c5881d0838355910a12460d"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "11",
+        "cost": "60",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Xin Zhao''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target enemy's location, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to them and nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> all targets hit by 30% for 0.<small>5</small> seconds. ''Audacious Charge's'' range is increased against ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Challenged\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Challenged.png|20xpx|link=Xin Zhao#Challenged|An icon for Xin Zhao's ability Challenged]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Challenged|Challenged]]</span></span>'' targets.",
+          "text": "Active: Xin Zhao dashes to the target enemy's location, dealing magic damage to them and nearby enemies and slowing all targets hit by 30% for 0.5 seconds. Audacious Charge's range is increased against Challenged targets."
+        },
+        "description2": {
+          "raw": "'''Xin Zhao''' then gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 5 seconds.",
+          "text": "Xin Zhao then gains &nbsp;bonus attack speed for 5 seconds."
+        },
+        "description3": {
+          "raw": "''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Three Talon Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Three Talon Strike.png|20xpx|border|link=Xin Zhao#Three Talon Strike|An icon for Xin Zhao's ability Three Talon Strike]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Three Talon Strike|Three Talon Strike]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Crescent Guard\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Crescent Guard.png|20xpx|border|link=Xin Zhao#Crescent Guard|An icon for Xin Zhao's ability Crescent Guard]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Crescent Guard|Crescent Guard]]</span></span> can be cast during the dash.''",
+          "text": "Three Talon Strike and Crescent Guard can be cast during the dash."
+        },
+        "effectradius": "250",
+        "icon": "Audacious Charge.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 75 / 100 / 125 / 150 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Magic Damage:50 / 75 / 100 / 125 / 150 (+ 120% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>38 / 46 / 54 / 62 / 70% <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10% per 100 AP)</span> <span style=\"color:\n#F5EE99; white-space:normal\">(+ 1% per 5% '''bonus''' attack speed from non-buff sources)</span></dd></dl>",
+          "text": "Bonus Attack Speed:38 / 46 / 54 / 62 / 70% (+ 10% per 100 AP) (+ 1% per 5% bonus attack speed from non-buff sources)"
+        },
+        "name": "Audacious Charge",
+        "notes": {
+          "raw": "* The primary target cannot dodge ''Audacious Charge's'' effects.\n** The target will always emit the area of effect from their position.\n* ''Audacious Charge'' has a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Forgiveness radius\">[[File:Targeting forgiveness.svg|20px|link=Targeting#Targeting_Forgiveness|An icon representing the keyword Targeting forgiveness]] [[:Targeting#Targeting_Forgiveness|forgiveness radius]]</span> of 200 units.",
+          "text": "The primary target cannot dodge Audacious Charge's effects.\n* The target will always emit the area of effect from their position.\nAudacious Charge has a forgiveness radius of 200 units."
+        },
+        "speed": "2500",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Audacious Charge"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "173e1d3600a716f356fe5ae0cece669b4b5e4f697a2b57721cf632b19d33c256",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Xin_Zhao/Audacious_Charge",
+    "revisionId": 4026484,
+    "sourceTimestamp": "2026-06-09T22:02:55Z"
+  }
+}

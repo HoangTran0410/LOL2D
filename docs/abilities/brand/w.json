@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_brand_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pillar_of_Flame.png?b08f8",
+    "sha1": "aad587918043b43fbf280423e774b97ad3faf089"
+  },
+  "champion": "Brand",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_brand_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pillar_of_Flame.png?b08f8",
+        "sha1": "aad587918043b43fbf280423e774b97ad3faf089"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "10 / 9.5 / 9 / 8.5 / 8",
+        "cost": "60 / 70 / 80 / 90 / 100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> After a <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.625 seconds, but rounded up to the next game tick.\">0.<small>627</small> seconds</span> delay, '''Brand''' erupts a pillar of flame at the target location that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.",
+          "text": "Active: After a 0.627 seconds delay, Brand erupts a pillar of flame at the target location that deals magic damage to enemies hit."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> The target takes 25% increased damage.",
+          "text": "Ablaze Bonus: The target takes 25% increased damage."
+        },
+        "effectradius": "260",
+        "icon": "Pillar of Flame.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>75 / 120 / 165 / 210 / 255 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>",
+          "text": "Magic Damage:75 / 120 / 165 / 210 / 255 (+ 70% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Damage:'''</span></dt><dd>93.<small>75</small> / 150 / 206.<small>25</small> / 262.<small>5</small> / 318.<small>75</small> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 87.<small>5</small>% AP)</span></dd></dl>",
+          "text": "Increased Damage:93.75 / 150 / 206.25 / 262.5 / 318.75 (+ 87.5% AP)"
+        },
+        "name": "Pillar of Flame",
+        "notes": {
+          "raw": "* The delay before the eruption does not include the cast time. The delay would be a total of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.889 seconds, but rounded up to the next game tick.\">0.<small>891</small> seconds</span> if it included the cast time.",
+          "text": "The delay before the eruption does not include the cast time. The delay would be a total of 0.891 seconds if it included the cast time."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Pillar of Flame"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "a228bd26756116562b3d07ca64299efb54358b65f83db73a482bbfcce96041c9",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Pillar_of_Flame",
+    "revisionId": 3955084,
+    "sourceTimestamp": "2025-09-23T19:42:28Z"
+  }
+}

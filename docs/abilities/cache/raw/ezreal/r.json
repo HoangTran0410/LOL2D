@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ezreal/Trueshot Barrage",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Trueshot Barrage@@icon@@Trueshot Barrage.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Ezreal''' fires a powerful arc of energy in the target direction that briefly grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of its surroundings and deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit.@@description2@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minion\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|Minions]]</span> and non-epic <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monster\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> take modified damage.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>350 / 450 / 550 / 650 / 750 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 110% AP)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Modified Damage:'''</span></dt><dd>150 / 187.<small>5</small> / 225 / 262.<small>5</small> / 300 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 110% AP)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"missile width\">320</span>@@speed@@2000@@casttime@@1@@cost@@100@@cooldown@@120 / 112.<small>5</small> / 105 / 97.<small>5</small> / 90@@targeting@@Direction@@damagetype@@Magic@@spellshield@@True@@projectile@@True@@notes@@\n* ''Trueshot Barrage's'' projectile has an [[File:Trueshot Barrage Minimap.png|40px|link=]] icon on the mini-map while it is in flight. It can be seen by only '''Ezreal''' and his allies.\n* This ability will cast from wherever the caster is at the start of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307113,
+                "revisions": [
+                  {
+                    "parentid": 3936312,
+                    "revid": 4013235,
+                    "timestamp": "2026-04-28T21:20:36Z"
+                  }
+                ],
+                "title": "Template:Data Ezreal/Trueshot Barrage"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4013235,
+      "timestamp": "2026-04-28T21:20:36Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "3ce08a5f1de164f4b59e9b57d229a41db8ee23be55195006614baecef8bffa2a",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ezreal/Trueshot_Barrage",
+    "revisionId": 4013235,
+    "sourceTimestamp": "2026-04-28T21:20:36Z"
+  }
+}

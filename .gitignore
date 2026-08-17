@@ -2,3 +2,6 @@ node_modules/
 dist/
 .worktrees/
 .claude/
+
+# Copied from node_modules by scripts/copy-vendor.mjs on predev/prebuild.
+public/vendor/

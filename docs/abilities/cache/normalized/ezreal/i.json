@@ -1,0 +1,47 @@
+{
+  "asset": {
+    "key": "spell_ezreal_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Rising_Spell_Force.png?d2c7d",
+    "sha1": "31d9059e725fa01161f0c74d093cbf656bf4cbc8"
+  },
+  "champion": "Ezreal",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ezreal_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Rising_Spell_Force.png?d2c7d",
+        "sha1": "31d9059e725fa01161f0c74d093cbf656bf4cbc8"
+      },
+      "fields": {
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Ezreal''' generates a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Rising Spell Force'' for each enemy hit by his <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span>, lasting for 6 seconds, refreshing on subsequent hits, and stacking up to 5 times.",
+          "text": "Innate: Ezreal generates a stack of Rising Spell Force for each enemy hit by his abilities, lasting for 6 seconds, refreshing on subsequent hits, and stacking up to 5 times."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Rising Spell Force:'''</span> For each stack, '''Ezreal''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">10% '''bonus''' attack speed</span></span>, up to a maximum of <span style=\"color:\n#F5EE99; white-space:normal\">50%</span>.",
+          "text": "Rising Spell Force: For each stack, Ezreal gains &nbsp;10% bonus attack speed, up to a maximum of 50%."
+        },
+        "icon": "false",
+        "icon2": "Rising Spell Force.png",
+        "name": "Rising Spell Force",
+        "notes": {
+          "raw": "* ''Rising Spell Force'' will stack even if the abilities hit were blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shields]]</span>.",
+          "text": "Rising Spell Force will stack even if the abilities hit were blocked by spell shields."
+        },
+        "targeting": "Passive"
+      },
+      "name": "Rising Spell Force"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "b2c34980e2e1a96a5800d94e31e6c580d6824be507b1369a3c2b971bbc20a071",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ezreal/Rising_Spell_Force",
+    "revisionId": 3932280,
+    "sourceTimestamp": "2025-07-18T21:56:34Z"
+  }
+}

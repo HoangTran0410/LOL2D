@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Darius/Decimate",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Decimate@@icon@@Decimate.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Darius''' becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> for 1 second and hefts his axe for 0.<small>75</small> seconds, afterward swinging it around himself to deal <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to nearby enemies. Enemies within the inner radius take 35% damage.@@description2@@Against champions and large monsters hit, '''Darius''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heal\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> for <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"number of targets hit by the outer radius\" data-displayformula=\"17% * number of targets hit. ''This is capped at 3 enemies.''\" data-bot-values=\"17;34;51\" data-top-values=\"1;2;3+\" data-bot-key=\"%\">17% – 51% (based on number of targets hit by the outer radius)</span> of his '''missing''' health</span></span>. Enemies hit by the inner radius do not refresh the duration of or gain a stack of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Darius\" data-ability=\"Hemorrhage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Darius Hemorrhage.png|20xpx|border|link=Darius#Hemorrhage|An icon for Darius's ability Hemorrhage]]</span> <span style=\"white-space:normal;\">[[Darius#Hemorrhage|Hemorrhage]]</span></span>''.@@description3@@'''''Darius''' can move during Decimate, but is unable to declare basic attacks or cast <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Darius\" data-ability=\"Apprehend\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Darius Apprehend.png|20xpx|border|link=Darius#Apprehend|An icon for Darius's ability Apprehend]]</span> <span style=\"white-space:normal;\">[[Darius#Apprehend|Apprehend]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Darius\" data-ability=\"Noxian Guillotine\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Darius Noxian Guillotine.png|20xpx|border|link=Darius#Noxian Guillotine|An icon for Darius's ability Noxian Guillotine]]</span> <span style=\"white-space:normal;\">[[Darius#Noxian Guillotine|Noxian Guillotine]]</span></span>.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage (Blade):'''</span></dt><dd>50 / 80 / 110 / 140 / 170 <span style=\"color:orange; white-space:normal\">(+ 100 / 110 / 120 / 130 / 140% AD)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage (Handle):'''</span></dt><dd>17.<small>5</small> / 28 / 38.<small>5</small> / 49 / 59.<small>5</small> <span style=\"color:orange; white-space:normal\">(+ 35 / 38.<small>5</small> / 42 / 45.<small>5</small> / 49% AD)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Outer radius\">460</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@25 / 30 / 35 / 40 / 45@@cooldown@@9 / 8 / 7 / 6 / 5@@targeting@@Auto@@damagetype@@Physical@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Decimate'' will cancel if '''Darius''' enters <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis (buff)\">[[File:Stasis icon.png|20px|link=Invulnerability#Stasis|An icon representing the keyword Stasis (buff)]] [[:Invulnerability#Stasis|stasis]]</span> or uses <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Dash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Dash.png|20xpx|border|link=Mark#Dash|An icon representing Mark#Dash]]</span> <span style=\"white-space:normal;\">[[Mark#Dash|Dash]]</span></span> during the delay.\n** After the delay, ''Decimate'' will be placed on a 1-second cooldown.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307013,
+                "revisions": [
+                  {
+                    "parentid": 3971179,
+                    "revid": 4007591,
+                    "timestamp": "2026-04-12T06:56:09Z"
+                  }
+                ],
+                "title": "Template:Data Darius/Decimate"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007591,
+      "timestamp": "2026-04-12T06:56:09Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "dc80a75ed64ea66690b35b3e3d24add4f0888b56d39300642b1235734dd76e9b",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Darius/Decimate",
+    "revisionId": 4007591,
+    "sourceTimestamp": "2026-04-12T06:56:09Z"
+  }
+}

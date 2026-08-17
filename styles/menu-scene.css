@@ -156,3 +156,63 @@
     1px 25px 35px rgba(16, 16, 16, 0.2),
     1px 30px 60px rgba(16, 16, 16, 0.4);
 }
+
+/* ------------------------------------------------------------ Version stamp
+
+   Bottom-left, deliberately quiet. It exists so a bug report can name a build
+   — which an installed PWA makes a real question, since it serves whatever it
+   cached until told otherwise — and for nothing else, so it must not compete
+   with the two buttons above it. */
+.menu-version {
+  position: fixed;
+  bottom: 8px;
+  left: 12px;
+  margin: 0;
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The one thing here worth a colour: "this app now opens without a network"
+   is the whole point of installing it, and it is otherwise invisible. */
+.menu-version-offline {
+  margin-left: 0.5rem;
+  color: #7fd4a0;
+}
+
+/* --------------------------------------------------------- Update available
+
+   Bottom-right, opposite the version it is about to change. Present only when
+   a new build is already downloaded and waiting, so the press is a reload
+   rather than a download that can fail — see src/pwa/updates.ts. */
+.menu-update {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  background: rgba(10, 20, 40, 0.85);
+  border: 2px solid rgba(120, 190, 240, 0.55);
+  color: rgb(190, 225, 255);
+  font: inherit;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.menu-update:hover:not(:disabled) {
+  border-color: rgb(150, 215, 255);
+  color: #fff;
+}
+
+.menu-update:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

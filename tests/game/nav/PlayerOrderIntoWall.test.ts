@@ -1,7 +1,32 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import NavigationSystem from '../../../src/game/nav/NavigationSystem';
+import { NAV_MAX_ACCEPTED_OVERLAP } from '../../../src/game/nav/NavGrid';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+
+/**
+ * How far a body may end up inside a wall while walking a route the grid
+ * approved, with `pushOutOfWalls` switched off.
+ *
+ * Not zero, and deliberately the project's own measured bound rather than a
+ * number chosen here: `NavGrid.requiredClearance` adds half a *cell* of margin
+ * while a body standing at a cell corner is half a *diagonal* from its centre,
+ * and the difference is exactly `NAV_MAX_ACCEPTED_OVERLAP`. That trade is
+ * documented on that method and swept over the shipped map by
+ * `NavGrid.test.ts`, which measures 2.84px against the 4px bound.
+ *
+ * This file read zero for a while, which was luck rather than a guarantee: the
+ * clearance field used to be derived from rasterized cell centres and so
+ * *understated* the true distance to a wall, padding every route by up to 19px
+ * of accidental margin. `NavGrid.refineNearWalls` removed that padding — it was
+ * closing jungle passages a champion visibly fits through — and with it this
+ * file's free ride. Asserting zero here now would be asserting something
+ * stricter than the navigation grid has ever promised.
+ *
+ * The other half of each test is untouched and is the stronger claim anyway:
+ * routing must never *aim* a destination inside a wall, and that stays at zero.
+ */
+const ACCEPTED_GRAZE = -NAV_MAX_ACCEPTED_OVERLAP;
 
 /**
  * Reproduces `Game.fixedUpdate`'s exact per-frame order for the local player:
@@ -123,7 +148,9 @@ describe('player click/drag into a wall (Game.fixedUpdate order, no push-out)', 
       worstDestination,
       'destination was aimed inside real wall geometry'
     ).toBeGreaterThanOrEqual(0);
-    expect(worstPosition, 'position walked into real wall geometry').toBeGreaterThanOrEqual(0);
+    expect(worstPosition, 'position walked into real wall geometry').toBeGreaterThanOrEqual(
+      ACCEPTED_GRAZE
+    );
   });
 
   it('never sets destination, or walks position, into the wall during a held drag across it', () => {
@@ -164,6 +191,8 @@ describe('player click/drag into a wall (Game.fixedUpdate order, no push-out)', 
       worstDestination,
       'destination was aimed inside real wall geometry'
     ).toBeGreaterThanOrEqual(0);
-    expect(worstPosition, 'position walked into real wall geometry').toBeGreaterThanOrEqual(0);
+    expect(worstPosition, 'position walked into real wall geometry').toBeGreaterThanOrEqual(
+      ACCEPTED_GRAZE
+    );
   });
 });

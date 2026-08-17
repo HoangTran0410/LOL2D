@@ -121,6 +121,25 @@ everyone it overlaps — Amumu W ticking on the champion hiding in the bush is
 correct, and adding the filter there would be the bug. The question to ask of a
 query is whether picking a unit out of it means the caster *chose* that unit.
 
+### Driving your spell from a script
+
+`Spell.cast()` is **not** the path a key press takes, and reaching for it is how
+a working ability gets reported as broken. It builds a bare `CastContext` from
+`game.worldMouse` with no `target` field, so a `UNIT` spell — whose entire job
+is resolving one — is handed nothing to act on and declines silently.
+
+The real path is `SpellInputController.keyDown`, which is two calls:
+
+```ts
+const context = game.createSpellContext(spell, caster, cursorWorld);
+if (context) spell.press(context);
+```
+
+That is where `TargetResolver` runs, which is where team, range and *vision*
+filtering happen. `tests/e2e/smoke-new-champions.mjs` drives all forty abilities
+of the newest roster through it; seven of them failed against `cast()` first,
+and not one of them was actually broken.
+
 ## 3. Define lifecycle policies
 
 The runtime owns `READY`, `CASTING`, `CHARGING`, `CHANNELING`, `ACTIVE`, and `COOLDOWN`. Do not assign `state` or `currentCooldown` in migrated spells.

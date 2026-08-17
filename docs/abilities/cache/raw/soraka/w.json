@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Soraka/Astral Infusion",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Astral Infusion@@icon@@Astral Infusion.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Soraka''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Heals\">[[File:Heal power icon.svg|20px|link=Healing|An icon representing the keyword Heal]] [[:Healing|heals]]</span> the target allied champion.@@description2@@If cast while under ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Starcall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Starcall.png|20xpx|border|link=Soraka#Starcall|An icon for Soraka's ability Starcall]]</span> <span style=\"white-space:normal;\">[[Soraka#Starcall|Rejuvenation]]</span></span>'', the <span style=\"color:\n#21B053; white-space:normal\">health cost</span> will be reduced by a percentage.@@description3@@''Astral Infusion'' cannot be cast if '''Soraka''' is below <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;5% of her '''maximum''' health</span></span>.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Heal:'''</span></dt><dd>90 / 110 / 130 / 150 / 170 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Health Cost Reduction:'''</span></dt><dd>80 / 85 / 90 / 95 / 100%</dd><dt><span class=\"template_lc\">'''Reduced Health Cost:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">2 / 1.<small>5</small> / 1 / 0.<small>5</small> / 0% of '''maximum''' health</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@<span style=\"color:\n#21B053; white-space:normal\">10%</span>@@cooldown@@6 / 5 / 4 / 3 / 2@@targeting@@Unit@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@False@@notes@@\n* ''Astral Infusion'' can also be targeted on allied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clone\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|decoys]]</span>.\n* ''Astral Infusion'' can be cast even if '''Soraka''' doesn't have the sufficient amount of health to pay for the health cost while above <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;5% of her '''maximum''' health</span></span>.\n** As with all abilities with health costs, ''Astral Infusion'' will not reduce '''Soraka's''' health below <span style=\"color:\n#21B053; white-space:normal\">1</span>.\n* <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Spirit Visage\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Spirit Visage item.png|20xpx|border|link=Spirit Visage|An icon for the item Spirit Visage]]</span> <span style=\"white-space:normal;\">[[Spirit Visage]]</span></span> will only increase the health donated to allies if the target ally possesses it, although owning it ''will'' boost the heal that '''Soraka''' receives from <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Starcall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Starcall.png|20xpx|border|link=Soraka#Starcall|An icon for Soraka's ability Starcall]]</span> <span style=\"white-space:normal;\">[[Soraka#Starcall|Starcall]]</span></span> and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Soraka\" data-ability=\"Wish\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Soraka Wish.png|20xpx|border|link=Soraka#Wish|An icon for Soraka's ability Wish]]</span> <span style=\"white-space:normal;\">[[Soraka#Wish|Wish]]</span></span>.\n* ''Astral Infusion's'' effects occur before the cast time.\n* ''Astral Infusion'' has a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Forgiveness radius\">[[File:Targeting forgiveness.svg|20px|link=Targeting#Targeting_Forgiveness|An icon representing the keyword Targeting forgiveness]] [[:Targeting#Targeting_Forgiveness|forgiveness radius]]</span> of 175 units.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308750,
+                "revisions": [
+                  {
+                    "parentid": 4007008,
+                    "revid": 4007066,
+                    "timestamp": "2026-04-09T17:56:15Z"
+                  }
+                ],
+                "title": "Template:Data Soraka/Astral Infusion"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007066,
+      "timestamp": "2026-04-09T17:56:15Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "d45688854c3ee0d7fa0a68af25721e7b50b2fb8a1947d210cb1bab14878e440e",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Astral_Infusion",
+    "revisionId": 4007066,
+    "sourceTimestamp": "2026-04-09T17:56:15Z"
+  }
+}

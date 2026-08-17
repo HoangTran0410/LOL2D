@@ -159,10 +159,16 @@ describe('cancel policy, driven through real spells', () => {
 
     expect(exceptions).toEqual([
       'Anivia_R: TETHERED',
+      // Decimate: the wiki is explicit that Darius may walk through the wind-up,
+      // so stepping forward is part of the gesture; crowd control still takes it.
+      'Darius_Q: AIMED',
       'Janna_Q: INDEPENDENT',
       'Lux_R: INDEPENDENT',
       'Pantheon_Q: AIMED',
       'Rammus_Q: INDEPENDENT',
+      // Slice and Dice spends its ACTIVE window as a recast timer over a dash
+      // that already has its momentum — the Dash buff owns being interrupted.
+      'Renekton_E: INDEPENDENT',
       'Varus_Q: AIMED',
     ]);
   });

@@ -1,0 +1,50 @@
+{
+  "asset": {
+    "key": "spell_renekton_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Reign_of_Anger.png?ad58c",
+    "sha1": "d74a68af2aa1e33cedf3604ac0140b81cdbdae31"
+  },
+  "champion": "Renekton",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_renekton_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Reign_of_Anger.png?ad58c",
+        "sha1": "d74a68af2aa1e33cedf3604ac0140b81cdbdae31"
+      },
+      "fields": {
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Renekton's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> generate <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Fury\">[[File:Fury resource.png|20px|link=Manaless#Fury|An icon representing the keyword Fury]] [[:Manaless#Fury|<span style=\"color:\n#FA6533; white-space:normal\">5 Fury</span>]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>. After 12 seconds of being out of combat and not basic attacking, he loses <span style=\"color:\n#FA6533; white-space:normal\">1 Fury</span> every 0.<small>25</small> seconds.<br><br>Entering combat or using an attack will stop the <span style=\"color:\n#FA6533; white-space:normal\">Fury</span> loss and refresh the timer. Additionally, while ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Dominus\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Dominus.png|20xpx|border|link=Renekton#Dominus|An icon for Renekton's ability Dominus]]</span> <span style=\"white-space:normal;\">[[Renekton#Dominus|Dominus]]</span></span>'' is active, the timer is continuously refreshed.",
+          "text": "Innate: Renekton's basic attacks generate 5 Fury on-hit. After 12 seconds of being out of combat and not basic attacking, he loses 1 Fury every 0.25 seconds.\nEntering combat or using an attack will stop the Fury loss and refresh the timer. Additionally, while Dominus is active, the timer is continuously refreshed."
+        },
+        "description2": {
+          "raw": "While '''Renekton''' has at least <span style=\"color:\n#FA6533; white-space:normal\">50 Fury</span>, his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|basic ability]]</span>, excluding ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Renekton\" data-ability=\"Slice and Dice\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Renekton Slice and Dice.png|20xpx|border|link=Renekton#Slice and Dice|An icon for Renekton's ability Slice and Dice]]</span> <span style=\"white-space:normal;\">[[Renekton#Slice and Dice|Slice]]</span></span>'', consumes <span style=\"color:\n#FA6533; white-space:normal\">50 Fury</span> to become empowered with an additional effect. Empowered abilities do not generate <span style=\"color:\n#FA6533; white-space:normal\">Fury</span>.",
+          "text": "While Renekton has at least 50 Fury, his next basic ability, excluding Slice, consumes 50 Fury to become empowered with an additional effect. Empowered abilities do not generate Fury."
+        },
+        "description3": {
+          "raw": "'''Renekton''' generates <span style=\"color:\n#FA6533; white-space:normal\">50% '''bonus''' Fury</span> from all sources while <span style=\"color:\n#21B053; white-space:normal\">below 50% of his '''maximum''' health</span>.",
+          "text": "Renekton generates 50% bonus Fury from all sources while below 50% of his maximum health."
+        },
+        "icon": "Reign of Anger.png",
+        "name": "Reign of Anger",
+        "notes": {
+          "raw": "* Basic attacks against any enemy that is not a structure will generate the Fury.\n** '''Renekton''' can generate Fury by collecting <span class=\"inline-image unit-icon label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:HoneyfruitSquare.png|20xpx|border|link=Honeyfruit|An icon representing Honeyfruit]]</span> <span style=\"white-space:normal;\">[[Honeyfruit]]</span></span> and [[Health Relic]]s (interacts with ''Reign of Anger's'' bonus generation).\n* <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span> Fury generation with parrying effects (<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blind]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodge]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|block]]</span>)",
+          "text": "Basic attacks against any enemy that is not a structure will generate the Fury.\n* Renekton can generate Fury by collecting Honeyfruit and Health Relics (interacts with Reign of Anger's bonus generation).\nPENDING FOR TEST: Fury generation with parrying effects ( blind, dodge, block)"
+        },
+        "targeting": "Passive"
+      },
+      "name": "Reign of Anger"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "50decbd2977bcf26e795b1c5d7cc96af94d3c5231bb6c4c3e7e3235393e0eb81",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Renekton/Reign_of_Anger",
+    "revisionId": 3961774,
+    "sourceTimestamp": "2025-10-29T04:36:45Z"
+  }
+}

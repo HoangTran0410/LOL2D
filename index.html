@@ -9,10 +9,18 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
+    <!-- No <link rel="manifest"> here: vite-plugin-pwa generates one from
+         vite.config.ts and injects the tag, so the hand-written
+         favicon/site.webmanifest that used to sit here was deleted rather than
+         left to disagree with it. -->
     <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#0a1428">
+    <!-- iOS ignores the manifest; these are how an iPhone gets a chrome-less
+         window after "Add to Home Screen". -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOL2D">
 
     <title>LOL2D</title>
 
@@ -28,9 +36,15 @@
 
     <!-- p5.js and stats.js must load here (not in <body>) so they are parsed and
          execute before the deferred ES module — this exposes all p5 globals
-         (loadImage, loadJSON, createVector, background, etc.) to the module below. -->
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
-    <script src="https://mrdoob.github.io/stats.js/build/stats.min.js"></script>
+         (loadImage, loadJSON, createVector, background, etc.) to the module below.
+
+         Served from our own origin, not a CDN, and copied out of node_modules by
+         scripts/copy-vendor.mjs — see that file. Both are load-bearing enough
+         that losing either is a white screen, which an installed app opened
+         offline cannot afford. Still plain <script> tags: global mode is the
+         whole reason they are here rather than imported. -->
+    <script src="/vendor/p5.min.js"></script>
+    <script src="/vendor/stats.min.js"></script>
 </head>
 
 <body>

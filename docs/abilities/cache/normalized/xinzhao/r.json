@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_xinzhao_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Crescent_Guard.png?53ad9",
+    "sha1": "681d30ee5940e9330d5ba144936d34fbeb306d4d"
+  },
+  "champion": "Xin Zhao",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_xinzhao_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Crescent_Guard.png?53ad9",
+        "sha1": "681d30ee5940e9330d5ba144936d34fbeb306d4d"
+      },
+      "fields": {
+        "casttime": "0.35",
+        "cooldown": "120 / 115 / 110 / 105 / 100",
+        "cost": "100",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Xin Zhao's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Audacious Charge\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Audacious Charge.png|20xpx|border|link=Xin Zhao#Audacious Charge|An icon for Xin Zhao's ability Audacious Charge]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Audacious Charge|Audacious Charge]]</span></span>'' apply the ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Challenged\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Challenged.png|20xpx|link=Xin Zhao#Challenged|An icon for Xin Zhao's ability Challenged]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Challenged|Challenged]]</span></span>'' mark to enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> hit, with the latter applying the mark to the farthest champion hit in the area of effect or the primary target if they are a champion.",
+          "text": "Passive: Xin Zhao's basic attacks and Audacious Charge apply the Challenged mark to enemy champions hit, with the latter applying the mark to the farthest champion hit in the area of effect or the primary target if they are a champion."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Xin Zhao''' sweeps his spear around him, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to nearby enemies, capped at 600 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking back]]</span> all targets hit that are not ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Xin Zhao\" data-ability=\"Challenged\" data-game=\"lol\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Xin Zhao Challenged.png|20xpx|link=Xin Zhao#Challenged|An icon for Xin Zhao's ability Challenged]]</span> <span style=\"white-space:normal;\">[[Xin Zhao#Challenged|Challenged]]</span></span>'' up-to 700 units over 0.<small>75</small> seconds, as well as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> them for the same duration.",
+          "text": "Active: Xin Zhao sweeps his spear around him, dealing physical damage to nearby enemies, capped at 600 against minions and monsters, and knocking back all targets hit that are not Challenged up-to 700 units over 0.75 seconds, as well as stunning them for the same duration."
+        },
+        "description3": {
+          "raw": "For the next 4 seconds, '''Xin Zhao''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invulnerable\">[[File:Cosmic Radiance.png|20px|link=Invulnerability|An icon representing the keyword Invulnerability]] [[:Invulnerability|invulnerable]]</span> against enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> far away from him.",
+          "text": "For the next 4 seconds, Xin Zhao is invulnerable against enemy champions far away from him."
+        },
+        "effectradius": "500 • 450",
+        "icon": "false",
+        "icon2": "Crescent Guard.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>75 / 125 / 175 / 225 / 275 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 110% AP)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 15% of target's '''current''' health)</span></dd></dl>",
+          "text": "Physical Damage:75 / 125 / 175 / 225 / 275 (+ 100% bonus AD) (+ 110% AP) (+ 15% of target's current health)"
+        },
+        "name": "Crescent Guard",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Pet\">[[File:Summon Tibbers.png|20px|link=Pets|An icon representing the keyword Pet]] [[:Pets|Pets]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealthed trap\">[[File:Noxious Trap.png|20px|link=Stealth#Stealthed_traps_and_wards|An icon representing the keyword Stealthed trap]] [[:Stealth#Stealthed_traps_and_wards|traps]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground-targeted\">[[File:Eye of Destruction.png|20px|link=Location-targeted|An icon representing the keyword Location-targeted]] [[:Location-targeted|ground]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area of effect\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|AoEs]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Damage over time\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|DoTs]]</span>, and delayed-damage abilities (e.g. <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Zed\" data-ability=\"Death Mark\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Zed Death Mark.png|20xpx|border|link=Zed#Death Mark|An icon for Zed's ability Death Mark]]</span> <span style=\"white-space:normal;\">[[Zed#Death Mark|Death Mark]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Tristana\" data-ability=\"Explosive Charge\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Tristana Explosive Charge.png|20xpx|border|link=Tristana#Explosive Charge|An icon for Tristana's ability Explosive Charge]]</span> <span style=\"white-space:normal;\">[[Tristana#Explosive Charge|Explosive Charge]]</span></span>, <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vladimir\" data-ability=\"Hemoplague\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vladimir Hemoplague.png|20xpx|border|link=Vladimir#Hemoplague|An icon for Vladimir's ability Hemoplague]]</span> <span style=\"white-space:normal;\">[[Vladimir#Hemoplague|Hemoplague]]</span></span>) will not damage '''Xin Zhao''' if the enemy champion source is outside the circle when the damage applies.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immunity]]</span> will also resist the application of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span>.",
+          "text": "Pets, traps, ground AoEs, DoTs, and delayed-damage abilities (e.g. Death Mark, Explosive Charge, Hemoplague) will not damage Xin Zhao if the enemy champion source is outside the circle when the damage applies.\nThis ability will cast from wherever the caster is at the end of the cast time.\nDisplacement immunity will also resist the application of the stun."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Crescent Guard"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "d152ecc1d642c42bf3cf30cee0253ef124f1899e90f6cd7849566d3dfae9034b",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Xin_Zhao/Crescent_Guard",
+    "revisionId": 4008632,
+    "sourceTimestamp": "2026-04-15T00:31:09Z"
+  }
+}

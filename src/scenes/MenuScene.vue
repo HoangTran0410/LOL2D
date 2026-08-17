@@ -13,6 +13,7 @@
 import { onMounted, onUnmounted, ref } from 'vue';
 import AssetManager, { type AssetKey } from '../managers/AssetManager';
 import DomUtils from '../utils/dom.utils';
+import { applyUpdate, offlineReady, updateReady } from '../pwa/updates';
 
 const MENU_BACKGROUNDS: AssetKey[] = [
   'other_menu_bg_1',
@@ -58,6 +59,32 @@ onUnmounted(() => {
 const toggleFullscreen = (): void => {
   isFullscreen.value = DomUtils.toggleFullscreen();
 };
+
+/**
+ * ## The version stamp, and the update offer beside it
+ *
+ * `__APP_VERSION__` is `package.json`'s version, replaced at build time (see
+ * `vite.config.ts`). It is on the menu rather than anywhere else for the
+ * reason a version number is ever shown: so a player reporting "spell X is
+ * broken" can say *which build* they are on. An installed PWA makes that
+ * question real — it serves whatever it cached until it is told otherwise, so
+ * two players can be on different builds of the same URL.
+ *
+ * Which is also why the update lives here. `src/pwa/updates.ts` holds the new
+ * build back rather than swapping it in, and this is the screen where taking
+ * the reload costs nothing: no match is running.
+ *
+ * The refs are module state, not component state — this component remounts on
+ * every return to the menu, and a worker that finished installing while the
+ * player was in a match must still be offered when they come back out.
+ */
+const appVersion = __APP_VERSION__;
+const updating = ref(false);
+
+const installUpdate = async (): Promise<void> => {
+  updating.value = true;
+  await applyUpdate();
+};
 </script>
 
 <template>
@@ -75,5 +102,27 @@ const toggleFullscreen = (): void => {
 
   <button id="fullscreen-btn" @click="toggleFullscreen">
     <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'"></i>
+  </button>
+
+  <!-- Bottom corner, dim: findable when someone asks "what version are you
+       on", invisible the rest of the time. -->
+  <p id="menu-version" class="menu-version">
+    v{{ appVersion }}
+    <span v-if="offlineReady" class="menu-version-offline" title="Đã lưu để chơi offline">
+      <i class="fas fa-circle-check" aria-hidden="true"></i> offline
+    </span>
+  </p>
+
+  <!-- Only ever on the menu, and only when a build is already downloaded and
+       waiting — so pressing it is a reload, not a download that might fail. -->
+  <button
+    v-if="updateReady"
+    id="menu-update-btn"
+    class="menu-update"
+    :disabled="updating"
+    @click="installUpdate"
+  >
+    <i class="fas fa-arrow-rotate-right" aria-hidden="true"></i>
+    <span>{{ updating ? 'Đang cập nhật…' : 'Có bản mới — cập nhật' }}</span>
   </button>
 </template>

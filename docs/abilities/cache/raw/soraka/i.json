@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Soraka/Salvation",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Salvation@@icon@@Salvation.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Soraka''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">90% '''bonus''' movement speed</span></span> while facing nearby allied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> that are <span style=\"color:\n#21B053; white-space:normal\">below 40% of their '''maximum''' health</span>.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@2500@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@{{{damagetype}}}@@spellshield@@{{{spellshield}}}@@projectile@@{{{projectile}}}@@notes@@\n* '''Soraka''' will see an arrow indicating the direction in which she can gain the bonus movement speed.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308748,
+                "revisions": [
+                  {
+                    "parentid": 3423029,
+                    "revid": 3681502,
+                    "timestamp": "2024-02-23T19:12:54Z"
+                  }
+                ],
+                "title": "Template:Data Soraka/Salvation"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3681502,
+      "timestamp": "2024-02-23T19:12:54Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "a2040d0412dc44116f1655549b4cb50262edba7ef07c95f0740701790b0e7668",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Salvation",
+    "revisionId": 3681502,
+    "sourceTimestamp": "2024-02-23T19:12:54Z"
+  }
+}

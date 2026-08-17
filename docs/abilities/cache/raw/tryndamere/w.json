@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Tryndamere/Mocking Shout",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Mocking Shout@@icon@@Mocking Shout.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Tryndamere''' reduces the <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> of nearby enemy champions for 4 seconds.@@description2@@'''Tryndamere''' also applies a curse to all nearby enemy champions for 3.<small>25</small> seconds. While accursed, they become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> while facing in the opposite direction of '''Tryndamere'''.@@description3@@''A nearby enemy champion is required to cast this ability. The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> to be targeted by this ability.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Attack Damage Reduction:'''</span></dt><dd>20 / 35 / 50 / 65 / 80</dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@850@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>3</small>@@cost@@{{{cost}}}@@cooldown@@14@@targeting@@Proximity@@damagetype@@@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Mocking Shout'' very briefly <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|reveals]]</span> '''Tryndamere''' if he uses it while in the fog of war to enemies.\n* ''Mocking Shout'' prevents '''Tryndamere''' from using ''Undying Rage'' during its cast time. \n* If the attack damage reduction would reduce the target's <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> below <span style=\"color:orange; white-space:normal\">0</span>, the target's <span style=\"color:orange; white-space:normal\">'''base''' attack damage</span> value is unaffected, but their <span style=\"color:orange; white-space:normal\">'''total''' attack damage</span> will still be reduced. The target will however retain a <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> value of 0.\n** Effects that scale with <span style=\"color:orange; white-space:normal\">'''total''' attack damage</span>, such as basic attacks, will take the attack damage reduction into account for their calculations.\n** Those that have a ratio for <span style=\"color:orange; white-space:normal\">'''base''' attack damage</span> or <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> do not take the reduction into account.\n* ''Mocking Shout's'' <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;attack damage</span> reduction is worth <span class=\"inline-image label-after\" style=\"display:inline;color:#E2BA3D&#59;white-space:pre&#59;text-shadow:-1px 0 black,0 1px black,1px 0 black,0 -1px black;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Gold colored icon.svg|20xpx|link=Gold|An icon representing Gold]]</span> <span style=\"white-space:normal;\">&nbsp;&minus;&nbsp;700 / 1225 / 1750 / 2275 / 2800</span></span> per enemy hit.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308423,
+                "revisions": [
+                  {
+                    "parentid": 3982829,
+                    "revid": 3983173,
+                    "timestamp": "2026-01-10T21:52:10Z"
+                  }
+                ],
+                "title": "Template:Data Tryndamere/Mocking Shout"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3983173,
+      "timestamp": "2026-01-10T21:52:10Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "abc6b0c7ce0113acd75432b8bc90e366bd3e99147a2dd37ad308af69e99fa5f3",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Tryndamere/Mocking_Shout",
+    "revisionId": 3983173,
+    "sourceTimestamp": "2026-01-10T21:52:10Z"
+  }
+}

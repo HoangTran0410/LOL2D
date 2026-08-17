@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Caitlyn/Yordle Snap Trap",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Yordle Snap Trap@@icon@@Yordle Snap Trap.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Caitlyn''' sets a visible trap at the target location that is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> and arms after 1 second, lasting for a duration. The trap grants <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area for 1 second after being placed.@@description2@@'''Caitlyn''' periodically [[ammunition|stocks]] a ''Yordle Snap Trap'' charge, up to a maximum amount. Deploying traps beyond the maximum destroys the oldest one.@@description3@@The next enemy champion that springs the trap is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|rooted]]</span> for 1.<small>5</small> seconds and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"True sight\">[[File:True Sight icon.png|20px|link=Sight#True_sight|An icon representing the keyword True sight]] [[:Sight#True_sight|revealed]]</span> for 3 seconds, as well as takes additional damage from the ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Headshot\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Headshot.png|20xpx|border|link=Caitlyn#Headshot|An icon for Caitlyn's ability Headshot]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Headshot|Headshot]]</span></span>'' granted by this ability. Trapped targets become immune to further ''Yordle Snap Traps'' for 3 seconds, preventing them from springing subsequent traps for the duration.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Trap Duration:'''</span></dt><dd>30 / 35 / 40 / 45 / 50 seconds</dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Number of Traps:'''</span></dt><dd>3 / 3 / 4 / 4 / 5</dd></dl>@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Caitlyn\" data-ability=\"Headshot\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Caitlyn Headshot.png|20xpx|border|link=Caitlyn#Headshot|An icon for Caitlyn's ability Headshot]]</span> <span style=\"white-space:normal;\">[[Caitlyn#Headshot|Headshot]]</span></span> Damage Increase:'''</span></dt><dd>35 / 80 / 125 / 170 / 215 <span style=\"color:orange; white-space:normal\">(+ 30% '''bonus''' AD)</span></dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@20@@cooldown@@0.<small>5</small>@@targeting@@Location@@damagetype@@@@spellshield@@True@@projectile@@@@notes@@\n* Multiple armed traps on the same location will spring all at once if an enemy steps on one of them.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1306913,
+                "revisions": [
+                  {
+                    "parentid": 3932693,
+                    "revid": 4023135,
+                    "timestamp": "2026-05-28T01:59:43Z"
+                  }
+                ],
+                "title": "Template:Data Caitlyn/Yordle Snap Trap"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4023135,
+      "timestamp": "2026-05-28T01:59:43Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "c949f011a184c7c3a425e129efd9ec9d9c58c276302c9d073215e4b51249bfe4",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Caitlyn/Yordle_Snap_Trap",
+    "revisionId": 4023135,
+    "sourceTimestamp": "2026-05-28T01:59:43Z"
+  }
+}

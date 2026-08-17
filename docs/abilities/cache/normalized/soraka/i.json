@@ -1,0 +1,43 @@
+{
+  "asset": {
+    "key": "spell_soraka_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Salvation.png?a58c1",
+    "sha1": "f22ab7bfb52bca2932812ab8ffc28069eba4fd4d"
+  },
+  "champion": "Soraka",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_soraka_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Salvation.png?a58c1",
+        "sha1": "f22ab7bfb52bca2932812ab8ffc28069eba4fd4d"
+      },
+      "fields": {
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Soraka''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">90% '''bonus''' movement speed</span></span> while facing nearby allied <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> that are <span style=\"color:\n#21B053; white-space:normal\">below 40% of their '''maximum''' health</span>.",
+          "text": "Innate: Soraka gains &nbsp;90% bonus movement speed while facing nearby allied champions that are below 40% of their maximum health."
+        },
+        "effectradius": "2500",
+        "icon": "Salvation.png",
+        "name": "Salvation",
+        "notes": {
+          "raw": "* '''Soraka''' will see an arrow indicating the direction in which she can gain the bonus movement speed.",
+          "text": "Soraka will see an arrow indicating the direction in which she can gain the bonus movement speed."
+        },
+        "targeting": "Passive"
+      },
+      "name": "Salvation"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "79b2b972244cb6152b4851d96554cd625ec471d5c6167aab428b0a4fbf67adc1",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Soraka/Salvation",
+    "revisionId": 3681502,
+    "sourceTimestamp": "2024-02-23T19:12:54Z"
+  }
+}

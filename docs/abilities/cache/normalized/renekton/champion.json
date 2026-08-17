@@ -1,0 +1,110 @@
+{
+  "asset": {
+    "key": "champ_renekton",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_OriginalSquare.png?0f653",
+    "sha1": "c464f15c4eb1a32529bd64669b99e7bd427111cb"
+  },
+  "champion": "Renekton",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Renekton",
+    "be": 2400,
+    "changes": "V25.08",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Duelist",
+      "Durable ",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2011-01-18",
+    "difficulty": 1,
+    "external_positions": [
+      "Top"
+    ],
+    "herotype": "Fighter",
+    "id": 58,
+    "mobility": 2,
+    "patch": "V1.0.0.109",
+    "rangetype": "Melee",
+    "resource": "Fury",
+    "role": [
+      "Diver"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Slice and Dice"
+    },
+    "skill_i": {
+      "1": "Reign of Anger"
+    },
+    "skill_q": {
+      "1": "Cull the Meek"
+    },
+    "skill_r": {
+      "1": "Dominus"
+    },
+    "skill_w": {
+      "1": "Ruthless Predator"
+    },
+    "skills": {
+      "1": "Reign of Anger",
+      "2": "Cull the Meek",
+      "3": "Ruthless Predator",
+      "4": "Slice and Dice",
+      "5": "Dominus"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1,
+        "healing": 1.1
+      },
+      "arm_base": 35,
+      "arm_lvl": 5.2,
+      "as_base": 0.665,
+      "as_lvl": 2.75,
+      "as_ratio": 0.665000021457672,
+      "attack_delay_offset": -0.122695036232471,
+      "dam_base": 69,
+      "dam_lvl": 4.15,
+      "gameplay_radius": 80,
+      "hp5_base": 8,
+      "hp5_lvl": 0.75,
+      "hp_base": 660,
+      "hp_lvl": 111,
+      "mp5_base": 0,
+      "mp5_lvl": 0,
+      "mp_base": 100,
+      "mp_lvl": 0,
+      "mr_base": 28,
+      "mr_lvl": 2.05,
+      "ms": 345,
+      "pathing_radius": 50,
+      "range": 125,
+      "selection_height": 155,
+      "selection_radius": 125,
+      "urf": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 0.95
+      }
+    },
+    "style": 45,
+    "title": "The Butcher of the Sands",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "684c2788ab490c508c35c390ee8c003eda39d8d8afce72970d9daf59e5c9faa5",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

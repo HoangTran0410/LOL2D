@@ -156,3 +156,53 @@ export { default as Camille_Q } from './Camille_Q';
 export { default as Camille_W } from './Camille_W';
 export { default as Camille_E } from './Camille_E';
 export { default as Camille_R } from './Camille_R';
+
+export { default as Darius_Q } from './Darius_Q';
+export { default as Darius_W } from './Darius_W';
+export { default as Darius_E } from './Darius_E';
+export { default as Darius_R } from './Darius_R';
+
+export { default as Renekton_Q } from './Renekton_Q';
+export { default as Renekton_W } from './Renekton_W';
+export { default as Renekton_E } from './Renekton_E';
+export { default as Renekton_R } from './Renekton_R';
+
+export { default as XinZhao_Q } from './XinZhao_Q';
+export { default as XinZhao_W } from './XinZhao_W';
+export { default as XinZhao_E } from './XinZhao_E';
+export { default as XinZhao_R } from './XinZhao_R';
+
+export { default as Tryndamere_Q } from './Tryndamere_Q';
+export { default as Tryndamere_W } from './Tryndamere_W';
+export { default as Tryndamere_E } from './Tryndamere_E';
+export { default as Tryndamere_R } from './Tryndamere_R';
+
+export { default as MasterYi_Q } from './MasterYi_Q';
+export { default as MasterYi_W } from './MasterYi_W';
+export { default as MasterYi_E } from './MasterYi_E';
+export { default as MasterYi_R } from './MasterYi_R';
+
+export { default as Malzahar_Q } from './Malzahar_Q';
+export { default as Malzahar_W } from './Malzahar_W';
+export { default as Malzahar_E } from './Malzahar_E';
+export { default as Malzahar_R } from './Malzahar_R';
+
+export { default as Ezreal_Q } from './Ezreal_Q';
+export { default as Ezreal_W } from './Ezreal_W';
+export { default as Ezreal_E } from './Ezreal_E';
+export { default as Ezreal_R } from './Ezreal_R';
+
+export { default as Caitlyn_Q } from './Caitlyn_Q';
+export { default as Caitlyn_W } from './Caitlyn_W';
+export { default as Caitlyn_E } from './Caitlyn_E';
+export { default as Caitlyn_R } from './Caitlyn_R';
+
+export { default as Soraka_Q } from './Soraka_Q';
+export { default as Soraka_W } from './Soraka_W';
+export { default as Soraka_E } from './Soraka_E';
+export { default as Soraka_R } from './Soraka_R';
+
+export { default as Brand_Q } from './Brand_Q';
+export { default as Brand_W } from './Brand_W';
+export { default as Brand_E } from './Brand_E';
+export { default as Brand_R } from './Brand_R';

@@ -392,6 +392,76 @@ export const SpellGroups: {
     spells: [AllSpells.Camille_Q, AllSpells.Camille_W, AllSpells.Camille_E, AllSpells.Camille_R],
   },
   {
+    name: 'Darius',
+    attack: ATTACK.BRUISER,
+    image: 'champ_darius',
+
+    spells: [AllSpells.Darius_Q, AllSpells.Darius_W, AllSpells.Darius_E, AllSpells.Darius_R],
+  },
+  {
+    name: 'Renekton',
+    attack: ATTACK.BRUISER,
+    image: 'champ_renekton',
+
+    spells: [AllSpells.Renekton_Q, AllSpells.Renekton_W, AllSpells.Renekton_E, AllSpells.Renekton_R],
+  },
+  {
+    name: 'Xin Zhao',
+    attack: ATTACK.BRUISER,
+    image: 'champ_xinzhao',
+
+    spells: [AllSpells.XinZhao_Q, AllSpells.XinZhao_W, AllSpells.XinZhao_E, AllSpells.XinZhao_R],
+  },
+  {
+    name: 'Tryndamere',
+    attack: ATTACK.BRUISER,
+    image: 'champ_tryndamere',
+
+    spells: [AllSpells.Tryndamere_Q, AllSpells.Tryndamere_W, AllSpells.Tryndamere_E, AllSpells.Tryndamere_R],
+  },
+  {
+    name: 'Master Yi',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_masteryi',
+
+    spells: [AllSpells.MasterYi_Q, AllSpells.MasterYi_W, AllSpells.MasterYi_E, AllSpells.MasterYi_R],
+  },
+  {
+    name: 'Malzahar',
+    attack: ATTACK.MAGE,
+    image: 'champ_malzahar',
+
+    spells: [AllSpells.Malzahar_Q, AllSpells.Malzahar_W, AllSpells.Malzahar_E, AllSpells.Malzahar_R],
+  },
+  {
+    name: 'Ezreal',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_ezreal',
+
+    spells: [AllSpells.Ezreal_Q, AllSpells.Ezreal_W, AllSpells.Ezreal_E, AllSpells.Ezreal_R],
+  },
+  {
+    name: 'Caitlyn',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_caitlyn',
+
+    spells: [AllSpells.Caitlyn_Q, AllSpells.Caitlyn_W, AllSpells.Caitlyn_E, AllSpells.Caitlyn_R],
+  },
+  {
+    name: 'Soraka',
+    attack: ATTACK.SUPPORT,
+    image: 'champ_soraka',
+
+    spells: [AllSpells.Soraka_Q, AllSpells.Soraka_W, AllSpells.Soraka_E, AllSpells.Soraka_R],
+  },
+  {
+    name: 'Brand',
+    attack: ATTACK.MAGE,
+    image: 'champ_brand',
+
+    spells: [AllSpells.Brand_Q, AllSpells.Brand_W, AllSpells.Brand_E, AllSpells.Brand_R],
+  },
+  {
     name: 'Phép Bổ Trợ',
     image: null,
 

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Master Yi/Wuju Style",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Wuju Style@@icon@@Wuju Style.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Master Yi''' empowers his basic attacks within the next 5 seconds to deal <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">'''bonus''' true damage</span></span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span>.@@description2@@{{{description2}}}@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus True Damage:'''</span></dt><dd>20 / 25 / 30 / 35 / 40 <span style=\"color:orange; white-space:normal\">(+ 35% '''bonus''' AD)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@14@@targeting@@Auto@@damagetype@@True@@spellshield@@@@projectile@@{{{projectile}}}@@notes@@\n* ''Wuju Style'' can be cast during ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Master Yi\" data-ability=\"Alpha Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Master Yi Alpha Strike.png|20xpx|border|link=Master Yi#Alpha Strike|An icon for Master Yi's ability Alpha Strike]]</span> <span style=\"white-space:normal;\">[[Master Yi#Alpha Strike|Alpha Strike]]</span></span>''.\n* ''Wuju Style'' cannot be cast while it is already active.\n* ''Wuju Style's'' bonus true damage does not interact with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strikes]]</span>.\n* ''Wuju Style's'' bonus true damage cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> but can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> and/or missed if '''Master Yi''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The attacks do not deal the '''bonus''' damage against [[structures]].\n* While ''Wuju Style'' is active, the damage will dynamically update its calculations.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308378,
+                "revisions": [
+                  {
+                    "parentid": 3959669,
+                    "revid": 3959670,
+                    "timestamp": "2025-10-15T06:23:00Z"
+                  }
+                ],
+                "title": "Template:Data Master Yi/Wuju Style"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3959670,
+      "timestamp": "2025-10-15T06:23:00Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "672bccb2bc8c7f1943a7306e398644f3b7f2ce65fb4e9ec725ac8d2e0294f3c5",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Master_Yi/Wuju_Style",
+    "revisionId": 3959670,
+    "sourceTimestamp": "2025-10-15T06:23:00Z"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "asset": {
+    "key": "spell_brand_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pyroclasm.png?fcadc",
+    "sha1": "fb0814f82d2ce919909f99b8606bb54e0c04749e"
+  },
+  "champion": "Brand",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_brand_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pyroclasm.png?fcadc",
+        "sha1": "fb0814f82d2ce919909f99b8606bb54e0c04749e"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "100 / 95 / 90 / 85 / 80",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Brand''' launches a fireball at the target enemy that bounces between nearby enemies and '''Brand''' up to four times, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies each time and having a 0.<small>15</small>-second delay between bounces.",
+          "text": "Active: Brand launches a fireball at the target enemy that bounces between nearby enemies and Brand up to four times, dealing magic damage to enemies each time and having a 0.15-second delay between bounces."
+        },
+        "description2": {
+          "raw": "''Pyroclasm'' prioritizes ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span>'' enemy champions, then other enemy champions, then any valid bounce target, then '''Brand'''.",
+          "text": "Pyroclasm prioritizes Ablaze enemy champions, then other enemy champions, then any valid bounce target, then Brand."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Brand\" data-ability=\"Blaze\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Brand Blaze.png|20xpx|border|link=Brand#Blaze|An icon for Brand's ability Blaze]]</span> <span style=\"white-space:normal;\">[[Brand#Blaze|Ablaze]]</span></span> Bonus:'''</span> The target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowed]]</span> for 0.<small>25</small> seconds. This can affect the same enemy more than once.",
+          "text": "Ablaze Bonus: The target is slowed for 0.25 seconds. This can affect the same enemy more than once."
+        },
+        "description4": {
+          "raw": "''The target does not have to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> for the fireball to bounce to them.''",
+          "text": "The target does not have to be visible for the fireball to bounce to them."
+        },
+        "effectradius": "600",
+        "icon": "Pyroclasm.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>100 / 137.<small>5</small> / 175 / 212.<small>5</small> / 250 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span></dd><dt><span class=\"template_lc\">'''Total Single-Target Damage:'''</span></dt><dd>300 / 412.<small>5</small> / 525 / 637.<small>5</small> / 750 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 90% AP)</span></dd></dl>",
+          "text": "Magic Damage:100 / 137.5 / 175 / 212.5 / 250 (+ 30% AP)Total Single-Target Damage:300 / 412.5 / 525 / 637.5 / 750 (+ 90% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 37.<small>5</small> / 45 / 52.<small>5</small> / 60%</dd></dl>",
+          "text": "Slow:30 / 37.5 / 45 / 52.5 / 60%"
+        },
+        "name": "Pyroclasm",
+        "notes": {
+          "raw": "* The fireball acquires a new valid, bounce target once the bounce delay finishes.\n* If the target the fireball is in flight towards becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, the fireball missile will be destroyed but a new missile will be formed at the target's location that is able to bounce for up to the remaining bounces of the previous fireball.\n** The new missile is only formed if there is a valid target to bounce to at the time of the previous missile being destroyed.\n** This does not apply if the target is '''Brand''', as the missile would not be destroyed and would bounce from him even if he is untargetable.\n* The fireball will still bounce from the target even if they were dead upon arrival.\n* The fireball may only bounce to valid targets, including '''Brand'''.\n* If the initial cast target uses <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>, ''Pyroclasm'' will not bounce. If the bounce is blocked by an enemy's ''spell shield'' it will not deal any damage, but it will keep on bouncing.\n* ''Pyroclasm's'' damage against enemy champions will not aggro nearby enemy minions.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "The fireball acquires a new valid, bounce target once the bounce delay finishes.\nIf the target the fireball is in flight towards becomes untargetable, the fireball missile will be destroyed but a new missile will be formed at the target's location that is able to bounce for up to the remaining bounces of the previous fireball.\n* The new missile is only formed if there is a valid target to bounce to at the time of the previous missile being destroyed.\n* This does not apply if the target is Brand, as the missile would not be destroyed and would bounce from him even if he is untargetable.\nThe fireball will still bounce from the target even if they were dead upon arrival.\nThe fireball may only bounce to valid targets, including Brand.\nIf the initial cast target uses spell shield, Pyroclasm will not bounce. If the bounce is blocked by an enemy's spell shield it will not deal any damage, but it will keep on bouncing.\nPyroclasm's damage against enemy champions will not aggro nearby enemy minions.(bug)\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "750 - 3000",
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Pyroclasm"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "51d6f2354805ea810f7988c1dd92b51b136e106000126d37fc2f03fe4ef5e4f7",
+    "fetchedAt": "2026-08-16T21:32:17.622Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Brand/Pyroclasm",
+    "revisionId": 3955099,
+    "sourceTimestamp": "2025-09-23T19:42:50Z"
+  }
+}
