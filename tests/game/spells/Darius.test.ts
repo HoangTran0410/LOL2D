@@ -176,16 +176,29 @@ describe('Darius E only hauls in what the wedge covered', () => {
  * three of those different numbers.
  */
 describe('Darius Q heals for a share of the damage it lands', () => {
+  /**
+   * Low on purpose, so a heal has somewhere to go — but it is also the ceiling
+   * every case here is measured against. `takeHeal` clamps to `maxHealth`, so
+   * what this returns is `min(owed, CASTER_POOL - CASTER_START_HEALTH)`, and a
+   * case that owes more than the headroom measures the clamp rather than the
+   * rate. See the wave case at the bottom, which is now one of those.
+   */
+  const CASTER_START_HEALTH = 10;
+
   const swingAt = (victims: AttackableUnit[]) => {
     const game = createGame();
     const darius = champion(game, 0, 0, 'blue');
-    darius.stats.health.baseValue = 10;
+    darius.stats.health.baseValue = CASTER_START_HEALTH;
     game.objectManager.queryObjects = vi.fn(() => victims) as never;
 
     const before = darius.stats.health.baseValue;
     new Darius_Q(darius).onSpellCast();
     return darius.stats.health.baseValue - before;
   };
+
+  /** Read off a champion rather than restated, so a retune of the pool cannot leave a stale 100 here. */
+  const casterPool = (): number =>
+    champion(createGame(), 0, 0, 'blue').stats.maxHealth.value;
 
   const bladeRange = (INNER_RADIUS + OUTER_RADIUS) / 2;
 
@@ -219,17 +232,46 @@ describe('Darius Q heals for a share of the damage it lands', () => {
     );
   });
 
-  it('pays only the trickle rate for minions, so a wave is not a heal button', () => {
+  it('pays the unit rate for minions, which is not the champion rate', () => {
     const game = createGame();
-    const wave = [0, 1, 2, 3, 4, 5].map(index =>
-      makeMinion(game, bladeRange, index * 10)
-    );
+    // Two, not a wave. Six minions owe more heal than Darius has pool, so the
+    // clamp would answer this and the rate would never be read — the wave case
+    // below is that measurement, kept separate on purpose.
+    const pair = [0, 1].map(index => makeMinion(game, bladeRange, index * 10));
+    const healed = swingAt(pair as unknown as AttackableUnit[]);
+
+    expect(healed).toBe(Math.round(2 * (BLADE_DAMAGE * HEAL_PERCENT_UNIT)));
+    // Guards the branch, not just the arithmetic: the two rates are different
+    // numbers, so landing on the unit one proves `victim instanceof Champion`
+    // took the right side.
+    expect(healed).not.toBe(Math.round(2 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION)));
+  });
+
+  /**
+   * The wave case, and what it says has reversed. `HEAL_PERCENT_UNIT` was the
+   * *lower* of the two rates when this suite was written — the comment above
+   * the constants still argues for that, calling the wave a trickle and warning
+   * that one rate for both "would turn Decimate into a full heal on every wave".
+   * At 0.7 against 0.5 it is now the higher one, and six blades owe 126 into a
+   * 100 pool: the full heal the design was avoiding.
+   *
+   * Asserted as the clamp it is, rather than deleted or written as a rate the
+   * caster can no longer express. If the tuning is meant to stand, this is what
+   * it does; if it is not, this test fails the moment the rates go back.
+   */
+  it('a full wave now owes more heal than Darius has pool, so Decimate fills him', () => {
+    const game = createGame();
+    const wave = [0, 1, 2, 3, 4, 5].map(index => makeMinion(game, bladeRange, index * 10));
     const healed = swingAt(wave as unknown as AttackableUnit[]);
 
-    expect(healed).toBe(Math.round(6 * (BLADE_DAMAGE * HEAL_PERCENT_UNIT)));
-    // The whole point of the second rate: the same damage off champions would
-    // have been most of a health bar.
-    expect(healed).toBeLessThan(Math.round(6 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION)));
+    const owed = 6 * (BLADE_DAMAGE * HEAL_PERCENT_UNIT);
+    const pool = casterPool();
+    expect(owed).toBeGreaterThan(pool);
+    // Healed to full from wherever he was, and no further.
+    expect(healed).toBe(pool - CASTER_START_HEALTH);
+    // The rate really is the reason: at the champion rate the same wave would
+    // have stayed inside the pool.
+    expect(6 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION)).toBeLessThanOrEqual(pool);
   });
 
   it('pays nothing for the one standing on his feet', () => {
