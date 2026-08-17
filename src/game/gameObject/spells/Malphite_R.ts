@@ -370,12 +370,6 @@ export class Malphite_R_Object extends SpellObject {
   getDisplayBoundingBox() {
     // The shards fly well past the hit radius, and the cracks past them.
     const span = this.hitRadius * 2.2;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

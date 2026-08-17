@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import EventType from '../../enums/EventType';
@@ -211,13 +210,7 @@ export class Ezreal_W_Orb extends MissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 1.4;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -351,13 +344,7 @@ export class Ezreal_W_Mark extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.radius * 1.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -408,12 +395,6 @@ export class Ezreal_W_Burst extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.radius * 2 + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

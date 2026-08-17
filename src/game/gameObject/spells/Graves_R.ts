@@ -243,13 +243,7 @@ export class Graves_R_Muzzle extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.reach + 40;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -329,12 +323,6 @@ export class Graves_R_Impact extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

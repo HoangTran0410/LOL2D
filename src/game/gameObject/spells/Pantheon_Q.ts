@@ -375,12 +375,6 @@ export class Pantheon_Q_Thrust extends SpellObject {
   // the lunge reaches far past `position`, so the box must cover the whole lane
   getDisplayBoundingBox(): Rectangle {
     const pad = this.reach + this.laneWidth;
-    return new Rectangle({
-      x: this.position.x - pad,
-      y: this.position.y - pad,
-      w: pad * 2,
-      h: pad * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(pad * 2);
   }
 }

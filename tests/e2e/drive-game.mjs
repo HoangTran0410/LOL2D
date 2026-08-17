@@ -158,7 +158,7 @@ await page.evaluate(async () => {
   game.fogOfWar.outOfViewColor = '#0003';
 
   const probe = {
-    // Observation aid, not gameplay: fog of war clears willDraw on every unit
+    // Observation aid, not gameplay: fog of war clears visibleToPlayerTeam on every unit
     // outside the player's sight, so any lane but the one the player is standing
     // in screenshots black. `alwaysVisible` is a per-instance field, so this has
     // to be re-applied to each minion rather than set on the prototype once.

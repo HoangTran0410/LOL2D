@@ -34,7 +34,7 @@ const drawCalls = (): number =>
 
 const unit = (x: number, y: number, extra: Record<string, unknown> = {}) => ({
   position: { x, y },
-  willDraw: true,
+  visibleToPlayerTeam: true,
   visionRadius: 500,
   getCollideBoundingBox: () => new Circle({ x, y, r: 30 }),
   ...extra,
@@ -188,7 +188,7 @@ describe('drawDebugOverlay', () => {
     const one = host({ vision: true });
     one.objectManager.objects = [
       unit(0, 0),
-      unit(10, 10, { willDraw: false }),
+      unit(10, 10, { visibleToPlayerTeam: false }),
       unit(20, 20, { visionRadius: 0 }),
     ] as never;
     drawDebugOverlay(one);

@@ -426,13 +426,7 @@ export class Morgana_R_Windup extends SpellObject {
   }
 
   getDisplayBoundingBox(): Rectangle {
-    return new Rectangle({
-      x: this.position.x - LATCH_RADIUS,
-      y: this.position.y - LATCH_RADIUS,
-      w: LATCH_RADIUS * 2,
-      h: LATCH_RADIUS * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(LATCH_RADIUS * 2);
   }
 }
 
@@ -523,12 +517,6 @@ export class Morgana_R_Shatter extends SpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const span = this.radius * 1.6;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

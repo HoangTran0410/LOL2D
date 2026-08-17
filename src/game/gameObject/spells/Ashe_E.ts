@@ -178,13 +178,7 @@ export class Ashe_E_Object extends MissileSpellObject {
 
   // the vision it carries reaches far past the sprite, so the box must cover it
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.visionRadius,
-      y: this.position.y - this.visionRadius,
-      w: this.visionRadius * 2,
-      h: this.visionRadius * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.visionRadius * 2);
   }
 }
 

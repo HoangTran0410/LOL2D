@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import TeamId from '../../enums/TeamId';
 import type { LaneWaypoint } from '../../lanes';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -551,15 +551,9 @@ export default class Minion extends AttackableUnit {
   getDisplayBoundingBox() {
     // the base sizes an allied unit's box by its vision radius; a minion grants
     // no vision, so its box is just its body
-    const size = this.stats.size.value * 1.4;
-    return new Rectangle({
-      x: this.position.x - size / 2,
-      y: this.position.y - size / 2,
-      w: size,
-      h: size,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.stats.size.value * 1.4);
   }
+
 }
 
 /**
@@ -728,13 +722,6 @@ export class MinionSwing extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    const r = this.reach + 20;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox((this.reach + 20) * 2);
   }
 }

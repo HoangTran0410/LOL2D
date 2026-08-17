@@ -13,6 +13,7 @@ import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 import { notifyJannaControlLanded } from './Janna_E';
+import { canSee } from '../../combat/Vision';
 
 type ZephyrTarget = AttackableUnit;
 
@@ -75,7 +76,7 @@ export default class Janna_W extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isZephyrTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isZephyrTarget(candidate),
       getTargetInfo: candidate =>
         isZephyrTarget(candidate)
           ? {
@@ -134,7 +135,7 @@ export default class Janna_W extends Spell {
   private isValidTarget(target: unknown): target is ZephyrTarget {
     return (
       isZephyrTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -210,12 +211,6 @@ export class Janna_W_Bolt extends HomingMissileSpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = this.size * 1.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

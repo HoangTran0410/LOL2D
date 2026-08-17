@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import BuffAddType from '../../enums/BuffAddType';
@@ -385,12 +385,6 @@ export class Teemo_R_Object extends SpellObject {
       this.phase === Teemo_R_Object.PHASES.exploding
         ? this.explodeRange / 2 + 45
         : this.size / 2 + 12;
-    return new Rectangle({
-      x: this.position.x - reach,
-      y: this.position.y - reach,
-      w: reach * 2,
-      h: reach * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(reach * 2);
   }
 }

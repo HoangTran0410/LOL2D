@@ -10,6 +10,7 @@ import StatAmp from '../buffs/StatAmp';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { canSee } from '../../combat/Vision';
 
 type EyeTarget = AttackableUnit;
 
@@ -76,7 +77,7 @@ export default class Janna_E extends Spell {
       range: this.range,
       targetTeam: 'ALLY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isEyeTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isEyeTarget(candidate),
       getTargetInfo: candidate => isEyeTarget(candidate) ? {
         position: candidate.position,
         teamId: candidate.teamId,
@@ -153,7 +154,7 @@ export default class Janna_E extends Spell {
 
   private isValidTarget(target: unknown): target is EyeTarget {
     return isEyeTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId === this.owner.teamId &&
       withinRange(this.range, this.owner, target);
   }
@@ -217,12 +218,6 @@ export class Janna_E_Shell extends SpellObject {
   getDisplayBoundingBox(): Rectangle {
     const size = this.target.animatedValues?.displaySize ?? 40;
     const r = size / 2 + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

@@ -168,13 +168,7 @@ export class Shaco_W_Box extends Pet {
 
   getDisplayBoundingBox() {
     const span = Math.max(60, this.rangeToDraw);
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }
 
@@ -262,12 +256,6 @@ export class Shaco_W_Bullet_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.lazerLength,
-      y: this.position.y - this.lazerLength,
-      w: this.lazerLength * 2,
-      h: this.lazerLength * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.lazerLength * 2);
   }
 }

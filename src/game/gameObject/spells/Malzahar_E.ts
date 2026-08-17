@@ -9,6 +9,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import DamageOverTime from '../buffs/DamageOverTime';
+import { canSee } from '../../combat/Vision';
 
 // Exported so the suite asserts the infection's wiring rather than a copy of
 // the numbers — retuning a value must not mean editing a test.
@@ -73,7 +74,7 @@ export default class Malzahar_E extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isVisionsTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isVisionsTarget(candidate),
       getTargetInfo: candidate =>
         isVisionsTarget(candidate)
           ? {
@@ -119,7 +120,7 @@ export default class Malzahar_E extends Spell {
   isValidTarget(target: unknown): target is AttackableUnit {
     return (
       isVisionsTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );

@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -212,13 +212,7 @@ export class Pantheon_E_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - REACH,
-      y: this.position.y - REACH,
-      w: REACH * 2,
-      h: REACH * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(REACH * 2);
   }
 }
 
@@ -377,12 +371,6 @@ export class Pantheon_E_Aegis extends SpellObject {
   getDisplayBoundingBox() {
     // The spear reaches past the shield, and the wedge it works in is REACH deep.
     const span = REACH + 60;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Slow from '../buffs/Slow';
@@ -143,12 +143,6 @@ export class Zed_E_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.radius,
-      y: this.position.y - this.radius,
-      w: this.radius * 2,
-      h: this.radius * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.radius * 2);
   }
 }

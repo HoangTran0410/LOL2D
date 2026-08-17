@@ -188,7 +188,7 @@ try {
     // Alive only: a dead unit is not drawn with the cheat on either, and the
     // cheat is about vision, not about death.
     const hidden = game.objectManager.objects.filter(
-      o => o !== game.player && o.willDraw === false && !o.isDead && o.position
+      o => o !== game.player && o.visibleToPlayerTeam === false && !o.isDead && o.position
     );
     const before = drawn();
     const missing = hidden.filter(

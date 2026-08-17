@@ -45,7 +45,6 @@ export interface GameObjectOptions {
 
 export default class GameObject {
   toRemove = false;
-  willDraw = true;
 
   /**
    * Draw order override. `null` falls back to the class table in ObjectManager,
@@ -56,7 +55,7 @@ export default class GameObject {
 
   /**
    * Structures stay on screen once discovered, so FogOfWar must not clear their
-   * `willDraw` the way it does for units.
+   * `visibleToPlayerTeam` the way it does for units.
    */
   alwaysVisible = false;
 
@@ -81,10 +80,10 @@ export default class GameObject {
   private _collideBBY = NaN;
   private _collideBBRadius = NaN;
 
-  private _displayBB: Rectangle | null = null;
-  private _displayBBX = NaN;
-  private _displayBBY = NaN;
-  private _displayBBRadius = NaN;
+  protected _displayBB: Rectangle | null = null;
+  protected _displayBBX = NaN;
+  protected _displayBBY = NaN;
+  protected _displayBBSize = NaN;
 
   constructor({
     game,
@@ -139,26 +138,45 @@ export default class GameObject {
     return this._collideBB;
   }
 
-  getDisplayBoundingBox() {
+  /**
+   * A memoised square display box of `size`, centred on this object.
+   *
+   * Almost every display box in the game is this shape — only the size rule
+   * differs (vision radius here, animated body size for a unit, a multiple of
+   * it for minions and turrets, reach for a swing). Subclasses that override
+   * `getDisplayBoundingBox` used to hand-roll the `new Rectangle`, which
+   * silently opted them out of the cache above and put an allocation per
+   * object per call back on the hot path — and the box is asked for at least
+   * three times a frame each (quadtree rebuild, draw cull, every targeting
+   * candidate). Override the *size*, not the caching.
+   *
+   * Keyed on the resolved size, so a rule that switches which size applies
+   * moves the key with it.
+   */
+  protected squareDisplayBoundingBox(size: number): Rectangle {
     if (
       this._displayBB &&
       this._displayBBX === this.position.x &&
       this._displayBBY === this.position.y &&
-      this._displayBBRadius === this.visionRadius
+      this._displayBBSize === size
     ) {
       return this._displayBB;
     }
     this._displayBBX = this.position.x;
     this._displayBBY = this.position.y;
-    this._displayBBRadius = this.visionRadius;
+    this._displayBBSize = size;
     this._displayBB = new Rectangle({
-      x: this.position.x - this.visionRadius,
-      y: this.position.y - this.visionRadius,
-      w: this.visionRadius * 2,
-      h: this.visionRadius * 2,
+      x: this.position.x - size / 2,
+      y: this.position.y - size / 2,
+      w: size,
+      h: size,
       data: this,
     });
     return this._displayBB;
+  }
+
+  getDisplayBoundingBox() {
+    return this.squareDisplayBoundingBox(this.visionRadius * 2);
   }
 
   drawBoundingBox(collide = false) {

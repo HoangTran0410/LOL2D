@@ -11,6 +11,7 @@ import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { canSee } from '../../combat/Vision';
 
 type FrostbiteTarget = AttackableUnit;
 
@@ -62,7 +63,7 @@ export default class Anivia_E extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isFrostbiteTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isFrostbiteTarget(candidate),
       getTargetInfo: candidate =>
         isFrostbiteTarget(candidate)
           ? {
@@ -119,7 +120,7 @@ export default class Anivia_E extends Spell {
   private isValidTarget(target: unknown): target is FrostbiteTarget {
     return (
       isFrostbiteTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -191,13 +192,7 @@ export class Anivia_E_Bolt extends HomingMissileSpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = this.size * 1.5;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -243,12 +238,6 @@ export class Anivia_E_Impact extends SpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = (this.targetSize + 60) * (this.empowered ? 1.5 : 1);
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

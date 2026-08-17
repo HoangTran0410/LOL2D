@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import {
@@ -303,12 +303,6 @@ export class ChoGath_R_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 0.8;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

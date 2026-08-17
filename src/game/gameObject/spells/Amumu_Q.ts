@@ -333,12 +333,6 @@ export class Amumu_Q_Impact extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.maxRadius + 20;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

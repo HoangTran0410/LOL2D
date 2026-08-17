@@ -2,7 +2,6 @@ import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import EventType from '../../enums/EventType';
 import type { BasicAttackHit } from '../../combat/BasicAttack';
-import { Rectangle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
 import SpellObject from '../SpellObject';
 import Spell from '../Spell';
@@ -183,13 +182,7 @@ export class Twitch_R_Bolt extends MissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = 110;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -231,12 +224,6 @@ export class Twitch_R_Pierce extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

@@ -72,7 +72,7 @@ const makeOwner = (mana = 200) => {
     teamId: 'blue',
     isDead: false,
     canCast: true,
-    willDraw: true,
+    visibleToPlayerTeam: true,
     targetable: true,
     spells: [] as unknown[],
     stats: {

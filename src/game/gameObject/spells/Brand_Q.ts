@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
 import Spell from '../Spell';
 import MissileSpellObject from '../MissileSpellObject';
@@ -161,12 +160,6 @@ export class Brand_Q_Missile extends MissileSpellObject {
   getDisplayBoundingBox() {
     // the tongues stream well behind the missile's own body
     const r = this.size * 1.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

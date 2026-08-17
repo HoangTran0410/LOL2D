@@ -66,6 +66,44 @@ describe('base object type boundary', () => {
     }
   });
 
+  /**
+   * `squareDisplayBoundingBox` is the one memoised box every square-boxed
+   * subclass now shares (GameObject, AttackableUnit, Minion, MinionSwing,
+   * Turret). Each of those used to hand-roll `new Rectangle`, which is an
+   * allocation per object per call on a path that runs at least three times a
+   * frame per object — quadtree rebuild, draw cull, and every targeting
+   * candidate. These two cases are the whole contract: reuse while the inputs
+   * hold, and rebuild the moment either input moves.
+   */
+  it('reuses one display box until position or size changes', () => {
+    const object = new GameObject({ visionRadius: 30 });
+
+    const first = object.getDisplayBoundingBox();
+    expect(object.getDisplayBoundingBox()).toBe(first);
+    expect([first.x, first.y, first.w, first.h]).toEqual([-30, -30, 60, 60]);
+
+    object.position.set(10, 5);
+    const moved = object.getDisplayBoundingBox();
+    expect(moved).not.toBe(first);
+    expect([moved.x, moved.y, moved.w, moved.h]).toEqual([-20, -25, 60, 60]);
+
+    object.visionRadius = 10;
+    const resized = object.getDisplayBoundingBox();
+    expect(resized).not.toBe(moved);
+    expect([resized.x, resized.y, resized.w, resized.h]).toEqual([0, -5, 20, 20]);
+  });
+
+  /**
+   * The box carries `data`, and the quadtree hands that straight back as the
+   * retrieved object — a cached box that lost it would make every spatial
+   * query return undefined objects rather than fail loudly.
+   */
+  it('keeps the owning object on a reused display box', () => {
+    const object = new GameObject({ visionRadius: 12 });
+    expect(object.getDisplayBoundingBox().data).toBe(object);
+    expect(object.getDisplayBoundingBox().data).toBe(object);
+  });
+
   it('keeps base game ownership optional but spell ownership concrete', () => {
     expect(gameObjectSource).not.toMatch(/game!/);
     expect(spellObjectSource).not.toMatch(/owner!/);

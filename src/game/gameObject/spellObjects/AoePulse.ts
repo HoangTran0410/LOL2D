@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import SpellObject from '../SpellObject';
 
 /**
@@ -358,12 +357,6 @@ export default class AoePulse extends SpellObject {
   getDisplayBoundingBox() {
     // 1.4x the radius: shards and cracks deliberately overshoot the hit circle.
     const span = this.radius * 1.4;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

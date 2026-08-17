@@ -244,12 +244,6 @@ export class XinZhao_E_Object extends SpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = XINZHAO_E_SPLASH_RADIUS + 40;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

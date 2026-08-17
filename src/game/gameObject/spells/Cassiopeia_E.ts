@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -234,12 +234,6 @@ export class Cassiopeia_E_Venom extends MissileSpellObject {
   /** The glow and the drips reach well past `size`, so the box has to as well. */
   getDisplayBoundingBox() {
     const pad = this.size * 2.5;
-    return new Rectangle({
-      x: this.position.x - pad,
-      y: this.position.y - pad,
-      w: pad * 2,
-      h: pad * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(pad * 2);
   }
 }

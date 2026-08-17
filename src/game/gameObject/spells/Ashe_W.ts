@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import Spell from '../Spell';
@@ -150,13 +149,7 @@ export class Ashe_W_Object extends MissileSpellObject {
   // the shard is far longer than the 10px hitbox
   getDisplayBoundingBox() {
     const r = 34;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -215,12 +208,6 @@ export class Ashe_W_Frost extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius + 15;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

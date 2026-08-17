@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
@@ -120,13 +119,7 @@ export class ChoGath_E_Object extends MissileSpellObject {
   // the cluster draws well past its 26px hitbox
   getDisplayBoundingBox() {
     const r = this.size * 1.8;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -194,12 +187,6 @@ export class ChoGath_E_Gore extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

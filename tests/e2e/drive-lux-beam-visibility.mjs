@@ -7,7 +7,7 @@
  * see it. `Champion.draw()` calls `spell.drawVfx()`, so anything hung on
  * `castSpec.vfx` inherits the caster's visibility twice over: the draw pass
  * only reaches objects whose *own* display bounding box is on camera, and
- * `FogOfWar` clears `willDraw` on every unit the player cannot see. Lux R's
+ * `FogOfWar` clears `visibleToPlayerTeam` on every unit the player cannot see. Lux R's
  * beam is 3400px long and her body is about 40px wide, so hanging the beam off
  * her meant that a bot standing off screen fired a beam across the player's
  * whole screen that was never painted — while still doing its damage and
@@ -27,7 +27,7 @@
  * true of anything far enough away. So the run asserts both at once, of the
  * same cast:
  *
- *   - the caster is genuinely unrendered — `willDraw` false on every sample
+ *   - the caster is genuinely unrendered — `visibleToPlayerTeam` false on every sample
  *     across the cast, and her `Champion.draw()` called zero times, which is
  *     what makes `drawVfx()` unreachable; and
  *   - `LuxBeamEffect.draw()` ran anyway, in both phases; and
@@ -156,7 +156,7 @@ const staged = await page.evaluate(async offset => {
     return casterDraw();
   };
 
-  window.__probe = { game, player, bot, luxR, counters, willDrawSamples: [] };
+  window.__probe = { game, player, bot, luxR, counters, visibilitySamples: [] };
   return { ok: true, botName: bot.name ?? null };
 }, LUX_OFFSET_PX);
 
@@ -237,7 +237,7 @@ if (staged.ok) {
       player.destination.set(player.position.x, player.position.y);
     }, 50);
     window.__probe.sampler = setInterval(() => {
-      window.__probe.willDrawSamples.push(bot.willDraw);
+      window.__probe.visibilitySamples.push(bot.visibleToPlayerTeam);
     }, 60);
   }, LUX_OFFSET_PX);
 
@@ -251,7 +251,7 @@ if (staged.ok) {
   await page.screenshot({ path: `${OUT}-2-release.png` });
 
   const after = await page.evaluate(() => {
-    const { player, bot, luxR, counters, willDrawSamples, accepted } = window.__probe;
+    const { player, bot, luxR, counters, visibilitySamples, accepted } = window.__probe;
     clearInterval(window.__probe.sampler);
     clearInterval(window.__probe.pin);
     const geometry = luxR.geometry;
@@ -281,8 +281,8 @@ if (staged.ok) {
       accepted,
       counters: { ...counters },
       health: player.stats.health.value,
-      willDrawSeen: [...new Set(willDrawSamples)],
-      sampleCount: willDrawSamples.length,
+      visibilitySeen: [...new Set(visibilitySamples)],
+      sampleCount: visibilitySamples.length,
       distanceToBeam,
       tolerance: geometry ? geometry.width / 2 + player.collisionRadius : null,
       reveals: player.buffs
@@ -301,11 +301,11 @@ if (staged.ok) {
   // Half one: the caster is genuinely unrendered, so `Champion.draw()` — and
   // with it `spell.drawVfx()` — never ran.
   check(
-    'the caster was unrendered for the whole cast (willDraw false, Champion.draw at zero)',
+    'the caster was unrendered for the whole cast (visibleToPlayerTeam false, Champion.draw at zero)',
     after.sampleCount > 0 &&
-      after.willDrawSeen.every(seen => seen === false) &&
+      after.visibilitySeen.every(seen => seen === false) &&
       after.counters.casterDraws === 0,
-    `willDrawSeen=${JSON.stringify(after.willDrawSeen)} samples=${after.sampleCount} ` +
+    `visibilitySeen=${JSON.stringify(after.visibilitySeen)} samples=${after.sampleCount} ` +
       `casterDraws=${after.counters.casterDraws}`
   );
 

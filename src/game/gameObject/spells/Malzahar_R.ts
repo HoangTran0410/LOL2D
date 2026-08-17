@@ -10,6 +10,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import Stun from '../buffs/Stun';
+import { canSee } from '../../combat/Vision';
 
 // Exported so the suite asserts the grasp's wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.
@@ -88,7 +89,7 @@ export default class Malzahar_R extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isGraspTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isGraspTarget(candidate),
       getTargetInfo: candidate =>
         isGraspTarget(candidate)
           ? {
@@ -182,7 +183,7 @@ export default class Malzahar_R extends Spell {
   isValidTarget(target: unknown): target is AttackableUnit {
     return (
       isGraspTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );

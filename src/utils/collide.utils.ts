@@ -18,22 +18,38 @@ const CollideUtils = {
     );
   },
 
-  // using SAT library + decomp library
-  pointPolygonConcave: (x: number, y: number, vertices: Point[]): boolean => {
-    let _vertices = vertices.map(_ => [_.x, _.y]);
-
+  /**
+   * Convex decomposition of a concave polygon, for reuse across many point
+   * tests against that same polygon.
+   *
+   * Split out of `pointPolygonConcave` because the decomposition depends only
+   * on the polygon, never on the point — and the one caller that matters tests
+   * a whole quadtree page of candidates against a single sight polygon, so
+   * folding it into the point test re-ran `makeCCW` + `quickDecomp` (plus two
+   * array copies) once per candidate, per observer, per frame. Prepare once,
+   * test many.
+   */
+  prepareConcave: (vertices: Point[]): Point[][] => {
+    const _vertices = vertices.map(_ => [_.x, _.y]);
     PolyDecomp.makeCCW(_vertices);
-    let decompVisibility = PolyDecomp.quickDecomp(_vertices);
+    return PolyDecomp.quickDecomp(_vertices).map((poly: number[][]) =>
+      poly.map((_: number[]) => ({ x: _[0], y: _[1] }))
+    );
+  },
 
-    for (let poly of decompVisibility) {
-      let _poly = poly.map((_: number[]) => ({ x: _[0], y: _[1] }));
-      let overlap = CollideUtils.pointPolygon(x, y, _poly);
-      if (overlap) {
-        return true;
-      }
+  /** Point-in-concave-polygon against an already `prepareConcave`d polygon. */
+  pointPreparedConcave: (x: number, y: number, parts: Point[][]): boolean => {
+    for (const part of parts) {
+      if (CollideUtils.pointPolygon(x, y, part)) return true;
     }
     return false;
   },
+
+  // using SAT library + decomp library
+  pointPolygonConcave: (x: number, y: number, vertices: Point[]): boolean =>
+    // Same operations in the same order as before the split, so the semantics
+    // this file's header pins down are unchanged for every existing caller.
+    CollideUtils.pointPreparedConcave(x, y, CollideUtils.prepareConcave(vertices)),
 
   // check collision between circle and arc
   circleArc: (

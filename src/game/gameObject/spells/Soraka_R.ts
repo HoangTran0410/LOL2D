@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
@@ -162,12 +162,6 @@ export class Soraka_R_Blessing extends SpellObject {
   getDisplayBoundingBox() {
     // the shaft starts well above the ally's head
     const r = this.fallHeight + 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

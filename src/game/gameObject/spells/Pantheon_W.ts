@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -271,13 +271,7 @@ export class Pantheon_W_Vault extends SpellObject {
 
   getDisplayBoundingBox() {
     const span = this.owner.stats.size.value * 3;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }
 
@@ -385,12 +379,6 @@ export class Pantheon_W_Impact extends SpellObject {
   getDisplayBoundingBox() {
     // the comet overshoots the ring by a long way behind him
     const span = this.radius * 3.4;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

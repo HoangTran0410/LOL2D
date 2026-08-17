@@ -39,6 +39,49 @@ const drawParticles = (touchUi: boolean, renderQuality?: string): number => {
 beforeEach(() => stubGameGlobals());
 afterEach(() => vi.unstubAllGlobals());
 
+describe('the decoration index', () => {
+  /**
+   * Particles and trails are `GameObject`s so the loop carries them, but no
+   * gameplay question is ever about them. Indexed with everything else they
+   * were still retrieved, stamped and intersect-tested by every one of the
+   * ~150 `queryObjects` call sites, to be discarded by each caller's own type
+   * filter — worst exactly when a fight has the most of them.
+   *
+   * Both halves matter and they pull against each other: skipping them in
+   * queries is the point, and painting them anyway is what stops that being a
+   * regression. A split that dropped them from the draw pass would make the
+   * game faster by deleting its effects.
+   */
+  it('keeps decoration out of gameplay queries while still painting it', () => {
+    const manager = new ObjectManager({ mapSize: 1_000, camera } as never);
+    const solid = new GameObject({ visionRadius: 20 });
+    solid.position.set(50, 50);
+
+    let particlesPainted = 0;
+    const decoration = new ParticleSystem({
+      isDeadFn: () => false,
+      drawFn: () => particlesPainted++,
+      getParticlePosFn: particle => particle,
+      getParticleSizeFn: () => 4,
+    });
+    decoration.particles = [{ x: 50, y: 50 }];
+
+    manager.addObject(solid);
+    manager.addObject(decoration);
+    manager.update();
+
+    const hits = manager.queryObjects({
+      area: new Rectangle({ x: 0, y: 0, w: 100, h: 100 }),
+      queryByDisplayBoundingBox: true,
+    });
+    expect(hits).toContain(solid);
+    expect(hits).not.toContain(decoration);
+
+    manager.draw();
+    expect(particlesPainted).toBeGreaterThan(0);
+  });
+});
+
 describe('ObjectManager mobile rendering', () => {
   it('keeps the mobile render budget in sync with the live touch toggle', () => {
     const game = {

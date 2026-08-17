@@ -27,10 +27,16 @@ where two thumbs sit for the whole match, and avoiding them costs nothing.
 
 ## Fog
 
-The minimap shows only what the player can see — units whose `willDraw` is
-true. `FogOfWar.calculateSight()` already computes that flag every frame and
-`ObjectManager.draw` and `AttackTargeting` already consume it, so there is **no
+The minimap shows only what the player can see — units whose
+`visibleToPlayerTeam` is true. `FogOfWar.calculateSight()` already computes that
+flag every frame and `ObjectManager.draw` already consumes it, so there is **no
 new visibility maths**; the minimap is a second consumer of an existing answer.
+
+> Renamed since this spec was written: the flag was `willDraw`, and it lived on
+> `GameObject`. It is also *only* a rendering answer — `AttackTargeting` used to
+> read it and was moved onto `combat/Vision.ts`, which asks per observer rather
+> than through the player's eyes. The minimap may read it because the minimap is
+> the player's point of view; anything deciding what a unit may *do* may not.
 
 Seeing the whole map is a **toggle in the Gian lận tab**, where it belongs:
 that is a cheat, and putting it there means the minimap itself never has to
@@ -87,7 +93,7 @@ and is exactly what a headless test catches.
 
 - Terrain: wall polygons from `TerrainMap.wallPolygons()`, pre-rendered.
 - The player, in a distinct colour, always (you can always see yourself).
-- Every other unit with `willDraw`, coloured by team using the same
+- Every other unit with `visibleToPlayerTeam`, coloured by team using the same
   `TEAM_COLORS` / `NEUTRAL_COLORS` the minions already use, so a colour means
   the same thing in both places.
 - Turrets and fountains, which are static and always known.

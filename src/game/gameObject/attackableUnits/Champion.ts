@@ -72,6 +72,14 @@ export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
  * The step widens once a pool would draw more than MAX_TICKS, otherwise a
  * grown-out Cho'Gath bar turns into a solid block of lines.
  */
+/**
+ * Crowd-control buffs named under the health bar, in the order they print.
+ * Module-level because the list is fixed and `drawHealthBar` runs per champion
+ * per frame — rebuilding it there made a nine-element array 60 times a second
+ * per champion for a label that is usually empty.
+ */
+const STATUS_TEXT_BUFFS = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear, Taunt];
+
 const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
 const MAX_TICKS = 20;
 
@@ -432,13 +440,27 @@ export default class Champion extends AttackableUnit {
         );
       }
     } else {
-      let statusString = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear, Taunt]
-        .map(BuffClass => {
-          let buff = this.buffs.find(b => b instanceof BuffClass);
-          if (buff && buff.sourceUnit !== this) return buff.name;
-        })
-        .filter(Boolean)
-        .join(', ');
+      // Built with a plain loop over a hoisted class list rather than
+      // map/filter/join over a freshly-built array: this runs per champion per
+      // frame and the answer is the empty string almost always, so the old
+      // shape allocated four arrays and nine closures to say nothing. The
+      // `break` keeps `.find`'s semantics exactly — the *first* buff of a
+      // class decides, and a self-inflicted one prints nothing rather than
+      // deferring to a later buff of the same class.
+      let statusString = '';
+      if (this.buffs.length > 0) {
+        for (let i = 0; i < STATUS_TEXT_BUFFS.length; i++) {
+          const BuffClass = STATUS_TEXT_BUFFS[i];
+          for (let j = 0; j < this.buffs.length; j++) {
+            const buff = this.buffs[j];
+            if (!(buff instanceof BuffClass)) continue;
+            if (buff.sourceUnit !== this) {
+              statusString = statusString ? `${statusString}, ${buff.name}` : buff.name;
+            }
+            break;
+          }
+        }
+      }
 
       if (statusString) {
         noStroke();

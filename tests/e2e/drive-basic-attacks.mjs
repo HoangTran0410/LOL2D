@@ -117,7 +117,7 @@ try {
         pin(bot, x, y);
         game.camera.position.set((player.position.x + x) / 2, (player.position.y + y) / 2);
         await settle();
-        if (bot.willDraw) placed = { x: Math.round(x), y: Math.round(y), radius };
+        if (bot.visibleToPlayerTeam) placed = { x: Math.round(x), y: Math.round(y), radius };
       }
       if (placed) break;
     }
@@ -125,7 +125,7 @@ try {
     window.__probe = { player, bot };
     return {
       placed,
-      botVisible: !!bot.willDraw,
+      botVisible: !!bot.visibleToPlayerTeam,
       botTargetable: !!bot.targetable,
       attackDamage: player.stats.attackDamage.value,
       attacksPerSecond: player.stats.attackSpeed.value,
@@ -223,8 +223,8 @@ try {
       },
       hotKeys: player.spells.map(s => s?.name),
       decoyPlaced: !!decoy,
-      decoyVisible: !!decoy?.willDraw,
-      botVisible: !!bot.willDraw,
+      decoyVisible: !!decoy?.visibleToPlayerTeam,
+      botVisible: !!bot.visibleToPlayerTeam,
       decoyDistanceFromPlayer: decoy
         ? Math.round(player.position.dist(decoy.position))
         : null,

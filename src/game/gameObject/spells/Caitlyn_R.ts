@@ -10,6 +10,7 @@ import TrailSystem from '../helpers/TrailSystem';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
+import { canSee } from '../../combat/Vision';
 
 export const CAITLYN_R_RANGE = 820;
 export const CAITLYN_R_DAMAGE = 55;
@@ -70,7 +71,7 @@ export default class Caitlyn_R extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isCaitlynRTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isCaitlynRTarget(candidate),
       getTargetInfo: candidate =>
         isCaitlynRTarget(candidate)
           ? {
@@ -161,7 +162,7 @@ export default class Caitlyn_R extends Spell {
   private isValidTarget(target: unknown): target is CaitlynRTarget {
     return (
       isCaitlynRTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -219,13 +220,7 @@ export class Caitlyn_R_Bullet extends HomingMissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 2.4;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -348,12 +343,6 @@ export class Caitlyn_R_Hit extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + 160;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

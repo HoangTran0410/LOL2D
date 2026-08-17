@@ -150,14 +150,20 @@ export default class FogOfWar {
       });
     });
 
-    // reset willDraw for all AttackableUnit (structures opt out — once built they
-    // stay on the map, and the update loop is not in lockstep with draw, so
-    // re-enabling them from their own update() would flicker)
+    // Reset the player's-eye visibility flag on every AttackableUnit, then
+    // re-light the ones in sight. Structures opt out — once built they stay on
+    // the map, and the update loop is not in lockstep with draw, so re-enabling
+    // them from their own update() would flicker.
+    //
+    // This flag is the *only* thing the sight pass writes outside itself, and
+    // it feeds rendering alone — see `AttackableUnit.visibleToPlayerTeam`. That
+    // is what keeps the painting side of the fog separable from the game: what
+    // a unit may target is `combat/Vision.ts`'s answer, per observer, never
+    // this one.
     this.game.objectManager.objects.forEach((o: any) => {
-      if (o instanceof AttackableUnit && !o.alwaysVisible) o.willDraw = false;
+      if (o instanceof AttackableUnit && !o.alwaysVisible) o.visibleToPlayerTeam = false;
     });
-    // enable willDraw for all visible players
-    visiblePlayers.forEach((p: any) => (p.willDraw = true));
+    visiblePlayers.forEach((p: any) => (p.visibleToPlayerTeam = true));
 
     if (typeof revision === 'number') {
       this.lastSightCalculation = { revision, cameraKey, result: allSightPoly };
@@ -170,8 +176,14 @@ export default class FogOfWar {
     // (reusing the cached segment list whenever it can — see the file header
     // and computeSightPoly), so it's always frame-accurate. playersInSight is
     // a separate, cheap-enough-to-always-run quadtree lookup that gates
-    // visibility (willDraw); it was already frame-accurate and stays that way.
+    // visibility (visibleToPlayerTeam); it was already frame-accurate and stays so.
     const sightPoly = this.getSightPoly(obj);
+
+    // Decomposed once for the whole scan rather than inside the predicate: the
+    // polygon is the same for every candidate, and `pointPolygonConcave` would
+    // otherwise re-run the full convex decomposition per candidate, per
+    // observer, per frame.
+    const sightParts = CollideUtils.prepareConcave(sightPoly);
 
     const playersInSight = this.game.objectManager.queryObjects({
       area: new Circle({
@@ -181,11 +193,9 @@ export default class FogOfWar {
       }),
       filters: [
         PredefinedFilters.type(AttackableUnit),
-        (o: any) => CollideUtils.pointPolygonConcave(o.position.x, o.position.y, sightPoly),
+        (o: any) => CollideUtils.pointPreparedConcave(o.position.x, o.position.y, sightParts),
       ],
     });
-
-    if (keyIsDown(13)) console.log(playersInSight);
 
     return {
       sightPoly,

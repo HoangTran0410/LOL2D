@@ -148,12 +148,6 @@ export class MasterYi_R_Object extends SpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = AURA_REACH;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

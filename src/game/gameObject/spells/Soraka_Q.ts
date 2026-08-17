@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import BuffAddType from '../../enums/BuffAddType';
@@ -247,12 +247,6 @@ export class Soraka_Q_Object extends SpellObject {
     // the star starts a long way above the impact point, so the box has to hold
     // the whole descent or the effect pops in only once it has already landed
     const r = this.radius + FALL_HEIGHT + 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

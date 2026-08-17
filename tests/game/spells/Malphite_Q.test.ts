@@ -130,7 +130,13 @@ describe('Malphite Q', () => {
     const owner = unit(game, 0, 'blue');
     game.setPlayer(owner);
     const unseen = unit(game, 100, 'red');
-    unseen.willDraw = false;
+    // Hidden the way the game decides hidden: `combat/Vision.ts` is the seam,
+    // and `isInsideBush` is the half of it that still holds in a fixture with
+    // no terrain. This used to set `willDraw` instead, which is the fog's
+    // *draw* flag — it answers "lit for the player", so gating a cast on it
+    // meant a bot could only target what the human could see. See the note on
+    // `findAttackTargetNearPoint`, which was migrated off it for that reason.
+    unseen.isInsideBush = true;
 
     expect(new Malphite_Q(owner).press(castContext(owner, unseen))).toBe(false);
 
@@ -143,7 +149,7 @@ describe('Malphite Q', () => {
     const spell = new (withCastTime(Malphite_Q, TEST_CAST_TIME_MS))(owner);
     const onCancel = vi.spyOn(spell, 'onCancel');
     expect(spell.press(castContext(owner, target))).toBe(true);
-    target.willDraw = false;
+    target.isInsideBush = true;
 
     spell.update();
 

@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange, withinRange } from '../../combat/Reach';
 import BuffAddType from '../../enums/BuffAddType';
@@ -12,6 +12,7 @@ import { applyAblaze, isAblaze } from './Brand_Q';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { canSee } from '../../combat/Vision';
 
 /**
  * Pyroclasm. A fireball thrown at one enemy that then keeps jumping to whoever
@@ -60,7 +61,7 @@ export default class Brand_R extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isBounceTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isBounceTarget(candidate),
       getTargetInfo: candidate =>
         isBounceTarget(candidate)
           ? {
@@ -110,7 +111,7 @@ export default class Brand_R extends Spell {
   private isValidTarget(target: unknown): target is AttackableUnit {
     return (
       isBounceTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -302,12 +303,6 @@ export class Brand_R_Fireball extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 2.4;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

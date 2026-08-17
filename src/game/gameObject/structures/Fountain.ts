@@ -33,7 +33,7 @@ interface Mote {
  * to rather than just a spawn marker.
  *
  * Deliberately a plain GameObject, not an AttackableUnit: it has no health, it
- * cannot be attacked, and FogOfWar's willDraw reset only touches units.
+ * cannot be attacked, and FogOfWar's visibleToPlayerTeam reset only touches units.
  *
  * It carries its base's TeamId so the minion spawner can ask a fountain which
  * side it is, but it still heals whichever champion stands on it — champions are

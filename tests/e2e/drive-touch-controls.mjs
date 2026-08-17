@@ -473,7 +473,7 @@ try {
       bot.destination.set(bot.position.x, bot.position.y);
     }
     return bot
-      ? { x: bot.position.x, y: bot.position.y, visible: bot.willDraw }
+      ? { x: bot.position.x, y: bot.position.y, visible: bot.visibleToPlayerTeam }
       : null;
   });
   await page.waitForTimeout(400);
@@ -487,14 +487,14 @@ try {
     const game = window.__lol2d.scene.oScene.game;
     const spell = game.player.spells[1];
     const context = spell.castContext;
-    const bot = game.objectManager.objects.find(o => o.constructor.name === 'AIChampion' && o.willDraw);
+    const bot = game.objectManager.objects.find(o => o.constructor.name === 'AIChampion' && o.visibleToPlayerTeam);
     return {
       // Counted by kind: an orb still in flight from the previous check spawns
       // its own trail and impact effects, which are also owned by the player.
       spawned: window.__spawned.filter(o => o.kind === 'Ahri_Q_Object').length,
       direction: context ? { x: context.direction.x, y: context.direction.y } : null,
       cooldown: Math.round(spell.currentCooldown),
-      victim: bot ? { x: bot.position.x, y: bot.position.y, visible: bot.willDraw } : null,
+      victim: bot ? { x: bot.position.x, y: bot.position.y, visible: bot.visibleToPlayerTeam } : null,
       origin: context ? { x: context.origin.x, y: context.origin.y } : null,
     };
   });

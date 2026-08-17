@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import StatusFlags from '../../enums/StatusFlags';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -389,13 +389,7 @@ export class Rammus_Q_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size / 2 + 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -465,12 +459,6 @@ export class Rammus_Q_Crash extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = 170 + this.power * 120;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

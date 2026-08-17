@@ -70,6 +70,21 @@ function zIndexOf(o: GameObject): number {
   return o.zIndex ?? classZIndex;
 }
 
+/**
+ * Objects that exist only to be looked at, and so are indexed separately from
+ * everything a gameplay query can ask about — see `ObjectManager._decorTree`.
+ *
+ * Deliberately a closed list of two rather than a `decorative = true` flag on
+ * `GameObject`: a flag invites a spell object to set it because "it's only
+ * VFX", and a spell object is exactly the thing that must stay queryable. Add
+ * to this list only for something that deals no damage, holds no target and
+ * blocks nothing. `CombatText` is not here on purpose — it extends
+ * `SpellObject`, so a query narrowing by that type would quietly stop seeing it.
+ */
+function isDecoration(o: GameObject): boolean {
+  return o instanceof ParticleSystem || o instanceof TrailSystem;
+}
+
 export interface QueryOptions {
   area?: QueryArea;
   filters?: readonly GameObjectFilter[];
@@ -198,6 +213,22 @@ export default class ObjectManager {
   objects: GameObject[] = [];
   _objectToBeAdd: GameObject[] = [];
   _objectsTree!: Quadtree;
+  /**
+   * Spatial index for decoration — particle systems and trails.
+   *
+   * They are `GameObject`s so the update/draw loop carries them for free, but
+   * nothing in the game ever asks a spatial question *about* them: they deal no
+   * damage, hold no target and block nothing. Kept in the main index they were
+   * still inserted every tick and then retrieved, stamped and intersect-tested
+   * by every one of the ~150 `queryObjects` call sites, only to be thrown away
+   * by each caller's own type filter — and a fight is where there are most of
+   * them and least budget to spare.
+   *
+   * Splitting them out shrinks the gameplay tree as well as skipping the work,
+   * so the queries that remain go shallower. `draw` reads both; `queryObjects`
+   * reads only the gameplay one, which is the whole point.
+   */
+  _decorTree!: Quadtree;
   _objectsTreeIsUpdating = false;
   _deadBuffer: number[] = [];
   revision = 0;
@@ -217,6 +248,14 @@ export default class ObjectManager {
       // that spans multiple quadrants near a boundary gets inserted into
       // each one) on every rebuild, every tick. 12 keeps leaves shallow
       // without turning every query into a near-linear scan of one big leaf.
+      maxObjects: 12,
+      maxLevels: 4,
+    });
+    this._decorTree = new Quadtree({
+      x: 0,
+      y: 0,
+      w: mapSize,
+      h: mapSize,
       maxObjects: 12,
       maxLevels: 4,
     });
@@ -267,8 +306,12 @@ export default class ObjectManager {
     // update quadtree
     this._objectsTreeIsUpdating = true;
     this._objectsTree.clear();
+    this._decorTree.clear();
     for (const o of this.objects) {
-      this._objectsTree.insert(o.getDisplayBoundingBox());
+      // Decoration is indexed apart from everything gameplay can ask about —
+      // see `_decorTree`.
+      const tree = isDecoration(o) ? this._decorTree : this._objectsTree;
+      tree.insert(o.getDisplayBoundingBox());
     }
     this._objectsTreeIsUpdating = false;
     this.revision++;
@@ -293,15 +336,26 @@ export default class ObjectManager {
     const drawables: { o: GameObject; z: number }[] = [];
     let particleCount = 0;
     let attackableCount = 0;
-    for (const region of this._objectsTree.retrieve(camBound) as GameObjectRegion[]) {
-      const o = region.data;
-      if (!o.willDraw) continue;
-      if (o instanceof AttackableUnit && !o.getCollideBoundingBox().intersect(visualBound)) continue;
-      // zIndexOf does a Map lookup + Object.hasOwn — computed once here
-      // rather than repeatedly by the sort comparator below.
-      drawables.push({ o, z: zIndexOf(o) });
-      if (o instanceof ParticleSystem) particleCount += o.particles.length;
-      if (o instanceof AttackableUnit) attackableCount++;
+    // Both indexes: decoration lives in its own tree so gameplay queries never
+    // page it in (see `_decorTree`), but it still has to be painted, so the
+    // draw pass is the one caller that reads both. An object is in exactly one
+    // of them, so the two walks cannot hand back the same thing twice.
+    for (const tree of [this._objectsTree, this._decorTree]) {
+      for (const region of tree.retrieve(camBound) as GameObjectRegion[]) {
+        const o = region.data;
+        if (o instanceof AttackableUnit) {
+          // The fog's answer for the player's own eyes — rendering only. What a
+          // unit may *target* is `combat/Vision.ts`, asked per observer.
+          if (!o.visibleToPlayerTeam) continue;
+          if (!o.getCollideBoundingBox().intersect(visualBound)) continue;
+          attackableCount++;
+        } else if (o instanceof ParticleSystem) {
+          particleCount += o.particles.length;
+        }
+        // zIndexOf does a Map lookup + Object.hasOwn — computed once here
+        // rather than repeatedly by the sort comparator below.
+        drawables.push({ o, z: zIndexOf(o) });
+      }
     }
     drawables.sort((a, b) => a.z - b.z);
 

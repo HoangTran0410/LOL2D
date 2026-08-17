@@ -262,7 +262,8 @@ function borrowedEyeSees(game: VisionHost | undefined, eye: Seeable, target: See
  * Whether `observer`'s team can see `target` right now.
  *
  * Structures are exempt (`alwaysVisible`): once a turret is discovered it stays
- * on the map, and `FogOfWar` already refuses to clear its `willDraw`. Allies are
+ * on the map, and `FogOfWar` already refuses to clear its `visibleToPlayerTeam`.
+ * Allies are
  * exempt for the obvious reason.
  */
 export function canSee(observer: Seeable | undefined, target: Seeable | undefined): boolean {

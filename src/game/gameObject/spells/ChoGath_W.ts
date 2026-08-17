@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import CollideUtils from '../../../utils/collide.utils';
 import BuffAddType from '../../enums/BuffAddType';
@@ -124,12 +124,6 @@ export class ChoGath_W_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.currentRange,
-      y: this.position.y - this.currentRange,
-      w: this.currentRange * 2,
-      h: this.currentRange * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.currentRange * 2);
   }
 }

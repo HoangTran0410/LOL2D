@@ -4,7 +4,7 @@ import MissileSpellObject from '../MissileSpellObject';
 import Spell from '../Spell';
 import Slow from '../buffs/Slow';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import { effectiveRange } from '../../combat/Reach';
 import SpellObject from '../SpellObject';
 import TrailSystem from '../helpers/TrailSystem';
@@ -258,13 +258,7 @@ export class Ekko_Q_Object extends MissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.expanded ? EKKO_Q_FIELD_RADIUS + 20 : this.size + 10;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -327,12 +321,6 @@ export class Ekko_Q_HitFlash extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = 80;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

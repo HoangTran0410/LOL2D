@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
@@ -294,12 +294,6 @@ export class Jinx_E_Chomper extends Pet {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - BLAST_RADIUS,
-      y: this.position.y - BLAST_RADIUS,
-      w: BLAST_RADIUS * 2,
-      h: BLAST_RADIUS * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(BLAST_RADIUS * 2);
   }
 }

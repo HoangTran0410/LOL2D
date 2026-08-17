@@ -69,7 +69,7 @@ export interface QuadtreeNode {
 /** Just enough of a `GameObject` for the layers below to draw it. */
 interface DebugDrawable {
   position: { x: number; y: number };
-  willDraw?: boolean;
+  visibleToPlayerTeam?: boolean;
   visionRadius?: number;
   getCollideBoundingBox?(): Circle | Line | Rectangle;
 }
@@ -141,7 +141,8 @@ function drawCollision(host: DebugOverlayHost): void {
 /**
  * The visibility polygon behind the fog, per unit that has one.
  *
- * `willDraw` is the fog's own answer to "is this unit visible", written by
+ * `visibleToPlayerTeam` is the fog's own answer to "does the player see this",
+ * written by
  * `FogOfWar.calculateSight()` earlier in the same frame, so this layer shows
  * vision for exactly what is on screen. `getSightPoly` is cached per unit and
  * position, so for the allies the fog already asked about this frame it is a
@@ -154,7 +155,7 @@ function drawVision(host: DebugOverlayHost): void {
   stroke(255, 230, 120, 170);
   strokeWeight(1.5);
   for (const object of host.objectManager.objects) {
-    if (!object.willDraw) continue;
+    if (!object.visibleToPlayerTeam) continue;
     if (!object.visionRadius || object.visionRadius <= 0) continue;
     const polygon = host.fogOfWar.getSightPoly(object);
     if (polygon.length === 0) continue;

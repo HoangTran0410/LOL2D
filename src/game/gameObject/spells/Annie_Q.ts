@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import { withinRange } from '../../combat/Reach';
@@ -83,7 +83,7 @@ export default class Annie_Q extends Spell implements ExecuteSpell {
         return best ?? nearestToCursor;
       },
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isAnnieTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isAnnieTarget(candidate),
       getTargetInfo: candidate =>
         isAnnieTarget(candidate)
           ? {
@@ -265,13 +265,7 @@ export class Annie_Q_Object extends HomingMissileSpellObject {
   // tongues and heat glow both paint well past the 22px hitbox
   getDisplayBoundingBox() {
     const r = this.size * 1.8;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -348,12 +342,6 @@ export class Annie_Q_Burst extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

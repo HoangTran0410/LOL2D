@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import CollideUtils from '../../../utils/collide.utils';
 import VectorUtils from '../../../utils/vector.utils';
@@ -359,13 +359,7 @@ export class Veigar_Q_Object extends MissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 1.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -414,12 +408,6 @@ export class Veigar_Q_Implode extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

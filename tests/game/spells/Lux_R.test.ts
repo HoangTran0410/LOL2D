@@ -68,7 +68,7 @@ const context = (caster: unknown): CastContext => Object.freeze({
 });
 
 interface WorldObject {
-  willDraw?: boolean;
+  visibleToPlayerTeam?: boolean;
   toRemove?: boolean;
   getDisplayBoundingBox?: () => Rectangle;
   draw?: () => void;
@@ -76,14 +76,15 @@ interface WorldObject {
 
 /**
  * The world draw pass, as `ObjectManager.draw()` runs it: every live object
- * whose *own* display bounding box is on camera and whose `willDraw` is still
- * set. The caster is deliberately not in this list — she is off camera, and
- * `FogOfWar` clears `willDraw` on every unit the player cannot see — because
+ * whose *own* display bounding box is on camera and which the fog has not
+ * hidden. The caster is deliberately not in this list — she is off camera, and
+ * `FogOfWar` clears `visibleToPlayerTeam` on every unit the player cannot see —
+ * because
  * that is the frame the beam has to survive.
  */
 const drawWorld = (objects: readonly WorldObject[], camera: Rectangle): void => {
   for (const object of objects) {
-    if (object.toRemove || object.willDraw === false) continue;
+    if (object.toRemove || object.visibleToPlayerTeam === false) continue;
     if (!object.getDisplayBoundingBox?.().intersect(camera)) continue;
     object.draw?.();
   }

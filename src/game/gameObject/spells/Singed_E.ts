@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -251,12 +251,6 @@ export class Singed_E_Impact extends SpellObject {
 
   getDisplayBoundingBox() {
     const span = this.radius * 1.8;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

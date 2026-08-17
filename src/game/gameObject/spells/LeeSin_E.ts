@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import BuffAddType from '../../enums/BuffAddType';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -255,12 +255,6 @@ export class LeeSin_E_Object extends SpellObject {
    */
   getDisplayBoundingBox() {
     const span = this.range + 60;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

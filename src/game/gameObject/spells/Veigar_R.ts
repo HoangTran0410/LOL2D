@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange, withinRange } from '../../combat/Reach';
 import Spell from '../Spell';
@@ -9,6 +8,7 @@ import TrailSystem from '../helpers/TrailSystem';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
+import { canSee } from '../../combat/Vision';
 
 type VeigarRTarget = AttackableUnit;
 
@@ -62,7 +62,7 @@ export default class Veigar_R extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isVeigarRTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isVeigarRTarget(candidate),
       getTargetInfo: candidate =>
         isVeigarRTarget(candidate)
           ? {
@@ -111,7 +111,7 @@ export default class Veigar_R extends Spell {
   private isValidTarget(target: unknown): target is VeigarRTarget {
     return (
       isVeigarRTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -198,13 +198,7 @@ export class Veigar_R_Object extends HomingMissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 1.8;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -254,12 +248,6 @@ export class Veigar_R_Burst extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

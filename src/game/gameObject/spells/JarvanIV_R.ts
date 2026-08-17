@@ -4,7 +4,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Dash from '../buffs/Dash';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import ActionState from '../../enums/ActionState';
 import { hasFlag } from '../../../utils/index';
@@ -234,13 +234,7 @@ export class JarvanIV_R_ImpactObject extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.blastRadius + 60;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -437,12 +431,6 @@ export class JarvanIV_R_WallObject extends SpellObject implements DynamicWall {
 
   getDisplayBoundingBox() {
     const r = Math.hypot(this.length, this.thickness) / 2 + 50;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

@@ -8,6 +8,7 @@ import { grantRejuvenation, hasRejuvenation } from './Soraka_Q';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { canSee } from '../../combat/Vision';
 
 /**
  * Astral Infusion. Soraka pays her own health to heal an ally — the one spell
@@ -55,7 +56,7 @@ export default class Soraka_W extends Spell {
       range: this.range,
       targetTeam: 'ALLY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isInfusionTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isInfusionTarget(candidate),
       getTargetInfo: candidate =>
         isInfusionTarget(candidate)
           ? {
@@ -127,7 +128,7 @@ export default class Soraka_W extends Spell {
   private isValidTarget(target: unknown): target is AttackableUnit {
     return (
       isInfusionTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId === this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );

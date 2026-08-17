@@ -70,4 +70,40 @@ describe('an auto-locking spell cannot pick a target it cannot see', () => {
 
     expect(scanned).toBeGreaterThan(15);
   });
+
+  /**
+   * The other way a spell asks "can I see it", and the wrong one.
+   *
+   * `visibleToPlayerTeam` (once `willDraw`) is `FogOfWar`'s own flag:
+   * `calculateSight` clears it on every unit and re-lights it from
+   * `game.player.teamId`'s eyes, so it answers "is this lit *for the human*"
+   * and nothing else. Thirteen UNIT-targeted spells
+   * gated targeting on it, which meant a bot could not target an enemy beside
+   * it in a bush the player happened not to see, and could target one across
+   * the map the player did. It is also a *draw* flag, so it says nothing at all
+   * before the first frame is painted.
+   *
+   * `combat/Vision.ts` answers the same question per observer, which is why
+   * `findAttackTargetNearPoint` was migrated off `willDraw` first and these
+   * followed. Nothing in a spell should read it again: a spell deciding what it
+   * may *hit* has no business knowing what the camera is showing.
+   */
+  it('no spell decides targeting from the fog draw flag', () => {
+    // Both names on purpose. `willDraw` is dead and the scan keeps it from
+    // being resurrected, but the live risk is the *current* name: the rename
+    // made the flag honest, not unreachable, and a spell reaching for
+    // `visibleToPlayerTeam` would be the identical bug wearing better
+    // spelling. Neither belongs in this directory at all.
+    const FOG_DRAW_FLAG = /\bwillDraw\b|\bvisibleToPlayerTeam\b/;
+    const offenders: string[] = [];
+
+    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
+      // Comments stripped first: Lux R documents the flag at length, and
+      // flagging that would be the scan reporting its own explanation.
+      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+      if (FOG_DRAW_FLAG.test(source)) offenders.push(file);
+    }
+
+    expect(offenders).toEqual([]);
+  });
 });

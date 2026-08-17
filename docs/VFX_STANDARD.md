@@ -47,11 +47,16 @@ camera while its damage lands normally.
 ```ts
 getDisplayBoundingBox() {
   const r = this.radius + 40;
-  return new Rectangle({
-    x: this.position.x - r, y: this.position.y - r, w: r * 2, h: r * 2, data: this,
-  });
+  return this.squareDisplayBoundingBox(r * 2);
 }
 ```
+
+The helper takes the full edge length and memoises on `(position, size)`; the
+box is read at least three times a frame per object, so a hand-rolled
+`new Rectangle` is an allocation on every one of them. Build the `Rectangle`
+yourself only when the box is *not* a square around your own centre — a path, a
+tether back to the caster, a span over several victims — because those depend on
+state the cache key does not watch.
 
 **Never assign `dashBuff.onUpdate`.** `Dash` implements its movement in
 `Dash.prototype.onUpdate`, so an instance assignment replaces the frame rather

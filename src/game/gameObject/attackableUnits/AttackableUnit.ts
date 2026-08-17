@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import { hasFlag } from '../../../utils/index';
 import ActionState from '../../enums/ActionState';
 import BuffAddType from '../../enums/BuffAddType';
@@ -42,6 +42,31 @@ export const DISPLACEMENT_GRACE_FRAMES = 2;
 
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
+
+  /**
+   * Whether **the player's team** currently has vision of this unit.
+   *
+   * Written once a frame by `FogOfWar.calculateSight`, which clears it on every
+   * unit and re-lights it from `game.player.teamId`'s eyes. Read by the three
+   * things that render the player's point of view — the draw cull, the minimap
+   * and the debug overlay — and by nothing else.
+   *
+   * **It is not a targeting gate, and it is not a general "should I paint
+   * this" flag.** It used to be called `willDraw` and lived on `GameObject`,
+   * and both halves of that name were wrong: thirteen abilities read it as
+   * "can my caster see this", which silently gated every bot's spell on what
+   * the *human* could see — a bot could not target an enemy beside it in a
+   * bush the player had not lit, and could target one across the map the
+   * player had. `combat/Vision.ts` (`canSee` / `PredefinedFilters.visibleTo`)
+   * answers that question per observer and is the only thing that may decide
+   * what a unit is allowed to do; `tests/game/spells/target-vision-seam.test.ts`
+   * keeps the old name from coming back.
+   *
+   * It lives here rather than on `GameObject` because the fog only ever
+   * touches units — asking a particle system whether the player's team can see
+   * it never meant anything.
+   */
+  visibleToPlayerTeam = true;
 
   /** Kills, deaths, farm and damage — the scoreboard. See `combat/MatchTally.ts`. */
   readonly tally = new MatchTally();
@@ -340,7 +365,20 @@ export default class AttackableUnit extends GameObject {
   }
 
   updateBuffs(): void {
-    this.buffs = this.buffs.filter(buff => !buff.toRemove);
+    // Compact in place, and only when something actually expired. This was a
+    // `.filter`, which built a fresh array per unit per frame to almost always
+    // hand back the same list — buffs expire on events, not on the clock.
+    // Same two-pointer shape ObjectManager and MinionSpawner use, and it keeps
+    // insertion order, which `modifyIncomingDamage` depends on.
+    let removed = 0;
+    for (let i = 0; i < this.buffs.length; i++) {
+      if (this.buffs[i].toRemove) {
+        removed++;
+        continue;
+      }
+      if (removed > 0) this.buffs[i - removed] = this.buffs[i];
+    }
+    if (removed > 0) this.buffs.length -= removed;
 
     this._buffEffectsToEnable = 0;
     this._buffEffectsToDisable = 0;
@@ -547,14 +585,24 @@ export default class AttackableUnit extends GameObject {
   }
 
   move() {
-    let distance = this.position.dist(this.destination);
-    let speed = this.stats.speed.value;
+    // Written out rather than as `p5.Vector.sub(...).normalize().mult(speed)`,
+    // which allocated a vector per moving unit per frame. The arithmetic is
+    // deliberately in p5's own order — normalize multiplies by `1 / len`, it
+    // does not divide — so this is bit-identical to what it replaced, not
+    // merely equivalent to within rounding.
+    const dx = this.destination.x - this.position.x;
+    const dy = this.destination.y - this.position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const speed = this.stats.speed.value;
 
     if (distance <= speed) {
       this.position.set(this.destination.x, this.destination.y);
     } else {
-      let direction = p5.Vector.sub(this.destination, this.position).normalize();
-      this.position.add(direction.mult(speed));
+      // `distance > speed >= 0` here, so it is never zero and normalize's own
+      // zero-length guard has nothing to protect.
+      const inverseDistance = 1 / distance;
+      this.position.x += dx * inverseDistance * speed;
+      this.position.y += dy * inverseDistance * speed;
     }
     return true;
   }
@@ -639,11 +687,6 @@ export default class AttackableUnit extends GameObject {
   private _unitCollideBBY = NaN;
   private _unitCollideBBSize = NaN;
 
-  private _unitDisplayBB: Rectangle | null = null;
-  private _unitDisplayBBX = NaN;
-  private _unitDisplayBBY = NaN;
-  private _unitDisplayBBSize = NaN;
-
   getCollideBoundingBox() {
     const size = this.animatedValues.size;
     if (
@@ -667,26 +710,9 @@ export default class AttackableUnit extends GameObject {
   }
 
   getDisplayBoundingBox() {
-    const size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
-    if (
-      this._unitDisplayBB &&
-      this._unitDisplayBBX === this.position.x &&
-      this._unitDisplayBBY === this.position.y &&
-      this._unitDisplayBBSize === size
-    ) {
-      return this._unitDisplayBB;
-    }
-    this._unitDisplayBBX = this.position.x;
-    this._unitDisplayBBY = this.position.y;
-    this._unitDisplayBBSize = size;
-    this._unitDisplayBB = new Rectangle({
-      x: this.position.x - size / 2,
-      y: this.position.y - size / 2,
-      w: size,
-      h: size,
-      data: this,
-    });
-    return this._unitDisplayBB;
+    return this.squareDisplayBoundingBox(
+      this.isAllied ? this.visionRadius * 2 : this.animatedValues.size
+    );
   }
 
   get canCast() {

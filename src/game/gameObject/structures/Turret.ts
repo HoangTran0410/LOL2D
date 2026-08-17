@@ -1,12 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
 import type { KillCredit } from '../../combat/MatchTally';
 import type { AttackableUnitOptions } from '../attackableUnits/AttackableUnit';
 import Champion from '../attackableUnits/Champion';
-import Minion from '../attackableUnits/Minion';
+import Minion, { AGGRO_SCAN_INTERVAL_MS } from '../attackableUnits/Minion';
 import TrailSystem from '../helpers/TrailSystem';
 import { PredefinedFilters } from '../../managers/ObjectManager';
+import { canSee } from '../../combat/Vision';
 
 export interface TurretPresetData {
   health: number;
@@ -78,6 +79,8 @@ export default class Turret extends AttackableUnit {
 
   target: AttackableUnit | null = null;
   _attackCooldown = 0;
+  /** Time left until the next full target scan — see `update`. */
+  _scanCooldown = 0;
   /** ms since the last hit taken — gates self-repair. */
   _sinceDamaged = Infinity;
   /** ms left on the muzzle flash. */
@@ -136,7 +139,23 @@ export default class Turret extends AttackableUnit {
     }
 
     this._attackCooldown -= deltaTime;
-    this.target = this.findTarget();
+
+    // Re-scan on a cadence, the way minions and camps already do. A turret
+    // fires at most once per `attackInterval` (1300ms), so re-picking its
+    // target 60 times a second bought nothing and cost a quadtree query plus
+    // a Circle and four filter closures every frame, per turret.
+    //
+    // The cadence never delays *dropping* a target: `stillValidTarget` re-runs
+    // the same predicates `findTarget` filters on, against the one unit we
+    // already hold, every frame. So stealth, death, untargetability, a team
+    // change or walking out of range still break aggro on the frame they
+    // happen — only *acquiring* a new target waits for the next scan, and it
+    // rescans immediately when the current one is lost.
+    this._scanCooldown -= deltaTime;
+    if (this._scanCooldown <= 0 || !this.stillValidTarget(this.target)) {
+      this._scanCooldown = AGGRO_SCAN_INTERVAL_MS;
+      this.target = this.findTarget();
+    }
     // `canAttack` for the same reason minions and camps need it: a building
     // fires on its own timer and never went through `BasicAttackController`, so
     // crowd control spent on a turret bought nothing at all.
@@ -155,6 +174,26 @@ export default class Turret extends AttackableUnit {
    * Still champions and minions only — a turret next to a jungle camp would
    * otherwise farm it forever, and one next to another turret would shoot that.
    */
+  /**
+   * The predicates `findTarget` filters on, re-checked against a single unit
+   * we already hold. Kept in step with the filter list below by hand — there
+   * is no way to run a `PredefinedFilters` chain against one object without
+   * rebuilding the closures this exists to avoid.
+   */
+  private stillValidTarget(target: AttackableUnit | null): boolean {
+    if (!target) return false;
+    if (target.isDead || !target.targetable) return false;
+    if (target.isStealthed) return false;
+    if (target.teamId === this.teamId) return false;
+    if (!(target instanceof Champion || target instanceof Minion)) return false;
+
+    const dx = target.position.x - this.position.x;
+    const dy = target.position.y - this.position.y;
+    if (dx * dx + dy * dy > this.attackRange * this.attackRange) return false;
+
+    return canSee(this, target);
+  }
+
   findTarget(): AttackableUnit | null {
     const found = this.game.objectManager.queryObjects({
       area: new Circle({
@@ -176,7 +215,12 @@ export default class Turret extends AttackableUnit {
     let nearestChampionDist = Infinity;
 
     for (const unit of found) {
-      const d = p5.Vector.dist(this.position, unit.position);
+      // Squared: these two numbers are only ever compared with each other, and
+      // squaring is monotonic, so the nearest unit is the same one without the
+      // per-candidate sqrt (and without p5.Vector.dist's copy/sub pair).
+      const dx = unit.position.x - this.position.x;
+      const dy = unit.position.y - this.position.y;
+      const d = dx * dx + dy * dy;
       if (unit instanceof Minion) {
         if (d < nearestMinionDist) {
           nearestMinionDist = d;
@@ -345,14 +389,7 @@ export default class Turret extends AttackableUnit {
   drawDir() {}
 
   getDisplayBoundingBox() {
-    const size = this.stats.size.value * 1.6;
-    return new Rectangle({
-      x: this.position.x - size / 2,
-      y: this.position.y - size / 2,
-      w: size,
-      h: size,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.stats.size.value * 1.6);
   }
 }
 

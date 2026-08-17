@@ -270,13 +270,7 @@ export class Jinx_R_Object extends MissileSpellObject {
     // Generous: the plume alone reaches ~280 behind a fully charged rocket, and
     // the box is what decides whether any of this is drawn at all.
     const span = ROCKET_LENGTH * 1.6;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }
 

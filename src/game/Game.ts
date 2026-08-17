@@ -680,10 +680,12 @@ export default class Game {
   /**
    * One dot per thing worth knowing about, rebuilt each frame.
    *
-   * Visibility is read off `willDraw`, never recomputed: `FogOfWar.
+   * Visibility is read off `visibleToPlayerTeam`, never recomputed: `FogOfWar.
    * calculateSight()` already sets it every frame and `ObjectManager.draw`
-   * already consumes it, so the minimap is a second reader of one answer.
-   * Structures keep `willDraw` true for good (turrets are `alwaysVisible`, and
+   * already consumes it, so the minimap is a second reader of one answer. Like
+   * both of those it is a *rendering* question — "what does the player see" —
+   * which is why it may read this flag at all; see `AttackableUnit`.
+   * Structures keep it true for good (turrets are `alwaysVisible`, and
    * a fountain is not an `AttackableUnit` at all, so the fog's per-frame reset
    * never touches either) — which is exactly the "static and always known"
    * the minimap wants, with no special case here.
@@ -701,7 +703,7 @@ export default class Game {
       const isStructure = object instanceof Turret || object instanceof Fountain;
       if (!isStructure && !(object instanceof AttackableUnit)) continue;
       if (unit.isDead) continue;
-      if (!isStructure && !reveal && !object.willDraw) continue;
+      if (!isStructure && !reveal && !unit.visibleToPlayerTeam) continue;
       blips.push({
         x: object.position.x,
         y: object.position.y,

@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
@@ -205,13 +204,7 @@ export class Ahri_Q_Object extends MissileSpellObject {
   // tails and halo reach well past the 35px hitbox
   getDisplayBoundingBox() {
     const r = this.size * ORB_PAINT_REACH;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -286,12 +279,6 @@ export class Ahri_Q_Impact extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + this.maxRadius + 20;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

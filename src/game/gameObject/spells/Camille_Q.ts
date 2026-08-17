@@ -4,7 +4,6 @@ import Buff from '../Buff';
 import EventType from '../../enums/EventType';
 import Speedup from '../buffs/Speedup';
 import SpellObject from '../SpellObject';
-import { Rectangle } from '../../../libs/quadtree';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 /** How long before the blade finishes charging and the hit turns true damage. */
@@ -253,12 +252,6 @@ export class Camille_Q_AuraObject extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = BLADE_ORBIT * 2.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

@@ -6,7 +6,7 @@ import Dash from '../buffs/Dash';
 import Invulnerable from '../buffs/Invulnerable';
 import Untargetable from '../buffs/Untargetable';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
@@ -278,12 +278,6 @@ export class Camille_R_Object extends SpellObject {
   getDisplayBoundingBox() {
     // the seal animation starts nearly twice as wide as the final radius
     const r = this.radius * 2 + 40;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

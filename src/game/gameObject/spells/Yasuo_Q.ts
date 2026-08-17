@@ -386,12 +386,6 @@ export class Yasuo_Q3_Object extends MissileSpellObject {
     // The outermost crescent sits at 0.74 * size from the centre, so the base
     // class's `size`-wide box would clip the funnel off its own tornado.
     const span = this.size * 0.9 + 20;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

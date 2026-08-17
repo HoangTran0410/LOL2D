@@ -50,6 +50,7 @@ describe('Champion spell presentation lifecycle', () => {
       _deadBuffer: [],
       _objectsTreeIsUpdating: false,
       _objectsTree: { clear: vi.fn(), insert: vi.fn() },
+      _decorTree: { clear: vi.fn(), insert: vi.fn() },
       // hand-built manager, so the class field initialisers never ran
       unitCollision: { resolve: vi.fn() },
     });

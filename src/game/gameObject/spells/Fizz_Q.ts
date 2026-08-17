@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -192,12 +192,6 @@ export class Fizz_Q_Slash extends SpellObject {
   getDisplayBoundingBox() {
     // The prongs and the flung droplets both overshoot the body by SLASH_REACH.
     const span = SLASH_REACH * 2;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

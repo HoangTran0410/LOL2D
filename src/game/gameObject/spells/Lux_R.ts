@@ -74,7 +74,7 @@ export const MANA_COST = 100;
  *
  * `castSpec.vfx` is drawn from `Champion.draw()`, so it inherits the caster's
  * visibility twice over: `ObjectManager.draw()` only reaches objects whose
- * *own* display box is on camera, and `FogOfWar` clears `willDraw` on every
+ * *own* display box is on camera, and `FogOfWar` clears `visibleToPlayerTeam` on every
  * unit the player cannot see. A 3400px beam hung off a 40px champion therefore
  * vanished outright whenever Lux was off screen or in fog, while still doing
  * its damage and stamping its reveal on the victim — measured on a real match:

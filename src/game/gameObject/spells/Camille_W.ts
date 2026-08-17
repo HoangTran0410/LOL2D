@@ -4,7 +4,7 @@ import Spell from '../Spell';
 import SpellObject from '../SpellObject';
 import Slow from '../buffs/Slow';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
 export const CAMILLE_W_OUTER_DAMAGE = 40;
@@ -211,12 +211,6 @@ export class Camille_W_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.range + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

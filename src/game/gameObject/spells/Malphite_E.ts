@@ -202,12 +202,6 @@ export class Malphite_E_Object extends SpellObject {
   // the shockwave and debris both reach out to the true radius
   getDisplayBoundingBox(): Rectangle {
     const r = this.radius + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

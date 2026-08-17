@@ -10,6 +10,7 @@ import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
 import TrailSystem from '../helpers/TrailSystem';
+import { canSee } from '../../combat/Vision';
 
 type SigilTarget = AttackableUnit;
 
@@ -53,7 +54,7 @@ export default class Leblanc_Q extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isSigilTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isSigilTarget(candidate),
       getTargetInfo: candidate =>
         isSigilTarget(candidate)
           ? {
@@ -105,7 +106,7 @@ export default class Leblanc_Q extends Spell {
   private isValidTarget(target: unknown): target is SigilTarget {
     return (
       isSigilTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -221,12 +222,6 @@ export class Leblanc_Q_Object extends HomingMissileSpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const pad = this.size * 1.6;
-    return new Rectangle({
-      x: this.position.x - pad,
-      y: this.position.y - pad,
-      w: pad * 2,
-      h: pad * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(pad * 2);
   }
 }

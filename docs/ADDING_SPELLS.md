@@ -116,6 +116,15 @@ showing nothing but fog, and leaped through the wall to bite it. The filter asks
 `FogOfWar` paints them, and is a no-op for allies. `tests/game/spells/
 target-vision-seam.test.ts` scans for the missing line.
 
+**Do not reach for `AttackableUnit.visibleToPlayerTeam` instead.** It is the
+fog's own flag, written from *the player's* eyes for the draw cull, the minimap
+and the debug overlay, and it answers a rendering question rather than a
+targeting one. Thirteen abilities had used it as a vision check (under its old
+name, `willDraw`, which is what made it look like one), and every bot's spell
+was quietly limited to what the human could see: it could not target an enemy
+beside it in an unlit bush, and could target one across the map the player had
+lit. The same source scan now rejects the name anywhere under `spells/`.
+
 The gate is on **acquisition, never on damage**. An area effect still hits
 everyone it overlaps — Amumu W ticking on the champion hiding in the bush is
 correct, and adding the filter there would be the bug. The question to ask of a
@@ -213,11 +222,23 @@ vanishes at the screen edge while its damage lands normally.
 ```ts
 getDisplayBoundingBox() {
   const r = this.radius + 40; // everything the draw actually touches
-  return new Rectangle({
-    x: this.position.x - r, y: this.position.y - r, w: r * 2, h: r * 2, data: this,
-  });
+  return this.squareDisplayBoundingBox(r * 2);
 }
 ```
+
+`squareDisplayBoundingBox` takes the full edge length and **memoises on
+`(position, size)`**, so the box is rebuilt only when one of those actually
+moves. Prefer it: the box is asked for at least three times a frame per object
+(quadtree rebuild, draw cull, every targeting candidate), and hand-rolling a
+`new Rectangle` here is an allocation on all of them. `Minion`, `MinionSwing`
+and `Turret` each shipped with that hand-rolled version and silently opted the
+most numerous units on the board out of the cache.
+
+**Build a `Rectangle` by hand when the box is not a square around your own
+centre** — a ribbon that follows a path, a tether that reaches back to the
+caster, anything spanning a list of victims. The helper's cache key is only
+position and size, so a box that depends on anything else would go stale
+without ever missing the cache. `Yasuo_E` and `Yasuo_R` are the live examples.
 
 `MissileSpellObject` already supplies one sized to `size`; override it if you
 paint wider than the missile, or if you draw back to the caster (a tether, a
@@ -337,7 +358,7 @@ An attack only reaches `ON_ATTACK_HIT` if it actually landed, so nothing fires w
 
 ## 10. The basic attack is itself a spell
 
-`src/game/gameObject/spells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `willDraw`) and hands it to `BasicAttackController.order()`. Right click is a move order and nothing else — it no longer doubles as an attack order, so a click meant to walk past a fight cannot commit to it. The slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
+`src/game/gameObject/spells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `PredefinedFilters.visibleTo` over `combat/Vision.ts`) and hands it to `BasicAttackController.order()`. It asks the *attacker's* vision, never the fog's draw flag — see the note on `AttackableUnit.visibleToPlayerTeam` for why those are different questions. Right click is a move order and nothing else — it no longer doubles as an attack order, so a click meant to walk past a fight cannot commit to it. The slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
 
 Three consequences for a new spell:
 

@@ -138,13 +138,7 @@ export class Ahri_E_Object extends MissileSpellObject {
   // the halo and breath-wisp both paint past the 25px hitbox
   getDisplayBoundingBox() {
     const r = this.size * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 

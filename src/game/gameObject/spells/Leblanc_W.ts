@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import VectorUtils from '../../../utils/vector.utils';
@@ -229,13 +229,7 @@ export class Leblanc_W_Object extends SpellObject {
   getDisplayBoundingBox() {
     // the sigil and countdown arc sit well outside the avatar
     const r = this.owner.stats.size.value * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -315,12 +309,6 @@ export class Leblanc_W_Object2 extends Leblanc_W_Object {
   getDisplayBoundingBox() {
     // the ripples overshoot the rim, so the box is wider than the damage radius
     const r = this.size * 0.85;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

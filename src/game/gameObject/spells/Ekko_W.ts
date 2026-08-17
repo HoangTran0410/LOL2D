@@ -6,7 +6,7 @@ import Slow from '../buffs/Slow';
 import Stun from '../buffs/Stun';
 import Shield from '../buffs/Shield';
 import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import MissileSpellObject from '../MissileSpellObject';
 import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
 
@@ -82,13 +82,7 @@ export class Ekko_W_DeviceMissile extends MissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = 20;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -300,13 +294,7 @@ export class Ekko_W_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.radius + 45;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -372,12 +360,6 @@ export class Ekko_W_ShatterObject extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.radius * 2 + 40;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

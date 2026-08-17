@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -332,12 +332,6 @@ export class Thresh_E_Object extends SpellObject {
 
   getDisplayBoundingBox() {
     const span = Math.hypot(HALF_LENGTH, HALF_WIDTH) + 40;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

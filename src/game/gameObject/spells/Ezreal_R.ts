@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
@@ -207,13 +206,7 @@ export class Ezreal_R_Object extends MissileSpellObject {
     // the column paints well behind its own centre, and the box decides whether
     // draw() is called at all
     const r = this.size * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -300,12 +293,6 @@ export class Ezreal_R_Charge extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.radius * 1.6;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

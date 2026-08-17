@@ -197,12 +197,6 @@ export class Twitch_W_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.radius,
-      y: this.position.y - this.radius,
-      w: this.radius * 2,
-      h: this.radius * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.radius * 2);
   }
 }

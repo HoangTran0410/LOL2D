@@ -183,12 +183,6 @@ export class MasterYi_W_Object extends SpellObject {
 
   getDisplayBoundingBox(): Rectangle {
     const r = MEDITATE_RADIUS + 30;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

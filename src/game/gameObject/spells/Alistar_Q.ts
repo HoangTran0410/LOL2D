@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import Spell from '../Spell';
@@ -151,12 +151,6 @@ export class Alistar_Q_Ground extends SpellObject {
   getDisplayBoundingBox() {
     // 1.2x: the longest cracks overshoot the hit ellipse on purpose.
     const span = this.radius * 1.2;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

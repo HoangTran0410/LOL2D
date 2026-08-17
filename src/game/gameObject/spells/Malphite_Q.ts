@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { effectiveRange, withinRange } from '../../combat/Reach';
@@ -12,6 +11,7 @@ import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
 import TargetResolver from '../../spell/targeting/TargetResolver';
 import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { canSee } from '../../combat/Vision';
 
 type MalphiteTarget = AttackableUnit;
 
@@ -58,7 +58,7 @@ export default class Malphite_Q extends Spell {
       range: this.range,
       targetTeam: 'ENEMY',
       queryCandidates: () => this.game.objectManager.objects,
-      isTargetable: candidate => isMalphiteTarget(candidate) && candidate.willDraw,
+      isTargetable: candidate => isMalphiteTarget(candidate),
       getTargetInfo: candidate =>
         isMalphiteTarget(candidate)
           ? {
@@ -117,7 +117,7 @@ export default class Malphite_Q extends Spell {
   private isValidTarget(target: unknown): target is MalphiteTarget {
     return (
       isMalphiteTarget(target) &&
-      target.willDraw &&
+      canSee(this.owner, target) &&
       target.teamId !== this.owner.teamId &&
       withinRange(this.range, this.owner, target)
     );
@@ -257,13 +257,7 @@ export class Malphite_Q_Object extends HomingMissileSpellObject {
 
   getDisplayBoundingBox() {
     const r = this.size * 2;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -341,13 +335,7 @@ export class Malphite_Q_Shatter extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.targetSize + 70;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
 
@@ -402,12 +390,6 @@ export class Malphite_Q_Rush extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = 90;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

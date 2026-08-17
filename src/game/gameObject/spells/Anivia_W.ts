@@ -1,5 +1,5 @@
 import SAT from '../../../libs/SAT';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import { hasFlag } from '../../../utils/index';
 import VectorUtils from '../../../utils/vector.utils';
@@ -224,12 +224,6 @@ export class Anivia_W_Object extends SpellObject implements DynamicWall {
 
   getDisplayBoundingBox() {
     const r = this._boundingRadius();
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

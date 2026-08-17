@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -194,12 +194,6 @@ export class Blitzcrank_E_Object extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return new Rectangle({
-      x: this.position.x - this.range,
-      y: this.position.y - this.range,
-      w: this.range * 2,
-      h: this.range * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(this.range * 2);
   }
 }

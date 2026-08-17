@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import Spell from '../Spell';
 import SpellObject from '../SpellObject';
@@ -231,12 +230,6 @@ export class Nocturne_W_Shroud extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = this.owner.animatedValues.displaySize / 2 + BOUNDING_MARGIN;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }

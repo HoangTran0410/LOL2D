@@ -1,4 +1,3 @@
-import { Rectangle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
 import VectorUtils from '../../../utils/vector.utils';
 import MissileSpellObject from '../MissileSpellObject';
@@ -167,12 +166,6 @@ export class Jinx_W_Object extends MissileSpellObject {
    */
   getDisplayBoundingBox() {
     const span = BOLT_TAIL + 30;
-    return new Rectangle({
-      x: this.position.x - span,
-      y: this.position.y - span,
-      w: span * 2,
-      h: span * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(span * 2);
   }
 }

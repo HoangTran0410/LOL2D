@@ -358,12 +358,6 @@ export class Ekko_E_AuraObject extends SpellObject {
 
   getDisplayBoundingBox() {
     const r = EKKO_E_AURA_RADIUS + 12;
-    return new Rectangle({
-      x: this.position.x - r,
-      y: this.position.y - r,
-      w: r * 2,
-      h: r * 2,
-      data: this,
-    });
+    return this.squareDisplayBoundingBox(r * 2);
   }
 }
