@@ -119,8 +119,18 @@ export const SpellGroups: {
   {
     name: 'Đánh Thường',
     image: 'spell_basic_attack',
-
     spells: [AllSpells.BasicAttack],
+  },
+  {
+    name: 'Phép Bổ Trợ',
+    image: null,
+    spells: [
+      AllSpells.Flash,
+      AllSpells.Ghost,
+      AllSpells.Heal,
+      AllSpells.Ignite,
+      AllSpells.StealthWard,
+    ],
   },
   {
     name: 'Yasuo',
@@ -500,18 +510,6 @@ export const SpellGroups: {
     image: 'champ_brand',
 
     spells: [AllSpells.Brand_Q, AllSpells.Brand_W, AllSpells.Brand_E, AllSpells.Brand_R],
-  },
-  {
-    name: 'Phép Bổ Trợ',
-    image: null,
-
-    spells: [
-      AllSpells.Flash,
-      AllSpells.Ghost,
-      AllSpells.Heal,
-      AllSpells.Ignite,
-      AllSpells.StealthWard,
-    ],
   },
 ];
 
