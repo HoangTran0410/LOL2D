@@ -592,7 +592,7 @@
 }
 
 /* ------------------------------------------------------- saving a kit
-   "Lưu bộ" shares the slot bar with Huỷ / Xác nhận but is not one of them:
+   "Lưu bộ" shares the slot bar with Xác nhận but is not one of them:
    it neither commits the draft nor discards it, it copies it into the
    library (see LoadoutEditorModal.vue). It is first of the three in
    `.kit-bar-actions`, which is what now holds the group at the right end —

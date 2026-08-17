@@ -10,8 +10,8 @@
  * Chiêu". This replaces all of it with the shape the in-game HUD picker
  * already had: the slot row pinned at
  * the top, the whole roster scrolling underneath it, and picks batched behind
- * Huỷ / Xác nhận so a player can keep changing their mind. Same roster, same
- * order, same two gestures — see `KitRoster.vue`.
+ * Xác nhận so a player can keep changing their mind. Same roster, same order,
+ * same two gestures — see `KitRoster.vue`.
  *
  * ## The mode field survives, as a consequence rather than a question
  *
@@ -39,8 +39,10 @@
  *
  * Every other control on this screen writes straight to `localStorage` on
  * change. This one doesn't: `draft` is edited freely and only `emit('change')`
- * on "Xác nhận" reaches `usePregameConfig`. "Huỷ", the X and the backdrop all
- * discard it. That is the in-game picker's contract, and it is what makes
+ * on "Xác nhận" reaches `usePregameConfig`. The X and the backdrop both
+ * discard it — there was a "Huỷ" button beside Xác nhận too, dropped once the
+ * slot bar had to hold the view toggle as well; two adjacent buttons whose
+ * outcomes differ by the whole edit was the mis-hit worth removing anyway. That is the in-game picker's contract, and it is what makes
  * "take Ahri's kit, then swap her R" a thing you can back out of.
  *
  * ## Saving is a third act, next to those two
@@ -429,17 +431,7 @@ const hint = computed(() => {
         </button>
       </header>
 
-      <!-- Pinned above the roster, never scrolls: it is both where you choose
-           which slot the next tap fills and where you commit or back out. The
-           two actions share the row rather than taking a footer of their own,
-           the way the in-game picker's do — on a landscape phone that row is
-           most of the chrome the modal can afford. -->
       <div class="kit-slot-bar">
-        <!-- Hover or hold describes the spell in the slot; the tap still
-             selects it. Same two gestures on the same icon as the roster
-             below, so "what does this do" is asked the same way wherever the
-             icon happens to be. A slot left to chance has nothing to
-             describe, hence the `slot.entry &&` guard on both openers. -->
         <button
           v-for="slot in slots"
           :key="slot.index"
@@ -460,8 +452,6 @@ const hint = computed(() => {
           <span class="kit-slot-pill-key">{{ slot.label }}</span>
         </button>
 
-        <!-- The eighth control in the slot group, and it belongs there: it
-             acts on the selected slot, not on a spell. -->
         <button
           type="button"
           class="kit-slot-pill kit-slot-random"
@@ -472,40 +462,18 @@ const hint = computed(() => {
           <i class="fas fa-random"></i>
         </button>
 
-        <!-- A view control, not an action: it sits beside the pills and
-             borrows their shape in CSS, but deliberately does not take
-             `.kit-slot-pill`. That class means "a slot, or the button that
-             acts on the selected slot", `drive-kit-builder.mjs` counts it
-             expecting exactly eight, and a ninth member would quietly make
-             both the count and the `:nth-child` slot selectors lie.
-
-             The icon names what the press *gives* you, which is the half a
-             player is choosing between. -->
-        <button
-          type="button"
-          class="kit-view-toggle"
-          :class="{ compact }"
-          id="kit-view-toggle"
-          :title="compact ? 'Hiện từng chiêu' : 'Thu gọn — chỉ hiện tướng'"
-          :aria-pressed="compact"
-          @click="toggleView"
-        >
-          <i :class="compact ? 'fas fa-list' : 'fas fa-table-cells-large'"></i>
-        </button>
-
-        <!-- The three actions, in one group rather than three siblings. They
-             used to pass `margin-left: auto` between them to hold the right
-             end, which worked only while all three fit on the row: the view
-             toggle made it 42px wider and Xác nhận wrapped alone, under the
-             two it belongs beside. A flex group wraps as one thing and owns
-             the auto margin itself. -->
         <div class="kit-bar-actions">
-          <!-- First of the three, because it is the one that does not end the
-               editing session. Deliberately not a `.kit-bar-btn`: that class
-               is how the e2e drives address Huỷ (`.kit-bar-btn.secondary`)
-               and Xác nhận (`.kit-bar-btn:not(.secondary)`), and a third
-               member would make both selectors ambiguous. It borrows the same
-               sizing in CSS instead. -->
+          <button
+            type="button"
+            class="kit-view-toggle"
+            :class="{ compact }"
+            id="kit-view-toggle"
+            :title="compact ? 'Hiện từng chiêu' : 'Thu gọn — chỉ hiện tướng'"
+            :aria-pressed="compact"
+            @click="toggleView"
+          >
+            <i :class="compact ? 'fas fa-list' : 'fas fa-table-cells-large'"></i>
+          </button>
           <button
             type="button"
             class="hextech-btn secondary saved-kit-save"
@@ -515,22 +483,13 @@ const hint = computed(() => {
             @click="toggleSave"
           >
             <i class="fas fa-floppy-disk" aria-hidden="true"></i>
-            <!-- The label goes, the icon and the `title`/`aria-label` stay:
-                 below 640px this row is eight pills plus four buttons on a
-                 landscape phone, and the words are what does not fit. See
-                 `.kit-bar-label` in pregame-scene.css. -->
-            <span class="kit-bar-label">Lưu bộ</span>
+            <!-- <span class="kit-bar-label">Lưu bộ</span> -->
           </button>
-          <button
-            type="button"
-            class="hextech-btn secondary kit-bar-btn"
-            title="Huỷ, không đổi gì"
-            aria-label="Huỷ"
-            @click="cancel"
-          >
-            <i class="fas fa-xmark" aria-hidden="true"></i>
+          <!-- <button type="button" class="hextech-btn secondary kit-bar-btn" title="Huỷ, không đổi gì" aria-label="Huỷ"
+            @click="cancel">
+            <i class="fas fa-rotate-left" aria-hidden="true"></i>
             <span class="kit-bar-label">Huỷ</span>
-          </button>
+          </button> -->
           <button
             type="button"
             class="hextech-btn kit-bar-btn"
@@ -597,25 +556,6 @@ const hint = computed(() => {
         />
       </div>
 
-      <!-- The way out of a description a thumb opened. A hover ends itself on
-           `mouseleave`; a hold has no such end, and the panel cannot provide
-           one itself — it is `pointer-events: none` on purpose, so that under
-           a cursor it never steals the hover that is keeping it open or the
-           click meant for the icon underneath it.
-
-           So dismissal is this: a full-screen layer under the panel and over
-           everything else, alive only while `peekHeldOpen`. `touchstart`
-           rather than `click`, and `.prevent` with it, for two reasons the
-           gesture forces:
-
-             - the *lift* of the hold that opened the panel synthesises a
-               click at that same point, which by then lands on this layer. A
-               `@click` here would close the panel in the same motion that
-               opened it.
-             - `.prevent` on `touchstart` cancels the compatibility mouse
-               events for the dismissing tap, so it closes the description and
-               nothing else — it does not fall through and equip whatever
-               spell happened to be under the player's thumb. -->
       <div
         v-if="peekHeldOpen"
         class="spell-peek-scrim"
@@ -623,11 +563,8 @@ const hint = computed(() => {
         @touchstart.prevent="closePeek()"
       ></div>
 
-      <!-- `position: fixed`, above the modal it floats over (see
-           `.spell-peek` in pregame-scene.css). -->
       <div v-if="peekDisplay" class="spell-peek" :style="peekStyle">
         <SpellDetailPane :display="peekDisplay" placeholder="" />
-        <!-- <p v-if="peekHeldOpen" class="spell-peek-dismiss">Chạm để đóng</p> -->
       </div>
     </div>
   </div>

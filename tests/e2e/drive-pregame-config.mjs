@@ -71,7 +71,12 @@ const openTab = tab => page.click(`#pregame-tab-${tab}`);
 const openParticipantAt = n => page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
 /** The header X. It discards the draft now, exactly like "Huỷ" — see LoadoutEditorModal.vue. */
 const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
-const cancelLoadout = () => page.click('.kit-bar-btn.secondary'); // Huỷ
+/**
+ * The way out without committing. The slot bar's "Huỷ" button is gone — it was
+ * dropped when the bar had to hold the view toggle too — so this is the header
+ * X, which is the same `cancel` handler it called.
+ */
+const cancelLoadout = dismissLoadoutModal;
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
 /**
  * Which slot the next roster tap fills. 0 = A, 1 = Q, ... 5 = D, 6 = F.
@@ -87,7 +92,14 @@ const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-
 
 try {
   await page.goto(url, { waitUntil: 'load' });
-  await page.evaluate(() => localStorage.removeItem('lol2d:pregameConfig:v1'));
+  await page.evaluate(() => {
+    localStorage.removeItem('lol2d:pregameConfig:v1');
+    // The loadout roster opens compact (`kitRosterView.ts`), which hides the
+    // ability cards — and Playwright will not click what it cannot see. This
+    // script drives individual spells throughout, so it asks for the expanded
+    // roster up front. `drive-kit-builder.mjs` is the one that covers compact.
+    localStorage.setItem('lol2d:kitRosterView:v1', 'expanded');
+  });
 
   // 1. "Chơi" is still a one-click path into a match with nothing configured
   await page.reload({ waitUntil: 'load' });
@@ -102,9 +114,13 @@ try {
       defaultAiCount: game.objectManager.objects.filter(o => o.constructor.name === 'AIChampion').length,
     };
   });
-  await evaluate(() => window.__lol2d.scene.oScene.stopGame());
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(200);
+  // Back out to the menu the way the game itself does. This was `stopGame()`
+  // followed by Escape, from when Escape left the match — Escape now opens the
+  // practice panel (`GameScene.keyPressed`), so the scene never switched and
+  // every step after this waited for a menu that was not coming.
+  // `onExitRequested` is the seam the panel's own exit button calls.
+  await evaluate(() => window.__lol2d.scene.oScene.game.onExitRequested());
+  await page.waitForSelector('#config-btn', { state: 'visible' });
 
   // 2. Players tab, first open: the player marked "Bạn", 5 bots, nothing else
   await page.click('#config-btn');
@@ -344,9 +360,13 @@ try {
 
   // Step 8 started a live match on `page` — back out to the setup screen
   // before driving it further (steps 14-16 below reuse this same page).
-  await evaluate(() => window.__lol2d.scene.oScene.stopGame());
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(200);
+  // Back out to the menu the way the game itself does. This was `stopGame()`
+  // followed by Escape, from when Escape left the match — Escape now opens the
+  // practice panel (`GameScene.keyPressed`), so the scene never switched and
+  // every step after this waited for a menu that was not coming.
+  // `onExitRequested` is the seam the panel's own exit button calls.
+  await evaluate(() => window.__lol2d.scene.oScene.game.onExitRequested());
+  await page.waitForSelector('#config-btn', { state: 'visible' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.click('#pregame-tab-players');
@@ -418,6 +438,7 @@ try {
     await setupPage.evaluate(() => {
       localStorage.removeItem('lol2d:pregameConfig:v1');
       localStorage.removeItem('lol2d.touchControls');
+      localStorage.setItem('lol2d:kitRosterView:v1', 'expanded');
     });
     await setupPage.reload({ waitUntil: 'load' });
     await setupPage.click('#config-btn');

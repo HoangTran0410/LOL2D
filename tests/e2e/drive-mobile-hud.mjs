@@ -178,9 +178,14 @@ try {
 
   // ------------------------------------------------ 4. the way back out, twice
 
+  // The header X. This used to be the slot bar's "Huỷ" button
+  // (`.kit-bar-btn.secondary`), which was dropped when the bar had to hold the
+  // view toggle as well — the X is the same `cancel` handler, and now the only
+  // button that runs it. The gesture under test is unchanged: a real touch tap
+  // on the control that backs out of the editor.
   const cancelBox = await page.evaluate(() => {
     const box = document
-      .querySelector('.loadout-modal .kit-bar-btn.secondary')
+      .querySelector('.loadout-modal .pregame-modal-header .pregame-icon-btn')
       .getBoundingClientRect();
     return { x: box.x + box.width / 2, y: box.y + box.height / 2, h: box.height };
   });
@@ -188,7 +193,7 @@ try {
   await page.waitForTimeout(250);
   report.editorAfterCancel = await page.evaluate(() => !!document.querySelector('.loadout-modal'));
   check(
-    'a real touch tap on Huỷ closes the editor and leaves the panel up',
+    'a real touch tap on the editor X closes it and leaves the panel up',
     report.editorAfterCancel === false &&
       (await page.evaluate(() => !!document.querySelector('.practice-panel'))) === true
   );

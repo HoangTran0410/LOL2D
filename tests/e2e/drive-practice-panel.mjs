@@ -851,7 +851,11 @@ try {
   const storedKits = await gameEval(key => localStorage.getItem(key), KITS_KEY);
   const storedConfig = await gameEval(key => localStorage.getItem(key), CFG_KEY);
   await page.screenshot({ path: `${OUT}-06-save-kit.png` });
-  await tapSelector('.kit-bar-btn.secondary'); // Huỷ — a save is not a commit
+  // Back out without committing — a save is not a commit, which is the whole
+  // point of this check. The header X, since the slot bar's "Huỷ" button was
+  // dropped when the bar had to hold the roster's view toggle as well; it is
+  // the same `cancel` handler that button called.
+  await tapSelector('.loadout-modal .pregame-modal-header .pregame-icon-btn');
   await page.waitForTimeout(200);
   await closePanel();
 
@@ -979,7 +983,8 @@ try {
   // on the reloaded match, because that match is the persisted one — 90% CDR,
   // no jungle, two bots — so there is something real to reset.
 
-  await tapSelector('.kit-bar-btn.secondary'); // close the editor check 11 left open
+  // The header X — see check 11 for why it is no longer the slot bar's Huỷ.
+  await tapSelector('.loadout-modal .pregame-modal-header .pregame-icon-btn');
   await page.waitForTimeout(200);
   await selectTab('rules');
   await tapSelector('#practice-reset');

@@ -15,18 +15,20 @@
  * This script drives exactly that shape rather than the old drill-down.
  *
  * What it proves, in order:
- *   1. the roster exposes the whole spell catalogue (85 spells) in one
- *      scrolling list, including the standalone abilities (Olaf_Q, Graves_W)
- *      the old champion grid left out entirely, and offers a whole-kit action
- *      on every shelf that actually has a kit;
+ *   1. the roster exposes the *whole* spell catalogue in one scrolling list,
+ *      including the standalone abilities (Olaf_Q, Graves_W) the old champion
+ *      grid left out entirely, and offers a whole-kit action on every shelf
+ *      that actually has a kit. Counted against `getPregameCatalog()` rather
+ *      than against a literal — see `catalogShape` for why the literals that
+ *      used to be here were both brittle and testing the wrong thing;
  *   2. picks are a draft: nothing reaches `localStorage` until "Xác nhận", and
- *      both "Huỷ" and the header's X discard the draft without a trace;
+ *      and the header's X discards it without a trace, both for a single
+ *      ability and for a whole-kit pick;
  *   3. the *gesture* decides the mode, since there is no mode toggle left to
  *      ask: a shelf header is a champion pick; a real summoner spell dropped
  *      into D/F keeps champion mode; a single ability (or a non-summoner in
  *      D/F) turns the loadout custom with the champion's own kit expanded into
- *      the seven slots first; and a partial shelf (Graves) writes only the
- *      slot its name claims, through that same custom path; plus
+ *      the seven slots first; plus
  *      `.kit-slot-random`, the eighth control in the slot group, which leaves
  *      the *selected* slot to chance (disabled when that slot already is) and
  *      whose `'random'` really does resolve to a spell at spawn;
@@ -80,9 +82,16 @@ const expect = (label, actual, expected) => {
 
 const openParticipantAt = n =>
   page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
-/** The header X — same as "Huỷ" now: it discards the draft (see LoadoutEditorModal.vue). */
+/**
+ * The way out without committing. There used to be two — a "Huỷ" button in the
+ * slot bar and this X — and the script drove each once. The button is gone
+ * (see `LoadoutEditorModal.vue`), so both discard cases now go through the X,
+ * which is the same `cancel` handler the button called. The backdrop is a
+ * third path and is deliberately still untested: it is one `@click.self`.
+ */
 const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
-const cancelLoadout = () => page.click('.kit-bar-btn.secondary'); // Huỷ
+const cancelLoadout = dismissLoadoutModal;
+/** The one `.kit-bar-btn` left, and `:not(.secondary)` is what says so. */
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
 /**
  * Which slot the next roster tap fills. 0 = A, 1 = Q, ... 5 = D, 6 = F.
@@ -97,6 +106,38 @@ const pickSpell = id => page.click(`.catalog-spell-card[data-spell="${id}"]`);
 const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-shelf-apply`);
 
 const storedPlayer = () => evaluate(k => JSON.parse(localStorage.getItem(k) ?? 'null')?.player ?? null, CFG);
+
+/**
+ * The roster's shape, read out of the catalogue the component itself renders
+ * from — never restated as a literal here.
+ *
+ * This check used to hardcode 85 spells / 33 shelves / 31 whole-kit actions,
+ * which meant every champion added to `SpellGroups` broke a script that was
+ * not about `SpellGroups`. It went stale exactly that way: the real numbers
+ * are 194 / 49 / 47 by the time anyone ran it again, and three failures said
+ * nothing about the editor.
+ *
+ * Deriving is not the "a transform verifying itself" trap, because the claim
+ * is not "the catalogue has N spells" — it is "the roster puts *every* shelf
+ * and *every* entry the catalogue has on screen, and offers the whole-kit
+ * action on exactly the shelves that have a kit". That is a statement about
+ * rendering against a source, and the source is where it has to come from.
+ * The hardcoded version was, if anything, testing the wrong thing.
+ */
+const catalogShape = () =>
+  evaluate(async () => {
+    const { getPregameCatalog } = await import('/src/scenes/setup/pregameCatalog.ts');
+    const { kitShelves } = getPregameCatalog();
+    return {
+      shelves: kitShelves.length,
+      entries: kitShelves.reduce((total, shelf) => total + shelf.entries.length, 0),
+      withKit: kitShelves.filter(shelf => shelf.kit.length > 0).length,
+      /** Named a shelf that has abilities but no `championName` — see the partial-shelf check. */
+      partialShelfNames: kitShelves
+        .filter(shelf => shelf.kit.length > 0 && !shelf.championName)
+        .map(shelf => shelf.name),
+    };
+  });
 const setCdr = async percent => {
   await page.click('#pregame-tab-settings');
   await page.waitForSelector('#pregame-cdr', { state: 'visible' });
@@ -154,9 +195,13 @@ try {
     randomCardSelected: !!document.querySelector('.catalog-random-card.selected'),
     selectedShelf: document.querySelector('.kit-shelf.selected')?.dataset.champion ?? null,
   }));
-  expect('rosterShape.catalogCardCount', report.rosterShape.catalogCardCount, 194);
-  expect('rosterShape.shelfCount', report.rosterShape.shelfCount, 49);
-  expect('rosterShape.wholeKitActions', report.rosterShape.wholeKitActions, 47);
+  report.catalog = await catalogShape();
+  expect('rosterShape.catalogCardCount', report.rosterShape.catalogCardCount, report.catalog.entries);
+  expect('rosterShape.shelfCount', report.rosterShape.shelfCount, report.catalog.shelves);
+  expect('rosterShape.wholeKitActions', report.rosterShape.wholeKitActions, report.catalog.withKit);
+  // A roster of nothing would satisfy all three of those. This is the floor
+  // that keeps them meaning "the whole catalogue is on screen".
+  expect('catalog is not empty', report.catalog.entries > 50 && report.catalog.shelves > 10, true);
   expect('rosterShape.shelvesWithoutWholeKitAction', report.rosterShape.shelvesWithoutWholeKitAction, [
     'Đánh Thường',
     'Phép Bổ Trợ',
@@ -182,7 +227,7 @@ try {
   expect('draftIsNotStored.selectedCard', report.draftIsNotStored.selectedCard, 'Olaf_Q');
   expect('draftIsNotStored.storedWhileDrafting', report.draftIsNotStored.storedWhileDrafting, null);
 
-  await dismissLoadoutModal(); // the X discards, same as Huỷ
+  await dismissLoadoutModal();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
   report.storedAfterXDiscards = await storedPlayer();
   expect('storedAfterXDiscards', report.storedAfterXDiscards, null);
@@ -202,7 +247,8 @@ try {
     randomCardSelected: true,
   });
 
-  // ...and "Huỷ" discards a whole-kit pick just as completely.
+  // ...and it discards a whole-kit pick just as completely, not only a single
+  // ability — a different code path in `applyKit`, hence a second drive.
   await applyShelf('Ahri');
   await page.waitForTimeout(80);
   await cancelLoadout();
@@ -232,11 +278,6 @@ try {
       await selectSlot(6);
       await pickSpell('Ahri_W');
     }),
-    championBeforePartialShelf: await editPlayer(() => applyShelf('Teemo')),
-    // Graves' shelf is only `Graves_W` — no championName can name it, so it
-    // goes through the custom path and lands in the slot its *name* claims
-    // (W, index 2), not the first slot of the shelf.
-    partialShelf: await editPlayer(() => applyShelf('Graves')),
     randomCard: await editPlayer(() => page.click('.catalog-random-card')),
   };
   const g = report.gestureDecidesMode;
@@ -272,13 +313,22 @@ try {
     summonerF: 'Heal',
     customSlots: ['BasicAttack', 'Ahri_Q', 'Ahri_W', 'Ahri_E', 'Ahri_R', 'Ghost', 'Ahri_W'],
   });
-  expect('gestureDecidesMode.partialShelf', g.partialShelf, {
-    mode: 'custom',
-    championName: 'Teemo',
-    summonerD: 'Ghost',
-    summonerF: 'Heal',
-    customSlots: ['BasicAttack', 'Teemo_Q', 'Graves_W', 'Teemo_E', 'Teemo_R', 'Ghost', 'Heal'],
-  });
+  // ## The partial shelf, and where it went
+  //
+  // This used to drive Graves — a shelf that was only `Graves_W`, which no
+  // `championName` can name, so applying it went through the custom path and
+  // landed in the slot its *name* claims (W) rather than the first slot of the
+  // shelf. Graves has a full kit now, and so does every other shelf: nothing
+  // in the catalogue is partial any more, so the check had no subject left and
+  // was failing on its own premise rather than on the behaviour.
+  //
+  // Written as the catalogue invariant instead of deleted. The custom path it
+  // guarded is still there (`KitShelf.championName` is still nullable and
+  // `applyKit` still branches on it), so if a partial shelf is ever added back
+  // this fails and says exactly which one — at which point the drive above is
+  // worth restoring for it. A silent skip would have let that rot unnoticed.
+  const partial = report.catalog.partialShelfNames;
+  expect('no shelf is partial, so the partial-shelf drive has no subject', partial, []);
   expect('gestureDecidesMode.randomCard.mode', [g.randomCard.mode, g.randomCard.championName], [
     'champion',
     'random',
@@ -349,9 +399,13 @@ try {
     errors.push(`randomSlotButton.spawnedSpells: the R slot rolled ${JSON.stringify(spawned[4])}, expected a real spell`);
   }
   // back out to the setup screen — the rest of this script drives it further
-  await evaluate(() => window.__lol2d.scene.oScene.stopGame());
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(200);
+  // Back out to the menu the way the game itself does. This was `stopGame()`
+  // followed by Escape, from when Escape left the match — Escape now opens the
+  // practice panel (`GameScene.keyPressed`), so the scene never switched and
+  // every step after this waited for a menu that was not coming.
+  // `onExitRequested` is the seam the panel's own exit button calls.
+  await evaluate(() => window.__lol2d.scene.oScene.game.onExitRequested());
+  await page.waitForSelector('#config-btn', { state: 'visible' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.waitForSelector('#pregame-participant-list', { state: 'visible' });
@@ -505,12 +559,14 @@ try {
     wholeKitActions: document.querySelectorAll('.kit-shelf-apply').length,
     backdropCount: document.querySelectorAll('.pregame-modal-backdrop').length,
   }));
+  // Same catalogue as the player's editor, because it is the same component —
+  // derived, not restated, for the reason `catalogShape` gives.
   expect('bot1EditorIsSameComponent', report.bot1EditorIsSameComponent, {
     title: 'Bot 1',
     slotPills: 7,
     hasRandomSlotButton: true,
-    catalogCardCount: 85,
-    wholeKitActions: 31,
+    catalogCardCount: report.catalog.entries,
+    wholeKitActions: report.catalog.withKit,
     backdropCount: 1,
   });
   report.playerCardNotClickableBehindModal = await page
@@ -686,17 +742,23 @@ try {
   });
 
   expect('compactRoster.toggleOn', report.compactRoster.toggleOn, true);
-  // Same numbers section 1 asserted while expanded: hiding, not unmounting.
-  expect('compactRoster.shelvesInDom', report.compactRoster.shelvesInDom, 49);
-  expect('compactRoster.cardsInDom', report.compactRoster.cardsInDom, 194);
-  // 49 shelves less the two that are not a champion.
-  expect('compactRoster.shelvesVisible', report.compactRoster.shelvesVisible, 47);
+  // Same numbers section 1 asserted while expanded: compact hides, it does not
+  // unmount — and derived from the catalogue for the same reason they are there.
+  expect('compactRoster.shelvesInDom', report.compactRoster.shelvesInDom, report.catalog.shelves);
+  expect('compactRoster.cardsInDom', report.compactRoster.cardsInDom, report.catalog.entries);
+  // Every shelf that has a kit, and only those: the two that are not a
+  // champion have no kit to apply, so compact has nothing to show for them.
+  expect('compactRoster.shelvesVisible', report.compactRoster.shelvesVisible, report.catalog.withKit);
   expect('compactRoster.nonChampionShelvesVisible', report.compactRoster.nonChampionShelvesVisible, 0);
   expect('compactRoster.cardsVisible', report.compactRoster.cardsVisible, 0);
   // Ngẫu Nhiên stays: it is a whole-loadout action, which is what compact is for.
   expect('compactRoster.randomCardVisible', report.compactRoster.randomCardVisible, 1);
-  // Desktop viewport, so the three buttons keep their words.
-  expect('compactRoster.labelsVisible', report.compactRoster.labelsVisible, 3);
+  // Desktop viewport, so what labels there are keep their words. Just the one:
+  // Xác nhận is the only button in the bar still carrying a word — Huỷ is gone
+  // and Lưu bộ is icon-only (see `LoadoutEditorModal.vue`). The number is the
+  // control for the narrow-viewport check at the end, which is the real
+  // assertion; if a label comes back, that one is what has to keep passing.
+  expect('compactRoster.labelsVisible', report.compactRoster.labelsVisible, 1);
 
   await page.screenshot({ path: `${OUT}-compact-roster.png` });
 
