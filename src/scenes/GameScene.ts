@@ -14,6 +14,14 @@ let checkUpdateAnalys: typeof Stats;
 let realUpdateAnalys: typeof Stats;
 let previousTime: number;
 
+/**
+ * Stand-in for the three Stats.js panels in production, so `updateLoop`/`draw`
+ * can call `.begin()`/`.end()` unconditionally instead of branching every
+ * frame. Every real player's phone was otherwise redrawing three debug
+ * canvases 60 times a second for a HUD nobody but a developer reads.
+ */
+const noopStats = { begin: () => {}, end: () => {} };
+
 /** One wheel notch, as a step on the manual zoom factor. */
 const ZOOM_WHEEL_STEP = 0.1;
 
@@ -69,23 +77,30 @@ export default class GameScene extends Scene {
     // burning CPU/battery for no visual benefit.
     frameRate(renderFpsPreference());
 
-    drawAnalys = new Stats();
-    drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    drawAnalys.dom.style.cssText = '';
-    drawAnalys.dom.title = 'Draw time';
-    this.statsContainer.appendChild(drawAnalys.dom);
+    if (import.meta.env.DEV) {
+      drawAnalys = new Stats();
+      drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+      drawAnalys.dom.style.cssText = '';
+      drawAnalys.dom.title = 'Draw time';
+      this.statsContainer.appendChild(drawAnalys.dom);
 
-    realUpdateAnalys = new Stats();
-    realUpdateAnalys.showPanel(0);
-    realUpdateAnalys.dom.style.cssText = '';
-    realUpdateAnalys.dom.title = 'Update time';
-    this.statsContainer.appendChild(realUpdateAnalys.dom);
+      realUpdateAnalys = new Stats();
+      realUpdateAnalys.showPanel(0);
+      realUpdateAnalys.dom.style.cssText = '';
+      realUpdateAnalys.dom.title = 'Update time';
+      this.statsContainer.appendChild(realUpdateAnalys.dom);
 
-    checkUpdateAnalys = new Stats();
-    checkUpdateAnalys.showPanel(0);
-    checkUpdateAnalys.dom.style.cssText = '';
-    checkUpdateAnalys.dom.title = 'Check update time';
-    this.statsContainer.appendChild(checkUpdateAnalys.dom);
+      checkUpdateAnalys = new Stats();
+      checkUpdateAnalys.showPanel(0);
+      checkUpdateAnalys.dom.style.cssText = '';
+      checkUpdateAnalys.dom.title = 'Check update time';
+      this.statsContainer.appendChild(checkUpdateAnalys.dom);
+    } else {
+      // Production: no panels, no per-frame DOM redraw — see `noopStats`.
+      drawAnalys = noopStats;
+      realUpdateAnalys = noopStats;
+      checkUpdateAnalys = noopStats;
+    }
   }
 
   enter() {

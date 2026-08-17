@@ -47,4 +47,52 @@ describe('Quadtree.retrieve', () => {
 
     expect(results.map((r) => r.data)).toEqual(['first', 'second', 'third']);
   });
+
+  /**
+   * `qtIndex` returns a bitmask whose bit `i` means "child node `i`", and
+   * `split()` decides what child `i` actually covers. Nothing else pins those
+   * two together: scramble either and inserts still land somewhere, queries
+   * still descend somewhere, and the tree simply stops finding things. Both
+   * sides use the same mask, so a *consistently* wrong mapping is invisible —
+   * only checking each quadrant against real geometry catches it.
+   */
+  it('stores each quadrant where a query of that quadrant looks for it', () => {
+    const corners = [
+      { data: 'top-right', x: 80, y: 10 },
+      { data: 'top-left', x: 10, y: 10 },
+      { data: 'bottom-left', x: 10, y: 80 },
+      { data: 'bottom-right', x: 80, y: 80 },
+    ];
+
+    // maxObjects: 1 forces the root to split, so the children are what answer.
+    const tree = new Quadtree({ x: 0, y: 0, w: 100, h: 100, maxObjects: 1, maxLevels: 4 });
+    for (const corner of corners) {
+      tree.insert(new Rectangle({ x: corner.x, y: corner.y, w: 5, h: 5, data: corner.data }));
+    }
+
+    for (const corner of corners) {
+      const probe = new Rectangle({ x: corner.x + 1, y: corner.y + 1, w: 1, h: 1 });
+      expect(tree.retrieve(probe).map((r) => r.data)).toEqual([corner.data]);
+    }
+  });
+
+  /**
+   * Dedupe is a stamp written onto the stored object, not a per-query Set. A
+   * stamp that failed to advance between calls would make every object look
+   * already-seen the second time round, so the first query would work and
+   * every later one would come back empty.
+   */
+  it('returns the same objects when the identical query runs twice', () => {
+    const tree = new Quadtree({ x: 0, y: 0, w: 100, h: 100, maxObjects: 1, maxLevels: 4 });
+    tree.insert(new Rectangle({ x: 10, y: 10, w: 5, h: 5, data: 'a' }));
+    tree.insert(new Rectangle({ x: 12, y: 12, w: 5, h: 5, data: 'b' }));
+    tree.insert(new Rectangle({ x: 80, y: 80, w: 5, h: 5, data: 'c' }));
+
+    const query = new Rectangle({ x: 0, y: 0, w: 30, h: 30 });
+    const first = tree.retrieve(query).map((r) => r.data);
+    const second = tree.retrieve(query).map((r) => r.data);
+
+    expect(first).toEqual(['a', 'b']);
+    expect(second).toEqual(first);
+  });
 });

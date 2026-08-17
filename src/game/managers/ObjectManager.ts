@@ -249,7 +249,11 @@ export default class ObjectManager {
         this.objects.push(o);
         o.onAdded?.();
       }
-      this._objectToBeAdd = [];
+      // Truncate rather than rebind. `onAdded` may itself call `addObject`,
+      // and a for..of re-reads `length` each step, so anything queued during
+      // the loop is drained by this same pass either way — but keeping the
+      // array identity stops one throwaway allocation per tick.
+      this._objectToBeAdd.length = 0;
     }
 
     // Bodies push each other apart once everything has moved, and before the
@@ -272,17 +276,6 @@ export default class ObjectManager {
 
   draw(): void {
     const camBound = this.game.camera.getBoundingBox();
-    const objectsInCamera = this.queryObjects({
-      queryByDisplayBoundingBox: true,
-      area: camBound,
-    });
-
-    // Precompute each object's z-index once (zIndexOf does a Map lookup +
-    // Object.hasOwn) instead of recomputing it on every comparison the sort
-    // makes, then sort the small keyed array and drop the keys.
-    const keyed = objectsInCamera.map((o) => ({ o, z: zIndexOf(o) }));
-    keyed.sort((a, b) => a.z - b.z);
-
     const margin = this.game.camera.constantSize?.(ATTACKABLE_DRAW_MARGIN_PX)
       ?? ATTACKABLE_DRAW_MARGIN_PX;
     const visualBound = new Rectangle({
@@ -291,16 +284,27 @@ export default class ObjectManager {
       w: camBound.w + margin * 2,
       h: camBound.h + margin * 2,
     });
-    const drawables = keyed.filter(({ o }) =>
-      o.willDraw &&
-      (!(o instanceof AttackableUnit) || o.getCollideBoundingBox().intersect(visualBound))
-    );
+
+    // Single pass over the quadtree hit-list: unwrap the region, filter to
+    // what will actually draw, and tag it with a z-index together, instead of
+    // the three full-length arrays (map region->object, map in z-index,
+    // filter to drawables) this used to rebuild from scratch every frame for
+    // the same object set — real GC churn at 60 draws/sec.
+    const drawables: { o: GameObject; z: number }[] = [];
     let particleCount = 0;
     let attackableCount = 0;
-    for (const { o } of drawables) {
+    for (const region of this._objectsTree.retrieve(camBound) as GameObjectRegion[]) {
+      const o = region.data;
+      if (!o.willDraw) continue;
+      if (o instanceof AttackableUnit && !o.getCollideBoundingBox().intersect(visualBound)) continue;
+      // zIndexOf does a Map lookup + Object.hasOwn — computed once here
+      // rather than repeatedly by the sort comparator below.
+      drawables.push({ o, z: zIndexOf(o) });
       if (o instanceof ParticleSystem) particleCount += o.particles.length;
       if (o instanceof AttackableUnit) attackableCount++;
     }
+    drawables.sort((a, b) => a.z - b.z);
+
     const quality = this.game.renderQuality ?? 'auto';
     const automaticCompact = Boolean(
       this.game.touchUi &&
@@ -362,7 +366,9 @@ export default class ObjectManager {
 
     let objects: GameObject[];
     if (area) {
-      objects = this._objectsTree.retrieve(area).map((region: GameObjectRegion) => region.data);
+      const regions = this._objectsTree.retrieve(area) as GameObjectRegion[];
+      objects = new Array<GameObject>(regions.length);
+      for (let i = 0; i < regions.length; i++) objects[i] = regions[i].data;
     } else {
       objects = this.objects;
     }
@@ -371,8 +377,33 @@ export default class ObjectManager {
       return objects;
     }
 
-    const resolvedFilters = [...filters];
-    if (!queryByDisplayBoundingBox) resolvedFilters.push(PredefinedFilters.collideWith(area));
-    return objects.filter((object) => resolvedFilters.every((filter) => filter(object)));
+    // Hand-rolled instead of `[...filters]` + `.filter(o => resolved.every(f => f(o)))`:
+    // that spread built an array, `collideWith(area)` built a closure and the
+    // two callbacks built two more — per query, and there are many queries per
+    // frame. The collide test stays last, exactly where appending it put it,
+    // because `every` short-circuits and the cheap type/team filters should
+    // reject before a bounding-box intersect runs.
+    const needsCollideCheck = !queryByDisplayBoundingBox;
+    const result: GameObject[] = [];
+    for (let i = 0; i < objects.length; i++) {
+      const object = objects[i];
+      let passed = true;
+      for (let f = 0; f < filters.length; f++) {
+        if (!filters[f](object)) {
+          passed = false;
+          break;
+        }
+      }
+      if (!passed) continue;
+      if (needsCollideCheck) {
+        // Matches PredefinedFilters.collideWith, including its "no area means
+        // nothing matches" answer.
+        if (!area) continue;
+        if (typeof object.getCollideBoundingBox !== 'function') continue;
+        if (!object.getCollideBoundingBox().intersect(area)) continue;
+      }
+      result.push(object);
+    }
+    return result;
   }
 }

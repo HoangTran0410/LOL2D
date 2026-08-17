@@ -622,25 +622,71 @@ export default class AttackableUnit extends GameObject {
     return this.buffs.some(buff => buff instanceof BuffClass);
   }
 
+  /**
+   * `GameObject` memoises both bounding boxes and explains why; these two
+   * overrides used to allocate unconditionally, which quietly opted the most
+   * numerous object on the board out of that cache. Units are the ones it
+   * matters most for: each box is rebuilt for the quadtree every tick, again
+   * by the draw cull, and again for every candidate of every targeting query
+   * in the same frame.
+   *
+   * Keyed on the *computed* size rather than on `isAllied`/`visionRadius`
+   * separately, because the box is fully determined by centre plus size — if
+   * a team change flips which size applies, the key moves with it.
+   */
+  private _unitCollideBB: Circle | null = null;
+  private _unitCollideBBX = NaN;
+  private _unitCollideBBY = NaN;
+  private _unitCollideBBSize = NaN;
+
+  private _unitDisplayBB: Rectangle | null = null;
+  private _unitDisplayBBX = NaN;
+  private _unitDisplayBBY = NaN;
+  private _unitDisplayBBSize = NaN;
+
   getCollideBoundingBox() {
-    let size = this.animatedValues.size;
-    return new Circle({
+    const size = this.animatedValues.size;
+    if (
+      this._unitCollideBB &&
+      this._unitCollideBBX === this.position.x &&
+      this._unitCollideBBY === this.position.y &&
+      this._unitCollideBBSize === size
+    ) {
+      return this._unitCollideBB;
+    }
+    this._unitCollideBBX = this.position.x;
+    this._unitCollideBBY = this.position.y;
+    this._unitCollideBBSize = size;
+    this._unitCollideBB = new Circle({
       x: this.position.x,
       y: this.position.y,
       r: size / 2,
       data: this,
     });
+    return this._unitCollideBB;
   }
 
   getDisplayBoundingBox() {
-    let size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
-    return new Rectangle({
+    const size = this.isAllied ? this.visionRadius * 2 : this.animatedValues.size;
+    if (
+      this._unitDisplayBB &&
+      this._unitDisplayBBX === this.position.x &&
+      this._unitDisplayBBY === this.position.y &&
+      this._unitDisplayBBSize === size
+    ) {
+      return this._unitDisplayBB;
+    }
+    this._unitDisplayBBX = this.position.x;
+    this._unitDisplayBBY = this.position.y;
+    this._unitDisplayBBSize = size;
+    this._unitDisplayBB = new Rectangle({
       x: this.position.x - size / 2,
       y: this.position.y - size / 2,
       w: size,
       h: size,
       data: this,
     });
+    return this._unitDisplayBB;
   }
 
   get canCast() {

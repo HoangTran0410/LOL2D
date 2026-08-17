@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml/badge.svg)](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml)
 
-Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 30+ champions, bot fights, and spells you can swap mid-match.
+Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 47 champions, bot fights, and an installable PWA you can play offline.
 
 **[▶ Play Now](https://hoangtran0410.github.io/LOL2D)**
 
@@ -33,10 +33,12 @@ A fan-made, indie game based on [League of Legends](https://www.leagueoflegends.
 
 What is in it:
 
-- **30+ champion kits** rebuilt from the real game — skillshots, charged casts, channels, recasts, shields, heals, and a full spread of crowd control.
-- **Swap spells mid-match**, including a *One For All* mode that puts the whole board on a single ability.
-- **Fighting bots**, jungle camps, healing fountains, and turrets.
+- **47 champion kits** rebuilt from the real game — skillshots, charged casts, channels, recasts, shields, heals, and a full spread of crowd control.
+- **A kit builder**: mix and match abilities from different champions into a custom loadout, save it, and drop it onto yourself or any bot.
+- **Fighting bots**, jungle camps, healing fountains, turrets, and lane minions on a free-for-all map.
 - **Fog of war** built from a visibility-polygon sweep, with bushes and walls that really do block line of sight.
+- **Touch controls** and a mobile-friendly HUD alongside mouse/keyboard.
+- **Installable as a PWA** — works offline once cached.
 
 ## Controls
 
@@ -46,9 +48,11 @@ What is in it:
 | Abilities | `A` `Q` `W` `E` `R` |
 | Summoner spells | `D` `F` |
 | Toggle camera follow | `Space` |
-| Back to menu | `Esc` |
+| Zoom | Mouse wheel |
+| Nav debug overlay | `N` |
+| Practice panel (pause + live settings) | `Esc` |
 
-Charged abilities (Varus Q, Pantheon Q) are held down and fire on release.
+Charged abilities (Varus Q, Pantheon Q) are held down and fire on release. `Esc` pauses and opens the practice panel rather than leaving the match — exit from the panel's *Trận đấu* tab.
 
 ## Getting started
 
@@ -76,41 +80,56 @@ npm run preview   # serve the built output
 
 | Script | What it does |
 | --- | --- |
-| `npm run dev` | Dev server with hot reload |
+| `npm run dev` | Dev server with hot reload (copies vendor libs + regenerates assets first) |
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the built output |
 | `npm test` | Run the unit suite once |
 | `npm run test:watch` | Run the unit suite in watch mode |
 | `npm run typecheck` | Type-check the whole project |
 | `npm run typecheck:core` | Strict type-check of the core modules |
-| `npm run verify` | **All of the above** — run this before opening a PR |
+| `npm run verify` | **Everything CI runs** — assets, ability data, both type-checks, tests, build. Run before opening a PR |
 | `npm run assets:generate` | Regenerate the asset manifest from `assets/` |
 | `npm run assets:check` | Fail if the asset manifest is out of date |
+| `npm run vendor:copy` | Copy p5 and stats.js from `node_modules` into `public/vendor/` (PWA needs them local, not CDN) |
 | `npm run ability:import` | Pull fresh ability data from the LoL Wiki |
+| `npm run ability:update` | Refresh already-imported ability records |
 | `npm run ability:check` | Validate the imported ability records |
+| `npm run names:sync` | Diff spell names against Data Dragon's Vietnamese locale |
+| `npm run names:apply` | Rewrite spell names in place from that diff |
 | `npm run e2e` | Drive the real game in Chrome via Playwright and screenshot it |
+| `npm run e2e:pwa` | Build, then verify the PWA boots offline in a real browser |
+| `npm run e2e:hud` / `e2e:attacks` / `e2e:collision` / `e2e:pathfinding` / `e2e:champions` | Narrower Playwright scripts — see `tests/e2e/` for the full list |
 
 ## Project layout
 
 ```
 src/
-├── main.ts               # entry point: boots p5 and the SceneManager
-├── scenes/               # LoadingScene → MenuScene → GameScene
+├── main.ts               # entry point: boots p5 (global mode) and the SceneManager
+├── scenes/                   # LoadingScene → MenuScene → GameScene
+│   └── setup/                 # pregame setup screen (roster, kit builder, rules)
 ├── game/
-│   ├── Game.ts           # main loop, owns camera/objectManager/map
-│   ├── preset.ts         # champion kits, jungle camps, turret and fountain spots
+│   ├── Game.ts               # main loop, owns camera/objectManager/terrainMap/fogOfWar
+│   ├── MatchDirector.ts       # every mutation of a running match, and the only thing that persists them
+│   ├── preset.ts              # champion kits, jungle camps, turret and fountain spots
 │   ├── gameObject/
-│   │   ├── attackableUnits/  # Champion, AIChampion, Monster
-│   │   ├── spells/           # one file per ability: Ahri_Q.ts, Yasuo_R.ts, ...
-│   │   ├── spellObjects/     # base classes: Missile, Area, Beam, HomingMissile
-│   │   ├── buffs/            # Stun, Slow, Shield, Invisible, ...
-│   │   ├── structures/       # Turret, Fountain
-│   │   └── map/              # TerrainMap, FogOfWar, Camera, Obstacle
-│   ├── spell/runtime/    # the spell lifecycle state machine
-│   ├── hud/              # Vue-based HUD
-│   └── managers/         # ObjectManager (quadtree), EventManager
-├── managers/             # AssetManager, SceneManager
-└── generated/            # script-generated asset manifest — do not hand-edit
+│   │   ├── attackableUnits/    # Champion, AIChampion, Minion, Monster, Turret
+│   │   ├── spells/             # one file per ability: Ahri_Q.ts, Yasuo_R.ts, ... (47 champions)
+│   │   ├── spellObjects/       # base classes: Missile, Area, Beam, HomingMissile
+│   │   ├── buffs/              # Stun, Slow, Shield, Invisible, ...
+│   │   ├── structures/         # Turret, Fountain
+│   │   └── map/                # TerrainMap, FogOfWar, Camera, Obstacle, Minimap
+│   ├── combat/                # Vision, MatchTally, ExecuteTargeting
+│   ├── nav/                   # NavGrid pathfinding
+│   ├── managers/               # ObjectManager (quadtree), MinionSpawner, EventManager
+│   ├── input/                  # keyboard/mouse + TouchControls
+│   ├── spell/runtime/          # the spell lifecycle state machine
+│   ├── config/                 # PregameConfig, savedKits (localStorage)
+│   ├── enums/                   # TeamId, ActionState, StatusFlags, SpellState, EventType
+│   ├── vfx/, debug/             # shared VFX helpers, nav/debug overlays
+│   └── hud/                     # Vue-based HUD, incl. hud/practice/ (the Esc panel)
+├── managers/                  # AssetManager, SceneManager
+├── pwa/                       # service worker registration/update flow
+└── generated/                 # script-generated asset manifest — do not hand-edit
 ```
 
 ## Architecture
@@ -122,6 +141,12 @@ src/
 **Collision and queries.** `ObjectManager` maintains a quadtree rebuilt each frame; all target selection goes through `queryObjects({ area, filters })` with the ready-made predicates in `PredefinedFilters`.
 
 **Crowd control.** Buffs raise and clear bits in `StatusFlags`, which the system resolves into `ActionState` (can move / can cast / targetable).
+
+**Teams and lanes.** Every unit defaults to its own unique `teamId`, so player and bots are free-for-all by default; `TeamId` adds the two shared ids that a base's fountain, turret row, and lane minions share. `MinionSpawner` runs the wave clock for both bases along the three lanes in `lanes.ts`.
+
+**The practice panel** (`Esc`) is a superset of the pregame setup screen: three tabs (*Đấu thủ*, *Trận đấu*, *Gian lận*) that reshape a paused, live match through `MatchDirector` rather than touching `localStorage` directly.
+
+**PWA.** The build copies p5 and stats.js into `public/vendor/` and loads them locally instead of from a CDN, and a service worker precaches the app shell, so the game can boot fully offline after the first visit.
 
 The full details live in [`docs/ADDING_SPELLS.md`](./docs/ADDING_SPELLS.md) — **read it before writing a new spell.** It covers the three registration points, the mandatory buff `stackId` rule, and the engine traps `tsc` cannot catch.
 
@@ -149,14 +174,14 @@ npx vitest run tests/game/spells/Varus_Q.test.ts   # a single file
 
 House rule: **tuning values are exported as constants from the spell file and imported by its test.** Tests assert the wiring, not a copy of the numbers — retuning damage should never mean editing a test.
 
-**End-to-end** tests drive real Chrome through Playwright, because a unit test cannot prove the game boots and paints:
+**End-to-end** tests drive real Chrome through Playwright, because a unit test cannot prove the game boots and paints. `tests/e2e/` has 25+ scripts covering the practice panel, touch controls, minimap, kit builder, PWA offline boot, and more — run the one that touches what you changed rather than the whole folder:
 
 ```bash
 npx vite --port 5199 --strictPort   # in another terminal
-npm run e2e
+npm run e2e                         # or e.g. node tests/e2e/drive-practice-panel.mjs
 ```
 
-Scripts in `tests/e2e/` reach into the running game through `window.__lol2d`, which only exists in dev builds.
+Scripts reach into the running game through `window.__lol2d`, which only exists in dev builds. `drive-new-spells.mjs` and `drive-touch-controls.mjs` have known rare flakes unrelated to code correctness — a stray dev server already holding port 5173 makes both more likely.
 
 ## Contributing
 
