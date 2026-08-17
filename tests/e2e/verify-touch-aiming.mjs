@@ -11,51 +11,19 @@
  *
  * Requires a system Chrome install.
  */
-import { createServer } from 'vite';
-import { chromium } from 'playwright';
+import { PHONE_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-touch-aiming';
-const VIEWPORT = { width: 844, height: 390 };
 
-const server = await createServer({ server: { port: 0, strictPort: false } });
-await server.listen();
-const url = `${server.resolvedUrls.local[0]}?touch=1`;
-
-const browser = await chromium.launch({ channel: 'chrome' });
-const page = await browser.newPage({
-  viewport: VIEWPORT,
-  hasTouch: true,
-  deviceScaleFactor: 3,
-});
-const errors = [];
-page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
-page.on('console', message => {
-  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
-});
-
-const cdp = await page.context().newCDPSession(page);
-const report = {};
-const failures = [];
-const check = (name, passed, detail) => {
-  if (!passed) failures.push(`${name}: ${detail ?? 'failed'}`);
-  console.log(`${passed ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
-};
-
-const dispatch = (type, points) =>
-  cdp.send('Input.dispatchTouchEvent', {
-    type,
-    touchPoints: points.map((point, index) => ({
-      x: Math.round(point.x),
-      y: Math.round(point.y),
-      id: point.id ?? index,
-      radiusX: 14,
-      radiusY: 14,
-      force: 1,
-    })),
+const { url, page, errors, report, failures, check, touchStart, touchMove, touchEnd, finish } =
+  await startHarness({
+    out: OUT,
+    viewport: PHONE_VIEWPORT,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    touch: true,
   });
-const touchStart = points => dispatch('touchStart', points);
-const touchMove = points => dispatch('touchMove', points);
-const touchEnd = () => dispatch('touchEnd', []);
+
 const settle = (ms = 120) => page.waitForTimeout(ms);
 
 try {
@@ -503,20 +471,5 @@ try {
 } catch (error) {
   failures.push(`threw: ${error.stack ?? error}`);
 } finally {
-  console.log('\n--- report ---');
-  console.log(JSON.stringify(report, null, 2));
-  if (errors.length) {
-    console.log('\n--- page errors ---');
-    for (const error of errors.slice(0, 10)) console.log(error);
-  }
-  console.log(`\nscreenshots: ${OUT}-*.png`);
-  if (failures.length) {
-    console.log('\n--- FAILURES ---');
-    for (const failure of failures) console.log(failure);
-  } else {
-    console.log('\nall checks passed');
-  }
-  await browser.close();
-  await server.close();
-  process.exit(failures.length ? 1 : 0);
+  await finish();
 }

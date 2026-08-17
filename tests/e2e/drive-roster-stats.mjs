@@ -16,12 +16,9 @@
  * Requires a system Chrome install.
  */
 import { mkdirSync } from 'node:fs';
-import { createServer } from 'vite';
-import { chromium } from 'playwright';
+import { CFG_KEY, DESKTOP_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-roster-stats';
-const CFG_KEY = 'lol2d:pregameConfig:v1';
-const VIEWPORT = { width: 1280, height: 900 };
 
 mkdirSync(OUT, { recursive: true });
 
@@ -37,39 +34,31 @@ const MATCH_CONFIG = {
   rules: { cooldownReductionPercent: 0, manaFree: true },
 };
 
-const server = await createServer({ server: { port: 0, strictPort: false } });
-await server.listen();
-const url = server.resolvedUrls.local[0];
-
-const browser = await chromium.launch({ channel: 'chrome' });
-const page = await browser.newPage({ viewport: VIEWPORT });
-const errors = [];
-page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
-page.on('console', message => {
-  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+const { url, page, browser, server, errors, failures, check } = await startHarness({
+  viewport: DESKTOP_VIEWPORT,
 });
 
-const failures = [];
-const check = (name, passed, detail) => {
-  if (!passed) failures.push(`${name}: ${detail ?? 'failed'}`);
-  console.log(`${passed ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
-};
-
-/** A real finger, not a synthetic click — see drive-practice-panel.mjs. */
-const cdp = async () => page.context().newCDPSession(page);
+/**
+ * A real finger, not a synthetic click — see drive-practice-panel.mjs.
+ *
+ * Its own session per tap, detached after, rather than the harness's long-lived
+ * one: this script taps twice in a run and the detach is what proves a stat
+ * sheet opened by a finger survives the finger going away.
+ */
+const session = async () => page.context().newCDPSession(page);
 const tapSelector = async selector => {
   const box = await page.locator(selector).first().boundingBox();
   if (!box) throw new Error(`no box for ${selector}`);
   const x = box.x + box.width / 2;
   const y = box.y + box.height / 2;
-  const session = await cdp();
+  const tapSession = await session();
   const point = { x, y, radiusX: 6, radiusY: 6, force: 1 };
-  await session.send('Input.dispatchTouchEvent', {
+  await tapSession.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
     touchPoints: [point],
   });
-  await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await session.detach();
+  await tapSession.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await tapSession.detach();
   await page.waitForTimeout(150);
 };
 

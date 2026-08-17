@@ -46,25 +46,16 @@
  *
  *   node tests/e2e/drive-pregame-config.mjs [outPrefix]
  */
-import { createServer } from 'vite';
-import { chromium } from 'playwright';
+import { DESKTOP_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-pregame';
 
-const server = await createServer({ server: { port: 0, strictPort: false } });
-await server.listen();
-const port = server.config.server.port ?? server.httpServer.address().port;
-const url = `http://localhost:${port}/`;
-
-const browser = await chromium.launch({ channel: 'chrome' });
-const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-const errors = [];
-page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
-page.on('console', message => {
-  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+// No `check`/`finish` from the harness here: this script reports by dumping one
+// JSON object and exits on `errors.length || report.FAILURE` rather than on a
+// list of named checks. Only the boot is shared.
+const { url, page, browser, server, errors, report, openPage } = await startHarness({
+  viewport: DESKTOP_VIEWPORT,
 });
-
-const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
 const openTab = tab => page.click(`#pregame-tab-${tab}`);
 /** The nth participant card (1 = the player, 2 = Bot 1, 3 = Bot 2, ...). */
@@ -428,12 +419,10 @@ try {
   };
 
   const openSetupPage = async ({ hasTouch, viewport }) => {
-    const context = await browser.newContext({ viewport, hasTouch });
-    const setupPage = await context.newPage();
-    setupPage.on('pageerror', e => errors.push(`pageerror(${hasTouch ? 'touch' : 'pointer'}): ${e.message}`));
-    setupPage.on('console', m => {
-      if (m.type() === 'error') errors.push(`console(${hasTouch ? 'touch' : 'pointer'}): ${m.text()}`);
-    });
+    // The context, the page and the tagged error capture come from the harness;
+    // everything below — the storage reset, the reload, the route into the
+    // config screen — is this script's own business.
+    const { context, page: setupPage } = await openPage({ viewport, hasTouch });
     await setupPage.goto(url, { waitUntil: 'load' });
     await setupPage.evaluate(() => {
       localStorage.removeItem('lol2d:pregameConfig:v1');

@@ -68,13 +68,11 @@
  *
  * Requires a system Chrome install.
  */
-import { createServer } from 'vite';
-import { chromium } from 'playwright';
+import { PHONE_VIEWPORT as MOBILE_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-practice-panel';
 /** Roomy enough that neither of `styles/hud.css`'s full-bleed media queries applies. */
 const VIEWPORT = { width: 1280, height: 900 };
-const MOBILE_VIEWPORT = { width: 844, height: 390 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
@@ -102,44 +100,14 @@ const MATCH_CONFIG = {
   rules: { cooldownReductionPercent: 0, manaFree: false },
 };
 
-const server = await createServer({ server: { port: 0, strictPort: false } });
-await server.listen();
-const url = server.resolvedUrls.local[0];
+// A desktop frame with `hasTouch`, and deliberately no `?touch=1`: this script
+// taps HUD controls with a real finger but never asks for the Wild Rift
+// controls themselves. `check` records a mismatch instead of throwing, so one
+// bad expectation cannot hide the rest of the run — that is the harness's.
+const { url, page, browser, server, errors, report, failures, check, touchStart, touchMove, touchEnd } =
+  await startHarness({ out: OUT, viewport: VIEWPORT, hasTouch: true });
 
-const browser = await chromium.launch({ channel: 'chrome' });
-const page = await browser.newPage({ viewport: VIEWPORT, hasTouch: true });
-const errors = [];
-page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
-page.on('console', message => {
-  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
-});
-
-const cdp = await page.context().newCDPSession(page);
-const report = {};
-const failures = [];
-/** Records a mismatch instead of throwing, so one bad expectation cannot hide the rest of the run. */
-const check = (name, passed, detail) => {
-  if (!passed) failures.push(`${name}: ${detail ?? 'failed'}`);
-  console.log(`${passed ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
-};
-
-// ----------------------------------------------------------------- touch
-
-const dispatch = (type, points) =>
-  cdp.send('Input.dispatchTouchEvent', {
-    type,
-    touchPoints: points.map((point, index) => ({
-      x: Math.round(point.x),
-      y: Math.round(point.y),
-      id: point.id ?? index,
-      radiusX: 14,
-      radiusY: 14,
-      force: 1,
-    })),
-  });
-const touchStart = points => dispatch('touchStart', points);
-const touchMove = points => dispatch('touchMove', points);
-const touchEnd = () => dispatch('touchEnd', []);
+/** A 60ms hold rather than the harness's 70: tuned against this panel's controls. */
 const tap = async (x, y, holdMs = 60) => {
   await touchStart([{ x, y }]);
   await page.waitForTimeout(holdMs);
