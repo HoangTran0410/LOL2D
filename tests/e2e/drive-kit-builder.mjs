@@ -69,6 +69,7 @@ page.on('console', m => {
 const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
 const CFG = 'lol2d:pregameConfig:v1';
+const VIEW = 'lol2d:kitRosterView:v1';
 
 /** Records a mismatch instead of throwing, so one bad expectation doesn't hide the rest of the run. */
 const expect = (label, actual, expected) => {
@@ -121,6 +122,11 @@ const editPlayer = async steps => {
 try {
   await page.goto(url, { waitUntil: 'load' });
   await evaluate(k => localStorage.removeItem(k), CFG);
+  // The roster opens compact now (`kitRosterView.ts`), which hides the ability
+  // cards — and Playwright will not click what it cannot see. Everything below
+  // this point drives individual spells, so the run is seeded expanded and the
+  // compact mode gets its own check at the end.
+  await evaluate(k => localStorage.setItem(k, 'expanded'), VIEW);
   await page.reload({ waitUntil: 'load' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
@@ -148,9 +154,9 @@ try {
     randomCardSelected: !!document.querySelector('.catalog-random-card.selected'),
     selectedShelf: document.querySelector('.kit-shelf.selected')?.dataset.champion ?? null,
   }));
-  expect('rosterShape.catalogCardCount', report.rosterShape.catalogCardCount, 85);
-  expect('rosterShape.shelfCount', report.rosterShape.shelfCount, 33);
-  expect('rosterShape.wholeKitActions', report.rosterShape.wholeKitActions, 31);
+  expect('rosterShape.catalogCardCount', report.rosterShape.catalogCardCount, 194);
+  expect('rosterShape.shelfCount', report.rosterShape.shelfCount, 49);
+  expect('rosterShape.wholeKitActions', report.rosterShape.wholeKitActions, 47);
   expect('rosterShape.shelvesWithoutWholeKitAction', report.rosterShape.shelvesWithoutWholeKitAction, [
     'Đánh Thường',
     'Phép Bổ Trợ',
@@ -642,6 +648,64 @@ try {
     'Ahri_R',
   ]);
   await page.screenshot({ path: `${OUT}-live-match.png` });
+
+  // 8. compact roster: champion tiles only, and a tile is the whole kit
+  //
+  // Last, because it leaves the stored view on 'compact' — and the reload in
+  // the middle of it is the point of the check, not scaffolding: the toggle
+  // lives in a module with a `localStorage` key precisely so it survives the
+  // modal being unmounted and the page being closed, and a check that never
+  // reloads would pass on a plain `ref` in `<script setup>`.
+  await page.goto(url, { waitUntil: 'load' });
+  await evaluate(k => localStorage.setItem(k, 'compact'), VIEW);
+  await page.reload({ waitUntil: 'load' });
+  await page.click('#config-btn');
+  await page.waitForSelector('#pregame-scene', { state: 'visible' });
+  await openParticipantAt(1);
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+  await page.waitForTimeout(150);
+
+  report.compactRoster = await evaluate(() => {
+    // `offsetParent === null` is what `display: none` on the element or on any
+    // ancestor produces, which is exactly how compact hides things.
+    const shown = selector =>
+      [...document.querySelectorAll(selector)].filter(element => element.offsetParent !== null)
+        .length;
+    return {
+      toggleOn: document.querySelector('#kit-view-toggle')?.classList.contains('compact') ?? null,
+      // The DOM is deliberately unchanged — compact hides, it does not unmount.
+      shelvesInDom: document.querySelectorAll('.kit-shelf').length,
+      cardsInDom: document.querySelectorAll('.catalog-spell-card').length,
+      // ...and these are what a player can actually see and press.
+      shelvesVisible: shown('.kit-shelf'),
+      cardsVisible: shown('.catalog-spell-card'),
+      nonChampionShelvesVisible: shown('.kit-shelf:not(.has-kit)'),
+      randomCardVisible: shown('.catalog-random-card'),
+      labelsVisible: shown('.kit-bar-label'),
+    };
+  });
+
+  expect('compactRoster.toggleOn', report.compactRoster.toggleOn, true);
+  // Same numbers section 1 asserted while expanded: hiding, not unmounting.
+  expect('compactRoster.shelvesInDom', report.compactRoster.shelvesInDom, 49);
+  expect('compactRoster.cardsInDom', report.compactRoster.cardsInDom, 194);
+  // 49 shelves less the two that are not a champion.
+  expect('compactRoster.shelvesVisible', report.compactRoster.shelvesVisible, 47);
+  expect('compactRoster.nonChampionShelvesVisible', report.compactRoster.nonChampionShelvesVisible, 0);
+  expect('compactRoster.cardsVisible', report.compactRoster.cardsVisible, 0);
+  // Ngẫu Nhiên stays: it is a whole-loadout action, which is what compact is for.
+  expect('compactRoster.randomCardVisible', report.compactRoster.randomCardVisible, 1);
+  // Desktop viewport, so the three buttons keep their words.
+  expect('compactRoster.labelsVisible', report.compactRoster.labelsVisible, 3);
+
+  await page.screenshot({ path: `${OUT}-compact-roster.png` });
+
+  // A tile applies the champion's whole kit, which is compact's one gesture.
+  await applyShelf('Ahri');
+  await confirmLoadout();
+  report.compactApplied = await storedPlayer();
+  expect('compactApplied.mode', report.compactApplied?.mode, 'champion');
+  expect('compactApplied.championName', report.compactApplied?.championName, 'Ahri');
 } catch (error) {
   report.FAILURE = `${error.message}\n${error.stack}`;
 } finally {

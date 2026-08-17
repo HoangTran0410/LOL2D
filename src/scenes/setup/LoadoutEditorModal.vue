@@ -70,6 +70,7 @@ import {
 import { SpellHotKeys } from '../../game/constants';
 import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
+import { kitRosterView, setKitRosterView } from './kitRosterView';
 import KitRoster from './KitRoster.vue';
 import SpellDetailPane from './SpellDetailPane.vue';
 import SpellIcon from './SpellIcon.vue';
@@ -381,6 +382,22 @@ const removeSavedKit = (kit: SavedKit): void => {
   savedKits.value = loadSavedKits();
 };
 
+/* ------------------------------------------------------ compact / expanded */
+
+/**
+ * The roster is ~50 shelves and ~200 ability icons, which is a long scroll to
+ * find one champion in — and taking a whole kit is what most opens of this
+ * editor are for. Compact keeps the champion tiles and drops everything else;
+ * expanded is the roster as it was.
+ *
+ * The state is in a module (`kitRosterView.ts`) and not a `ref` here, because
+ * this modal is mounted with `v-if` and `<script setup>` *is* the setup
+ * function — a `ref` at the top of this block is rebuilt on every open.
+ */
+const compact = computed(() => kitRosterView.value === 'compact');
+
+const toggleView = (): void => setKitRosterView(compact.value ? 'expanded' : 'compact');
+
 const confirm = (): void => {
   emit('change', draft.value);
   emit('close');
@@ -388,6 +405,10 @@ const confirm = (): void => {
 const cancel = (): void => emit('close');
 
 const hint = computed(() => {
+  // Compact has no ability cards to tap, so the slot the roster would fill is
+  // not what the screen is about — saying "đang chọn chiêu cho ô Q" over a grid
+  // that cannot fill one is the hint pointing at the wrong gesture.
+  if (compact.value) return 'Bấm một tướng để lấy cả bộ chiêu — mở rộng để chọn từng chiêu.';
   if (activeSlot.value === 0) {
     return 'Ô A là đòn đánh thường — đổi ô này là đổi luôn nhịp đánh của tướng.';
   }
@@ -451,24 +472,76 @@ const hint = computed(() => {
           <i class="fas fa-random"></i>
         </button>
 
-        <!-- Third in the row and first of the three actions, because it is the
-             one that does not end the editing session. Deliberately not a
-             `.kit-bar-btn`: that class is how the e2e drives address Huỷ
-             (`.kit-bar-btn.secondary`) and Xác nhận
-             (`.kit-bar-btn:not(.secondary)`), and a third member would make
-             both selectors ambiguous. It borrows the same sizing in CSS
-             instead. -->
+        <!-- A view control, not an action: it sits beside the pills and
+             borrows their shape in CSS, but deliberately does not take
+             `.kit-slot-pill`. That class means "a slot, or the button that
+             acts on the selected slot", `drive-kit-builder.mjs` counts it
+             expecting exactly eight, and a ninth member would quietly make
+             both the count and the `:nth-child` slot selectors lie.
+
+             The icon names what the press *gives* you, which is the half a
+             player is choosing between. -->
         <button
           type="button"
-          class="hextech-btn secondary saved-kit-save"
-          :class="{ open: naming }"
-          title="Lưu bộ chiêu này để dùng lại ở trận khác"
-          @click="toggleSave"
+          class="kit-view-toggle"
+          :class="{ compact }"
+          id="kit-view-toggle"
+          :title="compact ? 'Hiện từng chiêu' : 'Thu gọn — chỉ hiện tướng'"
+          :aria-pressed="compact"
+          @click="toggleView"
         >
-          Lưu bộ
+          <i :class="compact ? 'fas fa-list' : 'fas fa-table-cells-large'"></i>
         </button>
-        <button type="button" class="hextech-btn secondary kit-bar-btn" @click="cancel">Huỷ</button>
-        <button type="button" class="hextech-btn kit-bar-btn" @click="confirm">Xác nhận</button>
+
+        <!-- The three actions, in one group rather than three siblings. They
+             used to pass `margin-left: auto` between them to hold the right
+             end, which worked only while all three fit on the row: the view
+             toggle made it 42px wider and Xác nhận wrapped alone, under the
+             two it belongs beside. A flex group wraps as one thing and owns
+             the auto margin itself. -->
+        <div class="kit-bar-actions">
+          <!-- First of the three, because it is the one that does not end the
+               editing session. Deliberately not a `.kit-bar-btn`: that class
+               is how the e2e drives address Huỷ (`.kit-bar-btn.secondary`)
+               and Xác nhận (`.kit-bar-btn:not(.secondary)`), and a third
+               member would make both selectors ambiguous. It borrows the same
+               sizing in CSS instead. -->
+          <button
+            type="button"
+            class="hextech-btn secondary saved-kit-save"
+            :class="{ open: naming }"
+            title="Lưu bộ chiêu này để dùng lại ở trận khác"
+            aria-label="Lưu bộ"
+            @click="toggleSave"
+          >
+            <i class="fas fa-floppy-disk" aria-hidden="true"></i>
+            <!-- The label goes, the icon and the `title`/`aria-label` stay:
+                 below 640px this row is eight pills plus four buttons on a
+                 landscape phone, and the words are what does not fit. See
+                 `.kit-bar-label` in pregame-scene.css. -->
+            <span class="kit-bar-label">Lưu bộ</span>
+          </button>
+          <button
+            type="button"
+            class="hextech-btn secondary kit-bar-btn"
+            title="Huỷ, không đổi gì"
+            aria-label="Huỷ"
+            @click="cancel"
+          >
+            <i class="fas fa-xmark" aria-hidden="true"></i>
+            <span class="kit-bar-label">Huỷ</span>
+          </button>
+          <button
+            type="button"
+            class="hextech-btn kit-bar-btn"
+            title="Xác nhận bộ chiêu này"
+            aria-label="Xác nhận"
+            @click="confirm"
+          >
+            <i class="fas fa-check" aria-hidden="true"></i>
+            <span class="kit-bar-label">Xác nhận</span>
+          </button>
+        </div>
       </div>
 
       <div v-if="naming" class="saved-kit-form">
@@ -513,6 +586,7 @@ const hint = computed(() => {
           :selected-champion="selectedChampion"
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
+          :compact="compact"
           :saved-kits="savedKits"
           :peek="peek"
           @pick="pickSpell"

@@ -60,6 +60,18 @@ const props = defineProps<{
    */
   matchRules: MatchRules;
   isTouchUi: boolean;
+  /**
+   * Champion tiles only: the ability rows and the two shelves that are not a
+   * champion are hidden, leaving the whole-kit action as the only gesture.
+   *
+   * Hidden in CSS rather than dropped with `v-if`, which is the whole reason
+   * this is one boolean and not a second render path. The roster is ~50
+   * shelves and ~200 icons; keeping them mounted makes the toggle instant
+   * instead of a rebuild, and `loading="lazy"` already means an icon nobody
+   * has scrolled to never fetched. Nothing about the DOM changes — see
+   * `.kit-roster.compact` in pregame-scene.css.
+   */
+  compact: boolean;
   /** The library, newest first — see `loadSavedKits`. Empty renders no shelf at all. */
   savedKits: readonly SavedKit[];
   /**
@@ -103,7 +115,7 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
 </script>
 
 <template>
-  <div class="kit-roster">
+  <div class="kit-roster" :class="{ compact }">
     <!-- Deliberately its own class prefix rather than `.kit-shelf`: a
          champion's shelf is a fixed part of the catalogue and a saved kit is
          a row the player can delete, they carry different actions, and the
@@ -152,9 +164,14 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       v-for="shelf in shelves"
       :key="shelf.name"
       class="kit-shelf"
-      :class="{ selected: isSelectedShelf(shelf) }"
+      :class="{ selected: isSelectedShelf(shelf), 'has-kit': shelf.kit.length > 0 }"
       :data-champion="shelf.name"
     >
+      <!-- `has-kit` is the same predicate that decides whether the header is a
+           button at all (`v-if="shelf.kit.length"` below), reused rather than
+           restated: compact mode shows exactly the shelves that have a whole
+           kit to apply, so Đánh Thường and Phép Bổ Trợ drop out of the grid on
+           their own and no second rule can drift away from the first. -->
       <!-- The shelf header doubles as the whole-kit button wherever there is
            a kit to apply; the basic-attack and summoner shelves render the
            same row as an inert heading. -->
