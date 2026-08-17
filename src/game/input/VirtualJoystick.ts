@@ -68,7 +68,10 @@ export class VirtualJoystick {
    */
   get magnitude(): number {
     if (this._pointerId === null) return 0;
-    const raw = Math.min(1, Math.hypot(this._x - this._baseX, this._y - this._baseY) / this._radius);
+    const raw = Math.min(
+      1,
+      Math.hypot(this._x - this._baseX, this._y - this._baseY) / this._radius
+    );
     if (raw <= this.deadZone) return 0;
     return (raw - this.deadZone) / (1 - this.deadZone);
   }
@@ -97,8 +100,14 @@ export class VirtualJoystick {
   ): void {
     this._pointerId = pointerId;
     this._radius = Math.max(1, radius);
-    this._baseX = Math.min(Math.max(x, this._radius), Math.max(this._radius, viewport.width - this._radius));
-    this._baseY = Math.min(Math.max(y, this._radius), Math.max(this._radius, viewport.height - this._radius));
+    this._baseX = Math.min(
+      Math.max(x, this._radius),
+      Math.max(this._radius, viewport.width - this._radius)
+    );
+    this._baseY = Math.min(
+      Math.max(y, this._radius),
+      Math.max(this._radius, viewport.height - this._radius)
+    );
     this._x = x;
     this._y = y;
   }

@@ -3,12 +3,7 @@ import type { BuffConstructor } from '../../gameObject/Buff';
 
 export type ActivationPattern = 'PRESS' | 'HOLD_RELEASE' | 'RECAST' | 'TOGGLE' | 'TAP_OR_HOLD';
 export type SpellRuntimeState =
-  | 'READY'
-  | 'CASTING'
-  | 'CHARGING'
-  | 'CHANNELING'
-  | 'ACTIVE'
-  | 'COOLDOWN';
+  'READY' | 'CASTING' | 'CHARGING' | 'CHANNELING' | 'ACTIVE' | 'COOLDOWN';
 export type TargetingMode = 'SELF' | 'DIRECTION' | 'POINT' | 'UNIT';
 export type ResourceCommitPoint = 'start' | 'release' | 'tick';
 export type CooldownStartPoint = 'start' | 'release' | 'end';

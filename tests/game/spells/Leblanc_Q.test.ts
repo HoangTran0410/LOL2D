@@ -138,7 +138,9 @@ describe('Leblanc Q (Sigil of Malice)', () => {
 
     expect(takeDamage).toHaveBeenCalledTimes(1);
     expect(takeDamage).toHaveBeenCalledWith(DAMAGE, owner);
-    const mark = target.buffs.find((buff): buff is Leblanc_Q_Mark => buff instanceof Leblanc_Q_Mark);
+    const mark = target.buffs.find(
+      (buff): buff is Leblanc_Q_Mark => buff instanceof Leblanc_Q_Mark
+    );
     expect(mark).toMatchObject({ duration: MARK_DURATION_MS, bonusDamage: DAMAGE });
   });
 
@@ -168,7 +170,18 @@ describe('Leblanc Q (Sigil of Malice)', () => {
   it('draws a procedural orb rather than blitting the ability icon, and sizes its box to cover it', () => {
     const spies = { circle: vi.fn(), ellipse: vi.fn(), image: vi.fn() };
     for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'rotate', 'fill', 'noFill', 'stroke', 'noStroke', 'strokeWeight', 'blendMode']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'rotate',
+      'fill',
+      'noFill',
+      'stroke',
+      'noStroke',
+      'strokeWeight',
+      'blendMode',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     for (const name of ['ADD', 'BLEND']) vi.stubGlobal(name, name);

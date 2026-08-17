@@ -65,7 +65,7 @@ describe('practice range controls', () => {
 
     expect(roster).toContain('loading="lazy"');
     expect(roster).toContain('<SpellIcon :display="item.entry.display" lazy />');
-    expect(icon).toContain(':loading="lazy ? \'lazy\' : \'eager\'"');
+    expect(icon).toContain(":loading=\"lazy ? 'lazy' : 'eager'\"");
   });
 
   it('exposes persistent quality and FPS controls in the match tab', () => {

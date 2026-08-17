@@ -18,43 +18,85 @@ import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class Vector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): Vector { return new Vector(this.x, this.y); }
-  dist(other: Vector): number { return Math.hypot(this.x - other.x, this.y - other.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): Vector {
+    return new Vector(this.x, this.y);
+  }
+  dist(other: Vector): number {
+    return Math.hypot(this.x - other.x, this.y - other.y);
+  }
 }
 
-const context = (x: number, y: number): CastContext => Object.freeze({
-  spellId: 'varus-q', activationId: `${x}:${y}`, startedAtMs: 0, caster: {},
-  origin: Object.freeze({ x: 0, y: 0 }), cursorWorld: Object.freeze({ x, y }),
-  direction: Object.freeze({ x, y }),
-});
+const context = (x: number, y: number): CastContext =>
+  Object.freeze({
+    spellId: 'varus-q',
+    activationId: `${x}:${y}`,
+    startedAtMs: 0,
+    caster: {},
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x, y }),
+    direction: Object.freeze({ x, y }),
+  });
 
 const owner = () => {
   const objects: unknown[] = [];
   const buffs: { percent: number; toRemove: boolean }[] = [];
   const mana = {
     baseValue: 100,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   return {
-    position: new Vector(), destination: new Vector(), teamId: 'blue', isDead: false, canCast: true,
+    position: new Vector(),
+    destination: new Vector(),
+    teamId: 'blue',
+    isDead: false,
+    canCast: true,
     stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
-    game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
+    game: {
+      eventManager: { emit: vi.fn() },
+      objectManager: { addObject: (object: unknown) => objects.push(object) },
+    },
     addBuff: (buff: { percent: number; toRemove: boolean; activateBuff(): void }) => {
       buffs.push(buff);
       buff.activateBuff();
-    }, objects, buffs,
+    },
+    objects,
+    buffs,
   };
 };
 
 const stubDrawGlobals = () => {
   const spies = {
-    image: vi.fn(), line: vi.fn(), triangle: vi.fn(), vertex: vi.fn(), quad: vi.fn(),
-    beginShape: vi.fn(), endShape: vi.fn(), strokeWeight: vi.fn(),
+    image: vi.fn(),
+    line: vi.fn(),
+    triangle: vi.fn(),
+    vertex: vi.fn(),
+    quad: vi.fn(),
+    beginShape: vi.fn(),
+    endShape: vi.fn(),
+    strokeWeight: vi.fn(),
   };
   for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-  for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeCap']) {
+  for (const name of [
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'blendMode',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeCap',
+  ]) {
     vi.stubGlobal(name, vi.fn());
   }
   for (const name of ['ADD', 'BLEND', 'CLOSE', 'SQUARE', 'ROUND']) vi.stubGlobal(name, name);
@@ -107,7 +149,10 @@ describe('Varus Q', () => {
     expect(arrow).toBeInstanceOf(Varus_Q_Arrow);
     expect(arrow.destination).toMatchObject({ x: 100, y: 0 });
     expect(arrow.size).toBe(ARROW_SIZE);
-    expect(arrow).toMatchObject({ visualWidth: ARROW_VISUAL_WIDTH, visualHeight: ARROW_VISUAL_HEIGHT });
+    expect(arrow).toMatchObject({
+      visualWidth: ARROW_VISUAL_WIDTH,
+      visualHeight: ARROW_VISUAL_HEIGHT,
+    });
     expect(arrow.speed).toBeCloseTo(ARROW_SPEED);
     expect(spell.state).toBe('COOLDOWN');
   });
@@ -124,7 +169,8 @@ describe('Varus Q', () => {
     const arrow = caster.objects[0] as Varus_Q_Arrow;
     expect(arrow.destination).toMatchObject({ x: 0 });
     expect(arrow.destination.y).toBeCloseTo(
-      MIN_CENTER_TRAVEL + (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * (DAMAGE_CHARGE_MS / RANGE_CHARGE_MS),
+      MIN_CENTER_TRAVEL +
+        (MAX_CENTER_TRAVEL - MIN_CENTER_TRAVEL) * (DAMAGE_CHARGE_MS / RANGE_CHARGE_MS),
       2
     );
     expect(arrow.damage).toBe(MAX_DAMAGE);
@@ -162,7 +208,10 @@ describe('Varus Q', () => {
 
     spell.release(context(0, 1));
 
-    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({ x: 0, y: MIN_CENTER_TRAVEL });
+    expect((caster.objects[0] as Varus_Q_Arrow).destination).toMatchObject({
+      x: 0,
+      y: MIN_CENTER_TRAVEL,
+    });
   });
 
   it('caps missile center travel once range finishes charging', () => {
@@ -212,8 +261,18 @@ describe('Varus Q', () => {
   });
 
   it.each([
-    ['death', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
-    ['cast-inhibiting status', (caster: ReturnType<typeof owner>) => { caster.canCast = false; }],
+    [
+      'death',
+      (caster: ReturnType<typeof owner>) => {
+        caster.isDead = true;
+      },
+    ],
+    [
+      'cast-inhibiting status',
+      (caster: ReturnType<typeof owner>) => {
+        caster.canCast = false;
+      },
+    ],
   ])('cancels charging on %s and keeps the imported half-mana refund', (_name, interrupt) => {
     const caster = owner();
     const spell = new Varus_Q(caster);

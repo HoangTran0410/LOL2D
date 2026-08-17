@@ -42,12 +42,15 @@ export default abstract class HomingMissileSpellObject extends MissileSpellObjec
     const stepLengthSquared = stepX * stepX + stepY * stepY;
     const toTargetX = this.destination.x - previousPosition.x;
     const toTargetY = this.destination.y - previousPosition.y;
-    const progress = stepLengthSquared === 0
-      ? 0
-      : Math.max(0, Math.min(1, (toTargetX * stepX + toTargetY * stepY) / stepLengthSquared));
+    const progress =
+      stepLengthSquared === 0
+        ? 0
+        : Math.max(0, Math.min(1, (toTargetX * stepX + toTargetY * stepY) / stepLengthSquared));
     const nearestX = previousPosition.x + stepX * progress;
     const nearestY = previousPosition.y + stepY * progress;
-    return Math.hypot(this.destination.x - nearestX, this.destination.y - nearestY) <= this.arrivalRadius;
+    return (
+      Math.hypot(this.destination.x - nearestX, this.destination.y - nearestY) <= this.arrivalRadius
+    );
   }
 
   protected shouldStopAfterArrival(): boolean {

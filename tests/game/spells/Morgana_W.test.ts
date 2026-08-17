@@ -22,7 +22,10 @@ import {
   installSpellObjectGlobals,
 } from '../spell/fixtures';
 
-const context = (owner: { position: { x: number; y: number } }, cursorWorld: { x: number; y: number }): CastContext =>
+const context = (
+  owner: { position: { x: number; y: number } },
+  cursorWorld: { x: number; y: number }
+): CastContext =>
   Object.freeze({
     spellId: 'morgana-w',
     activationId: 'activation',
@@ -145,7 +148,16 @@ describe('Morgana W (Tormented Shadow)', () => {
       image: vi.fn(),
     };
     for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'fill', 'noFill', 'stroke', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'fill',
+      'noFill',
+      'stroke',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
 
@@ -203,7 +215,9 @@ describe('Morgana W spikes cover the whole zone', () => {
   });
 
   it('gives each spike its own clock, so they do not pump in unison', () => {
-    const phases = new Set(layout.map(spike => Math.round(spike.phaseOffsetMs / spike.loopMs * 8)));
+    const phases = new Set(
+      layout.map(spike => Math.round((spike.phaseOffsetMs / spike.loopMs) * 8))
+    );
     expect(phases.size).toBeGreaterThan(3);
   });
 });

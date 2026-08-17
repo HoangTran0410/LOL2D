@@ -16,7 +16,12 @@ import Chilled from '../../../src/game/gameObject/buffs/Chilled';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);
@@ -165,7 +170,18 @@ describe('Anivia E', () => {
       line: vi.fn(),
     };
     for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noStroke', 'strokeWeight', 'strokeCap']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'rotate',
+      'blendMode',
+      'fill',
+      'stroke',
+      'noStroke',
+      'strokeWeight',
+      'strokeCap',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     for (const name of ['ADD', 'BLEND', 'CLOSE', 'SQUARE', 'ROUND']) vi.stubGlobal(name, name);

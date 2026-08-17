@@ -30,7 +30,12 @@ export interface TouchButton extends TouchCircle {
 
 export interface TouchLayout {
   /** Anywhere in here, a finger landing grabs the stick. */
-  readonly joystickZone: { readonly x: number; readonly y: number; readonly w: number; readonly h: number };
+  readonly joystickZone: {
+    readonly x: number;
+    readonly y: number;
+    readonly w: number;
+    readonly h: number;
+  };
   /** Where the ring rests when nobody is touching it. */
   readonly joystickHome: TouchCircle;
   readonly knobRadius: number;
@@ -92,10 +97,7 @@ const SUMMONER_ARC = [184, 266];
  */
 const BUTTON_GAP_SCALE = 0.42;
 
-export function computeTouchLayout(
-  viewport: TouchViewport,
-  slotCount: number
-): TouchLayout {
+export function computeTouchLayout(viewport: TouchViewport, slotCount: number): TouchLayout {
   const unit = Math.min(viewport.width, viewport.height);
   const margin = clamp(unit * 0.05, 14, 34);
 

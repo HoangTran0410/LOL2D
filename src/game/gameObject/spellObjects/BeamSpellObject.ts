@@ -41,15 +41,24 @@ export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): bool
   const dx = geometry.end.x - geometry.start.x;
   const dy = geometry.end.y - geometry.start.y;
   const lengthSquared = dx * dx + dy * dy;
-  const projection = lengthSquared === 0
-    ? 0
-    : Math.max(0, Math.min(1,
-      ((target.position.x - geometry.start.x) * dx +
-        (target.position.y - geometry.start.y) * dy) / lengthSquared));
+  const projection =
+    lengthSquared === 0
+      ? 0
+      : Math.max(
+          0,
+          Math.min(
+            1,
+            ((target.position.x - geometry.start.x) * dx +
+              (target.position.y - geometry.start.y) * dy) /
+              lengthSquared
+          )
+        );
   const nearestX = geometry.start.x + dx * projection;
   const nearestY = geometry.start.y + dy * projection;
-  return Math.hypot(target.position.x - nearestX, target.position.y - nearestY) <=
-    geometry.width / 2 + target.collisionRadius;
+  return (
+    Math.hypot(target.position.x - nearestX, target.position.y - nearestY) <=
+    geometry.width / 2 + target.collisionRadius
+  );
 };
 
 export default class BeamSpellObject extends SpellObject {
@@ -63,11 +72,7 @@ export default class BeamSpellObject extends SpellObject {
   private readonly instant: boolean;
   private readonly durationMs?: number;
 
-  constructor(
-    owner: AttackableUnit,
-    geometry: BeamGeometry,
-    options: BeamOptions = {}
-  ) {
+  constructor(owner: AttackableUnit, geometry: BeamGeometry, options: BeamOptions = {}) {
     super(owner);
     this.geometry = geometry;
     this.candidates = options.candidates;

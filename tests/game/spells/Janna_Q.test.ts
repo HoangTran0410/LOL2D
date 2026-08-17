@@ -22,13 +22,32 @@ import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
 
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
-  add(vector: TestVector): this { this.x += vector.x; this.y += vector.y; return this; }
-  mult(value: number): this { this.x *= value; this.y *= value; return this; }
-  dist(vector: TestVector): number { return Math.hypot(this.x - vector.x, this.y - vector.y); }
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(vector: TestVector): this {
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
+  }
+  mult(value: number): this {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  dist(vector: TestVector): number {
+    return Math.hypot(this.x - vector.x, this.y - vector.y);
+  }
 }
 
 const context = (
@@ -107,7 +126,9 @@ describe('Janna Q', () => {
   it('releases on second Q press', () => {
     const { owner, spell, tornado } = setup();
 
-    expect(spell.press(context(owner, { x: 10, y: 20 }, { x: 10, y: 120 }, { x: 0, y: 1 }))).toBe(true);
+    expect(spell.press(context(owner, { x: 10, y: 20 }, { x: 10, y: 120 }, { x: 0, y: 1 }))).toBe(
+      true
+    );
 
     expect(tornado.charging).toBe(false);
     expect(spell.state).toBe('COOLDOWN');
@@ -137,7 +158,9 @@ describe('Janna Q', () => {
     });
     expect(tornado.speed).toBeCloseTo(MIN_SPEED + (MAX_SPEED - MIN_SPEED) * ratio);
     expect(tornado.size).toBe(MIN_SIZE + (MAX_SIZE - MIN_SIZE) * ratio);
-    expect(tornado.getCurrentDamage()).toBe(Math.round(MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * ratio));
+    expect(tornado.getCurrentDamage()).toBe(
+      Math.round(MIN_DAMAGE + (MAX_DAMAGE - MIN_DAMAGE) * ratio)
+    );
     expect(tornado.getCurrentAirborneTime()).toBe(
       Math.round(MIN_AIRBORNE_MS + (MAX_AIRBORNE_MS - MIN_AIRBORNE_MS) * ratio)
     );
@@ -157,10 +180,30 @@ describe('Janna Q', () => {
   // she is physically holding — Varus Q, Pantheon Q — is the opposite case and
   // keeps cancelling.
   it.each([
-    ['stun', (o: { status: number }) => { o.status = StatusFlags.Stunned; }],
-    ['suppression', (o: { status: number }) => { o.status = StatusFlags.Suppressed; }],
-    ['silence', (o: { status: number }) => { o.status = StatusFlags.Silenced; }],
-    ['a cast-inhibiting state', (o: { canCast: boolean }) => { o.canCast = false; }],
+    [
+      'stun',
+      (o: { status: number }) => {
+        o.status = StatusFlags.Stunned;
+      },
+    ],
+    [
+      'suppression',
+      (o: { status: number }) => {
+        o.status = StatusFlags.Suppressed;
+      },
+    ],
+    [
+      'silence',
+      (o: { status: number }) => {
+        o.status = StatusFlags.Silenced;
+      },
+    ],
+    [
+      'a cast-inhibiting state',
+      (o: { canCast: boolean }) => {
+        o.canCast = false;
+      },
+    ],
   ])('keeps the tornado alive through %s on the caster', (_name, applyCrowdControl) => {
     const { owner, spell, tornado } = setup();
 

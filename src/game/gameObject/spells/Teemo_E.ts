@@ -49,8 +49,7 @@ export default class Teemo_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_teemo_e');
   name = 'Bắn Độc (Teemo_E)';
-  description =
-    `Nội tại: mỗi đòn <span class="buff">đánh thường</span> của Teemo khiến mục tiêu <span class="buff">Trúng Độc</span>. Chủ động: bắn một mũi tẩm độc về hướng chỉ định, gây <span class="damage">${ON_HIT_DAMAGE} sát thương</span> tức thì và gây độc tương tự. Độc gây <span class="damage">${POISON_DAMAGE_PER_TICK} sát thương mỗi giây</span> trong <span class="time">${POISON_DURATION_MS / 1000} giây</span>.`;
+  description = `Nội tại: mỗi đòn <span class="buff">đánh thường</span> của Teemo khiến mục tiêu <span class="buff">Trúng Độc</span>. Chủ động: bắn một mũi tẩm độc về hướng chỉ định, gây <span class="damage">${ON_HIT_DAMAGE} sát thương</span> tức thì và gây độc tương tự. Độc gây <span class="damage">${POISON_DAMAGE_PER_TICK} sát thương mỗi giây</span> trong <span class="time">${POISON_DURATION_MS / 1000} giây</span>.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade
   // cooldown-cap scan in tests/game/spells/cooldowns.test.ts can see it
   coolDown = 4_000;

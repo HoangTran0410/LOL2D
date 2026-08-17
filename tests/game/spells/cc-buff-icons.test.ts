@@ -79,7 +79,10 @@ describe('crowd-control buffs keep their own CC icon', () => {
     ['Amumu_Q.ts', "this.dashBuff.image = AssetManager.get('spell_amumu_q')"],
   ];
 
-  it.each(keptOverrides)('%s still shows its own ability art, not a CC icon (%s)', (file, snippet) => {
-    expect(read(file)).toContain(snippet);
-  });
+  it.each(keptOverrides)(
+    '%s still shows its own ability art, not a CC icon (%s)',
+    (file, snippet) => {
+      expect(read(file)).toContain(snippet);
+    }
+  );
 });

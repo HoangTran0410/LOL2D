@@ -7,13 +7,7 @@ export class StatModifier {
   percentBonus = 0;
   percentBaseBonus = 0;
 
-  constructor(
-    baseValue = 0,
-    baseBonus = 0,
-    flatBonus = 0,
-    percentBonus = 0,
-    percentBaseBonus = 0
-  ) {
+  constructor(baseValue = 0, baseBonus = 0, flatBonus = 0, percentBonus = 0, percentBaseBonus = 0) {
     this.baseValue = baseValue;
     this.baseBonus = baseBonus;
     this.flatBonus = flatBonus;
@@ -266,10 +260,7 @@ export default class Stats {
   critDamage = new Stat(CRIT_MULTIPLIER);
 
   actionState =
-    ActionState.CAN_CAST |
-    ActionState.CAN_MOVE |
-    ActionState.CAN_ATTACK |
-    ActionState.TARGETABLE;
+    ActionState.CAN_CAST | ActionState.CAN_MOVE | ActionState.CAN_ATTACK | ActionState.TARGETABLE;
 
   addModifier(modifier: StatsModifier) {
     if (!(modifier instanceof StatsModifier)) return;
@@ -330,10 +321,7 @@ export default class Stats {
     this.setActionState(ActionState.FEARED, hasFlag(statusFlag, StatusFlags.Feared));
     this.setActionState(ActionState.TAUNTED, hasFlag(statusFlag, StatusFlags.Taunted));
     this.setActionState(ActionState.IS_GHOSTED, hasFlag(statusFlag, StatusFlags.Ghosted));
-    this.setActionState(
-      ActionState.PHASES_UNITS,
-      hasFlag(statusFlag, StatusFlags.PhasesUnits)
-    );
+    this.setActionState(ActionState.PHASES_UNITS, hasFlag(statusFlag, StatusFlags.PhasesUnits));
     this.setActionState(ActionState.GROUNDED, hasFlag(statusFlag, StatusFlags.Grounded));
     this.setActionState(ActionState.IS_NEAR_SIGHTED, hasFlag(statusFlag, StatusFlags.NearSighted));
     this.setActionState(ActionState.NO_RENDER, hasFlag(statusFlag, StatusFlags.NoRender));

@@ -73,8 +73,7 @@ function harness(spells: Array<new (owner: Champion) => Spell> = [BasicAttack, P
   const input = new SpellInputController({
     keyBindings: SpellHotKeys,
     getSpell: slot => player.spells[slot],
-    createContext: (_spell, slot) =>
-      player.spells[slot] ? contextAt(player, cursor) : undefined,
+    createContext: (_spell, slot) => (player.spells[slot] ? contextAt(player, cursor) : undefined),
   });
 
   return {
@@ -463,9 +462,7 @@ describe('BasicAttack, the ability in the A slot', () => {
     const enemy = champion(world.game, 200);
     world.world([enemy]);
 
-    world.player.replaceSpells(
-      SpellHotKeys.map(() => new BasicAttack(world.player))
-    );
+    world.player.replaceSpells(SpellHotKeys.map(() => new BasicAttack(world.player)));
 
     expect(() => {
       for (const key of SpellHotKeys) world.press(key, { x: 200, y: 0 });

@@ -30,12 +30,31 @@ import {
 import type { CancelReason, CastContext, CastSpec } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
-  add(vector: TestVector): this { this.x += vector.x; this.y += vector.y; return this; }
-  mult(value: number): this { this.x *= value; this.y *= value; return this; }
-  dist(vector: TestVector): number { return Math.hypot(this.x - vector.x, this.y - vector.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(vector: TestVector): this {
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
+  }
+  mult(value: number): this {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  dist(vector: TestVector): number {
+    return Math.hypot(this.x - vector.x, this.y - vector.y);
+  }
 }
 
 const owner = () => ({
@@ -78,16 +97,29 @@ const context = (caster: TestOwner): CastContext =>
 
 /** The caster states the watcher turns into each governed reason. */
 const applyReason: Record<string, (caster: TestOwner) => void> = {
-  DEATH: caster => { caster.isDead = true; },
-  STUN: caster => { caster.status |= StatusFlags.Stunned; },
-  SILENCE: caster => { caster.status |= StatusFlags.Silenced; },
-  DISPLACEMENT: caster => { caster.displacementRevision += 1; },
-  MOVE: caster => { caster.movementRevision += 1; },
+  DEATH: caster => {
+    caster.isDead = true;
+  },
+  STUN: caster => {
+    caster.status |= StatusFlags.Stunned;
+  },
+  SILENCE: caster => {
+    caster.status |= StatusFlags.Silenced;
+  },
+  DISPLACEMENT: caster => {
+    caster.displacementRevision += 1;
+  },
+  MOVE: caster => {
+    caster.movementRevision += 1;
+  },
 };
 
 class FormSpell extends Spell {
   cancelled: CancelReason[] = [];
-  constructor(casterUnit: TestOwner, private readonly form: SpellFormName) {
+  constructor(
+    casterUnit: TestOwner,
+    private readonly form: SpellFormName
+  ) {
     super(casterUnit);
   }
   get castSpec(): Readonly<CastSpec> {
@@ -100,7 +132,9 @@ class FormSpell extends Spell {
       interrupts: SpellForm[this.form],
     };
   }
-  onCancel(_context: CastContext, reason: CancelReason): void { this.cancelled.push(reason); }
+  onCancel(_context: CastContext, reason: CancelReason): void {
+    this.cancelled.push(reason);
+  }
 }
 
 /** Every spell class the game can put in a slot. */
@@ -114,7 +148,9 @@ describe('cancel policy, driven through real spells', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     vi.stubGlobal('random', (a = 1, b?: number) => (b === undefined ? a * 0.5 : (a + b) / 2));
-    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v)));
+    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) =>
+      Math.min(hi, Math.max(lo, v))
+    );
     vi.stubGlobal('lerp', (a: number, b: number, t: number) => a + (b - a) * t);
     vi.stubGlobal('TWO_PI', Math.PI * 2);
   });
@@ -152,7 +188,10 @@ describe('cancel policy, driven through real spells', () => {
 
   it('keeps the roster of spells that are not plain HELD casts', () => {
     const exceptions = productionSpells
-      .map(([name, SpellClass]) => [name, spellFormNameOf(new SpellClass(undefined).castSpec.interrupts)] as const)
+      .map(
+        ([name, SpellClass]) =>
+          [name, spellFormNameOf(new SpellClass(undefined).castSpec.interrupts)] as const
+      )
       .filter(([, form]) => form !== 'HELD')
       .map(([name, form]) => `${name}: ${form}`)
       .sort();
@@ -212,7 +251,9 @@ describe('the three cases the forms exist for', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     vi.stubGlobal('random', (a = 1, b?: number) => (b === undefined ? a * 0.5 : (a + b) / 2));
-    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v)));
+    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) =>
+      Math.min(hi, Math.max(lo, v))
+    );
     vi.stubGlobal('lerp', (a: number, b: number, t: number) => a + (b - a) * t);
     vi.stubGlobal('TWO_PI', Math.PI * 2);
   });

@@ -62,7 +62,9 @@ describe('computeTouchLayout', () => {
   it('keeps every ability compact around attack without crowding touch targets', () => {
     const layout = computeTouchLayout(PHONE, SLOTS);
     const attack = layout.buttons.find(button => button.slot === 0)!;
-    const abilities = [1, 2, 3, 4].map(slot => layout.buttons.find(button => button.slot === slot)!);
+    const abilities = [1, 2, 3, 4].map(slot =>
+      layout.buttons.find(button => button.slot === slot)!
+    );
     const summoners = [5, 6].map(slot => layout.buttons.find(button => button.slot === slot)!);
 
     for (const ability of abilities) {
@@ -113,7 +115,10 @@ describe('computeTouchLayout', () => {
           const a = buttons[i];
           const b = buttons[j];
           const gap = Math.hypot(a.x - b.x, a.y - b.y) - a.radius - b.radius;
-          expect(gap, `${viewport.width}x${viewport.height}: slots ${a.slot}/${b.slot}`).toBeGreaterThanOrEqual(10);
+          expect(
+            gap,
+            `${viewport.width}x${viewport.height}: slots ${a.slot}/${b.slot}`
+          ).toBeGreaterThanOrEqual(10);
         }
       }
     }
@@ -182,7 +187,11 @@ describe('buttonAt', () => {
     const midX = (attack.x + q.x) / 2;
     const midY = (attack.y + q.y) / 2;
 
-    const nearAttack = buttonAt(layout, midX + (attack.x - midX) * 0.6, midY + (attack.y - midY) * 0.6);
+    const nearAttack = buttonAt(
+      layout,
+      midX + (attack.x - midX) * 0.6,
+      midY + (attack.y - midY) * 0.6
+    );
     expect(nearAttack?.slot).toBe(0);
   });
 

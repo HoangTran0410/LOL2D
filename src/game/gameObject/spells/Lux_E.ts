@@ -42,10 +42,7 @@ export default class Lux_E extends Spell {
       this.resetCoolDown();
     }
 
-    if (
-      this.luxEObject?.phase === Lux_E_Object.PHASES.EXPLODE ||
-      this.luxEObject?.toRemove
-    ) {
+    if (this.luxEObject?.phase === Lux_E_Object.PHASES.EXPLODE || this.luxEObject?.toRemove) {
       this.luxEObject = null;
     }
   }
@@ -59,8 +56,7 @@ export class Lux_E_Object extends SpellObject {
     STATIC: 1,
     EXPLODE: 2,
   } as const;
-  phase: (typeof Lux_E_Object.PHASES)[keyof typeof Lux_E_Object.PHASES] =
-    Lux_E_Object.PHASES.MOVE;
+  phase: (typeof Lux_E_Object.PHASES)[keyof typeof Lux_E_Object.PHASES] = Lux_E_Object.PHASES.MOVE;
 
   moveSpeed = 7;
   moveSize = 30;

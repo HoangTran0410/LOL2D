@@ -145,9 +145,10 @@ describe('NavGrid', () => {
       // nothing about the grid
       if (!pointInPolygon(cx, cy, polygon)) continue;
       insideSamples++;
-      expect(realGrid.isWalkable(cx, cy, MINION_RADIUS), `walkable inside wall at ${cx},${cy}`).toBe(
-        false
-      );
+      expect(
+        realGrid.isWalkable(cx, cy, MINION_RADIUS),
+        `walkable inside wall at ${cx},${cy}`
+      ).toBe(false);
     }
     expect(insideSamples).toBeGreaterThan(100);
   });
@@ -260,7 +261,10 @@ describe('NavGrid', () => {
       const capped = standableCells(NAV_MAX_TERRAIN_RADIUS);
       const uncapped = standableCells(MAX_UNIT_SIZE / 2);
 
-      expect(capped / champion, 'the cap must keep most of a champion’s standable ground').toBeGreaterThan(0.85);
+      expect(
+        capped / champion,
+        'the cap must keep most of a champion’s standable ground'
+      ).toBeGreaterThan(0.85);
       // the measurement the cap exists for: without it, a maxed body loses
       // nearly half the map's standable ground and detours around the rest
       expect(uncapped / champion).toBeLessThan(0.65);

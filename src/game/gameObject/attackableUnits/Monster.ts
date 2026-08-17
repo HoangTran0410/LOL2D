@@ -154,10 +154,10 @@ export default class Monster extends AttackableUnit {
     this.stats.healthRegen.baseValue = this.isDead
       ? 0
       : this.phase === Monster.PHASES.IDLE
-      ? this._idleRegen
-      : this.phase === Monster.PHASES.BACK_TO_CAMP
-      ? this._leashRegen
-      : 0;
+        ? this._idleRegen
+        : this.phase === Monster.PHASES.BACK_TO_CAMP
+          ? this._leashRegen
+          : 0;
 
     super.update();
 

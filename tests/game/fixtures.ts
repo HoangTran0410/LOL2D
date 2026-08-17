@@ -8,22 +8,53 @@ import type { GameObjectRuntimeContext } from '../../src/game/gameObject/GameObj
 
 /** The subset of p5.Vector the unit classes actually reach for. */
 export class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
-  add(vector: TestVector) { this.x += vector.x; this.y += vector.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  div(value: number) { this.x /= value; this.y /= value; return this; }
-  normalize() { return this.setMag(1); }
-  magSq() { return this.x * this.x + this.y * this.y; }
-  mag() { return Math.hypot(this.x, this.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(vector: TestVector) {
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
+  }
+  mult(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  div(value: number) {
+    this.x /= value;
+    this.y /= value;
+    return this;
+  }
+  normalize() {
+    return this.setMag(1);
+  }
+  magSq() {
+    return this.x * this.x + this.y * this.y;
+  }
+  mag() {
+    return Math.hypot(this.x, this.y);
+  }
   setMag(value: number) {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > 0) this.mult(value / magnitude);
     return this;
   }
-  dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
-  heading() { return Math.atan2(this.y, this.x); }
+  dist(vector: TestVector) {
+    return Math.hypot(this.x - vector.x, this.y - vector.y);
+  }
+  heading() {
+    return Math.atan2(this.y, this.x);
+  }
   /** In place, like p5's — `Obstacle.getBoundingBox` rotates and then reads x/y. */
   rotate(angle: number) {
     const { x, y } = this;
@@ -31,9 +62,15 @@ export class TestVector {
     this.y = x * Math.sin(angle) + y * Math.cos(angle);
     return this;
   }
-  static add(a: TestVector, b: TestVector) { return new TestVector(a.x + b.x, a.y + b.y); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
-  static dist(a: TestVector, b: TestVector) { return a.dist(b); }
+  static add(a: TestVector, b: TestVector) {
+    return new TestVector(a.x + b.x, a.y + b.y);
+  }
+  static sub(a: TestVector, b: TestVector) {
+    return new TestVector(a.x - b.x, a.y - b.y);
+  }
+  static dist(a: TestVector, b: TestVector) {
+    return a.dist(b);
+  }
 }
 
 export type TestGame = GameObjectRuntimeContext & { setPlayer(player: AttackableUnit): void };
@@ -54,7 +91,9 @@ export function createGame(mapSize = 6_400): TestGame {
     },
     randomSpawnPoint: () => createVector(),
     createSpellContext: () => undefined,
-    setPlayer(value: AttackableUnit) { player = value; },
+    setPlayer(value: AttackableUnit) {
+      player = value;
+    },
   };
 }
 
@@ -80,7 +119,9 @@ export function stubGameGlobals(): Record<string, ReturnType<typeof vi.fn>> {
     max === undefined ? Math.random() * min : min + Math.random() * (max - min)
   );
   vi.stubGlobal('lerp', (from: number, to: number, amount: number) => from + (to - from) * amount);
-  vi.stubGlobal('constrain', (n: number, low: number, high: number) => Math.min(high, Math.max(low, n)));
+  vi.stubGlobal('constrain', (n: number, low: number, high: number) =>
+    Math.min(high, Math.max(low, n))
+  );
   vi.stubGlobal('max', Math.max);
   vi.stubGlobal('min', Math.min);
   vi.stubGlobal('cos', Math.cos);
@@ -89,9 +130,28 @@ export function stubGameGlobals(): Record<string, ReturnType<typeof vi.fn>> {
 
   const spies: Record<string, ReturnType<typeof vi.fn>> = {};
   for (const name of [
-    'push', 'pop', 'translate', 'rotate', 'fill', 'stroke', 'noFill', 'noStroke',
-    'strokeWeight', 'rect', 'line', 'circle', 'ellipse', 'arc', 'image', 'tint',
-    'text', 'textSize', 'textAlign', 'beginShape', 'vertex', 'endShape',
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeWeight',
+    'rect',
+    'line',
+    'circle',
+    'ellipse',
+    'arc',
+    'image',
+    'tint',
+    'text',
+    'textSize',
+    'textAlign',
+    'beginShape',
+    'vertex',
+    'endShape',
   ]) {
     spies[name] = vi.fn();
     vi.stubGlobal(name, spies[name]);

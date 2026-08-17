@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import Buff, { type BuffConstructor } from '../../../src/game/gameObject/Buff';
-import AttackableUnit, { type HealSource } from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import AttackableUnit, {
+  type HealSource,
+} from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
 import Nearsight, { type NearsightGameContext } from '../../../src/game/gameObject/buffs/Nearsight';
@@ -60,10 +62,18 @@ class TrackingBuff extends Buff {
   deactivated = 0;
   damageReduction = 0;
 
-  onCreate(): void { this.created += 1; }
-  onActivate(): void { this.activated += 1; }
-  onDeactivate(): void { this.deactivated += 1; }
-  modifyIncomingDamage(damage: number): number { return damage - this.damageReduction; }
+  onCreate(): void {
+    this.created += 1;
+  }
+  onActivate(): void {
+    this.activated += 1;
+  }
+  onDeactivate(): void {
+    this.deactivated += 1;
+  }
+  modifyIncomingDamage(damage: number): number {
+    return damage - this.damageReduction;
+  }
 }
 
 function createGame(): GameObjectRuntimeContext {
@@ -116,7 +126,9 @@ describe('buff and attackable unit type boundary', () => {
     vi.stubGlobal('random', () => 0);
   });
 
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('does not use explicit any or deprecated asset lookups in scoped production files', () => {
     for (const source of scopedSources) {

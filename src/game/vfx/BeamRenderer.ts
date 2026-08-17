@@ -15,7 +15,9 @@ export default class BeamRenderer implements VfxHandle {
     if (!this.disposed) this.render(this.geometry);
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 
   private static renderDefault(geometry: BeamGeometry): void {
     push();

@@ -68,7 +68,6 @@ describe('a spell hooks a dash frame, it does not replace it', () => {
 });
 
 describe('Dash still moves while a spell hooks its per-frame update', () => {
-
   beforeEach(() => {
     installSpellObjectGlobals();
     installSketchMathGlobals();

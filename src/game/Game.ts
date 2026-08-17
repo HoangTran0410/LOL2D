@@ -39,10 +39,7 @@ import TargetResolver, {
   defaultTargetInfo,
 } from './spell/targeting/TargetResolver';
 import AssetManager from '../managers/AssetManager';
-import {
-  findAttackTargetAlongRay,
-  findAttackTargetNearPoint,
-} from './combat/AttackTargeting';
+import { findAttackTargetAlongRay, findAttackTargetNearPoint } from './combat/AttackTargeting';
 import TouchControls, {
   touchControlsPreference,
   rememberTouchControlsPreference,

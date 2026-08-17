@@ -227,7 +227,6 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
  * in the root stacking context, where `z-index: 200` clears the HUD. The host
  * is `display: contents` so it adds no box of its own.
  */
-
 </script>
 
 <template>
@@ -314,11 +313,7 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
       <!-- Bots only: the player's own movement, attacks and casts are the
            player's. -->
       <div v-if="entry.behaviour" class="practice-roster-flags">
-        <label
-          v-for="flag of BEHAVIOUR_FLAGS"
-          :key="flag.key"
-          class="pregame-toggle practice-flag"
-        >
+        <label v-for="flag of BEHAVIOUR_FLAGS" :key="flag.key" class="pregame-toggle practice-flag">
           <input
             type="checkbox"
             :checked="entry.behaviour[flag.key]"
@@ -337,22 +332,14 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
          on screen otherwise. The count is on the button rather than in a note
          beside it for the same reason: at the cap, the one control the player is
          pressing is the one that has to explain itself. -->
-    <button
-      type="button"
-      class="practice-add-bot"
-      :disabled="atCap"
-      @click="addBot"
-    >
+    <button type="button" class="practice-add-bot" :disabled="atCap" @click="addBot">
       <i class="fas fa-plus"></i>
       <span>{{ atCap ? `Đã đủ ${AI_COUNT_MAX} bot — xoá bớt để thêm` : 'Thêm bot' }}</span>
       <span class="practice-add-bot-count">{{ bots.length }}/{{ AI_COUNT_MAX }}</span>
     </button>
 
     <Teleport to="body">
-      <div
-        v-if="editing"
-        class="practice-editor-host"
-      >
+      <div v-if="editing" class="practice-editor-host">
         <LoadoutEditorModal
           :title="`Đổi tướng — ${labelOf(editingIndex)}`"
           :loadout="editingLoadout"

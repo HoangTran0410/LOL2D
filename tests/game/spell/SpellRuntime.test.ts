@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import EventType from '../../../src/game/enums/EventType';
 import Spell from '../../../src/game/gameObject/Spell';
-import { SpellRuntime, type SpellRuntimeDelegate } from '../../../src/game/spell/runtime/SpellRuntime';
+import {
+  SpellRuntime,
+  type SpellRuntimeDelegate,
+} from '../../../src/game/spell/runtime/SpellRuntime';
 import type {
   CastContext,
   CastSpec,
@@ -36,8 +39,7 @@ const fakeDelegate = () => {
     },
     refundResource: (_context, reason) => events.push(`refund:${reason}`),
     onCastStart: () => events.push('castStart'),
-    onChargeUpdate: (_context, elapsedMs, ratio) =>
-      events.push(`charge:${elapsedMs}:${ratio}`),
+    onChargeUpdate: (_context, elapsedMs, ratio) => events.push(`charge:${elapsedMs}:${ratio}`),
     onRelease: () => events.push('release'),
     onChannelTick: (_context, tickIndex) => events.push(`tick:${tickIndex}`),
     onActivate: () => events.push('activate'),
@@ -75,7 +77,7 @@ describe('SpellRuntime', () => {
     runtime.hold(context);
     runtime.update(50);
 
-    expect(events.filter((event) => event === 'commit:start')).toHaveLength(1);
+    expect(events.filter(event => event === 'commit:start')).toHaveLength(1);
   });
 
   it('commits release resources only when a charge releases', () => {
@@ -96,8 +98,8 @@ describe('SpellRuntime', () => {
     runtime.release(context);
     runtime.release(context);
 
-    expect(events.filter((event) => event === 'commit:release')).toHaveLength(1);
-    expect(events.filter((event) => event === 'release')).toHaveLength(1);
+    expect(events.filter(event => event === 'commit:release')).toHaveLength(1);
+    expect(events.filter(event => event === 'release')).toHaveLength(1);
   });
 
   it('refunds according to the cancel policy', () => {
@@ -114,7 +116,7 @@ describe('SpellRuntime', () => {
     runtime.cancel('STUN');
     runtime.cancel('STUN');
 
-    expect(events.filter((event) => event === 'refund:STUN')).toHaveLength(1);
+    expect(events.filter(event => event === 'refund:STUN')).toHaveLength(1);
   });
 
   it('starts cooldown at start, release, or end according to policy', () => {
@@ -124,10 +126,7 @@ describe('SpellRuntime', () => {
         spec({
           activation: startAt === 'release' ? 'HOLD_RELEASE' : 'PRESS',
           castTimeMs: startAt === 'release' ? undefined : 100,
-          charge:
-            startAt === 'release'
-              ? { maxDurationMs: 500, releaseAtMax: false }
-              : undefined,
+          charge: startAt === 'release' ? { maxDurationMs: 500, releaseAtMax: false } : undefined,
           cooldown: { startAt, durationMs: 1_000 },
         }),
         delegate
@@ -172,8 +171,8 @@ describe('SpellRuntime', () => {
     runtime.update(50);
     runtime.press(context);
 
-    expect(events.filter((event) => event === 'recast')).toHaveLength(1);
-    expect(events.filter((event) => event === 'complete')).toHaveLength(1);
+    expect(events.filter(event => event === 'recast')).toHaveLength(1);
+    expect(events.filter(event => event === 'complete')).toHaveLength(1);
     expect(runtime.state).toBe('READY');
   });
 
@@ -199,7 +198,7 @@ describe('SpellRuntime', () => {
     runtime.cancel('PLAYER_CANCEL');
     runtime.cancel('PLAYER_CANCEL');
 
-    expect(events.filter((event) => event === 'cancel:PLAYER_CANCEL')).toHaveLength(1);
+    expect(events.filter(event => event === 'cancel:PLAYER_CANCEL')).toHaveLength(1);
   });
 
   it('maps legacy cast to an immediate onSpellCast call', () => {
@@ -282,16 +281,20 @@ describe('SpellRuntime', () => {
     runtime.press(context);
     runtime.update(2_000);
 
-    expect(events.filter((event) => event.startsWith('tick:'))).toEqual([
+    expect(events.filter(event => event.startsWith('tick:'))).toEqual([
       'tick:1',
       'tick:2',
       'tick:3',
     ]);
-    expect(events.filter((event) => event === 'complete')).toHaveLength(1);
+    expect(events.filter(event => event === 'complete')).toHaveLength(1);
   });
 
   it.each([
-    ['channel tick', spec({ channel: { durationMs: 1_000, tickEveryMs: 0 } }), 'channel.tickEveryMs'],
+    [
+      'channel tick',
+      spec({ channel: { durationMs: 1_000, tickEveryMs: 0 } }),
+      'channel.tickEveryMs',
+    ],
     [
       'resource tick',
       spec({
@@ -303,7 +306,9 @@ describe('SpellRuntime', () => {
   ])('rejects a non-progressing %s interval', (_name, invalidSpec, field) => {
     const { delegate } = fakeDelegate();
 
-    expect(() => new SpellRuntime(invalidSpec, delegate)).toThrow(`${field} must be greater than 0`);
+    expect(() => new SpellRuntime(invalidSpec, delegate)).toThrow(
+      `${field} must be greater than 0`
+    );
   });
 
   it('uses independent channel and resource tick cadences', () => {
@@ -319,12 +324,12 @@ describe('SpellRuntime', () => {
     runtime.press(context);
     runtime.update(1_000);
 
-    expect(events.filter((event) => event.startsWith('tick:'))).toEqual([
+    expect(events.filter(event => event.startsWith('tick:'))).toEqual([
       'tick:1',
       'tick:2',
       'tick:3',
     ]);
-    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(4);
+    expect(events.filter(event => event === 'commit:tick')).toHaveLength(4);
   });
 
   it('commits tick resources while ACTIVE', () => {
@@ -342,7 +347,7 @@ describe('SpellRuntime', () => {
     runtime.update(600);
 
     expect(runtime.state).toBe('ACTIVE');
-    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(3);
+    expect(events.filter(event => event === 'commit:tick')).toHaveLength(3);
   });
 
   it('cancels ACTIVE when a tick resource commit fails', () => {
@@ -365,14 +370,14 @@ describe('SpellRuntime', () => {
     runtime.press(context);
     runtime.update(600);
 
-    expect(events.filter((event) => event === 'commit:tick')).toHaveLength(2);
+    expect(events.filter(event => event === 'commit:tick')).toHaveLength(2);
     expect(events).toContain('cancel:OUT_OF_RESOURCE');
     expect(runtime.state).toBe('COOLDOWN');
   });
 
   it.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
     'requires charge configuration for %s activation',
-    (activation) => {
+    activation => {
       const { delegate } = fakeDelegate();
 
       expect(() => new SpellRuntime(spec({ activation }), delegate)).toThrow(
@@ -395,7 +400,7 @@ describe('SpellRuntime', () => {
 
   it.each(['RECAST', 'TOGGLE'] as const)(
     'rejects charge configuration for %s activation',
-    (activation) => {
+    activation => {
       const { delegate } = fakeDelegate();
 
       expect(

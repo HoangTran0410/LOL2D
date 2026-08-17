@@ -38,11 +38,7 @@ export class SpellName_Skillshot extends Spell {
   range = 400;
 
   onSpellCast() {
-    const { to } = VectorUtils.getVectorWithRange(
-      this.owner.position,
-      this.aimPoint,
-      this.range
-    );
+    const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
 
     const obj = new SpellName_Missile(this.owner);
     obj.destination = to;

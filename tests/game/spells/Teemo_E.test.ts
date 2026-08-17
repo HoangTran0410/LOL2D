@@ -22,10 +22,7 @@ import AttackableUnit from '../../../src/game/gameObject/attackableUnits/Attacka
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import SpellInputController from '../../../src/game/spell/input/SpellInputController';
 import { HotKeys, SpellHotKeys } from '../../../src/game/constants';
-import {
-  BasicAttackSwing,
-  MELEE_WINDUP_MS,
-} from '../../../src/game/combat/BasicAttack';
+import { BasicAttackSwing, MELEE_WINDUP_MS } from '../../../src/game/combat/BasicAttack';
 import { TestVector } from '../spell/fixtures';
 import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
 
@@ -45,8 +42,12 @@ const owner = () => {
   const objects: unknown[] = [];
   const manaStat = {
     baseValue: 200,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   return {
     position: new TestVector(0, 0),
@@ -231,8 +232,13 @@ describe('Teemo E', () => {
     caster.position = new TestVector(0, 0);
     const spell = new Teemo_E(caster);
     spell.press?.({
-      spellId: 'teemo-e', activationId: 'a', startedAtMs: 0, caster: {},
-      origin: { x: 0, y: 0 }, cursorWorld: { x: RANGE * 5, y: 0 }, direction: { x: 1, y: 0 },
+      spellId: 'teemo-e',
+      activationId: 'a',
+      startedAtMs: 0,
+      caster: {},
+      origin: { x: 0, y: 0 },
+      cursorWorld: { x: RANGE * 5, y: 0 },
+      direction: { x: 1, y: 0 },
     } as never);
 
     const vial = caster.objects[0] as Teemo_E_Object;
@@ -286,7 +292,18 @@ describe('Teemo E', () => {
 
     const draw = { ellipse: vi.fn(), rect: vi.fn(), arc: vi.fn(), circle: vi.fn() };
     for (const [name, spy] of Object.entries(draw)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'rotate',
+      'blendMode',
+      'fill',
+      'stroke',
+      'noFill',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     for (const name of ['ADD', 'BLEND', 'PI']) vi.stubGlobal(name, name === 'PI' ? Math.PI : name);
@@ -303,7 +320,9 @@ describe('Teemo E', () => {
 
     const splash = new Teemo_E_Splash(caster as never);
     splash.position = new TestVector(0, 0) as never;
-    vi.stubGlobal('constrain', (value: number, low: number, high: number) => Math.min(Math.max(value, low), high));
+    vi.stubGlobal('constrain', (value: number, low: number, high: number) =>
+      Math.min(Math.max(value, low), high)
+    );
     splash.onAdded();
     splash.draw();
     expect(draw.circle).toHaveBeenCalled();

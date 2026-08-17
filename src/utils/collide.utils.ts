@@ -83,7 +83,14 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/circle-circle.php
-  circleCircle(c1x: number, c1y: number, c1r: number, c2x: number, c2y: number, c2r: number): boolean {
+  circleCircle(
+    c1x: number,
+    c1y: number,
+    c1r: number,
+    c2x: number,
+    c2y: number,
+    c2r: number
+  ): boolean {
     const dx = c1x - c2x;
     const dy = c1y - c2y;
     return Math.sqrt(dx * dx + dy * dy) <= c1r + c2r;
@@ -95,12 +102,29 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/rect-rect.php
-  rectRect(r1x: number, r1y: number, r1w: number, r1h: number, r2x: number, r2y: number, r2w: number, r2h: number): boolean {
+  rectRect(
+    r1x: number,
+    r1y: number,
+    r1w: number,
+    r1h: number,
+    r2x: number,
+    r2y: number,
+    r2w: number,
+    r2h: number
+  ): boolean {
     return r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h;
   },
 
   // http://www.jeffreythompson.org/collision-detection/circle-rect.php
-  circleRect(cx: number, cy: number, radius: number, rx: number, ry: number, rw: number, rh: number): boolean {
+  circleRect(
+    cx: number,
+    cy: number,
+    radius: number,
+    rx: number,
+    ry: number,
+    rw: number,
+    rh: number
+  ): boolean {
     let testX = cx;
     let testY = cy;
     if (cx < rx) testX = rx;
@@ -113,7 +137,15 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-point.php
-  linePoint(x1: number, y1: number, x2: number, y2: number, px: number, py: number, buffer = 0.1): boolean {
+  linePoint(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    px: number,
+    py: number,
+    buffer = 0.1
+  ): boolean {
     const dx1 = px - x1;
     const dy1 = py - y1;
     const dx2 = px - x2;
@@ -127,7 +159,15 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-circle.php
-  lineCircle(x1: number, y1: number, x2: number, y2: number, cx: number, cy: number, r: number): boolean {
+  lineCircle(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    cx: number,
+    cy: number,
+    r: number
+  ): boolean {
     if (this.pointCircle(x1, y1, cx, cy, r)) return true;
     if (this.pointCircle(x2, y2, cx, cy, r)) return true;
     const dx = x2 - x1;
@@ -144,7 +184,16 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-line.php
-  lineLine(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number): boolean {
+  lineLine(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number,
+    x4: number,
+    y4: number
+  ): boolean {
     let uA =
       ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) /
       ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
@@ -155,7 +204,16 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/line-rect.php
-  lineRect(x1: number, y1: number, x2: number, y2: number, rx: number, ry: number, rw: number, rh: number): boolean {
+  lineRect(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    rx: number,
+    ry: number,
+    rw: number,
+    rh: number
+  ): boolean {
     return (
       this.lineLine(x1, y1, x2, y2, rx, ry, rx, ry + rh) ||
       this.lineLine(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh) ||
@@ -197,7 +255,14 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/poly-rect.php
-  polyRect(vertices: Point[], rx: number, ry: number, rw: number, rh: number, isCheckInside = false): boolean {
+  polyRect(
+    vertices: Point[],
+    rx: number,
+    ry: number,
+    rw: number,
+    rh: number,
+    isCheckInside = false
+  ): boolean {
     let next = 0;
     for (let current = 0; current < vertices.length; current++) {
       next = current + 1;
@@ -247,7 +312,16 @@ const CollideUtils = {
   },
 
   // http://www.jeffreythompson.org/collision-detection/tri-point.php
-  triPoint(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, px: number, py: number): boolean {
+  triPoint(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number,
+    px: number,
+    py: number
+  ): boolean {
     const areaOrig = Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
     const area1 = Math.abs((x1 - px) * (y2 - py) - (x2 - px) * (y1 - py));
     const area2 = Math.abs((x2 - px) * (y3 - py) - (x3 - px) * (y2 - py));

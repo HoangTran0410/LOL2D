@@ -32,24 +32,59 @@ import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/Game
 import type GameObject from '../../../src/game/gameObject/GameObject';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
-  add(vector: TestVector) { this.x += vector.x; this.y += vector.y; return this; }
-  sub(vector: TestVector) { this.x -= vector.x; this.y -= vector.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
-  magSq() { return this.x * this.x + this.y * this.y; }
-  normalize() { return this.setMag(1); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(vector: TestVector) {
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
+  }
+  sub(vector: TestVector) {
+    this.x -= vector.x;
+    this.y -= vector.y;
+    return this;
+  }
+  mult(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  mag() {
+    return Math.hypot(this.x, this.y);
+  }
+  magSq() {
+    return this.x * this.x + this.y * this.y;
+  }
+  normalize() {
+    return this.setMag(1);
+  }
   setMag(value: number) {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > 0) this.mult(value / magnitude);
     return this;
   }
-  dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
-  static add(a: TestVector, b: TestVector) { return a.copy().add(b); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
-  static dist(a: TestVector, b: TestVector) { return a.dist(b); }
+  dist(vector: TestVector) {
+    return Math.hypot(this.x - vector.x, this.y - vector.y);
+  }
+  static add(a: TestVector, b: TestVector) {
+    return a.copy().add(b);
+  }
+  static sub(a: TestVector, b: TestVector) {
+    return new TestVector(a.x - b.x, a.y - b.y);
+  }
+  static dist(a: TestVector, b: TestVector) {
+    return a.dist(b);
+  }
 }
 
 interface TestGame extends GameObjectRuntimeContext {
@@ -70,7 +105,9 @@ function createGame(): TestGame {
       if (!player) throw new Error('Player is not available in this test context.');
       return player;
     },
-    setPlayer(value: AttackableUnit) { player = value; },
+    setPlayer(value: AttackableUnit) {
+      player = value;
+    },
     randomSpawnPoint: () => createVector(),
     createSpellContext: () => undefined,
   };
@@ -110,13 +147,18 @@ describe('basic attacks', () => {
     vi.stubGlobal('random', (min = 1, max?: number) =>
       max === undefined ? min * 0.5 : min + (max - min) * 0.5
     );
-    vi.stubGlobal('lerp', (from: number, to: number, amount: number) => from + (to - from) * amount);
+    vi.stubGlobal(
+      'lerp',
+      (from: number, to: number, amount: number) => from + (to - from) * amount
+    );
     vi.stubGlobal('constrain', (n: number, low: number, high: number) =>
       Math.min(high, Math.max(low, n))
     );
   });
 
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   // ------------------------------------------------------------------ stats
 

@@ -137,7 +137,8 @@ export function resolveSpellAim(input: SpellAimInput): SpellAimResult {
         : finish(origin, { x: origin.x, y: origin.y }, null, false);
     }
     const probe = project(origin, direction, range);
-    const picked = input.pickUnitNear?.(probe, UNIT_SNAP_RADIUS, input.lockedTarget ?? null) ?? null;
+    const picked =
+      input.pickUnitNear?.(probe, UNIT_SNAP_RADIUS, input.lockedTarget ?? null) ?? null;
     return picked
       ? finish(origin, { x: picked.position.x, y: picked.position.y }, picked, true)
       : finish(origin, probe, null, true);

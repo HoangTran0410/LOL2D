@@ -118,9 +118,5 @@ export const routeClearance = (
 };
 
 /** Straight-line worst clearance, for asserting that a detour was necessary. */
-export const segmentClearance = (
-  ax: number,
-  ay: number,
-  bx: number,
-  by: number
-): WorstClearance => routeClearance([bx, by], ax, ay);
+export const segmentClearance = (ax: number, ay: number, bx: number, by: number): WorstClearance =>
+  routeClearance([bx, by], ax, ay);

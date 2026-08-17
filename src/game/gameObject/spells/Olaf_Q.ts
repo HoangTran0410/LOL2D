@@ -145,10 +145,7 @@ export class Olaf_Q_Object extends MissileSpellObject {
       this.toRemove = true;
     }
 
-    if (
-      this.owner.position.dist(this.position) <
-      this.owner.stats.size.value / 2 + this.size / 2
-    ) {
+    if (this.owner.position.dist(this.position) < this.owner.stats.size.value / 2 + this.size / 2) {
       if (this.spellSource) {
         this.spellSource.currentCooldown *= 0.4;
       }
@@ -165,7 +162,15 @@ export class Olaf_Q_Object extends MissileSpellObject {
     strokeWeight(3);
     (fill as any)(...(this.color as [number, number, number]), 200);
 
-    let shape: [number, number][] = [[-45, -10], [-10, -5], [30, -10], [35, 20], [0, 20], [10, 0], [-45, 0]];
+    let shape: [number, number][] = [
+      [-45, -10],
+      [-10, -5],
+      [30, -10],
+      [35, 20],
+      [0, 20],
+      [10, 0],
+      [-45, 0],
+    ];
     if (!this.willRotateRight) shape = shape.map(([x, y]) => [-x, y]);
     beginShape();
     shape.forEach(([x, y]) => vertex(x, y));

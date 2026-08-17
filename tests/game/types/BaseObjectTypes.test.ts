@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { Rectangle } from '../../../src/libs/quadtree';
 import GameObject from '../../../src/game/gameObject/GameObject';
-import type { GameObjectGameContext, GameObjectRuntimeContext } from '../../../src/game/gameObject/GameObject';
+import type {
+  GameObjectGameContext,
+  GameObjectRuntimeContext,
+} from '../../../src/game/gameObject/GameObject';
 import SpellObject from '../../../src/game/gameObject/SpellObject';
 import ObjectManager, { PredefinedFilters } from '../../../src/game/managers/ObjectManager';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -23,15 +26,30 @@ class TestObject extends GameObject {
   removed = 0;
   updates = 0;
 
-  onAdded() { this.added += 1; }
-  onRemoved() { this.removed += 1; }
-  update() { this.updates += 1; }
+  onAdded() {
+    this.added += 1;
+  }
+  onRemoved() {
+    this.removed += 1;
+  }
+  update() {
+    this.updates += 1;
+  }
 }
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
 }
 
 function createGame(): GameObjectRuntimeContext {
@@ -58,7 +76,9 @@ describe('base object type boundary', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
   });
 
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('does not use explicit any in base object production files', () => {
     for (const source of scopedSources) {
@@ -211,8 +231,12 @@ describe('base object type boundary', () => {
     const champion = new Champion({ game });
     const combatText = new CombatText(champion);
     const order: string[] = [];
-    champion.draw = () => { order.push('champion'); };
-    combatText.draw = () => { order.push('combat-text'); };
+    champion.draw = () => {
+      order.push('champion');
+    };
+    combatText.draw = () => {
+      order.push('combat-text');
+    };
     champion.getDisplayBoundingBox = () =>
       new Rectangle({ x: -5, y: -5, w: 10, h: 10, data: champion });
     combatText.getDisplayBoundingBox = () =>

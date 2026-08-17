@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Turret, { DEFAULT_TURRET_PRESET, TurretBolt } from '../../../src/game/gameObject/structures/Turret';
+import Turret, {
+  DEFAULT_TURRET_PRESET,
+  TurretBolt,
+} from '../../../src/game/gameObject/structures/Turret';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
@@ -10,12 +13,7 @@ import { getTurretPositions } from '../../../src/game/preset';
 import mapData from '../../../assets/json/summoner_map.json';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import turretSource from '../../../src/game/gameObject/structures/Turret.ts?raw';
-import {
-  createGame,
-  indexObjects,
-  stubGameGlobals,
-  type TestGame,
-} from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 let game: TestGame;
 
@@ -80,8 +78,14 @@ describe('Turret as a team building', () => {
       const monster = new Monster({
         game,
         preset: {
-          name: 'Camp', avatar: 'monster_Baron_Nashor', camp: { x: 100, y: 0, r: 100 },
-          speed: 0, size: 60, attackRange: 50, reviveTime: 100, health: 300,
+          name: 'Camp',
+          avatar: 'monster_Baron_Nashor',
+          camp: { x: 100, y: 0, r: 100 },
+          speed: 0,
+          size: 60,
+          attackRange: 50,
+          reviveTime: 100,
+          health: 300,
         },
       });
       indexObjects(game, [turret, monster]);

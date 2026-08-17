@@ -66,7 +66,7 @@ function zIndexOf(o: GameObject): number {
     'displayZIndex' in constructor &&
     typeof constructor.displayZIndex === 'number'
       ? constructor.displayZIndex
-      : Z_INDEX_MAP.get(constructor) ?? DEFAULT_Z_INDEX;
+      : (Z_INDEX_MAP.get(constructor) ?? DEFAULT_Z_INDEX);
   return o.zIndex ?? classZIndex;
 }
 
@@ -91,9 +91,8 @@ export interface QueryOptions {
   queryByDisplayBoundingBox?: boolean;
 }
 
-type GuardedGameObject<TFilter> = TFilter extends GameObjectTypeGuard<infer TObject>
-  ? TObject
-  : never;
+type GuardedGameObject<TFilter> =
+  TFilter extends GameObjectTypeGuard<infer TObject> ? TObject : never;
 type IntersectGuardedGameObjects<TFilter> = (
   GuardedGameObject<TFilter> extends infer TObject
     ? TObject extends GameObject
@@ -103,31 +102,57 @@ type IntersectGuardedGameObjects<TFilter> = (
 ) extends (object: infer TIntersection) => void
   ? TIntersection
   : never;
-type QueryResult<TFilters extends readonly GameObjectFilter[]> =
-  [GuardedGameObject<TFilters[number]>] extends [never]
-    ? GameObject
-    : IntersectGuardedGameObjects<TFilters[number]>;
+type QueryResult<TFilters extends readonly GameObjectFilter[]> = [
+  GuardedGameObject<TFilters[number]>,
+] extends [never]
+  ? GameObject
+  : IntersectGuardedGameObjects<TFilters[number]>;
 
 export const PredefinedFilters = {
-  id: (id: string): GameObjectFilter => (object) => object.id === id,
-  type: <T extends GameObject>(type: GameObjectConstructor<T>): GameObjectTypeGuard<T> =>
-    (object): object is T => object instanceof type,
-  excludeType: (type: GameObjectConstructor): GameObjectFilter => (object) => !(object instanceof type),
-  teamId: (teamId: string): GameObjectFilter => (object) => object.teamId === teamId,
-  excludeTeamId: (teamId: string): GameObjectFilter => (object) => object.teamId !== teamId,
-  includeTeamIds: (teamIds: string[]): GameObjectFilter =>
-    (object) => teamIds.some((teamId) => object.teamId === teamId),
-  excludeTeamIds: (teamIds: string[]): GameObjectFilter =>
-    (object) => !teamIds.some((teamId) => object.teamId === teamId),
-  includeTypes: (types: GameObjectConstructor[]): GameObjectFilter =>
-    (object) => types.some((type) => object instanceof type),
-  excludeTypes: (types: GameObjectConstructor[]): GameObjectFilter =>
-    (object) => !types.some((type) => object instanceof type),
-  excludeObjects: (objects: GameObject[]): GameObjectFilter =>
-    (object) => !objects.some((excluded) => excluded === object),
+  id:
+    (id: string): GameObjectFilter =>
+    object =>
+      object.id === id,
+  type:
+    <T extends GameObject>(type: GameObjectConstructor<T>): GameObjectTypeGuard<T> =>
+    (object): object is T =>
+      object instanceof type,
+  excludeType:
+    (type: GameObjectConstructor): GameObjectFilter =>
+    object =>
+      !(object instanceof type),
+  teamId:
+    (teamId: string): GameObjectFilter =>
+    object =>
+      object.teamId === teamId,
+  excludeTeamId:
+    (teamId: string): GameObjectFilter =>
+    object =>
+      object.teamId !== teamId,
+  includeTeamIds:
+    (teamIds: string[]): GameObjectFilter =>
+    object =>
+      teamIds.some(teamId => object.teamId === teamId),
+  excludeTeamIds:
+    (teamIds: string[]): GameObjectFilter =>
+    object =>
+      !teamIds.some(teamId => object.teamId === teamId),
+  includeTypes:
+    (types: GameObjectConstructor[]): GameObjectFilter =>
+    object =>
+      types.some(type => object instanceof type),
+  excludeTypes:
+    (types: GameObjectConstructor[]): GameObjectFilter =>
+    object =>
+      !types.some(type => object instanceof type),
+  excludeObjects:
+    (objects: GameObject[]): GameObjectFilter =>
+    object =>
+      !objects.some(excluded => excluded === object),
   includeDead: (object: GameObject): object is AttackableUnit =>
     object instanceof AttackableUnit && object.isDead,
-  excludeDead: (object: GameObject): boolean => !(object instanceof AttackableUnit && object.isDead),
+  excludeDead: (object: GameObject): boolean =>
+    !(object instanceof AttackableUnit && object.isDead),
   includeUntargetable: (object: GameObject): boolean =>
     !hasTargetableProperty(object) || !Boolean(object.targetable),
   excludeUntargetable: (object: GameObject): boolean =>
@@ -140,23 +165,33 @@ export const PredefinedFilters = {
    * `combat/Reach.ts`, which needs both ends.
    */
   attackableUnitInRange:
-    (position: p5.Vector, radius: number, includeSize = false): GameObjectTypeGuard<AttackableUnit> =>
+    (
+      position: p5.Vector,
+      radius: number,
+      includeSize = false
+    ): GameObjectTypeGuard<AttackableUnit> =>
     (object): object is AttackableUnit =>
       object instanceof AttackableUnit &&
       p5.Vector.dist(object.position, position) <=
         radius + (includeSize ? object.animatedValues.size / 2 : 0),
-  collideWith: (area?: QueryArea): GameObjectFilter => (object) => {
-    if (!area) return false;
-    if (typeof object.getCollideBoundingBox !== 'function') return false;
-    return object.getCollideBoundingBox().intersect(area);
-  },
+  collideWith:
+    (area?: QueryArea): GameObjectFilter =>
+    object => {
+      if (!area) return false;
+      if (typeof object.getCollideBoundingBox !== 'function') return false;
+      return object.getCollideBoundingBox().intersect(area);
+    },
   missileSpellObject: (object: GameObject): object is SpellObject =>
     object instanceof SpellObject && object.isMissile,
   canTakeDamage: (object: GameObject): object is AttackableUnit =>
     object instanceof AttackableUnit && object.targetable && !object.isDead,
-  canTakeDamageFromTeam: (teamId: string): GameObjectTypeGuard<AttackableUnit> =>
+  canTakeDamageFromTeam:
+    (teamId: string): GameObjectTypeGuard<AttackableUnit> =>
     (object): object is AttackableUnit =>
-      object instanceof AttackableUnit && object.targetable && !object.isDead && object.teamId !== teamId,
+      object instanceof AttackableUnit &&
+      object.targetable &&
+      !object.isDead &&
+      object.teamId !== teamId,
   /**
    * Drops units hidden by an active stealth (Twitch Q).
    *
@@ -200,8 +235,10 @@ export const PredefinedFilters = {
    * this is the same reasoning that leaves `AIChampion.aimPoint` alone. A bot
    * *casting a spell* is gated like anyone else — that is the spell's rule.
    */
-  visibleTo: (observer: VisionObserver): GameObjectFilter =>
-    (object) => !(object instanceof AttackableUnit) || canSee(observer, object),
+  visibleTo:
+    (observer: VisionObserver): GameObjectFilter =>
+    object =>
+      !(object instanceof AttackableUnit) || canSee(observer, object),
 };
 
 declare global {
@@ -319,8 +356,8 @@ export default class ObjectManager {
 
   draw(): void {
     const camBound = this.game.camera.getBoundingBox();
-    const margin = this.game.camera.constantSize?.(ATTACKABLE_DRAW_MARGIN_PX)
-      ?? ATTACKABLE_DRAW_MARGIN_PX;
+    const margin =
+      this.game.camera.constantSize?.(ATTACKABLE_DRAW_MARGIN_PX) ?? ATTACKABLE_DRAW_MARGIN_PX;
     const visualBound = new Rectangle({
       x: camBound.x - margin,
       y: camBound.y - margin,
@@ -366,15 +403,15 @@ export default class ObjectManager {
       attackableCount >= MOBILE_COMPACT_UNIT_COUNT
     );
     const compactUnits = quality === 'low' || (quality === 'auto' && automaticCompact);
-    const particleBudget = quality === 'high'
-      ? Infinity
-      : quality === 'low' || (compactUnits && drawables.length > MOBILE_CROWDED_DRAWABLE_COUNT)
-        ? MOBILE_CROWDED_PARTICLE_DRAW_BUDGET
-        : MOBILE_PARTICLE_DRAW_BUDGET;
+    const particleBudget =
+      quality === 'high'
+        ? Infinity
+        : quality === 'low' || (compactUnits && drawables.length > MOBILE_CROWDED_DRAWABLE_COUNT)
+          ? MOBILE_CROWDED_PARTICLE_DRAW_BUDGET
+          : MOBILE_PARTICLE_DRAW_BUDGET;
     const limitParticles = quality === 'low' || (quality === 'auto' && this.game.touchUi);
-    const particleScale = limitParticles && particleCount > particleBudget
-      ? particleBudget / particleCount
-      : 1;
+    const particleScale =
+      limitParticles && particleCount > particleBudget ? particleBudget / particleCount : 1;
 
     for (const { o } of drawables) {
       if (o instanceof ParticleSystem) {
@@ -409,11 +446,7 @@ export default class ObjectManager {
     options: Omit<QueryOptions, 'filters'> & { filters: TFilters }
   ): QueryResult<TFilters>[];
   queryObjects(options: QueryOptions): GameObject[];
-  queryObjects({
-    area,
-    filters,
-    queryByDisplayBoundingBox = false,
-  }: QueryOptions): GameObject[] {
+  queryObjects({ area, filters, queryByDisplayBoundingBox = false }: QueryOptions): GameObject[] {
     if (this._objectsTreeIsUpdating) {
       console.warn('Quadtree is updating, this may cause unexpected result.');
     }

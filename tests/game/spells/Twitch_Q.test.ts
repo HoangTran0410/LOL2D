@@ -22,7 +22,8 @@ describe('Twitch Q stealth VFX does not survive death', () => {
     const twitch = createUnit(game, 0, 'blue');
     twitch.animatedValues.displaySize = 20;
     const spawned: unknown[] = [];
-    game.objectManager.addObject = ((object: unknown) => spawned.push(object)) as typeof game.objectManager.addObject;
+    game.objectManager.addObject = ((object: unknown) =>
+      spawned.push(object)) as typeof game.objectManager.addObject;
 
     const spell = new Twitch_Q(twitch);
     spell.press(context);
@@ -56,7 +57,8 @@ describe('Twitch Q stealth VFX does not survive death', () => {
     const twitch = createUnit(game, 0, 'blue');
     twitch.animatedValues.displaySize = 20;
     const spawned: unknown[] = [];
-    game.objectManager.addObject = ((object: unknown) => spawned.push(object)) as typeof game.objectManager.addObject;
+    game.objectManager.addObject = ((object: unknown) =>
+      spawned.push(object)) as typeof game.objectManager.addObject;
 
     const spell = new Twitch_Q(twitch);
     spell.press(context);

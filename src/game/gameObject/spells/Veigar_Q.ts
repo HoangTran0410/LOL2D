@@ -72,11 +72,7 @@ export default class Veigar_Q extends Spell implements ExecuteSpell {
   }
 
   onSpellCast() {
-    const { to } = VectorUtils.getVectorWithRange(
-      this.owner.position,
-      this.aimPoint,
-      this.range
-    );
+    const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
 
     const obj = new Veigar_Q_Object(this.owner);
     obj.destination = to;
@@ -125,7 +121,17 @@ export default class Veigar_Q extends Spell implements ExecuteSpell {
     const inTheWay: AttackableUnit[] = [];
     for (const enemy of nearby) {
       const reach = (enemy.stats?.size?.value ?? 0) / 2 + ORB_SIZE / 2;
-      if (CollideUtils.lineCircle(from.x, from.y, to.x, to.y, enemy.position.x, enemy.position.y, reach)) {
+      if (
+        CollideUtils.lineCircle(
+          from.x,
+          from.y,
+          to.x,
+          to.y,
+          enemy.position.x,
+          enemy.position.y,
+          reach
+        )
+      ) {
         inTheWay.push(enemy);
       }
     }

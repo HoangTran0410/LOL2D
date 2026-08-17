@@ -26,9 +26,16 @@ export default class ChargeRangeTelegraph implements VfxHandle {
     );
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 
-  private static renderDefault(origin: Vec2, direction: Vec2, range: number, progress: number): void {
+  private static renderDefault(
+    origin: Vec2,
+    direction: Vec2,
+    range: number,
+    progress: number
+  ): void {
     const endX = origin.x + direction.x * range;
     const endY = origin.y + direction.y * range;
     push();

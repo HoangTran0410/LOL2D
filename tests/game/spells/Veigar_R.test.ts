@@ -223,9 +223,26 @@ describe('Veigar R', () => {
     const target = unit(game, 10, 'red');
     const missile = launch(owner, target);
 
-    const draw = { circle: vi.fn(), line: vi.fn(), beginShape: vi.fn(), vertex: vi.fn(), endShape: vi.fn() };
+    const draw = {
+      circle: vi.fn(),
+      line: vi.fn(),
+      beginShape: vi.fn(),
+      vertex: vi.fn(),
+      endShape: vi.fn(),
+    };
     for (const [name, spy] of Object.entries(draw)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'rotate',
+      'blendMode',
+      'fill',
+      'stroke',
+      'noFill',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     for (const name of ['ADD', 'BLEND', 'CLOSE']) vi.stubGlobal(name, name);
@@ -245,7 +262,9 @@ describe('Veigar R', () => {
       (object): object is Veigar_R_Burst => object instanceof Veigar_R_Burst
     );
     if (!burst) throw new Error('Veigar R must spawn an impact burst on arrival.');
-    vi.stubGlobal('constrain', (value: number, low: number, high: number) => Math.min(Math.max(value, low), high));
+    vi.stubGlobal('constrain', (value: number, low: number, high: number) =>
+      Math.min(Math.max(value, low), high)
+    );
     burst.draw();
     expect(draw.circle).toHaveBeenCalled();
 

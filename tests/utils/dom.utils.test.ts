@@ -91,7 +91,11 @@ describe('goFullscreen', () => {
     // The ordering that matters: Android refuses an orientation lock until the
     // document is actually fullscreen, so a lock fired beside the request —
     // rather than chained onto it — silently does nothing.
-    const { calls, settle } = device({ fullscreen: 'standard', async: true, orientation: 'lockable' });
+    const { calls, settle } = device({
+      fullscreen: 'standard',
+      async: true,
+      orientation: 'lockable',
+    });
 
     DomUtils.goFullscreen();
     expect(calls.requested).toBe(1);

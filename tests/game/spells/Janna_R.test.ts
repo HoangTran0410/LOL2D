@@ -10,13 +10,20 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 
 vi.mock('../../../src/game/vfx/CastTelegraph', () => ({
   default: class {
-    constructor(context: CastContext, _radius: number, _render: unknown, getCenter: () => { x: number; y: number }) {
+    constructor(
+      context: CastContext,
+      _radius: number,
+      _render: unknown,
+      getCenter: () => { x: number; y: number }
+    ) {
       telegraphContexts.push(context);
       telegraphCenters.push(getCenter);
     }
     update() {}
     draw() {}
-    dispose() { loopDispose(); }
+    dispose() {
+      loopDispose();
+    }
   },
 }));
 
@@ -52,7 +59,16 @@ const stubDrawGlobals = () => {
     endShape: vi.fn(),
   };
   for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-  for (const name of ['push', 'pop', 'translate', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+  for (const name of [
+    'push',
+    'pop',
+    'translate',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeWeight',
+  ]) {
     vi.stubGlobal(name, vi.fn());
   }
   vi.stubGlobal('sin', Math.sin);
@@ -62,9 +78,18 @@ const stubDrawGlobals = () => {
 };
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
 }
 
 interface TestUnit {
@@ -79,15 +104,16 @@ interface TestUnit {
   takeHeal: (amount: number, healer: unknown) => void;
 }
 
-const context = (caster: unknown): CastContext => Object.freeze({
-  spellId: 'janna-r',
-  activationId: 'cast',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 300, y: 200 }),
-  direction: Object.freeze({ x: 0, y: 0 }),
-});
+const context = (caster: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'janna-r',
+    activationId: 'cast',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 300, y: 200 }),
+    direction: Object.freeze({ x: 0, y: 0 }),
+  });
 
 const makeOwner = (candidates: TestUnit[] = []) => {
   const added: unknown[] = [];
@@ -100,7 +126,9 @@ const makeOwner = (candidates: TestUnit[] = []) => {
     canCast: true,
     addBuff: vi.fn(),
     takeHeal: vi.fn(),
-    stopMovement() { this.destination.set(this.position.x, this.position.y); },
+    stopMovement() {
+      this.destination.set(this.position.x, this.position.y);
+    },
     game: {
       eventManager: new EventManager(),
       terrainMap: { getObstaclesInArea: vi.fn(() => []) },
@@ -161,7 +189,9 @@ describe('Janna R', () => {
       teamId: 'red',
       isDead: false,
       canCast: true,
-      stopMovement() { this.destination.set(this.position.x, this.position.y); },
+      stopMovement() {
+        this.destination.set(this.position.x, this.position.y);
+      },
       addBuff: buff => enemyBuffs.push(buff),
       takeHeal: vi.fn(),
     };
@@ -172,7 +202,9 @@ describe('Janna R', () => {
       teamId: 'blue',
       isDead: false,
       canCast: true,
-      stopMovement() { this.destination.set(this.position.x, this.position.y); },
+      stopMovement() {
+        this.destination.set(this.position.x, this.position.y);
+      },
       addBuff: vi.fn(),
       takeHeal: vi.fn(),
     };
@@ -202,15 +234,29 @@ describe('Janna R', () => {
   });
 
   it.each([
-    ['movement command', (owner: ReturnType<typeof makeOwner>['owner']) => owner.destination.set(10, 0)],
+    [
+      'movement command',
+      (owner: ReturnType<typeof makeOwner>['owner']) => owner.destination.set(10, 0),
+    ],
     ['displacement', (owner: ReturnType<typeof makeOwner>['owner']) => owner.position.set(10, 0)],
-    ['cast-blocking CC', (owner: ReturnType<typeof makeOwner>['owner']) => { owner.canCast = false; }],
-    ['another spell cast', (owner: ReturnType<typeof makeOwner>['owner']) => {
-      owner.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, { owner });
-    }],
-    ['an attack', (owner: ReturnType<typeof makeOwner>['owner']) => {
-      owner.game.eventManager.emit(EventType.ON_ATTACK, owner);
-    }],
+    [
+      'cast-blocking CC',
+      (owner: ReturnType<typeof makeOwner>['owner']) => {
+        owner.canCast = false;
+      },
+    ],
+    [
+      'another spell cast',
+      (owner: ReturnType<typeof makeOwner>['owner']) => {
+        owner.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, { owner });
+      },
+    ],
+    [
+      'an attack',
+      (owner: ReturnType<typeof makeOwner>['owner']) => {
+        owner.game.eventManager.emit(EventType.ON_ATTACK, owner);
+      },
+    ],
   ] as const)('gameplay %s cancels ticks and loop VFX', (_name, interrupt) => {
     const { owner, added } = makeOwner();
     const spell = new Janna_R(owner);
@@ -232,7 +278,9 @@ describe('Janna R', () => {
   it('keeps channeling after rejected casts and imported-permitted summoner casts', () => {
     class RejectedSpell extends Spell {
       targetingMode = 'DIRECTION' as const;
-      checkCastCondition(): boolean { return false; }
+      checkCastCondition(): boolean {
+        return false;
+      }
     }
 
     const { owner } = makeOwner();
@@ -272,7 +320,9 @@ describe('Janna R', () => {
       teamId: 'blue',
       isDead: false,
       canCast: true,
-      stopMovement() { this.destination.set(this.position.x, this.position.y); },
+      stopMovement() {
+        this.destination.set(this.position.x, this.position.y);
+      },
       addBuff: vi.fn(),
       takeHeal: vi.fn(),
     };
@@ -296,7 +346,9 @@ describe('Janna R', () => {
       teamId: 'red',
       isDead: false,
       canCast: true,
-      stopMovement() { this.destination.set(this.position.x, this.position.y); },
+      stopMovement() {
+        this.destination.set(this.position.x, this.position.y);
+      },
       addBuff: buff => enemyBuffs.push(buff),
       takeHeal: vi.fn(),
     };
@@ -306,14 +358,16 @@ describe('Janna R', () => {
     // enemy is then stopped a collisionRadius (20) shy of the face.
     const wallFaceX = KNOCKBACK_DISTANCE - 50;
     const clampedX = wallFaceX - 20;
-    owner.game.terrainMap.getObstaclesInArea.mockReturnValue([{
-      vertices: [
-        { x: wallFaceX, y: -100 },
-        { x: wallFaceX + 100, y: -100 },
-        { x: wallFaceX + 100, y: 100 },
-        { x: wallFaceX, y: 100 },
-      ],
-    }]);
+    owner.game.terrainMap.getObstaclesInArea.mockReturnValue([
+      {
+        vertices: [
+          { x: wallFaceX, y: -100 },
+          { x: wallFaceX + 100, y: -100 },
+          { x: wallFaceX + 100, y: 100 },
+          { x: wallFaceX, y: 100 },
+        ],
+      },
+    ]);
     const spell = new Janna_R(owner);
 
     spell.press(context(owner));
@@ -388,9 +442,7 @@ describe('Janna R', () => {
 
     spell.press(context(owner));
 
-    const area = added.find(
-      (object): object is Janna_R_Object => object instanceof Janna_R_Object
-    );
+    const area = added.find((object): object is Janna_R_Object => object instanceof Janna_R_Object);
     if (!area) throw new Error('Janna R must create its channel area.');
     const box = area.getDisplayBoundingBox();
 

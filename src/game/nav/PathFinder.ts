@@ -152,11 +152,23 @@ export default class PathFinder {
     // on and use that instead of refusing the order.
     const start = grid.nearestWalkable(fromX, fromY, radius, NAV_SNAP_DISTANCE);
     if (!start) {
-      return { ok: false, waypoints: [], expanded: 0, elapsedMs: navNow() - startedAt, failure: 'NO_START' };
+      return {
+        ok: false,
+        waypoints: [],
+        expanded: 0,
+        elapsedMs: navNow() - startedAt,
+        failure: 'NO_START',
+      };
     }
     const goal = grid.nearestWalkable(toX, toY, radius, NAV_SNAP_DISTANCE);
     if (!goal) {
-      return { ok: false, waypoints: [], expanded: 0, elapsedMs: navNow() - startedAt, failure: 'NO_GOAL' };
+      return {
+        ok: false,
+        waypoints: [],
+        expanded: 0,
+        elapsedMs: navNow() - startedAt,
+        failure: 'NO_GOAL',
+      };
     }
 
     const cols = grid.cols;

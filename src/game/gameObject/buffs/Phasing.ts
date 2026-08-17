@@ -33,14 +33,9 @@ export default class Phasing extends Buff {
     // ground ellipse rather than anything on the silhouette.
     noStroke();
     for (let i = 0; i < 3; i++) {
-      const phase = ((frameCount / 40 + i / 3) % 1);
+      const phase = (frameCount / 40 + i / 3) % 1;
       fill(190, 220, 255, 90 * (1 - phase));
-      ellipse(
-        pos.x,
-        pos.y + size * 0.32,
-        size * (0.7 + phase * 0.55),
-        size * (0.26 + phase * 0.2)
-      );
+      ellipse(pos.x, pos.y + size * 0.32, size * (0.7 + phase * 0.55), size * (0.26 + phase * 0.2));
     }
     // and a thin outline that breaks up, so a solid unit and a phasing one are
     // not the same silhouette

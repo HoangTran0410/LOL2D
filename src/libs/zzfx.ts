@@ -63,9 +63,9 @@ const zzfxG = (
   // init parameters
   const PI2 = Math.PI * 2;
   const sign = (v: number) => (v > 0 ? 1 : -1);
-  const startSlide = (slide *= 500 * PI2 / zzfxR / zzfxR);
-  let startFrequency =
-    (frequency *= (1 + randomness * 2 * Math.random() - randomness) * PI2 / zzfxR);
+  const startSlide = (slide *= (500 * PI2) / zzfxR / zzfxR);
+  let startFrequency = (frequency *=
+    ((1 + randomness * 2 * Math.random() - randomness) * PI2) / zzfxR);
   let b: number[] = [];
   let t = 0;
   let tm = 0;
@@ -90,11 +90,7 @@ const zzfxG = (
   repeatTime = (repeatTime * zzfxR) | 0;
 
   // generate waveform
-  for (
-    length = (attack + decay + sustain + release + delay) | 0;
-    i < length;
-    b[i++] = s
-  ) {
+  for (length = (attack + decay + sustain + release + delay) | 0; i < length; b[i++] = s) {
     if (!(++c % ((bitCrush * 100) | 0))) {
       // bit crush
       s = shape
@@ -106,7 +102,7 @@ const zzfxG = (
               : // 3 tan
                 Math.max(Math.min(Math.tan(t), 1), -1)
             : // 2 saw
-              1 - ((2 * t) / PI2 % 2 + 2) % 2
+              1 - (((((2 * t) / PI2) % 2) + 2) % 2)
           : // 1 triangle
             1 - 4 * Math.abs(Math.round(t / PI2) - t / PI2)
         : // 0 sin
@@ -133,14 +129,14 @@ const zzfxG = (
         ? s / 2 +
           (delay > i
             ? 0 // sample delay
-            : (i < length - delay ? 1 : (length - i) / delay) * b[(i - delay) | 0] / 2) // release delay
+            : ((i < length - delay ? 1 : (length - i) / delay) * b[(i - delay) | 0]) / 2) // release delay
         : s;
     }
 
     f =
-      (frequency += (slide += deltaSlide)) * // frequency
+      (frequency += slide += deltaSlide) * // frequency
       Math.cos(modulation * tm++); // modulation
-    t += f - f * noise * (1 - ((Math.sin(i) + 1) * 1e9) % 2); // noise
+    t += f - f * noise * (1 - (((Math.sin(i) + 1) * 1e9) % 2)); // noise
 
     if (j && ++j > pitchJumpTime) {
       // pitch jump

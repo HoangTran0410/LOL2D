@@ -183,7 +183,8 @@ export const useSpellPeek = (): SpellPeek => {
       if (moved) return;
       const touch = event.touches[0];
       if (!touch) return;
-      if (Math.hypot(touch.clientX - startX, touch.clientY - startY) <= TAP_MOVE_TOLERANCE_PX) return;
+      if (Math.hypot(touch.clientX - startX, touch.clientY - startY) <= TAP_MOVE_TOLERANCE_PX)
+        return;
       moved = true;
       // A finger on its way somewhere (scrolling the roster) must not leave a
       // description behind it.

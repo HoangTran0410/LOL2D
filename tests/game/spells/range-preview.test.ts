@@ -72,9 +72,7 @@ describe('every spell with a declared reach previews it', () => {
     // A preview does not have to be a disc. Blitzcrank E deliberately draws a
     // wedge because it hits a cone, and a circle there would overstate it. What
     // the test cares about is that *something* is drawn at the declared reach.
-    vi.stubGlobal('arc', (x: number, y: number, w: number) =>
-      circles.push({ x, y, d: w })
-    );
+    vi.stubGlobal('arc', (x: number, y: number, w: number) => circles.push({ x, y, d: w }));
     vi.stubGlobal('ellipse', () => {});
     vi.stubGlobal('beginShape', () => {});
     vi.stubGlobal('vertex', () => {});
@@ -127,9 +125,7 @@ describe('every spell with a declared reach previews it', () => {
       }
 
       const declared =
-        (spell as any).targetingRequest?.range ??
-        (spell as any).range ??
-        (spell as any).castRange;
+        (spell as any).targetingRequest?.range ?? (spell as any).range ?? (spell as any).castRange;
       if (typeof declared !== 'number' || declared <= 0) continue;
 
       circles.length = 0;

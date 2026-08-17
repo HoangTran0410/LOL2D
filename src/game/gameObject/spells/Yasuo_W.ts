@@ -277,7 +277,14 @@ export class Yasuo_W_Object extends SpellObject {
       const curl = end > 0 ? 1 : -1;
       stroke(215, 248, 255, 190 * alpha);
       strokeWeight(2.5);
-      arc(w * 0.5, end - curl * w * 0.6, w * 1.6, w * 1.6, curl > 0 ? 0 : PI, curl > 0 ? PI : TWO_PI);
+      arc(
+        w * 0.5,
+        end - curl * w * 0.6,
+        w * 1.6,
+        w * 1.6,
+        curl > 0 ? 0 : PI,
+        curl > 0 ? PI : TWO_PI
+      );
     }
 
     this._drawBlocks(w);

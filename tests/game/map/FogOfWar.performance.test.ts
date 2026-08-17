@@ -32,8 +32,6 @@ describe('FogOfWar render caching', () => {
     const obstacles = [{ id: 'wall-a' }, { id: 'bush-b' }];
     const signature = fog.buildObstacleSignature as any;
 
-    expect(signature.call(fog, obstacles, 500)).toBe(
-      signature.call(fog, obstacles, 501)
-    );
+    expect(signature.call(fog, obstacles, 500)).toBe(signature.call(fog, obstacles, 501));
   });
 });

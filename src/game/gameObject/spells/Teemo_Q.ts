@@ -18,11 +18,7 @@ export default class Teemo_Q extends Spell {
   range = 400;
 
   onSpellCast() {
-    const { to } = VectorUtils.getVectorWithRange(
-      this.owner.position,
-      this.aimPoint,
-      this.range
-    );
+    const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
 
     const obj = new Teemo_Q_Object(this.owner);
     obj.destination = to;

@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  JOYSTICK_DEAD_ZONE,
-  VirtualJoystick,
-} from '../../../src/game/input/VirtualJoystick';
+import { JOYSTICK_DEAD_ZONE, VirtualJoystick } from '../../../src/game/input/VirtualJoystick';
 
 const VIEWPORT = { width: 900, height: 420 };
 

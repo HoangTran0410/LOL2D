@@ -242,7 +242,13 @@ export default class NavGrid {
   /** Wall-clock cost of the build, for the perf harness. */
   readonly buildMs: number;
 
-  private constructor(cellSize: number, cols: number, rows: number, clearance: Uint16Array, buildMs: number) {
+  private constructor(
+    cellSize: number,
+    cols: number,
+    rows: number,
+    clearance: Uint16Array,
+    buildMs: number
+  ) {
     this.cellSize = cellSize;
     this.cols = cols;
     this.rows = rows;
@@ -461,7 +467,11 @@ export default class NavGrid {
         if (interior[i] === 1) continue;
         if (clearance[i] > REFINE_BAND) continue;
 
-        const exact = NavGrid.nearestWallDistance(index, (cx + 0.5) * cellSize, (cy + 0.5) * cellSize);
+        const exact = NavGrid.nearestWallDistance(
+          index,
+          (cx + 0.5) * cellSize,
+          (cy + 0.5) * cellSize
+        );
         if (exact === Infinity) continue;
         clearance[i] = exact <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(exact));
       }
@@ -497,9 +507,18 @@ export default class NavGrid {
     const coords = Float64Array.from(coordinates);
     for (let s = 0; s < coords.length; s += 4) {
       const fromX = Math.max(0, Math.floor(Math.min(coords[s], coords[s + 2]) / SEGMENT_BUCKET));
-      const toX = Math.min(cols - 1, Math.floor(Math.max(coords[s], coords[s + 2]) / SEGMENT_BUCKET));
-      const fromY = Math.max(0, Math.floor(Math.min(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET));
-      const toY = Math.min(cols - 1, Math.floor(Math.max(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET));
+      const toX = Math.min(
+        cols - 1,
+        Math.floor(Math.max(coords[s], coords[s + 2]) / SEGMENT_BUCKET)
+      );
+      const fromY = Math.max(
+        0,
+        Math.floor(Math.min(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET)
+      );
+      const toY = Math.min(
+        cols - 1,
+        Math.floor(Math.max(coords[s + 1], coords[s + 3]) / SEGMENT_BUCKET)
+      );
       for (let by = fromY; by <= toY; by++) {
         for (let bx = fromX; bx <= toX; bx++) buckets[by * cols + bx].push(s);
       }

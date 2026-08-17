@@ -99,7 +99,7 @@ describe('Malphite Q', () => {
       range: RANGE,
       targetTeam: 'ENEMY',
       queryCandidates: () => [target],
-      getTargetInfo: candidate => candidate === target ? target : null,
+      getTargetInfo: candidate => (candidate === target ? target : null),
       isTargetable: candidate => candidate === target && target.targetable,
     });
     const spell = new Malphite_Q(owner);

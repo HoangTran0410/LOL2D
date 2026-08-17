@@ -23,13 +23,7 @@ import { foreignControlBuff } from '../../spell/runtime/CancelPolicy';
  * spell that roots its victim and then pulls them must not have its own pull
  * cancelled by its own root. See the table in docs/ADDING_SPELLS.md.
  */
-export const DASH_INTERRUPT_BUFFS: readonly BuffConstructor[] = [
-  Airborne,
-  Root,
-  Stun,
-  Fear,
-  Charm,
-];
+export const DASH_INTERRUPT_BUFFS: readonly BuffConstructor[] = [Airborne, Root, Stun, Fear, Charm];
 
 export default class Dash extends Buff {
   image: Buff['image'] = AssetManager.get('buff_root');
@@ -125,12 +119,7 @@ export default class Dash extends Buff {
     // somebody else took control of this unit mid-flight
     if (
       this.cancelable &&
-      foreignControlBuff(
-        this.targetUnit.buffs,
-        this,
-        this.sourceUnit,
-        this.buffsToCheckCancel
-      )
+      foreignControlBuff(this.targetUnit.buffs, this, this.sourceUnit, this.buffsToCheckCancel)
     ) {
       this.onCancelled?.();
       this.deactivateBuff();

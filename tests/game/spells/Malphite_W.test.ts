@@ -17,7 +17,12 @@ import Shield from '../../../src/game/gameObject/buffs/Shield';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import Buff from '../../../src/game/gameObject/Buff';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 function unit(game: TestGame, x = 0, teamId = 'blue') {
   const result = createUnit(game, x, teamId);
@@ -53,8 +58,16 @@ const stubDrawGlobals = () => {
   };
   for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
   for (const name of [
-    'push', 'pop', 'translate', 'rotate', 'blendMode',
-    'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight',
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'blendMode',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeWeight',
   ]) {
     vi.stubGlobal(name, vi.fn());
   }

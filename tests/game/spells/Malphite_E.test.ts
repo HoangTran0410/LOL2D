@@ -19,7 +19,12 @@ import Slow from '../../../src/game/gameObject/buffs/Slow';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);
@@ -51,8 +56,16 @@ const stubDrawGlobals = () => {
   };
   for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
   for (const name of [
-    'push', 'pop', 'translate', 'rotate', 'blendMode',
-    'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight',
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'blendMode',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeWeight',
   ]) {
     vi.stubGlobal(name, vi.fn());
   }
@@ -140,7 +153,8 @@ describe('Malphite E', () => {
     press(owner).update();
 
     const cripple = enemy.buffs.find(
-      (buff): buff is StatAmp => buff instanceof StatAmp && buff.stackId === 'malphite_e_attack_cripple'
+      (buff): buff is StatAmp =>
+        buff instanceof StatAmp && buff.stackId === 'malphite_e_attack_cripple'
     );
     expect(cripple?.duration).toBe(SLOW_DURATION_MS);
 

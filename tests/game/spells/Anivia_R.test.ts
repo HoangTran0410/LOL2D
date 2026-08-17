@@ -28,9 +28,14 @@ import type { MatchRules } from '../../../src/game/config/PregameConfig';
 const URF: MatchRules = { cooldownMultiplier: 1, manaFree: true };
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
 
-  copy(): TestVector { return new TestVector(this.x, this.y); }
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
   limit(maximum: number): TestVector {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > maximum) {
@@ -55,8 +60,7 @@ Object.assign(globalThis, {
   },
 });
 
-const vector = (x: number, y: number): p5.Vector =>
-  new TestVector(x, y) as unknown as p5.Vector;
+const vector = (x: number, y: number): p5.Vector => new TestVector(x, y) as unknown as p5.Vector;
 
 const context = (cursorWorld: { x: number; y: number }): CastContext => ({
   spellId: 'anivia-r',
@@ -75,13 +79,21 @@ const setup = (mana = 240, matchRules?: MatchRules) => {
     collisionRadius: 0,
     damage: [] as number[],
     buffs: [] as unknown[],
-    takeDamage(damage: number) { this.damage.push(damage); },
-    addBuff(buff: unknown) { this.buffs.push(buff); },
+    takeDamage(damage: number) {
+      this.damage.push(damage);
+    },
+    addBuff(buff: unknown) {
+      this.buffs.push(buff);
+    },
   };
   const manaStat = {
     baseValue: mana,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   const owner = {
     game: {
@@ -142,7 +154,10 @@ describe('Anivia R', () => {
     expect(added[0].radius).toBe(START_RADIUS);
     expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2]);
     expect(enemy.buffs).toHaveLength(1);
-    expect(enemy.buffs[0]).toMatchObject({ percent: NORMAL_SLOW, duration: NORMAL_SLOW_DURATION_MS });
+    expect(enemy.buffs[0]).toMatchObject({
+      percent: NORMAL_SLOW,
+      duration: NORMAL_SLOW_DURATION_MS,
+    });
   });
 
   it('grows and empowers damage and slow once the storm finishes growing', () => {
@@ -152,11 +167,19 @@ describe('Anivia R', () => {
     added[0].update(GROWTH_MS);
 
     expect(added[0].radius).toBe(END_RADIUS);
-    expect(enemy.damage).toEqual([NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, NORMAL_DAMAGE / 2, EMPOWERED_DAMAGE]);
+    expect(enemy.damage).toEqual([
+      NORMAL_DAMAGE / 2,
+      NORMAL_DAMAGE / 2,
+      NORMAL_DAMAGE / 2,
+      EMPOWERED_DAMAGE,
+    ]);
     // 4 Slow ticks (0/500/1000/1500ms) plus one Chilled mark, applied once the
     // storm's damage tick lands empowered — see Anivia_E's Frostbite passive.
     expect(enemy.buffs).toHaveLength(5);
-    expect(enemy.buffs.at(-1)).toMatchObject({ percent: EMPOWERED_SLOW, duration: EMPOWERED_SLOW_DURATION_MS });
+    expect(enemy.buffs.at(-1)).toMatchObject({
+      percent: EMPOWERED_SLOW,
+      duration: EMPOWERED_SLOW_DURATION_MS,
+    });
   });
 
   it('uses each due tick radius when catching up a long frame', () => {
@@ -178,8 +201,9 @@ describe('Anivia R', () => {
     spell.press(context({ x: 100, y: 0 }));
     added[0].update(GROWTH_MS);
 
-    const radii = owner.game.objectManager.queryObjects.mock.calls
-      .map(([query]) => query.area.r as number);
+    const radii = owner.game.objectManager.queryObjects.mock.calls.map(
+      ([query]) => query.area.r as number
+    );
     expect(radii).toContain(stormRadiusAt(0));
     expect(radii).toContain(stormRadiusAt(DAMAGE_TICK_MS));
     expect(radii).toContain(stormRadiusAt(DAMAGE_TICK_MS * 2));
@@ -248,10 +272,33 @@ describe('Anivia R', () => {
   });
 
   it.each([
-    ['death', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.isDead = true; spell.update(); }],
-    ['no mana', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.stats.mana.baseValue = 0; updateSpell(spell, UPKEEP_TICK_MS); }],
-    ['tether violation', (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { owner.position.x = TETHER_RANGE + 150; spell.update(); }],
-    ['silence', (_owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => { spell.cancel('SILENCE'); }],
+    [
+      'death',
+      (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => {
+        owner.isDead = true;
+        spell.update();
+      },
+    ],
+    [
+      'no mana',
+      (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => {
+        owner.stats.mana.baseValue = 0;
+        updateSpell(spell, UPKEEP_TICK_MS);
+      },
+    ],
+    [
+      'tether violation',
+      (owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => {
+        owner.position.x = TETHER_RANGE + 150;
+        spell.update();
+      },
+    ],
+    [
+      'silence',
+      (_owner: ReturnType<typeof setup>['owner'], spell: Anivia_R) => {
+        spell.cancel('SILENCE');
+      },
+    ],
   ])('ends on %s', (_reason, end) => {
     const { spell, owner, added } = setup();
 

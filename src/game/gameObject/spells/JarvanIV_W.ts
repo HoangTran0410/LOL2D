@@ -175,14 +175,7 @@ export class JarvanIV_W_WaveObject extends SpellObject {
       // and how much of the duration remains, as an arc
       stroke(255, 250, 210, plateAlpha);
       strokeWeight(3);
-      arc(
-        0,
-        0,
-        bodyR * 2 + 16,
-        bodyR * 2 + 16,
-        -HALF_PI,
-        -HALF_PI + TWO_PI * aegisLeft
-      );
+      arc(0, 0, bodyR * 2 + 16, bodyR * 2 + 16, -HALF_PI, -HALF_PI + TWO_PI * aegisLeft);
     }
     pop();
   }

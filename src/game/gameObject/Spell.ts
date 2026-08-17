@@ -471,7 +471,9 @@ export default class Spell {
     return true;
   }
 
-  get targetingRequest(): Readonly<TargetingRequest> { return {}; }
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {};
+  }
 
   protected playImpactVfx(context: CastContext): void {
     this.spellVfx?.impact(context);
@@ -500,36 +502,36 @@ export default class Spell {
       this.resolvedSpec = spec;
       this.spellVfx = new SpellVfx(spec.vfx, spec.sfx);
       const delegate: SpellRuntimeDelegate = {
-        canStart: (context) => this.canStart(context),
+        canStart: context => this.canStart(context),
         commitResource: (context, point) => this.commitResource(context, point),
         refundResource: (context, reason) => this.refundResource(context, reason),
-        onCastStart: (context) => {
+        onCastStart: context => {
           this.spellVfx?.castStart(context);
           this.onCastStart(context);
         },
         onChargeUpdate: (context, elapsedMs, ratio) =>
           this.onChargeUpdate(context, elapsedMs, ratio),
-        onRelease: (context) => {
+        onRelease: context => {
           this.spellVfx?.release(context);
           this.onRelease(context);
           this.onSpellCast(context);
           this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
         },
         onChannelTick: (context, tickIndex) => this.onChannelTick(context, tickIndex),
-        onActivate: (context) => {
+        onActivate: context => {
           this.spellVfx?.activate(context);
           this.onActivate(context);
         },
-        onRecast: (context) => this.onRecast(context),
+        onRecast: context => this.onRecast(context),
         onCancel: (context, reason) => {
           this.spellVfx?.cancel(context);
           this.onCancel(context, reason);
         },
-        onComplete: (context) => {
+        onComplete: context => {
           this.spellVfx?.complete();
           this.onComplete(context);
         },
-        cooldownDurationMs: (durationMs) => this.reducedCooldown(durationMs),
+        cooldownDurationMs: durationMs => this.reducedCooldown(durationMs),
       };
       this.spellRuntime = new SpellRuntime(spec, delegate);
     }
@@ -609,9 +611,7 @@ export default class Spell {
       (this as { range?: number }).range ??
       (this as { castRange?: number }).castRange;
     if (typeof declared !== 'number' || declared <= 0) return undefined;
-    return this.castSpec.targeting === 'UNIT'
-      ? effectiveRange(declared, this.owner)
-      : declared;
+    return this.castSpec.targeting === 'UNIT' ? effectiveRange(declared, this.owner) : declared;
   }
 
   /**

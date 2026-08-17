@@ -3,15 +3,23 @@ import AssetManager from '../../../src/managers/AssetManager';
 import { Veigar_E_Object } from '../../../src/game/gameObject/spells/Veigar_E';
 
 class Vector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): Vector { return new Vector(this.x, this.y); }
-  dist(other: Vector): number { return Math.hypot(this.x - other.x, this.y - other.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): Vector {
+    return new Vector(this.x, this.y);
+  }
+  dist(other: Vector): number {
+    return Math.hypot(this.x - other.x, this.y - other.y);
+  }
 }
 
 const owner = () => {
   const objects: unknown[] = [];
   return {
-    position: new Vector(0, 0), teamId: 'blue',
+    position: new Vector(0, 0),
+    teamId: 'blue',
     game: {
       objectManager: {
         addObject: (object: unknown) => objects.push(object),

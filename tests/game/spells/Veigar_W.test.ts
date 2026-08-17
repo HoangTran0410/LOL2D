@@ -19,8 +19,13 @@ import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixt
 // A local vector with `.limit()`, which VectorUtils.getVectorWithMaxRange needs
 // and the shared test fixture's TestVector does not implement.
 class ClampVector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): ClampVector { return new ClampVector(this.x, this.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): ClampVector {
+    return new ClampVector(this.x, this.y);
+  }
   limit(maximum: number): ClampVector {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > maximum) {
@@ -45,8 +50,12 @@ const owner = () => {
   const objects: unknown[] = [];
   const manaStat = {
     baseValue: 200,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   return {
     position: new ClampVector(0, 0),
@@ -185,7 +194,15 @@ describe('Veigar W impact', () => {
     };
     for (const [name, spy] of Object.entries(draw)) vi.stubGlobal(name, spy);
     for (const name of [
-      'push', 'pop', 'translate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight',
+      'push',
+      'pop',
+      'translate',
+      'blendMode',
+      'fill',
+      'stroke',
+      'noFill',
+      'noStroke',
+      'strokeWeight',
     ]) {
       vi.stubGlobal(name, vi.fn());
     }

@@ -28,10 +28,21 @@ import { Rectangle } from '../../../src/libs/quadtree';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  add(x: number, y: number) { this.x += x; this.y += y; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  add(x: number, y: number) {
+    this.x += x;
+    this.y += y;
+    return this;
+  }
+  mag() {
+    return Math.hypot(this.x, this.y);
+  }
   setMag(length: number) {
     const magnitude = this.mag();
     if (magnitude > 0) {
@@ -57,15 +68,16 @@ interface TestTarget {
   addBuff: (buff: unknown) => void;
 }
 
-const context = (caster: unknown): CastContext => Object.freeze({
-  spellId: 'lux-r',
-  activationId: 'cast',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 100, y: 0 }),
-  direction: Object.freeze({ x: 1, y: 0 }),
-});
+const context = (caster: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'lux-r',
+    activationId: 'cast',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 100, y: 0 }),
+    direction: Object.freeze({ x: 1, y: 0 }),
+  });
 
 interface WorldObject {
   visibleToPlayerTeam?: boolean;
@@ -91,15 +103,16 @@ const drawWorld = (objects: readonly WorldObject[], camera: Rectangle): void => 
 };
 
 /** An aim that landed exactly on the caster: no distance, so no direction. */
-const degenerateContext = (caster: unknown): CastContext => Object.freeze({
-  spellId: 'lux-r',
-  activationId: 'cast',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 0, y: 0 }),
-  direction: Object.freeze({ x: 0, y: 0 }),
-});
+const degenerateContext = (caster: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'lux-r',
+    activationId: 'cast',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 0, y: 0 }),
+    direction: Object.freeze({ x: 0, y: 0 }),
+  });
 
 const beamOwner = (added: unknown[]) => ({
   game: {
@@ -124,8 +137,16 @@ describe('Lux R', () => {
     vi.stubGlobal('createVector', (x = 0, y = 0) => new TestVector(x, y));
     vi.stubGlobal('deltaTime', 16);
     vi.stubGlobal('p5', { Vector: TestVector });
-    const p5Globals =
-      ['push', 'pop', 'noFill', 'stroke', 'strokeWeight', 'noStroke', 'fill', 'rect'];
+    const p5Globals = [
+      'push',
+      'pop',
+      'noFill',
+      'stroke',
+      'strokeWeight',
+      'noStroke',
+      'fill',
+      'rect',
+    ];
     for (const name of p5Globals) {
       vi.stubGlobal(name, vi.fn());
     }
@@ -301,7 +322,10 @@ describe('Lux R', () => {
 
     expect(target.takeDamage).toHaveBeenCalledWith(DAMAGE, owner);
     expect(targetBuffs).toHaveLength(1);
-    expect(targetBuffs[0]).toMatchObject({ duration: REVEAL_DURATION_MS, visionRadius: REVEAL_VISION_RADIUS });
+    expect(targetBuffs[0]).toMatchObject({
+      duration: REVEAL_DURATION_MS,
+      visionRadius: REVEAL_VISION_RADIUS,
+    });
     expect(ownerBuffs[0].toRemove).toBe(true);
   });
 
@@ -329,7 +353,7 @@ describe('Lux R', () => {
       isDead: false,
       canCast: true,
       stopMovement: vi.fn(),
-      addBuff: (buff: typeof ownerBuffs[number]) => {
+      addBuff: (buff: (typeof ownerBuffs)[number]) => {
         ownerBuffs.push(buff);
         buff.activateBuff();
       },
@@ -347,7 +371,17 @@ describe('Lux R', () => {
     const prohibited = new ProhibitedSpell(owner);
     const alreadyDisabled = new ProhibitedSpell(owner);
     alreadyDisabled.disabled = true;
-    owner.spells = [spell, ghost, heal, ignite, flash, recast, freshLuxE, prohibited, alreadyDisabled];
+    owner.spells = [
+      spell,
+      ghost,
+      heal,
+      ignite,
+      flash,
+      recast,
+      freshLuxE,
+      prohibited,
+      alreadyDisabled,
+    ];
 
     spell.press(context(owner));
 
@@ -378,7 +412,7 @@ describe('Lux R', () => {
       game: {
         eventManager: { emit: vi.fn() },
         objectManager: {
-          addObject: (object: typeof added[number]) => added.push(object),
+          addObject: (object: (typeof added)[number]) => added.push(object),
           queryObjects: () => [],
         },
       },

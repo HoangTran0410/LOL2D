@@ -259,8 +259,9 @@ export class Anivia_R_Object extends AreaSpellObject {
       area: new Circle({ x: this.center.x, y: this.center.y, r: radius }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
-    return candidates.filter(target =>
-      Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
+    return candidates.filter(
+      target =>
+        Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
         radius + target.collisionRadius
     );
   }

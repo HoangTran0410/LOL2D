@@ -326,14 +326,7 @@ export class Ekko_E_AuraObject extends SpellObject {
     circle(0, 0, EKKO_E_AURA_RADIUS * 2);
     stroke(0, 245, 225, 220);
     strokeWeight(3);
-    arc(
-      0,
-      0,
-      EKKO_E_AURA_RADIUS * 2,
-      EKKO_E_AURA_RADIUS * 2,
-      -HALF_PI,
-      -HALF_PI + TWO_PI * left
-    );
+    arc(0, 0, EKKO_E_AURA_RADIUS * 2, EKKO_E_AURA_RADIUS * 2, -HALF_PI, -HALF_PI + TWO_PI * left);
 
     // ticking second hand — snaps between twelve positions
     const tick = Math.floor((frameCount / 10) % 12);

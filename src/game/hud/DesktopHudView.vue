@@ -42,7 +42,9 @@ const hud = inject<HudInteractions>('hud')!;
       </div>
       <div class="costs">
         <span>{{ FormatUtils.spellSeconds(hud.spellHover.coolDown) }}s</span>
-        <span v-if="hud.spellHover.manaCost > 0" class="mana">{{ hud.spellHover.manaCost }} mana</span>
+        <span v-if="hud.spellHover.manaCost > 0" class="mana"
+          >{{ hud.spellHover.manaCost }} mana</span
+        >
       </div>
     </div>
     <p class="body" v-html="hud.spellHover.description"></p>
@@ -81,9 +83,11 @@ const hud = inject<HudInteractions>('hud')!;
 
           <span v-if="spell.hotKey" class="hotKey">{{ spell.hotKey }}</span>
           <span v-if="spell.stackCount !== undefined" class="stacks">{{ spell.stackCount }}</span>
-          <span v-if="spell.manaCost > 0" :class="spell.affordable ? 'mana-cost' : 'mana-cost short'">{{
-            spell.manaCost
-          }}</span>
+          <span
+            v-if="spell.manaCost > 0"
+            :class="spell.affordable ? 'mana-cost' : 'mana-cost short'"
+            >{{ spell.manaCost }}</span
+          >
           <div v-if="spell.showCoolDown">
             <div
               :class="spell.lockedOut ? 'cooldown-overlay' : 'cooldown-overlay rhythm'"

@@ -37,7 +37,7 @@ interface Harness {
     begin: number[];
     commit: number[];
     cancel: number[];
-    steer: (({ x: number; y: number }) | null)[];
+    steer: ({ x: number; y: number } | null)[];
     aim: { slot: number; world: { x: number; y: number } | null }[];
   };
   setTargeting(mode: TargetingMode): void;
@@ -550,7 +550,8 @@ describe('TouchControls — tri-state mode preference', () => {
       location: { search: '' },
       localStorage: { getItem: () => null, setItem },
     });
-    const { rememberTouchControlsPreference } = await import('../../../src/game/input/TouchControls');
+    const { rememberTouchControlsPreference } =
+      await import('../../../src/game/input/TouchControls');
 
     rememberTouchControlsPreference(true);
     expect(setItem).toHaveBeenCalledWith('lol2d.touchControls', 'touch');
@@ -579,10 +580,8 @@ describe('TouchControls — tap target preference', () => {
     vi.stubGlobal('window', {
       localStorage: { getItem: () => 'lowest-health', setItem },
     });
-    const {
-      setTouchTargetPriorityPreference,
-      touchTargetPriorityPreference,
-    } = await import('../../../src/game/input/TouchControls');
+    const { setTouchTargetPriorityPreference, touchTargetPriorityPreference } =
+      await import('../../../src/game/input/TouchControls');
 
     expect(touchTargetPriorityPreference()).toBe('lowest-health');
     setTouchTargetPriorityPreference('lowest-health');
@@ -608,7 +607,13 @@ describe('TouchControls — button visual', () => {
   it('the swing rhythm never dims and never shows seconds, only the warm sweep', () => {
     // The basic attack: cooldownRatio ticks the whole game, onCooldown never does.
     const visual = describeButtonVisual(
-      withView({ onCooldown: false, remainingSeconds: 0, cooldownRatio: 0.7, affordable: true, castable: true })
+      withView({
+        onCooldown: false,
+        remainingSeconds: 0,
+        cooldownRatio: 0.7,
+        affordable: true,
+        castable: true,
+      })
     );
     expect(visual.dim).toBe(false);
     expect(visual.wedgeColor).toEqual(RHYTHM_WEDGE_COLOR);

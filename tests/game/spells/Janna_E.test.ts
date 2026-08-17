@@ -19,7 +19,12 @@ import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 function champion(game: TestGame, x: number, teamId: string): Champion {
   const result = new Champion({ game, position: createVector(x, 0), teamId });
@@ -54,7 +59,9 @@ function tick(objects: { update(): void }[], stepMs: number, totalMs: number): v
 describe('Janna E', () => {
   beforeEach(() => {
     installSpellObjectGlobals();
-    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi));
+    vi.stubGlobal('constrain', (v: number, lo: number, hi: number) =>
+      Math.min(Math.max(v, lo), hi)
+    );
     vi.stubGlobal('cos', Math.cos);
     vi.stubGlobal('sin', Math.sin);
     vi.stubGlobal('PI', Math.PI);
@@ -159,7 +166,16 @@ describe('Janna E', () => {
     const shell = new Janna_E_Shell(owner, ally);
     const spies = { image: vi.fn(), circle: vi.fn(), arc: vi.fn() };
     for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'fill',
+      'stroke',
+      'noFill',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     shell.age = 500;

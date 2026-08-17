@@ -98,7 +98,9 @@ const installUpdate = async (): Promise<void> => {
   </div>
 
   <button id="play-btn" class="hextech-btn" @click="emit('play')">Chơi</button>
-  <button id="config-btn" class="hextech-btn secondary" @click="emit('openConfig')">Cấu Hình Trận Đấu</button>
+  <button id="config-btn" class="hextech-btn secondary" @click="emit('openConfig')">
+    Cấu Hình Trận Đấu
+  </button>
 
   <button id="fullscreen-btn" @click="toggleFullscreen">
     <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'"></i>

@@ -140,7 +140,11 @@ export default class AoePulse extends SpellObject {
     fill(r * 0.7, g * 0.7, b * 0.7, 110 * fade);
     for (let i = 0; i < 4; i++) {
       const a = this.seed + i * 1.3;
-      circle(cos(a) * this.radius * 0.16 * t, sin(a) * this.radius * 0.16 * t, this.radius * 0.3 * (0.4 + t));
+      circle(
+        cos(a) * this.radius * 0.16 * t,
+        sin(a) * this.radius * 0.16 * t,
+        this.radius * 0.3 * (0.4 + t)
+      );
     }
   }
 
@@ -197,7 +201,8 @@ export default class AoePulse extends SpellObject {
     const lobes = 18;
     for (let i = 0; i < lobes; i++) {
       const a = (i / lobes) * TWO_PI;
-      const wobble = 1 + 0.18 * Math.sin(this.seed + i * 1.7) + 0.08 * Math.sin(this.seed + i * 4.3);
+      const wobble =
+        1 + 0.18 * Math.sin(this.seed + i * 1.7) + 0.08 * Math.sin(this.seed + i * 4.3);
       const rr = this.radius * (0.35 + 0.65 * t) * wobble;
       vertex(cos(a) * rr, sin(a) * rr);
     }
@@ -222,7 +227,12 @@ export default class AoePulse extends SpellObject {
       if (spread > 1) continue;
       stroke(r, g, b, 230 * (1 - spread));
       strokeWeight(8 * (1 - spread) + 2);
-      ellipse(0, 0, this.radius * 2 * (0.3 + 0.7 * spread), this.radius * 1.15 * (0.3 + 0.7 * spread));
+      ellipse(
+        0,
+        0,
+        this.radius * 2 * (0.3 + 0.7 * spread),
+        this.radius * 1.15 * (0.3 + 0.7 * spread)
+      );
     }
     // dust clods kicked low and outward
     noStroke();
@@ -309,7 +319,10 @@ export default class AoePulse extends SpellObject {
         const p = k / 6;
         const wobble = Math.sin(p * PI * 2 + this.seed + i) * this.radius * 0.09 * p;
         const angle = a + curl * p * 0.55;
-        vertex(cos(angle) * reach * p - sin(angle) * wobble, sin(angle) * reach * p + cos(angle) * wobble);
+        vertex(
+          cos(angle) * reach * p - sin(angle) * wobble,
+          sin(angle) * reach * p + cos(angle) * wobble
+        );
       }
       endShape();
     }

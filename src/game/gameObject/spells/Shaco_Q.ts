@@ -153,7 +153,7 @@ export class Shaco_Q_Object extends SpellObject {
     // the harlequin diamonds
     for (const shard of this._shards) {
       const distance = this.reach * travel * shard.speed;
-      const scale = this.implode ? 0.4 + 0.6 * fade : (1 - t * 0.55);
+      const scale = this.implode ? 0.4 + 0.6 * fade : 1 - t * 0.55;
       push();
       translate(cos(shard.angle) * distance, sin(shard.angle) * distance);
       rotate(shard.spin * (this.implode ? -t : t) + shard.angle);

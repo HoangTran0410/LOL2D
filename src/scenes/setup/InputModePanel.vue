@@ -62,13 +62,14 @@ const setTargetPriority = (priority: TouchTargetPriority): void => {
     <p class="pregame-hint">
       <template v-if="mode === 'auto'">
         Đang tự nhận diện theo thiết bị, và hiện dùng giao diện
-        <strong>{{ isTouchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong>.
+        <strong>{{ isTouchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong
+        >.
       </template>
       <template v-else>
         Bạn đang <strong>tự chọn</strong> giao diện
-        <strong>{{ isTouchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong>. Lựa chọn này được ghi
-        nhớ cho mọi lần vào sau và cho cả trận đấu, kể cả trên thiết bị nhận diện ra kiểu khác —
-        chọn <strong>Tự động</strong> để trả lại cho thiết bị quyết định.
+        <strong>{{ isTouchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong
+        >. Lựa chọn này được ghi nhớ cho mọi lần vào sau và cho cả trận đấu, kể cả trên thiết bị
+        nhận diện ra kiểu khác — chọn <strong>Tự động</strong> để trả lại cho thiết bị quyết định.
       </template>
     </p>
     <h3>Ưu tiên mục tiêu khi chạm nhanh</h3>

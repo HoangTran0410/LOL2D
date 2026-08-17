@@ -132,10 +132,7 @@ export class Ahri_W_Object extends SpellObject {
     }
 
     // attacking
-    else if (
-      this.phase === Ahri_W_Object.PHASES.ATTACKING &&
-      this.targetEnemy
-    ) {
+    else if (this.phase === Ahri_W_Object.PHASES.ATTACKING && this.targetEnemy) {
       const previous = this.position.copy();
       VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.moveSpeed);
       this.trailSystem.addTrail(this.position);

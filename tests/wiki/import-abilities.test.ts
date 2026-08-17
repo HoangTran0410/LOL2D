@@ -28,7 +28,8 @@ async function fixture() {
 function client(data: Awaited<ReturnType<typeof fixture>>, overrides = {}) {
   return {
     fetchChampionIndex: vi.fn(async () => ({
-      source: 'return { Janna = { name = "Janna", image = "JannaSquare.png", skill_q = { "Howling Gale", "Howling Gale Recast" } } }',
+      source:
+        'return { Janna = { name = "Janna", image = "JannaSquare.png", skill_q = { "Howling Gale", "Howling Gale Recast" } } }',
       revisionId: 100,
       timestamp: '2026-08-12T00:00:00Z',
       pageUrl: 'https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data',
@@ -41,11 +42,15 @@ function client(data: Awaited<ReturnType<typeof fixture>>, overrides = {}) {
       raw: { revision: data.revision, expanded: data.expanded },
       pageUrl: 'https://wiki.leagueoflegends.com/en-us/Template:Data_Janna/Howling_Gale',
     })),
-    fetchImageInfo: vi.fn(async file => file.includes('JannaSquare') ? {
-      url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
-      sha1: 'fedcba9876543210',
-      mime: 'image/png',
-    } : data.imageinfo.query.pages[0].imageinfo[0]),
+    fetchImageInfo: vi.fn(async file =>
+      file.includes('JannaSquare')
+        ? {
+            url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
+            sha1: 'fedcba9876543210',
+            mime: 'image/png',
+          }
+        : data.imageinfo.query.pages[0].imageinfo[0]
+    ),
     fetchBytes: vi.fn(async () => new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])),
     ...overrides,
   };
@@ -60,9 +65,15 @@ describe('League Wiki importer', () => {
     expect(request).toContain('@@name@@{{Template:Data Lux/Final Spark|pst2|1}}');
     expect(request).toContain('@@icon@@{{Template:Data Lux/Final Spark|pst2|icon}}');
     expect(request).toContain('@@casttime@@{{Template:Data Lux/Final Spark|pst2|cast time}}');
-    expect(request).toContain('@@effectradius@@{{Template:Data Lux/Final Spark|pst2|effect radius}}');
+    expect(request).toContain(
+      '@@effectradius@@{{Template:Data Lux/Final Spark|pst2|effect radius}}'
+    );
     expect(request).toContain('@@radius@@{{Template:Data Lux/Final Spark|pst2|radius}}');
-    expect(normalizeAbilityFields('@@name@@Final Spark@@icon@@Final Spark.png@@casttime@@1@@effectradius@@@@radius@@@@')).toEqual({
+    expect(
+      normalizeAbilityFields(
+        '@@name@@Final Spark@@icon@@Final Spark.png@@casttime@@1@@effectradius@@@@radius@@@@'
+      )
+    ).toEqual({
       name: 'Final Spark',
       icon: 'Final Spark.png',
       casttime: '1',
@@ -70,7 +81,9 @@ describe('League Wiki importer', () => {
   });
 
   it('omits exact unresolved pst2 placeholders without dropping embedded braces', () => {
-    const fields = normalizeAbilityFields('@@description@@Keep {{{value}}} literal@@description2@@ {{{description2}}} @@range@@{{{target range}}}@@');
+    const fields = normalizeAbilityFields(
+      '@@description@@Keep {{{value}}} literal@@description2@@ {{{description2}}} @@range@@{{{target range}}}@@'
+    );
 
     expect(fields.description).toMatchObject({ raw: 'Keep {{{value}}} literal' });
     expect(fields).not.toHaveProperty('description2');
@@ -85,7 +98,10 @@ describe('League Wiki importer', () => {
       raw: "'''Active:''' Janna summons a [[File:Airborne icon.png|20px]] whirlwind dealing {{as|magic damage}}.",
       text: 'Active: Janna summons a whirlwind dealing magic damage.',
     });
-    expect(fields.leveling).toMatchObject({ raw: expect.stringContaining('60 / 85'), text: expect.stringContaining('60 / 85') });
+    expect(fields.leveling).toMatchObject({
+      raw: expect.stringContaining('60 / 85'),
+      text: expect.stringContaining('60 / 85'),
+    });
     expect(fields.range).toBe('1100 - 1760');
     expect(fields.projectile).toBe(true);
   });
@@ -99,7 +115,13 @@ describe('League Wiki importer', () => {
     );
     const wiki = client(data);
 
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: wiki, now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: wiki,
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
 
     expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Glacial Storm.png');
     const record = JSON.parse(await readFile(join(target, 'docs/abilities/janna/q.json'), 'utf8'));
@@ -113,7 +135,8 @@ describe('League Wiki importer', () => {
     // unresolved `{{{icon2}}}` placeholder on both (dropped by normalization).
     const wiki = {
       fetchChampionIndex: vi.fn(async () => ({
-        source: 'return { Fizz = { name = "Fizz", image = "FizzSquare.png", skill_e = { "Playful", "Trickster" } } }',
+        source:
+          'return { Fizz = { name = "Fizz", image = "FizzSquare.png", skill_e = { "Playful", "Trickster" } } }',
         revisionId: 200,
         timestamp: '2026-08-12T00:00:00Z',
         pageUrl: 'https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data',
@@ -132,9 +155,24 @@ describe('League Wiki importer', () => {
         };
       }),
       fetchImageInfo: vi.fn(async (file: string) => {
-        if (file.includes('FizzSquare')) return { url: 'https://wiki.leagueoflegends.com/images/FizzSquare.png', sha1: 'champsha1', mime: 'image/png' };
-        if (file === 'Playful.png') return { url: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png', sha1: 'playfulsha1', mime: 'image/png' };
-        if (file === 'Trickster.png') return { url: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png', sha1: 'tricksha1', mime: 'image/png' };
+        if (file.includes('FizzSquare'))
+          return {
+            url: 'https://wiki.leagueoflegends.com/images/FizzSquare.png',
+            sha1: 'champsha1',
+            mime: 'image/png',
+          };
+        if (file === 'Playful.png')
+          return {
+            url: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png',
+            sha1: 'playfulsha1',
+            mime: 'image/png',
+          };
+        if (file === 'Trickster.png')
+          return {
+            url: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
+            sha1: 'tricksha1',
+            mime: 'image/png',
+          };
         throw new Error(`unexpected file request: ${file}`);
       }),
       fetchBytes: vi.fn(async (url: string) => {
@@ -144,7 +182,13 @@ describe('League Wiki importer', () => {
       }),
     };
 
-    await importAbilities({ root: target, champions: ['Fizz'], slots: ['E'], client: wiki, now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Fizz'],
+      slots: ['E'],
+      client: wiki,
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
 
     expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Playful.png');
     expect(wiki.fetchImageInfo).toHaveBeenCalledWith('Trickster.png');
@@ -153,23 +197,43 @@ describe('League Wiki importer', () => {
     expect(record.forms).toHaveLength(2);
     expect(record.forms[0]).toMatchObject({
       name: 'Playful',
-      asset: { key: 'spell_fizz_e', originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png' },
+      asset: {
+        key: 'spell_fizz_e',
+        originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png',
+      },
     });
     expect(record.forms[1]).toMatchObject({
       name: 'Trickster',
-      asset: { key: 'spell_fizz_e2', originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png' },
+      asset: {
+        key: 'spell_fizz_e2',
+        originalUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
+      },
     });
     expect(record.asset).toMatchObject({ key: 'spell_fizz_e' });
 
-    await expect(readFile(join(target, 'assets/images/spells/fizz_e.png'))).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]));
-    await expect(readFile(join(target, 'assets/images/spells/fizz_e2.png'))).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 2]));
+    await expect(readFile(join(target, 'assets/images/spells/fizz_e.png'))).resolves.toEqual(
+      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1])
+    );
+    await expect(readFile(join(target, 'assets/images/spells/fizz_e2.png'))).resolves.toEqual(
+      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 2])
+    );
 
-    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
-    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e')).toMatchObject({
+    const manifest = JSON.parse(
+      await readFile(join(target, 'assets/source-manifest.json'), 'utf8')
+    );
+    expect(
+      manifest.sources.find(
+        (source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e'
+      )
+    ).toMatchObject({
       localPath: 'assets/images/spells/fizz_e.png',
       sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png',
     });
-    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e2')).toMatchObject({
+    expect(
+      manifest.sources.find(
+        (source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e2'
+      )
+    ).toMatchObject({
       localPath: 'assets/images/spells/fizz_e2.png',
       sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
     });
@@ -181,12 +245,24 @@ describe('League Wiki importer', () => {
     const data = await fixture();
     const target = await root();
 
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
 
     const record = JSON.parse(await readFile(join(target, 'docs/abilities/janna/q.json'), 'utf8'));
-    const raw = JSON.parse(await readFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), 'utf8'));
-    const champion = JSON.parse(await readFile(join(target, 'docs/abilities/janna/champion.json'), 'utf8'));
-    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
+    const raw = JSON.parse(
+      await readFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), 'utf8')
+    );
+    const champion = JSON.parse(
+      await readFile(join(target, 'docs/abilities/janna/champion.json'), 'utf8')
+    );
+    const manifest = JSON.parse(
+      await readFile(join(target, 'assets/source-manifest.json'), 'utf8')
+    );
     expect(record).toMatchObject({
       schemaVersion: 1,
       champion: 'Janna',
@@ -195,22 +271,45 @@ describe('League Wiki importer', () => {
         { name: 'Howling Gale', fields: { range: '1100 - 1760' } },
         { name: 'Howling Gale Recast', fields: { range: '1100 - 1760' } },
       ],
-      source: { revisionId: 456, fetchedAt: '2026-08-13T00:00:00.000Z', contentHash: expect.stringMatching(/^[a-f0-9]{64}$/) },
-      asset: { key: 'spell_janna_q', originalUrl: 'https://wiki.leagueoflegends.com/images/Howling_Gale.png' },
+      source: {
+        revisionId: 456,
+        fetchedAt: '2026-08-13T00:00:00.000Z',
+        contentHash: expect.stringMatching(/^[a-f0-9]{64}$/),
+      },
+      asset: {
+        key: 'spell_janna_q',
+        originalUrl: 'https://wiki.leagueoflegends.com/images/Howling_Gale.png',
+      },
     });
     expect(raw).toMatchObject({
       schemaVersion: 1,
       source: { revisionId: 456 },
       payload: [
-        { page: 'Template:Data Janna/Howling Gale', response: { revision: data.revision, expanded: data.expanded } },
-        { page: 'Template:Data Janna/Howling Gale', response: { revision: data.revision, expanded: data.expanded } },
+        {
+          page: 'Template:Data Janna/Howling Gale',
+          response: { revision: data.revision, expanded: data.expanded },
+        },
+        {
+          page: 'Template:Data Janna/Howling Gale',
+          response: { revision: data.revision, expanded: data.expanded },
+        },
       ],
     });
-    expect(champion).toMatchObject({ schemaVersion: 1, champion: 'Janna', asset: { key: 'champ_janna' } });
+    expect(champion).toMatchObject({
+      schemaVersion: 1,
+      champion: 'Janna',
+      asset: { key: 'champ_janna' },
+    });
     expect(await readFile(join(target, 'assets/images/spells/janna_q.png'))).toHaveLength(8);
     expect(await readFile(join(target, 'assets/images/champions/janna.png'))).toHaveLength(8);
-    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').contentHash).toBe(
-      createHash('sha256').update(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])).digest('hex')
+    expect(
+      manifest.sources.find(
+        (source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q'
+      ).contentHash
+    ).toBe(
+      createHash('sha256')
+        .update(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]))
+        .digest('hex')
     );
 
     await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
@@ -223,9 +322,21 @@ describe('League Wiki importer', () => {
     const data = await fixture();
     const target = await root();
     await writeFile(join(target, 'existing.txt'), 'keep me');
-    const failing = client(data, { fetchBytes: vi.fn(async () => { throw new Error('offline'); }) });
+    const failing = client(data, {
+      fetchBytes: vi.fn(async () => {
+        throw new Error('offline');
+      }),
+    });
 
-    await expect(importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: failing, now: () => '2026-08-13T00:00:00.000Z' })).rejects.toThrow(/offline/);
+    await expect(
+      importAbilities({
+        root: target,
+        champions: ['Janna'],
+        slots: ['Q'],
+        client: failing,
+        now: () => '2026-08-13T00:00:00.000Z',
+      })
+    ).rejects.toThrow(/offline/);
     await expect(readdir(target)).resolves.toEqual(['existing.txt']);
     await expect(readFile(join(target, 'existing.txt'), 'utf8')).resolves.toBe('keep me');
   });
@@ -240,7 +351,13 @@ describe('League Wiki importer', () => {
     await writeFile(championPath, 'existing champion record\n');
     await writeFile(imagePath, 'existing champion image');
 
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
 
     await expect(readFile(championPath, 'utf8')).resolves.toBe('existing champion record\n');
     await expect(readFile(imagePath, 'utf8')).resolves.toBe('existing champion image');
@@ -265,10 +382,27 @@ describe('League Wiki importer', () => {
     const data = await fixture();
     const target = await root();
     const logs: string[] = [];
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
-    data.expanded.expandtemplates.wikitext = data.expanded.expandtemplates.wikitext.replace('1100 - 1760', '1100 - 1800');
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
+    data.expanded.expandtemplates.wikitext = data.expanded.expandtemplates.wikitext.replace(
+      '1100 - 1760',
+      '1100 - 1800'
+    );
 
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: client(data), now: () => '2026-08-14T00:00:00.000Z', log: line => logs.push(line) });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      update: true,
+      client: client(data),
+      now: () => '2026-08-14T00:00:00.000Z',
+      log: line => logs.push(line),
+    });
 
     expect(logs).toContain('Janna Q: fields.range changed');
   });
@@ -276,7 +410,13 @@ describe('League Wiki importer', () => {
   it('updates independently changed champion and ability image bytes', async () => {
     const data = await fixture();
     const target = await root();
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
     const changedPng = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
 
     await importAbilities({
@@ -288,36 +428,73 @@ describe('League Wiki importer', () => {
       now: () => '2026-08-14T00:00:00.000Z',
     });
 
-    await expect(readFile(join(target, 'assets/images/spells/janna_q.png'))).resolves.toEqual(Buffer.from(changedPng));
-    await expect(readFile(join(target, 'assets/images/champions/janna.png'))).resolves.toEqual(Buffer.from(changedPng));
-    const manifest = JSON.parse(await readFile(join(target, 'assets/source-manifest.json'), 'utf8'));
+    await expect(readFile(join(target, 'assets/images/spells/janna_q.png'))).resolves.toEqual(
+      Buffer.from(changedPng)
+    );
+    await expect(readFile(join(target, 'assets/images/champions/janna.png'))).resolves.toEqual(
+      Buffer.from(changedPng)
+    );
+    const manifest = JSON.parse(
+      await readFile(join(target, 'assets/source-manifest.json'), 'utf8')
+    );
     const expectedHash = createHash('sha256').update(changedPng).digest('hex');
-    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').contentHash).toBe(expectedHash);
-    expect(manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'champ_janna').contentHash).toBe(expectedHash);
+    expect(
+      manifest.sources.find(
+        (source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q'
+      ).contentHash
+    ).toBe(expectedHash);
+    expect(
+      manifest.sources.find(
+        (source: { localAssetKey: string }) => source.localAssetKey === 'champ_janna'
+      ).contentHash
+    ).toBe(expectedHash);
   });
 
   it('replaces an old image extension and generated manifest in one import', async () => {
     const data = await fixture();
     const target = await root();
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
     const wiki = client(data, {
-      fetchImageInfo: vi.fn(async (file: string) => file.includes('JannaSquare') ? {
-        url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
-        sha1: 'fedcba9876543210',
-        mime: 'image/png',
-      } : {
-        url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg',
-        sha1: 'changed',
-        mime: 'image/jpeg',
-      }),
-      fetchBytes: vi.fn(async (url: string) => url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])),
+      fetchImageInfo: vi.fn(async (file: string) =>
+        file.includes('JannaSquare')
+          ? {
+              url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
+              sha1: 'fedcba9876543210',
+              mime: 'image/png',
+            }
+          : {
+              url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg',
+              sha1: 'changed',
+              mime: 'image/jpeg',
+            }
+      ),
+      fetchBytes: vi.fn(async (url: string) =>
+        url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])
+      ),
     });
 
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: wiki, now: () => '2026-08-14T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      update: true,
+      client: wiki,
+      now: () => '2026-08-14T00:00:00.000Z',
+    });
 
-    await expect(stat(join(target, 'assets/images/spells/janna_q.png'))).rejects.toMatchObject({ code: 'ENOENT' });
-    await expect(readFile(join(target, 'assets/images/spells/janna_q.jpg'))).resolves.toEqual(Buffer.from(jpeg));
+    await expect(stat(join(target, 'assets/images/spells/janna_q.png'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
+    await expect(readFile(join(target, 'assets/images/spells/janna_q.jpg'))).resolves.toEqual(
+      Buffer.from(jpeg)
+    );
     const generated = await readFile(join(target, 'src/generated/assetManifest.ts'), 'utf8');
     expect(generated).toContain('assets/images/spells/janna_q.jpg?url');
     expect(generated).not.toContain('assets/images/spells/janna_q.png?url');
@@ -327,7 +504,13 @@ describe('League Wiki importer', () => {
   it('writes nothing when hypothetical asset manifest generation fails', async () => {
     const data = await fixture();
     const target = await root();
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
     const tracked = [
       'docs/abilities/janna/q.json',
       'assets/images/spells/janna_q.png',
@@ -335,29 +518,59 @@ describe('League Wiki importer', () => {
       'src/generated/assetManifest.ts',
     ];
     const before = await Promise.all(tracked.map(path => readFile(join(target, path))));
-    await writeFile(join(target, 'assets/images/spells/janna-q.webp'), new Uint8Array([82, 73, 70, 70]));
+    await writeFile(
+      join(target, 'assets/images/spells/janna-q.webp'),
+      new Uint8Array([82, 73, 70, 70])
+    );
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
     const wiki = client(data, {
-      fetchImageInfo: vi.fn(async (file: string) => file.includes('JannaSquare') ? {
-        url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png', sha1: 'champion', mime: 'image/png',
-      } : {
-        url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg', sha1: 'ability', mime: 'image/jpeg',
-      }),
-      fetchBytes: vi.fn(async (url: string) => url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])),
+      fetchImageInfo: vi.fn(async (file: string) =>
+        file.includes('JannaSquare')
+          ? {
+              url: 'https://wiki.leagueoflegends.com/images/JannaSquare.png',
+              sha1: 'champion',
+              mime: 'image/png',
+            }
+          : {
+              url: 'https://wiki.leagueoflegends.com/images/Howling_Gale.jpg',
+              sha1: 'ability',
+              mime: 'image/jpeg',
+            }
+      ),
+      fetchBytes: vi.fn(async (url: string) =>
+        url.endsWith('.jpg') ? jpeg : new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])
+      ),
     });
 
-    await expect(importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], update: true, client: wiki, now: () => '2026-08-14T00:00:00.000Z' })).rejects.toThrow(/duplicate asset key/i);
+    await expect(
+      importAbilities({
+        root: target,
+        champions: ['Janna'],
+        slots: ['Q'],
+        update: true,
+        client: wiki,
+        now: () => '2026-08-14T00:00:00.000Z',
+      })
+    ).rejects.toThrow(/duplicate asset key/i);
 
     for (const [index, path] of tracked.entries()) {
       await expect(readFile(join(target, path))).resolves.toEqual(before[index]);
     }
-    await expect(stat(join(target, 'assets/images/spells/janna_q.jpg'))).rejects.toMatchObject({ code: 'ENOENT' });
+    await expect(stat(join(target, 'assets/images/spells/janna_q.jpg'))).rejects.toMatchObject({
+      code: 'ENOENT',
+    });
   });
 
   it('detects normalized record, local image, and source-manifest corruption', async () => {
     const data = await fixture();
     const target = await root();
-    await importAbilities({ root: target, champions: ['Janna'], slots: ['Q'], client: client(data), now: () => '2026-08-13T00:00:00.000Z' });
+    await importAbilities({
+      root: target,
+      champions: ['Janna'],
+      slots: ['Q'],
+      client: client(data),
+      now: () => '2026-08-13T00:00:00.000Z',
+    });
     const recordPath = join(target, 'docs/abilities/janna/q.json');
     const imagePath = join(target, 'assets/images/spells/janna_q.png');
     const manifestPath = join(target, 'assets/source-manifest.json');
@@ -376,7 +589,9 @@ describe('League Wiki importer', () => {
     await writeFile(imagePath, originalImage);
 
     const manifest = JSON.parse(originalManifest.toString());
-    manifest.sources.find((source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q').localPath = 'assets/images/spells/wrong.png';
+    manifest.sources.find(
+      (source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q'
+    ).localPath = 'assets/images/spells/wrong.png';
     await writeFile(manifestPath, JSON.stringify(manifest));
     await expect(checkAbilities(target)).rejects.toThrow(/asset key\/path/i);
     await writeFile(manifestPath, originalManifest);
@@ -387,11 +602,29 @@ describe('League Wiki importer', () => {
   });
 
   it('retries transient MediaWiki failures with identifying headers and imageinfo originals', async () => {
-    const responses = [new Response('busy', { status: 503 }), new Response(JSON.stringify({ query: { pages: [{ imageinfo: [{ url: 'https://example.test/original.png', sha1: 'a', mime: 'image/png' }] }] } }), { status: 200 })];
+    const responses = [
+      new Response('busy', { status: 503 }),
+      new Response(
+        JSON.stringify({
+          query: {
+            pages: [
+              {
+                imageinfo: [
+                  { url: 'https://example.test/original.png', sha1: 'a', mime: 'image/png' },
+                ],
+              },
+            ],
+          },
+        }),
+        { status: 200 }
+      ),
+    ];
     const fetcher = vi.fn(async () => responses.shift()!);
     const wiki = createMediaWikiClient({ fetcher, sleep: async () => {}, throttleMs: 0 });
 
-    await expect(wiki.fetchImageInfo('File:Howling Gale.png')).resolves.toMatchObject({ url: 'https://example.test/original.png' });
+    await expect(wiki.fetchImageInfo('File:Howling Gale.png')).resolves.toMatchObject({
+      url: 'https://example.test/original.png',
+    });
     expect(fetcher).toHaveBeenCalledTimes(2);
     const [url, init] = fetcher.mock.calls[0];
     expect(String(url)).toContain('iiprop=url%7Csha1%7Cmime');
@@ -400,7 +633,8 @@ describe('League Wiki importer', () => {
 
   it('requests revision metadata and sentinel-expanded template fields from the API fixture', async () => {
     const data = await fixture();
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(new Response(JSON.stringify(data.revision), { status: 200 }))
       .mockResolvedValueOnce(new Response(JSON.stringify(data.expanded), { status: 200 }));
     const wiki = createMediaWikiClient({ fetcher, sleep: async () => {}, throttleMs: 0 });
@@ -411,12 +645,17 @@ describe('League Wiki importer', () => {
       raw: { revision: data.revision, expanded: data.expanded },
     });
     expect(fetcher).toHaveBeenCalledTimes(2);
-    expect(fetcher.mock.calls.map(([url]) => new URL(url).searchParams.get('action')).sort()).toEqual(['expandtemplates', 'query']);
+    expect(
+      fetcher.mock.calls.map(([url]) => new URL(url).searchParams.get('action')).sort()
+    ).toEqual(['expandtemplates', 'query']);
   });
 
   it('accepts singular, plural, and all champion selection with sanitized slots', () => {
     expect(parseCli(['--champion', 'Janna'])).toMatchObject({ champions: ['Janna'] });
-    expect(parseCli(['--champions', 'Janna,Lux', '--slots', 'Q,R'])).toMatchObject({ champions: ['Janna', 'Lux'], slots: ['Q', 'R'] });
+    expect(parseCli(['--champions', 'Janna,Lux', '--slots', 'Q,R'])).toMatchObject({
+      champions: ['Janna', 'Lux'],
+      slots: ['Q', 'R'],
+    });
     expect(parseCli(['--all'])).toMatchObject({ all: true });
     expect(() => parseCli(['--champion', '../Janna'])).toThrow(/invalid champion/i);
     expect(() => parseCli(['--champions', 'Janna,Janna'])).toThrow(/duplicate champion/i);

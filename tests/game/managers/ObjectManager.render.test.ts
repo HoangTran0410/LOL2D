@@ -138,8 +138,9 @@ describe('ObjectManager mobile rendering', () => {
       system.particles = Array.from({ length: 1_000 }, () => ({ x: 50, y: 50 }));
       return system;
     });
-    const effects = Array.from({ length: 31 }, () =>
-      new GameObject({ position: createVector(50, 50) })
+    const effects = Array.from(
+      { length: 31 },
+      () => new GameObject({ position: createVector(50, 50) })
     );
     manager.objects = [...units, ...particles, ...effects];
     for (const object of manager.objects) {
@@ -253,9 +254,7 @@ describe('ObjectManager mobile rendering', () => {
       waypoints: [{ x: 0, y: 0 }],
     });
     const cosmeticDraw = vi.fn();
-    minion.buffs = [
-      { statusFlagsToEnable: 0, statusFlagsToDisable: 0, draw: cosmeticDraw },
-    ] as any;
+    minion.buffs = [{ statusFlagsToEnable: 0, statusFlagsToDisable: 0, draw: cosmeticDraw }] as any;
 
     minion.draw({ compactUnits: true } as any);
 

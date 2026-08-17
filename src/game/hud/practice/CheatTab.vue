@@ -176,7 +176,6 @@ const clearStacks = (spell: Spell): void => {
 };
 
 const STACK_STEPS = [1, 10, 100];
-
 </script>
 
 <template>
@@ -240,12 +239,7 @@ const STACK_STEPS = [1, 10, 100];
     </div>
 
     <div class="practice-cheat-actions">
-      <button
-        type="button"
-        class="practice-cheat-btn"
-        id="practice-cheat-refill"
-        @click="refill"
-      >
+      <button type="button" class="practice-cheat-btn" id="practice-cheat-refill" @click="refill">
         Hồi đầy
       </button>
       <button
@@ -280,13 +274,7 @@ const STACK_STEPS = [1, 10, 100];
         >
           +{{ step }}
         </button>
-        <button
-          type="button"
-          class="practice-cheat-btn"
-          @click="clearStacks(spell)"
-        >
-          Xoá
-        </button>
+        <button type="button" class="practice-cheat-btn" @click="clearStacks(spell)">Xoá</button>
       </span>
     </div>
 

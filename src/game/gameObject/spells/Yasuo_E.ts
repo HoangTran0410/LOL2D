@@ -230,7 +230,8 @@ export class Yasuo_E_Object extends SpellObject {
     if (target.isDead || target.toRemove) return;
 
     const contact =
-      (target.stats.size.value + this.owner.stats.size.value) / 2 + this.owner.stats.size.value * 0.2;
+      (target.stats.size.value + this.owner.stats.size.value) / 2 +
+      this.owner.stats.size.value * 0.2;
     if (this.owner.position.dist(target.position) > contact) return;
 
     this._strike(target);
@@ -332,7 +333,8 @@ export class Yasuo_E_Object extends SpellObject {
 
     // Newest sample is widest; the tail closes to a point as it ages out.
     const freshness = 1 - constrain(sample.age / E_TRAIL_MS, 0, 1);
-    const halfWidth = E_TRAIL_HALF_WIDTH * freshness * (0.35 + 0.65 * (index / Math.max(1, count - 1)));
+    const halfWidth =
+      E_TRAIL_HALF_WIDTH * freshness * (0.35 + 0.65 * (index / Math.max(1, count - 1)));
     vertex(sample.x + nx * halfWidth * side, sample.y + ny * halfWidth * side);
   }
 

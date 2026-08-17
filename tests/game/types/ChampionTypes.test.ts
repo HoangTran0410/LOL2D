@@ -33,21 +33,48 @@ const scopedSources = [
 ];
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
-  add(vector: TestVector) { this.x += vector.x; this.y += vector.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  normalize() { return this.setMag(1); }
-  magSq() { return this.x * this.x + this.y * this.y; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(vector: TestVector) {
+    this.x += vector.x;
+    this.y += vector.y;
+    return this;
+  }
+  mult(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  normalize() {
+    return this.setMag(1);
+  }
+  magSq() {
+    return this.x * this.x + this.y * this.y;
+  }
   setMag(value: number) {
     const magnitude = Math.hypot(this.x, this.y);
     if (magnitude > 0) this.mult(value / magnitude);
     return this;
   }
-  dist(vector: TestVector) { return Math.hypot(this.x - vector.x, this.y - vector.y); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
-  static dist(a: TestVector, b: TestVector) { return a.dist(b); }
+  dist(vector: TestVector) {
+    return Math.hypot(this.x - vector.x, this.y - vector.y);
+  }
+  static sub(a: TestVector, b: TestVector) {
+    return new TestVector(a.x - b.x, a.y - b.y);
+  }
+  static dist(a: TestVector, b: TestVector) {
+    return a.dist(b);
+  }
 }
 
 function createGame(): GameObjectRuntimeContext & { setPlayer(player: AttackableUnit): void } {
@@ -66,7 +93,9 @@ function createGame(): GameObjectRuntimeContext & { setPlayer(player: Attackable
     },
     randomSpawnPoint: () => createVector(),
     createSpellContext: () => undefined,
-    setPlayer(value: AttackableUnit) { player = value; },
+    setPlayer(value: AttackableUnit) {
+      player = value;
+    },
   };
 }
 
@@ -84,9 +113,14 @@ describe('champion and direct-subclass type boundary', () => {
     vi.stubGlobal('p5', { Vector: TestVector });
     vi.stubGlobal('random', () => 0);
     vi.stubGlobal('deltaTime', 16);
-    vi.stubGlobal('lerp', (from: number, to: number, amount: number) => from + (to - from) * amount);
-    vi.stubGlobal('map', (value: number, start1: number, stop1: number, start2: number, stop2: number) =>
-      start2 + ((value - start1) / (stop1 - start1)) * (stop2 - start2)
+    vi.stubGlobal(
+      'lerp',
+      (from: number, to: number, amount: number) => from + (to - from) * amount
+    );
+    vi.stubGlobal(
+      'map',
+      (value: number, start1: number, stop1: number, start2: number, stop2: number) =>
+        start2 + ((value - start1) / (stop1 - start1)) * (stop2 - start2)
     );
     vi.stubGlobal('push', vi.fn());
     vi.stubGlobal('pop', vi.fn());
@@ -95,7 +129,9 @@ describe('champion and direct-subclass type boundary', () => {
     vi.stubGlobal('strokeWeight', vi.fn());
     vi.stubGlobal('rect', vi.fn());
     vi.stubGlobal('line', vi.fn());
-    vi.stubGlobal('constrain', (n: number, low: number, high: number) => Math.min(high, Math.max(low, n)));
+    vi.stubGlobal('constrain', (n: number, low: number, high: number) =>
+      Math.min(high, Math.max(low, n))
+    );
     vi.stubGlobal('textSize', vi.fn());
     vi.stubGlobal('text', vi.fn());
     vi.stubGlobal('noStroke', vi.fn());
@@ -108,7 +144,9 @@ describe('champion and direct-subclass type boundary', () => {
     vi.stubGlobal('BASELINE', 'BASELINE');
   });
 
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('does not use explicit any or deprecated asset lookups in scoped production files', () => {
     for (const source of scopedSources) {
@@ -162,8 +200,14 @@ describe('champion and direct-subclass type boundary', () => {
     const monster = new Monster({
       game,
       preset: {
-        name: 'Test Monster', avatar: 'monster_Baron_Nashor', camp: { x: 0, y: 0, r: 100 },
-        speed: 0, size: 100, attackRange: 100, reviveTime: 100, health: 100,
+        name: 'Test Monster',
+        avatar: 'monster_Baron_Nashor',
+        camp: { x: 0, y: 0, r: 100 },
+        speed: 0,
+        size: 100,
+        attackRange: 100,
+        reviveTime: 100,
+        health: 100,
       },
     });
     const turret = new Turret({ game, position: createVector() });
@@ -228,7 +272,12 @@ describe('champion and direct-subclass type boundary', () => {
     expect(text).toHaveBeenCalledWith(2, expect.any(Number), expect.any(Number));
   });
 
-  const shieldedChampion = (game: ReturnType<typeof createGame>, health: number, shieldAmount: number, maxHealth = 100) => {
+  const shieldedChampion = (
+    game: ReturnType<typeof createGame>,
+    health: number,
+    shieldAmount: number,
+    maxHealth = 100
+  ) => {
     const champion = new Champion({ game, position: createVector(100, 100) });
     game.setPlayer(champion);
     champion.stats.health.baseValue = health;
@@ -288,7 +337,9 @@ describe('champion and direct-subclass type boundary', () => {
       order.push('unit');
     });
     class OverlaySpell extends Spell {
-      drawVfx(): void { order.push('vfx'); }
+      drawVfx(): void {
+        order.push('vfx');
+      }
     }
     champion.spells = [new OverlaySpell(champion)];
 
@@ -312,7 +363,9 @@ describe('champion and direct-subclass type boundary', () => {
     };
 
     expectTypeOf(requireChargeSpec(holdSpec)).toEqualTypeOf<ChargeSpec>();
-    expect(() => requireChargeSpec(malformedHoldSpec)).toThrow('HOLD_RELEASE activation requires charge');
+    expect(() => requireChargeSpec(malformedHoldSpec)).toThrow(
+      'HOLD_RELEASE activation requires charge'
+    );
   });
 
   it('keeps dummy construction and AI respawn preset replacement compatible with typed options', () => {

@@ -1,7 +1,12 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
-  default: { get: () => undefined, getAsset: () => undefined, renderable: () => undefined, ensure: async () => undefined },
+  default: {
+    get: () => undefined,
+    getAsset: () => undefined,
+    renderable: () => undefined,
+    ensure: async () => undefined,
+  },
 }));
 
 import Cassiopeia_E, {
@@ -19,9 +24,7 @@ import LeeSin_E, {
 import Pantheon_W, {
   DAMAGE as PANTHEON_DAMAGE,
 } from '../../../src/game/gameObject/spells/Pantheon_W';
-import Singed_E, {
-  DAMAGE as SINGED_DAMAGE,
-} from '../../../src/game/gameObject/spells/Singed_E';
+import Singed_E, { DAMAGE as SINGED_DAMAGE } from '../../../src/game/gameObject/spells/Singed_E';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';

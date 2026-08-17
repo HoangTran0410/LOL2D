@@ -163,7 +163,9 @@ const onReset = (): void => {
     </div>
 
     <footer class="pregame-actions">
-      <button id="pregame-reset-btn" class="hextech-btn secondary" @click="onReset">Mặc Định</button>
+      <button id="pregame-reset-btn" class="hextech-btn secondary" @click="onReset">
+        Mặc Định
+      </button>
       <button id="pregame-start-btn" class="hextech-btn" @click="emit('start')">Bắt Đầu</button>
     </footer>
   </div>

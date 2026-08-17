@@ -4,7 +4,10 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
 
-import Pet, { PET_LEASH_RANGE, PET_SCAN_INTERVAL_MS } from '../../../src/game/gameObject/attackableUnits/Pet';
+import Pet, {
+  PET_LEASH_RANGE,
+  PET_SCAN_INTERVAL_MS,
+} from '../../../src/game/gameObject/attackableUnits/Pet';
 import Shaco_R from '../../../src/game/gameObject/spells/Shaco_R';
 import Shaco_W, { ARM_TIME_MS, Shaco_W_Box } from '../../../src/game/gameObject/spells/Shaco_W';
 import Jinx_E, {

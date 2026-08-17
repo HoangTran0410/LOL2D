@@ -7,35 +7,76 @@ import ObjectManager from '../../../src/game/managers/ObjectManager';
 import type Spell from '../../../src/game/gameObject/Spell';
 
 export class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
-  add(value: TestVector) { this.x += value.x; this.y += value.y; return this; }
-  sub(value: TestVector) { this.x -= value.x; this.y -= value.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
-  magSq() { return this.x * this.x + this.y * this.y; }
-  limit(max: number) { return this.mag() > max ? this.setMag(max) : this; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(value: TestVector) {
+    this.x += value.x;
+    this.y += value.y;
+    return this;
+  }
+  sub(value: TestVector) {
+    this.x -= value.x;
+    this.y -= value.y;
+    return this;
+  }
+  mult(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  mag() {
+    return Math.hypot(this.x, this.y);
+  }
+  magSq() {
+    return this.x * this.x + this.y * this.y;
+  }
+  limit(max: number) {
+    return this.mag() > max ? this.setMag(max) : this;
+  }
   setMag(value: number) {
     const length = this.mag();
     if (length > 0) this.mult(value / length);
     return this;
   }
-  dist(value: TestVector) { return Math.hypot(this.x - value.x, this.y - value.y); }
-  heading() { return Math.atan2(this.y, this.x); }
-  normalize() { return this.setMag(1); }
+  dist(value: TestVector) {
+    return Math.hypot(this.x - value.x, this.y - value.y);
+  }
+  heading() {
+    return Math.atan2(this.y, this.x);
+  }
+  normalize() {
+    return this.setMag(1);
+  }
   lerp(target: TestVector, amount: number) {
     this.x += (target.x - this.x) * amount;
     this.y += (target.y - this.y) * amount;
     return this;
   }
-  static add(a: TestVector, b: TestVector) { return a.copy().add(b); }
-  static sub(a: TestVector, b: TestVector) { return new TestVector(a.x - b.x, a.y - b.y); }
-  static dist(a: TestVector, b: TestVector) { return a.dist(b); }
+  static add(a: TestVector, b: TestVector) {
+    return a.copy().add(b);
+  }
+  static sub(a: TestVector, b: TestVector) {
+    return new TestVector(a.x - b.x, a.y - b.y);
+  }
+  static dist(a: TestVector, b: TestVector) {
+    return a.dist(b);
+  }
   static fromAngle(angle: number, length = 1) {
     return new TestVector(Math.cos(angle) * length, Math.sin(angle) * length);
   }
-  static random2D() { return new TestVector(1, 0); }
+  static random2D() {
+    return new TestVector(1, 0);
+  }
 }
 
 export interface TestGame extends GameObjectRuntimeContext {
@@ -60,14 +101,17 @@ export function installSketchMathGlobals(): void {
     if (high === undefined) return low / 2;
     return (low + high) / 2;
   });
-  vi.stubGlobal('lerp', (start: number, stop: number, amount: number) =>
-    start + (stop - start) * amount
+  vi.stubGlobal(
+    'lerp',
+    (start: number, stop: number, amount: number) => start + (stop - start) * amount
   );
   vi.stubGlobal('constrain', (value: number, low: number, high: number) =>
     Math.min(Math.max(value, low), high)
   );
-  vi.stubGlobal('map', (value: number, a: number, b: number, c: number, d: number) =>
-    c + ((value - a) / (b - a)) * (d - c)
+  vi.stubGlobal(
+    'map',
+    (value: number, a: number, b: number, c: number, d: number) =>
+      c + ((value - a) / (b - a)) * (d - c)
   );
   vi.stubGlobal('sin', Math.sin);
   vi.stubGlobal('cos', Math.cos);
@@ -90,7 +134,9 @@ export function createGame(): TestGame {
       if (!player) throw new Error('Player is not available in this test context.');
       return player;
     },
-    setPlayer(value) { player = value; },
+    setPlayer(value) {
+      player = value;
+    },
     randomSpawnPoint: () => createVector(),
     createSpellContext: () => undefined,
   };

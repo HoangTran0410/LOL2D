@@ -79,7 +79,8 @@ export class Thresh_W_Lantern_Throw extends MissileSpellObject {
 
   /** Height above the ground right now: 0 at both ends of the throw. */
   _arcLift(): number {
-    const travelled = 1 - constrain(this.position.dist(this.destination) / this.totalDistance, 0, 1);
+    const travelled =
+      1 - constrain(this.position.dist(this.destination) / this.totalDistance, 0, 1);
     return Math.sin(travelled * PI) * Math.min(70, this.totalDistance * 0.2);
   }
 

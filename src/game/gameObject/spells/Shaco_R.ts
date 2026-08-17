@@ -110,7 +110,6 @@ class Shaco_R_Clone extends Pet {
   }
 
   shacoR_explode() {
-
     const explodeRadius = 100;
     const clonePos = this.position.copy();
 
@@ -163,12 +162,10 @@ class Shaco_R_Clone extends Pet {
     // untargetable until something walks into it, killable once it pops.
     const count = 3;
     for (let i = 0; i < count; i++) {
-      const spot = clonePos
-        .copy()
-        .add(
-          Math.cos((i * 2 * Math.PI) / count) * 100, // 100 is the radius
-          Math.sin((i * 2 * Math.PI) / count) * 100
-        );
+      const spot = clonePos.copy().add(
+        Math.cos((i * 2 * Math.PI) / count) * 100, // 100 is the radius
+        Math.sin((i * 2 * Math.PI) / count) * 100
+      );
       const box = new Shaco_W_Box({
         game: this.game,
         position: clonePos.copy(),

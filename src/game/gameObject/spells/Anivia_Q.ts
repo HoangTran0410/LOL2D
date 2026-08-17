@@ -45,11 +45,7 @@ export default class Anivia_Q extends Spell {
 
   onSpellCast() {
     if (this.phase === 'Q1') {
-      const { to } = VectorUtils.getVectorWithRange(
-        this.owner.position,
-        this.aimPoint,
-        this.range
-      );
+      const { to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, this.range);
 
       const obj = new Anivia_Q_Object(this.owner);
       obj.destination = to;

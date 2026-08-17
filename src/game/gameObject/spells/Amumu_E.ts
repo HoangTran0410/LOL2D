@@ -165,8 +165,18 @@ export class Amumu_E_Object extends SpellObject {
     if (flash > 0) {
       noStroke();
       fill(235, 225, 255, 210 * flash);
-      ellipse(-this.radius * 0.09, this.radius * 0.03, this.radius * 0.2 * flash + 10, this.radius * 0.13 * flash + 8);
-      ellipse(this.radius * 0.09, this.radius * 0.03, this.radius * 0.2 * flash + 10, this.radius * 0.13 * flash + 8);
+      ellipse(
+        -this.radius * 0.09,
+        this.radius * 0.03,
+        this.radius * 0.2 * flash + 10,
+        this.radius * 0.13 * flash + 8
+      );
+      ellipse(
+        this.radius * 0.09,
+        this.radius * 0.03,
+        this.radius * 0.2 * flash + 10,
+        this.radius * 0.13 * flash + 8
+      );
       fill(255, 255, 255, 180 * flash);
       circle(0, 0, this.radius * 0.7 * flash + 16);
     }

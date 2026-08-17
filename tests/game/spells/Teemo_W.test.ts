@@ -15,9 +15,18 @@ import type { CastContext } from '../../../src/game/spell/runtime/types';
 import teemoWSource from '../../../src/game/gameObject/spells/Teemo_W.ts?raw';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
 }
 
 const context: CastContext = {
@@ -35,8 +44,12 @@ const owner = () => {
   const buffs: unknown[] = [];
   const manaStat = {
     baseValue: 200,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   return {
     position: new TestVector(5, 5),
@@ -116,10 +129,21 @@ describe('Teemo W', () => {
 
     const draw = { ellipse: vi.fn(), line: vi.fn() };
     for (const [name, spy] of Object.entries(draw)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'fill',
+      'stroke',
+      'noFill',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
-    vi.stubGlobal('constrain', (value: number, low: number, high: number) => Math.min(Math.max(value, low), high));
+    vi.stubGlobal('constrain', (value: number, low: number, high: number) =>
+      Math.min(Math.max(value, low), high)
+    );
     vi.stubGlobal('cos', Math.cos);
     vi.stubGlobal('sin', Math.sin);
     vi.stubGlobal('TWO_PI', Math.PI * 2);

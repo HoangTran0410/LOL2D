@@ -41,7 +41,8 @@ export default class GameScene extends Scene {
   }
 
   private resumeRuntime(): void {
-    if (!this.game || document.hidden || this.game.paused || this._animationFrameId !== null) return;
+    if (!this.game || document.hidden || this.game.paused || this._animationFrameId !== null)
+      return;
     const now = performance.now();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const p5Instance = (window as any).p5?.instance;

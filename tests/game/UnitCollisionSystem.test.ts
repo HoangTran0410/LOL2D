@@ -330,14 +330,18 @@ describe('unit body separation', () => {
   // down, because a wave is where bodies piling up is most visible.
   it('gives lane minions solid bodies without naming them', () => {
     const game = createGame();
-    const wave = [Lane.TOP, Lane.MID].map((lane, index) =>
-      new Minion({
-        game,
-        teamId: TeamId.BLUE,
-        lane,
-        waypoints: [{ x: 0, y: 0 }, { x: 400, y: 0 }],
-        position: createVector(600 + index * 8, 600),
-      } as ConstructorParameters<typeof Minion>[0])
+    const wave = [Lane.TOP, Lane.MID].map(
+      (lane, index) =>
+        new Minion({
+          game,
+          teamId: TeamId.BLUE,
+          lane,
+          waypoints: [
+            { x: 0, y: 0 },
+            { x: 400, y: 0 },
+          ],
+          position: createVector(600 + index * 8, 600),
+        } as ConstructorParameters<typeof Minion>[0])
     );
 
     for (const minion of wave) {

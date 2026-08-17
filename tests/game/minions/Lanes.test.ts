@@ -61,17 +61,26 @@ const pointInPolygon = (px: number, py: number, poly: Point[]): boolean => {
 };
 
 const distanceToSegment = (
-  px: number, py: number, ax: number, ay: number, bx: number, by: number
+  px: number,
+  py: number,
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number
 ): number => {
   const dx = bx - ax;
   const dy = by - ay;
   const lengthSq = dx * dx + dy * dy;
-  const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSq));
+  const t =
+    lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSq));
   return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 };
 
 const bounds = walls.map(poly => {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const [x, y] of poly) {
     if (x < minX) minX = x;
     if (y < minY) minY = y;
@@ -97,7 +106,10 @@ const wallClearance = (px: number, py: number, ceiling = 200): number => {
     const poly = walls[i];
     let edge = Infinity;
     for (let k = 0, j = poly.length - 1; k < poly.length; j = k++) {
-      edge = Math.min(edge, distanceToSegment(px, py, poly[j][0], poly[j][1], poly[k][0], poly[k][1]));
+      edge = Math.min(
+        edge,
+        distanceToSegment(px, py, poly[j][0], poly[j][1], poly[k][0], poly[k][1])
+      );
     }
     const signed = pointInPolygon(px, py, poly) ? -edge : edge;
     if (signed < best) best = signed;
@@ -106,7 +118,10 @@ const wallClearance = (px: number, py: number, ceiling = 200): number => {
 };
 
 /** Worst clearance along the straight line a minion actually walks. */
-const segmentClearance = (a: LaneWaypoint, b: LaneWaypoint): { clearance: number; at: LaneWaypoint } => {
+const segmentClearance = (
+  a: LaneWaypoint,
+  b: LaneWaypoint
+): { clearance: number; at: LaneWaypoint } => {
   const length = Math.hypot(b.x - a.x, b.y - a.y);
   const steps = Math.max(2, Math.ceil(length / 20));
   let worst = Infinity;
@@ -125,7 +140,10 @@ const segmentClearance = (a: LaneWaypoint, b: LaneWaypoint): { clearance: number
 };
 
 /** The waypoint a lane walks past `point` at — index and distance. Lane waypoints sit *beside* their turret, never on it. */
-const nearestWaypoint = (path: LaneWaypoint[], [x, y]: Point): { index: number; distance: number } => {
+const nearestWaypoint = (
+  path: LaneWaypoint[],
+  [x, y]: Point
+): { index: number; distance: number } => {
   let index = -1;
   let distance = Infinity;
   path.forEach((p, i) => {
@@ -144,16 +162,44 @@ const nearestWaypoint = (path: LaneWaypoint[], [x, y]: Point): { index: number; 
  * restating it twice.
  */
 const BLUE_LANE_TURRETS: Record<string, Point[]> = {
-  [Lane.TOP]: [[520, 4432], [604, 3557], [410, 1859]],
-  [Lane.MID]: [[1617, 4767], [2153, 4346], [2543, 3687]],
-  [Lane.BOT]: [[963, 5626], [1950, 5837], [2995, 5775], [4558, 5962]],
+  [Lane.TOP]: [
+    [520, 4432],
+    [604, 3557],
+    [410, 1859],
+  ],
+  [Lane.MID]: [
+    [1617, 4767],
+    [2153, 4346],
+    [2543, 3687],
+  ],
+  [Lane.BOT]: [
+    [963, 5626],
+    [1950, 5837],
+    [2995, 5775],
+    [4558, 5962],
+  ],
 };
 const RED_LANE_TURRETS: Record<string, Point[]> = {
-  [Lane.TOP]: [[1873, 440], [3423, 595], [4517, 518]],
-  [Lane.MID]: [[3885, 2723], [4291, 2044], [4790, 1617]],
-  [Lane.BOT]: [[5994, 4467], [5801, 2864], [5898, 1922]],
+  [Lane.TOP]: [
+    [1873, 440],
+    [3423, 595],
+    [4517, 518],
+  ],
+  [Lane.MID]: [
+    [3885, 2723],
+    [4291, 2044],
+    [4790, 1617],
+  ],
+  [Lane.BOT]: [
+    [5994, 4467],
+    [5801, 2864],
+    [5898, 1922],
+  ],
 };
-const laneTurrets = (lane: string): Point[] => [...BLUE_LANE_TURRETS[lane], ...RED_LANE_TURRETS[lane]];
+const laneTurrets = (lane: string): Point[] => [
+  ...BLUE_LANE_TURRETS[lane],
+  ...RED_LANE_TURRETS[lane],
+];
 
 /**
  * Which lane walks closest to `point`, and by how much it wins.
@@ -166,8 +212,10 @@ const laneTurrets = (lane: string): Point[] => [...BLUE_LANE_TURRETS[lane], ...R
  * would be a test tuned to two decimal places of the current geometry.
  */
 const owningLane = (point: Point): { lane: string; distance: number; runnerUp: number } => {
-  const ranked = LANES.map(lane => ({ lane, distance: nearestWaypoint(LANE_WAYPOINTS[lane], point).distance }))
-    .sort((a, b) => a.distance - b.distance);
+  const ranked = LANES.map(lane => ({
+    lane,
+    distance: nearestWaypoint(LANE_WAYPOINTS[lane], point).distance,
+  })).sort((a, b) => a.distance - b.distance);
   return { lane: ranked[0].lane, distance: ranked[0].distance, runnerUp: ranked[1].distance };
 };
 
@@ -253,7 +301,11 @@ describe('lane waypoints', () => {
   it('assigns every map turret to exactly one lane, or to a base', () => {
     // the two rows are 11 points each; 10 are lane turrets and the rest guard a
     // fountain. Nothing may be silently dropped when the paths are edited.
-    const baseTurrets: Point[] = [[736, 5392], [5454, 779], [5646, 967]];
+    const baseTurrets: Point[] = [
+      [736, 5392],
+      [5454, 779],
+      [5646, 967],
+    ];
     expect(turret1).toHaveLength(11);
     expect(turret2).toHaveLength(11);
 
@@ -270,7 +322,9 @@ describe('lane waypoints', () => {
         continue;
       }
 
-      const expected = LANES.find(l => laneTurrets(l).some(([x, y]) => x === point[0] && y === point[1]));
+      const expected = LANES.find(l =>
+        laneTurrets(l).some(([x, y]) => x === point[0] && y === point[1])
+      );
       expect(expected, `turret ${point} is on no lane's list`).toBeDefined();
       expect(lane, `turret ${point} is nearest ${lane}, not ${expected}`).toBe(expected);
       expect(distance).toBeLessThanOrEqual(LANE_COVERS_TURRET);

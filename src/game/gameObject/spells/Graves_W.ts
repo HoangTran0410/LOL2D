@@ -176,11 +176,7 @@ export class Graves_W_Object extends SpellObject {
       const a = lobe.angle + churn * 0.08 * lobe.speed;
       const grey = 96 + lobe.shade * 78;
       fill(grey, grey - 3, grey - 8, (58 + lobe.shade * 45) * density);
-      circle(
-        cos(a) * d,
-        sin(a) * d,
-        this.curRange * lobe.size * (0.95 + wobble * 0.12)
-      );
+      circle(cos(a) * d, sin(a) * d, this.curRange * lobe.size * (0.95 + wobble * 0.12));
     }
 
     // a pale crown riding on top, offset upward so the pile reads as having

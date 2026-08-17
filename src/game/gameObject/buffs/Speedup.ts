@@ -60,7 +60,10 @@ export default class Speedup extends Buff {
 
   onUpdate(): void {
     if (random(1) < 0.2) {
-      const targetDestination = p5.Vector.sub(this.targetUnit.destination, this.targetUnit.position);
+      const targetDestination = p5.Vector.sub(
+        this.targetUnit.destination,
+        this.targetUnit.position
+      );
       const vel = targetDestination.normalize().mult(random(-2, -1));
 
       const size = this.targetUnit.stats.size.value / 2;

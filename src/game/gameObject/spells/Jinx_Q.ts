@@ -89,10 +89,7 @@ export class Jinx_Q_Launcher extends SpellObject {
     // on `Champion`, and this object is handed the wider `AttackableUnit`.
     const target = (this.owner as { basicAttack?: BasicAttackController }).basicAttack?.target;
     if (target) {
-      return Math.atan2(
-        target.position.y - this.position.y,
-        target.position.x - this.position.x
-      );
+      return Math.atan2(target.position.y - this.position.y, target.position.x - this.position.x);
     }
     const destination = this.owner.destination;
     if (destination) {
@@ -160,7 +157,14 @@ export class Jinx_Q_Launcher extends SpellObject {
     }
     // Dorsal fin and a pink shell showing in the breech.
     fill(228, 66, 148);
-    triangle(length * 0.05, -barrel * 0.5, length * 0.3, -barrel * 1.1, length * 0.34, -barrel * 0.5);
+    triangle(
+      length * 0.05,
+      -barrel * 0.5,
+      length * 0.3,
+      -barrel * 1.1,
+      length * 0.34,
+      -barrel * 0.5
+    );
     fill(255, 190, 220, 230 * glow);
     circle(length * 0.62, 0, barrel * 0.72);
 

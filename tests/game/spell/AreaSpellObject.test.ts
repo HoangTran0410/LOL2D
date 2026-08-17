@@ -4,7 +4,9 @@ import { createGame, createUnit, installSpellObjectGlobals } from './fixtures';
 
 describe('AreaSpellObject', () => {
   beforeEach(installSpellObjectGlobals);
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('fires area enter tick and exit callbacks in order', () => {
     const game = createGame();
@@ -71,7 +73,8 @@ describe('AreaSpellObject', () => {
     ['durationMs', { durationMs: Number.POSITIVE_INFINITY }],
   ])('rejects a non-finite %s', (_field, options) => {
     const game = createGame();
-    expect(() => new AreaSpellObject(createUnit(game), { x: 0, y: 0 }, 10, options))
-      .toThrow(`${_field} must be finite and greater than 0`);
+    expect(() => new AreaSpellObject(createUnit(game), { x: 0, y: 0 }, 10, options)).toThrow(
+      `${_field} must be finite and greater than 0`
+    );
   });
 });

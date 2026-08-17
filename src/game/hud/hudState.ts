@@ -115,15 +115,8 @@ function buildSpells(player: any): SpellDisplay[] {
         ? String.fromCharCode(SpellHotKeys[index]).toUpperCase()
         : '';
 
-      const {
-        disabled,
-        image,
-        state,
-        currentCooldown,
-        name,
-        description,
-        stackCount,
-      } = spell || {};
+      const { disabled, image, state, currentCooldown, name, description, stackCount } =
+        spell || {};
 
       // The *effective* numbers, not the spell's own tuning fields: under a
       // cooldown-reduction or URF match those differ, and the icon has to agree

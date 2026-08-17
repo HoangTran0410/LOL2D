@@ -29,7 +29,13 @@ import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSketchMathGlobals, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSketchMathGlobals,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 const at = (game: TestGame, x: number, y: number, teamId: string): AttackableUnit => {
   const unit = createUnit(game, x, teamId);
@@ -140,8 +146,18 @@ describe('Pantheon E plants a shield over a wedge of torn ground', () => {
     const pantheon = at(game, 0, 0, 'blue');
     aimAt(game, { x: 300, y: 0 });
     // One body just inside the painted edge, one just outside it.
-    const inside = at(game, Math.cos(HALF_ANGLE - 0.05) * 120, Math.sin(HALF_ANGLE - 0.05) * 120, 'red');
-    const outside = at(game, Math.cos(HALF_ANGLE + 0.05) * 120, Math.sin(HALF_ANGLE + 0.05) * 120, 'red');
+    const inside = at(
+      game,
+      Math.cos(HALF_ANGLE - 0.05) * 120,
+      Math.sin(HALF_ANGLE - 0.05) * 120,
+      'red'
+    );
+    const outside = at(
+      game,
+      Math.cos(HALF_ANGLE + 0.05) * 120,
+      Math.sin(HALF_ANGLE + 0.05) * 120,
+      'red'
+    );
     game.objectManager.queryObjects = vi.fn(() => [inside, outside]) as never;
 
     new Pantheon_E(pantheon).onSpellCast();

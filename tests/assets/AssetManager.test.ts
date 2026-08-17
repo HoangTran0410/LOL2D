@@ -29,7 +29,10 @@ function stubPlaceholderGraphics(marker: object) {
   vi.stubGlobal('HSL', 'hsl');
   vi.stubGlobal('CENTER', 'center');
   vi.stubGlobal('BOLD', 'bold');
-  vi.stubGlobal('createGraphics', vi.fn(() => graphics));
+  vi.stubGlobal(
+    'createGraphics',
+    vi.fn(() => graphics)
+  );
   return graphics;
 }
 

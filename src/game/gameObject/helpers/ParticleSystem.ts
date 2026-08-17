@@ -100,9 +100,7 @@ export default class ParticleSystem extends GameObject {
       ? Math.min(length, Math.max(0, Math.floor(limit)))
       : length;
     for (let i = 0; i < count; i++) {
-      const index = count === length
-        ? i
-        : Math.floor(((i + 0.5) * length) / count);
+      const index = count === length ? i : Math.floor(((i + 0.5) * length) / count);
       this.drawFn?.(this.particles[index]);
     }
     this.postDrawFn?.(this.particles);
@@ -172,10 +170,7 @@ interface RandomMovingParticle {
 }
 
 export const PredefinedParticleSystems = {
-  randomMovingParticlesDecreaseSize: (
-    colour = '#77f9',
-    decreaseSizeSpeed = 0.2
-  ): ParticleSystem =>
+  randomMovingParticlesDecreaseSize: (colour = '#77f9', decreaseSizeSpeed = 0.2): ParticleSystem =>
     new ParticleSystem({
       getParticlePosFn: (p: RandomMovingParticle) => ({ x: p.x, y: p.y }),
       getParticleSizeFn: (p: RandomMovingParticle) => p.r * 2,

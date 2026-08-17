@@ -256,7 +256,12 @@ export const SpellGroups: {
     attack: ATTACK.BRUISER,
     image: 'champ_pantheon',
 
-    spells: [AllSpells.Pantheon_Q, AllSpells.Pantheon_W, AllSpells.Pantheon_E, AllSpells.Pantheon_R],
+    spells: [
+      AllSpells.Pantheon_Q,
+      AllSpells.Pantheon_W,
+      AllSpells.Pantheon_E,
+      AllSpells.Pantheon_R,
+    ],
   },
   {
     name: 'Thresh',
@@ -298,7 +303,12 @@ export const SpellGroups: {
     attack: ATTACK.ASSASSIN,
     image: 'champ_nocturne',
 
-    spells: [AllSpells.Nocturne_Q, AllSpells.Nocturne_W, AllSpells.Nocturne_E, AllSpells.Nocturne_R],
+    spells: [
+      AllSpells.Nocturne_Q,
+      AllSpells.Nocturne_W,
+      AllSpells.Nocturne_E,
+      AllSpells.Nocturne_R,
+    ],
   },
   {
     name: 'Twitch',
@@ -333,7 +343,12 @@ export const SpellGroups: {
     attack: ATTACK.MAGE,
     image: 'champ_cassiopeia',
 
-    spells: [AllSpells.Cassiopeia_Q, AllSpells.Cassiopeia_W, AllSpells.Cassiopeia_E, AllSpells.Cassiopeia_R],
+    spells: [
+      AllSpells.Cassiopeia_Q,
+      AllSpells.Cassiopeia_W,
+      AllSpells.Cassiopeia_E,
+      AllSpells.Cassiopeia_R,
+    ],
   },
   {
     name: 'Fizz',
@@ -382,7 +397,12 @@ export const SpellGroups: {
     attack: ATTACK.BRUISER,
     image: 'champ_jarvaniv',
 
-    spells: [AllSpells.JarvanIV_Q, AllSpells.JarvanIV_W, AllSpells.JarvanIV_E, AllSpells.JarvanIV_R],
+    spells: [
+      AllSpells.JarvanIV_Q,
+      AllSpells.JarvanIV_W,
+      AllSpells.JarvanIV_E,
+      AllSpells.JarvanIV_R,
+    ],
   },
   {
     name: 'Camille',
@@ -403,7 +423,12 @@ export const SpellGroups: {
     attack: ATTACK.BRUISER,
     image: 'champ_renekton',
 
-    spells: [AllSpells.Renekton_Q, AllSpells.Renekton_W, AllSpells.Renekton_E, AllSpells.Renekton_R],
+    spells: [
+      AllSpells.Renekton_Q,
+      AllSpells.Renekton_W,
+      AllSpells.Renekton_E,
+      AllSpells.Renekton_R,
+    ],
   },
   {
     name: 'Xin Zhao',
@@ -417,21 +442,36 @@ export const SpellGroups: {
     attack: ATTACK.BRUISER,
     image: 'champ_tryndamere',
 
-    spells: [AllSpells.Tryndamere_Q, AllSpells.Tryndamere_W, AllSpells.Tryndamere_E, AllSpells.Tryndamere_R],
+    spells: [
+      AllSpells.Tryndamere_Q,
+      AllSpells.Tryndamere_W,
+      AllSpells.Tryndamere_E,
+      AllSpells.Tryndamere_R,
+    ],
   },
   {
     name: 'Master Yi',
     attack: ATTACK.ASSASSIN,
     image: 'champ_masteryi',
 
-    spells: [AllSpells.MasterYi_Q, AllSpells.MasterYi_W, AllSpells.MasterYi_E, AllSpells.MasterYi_R],
+    spells: [
+      AllSpells.MasterYi_Q,
+      AllSpells.MasterYi_W,
+      AllSpells.MasterYi_E,
+      AllSpells.MasterYi_R,
+    ],
   },
   {
     name: 'Malzahar',
     attack: ATTACK.MAGE,
     image: 'champ_malzahar',
 
-    spells: [AllSpells.Malzahar_Q, AllSpells.Malzahar_W, AllSpells.Malzahar_E, AllSpells.Malzahar_R],
+    spells: [
+      AllSpells.Malzahar_Q,
+      AllSpells.Malzahar_W,
+      AllSpells.Malzahar_E,
+      AllSpells.Malzahar_R,
+    ],
   },
   {
     name: 'Ezreal',

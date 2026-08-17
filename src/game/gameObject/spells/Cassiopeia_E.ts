@@ -218,13 +218,20 @@ export class Cassiopeia_E_Venom extends MissileSpellObject {
     noStroke();
     fill(246, 255, 232, 235);
     for (const side of [-1, 1]) {
-      triangle(half * 0.2, side * half * 0.42, half * 0.2, side * half * 0.1, half * 1.5, side * half * 0.04);
+      triangle(
+        half * 0.2,
+        side * half * 0.42,
+        half * 0.2,
+        side * half * 0.1,
+        half * 1.5,
+        side * half * 0.04
+      );
     }
 
     // Venom dripping off the back and falling out of the flight line.
     fill(126, 214, 86, 165);
     for (let i = 0; i < 3; i++) {
-      const drip = ((frameCount / 22 + i / 3) % 1);
+      const drip = (frameCount / 22 + i / 3) % 1;
       circle(-half * (1.4 + drip * 3.2), Math.sin(swirl + i * 2.1) * 7 * drip, 6 * (1 - drip) + 2);
     }
 

@@ -22,7 +22,12 @@ import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from '../spell/fixtures';
+import {
+  createGame,
+  createUnit,
+  installSpellObjectGlobals,
+  type TestGame,
+} from '../spell/fixtures';
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);
@@ -93,7 +98,9 @@ describe('Janna W', () => {
     spell.onUpdate();
     spell.onUpdate();
 
-    const passives = owner.buffs.filter((buff): buff is Janna_W_Passive => buff instanceof Janna_W_Passive);
+    const passives = owner.buffs.filter(
+      (buff): buff is Janna_W_Passive => buff instanceof Janna_W_Passive
+    );
     expect(passives).toHaveLength(1);
     expect(passives[0].statusFlagsToEnable & StatusFlags.Ghosted).toBeTruthy();
     expect(passives[0].bonuses).toEqual({ speed: { percentBaseBonus: PASSIVE_SPEED_PERCENT } });
@@ -188,9 +195,25 @@ describe('Janna W', () => {
     const game = createGame();
     const owner = unit(game, 0, 'blue');
     const target = unit(game, 300, 'red');
-    const spies = { image: vi.fn(), beginShape: vi.fn(), vertex: vi.fn(), endShape: vi.fn(), ellipse: vi.fn(), circle: vi.fn() };
+    const spies = {
+      image: vi.fn(),
+      beginShape: vi.fn(),
+      vertex: vi.fn(),
+      endShape: vi.fn(),
+      ellipse: vi.fn(),
+      circle: vi.fn(),
+    };
     for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-    for (const name of ['push', 'pop', 'translate', 'rotate', 'fill', 'stroke', 'noStroke', 'strokeWeight']) {
+    for (const name of [
+      'push',
+      'pop',
+      'translate',
+      'rotate',
+      'fill',
+      'stroke',
+      'noStroke',
+      'strokeWeight',
+    ]) {
       vi.stubGlobal(name, vi.fn());
     }
     vi.stubGlobal('CLOSE', 'CLOSE');

@@ -152,7 +152,7 @@ export class Nocturne_E_Object extends SpellObject {
     // doing this to whom
     noStroke();
     for (let i = 0; i < 3; i++) {
-      const crawl = ((this.age / 620 + i / 3) % 1);
+      const crawl = (this.age / 620 + i / 3) % 1;
       fill(210, 170, 255, 200 * (1 - crawl) * (0.4 + 0.6 * t));
       circle(from.x + dx * crawl, from.y + dy * crawl, 5 + 6 * t);
     }

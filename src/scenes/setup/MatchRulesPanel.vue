@@ -20,7 +20,10 @@ const onCdrInput = (event: Event): void => {
   <div class="pregame-column">
     <h2>Luật Đấu</h2>
     <label class="pregame-field">
-      <span>Giảm hồi chiêu: <strong id="pregame-cdr-value">{{ cooldownReductionPercent }}%</strong></span>
+      <span
+        >Giảm hồi chiêu:
+        <strong id="pregame-cdr-value">{{ cooldownReductionPercent }}%</strong></span
+      >
       <input
         type="range"
         id="pregame-cdr"

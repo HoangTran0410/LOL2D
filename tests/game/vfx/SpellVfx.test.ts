@@ -37,20 +37,32 @@ const handle = (): VfxHandle => ({
 const completableHandle = () => {
   let complete = false;
   const effect: VfxHandle = {
-    get complete() { return complete; },
+    get complete() {
+      return complete;
+    },
     update: vi.fn(),
     draw: vi.fn(),
     dispose: vi.fn(),
   };
-  return { effect, complete: () => { complete = true; } };
+  return {
+    effect,
+    complete: () => {
+      complete = true;
+    },
+  };
 };
 
 class VfxSpell extends Spell {
-  constructor(ownerValue: ReturnType<typeof owner>, private readonly spec: CastSpec) {
+  constructor(
+    ownerValue: ReturnType<typeof owner>,
+    private readonly spec: CastSpec
+  ) {
     super(ownerValue);
   }
 
-  get castSpec(): CastSpec { return this.spec; }
+  get castSpec(): CastSpec {
+    return this.spec;
+  }
 }
 
 const spec = (vfx: CastSpec['vfx'], sfx?: CastSpec['sfx']): CastSpec => ({
@@ -64,13 +76,20 @@ const spec = (vfx: CastSpec['vfx'], sfx?: CastSpec['sfx']): CastSpec => ({
 });
 
 describe('Spell VFX lifecycle', () => {
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('reads live anchors without mutating the frozen cast context', () => {
     const anchor = { x: 10, y: 20 };
     const renderBar = vi.fn();
     const renderCircle = vi.fn();
-    const bar = new CastBar(context, () => 0.5, renderBar, () => anchor);
+    const bar = new CastBar(
+      context,
+      () => 0.5,
+      renderBar,
+      () => anchor
+    );
     const telegraph = new CastTelegraph(context, 100, renderCircle, () => anchor);
 
     anchor.x = 90;
@@ -162,19 +181,25 @@ describe('Spell VFX lifecycle', () => {
   it.each([
     ['release', (spell: VfxSpell) => spell.release(context)],
     ['cancel', (spell: VfxSpell) => spell.cancel('PLAYER_CANCEL')],
-    ['death', (spell: VfxSpell, spellOwner: ReturnType<typeof owner>) => {
-      spellOwner.isDead = true;
-      spell.update();
-    }],
+    [
+      'death',
+      (spell: VfxSpell, spellOwner: ReturnType<typeof owner>) => {
+        spellOwner.isDead = true;
+        spell.update();
+      },
+    ],
     ['scene exit', (spell: VfxSpell) => spell.cancel('SCENE_EXIT')],
     ['deactivate', (spell: VfxSpell) => spell.deactivate()],
     ['object removal', (spell: VfxSpell) => spell.onRemoved()],
   ])('stops looping audio once on %s', (_name, finish) => {
     const stop = vi.fn();
     const spellOwner = owner();
-    const spell = new VfxSpell(spellOwner, spec(undefined, {
-      castLoop: () => ({ play: vi.fn(), stop }),
-    }));
+    const spell = new VfxSpell(
+      spellOwner,
+      spec(undefined, {
+        castLoop: () => ({ play: vi.fn(), stop }),
+      })
+    );
 
     spell.press(context);
     finish(spell, spellOwner);
@@ -192,7 +217,7 @@ describe('Spell VFX lifecycle', () => {
 
   it.each(['idle', 'loading', 'error'] as const)(
     'uses procedural VFX while a stable asset handle is %s',
-    (status) => {
+    status => {
       const fallback = handle();
       const asset = { status, data: null, url: '', path: '' };
       const effect = new SpriteEffect(asset, fallback);
@@ -221,10 +246,13 @@ describe('Spell VFX lifecycle', () => {
   it('replaces repeated one-shot phases and retires completed handles', () => {
     let complete = false;
     const first = handle();
-    const second = { ...handle(), get complete() { return complete; } };
-    const factory = vi.fn()
-      .mockReturnValueOnce(first)
-      .mockReturnValueOnce(second);
+    const second = {
+      ...handle(),
+      get complete() {
+        return complete;
+      },
+    };
+    const factory = vi.fn().mockReturnValueOnce(first).mockReturnValueOnce(second);
     const lifecycle = new SpellVfx({ impact: factory });
 
     lifecycle.impact(context);
@@ -294,10 +322,9 @@ describe('Spell VFX lifecycle', () => {
     const secondLoop = handle();
     const stopFirst = vi.fn();
     const stopSecond = vi.fn();
-    const channelLoop = vi.fn()
-      .mockReturnValueOnce(firstLoop)
-      .mockReturnValueOnce(secondLoop);
-    const channelSound = vi.fn()
+    const channelLoop = vi.fn().mockReturnValueOnce(firstLoop).mockReturnValueOnce(secondLoop);
+    const channelSound = vi
+      .fn()
       .mockReturnValueOnce({ play: vi.fn(), stop: stopFirst })
       .mockReturnValueOnce({ play: vi.fn(), stop: stopSecond });
     const spellOwner = owner();

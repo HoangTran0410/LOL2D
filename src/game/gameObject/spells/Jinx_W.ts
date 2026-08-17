@@ -102,7 +102,8 @@ export class Jinx_W_Object extends MissileSpellObject {
     );
     const crawl = this.position.x * 0.05 + this.position.y * 0.05;
     const kink = (i: number, amount: number) =>
-      Math.sin(this.seed + i * 2.3 + crawl) * amount + Math.sin(this.seed * 3 + i * 5.1) * amount * 0.4;
+      Math.sin(this.seed + i * 2.3 + crawl) * amount +
+      Math.sin(this.seed * 3 + i * 5.1) * amount * 0.4;
 
     push();
     translate(this.position.x, this.position.y);

@@ -307,9 +307,7 @@ export default class Turret extends AttackableUnit {
     pop();
 
     // the barrel points at whatever it is shooting
-    const aim = this.target
-      ? p5.Vector.sub(this.target.position, pos)
-      : createVector(0, -1);
+    const aim = this.target ? p5.Vector.sub(this.target.position, pos) : createVector(0, -1);
     if (aim.magSq() === 0) aim.set(0, -1);
     aim.setMag(size * 0.55);
     stroke(this.target ? [255, 170, 70] : [130, 136, 150]);

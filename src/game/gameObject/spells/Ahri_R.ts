@@ -96,10 +96,7 @@ export default class Ahri_R extends Spell {
       this.timeSinceLastDash += deltaTime;
     }
 
-    if (
-      this.dashCount >= this.maxDashCount ||
-      this.timeSinceFirstDash > this.timeoutForAllDashes
-    ) {
+    if (this.dashCount >= this.maxDashCount || this.timeSinceFirstDash > this.timeoutForAllDashes) {
       this.dashCount = 0;
       this.timeSinceFirstDash = 0;
       this.timeSinceLastDash = 0;
@@ -279,7 +276,7 @@ export class Ahri_R_Burst extends SpellObject {
     for (let i = 0; i < ESSENCE_POINTS; i++) {
       const a = (TWO_PI * i) / ESSENCE_POINTS + t * 0.5;
       const inner = 6 + this.maxRadius * 0.25 * t;
-      const outer = inner + (this.maxRadius * 0.7) * t * fade + 6;
+      const outer = inner + this.maxRadius * 0.7 * t * fade + 6;
       line(cos(a) * inner, sin(a) * inner, cos(a) * outer, sin(a) * outer);
     }
 

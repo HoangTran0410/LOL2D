@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import NavGrid from '../../../src/game/nav/NavGrid';
-import PathFinder, {
-  NAV_MAX_NODES_PER_SEARCH,
-  smoothPath,
-} from '../../../src/game/nav/PathFinder';
+import PathFinder, { NAV_MAX_NODES_PER_SEARCH, smoothPath } from '../../../src/game/nav/PathFinder';
 import { routeClearance, segmentClearance, wallClearance, wallPolygons } from './geometry';
 
 const MAP_SIZE = 6_400;
@@ -70,11 +67,16 @@ describe('PathFinder on the shipped map', () => {
     // distribution, so it is the thing that has to be re-measured if either
     // moves. A deterministic sample, so a failure is reproducible.
     let seed = 12_345;
-    const random = () => ((seed = (seed * 1_103_515_245 + 12_345) & 0x7fffffff) / 0x7fffffff);
+    const random = () => (seed = (seed * 1_103_515_245 + 12_345) & 0x7fffffff) / 0x7fffffff;
 
     const points: Array<{ x: number; y: number }> = [];
     while (points.length < 300) {
-      const point = realGrid.nearestWalkable(random() * MAP_SIZE, random() * MAP_SIZE, CHAMPION_RADIUS, 300);
+      const point = realGrid.nearestWalkable(
+        random() * MAP_SIZE,
+        random() * MAP_SIZE,
+        CHAMPION_RADIUS,
+        300
+      );
       if (point) points.push(point);
     }
 

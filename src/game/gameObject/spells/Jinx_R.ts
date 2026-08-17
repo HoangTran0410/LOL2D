@@ -225,8 +225,26 @@ export class Jinx_R_Object extends MissileSpellObject {
     // Fins, swept back off the tail. Light enough to be seen against a nearly
     // black map — the first pass painted them in a plum that vanished into it.
     fill(150, 62, 118);
-    quad(-half + 6, -wide * 0.72, -half + 30, -wide * 1.5, -half + 56, -wide * 1.2, -half + 44, -wide * 0.66);
-    quad(-half + 6, wide * 0.72, -half + 30, wide * 1.5, -half + 56, wide * 1.2, -half + 44, wide * 0.66);
+    quad(
+      -half + 6,
+      -wide * 0.72,
+      -half + 30,
+      -wide * 1.5,
+      -half + 56,
+      -wide * 1.2,
+      -half + 44,
+      -wide * 0.66
+    );
+    quad(
+      -half + 6,
+      wide * 0.72,
+      -half + 30,
+      wide * 1.5,
+      -half + 56,
+      wide * 1.2,
+      -half + 44,
+      wide * 0.66
+    );
 
     // Hull.
     const nose = half * 0.44;

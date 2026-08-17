@@ -33,7 +33,8 @@ defineProps<{
           <h3>{{ display.name }}</h3>
           <div class="spell-detail-costs">
             <span class="spell-detail-cooldown">
-              <i class="fas fa-clock"></i> {{ FormatUtils.spellSeconds(display.effectiveCoolDownMs) }}s
+              <i class="fas fa-clock"></i>
+              {{ FormatUtils.spellSeconds(display.effectiveCoolDownMs) }}s
             </span>
             <span class="spell-detail-mana">
               <i class="fas fa-tint"></i> {{ Math.round(display.effectiveManaCost) }}

@@ -291,7 +291,7 @@ export class Fizz_E_Hover extends Buff {
     noStroke();
     fill(190, 240, 255, 180);
     for (let i = 0; i < 3; i++) {
-      const t = ((frameCount / 30 + i / 3) % 1);
+      const t = (frameCount / 30 + i / 3) % 1;
       circle(pos.x + sin(frameCount / 5 + i * 2) * 2, lerp(prongY, bottom, t), 5 * (1 - t) + 2);
     }
     pop();

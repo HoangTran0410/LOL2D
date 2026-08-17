@@ -12,7 +12,8 @@ export interface TargetInfo {
 }
 
 export const defaultIsTargetable = (candidate: unknown): boolean =>
-  typeof candidate === 'object' && candidate !== null &&
+  typeof candidate === 'object' &&
+  candidate !== null &&
   (candidate as { targetable?: boolean }).targetable !== false;
 
 export const defaultTargetInfo = (candidate: unknown): TargetInfo | null => {
@@ -28,7 +29,9 @@ export const defaultTargetInfo = (candidate: unknown): TargetInfo | null => {
   return {
     position: target.position,
     teamId: target.teamId,
-    selectionRadius: target.selectionRadius ?? target.collisionRadius ??
+    selectionRadius:
+      target.selectionRadius ??
+      target.collisionRadius ??
       (target.animatedValues?.displaySize ?? 0) / 2,
   };
 };
@@ -76,19 +79,25 @@ export interface TargetRequest {
   readonly getTargetInfo?: (candidate: unknown) => TargetInfo | null;
 }
 
-export type TargetingRequest = Partial<Pick<TargetRequest,
-  | 'range'
-  | 'targetTeam'
-  | 'acquisitionRadius'
-  | 'pickWithoutAim'
-  | 'queryCandidates'
-  | 'isTargetable'
-  | 'getTargetInfo'
->>;
+export type TargetingRequest = Partial<
+  Pick<
+    TargetRequest,
+    | 'range'
+    | 'targetTeam'
+    | 'acquisitionRadius'
+    | 'pickWithoutAim'
+    | 'queryCandidates'
+    | 'isTargetable'
+    | 'getTargetInfo'
+  >
+>;
 
 export type TargetResolution =
   | { readonly ok: true; readonly context: CastContext }
-  | { readonly ok: false; readonly reason: Extract<CancelReason, 'TARGET_INVALID' | 'OUT_OF_RANGE'> };
+  | {
+      readonly ok: false;
+      readonly reason: Extract<CancelReason, 'TARGET_INVALID' | 'OUT_OF_RANGE'>;
+    };
 
 const distance = (a: Vec2, b: Vec2): number => Math.hypot(b.x - a.x, b.y - a.y);
 
@@ -96,9 +105,7 @@ const matchesTeam = (request: TargetRequest, teamId: unknown): boolean => {
   const relation = request.targetTeam ?? 'ANY';
   if (relation === 'ANY') return true;
   if (request.casterTeamId === undefined || teamId === undefined) return false;
-  return relation === 'ALLY'
-    ? teamId === request.casterTeamId
-    : teamId !== request.casterTeamId;
+  return relation === 'ALLY' ? teamId === request.casterTeamId : teamId !== request.casterTeamId;
 };
 
 const createContext = (request: TargetRequest, target?: unknown): CastContext => {
@@ -132,8 +139,11 @@ export class TargetResolver {
     // POINT deliberately keeps the authored range. Its far end is a spot on the
     // ground, which has no body to push the caster away from it, so a bigger
     // caster does not get to nominate a further one.
-    if (mode === 'POINT' && request.range !== undefined &&
-        distance(request.origin, request.cursorWorld) > request.range) {
+    if (
+      mode === 'POINT' &&
+      request.range !== undefined &&
+      distance(request.origin, request.cursorWorld) > request.range
+    ) {
       return { ok: false, reason: 'OUT_OF_RANGE' };
     }
 

@@ -196,10 +196,20 @@ describe('Morgana R (Soul Shackles)', () => {
 
   it('draws a procedural tether line and marker rather than blitting the ability icon', () => {
     for (const name of [
-      'push', 'pop', 'translate', 'fill', 'noFill', 'stroke', 'noStroke',
-      'strokeWeight', 'blendMode', 'ADD', 'BLEND',
+      'push',
+      'pop',
+      'translate',
+      'fill',
+      'noFill',
+      'stroke',
+      'noStroke',
+      'strokeWeight',
+      'blendMode',
+      'ADD',
+      'BLEND',
       // the chain draws rotated links, so the tether needs these two as well
-      'rotate', 'ellipse',
+      'rotate',
+      'ellipse',
     ]) {
       vi.stubGlobal(name, name === 'ADD' || name === 'BLEND' ? name : vi.fn());
     }

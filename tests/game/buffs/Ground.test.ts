@@ -5,17 +5,37 @@ import Dash from '../../../src/game/gameObject/buffs/Dash';
 import ActionState from '../../../src/game/enums/ActionState';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
-  add(other: TestVector): this { this.x += other.x; this.y += other.y; return this; }
-  mag(): number { return Math.hypot(this.x, this.y); }
-  setMag(value: number): this {
-    const length = this.mag();
-    if (length > 0) { this.x = (this.x / length) * value; this.y = (this.y / length) * value; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
     return this;
   }
-  dist(other: TestVector): number { return Math.hypot(this.x - other.x, this.y - other.y); }
+  add(other: TestVector): this {
+    this.x += other.x;
+    this.y += other.y;
+    return this;
+  }
+  mag(): number {
+    return Math.hypot(this.x, this.y);
+  }
+  setMag(value: number): this {
+    const length = this.mag();
+    if (length > 0) {
+      this.x = (this.x / length) * value;
+      this.y = (this.y / length) * value;
+    }
+    return this;
+  }
+  dist(other: TestVector): number {
+    return Math.hypot(this.x - other.x, this.y - other.y);
+  }
 }
 
 const p5Stub = {
@@ -121,13 +141,10 @@ describe('Ground', () => {
 describe('no spell relocates its own caster behind the shared gate', () => {
   const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
 
-  it.each(readdirSync(spellsDir).filter(name => name.endsWith('.ts')))(
-    '%s',
-    name => {
-      const source = readFileSync(join(spellsDir, name), 'utf8');
-      // `owner.teleportTo` moves the champion; `clone.teleportTo` / `shadow.teleportTo`
-      // move a spell's own puppet, which grounding has no say over.
-      expect(source).not.toMatch(/\bowner\.teleportTo\s*\(/);
-    }
-  );
+  it.each(readdirSync(spellsDir).filter(name => name.endsWith('.ts')))('%s', name => {
+    const source = readFileSync(join(spellsDir, name), 'utf8');
+    // `owner.teleportTo` moves the champion; `clone.teleportTo` / `shadow.teleportTo`
+    // move a spell's own puppet, which grounding has no say over.
+    expect(source).not.toMatch(/\bowner\.teleportTo\s*\(/);
+  });
 });

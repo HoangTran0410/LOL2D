@@ -6,18 +6,26 @@ import Stats from '../../../src/game/gameObject/Stats';
 import type { CancelReason, CastContext, CastSpec } from '../../../src/game/spell/runtime/types';
 import CastBar from '../../../src/game/vfx/CastBar';
 
-const context = (owner: unknown): CastContext => Object.freeze({
-  spellId: 'spell', activationId: 'activation', startedAtMs: 0, caster: owner,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 10, y: 0 }),
-  direction: Object.freeze({ x: 1, y: 0 }),
-});
+const context = (owner: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'spell',
+    activationId: 'activation',
+    startedAtMs: 0,
+    caster: owner,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 10, y: 0 }),
+    direction: Object.freeze({ x: 1, y: 0 }),
+  });
 
 const owner = () => ({
   game: { eventManager: { emit: vi.fn() }, worldMouse: { x: 10, y: 0 } },
-  position: { x: 0, y: 0 }, destination: { x: 0, y: 0 },
-  isDead: false, canCast: true, status: StatusFlags.CanCast | StatusFlags.CanMove,
-  movementRevision: 0, displacementRevision: 0,
+  position: { x: 0, y: 0 },
+  destination: { x: 0, y: 0 },
+  isDead: false,
+  canCast: true,
+  status: StatusFlags.CanCast | StatusFlags.CanMove,
+  movementRevision: 0,
+  displacementRevision: 0,
   stats: new Stats(),
 });
 
@@ -27,13 +35,19 @@ class RuntimeSpell extends Spell {
   completed = 0;
   get castSpec(): CastSpec {
     return {
-      activation: 'PRESS', targeting: 'SELF', castTimeMs: 100,
+      activation: 'PRESS',
+      targeting: 'SELF',
+      castTimeMs: 100,
       resource: { commitAt: 'start', refundOn: ['STUN'] },
       cooldown: { startAt: 'end', durationMs: 500 },
     };
   }
-  onCancel(_context: CastContext, reason: CancelReason) { this.cancelled.push(reason); }
-  onComplete() { this.completed += 1; }
+  onCancel(_context: CastContext, reason: CancelReason) {
+    this.cancelled.push(reason);
+  }
+  onComplete() {
+    this.completed += 1;
+  }
 }
 
 describe('Spell runtime production wiring', () => {
@@ -63,13 +77,31 @@ describe('Spell runtime production wiring', () => {
   });
 
   it.each([
-    ['DEATH', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
-    ['STUN', (caster: ReturnType<typeof owner>) => { caster.status |= StatusFlags.Stunned; }],
-    ['SILENCE', (caster: ReturnType<typeof owner>) => { caster.status |= StatusFlags.Silenced; }],
-    ['DISPLACEMENT', (caster: ReturnType<typeof owner>) => {
-      caster.position.x = 25;
-      caster.displacementRevision += 1;
-    }],
+    [
+      'DEATH',
+      (caster: ReturnType<typeof owner>) => {
+        caster.isDead = true;
+      },
+    ],
+    [
+      'STUN',
+      (caster: ReturnType<typeof owner>) => {
+        caster.status |= StatusFlags.Stunned;
+      },
+    ],
+    [
+      'SILENCE',
+      (caster: ReturnType<typeof owner>) => {
+        caster.status |= StatusFlags.Silenced;
+      },
+    ],
+    [
+      'DISPLACEMENT',
+      (caster: ReturnType<typeof owner>) => {
+        caster.position.x = 25;
+        caster.displacementRevision += 1;
+      },
+    ],
   ] as const)('routes owner state changes through %s policy once', (reason, interrupt) => {
     const caster = owner();
     const spell = new RuntimeSpell(caster);
@@ -86,12 +118,16 @@ describe('Spell runtime production wiring', () => {
       removed = 0;
       get castSpec(): CastSpec {
         return {
-          activation: 'TOGGLE', targeting: 'POINT', active: {},
+          activation: 'TOGGLE',
+          targeting: 'POINT',
+          active: {},
           resource: { commitAt: 'start', refundOn: [] },
           cooldown: { startAt: 'end', durationMs: 500 },
         };
       }
-      onCancel() { this.removed += 1; }
+      onCancel() {
+        this.removed += 1;
+      }
     }
     const spell = new ActiveSpell(caster);
     spell.press(context(caster));

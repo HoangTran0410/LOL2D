@@ -232,10 +232,7 @@ export class Singed_W_Object extends SpellObject {
       const sag = sin(this.age / 500 + i) * 0.12;
       beginShape();
       vertex(cos(a) * this.radius * 0.15, sin(a) * this.radius * 0.15);
-      vertex(
-        cos(a + sag) * this.radius * 0.55,
-        sin(a + sag) * this.radius * 0.55
-      );
+      vertex(cos(a + sag) * this.radius * 0.55, sin(a + sag) * this.radius * 0.55);
       vertex(cos(a) * this.radius * 0.95, sin(a) * this.radius * 0.95);
       endShape();
     }

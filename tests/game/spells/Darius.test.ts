@@ -197,8 +197,7 @@ describe('Darius Q heals for a share of the damage it lands', () => {
   };
 
   /** Read off a champion rather than restated, so a retune of the pool cannot leave a stale 100 here. */
-  const casterPool = (): number =>
-    champion(createGame(), 0, 0, 'blue').stats.maxHealth.value;
+  const casterPool = (): number => champion(createGame(), 0, 0, 'blue').stats.maxHealth.value;
 
   const bladeRange = (INNER_RADIUS + OUTER_RADIUS) / 2;
 
@@ -227,9 +226,7 @@ describe('Darius Q heals for a share of the damage it lands', () => {
     // rounded once at the end. `3 * BLADE_DAMAGE * HEAL_PERCENT_CHAMPION`
     // associates the other way and is 31.499999999999996 rather than 31.5, so it
     // rounds to 31 and disagrees with correct code by one.
-    expect(swingAt([one, two, three])).toBe(
-      Math.round(3 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION))
-    );
+    expect(swingAt([one, two, three])).toBe(Math.round(3 * (BLADE_DAMAGE * HEAL_PERCENT_CHAMPION)));
   });
 
   it('pays the unit rate for minions, which is not the champion rate', () => {

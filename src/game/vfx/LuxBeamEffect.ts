@@ -35,7 +35,9 @@ export default class LuxBeamEffect implements VfxHandle {
     else this.drawRelease();
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 
   private drawPrepare(): void {
     const progress = Math.max(0, Math.min(1, this.getProgress()));
@@ -89,11 +91,6 @@ export default class LuxBeamEffect implements VfxHandle {
   }
 
   private drawCenterLine(): void {
-    line(
-      this.geometry.start.x,
-      this.geometry.start.y,
-      this.geometry.end.x,
-      this.geometry.end.y
-    );
+    line(this.geometry.start.x, this.geometry.start.y, this.geometry.end.x, this.geometry.end.y);
   }
 }

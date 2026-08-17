@@ -31,15 +31,16 @@ import Thresh_Q, { Thresh_Q_Object } from '../../../src/game/gameObject/spells/T
 import Twitch_Q, { Twitch_Q_Object } from '../../../src/game/gameObject/spells/Twitch_Q';
 import Zed_E, { Zed_E_Object } from '../../../src/game/gameObject/spells/Zed_E';
 
-const castContext = (caster: AttackableUnit): CastContext => Object.freeze({
-  spellId: 'attached-effect',
-  activationId: 'activation',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: caster.position.x, y: caster.position.y }),
-  cursorWorld: Object.freeze({ x: caster.position.x + 100, y: caster.position.y }),
-  direction: Object.freeze({ x: 1, y: 0 }),
-});
+const castContext = (caster: AttackableUnit): CastContext =>
+  Object.freeze({
+    spellId: 'attached-effect',
+    activationId: 'activation',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: caster.position.x, y: caster.position.y }),
+    cursorWorld: Object.freeze({ x: caster.position.x + 100, y: caster.position.y }),
+    direction: Object.freeze({ x: 1, y: 0 }),
+  });
 
 /** Everything the spell handed to the object manager this frame. */
 const spawned = <T>(game: TestGame, type: new (...args: never[]) => T): T[] => {

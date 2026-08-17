@@ -14,14 +14,25 @@ import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class Vector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): Vector { return new Vector(this.x, this.y); }
-  dist(other: Vector): number { return Math.hypot(this.x - other.x, this.y - other.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): Vector {
+    return new Vector(this.x, this.y);
+  }
+  dist(other: Vector): number {
+    return Math.hypot(this.x - other.x, this.y - other.y);
+  }
 }
 
 const context: CastContext = Object.freeze({
-  spellId: 'pantheon-q', activationId: 'activation', startedAtMs: 0, caster: {},
-  origin: Object.freeze({ x: 0, y: 0 }), cursorWorld: Object.freeze({ x: 1, y: 0 }),
+  spellId: 'pantheon-q',
+  activationId: 'activation',
+  startedAtMs: 0,
+  caster: {},
+  origin: Object.freeze({ x: 0, y: 0 }),
+  cursorWorld: Object.freeze({ x: 1, y: 0 }),
   direction: Object.freeze({ x: 1, y: 0 }),
 });
 
@@ -43,42 +54,73 @@ const target = (
   health = 100,
   prototype: object = AttackableUnit.prototype,
   unitType?: 'minion'
-) => Object.assign(Object.create(prototype) as AttackableUnit, {
-  position: { x: 100, y: 0 },
-  collisionRadius: 10,
-  teamId,
-  stats: {
-    health: { value: health },
-    maxHealth: { value: 100 },
-    actionState: ActionState.TARGETABLE,
-  },
-  takeDamage: vi.fn(),
-  unitType,
-  deathData: null,
-});
+) =>
+  Object.assign(Object.create(prototype) as AttackableUnit, {
+    position: { x: 100, y: 0 },
+    collisionRadius: 10,
+    teamId,
+    stats: {
+      health: { value: health },
+      maxHealth: { value: 100 },
+      actionState: ActionState.TARGETABLE,
+    },
+    takeDamage: vi.fn(),
+    unitType,
+    deathData: null,
+  });
 
 const owner = () => {
   const objects: unknown[] = [];
   const mana = {
     baseValue: 100,
-    get value() { return this.baseValue; },
-    set value(value: number) { this.baseValue = value; },
+    get value() {
+      return this.baseValue;
+    },
+    set value(value: number) {
+      this.baseValue = value;
+    },
   };
   return {
-    position: new Vector(), destination: new Vector(), teamId: 'blue', isDead: false, canCast: true,
+    position: new Vector(),
+    destination: new Vector(),
+    teamId: 'blue',
+    isDead: false,
+    canCast: true,
     stats: { mana, health: { value: 100 }, addModifier: vi.fn(), removeModifier: vi.fn() },
-    game: { eventManager: { emit: vi.fn() }, objectManager: { addObject: (object: unknown) => objects.push(object) } },
-    addBuff: vi.fn(), objects,
+    game: {
+      eventManager: { emit: vi.fn() },
+      objectManager: { addObject: (object: unknown) => objects.push(object) },
+    },
+    addBuff: vi.fn(),
+    objects,
   };
 };
 
 const stubDrawGlobals = () => {
   const spies = {
-    image: vi.fn(), line: vi.fn(), ellipse: vi.fn(), quad: vi.fn(),
-    beginShape: vi.fn(), bezierVertex: vi.fn(), vertex: vi.fn(), endShape: vi.fn(),
+    image: vi.fn(),
+    line: vi.fn(),
+    ellipse: vi.fn(),
+    quad: vi.fn(),
+    beginShape: vi.fn(),
+    bezierVertex: vi.fn(),
+    vertex: vi.fn(),
+    endShape: vi.fn(),
   };
   for (const [name, spy] of Object.entries(spies)) vi.stubGlobal(name, spy);
-  for (const name of ['push', 'pop', 'translate', 'rotate', 'blendMode', 'fill', 'stroke', 'noFill', 'noStroke', 'strokeWeight', 'strokeCap']) {
+  for (const name of [
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'blendMode',
+    'fill',
+    'stroke',
+    'noFill',
+    'noStroke',
+    'strokeWeight',
+    'strokeCap',
+  ]) {
     vi.stubGlobal(name, vi.fn());
   }
   for (const name of ['ADD', 'BLEND', 'CLOSE', 'SQUARE', 'ROUND']) vi.stubGlobal(name, name);
@@ -176,7 +218,13 @@ describe('Pantheon Q', () => {
     const minion = target('red', 100, AttackableUnit.prototype, 'minion');
     const scenery = { position: { x: 100, y: 0 }, collisionRadius: 10 };
     caster.game.objectManager.queryObjects = vi.fn(() => [
-      caster, ally, enemy, untargetable, monster, minion, scenery,
+      caster,
+      ally,
+      enemy,
+      untargetable,
+      monster,
+      minion,
+      scenery,
     ]);
     const spell = new Pantheon_Q(caster);
 
@@ -233,8 +281,18 @@ describe('Pantheon Q', () => {
   });
 
   it.each([
-    ['death', (caster: ReturnType<typeof owner>) => { caster.isDead = true; }],
-    ['cast-inhibiting status', (caster: ReturnType<typeof owner>) => { caster.canCast = false; }],
+    [
+      'death',
+      (caster: ReturnType<typeof owner>) => {
+        caster.isDead = true;
+      },
+    ],
+    [
+      'cast-inhibiting status',
+      (caster: ReturnType<typeof owner>) => {
+        caster.canCast = false;
+      },
+    ],
   ])('cancels charging on %s and keeps the imported half-mana refund', (_name, interrupt) => {
     const caster = owner();
     const spell = new Pantheon_Q(caster);

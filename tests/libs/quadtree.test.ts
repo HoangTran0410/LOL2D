@@ -22,7 +22,7 @@ describe('Quadtree.retrieve', () => {
     const query = new Rectangle({ x: 0, y: 0, w: 100, h: 100 });
     const results = tree.retrieve(query);
 
-    expect(results.filter((r) => r.data === 'shared')).toHaveLength(1);
+    expect(results.filter(r => r.data === 'shared')).toHaveLength(1);
   });
 
   it('still filters out objects that do not actually intersect the query area', () => {
@@ -33,7 +33,7 @@ describe('Quadtree.retrieve', () => {
     const query = new Rectangle({ x: 0, y: 0, w: 10, h: 10 });
     const results = tree.retrieve(query);
 
-    expect(results.map((r) => r.data)).toEqual(['near']);
+    expect(results.map(r => r.data)).toEqual(['near']);
   });
 
   it('keeps first-occurrence order for objects retrieved from a single leaf', () => {
@@ -45,7 +45,7 @@ describe('Quadtree.retrieve', () => {
     const query = new Rectangle({ x: 0, y: 0, w: 10, h: 10 });
     const results = tree.retrieve(query);
 
-    expect(results.map((r) => r.data)).toEqual(['first', 'second', 'third']);
+    expect(results.map(r => r.data)).toEqual(['first', 'second', 'third']);
   });
 
   /**
@@ -72,7 +72,7 @@ describe('Quadtree.retrieve', () => {
 
     for (const corner of corners) {
       const probe = new Rectangle({ x: corner.x + 1, y: corner.y + 1, w: 1, h: 1 });
-      expect(tree.retrieve(probe).map((r) => r.data)).toEqual([corner.data]);
+      expect(tree.retrieve(probe).map(r => r.data)).toEqual([corner.data]);
     }
   });
 
@@ -89,8 +89,8 @@ describe('Quadtree.retrieve', () => {
     tree.insert(new Rectangle({ x: 80, y: 80, w: 5, h: 5, data: 'c' }));
 
     const query = new Rectangle({ x: 0, y: 0, w: 30, h: 30 });
-    const first = tree.retrieve(query).map((r) => r.data);
-    const second = tree.retrieve(query).map((r) => r.data);
+    const first = tree.retrieve(query).map(r => r.data);
+    const second = tree.retrieve(query).map(r => r.data);
 
     expect(first).toEqual(['a', 'b']);
     expect(second).toEqual(first);

@@ -53,7 +53,11 @@ export default class Thresh_Q extends Spell {
     if (this.phase === 'Q2') {
       const victim = this.threshObj?.champHooked;
       return (
-        !!this.threshObj && !this.threshObj.toRemove && !!victim && !victim.isDead && Dash.CanDash(this.owner)
+        !!this.threshObj &&
+        !this.threshObj.toRemove &&
+        !!victim &&
+        !victim.isDead &&
+        Dash.CanDash(this.owner)
       );
     }
     return true;
@@ -362,9 +366,7 @@ export class Thresh_Q_Object extends MissileSpellObject {
 
     // while shackled the scythe rides on the victim's centre, where their own
     // crowd-control effect swallows it — bite into the near edge instead
-    const bite = shackled && this.champHooked
-      ? this.champHooked.animatedValues.displaySize / 2
-      : 0;
+    const bite = shackled && this.champHooked ? this.champHooked.animatedValues.displaySize / 2 : 0;
 
     push();
     translate(this.position.x + dirX * -bite, this.position.y + dirY * -bite);

@@ -20,8 +20,12 @@ class TerminalMissile extends MissileSpellObject {
   arrivals = 0;
   afterMoves = 0;
 
-  onArrive(): void { this.arrivals += 1; }
-  onAfterMove(): void { this.afterMoves += 1; }
+  onArrive(): void {
+    this.arrivals += 1;
+  }
+  onAfterMove(): void {
+    this.afterMoves += 1;
+  }
 }
 
 class CollisionCheckingHomingMissile extends TestHomingMissile {
@@ -36,7 +40,9 @@ function target(game: TestGame, x: number, collisionRadius = 0): AttackableUnit 
 
 describe('HomingMissileSpellObject', () => {
   beforeEach(installSpellObjectGlobals);
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('draws a ready missile sprite at visual dimensions independent from collision size', () => {
     const missile = new TerminalMissile(createUnit(createGame()));

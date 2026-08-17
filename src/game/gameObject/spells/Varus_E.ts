@@ -114,7 +114,7 @@ export class Varus_E_Object extends SpellObject {
     strokeWeight(2);
     for (let i = 0; i < 14; i++) {
       const a = (i / 14) * TWO_PI + i;
-      const d = this.radius * (0.25 + 0.7 * ((i * 7) % 10) / 10);
+      const d = this.radius * (0.25 + (0.7 * ((i * 7) % 10)) / 10);
       const x = cos(a) * d;
       const y = sin(a) * d;
       line(x, y, x + 4, y - 14);

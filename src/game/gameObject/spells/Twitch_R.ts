@@ -138,7 +138,6 @@ export class Twitch_R_Bolt extends MissileSpellObject {
   /** Infinity is the whole point: the bolt does not stop at the first body. */
   maxHitCount = Infinity;
 
-
   draw() {
     const angle = Math.atan2(
       this.destination.y - this.position.y,

@@ -15,35 +15,51 @@ import Lux_R, {
 import Malphite_Q, {
   CAST_TIME_MS as MALPHITE_CAST_TIME_MS,
 } from '../../../src/game/gameObject/spells/Malphite_Q';
-import Pantheon_Q, {
-  Pantheon_Q_Spear,
-} from '../../../src/game/gameObject/spells/Pantheon_Q';
+import Pantheon_Q, { Pantheon_Q_Spear } from '../../../src/game/gameObject/spells/Pantheon_Q';
 import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import { SpellGroups } from '../../../src/game/preset';
-import type {
-  ActivationPattern,
-  CastContext,
-} from '../../../src/game/spell/runtime/types';
+import type { ActivationPattern, CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, createUnit, withCastTime } from '../spell/fixtures';
 
 /** The cast window this suite drives the runtime through — see `withCastTime`. */
 const TEST_CAST_TIME_MS = 250;
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
 
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
-  add(value: TestVector): this { this.x += value.x; this.y += value.y; return this; }
-  mult(value: number): this { this.x *= value; this.y *= value; return this; }
-  mag(): number { return Math.hypot(this.x, this.y); }
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(value: TestVector): this {
+    this.x += value.x;
+    this.y += value.y;
+    return this;
+  }
+  mult(value: number): this {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  mag(): number {
+    return Math.hypot(this.x, this.y);
+  }
   setMag(value: number): this {
     const length = this.mag();
     if (length > 0) this.mult(value / length);
     return this;
   }
-  dist(value: TestVector): number { return Math.hypot(this.x - value.x, this.y - value.y); }
+  dist(value: TestVector): number {
+    return Math.hypot(this.x - value.x, this.y - value.y);
+  }
   static add(first: TestVector, second: TestVector): TestVector {
     return first.copy().add(second);
   }
@@ -52,16 +68,17 @@ class TestVector {
   }
 }
 
-const context = (caster: unknown, target?: unknown): CastContext => Object.freeze({
-  spellId: 'representative-spell',
-  activationId: 'activation',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 100, y: 0 }),
-  direction: Object.freeze({ x: 1, y: 0 }),
-  ...(target === undefined ? {} : { target }),
-});
+const context = (caster: unknown, target?: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'representative-spell',
+    activationId: 'activation',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 100, y: 0 }),
+    direction: Object.freeze({ x: 1, y: 0 }),
+    ...(target === undefined ? {} : { target }),
+  });
 
 const makeOwner = (mana = 200) => {
   const objects: unknown[] = [];
@@ -82,7 +99,9 @@ const makeOwner = (mana = 200) => {
       addModifier: vi.fn(),
       removeModifier: vi.fn(),
     },
-    stopMovement() { this.destination.set(this.position.x, this.position.y); },
+    stopMovement() {
+      this.destination.set(this.position.x, this.position.y);
+    },
     addBuff: vi.fn((buff: { activateBuff?: () => void }) => buff.activateBuff?.()),
     takeHeal: vi.fn(),
     takeDamage: vi.fn(),
@@ -95,7 +114,9 @@ const makeOwner = (mana = 200) => {
       terrainMap: { getObstaclesInArea: vi.fn(() => []) },
       objectManager: {
         objects,
-        addObject: vi.fn((object: unknown) => { objects.push(object); }),
+        addObject: vi.fn((object: unknown) => {
+          objects.push(object);
+        }),
         queryObjects: vi.fn(() => []),
       },
     },
@@ -105,25 +126,39 @@ const makeOwner = (mana = 200) => {
 };
 
 class InspectableLuxR extends Lux_R {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectableJannaR extends Janna_R {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectableJannaQ extends Janna_Q {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectableAniviaR extends Anivia_R {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectableVarusQ extends Varus_Q {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectablePantheonQ extends Pantheon_Q {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 class InspectableMalphiteQ extends Malphite_Q {
-  get activationPattern(): ActivationPattern { return this.castSpec.activation; }
+  get activationPattern(): ActivationPattern {
+    return this.castSpec.activation;
+  }
 }
 
 describe('representative spells through public commands', () => {
@@ -135,7 +170,9 @@ describe('representative spells through public commands', () => {
     vi.stubGlobal('TWO_PI', Math.PI * 2);
   });
 
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('publishes all seven activation patterns', () => {
     expect({

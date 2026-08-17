@@ -128,11 +128,7 @@ export interface TouchControlsHost {
   playerFacing(): Vec2;
   /** The tap's victim: nearest visible hostile body within `range`. */
   autoTargetWithin(range: number, priority: AttackTargetPriority): AimCandidate | null;
-  pickUnitNear(
-    point: Vec2,
-    radius: number,
-    preferred: AimCandidate | null
-  ): AimCandidate | null;
+  pickUnitNear(point: Vec2, radius: number, preferred: AimCandidate | null): AimCandidate | null;
   /** Held stick direction, or null the frame the thumb lifts. */
   steer(direction: JoystickVector | null): void;
   /** Where slot `slot` is currently aimed, or null once the gesture is over. */
@@ -291,7 +287,10 @@ export class TouchControls {
   private viewportHeight = 0;
   private readonly targetPriority: TouchTargetPriority;
 
-  constructor(private readonly host: TouchControlsHost, enabled = false) {
+  constructor(
+    private readonly host: TouchControlsHost,
+    enabled = false
+  ) {
     this._enabled = enabled;
     this.targetPriority = touchTargetPriorityPreference();
     const viewport = host.viewport();
@@ -318,7 +317,9 @@ export class TouchControls {
   }
 
   /** True while a thumb is on this slot's button, for the button's own look. */
-  gestureFor(slot: number): { readonly phase: GesturePhase; readonly aim: SpellAimResult | null } | null {
+  gestureFor(
+    slot: number
+  ): { readonly phase: GesturePhase; readonly aim: SpellAimResult | null } | null {
     for (const gesture of this.gestures.values()) {
       if (gesture.slot === slot) return gesture;
     }
@@ -498,10 +499,11 @@ export class TouchControls {
       drag: gesture.phase === 'CANCEL' ? null : drag,
       dragToRange: this.layout.dragToRange,
       facing: this.host.playerFacing(),
-      autoTarget: gesture.moved ? null : this.host.autoTargetWithin(view.range, this.targetPriority),
+      autoTarget: gesture.moved
+        ? null
+        : this.host.autoTargetWithin(view.range, this.targetPriority),
       lockedTarget: gesture.aim?.target ?? null,
-      pickUnitNear: (point, radius, preferred) =>
-        this.host.pickUnitNear(point, radius, preferred),
+      pickUnitNear: (point, radius, preferred) => this.host.pickUnitNear(point, radius, preferred),
     });
   }
 
@@ -598,8 +600,18 @@ export class TouchControls {
       const side = 26;
       const nx = -aim.direction.y;
       const ny = aim.direction.x;
-      line(endX, endY, endX - aim.direction.x * back + nx * side, endY - aim.direction.y * back + ny * side);
-      line(endX, endY, endX - aim.direction.x * back - nx * side, endY - aim.direction.y * back - ny * side);
+      line(
+        endX,
+        endY,
+        endX - aim.direction.x * back + nx * side,
+        endY - aim.direction.y * back + ny * side
+      );
+      line(
+        endX,
+        endY,
+        endX - aim.direction.x * back - nx * side,
+        endY - aim.direction.y * back - ny * side
+      );
       pop();
     });
   }

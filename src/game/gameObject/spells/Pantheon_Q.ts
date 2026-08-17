@@ -58,10 +58,14 @@ const drawSpearBody = (half: number, blade: number): void => {
   // socket collar, kept slim so it does not read as a bead on the shaft
   fill(198, 150, 78, 240);
   quad(
-    half * 0.28, -blade * 0.22,
-    half * 0.4, -blade * 0.18,
-    half * 0.4, blade * 0.18,
-    half * 0.28, blade * 0.22
+    half * 0.28,
+    -blade * 0.22,
+    half * 0.4,
+    -blade * 0.18,
+    half * 0.4,
+    blade * 0.18,
+    half * 0.28,
+    blade * 0.22
   );
 
   // narrow leaf blade, drawn over the collar so the point stays the far end
@@ -195,7 +199,10 @@ export default class Pantheon_Q extends Spell {
     const beam = new BeamSpellObject(
       this.owner,
       {
-        start: { x: start.x - direction.x * THRUST_BACKSWING, y: start.y - direction.y * THRUST_BACKSWING },
+        start: {
+          x: start.x - direction.x * THRUST_BACKSWING,
+          y: start.y - direction.y * THRUST_BACKSWING,
+        },
         end: { x: start.x + direction.x * THRUST_REACH, y: start.y + direction.y * THRUST_REACH },
         width: THRUST_WIDTH,
       },

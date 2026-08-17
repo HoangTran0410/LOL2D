@@ -35,9 +35,29 @@ function record(name: string) {
 function stubDrawing() {
   calls = {};
   for (const name of [
-    'push', 'pop', 'translate', 'rotate', 'fill', 'noFill', 'stroke', 'noStroke',
-    'strokeWeight', 'circle', 'ellipse', 'arc', 'line', 'image', 'tint', 'noTint',
-    'blendMode', 'triangle', 'rect', 'beginShape', 'vertex', 'endShape', 'quad',
+    'push',
+    'pop',
+    'translate',
+    'rotate',
+    'fill',
+    'noFill',
+    'stroke',
+    'noStroke',
+    'strokeWeight',
+    'circle',
+    'ellipse',
+    'arc',
+    'line',
+    'image',
+    'tint',
+    'noTint',
+    'blendMode',
+    'triangle',
+    'rect',
+    'beginShape',
+    'vertex',
+    'endShape',
+    'quad',
   ]) {
     vi.stubGlobal(name, record(name));
   }
@@ -54,7 +74,16 @@ function stubDrawing() {
   vi.stubGlobal('TWO_PI', Math.PI * 2);
   vi.stubGlobal('HALF_PI', Math.PI / 2);
   vi.stubGlobal('createVector', (x = 0, y = 0) => ({
-    x, y, copy() { return { ...this }; }, set(a: number, b: number) { this.x = a; this.y = b; return this; },
+    x,
+    y,
+    copy() {
+      return { ...this };
+    },
+    set(a: number, b: number) {
+      this.x = a;
+      this.y = b;
+      return this;
+    },
   }));
 }
 

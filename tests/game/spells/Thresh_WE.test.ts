@@ -88,7 +88,10 @@ describe('Thresh E sweeps a box, in one direction', () => {
     spell.onSpellCast();
     // The chain starts behind him and has to get there: casting alone hits
     // nobody, which is the difference between the swing and a flash of art.
-    expect(north.buffs.some(buff => buff instanceof Dash), 'not on the cast frame').toBe(false);
+    expect(
+      north.buffs.some(buff => buff instanceof Dash),
+      'not on the cast frame'
+    ).toBe(false);
     swingThrough(game);
 
     for (const victim of [north, south]) {
@@ -113,7 +116,10 @@ describe('Thresh E sweeps a box, in one direction', () => {
 
     expect(swing.heading).toBeCloseTo(Math.PI / 2, 3);
     expect(south.buffs.some(buff => buff instanceof Dash)).toBe(true);
-    expect(east.buffs.some(buff => buff instanceof Dash), 'now out of the box').toBe(false);
+    expect(
+      east.buffs.some(buff => buff instanceof Dash),
+      'now out of the box'
+    ).toBe(false);
   });
 });
 

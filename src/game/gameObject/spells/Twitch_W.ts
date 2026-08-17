@@ -78,7 +78,8 @@ export class Twitch_W_Cask extends MissileSpellObject {
 
   /** How high the flask is riding right now, 0 at both ends. */
   _arcLift(): number {
-    const travelled = 1 - constrain(this.position.dist(this.destination) / this.totalDistance, 0, 1);
+    const travelled =
+      1 - constrain(this.position.dist(this.destination) / this.totalDistance, 0, 1);
     return Math.sin(travelled * PI) * Math.min(60, this.totalDistance * 0.18);
   }
 
@@ -109,7 +110,7 @@ export class Twitch_W_Cask extends MissileSpellObject {
     noStroke();
     for (let i = 1; i <= 3; i++) {
       fill(150, 220, 100, 90 / i);
-      circle(this.position.x, this.position.y - lift + i * 5, this.size * 0.5 / i);
+      circle(this.position.x, this.position.y - lift + i * 5, (this.size * 0.5) / i);
     }
     pop();
   }

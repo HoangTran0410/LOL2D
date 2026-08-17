@@ -60,7 +60,15 @@ describe('unit navigation', () => {
     expect(unit.pathAgent?.state).toBe('FOLLOWING');
     // the first place it is sent is round the wall, not through it
     expect(unit.destination.y).toBeGreaterThan(900);
-    expect(navigation.isLineClear(SOUTH.x, SOUTH.y, unit.destination.x, unit.destination.y, unit.bodyRadius)).toBe(true);
+    expect(
+      navigation.isLineClear(
+        SOUTH.x,
+        SOUTH.y,
+        unit.destination.x,
+        unit.destination.y,
+        unit.bodyRadius
+      )
+    ).toBe(true);
   });
 
   it('takes no search at all when the goal is in plain sight', () => {
@@ -147,7 +155,9 @@ describe('unit navigation', () => {
     }
 
     expect(insideWall).toBe(false);
-    expect(Math.hypot(champion.position.x - NORTH.x, champion.position.y - NORTH.y)).toBeLessThan(30);
+    expect(Math.hypot(champion.position.x - NORTH.x, champion.position.y - NORTH.y)).toBeLessThan(
+      30
+    );
   });
 
   it('degrades a champion move order to a straight line with no navigation present', () => {

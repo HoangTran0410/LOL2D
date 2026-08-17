@@ -263,7 +263,9 @@ describe('NavigationSystem', () => {
     // it gave up rather than throwing, and never walked through the wall
     expect(agent.state).toBe('BLOCKED');
     expect(insideTheRoom).toBe(false);
-    expect(navigation.grid.isWalkable(host.position.x, host.position.y, CHAMPION_RADIUS)).toBe(true);
+    expect(navigation.grid.isWalkable(host.position.x, host.position.y, CHAMPION_RADIUS)).toBe(
+      true
+    );
     // and it did close the distance rather than standing still
     expect(Math.hypot(host.position.x - 1_200, host.position.y - 1_200)).toBeLessThan(800);
     expect(navigation.stats.failedSearches).toBeGreaterThan(0);

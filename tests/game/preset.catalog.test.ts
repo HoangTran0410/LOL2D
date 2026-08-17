@@ -46,7 +46,9 @@ describe('listSpellCatalog — catalogue completeness', () => {
     for (const group of SpellGroups) {
       for (const spellClass of group.spells) referenced.add(spellClass);
     }
-    const missing = barrelKeys.filter(key => !referenced.has((AllSpells as Record<string, unknown>)[key]));
+    const missing = barrelKeys.filter(
+      key => !referenced.has((AllSpells as Record<string, unknown>)[key])
+    );
     expect(missing).toEqual([]);
   });
 
@@ -57,7 +59,10 @@ describe('listSpellCatalog — catalogue completeness', () => {
 
   it('constructs a real, non-empty description for every spell — the null-owner audit, pinned as a regression test', () => {
     const broken = listSpellCatalog().filter(
-      e => e.display.name === '?' || typeof e.display.description !== 'string' || e.display.description.length === 0
+      e =>
+        e.display.name === '?' ||
+        typeof e.display.description !== 'string' ||
+        e.display.description.length === 0
     );
     expect(broken.map(e => e.id)).toEqual([]);
   });
@@ -131,7 +136,8 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
     const preset = getChampionPresetFromLoadout(customLoadout(slots));
     expect(preset.spells).toHaveLength(SLOT_COUNT);
     expect(preset.spells[2]).toBe(AllSpells.Yasuo_Q);
-    for (const spell of preset.spells) expect(barrelKeys).toContain((spell as { name: string }).name);
+    for (const spell of preset.spells)
+      expect(barrelKeys).toContain((spell as { name: string }).name);
   });
 
   it('pads a short customSlots array (e.g. from an older/corrupt save) rather than throwing', () => {

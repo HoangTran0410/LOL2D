@@ -13,12 +13,7 @@ export default class Obstacle {
   private _boundingBox: Rectangle | null = null;
   private _SATPolygon: any = null;
 
-  constructor(
-    x: number,
-    y: number,
-    vertices?: { x: number; y: number }[],
-    type?: string
-  ) {
+  constructor(x: number, y: number, vertices?: { x: number; y: number }[], type?: string) {
     this.type = type || TerrainType.WALL;
     this.position = createVector(x, y);
     this.angle = 0;

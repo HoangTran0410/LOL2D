@@ -180,7 +180,10 @@ export default class FogOfWar {
     return allSightPoly;
   }
 
-  calculateSightForObject(obj: any): { sightPoly: { x: number; y: number }[]; playersInSight: any[] } {
+  calculateSightForObject(obj: any): {
+    sightPoly: { x: number; y: number }[];
+    playersInSight: any[];
+  } {
     // getSightPoly recomputes the polygon at obj's live position every frame
     // (reusing the cached segment list whenever it can — see the file header
     // and computeSightPoly), so it's always frame-accurate. playersInSight is
@@ -248,8 +251,7 @@ export default class FogOfWar {
 
     // remove bushes that player is inside => player can see through that bush
     obstaclesInSight = obstaclesInSight.filter(
-      (o: any) =>
-        !CollideUtils.pointPolygon(obj.position.x, obj.position.y, o.vertices)
+      (o: any) => !CollideUtils.pointPolygon(obj.position.x, obj.position.y, o.vertices)
     );
 
     const obstacleSignature = this.buildObstacleSignature(obstaclesInSight);
@@ -303,25 +305,32 @@ export default class FogOfWar {
   drawVisions(): void {
     const allSightPoly = this.calculateSight();
 
-    allSightPoly.forEach(({ object, sightPoly }: { object: any; sightPoly: { x: number; y: number }[] }) => {
-      const { x, y, gradient } = this.prepareRadialGradient(object.position.x, object.position.y, object.visionRadius, 50);
+    allSightPoly.forEach(
+      ({ object, sightPoly }: { object: any; sightPoly: { x: number; y: number }[] }) => {
+        const { x, y, gradient } = this.prepareRadialGradient(
+          object.position.x,
+          object.position.y,
+          object.visionRadius,
+          50
+        );
 
-      // The gradient is defined around the origin (see prepareRadialGradient) so it
-      // can be shared across units/frames; translate the canvas to the unit's screen
-      // position and draw the polygon relative to that origin to line the two up.
-      // Canvas gradients paint using the CTM at fill time, not at creation time, so
-      // this reproduces exactly what passing absolute coordinates would have drawn.
-      this.overlay.push();
-      this.overlay.translate(x, y);
-      this.overlay.drawingContext.fillStyle = gradient;
-      this.overlay.beginShape();
-      sightPoly.forEach((v: { x: number; y: number }) => {
-        const pos = this.game.camera.worldToScreen(v.x, v.y);
-        this.overlay.vertex(pos.x - x, pos.y - y);
-      });
-      this.overlay.endShape(this.overlay.CLOSE);
-      this.overlay.pop();
-    });
+        // The gradient is defined around the origin (see prepareRadialGradient) so it
+        // can be shared across units/frames; translate the canvas to the unit's screen
+        // position and draw the polygon relative to that origin to line the two up.
+        // Canvas gradients paint using the CTM at fill time, not at creation time, so
+        // this reproduces exactly what passing absolute coordinates would have drawn.
+        this.overlay.push();
+        this.overlay.translate(x, y);
+        this.overlay.drawingContext.fillStyle = gradient;
+        this.overlay.beginShape();
+        sightPoly.forEach((v: { x: number; y: number }) => {
+          const pos = this.game.camera.worldToScreen(v.x, v.y);
+          this.overlay.vertex(pos.x - x, pos.y - y);
+        });
+        this.overlay.endShape(this.overlay.CLOSE);
+        this.overlay.pop();
+      }
+    );
   }
 
   drawCircleSight(_x: number, _y: number, _r: number): void {

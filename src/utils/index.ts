@@ -2,7 +2,10 @@ export function hasFlag(target: number, flag: number): boolean {
   return (target & flag) === flag;
 }
 
-export const statusFlagsToString = (status: number, statusFlags: Record<string, number>): string[] => {
+export const statusFlagsToString = (
+  status: number,
+  statusFlags: Record<string, number>
+): string[] => {
   const result: string[] = [];
   for (const key in statusFlags) {
     if (status & (statusFlags as Record<string, number>)[key]) {

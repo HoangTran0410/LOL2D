@@ -250,15 +250,18 @@ export class Darius_E_Object extends SpellObject {
     const hauled = haulT * haulT;
     const swing = -CONE_HALF_ANGLE + CONE_HALF_ANGLE * 2 * reachT;
     // Never shorter than the grip, or the head would pass through his own body.
-    const armReach = Math.max(
-      CONE_RANGE * 0.28,
-      reach * (1 - HAUL_RETRACTION * hauled)
-    );
+    const armReach = Math.max(CONE_RANGE * 0.28, reach * (1 - HAUL_RETRACTION * hauled));
 
     // The trail sweeps with him on the way out and drops away on the way in:
     // a hot arc still travelling outward while the bodies move inward is the
     // same contradiction, one layer down.
-    drawAxeArc(armReach * 0.78, swing, CONE_HALF_ANGLE * 1.6 * reachT, 210 * fade * (1 - hauled), 16);
+    drawAxeArc(
+      armReach * 0.78,
+      swing,
+      CONE_HALF_ANGLE * 1.6 * reachT,
+      210 * fade * (1 - hauled),
+      16
+    );
 
     const grip = CONE_RANGE * 0.16;
     push();

@@ -189,8 +189,7 @@ export class Line {
     const bx = this.x2;
     const by = this.y2;
     let quadrants = 0;
-    if (Line.intersectRect(ax, ay, bx, by, qx, y, qx + w2, y + h2))
-      quadrants |= QUADRANT_TOP_RIGHT;
+    if (Line.intersectRect(ax, ay, bx, by, qx, y, qx + w2, y + h2)) quadrants |= QUADRANT_TOP_RIGHT;
     if (Line.intersectRect(ax, ay, bx, by, x, y, x + w2, y + h2)) quadrants |= QUADRANT_TOP_LEFT;
     if (Line.intersectRect(ax, ay, bx, by, x, qy, x + w2, qy + h2))
       quadrants |= QUADRANT_BOTTOM_LEFT;
@@ -337,7 +336,10 @@ export class Quadtree {
     }
   }
 
-  retrieve(areaObj: { qtIndex: (bounds: any) => number; intersect: (other: any) => boolean }, cleanUp = true): any[] {
+  retrieve(
+    areaObj: { qtIndex: (bounds: any) => number; intersect: (other: any) => boolean },
+    cleanUp = true
+  ): any[] {
     if (!cleanUp) {
       // Internal recursive step (called by a parent node's cleanUp pass):
       // just gather this node's + matching children's objects, duplicates

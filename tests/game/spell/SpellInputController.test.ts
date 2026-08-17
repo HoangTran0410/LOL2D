@@ -89,7 +89,7 @@ describe('SpellInputController', () => {
     };
     const controller = new SpellInputController({
       keyBindings: [81, 87],
-      getSpell: slot => slot === 0 ? first.spell : secondSpell,
+      getSpell: slot => (slot === 0 ? first.spell : secondSpell),
       createContext: () => context,
     });
 

@@ -146,10 +146,7 @@ export function drawDariusAxe(length: number, style: AxeStyle = {}): void {
 
 /** Moves a head point toward the centroid, so inner curves stay parallel-ish. */
 function lerpToCentre(p: readonly [number, number] | readonly number[], inset: number) {
-  return [
-    p[0] + (HEAD_CENTRE[0] - p[0]) * inset,
-    p[1] + (HEAD_CENTRE[1] - p[1]) * inset,
-  ] as const;
+  return [p[0] + (HEAD_CENTRE[0] - p[0]) * inset, p[1] + (HEAD_CENTRE[1] - p[1]) * inset] as const;
 }
 
 function point2(p: readonly number[], L: number, inset: number): void {

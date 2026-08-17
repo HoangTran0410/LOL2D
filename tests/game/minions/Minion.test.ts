@@ -17,12 +17,7 @@ import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane, getLaneWaypoints, type LaneWaypoint } from '../../../src/game/lanes';
 import minionSource from '../../../src/game/gameObject/attackableUnits/Minion.ts?raw';
-import {
-  createGame,
-  indexObjects,
-  stubGameGlobals,
-  type TestGame,
-} from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 const STRAIGHT: LaneWaypoint[] = [
   { x: 0, y: 0 },
@@ -151,8 +146,14 @@ describe('Minion', () => {
       const monster = new Monster({
         game,
         preset: {
-          name: 'Camp', avatar: 'monster_Baron_Nashor', camp: { x: 30, y: 0, r: 100 },
-          speed: 0, size: 60, attackRange: 50, reviveTime: 100, health: 300,
+          name: 'Camp',
+          avatar: 'monster_Baron_Nashor',
+          camp: { x: 30, y: 0, r: 100 },
+          speed: 0,
+          size: 60,
+          attackRange: 50,
+          reviveTime: 100,
+          health: 300,
         },
       });
       indexObjects(game, [minion, monster]);
@@ -262,7 +263,11 @@ describe('Minion', () => {
 
     it('never re-aims backwards down the lane', () => {
       const minion = makeMinion();
-      const champion = new Champion({ game, teamId: 'other', position: createVector(9_000, 9_000) });
+      const champion = new Champion({
+        game,
+        teamId: 'other',
+        position: createVector(9_000, 9_000),
+      });
       indexObjects(game, [minion, champion]);
 
       minion.waypointIndex = 2;

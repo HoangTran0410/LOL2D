@@ -109,7 +109,17 @@ export default class Champion extends AttackableUnit {
   /** Standing attack order, swing timer and delivery. Never scans on its own. */
   basicAttack: BasicAttackController = new BasicAttackController(this);
 
-  constructor({ game, position, collisionRadius, visionRadius, teamId, id, stats, avatar, preset }: ChampionOptions) {
+  constructor({
+    game,
+    position,
+    collisionRadius,
+    visionRadius,
+    teamId,
+    id,
+    stats,
+    avatar,
+    preset,
+  }: ChampionOptions) {
     super({
       game,
       position,
@@ -287,12 +297,7 @@ export default class Champion extends AttackableUnit {
       push();
       noStroke();
       fill(2, 15, 21, alpha);
-      rect(
-        x - k,
-        y - k,
-        barWidth + 2 * k,
-        healthHeight + (hasMana ? manaHeight + 3 * k : 2 * k)
-      );
+      rect(x - k, y - k, barWidth + 2 * k, healthHeight + (hasMana ? manaHeight + 3 * k : 2 * k));
       fill(
         this.isDead
           ? [153, 153, 153, alpha]
@@ -362,8 +367,8 @@ export default class Champion extends AttackableUnit {
       this.isDead
         ? [153, 153, 153, alpha]
         : this.isAllied
-        ? [67, 196, 29, alpha]
-        : [196, 67, 29, alpha]
+          ? [67, 196, 29, alpha]
+          : [196, 67, 29, alpha]
     );
     const healthRowH = barHeight - manaHeight - 1 * k;
     rect(topleft.x + barHeight, topleft.y, healthW, healthRowH);

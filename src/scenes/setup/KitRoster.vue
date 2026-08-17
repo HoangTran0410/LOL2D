@@ -113,8 +113,12 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       <h4 class="saved-kit-heading">Bộ đã lưu</h4>
       <div class="saved-kit-list">
         <div v-for="kit in savedKits" :key="kit.id" class="saved-kit" :data-kit="kit.name">
-          <button type="button" class="saved-kit-apply" :title="`Dùng bộ ${kit.name}`"
-            @click="emit('applySavedKit', kit)">
+          <button
+            type="button"
+            class="saved-kit-apply"
+            :title="`Dùng bộ ${kit.name}`"
+            @click="emit('applySavedKit', kit)"
+          >
             <span class="saved-kit-name">{{ kit.name }}</span>
             <span class="kit-apply-chip">Dùng</span>
           </button>
@@ -122,34 +126,65 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
                `.practice-remove-bot`: a saved kit is a shortcut, not the
                loadout itself, and re-saving one is the same two taps that
                made it. -->
-          <button type="button" class="saved-kit-delete" :title="`Xoá bộ ${kit.name}`"
-            :aria-label="`Xoá bộ ${kit.name}`" @click="emit('deleteSavedKit', kit)">
+          <button
+            type="button"
+            class="saved-kit-delete"
+            :title="`Xoá bộ ${kit.name}`"
+            :aria-label="`Xoá bộ ${kit.name}`"
+            @click="emit('deleteSavedKit', kit)"
+          >
             <i class="fas fa-times"></i>
           </button>
         </div>
       </div>
     </section>
 
-    <button type="button" class="catalog-random-card" :class="{ selected: selectedChampion === 'random' }"
-      @click="emit('pickRandom')">
+    <button
+      type="button"
+      class="catalog-random-card"
+      :class="{ selected: selectedChampion === 'random' }"
+      @click="emit('pickRandom')"
+    >
       <i class="fas fa-random"></i> Ngẫu Nhiên — tướng và bộ chiêu bốc thăm khi vào trận
     </button>
 
-    <section v-for="shelf in shelves" :key="shelf.name" class="kit-shelf" :class="{ selected: isSelectedShelf(shelf) }"
-      :data-champion="shelf.name">
+    <section
+      v-for="shelf in shelves"
+      :key="shelf.name"
+      class="kit-shelf"
+      :class="{ selected: isSelectedShelf(shelf) }"
+      :data-champion="shelf.name"
+    >
       <!-- The shelf header doubles as the whole-kit button wherever there is
            a kit to apply; the basic-attack and summoner shelves render the
            same row as an inert heading. -->
-      <button v-if="shelf.kit.length" type="button" class="kit-shelf-heading kit-shelf-apply"
-        :title="`Dùng cả bộ chiêu ${shelf.name}`" @click="emit('applyKit', shelf)">
-        <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name" loading="lazy" decoding="async" />
+      <button
+        v-if="shelf.kit.length"
+        type="button"
+        class="kit-shelf-heading kit-shelf-apply"
+        :title="`Dùng cả bộ chiêu ${shelf.name}`"
+        @click="emit('applyKit', shelf)"
+      >
+        <img
+          v-if="shelf.avatar"
+          class="catalog-group-avatar"
+          :src="AssetManager.get(shelf.avatar).url"
+          :alt="shelf.name"
+          loading="lazy"
+          decoding="async"
+        />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
         <span class="kit-apply-chip">Chọn</span>
       </button>
       <div v-else class="kit-shelf-heading">
-        <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name" loading="lazy" decoding="async" />
+        <img
+          v-if="shelf.avatar"
+          class="catalog-group-avatar"
+          :src="AssetManager.get(shelf.avatar).url"
+          :alt="shelf.name"
+          loading="lazy"
+          decoding="async"
+        />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
       </div>
 
@@ -159,11 +194,22 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
              menu unless something says otherwise. That menu both hides the
              description the hold just opened and cancels the touch that would
              have finished the gesture. The hold belongs to the app. -->
-        <button v-for="item in shelf.entries" :key="item.entry.id" type="button" class="catalog-spell-card"
-          :class="{ selected: activeEntryId === item.entry.id }" :data-spell="item.entry.id" @click="pick(item.entry)"
-          @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)" @mouseleave="!isTouchUi && hoverEnd()"
-          @touchstart="touchStart(detailOf(item.entry), $event)" @touchmove="touchMove($event)" @touchend="touchEnd()"
-          @touchcancel="closePeek()" @contextmenu.prevent>
+        <button
+          v-for="item in shelf.entries"
+          :key="item.entry.id"
+          type="button"
+          class="catalog-spell-card"
+          :class="{ selected: activeEntryId === item.entry.id }"
+          :data-spell="item.entry.id"
+          @click="pick(item.entry)"
+          @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)"
+          @mouseleave="!isTouchUi && hoverEnd()"
+          @touchstart="touchStart(detailOf(item.entry), $event)"
+          @touchmove="touchMove($event)"
+          @touchend="touchEnd()"
+          @touchcancel="closePeek()"
+          @contextmenu.prevent
+        >
           <!-- The icon is the whole card. No name under it: at four abilities
                to a shelf the champion's name above them already says what
                they are, and the spell's own name is a hover or a hold away

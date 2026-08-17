@@ -27,8 +27,7 @@ export default class Veigar_W extends Spell {
   targetingMode = 'POINT' as const;
   image = AssetManager.get('spell_veigar_w');
   name = 'Thiên Thạch Đen (Veigar_W)';
-  description =
-    `Gọi một khối vật chất hắc ám giáng xuống vị trí chỉ định. Vùng đất bị ảnh hưởng hiện rõ trong <span class="time">${WINDUP_MS / 1000} giây</span> trước khi nổ, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch còn đứng trong vùng.`;
+  description = `Gọi một khối vật chất hắc ám giáng xuống vị trí chỉ định. Vùng đất bị ảnh hưởng hiện rõ trong <span class="time">${WINDUP_MS / 1000} giây</span> trước khi nổ, gây <span class="damage">${DAMAGE} sát thương</span> cho kẻ địch còn đứng trong vùng.`;
   // kept as a literal (not an exported constant) so the repo-wide arcade
   // cooldown-cap scan in tests/game/spells/cooldowns.test.ts can see it
   coolDown = 6_000;
@@ -40,7 +39,11 @@ export default class Veigar_W extends Spell {
   damage = DAMAGE;
 
   onSpellCast() {
-    const { to } = VectorUtils.getVectorWithMaxRange(this.owner.position, this.aimPoint, this.range);
+    const { to } = VectorUtils.getVectorWithMaxRange(
+      this.owner.position,
+      this.aimPoint,
+      this.range
+    );
 
     const obj = new Veigar_W_Object(this.owner);
     obj.position = to;

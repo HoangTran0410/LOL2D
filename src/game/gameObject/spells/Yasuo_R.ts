@@ -62,8 +62,8 @@ export default class Yasuo_R extends Spell {
         PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
         PredefinedFilters.visibleTo(this.owner),
         (p: any) =>
-          p.buffs.filter((buff: any) => buff.sourceUnit != p && buff instanceof Airborne)
-            ?.length > 0,
+          p.buffs.filter((buff: any) => buff.sourceUnit != p && buff instanceof Airborne)?.length >
+          0,
       ],
     });
 
@@ -182,11 +182,7 @@ function drawSuspension(unit: any) {
   for (let i = 0; i < 4; i++) {
     const p = (frameCount / 40 + i / 4) % 1;
     fill(230, 250, 255, 200 * (1 - p));
-    circle(
-      x + sin(spin + i * 2) * size * 0.45,
-      y + size * 0.6 - p * size * 1.7,
-      4 * (1 - p) + 1.5
-    );
+    circle(x + sin(spin + i * 2) * size * 0.45, y + size * 0.6 - p * size * 1.7, 4 * (1 - p) + 1.5);
   }
 
   blendMode(BLEND);
@@ -290,7 +286,8 @@ export class Yasuo_R_Object extends SpellObject {
     // to the centre, so the gathering has a direction
     for (let i = 0; i < R_VORTEX_STREAKS; i++) {
       const a = this.seed + (TWO_PI * i) / R_VORTEX_STREAKS + this.gatherAge / 300;
-      const outer = this.radius * (1.15 - 0.35 * ((this.gatherAge / 420 + i / R_VORTEX_STREAKS) % 1));
+      const outer =
+        this.radius * (1.15 - 0.35 * ((this.gatherAge / 420 + i / R_VORTEX_STREAKS) % 1));
       const inner = outer * 0.55;
       stroke(185, 240, 255, 130 * (0.4 + 0.6 * t));
       strokeWeight(2);

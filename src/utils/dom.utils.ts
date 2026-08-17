@@ -27,9 +27,9 @@ const DomUtils = {
     const element = document.documentElement as any;
     return Boolean(
       element?.requestFullscreen ||
-        element?.webkitRequestFullscreen ||
-        element?.mozRequestFullScreen ||
-        element?.msRequestFullscreen
+      element?.webkitRequestFullscreen ||
+      element?.mozRequestFullScreen ||
+      element?.msRequestFullscreen
     );
   },
 

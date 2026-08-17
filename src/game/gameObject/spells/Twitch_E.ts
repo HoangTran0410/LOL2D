@@ -49,9 +49,7 @@ export default class Twitch_E extends Spell {
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     });
     return enemies.filter((enemy: any) =>
-      enemy.buffs.some(
-        (buff: DamageOverTime) => buff.stackId === 'twitch_poison' && !buff.toRemove
-      )
+      enemy.buffs.some((buff: DamageOverTime) => buff.stackId === 'twitch_poison' && !buff.toRemove)
     );
   }
 

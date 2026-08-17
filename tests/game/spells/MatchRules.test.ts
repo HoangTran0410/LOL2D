@@ -28,31 +28,57 @@ import type { CastContext } from '../../../src/game/spell/runtime/types';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy(): TestVector { return new TestVector(this.x, this.y); }
-  set(x: number, y: number): this { this.x = x; this.y = y; return this; }
-  add(value: TestVector): this { this.x += value.x; this.y += value.y; return this; }
-  mult(value: number): this { this.x *= value; this.y *= value; return this; }
-  mag(): number { return Math.hypot(this.x, this.y); }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy(): TestVector {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number): this {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  add(value: TestVector): this {
+    this.x += value.x;
+    this.y += value.y;
+    return this;
+  }
+  mult(value: number): this {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  mag(): number {
+    return Math.hypot(this.x, this.y);
+  }
   setMag(value: number): this {
     const length = this.mag();
     if (length > 0) this.mult(value / length);
     return this;
   }
-  dist(value: TestVector): number { return Math.hypot(this.x - value.x, this.y - value.y); }
-  static sub(a: TestVector, b: TestVector): TestVector { return new TestVector(a.x - b.x, a.y - b.y); }
-  static add(a: TestVector, b: TestVector): TestVector { return a.copy().add(b); }
+  dist(value: TestVector): number {
+    return Math.hypot(this.x - value.x, this.y - value.y);
+  }
+  static sub(a: TestVector, b: TestVector): TestVector {
+    return new TestVector(a.x - b.x, a.y - b.y);
+  }
+  static add(a: TestVector, b: TestVector): TestVector {
+    return a.copy().add(b);
+  }
 }
 
-const context = (caster: unknown): CastContext => Object.freeze({
-  spellId: 'match-rules-spell',
-  activationId: 'activation',
-  startedAtMs: 0,
-  caster,
-  origin: Object.freeze({ x: 0, y: 0 }),
-  cursorWorld: Object.freeze({ x: 100, y: 0 }),
-  direction: Object.freeze({ x: 1, y: 0 }),
-});
+const context = (caster: unknown): CastContext =>
+  Object.freeze({
+    spellId: 'match-rules-spell',
+    activationId: 'activation',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: 0, y: 0 }),
+    cursorWorld: Object.freeze({ x: 100, y: 0 }),
+    direction: Object.freeze({ x: 1, y: 0 }),
+  });
 
 const makeOwner = (matchRules?: MatchRules, mana = 500) => {
   const objects: unknown[] = [];

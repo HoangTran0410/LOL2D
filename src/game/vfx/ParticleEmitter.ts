@@ -5,13 +5,18 @@ export default class ParticleEmitter implements VfxHandle {
   protected elapsedMs = 0;
   protected disposed = false;
 
-  constructor(readonly position: Vec2, readonly durationMs = 300) {
+  constructor(
+    readonly position: Vec2,
+    readonly durationMs = 300
+  ) {
     if (!Number.isFinite(durationMs) || durationMs < 0) {
       throw new Error('durationMs must be finite and non-negative');
     }
   }
 
-  get complete(): boolean { return this.disposed || this.elapsedMs >= this.durationMs; }
+  get complete(): boolean {
+    return this.disposed || this.elapsedMs >= this.durationMs;
+  }
 
   update(deltaMs: number): void {
     this.elapsedMs = Math.min(this.durationMs, this.elapsedMs + Math.max(0, deltaMs));
@@ -27,5 +32,7 @@ export default class ParticleEmitter implements VfxHandle {
     pop();
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 }

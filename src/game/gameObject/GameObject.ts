@@ -31,7 +31,11 @@ export interface GameObjectRuntimeContext extends GameObjectGameContext {
   navigation?: NavigationSystem;
   worldMouse?: p5.Vector;
   randomSpawnPoint(): p5.Vector;
-  createSpellContext(spell: Spell, caster: AttackableUnit, cursorWorld: Vec2): CastContext | undefined;
+  createSpellContext(
+    spell: Spell,
+    caster: AttackableUnit,
+    cursorWorld: Vec2
+  ): CastContext | undefined;
 }
 
 export interface GameObjectOptions {

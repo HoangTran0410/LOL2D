@@ -21,13 +21,19 @@ export default class CastBar implements VfxHandle {
   constructor(
     readonly context: CastContext,
     private readonly getProgress: () => number,
-    private readonly render: (context: CastContext, progress: number, anchor: Position) => void = CastBar.renderDefault,
+    private readonly render: (
+      context: CastContext,
+      progress: number,
+      anchor: Position
+    ) => void = CastBar.renderDefault,
     private readonly getAnchor: () => Position = () => context.origin
   ) {}
 
   update(_deltaMs: number): void {}
 
-  get complete(): boolean { return this.getProgress() >= 1; }
+  get complete(): boolean {
+    return this.getProgress() >= 1;
+  }
 
   draw(): void {
     if (!this.disposed) {
@@ -35,7 +41,9 @@ export default class CastBar implements VfxHandle {
     }
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 
   private static renderDefault(_context: CastContext, progress: number, anchor: Position): void {
     const x = anchor.x - 30;

@@ -58,8 +58,7 @@ const validateSpec = (spec: CastSpec): void => {
     throw new Error('resource.tickEveryMs is only valid when commitAt is tick');
   }
 
-  const acceptsCharge =
-    spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD';
+  const acceptsCharge = spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD';
   if (acceptsCharge) {
     if (!spec.charge) throw new Error(`${spec.activation} activation requires charge`);
   } else if (spec.charge) {
@@ -235,7 +234,11 @@ export class SpellRuntime {
     if (this.spec.channel) {
       this._state = 'CHANNELING';
       this.nextChannelTickMs = this.spec.channel.tickEveryMs;
-    } else if (this.spec.active || this.spec.activation === 'RECAST' || this.spec.activation === 'TOGGLE') {
+    } else if (
+      this.spec.active ||
+      this.spec.activation === 'RECAST' ||
+      this.spec.activation === 'TOGGLE'
+    ) {
       this._state = 'ACTIVE';
       this.delegate.onActivate(this.context);
     } else {
@@ -264,8 +267,7 @@ export class SpellRuntime {
           ? this.nextChannelTickMs
           : Number.POSITIVE_INFINITY;
       const nextResourceTick =
-        this.spec.resource.commitAt === 'tick' &&
-        this.nextResourceTickMs <= this.resourceElapsedMs
+        this.spec.resource.commitAt === 'tick' && this.nextResourceTickMs <= this.resourceElapsedMs
           ? this.nextResourceTickMs
           : Number.POSITIVE_INFINITY;
 

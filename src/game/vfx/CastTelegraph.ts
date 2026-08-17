@@ -9,7 +9,11 @@ export default class CastTelegraph implements VfxHandle {
   constructor(
     readonly context: CastContext,
     readonly radius: number,
-    private readonly render: (context: CastContext, radius: number, center: Position) => void = CastTelegraph.renderDefault,
+    private readonly render: (
+      context: CastContext,
+      radius: number,
+      center: Position
+    ) => void = CastTelegraph.renderDefault,
     private readonly getCenter: () => Position = () => context.cursorWorld
   ) {}
 
@@ -19,7 +23,9 @@ export default class CastTelegraph implements VfxHandle {
     if (!this.disposed) this.render(this.context, this.radius, this.getCenter());
   }
 
-  dispose(): void { this.disposed = true; }
+  dispose(): void {
+    this.disposed = true;
+  }
 
   private static renderDefault(_context: CastContext, radius: number, center: Position): void {
     push();

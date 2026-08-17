@@ -3,24 +3,33 @@ import FogOfWar from '../../src/game/gameObject/map/FogOfWar';
 
 // Static wall polygons, far enough apart that "which wall is in range" is
 // unambiguous per test position.
-const wallA = { id: 'wall-a', vertices: [
-  { x: 40, y: -20 },
-  { x: 60, y: -20 },
-  { x: 60, y: 20 },
-  { x: 40, y: 20 },
-] };
-const wallB = { id: 'wall-b', vertices: [
-  { x: -60, y: -20 },
-  { x: -40, y: -20 },
-  { x: -40, y: 20 },
-  { x: -60, y: 20 },
-] };
-const bush = { id: 'bush-1', vertices: [
-  { x: -10, y: -10 },
-  { x: 10, y: -10 },
-  { x: 10, y: 10 },
-  { x: -10, y: 10 },
-] };
+const wallA = {
+  id: 'wall-a',
+  vertices: [
+    { x: 40, y: -20 },
+    { x: 60, y: -20 },
+    { x: 60, y: 20 },
+    { x: 40, y: 20 },
+  ],
+};
+const wallB = {
+  id: 'wall-b',
+  vertices: [
+    { x: -60, y: -20 },
+    { x: -40, y: -20 },
+    { x: -40, y: 20 },
+    { x: -60, y: 20 },
+  ],
+};
+const bush = {
+  id: 'bush-1',
+  vertices: [
+    { x: -10, y: -10 },
+    { x: 10, y: -10 },
+    { x: 10, y: 10 },
+    { x: -10, y: 10 },
+  ],
+};
 
 function makeGame(getObstacles: (...args: unknown[]) => unknown) {
   return {

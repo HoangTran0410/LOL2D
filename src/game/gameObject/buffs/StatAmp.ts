@@ -17,11 +17,7 @@ export type StatName = {
  * `((baseValue + baseBonus) * (1 + percentBaseBonus) + flatBonus) * (1 + percentBonus)`
  */
 export type BonusKind =
-  | 'baseValue'
-  | 'baseBonus'
-  | 'flatBonus'
-  | 'percentBonus'
-  | 'percentBaseBonus';
+  'baseValue' | 'baseBonus' | 'flatBonus' | 'percentBonus' | 'percentBaseBonus';
 
 /**
  * Changes selected stats for as long as it lasts, then puts them back. `Slow` and

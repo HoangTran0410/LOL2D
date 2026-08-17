@@ -2,12 +2,7 @@ import { hasFlag } from '../../utils/index';
 import ActionState from '../enums/ActionState';
 import EventType from '../enums/EventType';
 import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import {
-  BasicAttackBolt,
-  BasicAttackSwing,
-  MELEE_RANGE_THRESHOLD,
-  canBeHit,
-} from './BasicAttack';
+import { BasicAttackBolt, BasicAttackSwing, MELEE_RANGE_THRESHOLD, canBeHit } from './BasicAttack';
 
 /**
  * Why an attack order stopped. Surfaced so callers (the AI, later an order

@@ -99,7 +99,18 @@ export class Zed_Q_Object extends MissileSpellObject {
     (fill as any)(...(this.color as [number, number, number]), alpha);
 
     const shape: [number, number][] = [
-      [0, -25], [0, 0], [25, -25], [25, 0], [0, 0], [26, 25], [0, 25], [0, 0], [-25, 25], [-25, 0], [0, 0], [-25, -25],
+      [0, -25],
+      [0, 0],
+      [25, -25],
+      [25, 0],
+      [0, 0],
+      [26, 25],
+      [0, 25],
+      [0, 0],
+      [-25, 25],
+      [-25, 0],
+      [0, 0],
+      [-25, -25],
     ];
     beginShape();
     shape.forEach(([x, y]) => vertex(x, y));

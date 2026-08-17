@@ -56,7 +56,9 @@ export default class Garen_Q extends Spell {
   }
 
   get isArmed(): boolean {
-    return this.owner?.buffs?.some((buff: Buff) => buff.stackId === STACK_ID && !buff.toRemove) ?? false;
+    return (
+      this.owner?.buffs?.some((buff: Buff) => buff.stackId === STACK_ID && !buff.toRemove) ?? false
+    );
   }
 
   onRemoved(): void {

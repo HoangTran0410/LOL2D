@@ -15,7 +15,10 @@ import {
   type InterruptibleOwner,
   type SpellFormName,
 } from '../../../src/game/spell/runtime/CancelPolicy';
-import { SpellRuntime, type SpellRuntimeDelegate } from '../../../src/game/spell/runtime/SpellRuntime';
+import {
+  SpellRuntime,
+  type SpellRuntimeDelegate,
+} from '../../../src/game/spell/runtime/SpellRuntime';
 import type { BuffConstructor } from '../../../src/game/gameObject/Buff';
 import type {
   CancelReason,

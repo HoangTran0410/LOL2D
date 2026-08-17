@@ -18,9 +18,13 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Singed_R, { BONUS_HEALTH as SINGED_BONUS } from '../../../src/game/gameObject/spells/Singed_R';
+import Singed_R, {
+  BONUS_HEALTH as SINGED_BONUS,
+} from '../../../src/game/gameObject/spells/Singed_R';
 import Nasus_R, { BONUS_HEALTH as NASUS_BONUS } from '../../../src/game/gameObject/spells/Nasus_R';
-import Renekton_R, { BONUS_HEALTH as RENEKTON_BONUS } from '../../../src/game/gameObject/spells/Renekton_R';
+import Renekton_R, {
+  BONUS_HEALTH as RENEKTON_BONUS,
+} from '../../../src/game/gameObject/spells/Renekton_R';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,

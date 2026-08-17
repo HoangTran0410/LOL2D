@@ -146,9 +146,12 @@ export class Fizz_R_Shark extends SpellObject {
       const d = this.radius * (1 - t * 0.85);
       fill(60, 130, 200, 240);
       triangle(
-        cos(a) * d, sin(a) * d,
-        cos(a) * d - 12, sin(a) * d + 14,
-        cos(a) * d + 12, sin(a) * d + 14
+        cos(a) * d,
+        sin(a) * d,
+        cos(a) * d - 12,
+        sin(a) * d + 14,
+        cos(a) * d + 12,
+        sin(a) * d + 14
       );
       pop();
       return;

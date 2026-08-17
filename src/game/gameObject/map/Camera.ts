@@ -162,14 +162,22 @@ export default class Camera {
    * `target` instead of creating a new p5.Vector. Use in hot paths (e.g. a
    * per-vertex loop) where only the numbers are needed.
    */
-  screenToWorldInto(x: number, y: number, target: { x: number; y: number }): { x: number; y: number } {
+  screenToWorldInto(
+    x: number,
+    y: number,
+    target: { x: number; y: number }
+  ): { x: number; y: number } {
     target.x = (x - width / 2) / this.currentScale + this.position.x;
     target.y = (y - height / 2) / this.currentScale + this.position.y;
     return target;
   }
 
   /** Non-allocating variant of worldToScreen — see screenToWorldInto. */
-  worldToScreenInto(x: number, y: number, target: { x: number; y: number }): { x: number; y: number } {
+  worldToScreenInto(
+    x: number,
+    y: number,
+    target: { x: number; y: number }
+  ): { x: number; y: number } {
     target.x = (x - this.position.x) * this.currentScale + width / 2;
     target.y = (y - this.position.y) * this.currentScale + height / 2;
     return target;

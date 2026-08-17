@@ -47,7 +47,11 @@ export default class Shaco_W extends Spell {
       preset: {
         name: 'Hộp Hề Ma Quái',
         spells: [],
-        attack: { damage: ATTACK_DAMAGE, attacksPerSecond: ATTACKS_PER_SECOND, range: ATTACK_RANGE },
+        attack: {
+          damage: ATTACK_DAMAGE,
+          attacksPerSecond: ATTACKS_PER_SECOND,
+          range: ATTACK_RANGE,
+        },
       },
     });
     box.slideTo = to;

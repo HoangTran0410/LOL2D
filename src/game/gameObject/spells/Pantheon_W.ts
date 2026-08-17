@@ -341,8 +341,16 @@ export class Pantheon_W_Impact extends SpellObject {
       translate(cos(shard.angle) * d, sin(shard.angle) * d * 0.8 - lift);
       rotate(shard.angle + shard.spin * t);
       fill(198, 148, 74, 235 * fade);
-      quad(-shard.size * 0.5, -shard.size * 0.3, shard.size * 0.5, -shard.size * 0.2,
-           shard.size * 0.4, shard.size * 0.35, -shard.size * 0.4, shard.size * 0.3);
+      quad(
+        -shard.size * 0.5,
+        -shard.size * 0.3,
+        shard.size * 0.5,
+        -shard.size * 0.2,
+        shard.size * 0.4,
+        shard.size * 0.35,
+        -shard.size * 0.4,
+        shard.size * 0.3
+      );
       pop();
     }
 
@@ -355,9 +363,12 @@ export class Pantheon_W_Impact extends SpellObject {
       noStroke();
       fill(255, 208, 130, 200 * flash);
       triangle(
-        -this.radius * (2.6 * flash + 0.4), -this.radius * 0.32 * flash,
-        -this.radius * (2.6 * flash + 0.4), this.radius * 0.32 * flash,
-        this.radius * 0.15, 0
+        -this.radius * (2.6 * flash + 0.4),
+        -this.radius * 0.32 * flash,
+        -this.radius * (2.6 * flash + 0.4),
+        this.radius * 0.32 * flash,
+        this.radius * 0.15,
+        0
       );
       fill(255, 250, 226, 235 * flash);
       circle(0, 0, this.radius * 0.9 * flash + 16);

@@ -138,7 +138,9 @@ describe('MinionSpawner', () => {
       spawner.update();
 
       expect(spawner.liveCount).toBe(MINION_LIVE_CAP - 1);
-      expect(spawner.spawn({ teamId: TeamId.RED, lane: LANES[1], kind: 'ranged' })).toBeInstanceOf(Minion);
+      expect(spawner.spawn({ teamId: TeamId.RED, lane: LANES[1], kind: 'ranged' })).toBeInstanceOf(
+        Minion
+      );
     });
 
     it('leaves the cap high enough for two waves per lane to be in flight', () => {

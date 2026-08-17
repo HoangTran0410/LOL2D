@@ -1,11 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import BeamSpellObject, { type BeamGeometry } from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
+import BeamSpellObject, {
+  type BeamGeometry,
+} from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import BeamRenderer from '../../../src/game/vfx/BeamRenderer';
 import { createGame, createUnit, installSpellObjectGlobals } from './fixtures';
 
 describe('BeamSpellObject', () => {
   beforeEach(installSpellObjectGlobals);
-  afterEach(() => { vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   it('uses one capsule geometry for beam hit tests and rendering data', () => {
     const game = createGame();
@@ -35,15 +39,19 @@ describe('BeamSpellObject', () => {
     const owner = createUnit(game);
     const target = createUnit(game, 50, 'red');
     const onHit = vi.fn();
-    const beam = new BeamSpellObject(owner, {
-      start: { x: 0, y: 0 },
-      end: { x: 100, y: 0 },
-      width: 20,
-    }, {
-      candidates: () => [target, target],
-      onHit,
-      instant: true,
-    });
+    const beam = new BeamSpellObject(
+      owner,
+      {
+        start: { x: 0, y: 0 },
+        end: { x: 100, y: 0 },
+        width: 20,
+      },
+      {
+        candidates: () => [target, target],
+        onHit,
+        instant: true,
+      }
+    );
 
     beam.update();
     beam.update();
@@ -58,16 +66,20 @@ describe('BeamSpellObject', () => {
     const owner = createUnit(game);
     const target = createUnit(game, 50, 'red');
     const onHit = vi.fn();
-    const beam = new BeamSpellObject(owner, {
-      start: { x: 0, y: 0 },
-      end: { x: 100, y: 0 },
-      width: 20,
-    }, {
-      candidates: () => [target],
-      onHit,
-      instant: false,
-      durationMs: 100,
-    });
+    const beam = new BeamSpellObject(
+      owner,
+      {
+        start: { x: 0, y: 0 },
+        end: { x: 100, y: 0 },
+        width: 20,
+      },
+      {
+        candidates: () => [target],
+        onHit,
+        instant: false,
+        durationMs: 100,
+      }
+    );
 
     beam.update(99);
     expect(beam.toRemove).toBe(false);
@@ -81,13 +93,20 @@ describe('BeamSpellObject', () => {
 
   it.each([0, Number.NaN, Number.POSITIVE_INFINITY])(
     'rejects invalid duration beam lifetime %s',
-    (durationMs) => {
+    durationMs => {
       const game = createGame();
-      expect(() => new BeamSpellObject(createUnit(game), {
-        start: { x: 0, y: 0 },
-        end: { x: 100, y: 0 },
-        width: 20,
-      }, { instant: false, durationMs })).toThrow('durationMs must be finite and greater than 0');
+      expect(
+        () =>
+          new BeamSpellObject(
+            createUnit(game),
+            {
+              start: { x: 0, y: 0 },
+              end: { x: 100, y: 0 },
+              width: 20,
+            },
+            { instant: false, durationMs }
+          )
+      ).toThrow('durationMs must be finite and greater than 0');
     }
   );
 });

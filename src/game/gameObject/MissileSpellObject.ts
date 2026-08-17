@@ -98,17 +98,19 @@ export default class MissileSpellObject extends SpellObject {
   }
 
   queryEnemies(): AttackableUnit[] {
-    return this.owner.game.objectManager.queryObjects?.({
-      area: new Circle({
-        x: this.position.x,
-        y: this.position.y,
-        r: this.size / 2,
-      }),
-      filters: [
-        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
-        PredefinedFilters.excludeObjects(this.hitTargets),
-      ],
-    }) ?? [];
+    return (
+      this.owner.game.objectManager.queryObjects?.({
+        area: new Circle({
+          x: this.position.x,
+          y: this.position.y,
+          r: this.size / 2,
+        }),
+        filters: [
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+          PredefinedFilters.excludeObjects(this.hitTargets),
+        ],
+      }) ?? []
+    );
   }
 
   getDisplayBoundingBox() {
@@ -153,7 +155,9 @@ export default class MissileSpellObject extends SpellObject {
     return position.dist(this.destination) < this.speed;
   }
   /** Homing missiles stop after arrival; ordinary missiles finish their terminal hooks. */
-  protected shouldStopAfterArrival(): boolean { return false; }
+  protected shouldStopAfterArrival(): boolean {
+    return false;
+  }
   onArrive(): void {}
   onHit(_enemy: AttackableUnit): void {}
   getTrailPosition(): p5.Vector {

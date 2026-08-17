@@ -69,10 +69,7 @@ export default class DamageOverTime extends Buff {
     const radius = this.targetUnit.animatedValues.displaySize / 2;
 
     this._timeSinceLastSpawn += deltaTime;
-    while (
-      this._timeSinceLastSpawn >= FLAME_SPAWN_INTERVAL &&
-      this._flames.length < MAX_FLAMES
-    ) {
+    while (this._timeSinceLastSpawn >= FLAME_SPAWN_INTERVAL && this._flames.length < MAX_FLAMES) {
       this._timeSinceLastSpawn -= FLAME_SPAWN_INTERVAL;
       this._flames.push({
         // wide at the feet; draw() pulls them toward the centre as they climb
@@ -119,9 +116,7 @@ export default class DamageOverTime extends Buff {
 
       // converge toward the centre while rising => tapered flame, not a cloud
       const x =
-        pos.x +
-        flame.baseX * (1 - t * 0.8) +
-        sin(flame.wobblePhase + t * 7) * flame.wobbleAmp * t;
+        pos.x + flame.baseX * (1 - t * 0.8) + sin(flame.wobblePhase + t * 7) * flame.wobbleAmp * t;
       const y = pos.y + flame.baseY - risen;
       const size = flame.size * (1 - t * 0.75);
       // kept low because additive blending stacks these into a solid glow
@@ -144,11 +139,7 @@ export default class DamageOverTime extends Buff {
 
       const risen = (flame.riseSpeed * flame.age) / FRAME_MS;
       fill(255, 250, 225, 70 * (1 - t / 0.22));
-      circle(
-        pos.x + flame.baseX * (1 - t * 0.8),
-        pos.y + flame.baseY - risen,
-        flame.size * 0.3
-      );
+      circle(pos.x + flame.baseX * (1 - t * 0.8), pos.y + flame.baseY - risen, flame.size * 0.3);
     }
 
     blendMode(BLEND);

@@ -43,10 +43,11 @@ describe('Game pause lifecycle', () => {
 });
 
 describe('GameScene paused runtime', () => {
-  const runtime = (scene: GameScene) => scene as unknown as {
-    _animationFrameId: number | null;
-    _handleGamePause?: (paused: boolean) => void;
-  };
+  const runtime = (scene: GameScene) =>
+    scene as unknown as {
+      _animationFrameId: number | null;
+      _handleGamePause?: (paused: boolean) => void;
+    };
 
   it('stops both game loops while the modal owns pause', () => {
     const clearTimeout = vi.fn();
@@ -123,9 +124,11 @@ describe('paused HUD polling', () => {
       _rafId: 7,
       _startUpdateLoop: startUpdateLoop,
     };
-    const setUpdatesPaused = (InGameHUD.prototype as unknown as {
-      setUpdatesPaused?: (paused: boolean) => void;
-    }).setUpdatesPaused;
+    const setUpdatesPaused = (
+      InGameHUD.prototype as unknown as {
+        setUpdatesPaused?: (paused: boolean) => void;
+      }
+    ).setUpdatesPaused;
 
     expect(setUpdatesPaused).toBeTypeOf('function');
     setUpdatesPaused?.call(hud, true);
@@ -142,9 +145,11 @@ describe('paused HUD polling', () => {
 
   it('syncs the touch layout directly while polling is paused', () => {
     const hud = { view: { hud: { touchUi: true } } };
-    const setTouchUi = (InGameHUD.prototype as unknown as {
-      setTouchUi?: (enabled: boolean) => void;
-    }).setTouchUi;
+    const setTouchUi = (
+      InGameHUD.prototype as unknown as {
+        setTouchUi?: (enabled: boolean) => void;
+      }
+    ).setTouchUi;
 
     expect(setTouchUi).toBeTypeOf('function');
     setTouchUi?.call(hud, false);

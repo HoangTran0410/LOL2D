@@ -333,7 +333,14 @@ export class Annie_Q_Burst extends SpellObject {
       fill(232, 84, 24, 230 * fade);
       triangle(s.len * fade, 0, -s.len * 0.3, -s.width * fade, -s.len * 0.3, s.width * fade);
       fill(255, 206, 110, 235 * fade);
-      triangle(s.len * fade * 0.7, 0, -s.len * 0.2, -s.width * fade * 0.5, -s.len * 0.2, s.width * fade * 0.5);
+      triangle(
+        s.len * fade * 0.7,
+        0,
+        -s.len * 0.2,
+        -s.width * fade * 0.5,
+        -s.len * 0.2,
+        s.width * fade * 0.5
+      );
       pop();
     }
 

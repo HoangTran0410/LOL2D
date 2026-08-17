@@ -39,11 +39,7 @@ export default class Ahri_E extends Spell {
     const range = 350;
     const charmTime = 1500;
 
-    const { from, to } = VectorUtils.getVectorWithRange(
-      this.owner.position,
-      this.aimPoint,
-      range
-    );
+    const { from, to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, range);
 
     const obj = new Ahri_E_Object(this.owner);
     obj.position = from;
@@ -96,7 +92,13 @@ export class Ahri_E_Object extends MissileSpellObject {
     const beat =
       1 + Math.max(0, sin(phase * TWO_PI)) * 0.16 + Math.max(0, sin(phase * TWO_PI * 2 - 1)) * 0.07;
     // the kiss thins out as it runs out of breath at the edge of its range
-    const alpha = map(constrain(this.position.dist(this.destination), 0, this.range), 0, this.range, 90, 255);
+    const alpha = map(
+      constrain(this.position.dist(this.destination), 0, this.range),
+      0,
+      this.range,
+      90,
+      255
+    );
     const s = this.size * born * beat;
     const heading = Math.atan2(
       this.destination.y - this.position.y,

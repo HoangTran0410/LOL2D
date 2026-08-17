@@ -119,9 +119,7 @@ export interface OwnerMovementSnapshot {
 
 export const snapshotOwnerMovement = (owner: InterruptibleOwner): OwnerMovementSnapshot => ({
   position: { x: owner.position.x, y: owner.position.y },
-  ...(owner.destination
-    ? { destination: { x: owner.destination.x, y: owner.destination.y } }
-    : {}),
+  ...(owner.destination ? { destination: { x: owner.destination.x, y: owner.destination.y } } : {}),
   movementRevision: owner.movementRevision,
   displacementRevision: owner.displacementRevision,
 });
@@ -182,8 +180,7 @@ export const ownerInterruptReason = (
     !!destination &&
     !!currentDestination &&
     (currentDestination.x !== destination.x || currentDestination.y !== destination.y);
-  const positionChanged =
-    currentPosition.x !== position.x || currentPosition.y !== position.y;
+  const positionChanged = currentPosition.x !== position.x || currentPosition.y !== position.y;
 
   let reason: CancelReason | null = null;
   if (

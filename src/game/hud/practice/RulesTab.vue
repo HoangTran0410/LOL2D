@@ -269,11 +269,7 @@ const resetDefaults = (): void => {
     <div class="practice-render-settings">
       <label class="pregame-field">
         <span>Chất lượng hình ảnh</span>
-        <select
-          id="practice-render-quality"
-          :value="renderQuality"
-          @change="onRenderQualityChange"
-        >
+        <select id="practice-render-quality" :value="renderQuality" @change="onRenderQualityChange">
           <option value="auto">Tự động</option>
           <option value="low">Thấp — mượt hơn</option>
           <option value="high">Cao — đẹp hơn</option>
@@ -308,8 +304,7 @@ const resetDefaults = (): void => {
 
     <label class="pregame-field">
       <span
-        >Thu phóng:
-        <strong id="practice-zoom-value">{{ Math.round(zoom * 100) }}%</strong></span
+        >Thu phóng: <strong id="practice-zoom-value">{{ Math.round(zoom * 100) }}%</strong></span
       >
       <input
         type="range"

@@ -245,7 +245,8 @@ export default class Minion extends AttackableUnit {
   distanceToLane(): number {
     const path = this.waypoints;
     if (path.length === 0) return 0;
-    if (path.length === 1) return Math.hypot(this.position.x - path[0].x, this.position.y - path[0].y);
+    if (path.length === 1)
+      return Math.hypot(this.position.x - path[0].x, this.position.y - path[0].y);
 
     const { x, y } = this.position;
     let best = Infinity;
@@ -255,7 +256,8 @@ export default class Minion extends AttackableUnit {
       const dx = path[i + 1].x - ax;
       const dy = path[i + 1].y - ay;
       const lengthSq = dx * dx + dy * dy;
-      const t = lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / lengthSq));
+      const t =
+        lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / lengthSq));
       const d = Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
       if (d < best) best = d;
     }
@@ -553,7 +555,6 @@ export default class Minion extends AttackableUnit {
     // no vision, so its box is just its body
     return this.squareDisplayBoundingBox(this.stats.size.value * 1.4);
   }
-
 }
 
 /**
@@ -590,13 +591,7 @@ export class MinionBolt extends MissileSpellObject {
 
   onArrive() {
     const target = this.target;
-    if (
-      target &&
-      !target.isDead &&
-      !target.toRemove &&
-      target.targetable &&
-      !this.owner.isDead
-    ) {
+    if (target && !target.isDead && !target.toRemove && target.targetable && !this.owner.isDead) {
       target.takeDamage(this.damage, this.owner);
     }
   }
@@ -646,13 +641,7 @@ export class MinionSwing extends SpellObject {
 
   strike(): void {
     const target = this.target;
-    if (
-      !target ||
-      target.isDead ||
-      target.toRemove ||
-      !target.targetable ||
-      this.owner.isDead
-    ) {
+    if (!target || target.isDead || target.toRemove || !target.targetable || this.owner.isDead) {
       return;
     }
     // the target (or this minion) may have drifted during the wind-up
@@ -703,11 +692,11 @@ export class MinionSwing extends SpellObject {
       fill(this.color[0], this.color[1], this.color[2], 200 * fade);
       beginShape();
       for (let i = 0; i <= 4; i++) {
-        const a = -half + (2 * half) * (i / 4);
+        const a = -half + 2 * half * (i / 4);
         vertex(cos(a) * outerR, sin(a) * outerR);
       }
       for (let i = 4; i >= 0; i--) {
-        const a = -half + (2 * half) * (i / 4);
+        const a = -half + 2 * half * (i / 4);
         vertex(cos(a) * innerR, sin(a) * innerR);
       }
       endShape(CLOSE);

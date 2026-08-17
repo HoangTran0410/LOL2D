@@ -15,37 +15,74 @@ import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 class TestVector {
-  constructor(public x = 0, public y = 0) {}
-  copy() { return new TestVector(this.x, this.y); }
-  set(x: number, y: number) { this.x = x; this.y = y; return this; }
+  constructor(
+    public x = 0,
+    public y = 0
+  ) {}
+  copy() {
+    return new TestVector(this.x, this.y);
+  }
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
   add(value: TestVector | number, y?: number) {
     this.x += typeof value === 'number' ? value : value.x;
     this.y += typeof value === 'number' ? (y ?? value) : value.y;
     return this;
   }
-  sub(value: TestVector) { this.x -= value.x; this.y -= value.y; return this; }
-  mult(value: number) { this.x *= value; this.y *= value; return this; }
-  mag() { return Math.hypot(this.x, this.y); }
-  magSq() { return this.x * this.x + this.y * this.y; }
+  sub(value: TestVector) {
+    this.x -= value.x;
+    this.y -= value.y;
+    return this;
+  }
+  mult(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+  mag() {
+    return Math.hypot(this.x, this.y);
+  }
+  magSq() {
+    return this.x * this.x + this.y * this.y;
+  }
   setMag(value: number) {
     const length = this.mag();
     if (length > 0) this.mult(value / length);
     return this;
   }
-  normalize() { return this.setMag(1); }
-  limit(value: number) { return this.mag() > value ? this.setMag(value) : this; }
-  dist(value: TestVector) { return Math.hypot(this.x - value.x, this.y - value.y); }
-  heading() { return Math.atan2(this.y, this.x); }
+  normalize() {
+    return this.setMag(1);
+  }
+  limit(value: number) {
+    return this.mag() > value ? this.setMag(value) : this;
+  }
+  dist(value: TestVector) {
+    return Math.hypot(this.x - value.x, this.y - value.y);
+  }
+  heading() {
+    return Math.atan2(this.y, this.x);
+  }
   rotate(angle: number) {
     const x = this.x * Math.cos(angle) - this.y * Math.sin(angle);
     this.y = this.x * Math.sin(angle) + this.y * Math.cos(angle);
     this.x = x;
     return this;
   }
-  static add(a: TestVector, b: TestVector) { return a.copy().add(b); }
-  static sub(a: TestVector, b: TestVector) { return a.copy().sub(b); }
-  static dist(a: TestVector, b: TestVector) { return a.dist(b); }
-  static fromAngle(angle: number) { return new TestVector(Math.cos(angle), Math.sin(angle)); }
+  static add(a: TestVector, b: TestVector) {
+    return a.copy().add(b);
+  }
+  static sub(a: TestVector, b: TestVector) {
+    return a.copy().sub(b);
+  }
+  static dist(a: TestVector, b: TestVector) {
+    return a.dist(b);
+  }
+  static fromAngle(angle: number) {
+    return new TestVector(Math.cos(angle), Math.sin(angle));
+  }
 }
 
 const castContext = (caster: unknown, cursorWorld = { x: 0, y: 10 }): CastContext =>
@@ -85,7 +122,9 @@ const makeResourcesWritable = (unit: AIChampion | Zed_W_Clone) => {
     Object.defineProperty(resource, 'value', {
       configurable: true,
       get: () => resource.baseValue,
-      set: (value: number) => { resource.baseValue = value; },
+      set: (value: number) => {
+        resource.baseValue = value;
+      },
     });
   }
 };
@@ -153,11 +192,16 @@ describe('spell aim integration', () => {
     class AimSpell extends Spell {
       targetingMode = 'DIRECTION' as const;
       usedAim?: p5.Vector;
-      onSpellCast() { this.usedAim = this.aimPoint; }
+      onSpellCast() {
+        this.usedAim = this.aimPoint;
+      }
     }
     const spell = new AimSpell(ai);
     ai.spells = [spell];
-    vi.stubGlobal('random', vi.fn(() => 0));
+    vi.stubGlobal(
+      'random',
+      vi.fn(() => 0)
+    );
     return { ai, spell };
   };
 
@@ -215,11 +259,16 @@ describe('spell aim integration', () => {
             interrupts: { move: false },
           };
         }
-        onRelease() { this.releases += 1; }
+        onRelease() {
+          this.releases += 1;
+        }
       }
       const spell = new ChargedSpell(ai);
       ai.spells = [spell];
-      vi.stubGlobal('random', vi.fn(() => 0));
+      vi.stubGlobal(
+        'random',
+        vi.fn(() => 0)
+      );
       vi.stubGlobal('deltaTime', 50);
 
       ai.update();
@@ -245,8 +294,12 @@ describe('spell aim integration', () => {
             interrupts: { move: false },
           };
         }
-        onRelease() { this.releases += 1; }
-        onCancel() { this.cancels += 1; }
+        onRelease() {
+          this.releases += 1;
+        }
+        onCancel() {
+          this.cancels += 1;
+        }
       }
 
       const chargingShadow = () => {
@@ -300,38 +353,56 @@ describe('spell aim integration', () => {
 
   it('aims an AI UNIT cast at an eligible unit instead of its move destination', () => {
     const untargetable = {
-      position: new TestVector(50, 0), collisionRadius: 25,
-      teamId: 'blue', targetable: false,
+      position: new TestVector(50, 0),
+      collisionRadius: 25,
+      teamId: 'blue',
+      targetable: false,
     };
     const target = {
-      position: new TestVector(100, 0), collisionRadius: 25,
-      teamId: 'blue', targetable: true,
+      position: new TestVector(100, 0),
+      collisionRadius: 25,
+      teamId: 'blue',
+      targetable: true,
     };
     const game = Object.assign(gameWithMouse(), {
       objectManager: { objects: [untargetable, target], addObject: vi.fn() },
       createSpellContext: Game.prototype.createSpellContext,
     });
     const ai = new AIChampion({
-      game, position: new TestVector(0, 0) as any, teamId: 'red', preset: { spells: [] },
+      game,
+      position: new TestVector(0, 0) as any,
+      teamId: 'red',
+      preset: { spells: [] },
     });
     makeResourcesWritable(ai);
     ai.destination = new TestVector(0, 500) as any;
     ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
     class UnitSpell extends Spell {
       usedTarget?: unknown;
-      get castSpec() { return {
-        activation: 'PRESS' as const, targeting: 'UNIT' as const,
-        resource: { commitAt: 'start' as const, refundOn: [] },
-        cooldown: { startAt: 'start' as const, durationMs: 0 },
-      }; }
-      get targetingRequest() { return {
-        range: 500, targetTeam: 'ENEMY' as const,
-      }; }
-      onSpellCast(context: CastContext) { this.usedTarget = context.target; }
+      get castSpec() {
+        return {
+          activation: 'PRESS' as const,
+          targeting: 'UNIT' as const,
+          resource: { commitAt: 'start' as const, refundOn: [] },
+          cooldown: { startAt: 'start' as const, durationMs: 0 },
+        };
+      }
+      get targetingRequest() {
+        return {
+          range: 500,
+          targetTeam: 'ENEMY' as const,
+        };
+      }
+      onSpellCast(context: CastContext) {
+        this.usedTarget = context.target;
+      }
     }
     const spell = new UnitSpell(ai);
     ai.spells = [spell];
-    vi.stubGlobal('random', vi.fn(() => 0));
+    vi.stubGlobal(
+      'random',
+      vi.fn(() => 0)
+    );
 
     ai.update();
 
@@ -355,7 +426,9 @@ describe('spell aim integration', () => {
           cooldown: { startAt: 'start' as const, durationMs: 0 },
         };
       }
-      get targetingRequest() { return { range: 500, targetTeam: 'ENEMY' as const }; }
+      get targetingRequest() {
+        return { range: 500, targetTeam: 'ENEMY' as const };
+      }
     }
     const game = Object.assign(Object.create(Game.prototype), {
       worldMouse: new TestVector(100, 0),
@@ -379,7 +452,9 @@ describe('spell aim integration', () => {
     class MirroredSpell extends Spell {
       targetingMode = 'DIRECTION' as const;
       usedContext?: CastContext;
-      onSpellCast(context: CastContext) { this.usedContext = context; }
+      onSpellCast(context: CastContext) {
+        this.usedContext = context;
+      }
     }
     const source = new MirroredSpell(owner);
     source.press(castContext(owner));

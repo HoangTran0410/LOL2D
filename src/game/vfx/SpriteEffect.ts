@@ -23,8 +23,11 @@ export default class SpriteEffect<TAsset = unknown> implements VfxHandle {
   }
 
   get complete(): boolean {
-    return this.disposed || this.elapsedMs >= this.durationMs ||
-      (this.readyAsset === undefined && this.fallback.complete === true);
+    return (
+      this.disposed ||
+      this.elapsedMs >= this.durationMs ||
+      (this.readyAsset === undefined && this.fallback.complete === true)
+    );
   }
 
   get effect(): VfxHandle {
@@ -52,8 +55,6 @@ export default class SpriteEffect<TAsset = unknown> implements VfxHandle {
   }
 
   private get readyAsset(): TAsset | undefined {
-    return this.asset?.status === 'ready' && this.asset.data !== null
-      ? this.asset.data
-      : undefined;
+    return this.asset?.status === 'ready' && this.asset.data !== null ? this.asset.data : undefined;
   }
 }

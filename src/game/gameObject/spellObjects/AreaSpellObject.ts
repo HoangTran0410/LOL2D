@@ -32,12 +32,7 @@ export default class AreaSpellObject extends SpellObject {
   private readonly tick: (target: AttackableUnit) => void;
   private readonly exit: (target: AttackableUnit) => void;
 
-  constructor(
-    owner: AttackableUnit,
-    center: Vec2,
-    radius: number,
-    options: AreaOptions = {}
-  ) {
+  constructor(owner: AttackableUnit, center: Vec2, radius: number, options: AreaOptions = {}) {
     super(owner);
     this.validateInterval('tickEveryMs', options.tickEveryMs);
     this.validateInterval('durationMs', options.durationMs);
@@ -55,9 +50,10 @@ export default class AreaSpellObject extends SpellObject {
 
   update(deltaMs = deltaTime): void {
     if (this.toRemove) return;
-    const remainingMs = this.durationMs === undefined
-      ? Number.POSITIVE_INFINITY
-      : Math.max(0, this.durationMs - this.elapsedMs);
+    const remainingMs =
+      this.durationMs === undefined
+        ? Number.POSITIVE_INFINITY
+        : Math.max(0, this.durationMs - this.elapsedMs);
     const elapsed = Math.min(Math.max(0, deltaMs), remainingMs);
     this.elapsedMs += elapsed;
     if (this.radiusAt) this.radius = Math.max(0, this.radiusAt(this.elapsedMs));
@@ -102,10 +98,10 @@ export default class AreaSpellObject extends SpellObject {
   }
 
   private contains(target: AttackableUnit): boolean {
-    return Math.hypot(
-      target.position.x - this.center.x,
-      target.position.y - this.center.y
-    ) <= this.radius + target.collisionRadius;
+    return (
+      Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
+      this.radius + target.collisionRadius
+    );
   }
 
   private queryCandidates(): Iterable<AttackableUnit> {

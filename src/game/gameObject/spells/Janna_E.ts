@@ -52,8 +52,7 @@ export const REFUND_RATIO = 0.2;
 export default class Janna_E extends Spell {
   image = AssetManager.get('spell_janna_e');
   name = 'Mắt Bão (Janna_E)';
-  description =
-    `Nội tại: khi một kỹ năng của Janna làm chậm hoặc hất tung ít nhất một tướng địch, hoàn <span class="buff">${Math.round(REFUND_RATIO * 100)}% hồi chiêu</span> của kỹ năng này (một lần mỗi chu kỳ hồi chiêu). Chủ động: khiên cho tướng đồng minh hoặc trụ, hấp thụ <span class="damage">${SHIELD_AMOUNT} sát thương</span> và <span class="buff">+${BONUS_ATTACK_DAMAGE} sát thương đánh thường</span> trong <span class="time">${SHIELD_DURATION_MS / 1000} giây</span>.`;
+  description = `Nội tại: khi một kỹ năng của Janna làm chậm hoặc hất tung ít nhất một tướng địch, hoàn <span class="buff">${Math.round(REFUND_RATIO * 100)}% hồi chiêu</span> của kỹ năng này (một lần mỗi chu kỳ hồi chiêu). Chủ động: khiên cho tướng đồng minh hoặc trụ, hấp thụ <span class="damage">${SHIELD_AMOUNT} sát thương</span> và <span class="buff">+${BONUS_ATTACK_DAMAGE} sát thương đánh thường</span> trong <span class="time">${SHIELD_DURATION_MS / 1000} giây</span>.`;
   coolDown = COOLDOWN_MS;
   manaCost = MANA_COST;
 
@@ -78,13 +77,16 @@ export default class Janna_E extends Spell {
       targetTeam: 'ALLY',
       queryCandidates: () => this.game.objectManager.objects,
       isTargetable: candidate => isEyeTarget(candidate),
-      getTargetInfo: candidate => isEyeTarget(candidate) ? {
-        position: candidate.position,
-        teamId: candidate.teamId,
-        selectionRadius: candidate.animatedValues?.displaySize
-          ? candidate.animatedValues.displaySize / 2
-          : candidate.collisionRadius,
-      } : null,
+      getTargetInfo: candidate =>
+        isEyeTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
     };
   }
 
@@ -153,10 +155,12 @@ export default class Janna_E extends Spell {
   }
 
   private isValidTarget(target: unknown): target is EyeTarget {
-    return isEyeTarget(target) &&
+    return (
+      isEyeTarget(target) &&
       canSee(this.owner, target) &&
       target.teamId === this.owner.teamId &&
-      withinRange(this.range, this.owner, target);
+      withinRange(this.range, this.owner, target)
+    );
   }
 }
 

@@ -69,7 +69,9 @@ export class Teemo_W_Burst extends SpellObject {
   draw() {
     const t = constrain(this.age / this.lifeTime, 0, 1);
     const fade = 1 - t;
-    const r = this.owner.animatedValues?.displaySize ? this.owner.animatedValues.displaySize / 2 : 28;
+    const r = this.owner.animatedValues?.displaySize
+      ? this.owner.animatedValues.displaySize / 2
+      : 28;
 
     push();
     translate(this.position.x, this.position.y);
@@ -78,7 +80,7 @@ export class Teemo_W_Burst extends SpellObject {
     noFill();
     stroke(215, 255, 150, 220 * fade);
     strokeWeight(4 * fade + 1);
-    ellipse(0, r * 0.6, (r * 1.4 + 60 * t) * 1.3, (r * 0.6 + 20 * t));
+    ellipse(0, r * 0.6, (r * 1.4 + 60 * t) * 1.3, r * 0.6 + 20 * t);
 
     // a handful of forward-streaking dashes, evenly spread so it reads as a burst
     stroke(235, 255, 200, 200 * fade);

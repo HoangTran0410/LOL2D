@@ -40,14 +40,10 @@ describe('basic-attack profiles', () => {
 
   it('the marksman swings fastest, which is the whole role', () => {
     for (const role of ['MAGE', 'SUPPORT', 'ASSASSIN', 'BRUISER', 'TANK'] as const) {
-      expect(ATTACK.MARKSMAN.attacksPerSecond, role).toBeGreaterThan(
-        ATTACK[role].attacksPerSecond
-      );
+      expect(ATTACK.MARKSMAN.attacksPerSecond, role).toBeGreaterThan(ATTACK[role].attacksPerSecond);
     }
     // and far enough ahead that an attack-speed buff is worth building around
-    expect(ATTACK.MARKSMAN.attacksPerSecond).toBeGreaterThan(
-      ATTACK.TANK.attacksPerSecond * 1.5
-    );
+    expect(ATTACK.MARKSMAN.attacksPerSecond).toBeGreaterThan(ATTACK.TANK.attacksPerSecond * 1.5);
   });
 
   it('leaves headroom above the fastest base for buffs to matter', () => {

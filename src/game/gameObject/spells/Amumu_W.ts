@@ -62,7 +62,8 @@ export class Amumu_W_Object extends SpellObject {
     beginShape();
     for (let i = 0; i <= 28; i++) {
       const a = (i / 28) * TWO_PI;
-      const wobble = 1 + 0.08 * Math.sin(a * 3 + this.age / 260) + 0.05 * Math.sin(a * 5 - this.age / 190);
+      const wobble =
+        1 + 0.08 * Math.sin(a * 3 + this.age / 260) + 0.05 * Math.sin(a * 5 - this.age / 190);
       vertex(cos(a) * this.radius * wobble, sin(a) * this.radius * wobble);
     }
     endShape(CLOSE);
@@ -70,8 +71,8 @@ export class Amumu_W_Object extends SpellObject {
     // tears falling all the way through it, each on its own clock
     for (let i = 0; i < 10; i++) {
       const a = (i / 10) * TWO_PI + this.seed;
-      const d = this.radius * (0.25 + 0.5 * ((i * 37) % 10) / 10);
-      const drop = ((this.age / 5) + i * 47) % (this.radius * 1.2) - this.radius * 0.6;
+      const d = this.radius * (0.25 + (0.5 * ((i * 37) % 10)) / 10);
+      const drop = ((this.age / 5 + i * 47) % (this.radius * 1.2)) - this.radius * 0.6;
       fill(170, 200, 255, 200);
       ellipse(cos(a) * d, sin(a) * d + drop, 5, 10);
     }

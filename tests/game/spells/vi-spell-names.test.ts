@@ -41,13 +41,10 @@ describe(`spell names match Riot's vi_VN localisation (Data Dragon ${NAMES.versi
     expect(missing, 'run `npm run names:sync -- --refresh` to pick up new spells').toEqual([]);
   });
 
-  it.each(spellFiles.map(entry => [entry.slug, entry.file] as const))(
-    '%s',
-    (slug, file) => {
-      const source = readFileSync(`${SPELL_DIR}${file}`, 'utf8');
-      const match = source.match(NAME_LINE);
-      expect(match, `${file} has no \`name = '… (Tag)';\` line`).toBeTruthy();
-      expect(match![3]).toBe(NAMES.names[slug]);
-    }
-  );
+  it.each(spellFiles.map(entry => [entry.slug, entry.file] as const))('%s', (slug, file) => {
+    const source = readFileSync(`${SPELL_DIR}${file}`, 'utf8');
+    const match = source.match(NAME_LINE);
+    expect(match, `${file} has no \`name = '… (Tag)';\` line`).toBeTruthy();
+    expect(match![3]).toBe(NAMES.names[slug]);
+  });
 });

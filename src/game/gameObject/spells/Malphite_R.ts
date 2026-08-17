@@ -294,7 +294,12 @@ export class Malphite_R_Object extends SpellObject {
       const inner = this.hitRadius * 0.25;
       const outer = this.hitRadius * (1.05 + 0.3 * Math.abs(sin(plate.angle * 3.1))) * heave;
       const kink = plate.angle + 0.16 * sin(plate.angle * 5);
-      line(cos(plate.angle) * inner, sin(plate.angle) * inner, cos(kink) * outer, sin(kink) * outer);
+      line(
+        cos(plate.angle) * inner,
+        sin(plate.angle) * inner,
+        cos(kink) * outer,
+        sin(kink) * outer
+      );
     }
 
     // The rim itself.
