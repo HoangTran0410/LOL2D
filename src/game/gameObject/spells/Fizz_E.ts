@@ -1,16 +1,16 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import { StatsModifier } from '../Stats';
-import Dash from '../buffs/Dash';
-import Slow from '../buffs/Slow';
-import Untargetable from '../buffs/Untargetable';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { StatsModifier } from '@/game/gameObject/Stats';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
 
 /**
  * Playful / Trickster.

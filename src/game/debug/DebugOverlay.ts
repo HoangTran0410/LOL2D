@@ -1,4 +1,4 @@
-import { Circle, Line, Rectangle } from '../../libs/quadtree';
+import { Circle, Line, Rectangle } from '@/libs/quadtree';
 
 /**
  * The debug hub: one flag per layer, and one draw function per flag.

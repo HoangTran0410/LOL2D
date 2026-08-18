@@ -1,11 +1,11 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Chilled from '../buffs/Chilled';
-import Slow from '../buffs/Slow';
-import Speedup from '../buffs/Speedup';
-import StatAmp from '../buffs/StatAmp';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Chilled from '@/game/gameObject/buffs/Chilled';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 // Exported so the suite asserts the ultimate's wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.

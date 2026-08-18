@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import DamageOverTime from '../buffs/DamageOverTime';
-import Speedup from '../buffs/Speedup';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import Speedup from '@/game/gameObject/buffs/Speedup';
 
 export const MAX_RANGE = 550;
 export const RADIUS = 110;

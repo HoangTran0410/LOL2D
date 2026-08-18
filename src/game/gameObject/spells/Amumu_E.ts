@@ -1,9 +1,9 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AoePulse from '../spellObjects/AoePulse';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
 
 export const RADIUS = 200;
 export const DAMAGE = 20;

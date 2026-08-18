@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Dash from '../buffs/Dash';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import VectorUtils from '@/utils/vector.utils';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** The illusion resolves into focus over this long, rather than appearing. */
 export const MIRROR_ASSEMBLE_MS = 300;

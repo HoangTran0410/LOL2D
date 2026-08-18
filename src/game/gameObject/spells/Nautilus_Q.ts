@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Dash from '../buffs/Dash';
-import Stun from '../buffs/Stun';
-import { wallOutlinesInArea } from '../map/DynamicTerrain';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Stun from '@/game/gameObject/buffs/Stun';
+import { wallOutlinesInArea } from '@/game/gameObject/map/DynamicTerrain';
 
 export const Q_DAMAGE = 20;
 export const Q_RANGE = 420;

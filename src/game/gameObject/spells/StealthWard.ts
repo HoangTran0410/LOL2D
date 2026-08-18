@@ -1,8 +1,8 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** The totem's drawn proportions. `size` stays the ward's own tiny footprint. */
 export const WARD_HEIGHT = 26;

@@ -1,13 +1,13 @@
-import AssetManager from '../../../managers/AssetManager';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import Slow from '../buffs/Slow';
-import TrailSystem from '../helpers/TrailSystem';
-import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
-import ChargeRangeTelegraph from '../../vfx/ChargeRangeTelegraph';
-import VfxGroup from '../../vfx/VfxGroup';
+import AssetManager from '@/managers/AssetManager';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CancelReason, CastContext, CastSpec } from '@/game/spell/runtime/types';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import Slow from '@/game/gameObject/buffs/Slow';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
+import ChargeRangeTelegraph from '@/game/vfx/ChargeRangeTelegraph';
+import VfxGroup from '@/game/vfx/VfxGroup';
 
 export const MAX_CHARGE_MS = 4_000;
 export const RANGE_CHARGE_MS = 1_500;

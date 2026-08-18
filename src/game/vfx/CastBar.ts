@@ -1,4 +1,4 @@
-import type { CastContext } from '../spell/runtime/types';
+import type { CastContext } from '@/game/spell/runtime/types';
 import type { VfxHandle } from './SpellVfx';
 
 type Position = Readonly<{ x: number; y: number }>;

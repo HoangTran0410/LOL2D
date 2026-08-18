@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Slow from '../buffs/Slow';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Slow from '@/game/gameObject/buffs/Slow';
 
 export const E_RADII = [130, 220, 310];
 export const E_MAX_RADIUS = E_RADII[E_RADII.length - 1];

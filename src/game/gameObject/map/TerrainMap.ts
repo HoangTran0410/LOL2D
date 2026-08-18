@@ -1,15 +1,15 @@
-import SAT from '../../../libs/SAT';
-import { Circle, Quadtree, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import { hasFlag } from '../../../utils/index';
-import ActionState from '../../enums/ActionState';
-import TerrainType from '../../enums/TerrainType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Minion from '../attackableUnits/Minion';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import SAT from '@/libs/SAT';
+import { Circle, Quadtree, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import { hasFlag } from '@/utils/index';
+import ActionState from '@/game/enums/ActionState';
+import TerrainType from '@/game/enums/TerrainType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Minion from '@/game/gameObject/attackableUnits/Minion';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 import Obstacle from './Obstacle';
 
 export default class TerrainMap {

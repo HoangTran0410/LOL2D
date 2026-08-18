@@ -1,10 +1,10 @@
-import { isChargeActivation } from '../runtime/types';
+import { isChargeActivation } from '@/game/spell/runtime/types';
 import type {
   ActivationPattern,
   CancelReason,
   CastContext,
   SpellRuntimeState,
-} from '../runtime/types';
+} from '@/game/spell/runtime/types';
 
 interface InputSpell {
   readonly state: SpellRuntimeState;

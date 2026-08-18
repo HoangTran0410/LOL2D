@@ -1,11 +1,11 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Champion from '../attackableUnits/Champion';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import { isEnraged } from './Renekton_R';
 
 /** The rear-swing before the blade comes round. Short — Q is his rhythm key. */

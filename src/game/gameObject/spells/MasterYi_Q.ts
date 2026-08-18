@@ -1,11 +1,11 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Untargetable from '../buffs/Untargetable';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 // Exported so the suite asserts the flurry's wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.

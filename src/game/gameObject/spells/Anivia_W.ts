@@ -1,14 +1,14 @@
-import SAT from '../../../libs/SAT';
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { hasFlag } from '../../../utils/index';
-import VectorUtils from '../../../utils/vector.utils';
-import ActionState from '../../enums/ActionState';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import { slabVertices, type DynamicWall } from '../map/DynamicTerrain';
+import SAT from '@/libs/SAT';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { hasFlag } from '@/utils/index';
+import VectorUtils from '@/utils/vector.utils';
+import ActionState from '@/game/enums/ActionState';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { slabVertices, type DynamicWall } from '@/game/gameObject/map/DynamicTerrain';
 
 /**
  * Crystallize. A genuinely solid wall: it deals no damage and applies no

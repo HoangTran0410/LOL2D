@@ -1,9 +1,9 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type Buff from '../Buff';
-import Shield from '../buffs/Shield';
-import StatAmp from '../buffs/StatAmp';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type Buff from '@/game/gameObject/Buff';
+import Shield from '@/game/gameObject/buffs/Shield';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 // Exported so the suite asserts the armor's wiring against the spell's real
 // tuning instead of a copied set of numbers — retuning a value should not

@@ -1,11 +1,11 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import StatusFlags from '../../enums/StatusFlags';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import Untargetable from '../buffs/Untargetable';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import StatusFlags from '@/game/enums/StatusFlags';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
 import { drawAegis } from './Pantheon_W';
 
 export const MAX_RANGE = 900;

@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Slow from '../buffs/Slow';
-import ParticleSystem from '../helpers/ParticleSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Slow from '@/game/gameObject/buffs/Slow';
+import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export default class Zed_E extends Spell {
   targetingMode = 'SELF' as const;

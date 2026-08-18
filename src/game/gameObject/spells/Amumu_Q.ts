@@ -1,12 +1,12 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
-import Stun from '../buffs/Stun';
-import TrailSystem from '../helpers/TrailSystem';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Stun from '@/game/gameObject/buffs/Stun';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Dirty linen, with a darker weave underneath for contrast on pale ground. */
 const LINEN: [number, number, number] = [235, 222, 172];

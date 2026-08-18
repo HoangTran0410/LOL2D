@@ -10,7 +10,7 @@ import {
   type PregameConfig,
   type ChampionLoadout,
   type MatchRules,
-} from '../../game/config/PregameConfig';
+} from '@/game/config/PregameConfig';
 
 export interface PregameConfigController {
   config: Ref<PregameConfig>;

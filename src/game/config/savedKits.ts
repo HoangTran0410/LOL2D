@@ -25,7 +25,7 @@
  * reach into the game object graph, so it imports safely from anywhere and
  * unit-tests in plain node.
  */
-import { uuidv4 } from '../../utils';
+import { uuidv4 } from '@/utils';
 import { SLOT_COUNT } from './PregameConfig';
 import type { ChampionLoadout } from './PregameConfig';
 

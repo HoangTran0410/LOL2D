@@ -1,19 +1,19 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
 import {
   pickExecuteTarget,
   type ExecuteFallback,
   type ExecuteSpell,
-} from '../../combat/ExecuteTargeting';
-import { effectiveRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import { MAX_UNIT_SIZE } from '../Stats';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+} from '@/game/combat/ExecuteTargeting';
+import { effectiveRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { MAX_UNIT_SIZE } from '@/game/gameObject/Stats';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /** One Feast stack. Kept as constants so the heal matches the max health gained. */
 export const SIZE_PER_STACK = 6;

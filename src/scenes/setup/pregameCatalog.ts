@@ -8,8 +8,8 @@ import {
   type SelectableChampion,
   type SummonerSpellOption,
   type SpellCatalogEntry,
-} from '../../game/preset';
-import type { AssetKey } from '../../managers/AssetManager';
+} from '@/game/preset';
+import type { AssetKey } from '@/managers/AssetManager';
 import type { SpellClass } from './types';
 
 /** One catalogue entry on a shelf, with the kit slot its name claims (`abilitySlotOfId`) or `null`. */

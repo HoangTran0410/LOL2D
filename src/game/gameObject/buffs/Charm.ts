@@ -1,11 +1,11 @@
 // TODO https://leagueoflegends.fandom.com/wiki/Charm
 
-import Buff from '../Buff';
-import StatusFlags from '../../enums/StatusFlags';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import VectorUtils from '../../../utils/vector.utils';
+import Buff from '@/game/gameObject/Buff';
+import StatusFlags from '@/game/enums/StatusFlags';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import VectorUtils from '@/utils/vector.utils';
 
 export default class Charm extends Buff {
   image: Buff['image'] = AssetManager.get('buff_charm');

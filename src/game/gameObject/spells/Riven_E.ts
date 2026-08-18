@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import type Buff from '../Buff';
-import Dash from '../buffs/Dash';
-import Shield from '../buffs/Shield';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Buff from '@/game/gameObject/Buff';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Shield from '@/game/gameObject/buffs/Shield';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const E_DISTANCE = 280;
 export const E_SHIELD = 25;

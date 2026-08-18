@@ -1,10 +1,10 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Pet from '../attackableUnits/Pet';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 // Exported so the suite asserts the swarm's wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.

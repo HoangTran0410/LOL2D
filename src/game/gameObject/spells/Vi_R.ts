@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import type { CastContext } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import type { CastContext } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const R_RANGE = 450;
 export const R_DAMAGE = 45;

@@ -1,10 +1,10 @@
-import { Circle, Rectangle } from '../../libs/quadtree';
-import VectorUtils from '../../utils/vector.utils';
-import { PredefinedFilters } from '../managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import SpellObject from './SpellObject';
 import AttackableUnit from './attackableUnits/AttackableUnit';
 import TrailSystem from './helpers/TrailSystem';
-import AssetManager, { type AssetHandle } from '../../managers/AssetManager';
+import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 
 /**
  * Base for skillshot projectiles: travels from `position` to `destination`, damages

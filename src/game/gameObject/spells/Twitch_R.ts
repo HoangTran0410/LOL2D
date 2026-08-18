@@ -1,13 +1,13 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import MissileSpellObject from '../MissileSpellObject';
-import SpellObject from '../SpellObject';
-import Spell from '../Spell';
-import StatAmp from '../buffs/StatAmp';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import type Buff from '../Buff';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Spell from '@/game/gameObject/Spell';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Buff from '@/game/gameObject/Buff';
 
 export const DURATION = 7000;
 export const BONUS_RANGE = 250;

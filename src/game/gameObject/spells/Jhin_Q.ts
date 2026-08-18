@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Buff from '../Buff';
-import TrailSystem from '../helpers/TrailSystem';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** How long a lotus mark rides a body. Shared by Q, W and E — defined here, imported there. */
 export const JHIN_MARK_MS = 4_000;

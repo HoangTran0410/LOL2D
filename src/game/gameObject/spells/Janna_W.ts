@@ -1,19 +1,19 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import StatusFlags from '../../enums/StatusFlags';
-import Spell from '../Spell';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Slow from '../buffs/Slow';
-import StatAmp from '../buffs/StatAmp';
-import TrailSystem from '../helpers/TrailSystem';
-import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Spell from '@/game/gameObject/Spell';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Slow from '@/game/gameObject/buffs/Slow';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
 import { notifyJannaControlLanded } from './Janna_E';
-import { canSee } from '../../combat/Vision';
+import { canSee } from '@/game/combat/Vision';
 
 type ZephyrTarget = AttackableUnit;
 

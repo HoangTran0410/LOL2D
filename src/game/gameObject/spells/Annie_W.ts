@@ -1,9 +1,9 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import AoePulse from '../spellObjects/AoePulse';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
 
 export const REACH = 290;
 export const HALF_ANGLE = 0.55;

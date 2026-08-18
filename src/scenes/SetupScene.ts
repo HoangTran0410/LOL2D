@@ -1,5 +1,5 @@
 import { createApp, type App } from 'vue';
-import { Scene } from '../managers/SceneManager';
+import { Scene } from '@/managers/SceneManager';
 import SetupSceneView from './SetupScene.vue';
 import GameScene from './GameScene';
 import MenuScene from './MenuScene';

@@ -1,13 +1,13 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import Champion from '../attackableUnits/Champion';
-import Pet from '../attackableUnits/Pet';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
-import Root from '../buffs/Root';
-import AoePulse from '../spellObjects/AoePulse';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Root from '@/game/gameObject/buffs/Root';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
 
 export const MAX_RANGE = 500;
 export const COUNT = 3;

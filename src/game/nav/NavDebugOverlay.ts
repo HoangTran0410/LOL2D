@@ -1,6 +1,6 @@
-import type { Rectangle } from '../../libs/quadtree';
-import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import type GameObject from '../gameObject/GameObject';
+import type { Rectangle } from '@/libs/quadtree';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type GameObject from '@/game/gameObject/GameObject';
 import type NavigationSystem from './NavigationSystem';
 import type { PathAgentState } from './PathAgent';
 

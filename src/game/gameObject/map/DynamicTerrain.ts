@@ -1,8 +1,8 @@
-import CollideUtils from '../../../utils/collide.utils';
-import TerrainType from '../../enums/TerrainType';
-import { Rectangle } from '../../../libs/quadtree';
-import type { Circle } from '../../../libs/quadtree';
-import type GameObject from '../GameObject';
+import CollideUtils from '@/utils/collide.utils';
+import TerrainType from '@/game/enums/TerrainType';
+import { Rectangle } from '@/libs/quadtree';
+import type { Circle } from '@/libs/quadtree';
+import type GameObject from '@/game/gameObject/GameObject';
 
 /**
  * Terrain a spell put there.

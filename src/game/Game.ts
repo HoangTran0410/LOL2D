@@ -31,14 +31,14 @@ import NavigationSystem from './nav/NavigationSystem';
 import { drawNavDebug } from './nav/NavDebugOverlay';
 import { drawExecuteMarks } from './combat/ExecuteMarks';
 import { drawDebugOverlay } from './debug/DebugOverlay';
-import EventManager from '../managers/EventManager';
-import { uuidv4 } from '../utils';
+import EventManager from '@/managers/EventManager';
+import { uuidv4 } from '@/utils';
 import SpellInputController from './spell/input/SpellInputController';
 import TargetResolver, {
   defaultIsTargetable,
   defaultTargetInfo,
 } from './spell/targeting/TargetResolver';
-import AssetManager from '../managers/AssetManager';
+import AssetManager from '@/managers/AssetManager';
 import { findAttackTargetAlongRay, findAttackTargetNearPoint } from './combat/AttackTargeting';
 import TouchControls, {
   touchControlsPreference,

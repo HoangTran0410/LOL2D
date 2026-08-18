@@ -21,13 +21,13 @@
  * controls layered above it retain native click, input and scroll behavior.
  */
 import { markRaw, reactive, toRaw } from 'vue';
-import type Game from '../Game';
-import type { RenderFps } from '../Game';
-import type MatchDirector from '../MatchDirector';
-import type Camera from '../gameObject/map/Camera';
-import type { RenderQuality } from '../managers/ObjectManager';
-import { removeAccents } from '../../utils/index';
-import type { AssetKey } from '../../managers/AssetManager';
+import type Game from '@/game/Game';
+import type { RenderFps } from '@/game/Game';
+import type MatchDirector from '@/game/MatchDirector';
+import type Camera from '@/game/gameObject/map/Camera';
+import type { RenderQuality } from '@/game/managers/ObjectManager';
+import { removeAccents } from '@/utils/index';
+import type { AssetKey } from '@/managers/AssetManager';
 
 export interface SpellItemDisplay {
   name: string;

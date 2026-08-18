@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 import { MOON_CORE, MOON_NIGHT, MOON_PALE, drawCrescent } from './Diana_Q';
 
 export const R_RADIUS = 330;

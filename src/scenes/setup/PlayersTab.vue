@@ -12,8 +12,8 @@
  * list, rather than only ever being able to lop off whichever one happens to
  * be last.
  */
-import { AI_COUNT_MAX } from '../../game/config/PregameConfig';
-import type { PregameConfig } from '../../game/config/PregameConfig';
+import { AI_COUNT_MAX } from '@/game/config/PregameConfig';
+import type { PregameConfig } from '@/game/config/PregameConfig';
 import type { SpellClass } from './types';
 import ParticipantCard from './ParticipantCard.vue';
 

@@ -1,11 +1,11 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import AoePulse from '../spellObjects/AoePulse';
-import Slow from '../buffs/Slow';
-import StatAmp from '../buffs/StatAmp';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import Slow from '@/game/gameObject/buffs/Slow';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 export const RANGE = 260;
 export const SLOW_PERCENT = 0.6;

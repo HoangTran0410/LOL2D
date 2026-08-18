@@ -1,13 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import type { CastContext } from '../../spell/runtime/types';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import type { CastContext } from '@/game/spell/runtime/types';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
 
 export const R_RANGE = 450;
 export const R_DAMAGE = 45;

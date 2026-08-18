@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import Speedup from '../buffs/Speedup';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const HASTE_DURATION = 4000;
 export const HASTE_PERCENT = 0.5;

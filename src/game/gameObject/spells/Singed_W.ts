@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Ground from '../buffs/Ground';
-import Slow from '../buffs/Slow';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Ground from '@/game/gameObject/buffs/Ground';
+import Slow from '@/game/gameObject/buffs/Slow';
 
 /**
  * Mega Adhesive. Pure crowd control: it deals NO damage whatsoever — the

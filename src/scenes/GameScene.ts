@@ -1,9 +1,9 @@
-import { Scene } from '../managers/SceneManager';
-import Game, { renderFpsPreference } from '../game/Game';
+import { Scene } from '@/managers/SceneManager';
+import Game, { renderFpsPreference } from '@/game/Game';
 import MenuScene from './MenuScene';
-import DomUtils from '../utils/dom.utils';
-import AssetManager from '../managers/AssetManager';
-import { setZoomFactorPreference } from '../game/gameObject/map/Camera';
+import DomUtils from '@/utils/dom.utils';
+import AssetManager from '@/managers/AssetManager';
+import { setZoomFactorPreference } from '@/game/gameObject/map/Camera';
 
 // Stats.js is loaded via CDN — declare it as a global
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

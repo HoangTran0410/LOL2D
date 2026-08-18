@@ -1,13 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Shield from '../buffs/Shield';
-import TrailSystem from '../helpers/TrailSystem';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Shield from '@/game/gameObject/buffs/Shield';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 export default class Lux_W extends Spell {
   targetingMode = 'DIRECTION' as const;

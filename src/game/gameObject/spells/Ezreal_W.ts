@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import TrailSystem from '../helpers/TrailSystem';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const EZREAL_W_RANGE = 640;
 export const EZREAL_W_SPEED = 13;

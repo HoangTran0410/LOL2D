@@ -1,10 +1,10 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /** The floor of the heal, paid even at full health. */
 export const TRYNDAMERE_Q_BASE_HEAL = 14;

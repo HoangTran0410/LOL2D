@@ -6,7 +6,7 @@
  * spell-icon `<img>` on this screen always has, so this is the one place
  * that fallback is written rather than four.
  */
-import AssetManager from '../../managers/AssetManager';
+import AssetManager from '@/managers/AssetManager';
 
 defineProps<{
   display: { iconUrl: string | null; name: string } | null;

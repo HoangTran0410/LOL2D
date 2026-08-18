@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { Rectangle } from '../../../libs/quadtree';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { Rectangle } from '@/libs/quadtree';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 700;
 export const DAMAGE = 45;

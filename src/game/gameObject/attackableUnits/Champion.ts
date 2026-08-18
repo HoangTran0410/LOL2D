@@ -1,23 +1,23 @@
-import AssetManager, { type AssetHandle, type AssetKey } from '../../../managers/AssetManager';
-import type Spell from '../Spell';
-import BasicAttackController from '../../combat/BasicAttackController';
+import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
+import type Spell from '@/game/gameObject/Spell';
+import BasicAttackController from '@/game/combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
 import type {
   AttackableUnitOptions,
   AttackableUnitRenderOptions,
   UnitDeathData,
 } from './AttackableUnit';
-import type { KillCredit } from '../../combat/MatchTally';
-import Airborne from '../buffs/Airborne';
-import Charm from '../buffs/Charm';
-import Dash from '../buffs/Dash';
-import Fear from '../buffs/Fear';
-import Root from '../buffs/Root';
-import Silence from '../buffs/Silence';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
-import Taunt from '../buffs/Taunt';
-import type { BuffStackId } from '../Buff';
+import type { KillCredit } from '@/game/combat/MatchTally';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Charm from '@/game/gameObject/buffs/Charm';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Fear from '@/game/gameObject/buffs/Fear';
+import Root from '@/game/gameObject/buffs/Root';
+import Silence from '@/game/gameObject/buffs/Silence';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
+import Taunt from '@/game/gameObject/buffs/Taunt';
+import type { BuffStackId } from '@/game/gameObject/Buff';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
 export interface ChampionAttackTuning {

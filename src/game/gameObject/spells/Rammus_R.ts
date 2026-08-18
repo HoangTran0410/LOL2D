@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AoePulse from '../spellObjects/AoePulse';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Slow from '../buffs/Slow';
-import Untargetable from '../buffs/Untargetable';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
 
 export const MAX_RANGE = 500;
 export const RADIUS = 210;

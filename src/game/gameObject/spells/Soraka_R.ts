@@ -1,9 +1,9 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * Wish. The only map-crossing effect in Soraka's kit: everybody on her side is

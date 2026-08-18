@@ -1,13 +1,13 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { wrapAngle } from '../../../utils/math.utils';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { wrapAngle } from '@/utils/math.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const Q_DAMAGE = 22;
 export const Q_RADIUS = 280;

@@ -1,13 +1,13 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Root from '../buffs/Root';
-import Silence from '../buffs/Silence';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Root from '@/game/gameObject/buffs/Root';
+import Silence from '@/game/gameObject/buffs/Silence';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 /**
  * Equinox. Two halves of one field: while it stands, nobody inside may cast;

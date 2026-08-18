@@ -1,5 +1,5 @@
-import { Rectangle } from '../../../libs/quadtree';
-import GameObject from '../GameObject';
+import { Rectangle } from '@/libs/quadtree';
+import GameObject from '@/game/gameObject/GameObject';
 
 interface ParticleSystemOptions {
   isDeadFn: (particle: any) => boolean;

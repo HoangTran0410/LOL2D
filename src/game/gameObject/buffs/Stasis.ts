@@ -1,7 +1,7 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
 
 /**
  * Zhonya's-style stasis: the unit is frozen solid — it cannot move, cast or be

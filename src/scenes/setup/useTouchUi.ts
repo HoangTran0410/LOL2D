@@ -4,7 +4,7 @@ import {
   touchModePreference,
   setTouchModePreference,
   type TouchModePreference,
-} from '../../game/input/TouchControls';
+} from '@/game/input/TouchControls';
 
 const TOUCH_UI_CLASS = 'touch-ui';
 

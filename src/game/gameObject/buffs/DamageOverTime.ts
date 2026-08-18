@@ -1,6 +1,6 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
 
 interface Flame {
   baseX: number;

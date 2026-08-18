@@ -1,13 +1,13 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import EventType from '../../enums/EventType';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Shield from '../buffs/Shield';
-import Stun from '../buffs/Stun';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import EventType from '@/game/enums/EventType';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Shield from '@/game/gameObject/buffs/Shield';
+import Stun from '@/game/gameObject/buffs/Stun';
 import { isEnraged } from './Renekton_R';
 
 /** How long the empowered bite waits to be spent. */

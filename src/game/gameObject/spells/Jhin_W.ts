@@ -1,17 +1,17 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Root from '../buffs/Root';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Root from '@/game/gameObject/buffs/Root';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 import {
   beamBoundingBox,
   intersectsBeam,
   type BeamGeometry,
-} from '../spellObjects/BeamSpellObject';
+} from '@/game/gameObject/spellObjects/BeamSpellObject';
 import { consumeJhinMark } from './Jhin_Q';
 
 export const JHIN_W_DAMAGE = 22;

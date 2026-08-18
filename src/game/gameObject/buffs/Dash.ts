@@ -1,17 +1,17 @@
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Airborne from './Airborne';
 import Root from './Root';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
 import Stun from './Stun';
-import TrailSystem from '../helpers/TrailSystem';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import Fear from './Fear';
 import Charm from './Charm';
-import type { BuffConstructor } from '../Buff';
-import { foreignControlBuff } from '../../spell/runtime/CancelPolicy';
+import type { BuffConstructor } from '@/game/gameObject/Buff';
+import { foreignControlBuff } from '@/game/spell/runtime/CancelPolicy';
 
 /**
  * The crowd control that takes a dash off its feet.

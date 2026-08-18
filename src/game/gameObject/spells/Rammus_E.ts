@@ -1,11 +1,11 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import AoePulse from '../spellObjects/AoePulse';
-import Taunt from '../buffs/Taunt';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import Taunt from '@/game/gameObject/buffs/Taunt';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 200;
 export const DAMAGE = 12;

@@ -1,11 +1,11 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Charm from '../buffs/Charm';
-import TrailSystem from '../helpers/TrailSystem';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Charm from '@/game/gameObject/buffs/Charm';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Windup: the kiss forms on her lips instead of appearing at full size. */
 export const KISS_SPAWN_MS = 120;

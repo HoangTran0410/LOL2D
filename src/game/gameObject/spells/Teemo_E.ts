@@ -1,13 +1,13 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import DamageOverTime from '../buffs/DamageOverTime';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import TrailSystem from '../helpers/TrailSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 // Exported so the suite asserts the wiring, not a copy of the numbers —
 // retuning a value should not mean editing the test.

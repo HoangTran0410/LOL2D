@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Invulnerable from '../buffs/Invulnerable';
-import Untargetable from '../buffs/Untargetable';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Invulnerable from '@/game/gameObject/buffs/Invulnerable';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const EKKO_R_DAMAGE = 60;
 export const EKKO_R_RADIUS = 180;

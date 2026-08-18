@@ -1,14 +1,14 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Champion from '../attackableUnits/Champion';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import DamageOverTime from '../buffs/DamageOverTime';
-import { drawAxeArc, drawDariusAxe } from '../../vfx/DariusAxe';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CancelReason, CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
 
 /** He hefts the axe this long before it comes round; the whole telegraph. */
 export const WINDUP_MS = 550;

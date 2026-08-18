@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import { Rectangle } from '../../../libs/quadtree';
-import StatAmp from '../buffs/StatAmp';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { Rectangle } from '@/libs/quadtree';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 export const DURATION = 8000;
 export const AURA_RADIUS = 200;

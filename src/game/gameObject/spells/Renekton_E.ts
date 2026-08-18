@@ -1,13 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Dash from '../buffs/Dash';
-import StatAmp from '../buffs/StatAmp';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Dash from '@/game/gameObject/buffs/Dash';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 import { isEnraged } from './Renekton_R';
 
 export const DASH_DISTANCE = 250;

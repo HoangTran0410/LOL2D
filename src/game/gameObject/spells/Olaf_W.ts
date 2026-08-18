@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const DURATION = 6000;
 export const ATTACK_SPEED_PERCENT = 0.5;

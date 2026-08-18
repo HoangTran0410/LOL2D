@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Root from '../buffs/Root';
-import Stun from '../buffs/Stun';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Root from '@/game/gameObject/buffs/Root';
+import Stun from '@/game/gameObject/buffs/Stun';
 
 export default class ChoGath_W extends Spell {
   targetingMode = 'DIRECTION' as const;

@@ -1,5 +1,5 @@
 import * as AllSpells from './gameObject/spells/index';
-import AssetManager, { type AssetKey } from '../managers/AssetManager';
+import AssetManager, { type AssetKey } from '@/managers/AssetManager';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';

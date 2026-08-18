@@ -1,14 +1,14 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Pet from '../attackableUnits/Pet';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Fear from '../buffs/Fear';
-import TrailSystem from '../helpers/TrailSystem';
-import { Rectangle } from '../../../libs/quadtree';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Fear from '@/game/gameObject/buffs/Fear';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { Rectangle } from '@/libs/quadtree';
 
 export const ARM_TIME_MS = 1000;
 export const LIFETIME_MS = 20000;

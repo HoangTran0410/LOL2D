@@ -1,11 +1,11 @@
-import { Rectangle, Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec, Vec2 } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Monster from '../attackableUnits/Monster';
-import AreaSpellObject from '../spellObjects/AreaSpellObject';
+import { Rectangle, Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec, Vec2 } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Monster from '@/game/gameObject/attackableUnits/Monster';
+import AreaSpellObject from '@/game/gameObject/spellObjects/AreaSpellObject';
 
 // Exported so the suite asserts the zone's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.

@@ -1,17 +1,17 @@
-import { uuidv4 } from '../../utils/index';
-import { effectiveRange } from '../combat/Reach';
-import EventType from '../enums/EventType';
-import SpellState from '../enums/SpellState';
-import { SpellRuntime, type SpellRuntimeDelegate } from '../spell/runtime/SpellRuntime';
-import SpellVfx from '../vfx/SpellVfx';
+import { uuidv4 } from '@/utils/index';
+import { effectiveRange } from '@/game/combat/Reach';
+import EventType from '@/game/enums/EventType';
+import SpellState from '@/game/enums/SpellState';
+import { SpellRuntime, type SpellRuntimeDelegate } from '@/game/spell/runtime/SpellRuntime';
+import SpellVfx from '@/game/vfx/SpellVfx';
 import {
   interruptsSuspended,
   isInterruptibleState,
   ownerInterruptReason,
   snapshotOwnerMovement,
   type OwnerMovementSnapshot,
-} from '../spell/runtime/CancelPolicy';
-import type { TargetingRequest } from '../spell/targeting/TargetResolver';
+} from '@/game/spell/runtime/CancelPolicy';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
 import type {
   CancelReason,
   CastContext,
@@ -20,7 +20,7 @@ import type {
   SpellRuntimeState,
   TargetingMode,
   Vec2,
-} from '../spell/runtime/types';
+} from '@/game/spell/runtime/types';
 
 /** Where a spell fires when neither the aim nor the caster points anywhere. */
 const DEFAULT_FACING: Vec2 = Object.freeze({ x: 1, y: 0 });

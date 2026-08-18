@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import BuffAddType from '../../enums/BuffAddType';
-import EventType from '../../enums/EventType';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import BuffAddType from '@/game/enums/BuffAddType';
+import EventType from '@/game/enums/EventType';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** How long Silver Bolts stays armed. */
 export const VAYNE_W_DURATION_MS = 8_000;

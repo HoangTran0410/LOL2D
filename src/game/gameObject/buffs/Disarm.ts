@@ -1,7 +1,7 @@
 // https://leagueoflegends.fandom.com/wiki/Disarm
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
 
 /**
  * Tước Vũ Khí — blocks basic attacks and nothing else. The unit keeps walking

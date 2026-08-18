@@ -1,17 +1,17 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Chilled from '../buffs/Chilled';
-import TrailSystem from '../helpers/TrailSystem';
-import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import { canSee } from '../../combat/Vision';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Chilled from '@/game/gameObject/buffs/Chilled';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import { canSee } from '@/game/combat/Vision';
 
 type FrostbiteTarget = AttackableUnit;
 

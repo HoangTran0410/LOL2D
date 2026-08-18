@@ -1,14 +1,14 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import { StatsModifier } from '../Stats';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { StatsModifier } from '@/game/gameObject/Stats';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 620;
 export const DAMAGE = 26;

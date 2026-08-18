@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
-import Invulnerable from '../buffs/Invulnerable';
-import Untargetable from '../buffs/Untargetable';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../libs/quadtree';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Invulnerable from '@/game/gameObject/buffs/Invulnerable';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const CAMILLE_R_RADIUS = 220;
 export const CAMILLE_R_DURATION_MS = 4000;

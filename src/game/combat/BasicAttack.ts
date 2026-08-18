@@ -1,9 +1,9 @@
-import EventType from '../enums/EventType';
-import MissileSpellObject from '../gameObject/MissileSpellObject';
-import SpellObject from '../gameObject/SpellObject';
-import TrailSystem from '../gameObject/helpers/TrailSystem';
-import AoePulse from '../gameObject/spellObjects/AoePulse';
-import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
+import EventType from '@/game/enums/EventType';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * Basic attack delivery: the two objects that carry a swing from the attacker to

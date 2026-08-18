@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import { dist, distSq, withinRadius } from '../../../utils/math.utils';
-import TeamId from '../../enums/TeamId';
-import type { LaneWaypoint } from '../../lanes';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import MissileSpellObject from '../MissileSpellObject';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import { dist, distSq, withinRadius } from '@/utils/math.utils';
+import TeamId from '@/game/enums/TeamId';
+import type { LaneWaypoint } from '@/game/lanes';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
 import AttackableUnit from './AttackableUnit';
 import type {
   AttackableUnitOptions,

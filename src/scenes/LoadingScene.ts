@@ -1,6 +1,6 @@
 import { createApp, type App } from 'vue';
-import { Scene } from '../managers/SceneManager';
-import AssetManager from '../managers/AssetManager';
+import { Scene } from '@/managers/SceneManager';
+import AssetManager from '@/managers/AssetManager';
 import LoadingSceneView from './LoadingScene.vue';
 import type MenuScene from './MenuScene';
 

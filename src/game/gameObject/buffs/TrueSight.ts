@@ -1,9 +1,9 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
-import GameObject from '../GameObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
+import GameObject from '@/game/gameObject/GameObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 // Cung cấp tầm nhìn
 export default class TrueSight extends Buff {

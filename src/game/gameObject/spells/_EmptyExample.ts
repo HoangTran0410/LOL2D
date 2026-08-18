@@ -6,14 +6,14 @@
  *   2. `preset.ts` SpellGroups  — add it to the champion's kit
  *   3. `AssetManager` AssetPaths — add `spell_<name>` pointing at the icon
  */
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import TrailSystem from '../helpers/TrailSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 export default class SpellName extends Spell {
   image = AssetManager.placeholder('spell_name');

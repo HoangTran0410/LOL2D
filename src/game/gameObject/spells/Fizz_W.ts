@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import Spell from '../Spell';
-import DamageOverTime from '../buffs/DamageOverTime';
-import StatAmp from '../buffs/StatAmp';
-import type Buff from '../Buff';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import Spell from '@/game/gameObject/Spell';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type Buff from '@/game/gameObject/Buff';
 
 export const DURATION = 8000;
 export const BLEED_PER_TICK = 5;

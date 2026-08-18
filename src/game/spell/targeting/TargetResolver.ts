@@ -1,8 +1,8 @@
-import { CURSOR_ACQUISITION_RADIUS } from '../../combat/AttackTargeting';
-import { effectiveRange } from '../../combat/Reach';
-import { canSee, type Seeable } from '../../combat/Vision';
-import { vecDist } from '../../../utils/math.utils';
-import type { CancelReason, CastContext, TargetingMode, Vec2 } from '../runtime/types';
+import { CURSOR_ACQUISITION_RADIUS } from '@/game/combat/AttackTargeting';
+import { effectiveRange } from '@/game/combat/Reach';
+import { canSee, type Seeable } from '@/game/combat/Vision';
+import { vecDist } from '@/utils/math.utils';
+import type { CancelReason, CastContext, TargetingMode, Vec2 } from '@/game/spell/runtime/types';
 
 export type TargetTeam = 'ALLY' | 'ENEMY' | 'ANY';
 

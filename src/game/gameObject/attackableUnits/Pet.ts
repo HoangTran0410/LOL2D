@@ -1,11 +1,11 @@
-import { Circle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Champion, { type ChampionOptions } from './Champion';
-import type { KillCredit } from '../../combat/MatchTally';
+import type { KillCredit } from '@/game/combat/MatchTally';
 import type AttackableUnit from './AttackableUnit';
 import type { UnitDeathData } from './AttackableUnit';
-import Invisible from '../buffs/Invisible';
-import Untargetable from '../buffs/Untargetable';
+import Invisible from '@/game/gameObject/buffs/Invisible';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
 
 /** How often a pet re-picks its target. Cheaper than a query per frame, and it also stops it twitching between two equidistant enemies. */
 export const PET_SCAN_INTERVAL_MS = 250;

@@ -1,4 +1,4 @@
-import SAT from '../libs/SAT';
+import SAT from '@/libs/SAT';
 import PolyDecomp from 'poly-decomp';
 
 type Point = { x: number; y: number };

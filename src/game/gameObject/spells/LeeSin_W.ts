@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Dash from '../buffs/Dash';
-import Shield from '../buffs/Shield';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Shield from '@/game/gameObject/buffs/Shield';
 
 /**
  * Safeguard / Iron Will.

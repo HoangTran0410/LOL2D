@@ -1,5 +1,5 @@
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
 
 /**
  * Takes no damage from anything, and nothing else.

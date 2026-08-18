@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { withinRange } from '../../combat/Reach';
-import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
-import SpellObject from '../SpellObject';
-import Spell from '../Spell';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type { CastSpec } from '../../spell/runtime/types';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import { effectiveHealth, isLethal, type ExecuteSpell } from '../../combat/ExecuteTargeting';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { withinRange } from '@/game/combat/Reach';
+import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Spell from '@/game/gameObject/Spell';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import { effectiveHealth, isLethal, type ExecuteSpell } from '@/game/combat/ExecuteTargeting';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 500;
 export const DAMAGE = 26;

@@ -28,7 +28,7 @@
  * needs a `Game` to be constructed), and the update loop.
  */
 import { createApp, type App } from 'vue';
-import Game from '../Game';
+import Game from '@/game/Game';
 import { computeHudState, HUD_UPDATE_INTERVAL_MS, type HudState } from './hudState';
 import { createHudInteractions, type HudInteractions } from './hudInteractions';
 import InGameHUDView from './InGameHUD.vue';

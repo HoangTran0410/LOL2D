@@ -12,7 +12,7 @@
  * run in a plain node test with no canvas — the shape `TouchControls` already
  * uses. Only `draw()` and the buffer builder may touch p5.
  */
-import { removeGraphics } from '../../../utils/graphics.utils';
+import { removeGraphics } from '@/utils/graphics.utils';
 
 export interface MinimapRect {
   x: number;

@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Speedup from '../buffs/Speedup';
-import StatAmp from '../buffs/StatAmp';
-import { createReveal } from '../buffs/TrueSight';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const DURATION = 6000;
 export const SPEED_PERCENT = 0.4;

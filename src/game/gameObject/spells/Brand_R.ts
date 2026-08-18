@@ -1,18 +1,18 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Slow from '../buffs/Slow';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Slow from '@/game/gameObject/buffs/Slow';
 import { applyAblaze, isAblaze } from './Brand_Q';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import { canSee } from '../../combat/Vision';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import { canSee } from '@/game/combat/Vision';
 
 /**
  * Pyroclasm. A fireball thrown at one enemy that then keeps jumping to whoever

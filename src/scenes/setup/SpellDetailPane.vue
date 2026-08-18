@@ -13,8 +13,8 @@
  * (see `LoadoutEditorModal.vue`) and both surfaces left are transient panels
  * that only ever show one spell, so the mode went with it.
  */
-import FormatUtils from '../../utils/format.utils';
-import type { SpellDisplay } from '../../game/preset';
+import FormatUtils from '@/utils/format.utils';
+import type { SpellDisplay } from '@/game/preset';
 import SpellIcon from './SpellIcon.vue';
 
 defineProps<{

@@ -1,15 +1,15 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import DamageOverTime from '../buffs/DamageOverTime';
-import { canSee } from '../../combat/Vision';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import { canSee } from '@/game/combat/Vision';
 
 // Exported so the suite asserts the infection's wiring rather than a copy of
 // the numbers — retuning a value must not mean editing a test.

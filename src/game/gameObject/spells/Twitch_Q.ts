@@ -1,10 +1,10 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Invisible from '../buffs/Invisible';
-import Speedup from '../buffs/Speedup';
-import Phasing from '../buffs/Phasing';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Invisible from '@/game/gameObject/buffs/Invisible';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import Phasing from '@/game/gameObject/buffs/Phasing';
 
 export default class Twitch_Q extends Spell {
   targetingMode = 'SELF' as const;

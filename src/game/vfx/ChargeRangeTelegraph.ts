@@ -1,4 +1,4 @@
-import type { Vec2 } from '../spell/runtime/types';
+import type { Vec2 } from '@/game/spell/runtime/types';
 import type { VfxHandle } from './SpellVfx';
 
 type Renderer = (origin: Vec2, direction: Vec2, range: number, progress: number) => void;

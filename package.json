@@ -11,6 +11,7 @@
     "ability:check": "node scripts/wiki/check-abilities.mjs",
     "names:sync": "node scripts/wiki/sync-spell-names.mjs",
     "names:apply": "node scripts/wiki/sync-spell-names.mjs --apply",
+    "alias:migrate": "node scripts/migrate-to-alias.mjs",
     "predev": "npm run assets:generate && npm run vendor:copy",
     "dev": "vite",
     "prebuild": "npm run assets:generate && npm run vendor:copy",

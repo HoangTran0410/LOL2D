@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import RootBuff from '../buffs/Root';
-import VectorUtils from '../../../utils/vector.utils';
-import { Rectangle } from '../../../libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import RootBuff from '@/game/gameObject/buffs/Root';
+import VectorUtils from '@/utils/vector.utils';
+import { Rectangle } from '@/libs/quadtree';
 
 export default class Blitzcrank_Q extends Spell {
   targetingMode = 'DIRECTION' as const;

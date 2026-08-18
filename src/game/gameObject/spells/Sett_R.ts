@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Slow from '../buffs/Slow';
-import Untargetable from '../buffs/Untargetable';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const SETT_R_RANGE = 250;
 export const SETT_R_CARRY = 300;

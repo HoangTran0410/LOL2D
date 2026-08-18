@@ -1,4 +1,4 @@
-import { Rectangle } from '../../../libs/quadtree';
+import { Rectangle } from '@/libs/quadtree';
 
 /**
  * The world span every screen must show. A champion's `visionRadius` is 500

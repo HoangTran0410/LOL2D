@@ -1,11 +1,11 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import { rectToVertices } from '../../../utils/index';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import { rectToVertices } from '@/utils/index';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const WALL_LENGTH = 300;
 export const WALL_WIDTH = 25;

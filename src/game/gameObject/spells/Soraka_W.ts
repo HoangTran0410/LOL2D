@@ -1,14 +1,14 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import { grantRejuvenation, hasRejuvenation } from './Soraka_Q';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import { canSee } from '../../combat/Vision';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import { canSee } from '@/game/combat/Vision';
 
 /**
  * Astral Infusion. Soraka pays her own health to heal an ally — the one spell

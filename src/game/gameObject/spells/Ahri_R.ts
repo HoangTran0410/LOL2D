@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import MissileSpellObject from '../MissileSpellObject';
-import Dash from '../buffs/Dash';
-import TrailSystem from '../helpers/TrailSystem';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Nine tails again — the ultimate's orbs and its burst both carry the count. */
 export const ESSENCE_POINTS = 9;

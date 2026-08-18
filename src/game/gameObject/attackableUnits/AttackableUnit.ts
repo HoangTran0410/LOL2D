@@ -1,18 +1,18 @@
-import { Circle } from '../../../libs/quadtree';
-import { hasFlag } from '../../../utils/index';
-import ActionState from '../../enums/ActionState';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import GameObject from '../GameObject';
-import type { GameObjectOptions, GameObjectRuntimeContext } from '../GameObject';
-import Stats from '../Stats';
-import CombatText from '../helpers/CombatText';
-import MatchTally, { type KillCredit } from '../../combat/MatchTally';
-import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
-import PathAgent from '../../nav/PathAgent';
-import { NAV_MAX_TERRAIN_RADIUS } from '../../nav/NavGrid';
-import type Buff from '../Buff';
-import type { BuffConstructor } from '../Buff';
+import { Circle } from '@/libs/quadtree';
+import { hasFlag } from '@/utils/index';
+import ActionState from '@/game/enums/ActionState';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import GameObject from '@/game/gameObject/GameObject';
+import type { GameObjectOptions, GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
+import Stats from '@/game/gameObject/Stats';
+import CombatText from '@/game/gameObject/helpers/CombatText';
+import MatchTally, { type KillCredit } from '@/game/combat/MatchTally';
+import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
+import PathAgent from '@/game/nav/PathAgent';
+import { NAV_MAX_TERRAIN_RADIUS } from '@/game/nav/NavGrid';
+import type Buff from '@/game/gameObject/Buff';
+import type { BuffConstructor } from '@/game/gameObject/Buff';
 
 export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
   game: GameObjectRuntimeContext;

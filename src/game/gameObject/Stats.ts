@@ -113,9 +113,9 @@ export class Stat {
 // Stats / StatsModifier — imports go here so Stat/StatModifier are first
 // ---------------------------------------------------------------------------
 
-import { hasFlag } from '../../utils/index';
-import ActionState from '../enums/ActionState';
-import StatusFlags from '../enums/StatusFlags';
+import { hasFlag } from '@/utils/index';
+import ActionState from '@/game/enums/ActionState';
+import StatusFlags from '@/game/enums/StatusFlags';
 
 export class StatsModifier {
   maxHealth = new StatModifier(0);

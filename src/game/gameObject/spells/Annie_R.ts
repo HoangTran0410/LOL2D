@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import Pet from '../attackableUnits/Pet';
-import AoePulse from '../spellObjects/AoePulse';
-import DamageOverTime from '../buffs/DamageOverTime';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
 
 export const MAX_RANGE = 450;
 export const SUMMON_DAMAGE = 34;

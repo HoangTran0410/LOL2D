@@ -1,9 +1,9 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Shield from '../buffs/Shield';
-import StatAmp from '../buffs/StatAmp';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Shield from '@/game/gameObject/buffs/Shield';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const DURATION = 7000;
 export const SHIELD_AMOUNT = 70;

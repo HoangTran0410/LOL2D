@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Champion from '../attackableUnits/Champion';
-import Dash from '../buffs/Dash';
-import Nearsight from '../buffs/Nearsight';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Nearsight from '@/game/gameObject/buffs/Nearsight';
 
 // Exported so the suite asserts the wiring, not a copy of the number —
 // retuning a value should not mean editing the test.

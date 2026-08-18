@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import BuffAddType from '../../enums/BuffAddType';
-import Dash from '../buffs/Dash';
-import Untargetable from '../buffs/Untargetable';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Untargetable from '@/game/gameObject/buffs/Untargetable';
 import { Zed_W_Clone } from './Zed_W';
 
 /** Bruised purple, so the mark does not read as a normal burn. */

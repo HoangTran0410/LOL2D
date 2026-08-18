@@ -14,7 +14,7 @@
  * lives on the overlay, and the two never share an element.
  */
 import { ref } from 'vue';
-import AssetManager from '../managers/AssetManager';
+import AssetManager from '@/managers/AssetManager';
 
 const logo = AssetManager.get('other_logo').url;
 

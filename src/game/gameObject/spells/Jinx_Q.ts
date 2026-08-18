@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import type BasicAttackController from '../../combat/BasicAttackController';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type BasicAttackController from '@/game/combat/BasicAttackController';
 
 export const DURATION = 6000;
 export const BONUS_RANGE = 200;

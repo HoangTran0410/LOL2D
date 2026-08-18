@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Airborne from '../buffs/Airborne';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import TrailSystem from '../helpers/TrailSystem';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
+import AssetManager from '@/managers/AssetManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CancelReason, CastContext, CastSpec } from '@/game/spell/runtime/types';
 import { notifyJannaControlLanded } from './Janna_E';
 
 /** Pale sea-green, the colour of Janna's wind. */

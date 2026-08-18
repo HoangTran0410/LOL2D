@@ -1,17 +1,17 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import StatusFlags from '../../enums/StatusFlags';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import { MAX_UNIT_SIZE } from '../Stats';
-import Airborne from '../buffs/Airborne';
-import Slow from '../buffs/Slow';
-import Speedup from '../buffs/Speedup';
-import TrailSystem from '../helpers/TrailSystem';
-import Phasing from '../buffs/Phasing';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import StatusFlags from '@/game/enums/StatusFlags';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { MAX_UNIT_SIZE } from '@/game/gameObject/Stats';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import Phasing from '@/game/gameObject/buffs/Phasing';
 
 /**
  * Powerball. The real spell accelerates: Rammus gains bonus movement speed every

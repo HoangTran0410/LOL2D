@@ -1,14 +1,14 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Root from '../buffs/Root';
-import { createReveal } from '../buffs/TrueSight';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Root from '@/game/gameObject/buffs/Root';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const CAITLYN_W_PLACE_RANGE = 500;
 /** The window in which a trap can be walked over for free. */

@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
 
 export const E_RANGE = 130;
 export const E_DAMAGE = 10;

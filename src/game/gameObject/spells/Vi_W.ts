@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import EventType from '../../enums/EventType';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Buff from '../Buff';
-import Slow from '../buffs/Slow';
-import StatAmp from '../buffs/StatAmp';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import EventType from '@/game/enums/EventType';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import Slow from '@/game/gameObject/buffs/Slow';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const W_DURATION_MS = 8_000;
 export const W_STACKS = 3;

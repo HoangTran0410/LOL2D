@@ -1,5 +1,5 @@
-import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import type GameObject from '../gameObject/GameObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type GameObject from '@/game/gameObject/GameObject';
 
 /**
  * Soft body separation for units.

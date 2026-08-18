@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Speedup from '../buffs/Speedup';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Speedup from '@/game/gameObject/buffs/Speedup';
 
 export const R_FIND_RANGE = 600;
 export const R_AIRBORNE_RADIUS = 200;

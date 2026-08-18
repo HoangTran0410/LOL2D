@@ -1,6 +1,6 @@
-import ColorUtils from '../../../utils/color.utils';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import ColorUtils from '@/utils/color.utils';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export default class CombatText extends SpellObject {
   velocity: p5.Vector;

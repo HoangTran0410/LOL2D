@@ -1,11 +1,11 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 // Exported so the suite asserts the on-hit wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.

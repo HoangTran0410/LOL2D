@@ -1,4 +1,4 @@
-import CollideUtils from '../utils/collide.utils';
+import CollideUtils from '@/utils/collide.utils';
 
 /**
  * `qtIndex` answers "which of my four child quadrants does this area touch?"

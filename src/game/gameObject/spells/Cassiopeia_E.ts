@@ -1,13 +1,13 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import AoePulse from '../spellObjects/AoePulse';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import DamageOverTime from '../buffs/DamageOverTime';
-import TrailSystem from '../helpers/TrailSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 export const RANGE = 450;
 export const BASE_DAMAGE = 10;

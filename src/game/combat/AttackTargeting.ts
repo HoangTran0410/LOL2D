@@ -1,9 +1,8 @@
-import { Circle } from '../../libs/quadtree';
-import { vecDist } from '../../utils/math.utils';
-import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import { PredefinedFilters } from '../managers/ObjectManager';
-import type GameObject from '../gameObject/GameObject';
-import type { Vec2 } from '../spell/runtime/types';
+import { Circle } from '@/libs/quadtree';
+import { vecDist } from '@/utils/math.utils';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { Vec2 } from '@/game/spell/runtime/types';
 
 /**
  * Target acquisition for an attack *order* — as opposed to the delivery in
@@ -50,8 +49,7 @@ export const FALLBACK_CHASE_MARGIN = 150;
 
 export type AttackTargetPriority = 'nearest' | 'lowest-health';
 
-const distanceTo = (point: Vec2, unit: AttackableUnit): number =>
-  vecDist(point, unit.position);
+const distanceTo = (point: Vec2, unit: AttackableUnit): number => vecDist(point, unit.position);
 
 /**
  * The attackable enemy nearest `point`, or null when the neighbourhood is empty.

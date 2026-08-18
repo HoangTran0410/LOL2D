@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import Shield from '../buffs/Shield';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import Champion from '../attackableUnits/Champion';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Shield from '@/game/gameObject/buffs/Shield';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const JARVAN_W_BASE_SHIELD = 50;
 export const JARVAN_W_SHIELD_PER_CHAMPION = 15;

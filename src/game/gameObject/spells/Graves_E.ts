@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import Dash from '../buffs/Dash';
-import StatAmp from '../buffs/StatAmp';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import Dash from '@/game/gameObject/buffs/Dash';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 export const DASH_DISTANCE = 250;
 export const DASH_SPEED = 20;

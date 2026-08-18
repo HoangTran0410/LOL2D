@@ -1,6 +1,6 @@
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
-import { StatsModifier } from '../Stats';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
+import { StatsModifier } from '@/game/gameObject/Stats';
 
 /**
  * Every stat a buff can modify, derived from StatsModifier rather than listed

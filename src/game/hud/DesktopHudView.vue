@@ -10,7 +10,7 @@
  * for the tooltip, everything else is the shared interaction layer.
  */
 import { inject } from 'vue';
-import FormatUtils from '../../utils/format.utils';
+import FormatUtils from '@/utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
 import PracticePanel from './PracticePanel.vue';

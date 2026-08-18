@@ -1,15 +1,15 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
-import Slow from '../buffs/Slow';
-import StatAmp from '../buffs/StatAmp';
-import { createReveal } from '../buffs/TrueSight';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Slow from '@/game/gameObject/buffs/Slow';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const XINZHAO_E_RANGE = 420;
 export const XINZHAO_E_DAMAGE = 22;

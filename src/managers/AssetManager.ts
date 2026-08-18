@@ -1,6 +1,6 @@
-import { assetManifest, type AssetKey, type AssetKind } from '../generated/assetManifest';
+import { assetManifest, type AssetKey, type AssetKind } from '@/generated/assetManifest';
 
-export type { AssetKey, AssetKind } from '../generated/assetManifest';
+export type { AssetKey, AssetKind } from '@/generated/assetManifest';
 
 export interface AssetHandle<T = unknown> {
   readonly key: AssetKey | null;

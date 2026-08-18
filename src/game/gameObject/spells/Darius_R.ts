@@ -1,18 +1,18 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
 import {
   pickExecuteTarget,
   type ExecuteFallback,
   type ExecuteSpell,
-} from '../../combat/ExecuteTargeting';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Champion from '../attackableUnits/Champion';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Dash from '../buffs/Dash';
-import Fear from '../buffs/Fear';
+} from '@/game/combat/ExecuteTargeting';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Fear from '@/game/gameObject/buffs/Fear';
 import { HEMORRHAGE_MAX_STACKS, hemorrhageStacks } from './Darius_Q';
 
 export const RANGE = 200;

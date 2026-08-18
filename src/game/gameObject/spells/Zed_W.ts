@@ -1,13 +1,13 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import StatusFlags from '../../enums/StatusFlags';
-import VectorUtils from '../../../utils/vector.utils';
-import { uuidv4 } from '../../../utils';
-import { isChargeActivation, type CastContext } from '../../spell/runtime/types';
-import Champion from '../attackableUnits/Champion';
-import Dash from '../buffs/Dash';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Spell from '../Spell';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import VectorUtils from '@/utils/vector.utils';
+import { uuidv4 } from '@/utils';
+import { isChargeActivation, type CastContext } from '@/game/spell/runtime/types';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Dash from '@/game/gameObject/buffs/Dash';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
 
 export default class Zed_W extends Spell {
   targetingMode = 'POINT' as const;

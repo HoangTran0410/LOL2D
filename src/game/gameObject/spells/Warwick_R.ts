@@ -1,13 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
-import Stun from '../buffs/Stun';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Stun from '@/game/gameObject/buffs/Stun';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 550;
 export const LEAP_SPEED = 24;

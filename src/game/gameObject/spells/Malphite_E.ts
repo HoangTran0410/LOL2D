@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CancelReason, CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Slow from '../buffs/Slow';
-import StatAmp from '../buffs/StatAmp';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CancelReason, CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Slow from '@/game/gameObject/buffs/Slow';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 /**
  * Ground Slam. Malphite slams the ground beneath him: an instant, self-centred

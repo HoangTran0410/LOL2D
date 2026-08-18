@@ -1,11 +1,11 @@
-import { Circle, Line, Rectangle } from '../../libs/quadtree';
-import { uuidv4 } from '../../utils/index';
-import type { CastContext, Vec2 } from '../spell/runtime/types';
-import type EventManager from '../../managers/EventManager';
+import { Circle, Line, Rectangle } from '@/libs/quadtree';
+import { uuidv4 } from '@/utils/index';
+import type { CastContext, Vec2 } from '@/game/spell/runtime/types';
+import type EventManager from '@/managers/EventManager';
 import type Spell from './Spell';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
-import type ObjectManager from '../managers/ObjectManager';
-import type NavigationSystem from '../nav/NavigationSystem';
+import type ObjectManager from '@/game/managers/ObjectManager';
+import type NavigationSystem from '@/game/nav/NavigationSystem';
 
 export interface GameObjectGameContext {
   objectManager: Pick<ObjectManager, 'queryObjects'> & Partial<Pick<ObjectManager, 'addObject'>>;

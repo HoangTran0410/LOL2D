@@ -1,4 +1,4 @@
-import type { CastContext } from '../spell/runtime/types';
+import type { CastContext } from '@/game/spell/runtime/types';
 
 export interface VfxHandle {
   readonly complete?: boolean;

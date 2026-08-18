@@ -1,8 +1,8 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import GameObject from '../GameObject';
-import type { GameObjectRuntimeContext } from '../GameObject';
-import Champion from '../attackableUnits/Champion';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import GameObject from '@/game/gameObject/GameObject';
+import type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 
 export interface FountainPresetData {
   name: string;

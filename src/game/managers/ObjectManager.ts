@@ -1,13 +1,13 @@
-import { System } from '../../libs/detect-collisions';
-import SpellObject from '../gameObject/SpellObject';
-import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import CombatText from '../gameObject/helpers/CombatText';
-import { Circle, Quadtree, Rectangle } from '../../libs/quadtree';
-import TrailSystem from '../gameObject/helpers/TrailSystem';
-import ParticleSystem from '../gameObject/helpers/ParticleSystem';
-import GameObject from '../gameObject/GameObject';
+import { System } from '@/libs/detect-collisions';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import CombatText from '@/game/gameObject/helpers/CombatText';
+import { Circle, Quadtree, Rectangle } from '@/libs/quadtree';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
+import GameObject from '@/game/gameObject/GameObject';
 import UnitCollisionSystem from './UnitCollisionSystem';
-import { canSee, type Seeable as VisionObserver } from '../combat/Vision';
+import { canSee, type Seeable as VisionObserver } from '@/game/combat/Vision';
 
 export type QueryArea = Circle | Rectangle;
 export type RenderQuality = 'auto' | 'low' | 'high';

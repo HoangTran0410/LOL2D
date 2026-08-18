@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Slow from '../buffs/Slow';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Slow from '@/game/gameObject/buffs/Slow';
 import { applyHemorrhage } from './Darius_Q';
-import { drawAxeArc, drawDariusAxe } from '../../vfx/DariusAxe';
+import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
 
 export const CAST_TIME_MS = 250;
 export const CONE_RANGE = 300;

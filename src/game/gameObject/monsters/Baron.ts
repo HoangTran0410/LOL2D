@@ -1,16 +1,16 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import MissileSpellObject from '../MissileSpellObject';
-import SpellObject from '../SpellObject';
-import AreaSpellObject from '../spellObjects/AreaSpellObject';
-import Airborne from '../buffs/Airborne';
-import DamageOverTime from '../buffs/DamageOverTime';
-import Slow from '../buffs/Slow';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import type Champion from '../attackableUnits/Champion';
-import type Monster from '../attackableUnits/Monster';
-import type { MonsterAbility } from '../attackableUnits/Monster';
-import type { Vec2 } from '../../spell/runtime/types';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AreaSpellObject from '@/game/gameObject/spellObjects/AreaSpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import Slow from '@/game/gameObject/buffs/Slow';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Champion from '@/game/gameObject/attackableUnits/Champion';
+import type Monster from '@/game/gameObject/attackableUnits/Monster';
+import type { MonsterAbility } from '@/game/gameObject/attackableUnits/Monster';
+import type { Vec2 } from '@/game/spell/runtime/types';
 
 /**
  * Baron's kit, and the first thing built on `MonsterAbility`.

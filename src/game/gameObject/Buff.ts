@@ -1,5 +1,5 @@
-import BuffAddType from '../enums/BuffAddType';
-import type { AssetHandle } from '../../managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import type { AssetHandle } from '@/managers/AssetManager';
 import type { GameObjectRuntimeContext } from './GameObject';
 import type AttackableUnit from './attackableUnits/AttackableUnit';
 

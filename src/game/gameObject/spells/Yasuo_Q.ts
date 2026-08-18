@@ -1,14 +1,14 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import { rectToVertices } from '../../../utils/index';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import MissileSpellObject from '../MissileSpellObject';
-import Airborne from '../buffs/Airborne';
-import RootBuff from '../buffs/Root';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import { rectToVertices } from '@/utils/index';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import RootBuff from '@/game/gameObject/buffs/Root';
 
 // Tuning lives here so the tests and the HUD read the same numbers the spell
 // does — retuning a value must never mean editing something else to match.

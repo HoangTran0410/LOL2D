@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
-import Shield from '../buffs/Shield';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../libs/quadtree';
-import MissileSpellObject from '../MissileSpellObject';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
+import Shield from '@/game/gameObject/buffs/Shield';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const EKKO_W_RADIUS = 150;
 export const EKKO_W_ARM_DELAY_MS = 2000;

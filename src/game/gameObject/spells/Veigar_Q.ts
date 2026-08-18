@@ -1,16 +1,16 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import CollideUtils from '../../../utils/collide.utils';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import BuffAddType from '../../enums/BuffAddType';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import StatAmp from '../buffs/StatAmp';
-import TrailSystem from '../helpers/TrailSystem';
-import type { ExecuteSpell } from '../../combat/ExecuteTargeting';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import CollideUtils from '@/utils/collide.utils';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import type { ExecuteSpell } from '@/game/combat/ExecuteTargeting';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /** Diameter of the orb, shared by the missile, the aim line and the preview. */
 export const ORB_SIZE = 26;

@@ -1,17 +1,17 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import { effectiveRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import EventType from '../../enums/EventType';
-import type { CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Buff from '../Buff';
-import Dash from '../buffs/Dash';
-import Invisible from '../buffs/Invisible';
-import TrailSystem from '../helpers/TrailSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import { effectiveRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import EventType from '@/game/enums/EventType';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Invisible from '@/game/gameObject/buffs/Invisible';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 import { VAYNE_R_Q_CDR, VAYNE_R_STEALTH_MS, Vayne_R_Buff } from './Vayne_R';
 
 /** How far the roll carries her. Repositioning, not travel. */

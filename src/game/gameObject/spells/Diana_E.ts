@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Dash from '../buffs/Dash';
-import TrailSystem from '../helpers/TrailSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Dash from '@/game/gameObject/buffs/Dash';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 import { MOON_CORE, MOON_PALE, drawCrescent, moonlightOn } from './Diana_Q';
 
 export const E_RANGE = 380;

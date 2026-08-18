@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Nearsight from '../buffs/Nearsight';
-import Slow from '../buffs/Slow';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import VectorUtils from '@/utils/vector.utils';
+import Nearsight from '@/game/gameObject/buffs/Nearsight';
+import Slow from '@/game/gameObject/buffs/Slow';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** Lobes of smoke making up the cloud. Enough to churn, few enough to stay cheap. */
 export const SMOKE_LOBES = 14;

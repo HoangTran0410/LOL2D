@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import DamageOverTime from '../buffs/DamageOverTime';
-import StatAmp from '../buffs/StatAmp';
-import type Buff from '../Buff';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type Buff from '@/game/gameObject/Buff';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const DURATION = 8000;
 export const BLIGHT_PER_TICK = 4;

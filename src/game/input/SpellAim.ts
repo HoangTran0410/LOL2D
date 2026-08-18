@@ -12,7 +12,7 @@
  * This maps one onto the other, per targeting mode, and nothing downstream has
  * to learn that a touch happened.
  */
-import type { TargetingMode, Vec2 } from '../spell/runtime/types';
+import type { TargetingMode, Vec2 } from '@/game/spell/runtime/types';
 
 export interface AimCandidate {
   readonly position: Vec2;

@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import Spell from '../Spell';
-import type Buff from '../Buff';
-import Silence from '../buffs/Silence';
-import Slow from '../buffs/Slow';
-import Speedup from '../buffs/Speedup';
-import StatAmp from '../buffs/StatAmp';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import Spell from '@/game/gameObject/Spell';
+import type Buff from '@/game/gameObject/Buff';
+import Silence from '@/game/gameObject/buffs/Silence';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 export const SPEED_DURATION = 3000;
 export const SPEED_PERCENT = 0.35;

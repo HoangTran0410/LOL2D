@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import RootBuff from '../buffs/Root';
-import TrailSystem from '../helpers/TrailSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import RootBuff from '@/game/gameObject/buffs/Root';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Faces on the prism, and spokes in the burst it leaves. */
 export const PRISM_FACES = 6;

@@ -1,10 +1,10 @@
-import PolyVisibility from '../../../libs/poly-visibility';
-import TerrainType from '../../enums/TerrainType';
-import CollideUtils from '../../../utils/collide.utils';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../libs/quadtree';
-import { removeGraphics } from '../../../utils/graphics.utils';
+import PolyVisibility from '@/libs/poly-visibility';
+import TerrainType from '@/game/enums/TerrainType';
+import CollideUtils from '@/utils/collide.utils';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { removeGraphics } from '@/utils/graphics.utils';
 
 // The fog polygon is recomputed at the unit's live position every frame — no
 // throttle, no interpolation — so the gradient (drawn every frame at the

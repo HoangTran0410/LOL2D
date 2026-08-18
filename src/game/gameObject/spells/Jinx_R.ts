@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { acceleratedSpeed, enemyChampionsOnly, travelRamp } from '../../combat/GlobalShot';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AoePulse from '../spellObjects/AoePulse';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { acceleratedSpeed, enemyChampionsOnly, travelRamp } from '@/game/combat/GlobalShot';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
 
 export const BLAST_RADIUS = 200;
 export const BASE_DAMAGE = 34;

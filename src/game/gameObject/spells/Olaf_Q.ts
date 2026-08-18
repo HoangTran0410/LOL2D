@@ -1,12 +1,12 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import ParticleSystem from '../helpers/ParticleSystem';
-import TrailSystem from '../helpers/TrailSystem';
-import Slow from '../buffs/Slow';
-import Speedup from '../buffs/Speedup';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 
 export default class Olaf_Q extends Spell {
   targetingMode = 'POINT' as const;

@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import Slow from '../buffs/Slow';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../libs/quadtree';
-import { effectiveRange } from '../../combat/Reach';
-import SpellObject from '../SpellObject';
-import TrailSystem from '../helpers/TrailSystem';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import Slow from '@/game/gameObject/buffs/Slow';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { effectiveRange } from '@/game/combat/Reach';
+import SpellObject from '@/game/gameObject/SpellObject';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const EKKO_Q_OUT_DAMAGE = 20;
 export const EKKO_Q_RETURN_DAMAGE = 30;

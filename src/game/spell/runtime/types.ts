@@ -1,5 +1,5 @@
-import type { SpellSfxSpec, SpellVfxSpec } from '../../vfx/SpellVfx';
-import type { BuffConstructor } from '../../gameObject/Buff';
+import type { SpellSfxSpec, SpellVfxSpec } from '@/game/vfx/SpellVfx';
+import type { BuffConstructor } from '@/game/gameObject/Buff';
 
 export type ActivationPattern = 'PRESS' | 'HOLD_RELEASE' | 'RECAST' | 'TOGGLE' | 'TAP_OR_HOLD';
 export type SpellRuntimeState =

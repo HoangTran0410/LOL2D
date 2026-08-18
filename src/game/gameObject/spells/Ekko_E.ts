@@ -1,12 +1,12 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import Dash from '../buffs/Dash';
-import Buff from '../Buff';
-import EventType from '../../enums/EventType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Buff from '@/game/gameObject/Buff';
+import EventType from '@/game/enums/EventType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const EKKO_E_BLINK_DAMAGE = 25;
 export const EKKO_E_WINDOW_MS = 5000;

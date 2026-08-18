@@ -1,13 +1,13 @@
-import { Circle } from '../../../libs/quadtree';
-import MissileSpellObject from '../MissileSpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import type { KillCredit } from '../../combat/MatchTally';
-import type { AttackableUnitOptions } from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Minion, { AGGRO_SCAN_INTERVAL_MS } from '../attackableUnits/Minion';
-import TrailSystem from '../helpers/TrailSystem';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { canSee } from '../../combat/Vision';
+import { Circle } from '@/libs/quadtree';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type { KillCredit } from '@/game/combat/MatchTally';
+import type { AttackableUnitOptions } from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Minion, { AGGRO_SCAN_INTERVAL_MS } from '@/game/gameObject/attackableUnits/Minion';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { canSee } from '@/game/combat/Vision';
 
 export interface TurretPresetData {
   health: number;

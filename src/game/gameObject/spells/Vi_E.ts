@@ -1,12 +1,12 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import { effectiveRange } from '../../combat/Reach';
-import EventType from '../../enums/EventType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import { effectiveRange } from '@/game/combat/Reach';
+import EventType from '@/game/enums/EventType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const E_CHARGES = 2;
 export const E_WINDOW_MS = 5_000;

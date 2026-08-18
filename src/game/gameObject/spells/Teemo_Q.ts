@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Nearsight from '../buffs/Nearsight';
-import TrailSystem from '../helpers/TrailSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Nearsight from '@/game/gameObject/buffs/Nearsight';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 export default class Teemo_Q extends Spell {
   targetingMode = 'DIRECTION' as const;

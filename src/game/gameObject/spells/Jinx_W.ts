@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import Slow from '../buffs/Slow';
-import AoePulse from '../spellObjects/AoePulse';
-import TrailSystem from '../helpers/TrailSystem';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import Slow from '@/game/gameObject/buffs/Slow';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * Reach of the bolt.

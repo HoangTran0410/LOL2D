@@ -54,10 +54,10 @@
  * the library, so it is also the thing that knows when the list changed, and
  * this component stays what it already was: a view of what it is handed.
  */
-import { getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
-import type { MatchRules } from '../../game/config/PregameConfig';
-import type { SavedKit } from '../../game/config/savedKits';
-import AssetManager from '../../managers/AssetManager';
+import { getSpellDisplay, type SpellCatalogEntry } from '@/game/preset';
+import type { MatchRules } from '@/game/config/PregameConfig';
+import type { SavedKit } from '@/game/config/savedKits';
+import AssetManager from '@/managers/AssetManager';
 import type { KitShelf } from './pregameCatalog';
 import SpellIcon from './SpellIcon.vue';
 import type { SpellPeek } from './useSpellPeek';

@@ -1,10 +1,10 @@
 // TODO: https://leagueoflegends.fandom.com/wiki/Nearsight
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
-import { StatsModifier } from '../Stats';
-import type { GameObjectRuntimeContext } from '../GameObject';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
+import { StatsModifier } from '@/game/gameObject/Stats';
+import type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
 
 export interface NearsightGameContext extends GameObjectRuntimeContext {
   fogOfWar: { sightChangeLerpSpeed: number };

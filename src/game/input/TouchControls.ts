@@ -34,8 +34,8 @@ import {
 } from './TouchLayout';
 import { VirtualJoystick, type JoystickVector } from './VirtualJoystick';
 import { resolveSpellAim, type AimCandidate, type SpellAimResult } from './SpellAim';
-import type { ActivationPattern, TargetingMode, Vec2 } from '../spell/runtime/types';
-import type { AttackTargetPriority } from '../combat/AttackTargeting';
+import type { ActivationPattern, TargetingMode, Vec2 } from '@/game/spell/runtime/types';
+import type { AttackTargetPriority } from '@/game/combat/AttackTargeting';
 
 /** One finger, in canvas coordinates. */
 export interface TouchPoint {

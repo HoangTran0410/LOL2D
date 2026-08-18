@@ -1,20 +1,20 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Airborne from '../buffs/Airborne';
-import Charm from '../buffs/Charm';
-import Dash from '../buffs/Dash';
-import Fear from '../buffs/Fear';
-import Ground from '../buffs/Ground';
-import Root from '../buffs/Root';
-import Shield from '../buffs/Shield';
-import Silence from '../buffs/Silence';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Charm from '@/game/gameObject/buffs/Charm';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Fear from '@/game/gameObject/buffs/Fear';
+import Ground from '@/game/gameObject/buffs/Ground';
+import Root from '@/game/gameObject/buffs/Root';
+import Shield from '@/game/gameObject/buffs/Shield';
+import Silence from '@/game/gameObject/buffs/Silence';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
 
 // Exported so the suite asserts the wiring, not a copy of the numbers —
 // retuning a value should not mean editing the test.

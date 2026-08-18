@@ -1,7 +1,7 @@
-import CollideUtils from '../../utils/collide.utils';
-import { withinRadius } from '../../utils/math.utils';
-import TerrainType from '../enums/TerrainType';
-import { Rectangle } from '../../libs/quadtree';
+import CollideUtils from '@/utils/collide.utils';
+import { withinRadius } from '@/utils/math.utils';
+import TerrainType from '@/game/enums/TerrainType';
+import { Rectangle } from '@/libs/quadtree';
 
 /**
  * Whether one unit can see another.

@@ -1,10 +1,10 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import type { CastSpec } from '../../spell/runtime/types';
-import CastBar, { unitCastBarAnchor } from '../../vfx/CastBar';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Shield from '../buffs/Shield';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Shield from '@/game/gameObject/buffs/Shield';
 
 // Exported so the suite asserts the channel's wiring, not a copy of the
 // numbers — retuning a value must not mean editing a test.

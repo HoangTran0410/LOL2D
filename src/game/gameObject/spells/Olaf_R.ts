@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import AoePulse from '../spellObjects/AoePulse';
-import StatAmp from '../buffs/StatAmp';
-import Airborne from '../buffs/Airborne';
-import Charm from '../buffs/Charm';
-import Fear from '../buffs/Fear';
-import Root from '../buffs/Root';
-import Silence from '../buffs/Silence';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Charm from '@/game/gameObject/buffs/Charm';
+import Fear from '@/game/gameObject/buffs/Fear';
+import Root from '@/game/gameObject/buffs/Root';
+import Silence from '@/game/gameObject/buffs/Silence';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
 
 export const DURATION = 7000;
 export const BONUS_DAMAGE = 10;

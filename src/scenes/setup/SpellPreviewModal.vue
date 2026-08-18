@@ -15,7 +15,7 @@
  * `SpellDetailPane.vue` for the content, same as everywhere else a spell's
  * description is shown on this screen.
  */
-import type { SpellDisplay } from '../../game/preset';
+import type { SpellDisplay } from '@/game/preset';
 import SpellDetailPane from './SpellDetailPane.vue';
 
 defineProps<{ display: SpellDisplay }>();

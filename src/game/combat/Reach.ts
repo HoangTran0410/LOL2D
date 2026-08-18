@@ -1,5 +1,5 @@
-import { DEFAULT_UNIT_SIZE } from '../gameObject/Stats';
-import { withinRadius } from '../../utils/math.utils';
+import { DEFAULT_UNIT_SIZE } from '@/game/gameObject/Stats';
+import { withinRadius } from '@/utils/math.utils';
 
 /**
  * Size-aware reach for caster-centred ranges.

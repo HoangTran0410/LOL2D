@@ -35,17 +35,17 @@
  * spell reading the old one.)
  */
 import { inject, onBeforeUnmount, onMounted, ref } from 'vue';
-import DomUtils from '../../../utils/dom.utils';
-import type { HudInteractions } from '../hudInteractions';
-import type { RenderFps } from '../../Game';
-import type { RenderQuality } from '../../managers/ObjectManager';
-import type { MatchRulesConfig } from '../../config/PregameConfig';
-import { CDR_PERCENT_MAX, CDR_PERCENT_MIN } from '../../config/PregameConfig';
+import DomUtils from '@/utils/dom.utils';
+import type { HudInteractions } from '@/game/hud/hudInteractions';
+import type { RenderFps } from '@/game/Game';
+import type { RenderQuality } from '@/game/managers/ObjectManager';
+import type { MatchRulesConfig } from '@/game/config/PregameConfig';
+import { CDR_PERCENT_MAX, CDR_PERCENT_MIN } from '@/game/config/PregameConfig';
 import {
   ZOOM_FACTOR_MAX,
   ZOOM_FACTOR_MIN,
   setZoomFactorPreference,
-} from '../../gameObject/map/Camera';
+} from '@/game/gameObject/map/Camera';
 
 const hud = inject<HudInteractions>('hud')!;
 const renderQuality = ref<RenderQuality>(hud.renderQuality);

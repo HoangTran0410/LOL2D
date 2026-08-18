@@ -1,7 +1,7 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
-import { StatsModifier } from '../Stats';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
+import { StatsModifier } from '@/game/gameObject/Stats';
 
 export default class Slow extends Buff {
   image: Buff['image'] = AssetManager.get('buff_slow');

@@ -1,4 +1,4 @@
-import type { BeamGeometry } from '../gameObject/spellObjects/BeamSpellObject';
+import type { BeamGeometry } from '@/game/gameObject/spellObjects/BeamSpellObject';
 import type { VfxHandle } from './SpellVfx';
 
 type Phase = 'prepare' | 'release';

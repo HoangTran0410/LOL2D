@@ -35,13 +35,13 @@
  * for the same reason.
  */
 import { computed, inject, onUnmounted, ref, shallowRef } from 'vue';
-import type { HudInteractions } from '../hudInteractions';
+import type { HudInteractions } from '@/game/hud/hudInteractions';
 import { scoreLine, statGroups } from './participantStats';
-import type { BotBehaviour, RosterEntry } from '../../MatchDirector';
-import type { ChampionLoadout } from '../../config/PregameConfig';
-import { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } from '../../config/PregameConfig';
-import AIChampion from '../../gameObject/attackableUnits/AIChampion';
-import LoadoutEditorModal from '../../../scenes/setup/LoadoutEditorModal.vue';
+import type { BotBehaviour, RosterEntry } from '@/game/MatchDirector';
+import type { ChampionLoadout } from '@/game/config/PregameConfig';
+import { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } from '@/game/config/PregameConfig';
+import AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
+import LoadoutEditorModal from '@/scenes/setup/LoadoutEditorModal.vue';
 
 const hud = inject<HudInteractions>('hud')!;
 

@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Dash from '../buffs/Dash';
-import Airborne from '../buffs/Airborne';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import CollideUtils from '../../../utils/collide.utils';
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import TrailSystem from '../helpers/TrailSystem';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import CollideUtils from '@/utils/collide.utils';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const JARVAN_Q_DAMAGE = 25;
 export const JARVAN_Q_KNOCKUP_MS = 750;

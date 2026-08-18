@@ -1,9 +1,9 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import DamageReflect from '../buffs/DamageReflect';
-import Shield from '../buffs/Shield';
-import Slow from '../buffs/Slow';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import DamageReflect from '@/game/gameObject/buffs/DamageReflect';
+import Shield from '@/game/gameObject/buffs/Shield';
+import Slow from '@/game/gameObject/buffs/Slow';
 
 export const DURATION = 5000;
 export const SHIELD_AMOUNT = 80;

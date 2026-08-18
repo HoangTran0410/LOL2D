@@ -1,5 +1,5 @@
-import StatusFlags from '../../enums/StatusFlags';
-import type { BuffConstructor } from '../../gameObject/Buff';
+import StatusFlags from '@/game/enums/StatusFlags';
+import type { BuffConstructor } from '@/game/gameObject/Buff';
 import type { CancelReason, InterruptPolicy, SpellRuntimeState } from './types';
 
 /**

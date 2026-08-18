@@ -1,8 +1,8 @@
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AssetManager from '../../../managers/AssetManager';
-import Speedup from '../buffs/Speedup';
-import Phasing from '../buffs/Phasing';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import Phasing from '@/game/gameObject/buffs/Phasing';
 
 export const DURATION = 5000;
 export const SPEED_PERCENT = 0.4;

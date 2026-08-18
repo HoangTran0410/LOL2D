@@ -1,11 +1,11 @@
-import AssetManager, { type AssetHandle } from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import DamageOverTime from '../buffs/DamageOverTime';
-import Stun from '../buffs/Stun';
-import TrailSystem from '../helpers/TrailSystem';
-import type { CastContext } from '../../spell/runtime/types';
+import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import Stun from '@/game/gameObject/buffs/Stun';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import type { CastContext } from '@/game/spell/runtime/types';
 
 /**
  * Sear, and the Blaze mechanic the whole kit is built on.

@@ -1,6 +1,6 @@
 import { isExecuteSpell, lethalTargets } from './ExecuteTargeting';
-import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import type Spell from '../gameObject/Spell';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Spell from '@/game/gameObject/Spell';
 
 /**
  * "This one dies if you press the key."

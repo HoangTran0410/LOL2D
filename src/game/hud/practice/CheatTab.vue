@@ -32,10 +32,10 @@
  * cancels touch gestures only when their target is the game canvas.
  */
 import { computed, inject, ref } from 'vue';
-import type { HudInteractions } from '../hudInteractions';
-import type { RosterEntry } from '../../MatchDirector';
-import type Spell from '../../gameObject/Spell';
-import type { DebugFlags } from '../../debug/DebugOverlay';
+import type { HudInteractions } from '@/game/hud/hudInteractions';
+import type { RosterEntry } from '@/game/MatchDirector';
+import type Spell from '@/game/gameObject/Spell';
+import type { DebugFlags } from '@/game/debug/DebugOverlay';
 
 const hud = inject<HudInteractions>('hud')!;
 

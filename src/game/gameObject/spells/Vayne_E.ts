@@ -1,15 +1,15 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { effectiveRange } from '../../combat/Reach';
-import type { CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Dash from '../buffs/Dash';
-import Stun from '../buffs/Stun';
-import TrailSystem from '../helpers/TrailSystem';
-import { pointInWall } from '../map/DynamicTerrain';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import { effectiveRange } from '@/game/combat/Reach';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Stun from '@/game/gameObject/buffs/Stun';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { pointInWall } from '@/game/gameObject/map/DynamicTerrain';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /** How far the heavy bolt flies. */
 export const VAYNE_E_RANGE = 400;

@@ -1,6 +1,6 @@
-import MissileSpellObject from '../MissileSpellObject';
-import { withinRadiusCoords } from '../../../utils/math.utils';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import { withinRadiusCoords } from '@/utils/math.utils';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export type HomingTarget = AttackableUnit;
 

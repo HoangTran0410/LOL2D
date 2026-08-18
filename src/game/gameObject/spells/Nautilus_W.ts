@@ -1,13 +1,13 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import EventType from '../../enums/EventType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import DamageOverTime from '../buffs/DamageOverTime';
-import Shield from '../buffs/Shield';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import EventType from '@/game/enums/EventType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
+import Shield from '@/game/gameObject/buffs/Shield';
 
 export const W_SHIELD = 35;
 export const W_DURATION_MS = 5_000;

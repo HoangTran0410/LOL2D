@@ -1,13 +1,13 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { BasicAttackHit } from '../../combat/BasicAttack';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Airborne from '../buffs/Airborne';
-import Stun from '../buffs/Stun';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { BasicAttackHit } from '@/game/combat/BasicAttack';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Stun from '@/game/gameObject/buffs/Stun';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /** How long the three strikes stay armed with no attack landing. */
 export const XINZHAO_Q_DURATION_MS = 5_000;

@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
-import TrailSystem from '../helpers/TrailSystem';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import { canSee } from '../../combat/Vision';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import { canSee } from '@/game/combat/Vision';
 
 type VeigarRTarget = AttackableUnit;
 

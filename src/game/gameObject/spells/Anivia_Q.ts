@@ -1,15 +1,15 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Chilled, { CHILL_DURATION_MS } from '../buffs/Chilled';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
-import TrailSystem from '../helpers/TrailSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Chilled, { CHILL_DURATION_MS } from '@/game/gameObject/buffs/Chilled';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /**
  * Flash Frost. The chunk of ice flies THROUGH everyone, chilling them, and only

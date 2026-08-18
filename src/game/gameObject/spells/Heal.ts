@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import { StatModifier } from '../Stats';
-import Speedup from '../buffs/Speedup';
-import CombatText from '../helpers/CombatText';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { StatModifier } from '@/game/gameObject/Stats';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import CombatText from '@/game/gameObject/helpers/CombatText';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export default class Heal extends Spell {
   targetingMode = 'SELF' as const;

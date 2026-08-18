@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
-import Dash from '../buffs/Dash';
-import VectorUtils from '../../../utils/vector.utils';
-import TrailSystem from '../helpers/TrailSystem';
-import { createReveal } from '../buffs/TrueSight';
-import { Rectangle } from '../../../libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Dash from '@/game/gameObject/buffs/Dash';
+import VectorUtils from '@/utils/vector.utils';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
+import { Rectangle } from '@/libs/quadtree';
 
 /** Lee Sin's own reveal slot, so his neither evicts nor is evicted by another spell's. */
 export const REVEAL_STACK_ID = 'leesin_q_reveal';

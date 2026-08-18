@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Invisible from '../buffs/Invisible';
-import Speedup from '../buffs/Speedup';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Invisible from '@/game/gameObject/buffs/Invisible';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const BLINK_RANGE = 200;
 export const STEALTH_MS = 2000;

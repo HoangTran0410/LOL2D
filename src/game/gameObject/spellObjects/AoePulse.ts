@@ -1,4 +1,4 @@
-import SpellObject from '../SpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 /**
  * The one-shot mark an area effect leaves behind: plays once, fades, gone.

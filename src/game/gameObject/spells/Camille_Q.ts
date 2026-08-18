@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import Buff from '../Buff';
-import EventType from '../../enums/EventType';
-import Speedup from '../buffs/Speedup';
-import SpellObject from '../SpellObject';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import Buff from '@/game/gameObject/Buff';
+import EventType from '@/game/enums/EventType';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import SpellObject from '@/game/gameObject/SpellObject';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 /** How long before the blade finishes charging and the hit turns true damage. */
 export const CAMILLE_Q_CHARGE_MS = 1500;

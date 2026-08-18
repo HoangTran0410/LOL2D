@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { Circle } from '../../../libs/quadtree';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
 export const CAMILLE_W_OUTER_DAMAGE = 40;
 export const CAMILLE_W_INNER_DAMAGE = 20;

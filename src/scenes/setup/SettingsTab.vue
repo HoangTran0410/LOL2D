@@ -7,11 +7,11 @@
  * everything else on this tab does: it changes how the *match* runs, not
  * who is playing.
  */
-import type { PregameConfig } from '../../game/config/PregameConfig';
+import type { PregameConfig } from '@/game/config/PregameConfig';
 import AiConfigPanel from './AiConfigPanel.vue';
 import MatchRulesPanel from './MatchRulesPanel.vue';
 import InputModePanel from './InputModePanel.vue';
-import type { TouchModePreference } from '../../game/input/TouchControls';
+import type { TouchModePreference } from '@/game/input/TouchControls';
 
 defineProps<{
   config: PregameConfig;

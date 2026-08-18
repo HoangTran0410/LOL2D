@@ -1,9 +1,9 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import RootBuff from '../buffs/Root';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import RootBuff from '@/game/gameObject/buffs/Root';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 
 export default class Leblanc_E extends Spell {
   targetingMode = 'DIRECTION' as const;

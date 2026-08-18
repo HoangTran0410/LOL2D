@@ -1,8 +1,8 @@
-import TeamId from '../enums/TeamId';
-import Minion, { MinionPresets, type MinionKind } from '../gameObject/attackableUnits/Minion';
-import type { GameObjectRuntimeContext } from '../gameObject/GameObject';
-import type Fountain from '../gameObject/structures/Fountain';
-import { LANES, getLaneWaypoints } from '../lanes';
+import TeamId from '@/game/enums/TeamId';
+import Minion, { MinionPresets, type MinionKind } from '@/game/gameObject/attackableUnits/Minion';
+import type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
+import type Fountain from '@/game/gameObject/structures/Fountain';
+import { LANES, getLaneWaypoints } from '@/game/lanes';
 
 /** ms between waves, per base. */
 export const WAVE_INTERVAL_MS = 30_000;

@@ -1,9 +1,9 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import { withinRadius } from '../../../utils/math.utils';
-import type { Vec2 } from '../../spell/runtime/types';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import { withinRadius } from '@/utils/math.utils';
+import type { Vec2 } from '@/game/spell/runtime/types';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 
 export type AreaTarget = AttackableUnit;
 

@@ -1,19 +1,19 @@
-import { Circle } from '../../../libs/quadtree';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import { getChampionPresetRandom } from '../../preset';
-import type { AssetKey } from '../../../managers/AssetManager';
+import { Circle } from '@/libs/quadtree';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { getChampionPresetRandom } from '@/game/preset';
+import type { AssetKey } from '@/managers/AssetManager';
 import Champion, { type ChampionOptions, type ChampionPresetData } from './Champion';
 import type AttackableUnit from './AttackableUnit';
-import { uuidv4 } from '../../../utils';
-import { vecDist } from '../../../utils/math.utils';
-import { effectiveRange } from '../../combat/Reach';
+import { uuidv4 } from '@/utils';
+import { vecDist } from '@/utils/math.utils';
+import { effectiveRange } from '@/game/combat/Reach';
 import TargetResolver, {
   defaultIsTargetable,
   defaultTargetInfo,
-} from '../../spell/targeting/TargetResolver';
-import type Spell from '../Spell';
-import { isChargeActivation, requireChargeSpec, type CastContext } from '../../spell/runtime/types';
-import type { Vec2 } from '../../spell/runtime/types';
+} from '@/game/spell/targeting/TargetResolver';
+import type Spell from '@/game/gameObject/Spell';
+import { isChargeActivation, requireChargeSpec, type CastContext } from '@/game/spell/runtime/types';
+import type { Vec2 } from '@/game/spell/runtime/types';
 
 export type ChampionPresetFactory = () => ChampionPresetData & { avatar: AssetKey };
 

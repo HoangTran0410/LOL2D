@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import StatusFlags from '../../enums/StatusFlags';
-import { SpellForm } from '../../spell/runtime/CancelPolicy';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import CastBar from '../../vfx/CastBar';
-import LuxBeamEffect from '../../vfx/LuxBeamEffect';
-import Buff from '../Buff';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import { createReveal } from '../buffs/TrueSight';
+import AssetManager from '@/managers/AssetManager';
+import StatusFlags from '@/game/enums/StatusFlags';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import CastBar from '@/game/vfx/CastBar';
+import LuxBeamEffect from '@/game/vfx/LuxBeamEffect';
+import Buff from '@/game/gameObject/Buff';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
 import Flash from './Flash';
 import Ghost from './Ghost';
 import Heal from './Heal';
@@ -17,8 +17,8 @@ import Lux_E, { Lux_E_Object } from './Lux_E';
 import BeamSpellObject, {
   beamBoundingBox,
   type BeamGeometry,
-} from '../spellObjects/BeamSpellObject';
-import type { Rectangle } from '../../../libs/quadtree';
+} from '@/game/gameObject/spellObjects/BeamSpellObject';
+import type { Rectangle } from '@/libs/quadtree';
 
 function hasSpells(unit: AttackableUnit): unit is AttackableUnit & { spells: Spell[] } {
   return 'spells' in unit && Array.isArray(unit.spells);

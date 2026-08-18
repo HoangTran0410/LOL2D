@@ -1,6 +1,6 @@
-import Buff from '../Buff';
-import CombatText from '../helpers/CombatText';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+import Buff from '@/game/gameObject/Buff';
+import CombatText from '@/game/gameObject/helpers/CombatText';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * Sends a share of every hit straight back at whoever landed it.

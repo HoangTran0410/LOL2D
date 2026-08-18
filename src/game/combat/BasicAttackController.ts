@@ -1,7 +1,7 @@
-import { hasFlag } from '../../utils/index';
-import ActionState from '../enums/ActionState';
-import EventType from '../enums/EventType';
-import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
+import { hasFlag } from '@/utils/index';
+import ActionState from '@/game/enums/ActionState';
+import EventType from '@/game/enums/EventType';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import { BasicAttackBolt, BasicAttackSwing, MELEE_RANGE_THRESHOLD, canBeHit } from './BasicAttack';
 
 /**

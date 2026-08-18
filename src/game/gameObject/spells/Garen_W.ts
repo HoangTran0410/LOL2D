@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Shield from '../buffs/Shield';
-import StatAmp from '../buffs/StatAmp';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Shield from '@/game/gameObject/buffs/Shield';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
 
 export const DURATION = 3000;
 export const SHIELD_AMOUNT = 70;

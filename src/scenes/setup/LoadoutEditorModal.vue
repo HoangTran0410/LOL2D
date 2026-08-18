@@ -63,17 +63,17 @@
  * kit crosses between them.
  */
 import { ref, shallowRef, computed, nextTick } from 'vue';
-import type { ChampionLoadout, MatchRules, SlotChoice } from '../../game/config/PregameConfig';
-import { SLOT_COUNT } from '../../game/config/PregameConfig';
+import type { ChampionLoadout, MatchRules, SlotChoice } from '@/game/config/PregameConfig';
+import { SLOT_COUNT } from '@/game/config/PregameConfig';
 import {
   deleteKit,
   loadSavedKits,
   saveKit,
   SAVED_KIT_NAME_MAX,
   type SavedKit,
-} from '../../game/config/savedKits';
-import { SpellHotKeys } from '../../game/constants';
-import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
+} from '@/game/config/savedKits';
+import { SpellHotKeys } from '@/game/constants';
+import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '@/game/preset';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
 import KitRoster from './KitRoster.vue';
 import SpellDetailPane from './SpellDetailPane.vue';

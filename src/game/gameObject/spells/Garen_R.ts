@@ -1,19 +1,19 @@
-import AssetManager from '../../../managers/AssetManager';
-import { Circle, Rectangle } from '../../../libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { Circle, Rectangle } from '@/libs/quadtree';
 import {
   pickExecuteTarget,
   type ExecuteFallback,
   type ExecuteSpell,
-} from '../../combat/ExecuteTargeting';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Champion from '../attackableUnits/Champion';
-import Pet from '../attackableUnits/Pet';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AoePulse from '../spellObjects/AoePulse';
-import { createReveal } from '../buffs/TrueSight';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
+} from '@/game/combat/ExecuteTargeting';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 export const RANGE = 200;
 export const BASE_DAMAGE = 30;

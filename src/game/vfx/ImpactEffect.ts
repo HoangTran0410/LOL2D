@@ -1,4 +1,4 @@
-import type { Vec2 } from '../spell/runtime/types';
+import type { Vec2 } from '@/game/spell/runtime/types';
 import ParticleEmitter from './ParticleEmitter';
 
 export default class ImpactEffect extends ParticleEmitter {

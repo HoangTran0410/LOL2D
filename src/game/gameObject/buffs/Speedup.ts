@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Buff from '../Buff';
-import { StatsModifier } from '../Stats';
-import ParticleSystem from '../helpers/ParticleSystem';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Buff from '@/game/gameObject/Buff';
+import { StatsModifier } from '@/game/gameObject/Stats';
+import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
 
 interface SpeedupParticle {
   x: number;

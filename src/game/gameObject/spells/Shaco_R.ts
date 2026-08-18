@@ -1,10 +1,10 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import Pet from '../attackableUnits/Pet';
-import Fear from '../buffs/Fear';
-import ParticleSystem from '../helpers/ParticleSystem';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
+import Fear from '@/game/gameObject/buffs/Fear';
+import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
 import { ATTACK_DAMAGE, ATTACK_RANGE, Shaco_W_Box } from './Shaco_W';
 
 export default class Shaco_R extends Spell {

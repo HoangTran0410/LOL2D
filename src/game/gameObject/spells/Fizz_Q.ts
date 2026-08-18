@@ -1,11 +1,11 @@
-import { Circle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange } from '../../combat/Reach';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AoePulse from '../spellObjects/AoePulse';
-import Dash from '../buffs/Dash';
+import { Circle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange } from '@/game/combat/Reach';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import Dash from '@/game/gameObject/buffs/Dash';
 
 export const RANGE = 380;
 export const DAMAGE = 22;

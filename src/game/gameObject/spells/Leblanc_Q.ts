@@ -1,16 +1,16 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import BuffAddType from '../../enums/BuffAddType';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import Buff from '../Buff';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import HomingMissileSpellObject from '../spellObjects/HomingMissileSpellObject';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import TrailSystem from '../helpers/TrailSystem';
-import { canSee } from '../../combat/Vision';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import BuffAddType from '@/game/enums/BuffAddType';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import Buff from '@/game/gameObject/Buff';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { canSee } from '@/game/combat/Vision';
 
 type SigilTarget = AttackableUnit;
 

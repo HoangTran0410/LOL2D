@@ -1,11 +1,11 @@
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import Spell from '../Spell';
-import MissileSpellObject from '../MissileSpellObject';
-import SpellObject from '../SpellObject';
-import Slow from '../buffs/Slow';
-import VectorUtils from '../../../utils/vector.utils';
-import TrailSystem from '../helpers/TrailSystem';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import Spell from '@/game/gameObject/Spell';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Slow from '@/game/gameObject/buffs/Slow';
+import VectorUtils from '@/utils/vector.utils';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Windup: each needle draws itself out of the bow rather than blinking in. */
 export const NEEDLE_SPAWN_MS = 90;

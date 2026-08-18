@@ -11,9 +11,9 @@
  * entirely local to this component instead of being driven from `MenuScene.ts`.
  */
 import { onMounted, onUnmounted, ref } from 'vue';
-import AssetManager, { type AssetKey } from '../managers/AssetManager';
-import DomUtils from '../utils/dom.utils';
-import { applyUpdate, offlineReady, updateReady } from '../pwa/updates';
+import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import DomUtils from '@/utils/dom.utils';
+import { applyUpdate, offlineReady, updateReady } from '@/pwa/updates';
 
 const MENU_BACKGROUNDS: AssetKey[] = [
   'other_menu_bg_1',

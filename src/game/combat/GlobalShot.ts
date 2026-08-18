@@ -1,6 +1,6 @@
-import { PredefinedFilters, type GameObjectFilter } from '../managers/ObjectManager';
-import Champion from '../gameObject/attackableUnits/Champion';
-import Pet from '../gameObject/attackableUnits/Pet';
+import { PredefinedFilters, type GameObjectFilter } from '@/game/managers/ObjectManager';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Pet from '@/game/gameObject/attackableUnits/Pet';
 
 /**
  * The two rules that make a global ultimate a global ultimate.

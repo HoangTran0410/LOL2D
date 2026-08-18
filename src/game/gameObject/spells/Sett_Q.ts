@@ -1,10 +1,10 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import type { CastSpec } from '../../spell/runtime/types';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import StatAmp from '../buffs/StatAmp';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import type { CastSpec } from '@/game/spell/runtime/types';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const SETT_Q_HITS = 2;
 export const SETT_Q_WINDOW_MS = 5_000;

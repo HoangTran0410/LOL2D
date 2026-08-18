@@ -25,8 +25,8 @@
 import { ref, computed } from 'vue';
 import { usePregameConfig } from './setup/usePregameConfig';
 import { useTouchUi } from './setup/useTouchUi';
-import { AI_COUNT_MAX, type ChampionLoadout } from '../game/config/PregameConfig';
-import { getSpellDisplay, type SpellDisplay } from '../game/preset';
+import { AI_COUNT_MAX, type ChampionLoadout } from '@/game/config/PregameConfig';
+import { getSpellDisplay, type SpellDisplay } from '@/game/preset';
 import type { SpellClass } from './setup/types';
 import PlayersTab from './setup/PlayersTab.vue';
 import SettingsTab from './setup/SettingsTab.vue';

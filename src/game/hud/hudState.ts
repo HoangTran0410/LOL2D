@@ -8,9 +8,9 @@
  * "66/100 health" or "this spell is greyed out" — that logic is written once,
  * here, and both views only choose how to lay the result out.
  */
-import type Game from '../Game';
-import { SpellHotKeys } from '../constants';
-import AssetManager, { type AssetHandle } from '../../managers/AssetManager';
+import type Game from '@/game/Game';
+import { SpellHotKeys } from '@/game/constants';
+import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 
 function ensureVisibleAsset(asset: Pick<AssetHandle, 'key' | 'status'> | undefined): void {
   if (asset?.key && asset.status === 'idle') {

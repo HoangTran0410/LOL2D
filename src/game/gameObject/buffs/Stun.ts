@@ -1,9 +1,9 @@
 // TODO https://leagueoflegends.fandom.com/wiki/Stun
 // https://leagueoflegends.fandom.com/wiki/Root
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import StatusFlags from '../../enums/StatusFlags';
-import Buff from '../Buff';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import StatusFlags from '@/game/enums/StatusFlags';
+import Buff from '@/game/gameObject/Buff';
 
 // Làm choáng
 export default class Stun extends Buff {

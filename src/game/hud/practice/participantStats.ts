@@ -1,4 +1,4 @@
-import type AttackableUnit from '../../gameObject/attackableUnits/AttackableUnit';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * What a roster card says about a participant.

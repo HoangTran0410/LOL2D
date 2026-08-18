@@ -1,13 +1,13 @@
-import AssetManager from '../../../managers/AssetManager';
-import VectorUtils from '../../../utils/vector.utils';
-import MissileSpellObject from '../MissileSpellObject';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import TrailSystem from '../helpers/TrailSystem';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
+import AssetManager from '@/managers/AssetManager';
+import VectorUtils from '@/utils/vector.utils';
+import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import { detonateEssenceFlux } from './Ezreal_W';
 
 /** Not literally global, but far enough to cross most of a fight from outside it. */

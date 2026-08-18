@@ -1,16 +1,16 @@
-import { Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { effectiveRange, withinRange } from '../../combat/Reach';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Champion from '../attackableUnits/Champion';
-import Shield from '../buffs/Shield';
-import StatAmp from '../buffs/StatAmp';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import TargetResolver from '../../spell/targeting/TargetResolver';
-import type { TargetingRequest } from '../../spell/targeting/TargetResolver';
-import { canSee } from '../../combat/Vision';
+import { Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Shield from '@/game/gameObject/buffs/Shield';
+import StatAmp from '@/game/gameObject/buffs/StatAmp';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import { canSee } from '@/game/combat/Vision';
 
 type EyeTarget = AttackableUnit;
 

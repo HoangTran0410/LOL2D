@@ -1,7 +1,7 @@
-import { Circle } from '../../../libs/quadtree';
-import { withinRadius } from '../../../utils/math.utils';
-import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
+import { Circle } from '@/libs/quadtree';
+import { withinRadius } from '@/utils/math.utils';
+import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitRenderOptions } from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';

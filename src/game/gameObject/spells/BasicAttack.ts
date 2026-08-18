@@ -1,14 +1,14 @@
-import AssetManager from '../../../managers/AssetManager';
-import Spell from '../Spell';
+import AssetManager from '@/managers/AssetManager';
+import Spell from '@/game/gameObject/Spell';
 import {
   CURSOR_ACQUISITION_RADIUS,
   FALLBACK_CHASE_MARGIN,
   findAttackTargetNearPoint,
-} from '../../combat/AttackTargeting';
-import { DEFAULT_CHAMPION_ATTACK } from '../attackableUnits/Champion';
-import type AttackableUnit from '../attackableUnits/AttackableUnit';
-import type BasicAttackController from '../../combat/BasicAttackController';
-import type { CastContext, CastSpec, Vec2 } from '../../spell/runtime/types';
+} from '@/game/combat/AttackTargeting';
+import { DEFAULT_CHAMPION_ATTACK } from '@/game/gameObject/attackableUnits/Champion';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type BasicAttackController from '@/game/combat/BasicAttackController';
+import type { CastContext, CastSpec, Vec2 } from '@/game/spell/runtime/types';
 
 /**
  * The basic attack, as an ability.

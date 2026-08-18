@@ -1,8 +1,8 @@
-import AssetManager from '../../../managers/AssetManager';
-import EventType from '../../enums/EventType';
-import { uuidv4 } from '../../../utils/index';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
+import AssetManager from '@/managers/AssetManager';
+import EventType from '@/game/enums/EventType';
+import { uuidv4 } from '@/utils/index';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
 
 // Exported so the suite asserts Mimic's wiring, not a copy of the numbers —
 // retuning a value should not mean editing the test.

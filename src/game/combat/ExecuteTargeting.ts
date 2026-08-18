@@ -1,7 +1,7 @@
-import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
-import type Spell from '../gameObject/Spell';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Spell from '@/game/gameObject/Spell';
 import { canSee, type Seeable } from './Vision';
-import { vecDist } from '../../utils/math.utils';
+import { vecDist } from '@/utils/math.utils';
 
 /**
  * Last-hitting, for a game that cannot click a unit.

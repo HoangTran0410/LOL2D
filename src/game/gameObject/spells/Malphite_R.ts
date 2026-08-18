@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import VectorUtils from '../../../utils/vector.utils';
-import { PredefinedParticleSystems } from '../helpers/ParticleSystem';
-import Airborne from '../buffs/Airborne';
-import Dash from '../buffs/Dash';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import VectorUtils from '@/utils/vector.utils';
+import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import Airborne from '@/game/gameObject/buffs/Airborne';
+import Dash from '@/game/gameObject/buffs/Dash';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
 
 export const MAX_RANGE = 350;
 export const HIT_RADIUS = 100;

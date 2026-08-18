@@ -1,7 +1,7 @@
-import SAT from '../../../libs/SAT';
-import { Rectangle } from '../../../libs/quadtree';
-import { uuidv4 } from '../../../utils/index';
-import TerrainType from '../../enums/TerrainType';
+import SAT from '@/libs/SAT';
+import { Rectangle } from '@/libs/quadtree';
+import { uuidv4 } from '@/utils/index';
+import TerrainType from '@/game/enums/TerrainType';
 
 export default class Obstacle {
   type: string;

@@ -1,12 +1,12 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import BuffAddType from '../../enums/BuffAddType';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Stun from '../buffs/Stun';
-import TrailSystem from '../helpers/TrailSystem';
-import { acceleratedSpeed, enemyChampionsOnly, travelRamp } from '../../combat/GlobalShot';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import BuffAddType from '@/game/enums/BuffAddType';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Stun from '@/game/gameObject/buffs/Stun';
+import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
+import { acceleratedSpeed, enemyChampionsOnly, travelRamp } from '@/game/combat/GlobalShot';
 
 export const SIZE = 35;
 export const DAMAGE = 30;

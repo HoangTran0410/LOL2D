@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** The "Luật Đấu" column: cooldown reduction and URF. */
-import { CDR_PERCENT_MIN, CDR_PERCENT_MAX } from '../../game/config/PregameConfig';
+import { CDR_PERCENT_MIN, CDR_PERCENT_MAX } from '@/game/config/PregameConfig';
 
 defineProps<{
   cooldownReductionPercent: number;

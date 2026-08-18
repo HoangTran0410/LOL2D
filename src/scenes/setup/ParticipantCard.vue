@@ -19,9 +19,9 @@
  * only competing target is "open the editor".
  */
 import { computed } from 'vue';
-import AssetManager from '../../managers/AssetManager';
-import type { ChampionLoadout } from '../../game/config/PregameConfig';
-import type { SpellCatalogEntry } from '../../game/preset';
+import AssetManager from '@/managers/AssetManager';
+import type { ChampionLoadout } from '@/game/config/PregameConfig';
+import type { SpellCatalogEntry } from '@/game/preset';
 import { getPregameCatalog } from './pregameCatalog';
 import type { SpellClass } from './types';
 import SpellIcon from './SpellIcon.vue';

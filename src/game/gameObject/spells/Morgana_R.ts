@@ -1,15 +1,15 @@
-import { Circle, Rectangle } from '../../../libs/quadtree';
-import AssetManager from '../../../managers/AssetManager';
-import { PredefinedFilters } from '../../managers/ObjectManager';
-import type { CastContext, CastSpec } from '../../spell/runtime/types';
-import Spell from '../Spell';
-import SpellObject from '../SpellObject';
-import Buff from '../Buff';
-import AttackableUnit from '../attackableUnits/AttackableUnit';
-import Slow from '../buffs/Slow';
-import Stun from '../buffs/Stun';
-import Speedup from '../buffs/Speedup';
-import { createReveal } from '../buffs/TrueSight';
+import { Circle, Rectangle } from '@/libs/quadtree';
+import AssetManager from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import Spell from '@/game/gameObject/Spell';
+import SpellObject from '@/game/gameObject/SpellObject';
+import Buff from '@/game/gameObject/Buff';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import Slow from '@/game/gameObject/buffs/Slow';
+import Stun from '@/game/gameObject/buffs/Stun';
+import Speedup from '@/game/gameObject/buffs/Speedup';
+import { createReveal } from '@/game/gameObject/buffs/TrueSight';
 
 // Exported so the suite asserts the tether's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.
