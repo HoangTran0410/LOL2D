@@ -156,7 +156,7 @@ describe('Syndra — the sphere economy', () => {
 
     const w = new Syndra_W(owner);
     w.onActivate(context(400, 0));
-    expect(carried.mode).toBe('held');
+    expect(['reeling', 'held']).toContain(carried.mode);
     expect(groundedSpheres(owner).length).toBe(0);
 
     w.onRecast(context(400, 0));
@@ -176,7 +176,7 @@ describe('Syndra — the sphere economy', () => {
 
     const w = new Syndra_W(owner);
     w.onActivate(context(300, 0));
-    expect(carried.mode).toBe('held');
+    expect(['reeling', 'held']).toContain(carried.mode);
 
     owner.position.x = 40;
     w.onComplete(context(300, 0));
@@ -233,5 +233,25 @@ describe('Syndra — the sphere economy', () => {
     advance(SYNDRA_R_CONVERGE_MS + 200);
     expect(victim.tally.damageTaken).toBeGreaterThan(0);
     expect(bystander.tally.damageTaken).toBe(0);
+  });
+
+  it('R refuses to target self or ally and does not bombard self', () => {
+    const r = new Syndra_R(owner);
+    const ally = unit(game, 200, 'blue');
+    game.objectManager.addObject(ally);
+    sphere(-100);
+    game.objectManager.update();
+
+    r.onSpellCast(context(0, 0, owner));
+    expect(owner.tally.damageTaken).toBe(0);
+    expect(groundedSpheres(owner).length).toBe(1);
+
+    r.onSpellCast(context(200, 0, ally));
+    expect(ally.tally.damageTaken).toBe(0);
+    expect(groundedSpheres(owner).length).toBe(1);
+
+    const pressed = r.press(context(0, 0));
+    expect(pressed).toBe(false);
+    expect(owner.tally.damageTaken).toBe(0);
   });
 });

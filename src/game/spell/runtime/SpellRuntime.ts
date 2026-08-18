@@ -141,9 +141,11 @@ export class SpellRuntime {
     return this._state === 'CHARGING';
   }
 
-  release(context: CastContext): boolean {
-    void context;
+  release(context?: CastContext): boolean {
     if (this._state !== 'CHARGING') return false;
+    if (context) {
+      this.context = snapshotContext(context);
+    }
     return this.releaseCast();
   }
 

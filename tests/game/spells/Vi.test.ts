@@ -156,7 +156,7 @@ describe('Vi spells', () => {
     w.onSpellCast();
 
     for (let i = 0; i < W_STACKS; i++) swing(victim);
-    expect(owner.stats.attackSpeed.value).toBeCloseTo(W_ATTACK_SPEED, 5);
+    expect(owner.stats.attackSpeed.value).toBeCloseTo(0.5, 5);
 
     swing(victim);
     swing(victim);
@@ -218,5 +218,24 @@ describe('Vi spells', () => {
     expect(target.stats.health.value).toBe(100 - R_DAMAGE);
     expect(target.buffs.some(buff => buff instanceof Airborne)).toBe(true);
     expect(bystander.stats.health.value).toBe(100 - R_PASS_DAMAGE);
+  });
+
+  it('R refuses to target self or ally and does not dash into or damage self', () => {
+    const r = new Vi_R(owner);
+    const ally = unit(game, 200, 'blue');
+    game.objectManager.addObject(ally);
+    game.objectManager.update();
+
+    r.onSpellCast(context(0, 0, owner));
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
+    expect(owner.tally.damageTaken).toBe(0);
+
+    r.onSpellCast(context(200, 0, ally));
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
+    expect(ally.tally.damageTaken).toBe(0);
+
+    const pressed = r.press(context(0, 0));
+    expect(pressed).toBe(false);
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
   });
 });

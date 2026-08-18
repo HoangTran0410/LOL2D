@@ -115,6 +115,8 @@ Each was found by measurement, more than once, and none is visible from the file
 
 **`ON_ATTACK_HIT` is basic attacks only** — `combat/BasicAttack.ts` is the sole emitter, so an effect hung there is invisible to every spell. Annie E's shield burn shipped that way and punished nobody. For "someone damaged me", use `Buff.onDamageTaken`.
 
+**A `UNIT` targeting spell must declare `targetingRequest: { targetTeam: 'ENEMY' }` (or `'ALLY'`), validate `context.target`, and override `press()`.** Omitting `targetTeam` causes `TargetResolver` to default to `'ANY'`, which includes the caster herself (`request.caster`). With the cursor on empty ground, nearest-to-cursor fallback will resolve the caster as the target, causing the spell to cast on, dash to, and damage the caster herself (`Diana E`, `Sett R`, `Syndra R`, `Vi R` all shipped with this). Always provide `targetingRequest` with explicit `targetTeam: 'ENEMY'`, validate `target !== this.owner && target.teamId !== this.owner.teamId` in `checkCastCondition`/`onSpellCast`, and wire `press()` to resolve through `TargetResolver`.
+
 **Concurrent agents share one working tree.** `git stash` takes another agent's uncommitted work with it. Use `git worktree`, and commit with explicit paths — never `git add -A`, never `.`, never a bare `git commit`.
 
 ## Assets and data

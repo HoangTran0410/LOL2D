@@ -98,10 +98,10 @@ describe('Diana spells', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  it('Q sweeps a 180 degree arc: the flanks are cut, the back is not', () => {
-    // Three enemies at the same distance, differing only in angle from the aim.
+  it('Q curves along a crescent arc: the arc path and destination are cut, the back is not', () => {
+    // Enemies along destination, crescent arc, and behind the cast.
     const ahead = enemyAt(HOME_X + 250, HOME_Y);
-    const flank = enemyAt(HOME_X, HOME_Y + 250);
+    const flank = enemyAt(HOME_X + 150, HOME_Y + 110);
     const behind = enemyAt(HOME_X - 250, HOME_Y);
     game.objectManager.update();
 
@@ -174,6 +174,30 @@ describe('Diana spells', () => {
     expect(victim.tally.damageTaken).toBe(E_DAMAGE);
     expect(e.lastDiveConsumedMoonlight).toBe(false);
     expect(reset).not.toHaveBeenCalled();
+  });
+
+  it('E refuses to cast on self or an ally and never deals self-damage', () => {
+    const e = new Diana_E(owner);
+    const ally = unitAt(HOME_X + 100, HOME_Y, 'blue');
+    game.objectManager.addObject(ally);
+    game.objectManager.update();
+
+    // Direct cast targeting self or ally is rejected by onSpellCast and press
+    e.onSpellCast(context(0, 0, owner));
+    expect(owner.tally.damageTaken).toBe(0);
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
+
+    e.onSpellCast(context(100, 0, ally));
+    expect(ally.tally.damageTaken).toBe(0);
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
+
+    // Press with empty ground or no enemy returns false and does not dash or damage
+    const pressedSelf = e.press(context(0, 0));
+    expect(pressedSelf).toBe(false);
+    expect(owner.tally.damageTaken).toBe(0);
+    expect(owner.buffs.some(buff => buff instanceof Dash)).toBe(false);
+    expect(e.currentCooldown).toBe(0);
+    expect(e.state).toBe('READY');
   });
 
   it('W refreshes the shield once all three spheres are spent, and not before', () => {

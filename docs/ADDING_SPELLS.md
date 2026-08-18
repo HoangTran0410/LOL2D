@@ -94,10 +94,11 @@ declaring it `UNIT` hands the *cast itself* to `TargetResolver`, which (unlike
 these spells' own lookup) requires the cursor to be sitting almost on top of a
 body before it will resolve at all — see `TargetResolver.resolve`'s `UNIT`
 branch. None of these spells supply the `targetingRequest` + `press()`
-override that the real `UNIT` spells do (`Malphite_Q`, `Janna_E`/`W`,
-`Anivia_E`, `Leblanc_Q`, `Veigar_R` all override both — see any of them for
+override that the real `UNIT` spells do (`Diana_E`, `Malphite_Q`, `Janna_E`/`W`,
+`Anivia_E`, `Leblanc_Q`, `Sett_R`, `Syndra_R`, `Veigar_R`, `Vi_R` all override both — see any of them for
 the pattern); without that, `UNIT` would silently swallow the key press
 whenever the mouse is not precisely on a target, which none of them do today.
+**Every `UNIT` spell must explicitly set `targetTeam: 'ENEMY'`** (or `'ALLY'`) in its `targetingRequest` and guard against self/friendly target in `onSpellCast`/`checkCastCondition`; omitting `targetTeam` defaults to `'ANY'`, allowing the caster to self-target and deal damage to themselves when no enemy is around.
 They are declared `targetingMode = 'SELF'` instead: it is the only mode that
 changes nothing about when the cast is allowed to start, on touch or on
 desktop. Turning one of these into a true `UNIT` spell — so a drag can

@@ -1,11 +1,13 @@
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Dash from '@/game/gameObject/buffs/Dash';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
 import { MOON_CORE, MOON_PALE, drawCrescent, moonlightOn } from './Diana_Q';
 
 export const E_RANGE = 380;
@@ -38,19 +40,62 @@ export default class Diana_E extends Spell {
       activation: 'PRESS',
       targeting: 'UNIT',
       castTimeMs: E_WINDUP_MS,
-      resource: { commitAt: 'start', refundOn: [] },
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
   }
 
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {
+      range: this.range,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => this.isValidTarget(candidate),
+      getTargetInfo: candidate =>
+        this.isValidTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
+    };
+  }
+
+  private isValidTarget(target?: unknown): target is AttackableUnit {
+    return (
+      target instanceof AttackableUnit &&
+      !target.isDead &&
+      !target.toRemove &&
+      target !== this.owner &&
+      target.teamId !== this.owner.teamId &&
+      withinRange(this.range, this.owner, target)
+    );
+  }
+
   checkCastCondition(): boolean {
-    return Dash.CanDash(this.owner);
+    return Dash.CanDash(this.owner) && this.isValidTarget(this.castContext?.target);
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) {
+      if (!this.isValidTarget(context.target as AttackableUnit)) return false;
+      return super.press(context);
+    }
+
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      ...this.targetingRequest,
+    });
+    return result.ok ? super.press(result.context) : false;
   }
 
   onSpellCast(context?: CastContext): void {
     const target = context?.target as AttackableUnit | undefined;
-    if (!target || target.isDead) return;
-    if (!withinRange(this.range, this.owner, target)) return;
+    if (!this.isValidTarget(target)) return;
 
     const from = this.owner.position;
     const dx = target.position.x - from.x;

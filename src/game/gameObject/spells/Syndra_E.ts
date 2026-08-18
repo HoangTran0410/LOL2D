@@ -116,7 +116,10 @@ export default class Syndra_E extends Spell {
 
     for (const sphere of groundedSpheres(this.owner)) {
       if (!insideCone(origin, heading, reach, sphere.position)) continue;
-      this.launchSphere(sphere, heading);
+      const dx = sphere.position.x - origin.x;
+      const dy = sphere.position.y - origin.y;
+      const sphereHeading = Math.hypot(dx, dy) < 1 ? heading : Math.atan2(dy, dx);
+      this.launchSphere(sphere, sphereHeading);
     }
   }
 

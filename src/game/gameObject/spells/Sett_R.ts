@@ -3,7 +3,9 @@ import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Airborne from '@/game/gameObject/buffs/Airborne';
 import Dash from '@/game/gameObject/buffs/Dash';
 import Slow from '@/game/gameObject/buffs/Slow';
@@ -12,11 +14,11 @@ import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 
 export const SETT_R_RANGE = 250;
-export const SETT_R_CARRY = 300;
-export const SETT_R_CARRY_MS = 450;
+export const SETT_R_CARRY = 340;
+export const SETT_R_CARRY_MS = 550;
 export const SETT_R_SLAM = 45;
 export const SETT_R_BLAST = 30;
-export const SETT_R_BLAST_RADIUS = 200;
+export const SETT_R_BLAST_RADIUS = 220;
 export const SETT_R_SLOW = 0.5;
 export const SETT_R_SLOW_MS = 1_500;
 export const SETT_R_CRATER_MS = 2_000;
@@ -25,22 +27,21 @@ export const SETT_R_LIFT = 70;
 /** How far in front of him the body is planted on landing. */
 export const SETT_R_DROP = 58;
 
-const HOT: [number, number, number] = [225, 112, 85];
+const HOT: [number, number, number] = [255, 140, 0];
+const GOLD: [number, number, number] = [255, 215, 0];
 const BLOOD: [number, number, number] = [183, 21, 64];
 
 /**
- * He picks one champion up and throws himself with them. The carry is owned by
- * Sett_R_Carry rather than the dash callbacks, so the landing fires on one clock
- * whether the dash arrived early, was walled off, or was cut short.
+ * He picks one champion up and throws himself with them in a parabolic suplex.
  */
 export default class Sett_R extends Spell {
   image = AssetManager.get('spell_sett_r');
   name = 'Hủy Diệt Đấu Trường (Sett_R)';
   description =
-    `Sett bốc một tướng địch lên đầu, lao ${SETT_R_CARRY} và giáng xuống đất: mục tiêu bị ném ` +
-    `nhận <span class="damage">${SETT_R_SLAM} sát thương</span>, mọi kẻ địch khác trong bán kính ` +
-    `${SETT_R_BLAST_RADIUS} nhận <span class="damage">${SETT_R_BLAST} sát thương</span> và bị ` +
-    `làm chậm ${Math.round(SETT_R_SLOW * 100)}% trong ${SETT_R_SLOW_MS / 1000} giây.`;
+    `Sett bốc một tướng địch lên không trung (không thể bị chọn làm mục tiêu), bay vút lên ` +
+    `và nện xuống đất: mục tiêu bị ném nhận <span class="damage">${SETT_R_SLAM} sát thương</span>, ` +
+    `mọi kẻ địch khác trong bán kính ${SETT_R_BLAST_RADIUS} nhận <span class="damage">${SETT_R_BLAST} sát thương</span> ` +
+    `và bị làm chậm ${Math.round(SETT_R_SLOW * 100)}% trong ${SETT_R_SLOW_MS / 1000} giây.`;
   coolDown = 10_000;
   manaCost = 100;
   range = SETT_R_RANGE;
@@ -49,24 +50,64 @@ export default class Sett_R extends Spell {
     return {
       activation: 'PRESS',
       targeting: 'UNIT',
-      resource: { commitAt: 'start', refundOn: [] },
-      cooldown: { startAt: 'start', durationMs: this.coolDown },
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
+      cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
   }
 
   /** Caster-centred, and both bodies are wide, so Reach owns the number. */
-  get targetingRequest() {
-    return { ...super.targetingRequest, range: effectiveRange(this.range, this.owner) };
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {
+      ...super.targetingRequest,
+      range: effectiveRange(this.range, this.owner),
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => this.isValidTarget(candidate),
+      getTargetInfo: candidate =>
+        this.isValidTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
+    };
+  }
+
+  private isValidTarget(target?: unknown): target is AttackableUnit {
+    return (
+      target instanceof AttackableUnit &&
+      !target.isDead &&
+      !target.toRemove &&
+      target !== this.owner &&
+      target.teamId !== this.owner.teamId &&
+      withinRange(SETT_R_RANGE, this.owner, target)
+    );
   }
 
   checkCastCondition(): boolean {
-    return Dash.CanDash(this.owner);
+    return Dash.CanDash(this.owner) && this.isValidTarget(this.castContext?.target);
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) {
+      if (!this.isValidTarget(context.target as AttackableUnit)) return false;
+      return super.press(context);
+    }
+
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      ...this.targetingRequest,
+    });
+    return result.ok ? super.press(result.context) : false;
   }
 
   onSpellCast(context: CastContext): void {
     const victim = context?.target as AttackableUnit | undefined;
-    if (!victim || victim.isDead || victim.toRemove) return;
-    if (!withinRange(SETT_R_RANGE, this.owner, victim)) return;
+    if (!this.isValidTarget(victim)) return;
 
     const aim = this.firingDirection(context);
     const heading = Math.atan2(aim.y, aim.x);
@@ -76,21 +117,23 @@ export default class Sett_R extends Spell {
     const lifted = new Airborne(SETT_R_CARRY_MS, this.owner, victim);
     lifted.height = SETT_R_LIFT;
     victim.addBuff(lifted);
-    const hidden = new Untargetable(SETT_R_CARRY_MS, this.owner, victim);
-    victim.addBuff(hidden);
+
+    const victimHidden = new Untargetable(SETT_R_CARRY_MS, this.owner, victim);
+    victim.addBuff(victimHidden);
+
+    const settHidden = new Untargetable(SETT_R_CARRY_MS, this.owner, this.owner);
+    this.owner.addBuff(settHidden);
 
     const dash = new Dash(SETT_R_CARRY_MS, this.owner, this.owner);
     dash.dashDestination = createVector(
       this.owner.position.x + Math.cos(heading) * SETT_R_CARRY,
       this.owner.position.y + Math.sin(heading) * SETT_R_CARRY
     );
-    dash.dashSpeed = 14;
-    // He is carrying somebody: nothing short of death shakes him off, and the
-    // slam's own stun-shaped effects must not cancel the carry that spawns them.
+    dash.dashSpeed = 15;
     dash.buffsToCheckCancel = [];
     this.owner.addBuff(dash);
 
-    const carry = new Sett_R_Carry(this.owner, victim, heading, lifted, hidden);
+    const carry = new Sett_R_Carry(this.owner, victim, heading, lifted, victimHidden, settHidden);
     this.game.objectManager.addObject(carry);
   }
 
@@ -100,38 +143,39 @@ export default class Sett_R extends Spell {
 }
 
 /**
- * The flight. It pins the carried body to Sett so the whole map can read who is
- * being thrown, and it is the thing that decides where the slam lands: his real
- * position when the carry ends, not the point the dash was aimed at.
+ * The parabolic flight. Sett and victim leap in an arc through the air,
+ * untargetable until the crater slam.
  */
 export class Sett_R_Carry extends SpellObject {
   age = 0;
   landed = false;
-  /** Seeded once in onAdded — random() inside draw() flickers instead of animating. */
   sparks: { angle: number; reach: number }[] = [];
 
   private heading: number;
   private carried: AttackableUnit;
   private lifted: Airborne | null;
-  private hidden: Untargetable | null;
+  private victimHidden: Untargetable | null;
+  private settHidden: Untargetable | null;
 
   constructor(
     owner: AttackableUnit,
     carried: AttackableUnit,
     heading: number,
     lifted: Airborne | null,
-    hidden: Untargetable | null
+    victimHidden: Untargetable | null,
+    settHidden: Untargetable | null
   ) {
     super(owner);
     this.carried = carried;
     this.heading = heading;
     this.lifted = lifted;
-    this.hidden = hidden;
+    this.victimHidden = victimHidden;
+    this.settHidden = settHidden;
   }
 
   onAdded(): void {
-    for (let i = 0; i < 7; i++) {
-      this.sparks.push({ angle: random(TWO_PI), reach: random(14, 34) });
+    for (let i = 0; i < 9; i++) {
+      this.sparks.push({ angle: random(TWO_PI), reach: random(20, 50) });
     }
   }
 
@@ -143,47 +187,64 @@ export class Sett_R_Carry extends SpellObject {
     this.age += deltaTime;
     this.position.set(this.owner.position.x, this.owner.position.y);
 
+    const t = constrain(this.age / SETT_R_CARRY_MS, 0, 1);
+    const leapZ = Math.sin(t * Math.PI) * 90;
+
     const lost = this.carried.isDead || this.carried.toRemove;
-    if (!lost) this.carried.teleportTo(this.owner.position.x, this.owner.position.y);
+    if (!lost) {
+      this.carried.teleportTo(this.owner.position.x, this.owner.position.y - leapZ);
+    }
     if (this.age >= SETT_R_CARRY_MS || lost || this.owner.isDead) this.slam();
   }
 
   draw(): void {
     const t = constrain(this.age / SETT_R_CARRY_MS, 0, 1);
-    const swept = 1 - (1 - t) * (1 - t);
+    const leapZ = Math.sin(t * Math.PI) * 90;
     const body = this.owner.animatedValues.displaySize * 0.5 || 27;
+    const shadowScale = Math.max(0.4, 1 - leapZ / 150);
+
     push();
-    rectMode(CORNER);
     translate(this.position.x, this.position.y);
-    // two slab arms braced overhead, holding the body up where everyone sees it
+
+    // 1. Ground drop shadow beneath leaping Sett and victim
     noStroke();
+    fill(0, 0, 0, 100 * shadowScale);
+    ellipse(0, 0, body * 3.2 * shadowScale, body * 1.6 * shadowScale);
+
+    // 2. Fiery overhead grip & speed lines
+    translate(0, -leapZ);
+    rotate(this.heading);
+
+    // Fiery overhead clamp arms
     for (let side = -1; side <= 1; side += 2) {
-      fill(BLOOD[0], BLOOD[1], BLOOD[2], 225);
-      rect(side * body * 0.55 - 7, -SETT_R_LIFT * 0.55, 14, SETT_R_LIFT * 0.6, 3);
+      fill(BLOOD[0], BLOOD[1], BLOOD[2], 235);
+      rect(side * body * 0.6 - 7, -SETT_R_LIFT * 0.55, 14, SETT_R_LIFT * 0.6, 4);
     }
-    fill(HOT[0], HOT[1], HOT[2], 200);
-    rect(-body * 0.8, -SETT_R_LIFT * 0.62, body * 1.6, 12, 3);
-    // speed lines dragged behind the run
-    stroke(HOT[0], HOT[1], HOT[2], 190);
-    strokeWeight(3);
+    fill(HOT[0], HOT[1], HOT[2], 220);
+    rect(-body * 0.9, -SETT_R_LIFT * 0.65, body * 1.8, 14, 4);
+
+    // Trailing fiery leap sparks
+    stroke(GOLD[0], GOLD[1], GOLD[2], 220);
+    strokeWeight(3.5);
     for (const spark of this.sparks) {
-      const back = -this.heading;
       const sx = cos(spark.angle) * body;
-      const sy = sin(spark.angle) * body * 0.5;
-      line(sx, sy, sx - cos(back) * spark.reach * swept, sy + sin(back) * spark.reach * swept);
+      const sy = sin(spark.angle) * body * 0.6;
+      line(sx, sy, sx - spark.reach * (1 - t * 0.5), sy);
     }
+
     pop();
   }
 
   getDisplayBoundingBox() {
-    return this.squareDisplayBoundingBox((SETT_R_LIFT + 80) * 2);
+    return this.squareDisplayBoundingBox((SETT_R_LIFT + 140) * 2);
   }
 
   private slam(): void {
     this.landed = true;
     this.toRemove = true;
     if (this.lifted && !this.lifted.toRemove) this.lifted.deactivateBuff();
-    if (this.hidden && !this.hidden.toRemove) this.hidden.deactivateBuff();
+    if (this.victimHidden && !this.victimHidden.toRemove) this.victimHidden.deactivateBuff();
+    if (this.settHidden && !this.settHidden.toRemove) this.settHidden.deactivateBuff();
 
     const atX = this.owner.position.x;
     const atY = this.owner.position.y;

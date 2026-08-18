@@ -2,9 +2,10 @@ import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
 import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
-import type { CastContext } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Airborne from '@/game/gameObject/buffs/Airborne';
 import Dash from '@/game/gameObject/buffs/Dash';
 import Spell from '@/game/gameObject/Spell';
@@ -12,16 +13,16 @@ import SpellObject from '@/game/gameObject/SpellObject';
 
 export const R_RANGE = 450;
 export const R_DAMAGE = 45;
-export const R_KNOCKUP_MS = 1_000;
+export const R_KNOCKUP_MS = 1_300;
 export const R_PASS_DAMAGE = 15;
 export const R_PASS_KNOCKUP_MS = 500;
 /** How close a body has to be to the charge to be knocked out of the way. */
 export const R_PASS_RADIUS = 60;
 /** The blast at the end of the charge, centred where she stopped. */
 export const R_BLAST_RADIUS = 90;
-export const R_DASH_SPEED = 20;
+export const R_DASH_SPEED = 14;
 /** A ceiling, not a duration: the charge ends the frame it arrives. */
-export const R_DASH_MAX_MS = 2_000;
+export const R_DASH_MAX_MS = 2_500;
 /** She stops a fist's length short instead of standing inside the target. */
 export const R_ARRIVAL_GAP = 45;
 export const R_IMPACT_REACH = 120;
@@ -51,18 +52,66 @@ export default class Vi_R extends Spell {
   manaCost = 100;
   range = R_RANGE;
 
+  get castSpec(): Readonly<CastSpec> {
+    return {
+      activation: 'PRESS',
+      targeting: 'UNIT',
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
+      cooldown: { startAt: 'release', durationMs: this.coolDown },
+    };
+  }
+
   get targetingRequest(): Readonly<TargetingRequest> {
-    return { range: R_RANGE };
+    return {
+      range: R_RANGE,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => this.isValidTarget(candidate),
+      getTargetInfo: candidate =>
+        this.isValidTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
+    };
+  }
+
+  private isValidTarget(target?: unknown): target is AttackableUnit {
+    return (
+      target instanceof AttackableUnit &&
+      !target.isDead &&
+      !target.toRemove &&
+      target !== this.owner &&
+      target.teamId !== this.owner.teamId &&
+      withinRange(R_RANGE, this.owner, target)
+    );
   }
 
   checkCastCondition(): boolean {
-    return Dash.CanDash(this.owner);
+    return Dash.CanDash(this.owner) && this.isValidTarget(this.castContext?.target);
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) {
+      if (!this.isValidTarget(context.target as AttackableUnit)) return false;
+      return super.press(context);
+    }
+
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      ...this.targetingRequest,
+    });
+    return result.ok ? super.press(result.context) : false;
   }
 
   onSpellCast(context?: CastContext): void {
     const target = context?.target as AttackableUnit | undefined;
-    if (!target || target.isDead || target.toRemove) return;
-    if (!withinRange(R_RANGE, this.owner, target)) return;
+    if (!this.isValidTarget(target)) return;
 
     // One ledger for the whole ultimate: nobody takes both the pass-through and
     // the blast, and nobody takes either twice.
@@ -96,7 +145,7 @@ export default class Vi_R extends Spell {
     };
 
     this.owner.addBuff(charge);
-    this.game.objectManager.addObject(new Vi_R_Streak(this.owner, launch, charge));
+    this.game.objectManager.addObject(new Vi_R_Streak(this.owner, launch, charge, target));
   }
 
   /** A point a fist short of the body, so she arrives beside it rather than in it. */
@@ -153,34 +202,48 @@ export default class Vi_R extends Spell {
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     }) as AttackableUnit[];
 
-    for (const victim of found) {
-      if (victim === this.owner) continue;
-      if (punched.has(victim)) continue;
-      punched.add(victim);
-      victim.takeDamage(R_DAMAGE, this.owner);
-      victim.addBuff(new Airborne(R_KNOCKUP_MS, this.owner, victim));
+    const dead = target.toRemove || target.isDead;
+    if (!dead) {
+      punched.add(target);
+      target.takeDamage(R_DAMAGE, this.owner);
+      target.addBuff(new Airborne(R_KNOCKUP_MS, this.owner, target));
     }
 
-    const towards = this.stillReachable(target) ? target.position : at;
-    const heading = Math.atan2(towards.y - at.y, towards.x - at.x);
+    for (const victim of found) {
+      if (punched.has(victim)) continue;
+      punched.add(victim);
+      victim.takeDamage(R_PASS_DAMAGE, this.owner);
+      victim.addBuff(new Airborne(R_PASS_KNOCKUP_MS, this.owner, victim));
+    }
+
+    const aim = { x: target.position.x - this.launchPoint(at).x, y: target.position.y - this.launchPoint(at).y };
+    const heading = Math.atan2(aim.y, aim.x);
     this.game.objectManager.addObject(new Vi_R_Impact(this.owner, at, heading));
+  }
+
+  private launchPoint(fallback: p5.Vector): p5.Vector {
+    return this.owner.previousPosition ?? fallback;
+  }
+
+  drawPreview(): void {
+    super.drawPreview(effectiveRange(this.range, this.owner));
   }
 }
 
 /**
- * The streak: a straight brass-and-blue bar from where she launched to where she
- * is this frame. It spans two points that are up to a screen apart, so the box
- * is built by hand around both ends — a square around her centre would cull the
- * half of it that is behind her.
+ * The line of steam and brass she drags behind her, widening as the charge
+ * covers ground, and the dynamic lock-on tether laser connecting Vi to her victim.
  */
 export class Vi_R_Streak extends SpellObject {
   age = 0;
-  launch: p5.Vector;
-  private pad = 34;
+  private readonly launch: p5.Vector;
+  private readonly target: AttackableUnit;
+  private readonly pad = 120;
 
-  constructor(owner: AttackableUnit, launch: p5.Vector, charge: Dash) {
+  constructor(owner: AttackableUnit, launch: p5.Vector, charge: Dash, target: AttackableUnit) {
     super(owner);
     this.launch = launch;
+    this.target = target;
     this.position = owner.position.copy();
     this.attachTo(owner, charge);
   }
@@ -195,34 +258,85 @@ export class Vi_R_Streak extends SpellObject {
     const spanX = this.position.x - this.launch.x;
     const spanY = this.position.y - this.launch.y;
     const flown = Math.hypot(spanX, spanY);
-    if (flown < 1) return;
-    const heading = Math.atan2(spanY, spanX);
     const pulse = 0.75 + 0.25 * sin(this.age / 90);
 
     push();
-    translate(this.launch.x, this.launch.y);
-    rotate(heading);
-    noStroke();
-    // Widening toward her, so the bar reads as a direction and not a rope.
-    fill(HEXTECH[0], HEXTECH[1], HEXTECH[2], 90 * pulse);
-    quad(0, -5, flown, -15, flown, 15, 0, 5);
-    fill(BRASS[0], BRASS[1], BRASS[2], 200 * pulse);
-    quad(0, -2, flown, -6, flown, 6, 0, 2);
-    stroke(255, 255, 255, 150 * pulse);
-    strokeWeight(2);
-    line(flown * 0.55, -3, flown, 0);
-    line(flown * 0.55, 3, flown, 0);
+    if (flown >= 1) {
+      const heading = Math.atan2(spanY, spanX);
+      push();
+      translate(this.launch.x, this.launch.y);
+      rotate(heading);
+      noStroke();
+      // Widening toward her, so the bar reads as a direction and not a rope.
+      fill(HEXTECH[0], HEXTECH[1], HEXTECH[2], 90 * pulse);
+      quad(0, -5, flown, -15, flown, 15, 0, 5);
+      fill(BRASS[0], BRASS[1], BRASS[2], 200 * pulse);
+      quad(0, -2, flown, -6, flown, 6, 0, 2);
+      stroke(255, 255, 255, 150 * pulse);
+      strokeWeight(2);
+      line(flown * 0.55, -3, flown, 0);
+      line(flown * 0.55, 3, flown, 0);
+      pop();
+    }
+
+    // Active lock-on tether line connecting Vi to her locked target
+    if (this.target && !this.target.isDead && !this.target.toRemove) {
+      const tx = this.target.position.x;
+      const ty = this.target.position.y;
+      const vx = this.position.x;
+      const vy = this.position.y;
+
+      // Hextech energy tether beam
+      stroke(HEXTECH[0], HEXTECH[1], HEXTECH[2], 180 * pulse);
+      strokeWeight(3.5);
+      line(vx, vy, tx, ty);
+      stroke(255, 255, 255, 240 * pulse);
+      strokeWeight(1.5);
+      line(vx, vy, tx, ty);
+
+      // Lock-on target reticle brackets around target
+      const size = (this.target.animatedValues?.displaySize ?? 40) * 0.7 + 8;
+      const bracketLen = 10;
+      push();
+      translate(tx, ty);
+      noFill();
+      stroke(BRASS[0], BRASS[1], BRASS[2], 230 * pulse);
+      strokeWeight(2.5);
+      // 4 corner brackets
+      // top-left
+      line(-size, -size, -size + bracketLen, -size);
+      line(-size, -size, -size, -size + bracketLen);
+      // top-right
+      line(size, -size, size - bracketLen, -size);
+      line(size, -size, size, -size + bracketLen);
+      // bottom-left
+      line(-size, size, -size + bracketLen, size);
+      line(-size, size, -size, size - bracketLen);
+      // bottom-right
+      line(size, size, size - bracketLen, size);
+      line(size, size, size, size - bracketLen);
+
+      // Inner pulsating lock pip
+      fill(255, 60, 60, 200 * pulse);
+      noStroke();
+      circle(0, 0, 6 * pulse);
+      pop();
+    }
     pop();
   }
 
   getDisplayBoundingBox() {
-    const left = Math.min(this.launch.x, this.position.x) - this.pad;
-    const top = Math.min(this.launch.y, this.position.y) - this.pad;
+    const targetX = this.target?.position?.x ?? this.position.x;
+    const targetY = this.target?.position?.y ?? this.position.y;
+    const minX = Math.min(this.launch.x, this.position.x, targetX) - this.pad;
+    const maxX = Math.max(this.launch.x, this.position.x, targetX) + this.pad;
+    const minY = Math.min(this.launch.y, this.position.y, targetY) - this.pad;
+    const maxY = Math.max(this.launch.y, this.position.y, targetY) + this.pad;
     return new Rectangle({
-      x: left,
-      y: top,
-      w: Math.abs(this.position.x - this.launch.x) + this.pad * 2,
-      h: Math.abs(this.position.y - this.launch.y) + this.pad * 2,
+      x: minX,
+      y: minY,
+      w: maxX - minX,
+      h: maxY - minY,
       data: this,
     });
   }

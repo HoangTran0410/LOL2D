@@ -142,15 +142,37 @@ export class Diana_R_Gather extends SpellObject {
     push();
     noFill();
 
-    // The decision circle: hard and full-size from the first frame, because that rim is the
-    // only information an enemy gets. It then closes inward as the pull resolves.
-    stroke(MOON_NIGHT[0] + 40, MOON_NIGHT[1] + 50, MOON_NIGHT[2] + 80, 90 * (1 - drawnIn * 0.7));
-    strokeWeight(1.2);
+    // 1. Radiant moonlight ground fill inside the pull area
+    fill(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 35 * (1 - drawnIn * 0.4));
+    noStroke();
     circle(this.position.x, this.position.y, R_RADIUS * 2);
 
+    // 2. Converging moonlight rays pulling towards Diana
+    const rayCount = 12;
+    for (let i = 0; i < rayCount; i++) {
+      const a = (i / rayCount) * TWO_PI + (this.age / 500);
+      const rayStart = R_RADIUS * (1 - drawnIn * 0.25);
+      const rayEnd = R_GATHER_GAP + 20 * (1 - drawnIn);
+      stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 140 * (1 - drawnIn * 0.3));
+      strokeWeight(2);
+      line(
+        this.position.x + Math.cos(a) * rayStart,
+        this.position.y + Math.sin(a) * rayStart,
+        this.position.x + Math.cos(a) * rayEnd,
+        this.position.y + Math.sin(a) * rayEnd
+      );
+    }
+
+    noFill();
+    // 3. Outer boundary ring
+    stroke(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 160 * (1 - drawnIn * 0.6));
+    strokeWeight(2);
+    circle(this.position.x, this.position.y, R_RADIUS * 2);
+
+    // 4. Inward collapsing moonlight ring
     const rim = R_RADIUS - (R_RADIUS - R_GATHER_GAP - 20) * drawnIn;
-    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 200 + 55 * glow);
-    strokeWeight(3.5 + 4 * glow);
+    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 220 + 35 * glow);
+    strokeWeight(4.5 + 4 * glow);
     circle(this.position.x, this.position.y, rim * 2);
 
     // Crescents riding the rim down onto her: the motion has to travel the way the pull does.
@@ -163,15 +185,15 @@ export class Diana_R_Gather extends SpellObject {
         away * 0.5,
         rib.angle,
         rib.span,
-        7 * (1 - own) + 1.5,
+        8 * (1 - own) + 2,
         MOON_CORE,
-        215 * (0.35 + 0.65 * (1 - own))
+        230 * (0.35 + 0.65 * (1 - own))
       );
     }
 
     // Every victim wears a streak pointing at Diana — the direction they are being taken.
-    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 170 * (1 - glow * 0.5));
-    strokeWeight(2.5);
+    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 200 * (1 - glow * 0.5));
+    strokeWeight(3);
     for (const body of this.dragged) {
       const victim = body.unit;
       if (victim.toRemove || victim.isDead) continue;
@@ -179,7 +201,7 @@ export class Diana_R_Gather extends SpellObject {
       const dy = this.position.y - victim.position.y;
       const span = Math.hypot(dx, dy);
       if (span < 1) continue;
-      const reach = Math.min(span, 40 + 30 * drawnIn);
+      const reach = Math.min(span, 45 + 35 * drawnIn);
       line(
         victim.position.x,
         victim.position.y,
@@ -188,10 +210,16 @@ export class Diana_R_Gather extends SpellObject {
       );
     }
 
+    // Detonation burst flash at Diana's location
     if (glow > 0) {
-      stroke(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 230 * glow);
-      strokeWeight(2 + 6 * glow);
-      circle(this.position.x, this.position.y, (R_GATHER_GAP + 30) * 2 * (1 - 0.4 * glow));
+      fill(255, 255, 255, 220 * glow);
+      noStroke();
+      circle(this.position.x, this.position.y, (R_GATHER_GAP + 40) * 2 * (1 - 0.3 * glow));
+
+      noFill();
+      stroke(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 240 * glow);
+      strokeWeight(3 + 8 * glow);
+      circle(this.position.x, this.position.y, (R_GATHER_GAP + 60) * 2 * (1 - 0.2 * glow));
     }
     pop();
   }
@@ -203,7 +231,7 @@ export class Diana_R_Gather extends SpellObject {
 
 /** The blow, on each gathered body. */
 export class Diana_R_Crash extends SpellObject {
-  lifeTime = 360;
+  lifeTime = 380;
   age = 0;
   private blades: number[] = [];
 
@@ -213,7 +241,7 @@ export class Diana_R_Crash extends SpellObject {
   }
 
   onAdded(): void {
-    for (let i = 0; i < 5; i++) this.blades.push((i / 5) * TWO_PI + random(-0.25, 0.25));
+    for (let i = 0; i < 6; i++) this.blades.push((i / 6) * TWO_PI + random(-0.25, 0.25));
   }
 
   update(): void {
@@ -225,9 +253,14 @@ export class Diana_R_Crash extends SpellObject {
     const t = constrain(this.age / this.lifeTime, 0, 1);
     const closing = 1 - (1 - t) * (1 - t);
     push();
+    // Moonlight impact flash
+    fill(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 80 * (1 - t));
+    noStroke();
+    circle(this.position.x, this.position.y, R_CRASH_RADIUS * 2 * (1 - 0.5 * closing));
+
     noFill();
-    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 225 * (1 - t));
-    strokeWeight(4 * (1 - t) + 1);
+    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 240 * (1 - t));
+    strokeWeight(4.5 * (1 - t) + 1.5);
     circle(this.position.x, this.position.y, R_CRASH_RADIUS * 2 * (1 - 0.7 * closing));
     for (const blade of this.blades) {
       const away = R_CRASH_RADIUS * (1 - 0.75 * closing);
@@ -236,10 +269,10 @@ export class Diana_R_Crash extends SpellObject {
         this.position.y + sin(blade) * away * 0.4,
         away * 0.55,
         blade + PI,
-        1.4,
-        6 * (1 - t) + 1,
+        1.5,
+        7 * (1 - t) + 1,
         MOON_CORE,
-        235 * (1 - t)
+        245 * (1 - t)
       );
     }
     pop();

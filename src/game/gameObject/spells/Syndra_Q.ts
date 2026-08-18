@@ -46,7 +46,7 @@ const HELD_HEIGHT = 46;
 const SMEAR_POINTS = 10;
 const SMEAR_STEP = 9;
 
-export type SyndraSphereMode = 'grounded' | 'held' | 'flying';
+export type SyndraSphereMode = 'grounded' | 'held' | 'flying' | 'reeling';
 
 function distanceBetween(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -136,7 +136,7 @@ export default class Syndra_Q extends Spell {
 }
 
 /**
- * The resource itself. Three states, three pictures: it lies on the floor and
+ * A dark sphere. It drops from the sky when Q casts, it rolls slightly and
  * settles when it arrives, it rides over her head when she seizes it, and it
  * drags a ragged smear behind it when she moves it.
  */
@@ -179,9 +179,9 @@ export class Syndra_Sphere extends SpellObject {
     if (index >= 0) list.splice(index, 1);
   }
 
-  /** W's first press: it lifts, visibly hers. */
+  /** W's first press: it lifts and reels smoothly toward her overhead. */
   seize(): void {
-    this.mode = 'held';
+    this.mode = 'reeling';
     this.zIndex = SPHERE_AIR_Z_INDEX;
     this.smear.length = 0;
   }
@@ -214,6 +214,30 @@ export class Syndra_Sphere extends SpellObject {
     if (this.mode === 'held') {
       this.position.x = this.owner.position.x;
       this.position.y = this.owner.position.y - HELD_HEIGHT;
+      return;
+    }
+
+    if (this.mode === 'reeling') {
+      const targetX = this.owner.position.x;
+      const targetY = this.owner.position.y - HELD_HEIGHT;
+      const dx = targetX - this.position.x;
+      const dy = targetY - this.position.y;
+      const dist = Math.hypot(dx, dy);
+      const reelSpeed = (24 * step) / 16;
+
+      if (dist <= reelSpeed || dist < 2) {
+        this.position.x = targetX;
+        this.position.y = targetY;
+        this.mode = 'held';
+      } else {
+        this.position.x += (dx / dist) * reelSpeed;
+        this.position.y += (dy / dist) * reelSpeed;
+        const last = this.smear[this.smear.length - 1];
+        if (!last || distanceBetween(last, this.position) > SMEAR_STEP) {
+          this.smear.push({ x: this.position.x, y: this.position.y });
+          if (this.smear.length > SMEAR_POINTS) this.smear.shift();
+        }
+      }
       return;
     }
 

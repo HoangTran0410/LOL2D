@@ -182,9 +182,32 @@ export class Diana_W_Orbit extends SpellObject {
       if (sphere.detonated) continue;
       const at = this.spherePosition(sphere);
       const spin = (this.age / W_ORBIT_PERIOD_MS) * Math.PI * 2 + sphere.angleOffset;
-      const breathe = 1 + 0.12 * sin(this.age / 220 + sphere.angleOffset);
-      drawCrescent(at.x, at.y, 13 * breathe, spin + HALF_PI, Math.PI * 1.1, 6, MOON_PALE, 235);
-      drawCrescent(at.x, at.y, 8 * breathe, spin + HALF_PI, Math.PI * 0.8, 3, MOON_CORE, 215);
+      const breathe = 1 + 0.15 * sin(this.age / 180 + sphere.angleOffset);
+
+      // Outer soft moonlight aura
+      noStroke();
+      fill(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 75);
+      circle(at.x, at.y, 36 * breathe);
+
+      // Bright lunar halo
+      stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 220);
+      strokeWeight(2.5);
+      fill(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 180);
+      circle(at.x, at.y, 22 * breathe);
+
+      // Brilliant white core
+      fill(255, 255, 255, 250);
+      noStroke();
+      circle(at.x, at.y, 14 * breathe);
+
+      // Orbital sparkle trail
+      const trailAngle = spin - 0.28;
+      stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 180);
+      strokeWeight(3.5);
+      point(
+        this.position.x + Math.cos(trailAngle) * W_ORBIT,
+        this.position.y + Math.sin(trailAngle) * W_ORBIT
+      );
     }
     pop();
   }
@@ -219,9 +242,14 @@ export class Diana_W_Bloom extends SpellObject {
     const opened = 1 - (1 - t) * (1 - t);
     push();
     noFill();
+    // Glowing lunar blast fill
+    fill(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 60 * (1 - t));
+    circle(this.position.x, this.position.y, W_SPHERE_RADIUS * 2 * opened);
+
     // Hard rim on the real damage radius, so the pop states its own area.
-    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 210 * (1 - t));
-    strokeWeight(3 * (1 - t) + 1);
+    noFill();
+    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 230 * (1 - t));
+    strokeWeight(3.5 * (1 - t) + 1);
     circle(this.position.x, this.position.y, W_SPHERE_RADIUS * 2 * opened);
     for (const petal of this.petals) {
       drawCrescent(

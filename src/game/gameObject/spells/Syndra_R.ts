@@ -3,7 +3,9 @@ import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import {
@@ -56,9 +58,57 @@ export default class Syndra_R extends Spell {
       activation: 'PRESS',
       targeting: 'UNIT',
       castTimeMs: 180,
-      resource: { commitAt: 'start', refundOn: [] },
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
+  }
+
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {
+      range: effectiveRange(this.range, this.owner),
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => this.isValidTarget(candidate),
+      getTargetInfo: candidate =>
+        this.isValidTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
+    };
+  }
+
+  private isValidTarget(target?: unknown): target is AttackableUnit {
+    return (
+      target instanceof AttackableUnit &&
+      !target.isDead &&
+      !target.toRemove &&
+      target !== this.owner &&
+      target.teamId !== this.owner.teamId &&
+      withinRange(this.range, this.owner, target)
+    );
+  }
+
+  checkCastCondition(): boolean {
+    return !!this.pickTarget(this.castContext);
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) {
+      if (!this.isValidTarget(context.target as AttackableUnit)) return false;
+      return super.press(context);
+    }
+
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      ...this.targetingRequest,
+    });
+    return result.ok ? super.press(result.context) : false;
   }
 
   onSpellCast(context?: CastContext): void {
@@ -66,12 +116,26 @@ export default class Syndra_R extends Spell {
     if (!target) return;
 
     const origins: { x: number; y: number }[] = [];
-    for (const sphere of groundedSpheres(this.owner)) {
+    const grounded = groundedSpheres(this.owner);
+    const groundedCount = grounded.length;
+
+    for (const sphere of grounded) {
       origins.push({ x: sphere.position.x, y: sphere.position.y });
       sphere.toRemove = true;
     }
 
-    this.game.objectManager.addObject(new Syndra_R_Strike(this.owner, target, origins));
+    // Baseline 3 dark spheres for visual barrage if no grounded spheres exist
+    if (origins.length === 0) {
+      for (let i = 0; i < 3; i++) {
+        const a = (i / 3) * Math.PI * 2;
+        origins.push({
+          x: this.owner.position.x + Math.cos(a) * 50,
+          y: this.owner.position.y + Math.sin(a) * 50,
+        });
+      }
+    }
+
+    this.game.objectManager.addObject(new Syndra_R_Strike(this.owner, target, origins, groundedCount));
   }
 
   /**
@@ -81,12 +145,7 @@ export default class Syndra_R extends Spell {
    */
   private pickTarget(context?: CastContext): AttackableUnit | null {
     const supplied = context?.target as AttackableUnit | undefined;
-    if (
-      supplied &&
-      !supplied.toRemove &&
-      !supplied.isDead &&
-      withinRange(this.range, this.owner, supplied)
-    ) {
+    if (this.isValidTarget(supplied)) {
       return supplied;
     }
 
@@ -121,33 +180,45 @@ export default class Syndra_R extends Spell {
   }
 }
 
+const STAGGER_MS = 60;
+const FLIGHT_MS = 250;
+
 /**
- * The convergence. It owns the whole ability's timing and its one damage event,
- * and it draws as many spheres as it is going to be paid for.
+ * The convergence. It fires spheres in sequential waves flying into the target,
+ * dealing sequential damage impacts and culminating in an explosion.
  */
 export class Syndra_R_Strike extends SpellObject {
   target: AttackableUnit;
   origins: { x: number; y: number }[];
+  groundedCount: number;
   radius = SYNDRA_R_IMPACT_RADIUS;
-  lifeTime = SYNDRA_R_CONVERGE_MS;
+  lifeTime: number;
   age = 0;
-  landed = false;
+  private hitFlags: boolean[];
   shards: { angle: number; drift: number }[] = [];
 
-  constructor(owner: AttackableUnit, target: AttackableUnit, origins: { x: number; y: number }[]) {
+  constructor(
+    owner: AttackableUnit,
+    target: AttackableUnit,
+    origins: { x: number; y: number }[],
+    groundedCount?: number
+  ) {
     super(owner);
     this.target = target;
     this.origins = origins;
+    this.groundedCount = groundedCount ?? origins.length;
+    this.hitFlags = new Array(origins.length).fill(false);
+    this.lifeTime = (origins.length - 1) * STAGGER_MS + FLIGHT_MS + 200;
     this.position = createVector(target.position.x, target.position.y);
   }
 
   onAdded(): void {
     super.onAdded();
-    const count = 6;
+    const count = 8;
     for (let i = 0; i < count; i++) {
       this.shards.push({
         angle: (TWO_PI * i) / count + random(-0.3, 0.3),
-        drift: random(0.7, 1.7),
+        drift: random(0.8, 1.8),
       });
     }
   }
@@ -157,67 +228,121 @@ export class Syndra_R_Strike extends SpellObject {
     this.position.x = this.target.position.x;
     this.position.y = this.target.position.y;
 
-    if (this.age < this.lifeTime) return;
-    if (!this.landed) this.land();
-    this.toRemove = true;
-  }
+    const totalDamage = convergedDamage(this.groundedCount);
+    const n = Math.max(1, this.origins.length);
+    const baseChunk = Math.floor(totalDamage / n);
+    const lastChunk = totalDamage - baseChunk * (n - 1);
 
-  private land(): void {
-    this.landed = true;
-    if (this.target.toRemove || this.target.isDead) return;
+    for (let i = 0; i < this.origins.length; i++) {
+      const arriveTime = i * STAGGER_MS + FLIGHT_MS;
+      if (this.age >= arriveTime && !this.hitFlags[i]) {
+        this.hitFlags[i] = true;
+        if (!this.target.toRemove && !this.target.isDead) {
+          const dmg = i === this.origins.length - 1 ? lastChunk : baseChunk;
+          this.target.takeDamage(dmg, this.owner);
+          this.game.objectManager.addObject(
+            new Syndra_Burst(
+              this.owner,
+              this.target.position.x,
+              this.target.position.y,
+              45,
+              260
+            )
+          );
+          if (i === this.origins.length - 1) {
+            this.game.objectManager.addObject(
+              new Syndra_Burst(
+                this.owner,
+                this.target.position.x,
+                this.target.position.y,
+                SYNDRA_R_IMPACT_RADIUS,
+                420
+              )
+            );
+          }
+        }
+      }
+    }
 
-    this.target.takeDamage(convergedDamage(this.origins.length), this.owner);
-    this.game.objectManager.addObject(
-      new Syndra_Burst(
-        this.owner,
-        this.target.position.x,
-        this.target.position.y,
-        SYNDRA_R_IMPACT_RADIUS,
-        380
-      )
-    );
+    if (this.age >= this.lifeTime) this.toRemove = true;
   }
 
   draw(): void {
-    const t = constrain(this.age / this.lifeTime, 0, 1);
-    const closing = t * t;
     const cx = this.position.x;
     const cy = this.position.y;
-    const core = SPHERE_CORE_RADIUS * (1 - 0.35 * closing);
 
     push();
-
     noFill();
-    stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 90 + 120 * t);
-    strokeWeight(2);
-    circle(cx, cy, SYNDRA_R_IMPACT_RADIUS * 2 * (1 - 0.55 * closing));
 
-    for (const origin of this.origins) {
-      const px = origin.x + (cx - origin.x) * closing;
-      const py = origin.y + (cy - origin.y) * closing;
+    // 1. Dark aura under the victim
+    stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 140);
+    strokeWeight(2.5);
+    circle(cx, cy, SYNDRA_R_IMPACT_RADIUS * 2 * (1 - 0.2 * sin(this.age / 120)));
+    fill(SPHERE_DARK[0], SPHERE_DARK[1], SPHERE_DARK[2], 45);
+    circle(cx, cy, SYNDRA_R_IMPACT_RADIUS * 2);
 
-      stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 150 * (1 - closing) + 60);
-      strokeWeight(core * 0.7);
+    // 2. Sequential sphere flight
+    for (let i = 0; i < this.origins.length; i++) {
+      if (this.hitFlags[i]) continue;
+      const origin = this.origins[i];
+      const startTime = i * STAGGER_MS;
+      const arriveTime = startTime + FLIGHT_MS;
+
+      let px = origin.x;
+      let py = origin.y;
+      let flightRatio = 0;
+
+      if (this.age < startTime) {
+        // Charging at origin before launch
+        const chargePulse = 1 + 0.18 * sin(this.age / 70 + i);
+        noStroke();
+        fill(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 90);
+        circle(px, py, SPHERE_CORE_RADIUS * 2.5 * chargePulse);
+        fill(SPHERE_DARK[0], SPHERE_DARK[1], SPHERE_DARK[2], 240);
+        circle(px, py, SPHERE_CORE_RADIUS * 2 * chargePulse);
+        stroke(SPHERE_EDGE[0], SPHERE_EDGE[1], SPHERE_EDGE[2], 220);
+        strokeWeight(1.8);
+        noFill();
+        circle(px, py, SPHERE_CORE_RADIUS * 2 * chargePulse);
+        continue;
+      }
+
+      flightRatio = constrain((this.age - startTime) / FLIGHT_MS, 0, 1);
+      const closing = flightRatio * flightRatio;
+      const arcHeight = Math.sin(flightRatio * Math.PI) * -35;
+
+      px = origin.x + (cx - origin.x) * closing;
+      py = origin.y + (cy - origin.y) * closing + arcHeight;
+
+      // Energy trail behind flying sphere
+      stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 180 * (1 - flightRatio) + 70);
+      strokeWeight(SPHERE_CORE_RADIUS * 0.9);
       line(origin.x, origin.y, px, py);
 
+      // Dark sphere body
       noStroke();
-      fill(SPHERE_DARK[0], SPHERE_DARK[1], SPHERE_DARK[2], 240);
-      circle(px, py, core * 2);
-      fill(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 225);
-      circle(px, py, core * 1.3);
-      noFill();
-      stroke(SPHERE_EDGE[0], SPHERE_EDGE[1], SPHERE_EDGE[2], 235);
-      strokeWeight(1.6);
-      circle(px, py, core * 2);
+      fill(SPHERE_DARK[0], SPHERE_DARK[1], SPHERE_DARK[2], 250);
+      circle(px, py, SPHERE_CORE_RADIUS * 2.2);
 
+      // Violet inner fire
+      fill(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 235);
+      circle(px, py, SPHERE_CORE_RADIUS * 1.4);
+
+      // Electric white rim
+      noFill();
+      stroke(SPHERE_EDGE[0], SPHERE_EDGE[1], SPHERE_EDGE[2], 245);
+      strokeWeight(2);
+      circle(px, py, SPHERE_CORE_RADIUS * 2.2);
+
+      // Dark lightning shards
       for (const shard of this.shards) {
-        const angle = shard.angle + (this.age / 110) * shard.drift;
-        const out = core + 4 + 9 * (1 - closing);
-        stroke(SPHERE_DARK[0], SPHERE_DARK[1], SPHERE_DARK[2], 220);
+        const angle = shard.angle + (this.age / 90) * shard.drift;
+        const out = SPHERE_CORE_RADIUS + 8 + 12 * (1 - closing);
+        stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 230);
         strokeWeight(2);
         line(
-          px + cos(angle) * (core + 2),
-          py + sin(angle) * (core + 2),
+          px + cos(angle) * (SPHERE_CORE_RADIUS + 2),
+          py + sin(angle) * (SPHERE_CORE_RADIUS + 2),
           px + cos(angle) * out,
           py + sin(angle) * out
         );
@@ -228,11 +353,11 @@ export class Syndra_R_Strike extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    let span = SYNDRA_R_IMPACT_RADIUS + 40;
+    let span = SYNDRA_R_IMPACT_RADIUS + 80;
     for (const origin of this.origins) {
       span = Math.max(
         span,
-        Math.hypot(origin.x - this.position.x, origin.y - this.position.y) + 60
+        Math.hypot(origin.x - this.position.x, origin.y - this.position.y) + 80
       );
     }
     return this.squareDisplayBoundingBox(span * 2);

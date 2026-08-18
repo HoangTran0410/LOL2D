@@ -13,7 +13,7 @@ export const W_STACKS = 3;
 export const W_PROC = 16;
 export const W_SLOW = 0.2;
 export const W_SLOW_MS = 2_000;
-export const W_ATTACK_SPEED = 0.3;
+export const W_ATTACK_SPEED = 0.5;
 export const W_HASTE_MS = 4_000;
 
 const BRASS: [number, number, number] = [225, 177, 44];
@@ -32,10 +32,9 @@ export default class Vi_W extends Spell {
   targetingMode = 'SELF' as const;
   image = AssetManager.get('spell_vi_w');
   name = 'Cú Đấm Phá Giáp (Vi_W)';
-  description = `Trong ${W_DURATION_MS / 1000} giây, mỗi ${W_STACKS} đòn đánh thường vào
-    <b>cùng một mục tiêu</b> gây thêm <span class="damage">${W_PROC} sát thương</span>,
-    làm chậm ${W_SLOW * 100}% trong ${W_SLOW_MS / 1000} giây và cộng
-    ${W_ATTACK_SPEED} tốc đánh cho Vi trong ${W_HASTE_MS / 1000} giây.`;
+  description = `Kích hoạt tăng <b>50% tốc đánh</b> trong ${W_DURATION_MS / 1000} giây. Mỗi ${W_STACKS} đòn đánh thường vào
+    <b>cùng một mục tiêu</b> gây thêm <span class="damage">${W_PROC} sát thương</span> và
+    làm chậm ${W_SLOW * 100}% trong ${W_SLOW_MS / 1000} giây.`;
   coolDown = 10_000;
   manaCost = 20;
 
@@ -51,6 +50,11 @@ export default class Vi_W extends Spell {
     this.window = opened;
     opened.addDeactivateListener(() => this.stop());
     this.owner.addBuff(opened);
+
+    const haste = new StatAmp(W_DURATION_MS, this.owner, this.owner);
+    haste.bonuses = { attackSpeed: { baseBonus: 0.5 } };
+    haste.stackId = 'vi_w_haste';
+    this.owner.addBuff(haste);
 
     this.unsubscribe = this.game.eventManager.on(EventType.ON_ATTACK_HIT, (hit: BasicAttackHit) =>
       this.onAttackLanded(hit)

@@ -1,4 +1,4 @@
-import { Circle } from '@/libs/quadtree';
+import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { wrapAngle } from '@/utils/math.utils';
 import { effectiveRange } from '@/game/combat/Reach';
@@ -10,39 +10,22 @@ import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 
 export const Q_DAMAGE = 22;
-export const Q_RADIUS = 280;
+export const Q_RADIUS = 380;
 export const Q_ARC_DEG = 180;
-export const Q_SWEEP_MS = 550;
+export const Q_SWEEP_MS = 480;
 /** Radial half-width of the swept corridor: how far off the blade's own reach still gets cut. */
-export const Q_BAND = 70;
+export const Q_BAND = 55;
 /** How long a Moonlight mark rides its victim before Diana loses the reset. */
 export const MOONLIGHT_MS = 4_000;
 
-const Q_WINDUP_MS = 180;
-const Q_FADE_MS = 280;
-/** The first slice of the sweep is a windup: the blade gathers at her body before it flies. */
-const Q_WIND_FRACTION = 0.18;
-/** Angular slack at both ends of the arc, in units of the arc fraction. */
-const Q_EDGE_PAD = 0.04;
-const Q_ARC_RAD = (Q_ARC_DEG * Math.PI) / 180;
-const Q_CUT_RADIUS = 46;
+const Q_WINDUP_MS = 140;
+const Q_FADE_MS = 250;
+const Q_CUT_RADIUS = 65;
 
 /** Moonlight. Pale silver-blue, cold cyan core, indigo night. Nothing here is warm. */
 export const MOON_PALE = [223, 230, 245] as const;
 export const MOON_CORE = [116, 185, 255] as const;
 export const MOON_NIGHT = [58, 70, 120] as const;
-
-/** Where the blade is, as a fraction of the 180 degrees it will cover. */
-function sweptFraction(progress: number): number {
-  if (progress <= Q_WIND_FRACTION) return 0;
-  return (progress - Q_WIND_FRACTION) / (1 - Q_WIND_FRACTION);
-}
-
-/** How far out the blade rides at that fraction: it leaves her body and accelerates outward. */
-export function bladeReach(fraction: number): number {
-  const k = Math.min(Math.max(fraction, 0), 1);
-  return Q_RADIUS * (0.12 + 0.88 * (1 - (1 - k) * (1 - k)));
-}
 
 /**
  * Diana's one shape: a thick arc with a sharp outer lip and two tapering tails.
@@ -118,9 +101,9 @@ export function moonlightOn(unit: AttackableUnit): Moonlight | null {
 export default class Diana_Q extends Spell {
   image = AssetManager.get('spell_diana_q');
   name = 'Trăng Lưỡi Liềm (Diana_Q)';
-  description = `Lưỡi liềm ánh trăng quét một vòng cung ${Q_ARC_DEG} độ quanh Diana, gây
-    <span class="damage">${Q_DAMAGE} sát thương</span> và đánh dấu Ánh Trăng trong
-    ${MOONLIGHT_MS / 1000} giây.`;
+  description = `Bắn ra một vệt ánh trăng hình lưỡi liềm uốn lượn tới điểm chỉ định, gây
+    <span class="damage">${Q_DAMAGE} sát thương</span> cho kẻ địch trên đường bay và tại điểm đích,
+    đồng thời đánh dấu Ánh Trăng trong ${MOONLIGHT_MS / 1000} giây.`;
   coolDown = 8_000;
   manaCost = 30;
   range = Q_RADIUS;
@@ -136,18 +119,19 @@ export default class Diana_Q extends Spell {
   }
 
   onSpellCast(context?: CastContext): void {
-    const sweep = new Diana_Q_Sweep(this.owner, this.openingAngle(context));
-    this.game.objectManager.addObject(sweep);
-  }
-
-  /** Body heading, then a fixed vector — a direction is never allowed to be (0,0). */
-  private openingAngle(context?: CastContext): number {
+    const origin = { x: this.owner.position.x, y: this.owner.position.y };
     let aimX = 1;
     let aimY = 0;
+    let dist = this.range;
+
     if (context) {
       const aim = this.firingDirection(context);
       aimX = aim.x;
       aimY = aim.y;
+      const cursorX = context.cursorWorld?.x ?? origin.x + aimX * this.range;
+      const cursorY = context.cursorWorld?.y ?? origin.y + aimY * this.range;
+      const span = Math.hypot(cursorX - origin.x, cursorY - origin.y);
+      dist = Math.min(Math.max(span, 100), effectiveRange(this.range, this.owner));
     } else {
       const heading = this.owner.direction;
       if (heading && (heading.x !== 0 || heading.y !== 0)) {
@@ -155,7 +139,15 @@ export default class Diana_Q extends Spell {
         aimY = heading.y;
       }
     }
-    return Math.atan2(aimY, aimX) - Q_ARC_RAD / 2;
+
+    const headingAngle = Math.atan2(aimY, aimX);
+    const target = {
+      x: origin.x + Math.cos(headingAngle) * dist,
+      y: origin.y + Math.sin(headingAngle) * dist,
+    };
+
+    const sweep = new Diana_Q_Sweep(this.owner, origin, target);
+    this.game.objectManager.addObject(sweep);
   }
 
   drawPreview(): void {
@@ -164,28 +156,58 @@ export default class Diana_Q extends Spell {
 }
 
 /**
- * The sweep itself. The path *is* the hitbox: a unit is cut when the blade passes its angle
- * at roughly its distance, so nothing behind Diana is ever in the arc. Anchored to the cast
- * position rather than to her body, because a blade that follows her would lie about where
- * it already cut.
+ * The crescent projectile. Curves from Diana's launch position to the target destination
+ * along a quadratic Bézier path, leaving a luminous moonlight trail and detonating at the tip.
  */
 export class Diana_Q_Sweep extends SpellObject {
   age = 0;
-  readonly startAngle: number;
+  readonly p0: { x: number; y: number };
+  readonly p1: { x: number; y: number };
+  readonly p2: { x: number; y: number };
   private readonly cut = new Set<AttackableUnit>();
-  /** Seeded once in onAdded: random() inside draw() flickers instead of animating. */
-  private motes: { fraction: number; radial: number; phase: number }[] = [];
+  private motes: { t: number; radial: number; phase: number }[] = [];
+  private detonated = false;
 
-  constructor(owner: AttackableUnit, startAngle: number) {
+  constructor(owner: AttackableUnit, p0: { x: number; y: number }, p2: { x: number; y: number }) {
     super(owner);
-    this.startAngle = startAngle;
+    this.p0 = p0;
+    this.p2 = p2;
+    this.position = createVector(p0.x, p0.y);
+
+    const dx = p2.x - p0.x;
+    const dy = p2.y - p0.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    // Perpendicular normal pointing outward to the right
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const midX = (p0.x + p2.x) / 2;
+    const midY = (p0.y + p2.y) / 2;
+    const bow = dist * 0.45;
+    this.p1 = { x: midX + nx * bow, y: midY + ny * bow };
+  }
+
+  pointAt(t: number): { x: number; y: number } {
+    const k = constrain(t, 0, 1);
+    const u = 1 - k;
+    return {
+      x: u * u * this.p0.x + 2 * u * k * this.p1.x + k * k * this.p2.x,
+      y: u * u * this.p0.y + 2 * u * k * this.p1.y + k * k * this.p2.y,
+    };
+  }
+
+  tangentAt(t: number): number {
+    const k = constrain(t, 0, 1);
+    const u = 1 - k;
+    const dx = 2 * u * (this.p1.x - this.p0.x) + 2 * k * (this.p2.x - this.p1.x);
+    const dy = 2 * u * (this.p1.y - this.p0.y) + 2 * k * (this.p2.y - this.p1.y);
+    return Math.atan2(dy, dx);
   }
 
   onAdded(): void {
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 18; i++) {
       this.motes.push({
-        fraction: random(0.05, 1),
-        radial: random(-Q_BAND * 0.5, Q_BAND * 0.5),
+        t: random(0.05, 0.95),
+        radial: random(-Q_BAND * 0.4, Q_BAND * 0.4),
         phase: random(0, TWO_PI),
       });
     }
@@ -193,42 +215,78 @@ export class Diana_Q_Sweep extends SpellObject {
 
   update(): void {
     this.age += deltaTime;
-    this.applyCuts(Math.min(this.age / Q_SWEEP_MS, 1));
+    const progress = Math.min(this.age / Q_SWEEP_MS, 1);
+    this.applyCuts(progress);
+
+    if (progress >= 1 && !this.detonated) {
+      this.detonated = true;
+      this.detonate();
+    }
+
     if (this.age >= Q_SWEEP_MS + Q_FADE_MS) this.toRemove = true;
   }
 
   private applyCuts(progress: number): void {
-    const swept = sweptFraction(progress);
-    if (swept <= 0) return;
+    if (progress <= 0) return;
+
+    const sampleCount = Math.max(4, Math.floor(progress * 24));
+    const sampledPoints: { x: number; y: number }[] = [];
+    for (let i = 0; i <= sampleCount; i++) {
+      sampledPoints.push(this.pointAt((i / sampleCount) * progress));
+    }
+
+    const currentHead = sampledPoints[sampledPoints.length - 1];
+    this.position.set(currentHead.x, currentHead.y);
 
     const candidates = this.game.objectManager.queryObjects({
       area: new Circle({
-        x: this.position.x,
-        y: this.position.y,
-        r: Q_RADIUS + Q_BAND + 60,
+        x: currentHead.x,
+        y: currentHead.y,
+        r: Q_BAND + 80,
       }),
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     }) as AttackableUnit[];
 
     for (const victim of candidates) {
-      if (this.cut.has(victim)) continue;
-      const dx = victim.position.x - this.position.x;
-      const dy = victim.position.y - this.position.y;
-      const away = Math.sqrt(dx * dx + dy * dy);
-      const fraction = wrapAngle(Math.atan2(dy, dx) - this.startAngle) / Q_ARC_RAD;
-      if (fraction < -Q_EDGE_PAD || fraction > swept + Q_EDGE_PAD) continue;
-      if (Math.abs(away - bladeReach(fraction)) > Q_BAND) continue;
+      if (this.cut.has(victim) || victim.isDead || victim.toRemove) continue;
 
+      let minDistance = Number.POSITIVE_INFINITY;
+      for (const pt of sampledPoints) {
+        const d = Math.hypot(victim.position.x - pt.x, victim.position.y - pt.y);
+        if (d < minDistance) minDistance = d;
+      }
+
+      if (minDistance <= Q_BAND + (victim.collisionRadius || 20)) {
+        this.cut.add(victim);
+        victim.takeDamage(Q_DAMAGE, this.owner);
+        victim.addBuff(new Moonlight(MOONLIGHT_MS, this.owner, victim));
+        this.game.objectManager.addObject(new Diana_Q_Cut(this.owner, victim.position.copy()));
+      }
+    }
+  }
+
+  private detonate(): void {
+    this.game.objectManager.addObject(new Diana_Q_Cut(this.owner, createVector(this.p2.x, this.p2.y)));
+
+    const victims = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.p2.x,
+        y: this.p2.y,
+        r: Q_CUT_RADIUS + 20,
+      }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+    }) as AttackableUnit[];
+
+    for (const victim of victims) {
+      if (this.cut.has(victim) || victim.isDead || victim.toRemove) continue;
       this.cut.add(victim);
       victim.takeDamage(Q_DAMAGE, this.owner);
       victim.addBuff(new Moonlight(MOONLIGHT_MS, this.owner, victim));
-      this.game.objectManager.addObject(new Diana_Q_Cut(this.owner, victim.position.copy()));
     }
   }
 
   draw(): void {
     const progress = Math.min(this.age / Q_SWEEP_MS, 1);
-    const swept = sweptFraction(progress);
     const tail =
       this.age <= Q_SWEEP_MS ? 1 : constrain(1 - (this.age - Q_SWEEP_MS) / Q_FADE_MS, 0, 1);
     if (tail <= 0) return;
@@ -236,57 +294,75 @@ export class Diana_Q_Sweep extends SpellObject {
     push();
     noFill();
 
-    // The corridor already covered, drawn as its two edges: the shape of the ability,
-    // legible after the fact instead of only during the frame that cut you.
-    const samples = 26;
-    for (let i = 1; i < samples; i++) {
-      const f0 = ((i - 1) / (samples - 1)) * swept;
-      const f1 = (i / (samples - 1)) * swept;
-      const behind = swept > 0 ? 1 - f1 / swept : 1;
-      const shade = 130 * tail * (1 - behind * 0.8);
-      stroke(MOON_NIGHT[0] + 60, MOON_NIGHT[1] + 70, MOON_NIGHT[2] + 90, shade);
-      strokeWeight(1 + 1.6 * (1 - behind));
-      const a0 = this.startAngle + Q_ARC_RAD * f0;
-      const a1 = this.startAngle + Q_ARC_RAD * f1;
-      const r0 = bladeReach(f0);
-      const r1 = bladeReach(f1);
-      for (let edge = -1; edge <= 1; edge += 2) {
-        const e0 = r0 + edge * Q_BAND * 0.62;
-        const e1 = r1 + edge * Q_BAND * 0.62;
-        line(
-          this.position.x + cos(a0) * e0,
-          this.position.y + sin(a0) * e0,
-          this.position.x + cos(a1) * e1,
-          this.position.y + sin(a1) * e1
-        );
-      }
-    }
+    // 1. Draw glowing crescent moonlight corridor along the Bézier curve
+    const samples = 28;
+    const stepCount = Math.max(2, Math.floor(progress * samples));
 
-    // Motes shaken loose along the corridor.
+    // Outer soft lunar aura
+    stroke(MOON_CORE[0], MOON_CORE[1], MOON_CORE[2], 90 * tail);
+    strokeWeight(14);
+    beginShape();
+    for (let i = 0; i <= stepCount; i++) {
+      const pt = this.pointAt((i / samples) * progress);
+      vertex(pt.x, pt.y);
+    }
+    endShape();
+
+    // Inner bright beam
+    stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 220 * tail);
+    strokeWeight(4.5);
+    beginShape();
+    for (let i = 0; i <= stepCount; i++) {
+      const pt = this.pointAt((i / samples) * progress);
+      vertex(pt.x, pt.y);
+    }
+    endShape();
+
+    // 2. Sparkling motes along the path
     for (const mote of this.motes) {
-      if (mote.fraction > swept) continue;
-      const angle = this.startAngle + Q_ARC_RAD * mote.fraction;
-      const away = bladeReach(mote.fraction) + mote.radial;
-      const twinkle = 0.4 + 0.6 * Math.abs(sin(mote.phase + this.age / 130));
-      stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 150 * tail * twinkle);
-      strokeWeight(2);
-      point(this.position.x + cos(angle) * away, this.position.y + sin(angle) * away);
+      if (mote.t > progress) continue;
+      const pt = this.pointAt(mote.t);
+      const angle = this.tangentAt(mote.t) + HALF_PI;
+      const mx = pt.x + Math.cos(angle) * mote.radial;
+      const my = pt.y + Math.sin(angle) * mote.radial;
+      const twinkle = 0.4 + 0.6 * Math.abs(sin(mote.phase + this.age / 110));
+      stroke(MOON_PALE[0], MOON_PALE[1], MOON_PALE[2], 200 * tail * twinkle);
+      strokeWeight(2.5);
+      point(mx, my);
     }
 
-    // The blade, bulging outward, brighter than anything it left behind.
-    const lead = this.startAngle + Q_ARC_RAD * swept;
-    const reach = bladeReach(swept);
-    const bow = 32;
-    const bx = this.position.x + cos(lead) * (reach - bow);
-    const by = this.position.y + sin(lead) * (reach - bow);
-    const rising = progress < Q_WIND_FRACTION ? progress / Q_WIND_FRACTION : 1;
-    drawCrescent(bx, by, bow, lead, 1.55, 8 * rising, MOON_PALE, 240 * tail);
-    drawCrescent(bx, by, bow - 7, lead, 1.15, 4 * rising, MOON_CORE, 215 * tail);
+    // 3. Leading crescent blade at head
+    const headPt = this.pointAt(progress);
+    const headAngle = this.tangentAt(progress);
+    const bow = 28;
+
+    push();
+    translate(headPt.x, headPt.y);
+    rotate(headAngle);
+    // Outer crescent
+    drawCrescent(0, 0, bow, 0, 1.6, 9, MOON_PALE, 250 * tail);
+    drawCrescent(0, 0, bow - 6, 0, 1.2, 5, MOON_CORE, 230 * tail);
+    // Glowing lunar star core
+    fill(255, 255, 255, 240 * tail);
+    noStroke();
+    circle(0, 0, 8);
+    pop();
+
     pop();
   }
 
   getDisplayBoundingBox() {
-    return this.squareDisplayBoundingBox((Q_RADIUS + Q_BAND + 40) * 2);
+    const minX = Math.min(this.p0.x, this.p1.x, this.p2.x) - Q_BAND - 50;
+    const maxX = Math.max(this.p0.x, this.p1.x, this.p2.x) + Q_BAND + 50;
+    const minY = Math.min(this.p0.y, this.p1.y, this.p2.y) - Q_BAND - 50;
+    const maxY = Math.max(this.p0.y, this.p1.y, this.p2.y) + Q_BAND + 50;
+    return new Rectangle({
+      x: minX,
+      y: minY,
+      w: maxX - minX,
+      h: maxY - minY,
+      data: this,
+    });
   }
 }
 

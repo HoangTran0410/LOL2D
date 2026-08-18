@@ -9,21 +9,23 @@ import Shield from '@/game/gameObject/buffs/Shield';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 
-export const SETT_W_GRIT_RATIO = 0.5;
-export const SETT_W_GRIT_MAX = 40;
-export const SETT_W_GRIT_DECAY_MS = 4_000;
-export const SETT_W_BASE = 20;
-export const SETT_W_GRIT_SCALE = 0.5;
-export const SETT_W_SHIELD_MS = 4_000;
-export const SETT_W_LENGTH = 380;
-export const SETT_W_WIDTH = 140;
-export const SETT_W_CORE_LENGTH = 140;
-export const SETT_W_WINDUP_MS = 250;
+export const SETT_W_GRIT_RATIO = 1.0;
+export const SETT_W_GRIT_MAX = 100;
+export const SETT_W_GRIT_DECAY_MS = 3_000;
+export const SETT_W_BASE = 28;
+export const SETT_W_GRIT_SCALE = 0.8;
+export const SETT_W_SHIELD_MS = 3_000;
+export const SETT_W_LENGTH = 420;
+export const SETT_W_CONE_DEG = 75;
+export const SETT_W_CONE_RAD = (SETT_W_CONE_DEG * Math.PI) / 180;
+export const SETT_W_CORE_WIDTH = 90;
+export const SETT_W_WINDUP_MS = 450;
 
 /** The listener buff is re-planted whenever it is missing, so its length is cosmetic. */
 const LISTEN_MS = 60_000;
-const PUNCH_LIFE_MS = 360;
-const HOT: [number, number, number] = [225, 112, 85];
+const PUNCH_LIFE_MS = 400;
+const HOT: [number, number, number] = [255, 140, 0];
+const GOLD: [number, number, number] = [255, 215, 0];
 const BLOOD: [number, number, number] = [183, 21, 64];
 
 /**
@@ -38,20 +40,22 @@ export default class Sett_W extends Spell {
   image = AssetManager.get('spell_sett_w');
   name = 'Cuồng Thú Quyền (Sett_W)';
   description =
-    `Sett tích <b>Nộ Khí</b> bằng ${Math.round(SETT_W_GRIT_RATIO * 100)}% sát thương phải nhận ` +
-    `(tối đa ${SETT_W_GRIT_MAX}). Khi tung chưởng, toàn bộ Nộ Khí biến thành khiên và ` +
+    `Sett tích <b>Nộ Khí</b> bằng 100% mọi sát thương nhận vào (không giới hạn tối đa). ` +
+    `Sau 3 giây không nhận sát thương, Nộ Khí mới bắt đầu suy giảm. ` +
+    `Khi kích hoạt chiêu, Sett lập tức nhận lá chắn bằng toàn bộ Nộ Khí trong 3 giây ` +
+    `và tung đòn đánh hình cánh quạt ${SETT_W_CONE_DEG}° tầm ${SETT_W_LENGTH} gây ` +
     `<span class="damage">${SETT_W_BASE} sát thương</span> cộng ` +
-    `${Math.round(SETT_W_GRIT_SCALE * 100)}% Nộ Khí trong một hình chữ nhật dài ${SETT_W_LENGTH}. ` +
-    `Phần lõi ${SETT_W_CORE_LENGTH} đầu tiên xuyên qua khiên của mục tiêu.`;
+    `${Math.round(SETT_W_GRIT_SCALE * 100)}% Nộ Khí (dải trung tâm gây sát thương chuẩn).`;
   coolDown = 10_000;
   manaCost = 40;
   range = SETT_W_LENGTH;
 
   /**
-   * Each chunk remembers what it was worth and how long ago it landed; a chunk
-   * fades linearly to nothing over SETT_W_GRIT_DECAY_MS.
+   * Each chunk remembers what it was worth.
    */
-  gritChunks: { amount: number; age: number }[] = [];
+  gritChunks: { amount: number }[] = [];
+  timeSinceDamage = 0;
+  private castGrit = 0;
 
   private bar: Sett_W_Grit_Bar | null = null;
 
@@ -65,14 +69,18 @@ export default class Sett_W extends Spell {
     };
   }
 
-  /** Grit available right now, after decay. Never above the cap. */
+  /** Grit available right now, uncapped, decaying only after 3s of no incoming damage. */
   get grit(): number {
     let total = 0;
     for (const chunk of this.gritChunks) {
-      const left = 1 - chunk.age / SETT_W_GRIT_DECAY_MS;
-      if (left > 0) total += chunk.amount * left;
+      total += chunk.amount;
     }
-    return Math.min(total, SETT_W_GRIT_MAX);
+    if (this.timeSinceDamage >= SETT_W_GRIT_DECAY_MS) {
+      const decayProgress = (this.timeSinceDamage - SETT_W_GRIT_DECAY_MS) / SETT_W_GRIT_DECAY_MS;
+      const left = Math.max(0, 1 - decayProgress);
+      total *= left;
+    }
+    return Math.max(0, total);
   }
 
   get stackCount(): number | undefined {
@@ -80,12 +88,11 @@ export default class Sett_W extends Spell {
     return banked > 0 ? banked : undefined;
   }
 
-  /** Called by the listener buff with SETT_W_GRIT_RATIO of what actually landed. */
+  /** Called by the listener buff: adds 100% of damage taken, resetting the decay timer. */
   addGrit(amount: number): void {
     if (!(amount > 0)) return;
-    const room = SETT_W_GRIT_MAX - this.grit;
-    if (room <= 0) return;
-    this.gritChunks.push({ amount: Math.min(amount, room), age: 0 });
+    this.gritChunks.push({ amount });
+    this.timeSinceDamage = 0;
   }
 
   onUpdate(): void {
@@ -95,27 +102,28 @@ export default class Sett_W extends Spell {
   }
 
   onCastStart(context: CastContext): void {
+    this.castGrit = this.grit;
+    this.gritChunks = [];
+    this.timeSinceDamage = 0;
+
+    if (this.castGrit > 0) {
+      const guard = new Shield(SETT_W_SHIELD_MS, this.owner, this.owner);
+      guard.amount = this.castGrit;
+      guard.color = [255, 170, 0];
+      guard.stackId = 'sett_w_grit_shield';
+      this.owner.addBuff(guard);
+    }
+
     const aim = this.firingDirection(context);
     const telegraph = new Sett_W_Telegraph(this.owner, Math.atan2(aim.y, aim.x));
     this.game.objectManager.addObject(telegraph);
   }
 
   onSpellCast(context: CastContext): void {
-    const spent = this.grit;
-    this.gritChunks = [];
-
-    if (spent > 0) {
-      const guard = new Shield(SETT_W_SHIELD_MS, this.owner, this.owner);
-      guard.amount = spent;
-      guard.color = HOT;
-      guard.stackId = 'sett_w_grit_shield';
-      this.owner.addBuff(guard);
-    }
+    const spent = this.castGrit;
 
     const aim = this.firingDirection(context);
     const heading = Math.atan2(aim.y, aim.x);
-    const along = Math.cos(heading);
-    const across = Math.sin(heading);
     const damage = SETT_W_BASE + SETT_W_GRIT_SCALE * spent;
     const origin = this.owner.position;
 
@@ -128,22 +136,26 @@ export default class Sett_W extends Spell {
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     }) as AttackableUnit[];
 
-    // A plain loop: Array.prototype.filter cannot narrow here.
     const struck = new Set<AttackableUnit>();
     for (const victim of candidates) {
-      if (struck.has(victim)) continue;
+      if (struck.has(victim) || victim.isDead || victim.toRemove) continue;
       const dx = victim.position.x - origin.x;
       const dy = victim.position.y - origin.y;
-      const depth = dx * along + dy * across;
-      const offset = -dx * across + dy * along;
-      const pad = victim.collisionRadius;
-      if (depth < -pad || depth > SETT_W_LENGTH + pad) continue;
-      if (Math.abs(offset) > SETT_W_WIDTH / 2 + pad) continue;
+      const dist = Math.hypot(dx, dy);
+      const pad = victim.collisionRadius || 20;
+      if (dist > SETT_W_LENGTH + pad) continue;
+
+      const angle = Math.atan2(dy, dx);
+      let diff = angle - heading;
+      while (diff > Math.PI) diff -= 2 * Math.PI;
+      while (diff < -Math.PI) diff += 2 * Math.PI;
+
+      if (Math.abs(diff) > SETT_W_CONE_RAD / 2 + pad / Math.max(dist, 1)) continue;
       struck.add(victim);
 
-      if (depth <= SETT_W_CORE_LENGTH + pad) {
-        // The white-hot core is felt through a shield: swing for the shield as
-        // well, so exactly `damage` reaches the body underneath it.
+      const lateral = Math.abs(-dx * Math.sin(heading) + dy * Math.cos(heading));
+      if (lateral <= SETT_W_CORE_WIDTH / 2 + pad) {
+        // True damage piercing shields along center strip
         victim.takeDamage(damage + victim.shieldAmount, this.owner);
       } else {
         victim.takeDamage(damage, this.owner);
@@ -262,7 +274,7 @@ export class Sett_W_Grit_Bar extends SpellObject {
   }
 }
 
-/** The windup: the box grows to full reach while he pulls the fist back. */
+/** The windup: the cone sector grows to full reach while he pulls the fist back. */
 export class Sett_W_Telegraph extends SpellObject {
   /** Ground art: Z_INDEX_MAP is keyed by exact constructor, so a subclass must say so. */
   zIndex = 2;
@@ -286,19 +298,31 @@ export class Sett_W_Telegraph extends SpellObject {
 
   draw(): void {
     const t = constrain(this.age / this.lifeTime, 0, 1);
-    const grown = t * t; // wind-in easing: slow start, then the arm snaps
+    const grown = t * t; // wind-in easing
     const reach = SETT_W_LENGTH * grown;
+    const halfAngle = SETT_W_CONE_RAD / 2;
+
     push();
-    rectMode(CORNER);
     translate(this.position.x, this.position.y);
     rotate(this.heading);
+
+    // 1. Expanding cone sector outline and fill
+    fill(HOT[0], HOT[1], HOT[2], 25 + 50 * grown);
+    stroke(GOLD[0], GOLD[1], GOLD[2], 120 + 130 * grown);
+    strokeWeight(2.5);
+    arc(0, 0, reach * 2, reach * 2, -halfAngle, halfAngle, PIE);
+
+    // 2. Center true-damage strip indicator
+    fill(255, 255, 255, 45 * grown);
+    noStroke();
+    rect(0, -SETT_W_CORE_WIDTH / 2, reach, SETT_W_CORE_WIDTH);
+
+    // 3. Leading arc rim
     noFill();
-    stroke(HOT[0], HOT[1], HOT[2], 90 + 90 * grown);
-    strokeWeight(3);
-    rect(0, -SETT_W_WIDTH / 2, reach, SETT_W_WIDTH, 4);
-    // the flat leading edge, which is where the knuckles will arrive
-    strokeWeight(6);
-    line(reach, -SETT_W_WIDTH / 2, reach, SETT_W_WIDTH / 2);
+    stroke(255, 230, 180, 230 * grown);
+    strokeWeight(5);
+    arc(0, 0, reach * 2, reach * 2, -halfAngle, halfAngle);
+
     pop();
   }
 
@@ -308,21 +332,14 @@ export class Sett_W_Telegraph extends SpellObject {
 }
 
 /**
- * The punch itself. Two regions because they behave differently: a solid
- * white-hot core slab that is felt through a shield, and an open outlined band
- * behind it that is not.
+ * The punch itself. Blasts the full cone sector with golden flame, with an intense
+ * true-damage laser strip along the center.
  */
 export class Sett_W_Punch extends SpellObject {
-  /**
-   * Ground art, at zIndex 2 rather than the 99 a SpellObject subclass falls
-   * through to: the core is a solid slab, and at 99 it would paint over the very
-   * body it just hit.
-   */
   zIndex = 2;
   lifeTime = PUNCH_LIFE_MS;
   age = 0;
   radius = SETT_W_LENGTH;
-  /** Seeded once in onAdded — random() inside draw() flickers instead of animating. */
   cracks: { depth: number; offset: number; tilt: number; span: number }[] = [];
 
   private heading: number;
@@ -335,12 +352,12 @@ export class Sett_W_Punch extends SpellObject {
   }
 
   onAdded(): void {
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 12; i++) {
       this.cracks.push({
-        depth: random(20, SETT_W_LENGTH),
-        offset: random(-SETT_W_WIDTH / 2, SETT_W_WIDTH / 2),
+        depth: random(30, SETT_W_LENGTH * 0.95),
+        offset: random(-SETT_W_CORE_WIDTH * 1.5, SETT_W_CORE_WIDTH * 1.5),
         tilt: random(-0.7, 0.7),
-        span: random(16, 40),
+        span: random(20, 55),
       });
     }
   }
@@ -354,38 +371,41 @@ export class Sett_W_Punch extends SpellObject {
     const t = constrain(this.age / this.lifeTime, 0, 1);
     const opened = 1 - (1 - t) * (1 - t);
     const fade = 1 - t;
-    const heat = 0.4 + 0.6 * constrain(this.grit / SETT_W_GRIT_MAX, 0, 1);
+    const heat = 0.5 + 0.5 * constrain(this.grit / SETT_W_GRIT_MAX, 0, 1);
+    const halfAngle = SETT_W_CONE_RAD / 2;
+    const reach = SETT_W_LENGTH * opened;
+
     push();
-    rectMode(CORNER);
     translate(this.position.x, this.position.y);
     rotate(this.heading);
 
-    // outer band: open box, ordinary damage
-    noFill();
-    stroke(BLOOD[0], BLOOD[1], BLOOD[2], 230 * fade);
-    strokeWeight(5 * fade + 2);
-    const reach = SETT_W_CORE_LENGTH + (SETT_W_LENGTH - SETT_W_CORE_LENGTH) * opened;
-    rect(SETT_W_CORE_LENGTH, -SETT_W_WIDTH / 2, reach - SETT_W_CORE_LENGTH, SETT_W_WIDTH, 4);
+    // 1. Blazing cone sector shockwave
+    fill(HOT[0], HOT[1], HOT[2], 65 * fade * heat);
+    stroke(GOLD[0], GOLD[1], GOLD[2], 240 * fade);
+    strokeWeight(4 * fade + 1.5);
+    arc(0, 0, reach * 2, reach * 2, -halfAngle, halfAngle, PIE);
 
-    // core: one solid white-hot slab, at exactly the length that ignores shields
+    // 2. Core true-damage blast beam along the center
     noStroke();
-    fill(255, 236 - 40 * (1 - heat), 214 - 60 * (1 - heat), 210 * fade);
-    rect(0, -SETT_W_WIDTH / 2, SETT_W_CORE_LENGTH, SETT_W_WIDTH, 4);
-    fill(HOT[0], HOT[1], HOT[2], 235 * fade * heat);
-    rect(6, -SETT_W_WIDTH / 2 + 6, SETT_W_CORE_LENGTH - 12, SETT_W_WIDTH - 12, 3);
+    fill(255, 245, 220, 230 * fade * heat);
+    rect(0, -SETT_W_CORE_WIDTH / 2, reach, SETT_W_CORE_WIDTH, 4);
+    fill(255, 255, 255, 250 * fade);
+    rect(0, -SETT_W_CORE_WIDTH / 4, reach, SETT_W_CORE_WIDTH / 2, 2);
 
-    // radial speed lines down the whole punch, and cracked ground under it
-    stroke(255, 214, 190, 200 * fade);
-    strokeWeight(3);
+    // 3. Ground cracks and ember sparks
+    stroke(255, 200, 120, 220 * fade);
+    strokeWeight(2.5);
     for (const crack of this.cracks) {
       const at = crack.depth * opened;
       line(at, crack.offset, at + crack.span * cos(crack.tilt), crack.offset + crack.span * 0.4);
     }
 
-    // the flat leading edge: the knuckle face
-    stroke(255, 244, 226, 245 * fade);
-    strokeWeight(8 * fade + 2);
-    line(reach, -SETT_W_WIDTH / 2, reach, SETT_W_WIDTH / 2);
+    // 4. Heavy outer rim impact shockwave
+    noFill();
+    stroke(255, 255, 255, 250 * fade);
+    strokeWeight(7 * fade + 2);
+    arc(0, 0, reach * 2, reach * 2, -halfAngle, halfAngle);
+
     pop();
   }
 

@@ -70,8 +70,44 @@ export default class Vi_E extends Spell {
     // own time from there: spending the second charge must not push the first
     // one further away.
     if (this.chargesLeft === E_CHARGES - 1) this.rechargeMs = 0;
-    this.arm();
+
+    const nearbyTarget = this.findClosestEnemyInReach();
+    if (nearbyTarget) {
+      this.cleave(nearbyTarget);
+    } else {
+      this.arm();
+    }
     if (this.chargesLeft > 0) this.resetCoolDown();
+  }
+
+  private findClosestEnemyInReach(): AttackableUnit | null {
+    const reach = effectiveRange(180, this.owner);
+    const candidates = this.game.objectManager.queryObjects({
+      area: new Circle({
+        x: this.owner.position.x,
+        y: this.owner.position.y,
+        r: reach,
+      }),
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
+    }) as AttackableUnit[];
+
+    let nearest: AttackableUnit | null = null;
+    let minDistance = Infinity;
+    for (const candidate of candidates) {
+      if (candidate === this.owner || candidate.isDead || candidate.toRemove) continue;
+      const d = Math.hypot(
+        candidate.position.x - this.owner.position.x,
+        candidate.position.y - this.owner.position.y
+      );
+      if (d < minDistance) {
+        minDistance = d;
+        nearest = candidate;
+      }
+    }
+    return nearest;
   }
 
   onUpdate(): void {

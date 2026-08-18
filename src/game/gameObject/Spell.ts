@@ -114,8 +114,12 @@ export default class Spell {
   }
 
   get aimPoint(): p5.Vector {
-    const aim = this._castContext?.cursorWorld ?? this.game.worldMouse;
-    return createVector(aim.x, aim.y);
+    if (this.spellRuntime?.state === 'CHARGING') {
+      const liveAim = this.game?.worldMouse;
+      if (liveAim) return createVector(liveAim.x, liveAim.y);
+    }
+    const aim = this._castContext?.cursorWorld ?? this.game?.worldMouse;
+    return createVector(aim ? aim.x : 0, aim ? aim.y : 0);
   }
 
   update(): void {
@@ -225,7 +229,8 @@ export default class Spell {
   }
 
   release(context: CastContext): boolean {
-    const released = this.runtime.release(context);
+    this._castContext = snapshotContext(context);
+    const released = this.runtime.release(this._castContext);
     this.syncVfxPhase();
     return released;
   }

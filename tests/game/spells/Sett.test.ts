@@ -112,28 +112,26 @@ describe('Sett spells', () => {
     const w = new Sett_W(owner);
     w.onUpdate();
     owner.takeDamage(40, place(game, 900, 'red'));
-    expect(w.grit).toBe(20);
+    expect(w.grit).toBe(40 * SETT_W_GRIT_RATIO);
 
     w.onSpellCast(context(300, 0));
     expect(w.grit).toBe(0);
-    expect(owner.shieldAmount).toBe(20);
+    expect(owner.shieldAmount).toBe(40 * SETT_W_GRIT_RATIO);
   });
 
   it('W punches for its base at no grit and for base plus half the grit at the cap', () => {
     const w = new Sett_W(owner);
     w.onUpdate();
-    const punched = place(game, 650, 'red', 500); // 250 along the punch: outer band
+    const punched = place(game, 650, 'red', 500);
     const bully = place(game, 900, 'red');
     game.objectManager.update();
 
     w.onSpellCast(context(300, 0));
-    // 500 - 20 = 480
     expect(punched.stats.health.value).toBe(500 - SETT_W_BASE);
 
     owner.takeDamage(SETT_W_GRIT_MAX / SETT_W_GRIT_RATIO, bully);
     expect(w.grit).toBe(SETT_W_GRIT_MAX);
     w.onSpellCast(context(300, 0));
-    // 20 + 0.5 * 40 = 40, so 480 - 40 = 440
     expect(punched.stats.health.value).toBe(
       500 - SETT_W_BASE - (SETT_W_BASE + SETT_W_GRIT_SCALE * SETT_W_GRIT_MAX)
     );
@@ -141,8 +139,9 @@ describe('Sett spells', () => {
 
   it("W's core punches through a shield while its outer band is absorbed", () => {
     const w = new Sett_W(owner);
-    const core = place(game, 480, 'red'); // 80 along the punch: inside the core
-    const band = place(game, 650, 'red'); // 250 along the punch: outer band
+    const core = place(game, 600, 'red'); // along center beam
+    const band = place(game, 600, 'red'); // in sector flank
+    band.position.y = 80;
     for (const target of [core, band]) {
       const guard = new Shield(4_000, owner, target);
       guard.amount = 50;
@@ -196,6 +195,26 @@ describe('Sett spells', () => {
     // 100 - 45 = 55 for the man he threw, 100 - 30 = 70 for the man beside the crater
     expect(grabbed.stats.health.value).toBe(100 - SETT_R_SLAM);
     expect(bystander.stats.health.value).toBe(100 - SETT_R_BLAST);
+  });
+
+  it('R refuses to target self or ally and does not carry or slam self', () => {
+    const r = new Sett_R(owner);
+    const ally = place(game, 450, 'blue');
+    game.objectManager.update();
+
+    r.onSpellCast({ ...context(0, 0), target: owner });
+    expect(findCarry(game)).toBeNull();
+    expect(owner.stats.health.value).toBe(1000);
+
+    r.onSpellCast({ ...context(50, 0), target: ally });
+    expect(findCarry(game)).toBeNull();
+    expect(ally.stats.health.value).toBe(100);
+
+    const pressed = r.press(context(0, 0));
+    expect(pressed).toBe(false);
+    expect(findCarry(game)).toBeNull();
+    expect(r.currentCooldown).toBe(0);
+    expect(r.state).toBe('READY');
   });
 
   it('Q arms exactly two punches and spends them one landed swing at a time', () => {
