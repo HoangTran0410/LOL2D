@@ -32,7 +32,7 @@ export default class Yasuo_E extends Spell {
   description =
     '<span class="buff">Lướt</span> xuyên qua kẻ địch gần nhất trong tầm, gây <span class="damage">10 sát thương</span> <i>khi lưỡi kiếm chạm tới mục tiêu</i>';
   coolDown = 2000;
-  manaCost = 30;
+  manaCost = 20;
 
   rangeToFindEnemies = E_RANGE;
 

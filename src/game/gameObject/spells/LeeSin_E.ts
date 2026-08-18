@@ -39,6 +39,7 @@ export default class LeeSin_E extends Spell {
     ` <span class="damage">${DAMAGE} sát thương</span> và <span class="buff">Làm Chậm ${SLOW_PERCENT * 100}%</span>` +
     ` trong <span class="time">${SLOW_DURATION / 1000} giây</span> <i>khi sóng chạm tới từng kẻ địch</i>`;
   coolDown = 5000;
+  manaCost = 30;
 
   range = RANGE;
 

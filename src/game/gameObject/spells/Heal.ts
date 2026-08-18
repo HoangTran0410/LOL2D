@@ -6,12 +6,13 @@ import Speedup from '@/game/gameObject/buffs/Speedup';
 import CombatText from '@/game/gameObject/helpers/CombatText';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 
+const SPEEDUP_TIME = 3000;
+
 export default class Heal extends Spell {
   targetingMode = 'SELF' as const;
   name = 'Hồi Máu (Heal)';
   image = AssetManager.get('spell_heal');
-  description =
-    '<span class="buff">Hồi Máu</span> một lượng bằng <span>30% máu tối đa</span> và <span class="buff">Tăng Tốc 50%</span> trong <span class="time">1 giây</span>';
+  description = `<span class="buff">Hồi Máu</span> một lượng bằng <span>30% máu tối đa</span> và <span class="buff">Tăng Tốc 50%</span> trong <span class="time">${SPEEDUP_TIME / 1000} giây</span>`;
   coolDown = 10000;
   manaCost = 100;
 
@@ -30,7 +31,7 @@ export default class Heal extends Spell {
     this.game.objectManager.addObject(healObject);
 
     // ghost buff for 1s
-    let speedBuff = new Speedup(1000, this.owner, this.owner);
+    let speedBuff = new Speedup(SPEEDUP_TIME, this.owner, this.owner);
     speedBuff.image = this.image;
     speedBuff.percent = 0.5;
     this.owner.addBuff(speedBuff);

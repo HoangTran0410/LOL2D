@@ -34,6 +34,7 @@ export default class Ahri_E extends Spell {
   description =
     'Hôn gió theo hướng chỉ định, gây <span class="damage">15 sát thương</span> và <span class="buff">Mê Hoặc</span> kẻ địch trong <span class="time">1.5 giây</span>';
   coolDown = 5000;
+  manaCost = 20;
 
   onSpellCast() {
     const range = 350;

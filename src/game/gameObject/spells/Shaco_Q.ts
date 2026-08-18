@@ -34,6 +34,7 @@ export default class Shaco_Q extends Spell {
   description =
     '<span class="buff">Dịch chuyển</span> đến vị trí chỉ định, trở nên <span class="buff">Tàng Hình</span> trong <span class="time">2 giây</span> và <span class="buff">Tăng Tốc 40%</span> trong thời gian tàng hình.';
   coolDown = 5000;
+  manaCost = 30;
 
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithMaxRange(

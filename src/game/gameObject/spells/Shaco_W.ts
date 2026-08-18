@@ -27,10 +27,11 @@ export default class Shaco_W extends Spell {
   description =
     `Đặt một Hộp Hề Ma Quái, tàng hình sau <span class="time">${ARM_TIME_MS / 1000} giây</span> và tồn tại` +
     ` <span class="time">${LIFETIME_MS / 1000} giây</span>. Khi kẻ địch tới gần, hộp bật ra:` +
-    ` <span class="buff">Hoảng Sợ</span> chúng rồi bắn trong <span class="time">${ATTACK_WINDOW_MS / 1000} giây</span>,` +
+    ` <span class="buff">Hoảng Sợ</span> và nã <span class="damage">mọi kẻ địch xung quanh</span> trong <span class="time">${ATTACK_WINDOW_MS / 1000} giây</span>,` +
     ` <span class="damage">${ATTACK_DAMAGE} sát thương</span> mỗi phát. Lúc tàng hình <span class="buff">không thể bị chọn</span>,` +
     ` nhưng khi đã bật ra thì <span class="damage">có thể bị phá</span> (${BOX_HEALTH} máu)`;
   coolDown = 5000;
+  manaCost = 20;
 
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithMaxRange(this.owner.position, this.aimPoint, 100);
@@ -78,13 +79,23 @@ export class Shaco_W_Box extends Pet {
   slideSpeed = 6;
   armed = false;
   triggered = false;
-  /** Cosmetic: the radius circle grows into whichever range is live. */
-  rangeToDraw = 0;
+  /** Counts down between volleys once popped; at 0 the next tick fires. */
+  attackCooldown = 0;
 
   constructor(options: ConstructorParameters<typeof Pet>[0]) {
     super(options);
     this.stats.maxHealth.baseValue = BOX_HEALTH;
     this.stats.health.baseValue = BOX_HEALTH;
+  }
+
+  /**
+   * A phantom trap: enemies can shoot it and hit it with spells, but it never
+   * shoves a champion off their path — walking over the box is free. Excluding
+   * it from `UnitCollisionSystem` (which skips any unit whose collidesWithUnits
+   * is false) is all it takes; the box still sits in every gameplay query.
+   */
+  get collidesWithUnits(): boolean {
+    return false;
   }
 
   update(): void {
@@ -104,11 +115,45 @@ export class Shaco_W_Box extends Pet {
     }
 
     if (this.armed && !this.triggered) {
-      this.rangeToDraw = lerp(this.rangeToDraw, FEAR_RANGE, 0.1);
       this.checkTrigger();
       return;
     }
-    if (this.triggered) this.rangeToDraw = lerp(this.rangeToDraw, ATTACK_RANGE, 0.1);
+    if (this.triggered) this.fireVolley();
+  }
+
+  /**
+   * A single-target basic attack is the wrong shape for a trap: a box that pops
+   * in the middle of a wave should punish the whole wave, not lock one body and
+   * ignore the rest. So the box takes no `orderAttack` — findTarget stays null —
+   * and drives its own barrage in `fireVolley` instead.
+   */
+  findTarget(): AttackableUnit | null {
+    return null;
+  }
+
+  /**
+   * One bolt at every enemy inside ATTACK_RANGE, on the attack clock. This is an
+   * area effect, not an acquisition, so it is not vision-gated — the same rule
+   * `checkTrigger`'s fear plays by: a body that stepped on the box in a bush
+   * still eats the volley.
+   */
+  fireVolley(): void {
+    this.attackCooldown -= deltaTime;
+    if (this.attackCooldown > 0) return;
+    this.attackCooldown = 1000 / ATTACKS_PER_SECOND;
+
+    const enemies = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.position.x, y: this.position.y, r: ATTACK_RANGE }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.teamId)],
+    }) as AttackableUnit[];
+
+    for (const enemy of enemies) {
+      const bolt = new Shaco_W_Bullet_Object(this);
+      bolt.position = this.position.copy();
+      bolt.targetEnemy = enemy;
+      bolt.damage = ATTACK_DAMAGE;
+      this.game.objectManager.addObject(bolt);
+    }
   }
 
   /** Someone stepped on it: fear the room, come out of hiding, start the clock. */
@@ -132,47 +177,117 @@ export class Shaco_W_Box extends Pet {
     }
   }
 
-  /** The box, not a champion portrait. Everything else — health bar, buffs — is the base's. */
+  /**
+   * A jack-in-the-box, not a champion portrait: a lidded wind-up box while it
+   * waits, the jester flung out on a coil once it pops. No range ring — the toy
+   * itself is the whole telegraph.
+   */
   drawAvatar(): void {
     if (this.hidden) {
-      // A hint only its owner can act on; enemies see nothing at all because
+      // Owner-only hint at the buried box; enemies see nothing at all because
       // `Stealthed` keeps the whole unit out of their render pass.
+      push();
+      translate(this.position.x, this.position.y);
       noStroke();
-      fill(255, 30);
-      circle(this.position.x, this.position.y, 35);
+      fill(255, 26);
+      rect(-9, -9, 18, 18, 3);
+      pop();
       return;
     }
 
-    const spring = this.triggered ? 6 + 4 * Math.sin(this.age / 90) : 0;
+    const bob = this.triggered ? 6 + 4 * Math.sin(this.age / 90) : 0;
     push();
     translate(this.position.x, this.position.y);
-    stroke(120, 70, 40);
+
+    // the crate body — jester red with a yellow front band and a diamond, so it
+    // reads as a toy box rather than a plain barrel
+    stroke(40, 20, 60);
     strokeWeight(2);
-    fill(190, 120, 60);
-    rect(-14, -14 + spring * 0.3, 28, 28, 4);
-    if (this.triggered) {
-      // the jester springing out of the lid
-      stroke(200, 60, 60);
-      strokeWeight(3);
-      noFill();
-      line(0, -14, 0, -20 - spring);
-      fill(230, 90, 90);
-      noStroke();
-      circle(0, -24 - spring, 14);
-    }
+    fill(150, 40, 60);
+    rect(-14, -12, 28, 24, 4);
+    noStroke();
+    fill(240, 200, 70);
+    rect(-14, 2, 28, 8, 0, 0, 3, 3);
+    fill(150, 40, 60);
+    push();
+    rotate(QUARTER_PI);
+    rect(-4, 2, 8, 8);
     pop();
 
-    if (this.rangeToDraw <= 1) return;
-    push();
-    noFill();
-    stroke(120, this.triggered ? 150 : 60);
-    circle(this.position.x, this.position.y, this.rangeToDraw * 2);
+    if (!this.triggered) {
+      // closed lid + a wind-up crank on the side
+      stroke(40, 20, 60);
+      strokeWeight(2);
+      fill(120, 30, 50);
+      rect(-15, -16, 30, 6, 3);
+      stroke(70, 70, 82);
+      strokeWeight(2);
+      noFill();
+      line(15, -7, 20, -7);
+      line(20, -7, 20, -13);
+      noStroke();
+      fill(96, 96, 110);
+      circle(20, -13, 5);
+    } else {
+      // lid flung open at the hinge, jester on a coil
+      push();
+      translate(-15, -16);
+      rotate(-0.8);
+      stroke(40, 20, 60);
+      strokeWeight(2);
+      fill(120, 30, 50);
+      rect(0, -6, 30, 6, 3);
+      pop();
+
+      const headY = -18 - bob;
+      stroke(225, 215, 120);
+      strokeWeight(2);
+      noFill();
+      beginShape();
+      const links = 24;
+      for (let i = 0; i <= links; i++) {
+        const t = i / links;
+        vertex(Math.sin(t * 3 * TWO_PI) * 6, lerp(-10, headY + 7, t));
+      }
+      endShape();
+
+      push();
+      translate(0, headY);
+      // two-point jester hat with bells
+      stroke(40, 20, 60);
+      strokeWeight(1.5);
+      fill(70, 120, 200);
+      triangle(-8, -3, -13, -13, -1, -7);
+      triangle(8, -3, 13, -13, 1, -7);
+      noStroke();
+      fill(240, 220, 90);
+      circle(-13, -13, 4);
+      circle(13, -13, 4);
+      // face
+      stroke(40, 20, 60);
+      strokeWeight(1.5);
+      fill(245, 222, 194);
+      circle(0, 0, 15);
+      noStroke();
+      fill(40, 20, 60);
+      circle(-3, -1, 2.5);
+      circle(3, -1, 2.5);
+      fill(220, 70, 70);
+      circle(0, 3, 3.5);
+      noFill();
+      stroke(40, 20, 60);
+      strokeWeight(1.5);
+      arc(0, 1, 8, 7, 0, PI);
+      pop();
+    }
+
     pop();
   }
 
   getDisplayBoundingBox() {
-    const span = Math.max(60, this.rangeToDraw);
-    return this.squareDisplayBoundingBox(span * 2);
+    // Covers the crate and the jester at the top of its coil; the bolts it fires
+    // are their own SpellObjects with their own boxes.
+    return this.squareDisplayBoundingBox(120);
   }
 }
 

@@ -28,6 +28,7 @@ export default class LeeSin_Q extends Spell {
   description =
     'Chưởng 1 luồng Sóng Âm về hướng chỉ định, gây <span class="damage">15 sát thương</span> khi trúng địch. Có thể tái kích hoạt trong vòng <span class="time">3 giây</span> để <span class="buff">Lướt</span> tới kẻ địch trúng Sóng Âm, gây thêm <span class="damage">15 sát thương</span> khi tới nơi';
   coolDown = 5000;
+  manaCost = 30;
   collDownAfterQ1 = 500;
   spellObject: LeeSin_Q_Object | null = null;
   enemyHit: any = null;

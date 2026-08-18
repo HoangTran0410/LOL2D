@@ -13,6 +13,7 @@ export default class Zed_E extends Spell {
   description =
     'Xoay lưỡi kiếm xung quanh bản thân. Gây <span class="damage">15 sát thương</span> và <span class="buff">Làm chậm 30%</span> các kẻ địch trong <span class="time">1 giây</span>';
   coolDown = 1000;
+  manaCost = 10;
 
   onSpellCast() {
     const obj = new Zed_E_Object(this.owner);

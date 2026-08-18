@@ -28,7 +28,7 @@ const isFrostbiteTarget = (target: unknown): target is FrostbiteTarget =>
 // Exported so the suite asserts the bolt's wiring, not a copy of the
 // numbers — retuning a value should not mean editing the test.
 export const COOLDOWN_MS = 4_000;
-export const MANA_COST = 50;
+export const MANA_COST = 40;
 export const CAST_TIME_MS = 0;
 export const RANGE = 450;
 export const MISSILE_SPEED = 1_600 / 60;

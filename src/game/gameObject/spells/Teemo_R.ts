@@ -35,6 +35,8 @@ export default class Teemo_R extends Spell {
 
   coolDown = 3000;
 
+  manaCost = 30;
+
   onSpellCast() {
     let { from, to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,

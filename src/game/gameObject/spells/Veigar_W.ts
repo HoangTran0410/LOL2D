@@ -16,7 +16,7 @@ export const IMPACT_LIFETIME_MS = 450;
 // pool off a basic ability. Sits at the top of the 15-35 band a normal spell
 // gets here, which the 1.3s telegraph and the walk-out radius both pay for.
 export const DAMAGE = 32;
-export const MANA_COST = 60;
+export const MANA_COST = 45;
 
 const CRACK_COUNT = 10;
 // The final stretch of the wind-up gets an extra pulse so the instant of

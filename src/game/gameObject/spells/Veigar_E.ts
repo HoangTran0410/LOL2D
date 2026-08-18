@@ -35,6 +35,7 @@ export default class Veigar_E extends Spell {
   name = 'Bẻ Cong Không Gian (Veigar_E)';
   description = `Vặn xoắn không gian, tạo ra một lồng giam tồn tại trong <span class="time">${CAGE_LIFETIME_MS / 1000} giây</span>. <span class="buff">Làm Choáng</span> <span class="time">${STUN_TIME / 1000} giây</span> những kẻ địch dám bước qua.`;
   coolDown = 5000;
+  manaCost = 50;
 
   onSpellCast() {
     const { to } = VectorUtils.getVectorWithMaxRange(

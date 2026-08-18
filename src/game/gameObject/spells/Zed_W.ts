@@ -16,6 +16,7 @@ export default class Zed_W extends Spell {
   description =
     'Tạo 1 phân thân <span class="buff">Lướt</span> tới trước, sau đó đứng im và sẽ <span>bắt chước</span> các kỹ năng bạn tung ra trong <span class="time">3 giây</span>. Có thể tái kích hoạt kỹ năng để <span class="buff">Đổi chỗ</span> với phân thân <i>(Phân thân không thể bị chọn làm mục tiêu)</i>';
   coolDown = 7500;
+  manaCost = 30;
   /** Matches the 350 passed to `getVectorWithMaxRange` below, so the touch
    * telegraph's reach ring shows the shadow's real range instead of guessing
    * `DEFAULT_TOUCH_AIM_RANGE`. */

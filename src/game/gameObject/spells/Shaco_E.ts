@@ -28,6 +28,7 @@ export default class Shaco_E extends Spell {
   description =
     'Ném dao tới kẻ địch, <span class="buff">Làm Chậm 40%</span> và gây <span class="damage">15 sát thương</span>, gây thêm <span class="damage">10 sát thương</span> nếu mục tiêu <span>dưới 30% máu</span>';
   coolDown = 5000;
+  manaCost = 40;
 
   range = RANGE;
   targetEnemy: any = null;

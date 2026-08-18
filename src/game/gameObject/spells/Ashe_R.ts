@@ -43,6 +43,7 @@ export default class Ashe_R extends Spell {
     ` <span class="time">${MAX_STUN_MS / 1000} giây</span> theo quãng đường, gây` +
     ` <span class="damage">${DAMAGE} sát thương</span> cho mục tiêu và mọi kẻ địch xung quanh`;
   coolDown = 10000;
+  manaCost = 80;
 
   onSpellCast() {
     const toAim = p5.Vector.sub(this.aimPoint, this.owner.position);

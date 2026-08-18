@@ -26,6 +26,7 @@ export default class Ahri_Q extends Spell {
   description =
     'Phóng quả cầu theo hướng chỉ định, khi tới giới hạn 350px, quả cầu sẽ quay lại. Gây <span class="damage">15 sát thương</span> và <span class="buff">Làm Chậm 50%</span> trong <span class="time">0.5 giây</span> trên cả đường đi và đường về của quả cầu';
   coolDown = 5000;
+  manaCost = 20;
 
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithRange(this.owner.position, this.aimPoint, 350);

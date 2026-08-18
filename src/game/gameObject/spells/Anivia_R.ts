@@ -29,7 +29,7 @@ export const NORMAL_SLOW = 0.2;
 export const EMPOWERED_SLOW = 0.3;
 export const NORMAL_SLOW_DURATION_MS = 1_000;
 export const EMPOWERED_SLOW_DURATION_MS = 1_500;
-export const MANA_COST = 60;
+export const MANA_COST = 45;
 const SNOW_COUNT = 14;
 // Exported so the suite can compute the exact radius checkpoint a given tick
 // resolves to, instead of restating the rounded numbers it produces.

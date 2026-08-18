@@ -13,6 +13,7 @@ export default class Zed_Q extends Spell {
   description =
     'Phóng 1 phi tiêu về phía trước, gây <span class="damage">15 sát thương</span> và <span class="buff">làm chậm 50%</span> trong <span class="time">0.2 giây</span> cho mỗi kẻ địch bị xuyên qua.';
   coolDown = 3000;
+  manaCost = 30;
 
   maxThrowRange = 350;
 

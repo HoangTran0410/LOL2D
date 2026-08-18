@@ -34,6 +34,7 @@ export default class Malphite_R extends Spell {
   description =
     '<span class="buff">Lướt</span> tới khu vực chỉ định với tốc độ cao, gây <span class="damage">30 sát thương</span> và <span class="buff">Hất Tung</span> các kẻ địch trong <span class="time">1 giây</span> xung quanh điểm đến. <i>(Không thể cản phá bởi các hiệu ứng khống chế)</i>';
   coolDown = 10000;
+  manaCost = 100;
 
   maxRange = MAX_RANGE;
   hitRadius = HIT_RADIUS;

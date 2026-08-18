@@ -15,6 +15,7 @@ export default class ChoGath_W extends Spell {
   description =
     'Gầm vào hướng đã chọn theo <span>hình nón</span>, <span class="buff">Làm Choáng</span> <span class="time">1 giây</span> và gây <span class="damage">15 sát thương</span> cho các kẻ địch trong tầm.';
   coolDown = 5000;
+  manaCost = 25;
 
   onSpellCast() {
     const lifeTime = 1000;

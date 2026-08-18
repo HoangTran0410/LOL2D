@@ -43,7 +43,7 @@ export default class Janna_Q extends Spell {
   description =
     'Triệu hồi một cơn lốc tại chỗ và <span class="buff">tích luỹ sức mạnh</span> trong tối đa <span class="time">3 giây</span>. Tái kích hoạt để phóng cơn lốc về hướng con trỏ, hoặc nó tự phóng khi tích đầy. Tích càng lâu thì tầm bay, tốc độ, sát thương và thời gian hất tung càng lớn: gây <span class="damage">15 - 30 sát thương</span> và <span class="buff">Hất Tung</span> trong <span class="time">0.5 - 1.25 giây</span>, xuyên qua mọi kẻ địch trên đường đi';
   coolDown = 5_000;
-  manaCost = 90;
+  manaCost = 50;
 
   minRange = MIN_RANGE;
   maxRange = MAX_RANGE;

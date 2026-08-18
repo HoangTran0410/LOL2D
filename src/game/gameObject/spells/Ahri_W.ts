@@ -21,6 +21,7 @@ export default class Ahri_W extends Spell {
   description =
     'Tạo ra <span>3 ngọn lửa</span> quay xung quanh bản thân trong <span class="time">5 giây</span>. Mỗi ngọn lửa sẽ tự động tấn công mục tiêu gần nhất trong tầm, gây <span class="damage">10 sát thương</span> và <span class="buff">Làm Châm 20%</span> tốc chạy kẻ địch trong <span class="time">0.5 giây</span>';
   coolDown = 5000;
+  manaCost = 25;
 
   onSpellCast() {
     const count = 3;

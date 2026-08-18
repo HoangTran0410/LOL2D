@@ -24,6 +24,7 @@ export default class Ahri_R extends Spell {
   description =
     '<span class="buff">Lướt</span> tới trước theo hướng chỉ định, bắn tối đa 3 quả cầu vào 3 kẻ địch gần nhất trong phạm vi, gây <span class="damage">20 sát thương</span> mỗi quả cầu. Có thể sử dụng tối đa <span>3 lần</span> lướt trong vòng <span class="time">10 giây</span>';
   coolDown = 10000;
+  manaCost = 50;
 
   maxDashCount = 3;
   maxDashDistance = 150;
