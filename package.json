@@ -9,6 +9,7 @@
     "ability:import": "node scripts/wiki/import-abilities.mjs",
     "ability:update": "node scripts/wiki/import-abilities.mjs --update",
     "ability:check": "node scripts/wiki/check-abilities.mjs",
+    "spell:new": "node scripts/new-spell.mjs",
     "names:sync": "node scripts/wiki/sync-spell-names.mjs",
     "names:apply": "node scripts/wiki/sync-spell-names.mjs --apply",
     "alias:migrate": "node scripts/migrate-to-alias.mjs",

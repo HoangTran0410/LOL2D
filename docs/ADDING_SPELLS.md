@@ -2,6 +2,73 @@
 
 Use the typed spell runtime for new abilities. Existing spells may still use the legacy `cast()`/`onSpellCast()` bridge, but new code should describe its lifecycle in `castSpec` and implement only the relevant hooks.
 
+## Start here
+
+```sh
+npm run spell:new -- --champion Jhin --slot R --activation RECAST --recasts 4
+```
+
+It writes the spell and a test already driven through `press()`, performs both
+registrations, and builds the `castSpec` out of constants — which is the shape
+that several of the traps below exist because somebody got wrong by hand. Use
+it even if you rewrite everything inside it.
+
+### Write the script before the code
+
+Half the rework on this codebase is not a bug — it is an ability that does
+exactly what its author wrote and not what was wanted. Before touching the spell
+body, state what the **player sees**, one line per interaction, and make those
+the test names:
+
+> press once → the trap is planted and then disappears
+> an enemy walks within 90 → they are slowed, the trap becomes visible and starts opening
+> 1.3s later → it detonates, hitting whoever is still inside 150
+
+If you cannot write that list, the design is not decided yet and no amount of
+implementation will settle it. Jhin E was rebuilt from scratch because this step
+was skipped: the code was correct and the ability was wrong.
+
+### What is enforced, and what is only advice
+
+Every rule below that is **enforced by a test** has never been broken. Every rule
+that was only prose has been broken at least once — usually several times. So
+check the enforced list first, and treat the rest as things to verify by hand.
+
+| Rule | Enforced by |
+|---|---|
+| A spell test drives `press()`, never a lifecycle hook | `spell-runtime-drive-seam.test.ts` |
+| `castSpec` is built from constants, never live state | `castspec-frozen-seam.test.ts` |
+| A `UNIT` spell declares `targetTeam` + `targetingRequest` + `press()` | `unit-target-team-seam.test.ts` |
+| A spell that picks a unit filters on `visibleTo`, and never reads `visibleToPlayerTeam` | `target-vision-seam.test.ts` |
+| A dash hooks `onDashUpdate`, never `onUpdate` | `dash-onupdate-seam.test.ts` |
+| An effect painting past its centre has `getDisplayBoundingBox` | `aoe-display-bounds.test.ts`, `spell-object-display-box-seam.test.ts` |
+| Ground art sets `zIndex = 2` | `ground-decal-zindex.test.ts` |
+| Mana moves only through `effectiveMana`/`spendMana` | `mana-spend-seam.test.ts` |
+| A legacy spell declares `targetingMode` | `TargetingModeDeclared.test.ts` |
+| The display name is Riot's `vi_VN` string | `vi-spell-names.test.ts` |
+
+**Not enforced, and therefore your job**: that the ability matches the script you
+wrote above; that the damage is scaled to a ~100 health pool; that the VFX is
+legible (`docs/VFX_STANDARD.md`); that cleanup is idempotent.
+
+### Two traps that are invisible from the file you are editing
+
+**`castSpec` is read once, on the first cast, and frozen.** `Spell.runtime` is a
+lazy getter — the first press builds the `SpellRuntime` and stores
+`resolvedSpec`, and every later question is answered from that copy. A getter
+that computes anything from live state describes the spell *as it was on the
+opening press*, forever, while the HUD reads `castSpec` fresh every frame and
+therefore disagrees. Jhin R froze a 250ms cooldown in for the whole match this
+way. To vary a cooldown, write `this.currentCooldown = this.reducedCooldown(n)`;
+to vary anything else, put it in a hook.
+
+**`RECAST` gives you exactly one recast unless you ask for more.**
+`SpellRuntime.recast()` completes the activation after the first one. An ability
+whose whole shape is "press again N times" — Jhin R's four shots — needs
+`active: { recasts: N }`, and `recastDelayMs` is then the gap between
+*consecutive* recasts. `onRecast` is also handed the context of the **opening**
+press, so aim each repeat with `this.aimPoint`, never the context argument.
+
 ## 1. Research and register
 
 Import PC League data and images into the repository before implementing mechanics:
@@ -283,7 +350,30 @@ Use `AssetManager.ensureMany` for a visible batch. If art is intentionally absen
 
 ## 7. Test the public commands
 
-Add a focused Vitest file under `tests/game/spells/`. Drive `press`, `hold`, `release`, and `cancel` with deterministic cast contexts and clocks. Assert:
+Add a focused Vitest file under `tests/game/spells/`. Drive `press`, `hold`,
+`release` and `cancel` — **never a lifecycle hook**. `pressSpell` and
+`releaseSpell` in `tests/game/spell/fixtures.ts` build the same `CastContext`
+the game builds:
+
+```ts
+import { pressSpell } from '../spell/fixtures';
+
+expect(pressSpell(spell, { at: { x: 300, y: 0 } })).toBe(true);
+expect(pressSpell(spell, { target: victim })).toBe(true); // UNIT spells
+```
+
+`spell.onSpellCast()` runs one hook in isolation: no activation pattern, no
+recast budget, no `onComplete`, no resource commit, no cooldown, no targeting
+rejection. Jhin R's five assertions were green against an ultimate that raised
+and dropped its curtain inside a single keypress, and Jhin Q's never asked
+whether the cast should have been allowed at all. `spell-runtime-drive-seam.test.ts`
+bans it; 33 files predate the ban and are listed there as debt.
+
+The same shift is what surfaces a spell's real shape: migrating Jhin W's test
+revealed it had a `castTimeMs` windup nobody was testing, and Katarina R's
+revealed that an interrupted channel still landed one more volley.
+
+Assert:
 
 - activation and runtime states;
 - exact resource commitment/refund timing;
@@ -300,6 +390,43 @@ npm run verify
 ```
 
 `verify` checks generated assets, imported abilities, both TypeScript boundaries, every Vitest test, and the production build.
+
+## 7a. Look at it, once, in the real renderer
+
+`verify` cannot see whether an effect is legible, and no unit test ever will —
+so a new spell is not done until somebody has looked at it running. Add an entry
+to `tests/e2e/shoot-new-champion-vfx.mjs` and shoot it:
+
+```sh
+LOL2D_CHROME_CHANNEL= node tests/e2e/shoot-new-champion-vfx.mjs /tmp/vfx Jhin
+```
+
+```js
+{ champion: 'Jhin', slot: 'E', aim: [280, 0], frames: [1250, 1900, 2350] },
+```
+
+`frames` are milliseconds after the press, and they should straddle the moments
+the ability *changes* — the windup, the strike, the settle — because a single
+frame cannot tell an effect that animates from one that pops in. `aim` also
+places the punching-bag dummy, at **0.75×** the aim vector, and the throw is
+clamped to the spell's own range: aim wider than the range and the effect lands
+*closer* to the dummy, not further. Give one ability two entries with different
+`label`s when its interesting states are mutually exclusive.
+
+Then open **one or two** of the PNGs. A 1280×900 screenshot costs about what 600
+lines of source costs to read, so trust the script's numeric summary for "did it
+fire" and spend the frames on judging the look.
+
+What to judge, from `docs/VFX_STANDARD.md`, in order:
+
+1. Can you tell where it hits, without knowing the ability?
+2. Does anything the player must *find* — a ground trap, a dropped dagger — read
+   at a glance? Katarina's daggers were 26px of pale grey on a pale floor with no
+   outline. Anything on the floor wants ~40px of longest dimension and a
+   contrasting rim; a dark rim under a light shape is what makes it legible over
+   grass, water and stone alike.
+3. Do two zones that behave differently look different?
+4. Is the impact on the victim, rather than near it?
 
 ## 8. Measure a caster-centred range through `Reach`
 

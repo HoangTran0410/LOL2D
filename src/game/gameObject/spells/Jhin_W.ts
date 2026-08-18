@@ -15,7 +15,7 @@ import {
 import { consumeJhinMark } from './Jhin_Q';
 
 export const JHIN_W_DAMAGE = 22;
-export const JHIN_W_RANGE = 520;
+export const JHIN_W_RANGE = 1250;
 export const JHIN_W_WIDTH = 40;
 export const JHIN_W_ROOT_MS = 1_200;
 export const JHIN_W_CAST_MS = 300;
@@ -28,7 +28,7 @@ const SHOT_LIFE_MS = 260;
 export default class Jhin_W extends Spell {
   image = AssetManager.get('spell_jhin_w');
   name = 'Nét Vẽ Chết Chóc (Jhin_W)';
-  description = `Nâng súng trong ${JHIN_W_CAST_MS / 1000} giây rồi bắn một phát xuyên thẳng
+  description = `Nâng súng trong ${JHIN_W_CAST_MS / 1000} giây rồi bắn một phát xuyên thẳng tầm xa
     ${JHIN_W_RANGE} đơn vị, gây <span class="damage">${JHIN_W_DAMAGE} sát thương</span> cho mọi
     kẻ địch trên đường đạn. Mục tiêu đang bị <b>đánh dấu</b> bị trói chân
     ${JHIN_W_ROOT_MS / 1000} giây và mất dấu.`;

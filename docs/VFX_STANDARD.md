@@ -55,6 +55,36 @@ The test for all five: at minimum zoom, in a fight, could a player who has never
 seen this champion tell where it hits and who it hit? If not, simplify until
 they can.
 
+### Anything the player has to *find* has a size floor
+
+The five rules above are judgement calls. This one is not, because it has been
+got wrong by simply drawing something too small: **an object the player must
+locate — a dropped dagger, a ground trap, a pickup — needs roughly 40 units of
+longest dimension and a contrasting rim.**
+
+A champion body is about 40 across, so anything much under that is grit. Colour
+alone is not enough: Katarina's daggers were a 26-unit pale-grey blade with no
+outline, on a pale-grey floor, and finding them is the entire point of her kit.
+A dark rim under a light shape (or the reverse) is what makes a silhouette hold
+over grass, water and stone alike — draw the rim under *each piece*, not around
+the whole thing, or the parts merge into a blob.
+
+Concealed objects are the deliberate exception, and they invert it: Jhin's armed
+trap is drawn only for its owner and only at ~80 alpha, because being hard to
+see is what it is for.
+
+### Prove it in the renderer, not in your head
+
+`tests/e2e/shoot-new-champion-vfx.mjs` exists for this and takes a champion
+filter, so shooting one kit is seconds rather than a full run:
+
+```sh
+LOL2D_CHROME_CHANNEL= node tests/e2e/shoot-new-champion-vfx.mjs /tmp/vfx Katarina
+```
+
+Add an entry per ability with `frames` straddling the moments it changes. See
+`docs/ADDING_SPELLS.md` §7a for the arguments and what to look for.
+
 ## The shape of a good `draw()`
 
 - One normalized `t = age / lifeTime`, and every value derived from it. No bare

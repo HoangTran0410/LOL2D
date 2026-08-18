@@ -12,6 +12,60 @@ import SpellObject from '@/game/gameObject/SpellObject';
 /** Cold steel and blood — the only two colours Katarina is allowed. */
 export const KATARINA_STEEL: [number, number, number] = [223, 230, 233];
 export const KATARINA_BLOOD: [number, number, number] = [192, 57, 43];
+/** The dark rim every blade is drawn over. Steel on a pale floor has no edge without it. */
+const KATARINA_INK: [number, number, number] = [18, 10, 14];
+
+/**
+ * Tip to pommel, in world units. A champion body is roughly 40 across, so a dagger
+ * at 46 reads as a weapon lying on the floor rather than a speck of grit.
+ *
+ * It was 26 with no outline: a pale grey sliver on a pale grey map, which made the
+ * one thing Katarina's whole kit is about — where her daggers are — genuinely hard
+ * to find in a fight.
+ */
+export const KATARINA_DAGGER_LENGTH = 46;
+
+/**
+ * Katarina's dagger, point-down from the origin, in one place so Q's missile, the
+ * grounded pickup and R's volley are recognisably the same weapon.
+ *
+ * Caller owns the transform: translate and rotate first, then call this. The dark
+ * outline is not decoration — it is what makes the blade legible over bush, water
+ * and stone alike, and it is drawn under every piece rather than around the whole
+ * silhouette so the crossguard keeps its own edge.
+ */
+export function drawKatarinaDagger(length: number, alpha: number): void {
+  const tip = length * 0.54;
+  const guard = -length * 0.14;
+  const pommel = -length * 0.46;
+  const halfWidth = length * 0.13;
+  const rim = Math.max(2, length * 0.065);
+
+  strokeJoin(ROUND);
+  stroke(KATARINA_INK[0], KATARINA_INK[1], KATARINA_INK[2], alpha);
+  strokeWeight(rim);
+
+  // blade
+  fill(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], alpha);
+  triangle(0, tip, -halfWidth, guard, halfWidth, guard);
+
+  // the blood groove down one half, so the blade has a lit side and a dark one
+  noStroke();
+  fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], alpha * 0.95);
+  triangle(0, tip, 0, guard, halfWidth * 0.8, guard);
+
+  // crossguard and grip
+  stroke(KATARINA_INK[0], KATARINA_INK[1], KATARINA_INK[2], alpha);
+  strokeWeight(rim);
+  fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], alpha);
+  rect(-halfWidth * 1.8, guard - length * 0.055, halfWidth * 3.6, length * 0.11, length * 0.035);
+  rect(-halfWidth * 0.45, pommel, halfWidth * 0.9, guard - pommel, length * 0.03);
+
+  // the glint: a hard white sliver, which is what the eye actually catches
+  noStroke();
+  fill(255, 255, 255, alpha * 0.85);
+  triangle(0, tip * 0.82, -halfWidth * 0.34, guard * 0.3, -halfWidth * 0.05, guard * 0.3);
+}
 
 // ─── the grounded dagger, shared by Q, W and E ────────────────────────────────
 export const KATARINA_PICKUP_RADIUS = 150;
@@ -19,15 +73,19 @@ export const KATARINA_DAGGER_LIFETIME_MS = 4_500;
 export const KATARINA_DAGGER_FADE_MS = 600;
 export const KATARINA_DAGGER_LAND_MS = 200;
 export const KATARINA_MAX_DAGGERS = 3;
+export const KATARINA_DAGGER_SLASH_RADIUS = 300;
+export const KATARINA_DAGGER_SLASH_DAMAGE = 22;
+export const KATARINA_DAGGER_E_REFUND_MS = 7_000;
 
 // ─── Q ────────────────────────────────────────────────────────────────────────
-export const KATARINA_Q_RANGE = 420;
+export const KATARINA_Q_RANGE = 450;
 export const KATARINA_Q_FIRST_DAMAGE = 18;
-export const KATARINA_Q_BOUNCE_DAMAGE = 12;
-export const KATARINA_Q_BOUNCE_RANGE = 250;
+export const KATARINA_Q_BOUNCE_DAMAGE = 14;
+export const KATARINA_Q_BOUNCE_RANGE = 280;
 export const KATARINA_Q_MAX_TARGETS = 3;
-export const KATARINA_Q_DAGGER_OFFSET = 60;
-const WINDUP_MS = 160;
+export const KATARINA_Q_DAGGER_OFFSET = 240;
+/** The blade is still in her hand for this long. Exported so a test can wait it out. */
+export const KATARINA_Q_WINDUP_MS = 140;
 
 export default class Katarina_Q extends Spell {
   image = AssetManager.get('spell_katarina_q');
@@ -35,16 +93,16 @@ export default class Katarina_Q extends Spell {
   description = `Phóng một lưỡi dao nảy tới <b>${KATARINA_Q_MAX_TARGETS}</b> mục tiêu, gây
     <span class="damage">${KATARINA_Q_FIRST_DAMAGE} sát thương</span> cho mục tiêu đầu và
     <span class="damage">${KATARINA_Q_BOUNCE_DAMAGE} sát thương</span> cho mỗi lần nảy.
-    Dao cắm xuống đất phía sau mục tiêu cuối cùng.`;
+    Sau đó dao cắm xuống đất phía sau mục tiêu đầu tiên. Đi vào dao sẽ <b>xoay kiếm</b> gây sát thương diện rộng.`;
   coolDown = 8_000;
-  manaCost = 30;
+  manaCost = 0;
   range = KATARINA_Q_RANGE;
 
   get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
       targeting: 'POINT',
-      castTimeMs: WINDUP_MS,
+      castTimeMs: KATARINA_Q_WINDUP_MS,
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
@@ -54,11 +112,33 @@ export default class Katarina_Q extends Spell {
     const reach = effectiveRange(this.range, this.owner);
     const aim = context?.cursorWorld ?? this.aimPoint;
     const origin = this.owner.position;
+
+    // Find enemy closest to cursor within reach
+    const enemies = this.game.objectManager.queryObjects({
+      area: new Circle({ x: aim.x, y: aim.y, r: 160 }),
+      filters: [
+        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.visibleTo(this.owner),
+      ],
+    }) as AttackableUnit[];
+
+    let primaryTarget: AttackableUnit | null = null;
+    let closestDistance = Infinity;
+    for (const enemy of enemies) {
+      const distToOwner = Math.hypot(enemy.position.x - origin.x, enemy.position.y - origin.y);
+      if (distToOwner <= reach + 60) {
+        const distToAim = Math.hypot(enemy.position.x - aim.x, enemy.position.y - aim.y);
+        if (distToAim < closestDistance) {
+          closestDistance = distToAim;
+          primaryTarget = enemy;
+        }
+      }
+    }
+
     let toX = aim.x - origin.x;
     let toY = aim.y - origin.y;
     const span = Math.hypot(toX, toY);
     if (span < 1) {
-      // The cursor is standing on her: a thrown blade still needs somewhere to go.
       const heading = this.firingDirection(context);
       const length = Math.hypot(heading.x, heading.y) || 1;
       toX = (heading.x / length) * reach;
@@ -70,7 +150,12 @@ export default class Katarina_Q extends Spell {
     }
 
     const dagger = new Katarina_Q_Object(this.owner);
-    dagger.destination = createVector(origin.x + toX, origin.y + toY);
+    if (primaryTarget) {
+      dagger.chasing = primaryTarget;
+      dagger.destination = createVector(primaryTarget.position.x, primaryTarget.position.y);
+    } else {
+      dagger.destination = createVector(origin.x + toX, origin.y + toY);
+    }
     this.game.objectManager.addObject(dagger);
   }
 
@@ -80,38 +165,31 @@ export default class Katarina_Q extends Spell {
 }
 
 /**
- * The thrown blade. It bounces by re-pointing itself at the nearest unstruck
- * body, so `struck` is both the damage ledger (first hit is worth more) and the
- * one-hit-per-unit guard.
+ * The thrown blade. Slower, highly visible, with clear bounce arcs and planting behind first target.
  */
 export class Katarina_Q_Object extends MissileSpellObject {
-  speed = 13;
-  size = 22;
+  speed = 8.5;
+  size = 24;
   maxHitCount = KATARINA_Q_MAX_TARGETS;
   removeOnArrive = true;
   age = 0;
   struck: AttackableUnit[] = [];
   chasing: AttackableUnit | null = null;
+  primaryTarget: AttackableUnit | null = null;
   planted = false;
-  /** Last travel heading, kept so the dropped dagger lands *behind* the victim. */
   travelX = 1;
   travelY = 0;
   lastHitX: number | null = null;
   lastHitY: number | null = null;
-  /** Seeded once — random() inside draw() flickers instead of animating. */
-  glints: { offset: number; phase: number }[] = [];
   trailSystem = new TrailSystem({
-    trailSize: this.size * 0.5,
-    trailColor: '#c0392b66',
-    trailLifeTime: 220,
-    maxLength: 14,
+    trailSize: KATARINA_DAGGER_LENGTH * 0.4,
+    trailColor: '#e74c3ccc',
+    trailLifeTime: 280,
+    maxLength: 18,
   });
 
   onAdded(): void {
     super.onAdded();
-    for (let i = 0; i < 4; i++) {
-      this.glints.push({ offset: random(-8, 8), phase: random(0, TWO_PI) });
-    }
     this.aimAtDestination();
   }
 
@@ -140,6 +218,9 @@ export class Katarina_Q_Object extends MissileSpellObject {
   onHit(enemy: AttackableUnit): void {
     if (this.struck.includes(enemy)) return;
     const isFirst = this.struck.length === 0;
+    if (isFirst) {
+      this.primaryTarget = enemy;
+    }
     this.struck.push(enemy);
     this.lastHitX = enemy.position.x;
     this.lastHitY = enemy.position.y;
@@ -147,7 +228,7 @@ export class Katarina_Q_Object extends MissileSpellObject {
     const payload = isFirst ? KATARINA_Q_FIRST_DAMAGE : KATARINA_Q_BOUNCE_DAMAGE;
     enemy.takeDamage(payload, this.owner);
     this.game.objectManager.addObject(
-      new Katarina_Blade_Impact(this.owner, enemy.position.x, enemy.position.y, isFirst ? 46 : 34)
+      new Katarina_Blade_Impact(this.owner, enemy.position.x, enemy.position.y, isFirst ? 50 : 38)
     );
 
     if (this.struck.length >= KATARINA_Q_MAX_TARGETS) {
@@ -172,7 +253,6 @@ export class Katarina_Q_Object extends MissileSpellObject {
       ],
     }) as AttackableUnit[];
 
-    // A plain loop: Array.prototype.filter cannot narrow here.
     let chosen: AttackableUnit | null = null;
     let nearestDistance = Infinity;
     for (const candidate of candidates) {
@@ -190,54 +270,147 @@ export class Katarina_Q_Object extends MissileSpellObject {
     this.finish();
   }
 
-  /** Idempotent: arrival, the third bounce and a dead chain all land here. */
+  /** Plants dagger behind the primary target (or last hit unit) with slight drop flight. */
   finish(): void {
     if (this.planted) return;
     this.planted = true;
-    const anchorX = this.lastHitX ?? this.position.x;
-    const anchorY = this.lastHitY ?? this.position.y;
-    Katarina_Dagger.plant(
-      this.owner,
-      anchorX + this.travelX * KATARINA_Q_DAGGER_OFFSET,
-      anchorY + this.travelY * KATARINA_Q_DAGGER_OFFSET
-    );
+
+    const target = this.primaryTarget;
+    let plantX: number;
+    let plantY: number;
+
+    if (target) {
+      const dx = target.position.x - this.owner.position.x;
+      const dy = target.position.y - this.owner.position.y;
+      const len = Math.hypot(dx, dy) || 1;
+      plantX = target.position.x + (dx / len) * KATARINA_Q_DAGGER_OFFSET;
+      plantY = target.position.y + (dy / len) * KATARINA_Q_DAGGER_OFFSET;
+    } else {
+      const anchorX = this.lastHitX ?? this.position.x;
+      const anchorY = this.lastHitY ?? this.position.y;
+      plantX = anchorX + this.travelX * KATARINA_Q_DAGGER_OFFSET;
+      plantY = anchorY + this.travelY * KATARINA_Q_DAGGER_OFFSET;
+    }
+
+    Katarina_Dagger.plant(this.owner, plantX, plantY, 300);
     this.toRemove = true;
   }
 
   draw(): void {
-    const spin = this.age / 90;
+    const spin = this.age / 55;
     const heading = Math.atan2(this.travelY, this.travelX);
     push();
     translate(this.position.x, this.position.y);
-    rotate(heading + spin);
+
+    // A halo behind the blade, so a thrown dagger is still findable against a
+    // crowded fight rather than being one more grey sliver among the bodies.
     noStroke();
-    fill(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], 240);
-    triangle(this.size * 0.62, 0, -this.size * 0.34, -4.5, -this.size * 0.34, 4.5);
-    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 230);
-    triangle(this.size * 0.62, 0, -this.size * 0.34, 4.5, -this.size * 0.18, 1.5);
-    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 170);
-    strokeWeight(1.5);
-    for (const glint of this.glints) {
-      const swept = sin(glint.phase + spin) * 5;
-      line(-this.size * 0.34, glint.offset * 0.35, -this.size * 0.8 + swept, glint.offset * 0.5);
-    }
+    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 70);
+    circle(0, 0, KATARINA_DAGGER_LENGTH * 0.95);
+
+    // `- HALF_PI` because the shared blade points down its own +y and this one
+    // has to point where it is flying.
+    rotate(heading + spin - HALF_PI);
+    drawKatarinaDagger(KATARINA_DAGGER_LENGTH, 255);
     pop();
   }
 
   getDisplayBoundingBox() {
-    return this.squareDisplayBoundingBox((this.size + 30) * 2);
+    return this.squareDisplayBoundingBox((KATARINA_DAGGER_LENGTH + 35) * 2);
   }
 }
 
 /**
- * The mark left on the body that took a blade. It is deliberately a cut and a
- * ring rather than seeded grit: the ring says "hit here", the cut says "steel".
+ * The 360-degree blade spin (Sinister Steel / Dagger Slash) triggered when
+ * Katarina picks up a dagger by walking into it or Shunpos (E) onto it.
+ */
+export class Katarina_Dagger_Slash extends SpellObject {
+  lifeTime = 320;
+  age = 0;
+  radius = KATARINA_DAGGER_SLASH_RADIUS;
+  bladeAngles: number[] = [0, HALF_PI, PI, PI + HALF_PI];
+
+  constructor(owner: AttackableUnit, x: number, y: number) {
+    super(owner);
+    this.position = createVector(x, y);
+    this.dealSlashDamage();
+  }
+
+  private dealSlashDamage(): void {
+    const victims = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.position.x, y: this.position.y, r: this.radius }),
+      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
+    }) as AttackableUnit[];
+
+    const struck = new Set<AttackableUnit>();
+    for (const victim of victims) {
+      if (struck.has(victim)) continue;
+      struck.add(victim);
+      victim.takeDamage(KATARINA_DAGGER_SLASH_DAMAGE, this.owner);
+      this.game.objectManager.addObject(
+        new Katarina_Blade_Impact(this.owner, victim.position.x, victim.position.y, 45)
+      );
+    }
+  }
+
+  update(): void {
+    if (this.owner && !this.owner.isDead && !this.owner.toRemove) {
+      this.position.set(this.owner.position.x, this.owner.position.y);
+    }
+    this.age += deltaTime;
+    if (this.age >= this.lifeTime) this.toRemove = true;
+  }
+
+  draw(): void {
+    const t = constrain(this.age / this.lifeTime, 0, 1);
+    const spin = (this.age / 40) * TWO_PI;
+    const fade = 1 - t;
+    const expand = 1 - (1 - t) * (1 - t);
+
+    push();
+    translate(this.position.x, this.position.y);
+
+    // Outer crimson slash wave
+    noFill();
+    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 235 * fade);
+    strokeWeight(4 * fade + 1.5);
+    circle(0, 0, this.radius * 2 * expand);
+
+    // Inner blade whirlwind
+    stroke(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], 255 * fade);
+    strokeWeight(3.5);
+    for (let i = 0; i < 4; i++) {
+      const baseAngle = this.bladeAngles[i] + spin;
+      const rInner = this.radius * 0.2 * expand;
+      const rOuter = this.radius * 0.95 * expand;
+      arc(0, 0, rOuter * 2, rOuter * 2, baseAngle, baseAngle + PI * 0.45);
+      line(
+        cos(baseAngle) * rInner,
+        sin(baseAngle) * rInner,
+        cos(baseAngle + 0.3) * rOuter,
+        sin(baseAngle + 0.3) * rOuter
+      );
+    }
+
+    // Blood mist burst
+    noStroke();
+    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 90 * fade);
+    circle(0, 0, this.radius * 1.4 * expand);
+    pop();
+  }
+
+  getDisplayBoundingBox() {
+    return this.squareDisplayBoundingBox((this.radius + 30) * 2);
+  }
+}
+
+/**
+ * The mark left on the body that took a blade.
  */
 export class Katarina_Blade_Impact extends SpellObject {
   lifeTime = 260;
   age = 0;
   reach: number;
-  /** Seeded once in the constructor; a draw()-time random() would flicker. */
   cuts: number[] = [];
 
   constructor(owner: AttackableUnit, x: number, y: number, reach = 46) {
@@ -258,7 +431,6 @@ export class Katarina_Blade_Impact extends SpellObject {
     const fade = 1 - t;
     push();
     noFill();
-    // The hard rim sits on the radius the hit actually used.
     stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 235 * fade);
     strokeWeight(3.5 * fade + 1);
     circle(this.position.x, this.position.y, this.reach * 2 * opened);
@@ -283,32 +455,30 @@ export class Katarina_Blade_Impact extends SpellObject {
 }
 
 /**
- * A dagger stuck point-down in the floor. It is ground art (`zIndex = 2`), and
- * its pulsing ring is drawn at exactly `KATARINA_PICKUP_RADIUS` so E's snap
- * distance is never a guess.
- *
- * The living set is owned here rather than recounted from the object manager,
- * because a freshly planted dagger sits in `_objectToBeAdd` and would not be
- * visible to a query until the next update — and the cap has to hold on the
- * frame she plants the fourth.
+ * A dagger stuck point-down in the floor, or dropping from the air.
+ * Stepping into pickup radius or Shunpo (E) into it retrieves the dagger
+ * and triggers a 360-degree Dagger Slash!
  */
 export class Katarina_Dagger extends SpellObject {
   zIndex = 2;
   age = 0;
   lifeTime = KATARINA_DAGGER_LIFETIME_MS;
   pickupRadius = KATARINA_PICKUP_RADIUS;
-  /** Seeded once so the blade always sticks at its own slight angle. */
+  dropDelayMs = 0;
+  landed = false;
   tilt = 0;
 
   private static living = new WeakMap<AttackableUnit, Katarina_Dagger[]>();
 
-  constructor(owner: AttackableUnit, x: number, y: number) {
+  constructor(owner: AttackableUnit, x: number, y: number, dropDelayMs = 0) {
     super(owner);
     this.position = createVector(x, y);
+    this.dropDelayMs = dropDelayMs;
+    this.landed = dropDelayMs <= 0;
     this.tilt = random(-0.35, 0.35);
   }
 
-  /** Her daggers that are still on the floor, oldest first. */
+  /** Her daggers that are still active or dropping, oldest first. */
   static aliveFor(owner: AttackableUnit): Katarina_Dagger[] {
     const known = Katarina_Dagger.living.get(owner) ?? [];
     const kept: Katarina_Dagger[] = [];
@@ -317,8 +487,8 @@ export class Katarina_Dagger extends SpellObject {
     return kept;
   }
 
-  static plant(owner: AttackableUnit, x: number, y: number): Katarina_Dagger {
-    const dagger = new Katarina_Dagger(owner, x, y);
+  static plant(owner: AttackableUnit, x: number, y: number, dropDelayMs = 0): Katarina_Dagger {
+    const dagger = new Katarina_Dagger(owner, x, y, dropDelayMs);
     const alive = Katarina_Dagger.aliveFor(owner);
     alive.push(dagger);
     while (alive.length > KATARINA_MAX_DAGGERS) {
@@ -343,8 +513,29 @@ export class Katarina_Dagger extends SpellObject {
     return chosen;
   }
 
-  consume(): void {
+  consumeAndSlash(): void {
+    if (this.toRemove) return;
     this.toRemove = true;
+
+    // Trigger Dagger Slash around Katarina
+    this.game.objectManager.addObject(
+      new Katarina_Dagger_Slash(this.owner, this.owner.position.x, this.owner.position.y)
+    );
+
+    // Refund E cooldown
+    const spells = (this.owner as any)?.spells as Spell[] | undefined;
+    if (spells) {
+      for (const spell of spells) {
+        if (spell.name.includes('Katarina_E')) {
+          spell.currentCooldown = Math.max(0, spell.currentCooldown - KATARINA_DAGGER_E_REFUND_MS);
+          break;
+        }
+      }
+    }
+  }
+
+  consume(): void {
+    this.consumeAndSlash();
   }
 
   update(): void {
@@ -353,41 +544,85 @@ export class Katarina_Dagger extends SpellObject {
       return;
     }
     this.age += deltaTime;
-    if (this.age >= this.lifeTime) this.toRemove = true;
+
+    if (!this.landed && this.age >= this.dropDelayMs) {
+      this.landed = true;
+    }
+
+    // Walking over a landed dagger triggers Dagger Slash
+    if (this.landed) {
+      const dist = Math.hypot(
+        this.owner.position.x - this.position.x,
+        this.owner.position.y - this.position.y
+      );
+      if (dist <= this.pickupRadius) {
+        this.consumeAndSlash();
+        return;
+      }
+    }
+
+    if (this.age >= this.lifeTime + this.dropDelayMs) {
+      this.toRemove = true;
+    }
   }
 
   draw(): void {
-    const t = constrain(this.age / this.lifeTime, 0, 1);
-    const landed = constrain(this.age / KATARINA_DAGGER_LAND_MS, 0, 1);
-    const settled = 1 - (1 - landed) * (1 - landed);
+    const isDropping = !this.landed;
+    const dropProgress = this.dropDelayMs > 0 ? constrain(this.age / this.dropDelayMs, 0, 1) : 1;
+    const groundedAge = Math.max(0, this.age - this.dropDelayMs);
+    const t = constrain(groundedAge / this.lifeTime, 0, 1);
     const fadeFrom = 1 - KATARINA_DAGGER_FADE_MS / this.lifeTime;
     const fade = t <= fadeFrom ? 1 : constrain(1 - (t - fadeFrom) / (1 - fadeFrom), 0, 1);
     const pulse = 0.5 + 0.5 * sin(this.age / 240);
-    const hover = (1 - settled) * 34;
-    const bounce = sin(landed * PI) * 3.5;
 
     push();
-    // The pickup ring, on exactly the radius E will snap from.
-    noFill();
-    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], (55 + 70 * pulse) * fade);
-    strokeWeight(2);
-    circle(this.position.x, this.position.y, this.pickupRadius * 2);
 
-    // Shadow: it grows as the blade comes down, which is what reads as "landing".
-    noStroke();
-    fill(0, 0, 0, 70 * settled * fade);
-    ellipse(this.position.x, this.position.y + 3, 22 * settled, 7 * settled);
+    if (isDropping) {
+      // Falling: the shadow tightens under it, so where it will land is readable
+      // before it gets there.
+      const height = (1 - dropProgress) * (1 - dropProgress) * 150;
+      const spinAir = (this.age / 80) * TWO_PI;
 
-    translate(this.position.x, this.position.y - hover - bounce);
-    rotate(this.tilt + (1 - settled) * TWO_PI * 2);
-    fill(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], 245 * fade);
-    triangle(0, 16, -4.5, -10, 4.5, -10);
-    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 235 * fade);
-    triangle(0, 16, 1.6, -10, 4.5, -10);
-    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 235 * fade);
-    strokeWeight(3);
-    line(-7, -12, 7, -12);
-    line(0, -12, 0, -20);
+      noStroke();
+      fill(0, 0, 0, 110 * dropProgress);
+      ellipse(this.position.x, this.position.y + 3, 26 * dropProgress, 10 * dropProgress);
+
+      noFill();
+      stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 150 * dropProgress);
+      strokeWeight(2);
+      circle(this.position.x, this.position.y, this.pickupRadius * 2 * (0.6 + 0.4 * dropProgress));
+
+      translate(this.position.x, this.position.y - height);
+      rotate(spinAir);
+      drawKatarinaDagger(KATARINA_DAGGER_LENGTH, 255);
+    } else {
+      // Landed. The ring is the pickup radius exactly, because walking inside it
+      // is the whole interaction — the player has to be able to see the edge.
+      noStroke();
+      fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], (16 + 12 * pulse) * fade);
+      circle(this.position.x, this.position.y, this.pickupRadius * 2);
+
+      noFill();
+      stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], (150 + 90 * pulse) * fade);
+      strokeWeight(3);
+      circle(this.position.x, this.position.y, this.pickupRadius * 2);
+
+      stroke(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], (70 + 60 * pulse) * fade);
+      strokeWeight(1.5);
+      circle(this.position.x, this.position.y, this.pickupRadius * 1.2);
+
+      // a bloom around the blade itself: the eye lands here first, then reads the ring
+      noStroke();
+      fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], (60 + 45 * pulse) * fade);
+      circle(this.position.x, this.position.y, (34 + 8 * pulse) * fade + 26);
+
+      fill(0, 0, 0, 120 * fade);
+      ellipse(this.position.x, this.position.y + 5, 30, 11);
+
+      translate(this.position.x, this.position.y);
+      rotate(this.tilt);
+      drawKatarinaDagger(KATARINA_DAGGER_LENGTH, 250 * fade);
+    }
     pop();
   }
 

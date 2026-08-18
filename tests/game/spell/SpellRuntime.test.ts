@@ -176,6 +176,70 @@ describe('SpellRuntime', () => {
     expect(runtime.state).toBe('READY');
   });
 
+  it('spends a whole recast budget before completing, gapping each one', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'RECAST',
+        active: { recastDelayMs: 100, recasts: 4 },
+        cooldown: { startAt: 'end', durationMs: 50 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    expect(runtime.state).toBe('ACTIVE');
+
+    for (let shot = 1; shot <= 4; shot++) {
+      // The gap is measured from the previous recast, so each one waits its own
+      // 100ms rather than every press after the first being free.
+      runtime.update(99);
+      runtime.press(context);
+      expect(events.filter(event => event === 'recast')).toHaveLength(shot - 1);
+
+      runtime.update(1);
+      runtime.press(context);
+      expect(events.filter(event => event === 'recast')).toHaveLength(shot);
+      expect(events.filter(event => event === 'complete')).toHaveLength(shot === 4 ? 1 : 0);
+    }
+
+    expect(runtime.state).toBe('COOLDOWN');
+
+    // The budget is spent: the key does nothing more.
+    runtime.press(context);
+    expect(events.filter(event => event === 'recast')).toHaveLength(4);
+  });
+
+  it('ends an unspent recast budget when the active window lapses', () => {
+    const { delegate, events } = fakeDelegate();
+    const runtime = new SpellRuntime(
+      spec({
+        activation: 'RECAST',
+        active: { maxDurationMs: 500, recastDelayMs: 100, recasts: 4 },
+        cooldown: { startAt: 'end', durationMs: 50 },
+      }),
+      delegate
+    );
+
+    runtime.press(context);
+    runtime.update(100);
+    runtime.press(context);
+    expect(events.filter(event => event === 'recast')).toHaveLength(1);
+
+    runtime.update(400);
+    expect(events.filter(event => event === 'complete')).toHaveLength(1);
+    expect(runtime.state).toBe('COOLDOWN');
+  });
+
+  it('refuses a recast budget that is not a positive whole number', () => {
+    const { delegate } = fakeDelegate();
+    for (const recasts of [0, -1, 1.5]) {
+      expect(
+        () => new SpellRuntime(spec({ activation: 'RECAST', active: { recasts } }), delegate)
+      ).toThrow('active.recasts must be a positive integer');
+    }
+  });
+
   it('rejects an interrupt disabled by the spell override', () => {
     const { delegate, events } = fakeDelegate();
     const runtime = new SpellRuntime(

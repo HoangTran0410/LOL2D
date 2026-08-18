@@ -5,6 +5,7 @@ import type { GameObjectRuntimeContext } from '../../../src/game/gameObject/Game
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import ObjectManager from '../../../src/game/managers/ObjectManager';
 import type Spell from '../../../src/game/gameObject/Spell';
+import type { CastContext } from '../../../src/game/spell/runtime/types';
 
 export class TestVector {
   constructor(
@@ -144,6 +145,77 @@ export function createGame(): TestGame {
 
 export function createUnit(game: TestGame, x = 0, teamId = 'blue'): AttackableUnit {
   return new AttackableUnit({ game, position: createVector(x, 0), teamId });
+}
+
+/**
+ * A `CastContext` shaped exactly the way the game shapes one.
+ *
+ * Deliberately faithful to `Spell.cast()`, including the part that looks like a
+ * bug: a cursor sitting exactly on the caster yields a `(0,0)` direction, because
+ * that is the case `Spell.firingDirection` exists to absorb and a helper that
+ * quietly fixed it would hide the only path that reaches it.
+ */
+export function castContextFor(
+  caster: AttackableUnit,
+  at: { x: number; y: number },
+  extra: Partial<CastContext> = {}
+): CastContext {
+  const dx = at.x - caster.position.x;
+  const dy = at.y - caster.position.y;
+  const length = Math.hypot(dx, dy);
+  return Object.freeze({
+    spellId: 'test-cast',
+    activationId: 'test-activation',
+    startedAtMs: 0,
+    caster,
+    origin: Object.freeze({ x: caster.position.x, y: caster.position.y }),
+    cursorWorld: Object.freeze({ x: at.x, y: at.y }),
+    direction: Object.freeze({
+      x: length === 0 ? 0 : dx / length,
+      y: length === 0 ? 0 : dy / length,
+    }),
+    ...extra,
+  }) as CastContext;
+}
+
+/**
+ * Press a spell the way a key press presses it, and answer whether the cast was
+ * accepted.
+ *
+ * **This is the only honest way to drive a spell in a test.** Calling
+ * `onSpellCast()` by hand runs one hook in isolation: no activation pattern, no
+ * recast budget, no `onComplete`, no resource commit, no targeting rejection, no
+ * cooldown. Jhin R's five assertions were all green against an ultimate that
+ * opened and shut its stage inside a single keypress, because every one of them
+ * called the hook directly. `spell-runtime-drive-seam.test.ts` is the ban; this
+ * is the thing that makes obeying it a one-liner.
+ *
+ * `target` is for a `UNIT` spell whose victim the test wants to name outright —
+ * it goes into the context, which is what `Spell.press` checks before falling
+ * back to `TargetResolver`. Leave it off to exercise the resolver itself.
+ */
+export function pressSpell(
+  spell: Spell,
+  options: {
+    caster?: AttackableUnit;
+    at?: { x: number; y: number };
+    target?: AttackableUnit;
+  } = {}
+): boolean {
+  const caster = options.caster ?? (spell.owner as AttackableUnit);
+  const at = options.at ??
+    options.target?.position ?? { x: caster.position.x + 100, y: caster.position.y };
+  return spell.press(castContextFor(caster, at, options.target ? { target: options.target } : {}));
+}
+
+/** The key coming back up, for a `HOLD_RELEASE` or `TAP_OR_HOLD` spell. */
+export function releaseSpell(
+  spell: Spell,
+  options: { caster?: AttackableUnit; at?: { x: number; y: number } } = {}
+): boolean {
+  const caster = options.caster ?? (spell.owner as AttackableUnit);
+  const at = options.at ?? { x: caster.position.x + 100, y: caster.position.y };
+  return spell.release(castContextFor(caster, at));
 }
 
 /**

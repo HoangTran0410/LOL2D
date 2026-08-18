@@ -70,6 +70,34 @@ const ALL_CASTS = [
   // Morgana R: 350ms windup, then a 3s tether that resolves. The frames are the
   // gather, the shackles slamming shut, the middle of the tether, and the burst.
   { champion: 'Morgana', slot: 'R', aim: [300, 0], frames: [220, 480, 1800, 3500] },
+  // Katarina: her daggers *are* the kit, and they were a 26px pale sliver on a
+  // pale floor with no outline. Q plants one behind the target, W drops one
+  // after 800ms, R throws three a tick — all three exist to answer one
+  // question, which is whether a dagger can be found at a glance.
+  { champion: 'Katarina', slot: 'Q', aim: [380, 0], frames: [140, 520, 1200] },
+  { champion: 'Katarina', slot: 'W', aim: [200, 0], frames: [120, 700, 1400] },
+  { champion: 'Katarina', slot: 'R', aim: [300, 0], frames: [220, 900, 2000] },
+  // Jhin E is a concealed mine with a fuse, and its two interesting states are
+  // mutually exclusive: untripped it has to stay invisible, tripped it has to
+  // bloom visibly before it bites. The dummy stands at 0.75x the aim and the
+  // throw is clamped to E's 400 range, so separation peaks at exactly 400 —
+  // aim any wider and the trap lands *closer* to the dummy, which is how the
+  // first version of this entry tripped the trap it meant to leave hidden.
+  {
+    champion: 'Jhin',
+    slot: 'E',
+    aim: [400, 0],
+    frames: [220, 900, 1500, 2400],
+    label: 'Jhin_E_concealed',
+  },
+  {
+    champion: 'Jhin',
+    slot: 'E',
+    aim: [280, 0],
+    frames: [1250, 1900, 2350, 2600],
+    label: 'Jhin_E_fuse',
+  },
+  { champion: 'Jhin', slot: 'Q', aim: [380, 0], frames: [120, 420, 800] },
 ];
 
 // Substring match, so "Jarvan" and "Pantheon" both work without quoting.
@@ -91,7 +119,10 @@ const server = await createServer({ server: { port: 0, strictPort: false, hmr: f
 await server.listen();
 const url = server.resolvedUrls.local[0];
 
-const browser = await chromium.launch({ channel: 'chrome' });
+// Same override as `harness.mjs`: system Chrome by default because that is what
+// the game ships to, `LOL2D_CHROME_CHANNEL=` (empty) for a machine without it.
+const channel = process.env.LOL2D_CHROME_CHANNEL ?? 'chrome';
+const browser = await chromium.launch(channel ? { channel } : {});
 const page = await browser.newPage({ viewport: VIEWPORT });
 const errors = [];
 page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
@@ -190,7 +221,9 @@ for (const cast of CASTS) {
     [cast.champion, cast.slotName ?? cast.champion, cast.slot, cast.aim[0], cast.aim[1]]
   );
 
-  const label = `${cast.slotName ?? cast.champion}_${cast.slot}`;
+  // `label` only when one ability needs more than one shot of it — two entries
+  // for the same slot would otherwise write over each other's screenshots.
+  const label = cast.label ?? `${cast.slotName ?? cast.champion}_${cast.slot}`;
   if (!staged.ok) {
     check(`${label} staged`, false, staged.reason);
     continue;
@@ -215,9 +248,7 @@ for (const cast of CASTS) {
       if (!spell) {
         return {
           ok: false,
-          reason: `no ${wanted} in kit: ${subject.spells
-            .map(s => s?.constructor?.name)
-            .join(',')}`,
+          reason: `no ${wanted} in kit: ${subject.spells.map(s => s?.constructor?.name).join(',')}`,
         };
       }
 
@@ -256,10 +287,7 @@ for (const cast of CASTS) {
       );
       rig.moved = Math.max(
         rig.moved,
-        Math.hypot(
-          rig.subject.position.x - rig.startPos.x,
-          rig.subject.position.y - rig.startPos.y
-        )
+        Math.hypot(rig.subject.position.x - rig.startPos.x, rig.subject.position.y - rig.startPos.y)
       );
     });
     await page.screenshot({ path: `${OUT}/${label}-${index + 1}-t${at}.png` });

@@ -5,21 +5,23 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import Katarina_Q, {
+  KATARINA_DAGGER_E_REFUND_MS,
+  KATARINA_DAGGER_SLASH_DAMAGE,
   KATARINA_MAX_DAGGERS,
   KATARINA_PICKUP_RADIUS,
   KATARINA_Q_BOUNCE_DAMAGE,
   KATARINA_Q_FIRST_DAMAGE,
   KATARINA_Q_MAX_TARGETS,
+  KATARINA_Q_WINDUP_MS,
   Katarina_Dagger,
   type Katarina_Q_Object,
 } from '../../../src/game/gameObject/spells/Katarina_Q';
 import Katarina_W, {
-  KATARINA_W_HOP,
-  KATARINA_W_SLOW_RADIUS,
+  KATARINA_W_DROP_DELAY_MS,
+  KATARINA_W_SPEEDUP_MS,
 } from '../../../src/game/gameObject/spells/Katarina_W';
 import Katarina_E, {
-  KATARINA_E_DAGGER_DAMAGE,
-  KATARINA_E_Q_REFUND_MS,
+  KATARINA_E_STRIKE_DAMAGE,
 } from '../../../src/game/gameObject/spells/Katarina_E';
 import Katarina_R, {
   KATARINA_R_DURATION_MS,
@@ -27,16 +29,17 @@ import Katarina_R, {
   KATARINA_R_TICK_MS,
   type Katarina_R_Lotus,
 } from '../../../src/game/gameObject/spells/Katarina_R';
+import Speedup from '../../../src/game/gameObject/buffs/Speedup';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
   createUnit,
   installSketchMathGlobals,
   installSpellObjectGlobals,
+  pressSpell,
   type TestGame,
 } from '../spell/fixtures';
 
-/** Ticks the channel is allowed, worked out here rather than read back from the spell. */
 const EXPECTED_R_TICKS = Math.floor(KATARINA_R_DURATION_MS / KATARINA_R_TICK_MS);
 
 function unit(game: TestGame, x: number, teamId: string, y = 0): AttackableUnit {
@@ -48,14 +51,13 @@ function unit(game: TestGame, x: number, teamId: string, y = 0): AttackableUnit 
   result.stats.mana.baseValue = 100;
   result.stats.health.baseValue = 100;
   result.stats.maxHealth.baseValue = 100;
-  // Regen would drift the exact-damage assertions over a multi-second channel.
   result.stats.healthRegen.baseValue = 0;
   result.stats.manaRegen.baseValue = 0;
   result.animatedValues.displaySize = 20;
   return result;
 }
 
-describe('Katarina — the dagger economy', () => {
+describe('Katarina — Reworked Dagger Mechanics', () => {
   let game: TestGame;
   let owner: AttackableUnit;
 
@@ -73,16 +75,9 @@ describe('Katarina — the dagger economy', () => {
 
   afterEach(() => vi.unstubAllGlobals());
 
-  function context(dx: number, dy: number) {
-    return {
-      spellId: 'test',
-      activationId: 'test',
-      startedAtMs: 0,
-      caster: owner,
-      origin: { x: owner.position.x, y: owner.position.y },
-      cursorWorld: { x: owner.position.x + dx, y: owner.position.y + dy },
-      direction: { x: Math.sign(dx), y: Math.sign(dy) },
-    } as any;
+  /** A cursor `dx`/`dy` away from Katarina, in world coordinates. */
+  function at(dx: number, dy: number) {
+    return { x: owner.position.x + dx, y: owner.position.y + dy };
   }
 
   function enemy(x: number, y = 0): AttackableUnit {
@@ -91,9 +86,20 @@ describe('Katarina — the dagger economy', () => {
     return victim;
   }
 
+  /**
+   * Q has a `castTimeMs` windup before the blade leaves her hand, which the old
+   * `onSpellCast()` version of this helper skipped over entirely — it could not
+   * have noticed the windup disappearing.
+   */
   function flyQ(): Katarina_Q_Object {
     const q = new Katarina_Q(owner);
-    q.onSpellCast(context(300, 0));
+    expect(pressSpell(q, { at: at(300, 0) })).toBe(true);
+    expect(q.state).toBe('CASTING');
+
+    vi.stubGlobal('deltaTime', KATARINA_Q_WINDUP_MS);
+    q.update();
+    vi.stubGlobal('deltaTime', 250);
+
     const missile = game.objectManager._objectToBeAdd.find(
       object => object instanceof Object && 'struck' in (object as any)
     ) as Katarina_Q_Object;
@@ -117,7 +123,7 @@ describe('Katarina — the dagger economy', () => {
     expect(fourth.stats.health.value).toBe(100);
   });
 
-  it('Q leaves exactly one dagger, and a fourth dagger evicts the oldest', () => {
+  it('Q leaves a dagger on ground, and a fourth dagger evicts the oldest', () => {
     enemy(300);
     flyQ();
     expect(Katarina_Dagger.aliveFor(owner).length).toBe(1);
@@ -129,76 +135,126 @@ describe('Katarina — the dagger economy', () => {
     expect(oldest.toRemove).toBe(true);
   });
 
-  it('W drops its dagger where she left, not where she lands', () => {
-    const victim = enemy(120);
-    game.objectManager.update();
-    new Katarina_W(owner).onSpellCast(context(200, 0));
+  it('Walking onto a landed dagger triggers Dagger Slash AoE and refunds E cooldown', () => {
+    const e = new Katarina_E(owner);
+    (owner as any).spells = [new Katarina_Q(owner), new Katarina_W(owner), e, new Katarina_R(owner)];
+    e.currentCooldown = 10_000;
 
+    // Plant a landed dagger nearby
+    const dagger = Katarina_Dagger.plant(owner, 50, 0, 0);
+    expect(dagger.landed).toBe(true);
+
+    const nearbyEnemy = enemy(100, 0);
+    game.objectManager.update();
+
+    // Owner moves within pickup radius of dagger
+    owner.position.x = 40;
+    game.objectManager.update();
+
+    // Dagger should be consumed and slash dealt damage
+    expect(dagger.toRemove).toBe(true);
+    expect(nearbyEnemy.stats.health.value).toBe(100 - KATARINA_DAGGER_SLASH_DAMAGE);
+    expect(e.currentCooldown).toBe(10_000 - KATARINA_DAGGER_E_REFUND_MS);
+  });
+
+  it('W grants Speedup buff and drops a dagger at current position', () => {
+    expect(pressSpell(new Katarina_W(owner), { at: at(0, 0) })).toBe(true);
+
+    // Has Speedup buff
+    const speedBuff = owner.buffs.find(b => b instanceof Speedup) as Speedup | undefined;
+    expect(speedBuff).toBeDefined();
+    expect(speedBuff?.duration).toBe(KATARINA_W_SPEEDUP_MS);
+
+    // Has planted dagger at position 0, 0
     const daggers = Katarina_Dagger.aliveFor(owner);
     expect(daggers.length).toBe(1);
     expect(daggers[0].position.x).toBe(0);
-
-    const dash = owner.buffs.find(buff => 'dashDestination' in (buff as any)) as any;
-    expect(dash.dashDestination.x).toBeCloseTo(-KATARINA_W_HOP, 5);
-    expect(daggers[0].position.dist(dash.dashDestination)).toBeCloseTo(KATARINA_W_HOP, 5);
-    // The slow is measured from the departure point, so a unit ahead of her is caught.
-    expect(victim.position.dist(daggers[0].position)).toBeLessThan(KATARINA_W_SLOW_RADIUS);
-    expect(victim.buffs.length).toBeGreaterThan(0);
+    expect(daggers[0].position.y).toBe(0);
+    expect(daggers[0].dropDelayMs).toBe(KATARINA_W_DROP_DELAY_MS);
   });
 
-  it('E snaps to a dagger inside the pickup radius and to the raw point outside it', () => {
-    Katarina_Dagger.plant(owner, 300, KATARINA_PICKUP_RADIUS - 50);
-    const near = Katarina_Dagger.aliveFor(owner)[0];
-    new Katarina_E(owner).onSpellCast(context(300, 0));
-    expect(owner.position.x).toBe(300);
-    expect(owner.position.y).toBe(KATARINA_PICKUP_RADIUS - 50);
-    expect(near.toRemove).toBe(true);
-
-    // Now a dagger far from the click: the click point wins, untouched.
-    const far = Katarina_Dagger.plant(owner, 0, KATARINA_PICKUP_RADIUS + 200);
-    new Katarina_E(owner).onSpellCast(context(0, -300));
-    expect(owner.position.x).toBe(300);
-    expect(owner.position.y).toBe(KATARINA_PICKUP_RADIUS - 50 - 300);
-    expect(far.toRemove).toBe(false);
-    expect(owner.position.dist(far.position)).toBeGreaterThan(KATARINA_PICKUP_RADIUS);
-  });
-
-  it('E only refunds Q when it actually eats a dagger, and detonates around the arrival', () => {
-    const q = new Katarina_Q(owner);
-    const e = new Katarina_E(owner);
-    (owner as any).spells = [q, new Katarina_W(owner), e, new Katarina_R(owner)];
-
-    q.currentCooldown = 5000;
-    e.onSpellCast(context(300, 0));
-    expect(q.currentCooldown).toBe(5000);
-    expect(owner.position.x).toBe(300);
-
-    // A dagger under her feet, a click just off it: she eats it this time.
-    Katarina_Dagger.plant(owner, owner.position.x, owner.position.y);
-    const bystander = enemy(340);
+  it('E blinks to target point or dagger and triggers strike on enemy', () => {
+    const target = enemy(300, 0);
     game.objectManager.update();
-    q.currentCooldown = 5000;
-    e.onSpellCast(context(0, 40));
-    expect(q.currentCooldown).toBe(5000 - KATARINA_E_Q_REFUND_MS);
-    expect(bystander.stats.health.value).toBeLessThanOrEqual(100 - KATARINA_E_DAGGER_DAMAGE);
+
+    const e = new Katarina_E(owner);
+    expect(pressSpell(e, { at: at(300, 0) })).toBe(true);
+
+    expect(owner.position.x).toBe(300);
+    expect(target.stats.health.value).toBe(100 - KATARINA_E_STRIKE_DAMAGE);
   });
 
-  it('R ticks duration/tick times and stops, converging on one cleanup', () => {
-    const victim = enemy(200);
-    const r = new Katarina_R(owner);
-    r.onCastStart(context(0, 0));
-    const lotus = game.objectManager._objectToBeAdd.find(
-      object => 'ticksDone' in (object as any)
-    ) as Katarina_R_Lotus;
+  it('E onto a dagger triggers Dagger Slash and refunds E cooldown', () => {
+    const e = new Katarina_E(owner);
+    (owner as any).spells = [new Katarina_Q(owner), new Katarina_W(owner), e, new Katarina_R(owner)];
 
+    const dagger = Katarina_Dagger.plant(owner, 200, 0, 0);
+    const bystander = enemy(250, 0);
+    game.objectManager.update();
+
+    expect(pressSpell(e, { at: at(200, 0) })).toBe(true);
+
+    expect(owner.position.x).toBe(200);
+    expect(dagger.toRemove).toBe(true);
+    // Hit by dagger slash
+    expect(bystander.stats.health.value).toBeLessThanOrEqual(100 - KATARINA_DAGGER_SLASH_DAMAGE);
+    // ...and the refund this test is named for, which it never used to assert:
+    // the press starts E's own cooldown, and landing on a dagger pays part back.
+    expect(e.currentCooldown).toBe(e.coolDown - KATARINA_DAGGER_E_REFUND_MS);
+  });
+
+  /** The lotus the channel puts in the world, whichever queue it is sitting in. */
+  function lotusInPlay(): Katarina_R_Lotus {
+    const found = [
+      ...game.objectManager._objectToBeAdd,
+      ...game.objectManager.objects,
+    ].find(object => 'ticksDone' in (object as any)) as Katarina_R_Lotus;
+    expect(found).toBeDefined();
+    return found;
+  }
+
+  it('R channels and ticks multiple times dealing AoE damage', () => {
+    const victim = enemy(200);
+    victim.stats.health.baseValue = 500;
+    victim.stats.maxHealth.baseValue = 500;
+
+    const r = new Katarina_R(owner);
+    expect(pressSpell(r, { at: at(0, 0) })).toBe(true);
+    // Pressing it is what opens the channel — the old test called `onCastStart`
+    // by hand and so never established that R is a channel at all.
+    expect(r.state).toBe('CHANNELING');
+
+    const lotus = lotusInPlay();
     for (let frame = 0; frame < 200 && !lotus.toRemove; frame++) game.objectManager.update();
 
     expect(lotus.ticksDone).toBe(EXPECTED_R_TICKS);
-    expect(victim.stats.health.value).toBe(100 - EXPECTED_R_TICKS * KATARINA_R_TICK_DAMAGE);
+    expect(victim.stats.health.value).toBe(500 - EXPECTED_R_TICKS * KATARINA_R_TICK_DAMAGE);
+    expect(lotus.toRemove).toBe(true);
+  });
+
+  it('R stops dead when the channel is interrupted', () => {
+    const victim = enemy(200);
+    victim.stats.health.baseValue = 500;
+    victim.stats.maxHealth.baseValue = 500;
+
+    const r = new Katarina_R(owner);
+    expect(pressSpell(r, { at: at(0, 0) })).toBe(true);
+    const lotus = lotusInPlay();
+
+    // Two ticks in, then a stun. Cancelling mid-channel is the case that
+    // matters, and the old test could only cancel one that had already ended.
+    vi.stubGlobal('deltaTime', KATARINA_R_TICK_MS);
+    for (let frame = 0; frame < 40 && lotus.ticksDone < 2; frame++) game.objectManager.update();
+    const struckSoFar = lotus.ticksDone;
+    expect(struckSoFar).toBe(2);
+    expect(struckSoFar).toBeLessThan(EXPECTED_R_TICKS);
+
+    expect(r.cancel('STUN')).toBe(true);
     expect(lotus.toRemove).toBe(true);
 
-    // Interrupt and natural end converge: finishing again changes nothing.
-    r.onCancel(context(0, 0), 'STUN');
-    expect(lotus.ticksDone).toBe(EXPECTED_R_TICKS);
+    const healthAtCancel = victim.stats.health.value;
+    for (let frame = 0; frame < 60; frame++) game.objectManager.update();
+    expect(lotus.ticksDone).toBe(struckSoFar);
+    expect(victim.stats.health.value).toBe(healthAtCancel);
   });
 });

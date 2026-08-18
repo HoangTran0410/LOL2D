@@ -3,33 +3,32 @@ import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
-import Katarina_Q, {
+import {
   KATARINA_BLOOD,
   KATARINA_STEEL,
+  KATARINA_DAGGER_SLASH_DAMAGE,
   Katarina_Blade_Impact,
   Katarina_Dagger,
 } from './Katarina_Q';
 
-export const KATARINA_E_RANGE = 380;
+export const KATARINA_E_RANGE = 420;
 export const KATARINA_E_STRIKE_DAMAGE = 14;
 export const KATARINA_E_STRIKE_RADIUS = 130;
-export const KATARINA_E_DAGGER_DAMAGE = 20;
-export const KATARINA_E_DAGGER_RADIUS = 170;
+export const KATARINA_E_DAGGER_DAMAGE = KATARINA_DAGGER_SLASH_DAMAGE;
 export const KATARINA_E_Q_REFUND_MS = 1_500;
 
 export default class Katarina_E extends Spell {
   image = AssetManager.get('spell_katarina_e');
   name = 'Ám Sát (Katarina_E)';
-  description = `Dịch chuyển tới vị trí chỉ định và gây
-    <span class="damage">${KATARINA_E_STRIKE_DAMAGE} sát thương</span> cho kẻ địch gần nhất.
-    Nếu có dao của cô ở đó, cô nhảy tới <b>con dao</b>, thu lại nó để gây
-    <span class="damage">${KATARINA_E_DAGGER_DAMAGE} sát thương</span> trong vùng
-    ${KATARINA_E_DAGGER_RADIUS} và giảm ${KATARINA_E_Q_REFUND_MS / 1000} giây hồi chiêu Q.`;
+  description = `Dịch chuyển tức thời tới một <b>kẻ địch, đồng minh</b> hoặc <b>con dao</b>.
+    Nếu tới kẻ địch, gây <span class="damage">${KATARINA_E_STRIKE_DAMAGE} sát thương</span>.
+    Nếu tới con dao, kích hoạt <b>xoay kiếm diện rộng</b> gây
+    <span class="damage">${KATARINA_DAGGER_SLASH_DAMAGE} sát thương</span> và hồi lại phần lớn thời gian hồi chiêu Ám Sát.`;
   coolDown = 10_000;
-  manaCost = 25;
+  manaCost = 0;
   range = KATARINA_E_RANGE;
 
   get castSpec(): Readonly<CastSpec> {
@@ -49,91 +48,115 @@ export default class Katarina_E extends Spell {
     const reach = effectiveRange(this.range, this.owner);
     const aim = context?.cursorWorld ?? this.aimPoint;
     const origin = createVector(this.owner.position.x, this.owner.position.y);
-    let requestedX = aim.x;
-    let requestedY = aim.y;
-    const span = Math.hypot(aim.x - origin.x, aim.y - origin.y);
-    if (span < 1) {
-      const heading = this.firingDirection(context);
-      const length = Math.hypot(heading.x, heading.y) || 1;
-      requestedX = origin.x + (heading.x / length) * reach;
-      requestedY = origin.y + (heading.y / length) * reach;
-    } else if (span > reach) {
-      requestedX = origin.x + ((aim.x - origin.x) / span) * reach;
-      requestedY = origin.y + ((aim.y - origin.y) / span) * reach;
-    }
 
-    // A dagger near the requested point wins the destination outright — that is
-    // the whole reason the pickup ring is drawn on the floor.
-    const snapped = Katarina_Dagger.snapTarget(this.owner, requestedX, requestedY);
-    const arrivalX = snapped ? snapped.position.x : requestedX;
-    const arrivalY = snapped ? snapped.position.y : requestedY;
-    if (!this.blinkOwnerTo(arrivalX, arrivalY)) return;
+    // 1. Check if aim is near an active/landing Dagger
+    const dagger = Katarina_Dagger.snapTarget(this.owner, aim.x, aim.y);
 
-    if (snapped) {
-      snapped.consume();
-      this.detonate(arrivalX, arrivalY);
-      this.refundQ();
-    }
-    this.strike(arrivalX, arrivalY);
-
-    const blink = new Katarina_E_Afterimage(this.owner, origin.x, origin.y, arrivalX, arrivalY);
-    this.game.objectManager.addObject(blink);
-    const arrival = new Katarina_E_Arrival(this.owner, arrivalX, arrivalY);
-    arrival.detonationRadius = snapped ? KATARINA_E_DAGGER_RADIUS : 0;
-    this.game.objectManager.addObject(arrival);
-  }
-
-  /** An area effect: it must still catch the champion standing in an unlit bush. */
-  private detonate(x: number, y: number): void {
-    const victims = this.game.objectManager.queryObjects({
-      area: new Circle({ x, y, r: KATARINA_E_DAGGER_RADIUS }),
-      filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
-    }) as AttackableUnit[];
-
-    const struck = new Set<AttackableUnit>();
-    for (const victim of victims) {
-      if (struck.has(victim)) continue;
-      struck.add(victim);
-      victim.takeDamage(KATARINA_E_DAGGER_DAMAGE, this.owner);
-      this.game.objectManager.addObject(
-        new Katarina_Blade_Impact(this.owner, victim.position.x, victim.position.y, 30)
-      );
-    }
-  }
-
-  /** One chosen unit, so it goes through the fog the same way the player does. */
-  private strike(x: number, y: number): void {
-    const candidates = this.game.objectManager.queryObjects({
-      area: new Circle({ x, y, r: effectiveRange(KATARINA_E_STRIKE_RADIUS, this.owner) }),
+    // 2. Check if aim is near an AttackableUnit (enemy, ally, monster, minion)
+    const unitCandidates = this.game.objectManager.queryObjects({
+      area: new Circle({ x: aim.x, y: aim.y, r: 90 }),
       filters: [
-        PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+        PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.visibleTo(this.owner),
       ],
     }) as AttackableUnit[];
 
-    let chosen: AttackableUnit | null = null;
-    let nearestDistance = Infinity;
-    for (const candidate of candidates) {
-      const gap = Math.hypot(candidate.position.x - x, candidate.position.y - y);
-      if (gap < nearestDistance) {
-        nearestDistance = gap;
-        chosen = candidate;
+    let targetUnit: AttackableUnit | null = null;
+    let closestDist = Infinity;
+    for (const u of unitCandidates) {
+      if (u === this.owner || u.isDead || u.toRemove || !(u instanceof AttackableUnit)) continue;
+      const d = Math.hypot(u.position.x - aim.x, u.position.y - aim.y);
+      if (d < closestDist) {
+        closestDist = d;
+        targetUnit = u;
       }
     }
-    if (!chosen) return;
-    chosen.takeDamage(KATARINA_E_STRIKE_DAMAGE, this.owner);
+
+    let arrivalX = aim.x;
+    let arrivalY = aim.y;
+    let snappedDagger: Katarina_Dagger | null = null;
+
+    if (dagger) {
+      arrivalX = dagger.position.x;
+      arrivalY = dagger.position.y;
+      snappedDagger = dagger;
+    } else if (targetUnit) {
+      arrivalX = targetUnit.position.x;
+      arrivalY = targetUnit.position.y;
+    } else {
+      const span = Math.hypot(aim.x - origin.x, aim.y - origin.y);
+      if (span < 1) {
+        const heading = this.firingDirection(context);
+        const length = Math.hypot(heading.x, heading.y) || 1;
+        arrivalX = origin.x + (heading.x / length) * reach;
+        arrivalY = origin.y + (heading.y / length) * reach;
+      } else if (span > reach) {
+        arrivalX = origin.x + ((aim.x - origin.x) / span) * reach;
+        arrivalY = origin.y + ((aim.y - origin.y) / span) * reach;
+      }
+    }
+
+    // Clamp distance to max reach
+    const finalSpan = Math.hypot(arrivalX - origin.x, arrivalY - origin.y);
+    if (finalSpan > reach) {
+      arrivalX = origin.x + ((arrivalX - origin.x) / finalSpan) * reach;
+      arrivalY = origin.y + ((arrivalY - origin.y) / finalSpan) * reach;
+    }
+
+    if (!this.blinkOwnerTo(arrivalX, arrivalY)) return;
+
+    // Afterimage & Arrival effects
     this.game.objectManager.addObject(
-      new Katarina_Blade_Impact(this.owner, chosen.position.x, chosen.position.y, 40)
+      new Katarina_E_Afterimage(this.owner, origin.x, origin.y, arrivalX, arrivalY)
     );
+    this.game.objectManager.addObject(new Katarina_E_Arrival(this.owner, arrivalX, arrivalY));
+
+    // If destination is near a dagger (or snapped dagger), consume & slash
+    const daggerAtArrival =
+      snappedDagger ?? Katarina_Dagger.snapTarget(this.owner, arrivalX, arrivalY);
+    if (daggerAtArrival) {
+      daggerAtArrival.consumeAndSlash();
+    }
+
+    // Single target strike if an enemy was targeted / is at arrival
+    this.strike(arrivalX, arrivalY, targetUnit);
   }
 
-  private refundQ(): void {
-    const spells = this.owner?.spells as Spell[] | undefined;
-    if (!spells) return;
-    for (const spell of spells) {
-      if (!(spell instanceof Katarina_Q)) continue;
-      spell.currentCooldown = Math.max(0, spell.currentCooldown - KATARINA_E_Q_REFUND_MS);
-      return;
+  private strike(x: number, y: number, explicitTarget: AttackableUnit | null): void {
+    let chosen: AttackableUnit | null =
+      explicitTarget instanceof AttackableUnit ? explicitTarget : null;
+    if (!chosen || chosen.teamId === this.owner.teamId || chosen.isDead || chosen.toRemove) {
+      const candidates = this.game.objectManager.queryObjects({
+        area: new Circle({ x, y, r: effectiveRange(KATARINA_E_STRIKE_RADIUS, this.owner) }),
+        filters: [
+          PredefinedFilters.type(AttackableUnit),
+          PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId),
+          PredefinedFilters.visibleTo(this.owner),
+        ],
+      }) as AttackableUnit[];
+
+      let nearestDistance = Infinity;
+      chosen = null;
+      for (const candidate of candidates) {
+        if (!(candidate instanceof AttackableUnit)) continue;
+        const gap = Math.hypot(candidate.position.x - x, candidate.position.y - y);
+        if (gap < nearestDistance) {
+          nearestDistance = gap;
+          chosen = candidate;
+        }
+      }
+    }
+
+    if (
+      chosen &&
+      chosen instanceof AttackableUnit &&
+      typeof chosen.takeDamage === 'function' &&
+      chosen.teamId !== this.owner.teamId
+    ) {
+      chosen.takeDamage(KATARINA_E_STRIKE_DAMAGE, this.owner);
+      this.game.objectManager.addObject(
+        new Katarina_Blade_Impact(this.owner, chosen.position.x, chosen.position.y, 42)
+      );
     }
   }
 
@@ -142,7 +165,7 @@ export default class Katarina_E extends Spell {
   }
 }
 
-/** The red shape she was standing in a moment ago, thinning out as it dies. */
+/** The red silhouette left behind, stretched along the teleport trajectory. */
 export class Katarina_E_Afterimage extends SpellObject {
   lifeTime = 320;
   age = 0;
@@ -170,13 +193,12 @@ export class Katarina_E_Afterimage extends SpellObject {
     const stretch = 26 + 22 * t;
 
     push();
-    // The silhouette left behind, stretched the way she went.
     noStroke();
-    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 150 * fade);
+    fill(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 160 * fade);
     ellipse(this.position.x, this.position.y, 30 * fade + 8, stretch * fade + 8);
-    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 130 * fade);
+    stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 140 * fade);
     strokeWeight(3 * fade + 1);
-    const drawn = Math.min(length, 110) * (1 - t * 0.4);
+    const drawn = Math.min(length, 120) * (1 - t * 0.4);
     line(
       this.position.x,
       this.position.y,
@@ -187,20 +209,16 @@ export class Katarina_E_Afterimage extends SpellObject {
   }
 
   getDisplayBoundingBox() {
-    return this.squareDisplayBoundingBox((110 + 30) * 2);
+    return this.squareDisplayBoundingBox((120 + 30) * 2);
   }
 }
 
 /**
- * Arrival. Steel collapses *inward* onto her, which is how a reposition reads;
- * the 170 rim is drawn only when a dagger was actually eaten, so the two
- * outcomes of the same button never look alike.
+ * Arrival flash. Steel blades collapse inward onto Katarina.
  */
 export class Katarina_E_Arrival extends SpellObject {
-  lifeTime = 340;
+  lifeTime = 320;
   age = 0;
-  detonationRadius = 0;
-  /** Seeded once in the constructor. */
   blades: number[] = [];
 
   constructor(owner: AttackableUnit, x: number, y: number) {
@@ -220,12 +238,11 @@ export class Katarina_E_Arrival extends SpellObject {
     const fade = 1 - t;
 
     push();
-    // Inward flourish: blades start wide and fall onto her.
-    stroke(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], 220 * fade);
+    stroke(KATARINA_STEEL[0], KATARINA_STEEL[1], KATARINA_STEEL[2], 230 * fade);
     strokeWeight(2.5);
     noFill();
     for (const angle of this.blades) {
-      const outer = 74 * (1 - closing) + 16;
+      const outer = 70 * (1 - closing) + 16;
       const inner = outer - 18;
       line(
         this.position.x + cos(angle) * outer,
@@ -234,21 +251,10 @@ export class Katarina_E_Arrival extends SpellObject {
         this.position.y + sin(angle) * inner
       );
     }
-
-    if (this.detonationRadius > 0) {
-      // The hard rim on the radius the detonation really used.
-      stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 240 * fade);
-      strokeWeight(4 * fade + 1);
-      circle(this.position.x, this.position.y, this.detonationRadius * 2 * closing);
-      stroke(KATARINA_BLOOD[0], KATARINA_BLOOD[1], KATARINA_BLOOD[2], 90 * fade);
-      strokeWeight(2);
-      circle(this.position.x, this.position.y, this.detonationRadius * 1.2 * closing);
-    }
     pop();
   }
 
   getDisplayBoundingBox() {
-    const painted = Math.max(this.detonationRadius, 90) + 20;
-    return this.squareDisplayBoundingBox(painted * 2);
+    return this.squareDisplayBoundingBox(120);
   }
 }

@@ -58,6 +58,11 @@ const validateSpec = (spec: CastSpec): void => {
     throw new Error('resource.tickEveryMs is only valid when commitAt is tick');
   }
 
+  const recasts = spec.active?.recasts;
+  if (recasts !== undefined && (!Number.isInteger(recasts) || recasts < 1)) {
+    throw new Error('active.recasts must be a positive integer');
+  }
+
   const acceptsCharge = spec.activation === 'HOLD_RELEASE' || spec.activation === 'TAP_OR_HOLD';
   if (acceptsCharge) {
     if (!spec.charge) throw new Error(`${spec.activation} activation requires charge`);
@@ -90,6 +95,8 @@ export class SpellRuntime {
   private cooldownStarted = false;
   private released = false;
   private terminal = true;
+  private recastsRemaining = 0;
+  private lastRecastAtMs = 0;
 
   constructor(
     private readonly spec: CastSpec,
@@ -120,6 +127,8 @@ export class SpellRuntime {
     this.cooldownStarted = false;
     this.released = false;
     this.terminal = false;
+    this.recastsRemaining = 0;
+    this.lastRecastAtMs = 0;
 
     if (!this.commitResource('start')) return false;
     this.startCooldown('start');
@@ -242,6 +251,8 @@ export class SpellRuntime {
       this.spec.activation === 'TOGGLE'
     ) {
       this._state = 'ACTIVE';
+      this.recastsRemaining = this.spec.active?.recasts ?? 1;
+      this.lastRecastAtMs = 0;
       this.delegate.onActivate(this.context);
     } else {
       this.completeActivation();
@@ -305,18 +316,27 @@ export class SpellRuntime {
     }
   }
 
+  /**
+   * The activation ends on the last recast, not the first: `recasts` is a
+   * budget. The gap is measured from the previous recast rather than from the
+   * activation, so a spell with several of them spaces every shot instead of
+   * only the first — at one recast the two are the same number, which is why
+   * every spell that predates the budget is unaffected.
+   */
   private recast(): boolean {
     if (
       !this.context ||
       this.terminal ||
       (this.spec.activation !== 'RECAST' && this.spec.activation !== 'TOGGLE') ||
-      this.elapsedMs < (this.spec.active?.recastDelayMs ?? 0)
+      this.elapsedMs - this.lastRecastAtMs < (this.spec.active?.recastDelayMs ?? 0)
     ) {
       return false;
     }
 
+    this.lastRecastAtMs = this.elapsedMs;
+    this.recastsRemaining -= 1;
     this.delegate.onRecast(this.context);
-    this.completeActivation();
+    if (this.recastsRemaining <= 0) this.completeActivation();
     return true;
   }
 

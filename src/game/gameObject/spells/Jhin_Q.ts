@@ -1,10 +1,12 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import VectorUtils from '@/utils/vector.utils';
-import { effectiveRange } from '@/game/combat/Reach';
+import { canSee } from '@/game/combat/Vision';
+import { effectiveRange, withinRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
-import type { CastSpec } from '@/game/spell/runtime/types';
-import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Buff from '@/game/gameObject/Buff';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
@@ -77,41 +79,100 @@ export function applyJhinMark(source: AttackableUnit, target: AttackableUnit): v
 export default class Jhin_Q extends Spell {
   image = AssetManager.get('spell_jhin_q');
   name = 'Lựu Đạn Nhảy Múa (Jhin_Q)';
-  description = `Bắn một viên đạn hoa nảy qua tối đa ${JHIN_Q_MAX_HITS} mục tiêu, mỗi lần nảy
+  description = `Ném lựu đạn hoa vào <b>một kẻ địch được chỉ định</b>, rồi nảy sang tối đa
+    ${JHIN_Q_MAX_HITS - 1} mục tiêu khác trong bán kính ${JHIN_Q_BOUNCE_RANGE}, mỗi lần nảy
     mạnh hơn lần trước: <span class="damage">${JHIN_Q_DAMAGE.join(' / ')} sát thương</span>.
     Mọi mục tiêu trúng đòn bị <b>đánh dấu</b> trong ${JHIN_MARK_MS / 1000} giây.`;
   coolDown = 8_000;
   manaCost = 30;
   range = JHIN_Q_RANGE;
 
+  /**
+   * A named enemy, not a direction. Fired at empty ground this used to fly the
+   * full 420, then run `seekNextBody` from wherever it stopped and latch onto
+   * the nearest champion within another 300 — a free 720-unit homing missile
+   * for a keypress aimed at nothing. Only the *first* body is chosen here; the
+   * bounces after it are still proximity off the body it just hit.
+   */
   get castSpec(): Readonly<CastSpec> {
     return {
       activation: 'PRESS',
-      targeting: 'POINT',
-      resource: { commitAt: 'start', refundOn: [] },
+      targeting: 'UNIT',
+      resource: { commitAt: 'release', refundOn: ['TARGET_INVALID', 'OUT_OF_RANGE'] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
     };
   }
 
-  onSpellCast(): void {
-    const { to } = VectorUtils.getVectorWithMaxRange(
-      this.owner.position,
-      this.aimPoint,
-      effectiveRange(this.range, this.owner)
-    );
+  get targetingRequest(): Readonly<TargetingRequest> {
+    return {
+      range: this.range,
+      // Without this the resolver defaults to 'ANY', and a cursor on empty
+      // ground resolves the caster — Jhin grenading himself.
+      targetTeam: 'ENEMY',
+      queryCandidates: () => this.game.objectManager.objects,
+      isTargetable: candidate => isGrenadeTarget(candidate),
+      getTargetInfo: candidate =>
+        isGrenadeTarget(candidate)
+          ? {
+              position: candidate.position,
+              teamId: candidate.teamId,
+              selectionRadius: candidate.animatedValues?.displaySize
+                ? candidate.animatedValues.displaySize / 2
+                : candidate.collisionRadius,
+            }
+          : null,
+    };
+  }
+
+  press(context: CastContext): boolean {
+    if (context.target !== undefined) return super.press(context);
+
+    const result = TargetResolver.resolve('UNIT', {
+      ...context,
+      casterTeamId: this.owner.teamId,
+      ...this.targetingRequest,
+    });
+    return result.ok ? super.press(result.context) : false;
+  }
+
+  checkCastCondition(): boolean {
+    return this.isValidTarget(this.castContext?.target);
+  }
+
+  onSpellCast(context?: CastContext): void {
+    const target = context?.target ?? this.castContext?.target;
+    if (!this.isValidTarget(target)) return;
+
     const grenade = new Jhin_Q_Object(this.owner);
-    grenade.destination = to.copy();
+    grenade.destination = createVector(target.position.x, target.position.y);
+    grenade.chasing = target;
     this.game.objectManager.addObject(grenade);
   }
 
   drawPreview(): void {
     super.drawPreview(effectiveRange(this.range, this.owner));
   }
+
+  private isValidTarget(target: unknown): target is AttackableUnit {
+    return (
+      isGrenadeTarget(target) &&
+      target !== this.owner &&
+      target.teamId !== this.owner.teamId &&
+      canSee(this.owner, target) &&
+      withinRange(this.range, this.owner, target)
+    );
+  }
 }
 
+const isGrenadeTarget = (target: unknown): target is AttackableUnit =>
+  target instanceof AttackableUnit && target.targetable && !target.toRemove && !target.isDead;
+
 /**
- * Flies to the aimed point, then hunts. Each landed hit re-aims it at the nearest body it has
- * not struck yet; the payload climbs with the hit index and the blast grows to match.
+ * Chases the enemy Jhin named, then bounces. Each landed hit re-aims it at the nearest body it
+ * has not struck yet; the payload climbs with the hit index and the blast grows to match.
+ *
+ * Arriving on nothing is the end of it. Hunting from the point it stopped at is what made this
+ * castable at empty ground for a guaranteed hit, so `onArrive` expires rather than seeking.
  */
 export class Jhin_Q_Object extends MissileSpellObject {
   speed = 10;
@@ -120,6 +181,8 @@ export class Jhin_Q_Object extends MissileSpellObject {
   removeOnArrive = false;
   hits = 0;
   age = 0;
+  /** The body it is flying at right now — the named target, then each bounce. */
+  chasing: AttackableUnit | null = null;
   struck = new Set<AttackableUnit>();
   blades: { phase: number; tilt: number }[] = [];
   trailSystem = new TrailSystem({
@@ -132,6 +195,14 @@ export class Jhin_Q_Object extends MissileSpellObject {
     super.onAdded();
     for (let i = 0; i < MARK_PETALS; i++) {
       this.blades.push({ phase: random(0, TWO_PI), tilt: random(0.7, 1.3) });
+    }
+  }
+
+  /** Track the body it is chasing, so a walking target is still hit. */
+  onBeforeMove(): void {
+    const chased = this.chasing;
+    if (chased && !chased.isDead && !chased.toRemove) {
+      this.destination = createVector(chased.position.x, chased.position.y);
     }
   }
 
@@ -153,14 +224,18 @@ export class Jhin_Q_Object extends MissileSpellObject {
     if (!this.seekNextBody(enemy)) this.toRemove = true;
   }
 
+  /** It reached where it was aimed and hit nobody. That is a miss, not a new search. */
   onArrive(): void {
-    if (!this.seekNextBody(null)) this.toRemove = true;
+    this.toRemove = true;
   }
 
-  /** Picks one body out of many, so the query is gated on what Jhin can actually see. */
-  seekNextBody(from: AttackableUnit | null): boolean {
+  /**
+   * The next bounce, measured from the body just struck. Picks one unit out of many, so the
+   * query is gated on what Jhin can actually see.
+   */
+  seekNextBody(from: AttackableUnit): boolean {
     if (this.hits >= JHIN_Q_MAX_HITS) return false;
-    const centre = from ? from.position : this.position;
+    const centre = from.position;
     const spent: AttackableUnit[] = [];
     for (const done of this.struck) spent.push(done);
 
@@ -183,6 +258,7 @@ export class Jhin_Q_Object extends MissileSpellObject {
       chosen = candidate;
     }
     if (!chosen) return false;
+    this.chasing = chosen;
     this.destination = chosen.position.copy();
     return true;
   }
