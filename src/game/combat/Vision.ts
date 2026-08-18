@@ -1,4 +1,5 @@
 import CollideUtils from '../../utils/collide.utils';
+import { withinRadius } from '../../utils/math.utils';
 import TerrainType from '../enums/TerrainType';
 import { Rectangle } from '../../libs/quadtree';
 
@@ -253,7 +254,7 @@ function borrowedEyeSees(game: VisionHost | undefined, eye: Seeable, target: See
   // Measured to the target's edge, the same widening `Reach.ts` applies: a
   // Cho'Gath who has eaten his way to twice the size is seen from further away.
   const reach = grantedSightRadius(eye) + (target.stats?.size?.value ?? 0) / 2;
-  if (Math.hypot(to.x - from.x, to.y - from.y) > reach) return false;
+  if (!withinRadius(from, to, reach)) return false;
 
   return viewIsClear(game, eye, target);
 }

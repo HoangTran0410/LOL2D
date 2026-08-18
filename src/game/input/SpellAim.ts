@@ -71,7 +71,7 @@ export const UNIT_SNAP_RADIUS = 220;
 export const BLIND_POINT_FRACTION = 0.6;
 
 const normalise = (x: number, y: number): Vec2 => {
-  const length = Math.hypot(x, y);
+  const length = Math.sqrt(x * x + y * y);
   return length === 0 ? { x: 0, y: 0 } : { x: x / length, y: y / length };
 };
 
@@ -88,10 +88,11 @@ const finish = (
 ): SpellAimResult => {
   const dx = cursorWorld.x - origin.x;
   const dy = cursorWorld.y - origin.y;
+  const length = Math.sqrt(dx * dx + dy * dy);
   return {
     cursorWorld,
-    direction: normalise(dx, dy),
-    distance: Math.hypot(dx, dy),
+    direction: length === 0 ? { x: 0, y: 0 } : { x: dx / length, y: dy / length },
+    distance: length,
     target,
     manual,
   };
@@ -123,7 +124,7 @@ export function resolveSpellAim(input: SpellAimInput): SpellAimResult {
 
   if (mode === 'SELF') return finish(origin, { x: origin.x, y: origin.y }, null, drag !== null);
 
-  const dragLength = drag ? Math.hypot(drag.x, drag.y) : 0;
+  const dragLength = drag ? Math.sqrt(drag.x * drag.x + drag.y * drag.y) : 0;
   const manual = drag !== null && dragLength > 0;
   const direction = manual
     ? normalise(drag!.x, drag!.y)

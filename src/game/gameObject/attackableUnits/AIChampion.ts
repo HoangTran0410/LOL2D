@@ -5,6 +5,7 @@ import type { AssetKey } from '../../../managers/AssetManager';
 import Champion, { type ChampionOptions, type ChampionPresetData } from './Champion';
 import type AttackableUnit from './AttackableUnit';
 import { uuidv4 } from '../../../utils';
+import { vecDist } from '../../../utils/math.utils';
 import { effectiveRange } from '../../combat/Reach';
 import TargetResolver, {
   defaultIsTargetable,
@@ -238,10 +239,7 @@ export default class AIChampion extends Champion {
       if (!info || !isTargetable(candidate)) continue;
       if (request.targetTeam === 'ENEMY' && info.teamId === this.teamId) continue;
       if (request.targetTeam === 'ALLY' && info.teamId !== this.teamId) continue;
-      const distance = Math.hypot(
-        info.position.x - this.position.x,
-        info.position.y - this.position.y
-      );
+      const distance = vecDist(info.position, this.position);
       // Same size-corrected reach TargetResolver will apply a moment later; a
       // bot that aimed by the raw number would pick a victim the resolver then
       // rejects, and simply stop casting once its own body had grown.

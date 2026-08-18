@@ -1,6 +1,7 @@
 import { CURSOR_ACQUISITION_RADIUS } from '../../combat/AttackTargeting';
 import { effectiveRange } from '../../combat/Reach';
 import { canSee, type Seeable } from '../../combat/Vision';
+import { vecDist } from '../../../utils/math.utils';
 import type { CancelReason, CastContext, TargetingMode, Vec2 } from '../runtime/types';
 
 export type TargetTeam = 'ALLY' | 'ENEMY' | 'ANY';
@@ -100,7 +101,7 @@ export type TargetResolution =
       readonly reason: Extract<CancelReason, 'TARGET_INVALID' | 'OUT_OF_RANGE'>;
     };
 
-const distance = (a: Vec2, b: Vec2): number => Math.hypot(b.x - a.x, b.y - a.y);
+const distance = (a: Vec2, b: Vec2): number => vecDist(a, b);
 
 const matchesTeam = (request: TargetRequest, teamId: unknown): boolean => {
   const relation = request.targetTeam ?? 'ANY';
@@ -117,7 +118,7 @@ const createContext = (request: TargetRequest, target?: unknown): CastContext =>
   });
   const dx = cursorWorld.x - origin.x;
   const dy = cursorWorld.y - origin.y;
-  const length = Math.hypot(dx, dy);
+  const length = Math.sqrt(dx * dx + dy * dy);
   return Object.freeze({
     spellId: request.spellId,
     activationId: request.activationId,

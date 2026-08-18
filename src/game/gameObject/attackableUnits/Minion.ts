@@ -1,4 +1,5 @@
 import { Circle } from '../../../libs/quadtree';
+import { dist, distSq, withinRadius } from '../../../utils/math.utils';
 import TeamId from '../../enums/TeamId';
 import type { LaneWaypoint } from '../../lanes';
 import { PredefinedFilters } from '../../managers/ObjectManager';
@@ -246,7 +247,7 @@ export default class Minion extends AttackableUnit {
     const path = this.waypoints;
     if (path.length === 0) return 0;
     if (path.length === 1)
-      return Math.hypot(this.position.x - path[0].x, this.position.y - path[0].y);
+      return dist(this.position.x, this.position.y, path[0].x, path[0].y);
 
     const { x, y } = this.position;
     let best = Infinity;
@@ -258,7 +259,7 @@ export default class Minion extends AttackableUnit {
       const lengthSq = dx * dx + dy * dy;
       const t =
         lengthSq === 0 ? 0 : Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / lengthSq));
-      const d = Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
+      const d = dist(x, y, ax + t * dx, ay + t * dy);
       if (d < best) best = d;
     }
     return best;
@@ -285,11 +286,11 @@ export default class Minion extends AttackableUnit {
   resyncWaypoint(): void {
     const { x, y } = this.position;
     let best = this.waypointIndex;
-    let bestDist = Infinity;
+    let bestDistSq = Infinity;
     for (let i = this.waypointIndex; i < this.waypoints.length; i++) {
-      const d = Math.hypot(x - this.waypoints[i].x, y - this.waypoints[i].y);
-      if (d < bestDist) {
-        bestDist = d;
+      const dSq = distSq(x, y, this.waypoints[i].x, this.waypoints[i].y);
+      if (dSq < bestDistSq) {
+        bestDistSq = dSq;
         best = i;
       }
     }
@@ -303,8 +304,7 @@ export default class Minion extends AttackableUnit {
       return;
     }
 
-    const reached =
-      Math.hypot(this.position.x - waypoint.x, this.position.y - waypoint.y) <= WAYPOINT_TOLERANCE;
+    const reached = withinRadius(this.position, waypoint, WAYPOINT_TOLERANCE);
     if (reached && this.waypointIndex < this.waypoints.length - 1) {
       this.waypointIndex += 1;
     }
@@ -657,7 +657,7 @@ export class MinionSwing extends SpellObject {
     if (target) {
       const dx = target.position.x - pos.x;
       const dy = target.position.y - pos.y;
-      const len = Math.hypot(dx, dy);
+      const len = Math.sqrt(dx * dx + dy * dy);
       if (len > 0) {
         dirX = dx / len;
         dirY = dy / len;

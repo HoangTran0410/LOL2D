@@ -9,7 +9,7 @@
  * assigning window.setup here is what activates p5. All game code that uses
  * p5 globals must therefore run inside setup() — NOT at module eval time.
  */
-import { every, filter, forEach, map, some } from './utils/optimized.utils';
+import { every, fastHypot, filter, forEach, map, some } from './utils/optimized.utils';
 import { System } from './libs/detect-collisions';
 import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
@@ -17,6 +17,9 @@ import { registerServiceWorker } from './pwa/updates';
 
 // Expose detect-collisions System globally for code that accesses window.ABC
 (window as any).ABC = { System };
+
+// Patch Math.hypot with fast 2D scalar implementation
+Math.hypot = fastHypot;
 
 // Patch Array prototype for performance (mirrors original app.js behaviour)
 /* eslint-disable @typescript-eslint/no-explicit-any */

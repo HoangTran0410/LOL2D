@@ -1,4 +1,5 @@
 import { Circle } from '../../../libs/quadtree';
+import { withinRadius } from '../../../utils/math.utils';
 import AssetManager, { type AssetKey } from '../../../managers/AssetManager';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
@@ -213,7 +214,7 @@ export default class Monster extends AttackableUnit {
 
   /** Beyond the leash radius: too far from the camp point to still belong to it. */
   isOutsideCamp(): boolean {
-    return Math.hypot(this.position.x - this.camp.x, this.position.y - this.camp.y) > this.camp.r;
+    return !withinRadius(this.position, this.camp, this.camp.r);
   }
 
   /**
@@ -232,10 +233,7 @@ export default class Monster extends AttackableUnit {
 
   /** Whether `target` has left the circle this camp is willing to fight in. */
   hasEscaped(target: AttackableUnit): boolean {
-    return (
-      Math.hypot(target.position.x - this.camp.x, target.position.y - this.camp.y) >
-      this.targetLeashRange()
-    );
+    return !withinRadius(target.position, this.camp, this.targetLeashRange());
   }
 
   updateAttack() {
@@ -342,7 +340,7 @@ export default class Monster extends AttackableUnit {
     // re-aggroing on proximity for the rest of the match while standing on its
     // own camp.
     const home = Math.max(MONSTER_HOME_TOLERANCE, this.stats.size.value / 2);
-    if (Math.hypot(this.position.x - this.camp.x, this.position.y - this.camp.y) <= home) {
+    if (withinRadius(this.position, this.camp, home)) {
       this.phase = Monster.PHASES.IDLE;
       this.stopMovement();
       return;

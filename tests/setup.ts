@@ -1,4 +1,7 @@
 import { vi } from 'vitest';
+import { fastHypot } from '../src/utils/optimized.utils';
+
+Math.hypot = fastHypot;
 
 Object.assign(globalThis, {
   deltaTime: 16,

@@ -1,6 +1,7 @@
 import type AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 import type Spell from '../gameObject/Spell';
 import { canSee, type Seeable } from './Vision';
+import { vecDist } from '../../utils/math.utils';
 
 /**
  * Last-hitting, for a game that cannot click a unit.
@@ -78,7 +79,7 @@ export const isLethal = (damage: number, unit: AttackableUnit): boolean =>
   Math.round(damage) >= effectiveHealth(unit);
 
 const distanceFrom = (origin: { x: number; y: number }, unit: AttackableUnit): number =>
-  Math.hypot(unit.position.x - origin.x, unit.position.y - origin.y);
+  vecDist(origin, unit.position);
 
 /**
  * The caster, when the spell knows one. Every execute spell is a `Spell` and so

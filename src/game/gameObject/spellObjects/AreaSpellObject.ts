@@ -1,4 +1,5 @@
 import { Circle, Rectangle } from '../../../libs/quadtree';
+import { withinRadius } from '../../../utils/math.utils';
 import type { Vec2 } from '../../spell/runtime/types';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -98,10 +99,7 @@ export default class AreaSpellObject extends SpellObject {
   }
 
   private contains(target: AttackableUnit): boolean {
-    return (
-      Math.hypot(target.position.x - this.center.x, target.position.y - this.center.y) <=
-      this.radius + target.collisionRadius
-    );
+    return withinRadius(target.position, this.center, this.radius + target.collisionRadius);
   }
 
   private queryCandidates(): Iterable<AttackableUnit> {

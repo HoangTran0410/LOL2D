@@ -1,4 +1,5 @@
 import { DEFAULT_UNIT_SIZE } from '../gameObject/Stats';
+import { withinRadius } from '../../utils/math.utils';
 
 /**
  * Size-aware reach for caster-centred ranges.
@@ -132,5 +133,6 @@ export function withinRange(authoredRange: number, caster: unknown, target: unkn
   const from = positionOf(caster);
   const to = positionOf(target);
   if (!from || !to) return false;
-  return Math.hypot(to.x - from.x, to.y - from.y) <= effectiveRange(authoredRange, caster, target);
+  const reach = effectiveRange(authoredRange, caster, target);
+  return withinRadius(from, to, reach);
 }

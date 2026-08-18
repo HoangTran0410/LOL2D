@@ -1,4 +1,5 @@
 import { Rectangle } from '../../../libs/quadtree';
+import { withinRadiusCoords } from '../../../utils/math.utils';
 import type { Vec2 } from '../../spell/runtime/types';
 import SpellObject from '../SpellObject';
 import AttackableUnit from '../attackableUnits/AttackableUnit';
@@ -55,10 +56,8 @@ export const intersectsBeam = (target: BeamTarget, geometry: BeamGeometry): bool
         );
   const nearestX = geometry.start.x + dx * projection;
   const nearestY = geometry.start.y + dy * projection;
-  return (
-    Math.hypot(target.position.x - nearestX, target.position.y - nearestY) <=
-    geometry.width / 2 + target.collisionRadius
-  );
+  const maxDist = geometry.width / 2 + target.collisionRadius;
+  return withinRadiusCoords(target.position.x, target.position.y, nearestX, nearestY, maxDist);
 };
 
 export default class BeamSpellObject extends SpellObject {

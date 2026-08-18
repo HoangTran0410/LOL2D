@@ -11,6 +11,8 @@
  * the middle of the screen left empty so neither thumb covers the fight.
  */
 
+import { clamp } from '@/utils/math.utils';
+
 export interface TouchViewport {
   readonly width: number;
   readonly height: number;
@@ -63,9 +65,6 @@ export const TAP_SLOP = 18;
  * spell can never read as aiming another.
  */
 export const CANCEL_RADIUS_SCALE = 1.35;
-
-const clamp = (value: number, low: number, high: number): number =>
-  value < low ? low : value > high ? high : value;
 
 /** Screen coordinates: x right, y *down*, so a 270 degree offset points up. */
 const onArc = (

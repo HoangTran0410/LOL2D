@@ -1,4 +1,5 @@
 import { Circle } from '../../libs/quadtree';
+import { vecDist } from '../../utils/math.utils';
 import AttackableUnit from '../gameObject/attackableUnits/AttackableUnit';
 import { PredefinedFilters } from '../managers/ObjectManager';
 import type GameObject from '../gameObject/GameObject';
@@ -50,7 +51,7 @@ export const FALLBACK_CHASE_MARGIN = 150;
 export type AttackTargetPriority = 'nearest' | 'lowest-health';
 
 const distanceTo = (point: Vec2, unit: AttackableUnit): number =>
-  Math.hypot(unit.position.x - point.x, unit.position.y - point.y);
+  vecDist(point, unit.position);
 
 /**
  * The attackable enemy nearest `point`, or null when the neighbourhood is empty.
@@ -101,7 +102,7 @@ export function findAttackTargetNearPoint(
   let nearest: AttackableUnit | null = null;
   let nearestDistance = Infinity;
   let lowestHealth = Infinity;
-  for (const unit of found) {
+  for (const unit of found as AttackableUnit[]) {
     if (unit === attacker) continue;
     const distance = distanceTo(point, unit);
     if (distance > radius) continue;
@@ -121,7 +122,18 @@ export function findAttackTargetNearPoint(
 }
 
 /**
- * The hostile body closest to a thumb's aim ray. A short drag therefore says
+ * Directional acquisition for swipe-to-aim controls on touch devices.
+ *
+ * The player dragged a line: we want the target the line *points along*, not
+ * merely what happens to be close to the fingertip. A line from the champion
+ * out to the finger defines a ray; units inside a widening wedge around that
+ * ray are candidates, and the one whose angle off the ray is smallest wins.
+ *
+ * "Sticky" targeting gives the previously selected target a wider angular
+ * window so small thumb wobbles do not bounce the target back and forth.
+ *
+ * The gesture was designed for phones: you can aim a skillshot or a basic
+ * attack at a champion three screens away by swiping a centimetre in
  * "that direction" instead of forcing the player to also encode the target's
  * exact distance in a few centimetres of glass.
  */
@@ -133,7 +145,7 @@ export function findAttackTargetAlongRay(
 ): AttackableUnit | null {
   const dx = endpoint.x - attacker.position.x;
   const dy = endpoint.y - attacker.position.y;
-  const reach = Math.hypot(dx, dy);
+  const reach = Math.sqrt(dx * dx + dy * dy);
   if (reach === 0) return null;
   const ux = dx / reach;
   const uy = dy / reach;
@@ -154,11 +166,11 @@ export function findAttackTargetAlongRay(
   let best: AttackableUnit | null = null;
   let bestAngle = Infinity;
   let bestDistance = Infinity;
-  for (const unit of found) {
+  for (const unit of found as AttackableUnit[]) {
     if (unit === attacker) continue;
     const rx = unit.position.x - attacker.position.x;
     const ry = unit.position.y - attacker.position.y;
-    const distance = Math.hypot(rx, ry);
+    const distance = Math.sqrt(rx * rx + ry * ry);
     const along = rx * ux + ry * uy;
     const perpendicular = Math.abs(rx * uy - ry * ux);
     const bodyRadius = (unit.animatedValues?.displaySize ?? 0) / 2;

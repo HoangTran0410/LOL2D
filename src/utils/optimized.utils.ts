@@ -57,3 +57,20 @@ export const map = <T, U>(
   }
   return output;
 };
+
+/**
+ * High-performance 2D/multi-variate hypot replacement.
+ * Uses direct scalar multiplications and Math.sqrt, bypassing V8's variadic scaling loop.
+ */
+export const fastHypot = (a = 0, b = 0, ...rest: number[]): number => {
+  if (rest.length === 0) {
+    return Math.sqrt(a * a + b * b);
+  }
+  let sum = a * a + b * b;
+  for (let i = 0; i < rest.length; i++) {
+    const v = rest[i];
+    sum += v * v;
+  }
+  return Math.sqrt(sum);
+};
+

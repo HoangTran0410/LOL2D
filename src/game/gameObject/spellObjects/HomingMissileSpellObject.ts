@@ -1,4 +1,5 @@
 import MissileSpellObject from '../MissileSpellObject';
+import { withinRadiusCoords } from '../../../utils/math.utils';
 import type AttackableUnit from '../attackableUnits/AttackableUnit';
 
 export type HomingTarget = AttackableUnit;
@@ -48,8 +49,12 @@ export default abstract class HomingMissileSpellObject extends MissileSpellObjec
         : Math.max(0, Math.min(1, (toTargetX * stepX + toTargetY * stepY) / stepLengthSquared));
     const nearestX = previousPosition.x + stepX * progress;
     const nearestY = previousPosition.y + stepY * progress;
-    return (
-      Math.hypot(this.destination.x - nearestX, this.destination.y - nearestY) <= this.arrivalRadius
+    return withinRadiusCoords(
+      this.destination.x,
+      this.destination.y,
+      nearestX,
+      nearestY,
+      this.arrivalRadius
     );
   }
 

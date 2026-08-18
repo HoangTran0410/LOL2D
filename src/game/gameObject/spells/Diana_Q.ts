@@ -1,5 +1,6 @@
 import { Circle } from '../../../libs/quadtree';
 import AssetManager from '../../../managers/AssetManager';
+import { wrapAngle } from '../../../utils/math.utils';
 import { effectiveRange } from '../../combat/Reach';
 import { PredefinedFilters } from '../../managers/ObjectManager';
 import type { CastContext, CastSpec } from '../../spell/runtime/types';
@@ -41,13 +42,6 @@ function sweptFraction(progress: number): number {
 export function bladeReach(fraction: number): number {
   const k = Math.min(Math.max(fraction, 0), 1);
   return Q_RADIUS * (0.12 + 0.88 * (1 - (1 - k) * (1 - k)));
-}
-
-function wrapAngle(angle: number): number {
-  let wrapped = angle;
-  while (wrapped <= -Math.PI) wrapped += Math.PI * 2;
-  while (wrapped > Math.PI) wrapped -= Math.PI * 2;
-  return wrapped;
 }
 
 /**
@@ -220,7 +214,7 @@ export class Diana_Q_Sweep extends SpellObject {
       if (this.cut.has(victim)) continue;
       const dx = victim.position.x - this.position.x;
       const dy = victim.position.y - this.position.y;
-      const away = Math.hypot(dx, dy);
+      const away = Math.sqrt(dx * dx + dy * dy);
       const fraction = wrapAngle(Math.atan2(dy, dx) - this.startAngle) / Q_ARC_RAD;
       if (fraction < -Q_EDGE_PAD || fraction > swept + Q_EDGE_PAD) continue;
       if (Math.abs(away - bladeReach(fraction)) > Q_BAND) continue;
