@@ -34,7 +34,11 @@ function staticDeps(file) {
 }
 
 function chunk(prefix) {
-  const found = readdirSync(assets).filter(name => new RegExp(`^${prefix}-[^-]+\\.js$`).test(name));
+  // The trailing token is Vite's content hash, whose base64url alphabet
+  // includes `-` and `_` — so match anything up to `.js`, not `[^-]+`, or a
+  // hash that happens to contain a hyphen (e.g. `MenuScene-7Yhb0-MG.js`) reads
+  // as zero chunks and fails a perfectly good split at random.
+  const found = readdirSync(assets).filter(name => new RegExp(`^${prefix}-[^.]+\\.js$`).test(name));
   if (found.length !== 1) {
     throw new Error(`expected exactly one ${prefix}-*.js chunk, found ${found.length}`);
   }

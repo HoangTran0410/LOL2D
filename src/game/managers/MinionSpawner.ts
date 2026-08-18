@@ -27,13 +27,14 @@ export const MINION_RELEASE_INTERVAL_MS = 650;
  * ~68s to walk a lane end to end. The largest scheduled overlap is the 30-minute
  * cadence transition: the final 25-second wave (6 minions per lane-side) is only
  * 65 seconds into that walk when three 20-second waves (5 each) have left. Across
- * 3 lanes and 2 teams that is 6 * (6 + 3 * 5) = 126 live minions. The 650ms
- * within-wave release spacing only makes the overlap slightly longer. In
- * practice waves meet near mid and kill each other, so the count usually sits
- * well under this; the cap only catches a genuinely stalled board instead of
- * silently deleting an ordinary late wave — especially its last-released cannon.
+ * 3 lanes and 2 teams that is 6 * (6 + 3 * 5) = 126 live minions, and the 650ms
+ * within-wave release spacing stretches the real overlap a little past even that.
+ * The cap therefore sits above the modelled peak with headroom, so an ordinary
+ * late wave — especially its last-released cannon — is never what the ceiling
+ * deletes. In practice waves meet near mid and kill each other, so the count
+ * usually sits well under this; the cap only catches a genuinely stalled board.
  */
-export const MINION_LIVE_CAP = 126;
+export const MINION_LIVE_CAP = 160;
 
 /**
  * The standard League lane formation: three melee bodies followed by three

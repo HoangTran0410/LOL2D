@@ -4,10 +4,10 @@
  * ## Why this is not `PregameConfig`
  *
  * The two describe the same match and are not interchangeable. `PregameConfig`
- * is plain, serializable data about a match that **does not exist yet**: "five
+ * is plain, serializable data about a match that **does not exist yet**: "three
  * bots" there is a number in an object, and changing it changes nothing until
  * `Game` reads it once at construction. This is the other side — changes to a
- * match that is already running, where "five bots" is five live units holding a
+ * match that is already running, where "three bots" is three live units holding a
  * quadtree slot, a pathfinding agent, a spell list mid-cooldown and a team id
  * other units are resolving hostility against. "Remove bot 3" is an array
  * splice on one side and, on this one, marking a unit for the sweep and letting

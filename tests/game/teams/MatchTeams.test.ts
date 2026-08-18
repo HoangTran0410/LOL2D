@@ -3,14 +3,14 @@ import TeamId from '../../../src/game/enums/TeamId';
 import { initialBotTeam, teamForAddedBot } from '../../../src/game/config/MatchTeams';
 
 describe('match champion teams', () => {
-  it('alternates the initial bots Red/Blue so the default roster is 3v3', () => {
-    const botTeams = Array.from({ length: 5 }, (_, index) => initialBotTeam(index));
+  it('alternates the initial bots Red/Blue so the default roster is 2v2', () => {
+    const botTeams = Array.from({ length: 3 }, (_, index) => initialBotTeam(index));
 
-    expect(botTeams).toEqual([TeamId.RED, TeamId.BLUE, TeamId.RED, TeamId.BLUE, TeamId.RED]);
+    expect(botTeams).toEqual([TeamId.RED, TeamId.BLUE, TeamId.RED]);
 
     const roster = [TeamId.BLUE, ...botTeams];
-    expect(roster.filter(teamId => teamId === TeamId.BLUE)).toHaveLength(3);
-    expect(roster.filter(teamId => teamId === TeamId.RED)).toHaveLength(3);
+    expect(roster.filter(teamId => teamId === TeamId.BLUE)).toHaveLength(2);
+    expect(roster.filter(teamId => teamId === TeamId.RED)).toHaveLength(2);
   });
 
   it('puts a newly added bot on the less populated team', () => {

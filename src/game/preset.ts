@@ -228,13 +228,13 @@ export {
 // longer works, and the reason is worth stating because it is the whole
 // argument for splitting them:
 //
-//   A default match is six `championName: 'random'` loadouts. The config says
-//   none of which six champion rows they will become, so deciding what to load
+//   A default match is four `championName: 'random'` loadouts. The config says
+//   none of which four champion rows they will become, so deciding what to load
 //   from it alone would still answer "all 58 kits" — the exact thing this was
 //   supposed to avoid.
 //
 // So the roll happens first, against ids alone (`planMatchKits` — no module has
-// to have arrived for it to pick names out of a list), the ~24 ids it produces
+// to have arrived for it to pick names out of a list), the ~16 ids it produces
 // are loaded, and only then are classes read (`presetFromPlan`). One roll, and
 // a match that fetches the six kits it is about to play.
 //

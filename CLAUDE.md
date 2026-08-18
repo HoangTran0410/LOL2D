@@ -19,7 +19,7 @@ npm run verify   # everything CI runs — do this before declaring work done
 
 **The app is an installable PWA**, so two build-time facts are load-bearing. `predev`/`prebuild` copy p5 and stats.js out of `node_modules` into `public/vendor/` (gitignored, `scripts/copy-vendor.mjs`) and `index.html` loads them from there rather than a CDN: p5 is a global the game cannot boot without, in dev or production, and a service worker can only cache a cross-origin script it has already seen fetched, so the first offline launch would otherwise be a white screen. Stats.js is the same story only in dev — `GameScene.setup()` gates `new Stats()` behind `import.meta.env.DEV` (three always-redrawing debug canvases cost real frame budget on a phone for a HUD nobody but a developer reads), so it stays vendored and precached for dev builds but is dead weight, not a boot dependency, in production. And `public/` is the only directory Vite copies verbatim, which is why `favicon/` lives there: the generated manifest points at those icons by path. `npm run e2e:pwa` builds and checks the whole thing in a real browser with the network cut — including clearing Chromium's own HTTP cache first, without which a missing precache entry still appears to work.
 
-In-game: right-click moves, `A Q W E R` abilities, `D F` summoners (`SpellHotKeys` in `src/game/constants.ts`), `Space` toggles camera follow, `N` the nav debug overlay, wheel zooms, `Esc` opens the practice panel. **`Esc` does not leave the match** — one mis-hit used to end it outright; the way out is the exit button in the panel's Trận đấu tab, behind a two-step confirm.
+In-game: right-click ground moves and right-clicking a visible enemy attacks it; `A Q W E R` abilities, `D F` summoners (`SpellHotKeys` in `src/game/constants.ts`), `Space` toggles camera follow, `N` the nav debug overlay, wheel zooms, `Esc` opens the practice panel. **`Esc` does not leave the match** — one mis-hit used to end it outright; the way out is the exit button in the panel's Trận đấu tab, behind a two-step confirm.
 
 ## Code style
 
@@ -69,7 +69,7 @@ Objects: `GameObject` → `AttackableUnit` (`Champion`, `AIChampion`, `Minion`, 
 
 ### Teams, lanes and minions
 
-`GameObject.teamId` defaults to a fresh uuid per unit, so **every unit is its own faction, and champions keep that** — player and bots are free-for-all, hostile to everyone including both minion teams. `enums/TeamId.ts` adds the two shared ids that a base's fountain, its turret row (`turret1` blue, `turret2` red in `summoner_map.json`) and its minions share. `lanes.ts` holds three waypoint paths ordered blue → red; red minions walk them backwards, and `tests/game/minions/Lanes.test.ts` checks the coordinates against the wall polygons — edit them and re-run it.
+`GameObject.teamId` still defaults to a fresh uuid for neutral/standalone objects, but a running match assigns champions explicitly: the player is Blue and initial bots alternate Red/Blue (the default player + 3 bots is 2v2); a bot added later joins the smaller side. A champion shares its base's fountain, turret row (`turret1` blue, `turret2` red in `summoner_map.json`) and minions, and spawn/respawn always uses that team's fountain. `lanes.ts` holds three waypoint paths ordered blue → red; red minions walk them backwards, and `tests/game/minions/Lanes.test.ts` checks the coordinates against the wall polygons — edit them and re-run it. Waves start with three melee plus three caster minions; cannon cadence and mid/late wave thinning live in `MinionSpawner.ts`.
 
 ### The practice panel
 

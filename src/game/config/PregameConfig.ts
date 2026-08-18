@@ -51,7 +51,7 @@
  * per bot. Seeding from the defaults would look right (the defaults are a
  * plausible answer) while silently discarding a setting the player really
  * made on the setup screen. A missing `ai.botTeams` gets the stable Red/Blue
- * alternation that balances five bots around the fixed Blue player. `world`
+ * alternation that balances the default three bots around the fixed Blue player. `world`
  * is the same story with a simpler answer: a config saved before it existed
  * meant a match with a full jungle and lane minions, because that is the only
  * match the game could boot.
@@ -202,14 +202,14 @@ export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
 
 /**
  * Reproduces the game's behaviour before this config existed: a fully random
- * champion and kit, 5 AI champions — each also random, alternating Red/Blue
- * around the Blue player for a 3v3 — that move, fight and cast on their own,
+ * champion and kit, 3 AI champions — each also random, alternating Red/Blue
+ * around the Blue player for a 2v2 — that move, fight and cast on their own,
  * no cooldown reduction, full mana costs, a full jungle and lane minions.
  */
 export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
   player: DEFAULT_CHAMPION_LOADOUT,
   ai: Object.freeze({
-    count: 5,
+    count: 3,
     autoMove: DEFAULT_BOT_BEHAVIOUR.autoMove,
     autoAttack: DEFAULT_BOT_BEHAVIOUR.autoAttack,
     autoCast: DEFAULT_BOT_BEHAVIOUR.autoCast,

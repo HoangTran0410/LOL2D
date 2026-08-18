@@ -51,7 +51,7 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
       summonerF: 'Heal',
       customSlots: Array(SLOT_COUNT).fill('random'),
     });
-    expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(5);
+    expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(3);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoMove).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoAttack).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoCast).toBe(true);

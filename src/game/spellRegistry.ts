@@ -25,9 +25,9 @@ import { spellModules } from '@/generated/spellModules';
  *
  * ## Random, and why it still works
  *
- * A default match is six `championName: 'random'` loadouts. Each roll chooses
+ * A default match is four `championName: 'random'` loadouts. Each roll chooses
  * one coherent champion row before loading, so `planMatchKits` fetches only
- * those six champions' chunks rather than the full catalogue.
+ * those four champions' chunks rather than the full catalogue.
  *
  * Respawns re-roll, which is the one case the plan cannot see ahead. That is
  * what `loadRemainingSpells()` is for: the match starts on its own kits, and the
