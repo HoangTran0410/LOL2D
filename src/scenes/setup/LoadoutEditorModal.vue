@@ -43,9 +43,10 @@
  * discard it. That is the in-game picker's contract, and it is what makes
  * "take Ahri's kit, then swap her R" a thing you can back out of.
  *
- * There was a "Huỷ" button beside Xác nhận too, dropped once the slot bar had
- * to hold the roster's view toggle as well — two adjacent buttons whose
- * outcomes differ by the whole edit was a mis-hit worth designing out anyway.
+ * There was a "Huỷ" button beside Xác nhận too, dropped when the slot bar ran
+ * out of room — two adjacent buttons whose outcomes differ by the whole edit was
+ * a mis-hit worth designing out anyway, and the X and the backdrop both still
+ * discard.
  *
  * ## Saving is a third act, next to those two
  *
@@ -61,7 +62,7 @@
  * mounts it over a paused match), so both screens get the library and the same
  * kit crosses between them.
  */
-import { ref, computed, nextTick } from 'vue';
+import { ref, shallowRef, computed, nextTick } from 'vue';
 import type { ChampionLoadout, MatchRules, SlotChoice } from '../../game/config/PregameConfig';
 import { SLOT_COUNT } from '../../game/config/PregameConfig';
 import {
@@ -74,7 +75,6 @@ import {
 import { SpellHotKeys } from '../../game/constants';
 import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '../../game/preset';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
-import { kitRosterView, setKitRosterView } from './kitRosterView';
 import KitRoster from './KitRoster.vue';
 import SpellDetailPane from './SpellDetailPane.vue';
 import SpellIcon from './SpellIcon.vue';
@@ -194,6 +194,16 @@ const detailOf = (entry: SpellCatalogEntry) => getSpellDisplay(entry.spellClass,
 const selectSlot = (index: number): void => {
   if (touchEnd()) return;
   activeSlot.value = index;
+
+  // Selecting a slot answers "what am I filling", so it also decides what the
+  // roster should be offering. A, D and F open the shelf that can fill them
+  // (`shelfForSlot`); moving back to an ability slot closes that shelf, because
+  // a summoner list left standing over a Q selection is offering spells that
+  // slot cannot take. A champion someone opened by hand is left alone — they
+  // are mid-gesture, and the slot bar is how they aim it.
+  const served = shelfForSlot(index);
+  if (served) openShelf.value = served;
+  else if (openShelf.value?.nonChampionKind) openShelf.value = null;
 };
 
 const activeEntryId = computed(() => draftSlots.value[activeSlot.value]?.id ?? null);
@@ -386,44 +396,66 @@ const removeSavedKit = (kit: SavedKit): void => {
   savedKits.value = loadSavedKits();
 };
 
-/* ------------------------------------------------------ compact / expanded */
+/* --------------------------------------------------------- the open shelf */
 
 /**
- * The roster is ~50 shelves and ~200 ability icons, which is a long scroll to
- * find one champion in — and taking a whole kit is what most opens of this
- * editor are for. Compact keeps the champion tiles and drops everything else;
- * expanded is the roster as it was.
+ * Which champion is expanded in the roster, or `null` for a grid of closed
+ * tiles. One at a time, in place — see `KitRoster.vue` for why this replaced a
+ * compact/expanded mode toggle.
  *
- * The state is in a module (`kitRosterView.ts`) and not a `ref` here, because
- * this modal is mounted with `v-if` and `<script setup>` *is* the setup
- * function — a `ref` at the top of this block is rebuilt on every open.
+ * A plain `ref` here, unlike the compact/expanded toggle it replaced. That one
+ * had to live in its own module and its own storage key, because this modal is
+ * mounted with `v-if` and `<script setup>` *is* the setup function, so a `ref`
+ * at this level is rebuilt on every open — and a view *setting* that forgot
+ * itself each time was a bug. The rebuild is the wanted behaviour here: which
+ * champion you had open is a fact about the last few seconds, not a setting, and
+ * an editor that reopened with somebody's kit already expanded would be
+ * answering a question the player has not asked yet.
  */
-const compact = computed(() => kitRosterView.value === 'compact');
-
-const toggleView = (): void => setKitRosterView(compact.value ? 'expanded' : 'compact');
+/**
+ * **`shallowRef`, not `ref`.** The roster decides what to expand by identity
+ * (`shelf === openShelf`), because the catalogue is built once and cached so
+ * both sides are meant to be the very same object. A plain `ref` deep-converts
+ * whatever it holds, handing the roster a reactive *proxy* of the shelf to
+ * compare against the raw one it is iterating — never equal, so the class never
+ * lands. Nothing fails loudly: the hint line reads "Ahri — bấm Dùng cả bộ" while
+ * the roster stays a grid of closed tiles.
+ *
+ * The compact mode this replaced happened not to hit it, which is why it is
+ * worth writing down: its equivalent was a `computed`, and a computed hands back
+ * its value untouched.
+ */
+const openShelf = shallowRef<KitShelf | null>(null);
 
 /**
- * The one shelf compact brings back, and only while a slot no champion ability
- * can fill is selected.
+ * The shelf that serves a slot no champion ability can fill — A, D and F.
  *
- * Compact shows champion tiles because taking a whole kit is its only gesture,
- * which leaves A, D and F unfillable — and those three are the slots a player
- * most often wants to change *without* rebuilding a kit ("Ahri, but Ghost
- * instead of Flash"). Making them work meant either sending the player out to
- * expanded and back, or bringing back the one shelf that serves the selected
- * slot. This is the second.
+ * Those three are the slots a player most often wants to change *without*
+ * rebuilding a kit ("Ahri, but Ghost instead of Flash"), and no champion tile
+ * can offer them, so selecting one of them opens the shelf that can. This is
+ * the same rule the old compact mode implemented as a separate "revealed"
+ * shelf; it is now just one more thing that can be the open shelf.
  *
  * `nonChampionKind` rather than the shelf's name, so a retranslated label
  * cannot quietly break it. Identity is what the roster compares against — the
  * catalogue is built once and cached, so these are the same objects it renders.
  */
-const revealShelf = computed<KitShelf | null>(() => {
-  if (!compact.value) return null;
-  const kind =
-    activeSlot.value === 0 ? 'basicAttack' : activeSlot.value >= SLOT_D ? 'summoner' : null;
+const shelfForSlot = (index: number): KitShelf | null => {
+  const kind = index === 0 ? 'basicAttack' : index >= SLOT_D ? 'summoner' : null;
   if (!kind) return null;
   return kitShelves.find(shelf => shelf.nonChampionKind === kind) ?? null;
-});
+};
+
+/** Tapping a tile opens it; tapping the open one closes it again. */
+const toggleShelf = (shelf: KitShelf): void => {
+  openShelf.value = openShelf.value === shelf ? null : shelf;
+};
+
+// The practice panel can open this editor already pointed at a slot (clicking
+// your own D on the in-game strip). If that slot is one no champion ability can
+// fill, the shelf that can is open from the first frame rather than after a tap
+// the player has no reason to know they owe.
+openShelf.value = shelfForSlot(activeSlot.value);
 
 const confirm = (): void => {
   emit('change', draft.value);
@@ -431,25 +463,20 @@ const confirm = (): void => {
 };
 const cancel = (): void => emit('close');
 
+/**
+ * The line follows what is actually on screen, because the roster offers
+ * different things depending on what is open — and a hint naming a gesture the
+ * grid in front of the player cannot perform is worse than no hint.
+ */
 const hint = computed(() => {
-  // Compact has no ability cards to tap, so the slot the roster would fill is
-  // not what the screen is about — saying "đang chọn chiêu cho ô Q" over a grid
-  // that cannot fill one is the hint pointing at the wrong gesture.
-  if (compact.value) {
-    // A revealed shelf changes what the screen is offering, so it changes what
-    // the line says: there *is* something to pick now.
-    if (revealShelf.value) {
-      return `Đang chọn cho ô ${SLOT_LABELS[activeSlot.value]} — ${revealShelf.value.name} ở đầu danh sách.`;
-    }
-    return 'Bấm một tướng để lấy cả bộ chiêu — mở rộng để chọn từng chiêu.';
+  const open = openShelf.value;
+  if (open?.nonChampionKind) {
+    return `Đang chọn cho ô ${SLOT_LABELS[activeSlot.value]} — bấm một ô bên dưới.`;
   }
-  if (activeSlot.value === 0) {
-    return 'Ô A là đòn đánh thường — đổi ô này là đổi luôn nhịp đánh của tướng.';
+  if (open) {
+    return `${open.name} — bấm "Dùng cả bộ", hoặc một chiêu để đặt vào ô ${SLOT_LABELS[activeSlot.value]}.`;
   }
-  if (activeSlot.value >= SLOT_D) {
-    return `Đang chọn phép bổ trợ cho ô ${SLOT_LABELS[activeSlot.value]}.`;
-  }
-  return `Đang chọn chiêu cho ô ${SLOT_LABELS[activeSlot.value]} — bấm tên tướng để lấy cả bộ.`;
+  return 'Bấm một tướng để mở bộ chiêu — rồi lấy cả bộ hoặc chọn từng chiêu.';
 });
 </script>
 
@@ -495,17 +522,6 @@ const hint = computed(() => {
         </button>
 
         <div class="kit-bar-actions">
-          <button
-            type="button"
-            class="kit-view-toggle"
-            :class="{ compact }"
-            id="kit-view-toggle"
-            :title="compact ? 'Hiện từng chiêu' : 'Thu gọn — chỉ hiện tướng'"
-            :aria-pressed="compact"
-            @click="toggleView"
-          >
-            <i :class="compact ? 'fas fa-list' : 'fas fa-table-cells-large'"></i>
-          </button>
           <button
             type="button"
             class="hextech-btn secondary saved-kit-save"
@@ -577,12 +593,13 @@ const hint = computed(() => {
           :selected-champion="selectedChampion"
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
-          :compact="compact"
-          :reveal-shelf="revealShelf"
+          :open-shelf="openShelf"
+          :active-slot-label="SLOT_LABELS[activeSlot]"
           :saved-kits="savedKits"
           :peek="peek"
           @pick="pickSpell"
           @apply-kit="applyKit"
+          @toggle-shelf="toggleShelf"
           @pick-random="pickRandom"
           @apply-saved-kit="applySavedKit"
           @delete-saved-kit="removeSavedKit"

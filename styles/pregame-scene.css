@@ -530,35 +530,6 @@
   gap: 0.4rem;
 }
 
-/* The compact/expanded switch: a pill's shape without a pill's class. It
-   changes what the roster shows rather than committing or discarding
-   anything, and `.kit-slot-pill` is counted by the e2e as "the seven slots
-   plus the one button that acts on them" — see LoadoutEditorModal.vue. So the
-   sizing is borrowed here instead, the way `.saved-kit-save` borrows
-   `.kit-bar-btn`'s. */
-.kit-view-toggle {
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--hextech-sunken);
-  border: 2px solid var(--hextech-line);
-  color: var(--hextech-text);
-  cursor: pointer;
-}
-
-.kit-view-toggle:hover {
-  border-color: var(--hextech-gold-dim);
-}
-
-/* Held lit while compact, the way `.saved-kit-save.open` marks its own state. */
-.kit-view-toggle.compact {
-  border-color: var(--hextech-gold);
-  color: var(--hextech-gold);
-}
-
 /* Below this the slot bar is eight pills and four buttons on a landscape
    phone, and the words are what stops fitting. The icons and the
    `title`/`aria-label` on every one of them carry the meaning through — see
@@ -678,99 +649,136 @@
    48px icons plus their gaps and the shelf's own padding, so a champion's
    kit never wraps to a second line. */
 
+/* Champion tiles — a portrait over a name — so the track is a tile's width
+   rather than "a name over four 48px icons". There used to be a second, wider
+   layout behind a compact/expanded toggle; opening one shelf in place replaced
+   both of them, so this is now the only grid. See `KitRoster.vue`. */
 .kit-roster {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
   align-items: start;
   gap: 0.4rem;
 }
 
-/* ------------------------------------------------------- compact roster
-   Champion tiles only. Everything here hides rather than removes: the roster
+/* ------------------------------------------------ closed tiles, one open shelf
+   Everything a closed tile does not show hides rather than unmounts: the roster
    is ~50 shelves and ~200 icons, and `KitRoster.vue` keeps them all mounted so
-   the toggle is instant instead of a rebuild (`loading="lazy"` already means
+   opening one is instant instead of a rebuild (`loading="lazy"` already means
    an icon nobody scrolled to never fetched). The e2e drives count `.kit-shelf`
-   and `.catalog-spell-card`, and those counts are unchanged by design.
-
-   Narrower tracks, because a tile is a portrait and a name rather than a name
-   over four 48px icons. */
-.kit-roster.compact {
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
-}
+   and `.catalog-spell-card` expecting the whole catalogue in the DOM, and check
+   what is actually *visible* separately. */
 
 /* The two shelves that are not a champion — the basic attack and the summoner
-   spells. `has-kit` is the same predicate that gives a shelf its whole-kit
-   button, so this cannot select a shelf that would have had nothing to do. */
-.kit-roster.compact .kit-shelf:not(.has-kit),
-.kit-roster.compact .catalog-group-row {
+   spells. `has-kit` is the same predicate that gives a shelf its tile button,
+   so this cannot select a shelf that would have had nothing to open. */
+.kit-roster .kit-shelf:not(.has-kit),
+.kit-roster .catalog-group-row {
   display: none;
 }
 
-/* ...except the one shelf that serves the selected slot.
-
-   Compact's gesture is "take a whole kit", which leaves A, D and F unfillable
-   — and those are the slots a player most often changes without wanting to
-   rebuild anything. So when one of them is selected, its shelf comes back
-   expanded and full width while the champion tiles stay as they are. The
-   parent picks which shelf; see `LoadoutEditorModal.revealShelf`.
+/* ...except whichever shelf is open, which spans the grid and pushes the tiles
+   after it down — an accordion, so the champion stays where it was tapped
+   instead of the list jumping.
 
    Placed immediately after the hide rules, and that is load-bearing: both
-   selectors carry four classes, so they have equal specificity and the later
+   selectors carry three classes, so they have equal specificity and the later
    one wins. Moving this block above them silently turns the feature off. */
-.kit-roster.compact .kit-shelf.revealed {
+.kit-roster .kit-shelf.open {
   display: block;
   grid-column: 1 / -1;
   border-color: var(--hextech-gold-dim);
 }
 
-.kit-roster.compact .kit-shelf.revealed .catalog-group-row {
+.kit-roster .kit-shelf.open .catalog-group-row {
   display: flex;
 }
 
 /* Back to the ordinary horizontal heading — the column layout below is for a
-   tile, and this one is a row again. */
-.kit-roster.compact .kit-shelf.revealed .kit-shelf-heading {
+   tile, and an open shelf's heading is a row again. */
+.kit-roster .kit-shelf.open .kit-shelf-heading {
   flex-direction: row;
   margin-bottom: 0.35rem;
   text-align: left;
 }
 
-.kit-roster.compact .kit-shelf.revealed .kit-shelf-name {
+.kit-roster .kit-shelf.open .kit-shelf-name {
   width: auto;
   text-align: left;
 }
 
-.kit-roster.compact .kit-shelf.revealed .catalog-group-avatar {
+.kit-roster .kit-shelf.open .catalog-group-avatar {
   width: 35px;
   height: 35px;
 }
 
-/* The whole tile is the button, so the chip that used to advertise it is one
-   label too many; the portrait goes on top of the name instead of beside it,
-   which is what lets the track be 132px. */
-.kit-roster.compact .kit-apply-chip {
+/* A closed tile carries no chip: the portrait sits on top of the name rather
+   than beside it, which is what lets the track be 132px, and there is nothing
+   to advertise when tapping only opens. The open shelf gets the chip back as
+   its close affordance.
+
+   Scoped to the roster rather than the shelf so the saved-kit rows keep the
+   behaviour they already had — `.saved-kit-apply` reuses `.kit-apply-chip`, and
+   its chip has been hidden here since compact became the default. */
+.kit-roster .kit-apply-chip {
   display: none;
 }
 
-.kit-roster.compact .kit-shelf-heading {
+.kit-roster .kit-shelf.open .kit-apply-chip {
+  display: inline-block;
+}
+
+.kit-roster .kit-shelf-heading {
   flex-direction: column;
   gap: 0.3rem;
   margin-bottom: 0;
   text-align: center;
 }
 
-.kit-roster.compact .catalog-group-avatar {
+.kit-roster .catalog-group-avatar {
   width: 52px;
   height: 52px;
 }
 
-.kit-roster.compact .kit-shelf-name {
+.kit-roster .kit-shelf-name {
   width: 100%;
   text-align: center;
 }
 
-.kit-roster.compact .kit-shelf {
+.kit-roster .kit-shelf {
   padding: 0.5rem 0.35rem;
+}
+
+/* The open shelf's two answers, on one row above its abilities: the whole-kit
+   button, and a line naming the slot a tapped ability would land in. The note
+   is what keeps the ability icons from being a guess — they fill the slot
+   selected up in the bar, which is somewhere else on the screen. */
+.kit-shelf-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.kit-apply-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.85em;
+}
+
+/* `text-transform`/`letter-spacing` are reset explicitly: this sits inside
+   `.kit-shelf`, whose heading styling uppercases and tracks out its text, and a
+   sentence of guidance rendered in spaced capitals reads as a label rather than
+   as something to follow. */
+.kit-cta-note {
+  min-width: 0;
+  color: var(--hextech-muted);
+  font-size: 0.78em;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 /* The saved-kit library, ahead of everything else in the roster: it is the
@@ -1348,13 +1356,13 @@ body.touch-ui .spell-peek .spell-detail-body {
     padding: 0.3rem 0.5rem;
   }
 
-  /* The roster's own rows, compacted. A landscape phone has ~210px of list;
-     the shelves are side by side now, so what buys back a row here is a
-     narrower track (three to a row instead of two on an 844px-wide phone)
-     and a smaller icon — 44px, still exactly a thumb target, rather than the
-     48px a roomier screen gets. */
+  /* The roster's own rows, compacted. A landscape phone has ~210px of list, so
+     what buys back a row here is a narrower tile track and a smaller icon —
+     44px, still exactly a thumb target, rather than the 48px a roomier screen
+     gets. The track was 200px when a row was a name over four icons; a tile is
+     a portrait over a name, so it wants roughly half that. */
   .kit-roster {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
   }
 
   .catalog-spell-card {

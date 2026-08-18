@@ -46,11 +46,11 @@ export interface KitShelf {
    * What this shelf serves when it is not a champion's row: the basic attack,
    * or the summoner spells. `null` for every champion.
    *
-   * Compact mode hides both of these — neither has a kit to apply, which is
-   * compact's only gesture — but the slot bar can still select A, D or F, and
-   * those three slots are filled from exactly these two shelves. This is how
-   * the editor knows which one to bring back for the selected slot without
-   * leaving compact; see `LoadoutEditorModal.revealShelf`.
+   * The roster's tile grid holds neither of these — a tile opens a champion's
+   * kit and neither of these is a champion — but the slot bar can still select
+   * A, D or F, and those three slots are filled from exactly these two shelves.
+   * This is how the editor knows which one to open for the selected slot; see
+   * `LoadoutEditorModal.shelfForSlot`.
    *
    * Derived from the catalogue rather than from the display name: matching
    * `'Phép Bổ Trợ'` as a string would break the moment the label is

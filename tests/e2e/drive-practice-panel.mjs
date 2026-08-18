@@ -351,7 +351,16 @@ try {
   // Every control below belongs to the *setup screen's* editor, which is wired
   // to `@click` alone; it is reachable here only through `RosterTab`'s touch
   // bridge, so driving it by thumb is the point of doing it this way.
+  // Two taps, because a tile is a disclosure: the first opens Zed's shelf, the
+  // button inside it is what takes the kit. Driving both by thumb is the point —
+  // the whole-kit button is new surface, and it is wired to `@click` alone like
+  // everything else in that editor.
   await tapSelector('.kit-shelf[data-champion="Zed"] .kit-shelf-apply');
+  await page.waitForSelector('.kit-shelf[data-champion="Zed"].open .kit-apply-all', {
+    state: 'visible',
+    timeout: 5_000,
+  });
+  await tapSelector('.kit-shelf[data-champion="Zed"] .kit-apply-all');
   await tapSelector('.kit-bar-btn:not(.secondary)'); // Xác nhận
   await page.waitForTimeout(250);
   const afterSwap = await botSnapshot(botId);

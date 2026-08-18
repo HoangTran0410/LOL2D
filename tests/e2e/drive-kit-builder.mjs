@@ -9,10 +9,16 @@
  * two different editors, each of which drilled into a *third* view: a per-slot
  * catalogue you highlighted in and committed out of ("Dùng chiêu này"), one
  * slot at a time. All of that is gone. It is now one screen — seven slot pills
- * pinned above the whole roster, one tap to fill the selected slot, one tap on
- * a shelf header to take a champion's entire kit — with every pick held as a
+ * pinned above a grid of champion tiles, where tapping a tile opens that
+ * champion in place and offers both answers at once: "Dùng cả bộ" for the whole
+ * kit, or one of its abilities for the selected slot — with every pick held as a
  * *draft* until "Xác nhận" (see `LoadoutEditorModal.vue` and `KitRoster.vue`).
  * This script drives exactly that shape rather than the old drill-down.
+ *
+ * A compact/expanded toggle over the same roster came in between and is also
+ * gone: it made the player choose up front between tiles that could not fill a
+ * single slot and ~200 ability icons too dense to find a champion in. Section 8
+ * is what used to check it and now checks the disclosure that replaced it.
  *
  * What it proves, in order:
  *   1. the roster exposes the *whole* spell catalogue in one scrolling list,
@@ -71,7 +77,6 @@ page.on('console', m => {
 const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
 const CFG = 'lol2d:pregameConfig:v1';
-const VIEW = 'lol2d:kitRosterView:v1';
 
 /** Records a mismatch instead of throwing, so one bad expectation doesn't hide the rest of the run. */
 const expect = (label, actual, expected) => {
@@ -101,10 +106,39 @@ const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác
  * anything that *counts* pills has to say `:not(.kit-slot-random)` though.
  */
 const selectSlot = index => page.click(`.kit-slot-bar .kit-slot-pill:nth-child(${index + 1})`);
-/** Puts one catalogue entry (an `AllSpells` barrel key) into the selected slot. */
-const pickSpell = id => page.click(`.catalog-spell-card[data-spell="${id}"]`);
-/** Takes a whole shelf's kit in one tap — the shelf header doubles as the button. */
-const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-shelf-apply`);
+/** Opens a shelf's tile, or leaves it alone if it is already the open one. */
+const openShelf = name =>
+  evaluate(n => {
+    const shelf = document.querySelector(`.kit-shelf[data-champion="${n}"]`);
+    if (shelf && !shelf.classList.contains('open')) shelf.querySelector('.kit-shelf-apply')?.click();
+  }, name);
+
+/**
+ * Taps one ability, opening the shelf that holds it first.
+ *
+ * That second step is the gesture now, not a workaround: the roster is a grid of
+ * closed champion tiles and only the open shelf shows its abilities, so a
+ * player reaching a single spell opens its champion on the way. The script used
+ * to skip it by seeding the old `expanded` view into `localStorage` before the
+ * page loaded, which drove a layout no default player ever saw.
+ *
+ * The owning shelf is found from the card rather than passed in, so a caller
+ * still names only the spell it wants.
+ */
+const pickSpell = async id => {
+  await evaluate(s => {
+    const card = document.querySelector(`.catalog-spell-card[data-spell="${s}"]`);
+    const shelf = card?.closest('.kit-shelf');
+    if (shelf && !shelf.classList.contains('open')) shelf.querySelector('.kit-shelf-apply')?.click();
+  }, id);
+  await page.click(`.catalog-spell-card[data-spell="${id}"]`);
+};
+
+/** Takes a whole shelf's kit: open the tile, then the Dùng cả bộ button inside it. */
+const applyShelf = async name => {
+  await openShelf(name);
+  await page.click(`.kit-shelf[data-champion="${name}"] .kit-apply-all`);
+};
 
 const storedPlayer = () =>
   evaluate(k => JSON.parse(localStorage.getItem(k) ?? 'null')?.player ?? null, CFG);
@@ -165,12 +199,6 @@ const editPlayer = async steps => {
 try {
   await page.goto(url, { waitUntil: 'load' });
   await evaluate(k => localStorage.removeItem(k), CFG);
-  // The roster opens compact now (`kitRosterView.ts`), which hides the ability
-  // cards — and Playwright will not click what it cannot see. Everything below
-  // this point drives individual spells, so the run is seeded expanded and the
-  // compact mode gets its own check at the end.
-  await evaluate(k => localStorage.setItem(k, 'expanded'), VIEW);
-  await page.reload({ waitUntil: 'load' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.waitForTimeout(150);
@@ -473,6 +501,7 @@ try {
   // nothing" is visible in the roster too: `.catalog-spell-card.selected`
   // tracks whatever sits in the active slot (Olaf_Q, from the kit just built),
   // and must still say so with Lux_Q under the cursor.
+  await openShelf('Lux'); // a closed tile hides its cards, and hover needs a visible one
   await page.hover('.catalog-spell-card[data-spell="Lux_Q"]');
   await page.waitForTimeout(250);
   report.hoverDescribesWithoutPicking = await evaluate(() => {
@@ -538,6 +567,7 @@ try {
     evaluate(
       () => document.querySelector('.spell-peek .spell-detail-header h3')?.textContent ?? null
     );
+  await openShelf('Yasuo');
   await page.hover('.catalog-spell-card[data-spell="Yasuo_W"]');
   await page.waitForTimeout(250);
   const cardTitle = await peekTitle();
@@ -759,88 +789,108 @@ try {
   ]);
   await page.screenshot({ path: `${OUT}-live-match.png` });
 
-  // 8. compact roster: champion tiles only, and a tile is the whole kit
+  // 8. the roster's two states: a grid of closed tiles, and one open shelf
   //
-  // Last, because it leaves the stored view on 'compact' — and the reload in
-  // the middle of it is the point of the check, not scaffolding: the toggle
-  // lives in a module with a `localStorage` key precisely so it survives the
-  // modal being unmounted and the page being closed, and a check that never
-  // reloads would pass on a plain `ref` in `<script setup>`.
+  // This replaced a compact/expanded mode toggle, and the check replaced with
+  // it: there is no stored view to seed any more, so the section opens the
+  // editor the way a player does and drives the disclosure itself.
+  //
+  // Last, and still after a fresh load, because what it proves is that the
+  // *default* state of the roster is the closed grid. Seeded state was how the
+  // old version of this script hid the fact that everything above it drove a
+  // layout no default player ever saw.
   await page.goto(url, { waitUntil: 'load' });
-  await evaluate(k => localStorage.setItem(k, 'compact'), VIEW);
-  await page.reload({ waitUntil: 'load' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
   await page.waitForTimeout(150);
 
-  report.compactRoster = await evaluate(() => {
-    // `offsetParent === null` is what `display: none` on the element or on any
-    // ancestor produces, which is exactly how compact hides things.
-    const shown = selector =>
-      [...document.querySelectorAll(selector)].filter(element => element.offsetParent !== null)
-        .length;
-    return {
-      toggleOn: document.querySelector('#kit-view-toggle')?.classList.contains('compact') ?? null,
-      // The DOM is deliberately unchanged — compact hides, it does not unmount.
-      shelvesInDom: document.querySelectorAll('.kit-shelf').length,
-      cardsInDom: document.querySelectorAll('.catalog-spell-card').length,
-      // ...and these are what a player can actually see and press.
-      shelvesVisible: shown('.kit-shelf'),
-      cardsVisible: shown('.catalog-spell-card'),
-      nonChampionShelvesVisible: shown('.kit-shelf:not(.has-kit)'),
-      randomCardVisible: shown('.catalog-random-card'),
-      labelsVisible: shown('.kit-bar-label'),
-    };
-  });
-
-  expect('compactRoster.toggleOn', report.compactRoster.toggleOn, true);
-  // Same numbers section 1 asserted while expanded: compact hides, it does not
-  // unmount — and derived from the catalogue for the same reason they are there.
-  expect('compactRoster.shelvesInDom', report.compactRoster.shelvesInDom, report.catalog.shelves);
-  expect('compactRoster.cardsInDom', report.compactRoster.cardsInDom, report.catalog.entries);
-  // Every shelf that has a kit, and only those: the two that are not a
-  // champion have no kit to apply, so compact has nothing to show for them.
-  expect(
-    'compactRoster.shelvesVisible',
-    report.compactRoster.shelvesVisible,
-    report.catalog.withKit
-  );
-  expect(
-    'compactRoster.nonChampionShelvesVisible',
-    report.compactRoster.nonChampionShelvesVisible,
-    0
-  );
-  expect('compactRoster.cardsVisible', report.compactRoster.cardsVisible, 0);
-  // Ngẫu Nhiên stays: it is a whole-loadout action, which is what compact is for.
-  expect('compactRoster.randomCardVisible', report.compactRoster.randomCardVisible, 1);
-  // Desktop viewport, so what labels there are keep their words. Just the one:
-  // Xác nhận is the only button in the bar still carrying a word — Huỷ is gone
-  // and Lưu bộ is icon-only (see `LoadoutEditorModal.vue`). The number is the
-  // control for the narrow-viewport check at the end, which is the real
-  // assertion; if a label comes back, that one is what has to keep passing.
-  expect('compactRoster.labelsVisible', report.compactRoster.labelsVisible, 1);
-
-  await page.screenshot({ path: `${OUT}-compact-roster.png` });
-
-  // ## The one shelf compact lets through
-  //
-  // Taking a whole kit is compact's only gesture, which leaves A, D and F —
-  // the three slots no champion ability fills — unreachable. Selecting one
-  // brings its shelf back expanded, and nothing else with it. The roster is
-  // ordered for this too: both non-champion shelves are pinned ahead of the
-  // champions, which are sorted by name.
-  const compactShown = () =>
+  const rosterShown = () =>
     evaluate(() => {
-      const shown = s => [...document.querySelectorAll(s)].filter(e => e.offsetParent !== null);
+      // `offsetParent === null` is what `display: none` on the element or on any
+      // ancestor produces, which is exactly how a closed tile hides its body.
+      const shown = selector =>
+        [...document.querySelectorAll(selector)].filter(element => element.offsetParent !== null);
       return {
-        revealed: document.querySelector('.kit-shelf.revealed')?.dataset.champion ?? null,
-        cardIds: shown('.catalog-spell-card').map(e => e.dataset.spell),
+        open: document.querySelector('.kit-shelf.open')?.dataset.champion ?? null,
+        // The DOM is deliberately unchanged — closing hides, it does not unmount.
+        shelvesInDom: document.querySelectorAll('.kit-shelf').length,
+        cardsInDom: document.querySelectorAll('.catalog-spell-card').length,
+        // ...and these are what a player can actually see and press.
+        shelvesVisible: shown('.kit-shelf').length,
+        cardIds: shown('.catalog-spell-card').map(element => element.dataset.spell),
+        nonChampionShelvesVisible: shown('.kit-shelf:not(.has-kit)').length,
+        wholeKitButtonsVisible: shown('.kit-apply-all').length,
+        randomCardVisible: shown('.catalog-random-card').length,
+        labelsVisible: shown('.kit-bar-label').length,
       };
     });
 
-  report.compactOrder = await evaluate(() =>
+  report.rosterClosed = await rosterShown();
+
+  expect('rosterClosed.open', report.rosterClosed.open, null);
+  // Same numbers section 1 asserted, and derived from the catalogue for the same
+  // reason they are there: closing hides, it does not unmount.
+  expect('rosterClosed.shelvesInDom', report.rosterClosed.shelvesInDom, report.catalog.shelves);
+  expect('rosterClosed.cardsInDom', report.rosterClosed.cardsInDom, report.catalog.entries);
+  // Every shelf that has a kit, and only those: the two that are not a champion
+  // are opened by selecting the slot they serve, never by being tapped.
+  expect('rosterClosed.shelvesVisible', report.rosterClosed.shelvesVisible, report.catalog.withKit);
+  expect('rosterClosed.nonChampionShelvesVisible', report.rosterClosed.nonChampionShelvesVisible, 0);
+  // The whole point of the rework: nothing is pickable and nothing is
+  // committable until a tile is opened, so a stray tap on the grid cannot
+  // replace the kit.
+  expect('rosterClosed.cardIds', report.rosterClosed.cardIds, []);
+  expect('rosterClosed.wholeKitButtonsVisible', report.rosterClosed.wholeKitButtonsVisible, 0);
+  // Ngẫu Nhiên stays: it is a whole-loadout action and needs no champion.
+  expect('rosterClosed.randomCardVisible', report.rosterClosed.randomCardVisible, 1);
+  // Desktop viewport, so what labels there are keep their words. Just the one:
+  // Xác nhận is the only button in the bar still carrying a word — Huỷ is gone,
+  // Lưu bộ is icon-only, and the view toggle it used to sit beside no longer
+  // exists (see `LoadoutEditorModal.vue`). The number is the control for the
+  // narrow-viewport check at the end, which is the real assertion; if a label
+  // comes back, that one is what has to keep passing.
+  expect('rosterClosed.labelsVisible', report.rosterClosed.labelsVisible, 1);
+
+  await page.screenshot({ path: `${OUT}-roster-closed.png` });
+
+  // Opening one champion shows exactly that champion's abilities and exactly one
+  // whole-kit button. "Exactly" is the assertion: an accordion that opened two
+  // shelves, or left a previous one open, is the density this replaced.
+  await openShelf('Ahri');
+  report.rosterOpen = await rosterShown();
+  expect('rosterOpen.open', report.rosterOpen.open, 'Ahri');
+  expect('rosterOpen.cardIds', report.rosterOpen.cardIds, [
+    'Ahri_Q',
+    'Ahri_W',
+    'Ahri_E',
+    'Ahri_R',
+  ]);
+  expect('rosterOpen.wholeKitButtonsVisible', report.rosterOpen.wholeKitButtonsVisible, 1);
+
+  await openShelf('Lux');
+  report.rosterSwitched = await rosterShown();
+  expect('rosterSwitched.open', report.rosterSwitched.open, 'Lux');
+  expect('rosterSwitched.cardCount', report.rosterSwitched.cardIds.length, 4);
+
+  // Tapping the open tile closes it again, back to the grid.
+  await page.click('.kit-shelf[data-champion="Lux"] .kit-shelf-apply');
+  report.rosterReclosed = await rosterShown();
+  expect('rosterReclosed.open', report.rosterReclosed.open, null);
+  expect('rosterReclosed.cardIds', report.rosterReclosed.cardIds, []);
+
+  await page.screenshot({ path: `${OUT}-roster-open.png` });
+
+  // ## The two shelves a champion tile cannot offer
+  //
+  // A, D and F are filled from the basic-attack and summoner shelves, which are
+  // not champions and so are not tiles. Selecting one of those slots opens the
+  // shelf that serves it; going back to an ability slot closes it again, because
+  // a summoner list standing over a Q selection offers spells that slot cannot
+  // take. The roster is ordered for this too: both non-champion shelves are
+  // pinned ahead of the champions, which are sorted by name.
+  report.shelfOrder = await evaluate(() =>
     [...document.querySelectorAll('.kit-shelf')].slice(0, 3).map(e => e.dataset.champion)
   );
   // The third is whichever champion sorts first, read off the catalogue rather
@@ -853,15 +903,16 @@ try {
         .map(shelf => shelf.name)[0] ?? null
     );
   });
-  expect('compactOrder', report.compactOrder, ['Đánh Thường', 'Phép Bổ Trợ', firstChampion]);
+  expect('shelfOrder', report.shelfOrder, ['Đánh Thường', 'Phép Bổ Trợ', firstChampion]);
 
-  await selectSlot(1); // Q — an ability slot, so nothing is revealed
-  report.compactOnAbilitySlot = await compactShown();
-  expect('compactOnAbilitySlot', report.compactOnAbilitySlot, { revealed: null, cardIds: [] });
+  await selectSlot(1); // Q — an ability slot, so nothing opens on its own
+  report.slotQ = await rosterShown();
+  expect('slotQ.open', report.slotQ.open, null);
+  expect('slotQ.cardIds', report.slotQ.cardIds, []);
 
   await selectSlot(5); // D
-  report.compactOnD = await compactShown();
-  expect('compactOnD.revealed', report.compactOnD.revealed, 'Phép Bổ Trợ');
+  report.slotD = await rosterShown();
+  expect('slotD.open', report.slotD.open, 'Phép Bổ Trợ');
   // Exactly the summoner spells, from the catalogue rather than a hand list.
   const summonerIds = await evaluate(async () => {
     const { getPregameCatalog } = await import('/src/scenes/setup/pregameCatalog.ts');
@@ -869,28 +920,31 @@ try {
       .summoners.map(option => option.id)
       .sort();
   });
-  expect('compactOnD.cardIds', [...report.compactOnD.cardIds].sort(), summonerIds);
+  expect('slotD.cardIds', [...report.slotD.cardIds].sort(), summonerIds);
+  // No whole-kit button: there is no kit here to take.
+  expect('slotD.wholeKitButtonsVisible', report.slotD.wholeKitButtonsVisible, 0);
 
   // Picked while D is the selected slot, so it lands in a summoner field and
-  // leaves the loadout a champion pick — the same rule section 3 proves in
-  // expanded mode, now reachable without leaving compact.
+  // leaves the loadout a champion pick — the same rule section 3 proves, now
+  // reachable without hunting for the shelf.
   await pickSpell('Ignite');
 
   await selectSlot(0); // A
-  report.compactOnA = await compactShown();
-  expect('compactOnA', report.compactOnA, {
-    revealed: 'Đánh Thường',
-    cardIds: ['BasicAttack'],
-  });
+  report.slotA = await rosterShown();
+  expect('slotA.open', report.slotA.open, 'Đánh Thường');
+  expect('slotA.cardIds', report.slotA.cardIds, ['BasicAttack']);
 
+  // Back to an ability slot: the summoner shelf must not be left standing.
   await selectSlot(1);
+  report.slotBackToQ = await rosterShown();
+  expect('slotBackToQ.open', report.slotBackToQ.open, null);
 
-  // A tile applies the champion's whole kit, which is compact's one gesture.
+  // A tile opens; the button inside it is what takes the kit.
   await applyShelf('Ahri');
   await confirmLoadout();
-  report.compactApplied = await storedPlayer();
-  expect('compactApplied.mode', report.compactApplied?.mode, 'champion');
-  expect('compactApplied.championName', report.compactApplied?.championName, 'Ahri');
+  report.tileApplied = await storedPlayer();
+  expect('tileApplied.mode', report.tileApplied?.mode, 'champion');
+  expect('tileApplied.championName', report.tileApplied?.championName, 'Ahri');
 } catch (error) {
   report.FAILURE = `${error.message}\n${error.stack}`;
 } finally {

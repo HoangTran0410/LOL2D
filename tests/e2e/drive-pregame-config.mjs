@@ -12,12 +12,14 @@
  * has a `.stop`-guarded child handler competing with its own, so this script
  * uses plain `page.click()` throughout (no coordinate workarounds needed).
  *
- * The editor inside that modal is one screen: seven slot pills pinned above
- * the whole spell roster, a shelf header to take a champion's entire kit, and
- * every pick held as a draft until "Xác nhận" ("Huỷ", the X and the backdrop
- * all discard it) — see LoadoutEditorModal.vue / KitRoster.vue. The mode
- * toggle, the champion grid and the per-slot drill-down catalogue it replaced
- * are gone, and so are the selectors that named them.
+ * The editor inside that modal is one screen: seven slot pills pinned above a
+ * grid of champion tiles, where tapping a tile opens that champion in place and
+ * offers "Dùng cả bộ" for the whole kit or any one of its abilities for the
+ * selected slot — every pick held as a draft until "Xác nhận" (the X and the
+ * backdrop discard it) — see LoadoutEditorModal.vue / KitRoster.vue. The mode
+ * toggle, the champion grid, the per-slot drill-down catalogue and the later
+ * compact/expanded switch it all replaced are gone, and so are the selectors
+ * that named them.
  *
  * What it proves, in order:
  *   1. the menu's "Chơi" button is still a one-click path into a match (no
@@ -63,9 +65,9 @@ const openParticipantAt = n => page.click(`#pregame-participant-list .participan
 /** The header X. It discards the draft now, exactly like "Huỷ" — see LoadoutEditorModal.vue. */
 const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
 /**
- * The way out without committing. The slot bar's "Huỷ" button is gone — it was
- * dropped when the bar had to hold the view toggle too — so this is the header
- * X, which is the same `cancel` handler it called.
+ * The way out without committing. The slot bar's "Huỷ" button is gone — dropped
+ * when the bar ran out of room — so this is the header X, which is the same
+ * `cancel` handler it called.
  */
 const cancelLoadout = dismissLoadoutModal;
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
@@ -76,20 +78,47 @@ const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác
  * anything that *counts* pills has to say `:not(.kit-slot-random)` though.
  */
 const selectSlot = index => page.click(`.kit-slot-bar .kit-slot-pill:nth-child(${index + 1})`);
-/** Puts one catalogue entry (an `AllSpells` barrel key) into the selected slot. */
-const pickSpell = id => page.click(`.catalog-spell-card[data-spell="${id}"]`);
-/** Takes a whole shelf's kit in one tap — the shelf header doubles as the button. */
-const applyShelf = name => page.click(`.kit-shelf[data-champion="${name}"] .kit-shelf-apply`);
+/**
+ * Opens a champion's shelf in the roster, or leaves it alone if it is already
+ * the open one.
+ *
+ * The roster is a grid of closed champion tiles and only the open shelf shows
+ * its abilities, so reaching any single spell means opening its champion first —
+ * that is the gesture, not scaffolding. Takes the page so the touch-viewport
+ * clone can use it too.
+ */
+const openShelfOn = (target, name) =>
+  target.evaluate(n => {
+    const shelf = document.querySelector(`.kit-shelf[data-champion="${n}"]`);
+    if (shelf && !shelf.classList.contains('open'))
+      shelf.querySelector('.kit-shelf-apply')?.click();
+  }, name);
+
+/**
+ * Puts one catalogue entry (an `AllSpells` barrel key) into the selected slot,
+ * opening the shelf that holds it first. The owning shelf is found from the card
+ * rather than passed in, so a caller still names only the spell it wants.
+ */
+const pickSpell = async id => {
+  await evaluate(s => {
+    const card = document.querySelector(`.catalog-spell-card[data-spell="${s}"]`);
+    const shelf = card?.closest('.kit-shelf');
+    if (shelf && !shelf.classList.contains('open'))
+      shelf.querySelector('.kit-shelf-apply')?.click();
+  }, id);
+  await page.click(`.catalog-spell-card[data-spell="${id}"]`);
+};
+
+/** Takes a whole shelf's kit: open the tile, then the Dùng cả bộ button inside it. */
+const applyShelf = async name => {
+  await openShelfOn(page, name);
+  await page.click(`.kit-shelf[data-champion="${name}"] .kit-apply-all`);
+};
 
 try {
   await page.goto(url, { waitUntil: 'load' });
   await page.evaluate(() => {
     localStorage.removeItem('lol2d:pregameConfig:v1');
-    // The loadout roster opens compact (`kitRosterView.ts`), which hides the
-    // ability cards — and Playwright will not click what it cannot see. This
-    // script drives individual spells throughout, so it asks for the expanded
-    // roster up front. `drive-kit-builder.mjs` is the one that covers compact.
-    localStorage.setItem('lol2d:kitRosterView:v1', 'expanded');
   });
 
   // 1. "Chơi" is still a one-click path into a match with nothing configured
@@ -400,6 +429,9 @@ try {
    * touch path holds a synthetic finger still through CDP instead.
    */
   const openSpellPeek = async (target, isTouch) => {
+    // Lux's shelf holds both cards this section reaches for, and a closed tile
+    // shows neither — `boundingBox()` on a `display: none` card is null.
+    await openShelfOn(target, 'Lux');
     const card = await target.$('.catalog-spell-card[data-spell="Lux_Q"]');
     await card.scrollIntoViewIfNeeded();
     await target.waitForTimeout(150);
@@ -427,7 +459,6 @@ try {
     await setupPage.evaluate(() => {
       localStorage.removeItem('lol2d:pregameConfig:v1');
       localStorage.removeItem('lol2d.touchControls');
-      localStorage.setItem('lol2d:kitRosterView:v1', 'expanded');
     });
     await setupPage.reload({ waitUntil: 'load' });
     await setupPage.click('#config-btn');
@@ -628,6 +659,7 @@ try {
     selectedBefore: document.querySelector('.catalog-spell-card.selected')?.dataset.spell ?? null,
     changedPillsBefore: document.querySelectorAll('.kit-slot-pill.changed').length,
   }));
+  await openShelfOn(page, 'Lux'); // its tile has to be open for the card to exist on screen
   await page.hover('.catalog-spell-card[data-spell="Lux_Q"]'); // deliberately not in the kit
   await page.waitForTimeout(250);
   report.abilityPreview.whileHovering = await evaluate(() => {

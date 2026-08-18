@@ -13,15 +13,31 @@
  * slot you are filling stays pinned above the list the whole time (the parent
  * owns that row — see `LoadoutEditorModal.vue`).
  *
- * Two gestures, one target:
+ * ## One champion open at a time
  *
- *   - tapping a champion's *header* takes that champion's whole kit, which is
- *     the four taps and four slot changes it used to cost. Only shelves that
- *     are a champion offer it — `KitShelf.kit` is empty for the basic attack
- *     and the summoner spells, and five summoner spells have no four slots to
- *     land in.
- *   - tapping an *ability* puts that one spell in whichever slot is selected
- *     above.
+ * The roster is always champion tiles — a portrait over a name, ~50 of them —
+ * and tapping one **opens** it in place rather than doing anything to the
+ * loadout. The opened shelf spans the grid and shows the two things a player
+ * could have meant by that tap:
+ *
+ *   - **Dùng cả bộ** takes the whole kit, which is the four taps and four slot
+ *     changes it used to cost. Only shelves that are a champion offer it —
+ *     `KitShelf.kit` is empty for the basic attack and the summoner spells, and
+ *     five summoner spells have no four slots to land in.
+ *   - tapping one of its *abilities* puts that spell in whichever slot is
+ *     selected in the bar above.
+ *
+ * This replaced a global compact/expanded toggle over the same roster, which
+ * made the player choose between the two halves of that up front: compact
+ * showed the tiles and could not fill a single slot at all, expanded showed all
+ * ~200 ability icons at once and was too dense to find a champion in. Neither
+ * mode was the common case, and the toggle was a setting to get wrong before
+ * reaching the screen you wanted. Opening one shelf is both answers, in the
+ * place the question was asked, and it is why there is no second modal here.
+ *
+ * The two shelves that are not a champion stay out of the tile grid and open
+ * only when the slot they serve is selected — see
+ * `LoadoutEditorModal.shelfForSlot`.
  *
  * Reading a description is a hover or a hold on the same icon, not a second
  * click target beside it — see `useSpellPeek.ts` for that contract and for
@@ -61,26 +77,29 @@ const props = defineProps<{
   matchRules: MatchRules;
   isTouchUi: boolean;
   /**
-   * Champion tiles only: the ability rows and the two shelves that are not a
-   * champion are hidden, leaving the whole-kit action as the only gesture.
-   *
-   * Hidden in CSS rather than dropped with `v-if`, which is the whole reason
-   * this is one boolean and not a second render path. The roster is ~50
-   * shelves and ~200 icons; keeping them mounted makes the toggle instant
-   * instead of a rebuild, and `loading="lazy"` already means an icon nobody
-   * has scrolled to never fetched. Nothing about the DOM changes — see
-   * `.kit-roster.compact` in pregame-scene.css.
-   */
-  compact: boolean;
-  /**
-   * The one shelf compact lets through anyway, or `null`.
+   * The one shelf expanded in place, or `null` for a grid of closed tiles.
    *
    * Compared by identity, not by name: `getPregameCatalog()` builds once and
-   * caches, so the parent hands back one of the very objects in `shelves`.
-   * The parent decides which — it is the one that knows what the selected slot
-   * means. See `LoadoutEditorModal.revealShelf`.
+   * caches, so the parent hands back one of the very objects in `shelves`. The
+   * parent owns which one, because opening is also driven by the slot bar it
+   * owns — see `LoadoutEditorModal.openShelf`.
+   *
+   * Everything an unopened shelf would have shown is hidden in CSS rather than
+   * dropped with `v-if`. The roster is ~50 shelves and ~200 icons; keeping them
+   * mounted makes opening one instant instead of a rebuild, and
+   * `loading="lazy"` already means an icon nobody has scrolled to never
+   * fetched. The e2e drives count `.kit-shelf` and `.catalog-spell-card`
+   * expecting the whole catalogue in the DOM, and check visibility separately.
+   * See `.kit-shelf.open` in pregame-scene.css.
    */
-  revealShelf: KitShelf | null;
+  openShelf: KitShelf | null;
+  /**
+   * The hotkey letter of the slot a tapped ability would fill, for the opened
+   * shelf's note. The parent owns the selection, so it owns the label too —
+   * spelling it out is what keeps "tap an ability" from being a guess about
+   * where the spell lands.
+   */
+  activeSlotLabel: string;
   /** The library, newest first — see `loadSavedKits`. Empty renders no shelf at all. */
   savedKits: readonly SavedKit[];
   /**
@@ -95,6 +114,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   pick: [entry: SpellCatalogEntry];
   applyKit: [shelf: KitShelf];
+  /** Open this shelf, or close it if it is the open one. The parent decides. */
+  toggleShelf: [shelf: KitShelf];
   pickRandom: [];
   applySavedKit: [kit: SavedKit];
   deleteSavedKit: [kit: SavedKit];
@@ -124,7 +145,7 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
 </script>
 
 <template>
-  <div class="kit-roster" :class="{ compact }">
+  <div class="kit-roster">
     <!-- Deliberately its own class prefix rather than `.kit-shelf`: a
          champion's shelf is a fixed part of the catalogue and a saved kit is
          a row the player can delete, they carry different actions, and the
@@ -176,24 +197,28 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       :class="{
         selected: isSelectedShelf(shelf),
         'has-kit': shelf.kit.length > 0,
-        revealed: shelf === revealShelf,
+        open: shelf === openShelf,
       }"
       :data-champion="shelf.name"
     >
       <!-- `has-kit` is the same predicate that decides whether the header is a
            button at all (`v-if="shelf.kit.length"` below), reused rather than
-           restated: compact mode shows exactly the shelves that have a whole
-           kit to apply, so Đánh Thường and Phép Bổ Trợ drop out of the grid on
-           their own and no second rule can drift away from the first. -->
-      <!-- The shelf header doubles as the whole-kit button wherever there is
-           a kit to apply; the basic-attack and summoner shelves render the
-           same row as an inert heading. -->
+           restated: the tile grid shows exactly the shelves that have a whole
+           kit to offer, so Đánh Thường and Phép Bổ Trợ drop out of it on their
+           own and no second rule can drift away from the first. -->
+      <!-- The shelf header is the tile, and the tile is a disclosure: it opens
+           this champion rather than committing it, because a tap on a portrait
+           is ambiguous between "give me this kit" and "let me see it". Both
+           answers live in the opened body below. The basic-attack and summoner
+           shelves render the same row as an inert heading — they are opened by
+           selecting the slot they serve, not by being tapped. -->
       <button
         v-if="shelf.kit.length"
         type="button"
         class="kit-shelf-heading kit-shelf-apply"
-        :title="`Dùng cả bộ chiêu ${shelf.name}`"
-        @click="emit('applyKit', shelf)"
+        :title="shelf === openShelf ? `Đóng ${shelf.name}` : `Xem bộ chiêu ${shelf.name}`"
+        :aria-expanded="shelf === openShelf"
+        @click="emit('toggleShelf', shelf)"
       >
         <img
           v-if="shelf.avatar"
@@ -204,7 +229,7 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
           decoding="async"
         />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
-        <span class="kit-apply-chip">Chọn</span>
+        <span class="kit-apply-chip">{{ shelf === openShelf ? 'Đóng' : 'Chọn' }}</span>
       </button>
       <div v-else class="kit-shelf-heading">
         <img
@@ -216,6 +241,26 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
           decoding="async"
         />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
+      </div>
+
+      <!-- The whole-kit action, stated as a button instead of being what
+           tapping the portrait did. It is only ever rendered for the shelf that
+           is open, so the grid of ~50 closed tiles carries no buttons a stray
+           tap could hit — which is the thing that made the old tile grid unable
+           to do anything *but* replace the kit. -->
+      <div v-if="shelf === openShelf && shelf.kit.length" class="kit-shelf-cta">
+        <button
+          type="button"
+          class="hextech-btn kit-apply-all"
+          :title="`Dùng cả bộ chiêu ${shelf.name}`"
+          @click="emit('applyKit', shelf)"
+        >
+          <i class="fas fa-check" aria-hidden="true"></i>
+          <span>Dùng cả bộ</span>
+        </button>
+        <span class="kit-cta-note">
+          hoặc bấm một chiêu bên dưới để đặt vào ô {{ activeSlotLabel }}
+        </span>
       </div>
 
       <div class="catalog-group-row">
