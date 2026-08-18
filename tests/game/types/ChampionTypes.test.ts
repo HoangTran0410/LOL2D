@@ -185,10 +185,10 @@ describe('champion and direct-subclass type boundary', () => {
     expect(target.score).toBe(-1);
     expect(attacker.score).toBe(1);
     expect(monster.targetLock).toBe(target);
-    expect(monster.findNearestChampion(1)).toBeNull();
     expect(turret.target).toBeNull();
     expect(game.objectManager._objectToBeAdd[0]).toBeInstanceOf(TurretBolt);
-    expectTypeOf(monster.targetLock).toEqualTypeOf<Champion | null>();
+    // A camp fights back against whatever hits it — a champion, a pet, a minion.
+    expectTypeOf(monster.targetLock).toEqualTypeOf<AttackableUnit | null>();
     // a turret is a team building now: it shoots minions as well as champions
     expectTypeOf(turret.target).toEqualTypeOf<AttackableUnit | null>();
   });
@@ -215,7 +215,6 @@ describe('champion and direct-subclass type boundary', () => {
     const farther = new Champion({ game, teamId: 'red', position: createVector(60, 0) });
     indexObjects(game, [monster, turret, nearest, farther]);
 
-    expect(monster.findNearestChampion(100)).toBe(nearest);
     expect(turret.findTarget()).toBe(nearest);
     monster.aggroOn(nearest);
     turret.target = nearest;

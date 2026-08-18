@@ -107,6 +107,8 @@ export const AGGRO_SCAN_INTERVAL_MS = 200;
  * arrow and Turret's bolt both move at 780-1200 units/sec).
  */
 export const RANGED_BOLT_SPEED = 360 / 60;
+/** How far a minion lights fog for its team — a cheap circle, no wall raycast. */
+export const MINION_FOG_REVEAL_RADIUS = 300;
 /** ms of wind-up before a melee swing's damage resolves. */
 export const MELEE_WINDUP_MS = 130;
 /** Total ms a melee swing's visual lives, wind-up through fade. */
@@ -119,12 +121,15 @@ const TEAM_COLORS: Record<string, { body: number[]; trim: number[]; bar: number[
 const NEUTRAL_COLORS = { body: [150, 150, 160], trim: [40, 40, 48], bar: [200, 200, 210] };
 
 /**
- * The body colour for a team, for anything that has to agree with a minion
- * about what a team looks like — the minimap's dots, today. Exported rather
- * than copied so a colour means the same thing in both places.
+ * The full team palette (body/trim/bar), for anything that has to agree with a
+ * minion about what a team looks like — the minimap's dots and the turret rows.
+ * Exported rather than copied so a colour means the same thing everywhere.
  */
-export const teamBodyColor = (teamId: string): number[] =>
-  (TEAM_COLORS[teamId] ?? NEUTRAL_COLORS).body;
+export const teamColors = (teamId: string): { body: number[]; trim: number[]; bar: number[] } =>
+  TEAM_COLORS[teamId] ?? NEUTRAL_COLORS;
+
+/** The body colour alone — the minimap's case. */
+export const teamBodyColor = (teamId: string): number[] => teamColors(teamId).body;
 
 export interface MinionOptions {
   game: AttackableUnitOptions['game'];
@@ -542,6 +547,11 @@ export default class Minion extends AttackableUnit {
     // usually is
     this.drawBuffs(compactUnits);
     this.drawHealthBar();
+  }
+
+  /** Lights a cheap circle for the player team; minions carry no combat sight. */
+  get fogRevealRadius(): number {
+    return MINION_FOG_REVEAL_RADIUS;
   }
 
   /** Points at whatever it is hitting. The base class points at the mouse. */

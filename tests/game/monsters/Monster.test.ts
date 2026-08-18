@@ -80,18 +80,26 @@ describe('Monster', () => {
       expect(camp.phase).toBe(Monster.PHASES.IDLE);
     });
 
-    it('gives up a chase that drags it past its leash radius', () => {
+    it('gives up a chase that drags it past its leash radius, after the grace delay', () => {
       const camp = makeCamp();
       const champion = new Champion({ game, teamId: 'other' });
       indexObjects(game, [camp, champion]);
+      vi.stubGlobal('deltaTime', 16);
 
       camp.aggroOn(champion);
       expect(camp.phase).toBe(Monster.PHASES.ATTACK);
 
-      camp.position.set(CAMP.x + CAMP.r + 50, CAMP.y);
+      // Well past the chase leash (camp.r 300 + MONSTER_CHASE_MARGIN 350 = 650).
+      camp.position.set(CAMP.x + 900, CAMP.y);
       champion.position.set(camp.position.x + 20, camp.position.y);
-      camp.updateAttack();
 
+      // Still chasing during the give-up grace.
+      camp.updateAttack();
+      expect(camp.phase).toBe(Monster.PHASES.ATTACK);
+
+      // Once the delay is spent, it turns for home.
+      camp._giveUpTimer = 0;
+      camp.updateAttack();
       expect(camp.phase).toBe(Monster.PHASES.BACK_TO_CAMP);
       expect(camp.targetLock).toBeNull();
     });
@@ -312,22 +320,22 @@ describe('Monster', () => {
       expect(baron.targetLock).toBeNull();
     });
 
-    it('takes the next thing that walks up once it has let go', () => {
+    it('no longer takes the next thing that walks up — it waits to be hit', () => {
       const baron = makeBaron();
-      const runaway = new Champion({ game, teamId: 'other' });
       const clone = new Champion({ game, teamId: 'clone' });
-      runaway.position.set(CAMP.x + 60, CAMP.y);
-      clone.position.set(CAMP.x + 3_000, CAMP.y);
-      indexObjects(game, [baron, runaway, clone]);
-      baron.aggroOn(runaway);
-
-      runaway.position.set(CAMP.x + 3_000, CAMP.y);
       clone.position.set(CAMP.x + 80, CAMP.y);
-      // the scan reads the quadtree, which the real loop rebuilds every frame
-      indexObjects(game, [baron, runaway, clone]);
+      indexObjects(game, [baron, clone]);
+
+      // Camps stopped scanning for champions in IDLE, so one standing right on
+      // top of the camp is ignored — a change from the old proximity aggro.
       baron._scanCooldown = 0;
       for (let i = 0; i < 4; i++) baron.update();
+      expect(baron.phase).toBe(Monster.PHASES.IDLE);
+      expect(baron.targetLock).toBeNull();
 
+      // It wakes only once that champion actually damages it.
+      baron.takeDamage(5, clone);
+      expect(baron.phase).toBe(Monster.PHASES.ATTACK);
       expect(baron.targetLock).toBe(clone);
     });
 
@@ -347,31 +355,23 @@ describe('Monster', () => {
       expect(wolf.destination.x).toBeGreaterThan(wolf.position.x);
     });
 
-    it('drops a target that outruns the circle it is allowed to fight in', () => {
+    it('drops a target that outruns the chase leash, after the grace delay', () => {
       const wolf = makeCamp();
       const champion = new Champion({ game, teamId: 'other' });
       champion.position.set(CAMP.x + 40, CAMP.y);
       indexObjects(game, [wolf, champion]);
+      vi.stubGlobal('deltaTime', 16);
       wolf.aggroOn(champion);
 
-      champion.position.set(CAMP.x + CAMP.r + 200, CAMP.y);
+      // Far past the chase leash (camp.r 300 + MONSTER_CHASE_MARGIN 350 = 650).
+      champion.position.set(CAMP.x + 900, CAMP.y);
       wolf.updateAttack();
+      expect(wolf.phase).toBe(Monster.PHASES.ATTACK); // still pursuing in the grace window
 
+      wolf._giveUpTimer = 0;
+      wolf.updateAttack();
       expect(wolf.targetLock).toBeNull();
     });
   });
 
-  describe('bushes', () => {
-    it('does not wake up for a champion hidden in a bush', () => {
-      const camp = makeCamp();
-      const champion = new Champion({ game, teamId: 'other' });
-      champion.position.set(CAMP.x + 40, CAMP.y);
-      indexObjects(game, [camp, champion]);
-
-      expect(camp.findNearestChampion(camp.aggroRange)).toBe(champion);
-
-      champion.isInsideBush = true;
-      expect(camp.findNearestChampion(camp.aggroRange)).toBeNull();
-    });
-  });
 });

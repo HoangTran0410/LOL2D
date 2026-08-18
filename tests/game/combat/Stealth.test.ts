@@ -88,16 +88,21 @@ describe('nothing acquires a target it cannot see', () => {
     expect(minion.findTarget()).toBeNull();
   });
 
-  it('a jungle camp does not wake up for one', () => {
+  it('a jungle camp drops a target that vanishes mid-fight', () => {
+    // Camps no longer wake on proximity at all, so the stealth-relevant rule is
+    // the other end: a camp already fighting a champion lets go the moment it
+    // can no longer see them (updateAttack's isStealthed check).
     const camp = makeCamp();
     const champion = new Champion({ game, teamId: 'other' });
     champion.position.set(CAMP.x + 40, CAMP.y);
     indexObjects(game, [camp, champion]);
-
-    expect(camp.findNearestChampion(camp.aggroRange)).toBe(champion);
+    camp.aggroOn(champion);
+    expect(camp.phase).toBe(Monster.PHASES.ATTACK);
 
     vanish(champion);
-    expect(camp.findNearestChampion(camp.aggroRange)).toBeNull();
+    camp.updateAttack();
+    expect(camp.phase).toBe(Monster.PHASES.BACK_TO_CAMP);
+    expect(camp.targetLock).toBeNull();
   });
 
   it('a turret holds its fire', () => {

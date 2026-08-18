@@ -1,7 +1,5 @@
-import { Circle } from '@/libs/quadtree';
 import { withinRadius } from '@/utils/math.utils';
 import AssetManager, { type AssetKey } from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitRenderOptions } from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
@@ -65,6 +63,13 @@ export type MonsterPhase = (typeof Monster.PHASES)[keyof typeof Monster.PHASES];
  */
 export const MONSTER_HOME_TOLERANCE = 12;
 
+/** Extra chase distance past a camp's pit/reach, so it actually pursues a
+ *  fleeing target instead of stopping at the edge of its own ground. */
+export const MONSTER_CHASE_MARGIN = 350;
+/** Grace after a camp's target leaves the chase leash before it turns for
+ *  home, so a target that ducks out and back is still pursued. */
+export const MONSTER_GIVE_UP_DELAY_MS = 2000;
+
 const DEFAULT_PRESET: MonsterPresetData = {
   name: 'Baron',
   avatar: 'monster_Baron_Nashor',
@@ -99,7 +104,7 @@ export default class Monster extends AttackableUnit {
   damage: number;
   aggroRange: number;
   reviveTime = 0;
-  targetLock: Champion | null = null;
+  targetLock: AttackableUnit | null = null;
 
   /** What this camp can do besides swing, in the order it prefers to do it. */
   abilities: MonsterAbility[];
@@ -112,6 +117,8 @@ export default class Monster extends AttackableUnit {
   _attackFlash = 0;
   /** ms left before the next idle aggro scan. */
   _scanCooldown = 0;
+  /** Grace left before a camp whose target left the chase leash turns for home. */
+  _giveUpTimer = MONSTER_GIVE_UP_DELAY_MS;
   /** Per-frame regen applied by Stats.update(), picked per phase. */
   _idleRegen: number;
   _leashRegen: number;
@@ -208,8 +215,10 @@ export default class Monster extends AttackableUnit {
       return;
     }
 
-    const champion = this.findNearestChampion(this.aggroRange);
-    if (champion) this.aggroOn(champion);
+    // Camps no longer wake on proximity: a champion can walk straight through a
+    // pit untouched. A camp only enters ATTACK when something damages it —
+    // `takeDamage` calls `aggroOn(attacker)`. IDLE is now a genuinely passive
+    // state whose only job is to hold the camp point and regen.
   }
 
   /** Beyond the leash radius: too far from the camp point to still belong to it. */
@@ -218,22 +227,17 @@ export default class Monster extends AttackableUnit {
   }
 
   /**
-   * The circle a camp will fight inside, measured from the camp point.
+   * The circle a camp will chase inside, measured from the camp point — wider
+   * than the pit on purpose so it actually pursues rather than stopping at the
+   * edge of its own ground.
    *
-   * `camp.r` alone is the wrong measure for a camp that outranges its own pit:
-   * Baron's circle is 100px and its reach is 400, so it would drop a champion
-   * it was happily hitting. `aggroRange` alone is the wrong measure for a small
-   * camp, whose 170 sits only ~50px past its own reach — a champion kiting at
-   * the edge would be dropped and re-acquired every other scan. The wider of
-   * the two is right for both: the pit for a wolf, the reach for Baron.
+   * The base is `camp.r`/`aggroRange`, whichever is wider (the pit for a wolf,
+   * the reach for Baron), plus `MONSTER_CHASE_MARGIN`. A target — or the camp
+   * itself, once it has walked out chasing — outside this for longer than
+   * `MONSTER_GIVE_UP_DELAY_MS` is let go.
    */
-  targetLeashRange(): number {
-    return Math.max(this.camp.r, this.aggroRange);
-  }
-
-  /** Whether `target` has left the circle this camp is willing to fight in. */
-  hasEscaped(target: AttackableUnit): boolean {
-    return !withinRadius(target.position, this.camp, this.targetLeashRange());
+  chaseLeashRange(): number {
+    return Math.max(this.camp.r, this.aggroRange) + MONSTER_CHASE_MARGIN;
   }
 
   updateAttack() {
@@ -250,20 +254,25 @@ export default class Monster extends AttackableUnit {
     }
 
     const pos = this.position;
-    if (this.isOutsideCamp()) {
-      this.goBackToCamp();
-      return;
-    }
 
-    // The leash above measures the camp against its own circle, which is the
-    // whole story only for a camp that chases. Baron never moves, so it never
-    // left that circle and never let go of anything: a player could teleport
-    // across the map, come back minutes later, and still be its target — while
-    // a Shaco clone standing on top of it was never considered, because the
-    // scan that finds a new target only runs in IDLE.
-    if (this.hasEscaped(target)) {
-      this.goBackToCamp();
-      return;
+    // Give-up leash, measured from the camp point. The camp keeps chasing while
+    // it and its target are both inside `chaseLeashRange`; when either crosses
+    // it — the target runs off, or the camp itself has walked too far out — a
+    // delay runs before it turns for home. A player who kites just past the line
+    // for a moment, or ducks out and back, is still pursued rather than dropped
+    // the instant they step over it. Baron (no legs) never moves, so only its
+    // target leaving can start the clock.
+    const leash = this.chaseLeashRange();
+    const escaped =
+      !withinRadius(pos, this.camp, leash) || !withinRadius(target.position, this.camp, leash);
+    if (escaped) {
+      this._giveUpTimer -= deltaTime;
+      if (this._giveUpTimer <= 0) {
+        this.goBackToCamp();
+        return;
+      }
+    } else {
+      this._giveUpTimer = MONSTER_GIVE_UP_DELAY_MS;
     }
 
     // Before the reach check, so a camp can open with an ability while it is
@@ -308,8 +317,11 @@ export default class Monster extends AttackableUnit {
    * way it cuts yours. One per frame, and the caller returns straight after —
    * a camp that both quaked and bit in the same 16ms would be unreadable.
    */
-  castAbility(target: Champion): boolean {
+  castAbility(target: AttackableUnit): boolean {
     if (!this.canCast) return false;
+    // Camp abilities are written for champions; against a pet or a minion the
+    // camp still basic-swings, it just does not cast on it.
+    if (!(target instanceof Champion)) return false;
 
     for (let i = 0; i < this.abilities.length; i++) {
       if (this._abilityCooldowns[i] > 0) continue;
@@ -354,34 +366,11 @@ export default class Monster extends AttackableUnit {
     this.navigateTo(this.camp.x, this.camp.y);
   }
 
-  findNearestChampion(radius: number): Champion | null {
-    const found = this.game.objectManager.queryObjects({
-      area: new Circle({ x: this.position.x, y: this.position.y, r: radius }),
-      filters: [
-        PredefinedFilters.type(Champion),
-        PredefinedFilters.canTakeDamageFromTeam(this.teamId),
-        // a camp does not wake up for a champion hidden in a bush
-        PredefinedFilters.excludeStealthed,
-        PredefinedFilters.visibleTo(this),
-      ],
-    });
-
-    let nearest = null;
-    let nearestDist = Infinity;
-    for (const c of found) {
-      const d = p5.Vector.dist(this.position, c.position);
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearest = c;
-      }
-    }
-    return nearest;
-  }
-
-  aggroOn(unit?: Champion) {
-    if (!unit || !(unit instanceof Champion)) return;
+  aggroOn(unit?: AttackableUnit) {
+    if (!unit || unit === this) return;
     this.targetLock = unit;
     this.phase = Monster.PHASES.ATTACK;
+    this._giveUpTimer = MONSTER_GIVE_UP_DELAY_MS;
   }
 
   goBackToCamp() {
@@ -443,8 +432,11 @@ export default class Monster extends AttackableUnit {
   takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
     super.takeDamage(damage, attacker);
-    // super.takeDamage may have killed us; a corpse must not hold aggro
-    if (!this.isDead && attacker instanceof Champion) this.aggroOn(attacker);
+    // super.takeDamage may have killed us; a corpse must not hold aggro. A camp
+    // fights back against *whatever* hit it — a champion, a pet, an allied
+    // minion — not champions alone, so "only attack when attacked" holds for
+    // every attacker (see aggroOn / castAbility).
+    if (!this.isDead && attacker) this.aggroOn(attacker);
   }
 
   die(deathData: UnitDeathData) {

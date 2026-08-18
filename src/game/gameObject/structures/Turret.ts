@@ -4,7 +4,7 @@ import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import type { KillCredit } from '@/game/combat/MatchTally';
 import type { AttackableUnitOptions } from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
-import Minion, { AGGRO_SCAN_INTERVAL_MS } from '@/game/gameObject/attackableUnits/Minion';
+import Minion, { AGGRO_SCAN_INTERVAL_MS, teamColors } from '@/game/gameObject/attackableUnits/Minion';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import { canSee } from '@/game/combat/Vision';
@@ -208,6 +208,13 @@ export default class Turret extends AttackableUnit {
       ],
     });
 
+    // Ally protection: an enemy champion attacking an allied champion under this
+    // turret is shot before anything else — the reason standing under your own
+    // tower is safe. Only enemies already in `found` (in range, visible, not
+    // stealthed) qualify, so the switch always lands on a shootable target.
+    const defender = this.findAllyAttacker(found as AttackableUnit[]);
+    if (defender) return defender;
+
     let nearestMinion: AttackableUnit | null = null;
     let nearestMinionDist = Infinity;
     let nearestChampion: AttackableUnit | null = null;
@@ -232,6 +239,50 @@ export default class Turret extends AttackableUnit {
     }
 
     return nearestMinion ?? nearestChampion;
+  }
+
+  /**
+   * The enemy champion in range currently attacking an allied champion under
+   * this turret, nearest to the turret — or null. Runs only on the aggro scan
+   * cadence, not every frame, and reuses the freshly queried enemy set, so it
+   * costs one extra ally query only when an enemy champion is actually present.
+   */
+  private findAllyAttacker(enemiesInRange: AttackableUnit[]): AttackableUnit | null {
+    let hasEnemyChampion = false;
+    for (const enemy of enemiesInRange) {
+      if (enemy instanceof Champion) {
+        hasEnemyChampion = true;
+        break;
+      }
+    }
+    if (!hasEnemyChampion) return null;
+
+    const inRange = new Set(enemiesInRange);
+    const allies = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.position.x, y: this.position.y, r: this.attackRange }),
+      filters: [PredefinedFilters.type(Champion), PredefinedFilters.teamId(this.teamId)],
+    }) as AttackableUnit[];
+
+    let best: AttackableUnit | null = null;
+    let bestDist = Infinity;
+    for (const ally of allies) {
+      if (ally.isDead) continue;
+      const enemy = ally.recentAttacker;
+      if (!enemy || !(enemy instanceof Champion) || !inRange.has(enemy)) continue;
+      const dx = enemy.position.x - this.position.x;
+      const dy = enemy.position.y - this.position.y;
+      const d = dx * dx + dy * dy;
+      if (d < bestDist) {
+        bestDist = d;
+        best = enemy;
+      }
+    }
+    return best;
+  }
+
+  /** A turret lights its own reach for the team; it carries no combat sight. */
+  get fogRevealRadius(): number {
+    return this.attackRange;
   }
 
   fireAt(target: AttackableUnit) {
@@ -283,18 +334,23 @@ export default class Turret extends AttackableUnit {
       circle(pos.x, pos.y, this.attackRange * 2);
     }
 
+    // The stone stays dark, but the pad and tower take the base's team colour
+    // so a turret row reads as its side's at a glance — the same blue/red a
+    // minion carries, shared through `teamColors` so the two never disagree.
+    const team = teamColors(this.teamId);
+
     // stone base
     noStroke();
     fill(28, 30, 38, 230);
     circle(pos.x, pos.y, size * 1.15);
-    fill(58, 62, 74);
+    fill(team.trim[0], team.trim[1], team.trim[2]);
     circle(pos.x, pos.y, size);
 
     // body — an octagonal tower
     push();
     translate(pos.x, pos.y);
     rotate(this._spin);
-    fill(96, 102, 118);
+    fill(team.body[0], team.body[1], team.body[2]);
     stroke(20, 22, 28);
     strokeWeight(3);
     beginShape();
@@ -374,7 +430,10 @@ export default class Turret extends AttackableUnit {
     noStroke();
     fill(12, 14, 18, 220);
     rect(x - 2 * k, y - 2 * k, w + 4 * k, h + 4 * k);
-    fill(220, 170, 60);
+    // Team-coloured fill, the same bar shade a minion carries, so a turret's
+    // side is legible from its health bar as well as its body.
+    const bar = teamColors(this.teamId).bar;
+    fill(bar[0], bar[1], bar[2]);
     rect(x, y, w * percent, h);
     fill(200, 200, 210);
     textAlign(CENTER, CENTER);

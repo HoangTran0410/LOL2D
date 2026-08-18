@@ -66,6 +66,14 @@ export default class FogOfWar {
     result: SightResult[];
   };
 
+  /**
+   * Cheap circle revealers — allied minions and turrets — from the last sight
+   * pass. Drawn as plain circles rather than wall-aware polygons so an ally
+   * swarm costs a fill each, not a raycast each. Held on the instance so a
+   * cached sight frame reuses the same circles the polys were paired with.
+   */
+  circleSights: { x: number; y: number; r: number }[] = [];
+
   constructor(game: any) {
     this.game = game;
     this.overlay = createGraphics(windowWidth, windowHeight);
@@ -138,9 +146,12 @@ export default class FogOfWar {
         (o: any) => {
           if (o === this.game.player) return true;
           if (PredefinedFilters.includeDead(o)) return false;
-          if (o.visionRadius > 0) {
+          // `fogRevealRadius`, not `visionRadius`: minions and turrets carry no
+          // combat sight (visionRadius 0) but still light a circle for the team.
+          const r = o.fogRevealRadius;
+          if (r > 0) {
             const { x: ox, y: oy } = o.position;
-            return CollideUtils.circleRect(ox, oy, o.visionRadius, x, y, w, h);
+            return CollideUtils.circleRect(ox, oy, r, x, y, w, h);
           }
           return false;
         },
@@ -149,15 +160,20 @@ export default class FogOfWar {
 
     const allSightPoly: SightResult[] = [];
     const visiblePlayers: any[] = [];
+    const circleSights: { x: number; y: number; r: number }[] = [];
 
     allyObjects.forEach((obj: any) => {
-      const { sightPoly, playersInSight } = this.calculateSightForObject(obj);
-      visiblePlayers.push(...playersInSight);
-      allSightPoly.push({
-        object: obj,
-        sightPoly,
-      });
+      if (obj.visionRadius > 0) {
+        // Player and allied champions: the real, wall-aware sight polygon.
+        const { sightPoly, playersInSight } = this.calculateSightForObject(obj);
+        visiblePlayers.push(...playersInSight);
+        allSightPoly.push({ object: obj, sightPoly });
+      } else {
+        // A minion or turret: one cheap circle, no raycast, no per-body query.
+        circleSights.push({ x: obj.position.x, y: obj.position.y, r: obj.fogRevealRadius });
+      }
     });
+    this.circleSights = circleSights;
 
     // Reset the player's-eye visibility flag on every AttackableUnit, then
     // re-light the ones in sight. Structures opt out — once built they stay on
@@ -173,6 +189,26 @@ export default class FogOfWar {
       if (o instanceof AttackableUnit && !o.alwaysVisible) o.visibleToPlayerTeam = false;
     });
     visiblePlayers.forEach((p: any) => (p.visibleToPlayerTeam = true));
+
+    // Circle revealers light any body standing in them — one distance test per
+    // unit, no polygon test and no per-revealer query, so the ally swarm stays
+    // cheap. Deliberately wall-blind: a minion's cheap circle is not the
+    // player's exact sight, and folding walls back in would mean the raycast
+    // this path exists to avoid.
+    if (circleSights.length) {
+      this.game.objectManager.objects.forEach((o: any) => {
+        if (!(o instanceof AttackableUnit) || o.visibleToPlayerTeam || o.alwaysVisible) return;
+        const { x: ox, y: oy } = o.position;
+        for (const c of circleSights) {
+          const dx = ox - c.x;
+          const dy = oy - c.y;
+          if (dx * dx + dy * dy <= c.r * c.r) {
+            o.visibleToPlayerTeam = true;
+            break;
+          }
+        }
+      });
+    }
 
     if (typeof revision === 'number') {
       this.lastSightCalculation = { revision, cameraKey, result: allSightPoly };
@@ -331,6 +367,10 @@ export default class FogOfWar {
         this.overlay.pop();
       }
     );
+
+    // Allied minions and turrets: cheap circle holes, drawn after the wall-aware
+    // polygons so both stack into the same erased sight mask.
+    this.circleSights.forEach(c => this.drawCircleSight(c.x, c.y, c.r));
   }
 
   drawCircleSight(_x: number, _y: number, _r: number): void {

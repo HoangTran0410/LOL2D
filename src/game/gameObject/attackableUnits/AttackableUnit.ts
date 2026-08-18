@@ -40,6 +40,14 @@ export type HealSource = GameObject;
  */
 export const DISPLACEMENT_GRACE_FRAMES = 2;
 
+/**
+ * How long a unit remembers the enemy that last hit it, in ms. Read by
+ * `Turret.findTarget` for ally-protection aggro: a tower punishes an enemy
+ * champion attacking an ally under it, and holds that aggro this long after the
+ * last hit so a single stray shot does not pin the tower forever.
+ */
+export const RECENT_ATTACKER_MS = 1500;
+
 export default class AttackableUnit extends GameObject {
   declare game: GameObjectRuntimeContext;
 
@@ -104,6 +112,25 @@ export default class AttackableUnit extends GameObject {
   _separationGrace = 0;
 
   /**
+   * The last enemy to damage this unit, warm for `RECENT_ATTACKER_MS`. Read by
+   * `Turret.findTarget` so a tower prioritises an enemy champion attacking an
+   * ally standing under it. Written in `takeDamage`, aged out in `update`.
+   */
+  recentAttacker: AttackableUnit | null = null;
+  private _recentAttackerTtl = 0;
+
+  /**
+   * How far this unit lights fog for the player team, independent of combat
+   * `visionRadius`. Champions reveal their own (wall-aware) sight; minions and
+   * turrets carry `visionRadius = 0` — no combat sight of their own — and
+   * override this to light a cheap circle for their team instead, so an ally
+   * swarm reveals the map without a raycast per body. 0 reveals nothing.
+   */
+  get fogRevealRadius(): number {
+    return this.visionRadius;
+  }
+
+  /**
    * The route this unit is walking, when it has one. Built on first use, so a
    * unit that never takes a `navigateTo` — turrets, fountains, every unit in a
    * headless spell test — never allocates one.
@@ -149,6 +176,17 @@ export default class AttackableUnit extends GameObject {
     // ticked before the buffs run, so a displacement applied during this frame's
     // updateBuffs() still gets its full grace afterwards
     if (this._separationGrace > 0) this._separationGrace -= 1;
+
+    if (this._recentAttackerTtl > 0) {
+      this._recentAttackerTtl -= deltaTime;
+      if (
+        this._recentAttackerTtl <= 0 ||
+        this.recentAttacker?.isDead ||
+        this.recentAttacker?.toRemove
+      ) {
+        this.recentAttacker = null;
+      }
+    }
 
     this.updateBuffs();
     this.stats.update();
@@ -454,6 +492,14 @@ export default class AttackableUnit extends GameObject {
     // takes 40" is the sentence, and a shield eating the 50 does not make the
     // swing smaller.
     const swung = damage;
+
+    // Remember who is hitting us, for the turret's ally-protection aggro
+    // (`recentAttacker`). An enemy swing counts even when a shield eats it — a
+    // tower answers the attack, not the damage that gets through.
+    if (attacker && attacker !== this && attacker.teamId !== this.teamId) {
+      this.recentAttacker = attacker;
+      this._recentAttackerTtl = RECENT_ATTACKER_MS;
+    }
 
     // shields and damage modifiers get first look; they may eat all of it
     for (const buff of this.buffs) {
