@@ -1,0 +1,76 @@
+{
+  "asset": {
+    "key": "spell_riven_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Blade_of_the_Exile.png?490bb",
+    "sha1": "25f975bedbed57b4cb35d193144d3a2f627f4e5b"
+  },
+  "champion": "Riven",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_riven_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Blade_of_the_Exile.png?490bb",
+        "sha1": "25f975bedbed57b4cb35d193144d3a2f627f4e5b"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 105 / 90 / 75 / 60",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' empowers her blade for 15 seconds, gaining <span style=\"color:orange; white-space:normal\">20% AD</span> <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span>, <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;75 '''bonus''' attack range</span>, and increased range on ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Broken Wings\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Broken Wings.png|20xpx|border|link=Riven#Broken Wings|An icon for Riven's ability Broken Wings]]</span> <span style=\"white-space:normal;\">[[Riven#Broken Wings|Broken Wings]]</span></span>'' and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Ki Burst\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Ki Burst.png|20xpx|border|link=Riven#Ki Burst|An icon for Riven's ability Ki Burst]]</span> <span style=\"white-space:normal;\">[[Riven#Ki Burst|Ki Burst]]</span></span>''.<br/><br/> After 0.<small>5</small> seconds, she can cast ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Wind Slash\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Wind Slash.png|20xpx|border|link=Riven#Wind Slash|An icon for Riven's ability Wind Slash]]</span> <span style=\"white-space:normal;\">[[Riven#Wind Slash|Wind Slash]]</span></span>'' within the duration.",
+          "text": "Active: Riven empowers her blade for 15 seconds, gaining 20% AD &nbsp;bonus attack damage, &nbsp;75 bonus attack range, and increased range on Broken Wings and Ki Burst.\nAfter 0.5 seconds, she can cast Wind Slash within the duration."
+        },
+        "icon": "Blade of the Exile.png",
+        "name": "Blade of the Exile",
+        "notes": {
+          "raw": "* All bonuses are gained after 0.<small>5</small> seconds of the ability starting its cast.\n** The <span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span> amount is factored upon cast, and does not change.\n* If '''Riven''' has a basic attack buffered before the end of ''Blade of the Exile's'' cast time, the buffered basic attack will start 0.<small>33</small> seconds after the end of the cast time.\n** The delay will not apply to basic attack commands input after ''Blade of the Exile's'' cast time.",
+          "text": "All bonuses are gained after 0.5 seconds of the ability starting its cast.\n* The bonus attack damage amount is factored upon cast, and does not change.\nIf Riven has a basic attack buffered before the end of Blade of the Exile's cast time, the buffered basic attack will start 0.33 seconds after the end of the cast time.\n* The delay will not apply to basic attack commands input after Blade of the Exile's cast time."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Blade of the Exile"
+    },
+    {
+      "asset": {
+        "key": "spell_riven_r2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Wind_Slash.png?69c5a",
+        "sha1": "a605679a0e2a1235117cd26f2305645703186c74"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "damagetype": "physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' unleashes a wave of energy in a cone in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit, increased by <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-top-label=\"target's missing health\" data-displayformula=\"2.667% per 1% missing health. ''This is capped at 200% bonus damage at 75% missing health.''\" data-bot-values=\"0;25;50;75;100;125;150;175;200\" data-top-values=\"0;9.38;18.75;28.13;37.5;46.88;56.25;65.63;75\" data-bot-key=\"%\" data-top-key=\"%\">0% – 200% (based on target's '''missing''' health)</span>[[Category:Debug]]</span>.",
+          "text": "Active: Riven unleashes a wave of energy in a cone in the target direction that deals physical damage to enemies hit, increased by 0% – 200% (based on target's missing health)Category:Debug."
+        },
+        "icon": "Wind Slash.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Physical Damage:'''</span></dt><dd>100 / 125 / 150 / 175 / 200 <span style=\"color:orange; white-space:normal\">(+ 55% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Maximum Physical Damage:'''</span></dt><dd>300 / 375 / 450 / 525 / 600 <span style=\"color:orange; white-space:normal\">(+ 165% '''bonus''' AD)</span></dd></dl>",
+          "text": "Minimum Physical Damage:100 / 125 / 150 / 175 / 200 (+ 55% bonus AD)Maximum Physical Damage:300 / 375 / 450 / 525 / 600 (+ 165% bonus AD)"
+        },
+        "name": "Wind Slash",
+        "notes": {
+          "raw": "* ''Wind Slash'' counts as an ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* The ability will cast to wherever the caster's cursor was at the start of cast time.\n* ''Wind Slash's'' wave is made up of three individual missiles spread in a cone.\n** Each enemy can be damaged by only one missile.\n* If ''Wind Slash'' hits an enemy while ''Riven'' is not visible, it will briefly grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area around her to enemies.\n* If '''Riven''' has a basic attack buffered before the end of ''Wind Slash's'' cast time, the buffered basic attack will start 0.<small>528</small> seconds after the end of the cast time.\n** The delay is not applied if a basic attack command is input after the cast time.",
+          "text": "Wind Slash counts as an ability activation for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\nThis ability will cast from wherever the caster is at the end of the cast time.\nThe ability will cast to wherever the caster's cursor was at the start of cast time.\nWind Slash's wave is made up of three individual missiles spread in a cone.\n* Each enemy can be damaged by only one missile.\nIf Wind Slash hits an enemy while Riven is not visible, it will briefly grant sight of the area around her to enemies.\nIf Riven has a basic attack buffered before the end of Wind Slash's cast time, the buffered basic attack will start 0.528 seconds after the end of the cast time.\n* The delay is not applied if a basic attack command is input after the cast time."
+        },
+        "projectile": true,
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "200"
+      },
+      "name": "Wind Slash"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "c167f8b052b35005a91812edf1a5b3d255b80454af85af1bcd2f82eec020bab8",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Blade_of_the_Exile",
+    "revisionId": 4046587,
+    "sourceTimestamp": "2026-07-28T20:03:18Z"
+  }
+}

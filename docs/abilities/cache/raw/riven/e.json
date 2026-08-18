@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Riven/Valor",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Valor@@icon@@Valor.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> in the target direction, though not through terrain, while granting herself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 1.<small>5</small> seconds.@@description2@@'''''Riven''' can cast any of her abilities during the dash. Valor will cast at max range if cast beyond that.''@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>70 / 95 / 120 / 145 / 170 <span style=\"color:orange; white-space:normal\">(+ 110% '''bonus''' AD)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@250@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@10 / 9 / 8 / 7 / 6@@targeting@@Direction@@damagetype@@@@spellshield@@@@projectile@@{{{projectile}}}@@notes@@\n* This ability always employs [[Quick cast]].\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Broken Wings\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Broken Wings.png|20xpx|border|link=Riven#Broken Wings|An icon for Riven's ability Broken Wings]]</span> <span style=\"white-space:normal;\">[[Riven#Broken Wings|Broken Wings]]</span></span> may be cast during <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Ki Burst\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Ki Burst.png|20xpx|border|link=Riven#Ki Burst|An icon for Riven's ability Ki Burst]]</span> <span style=\"white-space:normal;\">[[Riven#Ki Burst|Ki Burst]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Blade of the Exile\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Blade of the Exile.png|20xpx|border|link=Riven#Blade of the Exile|An icon for Riven's ability Blade of the Exile]]</span> <span style=\"white-space:normal;\">[[Riven#Blade of the Exile|Blade of the Exile]]</span></span> cast times if they're used at the end or briefly after the dash.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309394,
+                "revisions": [
+                  {
+                    "parentid": 3838542,
+                    "revid": 3959341,
+                    "timestamp": "2025-10-13T20:20:07Z"
+                  }
+                ],
+                "title": "Template:Data Riven/Valor"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3959341,
+      "timestamp": "2025-10-13T20:20:07Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "6eeab186fecf978285012c188c1f1ffb8920a6616228bfb4c9c98d222dc62cdf",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Valor",
+    "revisionId": 3959341,
+    "sourceTimestamp": "2025-10-13T20:20:07Z"
+  }
+}

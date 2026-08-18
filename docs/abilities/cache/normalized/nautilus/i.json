@@ -1,0 +1,48 @@
+{
+  "asset": {
+    "key": "spell_nautilus_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Staggering_Blow.png?38b5c",
+    "sha1": "848bc9ca7c9f339c88d1ccf64a56ab7485821ac4"
+  },
+  "champion": "Nautilus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nautilus_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Staggering_Blow.png?38b5c",
+        "sha1": "848bc9ca7c9f339c88d1ccf64a56ab7485821ac4"
+      },
+      "fields": {
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Nautilus' '''<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to deal <span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-useformula=\"14 + (116-14)/17*(x-1)\" data-bot-values=\"14;20;26;32;38;44;50;56;62;68;74;80;86;92;98;104;110;116;122;128\">14 – 128 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> the target for <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"0.75;1\" data-finish=\"1.5;16\" data-top-fill=\"4\" data-bot-values=\"0.75;1;1.25;1.5\" data-top-values=\"1;6;11;16\">0.<small>75</small> – 1.<small>5</small> (based on level)</span> seconds.",
+          "text": "Innate: Nautilus' basic attacks are empowered to deal 14 – 128 (based on level)Category:Debug bonus physical damage and root the target for 0.75 – 1.5 (based on level) seconds."
+        },
+        "description2": {
+          "raw": "This effect cannot occur on the same target more than once every few seconds.",
+          "text": "This effect cannot occur on the same target more than once every few seconds."
+        },
+        "icon": "Staggering Blow.png",
+        "name": "Staggering Blow",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> but not the bonus damage.\n* ''Staggering Blow's'' enhanced attack can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> (the on-target cooldown will still be applied).\n** It will fail to trigger while he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.\n*",
+          "text": "Spell shield will block the root but not the bonus damage.\nStaggering Blow's enhanced attack can be blocked and dodged (the on-target cooldown will still be applied).\n* It will fail to trigger while he is blinded.\nThe empowered attack will not trigger against structures."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Staggering Blow"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "ba2a0d38a20944fe9afe3735548c14a03847840ce13dc296d307a3dc3a37409c",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nautilus/Staggering_Blow",
+    "revisionId": 3985615,
+    "sourceTimestamp": "2026-01-20T21:01:21Z"
+  }
+}

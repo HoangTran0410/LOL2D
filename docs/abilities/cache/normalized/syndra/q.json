@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_syndra_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Dark_Sphere.png?54dcd",
+    "sha1": "cd4dd0b4662ae43c5da15e37c6b9407f28770cff"
+  },
+  "champion": "Syndra",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_syndra_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Dark_Sphere.png?54dcd",
+        "sha1": "cd4dd0b4662ae43c5da15e37c6b9407f28770cff"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "7",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Syndra''' conjures a ''Dark Sphere'' at the target location that appears after a 0.<small>6</small>-second delay, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies. The ''Dark Sphere'' then remains on the ground for 6 seconds.",
+          "text": "Active: Syndra conjures a Dark Sphere at the target location that appears after a 0.6-second delay, dealing magic damage to nearby enemies. The Dark Sphere then remains on the ground for 6 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> Bonus:'''</span> Collecting <span style=\"color:\n#D929D9; white-space:normal\">40 Splinters of Wrath</span> causes '''Syndra''' to periodically [[stock]] a ''Dark Sphere'' charge, up to a maximum of 2.",
+          "text": "Transcendent Bonus: Collecting 40 Splinters of Wrath causes Syndra to periodically stock a Dark Sphere charge, up to a maximum of 2."
+        },
+        "effectradius": "210",
+        "icon": "Dark Sphere.png",
+        "icon2": "Dark Sphere 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 125 / 160 / 195 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>",
+          "text": "Magic Damage:90 / 125 / 160 / 195 / 230 (+ 70% AP)"
+        },
+        "name": "Dark Sphere",
+        "notes": {
+          "raw": "* ''Dark Sphere'' can be conjured inside terrain, but cannot be thrown there with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Force of Will\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Force of Will.png|20xpx|border|link=Syndra#Force of Will|An icon for Syndra's ability Force of Will]]</span> <span style=\"white-space:normal;\">[[Syndra#Force of Will|Force of Will]]</span></span>.\n* There is no limit as to how many ''Dark Spheres'' can be active at a time.\n* After '''Syndra''' gains the <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> bonus, the number of ''Dark Sphere'' charges available is represented by small Sphere icons under her [[health bar]], visible to the player only.",
+          "text": "Dark Sphere can be conjured inside terrain, but cannot be thrown there with Force of Will.\nThere is no limit as to how many Dark Spheres can be active at a time.\nAfter Syndra gains the Transcendent bonus, the number of Dark Sphere charges available is represented by small Sphere icons under her health bar, visible to the player only."
+        },
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Dark Sphere"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "07ee2e127193c8b7737269a31c608927389fefb7b5c600b365af9016c2eb03a2",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Syndra/Dark_Sphere",
+    "revisionId": 4026460,
+    "sourceTimestamp": "2026-06-09T21:58:51Z"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "asset": {
+    "key": "spell_ziggs_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Short_Fuse.png?ca3bb",
+    "sha1": "37e3145814dcbbc361b5afb6a11b15da846dbf88"
+  },
+  "champion": "Ziggs",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ziggs_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Short_Fuse.png?ca3bb",
+        "sha1": "37e3145814dcbbc361b5afb6a11b15da846dbf88"
+      },
+      "fields": {
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> Periodically, '''Ziggs''' empowers his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> to deal <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"16 + 4 per level up to 6, then + 8 per level up to 12, then + 12 per level up to 18\" data-bot-values=\"20;24;28;32;36;40;48;56;64;72;80;88;100;112;124;136;148;160;172;184\">20 – 184 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>,<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;increased by 75% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.&nbsp;」</span><span class=\"flipText2\">「&nbsp;increased to <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"35 + 7 per level up to 6, then + 14 per level up to level 12, then + 21 per level\" data-bot-values=\"35;42;49;56;63;70;84;98;112;126;140;154;175;196;217;238;259;280;301;322\">35 – 322 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 87.<small>5</small>% AP)</span> against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.&nbsp;」</span></span>",
+          "text": "Innate: Periodically, Ziggs empowers his next basic attack to deal 20 – 184 (based on level)Category:Debug (+ 50% AP) bonus magic damage,「&nbsp;increased by 75% against structures.&nbsp;」「&nbsp;increased to 35 – 322 (based on level)Category:Debug (+ 87.5% AP) against structures.&nbsp;」"
+        },
+        "description2": {
+          "raw": "''Short Fuse's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"4;1\" data-finish=\"6;13\" data-top-fill=\"3\" data-bot-values=\"4;5;6\" data-top-values=\"1;7;13\">4 / 5 / 6 (based on level)</span> seconds whenever '''Ziggs''' casts an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span>.",
+          "text": "Short Fuse's &nbsp;cooldown is reduced by 4 / 5 / 6 (based on level) seconds whenever Ziggs casts an ability."
+        },
+        "icon": "Short Fuse.png",
+        "name": "Short Fuse",
+        "notes": {
+          "raw": "* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.\n* The cooldown reduction is granted at the start of the abilities' cast time.\n* ''Short Fuse'' will go on cooldown but not deal any damage if the attack misses due to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blind]]</span>.\n* <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span>: ''Short Fuse's'' interactions with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodging]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocking]]</span> effects.",
+          "text": "The empowered attack will not trigger against wards.\nThe cooldown reduction is granted at the start of the abilities' cast time.\nShort Fuse will go on cooldown but not deal any damage if the attack misses due to blind.\nPENDING FOR TEST:: Short Fuse's interactions with dodging and blocking effects."
+        },
+        "speed": "1500",
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Short Fuse"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "544b9dca4ff7310b958d2b79c91145406984ae8deb5d7f837210e0fa13cb22b4",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Short_Fuse",
+    "revisionId": 4005222,
+    "sourceTimestamp": "2026-04-04T06:53:28Z"
+  }
+}

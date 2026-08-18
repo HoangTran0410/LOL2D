@@ -1,0 +1,106 @@
+{
+  "asset": {
+    "key": "spell_nautilus_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Depth_Charge.png?65525",
+    "sha1": "becce86ac37a298b47f9d4bd3a277a3f5ee7a34e"
+  },
+  "champion": "Nautilus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nautilus_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Depth_Charge.png?65525",
+        "sha1": "becce86ac37a298b47f9d4bd3a277a3f5ee7a34e"
+      },
+      "fields": {
+        "casttime": "0.46",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nautilus''' sends out a [[File:Depth Charge 2.png|20px|link=]] ''Depth Charge'' that chases the target enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, accelerating over time and creating eruptions every <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.25 seconds, but rounded up to the next game tick.\">0.<small>264</small> seconds</span> in its wake that also briefly grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area. Enemies hit by the eruptions are dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked up]]</span> for 1 second, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for a duration.",
+          "text": "Active: Nautilus sends out a Depth Charge that chases the target enemy champion, accelerating over time and creating eruptions every 0.264 seconds in its wake that also briefly grant sight of the area. Enemies hit by the eruptions are dealt magic damage, knocked up for 1 second, and stunned for a duration."
+        },
+        "description2": {
+          "raw": "Upon reaching the primary target, the ''Depth Charge'' erupts a final time at their location. The primary target takes increased damage, is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for the same duration, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked up]]</span> for a modified duration.",
+          "text": "Upon reaching the primary target, the Depth Charge erupts a final time at their location. The primary target takes increased damage, is stunned for the same duration, and knocked up for a modified duration."
+        },
+        "effectradius": "225 • 300 • 750",
+        "icon": "Depth Charge.png",
+        "icon2": "Depth Charge 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>125 / 150 / 175 / 200 / 225 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stun Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Magic Damage:125 / 150 / 175 / 200 / 225 (+ 40% AP)\nStun Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Damage:'''</span></dt><dd>150 / 212.<small>5</small> / 275 / 337.<small>5</small> / 400 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Knock Up Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Increased Damage:150 / 212.5 / 275 / 337.5 / 400 (+ 80% AP)\nKnock Up Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "name": "Depth Charge",
+        "notes": {
+          "raw": "* ''Depth Charge'' starts in an offset from whichever direction '''Nautilus''' is facing at the end of the cast time.\n** Since <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line's]]</span></span> causes '''Nautilus''' to change his facing direction upon hitting a valid target, ''Depth Charge's'' starting point can be changed with a quick <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line]]</span></span> + ''Depth Charge'' combo.\n* Enemies a certain distance away from the charge / eruption are instead <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked back]]</span>.\n* ''Depth Charge's'' final eruption will occur prematurely if the primary target moves more than 3000 units away from it.\n* ''Depth Charge'' will not stop chasing if the target dies or becomes untargetable.\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line]]</span></span> will not override ''Depth Charge's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immunity]]</span> will not resist the application of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span>.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Depth Charge starts in an offset from whichever direction Nautilus is facing at the end of the cast time.\n* Since Dredge Line's causes Nautilus to change his facing direction upon hitting a valid target, Depth Charge's starting point can be changed with a quick Dredge Line + Depth Charge combo.\nEnemies a certain distance away from the charge / eruption are instead knocked back.\nDepth Charge's final eruption will occur prematurely if the primary target moves more than 3000 units away from it.\nDepth Charge will not stop chasing if the target dies or becomes untargetable.\nDredge Line will not override Depth Charge's knock up.\nDisplacement immunity will not resist the application of the stun.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": false,
+        "speed": "275 + 466.67 per second",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Depth Charge"
+    },
+    {
+      "asset": {
+        "key": "spell_nautilus_r2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Depth_Charge.png?65525",
+        "sha1": "becce86ac37a298b47f9d4bd3a277a3f5ee7a34e"
+      },
+      "fields": {
+        "casttime": "0.46",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nautilus''' sends out a [[File:Depth Charge 2.png|20px|link=]] ''Depth Charge'' that chases the target enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, accelerating over time and creating eruptions every <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"0.25 seconds, but rounded up to the next game tick.\">0.<small>264</small> seconds</span> in its wake that also briefly grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area. Enemies hit by the eruptions are dealt <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked up]]</span> for 1 second, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for a duration.",
+          "text": "Active: Nautilus sends out a Depth Charge that chases the target enemy champion, accelerating over time and creating eruptions every 0.264 seconds in its wake that also briefly grant sight of the area. Enemies hit by the eruptions are dealt magic damage, knocked up for 1 second, and stunned for a duration."
+        },
+        "description2": {
+          "raw": "Upon reaching the primary target, the ''Depth Charge'' erupts a final time at their location. The primary target takes increased damage, is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for the same duration, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked up]]</span> for a modified duration.",
+          "text": "Upon reaching the primary target, the Depth Charge erupts a final time at their location. The primary target takes increased damage, is stunned for the same duration, and knocked up for a modified duration."
+        },
+        "effectradius": "225 • 300 • 750",
+        "icon": "Depth Charge.png",
+        "icon2": "Depth Charge 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>125 / 150 / 175 / 200 / 225 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Stun Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Magic Damage:125 / 150 / 175 / 200 / 225 (+ 40% AP)\nStun Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Increased Damage:'''</span></dt><dd>150 / 212.<small>5</small> / 275 / 337.<small>5</small> / 400 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 80% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Knock Up Duration:'''</span></dt><dd>1 / 1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 seconds</dd></dl>",
+          "text": "Increased Damage:150 / 212.5 / 275 / 337.5 / 400 (+ 80% AP)\nKnock Up Duration:1 / 1.25 / 1.5 / 1.75 / 2 seconds"
+        },
+        "name": "Depth Charge",
+        "notes": {
+          "raw": "* ''Depth Charge'' starts in an offset from whichever direction '''Nautilus''' is facing at the end of the cast time.\n** Since <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line's]]</span></span> causes '''Nautilus''' to change his facing direction upon hitting a valid target, ''Depth Charge's'' starting point can be changed with a quick <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line]]</span></span> + ''Depth Charge'' combo.\n* Enemies a certain distance away from the charge / eruption are instead <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocked back]]</span>.\n* ''Depth Charge's'' final eruption will occur prematurely if the primary target moves more than 3000 units away from it.\n* ''Depth Charge'' will not stop chasing if the target dies or becomes untargetable.\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Nautilus\" data-ability=\"Dredge Line\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Nautilus Dredge Line.png|20xpx|border|link=Nautilus#Dredge Line|An icon for Nautilus's ability Dredge Line]]</span> <span style=\"white-space:normal;\">[[Nautilus#Dredge Line|Dredge Line]]</span></span> will not override ''Depth Charge's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock up]]</span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|Displacement immunity]]</span> will not resist the application of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span>.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Depth Charge starts in an offset from whichever direction Nautilus is facing at the end of the cast time.\n* Since Dredge Line's causes Nautilus to change his facing direction upon hitting a valid target, Depth Charge's starting point can be changed with a quick Dredge Line + Depth Charge combo.\nEnemies a certain distance away from the charge / eruption are instead knocked back.\nDepth Charge's final eruption will occur prematurely if the primary target moves more than 3000 units away from it.\nDepth Charge will not stop chasing if the target dies or becomes untargetable.\nDredge Line will not override Depth Charge's knock up.\nDisplacement immunity will not resist the application of the stun.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": false,
+        "speed": "275 + 466.67 per second",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Depth Charge 2"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "387153d7aae8ad73b71c09bbab6924c3ba9c20c16f2631851ce367b2bb8ec057",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nautilus/Depth_Charge",
+    "revisionId": 4007702,
+    "sourceTimestamp": "2026-04-12T12:15:42Z"
+  }
+}

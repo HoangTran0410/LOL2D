@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_ziggs_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Bouncing_Bomb.png?30cb6",
+    "sha1": "77e7478ede03513e7aca327174c9c2b1614187be"
+  },
+  "champion": "Ziggs",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ziggs_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Bouncing_Bomb.png?30cb6",
+        "sha1": "77e7478ede03513e7aca327174c9c2b1614187be"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "6 / 5.5 / 5 / 4.5 / 4",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ziggs''' throws a bomb to the target location that bounces forward up to two times, with the distance traveled each time being based on how far it was originally thrown and each bounce occurring over 0.<small>495</small> seconds regardless of distance.",
+          "text": "Active: Ziggs throws a bomb to the target location that bounces forward up to two times, with the distance traveled each time being based on how far it was originally thrown and each bounce occurring over 0.495 seconds regardless of distance."
+        },
+        "description2": {
+          "raw": "The bomb explodes upon landing near an enemy, within terrain, or the final bounce, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.",
+          "text": "The bomb explodes upon landing near an enemy, within terrain, or the final bounce, dealing magic damage to nearby enemies."
+        },
+        "effectradius": "240",
+        "icon": "Bouncing Bomb.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 130 / 180 / 230 / 280 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60 / 65 / 70 / 75 / 80% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 130 / 180 / 230 / 280 (+ 60 / 65 / 70 / 75 / 80% AP)"
+        },
+        "name": "Bouncing Bomb",
+        "notes": {
+          "raw": "* ''Bouncing Bomb'' can be thrown or bounce over units/terrain.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the damage of the explosion, but the explosion can still damage other targets in the radius.\n* '''Ziggs''' will throw the bomb from his location at the end of the cast time, towards the <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Relevant only if cast beyond maximum range\">pre-clamped</span> cast location, causing the bounces to adjust their angle accordingly.",
+          "text": "Bouncing Bomb can be thrown or bounce over units/terrain.\nSpell shield will block the damage of the explosion, but the explosion can still damage other targets in the radius.\nZiggs will throw the bomb from his location at the end of the cast time, towards the pre-clamped cast location, causing the bounces to adjust their angle accordingly."
+        },
+        "projectile": true,
+        "range": "1400",
+        "speed": "1700",
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Bouncing Bomb"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "65eddd048ef029432e6ad2ae0f1c0c1177795b2dd166260b30653763f63efd75",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Bouncing_Bomb",
+    "revisionId": 4008669,
+    "sourceTimestamp": "2026-04-15T01:25:41Z"
+  }
+}

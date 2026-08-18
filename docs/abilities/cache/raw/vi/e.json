@@ -1,0 +1,74 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Vi/Relentless Force",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Relentless Force@@icon@@Relentless Force 2.png@@icon2@@Relentless Force.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Vi''' empowers her next basic attack within 6 seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span> and trigger a blast in the target's direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">'''modified''' physical damage</span> to enemies hit in a cone.<br><br>''Relentless Force'' can <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critically strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> for <span style=\"color:\n#B4814C; white-space:normal\">(100%&nbsp;+&nbsp;<span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Infinity Edge\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Infinity Edge item.png|20xpx|border|link=Infinity Edge|An icon for the item Infinity Edge]]</span> <span style=\"white-space:normal;\">[[Infinity Edge|30%]]</span></span>)</span> <span style=\"color:orange; white-space:normal\">AD</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> against the primary target. Secondary targets take the same damage but do not count as being critically struck.@@description2@@'''Vi''' periodically [[stock]]s a ''Relentless Force'' charge, up to a maximum of 2.@@description3@@''Relentless Force <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Vi's''' basic attack timer.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>10 / 30 / 50 / 70 / 90 <span style=\"color:orange; white-space:normal\">(+ 110% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 600@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@26 / 32 / 38 / 44 / 50@@cooldown@@{{{cooldown}}}@@targeting@@Auto@@damagetype@@physical@@spellshield@@special@@projectile@@{{{projectile}}}@@notes@@\n* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> to the primary target, applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span> required effects on the primary target, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to secondary targets.\n* The empowered attack has the same windup time as '''Vi's''' basic attacks.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block damage to secondary targets, but not to the primary target.\n* ''Relentless Force'' will only apply a stack of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Denting Blows\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Denting Blows.png|20xpx|border|link=Vi#Denting Blows|An icon for Vi's ability Denting Blows]]</span> <span style=\"white-space:normal;\">[[Vi#Denting Blows|Denting Blows]]</span></span> to the primary target.\n* If the ''Relentless Force'' buff is about to run out as '''Vi''' starts the attack windup, the duration will be updated and extended to allow '''Vi''' to still sucessfully attack.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308603,
+                "revisions": [
+                  {
+                    "parentid": 3986699,
+                    "revid": 3986710,
+                    "timestamp": "2026-01-23T00:42:37Z"
+                  }
+                ],
+                "title": "Template:Data Vi/Relentless Force"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3986710,
+      "timestamp": "2026-01-23T00:42:37Z"
+    },
+    {
+      "page": "Template:Data Vi/Relentless Force 2",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Relentless Force@@icon@@Relentless Force 2.png@@icon2@@Relentless Force.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Vi''' empowers her next basic attack within 6 seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span> and trigger a blast in the target's direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">'''modified''' physical damage</span> to enemies hit in a cone.<br><br>''Relentless Force'' can <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critically strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> for <span style=\"color:\n#B4814C; white-space:normal\">(100%&nbsp;+&nbsp;<span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Infinity Edge\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Infinity Edge item.png|20xpx|border|link=Infinity Edge|An icon for the item Infinity Edge]]</span> <span style=\"white-space:normal;\">[[Infinity Edge|30%]]</span></span>)</span> <span style=\"color:orange; white-space:normal\">AD</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> against the primary target. Secondary targets take the same damage but do not count as being critically struck.@@description2@@'''Vi''' periodically [[stock]]s a ''Relentless Force'' charge, up to a maximum of 2.@@description3@@''Relentless Force <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Vi's''' basic attack timer.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>10 / 30 / 50 / 70 / 90 <span style=\"color:orange; white-space:normal\">(+ 110% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> 600@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@26 / 32 / 38 / 44 / 50@@cooldown@@{{{cooldown}}}@@targeting@@Auto@@damagetype@@physical@@spellshield@@special@@projectile@@{{{projectile}}}@@notes@@\n* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> to the primary target, applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span> required effects on the primary target, and applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to secondary targets.\n* The empowered attack has the same windup time as '''Vi's''' basic attacks.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block damage to secondary targets, but not to the primary target.\n* ''Relentless Force'' will only apply a stack of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Denting Blows\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Denting Blows.png|20xpx|border|link=Vi#Denting Blows|An icon for Vi's ability Denting Blows]]</span> <span style=\"white-space:normal;\">[[Vi#Denting Blows|Denting Blows]]</span></span> to the primary target.\n* If the ''Relentless Force'' buff is about to run out as '''Vi''' starts the attack windup, the duration will be updated and extended to allow '''Vi''' to still sucessfully attack.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1514244,
+                "revisions": [
+                  {
+                    "parentid": 0,
+                    "revid": 3365024,
+                    "timestamp": "2021-11-22T15:30:49Z"
+                  }
+                ],
+                "title": "Template:Data Vi/Relentless Force 2"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3365024,
+      "timestamp": "2021-11-22T15:30:49Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f1e1864a46d56659b8bd014e8754d3b29accb6dfd8fde5ce6e263ff62c7124a3",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vi/Relentless_Force",
+    "revisionId": 3986710,
+    "sourceTimestamp": "2026-01-23T00:42:37Z"
+  }
+}

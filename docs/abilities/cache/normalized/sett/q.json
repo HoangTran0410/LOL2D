@@ -1,0 +1,98 @@
+{
+  "asset": {
+    "key": "spell_sett_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Knuckle_Down.png?a7444",
+    "sha1": "a947f9a3dbe6ffb9315d995464db56ab51b3a5e3"
+  },
+  "champion": "Sett",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_sett_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Knuckle_Down.png?a7444",
+        "sha1": "a947f9a3dbe6ffb9315d995464db56ab51b3a5e3"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "9 / 8 / 7 / 6 / 5",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Sett''' empowers his next two basic attacks within 5 seconds to gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span> and deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>, capped at 400 '''total''' damage of each attack against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Active: Sett empowers his next two basic attacks within 5 seconds to gain &nbsp;50 bonus range and deal bonus physical damage, capped at 400 total damage of each attack against monsters."
+        },
+        "description2": {
+          "raw": "For 1.<small>5</small> seconds, '''Sett''' also gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">30% '''bonus''' movement speed</span></span> while facing <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within 2000 units.",
+          "text": "For 1.5 seconds, Sett also gains &nbsp;30% bonus movement speed while facing visible enemy champions within 2000 units."
+        },
+        "description3": {
+          "raw": "''Knuckle Down <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Sett's''' basic attack timer. The empowered attacks are guaranteed to be a <span style=\"color:yellow; white-space:normal\">Left Punch</span> followed by a <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span>, resetting '''Sett's''' current <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Sett\" data-ability=\"Pit Grit\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sett Pit Grit.png|20xpx|border|link=Sett#Pit Grit|An icon for Sett's ability Pit Grit]]</span> <span style=\"white-space:normal;\">[[Sett#Pit Grit|Pit Grit]]</span></span> state (if applicable) and ignoring the usual time-out period for a follow-up <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span>.''",
+          "text": "Knuckle Down resets Sett's basic attack timer. The empowered attacks are guaranteed to be a Left Punch followed by a Right Punch, resetting Sett's current Pit Grit state (if applicable) and ignoring the usual time-out period for a follow-up Right Punch."
+        },
+        "icon": "Knuckle Down.png",
+        "icon2": "Looking for a Fight.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd>10 / 20 / 30 / 40 / 50 <span style=\"color:\n#21B053; white-space:normal\">(+ 1% <span style=\"color:orange; white-space:normal\">(+ 1 / 1.<small>5</small> / 2 / 2.<small>5</small> / 3% per 100 AD)</span> of target's '''maximum''' health)</span></dd><dt><span class=\"template_lc\">'''Total Bonus Physical Damage:'''</span></dt><dd>20 / 40 / 60 / 80 / 100 <span style=\"color:\n#21B053; white-space:normal\">(+ 2% <span style=\"color:orange; white-space:normal\">(+ 2 / 3 / 4 / 5 / 6% per 100 AD)</span> of target's '''maximum''' health)</span></dd></dl>",
+          "text": "Bonus Physical Damage:10 / 20 / 30 / 40 / 50 (+ 1% (+ 1 / 1.5 / 2 / 2.5 / 3% per 100 AD) of target's maximum health)Total Bonus Physical Damage:20 / 40 / 60 / 80 / 100 (+ 2% (+ 2 / 3 / 4 / 5 / 6% per 100 AD) of target's maximum health)"
+        },
+        "name": "Knuckle Down",
+        "notes": {
+          "raw": "* The bonus movement speed buff is named ''Looking For a Fight''.\n* ''Knuckle Down'' can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> or missed while '''Sett''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.",
+          "text": "The bonus movement speed buff is named Looking For a Fight.\nKnuckle Down can be dodged, blocked or missed while Sett is blinded."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Knuckle Down"
+    },
+    {
+      "asset": {
+        "key": "spell_sett_q2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Knuckle_Down.png?a7444",
+        "sha1": "a947f9a3dbe6ffb9315d995464db56ab51b3a5e3"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "9 / 8 / 7 / 6 / 5",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Sett''' empowers his next two basic attacks within 5 seconds to gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span> and deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>, capped at 400 '''total''' damage of each attack against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Active: Sett empowers his next two basic attacks within 5 seconds to gain &nbsp;50 bonus range and deal bonus physical damage, capped at 400 total damage of each attack against monsters."
+        },
+        "description2": {
+          "raw": "For 1.<small>5</small> seconds, '''Sett''' also gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">30% '''bonus''' movement speed</span></span> while facing <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> within 2000 units.",
+          "text": "For 1.5 seconds, Sett also gains &nbsp;30% bonus movement speed while facing visible enemy champions within 2000 units."
+        },
+        "description3": {
+          "raw": "''Knuckle Down <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Sett's''' basic attack timer. The empowered attacks are guaranteed to be a <span style=\"color:yellow; white-space:normal\">Left Punch</span> followed by a <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span>, resetting '''Sett's''' current <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Sett\" data-ability=\"Pit Grit\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sett Pit Grit.png|20xpx|border|link=Sett#Pit Grit|An icon for Sett's ability Pit Grit]]</span> <span style=\"white-space:normal;\">[[Sett#Pit Grit|Pit Grit]]</span></span> state (if applicable) and ignoring the usual time-out period for a follow-up <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span>.''",
+          "text": "Knuckle Down resets Sett's basic attack timer. The empowered attacks are guaranteed to be a Left Punch followed by a Right Punch, resetting Sett's current Pit Grit state (if applicable) and ignoring the usual time-out period for a follow-up Right Punch."
+        },
+        "icon": "Knuckle Down.png",
+        "icon2": "Looking for a Fight.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd>10 / 20 / 30 / 40 / 50 <span style=\"color:\n#21B053; white-space:normal\">(+ 1% <span style=\"color:orange; white-space:normal\">(+ 1 / 1.<small>5</small> / 2 / 2.<small>5</small> / 3% per 100 AD)</span> of target's '''maximum''' health)</span></dd><dt><span class=\"template_lc\">'''Total Bonus Physical Damage:'''</span></dt><dd>20 / 40 / 60 / 80 / 100 <span style=\"color:\n#21B053; white-space:normal\">(+ 2% <span style=\"color:orange; white-space:normal\">(+ 2 / 3 / 4 / 5 / 6% per 100 AD)</span> of target's '''maximum''' health)</span></dd></dl>",
+          "text": "Bonus Physical Damage:10 / 20 / 30 / 40 / 50 (+ 1% (+ 1 / 1.5 / 2 / 2.5 / 3% per 100 AD) of target's maximum health)Total Bonus Physical Damage:20 / 40 / 60 / 80 / 100 (+ 2% (+ 2 / 3 / 4 / 5 / 6% per 100 AD) of target's maximum health)"
+        },
+        "name": "Knuckle Down",
+        "notes": {
+          "raw": "* The bonus movement speed buff is named ''Looking For a Fight''.\n* ''Knuckle Down'' can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> or missed while '''Sett''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.",
+          "text": "The bonus movement speed buff is named Looking For a Fight.\nKnuckle Down can be dodged, blocked or missed while Sett is blinded."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Looking for a Fight"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "4c8ba474fb1418b73aae2ea4a7fa739d78853d141a24fcb97c24722d84ceb944",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Sett/Knuckle_Down",
+    "revisionId": 4024545,
+    "sourceTimestamp": "2026-06-01T14:02:44Z"
+  }
+}

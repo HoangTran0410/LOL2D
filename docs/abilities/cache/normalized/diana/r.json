@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_diana_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonfall.png?b2777",
+    "sha1": "ff1f5456a3a55589a85289a28aa1ec4635a41faf"
+  },
+  "champion": "Diana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_diana_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonfall.png?b2777",
+        "sha1": "ff1f5456a3a55589a85289a28aa1ec4635a41faf"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "100 / 95 / 90 / 85 / 80",
+        "cost": "100",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Diana''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|pulls]]</span> all nearby enemies towards her, during which they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span>, then <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them for 2 seconds.",
+          "text": "Active: Diana pulls all nearby enemies towards her, during which they are revealed, then slows them for 2 seconds."
+        },
+        "description2": {
+          "raw": "If an enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span> is pulled, she calls down a beam of moonlight to strike upon the area around her after 1 second, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to all nearby enemies, increased for each champion pulled beyond the first.",
+          "text": "If an enemy champion is pulled, she calls down a beam of moonlight to strike upon the area around her after 1 second, dealing magic damage to all nearby enemies, increased for each champion pulled beyond the first."
+        },
+        "effectradius": "475 • 225",
+        "icon": "Moonfall.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>40 / 45 / 50 / 55 / 60%</dd></dl>",
+          "text": "Slow:40 / 45 / 50 / 55 / 60%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>200 / 250 / 300 / 350 / 400 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Damage Per Champion:'''</span></dt><dd>35 / 47.<small>5</small> / 60 / 72.<small>5</small> / 85 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 15% AP)</span></dd><dt><span class=\"template_lc\">'''Total Damage Vs. 5 Champions:'''</span></dt><dd>340 / 440 / 540 / 640 / 740 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 120% AP)</span></dd></dl>",
+          "text": "Magic Damage:200 / 250 / 300 / 350 / 400 (+ 60% AP)\nBonus Damage Per Champion:35 / 47.5 / 60 / 72.5 / 85 (+ 15% AP)Total Damage Vs. 5 Champions:340 / 440 / 540 / 640 / 740 (+ 120% AP)"
+        },
+        "name": "Moonfall",
+        "notes": {
+          "raw": "* Enemies stay in the area for a maximum of approximately 0.<small>5</small> seconds while being pulled.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cc-immune\">[[File:Cc-immune_icon.png|20px|link=Crowd control#Immunity|An icon representing the keyword Cc-Immune]] [[:Crowd control#Immunity|Crowd control immunity]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Displacement immunity\">[[File:Unstoppable icon.png|20px|link=Crowd control#Displacement_Immunity|An icon representing the keyword Displacement immune]] [[:Crowd control#Displacement_Immunity|displacement immunity]]</span> still count as being \"pulled in\" by the ability.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clone\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|Clones]]</span> count as champions for increasing this ability's damage.\n* ''Moonfall's'' additional damage is not capped at 4 champions.\n* The beam of moonlight does not crash down if champions hit blocked the initial effect with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>.\n** Enemy champions protected by ''spell shield'' do not count towards the damage increase.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* A lunar phase of the moon will appear above '''Diana''' while she is casting ''Moonfall'', each phase is based on the number of enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> pulled:\n<gallery navigation=true widths=\"80px\">\nNew_Moon_Moonfall_(1_Enemy_Champion).png|{{sbc|New Moon:}} '''1''' Enemy Champion Pulled\nWaning_Crescent_Moonfall_(2_Enemy_Champions).png|{{sbc|Waning Crescent:}} '''2''' Enemy Champions Pulled\nThird_Quarter_Moonfall_(3_Enemy_Champions).png|{{sbc|Third Quarter:}} '''3''' Enemy Champions Pulled\nWaning_Gibbous_Moonfall_(4_Enemy_Champions).png|{{sbc|Waning Gibbous:}} '''4''' Enemy Champions Pulled\nFull_Moon_Moonfall_(5_Enemy_Champions).png|{{sbc|Full Moon:}} '''5''' Enemy Champions Pulled\n</gallery>",
+          "text": "Enemies stay in the area for a maximum of approximately 0.5 seconds while being pulled.\nCrowd control immunity and displacement immunity still count as being \"pulled in\" by the ability.\nClones count as champions for increasing this ability's damage.\nMoonfall's additional damage is not capped at 4 champions.\nThe beam of moonlight does not crash down if champions hit blocked the initial effect with spell shield.\n* Enemy champions protected by spell shield do not count towards the damage increase.\nThis ability will cast from wherever the caster is at the end of the cast time.\nA lunar phase of the moon will appear above Diana while she is casting Moonfall, each phase is based on the number of enemy champions pulled:\nNew_Moon_Moonfall_(1_Enemy_Champion).png|New Moon: 1 Enemy Champion Pulled\nWaning_Crescent_Moonfall_(2_Enemy_Champions).png|Waning Crescent: 2 Enemy Champions Pulled\nThird_Quarter_Moonfall_(3_Enemy_Champions).png|Third Quarter: 3 Enemy Champions Pulled\nWaning_Gibbous_Moonfall_(4_Enemy_Champions).png|Waning Gibbous: 4 Enemy Champions Pulled\nFull_Moon_Moonfall_(5_Enemy_Champions).png|Full Moon: 5 Enemy Champions Pulled"
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Moonfall"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "18396cce97196bf33dbd7e0afaa4d78b4f8c42f2fde943b84204c228bcb53b5c",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Moonfall",
+    "revisionId": 4007593,
+    "sourceTimestamp": "2026-04-12T06:58:43Z"
+  }
+}

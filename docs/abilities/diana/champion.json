@@ -1,0 +1,111 @@
+{
+  "asset": {
+    "key": "champ_diana",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_OriginalSquare.png?d5d54",
+    "sha1": "c4b0f7c311b39cacd3f6fba78341b8db398534e5"
+  },
+  "champion": "Diana",
+  "data": {
+    "adaptivetype": "Magic",
+    "alttype": "Assassin",
+    "apiname": "Diana",
+    "be": 225,
+    "changes": "V26.15",
+    "client_positions": [
+      "Jungle",
+      "Middle"
+    ],
+    "client_tags": [
+      "Burst",
+      "Dive",
+      "Magic"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2012-08-07",
+    "difficulty": 1,
+    "external_positions": [
+      "Jungle",
+      "Middle"
+    ],
+    "herotype": "Fighter",
+    "id": 131,
+    "mobility": 2,
+    "patch": "V1.0.0.144",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Assassin",
+      "Diver"
+    ],
+    "rp": 260,
+    "skill_e": {
+      "1": "Lunar Rush"
+    },
+    "skill_i": {
+      "1": "Moonsilver Blade"
+    },
+    "skill_q": {
+      "1": "Crescent Strike"
+    },
+    "skill_r": {
+      "1": "Moonfall"
+    },
+    "skill_w": {
+      "1": "Pale Cascade"
+    },
+    "skills": {
+      "1": "Moonsilver Blade",
+      "2": "Crescent Strike",
+      "3": "Pale Cascade",
+      "4": "Lunar Rush",
+      "5": "Moonfall"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1
+      },
+      "arm_base": 31,
+      "arm_lvl": 4.3,
+      "as_base": 0.625,
+      "as_lvl": 2,
+      "as_ratio": 0.694,
+      "attack_delay_offset": -0.0916666686534881,
+      "dam_base": 57,
+      "dam_lvl": 3,
+      "hp5_base": 6.5,
+      "hp5_lvl": 0.85,
+      "hp_base": 640,
+      "hp_lvl": 109,
+      "mp5_base": 8,
+      "mp5_lvl": 0.8,
+      "mp_base": 375,
+      "mp_lvl": 25,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 345,
+      "ofa": {
+        "dmg_dealt": 0.95
+      },
+      "pathing_radius": 35,
+      "range": 150,
+      "selection_height": 188.88890075683594,
+      "selection_radius": 120
+    },
+    "style": 65,
+    "title": "Scorn of the Moon",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "f798500ac11c282cf3a7e78619f57679fd17e2e2cd71372229f60953b38ec9c8",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

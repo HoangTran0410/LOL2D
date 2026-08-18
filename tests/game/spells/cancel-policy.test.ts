@@ -202,13 +202,31 @@ describe('cancel policy, driven through real spells', () => {
       // so stepping forward is part of the gesture; crowd control still takes it.
       'Darius_Q: AIMED',
       'Janna_Q: INDEPENDENT',
+      // Curtain Call: the four shots are fired from a set position over a 6s
+      // window, and walking between them is part of the performance. Crowd
+      // control still ends it, which is the whole counterplay.
+      'Jhin_R: AIMED',
       'Lux_R: INDEPENDENT',
       'Pantheon_Q: AIMED',
       'Rammus_Q: INDEPENDENT',
       // Slice and Dice spends its ACTIVE window as a recast timer over a dash
       // that already has its momentum — the Dash buff owns being interrupted.
       'Renekton_E: INDEPENDENT',
+      // Blade of the Exile is a 9s empower she has to fight through; a silence
+      // landing halfway must not confiscate the reforged blade, and the Wind
+      // Slash recast is gated on the window rather than on holding still.
+      'Riven_R: INDEPENDENT',
+      // Force of Will holds a seized sphere over her head: out in the world and
+      // leashed to her, so she may walk and be shoved, and losing control of
+      // herself drops it.
+      'Syndra_W: TETHERED',
       'Varus_Q: AIMED',
+      // Vault Breaker charges while strafing, the same gesture as Varus Q.
+      'Vi_Q: AIMED',
+      // The satchel is already stuck in the ground on its own 4s fuse, and the
+      // detonation knocks Ziggs himself back — a form that ended on being
+      // shoved would have the ability cancel itself.
+      'Ziggs_W: INDEPENDENT',
     ]);
   });
 });

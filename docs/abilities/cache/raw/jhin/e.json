@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Jhin/Captive Audience",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Captive Audience@@icon@@false@@icon2@@Captive Audience.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Passive - Beauty in Death:'''</span> Whenever '''Jhin''' kills an enemy champion, he summons a ''Blooming Lotus Trap'' on their corpse.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Jhin''' places a ''Lotus Trap'' at the target location which, upon landing, becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealthed trap\">[[File:Noxious Trap.png|20px|link=Stealth#Stealthed_traps_and_wards|An icon representing the keyword Stealthed trap]] [[:Stealth#Stealthed_traps_and_wards|stealthed]]</span> after arming over 1 second, lasting for up to 180 seconds and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> within its radius. The ''Lotus Trap blooms'' upon enemy contact, with enemies in the area at the time of its trigger becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span> for 4 seconds.@@description3@@'''Jhin''' periodically [[stock]]s a ''Lotus Trap'' charge, up to a maximum of 2.@@description4@@''Blooming Lotus Traps'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> enemies within the area by 35% for 2 seconds before exploding, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies. ''Lotus Traps'' deal 65% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> as well as against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> who have been struck by another ''Lotus Trap'' in the last 1 second.@@description5@@''See [[Jhin#Pets|Pets]] for more details about Lotus Traps.''@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>20 / 80 / 140 / 200 / 260 <span style=\"color:orange; white-space:normal\">(+ 120% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>13 / 52 / 91 / 130 / 169 <span style=\"color:orange; white-space:normal\">(+ 78% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"On-trigger reveal and explosion radius\">260</span> • <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]]</span><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Trap sight radius\">260</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@0.<small>25</small>@@cost@@30@@cooldown@@2@@targeting@@Location@@damagetype@@Magic@@spellshield@@True@@projectile@@Special@@notes@@\n* ''Beauty in Death'' does not consume ''Lotus Trap'' charges.\n* The ''Lotus Trap'' will stop upon encountering a <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* ''Beauty in Death'' does not trigger after killing a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clone\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|clone]]</span>.\n* The reveal debuff is named [[File: Caught Out.png|20px|link=]] ''Caught Out''.\n** This debuff is shared between ''Captive Audience'' and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Curtain Call\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Curtain Call.png|20xpx|border|link=Jhin#Curtain Call|An icon for Jhin's ability Curtain Call]]</span> <span style=\"white-space:normal;\">[[Jhin#Curtain Call|Curtain Call]]</span></span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307583,
+                "revisions": [
+                  {
+                    "parentid": 3922821,
+                    "revid": 4007613,
+                    "timestamp": "2026-04-12T07:25:10Z"
+                  }
+                ],
+                "title": "Template:Data Jhin/Captive Audience"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007613,
+      "timestamp": "2026-04-12T07:25:10Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "7816ccb3465392d2331fb749d136f34db0d351c8536ccbfb33efa044156e3189",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jhin/Captive_Audience",
+    "revisionId": 4007613,
+    "sourceTimestamp": "2026-04-12T07:25:10Z"
+  }
+}

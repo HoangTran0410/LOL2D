@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_ziggs_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Mega_Inferno_Bomb.png?af8a4",
+    "sha1": "5d22fd2e60047a5b12a4d3863de01a438b2403db"
+  },
+  "champion": "Ziggs",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ziggs_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Mega_Inferno_Bomb.png?af8a4",
+        "sha1": "5d22fd2e60047a5b12a4d3863de01a438b2403db"
+      },
+      "fields": {
+        "casttime": "0.375",
+        "cooldown": "120 / 107.5 / 95 / 82.5 / 70",
+        "cost": "100",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ziggs''' catapults the ''Mega Inferno Bomb'' to the target location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area for 4 seconds.",
+          "text": "Active: Ziggs catapults the Mega Inferno Bomb to the target location, granting sight of the area for 4 seconds."
+        },
+        "description2": {
+          "raw": "The bomb explodes upon arrival to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit, reduced to 65% against those outside of the epicenter.",
+          "text": "The bomb explodes upon arrival to deal magic damage to enemies hit, reduced to 65% against those outside of the epicenter."
+        },
+        "effectradius": "525 • 600",
+        "icon": "Mega Inferno Bomb.png",
+        "icon2": "Mega Inferno Bomb Minimap.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Epicenter Magic Damage:'''</span></dt><dd>300 / 400 / 500 / 600 / 700 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>195 / 260 / 325 / 390 / 455 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>",
+          "text": "Epicenter Magic Damage:300 / 400 / 500 / 600 / 700 (+ 100% AP)Reduced Damage:195 / 260 / 325 / 390 / 455 (+ 65% AP)"
+        },
+        "name": "Mega Inferno Bomb",
+        "notes": {
+          "raw": "* Allies cannot see ''Mega Inferno Bomb's'' area indicator until shortly before the blast.\n* ''Mega Inferno Bomb'' takes 2.<small>64</small> seconds from the start of the cast time to land when cast at maximum range (reduced to 1.<small>617</small> seconds from the start of the cast time when casting within <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Estimated\">2700</span> units).\n** When cast within 2700 units, ''Mega Inferno Bomb'' has a fixed travel time. Beyond that, the travel time is equal to the cast distance divided by the now-fixed missile speed.\n* The area reveal on the target location begins as soon as the cast time is completed and can see into <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Brush\">[[File:Brushmaker.png|20px|link=Brush|An icon representing the keyword Brush]] [[:Brush|brush]]</span> and across terrain.",
+          "text": "Allies cannot see Mega Inferno Bomb's area indicator until shortly before the blast.\nMega Inferno Bomb takes 2.64 seconds from the start of the cast time to land when cast at maximum range (reduced to 1.617 seconds from the start of the cast time when casting within 2700 units).\n* When cast within 2700 units, Mega Inferno Bomb has a fixed travel time. Beyond that, the travel time is equal to the cast distance divided by the now-fixed missile speed.\nThe area reveal on the target location begins as soon as the cast time is completed and can see into brush and across terrain."
+        },
+        "projectile": false,
+        "speed": "2250",
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Mega Inferno Bomb"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "8154c8200254594be93410c95963afab8349c355adc95a079705c0c66f771bc2",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Mega_Inferno_Bomb",
+    "revisionId": 4008677,
+    "sourceTimestamp": "2026-04-15T01:31:12Z"
+  }
+}

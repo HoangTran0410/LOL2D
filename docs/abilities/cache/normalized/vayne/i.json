@@ -1,0 +1,43 @@
+{
+  "asset": {
+    "key": "spell_vayne_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Night_Hunter.png?110b5",
+    "sha1": "aa84b432054b8430970e6fb860f4c7e7894536cf"
+  },
+  "champion": "Vayne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_vayne_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Night_Hunter.png?110b5",
+        "sha1": "aa84b432054b8430970e6fb860f4c7e7894536cf"
+      },
+      "fields": {
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Vayne''' gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">30 '''bonus''' movement speed</span></span> while facing a nearby <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champion]]</span>, increased to <span style=\"color:\n#9FFF4D; white-space:normal\">90</span> while under the effects of ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Final Hour\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Final Hour.png|20xpx|border|link=Vayne#Final Hour|An icon for Vayne's ability Final Hour]]</span> <span style=\"white-space:normal;\">[[Vayne#Final Hour|Final Hour]]</span></span>''.",
+          "text": "Innate: Vayne gains &nbsp;30 bonus movement speed while facing a nearby visible enemy champion, increased to 90 while under the effects of Final Hour."
+        },
+        "effectradius": "2000",
+        "icon": "Night Hunter.png",
+        "name": "Night Hunter",
+        "notes": {
+          "raw": "* The '''bonus''' movement speed persists for 2 seconds after '''Vayne''' loses <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of an enemy champion.",
+          "text": "The bonus movement speed persists for 2 seconds after Vayne loses sight of an enemy champion."
+        },
+        "targeting": "Passive"
+      },
+      "name": "Night Hunter"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "1e2cce2a341f23b7697ccb114f2be6c151be98dc1947adb205a22ad1488baae8",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Night_Hunter",
+    "revisionId": 3920984,
+    "sourceTimestamp": "2025-06-28T00:17:28Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ziggs/Short Fuse",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Short Fuse@@icon@@Short Fuse.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> Periodically, '''Ziggs''' empowers his next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> to deal <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"16 + 4 per level up to 6, then + 8 per level up to 12, then + 12 per level up to 18\" data-bot-values=\"20;24;28;32;36;40;48;56;64;72;80;88;100;112;124;136;148;160;172;184\">20 – 184 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>,<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;increased by 75% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.&nbsp;」</span><span class=\"flipText2\">「&nbsp;increased to <span style=\"color:\n#00B0F0; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"35 + 7 per level up to 6, then + 14 per level up to level 12, then + 21 per level\" data-bot-values=\"35;42;49;56;63;70;84;98;112;126;140;154;175;196;217;238;259;280;301;322\">35 – 322 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 87.<small>5</small>% AP)</span> against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.&nbsp;」</span></span>@@description2@@''Short Fuse's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"4;1\" data-finish=\"6;13\" data-top-fill=\"3\" data-bot-values=\"4;5;6\" data-top-values=\"1;7;13\">4 / 5 / 6 (based on level)</span> seconds whenever '''Ziggs''' casts an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span>.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Attack missile speed, same as basic attacks\">1500</span>@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@magic@@spellshield@@False@@projectile@@{{{projectile}}}@@notes@@\n* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.\n* The cooldown reduction is granted at the start of the abilities' cast time.\n* ''Short Fuse'' will go on cooldown but not deal any damage if the attack misses due to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blind]]</span>.\n* <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span>: ''Short Fuse's'' interactions with <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodging]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocking]]</span> effects.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309289,
+                "revisions": [
+                  {
+                    "parentid": 3988544,
+                    "revid": 4005222,
+                    "timestamp": "2026-04-04T06:53:28Z"
+                  }
+                ],
+                "title": "Template:Data Ziggs/Short Fuse"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4005222,
+      "timestamp": "2026-04-04T06:53:28Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b70cff3d7426f3a624ae4c6a4a30f1b36437a5bc4cc61fa126c0bf3bdb466a7a",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Short_Fuse",
+    "revisionId": 4005222,
+    "sourceTimestamp": "2026-04-04T06:53:28Z"
+  }
+}

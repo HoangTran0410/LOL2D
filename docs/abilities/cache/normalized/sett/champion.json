@@ -1,0 +1,123 @@
+{
+  "asset": {
+    "key": "champ_sett",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_OriginalSquare.png?a9ec3",
+    "sha1": "26862dc6ff17037a3e863cf708fb895313407175"
+  },
+  "champion": "Sett",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Tank",
+    "apiname": "Sett",
+    "be": 675,
+    "changes": "V25.17",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Duelist",
+      "Durable ",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 2,
+    "date": "2020-01-14",
+    "difficulty": 2,
+    "external_positions": [
+      "Top"
+    ],
+    "fullname": "Settrigh",
+    "herotype": "Fighter",
+    "id": 875,
+    "mobility": 2,
+    "patch": "V10.1",
+    "rangetype": "Melee",
+    "resource": "Grit",
+    "role": [
+      "Juggernaut"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Facebreaker"
+    },
+    "skill_i": {
+      "1": "Pit Grit"
+    },
+    "skill_q": {
+      "1": "Knuckle Down",
+      "2": "Looking for a Fight"
+    },
+    "skill_r": {
+      "1": "The Show Stopper"
+    },
+    "skill_w": {
+      "1": "Haymaker"
+    },
+    "skills": {
+      "1": "Pit Grit",
+      "2": "Knuckle Down",
+      "3": "Haymaker",
+      "4": "Facebreaker",
+      "5": "The Show Stopper"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1,
+        "dmg_taken": 1.1
+      },
+      "arm_base": 33,
+      "arm_lvl": 4.7,
+      "as_base": 0.625,
+      "as_lvl": 1.75,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.0857142857,
+      "dam_base": 60,
+      "dam_lvl": 4,
+      "hp5_base": 7,
+      "hp5_lvl": 0.5,
+      "hp_base": 670,
+      "hp_lvl": 114,
+      "mp5_base": 0,
+      "mp5_lvl": 0,
+      "mp_base": 0,
+      "mp_lvl": 0,
+      "mr_base": 28,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "nb": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1
+      },
+      "ofa": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 100,
+      "selection_radius": 100,
+      "urf": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.92
+      },
+      "usb": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      }
+    },
+    "style": 40,
+    "title": "The Boss",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "866978f11ae7142263e58e5c509d41e69e135b076843f47e658ad6b21b06c961",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

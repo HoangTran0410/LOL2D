@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Sett/Haymaker",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Haymaker@@icon@@false@@icon2@@Haymaker.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Sett''' stores 100% of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage calculated after resistances and modifiers.\">post-mitigation damage</span> taken as ''Grit'' on his resource bar, up to a cap of <span style=\"color:\n#21B053; white-space:normal\">50% of his '''maximum''' health</span>. Each instance of stored ''Grit'' decays in value by 30% every second after 4 seconds.@@description2@@<span class=\"template_sbc\">'''Active:'''</span> '''Sett''' charges up a strike over the cast time. Additionally, he immediately consumes all of his stored ''Grit'' to grant himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> at the start of the cast time that is equal to the expended ''Grit'' for 3 seconds, decaying in strength over the duration after 0.<small>75</small> seconds.@@description3@@After the cast time, he unleashes a massive blast in an area in the target direction, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit; those hit in a line in the middle are dealt [[File:Successfully enhanced damage true icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\"><span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">true damage</span></span></span> instead.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Damage:'''</span></dt><dd>80 / 100 / 120 / 140 / 160 (+ 25% <span style=\"color:orange; white-space:normal\">(+ 25% per 100 '''bonus''' AD)</span> of expended ''Grit'')</dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Trapezoid (and inner rectangle) length, starts behind Sett; 745 total length\">-25 – 720</span>@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Trapezoid smaller base, close to Sett\">300</span>  • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Trapezoid larger base, farther from Sett\">620</span> • <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Er\">[[File:Range model.png|20px|link=Range|An icon representing the keyword Edge range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Inner true damage rectangle width\">70</span>@@speed@@{{{speed}}}@@casttime@@0.<small>75</small>@@cost@@100%@@cooldown@@18 / 16.<small>5</small> / 15 / 13.<small>5</small> / 12@@targeting@@Direction@@damagetype@@Physical True@@spellshield@@True@@projectile@@false@@notes@@\n* ''Haymaker's'' total hitbox uses the intersection of a trapezoid and a circle. Enemies are hit by ''Haymaker'' only when their hitbox overlaps with both of those areas.\n** <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span> Where is the center of the circle?\n* The trapezoid and the rectangle both register the edge of enemies' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Gameplay radius\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|hitbox]]</span>.\n* The shield is granted at the start of the cast time and will decay afterwards.\n* '''Sett''' does not store ''Grit'' from damage that was mitigated by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shields]]</span>.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* '''Sett''' will turn towards the target direction at the start of the cast time.\n* '''Sett''' will glow when attaining 90% ''Grit''. Casting ''Haymaker'' at this amount has a different visual and audio effect.\n[[File:90%_Grit_Sett.png|thumb|left|'''Sett''' will turn <span style=\"color:#FFDF00;\">'''golden'''</span> ''(base skin)''.]]@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1415955,
+                "revisions": [
+                  {
+                    "parentid": 3966862,
+                    "revid": 4008036,
+                    "timestamp": "2026-04-13T04:12:41Z"
+                  }
+                ],
+                "title": "Template:Data Sett/Haymaker"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4008036,
+      "timestamp": "2026-04-13T04:12:41Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "0ce0d447754e71d232c4d1cddca1d7ab4f33a754504f137fc061f1b7ad2b1ad6",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Sett/Haymaker",
+    "revisionId": 4008036,
+    "sourceTimestamp": "2026-04-13T04:12:41Z"
+  }
+}

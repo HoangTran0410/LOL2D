@@ -1,0 +1,57 @@
+{
+  "asset": {
+    "key": "spell_katarina_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Bouncing_Blade.png?45a1c",
+    "sha1": "8de9c63600659099625efa7eac452afa132343e6"
+  },
+  "champion": "Katarina",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_katarina_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Bouncing_Blade.png?45a1c",
+        "sha1": "8de9c63600659099625efa7eac452afa132343e6"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "11 / 10 / 9 / 8 / 7",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Katarina''' throws a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span> at the target enemy that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. Upon arrival, the <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span> also bounces to up to two additional <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|visible]]</span> nearby enemies, dealing the same damage and travelling to bounce targets over 0.<small>15</small> seconds each time.",
+          "text": "Active: Katarina throws a Dagger at the target enemy that deals magic damage. Upon arrival, the Dagger also bounces to up to two additional visible nearby enemies, dealing the same damage and travelling to bounce targets over 0.15 seconds each time."
+        },
+        "description2": {
+          "raw": "The <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span> lands <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"1 seconds, but rounded up to the next game tick.\">1.<small>023</small> seconds</span> after striking the first target, <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"slightly random location\">about 350 units</span> opposite from their position when it struck them.",
+          "text": "The Dagger lands 1.023 seconds after striking the first target, about 350 units opposite from their position when it struck them."
+        },
+        "effectradius": "450",
+        "icon": "Bouncing Blade.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>80 / 115 / 150 / 185 / 220 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd></dl>",
+          "text": "Magic Damage:80 / 115 / 150 / 185 / 220 (+ 40% AP)"
+        },
+        "name": "Bouncing Blade",
+        "notes": {
+          "raw": "* ''Bouncing Blade'' will not be destroyed in-flight if the target dies before reaching them but it will on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clones\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|clones]]</span> that expire.\n* If the <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span>'s intended landing position is inside terrain it will instead land at the closest spot that isn't inside terrain.\n* Valid targets are determined after each bounce.\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Bouncing Blade will not be destroyed in-flight if the target dies before reaching them but it will on clones that expire.\nIf the Dagger's intended landing position is inside terrain it will instead land at the closest spot that isn't inside terrain.\nValid targets are determined after each bounce.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1600",
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Bouncing Blade"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "1a9e258617f2366c28968136a697561ffdc982baf007c294ab8e242615b3f130",
+    "fetchedAt": "2026-08-17T14:37:44.748Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Katarina/Bouncing_Blade",
+    "revisionId": 4015158,
+    "sourceTimestamp": "2026-05-03T14:16:38Z"
+  }
+}

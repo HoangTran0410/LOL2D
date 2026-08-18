@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Vayne/Condemn",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Condemn@@icon@@Condemn.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Vayne''' fires a heavy bolt at the target enemy that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocks them back]]</span> 475 units, though not through terrain.@@description2@@If the target collides with [[terrain]], they take [[File:Successfully enhanced damage physical icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\"><span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span></span> and become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for 1.<small>5</small> seconds.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>50 / 85 / 120 / 155 / 190 <span style=\"color:orange; white-space:normal\">(+ 50% '''bonus''' AD)</span></dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd>75 / 127.<small>5</small> / 180 / 232.<small>5</small> / 285 <span style=\"color:orange; white-space:normal\">(+ 75% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Physical Damage:'''</span></dt><dd>125 / 212.<small>5</small> / 300 / 387.<small>5</small> / 475 <span style=\"color:orange; white-space:normal\">(+ 125% '''bonus''' AD)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Missile speed\">2200</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Knockback speed\">2000</span>@@casttime@@0.<small>25</small>@@cost@@90@@cooldown@@20 / 18 / 16 / 14 / 12@@targeting@@Unit@@damagetype@@physical@@spellshield@@True@@projectile@@true@@notes@@\n* ''Condemn's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|displacement]]</span> direction is determined at the end of the cast time.\n** Because of this, '''Vayne''' may use <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> during the cast time to create a better angle.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cleanse\">[[File:Remove Scurvy.png|20px|link=Crowd control#Removal|An icon representing the keyword Cleanse]] [[:Crowd control#Removal|Cleansing]]</span> the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock back]]</span> will also end the displacement early.\n* The [[spell indicator]] for this ability also displays the direction for the knock back relative to '''Vayne's''' position.\n* ''Condemn's'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> duration starts when '''Vayne's''' target collides with a wall (they can be immobilized for up to 2 seconds depending on <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|displacement]]</span> duration based on distance traveled).\n* ''Condemn's'' missile will fail to fire if '''Vayne''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Suppression\">[[File:Suppression icon.png|20px|link=Types of Crowd Control#Suppression|An icon representing the keyword Suppression]] [[:Types of Crowd Control#Suppression|suppressed]]</span> during the cast time.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. \">(unexpected)</span></sup>\n* ''Condemn'' can interact with [[Terrain#Player-Generated|player-generated terrain]].\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309990,
+                "revisions": [
+                  {
+                    "parentid": 3464847,
+                    "revid": 4008541,
+                    "timestamp": "2026-04-14T23:45:40Z"
+                  }
+                ],
+                "title": "Template:Data Vayne/Condemn"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4008541,
+      "timestamp": "2026-04-14T23:45:40Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "e7989bff01421311f3ebfb33ad69fe17152393dbcc98eb65661a80fa0270679f",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Condemn",
+    "revisionId": 4008541,
+    "sourceTimestamp": "2026-04-14T23:45:40Z"
+  }
+}

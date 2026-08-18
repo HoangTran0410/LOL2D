@@ -1,0 +1,122 @@
+{
+  "asset": {
+    "key": "champ_vi",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_OriginalSquare.png?78709",
+    "sha1": "dd1d633f43207122bfd3c6c1b059805ac30f78b8"
+  },
+  "champion": "Vi",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Vi",
+    "be": 675,
+    "changes": "V26.10",
+    "client_positions": [
+      "Jungle"
+    ],
+    "client_tags": [
+      "Dive",
+      "Auto-attack",
+      "Physical"
+    ],
+    "control": 3,
+    "damage": 2,
+    "date": "2012-12-19",
+    "difficulty": 1,
+    "external_positions": [
+      "Jungle"
+    ],
+    "fullname": "Violet",
+    "herotype": "Fighter",
+    "id": 254,
+    "mobility": 2,
+    "nickname": "6",
+    "patch": "V1.0.0.153",
+    "rangetype": "Melee",
+    "resource": "Mana",
+    "role": [
+      "Diver"
+    ],
+    "rp": 585,
+    "skill_e": {
+      "1": "Relentless Force",
+      "2": "Relentless Force 2"
+    },
+    "skill_i": {
+      "1": "Blast Shield"
+    },
+    "skill_q": {
+      "1": "Vault Breaker"
+    },
+    "skill_r": {
+      "1": "Cease and Desist"
+    },
+    "skill_w": {
+      "1": "Denting Blows",
+      "2": "Denting Blows 2"
+    },
+    "skills": {
+      "1": "Blast Shield",
+      "2": "Vault Breaker",
+      "3": "Denting Blows",
+      "4": "Relentless Force",
+      "5": "Cease and Desist"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.95
+      },
+      "arm_base": 30,
+      "arm_lvl": 4.7,
+      "as_base": 0.644,
+      "as_lvl": 2,
+      "as_ratio": 0.643999993801116,
+      "attack_cast_time": 0.360000014305114,
+      "attack_total_time": 1.60000002384185,
+      "dam_base": 63,
+      "dam_lvl": 3.5,
+      "hp5_base": 10,
+      "hp5_lvl": 1,
+      "hp_base": 655,
+      "hp_lvl": 105,
+      "mp5_base": 8,
+      "mp5_lvl": 0.65,
+      "mp_base": 295,
+      "mp_lvl": 65,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "ofa": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 100,
+      "selection_radius": 100,
+      "urf": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      },
+      "usb": {
+        "dmg_dealt": 0.95,
+        "dmg_taken": 1.05
+      }
+    },
+    "style": 55,
+    "title": "The Piltover Enforcer",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "4a8d3d08628b02a062128590c049793d1ab7aac658c5927e10b498dd7e36909a",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

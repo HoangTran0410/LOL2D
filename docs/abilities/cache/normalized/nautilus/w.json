@@ -1,0 +1,64 @@
+{
+  "asset": {
+    "key": "spell_nautilus_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Titan%27s_Wrath.png?e0144",
+    "sha1": "c48c89f70a8db0d8899b0ab8332d96ee437fc2a5"
+  },
+  "champion": "Nautilus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nautilus_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Titan%27s_Wrath.png?e0144",
+        "sha1": "c48c89f70a8db0d8899b0ab8332d96ee437fc2a5"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "12",
+        "cost": "60",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nautilus''' grants himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for 6 seconds, and while it holds, his <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to apply ''Pain of Wrath'' to the target and enemies near them.",
+          "text": "Active: Nautilus grants himself a shield for 6 seconds, and while it holds, his basic attacks are empowered to apply Pain of Wrath to the target and enemies near them."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Pain of Wrath:'''</span> The target takes <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> over time, half dealt immediately and the other half dealt after 1.<small>25</small> seconds.",
+          "text": "Pain of Wrath: The target takes magic damage over time, half dealt immediately and the other half dealt after 1.25 seconds."
+        },
+        "description3": {
+          "raw": "''Titan's Wrath <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Nautilus' ''' basic attack timer.''",
+          "text": "Titan's Wrath resets Nautilus' basic attack timer."
+        },
+        "effectradius": "250",
+        "icon": "Titan's Wrath.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>50 / 60 / 70 / 80 / 90 <span style=\"color:\n#21B053; white-space:normal\">(+ 8 / 9 / 10 / 11 / 12% '''maximum''' health)</span></dd></dl>",
+          "text": "Shield Strength:50 / 60 / 70 / 80 / 90 (+ 8 / 9 / 10 / 11 / 12% maximum health)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>30 / 40 / 50 / 60 / 70 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 40% AP)</span></dd><dt><span class=\"template_lc\">'''Magic Damage per Instance:'''</span></dt><dd>15 / 20 / 25 / 30 / 35 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 20% AP)</span></dd></dl>",
+          "text": "Total Magic Damage:30 / 40 / 50 / 60 / 70 (+ 40% AP)Magic Damage per Instance:15 / 20 / 25 / 30 / 35 (+ 20% AP)"
+        },
+        "name": "Titan's Wrath",
+        "notes": {
+          "raw": "* ''Pain of Wrath's'' first damage instance is tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span>, while the second damage instance is tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Persistent damage\">[[File:Blaze.png|20px|link=Damage|An icon representing the keyword Persistent damage]] [[:Damage|persistent damage]]</span>.\n* ''Pain of Wrath'' damage over time debuff gains another stack when reapplied to the target, but doesn't restart its tick timer. Additional stacks of ''Pain of Wrath'' expire when the original debuff does and do not deal any additional damage.\n** ''Pain of Wrath'''s debuff can last up to 0.<small>25</small> seconds after dealing the second instance of damage.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n* ''Pain of Wrath'' will be applied by '''Nautilus's''' basic attack if he is affected by ''Titan's Wrath'' at the start of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Attack windup\">[[:Attack speed#Windup|attack windup]]</span>, even if ''Titan's Wrath'' expires during the windup.\n* ''Pain of Wrath'' will not be applied if the basic attack is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span>, but will be applied if it is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|missed]]</span>.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the ability (but only a single application).\n* The empowered attack does not apply ''Pain of Wrath'' to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.",
+          "text": "Pain of Wrath's first damage instance is tagged as spell damage, while the second damage instance is tagged as persistent damage.\nPain of Wrath damage over time debuff gains another stack when reapplied to the target, but doesn't restart its tick timer. Additional stacks of Pain of Wrath expire when the original debuff does and do not deal any additional damage.\n* Pain of Wraths debuff can last up to 0.25 seconds after dealing the second instance of damage.(bug)\nPain of Wrath will be applied by Nautilus's basic attack if he is affected by Titan's Wrath at the start of the attack windup, even if Titan's Wrath expires during the windup.\nPain of Wrath will not be applied if the basic attack is dodged or blocked, but will be applied if it is missed.\nSpell shield will block the ability (but only a single application).\nThe empowered attack does not apply Pain of Wrath to structures."
+        },
+        "spellshield": false,
+        "targeting": "Auto"
+      },
+      "name": "Titan's Wrath"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "0cfe8e5e6c73284643a74aa84efa4e2ea570a3f9e97609f2806c20dd7e6be225",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nautilus/Titan's_Wrath",
+    "revisionId": 3981480,
+    "sourceTimestamp": "2026-01-06T12:15:55Z"
+  }
+}

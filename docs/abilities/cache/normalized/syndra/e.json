@@ -1,0 +1,64 @@
+{
+  "asset": {
+    "key": "spell_syndra_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Scatter_the_Weak.png?5e7ab",
+    "sha1": "c2b337f5ed8708e7e3ef58036ea9876dc1fa4ac5"
+  },
+  "champion": "Syndra",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_syndra_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Scatter_the_Weak.png?5e7ab",
+        "sha1": "c2b337f5ed8708e7e3ef58036ea9876dc1fa4ac5"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "15",
+        "cost": "50",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Syndra''' propels a wave of force in a cone in the target direction that deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocks them back]]</span> for 400 units and up to 800 units away from '''Syndra''' based on proximity, though not through terrain.",
+          "text": "Active: Syndra propels a wave of force in a cone in the target direction that deals magic damage to enemies hit and knocks them back for 400 units and up to 800 units away from Syndra based on proximity, though not through terrain."
+        },
+        "description2": {
+          "raw": "''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Spheres]]</span></span>'' can be knocked back for 950 units and up to 1200 units away from '''Syndra''' based on proximity, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking back]]</span> enemies they hit over 70 units, though not through terrain. Targets hit are also <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunned]]</span> for 1.<small>25</small> seconds, during which they are also <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span>, and dealt ''Scatter the Weak's'' damage if they were not damaged by the initial cast.",
+          "text": "Dark Spheres can be knocked back for 950 units and up to 1200 units away from Syndra based on proximity, knocking back enemies they hit over 70 units, though not through terrain. Targets hit are also stunned for 1.25 seconds, during which they are also revealed, and dealt Scatter the Weak's damage if they were not damaged by the initial cast."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> Bonus:'''</span> Collecting <span style=\"color:\n#D929D9; white-space:normal\">80 Splinters of Wrath</span> enhances ''Scatter the Weak'' to have an increased scatter angle and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> enemies hit by 70% for 1.<small>25</small> seconds starting after the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock back]]</span> ends or if the target was hit by a pushed ''Dark Sphere'', after the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stun]]</span> has ended.",
+          "text": "Transcendent Bonus: Collecting 80 Splinters of Wrath enhances Scatter the Weak to have an increased scatter angle and slow enemies hit by 70% for 1.25 seconds starting after the knock back ends or if the target was hit by a pushed Dark Sphere, after the stun has ended."
+        },
+        "icon": "Scatter the Weak.png",
+        "icon3": "Scatter the Weak 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>60 / 95 / 130 / 165 / 200 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Magic Damage:60 / 95 / 130 / 165 / 200 (+ 60% AP)"
+        },
+        "name": "Scatter the Weak",
+        "notes": {
+          "raw": "* ''Scatter the Weak'' is blocked by the portion of <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> it collides with. ''Spheres'' thrown will stop upon colliding with the wall.\n* ''Spheres'' spawned at close range of the ability are more likely to be hit.\n* Enemies and spheres will be knocked into the direction directly away from '''Syndra''', and the knock back has no dispersion.\n* ''Scatter the Weak'' will knock back ''Spheres'' even farther if they are inside terrain, up until they reach open space. If the terrain they're inside in cannot be surpassed, the ''Spheres'' will be knocked in the opposite direction.\n* ''Scatter the Weak'' will delay the expiration of a ''Sphere'' until after it finishes being knocked back.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* Once ''Scatter the Weak'' has been learned, an arrow directly in front of every <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Sphere]]</span></span> will appear to signify the direction the ''sphere'' will be knocked towards, each one corresponding to '''Syndra's''' position. This is only visible to '''Syndra'''.\n[[File:Dark_Sphere_directional_arrows.png|center|250px]]",
+          "text": "Scatter the Weak is blocked by the portion of Wind Wall it collides with. Spheres thrown will stop upon colliding with the wall.\nSpheres spawned at close range of the ability are more likely to be hit.\nEnemies and spheres will be knocked into the direction directly away from Syndra, and the knock back has no dispersion.\nScatter the Weak will knock back Spheres even farther if they are inside terrain, up until they reach open space. If the terrain they're inside in cannot be surpassed, the Spheres will be knocked in the opposite direction.\nScatter the Weak will delay the expiration of a Sphere until after it finishes being knocked back.\nThis ability will cast from wherever the caster is at the end of the cast time.\nOnce Scatter the Weak has been learned, an arrow directly in front of every Dark Sphere will appear to signify the direction the sphere will be knocked towards, each one corresponding to Syndra's position. This is only visible to Syndra."
+        },
+        "projectile": false,
+        "range": "700 • 800 • 1300",
+        "speed": "2500 • 2000",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "120 • 200"
+      },
+      "name": "Scatter the Weak"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "675a961fff0adc83bc12c2012d9e0bc0257bb766ae41696236373de70fb63e13",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Syndra/Scatter_the_Weak",
+    "revisionId": 4008068,
+    "sourceTimestamp": "2026-04-13T04:56:40Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Ziggs/Hexplosive Minefield",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Hexplosive Minefield@@icon@@Hexplosive Minefield.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Ziggs''' scatters a cluster of 11 proximity mines over the target location that grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area for 2 seconds, <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"travel time of the mines spreading out plus a brief delay\">arming after 0.<small>5</small> seconds</span> and lasting for up to 10 seconds.@@description2@@Each mine within the area explodes upon contact with terrain or an enemy, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slowing]]</span> them for 1.<small>5</small> seconds, as well as granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area around the explosion for 2 seconds. An enemy takes 40% damage from subsequent mines.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Mine:'''</span></dt><dd>30 / 70 / 110 / 150 / 190 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 25 / 30 / 35 / 40 / 45% AP)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage per Mine:'''</span></dt><dd>12 / 28 / 44 / 60 / 76 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 10 / 12 / 14 / 16 / 18% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Total Magic Damage:'''</span></dt><dd>150 / 350 / 550 / 750 / 950 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 125 / 150 / 175 / 200 / 225% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>10 / 20 / 30 / 40 / 50%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Effective minefield radius\">335</span> • <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Detection and explosion radius of each individual mine\">135</span>@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Travel speed to cast location\">1550</span>@@casttime@@0.<small>25</small>@@cost@@70 / 80 / 90 / 100 / 110@@cooldown@@16@@targeting@@Location@@damagetype@@magic@@spellshield@@Special@@projectile@@true@@notes@@\n* The mine cluster is built of 2 rings, with 3 mines in the inner ring (radius pending for test) and 8 mines on the other ring (200 radius), all equally spaced.\n** The angular offset is randomized on each cast.\n** Because of the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 135 detonation radius of each mine, the total possible range of a mine from the minefield hitting an enemy from the cast location is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 335 units. It will often be slightly less as the minefield is not guaranteed to be angled the right way for this.\n* Mines will not explode upon contact with [[Terrain#Player-Generated|player-generated terrain]].\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the effects of a single detonation.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309292,
+                "revisions": [
+                  {
+                    "parentid": 3929139,
+                    "revid": 4008673,
+                    "timestamp": "2026-04-15T01:28:53Z"
+                  }
+                ],
+                "title": "Template:Data Ziggs/Hexplosive Minefield"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4008673,
+      "timestamp": "2026-04-15T01:28:53Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "402879bd93fc62847b88ed73e36c9954847f1eb6051c6fdf4d24b3da2e790778",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Hexplosive_Minefield",
+    "revisionId": 4008673,
+    "sourceTimestamp": "2026-04-15T01:28:53Z"
+  }
+}

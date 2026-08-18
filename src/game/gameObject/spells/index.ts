@@ -206,3 +206,53 @@ export { default as Brand_Q } from './Brand_Q';
 export { default as Brand_W } from './Brand_W';
 export { default as Brand_E } from './Brand_E';
 export { default as Brand_R } from './Brand_R';
+
+export { default as Katarina_Q } from './Katarina_Q';
+export { default as Katarina_W } from './Katarina_W';
+export { default as Katarina_E } from './Katarina_E';
+export { default as Katarina_R } from './Katarina_R';
+
+export { default as Vayne_Q } from './Vayne_Q';
+export { default as Vayne_W } from './Vayne_W';
+export { default as Vayne_E } from './Vayne_E';
+export { default as Vayne_R } from './Vayne_R';
+
+export { default as Riven_Q } from './Riven_Q';
+export { default as Riven_W } from './Riven_W';
+export { default as Riven_E } from './Riven_E';
+export { default as Riven_R } from './Riven_R';
+
+export { default as Sett_Q } from './Sett_Q';
+export { default as Sett_W } from './Sett_W';
+export { default as Sett_E } from './Sett_E';
+export { default as Sett_R } from './Sett_R';
+
+export { default as Jhin_Q } from './Jhin_Q';
+export { default as Jhin_W } from './Jhin_W';
+export { default as Jhin_E } from './Jhin_E';
+export { default as Jhin_R } from './Jhin_R';
+
+export { default as Nautilus_Q } from './Nautilus_Q';
+export { default as Nautilus_W } from './Nautilus_W';
+export { default as Nautilus_E } from './Nautilus_E';
+export { default as Nautilus_R } from './Nautilus_R';
+
+export { default as Diana_Q } from './Diana_Q';
+export { default as Diana_W } from './Diana_W';
+export { default as Diana_E } from './Diana_E';
+export { default as Diana_R } from './Diana_R';
+
+export { default as Vi_Q } from './Vi_Q';
+export { default as Vi_W } from './Vi_W';
+export { default as Vi_E } from './Vi_E';
+export { default as Vi_R } from './Vi_R';
+
+export { default as Syndra_Q } from './Syndra_Q';
+export { default as Syndra_W } from './Syndra_W';
+export { default as Syndra_E } from './Syndra_E';
+export { default as Syndra_R } from './Syndra_R';
+
+export { default as Ziggs_Q } from './Ziggs_Q';
+export { default as Ziggs_W } from './Ziggs_W';
+export { default as Ziggs_E } from './Ziggs_E';
+export { default as Ziggs_R } from './Ziggs_R';

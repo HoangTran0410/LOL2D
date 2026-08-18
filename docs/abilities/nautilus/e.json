@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_nautilus_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Riptide.png?1cfa8",
+    "sha1": "0e8506c331e21350083c2b49ee6ff541d37dca99"
+  },
+  "champion": "Nautilus",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_nautilus_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Riptide.png?1cfa8",
+        "sha1": "0e8506c331e21350083c2b49ee6ff541d37dca99"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "7 / 6.5 / 6 / 5.5 / 5",
+        "cost": "50 / 60 / 70 / 80 / 90",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Nautilus''' sends three waves of explosions that radiate from him <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"See notes\">over 0.<small>561</small> seconds</span>. Each wave deals <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit, reduced to 50% against those hit by subsequent waves beyond the first, and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slows]]</span> them by an amount that decays over 1.<small>5</small> seconds.",
+          "text": "Active: Nautilus sends three waves of explosions that radiate from him over 0.561 seconds. Each wave deals magic damage to enemies hit, reduced to 50% against those hit by subsequent waves beyond the first, and slows them by an amount that decays over 1.5 seconds."
+        },
+        "description2": {
+          "raw": "The first hit against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> deals <span style=\"color:\n#00B0F0; white-space:normal\">'''bonus''' magic damage</span>.",
+          "text": "The first hit against monsters deals bonus magic damage."
+        },
+        "effectradius": "0 - 350 • 215 - 465 • 350 - 590",
+        "icon": "Riptide.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>55 / 90 / 125 / 160 / 195 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>27.<small>5</small> / 45 / 62.<small>5</small> / 80 / 97.<small>5</small> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 25% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Total Damage:'''</span></dt><dd>110 / 180 / 250 / 320 / 390 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Slow:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Magic Damage:55 / 90 / 125 / 160 / 195 (+ 50% AP)Reduced Damage:27.5 / 45 / 62.5 / 80 / 97.5 (+ 25% AP)Maximum Total Damage:110 / 180 / 250 / 320 / 390 (+ 100% AP)\nSlow:30 / 35 / 40 / 45 / 50%"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Bonus Damage:'''</span></dt><dd>125 / 165 / 205 / 245 / 285 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>",
+          "text": "Monster Bonus Damage:125 / 165 / 205 / 245 / 285 (+ 50% AP)"
+        },
+        "name": "Riptide",
+        "notes": {
+          "raw": "* This ability will cast from wherever the caster is at the end of the cast time.\n* The first wave is centered around '''Nautilus''', while the second and third wave are centered at an offset of 25 units in front of '''Nautilus''' at the original cast location.\n** Because of this, there is a zone each in which you can be hit by only 1 wave, or all 3 waves, respectively, without moving.\n* The first wave happens at 0 seconds after the cast time ends, the second wave at 0.<small>297</small> seconds and the third wave at 0.<small>561</small> seconds.\n** The intended timing may be 0.<small>25</small> seconds for each delay, however these are the measured, effective times.\n* The ''explosions'' are only a visual effect. The first wave has 8, the seconds has 9, and the third wave has 10 explosions, equally distributed around the rings, starting with one explosion directly in '''Nautilus'''' facing direction on each.",
+          "text": "This ability will cast from wherever the caster is at the end of the cast time.\nThe first wave is centered around Nautilus, while the second and third wave are centered at an offset of 25 units in front of Nautilus at the original cast location.\n* Because of this, there is a zone each in which you can be hit by only 1 wave, or all 3 waves, respectively, without moving.\nThe first wave happens at 0 seconds after the cast time ends, the second wave at 0.297 seconds and the third wave at 0.561 seconds.\n* The intended timing may be 0.25 seconds for each delay, however these are the measured, effective times.\nThe explosions are only a visual effect. The first wave has 8, the seconds has 9, and the third wave has 10 explosions, equally distributed around the rings, starting with one explosion directly in Nautilus' facing direction on each."
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Riptide"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "168772b1f39684d0d326582508b32ba9a174464aa60302b2256117ffcd78312c",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nautilus/Riptide",
+    "revisionId": 4007701,
+    "sourceTimestamp": "2026-04-12T12:14:22Z"
+  }
+}

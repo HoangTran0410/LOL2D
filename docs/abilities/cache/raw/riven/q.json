@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Riven/Broken Wings",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Broken Wings@@icon@@Broken Wings.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' can activate ''Broken Wings'' three times before the ability goes on cooldown, with a 0.<small>3125</small>-second <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Unaffected by ability haste\">static cooldown</span> between casts. If '''Riven''' does not recast the ability within 4 seconds of the previous cast, it goes on cooldown.@@description2@@'''Riven''' slashes with her sword for each of the three casts, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies struck within an area, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resetting]]</span> her basic attack timer, and ordering her to basic attack the target of ''Broken Wings'' if there are any.@@description3@@<span class=\"template_sbc\">'''First Cast:'''</span> '''Riven''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> 225 units in the direction she is currently facing, or up to 225 units towards the target enemy, striking enemies in the target area 100 units away. This cast cannot cross terrain.@@description4@@<span class=\"template_sbc\">'''Second Cast:'''</span> '''Riven''' mimics the first cast's effects.@@description5@@<span class=\"template_sbc\">'''Third Cast:'''</span> '''Riven''' mimics the first cast's effects in a larger area while also <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking back]]</span> enemies hit 75 units over 0.<small>5</small> seconds. This cast can cross terrain.@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>45 / 75 / 105 / 135 / 165 <span style=\"color:orange; white-space:normal\">(+ 60 / 65 / 70 / 75 / 80% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Physical Damage:'''</span></dt><dd>135 / 225 / 315 / 405 / 495 <span style=\"color:orange; white-space:normal\">(+ 180 / 195 / 210 / 225 / 240% '''bonus''' AD)</span></dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"First/second cast standard radius\">150</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Third cast standard radius\">250</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"First/second cast enhanced radius during Blade of the Exile\">200</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Third cast enhanced radius during Blade of the Exile\">300</span>@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@{{{cost}}}@@cooldown@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Starts after first cast\">13</span>@@targeting@@[[Auto-targeted|Auto]] • [[Unit-targeted|Unit]]@@damagetype@@physical@@spellshield@@true@@projectile@@{{{projectile}}}@@notes@@\n* This ability always employs [[Quick cast]].\n* Each cast counts as a single ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* Moving after using ''Broken Wings'' allows Riven to do other actions faster.\n* The <span class=\"template_sbc\">'''Third Cast'''</span> prevents '''Riven''' from using basic attacks and abilities for longer than the other 2 casts.\n* The <span class=\"template_sbc\">'''Third Cast'''</span> may have an extended dash range when crossing terrain.\n* The <span class=\"template_sbc\">'''Third Cast's'''</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockup]]</span> debuff is not removed early if the forced movement is interrupted.\n* Any forced movement affecting the target being knocked up is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|interrupted]]</span> when the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockup]]</span> debuff is removed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. this is not the case for most other knockups\">(unexpected)</span></sup>@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309388,
+                "revisions": [
+                  {
+                    "parentid": 4013480,
+                    "revid": 4025373,
+                    "timestamp": "2026-06-05T15:05:11Z"
+                  }
+                ],
+                "title": "Template:Data Riven/Broken Wings"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4025373,
+      "timestamp": "2026-06-05T15:05:11Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "57c35f1dacbed60f38acd74d02b5b8320a0d67ee49c8a20bbe135ba3d545c753",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Broken_Wings",
+    "revisionId": 4025373,
+    "sourceTimestamp": "2026-06-05T15:05:11Z"
+  }
+}

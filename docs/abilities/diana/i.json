@@ -1,0 +1,50 @@
+{
+  "asset": {
+    "key": "spell_diana_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonsilver_Blade.png?df846",
+    "sha1": "10b5ef53b9d87caea656ca89b747c8aa04dfcc56"
+  },
+  "champion": "Diana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_diana_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonsilver_Blade.png?df846",
+        "sha1": "10b5ef53b9d87caea656ca89b747c8aa04dfcc56"
+      },
+      "fields": {
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> '''Diana''' gains <span style=\"color:\n#F5EE99; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"15;\" data-finish=\"35;\" data-top-fill=\"18\" data-bot-values=\"15;16.18;17.35;18.53;19.71;20.88;22.06;23.24;24.41;25.59;26.76;27.94;29.12;30.29;31.47;32.65;33.82;35;36.18;37.35;38.53;39.71;40.88;42.06;43.24;44.41;45.59;46.76;47.94;49.12;50.29;51.47;52.65;53.82;55;56.18;57.35;58.53;59.71;60.88;62.06|displayMaxColumn=18\" data-bot-key=\"%\">15% – 35% (based on level)</span> '''bonus''' attack speed</span></span>. After casting an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span>, this bonus is tripled to <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#F5EE99;\" data-start=\"45;\" data-finish=\"105;\" data-top-fill=\"18\" data-bot-values=\"45;48.53;52.06;55.59;59.12;62.65;66.18;69.71;73.24;76.76;80.29;83.82;87.35;90.88;94.41;97.94;101.47;105;108.53;112.06;115.59;119.12;122.65;126.18;129.71;133.24;136.76;140.29;143.82;147.35;150.88;154.41;157.94;161.47;165;168.53;172.06;175.59;179.12;182.65;186.18|displayMaxColumn=18\" data-bot-key=\"%\">45% – 105% (based on level)</span> for 5 seconds.",
+          "text": "Innate: Diana gains &nbsp;15% – 35% (based on level) bonus attack speed. After casting an ability, this bonus is tripled to 45% – 105% (based on level) for 5 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Moonsilver Blade:'''</span> '''Diana's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> generate a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span>  of ''Moonsilver Blade'' for 5 seconds, refreshing on subsequent attacks and stacking up to 2 times. At 2 stacks, '''Diana''' empowers her next basic attack to consume the stacks <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> to additionally cleave nearby enemies, dealing them <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-displayformula=\"20 + 5 per level until level 6, then + 10 per level until level 11, then + 15 per level until level 16, then + 25 per level\" data-bot-values=\"20;25;30;35;40;45;55;65;75;85;95;110;125;140;155;170;195;220;245;270;295;320;345;370;395;420;445;470;495;520;545;570;595;620;645;670;695;720;745;770;795|displayMaxColumn=18\">20 – 220 (based on level)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span>. ''Moonsilver Blade'' deals 270% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Innate - Moonsilver Blade: Diana's basic attacks on-hit generate a stack of Moonsilver Blade for 5 seconds, refreshing on subsequent attacks and stacking up to 2 times. At 2 stacks, Diana empowers her next basic attack to consume the stacks on-hit to additionally cleave nearby enemies, dealing them 20 – 220 (based on level) (+ 50% AP) magic damage. Moonsilver Blade deals 270% damage against monsters."
+        },
+        "effectradius": "175",
+        "icon": "false",
+        "icon2": "Moonsilver Blade.png",
+        "name": "Moonsilver Blade",
+        "notes": {
+          "raw": "* ''Moonsilver Blade'' will affect <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.\n* Each attack has a distinct animation and she will glow when the empowered attack is ready.\n* When the stacks are consumed <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> (e.g <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Guinsoo&#39;s Rageblade\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Guinsoo's Rageblade item.png|20xpx|border|link=Guinsoo's Rageblade|An icon for the item Guinsoo's Rageblade]]</span> <span style=\"white-space:normal;\">[[Guinsoo's Rageblade]]</span></span>, <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Dusk and Dawn\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Dusk and Dawn item.png|20xpx|border|link=Dusk and Dawn|An icon for the item Dusk and Dawn]]</span> <span style=\"white-space:normal;\">[[Dusk and Dawn]]</span></span>), additional damage is only applied to the on-hit target, without triggering the cleave on nearby enemies. [https://www.reddit.com/r/DianaMains/comments/u7hlez/guinsoos_rageblade_interaction_with_dianas/]\n* Sometimes, the empowered basic attack will not consume the stacks.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n** In this case, the attack will also not deal its damage.",
+          "text": "Moonsilver Blade will affect structures.\nEach attack has a distinct animation and she will glow when the empowered attack is ready.\nWhen the stacks are consumed on-hit (e.g Guinsoo's Rageblade, Dusk and Dawn), additional damage is only applied to the on-hit target, without triggering the cleave on nearby enemies. [https://www.reddit.com/r/DianaMains/comments/u7hlez/guinsoos_rageblade_interaction_with_dianas/]\nSometimes, the empowered basic attack will not consume the stacks.(bug)\n* In this case, the attack will also not deal its damage."
+        },
+        "spellshield": true,
+        "targeting": "Passive"
+      },
+      "name": "Moonsilver Blade"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "c3d586b24f39e4f3f3907498667ba27a7404a918384e1f378b2ecb4da91f2215",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Moonsilver_Blade",
+    "revisionId": 4047026,
+    "sourceTimestamp": "2026-07-29T00:30:52Z"
+  }
+}

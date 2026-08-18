@@ -1,0 +1,47 @@
+{
+  "asset": {
+    "key": "spell_vi_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Blast_Shield.png?5060b",
+    "sha1": "c4380b8a87e2776f2dbf1da66477a15bebd966d1"
+  },
+  "champion": "Vi",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_vi_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Blast_Shield.png?5060b",
+        "sha1": "c4380b8a87e2776f2dbf1da66477a15bebd966d1"
+      },
+      "fields": {
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> Periodically, '''Vi's''' next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span> hit grants her a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> equal to <span style=\"color:\n#21B053; white-space:normal\">12% of her '''maximum''' health</span> for 3 seconds.",
+          "text": "Innate: Periodically, Vi's next ability hit grants her a shield equal to 12% of her maximum health for 3 seconds."
+        },
+        "description2": {
+          "raw": "''Blast Shield's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> is reduced by 4 seconds each time ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Denting Blows\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Denting Blows.png|20xpx|border|link=Vi#Denting Blows|An icon for Vi's ability Denting Blows]]</span> <span style=\"white-space:normal;\">[[Vi#Denting Blows|Denting Blows]]</span></span>'' is consumed.",
+          "text": "Blast Shield's &nbsp;cooldown is reduced by 4 seconds each time Denting Blows is consumed."
+        },
+        "icon": "Blast Shield.png",
+        "name": "Blast Shield",
+        "notes": {
+          "raw": "* ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Vault Breaker\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Vault Breaker.png|20xpx|border|link=Vi#Vault Breaker|An icon for Vi's ability Vault Breaker]]</span> <span style=\"white-space:normal;\">[[Vi#Vault Breaker|Vault Breaker]]</span></span>'' will trigger ''Blast Shield'' even if it's blocked by a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span>.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>\n** ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Cease and Desist\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Cease and Desist.png|20xpx|border|link=Vi#Cease and Desist|An icon for Vi's ability Cease and Desist]]</span> <span style=\"white-space:normal;\">[[Vi#Cease and Desist|Cease and Desist]]</span></span>'' will not.\n* ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Denting Blows\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Denting Blows.png|20xpx|border|link=Vi#Denting Blows|An icon for Vi's ability Denting Blows]]</span> <span style=\"white-space:normal;\">[[Vi#Denting Blows|Denting Blows]]</span></span>'' will not activate ''Blast Shield''.",
+          "text": "Vault Breaker will trigger Blast Shield even if it's blocked by a spell shield.(bug)\n* Cease and Desist will not.\nDenting Blows will not activate Blast Shield."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Blast Shield"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "8c9260b275c5aa2a4bb67b401f748b38031b753aba812c98a0e9fec685fa6692",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vi/Blast_Shield",
+    "revisionId": 3986701,
+    "sourceTimestamp": "2026-01-23T00:03:48Z"
+  }
+}

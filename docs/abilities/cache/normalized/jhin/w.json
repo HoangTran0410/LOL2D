@@ -1,0 +1,116 @@
+{
+  "asset": {
+    "key": "spell_jhin_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Deadly_Flourish.png?473eb",
+    "sha1": "a6c5a69892a73f7a65e58abd1ebc0844c20cde39"
+  },
+  "champion": "Jhin",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jhin_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Deadly_Flourish.png?473eb",
+        "sha1": "a6c5a69892a73f7a65e58abd1ebc0844c20cde39"
+      },
+      "fields": {
+        "casttime": "0.75",
+        "cooldown": "12",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span id=\"Caught Out\"></span><span class=\"template_sbc\">'''Passive:'''</span> Enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> that trigger a ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Captive Audience\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Captive Audience.png|20xpx|border|link=Jhin#Captive Audience|An icon for Jhin's ability Captive Audience]]</span> <span style=\"white-space:normal;\">[[Jhin#Captive Audience|Lotus Trap]]</span></span>'' to bloom or are damaged by '''Jhin''' or allied champions are ''marked'' for 4 seconds.",
+          "text": "Passive: Enemy champions that trigger a Lotus Trap to bloom or are damaged by Jhin or allied champions are marked for 4 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jhin''' fires a shot in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to all enemies in a line until colliding with an enemy champion, reduced by 25% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span>.",
+          "text": "Active: Jhin fires a shot in the target direction that deals physical damage to all enemies in a line until colliding with an enemy champion, reduced by 25% against minions."
+        },
+        "description3": {
+          "raw": "Hitting a ''marked'' champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|roots]]</span> them for a duration and grants '''Jhin''' <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Whisper\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Whisper.png|20xpx|border|link=Jhin#Whisper|An icon for Jhin's ability Whisper]]</span> <span style=\"white-space:normal;\">[[Jhin#Whisper|Every Moment Matters']]</span></span> <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>.",
+          "text": "Hitting a marked champion roots them for a duration and grants Jhin Every Moment Matters' &nbsp;bonus movement speed."
+        },
+        "icon": "false",
+        "icon2": "Deadly Flourish.png",
+        "icon3": "Caught Out.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:orange; white-space:normal\">(+ 50% AD)</span></dd><dt><span class=\"template_lc\">'''Minion Damage:'''</span></dt><dd>52.<small>5</small> / 78.<small>75</small> / 105 / 131.<small>25</small> / 157.<small>5</small> <span style=\"color:orange; white-space:normal\">(+ 37.<small>5</small>% AD)</span></dd></dl>",
+          "text": "Physical Damage:70 / 105 / 140 / 175 / 210 (+ 50% AD)Minion Damage:52.5 / 78.75 / 105 / 131.25 / 157.5 (+ 37.5% AD)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> seconds</dd></dl>",
+          "text": "Root Duration:1.25 / 1.5 / 1.75 / 2 / 2.25 seconds"
+        },
+        "name": "Deadly Flourish",
+        "notes": {
+          "raw": "* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> to the enemy champion and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to all other enemy units.\n* The ''Caught Out'' mark only appears if ''Deadly Flourish'' can potentially <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> the target, and will not if the ability's cooldown is longer than 4 seconds or isn't ranked up.\n* This ability will cast from wherever the caster is at the start of the cast time.\n* The ability will not preserve the caster's facing direction when using <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> and similar effects.\n* Uniquely, ''Deadly Flourish'' is special-cased to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Projectile\">[[File:Projectile.png|20px|link=Projectile|An icon representing the keyword Projectile]] [[:Projectile|intercepted]]</span> by valid counters because it looks like a blockable missile, even though it functionally is not a missile.\n* While <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Neeko\" data-ability=\"Inherent Glamour\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Neeko Inherent Glamour.png|20xpx|border|link=Neeko#Inherent Glamour|An icon for Neeko's ability Inherent Glamour]]</span> <span style=\"white-space:normal;\">[[Neeko#Inherent Glamour|disguised]]</span></span> as a non-champion, <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Neeko\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Neeko OriginalSquare.png|20xpx|border|link=Neeko|An icon representing Neeko]]</span> <span style=\"white-space:normal;\">[[Neeko]]</span></span> cannot be affected by ''Deadly Flourish''.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Applies spell damage to the enemy champion and area damage to all other enemy units.\nThe Caught Out mark only appears if Deadly Flourish can potentially root the target, and will not if the ability's cooldown is longer than 4 seconds or isn't ranked up.\nThis ability will cast from wherever the caster is at the start of the cast time.\nThe ability will not preserve the caster's facing direction when using Flash and similar effects.\nUniquely, Deadly Flourish is special-cased to be intercepted by valid counters because it looks like a blockable missile, even though it functionally is not a missile.\nWhile disguised as a non-champion, Neeko cannot be affected by Deadly Flourish.(bug)"
+        },
+        "projectile": true,
+        "range": "2520 • -20",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "80"
+      },
+      "name": "Deadly Flourish"
+    },
+    {
+      "asset": {
+        "key": "spell_jhin_w2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Deadly_Flourish.png?473eb",
+        "sha1": "a6c5a69892a73f7a65e58abd1ebc0844c20cde39"
+      },
+      "fields": {
+        "casttime": "0.75",
+        "cooldown": "12",
+        "cost": "50 / 55 / 60 / 65 / 70",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span id=\"Caught Out\"></span><span class=\"template_sbc\">'''Passive:'''</span> Enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> that trigger a ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Captive Audience\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Captive Audience.png|20xpx|border|link=Jhin#Captive Audience|An icon for Jhin's ability Captive Audience]]</span> <span style=\"white-space:normal;\">[[Jhin#Captive Audience|Lotus Trap]]</span></span>'' to bloom or are damaged by '''Jhin''' or allied champions are ''marked'' for 4 seconds.",
+          "text": "Passive: Enemy champions that trigger a Lotus Trap to bloom or are damaged by Jhin or allied champions are marked for 4 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jhin''' fires a shot in the target direction that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to all enemies in a line until colliding with an enemy champion, reduced by 25% against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span>.",
+          "text": "Active: Jhin fires a shot in the target direction that deals physical damage to all enemies in a line until colliding with an enemy champion, reduced by 25% against minions."
+        },
+        "description3": {
+          "raw": "Hitting a ''marked'' champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|roots]]</span> them for a duration and grants '''Jhin''' <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Whisper\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Whisper.png|20xpx|border|link=Jhin#Whisper|An icon for Jhin's ability Whisper]]</span> <span style=\"white-space:normal;\">[[Jhin#Whisper|Every Moment Matters']]</span></span> <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span>.",
+          "text": "Hitting a marked champion roots them for a duration and grants Jhin Every Moment Matters' &nbsp;bonus movement speed."
+        },
+        "icon": "false",
+        "icon2": "Deadly Flourish.png",
+        "icon3": "Caught Out.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:orange; white-space:normal\">(+ 50% AD)</span></dd><dt><span class=\"template_lc\">'''Minion Damage:'''</span></dt><dd>52.<small>5</small> / 78.<small>75</small> / 105 / 131.<small>25</small> / 157.<small>5</small> <span style=\"color:orange; white-space:normal\">(+ 37.<small>5</small>% AD)</span></dd></dl>",
+          "text": "Physical Damage:70 / 105 / 140 / 175 / 210 (+ 50% AD)Minion Damage:52.5 / 78.75 / 105 / 131.25 / 157.5 (+ 37.5% AD)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Root Duration:'''</span></dt><dd>1.<small>25</small> / 1.<small>5</small> / 1.<small>75</small> / 2 / 2.<small>25</small> seconds</dd></dl>",
+          "text": "Root Duration:1.25 / 1.5 / 1.75 / 2 / 2.25 seconds"
+        },
+        "name": "Deadly Flourish",
+        "notes": {
+          "raw": "* Applies <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span> to the enemy champion and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to all other enemy units.\n* The ''Caught Out'' mark only appears if ''Deadly Flourish'' can potentially <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> the target, and will not if the ability's cooldown is longer than 4 seconds or isn't ranked up.\n* This ability will cast from wherever the caster is at the start of the cast time.\n* The ability will not preserve the caster's facing direction when using <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Flash\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Flash.png|20xpx|border|link=Flash|An icon representing Flash]]</span> <span style=\"white-space:normal;\">[[Flash]]</span></span> and similar effects.\n* Uniquely, ''Deadly Flourish'' is special-cased to be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Projectile\">[[File:Projectile.png|20px|link=Projectile|An icon representing the keyword Projectile]] [[:Projectile|intercepted]]</span> by valid counters because it looks like a blockable missile, even though it functionally is not a missile.\n* While <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Neeko\" data-ability=\"Inherent Glamour\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Neeko Inherent Glamour.png|20xpx|border|link=Neeko#Inherent Glamour|An icon for Neeko's ability Inherent Glamour]]</span> <span style=\"white-space:normal;\">[[Neeko#Inherent Glamour|disguised]]</span></span> as a non-champion, <span class=\"inline-image label-after champion-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Neeko\" data-skin=\"Original\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Neeko OriginalSquare.png|20xpx|border|link=Neeko|An icon representing Neeko]]</span> <span style=\"white-space:normal;\">[[Neeko]]</span></span> cannot be affected by ''Deadly Flourish''.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Applies spell damage to the enemy champion and area damage to all other enemy units.\nThe Caught Out mark only appears if Deadly Flourish can potentially root the target, and will not if the ability's cooldown is longer than 4 seconds or isn't ranked up.\nThis ability will cast from wherever the caster is at the start of the cast time.\nThe ability will not preserve the caster's facing direction when using Flash and similar effects.\nUniquely, Deadly Flourish is special-cased to be intercepted by valid counters because it looks like a blockable missile, even though it functionally is not a missile.\nWhile disguised as a non-champion, Neeko cannot be affected by Deadly Flourish.(bug)"
+        },
+        "projectile": true,
+        "range": "2520 • -20",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "80"
+      },
+      "name": "Caught Out"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "1c57332da0039557ba0c02402604498592ecf12ace154b92ac58d691cae635f0",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jhin/Deadly_Flourish",
+    "revisionId": 4021795,
+    "sourceTimestamp": "2026-05-21T13:25:33Z"
+  }
+}

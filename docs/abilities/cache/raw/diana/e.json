@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Diana/Lunar Rush",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Lunar Rush@@icon@@Lunar Rush.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Diana''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target enemy's location, and upon completion, she deals them <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and consumes ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Diana\" data-ability=\"Crescent Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Diana Crescent Strike.png|20xpx|border|link=Diana#Crescent Strike|An icon for Diana's ability Crescent Strike]]</span> <span style=\"white-space:normal;\">[[Diana#Crescent Strike|Moonlight]]</span></span>'' from all enemies. If the target is within 400 range, '''Diana''' will dash through their location.@@description2@@If ''Moonlight'' is consumed from the target, ''Lunar Rush's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced to 0.<small>25</small> seconds.@@description3@@'''''Diana''' can cast any of her abilities during the dash.''@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 70 / 90 / 110 / 130 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@40 / 45 / 50 / 55 / 60@@cooldown@@22 / 20 / 18 / 16 / 14@@targeting@@Unit@@damagetype@@Magic@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* '''Diana''' will attempt to basic attack the target.\n* ''Lunar Rush's'' cooldown will also be reset if the target dies during the dash while being affected by ''Moonlight''.\n* ''Lunar Rush'' consumes ''Moonlight'' upon ending the dash (even if <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Interrupt\">[[File:Silence icon.png|20px|link=Crowd control#Disruption|An icon representing the keyword Interrupt]] [[:Crowd control#Disruption|interrupted]]</span>).\n* ''Lunar Rush'' will still deal damage even if the target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> by the end of the dash.\n* If ''Lunar Rush'' is blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> the ''Moonlight'' debuff is still consumed but ''Lunar Rush's'' cooldown is not reset.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307037,
+                "revisions": [
+                  {
+                    "parentid": 3906621,
+                    "revid": 3937024,
+                    "timestamp": "2025-07-27T22:08:48Z"
+                  }
+                ],
+                "title": "Template:Data Diana/Lunar Rush"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3937024,
+      "timestamp": "2025-07-27T22:08:48Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "bf17d27b3bd66f78051c85c404d34b0211693553ec6eacf311409b100c816166",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Lunar_Rush",
+    "revisionId": 3937024,
+    "sourceTimestamp": "2025-07-27T22:08:48Z"
+  }
+}

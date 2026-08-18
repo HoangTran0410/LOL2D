@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Diana/Crescent Strike",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Crescent Strike@@icon@@Crescent Strike.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Diana''' unleashes a bolt of lunar energy that travels in a counter-clockwise arc before exploding at the target location, granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area for 0.<small>5</small> seconds and dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies hit and afflicting them with ''Moonlight'' for 3 seconds, during which they are <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span>.@@description2@@''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Diana\" data-ability=\"Lunar Rush\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Diana Lunar Rush.png|20xpx|border|link=Diana#Lunar Rush|An icon for Diana's ability Lunar Rush]]</span> <span style=\"white-space:normal;\">[[Diana#Lunar Rush|Lunar Rush]]</span></span>'' interacts with ''Moonlight''.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Inner arc speed\">1900</span> • <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Outer arc speed\">2100</span>@@casttime@@0.<small>25</small>@@cost@@50@@cooldown@@8 / 7.<small>5</small> / 7 / 6.<small>5</small> / 6@@targeting@@Location@@damagetype@@Magic@@spellshield@@special@@projectile@@True@@notes@@\n* Even if the target <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shields]]</span> the bolt, they may still be damaged by the explosion. ''Moonlight'' is not applied to the protected target if blocked.\n* The bolt consists of two <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Projectiles\">[[File:Projectile.png|20px|link=Projectile|An icon representing the keyword Projectile]] [[:Projectile|projectiles]]</span> with slightly different trajectories.\n* This ability will cast from wherever the caster is at the end of the cast time.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1307029,
+                "revisions": [
+                  {
+                    "parentid": 3936284,
+                    "revid": 4007592,
+                    "timestamp": "2026-04-12T06:56:56Z"
+                  }
+                ],
+                "title": "Template:Data Diana/Crescent Strike"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4007592,
+      "timestamp": "2026-04-12T06:56:56Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b11af24e85839b690654dba2d9f61d17075fb6b51332e0a9de3add4666cc45be",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Crescent_Strike",
+    "revisionId": 4007592,
+    "sourceTimestamp": "2026-04-12T06:56:56Z"
+  }
+}

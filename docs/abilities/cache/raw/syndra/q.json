@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Syndra/Dark Sphere",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Dark Sphere@@icon@@Dark Sphere.png@@icon2@@Dark Sphere 2.png@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Syndra''' conjures a ''Dark Sphere'' at the target location that appears after a 0.<small>6</small>-second delay, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies. The ''Dark Sphere'' then remains on the ground for 6 seconds.@@description2@@<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> Bonus:'''</span> Collecting <span style=\"color:\n#D929D9; white-space:normal\">40 Splinters of Wrath</span> causes '''Syndra''' to periodically [[stock]] a ''Dark Sphere'' charge, up to a maximum of 2.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>90 / 125 / 160 / 195 / 230 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 70% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cr\">[[File:Range center.png|20px|link=Range|An icon representing the keyword Centered range]]</span> 210@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@40 / 45 / 50 / 55 / 60@@cooldown@@7@@targeting@@Location@@damagetype@@magic@@spellshield@@True@@projectile@@{{{projectile}}}@@notes@@\n* ''Dark Sphere'' can be conjured inside terrain, but cannot be thrown there with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Force of Will\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Force of Will.png|20xpx|border|link=Syndra#Force of Will|An icon for Syndra's ability Force of Will]]</span> <span style=\"white-space:normal;\">[[Syndra#Force of Will|Force of Will]]</span></span>.\n* There is no limit as to how many ''Dark Spheres'' can be active at a time.\n* After '''Syndra''' gains the <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> bonus, the number of ''Dark Sphere'' charges available is represented by small Sphere icons under her [[health bar]], visible to the player only.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309646,
+                "revisions": [
+                  {
+                    "parentid": 3955333,
+                    "revid": 4026460,
+                    "timestamp": "2026-06-09T21:58:51Z"
+                  }
+                ],
+                "title": "Template:Data Syndra/Dark Sphere"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4026460,
+      "timestamp": "2026-06-09T21:58:51Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "923287ff580ca42bff53b64f9de24e28868490e83854ee65d9fe45fab08078c2",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Syndra/Dark_Sphere",
+    "revisionId": 4026460,
+    "sourceTimestamp": "2026-06-09T21:58:51Z"
+  }
+}

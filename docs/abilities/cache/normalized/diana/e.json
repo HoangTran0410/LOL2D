@@ -1,0 +1,59 @@
+{
+  "asset": {
+    "key": "spell_diana_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Lunar_Rush.png?5859f",
+    "sha1": "bf47270c093b1ee446676646c193376a13e36214"
+  },
+  "champion": "Diana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_diana_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Lunar_Rush.png?5859f",
+        "sha1": "bf47270c093b1ee446676646c193376a13e36214"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "22 / 20 / 18 / 16 / 14",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Diana''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dashes\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> to the target enemy's location, and upon completion, she deals them <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> and consumes ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Diana\" data-ability=\"Crescent Strike\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Diana Crescent Strike.png|20xpx|border|link=Diana#Crescent Strike|An icon for Diana's ability Crescent Strike]]</span> <span style=\"white-space:normal;\">[[Diana#Crescent Strike|Moonlight]]</span></span>'' from all enemies. If the target is within 400 range, '''Diana''' will dash through their location.",
+          "text": "Active: Diana dashes to the target enemy's location, and upon completion, she deals them magic damage and consumes Moonlight from all enemies. If the target is within 400 range, Diana will dash through their location."
+        },
+        "description2": {
+          "raw": "If ''Moonlight'' is consumed from the target, ''Lunar Rush's'' <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;'''current''' cooldown</span> is reduced to 0.<small>25</small> seconds.",
+          "text": "If Moonlight is consumed from the target, Lunar Rush's &nbsp;current cooldown is reduced to 0.25 seconds."
+        },
+        "description3": {
+          "raw": "'''''Diana''' can cast any of her abilities during the dash.''",
+          "text": "Diana can cast any of her abilities during the dash."
+        },
+        "icon": "Lunar Rush.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>50 / 70 / 90 / 110 / 130 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Magic Damage:50 / 70 / 90 / 110 / 130 (+ 60% AP)"
+        },
+        "name": "Lunar Rush",
+        "notes": {
+          "raw": "* '''Diana''' will attempt to basic attack the target.\n* ''Lunar Rush's'' cooldown will also be reset if the target dies during the dash while being affected by ''Moonlight''.\n* ''Lunar Rush'' consumes ''Moonlight'' upon ending the dash (even if <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Interrupt\">[[File:Silence icon.png|20px|link=Crowd control#Disruption|An icon representing the keyword Interrupt]] [[:Crowd control#Disruption|interrupted]]</span>).\n* ''Lunar Rush'' will still deal damage even if the target is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> by the end of the dash.\n* If ''Lunar Rush'' is blocked by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|spell shield]]</span> the ''Moonlight'' debuff is still consumed but ''Lunar Rush's'' cooldown is not reset.",
+          "text": "Diana will attempt to basic attack the target.\nLunar Rush's cooldown will also be reset if the target dies during the dash while being affected by Moonlight.\nLunar Rush consumes Moonlight upon ending the dash (even if interrupted).\nLunar Rush will still deal damage even if the target is untargetable by the end of the dash.\nIf Lunar Rush is blocked by spell shield the Moonlight debuff is still consumed but Lunar Rush's cooldown is not reset."
+        },
+        "spellshield": true,
+        "targeting": "Unit"
+      },
+      "name": "Lunar Rush"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "8a27f2d428446d21c0f2fabc5e5dcf6e6c3e9eb5bee001171a89ba1b21515658",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Lunar_Rush",
+    "revisionId": 3937024,
+    "sourceTimestamp": "2025-07-27T22:08:48Z"
+  }
+}

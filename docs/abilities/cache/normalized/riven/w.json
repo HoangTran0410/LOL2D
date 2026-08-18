@@ -1,0 +1,51 @@
+{
+  "asset": {
+    "key": "spell_riven_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Ki_Burst.png?86ec1",
+    "sha1": "5683cbee790780ebffd97717d5409227203836f3"
+  },
+  "champion": "Riven",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_riven_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Ki_Burst.png?86ec1",
+        "sha1": "5683cbee790780ebffd97717d5409227203836f3"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "11 / 10 / 9 / 8 / 7",
+        "damagetype": "physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' emits a flash of runic energy, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stun\">[[File:Stun icon.png|20px|link=Stun|An icon representing the keyword Stun]] [[:Stun|stunning]]</span> them for 0.<small>75</small> seconds.",
+          "text": "Active: Riven emits a flash of runic energy, dealing physical damage to nearby enemies and stunning them for 0.75 seconds."
+        },
+        "effectradius": "300 • 360",
+        "icon": "Ki Burst.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>65 / 95 / 125 / 155 / 185 <span style=\"color:orange; white-space:normal\">(+ 100% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:65 / 95 / 125 / 155 / 185 (+ 100% bonus AD)"
+        },
+        "name": "Ki Burst",
+        "notes": {
+          "raw": "* ''Ki Burst's'' effects are applied before the cast time.\n* '''Riven''' is briefly unable to basic attack after the cast time.\n* <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Riven\" data-ability=\"Broken Wings\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Riven Broken Wings.png|20xpx|border|link=Riven#Broken Wings|An icon for Riven's ability Broken Wings]]</span> <span style=\"white-space:normal;\">[[Riven#Broken Wings|Broken Wings]]</span></span> may be cast while <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacking]]</span> briefly after casting ''Ki Burst''.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This is not intended. \">(bug)</span></sup>",
+          "text": "Ki Burst's effects are applied before the cast time.\nRiven is briefly unable to basic attack after the cast time.\nBroken Wings may be cast while basic attacking briefly after casting Ki Burst.(bug)"
+        },
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Ki Burst"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "7fa7a74b0b8d891009e64a7e1e8dae8a60d1ccff2981d458eea05010b9b159d4",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Ki_Burst",
+    "revisionId": 4024218,
+    "sourceTimestamp": "2026-05-30T15:30:49Z"
+  }
+}

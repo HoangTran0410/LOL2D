@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Riven/Runic Blade",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Runic Blade@@icon@@Runic Blade.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Riven's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span> casts generate a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Charge'' for 6 seconds, refreshing on subsequent casts and stacking up to 3 times. '''Riven's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to each consume a stack to deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> equal to <span style=\"color:orange; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-useformula=\"30 + (45-30)/17*(x-1)\" data-bot-values=\"30;30.88;31.76;32.65;33.53;34.41;35.29;36.18;37.06;37.94;38.82;39.71;40.59;41.47;42.35;43.24;44.12;45;45.88;46.76\" data-bot-key=\"%\">30% – 46.<small>76</small>% (based on level)</span>[[Category:Debug]] AD</span>, reduced to<span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;50%&nbsp;」</span><span class=\"flipText2\">「&nbsp;<span style=\"color:orange; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"50% of non-structure damage\" data-bot-values=\"15;15.44;15.88;16.32;16.76;17.21;17.65;18.09;18.53;18.97;19.41;19.85;20.29;20.74;21.18;21.62;22.06;22.5;22.94;23.38\" data-bot-key=\"%\">15% – 23.<small>38</small>% (based on level)</span>[[Category:Debug]] AD</span>&nbsp;」</span></span>against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>. Against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>, it also deals <span style=\"color:\n#FF8C34; white-space:normal\">50 '''additional bonus''' physical damage</span>.@@description2@@The '''bonus''' damage is affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strike]]</span> modifiers and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Applies lifesteal\">[[:Life steal|applies]]</span> <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span></span> at 100% effectiveness.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@physical@@spellshield@@@@projectile@@{{{projectile}}}@@notes@@\n* ''Runic Blade's'' duration also refreshes when '''Riven''' consumes a stack.\n* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.\n* The number of empowered attacks available is represented by a counter under her [[health bar]], only visible to the player.\n* The bonus damage to monsters also benefits from critical strike modifiers. The full formula is shown below.\n** <code>(1.<small>0</small> AD&nbsp;&times;&nbsp;(1 + AD ratio) + monster damage)&nbsp;&times;&nbsp;(100%&nbsp;&times;&nbsp;critical damage)</code>@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309389,
+                "revisions": [
+                  {
+                    "parentid": 3985665,
+                    "revid": 3989876,
+                    "timestamp": "2026-02-03T23:26:55Z"
+                  }
+                ],
+                "title": "Template:Data Riven/Runic Blade"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3989876,
+      "timestamp": "2026-02-03T23:26:55Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b1d94e9fd031acc0f4db128bc88127a6c06a456632553ca61fb068724432e16e",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Runic_Blade",
+    "revisionId": 3989876,
+    "sourceTimestamp": "2026-02-03T23:26:55Z"
+  }
+}

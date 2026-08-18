@@ -1,0 +1,61 @@
+{
+  "asset": {
+    "key": "spell_vayne_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Final_Hour.png?6f6c9",
+    "sha1": "ec75517d695c3071fc3c1f7f61cbde603de1b994"
+  },
+  "champion": "Vayne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_vayne_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Final_Hour.png?6f6c9",
+        "sha1": "ec75517d695c3071fc3c1f7f61cbde603de1b994"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "100 / 92.5 / 85 / 77.5 / 70",
+        "cost": "80",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Vayne''' equips her crossbow, gaining <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> for a duration.",
+          "text": "Active: Vayne equips her crossbow, gaining &nbsp;bonus attack damage for a duration."
+        },
+        "description2": {
+          "raw": "While active, ''Final Hour'' empowers ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Night Hunter\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Night Hunter.png|20xpx|border|link=Vayne#Night Hunter|An icon for Vayne's ability Night Hunter]]</span> <span style=\"white-space:normal;\">[[Vayne#Night Hunter|Night Hunter]]</span></span>'' to have tripled <span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble]]</span></span>'' to have a reduced <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span>. Additionally, ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble's]]</span></span>'' cast grants '''Vayne''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invisibility\">[[File:Twilight Shroud old2.png|20px|link=Stealth#Invisibility|An icon representing the keyword Invisibility]] [[:Stealth#Invisibility|invisibility]]</span> for 1 second. Attacking or casting abilities ends the stealth immediately.",
+          "text": "While active, Final Hour empowers Night Hunter to have tripled bonus movement speed and Tumble to have a reduced &nbsp;cooldown. Additionally, Tumble's cast grants Vayne invisibility for 1 second. Attacking or casting abilities ends the stealth immediately."
+        },
+        "description3": {
+          "raw": "Scoring an enemy champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> within 3 seconds of damaging them will extend ''Final Hour's'' duration by 4 seconds, up to its original duration.",
+          "text": "Scoring an enemy champion takedown within 3 seconds of damaging them will extend Final Hour's duration by 4 seconds, up to its original duration."
+        },
+        "icon": "Final Hour.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Effect Duration:'''</span></dt><dd>8 / 9 / 10 / 11 / 12 seconds</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Damage:'''</span></dt><dd>35 / 50 / 65</dd></dl>",
+          "text": "Effect Duration:8 / 9 / 10 / 11 / 12 seconds\nBonus Attack Damage:35 / 50 / 65"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble]]</span></span> Cooldown Reduction:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Tumble Cooldown Reduction:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Final Hour",
+        "notes": {
+          "raw": "* '''Vayne's''' animations and basic attack projectiles change slightly during ''Final Hour''.\n* ''Tumble's'' visual effects can be seen by enemies upon '''Vayne''' becoming invisible.\n* Using a basic attack breaks the stealth at the start of the attack windup.",
+          "text": "Vayne's animations and basic attack projectiles change slightly during Final Hour.\nTumble's visual effects can be seen by enemies upon Vayne becoming invisible.\nUsing a basic attack breaks the stealth at the start of the attack windup."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Final Hour"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "16cf0b47949f021c4338041cc8ddaf9f2da4e37ae52e1a00e50db2aca47226a7",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Final_Hour",
+    "revisionId": 3807995,
+    "sourceTimestamp": "2024-11-05T22:07:10Z"
+  }
+}

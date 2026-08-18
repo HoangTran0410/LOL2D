@@ -1,0 +1,88 @@
+{
+  "asset": {
+    "key": "spell_katarina_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Voracity.png?03c2a",
+    "sha1": "8baa9801c8103a3f6b7abdc1255a0eabb22fbcfe"
+  },
+  "champion": "Katarina",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_katarina_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Voracity.png?03c2a",
+        "sha1": "8baa9801c8103a3f6b7abdc1255a0eabb22fbcfe"
+      },
+      "fields": {
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> Scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> within 3 seconds of damaging them will reduce the <span style=\"white-space:nowrap\">'''current''' cooldowns</span> of '''Katarina's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span> by 15 seconds.",
+          "text": "Innate: Scoring a champion takedown within 3 seconds of damaging them will reduce the current cooldowns of Katarina's abilities by 15 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Sinister Steel:'''</span> Whenever '''Katarina''' retrieves a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span>, she slashes around herself to deal <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-bot-values=\"68;72;77;82;89;96;103;112;121;131;142;154;166;180;194;208;224;240;257;275|displayMaxColumn=18\">68 – 240 (based on level)</span>[[Category:Debug]] <span style=\"color:orange; white-space:normal\">(+ 60% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"70;1\" data-finish=\"100;16\" data-top-fill=\"4\" data-bot-values=\"70;80;90;100\" data-top-values=\"1;6;11;16\" data-bot-key=\"%\">70% / 80% / 90% / 100% (based on level)</span> AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies, apply <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects to enemy champions hit, and reduce ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Shunpo\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Shunpo.png|20xpx|border|link=Katarina#Shunpo|An icon for Katarina's ability Shunpo]]</span> <span style=\"white-space:normal;\">[[Katarina#Shunpo|Shunpo's]]</span></span>'' '''current''' cooldown by <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"78;1\" data-finish=\"96;16\" data-top-fill=\"4\" data-bot-values=\"78;84;90;96\" data-top-values=\"1;6;11;16\" data-bot-key=\"%\">78% / 84% / 90% / 96% (based on level)</span> of its '''total''' cooldown.",
+          "text": "Innate - Sinister Steel: Whenever Katarina retrieves a Dagger, she slashes around herself to deal 68 – 240 (based on level)Category:Debug (+ 60% bonus AD) (+ 70% / 80% / 90% / 100% (based on level) AP) magic damage to nearby enemies, apply on-hit effects to enemy champions hit, and reduce Shunpo's current cooldown by 78% / 84% / 90% / 96% (based on level) of its total cooldown."
+        },
+        "description4": {
+          "raw": "<span style=\"color:\n#D929D9; white-space:normal\">Daggers</span> grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of their radius and will disappear after being on the ground for 4 seconds.",
+          "text": "Daggers grant sight of their radius and will disappear after being on the ground for 4 seconds."
+        },
+        "effectradius": "340",
+        "icon": "Voracity.png",
+        "icon2": "Sinister Steel.png",
+        "name": "Voracity",
+        "notes": {
+          "raw": "* ''Voracity's'' cooldown reduction will still take effect even after '''Katarina''' dies.\n* The <span style=\"color:\n#D929D9; white-space:normal\">Dagger's</span> area of effect indicator is displayed even before it lands, although '''Katarina''' may not slash until it has. This can be targeted by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Shunpo\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Shunpo.png|20xpx|border|link=Katarina#Shunpo|An icon for Katarina's ability Shunpo]]</span> <span style=\"white-space:normal;\">[[Katarina#Shunpo|Shunpo]]</span></span>.\n* <span style=\"color:\n#D929D9; white-space:normal\">Daggers</span> will still deal damage but not apply on-hit effects if <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>. They cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> nor can they be missed while '''Katarina''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* Single-use on-hit effects, such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span>, will apply to the closest target to '''Katarina''' when she uses a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span>.",
+          "text": "Voracity's cooldown reduction will still take effect even after Katarina dies.\nThe Dagger's area of effect indicator is displayed even before it lands, although Katarina may not slash until it has. This can be targeted by Shunpo.\nDaggers will still deal damage but not apply on-hit effects if dodged. They cannot be blocked nor can they be missed while Katarina is blinded.\nSingle-use on-hit effects, such as Spellblade, will apply to the closest target to Katarina when she uses a Dagger."
+        },
+        "spellshield": true,
+        "targeting": "Passive"
+      },
+      "name": "Voracity"
+    },
+    {
+      "asset": {
+        "key": "spell_katarina_i2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Voracity.png?03c2a",
+        "sha1": "8baa9801c8103a3f6b7abdc1255a0eabb22fbcfe"
+      },
+      "fields": {
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate:'''</span> Scoring a champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> within 3 seconds of damaging them will reduce the <span style=\"white-space:nowrap\">'''current''' cooldowns</span> of '''Katarina's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Abilities\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|abilities]]</span> by 15 seconds.",
+          "text": "Innate: Scoring a champion takedown within 3 seconds of damaging them will reduce the current cooldowns of Katarina's abilities by 15 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Sinister Steel:'''</span> Whenever '''Katarina''' retrieves a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span>, she slashes around herself to deal <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help; color:#00B0F0;\" data-bot-values=\"68;72;77;82;89;96;103;112;121;131;142;154;166;180;194;208;224;240;257;275|displayMaxColumn=18\">68 – 240 (based on level)</span>[[Category:Debug]] <span style=\"color:orange; white-space:normal\">(+ 60% '''bonus''' AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"70;1\" data-finish=\"100;16\" data-top-fill=\"4\" data-bot-values=\"70;80;90;100\" data-top-values=\"1;6;11;16\" data-bot-key=\"%\">70% / 80% / 90% / 100% (based on level)</span> AP)</span> <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies, apply <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects to enemy champions hit, and reduce ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Shunpo\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Shunpo.png|20xpx|border|link=Katarina#Shunpo|An icon for Katarina's ability Shunpo]]</span> <span style=\"white-space:normal;\">[[Katarina#Shunpo|Shunpo's]]</span></span>'' '''current''' cooldown by <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"78;1\" data-finish=\"96;16\" data-top-fill=\"4\" data-bot-values=\"78;84;90;96\" data-top-values=\"1;6;11;16\" data-bot-key=\"%\">78% / 84% / 90% / 96% (based on level)</span> of its '''total''' cooldown.",
+          "text": "Innate - Sinister Steel: Whenever Katarina retrieves a Dagger, she slashes around herself to deal 68 – 240 (based on level)Category:Debug (+ 60% bonus AD) (+ 70% / 80% / 90% / 100% (based on level) AP) magic damage to nearby enemies, apply on-hit effects to enemy champions hit, and reduce Shunpo's current cooldown by 78% / 84% / 90% / 96% (based on level) of its total cooldown."
+        },
+        "description4": {
+          "raw": "<span style=\"color:\n#D929D9; white-space:normal\">Daggers</span> grant <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of their radius and will disappear after being on the ground for 4 seconds.",
+          "text": "Daggers grant sight of their radius and will disappear after being on the ground for 4 seconds."
+        },
+        "effectradius": "340",
+        "icon": "Voracity.png",
+        "icon2": "Sinister Steel.png",
+        "name": "Voracity",
+        "notes": {
+          "raw": "* ''Voracity's'' cooldown reduction will still take effect even after '''Katarina''' dies.\n* The <span style=\"color:\n#D929D9; white-space:normal\">Dagger's</span> area of effect indicator is displayed even before it lands, although '''Katarina''' may not slash until it has. This can be targeted by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Katarina\" data-ability=\"Shunpo\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Katarina Shunpo.png|20xpx|border|link=Katarina#Shunpo|An icon for Katarina's ability Shunpo]]</span> <span style=\"white-space:normal;\">[[Katarina#Shunpo|Shunpo]]</span></span>.\n* <span style=\"color:\n#D929D9; white-space:normal\">Daggers</span> will still deal damage but not apply on-hit effects if <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span>. They cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Block\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> nor can they be missed while '''Katarina''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* Single-use on-hit effects, such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span>, will apply to the closest target to '''Katarina''' when she uses a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span>.",
+          "text": "Voracity's cooldown reduction will still take effect even after Katarina dies.\nThe Dagger's area of effect indicator is displayed even before it lands, although Katarina may not slash until it has. This can be targeted by Shunpo.\nDaggers will still deal damage but not apply on-hit effects if dodged. They cannot be blocked nor can they be missed while Katarina is blinded.\nSingle-use on-hit effects, such as Spellblade, will apply to the closest target to Katarina when she uses a Dagger."
+        },
+        "spellshield": true,
+        "targeting": "Passive"
+      },
+      "name": "Sinister Steel"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "1aa8a2aa67cbbb670fec0a1c1462d9302dcd13226bf2778b974f1aede8549efc",
+    "fetchedAt": "2026-08-17T14:37:44.748Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Katarina/Voracity",
+    "revisionId": 4038392,
+    "sourceTimestamp": "2026-06-30T09:24:30Z"
+  }
+}

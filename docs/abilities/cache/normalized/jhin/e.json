@@ -1,0 +1,70 @@
+{
+  "asset": {
+    "key": "spell_jhin_e",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Captive_Audience.png?f5ed8",
+    "sha1": "54f4fd2b691badcecb1ac45413a8d15a2d8c314e"
+  },
+  "champion": "Jhin",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jhin_e",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Captive_Audience.png?f5ed8",
+        "sha1": "54f4fd2b691badcecb1ac45413a8d15a2d8c314e"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "2",
+        "cost": "30",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive - Beauty in Death:'''</span> Whenever '''Jhin''' kills an enemy champion, he summons a ''Blooming Lotus Trap'' on their corpse.",
+          "text": "Passive - Beauty in Death: Whenever Jhin kills an enemy champion, he summons a Blooming Lotus Trap on their corpse."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jhin''' places a ''Lotus Trap'' at the target location which, upon landing, becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stealthed trap\">[[File:Noxious Trap.png|20px|link=Stealth#Stealthed_traps_and_wards|An icon representing the keyword Stealthed trap]] [[:Stealth#Stealthed_traps_and_wards|stealthed]]</span> after arming over 1 second, lasting for up to 180 seconds and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> within its radius. The ''Lotus Trap blooms'' upon enemy contact, with enemies in the area at the time of its trigger becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Standard sight\">[[File:Reveal icon.png|20px|link=Sight#Standard sight|An icon representing the keyword Standard sight]] [[:Sight#Standard sight|revealed]]</span> for 4 seconds.",
+          "text": "Active: Jhin places a Lotus Trap at the target location which, upon landing, becomes stealthed after arming over 1 second, lasting for up to 180 seconds and granting sight within its radius. The Lotus Trap blooms upon enemy contact, with enemies in the area at the time of its trigger becoming revealed for 4 seconds."
+        },
+        "description3": {
+          "raw": "'''Jhin''' periodically [[stock]]s a ''Lotus Trap'' charge, up to a maximum of 2.",
+          "text": "Jhin periodically stocks a Lotus Trap charge, up to a maximum of 2."
+        },
+        "description4": {
+          "raw": "''Blooming Lotus Traps'' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Slow\">[[File:Slow icon.png|20px|link=Slow|An icon representing the keyword Slow]] [[:Slow|slow]]</span> enemies within the area by 35% for 2 seconds before exploding, dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to enemies. ''Lotus Traps'' deal 65% damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Minions\">[[File:Minion icon.png|20px|link=Minion|An icon representing the keyword Minion]] [[:Minion|minions]]</span> as well as against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champions\">[[File:Champion icon.png|20px|link=Champion|An icon representing the keyword Champion]] [[:Champion|champions]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span> who have been struck by another ''Lotus Trap'' in the last 1 second.",
+          "text": "Blooming Lotus Traps slow enemies within the area by 35% for 2 seconds before exploding, dealing magic damage to enemies. Lotus Traps deal 65% damage against minions as well as against champions and monsters who have been struck by another Lotus Trap in the last 1 second."
+        },
+        "description5": {
+          "raw": "''See [[Jhin#Pets|Pets]] for more details about Lotus Traps.''",
+          "text": "See Pets for more details about Lotus Traps."
+        },
+        "effectradius": "260 • 260",
+        "icon": "false",
+        "icon2": "Captive Audience.png",
+        "leveling4": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>20 / 80 / 140 / 200 / 260 <span style=\"color:orange; white-space:normal\">(+ 120% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 100% AP)</span></dd><dt><span class=\"template_lc\">'''Reduced Damage:'''</span></dt><dd>13 / 52 / 91 / 130 / 169 <span style=\"color:orange; white-space:normal\">(+ 78% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 65% AP)</span></dd></dl>",
+          "text": "Magic Damage:20 / 80 / 140 / 200 / 260 (+ 120% AD) (+ 100% AP)Reduced Damage:13 / 52 / 91 / 130 / 169 (+ 78% AD) (+ 65% AP)"
+        },
+        "name": "Captive Audience",
+        "notes": {
+          "raw": "* ''Beauty in Death'' does not consume ''Lotus Trap'' charges.\n* The ''Lotus Trap'' will stop upon encountering a <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Yasuo\" data-ability=\"Wind Wall\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Yasuo Wind Wall.png|20xpx|border|link=Yasuo#Wind Wall|An icon for Yasuo's ability Wind Wall]]</span> <span style=\"white-space:normal;\">[[Yasuo#Wind Wall|Wind Wall]]</span></span> or <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Braum\" data-ability=\"Unbreakable\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Braum Unbreakable.png|20xpx|border|link=Braum#Unbreakable|An icon for Braum's ability Unbreakable]]</span> <span style=\"white-space:normal;\">[[Braum#Unbreakable|Unbreakable]]</span></span>.\n* ''Beauty in Death'' does not trigger after killing a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Clone\">[[File:Shaco Hallucinate 2.png|20px|link=Champion_summoned_units#decoys|An icon representing the keyword Clone]] [[:Champion_summoned_units#decoys|clone]]</span>.\n* The reveal debuff is named [[File: Caught Out.png|20px|link=]] ''Caught Out''.\n** This debuff is shared between ''Captive Audience'' and <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Jhin\" data-ability=\"Curtain Call\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Jhin Curtain Call.png|20xpx|border|link=Jhin#Curtain Call|An icon for Jhin's ability Curtain Call]]</span> <span style=\"white-space:normal;\">[[Jhin#Curtain Call|Curtain Call]]</span></span>.",
+          "text": "Beauty in Death does not consume Lotus Trap charges.\nThe Lotus Trap will stop upon encountering a Wind Wall or Unbreakable.\nBeauty in Death does not trigger after killing a clone.\nThe reveal debuff is named Caught Out.\n* This debuff is shared between Captive Audience and Curtain Call."
+        },
+        "projectile": false,
+        "spellshield": true,
+        "targeting": "Location"
+      },
+      "name": "Captive Audience"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "E",
+  "source": {
+    "contentHash": "61e6f9200be173b8e63acde66addd3d89d01b4835ebe2ac8a21f5adb77793f73",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jhin/Captive_Audience",
+    "revisionId": 4007613,
+    "sourceTimestamp": "2026-04-12T07:25:10Z"
+  }
+}

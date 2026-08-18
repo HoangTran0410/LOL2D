@@ -1,0 +1,55 @@
+{
+  "asset": {
+    "key": "spell_jhin_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Whisper.png?aad97",
+    "sha1": "89a685dac5d8fcc51719eaee720135f5e1152d90"
+  },
+  "champion": "Jhin",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jhin_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Whisper.png?aad97",
+        "sha1": "89a685dac5d8fcc51719eaee720135f5e1152d90"
+      },
+      "fields": {
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Death In 4 Acts:'''</span> '''Jhin's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> consume [[ammunition]] within 4 rounds. He will reload over 2.<small>5</small> seconds immediately after expending all rounds or withholding leftover rounds after 10 seconds of being [[out of combat]] and not being affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Crowd control\">[[File:Stun icon.png|20px|link=Crowd control|An icon representing the keyword Crowd control]] [[:Crowd control|crowd control]]</span>. The latter reload can be interrupted by declaring an attack or casting an ability. '''Jhin''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Lockout\">[[File:Lockout icon 2.png|20px|link=Terminology#Lockout|An icon representing the keyword Lockout]] [[:Terminology#Lockout|unable]]</span> to declare basic attacks during the reload time.",
+          "text": "Innate - Death In 4 Acts: Jhin's basic attacks consume ammunition within 4 rounds. He will reload over 2.5 seconds immediately after expending all rounds or withholding leftover rounds after 10 seconds of being out of combat and not being affected by crowd control. The latter reload can be interrupted by declaring an attack or casting an ability. Jhin is unable to declare basic attacks during the reload time."
+        },
+        "description2": {
+          "raw": "'''Jhin's''' final round attack has an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span>, always <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critically strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strikes]]</span>, including against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turrets\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|structures]]</span>, and deals <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> equal to <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"15;1\" data-finish=\"25;11\" data-top-fill=\"3\" data-bot-values=\"15;20;25\" data-top-values=\"1;6;11\" data-bot-key=\"%\">15% / 20% / 25% (based on level)</span> of the target's <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;'''missing''' health</span></span>. The damage based on the target's health is capped at 800 against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Jhin's final round attack has an uncancellable windup, always critically strikes, including against structures, and deals bonus physical damage equal to 15% / 20% / 25% (based on level) of the target's &nbsp;missing health. The damage based on the target's health is capped at 800 against monsters."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Every Moment Matters:'''</span> '''Jhin''' gains <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> equal to <span style=\"color:orange; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"4% at + 1% per level up to 9, then + 2% up to 11, then + 4%, capped at level 18\" data-bot-values=\"4;5;6;7;8;9;10;11;12;14;16;20;24;28;32;36;40;44\" data-bot-key=\"%\">4% – 44% (based on level)</span></span><span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;<span style=\"color:orangered; white-space:normal\">(+ 0.<small>35</small>% per 1% critical strike chance)</span> <span style=\"color:\n#F5EE99; white-space:normal\">(+ 0.<small>3</small>% per 1% '''bonus''' attack speed)</span>&nbsp;」</span><span class=\"flipText2\">「&nbsp;<span style=\"color:orangered; white-space:normal\">(+ 35% critical strike chance)</span> <span style=\"color:\n#F5EE99; white-space:normal\">(+ 30% '''bonus''' attack speed)</span>&nbsp;」</span></span><span style=\"color:orange; white-space:normal\">AD</span>.",
+          "text": "Innate - Every Moment Matters: Jhin gains &nbsp;bonus attack damage equal to 4% – 44% (based on level)「&nbsp;(+ 0.35% per 1% critical strike chance) (+ 0.3% per 1% bonus attack speed)&nbsp;」「&nbsp;(+ 35% critical strike chance) (+ 30% bonus attack speed)&nbsp;」AD."
+        },
+        "description4": {
+          "raw": "Additionally, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strikes\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critical strikes]]</span> against enemies grant '''Jhin''' <span style=\"color:\n#9FFF4D; white-space:normal\">14%</span> <span style=\"color:\n#F5EE99; white-space:normal\">(+ 0.<small>44</small>% per 1% '''bonus''' attack speed)</span> <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> for 2 seconds.",
+          "text": "Additionally, critical strikes against enemies grant Jhin 14% (+ 0.44% per 1% bonus attack speed) &nbsp;bonus movement speed for 2 seconds."
+        },
+        "icon": "Whisper.png",
+        "name": "Whisper",
+        "notes": {
+          "raw": "* The <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;'''missing''' health</span></span> damage benefits from <span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span>.\n* The '''bonus''' damage based on the target's missing health does not affect structures.\n* The 4th attack versus a structure is classified as a critical strike.\n* The attack damage multiplier stacks additively with <span class=\"inline-image label-after buff-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-buff=\"Dragon Slayer\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Dragon Slayer buff.png|20xpx|border|link=Dragon Slayer|An icon representing the Dragon Slayer neutral buff]]</span> <span style=\"white-space:normal;\">[[Dragon Slayer|Dragon Slayer's]]</span></span>.\n* ''Every Moment Matters' '' bonus <span style=\"color:orange; white-space:normal\">AD</span> will benefit from any amount of <span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span>, even in excess of an amount that would usually reach the attacks per second cap (3).\n** The maximum modifier without attack speed is 79%.\n*** 44% base modifier at level 18.\n*** 35% from critical strike chance on account of the 100% cap.\n*** [[Attack speed#Reducing attack speed|Attack speed slows]] will not affect '''Jhin's''' bonus attack damage from his passive and will ignore his attack speed as it is fixed.\n* Attack damage reductions apply before the multiplier causing them to be stronger against '''Jhin''' than advertised or versus other champions.",
+          "text": "The &nbsp;missing health damage benefits from &nbsp;life steal.\nThe bonus damage based on the target's missing health does not affect structures.\nThe 4th attack versus a structure is classified as a critical strike.\nThe attack damage multiplier stacks additively with Dragon Slayer's.\nEvery Moment Matters' bonus AD will benefit from any amount of bonus attack speed, even in excess of an amount that would usually reach the attacks per second cap (3).\n* The maximum modifier without attack speed is 79%.\n** 44% base modifier at level 18.\n** 35% from critical strike chance on account of the 100% cap.\n** Attack speed slows will not affect Jhin's bonus attack damage from his passive and will ignore his attack speed as it is fixed.\nAttack damage reductions apply before the multiplier causing them to be stronger against Jhin than advertised or versus other champions."
+        },
+        "targeting": "Passive"
+      },
+      "name": "Whisper"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "6c0856fb45ef2786be1ffaf35075c9e4da34fb22356f7bd212e79b17ee7522ec",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jhin/Whisper",
+    "revisionId": 3998238,
+    "sourceTimestamp": "2026-03-10T20:28:41Z"
+  }
+}

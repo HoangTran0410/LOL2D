@@ -1,0 +1,52 @@
+{
+  "asset": {
+    "key": "spell_sett_i",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Pit_Grit.png?b4ebb",
+    "sha1": "dbd78c7177aa22469a701fd13b3a0baccdc9e526"
+  },
+  "champion": "Sett",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_sett_i",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Pit_Grit.png?b4ebb",
+        "sha1": "dbd78c7177aa22469a701fd13b3a0baccdc9e526"
+      },
+      "fields": {
+        "damagetype": "physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Heart of the Half-Beast:'''</span> '''Sett''' <span style=\"color:\n#21B053; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Health regeneration icon.svg|15px|link=Health regeneration]]&nbsp;regenerates</span></span><span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;an additional <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"0.075;0.25;0.5;1;1.025;1.05\" data-top-values=\"1;6;11;16;19;20\">0.<small>075</small> / 0.<small>25</small> / 0.<small>5</small> / 1 / 1.<small>025</small> / 1.<small>05</small> (based on level)</span>[[Category:Debug]] health</span> every 0.<small>5</small> seconds per <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">5% of his '''missing''' health</span></span>.&nbsp;」</span><span class=\"flipText2\">「&nbsp;up-to an additional <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"1.425;4.75;9.5;19;19.475;19.95\" data-top-values=\"1;6;11;16;19;20\">1.<small>425</small> / 4.<small>75</small> / 9.<small>5</small> / 19 / 19.<small>475</small> / 19.<small>95</small> (based on level)</span>[[Category:Debug]] health</span> per 0.<small>5</small> seconds, with the maximum reached at the threshold of <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">95% '''missing''' health</span></span>.&nbsp;」</span></span>",
+          "text": "Innate - Heart of the Half-Beast: Sett &nbsp;regenerates「&nbsp;an additional 0.075 / 0.25 / 0.5 / 1 / 1.025 / 1.05 (based on level)Category:Debug health every 0.5 seconds per &nbsp;5% of his missing health.&nbsp;」「&nbsp;up-to an additional 1.425 / 4.75 / 9.5 / 19 / 19.475 / 19.95 (based on level)Category:Debug health per 0.5 seconds, with the maximum reached at the threshold of &nbsp;95% missing health.&nbsp;」"
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Innate - Heavy Hands:'''</span> '''Sett's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> alternate between his <span style=\"color:yellow; white-space:normal\">Left Punch</span> and a <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-attack\">[[File:On-attack icon.svg|20px|link=Attack_effects#On_Attacking|An icon representing the keyword On-attack]] [[:Attack_effects#On_Attacking|on-attack]]</span>. '''Sett''' begins attacking with his <span style=\"color:yellow; white-space:normal\">Left Punch</span>, and will reset back to it after 2 seconds of not performing a <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span>.",
+          "text": "Innate - Heavy Hands: Sett's basic attacks alternate between his Left Punch and a Right Punch on-attack. Sett begins attacking with his Left Punch, and will reset back to it after 2 seconds of not performing a Right Punch."
+        },
+        "description3": {
+          "raw": "'''Sett's''' <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span> is empowered to gain <span style=\"white-space:nowrap\">[[File:Range icon.png|15px|link=Range]]&nbsp;50 '''bonus''' range</span> (unless ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Sett\" data-ability=\"Knuckle Down\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Sett Knuckle Down.png|20xpx|border|link=Sett#Knuckle Down|An icon for Sett's ability Knuckle Down]]</span> <span style=\"white-space:normal;\">[[Sett#Knuckle Down|Knuckle Down]]</span></span>'' is active), attack at 8 times the <span style=\"color:yellow; white-space:normal\">Left Punch's</span> <span style=\"color:\n#F5EE99; white-space:normal\">attack speed</span>, and deal <span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-useformula=\"5 + (90-5)/17*(x-1)\" data-bot-values=\"5;10;15;20;25;30;35;40;45;50;55;60;65;70;75;80;85;90;95;100\">5 – 100 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:orange; white-space:normal\">(+ 55% '''bonus''' AD)</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>.",
+          "text": "Sett's Right Punch is empowered to gain &nbsp;50 bonus range (unless Knuckle Down is active), attack at 8 times the Left Punch's attack speed, and deal 5 – 100 (based on level)Category:Debug (+ 55% bonus AD) bonus physical damage."
+        },
+        "icon": "false",
+        "icon2": "Pit Grit.png",
+        "name": "Pit Grit",
+        "notes": {
+          "raw": "* Alternatively, ''Pit Grit'' grants '''Sett''' <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"0.75;2.5;5;10;10.25;10.5\" data-top-values=\"1;6;11;16;19;20\">0.<small>75</small> / 2.<small>5</small> / 5 / 10 / 10.<small>25</small> / 10.<small>5</small> (based on level)</span>[[Category:Debug]] '''bonus''' health regeneration</span> for every <span style=\"color:\n#21B053; white-space:normal\">5% '''missing''' health</span>, up to <span style=\"color:\n#21B053; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"14.25;47.5;95;190;194.75;199.5\" data-top-values=\"1;6;11;16;19;20\">14.<small>25</small> / 47.<small>5</small> / 95 / 190 / 194.<small>75</small> / 199.<small>5</small> (based on level)</span>[[Category:Debug]]</span> at the cap of <span style=\"color:\n#21B053; white-space:normal\">95% '''missing''' health</span>.\n* The <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span> does not grant <span style=\"color:\n#F5EE99; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;'''bonus''' attack speed</span></span>, rather its windup is sped up and fixed at <span id=\"container\" class=\"container\" style=\"cursor:help;\"><span class=\"flipText1 active\">「&nbsp;12.<small>5</small>% of a <span style=\"color:yellow; white-space:normal\">Left Punch's</span> windup time.&nbsp;」</span><span class=\"flipText2\">「&nbsp;800% of a <span style=\"color:yellow; white-space:normal\">Left Punch's</span> windup speed.&nbsp;」</span></span>\n** The windup is still affected by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Cripple\">[[File:Cripple icon.png|20px|link=Cripple|An icon representing the keyword Cripple]] [[:Cripple|cripples]]</span> and attack speed buffs that were not already active for the previous <span style=\"color:yellow; white-space:normal\">Left Punch's</span>.\n* The bonus physical damage from the <span style=\"color:\n#E34D4C; white-space:normal\">Right Punch</span> benefits from <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span></span>.",
+          "text": "Alternatively, Pit Grit grants Sett 0.75 / 2.5 / 5 / 10 / 10.25 / 10.5 (based on level)Category:Debug bonus health regeneration for every 5% missing health, up to 14.25 / 47.5 / 95 / 190 / 194.75 / 199.5 (based on level)Category:Debug at the cap of 95% missing health.\nThe Right Punch does not grant &nbsp;bonus attack speed, rather its windup is sped up and fixed at 「&nbsp;12.5% of a Left Punch's windup time.&nbsp;」「&nbsp;800% of a Left Punch's windup speed.&nbsp;」\n* The windup is still affected by cripples and attack speed buffs that were not already active for the previous Left Punch's.\nThe bonus physical damage from the Right Punch benefits from &nbsp;life steal."
+        },
+        "targeting": "Passive"
+      },
+      "name": "Pit Grit"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "I",
+  "source": {
+    "contentHash": "9e5a8c85bb10ec036b52fde28a185fc5588522192033b8b3ce2e2d18a182be95",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Sett/Pit_Grit",
+    "revisionId": 4018819,
+    "sourceTimestamp": "2026-05-15T23:27:44Z"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "asset": {
+    "key": "spell_vi_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Denting_Blows.png?69ddf",
+    "sha1": "62d8f498da9bb3472605d7f4b54fd3a78553242a"
+  },
+  "champion": "Vi",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_vi_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Denting_Blows.png?69ddf",
+        "sha1": "62d8f498da9bb3472605d7f4b54fd3a78553242a"
+      },
+      "fields": {
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Vi's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Vault Breaker\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Vault Breaker.png|20xpx|border|link=Vi#Vault Breaker|An icon for Vi's ability Vault Breaker]]</span> <span style=\"white-space:normal;\">[[Vi#Vault Breaker|Vault Breaker]]</span></span>'' apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Denting Blows'' to enemies hit for 4 seconds, refreshing on subsequent applications and stacking up to 3 times. The third stack consumes them all to deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>, capped at 300 against non-champions, and inflict <span style=\"white-space:nowrap\">[[File:Armor penetration icon.svg|15px|link=Armor penetration]]&nbsp;<span style=\"color:yellow; white-space:normal\">20% armor reduction</span></span> for 4 seconds.",
+          "text": "Passive: Vi's basic attacks on-hit and Vault Breaker apply a stack of Denting Blows to enemies hit for 4 seconds, refreshing on subsequent applications and stacking up to 3 times. The third stack consumes them all to deal bonus physical damage, capped at 300 against non-champions, and inflict &nbsp;20% armor reduction for 4 seconds."
+        },
+        "description2": {
+          "raw": "After consuming ''Denting Blows'', '''Vi''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 4 seconds, which refreshes on subsequent triggers.",
+          "text": "After consuming Denting Blows, Vi gains &nbsp;bonus attack speed for 4 seconds, which refreshes on subsequent triggers."
+        },
+        "icon": "Denting Blows.png",
+        "icon2": "Denting Blows 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">4 / 5 / 6 / 7 / 8% <span style=\"color:orange; white-space:normal\">(+ 3.<small>5</small>% per 100 '''bonus''' AD)</span> of target's '''maximum''' health</span></dd></dl>",
+          "text": "Bonus Physical Damage:4 / 5 / 6 / 7 / 8% (+ 3.5% per 100 bonus AD) of target's maximum health"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Bonus Attack Speed:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Denting Blows",
+        "notes": {
+          "raw": "* The armor penetration will apply after the triggering damage.\n* The enhanced attack applies other <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects and can both <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> as normal as well as apply <span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;[[Life steal|life steal]]</span> (the bonus damage cannot do either).\n* ''Denting Blows'' can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> but cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> nor missed while '''Vi''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The attacks do not affect <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span> nor <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.",
+          "text": "The armor penetration will apply after the triggering damage.\nThe enhanced attack applies other on-hit effects and can both critically strike as normal as well as apply &nbsp;life steal (the bonus damage cannot do either).\nDenting Blows can be blocked but cannot be dodged nor missed while Vi is blinded.\nThe attacks do not affect structures nor wards."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Denting Blows"
+    },
+    {
+      "asset": {
+        "key": "spell_vi_w2",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Denting_Blows.png?69ddf",
+        "sha1": "62d8f498da9bb3472605d7f4b54fd3a78553242a"
+      },
+      "fields": {
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Vi's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vi\" data-ability=\"Vault Breaker\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vi Vault Breaker.png|20xpx|border|link=Vi#Vault Breaker|An icon for Vi's ability Vault Breaker]]</span> <span style=\"white-space:normal;\">[[Vi#Vault Breaker|Vault Breaker]]</span></span>'' apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Denting Blows'' to enemies hit for 4 seconds, refreshing on subsequent applications and stacking up to 3 times. The third stack consumes them all to deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>, capped at 300 against non-champions, and inflict <span style=\"white-space:nowrap\">[[File:Armor penetration icon.svg|15px|link=Armor penetration]]&nbsp;<span style=\"color:yellow; white-space:normal\">20% armor reduction</span></span> for 4 seconds.",
+          "text": "Passive: Vi's basic attacks on-hit and Vault Breaker apply a stack of Denting Blows to enemies hit for 4 seconds, refreshing on subsequent applications and stacking up to 3 times. The third stack consumes them all to deal bonus physical damage, capped at 300 against non-champions, and inflict &nbsp;20% armor reduction for 4 seconds."
+        },
+        "description2": {
+          "raw": "After consuming ''Denting Blows'', '''Vi''' gains <span style=\"white-space:nowrap\">[[File:Attack speed icon.png|15px|link=Attack speed]]&nbsp;<span style=\"color:\n#F5EE99; white-space:normal\">'''bonus''' attack speed</span></span> for 4 seconds, which refreshes on subsequent triggers.",
+          "text": "After consuming Denting Blows, Vi gains &nbsp;bonus attack speed for 4 seconds, which refreshes on subsequent triggers."
+        },
+        "icon": "Denting Blows.png",
+        "icon2": "Denting Blows 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">4 / 5 / 6 / 7 / 8% <span style=\"color:orange; white-space:normal\">(+ 3.<small>5</small>% per 100 '''bonus''' AD)</span> of target's '''maximum''' health</span></dd></dl>",
+          "text": "Bonus Physical Damage:4 / 5 / 6 / 7 / 8% (+ 3.5% per 100 bonus AD) of target's maximum health"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Speed:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>",
+          "text": "Bonus Attack Speed:30 / 35 / 40 / 45 / 50%"
+        },
+        "name": "Denting Blows",
+        "notes": {
+          "raw": "* The armor penetration will apply after the triggering damage.\n* The enhanced attack applies other <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> effects and can both <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Critical strike\">[[File:Critical strike icon.png|20px|link=Critical strike|An icon representing the keyword Critical strike]] [[:Critical strike|critically strike]]</span> as normal as well as apply <span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;[[Life steal|life steal]]</span> (the bonus damage cannot do either).\n* ''Denting Blows'' can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> but cannot be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodged\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> nor missed while '''Vi''' is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The attacks do not affect <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span> nor <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>.",
+          "text": "The armor penetration will apply after the triggering damage.\nThe enhanced attack applies other on-hit effects and can both critically strike as normal as well as apply &nbsp;life steal (the bonus damage cannot do either).\nDenting Blows can be blocked but cannot be dodged nor missed while Vi is blinded.\nThe attacks do not affect structures nor wards."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Denting Blows 2"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "aa5ca57c944b75d48883f34db9824b3d1591661246ad4ce9b030d1c389d208c9",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vi/Denting_Blows",
+    "revisionId": 3932548,
+    "sourceTimestamp": "2025-07-19T01:58:33Z"
+  }
+}

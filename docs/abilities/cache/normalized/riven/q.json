@@ -1,0 +1,67 @@
+{
+  "asset": {
+    "key": "spell_riven_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Broken_Wings.png?ee943",
+    "sha1": "48162b2663a3125935cfde3af7b87f35ab7b5153"
+  },
+  "champion": "Riven",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_riven_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Broken_Wings.png?ee943",
+        "sha1": "48162b2663a3125935cfde3af7b87f35ab7b5153"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "13",
+        "damagetype": "physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Riven''' can activate ''Broken Wings'' three times before the ability goes on cooldown, with a 0.<small>3125</small>-second <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Unaffected by ability haste\">static cooldown</span> between casts. If '''Riven''' does not recast the ability within 4 seconds of the previous cast, it goes on cooldown.",
+          "text": "Active: Riven can activate Broken Wings three times before the ability goes on cooldown, with a 0.3125-second static cooldown between casts. If Riven does not recast the ability within 4 seconds of the previous cast, it goes on cooldown."
+        },
+        "description2": {
+          "raw": "'''Riven''' slashes with her sword for each of the three casts, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies struck within an area, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resetting]]</span> her basic attack timer, and ordering her to basic attack the target of ''Broken Wings'' if there are any.",
+          "text": "Riven slashes with her sword for each of the three casts, dealing physical damage to enemies struck within an area, resetting her basic attack timer, and ordering her to basic attack the target of Broken Wings if there are any."
+        },
+        "description3": {
+          "raw": "<span class=\"template_sbc\">'''First Cast:'''</span> '''Riven''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> 225 units in the direction she is currently facing, or up to 225 units towards the target enemy, striking enemies in the target area 100 units away. This cast cannot cross terrain.",
+          "text": "First Cast: Riven dashes 225 units in the direction she is currently facing, or up to 225 units towards the target enemy, striking enemies in the target area 100 units away. This cast cannot cross terrain."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''Second Cast:'''</span> '''Riven''' mimics the first cast's effects.",
+          "text": "Second Cast: Riven mimics the first cast's effects."
+        },
+        "description5": {
+          "raw": "<span class=\"template_sbc\">'''Third Cast:'''</span> '''Riven''' mimics the first cast's effects in a larger area while also <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knocking back]]</span> enemies hit 75 units over 0.<small>5</small> seconds. This cast can cross terrain.",
+          "text": "Third Cast: Riven mimics the first cast's effects in a larger area while also knocking back enemies hit 75 units over 0.5 seconds. This cast can cross terrain."
+        },
+        "effectradius": "150 • 250 • 200 • 300",
+        "icon": "Broken Wings.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>45 / 75 / 105 / 135 / 165 <span style=\"color:orange; white-space:normal\">(+ 60 / 65 / 70 / 75 / 80% '''bonus''' AD)</span></dd><dt><span class=\"template_lc\">'''Total Physical Damage:'''</span></dt><dd>135 / 225 / 315 / 405 / 495 <span style=\"color:orange; white-space:normal\">(+ 180 / 195 / 210 / 225 / 240% '''bonus''' AD)</span></dd></dl>",
+          "text": "Physical Damage:45 / 75 / 105 / 135 / 165 (+ 60 / 65 / 70 / 75 / 80% bonus AD)Total Physical Damage:135 / 225 / 315 / 405 / 495 (+ 180 / 195 / 210 / 225 / 240% bonus AD)"
+        },
+        "name": "Broken Wings",
+        "notes": {
+          "raw": "* This ability always employs [[Quick cast]].\n* Each cast counts as a single ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n* Moving after using ''Broken Wings'' allows Riven to do other actions faster.\n* The <span class=\"template_sbc\">'''Third Cast'''</span> prevents '''Riven''' from using basic attacks and abilities for longer than the other 2 casts.\n* The <span class=\"template_sbc\">'''Third Cast'''</span> may have an extended dash range when crossing terrain.\n* The <span class=\"template_sbc\">'''Third Cast's'''</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockup]]</span> debuff is not removed early if the forced movement is interrupted.\n* Any forced movement affecting the target being knocked up is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Knockdown\">[[File:Knockdown icon.png|20px|link=Knockdown|An icon representing the keyword Knockdown]] [[:Knockdown|interrupted]]</span> when the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knockup]]</span> debuff is removed.<sup><span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"This does not match expectations. this is not the case for most other knockups\">(unexpected)</span></sup>",
+          "text": "This ability always employs Quick cast.\nEach cast counts as a single ability activation for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\nMoving after using Broken Wings allows Riven to do other actions faster.\nThe Third Cast prevents Riven from using basic attacks and abilities for longer than the other 2 casts.\nThe Third Cast may have an extended dash range when crossing terrain.\nThe Third Cast's knockup debuff is not removed early if the forced movement is interrupted.\nAny forced movement affecting the target being knocked up is interrupted when the knockup debuff is removed.(unexpected)"
+        },
+        "spellshield": true,
+        "targeting": "Auto • Unit"
+      },
+      "name": "Broken Wings"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "66a2e82eb88a3e2b8e67c2dccf36364737384100f5829e9d70d8658d0a1bc415",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Riven/Broken_Wings",
+    "revisionId": 4025373,
+    "sourceTimestamp": "2026-06-05T15:05:11Z"
+  }
+}

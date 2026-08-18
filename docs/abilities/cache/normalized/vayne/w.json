@@ -1,0 +1,60 @@
+{
+  "asset": {
+    "key": "spell_vayne_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Silver_Bolts.png?0ef24",
+    "sha1": "c2ca9cbce5e18b8800e49ae553640630d184d253"
+  },
+  "champion": "Vayne",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_vayne_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Silver_Bolts.png?0ef24",
+        "sha1": "c2ca9cbce5e18b8800e49ae553640630d184d253"
+      },
+      "fields": {
+        "damagetype": "true",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Vayne's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Condemn\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Condemn.png|20xpx|border|link=Vayne#Condemn|An icon for Vayne's ability Condemn]]</span> <span style=\"white-space:normal;\">[[Vayne#Condemn|Condemn]]</span></span>'' apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Silver Bolts'' for 3.<small>5</small> seconds, refreshing on subsequent applications, expiring upon attacking a new enemy, and stacking up to 3 times.",
+          "text": "Passive: Vayne's basic attacks on-hit and Condemn apply a stack of Silver Bolts for 3.5 seconds, refreshing on subsequent applications, expiring upon attacking a new enemy, and stacking up to 3 times."
+        },
+        "description2": {
+          "raw": "The third stack consumes them all to deal <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">'''bonus''' true damage</span></span>, with a minimum threshold.",
+          "text": "The third stack consumes them all to deal &nbsp;bonus true damage, with a minimum threshold."
+        },
+        "description3": {
+          "raw": "''Silver Bolts'' deals modified damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.",
+          "text": "Silver Bolts deals modified damage against monsters."
+        },
+        "icon": "Silver Bolts.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus True Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">6 / 7 / 8 / 9 / 10% of target's '''maximum''' health</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Bonus Damage:'''</span></dt><dd>50 / 65 / 80 / 95 / 110</dd></dl>",
+          "text": "Bonus True Damage:6 / 7 / 8 / 9 / 10% of target's maximum health\nMinimum Bonus Damage:50 / 65 / 80 / 95 / 110"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Damage:'''</span></dt><dd>140 / 155 / 170 / 185 / 200</dd></dl>",
+          "text": "Monster Damage:140 / 155 / 170 / 185 / 200"
+        },
+        "name": "Silver Bolts",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|Stacks]]</span> are not removed if '''Vayne''' switches to attacking a target immune to ''Silver Bolts'' (<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>).\n* ''Silver Bolts'' do not apply to additional targets with <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Runaan&#39;s Hurricane\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Runaan's Hurricane item.png|20xpx|border|link=Runaan's Hurricane|An icon for the item Runaan's Hurricane]]</span> <span style=\"white-space:normal;\">[[Runaan's Hurricane]]</span></span>.\n* The stacks can be consumed even if the target is in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis\">[[File:Stasis icon.png|20px|link=Types_of_Crowd_Control#Stasis|An icon representing the keyword Stasis]] [[:Types_of_Crowd_Control#Stasis|stasis]]</span>.",
+          "text": "Stacks are not removed if Vayne switches to attacking a target immune to Silver Bolts ( structures, wards).\nSilver Bolts do not apply to additional targets with Runaan's Hurricane.\nThe stacks can be consumed even if the target is in stasis."
+        },
+        "spellshield": false,
+        "targeting": "Passive"
+      },
+      "name": "Silver Bolts"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "fc118ce0c0bead8b9a3e4742c4c42baef4427e593a5f5e3ccdff50d7c3be96f2",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Silver_Bolts",
+    "revisionId": 3949891,
+    "sourceTimestamp": "2025-08-26T19:47:02Z"
+  }
+}

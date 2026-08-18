@@ -1,0 +1,117 @@
+{
+  "asset": {
+    "key": "champ_riven",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_OriginalSquare.png?6e136",
+    "sha1": "2c0ec4aecc0897c6673db3ac2f530050068a4dc5"
+  },
+  "champion": "Riven",
+  "data": {
+    "adaptivetype": "Physical",
+    "alttype": "Assassin",
+    "apiname": "Riven",
+    "be": 2400,
+    "changes": "V26.15",
+    "client_positions": [
+      "Top"
+    ],
+    "client_tags": [
+      "Mobile",
+      "Duelist",
+      "Physical"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2011-09-14",
+    "difficulty": 3,
+    "external_positions": [
+      "Top"
+    ],
+    "fullname": "Konte Riven",
+    "herotype": "Fighter",
+    "id": 92,
+    "mobility": 3,
+    "patch": "V1.0.0.125",
+    "rangetype": "Melee",
+    "resource": "None",
+    "role": [
+      "Skirmisher"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Valor"
+    },
+    "skill_i": {
+      "1": "Runic Blade"
+    },
+    "skill_q": {
+      "1": "Broken Wings"
+    },
+    "skill_r": {
+      "1": "Blade of the Exile",
+      "2": "Wind Slash"
+    },
+    "skill_w": {
+      "1": "Ki Burst"
+    },
+    "skills": {
+      "1": "Runic Blade",
+      "2": "Broken Wings",
+      "3": "Ki Burst",
+      "4": "Valor",
+      "5": "Blade of the Exile",
+      "6": "Wind Slash"
+    },
+    "stats": {
+      "acquisition_radius": 600,
+      "aram": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 0.92,
+        "shielding": 1
+      },
+      "arm_base": 33,
+      "arm_lvl": 4.4,
+      "as_base": 0.625,
+      "as_lvl": 3.5,
+      "as_ratio": 0.625,
+      "attack_delay_offset": -0.133333340287208,
+      "dam_base": 64,
+      "dam_lvl": 3,
+      "hp5_base": 8.5,
+      "hp5_lvl": 0.5,
+      "hp_base": 630,
+      "hp_lvl": 100,
+      "mp5_base": 0,
+      "mp5_lvl": 0,
+      "mp_base": 0,
+      "mp_lvl": 0,
+      "mr_base": 32,
+      "mr_lvl": 2.05,
+      "ms": 340,
+      "nb": {
+        "dmg_dealt": 1.05,
+        "dmg_taken": 1
+      },
+      "pathing_radius": 35,
+      "range": 125,
+      "selection_height": 150,
+      "selection_radius": 130,
+      "urf": {
+        "dmg_dealt": 1,
+        "dmg_taken": 0.95
+      }
+    },
+    "style": 75,
+    "title": "The Exile",
+    "toughness": 2,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "fc460dcac97bd76f41813b1e8ab66dfa61b14cc8ab6fbd895edd7647f90502c5",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

@@ -38,6 +38,16 @@ const RANDOM_AVATAR_POOL: AssetKey[] = [
   'champ_ekko',
   'champ_jarvaniv',
   'champ_camille',
+  'champ_katarina',
+  'champ_vayne',
+  'champ_riven',
+  'champ_sett',
+  'champ_jhin',
+  'champ_nautilus',
+  'champ_diana',
+  'champ_vi',
+  'champ_syndra',
+  'champ_ziggs',
 ];
 const randomAvatar = (): AssetKey => random(RANDOM_AVATAR_POOL);
 
@@ -510,6 +520,76 @@ export const SpellGroups: {
     image: 'champ_brand',
 
     spells: [AllSpells.Brand_Q, AllSpells.Brand_W, AllSpells.Brand_E, AllSpells.Brand_R],
+  },
+  {
+    name: 'Katarina',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_katarina',
+
+    spells: [AllSpells.Katarina_Q, AllSpells.Katarina_W, AllSpells.Katarina_E, AllSpells.Katarina_R],
+  },
+  {
+    name: 'Vayne',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_vayne',
+
+    spells: [AllSpells.Vayne_Q, AllSpells.Vayne_W, AllSpells.Vayne_E, AllSpells.Vayne_R],
+  },
+  {
+    name: 'Riven',
+    attack: ATTACK.BRUISER,
+    image: 'champ_riven',
+
+    spells: [AllSpells.Riven_Q, AllSpells.Riven_W, AllSpells.Riven_E, AllSpells.Riven_R],
+  },
+  {
+    name: 'Sett',
+    attack: ATTACK.BRUISER,
+    image: 'champ_sett',
+
+    spells: [AllSpells.Sett_Q, AllSpells.Sett_W, AllSpells.Sett_E, AllSpells.Sett_R],
+  },
+  {
+    name: 'Jhin',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_jhin',
+
+    spells: [AllSpells.Jhin_Q, AllSpells.Jhin_W, AllSpells.Jhin_E, AllSpells.Jhin_R],
+  },
+  {
+    name: 'Nautilus',
+    attack: ATTACK.TANK,
+    image: 'champ_nautilus',
+
+    spells: [AllSpells.Nautilus_Q, AllSpells.Nautilus_W, AllSpells.Nautilus_E, AllSpells.Nautilus_R],
+  },
+  {
+    name: 'Diana',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_diana',
+
+    spells: [AllSpells.Diana_Q, AllSpells.Diana_W, AllSpells.Diana_E, AllSpells.Diana_R],
+  },
+  {
+    name: 'Vi',
+    attack: ATTACK.BRUISER,
+    image: 'champ_vi',
+
+    spells: [AllSpells.Vi_Q, AllSpells.Vi_W, AllSpells.Vi_E, AllSpells.Vi_R],
+  },
+  {
+    name: 'Syndra',
+    attack: ATTACK.MAGE,
+    image: 'champ_syndra',
+
+    spells: [AllSpells.Syndra_Q, AllSpells.Syndra_W, AllSpells.Syndra_E, AllSpells.Syndra_R],
+  },
+  {
+    name: 'Ziggs',
+    attack: ATTACK.MAGE,
+    image: 'champ_ziggs',
+
+    spells: [AllSpells.Ziggs_Q, AllSpells.Ziggs_W, AllSpells.Ziggs_E, AllSpells.Ziggs_R],
   },
 ];
 

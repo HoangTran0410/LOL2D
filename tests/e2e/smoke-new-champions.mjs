@@ -1,7 +1,7 @@
 /**
  * Does every ability on the new roster actually fire in the real game?
  *
- * Forty spells were written by five agents in parallel against a spec, and
+ * Forty spells were written by ten agents in parallel against a spec, and
  * `verify` says they compile and their unit tests pass. Neither of those runs
  * `draw()`. What is left to find is the class of bug that only exists once p5
  * is real and a frame is running: a null read inside a draw, a missing global,
@@ -13,13 +13,14 @@
  * number can answer:
  *
  *   1. no page error while the ability is on screen,
- *   2. the cast was *accepted* (the spell left READY),
+ *   2. the cast was *accepted* — `press()`'s own return value, not an inference
+ *      from the spell's state afterwards; see the note beside it,
  *   3. something happened — an object, a buff, or the caster moved.
  *
  * The third is deliberately a disjunction. "Spawned an object" alone would
- * fail every ability whose whole payload is a buff on the caster (Darius W,
- * Xin Zhao Q, Master Yi E, Ezreal W, Tryndamere Q), and calling those broken
- * would be the test being wrong rather than the game.
+ * fail every ability whose whole payload is a buff on the caster (Vayne W and
+ * R, Sett Q, Vi W and E, Nautilus W), and calling those broken would be the
+ * test being wrong rather than the game.
  *
  *   node tests/e2e/smoke-new-champions.mjs [championFilter]
  *
@@ -30,19 +31,62 @@ import { chromium } from 'playwright';
 
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 
-/** [preset display name, spell class prefix] — they differ where a name has a space. */
+/**
+ * [preset display name, spell class prefix] — they differ where a name has a
+ * space. Retargeted per batch, not accumulated: this script's job is the roster
+ * that has not been driven in a browser yet, and forty casts is already three
+ * minutes. The previous batch (Darius, Renekton, Xin Zhao, Tryndamere, Master
+ * Yi, Malzahar, Ezreal, Caitlyn, Soraka, Brand) passed and is in git history.
+ */
 const ROSTER = [
-  ['Darius', 'Darius'],
-  ['Renekton', 'Renekton'],
-  ['Xin Zhao', 'XinZhao'],
-  ['Tryndamere', 'Tryndamere'],
-  ['Master Yi', 'MasterYi'],
-  ['Malzahar', 'Malzahar'],
-  ['Ezreal', 'Ezreal'],
-  ['Caitlyn', 'Caitlyn'],
-  ['Soraka', 'Soraka'],
-  ['Brand', 'Brand'],
+  ['Katarina', 'Katarina'],
+  ['Vayne', 'Vayne'],
+  ['Riven', 'Riven'],
+  ['Sett', 'Sett'],
+  ['Jhin', 'Jhin'],
+  ['Nautilus', 'Nautilus'],
+  ['Diana', 'Diana'],
+  ['Vi', 'Vi'],
+  ['Syndra', 'Syndra'],
+  ['Ziggs', 'Ziggs'],
 ];
+
+/**
+ * Abilities whose first press needs the board set, keyed by the label printed
+ * below; the value is the slot to cast first.
+ *
+ * Syndra W is the only one in this roster and it is not a targeting problem:
+ * it seizes one of her own grounded Dark Spheres, and `checkCastCondition`
+ * refuses — correctly, before billing anything — when she owns none. Q leaves a
+ * sphere behind, and that sphere falls for `SYNDRA_Q_FALL_MS` (400) before it
+ * can be grabbed, which is what the settle below is buying.
+ *
+ * Deliberately a prerequisite *cast* rather than reaching into her sphere list:
+ * the point of this script is that the real path works, and hand-placing a
+ * sphere would test a board state the game never produces.
+ */
+const PREREQUISITES = { Syndra_W: 'Q' };
+const PREREQUISITE_SETTLE_MS = 700;
+
+/**
+ * Two-stage abilities whose payload lands on the **recast**, so one press is
+ * half the gesture and the "something happened" disjunction below correctly
+ * sees nothing.
+ *
+ * Syndra W again, for the other half of the same mechanic: the first press only
+ * *seizes* a sphere that already exists — it lifts an object rather than
+ * spawning one, grants no buff and moves nobody — and the throw is what deals
+ * the damage. Measuring the seize alone reports a working ability as dead.
+ *
+ * Not folded into `PREREQUISITES`: that one sets the board *before* the cast
+ * under test, this one completes the cast under test. Ziggs W, Riven R and
+ * Jhin R are also `RECAST` activations and are deliberately absent — each does
+ * something visible on the first press, and driving their recast here would be
+ * testing a second ability under the first one's name.
+ */
+const RECASTS = new Set(['Syndra_W']);
+/** Budget for the seize to reach its recastable ACTIVE window. */
+const RECAST_WINDOW_TIMEOUT_MS = 2000;
 
 const ONLY = process.argv[2];
 const CASTS = [];
@@ -185,6 +229,27 @@ try {
     // seen yet and reports a working ability as broken.
     await page.waitForTimeout(150);
 
+    // Same class of harness error, one step further out: an ability whose first
+    // press needs the board set rather than a target picked. Casting it cold
+    // measures this script, not the spell.
+    const prerequisite = PREREQUISITES[label];
+    if (prerequisite) {
+      await page.evaluate(
+        ([prefix, slot]) => {
+          const { game, subject, home } = window.__stage;
+          const spell = subject.spells.find(s => s?.constructor?.name === `${prefix}_${slot}`);
+          if (!spell) return;
+          spell.currentCooldown = 0;
+          const at = { x: home.x + 140, y: home.y };
+          game.worldMouse = createVector(at.x, at.y);
+          const context = game.createSpellContext(spell, subject, at);
+          if (context) spell.press(context);
+        },
+        [cast.prefix, prerequisite]
+      );
+      await page.waitForTimeout(PREREQUISITE_SETTLE_MS);
+    }
+
     const fired = await page.evaluate(
       ([prefix, slot]) => {
         const { game, subject, home } = window.__stage;
@@ -234,6 +299,28 @@ try {
       continue;
     }
 
+    if (RECASTS.has(label)) {
+      // Wait for the recastable window rather than a fixed delay. The seize has
+      // a cast time of its own, and a recast pressed while the spell is still
+      // CASTING is swallowed — leaving a working ability reported as dead. A
+      // flat 250ms won when this script was filtered to one champion and lost in
+      // the full forty-cast run, where the page is busier: a real race, and the
+      // kind that only shows up in the run you were not watching.
+      await page
+        .waitForFunction(() => String(window.__cast.spell.state) === 'ACTIVE', {
+          timeout: RECAST_WINDOW_TIMEOUT_MS,
+        })
+        .catch(() => {});
+      await page.evaluate(() => {
+        const rig = window.__cast;
+        const { game, home } = window.__stage;
+        const at = { x: home.x + 300, y: home.y };
+        game.worldMouse = createVector(at.x, at.y);
+        const context = game.createSpellContext(rig.spell, rig.subject, at);
+        if (context) rig.spell.press(context);
+      });
+    }
+
     for (let elapsed = 0; elapsed < OBSERVE_MS; elapsed += SAMPLE_MS) {
       await page.waitForTimeout(SAMPLE_MS);
       await page.evaluate(() => {
@@ -260,15 +347,23 @@ try {
         spawned: rig.spawned,
         buffed: rig.buffed,
         moved: Math.round(rig.moved),
-        accepted: String(rig.spell.state) !== 'READY' || rig.spell.currentCooldown > 0,
       };
     });
 
+    // `press()` returns whether the runtime accepted the cast, and that is the
+    // only honest answer to the question. This used to be re-derived afterwards
+    // as "the spell is no longer READY, or its cooldown is running", which is a
+    // guess about a spell that has already resolved — and it is wrong for every
+    // spell that legitimately goes straight back to READY. A charge spell is
+    // exactly that: Riven Q and Vi E both call `resetCoolDown()` while charges
+    // remain, because the next charge has to be pressable. Both dashed, spawned
+    // their slashes and reported NOT-ACCEPTED.
+    const accepted = fired.accepted;
     const didSomething = result.spawned > 0 || result.buffed > 0 || result.moved > 2;
-    const ok = errors.length === 0 && result.accepted && didSomething;
+    const ok = errors.length === 0 && accepted && didSomething;
     const detail =
       `objects=+${result.spawned} buffs=+${result.buffed} moved=${result.moved}px` +
-      `${result.accepted ? '' : ' NOT-ACCEPTED'}${errors.length ? ` ${errors[0].slice(0, 120)}` : ''}`;
+      `${accepted ? '' : ' NOT-ACCEPTED'}${errors.length ? ` ${errors[0].slice(0, 120)}` : ''}`;
 
     rows.push({ label, ok, detail });
     if (!ok) failures.push(`${label}: ${detail}`);

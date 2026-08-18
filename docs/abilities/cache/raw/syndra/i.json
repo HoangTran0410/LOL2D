@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Syndra/Transcendent",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Transcendent@@icon@@Transcendent.png@@icon2@@{{{icon2}}}@@icon3@@Transcendent 2.png@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Syndra''' collects <span style=\"color:\n#D929D9; white-space:normal\">Splinters of Wrath</span> that enhance each of her abilities based on the number of them collected, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stacking]]</span> up to 120 times. She gains <span style=\"color:\n#D929D9; white-space:normal\">Splinters of Wrath</span> from the following:\n* Dealing two instances of <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Champion ability\">[[File:Champion ability.svg|20px|link=Champion ability|An icon representing the keyword Champion ability]] [[:Champion ability|ability]]</span> damage to an enemy champion within 4 seconds grants <span style=\"color:\n#D929D9; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-bot-values=\"1;2;3\" data-top-values=\"1;11;18\">1 / 2 / 3 (based on level)</span> Splinters</span>. This cannot occur on the same target more than once every few seconds.\n* Ranking up an ability with any skill points beyond level 1 grants <span style=\"color:\n#D929D9; white-space:normal\">5 Splinters</span>, up to <span style=\"color:\n#D929D9; white-space:normal\">85</span>.\n* Killing a large minion grants <span style=\"color:\n#D929D9; white-space:normal\">1 Splinter</span>.@@description2@@Collecting a <span style=\"color:\n#D929D9; white-space:normal\">Splinter of Wrath</span> from an enemy restores <span style=\"white-space:nowrap\">[[File:Mana icon.svg|15px|link=Mana]]&nbsp;<span style=\"color:\n#0099CC; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-displayformula=\"15 + 5 per level until level 5, then + 8 per level until level 10, then + 15 per level until level 15, then + 20 per level.\" data-bot-values=\"20;25;30;35;40;48;56;64;72;80;95;110;125;140;155;175;195;215;235;255\">20 – 255 (based on level)</span>[[Category:Debug]] mana</span></span>. <span style=\"color:\n#D929D9; white-space:normal\">Splinters of Wrath</span> are brought to '''Syndra''' from enemies over 0.<small>6</small> seconds.@@description3@@At <span style=\"color:\n#D929D9; white-space:normal\">120 Splinters of Wrath</span>, '''Syndra''' achieves ''Transcendence'', increasing her <span style=\"white-space:nowrap\">[[File:Ability power icon.svg|15px|link=Ability power]]&nbsp;<span style=\"color:\n#7A6DFF; white-space:normal\">ability power</span></span> by 15%.@@description4@@'''''Syndra''' can collect <span style=\"color:\n#D929D9; white-space:normal\">Splinters of Wrath</span> from enemies even if she is at maximum stacks. These <span style=\"color:\n#D929D9; white-space:normal\">Splinters</span> do not grant any stacks, but will still restore <span style=\"color:\n#0099CC; white-space:normal\">mana</span> for '''Syndra'''.''@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@@@spellshield@@@@projectile@@{{{projectile}}}@@notes@@\n* '''Syndra's''' abilities gain additional visual effects when they reach their <span style=\"color:\n#D929D9; white-space:normal\">Splinter of Wrath</span> thresholds. Her spells will also gain a red colored tint outlining the VFX.\n** ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Sphere]]</span></span>'' will cause fractures to appear in the earth when it is used.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309645,
+                "revisions": [
+                  {
+                    "parentid": 3980864,
+                    "revid": 3986169,
+                    "timestamp": "2026-01-22T03:02:27Z"
+                  }
+                ],
+                "title": "Template:Data Syndra/Transcendent"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3986169,
+      "timestamp": "2026-01-22T03:02:27Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "fee0b5082c4ded6ea5d5ee57a02fc0683d2ceffb19d16152557a05ca71334960",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Syndra/Transcendent",
+    "revisionId": 3986169,
+    "sourceTimestamp": "2026-01-22T03:02:27Z"
+  }
+}

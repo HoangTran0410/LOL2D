@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Vayne/Final Hour",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Final Hour@@icon@@Final Hour.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Vayne''' equips her crossbow, gaining <span style=\"white-space:nowrap\">[[File:Attack damage icon.svg|15px|link=Attack damage]]&nbsp;<span style=\"color:orange; white-space:normal\">'''bonus''' attack damage</span></span> for a duration.@@description2@@While active, ''Final Hour'' empowers ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Night Hunter\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Night Hunter.png|20xpx|border|link=Vayne#Night Hunter|An icon for Vayne's ability Night Hunter]]</span> <span style=\"white-space:normal;\">[[Vayne#Night Hunter|Night Hunter]]</span></span>'' to have tripled <span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble]]</span></span>'' to have a reduced <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span>. Additionally, ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble's]]</span></span>'' cast grants '''Vayne''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invisibility\">[[File:Twilight Shroud old2.png|20px|link=Stealth#Invisibility|An icon representing the keyword Invisibility]] [[:Stealth#Invisibility|invisibility]]</span> for 1 second. Attacking or casting abilities ends the stealth immediately.@@description3@@Scoring an enemy champion <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Takedown\">[[File:Damage rating.png|20px|link=Takedown|An icon representing the keyword Takedown]] [[:Takedown|takedown]]</span> within 3 seconds of damaging them will extend ''Final Hour's'' duration by 4 seconds, up to its original duration.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Effect Duration:'''</span></dt><dd>8 / 9 / 10 / 11 / 12 seconds</dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Attack Damage:'''</span></dt><dd>35 / 50 / 65</dd></dl>@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Tumble\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Tumble.png|20xpx|border|link=Vayne#Tumble|An icon for Vayne's ability Tumble]]</span> <span style=\"white-space:normal;\">[[Vayne#Tumble|Tumble]]</span></span> Cooldown Reduction:'''</span></dt><dd>30 / 35 / 40 / 45 / 50%</dd></dl>@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@none@@cost@@80@@cooldown@@100 / 92.<small>5</small> / 85 / 77.<small>5</small> / 70@@targeting@@Auto@@damagetype@@{{{damagetype}}}@@spellshield@@@@projectile@@{{{projectile}}}@@notes@@\n* '''Vayne's''' animations and basic attack projectiles change slightly during ''Final Hour''.\n* ''Tumble's'' visual effects can be seen by enemies upon '''Vayne''' becoming invisible.\n* Using a basic attack breaks the stealth at the start of the attack windup.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309991,
+                "revisions": [
+                  {
+                    "parentid": 3727266,
+                    "revid": 3807995,
+                    "timestamp": "2024-11-05T22:07:10Z"
+                  }
+                ],
+                "title": "Template:Data Vayne/Final Hour"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3807995,
+      "timestamp": "2024-11-05T22:07:10Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "905fba5ee3f5c5a8da9309d35d8cf7ca0dbb5e70e4cf37ce7e435577333d2dff",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Final_Hour",
+    "revisionId": 3807995,
+    "sourceTimestamp": "2024-11-05T22:07:10Z"
+  }
+}

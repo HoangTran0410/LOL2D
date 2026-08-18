@@ -1,0 +1,48 @@
+{
+  "asset": {
+    "key": "spell_katarina_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Preparation.png?0273e",
+    "sha1": "1b8d01acb9be11b38f7bfaed0a4c7260d32f477e"
+  },
+  "champion": "Katarina",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_katarina_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Preparation.png?0273e",
+        "sha1": "1b8d01acb9be11b38f7bfaed0a4c7260d32f477e"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "15 / 14 / 13 / 12 / 11",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Katarina''' tosses a <span style=\"color:\n#D929D9; white-space:normal\">Dagger</span> into the air above her current location and gains <span style=\"white-space:nowrap\">[[File:Movement speed icon.png|15px|link=Movement speed]]&nbsp;<span style=\"color:\n#9FFF4D; white-space:normal\">'''bonus''' movement speed</span></span> that decays until it lands after 1.<small>25</small> seconds, becoming <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ghosted\">[[File:Ghost.png|20px|link=Unit collision|An icon representing the keyword Ghosted]] [[:Unit collision|ghosted]]</span> for the same duration.",
+          "text": "Active: Katarina tosses a Dagger into the air above her current location and gains &nbsp;bonus movement speed that decays until it lands after 1.25 seconds, becoming ghosted for the same duration."
+        },
+        "icon": "Preparation.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Movement speed:'''</span></dt><dd>50 / 60 / 70 / 80 / 90%</dd></dl>",
+          "text": "Bonus Movement speed:50 / 60 / 70 / 80 / 90%"
+        },
+        "name": "Preparation",
+        "notes": {
+          "raw": "* No additional details.",
+          "text": "No additional details."
+        },
+        "targeting": "Auto"
+      },
+      "name": "Preparation"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "66aa6f8cf6e010b271a5880d02e30b8e4169cf6a04aced5d3eb4a55473fff57a",
+    "fetchedAt": "2026-08-17T14:37:44.748Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Katarina/Preparation",
+    "revisionId": 3845920,
+    "sourceTimestamp": "2024-12-29T22:09:32Z"
+  }
+}

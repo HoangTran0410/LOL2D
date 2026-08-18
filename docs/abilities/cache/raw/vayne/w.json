@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Vayne/Silver Bolts",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Silver Bolts@@icon@@Silver Bolts.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Passive:'''</span> '''Vayne's''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"On-hit\">[[File:On-hit icon.png|20px|link=Attack_effects#On_Hitting|An icon representing the keyword On-hit]] [[:Attack_effects#On_Hitting|on-hit]]</span> and ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Condemn\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Condemn.png|20xpx|border|link=Vayne#Condemn|An icon for Vayne's ability Condemn]]</span> <span style=\"white-space:normal;\">[[Vayne#Condemn|Condemn]]</span></span>'' apply a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stack\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|stack]]</span> of ''Silver Bolts'' for 3.<small>5</small> seconds, refreshing on subsequent applications, expiring upon attacking a new enemy, and stacking up to 3 times.@@description2@@The third stack consumes them all to deal <span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">'''bonus''' true damage</span></span>, with a minimum threshold.@@description3@@''Silver Bolts'' deals modified damage against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Monsters\">[[File:Monster icon.png|20px|link=Monster|An icon representing the keyword Monster]] [[:Monster|monsters]]</span>.@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus True Damage:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">6 / 7 / 8 / 9 / 10% of target's '''maximum''' health</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Bonus Damage:'''</span></dt><dd>50 / 65 / 80 / 95 / 110</dd></dl>@@leveling3@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Monster Damage:'''</span></dt><dd>140 / 155 / 170 / 185 / 200</dd></dl>@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@true@@spellshield@@False@@projectile@@{{{projectile}}}@@notes@@\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stacks\">[[File:Stack icon.png|20px|link=Stack|An icon representing the keyword Stack]] [[:Stack|Stacks]]</span> are not removed if '''Vayne''' switches to attacking a target immune to ''Silver Bolts'' (<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Wards\">[[File:Ward_icon.png|20px|link=Ward|An icon representing the keyword Ward]] [[:Ward|wards]]</span>).\n* ''Silver Bolts'' do not apply to additional targets with <span class=\"inline-image item-icon label-after item-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-item=\"Runaan&#39;s Hurricane\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Runaan's Hurricane item.png|20xpx|border|link=Runaan's Hurricane|An icon for the item Runaan's Hurricane]]</span> <span style=\"white-space:normal;\">[[Runaan's Hurricane]]</span></span>.\n* The stacks can be consumed even if the target is in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Stasis\">[[File:Stasis icon.png|20px|link=Types_of_Crowd_Control#Stasis|An icon representing the keyword Stasis]] [[:Types_of_Crowd_Control#Stasis|stasis]]</span>.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309989,
+                "revisions": [
+                  {
+                    "parentid": 3932653,
+                    "revid": 3949891,
+                    "timestamp": "2025-08-26T19:47:02Z"
+                  }
+                ],
+                "title": "Template:Data Vayne/Silver Bolts"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3949891,
+      "timestamp": "2025-08-26T19:47:02Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "b34b31e11cbbbd0dddbc6c6716a39a324d41e73b259bc2e848b7169526f78732",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Silver_Bolts",
+    "revisionId": 3949891,
+    "sourceTimestamp": "2025-08-26T19:47:02Z"
+  }
+}

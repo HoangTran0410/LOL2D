@@ -1,0 +1,119 @@
+{
+  "asset": {
+    "key": "champ_ziggs",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_OriginalSquare.png?d44a6",
+    "sha1": "d9a359254c38472e97109f0b96980c119afc6854"
+  },
+  "champion": "Ziggs",
+  "data": {
+    "adaptivetype": "Magic",
+    "apiname": "Ziggs",
+    "be": 2400,
+    "changes": "V26.03",
+    "client_positions": [
+      "Bottom"
+    ],
+    "client_tags": [
+      "Long Range",
+      "AoE",
+      "Magic"
+    ],
+    "control": 2,
+    "damage": 3,
+    "date": "2012-02-01",
+    "difficulty": 1,
+    "external_positions": [
+      "Middle",
+      "Bottom"
+    ],
+    "fullname": "Zigmund",
+    "herotype": "Mage",
+    "id": 115,
+    "mobility": 2,
+    "patch": "V1.0.0.133",
+    "rangetype": "Ranged",
+    "resource": "Mana",
+    "role": [
+      "Artillery"
+    ],
+    "rp": 880,
+    "skill_e": {
+      "1": "Hexplosive Minefield"
+    },
+    "skill_i": {
+      "1": "Short Fuse"
+    },
+    "skill_q": {
+      "1": "Bouncing Bomb"
+    },
+    "skill_r": {
+      "1": "Mega Inferno Bomb"
+    },
+    "skill_w": {
+      "1": "Satchel Charge"
+    },
+    "skills": {
+      "1": "Short Fuse",
+      "2": "Bouncing Bomb",
+      "3": "Satchel Charge",
+      "4": "Hexplosive Minefield",
+      "5": "Mega Inferno Bomb"
+    },
+    "stats": {
+      "acquisition_radius": 800,
+      "ar": {
+        "hp_lvl": 17
+      },
+      "aram": {
+        "ability_haste": -20,
+        "dmg_dealt": 0.92,
+        "dmg_taken": 1.2
+      },
+      "arm_base": 21,
+      "arm_lvl": 4.7,
+      "as_base": 0.656,
+      "as_lvl": 2,
+      "as_ratio": 0.656000018119812,
+      "attack_delay_offset": -0.1,
+      "dam_base": 55,
+      "dam_lvl": 3.1,
+      "gameplay_radius": 55,
+      "hp5_base": 6.5,
+      "hp5_lvl": 0.6,
+      "hp_base": 606,
+      "hp_lvl": 106,
+      "missile_speed": 1500,
+      "mp5_base": 8,
+      "mp5_lvl": 0.8,
+      "mp_base": 480,
+      "mp_lvl": 23.5,
+      "mr_base": 30,
+      "mr_lvl": 1.3,
+      "ms": 325,
+      "nb": {
+        "ability_haste": -10,
+        "dmg_dealt": 0.95
+      },
+      "ofa": {
+        "dmg_taken": 0.95
+      },
+      "pathing_radius": 30,
+      "range": 550,
+      "selection_height": 110,
+      "selection_radius": 100
+    },
+    "style": 90,
+    "title": "The Hexplosives Expert",
+    "toughness": 1,
+    "utility": 1
+  },
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "2b362559d0133ac63263f9c02f07966109b50396af8d63afc0b8e486e7a4a78a",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Module:ChampionData/data",
+    "revisionId": 4052219,
+    "sourceTimestamp": "2026-08-16T02:35:56Z"
+  }
+}

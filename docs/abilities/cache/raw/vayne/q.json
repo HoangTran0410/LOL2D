@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Vayne/Tumble",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Tumble@@icon@@Tumble.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Active:'''</span> '''Vayne''' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dashes]]</span> a fixed distance in the target direction, though not through terrain, and empowers her next <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attack]]</span> within 3 seconds to have an <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Uncancellable windup\">[[File:Relentless Force 2.png|20px|link=Basic attack#Uncancellable Windup|An icon representing the keyword Uncancellable windup]] [[:Basic attack#Uncancellable Windup|uncancellable windup]]</span> and deal <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span>.@@description2@@''Tumble <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attack reset\">[[File:Bladework.png|20px|link=Basic attack#Attack reset|An icon representing the keyword Basic attack reset]] [[:Basic attack#Attack reset|resets]]</span> '''Vayne's''' basic attack timer.''@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Physical Damage:'''</span></dt><dd><span style=\"color:orange; white-space:normal\">75 / 85 / 95 / 105 / 115% AD</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Dash distance\">300</span>@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@<span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Dash speed\">500 + <span style=\"color:\n#9FFF4D; white-space:normal\">100% movement speed</span></span>@@casttime@@none@@cost@@30@@cooldown@@6 / 5 / 4 / 3 / 2@@targeting@@Direction@@damagetype@@physical@@spellshield@@@@projectile@@@@notes@@\n* This ability always employs [[Quick cast]].\n* The basic attack portion of ''Tumble's'' damage is tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic damage\">[[File:Basic Attack.png|20px|link=Damage|An icon representing the keyword Basic damage]] [[:Damage|basic damage]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span>, while the bonus damage is tagged as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell damage\">[[File:Disintegrate.png|20px|link=Damage|An icon representing the keyword Spell damage]] [[:Damage|spell damage]]</span>.\n* The bonus damage applies <span style=\"color:\n#CC2051; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Life steal icon.svg|15px|link=Life steal]]&nbsp;life steal</span></span>.\n* Although ''Tumble'' will reset the basic attack timer, '''Vayne''' cannot attack until the animation is complete.\n* '''Vayne''' can cast <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Vayne\" data-ability=\"Final Hour\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Vayne Final Hour.png|20xpx|border|link=Vayne#Final Hour|An icon for Vayne's ability Final Hour]]</span> <span style=\"white-space:normal;\">[[Vayne#Final Hour|Final Hour]]</span></span> during ''Tumble''. She does not become <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Invisible\">[[File:Twilight Shroud old2.png|20px|link=Stealth#Invisibility|An icon representing the keyword Invisibility]] [[:Stealth#Invisibility|invisible]]</span> during the dash.@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1309988,
+                "revisions": [
+                  {
+                    "parentid": 4008540,
+                    "revid": 4015566,
+                    "timestamp": "2026-05-05T15:55:50Z"
+                  }
+                ],
+                "title": "Template:Data Vayne/Tumble"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 4015566,
+      "timestamp": "2026-05-05T15:55:50Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "ad1b1356e56080f06e96ac70685071c06f80f6336874be4d0e23283147455654",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Vayne/Tumble",
+    "revisionId": 4015566,
+    "sourceTimestamp": "2026-05-05T15:55:50Z"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "asset": {
+    "key": "spell_sett_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Haymaker.png?0bca2",
+    "sha1": "f42151d52f880c49a81f41962fb14c01ed392b96"
+  },
+  "champion": "Sett",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_sett_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Haymaker.png?0bca2",
+        "sha1": "f42151d52f880c49a81f41962fb14c01ed392b96"
+      },
+      "fields": {
+        "casttime": "0.75",
+        "cooldown": "18 / 16.5 / 15 / 13.5 / 12",
+        "cost": "100%",
+        "damagetype": "Physical True",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> '''Sett''' stores 100% of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Damage calculated after resistances and modifiers.\">post-mitigation damage</span> taken as ''Grit'' on his resource bar, up to a cap of <span style=\"color:\n#21B053; white-space:normal\">50% of his '''maximum''' health</span>. Each instance of stored ''Grit'' decays in value by 30% every second after 4 seconds.",
+          "text": "Passive: Sett stores 100% of post-mitigation damage taken as Grit on his resource bar, up to a cap of 50% of his maximum health. Each instance of stored Grit decays in value by 30% every second after 4 seconds."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Sett''' charges up a strike over the cast time. Additionally, he immediately consumes all of his stored ''Grit'' to grant himself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> at the start of the cast time that is equal to the expended ''Grit'' for 3 seconds, decaying in strength over the duration after 0.<small>75</small> seconds.",
+          "text": "Active: Sett charges up a strike over the cast time. Additionally, he immediately consumes all of his stored Grit to grant himself a shield at the start of the cast time that is equal to the expended Grit for 3 seconds, decaying in strength over the duration after 0.75 seconds."
+        },
+        "description3": {
+          "raw": "After the cast time, he unleashes a massive blast in an area in the target direction, dealing <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> to enemies hit; those hit in a line in the middle are dealt [[File:Successfully enhanced damage true icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\"><span style=\"white-space:nowrap\">[[File:Hybrid penetration icon.png|15px|link=True damage]]&nbsp;<span style=\"color:\n#F9966B; white-space:normal\">true damage</span></span></span> instead.",
+          "text": "After the cast time, he unleashes a massive blast in an area in the target direction, dealing physical damage to enemies hit; those hit in a line in the middle are dealt &nbsp;true damage instead."
+        },
+        "icon": "false",
+        "icon2": "Haymaker.png",
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Damage:'''</span></dt><dd>80 / 100 / 120 / 140 / 160 (+ 25% <span style=\"color:orange; white-space:normal\">(+ 25% per 100 '''bonus''' AD)</span> of expended ''Grit'')</dd></dl>",
+          "text": "Damage:80 / 100 / 120 / 140 / 160 (+ 25% (+ 25% per 100 bonus AD) of expended Grit)"
+        },
+        "name": "Haymaker",
+        "notes": {
+          "raw": "* ''Haymaker's'' total hitbox uses the intersection of a trapezoid and a circle. Enemies are hit by ''Haymaker'' only when their hitbox overlaps with both of those areas.\n** <span style=\"color:red; font-family:math; font-weight:bold; font-size:1em;\" title=\"Pending for test\"><span class=\"fas fa-vial\"></span>PENDING FOR TEST:</span> Where is the center of the circle?\n* The trapezoid and the rectangle both register the edge of enemies' <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Gameplay radius\">[[File:Gameplay radius.png|20px|link=Unit size|An icon representing the keyword Gameplay radius]] [[:Unit size|hitbox]]</span>.\n* The shield is granted at the start of the cast time and will decay afterwards.\n* '''Sett''' does not store ''Grit'' from damage that was mitigated by <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shields]]</span>.\n* This ability will cast from wherever the caster is at the end of the cast time.\n* '''Sett''' will turn towards the target direction at the start of the cast time.\n* '''Sett''' will glow when attaining 90% ''Grit''. Casting ''Haymaker'' at this amount has a different visual and audio effect.\n[[File:90%_Grit_Sett.png|thumb|left|'''Sett''' will turn <span style=\"color:#FFDF00;\">'''golden'''</span> ''(base skin)''.]]",
+          "text": "Haymaker's total hitbox uses the intersection of a trapezoid and a circle. Enemies are hit by Haymaker only when their hitbox overlaps with both of those areas.\n* PENDING FOR TEST: Where is the center of the circle?\nThe trapezoid and the rectangle both register the edge of enemies' hitbox.\nThe shield is granted at the start of the cast time and will decay afterwards.\nSett does not store Grit from damage that was mitigated by shields.\nThis ability will cast from wherever the caster is at the end of the cast time.\nSett will turn towards the target direction at the start of the cast time.\nSett will glow when attaining 90% Grit. Casting Haymaker at this amount has a different visual and audio effect."
+        },
+        "projectile": false,
+        "range": "-25 – 720",
+        "spellshield": true,
+        "targeting": "Direction",
+        "width": "300 • 620 • 70"
+      },
+      "name": "Haymaker"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "b0534127a0b1396b58b08295c2a79b9f48fa26018582e3dfac8bb995aac6f06a",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Sett/Haymaker",
+    "revisionId": 4008036,
+    "sourceTimestamp": "2026-04-13T04:12:41Z"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "asset": {
+    "key": "spell_ziggs_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Satchel_Charge.png?6455f",
+    "sha1": "e450468e5ed3be61d392b2c03ee98cac4260ca9c"
+  },
+  "champion": "Ziggs",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_ziggs_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Satchel_Charge.png?6455f",
+        "sha1": "e450468e5ed3be61d392b2c03ee98cac4260ca9c"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "20 / 18 / 16 / 14 / 12",
+        "cost": "80",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Ziggs''' hurls a charge to the target location, remaining there for 4 seconds and granting <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> of the area. ''Satchel Charge'' can be recast within the duration, and does so automatically afterwards. If recast while in flight, the charge will explode immediately upon landing.",
+          "text": "Active: Ziggs hurls a charge to the target location, remaining there for 4 seconds and granting sight of the area. Satchel Charge can be recast within the duration, and does so automatically afterwards. If recast while in flight, the charge will explode immediately upon landing."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Recast:'''</span> '''Ziggs''' detonates the charge, causing it to explode to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Airborne\">[[File:Airborne icon.png|20px|link=Airborne|An icon representing the keyword Airborne]] [[:Airborne|knock them back]]</span> over 0.<small>5</small> seconds up to 500 units away from the center of the explosion, though not through terrain. If this hits '''Ziggs''', he will <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> up to 825 units away from the center.",
+          "text": "Recast: Ziggs detonates the charge, causing it to explode to deal magic damage to nearby enemies and knock them back over 0.5 seconds up to 500 units away from the center of the explosion, though not through terrain. If this hits Ziggs, he will dash up to 825 units away from the center."
+        },
+        "description3": {
+          "raw": "<span class=\"inline-image label-after\" style=\"display:inline;white-space:pre;\" data-param=\"\"><span style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Satchel Charge Turret Explosion Indicator.png|20xpx|link=|An icon representing ]]</span> <span style=\"white-space:normal;\"><span class=\"template_sbc\">'''Turret Explosion:'''</span></span></span> The explosion also [[File:Successfully enhanced damage magic icon.png|20px|link=Damage#Successful_ability_casts]] <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"Cosmetic critical strike\"><span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Execute\">[[File:Death from Below.png|20px|link=Kill#Execute|An icon representing the keyword Execute]] [[:Kill#Execute|executes]]</span></span> enemy <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Turrets\">[[File:Turret icon.png|20px|link=Turret|An icon representing the keyword Turret]] [[:Turret|turrets]]</span> within that are below a <span style=\"color:\n#21B053; white-space:normal\">'''maximum''' health</span> threshold.",
+          "text": "Turret Explosion: The explosion also executes enemy turrets within that are below a maximum health threshold."
+        },
+        "description4": {
+          "raw": "'''''Ziggs''' will not <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dash\">[[File:Dash.png|20px|link=Dash|An icon representing the keyword Dash]] [[:Dash|dash]]</span> from the explosion if he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Immobilize\">[[File:Stun icon.png|20px|link=Crowd_control#Immobilizing|An icon representing the keyword Immobilize]] [[:Crowd_control#Immobilizing|immobilized]]</span> or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Ground\">[[File:Grounded icon.png|20px|link=Ground|An icon representing the keyword Ground]] [[:Ground|grounded]]</span>. He can cast any of his abilities during the dash.''",
+          "text": "Ziggs will not dash from the explosion if he is immobilized or grounded. He can cast any of his abilities during the dash."
+        },
+        "effectradius": "325 • 400",
+        "icon": "Satchel Charge.png",
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage:'''</span></dt><dd>70 / 105 / 140 / 175 / 210 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 50% AP)</span></dd></dl>",
+          "text": "Magic Damage:70 / 105 / 140 / 175 / 210 (+ 50% AP)"
+        },
+        "leveling3": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Demolition Threshold:'''</span></dt><dd><span style=\"color:\n#21B053; white-space:normal\">25 / 27.<small>5</small> / 30 / 32.<small>5</small> / 35% of turret's '''maximum''' health</span></dd></dl>",
+          "text": "Demolition Threshold:25 / 27.5 / 30 / 32.5 / 35% of turret's maximum health"
+        },
+        "name": "Satchel Charge",
+        "notes": {
+          "raw": "*The initial cast counts as an ability activation for the purposes of on-cast effects such as <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spellblade\">[[File:Sheen item.png|20px|link=Named item effect#Spellblade|An icon representing the keyword Spellblade]] [[:Named item effect#Spellblade|Spellblade]]</span> and triggering <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Kassadin\" data-ability=\"Force Pulse\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Kassadin Force Pulse.png|20xpx|border|link=Kassadin#Force Pulse|An icon for Kassadin's ability Force Pulse]]</span> <span style=\"white-space:normal;\">[[Kassadin#Force Pulse|Force Pulse's]]</span></span> passive.\n**Detonating the ability manually does not.\n* Deals <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Area damage\">[[File:Mega Inferno Bomb.png|20px|link=Damage|An icon representing the keyword Area damage]] [[:Damage|area damage]]</span> to non-turrets and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Raw damage\">[[File:Fear Beyond Death 2.png|20px|link=Damage|An icon representing the keyword Raw damage]] [[:Damage|raw damage]]</span> to turrets.\n* ''Satchel Charge's'' distance increases with proximity to the charge, resulting in being knocked straight up when aligned directly on top of it.\n* '''Ziggs''' will not ''dash'' from ''Satchel Charge's'' detonation while <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Teleport\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Teleport.png|20xpx|border|link=Teleport|An icon representing Teleport]]</span> <span style=\"white-space:normal;\">[[Teleport|Teleporting]]</span></span> but he will while <span class=\"inline-image label-after spell-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-spell=\"Recall\" data-game=\"lol\"><span class=\"border icon-20\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Recall.png|20xpx|border|link=Recall|An icon representing Recall]]</span> <span style=\"white-space:normal;\">[[Recall|Recalling]]</span></span>.",
+          "text": "The initial cast counts as an ability activation for the purposes of on-cast effects such as Spellblade and triggering Force Pulse's passive.\n*Detonating the ability manually does not.\nDeals area damage to non-turrets and raw damage to turrets.\nSatchel Charge's distance increases with proximity to the charge, resulting in being knocked straight up when aligned directly on top of it.\nZiggs will not dash from Satchel Charge's detonation while Teleporting but he will while Recalling."
+        },
+        "projectile": true,
+        "speed": "1750",
+        "spellshield": true,
+        "targeting": "Location / Auto"
+      },
+      "name": "Satchel Charge"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "ed3513b473681a04c68084098daecb18c4d9f4e25d8c74eb31919832fb16a758",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Ziggs/Satchel_Charge",
+    "revisionId": 4008672,
+    "sourceTimestamp": "2026-04-15T01:27:59Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "payload": [
+    {
+      "page": "Template:Data Nautilus/Staggering Blow",
+      "response": {
+        "expanded": {
+          "expandtemplates": {
+            "wikitext": "@@name@@Staggering Blow@@icon@@Staggering Blow.png@@icon2@@{{{icon2}}}@@icon3@@{{{icon3}}}@@icon4@@{{{icon4}}}@@description@@<span class=\"template_sbc\">'''Innate:'''</span> '''Nautilus' '''<span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Basic attacks\">[[File:Basic attack cursor icon.png|20px|link=Basic attack|An icon representing the keyword Basic attack]] [[:Basic attack|basic attacks]]</span> are empowered to deal <span style=\"color:\n#FF8C34; white-space:normal\"><span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-useformula=\"14 + (116-14)/17*(x-1)\" data-bot-values=\"14;20;26;32;38;44;50;56;62;68;74;80;86;92;98;104;110;116;122;128\">14 – 128 (based on level)</span>[[Category:Debug]]</span> <span style=\"color:\n#FF8C34; white-space:normal\">'''bonus''' physical damage</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> the target for <span class=\"pp-tooltip\" style=\"position:relative; border-bottom:1px dotted; cursor:help;\" data-start=\"0.75;1\" data-finish=\"1.5;16\" data-top-fill=\"4\" data-bot-values=\"0.75;1;1.25;1.5\" data-top-values=\"1;6;11;16\">0.<small>75</small> – 1.<small>5</small> (based on level)</span> seconds.@@description2@@This effect cannot occur on the same target more than once every few seconds.@@description3@@{{{description3}}}@@description4@@{{{description4}}}@@description5@@{{{description5}}}@@description6@@{{{description6}}}@@leveling@@{{{leveling}}}@@leveling2@@{{{leveling2}}}@@leveling3@@{{{leveling3}}}@@leveling4@@{{{leveling4}}}@@leveling5@@{{{leveling5}}}@@leveling6@@{{{leveling6}}}@@range@@{{{range}}}@@radius@@{{{radius}}}@@effectradius@@{{{effect radius}}}@@width@@{{{width}}}@@speed@@{{{speed}}}@@casttime@@{{{cast time}}}@@cost@@{{{cost}}}@@cooldown@@{{{cooldown}}}@@targeting@@Passive@@damagetype@@Physical@@spellshield@@Special@@projectile@@{{{projectile}}}@@notes@@\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will block the <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Root\">[[File:Root icon.png|20px|link=Root|An icon representing the keyword Root]] [[:Root|root]]</span> but not the bonus damage.\n* ''Staggering Blow's'' enhanced attack can be <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blocked\">[[File:Spirit's Refuge.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Block]] [[:Attack_effects#Parrying|blocked]]</span> and <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Dodge\">[[File:Jax Counter Strike old.png|20px|link=Attack_effects#Parrying|An icon representing the keyword Dodge]] [[:Attack_effects#Parrying|dodged]]</span> (the on-target cooldown will still be applied).\n** It will fail to trigger while he is <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Blind\">[[File:Blind icon.png|20px|link=Blind|An icon representing the keyword Blind]] [[:Blind|blinded]]</span>.\n* The empowered attack will not trigger against <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Structures\">[[File:Structure icon.png|20px|link=Category:Structure|An icon representing the keyword Structure]] [[:Category:Structure|structures]]</span>.\n*@@"
+          }
+        },
+        "revision": {
+          "batchcomplete": true,
+          "query": {
+            "pages": [
+              {
+                "ns": 10,
+                "pageid": 1308827,
+                "revisions": [
+                  {
+                    "parentid": 3972811,
+                    "revid": 3985615,
+                    "timestamp": "2026-01-20T21:01:21Z"
+                  }
+                ],
+                "title": "Template:Data Nautilus/Staggering Blow"
+              }
+            ]
+          }
+        }
+      },
+      "revisionId": 3985615,
+      "timestamp": "2026-01-20T21:01:21Z"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "contentHash": "ea8050303d3db00f34357082f532c6e90e781f21c53fc560777ab7a94a66c1a7",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Nautilus/Staggering_Blow",
+    "revisionId": 3985615,
+    "sourceTimestamp": "2026-01-20T21:01:21Z"
+  }
+}

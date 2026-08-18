@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_diana_w",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Pale_Cascade.png?08994",
+    "sha1": "a35b28215063e410f035b79a1aea09809f7b0a33"
+  },
+  "champion": "Diana",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_diana_w",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Pale_Cascade.png?08994",
+        "sha1": "a35b28215063e410f035b79a1aea09809f7b0a33"
+      },
+      "fields": {
+        "casttime": "none",
+        "cooldown": "15 / 13.5 / 12 / 10.5 / 9",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "Magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Diana''' grants herself a <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Shield\">[[File:Hybrid resistances icon.png|20px|link=Shield|An icon representing the keyword Shield]] [[:Shield|shield]]</span> for up to 5 seconds and creates three spheres that orbit her counterclockwise for the same duration, detonating upon contact with an enemy to deal <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> to nearby enemies.",
+          "text": "Active: Diana grants herself a shield for up to 5 seconds and creates three spheres that orbit her counterclockwise for the same duration, detonating upon contact with an enemy to deal magic damage to nearby enemies."
+        },
+        "description2": {
+          "raw": "If all three spheres detonate, ''Pale Cascade's'' shield is reapplied, stacking with its original shield and refreshing the duration.",
+          "text": "If all three spheres detonate, Pale Cascade's shield is reapplied, stacking with its original shield and refreshing the duration."
+        },
+        "effectradius": "200",
+        "icon": "Pale Cascade.png",
+        "icon2": "Pale Cascade 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Shield Strength:'''</span></dt><dd>45 / 60 / 75 / 90 / 105 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 30% AP)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 11% '''bonus''' health)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Orb:'''</span></dt><dd>20 / 32 / 44 / 56 / 68 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 18% AP)</span></dd><dt><span class=\"template_lc\">'''Total Magic Damage:'''</span></dt><dd>60 / 96 / 132 / 168 / 204 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 54% AP)</span></dd></dl>",
+          "text": "Shield Strength:45 / 60 / 75 / 90 / 105 (+ 30% AP) (+ 11% bonus health)\nMagic Damage per Orb:20 / 32 / 44 / 56 / 68 (+ 18% AP)Total Magic Damage:60 / 96 / 132 / 168 / 204 (+ 54% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Shield Strength:'''</span></dt><dd>90 / 120 / 150 / 180 / 210 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span> <span style=\"color:\n#21B053; white-space:normal\">(+ 22% '''bonus''' health)</span></dd></dl>",
+          "text": "Maximum Shield Strength:90 / 120 / 150 / 180 / 210 (+ 60% AP) (+ 22% bonus health)"
+        },
+        "name": "Pale Cascade",
+        "notes": {
+          "raw": "* On the second application of ''Pale Cascade's'' shield, <span style=\"white-space:nowrap\">[[File:Hybrid resistances icon.png|15px|link=Heal and shield power]]&nbsp;[[Heal and shield power|Shield Power]]</span> will apply to both the new shield amount and the shield amount remaining from the first shield, which has already benefited from ''shield power''.\n** Because of this, ''shield power'' effectively applies to the second shield twice, but with reduced efficiency, for up to an increase of 50% of ''shield power'' (maximum benefit if no damage was mitigated by the first shield). With 10% ''shield power'', the second shield's total amount will be increased by up to an additional 5%, for a total of <span class=\"basic-tooltip\" style=\"border-bottom:1px dotted gray;cursor:help;\" title=\"1.1*1.05\">15.<small>5</small>%</span> '''bonus''' shield.\n** The formula for the total amount of shield '''Diana''' will receive from both shield applications is:\n*** ''Total Shield = (((Shield Amount × (1 + Shield Power)) - Damage Blocked by Shield) + Shield Amount) × (1 + Shield Power)''",
+          "text": "On the second application of Pale Cascade's shield, &nbsp;Shield Power will apply to both the new shield amount and the shield amount remaining from the first shield, which has already benefited from shield power.\n* Because of this, shield power effectively applies to the second shield twice, but with reduced efficiency, for up to an increase of 50% of shield power (maximum benefit if no damage was mitigated by the first shield). With 10% shield power, the second shield's total amount will be increased by up to an additional 5%, for a total of 15.5% bonus shield.\n* The formula for the total amount of shield Diana will receive from both shield applications is:\n** Total Shield = (((Shield Amount × (1 + Shield Power)) - Damage Blocked by Shield) + Shield Amount) × (1 + Shield Power)"
+        },
+        "projectile": true,
+        "spellshield": true,
+        "targeting": "Auto"
+      },
+      "name": "Pale Cascade"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "W",
+  "source": {
+    "contentHash": "6fea1f7174defc7f3f81221490088c2f1e531bd465d906c88fc33dc575f98b5a",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Diana/Pale_Cascade",
+    "revisionId": 4022977,
+    "sourceTimestamp": "2026-05-27T21:09:34Z"
+  }
+}

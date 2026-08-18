@@ -1,0 +1,62 @@
+{
+  "asset": {
+    "key": "spell_jhin_q",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Dancing_Grenade.png?be6ff",
+    "sha1": "e83b184c8c40707c841a86f25d8fd44bacca7e05"
+  },
+  "champion": "Jhin",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_jhin_q",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Dancing_Grenade.png?be6ff",
+        "sha1": "e83b184c8c40707c841a86f25d8fd44bacca7e05"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "7 / 6.5 / 6 / 5.5 / 5",
+        "cost": "40 / 45 / 50 / 55 / 60",
+        "damagetype": "Physical",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Jhin''' throws a grenade at the target enemy that deals <span style=\"color:\n#FF8C34; white-space:normal\">physical damage</span> and can bounce to up to three additional nearby enemies, prioritizing the closest enemy that has not been hit.",
+          "text": "Active: Jhin throws a grenade at the target enemy that deals physical damage and can bounce to up to three additional nearby enemies, prioritizing the closest enemy that has not been hit."
+        },
+        "description2": {
+          "raw": "The grenade's damage is increased by 35% any time an enemy dies by any means after being hit by the grenade before it strikes its next target.",
+          "text": "The grenade's damage is increased by 35% any time an enemy dies by any means after being hit by the grenade before it strikes its next target."
+        },
+        "effectradius": "450",
+        "icon": "Dancing Grenade.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Physical Damage:'''</span></dt><dd>44 / 69 / 94 / 119 / 144 <span style=\"color:orange; white-space:normal\">(+ 44 / 51.<small>5</small> / 59 / 66.<small>5</small> / 74% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd></dl>",
+          "text": "Physical Damage:44 / 69 / 94 / 119 / 144 (+ 44 / 51.5 / 59 / 66.5 / 74% AD) (+ 60% AP)"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Bonus Damage per Target Death:'''</span></dt><dd>15.<small>4</small> / 24.<small>15</small> / 32.<small>9</small> / 41.<small>65</small> / 50.<small>4</small> <span style=\"color:orange; white-space:normal\">(+ 15.<small>4</small> / 18.<small>025</small> / 20.<small>65</small> / 23.<small>275</small> / 25.<small>9</small>% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 21% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Maximum Final Bounce Physical Damage:'''</span></dt><dd>90.<small>2</small> / 141.<small>45</small> / 192.<small>7</small> / 243.<small>95</small> / 295.<small>2</small> <span style=\"color:orange; white-space:normal\">(+ 90.<small>2</small> / 105.<small>575</small> / 120.<small>95</small> / 136.<small>325</small> / 151.<small>7</small>% AD)</span> <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 123% AP)</span></dd></dl>",
+          "text": "Bonus Damage per Target Death:15.4 / 24.15 / 32.9 / 41.65 / 50.4 (+ 15.4 / 18.025 / 20.65 / 23.275 / 25.9% AD) (+ 21% AP)\nMaximum Final Bounce Physical Damage:90.2 / 141.45 / 192.7 / 243.95 / 295.2 (+ 90.2 / 105.575 / 120.95 / 136.325 / 151.7% AD) (+ 123% AP)"
+        },
+        "name": "Dancing Grenade",
+        "notes": {
+          "raw": "* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will not prevent the canister from bouncing.\n\n* If the target becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span>, <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Death\">[[File:Death icon.svg|20px|link=Death|An icon representing the keyword Death]] [[:Death|dies]]</span>, or is too far away or no longer in <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Sight\">[[File:Sight icon.png|20px|link=Sight|An icon representing the keyword Sight]] [[:Sight|sight]]</span> during the cast time, this ability will cancel but does not go on <span style=\"white-space:nowrap\">[[File:Cooldown icon.png|15px|link=Cooldown]]&nbsp;cooldown</span> nor pay its cost (if applicable).",
+          "text": "Spell shield will not prevent the canister from bouncing.\nIf the target becomes untargetable, dies, or is too far away or no longer in sight during the cast time, this ability will cancel but does not go on &nbsp;cooldown nor pay its cost (if applicable)."
+        },
+        "projectile": true,
+        "speed": "1800 • 600",
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Dancing Grenade"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "Q",
+  "source": {
+    "contentHash": "e00b76fa76f91c863ca2a9e1981130010e3b7f3a0676f554c7fd762190e4dfc4",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Jhin/Dancing_Grenade",
+    "revisionId": 4007611,
+    "sourceTimestamp": "2026-04-12T07:23:12Z"
+  }
+}

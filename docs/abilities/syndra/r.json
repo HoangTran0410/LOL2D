@@ -1,0 +1,71 @@
+{
+  "asset": {
+    "key": "spell_syndra_r",
+    "mime": "image/png",
+    "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Unleashed_Power.png?99bea",
+    "sha1": "bd1c907ec2971f05acfc888a2eb4edb7e9c7d924"
+  },
+  "champion": "Syndra",
+  "forms": [
+    {
+      "asset": {
+        "key": "spell_syndra_r",
+        "mime": "image/png",
+        "originalUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Unleashed_Power.png?99bea",
+        "sha1": "bd1c907ec2971f05acfc888a2eb4edb7e9c7d924"
+      },
+      "fields": {
+        "casttime": "0.25",
+        "cooldown": "120 / 110 / 100 / 90 / 80",
+        "cost": "100",
+        "damagetype": "magic",
+        "description": {
+          "raw": "<span class=\"template_sbc\">'''Passive:'''</span> ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Sphere's]]</span></span>'' cooldown is reduced equivalent to an amount of <span style=\"color:\n#7ADECD; white-space:normal\"><span style=\"white-space:nowrap\">[[File:Cooldown reduction icon.png|15px|link=Ability haste]]&nbsp;ability haste</span></span>.",
+          "text": "Passive: Dark Sphere's cooldown is reduced equivalent to an amount of &nbsp;ability haste."
+        },
+        "description2": {
+          "raw": "<span class=\"template_sbc\">'''Active:'''</span> '''Syndra''' conjures 3 ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Spheres]]</span></span>'' and additionally grabs up to 4 nearby live ones. Afterwards, she barrages the target enemy champion with all collected ''Dark Spheres'', each dealing <span style=\"color:\n#00B0F0; white-space:normal\">magic damage</span> upon hit.",
+          "text": "Active: Syndra conjures 3 Dark Spheres and additionally grabs up to 4 nearby live ones. Afterwards, she barrages the target enemy champion with all collected Dark Spheres, each dealing magic damage upon hit."
+        },
+        "description3": {
+          "raw": "The ''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Dark Sphere\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Dark Sphere.png|20xpx|border|link=Syndra#Dark Sphere|An icon for Syndra's ability Dark Sphere]]</span> <span style=\"white-space:normal;\">[[Syndra#Dark Sphere|Dark Spheres]]</span></span>'' will then remain on the ground next to the target's current location for 6 seconds.",
+          "text": "The Dark Spheres will then remain on the ground next to the target's current location for 6 seconds."
+        },
+        "description4": {
+          "raw": "<span class=\"template_sbc\">'''<span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Transcendent\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Transcendent.png|20xpx|border|link=Syndra#Transcendent|An icon for Syndra's ability Transcendent]]</span> <span style=\"white-space:normal;\">[[Syndra#Transcendent|Transcendent]]</span></span> Bonus:'''</span> Collecting <span style=\"color:\n#D929D9; white-space:normal\">100 Splinters of Wrath</span> enhances ''Unleashed Power'' to <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Execute\">[[File:Death from Below.png|20px|link=Kill#Execute|An icon representing the keyword Execute]] [[:Kill#Execute|execute]]</span> the target if it would damage them to below <span style=\"white-space:nowrap\">[[File:Health icon.png|15px|link=Health]]&nbsp;<span style=\"color:\n#21B053; white-space:normal\">15% of their '''maximum''' health</span></span>.",
+          "text": "Transcendent Bonus: Collecting 100 Splinters of Wrath enhances Unleashed Power to execute the target if it would damage them to below &nbsp;15% of their maximum health."
+        },
+        "effectradius": "3000",
+        "icon": "false",
+        "icon2": "Unleashed Power.png",
+        "icon4": "Unleashed Power 2.png",
+        "leveling": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Ability Haste:'''</span></dt><dd>10 / 15 / 20 / 25 / 30</dd></dl>",
+          "text": "Ability Haste:10 / 15 / 20 / 25 / 30"
+        },
+        "leveling2": {
+          "raw": "<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Magic Damage per Sphere:'''</span></dt><dd>80 / 100 / 120 / 140 / 160 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 20% AP)</span></dd></dl>\n<dl class=\"skill-tabs\" style=\"letter-spacing:0.02rem;\"><dt><span class=\"template_lc\">'''Minimum Magic Damage:'''</span></dt><dd>240 / 300 / 360 / 420 / 480 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 60% AP)</span></dd><dt><span class=\"template_lc\">'''Maximum Magic Damage:'''</span></dt><dd>560 / 700 / 840 / 980 / 1120 <span style=\"color:\n#7A6DFF; white-space:normal\">(+ 140% AP)</span></dd></dl>",
+          "text": "Magic Damage per Sphere:80 / 100 / 120 / 140 / 160 (+ 20% AP)\nMinimum Magic Damage:240 / 300 / 360 / 420 / 480 (+ 60% AP)Maximum Magic Damage:560 / 700 / 840 / 980 / 1120 (+ 140% AP)"
+        },
+        "name": "Unleashed Power",
+        "notes": {
+          "raw": "* ''Unleashed Power's'' effect takes place at the start of the cast time.\n** Additionally, ''Unleashed Power'' cannot be interrupted by any means, including death or <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Resurrection\">[[File:Revival icon.png|20px|link=Death#Ways to prevent death when reaching zero health|An icon representing the keyword Resurrection]] [[:Death#Ways to prevent death when reaching zero health|resurrection]]</span>. ''Unleashed Power'' will complete its effect so long as '''Syndra''' has initiated its cast.\n* Casting ''Unleashed Power'' on a target that becomes <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Untargetable\">[[File:Untargetable icon.png|20px|link=Untargetable|An icon representing the keyword Untargetable]] [[:Untargetable|untargetable]]</span> while the ''spheres'' are in flight will not destroy them but will invalidate their effects.\n* ''Spheres'' already in flight will still travel if '''Syndra's''' target dies, but any remaining ''spheres'' will not. However, their duration will still get reset.\n* A ''sphere'' summoned very shortly before ''Unleashed Power'' '''will''' be used as one of the spheres that get thrown. \n** Depending on how many ''spheres'' are on the map and how far away the enemy is upon casting ''Unleashed Power'' it is possible that '''Syndra''' would conjure the ''sphere'' behind her as if she was going to throw it, but she won't.\n* ''Unleashed Power'' will not add a ''Sphere'' that '''Syndra''' is holding with <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Force of Will\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Force of Will.png|20xpx|border|link=Syndra#Force of Will|An icon for Syndra's ability Force of Will]]</span> <span style=\"white-space:normal;\">[[Syndra#Force of Will|Force of Will]]</span></span>.\n* ''Spheres'' that are being pushed by <span class=\"inline-image label-after ability-icon\" style=\"display:inline;white-space:pre;\" data-param=\"\" data-champion=\"Syndra\" data-ability=\"Scatter the Weak\" data-game=\"lol\"><span class=\"border\" style=\"display:inline-block;position:relative;\" data-width=\"20\">[[File:Syndra Scatter the Weak.png|20xpx|border|link=Syndra#Scatter the Weak|An icon for Syndra's ability Scatter the Weak]]</span> <span style=\"white-space:normal;\">[[Syndra#Scatter the Weak|Scatter the Weak]]</span></span> (normally ones that were made late during the push) will not get picked up for ''Unleashed Power''.\n* <span class=\"glossary\" style=\"white-space:pre; position:relative; \" data-game=\"lol\" data-tip=\"Spell shield\">[[File:Spell Shield.png|20px|link=Spell shield|An icon representing the keyword Spell shield]] [[:Spell shield|Spell shield]]</span> will only block the damage of a single ''sphere''.",
+          "text": "Unleashed Power's effect takes place at the start of the cast time.\n* Additionally, Unleashed Power cannot be interrupted by any means, including death or resurrection. Unleashed Power will complete its effect so long as Syndra has initiated its cast.\nCasting Unleashed Power on a target that becomes untargetable while the spheres are in flight will not destroy them but will invalidate their effects.\nSpheres already in flight will still travel if Syndra's target dies, but any remaining spheres will not. However, their duration will still get reset.\nA sphere summoned very shortly before Unleashed Power will be used as one of the spheres that get thrown.\n* Depending on how many spheres are on the map and how far away the enemy is upon casting Unleashed Power it is possible that Syndra would conjure the sphere behind her as if she was going to throw it, but she won't.\nUnleashed Power will not add a Sphere that Syndra is holding with Force of Will.\nSpheres that are being pushed by Scatter the Weak (normally ones that were made late during the push) will not get picked up for Unleashed Power.\nSpell shield will only block the damage of a single sphere."
+        },
+        "projectile": true,
+        "spellshield": false,
+        "targeting": "Unit"
+      },
+      "name": "Unleashed Power"
+    }
+  ],
+  "schemaVersion": 1,
+  "slot": "R",
+  "source": {
+    "contentHash": "e67d404b7aa7149ecef5864925114f164526ef07c29274f7df530f3f7bc8b514",
+    "fetchedAt": "2026-08-17T14:38:03.922Z",
+    "pageUrl": "https://wiki.leagueoflegends.com/en-us/Template:Data_Syndra/Unleashed_Power",
+    "revisionId": 4024661,
+    "sourceTimestamp": "2026-06-02T13:27:39Z"
+  }
+}
