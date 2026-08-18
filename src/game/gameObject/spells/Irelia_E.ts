@@ -14,7 +14,14 @@ import {
   intersectsBeam,
   type BeamGeometry,
 } from '@/game/gameObject/spellObjects/BeamSpellObject';
-import { drawIreliaBlade, IRELIA_CREST, IRELIA_EDGE, IRELIA_RIM, IRELIA_STEEL } from './Irelia_Q';
+import {
+  applyIreliaMark,
+  drawIreliaBlade,
+  IRELIA_CREST,
+  IRELIA_EDGE,
+  IRELIA_RIM,
+  IRELIA_STEEL,
+} from './Irelia_Q';
 
 export const E_RANGE = 420;
 export const E_DAMAGE = 24;
@@ -38,6 +45,15 @@ export const E_RECAST_DELAY_MS = 340;
 export const E_BAND_WIDTH = 70;
 /** How long the two blades take to meet in the middle, on screen. */
 export const E_SNAP_MS = 260;
+/**
+ * How long the cut itself is on screen, once they have met.
+ *
+ * Short on purpose. The line used to hold for the whole life of the object and
+ * it read as a laser someone had switched on — two swords striking each other
+ * is an *instant*, and anything that outlives the strike by more than a few
+ * frames stops being a strike.
+ */
+export const E_FLASH_MS = 80;
 
 /**
  * Flawless Duet.
@@ -182,6 +198,7 @@ export default class Irelia_E extends Spell {
       caught.push({ x: victim.position.x, y: victim.position.y });
       victim.takeDamage(E_DAMAGE, this.owner);
       victim.addBuff(new Stun(E_STUN_MS, this.owner, victim));
+      applyIreliaMark(this.owner, victim);
     }
 
     this.game.objectManager.addObject(new Irelia_E_Duet(this.owner, geometry, caught));
@@ -326,8 +343,22 @@ export class Irelia_E_Blade extends SpellObject {
     fill(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 130 * fade);
     ellipse(0, 6, this.length * 0.75, this.length * 0.28);
 
-    // A slow turn, so a waiting blade is never mistaken for a floor decal.
-    rotate(this.age / 420);
+    // The ring it is planted in, and the light coming off it. This is the part
+    // that makes a blade in the grass *findable*: a flat blade seen from above
+    // is a sliver, and the ring is what holds the spot at a glance.
+    noFill();
+    stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 215 * fade * planted);
+    strokeWeight(3.5);
+    ellipse(0, 6, this.length * (0.95 + 0.15 * sin(this.age / 300)), this.length * 0.42);
+    noStroke();
+    fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 70 * fade * planted);
+    quad(-8, 6, 8, 6, 4, -62 * planted, -4, -62 * planted);
+
+    // It stands, it does not spin. The turn was there to stop a waiting blade
+    // reading as a floor decal, and the ring and the shaft now do that job far
+    // better — with them, rotation reads as a blade *lying on* the ground and
+    // turning, which is the opposite of what it is.
+    rotate(sin(this.age / 520) * 0.07);
     translate(0, lift);
 
     // Point down, crest up: stuck in the ground, hilt where a hand would take
@@ -351,7 +382,7 @@ export class Irelia_E_Blade extends SpellObject {
  * than a glow somewhere near it.
  */
 export class Irelia_E_Duet extends SpellObject {
-  lifeTime = 520;
+  lifeTime = 500;
   age = 0;
   readonly geometry: BeamGeometry;
   readonly caught: Vec2[];
@@ -372,9 +403,14 @@ export class Irelia_E_Duet extends SpellObject {
   }
 
   draw(): void {
-    const t = constrain(this.age / this.lifeTime, 0, 1);
     const closing = constrain(this.age / E_SNAP_MS, 0, 1);
-    const fade = 1 - t;
+    const sinceSnap = Math.max(0, this.age - E_SNAP_MS);
+    // The strike: gone in 80ms, which is what makes it a strike.
+    const flash = 1 - constrain(sinceSnap / E_FLASH_MS, 0, 1);
+    // The area, brightening as they close and clearing shortly after they meet.
+    const band = closing < 1 ? 0.3 + 0.7 * closing : 1 - constrain(sinceSnap / 200, 0, 1);
+    const struck = 1 - constrain(sinceSnap / 220, 0, 1);
+
     const spanX = this.geometry.end.x - this.geometry.start.x;
     const spanY = this.geometry.end.y - this.geometry.start.y;
     const reach = Math.hypot(spanX, spanY);
@@ -384,57 +420,88 @@ export class Irelia_E_Duet extends SpellObject {
     translate(this.geometry.start.x, this.geometry.start.y);
     rotate(Math.atan2(spanY, spanX));
 
-    // The band the cut covered, over a dark rim so its edges are readable.
-    noStroke();
-    fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 90 * fade);
-    rectMode(CORNER);
-    rect(0, -half, reach, this.geometry.width);
-    stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 170 * fade);
-    strokeWeight(3);
-    noFill();
-    rect(0, -half, reach, this.geometry.width);
+    // The band the cut will cover. Deliberately faint — it is a corridor drawn
+    // on the ground, not a lit floor: the two blades and the line between them
+    // are the ability, and a bright slab under them was drowning both. Steel
+    // rather than the edge teal, for the same reason.
+    if (band > 0) {
+      noStroke();
+      fill(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 26 * band);
+      rectMode(CORNER);
+      rect(0, -half, reach, this.geometry.width);
+      stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 90 * band);
+      strokeWeight(1.5);
+      noFill();
+      rect(0, -half, reach, this.geometry.width);
+    }
 
-    // The blades themselves, converging on the middle.
-    const meet = reach / 2;
-    for (let i = 0; i < 2; i++) {
-      const at = i === 0 ? meet * closing : reach - meet * closing;
+    // The two ends, each ringed and throwing a shaft of light: the same anchor
+    // the waiting blade drew, so the pair reads as *those two blades* closing
+    // rather than as a beam that appeared between two points.
+    for (const end of [0, reach]) {
       push();
-      translate(at, 0);
-      stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 240 * fade);
-      strokeWeight(10);
-      line(0, -24, 0, 24);
-      stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 250 * fade);
-      strokeWeight(4.5);
-      line(0, -24, 0, 24);
+      translate(end, 0);
+      rotate(-Math.atan2(spanY, spanX));
+      noFill();
+      stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 225 * band);
+      strokeWeight(3.5);
+      ellipse(0, 0, 52, 23);
+      noStroke();
+      fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 55 * band);
+      quad(-7, 0, 7, 0, 4, -58, -4, -58);
       pop();
     }
 
-    // The clash where they meet, once they have actually met.
-    if (closing >= 1) {
-      const flash = 1 - constrain((this.age - E_SNAP_MS) / 220, 0, 1);
+    // CONVERGE: the two blades actually travelling toward each other along the
+    // line they cut, so the animation moves the way the ability moves.
+    const meet = reach / 2;
+    if (closing < 1) {
+      for (let i = 0; i < 2; i++) {
+        const at = i === 0 ? meet * closing : reach - meet * closing;
+        push();
+        translate(at, 0);
+        stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 240);
+        strokeWeight(10);
+        line(0, -24, 0, 24);
+        stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 250);
+        strokeWeight(4.5);
+        line(0, -24, 0, 24);
+        pop();
+      }
+    }
+
+    // The cut: one hard white line down the whole corridor, and the clash where
+    // the two of them actually met.
+    if (flash > 0) {
+      stroke(255, 255, 255, 195 * flash);
+      strokeWeight(1.5 + 3.5 * flash);
+      line(0, 0, reach, 0);
+
       noStroke();
-      fill(255, 255, 255, 220 * flash);
-      circle(meet, 0, 34 * flash + 8);
+      fill(255, 255, 255, 210 * flash);
+      circle(meet, 0, 32 * flash + 8);
       noFill();
-      stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 230 * flash);
+      stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 235 * flash);
       strokeWeight(4);
-      circle(meet, 0, 90 * (1 - flash) + 20);
+      circle(meet, 0, 96 * (1 - flash) + 20);
     }
     pop();
 
-    // One mark per victim, on the victim.
-    for (const at of this.caught) {
-      push();
-      translate(at.x, at.y);
-      stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 210 * fade);
-      strokeWeight(8);
-      line(-18, -18, 18, 18);
-      line(-18, 18, 18, -18);
-      stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 245 * fade);
-      strokeWeight(3);
-      line(-18, -18, 18, 18);
-      line(-18, 18, 18, -18);
-      pop();
+    // One mark per victim, on the victim, and gone about as fast as the cut.
+    if (struck > 0) {
+      for (const at of this.caught) {
+        push();
+        translate(at.x, at.y);
+        stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 210 * struck);
+        strokeWeight(8);
+        line(-18, -18, 18, 18);
+        line(-18, 18, 18, -18);
+        stroke(IRELIA_CREST[0], IRELIA_CREST[1], IRELIA_CREST[2], 245 * struck);
+        strokeWeight(3);
+        line(-18, -18, 18, 18);
+        line(-18, 18, 18, -18);
+        pop();
+      }
     }
   }
 

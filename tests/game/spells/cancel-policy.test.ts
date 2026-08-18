@@ -205,6 +205,12 @@ describe('cancel policy, driven through real spells', () => {
       // its partner, and walking between the two presses is the ability. Losing
       // control of herself still drops it.
       'Irelia_E: TETHERED',
+      // Defiance roots her outright for the wind-up, so the move interrupt is
+      // not a gesture allowance but the opposite: `movementRevision` ticks on
+      // the *order*, before `canMove` is ever consulted, so HELD would end the
+      // charge on a right click she was in no position to obey. Crowd control
+      // and displacement still take it.
+      'Irelia_W: AIMED',
       'Janna_Q: INDEPENDENT',
       // Curtain Call: the four shots are fired from a set position over a 6s
       // window, and walking between them is part of the performance. Crowd

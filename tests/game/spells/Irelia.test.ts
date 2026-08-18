@@ -4,7 +4,14 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
 
-import Irelia_Q, { Q_DAMAGE, Q_RANGE } from '../../../src/game/gameObject/spells/Irelia_Q';
+import Irelia_Q, {
+  applyIreliaMark,
+  Irelia_Q_Blades,
+  findIreliaMark,
+  IRELIA_MARK_MS,
+  Q_DAMAGE,
+  Q_RANGE,
+} from '../../../src/game/gameObject/spells/Irelia_Q';
 import Irelia_W, {
   Irelia_W_Guard,
   W_CHARGE_MS,
@@ -24,9 +31,13 @@ import Irelia_E, {
   Irelia_E_Throw,
 } from '../../../src/game/gameObject/spells/Irelia_E';
 import Irelia_R, {
-  Irelia_R_Arrow,
   Irelia_R_Volley,
+  Irelia_R_Wall,
+  R_APEX_OVERSHOOT,
   R_ARM_LENGTH,
+  R_HOOK_LENGTH,
+  R_HOOK_TURN,
+  R_OPEN_MS,
   R_DAMAGE,
   R_RANGE,
   R_VOLLEY_SIZE,
@@ -226,6 +237,101 @@ describe('Irelia spells', () => {
     expect(health(victim)).toBe(100);
   });
 
+  it('Q brings her blades with it, and takes them away when the slot is swapped out', () => {
+    const q = new Irelia_Q(owner);
+    expect(objectsOf(Irelia_Q_Blades).length).toBe(0);
+
+    frames(1, q);
+    expect(objectsOf(Irelia_Q_Blades).length).toBe(1);
+
+    // One set of blades, not one per frame.
+    frames(5, q);
+    expect(objectsOf(Irelia_Q_Blades).length).toBe(1);
+
+    // Swapped out in the practice panel: the art goes with the spell that owns
+    // it, or a custom kit accumulates the orbits of every spell it ever held.
+    q.onRemoved();
+    game.objectManager.update();
+    expect(objectsOf(Irelia_Q_Blades).length).toBe(0);
+  });
+
+  it('Q takes the enemy it can finish over the one under the cursor', () => {
+    // The cursor is parked on the healthy one, which is also the nearest body —
+    // exactly the pick `TargetResolver` makes on its own, and exactly the wrong
+    // one when a surge somewhere else would come straight back.
+    const healthy = enemy(120, 0);
+    const doomed = enemy(0, 260);
+    doomed.stats.health.baseValue = Q_DAMAGE - 1;
+
+    const q = new Irelia_Q(owner);
+    expect(pressSpell(q, { at: { x: 140, y: 0 } })).toBe(true);
+    frames(60);
+
+    expect(doomed.isDead).toBe(true);
+    expect(health(healthy)).toBe(100);
+    expect(q.currentCooldown).toBe(0);
+  });
+
+  it('Q takes a marked enemy over the one under the cursor', () => {
+    // Same setup as the finisher test, except nobody dies: the mark is the
+    // reason to fly past the near one, because it is also a reset.
+    const healthy = enemy(120, 0);
+    const marked = enemy(0, 260);
+    applyIreliaMark(owner, marked);
+
+    const q = new Irelia_Q(owner);
+    expect(pressSpell(q, { at: { x: 140, y: 0 } })).toBe(true);
+    frames(60);
+
+    expect(health(marked)).toBe(100 - Q_DAMAGE);
+    expect(health(healthy)).toBe(100);
+    expect(q.currentCooldown).toBe(0);
+  });
+
+  it('Q takes the enemy it can finish over a marked one', () => {
+    const marked = enemy(120, 0);
+    applyIreliaMark(owner, marked);
+    const doomed = enemy(0, 260);
+    doomed.stats.health.baseValue = Q_DAMAGE - 1;
+
+    const q = new Irelia_Q(owner);
+    expect(pressSpell(q, { at: { x: 140, y: 0 } })).toBe(true);
+    frames(60);
+
+    expect(doomed.isDead).toBe(true);
+    // The mark is a reset she did not have to spend, so it is still standing.
+    expect(health(marked)).toBe(100);
+    expect(findIreliaMark(marked)).not.toBeNull();
+  });
+
+  it('Q leaves the cursor in charge when nothing in reach dies to it', () => {
+    const near = enemy(120, 0);
+    const far = enemy(0, 260);
+
+    const q = new Irelia_Q(owner);
+    expect(pressSpell(q, { at: { x: 140, y: 0 } })).toBe(true);
+    frames(60);
+
+    expect(health(near)).toBe(100 - Q_DAMAGE);
+    expect(health(far)).toBe(100);
+  });
+
+  it('Q reports the enemies it would finish, for the on-screen mark', () => {
+    const healthy = enemy(120, 0);
+    const doomed = enemy(0, 260);
+    doomed.stats.health.baseValue = Q_DAMAGE - 1;
+    const outOfReach = enemy(Q_RANGE + 300, 0);
+    outOfReach.stats.health.baseValue = 1;
+
+    const q = new Irelia_Q(owner);
+    const candidates = q.executeCandidates();
+
+    expect(candidates).toContain(healthy);
+    expect(candidates).toContain(doomed);
+    expect(candidates).not.toContain(outOfReach);
+    expect(q.executeDamageAgainst(doomed)).toBe(Q_DAMAGE);
+  });
+
   // ------------------------------------------------------------------ W
 
   it('W guards her while the blades wind up, and stops the moment she lets go', () => {
@@ -249,6 +355,37 @@ describe('Irelia spells', () => {
     const guarded = health(owner);
     owner.takeDamage(20, foe);
     expect(health(owner)).toBe(guarded - 20);
+  });
+
+  it('W plants her feet: she cannot move while the blades wind up', () => {
+    const w = new Irelia_W(owner);
+    expect(owner.canMove).toBe(true);
+
+    expect(pressSpell(w, { at: at(600) })).toBe(true);
+    frames(1, w);
+    expect(w.state).toBe('CHARGING');
+    expect(owner.canMove).toBe(false);
+
+    expect(releaseSpell(w, { at: at(600) })).toBe(true);
+    frames(2, w);
+    expect(owner.canMove).toBe(true);
+  });
+
+  it('W: a move order neither moves her nor ends the charge', () => {
+    const w = new Irelia_W(owner);
+    expect(pressSpell(w, { at: at(600) })).toBe(true);
+    frames(1, w);
+    const stood = { x: owner.position.x, y: owner.position.y };
+
+    owner.navigateTo(owner.position.x + 400, owner.position.y);
+    frames(5, w);
+
+    // Refusing the order is not the same as cancelling on it. Under the old
+    // form the click ended the charge even though she never took a step, which
+    // is the worst of both: she is rooted *and* punished for asking to move.
+    expect(w.state).toBe('CHARGING');
+    expect(owner.position.x).toBe(stood.x);
+    expect(owner.position.y).toBe(stood.y);
   });
 
   it('W released at once reaches W_MIN_REACH for W_MIN_DAMAGE and no further', () => {
@@ -386,15 +523,15 @@ describe('Irelia spells', () => {
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     // one object, not a fan: the blades travel held together
     expect(objectsOf(Irelia_R_Volley).length).toBe(1);
-    expect(objectsOf(Irelia_R_Arrow).length).toBe(0);
+    expect(objectsOf(Irelia_R_Wall).length).toBe(0);
 
     frames(60);
 
-    const arrow = objectsOf(Irelia_R_Arrow);
-    expect(arrow.length).toBe(1);
-    // it opened on the body, well short of its own maximum reach
-    expect(arrow[0].position.x).toBeLessThan(R_RANGE / 2);
-    expect(Math.abs(arrow[0].position.x - blocker.position.x)).toBeLessThan(
+    const wall = objectsOf(Irelia_R_Wall);
+    expect(wall.length).toBe(1);
+    // it stopped on the body, well short of its own maximum reach
+    expect(wall[0].impact.x).toBeLessThan(R_RANGE / 2);
+    expect(Math.abs(wall[0].impact.x - blocker.position.x)).toBeLessThan(
       R_VOLLEY_SPEED + R_VOLLEY_SIZE
     );
   });
@@ -404,28 +541,123 @@ describe('Irelia spells', () => {
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     frames(60);
 
-    const arrow = objectsOf(Irelia_R_Arrow);
-    expect(arrow.length).toBe(1);
-    expect(Math.abs(arrow[0].position.x - R_RANGE)).toBeLessThan(R_VOLLEY_SPEED + 1);
+    const wall = objectsOf(Irelia_R_Wall);
+    expect(wall.length).toBe(1);
+    expect(Math.abs(wall[0].position.x - R_RANGE)).toBeLessThan(R_VOLLEY_SPEED + 1);
   });
 
-  it('R: the arrowhead sweeps back from the apex, both arms, along the throw', () => {
+  it('R: the apex stands past the body it struck, so the V closes around it', () => {
+    const blocker = enemy(200, 0);
     const r = new Irelia_R(owner);
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     frames(60);
 
-    const arrow = objectsOf(Irelia_R_Arrow)[0];
-    expect(arrow.arms.length).toBe(2);
-    for (const arm of arrow.arms) {
-      // thrown along +x, so both arms end *behind* the apex
-      expect(arm.end.x).toBeLessThan(arm.start.x);
-      expect(Math.hypot(arm.end.x - arm.start.x, arm.end.y - arm.start.y)).toBeCloseTo(
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    expect(wall.impact.x).toBeCloseTo(blocker.position.x, 3);
+    // Thrown along +x, so the vertex is further along the throw than the body,
+    // which leaves the body in the mouth of the V rather than at its tip.
+    expect(wall.position.x).toBeCloseTo(blocker.position.x + R_APEX_OVERSHOOT, 3);
+    for (const arm of wall.arms) {
+      expect(arm[0].start.x).toBeGreaterThan(blocker.position.x);
+    }
+  });
+
+  it('R opens at the point it stopped when it meets nobody, with no overshoot', () => {
+    // Nothing to close around, and pushing the vertex out anyway would hand the
+    // ability free reach past R_RANGE.
+    const r = new Irelia_R(owner);
+    expect(pressSpell(r, { at: at(600) })).toBe(true);
+    frames(60);
+
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    expect(wall.position.x).toBeCloseTo(wall.impact.x, 3);
+  });
+
+  it('R: the wall sweeps back from the apex, both arms, along the throw', () => {
+    const r = new Irelia_R(owner);
+    expect(pressSpell(r, { at: at(600) })).toBe(true);
+    frames(60);
+
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    expect(wall.arms.length).toBe(2);
+
+    for (const arm of wall.arms) {
+      // rooted at the vertex, and each segment carries on from the last
+      expect(arm[0].start.x).toBeCloseTo(wall.position.x, 3);
+      expect(arm[0].start.y).toBeCloseTo(wall.position.y, 3);
+      for (let i = 1; i < arm.length; i++) {
+        expect(arm[i].start.x).toBeCloseTo(arm[i - 1].end.x, 6);
+        expect(arm[i].start.y).toBeCloseTo(arm[i - 1].end.y, 6);
+      }
+
+      // thrown along +x, so the straight run goes *behind* the apex
+      const run = arm[0];
+      expect(run.end.x).toBeLessThan(run.start.x);
+      expect(Math.hypot(run.end.x - run.start.x, run.end.y - run.start.y)).toBeCloseTo(
         R_ARM_LENGTH,
         3
       );
+
+      let hook = 0;
+      for (let i = 1; i < arm.length; i++) {
+        hook += Math.hypot(arm[i].end.x - arm[i].start.x, arm[i].end.y - arm[i].start.y);
+      }
+      expect(hook).toBeCloseTo(R_HOOK_LENGTH, 3);
     }
-    // and to opposite sides of it
-    expect(arrow.arms[0].end.y * arrow.arms[1].end.y).toBeLessThan(0);
+
+    // and the two run to opposite sides of the throw
+    const tips = wall.arms.map(arm => arm[arm.length - 1].end);
+    expect(tips[0].y * tips[1].y).toBeLessThan(0);
+  });
+
+  it('R: each arm ends in a hook curling back toward the throw', () => {
+    const r = new Irelia_R(owner);
+    expect(pressSpell(r, { at: at(600) })).toBe(true);
+    frames(60);
+
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    for (const arm of wall.arms) {
+      const run = arm[0];
+      const tail = arm[arm.length - 1];
+      const runAngle = Math.atan2(run.end.y - run.start.y, run.end.x - run.start.x);
+      const tailAngle = Math.atan2(tail.end.y - tail.start.y, tail.end.x - tail.start.x);
+
+      const turned = Math.atan2(Math.sin(tailAngle - runAngle), Math.cos(tailAngle - runAngle));
+      expect(Math.abs(turned)).toBeCloseTo(R_HOOK_TURN, 3);
+
+      // Turning is not enough — it has to turn the right way. The straight run
+      // leans away from the throw axis; by the end of the hook the tail leans
+      // back across it, which is what makes the shape close rather than flare.
+      const runAcross = run.end.y - run.start.y;
+      const tailAcross = tail.end.y - tail.start.y;
+      expect(Math.sign(tailAcross)).toBe(-Math.sign(runAcross));
+    }
+  });
+
+  it('R: the blades charge nobody until they have finished travelling out', () => {
+    const r = new Irelia_R(owner);
+    expect(pressSpell(r, { at: at(600) })).toBe(true);
+
+    for (let i = 0; i < 120 && objectsOf(Irelia_R_Wall).length === 0; i++) frames(1);
+    // two more, so the opening burst has happened and is behind us
+    frames(2);
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    expect(wall).toBeDefined();
+
+    const walker = enemy(0, 900);
+    const run = wall.arms[0][0];
+    place(walker, (run.start.x + run.end.x) / 2, (run.start.y + run.end.y) / 2);
+    game.objectManager.update();
+
+    // Still in flight: the blades are not standing there yet, so neither is
+    // the toll. Charging for a wall that is visibly still travelling is the
+    // one direction of the draw/damage gap that is never defensible.
+    frames(3);
+    expect(health(walker)).toBe(100);
+
+    // And once they land, standing in them costs.
+    frames(Math.ceil(R_OPEN_MS / FRAME_MS) + 2);
+    expect(health(walker)).toBe(100 - R_WALL_DAMAGE);
   });
 
   it('R cuts and slows what the opening catches', () => {
@@ -445,12 +677,12 @@ describe('Irelia spells', () => {
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     frames(60);
 
-    const arrow = objectsOf(Irelia_R_Arrow)[0];
+    const wall = objectsOf(Irelia_R_Wall)[0];
     const walker = enemy(0, 900);
     expect(health(walker)).toBe(100);
 
     // Step onto an arm...
-    const arm = arrow.arms[0];
+    const arm = wall.arms[0][0];
     place(walker, (arm.start.x + arm.end.x) / 2, (arm.start.y + arm.end.y) / 2);
     game.objectManager.update();
     frames(2);
@@ -476,8 +708,8 @@ describe('Irelia spells', () => {
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     frames(60);
 
-    const arrow = objectsOf(Irelia_R_Arrow)[0];
-    const arm = arrow.arms[0];
+    const wall = objectsOf(Irelia_R_Wall)[0];
+    const arm = wall.arms[0][0];
     const standing = { x: (arm.start.x + arm.end.x) / 2, y: (arm.start.y + arm.end.y) / 2 };
 
     const foe = enemy(0, 900);
@@ -493,7 +725,7 @@ describe('Irelia spells', () => {
     const r = new Irelia_R(owner);
     expect(pressSpell(r, { at: at(600) })).toBe(true);
     frames(60);
-    expect(objectsOf(Irelia_R_Arrow).length).toBe(1);
+    expect(objectsOf(Irelia_R_Wall).length).toBe(1);
 
     vi.stubGlobal('deltaTime', R_WALL_MS);
     frames(1);
@@ -501,6 +733,61 @@ describe('Irelia spells', () => {
     frames(2);
     vi.stubGlobal('deltaTime', FRAME_MS);
 
-    expect(objectsOf(Irelia_R_Arrow).length).toBe(0);
+    expect(objectsOf(Irelia_R_Wall).length).toBe(0);
+  });
+
+  // --------------------------------------------------------------- the mark
+
+  it('E marks everyone the duet catches, and nobody it missed', () => {
+    const caught = enemy(300, 0);
+    const clear = enemy(100, 0);
+    const e = new Irelia_E(owner);
+
+    expect(pressSpell(e, { at: { x: 300, y: -200 } })).toBe(true);
+    frames(40, e);
+    expect(pressSpell(e, { at: { x: 300, y: 200 } })).toBe(true);
+    frames(40, e);
+
+    expect(findIreliaMark(caught)).not.toBeNull();
+    expect(findIreliaMark(clear)).toBeNull();
+  });
+
+  it('R marks everyone the opening catches', () => {
+    const caught = enemy(200, 0);
+    const r = new Irelia_R(owner);
+
+    expect(pressSpell(r, { at: at(600) })).toBe(true);
+    frames(60);
+
+    expect(findIreliaMark(caught)).not.toBeNull();
+  });
+
+  it('a surge onto a marked target hands the key back and spends the mark', () => {
+    const victim = enemy(200);
+    applyIreliaMark(owner, victim);
+    expect(findIreliaMark(victim)).not.toBeNull();
+
+    const q = new Irelia_Q(owner);
+    expect(pressSpell(q, { target: victim })).toBe(true);
+    expect(q.currentCooldown).toBe(q.coolDown);
+
+    frames(60);
+
+    // It survived, so this reset is the mark's doing and nothing else's.
+    expect(victim.isDead).toBe(false);
+    expect(q.currentCooldown).toBe(0);
+    expect(findIreliaMark(victim)).toBeNull();
+  });
+
+  it('a mark nobody spends lapses on its own', () => {
+    const victim = enemy(200);
+    applyIreliaMark(owner, victim);
+    expect(findIreliaMark(victim)).not.toBeNull();
+
+    vi.stubGlobal('deltaTime', IRELIA_MARK_MS);
+    frames(2);
+    vi.stubGlobal('deltaTime', FRAME_MS);
+
+    expect(findIreliaMark(victim)).toBeNull();
   });
 });

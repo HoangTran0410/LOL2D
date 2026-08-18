@@ -112,16 +112,18 @@ const ALL_CASTS = [
     // Both blades are *thrown*, and the flight is the half of this ability the
     // first version skipped, so the frames have to catch one in the air. 372px
     // at E_THROW_SPEED is ~250ms, hence: blade one flying, blade one standing,
-    // blade two flying after the second press at 700, and the clash.
-    frames: [130, 420, 800, 1100],
+    // blade two flying after the second press at 700, the clash, and the mark
+    // it leaves riding the dummy once the cut itself has gone.
+    frames: [130, 420, 800, 1060, 1400],
     recastAfterMs: 700,
     recastAim: [300, 220],
   },
-  // Irelia R: one cluster out, which opens into the arrowhead on the dummy the
-  // rig stands at 0.75x the aim — so ~390px at R_VOLLEY_SPEED, ~360ms. The
-  // frames are the cluster still travelling, the arms tearing open, the row
+  // Irelia R: one cluster out, which bursts on the dummy the rig stands at
+  // 0.75x the aim — so ~390px at R_VOLLEY_SPEED, ~360ms. The wall then spreads
+  // out of that body over R_OPEN_MS (300), so the frames are: the cluster still
+  // travelling, the blades a fifth of the way out, most of the way, the wall
   // standing, and it still standing near the end of its 2.5s.
-  { champion: 'Irelia', slot: 'R', aim: [520, 0], frames: [200, 430, 900, 2400] },
+  { champion: 'Irelia', slot: 'R', aim: [520, 0], frames: [200, 420, 560, 900, 2400] },
 ];
 
 // Substring match, so "Jarvan" and "Pantheon" both work without quoting.

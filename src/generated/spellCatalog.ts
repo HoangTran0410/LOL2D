@@ -684,7 +684,7 @@ export const spellCatalog = {
   },
   "Irelia_Q": {
     name: "Đâm Kiếm (Irelia_Q)",
-    description: "Lướt tới một kẻ địch và chém <span class=\"damage\">22 sát thương</span>.\n    Nếu cú chém <span class=\"buff\">hạ gục</span> mục tiêu, Đâm Kiếm được hoàn lại ngay lập tức.",
+    description: "Lướt tới một kẻ địch và chém <span class=\"damage\">22 sát thương</span>.\n    Nếu cú chém <span class=\"buff\">hạ gục</span> mục tiêu, hoặc mục tiêu đang\n    <span class=\"buff\">bị đánh dấu</span> (bởi Bước Nhảy Hoàn Vũ hay Thanh Kiếm Tiên Phong),\n    Đâm Kiếm được hoàn lại ngay lập tức và dấu bị tiêu thụ.",
     iconKey: "spell_irelia_q",
     coolDownMs: 6000,
     manaCost: 20,
@@ -692,7 +692,7 @@ export const spellCatalog = {
   },
   "Irelia_R": {
     name: "Thanh Kiếm Tiên Phong (Irelia_R)",
-    description: "Ném một chùm kiếm về phía trước. Khi trúng kẻ địch — hoặc khi tới cuối tầm —\n    chùm kiếm <span class=\"buff\">tách ra thành hình mũi tên</span>, gây\n    <span class=\"damage\">45 sát thương</span> và\n    <span class=\"buff\">làm chậm 40%</span> trong\n    <span class=\"time\">1.5 giây</span> cho mọi kẻ địch trúng phải.\n    Hàng kiếm cắm lại <span class=\"time\">2.5 giây</span>: ai bước vào cũng chịu\n    thêm <span class=\"damage\">18 sát thương</span> và bị làm chậm.",
+    description: "Ném một chùm kiếm về phía trước. Khi trúng kẻ địch — hoặc khi tới cuối tầm —\n    chùm kiếm <span class=\"buff\">bung ra thành hàng rào kiếm hình chữ V</span>, gây\n    <span class=\"damage\">45 sát thương</span> và\n    <span class=\"buff\">làm chậm 40%</span> trong\n    <span class=\"time\">1.5 giây</span> cho mọi kẻ địch trúng phải.\n    Hàng kiếm cắm lại <span class=\"time\">4 giây</span>: ai bước vào cũng chịu\n    thêm <span class=\"damage\">18 sát thương</span> và bị làm chậm.",
     iconKey: "spell_irelia_r",
     coolDownMs: 10000,
     manaCost: 100,

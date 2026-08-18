@@ -1,6 +1,8 @@
 import { Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
+import StatusFlags from '@/game/enums/StatusFlags';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec, Vec2 } from '@/game/spell/runtime/types';
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Buff from '@/game/gameObject/Buff';
@@ -12,7 +14,7 @@ import {
   intersectsBeam,
   type BeamGeometry,
 } from '@/game/gameObject/spellObjects/BeamSpellObject';
-import { IRELIA_CREST, IRELIA_EDGE, IRELIA_RIM, IRELIA_STEEL } from './Irelia_Q';
+import { drawIreliaBlade, IRELIA_CREST, IRELIA_EDGE, IRELIA_RIM, IRELIA_STEEL } from './Irelia_Q';
 
 export const W_CHARGE_MS = 1_200;
 export const W_MIN_REACH = 220;
@@ -31,9 +33,19 @@ export const W_HEAL_PER_HIT = 6;
  *
  * A commitment, not a poke: she plants her feet, the blades gather, and every
  * extra tenth of a second buys reach and damage. The trade is stated in both
- * directions — she cannot walk while she holds it (`SpellForm.HELD`, the
- * default, ends the charge on a step) and she is harder to kill while she does
- * (`Irelia_W_Guard`).
+ * directions — she genuinely cannot walk while she holds it, and she is harder
+ * to kill while she does (`Irelia_W_Guard` does both).
+ *
+ * **Rooted, not cancelled-on-a-step.** The charge used to run on the default
+ * `SpellForm.HELD`, whose `move: true` ends it the moment the caster's
+ * `movementRevision` ticks — and that counter is bumped by the *order*, not by
+ * the step, since `canMove` is only consulted later in `AttackableUnit.update`.
+ * So a right click ended the charge whether or not she was able to go anywhere,
+ * which is the worst of both worlds once she is rooted: unable to move and
+ * punished for asking. `AIMED` is the form whose interrupt table says exactly
+ * what is wanted here — death, crowd control and displacement still take it,
+ * a move order does not. The name reads oddly for a spell that plants her feet;
+ * the table is what a form is.
  *
  * `releaseAtMax` is on because a fully wound Defiance firing itself is what the
  * player expects from the telegraph: the bar filling *is* the promise that it
@@ -65,6 +77,7 @@ export default class Irelia_W extends Spell {
       charge: { maxDurationMs: W_CHARGE_MS, releaseAtMax: true },
       resource: { commitAt: 'start', refundOn: [] },
       cooldown: { startAt: 'release', durationMs: this.coolDown },
+      interrupts: SpellForm.AIMED,
     };
   }
 
@@ -223,6 +236,21 @@ export class Irelia_W_Guard extends Buff {
   name = 'Thế Thủ';
   percent = W_DAMAGE_REDUCTION;
 
+  /**
+   * The planted feet, and the only lever that actually works for it:
+   * `Stats.updateActionState` derives `CAN_MOVE` from the *flags* — Charmed,
+   * Feared, Immovable, Rooted, Stunned, Suppressed — so a buff that only listed
+   * `statusFlagsToDisable = StatusFlags.CanMove` would read as if it rooted her
+   * and would not.
+   *
+   * It rides the guard rather than being a separate `Root`, because the two are
+   * the same fact: this buff *is* the charge, it is created and dropped by
+   * `onCastStart`/`endCharge` together, and a second buff would be a second
+   * lifetime to keep in step for no gain. It is also not enemy crowd control —
+   * it is her own commitment — so it keeps the W icon rather than the root one.
+   */
+  statusFlagsToEnable = StatusFlags.Rooted;
+
   modifyIncomingDamage(damage: number): number {
     // A guard dropped this frame stops guarding this frame. `takeDamage` walks
     // `unit.buffs`, which still holds a deactivated buff until the next
@@ -261,10 +289,23 @@ export class Irelia_W_Charge extends SpellObject {
   dirY = 0;
   age = 0;
 
+  /** Seeded once: `random()` called from `draw` flickers instead of animating. */
+  private motes: { around: number; away: number; sway: number }[] = [];
+
   constructor(owner: AttackableUnit) {
     super(owner);
     this.position = owner.position.copy();
     this.attachTo(owner);
+  }
+
+  onAdded(): void {
+    for (let i = 0; i < 10; i++) {
+      this.motes.push({
+        around: random(0, TWO_PI),
+        away: random(58, 108),
+        sway: random(0.6, 1.4),
+      });
+    }
   }
 
   update(): void {
@@ -292,13 +333,27 @@ export class Irelia_W_Charge extends SpellObject {
     fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 40 + 70 * this.ratio);
     rect(0, -half, this.reach, W_WIDTH, 10);
 
-    // The blades gathering at her hands, drawn in so the wind-up is visible on
-    // her body and not only on the floor.
-    const gathered = 26 + 18 * (1 - this.ratio);
-    stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 240);
-    strokeWeight(3);
+    // Motes drawn in tight around her body, not out on the floor: the corridor
+    // already owns the ground, and this layer is only allowed to say one thing
+    // the corridor cannot — that the charge is being *gathered inward*.
+    const pull = 1 - this.ratio;
+    noStroke();
+    fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 90 + 140 * this.ratio);
+    for (const mote of this.motes) {
+      const away = 10 + mote.away * pull;
+      const around = mote.around + this.ratio * mote.sway * 2.4;
+      circle(cos(around) * away, sin(around) * away, 3 + 2 * this.ratio);
+    }
+
+    // Her blades leaving the orbit and coming to guard in front of her. Fully
+    // wound they shiver, which is the only cue that holding longer buys nothing.
+    const shiver = this.ratio >= 1 ? sin(this.age / 22) * 2.5 : 0;
     for (let i = -1; i <= 1; i += 2) {
-      line(gathered * 0.4, i * gathered, gathered, i * gathered * 0.25);
+      push();
+      translate(lerp(2, 34 + shiver, this.ratio), lerp(i * 30, i * 8, this.ratio));
+      rotate(lerp(HALF_PI * i, 0, this.ratio));
+      drawIreliaBlade(26);
+      pop();
     }
 
     // A hard bar at the far end: where it stops is the part the enemy needs.
@@ -353,16 +408,22 @@ export class Irelia_W_Slash extends SpellObject {
     fill(IRELIA_EDGE[0], IRELIA_EDGE[1], IRELIA_EDGE[2], 110 * fade);
     quad(0, -half * 0.35, reach * swept, -half, reach * swept, half, 0, half * 0.35);
 
-    // Three blade streaks fanning across the corridor: the cut, not a glow.
-    stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 200 * fade);
-    strokeWeight(8 * fade + 2);
-    for (let i = -1; i <= 1; i++) {
-      line(reach * 0.1, i * half * 0.55, reach * swept, i * half * 0.9);
-    }
-    stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 250 * fade);
-    strokeWeight(3.5 * fade + 1);
-    for (let i = -1; i <= 1; i++) {
-      line(reach * 0.1, i * half * 0.55, reach * swept, i * half * 0.9);
+    // Five blade streaks fanning out across the corridor: the cut, not a glow.
+    // Rim under body, both passes over the same five lines, so each streak keeps
+    // its silhouette instead of the pale layer smearing over the dark one.
+    const streaks = 5;
+    for (const pass of [0, 1]) {
+      if (pass === 0) {
+        stroke(IRELIA_RIM[0], IRELIA_RIM[1], IRELIA_RIM[2], 200 * fade);
+        strokeWeight(8 * fade + 2);
+      } else {
+        stroke(IRELIA_STEEL[0], IRELIA_STEEL[1], IRELIA_STEEL[2], 250 * fade);
+        strokeWeight(3.5 * fade + 1);
+      }
+      for (let i = 0; i < streaks; i++) {
+        const across = (i / (streaks - 1)) * 2 - 1;
+        line(reach * 0.1, across * half * 0.4, reach * swept, across * half * 0.92);
+      }
     }
 
     // The far edge, keyed to how hard it was wound.
