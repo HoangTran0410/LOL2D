@@ -1,61 +1,38 @@
-import { assetManifest, type AssetKey } from '@/generated/assetManifest';
-import AssetManager from '@/managers/AssetManager';
 import type GameScene from './GameScene';
 import type SetupScene from './SetupScene';
 
 /**
- * The menu's warm-up: the game's code and the art a match draws, fetched while
- * the player is looking at the main menu instead of after they press Chơi.
+ * The menu's warm-up: the game's *code*, fetched while the player is looking at
+ * the main menu instead of after they press Chơi.
  *
- * Two separate wins, and they are worth naming separately because they are
- * fixed by different halves of this file:
- *
- * - **Code.** `MenuScene` used to `import GameScene` and `SetupScene`
- *   statically, so the menu's chunk was the whole game — 2.1MB of modules,
- *   79% of it `game/gameObject`, all parsed before the logo could be drawn.
- *   The imports below are dynamic, which is what lets Rollup cut the game out
- *   of the menu chunk; calling them here means the split costs no waiting.
- * - **Art.** A match used to start with `AssetManager.renderable` handing back
- *   placeholder squares and swapping in champion portraits and spell icons as
- *   they arrived. Loading them against a progress bar on the menu turns a
- *   match-long trickle of pop-in into a wait the player can see the end of.
+ * `MenuScene` used to `import GameScene` and `SetupScene` statically, so the
+ * menu's chunk was the whole game — 2.1MB of modules, 79% of it
+ * `game/gameObject`, all parsed before the logo could be drawn. The imports
+ * below are dynamic, which is what lets Rollup cut the game out of the menu
+ * chunk; calling them here means the split costs no waiting.
  *
  * Runs once per page load: the promise is module state, so returning to the
  * menu from the pregame screen finds it already resolved and the bar already
  * gone.
+ *
+ * ## Match art is **not** preloaded here any more.
+ *
+ * This used to fetch every `champ_`/`buff_`/`monster_`/`obj_` image before Chơi
+ * appeared — 88 files, ~2.1MB — on the theory that a match should not open on
+ * placeholder squares. Two things made that the wrong place for it:
+ *
+ *  - It is the same mistake the spell barrel made. A menu cannot know which
+ *    champions a match will field, so "load what a match needs" from here means
+ *    "load all of them", and 50 of the 58 portraits are for champions nobody in
+ *    this match is playing.
+ *  - There is now somewhere better. `GameScene.startGame` knows the exact
+ *    roster (`planMatchKits`) and already waits there with a progress screen for
+ *    the spell chunks, so the art rides along with them: six portraits instead
+ *    of fifty-eight, behind a bar the player can see.
+ *
+ * What is left is the game's *code*, which the menu genuinely can fetch ahead —
+ * it is the same two chunks whatever the match turns out to be.
  */
-
-/**
- * What is worth *waiting* for, which is a much smaller set than what a match
- * eventually draws.
- *
- * The rule is: preload what appears on the field the instant a match opens and
- * would otherwise be a placeholder square, and let everything else stream in
- * through `AssetManager.renderable`, which already swaps art in as it arrives.
- *
- * - `champ_` (58 files, ~790KB) — bodies are on screen from the first frame.
- * - `buff_`, `monster_`, `obj_` (29 files, ~130KB) — small, and universal.
- * - **`spell_` is deliberately excluded** (310 files, ~1.45MB — the largest
- *   group by far). Spell icons appear in the HUD, at most seven of them at a
- *   time, for whichever kit the player actually took; fetching all 310 to show
- *   seven was over half the preload for almost none of the benefit.
- * - `other_` is the menu's own art — one background and the logo, both already
- *   on screen by the time this runs — and `screenshot_`/`source_manifest` are
- *   developer assets nothing renders.
- *
- * Widening this is a one-line change if the pop-in ever matters more than the
- * wait; the numbers above are what the trade is.
- */
-const MATCH_ASSET_PREFIXES = ['champ_', 'buff_', 'monster_', 'obj_'] as const;
-
-function matchAssetKeys(): AssetKey[] {
-  const keys: AssetKey[] = [];
-  for (const key of Object.keys(assetManifest) as AssetKey[]) {
-    if (assetManifest[key].kind !== 'image') continue;
-    if (MATCH_ASSET_PREFIXES.some(prefix => key.startsWith(prefix))) keys.push(key);
-  }
-  return keys;
-}
 
 export interface PreloadState {
   /** Units finished, out of `total`. */
@@ -136,10 +113,8 @@ let running: Promise<void> | null = null;
 export function preloadGame(): Promise<void> {
   if (running) return running;
 
-  const keys = matchAssetKeys();
-  // Two units for the two code chunks, so the bar moves immediately on a warm
-  // cache rather than sitting at zero until the first image lands.
-  state.total = keys.length + 2;
+  // Two units, for the two code chunks.
+  state.total = 2;
   state.loaded = 0;
   state.done = false;
   state.codeFailed = false;
@@ -160,13 +135,7 @@ export function preloadGame(): Promise<void> {
       }
     );
 
-    const art = keys.map(key =>
-      AssetManager.ensure(key)
-        .catch(() => undefined)
-        .then(step)
-    );
-
-    await Promise.all([code, ...art]);
+    await code;
     state.done = true;
     announce();
   })();

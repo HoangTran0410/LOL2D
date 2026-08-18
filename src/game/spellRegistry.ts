@@ -73,19 +73,34 @@ export const loadedSpellIds = (): string[] => [...loaded.keys()];
 /**
  * Fetch these ids' modules. Idempotent, deduplicated, and safe to call with
  * unknown ids (a stale `localStorage` slot naming a spell this build removed).
+ *
+ * `onSettled` fires once per id in `ids`, after that id is done — loaded,
+ * failed, already in memory, or unknown. That "once per id, whatever happened"
+ * rule is what makes it usable as a progress count: `GameScene` paints a bar
+ * against `ids.length` while a match is waiting, and a bar that could stall
+ * short of its own total on a dropped chunk would be worse than none.
  */
-export async function loadSpells(ids: readonly string[]): Promise<void> {
+export async function loadSpells(
+  ids: readonly string[],
+  onSettled?: (id: string) => void
+): Promise<void> {
   const pending: Promise<void>[] = [];
 
   for (const id of ids) {
-    if (loaded.has(id)) continue;
+    if (loaded.has(id)) {
+      onSettled?.(id);
+      continue;
+    }
     const existing = inFlight.get(id);
     if (existing) {
-      pending.push(existing);
+      pending.push(existing.then(() => onSettled?.(id)));
       continue;
     }
     const importer = spellModules[id];
-    if (!importer) continue;
+    if (!importer) {
+      onSettled?.(id);
+      continue;
+    }
 
     const load = importer()
       .then(module => {
@@ -103,7 +118,7 @@ export async function loadSpells(ids: readonly string[]): Promise<void> {
       });
 
     inFlight.set(id, load);
-    pending.push(load);
+    pending.push(load.then(() => onSettled?.(id)));
   }
 
   await Promise.all(pending);

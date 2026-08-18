@@ -1,8 +1,10 @@
 import { Scene } from '@/managers/SceneManager';
 import Game, { renderFpsPreference } from '@/game/Game';
-import { planMatchKits, plannedSpellIds } from '@/game/preset';
+import { planMatchKits, plannedSpellIds, type MatchPlan } from '@/game/preset';
 import { loadRemainingSpells, loadSpells } from '@/game/spellRegistry';
 import { loadPregameConfig } from '@/game/config/PregameConfig';
+import { spellCatalog } from '@/generated/spellCatalog';
+import { assetManifest, type AssetKey } from '@/generated/assetManifest';
 import MenuScene from './MenuScene';
 import DomUtils from '@/utils/dom.utils';
 import AssetManager from '@/managers/AssetManager';
@@ -25,6 +27,48 @@ let previousTime: number;
 /** One wheel notch, as a step on the manual zoom factor. */
 const ZOOM_WHEEL_STEP = 0.1;
 
+/**
+ * Art that is on screen the moment a match opens, for *this* match.
+ *
+ * The menu used to preload every `champ_`/`buff_`/`monster_`/`obj_` image before
+ * showing Chơi — 88 files, ~2.1MB — because from there it could not know which
+ * champions would play, so "what a match needs" meant "all of them". Here the
+ * roster is already decided, so it is six portraits and the player's own seven
+ * ability icons instead of fifty-eight portraits and nothing else.
+ *
+ * The universal sets stay whole because they are small and every match uses
+ * them: `buff_` is the crowd-control icons a HUD needs the first time anything
+ * lands, and `monster_`/`obj_` are the jungle and the map's furniture — 29 files,
+ * ~130KB between them.
+ *
+ * Everything not listed keeps streaming in through `AssetManager.renderable`,
+ * which has always swapped art in as it arrives. This is only the subset worth
+ * *waiting* for.
+ */
+const UNIVERSAL_ART_PREFIXES = ['buff_', 'monster_', 'obj_'] as const;
+
+function matchArtKeys(plan: MatchPlan): AssetKey[] {
+  const keys = new Set<AssetKey>();
+
+  for (const key of Object.keys(assetManifest) as AssetKey[]) {
+    if (assetManifest[key].kind !== 'image') continue;
+    if (UNIVERSAL_ART_PREFIXES.some(prefix => key.startsWith(prefix))) keys.add(key);
+  }
+
+  // Every unit's portrait — the player's and each bot's.
+  for (const kit of [plan.player, ...plan.bots]) keys.add(kit.avatar);
+
+  // And the player's own ability icons, which are in the HUD from frame one.
+  // Bot kits are only ever looked at through the practice panel, which opens on
+  // a paused match with all the time in the world to fetch one.
+  for (const id of plan.player.spellIds) {
+    const iconKey = spellCatalog[id as keyof typeof spellCatalog]?.iconKey;
+    if (iconKey) keys.add(iconKey);
+  }
+
+  return [...keys];
+}
+
 export default class GameScene extends Scene {
   dom!: HTMLElement;
   canvas!: any;
@@ -32,6 +76,9 @@ export default class GameScene extends Scene {
   private _animationFrameId: number | null = null;
   /** Set by `stopGame`, so a slow kit load that resolves after an exit is dropped. */
   private _exited = false;
+  /** How far this match's kits have got, for the screen `draw` paints while waiting. */
+  private _kitsLoaded = 0;
+  private _kitsTotal = 0;
 
   private suspendRuntime(): void {
     if (this._animationFrameId !== null) {
@@ -121,7 +168,25 @@ export default class GameScene extends Scene {
     this._exited = false;
 
     const plan = planMatchKits(loadPregameConfig());
-    await loadSpells(plannedSpellIds(plan));
+    const kitIds = plannedSpellIds(plan);
+    const artKeys = matchArtKeys(plan);
+
+    this._kitsLoaded = 0;
+    this._kitsTotal = kitIds.length + artKeys.length;
+    const step = () => {
+      this._kitsLoaded += 1;
+    };
+
+    await Promise.all([
+      loadSpells(kitIds, step),
+      // `.catch` per image, not for the batch: a missing portrait is a
+      // placeholder square, not a reason to refuse the match.
+      ...artKeys.map(key =>
+        AssetManager.ensure(key)
+          .catch(() => undefined)
+          .then(step)
+      ),
+    ]);
     if (this._exited) return;
 
     this.game = new Game(plan);
@@ -186,7 +251,58 @@ export default class GameScene extends Scene {
   }
 
   draw() {
-    this.game?.draw();
+    if (this.game) {
+      this.game.draw();
+      return;
+    }
+    // No match yet: either the kits are still arriving, or `stopGame` has run
+    // and the scene manager is a frame away from swapping us out. Only the
+    // first deserves a screen — painting one on the way out would flash.
+    if (!this._exited) this.drawKitLoading();
+  }
+
+  /**
+   * What the player looks at between pressing Chơi and the first frame.
+   *
+   * `startGame` awaits the match's spell chunks, and until that resolves
+   * `this.game` is null and `draw` had nothing to paint — so the canvas sat
+   * black for as long as the network took. On a warm cache that is a flicker;
+   * on a phone on mobile data it is a blank screen with no way to tell a slow
+   * match from a broken one.
+   *
+   * Drawn on the p5 canvas rather than as a DOM overlay because the canvas is
+   * already up (`enter` creates it before `startGame` runs) and this has to
+   * disappear the instant the match paints over it — one fewer thing to tear
+   * down on a boundary that already has `_exited` to think about.
+   */
+  private drawKitLoading(): void {
+    const span = this._kitsTotal > 0 ? Math.min(1, this._kitsLoaded / this._kitsTotal) : 0;
+    const barWidth = Math.min(360, width * 0.6);
+    const barLeft = (width - barWidth) / 2;
+    const barTop = height / 2;
+
+    push();
+    background(10, 20, 40);
+
+    noStroke();
+    fill(214, 202, 154);
+    textAlign(CENTER, BOTTOM);
+    textSize(18);
+    text('Đang vào trận…', width / 2, barTop - 18);
+
+    // The track, then the fill. A hairline of fill at zero so the bar reads as
+    // a bar rather than as an empty box while the first chunk is in flight.
+    fill(28, 45, 72);
+    rectMode(CORNER);
+    rect(barLeft, barTop, barWidth, 6, 3);
+    fill(200, 170, 90);
+    rect(barLeft, barTop, Math.max(4, barWidth * span), 6, 3);
+
+    fill(140, 160, 190);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(`Đang tải bộ chiêu… ${Math.round(span * 100)}%`, width / 2, barTop + 16);
+    pop();
   }
 
   keyPressed(event?: KeyboardEvent) {
