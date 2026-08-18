@@ -96,6 +96,7 @@ async function walk(directory, root) {
     throw error;
   });
   for (const entry of entries) {
+    if (entry.name.startsWith('.')) continue;
     const absolutePath = resolve(directory, entry.name);
     if (entry.isDirectory()) paths.push(...await walk(absolutePath, root));
     else {

@@ -371,4 +371,35 @@ describe('TargetResolver', () => {
       })
     ).toEqual({ ok: false, reason: 'TARGET_INVALID' });
   });
+
+  it('rejects candidates without explicit targetable=true by default', () => {
+    const spellObject = {
+      position: { x: 12, y: 20 },
+      teamId: 'red',
+      // No targetable property (e.g. SpellObject, ParticleSystem)
+    };
+    const deadUnit = {
+      position: { x: 12, y: 20 },
+      teamId: 'red',
+      targetable: false,
+    };
+    const removedUnit = {
+      position: { x: 12, y: 20 },
+      teamId: 'red',
+      targetable: true,
+      toRemove: true,
+    };
+
+    const request = baseRequest({
+      cursorWorld: { x: 12, y: 20 },
+      range: 100,
+      targetTeam: 'ENEMY',
+      queryCandidates: () => [spellObject, deadUnit, removedUnit],
+    });
+
+    expect(TargetResolver.resolve('UNIT', request)).toEqual({
+      ok: false,
+      reason: 'TARGET_INVALID',
+    });
+  });
 });

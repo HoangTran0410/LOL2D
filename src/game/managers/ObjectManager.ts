@@ -146,13 +146,17 @@ export const PredefinedFilters = {
     object =>
       !types.some(type => object instanceof type),
   excludeObjects:
-    (objects: GameObject[]): GameObjectFilter =>
+    (
+      objects: (GameObject | undefined | null)[] | Set<GameObject | undefined | null>
+    ): GameObjectFilter =>
     object =>
-      !objects.some(excluded => excluded === object),
+      objects instanceof Set
+        ? !objects.has(object)
+        : !objects.some(excluded => excluded === object),
   includeDead: (object: GameObject): object is AttackableUnit =>
     object instanceof AttackableUnit && object.isDead,
   excludeDead: (object: GameObject): boolean =>
-    !(object instanceof AttackableUnit && object.isDead),
+    object instanceof AttackableUnit ? !object.isDead : Boolean(object),
   includeUntargetable: (object: GameObject): boolean =>
     !hasTargetableProperty(object) || !Boolean(object.targetable),
   excludeUntargetable: (object: GameObject): boolean =>
@@ -454,14 +458,23 @@ export default class ObjectManager {
     let objects: GameObject[];
     if (area) {
       const regions = this._objectsTree.retrieve(area) as GameObjectRegion[];
-      objects = new Array<GameObject>(regions.length);
-      for (let i = 0; i < regions.length; i++) objects[i] = regions[i].data;
+      objects = [];
+      for (let i = 0; i < regions.length; i++) {
+        const data = regions[i]?.data;
+        if (data && !data.toRemove) objects.push(data);
+      }
     } else {
       objects = this.objects;
     }
 
     if (!filters || filters.length === 0) {
-      return objects;
+      if (area) return objects;
+      const clean: GameObject[] = [];
+      for (let i = 0; i < objects.length; i++) {
+        const o = objects[i];
+        if (o && !o.toRemove) clean.push(o);
+      }
+      return clean;
     }
 
     // Hand-rolled instead of `[...filters]` + `.filter(o => resolved.every(f => f(o)))`:
@@ -474,6 +487,7 @@ export default class ObjectManager {
     const result: GameObject[] = [];
     for (let i = 0; i < objects.length; i++) {
       const object = objects[i];
+      if (!object || object.toRemove) continue;
       let passed = true;
       for (let f = 0; f < filters.length; f++) {
         if (!filters[f](object)) {

@@ -14,7 +14,8 @@ export interface TargetInfo {
 export const defaultIsTargetable = (candidate: unknown): boolean =>
   typeof candidate === 'object' &&
   candidate !== null &&
-  (candidate as { targetable?: boolean }).targetable !== false;
+  (candidate as { targetable?: boolean }).targetable === true &&
+  (candidate as { toRemove?: boolean }).toRemove !== true;
 
 export const defaultTargetInfo = (candidate: unknown): TargetInfo | null => {
   if (typeof candidate !== 'object' || candidate === null) return null;
@@ -150,6 +151,8 @@ export class TargetResolver {
     if (mode !== 'UNIT') return { ok: true, context: createContext(request) };
 
     const candidates = request.queryCandidates?.() ?? [];
+    const isTargetable = request.isTargetable ?? defaultIsTargetable;
+    const getTargetInfo = request.getTargetInfo ?? defaultTargetInfo;
     const acquisitionRadius = Math.max(0, request.acquisitionRadius ?? CURSOR_ACQUISITION_RADIUS);
     let hadIneligibleByRange = false;
 
@@ -167,9 +170,10 @@ export class TargetResolver {
     let nearestDistance = Number.POSITIVE_INFINITY;
 
     for (const candidate of candidates) {
-      const info = request.getTargetInfo?.(candidate);
+      if (!candidate || !isTargetable(candidate)) continue;
+      const info = getTargetInfo(candidate);
       if (!info) continue;
-      if (request.isTargetable?.(candidate) === false || !matchesTeam(request, info.teamId)) {
+      if (!matchesTeam(request, info.teamId)) {
         continue;
       }
       // UNIT range is measured centre to centre against a body that separation
