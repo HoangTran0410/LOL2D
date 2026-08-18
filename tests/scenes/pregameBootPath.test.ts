@@ -1,0 +1,127 @@
+import { describe, expect, it } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
+ * The pregame screen renders the roster without loading a spell.
+ *
+ * `SetupScene` used to open with `import * as AllSpells` two hops away — it
+ * imported `preset.ts`, and `preset.ts` built `new SpellClass(...)` for all 238
+ * abilities to read their names and icons. Vite's `manualChunks` sends anything
+ * under `src/game/` to the `game` chunk, so choosing a champion meant fetching
+ * and parsing the entire match: 1.1MB to draw a grid of pictures.
+ *
+ * It is now generated data (`src/generated/spellCatalog.ts`), and the pregame
+ * chunk is ~133KB. One `import` of the wrong module puts the megabyte back,
+ * with nothing in the source looking wrong and nothing but a bundle diff to
+ * show for it — the same failure mode `menuBootPath.test.ts` exists for, one
+ * screen further in.
+ *
+ * `import type` is fine and deliberately allowed: type-only imports are erased
+ * before Rollup sees them.
+ */
+const ROOT = join(__dirname, '../..');
+const SRC = join(ROOT, 'src');
+
+/**
+ * What the setup screen may still reach inside `src/game/`.
+ *
+ * Every one is class-free data or `localStorage`, and every one is carved into
+ * the `pregame` chunk by `vite.config.ts`. Adding to this list means adding the
+ * same path to that carve-out, or the chunking silently reverts.
+ */
+const ALLOWED_GAME_MODULES = [
+  '@/game/config/PregameConfig',
+  '@/game/config/savedKits',
+  '@/game/config/spellCatalog',
+  '@/game/constants',
+  '@/game/input/touchPreferences',
+];
+
+function pregameFiles(): string[] {
+  const files = ['scenes/SetupScene.ts', 'scenes/SetupScene.vue'];
+  for (const name of readdirSync(join(SRC, 'scenes/setup'))) {
+    if (name.endsWith('.ts') || name.endsWith('.vue')) files.push(`scenes/setup/${name}`);
+  }
+  return files;
+}
+
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
+/** Static `import ... from '<spec>'` only — `import(` is dynamic, `import type` is erased. */
+function staticImports(source: string): string[] {
+  const found: string[] = [];
+  const pattern = /(^|\n)\s*import\s+(?!type\s)([^;'"]*?)from\s*['"]([^'"]+)['"]/g;
+  for (const [, , clause, specifier] of source.matchAll(pattern)) {
+    if (/^\s*type\s/.test(clause)) continue;
+    found.push(specifier);
+  }
+  return found;
+}
+
+const reachesTheMatch = (specifier: string): boolean =>
+  (specifier.startsWith('@/game/') || specifier.includes('/game/')) &&
+  !ALLOWED_GAME_MODULES.includes(specifier);
+
+describe('the pregame screen boots without the match', () => {
+  it('finds the files it claims to check', () => {
+    const files = pregameFiles();
+    expect(files.length).toBeGreaterThan(10);
+    for (const file of files) {
+      expect(() => readFileSync(join(SRC, file), 'utf8'), `${file} is missing`).not.toThrow();
+    }
+  });
+
+  it('no pregame module statically imports the match', () => {
+    const offenders: string[] = [];
+
+    for (const file of pregameFiles()) {
+      const source = stripComments(readFileSync(join(SRC, file), 'utf8'));
+      for (const specifier of staticImports(source)) {
+        if (reachesTheMatch(specifier)) offenders.push(`${file} -> ${specifier}`);
+      }
+    }
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('nothing on the pregame path reaches the spell barrel', () => {
+    // `preset.ts` is the specific module that used to do this, and the one an
+    // editor auto-import is most likely to bring back — it still exports the
+    // same names, so the code would compile and only the bundle would change.
+    const offenders: string[] = [];
+    for (const file of pregameFiles()) {
+      const source = stripComments(readFileSync(join(SRC, file), 'utf8'));
+      if (/from\s*['"][^'"]*(?:game\/preset|spells\/index)['"]/.test(source)) offenders.push(file);
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('vite.config still carves the pregame modules out of the game chunk', () => {
+    // The source rule above is necessary and not sufficient: the imports can be
+    // perfectly clean and the chunking still collapse, because `manualChunks`
+    // is a path test and `src/scenes/setup/` sits outside `src/game/` while the
+    // in-game practice panel imports the very same components. Delete the
+    // carve-out and Rollup quietly folds the picker back into `game`.
+    const config = readFileSync(join(ROOT, 'vite.config.ts'), 'utf8');
+    expect(config).toMatch(/return 'pregame'/);
+    expect(config).toContain("id.includes('src/scenes/setup/')");
+    expect(config).toContain("id.includes('src/game/config/')");
+    expect(config).toMatch(/return 'shared'/);
+    expect(config).toMatch(/dom\\?\.utils/);
+  });
+
+  it('the scan can see a violation it is meant to catch', () => {
+    const sample = `
+      import { SpellGroups } from '@/game/preset';
+      import { SLOT_COUNT } from '@/game/config/PregameConfig';
+      import type Game from '@/game/Game';
+      const later = () => import('@/game/Game');
+    `;
+    const caught = staticImports(sample).filter(reachesTheMatch);
+    // the preset import only: not the allowed config one, not the type, not the dynamic
+    expect(caught).toEqual(['@/game/preset']);
+  });
+});

@@ -1,9 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
-import { ATTACK, SpellGroups } from '../../../src/game/preset';
+import { ATTACK, spellGroups } from '../../../src/game/preset';
 import { DEFAULT_CHAMPION_ATTACK } from '../../../src/game/gameObject/attackableUnits/Champion';
 import { MELEE_RANGE_THRESHOLD } from '../../../src/game/combat/BasicAttack';
 import { MAX_ATTACK_SPEED } from '../../../src/game/gameObject/Stats';
+import { loadEverySpellForTests } from '../spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 /**
  * Roles have to actually differ.
@@ -67,7 +73,7 @@ describe('basic-attack profiles', () => {
   it('every playable champion declares a profile', () => {
     // a champion left on the default is one that silently opted out of roles
     const unassigned: string[] = [];
-    for (const group of SpellGroups) {
+    for (const group of spellGroups()) {
       // only champion shelves: these are the ones with a full four-spell kit
       if (!group.image?.startsWith('champ_')) continue;
       if (!group.attack) unassigned.push(group.name);

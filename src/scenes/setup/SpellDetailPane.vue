@@ -14,7 +14,7 @@
  * that only ever show one spell, so the mode went with it.
  */
 import FormatUtils from '@/utils/format.utils';
-import type { SpellDisplay } from '@/game/preset';
+import type { SpellDisplay } from '@/game/config/spellCatalog';
 import SpellIcon from './SpellIcon.vue';
 
 defineProps<{

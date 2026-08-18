@@ -73,7 +73,11 @@ import {
   type SavedKit,
 } from '@/game/config/savedKits';
 import { SpellHotKeys } from '@/game/constants';
-import { BASIC_ATTACK_ID, getSpellDisplay, type SpellCatalogEntry } from '@/game/preset';
+import {
+  BASIC_ATTACK_ID,
+  spellDisplayOf,
+  type SpellCatalogEntry,
+} from '@/game/config/spellCatalog';
 import { getPregameCatalog, type KitShelf } from './pregameCatalog';
 import KitRoster from './KitRoster.vue';
 import SpellDetailPane from './SpellDetailPane.vue';
@@ -95,7 +99,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ change: [ChampionLoadout]; close: [] }>();
 
-const { champions, summoners, catalogById, catalogByClass, kitShelves } = getPregameCatalog();
+const { champions, summoners, catalogById, kitShelves } = getPregameCatalog();
 
 /** A, Q, W, E, R, D, F — same order and source as the real in-game hotkeys. */
 const SLOT_LABELS = SpellHotKeys.map(code => String.fromCharCode(code));
@@ -136,7 +140,7 @@ const resolveSlots = (loadout: ChampionLoadout): (SpellCatalogEntry | null)[] =>
   if (!champion) return [entryById(BASIC_ATTACK_ID), null, null, null, null, ...tail];
   return [
     entryById(BASIC_ATTACK_ID),
-    ...champion.spells.map(spell => catalogByClass.get(spell.spellClass) ?? null),
+    ...champion.spells.map(spell => catalogById.get(spell.id) ?? null),
     ...tail,
   ];
 };
@@ -184,7 +188,7 @@ const {
 } = peek;
 
 /** The panel's copy of a spell, rebuilt under this match's CDR/URF — same as `KitRoster.detailOf`. */
-const detailOf = (entry: SpellCatalogEntry) => getSpellDisplay(entry.spellClass, props.matchRules);
+const detailOf = (entry: SpellCatalogEntry) => spellDisplayOf(entry.id, props.matchRules);
 
 /**
  * Same rule the roster's `pick` follows: a hold has already answered "what is

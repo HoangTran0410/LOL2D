@@ -26,8 +26,7 @@ import { ref, computed } from 'vue';
 import { usePregameConfig } from './setup/usePregameConfig';
 import { useTouchUi } from './setup/useTouchUi';
 import { AI_COUNT_MAX, type ChampionLoadout } from '@/game/config/PregameConfig';
-import { getSpellDisplay, type SpellDisplay } from '@/game/preset';
-import type { SpellClass } from './setup/types';
+import { isSpellCatalogId, spellDisplayOf, type SpellDisplay } from '@/game/config/spellCatalog';
 import PlayersTab from './setup/PlayersTab.vue';
 import SettingsTab from './setup/SettingsTab.vue';
 import LoadoutEditorModal from './setup/LoadoutEditorModal.vue';
@@ -95,8 +94,9 @@ const removeBot = (index: number): void => removeBotAt(index);
 // see `SpellPreviewModal.vue`'s file comment for why that already guarantees
 // "one dialog at a time" without needing to coordinate with `editTarget`.
 const previewSpell = ref<SpellDisplay | null>(null);
-const openPreview = (spellClass: SpellClass): void => {
-  previewSpell.value = getSpellDisplay(spellClass, matchRules.value);
+const openPreview = (id: string): void => {
+  if (!isSpellCatalogId(id)) return;
+  previewSpell.value = spellDisplayOf(id, matchRules.value);
 };
 const closePreview = (): void => {
   previewSpell.value = null;

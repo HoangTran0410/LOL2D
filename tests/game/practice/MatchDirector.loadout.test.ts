@@ -1,9 +1,15 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import MatchDirector from '../../../src/game/MatchDirector';
 import { DEFAULT_CHAMPION_LOADOUT } from '../../../src/game/config/PregameConfig';
 import type { ChampionLoadout } from '../../../src/game/config/PregameConfig';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import { context } from './helpers';
+import { loadEverySpellForTests } from '../spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 afterEach(() => vi.unstubAllGlobals());
 

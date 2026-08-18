@@ -1,5 +1,8 @@
 import { Scene } from '@/managers/SceneManager';
 import Game, { renderFpsPreference } from '@/game/Game';
+import { planMatchKits, plannedSpellIds } from '@/game/preset';
+import { loadRemainingSpells, loadSpells } from '@/game/spellRegistry';
+import { loadPregameConfig } from '@/game/config/PregameConfig';
 import MenuScene from './MenuScene';
 import DomUtils from '@/utils/dom.utils';
 import AssetManager from '@/managers/AssetManager';
@@ -27,6 +30,8 @@ export default class GameScene extends Scene {
   canvas!: any;
   game: Game | null = null;
   private _animationFrameId: number | null = null;
+  /** Set by `stopGame`, so a slow kit load that resolves after an exit is dropped. */
+  private _exited = false;
 
   private suspendRuntime(): void {
     if (this._animationFrameId !== null) {
@@ -90,11 +95,37 @@ export default class GameScene extends Scene {
 
     document.addEventListener('visibilitychange', this._handleVisibilityChange);
 
-    this.startGame();
+    void this.startGame();
   }
 
-  startGame() {
-    this.game = new Game();
+  /**
+   * Fetch the kits this match will play, then start it.
+   *
+   * Async because the spell catalogue is loaded per champion now (see
+   * `game/spellRegistry.ts`). The order is load-bearing in both directions:
+   *
+   *  - **Plan, then load, then construct.** A default match is six 'random'
+   *    loadouts, so "what does this match need?" can only be answered by rolling
+   *    the dice first — which is why `Game` is handed the plan rather than
+   *    rolling its own, and why the same plan must be the one it builds from.
+   *  - **Load the rest afterwards.** A bot re-rolls its kit on respawn, and that
+   *    happens inside `update()` with no chance to await anything. The
+   *    background load closes that gap within a second, long before anything has
+   *    died; `preset.classForId` is the backstop if it has not.
+   *
+   * The scene may have been left before the load resolves — a player pressing
+   * back out of a slow connection — so `exited` is checked before touching
+   * anything.
+   */
+  async startGame() {
+    this._exited = false;
+
+    const plan = planMatchKits(loadPregameConfig());
+    await loadSpells(plannedSpellIds(plan));
+    if (this._exited) return;
+
+    this.game = new Game(plan);
+    this.warmRemainingSpells();
     // The match's own way out, since Escape is no longer one. `Game` holds no
     // reference to the scene manager and must not gain one — see
     // `Game.onExitRequested`.
@@ -104,7 +135,29 @@ export default class GameScene extends Scene {
     this.updateLoop();
   }
 
+  /**
+   * Pull the rest of the catalogue in once the match has settled.
+   *
+   * Deferred to idle rather than fired beside `new Game`: it is 30-60 chunk
+   * requests, and the frames right after a match opens are the ones that decide
+   * whether it feels smooth. The 2s timeout is the floor, not the target — a bot
+   * cannot respawn before then, which is the only thing that needs these.
+   *
+   * Fire-and-forget on purpose: nothing in a match may block on it, and a
+   * chunk that fails to arrive is handled by `preset.classForId`.
+   */
+  private warmRemainingSpells(): void {
+    const idle = (
+      window as unknown as {
+        requestIdleCallback?: (cb: () => void, options?: { timeout: number }) => void;
+      }
+    ).requestIdleCallback;
+    if (idle) idle(() => void loadRemainingSpells(), { timeout: 2000 });
+    else window.setTimeout(() => void loadRemainingSpells(), 2000);
+  }
+
   stopGame() {
+    this._exited = true;
     const resumeP5ForNextScene = !!this.game?.paused && !document.hidden;
     if (this._animationFrameId !== null) {
       clearTimeout(this._animationFrameId);

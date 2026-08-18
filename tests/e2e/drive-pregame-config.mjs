@@ -702,19 +702,25 @@ try {
     );
   }
 
-  // sample descriptions + CDR-aware costs across several champions directly
-  // from preset.ts, the same function every description surface calls.
+  // Sample descriptions + CDR-aware costs across several champions directly
+  // from `config/spellCatalog.ts` — the module every description surface on
+  // this screen calls, and deliberately *not* `preset.ts`: the whole point of
+  // the split is that the pregame screen never loads a spell class, so a probe
+  // that reached for `preset.getSpellDisplay` would be exercising a path the
+  // screen no longer uses.
   report.abilityPreviewSample = await evaluate(async () => {
-    const preset = await import('/src/game/preset.ts');
-    const champs = preset.listSelectableChampions().slice(0, 5);
+    const catalog = await import('/src/game/config/spellCatalog.ts');
+    const champs = catalog.listSelectableChampions().slice(0, 5);
     const noRules = { cooldownMultiplier: 1, manaFree: false };
     const cdrRules = { cooldownMultiplier: 0.5, manaFree: false };
     return champs.map(c => ({
       name: c.name,
-      allDescriptionsNonEmpty: c.spells.every(s => !!preset.getSpellDisplay(s.spellClass, noRules).description?.trim()),
+      allDescriptionsNonEmpty: c.spells.every(
+        s => !!catalog.spellDisplayOf(s.id, noRules).description?.trim()
+      ),
       allRespectCdr: c.spells.every(s => {
-        const base = preset.getSpellDisplay(s.spellClass, noRules).effectiveCoolDownMs;
-        const withCdr = preset.getSpellDisplay(s.spellClass, cdrRules).effectiveCoolDownMs;
+        const base = catalog.spellDisplayOf(s.id, noRules).effectiveCoolDownMs;
+        const withCdr = catalog.spellDisplayOf(s.id, cdrRules).effectiveCoolDownMs;
         return withCdr < base;
       }),
     }));

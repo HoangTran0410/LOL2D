@@ -5,7 +5,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import { getPregameCatalog } from '../../src/scenes/setup/pregameCatalog';
-import { SpellGroups } from '../../src/game/preset';
+import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
 
 /**
  * The roster's order, and the two shelves that are not a champion.
@@ -36,8 +36,8 @@ describe('the roster pins the two non-champion shelves and sorts the rest', () =
     expect(firstChampionAt).toBe(pinned.length);
   });
 
-  it('keeps them in SpellGroups order rather than sorting them too', () => {
-    const source = SpellGroups.map(group => group.name);
+  it('keeps them in CHAMPION_KITS order rather than sorting them too', () => {
+    const source = CHAMPION_KITS.map(group => group.name);
     const pinnedNames = pinned.map(shelf => shelf.name);
     const bySource = [...pinnedNames].sort((a, b) => source.indexOf(a) - source.indexOf(b));
     expect(pinnedNames).toEqual(bySource);
@@ -48,11 +48,13 @@ describe('the roster pins the two non-champion shelves and sorts the rest', () =
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('really did reorder — the champions are not still in SpellGroups order', () => {
+  it('really did reorder — the champions are not still in CHAMPION_KITS order', () => {
     // Without this the sort assertion above passes on an accident: a source
     // list that happened to be alphabetical would satisfy it having done
-    // nothing. `SpellGroups` starts Yasuo, Shaco, Ahri, so it is not.
-    const source = SpellGroups.filter(group => group.spells.length === 4).map(group => group.name);
+    // nothing. `CHAMPION_KITS` starts Yasuo, Shaco, Ahri, so it is not.
+    const source = CHAMPION_KITS.filter(group => group.spells.length === 4).map(
+      group => group.name
+    );
     expect(champions.map(shelf => shelf.name)).not.toEqual(source);
   });
 });

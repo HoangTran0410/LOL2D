@@ -21,9 +21,8 @@
 import { computed } from 'vue';
 import AssetManager from '@/managers/AssetManager';
 import type { ChampionLoadout } from '@/game/config/PregameConfig';
-import type { SpellCatalogEntry } from '@/game/preset';
+import type { SpellCatalogEntry } from '@/game/config/spellCatalog';
 import { getPregameCatalog } from './pregameCatalog';
-import type { SpellClass } from './types';
 import SpellIcon from './SpellIcon.vue';
 
 const props = defineProps<{
@@ -33,7 +32,7 @@ const props = defineProps<{
   /** Shows the per-card delete button — every bot has one; removing it shifts the rest up (see `PlayersTab.vue`). */
   removable?: boolean;
 }>();
-const emit = defineEmits<{ open: []; remove: []; previewAbility: [spellClass: SpellClass] }>();
+const emit = defineEmits<{ open: []; remove: []; previewAbility: [id: string] }>();
 
 const { champions, spellCatalog } = getPregameCatalog();
 
@@ -55,7 +54,7 @@ const avatarKey = computed(() => pickedChampion.value?.avatar ?? null);
 /** Just the fields a kit-icon button needs — `champions[i].spells` (`SelectableChampionSpell`) and
  * `spellCatalog` (`SpellCatalogEntry`) both carry more than this, and structurally satisfy it either way. */
 interface KitIcon {
-  spellClass: SpellClass;
+  id: string;
   display: SpellCatalogEntry['display'];
 }
 
@@ -93,7 +92,7 @@ const kitIcons = computed<KitIcon[]>(() => {
             type="button"
             class="kit-icon-btn"
             title="Xem mô tả chiêu"
-            @click="emit('previewAbility', entry.spellClass)"
+            @click="emit('previewAbility', entry.id)"
           >
             <SpellIcon :display="entry.display" />
           </button>

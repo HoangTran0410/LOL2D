@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
 
-import { SpellGroups } from '../../../src/game/preset';
+import { spellGroups } from '../../../src/game/preset';
 import SpellBase from '../../../src/game/gameObject/Spell';
 import type Spell from '../../../src/game/gameObject/Spell';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -15,6 +15,12 @@ import {
   installSketchMathGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { loadEverySpellForTests } from '../spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 /**
  * A spell that states a reach must draw that reach.
@@ -99,7 +105,7 @@ describe('every spell with a declared reach previews it', () => {
   function allSpells(): { name: string; make: () => Spell }[] {
     const out: { name: string; make: () => Spell }[] = [];
     const seen = new Set<unknown>();
-    for (const group of SpellGroups as any[]) {
+    for (const group of spellGroups() as any[]) {
       for (const SpellClass of group.spells ?? []) {
         if (!SpellClass || seen.has(SpellClass)) continue;
         seen.add(SpellClass);

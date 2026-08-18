@@ -7,7 +7,7 @@
  * unreachable) and in `listSpellCatalog` (nothing silently missing from the
  * free-form picker).
  */
-import { describe, expect, it, vi } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../src/managers/AssetManager', () => ({
   default: {
@@ -19,12 +19,19 @@ vi.mock('../../src/managers/AssetManager', () => ({
 
 import * as AllSpells from '../../src/game/gameObject/spells/index';
 import {
-  SpellGroups,
+  spellGroups,
   getChampionPresetFromLoadout,
   listSpellCatalog,
   getSpellDisplay,
+  spellClassOfId,
 } from '../../src/game/preset';
 import { SLOT_COUNT, type ChampionLoadout } from '../../src/game/config/PregameConfig';
+import { loadEverySpellForTests } from '../game/spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 const barrelKeys = Object.keys(AllSpells);
 
@@ -35,15 +42,18 @@ describe('listSpellCatalog — catalogue completeness', () => {
     expect(new Set(catalog.map(e => e.id))).toEqual(new Set(barrelKeys));
   });
 
-  it('every catalogue entry resolves back to the exact class AllSpells exports under that id', () => {
+  it('every catalogue id resolves back to the exact class AllSpells exports under it', () => {
+    // The catalogue is generated data now; this is the join back to the code,
+    // and the one assertion that would catch the generated file and the barrel
+    // having drifted apart.
     for (const entry of listSpellCatalog()) {
-      expect(entry.spellClass).toBe((AllSpells as Record<string, unknown>)[entry.id]);
+      expect(spellClassOfId(entry.id)).toBe((AllSpells as Record<string, unknown>)[entry.id]);
     }
   });
 
   it('every spell in AllSpells appears in SpellGroups (nothing silently unreachable from the champion/summoner shelves)', () => {
     const referenced = new Set<unknown>();
-    for (const group of SpellGroups) {
+    for (const group of spellGroups()) {
       for (const spellClass of group.spells) referenced.add(spellClass);
     }
     const missing = barrelKeys.filter(

@@ -1,0 +1,692 @@
+import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import { spellCatalog, type SpellCatalogId } from '@/generated/spellCatalog';
+import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
+import type { MatchRules } from './PregameConfig';
+
+/**
+ * The spell catalogue as **data**: names, icons, numbers and which abilities
+ * make up which champion — everything the pregame screen renders, and not one
+ * line of anything a match executes.
+ *
+ * ## Why this is not in `preset.ts`
+ *
+ * It was. `preset.ts` answered "what does this ability look like?" by building
+ * a throwaway `new SpellClass({ game: { matchRules } })` and reading seven
+ * fields off it, which meant the setup screen's very first import pulled
+ * `import * as AllSpells` — all 238 spell modules, ~71% of the 1.1MB game
+ * chunk — to put names and icons on a grid. Vite's `manualChunks` sends
+ * anything under `src/game/` to the `game` chunk, so there was no arranging
+ * around it: touching `preset.ts` *was* loading the game.
+ *
+ * The instances are still built, once, by `scripts/generate-spell-catalog.mjs`
+ * at build time. This module is the read side, and the only thing it needs at
+ * runtime is a `Record` of strings and numbers.
+ *
+ * ## The two numbers that move
+ *
+ * `SpellDisplay` has seven fields and five are constants. The other two —
+ * `effectiveCoolDownMs`, `effectiveManaCost` — depend on the match's rules,
+ * and both are *pure functions* of the constants: `Spell.reducedCooldown` is
+ * `duration * multiplier` and `Spell.effectiveMana` is `manaFree ? 0 : amount`.
+ * So the generated file stores the rule-free numbers and `spellDisplayOf`
+ * reapplies the rules here, producing the identical object `getSpellDisplay`
+ * would have. `tests/game/config/spellCatalog.test.ts` asserts that
+ * equivalence against the real classes, spell by spell — which is what keeps
+ * this from drifting into a second, quietly-wrong source of truth.
+ *
+ * `preset.ts` still owns everything that needs a *class*: resolving a stored
+ * loadout into castable spells, and `getSpellDisplay` for the in-game HUD,
+ * which is already inside the game chunk and has nothing to save.
+ */
+
+/** The `AllSpells` barrel key of the basic attack — the A slot's default, and the way back to it. */
+export const BASIC_ATTACK_ID = 'BasicAttack';
+
+/** No cooldown reduction, no URF — what a spell shows outside any pregame context. */
+const NO_MATCH_RULES: MatchRules = { cooldownMultiplier: 1, manaFree: false };
+
+export interface SpellDisplay {
+  /**
+   * The icon, ready for an `<img src>`. Resolved here from the generated
+   * `iconKey` rather than stored, because a built URL is a content hash — the
+   * generated file would need rewriting every time an image changed.
+   */
+  iconUrl: string | null;
+  name: string;
+  /** Vietnamese HTML — `<span class="damage">`/`.buff`/`.time`/plain `<span>`. */
+  description: string;
+  /** The spell's own tuning number, unaffected by match rules. */
+  coolDownMs: number;
+  /** The spell's own tuning number, unaffected by match rules. */
+  manaCost: number;
+  /** `coolDownMs` after cooldown reduction — equal to it under no match rules. */
+  effectiveCoolDownMs: number;
+  /** `manaCost`, zeroed under URF — equal to `manaCost` under no match rules. */
+  effectiveManaCost: number;
+}
+
+/** Whether a stored slot choice still names a spell this build has. */
+export const isSpellCatalogId = (id: string): id is SpellCatalogId => id in spellCatalog;
+
+/** Every catalogue id, in the barrel's own order. */
+export const spellCatalogIds = (): SpellCatalogId[] =>
+  Object.keys(spellCatalog) as SpellCatalogId[];
+
+/**
+ * One spell's display fields, with match rules applied.
+ *
+ * The two rule-sensitive numbers are recomputed rather than stored, by the
+ * same two expressions `Spell` uses — see this module's header for why that is
+ * exact rather than approximate.
+ */
+export const spellDisplayOf = (
+  id: SpellCatalogId,
+  matchRules: MatchRules = NO_MATCH_RULES
+): SpellDisplay => {
+  const entry = spellCatalog[id];
+  return {
+    // `?.url` rather than `.url`: a handle is always returned in the real
+    // manager, but "no icon" has to stay a missing picture rather than a thrown
+    // error — which is exactly what the class-shaped `getSpellDisplay` promised
+    // with its own `handle?.url ?? null`.
+    iconUrl: entry.iconKey ? (AssetManager.get(entry.iconKey)?.url ?? null) : null,
+    name: entry.name,
+    description: entry.description,
+    coolDownMs: entry.coolDownMs,
+    manaCost: entry.manaCost,
+    effectiveCoolDownMs: entry.specCoolDownMs * matchRules.cooldownMultiplier,
+    effectiveManaCost: matchRules.manaFree ? 0 : entry.manaCost,
+  };
+};
+
+/**
+ * Basic-attack profiles by role.
+ *
+ * Every champion in the game shared `DEFAULT_CHAMPION_ATTACK` — the same 16
+ * damage at 0.8/s from the same 300 range — so a marksman's autos were a tank's
+ * autos, and a kit built to be carried by attack speed had no attack speed to be
+ * carried by. Two consequences fall out of fixing that:
+ *
+ *  - **Melee is finally melee.** `MELEE_RANGE_THRESHOLD` is 140 and everyone sat
+ *    at 300, so Garen and Malphite were quietly *shooting bolts*. The melee
+ *    profiles drop under the threshold, which is what makes `BasicAttackController`
+ *    swing instead, and they are paid for it in damage per hit.
+ *  - **Reach costs dps.** The ranged profiles hit softer per swing than the melee
+ *    ones; a marksman's payoff is that it never has to close, and that its dps
+ *    rises fastest under an attack-speed buff.
+ *
+ * Numbers are stated as dps against the ~100 champion pool so the trade is
+ * checkable at a glance rather than buried in two multiplied fields.
+ */
+export const ATTACK = {
+  /** 16.5 dps at the longest reach in the roster, and the best buff scaling. */
+  MARKSMAN: { damage: 10, attacksPerSecond: 1.65, range: 410 },
+  /** 12.6 dps. Autos are chip damage between cooldowns, not the plan. */
+  MAGE: { damage: 12, attacksPerSecond: 1.05, range: 385 },
+  /** 10.0 dps. The lowest in the game on purpose; the kit is the contribution. */
+  SUPPORT: { damage: 10, attacksPerSecond: 1.0, range: 385 },
+  /** 18.8 dps, melee. Burst kits that still want to finish with their hands. */
+  ASSASSIN: { damage: 15, attacksPerSecond: 1.25, range: 130 },
+  /** 18.7 dps, melee. The sustained-damage end of the roster. */
+  BRUISER: { damage: 17, attacksPerSecond: 1.1, range: 130 },
+  /** 14.3 dps, melee. Slowest swing; the body is the point, not the axe. */
+  TANK: { damage: 15, attacksPerSecond: 0.95, range: 125 },
+} as const;
+
+/**
+ * Every shelf the pregame picker offers, as ids.
+ *
+ * This is `preset.ts`'s old `SpellGroups`, with `AllSpells.Yasuo_Q` replaced by
+ * the string `'Yasuo_Q'` — the barrel key, which is the same identifier and the
+ * only one that survives minification (a bundler can rename a class's
+ * `Function.prototype.name`, never a namespace property key). `preset.ts` maps
+ * these back to classes for the match; nothing here can execute a spell.
+ *
+ * A mistyped id is a **compile error**, not a missing ability: `SpellCatalogId`
+ * is `keyof typeof spellCatalog`, generated from the barrel itself.
+ */
+export const CHAMPION_KITS: {
+  name: string;
+  image: AssetKey | null;
+  spells: SpellCatalogId[];
+  /** The champion's basic-attack profile; see `ATTACK` above. */
+  attack?: ChampionAttackTuning;
+}[] = [
+  // First, and a shelf of its own rather than a line on the summoner spell
+  // shelf: it belongs to no champion and it is not a summoner spell, it is the
+  // attack every champion already has. It is also the way back — a player who
+  // swaps slot 0 out for something else and wants `A` to attack again needs to
+  // find this, and hunting for it at the bottom of the Phép Bổ Trợ list would
+  // make that a one-way door in practice.
+  {
+    name: 'Đánh Thường',
+    image: 'spell_basic_attack',
+    spells: ['BasicAttack'],
+  },
+  {
+    name: 'Phép Bổ Trợ',
+    image: null,
+    spells: ['Flash', 'Ghost', 'Heal', 'Ignite', 'StealthWard'],
+  },
+  {
+    name: 'Yasuo',
+    attack: ATTACK.BRUISER,
+    image: 'champ_yasuo',
+
+    spells: ['Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R'],
+  },
+  {
+    name: 'Shaco',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_shaco',
+
+    spells: ['Shaco_Q', 'Shaco_W', 'Shaco_E', 'Shaco_R'],
+  },
+  {
+    name: 'Ahri',
+    attack: ATTACK.MAGE,
+    image: 'champ_ahri',
+
+    spells: ['Ahri_Q', 'Ahri_W', 'Ahri_E', 'Ahri_R'],
+  },
+  {
+    name: 'Lee Sin',
+    attack: ATTACK.BRUISER,
+    image: 'champ_leesin',
+
+    spells: ['LeeSin_Q', 'LeeSin_W', 'LeeSin_E', 'LeeSin_R'],
+  },
+  {
+    name: 'Blitzcrank',
+    attack: ATTACK.TANK,
+    image: 'champ_blitzcrank',
+
+    spells: ['Blitzcrank_Q', 'Blitzcrank_W', 'Blitzcrank_E', 'Blitzcrank_R'],
+  },
+  {
+    name: 'Lux',
+    attack: ATTACK.MAGE,
+    image: 'champ_lux',
+
+    spells: ['Lux_Q', 'Lux_W', 'Lux_E', 'Lux_R'],
+  },
+  {
+    name: 'Ashe',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_ashe',
+
+    spells: ['Ashe_Q', 'Ashe_W', 'Ashe_E', 'Ashe_R'],
+  },
+  {
+    name: "Cho'Gath",
+    attack: ATTACK.BRUISER,
+    image: 'champ_chogath',
+
+    spells: ['ChoGath_Q', 'ChoGath_W', 'ChoGath_E', 'ChoGath_R'],
+  },
+  {
+    name: 'Leblanc',
+    attack: ATTACK.MAGE,
+    image: 'champ_leblanc',
+
+    spells: ['Leblanc_Q', 'Leblanc_W', 'Leblanc_E', 'Leblanc_R'],
+  },
+  {
+    name: 'Malphite',
+    attack: ATTACK.TANK,
+    image: 'champ_malphite',
+
+    spells: ['Malphite_Q', 'Malphite_W', 'Malphite_E', 'Malphite_R'],
+  },
+  {
+    name: 'Olaf',
+    attack: ATTACK.BRUISER,
+    image: 'champ_olaf',
+
+    spells: ['Olaf_Q', 'Olaf_W', 'Olaf_E', 'Olaf_R'],
+  },
+  {
+    name: 'Teemo',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_teemo',
+
+    spells: ['Teemo_Q', 'Teemo_W', 'Teemo_E', 'Teemo_R'],
+  },
+  {
+    name: 'Veigar',
+    attack: ATTACK.MAGE,
+    image: 'champ_veigar',
+
+    spells: ['Veigar_Q', 'Veigar_W', 'Veigar_E', 'Veigar_R'],
+  },
+  {
+    name: 'Zed',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_zed',
+
+    spells: ['Zed_Q', 'Zed_W', 'Zed_E', 'Zed_R'],
+  },
+  {
+    name: 'Graves',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_graves',
+
+    spells: ['Graves_Q', 'Graves_W', 'Graves_E', 'Graves_R'],
+  },
+  {
+    name: 'Anivia',
+    attack: ATTACK.MAGE,
+    image: 'champ_anivia',
+
+    spells: ['Anivia_Q', 'Anivia_W', 'Anivia_E', 'Anivia_R'],
+  },
+  {
+    name: 'Varus',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_varus',
+
+    spells: ['Varus_Q', 'Varus_W', 'Varus_E', 'Varus_R'],
+  },
+  {
+    name: 'Pantheon',
+    attack: ATTACK.BRUISER,
+    image: 'champ_pantheon',
+
+    spells: ['Pantheon_Q', 'Pantheon_W', 'Pantheon_E', 'Pantheon_R'],
+  },
+  {
+    name: 'Thresh',
+    attack: ATTACK.SUPPORT,
+    image: 'champ_thresh',
+
+    spells: ['Thresh_Q', 'Thresh_W', 'Thresh_E', 'Thresh_R'],
+  },
+  {
+    name: 'Rammus',
+    attack: ATTACK.TANK,
+    image: 'champ_rammus',
+
+    spells: ['Rammus_Q', 'Rammus_W', 'Rammus_E', 'Rammus_R'],
+  },
+  {
+    name: 'Morgana',
+    attack: ATTACK.SUPPORT,
+    image: 'champ_morgana',
+
+    spells: ['Morgana_Q', 'Morgana_W', 'Morgana_E', 'Morgana_R'],
+  },
+  {
+    name: 'Janna',
+    attack: ATTACK.SUPPORT,
+    image: 'champ_janna',
+
+    spells: ['Janna_Q', 'Janna_W', 'Janna_E', 'Janna_R'],
+  },
+  {
+    name: 'Alistar',
+    attack: ATTACK.TANK,
+    image: 'champ_alistar',
+
+    spells: ['Alistar_Q', 'Alistar_W', 'Alistar_E', 'Alistar_R'],
+  },
+  {
+    name: 'Nocturne',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_nocturne',
+
+    spells: ['Nocturne_Q', 'Nocturne_W', 'Nocturne_E', 'Nocturne_R'],
+  },
+  {
+    name: 'Twitch',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_twitch',
+
+    spells: ['Twitch_Q', 'Twitch_W', 'Twitch_E', 'Twitch_R'],
+  },
+  {
+    name: 'Amumu',
+    attack: ATTACK.TANK,
+    image: 'champ_amumu',
+
+    spells: ['Amumu_Q', 'Amumu_W', 'Amumu_E', 'Amumu_R'],
+  },
+  {
+    name: 'Warwick',
+    attack: ATTACK.BRUISER,
+    image: 'champ_warwick',
+
+    spells: ['Warwick_Q', 'Warwick_W', 'Warwick_E', 'Warwick_R'],
+  },
+  {
+    name: 'Singed',
+    attack: ATTACK.BRUISER,
+    image: 'champ_singed',
+
+    spells: ['Singed_Q', 'Singed_W', 'Singed_E', 'Singed_R'],
+  },
+  {
+    name: 'Cassiopeia',
+    attack: ATTACK.MAGE,
+    image: 'champ_cassiopeia',
+
+    spells: ['Cassiopeia_Q', 'Cassiopeia_W', 'Cassiopeia_E', 'Cassiopeia_R'],
+  },
+  {
+    name: 'Fizz',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_fizz',
+
+    spells: ['Fizz_Q', 'Fizz_W', 'Fizz_E', 'Fizz_R'],
+  },
+  {
+    name: 'Annie',
+    attack: ATTACK.MAGE,
+    image: 'champ_annie',
+
+    spells: ['Annie_Q', 'Annie_W', 'Annie_E', 'Annie_R'],
+  },
+  {
+    name: 'Garen',
+    attack: ATTACK.BRUISER,
+    image: 'champ_garen',
+
+    spells: ['Garen_Q', 'Garen_W', 'Garen_E', 'Garen_R'],
+  },
+  {
+    name: 'Jinx',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_jinx',
+
+    spells: ['Jinx_Q', 'Jinx_W', 'Jinx_E', 'Jinx_R'],
+  },
+  {
+    name: 'Nasus',
+    attack: ATTACK.BRUISER,
+    image: 'champ_nasus',
+
+    spells: ['Nasus_Q', 'Nasus_W', 'Nasus_E', 'Nasus_R'],
+  },
+  {
+    name: 'Ekko',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_ekko',
+
+    spells: ['Ekko_Q', 'Ekko_W', 'Ekko_E', 'Ekko_R'],
+  },
+  {
+    name: 'Jarvan IV',
+    attack: ATTACK.BRUISER,
+    image: 'champ_jarvaniv',
+
+    spells: ['JarvanIV_Q', 'JarvanIV_W', 'JarvanIV_E', 'JarvanIV_R'],
+  },
+  {
+    name: 'Camille',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_camille',
+
+    spells: ['Camille_Q', 'Camille_W', 'Camille_E', 'Camille_R'],
+  },
+  {
+    name: 'Darius',
+    attack: ATTACK.BRUISER,
+    image: 'champ_darius',
+
+    spells: ['Darius_Q', 'Darius_W', 'Darius_E', 'Darius_R'],
+  },
+  {
+    name: 'Renekton',
+    attack: ATTACK.BRUISER,
+    image: 'champ_renekton',
+
+    spells: ['Renekton_Q', 'Renekton_W', 'Renekton_E', 'Renekton_R'],
+  },
+  {
+    name: 'Xin Zhao',
+    attack: ATTACK.BRUISER,
+    image: 'champ_xinzhao',
+
+    spells: ['XinZhao_Q', 'XinZhao_W', 'XinZhao_E', 'XinZhao_R'],
+  },
+  {
+    name: 'Tryndamere',
+    attack: ATTACK.BRUISER,
+    image: 'champ_tryndamere',
+
+    spells: ['Tryndamere_Q', 'Tryndamere_W', 'Tryndamere_E', 'Tryndamere_R'],
+  },
+  {
+    name: 'Master Yi',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_masteryi',
+
+    spells: ['MasterYi_Q', 'MasterYi_W', 'MasterYi_E', 'MasterYi_R'],
+  },
+  {
+    name: 'Malzahar',
+    attack: ATTACK.MAGE,
+    image: 'champ_malzahar',
+
+    spells: ['Malzahar_Q', 'Malzahar_W', 'Malzahar_E', 'Malzahar_R'],
+  },
+  {
+    name: 'Ezreal',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_ezreal',
+
+    spells: ['Ezreal_Q', 'Ezreal_W', 'Ezreal_E', 'Ezreal_R'],
+  },
+  {
+    name: 'Caitlyn',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_caitlyn',
+
+    spells: ['Caitlyn_Q', 'Caitlyn_W', 'Caitlyn_E', 'Caitlyn_R'],
+  },
+  {
+    name: 'Soraka',
+    attack: ATTACK.SUPPORT,
+    image: 'champ_soraka',
+
+    spells: ['Soraka_Q', 'Soraka_W', 'Soraka_E', 'Soraka_R'],
+  },
+  {
+    name: 'Brand',
+    attack: ATTACK.MAGE,
+    image: 'champ_brand',
+
+    spells: ['Brand_Q', 'Brand_W', 'Brand_E', 'Brand_R'],
+  },
+  {
+    name: 'Katarina',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_katarina',
+
+    spells: ['Katarina_Q', 'Katarina_W', 'Katarina_E', 'Katarina_R'],
+  },
+  {
+    name: 'Vayne',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_vayne',
+
+    spells: ['Vayne_Q', 'Vayne_W', 'Vayne_E', 'Vayne_R'],
+  },
+  {
+    name: 'Riven',
+    attack: ATTACK.BRUISER,
+    image: 'champ_riven',
+
+    spells: ['Riven_Q', 'Riven_W', 'Riven_E', 'Riven_R'],
+  },
+  {
+    name: 'Sett',
+    attack: ATTACK.BRUISER,
+    image: 'champ_sett',
+
+    spells: ['Sett_Q', 'Sett_W', 'Sett_E', 'Sett_R'],
+  },
+  {
+    name: 'Jhin',
+    attack: ATTACK.MARKSMAN,
+    image: 'champ_jhin',
+
+    spells: ['Jhin_Q', 'Jhin_W', 'Jhin_E', 'Jhin_R'],
+  },
+  {
+    name: 'Nautilus',
+    attack: ATTACK.TANK,
+    image: 'champ_nautilus',
+
+    spells: ['Nautilus_Q', 'Nautilus_W', 'Nautilus_E', 'Nautilus_R'],
+  },
+  {
+    name: 'Diana',
+    attack: ATTACK.ASSASSIN,
+    image: 'champ_diana',
+
+    spells: ['Diana_Q', 'Diana_W', 'Diana_E', 'Diana_R'],
+  },
+  {
+    name: 'Vi',
+    attack: ATTACK.BRUISER,
+    image: 'champ_vi',
+
+    spells: ['Vi_Q', 'Vi_W', 'Vi_E', 'Vi_R'],
+  },
+  {
+    name: 'Syndra',
+    attack: ATTACK.MAGE,
+    image: 'champ_syndra',
+
+    spells: ['Syndra_Q', 'Syndra_W', 'Syndra_E', 'Syndra_R'],
+  },
+  {
+    name: 'Ziggs',
+    attack: ATTACK.MAGE,
+    image: 'champ_ziggs',
+
+    spells: ['Ziggs_Q', 'Ziggs_W', 'Ziggs_E', 'Ziggs_R'],
+  },
+  {
+    name: 'Irelia',
+    attack: ATTACK.BRUISER,
+    image: 'champ_irelia',
+
+    spells: ['Irelia_Q', 'Irelia_W', 'Irelia_E', 'Irelia_R'],
+  },
+];
+
+// ---------------------------------------------------------------------------
+// The pregame screen's three lists.
+//
+// Same shapes `preset.ts` used to return, with `spellClass` replaced by `id`
+// everywhere. That substitution is the whole migration: every consumer only
+// ever used the class as an *identity token* — to key a Map, to compare two
+// icons, to hand back to `getSpellDisplay` — and an id does all three, with
+// the bonus that it round-trips through `localStorage`, which a class
+// reference never could.
+// ---------------------------------------------------------------------------
+
+export interface SelectableChampionSpell {
+  id: SpellCatalogId;
+  display: SpellDisplay;
+}
+
+export interface SelectableChampion {
+  /** Matches `ChampionLoadout.championName` and a `CHAMPION_KITS[i].name`. */
+  name: string;
+  avatar: AssetKey;
+  spells: SelectableChampionSpell[];
+}
+
+/**
+ * Champions the pregame screen can offer as a coherent kit: a real portrait
+ * and all four of Q/W/E/R implemented. `CHAMPION_KITS` also carries
+ * single-ability stubs (Olaf, Graves, Thresh, ...) used to fill the random
+ * pool — picking one of those directly would leave three of its four ability
+ * slots empty, so they're left out of *this* picker and stay reachable
+ * through "Ngẫu nhiên", and through `listSpellCatalog` slot by slot.
+ */
+export const listSelectableChampions = (): SelectableChampion[] => {
+  const champions: SelectableChampion[] = [];
+  for (const kit of CHAMPION_KITS) {
+    if (!kit.image || kit.spells.length !== 4) continue;
+    champions.push({
+      name: kit.name,
+      avatar: kit.image,
+      spells: kit.spells.map(id => ({ id, display: spellDisplayOf(id) })),
+    });
+  }
+  return champions;
+};
+
+export interface SummonerSpellOption {
+  id: SpellCatalogId;
+  display: SpellDisplay;
+}
+
+/**
+ * The "Phép Bổ Trợ" shelf. Written out explicitly rather than derived from the
+ * shelf's position in `CHAMPION_KITS`, so the D/F slots keep offering the same
+ * five things if the shelf ever moves.
+ */
+export const SUMMONER_SPELL_IDS: SpellCatalogId[] = [
+  'Flash',
+  'Ghost',
+  'Heal',
+  'Ignite',
+  'StealthWard',
+];
+
+export const listSummonerSpells = (): SummonerSpellOption[] =>
+  SUMMONER_SPELL_IDS.map(id => ({ id, display: spellDisplayOf(id) }));
+
+/**
+ * Which kit slot a spell's *name* claims: `Yasuo_Q` → 1 (Q), `Zed_R` → 4 (R).
+ * Slot order is A(0), Q(1), W(2), E(3), R(4), D(5), F(6) — `SLOT_COUNT` and
+ * `SpellHotKeys`.
+ *
+ * This exists so "apply this champion's whole kit" can put each ability where
+ * it belongs even when the champion only has some of them: `CHAMPION_KITS`
+ * carries single-ability shelves (Graves is `Graves_W` alone, Fizz is
+ * `Fizz_E`) and dropping those into Q just because they are first in their
+ * shelf would be wrong. Full four-ability shelves are always listed in
+ * Q/W/E/R order, so for those this agrees with position — it only ever
+ * *disagrees* for the partial shelves, which is the case it is here for.
+ *
+ * `null` for anything without one of those four suffixes — `BasicAttack`,
+ * `Flash`, `StealthWard` — which is also how the basic-attack and summoner
+ * shelves end up with no "apply the kit" action at all.
+ */
+const ABILITY_SLOT_BY_SUFFIX: Record<string, number> = { Q: 1, W: 2, E: 3, R: 4 };
+
+export const abilitySlotOfId = (id: string): number | null => {
+  const underscore = id.lastIndexOf('_');
+  if (underscore < 0) return null;
+  return ABILITY_SLOT_BY_SUFFIX[id.slice(underscore + 1)] ?? null;
+};
+
+/** `CHAMPION_KITS[i].name` for the first shelf a spell appears on — the "thuộc bộ: X" tag in the catalogue picker. */
+const shelfNameById = (): Map<string, string> => {
+  const map = new Map<string, string>();
+  for (const kit of CHAMPION_KITS) {
+    for (const id of kit.spells) if (!map.has(id)) map.set(id, kit.name);
+  }
+  return map;
+};
+
+export interface SpellCatalogEntry {
+  id: SpellCatalogId;
+  display: SpellDisplay;
+  groupName: string | null;
+}
+
+/** Every spell in the catalogue, for the free-form kit builder's per-slot picker. */
+export const listSpellCatalog = (): SpellCatalogEntry[] => {
+  const shelves = shelfNameById();
+  return spellCatalogIds().map(id => ({
+    id,
+    display: spellDisplayOf(id),
+    groupName: shelves.get(id) ?? null,
+  }));
+};

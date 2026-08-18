@@ -24,7 +24,7 @@ import {
   touchTargetPriorityPreference,
   type TouchModePreference,
   type TouchTargetPriority,
-} from '@/game/input/TouchControls';
+} from '@/game/input/touchPreferences';
 
 defineProps<{ isTouchUi: boolean; mode: TouchModePreference }>();
 const emit = defineEmits<{ 'update:mode': [TouchModePreference] }>();

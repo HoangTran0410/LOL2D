@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
@@ -18,9 +18,15 @@ import Malphite_Q, {
 import Pantheon_Q, { Pantheon_Q_Spear } from '../../../src/game/gameObject/spells/Pantheon_Q';
 import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
-import { SpellGroups } from '../../../src/game/preset';
+import { spellGroups } from '../../../src/game/preset';
 import type { ActivationPattern, CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, createUnit, withCastTime } from '../spell/fixtures';
+import { loadEverySpellForTests } from '../spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 /** The cast window this suite drives the runtime through — see `withCastTime`. */
 const TEST_CAST_TIME_MS = 250;
@@ -195,7 +201,7 @@ describe('representative spells through public commands', () => {
   });
 
   it('registers typed champion portraits for the migrated Anivia and Janna groups', () => {
-    const groups = Object.fromEntries(SpellGroups.map(group => [group.name, group]));
+    const groups = Object.fromEntries(spellGroups().map(group => [group.name, group]));
 
     expect(groups.Anivia.image).toBe('champ_anivia');
     expect(groups.Janna.image).toBe('champ_janna');

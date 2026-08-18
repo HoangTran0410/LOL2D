@@ -1,5 +1,5 @@
 import { ref, type CSSProperties, type Ref } from 'vue';
-import type { SpellDisplay } from '@/game/preset';
+import type { SpellDisplay } from '@/game/config/spellCatalog';
 
 /**
  * "What does this spell do?" for a roster where tapping an icon *equips* it.

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const loopDispose = vi.hoisted(() => vi.fn());
 const telegraphContexts = vi.hoisted(() => [] as CastContext[]);
@@ -47,8 +47,14 @@ import Janna_R, {
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import { SpellGroups } from '../../../src/game/preset';
+import { spellGroups } from '../../../src/game/preset';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { loadEverySpellForTests } from '../spell/registry';
+
+// Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
+// this fills the registry synchronously so a test can read the whole
+// catalogue without awaiting 238 of them.
+beforeAll(loadEverySpellForTests);
 
 const stubDrawGlobals = () => {
   const spies = {
@@ -154,7 +160,7 @@ describe('Janna R', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('exports and registers Monsoon in Janna’s spell group', () => {
-    const group = SpellGroups.find(candidate => candidate.name === 'Janna');
+    const group = spellGroups().find(candidate => candidate.name === 'Janna');
 
     expect(AllSpells.Janna_R).toBe(Janna_R);
     expect(group?.spells).toContain(Janna_R);

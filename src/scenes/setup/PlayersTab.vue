@@ -14,7 +14,6 @@
  */
 import { AI_COUNT_MAX } from '@/game/config/PregameConfig';
 import type { PregameConfig } from '@/game/config/PregameConfig';
-import type { SpellClass } from './types';
 import ParticipantCard from './ParticipantCard.vue';
 
 const props = defineProps<{ config: PregameConfig }>();
@@ -23,7 +22,7 @@ const emit = defineEmits<{
   openBot: [index: number];
   addBot: [];
   removeBot: [index: number];
-  previewAbility: [spellClass: SpellClass];
+  previewAbility: [id: string];
 }>();
 </script>
 
@@ -34,7 +33,7 @@ const emit = defineEmits<{
       is-player
       :loadout="config.player"
       @open="emit('openPlayer')"
-      @preview-ability="spellClass => emit('previewAbility', spellClass)"
+      @preview-ability="id => emit('previewAbility', id)"
     />
 
     <ParticipantCard
@@ -45,7 +44,7 @@ const emit = defineEmits<{
       removable
       @open="emit('openBot', index)"
       @remove="emit('removeBot', index)"
-      @preview-ability="spellClass => emit('previewAbility', spellClass)"
+      @preview-ability="id => emit('previewAbility', id)"
     />
 
     <p v-if="config.ai.count === 0" class="pregame-hint">

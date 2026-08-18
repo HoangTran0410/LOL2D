@@ -55,7 +55,7 @@
  * this component stays what it already was: a view of what it is handed.
  */
 import { watch, nextTick } from 'vue';
-import { getSpellDisplay, type SpellCatalogEntry } from '@/game/preset';
+import { spellDisplayOf, type SpellCatalogEntry } from '@/game/config/spellCatalog';
 import type { MatchRules } from '@/game/config/PregameConfig';
 import type { SavedKit } from '@/game/config/savedKits';
 import AssetManager from '@/managers/AssetManager';
@@ -139,7 +139,7 @@ const pick = (entry: SpellCatalogEntry): void => {
 };
 
 /** The description panel's copy of a spell, with this match's cooldown/mana applied. */
-const detailOf = (entry: SpellCatalogEntry) => getSpellDisplay(entry.spellClass, props.matchRules);
+const detailOf = (entry: SpellCatalogEntry) => spellDisplayOf(entry.id, props.matchRules);
 
 const isSelectedShelf = (shelf: KitShelf): boolean =>
   props.selectedChampion !== null && props.selectedChampion === shelf.championName;

@@ -16,6 +16,10 @@ import {
   MonsterPreset,
   getChampionPresetFromLoadout,
   getTurretPositions,
+  planLoadout,
+  planMatchKits,
+  presetFromPlan,
+  type MatchPlan,
 } from './preset';
 import {
   loadPregameConfig,
@@ -193,13 +197,22 @@ export default class Game {
   paused = false;
   touchUi: boolean;
 
-  constructor() {
+  /**
+   * @param plan Which kits every unit will play, with all randomness already
+   *   rolled. `GameScene` passes one because it has to: the spell classes are
+   *   fetched per champion now, so *something* has to decide what a match needs
+   *   before it can be loaded, and that decision has to be the same one this
+   *   constructor then builds from. Omitted, this plans for itself — which is
+   *   correct only when the catalogue is already loaded, i.e. in tests.
+   */
+  constructor(plan?: MatchPlan) {
     // Read once, before anything that might construct a Champion or a Spell:
     // `matchRules` has to be in place the moment the player's own kit is
     // built a few lines down. Validated/defaulted by `loadPregameConfig`
     // itself, so a corrupt or missing stored blob never reaches this
     // constructor as anything other than a playable config.
     const pregameConfig = loadPregameConfig();
+    const kits = plan ?? planMatchKits(pregameConfig);
     this.matchRules = toMatchRules(pregameConfig.rules);
     this.touchUi = touchControlsPreference();
 
@@ -232,7 +245,7 @@ export default class Game {
     this.player = new Champion({
       game: this,
       position: this.randomSpawnPoint(),
-      preset: getChampionPresetFromLoadout(pregameConfig.player),
+      preset: presetFromPlan(kits.player),
     });
     this.objectManager.addObject(this.player);
     this.spellInputController = new SpellInputController({
@@ -275,7 +288,7 @@ export default class Game {
       const bot = new AIChampion({
         game: this,
         position: this.randomSpawnPoint(),
-        preset: getChampionPresetFromLoadout(botLoadout),
+        preset: presetFromPlan(kits.bots[i] ?? planLoadout(botLoadout)),
         // Re-resolving the same loadout on every respawn is what makes a
         // bot configured with a fixed champion keep that identity across
         // deaths, while a bot left on 'random' keeps re-rolling exactly as

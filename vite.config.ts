@@ -174,6 +174,67 @@ export default defineConfig({
             return 'asset-manifest';
           }
           /**
+           * Dependency-free helpers used on both sides of a scene boundary.
+           *
+           * Left unassigned, a shared module goes wherever Rollup decides, and
+           * it decided `game` for all three — so `MenuScene`'s chunk statically
+           * imported the 1.1MB match chunk to get `DomUtils.preventZoom`, and
+           * the pregame screen imported it to format a cooldown. One binding
+           * each, a megabyte apiece.
+           *
+           * All three are pure functions with no imports of their own, so this
+           * chunk is ~4KB and safe anywhere. `collide.utils` and
+           * `optimized.utils` are deliberately excluded: the first pulls
+           * poly-decomp, and the second runs on the entry path before p5 loads.
+           */
+          if (/src\/utils\/(index|format\.utils|dom\.utils)\.ts$/.test(id)) return 'shared';
+          /**
+           * Vite's own `__vitePreload` runtime, which every dynamic import in
+           * the app calls.
+           *
+           * Unassigned it goes wherever Rollup puts it, and once
+           * `spellModules.ts` arrived with 238 dynamic imports in one module,
+           * "wherever" became the `game` chunk — so `MenuScene` imported a
+           * single helper function out of the match chunk and dragged the whole
+           * thing back onto the menu. Exactly the failure the two boot-path
+           * tests exist for, and exactly the one they cannot see: the source
+           * imports were clean, because this module is not in the source.
+           */
+          if (id.includes('vite/preload-helper')) return 'shared';
+          /**
+           * The pregame screen's data layer, carved out of `src/game/` ahead of
+           * the `game` rule below.
+           *
+           * These modules sit under `src/game/` because that is what they are
+           * *about* — a match's config, its saved kits, its spell catalogue,
+           * its touch settings — but none of them can execute anything. The
+           * rule below is a path test, so without this carve-out the setup
+           * screen importing `PregameConfig` was enough to pull the megabyte:
+           * `SetupScene` reached `preset.ts`, `preset.ts` reached
+           * `import * as AllSpells`, and rendering a roster of names and icons
+           * loaded all 238 spell modules.
+           *
+           * `config/spellCatalog.ts` is the piece that made this possible —
+           * generated display data instead of 238 constructors. See its header,
+           * and `tests/scenes/pregameBootPath.test.ts`, which is what stops
+           * a single stray import putting it all back.
+           */
+          if (
+            id.includes('src/game/config/') ||
+            id.includes('src/game/constants') ||
+            id.includes('src/game/input/touchPreferences') ||
+            id.includes('src/generated/spellCatalog') ||
+            // The picker components themselves. They are *shared* — the in-game
+            // practice panel opens the same `LoadoutEditorModal` — and a shared
+            // module goes wherever Rollup puts it, which was `game`. So the
+            // setup screen was importing its own roster back out of the match.
+            // Pinned to the side that can stand alone; the game chunk depends
+            // on this one anyway, through `PregameConfig`.
+            id.includes('src/scenes/setup/')
+          ) {
+            return 'pregame';
+          }
+          /**
            * The match itself, in one deliberately-named chunk. Rollup already
            * hoisted it into a shared chunk of its own once `GameScene` and
            * `SetupScene` became dynamic imports, but named it after whichever
@@ -185,6 +246,43 @@ export default defineConfig({
            * `src/game/`, or this whole megabyte lands back in front of the logo.
            * `tests/scenes/menuBootPath.test.ts` is that rule.
            */
+          /**
+           * One chunk per champion, so a match fetches the kits it is playing.
+           *
+           * `preset.ts` no longer imports the spell barrel; `spellModules.ts`
+           * holds a dynamic import per id and `spellRegistry.ts` pulls the ones
+           * a `MatchPlan` names. Rollup would otherwise emit 238 chunks — one
+           * per file — which is 238 requests for a six-champion match. Grouping
+           * by the filename's champion prefix makes it one request per champion,
+           * and each champion's files are an island: only `spells/index.ts` ever
+           * imported across them, and nothing imports that any more.
+           *
+           * It also fixes the cache granularity the old single chunk had:
+           * retuning one ability used to invalidate all 295KB (gzipped) of the
+           * game chunk for every returning player.
+           */
+          /**
+           * `BasicAttack` is the exception, and it has to be: `preset.ts`
+           * imports it *statically* (every kit holds it in slot 0, and it is the
+           * last-resort fallback when a lookup misses). A static edge from the
+           * `game` chunk into a spell chunk that imports `Spell`, `Champion` and
+           * the rest straight back out of `game` is a cycle **between chunks**,
+           * and Rollup resolves that into a live binding read before its
+           * initialiser runs: the menu died on "Cannot access 'd' before
+           * initialization" before it could draw. Left unassigned it lands in
+           * `game` beside the code that needs it, and the dynamic import in
+           * `spellModules.ts` simply resolves there.
+           */
+          const spell = id.includes('spells/BasicAttack.ts')
+            ? null
+            : /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
+          if (spell) {
+            // Summoner spells and the basic attack have no champion prefix to
+            // group by, and every kit can hold them — one shared chunk rather
+            // than six chunks of one file.
+            const champion = /_[QWER][0-9]*\.ts$/.test(id) ? spell[1].toLowerCase() : 'common';
+            return `spell-${champion}`;
+          }
           if (id.includes('/src/game/')) return 'game';
           if (id.includes('node_modules/@vue/') || id.includes('node_modules/vue/')) {
             return 'vendor-vue';

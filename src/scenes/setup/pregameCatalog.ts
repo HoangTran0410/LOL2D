@@ -1,16 +1,15 @@
 import {
   BASIC_ATTACK_ID,
+  CHAMPION_KITS,
   listSelectableChampions,
   listSummonerSpells,
   listSpellCatalog,
   abilitySlotOfId,
-  SpellGroups,
   type SelectableChampion,
   type SummonerSpellOption,
   type SpellCatalogEntry,
-} from '@/game/preset';
+} from '@/game/config/spellCatalog';
 import type { AssetKey } from '@/managers/AssetManager';
-import type { SpellClass } from './types';
 
 /** One catalogue entry on a shelf, with the kit slot its name claims (`abilitySlotOfId`) or `null`. */
 export interface KitShelfEntry {
@@ -23,7 +22,7 @@ export interface KitShelfEntry {
  * (portrait + name, and the "dùng cả bộ" action when there is a kit to
  * apply) and the ability icons under it.
  *
- * A reshaping of `SpellGroups` — the same shelves the in-game HUD picker
+ * A reshaping of `CHAMPION_KITS` — the same shelves the in-game HUD picker
  * renders — reordered for a roster that is now ~50 deep: the two shelves that
  * are not a champion first, then the champions by name. See
  * `LoadoutEditorModal.vue`.
@@ -63,9 +62,7 @@ export interface PregameCatalog {
   champions: SelectableChampion[];
   summoners: SummonerSpellOption[];
   spellCatalog: SpellCatalogEntry[];
-  /** `SpellCatalogEntry`, keyed by spell class reference — built once alongside `spellCatalog`. */
-  catalogByClass: Map<SpellClass, SpellCatalogEntry>;
-  /** The same, keyed by the stored id (an `AllSpells` barrel key) — what a persisted slot choice resolves through. */
+  /** `SpellCatalogEntry` keyed by the stored id (an `AllSpells` barrel key) — what a persisted slot choice resolves through, and the only identity this screen uses. */
   catalogById: Map<string, SpellCatalogEntry>;
   /** The picker roster: the two non-champion shelves first, then the champions by name — see the sort in `getPregameCatalog`. */
   kitShelves: KitShelf[];
@@ -74,7 +71,7 @@ export interface PregameCatalog {
 let cached: PregameCatalog | null = null;
 
 /**
- * `preset.ts`'s catalogue doesn't change at runtime, so this builds it once,
+ * The catalogue doesn't change at runtime, so this builds it once,
  * lazily, and every caller gets back the same object — the same "build once,
  * not on every render" rule `SetupScene.ts` used to enforce by hand in its
  * `setup()`. Every component that needs champion/summoner/spell data calls
@@ -85,7 +82,7 @@ let cached: PregameCatalog | null = null;
 export const getPregameCatalog = (): PregameCatalog => {
   if (!cached) {
     const spellCatalog = listSpellCatalog();
-    const catalogByClass = new Map(spellCatalog.map(entry => [entry.spellClass, entry]));
+    const catalogById = new Map(spellCatalog.map(entry => [entry.id as string, entry]));
     const summoners = listSummonerSpells();
     const summonerIds = new Set(summoners.map(option => option.id));
 
@@ -101,12 +98,12 @@ export const getPregameCatalog = (): PregameCatalog => {
       return null;
     };
 
-    /** `SpellGroups` order, for the pinned shelves — see the sort below. */
-    const sourceOrder = new Map(SpellGroups.map((group, index) => [group.name, index]));
+    /** `CHAMPION_KITS` order, for the pinned shelves — see the sort below. */
+    const sourceOrder = new Map(CHAMPION_KITS.map((kit, index) => [kit.name, index]));
 
-    const kitShelves: KitShelf[] = SpellGroups.map(group => {
-      const entries: KitShelfEntry[] = (group.spells as SpellClass[])
-        .map(spellClass => catalogByClass.get(spellClass))
+    const kitShelves: KitShelf[] = CHAMPION_KITS.map(group => {
+      const entries: KitShelfEntry[] = group.spells
+        .map(id => catalogById.get(id))
         .filter((entry): entry is SpellCatalogEntry => !!entry)
         .map(entry => ({ entry, slotIndex: abilitySlotOfId(entry.id) }));
 
@@ -130,7 +127,7 @@ export const getPregameCatalog = (): PregameCatalog => {
       .filter(shelf => shelf.entries.length > 0)
       /**
        * Champions by name, with the two shelves that are not a champion pinned
-       * ahead of them in `SpellGroups` order.
+       * ahead of them in `CHAMPION_KITS` order.
        *
        * A flat `localeCompare` put the basic attack between Cassiopeia and
        * Fizz, which is where nobody looks for it — and both pinned shelves are
@@ -159,8 +156,7 @@ export const getPregameCatalog = (): PregameCatalog => {
       champions: listSelectableChampions(),
       summoners,
       spellCatalog,
-      catalogByClass,
-      catalogById: new Map(spellCatalog.map(entry => [entry.id, entry])),
+      catalogById,
       kitShelves,
     };
   }
