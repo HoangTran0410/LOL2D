@@ -686,11 +686,14 @@
 .kit-roster .kit-shelf.open {
   display: block;
   grid-column: 1 / -1;
-  border-color: var(--hextech-gold-dim);
+  border-color: var(--hextech-gold);
+  background: linear-gradient(180deg, rgba(200, 170, 110, 0.08) 0%, var(--hextech-panel) 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 10px rgba(200, 170, 110, 0.15);
 }
 
 .kit-roster .kit-shelf.open .catalog-group-row {
   display: flex;
+  animation: shelfExpand 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Back to the ordinary horizontal heading — the column layout below is for a
@@ -704,6 +707,9 @@
 .kit-roster .kit-shelf.open .kit-shelf-name {
   width: auto;
   text-align: left;
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--hextech-text);
 }
 
 .kit-roster .kit-shelf.open .catalog-group-avatar {
@@ -724,7 +730,9 @@
 }
 
 .kit-roster .kit-shelf.open .kit-apply-chip {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .kit-roster .kit-shelf-heading {
@@ -746,6 +754,65 @@
 
 .kit-roster .kit-shelf {
   padding: 0.5rem 0.35rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.catalog-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kit-tile-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--hextech-gold);
+  color: #0c141c;
+  font-size: 9px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.kit-shelf-chevron {
+  color: var(--hextech-muted);
+  font-size: 0.68em;
+  margin-top: 1px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.kit-shelf-apply:hover .kit-shelf-chevron {
+  color: var(--hextech-gold);
+}
+
+.kit-shelf-state {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.kit-selected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(200, 170, 110, 0.2);
+  color: var(--hextech-gold);
+  border: 1px solid var(--hextech-gold-dim);
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 /* The open shelf's two answers, on one row above its abilities: the whole-kit
@@ -756,17 +823,117 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.5rem 0.8rem;
   margin-bottom: 0.45rem;
+  padding-top: 0.15rem;
+  animation: shelfExpand 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .kit-apply-all {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   flex-shrink: 0;
-  padding: 0.3rem 0.7rem;
+  padding: 0.32rem 0.75rem;
   font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 3px;
+}
+
+.kit-apply-all.is-active-kit {
+  background: rgba(200, 170, 110, 0.22);
+  border-color: var(--hextech-gold);
+  color: var(--hextech-gold);
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.25);
+}
+
+.kit-keys-preview {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: 2px;
+}
+
+.kit-key-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.45);
+  color: var(--hextech-gold);
+  border: 1px solid rgba(200, 170, 110, 0.3);
+  line-height: 1.1;
+}
+
+.kit-slot-target-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  color: var(--hextech-muted);
+  font-size: 0.78em;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.kit-guide-divider {
+  font-size: 0.7em;
+  font-weight: 700;
+  color: var(--hextech-muted);
+  background: var(--hextech-sunken);
+  border: 1px solid var(--hextech-line);
+  padding: 1px 5px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+.kit-guide-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--hextech-text);
+  font-size: 0.95em;
+}
+
+.kit-target-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--hextech-gold);
+  background: rgba(200, 170, 110, 0.15);
+  border: 1px solid var(--hextech-gold);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(200, 170, 110, 0.3);
+}
+
+.kit-guide-arrow {
+  color: var(--hextech-gold);
+  font-size: 0.8em;
+  animation: bounceGuideArrow 1.5s ease-in-out infinite;
+}
+
+@keyframes shelfExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceGuideArrow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(2px);
+  }
 }
 
 /* `text-transform`/`letter-spacing` are reset explicitly: this sits inside
@@ -1026,6 +1193,7 @@
    abilities hard to tell apart at a glance. Comfortably over the 44px thumb
    target in every mode, so the touch overrides below no longer resize it. */
 .catalog-spell-card {
+  position: relative;
   box-sizing: border-box;
   display: block;
   width: 48px;
@@ -1036,15 +1204,39 @@
   cursor: pointer;
   color: var(--hextech-text);
   line-height: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .catalog-spell-card:hover {
   border-color: var(--hextech-gold-dim);
+  transform: translateY(-1px);
 }
 
 .catalog-spell-card.selected {
   border-color: var(--hextech-gold);
   background: var(--hextech-gold-wash);
+  box-shadow: 0 0 8px rgba(200, 170, 110, 0.3);
+}
+
+.catalog-spell-card.matches-slot {
+  border-color: rgba(200, 170, 110, 0.55);
+}
+
+.spell-slot-tag {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  z-index: 2;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  padding: 1px 3px;
+  border-radius: 2px;
+  background: rgba(12, 20, 28, 0.85);
+  color: var(--hextech-gold);
+  border: 1px solid rgba(200, 170, 110, 0.4);
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .catalog-spell-card img {

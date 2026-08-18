@@ -54,6 +54,7 @@
  * the library, so it is also the thing that knows when the list changed, and
  * this component stays what it already was: a view of what it is handed.
  */
+import { watch, nextTick } from 'vue';
 import { getSpellDisplay, type SpellCatalogEntry } from '@/game/preset';
 import type { MatchRules } from '@/game/config/PregameConfig';
 import type { SavedKit } from '@/game/config/savedKits';
@@ -142,6 +143,33 @@ const detailOf = (entry: SpellCatalogEntry) => getSpellDisplay(entry.spellClass,
 
 const isSelectedShelf = (shelf: KitShelf): boolean =>
   props.selectedChampion !== null && props.selectedChampion === shelf.championName;
+
+const slotLetterOf = (slotIndex: number | null): string => {
+  if (slotIndex === 1) return 'Q';
+  if (slotIndex === 2) return 'W';
+  if (slotIndex === 3) return 'E';
+  if (slotIndex === 4) return 'R';
+  return '';
+};
+
+/**
+ * Smoothly scrolls the opened shelf into the viewport so the player never has
+ * to guess where the expanded kit went or search below the fold.
+ */
+watch(
+  () => props.openShelf,
+  newShelf => {
+    if (!newShelf) return;
+    void nextTick(() => {
+      requestAnimationFrame(() => {
+        const openEl = document.querySelector<HTMLElement>('.kit-shelf.open');
+        if (openEl) {
+          openEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      });
+    });
+  }
+);
 </script>
 
 <template>
@@ -155,12 +183,8 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
       <h4 class="saved-kit-heading">Bộ đã lưu</h4>
       <div class="saved-kit-list">
         <div v-for="kit in savedKits" :key="kit.id" class="saved-kit" :data-kit="kit.name">
-          <button
-            type="button"
-            class="saved-kit-apply"
-            :title="`Dùng bộ ${kit.name}`"
-            @click="emit('applySavedKit', kit)"
-          >
+          <button type="button" class="saved-kit-apply" :title="`Dùng bộ ${kit.name}`"
+            @click="emit('applySavedKit', kit)">
             <span class="saved-kit-name">{{ kit.name }}</span>
             <span class="kit-apply-chip">Dùng</span>
           </button>
@@ -168,39 +192,24 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
                `.practice-remove-bot`: a saved kit is a shortcut, not the
                loadout itself, and re-saving one is the same two taps that
                made it. -->
-          <button
-            type="button"
-            class="saved-kit-delete"
-            :title="`Xoá bộ ${kit.name}`"
-            :aria-label="`Xoá bộ ${kit.name}`"
-            @click="emit('deleteSavedKit', kit)"
-          >
+          <button type="button" class="saved-kit-delete" :title="`Xoá bộ ${kit.name}`"
+            :aria-label="`Xoá bộ ${kit.name}`" @click="emit('deleteSavedKit', kit)">
             <i class="fas fa-times"></i>
           </button>
         </div>
       </div>
     </section>
 
-    <button
-      type="button"
-      class="catalog-random-card"
-      :class="{ selected: selectedChampion === 'random' }"
-      @click="emit('pickRandom')"
-    >
-      <i class="fas fa-random"></i> Ngẫu Nhiên — tướng và bộ chiêu bốc thăm khi vào trận
+    <button type="button" class="catalog-random-card" :class="{ selected: selectedChampion === 'random' }"
+      @click="emit('pickRandom')">
+      <i class="fas fa-random"></i> Ngẫu Nhiên Tất Cả
     </button>
 
-    <section
-      v-for="shelf in shelves"
-      :key="shelf.name"
-      class="kit-shelf"
-      :class="{
-        selected: isSelectedShelf(shelf),
-        'has-kit': shelf.kit.length > 0,
-        open: shelf === openShelf,
-      }"
-      :data-champion="shelf.name"
-    >
+    <section v-for="shelf in shelves" :key="shelf.name" class="kit-shelf" :class="{
+      selected: isSelectedShelf(shelf),
+      'has-kit': shelf.kit.length > 0,
+      open: shelf === openShelf,
+    }" :data-champion="shelf.name">
       <!-- `has-kit` is the same predicate that decides whether the header is a
            button at all (`v-if="shelf.kit.length"` below), reused rather than
            restated: the tile grid shows exactly the shelves that have a whole
@@ -212,34 +221,31 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
            answers live in the opened body below. The basic-attack and summoner
            shelves render the same row as an inert heading — they are opened by
            selecting the slot they serve, not by being tapped. -->
-      <button
-        v-if="shelf.kit.length"
-        type="button"
-        class="kit-shelf-heading kit-shelf-apply"
+      <button v-if="shelf.kit.length" type="button" class="kit-shelf-heading kit-shelf-apply"
         :title="shelf === openShelf ? `Đóng ${shelf.name}` : `Xem bộ chiêu ${shelf.name}`"
-        :aria-expanded="shelf === openShelf"
-        @click="emit('toggleShelf', shelf)"
-      >
-        <img
-          v-if="shelf.avatar"
-          class="catalog-group-avatar"
-          :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name"
-          loading="lazy"
-          decoding="async"
-        />
+        :aria-expanded="shelf === openShelf" @click="emit('toggleShelf', shelf)">
+        <div class="catalog-avatar-wrap">
+          <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
+            :alt="shelf.name" loading="lazy" decoding="async" />
+          <span v-if="isSelectedShelf(shelf) && shelf !== openShelf" class="kit-tile-badge" title="Đang chọn tướng này">
+            <i class="fas fa-check" aria-hidden="true"></i>
+          </span>
+        </div>
         <span class="kit-shelf-name">{{ shelf.name }}</span>
-        <span class="kit-apply-chip">{{ shelf === openShelf ? 'Đóng' : 'Chọn' }}</span>
+        <div class="kit-shelf-state">
+          <span v-if="isSelectedShelf(shelf) && shelf === openShelf" class="kit-selected-pill">
+            <i class="fas fa-check" aria-hidden="true"></i> Đang dùng
+          </span>
+          <span class="kit-apply-chip">
+            <i v-if="shelf === openShelf" class="fas fa-times" aria-hidden="true"></i>
+            {{ shelf === openShelf ? 'Đóng' : 'Chọn' }}
+          </span>
+        </div>
+        <!-- <i v-if="shelf !== openShelf" class="fas fa-chevron-down kit-shelf-chevron" aria-hidden="true"></i> -->
       </button>
       <div v-else class="kit-shelf-heading">
-        <img
-          v-if="shelf.avatar"
-          class="catalog-group-avatar"
-          :src="AssetManager.get(shelf.avatar).url"
-          :alt="shelf.name"
-          loading="lazy"
-          decoding="async"
-        />
+        <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
+          :alt="shelf.name" loading="lazy" decoding="async" />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
       </div>
 
@@ -249,18 +255,28 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
            tap could hit — which is the thing that made the old tile grid unable
            to do anything *but* replace the kit. -->
       <div v-if="shelf === openShelf && shelf.kit.length" class="kit-shelf-cta">
-        <button
-          type="button"
-          class="hextech-btn kit-apply-all"
-          :title="`Dùng cả bộ chiêu ${shelf.name}`"
-          @click="emit('applyKit', shelf)"
-        >
-          <i class="fas fa-check" aria-hidden="true"></i>
-          <span>Dùng cả bộ</span>
+        <button type="button" class="hextech-btn kit-apply-all" :class="{ 'is-active-kit': isSelectedShelf(shelf) }"
+          :title="`Dùng cả bộ chiêu ${shelf.name}`" @click="emit('applyKit', shelf)">
+          <i class="fas" :class="isSelectedShelf(shelf) ? 'fa-check-double' : 'fa-bolt'" aria-hidden="true"></i>
+          <span class="kit-apply-all-label">
+            {{ isSelectedShelf(shelf) ? 'Đang dùng cả bộ' : 'Dùng cả bộ' }}
+          </span>
+          <span class="kit-keys-preview">
+            <span class="kit-key-badge">Q</span>
+            <span class="kit-key-badge">W</span>
+            <span class="kit-key-badge">E</span>
+            <span class="kit-key-badge">R</span>
+          </span>
         </button>
-        <span class="kit-cta-note">
-          hoặc bấm một chiêu bên dưới để đặt vào ô {{ activeSlotLabel }}
-        </span>
+
+        <div class="kit-slot-target-guide kit-cta-note">
+          <span class="kit-guide-divider">HOẶC</span>
+          <span class="kit-guide-action">
+            Gán 1 chiêu vào ô
+            <span class="kit-target-slot-badge">{{ activeSlotLabel }}</span>
+            <i class="fas fa-arrow-down kit-guide-arrow" aria-hidden="true"></i>
+          </span>
+        </div>
       </div>
 
       <div class="catalog-group-row">
@@ -269,28 +285,22 @@ const isSelectedShelf = (shelf: KitShelf): boolean =>
              menu unless something says otherwise. That menu both hides the
              description the hold just opened and cancels the touch that would
              have finished the gesture. The hold belongs to the app. -->
-        <button
-          v-for="item in shelf.entries"
-          :key="item.entry.id"
-          type="button"
-          class="catalog-spell-card"
-          :class="{ selected: activeEntryId === item.entry.id }"
-          :data-spell="item.entry.id"
-          @click="pick(item.entry)"
-          @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)"
-          @mouseleave="!isTouchUi && hoverEnd()"
-          @touchstart="touchStart(detailOf(item.entry), $event)"
-          @touchmove="touchMove($event)"
-          @touchend="touchEnd()"
-          @touchcancel="closePeek()"
-          @contextmenu.prevent
-        >
+        <button v-for="item in shelf.entries" :key="item.entry.id" type="button" class="catalog-spell-card" :class="{
+          selected: activeEntryId === item.entry.id,
+          'matches-slot': slotLetterOf(item.slotIndex) === activeSlotLabel,
+        }" :data-spell="item.entry.id" @click="pick(item.entry)"
+          @mouseenter="!isTouchUi && hoverStart(detailOf(item.entry), $event)" @mouseleave="!isTouchUi && hoverEnd()"
+          @touchstart="touchStart(detailOf(item.entry), $event)" @touchmove="touchMove($event)" @touchend="touchEnd()"
+          @touchcancel="closePeek()" @contextmenu.prevent>
           <!-- The icon is the whole card. No name under it: at four abilities
                to a shelf the champion's name above them already says what
                they are, and the spell's own name is a hover or a hold away
                (`useSpellPeek`) — spelling all of them out is what made this
                roster twice as tall as the in-game one. -->
           <SpellIcon :display="item.entry.display" lazy />
+          <span v-if="slotLetterOf(item.slotIndex)" class="spell-slot-tag">
+            {{ slotLetterOf(item.slotIndex) }}
+          </span>
         </button>
       </div>
     </section>
