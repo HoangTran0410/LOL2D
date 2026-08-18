@@ -1154,13 +1154,6 @@
    still renders them, unconditionally, exactly as before — so nothing here
    needs a `body.touch-ui` override any more. */
 
-/* The three profiler panels are hidden in touch mode independently of the
-   strip's old position — they are a dev tool, not sized or meant for a
-   thumb either way. */
-body.touch-ui #stats {
-  display: none;
-}
-
 /* =============== Description panel =============== */
 /* Fixed 300px is most of a phone held sideways. The width and the side it
    opens on are set from InGameHUD.showSpellInfo, which also flips it below

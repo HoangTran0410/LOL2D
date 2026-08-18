@@ -201,6 +201,10 @@ describe('cancel policy, driven through real spells', () => {
       // Decimate: the wiki is explicit that Darius may walk through the wind-up,
       // so stepping forward is part of the gesture; crowd control still takes it.
       'Darius_Q: AIMED',
+      // Flawless Duet: the first blade is standing out in the world waiting for
+      // its partner, and walking between the two presses is the ability. Losing
+      // control of herself still drops it.
+      'Irelia_E: TETHERED',
       'Janna_Q: INDEPENDENT',
       // Curtain Call: the four shots are fired from a set position over a 6s
       // window, and walking between them is part of the performance. Crowd

@@ -68,7 +68,24 @@ export default defineConfig({
          * the reason the precache is a few megabytes: a match that cannot draw
          * its champions offline is not an installed game.
          */
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest,woff2}'],
+        /**
+         * `webp` is here and `jpg` deliberately is not. The menu used to rotate
+         * six full-bleed JPEGs, ~1.1MB, and the glob has never listed `jpg`, so
+         * they were the one visible thing an offline launch did not have. One
+         * 88KB WebP replaces the lot and is cheap enough to precache, which is
+         * what makes the installed app look the same with the network off.
+         * The three `Screenshot_*.jpg` still in `assets/` stay excluded — they
+         * are store art nothing in the game renders.
+         */
+        globPatterns: ['**/*.{js,css,html,ico,png,webp,svg,json,webmanifest,woff2}'],
+        /**
+         * `assets/source-manifest.json` is provenance for the wiki importer —
+         * 110KB that `scripts/wiki/check-abilities.mjs` reads off disk and no
+         * running game ever fetches. It reaches `dist/` only because the asset
+         * manifest generator walks all of `assets/`, and the `json` glob above
+         * then made every install download it.
+         */
+        globIgnores: ['**/source-manifest-*.json'],
         /** The menu chunk alone is ~830KB; the default 2MB cap is too tight to trust. */
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
         /**
@@ -119,5 +136,69 @@ export default defineConfig({
   build: {
     target: 'esnext',
     assetsInlineLimit: 0,
+    rollupOptions: {
+      output: {
+        /**
+         * Chunks split by **how often they change**, which is what a returning
+         * player's cache actually cares about.
+         *
+         * `assetManifest.ts` is the reason this exists. It is one generated
+         * module holding all ~410 asset URLs, and adding a single champion icon
+         * rewrites it — which, folded into the entry chunk, meant re-downloading
+         * 161KB of application code for one new PNG. On its own it is ~31KB, and
+         * nothing else is invalidated with it.
+         *
+         * Vue and the physics libraries move on their own release schedule
+         * rather than with this repo, so they are worth the same treatment: a
+         * normal commit no longer touches them at all.
+         *
+         * The images themselves were never the problem — Vite hashes those on
+         * content, so `ahri_q-ViZcqiii.png` keeps its name across builds and the
+         * service worker precaches all ~380 of them with `revision: null`,
+         * meaning the URL *is* the version and an unchanged file is never
+         * re-fetched.
+         */
+        manualChunks(id) {
+          /**
+           * `AssetManager` rides with the manifest it wraps. Both are needed
+           * before the first frame, both change rarely, and — the reason this
+           * line exists — leaving `AssetManager` unassigned let Rollup hoist it
+           * into the `game` chunk as a shared module, so the entry imported one
+           * binding out of a megabyte and preloaded the lot before the menu
+           * could draw.
+           */
+          if (
+            id.includes('src/generated/assetManifest') ||
+            id.includes('src/managers/AssetManager')
+          ) {
+            return 'asset-manifest';
+          }
+          /**
+           * The match itself, in one deliberately-named chunk. Rollup already
+           * hoisted it into a shared chunk of its own once `GameScene` and
+           * `SetupScene` became dynamic imports, but named it after whichever
+           * module happened to lead — `TouchControls-*.js` — which is both
+           * meaningless to read and free to change when the module graph
+           * shifts. Naming it pins the filename to its contents.
+           *
+           * It is also the tripwire: nothing on the menu's path may import
+           * `src/game/`, or this whole megabyte lands back in front of the logo.
+           * `tests/scenes/menuBootPath.test.ts` is that rule.
+           */
+          if (id.includes('/src/game/')) return 'game';
+          if (id.includes('node_modules/@vue/') || id.includes('node_modules/vue/')) {
+            return 'vendor-vue';
+          }
+          if (
+            id.includes('node_modules/detect-collisions') ||
+            id.includes('node_modules/sat/') ||
+            id.includes('node_modules/poly-decomp')
+          ) {
+            return 'vendor-physics';
+          }
+          return undefined;
+        },
+      },
+    },
   },
 });

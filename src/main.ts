@@ -10,13 +10,21 @@
  * p5 globals must therefore run inside setup() — NOT at module eval time.
  */
 import { every, fastHypot, filter, forEach, map, some } from './utils/optimized.utils';
-import { System } from './libs/detect-collisions';
 import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
 import { registerServiceWorker } from './pwa/updates';
 
-// Expose detect-collisions System globally for code that accesses window.ABC
-(window as any).ABC = { System };
+/*
+ * No `import { System } from './libs/detect-collisions'` here.
+ *
+ * This file used to hang it on `window.ABC` "for code that accesses
+ * window.ABC". Nothing did — not src, not tests, not the e2e scripts — but the
+ * import was real, so the entry chunk depended on detect-collisions, sat and
+ * poly-decomp, and Vite emitted a `<link rel="modulepreload">` that fetched all
+ * 44KB of them before the menu could draw. `ObjectManager` imports `System`
+ * itself, which is what actually needs it, and that lands in the game chunk
+ * where it belongs. `tests/scenes/menuBootPath.test.ts` holds the line.
+ */
 
 // Patch Math.hypot with fast 2D scalar implementation
 Math.hypot = fastHypot;

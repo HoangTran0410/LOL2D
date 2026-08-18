@@ -5,29 +5,25 @@ import DomUtils from '@/utils/dom.utils';
 import AssetManager from '@/managers/AssetManager';
 import { setZoomFactorPreference } from '@/game/gameObject/map/Camera';
 
-// Stats.js is loaded via CDN — declare it as a global
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const Stats: any;
-
-let drawAnalys: typeof Stats;
-let checkUpdateAnalys: typeof Stats;
-let realUpdateAnalys: typeof Stats;
 let previousTime: number;
 
-/**
- * Stand-in for the three Stats.js panels in production, so `updateLoop`/`draw`
- * can call `.begin()`/`.end()` unconditionally instead of branching every
- * frame. Every real player's phone was otherwise redrawing three debug
- * canvases 60 times a second for a HUD nobody but a developer reads.
+/*
+ * There were three Stats.js FPS panels here, gated behind `import.meta.env.DEV`
+ * and wrapped around `update` and `draw` with `.begin()`/`.end()`.
+ *
+ * The whole library is gone, not just the panels. It was a second global that
+ * had to be copied out of `node_modules`, served from `public/vendor/`, loaded
+ * by a blocking `<script>` on every boot including production, and precached by
+ * the service worker — all of it carried so that a developer could read three
+ * numbers. `frameRate()` and the browser's own profiler cover the same ground
+ * without shipping anything.
  */
-const noopStats = { begin: () => {}, end: () => {} };
 
 /** One wheel notch, as a step on the manual zoom factor. */
 const ZOOM_WHEEL_STEP = 0.1;
 
 export default class GameScene extends Scene {
   dom!: HTMLElement;
-  statsContainer!: HTMLElement;
   canvas!: any;
   game: Game | null = null;
   private _animationFrameId: number | null = null;
@@ -71,37 +67,11 @@ export default class GameScene extends Scene {
 
   setup() {
     this.dom = document.querySelector('#game-scene') as HTMLElement;
-    this.statsContainer = document.querySelector('#stats') as HTMLElement;
 
     // No cap anywhere else in the codebase — without one, p5's draw loop
     // runs as fast as the display allows (120Hz+ on many phones/laptops),
     // burning CPU/battery for no visual benefit.
     frameRate(renderFpsPreference());
-
-    if (import.meta.env.DEV) {
-      drawAnalys = new Stats();
-      drawAnalys.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-      drawAnalys.dom.style.cssText = '';
-      drawAnalys.dom.title = 'Draw time';
-      this.statsContainer.appendChild(drawAnalys.dom);
-
-      realUpdateAnalys = new Stats();
-      realUpdateAnalys.showPanel(0);
-      realUpdateAnalys.dom.style.cssText = '';
-      realUpdateAnalys.dom.title = 'Update time';
-      this.statsContainer.appendChild(realUpdateAnalys.dom);
-
-      checkUpdateAnalys = new Stats();
-      checkUpdateAnalys.showPanel(0);
-      checkUpdateAnalys.dom.style.cssText = '';
-      checkUpdateAnalys.dom.title = 'Check update time';
-      this.statsContainer.appendChild(checkUpdateAnalys.dom);
-    } else {
-      // Production: no panels, no per-frame DOM redraw — see `noopStats`.
-      drawAnalys = noopStats;
-      realUpdateAnalys = noopStats;
-      checkUpdateAnalys = noopStats;
-    }
   }
 
   enter() {
@@ -152,15 +122,10 @@ export default class GameScene extends Scene {
     const currentTime = performance.now();
     const elapsedTime = currentTime - previousTime;
     const interval = 1000 / this.game.fps;
-    checkUpdateAnalys.begin();
     if (elapsedTime > interval) {
       previousTime = currentTime - (elapsedTime % interval);
-
-      realUpdateAnalys.begin();
       this.game.update();
-      realUpdateAnalys.end();
     }
-    checkUpdateAnalys.end();
 
     this._animationFrameId = window.setTimeout(() => {
       this.updateLoop();
@@ -168,9 +133,7 @@ export default class GameScene extends Scene {
   }
 
   draw() {
-    drawAnalys.begin();
     this.game?.draw();
-    drawAnalys.end();
   }
 
   keyPressed(event?: KeyboardEvent) {

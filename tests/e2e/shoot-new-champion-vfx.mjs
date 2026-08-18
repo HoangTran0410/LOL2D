@@ -98,6 +98,30 @@ const ALL_CASTS = [
     label: 'Jhin_E_fuse',
   },
   { champion: 'Jhin', slot: 'Q', aim: [380, 0], frames: [120, 420, 800] },
+  // Irelia. Q resolves its own target through TargetResolver, so the cursor
+  // only has to be near the dummy; W fires itself at full charge, which is why
+  // its last two frames sit either side of 1200ms; E is the one entry that
+  // needs `recastAfterMs`, because a single blade standing in the ground is
+  // half the ability.
+  { champion: 'Irelia', slot: 'Q', aim: [260, 0], frames: [70, 210, 460] },
+  { champion: 'Irelia', slot: 'W', aim: [420, 0], frames: [300, 1100, 1290, 1500] },
+  {
+    champion: 'Irelia',
+    slot: 'E',
+    aim: [300, -220],
+    // Both blades are *thrown*, and the flight is the half of this ability the
+    // first version skipped, so the frames have to catch one in the air. 372px
+    // at E_THROW_SPEED is ~250ms, hence: blade one flying, blade one standing,
+    // blade two flying after the second press at 700, and the clash.
+    frames: [130, 420, 800, 1100],
+    recastAfterMs: 700,
+    recastAim: [300, 220],
+  },
+  // Irelia R: one cluster out, which opens into the arrowhead on the dummy the
+  // rig stands at 0.75x the aim — so ~390px at R_VOLLEY_SPEED, ~360ms. The
+  // frames are the cluster still travelling, the arms tearing open, the row
+  // standing, and it still standing near the end of its 2.5s.
+  { champion: 'Irelia', slot: 'R', aim: [520, 0], frames: [200, 430, 900, 2400] },
 ];
 
 // Substring match, so "Jarvan" and "Pantheon" both work without quoting.
@@ -273,9 +297,39 @@ for (const cast of CASTS) {
   }
 
   let previous = 0;
+  let recastPending = cast.recastAfterMs !== undefined;
   for (const [index, at] of cast.frames.entries()) {
     await page.waitForTimeout(at - previous);
     previous = at;
+
+    // The second half of a RECAST ability. It cannot go through `cast()`, which
+    // gates on READY and so refuses while the activation is live — the real
+    // second press is `createSpellContext` + `press`, which is exactly what
+    // `SpellInputController.keyDown` does.
+    if (recastPending && at >= cast.recastAfterMs) {
+      recastPending = false;
+      const again = await page.evaluate(
+        ([classPrefix, slot, aimX, aimY]) => {
+          const { game, subject, home } = window.__stage;
+          const spell = subject.spells.find(s => s?.constructor?.name === `${classPrefix}_${slot}`);
+          if (!spell) return { ok: false, reason: 'spell missing' };
+          const aim = createVector(home.x + aimX, home.y + aimY);
+          game.worldMouse = aim;
+          const context = game.createSpellContext(spell, subject, aim);
+          if (!context) return { ok: false, reason: `no context (state ${spell.state})` };
+          const accepted = spell.press(context);
+          return { ok: accepted, reason: `state ${spell.state}` };
+        },
+        [
+          cast.slotName ?? cast.champion,
+          cast.slot,
+          (cast.recastAim ?? cast.aim)[0],
+          (cast.recastAim ?? cast.aim)[1],
+        ]
+      );
+      check(`${label} recast accepted`, again.ok, again.reason);
+    }
+
     await page.evaluate(() => {
       const rig = window.__cast;
       const game = rig.game;

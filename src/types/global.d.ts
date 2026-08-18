@@ -61,7 +61,6 @@ declare global {
   interface Window {
     objectManager?: any;
     champion?: any;
-    Stats: any;
   }
 }
 

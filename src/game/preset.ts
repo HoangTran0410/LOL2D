@@ -48,6 +48,7 @@ const RANDOM_AVATAR_POOL: AssetKey[] = [
   'champ_vi',
   'champ_syndra',
   'champ_ziggs',
+  'champ_irelia',
 ];
 const randomAvatar = (): AssetKey => random(RANDOM_AVATAR_POOL);
 
@@ -590,6 +591,13 @@ export const SpellGroups: {
     image: 'champ_ziggs',
 
     spells: [AllSpells.Ziggs_Q, AllSpells.Ziggs_W, AllSpells.Ziggs_E, AllSpells.Ziggs_R],
+  },
+  {
+    name: 'Irelia',
+    attack: ATTACK.BRUISER,
+    image: 'champ_irelia',
+
+    spells: [AllSpells.Irelia_Q, AllSpells.Irelia_W, AllSpells.Irelia_E, AllSpells.Irelia_R],
   },
 ];
 

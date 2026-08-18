@@ -8,9 +8,11 @@
  * build log looks fine about, and the failure only shows up on a phone in a
  * lift.
  *
- * Specifically, this is what would have caught p5 and stats.js still being on
- * their CDNs: the page would serve from cache and then white-screen, because
- * `GameScene` calls `new Stats()` with no guard and nothing draws without p5.
+ * Specifically, this is what would have caught p5 still being on its CDN: the
+ * page would serve from cache and then white-screen, because nothing draws
+ * without p5. (stats.js was vendored beside it for the same reason and has
+ * since been deleted outright — a dev-only FPS HUD is not worth a blocking
+ * script and a precache entry on every player's boot.)
  *
  *   npm run build && node tests/e2e/verify-pwa-offline.mjs
  *
@@ -96,10 +98,12 @@ try {
 
   const globals = await page.evaluate(() => ({
     p5: typeof window.createVector === 'function',
-    stats: typeof window.Stats === 'function',
+    // stats.js is deliberately gone, not merely unused: nothing may put a
+    // second blocking vendor script back on the boot path for a dev-only HUD.
+    stats: typeof window.Stats,
   }));
   check('p5 globals present offline', globals.p5);
-  check('stats.js present offline', globals.stats);
+  check('stats.js is not shipped at all', globals.stats === 'undefined', globals.stats);
   check('no page errors offline', consoleErrors.length === 0, consoleErrors[0] ?? '');
 
   // The real thing: start a match with the network off.

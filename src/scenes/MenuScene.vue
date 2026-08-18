@@ -1,59 +1,73 @@
 <script setup lang="ts">
 /**
- * The main menu: cycling background, logo, and the three buttons. Scene
- * transitions ("Chơi", "Cấu Hình Trận Đấu") are lifecycle, not presentation,
- * so this only emits — `MenuScene.ts` maps `play`/`openConfig` onto
- * `sceneManager.showScene`, the same split `LoadingScene.vue` uses for its
- * own scene handover.
+ * The main menu: background, logo, and the three buttons. Scene transitions
+ * ("Chơi", "Cấu Hình Trận Đấu") are lifecycle, not presentation, so this only
+ * emits — `MenuScene.ts` maps `play`/`openConfig` onto `sceneManager.showScene`,
+ * the same split `LoadingScene.vue` uses for its own scene handover.
  *
- * The background carousel and the fullscreen toggle are pure view state with
- * no scene-transition involved, so — unlike the two buttons above — they stay
- * entirely local to this component instead of being driven from `MenuScene.ts`.
+ * The fullscreen toggle is pure view state with no scene-transition involved,
+ * so — unlike the two buttons above — it stays entirely local to this component
+ * instead of being driven from `MenuScene.ts`.
+ *
+ * **One background, not a carousel.** Six full-bleed JPEGs used to rotate on a
+ * 5s timer: 1.1MB of art for a screen the player looks at for a few seconds,
+ * none of it precached (the workbox glob has never listed `jpg`), so the
+ * offline menu came up bare. It is now a single WebP — 88KB against 151KB for
+ * the JPEG it was encoded from — which is small enough to precache, so the
+ * installed app looks the same with the network off as with it on.
  */
-import { onMounted, onUnmounted, ref } from 'vue';
-import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import AssetManager from '@/managers/AssetManager';
 import DomUtils from '@/utils/dom.utils';
 import { applyUpdate, offlineReady, updateReady } from '@/pwa/updates';
-
-const MENU_BACKGROUNDS: AssetKey[] = [
-  'other_menu_bg_1',
-  'other_menu_bg_2',
-  'other_menu_bg_3',
-  'other_menu_bg_4',
-  'other_menu_bg_5',
-  'other_menu_bg_6',
-];
+import { watchPreload, type PreloadState } from './gamePreload';
 
 const emit = defineEmits<{ play: []; openConfig: [] }>();
 
 const logo = AssetManager.get('other_newlogo_vi').url;
-const backgroundUrl = ref('');
+const backgroundUrl = AssetManager.get('other_menu_bg').url;
 // Reads real document state rather than always starting from "not
 // fullscreen": this component remounts on every menu entry (see
 // MenuScene.ts), but the browser's actual fullscreen state does not reset
 // just because the player visited the pregame screen and came back.
 const isFullscreen = ref(!!document.fullscreenElement);
 
-let currentBgIndex: number | undefined;
-let interval: ReturnType<typeof setInterval> | null = null;
+/**
+ * ## The warm-up bar
+ *
+ * `gamePreload` fetches the game's code and every image a match draws while
+ * the player is looking at this screen, and Chơi waits for it. Two reasons it
+ * is a gate rather than a hint: pressing Play mid-fetch used to mean a black
+ * pause of unknown length, and the match itself used to open on placeholder
+ * squares that filled in over the first several seconds.
+ *
+ * The state is module-level and survives this component, which remounts on
+ * every return from the pregame screen — so a second visit finds the load long
+ * finished and never shows the bar at all.
+ *
+ * `codeFailed` still shows Play. A menu with no way into a match is a worse
+ * failure than a slow one, and `loadGameScene` retries the fetch when pressed.
+ */
+const preload = ref<PreloadState>({
+  loaded: 0,
+  total: 0,
+  ratio: 0,
+  done: false,
+  codeFailed: false,
+});
+let stopWatching: (() => void) | null = null;
 
-const nextBackground = (): void => {
-  const maxIndex = MENU_BACKGROUNDS.length;
-  if (currentBgIndex === undefined) {
-    currentBgIndex = Math.floor(Math.random() * maxIndex) + 1;
-  } else {
-    currentBgIndex += 1;
-    if (currentBgIndex > maxIndex) currentBgIndex = 1;
-  }
-  backgroundUrl.value = AssetManager.get(MENU_BACKGROUNDS[currentBgIndex - 1]).url;
-};
+const percent = computed(() => Math.round(preload.value.ratio * 100));
+const ready = computed(() => preload.value.done);
 
 onMounted(() => {
-  nextBackground();
-  interval = setInterval(nextBackground, 5000);
+  stopWatching = watchPreload(state => {
+    preload.value = state;
+  });
 });
 onUnmounted(() => {
-  if (interval !== null) clearInterval(interval);
+  stopWatching?.();
+  stopWatching = null;
 });
 
 const toggleFullscreen = (): void => {
@@ -97,10 +111,24 @@ const installUpdate = async (): Promise<void> => {
     <p class="p2d slide-bck-center">2D</p>
   </div>
 
-  <button id="play-btn" class="hextech-btn" @click="emit('play')">Chơi</button>
-  <button id="config-btn" class="hextech-btn secondary" @click="emit('openConfig')">
-    Cấu Hình Trận Đấu
-  </button>
+  <!-- The bar stands exactly where the buttons will, so the menu does not jump
+       when it is replaced by them. -->
+  <div v-if="!ready" id="menu-loading" class="menu-loading">
+    <div class="menu-loading-track">
+      <div class="menu-loading-fill" :style="{ width: `${percent}%` }"></div>
+    </div>
+    <p class="menu-loading-label">Đang tải tài nguyên trận đấu… {{ percent }}%</p>
+  </div>
+
+  <template v-else>
+    <button id="play-btn" class="hextech-btn" @click="emit('play')">Chơi</button>
+    <button id="config-btn" class="hextech-btn secondary" @click="emit('openConfig')">
+      Cấu Hình Trận Đấu
+    </button>
+    <p v-if="preload.codeFailed" class="menu-loading-warning">
+      Tải dữ liệu chưa xong — bấm Chơi để thử lại.
+    </p>
+  </template>
 
   <button id="fullscreen-btn" @click="toggleFullscreen">
     <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'"></i>

@@ -12,7 +12,7 @@ describe('asset manifest generator', () => {
     ['assets/images/buffs/stun.png', 'buff_stun'],
     ['assets/images/monsters/Blue_Sentinel.png', 'monster_Blue_Sentinel'],
     ['assets/json/summoner_map.json', 'json_summoner_map'],
-    ['assets/images/others/menu-bg-1.jpg', 'other_menu_bg_1'],
+    ['assets/images/others/menu-bg.webp', 'other_menu_bg'],
   ])('maps %s to stable key %s', (path, key) => {
     expect(assetKeyForPath(path)).toBe(key);
   });

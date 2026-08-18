@@ -216,3 +216,51 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/* --------------------------------------------------------------- Warm-up bar
+
+   Stands where the two buttons will, so replacing it does not make the menu
+   jump. The game's code and every image a match draws are fetched here rather
+   than after Chơi is pressed — see src/scenes/gamePreload.ts for why both
+   halves are worth waiting for. */
+.menu-loading {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(320px, 70vw);
+}
+
+.menu-loading-track {
+  width: 100%;
+  height: 6px;
+  border: 1px solid rgba(200, 170, 110, 0.55);
+  background-color: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+/* Width is the only animated property, and it eases rather than jumping: the
+   asset count lands in bursts of six (the browser's per-host request cap), and
+   an un-eased bar reads as broken rather than busy. */
+.menu-loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c8aa6e, #f0e6d2);
+  transition: width 220ms ease-out;
+}
+
+.menu-loading-label {
+  margin: 0;
+  color: #f0e6d2;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+  user-select: none;
+}
+
+.menu-loading-warning {
+  margin: 8px 0 0;
+  color: #e8b04b;
+  font-size: 0.75rem;
+  opacity: 0.9;
+}

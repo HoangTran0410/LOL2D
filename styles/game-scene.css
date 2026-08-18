@@ -6,21 +6,3 @@
     touch-action: none;
 }
 
-#stats {
-    position: fixed;
-    top: 5px;
-    left: 0;
-    display: flex;
-    flex-direction: row;
-    /* opacity: 0.1; */
-    transition: all 0.2s ease-in-out;
-}
-
-#stats:hover {
-    opacity: 1;
-}
-
-#stats>div {
-    cursor: pointer;
-    opacity: 0.5;
-}

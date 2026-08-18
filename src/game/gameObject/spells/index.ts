@@ -256,3 +256,8 @@ export { default as Ziggs_Q } from './Ziggs_Q';
 export { default as Ziggs_W } from './Ziggs_W';
 export { default as Ziggs_E } from './Ziggs_E';
 export { default as Ziggs_R } from './Ziggs_R';
+
+export { default as Irelia_Q } from './Irelia_Q';
+export { default as Irelia_W } from './Irelia_W';
+export { default as Irelia_E } from './Irelia_E';
+export { default as Irelia_R } from './Irelia_R';

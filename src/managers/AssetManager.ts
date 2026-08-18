@@ -124,6 +124,21 @@ export default class AssetManager {
   private static loaders = defaultLoaders;
   private static handles = new Map<AssetKey, AssetHandle>();
   private static loads = new Map<AssetKey, Promise<AssetHandle>>();
+  /**
+   * One in-flight load per *file*, not per key.
+   *
+   * Several keys routinely point at one file: Vite emits a single
+   * content-hashed asset for byte-identical sources, and 17 groups of icons
+   * here are literally the same picture — `jinx_q`, `jinx_q2`, `jinx_q3` and
+   * `jinx_q4` are one PNG, as are Leblanc's four R stages. Keyed only by asset
+   * key, each of those fetched the same bytes again: measured at 4 requests for
+   * `jinx_q-CtVD-9_Y.png` in a production build, 762 requests for 372 distinct
+   * files across the preload.
+   *
+   * Deliberately keyed on the resolved URL rather than the source path, because
+   * in dev those four *are* four separate files and each has to be fetched.
+   */
+  private static loadsByUrl = new Map<string, Promise<unknown>>();
   private static placeholders = new Map<string, AssetHandle>();
 
   static configureLoaders(loaders: AssetLoaders): void {
@@ -162,7 +177,14 @@ export default class AssetManager {
     }
 
     handle.status = 'loading';
-    const load = this.loaders[kind](handle.url)
+
+    let bytes = this.loadsByUrl.get(handle.url);
+    if (!bytes) {
+      bytes = this.loaders[kind](handle.url);
+      this.loadsByUrl.set(handle.url, bytes);
+    }
+
+    const load = bytes
       .then(data => {
         handle.data = data;
         handle.status = 'ready';

@@ -34,17 +34,20 @@
     <link rel="stylesheet" href="styles/game-scene.css">
     <link rel="stylesheet" href="styles/hud.css">
 
-    <!-- p5.js and stats.js must load here (not in <body>) so they are parsed and
-         execute before the deferred ES module — this exposes all p5 globals
-         (loadImage, loadJSON, createVector, background, etc.) to the module below.
+    <!-- p5.js must load here (not in <body>) so it is parsed and executes before
+         the deferred ES module — this exposes all p5 globals (loadImage,
+         loadJSON, createVector, background, etc.) to the module below.
 
          Served from our own origin, not a CDN, and copied out of node_modules by
-         scripts/copy-vendor.mjs — see that file. Both are load-bearing enough
-         that losing either is a white screen, which an installed app opened
-         offline cannot afford. Still plain <script> tags: global mode is the
-         whole reason they are here rather than imported. -->
+         scripts/copy-vendor.mjs — see that file. Losing it is a white screen,
+         which an installed app opened offline cannot afford. Still a plain
+         <script> tag: global mode is the whole reason it is here rather than
+         imported.
+
+         stats.js used to sit beside it, and is gone: a second blocking script
+         on every boot, production included, so that a developer could read
+         three FPS panels. -->
     <script src="/vendor/p5.min.js"></script>
-    <script src="/vendor/stats.min.js"></script>
 </head>
 
 <body>
@@ -53,7 +56,6 @@
     <div class="center-page-container">
         <div id="game-scene">
             <div id="InGameHUD"></div>
-            <div id="stats"></div>
         </div>
 
         <!-- Mount host for LoadingScene.vue, which renders the contents. The

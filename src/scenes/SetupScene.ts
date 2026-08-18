@@ -1,8 +1,7 @@
 import { createApp, type App } from 'vue';
 import { Scene } from '@/managers/SceneManager';
 import SetupSceneView from './SetupScene.vue';
-import GameScene from './GameScene';
-import MenuScene from './MenuScene';
+import { loadGameScene } from './gamePreload';
 
 /**
  * The lifecycle half of the pregame setup screen. Every control, every field
@@ -36,8 +35,16 @@ export default class SetupScene extends Scene {
   enter() {
     this.host.style.display = 'flex';
     this.app = createApp(SetupSceneView, {
-      onBack: () => this.sceneManager.showScene(MenuScene),
-      onStart: () => this.sceneManager.showScene(GameScene),
+      // `./MenuScene` is imported dynamically for the same reason `MenuScene`
+      // imports this file dynamically: the two referencing each other statically
+      // is a cycle, and a cycle is a single chunk — which is how the whole game
+      // ended up inside the menu's own bundle.
+      onBack: () => {
+        void import('./MenuScene').then(module => this.sceneManager.showScene(module.default));
+      },
+      onStart: () => {
+        void loadGameScene().then(scene => this.sceneManager.showScene(scene));
+      },
     });
     this.app.mount(this.host);
   }
