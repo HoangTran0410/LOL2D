@@ -17,7 +17,7 @@
  *  3. A miss degrades instead of throwing, because a re-roll mid-match can
  *     legitimately name something that has not arrived yet.
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../src/managers/AssetManager', () => ({
   default: {
@@ -28,6 +28,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import * as AllSpells from '../../src/game/gameObject/spells/index';
+import { DEFAULT_CHAMPION_ATTACK } from '../../src/game/gameObject/attackableUnits/Champion';
 import { spellModules } from '../../src/generated/spellModules';
 import { spellCatalog } from '../../src/generated/spellCatalog';
 import {
@@ -41,7 +42,9 @@ import {
   spellClassOfId,
 } from '../../src/game/spellRegistry';
 import {
+  getChampionPresetRandom,
   getChampionPresetFromLoadout,
+  loadChampionPresetFromLoadout,
   planLoadout,
   planMatchKits,
   plannedSpellIds,
@@ -59,6 +62,7 @@ const barrelKeys = Object.keys(AllSpells).filter(
 );
 
 beforeEach(() => resetSpellRegistryForTests());
+afterEach(() => vi.restoreAllMocks());
 
 describe('the generated module map', () => {
   it('covers exactly the spells the barrel exports', () => {
@@ -96,6 +100,21 @@ describe('loading', () => {
     await Promise.all([loadSpells(['Ahri_Q']), loadSpells(['Ahri_Q']), loadSpells(['Ahri_Q'])]);
     expect(spellClassOfId('Ahri_Q')).toBe(AllSpells.Ahri_Q);
   });
+
+  it('loads an exact live loadout before building its preset', async () => {
+    const lux = { ...DEFAULT_CHAMPION_LOADOUT, championName: 'Lux' };
+    expect(isSpellLoaded('Lux_Q')).toBe(false);
+
+    const preset = await loadChampionPresetFromLoadout(lux);
+
+    expect(preset.name).toBe('Lux');
+    expect(preset.spells?.slice(1, 5)).toEqual([
+      AllSpells.Lux_Q,
+      AllSpells.Lux_W,
+      AllSpells.Lux_E,
+      AllSpells.Lux_R,
+    ]);
+  });
 });
 
 describe('a match plan', () => {
@@ -113,14 +132,44 @@ describe('a match plan', () => {
   });
 
   it('names only ids the registry can load — for a random champion', () => {
-    // The case that decided the design: a default match is six of these, and a
-    // random kit can name anything, so the dice have to be rolled *before* the
-    // load rather than after it.
-    for (let attempt = 0; attempt < 40; attempt++) {
-      const plan = planLoadout(loadout({ championName: 'random' }));
-      expect(plan.spellIds).toHaveLength(SLOT_COUNT);
-      for (const id of plan.spellIds) expect(isSpellId(id)).toBe(true);
-    }
+    // Random is a champion choice, not a free-form spell shuffle: its portrait,
+    // name, Q/W/E/R and attack profile must all come from one catalogue row.
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const plan = planLoadout(loadout({ championName: 'random' }));
+
+    expect(plan.spellIds).toHaveLength(SLOT_COUNT);
+    for (const id of plan.spellIds) expect(isSpellId(id)).toBe(true);
+    expect(plan).toMatchObject({
+      name: 'Yasuo',
+      avatar: 'champ_yasuo',
+      spellIds: ['BasicAttack', 'Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R', 'Flash', 'Heal'],
+      attack: expect.any(Object),
+    });
+  });
+
+  it('rolls one coherent plan exactly once for a random respawn', () => {
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0);
+
+    const preset = getChampionPresetRandom();
+
+    expect(random).toHaveBeenCalledTimes(1);
+    expect(preset).toMatchObject({
+      name: 'Yasuo',
+      avatar: 'champ_yasuo',
+      attack: expect.any(Object),
+    });
+  });
+
+  it('carries a named champion attack profile through plan and preset', async () => {
+    const plan = planLoadout(loadout({ championName: 'Yasuo' }));
+    await loadSpells(plan.spellIds);
+
+    expect(plan).toMatchObject({
+      attack: { damage: 17, attacksPerSecond: 1.1, range: 130 },
+    });
+    expect(presetFromPlan(plan)).toMatchObject({
+      attack: { damage: 17, attacksPerSecond: 1.1, range: 130 },
+    });
   });
 
   it('names only ids the registry can load — for a custom kit with a stale slot', () => {
@@ -168,13 +217,18 @@ describe('a match plan', () => {
 });
 
 describe('a miss degrades instead of throwing', () => {
-  it('substitutes a loaded spell when an id has not arrived', async () => {
+  it('falls back only to BasicAttack when a known id has not arrived', async () => {
     await loadSpells(['Yasuo_Q']);
     // `Ahri_Q` is a real id whose module has not been fetched — the shape of a
     // mid-match re-roll that beat `loadRemainingSpells` to it.
-    const preset = presetFromPlan({ name: 'x', avatar: 'champ_yasuo', spellIds: ['Ahri_Q'] });
+    const preset = presetFromPlan({
+      name: 'x',
+      avatar: 'champ_yasuo',
+      attack: DEFAULT_CHAMPION_ATTACK,
+      spellIds: ['Ahri_Q'],
+    });
     expect(preset.spells).toHaveLength(1);
-    expect(preset.spells![0]).toBeTruthy();
+    expect(preset.spells![0]).toBe(AllSpells.BasicAttack);
   });
 
   it('still builds a kit with nothing loaded at all', () => {

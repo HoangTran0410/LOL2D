@@ -12,12 +12,10 @@ import { spellModules } from '@/generated/spellModules';
  *
  * ## Why the read side is synchronous
  *
- * Because the write side of the engine is. `Game`'s constructor builds the
- * player and every bot inline, `AIChampion` rebuilds its kit on respawn inside
- * `update()`, and `MatchDirector` swaps a live champion's spells from a Vue
- * click handler. Threading `await` through all three would turn a match's boot
- * into an async state machine for no gain, because the answer is always already
- * known by then.
+ * Because the engine read side is. `Game` builds the preloaded match plan
+ * synchronously and `AIChampion` rebuilds on respawn inside `update()`.
+ * Practice-panel changes are the deliberate exception: `MatchDirector` awaits
+ * `loadChampionPresetFromLoadout` before it reaches this synchronous seam.
  *
  * So loading is explicit and up front — `loadSpells(ids)` before a match, and
  * `spellClassOfId(id)` during one. The one rule: **anything that resolves an id
@@ -27,18 +25,15 @@ import { spellModules } from '@/generated/spellModules';
  *
  * ## Random, and why it still works
  *
- * A default match is six `championName: 'random'` loadouts, and a random kit
- * can name any spell in the catalogue — so "load only what the match needs"
- * would have meant loading everything. It does not, because the dice are rolled
- * *before* the load rather than during it: `planMatchKits` picks the ids, and
- * only those champions' chunks are fetched.
+ * A default match is four `championName: 'random'` loadouts. Each roll chooses
+ * one coherent champion row before loading, so `planMatchKits` fetches only
+ * those four champions' chunks rather than the full catalogue.
  *
  * Respawns re-roll, which is the one case the plan cannot see ahead. That is
  * what `loadRemainingSpells()` is for: the match starts on its own kits, and the
  * rest of the catalogue streams in behind it, long before anything has died.
- * `randomLoadedId` is the backstop for the seconds in between, and it picks from
- * what is loaded rather than failing — a re-roll that quietly repeats a
- * champion is invisible; a crash is not.
+ * If a respawn somehow beats that warm-up, its missing slots use the explicit
+ * BasicAttack fallback rather than borrowing an unrelated champion's skill.
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,14 +55,13 @@ export const isSpellLoaded = (id: string): boolean => loaded.has(id);
 /**
  * The class for an id, or `null` if its module has not been loaded.
  *
- * Callers in the match treat `null` as "not this one" and fall back — see
- * `randomLoadedId`. It is deliberately not an exception: a missing module is a
- * scheduling mistake, and the recovery (play a different spell) is better than
- * the alternative (a dead match).
+ * Callers in the match treat `null` as "not this one" and use their explicit
+ * safe fallback. It is deliberately not an exception: a missing module is a
+ * scheduling/load failure and must not take down the match.
  */
 export const spellClassOfId = (id: string): SpellClass | null => loaded.get(id) ?? null;
 
-/** Every id currently in memory — the pool `random` actually draws from. */
+/** Every id currently in memory, primarily for diagnostics and tests. */
 export const loadedSpellIds = (): string[] => [...loaded.keys()];
 
 /**
@@ -128,9 +122,9 @@ export async function loadSpells(
  * Everything not already loaded, in the background.
  *
  * Called once the match is running, never before it: the point is that pressing
- * Chơi waits for six kits rather than sixty-six. Fire-and-forget by design — the
- * caller has nothing useful to do with the promise, and nothing in a match may
- * block on it.
+ * Chơi waits for six kits rather than the full catalogue. Fire-and-forget by
+ * design — the caller has nothing useful to do with the promise, and nothing
+ * in a match may block on it.
  */
 export function loadRemainingSpells(): Promise<void> {
   if (everythingRequested) return Promise.resolve();
@@ -139,12 +133,9 @@ export function loadRemainingSpells(): Promise<void> {
 }
 
 /**
- * A random id from what is *loaded*, for the re-rolls that happen mid-match.
- *
- * Drawing from the loaded pool rather than the full catalogue is the one
- * concession lazy loading asks for, and it is a narrow one: `loadRemainingSpells`
- * makes the two sets identical within a second or so of the match starting, and
- * the first respawn cannot happen before then.
+ * A random id from what is loaded. Retained as a registry utility/test seam;
+ * champion rolls now select a coherent catalogue row instead of composing
+ * individual slots from this pool.
  */
 export function randomLoadedId(): string | null {
   if (loaded.size === 0) return null;

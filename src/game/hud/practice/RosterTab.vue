@@ -16,8 +16,8 @@
  *
  * Two different facts, and the row cannot be used as a source for the other.
  * The row is who is standing on the map — after a swap to Zed, "Zed"; on the
- * default config, "Random", because `getChampionPresetRandom` names a rolled
- * mix that and there is no champion to name. The editor opens on the *setting*:
+ * default config, the coherent champion rolled for this life. The editor opens
+ * on the *setting*:
  * "Ngẫu Nhiên", the thing a player would be editing and the thing that keeps a
  * bot re-rolling on every respawn. Reading the row back as a loadout would
  * silently pin a bot that was meant to keep rolling — hence
@@ -25,9 +25,9 @@
  *
  * ## What lands when
  *
- * A champion *swap* lands on the unit the moment it is confirmed: it mutates a
- * unit already in the world, and only the canvas has to wait (the panel opens
- * paused, so nothing redraws). Add and remove are the other kind — they need
+ * A champion *swap* first loads that exact kit, then lands on the existing unit;
+ * the panel is paused, so the canvas never shows an in-between fallback. Add
+ * and remove are the other kind — they need
  * `ObjectManager.update()`, which flushes `_objectToBeAdd` and sweeps
  * `toRemove`, and that cannot run until the panel closes. The roster shows them
  * immediately anyway, because `MatchDirector.bots()` counts both sets; the note
@@ -80,6 +80,8 @@ const roster = computed<RosterEntry[]>(() => {
 
 const bots = computed(() => roster.value.filter(entry => !entry.isPlayer));
 const atCap = computed(() => bots.value.length >= AI_COUNT_MAX);
+const addingBot = ref(false);
+const addDisabled = computed(() => atCap.value || addingBot.value);
 
 /**
  * `RosterEntry.unit` is a `Champion`, which is the honest type — the player is
@@ -94,12 +96,18 @@ const botOf = (entry: RosterEntry): AIChampion | null =>
 /** "Bạn", then Bot 1..n in spawn order — the position in the list, not a unit id. */
 const labelOf = (index: number): string => (index === 0 ? 'Bạn' : `Bot ${index}`);
 
-const addBot = (): void => {
+const addBot = async (): Promise<void> => {
   // The cap is the director's (`addBot` returns null at `AI_COUNT_MAX`); the
   // button is disabled and the count is on screen so a refusal is never the
   // player's first hint that there was a limit.
-  hud.director.addBot(DEFAULT_CHAMPION_LOADOUT);
-  invalidate();
+  if (addingBot.value) return;
+  addingBot.value = true;
+  try {
+    await hud.director.addBotLoaded(DEFAULT_CHAMPION_LOADOUT);
+    invalidate();
+  } finally {
+    addingBot.value = false;
+  }
 };
 
 const removeBot = (entry: RosterEntry): void => {
@@ -204,9 +212,11 @@ const editingLoadout = computed<ChampionLoadout>(() =>
   editing.value ? hud.director.loadoutOf(editing.value.unit) : DEFAULT_CHAMPION_LOADOUT
 );
 
-const applyLoadout = (loadout: ChampionLoadout): void => {
-  if (editing.value) hud.director.applyLoadout(editing.value.unit, loadout);
+const applyLoadout = async (loadout: ChampionLoadout): Promise<void> => {
+  const entry = editing.value;
+  if (!entry) return;
   editing.value = null;
+  await hud.director.applyLoadoutLoaded(entry.unit, loadout);
   invalidate();
 };
 
@@ -332,9 +342,15 @@ const applyLoadout = (loadout: ChampionLoadout): void => {
          on screen otherwise. The count is on the button rather than in a note
          beside it for the same reason: at the cap, the one control the player is
          pressing is the one that has to explain itself. -->
-    <button type="button" class="practice-add-bot" :disabled="atCap" @click="addBot">
+    <button type="button" class="practice-add-bot" :disabled="addDisabled" @click="addBot">
       <i class="fas fa-plus"></i>
-      <span>{{ atCap ? `Đã đủ ${AI_COUNT_MAX} bot — xoá bớt để thêm` : 'Thêm bot' }}</span>
+      <span>{{
+        addingBot
+          ? 'Đang tải bộ kỹ năng…'
+          : atCap
+            ? `Đã đủ ${AI_COUNT_MAX} bot — xoá bớt để thêm`
+            : 'Thêm bot'
+      }}</span>
       <span class="practice-add-bot-count">{{ bots.length }}/{{ AI_COUNT_MAX }}</span>
     </button>
 

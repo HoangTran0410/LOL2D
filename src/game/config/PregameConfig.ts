@@ -28,8 +28,9 @@
  * ## Schema versioning
  *
  * The storage key stays `lol2d:pregameConfig:v1` even though this revision
- * adds fields (`player.mode`, `player.customSlots`, `ai.bots`) that v1 never
- * wrote. Bumping the key was the other option and was rejected: a player who
+ * adds fields (`player.mode`, `player.customSlots`, `ai.bots`,
+ * `ai.botBehaviours`, `ai.botTeams`) that v1 never wrote. Bumping the key was
+ * the other option and was rejected: a player who
  * configured a match yesterday would load under a fresh key with nothing
  * there, silently losing their champion pick, AI count, CDR and URF — a
  * worse outcome than what this does instead, which is extend the *validator*.
@@ -49,10 +50,13 @@
  * what every bot in the match ran on — so they *are* what an old blob meant
  * per bot. Seeding from the defaults would look right (the defaults are a
  * plausible answer) while silently discarding a setting the player really
- * made on the setup screen. `world` is the same story with a simpler answer:
- * a config saved before it existed meant a match with a full jungle and lane
- * minions, because that is the only match the game could boot.
+ * made on the setup screen. A missing `ai.botTeams` gets the stable Red/Blue
+ * alternation that balances the default three bots around the fixed Blue player. `world`
+ * is the same story with a simpler answer: a config saved before it existed
+ * meant a match with a full jungle and lane minions, because that is the only
+ * match the game could boot.
  */
+import { initialBotTeam, isMatchTeamId, type MatchTeamId } from './MatchTeams';
 
 /** A `SpellGroups` champion name (see `preset.ts`), or the random-kit default. */
 export type ChampionChoice = string | 'random';
@@ -61,9 +65,9 @@ export type ChampionChoice = string | 'random';
 export type SlotChoice = string | 'random';
 
 /**
- * `'champion'`: avatar + Q/W/E/R come from one `SpellGroups` entry (or a
- * fully random mix, when `championName` is `'random'`) — the original,
- * simpler path, unchanged in behaviour.
+ * `'champion'`: avatar + Q/W/E/R come from one `SpellGroups` entry. When
+ * `championName` is `'random'`, one complete champion row is rolled so its
+ * identity, portrait, skills and attack profile stay coherent.
  *
  * `'custom'`: all 7 slots (A, Q, W, E, R, D, F — see `SLOT_COUNT`) are picked
  * independently from the whole spell catalogue via `customSlots`.
@@ -110,7 +114,7 @@ export interface AIConfig {
    * The behaviour a bot gets when nobody has chosen one for it: what the
    * setup screen's `AiConfigPanel` edits, what an old config's every bot ran
    * on (hence the `botBehaviours` migration), and what `MatchDirector.addBot`
-   * gives a bot added mid-match. Off by default, same as today.
+   * gives a bot added mid-match. On by default, matching `AIChampion`.
    */
   autoMove: boolean;
   /** Whether a bot picks fights on its own. */
@@ -127,6 +131,13 @@ export interface AIConfig {
    * before per-bot configuration existed.
    */
   bots: readonly ChampionLoadout[];
+  /**
+   * One Blue/Red lane team per bot slot. It is stored beside the loadout and
+   * behaviour so a roster edited mid-match boots back onto the same sides.
+   * Old configs migrate to Red/Blue alternating around the fixed Blue player;
+   * the setup screen rebalances only a slot as it becomes active.
+   */
+  botTeams: readonly MatchTeamId[];
   /**
    * One behaviour per bot *slot*, the same `AI_COUNT_MAX`-long, index-aligned
    * shape as `bots` and for the same reasons. Parallel to `bots` rather than a
@@ -191,19 +202,19 @@ export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
 
 /**
  * Reproduces the game's behaviour before this config existed: a fully random
- * champion and kit, 5 AI champions — each also random — that fight back and
- * cast on their own but don't wander (AIChampion's own hardcoded defaults:
- * autoAttack=true, autoCast=true, autoMove=false), no cooldown reduction,
- * full mana costs, a full jungle and lane minions running.
+ * champion and kit, 3 AI champions — each also random, alternating Red/Blue
+ * around the Blue player for a 2v2 — that move, fight and cast on their own,
+ * no cooldown reduction, full mana costs, a full jungle and lane minions.
  */
 export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
   player: DEFAULT_CHAMPION_LOADOUT,
   ai: Object.freeze({
-    count: 5,
+    count: 3,
     autoMove: DEFAULT_BOT_BEHAVIOUR.autoMove,
     autoAttack: DEFAULT_BOT_BEHAVIOUR.autoAttack,
     autoCast: DEFAULT_BOT_BEHAVIOUR.autoCast,
     bots: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => DEFAULT_CHAMPION_LOADOUT)),
+    botTeams: Object.freeze(Array.from({ length: AI_COUNT_MAX }, (_, i) => initialBotTeam(i))),
     botBehaviours: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => DEFAULT_BOT_BEHAVIOUR)),
   }),
   rules: Object.freeze({
@@ -302,6 +313,10 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
   const bots: ChampionLoadout[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
     sanitizeChampionLoadout(rawBots[i])
   );
+  const rawTeams = Array.isArray(ai.botTeams) ? ai.botTeams : [];
+  const botTeams: MatchTeamId[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+    isMatchTeamId(rawTeams[i]) ? rawTeams[i] : initialBotTeam(i)
+  );
 
   // Resolved before the per-bot array so it can seed it — the migration this
   // module's header spells out. Note the order: the *global* flags fall back to
@@ -322,6 +337,7 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
       count: clampInt(ai.count, AI_COUNT_MIN, AI_COUNT_MAX, DEFAULT_PREGAME_CONFIG.ai.count),
       ...globalBehaviour,
       bots,
+      botTeams,
       botBehaviours,
     },
     rules: {

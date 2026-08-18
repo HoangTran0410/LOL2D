@@ -414,6 +414,7 @@ const frameRate = await page.evaluate(async () => {
   game.fogOfWar.outOfViewColor = '#0007';
   MinionModule.MinionPresets.melee.speed = 2.6;
   MinionModule.MinionPresets.ranged.speed = 2.6;
+  MinionModule.MinionPresets.cannon.speed = 2.6;
 
   const spawner = game.minionSpawner;
   for (let i = 0; i < 6; i++) spawner.queueWave();

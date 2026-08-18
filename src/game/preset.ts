@@ -2,7 +2,10 @@ import AssetManager, { type AssetKey } from '@/managers/AssetManager';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
-import type { ChampionAttackTuning } from './gameObject/attackableUnits/Champion';
+import {
+  DEFAULT_CHAMPION_ATTACK,
+  type ChampionAttackTuning,
+} from './gameObject/attackableUnits/Champion';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
 import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameConfig';
@@ -18,8 +21,7 @@ import type { SpellCatalogId } from '@/generated/spellCatalog';
 import {
   allSpellIds,
   isSpellId,
-  isSpellLoaded,
-  randomLoadedId,
+  loadSpells,
   spellClassOfId,
   type SpellClass,
 } from './spellRegistry';
@@ -49,74 +51,54 @@ const random = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
  * Two things can make a lookup miss and both are recoverable: a stale
  * `localStorage` slot naming a spell this build removed, and — for a mid-match
  * re-roll — an id whose chunk has not landed yet. Neither is worth a broken
- * match, so this degrades to another loaded spell and finally to the basic
- * attack. Anything a match *plans* for is loaded before it starts; see
- * `planMatchKits`.
+ * match, so this degrades to the basic attack. It must never borrow a different
+ * loaded spell: a Lux portrait holding Yasuo Q is playable but dishonest, and
+ * much harder to diagnose than an obvious safe fallback. Anything a match
+ * *plans* for is loaded before it starts; see `planMatchKits`.
  */
-const classForId = (id: string): SpellClass => {
-  const found = spellClassOfId(id);
-  if (found) return found;
-  const substitute = randomLoadedId();
-  return (substitute && spellClassOfId(substitute)) ?? BasicAttack;
-};
+const classForId = (id: string): SpellClass => spellClassOfId(id) ?? BasicAttack;
 
 /**
- * Portraits used for a fully random loadout — 'random' champion mode and
- * every free-form custom kit, which has no single champion identity to draw
- * an avatar from. A curated subset (not "every `champ_*` key") because a few
- * champions in the catalogue never got a matching background/portrait pair.
+ * A catalogue row complete enough to be a real random champion.
+ *
+ * Kept as a narrowed table rather than repeatedly filtering `CHAMPION_KITS`:
+ * random planning runs once per unit at boot and again on random bot respawns.
+ * The loop is deliberate — this project's Array `filter` polyfill cannot narrow
+ * types, so a predicate would still leave `image` and `attack` nullable.
  */
-const RANDOM_AVATAR_POOL: AssetKey[] = [
-  'champ_yasuo',
-  'champ_lux',
-  'champ_blitzcrank',
-  'champ_ashe',
-  'champ_teemo',
-  'champ_leblanc',
-  'champ_leesin',
-  'champ_chogath',
-  'champ_ahri',
-  'champ_shaco',
-  'champ_olaf',
-  'champ_graves',
-  'champ_ekko',
-  'champ_jarvaniv',
-  'champ_camille',
-  'champ_katarina',
-  'champ_vayne',
-  'champ_riven',
-  'champ_sett',
-  'champ_jhin',
-  'champ_nautilus',
-  'champ_diana',
-  'champ_vi',
-  'champ_syndra',
-  'champ_ziggs',
-  'champ_irelia',
-];
-const randomAvatar = (): AssetKey => random(RANDOM_AVATAR_POOL);
+interface PlayableChampionKit {
+  name: string;
+  image: AssetKey;
+  spells: SpellCatalogId[];
+  attack: ChampionAttackTuning;
+}
+
+const PLAYABLE_CHAMPION_KITS: PlayableChampionKit[] = [];
+for (const kit of CHAMPION_KITS) {
+  if (!kit.image?.startsWith('champ_') || kit.spells.length !== 4 || !kit.attack) continue;
+  PLAYABLE_CHAMPION_KITS.push({
+    name: kit.name,
+    image: kit.image,
+    spells: kit.spells,
+    attack: kit.attack,
+  });
+}
+
+const randomChampionKit = (): PlayableChampionKit => random(PLAYABLE_CHAMPION_KITS);
+const randomAvatar = (): AssetKey => randomChampionKit().image;
 
 /**
  * A wholly random champion — the AI's respawn re-roll, and what a loadout on
  * 'random' resolves to.
  *
- * Reads through `planRandomKit` + `presetFromPlan` like everything else, which
- * is what keeps one definition of "what a random kit is". Note the ordering
- * constraint this creates: it can only return spells that are *loaded*, so a
- * re-roll during the first second of a match draws from a smaller pool than the
- * catalogue. `loadRemainingSpells` closes that window long before anything has
- * died; `classForId` is the backstop if it somehow has not.
+ * Reads through one `planRandomKit` + `presetFromPlan` like everything else,
+ * which keeps one definition of "what a random champion is" and one dice roll
+ * for its name, portrait, four abilities and attack profile. A chunk that has
+ * not arrived degrades that slot to BasicAttack through `classForId`; it never
+ * swaps in an unrelated loaded spell.
  */
 export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetKey } =>
-  presetFromPlan({
-    ...planRandomKit(),
-    // Only ever roll ids that have arrived: planning against the full catalogue
-    // is right *before* a match, when the plan is about to be loaded, and wrong
-    // during one, when nothing is going to fetch it.
-    spellIds: planRandomKit().spellIds.map(id =>
-      isSpellLoaded(id) ? id : (randomLoadedId() ?? id)
-    ),
-  });
+  presetFromPlan(planRandomKit());
 
 /**
  * The kit table, and `ATTACK`, now live in `config/spellCatalog.ts` as ids —
@@ -246,13 +228,13 @@ export {
 // longer works, and the reason is worth stating because it is the whole
 // argument for splitting them:
 //
-//   A default match is six `championName: 'random'` loadouts, and a random kit
-//   can name any spell in the catalogue. Deciding what to load by looking at the
-//   config would therefore have answered "all 238" — the exact thing this was
+//   A default match is four `championName: 'random'` loadouts. The config says
+//   none of which four champion rows they will become, so deciding what to load
+//   from it alone would still answer "all 58 kits" — the exact thing this was
 //   supposed to avoid.
 //
 // So the roll happens first, against ids alone (`planMatchKits` — no module has
-// to have arrived for it to pick names out of a list), the ~24 ids it produces
+// to have arrived for it to pick names out of a list), the ~16 ids it produces
 // are loaded, and only then are classes read (`presetFromPlan`). One roll, and
 // a match that fetches the six kits it is about to play.
 //
@@ -269,6 +251,8 @@ export { spellClassOfId } from './spellRegistry';
 export interface KitPlan {
   name: string;
   avatar: AssetKey;
+  /** The same catalogue row's basic-attack tuning; custom kits use the engine default. */
+  attack: ChampionAttackTuning;
   /** Exactly `SLOT_COUNT` ids, in A/Q/W/E/R/D/F order. */
   spellIds: string[];
 }
@@ -289,31 +273,32 @@ const planSlot = (choice: SlotChoice): string =>
   choice !== 'random' && isSpellId(choice) ? choice : randomSpellId();
 
 /**
- * The random kit: a portrait and four abilities off the whole catalogue.
+ * A random champion: one complete catalogue row, kept coherent all the way
+ * through name, portrait, Q/W/E/R and basic-attack profile.
  *
- * D and F are arguments rather than hardcoded Flash/Heal because random decides
- * the portrait and the four abilities, *not* the summoners — those are an
- * explicit choice on every loadout, and the random preset used to silently
- * overwrite them (a player who set Ignite on a random champion got Heal).
+ * D and F are arguments rather than part of that row because summoners are an
+ * explicit choice on every loadout. Random decides the champion, not those two
+ * slots — a player who set Ignite on a random champion must keep Ignite.
  */
-const planRandomKit = (summonerD = 'Flash', summonerF = 'Heal'): KitPlan => ({
-  name: 'Random',
-  avatar: randomAvatar(),
-  spellIds: [
-    // Slot 0 is the internal slot and SpellHotKeys[0] is `A`, so whatever sits
-    // here is what `A` presses. The basic attack lives there: it is an ability
-    // like the rest, and putting it in a slot is what gives the champion's own
-    // attack a key, an icon and a timer without inventing a second input path
-    // beside the spell one.
-    BASIC_ATTACK_ID,
-    randomSpellId(),
-    randomSpellId(),
-    randomSpellId(),
-    randomSpellId(),
-    summonerIdOr(summonerD),
-    summonerIdOr(summonerF),
-  ],
-});
+const planRandomKit = (summonerD = 'Flash', summonerF = 'Heal'): KitPlan => {
+  const kit = randomChampionKit();
+  return {
+    name: kit.name,
+    avatar: kit.image,
+    attack: kit.attack,
+    spellIds: [
+      // Slot 0 is the internal slot and SpellHotKeys[0] is `A`, so whatever sits
+      // here is what `A` presses. The basic attack lives there: it is an ability
+      // like the rest, and putting it in a slot is what gives the champion's own
+      // attack a key, an icon and a timer without inventing a second input path
+      // beside the spell one.
+      BASIC_ATTACK_ID,
+      ...kit.spells,
+      summonerIdOr(summonerD),
+      summonerIdOr(summonerF),
+    ],
+  };
+};
 
 /**
  * Turns a `ChampionLoadout` (plain, serializable data — the player's or one
@@ -328,9 +313,9 @@ const planRandomKit = (summonerD = 'Flash', summonerF = 'Heal'): KitPlan => ({
  *   removed, or corruption `PregameConfig`'s own sanitizer cannot catch because
  *   it does not know this catalogue — falls through to the random kit.
  *
- * A custom kit has no single champion identity to draw a portrait from, so it
- * gets the same random-avatar treatment, consistent with how 'random' champion
- * mode already decouples the avatar from the kit.
+ * A custom kit has no single champion identity or attack archetype, so it gets
+ * a portrait from the playable pool and keeps `DEFAULT_CHAMPION_ATTACK`; only
+ * explicit random-champion mode promises one coherent catalogue row.
  */
 export const planLoadout = (loadout: ChampionLoadout): KitPlan => {
   if (loadout.mode === 'custom') {
@@ -338,6 +323,7 @@ export const planLoadout = (loadout: ChampionLoadout): KitPlan => {
     return {
       name: 'Tự Ghép Chiêu',
       avatar: randomAvatar(),
+      attack: DEFAULT_CHAMPION_ATTACK,
       spellIds: slots.map(planSlot),
     };
   }
@@ -345,18 +331,14 @@ export const planLoadout = (loadout: ChampionLoadout): KitPlan => {
   const kit =
     loadout.championName === 'random'
       ? undefined
-      : CHAMPION_KITS.find(
-          candidate =>
-            candidate.name === loadout.championName &&
-            !!candidate.image &&
-            candidate.spells.length === 4
-        );
+      : PLAYABLE_CHAMPION_KITS.find(candidate => candidate.name === loadout.championName);
 
-  if (!kit || !kit.image) return planRandomKit(loadout.summonerD, loadout.summonerF);
+  if (!kit) return planRandomKit(loadout.summonerD, loadout.summonerF);
 
   return {
     name: kit.name,
     avatar: kit.image,
+    attack: kit.attack,
     spellIds: [
       BASIC_ATTACK_ID,
       ...kit.spells,
@@ -386,6 +368,7 @@ export const plannedSpellIds = (plan: MatchPlan): string[] => [
 export const presetFromPlan = (plan: KitPlan): ChampionPresetData & { avatar: AssetKey } => ({
   name: plan.name,
   avatar: plan.avatar,
+  attack: plan.attack,
   spells: plan.spellIds.map(classForId),
 });
 
@@ -397,6 +380,20 @@ export const presetFromPlan = (plan: KitPlan): ChampionPresetData & { avatar: As
 export const getChampionPresetFromLoadout = (
   loadout: ChampionLoadout
 ): ChampionPresetData & { avatar: AssetKey } => presetFromPlan(planLoadout(loadout));
+
+/**
+ * Safe live-match variant: decide the identity once, fetch exactly those spell
+ * modules, then build from that same plan. Practice-panel swaps use this path
+ * so confirming Lux before the background catalogue warm-up finishes cannot
+ * produce a Lux portrait with fallback skills.
+ */
+export const loadChampionPresetFromLoadout = async (
+  loadout: ChampionLoadout
+): Promise<ChampionPresetData & { avatar: AssetKey }> => {
+  const plan = planLoadout(loadout);
+  await loadSpells(plan.spellIds);
+  return presetFromPlan(plan);
+};
 export const MonsterPreset: Record<string, MonsterPresetData> = {
   baron: {
     name: 'Baron',

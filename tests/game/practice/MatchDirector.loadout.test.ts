@@ -20,6 +20,17 @@ const AHRI: ChampionLoadout = { ...DEFAULT_CHAMPION_LOADOUT, championName: 'Ahri
 const ZED: ChampionLoadout = { ...DEFAULT_CHAMPION_LOADOUT, championName: 'Zed' };
 
 describe('MatchDirector.applyLoadout', () => {
+  it('offers an awaited path for panel swaps and additions', async () => {
+    const { context: ctx, player } = context();
+    const director = new MatchDirector(ctx);
+
+    await director.applyLoadoutLoaded(player, ZED);
+    const bot = await director.addBotLoaded(AHRI);
+
+    expect(player.name).toBe('Zed');
+    expect(bot?.name).toBe('Ahri');
+  });
+
   it('keeps the unit exactly where it stands', () => {
     const { context: ctx, player } = context();
     const director = new MatchDirector(ctx);

@@ -76,6 +76,13 @@ describe('practice range controls', () => {
     expect(source).toContain('hud.setRenderQuality');
     expect(source).toContain('hud.setRenderFps');
   });
+
+  it('waits for a default reset and disables its button while kits are loading', () => {
+    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+
+    expect(source).toContain('await hud.director.resetToDefaults()');
+    expect(source).toContain(':disabled="resetting"');
+  });
 });
 
 describe('createHudInteractions — the ways into the practice panel', () => {

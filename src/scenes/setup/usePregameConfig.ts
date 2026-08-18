@@ -6,11 +6,13 @@ import {
   toMatchRules,
   DEFAULT_PREGAME_CONFIG,
   DEFAULT_CHAMPION_LOADOUT,
+  AI_COUNT_MAX,
   AI_COUNT_MIN,
   type PregameConfig,
   type ChampionLoadout,
   type MatchRules,
 } from '@/game/config/PregameConfig';
+import { MatchTeam as TeamId, teamForAddedBot } from '@/game/config/MatchTeams';
 
 export interface PregameConfigController {
   config: Ref<PregameConfig>;
@@ -18,6 +20,7 @@ export interface PregameConfigController {
   matchRules: ComputedRef<MatchRules>;
   setPlayerLoadout(loadout: ChampionLoadout): void;
   setBotLoadout(index: number, loadout: ChampionLoadout): void;
+  /** Activates new slots on the less populated team without moving existing bots. */
   setAiCount(count: number): void;
   /** Remove one bot by list position (not just the last), shifting the rest up. */
   removeBotAt(index: number): void;
@@ -62,7 +65,23 @@ export const usePregameConfig = (): PregameConfigController => {
   };
 
   const setAiCount = (count: number): void => {
-    config.value = { ...config.value, ai: { ...config.value.ai, count } };
+    const nextCount = Math.min(AI_COUNT_MAX, Math.max(AI_COUNT_MIN, Math.round(count)));
+    const previousCount = config.value.ai.count;
+    const botTeams = config.value.ai.botTeams.slice();
+
+    // A slot becoming active is a new participant, even when its saved kit and
+    // behaviour were retained while inactive. Pick only that new slot's side;
+    // existing participants keep their teams byte-for-byte.
+    for (let i = previousCount; i < nextCount; i++) {
+      const members: { teamId: string }[] = [{ teamId: TeamId.BLUE }];
+      for (let j = 0; j < i; j++) members.push({ teamId: botTeams[j] });
+      botTeams[i] = teamForAddedBot(members);
+    }
+
+    config.value = {
+      ...config.value,
+      ai: { ...config.value.ai, count: nextCount, botTeams },
+    };
     persist();
   };
 
@@ -74,13 +93,11 @@ export const usePregameConfig = (): PregameConfigController => {
    * `bots` array (always `AI_COUNT_MAX` entries — see the type's doc comment)
    * is preserved by refilling the freed tail slot with a default loadout.
    *
-   * `botBehaviours` is spliced in exactly the same step, because the two arrays
-   * are index-aligned by definition: shift the kits without the flags and the
-   * bot that moved down a slot inherits the behaviour of the bot that used to
-   * be there. The freed tail slot is refilled from the *global* flags rather
-   * than from `DEFAULT_BOT_BEHAVIOUR` — that is what a slot nobody has
-   * configured means everywhere else (see `sanitizePregameConfig`'s migration
-   * and `MatchDirector.addBot`), and this screen is where those flags are set.
+   * `botTeams` and `botBehaviours` are spliced in the same step because all
+   * three arrays are index-aligned: shift only the kit and the bot that moved
+   * down inherits somebody else's side and behaviour. The freed behaviour slot
+   * comes from the *global* flags rather than `DEFAULT_BOT_BEHAVIOUR`; its team
+   * comes from the stable default slot at the tail.
    */
   const removeBotAt = (index: number): void => {
     if (index < 0 || index >= config.value.ai.count) return;
@@ -90,6 +107,10 @@ export const usePregameConfig = (): PregameConfigController => {
     bots.splice(index, 1);
     bots.push(DEFAULT_CHAMPION_LOADOUT);
 
+    const botTeams = config.value.ai.botTeams.slice();
+    botTeams.splice(index, 1);
+    botTeams.push(DEFAULT_PREGAME_CONFIG.ai.botTeams[AI_COUNT_MAX - 1]);
+
     const botBehaviours = config.value.ai.botBehaviours.slice();
     botBehaviours.splice(index, 1);
     botBehaviours.push({ autoMove, autoAttack, autoCast });
@@ -97,7 +118,7 @@ export const usePregameConfig = (): PregameConfigController => {
     const count = Math.max(AI_COUNT_MIN, config.value.ai.count - 1);
     config.value = {
       ...config.value,
-      ai: { ...config.value.ai, count, bots, botBehaviours },
+      ai: { ...config.value.ai, count, bots, botTeams, botBehaviours },
     };
     persist();
   };

@@ -79,12 +79,16 @@ describe('MatchDirector world', () => {
   it('clears the field and stops the clock when minions go off', () => {
     const { context: ctx } = context();
     const minions = [{ toRemove: false }, { toRemove: false }];
-    ctx.minionSpawner = { minions, enabled: true } as never;
+    const setEnabled = vi.fn((on: boolean) => {
+      ctx.minionSpawner.enabled = on;
+    });
+    ctx.minionSpawner = { minions, enabled: true, setEnabled } as never;
     const director = new MatchDirector(ctx);
 
     director.minionsEnabled = false;
 
     expect(minions.every(minion => minion.toRemove)).toBe(true);
+    expect(setEnabled).toHaveBeenCalledWith(false);
     expect(ctx.minionSpawner.enabled).toBe(false);
     expect(director.minionsEnabled).toBe(false);
   });
@@ -106,13 +110,31 @@ describe('MatchDirector world', () => {
   it('restarts the clock and leaves the field alone when minions come back on', () => {
     const { context: ctx } = context();
     const minions = [{ toRemove: false }];
-    ctx.minionSpawner = { minions, enabled: false } as never;
+    const setEnabled = vi.fn((on: boolean) => {
+      ctx.minionSpawner.enabled = on;
+    });
+    ctx.minionSpawner = { minions, enabled: false, setEnabled } as never;
     const director = new MatchDirector(ctx);
 
     director.minionsEnabled = true;
 
     expect(ctx.minionSpawner.enabled).toBe(true);
+    expect(setEnabled).toHaveBeenCalledWith(true);
     expect(minions[0].toRemove).toBe(false);
+  });
+
+  it('seeds the boot-time minion state through the spawner lifecycle API', () => {
+    const { context: ctx } = context();
+    const setEnabled = vi.fn((on: boolean) => {
+      ctx.minionSpawner.enabled = on;
+    });
+    ctx.minionSpawner.setEnabled = setEnabled;
+    const director = new MatchDirector(ctx);
+
+    director.seedWorld({ jungle: true, minions: false });
+
+    expect(setEnabled).toHaveBeenCalledWith(false);
+    expect(director.minionsEnabled).toBe(false);
   });
 });
 

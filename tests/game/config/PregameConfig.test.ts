@@ -14,6 +14,7 @@ import {
   type ChampionLoadout,
   type PregameConfig,
 } from '../../../src/game/config/PregameConfig';
+import TeamId from '../../../src/game/enums/TeamId';
 
 /** A minimal in-memory `localStorage` so persistence can be tested in node. */
 class MemoryStorage {
@@ -50,7 +51,7 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
       summonerF: 'Heal',
       customSlots: Array(SLOT_COUNT).fill('random'),
     });
-    expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(5);
+    expect(DEFAULT_PREGAME_CONFIG.ai.count).toBe(3);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoMove).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoAttack).toBe(true);
     expect(DEFAULT_PREGAME_CONFIG.ai.autoCast).toBe(true);
@@ -62,6 +63,14 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
     for (const bot of DEFAULT_PREGAME_CONFIG.ai.bots) {
       expect(bot).toEqual(DEFAULT_PREGAME_CONFIG.player);
     }
+  });
+
+  it('gives every bot slot a stable alternating Red/Blue team', () => {
+    expect(DEFAULT_PREGAME_CONFIG.ai.botTeams).toEqual(
+      Array.from({ length: AI_COUNT_MAX }, (_, index) =>
+        index % 2 === 0 ? TeamId.RED : TeamId.BLUE
+      )
+    );
   });
 
   it('produces a no-op match-rules multiplier', () => {
@@ -223,6 +232,9 @@ describe('sanitizePregameConfig', () => {
           summonerF: 'Heal',
           customSlots: Array(SLOT_COUNT).fill('random'),
         })),
+        botTeams: Array.from({ length: AI_COUNT_MAX }, (_, index) =>
+          index % 2 === 0 ? TeamId.BLUE : TeamId.RED
+        ),
         botBehaviours: Array.from({ length: AI_COUNT_MAX }, () => ({
           autoMove: true,
           autoAttack: false,
@@ -317,6 +329,9 @@ describe('loadPregameConfig / savePregameConfig', () => {
           summonerF: 'Heal',
           customSlots: Array(SLOT_COUNT).fill('random'),
         })),
+        botTeams: Array.from({ length: AI_COUNT_MAX }, (_, index) =>
+          index % 2 === 0 ? TeamId.RED : TeamId.BLUE
+        ),
         botBehaviours: Array.from({ length: AI_COUNT_MAX }, (_, i) => ({
           autoMove: i === 0,
           autoAttack: true,
@@ -406,6 +421,29 @@ describe('loadPregameConfig / savePregameConfig', () => {
     expect(
       loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')
     ).toBe(true);
+    expect(loaded.ai.botTeams).toEqual(DEFAULT_PREGAME_CONFIG.ai.botTeams);
+  });
+});
+
+describe('ai.botTeams', () => {
+  it('migrates a missing array to the alternating default', () => {
+    expect(sanitizePregameConfig({ ai: { count: 4 } }).ai.botTeams).toEqual(
+      DEFAULT_PREGAME_CONFIG.ai.botTeams
+    );
+  });
+
+  it('keeps valid teams and falls back per slot for invalid values', () => {
+    const result = sanitizePregameConfig({
+      ai: { botTeams: [TeamId.BLUE, TeamId.RED, 'legacy-ffa-id', null] },
+    });
+
+    expect(result.ai.botTeams).toHaveLength(AI_COUNT_MAX);
+    expect(result.ai.botTeams.slice(0, 4)).toEqual([
+      TeamId.BLUE,
+      TeamId.RED,
+      TeamId.RED,
+      TeamId.BLUE,
+    ]);
   });
 });
 

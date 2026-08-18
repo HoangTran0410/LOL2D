@@ -248,19 +248,26 @@ const exitMatch = (): void => {
  * independently, so arming one and pressing the other cannot fire it.
  */
 const confirmingReset = ref(false);
+const resetting = ref(false);
 
-const resetDefaults = (): void => {
+const resetDefaults = async (): Promise<void> => {
+  if (resetting.value) return;
   if (!confirmingReset.value) {
     confirmingReset.value = true;
     return;
   }
   confirmingReset.value = false;
-  hud.director.resetToDefaults();
-  // Every control on this tab is seeded from the director at mount, so the ones
-  // this just moved have to be re-read rather than left showing the old match.
-  rules.value = hud.director.getRules();
-  jungle.value = hud.director.jungleEnabled;
-  minions.value = hud.director.minionsEnabled;
+  resetting.value = true;
+  try {
+    await hud.director.resetToDefaults();
+    // Every control on this tab is seeded from the director at mount, so the
+    // ones this moved must be re-read instead of showing the old match.
+    rules.value = hud.director.getRules();
+    jungle.value = hud.director.jungleEnabled;
+    minions.value = hud.director.minionsEnabled;
+  } finally {
+    resetting.value = false;
+  }
 };
 </script>
 
@@ -362,11 +369,14 @@ const resetDefaults = (): void => {
         type="button"
         class="practice-reset"
         :class="{ confirming: confirmingReset }"
+        :disabled="resetting"
         id="practice-reset"
         @click="resetDefaults"
       >
         <i class="fas fa-rotate-left" aria-hidden="true"></i>
-        <span>{{ confirmingReset ? 'Chắc chưa?' : 'Đặt lại mặc định' }}</span>
+        <span>{{
+          resetting ? 'Đang đặt lại…' : confirmingReset ? 'Chắc chưa?' : 'Đặt lại mặc định'
+        }}</span>
       </button>
 
       <button

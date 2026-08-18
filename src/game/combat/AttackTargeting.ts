@@ -8,12 +8,9 @@ import type { Vec2 } from '@/game/spell/runtime/types';
  * Target acquisition for an attack *order* — as opposed to the delivery in
  * BasicAttack.ts and the standing order in BasicAttackController.ts.
  *
- * This is the only way an attack order is issued now. Right click used to also
- * pick the body directly under the cursor, which meant a move order and an
- * attack order shared one gesture and the game guessed between them; that guess
- * is gone. The rule here is the nearest enemy to the cursor rather than to the
- * champion, so the gesture is "point roughly at him and press" instead of "hit
- * a 55-pixel circle".
+ * The attack-move (`A`) acquisition path. Right click has its own exact body
+ * hit-test in `input/PointerOrders.ts`; this path is deliberately more forgiving:
+ * nearest enemy to the cursor rather than only the body directly underneath it.
  */
 
 /**
@@ -54,13 +51,15 @@ const distanceTo = (point: Vec2, unit: AttackableUnit): number => vecDist(point,
 /**
  * The attackable enemy nearest `point`, or null when the neighbourhood is empty.
  *
- * Three rules, all of them the rules the right click path already plays by:
+ * Three rules shared with the exact right-click path:
  *
  * - hostile, alive and targetable — `canTakeDamageFromTeam` covers all three,
  *   and it drops the attacker itself along the way, because every champion
  *   carries its own team id;
- * - visible — an order cannot be given onto something that cannot be seen, the
- *   same refusal a right click into the fog gets. This used to read `willDraw`,
+ * - visible and not actively stealthed — `excludeStealthed` handles ability
+ *   stealth while `visibleTo` handles terrain/fog sight. An order cannot be
+ *   given onto something that cannot be seen, the same refusal a right click
+ *   into the fog gets. This used to read `willDraw`,
  *   which is the fog's own flag and therefore answers one question only: is it
  *   lit *for the player*. `FogOfWar.calculateSight` clears the flag on every
  *   unit and re-lights it from `game.player.teamId`'s eyes, so a bot's attack
@@ -93,6 +92,7 @@ export function findAttackTargetNearPoint(
       filters: [
         PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.canTakeDamageFromTeam(attacker.teamId),
+        PredefinedFilters.excludeStealthed,
         PredefinedFilters.visibleTo(attacker),
       ],
     }) ?? [];
@@ -156,6 +156,7 @@ export function findAttackTargetAlongRay(
       filters: [
         PredefinedFilters.type(AttackableUnit),
         PredefinedFilters.canTakeDamageFromTeam(attacker.teamId),
+        PredefinedFilters.excludeStealthed,
         PredefinedFilters.visibleTo(attacker),
       ],
     }) ?? [];
