@@ -199,13 +199,11 @@ export default class Sett_W extends Spell {
   }
 
   private decayGrit(): void {
+    this.timeSinceDamage += deltaTime;
     if (this.gritChunks.length === 0) return;
-    const alive: { amount: number; age: number }[] = [];
-    for (const chunk of this.gritChunks) {
-      chunk.age += deltaTime;
-      if (chunk.age < SETT_W_GRIT_DECAY_MS) alive.push(chunk);
+    if (this.timeSinceDamage >= SETT_W_GRIT_DECAY_MS * 2) {
+      this.gritChunks = [];
     }
-    this.gritChunks = alive;
   }
 }
 

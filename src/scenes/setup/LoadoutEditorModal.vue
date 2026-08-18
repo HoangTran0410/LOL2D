@@ -62,7 +62,7 @@
  * mounts it over a paused match), so both screens get the library and the same
  * kit crosses between them.
  */
-import { ref, shallowRef, computed, nextTick } from 'vue';
+import { ref, shallowRef, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import type { ChampionLoadout, MatchRules, SlotChoice } from '@/game/config/PregameConfig';
 import { SLOT_COUNT } from '@/game/config/PregameConfig';
 import {
@@ -325,18 +325,23 @@ const saveError = ref('');
 const nameInput = ref<HTMLInputElement | null>(null);
 const rosterBody = ref<HTMLElement | null>(null);
 
+const isCustomKit = computed(() => draft.value.mode === 'custom');
+
+watch(isCustomKit, custom => {
+  if (!custom) {
+    naming.value = false;
+    saveError.value = '';
+  }
+});
+
 const toggleSave = (): void => {
+  if (!isCustomKit.value) return;
   if (naming.value) {
     naming.value = false;
     return;
   }
   saveError.value = '';
-  // Prefilled with the champion the draft is, when it is one: most saves are
-  // "Ahri, but…", and a name is easier to edit than to invent.
-  kitName.value =
-    draft.value.mode === 'champion' && draft.value.championName !== 'random'
-      ? draft.value.championName
-      : '';
+  kitName.value = '';
   naming.value = true;
   void nextTick(() => nameInput.value?.focus());
 };
@@ -457,11 +462,67 @@ const toggleShelf = (shelf: KitShelf): void => {
 // the player has no reason to know they owe.
 openShelf.value = shelfForSlot(activeSlot.value);
 
+const hasChanges = computed(() => {
+  if (draft.value.mode !== props.loadout.mode) return true;
+  if (draft.value.mode === 'champion') {
+    return (
+      draft.value.championName !== props.loadout.championName ||
+      draft.value.summonerD !== props.loadout.summonerD ||
+      draft.value.summonerF !== props.loadout.summonerF
+    );
+  }
+  if (draft.value.customSlots.length !== props.loadout.customSlots.length) return true;
+  return draft.value.customSlots.some((slot, i) => slot !== props.loadout.customSlots[i]);
+});
+
+const showUnsavedConfirm = ref(false);
+
 const confirm = (): void => {
   emit('change', draft.value);
   emit('close');
 };
 const cancel = (): void => emit('close');
+
+const handleRequestClose = (): void => {
+  if (showUnsavedConfirm.value) {
+    showUnsavedConfirm.value = false;
+    return;
+  }
+  if (naming.value) {
+    naming.value = false;
+    return;
+  }
+  if (hasChanges.value) {
+    showUnsavedConfirm.value = true;
+    return;
+  }
+  cancel();
+};
+
+const onGlobalKey = (event: KeyboardEvent): void => {
+  if (event.key === 'Escape') {
+    if (showUnsavedConfirm.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      showUnsavedConfirm.value = false;
+    } else if (naming.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      cancelSave();
+    } else if (hasChanges.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      showUnsavedConfirm.value = true;
+    }
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', onGlobalKey, true);
+});
+onUnmounted(() => {
+  window.removeEventListener('keydown', onGlobalKey, true);
+});
 
 /**
  * The line follows what is actually on screen, because the roster offers
@@ -481,11 +542,11 @@ const hint = computed(() => {
 </script>
 
 <template>
-  <div class="pregame-modal-backdrop" @click.self="cancel">
+  <div class="pregame-modal-backdrop" @click.self="handleRequestClose">
     <div class="pregame-modal loadout-modal">
       <header class="pregame-modal-header">
         <h3>{{ title }}</h3>
-        <button type="button" class="pregame-icon-btn" title="Đóng" @click="cancel">
+        <button type="button" class="pregame-icon-btn" title="Đóng" @click="handleRequestClose">
           <i class="fas fa-times"></i>
         </button>
       </header>
@@ -523,10 +584,11 @@ const hint = computed(() => {
 
         <div class="kit-bar-actions">
           <button
+            v-if="isCustomKit"
             type="button"
             class="hextech-btn secondary saved-kit-save"
             :class="{ open: naming }"
-            title="Lưu bộ chiêu này để dùng lại ở trận khác"
+            title="Lưu bộ chiêu tự ghép này để dùng lại ở trận khác"
             aria-label="Lưu bộ"
             @click="toggleSave"
           >
@@ -541,6 +603,7 @@ const hint = computed(() => {
           <button
             type="button"
             class="hextech-btn kit-bar-btn"
+            :class="{ 'has-changes': hasChanges }"
             title="Xác nhận bộ chiêu này"
             aria-label="Xác nhận"
             @click="confirm"
@@ -551,7 +614,7 @@ const hint = computed(() => {
         </div>
       </div>
 
-      <div v-if="naming" class="saved-kit-form">
+      <div v-if="naming && isCustomKit" class="saved-kit-form">
         <input
           ref="nameInput"
           v-model="kitName"
@@ -615,6 +678,54 @@ const hint = computed(() => {
 
       <div v-if="peekDisplay" class="spell-peek" :style="peekStyle">
         <SpellDetailPane :display="peekDisplay" placeholder="" />
+      </div>
+
+      <!-- Unsaved changes confirmation dialog -->
+      <div
+        v-if="showUnsavedConfirm"
+        class="kit-unsaved-dialog-scrim"
+        role="presentation"
+        @click.self="showUnsavedConfirm = false"
+      >
+        <div
+          class="kit-unsaved-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unsaved-changes-title"
+        >
+          <h4 id="unsaved-changes-title" class="kit-unsaved-title">
+            <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+            Thay đổi chưa xác nhận
+          </h4>
+          <p class="kit-unsaved-text">
+            Bạn đã thay đổi bộ chiêu nhưng chưa bấm <strong>Xác nhận</strong>. Bạn có muốn áp dụng các thay đổi này không?
+          </p>
+          <div class="kit-unsaved-actions">
+            <button
+              type="button"
+              class="hextech-btn kit-unsaved-apply"
+              @click="confirm"
+            >
+              <i class="fas fa-check" aria-hidden="true"></i>
+              Áp dụng & Lưu
+            </button>
+            <button
+              type="button"
+              class="hextech-btn secondary kit-unsaved-discard"
+              @click="cancel"
+            >
+              <i class="fas fa-rotate-left" aria-hidden="true"></i>
+              Bỏ thay đổi
+            </button>
+            <button
+              type="button"
+              class="hextech-btn secondary kit-unsaved-stay"
+              @click="showUnsavedConfirm = false"
+            >
+              Tiếp tục sửa
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

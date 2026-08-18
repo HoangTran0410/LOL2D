@@ -1,6 +1,5 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { wrapAngle } from '@/utils/math.utils';
 import { effectiveRange } from '@/game/combat/Reach';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
@@ -182,7 +181,8 @@ export class Diana_Q_Sweep extends SpellObject {
     const ny = dx / dist;
     const midX = (p0.x + p2.x) / 2;
     const midY = (p0.y + p2.y) / 2;
-    const bow = dist * 0.45;
+    // Deep semicircular crescent curve
+    const bow = dist * 1.0;
     this.p1 = { x: midX + nx * bow, y: midY + ny * bow };
   }
 
@@ -266,7 +266,9 @@ export class Diana_Q_Sweep extends SpellObject {
   }
 
   private detonate(): void {
-    this.game.objectManager.addObject(new Diana_Q_Cut(this.owner, createVector(this.p2.x, this.p2.y)));
+    this.game.objectManager.addObject(
+      new Diana_Q_Cut(this.owner, createVector(this.p2.x, this.p2.y))
+    );
 
     const victims = this.game.objectManager.queryObjects({
       area: new Circle({

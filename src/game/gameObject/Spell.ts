@@ -514,12 +514,43 @@ export default class Spell {
           this.spellVfx?.castStart(context);
           this.onCastStart(context);
         },
-        onChargeUpdate: (context, elapsedMs, ratio) =>
-          this.onChargeUpdate(context, elapsedMs, ratio),
+        onChargeUpdate: (context, elapsedMs, ratio) => {
+          let liveContext = context;
+          if (
+            this.activeCastSpec.activation === 'HOLD_RELEASE' &&
+            this.game?.worldMouse &&
+            this.owner === this.game.player
+          ) {
+            const dx = this.game.worldMouse.x - this.owner.position.x;
+            const dy = this.game.worldMouse.y - this.owner.position.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            liveContext = {
+              ...context,
+              cursorWorld: { x: this.game.worldMouse.x, y: this.game.worldMouse.y },
+              direction: { x: dx / dist, y: dy / dist },
+            };
+          }
+          this.onChargeUpdate(liveContext, elapsedMs, ratio);
+        },
         onRelease: context => {
-          this.spellVfx?.release(context);
-          this.onRelease(context);
-          this.onSpellCast(context);
+          let liveContext = context;
+          if (
+            this.activeCastSpec.activation === 'HOLD_RELEASE' &&
+            this.game?.worldMouse &&
+            this.owner === this.game.player
+          ) {
+            const dx = this.game.worldMouse.x - this.owner.position.x;
+            const dy = this.game.worldMouse.y - this.owner.position.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            liveContext = {
+              ...context,
+              cursorWorld: { x: this.game.worldMouse.x, y: this.game.worldMouse.y },
+              direction: { x: dx / dist, y: dy / dist },
+            };
+          }
+          this.spellVfx?.release(liveContext);
+          this.onRelease(liveContext);
+          this.onSpellCast(liveContext);
           this.game.eventManager.emit(EventType.ON_POST_CAST_SPELL, this);
         },
         onChannelTick: (context, tickIndex) => this.onChannelTick(context, tickIndex),

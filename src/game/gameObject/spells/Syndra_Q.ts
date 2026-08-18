@@ -214,6 +214,7 @@ export class Syndra_Sphere extends SpellObject {
     if (this.mode === 'held') {
       this.position.x = this.owner.position.x;
       this.position.y = this.owner.position.y - HELD_HEIGHT;
+      this.smear.length = 0;
       return;
     }
 
@@ -229,6 +230,7 @@ export class Syndra_Sphere extends SpellObject {
         this.position.x = targetX;
         this.position.y = targetY;
         this.mode = 'held';
+        this.smear.length = 0;
       } else {
         this.position.x += (dx / dist) * reelSpeed;
         this.position.y += (dy / dist) * reelSpeed;
@@ -279,6 +281,7 @@ export class Syndra_Sphere extends SpellObject {
       this.flightDestination = null;
       this.onFlightArrive = null;
       this.settleMs = 0;
+      this.smear.length = 0;
       if (arrived) arrived(this);
       return;
     }
@@ -302,7 +305,7 @@ export class Syndra_Sphere extends SpellObject {
 
     push();
 
-    if (this.smear.length > 1) {
+    if (!held && this.smear.length > 1) {
       stroke(SPHERE_VIOLET[0], SPHERE_VIOLET[1], SPHERE_VIOLET[2], 130);
       for (let i = 1; i < this.smear.length; i++) {
         const ratio = i / this.smear.length;

@@ -94,8 +94,18 @@ const openParticipantAt = n =>
  * which is the same `cancel` handler the button called. The backdrop is a
  * third path and is deliberately still untested: it is one `@click.self`.
  */
-const dismissLoadoutModal = () =>
-  page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+const dismissLoadoutModal = async () => {
+  await page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+  try {
+    const discardBtn = await page.waitForSelector('.kit-unsaved-discard', {
+      state: 'visible',
+      timeout: 150,
+    });
+    if (discardBtn) await discardBtn.click();
+  } catch {
+    // No unsaved changes dialog if draft was not changed
+  }
+};
 const cancelLoadout = dismissLoadoutModal;
 /** The one `.kit-bar-btn` left, and `:not(.secondary)` is what says so. */
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận

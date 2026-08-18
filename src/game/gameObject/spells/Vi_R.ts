@@ -177,19 +177,44 @@ export default class Vi_R extends Spell {
       filters: [PredefinedFilters.canTakeDamageFromTeam(this.owner.teamId)],
     }) as AttackableUnit[];
 
+    const aimX = target.position.x - this.owner.position.x;
+    const aimY = target.position.y - this.owner.position.y;
+    const aimLen = Math.hypot(aimX, aimY) || 1;
+    const fwdX = aimX / aimLen;
+    const fwdY = aimY / aimLen;
+
     for (const victim of found) {
       if (victim === this.owner || victim === target) continue;
-      if (punched.has(victim)) continue;
+      if (punched.has(victim) || victim.isDead || victim.toRemove) continue;
       punched.add(victim);
       victim.takeDamage(R_PASS_DAMAGE, this.owner);
+
+      // Determine left or right perpendicular shove
+      const toVictimX = victim.position.x - this.owner.position.x;
+      const toVictimY = victim.position.y - this.owner.position.y;
+      const cross = -fwdY * toVictimX + fwdX * toVictimY;
+      const sign = cross >= 0 ? 1 : -1;
+      const perpX = -fwdY * sign;
+      const perpY = fwdX * sign;
+
+      // Push victim aside with Dash and Airborne
+      const shove = new Dash(R_PASS_KNOCKUP_MS, this.owner, victim);
+      const pushDist = 75;
+      shove.dashDestination = createVector(
+        victim.position.x + perpX * pushDist,
+        victim.position.y + perpY * pushDist
+      );
+      shove.dashSpeed = 12;
+      shove.showTrail = false;
+      shove.buffsToCheckCancel = [];
+      victim.markDisplaced();
+      victim.addBuff(shove);
       victim.addBuff(new Airborne(R_PASS_KNOCKUP_MS, this.owner, victim));
     }
   }
 
   /**
-   * The blast, centred where she actually stopped. Reading the position rather
-   * than the intended destination is what makes the "target died mid-charge"
-   * case land somewhere real instead of on a corpse's old coordinates.
+   * The blast and slam, centred where she actually stopped.
    */
   private land(punched: Set<AttackableUnit>, target: AttackableUnit): void {
     const at = this.owner.position.copy();
@@ -206,11 +231,13 @@ export default class Vi_R extends Spell {
     if (!dead) {
       punched.add(target);
       target.takeDamage(R_DAMAGE, this.owner);
-      target.addBuff(new Airborne(R_KNOCKUP_MS, this.owner, target));
+      const knockup = new Airborne(R_KNOCKUP_MS, this.owner, target);
+      knockup.height = 95;
+      target.addBuff(knockup);
     }
 
     for (const victim of found) {
-      if (punched.has(victim)) continue;
+      if (punched.has(victim) || victim.isDead || victim.toRemove) continue;
       punched.add(victim);
       victim.takeDamage(R_PASS_DAMAGE, this.owner);
       victim.addBuff(new Airborne(R_PASS_KNOCKUP_MS, this.owner, victim));
@@ -218,7 +245,7 @@ export default class Vi_R extends Spell {
 
     const aim = { x: target.position.x - this.launchPoint(at).x, y: target.position.y - this.launchPoint(at).y };
     const heading = Math.atan2(aim.y, aim.x);
-    this.game.objectManager.addObject(new Vi_R_Impact(this.owner, at, heading));
+    this.game.objectManager.addObject(new Vi_R_Impact(this.owner, at, heading, target));
   }
 
   private launchPoint(fallback: p5.Vector): p5.Vector {
@@ -342,25 +369,27 @@ export class Vi_R_Streak extends SpellObject {
   }
 }
 
-/** The wedge that lands on the target: brass cone, white vent flash, fracture fan. */
+/** The wedge and slam that lands on the target: uppercut lift, brass crater, hextech shockwave. */
 export class Vi_R_Impact extends SpellObject {
-  lifeTime = 460;
+  lifeTime = 650;
   age = 0;
   radius = R_IMPACT_REACH;
   heading: number;
+  private target?: AttackableUnit;
   private fractures: { spread: number; length: number; kink: number }[] = [];
 
-  constructor(owner: AttackableUnit, at: p5.Vector, heading: number) {
+  constructor(owner: AttackableUnit, at: p5.Vector, heading: number, target?: AttackableUnit) {
     super(owner);
     this.position = at;
     this.heading = heading;
+    this.target = target;
   }
 
   onAdded(): void {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 14; i++) {
       this.fractures.push({
-        spread: random(-1.4, 1.4),
-        length: random(0.5, 1),
+        spread: random(-2.2, 2.2),
+        length: random(0.6, 1.2),
         kink: random(-0.35, 0.35),
       });
     }
@@ -373,39 +402,67 @@ export class Vi_R_Impact extends SpellObject {
 
   draw(): void {
     const t = constrain(this.age / this.lifeTime, 0, 1);
-    const opened = 1 - (1 - t) * (1 - t);
-    const fade = 1 - t;
+
+    // Phase 1 (0..0.38): Rising Hextech Uppercut
+    // Phase 2 (0.38..1.0): Earth-shattering Slam Crater
+    const isUppercut = t < 0.38;
+    const slamProgress = constrain((t - 0.38) / 0.62, 0, 1);
+    const slamOpen = 1 - (1 - slamProgress) * (1 - slamProgress);
 
     push();
     translate(this.position.x, this.position.y);
-    rotate(this.heading);
 
-    noStroke();
-    fill(HEXTECH[0], HEXTECH[1], HEXTECH[2], 165 * fade);
-    const cone = this.radius * 0.8 * opened;
-    quad(-18, 0, cone * 0.45, -44 * opened - 10, cone, 0, cone * 0.45, 44 * opened + 10);
+    if (isUppercut) {
+      const upT = t / 0.38;
+      const liftY = -Math.sin(upT * Math.PI * 0.5) * 80;
 
-    stroke(BRASS[0], BRASS[1], BRASS[2], 240 * fade);
-    strokeWeight(4 * fade + 1);
-    for (const fracture of this.fractures) {
-      const reach = this.radius * fracture.length * opened;
-      const bend = fracture.spread + fracture.kink * opened;
-      line(
-        Math.cos(fracture.spread) * 14,
-        Math.sin(fracture.spread) * 14,
-        Math.cos(bend) * reach,
-        Math.sin(bend) * reach
-      );
+      // Hextech rising pillar & sparks
+      noStroke();
+      fill(HEXTECH[0], HEXTECH[1], HEXTECH[2], 180 * (1 - upT * 0.4));
+      ellipse(0, liftY, 50, 90);
+      fill(255, 255, 255, 230);
+      ellipse(0, liftY, 26, 50);
+
+      // Rising speed streaks
+      stroke(BRASS[0], BRASS[1], BRASS[2], 220);
+      strokeWeight(3);
+      for (let s = -1; s <= 1; s += 2) {
+        line(s * 18, 0, s * 22, liftY);
+      }
+    } else {
+      // Massive ground crater slam
+      rotate(this.heading);
+
+      // 1. Hextech shockwave ring
+      noFill();
+      stroke(HEXTECH[0], HEXTECH[1], HEXTECH[2], 230 * (1 - slamProgress));
+      strokeWeight(5 * (1 - slamProgress) + 2);
+      circle(0, 0, (this.radius * 1.5) * slamOpen);
+
+      // 2. Heavy brass crater cracks
+      stroke(BRASS[0], BRASS[1], BRASS[2], 250 * (1 - slamProgress));
+      strokeWeight(4 * (1 - slamProgress) + 1.5);
+      for (const fracture of this.fractures) {
+        const reach = this.radius * fracture.length * slamOpen;
+        const bend = fracture.spread + fracture.kink * slamOpen;
+        line(
+          Math.cos(fracture.spread) * 12,
+          Math.sin(fracture.spread) * 12,
+          Math.cos(bend) * reach,
+          Math.sin(bend) * reach
+        );
+      }
+
+      // 3. Central white-hot impact core
+      noStroke();
+      fill(255, 255, 255, 240 * (1 - slamProgress * 1.5));
+      circle(0, 0, 36 * (1 - slamProgress * 0.5));
     }
 
-    noFill();
-    stroke(255, 255, 255, 250 * fade * fade);
-    strokeWeight(6 * fade + 1);
-    circle(0, 0, 26 + 58 * opened);
     pop();
   }
 
   getDisplayBoundingBox() {
-    return this.squareDisplayBoundingBox((this.radius + 40) * 2);
+    return this.squareDisplayBoundingBox((this.radius + 60) * 2);
   }
 }

@@ -85,7 +85,7 @@ describe('Sett spells', () => {
     } as any;
   }
 
-  it('banks grit for the damage Sett takes, and stops banking at the cap', () => {
+  it('banks grit for all damage Sett takes without upper cap', () => {
     const w = new Sett_W(owner);
     w.onUpdate(); // installs the damage-taken listener
     const bully = place(game, 900, 'red');
@@ -94,46 +94,56 @@ describe('Sett spells', () => {
     expect(w.grit).toBe(20 * SETT_W_GRIT_RATIO);
 
     owner.takeDamage(200, bully);
-    expect(w.grit).toBe(SETT_W_GRIT_MAX);
+    expect(w.grit).toBe(220 * SETT_W_GRIT_RATIO);
   });
 
-  it('lets banked grit decay back to nothing over the decay window', () => {
+  it('lets banked grit decay after 3s of no damage taken', () => {
     const w = new Sett_W(owner);
     w.onUpdate();
-    owner.takeDamage(20, place(game, 900, 'red'));
-    expect(w.grit).toBeGreaterThan(0);
+    owner.takeDamage(50, place(game, 900, 'red'));
+    expect(w.grit).toBe(50);
 
     vi.stubGlobal('deltaTime', 500);
-    for (let step = 0; step < SETT_W_GRIT_DECAY_MS / 500; step++) w.onUpdate();
+    // After 2.5s (5 steps of 500ms): still full 50 grit because < 3s
+    for (let step = 0; step < 5; step++) w.onUpdate();
+    expect(w.grit).toBe(50);
+
+    // After another 3.5s: grit has decayed to 0
+    for (let step = 0; step < 7; step++) w.onUpdate();
     expect(w.grit).toBe(0);
   });
 
-  it('W spends every point of grit and shields Sett for exactly that much', () => {
+  it('W creates shield immediately at onCastStart and spends every point of grit', () => {
     const w = new Sett_W(owner);
     w.onUpdate();
-    owner.takeDamage(40, place(game, 900, 'red'));
-    expect(w.grit).toBe(40 * SETT_W_GRIT_RATIO);
+    owner.takeDamage(60, place(game, 900, 'red'));
+    expect(w.grit).toBe(60);
+
+    w.onCastStart(context(300, 0));
+    expect(w.grit).toBe(0);
+    expect(owner.shieldAmount).toBe(60);
 
     w.onSpellCast(context(300, 0));
-    expect(w.grit).toBe(0);
-    expect(owner.shieldAmount).toBe(40 * SETT_W_GRIT_RATIO);
+    expect(owner.shieldAmount).toBe(60);
   });
 
-  it('W punches for its base at no grit and for base plus half the grit at the cap', () => {
+  it('W punches for its base at no grit and scales with banked grit', () => {
     const w = new Sett_W(owner);
     w.onUpdate();
     const punched = place(game, 650, 'red', 500);
     const bully = place(game, 900, 'red');
     game.objectManager.update();
 
+    w.onCastStart(context(300, 0));
     w.onSpellCast(context(300, 0));
     expect(punched.stats.health.value).toBe(500 - SETT_W_BASE);
 
-    owner.takeDamage(SETT_W_GRIT_MAX / SETT_W_GRIT_RATIO, bully);
-    expect(w.grit).toBe(SETT_W_GRIT_MAX);
+    owner.takeDamage(100, bully);
+    expect(w.grit).toBe(100);
+    w.onCastStart(context(300, 0));
     w.onSpellCast(context(300, 0));
     expect(punched.stats.health.value).toBe(
-      500 - SETT_W_BASE - (SETT_W_BASE + SETT_W_GRIT_SCALE * SETT_W_GRIT_MAX)
+      500 - SETT_W_BASE - (SETT_W_BASE + SETT_W_GRIT_SCALE * 100)
     );
   });
 

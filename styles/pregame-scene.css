@@ -346,6 +346,7 @@
 }
 
 .pregame-modal {
+  position: relative;
   /* Without this, `height: 100dvh` + `padding` (see the `@media
        (max-width: 640px)` block below) renders ~22px taller than the
        viewport — no scroll region involved, just the default `content-box`
@@ -550,6 +551,24 @@
   padding: 0.3rem 0.9rem;
 }
 
+@keyframes hextechConfirmPulse {
+  0%, 100% {
+    box-shadow: 0 0 6px 1px rgba(200, 170, 110, 0.4), inset 0 0 8px rgba(200, 170, 110, 0.2);
+    border-color: var(--hextech-gold);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(200, 170, 110, 0.85), inset 0 0 12px rgba(200, 170, 110, 0.45);
+    border-color: #ffd700;
+  }
+}
+
+.kit-bar-btn.has-changes {
+  animation: hextechConfirmPulse 1.8s ease-in-out infinite;
+  border-color: var(--hextech-gold);
+  color: var(--hextech-gold);
+  font-weight: bold;
+}
+
 /* The three actions as one thing. They used to hold the right end by passing
    `margin-left: auto` between them, which only worked while all three fit on
    the row — the view toggle made it 42px wider and Xác nhận wrapped alone,
@@ -627,6 +646,88 @@
   font-size: 0.72em;
   color: var(--hextech-muted);
   font-style: italic;
+}
+
+/* ------------------------------------------- unsaved changes dialog */
+.kit-unsaved-dialog-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 10, 15, 0.84);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 220;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.kit-unsaved-dialog {
+  width: min(440px, 94%);
+  background: var(--hextech-bg);
+  border: 2px solid transparent;
+  border-image: linear-gradient(var(--hextech-gold), var(--hextech-teal)) 1;
+  box-shadow: 0 0 25px 5px rgba(0, 0, 0, 0.75), 0 0 15px rgba(200, 170, 110, 0.25);
+  padding: 1.2rem 1.4rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.kit-unsaved-title {
+  margin: 0;
+  font-size: 1.05em;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--hextech-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.kit-unsaved-title .fa-circle-exclamation {
+  color: #f59e0b;
+}
+
+.kit-unsaved-text {
+  margin: 0;
+  font-size: 0.88em;
+  line-height: 1.45;
+  color: #ddd;
+}
+
+.kit-unsaved-text strong {
+  color: var(--hextech-gold);
+}
+
+.kit-unsaved-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.kit-unsaved-actions .hextech-btn {
+  min-height: 38px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.kit-unsaved-apply {
+  flex: 1 1 100%;
+  font-weight: bold;
+}
+
+.kit-unsaved-discard,
+.kit-unsaved-stay {
+  flex: 1 1 calc(50% - 0.25rem);
 }
 
 /* ---------------------------------------------------------------- roster

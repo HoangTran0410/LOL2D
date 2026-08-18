@@ -833,6 +833,15 @@ try {
   // dropped when the bar had to hold the roster's view toggle as well; it is
   // the same `cancel` handler that button called.
   await tapSelector('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+  try {
+    const discardBtn = await page.waitForSelector('.kit-unsaved-discard', {
+      state: 'visible',
+      timeout: 150,
+    });
+    if (discardBtn) await discardBtn.click();
+  } catch {
+    // No unsaved changes dialog if not prompted
+  }
   await page.waitForTimeout(200);
   await closePanel();
 

@@ -63,12 +63,18 @@ const openTab = tab => page.click(`#pregame-tab-${tab}`);
 /** The nth participant card (1 = the player, 2 = Bot 1, 3 = Bot 2, ...). */
 const openParticipantAt = n => page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
 /** The header X. It discards the draft now, exactly like "Huỷ" — see LoadoutEditorModal.vue. */
-const dismissLoadoutModal = () => page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
-/**
- * The way out without committing. The slot bar's "Huỷ" button is gone — dropped
- * when the bar ran out of room — so this is the header X, which is the same
- * `cancel` handler it called.
- */
+const dismissLoadoutModal = async () => {
+  await page.click('.loadout-modal .pregame-modal-header .pregame-icon-btn');
+  try {
+    const discardBtn = await page.waitForSelector('.kit-unsaved-discard', {
+      state: 'visible',
+      timeout: 150,
+    });
+    if (discardBtn) await discardBtn.click();
+  } catch {
+    // No unsaved changes dialog if draft was not changed
+  }
+};
 const cancelLoadout = dismissLoadoutModal;
 const confirmLoadout = () => page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
 /**
