@@ -19,25 +19,13 @@
  *
  *   node tests/e2e/drive-basic-attacks.mjs [outPrefix]
  */
-import { createServer } from 'vite';
-import { chromium } from 'playwright';
+import { startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-attacks';
-
-const server = await createServer({ server: { port: 0, strictPort: false } });
-await server.listen();
-const port = server.config.server.port ?? server.httpServer.address().port;
-const url = `http://localhost:${port}/`;
-
-const browser = await chromium.launch({ channel: 'chrome' });
-const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-const errors = [];
-page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
-page.on('console', message => {
-  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+const { url, page, errors, report, check, finish } = await startHarness({
+  out: OUT,
+  viewport: { width: 1280, height: 800 },
 });
-
-const report = {};
 const evaluate = (fn, arg) => page.evaluate(fn, arg);
 
 /** Right click at a screen point through the real mouse pipeline. */
@@ -68,7 +56,10 @@ try {
   report.setup = await evaluate(async () => {
     const game = window.__lol2d.scene.oScene.game;
     const player = game.player;
-    const bot = game.objectManager.objects.find(o => o !== player && o.basicAttack);
+    const bot = game.objectManager.objects.find(
+      o => o !== player && o.basicAttack && o.teamId !== player.teamId
+    );
+    if (!bot) throw new Error('No hostile bot is available for the basic-attack probe.');
     const pin = (unit, x, y) => {
       unit.position.set(x, y);
       unit.destination.set(x, y);
@@ -78,6 +69,7 @@ try {
     bot._autoMove = false;
     bot._frozenSpeed = bot.stats.speed.baseValue;
     bot.stats.speed.baseValue = 0;
+    bot.stats.healthRegen.baseValue = 0;
     player.destination.set(player.position.x, player.position.y);
     // The roster has been brawling since the scene loaded. Whatever landed on
     // these two before the measurement starts (a stasis, an untargetable window,
@@ -122,7 +114,18 @@ try {
       if (placed) break;
     }
 
-    window.__probe = { player, bot };
+    window.__probe = {
+      player,
+      bot,
+      rightClickHits: 0,
+      rightClickDamage: 0,
+      rightClickHealthBefore: bot.stats.health.value,
+    };
+    game.eventManager.on('onUnitAttackHit', hit => {
+      if (hit.attacker !== player || hit.victim !== bot) return;
+      window.__probe.rightClickHits += 1;
+      window.__probe.rightClickDamage += hit.damage;
+    });
     return {
       placed,
       botVisible: !!bot.visibleToPlayerTeam,
@@ -158,6 +161,36 @@ try {
         ) < 20,
     };
   });
+  check(
+    'right click on an enemy body issues an attack order',
+    report.rightClickOnEnemy.ordersTheBot === true,
+    `cursorOnBody=${report.rightClickOnEnemy.cursorWasOnTheBot} ordered=${report.rightClickOnEnemy.ordersTheBot}`
+  );
+  // A target equality only proves acquisition. Let this exact pointer order
+  // chase/wind up/fly all the way to one landed hit before the ground click
+  // below is allowed to cancel it. Keep collecting a report on timeout so the
+  // harness prints the useful zeroes instead of only a Playwright stack.
+  await page
+    .waitForFunction(
+      () =>
+        window.__probe.rightClickHits >= 1 &&
+        window.__probe.bot.stats.health.value < window.__probe.rightClickHealthBefore,
+      null,
+      { timeout: 6_000 }
+    )
+    .catch(() => undefined);
+  report.rightClickDamage = await evaluate(() => ({
+    hits: window.__probe.rightClickHits,
+    damage: window.__probe.rightClickDamage,
+    healthLost: Math.round(
+      window.__probe.rightClickHealthBefore - window.__probe.bot.stats.health.value
+    ),
+  }));
+  check(
+    'the right-click order lands a damaging basic attack',
+    report.rightClickDamage.hits >= 1 && report.rightClickDamage.healthLost > 0,
+    `hits=${report.rightClickDamage.hits} damage=${report.rightClickDamage.damage} healthLost=${report.rightClickDamage.healthLost}`
+  );
 
   // 2. right click empty ground cancels the order and moves instead
   const groundBefore = await evaluate(
@@ -186,7 +219,7 @@ try {
     const player = game.player;
     const bot = window.__probe.bot;
     const decoy = game.objectManager.objects.find(
-      o => o !== player && o !== bot && o.basicAttack && !o.isDead
+      o => o !== player && o !== bot && o.basicAttack && !o.isDead && o.teamId !== player.teamId
     );
     window.__probe.decoy = decoy ?? null;
 
@@ -538,10 +571,13 @@ try {
   await page.screenshot({ path: `${OUT}-crowd.png` });
 
   report.errors = errors;
-  console.log(JSON.stringify(report, null, 2));
+  check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
+} catch (error) {
+  check(
+    'the basic-attack driver completed',
+    false,
+    error instanceof Error ? (error.stack ?? error.message) : String(error)
+  );
 } finally {
-  await browser.close();
-  await server.close();
+  await finish();
 }
-
-if (errors.length) process.exitCode = 1;

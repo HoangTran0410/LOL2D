@@ -79,7 +79,7 @@ describe('AssetManager', () => {
     await first;
   });
 
-  it('keeps a failed handle and error without replacing its identity', async () => {
+  it('keeps the handle identity and retries a transient failed load', async () => {
     const handle = AssetManager.get('champ_lux');
     const loading = AssetManager.ensure('champ_lux');
     const error = new Error('image failed');
@@ -89,6 +89,19 @@ describe('AssetManager', () => {
 
     expect(AssetManager.get('champ_lux')).toBe(handle);
     expect(handle).toMatchObject({ status: 'error', data: null, error });
+
+    const callsBeforeRetry = imageLoader.mock.calls.length;
+    const retry = AssetManager.ensure('champ_lux');
+    expect(retry).not.toBe(loading);
+    expect(imageLoader).toHaveBeenCalledTimes(callsBeforeRetry + 1);
+    expect(handle.status).toBe('loading');
+
+    const image = { width: 64, retried: true };
+    imageLoads.get(handle.url)?.resolve(image);
+    await retry;
+
+    expect(AssetManager.get('champ_lux')).toBe(handle);
+    expect(handle).toMatchObject({ status: 'ready', data: image, error: undefined });
   });
 
   it('requires an explicit placeholder label', () => {
@@ -112,16 +125,43 @@ describe('AssetManager', () => {
     expect(AssetManager.get('champ_jinx')).toBe(handle);
   });
 
-  it('keeps rendering a placeholder after a failed on-use load', async () => {
+  it('auto-retries one failed on-use load without request-storming, while explicit retry remains available', async () => {
     const placeholder = stubPlaceholderGraphics({ placeholder: true });
     const handle = AssetManager.get('champ_blitzcrank');
 
     expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
-    const error = new Error('draw load failed');
-    imageLoads.get(handle.url)?.reject(error);
+    imageLoads.get(handle.url)?.reject(new Error('draw load failed'));
     await vi.waitFor(() => expect(handle.status).toBe('error'));
 
+    // The next rendered frame gives one transient failure a second chance.
     expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
-    expect(imageLoader).toHaveBeenCalledTimes(1);
+    expect(imageLoader).toHaveBeenCalledTimes(2);
+    expect(handle.status).toBe('loading');
+
+    // While that retry is in flight, rendering is read-only no matter how many
+    // frames arrive.
+    for (let frame = 0; frame < 10; frame++) {
+      expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
+    }
+    expect(imageLoader).toHaveBeenCalledTimes(2);
+
+    imageLoads.get(handle.url)?.reject(new Error('draw retry failed'));
+    await vi.waitFor(() => expect(handle.status).toBe('error'));
+
+    // A persistent failure stays a placeholder rather than opening one request
+    // on every draw frame.
+    for (let frame = 0; frame < 10; frame++) {
+      expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
+    }
+    expect(imageLoader).toHaveBeenCalledTimes(2);
+
+    // A deliberate later request is never blocked by the automatic retry cap.
+    const explicitRetry = AssetManager.ensure('champ_blitzcrank');
+    expect(imageLoader).toHaveBeenCalledTimes(3);
+    const image = { width: 64, explicitlyRetried: true };
+    imageLoads.get(handle.url)?.resolve(image);
+    await explicitRetry;
+
+    expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(image);
   });
 });

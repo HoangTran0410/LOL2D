@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import MatchDirector from '../../../src/game/MatchDirector';
 import { AI_COUNT_MAX, DEFAULT_CHAMPION_LOADOUT } from '../../../src/game/config/PregameConfig';
+import TeamId from '../../../src/game/enums/TeamId';
 import { context } from './helpers';
 
 afterEach(() => vi.unstubAllGlobals());
@@ -156,6 +157,48 @@ describe('MatchDirector roster', () => {
 
     expect(bot.position.x).toBe(500);
     expect(bot.position.y).toBe(500);
+  });
+
+  it('puts added bots on the less populated team and uses that team fountain', () => {
+    const { context: ctx } = context();
+    const spawn = vi.fn((teamId?: string) =>
+      teamId === TeamId.BLUE ? createVector(200, 200) : createVector(800, 800)
+    );
+    ctx.randomSpawnPoint = spawn;
+    const director = new MatchDirector(ctx);
+
+    const first = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+    const second = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+    const third = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+
+    // Blue starts one ahead because it owns the player slot. Once the teams
+    // tie, the documented tie-break sends one more bot Red; Blue then catches up.
+    expect([first.teamId, second.teamId, third.teamId]).toEqual([
+      TeamId.RED,
+      TeamId.RED,
+      TeamId.BLUE,
+    ]);
+    expect(spawn.mock.calls.map(([teamId]) => teamId)).toEqual([
+      TeamId.RED,
+      TeamId.RED,
+      TeamId.BLUE,
+    ]);
+    expect(first.position.x).toBe(800);
+    expect(third.position.x).toBe(200);
+  });
+
+  it('does not count a removed bot when balancing its replacement', () => {
+    const { context: ctx } = context();
+    const director = new MatchDirector(ctx);
+    director.addBot(DEFAULT_CHAMPION_LOADOUT);
+    director.addBot(DEFAULT_CHAMPION_LOADOUT);
+    const blueBot = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+
+    director.removeBot(blueBot);
+    const replacement = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+
+    expect(blueBot.teamId).toBe(TeamId.BLUE);
+    expect(replacement.teamId).toBe(TeamId.BLUE);
   });
 
   it('setBotBehaviour writes only the flags it is given', () => {

@@ -10,11 +10,10 @@ import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
  * healed wherever they are standing, and the ones who are nearly dead are healed
  * for half again as much.
  *
- * Champions in this game are free-for-all, so `teamId` will usually resolve to
- * Soraka and her own summons — which is the correct query for this team model,
- * and the reason the blessing is a `SpellObject` per recipient rather than caster
- * VFX: an effect landing on a body somewhere else on the map must not be drawn
- * from `Champion.draw()`, which is skipped whenever the caster is off camera.
+ * `teamId` resolves every champion and summon on Soraka's Blue/Red side. The
+ * blessing is a `SpellObject` per recipient rather than caster VFX: an effect
+ * landing on a body somewhere else on the map must not be drawn from
+ * `Champion.draw()`, which is skipped whenever the caster is off camera.
  */
 export const COOLDOWN_MS = 10_000;
 export const MANA_COST = 60;

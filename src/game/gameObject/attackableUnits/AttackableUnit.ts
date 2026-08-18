@@ -553,10 +553,10 @@ export default class AttackableUnit extends GameObject {
   respawn() {
     this.stats.health.baseValue = this.stats.maxHealth.value;
     this.deathData = null;
-    // a route planned from where the corpse fell means nothing at the fountain
+    // A route planned from where the corpse fell means nothing at its team fountain.
     this.pathAgent?.clear();
 
-    let spawnPoint = this.game.randomSpawnPoint();
+    const spawnPoint = this.game.randomSpawnPoint(this.teamId);
     this.position.set(spawnPoint.x, spawnPoint.y);
     this.destination.set(spawnPoint.x, spawnPoint.y);
   }

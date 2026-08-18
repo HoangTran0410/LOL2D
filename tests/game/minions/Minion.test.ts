@@ -478,6 +478,25 @@ describe('Minion', () => {
   });
 
   describe('ranged basic attack (MinionBolt)', () => {
+    it('gives cannon minions their own durable preset and a ranged bolt', () => {
+      const cannon = makeMinion({ preset: MinionPresets.cannon });
+      const enemy = makeMinion({
+        teamId: TeamId.RED,
+        position: createVector(250, 0),
+      });
+      indexObjects(game, [cannon, enemy]);
+
+      cannon.launchAttack(enemy, cannon.reachTo(enemy));
+
+      const bolt = cannon.game.objectManager._objectToBeAdd.find(
+        (o): o is MinionBolt => o instanceof MinionBolt
+      );
+      expect(cannon.kind).toBe('cannon');
+      expect(cannon.stats.maxHealth.value).toBeGreaterThan(MinionPresets.melee.health);
+      expect(cannon.damage).toBeGreaterThan(MinionPresets.ranged.damage);
+      expect(bolt).toBeInstanceOf(MinionBolt);
+    });
+
     it('fires a bolt that takes real travel time and damages exactly the target it was fired at, on arrival', () => {
       const minion = makeMinion({ preset: MinionPresets.ranged });
       const enemy = makeMinion({

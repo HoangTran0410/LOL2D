@@ -77,11 +77,12 @@ import type {
   PregameConfig,
   WorldConfig,
 } from './config/PregameConfig';
-import { getChampionPresetFromLoadout } from './preset';
+import { getChampionPresetFromLoadout, loadChampionPresetFromLoadout } from './preset';
 import type GameObject from './gameObject/GameObject';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
 import type Monster from './gameObject/attackableUnits/Monster';
 import { createDebugFlags, type DebugFlags } from './debug/DebugOverlay';
+import { isMatchTeamId, teamForAddedBot, type MatchTeamId } from './config/MatchTeams';
 
 /**
  * A bot's three "does it act on its own" switches. Plain instance fields on
@@ -95,6 +96,21 @@ import { createDebugFlags, type DebugFlags } from './debug/DebugOverlay';
  * the one of the two that can't import the other.
  */
 export type { BotBehaviour };
+
+type ResolvedChampionPreset = Awaited<ReturnType<typeof loadChampionPresetFromLoadout>>;
+
+export type ChampionPresetLoader = (loadout: ChampionLoadout) => Promise<ResolvedChampionPreset>;
+
+export interface MatchDirectorOptions {
+  /** Test seam and the one async catalogue boundary used by panel mutations. */
+  loadPreset?: ChampionPresetLoader;
+}
+
+interface AddBotWithPresetOptions {
+  teamId?: MatchTeamId;
+  behaviour?: BotBehaviour;
+  persist?: boolean;
+}
 
 export interface RosterEntry {
   unit: Champion;
@@ -122,7 +138,11 @@ export interface MatchDirectorContext extends GameObjectRuntimeContext {
   /** Narrowed from `AttackableUnit`: the roster is champions, and only a champion has a kit to swap. */
   player: Champion;
   monsters: Monster[];
-  minionSpawner: { minions: { toRemove: boolean }[]; enabled: boolean };
+  minionSpawner: {
+    minions: { toRemove: boolean }[];
+    enabled: boolean;
+    setEnabled(on: boolean): void;
+  };
   matchRules: MatchRules;
   spawnJungle(): void;
 }
@@ -162,6 +182,19 @@ export default class MatchDirector {
    */
   private readonly loadouts = new WeakMap<Champion, ChampionLoadout>();
 
+  /** The same add button can outlive its Vue tab while its kit chunk loads. */
+  private pendingAdd: Promise<AIChampion | null> | null = null;
+  private addGeneration = 0;
+
+  /** A reset invalidates every older apply; per-unit versions order later picks. */
+  private applyEpoch = 0;
+  private readonly applyVersions = new WeakMap<Champion, number>();
+
+  /** Whichever reset or later user mutation owns this number is allowed to commit. */
+  private resetGeneration = 0;
+
+  private readonly loadPreset: ChampionPresetLoader;
+
   /**
    * Which debug layers are on. Plain fields, on purpose: the panel holds the
    * match paused while a tab is open, so `ObjectManager.update()` and
@@ -178,7 +211,11 @@ export default class MatchDirector {
    */
   readonly debug: DebugFlags;
 
-  constructor(private readonly game: MatchDirectorContext) {
+  constructor(
+    private readonly game: MatchDirectorContext,
+    options: MatchDirectorOptions = {}
+  ) {
+    this.loadPreset = options.loadPreset ?? loadChampionPresetFromLoadout;
     this.debug = createDebugFlags(game);
   }
 
@@ -288,9 +325,9 @@ export default class MatchDirector {
    * than invented. The global `ai.autoMove`/`autoAttack`/`autoCast` are the
    * setup screen's control (`AiConfigPanel`) and the panel has no view of them
    * — writing a derived value would let the panel quietly overwrite a screen it
-   * does not edit. The bot slots past the live bot count are the same promise
-   * `AIConfig.bots` already makes: lower the count, raise it again, and slot 4
-   * is still the Zed you configured.
+   * does not edit. Slots past the live bot count stay stored so lowering the
+   * count never loses a kit or behaviour. Their saved teams remain intact too;
+   * the setup screen may rebalance only a slot when it activates that bot.
    *
    * Note `bots()` and not `objectManager.objects`. That is the paused-panel
    * trap, and it is a data-loss bug rather than a nicety: the panel holds the
@@ -309,6 +346,10 @@ export default class MatchDirector {
     const botBehaviours = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
       i < live.length ? behaviourOf(live[i]) : stored.ai.botBehaviours[i]
     );
+    const botTeams: MatchTeamId[] = Array.from({ length: AI_COUNT_MAX }, (_, i) => {
+      if (i >= live.length) return stored.ai.botTeams[i];
+      return isMatchTeamId(live[i].teamId) ? live[i].teamId : stored.ai.botTeams[i];
+    });
 
     return {
       player: this.loadoutOf(this.game.player),
@@ -318,6 +359,7 @@ export default class MatchDirector {
         autoAttack: stored.ai.autoAttack,
         autoCast: stored.ai.autoCast,
         bots,
+        botTeams,
         botBehaviours,
       },
       rules: this.getRules(),
@@ -335,10 +377,22 @@ export default class MatchDirector {
     savePregameConfig(this.toPregameConfig());
   }
 
+  /** Any later visible edit wins over a reset that is still fetching kits. */
+  private invalidatePendingReset(): void {
+    this.resetGeneration++;
+  }
+
+  private nextApplyVersion(unit: Champion): number {
+    const version = (this.applyVersions.get(unit) ?? 0) + 1;
+    this.applyVersions.set(unit, version);
+    return version;
+  }
+
   /**
-   * Spawns a bot at a fountain spawn point, capped at the same `AI_COUNT_MAX`
-   * the pregame screen enforces — hence the nullable return: the cap is real
-   * and a caller that cannot see it would silently drop the player's click.
+   * Spawns a bot on the less populated lane team (Red wins a tie), at that
+   * team's fountain, capped at the same `AI_COUNT_MAX` the pregame screen
+   * enforces — hence the nullable return: the cap is real and a caller that
+   * cannot see it would silently drop the player's click.
    *
    * The bot is on the roster immediately and in the *world* on the next
    * unpaused tick — two different things, and `bots()` explains why it counts
@@ -350,23 +404,66 @@ export default class MatchDirector {
    * every call.
    */
   addBot(loadout: ChampionLoadout): AIChampion | null {
-    if (this.bots().length >= AI_COUNT_MAX) return null;
+    this.invalidatePendingReset();
+    this.addGeneration++;
+    this.pendingAdd = null;
+    return this.addBotWithPreset(loadout, getChampionPresetFromLoadout(loadout));
+  }
+
+  /**
+   * Panel-safe addition. Unlike the synchronous engine seam above, this waits
+   * for the one rolled kit before constructing the bot, so an early click
+   * cannot race the background spell-catalogue warm-up.
+   */
+  addBotLoaded(loadout: ChampionLoadout): Promise<AIChampion | null> {
+    if (this.pendingAdd) return this.pendingAdd;
+
+    this.invalidatePendingReset();
+    const generation = ++this.addGeneration;
+    let loading: Promise<ResolvedChampionPreset>;
+    try {
+      loading = this.loadPreset(loadout);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+
+    const pending = loading
+      .then(preset => {
+        if (generation !== this.addGeneration) return null;
+        return this.addBotWithPreset(loadout, preset);
+      })
+      .finally(() => {
+        if (this.pendingAdd === pending) this.pendingAdd = null;
+      });
+    this.pendingAdd = pending;
+    return pending;
+  }
+
+  private addBotWithPreset(
+    loadout: ChampionLoadout,
+    preset: ResolvedChampionPreset,
+    options: AddBotWithPresetOptions = {}
+  ): AIChampion | null {
+    const bots = this.bots();
+    if (bots.length >= AI_COUNT_MAX) return null;
 
     // The setup screen's global flags are the *default* behaviour for a bot
     // nobody has chosen one for, which is exactly what a bot added mid-match
     // is. Without this it would get `AIChampion`'s hardcoded defaults instead,
     // and a player who set "bots wander" on the setup screen would find that
     // every bot they add in the panel stands still.
-    const behaviour = loadPregameConfig().ai;
+    const behaviour = options.behaviour ?? loadPregameConfig().ai;
 
-    const spawn = this.game.randomSpawnPoint();
+    const teamId = options.teamId ?? teamForAddedBot([this.game.player, ...bots]);
+    const spawn = this.game.randomSpawnPoint(teamId);
     const bot = new AIChampion({
       game: this.game,
       // Copied rather than handed straight through: `position` is mutated every
       // tick from here on, and a spawn point the match still holds a reference
       // to would be dragged around the map by the bot standing on it.
       position: createVector(spawn.x, spawn.y),
-      preset: getChampionPresetFromLoadout(loadout),
+      teamId,
+      preset,
       presetFactory: () => getChampionPresetFromLoadout(loadout),
       autoMove: behaviour.autoMove,
       autoAttack: behaviour.autoAttack,
@@ -374,7 +471,7 @@ export default class MatchDirector {
     });
     this.game.objectManager.addObject(bot);
     this.loadouts.set(bot, loadout);
-    this.persist();
+    if (options.persist !== false) this.persist();
     return bot;
   }
 
@@ -386,6 +483,7 @@ export default class MatchDirector {
   removeBot(unit: Champion): void {
     if (unit === this.game.player) return;
     if (!(unit instanceof AIChampion)) return;
+    this.invalidatePendingReset();
     unit.toRemove = true;
     // After the mark, never before: `bots()` skips `toRemove` units, so the
     // config this derives is the roster the player is now looking at.
@@ -411,7 +509,31 @@ export default class MatchDirector {
    * the roll had been pinned off by the picker's "clone my spells".
    */
   applyLoadout(unit: Champion, loadout: ChampionLoadout): void {
-    unit.applyPreset(getChampionPresetFromLoadout(loadout));
+    this.invalidatePendingReset();
+    this.nextApplyVersion(unit);
+    this.applyResolvedLoadout(unit, loadout, getChampionPresetFromLoadout(loadout));
+  }
+
+  /** Awaited practice-panel path; see `addBotLoaded`. */
+  async applyLoadoutLoaded(unit: Champion, loadout: ChampionLoadout): Promise<boolean> {
+    this.invalidatePendingReset();
+    const epoch = this.applyEpoch;
+    const version = this.nextApplyVersion(unit);
+    const preset = await this.loadPreset(loadout);
+    if (epoch !== this.applyEpoch || version !== this.applyVersions.get(unit) || unit.toRemove) {
+      return false;
+    }
+    this.applyResolvedLoadout(unit, loadout, preset);
+    return true;
+  }
+
+  private applyResolvedLoadout(
+    unit: Champion,
+    loadout: ChampionLoadout,
+    preset: ResolvedChampionPreset,
+    persist = true
+  ): void {
+    unit.applyPreset(preset);
     this.refill(unit);
     // For the player as readily as for a bot: the editor has to reopen on
     // whatever it last committed, whoever it was committed to.
@@ -421,7 +543,7 @@ export default class MatchDirector {
       unit.setPresetFactory(() => getChampionPresetFromLoadout(loadout));
       unit.setRespawnRollsNewPreset(true);
     }
-    this.persist();
+    if (persist) this.persist();
   }
 
   /**
@@ -429,6 +551,7 @@ export default class MatchDirector {
    * one field without having to restate the other two.
    */
   setBotBehaviour(bot: AIChampion, flags: Partial<BotBehaviour>): void {
+    this.invalidatePendingReset();
     if (flags.autoMove !== undefined) bot._autoMove = flags.autoMove;
     if (flags.autoAttack !== undefined) bot._autoAttack = flags.autoAttack;
     if (flags.autoCast !== undefined) bot._autoCast = flags.autoCast;
@@ -454,6 +577,7 @@ export default class MatchDirector {
    */
   set jungleEnabled(on: boolean) {
     if (on === this._jungleEnabled) return;
+    this.invalidatePendingReset();
     this._jungleEnabled = on;
 
     if (on) {
@@ -489,7 +613,8 @@ export default class MatchDirector {
    */
   set minionsEnabled(on: boolean) {
     if (on === this.game.minionSpawner.enabled) return;
-    this.game.minionSpawner.enabled = on;
+    this.invalidatePendingReset();
+    this.game.minionSpawner.setEnabled(on);
     if (!on) for (const minion of this.game.minionSpawner.minions) minion.toRemove = true;
     this.persist();
   }
@@ -517,6 +642,7 @@ export default class MatchDirector {
    * `toMatchRules` clamps privately on its way to a multiplier.
    */
   setRules(rules: MatchRulesConfig): void {
+    this.invalidatePendingReset();
     this.seedRules(rules);
     this.persist();
   }
@@ -556,7 +682,7 @@ export default class MatchDirector {
    */
   seedWorld(world: WorldConfig): void {
     this._jungleEnabled = world.jungle;
-    this.game.minionSpawner.enabled = world.minions;
+    this.game.minionSpawner.setEnabled(world.minions);
   }
 
   /**
@@ -568,28 +694,58 @@ export default class MatchDirector {
    * took effect next time would be the same broken-looking silence the world
    * toggles needed a note for.
    *
-   * Storage is written first and then again at the end, and the first write is
-   * not redundant: `addBot` seeds a new bot's behaviour from the stored global
-   * flags, so the defaults have to be in place before the default bots are
-   * built. The last write is what makes the whole thing atomic from the
-   * player's side — every step in between persists its own partial roster.
+   * Every required kit is loaded before the first live mutation. This matters
+   * on a freshly opened panel: resolving through the synchronous registry seam
+   * before its background warm-up finishes turns unloaded slots into the
+   * BasicAttack fallback. It also gives the reset a commit point — a newer
+   * reset or roster edit can invalidate this one while its chunks are loading,
+   * without a half-reset match or partial storage writes.
    */
-  resetToDefaults(): void {
+  async resetToDefaults(): Promise<boolean> {
     const config = DEFAULT_PREGAME_CONFIG;
-    savePregameConfig(config);
+    const generation = ++this.resetGeneration;
+    // Pending panel work belongs to the match the player is discarding.
+    this.addGeneration++;
+    this.pendingAdd = null;
+    this.applyEpoch++;
 
-    for (const bot of this.bots()) this.removeBot(bot);
-    this.applyLoadout(this.game.player, config.player);
-    for (let i = 0; i < config.ai.count; i++) this.addBot(config.ai.bots[i]);
+    const loadouts = [
+      config.player,
+      ...Array.from({ length: config.ai.count }, (_, i) => config.ai.bots[i]),
+    ];
+    const presets = await Promise.all(loadouts.map(loadout => this.loadPreset(loadout)));
+    if (generation !== this.resetGeneration) return false;
+
+    for (const bot of this.bots()) bot.toRemove = true;
+    this.applyResolvedLoadout(this.game.player, config.player, presets[0], false);
+    for (let i = 0; i < config.ai.count; i++) {
+      this.addBotWithPreset(config.ai.bots[i], presets[i + 1], {
+        teamId: config.ai.botTeams[i],
+        behaviour: config.ai.botBehaviours[i],
+        persist: false,
+      });
+    }
 
     this.seedRules(config.rules);
-    // The public setters here, unlike at boot: these have to *act* — respawn
-    // the camps through `Game.spawnJungle()`, restart the wave clock — not just
-    // record a flag. Both no-op when the value already matches.
-    this.jungleEnabled = config.world.jungle;
-    this.minionsEnabled = config.world.minions;
+    if (this._jungleEnabled !== config.world.jungle) {
+      this._jungleEnabled = config.world.jungle;
+      if (config.world.jungle) {
+        this.game.spawnJungle();
+      } else {
+        for (const monster of this.game.monsters) monster.toRemove = true;
+        this.game.monsters.length = 0;
+      }
+    }
+    if (this.game.minionSpawner.enabled !== config.world.minions) {
+      this.game.minionSpawner.setEnabled(config.world.minions);
+      if (!config.world.minions) {
+        for (const minion of this.game.minionSpawner.minions) minion.toRemove = true;
+      }
+    }
 
-    this.persist();
+    // The exact defaults, including inactive bot slots and global AI flags.
+    savePregameConfig(config);
+    return true;
   }
 
   // ------------------------------------------------------------------ cheats

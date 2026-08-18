@@ -28,16 +28,15 @@ interface Mote {
 }
 
 /**
- * Bệ Đá Cổ — the spawn platform. Any champion standing inside gets a slice of
- * its health and mana back on every tick, so a fountain is somewhere to retreat
- * to rather than just a spawn marker.
+ * Bệ Đá Cổ — the spawn platform. Allied champions standing inside get a slice
+ * of health and mana back on every tick, so it is somewhere to retreat to
+ * rather than just a spawn marker.
  *
  * Deliberately a plain GameObject, not an AttackableUnit: it has no health, it
  * cannot be attacked, and FogOfWar's visibleToPlayerTeam reset only touches units.
  *
- * It carries its base's TeamId so the minion spawner can ask a fountain which
- * side it is, but it still heals whichever champion stands on it — champions are
- * free-for-all and a platform is a place to retreat to, not a team perk.
+ * Its TeamId is shared with that base's turrets, minions and champions. Enemy
+ * champions may cross the platform, but never receive its restoration.
  */
 export default class Fountain extends GameObject {
   declare game: GameObjectRuntimeContext;
@@ -101,7 +100,11 @@ export default class Fountain extends GameObject {
   championsInside(): Champion[] {
     return this.game.objectManager.queryObjects({
       area: new Circle({ x: this.position.x, y: this.position.y, r: this.radius }),
-      filters: [PredefinedFilters.type(Champion), PredefinedFilters.excludeDead],
+      filters: [
+        PredefinedFilters.type(Champion),
+        PredefinedFilters.teamId(this.teamId),
+        PredefinedFilters.excludeDead,
+      ],
     });
   }
 

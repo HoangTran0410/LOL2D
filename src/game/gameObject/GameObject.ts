@@ -30,7 +30,7 @@ export interface GameObjectRuntimeContext extends GameObjectGameContext {
    */
   navigation?: NavigationSystem;
   worldMouse?: p5.Vector;
-  randomSpawnPoint(): p5.Vector;
+  randomSpawnPoint(teamId?: string): p5.Vector;
   createSpellContext(
     spell: Spell,
     caster: AttackableUnit,

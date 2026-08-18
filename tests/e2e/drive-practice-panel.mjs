@@ -980,7 +980,15 @@ try {
   }));
   await page.screenshot({ path: `${OUT}-08-reset-confirm.png` });
   await tapSelector('#practice-reset');
-  await page.waitForTimeout(300);
+  await page.waitForFunction(() => {
+    const game = window.__lol2d?.scene?.oScene?.game;
+    return (
+      game?.director?.getRules().cooldownReductionPercent === 0 &&
+      game.director.bots().length === 5 &&
+      game.director.jungleEnabled === true &&
+      game.director.minionsEnabled === true
+    );
+  });
   const afterReset = await gameEval(key => {
     const game = window.__lol2d.scene.oScene.game;
     return {

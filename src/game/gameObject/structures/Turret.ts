@@ -49,11 +49,10 @@ export interface TurretOptions {
  * the way a real turret does. Destroying one opens the ground around it up for
  * `rebuildTime`, then it rebuilds where it stood, at full health.
  *
- * Champions are still free-for-all, each on its own uuid teamId, so every
- * champion is hostile to both turret rows. That falls out of
- * `canTakeDamageFromTeam(this.teamId)` on its own and needs no special case;
- * what the shared team ids buy is that a turret no longer shoots its own side's
- * minions.
+ * Production champions share one of the two lane team ids, so the same
+ * `canTakeDamageFromTeam(this.teamId)` rule rejects allied champions and
+ * minions while keeping the opposing side targetable. No turret-specific ally
+ * exception is needed.
  */
 export default class Turret extends AttackableUnit {
   /** A building is not farm — killing one moves nobody's CS. */

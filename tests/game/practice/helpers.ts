@@ -21,6 +21,7 @@
  */
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import type { MatchDirectorContext } from '../../../src/game/MatchDirector';
+import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, stubGameGlobals, type TestGame } from '../fixtures';
 
 export interface PracticeBench {
@@ -34,7 +35,11 @@ export function context(): PracticeBench {
   stubGameGlobals();
 
   const game = createGame();
-  const player = new Champion({ game, position: createVector(100, 100) });
+  const player = new Champion({
+    game,
+    position: createVector(100, 100),
+    teamId: TeamId.BLUE,
+  });
   game.setPlayer(player);
   game.objectManager.addObject(player);
   // `addObject` only queues; one tick is what actually puts the player in the
@@ -44,9 +49,15 @@ export function context(): PracticeBench {
   const context = Object.assign(game, {
     // A spawn point well away from the player's (100, 100), so "did the bot
     // land where the match said" is answerable.
-    randomSpawnPoint: () => createVector(500, 500),
+    randomSpawnPoint: (_teamId?: string) => createVector(500, 500),
     monsters: [],
-    minionSpawner: { minions: [], enabled: true },
+    minionSpawner: {
+      minions: [],
+      enabled: true,
+      setEnabled(on: boolean) {
+        this.enabled = on;
+      },
+    },
     matchRules: { cooldownMultiplier: 1, manaFree: false },
     spawnJungle: () => {},
     // The one thing the fixture cannot satisfy on its own: `TestGame.player` is

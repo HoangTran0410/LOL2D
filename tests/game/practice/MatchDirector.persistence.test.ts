@@ -8,6 +8,7 @@ import {
   savePregameConfig,
   type ChampionLoadout,
 } from '../../../src/game/config/PregameConfig';
+import TeamId from '../../../src/game/enums/TeamId';
 import { context } from './helpers';
 
 /**
@@ -94,6 +95,7 @@ describe('MatchDirector persistence', () => {
     expect(stored.player.championName).toBe('Veigar');
     expect(stored.ai.count).toBe(1);
     expect(stored.ai.bots[0].championName).toBe('Ahri');
+    expect(stored.ai.botTeams[0]).toBe(TeamId.RED);
     expect(stored.ai.botBehaviours[0]).toEqual({
       autoMove: true,
       autoAttack: true,
@@ -128,6 +130,17 @@ describe('MatchDirector persistence', () => {
     // The survivor slides down to slot 0 — the config is a list of bots, not a
     // map of the seats they were sitting in.
     expect(stored.ai.bots[0].championName).toBe('Zed');
+    expect(stored.ai.botTeams[0]).toBe(TeamId.RED);
+  });
+
+  it('persists the actual live team for every queued bot so reload keeps the same sides', () => {
+    const { director } = bench();
+
+    const first = director.addBot(loadoutNamed('Ahri'))!;
+    const second = director.addBot(loadoutNamed('Zed'))!;
+
+    expect([first.teamId, second.teamId]).toEqual([TeamId.RED, TeamId.RED]);
+    expect(loadPregameConfig().ai.botTeams.slice(0, 2)).toEqual([TeamId.RED, TeamId.RED]);
   });
 
   /**
@@ -214,6 +227,7 @@ describe('MatchDirector persistence', () => {
         'autoCast',
         'autoMove',
         'botBehaviours',
+        'botTeams',
         'bots',
         'count',
       ]);
@@ -251,7 +265,13 @@ describe('MatchDirector persistence', () => {
 
     it('keeps the bot slots past the live bot count', () => {
       const bots = Array.from({ length: AI_COUNT_MAX }, (_, i) => loadoutNamed(`Slot${i}`));
-      savePregameConfig({ ...DEFAULT_PREGAME_CONFIG, ai: { ...DEFAULT_PREGAME_CONFIG.ai, bots } });
+      const botTeams = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+        i < 2 ? TeamId.BLUE : TeamId.RED
+      );
+      savePregameConfig({
+        ...DEFAULT_PREGAME_CONFIG,
+        ai: { ...DEFAULT_PREGAME_CONFIG.ai, bots, botTeams },
+      });
       const { director } = bench();
 
       director.addBot(loadoutNamed('Ahri'));
@@ -262,6 +282,7 @@ describe('MatchDirector persistence', () => {
       // Untouched, so lowering the bot count and raising it again does not lose
       // a bot's customisation — the same promise `AIConfig.bots` already made.
       expect(stored.ai.bots[1].championName).toBe('Slot1');
+      expect(stored.ai.botTeams[1]).toBe(TeamId.BLUE);
       expect(stored.ai.bots).toHaveLength(AI_COUNT_MAX);
     });
   });
@@ -292,7 +313,7 @@ describe('MatchDirector persistence', () => {
    * running match as well as the storage.
    */
   describe('resetToDefaults', () => {
-    it('restores the defaults in storage and in the running match', () => {
+    it('restores the defaults in storage and in the running match', async () => {
       const { director, ctx } = bench();
       ctx.spawnJungle = vi.fn();
       const bot = director.addBot(loadoutNamed('Ahri'))!;
@@ -302,7 +323,7 @@ describe('MatchDirector persistence', () => {
       director.jungleEnabled = false;
       director.minionsEnabled = false;
 
-      director.resetToDefaults();
+      expect(await director.resetToDefaults()).toBe(true);
 
       // storage
       expect(loadPregameConfig()).toEqual(DEFAULT_PREGAME_CONFIG);
@@ -318,18 +339,22 @@ describe('MatchDirector persistence', () => {
       expect(bot.toRemove).toBe(true);
       expect(director.bots()).toHaveLength(DEFAULT_PREGAME_CONFIG.ai.count);
       expect(director.bots().every(b => b !== bot)).toBe(true);
+      expect(director.bots().map(b => b.teamId)).toEqual(
+        DEFAULT_PREGAME_CONFIG.ai.botTeams.slice(0, DEFAULT_PREGAME_CONFIG.ai.count)
+      );
     });
 
-    it('clears the setup screen’s global AI flags too — it is a reset, not a partial one', () => {
+    it('clears the setup screen’s global AI flags too — it is a reset, not a partial one', async () => {
       savePregameConfig({
         ...DEFAULT_PREGAME_CONFIG,
-        ai: { ...DEFAULT_PREGAME_CONFIG.ai, autoMove: true },
+        ai: { ...DEFAULT_PREGAME_CONFIG.ai, autoMove: false, autoAttack: false },
       });
       const { director } = bench();
 
-      director.resetToDefaults();
+      await director.resetToDefaults();
 
       expect(loadPregameConfig().ai.autoMove).toBe(true);
+      expect(loadPregameConfig().ai.autoAttack).toBe(true);
     });
   });
 

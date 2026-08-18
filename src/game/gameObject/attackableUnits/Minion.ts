@@ -13,7 +13,7 @@ import type {
 } from './AttackableUnit';
 import Monster from './Monster';
 
-export type MinionKind = 'melee' | 'ranged';
+export type MinionKind = 'melee' | 'ranged' | 'cannon';
 
 export interface MinionPresetData {
   name: string;
@@ -32,9 +32,8 @@ export interface MinionPresetData {
 }
 
 /**
- * Two bodies per wave, both cheap. The melee line tanks and the caster behind it
- * pokes; the caster is squishier and slightly further-reaching so the shape of a
- * wave fight reads at a glance without any pathing of its own.
+ * Three bodies, all intentionally cheap. The melee line tanks, casters poke from
+ * behind it, and the periodic cannon is a slower, tougher ranged siege body.
  *
  * Numbers are picked so a lane fight resolves in roughly ten seconds — long
  * enough to watch, short enough that two waves never stack into a blob.
@@ -61,6 +60,17 @@ export const MinionPresets: Record<MinionKind, MinionPresetData> = {
     attackInterval: 1_500,
     attackRange: 280,
     aggroRange: 340,
+  },
+  cannon: {
+    name: 'Lính Xe Pháo',
+    kind: 'cannon',
+    speed: 2.6,
+    size: 38,
+    health: 260,
+    damage: 8,
+    attackInterval: 1_650,
+    attackRange: 300,
+    aggroRange: 360,
   },
 };
 
@@ -367,7 +377,7 @@ export default class Minion extends AttackableUnit {
    * actually applies, so a target that dies or leaves takes nothing phantom.
    */
   launchAttack(target: AttackableUnit, reach: number): void {
-    if (this.kind === 'ranged') {
+    if (this.kind !== 'melee') {
       const bolt = new MinionBolt(this);
       bolt.target = target;
       bolt.damage = this.damage;
@@ -483,12 +493,11 @@ export default class Minion extends AttackableUnit {
   }
 
   /**
-   * Team colour, not `isAllied`: that getter means "same team as the player",
-   * and since the player carries a uuid teamId it would paint every minion on
-   * the map with the enemy's red outline.
+   * Team colour directly rather than `isAllied`, so both sides keep their own
+   * stable map identity regardless of which team the local player belongs to.
    *
    * Hand-drawn on purpose — no avatar, no particle system, no trail. There can
-   * be four dozen of these on screen and each one has to stay a handful of
+   * be dozens of these on screen and each one has to stay a handful of
    * draw calls.
    */
   draw({ compactUnits = false }: AttackableUnitRenderOptions = {}) {
@@ -505,7 +514,15 @@ export default class Minion extends AttackableUnit {
     fill(body[0], body[1], body[2]);
     circle(pos.x, pos.y, size);
 
-    if (this.kind === 'ranged') {
+    if (this.kind === 'cannon') {
+      // A double ring reads as a wheeled siege body without adding an image or
+      // particle system to a unit that can appear in every lane at once.
+      noFill();
+      stroke(255, 215, 120, 230);
+      strokeWeight(3);
+      circle(pos.x, pos.y, size * 0.68);
+      circle(pos.x, pos.y, size * 0.36);
+    } else if (this.kind === 'ranged') {
       // a caster reads as a ring rather than a disc, so the back line of a wave
       // is separable from the front one at a glance
       noFill();
@@ -530,7 +547,7 @@ export default class Minion extends AttackableUnit {
   /** Points at whatever it is hitting. The base class points at the mouse. */
   drawDir() {}
 
-  /** Tiny, and no readout — a champion bar on 48 units is a wall of text. */
+  /** Tiny, and no readout — champion-sized bars across a full board are a wall of text. */
   drawHealthBar() {
     const pos = this.position;
     const size = this.stats.size.value;
@@ -558,7 +575,7 @@ export default class Minion extends AttackableUnit {
 }
 
 /**
- * The ranged minion's basic attack: a small bolt that homes on its target and
+ * A ranged minion's basic attack: a small bolt that homes on its target and
  * damages it on arrival — nothing on the way, nothing if the target is gone
  * by the time it gets there. Mirrors TurretBolt (Turret.ts): `maxHitCount = 0`
  * switches MissileSpellObject's in-flight collision off entirely, so this can

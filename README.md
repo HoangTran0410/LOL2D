@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml/badge.svg)](https://github.com/HoangTran0410/LOL2D/actions/workflows/build.yml)
 
-Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 47 champions, bot fights, and an installable PWA you can play offline.
+Play your favourite League of Legends champions right in the browser — a 2D Summoner's Rift, 58 champions, bot fights, and an installable PWA you can play offline.
 
 **[▶ Play Now](https://hoangtran0410.github.io/LOL2D)**
 
@@ -33,9 +33,9 @@ A fan-made, indie game based on [League of Legends](https://www.leagueoflegends.
 
 What is in it:
 
-- **47 champion kits** rebuilt from the real game — skillshots, charged casts, channels, recasts, shields, heals, and a full spread of crowd control.
+- **58 champion kits** rebuilt from the real game — skillshots, charged casts, channels, recasts, shields, heals, and a full spread of crowd control.
 - **A kit builder**: mix and match abilities from different champions into a custom loadout, save it, and drop it onto yourself or any bot.
-- **Fighting bots**, jungle camps, healing fountains, turrets, and lane minions on a free-for-all map.
+- **Blue-vs-Red team fights** with bots, neutral jungle camps, allied fountains and turrets, and three lanes of minion waves.
 - **Fog of war** built from a visibility-polygon sweep, with bushes and walls that really do block line of sight.
 - **Touch controls** and a mobile-friendly HUD alongside mouse/keyboard.
 - **Installable as a PWA** — works offline once cached.
@@ -44,7 +44,7 @@ What is in it:
 
 | Action | Key |
 | --- | --- |
-| Move | Right click |
+| Move / attack target | Right click ground / enemy |
 | Abilities | `A` `Q` `W` `E` `R` |
 | Summoner spells | `D` `F` |
 | Toggle camera follow | `Space` |
@@ -113,7 +113,7 @@ src/
 │   ├── preset.ts              # champion kits, jungle camps, turret and fountain spots
 │   ├── gameObject/
 │   │   ├── attackableUnits/    # Champion, AIChampion, Minion, Monster, Turret
-│   │   ├── spells/             # one file per ability: Ahri_Q.ts, Yasuo_R.ts, ... (47 champions)
+│   │   ├── spells/             # one file per ability: Ahri_Q.ts, Yasuo_R.ts, ... (58 champions)
 │   │   ├── spellObjects/       # base classes: Missile, Area, Beam, HomingMissile
 │   │   ├── buffs/              # Stun, Slow, Shield, Invisible, ...
 │   │   ├── structures/         # Turret, Fountain
@@ -142,7 +142,7 @@ src/
 
 **Crowd control.** Buffs raise and clear bits in `StatusFlags`, which the system resolves into `ActionState` (can move / can cast / targetable).
 
-**Teams and lanes.** Every unit defaults to its own unique `teamId`, so player and bots are free-for-all by default; `TeamId` adds the two shared ids that a base's fountain, turret row, and lane minions share. `MinionSpawner` runs the wave clock for both bases along the three lanes in `lanes.ts`.
+**Teams and lanes.** A running match assigns the player to Blue and balances bots across Blue/Red; champions share their side's fountain, turret row, and lane minions. Neutral/standalone objects keep the unique `teamId` fallback. `MinionSpawner` runs mirrored waves down the three paths in `lanes.ts`, including melee, caster, and cannon minions.
 
 **The practice panel** (`Esc`) is a superset of the pregame setup screen: three tabs (*Đấu thủ*, *Trận đấu*, *Gian lận*) that reshape a paused, live match through `MatchDirector` rather than touching `localStorage` directly.
 

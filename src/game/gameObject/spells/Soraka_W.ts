@@ -16,9 +16,8 @@ import { canSee } from '@/game/combat/Vision';
  * class's `healthCost` (which URF's mana rule deliberately does not touch) and
  * refused outright below a floor, exactly as the real ability is.
  *
- * Champions here are free-for-all, so `targetTeam: 'ALLY'` will usually resolve
- * to Soraka herself or one of her own summons. That is the correct query for
- * this game's team model, not a simplification of it.
+ * `targetTeam: 'ALLY'` resolves Soraka or another champion on her Blue/Red
+ * side; the checks below enforce team, visibility and range.
  */
 export const COOLDOWN_MS = 4_000;
 export const MANA_COST = 15;

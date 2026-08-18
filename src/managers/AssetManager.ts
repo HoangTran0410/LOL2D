@@ -139,6 +139,15 @@ export default class AssetManager {
    * in dev those four *are* four separate files and each has to be fetched.
    */
   private static loadsByUrl = new Map<string, Promise<unknown>>();
+  /**
+   * Files already given their one render-driven retry after a failed load.
+   *
+   * Keyed by URL for the same reason as `loadsByUrl`: aliases that point at one
+   * image must not each open another request when their draw calls arrive on
+   * neighbouring frames. An explicit `ensure` bypasses this set, and any
+   * successful load clears it so a genuinely later failure starts fresh.
+   */
+  private static autoRetriedUrls = new Set<string>();
   private static placeholders = new Map<string, AssetHandle>();
 
   static configureLoaders(loaders: AssetLoaders): void {
@@ -177,6 +186,7 @@ export default class AssetManager {
     }
 
     handle.status = 'loading';
+    handle.error = undefined;
 
     let bytes = this.loadsByUrl.get(handle.url);
     if (!bytes) {
@@ -188,11 +198,18 @@ export default class AssetManager {
       .then(data => {
         handle.data = data;
         handle.status = 'ready';
+        handle.error = undefined;
+        this.autoRetriedUrls.delete(handle.url);
         return handle;
       })
       .catch(error => {
         handle.error = toError(error);
         handle.status = 'error';
+        // Cache only work that can still succeed. A dropped request during
+        // preload must be retryable when the same portrait/icon is rendered or
+        // requested again later; the handle itself stays stable for callers.
+        this.loads.delete(key);
+        if (this.loadsByUrl.get(handle.url) === bytes) this.loadsByUrl.delete(handle.url);
         throw handle.error;
       });
     this.loads.set(key, load);
@@ -205,7 +222,12 @@ export default class AssetManager {
 
   static renderable(handle: AssetHandle | undefined, label?: string): unknown {
     if (handle?.status === 'ready' && handle.data !== null) return handle.data;
-    if (handle?.key && handle.status === 'idle') {
+    const shouldStart =
+      handle?.key &&
+      (handle.status === 'idle' ||
+        (handle.status === 'error' && !this.autoRetriedUrls.has(handle.url)));
+    if (shouldStart && handle?.key) {
+      if (handle.status === 'error') this.autoRetriedUrls.add(handle.url);
       void this.ensure(handle.key).catch(() => undefined);
     }
     return this.placeholder(label ?? handle?.key ?? 'Missing asset').data!;

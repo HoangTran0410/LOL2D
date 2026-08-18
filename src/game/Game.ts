@@ -54,8 +54,10 @@ import TouchControls, {
 import { touchAimRange } from './input/SpellAim';
 import type { AimCandidate } from './input/SpellAim';
 import type { JoystickVector } from './input/VirtualJoystick';
+import { issuePointerOrder } from './input/PointerOrders';
 import type Spell from './gameObject/Spell';
 import type { CastContext, Vec2 } from './spell/runtime/types';
+import TeamId from './enums/TeamId';
 
 /**
  * How far ahead of the champion the joystick plants its destination, as frames
@@ -238,13 +240,14 @@ export default class Game {
     this.minimap = new Minimap(this.minimapHost());
     this.inGameHUD = new InGameHUD(this);
 
-    // fountains first: randomSpawnPoint() is defined in terms of them, and both
-    // the player and every AI champion are placed with it
+    // Fountains first: each champion asks the matching team fountain for its
+    // initial point, and randomSpawnPoint falls back safely for UUID/FFA teams.
     this.spawnFountains();
 
     this.player = new Champion({
       game: this,
-      position: this.randomSpawnPoint(),
+      position: this.randomSpawnPoint(TeamId.BLUE),
+      teamId: TeamId.BLUE,
       preset: presetFromPlan(kits.player),
     });
     this.objectManager.addObject(this.player);
@@ -267,11 +270,10 @@ export default class Game {
     // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
     // by default (today's behaviour, unchanged), or a specific loadout the
     // player configured for that bot. Behaviour flags come from the matching
-    // slot in ai.botBehaviours, which the practice panel writes per bot; a
-    // config saved before that array existed has every slot seeded from the
-    // global flags, so this is unchanged for anyone who never opened the
-    // panel. Count clamped to [AI_COUNT_MIN, AI_COUNT_MAX] by
-    // `loadPregameConfig`; `ai.bots` always has AI_COUNT_MAX entries.
+    // slot in ai.botBehaviours, and its persisted side comes from ai.botTeams.
+    // Older configs migrate behaviours from their global flags and teams to a
+    // stable Red/Blue alternation. Count is clamped by `loadPregameConfig`; all
+    // three slot arrays always have AI_COUNT_MAX entries.
     // Which loadout each unit built above is carrying, kept until the director
     // exists to be told. `getChampionPresetFromLoadout` is one-way — a bot on
     // 'random' has already become one particular champion by the time it is
@@ -285,9 +287,11 @@ export default class Game {
     for (let i = 0; i < pregameConfig.ai.count; i++) {
       const botLoadout = pregameConfig.ai.bots[i];
       const botBehaviour = pregameConfig.ai.botBehaviours[i];
+      const botTeam = pregameConfig.ai.botTeams[i];
       const bot = new AIChampion({
         game: this,
-        position: this.randomSpawnPoint(),
+        position: this.randomSpawnPoint(botTeam),
+        teamId: botTeam,
         preset: presetFromPlan(kits.bots[i] ?? planLoadout(botLoadout)),
         // Re-resolving the same loadout on every respawn is what makes a
         // bot configured with a fixed champion keep that identity across
@@ -394,15 +398,13 @@ export default class Game {
       mouseButton === RIGHT &&
       !hitTest({ x: mouseX, y: mouseY }, this.minimap.rect)
     ) {
-      // Right click means one thing only: move here. It used to also issue an
-      // attack order when the cursor happened to be over an enemy body, which
-      // made a walk past a fight silently turn into a commitment to it — the
-      // click that was meant to retreat instead planted the champion in range.
-      // Attacking now has its own key (slot 0, `A`), which picks the enemy
-      // nearest the cursor rather than the one under it, so the two orders can
-      // no longer be confused with each other.
-      this.player.orderMove(this.worldMouse.x, this.worldMouse.y, true);
-      this.clickedPoint = { x: this.worldMouse.x, y: this.worldMouse.y, size: 40 };
+      const target = issuePointerOrder(this.player, this.objectManager, this.worldMouse);
+      // A move gets the existing green ground pulse. An attack already has the
+      // red target ring drawn by Champion.drawAttackOrder, so stacking both
+      // signals on an enemy body would say two different things at once.
+      if (!target) {
+        this.clickedPoint = { x: this.worldMouse.x, y: this.worldMouse.y, size: 40 };
+      }
     }
     this.clickedPoint.size *= 0.9;
 
@@ -459,11 +461,16 @@ export default class Game {
   }
 
   /**
-   * Spawn and respawn point (AttackableUnit.respawn() calls this too). Picking a
-   * fountain rather than scattering everyone around the map centre is what makes
-   * the platforms worth having: you come back on one and heal up before leaving.
+   * Spawn and respawn point (AttackableUnit.respawn() calls this too). A lane
+   * team returns at its own fountain; UUID/FFA callers retain the old random
+   * fountain fallback instead of being forced onto either side.
    */
-  randomSpawnPoint() {
+  randomSpawnPoint(teamId?: string) {
+    const teamFountain = teamId
+      ? this.fountains.find(fountain => fountain.teamId === teamId)
+      : undefined;
+    if (teamFountain) return teamFountain.randomPointInside();
+
     if (this.fountains.length > 0) {
       const fountain = this.fountains[Math.floor(random(this.fountains.length))];
       return fountain.randomPointInside();

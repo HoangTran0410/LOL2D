@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+import ActionState from '../../../src/game/enums/ActionState';
 import {
   findAttackTargetAlongRay,
   findAttackTargetNearPoint,
 } from '../../../src/game/combat/AttackTargeting';
+import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
 
 const target = (x: number, y: number, health = 100) =>
   ({
@@ -19,7 +21,32 @@ const attackerWith = (targets: AttackableUnit[]) =>
     game: { objectManager: { queryObjects: () => targets } },
   }) as unknown as AttackableUnit;
 
+const stealthedCombatants = () => {
+  const game = createGame();
+  const attacker = new AttackableUnit({
+    game,
+    position: createVector(0, 0),
+    teamId: 'team-blue',
+  });
+  const hidden = new AttackableUnit({
+    game,
+    position: createVector(120, 0),
+    teamId: 'team-red',
+  });
+  hidden.stats.setActionState(ActionState.STEALTHED, true);
+  game.setPlayer(attacker);
+  indexObjects(game, [attacker, hidden]);
+  return { attacker, hidden };
+};
+
 describe('touch attack targeting', () => {
+  beforeEach(() => {
+    stubGameGlobals();
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('locks a target near the aim ray instead of requiring the exact endpoint', () => {
     const intended = target(420, 55);
     const attacker = attackerWith([intended]);
@@ -57,5 +84,19 @@ describe('touch attack targeting', () => {
 
     expect(findAttackTargetNearPoint(attacker, attacker.position, 300)).toBe(nearest);
     expect(findAttackTargetNearPoint(attacker, attacker.position, 300, 'lowest-health')).toBe(weak);
+  });
+
+  it('does not acquire a stealthed target near the attack-move point', () => {
+    const { attacker, hidden } = stealthedCombatants();
+
+    expect(hidden.isStealthed).toBe(true);
+    expect(findAttackTargetNearPoint(attacker, hidden.position, 300)).toBeNull();
+  });
+
+  it('does not acquire a stealthed target along the touch aim ray', () => {
+    const { attacker, hidden } = stealthedCombatants();
+
+    expect(hidden.isStealthed).toBe(true);
+    expect(findAttackTargetAlongRay(attacker, { x: 800, y: 0 }, 120)).toBeNull();
   });
 });

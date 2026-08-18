@@ -6,7 +6,16 @@ import { LANES, getLaneWaypoints } from '@/game/lanes';
 
 /** ms between waves, per base. */
 export const WAVE_INTERVAL_MS = 30_000;
-/** ms before the first wave, so a fresh game is not instantly full of minions. */
+export const MIDGAME_WAVE_INTERVAL_MS = 25_000;
+export const LATEGAME_WAVE_INTERVAL_MS = 20_000;
+const MIDGAME_WAVES_AT_MS = 14 * 60_000;
+const CANNON_EVERY_TWO_AT_MS = 15 * 60_000;
+const CANNON_EVERY_WAVE_AT_MS = 25 * 60_000;
+const LATEGAME_WAVES_AT_MS = 30 * 60_000;
+/**
+ * Accelerated opening for this shorter 2D match. Live Summoner's Rift uses
+ * 30s; waiting that long here leaves a new player staring at empty lanes.
+ */
 export const FIRST_WAVE_DELAY_MS = 8_000;
 /** ms between the minions of one wave leaving the fountain, so they walk in a line. */
 export const MINION_RELEASE_INTERVAL_MS = 650;
@@ -15,23 +24,55 @@ export const MINION_RELEASE_INTERVAL_MS = 650;
  * Hard ceiling on live minions across both teams.
  *
  * A lane is ~10,600px and a minion covers 2.6px/frame ≈ 156px/s, so one takes
- * ~68s to walk a lane end to end — a little over two wave intervals. Two waves
- * per lane per team in flight is therefore the realistic worst case, and 3 lanes
- * x 2 teams x 4 minions x 2 waves = 48. In practice the waves meet near mid at
- * ~34s and kill each other, so the live count sits well under this; the cap only
- * matters when something stalls (both waves grinding on a turret, or nobody
- * dying because every champion is elsewhere) and stops that turning into
- * unbounded growth.
+ * ~68s to walk a lane end to end. The largest scheduled overlap is the 30-minute
+ * cadence transition: the final 25-second wave (6 minions per lane-side) is only
+ * 65 seconds into that walk when three 20-second waves (5 each) have left. Across
+ * 3 lanes and 2 teams that is 6 * (6 + 3 * 5) = 126 live minions. The 650ms
+ * within-wave release spacing only makes the overlap slightly longer. In
+ * practice waves meet near mid and kill each other, so the count usually sits
+ * well under this; the cap only catches a genuinely stalled board instead of
+ * silently deleting an ordinary late wave — especially its last-released cannon.
  */
-export const MINION_LIVE_CAP = 48;
+export const MINION_LIVE_CAP = 126;
 
 /**
- * Four per lane per base. Three melee bodies and one caster is enough for a wave
- * to read as a formation and to trade with the enemy wave for a few seconds;
- * six was noticeably heavier on a full board for no extra legibility, and every
- * extra minion costs a quadtree insert, a buff pass and a draw every frame.
+ * The standard League lane formation: three melee bodies followed by three
+ * casters. Every third wave adds a cannon, beginning with wave three.
  */
-export const WAVE_COMPOSITION: MinionKind[] = ['melee', 'melee', 'melee', 'ranged'];
+export const WAVE_COMPOSITION: readonly MinionKind[] = [
+  'melee',
+  'melee',
+  'melee',
+  'ranged',
+  'ranged',
+  'ranged',
+];
+
+/** Current Summoner's Rift cadence: 30s, then 25s at 14:00 and 20s at 30:00. */
+export const waveIntervalAt = (elapsedMs: number): number => {
+  if (elapsedMs >= LATEGAME_WAVES_AT_MS) return LATEGAME_WAVE_INTERVAL_MS;
+  if (elapsedMs >= MIDGAME_WAVES_AT_MS) return MIDGAME_WAVE_INTERVAL_MS;
+  return WAVE_INTERVAL_MS;
+};
+
+/**
+ * Current normal-rift formation. Cannon cadence steps from every third wave to
+ * every second after 15:00, then every wave after 25:00. Riot's 2026 pacing
+ * trims one melee from mid-game cannon waves and one caster from all 30:00+
+ * waves, so the extra spawn rate does not inflate the board indefinitely.
+ */
+export const waveComposition = (waveNumber: number, elapsedMs = 0): readonly MinionKind[] => {
+  const cannonCadence =
+    elapsedMs >= CANNON_EVERY_WAVE_AT_MS ? 1 : elapsedMs >= CANNON_EVERY_TWO_AT_MS ? 2 : 3;
+  const hasCannon = waveNumber > 0 && waveNumber % cannonCadence === 0;
+  const meleeCount = hasCannon && elapsedMs >= MIDGAME_WAVES_AT_MS ? 2 : 3;
+  const rangedCount = elapsedMs >= LATEGAME_WAVES_AT_MS ? 2 : 3;
+  const composition: MinionKind[] = [];
+  for (let i = 0; i < meleeCount; i++) composition.push('melee');
+  for (let i = 0; i < rangedCount; i++) composition.push('ranged');
+  if (hasCannon) composition.push('cannon');
+  return composition;
+};
 
 export interface MinionSpawnerContext extends GameObjectRuntimeContext {
   fountains: Fountain[];
@@ -64,17 +105,36 @@ export default class MinionSpawner {
    * so minions already dead still leave the list and a field cleared by another
    * system stays cleared rather than filling back up with corpses.
    *
-   * The countdown freezes rather than draining while off, for the same reason
-   * `_nextWaveIn` resets below instead of subtracting: switching minions back
-   * on should mean a full interval of quiet, not a burst of backdated waves.
+   * Elapsed match time freezes rather than draining while off. `setEnabled`
+   * abandons any partly released wave and restarts a full current interval when
+   * switched back on, so the old queue cannot leak out of a paused panel toggle.
    */
   enabled = true;
 
   _nextWaveIn = FIRST_WAVE_DELAY_MS;
+  _elapsedMs = 0;
   _queue: QueuedMinion[] = [];
 
   constructor(game: MinionSpawnerContext) {
     this.game = game;
+  }
+
+  /**
+   * Changes the wave clock without rewinding the match-time thresholds.
+   *
+   * Off abandons the unreleased tail of the current wave. On keeps `_elapsedMs`
+   * (and therefore the 14/30-minute cadence) but replaces the stale remaining
+   * countdown with one full interval. Repeating the current state is a no-op so
+   * an already-running clock is never postponed by a duplicate UI event.
+   */
+  setEnabled(on: boolean): void {
+    if (on === this.enabled) return;
+    this.enabled = on;
+    if (!on) {
+      this._queue.length = 0;
+      return;
+    }
+    this._nextWaveIn = waveIntervalAt(this._elapsedMs);
   }
 
   get liveCount(): number {
@@ -90,12 +150,13 @@ export default class MinionSpawner {
     this.prune();
     if (!this.enabled) return;
 
+    this._elapsedMs += deltaTime;
     this._nextWaveIn -= deltaTime;
     if (this._nextWaveIn <= 0) {
       // reset rather than subtract: after a long tab-hidden gap deltaTime can be
       // several intervals wide, and queueing a burst of backdated waves is not
       // what anyone means by "a wave every 30 seconds"
-      this._nextWaveIn = WAVE_INTERVAL_MS;
+      this._nextWaveIn = waveIntervalAt(this._elapsedMs);
       this.queueWave();
     }
 
@@ -106,17 +167,18 @@ export default class MinionSpawner {
    *  driver can skip the countdown instead of waiting out a real 30 seconds. */
   queueWave() {
     this.waveCount += 1;
+    const composition = waveComposition(this.waveCount, this._elapsedMs);
 
     for (const fountain of this.game.fountains) {
       const teamId = fountain.teamId;
       if (teamId !== TeamId.BLUE && teamId !== TeamId.RED) continue;
 
       for (const lane of LANES) {
-        for (let i = 0; i < WAVE_COMPOSITION.length; i++) {
+        for (let i = 0; i < composition.length; i++) {
           this._queue.push({
             teamId,
             lane,
-            kind: WAVE_COMPOSITION[i],
+            kind: composition[i],
             releaseIn: i * MINION_RELEASE_INTERVAL_MS,
           });
         }

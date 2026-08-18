@@ -32,6 +32,7 @@ const SRC = join(ROOT, 'src');
  */
 const ALLOWED_GAME_MODULES = [
   '@/game/config/PregameConfig',
+  '@/game/config/MatchTeams',
   '@/game/config/savedKits',
   '@/game/config/spellCatalog',
   '@/game/constants',
