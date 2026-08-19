@@ -39,6 +39,36 @@ import { clampZoomFactor } from '@/game/config/zoomBounds';
 export const baseScaleFor = (viewportWidth: number, viewportHeight: number): number =>
   Math.min(viewportWidth, viewportHeight) / VISION_SPAN;
 
+/** The frame length the two smoothing factors below were tuned at. */
+export const REFERENCE_FRAME_MS = 1000 / 60;
+
+/** Fraction of the remaining gap the camera closes per 60fps frame. */
+export const FOLLOW_PER_FRAME = 0.1;
+
+/** The same, for the zoom settling on a new scale. */
+export const ZOOM_PER_FRAME = 0.07;
+
+/**
+ * A per-frame smoothing factor converted to the same pull per unit of *time*.
+ *
+ * `position.lerp(target, 0.1)` closes a tenth of the gap every frame, which
+ * makes the camera's speed a function of the frame rate rather than of time.
+ * Measured over half a second chasing a target 1000px away: 60fps ends 953px
+ * along, 30fps only 794px, 144fps 999px. So the camera sits further behind the
+ * champion on a slow device — and, because no two real frames are the same
+ * length, its speed jitters with every wobble in frame time even while the
+ * champion walks in a straight line. The whole world shakes slightly, which
+ * reads as motion sickness rather than as a frame rate problem.
+ *
+ * Exponential decay is the fix: raising the per-frame retention to the number
+ * of reference frames elapsed makes the result depend only on how much time
+ * passed. It cannot overshoot — the factor approaches 1 and never exceeds it —
+ * so a tab returning from minutes in the background snaps to its target rather
+ * than flying past it, which is the behaviour that case wants anyway.
+ */
+export const smoothingFor = (perFrame: number, deltaMs: number): number =>
+  1 - Math.pow(1 - perFrame, Math.max(0, deltaMs) / REFERENCE_FRAME_MS);
+
 export default class Camera {
   position: p5.Vector;
   currentScale: number;
@@ -105,10 +135,13 @@ export default class Camera {
   }
 
   update(): void {
+    // `elapsed`, not `delta`: a local named for the p5 global it reads would be
+    // one keystroke from shadowing it. See CLAUDE.md.
+    const elapsed = typeof deltaTime === 'number' ? deltaTime : REFERENCE_FRAME_MS;
     if (this.target) {
-      this.position.lerp(this.target, 0.1);
+      this.position.lerp(this.target, smoothingFor(FOLLOW_PER_FRAME, elapsed));
     }
-    this.currentScale = lerp(this.currentScale, this.scale, 0.07);
+    this.currentScale = lerp(this.currentScale, this.scale, smoothingFor(ZOOM_PER_FRAME, elapsed));
   }
 
   drawGrid(gridSize = 400): void {
