@@ -139,6 +139,20 @@ export default class FogOfWar {
       return this.lastSightCalculation.result;
     }
 
+    // Deliberately NOT narrowed to the camera.
+    //
+    // What the team can see and what is worth painting are two questions, and
+    // this pass answers both. The overlay only ever needs revealers near the
+    // camera — there is no point erasing fog off screen — but this is also the
+    // only writer of `visibleToPlayerTeam`, which `Game.minimapBlips` reads to
+    // decide whether a unit gets a dot, and the minimap draws the whole map. So
+    // the camera test used to delete allied minions, wards and champions from
+    // the minimap the moment the player walked away from them, along with
+    // everything they were lighting: the team held the vision and the map would
+    // not show it. Turrets and fountains hid the bug, being structures that
+    // `minimapBlips` draws without consulting the flag at all.
+    //
+    // The narrowing moved down to the two paint lists below, where it belongs.
     const allyObjects = this.game.objectManager.queryObjects({
       queryByDisplayBoundingBox: true,
       filters: [
@@ -148,32 +162,40 @@ export default class FogOfWar {
           if (PredefinedFilters.includeDead(o)) return false;
           // `fogRevealRadius`, not `visionRadius`: minions and turrets carry no
           // combat sight (visionRadius 0) but still light a circle for the team.
-          const r = o.fogRevealRadius;
-          if (r > 0) {
-            const { x: ox, y: oy } = o.position;
-            return CollideUtils.circleRect(ox, oy, r, x, y, w, h);
-          }
-          return false;
+          return o.fogRevealRadius > 0;
         },
       ],
     });
 
     const allSightPoly: SightResult[] = [];
     const visiblePlayers: any[] = [];
-    const circleSights: { x: number; y: number; r: number }[] = [];
+    /** Every allied circle on the map — what `visibleToPlayerTeam` is computed from. */
+    const revealCircles: { x: number; y: number; r: number }[] = [];
+    /** The subset near the camera — what the overlay actually erases fog for. */
+    const paintedCircles: { x: number; y: number; r: number }[] = [];
+    const nearCamera = (ox: number, oy: number, r: number) =>
+      CollideUtils.circleRect(ox, oy, r, x, y, w, h);
 
     allyObjects.forEach((obj: any) => {
       if (obj.visionRadius > 0) {
-        // Player and allied champions: the real, wall-aware sight polygon.
+        // Player and allied champions: the real, wall-aware sight polygon. Run
+        // for all of them rather than the on-camera ones — a team fields at most
+        // a handful of champions, and an ally's sight has to keep revealing for
+        // the minimap while the player is looking somewhere else.
         const { sightPoly, playersInSight } = this.calculateSightForObject(obj);
         visiblePlayers.push(...playersInSight);
-        allSightPoly.push({ object: obj, sightPoly });
+        if (nearCamera(obj.position.x, obj.position.y, obj.fogRevealRadius)) {
+          allSightPoly.push({ object: obj, sightPoly });
+        }
       } else {
         // A minion or turret: one cheap circle, no raycast, no per-body query.
-        circleSights.push({ x: obj.position.x, y: obj.position.y, r: obj.fogRevealRadius });
+        // `revealer`, not `circle`: `circle` is a p5 global. See CLAUDE.md.
+        const revealer = { x: obj.position.x, y: obj.position.y, r: obj.fogRevealRadius };
+        revealCircles.push(revealer);
+        if (nearCamera(revealer.x, revealer.y, revealer.r)) paintedCircles.push(revealer);
       }
     });
-    this.circleSights = circleSights;
+    this.circleSights = paintedCircles;
 
     // Reset the player's-eye visibility flag on every AttackableUnit, then
     // re-light the ones in sight. Structures opt out — once built they stay on
@@ -195,11 +217,11 @@ export default class FogOfWar {
     // cheap. Deliberately wall-blind: a minion's cheap circle is not the
     // player's exact sight, and folding walls back in would mean the raycast
     // this path exists to avoid.
-    if (circleSights.length) {
+    if (revealCircles.length) {
       this.game.objectManager.objects.forEach((o: any) => {
         if (!(o instanceof AttackableUnit) || o.visibleToPlayerTeam || o.alwaysVisible) return;
         const { x: ox, y: oy } = o.position;
-        for (const c of circleSights) {
+        for (const c of revealCircles) {
           const dx = ox - c.x;
           const dy = oy - c.y;
           if (dx * dx + dy * dy <= c.r * c.r) {
