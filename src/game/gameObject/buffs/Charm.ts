@@ -6,7 +6,6 @@ import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSys
 import AssetManager from '@/managers/AssetManager';
 import BuffAddType from '@/game/enums/BuffAddType';
 import VectorUtils from '@/utils/vector.utils';
-import { frameScale } from '@/game/time';
 
 export default class Charm extends Buff {
   image: Buff['image'] = AssetManager.get('buff_charm');
@@ -24,11 +23,10 @@ export default class Charm extends Buff {
 
   onUpdate(): void {
     if (this.sourceUnit?.position && !this.targetUnit.isDead) {
-      // Per-frame speed scaled by elapsed time. See `game/time.ts`.
       VectorUtils.moveVectorToVector(
         this.targetUnit.position,
         this.sourceUnit.position,
-        this.speed * frameScale()
+        this.speed
       );
     }
 

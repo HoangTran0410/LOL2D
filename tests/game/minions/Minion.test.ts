@@ -18,7 +18,6 @@ import TeamId from '../../../src/game/enums/TeamId';
 import { Lane, getLaneWaypoints, type LaneWaypoint } from '../../../src/game/lanes';
 import minionSource from '../../../src/game/gameObject/attackableUnits/Minion.ts?raw';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
-import { REFERENCE_FRAME_MS } from '../../../src/game/time';
 
 const STRAIGHT: LaneWaypoint[] = [
   { x: 0, y: 0 },
@@ -57,18 +56,12 @@ describe('Minion', () => {
 
   describe('lane walking', () => {
     it('advances to the next waypoint once it arrives within tolerance', () => {
-      // A step is `speed` scaled by how long the frame took (`game/time.ts`),
-      // and the fixture's 16ms is a hair short of a 16.667ms reference frame.
-      // This test is about arriving at a waypoint, not about frame pacing, so
-      // it runs at exactly one reference frame and the arithmetic below stays
-      // the plain multiplication it always was.
-      vi.stubGlobal('deltaTime', REFERENCE_FRAME_MS);
       // start 500px short of waypoint 0, so the first advance is earned
       const minion = makeMinion({ position: createVector(0, -500) });
       expect(minion.waypointIndex).toBe(0);
       expect(minion.currentWaypoint).toEqual(STRAIGHT[0]);
 
-      // 100 frames at 2.6px per reference frame is ~260px, still short
+      // speed is per frame: 100 frames at 2.6px/frame is ~260px, still short
       tick(minion, 100);
       expect(minion.waypointIndex).toBe(0);
       expect(minion.position.y).toBeCloseTo(-500 + 99 * MinionPresets.melee.speed, 0);

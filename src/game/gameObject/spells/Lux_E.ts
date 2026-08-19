@@ -1,7 +1,6 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
-import { frameScale } from '@/game/time';
 import BuffAddType from '@/game/enums/BuffAddType';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
@@ -87,14 +86,10 @@ export class Lux_E_Object extends SpellObject {
 
   update() {
     if (this.phase === Lux_E_Object.PHASES.MOVE) {
-      // One step, used for the move and for the arrival test alike: the move
-      // does not clamp to the destination, so a tolerance fixed at the
-      // unscaled speed would let a long frame overshoot. See `game/time.ts`.
-      const step = this.moveSpeed * frameScale();
-      VectorUtils.moveVectorToVector(this.position, this.destination, step);
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
 
       const distance = this.destination.dist(this.position);
-      if (distance < step) {
+      if (distance < this.moveSpeed) {
         this.position = this.destination.copy();
         this.phase = Lux_E_Object.PHASES.STATIC;
       }

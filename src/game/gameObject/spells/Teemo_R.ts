@@ -1,7 +1,6 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
-import { frameScale } from '@/game/time';
 import BuffAddType from '@/game/enums/BuffAddType';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
@@ -161,11 +160,9 @@ export class Teemo_R_Object extends SpellObject {
       // it tumbles through the air, which is what sells it as thrown rather
       // than slid along the ground
       this.angle += 0.08;
-      // One step for the move and the arrival test alike. See `game/time.ts`.
-      const step = this.moveSpeed * frameScale();
-      VectorUtils.moveVectorToVector(this.position, this.destination, step);
+      VectorUtils.moveVectorToVector(this.position, this.destination, this.moveSpeed);
 
-      if (this.position.dist(this.destination) < step) {
+      if (this.position.dist(this.destination) < this.moveSpeed) {
         // check collide with other teemo R
         let others = this.game.objectManager.queryObjects({
           area: new Circle({

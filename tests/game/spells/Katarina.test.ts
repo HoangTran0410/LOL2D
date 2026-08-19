@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { REFERENCE_FRAME_MS } from '../../../src/game/time';
-
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
@@ -105,14 +103,7 @@ describe('Katarina — Reworked Dagger Mechanics', () => {
     const missile = game.objectManager._objectToBeAdd.find(
       object => object instanceof Object && 'struck' in (object as any)
     ) as Katarina_Q_Object;
-    // The 250ms stub above is for this suite's timers. A missile's step is
-    // `speed` scaled by frame length (`game/time.ts`), so leaving it at 250
-    // makes every update a clamped three-frame leap and the dagger overshoots
-    // the units it is supposed to chain through. The flight is geometry, so it
-    // runs at one reference frame.
-    vi.stubGlobal('deltaTime', REFERENCE_FRAME_MS);
     for (let frame = 0; frame < 600 && !missile.toRemove; frame++) game.objectManager.update();
-    vi.stubGlobal('deltaTime', 250);
     return missile;
   }
 
@@ -146,12 +137,7 @@ describe('Katarina — Reworked Dagger Mechanics', () => {
 
   it('Walking onto a landed dagger triggers Dagger Slash AoE and refunds E cooldown', () => {
     const e = new Katarina_E(owner);
-    (owner as any).spells = [
-      new Katarina_Q(owner),
-      new Katarina_W(owner),
-      e,
-      new Katarina_R(owner),
-    ];
+    (owner as any).spells = [new Katarina_Q(owner), new Katarina_W(owner), e, new Katarina_R(owner)];
     e.currentCooldown = 10_000;
 
     // Plant a landed dagger nearby
@@ -200,12 +186,7 @@ describe('Katarina — Reworked Dagger Mechanics', () => {
 
   it('E onto a dagger triggers Dagger Slash and refunds E cooldown', () => {
     const e = new Katarina_E(owner);
-    (owner as any).spells = [
-      new Katarina_Q(owner),
-      new Katarina_W(owner),
-      e,
-      new Katarina_R(owner),
-    ];
+    (owner as any).spells = [new Katarina_Q(owner), new Katarina_W(owner), e, new Katarina_R(owner)];
 
     const dagger = Katarina_Dagger.plant(owner, 200, 0, 0);
     const bystander = enemy(250, 0);
@@ -224,9 +205,10 @@ describe('Katarina — Reworked Dagger Mechanics', () => {
 
   /** The lotus the channel puts in the world, whichever queue it is sitting in. */
   function lotusInPlay(): Katarina_R_Lotus {
-    const found = [...game.objectManager._objectToBeAdd, ...game.objectManager.objects].find(
-      object => 'ticksDone' in (object as any)
-    ) as Katarina_R_Lotus;
+    const found = [
+      ...game.objectManager._objectToBeAdd,
+      ...game.objectManager.objects,
+    ].find(object => 'ticksDone' in (object as any)) as Katarina_R_Lotus;
     expect(found).toBeDefined();
     return found;
   }
