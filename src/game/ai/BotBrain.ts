@@ -23,6 +23,7 @@ import {
   type SpellRoleMask,
 } from '@/game/ai/SpellRole';
 import { effectiveRange } from '@/game/combat/Reach';
+import { resolveInterrupts } from '@/game/spell/runtime/CancelPolicy';
 import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
 import { DEFAULT_PROJECTILE_SPEED, predictAim } from '@/game/ai/AimPredictor';
 import { Circle } from '@/libs/quadtree';
@@ -193,6 +194,25 @@ export class BotBrain {
     context: CastContext;
     elapsedMs: number;
     releaseAtMs: number;
+  };
+  /**
+   * A recast ability the bot has opened and still owes presses to.
+   *
+   * `cast` used to arrange a follow-through for charge activations and nothing
+   * else, so the seven `activation: 'RECAST'` spells got exactly one press each:
+   * Jhin R raised its curtain and fired none of its four rounds, Ziggs W never
+   * detonated, Riven R never slashed, Renekton E never dashed back.
+   *
+   * `choice` rather than a bare spell so each recast can be re-aimed through
+   * `aimFor` — Jhin's rounds should track a target that is still running.
+   */
+  private pendingRecast?: {
+    choice: SpellChoice;
+    context: CastContext;
+    target: Champion | null;
+    remaining: number;
+    delayMs: number;
+    nextAtMs: number;
   };
 
   constructor(readonly owner: AIChampion) {
@@ -599,6 +619,10 @@ export class BotBrain {
    */
   update(nowMs: number, deltaMs: number): void {
     this.nowMs = nowMs;
+    // Deliberately not a `return` the way a charge is. A charge is a key held
+    // down and owns the frame; a recast window is the spell being ACTIVE, which
+    // the bot is free to think and move through.
+    this.advanceRecast(nowMs);
     if (this.advanceCharge(deltaMs)) return;
     if (nowMs - this.lastThinkAtMs < THINK_INTERVAL_MS) return;
     this.lastThinkAtMs = nowMs;
@@ -622,6 +646,8 @@ export class BotBrain {
 
   private drive(posture: Posture, view: TeamView, target: Champion | null, nowMs: number): void {
     const owner = this.owner;
+    // See `castWouldBreakOnMove`: the bot used to cancel its own cast by walking.
+    if (this.castWouldBreakOnMove()) return;
     switch (posture) {
       case 'RETREAT': {
         // `refuge`, not `point`: `point` is a p5 global. See CLAUDE.md.
@@ -685,7 +711,7 @@ export class BotBrain {
       // the same point the cast will use.
       const aim = this.searchPoint(entry, nowMs);
       const ghost = this.chooseGhostSpell(entry, nowMs, aim);
-      if (ghost) this.cast(ghost, aim, nowMs);
+      if (ghost) this.cast(ghost, aim, nowMs, null);
       return;
     }
     // A bot running away still casts — but only what helps it leave. See
@@ -696,7 +722,7 @@ export class BotBrain {
 
     const choice = this.chooseSpell(target, view, running);
     if (!choice) return;
-    this.cast(choice, this.aimFor(choice, target), nowMs);
+    this.cast(choice, this.aimFor(choice, target), nowMs, target);
   }
 
   /** Where this spell should point. The replacement for the player's cursor. */
@@ -742,19 +768,98 @@ export class BotBrain {
     return { x: owner.position.x + FALLBACK_AIM_PX, y: owner.position.y };
   }
 
-  private cast(choice: SpellChoice, aim: Vec2, nowMs: number): void {
+  private cast(choice: SpellChoice, aim: Vec2, nowMs: number, target: Champion | null): void {
     const context = this.contextFor(choice.spell, aim);
     if (!context || !choice.spell.press(context)) return;
     this.lastCastAtMs = nowMs;
 
     const castSpec = choice.spell.castSpec;
-    if (!isChargeActivation(castSpec.activation)) return;
-    this.pendingCharge = {
-      spell: choice.spell,
+    if (isChargeActivation(castSpec.activation)) {
+      this.pendingCharge = {
+        spell: choice.spell,
+        context,
+        elapsedMs: 0,
+        releaseAtMs: requireChargeSpec(castSpec).maxDurationMs / 2,
+      };
+      return;
+    }
+
+    if (castSpec.activation !== 'RECAST') return;
+    // `recasts` defaults to 1 in the runtime, which is every recast spell here
+    // bar Jhin R: Ziggs W detonates, Riven R slashes, Renekton E dashes a second
+    // time and that is the end of it.
+    const remaining = castSpec.active?.recasts ?? 1;
+    if (remaining < 1) return;
+    const delayMs = castSpec.active?.recastDelayMs ?? 0;
+    this.pendingRecast = {
+      choice,
       context,
-      elapsedMs: 0,
-      releaseAtMs: requireChargeSpec(castSpec).maxDurationMs / 2,
+      target,
+      remaining,
+      delayMs,
+      nextAtMs: nowMs + delayMs,
     };
+  }
+
+  /**
+   * Sends the next press a recast ability is owed.
+   *
+   * The runtime owns the window — a max duration lapsing, a cancel, and the last
+   * recast all end it — so anything but `ACTIVE` means there is nothing left to
+   * press into and the follow-through is dropped rather than counted down.
+   *
+   * `castIntervalMs` deliberately does not apply. That knob rate-limits a bot
+   * *deciding* to cast; finishing an ability already on screen is not a second
+   * decision, and gating it would leave Jhin R's later rounds unfired at easy.
+   */
+  private advanceRecast(nowMs: number): void {
+    const pending = this.pendingRecast;
+    if (!pending) return;
+    if (this.owner.isDead || pending.choice.spell.state !== 'ACTIVE') {
+      this.pendingRecast = undefined;
+      return;
+    }
+    if (nowMs < pending.nextAtMs) return;
+
+    const aim =
+      pending.target && !pending.target.isDead
+        ? this.aimFor(pending.choice, pending.target)
+        : pending.context.cursorWorld;
+    const context = this.contextFor(pending.choice.spell, aim) ?? pending.context;
+    pending.context = context;
+    pending.choice.spell.press(context);
+
+    pending.remaining -= 1;
+    if (pending.remaining < 1) {
+      this.pendingRecast = undefined;
+      return;
+    }
+    pending.nextAtMs = nowMs + pending.delayMs;
+  }
+
+  /**
+   * Whether a fresh move order would cancel one of this bot's own casts.
+   *
+   * `drive()` re-issues `navigateTo` every think tick and `navigateTo` bumps
+   * `movementRevision`, which `CancelPolicy` reads as `'MOVE'` — cancelled by the
+   * default `SpellForm.HELD`. The think interval is 250ms, so every ability with
+   * a cast time at or above it died mid-cast, ten of them on the shipped roster:
+   * Caitlyn R at 1000ms down to Darius E at 250. Following an existing route is
+   * fine and stays allowed — only a *new* order bumps the counter.
+   *
+   * The basic attack is exempt by `attackOrder: 'keep'`, the marker for the one
+   * spell where casting *is* the order. Without that check a bot mid-swing would
+   * read as mid-cast and stand still for the rest of the match.
+   */
+  private castWouldBreakOnMove(): boolean {
+    for (const spell of this.owner.spells) {
+      if (!spell) continue;
+      if (spell.state !== 'CASTING' && spell.state !== 'CHANNELING') continue;
+      const spec = spell.castSpec;
+      if (spec.attackOrder === 'keep') continue;
+      if (resolveInterrupts(spec.interrupts).move) return true;
+    }
+    return false;
   }
 
   private contextFor(spell: Spell, aim: Vec2): CastContext | undefined {
