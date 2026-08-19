@@ -14,6 +14,7 @@ import TargetResolver, {
 import type Spell from '@/game/gameObject/Spell';
 import { isChargeActivation, requireChargeSpec, type CastContext } from '@/game/spell/runtime/types';
 import type { Vec2 } from '@/game/spell/runtime/types';
+import { type BotDifficulty, DEFAULT_DIFFICULTY } from '@/game/ai/Difficulty';
 
 export type ChampionPresetFactory = () => ChampionPresetData & { avatar: AssetKey };
 
@@ -28,6 +29,12 @@ export interface AIChampionOptions extends ChampionOptions {
   autoMove?: boolean;
   autoAttack?: boolean;
   autoCast?: boolean;
+  /**
+   * How well this bot plays. A plain option like the three behaviour flags
+   * above, resolved by the caller. The pregame config does not carry it yet —
+   * see §10 of the design doc for the three-line wiring a later pass adds.
+   */
+  difficulty?: BotDifficulty;
   /**
    * What `respawn()` rebuilds this bot's kit from, when `_respawnWithNewPreset`
    * is on. Defaults to `getChampionPresetRandom`, i.e. today's behaviour
@@ -78,6 +85,7 @@ export default class AIChampion extends Champion {
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
+  _difficulty: BotDifficulty = DEFAULT_DIFFICULTY;
   /** ms until the next scan, jittered on construction. */
   _attackScanCooldown = Math.random() * AI_ATTACK_SCAN_INTERVAL_MS;
   private pendingCharge?: {
@@ -93,6 +101,7 @@ export default class AIChampion extends Champion {
     if (options.autoMove !== undefined) this._autoMove = options.autoMove;
     if (options.autoAttack !== undefined) this._autoAttack = options.autoAttack;
     if (options.autoCast !== undefined) this._autoCast = options.autoCast;
+    if (options.difficulty !== undefined) this._difficulty = options.difficulty;
     this.presetFactory = options.presetFactory ?? getChampionPresetRandom;
   }
 
@@ -333,5 +342,10 @@ export default class AIChampion extends Champion {
    */
   setPresetFactory(factory: ChampionPresetFactory): void {
     this.presetFactory = factory;
+  }
+
+  /** The one writer for `_difficulty`, so a later UI pass has a single call site. */
+  setDifficulty(value: BotDifficulty): void {
+    this._difficulty = value;
   }
 }
