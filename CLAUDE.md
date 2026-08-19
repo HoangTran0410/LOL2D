@@ -71,6 +71,25 @@ Objects: `GameObject` → `AttackableUnit` (`Champion`, `AIChampion`, `Minion`, 
 
 `GameObject.teamId` still defaults to a fresh uuid for neutral/standalone objects, but a running match assigns champions explicitly: the player is Blue and initial bots alternate Red/Blue (the default player + 3 bots is 2v2); a bot added later joins the smaller side. A champion shares its base's fountain, turret row (`turret1` blue, `turret2` red in `summoner_map.json`) and minions, and spawn/respawn always uses that team's fountain. `lanes.ts` holds three waypoint paths ordered blue → red; red minions walk them backwards, and `tests/game/minions/Lanes.test.ts` checks the coordinates against the wall polygons — edit them and re-run it. Waves start with three melee plus three caster minions; cannon cadence and mid/late wave thinning live in `MinionSpawner.ts`.
 
+### The bot brain
+
+`src/game/ai/` — one shared brain, no per-champion logic yet (the spec for that is `docs/superpowers/specs/2026-08-19-champion-ai-design.md`).
+
+| File | Role |
+|---|---|
+| `BotBrain.ts` | posture FSM (`RETREAT RECOVER FIGHT SEARCH ENGAGE PUSH ROAM`), spell scoring, aiming, cast follow-through |
+| `TeamBlackboard.ts` | one snapshot per game per 250ms — allies, enemies, focus target, memory, lane buckets and lane assignments |
+| `LaneObjectives.ts` | pure lane maths: project a point onto a lane, score a lane's need, distribute bots across three |
+| `AimPredictor.ts` | leads a moving target by projectile flight time — the replacement for aiming at the player's cursor |
+| `Difficulty.ts` | three frozen profiles; every knob a tier changes lives here and nowhere else |
+| `SpellRole.ts` | ability role bitmask, cached per constructor |
+
+**One full-list walk, and `TeamBlackboard` owns it.** `objectManager.objects` is read exactly once in the whole directory (`TeamBlackboard.ts:131`), once per 250ms for the entire game, and everything else — champions, minions, turrets, lane pressure — is bucketed inside that same pass. `TeamBlackboard.lanes.test.ts` is a source scan that counts the reads and fails on a second one. Decisions run 4×/sec per bot, not 60.
+
+**Never aim at `game.worldMouse`.** On a phone the player's cursor *is* the touch control, so every bot fired at the on-screen button. `bot-aim-seam.test.ts` bans `worldMouse`, `visionRadius` and `spendMana` from the whole directory; `AimPredictor` is the replacement.
+
+**Time is `Game.matchTimeMs`, passed in as `nowMs`.** A per-bot clock looks equivalent and is not: a bot added mid-match through the Đội tab starts at 0 while the shared blackboard is at 300000, so it never rebuilds and its memory never expires.
+
 **Bots play the lanes.** `ai/LaneObjectives.ts` turns those waypoint paths into a progress measure, scores each lane's need, and distributes a team's bots across the three with hysteresis so nobody ping-pongs every 250ms; `TeamBlackboard` gathers the wave and turret positions that feed it **inside its existing single pass over `objectManager.objects`** — that pass is the only full-list walk the whole AI layer is allowed and `tests/game/ai/TeamBlackboard.lanes.test.ts` scans `src/game/ai/` to keep it that way. `BotBrain`'s `PUSH` posture sits below every rule that involves an enemy champion and above `ROAM`, and `findAttackTarget` stays **champions only** on purpose: farming is `findObjectiveTarget`, reachable only from `PUSH`, so "a champion in aggro range beats a wave" is stated once, in the posture chain.
 
 ### The match-config panel
@@ -141,5 +160,13 @@ Each was found by measurement, more than once, and none is visible from the file
 Ability data (damage, cooldowns, ranges, icons) is imported from the LoL Wiki by `scripts/wiki/import-abilities.mjs` into `docs/abilities/<champion>/<slot>.json`, with provenance in `assets/source-manifest.json`.
 
 **Spell names are Riot's, not ours.** `Spell.name` is `'<tên tiếng Việt> (Champion_Slot)'`, and the Vietnamese half must be the string the Vietnamese client ships — 97 had drifted into hand-written approximations. `npm run names:sync` reads Data Dragon's `vi_VN` locale into `docs/spell-names-vi.json` and reports the drift; `npm run names:apply` rewrites the name line in place. **Descriptions stay hand-written** — the official ones carry no numbers and ours are scaled to a ~100 health pool. The cache lives outside `docs/abilities/` because `ability:check` validates that tree against a different schema, and only the sync script touches the network; `vi-spell-names.test.ts` checks the code against the cache offline.
+
+**A body *inside* a spell-made wall is ejected to its nearest face — which past the midplane is the far one.** So the wall throws it through itself. Anivia is the one person that reliably happens to, because the slab is centred on the aim point and on a phone the aim point is on top of her own champion; `Anivia_W` therefore holds the centre a half-thickness plus a body radius away from its caster. Everyone else walks in from outside and rests on the surface, which is why the wall looked like it worked. `Anivia_W.test.ts` sweeps the whole approach.
+
+**A bot must finish what it starts, and two separate things stopped it.** `BotBrain.cast` arranges a follow-through for charge activations *and* for `activation: 'RECAST'` — seven spells, and without the second Jhin R raises its curtain and fires none of its four rounds. And `drive()` must not issue a move order while one of the bot's own casts is in flight: `navigateTo` bumps `movementRevision`, `CancelPolicy` reads that as `'MOVE'`, and the think interval is 250ms, so every ability with a cast time at or above it used to die mid-cast — ten on the roster. The basic attack is exempt via `attackOrder: 'keep'`; without that check a bot mid-swing reads as mid-cast and never walks again.
+
+**What the team can see is not what is worth painting.** `FogOfWar.calculateSight` narrows to the camera for the overlay, which is right — but it is also the only writer of `visibleToPlayerTeam`, and `Game.minimapBlips` reads that flag for a map that covers the whole world. Narrowing both together deleted allied minions, wards and champions from the minimap the moment the player walked away from them. `revealCircles` is every ally; `paintedCircles` is the camera's subset. Turrets and fountains hid it, being structures the minimap draws unconditionally.
+
+**Smoothing must be per unit of time, never per frame.** `position.lerp(target, 0.1)` makes the camera's speed a function of the frame rate: over half a second chasing a point 1000px away, 30fps ends 794px along and 144fps 999px. Worse than the spread is the jitter — no two real frames are the same length, so the camera's speed wobbles with frame time even while the champion walks straight, and the whole world shakes in a way that reads as motion sickness rather than as a frame rate problem. `Camera.smoothingFor` is the conversion; anything else that lerps every frame wants it too.
 
 `tools/shape-maker/` is a standalone p5 app for drawing polygon point arrays (`a` add, `d` delete, `e` export, `i` import); `tools/map-editor/` is linked from its own README.
