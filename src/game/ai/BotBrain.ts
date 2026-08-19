@@ -1,13 +1,33 @@
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import { canSee, type Seeable } from '@/game/combat/Vision';
 import { profileFor, type DifficultyProfile } from '@/game/ai/Difficulty';
-import type { TeamView } from '@/game/ai/TeamBlackboard';
+import type { SeenEnemy, TeamView } from '@/game/ai/TeamBlackboard';
 import type AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
+import type { Vec2 } from '@/game/spell/runtime/types';
 
 /** How much a target's remaining health pulls the choice, at full health missing. */
 export const TARGET_LOW_HEALTH_WEIGHT = 12;
 /** Pixels per point of target score. 100px of walking is worth one point. */
 export const TARGET_DISTANCE_DIVISOR = 100;
+
+export type Posture = 'RETREAT' | 'RECOVER' | 'FIGHT' | 'SEARCH' | 'ENGAGE' | 'ROAM';
+
+/** How far from an ally a focus target counts as "a fight worth joining". */
+export const ASSIST_RANGE = 700;
+export const ROAM_RADIUS = 500;
+/** Both must be met before a recovering bot rejoins. */
+export const RECOVER_HEALTH_PCT = 0.7;
+export const RECOVER_MANA_PCT = 0.5;
+export const OUTNUMBERED_BY = 2;
+export const OUTNUMBERED_HEALTH_PCT = 0.6;
+/** Ceiling on how far a remembered heading is projected forward. */
+export const SEARCH_MAX_LEAD_PX = 300;
+/** One frame, in ms. `SeenEnemy.vel` is pixels per *frame*, elapsed time is ms. */
+export const FRAME_MS = 1000 / 60;
+/** How far ahead an aimless cast points. Any positive number; never 0. */
+export const FALLBACK_AIM_PX = 100;
+
+const ratio = (value: number, max: number): number => (max > 0 ? value / max : 0);
 
 export class BotBrain {
   /**
@@ -89,6 +109,123 @@ export class BotBrain {
     if (enemy === this.owner.game.player) score += this.profile.playerBias;
 
     return score;
+  }
+
+  posture: Posture = 'ROAM';
+  /**
+   * Latched by a retreat and cleared only when health *and* mana are back.
+   *
+   * Without it, healing past `retreatHealthPct` alone makes rule 1 stop firing,
+   * the bot turns round at 31% health, gets hit once, and retreats again: a
+   * bot that yo-yos on the edge of its own threshold and never actually heals.
+   */
+  private recovering = false;
+
+  evaluatePosture(view: TeamView, nowMs: number): Posture {
+    const posture = this.decidePosture(view, nowMs);
+    this.posture = posture;
+    return posture;
+  }
+
+  private decidePosture(view: TeamView, nowMs: number): Posture {
+    const healthPct = ratio(this.owner.stats.health.value, this.owner.stats.maxHealth.value);
+    const manaPct = ratio(this.owner.stats.mana.value, this.owner.stats.maxMana.value);
+
+    if (this.recovering) {
+      if (healthPct > RECOVER_HEALTH_PCT && manaPct > RECOVER_MANA_PCT) this.recovering = false;
+      else return this.atRetreatPoint() ? 'RECOVER' : 'RETREAT';
+    }
+
+    const outnumbered = view.enemies.length - view.allies.length >= OUTNUMBERED_BY;
+    if (
+      healthPct < this.profile.retreatHealthPct ||
+      (outnumbered && healthPct < OUTNUMBERED_HEALTH_PCT)
+    ) {
+      this.recovering = true;
+      return 'RETREAT';
+    }
+
+    // An order already running outranks perception: `canKeep` has no vision
+    // check, so the chase continues whatever the bot can currently see.
+    if (this.owner.basicAttack?.target) return 'FIGHT';
+    if (this.pickTarget(view)) return 'FIGHT';
+    if (this.rememberedTarget(view, nowMs)) return 'SEARCH';
+    if (this.assistableFocus(view)) return 'ENGAGE';
+    return 'ROAM';
+  }
+
+  /** The freshest sighting this tier still remembers. */
+  rememberedTarget(view: TeamView, nowMs: number): SeenEnemy | null {
+    let best: SeenEnemy | null = null;
+    for (const entry of view.memory.values()) {
+      if (entry.unit.isDead || entry.unit.toRemove) continue;
+      if (nowMs - entry.atMs > this.profile.memoryTtlMs) continue;
+      if (!best || entry.atMs > best.atMs) best = entry;
+    }
+    return best;
+  }
+
+  /**
+   * Where the remembered enemy probably is now: last seen position, carried
+   * forward along the heading it was taking, capped so an old memory points at
+   * a plausible spot rather than at the far wall.
+   */
+  searchPoint(entry: SeenEnemy, nowMs: number): Vec2 {
+    const frames = Math.max(0, nowMs - entry.atMs) / FRAME_MS;
+    let dx = entry.vel.x * frames;
+    let dy = entry.vel.y * frames;
+    const lead = Math.hypot(dx, dy);
+    if (lead > SEARCH_MAX_LEAD_PX) {
+      const scale = SEARCH_MAX_LEAD_PX / lead;
+      dx *= scale;
+      dy *= scale;
+    }
+    return { x: entry.pos.x + dx, y: entry.pos.y + dy };
+  }
+
+  private assistableFocus(view: TeamView): Champion | null {
+    const focus = view.focusTarget;
+    if (!focus) return null;
+    for (const ally of view.allies) {
+      if (ally === this.owner) continue;
+      const dx = focus.position.x - ally.position.x;
+      const dy = focus.position.y - ally.position.y;
+      if (Math.hypot(dx, dy) <= ASSIST_RANGE) return focus;
+    }
+    return null;
+  }
+
+  /** Nearest living friendly turret, else the team fountain. */
+  retreatPoint(): Vec2 | null {
+    const game = this.owner.game as {
+      turrets?: { teamId?: unknown; isDead?: boolean; position: Vec2 }[];
+      fountains?: { teamId?: unknown; position: Vec2 }[];
+    };
+    let best: Vec2 | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const turret of game.turrets ?? []) {
+      if (turret.teamId !== this.owner.teamId || turret.isDead) continue;
+      const distance = Math.hypot(
+        turret.position.x - this.owner.position.x,
+        turret.position.y - this.owner.position.y
+      );
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = { x: turret.position.x, y: turret.position.y };
+      }
+    }
+    if (best) return best;
+    const fountain = (game.fountains ?? []).find(one => one.teamId === this.owner.teamId);
+    return fountain ? { x: fountain.position.x, y: fountain.position.y } : null;
+  }
+
+  private atRetreatPoint(): boolean {
+    const point = this.retreatPoint();
+    if (!point) return true; // nowhere to go: stand and recover where you are
+    return (
+      Math.hypot(point.x - this.owner.position.x, point.y - this.owner.position.y) <=
+      this.owner.moveSpeed * 2
+    );
   }
 }
 
