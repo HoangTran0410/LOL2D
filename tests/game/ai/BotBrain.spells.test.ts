@@ -172,28 +172,45 @@ describe('spell choice', () => {
     expect(brain.chooseSpell(null, view())?.slotIndex).toBe(1);
   });
 
+  it('does not fire a poke skillshot at nobody', () => {
+    // `distance` is +Infinity with no target, which used to satisfy the reach
+    // test on its own, so a Poke-role spell scored 6 with nobody to shoot at —
+    // `inferRoles` tags every DIRECTION/POINT spell of range >= 400 as Poke, so
+    // a roaming bot would fire skillshots at `FALLBACK_AIM_PX` ahead of itself,
+    // on cooldown. Every other target-dependent term already carries `&& target`.
+    const { bot, brain } = setup();
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Poke)];
+    expect(brain.chooseSpell(null, view())).toBeNull();
+  });
+
   it('turns into a different bot when the noise is turned up', () => {
-    // NOTE: the brief's original version of this test compared a Damage spell
-    // (score 10) against a Buff spell (score 5) and asserted that a
-    // favourable roll for the Buff slot flips the choice. That is
-    // mathematically unreachable: easy's noise is 0.9, so the best the Buff
-    // spell can ever score is 5 * (1 + 0.9) = 9.5, which never exceeds
-    // Damage's *unboosted* floor of 10 * (1 + 0) = 10 — no rng sequence can
-    // make the weaker spell win. Rewritten to compare two equal-weight Damage
-    // spells, where noise is the only thing that can separate them, which is
-    // what "turns into a different bot" is actually meant to demonstrate.
     const { bot, brain, enemy } = setup('easy');
-    bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage), makeSpell(SpellRole.Damage)];
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage), makeSpell(SpellRole.Buff)];
 
-    brain.rng = () => 0;
-    expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(1); // tie goes to the first slot
+    // Mid roll (0.5) is the neutral multiplier 1.0 at every tier, so the raw
+    // ranking wins: Damage 10 beats Buff 5.
+    brain.rng = () => 0.5;
+    expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(1);
 
-    // easy noise is 0.9. Both spells score SCORE_DAMAGE=10 at baseline; a roll
-    // that favours the second slot inflates it to 10 * 1.9 = 19, enough to
-    // beat the first slot's unboosted 10 * 1.0 = 10.
+    // easy noise 0.9, multiplier = 1 + (rng*2 - 1)*0.9, i.e. range [0.1, 1.9].
+    // First roll 0 -> Damage 10 * 0.1 = 1. Second roll 1 -> Buff 5 * 1.9 = 9.5.
+    // 9.5 > 1, so the easy bot buffs when it should have hit. Arithmetic by hand.
     let call = 0;
     brain.rng = () => (call++ === 0 ? 0 : 1);
     expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(2);
+  });
+
+  it('stays on the good choice at hard, given the identical rolls', () => {
+    // The counterpart that makes the previous test mean something. hard noise
+    // 0.2 -> range [0.8, 1.2]. Damage 10 * 0.8 = 8; Buff 5 * 1.2 = 6. 8 > 6, so
+    // the same rolls that flip an easy bot do not flip a hard one. Without this,
+    // the noise test above passes on a hard-coded constant.
+    const { bot, brain, enemy } = setup('hard');
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage), makeSpell(SpellRole.Buff)];
+
+    let call = 0;
+    brain.rng = () => (call++ === 0 ? 0 : 1);
+    expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(1);
   });
 });
 
@@ -207,28 +224,41 @@ describe('ghost cast', () => {
     pos: { x: 300, y: 0 },
     vel: { x: 0, y: 0 },
   });
+  // Matches `entry().pos` — the natural aim point for a spot the bot just lost
+  // sight of, well inside a 500-range spell's reach from the bot at (0, 0).
+  const AIM = { x: 300, y: 0 };
 
   it('throws an area spell at a spot it just lost sight of', () => {
     const { bot, brain, enemy } = setup('hard'); // ghostCastWindowMs 900
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone)];
-    expect(brain.chooseGhostSpell(entry(0, enemy), 500)?.slotIndex).toBe(1);
+    expect(brain.chooseGhostSpell(entry(0, enemy), 500, AIM)?.slotIndex).toBe(1);
   });
 
   it('will not throw a spell that is not an area or a poke', () => {
     const { bot, brain, enemy } = setup('hard');
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Heal)];
-    expect(brain.chooseGhostSpell(entry(0, enemy), 500)).toBeNull();
+    expect(brain.chooseGhostSpell(entry(0, enemy), 500, AIM)).toBeNull();
   });
 
   it('will not throw once the window has closed', () => {
     const { bot, brain, enemy } = setup('hard');
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone)];
-    expect(brain.chooseGhostSpell(entry(0, enemy), 901)).toBeNull();
+    expect(brain.chooseGhostSpell(entry(0, enemy), 901, AIM)).toBeNull();
   });
 
   it('never throws at easy, whose window is zero', () => {
     const { bot, brain, enemy } = setup('easy');
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone)];
-    expect(brain.chooseGhostSpell(entry(0, enemy), 0)).toBeNull();
+    expect(brain.chooseGhostSpell(entry(0, enemy), 0, AIM)).toBeNull();
+  });
+
+  it('will not throw at a point outside the spell\'s own reach', () => {
+    // Without this bound, a bot throws a 300-range zone at a point 2000px
+    // away and still pays the mana for it — the same reach discipline
+    // `scoreSpell` applies, just never wired into the ghost path.
+    const { bot, brain, enemy } = setup('hard'); // ghostCastWindowMs 900
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone)]; // declaredRange 500
+    const farAim = { x: 3_000, y: 0 };
+    expect(brain.chooseGhostSpell(entry(0, enemy), 500, farAim)).toBeNull();
   });
 });

@@ -340,7 +340,12 @@ export class BotBrain {
 
     let score = 0;
     if (hasRole(mask, SpellRole.Damage) && target) score += SCORE_DAMAGE;
-    if (hasRole(mask, SpellRole.Poke) && distance > this.owner.stats.attackRange.value) {
+    // `&& target` is load-bearing: `distance` is +Infinity with no target, which
+    // satisfies the reach test, so without it a roaming bot scores a poke at 6,
+    // wins its own selection, and fires skillshots into empty ground on cooldown.
+    // `inferRoles` tags every DIRECTION/POINT spell of range >= 400 as Poke, so
+    // that is a large share of the roster.
+    if (target && hasRole(mask, SpellRole.Poke) && distance > this.owner.stats.attackRange.value) {
       score += SCORE_POKE;
     }
     if (hasRole(mask, SpellRole.Burst) && target && effectiveHealth(target) < BURST_TARGET_HEALTH) {
@@ -360,10 +365,21 @@ export class BotBrain {
     if (hasRole(mask, SpellRole.Zone) && inReach) score += SCORE_ZONE;
     if (hasRole(mask, SpellRole.Ultimate)) score += SCORE_ULTIMATE;
 
-    // The randomness, and the only place it lives. `noise` is what makes an
-    // easy bot make odd-but-legal choices and a hard one make good ones,
-    // without either of them being a fixed rotation.
-    return score * (1 + this.rng() * this.profile.noise);
+    // The randomness, and the only place it lives.
+    //
+    // Symmetric about 1 — range [1-noise, 1+noise] — and that is the whole
+    // point. An always->=1 multiplier is ranking-NEUTRAL: a factor common to
+    // every candidate cancels, so only the spread matters. Under `1 + u*n` a
+    // lower-scoring spell displaces a higher one only when
+    // `base(B) > base(A) / (1 + n)` — a 1.9x band at easy and 1.2x at hard —
+    // so the easy tier got a faintly jittered copy of the hard tier's ranking
+    // rather than odd-but-legal choices. Symmetric widens that band to 19x at
+    // easy and 1.5x at hard, which is the graded behaviour the tier table is
+    // written for.
+    //
+    // Every shipped `noise` is < 1, so the multiplier never reaches 0 and a
+    // negative score stays negative: the `score <= 0` filter below is unaffected.
+    return score * (1 + (this.rng() * 2 - 1) * this.profile.noise);
   }
 
   chooseSpell(target: Champion | null, view: TeamView): SpellChoice | null {
@@ -387,9 +403,12 @@ export class BotBrain {
    * This is the moment that reads as "it guessed where I went" — and the reason
    * `easy` sets `ghostCastWindowMs` to 0 rather than getting a smaller version.
    */
-  chooseGhostSpell(entry: SeenEnemy, nowMs: number): SpellChoice | null {
-    const window = this.profile.ghostCastWindowMs;
-    if (window <= 0 || nowMs - entry.atMs > window) return null;
+  chooseGhostSpell(entry: SeenEnemy, nowMs: number, aimPoint: Vec2): SpellChoice | null {
+    // `windowMs`, not `window`: `window` is a global. See CLAUDE.md.
+    const windowMs = this.profile.ghostCastWindowMs;
+    if (windowMs <= 0 || nowMs - entry.atMs > windowMs) return null;
+
+    const away = Math.hypot(aimPoint.x - this.owner.position.x, aimPoint.y - this.owner.position.y);
 
     for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
       const spell = this.owner.spells[slotIndex];
@@ -397,6 +416,10 @@ export class BotBrain {
       const mask = rolesOf(spell, slotIndex);
       if (!hasRole(mask, SpellRole.Zone) && !hasRole(mask, SpellRole.Poke)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
+      // The same reach discipline `scoreSpell` applies. Without it a bot throws
+      // a 300-range zone at a point 2000px away and pays the mana for it.
+      const declared = spell.declaredRange;
+      if (declared !== undefined && away > effectiveRange(declared, this.owner)) continue;
       return { spell, slotIndex, mask, score: SCORE_ZONE };
     }
     return null;
