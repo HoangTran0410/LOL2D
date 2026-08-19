@@ -131,6 +131,46 @@ export const RETREAT_ROLES: SpellRoleMask = roles(
   SpellRole.Shield
 );
 
+/**
+ * May a bot running away press this spell?
+ *
+ * `RETREAT_ROLES` on its own is not that question, and shipping it as one made
+ * a fleeing bot worse than the bug it fixed. **No spell in
+ * `src/game/gameObject/spells/` declares `static aiRoles`** — the field exists
+ * on `Spell`, nothing sets it — so `Escape`, `Heal` and `Shield` are produced
+ * *solely* by `inferRoles`, which hands `roles(Buff, Shield)` to every `SELF`
+ * cast with a mana cost: about seventy files. While retreating that mask scores
+ * Shield `SCORE_SUPPORT` (health is below `SUPPORT_HEALTH_PCT` by definition
+ * there) + Buff + Ultimate, and it is the only candidate the role filter leaves,
+ * so it always wins. `Zed_R` is exactly that shape — `SELF`, 50 mana, `range`
+ * 500 — and it auto-locks the nearest enemy inside 500px and dashes *behind*
+ * them. So a bot below its retreat threshold ulted into the champion chasing it,
+ * where before the last wave it pressed nothing at all. `Warwick_R`,
+ * `Nocturne_R` and `Diana_R` are the same shape.
+ *
+ * The `Shield` bit is therefore inference noise on every costed `SELF` cast, and
+ * the retreat set cannot trust it alone. Two further axes separate a genuine
+ * self-preservation spell from a self-cast engage tool, and both must hold:
+ *
+ * - **Not the ultimate slot.** That catches those four by construction.
+ * - **Declares no range.** A real shield or heal reaches nobody; a `SELF` spell
+ *   carrying a `declaredRange` reaches *out* to something, and Zed R's 500 is
+ *   precisely that reach.
+ *
+ * The consequence is accepted: with nothing hand-tagged this leaves the retreat
+ * set small — self-buffs and shields that declare no range. Casting little while
+ * fleeing is right; ulting into the pursuer is not. The day spells do carry
+ * hand-written `aiRoles`, these two guards should apply to *inferred* masks
+ * only, or a hand-tagged blink (a ranged `Escape`) would be excluded with them.
+ */
+export function isRetreatCandidate(spell: Spell, mask: SpellRoleMask): boolean {
+  return (
+    hasRole(mask, RETREAT_ROLES) &&
+    !hasRole(mask, SpellRole.Ultimate) &&
+    spell.declaredRange === undefined
+  );
+}
+
 export class BotBrain {
   /**
    * The terrain half of perception, injectable purely so a test can state a
@@ -498,22 +538,18 @@ export class BotBrain {
   }
 
   /**
-   * `allowedRoles` narrows the kit to spells carrying at least one of its bits
-   * — `RETREAT_ROLES` while running away. Omitted, every castable spell is a
-   * candidate, which is every other posture.
+   * `retreating` narrows the kit to what a bot running away may press — the
+   * three axes of `isRetreatCandidate`, not the role mask alone. Left false,
+   * every castable spell is a candidate, which is every other posture.
    */
-  chooseSpell(
-    target: Champion | null,
-    view: TeamView,
-    allowedRoles?: SpellRoleMask
-  ): SpellChoice | null {
+  chooseSpell(target: Champion | null, view: TeamView, retreating = false): SpellChoice | null {
     let best: SpellChoice | null = null;
     // From 1: slot 0 is the basic attack, which is the attack controller's job.
     for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
       const spell = this.owner.spells[slotIndex];
       if (!spell?.isCastableNow) continue;
       const mask = rolesOf(spell, slotIndex);
-      if (allowedRoles !== undefined && !hasRole(mask, allowedRoles)) continue;
+      if (retreating && !isRetreatCandidate(spell, mask)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
       const score = this.scoreSpell(spell, slotIndex, mask, target, view);
       if (score <= 0 || !Number.isFinite(score)) continue;
@@ -541,10 +577,16 @@ export class BotBrain {
       const mask = rolesOf(spell, slotIndex);
       if (!hasRole(mask, SpellRole.Zone) && !hasRole(mask, SpellRole.Poke)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
-      // The same reach discipline `scoreSpell` applies. Without it a bot throws
-      // a 300-range zone at a point 2000px away and pays the mana for it.
-      const declared = spell.declaredRange;
-      if (declared !== undefined && away > effectiveRange(declared, this.owner)) continue;
+      // The same reach discipline `scoreSpell` applies, through the same helper.
+      // Without it a bot throws a 300-range zone at a point 2000px away and pays
+      // the mana for it — and an *undeclared* range is not an unlimited one, the
+      // ruling `reachOf` already makes for `scoreSpell` and `aimFor`. It bites
+      // hardest here: `inferRoles` calls every range-less `POINT` spell
+      // `Damage | Zone`, so all of them (23, plus `Flash`) are candidates on this
+      // path, the aim can sit `SEARCH_MAX_DISTANCE_PX + SEARCH_MAX_LEAD_PX` out,
+      // and nothing clamps it because the ghost cast does not go through
+      // `aimFor`. A bot summoned Tibbers at a guessed point 1200px away.
+      if (away > this.reachOf(spell, null)) continue;
       return { spell, slotIndex, mask, score: SCORE_ZONE };
     }
     return null;
@@ -652,7 +694,7 @@ export class BotBrain {
     const running = posture === 'RETREAT' || posture === 'RECOVER';
     if (!running && posture !== 'FIGHT' && posture !== 'ENGAGE') return;
 
-    const choice = this.chooseSpell(target, view, running ? RETREAT_ROLES : undefined);
+    const choice = this.chooseSpell(target, view, running);
     if (!choice) return;
     this.cast(choice, this.aimFor(choice, target), nowMs);
   }

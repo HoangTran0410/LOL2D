@@ -6,6 +6,9 @@ import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion'
 import { BotBrain, SCORE_DAMAGE, SCORE_ZONE } from '../../../src/game/ai/BotBrain';
 import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
 import type Spell from '../../../src/game/gameObject/Spell';
+import Zed_R from '../../../src/game/gameObject/spells/Zed_R';
+import Alistar_W from '../../../src/game/gameObject/spells/Alistar_W';
+import Nocturne_R from '../../../src/game/gameObject/spells/Nocturne_R';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
@@ -313,6 +316,19 @@ describe('ghost cast', () => {
     const farAim = { x: 3_000, y: 0 };
     expect(brain.chooseGhostSpell(entry(0, enemy), 500, farAim)).toBeNull();
   });
+
+  it('will not throw a range-less spell at a point outside the tier reach either', () => {
+    // An undeclared range is not an unlimited one — the same ruling `reachOf`
+    // makes for `scoreSpell` and `aimFor`, at the one site the last pass did
+    // not enumerate. It matters here more than anywhere: every `POINT` spell
+    // without a declared range infers to `Damage | Zone`, so all 23 of them
+    // plus `Flash` are ghost candidates, and the search point can sit
+    // `SEARCH_MAX_DISTANCE_PX + SEARCH_MAX_LEAD_PX` = 1200px away.
+    const { bot, brain, enemy } = setup('hard'); // aggroRange 480
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone, { range: undefined })];
+    const farAim = { x: 3_000, y: 0 };
+    expect(brain.chooseGhostSpell(entry(0, enemy), 500, farAim)).toBeNull();
+  });
 });
 
 /**
@@ -343,7 +359,11 @@ describe('casting while running away', () => {
   it('presses its escape while retreating, with nobody setting the posture', () => {
     const { bot, brain } = casting(); // normal retreats below 30% health
     const damage = makeSpell(SpellRole.Damage);
-    const getaway = makeSpell(SpellRole.Escape);
+    // `range: undefined`, here and in the two below: `isRetreatCandidate` takes
+    // a declared range as the mark of a spell that reaches *out* at something,
+    // and a real self-cast escape or heal declares none. A stub carrying the
+    // default 500 is not one of these spells.
+    const getaway = makeSpell(SpellRole.Escape, { range: undefined });
     bot.spells = [makeSpell(0), damage, getaway];
     bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
 
@@ -375,7 +395,7 @@ describe('casting while running away', () => {
     // without casting. `createGame` has no turrets and no fountain, so
     // `atRetreatPoint()` is true and the second tick is RECOVER.
     const { bot, brain } = casting();
-    const heal = makeSpell(SpellRole.Heal);
+    const heal = makeSpell(SpellRole.Heal, { range: undefined });
     bot.spells = [makeSpell(0), heal];
     bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
 
@@ -390,12 +410,70 @@ describe('casting while running away', () => {
 
   it('still obeys the cast interval while retreating', () => {
     const { bot, brain } = casting();
-    const getaway = makeSpell(SpellRole.Escape);
+    const getaway = makeSpell(SpellRole.Escape, { range: undefined });
     bot.spells = [makeSpell(0), getaway];
     bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
 
     brain.update(1_000, 16);
     brain.update(1_400, 16); // 400ms later: a think tick, but inside 900ms
     expect(getaway.press).toHaveBeenCalledTimes(1);
+  });
+
+  /**
+   * The three tests in this file that use REAL spell classes, because the stubs
+   * are what hid the bug they cover: every stub declares `static aiRoles`, and
+   * **no spell in `src/game/gameObject/spells/` does**. On real data `Escape`,
+   * `Heal` and `Shield` come only from `inferRoles`, and it hands
+   * `roles(Buff, Shield)` to every costed `SELF` cast — 72 of the 82 `SELF`
+   * spells in that directory. In RETREAT that mask is the only thing the role
+   * filter leaves standing, so whatever carries it is what the bot presses.
+   *
+   * Each case below is pinned by ONE of the two axes in `isRetreatCandidate`,
+   * so neither can be dropped without a red test.
+   */
+  const fleeingWith = (spell: Spell, slotIndex: number) => {
+    const { bot, brain } = casting(); // normal retreats below 30% health
+    // Spied, not stubbed: the point is which spell the bot chooses, and letting
+    // a real cast run would spawn dashes and shadows this test has no use for.
+    const press = vi.spyOn(spell, 'press').mockReturnValue(true);
+    const kit: Spell[] = [makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0)];
+    kit[slotIndex] = spell;
+    bot.spells = kit;
+    bot.stats.mana.baseValue = 500;
+    bot.stats.maxMana.baseValue = 500;
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
+
+    brain.update(1_000, 16);
+
+    expect(brain.posture).toBe('RETREAT');
+    return press;
+  };
+
+  it('does not ult into its pursuer while running away — Zed R', () => {
+    // `SELF`, 50 mana, `range` 500: it auto-locks the nearest enemy inside
+    // 500px and dashes *behind* them. Under `RETREAT_ROLES` alone it scored
+    // Shield 20 + Buff 5 + Ultimate 6 and won unopposed, so a bot below its
+    // retreat threshold ulted into the champion chasing it — strictly worse
+    // than the "presses nothing while fleeing" bug that ruling was fixing.
+    // Caught by both axes: ultimate slot, and a declared range.
+    const { bot } = casting();
+    expect(fleeingWith(new Zed_R(bot as unknown as Champion), 4)).not.toHaveBeenCalled();
+  });
+
+  it('does not headbutt its pursuer while running away — Alistar W, no ultimate involved', () => {
+    // The axis-2 case on its own: `SELF`, 50 mana, `range` 400, and it dashes
+    // TO the nearest enemy. Not an ultimate, so only "declares a range" keeps
+    // it out — a real shield or heal reaches nobody.
+    const { bot } = casting();
+    expect(fleeingWith(new Alistar_W(bot as unknown as Champion), 2)).not.toHaveBeenCalled();
+  });
+
+  it('does not open Paranoia while running away — Nocturne R declares no range at all', () => {
+    // The axis-1 case on its own, and the reason the ultimate slot is excluded
+    // rather than the range test being the whole rule: Nocturne's leap reach is
+    // `leapRange`, not `range`, so `declaredRange` is `undefined` and axis 2
+    // waves it through. Only the ultimate exclusion stops it.
+    const { bot } = casting();
+    expect(fleeingWith(new Nocturne_R(bot as unknown as Champion), 4)).not.toHaveBeenCalled();
   });
 });
