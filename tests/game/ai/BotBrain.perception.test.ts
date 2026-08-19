@@ -176,6 +176,25 @@ describe('BotBrain target choice', () => {
     expect(new BotBrain(bot).pickTarget(viewOf([tooFar, visible]))).toBe(visible);
   });
 
+  it('leans toward the human player, and only at tiers that say so', () => {
+    // Needs a player who is NOT the bot: the fixtures call `setPlayer(bot)`, so
+    // `enemy === game.player` was never true and this term had no test at all.
+    const game = createGame();
+    const bot = spawnBot(game, 'hard', 0, 0);
+    const human = spawnEnemy(game, 300, 0);
+    const otherBot = spawnEnemy(game, 260, 0);
+    game.setPlayer(human);
+    indexObjects(game, [bot, human, otherBot]);
+
+    // hard playerBias is 12; the distance gap favours otherBot by only
+    // (300-260)/100 = 0.4. Worked by hand.
+    expect(new BotBrain(bot).pickTarget(viewOf([otherBot, human]))).toBe(human);
+
+    // easy playerBias is 0, so the nearer one wins on distance alone.
+    const easyBot = spawnBot(game, 'easy', 0, 0);
+    expect(new BotBrain(easyBot).pickTarget(viewOf([otherBot, human]))).toBe(otherBot);
+  });
+
   it('returns null when it can perceive nobody', () => {
     const game = createGame();
     const bot = spawnBot(game, 'normal');
