@@ -23,13 +23,8 @@ export interface AboutArticle {
 
 export const ARTICLES: AboutArticle[] = [
   {
-    title: 'Mã nguồn dự án trên GitHub',
-    url: 'https://github.com/HoangTran0410/LOL2D',
+    title: 'Giới thiệu Game - Build in Public',
+    url: 'https://www.facebook.com/groups/indiehackervn/posts/2237444843709742/',
     description: 'Toàn bộ mã nguồn game — đọc, tải về, hoặc đóng góp thêm.',
-  },
-  {
-    title: 'README — tổng quan & hướng dẫn chơi',
-    url: 'https://github.com/HoangTran0410/LOL2D#readme',
-    description: 'Giới thiệu tính năng, cách điều khiển và ảnh chụp màn hình trong game.',
   },
 ];

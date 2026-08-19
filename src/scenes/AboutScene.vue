@@ -52,7 +52,7 @@ const REPO_URL = 'https://github.com/HoangTran0410/LOL2D';
         <p class="about-intro-text">
           <strong>LOL2D</strong> là một game 2D chạy thẳng trên trình duyệt, lấy cảm hứng từ Liên
           Minh Huyền Thoại — dự án fan-made, không chính thức và không liên quan tới Riot Games.
-          Chọn tướng, ghép đội hình Xanh/Đỏ, đẩy lính, hạ trụ và đối đầu với bot (hoặc bạn bè) ngay
+          Chọn tướng, ghép đội hình Xanh/Đỏ, ghép chiêu thức, đẩy lính, hạ trụ và đối đầu với đối thủ ngay
           trên điện thoại hay máy tính, không cần cài thêm gì ngoài trình duyệt.
         </p>
         <div class="about-link-row">
