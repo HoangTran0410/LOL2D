@@ -53,6 +53,20 @@
   cursor: pointer;
 }
 
+/* Left of the fullscreen toggle, same row, same quiet treatment — it opens a
+   read-only screen, not a scene-critical action, so it must not compete with
+   Chơi/Cấu Hình Trận Đấu for attention. */
+#about-btn {
+  position: fixed;
+  top: 20px;
+  right: 64px;
+  background-color: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 1em;
+  cursor: pointer;
+}
+
 .hextech-btn {
   text-transform: uppercase;
   font-size: 18px;
