@@ -170,6 +170,34 @@ describe('Syndra — the sphere economy', () => {
     expect(spheres[0].position.x).toBeCloseTo(400, 0);
   });
 
+  /**
+   * Driven through `press()` rather than by calling `onActivate`/`onRecast`
+   * directly, which is the whole point: the two tests above do call them
+   * directly, and that is why neither could see this. The runtime handed
+   * `onRecast` the context snapshotted when the window *opened*, so the throw
+   * went wherever the cursor had been at pickup — and she has to be standing
+   * next to a sphere to pick it up, so that is roughly back where the sphere
+   * already was. Reported as "it throws it back to the old sphere position".
+   */
+  it('W throws to where the cursor is on the second press, not the first', () => {
+    const carried = sphere(100);
+    game.objectManager.update();
+
+    const w = new Syndra_W(owner);
+    // Press one: cursor on the sphere she is picking up, 100px away.
+    expect(w.press(context(100, 0))).toBe(true);
+    expect(['reeling', 'held']).toContain(carried.mode);
+
+    // Press two: cursor somewhere else entirely, inside the 450px throw range.
+    expect(w.press(context(400, 0))).toBe(true);
+    advance(700);
+
+    const spheres = groundedSpheres(owner);
+    expect(spheres.length).toBe(1);
+    expect(spheres[0].position.x).toBeCloseTo(400, 0);
+    expect(spheres[0].position.y).toBeCloseTo(0, 0);
+  });
+
   it('W letting its window lapse drops the sphere at her feet, still hers', () => {
     const carried = sphere(200);
     game.objectManager.update();

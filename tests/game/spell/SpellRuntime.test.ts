@@ -210,6 +210,58 @@ describe('SpellRuntime', () => {
     expect(events.filter(event => event === 'recast')).toHaveLength(4);
   });
 
+  /**
+   * A recast is a *new* press by the player, so it has to be aimed by the
+   * cursor of that press. `press()` was handed one and threw it away, calling
+   * the delegate with `this.context` — the snapshot taken when the spell was
+   * activated. Every recast therefore fired at wherever the cursor had been
+   * when the window opened: Syndra W threw the sphere back to roughly where she
+   * picked it up (she has to stand next to it to grab it), Riven R's wind slash
+   * flew along the direction R was pressed rather than the one it was aimed,
+   * and Renekton E carried a local workaround (`this.castContext ?? context`)
+   * that was the only reason Dice went the right way.
+   */
+  it('aims a recast with the press that triggered it, not the one that opened it', () => {
+    const seen: CastContext[] = [];
+    const { delegate } = fakeDelegate();
+    delegate.onRecast = context => void seen.push(context);
+
+    const runtime = new SpellRuntime(
+      spec({ activation: 'RECAST', active: { recastDelayMs: 0 } }),
+      delegate
+    );
+
+    runtime.press(context);
+    expect(runtime.state).toBe('ACTIVE');
+
+    const elsewhere: CastContext = Object.freeze({
+      ...context,
+      cursorWorld: Object.freeze({ x: 900, y: -400 }),
+      direction: Object.freeze({ x: 0, y: -1 }),
+    });
+    runtime.press(elsewhere);
+
+    expect(seen).toHaveLength(1);
+    expect(seen[0].cursorWorld).toEqual({ x: 900, y: -400 });
+    expect(seen[0].direction).toEqual({ x: 0, y: -1 });
+  });
+
+  it('carries the recast context into the completion that follows it', () => {
+    const seen: CastContext[] = [];
+    const { delegate } = fakeDelegate();
+    delegate.onComplete = context => void seen.push(context);
+
+    const runtime = new SpellRuntime(
+      spec({ activation: 'RECAST', active: { recastDelayMs: 0 } }),
+      delegate
+    );
+    runtime.press(context);
+    runtime.press(Object.freeze({ ...context, cursorWorld: Object.freeze({ x: 900, y: -400 }) }));
+
+    expect(seen).toHaveLength(1);
+    expect(seen[0].cursorWorld).toEqual({ x: 900, y: -400 });
+  });
+
   it('ends an unspent recast budget when the active window lapses', () => {
     const { delegate, events } = fakeDelegate();
     const runtime = new SpellRuntime(

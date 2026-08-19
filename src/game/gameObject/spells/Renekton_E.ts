@@ -75,10 +75,14 @@ export default class Renekton_E extends Spell {
   }
 
   onRecast(context: CastContext): void {
-    // `this.castContext` is the context of the press that *just* happened;
-    // the argument is the runtime's copy of the original cast, so using it
-    // would send Dice back along the direction Slice was aimed.
-    this.pass(this.castContext ?? context, true);
+    // Aimed by the second press, not the first — otherwise Dice goes back along
+    // the direction Slice was aimed. This used to reach past the argument to
+    // `this.castContext` because the runtime handed every recast the context it
+    // had snapshotted at activation; `SpellRuntime.recast` replaces that with
+    // the press that triggered it now, so the argument is already the right
+    // one. Renekton was the only recast in the game that aimed correctly, by
+    // carrying that workaround.
+    this.pass(context, true);
   }
 
   /** One dash through everything in front of him. */
