@@ -110,12 +110,49 @@ export default class GameScene extends Scene {
     else this.resumeRuntime();
   };
 
+  /**
+   * The player left the page, by whichever of the two signals noticed.
+   *
+   * Stopping the runtime is not enough on its own: it freezes the frame but
+   * leaves `Game.paused` false, so nothing on screen says the match is held
+   * and the first thing that resumes the loop resumes the fight. `pauseForAway`
+   * is the half that makes it an explicit, visible paused state — see its
+   * comment for why it opens the panel instead of calling `pause()`.
+   *
+   * Both, and in this order, because `pauseForAway` is a no-op on a match that
+   * is already paused (and on a scene with no match at all) while the runtime
+   * still has to stop either way.
+   */
+  private _leavePage(): void {
+    this.suspendRuntime();
+    this.game?.pauseForAway();
+  }
+
   // Bound once so addEventListener/removeEventListener target the same
   // reference — otherwise the listener added in enter() could never be
   // removed in exit(), leaking a handler across every scene re-entry.
   private _handleVisibilityChange = (): void => {
-    if (document.hidden) this.suspendRuntime();
+    if (document.hidden) this._leavePage();
     else this.resumeRuntime();
+  };
+
+  /**
+   * The desktop case `visibilitychange` never reports: another window took
+   * focus while this one stayed perfectly visible.
+   *
+   * It also fires for things that are *not* the player leaving — clicking into
+   * devtools, an `<iframe>`, a native permission prompt — which is survivable
+   * only because the return is deliberately not symmetric in the obvious way.
+   * Nothing auto-resumes: coming back leaves the match paused with the panel
+   * up, and the player presses the close button. So the worst a spurious blur
+   * can do is open a panel the player closes again, never lose a frame of a
+   * match they were watching.
+   *
+   * `blur` does not bubble, so a text field inside the config panel losing
+   * focus cannot reach this listener on `window`.
+   */
+  private _handleWindowBlur = (): void => {
+    this._leavePage();
   };
 
   setup() {
@@ -142,6 +179,7 @@ export default class GameScene extends Scene {
     imageMode(CENTER);
 
     document.addEventListener('visibilitychange', this._handleVisibilityChange);
+    window.addEventListener('blur', this._handleWindowBlur);
 
     void this.startGame();
   }
@@ -394,6 +432,7 @@ export default class GameScene extends Scene {
 
   exit() {
     document.removeEventListener('visibilitychange', this._handleVisibilityChange);
+    window.removeEventListener('blur', this._handleWindowBlur);
     this.game?.spellInputController.cancelAll('SCENE_EXIT');
     this.stopGame();
     this.dom.style.display = 'none';

@@ -887,6 +887,37 @@ export default class Game {
   }
 
   /**
+   * The player stopped looking at the page — backgrounded the app, locked the
+   * phone, switched tab, or let another window take focus. Routed from
+   * `GameScene`, which owns the listeners.
+   *
+   * The match used to carry on without them: minions pushed, bots fought, and
+   * the champion standing still died to whatever walked past. Coming back to a
+   * match that moved on is the bug this closes.
+   *
+   * **It opens the panel rather than calling `pause()`.** The panel already
+   * holds the match paused — `openSpellPicker` *is* `pause()` plus the screen
+   * that says so and the button that undoes it — so a `pause()` here would be
+   * a second, invisible paused state with no way out on screen. One entry
+   * point, and it is the one the corner button and Escape already use.
+   *
+   * Refuses to do anything to a match that is already paused, for two reasons
+   * that happen to want the same guard: re-opening would wipe
+   * `editPlayerSlot`, closing a loadout the player had left open, and a match
+   * paused for any other reason is not ours to touch.
+   *
+   * `pause()` is the fallback only for a match with no HUD mounted — a
+   * headless bench — where stopping is still right and there is nothing to
+   * show.
+   */
+  pauseForAway(): void {
+    if (this.paused) return;
+    const hud = this.inGameHUD?.vueInstance?.hud;
+    if (hud) hud.openSpellPicker();
+    else this.pause();
+  }
+
+  /**
    * B: channel home, or stop the channel that is already running.
    *
    * A method rather than four lines inside `keyPressed`, so a touch button has

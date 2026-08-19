@@ -27,7 +27,10 @@
  *   6. a cheat switched on before the match starts survives into it, which is
  *      the persistence reversal this change is built on;
  *   7. Bắt Đầu enters the match, and Escape opens the same panel over it, now
- *      showing the live-only controls (KDA, Thoát trận) that hide on the menu.
+ *      showing the live-only controls (KDA, Thoát trận) that hide on the menu;
+ *   8. the page going away — backgrounded app, locked phone, switched tab —
+ *      pauses the running match and puts that same panel up, and coming back
+ *      leaves it paused.
  *
  *   node tests/e2e/drive-match-config.mjs [outPrefix]
  */
@@ -305,4 +308,76 @@ await page.waitForSelector('#practice-zoom');
 check('the zoom slider appears only in a match', await page.isVisible('#practice-zoom'));
 check('and the input-mode row is reachable mid-match', await page.isVisible('#pregame-input-mode-auto'));
 await shot('match-settings');
+
+// ------------------------------------------ 9. the player leaves the page
+//
+// A backgrounded PWA used to keep simulating: minions pushed, bots fought, and
+// the player came back to a match that had moved on without them. The fix is
+// one path — `visibilitychange` -> `GameScene` -> `Game.pauseForAway` -> the
+// HUD's own `openSpellPicker` — and a unit test can see each link but not that
+// they are joined, so the event is dispatched for real here.
+//
+// Everything below runs on the match this script has already built, which is
+// the point: `Game.paused` is read off the live game, not inferred from the
+// panel being on screen.
+
+const panelUp = '#practice-tab-roster';
+const matchState = () =>
+  page.evaluate(() => {
+    const game = window.__lol2d.scene.oScene.game;
+    return { paused: game.paused, panel: !!game.inGameHUD.vueInstance.hud.showSpellsPicker };
+  });
+
+await page.keyboard.press('Escape');
+await page.waitForSelector(panelUp, { state: 'detached', timeout: 15_000 });
+const running = await matchState();
+check(
+  'closing the panel puts the match back on the clock',
+  !running.paused && !running.panel,
+  JSON.stringify(running)
+);
+
+// `document.hidden` is an accessor on Document.prototype; an own configurable
+// property shadows it, which is the only way to make a real browser report
+// itself hidden without actually backgrounding the window.
+await page.evaluate(() => {
+  Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+  document.dispatchEvent(new Event('visibilitychange'));
+});
+await page.waitForSelector(panelUp, { timeout: 15_000 });
+const away = await matchState();
+check(
+  'the page going away pauses the match and opens the panel',
+  away.paused && away.panel,
+  JSON.stringify(away)
+);
+await shot('match-away');
+
+// Coming back must *not* undo it. A match that resumes itself the instant the
+// screen lights up is the same bug pointed the other way — the player resumes
+// deliberately, from the panel that is already in front of them.
+await page.evaluate(() => {
+  delete document.hidden;
+  document.dispatchEvent(new Event('visibilitychange'));
+});
+await page.waitForTimeout(500);
+const returned = await matchState();
+check(
+  'coming back leaves it paused, with the panel still up',
+  returned.paused && returned.panel,
+  JSON.stringify(returned)
+);
+
+// And the deliberate resume still works, which is what proves the runtime was
+// held rather than broken.
+await page.click('#practice-close');
+await page.waitForSelector(panelUp, { state: 'detached', timeout: 15_000 });
+await page.waitForTimeout(500);
+const resumed = await matchState();
+check(
+  'and the player can resume it from that panel',
+  !resumed.paused && !resumed.panel,
+  JSON.stringify(resumed)
+);
+
 await finish();

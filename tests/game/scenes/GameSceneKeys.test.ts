@@ -97,6 +97,7 @@ describe('GameScene paused runtime', () => {
     const loop = vi.fn();
     vi.stubGlobal('loop', loop);
     vi.stubGlobal('document', { hidden: false, removeEventListener: vi.fn() });
+    vi.stubGlobal('window', { removeEventListener: vi.fn() });
     const scene = new GameScene({} as never);
     scene.game = {
       paused: true,
@@ -294,5 +295,161 @@ describe('GameScene touch ownership', () => {
 
     expect(handled).toBeUndefined();
     expect(syncTouches).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Leaving the page mid-match.
+ *
+ * The match used to keep running while the player was somewhere else — another
+ * app, a locked phone, a different tab — so coming back meant walking into a
+ * fight that had already happened. Hiding the page now stops it *and* puts the
+ * panel up, which is both the paused state made visible and the way out of it.
+ *
+ * `Game.pauseForAway` is the seam, and it deliberately routes through
+ * `HudInteractions.openSpellPicker` rather than calling `pause()` beside its
+ * own copy of the open bookkeeping — the panel already pauses, so "open the
+ * panel" *is* "pause" and there is only ever one of them.
+ */
+const awayMatch = ({ mounted = true } = {}) => {
+  const game: Record<string, unknown> = {
+    paused: false,
+    player: { spells: [{}, {}] },
+  };
+  game.pause = vi.fn(() => {
+    game.paused = true;
+  });
+  game.unpause = vi.fn(() => {
+    game.paused = false;
+  });
+  const hud = createHudInteractions(game as never);
+  game.inGameHUD = mounted ? { vueInstance: { hud } } : undefined;
+  return { game: game as unknown as Game, raw: game, hud };
+};
+
+describe('Game.pauseForAway — the player stopped looking', () => {
+  it('pauses the match and puts the panel up', () => {
+    const { game, hud } = awayMatch();
+
+    Game.prototype.pauseForAway.call(game);
+
+    expect(hud.showSpellsPicker).toBe(true);
+    expect(game.paused).toBe(true);
+  });
+
+  it('leaves a panel the player already opened exactly as they left it', () => {
+    const { game, hud } = awayMatch();
+    // The desktop strip's shortcut: panel open, aimed at one slot.
+    hud.openPlayerLoadout(3);
+
+    Game.prototype.pauseForAway.call(game);
+
+    expect(hud.showSpellsPicker).toBe(true);
+    // `openSpellPicker` clears this, so a second open would be visible here.
+    expect(hud.editPlayerSlot).toBe(3);
+  });
+
+  it('still stops a match whose HUD is not mounted', () => {
+    const { game, raw } = awayMatch({ mounted: false });
+
+    Game.prototype.pauseForAway.call(game);
+
+    expect(raw.pause).toHaveBeenCalledOnce();
+    expect(game.paused).toBe(true);
+  });
+});
+
+describe('GameScene — leaving and returning to the page', () => {
+  const away = (scene: GameScene) =>
+    scene as unknown as {
+      _handleVisibilityChange: () => void;
+      _handleWindowBlur: () => void;
+    };
+
+  it('pauses the match and stops the runtime when the page is hidden', () => {
+    vi.stubGlobal('clearTimeout', vi.fn());
+    const noLoop = vi.fn();
+    vi.stubGlobal('noLoop', noLoop);
+    vi.stubGlobal('document', { hidden: true });
+    const scene = new GameScene({} as never);
+    const pauseForAway = vi.fn();
+    scene.game = { paused: false, pauseForAway } as never;
+
+    away(scene)._handleVisibilityChange();
+
+    expect(pauseForAway).toHaveBeenCalledOnce();
+    expect(noLoop).toHaveBeenCalledOnce();
+  });
+
+  it('treats the window losing focus the same way', () => {
+    vi.stubGlobal('clearTimeout', vi.fn());
+    vi.stubGlobal('noLoop', vi.fn());
+    // Not hidden: another window took focus, which `visibilitychange` never
+    // reports.
+    vi.stubGlobal('document', { hidden: false });
+    const scene = new GameScene({} as never);
+    const pauseForAway = vi.fn();
+    scene.game = { paused: false, pauseForAway } as never;
+
+    away(scene)._handleWindowBlur();
+
+    expect(pauseForAway).toHaveBeenCalledOnce();
+  });
+
+  it('does not resume the match when the page comes back', () => {
+    const loop = vi.fn();
+    vi.stubGlobal('loop', loop);
+    vi.stubGlobal('document', { hidden: false });
+    const scene = new GameScene({} as never);
+    const unpause = vi.fn();
+    scene.game = { paused: true, unpause } as never;
+    scene.updateLoop = vi.fn();
+
+    away(scene)._handleVisibilityChange();
+
+    expect(unpause).not.toHaveBeenCalled();
+    expect(loop).not.toHaveBeenCalled();
+    expect(scene.updateLoop).not.toHaveBeenCalled();
+  });
+
+  it('removes both away listeners when the scene exits', () => {
+    const documentRemove = vi.fn();
+    const windowRemove = vi.fn();
+    vi.stubGlobal('document', { hidden: false, removeEventListener: documentRemove });
+    vi.stubGlobal('window', { removeEventListener: windowRemove });
+    const scene = new GameScene({} as never);
+    scene.game = {
+      paused: false,
+      onPauseChanged: vi.fn(),
+      spellInputController: { cancelAll: vi.fn() },
+      destroy: vi.fn(),
+    } as never;
+    scene.dom = { style: {} } as HTMLElement;
+    scene.canvas = { remove: vi.fn() };
+    const handlers = away(scene);
+
+    scene.exit();
+
+    expect(documentRemove).toHaveBeenCalledWith(
+      'visibilitychange',
+      handlers._handleVisibilityChange
+    );
+    expect(windowRemove).toHaveBeenCalledWith('blur', handlers._handleWindowBlur);
+  });
+
+  /**
+   * The other half of the leak: `exit()` can only unhook what `enter()` hooked
+   * *by the same reference*, and scenes here are switched rather than reloaded,
+   * so a mismatch leaves a listener holding a dead `Game` for the rest of the
+   * session. The removal above is behavioural; this is the add side, which no
+   * unit test can reach without a p5 canvas.
+   */
+  it('adds exactly the two handlers it removes', () => {
+    const source = readFileSync('src/scenes/GameScene.ts', 'utf8');
+
+    expect(source).toContain(
+      "document.addEventListener('visibilitychange', this._handleVisibilityChange)"
+    );
+    expect(source).toContain("window.addEventListener('blur', this._handleWindowBlur)");
   });
 });

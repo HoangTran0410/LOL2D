@@ -20,8 +20,9 @@ export interface AIChampionOptions extends ChampionOptions {
   autoCast?: boolean;
   /**
    * How well this bot plays. A plain option like the three behaviour flags
-   * above, resolved by the caller. The pregame config does not carry it yet —
-   * see §10 of the design doc for the three-line wiring a later pass adds.
+   * above, resolved by the caller: it rides in `BotBehaviour` alongside them,
+   * so the Đội tab's per-bot picker, `MatchDirector.setBotBehaviour` and the
+   * persisted config all reach it the same way they reach `autoMove`.
    */
   difficulty?: BotDifficulty;
   /**
@@ -78,10 +79,9 @@ export default class AIChampion extends Champion {
    * the fields keeps one writer: `MatchDirector.setBotBehaviour`, the pregame
    * config and the e2e scripts all set `_autoMove` directly, and turning
    * movement back on restores exactly the reflexes the bot had.
-   */
-  /**
-   * **Off**, unlike the two below it, and the one flag here whose default is a
-   * decision rather than an inheritance.
+   *
+   * This first one is **off**, unlike the two after it, and is the one flag
+   * here whose default is a decision rather than an inheritance.
    *
    * Taking a hit used to re-roll the bot's destination to a random point on the
    * whole map. That predates `BotBrain`, which now answers "I am being hurt"
@@ -256,7 +256,16 @@ export default class AIChampion extends Champion {
     // and without this the very next incoming hit hands it straight back —
     // which under a turret is every 1.3 seconds, for as long as it takes to die.
     if (this.brain.isLeaving) return;
-    if (attacker instanceof Champion) this.basicAttack.order(attacker);
+    // ...and it does not enlist in a fight it is not allowed to walk to. This
+    // is the third acquisition path, and it used to be the only one with no
+    // turret gate: `updateAttackTargeting` asks through `findAttackTarget` and
+    // the posture chain asks in `decidePosture`, while an enemy standing under
+    // their own turret could get an order out of this one just by poking. The
+    // attack controller has never heard of a building, so it then re-issued
+    // `navigateTo(attacker)` every frame and undid both of the other rules.
+    if (attacker instanceof Champion && this.brain.mayFight(attacker)) {
+      this.basicAttack.order(attacker);
+    }
   }
 
   respawn() {
