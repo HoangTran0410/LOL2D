@@ -4,6 +4,10 @@ import { profileFor, type DifficultyProfile } from '@/game/ai/Difficulty';
 import type { SeenEnemy, TeamView } from '@/game/ai/TeamBlackboard';
 import type AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
 import type { Vec2 } from '@/game/spell/runtime/types';
+import { hasRole, rolesOf, SpellRole, ULTIMATE_SLOT, type SpellRoleMask } from '@/game/ai/SpellRole';
+import { effectiveRange } from '@/game/combat/Reach';
+import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
+import type Spell from '@/game/gameObject/Spell';
 
 /** How much a target's remaining health pulls the choice, at full health missing. */
 export const TARGET_LOW_HEALTH_WEIGHT = 12;
@@ -28,6 +32,36 @@ export const FRAME_MS = 1000 / 60;
 export const FALLBACK_AIM_PX = 100;
 
 const ratio = (value: number, max: number): number => (max > 0 ? value / max : 0);
+
+export interface SpellChoice {
+  spell: Spell;
+  slotIndex: number;
+  mask: SpellRoleMask;
+  score: number;
+}
+
+/**
+ * The whole tuning surface for spell choice, exported so no test hard-codes one
+ * of them. Retuning a bot's priorities is editing this block and nothing else.
+ */
+export const SCORE_DAMAGE = 10;
+export const SCORE_POKE = 6;
+export const SCORE_BURST = 14;
+export const SCORE_CC = 12;
+export const SCORE_SUPPORT = 20;
+export const SCORE_SUPPORT_WASTED = -5;
+export const SCORE_ESCAPE = 25;
+export const SCORE_ESCAPE_WASTED = -10;
+export const SCORE_DASH_GAPCLOSE = 6;
+export const SCORE_DASH_WASTED = -4;
+export const SCORE_BUFF = 5;
+export const SCORE_ZONE = 8;
+export const SCORE_ULTIMATE = 6;
+
+/** Below this effective health, a target is worth spending a burst spell on. */
+export const BURST_TARGET_HEALTH = 40;
+/** Below this fraction, a heal or shield is worth more than another hit. */
+export const SUPPORT_HEALTH_PCT = 0.5;
 
 export class BotBrain {
   /**
@@ -226,6 +260,116 @@ export class BotBrain {
       Math.hypot(point.x - this.owner.position.x, point.y - this.owner.position.y) <=
       this.owner.moveSpeed * 2
     );
+  }
+
+  /** Injected so a test is deterministic. Never `random()` — that is a p5 global. */
+  rng: () => number = Math.random;
+
+  /**
+   * Whether this spell fits inside the mana the bot is willing to spend now.
+   *
+   * The whole of the "cụt tay" fix: a bot used to fire whatever was off
+   * cooldown until the pool was empty, then stand in a fight with nothing to
+   * press. The reserve is only held while the ultimate could actually be cast —
+   * mana saved for a spell on cooldown is mana thrown away.
+   *
+   * Priced through `effectiveManaCost`, so under URF's `manaFree` every cost is
+   * 0 and the budget stops blocking anything, which is exactly right.
+   */
+  withinManaBudget(spell: Spell, mask: SpellRoleMask): boolean {
+    if (hasRole(mask, SpellRole.Ultimate)) return true;
+    const ultimate = this.owner.spells[ULTIMATE_SLOT];
+    if (!ultimate?.isCastableNow) return true;
+    const reserve = this.owner.stats.maxMana.value * this.profile.manaReservePct;
+    return spell.effectiveManaCost <= this.owner.stats.mana.value - reserve;
+  }
+
+  scoreSpell(
+    spell: Spell,
+    slotIndex: number,
+    mask: SpellRoleMask,
+    target: Champion | null,
+    view: TeamView
+  ): number {
+    void slotIndex;
+    const healthPct = ratio(this.owner.stats.health.value, this.owner.stats.maxHealth.value);
+    const distance = target
+      ? Math.hypot(
+          target.position.x - this.owner.position.x,
+          target.position.y - this.owner.position.y
+        )
+      : Number.POSITIVE_INFINITY;
+    const declared = spell.declaredRange;
+    const reach =
+      declared === undefined ? Number.POSITIVE_INFINITY : effectiveRange(declared, this.owner, target);
+    const inReach = distance <= reach;
+
+    // A spell that cannot reach is not worth scoring — unless closing the gap
+    // is the thing it does.
+    if (target && !inReach && !hasRole(mask, SpellRole.Dash)) return Number.NEGATIVE_INFINITY;
+
+    let score = 0;
+    if (hasRole(mask, SpellRole.Damage) && target) score += SCORE_DAMAGE;
+    if (hasRole(mask, SpellRole.Poke) && distance > this.owner.stats.attackRange.value) {
+      score += SCORE_POKE;
+    }
+    if (hasRole(mask, SpellRole.Burst) && target && effectiveHealth(target) < BURST_TARGET_HEALTH) {
+      score += SCORE_BURST;
+    }
+    if (hasRole(mask, SpellRole.Cc) && target && target === view.focusTarget) score += SCORE_CC;
+    if (hasRole(mask, SpellRole.Heal) || hasRole(mask, SpellRole.Shield)) {
+      score += healthPct < SUPPORT_HEALTH_PCT ? SCORE_SUPPORT : SCORE_SUPPORT_WASTED;
+    }
+    if (hasRole(mask, SpellRole.Escape)) {
+      score += this.posture === 'RETREAT' ? SCORE_ESCAPE : SCORE_ESCAPE_WASTED;
+    }
+    if (hasRole(mask, SpellRole.Dash)) {
+      score += target && !inReach ? SCORE_DASH_GAPCLOSE : SCORE_DASH_WASTED;
+    }
+    if (hasRole(mask, SpellRole.Buff)) score += SCORE_BUFF;
+    if (hasRole(mask, SpellRole.Zone) && inReach) score += SCORE_ZONE;
+    if (hasRole(mask, SpellRole.Ultimate)) score += SCORE_ULTIMATE;
+
+    // The randomness, and the only place it lives. `noise` is what makes an
+    // easy bot make odd-but-legal choices and a hard one make good ones,
+    // without either of them being a fixed rotation.
+    return score * (1 + this.rng() * this.profile.noise);
+  }
+
+  chooseSpell(target: Champion | null, view: TeamView): SpellChoice | null {
+    let best: SpellChoice | null = null;
+    // From 1: slot 0 is the basic attack, which is the attack controller's job.
+    for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
+      const spell = this.owner.spells[slotIndex];
+      if (!spell?.isCastableNow) continue;
+      const mask = rolesOf(spell, slotIndex);
+      if (!this.withinManaBudget(spell, mask)) continue;
+      const score = this.scoreSpell(spell, slotIndex, mask, target, view);
+      if (score <= 0 || !Number.isFinite(score)) continue;
+      if (!best || score > best.score) best = { spell, slotIndex, mask, score };
+    }
+    return best;
+  }
+
+  /**
+   * One area spell thrown at a position the bot can no longer see.
+   *
+   * This is the moment that reads as "it guessed where I went" — and the reason
+   * `easy` sets `ghostCastWindowMs` to 0 rather than getting a smaller version.
+   */
+  chooseGhostSpell(entry: SeenEnemy, nowMs: number): SpellChoice | null {
+    const window = this.profile.ghostCastWindowMs;
+    if (window <= 0 || nowMs - entry.atMs > window) return null;
+
+    for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
+      const spell = this.owner.spells[slotIndex];
+      if (!spell?.isCastableNow) continue;
+      const mask = rolesOf(spell, slotIndex);
+      if (!hasRole(mask, SpellRole.Zone) && !hasRole(mask, SpellRole.Poke)) continue;
+      if (!this.withinManaBudget(spell, mask)) continue;
+      return { spell, slotIndex, mask, score: SCORE_ZONE };
+    }
+    return null;
   }
 }
 
