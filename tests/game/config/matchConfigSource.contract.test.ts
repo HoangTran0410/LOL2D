@@ -328,6 +328,13 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
       expect(source.getCheats().debug.vision).toBe(false);
       expect(loadPregameConfig().cheats.debug.quadtree).toBe(true);
     });
+
+    it('toggles the FPS overlay like any other debug layer, and persists it', () => {
+      source.setCheats({ debug: { ...source.getCheats().debug, fps: true } });
+      expect(source.getCheats().debug.fps).toBe(true);
+      expect(source.getCheats().debug.terrain).toBe(false);
+      expect(loadPregameConfig().cheats.debug.fps).toBe(true);
+    });
   });
 
   describe('device settings', () => {

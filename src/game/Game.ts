@@ -35,6 +35,7 @@ import NavigationSystem from './nav/NavigationSystem';
 import { drawNavDebug } from './nav/NavDebugOverlay';
 import { drawExecuteMarks } from './combat/ExecuteMarks';
 import { drawDebugOverlay } from './debug/DebugOverlay';
+import { FpsMeter, drawFpsOverlay } from './debug/FpsOverlay';
 import EventManager from '@/managers/EventManager';
 import { uuidv4 } from '@/utils';
 import SpellInputController from './spell/input/SpellInputController';
@@ -119,6 +120,8 @@ export default class Game {
   minionSpawner!: MinionSpawner;
   touchControls!: TouchControls;
   minimap!: Minimap;
+  /** Backs the Cài đặt tab's FPS toggle (`director.debug.fps`); see `debug/FpsOverlay.ts`. */
+  private readonly fpsMeter = new FpsMeter();
 
   /**
    * Every mutation of this match once it is running — roster, world, rules —
@@ -462,6 +465,9 @@ export default class Game {
     // and an overlay you cannot see is not an overlay.
     this.minimap.draw();
     this.touchControls.draw();
+    // Screen space for the same reason, and the last of the three: a fixed
+    // HUD corner, not a world position the camera would pan or zoom under it.
+    drawFpsOverlay(this, this.fpsMeter);
   }
 
   destroy() {

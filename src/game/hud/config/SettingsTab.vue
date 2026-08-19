@@ -159,6 +159,7 @@ const DEBUG_LABELS: Record<keyof DebugLayerConfig, string> = {
   collision: 'Va chạm',
   vision: 'Tầm nhìn',
   quadtree: 'Quadtree',
+  fps: 'FPS',
 };
 
 const onDebugChange = (key: keyof DebugLayerConfig, event: Event): void => {

@@ -28,6 +28,9 @@ export interface DebugFlags {
   collision: boolean;
   vision: boolean;
   quadtree: boolean;
+  /** The FPS readout; drawn by `drawFpsOverlay` in `game/debug/FpsOverlay.ts`, not here — same
+   *  split as `routes`: this file is world-space layers, that one is a fixed screen-space HUD. */
+  fps: boolean;
 }
 
 /** The one field `createDebugFlags` proxies into. Structural, so tests need no `Game`. */
@@ -56,6 +59,7 @@ export function createDebugFlags(context: DebugFlagsContext): DebugFlags {
     collision: false,
     vision: false,
     quadtree: false,
+    fps: false,
   };
 }
 

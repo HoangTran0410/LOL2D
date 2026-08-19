@@ -409,6 +409,7 @@ export default class MatchDirector {
         collision: this.debug.collision,
         vision: this.debug.vision,
         quadtree: this.debug.quadtree,
+        fps: this.debug.fps,
       },
       playerInvulnerable: this.isInvulnerable(this.game.player),
       botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, i) =>
@@ -444,6 +445,7 @@ export default class MatchDirector {
     this.debug.collision = cheats.debug.collision;
     this.debug.vision = cheats.debug.vision;
     this.debug.quadtree = cheats.debug.quadtree;
+    this.debug.fps = cheats.debug.fps;
 
     // Both directions, not just "switch it on where the flag says so". On a
     // booting match every unit is fresh and clearing is a no-op, but this is

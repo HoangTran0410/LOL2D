@@ -175,6 +175,11 @@ export function stubGameGlobals(): Record<string, ReturnType<typeof vi.fn>> {
   vi.stubGlobal('cos', Math.cos);
   vi.stubGlobal('sin', Math.sin);
   vi.stubGlobal('TWO_PI', Math.PI * 2);
+  // A stand-in canvas size for screen-space HUD drawing (e.g. the FPS
+  // overlay), which positions itself off the right/top edge rather than a
+  // world coordinate.
+  vi.stubGlobal('width', 1280);
+  vi.stubGlobal('height', 800);
 
   const spies: Record<string, ReturnType<typeof vi.fn>> = {};
   for (const name of [
@@ -204,7 +209,7 @@ export function stubGameGlobals(): Record<string, ReturnType<typeof vi.fn>> {
     spies[name] = vi.fn();
     vi.stubGlobal(name, spies[name]);
   }
-  for (const name of ['CENTER', 'CLOSE', 'RIGHT', 'LEFT', 'BOTTOM', 'BASELINE']) {
+  for (const name of ['CENTER', 'CLOSE', 'RIGHT', 'LEFT', 'BOTTOM', 'BASELINE', 'TOP']) {
     vi.stubGlobal(name, name);
   }
   return spies;
