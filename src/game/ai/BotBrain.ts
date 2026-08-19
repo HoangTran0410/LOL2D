@@ -89,6 +89,24 @@ export const TURRET_KEEP_OUT_PX = 60;
  */
 export const TURRET_HOSTILE_MS = 4_000;
 /**
+ * How much closer a push has to be able to get before it is worth calling one.
+ *
+ * A shade under one think tick of walking (`moveSpeed` 3 x 15 frames = 45px),
+ * so a bot that can still take a real step keeps its lane and only a bot that
+ * genuinely cannot move toward its objective gives it up.
+ */
+export const PUSH_PROGRESS_PX = 40;
+/**
+ * How long a lane stays given up on once its objective proved unreachable.
+ *
+ * Without it the give-up is self-cancelling: the bot walks away, the objective
+ * becomes "approachable" again from further out purely because there is room to
+ * take a step, and it walks back to the same line — pacing, rebuilt out of the
+ * cure for pacing. Latched, like `TURRET_HOSTILE_MS` and `headingHome`, and
+ * cleared the moment the lane genuinely opens.
+ */
+export const PUSH_BLOCKED_MS = 6_000;
+/**
  * Health a bot must still have before it will trade a turret shot for a kill.
  *
  * Above `hard`'s `retreatHealthPct` of 0.4, so the dive rule is never what a
@@ -493,6 +511,11 @@ export class BotBrain {
    */
   private headingHome = false;
   /**
+   * Match time until which this bot's lane is treated as closed. See
+   * `pushApproach` and `PUSH_BLOCKED_MS`.
+   */
+  private pushBlockedUntilMs = Number.NEGATIVE_INFINITY;
+  /**
    * Match time of the last hit this bot took, written by `AIChampion.takeDamage`.
    *
    * `-Infinity` so a bot that has never been hit reads as safe rather than as
@@ -638,7 +661,7 @@ export class BotBrain {
     // Below every way of answering "is there a champion to deal with" and above
     // wandering: decision 2 of the lane layer. A bot only farms when there is
     // nobody to fight.
-    if (this.pushTarget(view)) return 'PUSH';
+    if (this.pushApproach(view, nowMs)) return 'PUSH';
     return 'ROAM';
   }
 
@@ -799,6 +822,49 @@ export class BotBrain {
       if (insideThreat(turret, unit.position, bodyRadius, TURRET_KEEP_OUT_PX)) return true;
     }
     return false;
+  }
+
+  /**
+   * Where a push should actually walk, or `null` when it cannot walk anywhere.
+   *
+   * `pushTarget` answers with the objective; this answers with the part of it
+   * the bot is allowed to reach, and that difference is a deadlock if nobody
+   * asks for it. Once the lane's wave is dead, `pushTarget` names the enemy
+   * turret itself, `safely` holds the walk at the keep-out line — and from the
+   * moment the bot is standing on that line the clamp's answer *is* its own
+   * position. It re-issued a walk to its own feet four times a second and
+   * stood in the jungle beside the lane until something else happened to it.
+   * Reported from a real match, and the direct cost of fixing the *pacing*
+   * version of the same standoff: refusing the inward step turned an
+   * oscillation into a parking space.
+   *
+   * The two cases the clamp cannot tell apart on its own are separated here.
+   * Having *arrived* at a frontier is not a deadlock — the wave is right there
+   * and `findObjectiveTarget` has something to swing at — so the give-up only
+   * fires when a turret actually shortened the walk and what is left of it is
+   * nothing.
+   */
+  pushApproach(view: TeamView, nowMs: number): Vec2 | null {
+    const front = this.pushTarget(view);
+    if (!front) return null;
+
+    const stop = this.safely(view, null, front);
+    // Nothing got in the way, so the lane is open however far off the objective
+    // is — and a bot that had given this lane up gets it back here, which is
+    // what makes the latch below expire on the wave arriving rather than on a
+    // clock nobody is watching.
+    if (Math.hypot(stop.x - front.x, stop.y - front.y) <= 1) {
+      this.pushBlockedUntilMs = Number.NEGATIVE_INFINITY;
+      return stop;
+    }
+
+    if (nowMs < this.pushBlockedUntilMs) return null;
+
+    const gain = Math.hypot(stop.x - this.owner.position.x, stop.y - this.owner.position.y);
+    if (gain >= PUSH_PROGRESS_PX) return stop;
+
+    this.pushBlockedUntilMs = nowMs + PUSH_BLOCKED_MS;
+    return null;
   }
 
   /**
@@ -1243,15 +1309,17 @@ export class BotBrain {
         // As in FIGHT: an order already running owns the walking, and stepping
         // in would fight the attack controller for the destination every tick.
         if (owner.basicAttack?.target) return;
-        // `front`, not `line` — `line` is a p5 global. See CLAUDE.md.
-        const front = this.pushTarget(view);
-        if (!front) return;
         // The single most visible symptom this layer was written for.
         // `pushTarget` answers with the enemy turret's own coordinates once the
         // lane holds no friendly wave, and this used to walk to them — while
         // `findObjectiveTarget`, which does have an escort rule, handed the bot
         // nothing to shoot. It stood in the guns, attacking nothing, and died.
-        const stop = this.safely(view, null, front);
+        //
+        // `pushApproach`, not `pushTarget`: the same helper the posture asked,
+        // so the two can never disagree about whether this lane is walkable.
+        // `stop`, not `line` — `line` is a p5 global. See CLAUDE.md.
+        const stop = this.pushApproach(view, nowMs);
+        if (!stop) return;
         owner.navigateTo(stop.x, stop.y);
         return;
       }
@@ -1260,7 +1328,16 @@ export class BotBrain {
         if (owner.position.dist(owner.destination) >= owner.moveSpeed) return;
         const anchor = view.rally ?? this.retreatPoint();
         if (!anchor) {
-          owner.moveToRandomLocation();
+          // Clamped like every other walk here. This was the one branch in
+          // `drive` that reached the world directly, and it only ever ran when
+          // a bot had nowhere in particular to be — which is exactly the state
+          // a bot that has just given its lane up is in. It wandered into the
+          // guns it had spent the last two seconds walking out of.
+          const roll = this.safely(view, null, {
+            x: this.rng() * owner.game.mapSize,
+            y: this.rng() * owner.game.mapSize,
+          });
+          owner.navigateToWalkable(roll.x, roll.y);
           return;
         }
         const angle = this.rng() * Math.PI * 2;

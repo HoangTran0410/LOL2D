@@ -479,3 +479,99 @@ describe('a bot held out of an enemy turret’s reach', () => {
     expect(brain.evaluatePosture(escorted, TURRET_HOSTILE_MS + 500)).toBe('FIGHT');
   });
 });
+
+describe('a bot whose lane objective is behind a turret it may not enter', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  /**
+   * The other end of the standoff, and the one the player actually reported: no
+   * enemy left to fight at all.
+   *
+   * A bot dives to finish someone, the fight ends — they died, or they got away
+   * — and the lane it is assigned holds no friendly wave. `pushTarget` then
+   * answers with the enemy turret's own coordinates, the clamp holds the bot at
+   * the keep-out line, and from that moment the clamp's answer *is* where the
+   * bot already stands. It re-issues a walk to its own feet, four times a
+   * second, for as long as anyone watches.
+   */
+  const strandedAtTheRing = () => {
+    const game = createGame();
+    const bot = spawnBot(game, TOWER.x, TOWER.y + 1_400);
+    const tower = spawnTurret(game, RED, TOWER.x, TOWER.y);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, tower]);
+
+    const board = view({
+      enemyTurrets: [tower],
+      // No `frontier`: the wave this bot was pushing with is dead, which is the
+      // state that makes `pushTarget` answer with the building itself.
+      lanes: new Map([[Lane.MID, laneState({ nextEnemyTurret: tower })]]),
+      laneAssignments: new Map([[bot, Lane.MID]]),
+      rally: { x: TOWER.x, y: TOWER.y + 2_000 },
+    });
+    return { game, bot, tower, board };
+  };
+
+  /** How far the body actually travelled over the tail of the walk. */
+  const travelledOver = (samples: readonly { position: { x: number; y: number } }[]) => {
+    let total = 0;
+    for (let i = 1; i < samples.length; i += 1) {
+      total += Math.hypot(
+        samples[i].position.x - samples[i - 1].position.x,
+        samples[i].position.y - samples[i - 1].position.y
+      );
+    }
+    return total;
+  };
+
+  it('does not park on the keep-out line for ever', () => {
+    // Reported from a real match: "bot đi vào rìa rừng rồi đứng đó luôn, không
+    // đi đâu nữa một hồi lâu". The fix for a bot *pacing* that line turned the
+    // oscillation into a deadlock — the clamp now refuses the inward step by
+    // answering with the body's own position, and nothing above it noticed that
+    // an objective it can never approach is not an objective.
+    const { bot, board } = strandedAtTheRing();
+    const brain = new BotBrain(bot);
+    brain.rng = () => 0.5;
+
+    const walk = driveTicks(brain, bot, board, 40);
+
+    // The last quarter of the walk: by then it has long since reached the line.
+    const settled = walk.samples.slice(30);
+    expect(travelledOver(settled)).toBeGreaterThan(bot.moveSpeed * 10);
+  });
+
+  it('stops calling it a push once it cannot get any closer', () => {
+    // The mechanism behind the symptom above, so a fix that merely jiggles the
+    // body without fixing the decision does not pass.
+    const { bot, board } = strandedAtTheRing();
+    const brain = new BotBrain(bot);
+    brain.rng = () => 0.5;
+
+    const walk = driveTicks(brain, bot, board, 40);
+
+    expect(walk.from(30).countOf('PUSH')).toBe(0);
+  });
+
+  it('still pushes a lane it can actually walk down', () => {
+    // The guard must not turn every push off: with the wave in front of it, the
+    // objective is the wave, the clamp never fires, and nothing changes.
+    const { bot, tower, board } = strandedAtTheRing();
+    const pushable = {
+      ...board,
+      lanes: new Map([
+        [
+          Lane.MID,
+          laneState({ nextEnemyTurret: tower, frontier: { x: TOWER.x, y: TOWER.y + 900 } }),
+        ],
+      ]),
+    };
+    const brain = new BotBrain(bot);
+    brain.rng = () => 0.5;
+
+    const walk = driveTicks(brain, bot, pushable, 12);
+
+    expect(walk.countOf('PUSH')).toBeGreaterThan(8);
+  });
+});
