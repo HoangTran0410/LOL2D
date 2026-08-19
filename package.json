@@ -36,7 +36,8 @@
     "version:show": "node scripts/version.mjs",
     "e2e:pwa": "npm run build && node tests/e2e/verify-pwa-offline.mjs",
     "e2e:champions": "node tests/e2e/smoke-new-champions.mjs",
-    "e2e:bots": "node tests/e2e/drive-bot-discipline.mjs"
+    "e2e:bots": "node tests/e2e/drive-bot-discipline.mjs",
+    "e2e:render": "node tests/e2e/verify-render-guard.mjs"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",

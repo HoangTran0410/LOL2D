@@ -120,6 +120,74 @@ const defaultLoaders: AssetLoaders = {
   audio: audioLoader,
 };
 
+/* ------------------------------------------------- surviving a memory purge */
+
+/**
+ * A canvas painted once and read back later, to find out whether the browser
+ * threw the pixels away.
+ *
+ * p5 1.11 builds every `p5.Image` out of `document.createElement('canvas')`
+ * (`p5.js:96392`) and `loadImage` draws the decoded `<img>` into it exactly once
+ * before dropping it (`p5.js:94848`). So all ~370 assets in this game live as
+ * off-DOM canvas backing stores — which is precisely the memory a mobile
+ * browser reclaims while the app is in the background. Reported from a real
+ * installed PWA: come back after five minutes and every avatar and every icon
+ * is blank, while every shape the game *draws* is fine. That split is the
+ * diagnosis, because vector drawing repaints the visible canvas each frame and
+ * owes nothing to a stored one.
+ *
+ * A probe rather than sampling the assets: reading a pixel out of 370 images on
+ * every resume is not free, and a transparent pixel is a perfectly ordinary
+ * thing for an icon to have. One 1x1 canvas painted opaque answers the only
+ * question that matters — the purge is wholesale, not per image.
+ */
+const PROBE_INK = 199;
+let probeCanvas: HTMLCanvasElement | null = null;
+
+function armProbe(): void {
+  if (typeof document === 'undefined') return;
+  if (!probeCanvas) {
+    probeCanvas = document.createElement('canvas');
+    probeCanvas.width = 1;
+    probeCanvas.height = 1;
+  }
+  const context = probeCanvas.getContext('2d');
+  if (!context) return;
+  context.fillStyle = `rgb(${PROBE_INK},${PROBE_INK},${PROBE_INK})`;
+  context.fillRect(0, 0, 1, 1);
+}
+
+function probeLost(): boolean {
+  if (!probeCanvas) return false;
+  const context = probeCanvas.getContext('2d');
+  if (!context) return false;
+  try {
+    // Alpha, not the ink: a reclaimed backing store reads back fully
+    // transparent, and comparing the colour would also flag a browser that
+    // rounds it.
+    return context.getImageData(0, 0, 1, 1).data[3] === 0;
+  } catch {
+    // A context that cannot be read at all is a lost one.
+    return true;
+  }
+}
+
+/** Decodes a URL into something `drawImage` accepts. Same origin, so no CORS. */
+function decodeImageElement(url: string): Promise<CanvasImageSource> {
+  return new Promise((resolve, reject) => {
+    const element = new Image();
+    element.onload = () => resolve(element);
+    element.onerror = () => reject(new Error(`Failed to decode ${url}`));
+    element.src = url;
+  });
+}
+
+/** What the repaint needs of a `p5.Image`. */
+interface RepaintableImage {
+  drawingContext?: { drawImage(source: CanvasImageSource, x: number, y: number): void };
+  setModified?: (value: boolean) => void;
+}
+
 export default class AssetManager {
   private static loaders = defaultLoaders;
   private static handles = new Map<AssetKey, AssetHandle>();
@@ -149,6 +217,74 @@ export default class AssetManager {
    */
   private static autoRetriedUrls = new Set<string>();
   private static placeholders = new Map<string, AssetHandle>();
+
+  /**
+   * Whether the browser has discarded the off-DOM canvas backing stores.
+   *
+   * A field rather than a method so the suite can state the answer: tests run
+   * on `environment: 'node'`, where there is no canvas to probe.
+   */
+  static backingStoresLost: () => boolean = probeLost;
+
+  /** Repaints the probe. Called after every recovery, and once at startup. */
+  static armBackingStoreProbe: () => void = armProbe;
+
+  /**
+   * Repaints every loaded image back into the `p5.Image` that already holds it.
+   *
+   * **Into the same object**, which is the whole of it: every champion, spell
+   * and HUD row is holding that reference, so swapping `handle.data` for a
+   * freshly loaded image would fix the manager and leave all of them drawing a
+   * blank. `drawingContext.drawImage` puts the pixels back where they were and
+   * nobody downstream has to hear about it.
+   *
+   * Failures are per file. Offline with one entry missing from the precache is
+   * a reason for that icon to stay blank, not for the other 369 to.
+   */
+  static async restoreImages(
+    decode: (url: string) => Promise<CanvasImageSource> = decodeImageElement
+  ): Promise<AssetKey[]> {
+    const restored: AssetKey[] = [];
+    const jobs: Promise<void>[] = [];
+
+    for (const [key, handle] of this.handles) {
+      if (handle.kind !== 'image' || handle.status !== 'ready') continue;
+      const image = handle.data as RepaintableImage | null;
+      if (!image?.drawingContext) continue;
+      const url = handle.url;
+      jobs.push(
+        decode(url)
+          .then(source => {
+            image.drawingContext!.drawImage(source, 0, 0);
+            // p5 uploads a texture from this canvas in WEBGL mode and caches
+            // it; the flag is how it is told the pixels moved.
+            image.setModified?.(true);
+            restored.push(key);
+          })
+          .catch(() => undefined)
+      );
+    }
+
+    await Promise.all(jobs);
+    // Placeholders are `p5.Graphics`, so they were blanked too. They are looked
+    // up by label on every draw and rebuild themselves lazily, so dropping them
+    // is the whole repair.
+    this.placeholders.clear();
+    return restored;
+  }
+
+  /**
+   * The one call a resume makes. Cheap when nothing was lost, which is most
+   * resumes.
+   */
+  static async recoverIfLost(
+    decode?: (url: string) => Promise<CanvasImageSource>
+  ): Promise<AssetKey[]> {
+    if (!this.backingStoresLost()) return [];
+    const restored = await this.restoreImages(decode);
+    this.armBackingStoreProbe();
+    return restored;
+  }
 
   static configureLoaders(loaders: AssetLoaders): void {
     this.loaders = loaders;

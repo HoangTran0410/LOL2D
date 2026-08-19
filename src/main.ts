@@ -13,6 +13,7 @@ import { every, fastHypot, filter, forEach, map, some } from './utils/optimized.
 import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
 import { registerServiceWorker } from './pwa/updates';
+import AssetManager from './managers/AssetManager';
 
 /*
  * No `import { System } from './libs/detect-collisions'` here.
@@ -61,6 +62,18 @@ Math.hypot = fastHypot;
 
   // open loading scene
   mgr.showScene(LoadingScene);
+
+  // Coming back from the background is where every image in the game can be
+  // gone. See the note on the probe in `AssetManager`: p5 keeps each one as an
+  // off-DOM canvas, and that is the memory a phone reclaims first while the app
+  // is not on screen. The probe is armed here, once, and read on every return.
+  AssetManager.armBackingStoreProbe();
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) return;
+      void AssetManager.recoverIfLost();
+    });
+  }
 
   // Last, and fire-and-forget: caching the app must never be on the path
   // between the player and a running game. See src/pwa/updates.ts.

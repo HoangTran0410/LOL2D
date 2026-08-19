@@ -1,6 +1,8 @@
 // original source: Marian Veteanu - https://github.com/mveteanu/p5.SceneManager
 // modified by Hoang Tran
 
+import { guardDraw } from './RenderGuard';
+
 const P5Events: string[] = [
   'mouseClicked',
   'mousePressed',
@@ -99,9 +101,15 @@ export default class SceneManager {
     const p5 = typeof this.p5 !== 'undefined' ? this.p5 : (window as any);
 
     // Wire draw manually for speed reasons...
-    p5.draw = function () {
+    //
+    // Guarded, and that is not defensive habit — it is the difference between a
+    // bad frame and a dead game. p5's `_draw` re-arms `requestAnimationFrame`
+    // *after* calling into here, so one throw ends the frame chain for the rest
+    // of the session and leaves a black canvas under a live Vue HUD. See
+    // `RenderGuard.ts`.
+    p5.draw = guardDraw(function () {
       me.draw();
-    };
+    });
 
     // This loop will wire automatically all P5 events to each scene like this:
     // p5.mouseClicked = function() { me.handleEvent("mouseClicked"); }
