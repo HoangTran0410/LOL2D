@@ -605,6 +605,10 @@ export default class AttackableUnit extends GameObject {
     const spawnPoint = this.game.randomSpawnPoint(this.teamId);
     this.position.set(spawnPoint.x, spawnPoint.y);
     this.destination.set(spawnPoint.x, spawnPoint.y);
+    // The corpse and the fountain are the whole map apart: draw the respawn at
+    // the fountain, not sliding there. (The 150px net would catch it anyway;
+    // this states it at the source.)
+    this.snapRenderOrigin();
   }
 
   setStatus(status: number, enabled: boolean) {
@@ -695,6 +699,9 @@ export default class AttackableUnit extends GameObject {
     this.pathAgent?.clear();
     this.position.set(x, y);
     this.destination.set(x, y);
+    // Overrides GameObject.teleportTo, so the render-origin snap has to be
+    // re-stated here — a blink must not be drawn as a slide across the map.
+    this.snapRenderOrigin();
   }
 
   markDisplaced() {

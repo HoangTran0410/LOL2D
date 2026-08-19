@@ -1,6 +1,6 @@
 # Render interpolation — design
 
-**Status:** ready to implement. Groundwork landed; the wiring is not started.
+**Status:** implemented. Groundwork and wiring both landed; `renderInterpolation.wiring.test.ts` covers the seams and `measure-frame-pacing.mjs` is the passing gate (see §4 for the one deviation the measurement environment forced).
 
 **Problem in one line:** the game _simulates_ on a fixed 60Hz clock and _draws_
 on an unrelated one, so a rendered frame catches the simulation at an arbitrary
@@ -230,8 +230,22 @@ inside it.
 Then:
 
 - Coefficient of variation of per-frame displacement **below 0.15** (it is 0.62
-  today). Prove the updated probe still reports ~0.62 with interpolation off,
-  or the number means nothing.
+  today). Prove the updated probe still reports the jiggle with interpolation
+  off, or the number means nothing.
+
+  **Deviation forced by the environment (implemented):** headless Chrome drives
+  rAF and the sim `setTimeout` off software clocks that lock into perfect 1:1
+  lockstep — every rendered frame catches exactly one tick — so the natural
+  0.62 does not occur there and cannot be the control. The measurement instead
+  *induces* the drift the way a real slow phone does: `frameRate(40)` against the
+  60Hz sim, so frames catch one tick or two in a steady 2:3 beat at a constant
+  sim speed. It then samples **one walk in two passes** — a forced-`alpha=1`
+  baseline (the control, ~0.33 here) and the real interpolated path (~0.12) —
+  so the falsifiability proof is built into every run rather than a manual
+  side-check. Throttling *below* the sim was load-bearing: pinning to a clean
+  multiple (30/60) re-locks the two into a jiggle-free 2:1, and blocking the loop
+  to force drift slows the simulation itself, which interpolation correctly
+  refuses to hide.
 - The 0-tick and 2-tick frames may remain — they are the simulation's business
   and are expected. What must become even is the **drawn** step.
 - `npm run verify` stays green, including `typecheck:core` (§3.2).

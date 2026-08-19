@@ -78,6 +78,23 @@ export default class GameObject {
   direction: p5.Vector;
 
   /**
+   * Where this object sat at the *start* of the current simulation tick.
+   * `ObjectManager.draw` blends between this and `position` at the fraction of a
+   * step that has elapsed, so a body drawn between two ticks moves smoothly
+   * instead of snapping to whichever tick the frame happened to catch — see
+   * `render/Interpolation.ts` for the why.
+   *
+   * Two plain numbers, not a vector: every object carries a pair and the draw
+   * pass reads them every frame, so a `createVector` here would be an allocation
+   * per object per tick for a value nothing outside rendering ever sees. Named
+   * `renderOrigin*` rather than `previous*` because `Camille_E`/`Nautilus_Q`
+   * already declare `private previousX/Y` and the collision would be a TS2415
+   * `typecheck:core` catches and nothing else.
+   */
+  renderOriginX: number;
+  renderOriginY: number;
+
+  /**
    * Bounding boxes are recomputed once per object per frame (plus once per
    * candidate in every spell targeting query), so a fresh allocation on every
    * call adds up fast. `position` is a p5.Vector mutated directly all over
@@ -110,6 +127,14 @@ export default class GameObject {
     this.teamId = teamId;
     this.id = id;
     this.direction = createVector(0, 0);
+    // Start the origin on the object itself, so an object created mid-tick draws
+    // at its spawn point rather than sliding in from wherever the field began.
+    // Tolerant of a missing position the way the rest of this constructor is: a
+    // real object always has one (createVector never returns undefined under
+    // p5), but a test may leave the global unstubbed, and constructing a
+    // GameObject never read `position` before this line.
+    this.renderOriginX = this.position ? this.position.x : 0;
+    this.renderOriginY = this.position ? this.position.y : 0;
   }
 
   onAdded() {}
@@ -124,6 +149,18 @@ export default class GameObject {
 
   teleportTo(x: number, y: number) {
     this.position.set(x, y);
+    this.snapRenderOrigin();
+  }
+
+  /**
+   * Collapse the render origin onto the current position, so the next drawn
+   * frame does not blend across a jump. Every instantaneous reposition —
+   * `teleportTo`, a respawn — calls this; `isContinuousStep`'s 150px net in the
+   * draw pass is the backstop for the reposition nobody remembered.
+   */
+  snapRenderOrigin() {
+    this.renderOriginX = this.position.x;
+    this.renderOriginY = this.position.y;
   }
 
   getCollideBoundingBox(): Circle | Line | Rectangle {

@@ -8,6 +8,7 @@ import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
 import GameObject from '@/game/gameObject/GameObject';
 import UnitCollisionSystem from './UnitCollisionSystem';
 import { canSee, type Seeable as VisionObserver } from '@/game/combat/Vision';
+import { blend, isContinuousStep } from '@/game/render/Interpolation';
 
 export type QueryArea = Circle | Rectangle;
 export type RenderQuality = 'auto' | 'low' | 'high';
@@ -308,6 +309,11 @@ export default class ObjectManager {
   update(): void {
     // update
     for (const o of this.objects) {
+      // Remember where the object began this tick, before its own update moves
+      // it, so `draw` can blend between the two endpoints. Riding the existing
+      // walk keeps this a field write, not a second pass over the list.
+      o.renderOriginX = o.position.x;
+      o.renderOriginY = o.position.y;
       o.update?.();
     }
 
@@ -359,7 +365,15 @@ export default class ObjectManager {
     this.revision++;
   }
 
-  draw(): void {
+  /**
+   * @param alpha How far into the current simulation step the renderer is,
+   *   `[0, 1]`. Defaults to `1` — the newest tick, a byte-for-byte no-op — so
+   *   every existing caller and test keeps working untouched. Below 1 each
+   *   object is drawn blended between its tick origin and its current position;
+   *   `GameScene.draw` is the one caller that passes a real value. See
+   *   `render/Interpolation.ts`.
+   */
+  draw(alpha = 1): void {
     const camBound = this.game.camera.getBoundingBox();
     const margin =
       this.game.camera.constantSize?.(ATTACKABLE_DRAW_MARGIN_PX) ?? ATTACKABLE_DRAW_MARGIN_PX;
@@ -418,7 +432,31 @@ export default class ObjectManager {
     const particleScale =
       limitParticles && particleCount > particleBudget ? particleBudget / particleCount : 1;
 
+    // When the frame sits between two ticks, draw each body at the fraction of
+    // its step that has elapsed. Substitute the blended position onto the live
+    // vector, draw, then put the true numbers back — no `draw()` body has to
+    // know it happened, and no draw site is edited. Culling above stayed on the
+    // true position on purpose (the difference is sub-pixel and the margin
+    // covers it); this only moves where the object is *painted*.
+    const interpolate = alpha < 1;
     for (const { o } of drawables) {
+      let trueX = 0;
+      let trueY = 0;
+      let swapped = false;
+      // A jump past the snap distance (a blink, a respawn) is not a journey to
+      // blend across — `isContinuousStep` refuses it and it is drawn where the
+      // simulation actually put it.
+      if (
+        interpolate &&
+        isContinuousStep(o.renderOriginX, o.renderOriginY, o.position.x, o.position.y)
+      ) {
+        trueX = o.position.x;
+        trueY = o.position.y;
+        o.position.x = blend(o.renderOriginX, trueX, alpha);
+        o.position.y = blend(o.renderOriginY, trueY, alpha);
+        swapped = true;
+      }
+
       if (o instanceof ParticleSystem) {
         o.draw(Math.floor(o.particles.length * particleScale));
       } else if (o instanceof TrailSystem) {
@@ -429,6 +467,14 @@ export default class ObjectManager {
         o.draw?.();
       }
       // o.drawBoundingBox?.(true);
+
+      // No try/finally: a throw inside a draw already breaks the frame, and the
+      // state being restored is about to be discarded — a guard per object at
+      // 60fps buys nothing.
+      if (swapped) {
+        o.position.x = trueX;
+        o.position.y = trueY;
+      }
     }
 
     // draw camera bound

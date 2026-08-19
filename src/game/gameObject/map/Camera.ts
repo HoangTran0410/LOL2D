@@ -1,4 +1,5 @@
 import { Rectangle } from '@/libs/quadtree';
+import { blend } from '@/game/render/Interpolation';
 
 /**
  * The world span every screen must show. A champion's `visionRadius` is 500
@@ -49,6 +50,21 @@ export default class Camera {
   // corner lookups don't allocate a p5.Vector via createVector each call.
   private _scratchTopLeft = { x: 0, y: 0 };
   private _scratchBottomRight = { x: 0, y: 0 };
+
+  // Render interpolation. `update()` runs inside the simulation tick and lerps
+  // both position and scale, so if the world is interpolated and the camera is
+  // not, the camera jumps once per tick and the whole world jitters against the
+  // screen — the same bug, relocated. These hold where the camera sat at the
+  // start of the tick (position *and* scale), so `Game.draw` can blend to the
+  // current values the same way `ObjectManager.draw` blends a body. See §3.6 of
+  // the design and `render/Interpolation.ts`.
+  private _renderOriginX = 0;
+  private _renderOriginY = 0;
+  private _renderOriginScale = 0.5;
+  private _renderTrueX = 0;
+  private _renderTrueY = 0;
+  private _renderTrueScale = 0;
+  private _renderSubstituted = false;
 
   constructor() {
     this.position = createVector(0, 0);
@@ -105,10 +121,51 @@ export default class Camera {
   }
 
   update(): void {
+    // Before the lerps below move either, so the origin is the start-of-tick
+    // state the draw pass blends *from* — matching every GameObject's origin,
+    // which ObjectManager.update captures at the same point in the tick.
+    this.snapshotRenderOrigin();
     if (this.target) {
       this.position.lerp(this.target, 0.1);
     }
     this.currentScale = lerp(this.currentScale, this.scale, 0.07);
+  }
+
+  /** Record the start-of-tick camera state. See the render-origin fields. */
+  snapshotRenderOrigin(): void {
+    this._renderOriginX = this.position.x;
+    this._renderOriginY = this.position.y;
+    this._renderOriginScale = this.currentScale;
+  }
+
+  /**
+   * Substitute the blended camera for the true one, for the duration of one
+   * draw. `Game.draw` wraps its *whole* body in this — not just the world
+   * transform — because the minimap paints the camera box and would otherwise
+   * stutter against a smooth world. Always paired with `restoreRenderOrigin`,
+   * which must run before `Game.fixedUpdate` reads `screenToWorld`.
+   *
+   * No continuity net like the objects have: the camera never teleports —
+   * `update()` only ever lerps it — so even a fast pan toward a jumped target is
+   * a real journey worth smoothing.
+   */
+  applyRenderOrigin(alpha: number): void {
+    this._renderTrueX = this.position.x;
+    this._renderTrueY = this.position.y;
+    this._renderTrueScale = this.currentScale;
+    this.position.x = blend(this._renderOriginX, this._renderTrueX, alpha);
+    this.position.y = blend(this._renderOriginY, this._renderTrueY, alpha);
+    this.currentScale = blend(this._renderOriginScale, this._renderTrueScale, alpha);
+    this._renderSubstituted = true;
+  }
+
+  /** Put the true camera back. A no-op if nothing was substituted. */
+  restoreRenderOrigin(): void {
+    if (!this._renderSubstituted) return;
+    this.position.x = this._renderTrueX;
+    this.position.y = this._renderTrueY;
+    this.currentScale = this._renderTrueScale;
+    this._renderSubstituted = false;
   }
 
   drawGrid(gridSize = 400): void {

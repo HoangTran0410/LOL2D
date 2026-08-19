@@ -433,9 +433,23 @@ export default class Game {
     this.fixedUpdate();
   }
 
-  draw() {
+  /**
+   * @param alpha How far into the current simulation step the renderer is,
+   *   `[0, 1]` — `GameScene.draw` computes it from the clock the two loops keep
+   *   apart. Defaults to `1` (the newest tick, no interpolation) so a bench that
+   *   calls `draw()` bare is unchanged. Below 1 the camera and every object are
+   *   drawn blended between the last two ticks; see `render/Interpolation.ts`.
+   */
+  draw(alpha = 1) {
     if (this.paused) return;
     background(30);
+
+    // Substitute the interpolated camera around the *whole* body: the minimap
+    // (below, outside makeDraw) paints the camera box and has to move with the
+    // smooth world too. Restored before returning, so the next fixedUpdate reads
+    // the true camera through screenToWorld.
+    const interpolate = alpha < 1;
+    if (interpolate) this.camera.applyRenderOrigin(alpha);
 
     this.camera.makeDraw(() => {
       this.terrainMap.draw();
@@ -449,7 +463,7 @@ export default class Game {
       this.player.spells.forEach(spell => {
         if (spell.willDrawPreview) spell.drawPreview?.();
       });
-      this.objectManager.draw();
+      this.objectManager.draw(alpha);
       // After the units, so the ring sits on top of the body it is marking, and
       // at game level rather than on the caster: see combat/ExecuteMarks.ts.
       drawExecuteMarks(this);
@@ -468,6 +482,10 @@ export default class Game {
     // Screen space for the same reason, and the last of the three: a fixed
     // HUD corner, not a world position the camera would pan or zoom under it.
     drawFpsOverlay(this, this.fpsMeter);
+
+    // True camera back, for the next fixedUpdate's screenToWorld and the next
+    // tick's lerp — which would otherwise start from a blended position.
+    if (interpolate) this.camera.restoreRenderOrigin();
   }
 
   destroy() {

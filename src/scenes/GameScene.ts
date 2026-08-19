@@ -9,6 +9,7 @@ import MenuScene from './MenuScene';
 import DomUtils from '@/utils/dom.utils';
 import AssetManager from '@/managers/AssetManager';
 import { setZoomFactorPreference } from '@/game/gameObject/map/Camera';
+import { renderAlpha } from '@/game/render/Interpolation';
 
 let previousTime: number;
 
@@ -252,7 +253,14 @@ export default class GameScene extends Scene {
 
   draw() {
     if (this.game) {
-      this.game.draw();
+      // The phase the render loop has reached inside the current simulation
+      // step. `previousTime` is the notional time of the last tick and
+      // `interval` its length — the two clocks this scene deliberately keeps
+      // apart (see `updateLoop`). `renderAlpha` clamps to `[0, 1]`, so a late
+      // loop draws the newest tick rather than extrapolating past it.
+      const interval = 1000 / this.game.fps;
+      const alpha = renderAlpha(performance.now() - previousTime, interval);
+      this.game.draw(alpha);
       return;
     }
     // No match yet: either the kits are still arriving, or `stopGame` has run

@@ -43,6 +43,9 @@ describe('Champion spell presentation lifecycle', () => {
       spells: [{ deactivate }] as unknown as Spell[],
       toRemove: true,
       update: vi.fn(),
+      // Every real object has one; the update loop snapshots it as the render
+      // origin (see ObjectManager.update). The sibling test below supplies it too.
+      position: { x: 0, y: 0 },
     });
     const manager = Object.assign(Object.create(ObjectManager.prototype) as ObjectManager, {
       objects: [champion],
