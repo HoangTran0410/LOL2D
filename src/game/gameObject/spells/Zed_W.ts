@@ -5,6 +5,7 @@ import VectorUtils from '@/utils/vector.utils';
 import { uuidv4 } from '@/utils';
 import { isChargeActivation, type CastContext } from '@/game/spell/runtime/types';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
+import type { KillCredit } from '@/game/combat/MatchTally';
 import Dash from '@/game/gameObject/buffs/Dash';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 import Spell from '@/game/gameObject/Spell';
@@ -80,6 +81,17 @@ interface MimickedSpell {
 }
 
 export class Zed_W_Clone extends Champion {
+  /**
+   * A shadow is not a takedown, and it is not a champion to anything that
+   * counts them. `Pet` carries the same override for the same reason — a
+   * summon that `extends Champion` silently poisons every `instanceof
+   * Champion` test in the game (see CLAUDE.md) — and this class, which does not
+   * extend `Pet`, was missed: killing a shadow scored a full champion kill on
+   * someone's KDA, and `TeamBlackboard` counted it in a team's roster, dragged
+   * the rally point toward it and could hand it to the whole team as a focus.
+   */
+  killCredit: KillCredit = 'none';
+
   lifeTime = 3000;
   age = 0;
   owner!: any;

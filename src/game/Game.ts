@@ -178,6 +178,16 @@ export default class Game {
   clickedPoint = { x: 0, y: 0, size: 0 };
   worldMouse!: p5.Vector;
   paused = false;
+  /**
+   * Milliseconds of unpaused match. The single time domain every bot shares.
+   *
+   * Deliberately not per-bot: bots are added mid-match (`MatchDirector.addBot`,
+   * the panel's Đội tab) and `TeamBlackboard` is one time-keyed object per
+   * game, so a second clock domain reading it never expires a memory and can
+   * stall the whole board's refresh. Behind the pause gate on purpose, so the
+   * practice panel holding the match does not age anyone's memory.
+   */
+  matchTimeMs = 0;
   touchUi: boolean;
 
   /**
@@ -416,6 +426,7 @@ export default class Game {
 
   update() {
     if (this.paused) return;
+    this.matchTimeMs += Math.max(0, deltaTime);
     this.fixedUpdate();
   }
 

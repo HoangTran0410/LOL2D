@@ -30,6 +30,12 @@ export interface GameObjectRuntimeContext extends GameObjectGameContext {
    */
   navigation?: NavigationSystem;
   worldMouse?: p5.Vector;
+  /**
+   * Milliseconds of unpaused match — `Game.matchTimeMs`, the one clock every
+   * bot brain reads. Optional because a headless context has no clock of its
+   * own, so read it as `?? 0` rather than asserting it away.
+   */
+  matchTimeMs?: number;
   randomSpawnPoint(teamId?: string): p5.Vector;
   createSpellContext(
     spell: Spell,

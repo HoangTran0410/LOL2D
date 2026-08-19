@@ -37,11 +37,12 @@ import { Rectangle } from '@/libs/quadtree';
  * Warwick R from its authored 550. The one place a radius *does* count is a
  * borrowed eye: a ward sees the circle it lights and no further.
  *
- * Deliberately **not** applied to `AIChampion`'s own aggro scan or aim point —
- * a bot you can break line of sight with is a difficulty change, and that call
- * was already made for the bush rule in `PredefinedFilters.visibleTo`. A bot
- * *casting* a spell goes through the same gate as the player, because that is
- * the spell's rule and not the AI's.
+ * Applied to `AIChampion`'s target scan only at the `easy` tier, through
+ * `BotBrain.canPerceive` — a bot you can break line of sight with is a
+ * difficulty change, and that is now what it is. `normal` and `hard` skip the
+ * terrain question; none of them skips the stealth one, and none of them uses
+ * a sight radius, because the rule above still holds: distance is not part of
+ * this. A bot *casting* a spell goes through the same gate as the player.
  */
 
 interface Point {
