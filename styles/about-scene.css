@@ -1,0 +1,203 @@
+#about-scene {
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centred by `#about-scene`'s own flex, like `.pregame-panel` — no
+   `position: fixed` + `translate(-50%, -50%)` needed, because unlike
+   `.practice-panel` this box is never mounted over something else that
+   already owns the viewport.
+   `height`, not `max-height`, for the same reason `.practice-panel` (see
+   `styles/hud.css`) picked it over `max-height`: a phone in landscape can
+   have as little as 380px of vertical room, and a *definite* height is what
+   keeps `.about-body`'s `flex: 1 1 auto` a real size to scroll inside rather
+   than an intrinsic one that collapses to zero — that file's comment has the
+   full story of the bug this avoids. */
+.about-panel {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 92vw);
+  height: min(600px, 88vh);
+  background: var(--hextech-bg);
+  border: 3px solid transparent;
+  border-image: linear-gradient(var(--hextech-teal), var(--hextech-teal-deep)) 1;
+  color: var(--hextech-text);
+  box-shadow: 0 0 30px 6px rgba(0, 0, 0, 0.5);
+}
+
+.about-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid var(--hextech-line);
+}
+
+.about-header h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.3em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--hextech-gold);
+}
+
+/* 44px square: the same thumb-sized close button every other panel uses
+   (`.practice-close`, `.pregame-icon-btn`) — this screen is reached from a
+   phone as often as from a mouse. */
+.about-close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  color: var(--hextech-muted);
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.about-close:hover {
+  color: var(--hextech-text);
+}
+
+/* The panel's one scroll region. `overflow-y: auto` alone is enough here —
+   unlike `.practice-tab-body`, nothing above this element sets
+   `touch-action: none`, so there is no competing gesture owner to hand
+   `pan-y` back from (see this file's header, and `AboutScene.vue`'s). The
+   three properties below are still worth carrying: they cost nothing and
+   make the scroll itself feel native on iOS (`-webkit-overflow-scrolling`)
+   and stop it handing an overscroll to the page underneath
+   (`overscroll-behavior`). */
+.about-body {
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem 1.2rem 1.4rem;
+}
+
+.about-section {
+  margin-bottom: 1.6rem;
+}
+
+.about-section:last-child {
+  margin-bottom: 0;
+}
+
+.about-section h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--hextech-gold);
+}
+
+.about-intro-text {
+  margin: 0 0 1rem;
+  line-height: 1.55;
+  color: var(--hextech-text);
+}
+
+.about-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.about-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.about-empty {
+  margin: 0;
+  color: var(--hextech-muted);
+  font-size: 0.9em;
+}
+
+.about-article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.about-article {
+  background: var(--hextech-panel);
+  border: 1px solid var(--hextech-line);
+  padding: 0.6rem 0.8rem;
+}
+
+.about-article-title {
+  color: var(--hextech-teal);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.about-article-title:hover {
+  color: var(--hextech-text);
+}
+
+.about-article-desc {
+  margin: 0.3rem 0 0;
+  color: var(--hextech-muted);
+  font-size: 0.88em;
+  line-height: 1.4;
+}
+
+.about-release {
+  margin-bottom: 1.1rem;
+}
+
+.about-release:last-child {
+  margin-bottom: 0;
+}
+
+.about-release-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.95em;
+  color: var(--hextech-text);
+}
+
+.about-release-date {
+  flex: none;
+  font-size: 0.78em;
+  color: var(--hextech-muted);
+  letter-spacing: 0.5px;
+}
+
+.about-release-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--hextech-text);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* Same breakpoint `.pregame-panel` and `.practice-panel` use for a landscape
+   phone: full-bleed rather than a bounded, floating box once there is not
+   enough room for one to read as a dialog. */
+@media (max-width: 640px), (max-height: 480px) {
+  .about-panel {
+    width: 100vw;
+    height: 100dvh;
+    border-width: 0;
+  }
+}

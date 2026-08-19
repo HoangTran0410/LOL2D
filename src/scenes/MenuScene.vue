@@ -1,13 +1,18 @@
 <script setup lang="ts">
 /**
- * The main menu: background, logo, and the three buttons. Scene transitions
- * ("Chơi", "Cấu Hình Trận Đấu") are lifecycle, not presentation, so this only
- * emits — `MenuScene.ts` maps `play`/`openConfig` onto `sceneManager.showScene`,
- * the same split `LoadingScene.vue` uses for its own scene handover.
+ * The main menu: background, logo, and the buttons. Scene transitions
+ * ("Chơi", "Cấu Hình Trận Đấu", "Giới thiệu") are lifecycle, not presentation,
+ * so this only emits — `MenuScene.ts` maps `play`/`openConfig`/`openAbout`
+ * onto `sceneManager.showScene`, the same split `LoadingScene.vue` uses for
+ * its own scene handover.
  *
  * The fullscreen toggle is pure view state with no scene-transition involved,
- * so — unlike the two buttons above — it stays entirely local to this component
+ * so — unlike the buttons above — it stays entirely local to this component
  * instead of being driven from `MenuScene.ts`.
+ *
+ * **Giới thiệu is not gated behind `ready`.** It opens no game code — see
+ * `AboutScene.ts` — so there is no reason to make a player wait through the
+ * warm-up bar to read what the game is.
  *
  * **One background, not a carousel.** Six full-bleed JPEGs used to rotate on a
  * 5s timer: 1.1MB of art for a screen the player looks at for a few seconds,
@@ -22,7 +27,7 @@ import DomUtils from '@/utils/dom.utils';
 import { applyUpdate, offlineReady, updateReady } from '@/pwa/updates';
 import { watchPreload, type PreloadState } from './gamePreload';
 
-const emit = defineEmits<{ play: []; openConfig: [] }>();
+const emit = defineEmits<{ play: []; openConfig: []; openAbout: [] }>();
 
 const logo = AssetManager.get('other_newlogo_vi').url;
 const backgroundUrl = AssetManager.get('other_menu_bg').url;
@@ -129,6 +134,10 @@ const installUpdate = async (): Promise<void> => {
       Tải dữ liệu chưa xong — bấm Chơi để thử lại.
     </p>
   </template>
+
+  <button id="about-btn" title="Giới thiệu" @click="emit('openAbout')">
+    <i class="fas fa-circle-info" aria-hidden="true"></i>
+  </button>
 
   <button id="fullscreen-btn" @click="toggleFullscreen">
     <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'"></i>
