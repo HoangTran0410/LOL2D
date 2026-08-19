@@ -20,14 +20,32 @@ export interface DifficultyProfile {
   retreatHealthPct: number;
   /** Fraction of the mana pool held back for the ultimate. */
   manaReservePct: number;
+  /**
+   * Mana a bot keeps in the bank before it will spend an ability on minions.
+   *
+   * Goes **down** as the tier goes up, unlike almost everything else here:
+   * clearing a wave with abilities rather than autoattacks is a mechanic a
+   * better player has and a worse one does not. Never below that tier's
+   * `manaReservePct` — `withinManaBudget` refuses anything that would spend
+   * into the reserve while the ultimate is up, so a lower floor would only buy
+   * a bot that tries to farm on every think tick and is refused every time.
+   */
+  waveClearManaPct: number;
   focusBonus: number;
   playerBias: number;
   aggroRange: number;
   /**
-   * Whether walls and bushes are ignored when *acquiring* a target. Never
-   * ignores sight range, and never reveals a STEALTHED unit.
+   * How long a bot keeps hunting an enemy it has lost sight of.
+   *
+   * This is the whole of a tier's sight advantage, and it used to share the job
+   * with a `seesThroughTerrain` column that was on for `normal` and `hard` —
+   * i.e. for every bot in every default match. That column is gone: seeing
+   * through a wall is not playing better, and `Vision.ts` states the promise
+   * the rest of the game keeps, that what is dark cannot be hit and what is lit
+   * can. Bounding the advantage in *time* instead is what makes the SEARCH
+   * posture run at all; a bot that could always see you never had a last known
+   * position to walk to.
    */
-  seesThroughTerrain: boolean;
   memoryTtlMs: number;
   /** 0 disables throwing an area spell at a last-known position entirely. */
   ghostCastWindowMs: number;
@@ -49,10 +67,10 @@ const PROFILES: Readonly<Record<BotDifficulty, Readonly<DifficultyProfile>>> = O
     noise: 0.9,
     retreatHealthPct: 0.2,
     manaReservePct: 0,
+    waveClearManaPct: 0.85,
     focusBonus: 2,
     playerBias: 0,
     aggroRange: 360,
-    seesThroughTerrain: false,
     memoryTtlMs: 1200,
     ghostCastWindowMs: 0,
   }),
@@ -63,10 +81,10 @@ const PROFILES: Readonly<Record<BotDifficulty, Readonly<DifficultyProfile>>> = O
     noise: 0.45,
     retreatHealthPct: 0.3,
     manaReservePct: 0.25,
+    waveClearManaPct: 0.6,
     focusBonus: 8,
     playerBias: 6,
     aggroRange: 420,
-    seesThroughTerrain: true,
     memoryTtlMs: 2500,
     ghostCastWindowMs: 500,
   }),
@@ -77,10 +95,10 @@ const PROFILES: Readonly<Record<BotDifficulty, Readonly<DifficultyProfile>>> = O
     noise: 0.2,
     retreatHealthPct: 0.4,
     manaReservePct: 0.4,
+    waveClearManaPct: 0.45,
     focusBonus: 14,
     playerBias: 12,
     aggroRange: 480,
-    seesThroughTerrain: true,
     memoryTtlMs: 4000,
     ghostCastWindowMs: 900,
   }),

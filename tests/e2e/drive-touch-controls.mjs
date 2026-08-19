@@ -27,7 +27,7 @@ const OUT = process.argv[2] ?? '/tmp/lol2d-touch';
 
 // `deviceScaleFactor: 3` is also what makes the fog-buffer reading below
 // meaningful, not just a retina check.
-const { url, page, errors, report, failures, check, touchStart, touchMove, touchEnd, finish } =
+const { url, page, errors, report, failures, check, touchStart, touchMove, touchEnd, tap, finish } =
   await startHarness({
     out: OUT,
     viewport: PHONE_VIEWPORT,
@@ -78,6 +78,11 @@ try {
         y: round(b.y),
         diameter: round(b.radius * 2),
       })),
+      recall: {
+        x: round(layout.recall.x),
+        y: round(layout.recall.y),
+        diameter: round(layout.recall.radius * 2),
+      },
     };
   });
 
@@ -85,11 +90,16 @@ try {
   // its density from the sketch, and the sketch is pinned to 1 in
   // GameScene.enter — one line away, in another file. FogOfWar now pins its own
   // too; this reads back both, and what p5 would have chosen unaided.
-  report.fogBuffer = await page.evaluate(() => {
+  report.fogBuffer = await page.evaluate(async () => {
+    // `removeGraphics`, not `probe.remove()`: the latter throws on every 2D
+    // buffer in p5 1.11.x (see `src/utils/graphics.utils.ts`, which exists for
+    // exactly that), and the throw took the whole run down with it before any
+    // check below had run.
+    const { removeGraphics } = await import('/src/utils/graphics.utils.ts');
     const fog = window.__lol2d.scene.oScene.game.fogOfWar;
     const probe = createGraphics(8, 8);
     const inherited = probe.pixelDensity();
-    probe.remove();
+    removeGraphics(probe);
     const backing = fog.overlay.drawingContext.canvas;
     return {
       cssSize: `${fog.overlay.width}x${fog.overlay.height}`,
@@ -115,7 +125,14 @@ try {
       pickerBtn: btn
         ? { top: round(btn.top), right: round(window.innerWidth - btn.right), size: round(btn.width) }
         : null,
-      statsPanelsVisible: getComputedStyle(document.querySelector('#stats')).display !== 'none',
+      // Stats.js is gone entirely now (see CLAUDE.md's "Running" section), so
+      // the honest question is "is anything profiler-shaped on screen", which
+      // a missing element answers as well as a hidden one. It used to be an
+      // unguarded `getComputedStyle(null)`, which threw and took the run down.
+      statsPanelsVisible: (() => {
+        const profiler = document.querySelector('#stats');
+        return !!profiler && getComputedStyle(profiler).display !== 'none';
+      })(),
     };
   });
   check('the bottom-HUD strip does not render in touch mode', report.hudTouch.bottomHudPresent === false);
@@ -620,6 +637,78 @@ try {
       : `state ${chargeReleased.state}, no arrow`
   );
 
+  // ---------------------------------------------------- 9. Hồi Thành
+  //
+  // On a phone there is no `B` key, so this button is the only way home — and
+  // a recall pressed in a teamfight is a death, which is why the gesture is
+  // release-inside rather than touch-down and why the geometry gets checked
+  // here against the live layout rather than trusted from the unit test.
+
+  const recallBtn = report.layout.recall;
+  const nearestSpellGap = Math.min(
+    ...report.layout.buttons.map(
+      b =>
+        Math.hypot(recallBtn.x - b.x, recallBtn.y - b.y) - recallBtn.diameter / 2 - b.diameter / 2
+    )
+  );
+  check(
+    'the recall button is a thumb target, up top, with a wide moat around it',
+    recallBtn.diameter >= 44 && recallBtn.y < PHONE_VIEWPORT.height * 0.3 && nearestSpellGap > 40,
+    `${recallBtn.diameter}px at (${recallBtn.x}, ${recallBtn.y}), ${Math.round(nearestSpellGap)}px from the nearest ability`
+  );
+
+  const readRecall = () =>
+    page.evaluate(() => {
+      const game = window.__lol2d.scene.oScene.game;
+      const spell = game.player.recall;
+      return {
+        state: spell.state,
+        progress: Math.round((spell.channelProgress ?? 0) * 100) / 100,
+        pads: game.objectManager.objects.filter(o => o.constructor.name === 'RecallPad').length,
+      };
+    });
+
+  // A thumb that lands on it and slides off must get away with it.
+  await touchStart([{ x: recallBtn.x, y: recallBtn.y }]);
+  await settle(90);
+  await touchMove([{ x: recallBtn.x, y: recallBtn.y + recallBtn.diameter * 2 }]);
+  await settle(90);
+  await touchEnd();
+  await page.waitForTimeout(250);
+  report.recallSlideOff = await readRecall();
+  check(
+    'a thumb that lands on the recall button and slides off does not go home',
+    report.recallSlideOff.state !== 'CHANNELING' && report.recallSlideOff.pads === 0,
+    JSON.stringify(report.recallSlideOff)
+  );
+
+  await tap(recallBtn.x, recallBtn.y, 80);
+  await page.waitForTimeout(300);
+  const recallStarted = await readRecall();
+  await page.waitForTimeout(900);
+  const recallRunning = await readRecall();
+  await page.screenshot({ path: `${OUT}-08-recall.png` });
+  report.recall = { started: recallStarted, running: recallRunning };
+  check(
+    'a real tap on the recall button starts the channel and puts the pad down',
+    recallStarted.state === 'CHANNELING' && recallStarted.pads === 1,
+    JSON.stringify(recallStarted)
+  );
+  check(
+    'the channel runs on, so the button has a clock to draw',
+    recallRunning.state === 'CHANNELING' && recallRunning.progress > recallStarted.progress,
+    `${recallStarted.progress} -> ${recallRunning.progress}`
+  );
+
+  await tap(recallBtn.x, recallBtn.y, 80);
+  await page.waitForTimeout(300);
+  report.recallCancelled = await readRecall();
+  check(
+    'a second tap calls the trip off and clears the pad',
+    report.recallCancelled.state !== 'CHANNELING' && report.recallCancelled.pads === 0,
+    JSON.stringify(report.recallCancelled)
+  );
+
   // ---------------------------------------------------- HUD in a phone view
 
   await page.evaluate(() => {
@@ -704,6 +793,81 @@ try {
       report.desktopAfterToggle.iconSize === 52 &&
       report.desktopAfterToggle.hotKeyVisible === true,
     JSON.stringify(report.desktopAfterToggle)
+  );
+
+  // The same action, the other surface. `B` still works here, so this button is
+  // a convenience rather than the only way in — but it is the one that has to
+  // stay visibly *subordinate* to the ability bar, and the one that has to show
+  // the channel running so a player knows a second click calls it off.
+  report.desktopRecall = await page.evaluate(() => {
+    const btn = document.querySelector('.bottom-HUD .recall-btn');
+    const ability = document.querySelectorAll('.bottom-HUD .spell')[1];
+    if (!btn || !ability) return { present: false };
+    const box = btn.getBoundingClientRect();
+    return {
+      present: true,
+      width: Math.round(box.width),
+      height: Math.round(box.height),
+      abilityWidth: Math.round(ability.getBoundingClientRect().width),
+      hotKey: btn.querySelector('.hotKey')?.textContent?.trim() ?? null,
+      icon: !!btn.querySelector('i.fa-house-chimney'),
+    };
+  });
+  check(
+    'the desktop bar carries a Hồi Thành button, keyed B and smaller than an ability',
+    report.desktopRecall.present === true &&
+      report.desktopRecall.hotKey === 'B' &&
+      report.desktopRecall.icon === true &&
+      report.desktopRecall.width < report.desktopRecall.abilityWidth,
+    JSON.stringify(report.desktopRecall)
+  );
+
+  await page.click('.bottom-HUD .recall-btn');
+  await page.waitForTimeout(400);
+  const desktopStarted = await page.evaluate(() => {
+    const spell = window.__lol2d.scene.oScene.game.player.recall;
+    const fill = document.querySelector('.bottom-HUD .recall-btn .recall-fill');
+    return {
+      state: spell.state,
+      channelling: document.querySelector('.bottom-HUD .recall-btn.channeling') !== null,
+      fillHeight: fill ? Math.round(fill.getBoundingClientRect().height * 10) / 10 : null,
+      count: document.querySelector('.bottom-HUD .recall-count')?.textContent?.trim() ?? null,
+    };
+  });
+  await page.waitForTimeout(900);
+  const desktopRunning = await page.evaluate(() => {
+    const fill = document.querySelector('.bottom-HUD .recall-btn .recall-fill');
+    return {
+      fillHeight: fill ? Math.round(fill.getBoundingClientRect().height * 10) / 10 : null,
+      count: document.querySelector('.bottom-HUD .recall-count')?.textContent?.trim() ?? null,
+    };
+  });
+  await page.screenshot({ path: `${OUT}-10-desktop-recall.png` });
+  report.desktopRecallRun = { started: desktopStarted, running: desktopRunning };
+  check(
+    'clicking it starts the channel and the button says so',
+    desktopStarted.state === 'CHANNELING' &&
+      desktopStarted.channelling === true &&
+      desktopStarted.count !== null,
+    JSON.stringify(desktopStarted)
+  );
+  check(
+    'the fill tracks the channel rather than sitting still',
+    desktopRunning.fillHeight > desktopStarted.fillHeight,
+    `${desktopStarted.fillHeight}px -> ${desktopRunning.fillHeight}px, ${desktopStarted.count}s -> ${desktopRunning.count}s`
+  );
+
+  await page.click('.bottom-HUD .recall-btn');
+  await page.waitForTimeout(400);
+  report.desktopRecallCancelled = await page.evaluate(() => ({
+    state: window.__lol2d.scene.oScene.game.player.recall.state,
+    channelling: document.querySelector('.bottom-HUD .recall-btn.channeling') !== null,
+  }));
+  check(
+    'clicking it again calls the trip off',
+    report.desktopRecallCancelled.state !== 'CHANNELING' &&
+      report.desktopRecallCancelled.channelling === false,
+    JSON.stringify(report.desktopRecallCancelled)
   );
 } catch (error) {
   failures.push(`threw: ${error.stack ?? error}`);

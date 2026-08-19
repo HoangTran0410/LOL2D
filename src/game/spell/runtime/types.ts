@@ -20,6 +20,13 @@ export type CancelReason =
   | 'MAX_DURATION'
   /** The effect the spell put into the world finished on its own terms. */
   | 'EFFECT_ENDED'
+  /**
+   * The caster was hit while sustaining it. Deliberately not one of
+   * `INTERRUPT_REASONS` — no `SpellForm` may refuse it, because nothing here
+   * should survive being hit — so a spell that cares has to watch for it
+   * itself (`Recall`), and one that does not never sees it.
+   */
+  | 'DAMAGE_TAKEN'
   | 'SCENE_EXIT';
 
 export interface Vec2 {

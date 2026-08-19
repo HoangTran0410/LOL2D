@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   buttonAt,
   computeTouchLayout,
+  hitRecall,
   insideJoystickZone,
+  RECALL_SLOT,
 } from '../../../src/game/input/TouchLayout';
+import { minimapRect } from '../../../src/game/gameObject/map/Minimap';
 
 /** A landscape phone: iPhone 14 rotated, in CSS pixels. */
 const PHONE = { width: 844, height: 390 };
@@ -220,5 +223,111 @@ describe('insideJoystickZone', () => {
     const layout = computeTouchLayout(PHONE, SLOTS);
 
     expect(insideJoystickZone(layout, 60, 10)).toBe(false);
+  });
+});
+
+/**
+ * Hồi Thành's button. On a phone there is no `B` key, so without this the
+ * ability is simply unreachable — but a recall pressed in the middle of a
+ * teamfight is a death, so the whole design question is *where it is not*.
+ *
+ * It is kept out of `layout.buttons` on purpose: that array is indexed by kit
+ * slot and drives `SpellInputController`, which knows nothing about a spell
+ * that is not in `spells[]`.
+ */
+describe('the recall button', () => {
+  const VIEWPORTS = [PHONE, { width: 667, height: 375 }, { width: 932, height: 430 }];
+
+  it('is not one of the kit slots', () => {
+    const layout = computeTouchLayout(PHONE, SLOTS);
+
+    expect(RECALL_SLOT).toBeLessThan(0);
+    expect(layout.recall.slot).toBe(RECALL_SLOT);
+    expect(layout.buttons.map(button => button.slot)).not.toContain(RECALL_SLOT);
+  });
+
+  it('is a thumb-sized target at every viewport, fully on screen', () => {
+    for (const viewport of [...VIEWPORTS, { width: 1280, height: 800 }]) {
+      const recall = computeTouchLayout(viewport, SLOTS).recall;
+
+      expect(recall.radius * 2, `${viewport.width}x${viewport.height}`).toBeGreaterThanOrEqual(44);
+      expect(recall.x - recall.radius).toBeGreaterThanOrEqual(0);
+      expect(recall.y - recall.radius).toBeGreaterThanOrEqual(0);
+      expect(recall.x + recall.radius).toBeLessThanOrEqual(viewport.width);
+      expect(recall.y + recall.radius).toBeLessThanOrEqual(viewport.height);
+    }
+  });
+
+  it('sits along the top edge, where neither thumb rests during a fight', () => {
+    for (const viewport of VIEWPORTS) {
+      const layout = computeTouchLayout(viewport, SLOTS);
+      const recall = layout.recall;
+
+      expect(recall.y + recall.radius, `${viewport.width}x${viewport.height}`).toBeLessThan(
+        viewport.height * 0.3
+      );
+      expect(insideJoystickZone(layout, recall.x, recall.y)).toBe(false);
+    }
+  });
+
+  /**
+   * Far wider than the 10px the abilities get from each other. A thumb that
+   * slips between Q and W casts the wrong spell; a thumb that slips onto this
+   * one leaves the fight.
+   */
+  it('keeps a wide moat between itself and every ability', () => {
+    for (const viewport of VIEWPORTS) {
+      const layout = computeTouchLayout(viewport, SLOTS);
+      const recall = layout.recall;
+      for (const button of layout.buttons) {
+        const gap =
+          Math.hypot(recall.x - button.x, recall.y - button.y) - recall.radius - button.radius;
+        expect(gap, `${viewport.width}x${viewport.height}: slot ${button.slot}`).toBeGreaterThan(
+          40
+        );
+      }
+    }
+  });
+
+  /**
+   * Two things already own the top-right: `InGameHUD.vue`'s practice-panel
+   * button (a DOM control, `top: 6px; right: 6px`, 46px square in touch mode)
+   * and the expanded minimap, which `Game.syncTouches` gives first refusal on
+   * every new finger — a tap that lands on it teleports instead.
+   */
+  it('clears the practice-panel corner button and the expanded minimap', () => {
+    for (const viewport of VIEWPORTS) {
+      const recall = computeTouchLayout(viewport, SLOTS).recall;
+      const label = `${viewport.width}x${viewport.height}`;
+
+      // 46px button + its 6px inset from the right edge.
+      expect(recall.x + recall.radius, `${label}: corner button`).toBeLessThan(
+        viewport.width - 52 - 12
+      );
+
+      const map = minimapRect(true, viewport);
+      const overlaps =
+        recall.x + recall.radius > map.x &&
+        recall.x - recall.radius < map.x + map.size &&
+        recall.y + recall.radius > map.y &&
+        recall.y - recall.radius < map.y + map.size;
+      expect(overlaps, `${label}: expanded minimap`).toBe(false);
+    }
+  });
+
+  it('is hit-tested with no slack at all, unlike the ability buttons', () => {
+    const layout = computeTouchLayout(PHONE, SLOTS);
+    const recall = layout.recall;
+
+    expect(hitRecall(layout, recall.x, recall.y)).toBe(true);
+    // `buttonAt` forgives a thumb out to 1.15 radii. This one does not: it is
+    // the one button on screen a mis-hit is expensive on.
+    expect(hitRecall(layout, recall.x + recall.radius * 1.1, recall.y)).toBe(false);
+  });
+
+  it('is invisible to buttonAt, so it can never be read as a kit slot', () => {
+    const layout = computeTouchLayout(PHONE, SLOTS);
+
+    expect(buttonAt(layout, layout.recall.x, layout.recall.y)).toBeNull();
   });
 });

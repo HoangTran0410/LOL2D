@@ -59,6 +59,7 @@ const view = (over: Partial<TeamView> = {}): TeamView => ({
   memory: new Map<Champion, SeenEnemy>(),
   lanes: new Map<string, LaneState>(),
   laneAssignments: new Map<Champion, string>(),
+  enemyTurrets: [],
   ...over,
 });
 
@@ -182,6 +183,52 @@ describe('spell choice', () => {
     const { bot, brain } = setup();
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Buff, { range: undefined })];
     expect(brain.chooseSpell(null, view())?.slotIndex).toBe(1);
+  });
+
+  it('never throws the ultimate at a guess', () => {
+    // `chooseGhostSpell` is the "it guessed where I went" moment, and an area
+    // spell at a half-second-old position is a fair read. An ultimate is not:
+    // it is the one cooldown a bot cannot afford to spend on a position that
+    // may be empty, and `drive-bot-discipline.mjs` counted one being spent that
+    // way in a 20-second window.
+    const { bot, brain, enemy } = setup();
+    const ultimate = makeSpell(SpellRole.Zone, { range: 600 });
+    bot.spells = [makeSpell(0), null, null, null, ultimate] as unknown as Spell[];
+
+    const seen = { unit: enemy, atMs: 0, pos: { x: 200, y: 0 }, vel: { x: 0, y: 0 } };
+    expect(brain.chooseGhostSpell(seen, 100, { x: 200, y: 0 })).toBeNull();
+
+    // ...and the same spell in an ordinary slot is still offered, so what the
+    // skip answers to is the slot and not the role mask.
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone, { range: 600 })];
+    expect(brain.chooseGhostSpell(seen, 100, { x: 200, y: 0 })?.slotIndex).toBe(1);
+  });
+
+  it('never presses an ultimate at nobody', () => {
+    // Reported from a real match: a bot walking an empty lane pressed R every
+    // cast interval. `inferRoles` hands `Buff|Shield` to every costed SELF cast
+    // and `rolesOf` adds `Ultimate` from the slot, so with no target the score
+    // is Buff 5 + Ultimate 6 — every target-dependent term is skipped, and the
+    // two that are left are enough on their own.
+    const { bot, brain } = setup();
+    bot.spells = [
+      makeSpell(0),
+      null,
+      null,
+      null,
+      makeSpell(SpellRole.Buff, { range: undefined }),
+    ] as unknown as Spell[];
+    expect(brain.chooseSpell(null, view())).toBeNull();
+  });
+
+  it('never presses a self-cast that reaches out at nobody', () => {
+    // Zed R's shape — SELF, costed, `declaredRange` 500. A spell that declares
+    // a range reaches OUT at something, and there is nothing out there. Same
+    // axis `isRetreatCandidate` already uses to tell a real shield from a
+    // self-cast engage tool.
+    const { bot, brain } = setup();
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Buff, { range: 500 })];
+    expect(brain.chooseSpell(null, view())).toBeNull();
   });
 
   it('does not fire a poke skillshot at nobody', () => {

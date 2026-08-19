@@ -56,6 +56,8 @@ const harness = (): Harness => {
     viewport: () => PHONE,
     slotCount: () => 7,
     spellView: () => view(targeting),
+    recallView: () => view('SELF'),
+    recall: () => undefined,
     playerPosition: () => ORIGIN,
     playerFacing: () => ({ x: 1, y: 0 }),
     autoTargetWithin: () => autoTarget,
@@ -643,5 +645,136 @@ describe('TouchControls — button visual', () => {
       withView({ onCooldown: false, affordable: true, castable: false })
     );
     expect(visual.dim).toBe(true);
+  });
+});
+
+/**
+ * Hồi Thành's button. It does not go through `SpellInputController` — the
+ * spell is not in `spells[]`, so there is no slot to press — and it fires on
+ * *release inside*, not on touch-down: the whole point of the placement and
+ * the gesture is that a thumb which lands on it by mistake can still get away.
+ */
+describe('TouchControls — the recall button', () => {
+  const recallHarness = () => {
+    const calls = { recall: 0 };
+    const host: TouchControlsHost = {
+      viewport: () => PHONE,
+      slotCount: () => 7,
+      spellView: () => view('DIRECTION'),
+      recallView: () => view('SELF'),
+      recall: () => {
+        calls.recall++;
+      },
+      playerPosition: () => ORIGIN,
+      playerFacing: () => ({ x: 1, y: 0 }),
+      autoTargetWithin: () => null,
+      pickUnitNear: () => null,
+      steer: () => undefined,
+      setSlotAim: () => undefined,
+      beginSlot: () => undefined,
+      commitSlot: () => undefined,
+      cancelSlot: () => undefined,
+      withWorldTransform: draw => draw(),
+    };
+    return { controls: new TouchControls(host, true), calls };
+  };
+
+  const RECALL = computeTouchLayout(PHONE, 7).recall;
+
+  it('goes home when a thumb lifts off it', () => {
+    const h = recallHarness();
+
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    expect(h.calls.recall, 'fired on touch-down').toBe(0);
+
+    h.controls.syncPointers([]);
+    expect(h.calls.recall).toBe(1);
+  });
+
+  it('lets a thumb that landed on it by mistake slide off and escape', () => {
+    const h = recallHarness();
+
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y + RECALL.radius * 3 }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.recall).toBe(0);
+  });
+
+  it('takes a thumb back, so a slide-off-and-return still goes home', () => {
+    const h = recallHarness();
+
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y + RECALL.radius * 3 }]);
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.recall).toBe(1);
+  });
+
+  it('presses no spell slot: there is no slot for a spell outside spells[]', () => {
+    const calls: number[] = [];
+    const host: TouchControlsHost = {
+      viewport: () => PHONE,
+      slotCount: () => 7,
+      spellView: () => view('DIRECTION'),
+      recallView: () => view('SELF'),
+      recall: () => undefined,
+      playerPosition: () => ORIGIN,
+      playerFacing: () => ({ x: 1, y: 0 }),
+      autoTargetWithin: () => null,
+      pickUnitNear: () => null,
+      steer: () => undefined,
+      setSlotAim: () => undefined,
+      beginSlot: slot => calls.push(slot),
+      commitSlot: slot => calls.push(slot),
+      cancelSlot: slot => calls.push(slot),
+      withWorldTransform: draw => draw(),
+    };
+    const controls = new TouchControls(host, true);
+
+    controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    controls.syncPointers([]);
+
+    expect(calls).toEqual([]);
+  });
+
+  it('does nothing at all for a champion with no recall', () => {
+    const calls = { recall: 0 };
+    const host: TouchControlsHost = {
+      viewport: () => PHONE,
+      slotCount: () => 7,
+      spellView: () => view('DIRECTION'),
+      recallView: () => null,
+      recall: () => {
+        calls.recall++;
+      },
+      playerPosition: () => ORIGIN,
+      playerFacing: () => ({ x: 1, y: 0 }),
+      autoTargetWithin: () => null,
+      pickUnitNear: () => null,
+      steer: () => undefined,
+      setSlotAim: () => undefined,
+      beginSlot: () => undefined,
+      commitSlot: () => undefined,
+      cancelSlot: () => undefined,
+      withWorldTransform: draw => draw(),
+    };
+    const controls = new TouchControls(host, true);
+
+    controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    controls.syncPointers([]);
+
+    expect(calls.recall).toBe(0);
+  });
+
+  it('drops a held press when touch mode is switched off mid-gesture', () => {
+    const h = recallHarness();
+
+    h.controls.syncPointers([{ id: 1, x: RECALL.x, y: RECALL.y }]);
+    h.controls.setEnabled(false);
+    h.controls.syncPointers([]);
+
+    expect(h.calls.recall).toBe(0);
   });
 });

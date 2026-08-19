@@ -37,12 +37,14 @@ import { Rectangle } from '@/libs/quadtree';
  * Warwick R from its authored 550. The one place a radius *does* count is a
  * borrowed eye: a ward sees the circle it lights and no further.
  *
- * Applied to `AIChampion`'s target scan only at the `easy` tier, through
- * `BotBrain.canPerceive` — a bot you can break line of sight with is a
- * difficulty change, and that is now what it is. `normal` and `hard` skip the
- * terrain question; none of them skips the stealth one, and none of them uses
- * a sight radius, because the rule above still holds: distance is not part of
- * this. A bot *casting* a spell goes through the same gate as the player.
+ * Applied to `AIChampion`'s target scan at every tier, through
+ * `BotBrain.canPerceive`. It was once `easy` only, on the grounds that a bot
+ * you can break line of sight with is a difficulty change — but that made a
+ * bot's basic attack the one thing in the game exempt from the promise this
+ * module exists to keep, and a player meets it as an autoattack out of a wall
+ * they cannot see into. No tier uses a sight radius either, because the rule
+ * above still holds: distance is not part of this. A bot *casting* a spell goes
+ * through the same gate as the player.
  */
 
 interface Point {

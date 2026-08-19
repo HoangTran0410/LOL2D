@@ -18,6 +18,7 @@ import Slow from '@/game/gameObject/buffs/Slow';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
 import type { BuffStackId } from '@/game/gameObject/Buff';
+import Recall from '@/game/gameObject/spells/Recall';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
 export interface ChampionAttackTuning {
@@ -122,6 +123,19 @@ export default class Champion extends AttackableUnit {
   /** Standing attack order, swing timer and delivery. Never scans on its own. */
   basicAttack: BasicAttackController = new BasicAttackController(this);
 
+  /**
+   * Everyone can go home. Deliberately **not** in `spells[]` — see the header
+   * of `Recall.ts`: that array is indexed by `SpellHotKeys` and an eighth entry
+   * ripples into the loadout editor's slots, `hudState`'s summoner-spell test,
+   * `MatchDirectorSource` and the generated catalogue. A champion swap does not
+   * take the ability to go home away, so `replaceSpells`/`applyPreset` never
+   * touch it either.
+   *
+   * A field initialiser is safe here: `super()` has already run and set `game`,
+   * which `new Recall(this)` reads through `Spell`'s constructor.
+   */
+  readonly recall: Recall = new Recall(this);
+
   constructor({
     game,
     position,
@@ -197,12 +211,16 @@ export default class Champion extends AttackableUnit {
     super.update();
     this.basicAttack.update();
     this.spells.forEach(spell => spell.update());
+    // `?.` for the same reason `drawAttackOrder` uses it: prototype-only
+    // champions built with Object.create never run a field initializer.
+    this.recall?.update();
   }
 
   draw(options: AttackableUnitRenderOptions = {}) {
     super.draw(options);
     this.drawAttackOrder();
     this.spells.forEach(spell => spell.drawVfx());
+    this.recall?.drawVfx();
   }
 
   /**
@@ -250,6 +268,7 @@ export default class Champion extends AttackableUnit {
 
   onRemoved() {
     this.spells.forEach(spell => this.removeSpell(spell));
+    this.removeSpell(this.recall);
   }
 
   /**

@@ -1,6 +1,8 @@
 #menu-scene {
   width: 100vw;
   height: 100vh;
+  /* Both, in this order — see `.center-page-container > div` in main.css. */
+  height: 100dvh;
   text-align: center;
 
   align-items: center;
@@ -16,6 +18,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -42,10 +45,15 @@
   opacity: 0.85;
 }
 
+/* Pinned controls add the safe-area inset for the edge they are pinned to
+   (--safe-* in main.css): 0 on a desktop and on most phones, a notch or a home
+   indicator's worth on the ones that have one. The scene root is sized in
+   `dvh`, which is what keeps them on screen at all; this is what keeps them out
+   from under the hardware once they are. */
 #fullscreen-btn {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: calc(20px + var(--safe-top));
+  right: calc(20px + var(--safe-right));
   background-color: transparent;
   border: none;
   color: #bbb;
@@ -58,8 +66,8 @@
    Chơi/Cấu Hình Trận Đấu for attention. */
 #about-btn {
   position: fixed;
-  top: 20px;
-  right: 64px;
+  top: calc(20px + var(--safe-top));
+  right: calc(64px + var(--safe-right));
   background-color: transparent;
   border: none;
   color: #bbb;
@@ -179,8 +187,8 @@
    with the two buttons above it. */
 .menu-version {
   position: fixed;
-  bottom: 8px;
-  left: 12px;
+  bottom: calc(8px + var(--safe-bottom));
+  left: calc(12px + var(--safe-left));
   margin: 0;
   color: #fff;
   font-size: 0.75rem;
@@ -204,8 +212,8 @@
    rather than a download that can fail — see src/pwa/updates.ts. */
 .menu-update {
   position: fixed;
-  bottom: 12px;
-  right: 12px;
+  bottom: calc(12px + var(--safe-bottom));
+  right: calc(12px + var(--safe-right));
   display: flex;
   align-items: center;
   gap: 0.5rem;

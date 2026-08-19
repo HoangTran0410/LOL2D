@@ -10,7 +10,7 @@ import Slow from '@/game/gameObject/buffs/Slow';
 export const MAX_RANGE = 450;
 export const RADIUS = 160;
 export const DURATION = 3000;
-export const SLOW_PERCENT = 0.5;
+export const SLOW_PERCENT = 0.3;
 export const POISON_PER_TICK = 3;
 export const THROW_SPEED = 9;
 

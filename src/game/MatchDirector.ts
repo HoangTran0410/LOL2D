@@ -73,6 +73,7 @@ import {
   CDR_PERCENT_MIN,
   DEFAULT_CHAMPION_LOADOUT,
   DEFAULT_PREGAME_CONFIG,
+  globalBotBehaviour,
   loadPregameConfig,
   savePregameConfig,
   toMatchRules,
@@ -94,10 +95,11 @@ import { createDebugFlags, type DebugFlags } from './debug/DebugOverlay';
 import { isMatchTeamId, teamForAddedBot, type MatchTeamId } from './config/MatchTeams';
 
 /**
- * A bot's three "does it act on its own" switches. Plain instance fields on
- * `AIChampion` rather than a typed sub-object because other code — the e2e
- * scripts included — already reads and flips them directly; this is a view of
- * them, not a second home for them.
+ * A bot's three "does it act on its own" switches, plus the tier it plays at.
+ * Plain instance fields on `AIChampion` rather than a typed sub-object because
+ * other code — the e2e scripts included — already reads and flips them
+ * directly; this is a view of them, not a second home for them. `difficulty`
+ * is the one field with a writer of its own (`AIChampion.setDifficulty`).
  *
  * Defined in `PregameConfig` and re-exported here, where every caller already
  * imports it from: the panel now *persists* a per-bot behaviour, so the stored
@@ -548,8 +550,9 @@ export default class MatchDirector {
     // nobody has chosen one for, which is exactly what a bot added mid-match
     // is. Without this it would get `AIChampion`'s hardcoded defaults instead,
     // and a player who set "bots wander" on the setup screen would find that
-    // every bot they add in the panel stands still.
-    const behaviour = options.behaviour ?? loadPregameConfig().ai;
+    // every bot they add in the panel stands still. There is no global for the
+    // tier, so `globalBotBehaviour` supplies the default one — see its comment.
+    const behaviour = options.behaviour ?? globalBotBehaviour(loadPregameConfig().ai);
 
     const teamId = options.teamId ?? teamForAddedBot([this.game.player, ...bots]);
     const spawn = this.game.randomSpawnPoint(teamId);
@@ -565,6 +568,7 @@ export default class MatchDirector {
       autoMove: behaviour.autoMove,
       autoAttack: behaviour.autoAttack,
       autoCast: behaviour.autoCast,
+      difficulty: behaviour.difficulty,
     });
     this.game.objectManager.addObject(bot);
     this.loadouts.set(bot, loadout);
@@ -645,13 +649,18 @@ export default class MatchDirector {
 
   /**
    * Writes only the flags it is handed, so a UI that owns one toggle can send
-   * one field without having to restate the other two.
+   * one field without having to restate the other three. `difficulty` rides in
+   * the same record for exactly that reason — see `BotBehaviour`.
    */
   setBotBehaviour(bot: AIChampion, flags: Partial<BotBehaviour>): void {
     this.invalidatePendingReset();
     if (flags.autoMove !== undefined) bot._autoMove = flags.autoMove;
     if (flags.autoAttack !== undefined) bot._autoAttack = flags.autoAttack;
     if (flags.autoCast !== undefined) bot._autoCast = flags.autoCast;
+    // Through `setDifficulty`, which is the single writer for `_difficulty` —
+    // the three above are plain fields the e2e scripts already flip directly,
+    // and this one deliberately is not.
+    if (flags.difficulty !== undefined) bot.setDifficulty(flags.difficulty);
     this.persist();
   }
 
@@ -1022,4 +1031,5 @@ const behaviourOf = (bot: AIChampion): BotBehaviour => ({
   autoMove: bot._autoMove,
   autoAttack: bot._autoAttack,
   autoCast: bot._autoCast,
+  difficulty: bot._difficulty,
 });

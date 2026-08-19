@@ -454,6 +454,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf1: {
     name: 'Greater Wolf',
+    campId: 'wolf1',
     avatar: 'monster_Greater_Murk_Wolf',
     camp: { x: 1685, y: 3562, r: 300 },
     speed: 2,
@@ -464,6 +465,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf1_a: {
     name: 'Wolf',
+    campId: 'wolf1',
     avatar: 'monster_Murk_Wolf',
     camp: { x: 1602, y: 3511, r: 300 },
     speed: 2.5,
@@ -474,6 +476,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf1_b: {
     name: 'Wolf',
+    campId: 'wolf1',
     avatar: 'monster_Murk_Wolf',
     camp: { x: 1725, y: 3659, r: 300 },
     speed: 2.5,
@@ -484,6 +487,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf2: {
     name: 'Greater Wolf',
+    campId: 'wolf2',
     avatar: 'monster_Greater_Murk_Wolf',
     camp: { x: 4728, y: 2835, r: 300 },
     speed: 2,
@@ -494,6 +498,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf2_a: {
     name: 'Wolf',
+    campId: 'wolf2',
     avatar: 'monster_Murk_Wolf',
     camp: { x: 4709, y: 2743, r: 300 },
     speed: 2.5,
@@ -504,6 +509,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   wolf2_b: {
     name: 'Wolf',
+    campId: 'wolf2',
     avatar: 'monster_Murk_Wolf',
     camp: { x: 4816, y: 2888, r: 300 },
     speed: 2.5,
@@ -534,6 +540,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor1: {
     name: 'Crimson_Raptor',
+    campId: 'raptor1',
     avatar: 'monster_Crimson_Raptor',
     camp: { x: 2954, y: 4110, r: 300 },
     speed: 2,
@@ -544,6 +551,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor1_a: {
     name: 'Raptor',
+    campId: 'raptor1',
     avatar: 'monster_Raptor',
     camp: { x: 3045, y: 4026, r: 300 },
     speed: 2,
@@ -554,6 +562,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor1_b: {
     name: 'Raptor',
+    campId: 'raptor1',
     avatar: 'monster_Raptor',
     camp: { x: 3149, y: 4095, r: 300 },
     speed: 2,
@@ -564,6 +573,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor1_c: {
     name: 'Raptor',
+    campId: 'raptor1',
     avatar: 'monster_Raptor',
     camp: { x: 3060, y: 4169, r: 300 },
     speed: 2,
@@ -574,6 +584,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor2: {
     name: 'Crimson_Raptor',
+    campId: 'raptor2',
     avatar: 'monster_Crimson_Raptor',
     camp: { x: 3498, y: 2258, r: 300 },
     speed: 2,
@@ -584,6 +595,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor2_a: {
     name: 'Raptor',
+    campId: 'raptor2',
     avatar: 'monster_Raptor',
     camp: { x: 3432, y: 2356, r: 300 },
     speed: 2,
@@ -594,6 +606,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor2_b: {
     name: 'Raptor',
+    campId: 'raptor2',
     avatar: 'monster_Raptor',
     camp: { x: 3307, y: 2295, r: 300 },
     speed: 2,
@@ -604,6 +617,7 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   },
   raptor2_c: {
     name: 'Raptor',
+    campId: 'raptor2',
     avatar: 'monster_Raptor',
     camp: { x: 3378, y: 2183, r: 300 },
     speed: 2,

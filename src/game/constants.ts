@@ -8,6 +8,11 @@ export const HotKeys = {
 
   D: 68,
   F: 70,
+
+  // Recall (Game.recall). Deliberately absent from SpellHotKeys below: that
+  // array is the kit's slot layout, and an eighth entry ripples into the
+  // loadout editor, the HUD and every persisted config.
+  B: 66,
 };
 
 export const SpellHotKeys = [

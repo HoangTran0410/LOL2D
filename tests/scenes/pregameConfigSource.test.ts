@@ -140,6 +140,9 @@ describe('PregameConfigSource.removeBot', () => {
       autoMove: true,
       autoAttack: false,
       autoCast: true,
+      // The globals say nothing about a tier — there is no control for one on
+      // the setup screen — so a freed slot is a bot nobody has tuned.
+      difficulty: 'normal',
     });
     expect(stored.ai.botTeams[AI_COUNT_MAX - 1]).toBe(
       DEFAULT_PREGAME_CONFIG.ai.botTeams[AI_COUNT_MAX - 1]

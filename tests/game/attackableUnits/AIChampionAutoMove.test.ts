@@ -55,9 +55,8 @@ describe('a bot with movement switched off stays put', () => {
     expect(bot.destination.y).toBe(0);
   });
 
-  it('still wanders on all three when movement is on', () => {
+  it('still wanders on terrain when movement is on', () => {
     for (const react of [
-      (bot: AIChampion) => bot.takeDamage(5),
       (bot: AIChampion) => bot.onCollideWall(),
       (bot: AIChampion) => bot.onCollideMapEdge(),
     ]) {
@@ -68,5 +67,28 @@ describe('a bot with movement switched off stays put', () => {
       expect(bot.destination.x).toBe(ROLL);
       expect(bot.destination.y).toBe(ROLL);
     }
+  });
+
+  it('does not flinch across the map when it is hit, even with movement on', () => {
+    // `_autoMoveOnTakeDamage` is the one reflex that ships off. `BotBrain`
+    // answers "I am being hurt" with a posture — RETREAT to the nearest
+    // friendly turret, DISENGAGE out of a turret's reach — and a random point
+    // on the whole map is as likely to be deeper into the danger as out of it.
+    const bot = makeBot(true);
+
+    bot.takeDamage(5);
+
+    expect(bot.destination.x).toBe(0);
+    expect(bot.destination.y).toBe(0);
+  });
+
+  it('flinches again for anyone who switches the reflex back on', () => {
+    const bot = makeBot(true);
+    bot._autoMoveOnTakeDamage = true;
+
+    bot.takeDamage(5);
+
+    expect(bot.destination.x).toBe(ROLL);
+    expect(bot.destination.y).toBe(ROLL);
   });
 });

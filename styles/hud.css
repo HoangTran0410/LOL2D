@@ -162,6 +162,105 @@
   text-shadow: #000 1px 0 10px;
 }
 
+/* =============== Hồi Thành =============== */
+
+/* The recall control, at the end of the cast strip and deliberately quieter
+   than everything to its left: 2em against an ability's 3em, no grey mat,
+   just an outline. It is a utility that lives on `Champion.recall` and never
+   enters `spells[]` (see `Recall.ts`), and the bar has to keep reading as
+   four abilities plus two summoners at a glance.
+
+   Start-or-cancel is `Game.recall()`'s rule, not this button's. */
+.recall-btn {
+  position: relative;
+  align-self: flex-start;
+  margin-left: 10px;
+  padding: 0;
+  overflow: hidden;
+
+  width: 2em;
+  height: 2em;
+
+  border: 1px solid #fff3;
+  border-radius: 6px;
+  background: #0d1420cc;
+  color: #cbb894;
+  font-size: 1em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.recall-btn:hover {
+  color: var(--hextech-gold);
+  border-color: #fff6;
+}
+
+/* Dead, silenced, or the recall itself disabled — the same "you cannot press
+   this" the spell icons say by greying out. */
+.recall-btn.unavailable {
+  color: #6b6b6b;
+  border-color: #ffffff1a;
+  cursor: default;
+}
+
+/* Running: gold, because the pad under the champion's feet is gold, and the
+   button is a cancel now. */
+.recall-btn.channeling {
+  color: #ffe09e;
+  border-color: #c8a15e;
+}
+
+.recall-btn i {
+  position: relative;
+  z-index: 2;
+}
+
+/* 2em is not enough room for a house and a countdown at once, and the
+   countdown is the thing worth reading while the channel runs. */
+.recall-btn.channeling i {
+  visibility: hidden;
+}
+
+.recall-btn .hotKey {
+  position: absolute;
+  bottom: -3px;
+  right: 1px;
+  z-index: 3;
+
+  color: #e8c17d;
+  font-size: 0.62em;
+  font-weight: bold;
+  text-shadow: #000 1px 0 10px;
+}
+
+/* The channel, filling from the bottom. The same clock `RecallPad`'s arc
+   draws on the ground, so the strip and the world cannot disagree about how
+   far along the trip is. */
+.recall-btn .recall-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+
+  background: rgba(255, 205, 120, 0.32);
+}
+
+.recall-btn .recall-count {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+  font-size: 0.85em;
+  font-weight: bold;
+  text-shadow: #000 1px 0 6px;
+}
+
 .cooldown {
   position: absolute;
   top: 0;
@@ -831,11 +930,11 @@
   background: #3a2222;
 }
 
-/* The bot's three AI-behaviour toggles, now the top of the Luyện tập card (see
-   RosterTab.vue) rather than a strip on the collapsed row. Stacked, and ruled
-   off from the cheats below so "how it plays" reads apart from "practice
-   tools". `.pregame-toggle` supplies the layout and the 44px-tall label that is
-   the real tap target. */
+/* The bot's three AI-behaviour toggles and the tier it plays at, now the top of
+   the Luyện tập card (see RosterTab.vue) rather than a strip on the collapsed
+   row. Stacked, and ruled off from the cheats below so "how it plays" reads
+   apart from "practice tools". `.pregame-toggle` supplies the layout and the
+   44px-tall label that is the real tap target. */
 .practice-cheat-behaviour {
   display: flex;
   flex-direction: column;
@@ -847,6 +946,53 @@
 .practice-cheat-flag {
   margin-bottom: 0;
   min-height: 34px;
+}
+
+/* Dễ / Thường / Khó, one press each — the same segmented shape as the input-mode
+   row on Cài đặt (`.input-mode-btn`), scaled down to sit inside a roster row's
+   drawer. Three equal buttons rather than a `<select>`: the whole range is one
+   tap wide and the current tier is readable without opening anything, which is
+   what a control the player retunes mid-match wants. */
+.practice-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 34px;
+  margin-top: 0.15rem;
+}
+
+.practice-difficulty-title {
+  font-size: 0.78em;
+  color: #bbb;
+}
+
+.practice-difficulty-row {
+  display: flex;
+  flex: 1;
+  gap: 0.3rem;
+}
+
+.practice-difficulty-btn {
+  flex: 1;
+  /* 34px is the row's own height; the button is the tap target, so it takes all
+     of it rather than sitting in the middle of it. */
+  min-height: 30px;
+  background: var(--hextech-panel);
+  border: 1px solid var(--hextech-line);
+  color: #bbb;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.76em;
+  cursor: pointer;
+}
+
+.practice-difficulty-btn:hover {
+  border-color: var(--hextech-gold-dim);
+}
+
+.practice-difficulty-btn.selected {
+  border-color: var(--hextech-teal);
+  color: var(--hextech-text);
+  background: #102426;
 }
 
 /* `.participant-add-btn`'s dashed teal call to action, plus a live count:

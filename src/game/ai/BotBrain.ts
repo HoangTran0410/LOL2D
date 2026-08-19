@@ -9,8 +9,10 @@ import {
   type TeamView,
 } from '@/game/ai/TeamBlackboard';
 import { laneApproach } from '@/game/ai/LaneObjectives';
+import { clampToSafeApproach, escapePoint, insideThreat } from '@/game/ai/TurretThreat';
 import type AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type Turret from '@/game/gameObject/structures/Turret';
 import {
   isChargeActivation,
   requireChargeSpec,
@@ -26,6 +28,7 @@ import {
   type SpellRoleMask,
 } from '@/game/ai/SpellRole';
 import { effectiveRange } from '@/game/combat/Reach';
+import { MELEE_RANGE_THRESHOLD } from '@/game/combat/BasicAttack';
 import { resolveInterrupts } from '@/game/spell/runtime/CancelPolicy';
 import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
 import { DEFAULT_PROJECTILE_SPEED, predictAim } from '@/game/ai/AimPredictor';
@@ -40,7 +43,8 @@ export const TARGET_LOW_HEALTH_WEIGHT = 12;
 /** Pixels per point of target score. 100px of walking is worth one point. */
 export const TARGET_DISTANCE_DIVISOR = 100;
 
-export type Posture = 'RETREAT' | 'RECOVER' | 'FIGHT' | 'SEARCH' | 'ENGAGE' | 'PUSH' | 'ROAM';
+export type Posture =
+  'RETREAT' | 'RECOVER' | 'DISENGAGE' | 'FIGHT' | 'SEARCH' | 'ENGAGE' | 'PUSH' | 'ROAM';
 
 /** How far from an ally a focus target counts as "a fight worth joining". */
 export const ASSIST_RANGE = 700;
@@ -56,6 +60,49 @@ export const ROAM_RADIUS = 500;
  * that has not arrived yet does not.
  */
 export const PUSH_TURRET_ESCORT_PX = 450;
+/**
+ * Clearance a bot keeps outside an enemy turret's reach.
+ *
+ * Two rules are written against it and they must not fight each other: a bot
+ * walking somewhere is held at `reach + this`, and a bot that has ended up
+ * *inside* `reach` walks back out to `reach + this`. Because the disengage
+ * trigger is the smaller radius of the two, a bot parked on the ring is not
+ * inside anything and the pair is stable — the yo-yo you get from a keep-out
+ * distance and an escape distance that are the same number.
+ */
+export const TURRET_KEEP_OUT_PX = 60;
+/**
+ * Health a bot must still have before it will trade a turret shot for a kill.
+ *
+ * Above `hard`'s `retreatHealthPct` of 0.4, so the dive rule is never what a
+ * nearly-dead bot is deciding with — that bot is already retreating.
+ */
+export const DIVE_HEALTH_PCT = 0.55;
+/** Effective health at or under which a target is worth diving a turret for. */
+export const DIVE_LETHAL_HEALTH = 30;
+/**
+ * How much of its own attack reach a kiting bot keeps between it and its
+ * target. Under 1 on purpose: `BasicAttackController.update` chases anything
+ * beyond the reach, so a step over the line is undone on the next frame and
+ * reads as a bot vibrating in place rather than as spacing.
+ */
+export const KITE_HOLD_PCT = 0.85;
+/** How far back one kite step goes, before the hold line trims it. */
+export const KITE_STEP_PX = 140;
+/** Swing timer left, under which a bot plants and fires instead of stepping. */
+export const KITE_COMMIT_MS = 120;
+/**
+ * How long since the last hit before standing still for a recall is worth it.
+ *
+ * Reported from a real match: the bot ran to its turret with an enemy bot right
+ * behind it, stopped dead and opened a four-second channel. Nothing in the
+ * interrupt table can prevent that — an enemy standing next to you is not a
+ * move, a stun or a hit — so the *decision* has to carry the safety check, and
+ * carry it every tick rather than only at the moment the key goes down.
+ */
+export const RECALL_SAFE_MS = 3_000;
+/** And no enemy the team has seen this recently, this close. */
+export const RECALL_CLEAR_PX = 900;
 /** Both must be met before a recovering bot rejoins. */
 export const RECOVER_HEALTH_PCT = 0.7;
 export const RECOVER_MANA_PCT = 0.5;
@@ -86,6 +133,25 @@ export const FALLBACK_AIM_PX = 100;
  * so one board is built per window for the whole match rather than one per bot.
  */
 export const THINK_INTERVAL_MS = 250;
+/**
+ * How long one kite step buys the right to move while an attack order stands.
+ *
+ * Longer than the think interval, so the window cannot lapse between two
+ * decisions and leave the bot planted for a frame; `BasicAttackController` ends
+ * it the instant the swing comes ready regardless, which is what keeps a
+ * kiting bot firing rather than running.
+ */
+export const KITE_WINDOW_MS = THINK_INTERVAL_MS + 50;
+
+/**
+ * The three postures whose whole content is "stop fighting and get out".
+ *
+ * They share one set of consequences — the standing attack order is dropped,
+ * only self-preservation spells may be pressed, and the attack scan stops
+ * answering — so they are named once rather than re-listed at each of them.
+ */
+export const isLeavingPosture = (posture: Posture): boolean =>
+  posture === 'RETREAT' || posture === 'RECOVER' || posture === 'DISENGAGE';
 
 /**
  * A resource as a fraction. **No pool reads as full**, not as empty: a champion
@@ -186,6 +252,68 @@ export function isRetreatCandidate(spell: Spell, mask: SpellRoleMask): boolean {
   );
 }
 
+/**
+ * What narrows the kit for one cast decision.
+ *
+ * - `FREE` — a real fight: everything castable is a candidate.
+ * - `RETREAT` — running away, so only what helps the bot leave. See
+ *   `isRetreatCandidate`, which is three axes rather than a role mask.
+ * - `WAVE` — farming, so only cheap damage. See `isWaveClearCandidate`.
+ */
+export type CastMode = 'FREE' | 'RETREAT' | 'WAVE';
+
+/**
+ * May a bot spend this on minions?
+ *
+ * Damage only, and never the ultimate. The point of letting a pushing bot cast
+ * at all is that four abilities off cooldown while it plinks a wave with
+ * autoattacks is what makes it read as asleep — not that the wave is worth a
+ * teamfight ability. The mana floor (`DifficultyProfile.waveClearManaPct`, a
+ * tier knob) is the other half,
+ * and it is checked once per decision rather than per spell.
+ *
+ * `Dash` and `Escape` are excluded explicitly even though `inferRoles` never
+ * produces either: the day a spell carries a hand-written `aiRoles`, a bot
+ * blinking into a wave is not the way to find out.
+ */
+/**
+ * May a bot press this with nobody to press it at?
+ *
+ * Every term in `scoreSpell` that depends on a target already carries
+ * `&& target` — but three do not, because they are not about one: `Buff` (+5),
+ * the support row (which pays `SCORE_SUPPORT` whenever the caster is hurt), and
+ * `SCORE_ULTIMATE` (+6). That is enough to win a selection on its own, and
+ * `inferRoles` hands `roles(Buff, Shield)` to **every** `SELF` cast with a mana
+ * cost — about seventy files — while `rolesOf` adds `Ultimate` from the slot.
+ * So a self-cast R scored 11 with nothing in sight, and a bot walking an empty
+ * lane pressed its ultimate every `castIntervalMs`. Reported from a real match.
+ *
+ * The two axes are `isRetreatCandidate`'s, for the same reason and against the
+ * same inference noise:
+ *
+ * - **Not the ultimate slot.** An ultimate is a spell you spend *on* something.
+ *   `SCORE_ULTIMATE` is a priority bump between candidates that already earned
+ *   their place, never a reason to cast.
+ * - **Declares no range.** A `SELF` spell carrying a `declaredRange` reaches
+ *   *out* at something — Zed R's 500 auto-locks the nearest enemy inside it —
+ *   and with no target there is nothing out there.
+ *
+ * A genuine self-buff or shield, which declares no range and is not the
+ * ultimate, is still pressable before contact. That is deliberate and
+ * `chooseSpell`'s "lets a SELF spell be chosen with no target at all" covers it.
+ */
+export function isTargetlessCandidate(spell: Spell, mask: SpellRoleMask): boolean {
+  return !hasRole(mask, SpellRole.Ultimate) && spell.declaredRange === undefined;
+}
+
+export function isWaveClearCandidate(mask: SpellRoleMask): boolean {
+  return (
+    hasRole(mask, SpellRole.Damage) &&
+    !hasRole(mask, SpellRole.Ultimate) &&
+    !hasRole(mask, roles(SpellRole.Dash, SpellRole.Escape))
+  );
+}
+
 export class BotBrain {
   /**
    * The terrain half of perception, injectable purely so a test can state a
@@ -223,7 +351,7 @@ export class BotBrain {
   private pendingRecast?: {
     choice: SpellChoice;
     context: CastContext;
-    target: Champion | null;
+    target: AttackableUnit | null;
     remaining: number;
     delayMs: number;
     nextAtMs: number;
@@ -257,8 +385,15 @@ export class BotBrain {
    *   from its authored 550. And it is emphatically not
    *   `AttackableUnit.visionRadius`, which is a lerped animation value written
    *   every frame from 0 upward, not a constant.
-   * - **Stealth** blocks at every tier. `seesThroughTerrain` does not reveal it.
-   * - **Terrain and bushes** block only when `!seesThroughTerrain` — `easy`.
+   * - **Stealth** blocks at every tier.
+   * - **Terrain and bushes** block at every tier. There used to be a
+   *   `seesThroughTerrain` column here, on for `normal` and `hard`, and it made
+   *   this the one acquisition path in the game that skipped the fog — minions,
+   *   monsters, pets, turrets and the player's own right click all go through
+   *   `PredefinedFilters.visibleTo`. A player hits it as "a bot autoattacked me
+   *   through a wall while neither of us had vision". A tier's sight advantage
+   *   is `memoryTtlMs` now: how long it hunts what it lost, not whether it ever
+   *   loses it.
    *
    * Acquisition only. A standing attack order is kept regardless, by
    * `BasicAttackController.canKeep`, which has no vision check and must keep
@@ -274,7 +409,7 @@ export class BotBrain {
     const dy = target.position.y - this.owner.position.y;
     if (Math.hypot(dx, dy) > this.profile.aggroRange) return false;
 
-    return this.profile.seesThroughTerrain || this.sees(this.owner, target);
+    return this.sees(this.owner, target);
   }
 
   /**
@@ -329,6 +464,46 @@ export class BotBrain {
    * bot that yo-yos on the edge of its own threshold and never actually heals.
    */
   private recovering = false;
+  /**
+   * Set while a recovering bot is walking to the platform rather than resetting
+   * at its turret. See the note in `decidePosture`; `retreatPoint()` reads it.
+   */
+  private headingHome = false;
+  /**
+   * Match time of the last hit this bot took, written by `AIChampion.takeDamage`.
+   *
+   * `-Infinity` so a bot that has never been hit reads as safe rather than as
+   * "hit at time zero", which every bot would be for the first three seconds of
+   * a match.
+   */
+  lastDamagedAtMs = Number.NEGATIVE_INFINITY;
+
+  /**
+   * Whether it is worth standing still for four seconds.
+   *
+   * Team knowledge, not omniscience: `view.memory` is what an ally has actually
+   * seen, terrain-honest and aged out by the tier's own `memoryTtlMs`. An enemy
+   * currently chasing this bot is in it by definition — the bot can see them —
+   * and one that broke line of sight a moment ago still counts, which is the
+   * case worth being careful about.
+   */
+  safeToRecall(view: TeamView, nowMs: number): boolean {
+    if (nowMs - this.lastDamagedAtMs < RECALL_SAFE_MS) return false;
+    return !this.enemySeenNear(view, nowMs, RECALL_CLEAR_PX);
+  }
+
+  private enemySeenNear(view: TeamView, nowMs: number, radius: number): boolean {
+    for (const entry of view.memory.values()) {
+      if (entry.unit.isDead || entry.unit.toRemove) continue;
+      if (nowMs - entry.atMs > this.profile.memoryTtlMs) continue;
+      const away = Math.hypot(
+        entry.pos.x - this.owner.position.x,
+        entry.pos.y - this.owner.position.y
+      );
+      if (away <= radius) return true;
+    }
+    return false;
+  }
 
   /**
    * `target` is the enemy this tick already picked, handed in so the scan runs
@@ -346,9 +521,44 @@ export class BotBrain {
     const healthPct = ratio(this.owner.stats.health.value, this.owner.stats.maxHealth.value);
     const manaPct = ratio(this.owner.stats.mana.value, this.owner.stats.maxMana.value);
 
+    // **First**, above even going home, and that ordering was worth a bug.
+    //
+    // It used to sit below the health retreat, which reads sensibly — a bot
+    // about to die should head for its own turret — and is wrong, because
+    // RETREAT walks a straight line to that turret and is deliberately not
+    // clamped by `safely()` (it has to be: a bot has to be able to cross a ring
+    // to get home). So a bot the turret had shot below its retreat threshold
+    // stopped disengaging and started walking home *through the guns*.
+    // `drive-bot-discipline.mjs` planted a full-health bot 150px inside a ring
+    // and watched it end up 228px inside one, dead.
+    //
+    // Getting out of the guns is not an alternative to going home, it is the
+    // first leg of it: `escapePoint` is the shortest way out, and the retreat
+    // resumes from there on the next tick.
+    const tower = this.threateningTurret(view);
+    if (tower && !this.divingAllowed(view, tower, target)) return 'DISENGAGE';
+
     if (this.recovering) {
-      if (healthPct > RECOVER_HEALTH_PCT && manaPct > RECOVER_MANA_PCT) this.recovering = false;
-      else return this.atRetreatPoint() ? 'RECOVER' : 'RETREAT';
+      if (healthPct > RECOVER_HEALTH_PCT && manaPct > RECOVER_MANA_PCT) {
+        this.recovering = false;
+        this.headingHome = false;
+      } else {
+        // Being chased turns the trip into a real one: the turret is where a
+        // healthy bot resets, and a hunted one keeps walking to the platform,
+        // which restores 12% of health and mana every half second and is the
+        // one place on the map an enemy champion will not follow it to.
+        //
+        // The latch is set by an enemy being *near*, and deliberately not by
+        // the damage clock: one stray hit with nobody around should cost three
+        // seconds of standing still, not a walk across the map when a
+        // four-second channel would do the same job. It clears on arrival
+        // rather than the moment the chaser drifts back out of
+        // `RECALL_CLEAR_PX`, so a bot committed to the walk finishes it instead
+        // of turning round between the two and arriving at neither.
+        if (this.enemySeenNear(view, nowMs, RECALL_CLEAR_PX)) this.headingHome = true;
+        if (this.headingHome && this.atOwnFountain()) this.headingHome = false;
+        return this.atRetreatPoint() ? 'RECOVER' : 'RETREAT';
+      }
     }
 
     const outnumbered = view.enemies.length - view.allies.length >= OUTNUMBERED_BY;
@@ -380,6 +590,120 @@ export class BotBrain {
     // nobody to fight.
     if (this.pushTarget(view)) return 'PUSH';
     return 'ROAM';
+  }
+
+  /** Half the body, which is what a turret's reach has to cover to hit it. */
+  private get bodyRadius(): number {
+    return this.owner.stats.size.value / 2;
+  }
+
+  /**
+   * The enemy turret whose guns this bot is standing in, nearest first.
+   *
+   * `view.enemyTurrets` and not `game.turrets`: the blackboard gathers them
+   * inside the one pass it already makes over the object list, which is the
+   * only full-list walk this layer is allowed (`TeamBlackboard.lanes.test.ts`).
+   * Six buildings is a loop nobody has to think about.
+   */
+  threateningTurret(view: TeamView): Turret | null {
+    let best: Turret | null = null;
+    let bestAway = Number.POSITIVE_INFINITY;
+    for (const turret of view.enemyTurrets) {
+      if (!insideThreat(turret, this.owner.position, this.bodyRadius)) continue;
+      const away = Math.hypot(
+        turret.position.x - this.owner.position.x,
+        turret.position.y - this.owner.position.y
+      );
+      if (away < bestAway) {
+        bestAway = away;
+        best = turret;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Whether standing in this turret's reach is currently worth it.
+   *
+   * Two ways, and only two:
+   *
+   * - **The kill is there.** A bot at healthy health, against a target one hit
+   *   from dying, may take a turret shot for it. That is the dive, and it is
+   *   the only reason to be under a building without an escort.
+   * - **Our own wave is under it.** `Turret.findTarget` shoots minions before
+   *   champions, so a wave standing under a turret is what makes the ground
+   *   holdable — the same escort rule `findObjectiveTarget` already applies
+   *   before it will let a bot hit the building, measured with the same
+   *   constant. It stops counting the moment the building switches onto us:
+   *   `Turret.findAllyAttacker` does exactly that as soon as the bot attacks a
+   *   champion standing under it, and the ring the turret draws round itself
+   *   plus a barrel pointing at the bot is what a human reads off the screen at
+   *   the same moment.
+   */
+  divingAllowed(view: TeamView, turret: Turret, target: AttackableUnit | null): boolean {
+    const healthPct = ratio(this.owner.stats.health.value, this.owner.stats.maxHealth.value);
+    if (target && healthPct >= DIVE_HEALTH_PCT && effectiveHealth(target) <= DIVE_LETHAL_HEALTH) {
+      return true;
+    }
+    if (turret.target === this.owner) return false;
+    return this.waveEscorts(view, turret);
+  }
+
+  /** Whether this team's wave has reached the ground under `turret`. */
+  private waveEscorts(view: TeamView, turret: Turret): boolean {
+    for (const state of view.lanes.values()) {
+      const front = state.frontier;
+      if (!front) continue;
+      const away = Math.hypot(front.x - turret.position.x, front.y - turret.position.y);
+      if (away <= PUSH_TURRET_ESCORT_PX) return true;
+    }
+    return false;
+  }
+
+  /** The enemy turrets this bot has no business walking into right now. */
+  private forbiddenTurrets(view: TeamView, target: AttackableUnit | null): Turret[] {
+    const out: Turret[] = [];
+    for (const turret of view.enemyTurrets) {
+      if (!this.divingAllowed(view, turret, target)) out.push(turret);
+    }
+    return out;
+  }
+
+  /**
+   * `to`, with the walk stopped at the first forbidden turret ring it crosses.
+   *
+   * The movement half of the rule. Its acquisition half is `guardedByTurret`,
+   * and both are needed: `BasicAttackController.update` re-issues
+   * `navigateTo(target)` every frame while an order is out of reach, so a
+   * destination this method held back is overwritten sixty times a second by
+   * the order the bot is still carrying.
+   */
+  private safely(view: TeamView, target: AttackableUnit | null, to: Vec2): Vec2 {
+    return clampToSafeApproach(
+      this.owner.position,
+      to,
+      this.forbiddenTurrets(view, target),
+      this.bodyRadius,
+      TURRET_KEEP_OUT_PX
+    );
+  }
+
+  /**
+   * Whether picking a fight with `unit` means walking under a turret.
+   *
+   * Acquisition only, the same boundary vision keeps: an order already running
+   * is dropped by the posture layer rather than here, and damage is never
+   * gated. A turret the bot is *already* inside is skipped — it is not a reason
+   * to refuse the fight the bot is in, it is a reason to leave, which is
+   * DISENGAGE's job.
+   */
+  private guardedByTurret(view: TeamView, unit: AttackableUnit): boolean {
+    const bodyRadius = this.bodyRadius;
+    for (const turret of this.forbiddenTurrets(view, unit)) {
+      if (insideThreat(turret, this.owner.position, bodyRadius)) continue;
+      if (insideThreat(turret, unit.position, bodyRadius, TURRET_KEEP_OUT_PX)) return true;
+    }
+    return false;
   }
 
   /**
@@ -456,12 +780,21 @@ export class BotBrain {
     return null;
   }
 
-  /** Nearest living friendly turret, else the team fountain. */
+  /**
+   * Where a retreat is aimed: the nearest living friendly turret, else the team
+   * fountain — **unless** the bot has been driven past wanting a turret, in
+   * which case it is the platform. See the `headingHome` latch in
+   * `decidePosture`.
+   */
   retreatPoint(): Vec2 | null {
     const game = this.owner.game as {
       turrets?: { teamId?: unknown; isDead?: boolean; position: Vec2 }[];
       fountains?: { teamId?: unknown; position: Vec2 }[];
     };
+    if (this.headingHome) {
+      const home = this.homeFountain();
+      if (home) return { x: home.position.x, y: home.position.y };
+    }
     let best: Vec2 | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
     for (const turret of game.turrets ?? []) {
@@ -480,7 +813,36 @@ export class BotBrain {
     return fountain ? { x: fountain.position.x, y: fountain.position.y } : null;
   }
 
+  /** This team's restore platform, or `null` in a headless or FFA context. */
+  private homeFountain(): { position: Vec2; radius: number } | null {
+    const game = this.owner.game as {
+      fountains?: { teamId?: unknown; radius?: number; position: Vec2 }[];
+    };
+    for (const fountain of game.fountains ?? []) {
+      if (fountain.teamId !== this.owner.teamId) continue;
+      return { position: fountain.position, radius: fountain.radius ?? 0 };
+    }
+    return null;
+  }
+
+  /** Standing on it, i.e. actually being restored rather than merely near it. */
+  private atOwnFountain(): boolean {
+    const home = this.homeFountain();
+    if (!home) return false;
+    const away = Math.hypot(
+      home.position.x - this.owner.position.x,
+      home.position.y - this.owner.position.y
+    );
+    return away <= home.radius;
+  }
+
   private atRetreatPoint(): boolean {
+    // The platform counts, and it has to: `retreatPoint()` is the nearest
+    // friendly *turret*, so a bot that has just recalled reads as not-yet-
+    // arrived, flips back to RETREAT and walks out of the one place on the map
+    // that restores it — 12% of health and mana every half second, against a
+    // turret's regen of nothing at all.
+    if (this.atOwnFountain()) return true;
     // `refuge`, not `point`: `point` is a p5 global in this project and a local
     // of the same name shadows it — see CLAUDE.md. Inert here, banned anyway.
     const refuge = this.retreatPoint();
@@ -530,7 +892,7 @@ export class BotBrain {
    * `profile.aggroRange` is the honest stand-in: it is already the furthest
    * this tier was willing to acquire a target at.
    */
-  private reachOf(spell: Spell, target: Champion | null): number {
+  private reachOf(spell: Spell, target: AttackableUnit | null): number {
     const declared = spell.declaredRange;
     return declared === undefined
       ? this.profile.aggroRange
@@ -541,7 +903,7 @@ export class BotBrain {
     spell: Spell,
     slotIndex: number,
     mask: SpellRoleMask,
-    target: Champion | null,
+    target: AttackableUnit | null,
     view: TeamView
   ): number {
     void slotIndex;
@@ -612,14 +974,20 @@ export class BotBrain {
    * three axes of `isRetreatCandidate`, not the role mask alone. Left false,
    * every castable spell is a candidate, which is every other posture.
    */
-  chooseSpell(target: Champion | null, view: TeamView, retreating = false): SpellChoice | null {
+  chooseSpell(
+    target: AttackableUnit | null,
+    view: TeamView,
+    mode: CastMode = 'FREE'
+  ): SpellChoice | null {
     let best: SpellChoice | null = null;
     // From 1: slot 0 is the basic attack, which is the attack controller's job.
     for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
       const spell = this.owner.spells[slotIndex];
       if (!spell?.isCastableNow) continue;
       const mask = rolesOf(spell, slotIndex);
-      if (retreating && !isRetreatCandidate(spell, mask)) continue;
+      if (mode === 'RETREAT' && !isRetreatCandidate(spell, mask)) continue;
+      if (mode === 'WAVE' && !isWaveClearCandidate(mask)) continue;
+      if (!target && !isTargetlessCandidate(spell, mask)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
       const score = this.scoreSpell(spell, slotIndex, mask, target, view);
       if (score <= 0 || !Number.isFinite(score)) continue;
@@ -646,6 +1014,11 @@ export class BotBrain {
       if (!spell?.isCastableNow) continue;
       const mask = rolesOf(spell, slotIndex);
       if (!hasRole(mask, SpellRole.Zone) && !hasRole(mask, SpellRole.Poke)) continue;
+      // Never the ultimate. An area spell at a half-second-old position is a
+      // fair read; the one cooldown a bot cannot afford to spend on a position
+      // that may already be empty is this one, and a wasted R is exactly what
+      // reads as a bot flailing rather than as one guessing well.
+      if (hasRole(mask, SpellRole.Ultimate)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
       // The same reach discipline `scoreSpell` applies, through the same helper.
       // Without it a bot throws a 300-range zone at a point 2000px away and pays
@@ -691,40 +1064,84 @@ export class BotBrain {
     const posture = this.evaluatePosture(view, nowMs, target);
 
     if (owner._autoMove) this.drive(posture, view, target, nowMs);
+    // Going home is a movement decision, not a cast one, whatever the trip is
+    // implemented as: a bot the panel has parked stays where it was parked.
+    if (owner._autoMove) this.manageRecall(posture, view, nowMs);
     if (owner._autoCast) this.maybeCast(posture, view, target, nowMs);
   }
 
-  private drive(posture: Posture, view: TeamView, target: Champion | null, nowMs: number): void {
+  /**
+   * The movement half of a think tick. Not `private`: it is one of the two
+   * things a posture actually *does*, and the suites drive it directly rather
+   * than through a whole match.
+   */
+  drive(posture: Posture, view: TeamView, target: Champion | null, nowMs: number): void {
     const owner = this.owner;
     // See `castWouldBreakOnMove`: the bot used to cancel its own cast by walking.
     if (this.castWouldBreakOnMove()) return;
     switch (posture) {
       case 'RETREAT': {
+        // A standing attack order out-drives everything below it:
+        // `BasicAttackController.update` re-issues `navigateTo(target)` every
+        // frame while the target is out of reach, and plants the bot with
+        // `stopMovement()` while it is in reach. So a retreating bot that still
+        // held an order simply stayed and traded — the retreat was a posture
+        // nobody could see. Leaving is a decision to stop fighting, and this is
+        // where it gets said.
+        owner.basicAttack?.clear();
         // `refuge`, not `point`: `point` is a p5 global. See CLAUDE.md.
         const refuge = this.retreatPoint();
         if (refuge) owner.navigateTo(refuge.x, refuge.y);
         return;
       }
       case 'RECOVER':
+        owner.basicAttack?.clear();
         owner.stopMovement();
         return;
-      case 'FIGHT':
+      case 'DISENGAGE': {
+        owner.basicAttack?.clear();
+        const tower = this.threateningTurret(view);
+        if (!tower) return;
+        // Straight back out of the guns, which is the shortest way there is.
+        const out = escapePoint(tower, owner.position, this.bodyRadius, TURRET_KEEP_OUT_PX);
+        owner.navigateToWalkable(out.x, out.y);
+        return;
+      }
+      case 'FIGHT': {
+        if (!target) return;
+        const held = this.safely(view, target, target.position);
+        if (held.x !== target.position.x || held.y !== target.position.y) {
+          // The target is standing somewhere this bot may not follow. Dropping
+          // the order is not optional: the attack controller owns the walking
+          // while one is out, and it has never heard of a turret.
+          owner.basicAttack?.clear();
+          owner.navigateTo(held.x, held.y);
+          return;
+        }
+        const step = this.kiteStep(view, target);
+        if (step) {
+          // The other half of the step, without which the attack controller
+          // plants the bot again on the very next frame. See `kiteStep`.
+          if (owner.basicAttack) owner.basicAttack.repositionMs = KITE_WINDOW_MS;
+          owner.navigateTo(step.x, step.y);
+          return;
+        }
         // The attack order owns the walking while it has one; only step in when
         // there is a target but no order, which is the frame before one is given.
-        if (!owner.basicAttack?.target && target) {
-          owner.navigateTo(target.position.x, target.position.y);
-        }
+        if (!owner.basicAttack?.target) owner.navigateTo(held.x, held.y);
         return;
+      }
       case 'SEARCH': {
         const entry = this.rememberedTarget(view, nowMs);
         if (!entry) return;
-        const hunch = this.searchPoint(entry, nowMs);
+        const hunch = this.safely(view, target, this.searchPoint(entry, nowMs));
         owner.navigateTo(hunch.x, hunch.y);
         return;
       }
       case 'ENGAGE':
         if (view.focusTarget) {
-          owner.navigateTo(view.focusTarget.position.x, view.focusTarget.position.y);
+          const toward = this.safely(view, view.focusTarget, view.focusTarget.position);
+          owner.navigateTo(toward.x, toward.y);
         }
         return;
       case 'PUSH': {
@@ -733,7 +1150,14 @@ export class BotBrain {
         if (owner.basicAttack?.target) return;
         // `front`, not `line` — `line` is a p5 global. See CLAUDE.md.
         const front = this.pushTarget(view);
-        if (front) owner.navigateTo(front.x, front.y);
+        if (!front) return;
+        // The single most visible symptom this layer was written for.
+        // `pushTarget` answers with the enemy turret's own coordinates once the
+        // lane holds no friendly wave, and this used to walk to them — while
+        // `findObjectiveTarget`, which does have an escort rule, handed the bot
+        // nothing to shoot. It stood in the guns, attacking nothing, and died.
+        const stop = this.safely(view, null, front);
+        owner.navigateTo(stop.x, stop.y);
         return;
       }
       default: {
@@ -746,12 +1170,87 @@ export class BotBrain {
         }
         const angle = this.rng() * Math.PI * 2;
         const radius = this.rng() * ROAM_RADIUS;
-        owner.navigateToWalkable(
-          anchor.x + Math.cos(angle) * radius,
-          anchor.y + Math.sin(angle) * radius
-        );
+        const wander = this.safely(view, null, {
+          x: anchor.x + Math.cos(angle) * radius,
+          y: anchor.y + Math.sin(angle) * radius,
+        });
+        owner.navigateToWalkable(wander.x, wander.y);
       }
     }
+  }
+
+  /**
+   * The trip home: opened in RECOVER, dropped the moment RECOVER ends.
+   *
+   * RECOVER is where a hurt bot spends most of its time, and what it used to do
+   * there was stand at its own turret waiting on health regen — a minute of a
+   * bot that reads as switched off. The platform restores 12% of health and
+   * mana every half second, so the same recovery takes about four seconds plus
+   * the channel. `Recall` is `SpellForm.HELD`, so this can only be pressed once
+   * the bot has actually stopped: RETREAT is still walking, and a channel
+   * opened there would be cancelled by the bot's own next step, every tick, for
+   * the whole way home.
+   *
+   * Cancelled rather than left running when the posture changes, because the
+   * posture may have changed for a reason the interrupt table cannot see — a
+   * heal landing and the bot being fit to play again is not a move, a stun or a
+   * hit.
+   */
+  private manageRecall(posture: Posture, view: TeamView, nowMs: number): void {
+    const recall = this.owner.recall;
+    if (!recall) return;
+
+    const wanted =
+      posture === 'RECOVER' &&
+      !this.atOwnFountain() &&
+      this.homeFountain() !== null &&
+      this.safeToRecall(view, nowMs);
+    if (!wanted) {
+      if (recall.state === 'CASTING' || recall.state === 'CHANNELING') {
+        recall.cancel('PLAYER_CANCEL');
+      }
+      return;
+    }
+    if (!recall.isCastableNow) return;
+    const context = this.contextFor(recall, this.fallbackAim());
+    if (context) recall.press(context);
+  }
+
+  /**
+   * One step back, for a bot whose next swing is not ready yet.
+   *
+   * The whole of kiting: a ranged champion's damage arrives in beats and the
+   * gap between two of them is free, so standing in it is throwing away the
+   * only thing range buys. Melee gets nothing here — closing is already what
+   * the attack controller does, and a melee bot that backed off would simply
+   * never land a hit.
+   *
+   * The step stays inside `KITE_HOLD_PCT` of the attack's own reach, because
+   * `BasicAttackController.update` chases anything further out: a step past the
+   * line is undone on the next frame and reads as a bot vibrating in place.
+   */
+  private kiteStep(view: TeamView, target: AttackableUnit): Vec2 | null {
+    const owner = this.owner;
+    const attack = owner.basicAttack;
+    if (!attack || attack.target !== target) return null;
+    if (owner.stats.attackRange.value <= MELEE_RANGE_THRESHOLD) return null;
+    // About to swing: planting and firing beats another step back.
+    if (attack.cooldownMs <= KITE_COMMIT_MS) return null;
+
+    const hold = attack.reachTo(target) * KITE_HOLD_PCT;
+    const dx = owner.position.x - target.position.x;
+    const dy = owner.position.y - target.position.y;
+    const away = Math.hypot(dx, dy);
+    if (away >= hold) return null;
+
+    // A direction must never be (0,0) — `Game.facing()`'s convention.
+    const towardX = away > 0.01 ? dx / away : 1;
+    const towardY = away > 0.01 ? dy / away : 0;
+    const step = Math.min(KITE_STEP_PX, hold - away);
+    return this.safely(view, target, {
+      x: owner.position.x + towardX * step,
+      y: owner.position.y + towardY * step,
+    });
   }
 
   private maybeCast(
@@ -773,19 +1272,55 @@ export class BotBrain {
       if (ghost) this.cast(ghost, aim, nowMs, null);
       return;
     }
+    if (posture === 'PUSH') {
+      this.castOnWave(view, nowMs);
+      return;
+    }
     // A bot running away still casts — but only what helps it leave. See
     // `RETREAT_ROLES`: without this branch the `SCORE_ESCAPE` and
     // `SCORE_SUPPORT` rows were both unreachable in a running match.
-    const running = posture === 'RETREAT' || posture === 'RECOVER';
+    const running = isLeavingPosture(posture);
     if (!running && posture !== 'FIGHT' && posture !== 'ENGAGE') return;
 
-    const choice = this.chooseSpell(target, view, running);
+    const choice = this.chooseSpell(target, view, running ? 'RETREAT' : 'FREE');
     if (!choice) return;
     this.cast(choice, this.aimFor(choice, target), nowMs, target);
   }
 
+  /**
+   * One ability into the wave, for a bot with nobody to fight and mana to spare.
+   *
+   * PUSH used to press nothing: `maybeCast` returned unless the posture was
+   * FIGHT, ENGAGE, SEARCH or one of the running ones — and a quiet match is
+   * mostly PUSH. So a bot walked at the wave and plinked it with autoattacks
+   * while four abilities sat off cooldown, which is a large part of why the
+   * whole layer read as *less* alive than the version that sprayed spells at
+   * the player's cursor sixty times a second.
+   *
+   * How much mana a bot keeps back before it will do this is a *tier* knob
+   * (`DifficultyProfile.waveClearManaPct`), not one number for every bot:
+   * clearing a wave with abilities is a mechanic a better player has, so an
+   * easy bot hoards at 85% where a hard one spends down to 45%.
+   *
+   * Minions only, deliberately. `findObjectiveTarget` also answers with the
+   * enemy turret once our wave escorts one, and a building neither dodges nor
+   * cares which ability hits it — spending a cooldown on it buys nothing the
+   * basic attack does not.
+   */
+  private castOnWave(view: TeamView, nowMs: number): void {
+    const manaPct = ratio(this.owner.stats.mana.value, this.owner.stats.maxMana.value);
+    if (manaPct < this.profile.waveClearManaPct) return;
+
+    const objective = this.findObjectiveTarget(view);
+    if (!(objective instanceof Minion)) return;
+
+    const choice = this.chooseSpell(objective, view, 'WAVE');
+    if (!choice) return;
+    this.cast(choice, this.aimFor(choice, objective), nowMs, objective);
+  }
+
   /** Where this spell should point. The replacement for the player's cursor. */
-  private aimFor(choice: SpellChoice, target: Champion | null): Vec2 {
+  private aimFor(choice: SpellChoice, target: AttackableUnit | null): Vec2 {
     const owner = this.owner;
     if (!target) return this.fallbackAim();
     if (choice.spell.castSpec.targeting === 'UNIT' || choice.spell.castSpec.targeting === 'SELF') {
@@ -827,7 +1362,7 @@ export class BotBrain {
     return { x: owner.position.x + FALLBACK_AIM_PX, y: owner.position.y };
   }
 
-  private cast(choice: SpellChoice, aim: Vec2, nowMs: number, target: Champion | null): void {
+  private cast(choice: SpellChoice, aim: Vec2, nowMs: number, target: AttackableUnit | null): void {
     const context = this.contextFor(choice.spell, aim);
     if (!context || !choice.spell.press(context)) return;
     this.lastCastAtMs = nowMs;
@@ -963,9 +1498,24 @@ export class BotBrain {
     return true;
   }
 
+  /**
+   * Whether this bot is currently getting out rather than getting stuck in.
+   *
+   * Read by `AIChampion.takeDamage`, which hits back at whoever hit it: a bot
+   * walking out of a turret's reach that answers every shot with a fresh attack
+   * order re-acquires the fight it is trying to leave, four times a second.
+   */
+  get isLeaving(): boolean {
+    return isLeavingPosture(this.posture);
+  }
+
   /** The quadtree scan, moved off `AIChampion` so perception has one home. */
   findAttackTarget(): Champion | null {
     const owner = this.owner;
+    // A bot on its way out of a turret's guns is not shopping for a fight. The
+    // posture layer clears the standing order, and without this the attack scan
+    // — which runs on its own 250ms clock — simply hands it back.
+    if (this.isLeaving) return null;
     // optional call for the same reason MissileSpellObject uses one: spell tests
     // hand in an object manager stub that only knows how to collect added objects
     const found =
@@ -988,6 +1538,11 @@ export class BotBrain {
     for (const candidate of found) {
       if (!(candidate instanceof Champion)) continue;
       if (!this.canPerceive(candidate)) continue;
+      // Acquisition, not retention: an order already out is dropped by the
+      // posture layer. Without this the bot orders an attack on a champion
+      // standing under its own turret and the attack controller — which has
+      // never heard of a building — walks it in.
+      if (this.guardedByTurret(view, candidate)) continue;
       const score = this.scoreTarget(candidate, view);
       if (score > bestScore) {
         bestScore = score;
@@ -1026,7 +1581,7 @@ export class BotBrain {
     if (lane === undefined) return null;
 
     const minion = this.nearestLaneMinion(lane);
-    if (minion) return minion;
+    if (minion && !this.guardedByTurret(view, minion)) return minion;
 
     const state = view.lanes.get(lane);
     const turret = state?.nextEnemyTurret;
@@ -1080,7 +1635,7 @@ export class BotBrain {
     for (const candidate of found) {
       if (!(candidate instanceof Minion)) continue;
       if (candidate.lane !== lane) continue;
-      if (!this.profile.seesThroughTerrain && !this.sees(owner, candidate)) continue;
+      if (!this.sees(owner, candidate)) continue;
       const away = Math.hypot(
         candidate.position.x - owner.position.x,
         candidate.position.y - owner.position.y

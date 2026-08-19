@@ -8,13 +8,12 @@ import Pet from '@/game/gameObject/attackableUnits/Pet';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Fear from '@/game/gameObject/buffs/Fear';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
-import { Rectangle } from '@/libs/quadtree';
 
 export const ARM_TIME_MS = 1000;
 export const LIFETIME_MS = 20000;
-export const FEAR_RANGE = 70;
+export const FEAR_RANGE = 80;
 export const FEAR_DURATION_MS = 1000;
-export const ATTACK_WINDOW_MS = 3000;
+export const ATTACK_WINDOW_MS = 4000;
 export const ATTACK_RANGE = 160;
 export const ATTACK_DAMAGE = 7;
 export const ATTACKS_PER_SECOND = 2;

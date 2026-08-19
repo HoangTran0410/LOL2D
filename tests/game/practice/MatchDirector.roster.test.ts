@@ -31,7 +31,12 @@ describe('MatchDirector roster', () => {
 
     const [player, bot] = director.roster();
     expect(player.behaviour).toBeUndefined();
-    expect(bot.behaviour).toEqual({ autoMove: true, autoAttack: true, autoCast: true });
+    expect(bot.behaviour).toEqual({
+      autoMove: true,
+      autoAttack: true,
+      autoCast: true,
+      difficulty: 'normal',
+    });
   });
 
   it('lists a new bot at once, before the paused match has ticked', () => {
@@ -210,7 +215,36 @@ describe('MatchDirector roster', () => {
     director.setBotBehaviour(bot, { autoMove: true });
 
     const entry = director.roster().find(e => e.unit === bot)!;
-    expect(entry.behaviour).toEqual({ autoMove: true, autoAttack: true, autoCast: true });
+    expect(entry.behaviour).toEqual({
+      autoMove: true,
+      autoAttack: true,
+      autoCast: true,
+      difficulty: 'normal',
+    });
+  });
+
+  /**
+   * The fourth field, and the one that is not a boolean on the unit: it is
+   * written through `AIChampion.setDifficulty`, the single writer for
+   * `_difficulty`, so this asserts the live field as well as the roster view.
+   */
+  it('setBotBehaviour retunes how well a bot plays', () => {
+    const { context: ctx, game } = context();
+    const director = new MatchDirector(ctx);
+    const bot = director.addBot(DEFAULT_CHAMPION_LOADOUT)!;
+    game.objectManager.update();
+
+    expect(bot._difficulty).toBe('normal');
+    director.setBotBehaviour(bot, { difficulty: 'hard' });
+
+    expect(bot._difficulty).toBe('hard');
+    const entry = director.roster().find(e => e.unit === bot)!;
+    expect(entry.behaviour).toEqual({
+      autoMove: true,
+      autoAttack: true,
+      autoCast: true,
+      difficulty: 'hard',
+    });
   });
 
   it('setBotBehaviour turns a flag off as readily as on', () => {
@@ -222,6 +256,11 @@ describe('MatchDirector roster', () => {
     director.setBotBehaviour(bot, { autoAttack: false, autoCast: false });
 
     const entry = director.roster().find(e => e.unit === bot)!;
-    expect(entry.behaviour).toEqual({ autoMove: true, autoAttack: false, autoCast: false });
+    expect(entry.behaviour).toEqual({
+      autoMove: true,
+      autoAttack: false,
+      autoCast: false,
+      difficulty: 'normal',
+    });
   });
 });

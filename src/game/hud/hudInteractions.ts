@@ -149,6 +149,17 @@ export interface HudInteractions {
    */
   openPlayerLoadout(index: number): void;
   closeSpellPicker(): void;
+  /**
+   * Hồi Thành, from the desktop HUD's button.
+   *
+   * Nothing but a forward to `Game.recall()`, which owns both halves of it —
+   * press to go home, press again to call the trip off. The `B` key, this
+   * button and the on-canvas touch button are three ways into one action, and
+   * a second copy of "is it already channelling?" in any of them is how they
+   * would come to disagree. It does **not** pause: unlike every other control
+   * on this object it is a move in the match, not a way into the panel.
+   */
+  recall(): void;
   mouseover(spellProxy: any, event: any): void;
   mouseout(spellProxy: any): void;
   showSpellInfo(spellProxy: any, element: any): void;
@@ -260,6 +271,11 @@ export function createHudInteractions(game: Game): HudInteractions {
       state.showSpellsPicker = false;
       state.editPlayerSlot = null;
       game.unpause();
+    },
+
+    /** See the interface: one line, on purpose. */
+    recall(): void {
+      game.recall();
     },
 
     mouseover(spellProxy: any, event: any): void {

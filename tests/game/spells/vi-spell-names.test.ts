@@ -25,8 +25,12 @@ const NAMES: { version: string; names: Record<string, string> } = JSON.parse(
   readFileSync(fileURLToPath(new URL('../../../docs/spell-names-vi.json', import.meta.url)), 'utf8')
 );
 
-/** Basic attack is ours; the example and the barrel file are not spells. */
-const NOT_FROM_RIOT = new Set(['BasicAttack', '_EmptyExample', 'index']);
+/**
+ * Basic attack and Recall are ours — this game's own abilities, not Riot ones,
+ * so Data Dragon ships no `vi_VN` string to check them against. The example and
+ * the barrel file are not spells at all.
+ */
+const NOT_FROM_RIOT = new Set(['BasicAttack', 'Recall', '_EmptyExample', 'index']);
 
 const NAME_LINE = /^(\s*name = (['"]))(.*?)(\s*\([^)]*\)\2;)\s*$/m;
 

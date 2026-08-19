@@ -27,6 +27,7 @@
 import {
   buttonAt,
   computeTouchLayout,
+  hitRecall,
   insideJoystickZone,
   type TouchButton,
   type TouchLayout,
@@ -68,6 +69,15 @@ export interface TouchSpellView {
   readonly affordable: boolean;
   readonly castable: boolean;
   readonly charging: boolean;
+  /**
+   * Mid-channel. Only the recall button draws anything from it today — no kit
+   * slot's button has a channel long enough to be worth a clock — but it is
+   * filled in for every view, because it is a fact about a spell's state and
+   * not a fact about which button is asking.
+   */
+  readonly channeling?: boolean;
+  /** 0..1 through that channel. Meaningless, and 0, while `channeling` is false. */
+  readonly channelProgress?: number;
 }
 
 /**
@@ -123,6 +133,16 @@ export interface TouchControlsHost {
   viewport(): TouchViewport;
   slotCount(): number;
   spellView(slot: number): TouchSpellView | null;
+  /** Hồi Thành, built through the same shape as a kit slot. Null if there is none. */
+  recallView(): TouchSpellView | null;
+  /**
+   * Start the trip home, or call off the one already running.
+   *
+   * Both halves are `Game.recall()`'s, not this file's: `B` and this button are
+   * two ways into one action, and a second copy of "is it already channelling?"
+   * here is how they would drift.
+   */
+  recall(): void;
   playerPosition(): Vec2;
   /** Unit vector the champion is pointed along. Never (0,0). */
   playerFacing(): Vec2;
@@ -201,6 +221,14 @@ export class TouchControls {
   private layout: TouchLayout;
   private readonly joystick = new VirtualJoystick();
   private readonly gestures = new Map<number, SlotGesture>();
+  /**
+   * The finger on the recall button, if any, and whether it is still on it.
+   *
+   * A press, not a gesture: it aims nothing, charges nothing and has no slot to
+   * hand `SpellInputController`. It fires on *release inside*, so a thumb that
+   * lands on it by accident can slide off and nothing happens.
+   */
+  private recallPress: { readonly pointerId: number; inside: boolean } | null = null;
   /** Set while the stick is driving, so `steer(null)` fires exactly once. */
   private steering = false;
   private viewportWidth = 0;
@@ -275,6 +303,8 @@ export class TouchControls {
       const gesture = this.gestures.get(point.id);
       if (gesture) {
         this.moveGesture(gesture, point.x, point.y);
+      } else if (this.recallPress?.pointerId === point.id) {
+        this.recallPress.inside = hitRecall(this.layout, point.x, point.y);
       } else if (this.joystick.pointerId === point.id) {
         this.joystick.moveTo(point.x, point.y);
       } else {
@@ -284,6 +314,12 @@ export class TouchControls {
 
     for (const [id, gesture] of [...this.gestures]) {
       if (!seen.has(id)) this.endGesture(gesture);
+    }
+
+    if (this.recallPress && !seen.has(this.recallPress.pointerId)) {
+      const onTarget = this.recallPress.inside;
+      this.recallPress = null;
+      if (onTarget) this.host.recall();
     }
     const stickId = this.joystick.pointerId;
     if (stickId !== null && !seen.has(stickId)) {
@@ -316,6 +352,10 @@ export class TouchControls {
 
   /** Drop every gesture without casting anything. */
   releaseEverything(): void {
+    // The recall press goes first and silently: leaving touch mode, or a resize
+    // that moves the button out from under the thumb holding it, must not send
+    // the champion home.
+    this.recallPress = null;
     for (const gesture of [...this.gestures.values()]) {
       this.gestures.delete(gesture.pointerId);
       this.host.setSlotAim(gesture.slot, null);
@@ -331,6 +371,15 @@ export class TouchControls {
   // ---------------------------------------------------------------- gestures
 
   private beginPointer(point: TouchPoint): void {
+    // Recall first, and it is the only claim tested before `buttonAt`: its
+    // circle is nowhere near the fan, so the order costs nothing and says
+    // plainly that a finger on it is never also a finger on a spell.
+    if (!this.recallPress && this.host.recallView() && hitRecall(this.layout, point.x, point.y)) {
+      this.recallPress = { pointerId: point.id, inside: true };
+      pulseTouchHaptic();
+      return;
+    }
+
     const button = buttonAt(this.layout, point.x, point.y);
     if (button) {
       // One thumb per slot. A second finger arriving on a button already held
@@ -436,6 +485,76 @@ export class TouchControls {
     this.drawAimTelegraph();
     this.drawJoystick();
     this.drawButtons();
+    this.drawRecallButton();
+  }
+
+  /**
+   * Hồi Thành, top-right.
+   *
+   * A house rather than a letter: the desktop button can label itself `B`
+   * because there is a key to press, and on the surface this one lives on
+   * there is not. The filling arc is the same clock `RecallPad` draws under the
+   * champion's feet, so the button and the ground never disagree about how far
+   * along the trip is, and it is the only lit thing on the button while the
+   * trip runs — which is also how the button says it is a cancel now.
+   */
+  private drawRecallButton(): void {
+    const view = this.host.recallView();
+    if (!view) return;
+
+    const button = this.layout.recall;
+    const diameter = button.radius * 2;
+    const held = this.recallPress?.inside === true;
+    const running = view.channeling === true;
+    const filled = Math.min(1, Math.max(0, view.channelProgress ?? 0));
+    const lit = view.castable ? 255 : 130;
+
+    push();
+    rectMode(CENTER);
+
+    noStroke();
+    fill(12, 16, 24, running ? 225 : 190);
+    circle(button.x, button.y, diameter);
+
+    // The house. Two shapes, drawn from the button's own radius so it scales
+    // with the viewport the same way the ability icons do.
+    const span = button.radius * 0.86;
+    const eaves = button.y - span * 0.06;
+    noFill();
+    stroke(235, 226, 205, held ? lit : lit * 0.85);
+    strokeWeight(Math.max(2, button.radius * 0.11));
+    triangle(
+      button.x - span * 0.5,
+      eaves,
+      button.x + span * 0.5,
+      eaves,
+      button.x,
+      button.y - span * 0.52
+    );
+    rect(button.x, eaves + span * 0.24, span * 0.62, span * 0.48);
+
+    // The channel's clock: an unlit rim and the arc that eats it, the same
+    // pair `RecallPad` paints on the ground. It is the only bright thing on
+    // the button while the trip runs — the outer ring goes *down* to a dim
+    // gold rather than up, because a bright full circle around a partial arc
+    // is what makes the partial arc unreadable.
+    if (running) {
+      noFill();
+      stroke(120, 95, 45, 170);
+      strokeWeight(5);
+      circle(button.x, button.y, diameter - 10);
+      stroke(255, 224, 158, 245);
+      strokeWeight(5);
+      arc(button.x, button.y, diameter - 10, diameter - 10, -HALF_PI, -HALF_PI + filled * TWO_PI);
+    }
+
+    noFill();
+    strokeWeight(running ? 2 : 3);
+    if (running) stroke(150, 118, 62, 170);
+    else if (held) stroke(120, 220, 255, 240);
+    else stroke(210, 210, 210, view.castable ? 150 : 80);
+    circle(button.x, button.y, diameter);
+    pop();
   }
 
   private drawAimTelegraph(): void {

@@ -235,11 +235,13 @@ export const PredefinedFilters = {
    * or terrain is not asking about vision, and every caller's own filters have
    * already narrowed the units to the ones it may hit.
    *
-   * `AIChampion` no longer routes its target scan through this filter at all:
-   * whether a bot can be broken line-of-sight with is a difficulty knob now
-   * (`seesThroughTerrain` in `src/game/ai/Difficulty.ts` — off for `easy`, on
-   * for `normal` and `hard`), and `BotBrain.canPerceive` applies it directly so
-   * the three tiers can differ. Every other caller here is unchanged.
+   * `AIChampion` does not route its target scan through this filter, and asks
+   * the same question one step later instead: `BotBrain.canPerceive` calls
+   * `canSee` itself, because the blackboard path (`pickTarget` walking
+   * `view.enemies`) has no quadtree query to hang a filter on and both paths
+   * have to answer alike. It is the same rule at every tier — there was once a
+   * `seesThroughTerrain` knob that switched it off for `normal` and `hard`, and
+   * it is gone. Every other caller here is unchanged.
    */
   visibleTo:
     (observer: VisionObserver): GameObjectFilter =>

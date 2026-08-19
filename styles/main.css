@@ -35,6 +35,23 @@
     /* body text, and what gold turns into on hover */
     --hextech-text: #f0e6d2;
     --hextech-muted: #a09b8c;
+
+    /* ------------------------------------------------- Safe area
+
+       The four insets a phone reserves for hardware and browser furniture — a
+       notch, a home indicator, rounded corners — as tokens, so a control that
+       is pinned to an edge can add one without every file restating the
+       `env(..., 0px)` fallback. Zero everywhere else, including desktop, so
+       adding them costs nothing where they do not apply.
+
+       They only report a real number because index.html asks for
+       `viewport-fit=cover`; they are *not* the answer to a retracting browser
+       toolbar, which is what `dvh` is for. Both are needed and neither
+       substitutes for the other. */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
 }
 
 body {
@@ -47,6 +64,19 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Every scene is one full-viewport box, centred here so only the active one is
+   `display: block`.
+
+   The `transform` is not only centring: a transformed element is the containing
+   block for `position: fixed` descendants, so each scene root is what its own
+   pinned chrome — the menu's About and fullscreen buttons, its version stamp —
+   is positioned against, not the viewport. A root taller than the screen
+   therefore does not merely overflow; it carries those buttons off both edges
+   with it, which is exactly what a mobile browser's `100vh` does. Hence
+   `height: 100vh; height: 100dvh;` on every root: `dvh` is the height actually
+   on screen with the toolbars showing, and `vh` stays first as the fallback for
+   a browser that cannot parse it. Safe-area insets are a separate question
+   (--safe-* above) and neither substitutes for the other. */
 .center-page-container>div {
     position: absolute;
     top: 50%;

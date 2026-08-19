@@ -77,8 +77,8 @@ describe('lane geometry', () => {
   });
 
   it('measures how far off the lane a point is', () => {
-    // (3503, 595) is a TOP waypoint, so a point on it is on the lane.
-    expect(nearestLane(3_503, 595).distance).toBeCloseTo(0, 6);
+    // (3608, 456) is a TOP waypoint, so a point on it is on the lane.
+    expect(nearestLane(3_608, 456).distance).toBeCloseTo(0, 6);
   });
 
   it('breaks a tie in LANES order, so assignment never depends on a hash', () => {

@@ -42,6 +42,13 @@ export interface TouchLayout {
   readonly joystickHome: TouchCircle;
   readonly knobRadius: number;
   readonly buttons: readonly TouchButton[];
+  /**
+   * Hồi Thành, top-right and deliberately far from everything else. Its own
+   * field rather than an eighth entry in `buttons`: that array is indexed by
+   * kit slot and drives `SpellInputController`, which has never heard of a
+   * spell outside `spells[]`. See `RECALL_SLOT`.
+   */
+  readonly recall: TouchButton;
   /** Screen pixels of drag that map to a spell's full range. */
   readonly dragToRange: number;
   /** Below this much movement a gesture is a tap, not an aim. */
@@ -95,6 +102,24 @@ const SUMMONER_ARC = [184, 266];
  * visible gap between two circles a thumb is 45 pixels wide.
  */
 const BUTTON_GAP_SCALE = 0.42;
+
+/**
+ * The recall button's slot number.
+ *
+ * Negative because it is not a slot: `Recall` lives on `Champion.recall` and
+ * never enters `spells[]` (see the class comment there), so there is no index
+ * to press and nothing downstream may treat this as one. It exists only so a
+ * `TouchButton` can carry an identity at all.
+ */
+export const RECALL_SLOT = -1;
+
+/**
+ * Room kept clear at the top-right for `InGameHUD.vue`'s practice-panel
+ * button: a DOM control at `top: 6px; right: 6px`, 46px square under
+ * `body.touch-ui`. It is drawn by the browser over the canvas, so nothing here
+ * can see it — this number is how the two stay out of each other's way.
+ */
+const CORNER_BUTTON_BOX = 52;
 
 export function computeTouchLayout(viewport: TouchViewport, slotCount: number): TouchLayout {
   const unit = Math.min(viewport.width, viewport.height);
@@ -152,6 +177,29 @@ export function computeTouchLayout(viewport: TouchViewport, slotCount: number): 
     push(i + 5, point.x, point.y, summonerRadius, false);
   }
 
+  /**
+   * Hồi Thành sits on the top edge, one gap left of the practice-panel corner
+   * button — the only part of the screen no thumb visits during a fight. The
+   * stick's band stops well short of it, the ability fan reaches nowhere near
+   * it, and the expanded minimap (which `Game.syncTouches` gives first refusal
+   * on every new finger) is centred, so it never covers this corner either.
+   *
+   * Reaching it means moving a hand off the controls, which is the point: a
+   * recall pressed in the middle of a teamfight is a death.
+   */
+  const recallRadius = clamp(unit * 0.062, 22, 30);
+  const recall: TouchButton = {
+    slot: RECALL_SLOT,
+    x: clamp(
+      viewport.width - CORNER_BUTTON_BOX - margin - recallRadius,
+      recallRadius + 2,
+      viewport.width - recallRadius - 2
+    ),
+    y: clamp(margin + recallRadius, recallRadius + 2, viewport.height - recallRadius - 2),
+    radius: recallRadius,
+    primary: false,
+  };
+
   return {
     // The stick floats: it re-centres wherever the left thumb lands inside this
     // band, which is what makes it usable without looking. The band stops short
@@ -170,6 +218,7 @@ export function computeTouchLayout(viewport: TouchViewport, slotCount: number): 
     },
     knobRadius: joystickRadius * 0.44,
     buttons,
+    recall,
     // Full range at 70% of the joystick's reach: a right thumb has less room
     // than a left one, because it starts in a corner.
     dragToRange: joystickRadius * 0.7,
@@ -192,6 +241,19 @@ export function buttonAt(layout: TouchLayout, x: number, y: number): TouchButton
     best = button;
   }
   return best;
+}
+
+/**
+ * Is a finger on the recall button?
+ *
+ * Exactly the drawn circle, with none of the 1.15-radius slack `buttonAt`
+ * gives every other button. Forgiveness is right for an ability — the cost of
+ * a mis-hit is the wrong spell — and wrong here, where the cost is walking out
+ * of a fight.
+ */
+export function hitRecall(layout: TouchLayout, x: number, y: number): boolean {
+  const button = layout.recall;
+  return Math.hypot(x - button.x, y - button.y) <= button.radius;
 }
 
 export function insideJoystickZone(layout: TouchLayout, x: number, y: number): boolean {

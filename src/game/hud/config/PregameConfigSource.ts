@@ -21,6 +21,7 @@ import {
   AI_COUNT_MIN,
   DEFAULT_CHAMPION_LOADOUT,
   DEFAULT_PREGAME_CONFIG,
+  globalBotBehaviour,
   loadPregameConfig,
   sanitizePregameConfig,
   savePregameConfig,
@@ -171,14 +172,14 @@ export default class PregameConfigSource implements MatchConfigSource {
    * The freed tail slot is refilled — the arrays are always `AI_COUNT_MAX` long
    * (see `AIConfig.bots`). Its behaviour comes from the config's own global
    * flags rather than `DEFAULT_BOT_BEHAVIOUR`, since those are what a slot
-   * nobody has configured means here.
+   * nobody has configured means here; `globalBotBehaviour` is that rule, and it
+   * is also where the tier — which has no global — gets its default.
    */
   removeBot(id: string): void {
     const index = this.slotOf(id);
     if (index === null) return;
 
     const { ai, cheats } = this.config;
-    const { autoMove, autoAttack, autoCast } = ai;
 
     const bots = ai.bots.slice();
     bots.splice(index, 1);
@@ -190,7 +191,7 @@ export default class PregameConfigSource implements MatchConfigSource {
 
     const botBehaviours = ai.botBehaviours.slice();
     botBehaviours.splice(index, 1);
-    botBehaviours.push({ autoMove, autoAttack, autoCast });
+    botBehaviours.push(globalBotBehaviour(ai));
 
     const botInvulnerable = cheats.botInvulnerable.slice();
     botInvulnerable.splice(index, 1);

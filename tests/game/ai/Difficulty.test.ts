@@ -35,6 +35,31 @@ describe('difficulty profiles', () => {
       // up as odd bot behaviour rather than as a failing test.
       expect(higher.manaReservePct).toBeGreaterThan(lower.manaReservePct);
       expect(higher.playerBias).toBeGreaterThan(lower.playerBias);
+      // ...and spends more freely on the wave, which is the other direction:
+      // clearing a wave with abilities is a mechanic a better player has and a
+      // worse one does not, so this goes DOWN as the tier goes up.
+      expect(higher.waveClearManaPct).toBeLessThan(lower.waveClearManaPct);
+    }
+  });
+
+  it('never lets farming eat into the reserve the ultimate is held back with', () => {
+    // `withinManaBudget` refuses anything that would spend into the reserve
+    // while the ultimate is up, so a wave-clear floor below it is a tier whose
+    // bots try to farm with abilities on every think tick and are refused every
+    // time — busy work, and invisible except as a bot that never casts.
+    for (const tier of BOT_DIFFICULTIES) {
+      const profile = profileFor(tier);
+      expect(profile.waveClearManaPct).toBeGreaterThanOrEqual(profile.manaReservePct);
+    }
+  });
+
+  it('keeps every fraction a fraction', () => {
+    for (const tier of BOT_DIFFICULTIES) {
+      const profile = profileFor(tier);
+      for (const knob of ['waveClearManaPct', 'manaReservePct', 'retreatHealthPct'] as const) {
+        expect(profile[knob]).toBeGreaterThanOrEqual(0);
+        expect(profile[knob]).toBeLessThanOrEqual(1);
+      }
     }
   });
 
@@ -42,10 +67,28 @@ describe('difficulty profiles', () => {
     expect(profileFor('normal').aggroRange).toBe(420);
   });
 
-  it('only lets easy bots be broken line-of-sight with', () => {
-    expect(profileFor('easy').seesThroughTerrain).toBe(false);
-    expect(profileFor('normal').seesThroughTerrain).toBe(true);
-    expect(profileFor('hard').seesThroughTerrain).toBe(true);
+  it('carries no way for a tier to see through terrain', () => {
+    // The column that used to sit here was on for `normal` and `hard`, i.e. for
+    // every bot in every default match, and it is what a player hits as "a bot
+    // autoattacked me through a wall while neither of us had vision".
+    //
+    // It is gone rather than set to false everywhere: a knob that must never be
+    // turned on is a trap for whoever reads the table next, and seeing through
+    // terrain is not playing better — `Vision.ts` states the promise the rest
+    // of the game keeps, that what is dark cannot be hit and what is lit can.
+    // `BotBrain.canPerceive` now asks `sees()` at every tier, and
+    // `BotBrain.perception.test.ts` is where that is checked.
+    for (const tier of BOT_DIFFICULTIES) {
+      expect(profileFor(tier)).not.toHaveProperty('seesThroughTerrain');
+    }
+  });
+
+  it('still separates the tiers by how long they hunt what they lost', () => {
+    // The replacement for the X-ray above: the same "I know roughly where you
+    // went" advantage, bounded in time instead of unbounded through walls.
+    const [easy, normal, hard] = BOT_DIFFICULTIES.map(profileFor);
+    expect(normal.memoryTtlMs).toBeGreaterThan(easy.memoryTtlMs);
+    expect(hard.memoryTtlMs).toBeGreaterThan(normal.memoryTtlMs);
   });
 
   it('never lets an easy bot throw a spell at a position it can no longer see', () => {

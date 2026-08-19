@@ -45,8 +45,30 @@ const TURRET_BLOCKED_RADIUS = 46 + 17;
  */
 const MIN_TURRET_CLEARANCE = TURRET_BLOCKED_RADIUS + 5;
 
-/** A lane "covers" the turret it is meant to walk past within this radius — the offsets in lanes.ts are 80-108px. */
-const LANE_COVERS_TURRET = 150;
+/**
+ * The same question asked of the *walk* rather than of the waypoints, which is
+ * the one that decides whether a wave gets down its lane.
+ *
+ * A minion goes to its next waypoint with `moveTo` — a straight line, no
+ * routing — so clearing the turrets at the waypoints and nowhere else buys
+ * nothing. The old paths cleared every waypoint by 80px and then ran their
+ * segments through turret centres at 4, 5, 8, 14, 19 and 22px: the wave drove
+ * into the building, `UnitCollisionSystem` shoved it around, and it re-aimed
+ * at the same line on the far side. That is the "minions hug the turret and
+ * walk around it" report, and it was invisible to a waypoint-only check.
+ *
+ * 100 rather than the blocked radius: this is a *lane*, not a squeeze, and a
+ * wave is six bodies pushing each other sideways. The real paths hold 118.
+ */
+const MIN_SEGMENT_TURRET_CLEARANCE = 100;
+
+/**
+ * A lane "covers" the turret it is meant to walk past within this radius,
+ * measured to the path rather than to the nearest waypoint — there is no
+ * longer one waypoint per turret, because a straight run that passes three of
+ * them needs no bend. The paths measure 118-256px.
+ */
+const LANE_COVERS_TURRET = 280;
 
 // ---------------------------------------------------------------- geometry
 
@@ -139,21 +161,64 @@ const segmentClearance = (
   return { clearance: worst, at };
 };
 
-/** The waypoint a lane walks past `point` at — index and distance. Lane waypoints sit *beside* their turret, never on it. */
-const nearestWaypoint = (
+/**
+ * How close a lane comes to `point`, and how far along it that happens.
+ *
+ * Measured to the polyline, not to the nearest vertex. The vertex answer used
+ * to be the same thing only because the paths carried one waypoint per turret;
+ * a straight run past three turrets has none of its own, and asking the
+ * vertices then says a lane misses its own first turret by 410px while the
+ * minion walking it passes at 196.
+ */
+const nearestOnPath = (
   path: LaneWaypoint[],
   [x, y]: Point
-): { index: number; distance: number } => {
-  let index = -1;
+): { distance: number; along: number } => {
   let distance = Infinity;
-  path.forEach((p, i) => {
-    const d = Math.hypot(p.x - x, p.y - y);
+  let along = 0;
+  let travelled = 0;
+  for (let i = 0; i + 1 < path.length; i++) {
+    const from = path[i];
+    const to = path[i + 1];
+    const spanX = to.x - from.x;
+    const spanY = to.y - from.y;
+    const spanSq = spanX * spanX + spanY * spanY;
+    const length = Math.sqrt(spanSq);
+    let t = 0;
+    if (spanSq > 0) {
+      t = ((x - from.x) * spanX + (y - from.y) * spanY) / spanSq;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+    }
+    const d = Math.hypot(x - (from.x + spanX * t), y - (from.y + spanY * t));
     if (d < distance) {
       distance = d;
-      index = i;
+      along = travelled + length * t;
     }
-  });
-  return { index, distance };
+    travelled += length;
+  }
+  return { distance, along };
+};
+
+/** The worst turret clearance anywhere on the straight line a minion walks. */
+const segmentTurretClearance = (
+  a: LaneWaypoint,
+  b: LaneWaypoint
+): { clearance: number; at: LaneWaypoint } => {
+  const length = Math.hypot(b.x - a.x, b.y - a.y);
+  const steps = Math.max(2, Math.ceil(length / 10));
+  let worst = Infinity;
+  let at = a;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const x = a.x + (b.x - a.x) * t;
+    const y = a.y + (b.y - a.y) * t;
+    const clearance = turretClearance(x, y);
+    if (clearance < worst) {
+      worst = clearance;
+      at = { x: Math.round(x), y: Math.round(y) };
+    }
+  }
+  return { clearance: worst, at };
 };
 
 /**
@@ -205,19 +270,30 @@ const laneTurrets = (lane: string): Point[] => [
  * Which lane walks closest to `point`, and by how much it wins.
  *
  * Ownership is "the nearest lane", not "within N px of a lane": the paths
- * round corners near each other, and MID's corner out of the blue base passes
- * 123px from BOT's first turret. A fixed radius wide enough to cover a
- * turret's own lane (the offsets are 80-108px) is therefore also wide enough
- * to let a neighbour claim it, and picking a threshold between 108 and 123
- * would be a test tuned to two decimal places of the current geometry.
+ * round corners near each other, and a fixed radius wide enough to cover a
+ * turret's own lane is also wide enough to let a neighbour claim it.
  */
 const owningLane = (point: Point): { lane: string; distance: number; runnerUp: number } => {
   const ranked = LANES.map(lane => ({
     lane,
-    distance: nearestWaypoint(LANE_WAYPOINTS[lane], point).distance,
+    distance: nearestOnPath(LANE_WAYPOINTS[lane], point).distance,
   })).sort((a, b) => a.distance - b.distance);
   return { lane: ranked[0].lane, distance: ranked[0].distance, runnerUp: ranked[1].distance };
 };
+
+/**
+ * All three lanes leave through the same gap between the base turrets, so
+ * within about 800px of a fountain "which lane is this" has no answer — MID's
+ * exit from the blue base runs 127px from BOT's first turret, which is nearer
+ * than BOT's own path gets to it. True of the old paths as much as these; the
+ * old check only missed it because it measured to the nearest waypoint.
+ * Ownership is asserted outside that shared ground, and stated here rather
+ * than absorbed into a threshold.
+ */
+const SHARED_BASE_EXIT = 900;
+const nearAFountain = ([x, y]: Point): boolean =>
+  Math.hypot(x - BLUE_FOUNTAIN.x, y - BLUE_FOUNTAIN.y) < SHARED_BASE_EXIT ||
+  Math.hypot(x - RED_FOUNTAIN.x, y - RED_FOUNTAIN.y) < SHARED_BASE_EXIT;
 
 /** Distance from a point to the nearest turret of either row. */
 const turretClearance = (x: number, y: number): number =>
@@ -271,30 +347,51 @@ describe('lane waypoints', () => {
     }
   });
 
+  /**
+   * The bug the whole re-derivation was for, and the one the waypoint check
+   * above structurally cannot see: a minion walks the *segment*, in a straight
+   * line with no routing, so a path whose vertices all clear a turret and whose
+   * runs between them go through one still drives every wave into a building.
+   * The old paths measured 4px at the worst of it.
+   */
+  it('keeps the whole walk out of the turrets, not just the waypoints', () => {
+    for (const lane of LANES) {
+      const path = LANE_WAYPOINTS[lane];
+      for (let i = 0; i + 1 < path.length; i++) {
+        const { clearance, at } = segmentTurretClearance(path[i], path[i + 1]);
+        expect(
+          clearance,
+          `${lane} segment ${i} (${path[i].x},${path[i].y}) -> (${path[i + 1].x},${path[i + 1].y}) ` +
+            `passes ${Math.round(clearance)}px from a turret centre at (${at.x},${at.y}) — ` +
+            `a minion body is blocked at ${TURRET_BLOCKED_RADIUS}px`
+        ).toBeGreaterThanOrEqual(MIN_SEGMENT_TURRET_CLEARANCE);
+      }
+    }
+  });
+
   it('walks past its own turret row, in order, so a lane is defended along its length', () => {
     for (const lane of LANES) {
       const path = LANE_WAYPOINTS[lane];
-      const indexOf = (p: Point) => nearestWaypoint(path, p).index;
+      const alongAt = (p: Point) => nearestOnPath(path, p).along;
 
       for (const point of laneTurrets(lane)) {
         expect(turret1.concat(turret2)).toContainEqual(point);
-        const { distance } = nearestWaypoint(path, point);
+        const { distance } = nearestOnPath(path, point);
         expect(
           distance,
           `${lane} passes turret ${point} at ${Math.round(distance)}px`
         ).toBeLessThanOrEqual(LANE_COVERS_TURRET);
       }
-      // one waypoint per turret, so "the nearest" is unambiguous and no turret
-      // shares its waypoint with the next one along the lane
-      const allIndexes = laneTurrets(lane).map(indexOf);
-      expect(new Set(allIndexes).size).toBe(allIndexes.length);
 
+      // Ordered by how far along the lane each turret is passed, rather than by
+      // waypoint index — a straight run past three turrets has no vertex of its
+      // own, so an index cannot separate them and a distance travelled can.
+      const blueAlong = BLUE_LANE_TURRETS[lane].map(alongAt);
+      const redAlong = RED_LANE_TURRETS[lane].map(alongAt);
+      expect(blueAlong).toEqual([...blueAlong].sort((a, b) => a - b));
+      expect(redAlong).toEqual([...redAlong].sort((a, b) => a - b));
       // blue's row first, red's after: a lane is one route from one base to the other
-      const blueIndexes = BLUE_LANE_TURRETS[lane].map(indexOf);
-      const redIndexes = RED_LANE_TURRETS[lane].map(indexOf);
-      expect(blueIndexes).toEqual([...blueIndexes].sort((a, b) => a - b));
-      expect(redIndexes).toEqual([...redIndexes].sort((a, b) => a - b));
-      expect(Math.max(...blueIndexes)).toBeLessThan(Math.min(...redIndexes));
+      expect(Math.max(...blueAlong)).toBeLessThan(Math.min(...redAlong));
     }
   });
 
@@ -313,14 +410,17 @@ describe('lane waypoints', () => {
       const onBase = baseTurrets.some(([x, y]) => x === point[0] && y === point[1]);
       const { lane, distance } = owningLane(point);
 
-      if (onBase) {
-        // a base turret guards its fountain's open ground, off every route out
-        expect(
-          distance,
-          `base turret ${point} is only ${Math.round(distance)}px from ${lane}`
-        ).toBeGreaterThan(LANE_COVERS_TURRET);
+      // Every base turret, and BOT's first, stands in the gap all three lanes
+      // leave through. Nothing there belongs to one lane; the listing below is
+      // still checked, only the "nearest lane owns it" part is skipped.
+      if (nearAFountain(point)) {
+        const expectedLane = LANES.find(l =>
+          laneTurrets(l).some(([x, y]) => x === point[0] && y === point[1])
+        );
+        expect(onBase || expectedLane !== undefined).toBe(true);
         continue;
       }
+      expect(onBase, `base turret ${point} sits outside the shared base exit`).toBe(false);
 
       const expected = LANES.find(l =>
         laneTurrets(l).some(([x, y]) => x === point[0] && y === point[1])
@@ -349,5 +449,54 @@ describe('lane waypoints', () => {
 
   it('falls back to mid for a lane it does not know', () => {
     expect(getLaneWaypoints('jungle', TeamId.BLUE)).toBe(LANE_WAYPOINTS[Lane.MID]);
+  });
+});
+
+describe('the muster point a wave forms up on', () => {
+  /**
+   * `MinionSpawner.musterPointFor` puts a wave between the two turrets nearest
+   * its own fountain. Those coordinates come out of this same map file, so the
+   * pair is recomputed here from `turret1`/`turret2` rather than pasted — but
+   * the *rule* is stated independently, so a spawner that started picking a
+   * different pair would fail this rather than agree with itself.
+   */
+  const musterFor = (row: Point[], fountain: { x: number; y: number }) => {
+    const byDistance = [...row].sort(
+      (a, b) =>
+        Math.hypot(a[0] - fountain.x, a[1] - fountain.y) -
+        Math.hypot(b[0] - fountain.x, b[1] - fountain.y)
+    );
+    const [first, second] = byDistance;
+    return { x: (first[0] + second[0]) / 2, y: (first[1] + second[1]) / 2 };
+  };
+
+  const MUSTERS = [
+    { side: 'blue', at: musterFor(turret1, BLUE_FOUNTAIN) },
+    { side: 'red', at: musterFor(turret2, RED_FOUNTAIN) },
+  ];
+
+  it.each(MUSTERS)('$side stands on open ground', ({ at }) => {
+    expect(wallClearance(at.x, at.y)).toBeGreaterThan(MIN_CLEARANCE);
+  });
+
+  it.each(MUSTERS)('$side clears both turrets it forms up between', ({ at }) => {
+    // A body inside a turret is shoved out by `UnitCollisionSystem` the moment
+    // it appears, which reads as a wave exploding outward on spawn.
+    for (const row of [turret1, turret2]) {
+      for (const [tx, ty] of row) {
+        const away = Math.hypot(at.x - tx, at.y - ty);
+        expect(away).toBeGreaterThan(TURRET_BLOCKED_RADIUS);
+      }
+    }
+  });
+
+  it.each(MUSTERS)('$side keeps its whole scatter ring off the walls', ({ at }) => {
+    // `MUSTER_SCATTER_PX` is 55, and a minion can land anywhere inside it.
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const x = at.x + Math.cos(angle) * 55;
+      const y = at.y + Math.sin(angle) * 55;
+      expect(wallClearance(x, y)).toBeGreaterThan(MIN_CLEARANCE);
+    }
   });
 });

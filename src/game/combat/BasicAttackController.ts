@@ -34,6 +34,23 @@ export default class BasicAttackController {
   cooldownMs = 0;
   /** Why the last order ended. Reset when a new one is issued. */
   lastEnd: AttackOrderEnd | null = null;
+  /**
+   * ms during which the owner's own move order outranks this controller's
+   * "stand still and wait for the swing".
+   *
+   * Kiting needs it and nothing else does. Once a target is inside reach this
+   * controller calls `stopMovement()` every frame, which is right for a unit
+   * that has nothing better to do — and which deleted a step back before the
+   * champion had taken it, so a ranged bot stood in the gaps between its own
+   * swings. `BotBrain.kiteStep` opens a window here and the window closes on
+   * its own; committing to a swing closes it early, so a kiting bot fires on
+   * the beat rather than running away from the fight.
+   *
+   * A plain countdown rather than a flag, because the writer thinks four times
+   * a second and this is read sixty: a flag would have to be cleared by
+   * somebody, and the somebody would be a frame that never came.
+   */
+  repositionMs = 0;
 
   constructor(owner: AttackableUnit) {
     this.owner = owner;
@@ -89,6 +106,7 @@ export default class BasicAttackController {
 
   update(): void {
     if (this.cooldownMs > 0) this.cooldownMs -= deltaTime;
+    if (this.repositionMs > 0) this.repositionMs -= deltaTime;
 
     if (this.owner.isDead) {
       this.target = null;
@@ -133,10 +151,16 @@ export default class BasicAttackController {
       return;
     }
 
-    this.owner.stopMovement();
+    // In reach. Plant, unless somebody has claimed the next few hundred ms to
+    // reposition with — see `repositionMs`.
+    if (this.repositionMs <= 0) this.owner.stopMovement();
     if (this.cooldownMs > 0) return;
     if (!this.owner.canAttack) return;
 
+    // The swing wins over the step: a kiting unit plants for the frame it fires
+    // on, whatever window was still open.
+    this.repositionMs = 0;
+    this.owner.stopMovement();
     this.cooldownMs = this.intervalMs;
     this.launch(target, reach);
   }

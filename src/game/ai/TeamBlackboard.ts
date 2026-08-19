@@ -24,12 +24,12 @@ import type { Vec2 } from '@/game/spell/runtime/types';
  * clustered, and a memory of where each enemy was last seen. This is what
  * turns bots from five independent agents into two teams.
  *
- * The memory records *terrain-honest* shared team sight, always — it is never
- * widened by a bot's `seesThroughTerrain`. A later difficulty tier gets to see
- * through walls at its own acquisition step (Task 6), but that privilege must
- * not leak into this object: three tiers read the same board, so it cannot
- * carry one tier's advantage. `sees` is injectable only so tests can be
- * deterministic; in the game it is always the honest `canSee`.
+ * The memory records *terrain-honest* shared team sight, always. Three tiers
+ * read the same board, so it must never carry one tier's advantage — and the
+ * advantage a tier does get is `memoryTtlMs`, applied by the *reader*: how long
+ * a bot keeps hunting what it lost, not whether it ever loses it. `sees` is
+ * injectable only so tests can be deterministic; in the game it is always the
+ * honest `canSee`.
  */
 
 /**
@@ -64,6 +64,16 @@ export interface TeamView {
   lanes: ReadonlyMap<string, LaneState>;
   /** Which lane each of this team's bots is working. Humans are not in it. */
   laneAssignments: ReadonlyMap<Champion, string>;
+  /**
+   * Every living hostile turret, for `TurretThreat`.
+   *
+   * Deliberately not the same answer as `LaneState.nextEnemyTurret`, which is
+   * the lane *economy* — the next building this team has to break, bucketed by
+   * lane and therefore missing any turret standing further than
+   * `LANE_MEMBERSHIP_PX` from a waypoint path. A turret nowhere near a lane
+   * still shoots, and "may I stand here" has to be asked of all of them.
+   */
+  enemyTurrets: readonly Turret[];
 }
 
 export type SeesFn = (observer: Champion, target: Champion) => boolean;
@@ -80,6 +90,7 @@ export const EMPTY_VIEW: TeamView = Object.freeze({
   memory: new Map<Champion, SeenEnemy>(),
   lanes: new Map<string, LaneState>(),
   laneAssignments: new Map<Champion, string>(),
+  enemyTurrets: Object.freeze([]) as readonly Turret[],
 });
 
 const defaultSees: SeesFn = (observer, target) =>
@@ -121,6 +132,8 @@ export class TeamBlackboard {
     // `AttackableUnit` test comes first and the three subtype tests only run on
     // what survives it.
     const living: Champion[] = [];
+    /** Every standing turret, whatever lane it does or does not belong to. */
+    const turrets: Turret[] = [];
     const laneMinions = new Map<string, LaneUnit<Minion>[]>();
     const laneTurrets = new Map<string, LaneUnit<Turret>[]>();
     for (const lane of LANES) {
@@ -144,6 +157,9 @@ export class TeamBlackboard {
       }
 
       if (object instanceof Turret) {
+        // Threat first, lane second: the buckets below drop a building that
+        // stands off every waypoint path, and one of those still shoots.
+        turrets.push(object);
         // A turret never moves, so its lane and its place along that lane are
         // measured once for the match rather than four times a second.
         const placed = turretPlacement(object);
@@ -184,10 +200,15 @@ export class TeamBlackboard {
         if (champion.teamId === teamId) allies.push(champion);
         else enemies.push(champion);
       }
+      const enemyTurrets: Turret[] = [];
+      for (const turret of turrets) {
+        if (turret.teamId !== teamId) enemyTurrets.push(turret);
+      }
       const lanes = this.buildLanes(teamId, enemies, laneOfChampion, laneMinions, laneTurrets);
       this.views.set(teamId, {
         allies,
         enemies,
+        enemyTurrets,
         focusTarget: pickFocus(allies, enemies),
         rally: centroid(allies),
         memory: this.refreshMemory(teamId, allies, enemies, nowMs, sees),

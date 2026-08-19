@@ -171,6 +171,7 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
         autoMove: expect.any(Boolean),
         autoAttack: expect.any(Boolean),
         autoCast: expect.any(Boolean),
+        difficulty: expect.any(String),
       });
     });
 
@@ -239,6 +240,37 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
       expect(behaviour.autoMove).toBe(true);
       expect(loadPregameConfig().ai.botBehaviours[0].autoCast).toBe(false);
       expect(loadPregameConfig().ai.botBehaviours[0].autoMove).toBe(true);
+    });
+
+    /**
+     * The tier travels inside `BotBehaviour` rather than beside it, which is
+     * what makes it one control on the same row and one setter for all four
+     * fields. A row that carried the flags but not the tier would be the exact
+     * shape of divergence this suite exists to catch.
+     */
+    it('carries the bot’s difficulty on the row, normal until it is set', () => {
+      expect(source.roster()[1].behaviour!.difficulty).toBe('normal');
+    });
+
+    it('sets the difficulty without disturbing the flags, and persists it', () => {
+      const id = source.roster()[1].id;
+      source.setBotBehaviour(id, { difficulty: 'hard' });
+
+      const behaviour = source.roster()[1].behaviour!;
+      expect(behaviour.difficulty).toBe('hard');
+      expect(behaviour.autoMove).toBe(true);
+      expect(behaviour.autoAttack).toBe(true);
+      expect(behaviour.autoCast).toBe(true);
+      expect(loadPregameConfig().ai.botBehaviours[0].difficulty).toBe('hard');
+    });
+
+    it('leaves the difficulty alone when only a flag is sent', () => {
+      const id = source.roster()[1].id;
+      source.setBotBehaviour(id, { difficulty: 'easy' });
+      source.setBotBehaviour(id, { autoMove: false });
+
+      expect(source.roster()[1].behaviour!.difficulty).toBe('easy');
+      expect(loadPregameConfig().ai.botBehaviours[0].difficulty).toBe('easy');
     });
 
     it('ignores a behaviour set on the player', () => {

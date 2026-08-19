@@ -284,9 +284,19 @@ export default defineConfig({
            * `game` beside the code that needs it, and the dynamic import in
            * `spellModules.ts` simply resolves there.
            */
-          const spell = id.includes('spells/BasicAttack.ts')
-            ? null
-            : /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
+          /**
+           * `Recall` is the second exception, for the identical reason.
+           * `Champion.ts` holds one (`champion.recall`) as a field, so the
+           * `game` chunk imports it statically — and it imports `Spell`,
+           * `SpellObject` and `SpellRole` straight back out of `game`. Left in
+           * a `spell-` chunk that is the same inter-chunk cycle `BasicAttack`
+           * documents above, and `scripts/check-chunks.mjs` fails the build on
+           * the static edge before anyone gets to see the crash.
+           */
+          const spell =
+            id.includes('spells/BasicAttack.ts') || id.includes('spells/Recall.ts')
+              ? null
+              : /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
           if (spell) {
             // Summoner spells and the basic attack have no champion prefix to
             // group by, and every kit can hold them — one shared chunk rather

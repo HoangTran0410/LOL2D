@@ -1,5 +1,7 @@
 import { withinRadius } from '@/utils/math.utils';
+import { Circle } from '@/libs/quadtree';
 import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitRenderOptions } from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
@@ -44,6 +46,16 @@ export interface MonsterPresetData {
   attackInterval?: number;
   /** Champions this close wake the camp up. Defaults to attackRange + 120. */
   aggroRange?: number;
+  /**
+   * Which pack this monster belongs to. Every camp-mate shares the string, and
+   * hitting any one of them pulls the rest in — see `alertCamp`.
+   *
+   * **Omit it only for a camp that is genuinely one body** (Baron, a buff, a
+   * gromp). A camp of one with no id skips the alert entirely, which is the
+   * whole reason the field is optional; adding a second monster to such a camp
+   * means giving both an id, or the new one fights alone.
+   */
+  campId?: string;
   /** Tried in order, one per frame. A camp that declares none just swings. */
   abilities?: MonsterAbility[];
 }
@@ -105,6 +117,8 @@ export default class Monster extends AttackableUnit {
   aggroRange: number;
   reviveTime = 0;
   targetLock: AttackableUnit | null = null;
+  /** Shared with every camp-mate; `null` for a camp of one. See `alertCamp`. */
+  campId: string | null;
 
   /** What this camp can do besides swing, in the order it prefers to do it. */
   abilities: MonsterAbility[];
@@ -148,6 +162,7 @@ export default class Monster extends AttackableUnit {
     this.attackInterval = preset.attackInterval ?? 1500;
     this.damage = preset.damage ?? Math.min(25, Math.max(3, Math.round(preset.health / 25)));
     this.aggroRange = preset.aggroRange ?? preset.attackRange + 120;
+    this.campId = preset.campId ?? null;
     this.abilities = preset.abilities ?? [];
     this._abilityCooldowns = this.abilities.map(() => 0);
 
@@ -431,12 +446,67 @@ export default class Monster extends AttackableUnit {
 
   takeDamage(damage: number, attacker?: AttackableUnit) {
     if (this.isDead) return;
+    // Latched before the hit lands, because the hit may kill us: what decides
+    // whether the pack gets shouted at is whether *this* body was already in
+    // the fight, and a corpse has had its lock cleared by `die`.
+    const engagedWith = this.phase === Monster.PHASES.ATTACK ? this.targetLock : null;
+
     super.takeDamage(damage, attacker);
+
+    if (!attacker) return;
     // super.takeDamage may have killed us; a corpse must not hold aggro. A camp
     // fights back against *whatever* hit it — a champion, a pet, an allied
     // minion — not champions alone, so "only attack when attacked" holds for
     // every attacker (see aggroOn / castAbility).
-    if (!this.isDead && attacker) this.aggroOn(attacker);
+    if (!this.isDead) this.aggroOn(attacker);
+    // A dead wolf still gets to shout: the hit that one-shot the small one is
+    // exactly the hit its pack should answer, and gating the alert on survival
+    // meant an opener that killed a 50hp raptor woke nothing at all.
+    //
+    // Only on the frame this body *joins* the fight, never on every later tick.
+    // A camp standing in a damage-over-time pool takes a hit per frame, and a
+    // quadtree query per frame per body is the cost this guard buys back.
+    if (engagedWith !== attacker) this.alertCamp(attacker);
+  }
+
+  /**
+   * Pulls the rest of the pack in on `attacker`.
+   *
+   * A camp is a pack, not three strangers standing near each other: the three
+   * wolves and the four raptors share a `campId`, and hitting any one of them
+   * used to wake exactly that one — the others watched their packmate die from
+   * 50px away, because `takeDamage` is the only thing that aggros a camp and it
+   * only ever aggroed the body it was called on.
+   *
+   * Found by query rather than by a list wired up at spawn, so this works the
+   * same in a headless test as it does in a match and survives the jungle being
+   * switched off and back on (`MatchDirector.jungleEnabled` rebuilds every camp
+   * from scratch). The circle is measured from the *camp point*, not from this
+   * body — the packmate we want is the one still sitting at home — and
+   * `chaseLeashRange` is its radius because that is already this camp's
+   * definition of "ground we fight over". `campId` is what actually decides
+   * membership; the radius only keeps the query small.
+   *
+   * Calls `aggroOn`, never `takeDamage`, so an alert cannot re-broadcast.
+   */
+  alertCamp(attacker: AttackableUnit) {
+    if (!this.campId || !this.game?.objectManager) return;
+
+    const mates = this.game.objectManager.queryObjects({
+      area: new Circle({ x: this.camp.x, y: this.camp.y, r: this.chaseLeashRange() }),
+      filters: [PredefinedFilters.type(Monster)],
+    });
+
+    for (const mate of mates) {
+      if (mate === this || mate === attacker) continue;
+      if (mate.campId !== this.campId) continue;
+      if (mate.isDead || mate.toRemove) continue;
+      // A packmate already busy keeps its own target: the pack converges on
+      // whoever walked in, it does not re-target as a unit every time one of
+      // them is hit.
+      if (mate.phase === Monster.PHASES.ATTACK && mate.targetLock) continue;
+      mate.aggroOn(attacker);
+    }
   }
 
   die(deathData: UnitDeathData) {

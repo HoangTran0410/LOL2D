@@ -97,6 +97,40 @@ const hud = inject<HudInteractions>('hud')!;
             </div>
           </div>
         </div>
+
+        <!--
+          Hồi Thành. Outside the v-for and visibly smaller than an ability,
+          because it is not one: it lives on `Champion.recall`, not in
+          `spells[]` (see `Recall.ts`), and the bar has to keep reading as
+          four abilities plus two summoners at a glance.
+
+          `@touchend.prevent` beside `@click` is not belt-and-braces —
+          `GameScene` cancels touches on the canvas, so a thumb never
+          synthesises the click and a `@click`-only control is dead under one.
+          Clicking again cancels: `Game.recall()` owns that, not this.
+        -->
+        <button
+          v-if="state.recall"
+          class="recall-btn"
+          :class="{
+            channeling: state.recall.channeling,
+            unavailable: !state.recall.canCast,
+          }"
+          :title="state.recall.name"
+          @click="hud.recall()"
+          @touchend.prevent="hud.recall()"
+        >
+          <i class="fa-solid fa-house-chimney"></i>
+          <span class="hotKey">{{ state.recall.hotKey }}</span>
+          <div
+            v-if="state.recall.channeling"
+            class="recall-fill"
+            :style="'height:' + state.recall.progressPercent + '%'"
+          ></div>
+          <span v-if="state.recall.channeling" class="recall-count">{{
+            state.recall.secondsLeft
+          }}</span>
+        </button>
       </div>
       <div class="health-bar">
         <div class="bar">

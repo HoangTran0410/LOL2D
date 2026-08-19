@@ -41,7 +41,12 @@
 import { computed, inject, ref, shallowRef } from 'vue';
 import { CONFIG_PANEL } from './panelState';
 import type { ConfigRosterEntry } from './MatchConfigSource';
-import { AI_COUNT_MAX, type BotBehaviour, type ChampionLoadout } from '@/game/config/PregameConfig';
+import {
+  AI_COUNT_MAX,
+  BOT_DIFFICULTY_ORDER,
+  type BotDifficulty,
+  type ChampionLoadout,
+} from '@/game/config/PregameConfig';
 import { MatchTeam, type MatchTeamId } from '@/game/config/MatchTeams';
 import type { SpellDisplay } from '@/game/config/spellCatalog';
 import LoadoutEditorModal from '@/scenes/setup/LoadoutEditorModal.vue';
@@ -116,14 +121,50 @@ const switchTeam = (row: ConfigRosterEntry): void => {
   panel.invalidate();
 };
 
-const BEHAVIOUR_FLAGS: { key: keyof BotBehaviour; label: string }[] = [
+/** The three booleans only: `difficulty` is the same record's fourth field and has its own row. */
+type BehaviourFlag = 'autoMove' | 'autoAttack' | 'autoCast';
+
+const BEHAVIOUR_FLAGS: { key: BehaviourFlag; label: string }[] = [
   { key: 'autoMove', label: 'Tự di chuyển' },
   { key: 'autoAttack', label: 'Tự tấn công' },
   { key: 'autoCast', label: 'Tự dùng kỹ năng' },
 ];
 
-const onFlagChange = (row: ConfigRosterEntry, flag: keyof BotBehaviour, event: Event): void => {
+const onFlagChange = (row: ConfigRosterEntry, flag: BehaviourFlag, event: Event): void => {
   source.setBotBehaviour(row.id, { [flag]: (event.target as HTMLInputElement).checked });
+  panel.invalidate();
+};
+
+/**
+ * How well this one bot plays — `BOT_DIFFICULTY_ORDER` is the config's own copy
+ * of the three tiers, easiest first. It is deliberately *not*
+ * `BOT_DIFFICULTIES` from `game/ai/Difficulty.ts`: that is a runtime value in
+ * the match chunk, and this panel is mounted over the menu, where importing it
+ * would fetch and parse the whole game before the logo (`matchConfigChunk` and
+ * `pregameBootPath` are the two tests that say so).
+ *
+ * The labels live here rather than beside the tiers because they are this
+ * screen's words, the same way `SettingsTab`'s debug-layer labels are. A
+ * `Record<BotDifficulty, string>` is what makes a fourth tier a compile error
+ * here instead of a blank button — that much `vue-tsc` does check, unlike the
+ * `v-if` guard below it (`strict: false`, so no `strictNullChecks`).
+ */
+const DIFFICULTY_LABELS: Record<BotDifficulty, string> = {
+  easy: 'Dễ',
+  normal: 'Thường',
+  hard: 'Khó',
+};
+
+/**
+ * Both handlers, on purpose. `GameScene` calls `preventDefault()` on every
+ * touch on the page, so the browser synthesises no trailing `click` and a
+ * `@click`-only button is dead under a thumb while being perfect under a mouse
+ * — the `.prevent` on the touch half then stops the pair firing twice where the
+ * click *is* synthesised. `tests/game/hud/rosterTabDifficulty.test.ts` checks
+ * both are still there and still reach this same call.
+ */
+const setDifficulty = (row: ConfigRosterEntry, difficulty: BotDifficulty): void => {
+  source.setBotBehaviour(row.id, { difficulty });
   panel.invalidate();
 };
 
@@ -418,6 +459,32 @@ defineExpose({
                 />
                 <span>{{ flag.label }}</span>
               </label>
+
+              <!-- Inside the same `v-if`, so the tier is offered exactly where a
+                   behaviour exists to hold it: the player's row has none, and
+                   nothing but this guard says so — `strict: false` means
+                   `row.behaviour.difficulty` compiles anywhere. A scan test
+                   holds it here. `@touchend.prevent` beside `@click` because
+                   `GameScene` cancels every touch on the page — see
+                   `setDifficulty`. -->
+              <div class="practice-difficulty" role="group" aria-label="Trình độ">
+                <span class="practice-difficulty-title">Trình độ</span>
+                <span class="practice-difficulty-row">
+                  <button
+                    v-for="tier of BOT_DIFFICULTY_ORDER"
+                    :key="tier"
+                    type="button"
+                    class="practice-difficulty-btn"
+                    :class="{ selected: row.behaviour.difficulty === tier }"
+                    :id="`practice-difficulty-${tier}-${row.index}`"
+                    :aria-pressed="row.behaviour.difficulty === tier"
+                    @click="setDifficulty(row, tier)"
+                    @touchend.prevent="setDifficulty(row, tier)"
+                  >
+                    {{ DIFFICULTY_LABELS[tier] }}
+                  </button>
+                </span>
+              </div>
             </div>
 
             <label class="pregame-toggle practice-cheat-invuln">

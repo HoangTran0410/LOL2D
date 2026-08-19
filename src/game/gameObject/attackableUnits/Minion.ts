@@ -181,6 +181,21 @@ export default class Minion extends AttackableUnit {
   aggroRange: number;
   targetLock: AttackableUnit | null = null;
 
+  /**
+   * Whether this minion has stood on a lane waypoint yet.
+   *
+   * A wave does not start on its lane: it musters between the two turrets
+   * nearest its own fountain and is handed the first waypoint *ahead* of that
+   * (`MinionSpawner.musterPointFor`, `nextWaypointIndexFrom`), which on TOP is
+   * 955px away across the corner of the base wall. The lane itself is built to
+   * be walked in straight lines — see the header of `lanes.ts` — but the join
+   * onto it is not part of the lane and is not built to be anything. Measured
+   * against the wall polygons that opening leg ran 42px *inside* a wall on TOP
+   * and 19px from a turret centre on BOT, and it did so on the previous paths
+   * as well: it is the one step a minion takes that has to be routed.
+   */
+  joinedLane = false;
+
   /** ms left before the next swing. */
   _attackCooldown = 0;
   /** ms left before the next aggro scan, jittered so a wave does not scan in lockstep. */
@@ -320,12 +335,19 @@ export default class Minion extends AttackableUnit {
     }
 
     const reached = withinRadius(this.position, waypoint, WAYPOINT_TOLERANCE);
-    if (reached && this.waypointIndex < this.waypoints.length - 1) {
-      this.waypointIndex += 1;
+    if (reached) {
+      this.joinedLane = true;
+      if (this.waypointIndex < this.waypoints.length - 1) this.waypointIndex += 1;
     }
 
     const next = this.currentWaypoint;
-    if (next) this.moveTo(next.x, next.y);
+    if (!next) return;
+    // Routed until it is standing on the lane, straight-line after — see
+    // `joinedLane`. `navigateTo` only bumps `movementRevision` when the
+    // destination actually changes, so asking every frame is free, and it
+    // degrades to `moveTo` in a context with no navigation at all.
+    if (this.joinedLane) this.moveTo(next.x, next.y);
+    else this.navigateTo(next.x, next.y);
   }
 
   updateAttack() {

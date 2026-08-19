@@ -104,6 +104,29 @@ const slot =
     Number(input.id.replace('practice-cheat-invuln-', ''))
   )) - 1;
 
+/**
+ * The fourth field of the same per-bot behaviour: how well that bot plays.
+ *
+ * Both halves of the control are pressed here because only a browser can tell
+ * them apart. `GameScene` calls `preventDefault()` on every touch on the page,
+ * so a `@click`-only button is perfect under a mouse and completely dead under
+ * a thumb — the failure that has shipped repeatedly in this panel, and the one
+ * a template scan can only check the *shape* of. `dispatchEvent` rather than
+ * `tap()` so the desktop context stays a desktop context.
+ */
+const difficultyRow = slot + 1;
+const storedDifficulty = () =>
+  page.evaluate(
+    ([k, i]) => JSON.parse(localStorage.getItem(k)).ai.botBehaviours[i].difficulty,
+    [CFG_KEY, slot]
+  );
+
+check('a bot starts on the default tier', (await storedDifficulty()) === 'normal');
+await page.dispatchEvent(`#practice-difficulty-easy-${difficultyRow}`, 'touchend');
+check('a touch on the difficulty control reaches the setter', (await storedDifficulty()) === 'easy');
+await page.click(`#practice-difficulty-hard-${difficultyRow}`);
+check('and so does a click', (await storedDifficulty()) === 'hard');
+
 await page.uncheck(`${botRow} .practice-cheat-behaviour input >> nth=2`);
 const storedCast = await page.evaluate(
   ([k, i]) => JSON.parse(localStorage.getItem(k)).ai.botBehaviours[i].autoCast,
@@ -211,11 +234,17 @@ const applied = await page.evaluate(i => {
     terrain: game.director.debug.terrain,
     botInvulnerable: !!bot && game.director.isInvulnerable(bot),
     botAutoCast: bot ? bot._autoCast : null,
+    botDifficulty: bot ? bot._difficulty : null,
   };
 }, slot);
 check('the debug layer set on the menu is on in the match', applied.terrain === true);
 check('the bot configured invulnerable spawns invulnerable', applied.botInvulnerable === true);
 check('the bot configured not to cast spawns not casting', applied.botAutoCast === false);
+check(
+  'the tier chosen on the menu is the tier that spawns',
+  applied.botDifficulty === 'hard',
+  applied.botDifficulty
+);
 
 const match = await page.evaluate(() => {
   const game = window.__lol2d.scene.oScene.game;

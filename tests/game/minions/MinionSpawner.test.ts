@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import MinionSpawner, {
   FIRST_WAVE_DELAY_MS,
+  MUSTER_SCATTER_PX,
   MINION_LIVE_CAP,
   MINION_RELEASE_INTERVAL_MS,
   WAVE_COMPOSITION,
@@ -11,7 +12,7 @@ import MinionSpawner, {
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import TeamId from '../../../src/game/enums/TeamId';
-import { LANES, getLaneWaypoints } from '../../../src/game/lanes';
+import { LANES, Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import { createSpawnerContext, type SpawnerGame } from './helpers';
 
 const FRAME_MS = 16;
@@ -97,8 +98,24 @@ describe('MinionSpawner', () => {
       expect(spawner.waveCount).toBe(3);
     });
 
-    it('releases a wave in a line rather than a clump', () => {
+    /**
+     * Hand-queues one wave and takes the automatic clock out of the picture.
+     *
+     * These four assert what ONE wave releases, and `advance` drives
+     * `update()`, which also runs the wave clock: with `FIRST_WAVE_DELAY_MS` at
+     * 1s and a wave taking `MINION_RELEASE_INTERVAL_MS * composition` to leave,
+     * a second wave queues itself halfway through the first and the counts read
+     * as double. Pushing the countdown out of reach says "one wave" once,
+     * instead of every assertion being a sum of however many the opening delay
+     * happens to allow today.
+     */
+    const queueOneWave = () => {
       spawner.queueWave();
+      spawner._nextWaveIn = Number.POSITIVE_INFINITY;
+    };
+
+    it('releases a wave in a line rather than a clump', () => {
+      queueOneWave();
 
       // the first of each lane leaves immediately: 2 bases x 3 lanes
       spawner.releaseQueued();
@@ -113,7 +130,7 @@ describe('MinionSpawner', () => {
     });
 
     it('sends one wave per lane from each base, in the composition it declares', () => {
-      spawner.queueWave();
+      queueOneWave();
       advance(MINION_RELEASE_INTERVAL_MS * WAVE_COMPOSITION.length);
 
       const minions = spawned();
@@ -125,8 +142,10 @@ describe('MinionSpawner', () => {
           expect(group.map(m => m.kind)).toEqual(WAVE_COMPOSITION);
           for (const minion of group) {
             expect(minion.waypoints).toBe(getLaneWaypoints(lane, teamId));
-            // waypoint 0 is the fountain it is standing on
-            expect(minion.waypointIndex).toBe(1);
+            // Never sent back to its own fountain, which is waypoint 0 of every
+            // lane. Which waypoint it *does* head for is pinned separately, in
+            // "heads down its lane rather than back to the fountain" below.
+            expect(minion.waypointIndex).toBeGreaterThan(0);
           }
         }
       }
@@ -134,7 +153,7 @@ describe('MinionSpawner', () => {
 
     it('releases a cannon for every lane on every third wave', () => {
       spawner.waveCount = 2;
-      spawner.queueWave();
+      queueOneWave();
       advance(MINION_RELEASE_INTERVAL_MS * (WAVE_COMPOSITION.length + 1) + FRAME_MS);
 
       const thirdWave = spawned();
@@ -147,14 +166,79 @@ describe('MinionSpawner', () => {
       }
     });
 
-    it('spawns each side on its own fountain', () => {
+    it('musters each side between the two turrets guarding its own base', () => {
+      // Hand-computed from `summoner_map.json`, not from `musterPointFor`:
+      // blue's fountain is 400,6075 and its two nearest turrets are 963,5626
+      // (720px) and 736,5392 (761px); red's is 6100,375 with 5646,967 (746px)
+      // and 5454,779 (762px). The next building on either side is over 1500px
+      // out, so the pair is not a close-run thing.
+      const MUSTER = {
+        [TeamId.BLUE]: { x: (963 + 736) / 2, y: (5626 + 5392) / 2 },
+        [TeamId.RED]: { x: (5646 + 5454) / 2, y: (967 + 779) / 2 },
+      } as Record<string, { x: number; y: number }>;
+
+      spawner.queueWave();
+      spawner.releaseQueued();
+
+      const seen = new Set<string>();
+      for (const minion of spawned()) {
+        const muster = MUSTER[minion.teamId];
+        seen.add(minion.teamId);
+        expect(
+          Math.hypot(minion.position.x - muster.x, minion.position.y - muster.y)
+        ).toBeLessThanOrEqual(MUSTER_SCATTER_PX);
+        // And no longer standing on the spawn platform, which is what this
+        // replaced — a wave used to materialise inside its own fountain.
+        const fountain = spawner.fountainFor(minion.teamId)!;
+        expect(minion.position.dist(fountain.position)).toBeGreaterThan(fountain.radius);
+      }
+      expect(seen).toEqual(new Set([TeamId.BLUE, TeamId.RED]));
+    });
+
+    it('heads down its lane rather than back to the fountain it no longer starts on', () => {
+      /**
+       * Pinned to the shipped waypoints, the same contract the rest of
+       * `Lanes.test.ts` carries: move a lane and re-derive these.
+       *
+       * The case that discriminates is **red MID**. Red's muster is (5550, 873)
+       * — the midpoint of 5646,967 and 5454,779 — and red walks the blue path
+       * backwards, so its waypoint 1 is 5976,856 and its waypoint 2 is
+       * 4472,2088. Projected by hand:
+       *
+       *   segment 0->1 clamps at its far end (5976,856), 426px from the muster
+       *   segment 1->2 passes within 257px of it
+       *
+       * so the muster is already past waypoint 1 and heading for it would walk
+       * the wave back toward the red fountain before it set off. Every other
+       * lane happens to answer 1 today, which is exactly why "always 1" was
+       * wrong rather than merely suboptimal: it depended on the lane, and one
+       * lane in six still disagrees with it.
+       */
+      spawner.queueWave();
+      spawner.releaseQueued();
+
+      const released = spawned();
+      const indexOf = (teamId: string, lane: string) =>
+        released.find(m => m.teamId === teamId && m.lane === lane)!.waypointIndex;
+
+      expect(indexOf(TeamId.BLUE, Lane.TOP)).toBe(1);
+      expect(indexOf(TeamId.BLUE, Lane.MID)).toBe(1);
+      expect(indexOf(TeamId.BLUE, Lane.BOT)).toBe(1);
+      expect(indexOf(TeamId.RED, Lane.TOP)).toBe(1);
+      expect(indexOf(TeamId.RED, Lane.MID)).toBe(2);
+      expect(indexOf(TeamId.RED, Lane.BOT)).toBe(1);
+    });
+
+    it('falls back to the fountain for a base with no turrets to muster between', () => {
+      game.turrets = [];
+
       spawner.queueWave();
       spawner.releaseQueued();
 
       for (const minion of spawned()) {
         const fountain = spawner.fountainFor(minion.teamId)!;
-        expect(fountain.teamId).toBe(minion.teamId);
         expect(minion.position.dist(fountain.position)).toBeLessThanOrEqual(fountain.radius);
+        expect(minion.waypointIndex).toBe(1);
       }
     });
   });
@@ -268,6 +352,7 @@ describe('MinionSpawner', () => {
     game.fountains.push(new Fountain({ game, preset: { name: 'Orphan', x: 10, y: 10, r: 50 } }));
 
     spawner.queueWave();
+    spawner._nextWaveIn = Number.POSITIVE_INFINITY; // one wave, not however many the clock allows
     advance(MINION_RELEASE_INTERVAL_MS * WAVE_COMPOSITION.length);
 
     expect(spawned()).toHaveLength(WAVE_SIZE);

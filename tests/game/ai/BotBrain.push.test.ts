@@ -6,6 +6,9 @@ import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion'
 import Minion, { MinionPresets } from '../../../src/game/gameObject/attackableUnits/Minion';
 import Turret from '../../../src/game/gameObject/structures/Turret';
 import { BotBrain, PUSH_TURRET_ESCORT_PX } from '../../../src/game/ai/BotBrain';
+import { profileFor, type BotDifficulty } from '../../../src/game/ai/Difficulty';
+import { SpellRole } from '../../../src/game/ai/SpellRole';
+import type Spell from '../../../src/game/gameObject/Spell';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
 import { laneApproach, type LaneState } from '../../../src/game/ai/LaneObjectives';
 import { getLaneWaypoints, Lane } from '../../../src/game/lanes';
@@ -61,6 +64,7 @@ const view = (over: Partial<TeamView> = {}): TeamView => ({
   memory: new Map<Champion, SeenEnemy>(),
   lanes: new Map<string, LaneState>(),
   laneAssignments: new Map<Champion, string>(),
+  enemyTurrets: [],
   ...over,
 });
 
@@ -400,5 +404,111 @@ describe('a bot in a running match', () => {
     bot._autoCast = false;
 
     expect(bot.findAttackTarget()).toBeNull();
+  });
+});
+
+/**
+ * The brain's whole contract with a spell is these members — the same stand-in
+ * `BotBrain.spells.test.ts` uses, and each stub needs its OWN class because
+ * `rolesOf` caches the mask by constructor.
+ */
+const makeSpell = (aiRoles: number, over: { cost?: number; range?: number } = {}) => {
+  class Stub {
+    static aiRoles = aiRoles;
+    isCastableNow = true;
+    effectiveManaCost = over.cost ?? 10;
+    manaCost = over.cost ?? 10;
+    declaredRange: number | undefined = over.range ?? 500;
+    castSpec = { targeting: 'DIRECTION' as const };
+    press = vi.fn(() => true);
+    hold = vi.fn();
+    release = vi.fn();
+  }
+  return new Stub() as unknown as Spell & { press: ReturnType<typeof vi.fn> };
+};
+
+describe('clearing the wave', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  /** A bot on MID with one enemy minion beside it and `mana` of a 100 pool. */
+  const pushingAt = (mana: number, difficulty: BotDifficulty = 'normal') => {
+    const game = createGame();
+    const bot = spawnBot(game);
+    bot.setDifficulty(difficulty);
+    const minion = spawnMinion(game, RED, Lane.MID, MID_MIDDLE.x + 120, MID_MIDDLE.y);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, minion]);
+    game.matchTimeMs = 60_000;
+    bot.stats.maxMana.baseValue = 100;
+    bot.stats.mana.baseValue = mana;
+    // `createGame` answers `undefined`, which `BotBrain.cast` reads as "this
+    // spell cannot be aimed" and drops the cast before pressing anything.
+    (game as unknown as { createSpellContext: () => unknown }).createSpellContext = () => ({
+      cursorWorld: { x: 0, y: 0 },
+    });
+    bot.brain.rng = () => 0.5; // neutral multiplier, so raw scores rank
+    return { game, bot, minion, brain: bot.brain };
+  };
+
+  it('spends an ability on the wave when there is nobody to fight', () => {
+    // A bot in PUSH used to press nothing at all: `maybeCast` returned unless
+    // the posture was FIGHT, ENGAGE, SEARCH or one of the running ones — and a
+    // bot spends most of a quiet match in PUSH. It walked at the wave and
+    // auto-attacked it with four abilities off cooldown.
+    const { bot, brain, minion } = pushingAt(100);
+    const wave = makeSpell(SpellRole.Damage);
+    bot.spells = [makeSpell(0), wave];
+
+    brain.update(60_000, 16);
+
+    expect(brain.posture).toBe('PUSH');
+    expect(brain.findObjectiveTarget()).toBe(minion);
+    expect(wave.press).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps its mana for a fight once the bar is low', () => {
+    const { bot, brain } = pushingAt(100 * profileFor('normal').waveClearManaPct - 1);
+    const wave = makeSpell(SpellRole.Damage);
+    bot.spells = [makeSpell(0), wave];
+
+    brain.update(60_000, 16);
+
+    expect(brain.posture).toBe('PUSH');
+    expect(wave.press).not.toHaveBeenCalled();
+  });
+
+  it('reads the floor off the tier, not off one number for every bot', () => {
+    // The knob lives in `Difficulty.ts` — "every knob a tier changes lives here
+    // and nowhere else" — so an easy bot hoards where a hard one spends. 70 of a
+    // 100 pool is above normal's 0.6 and hard's 0.45 and below easy's 0.85.
+    expect(profileFor('easy').waveClearManaPct).toBeGreaterThan(0.7);
+    expect(profileFor('hard').waveClearManaPct).toBeLessThan(0.7);
+
+    const timid = pushingAt(70, 'easy');
+    const timidSpell = makeSpell(SpellRole.Damage);
+    timid.bot.spells = [makeSpell(0), timidSpell];
+    timid.brain.update(60_000, 16);
+    expect(timid.brain.posture).toBe('PUSH');
+    expect(timidSpell.press).not.toHaveBeenCalled();
+
+    const keen = pushingAt(70, 'hard');
+    const keenSpell = makeSpell(SpellRole.Damage);
+    keen.bot.spells = [makeSpell(0), keenSpell];
+    keen.brain.update(60_000, 16);
+    expect(keen.brain.posture).toBe('PUSH');
+    expect(keenSpell.press).toHaveBeenCalledTimes(1);
+  });
+
+  it('never spends the ultimate on minions', () => {
+    const { bot, brain } = pushingAt(100);
+    const ultimate = makeSpell(SpellRole.Damage);
+    // Slot 4 is R — `rolesOf` adds `Ultimate` from the slot, not from the class.
+    bot.spells = [makeSpell(0), null, null, null, ultimate] as unknown as Spell[];
+
+    brain.update(60_000, 16);
+
+    expect(brain.posture).toBe('PUSH');
+    expect(ultimate.press).not.toHaveBeenCalled();
   });
 });

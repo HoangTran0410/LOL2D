@@ -2,8 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   AI_COUNT_MAX,
   AI_COUNT_MIN,
+  BOT_DIFFICULTY_ORDER,
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
+  DEFAULT_BOT_DIFFICULTY,
   DEFAULT_PREGAME_CONFIG,
   SLOT_COUNT,
   loadPregameConfig,
@@ -14,6 +16,7 @@ import {
   type ChampionLoadout,
   type PregameConfig,
 } from '../../../src/game/config/PregameConfig';
+import { BOT_DIFFICULTIES, DEFAULT_DIFFICULTY } from '../../../src/game/ai/Difficulty';
 import TeamId from '../../../src/game/enums/TeamId';
 
 /** A minimal in-memory `localStorage` so persistence can be tested in node. */
@@ -244,6 +247,7 @@ describe('sanitizePregameConfig', () => {
           autoMove: true,
           autoAttack: false,
           autoCast: false,
+          difficulty: 'hard' as const,
         })),
       },
       rules: { cooldownReductionPercent: 40, manaFree: true },
@@ -355,6 +359,7 @@ describe('loadPregameConfig / savePregameConfig', () => {
           autoMove: i === 0,
           autoAttack: true,
           autoCast: false,
+          difficulty: i === 0 ? ('easy' as const) : ('normal' as const),
         })),
       },
       rules: { cooldownReductionPercent: 30, manaFree: true },
@@ -502,7 +507,12 @@ describe('ai.botBehaviours', () => {
   it('defaults to one entry per slot carrying AIChampion’s own defaults', () => {
     expect(DEFAULT_PREGAME_CONFIG.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
     for (const behaviour of DEFAULT_PREGAME_CONFIG.ai.botBehaviours) {
-      expect(behaviour).toEqual({ autoMove: true, autoAttack: true, autoCast: true });
+      expect(behaviour).toEqual({
+        autoMove: true,
+        autoAttack: true,
+        autoCast: true,
+        difficulty: 'normal',
+      });
     }
   });
 
@@ -513,10 +523,11 @@ describe('ai.botBehaviours', () => {
   // silently discarding a setting the player really made on the setup screen.
   it('seeds a missing array from the stored global flags, not from DEFAULT_PREGAME_CONFIG', () => {
     const globals = { autoMove: true, autoAttack: false, autoCast: false };
+    const seeded = { ...globals, difficulty: 'normal' };
     const result = sanitizePregameConfig({ ai: { count: 3, ...globals } });
 
     expect(result.ai.botBehaviours).toHaveLength(AI_COUNT_MAX);
-    for (const behaviour of result.ai.botBehaviours) expect(behaviour).toEqual(globals);
+    for (const behaviour of result.ai.botBehaviours) expect(behaviour).toEqual(seeded);
     // Stated as its own assertion because it is the actual regression: every
     // one of these differs from the default.
     expect(result.ai.botBehaviours[0]).not.toEqual(DEFAULT_PREGAME_CONFIG.ai.botBehaviours[0]);
@@ -524,6 +535,7 @@ describe('ai.botBehaviours', () => {
 
   it('pads a short array from the global flags and truncates a long one', () => {
     const globals = { autoMove: true, autoAttack: false, autoCast: true };
+    const seeded = { ...globals, difficulty: 'normal' };
     const result = sanitizePregameConfig({
       ai: { ...globals, botBehaviours: [{ autoMove: false, autoAttack: true, autoCast: false }] },
     });
@@ -533,8 +545,9 @@ describe('ai.botBehaviours', () => {
       autoMove: false,
       autoAttack: true,
       autoCast: false,
+      difficulty: 'normal',
     });
-    expect(result.ai.botBehaviours[1]).toEqual(globals);
+    expect(result.ai.botBehaviours[1]).toEqual(seeded);
 
     expect(
       sanitizePregameConfig({
@@ -545,6 +558,7 @@ describe('ai.botBehaviours', () => {
 
   it('falls back per field, to the global flag, for a wrong-typed entry', () => {
     const globals = { autoMove: true, autoAttack: false, autoCast: true };
+    const seeded = { ...globals, difficulty: 'normal' };
     const result = sanitizePregameConfig({
       ai: { ...globals, botBehaviours: [{ autoMove: 'yes', autoCast: false }, 'not an object'] },
     });
@@ -553,8 +567,97 @@ describe('ai.botBehaviours', () => {
       autoMove: true, // 'yes' is not a boolean -> the global
       autoAttack: false, // absent -> the global
       autoCast: false, // a real boolean -> kept
+      difficulty: 'normal', // no global to fall back to -> the default tier
     });
-    expect(result.ai.botBehaviours[1]).toEqual(globals);
+    expect(result.ai.botBehaviours[1]).toEqual(seeded);
+  });
+});
+
+/**
+ * The fourth field of a behaviour: how well that bot plays.
+ *
+ * `game/ai/Difficulty.ts` owns the tiers and their tuning; this module owns only
+ * the stored answer and the validator over it, and holds its own copy of the
+ * three ids because a *value* import of the AI module would drag the whole match
+ * chunk in front of the menu (see `matchConfigChunk.test.ts`). The first test
+ * below is what makes the copy safe.
+ *
+ * Its migration is the simplest one in the file. Every match ever played ran
+ * `DEFAULT_DIFFICULTY`, because nothing could set anything else — so a blob with
+ * no `difficulty` in it is not missing information: it *is* a match of normal
+ * bots, and reading it as one loses nothing.
+ */
+describe('ai.botBehaviours[].difficulty', () => {
+  it('agrees with the AI module about the tiers and the default', () => {
+    expect(BOT_DIFFICULTY_ORDER).toEqual(BOT_DIFFICULTIES);
+    expect(DEFAULT_BOT_DIFFICULTY).toBe(DEFAULT_DIFFICULTY);
+  });
+
+  it('defaults every slot to normal', () => {
+    for (const behaviour of DEFAULT_PREGAME_CONFIG.ai.botBehaviours) {
+      expect(behaviour.difficulty).toBe('normal');
+    }
+  });
+
+  it('reads a stored behaviour with no difficulty as normal, keeping its own flags', () => {
+    const result = sanitizePregameConfig({
+      ai: {
+        count: 2,
+        autoMove: false,
+        autoAttack: false,
+        autoCast: false,
+        botBehaviours: [{ autoMove: true, autoAttack: false, autoCast: true }],
+      },
+      rules: { cooldownReductionPercent: 40, manaFree: true },
+    });
+
+    expect(result.ai.botBehaviours[0]).toEqual({
+      autoMove: true,
+      autoAttack: false,
+      autoCast: true,
+      difficulty: 'normal',
+    });
+    // Nothing else moved: the field is added, not a reset of the blob it is
+    // missing from.
+    expect(result.ai.count).toBe(2);
+    expect(result.ai.autoMove).toBe(false);
+    expect(result.ai.botBehaviours[1]).toEqual({
+      autoMove: false,
+      autoAttack: false,
+      autoCast: false,
+      difficulty: 'normal',
+    });
+    expect(result.rules).toEqual({ cooldownReductionPercent: 40, manaFree: true });
+  });
+
+  it('keeps a per-bot tier, and only that bot’s', () => {
+    const result = sanitizePregameConfig({
+      ai: { count: 3, botBehaviours: [{ difficulty: 'hard' }, { difficulty: 'easy' }] },
+    });
+
+    expect(result.ai.botBehaviours[0].difficulty).toBe('hard');
+    expect(result.ai.botBehaviours[1].difficulty).toBe('easy');
+    expect(result.ai.botBehaviours[2].difficulty).toBe('normal');
+  });
+
+  it('survives a save/load round trip', () => {
+    vi.stubGlobal('localStorage', new MemoryStorage());
+    const config = sanitizePregameConfig(DEFAULT_PREGAME_CONFIG);
+    const botBehaviours = config.ai.botBehaviours.slice();
+    botBehaviours[0] = { ...botBehaviours[0], difficulty: 'hard' };
+    savePregameConfig({ ...config, ai: { ...config.ai, botBehaviours } });
+
+    expect(loadPregameConfig().ai.botBehaviours[0].difficulty).toBe('hard');
+    expect(loadPregameConfig().ai.botBehaviours[1].difficulty).toBe('normal');
+  });
+
+  it('falls back to normal for a tier that is not one of the three', () => {
+    const result = sanitizePregameConfig({
+      ai: { botBehaviours: [{ difficulty: 'impossible' }, { difficulty: 7 }] },
+    });
+
+    expect(result.ai.botBehaviours[0].difficulty).toBe('normal');
+    expect(result.ai.botBehaviours[1].difficulty).toBe('normal');
   });
 });
 

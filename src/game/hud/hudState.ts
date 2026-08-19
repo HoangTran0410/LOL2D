@@ -9,7 +9,7 @@
  * here, and both views only choose how to lay the result out.
  */
 import type Game from '@/game/Game';
-import { SpellHotKeys } from '@/game/constants';
+import { HotKeys, SpellHotKeys } from '@/game/constants';
 import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 
 function ensureVisibleAsset(asset: Pick<AssetHandle, 'key' | 'status'> | undefined): void {
@@ -76,6 +76,27 @@ export interface StatsDisplay {
   shield: number;
 }
 
+/**
+ * Hồi Thành, which is not a `SpellDisplay` because it is not in `spells[]` —
+ * it lives on `Champion.recall` (see that class's comment for why) and the bar
+ * is built by index off the kit. Its own row here keeps that separation
+ * visible instead of smuggling an eighth slot into a seven-slot array.
+ */
+export interface RecallDisplay {
+  name: string;
+  description: string;
+  /** `B`. The key is one way in, not the definition of the action. */
+  hotKey: string;
+  /** The trip home is running, so the button now cancels it. */
+  channeling: boolean;
+  /** 0..100 through the channel, clamped: the button fills by this. */
+  progressPercent: number;
+  /** Whole seconds of channel left. 0 while it is not running. */
+  secondsLeft: number;
+  /** False for a corpse, a silenced champion, or a disabled recall. */
+  canCast: boolean;
+}
+
 export interface HudState {
   avatar: string;
   isDead: boolean;
@@ -83,6 +104,8 @@ export interface HudState {
   stats: StatsDisplay;
   spells: SpellDisplay[];
   buffs: BuffDisplay[];
+  /** Null for a unit with no recall at all — a headless test, mostly. */
+  recall: RecallDisplay | null;
 }
 
 function buildStats(player: any): StatsDisplay {
@@ -190,6 +213,29 @@ function buildBuffs(player: any): BuffDisplay[] {
   return [...buffRows.values()];
 }
 
+/**
+ * The channel's length comes off the spell's own `castSpec.channel`, never off
+ * a copy of `RECALL_CHANNEL_MS` — retuning the constant must not mean editing
+ * the HUD, and importing the spell here would drag it into this shared layer.
+ */
+function buildRecall(player: any): RecallDisplay | null {
+  const recall = player.recall;
+  if (!recall) return null;
+
+  const durationMs = recall.castSpec?.channel?.durationMs ?? 0;
+  const progress = Math.min(1, Math.max(0, recall.channelProgress ?? 0));
+
+  return {
+    name: recall.name ?? '',
+    description: recall.description ?? '',
+    hotKey: String.fromCharCode(HotKeys.B),
+    channeling: recall.state === 'CHANNELING',
+    progressPercent: progress * 100,
+    secondsLeft: Math.ceil(((1 - progress) * durationMs) / 1000),
+    canCast: !!player.canCast && !player.isDead && !recall.disabled,
+  };
+}
+
 /** Reads `game.player` and returns everything the HUD displays. Null while there is no player yet. */
 export function computeHudState(game: Game | undefined | null): HudState | null {
   const player = (game as any)?.player;
@@ -204,5 +250,6 @@ export function computeHudState(game: Game | undefined | null): HudState | null 
     stats: buildStats(player),
     spells: buildSpells(player),
     buffs: buildBuffs(player),
+    recall: buildRecall(player),
   };
 }

@@ -79,7 +79,23 @@ export default class AIChampion extends Champion {
    * config and the e2e scripts all set `_autoMove` directly, and turning
    * movement back on restores exactly the reflexes the bot had.
    */
-  _autoMoveOnTakeDamage = true;
+  /**
+   * **Off**, unlike the two below it, and the one flag here whose default is a
+   * decision rather than an inheritance.
+   *
+   * Taking a hit used to re-roll the bot's destination to a random point on the
+   * whole map. That predates `BotBrain`, which now answers "I am being hurt"
+   * with a posture — RETREAT to the nearest friendly turret, DISENGAGE out of a
+   * turret's reach — and the flinch cooperates with none of them: under
+   * a turret it fired once per bolt and sent the bot somewhere arbitrary, which
+   * is as likely to be deeper into the guns as out of them. Two answers to one
+   * question, and the wrong one ran sixty times a second.
+   *
+   * Still a flag, still writable by `MatchDirector.setBotBehaviour` and the
+   * pregame config, so the old reflex is one checkbox away for anyone who wants
+   * to watch it.
+   */
+  _autoMoveOnTakeDamage = false;
   _autoMoveOnCollideWall = true;
   _autoMoveOnCollideMapEdge = true;
   _respawnWithNewPreset = true;
@@ -223,12 +239,23 @@ export default class AIChampion extends Champion {
 
   takeDamage(damage: number, attacker?: AttackableUnit) {
     super.takeDamage(damage, attacker);
+    // The brain's "am I safe enough to stand still" clock. Written here rather
+    // than derived from health, because a shield eats the number and not the
+    // fact: being shot at is what makes a recall a bad idea, not losing health
+    // to it. `matchTimeMs` and never a clock of this unit's own — see the note
+    // on `BotBrain.update`.
+    this.brain.lastDamagedAtMs = this.game.matchTimeMs ?? 0;
     if (this.wandersOnReflex(this._autoMoveOnTakeDamage)) this.moveToRandomLocation();
 
     // Hit back. super.takeDamage may have killed us, and an order already
     // running is kept: a bot that re-targeted on every incoming hit would drop
     // the champion it was about to finish every time a turret shot it.
     if (!this._autoAttack || this.isDead || this.basicAttack.target) return;
+    // ...but a bot that has decided to leave does not re-enlist. RETREAT,
+    // RECOVER and DISENGAGE all clear the standing order on their think tick,
+    // and without this the very next incoming hit hands it straight back —
+    // which under a turret is every 1.3 seconds, for as long as it takes to die.
+    if (this.brain.isLeaving) return;
     if (attacker instanceof Champion) this.basicAttack.order(attacker);
   }
 

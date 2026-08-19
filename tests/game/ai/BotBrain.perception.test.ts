@@ -110,14 +110,15 @@ describe('BotBrain perception', () => {
         memory: new Map(),
         lanes: new Map(),
         laneAssignments: new Map(),
+        enemyTurrets: [],
       })
     ).toBeNull();
   });
 
   it('scans for a target once per think tick, not twice', () => {
-    // `think` called `pickTarget` and then `decidePosture` called it again. At
-    // `easy` — the one tier that does not skip terrain — each pass costs a
-    // `canSee` raycast per living enemy.
+    // `think` called `pickTarget` and then `decidePosture` called it again, and
+    // each pass costs a `canSee` raycast per living enemy — at every tier now
+    // that none of them skips the terrain question.
     const game = createGame();
     const bot = spawnBot(game, 'easy');
     const enemy = spawnEnemy(game, 200, 0);
@@ -138,22 +139,29 @@ describe('BotBrain perception', () => {
     expect(looks).toBe(1);
   });
 
-  it('lets normal and hard bots see through terrain, and stops easy ones', () => {
+  it('lets no tier acquire a target it cannot see', () => {
+    // `normal` and `hard` used to skip the terrain question outright, so every
+    // bot in every default match acquired through walls and bushes. Reported
+    // from a real match as "a bot autoattacked me while neither of us had
+    // vision", and it is the one acquisition path in the game that did that:
+    // minions, monsters, pets, turrets and the player's own right click all go
+    // through `PredefinedFilters.visibleTo`.
     const game = createGame();
-    const bot = spawnBot(game, 'easy');
     const enemy = spawnEnemy(game, 200, 0);
-    game.setPlayer(bot);
-    indexObjects(game, [bot, enemy]);
+    game.setPlayer(spawnBot(game, 'normal'));
 
-    const brain = new BotBrain(bot);
-    // The terrain answer is the ONLY thing that differs between the tiers.
-    brain.sees = () => false;
-    expect(brain.canPerceive(enemy)).toBe(false);
+    for (const tier of ['easy', 'normal', 'hard'] as const) {
+      const bot = spawnBot(game, tier);
+      indexObjects(game, [bot, enemy]);
 
-    const normalBot = spawnBot(game, 'normal');
-    const normalBrain = new BotBrain(normalBot);
-    normalBrain.sees = () => false;
-    expect(normalBrain.canPerceive(enemy)).toBe(true);
+      const blind = new BotBrain(bot);
+      blind.sees = () => false;
+      expect(blind.canPerceive(enemy), `${tier} acquired through terrain`).toBe(false);
+
+      const looking = new BotBrain(bot);
+      looking.sees = () => true;
+      expect(looking.canPerceive(enemy), `${tier} refused a target in the open`).toBe(true);
+    }
   });
 
   it('never sees a dead or removed enemy', () => {

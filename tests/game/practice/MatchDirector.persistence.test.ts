@@ -100,6 +100,7 @@ describe('MatchDirector persistence', () => {
       autoMove: true,
       autoAttack: true,
       autoCast: true,
+      difficulty: 'normal',
     });
     expect(stored.rules).toEqual({ cooldownReductionPercent: 40, manaFree: true });
     expect(stored.world).toEqual({ jungle: false, minions: false });
@@ -377,7 +378,29 @@ describe('MatchDirector persistence', () => {
       autoMove: true,
       autoAttack: true,
       autoCast: false,
+      // The setup screen has no difficulty control, so the global flags say
+      // nothing about it: a bot added mid-match is a bot nobody has tuned.
+      difficulty: 'normal',
     });
+  });
+
+  /**
+   * The tier is a *live* field on the bot, so it has to be read back off the
+   * unit the way its side and its flags already are — not patched into the
+   * stored config at the point the panel writes it. A match retuned to hard
+   * bots that reloads as normal ones is the whole bug this closes.
+   */
+  it('reads a retuned difficulty back off the live bot', () => {
+    const { director } = bench();
+    const bot = director.addBot(loadoutNamed('Ahri'))!;
+
+    director.setBotBehaviour(bot, { difficulty: 'hard' });
+
+    expect(bot._difficulty).toBe('hard');
+    expect(loadPregameConfig().ai.botBehaviours[0].difficulty).toBe('hard');
+    expect(director.toPregameConfig().ai.botBehaviours[0].difficulty).toBe('hard');
+    // The slots past the live roster keep whatever storage had for them.
+    expect(loadPregameConfig().ai.botBehaviours[1].difficulty).toBe('normal');
   });
 
   /**

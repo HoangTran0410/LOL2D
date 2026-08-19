@@ -24,13 +24,24 @@ import dummyChampionSource from '../../../src/game/gameObject/attackableUnits/Du
 import monsterSource from '../../../src/game/gameObject/attackableUnits/Monster.ts?raw';
 import turretSource from '../../../src/game/gameObject/structures/Turret.ts?raw';
 
+/**
+ * Comments stripped before any of these are matched. The rule is about the
+ * *code* — an explicit `any`, a deprecated asset lookup — and `\bany\b` against
+ * a raw file matches the English word as readily as the type, so a doc comment
+ * saying "hitting any one of them" failed the type-safety scan. Every scan in
+ * this repo strips first for the same reason; see the Testing section of
+ * CLAUDE.md.
+ */
+const stripComments = (source: string): string =>
+  source.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
+
 const scopedSources = [
   championSource,
   aiChampionSource,
   dummyChampionSource,
   monsterSource,
   turretSource,
-];
+].map(stripComments);
 
 class TestVector {
   constructor(
@@ -153,7 +164,7 @@ describe('champion and direct-subclass type boundary', () => {
       expect(source).not.toMatch(/\bany\b/);
       expect(source).not.toContain('AssetManager.getAsset(');
     }
-    expect(aiChampionSource).not.toContain('charge!');
+    expect(stripComments(aiChampionSource)).not.toContain('charge!');
   });
 
   it('constructs champion presets with generated avatar handles and owned spells', () => {

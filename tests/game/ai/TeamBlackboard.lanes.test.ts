@@ -272,6 +272,61 @@ describe('TeamBlackboard lanes', () => {
   });
 });
 
+describe('the turrets a team has to keep away from', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("lists the other side's buildings and none of its own", () => {
+    const game = createGame();
+    const bot = spawnBot(game, BLUE, 400, 6_075);
+    // A view exists only for a team that has a champion on it, so the red side
+    // needs a body before it has anything to read.
+    const foe = spawn(game, RED, 6_100, 375);
+    const ours = spawnTurret(game, BLUE, MID_BLUE_TURRETS[2].x, MID_BLUE_TURRETS[2].y);
+    const theirs = spawnTurret(game, RED, MID_RED_TURRETS[0].x, MID_RED_TURRETS[0].y);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, foe, ours, theirs]);
+
+    const view = blackboardFor(game, 0, blind).viewFor(BLUE);
+    expect(view.enemyTurrets).toEqual([theirs]);
+    // The same buildings read from the other side, so a list that quietly
+    // hard-coded one team would be caught.
+    expect(blackboardFor(game, 0, blind).viewFor(RED).enemyTurrets).toEqual([ours]);
+  });
+
+  it('carries a turret that stands in no lane at all', () => {
+    // `nextEnemyTurret` is bucketed by lane and a building further than
+    // LANE_MEMBERSHIP_PX from every waypoint path is dropped from those buckets.
+    // The threat list is not the lane economy: a turret nowhere near a lane
+    // still shoots, so it has to be here.
+    const game = createGame();
+    const bot = spawnBot(game, BLUE, 400, 6_075);
+    // 2200,2100 is the point on this map furthest from every lane polyline —
+    // 1536px out, comfortably past LANE_MEMBERSHIP_PX.
+    const stray = spawnTurret(game, RED, 2_200, 2_100);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, stray]);
+
+    const view = blackboardFor(game, 0, blind).viewFor(BLUE);
+    expect(view.enemyTurrets).toEqual([stray]);
+    for (const state of view.lanes.values()) expect(state.nextEnemyTurret).toBeNull();
+  });
+
+  it('drops a turret that has been destroyed', () => {
+    const game = createGame();
+    const bot = spawnBot(game, BLUE, 400, 6_075);
+    const rubble = spawnTurret(game, RED, MID_RED_TURRETS[0].x, MID_RED_TURRETS[0].y);
+    // `isDead` is `deathData !== null`, not an empty health pool — zeroing the
+    // stat leaves the building standing as far as every reader is concerned.
+    rubble.die({ reviveAfter: rubble.reviveTime });
+    game.setPlayer(bot);
+    indexObjects(game, [bot, rubble]);
+
+    expect(rubble.isDead).toBe(true);
+    expect(blackboardFor(game, 0, blind).viewFor(BLUE).enemyTurrets).toEqual([]);
+  });
+});
+
 describe('the AI layer walks the whole object list exactly once', () => {
   // The performance rule this layer was built under: the blackboard's one pass
   // is where a bot may learn about the map, and every reader of it goes through

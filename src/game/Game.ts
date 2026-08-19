@@ -1,4 +1,4 @@
-import { SpellHotKeys } from './constants';
+import { HotKeys, SpellHotKeys } from './constants';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
@@ -275,7 +275,8 @@ export default class Game {
     // Each bot's champion/kit comes from its own slot in ai.bots — 'random'
     // by default (today's behaviour, unchanged), or a specific loadout the
     // player configured for that bot. Behaviour flags come from the matching
-    // slot in ai.botBehaviours, and its persisted side comes from ai.botTeams.
+    // slot in ai.botBehaviours — including how well it plays, which is the same
+    // record's fourth field — and its persisted side comes from ai.botTeams.
     // Older configs migrate behaviours from their global flags and teams to a
     // stable Red/Blue alternation. Count is clamped by `loadPregameConfig`; all
     // three slot arrays always have AI_COUNT_MAX entries.
@@ -307,6 +308,7 @@ export default class Game {
         autoMove: botBehaviour.autoMove,
         autoAttack: botBehaviour.autoAttack,
         autoCast: botBehaviour.autoCast,
+        difficulty: botBehaviour.difficulty,
       });
       this.objectManager.addObject(bot);
       loadoutsInPlay.push({ unit: bot, loadout: botLoadout });
@@ -698,14 +700,33 @@ export default class Game {
     const spell = this.player.spells[slot];
     if (!spell?.image) return null;
 
-    const spec = spell.castSpec;
-    const icon = AssetManager.renderable(spell.image);
     const hotKey = SpellHotKeys[slot];
+    return this.touchViewOf(spell, hotKey ? String.fromCharCode(hotKey) : String(slot));
+  }
+
+  /**
+   * The recall button's view.
+   *
+   * Through `touchViewOf` rather than a shape of its own, so the one button
+   * that is not a kit slot still reports cooldown, castability and its channel
+   * the way every other button does — `Recall` is a `Spell`, it is only not in
+   * `spells[]`. Null for a unit that has no recall at all, which is how the
+   * touch layer decides whether to draw the button.
+   */
+  private touchRecallView(): TouchSpellView | null {
+    const spell = this.player?.recall;
+    return spell ? this.touchViewOf(spell, String.fromCharCode(HotKeys.B)) : null;
+  }
+
+  private touchViewOf(spell: Spell, label: string): TouchSpellView {
+    const spec = spell.castSpec;
+    // `Recall` carries no icon asset, and `renderable` is not asked for one.
+    const icon = spell.image ? AssetManager.renderable(spell.image) : null;
     return {
       targeting: spec.targeting,
       activation: spec.activation,
       range: touchAimRange(spell),
-      label: hotKey ? String.fromCharCode(hotKey) : String(slot),
+      label,
       // `renderable` hands back a data-URI string while the real icon is still
       // loading; the button draws its letter rather than a string as an image.
       icon: typeof icon === 'object' && icon !== null ? icon : null,
@@ -725,6 +746,10 @@ export default class Game {
       affordable: this.player.stats.mana.value >= spell.effectiveManaCost,
       castable: this.player.canCast && !this.player.isDead && !spell.disabled,
       charging: spell.state === 'CHARGING',
+      channeling: spell.state === 'CHANNELING',
+      // `channelProgress` is `Recall`'s own; a spell without one is not
+      // channelling anything a button would draw a clock for.
+      channelProgress: (spell as Spell & { channelProgress?: number }).channelProgress ?? 0,
     };
   }
 
@@ -785,6 +810,10 @@ export default class Game {
       viewport: () => ({ width: windowWidth, height: windowHeight }),
       slotCount: () => this.player.spells.length,
       spellView: slot => this.touchSpellView(slot),
+      recallView: () => this.touchRecallView(),
+      // Straight to the seam the `B` key already uses. On a phone there is no
+      // keyboard at all, so this button is the *only* way home.
+      recall: () => this.recall(),
       playerPosition: () => this.player.position,
       playerFacing: () => this.facing(),
       // The same acquisition the `A` key already uses, only measured from the
@@ -857,6 +886,29 @@ export default class Game {
     this.inGameHUD?.vueInstance?.hud.escape();
   }
 
+  /**
+   * B: channel home, or stop the channel that is already running.
+   *
+   * A method rather than four lines inside `keyPressed`, so a touch button has
+   * a seam to call — the key is one way in, not the definition of the action.
+   */
+  recall(): void {
+    const spell = this.player?.recall;
+    if (!spell) return;
+
+    // Pressing it again is how the player calls the trip off; without this the
+    // press would be refused as "already casting" and the only way to stop
+    // going home would be to walk.
+    if (spell.state === 'CHANNELING') {
+      spell.cancel('PLAYER_CANCEL');
+      return;
+    }
+
+    // SELF targeting, so the aim is the champion's own feet.
+    const context = this.createSpellContext(spell, this.player, this.player.position);
+    if (context) spell.press(context);
+  }
+
   keyPressed(keyCode: number, repeated = false) {
     if (keyCode === 32 && !repeated) {
       this.camera.target = this.camera.target ? null! : this.player.position;
@@ -872,6 +924,8 @@ export default class Game {
       // `createDebugFlags`) while disagreeing about what gets saved.
       this.director?.setDebugFlag('routes', !this.navigation.debugRoutes);
     }
+    // B: go home. Not one of SpellHotKeys' letters, so it never steals a cast.
+    if (keyCode === HotKeys.B && !repeated) this.recall();
     this.spellInputController.keyDown(keyCode, repeated);
   }
 

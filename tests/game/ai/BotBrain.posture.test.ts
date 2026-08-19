@@ -30,6 +30,7 @@ const view = (over: Partial<TeamView> = {}): TeamView => ({
   memory: new Map<Champion, SeenEnemy>(),
   lanes: new Map<string, LaneState>(),
   laneAssignments: new Map<Champion, string>(),
+  enemyTurrets: [],
   ...over,
 });
 

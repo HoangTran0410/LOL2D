@@ -10,17 +10,20 @@ import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 
 /** Ashe's own reveal slot, so hers neither evicts nor is evicted by another spell's. */
 export const REVEAL_STACK_ID = 'ashe_e_reveal';
+const RANGE = 4000;
 
 export default class Ashe_E extends Spell {
   targetingMode = 'DIRECTION' as const;
   image = AssetManager.get('spell_ashe_e');
   name = 'Ưng Tiễn (Ashe_E)';
-  description =
-    'Thả một chim ưng bay xa <span>900px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class="buff">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class="buff">Lộ Diện</span> trong <span class="time">3 giây</span>';
+  description = `Thả một chim ưng bay xa <span>${RANGE}px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class="buff">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class="buff">Lộ Diện</span> trong <span class="time">3 giây</span>`;
   coolDown = 6000;
   manaCost = 30;
 
-  range = 900;
+  // Fires a fixed distance in the aimed direction, not to the cursor: the cast
+  // resolves the *direction* to `aimPoint` and `getVectorWithRange` (via
+  // `setMag`) always extends it to the full range, overshooting a near cursor.
+  range = RANGE;
 
   onSpellCast() {
     const { from, to } = VectorUtils.getVectorWithRange(
@@ -43,12 +46,24 @@ export class Ashe_E_Object extends MissileSpellObject {
   // a scout, not a skillshot: it never collides with anything
   maxHitCount = 0;
 
-  /** Feeds the fog of war, so the bird lights up the terrain it flies over. */
+  /** How far the bird sees — the sight polygon that lights terrain for the team. */
   visionRadius = 400;
   /** Enemies this close get revealed to the whole team for a while. */
   revealRadius = 260;
   revealDuration = 3000;
   revealVisionRadius = 150;
+
+  /**
+   * The seam `FogOfWar.calculateSight` selects allied revealers on — it lives on
+   * `AttackableUnit` (defaulting to `visionRadius`) and nowhere on `SpellObject`,
+   * so without this the bird's `fogRevealRadius` was `undefined`, `undefined > 0`
+   * was `false`, and the whole hawk was dropped from the revealer list: it lit
+   * nothing for the team. Mirrors the unit default so the scout reveals a
+   * wall-aware sight polygon exactly like a champion's.
+   */
+  get fogRevealRadius(): number {
+    return this.visionRadius;
+  }
 
   /** Revealed once each — re-applying every frame would churn TrueSight's sight object. */
   revealedTargets: any[] = [];

@@ -92,7 +92,15 @@ export interface ConfigRosterEntry {
   avatarUrl: string | null;
   abilities: RosterAbility[];
   loadout: ChampionLoadout;
-  /** Bots only — the player drives itself and has no behaviour to configure. */
+  /**
+   * Bots only — the player drives itself and has no behaviour to configure.
+   * Carries the tier this bot plays at as well as its three switches, so the
+   * row renders the whole of its AI from one field and writes it back through
+   * one setter (`setBotBehaviour`). `undefined` here is what makes those
+   * controls a bot's — the tab guards them behind it, and
+   * `tests/game/hud/rosterTabDifficulty.test.ts` is what keeps them there,
+   * because `tsconfig.json` sets `strict: false` and the compiler will not.
+   */
   behaviour?: BotBehaviour;
   invulnerable: boolean;
 }
@@ -147,6 +155,10 @@ export interface MatchConfigSource {
   addBot(team: MatchTeamId): Promise<void>;
   removeBot(id: string): void;
   setTeam(id: string, team: MatchTeamId): void;
+  /**
+   * Writes only the fields it is handed — one toggle, or the difficulty row,
+   * can send its own without restating the rest. A no-op on the player.
+   */
   setBotBehaviour(id: string, flags: Partial<BotBehaviour>): void;
   /**
    * The loadout the editor opens on — the *setting*, not the champion currently

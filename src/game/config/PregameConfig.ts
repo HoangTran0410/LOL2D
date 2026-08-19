@@ -50,7 +50,11 @@
  * what every bot in the match ran on — so they *are* what an old blob meant
  * per bot. Seeding from the defaults would look right (the defaults are a
  * plausible answer) while silently discarding a setting the player really
- * made on the setup screen. A missing `ai.botTeams` gets the stable Red/Blue
+ * made on the setup screen. Its fourth field, `difficulty`, is the one that
+ * does *not* follow that shortcut and for the same reason: there has never been
+ * a global for it, and nothing outside `AIChampion`'s own default could set one
+ * — so a stored behaviour without a tier is a `normal` bot, which is what every
+ * match that was ever played actually was. A missing `ai.botTeams` gets the stable Red/Blue
  * alternation that balances the default three bots around the Blue player, and a
  * missing `playerTeam` gets Blue — the fixed side the player owned before the
  * team tab let them switch. `world`
@@ -59,6 +63,16 @@
  * match the game could boot.
  */
 import { initialBotTeam, isMatchTeamId, MatchTeam, type MatchTeamId } from './MatchTeams';
+import type { BotDifficulty } from '../ai/Difficulty';
+
+/**
+ * Re-exported so the stored schema and the panel that edits it can both name a
+ * tier without importing the AI module. The import above is `import type` and
+ * is erased; a *value* import of `game/ai/Difficulty` from here would be a
+ * static edge out of the `pregame` chunk into `game`, i.e. the whole match in
+ * front of the menu — see `tests/scenes/pregameBootPath.test.ts`.
+ */
+export type { BotDifficulty };
 
 /** A `SpellGroups` champion name (see `preset.ts`), or the random-kit default. */
 export type ChampionChoice = string | 'random';
@@ -107,6 +121,16 @@ export interface BotBehaviour {
   autoMove: boolean;
   autoAttack: boolean;
   autoCast: boolean;
+  /**
+   * How well this bot plays — `game/ai/Difficulty.ts` holds the three tiers and
+   * everything they tune. A fourth field of a *behaviour* rather than an array
+   * of its own beside `botBehaviours`, because it is the same question the
+   * three flags ask ("what does this bot do on its own?") about the same bot,
+   * and one shape means one persisted array, one splice when a bot is removed,
+   * one row in the panel and one setter — `setBotBehaviour(bot, flags)` already
+   * writes only the fields it is handed.
+   */
+  difficulty: BotDifficulty;
 }
 
 export interface AIConfig {
@@ -251,6 +275,29 @@ export const DEFAULT_CHAMPION_LOADOUT: Readonly<ChampionLoadout> = Object.freeze
 });
 
 /**
+ * The three tiers, easiest first — the order the roster row lists them in.
+ *
+ * A second copy of `BOT_DIFFICULTIES` in `game/ai/Difficulty.ts`, on purpose.
+ * That module is a *runtime value* in the `game` chunk, and this one is read by
+ * the match-config panel, which the menu mounts: importing the AI module's
+ * array here would drag the entire match in front of the logo (see the
+ * re-export at the top of this file). The two are held in step by
+ * `tests/game/config/PregameConfig.test.ts`, which imports both and fails if a
+ * tier is added, removed or renamed on one side only.
+ */
+export const BOT_DIFFICULTY_ORDER: readonly BotDifficulty[] = Object.freeze([
+  'easy',
+  'normal',
+  'hard',
+] as const);
+
+/** `AIChampion`'s own `DEFAULT_DIFFICULTY`, and what every match ran on before this was configurable. */
+export const DEFAULT_BOT_DIFFICULTY: BotDifficulty = 'normal';
+
+export const isBotDifficulty = (value: unknown): value is BotDifficulty =>
+  typeof value === 'string' && (BOT_DIFFICULTY_ORDER as readonly string[]).includes(value);
+
+/**
  * `AIChampion`'s own hardcoded defaults, which is what makes this the value a
  * bot slot nobody has configured must carry.
  */
@@ -258,6 +305,26 @@ export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
   autoMove: true,
   autoAttack: true,
   autoCast: true,
+  difficulty: DEFAULT_BOT_DIFFICULTY,
+});
+
+/**
+ * The behaviour a bot nobody has configured gets: the setup screen's global
+ * flags, which is what those are *for*, plus the default tier — the screen has
+ * no difficulty control, so the globals say nothing about it, and "normal" is
+ * what every bot in every match played before this one could be set.
+ *
+ * One helper rather than three literals, because all three call sites
+ * (`sanitizePregameConfig`, `PregameConfigSource.removeBot` refilling a freed
+ * tail slot, and `MatchDirector.addBotWithPreset`) mean exactly this sentence.
+ */
+export const globalBotBehaviour = (
+  ai: Pick<AIConfig, 'autoMove' | 'autoAttack' | 'autoCast'>
+): BotBehaviour => ({
+  autoMove: ai.autoMove,
+  autoAttack: ai.autoAttack,
+  autoCast: ai.autoCast,
+  difficulty: DEFAULT_BOT_DIFFICULTY,
 });
 
 /**
@@ -365,6 +432,11 @@ export const sanitizeBotBehaviour = (raw: unknown, fallback: BotBehaviour): BotB
     autoMove: asBoolean(source.autoMove, fallback.autoMove),
     autoAttack: asBoolean(source.autoAttack, fallback.autoAttack),
     autoCast: asBoolean(source.autoCast, fallback.autoCast),
+    // Per field like the three above, and the fallback callers hand in carries
+    // `DEFAULT_BOT_DIFFICULTY`: nothing could set a tier before this field
+    // existed, so a stored behaviour without one *is* a normal bot rather than
+    // an unanswered question. Reading it that way is lossless.
+    difficulty: isBotDifficulty(source.difficulty) ? source.difficulty : fallback.difficulty,
   };
 };
 
@@ -440,11 +512,14 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
   // Resolved before the per-bot array so it can seed it — the migration this
   // module's header spells out. Note the order: the *global* flags fall back to
   // the defaults, and every per-bot entry falls back to the globals.
-  const globalBehaviour: BotBehaviour = {
+  const globalFlags = {
     autoMove: asBoolean(ai.autoMove, DEFAULT_PREGAME_CONFIG.ai.autoMove),
     autoAttack: asBoolean(ai.autoAttack, DEFAULT_PREGAME_CONFIG.ai.autoAttack),
     autoCast: asBoolean(ai.autoCast, DEFAULT_PREGAME_CONFIG.ai.autoCast),
   };
+  // Only the three flags are spread into `ai` below; the tier is per bot and
+  // has no global to spread, which is why the two are separate values here.
+  const globalBehaviour: BotBehaviour = globalBotBehaviour(globalFlags);
   const rawBehaviours = Array.isArray(ai.botBehaviours) ? ai.botBehaviours : [];
   const botBehaviours: BotBehaviour[] = Array.from({ length: AI_COUNT_MAX }, (_, i) =>
     sanitizeBotBehaviour(rawBehaviours[i], globalBehaviour)
@@ -457,7 +532,7 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
       : DEFAULT_PREGAME_CONFIG.playerTeam,
     ai: {
       count: clampInt(ai.count, AI_COUNT_MIN, AI_COUNT_MAX, DEFAULT_PREGAME_CONFIG.ai.count),
-      ...globalBehaviour,
+      ...globalFlags,
       bots,
       botTeams,
       botBehaviours,

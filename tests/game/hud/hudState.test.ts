@@ -227,3 +227,65 @@ describe('computeHudState honours match rules', () => {
     expect(state?.spells[0].manaCost).toBe(40);
   });
 });
+
+/**
+ * Hồi Thành. It is not in `spells[]` — see `Recall.ts` — so it gets its own
+ * entry in `HudState` rather than an eighth `SpellDisplay`, and the desktop
+ * button reads that entry. The channel's duration is taken off the spell's own
+ * `castSpec.channel`, so retuning `RECALL_CHANNEL_MS` cannot make the readout
+ * lie without this suite noticing.
+ */
+describe('computeHudState — the recall control', () => {
+  const fakeRecall = (overrides: Record<string, unknown> = {}) => ({
+    name: 'Hồi Thành (Recall)',
+    description: 'Tự dịch chuyển về bệ đá của đội mình',
+    disabled: false,
+    state: 'READY',
+    channelProgress: 0,
+    castSpec: { channel: { durationMs: 4000 } },
+    ...overrides,
+  });
+
+  it('is null for a champion that has no recall at all', () => {
+    const state = computeHudState({ player: fakePlayer({ recall: null }) } as any)!;
+    expect(state.recall).toBeNull();
+  });
+
+  it('carries the B hotkey and the spell name, idle', () => {
+    const state = computeHudState({ player: fakePlayer({ recall: fakeRecall() }) } as any)!;
+    expect(state.recall).toMatchObject({
+      hotKey: 'B',
+      name: 'Hồi Thành (Recall)',
+      channeling: false,
+      progressPercent: 0,
+      secondsLeft: 4,
+      canCast: true,
+    });
+  });
+
+  it('reports how far through the channel is, and how long is left', () => {
+    const player = fakePlayer({
+      recall: fakeRecall({ state: 'CHANNELING', channelProgress: 0.25 }),
+    });
+    const state = computeHudState({ player } as any)!;
+    expect(state.recall).toMatchObject({
+      channeling: true,
+      progressPercent: 25,
+      secondsLeft: 3,
+    });
+  });
+
+  it('clamps an overshooting channel rather than drawing past the button', () => {
+    const player = fakePlayer({
+      recall: fakeRecall({ state: 'CHANNELING', channelProgress: 1.4 }),
+    });
+    const state = computeHudState({ player } as any)!;
+    expect(state.recall!.progressPercent).toBe(100);
+    expect(state.recall!.secondsLeft).toBe(0);
+  });
+
+  it('cannot be cast by a corpse', () => {
+    const player = fakePlayer({ isDead: true, recall: fakeRecall() });
+    expect(computeHudState({ player } as any)!.recall!.canCast).toBe(false);
+  });
+});

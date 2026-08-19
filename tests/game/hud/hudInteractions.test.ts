@@ -175,3 +175,64 @@ describe('createHudInteractions — the ways into the practice panel', () => {
     expect(game.unpause).toHaveBeenCalledOnce();
   });
 });
+
+/**
+ * Hồi Thành has two surfaces now — the desktop button here and the on-canvas
+ * touch button — and one action. `Game.recall()` already owns "start it, or
+ * call the trip off"; neither surface is allowed a second copy of that rule.
+ */
+describe('createHudInteractions — Hồi Thành', () => {
+  const fakeGame = () =>
+    ({
+      player: { spells: [{}, {}] },
+      objectManager: { objects: [] },
+      renderQuality: 'auto',
+      renderFps: 60,
+      setRenderQuality: vi.fn(),
+      setRenderFps: vi.fn(),
+      pause: vi.fn(),
+      unpause: vi.fn(),
+      recall: vi.fn(),
+    }) as any;
+
+  beforeEach(() => {
+    vi.stubGlobal('window', globalThis);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('forwards to Game.recall() rather than reaching for the spell itself', () => {
+    const game = fakeGame();
+    const hud = createHudInteractions(game);
+
+    (hud as any).recall();
+    (hud as any).recall();
+
+    expect(game.recall).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not pause the match the way the panel buttons do', () => {
+    const game = fakeGame();
+    createHudInteractions(game).recall();
+
+    expect(game.pause).not.toHaveBeenCalled();
+  });
+
+  /**
+   * `GameScene` cancels touches on the canvas, so a thumb never synthesises a
+   * `click` — a control with only `@click` is perfect under a mouse and dead
+   * under a finger. This is the one thing about the button no behaviour test
+   * of `hudInteractions` can see.
+   */
+  it('the desktop button answers a thumb as well as a mouse, and shows its key', () => {
+    const source = readFileSync('src/game/hud/DesktopHudView.vue', 'utf8');
+
+    expect(source).toContain('class="recall-btn"');
+    expect(source).toContain('@click="hud.recall()"');
+    expect(source).toContain('@touchend.prevent="hud.recall()"');
+    expect(source).toContain('state.recall.hotKey');
+    expect(source).toContain('state.recall.progressPercent');
+  });
+});

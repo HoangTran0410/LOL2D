@@ -188,7 +188,7 @@ export const spellCatalog = {
   },
   "Ashe_E": {
     name: "Ưng Tiễn (Ashe_E)",
-    description: "Thả một chim ưng bay xa <span>900px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class=\"buff\">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class=\"buff\">Lộ Diện</span> trong <span class=\"time\">3 giây</span>",
+    description: "Thả một chim ưng bay xa <span>4000px</span> theo hướng chỉ định. Chim ưng không gây sát thương nhưng <span class=\"buff\">Mở Tầm Nhìn</span> trên suốt đường bay và khiến mọi kẻ địch nó bay ngang qua bị <span class=\"buff\">Lộ Diện</span> trong <span class=\"time\">3 giây</span>",
     iconKey: "spell_ashe_e",
     coolDownMs: 6000,
     manaCost: 30,
@@ -1404,7 +1404,7 @@ export const spellCatalog = {
   },
   "Shaco_W": {
     name: "Hộp Hề Ma Quái (Shaco_W)",
-    description: "Đặt một Hộp Hề Ma Quái, tàng hình sau <span class=\"time\">1 giây</span> và tồn tại <span class=\"time\">20 giây</span>. Khi kẻ địch tới gần, hộp bật ra: <span class=\"buff\">Hoảng Sợ</span> và nã <span class=\"damage\">mọi kẻ địch xung quanh</span> trong <span class=\"time\">3 giây</span>, <span class=\"damage\">7 sát thương</span> mỗi phát. Lúc tàng hình <span class=\"buff\">không thể bị chọn</span>, nhưng khi đã bật ra thì <span class=\"damage\">có thể bị phá</span> (30 máu)",
+    description: "Đặt một Hộp Hề Ma Quái, tàng hình sau <span class=\"time\">1 giây</span> và tồn tại <span class=\"time\">20 giây</span>. Khi kẻ địch tới gần, hộp bật ra: <span class=\"buff\">Hoảng Sợ</span> và nã <span class=\"damage\">mọi kẻ địch xung quanh</span> trong <span class=\"time\">4 giây</span>, <span class=\"damage\">7 sát thương</span> mỗi phát. Lúc tàng hình <span class=\"buff\">không thể bị chọn</span>, nhưng khi đã bật ra thì <span class=\"damage\">có thể bị phá</span> (30 máu)",
     iconKey: "spell_shaco_w",
     coolDownMs: 5000,
     manaCost: 20,
@@ -1636,7 +1636,7 @@ export const spellCatalog = {
   },
   "Twitch_W": {
     name: "Độc Suy Nhược (Twitch_W)",
-    description: "Ném một bình độc bay tới vị trí chỉ định; <span class=\"damage\">khi chạm đất</span> bình vỡ thành vũng bán kính <span>160px</span> trong <span class=\"time\">3 giây</span>, <span class=\"buff\">Làm Chậm 50%</span> và <span class=\"damage\">nhiễm độc</span> kẻ địch bước vào",
+    description: "Ném một bình độc bay tới vị trí chỉ định; <span class=\"damage\">khi chạm đất</span> bình vỡ thành vũng bán kính <span>160px</span> trong <span class=\"time\">3 giây</span>, <span class=\"buff\">Làm Chậm 30%</span> và <span class=\"damage\">nhiễm độc</span> kẻ địch bước vào",
     iconKey: "spell_twitch_w",
     coolDownMs: 10000,
     manaCost: 30,
