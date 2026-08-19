@@ -977,6 +977,65 @@ try {
   report.slotBackToQ = await rosterShown();
   expect('slotBackToQ.open', report.slotBackToQ.open, null);
 
+  // --- 10. the search box ------------------------------------------------
+  // The roster is ~50 tiles in one scrolling list, so finding one by eye means
+  // scrolling past forty. The box filters the tiles; `matchesQuery` itself is
+  // unit-tested, so what is checked here is the wiring and the two cases a unit
+  // test cannot see: that clearing restores the list, and that a query does not
+  // close a shelf the player has open.
+  const shelfNames = () =>
+    evaluate(() => [...document.querySelectorAll('.kit-shelf')].map(e => e.dataset.champion));
+  const typeSearch = async text => {
+    await page.fill('.kit-search-input', text);
+    await page.waitForTimeout(80);
+  };
+
+  await selectSlot(1); // an ability slot, so nothing is open on its own
+  const everyShelf = await shelfNames();
+
+  await typeSearch('yas');
+  const narrowed = await shelfNames();
+  report.searchNarrowed = {
+    from: everyShelf.length,
+    to: narrowed.length,
+    names: narrowed,
+    // Checked here rather than by calling `matchesQuery`, which is the function
+    // under test: a transform asked to verify itself agrees with itself.
+    allContainQuery: narrowed.every(name => name.toLowerCase().includes('yas')),
+  };
+  expect('searchNarrowed.allContainQuery', report.searchNarrowed.allContainQuery, true);
+  expect('searchNarrowed.hasYasuo', narrowed.includes('Yasuo'), true);
+  expect('searchNarrowed.isNarrower', narrowed.length < everyShelf.length, true);
+
+  // A query nothing answers says so, rather than showing an empty screen.
+  await typeSearch('zzzz');
+  report.searchEmptyState = await evaluate(() => ({
+    shelves: document.querySelectorAll('.kit-shelf').length,
+    message: document.querySelector('.kit-search-empty')?.textContent?.trim() ?? null,
+  }));
+  expect('searchEmptyState.shelves', report.searchEmptyState.shelves, 0);
+  expect('searchEmptyState.hasMessage', report.searchEmptyState.message !== null, true);
+
+  // The clear button is a real target, and it puts the whole roster back.
+  await page.click('.kit-search-clear');
+  await page.waitForTimeout(80);
+  report.searchCleared = await shelfNames();
+  expect('searchCleared', report.searchCleared, everyShelf);
+
+  // A / D / F open a shelf whose name the player never typed and which has no
+  // tile. A query must not take it away from under them.
+  await selectSlot(5); // D — opens Phép Bổ Trợ
+  await typeSearch('zzzz');
+  report.searchKeepsOpenShelf = await evaluate(() => ({
+    open: document.querySelector('.kit-shelf.open')?.dataset.champion ?? null,
+    cards: document.querySelectorAll('.kit-shelf.open .catalog-spell-card').length,
+  }));
+  expect('searchKeepsOpenShelf.open', report.searchKeepsOpenShelf.open, 'Phép Bổ Trợ');
+  expect('searchKeepsOpenShelf.hasCards', report.searchKeepsOpenShelf.cards > 0, true);
+
+  await page.click('.kit-search-clear');
+  await selectSlot(1);
+
   // A tile opens; the button inside it is what takes the kit.
   await applyShelf('Ahri');
   await confirmLoadout();

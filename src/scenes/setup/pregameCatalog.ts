@@ -9,7 +9,30 @@ import {
   type SummonerSpellOption,
   type SpellCatalogEntry,
 } from '@/game/config/spellCatalog';
+import { removeAccents } from '@/utils/index';
 import type { AssetKey } from '@/managers/AssetManager';
+
+/**
+ * Folds a name for the picker's search box: case- and accent-insensitive.
+ *
+ * `removeAccents` rather than a hand-rolled strip — `src/utils/index.ts`
+ * already owns that transform and is already on this screen's import path.
+ */
+const searchKey = (text: string): string => removeAccents(text).toLowerCase().trim();
+
+/**
+ * Whether `name` answers `query` — a plain substring test, both sides folded.
+ *
+ * An empty (or all-space) query matches everything, which is what makes
+ * clearing the box restore the list without the caller having to special-case
+ * it. Accents are folded on both sides because the player types on a
+ * Vietnamese keyboard: Riot's champion names carry none, so that half only
+ * pays off on the saved-kit shelf, which the same box filters.
+ */
+export const matchesQuery = (name: string, query: string): boolean => {
+  const needle = searchKey(query);
+  return needle === '' || searchKey(name).includes(needle);
+};
 
 /** One catalogue entry on a shelf, with the kit slot its name claims (`abilitySlotOfId`) or `null`. */
 export interface KitShelfEntry {

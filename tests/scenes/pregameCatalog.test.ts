@@ -4,7 +4,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
 
-import { getPregameCatalog } from '../../src/scenes/setup/pregameCatalog';
+import { getPregameCatalog, matchesQuery } from '../../src/scenes/setup/pregameCatalog';
 import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
 
 /**
@@ -85,5 +85,50 @@ describe('each non-champion shelf knows what it serves', () => {
       shelf => shelf.kit.length > 0 && shelf.nonChampionKind !== null
     );
     expect(marked.map(shelf => shelf.name)).toEqual([]);
+  });
+});
+
+describe('searching the roster by name', () => {
+  /**
+   * The roster is ~50 champion tiles in one scrolling list, so finding one by
+   * eye means scrolling past forty. `matchesQuery` is what the picker's search
+   * box filters on, and it is a plain substring test with two foldings:
+   *
+   *  - **case**, because nobody types a capital;
+   *  - **accents**, because the player types on a Vietnamese keyboard and a
+   *    saved kit is very likely to be named in Vietnamese. Riot's champion
+   *    names carry none, so this half only ever pays off on the saved-kit
+   *    shelf — which is filtered by the same box, being the other named thing
+   *    on the screen.
+   */
+  it('matches a substring anywhere in the name', () => {
+    expect(matchesQuery('Cassiopeia', 'ssio')).toBe(true);
+    expect(matchesQuery('Cassiopeia', 'Cass')).toBe(true);
+    expect(matchesQuery('Cassiopeia', 'zed')).toBe(false);
+  });
+
+  it('ignores case and surrounding space', () => {
+    expect(matchesQuery('Master Yi', 'YI')).toBe(true);
+    expect(matchesQuery('Master Yi', '  master  ')).toBe(true);
+  });
+
+  it('ignores Vietnamese accents on both sides', () => {
+    expect(matchesQuery('Bộ chiêu để dành', 'bo chieu')).toBe(true);
+    expect(matchesQuery('Bo chieu de danh', 'bộ chiêu')).toBe(true);
+  });
+
+  it('matches everything on an empty query, so a cleared box restores the list', () => {
+    for (const query of ['', '   ']) {
+      expect(matchesQuery('Ashe', query)).toBe(true);
+    }
+  });
+
+  it('finds every champion in the catalogue by its own name', () => {
+    // Not a tautology: it is the guard against a folding that mangles a real
+    // name — an over-eager strip that ate an apostrophe or a space would leave
+    // `Kha'Zix` unfindable by typing exactly what the tile says.
+    for (const shelf of catalog.kitShelves) {
+      expect(matchesQuery(shelf.name, shelf.name), shelf.name).toBe(true);
+    }
   });
 });

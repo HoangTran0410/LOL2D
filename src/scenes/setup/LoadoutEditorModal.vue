@@ -78,7 +78,7 @@ import {
   spellDisplayOf,
   type SpellCatalogEntry,
 } from '@/game/config/spellCatalog';
-import { getPregameCatalog, type KitShelf } from './pregameCatalog';
+import { getPregameCatalog, matchesQuery, type KitShelf } from './pregameCatalog';
 import KitRoster from './KitRoster.vue';
 import SpellDetailPane from './SpellDetailPane.vue';
 import SpellIcon from './SpellIcon.vue';
@@ -436,6 +436,54 @@ const removeSavedKit = (kit: SavedKit): void => {
  */
 const openShelf = shallowRef<KitShelf | null>(null);
 
+/* ------------------------------------------------------------- the search */
+
+/**
+ * What the player has typed into the roster's search box.
+ *
+ * A plain `ref`, and rebuilt on every open for the same reason `openShelf` is:
+ * `<script setup>` *is* the setup function, and what you were looking for last
+ * time is a fact about the last few seconds, not a setting. Reopening the
+ * editor onto a filtered roster would hide forty champions and give no clue
+ * why.
+ */
+const search = ref('');
+
+/**
+ * The shelves whose name answers the query.
+ *
+ * Separate from `visibleShelves` below because it is what the empty state asks
+ * about: "nothing matched" has to mean nothing *matched*, not "nothing is on
+ * screen", and the open shelf is on screen either way.
+ */
+const matchingShelves = computed(() =>
+  kitShelves.filter(shelf => matchesQuery(shelf.name, search.value))
+);
+
+/**
+ * What the roster renders.
+ *
+ * The open shelf is always kept, whatever the query says. Two things break
+ * without that: the A / D / F slots open `Đánh Thường` and `Phép Bổ Trợ`, which
+ * are shelves the player never typed the name of and cannot see a tile for
+ * (`shelfForSlot`), and a champion you had already opened would vanish
+ * mid-keystroke as the name you are typing stops matching it.
+ */
+const visibleShelves = computed(() => {
+  const matching = matchingShelves.value;
+  const open = openShelf.value;
+  return open && !matching.includes(open) ? [open, ...matching] : matching;
+});
+
+/** The saved-kit shelf answers the same box: it is the other named thing here. */
+const visibleSavedKits = computed(() =>
+  savedKits.value.filter(kit => matchesQuery(kit.name, search.value))
+);
+
+const clearSearch = () => {
+  search.value = '';
+};
+
 /**
  * The shelf that serves a slot no champion ability can fill — A, D and F.
  *
@@ -653,16 +701,47 @@ const hint = computed(() => {
 
       <p class="kit-hint">{{ hint }}</p>
 
+      <!-- Above the scrolling body, not inside it: the roster is ~50 tiles
+           deep and a box that scrolled away with the list would be gone by the
+           time you knew you wanted it. No autofocus — on a phone that opens the
+           keyboard over the grid before the player has looked at it. -->
+      <div class="kit-search">
+        <i class="fas fa-magnifying-glass kit-search-icon" aria-hidden="true"></i>
+        <input
+          v-model="search"
+          type="search"
+          class="kit-search-input"
+          placeholder="Tìm tên tướng..."
+          aria-label="Tìm tên tướng"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button
+          v-if="search"
+          type="button"
+          class="pregame-icon-btn kit-search-clear"
+          title="Xoá ô tìm"
+          aria-label="Xoá ô tìm"
+          @click="clearSearch"
+          @touchend.prevent="clearSearch"
+        >
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
+      <p v-if="search && matchingShelves.length === 0" class="kit-hint kit-search-empty">
+        Không có tướng nào tên "{{ search }}".
+      </p>
+
       <div ref="rosterBody" class="pregame-modal-body">
         <KitRoster
-          :shelves="kitShelves"
+          :shelves="visibleShelves"
           :active-entry-id="activeEntryId"
           :selected-champion="selectedChampion"
           :match-rules="matchRules"
           :is-touch-ui="isTouchUi"
           :open-shelf="openShelf"
           :active-slot-label="SLOT_LABELS[activeSlot]"
-          :saved-kits="savedKits"
+          :saved-kits="visibleSavedKits"
           :peek="peek"
           @pick="pickSpell"
           @apply-kit="applyKit"
