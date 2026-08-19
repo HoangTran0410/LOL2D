@@ -94,10 +94,21 @@ export function escapePoint(
  * — cannot live there. Stopping short is the honest, conservative answer to
  * "do not walk into the guns", and the posture layer decides what to do next.
  *
- * A turret the body is **already inside** is skipped. Otherwise the clamp lands
- * on the body's own position and a bot that got dragged under a turret is
+ * A turret whose **guns the body is already in** is skipped. Otherwise the clamp
+ * lands on the body's own position and a bot that got dragged under a turret is
  * pinned there by the very rule meant to keep it out; walking back out is
  * DISENGAGE's job, through `escapePoint`.
+ *
+ * The guns, and not the keep-out ring — the distinction is the whole of a
+ * shipped bug. `clearance` puts a band between the two, and skipping on the
+ * outer radius handed that band to no rule at all: from inside a ring the entry
+ * root is negative, every turret is discarded, and the clamp goes quiet exactly
+ * where its own answer had just parked the body. A bot walked to the line, was
+ * let through on the next tick, crossed into the guns, was pushed back to the
+ * line by DISENGAGE, and did it again four times a second — reported from a
+ * real match as a bot pacing in and out of turret range. Inside the band the
+ * ring becomes the body's own distance instead, which refuses a step inward and
+ * leaves stepping out or sideways alone.
  */
 export function clampToSafeApproach(
   from: Vec2,
@@ -114,11 +125,16 @@ export function clampToSafeApproach(
   let earliest = 1;
   for (const turret of turrets) {
     if (!live(turret)) continue;
-    const ring = turretReach(turret, bodyRadius) + clearance;
+    const guns = turretReach(turret, bodyRadius);
     const offsetX = from.x - turret.position.x;
     const offsetY = from.y - turret.position.y;
     const startSq = offsetX * offsetX + offsetY * offsetY;
-    if (startSq <= ring * ring) continue; // already inside: not this rule's problem
+    if (startSq <= guns * guns) continue; // being shot at already: DISENGAGE's problem
+
+    // The ring this walk may not cross. Normally the keep-out line; for a body
+    // already inside it, its own distance, so the band between the two is a
+    // floor rather than a hole. See the note above.
+    const ring = Math.min(guns + clearance, Math.sqrt(startSq));
 
     // Where the segment first reaches the ring: the smaller root of
     // |from + t*span - centre|^2 = ring^2, which is a plain quadratic in t.
@@ -128,7 +144,12 @@ export function clampToSafeApproach(
     if (discriminant <= 0) continue; // the walk misses the ring entirely
 
     const entry = (-b - Math.sqrt(discriminant)) / spanSq;
-    if (entry <= 0 || entry >= earliest) continue;
+    // `< 0`, not `<= 0`. A body standing exactly on the ring and ordered inward
+    // has an entry root of exactly 0, and discarding that as "no crossing" is
+    // the other half of the same hole: 0 is a real answer, and it means the
+    // body may not take the step at all. A body ordered *outward* from the ring
+    // roots at a negative t and is left alone, which is what lets it leave.
+    if (entry < 0 || entry >= earliest) continue;
     earliest = entry;
   }
 

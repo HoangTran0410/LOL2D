@@ -72,6 +72,23 @@ export const PUSH_TURRET_ESCORT_PX = 450;
  */
 export const TURRET_KEEP_OUT_PX = 60;
 /**
+ * How long a turret that has fired on this bot stays off-limits to it.
+ *
+ * `turret.target === this.owner` is a true fact and a terrible gate on its own,
+ * because it stops being true the moment the bot steps out of range. A bot with
+ * a wave escorting it dived, `Turret.findAllyAttacker` swung the building onto
+ * it, it disengaged — and the instant it cleared the ring the building dropped
+ * it, the escort rule said yes again and it walked straight back in. Reported
+ * from a real match as a bot pacing the edge of turret range, and the slower of
+ * the two halves of that (the faster one is in `clampToSafeApproach`).
+ *
+ * A turret shot is a thing that happened, not a thing that is happening, so it
+ * has to outlive the range check. Four seconds is about how long a player stays
+ * off a tower after eating one — long enough for the wave to matter, short
+ * enough that the ground genuinely reopens.
+ */
+export const TURRET_HOSTILE_MS = 4_000;
+/**
  * Health a bot must still have before it will trade a turret shot for a kill.
  *
  * Above `hard`'s `retreatHealthPct` of 0.4, so the dive rule is never what a
@@ -465,6 +482,12 @@ export class BotBrain {
    */
   private recovering = false;
   /**
+   * When each enemy turret stops counting as hostile to this bot. Bounded by
+   * the number of buildings in the match, and only ever written for one the
+   * blackboard is publishing. See `TURRET_HOSTILE_MS`.
+   */
+  private readonly turretHostileUntilMs = new Map<Turret, number>();
+  /**
    * Set while a recovering bot is walking to the platform rather than resetting
    * at its turret. See the note in `decidePosture`; `retreatPoint()` reads it.
    */
@@ -511,6 +534,11 @@ export class BotBrain {
    * — a bot that can perceive nobody — so this cannot be a `??`.
    */
   evaluatePosture(view: TeamView, nowMs: number, target?: Champion | null): Posture {
+    // The clock, written here as well as at the top of `update`, because this is
+    // the entry point the suites use and `turretIsHostile` reads `this.nowMs`
+    // from paths that are handed no time at all (`findAttackTarget`).
+    this.nowMs = nowMs;
+    this.noteTurretFire(view);
     const chosen = target === undefined ? this.pickTarget(view) : target;
     const posture = this.decidePosture(view, nowMs, chosen);
     this.posture = posture;
@@ -581,8 +609,24 @@ export class BotBrain {
     // `killCredit === 'champion'` is the discriminator the codebase already
     // treats as authoritative (see CLAUDE.md); `instanceof` is not, because
     // `Pet` and `Zed_W_Clone` both extend `Champion`.
-    if (this.owner.basicAttack?.target?.killCredit === 'champion') return 'FIGHT';
-    if (target) return 'FIGHT';
+    //
+    // Both gated on `guardedByTurret`, and that gate is the point: it is the
+    // same test `findAttackTarget` has always applied to *acquisition*, and
+    // leaving it out here made the two halves of this layer contradict each
+    // other. The posture said close in, `safely()` said no further, and the bot
+    // paced the edge of the guns at 4Hz — reported from a real match, and
+    // legible from across the screen as a machine. A champion this bot may not
+    // walk to is not a fight; falling through sends it to its wave instead,
+    // which is also what eventually earns it the dive.
+    //
+    // The standing order is tested against itself rather than against `target`:
+    // they are often different champions, and a bot chasing a reachable one
+    // must not be talked out of it by a second enemy sitting under a turret.
+    // `maybeCast` still gets `target`, so a poke thrown from outside the ring
+    // is untouched — this is about where the feet go.
+    const order = this.owner.basicAttack?.target;
+    if (order?.killCredit === 'champion' && !this.guardedByTurret(view, order)) return 'FIGHT';
+    if (target && !this.guardedByTurret(view, target)) return 'FIGHT';
     if (this.rememberedTarget(view, nowMs)) return 'SEARCH';
     if (this.assistableFocus(view)) return 'ENGAGE';
     // Below every way of answering "is there a champion to deal with" and above
@@ -645,8 +689,36 @@ export class BotBrain {
     if (target && healthPct >= DIVE_HEALTH_PCT && effectiveHealth(target) <= DIVE_LETHAL_HEALTH) {
       return true;
     }
-    if (turret.target === this.owner) return false;
+    if (this.turretIsHostile(turret)) return false;
     return this.waveEscorts(view, turret);
+  }
+
+  /**
+   * Whether this building has had its barrel pointed at this bot lately.
+   *
+   * The live read is kept as well as the latch: a turret can switch onto a bot
+   * between two think ticks, and waiting a quarter of a second to notice is a
+   * quarter of a second of free shots.
+   */
+  private turretIsHostile(turret: Turret): boolean {
+    if (turret.target === this.owner) return true;
+    return this.nowMs < (this.turretHostileUntilMs.get(turret) ?? Number.NEGATIVE_INFINITY);
+  }
+
+  /**
+   * Stamps every enemy turret currently shooting at this bot. One pass over the
+   * six buildings the blackboard already gathered, once per decision.
+   *
+   * Deliberately here and not inside `divingAllowed`: that one is asked several
+   * times a tick, by `forbiddenTurrets` on behalf of two different callers, and
+   * a predicate that writes the state it reads answers differently depending on
+   * how many times it has been asked.
+   */
+  private noteTurretFire(view: TeamView): void {
+    for (const turret of view.enemyTurrets) {
+      if (turret.target !== this.owner) continue;
+      this.turretHostileUntilMs.set(turret, this.nowMs + TURRET_HOSTILE_MS);
+    }
   }
 
   /** Whether this team's wave has reached the ground under `turret`. */

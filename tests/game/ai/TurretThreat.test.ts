@@ -124,6 +124,40 @@ describe('clampToSafeApproach', () => {
     ).toEqual({ x: 1_000, y: 0 });
   });
 
+  it('refuses the step when the body is standing on the ring', () => {
+    // The shipped bug, at its smallest. `escapePoint` and this clamp share the
+    // 490 ring, so the clamp's own answer parks the body exactly on it — and
+    // the entry root there is exactly 0, which used to be discarded as "no
+    // crossing". The body walked on in, DISENGAGE walked it back to 490, and it
+    // did that four times a second for as long as anyone watched.
+    expect(
+      clampToSafeApproach({ x: 490, y: 0 }, { x: 0, y: 0 }, towers(tower(0, 0)), BODY, CLEAR)
+    ).toEqual({ x: 490, y: 0 });
+  });
+
+  it('refuses the step from inside the keep-out band too', () => {
+    // 460 is past the 430 guns and short of the 490 ring: outside anything that
+    // shoots, inside the margin. Skipping on the outer radius handed this whole
+    // band to no rule at all.
+    const held = clampToSafeApproach(
+      { x: 460, y: 0 },
+      { x: 0, y: 0 },
+      towers(tower(0, 0)),
+      BODY,
+      CLEAR
+    );
+    expect(held.x).toBeCloseTo(460, 6);
+    expect(held.y).toBeCloseTo(0, 6);
+  });
+
+  it('still lets a body in the band walk away from the turret', () => {
+    // The refusal is directional, or a bot that drifted into the margin would
+    // be pinned in it — which is the very thing the skip was written to avoid.
+    expect(
+      clampToSafeApproach({ x: 460, y: 0 }, { x: 2_000, y: 0 }, towers(tower(0, 0)), BODY, CLEAR)
+    ).toEqual({ x: 2_000, y: 0 });
+  });
+
   it('ignores a dead turret', () => {
     expect(
       clampToSafeApproach(
