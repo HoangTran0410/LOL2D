@@ -654,7 +654,7 @@ try {
     };
   });
   check(
-    'the practice panel opens on Đấu thủ and fits the phone viewport',
+    'the practice panel opens on Đội and fits the phone viewport',
     report.panelInPhoneView.visible &&
       report.panelInPhoneView.onScreen &&
       report.panelInPhoneView.selectedTab === 'practice-tab-roster',

@@ -73,6 +73,10 @@ describe('DEFAULT_PREGAME_CONFIG', () => {
     );
   });
 
+  it('starts the player on Blue, the fixed side before the team tab let them switch', () => {
+    expect(DEFAULT_PREGAME_CONFIG.playerTeam).toBe(TeamId.BLUE);
+  });
+
   it('produces a no-op match-rules multiplier', () => {
     expect(toMatchRules(DEFAULT_PREGAME_CONFIG.rules)).toEqual({
       cooldownMultiplier: 1,
@@ -220,6 +224,7 @@ describe('sanitizePregameConfig', () => {
         summonerF: 'Ignite',
         customSlots: Array(SLOT_COUNT).fill('random'),
       },
+      playerTeam: TeamId.RED,
       ai: {
         count: 3,
         autoMove: true,
@@ -317,6 +322,7 @@ describe('loadPregameConfig / savePregameConfig', () => {
         summonerF: 'Heal',
         customSlots: ['BasicAttack', 'Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R', 'Ghost', 'Ignite'],
       },
+      playerTeam: TeamId.RED,
       ai: {
         count: 8,
         autoMove: true,
@@ -422,6 +428,19 @@ describe('loadPregameConfig / savePregameConfig', () => {
       loaded.ai.bots.every(bot => bot.mode === 'champion' && bot.championName === 'random')
     ).toBe(true);
     expect(loaded.ai.botTeams).toEqual(DEFAULT_PREGAME_CONFIG.ai.botTeams);
+    // and the player, who had no team field before the team tab, migrates to Blue
+    expect(loaded.playerTeam).toBe(TeamId.BLUE);
+  });
+});
+
+describe('playerTeam', () => {
+  it('migrates a missing player team to Blue', () => {
+    expect(sanitizePregameConfig({ player: { championName: 'Zed' } }).playerTeam).toBe(TeamId.BLUE);
+  });
+
+  it('keeps a valid player team and falls back to Blue for an invalid one', () => {
+    expect(sanitizePregameConfig({ playerTeam: TeamId.RED }).playerTeam).toBe(TeamId.RED);
+    expect(sanitizePregameConfig({ playerTeam: 'legacy-ffa-id' }).playerTeam).toBe(TeamId.BLUE);
   });
 });
 

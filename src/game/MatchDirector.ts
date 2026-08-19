@@ -353,6 +353,12 @@ export default class MatchDirector {
 
     return {
       player: this.loadoutOf(this.game.player),
+      // Read back off the live player, the same way each bot's side is — a
+      // running match's player always holds a lane team, but fall back to the
+      // stored side rather than inventing one if a fixture ever does not.
+      playerTeam: isMatchTeamId(this.game.player.teamId)
+        ? this.game.player.teamId
+        : stored.playerTeam,
       ai: {
         count: live.length,
         autoMove: stored.ai.autoMove,
@@ -558,6 +564,30 @@ export default class MatchDirector {
     this.persist();
   }
 
+  /**
+   * Moves a champion — the player or any bot — to the given lane team, live.
+   *
+   * Everything that reads a side reads `teamId` at query time, so this one
+   * assignment is the whole switch: `randomSpawnPoint(teamId)` finds the
+   * fountain the unit respawns at, `PredefinedFilters.teamId` sorts ally from
+   * enemy for every acquisition, and the turret's ally-protection and the fog's
+   * ally-vision both follow the moment the field changes. Nothing is re-homed or
+   * teleported — the unit keeps standing where it is, and only its next respawn
+   * returns to the new fountain, which is what a paused practice switch should
+   * do.
+   *
+   * It persists like a bot's team: `toPregameConfig` reads the side back off the
+   * live unit (the player's into `playerTeam`), so the match you shaped is the
+   * one you reload. A no-op switch to the current side is dropped so it never
+   * writes storage for nothing.
+   */
+  setTeam(unit: Champion, teamId: MatchTeamId): void {
+    if (unit.teamId === teamId) return;
+    this.invalidatePendingReset();
+    unit.setTeamId(teamId);
+    this.persist();
+  }
+
   get jungleEnabled(): boolean {
     return this._jungleEnabled;
   }
@@ -718,6 +748,10 @@ export default class MatchDirector {
 
     for (const bot of this.bots()) bot.toRemove = true;
     this.applyResolvedLoadout(this.game.player, config.player, presets[0], false);
+    // The player's side is a match setting now, so a reset puts it back on the
+    // default team the same way it puts the bots back — otherwise a player who
+    // switched to Red would stay Red over a config that says Blue.
+    this.game.player.setTeamId(config.playerTeam);
     for (let i = 0; i < config.ai.count; i++) {
       this.addBotWithPreset(config.ai.bots[i], presets[i + 1], {
         teamId: config.ai.botTeams[i],

@@ -57,7 +57,6 @@ import type { JoystickVector } from './input/VirtualJoystick';
 import { issuePointerOrder } from './input/PointerOrders';
 import type Spell from './gameObject/Spell';
 import type { CastContext, Vec2 } from './spell/runtime/types';
-import TeamId from './enums/TeamId';
 
 /**
  * How far ahead of the champion the joystick plants its destination, as frames
@@ -244,10 +243,14 @@ export default class Game {
     // initial point, and randomSpawnPoint falls back safely for UUID/FFA teams.
     this.spawnFountains();
 
+    // Blue by default and for every match before the team tab existed, but the
+    // player is now a movable roster slot like any bot — so its side comes from
+    // the config, which persists a team switch the same way it persists a bot's.
+    const playerTeam = pregameConfig.playerTeam;
     this.player = new Champion({
       game: this,
-      position: this.randomSpawnPoint(TeamId.BLUE),
-      teamId: TeamId.BLUE,
+      position: this.randomSpawnPoint(playerTeam),
+      teamId: playerTeam,
       preset: presetFromPlan(kits.player),
     });
     this.objectManager.addObject(this.player);

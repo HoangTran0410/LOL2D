@@ -1,5 +1,5 @@
 /**
- * The stat sheet on the Đấu thủ tab, driven end to end.
+ * The stat sheet on the Đội tab, driven end to end.
  *
  * `participantStats.ts` is unit-tested and `MatchTally` is unit-tested, so what
  * is left is everything Vitest structurally cannot see: whether the numbers
@@ -176,8 +176,10 @@ const sheet = await page.evaluate(() => {
 });
 
 check(
-  'tapping the strip opens exactly one sheet, grouped',
-  sheet.count === 1 && sheet.groups?.length === 4,
+  'tapping the strip opens exactly one sheet, grouped — four stat groups plus the folded-in cheats',
+  sheet.count === 1 &&
+    sheet.groups?.length === 5 &&
+    sheet.groups?.includes('Luyện tập'),
   `sheets=${sheet.count} groups=${(sheet.groups ?? []).join(',')}`
 );
 

@@ -143,6 +143,38 @@ describe('MatchDirector persistence', () => {
     expect(loadPregameConfig().ai.botTeams.slice(0, 2)).toEqual([TeamId.RED, TeamId.RED]);
   });
 
+  it('moves a bot to the other team live and persists the new side', () => {
+    const { director } = bench();
+    const bot = director.addBot(loadoutNamed('Ahri'))!;
+    expect(bot.teamId).toBe(TeamId.RED);
+
+    director.setTeam(bot, TeamId.BLUE);
+
+    expect(bot.teamId).toBe(TeamId.BLUE);
+    expect(loadPregameConfig().ai.botTeams[0]).toBe(TeamId.BLUE);
+  });
+
+  it('moves the player off Blue and persists it as playerTeam, unlike a bot', () => {
+    const { director, ctx } = bench();
+    expect(ctx.player.teamId).toBe(TeamId.BLUE);
+
+    director.setTeam(ctx.player, TeamId.RED);
+
+    expect(ctx.player.teamId).toBe(TeamId.RED);
+    expect(loadPregameConfig().playerTeam).toBe(TeamId.RED);
+  });
+
+  it('does not write storage when a team switch changes nothing', () => {
+    const { director, ctx } = bench();
+    director.setRules({ cooldownReductionPercent: 20, manaFree: false });
+    const before = storage.getItem(STORAGE_KEY);
+
+    // The player is already Blue; asking for Blue again must be a no-op.
+    director.setTeam(ctx.player, TeamId.BLUE);
+
+    expect(storage.getItem(STORAGE_KEY)).toBe(before);
+  });
+
   /**
    * The paused-panel trap, which is the whole reason this derivation cannot be
    * a one-liner over `objectManager.objects`.
@@ -221,7 +253,7 @@ describe('MatchDirector persistence', () => {
       director.setRules({ cooldownReductionPercent: 10, manaFree: false });
 
       const raw = storedRaw()!;
-      expect(Object.keys(raw).sort()).toEqual(['ai', 'player', 'rules', 'world']);
+      expect(Object.keys(raw).sort()).toEqual(['ai', 'player', 'playerTeam', 'rules', 'world']);
       expect(Object.keys(raw.ai as object).sort()).toEqual([
         'autoAttack',
         'autoCast',

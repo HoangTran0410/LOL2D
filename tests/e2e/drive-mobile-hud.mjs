@@ -12,7 +12,7 @@
  * stacks, CC and the revive countdown all already draw on the canvas over
  * the champion, and the loadout row duplicated the canvas spell buttons. The
  * one entry point left is the corner button (`.spell-picker-btn`), which
- * opens the practice panel on Đấu thủ. The loadout it used to reach directly
+ * opens the practice panel on Đội. The loadout it used to reach directly
  * is now one tap further in — a roster row opens `LoadoutEditorModal`, which
  * is a setup-screen component that relies on native clicks and list scrolling;
  * this script proves those browser behaviors survive inside a match.
@@ -80,7 +80,7 @@ try {
     selected: document.querySelector('.practice-tab.selected')?.id ?? null,
   }));
   check(
-    'the panel opens on Đấu thủ, with the three tabs it should have',
+    'the panel opens on Đội, with the three tabs it should have',
     report.tabOnOpen.selected === 'practice-tab-roster' && report.tabOnOpen.tabs.length === 3,
     JSON.stringify(report.tabOnOpen)
   );

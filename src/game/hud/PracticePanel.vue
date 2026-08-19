@@ -68,7 +68,10 @@ import { activePracticeTab, type PracticeTabId } from './practice/panelTab';
 const hud = inject<HudInteractions>('hud')!;
 
 const TABS: { id: PracticeTabId; label: string }[] = [
-  { id: 'roster', label: 'Đấu thủ' },
+  // The id stays `roster` (the DOM id `practice-tab-roster` and its e2e
+  // selectors with it); the label is "Đội" because the tab is now about sides
+  // and per-champion setup, not a flat list of contestants.
+  { id: 'roster', label: 'Đội' },
   { id: 'rules', label: 'Trận đấu' },
   { id: 'cheats', label: 'Gian lận' },
 ];

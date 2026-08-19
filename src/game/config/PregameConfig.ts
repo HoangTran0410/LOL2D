@@ -29,7 +29,7 @@
  *
  * The storage key stays `lol2d:pregameConfig:v1` even though this revision
  * adds fields (`player.mode`, `player.customSlots`, `ai.bots`,
- * `ai.botBehaviours`, `ai.botTeams`) that v1 never wrote. Bumping the key was
+ * `ai.botBehaviours`, `ai.botTeams`, `playerTeam`) that v1 never wrote. Bumping the key was
  * the other option and was rejected: a player who
  * configured a match yesterday would load under a fresh key with nothing
  * there, silently losing their champion pick, AI count, CDR and URF — a
@@ -51,12 +51,14 @@
  * per bot. Seeding from the defaults would look right (the defaults are a
  * plausible answer) while silently discarding a setting the player really
  * made on the setup screen. A missing `ai.botTeams` gets the stable Red/Blue
- * alternation that balances the default three bots around the fixed Blue player. `world`
+ * alternation that balances the default three bots around the Blue player, and a
+ * missing `playerTeam` gets Blue — the fixed side the player owned before the
+ * team tab let them switch. `world`
  * is the same story with a simpler answer: a config saved before it existed
  * meant a match with a full jungle and lane minions, because that is the only
  * match the game could boot.
  */
-import { initialBotTeam, isMatchTeamId, type MatchTeamId } from './MatchTeams';
+import { initialBotTeam, isMatchTeamId, MatchTeam, type MatchTeamId } from './MatchTeams';
 
 /** A `SpellGroups` champion name (see `preset.ts`), or the random-kit default. */
 export type ChampionChoice = string | 'random';
@@ -169,6 +171,14 @@ export interface MatchRulesConfig {
 
 export interface PregameConfig {
   player: ChampionLoadout;
+  /**
+   * The player's lane team. Blue by default, and the practice panel's team tab
+   * can move the player to Red like any bot — so it persists here beside
+   * `ai.botTeams`, for the same reason those do: the match you shaped is the one
+   * you get back on reload. An old blob missing it migrates to Blue, the fixed
+   * side the player always used to own.
+   */
+  playerTeam: MatchTeamId;
   ai: AIConfig;
   rules: MatchRulesConfig;
   world: WorldConfig;
@@ -208,6 +218,7 @@ export const DEFAULT_BOT_BEHAVIOUR: Readonly<BotBehaviour> = Object.freeze({
  */
 export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
   player: DEFAULT_CHAMPION_LOADOUT,
+  playerTeam: MatchTeam.BLUE,
   ai: Object.freeze({
     count: 3,
     autoMove: DEFAULT_BOT_BEHAVIOUR.autoMove,
@@ -333,6 +344,9 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
 
   return {
     player: sanitizeChampionLoadout(source.player),
+    playerTeam: isMatchTeamId(source.playerTeam)
+      ? source.playerTeam
+      : DEFAULT_PREGAME_CONFIG.playerTeam,
     ai: {
       count: clampInt(ai.count, AI_COUNT_MIN, AI_COUNT_MAX, DEFAULT_PREGAME_CONFIG.ai.count),
       ...globalBehaviour,

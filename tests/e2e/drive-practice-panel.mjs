@@ -20,7 +20,7 @@
  *      closes it from *every* one of them — no tab owns an exit, and the one
  *      that used to (the deleted picker's Huỷ) left the others with no way out
  *      of a modal covering a paused match;
- *   2. Đấu thủ: a bot added while paused is on the roster at once and in
+ *   2. Đội: a bot added while paused is on the roster at once and in
  *      `objectManager.objects` on the first unpaused tick, not before;
  *   3. swapping that bot's champion changes its name and leaves it standing
  *      exactly where it was;
@@ -40,13 +40,16 @@
  *      and `=== 0.1` fails on correct code;
  *   8. the same tab's jungle switch empties `game.monsters` and the camps are
  *      gone from the world after one tick;
- *   9. Gian lận: the invulnerability toggle survives a close and reopen, and a
- *      stack button moves the spell's own count *and* the HUD badge;
+ *   9. Đội: a champion's side switches live — the player Blue↔Red, row and
+ *      teamId together; and, folded onto each champion's own row, the
+ *      invulnerability toggle survives a close and reopen and a stack button
+ *      moves the spell's own count *and* the HUD badge. The debug layers are the
+ *      one thing left on Gian lận, since they change the match, not a champion;
  *  10. an invulnerable bot stops losing health across unpaused frames while a
  *      second bot, hit identically, does not — the only check here that proves
  *      the buff works in the real loop rather than in a fixture;
  *  11. a kit saved mid-match survives a reload into a new match. Note *where*:
- *      the saved-kit shelf is not on the panel itself — it is at Đấu thủ → a
+ *      the saved-kit shelf is not on the panel itself — it is at Đội → a
  *      unit's row → the loadout editor, which teleports out of the panel.
  *      Asserted both ways. The same reload closes the persistence round trip:
  *      everything checks 7, 8 and 10 changed is in `lol2d:pregameConfig:v1`,
@@ -55,8 +58,8 @@
  *      opposite until the panel started persisting ("chỉ sửa trận hiện tại",
  *      reversed by `2026-08-16-panel-persistence-design`), and the half that
  *      did not reverse is asserted beside it: none of check 9's cheats or
- *      debug layers reaches storage, and the blob has only the four
- *      match-configuration sections;
+ *      debug layers reaches storage, and the blob has only the five
+ *      match-configuration sections (player, playerTeam, ai, rules, world);
  *  12. "Đặt lại mặc định" arms on the first press and, on the second, puts the
  *      running match *and* storage back to `DEFAULT_PREGAME_CONFIG` — the
  *      clean slate persistence took away;
@@ -77,7 +80,7 @@ const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
 const TAB_IDS = ['roster', 'rules', 'cheats'];
-const TAB_LABELS = ['Đấu thủ', 'Trận đấu', 'Gian lận'];
+const TAB_LABELS = ['Đội', 'Trận đấu', 'Gian lận'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
@@ -308,7 +311,7 @@ try {
     String(report.tabPersisted)
   );
 
-  // ------------------------------------------------- 2. Đấu thủ: add a bot
+  // ------------------------------------------------- 2. Đội: add a bot
 
   await openPanel();
   await selectTab('roster');
@@ -331,7 +334,7 @@ try {
     added: added.length,
   };
   check(
-    'Đấu thủ: a bot added under a thumb is on the roster at once, in the world after one tick',
+    'Đội: a bot added under a thumb is on the roster at once, in the world after one tick',
     rosterAfterAdd === rosterBeforeAdd + 1 &&
       botsWhilePaused.length === botsBeforeAdd.length &&
       added.length === 1,
@@ -366,7 +369,7 @@ try {
   const afterSwap = await botSnapshot(botId);
   report.swapChampion = { beforeSwap, afterSwap };
   check(
-    "Đấu thủ: swapping a bot's champion changes its name and leaves it standing where it was",
+    "Đội: swapping a bot's champion changes its name and leaves it standing where it was",
     !!beforeSwap &&
       !!afterSwap &&
       afterSwap.name === 'Zed' &&
@@ -387,7 +390,7 @@ try {
   const afterMouseFlag = await botSnapshot(botId);
   report.behaviourFlags = { flagsBefore, afterTouchFlag, afterMouseFlag };
   check(
-    "Đấu thủ: a behaviour toggle really flips the bot's own flag, under a thumb and under a mouse",
+    "Đội: a behaviour toggle really flips the bot's own flag, under a thumb and under a mouse",
     afterTouchFlag.autoMove === !flagsBefore.autoMove &&
       afterTouchFlag.autoAttack === flagsBefore.autoAttack &&
       afterMouseFlag.autoAttack === !flagsBefore.autoAttack &&
@@ -410,7 +413,7 @@ try {
     stillThere: botsAfterRemoval.includes(botId),
   };
   check(
-    'Đấu thủ: removing a bot marks it at once and the sweep takes it away on the next tick',
+    'Đội: removing a bot marks it at once and the sweep takes it away on the next tick',
     rosterAfterRemove === rosterBeforeAdd &&
       markedWhilePaused?.toRemove === true &&
       !botsAfterRemoval.includes(botId),
@@ -442,7 +445,7 @@ try {
   };
   await page.screenshot({ path: `${OUT}-03-cap.png` });
   check(
-    `Đấu thủ: ${PRESSES} presses while paused stop at AI_COUNT_MAX (${AI_COUNT_MAX}), imported not hardcoded`,
+    `Đội: ${PRESSES} presses while paused stop at AI_COUNT_MAX (${AI_COUNT_MAX}), imported not hardcoded`,
     report.cap.rosterBots === AI_COUNT_MAX &&
       report.cap.inWorldWhilePaused === 0 &&
       report.cap.addButtonDisabled === true &&
@@ -594,25 +597,56 @@ try {
     JSON.stringify(report.jungle)
   );
 
-  // ------------------------------- 9. Gian lận: the toggle and the stack rows
+  // ----------------- 9. Đội: per-unit cheats folded onto the champion's row
 
   await openPanel();
-  await selectTab('cheats', true); // one of the three switched by thumb
+  await selectTab('roster', true); // one of the three switched by thumb
+
+  // The headline of this tab: a champion changes sides live. Switch the player
+  // Blue→Red and back, and confirm the unit's teamId and which section its row
+  // sits under move together — a real reassignment, not a label. The player is
+  // switchable too, which is why this drives the player and not a bot.
+  const teamBefore = await gameEval(() => window.__lol2d.scene.oScene.game.player.teamId);
+  await tapSelector('.practice-roster-row.is-player .practice-team-switch'); // real thumb
+  const teamAfterSwitch = await gameEval(() => ({
+    teamId: window.__lol2d.scene.oScene.game.player.teamId,
+    underRed: !!document.querySelector('.practice-team--red .practice-roster-row.is-player'),
+    underBlue: !!document.querySelector('.practice-team--blue .practice-roster-row.is-player'),
+  }));
+  await tapSelector('.practice-team--red .practice-roster-row.is-player .practice-team-switch');
+  const teamAfterSwitchBack = await gameEval(
+    () => window.__lol2d.scene.oScene.game.player.teamId
+  );
+  report.teamSwitch = { teamBefore, teamAfterSwitch, teamAfterSwitchBack };
+  check(
+    'Đội: the switch moves the player to the other side — row and teamId together — and back',
+    teamBefore === 'team-blue' &&
+      teamAfterSwitch.teamId === 'team-red' &&
+      teamAfterSwitch.underRed === true &&
+      teamAfterSwitch.underBlue === false &&
+      teamAfterSwitchBack === 'team-blue',
+    JSON.stringify(report.teamSwitch)
+  );
+
+  // Bất tử, hồi đầy/xoá hồi chiêu and the stack rows live inside a champion's
+  // own drawer now, not behind a unit picker on a separate tab — so open the
+  // player's drawer (row 0) to reach them.
+  await tapSelector('#practice-row-toggle-0');
   const cheatShape = await gameEval(() => ({
-    units: document.querySelectorAll('[id^="practice-cheat-unit-"]').length,
+    invuln: !!document.querySelector('#practice-cheat-invuln-0'),
     stackRows: [...document.querySelectorAll('[data-cheat-stack]')].map(
       row => row.dataset.cheatStack
     ),
   }));
   await page.screenshot({ path: `${OUT}-06-cheats.png` });
   check(
-    'Gian lận: one row per unit, and one stack row for the one stacking spell in the kit',
-    cheatShape.units === (await rosterCount()) && cheatShape.stackRows.length === 1,
+    'Đội: the player drawer carries an invuln toggle and one stack row for its one stacking spell',
+    cheatShape.invuln === true && cheatShape.stackRows.length === 1,
     JSON.stringify(cheatShape)
   );
 
-  // The toggle, on the player (row 0, which is what the tab opens on).
-  await tapSelector('#practice-cheat-invuln');
+  // The toggle, on the player (row 0).
+  await tapSelector('#practice-cheat-invuln-0');
   const invulnAfterTap = await gameEval(() =>
     window.__lol2d.scene.oScene.game.director.isInvulnerable(
       window.__lol2d.scene.oScene.game.player
@@ -620,9 +654,11 @@ try {
   );
   await closePanel();
   await openPanel();
-  await selectTab('cheats');
+  await selectTab('roster');
+  // The drawer resets on remount — re-open it to reach the toggle again.
+  await tapSelector('#practice-row-toggle-0');
   const invulnAfterReopen = await gameEval(() => ({
-    checkbox: document.querySelector('#practice-cheat-invuln').checked,
+    checkbox: document.querySelector('#practice-cheat-invuln-0').checked,
     director: window.__lol2d.scene.oScene.game.director.isInvulnerable(
       window.__lol2d.scene.oScene.game.player
     ),
@@ -632,16 +668,16 @@ try {
   // cannot run while the panel holds the match paused — a toggle that only
   // ever counted buffs would report "still on" here and refuse to come back
   // on afterwards.
-  await tapSelector('#practice-cheat-invuln');
+  await tapSelector('#practice-cheat-invuln-0');
   const invulnAfterSecondTap = await gameEval(() => ({
-    checkbox: document.querySelector('#practice-cheat-invuln').checked,
+    checkbox: document.querySelector('#practice-cheat-invuln-0').checked,
     director: window.__lol2d.scene.oScene.game.director.isInvulnerable(
       window.__lol2d.scene.oScene.game.player
     ),
   }));
   report.invulnToggle = { invulnAfterTap, invulnAfterReopen, invulnAfterSecondTap };
   check(
-    'Gian lận: the invulnerability toggle survives a close and reopen, and still switches off',
+    'Đội: the invulnerability toggle survives a close and reopen, and still switches off',
     invulnAfterTap === true &&
       invulnAfterReopen.director === true &&
       invulnAfterReopen.checkbox === true &&
@@ -650,9 +686,12 @@ try {
     JSON.stringify(report.invulnToggle)
   );
 
-  // The debug layers, on the same tab. `routes` is the one worth driving: the
-  // checkbox and the `N` key must write one field, not two — so this taps the
-  // checkbox and reads `navigation.debugRoutes`, the field the key flips.
+  // The debug layers, on the Gian lận tab (they change the whole match, not a
+  // champion, so they stayed there when the per-unit cheats moved). `routes` is
+  // the one worth driving: the checkbox and the `N` key must write one field,
+  // not two — so this taps the checkbox and reads `navigation.debugRoutes`, the
+  // field the key flips.
+  await selectTab('cheats', true);
   await tapSelector('#practice-debug-routes');
   await tapSelector('#practice-debug-terrain');
   const debugAfterTaps = await gameEval(() => {
@@ -693,6 +732,10 @@ try {
   // The stack row updates the live spell and the visible tab immediately. The
   // covered HUD deliberately stays on its last snapshot while the panel has
   // paused the match; rebuilding it at 20Hz under the modal was wasted work.
+  // Back on the Đội tab, with the player's drawer re-opened — the stack row is
+  // inside it, and the debug detour above left us on Gian lận.
+  await selectTab('roster');
+  await tapSelector('#practice-row-toggle-0');
   const stackId = cheatShape.stackRows[0];
   const stacksBefore = await gameEval(
     () => window.__lol2d.scene.oScene.game.player.spells[1].stackCount
@@ -722,7 +765,7 @@ try {
   await page.waitForTimeout(300);
   report.stacks = { stacksBefore, stacksAfter, hudBadge };
   check(
-    "Gian lận: +10 updates the live spell/tab while the covered HUD snapshot stays paused",
+    "Đội: +10 updates the live spell/tab while the covered HUD snapshot stays paused",
     stacksBefore === 0 &&
       stacksAfter.spell === 10 &&
       stacksAfter.tabBadge === '10' &&
@@ -741,13 +784,14 @@ try {
   await closePanel();
   await runMatch();
   await openPanel();
-  await selectTab('cheats');
+  await selectTab('roster');
 
   // Row 1 is the first bot; row 2 is the control, hit identically with no buff.
   // The paired control is the point: "health unchanged" on its own would pass
-  // against a takeDamage that dropped everything.
-  await tapSelector('#practice-cheat-unit-1');
-  await tapSelector('#practice-cheat-invuln');
+  // against a takeDamage that dropped everything. The invuln toggle is inside
+  // the bot's own drawer now — open row 1's, wherever its team put it.
+  await tapSelector('#practice-row-toggle-1');
+  await tapSelector('#practice-cheat-invuln-1');
   const immuneId = await gameEval(
     () => window.__lol2d.scene.oScene.game.director.roster()[1].unit.id
   );
@@ -905,7 +949,7 @@ try {
     JSON.stringify(report.savedKit)
   );
   check(
-    'the shelf lives in the loadout editor off Đấu thủ, never on the panel itself',
+    'the shelf lives in the loadout editor off Đội, never on the panel itself',
     shelfOnPanelOpen === false && shelfOnPanelOpenAfterReload === false,
     `panel before ${shelfOnPanelOpen}, after reload ${shelfOnPanelOpenAfterReload}`
   );
@@ -937,7 +981,7 @@ try {
     'no cheat and no debug flag reaches the stored config',
     report.savedKit.cheatWordsInBlob.length === 0 &&
       JSON.stringify(report.savedKit.storedPregame?.sections) ===
-        JSON.stringify(['ai', 'player', 'rules', 'world']),
+        JSON.stringify(['ai', 'player', 'playerTeam', 'rules', 'world']),
     JSON.stringify({
       words: report.savedKit.cheatWordsInBlob,
       sections: report.savedKit.storedPregame?.sections,

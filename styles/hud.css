@@ -518,6 +518,92 @@
   padding-bottom: 0;
 }
 
+/* -------------------------------------------------- Team sections (RosterTab)
+   The roster is split into Đội Xanh / Đội Đỏ. A section is a heading plus its
+   rows; the two are told apart by the dot and the accent, not by boxing each
+   side in a frame the panel is too narrow to afford twice. */
+.practice-team {
+  margin-bottom: 0.8rem;
+}
+
+.practice-team-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.2rem 0.4rem;
+  border-bottom: 1px solid var(--hextech-line);
+  margin-bottom: 0.6rem;
+}
+
+.practice-team-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* The two sides' colours, the same blue and red the fountains and health bars
+   already use so "which side is this" reads the same on the panel as on the
+   map. */
+.practice-team--blue .practice-team-dot {
+  background: #4a9eff;
+  box-shadow: 0 0 6px rgba(74, 158, 255, 0.6);
+}
+.practice-team--red .practice-team-dot {
+  background: #e0564f;
+  box-shadow: 0 0 6px rgba(224, 86, 79, 0.6);
+}
+
+.practice-team-name {
+  flex: 1;
+  font-size: 0.9em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.practice-team--blue .practice-team-name {
+  color: #7ab8ff;
+}
+.practice-team--red .practice-team-name {
+  color: #ec8580;
+}
+
+.practice-team-count {
+  min-width: 1.6em;
+  padding: 0 0.4em;
+  text-align: center;
+  color: var(--hextech-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85em;
+  border: 1px solid var(--hextech-line);
+  border-radius: 999px;
+}
+
+.practice-team-empty {
+  margin: 0 0 0.6rem;
+  padding: 0 0.2rem;
+  color: var(--hextech-muted);
+  font-size: 0.78em;
+  font-style: italic;
+}
+
+/* The move-to-the-other-side control: a 44px column ruled off the row like the
+   delete beside it, but teal rather than red — it rearranges, it does not
+   destroy. On the player's row it is the only control in this strip. */
+.practice-team-switch {
+  flex-shrink: 0;
+  width: 44px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid var(--hextech-line);
+  color: var(--hextech-teal);
+  font-size: 0.95em;
+  cursor: pointer;
+}
+
+.practice-team-switch:hover {
+  background: rgba(80, 200, 200, 0.12);
+}
+
 .practice-roster-row {
   display: flex;
   flex-direction: column;
@@ -815,6 +901,23 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The folded-in per-unit cheats, the last section of the drawer. It spans every
+   column of the stat grid rather than sitting in a 160px cell: its buttons and
+   stack rows want the full width, and a caption of stats reads down a column
+   while a strip of controls reads across. A hairline above sets it off from the
+   numbers it follows. */
+.practice-cheat-group {
+  grid-column: 1 / -1;
+  margin-top: 0.2rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--hextech-line);
+}
+
+.practice-cheat-invuln {
+  margin-bottom: 0.2rem;
+  min-height: 36px;
+}
+
 /* Native range controls still need a generous hit box: the browser track is
    ~16px tall, while a thumb target should be at least 44px. */
 .practice-tab-body input[type='range'] {
@@ -833,58 +936,12 @@
   font-style: italic;
 }
 
-/* --------------------------------------------- Gian lận tab (CheatTab.vue)
-   The unit picker: one row per participant, the same order and labels the
-   roster tab uses. Rows rather than pills because a name has to fit — "Bot 3"
-   alone does not say which unit you are about to make immortal — and rows
-   stack down the one axis this panel already scrolls. */
-.practice-cheat-units {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  margin-bottom: 0.8rem;
-}
-
-.practice-cheat-unit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding: 0.3rem 0.6rem;
-  background: var(--hextech-panel);
-  border: 2px solid var(--hextech-line);
-  color: var(--hextech-muted);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.practice-cheat-unit:hover {
-  border-color: var(--hextech-gold-dim);
-}
-
-/* Teal for the selected unit, the same mark `.slot-pill.active` used to carry
-   and `.pregame-tab.selected` still does — one colour means "this is the one
-   you are acting on" across both screens. */
-.practice-cheat-unit.selected {
-  border-color: var(--hextech-teal);
-  color: var(--hextech-text);
-}
-
-.practice-cheat-unit-label {
-  flex: none;
-  min-width: 3.5em;
-  font-size: 0.75em;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.practice-cheat-unit-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
+/* ----------------------------------- Per-unit cheats, folded onto the roster
+   These classes used to live behind a unit picker on the Gian lận tab; the
+   picker is gone (each control is now inside its own champion's drawer on the
+   Đội tab — see RosterTab.vue), but the control styles below are shared, so they
+   stayed. `.practice-cheat-actions` and the stack rows render inside
+   `.practice-cheat-group`; the debug grid further down is what Gian lận keeps. */
 .practice-cheat-actions {
   display: flex;
   flex-wrap: wrap;
@@ -941,9 +998,10 @@
 }
 
 /* The debug layers (src/game/debug/DebugOverlay.ts), on the Gian lận tab
-   because the panel is deliberately at three tabs — see the tab row above.
+   alongside the one global cheat (reveal map) — the two things that change the
+   whole match rather than a single champion.
 
-   Two columns: five of these plus the two cheat toggles above them is more
+   Two columns: five of these plus the reveal-map toggle above them is more
    than a landscape phone shows at once, and none of the labels is long enough
    to need the full width. */
 .practice-debug {
