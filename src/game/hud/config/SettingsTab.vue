@@ -173,53 +173,35 @@ const onDebugChange = (key: keyof DebugLayerConfig, event: Event): void => {
   <div class="practice-tab-body">
     <h3 class="practice-section-title">Điều khiển</h3>
     <div class="input-mode-row" role="group" aria-label="Chế độ điều khiển">
-      <button
-        v-for="option of INPUT_MODES"
-        :key="option.value"
-        type="button"
-        :id="'pregame-input-mode-' + option.value"
-        class="input-mode-btn"
-        :class="{ selected: inputMode === option.value }"
-        :aria-pressed="inputMode === option.value"
-        @click="setInputMode(option.value)"
-      >
+      <button v-for="option of INPUT_MODES" :key="option.value" type="button" :id="'pregame-input-mode-' + option.value"
+        class="input-mode-btn" :class="{ selected: inputMode === option.value }"
+        :aria-pressed="inputMode === option.value" @click="setInputMode(option.value)">
         <i :class="option.icon"></i> {{ option.label }}
       </button>
     </div>
     <p class="pregame-hint">
       <template v-if="inputMode === 'auto'">
         Đang tự nhận diện theo thiết bị, và hiện dùng giao diện
-        <strong>{{ touchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong
-        >.
+        <strong>{{ touchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong>.
       </template>
       <template v-else>
         Bạn đang <strong>tự chọn</strong> giao diện
-        <strong>{{ touchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong
-        >. Lựa chọn này được ghi nhớ cho mọi lần vào sau — chọn <strong>Tự động</strong> để trả
+        <strong>{{ touchUi ? 'cảm ứng' : 'chuột &amp; bàn phím' }}</strong>. Lựa chọn này được ghi nhớ cho mọi lần vào
+        sau — chọn <strong>Tự động</strong> để trả
         lại cho thiết bị quyết định.
       </template>
     </p>
 
     <h3 class="practice-section-title">Ưu tiên mục tiêu khi chạm nhanh</h3>
     <div class="input-mode-row" role="group" aria-label="Ưu tiên mục tiêu">
-      <button
-        id="pregame-target-priority-nearest"
-        type="button"
-        class="input-mode-btn"
-        :class="{ selected: targetPriority === 'nearest' }"
-        :aria-pressed="targetPriority === 'nearest'"
-        @click="setTargetPriority('nearest')"
-      >
+      <button id="pregame-target-priority-nearest" type="button" class="input-mode-btn"
+        :class="{ selected: targetPriority === 'nearest' }" :aria-pressed="targetPriority === 'nearest'"
+        @click="setTargetPriority('nearest')">
         <i class="fa-solid fa-location-crosshairs"></i> Gần nhất
       </button>
-      <button
-        id="pregame-target-priority-lowest-health"
-        type="button"
-        class="input-mode-btn"
-        :class="{ selected: targetPriority === 'lowest-health' }"
-        :aria-pressed="targetPriority === 'lowest-health'"
-        @click="setTargetPriority('lowest-health')"
-      >
+      <button id="pregame-target-priority-lowest-health" type="button" class="input-mode-btn"
+        :class="{ selected: targetPriority === 'lowest-health' }" :aria-pressed="targetPriority === 'lowest-health'"
+        @click="setTargetPriority('lowest-health')">
         <i class="fa-solid fa-heart-crack"></i> Ít máu nhất
       </button>
     </div>
@@ -246,41 +228,20 @@ const onDebugChange = (key: keyof DebugLayerConfig, event: Event): void => {
 
     <!-- Needs a camera to act on, so it is not offered before a match exists. -->
     <label v-if="live" class="pregame-field">
-      <span
-        >Thu phóng: <strong id="practice-zoom-value">{{ Math.round(zoom * 100) }}%</strong></span
-      >
-      <input
-        type="range"
-        id="practice-zoom"
-        :min="ZOOM_FACTOR_MIN"
-        :max="ZOOM_FACTOR_MAX"
-        :step="ZOOM_STEP"
-        :value="zoom"
-        @input="onZoomInput"
-        @change="persistZoom"
-      />
+      <span>Thu phóng: <strong id="practice-zoom-value">{{ Math.round(zoom * 100) }}%</strong></span>
+      <input type="range" id="practice-zoom" :min="ZOOM_FACTOR_MIN" :max="ZOOM_FACTOR_MAX" :step="ZOOM_STEP"
+        :value="zoom" @input="onZoomInput" @change="persistZoom" />
     </label>
 
-    <button
-      v-if="fullscreenSupported"
-      type="button"
-      class="practice-fullscreen"
-      id="practice-fullscreen"
-      @click="toggleFullscreen"
-      @touchend.prevent="toggleFullscreen"
-    >
+    <button v-if="fullscreenSupported" type="button" class="practice-fullscreen" id="practice-fullscreen"
+      @click="toggleFullscreen" @touchend.prevent="toggleFullscreen">
       <i :class="isFullscreen ? 'fas fa-compress' : 'fas fa-expand'" aria-hidden="true"></i>
       <span>{{ isFullscreen ? 'Thoát toàn màn hình' : 'Toàn màn hình' }}</span>
     </button>
 
     <h3 class="practice-section-title">Gỡ lỗi</h3>
     <label class="pregame-toggle">
-      <input
-        type="checkbox"
-        id="practice-cheat-reveal-map"
-        :checked="cheats.revealMap"
-        @change="onRevealMapChange"
-      />
+      <input type="checkbox" id="practice-cheat-reveal-map" :checked="cheats.revealMap" @change="onRevealMapChange" />
       <span>Hiện toàn bản đồ</span>
     </label>
 
@@ -290,19 +251,11 @@ const onDebugChange = (key: keyof DebugLayerConfig, event: Event): void => {
       <span class="practice-debug-title">Lớp gỡ lỗi</span>
       <div class="practice-debug-grid">
         <label v-for="key of DEBUG_LAYER_KEYS" :key="key" class="pregame-toggle practice-debug-toggle">
-          <input
-            type="checkbox"
-            :id="`practice-debug-${key}`"
-            :checked="cheats.debug[key]"
-            @change="onDebugChange(key, $event)"
-          />
+          <input type="checkbox" :id="`practice-debug-${key}`" :checked="cheats.debug[key]"
+            @change="onDebugChange(key, $event)" />
           <span>{{ DEBUG_LABELS[key] }}</span>
         </label>
       </div>
     </div>
-
-    <p class="practice-note">
-      Bất tử, hồi đầy, xoá hồi chiêu và cộng dồn nằm trong từng tướng ở tab Đội.
-    </p>
   </div>
 </template>

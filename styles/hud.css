@@ -773,7 +773,7 @@
    (controls, targeting, display, debug) and reads as one long list without
    them. */
 .practice-section-title {
-  margin: 0.4rem 0 0.1rem;
+  margin: 1rem 0 0.5rem;
   color: var(--hextech-gold);
   font-size: 0.8em;
   text-transform: uppercase;
