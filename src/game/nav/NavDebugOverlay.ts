@@ -80,7 +80,10 @@ function drawClearanceField(host: NavDebugHost): void {
       const size = grid.cellSize * stride;
       const x = cx * grid.cellSize;
       const y = cy * grid.cellSize;
-      if (clearance === 0) {
+      // `<= 0`, not `=== 0`: a cell inside a wall carries how deep it is as a
+      // negative number now (see NavGrid.clearance), and painting those as the
+      // orange "fits but refused" moat would say the opposite of the truth.
+      if (clearance <= 0) {
         fill(150, 30, 30, 130); // wall
       } else {
         // the moat: a body this size fits here, navigation still says no

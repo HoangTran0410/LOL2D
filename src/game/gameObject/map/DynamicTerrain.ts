@@ -82,7 +82,7 @@ export function isDynamicWall(object: unknown): object is GameObject & DynamicWa
   return typeof candidate?.wallVertices === 'function' && 'blocksMovement' in (candidate as object);
 }
 
-interface TerrainHost {
+export interface TerrainHost {
   objectManager: {
     queryObjects(options: {
       area?: Rectangle | Circle;

@@ -1,5 +1,5 @@
-import SAT from '@/libs/SAT';
 import { Circle, Quadtree, Rectangle } from '@/libs/quadtree';
+import NavGrid from '@/game/nav/NavGrid';
 import AssetManager from '@/managers/AssetManager';
 import CollideUtils from '@/utils/collide.utils';
 import { hasFlag } from '@/utils/index';
@@ -11,6 +11,7 @@ import Champion from '@/game/gameObject/attackableUnits/Champion';
 import Minion from '@/game/gameObject/attackableUnits/Minion';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 import Obstacle from './Obstacle';
+import TerrainField from './TerrainField';
 
 export default class TerrainMap {
   game: any;
@@ -146,46 +147,67 @@ export default class TerrainMap {
     for (const m of minions) this.pushOutOfWalls(m);
   }
 
+  private _field: TerrainField | null = null;
+
   /**
-   * Moves `unit` out of any wall it overlaps, by the averaged SAT overlap of
-   * every wall it is inside. Shared by champions and minions.
+   * The signed distance field over this map's walls — the seam anything that
+   * reasons about terrain goes through. See `TerrainField` for why the
+   * polygons themselves stopped being the answer.
+   *
+   * Built lazily so a `TerrainMap` standing on its own still works; in a real
+   * match `Game` hands over the grid navigation has already built, through
+   * `useNavGrid`, and this never fires.
+   */
+  get field(): TerrainField {
+    if (!this._field) {
+      this._field = new TerrainField(
+        this.game,
+        NavGrid.fromPolygons(this.wallPolygons(), { size: this.size })
+      );
+    }
+    return this._field;
+  }
+
+  /**
+   * Adopts the navigation grid as the terrain field, so a match holds one and
+   * not two.
+   *
+   * They would be identical anyway — same polygons, same cell size — but "would
+   * be identical" is what the old arrangement claimed, where routes were
+   * planned against the grid and enforced against the SAT polygons.
+   */
+  useNavGrid(grid: NavGrid): void {
+    this._field = new TerrainField(this.game, grid);
+  }
+
+  /**
+   * Moves `unit` out of any static wall it overlaps. Shared by champions and
+   * minions.
+   *
+   * One field read and one gradient. This used to ask every convex piece of
+   * every nearby wall for its own minimum translation vector and average them,
+   * which is why a body could end up welded into a wall: the pieces of a split
+   * slab push in opposing directions and the average is zero. `TerrainField`
+   * carries the measurement.
    */
   pushOutOfWalls(unit: AttackableUnit): void {
     if (hasFlag(unit.stats.actionState, ActionState.IS_GHOSTED)) return;
 
-    const nearbyWalls = this.getObstaclesInArea(unit.getCollideBoundingBox(), [TerrainType.WALL]);
-    if (nearbyWalls.length === 0) return;
-
-    let collided = false;
-    const totalOverlap = createVector(0, 0);
-    const overlapsWalls: Obstacle[] = [];
-    // hoisted out of the wall loop: one circle per unit, one reused Response
-    const pSAT = new SAT.Circle(
-      new SAT.Vector(unit.position.x, unit.position.y),
-      // `terrainRadius`, not the drawn body: it is capped for a grown unit so a
-      // giant keeps fitting through the map's gaps, and it must be the same
-      // radius `PathAgent` planned the route with — a route planned at one
-      // radius and enforced at a larger one is a unit walking into a wall it
-      // was told it could pass. See NAV_MAX_TERRAIN_RADIUS.
+    // `terrainRadius`, not the drawn body: it is capped for a grown unit so a
+    // giant keeps fitting through the map's gaps, and it must be the same
+    // radius `PathAgent` planned the route with — a route planned at one radius
+    // and enforced at a larger one is a unit walking into a wall it was told it
+    // could pass. See NAV_MAX_TERRAIN_RADIUS.
+    const resolved = this.field.resolveStatic(
+      unit.position.x,
+      unit.position.y,
       unit.terrainRadius
     );
-    const response = new SAT.Response();
-    for (const wall of nearbyWalls) {
-      response.clear();
-      const _collided = SAT.testPolygonCircle(wall.toSATPolygon(), pSAT, response);
-      if (_collided) {
-        const overlap = createVector(response.overlapV.x, response.overlapV.y);
-        totalOverlap.add(overlap);
-        overlapsWalls.push(wall);
-        collided = true;
-      }
-    }
+    if (!resolved) return;
 
-    if (collided) {
-      totalOverlap.div(overlapsWalls.length);
-      unit.position.add(totalOverlap);
-      unit.onCollideWall?.();
-    }
+    unit.position.x = resolved.x;
+    unit.position.y = resolved.y;
+    unit.onCollideWall?.();
   }
 
   /**

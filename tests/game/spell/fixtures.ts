@@ -244,3 +244,9 @@ export function withCastTime<T extends Spell>(
     }
   } as unknown as new (owner: AttackableUnit) => T;
 }
+
+/**
+ * Re-exported rather than duplicated: spell suites and the map suites both need
+ * a game with real walls, and two builders would drift.
+ */
+export { withWalls } from '../fixtures';

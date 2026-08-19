@@ -217,6 +217,13 @@ export default class Game {
     // per frame. Built off the same Obstacle list the collision push-out uses,
     // so there is one source of truth for where the walls are.
     this.navigation = new NavigationSystem(this.terrainMap.wallPolygons(), this.mapSize);
+    // And now literally one structure, not merely one source: the grid routes
+    // are planned against is handed straight back to be the field they are
+    // enforced against. Those used to be a clearance grid and a pile of SAT
+    // polygons giving different answers to "where is the wall", which is what
+    // NAV_MAX_ACCEPTED_OVERLAP exists to reconcile. Without this line
+    // `TerrainMap` would build an identical second one and hold it twice.
+    this.terrainMap.useNavGrid(this.navigation.grid);
     this.fogOfWar = new FogOfWar(this);
     this.minimap = new Minimap(this.minimapHost());
     this.inGameHUD = new InGameHUD(this);

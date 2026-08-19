@@ -25,7 +25,7 @@
  *
  * ## Resolution
  *
- * 16px cells: 400 x 400 = 160,000 cells, 313KB as a Uint16Array, ~4ms to build.
+ * 16px cells: 400 x 400 = 160,000 cells, 313KB as an Int16Array, ~4ms to build.
  * The resolution was picked by measurement, not taste — flood-filling the map
  * for each body size at 48/32/24/20/16px shows 48px severs Baron's camp from
  * the lanes for a champion and severs the top lane for a large body, and 32px
@@ -148,7 +148,11 @@ export const NAV_MAX_ACCEPTED_OVERLAP = 4;
  */
 export const NAV_MAX_TERRAIN_RADIUS = 40;
 
-/** Clearance is stored in a Uint16Array; nothing on this map is further than this from a wall. */
+/**
+ * Clearance is stored in an Int16Array, so it caps at 32,767 either way;
+ * nothing on this map is further than this from a wall, in the open or buried
+ * in one.
+ */
 const MAX_STORED_CLEARANCE = 4_096;
 
 /**
@@ -161,6 +165,17 @@ const MAX_STORED_CLEARANCE = 4_096;
  * unrefined cannot be sitting near a threshold.
  */
 const REFINE_BAND = 64;
+
+/**
+ * How far the nearest open cell must be before a *blocked* cell counts as
+ * buried in a wall rather than as part of its surface shell, in cells.
+ *
+ * One cell away — orthogonally or diagonally — is the shell, and it has to keep
+ * the exact positive distance `refineNearWalls` measures, because that is the
+ * number routing reads at a wall face. Anything further is inside, whatever the
+ * scanline fill decided. See `buildSignedField`.
+ */
+const BURIED_CELLS = 1.5;
 
 /**
  * Bucket edge for the segment index. Must be at least `REFINE_BAND` — see
@@ -234,10 +249,22 @@ export default class NavGrid {
   readonly rows: number;
 
   /**
-   * Distance in whole pixels from each cell centre to the nearest wall surface.
-   * 0 means the cell is wall (or close enough to it to be worthless).
+   * Signed distance in whole pixels from each cell centre to the nearest wall
+   * surface: positive out in the open, **negative inside a wall**, and larger
+   * in magnitude the further from the surface either way.
+   *
+   * Navigation only ever asks "is this at least `required`", and every negative
+   * value fails that the same way the old 0 did — which is why `PathFinder` and
+   * `isWalkable` read this array unchanged. The inside half exists for
+   * `map/TerrainField.ts`, which resolves a body out of a wall by reading the
+   * field and its gradient instead of testing polygons.
+   *
+   * That sharing is the point rather than a convenience. Routes used to be
+   * planned against this grid and then enforced against the SAT polygons, two
+   * different answers to "where is the wall" that `NAV_MAX_ACCEPTED_OVERLAP`
+   * exists to paper over. One field cannot disagree with itself.
    */
-  readonly clearance: Uint16Array;
+  readonly clearance: Int16Array;
 
   /** Wall-clock cost of the build, for the perf harness. */
   readonly buildMs: number;
@@ -246,7 +273,7 @@ export default class NavGrid {
     cellSize: number,
     cols: number,
     rows: number,
-    clearance: Uint16Array,
+    clearance: Int16Array,
     buildMs: number
   ) {
     this.cellSize = cellSize;
@@ -282,8 +309,8 @@ export default class NavGrid {
     }
     for (let i = 0; i < blocked.length; i++) if (interior[i] === 1) blocked[i] = 1;
 
-    const clearance = NavGrid.buildClearance(blocked, cols, rows, cellSize);
-    NavGrid.refineNearWalls(clearance, interior, polygons, cols, rows, cellSize);
+    const { clearance, buried } = NavGrid.buildSignedField(blocked, interior, cols, rows, cellSize);
+    NavGrid.refineNearWalls(clearance, buried, polygons, cols, rows, cellSize);
     return new NavGrid(cellSize, cols, rows, clearance, navNow() - startedAt);
   }
 
@@ -378,51 +405,140 @@ export default class NavGrid {
     }
   }
 
-  private static buildClearance(
-    blocked: Uint8Array,
+  /**
+   * Squared cell distance from every cell to the nearest source cell, where a
+   * source is `mask[i] === 1`, or `mask[i] === 0` when `invert` is set.
+   *
+   * Split out of the field build because the signed field runs it twice over
+   * complementary masks — once outward from the walls, once outward from the
+   * open ground — and the buffers are the largest allocation in the build.
+   */
+  private static distanceField(
+    mask: Uint8Array,
+    invert: boolean,
     cols: number,
-    rows: number,
-    cellSize: number
-  ): Uint16Array {
+    rows: number
+  ): Float64Array {
     const INFINITE = 1e12;
+    const source = invert ? 0 : 1;
     const squared = new Float64Array(cols * rows);
-    for (let i = 0; i < squared.length; i++) squared[i] = blocked[i] === 1 ? 0 : INFINITE;
+    for (let i = 0; i < squared.length; i++) squared[i] = mask[i] === source ? 0 : INFINITE;
 
     const span = Math.max(cols, rows);
-    const line = new Float64Array(span);
+    const lane = new Float64Array(span);
     const out = new Float64Array(span);
     const hull = new Int32Array(span);
     const bounds = new Float64Array(span + 1);
 
     for (let y = 0; y < rows; y++) {
       const base = y * cols;
-      for (let x = 0; x < cols; x++) line[x] = squared[base + x];
-      distanceTransform1D(line, cols, out, hull, bounds);
+      for (let x = 0; x < cols; x++) lane[x] = squared[base + x];
+      distanceTransform1D(lane, cols, out, hull, bounds);
       for (let x = 0; x < cols; x++) squared[base + x] = out[x];
     }
     for (let x = 0; x < cols; x++) {
-      for (let y = 0; y < rows; y++) line[y] = squared[y * cols + x];
-      distanceTransform1D(line, rows, out, hull, bounds);
+      for (let y = 0; y < rows; y++) lane[y] = squared[y * cols + x];
+      distanceTransform1D(lane, rows, out, hull, bounds);
       for (let y = 0; y < rows; y++) squared[y * cols + x] = out[y];
     }
+    return squared;
+  }
 
-    // A free cell's centre is at least half a cell from real geometry, so the
-    // distance to the nearest blocked cell centre overstates the true clearance
-    // by up to that much. Subtract it, then floor: both directions understate.
-    const halfCell = cellSize * 0.5;
-    const clearance = new Uint16Array(cols * rows);
-    for (let i = 0; i < clearance.length; i++) {
-      const px = Math.sqrt(squared[i]) * cellSize - halfCell;
-      clearance[i] = px <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(px));
+  /**
+   * The signed field: distance to the nearest wall surface, negative inside.
+   *
+   * Two transforms over complementary masks, meeting at the surface. The
+   * outward half is the clearance field this grid has always had. The inward
+   * half is what lets a body buried in a wall be resolved by reading a number
+   * instead of by asking each convex piece of that wall which way *it* would
+   * like to push — the question that has no good answer when a thick wall is
+   * authored as several boxes and the pieces disagree.
+   *
+   * The two masks do different jobs here and swapping them breaks it in two
+   * different ways, both measured on the shipped map.
+   *
+   * **Which side a cell is on comes from `interior`.** `blocked` also holds the
+   * cells an edge merely clips, whose centres are out in the open — they are
+   * there so a wall thinner than a cell survives rasterization — and calling
+   * those "inside" would put a negative distance on ground a body legitimately
+   * stands on.
+   *
+   * **How deep an inside cell is is measured to the nearest cell that is not
+   * `blocked`,** which is not the same as the nearest cell that is not
+   * `interior`. Hand-drawn convex pieces do not meet exactly: polygon 286 ends
+   * at y = 4810 where polygon 208 begins at y = 4811, and a hairline like that
+   * runs along most of the map's seams. No scanline fills a cell whose centre
+   * lands in the gap, so measuring escape distance against `interior` finds
+   * open ground in the middle of a solid wall — the field read 12px deep at
+   * (6315, 4827), which is 100px inside the right-hand wall, and a body
+   * resolving against it oscillated across the seam forever instead of coming
+   * out. Both polygons' *edges* cross those cells, so `blocked` closes the
+   * crack and the seam goes back to being invisible.
+   *
+   * The cost is that the blocked shell around the true surface is also not an
+   * escape target, so depth runs about a cell long and a body inside a wall is
+   * pushed a few pixels further out than it strictly needs. That only applies
+   * to bodies already inside a wall; the outward half, which is what every
+   * ordinary wall-hugging body reads, is untouched and still exact.
+   */
+  private static buildSignedField(
+    blocked: Uint8Array,
+    interior: Uint8Array,
+    cols: number,
+    rows: number,
+    cellSize: number
+  ): { clearance: Int16Array; buried: Uint8Array } {
+    const toWall = NavGrid.distanceField(blocked, false, cols, rows);
+    const toOpen = NavGrid.distanceField(blocked, true, cols, rows);
+
+    // Which side of the surface each cell is on.
+    //
+    // The scanline fill answers this for almost every cell, and misses one kind:
+    // a cell whose centre lands in the hairline between two abutting pieces. No
+    // polygon contains it, so `interior` says outside — while it sits in the
+    // middle of solid rock, because both pieces' *edges* cross it. Those cells
+    // then kept a positive clearance, `refineNearWalls` "corrected" it to the
+    // distance to the seam edge (about zero), and the result was a cliff: a cell
+    // reading 0 with neighbours reading -100. That is not a rounding error, it
+    // is a hole in the wall as far as anything reading the field is concerned,
+    // and it made the field fall by nearly 12px per pixel travelled — enough
+    // that a sphere-traced sweep could step clean through a wall.
+    //
+    // Burial is the honest test, and the transform already has it: how far the
+    // nearest genuinely-open cell is. One cell away is the surface shell, which
+    // must keep its exact positive distance because that is what routing reads.
+    // Further than that and the cell is inside, whatever the scanline thought.
+    const buried = new Uint8Array(cols * rows);
+    for (let i = 0; i < buried.length; i++) {
+      if (interior[i] === 1) buried[i] = 1;
+      else if (blocked[i] === 1 && toOpen[i] > BURIED_CELLS * BURIED_CELLS) buried[i] = 1;
     }
-    return clearance;
+
+    // A cell centre is at least half a cell from the real geometry either way,
+    // so a distance measured to the nearest *cell centre* on the far side
+    // overstates by up to that much. Subtract it, then floor: on both sides
+    // that understates the magnitude, which is the safe direction — navigation
+    // refuses a gap it could have taken, and push-out under-corrects by a
+    // fraction of a pixel and finishes the job on the next frame.
+    const halfCell = cellSize * 0.5;
+    const clearance = new Int16Array(cols * rows);
+    for (let i = 0; i < clearance.length; i++) {
+      if (buried[i] === 1) {
+        const depth = Math.sqrt(toOpen[i]) * cellSize - halfCell;
+        clearance[i] = depth <= 0 ? 0 : -Math.min(MAX_STORED_CLEARANCE, Math.floor(depth));
+      } else {
+        const px = Math.sqrt(toWall[i]) * cellSize - halfCell;
+        clearance[i] = px <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(px));
+      }
+    }
+    return { clearance, buried };
   }
 
   /**
    * Replaces the transform's answer with the *exact* distance to the wall, for
    * every cell close enough to a wall for the difference to decide anything.
    *
-   * `buildClearance` measures to the nearest blocked cell *centre*, and a
+   * `buildSignedField` measures to the nearest blocked cell *centre*, and a
    * blocked cell's centre can be a half-diagonal away from the geometry that
    * blocked it. Subtracting a half-cell corrects the average and leaves the
    * spread: measured against the shipped map, a cell could be refused with as
@@ -451,8 +567,8 @@ export default class NavGrid {
    * to bound. A measured distance never overstates.
    */
   private static refineNearWalls(
-    clearance: Uint16Array,
-    interior: Uint8Array,
+    clearance: Int16Array,
+    buried: Uint8Array,
     polygons: readonly (readonly NavPoint[])[],
     cols: number,
     rows: number,
@@ -464,7 +580,30 @@ export default class NavGrid {
     for (let cy = 0; cy < rows; cy++) {
       for (let cx = 0; cx < cols; cx++) {
         const i = cy * cols + cx;
-        if (interior[i] === 1) continue;
+        // Outside the walls only, and that restriction is load-bearing rather
+        // than left over.
+        //
+        // The segment index holds *every* polygon edge, including the internal
+        // ones where a thick wall was authored as several convex boxes. From
+        // outside a wall those are harmless: an internal edge is further away
+        // than the surface between it and the query, so the nearest edge is
+        // always a real one. From inside, an internal edge is the nearest edge
+        // there is — so refining a cell 55px deep in a split slab, 5px off the
+        // seam between its halves, "corrects" its depth to 5 and the body
+        // resolving against it barely moves.
+        //
+        // The transform's own estimate has no such blind spot: it is measured
+        // from the rasterized union, where a seam is buried in the middle of
+        // the blocked region and there is nothing to measure to. It costs
+        // about half a cell of understated depth, which push-out finishes off
+        // over the following frame. Being seam-blind is the property that
+        // matters here, and it is the coarse pass that has it.
+        //
+        // `buried`, not `interior`: a cell in the hairline between two abutting
+        // pieces is not inside any polygon and would be refined to the distance
+        // to that hairline — about zero — in the middle of solid wall. See
+        // `buildSignedField`.
+        if (buried[i] === 1) continue;
         if (clearance[i] > REFINE_BAND) continue;
 
         const exact = NavGrid.nearestWallDistance(
@@ -473,6 +612,11 @@ export default class NavGrid {
           (cy + 0.5) * cellSize
         );
         if (exact === Infinity) continue;
+        // Positive unconditionally: every buried cell was skipped above, so
+        // anything reaching here is on the open side of the surface. The sign
+        // used to be picked by a ternary that could never take its other branch,
+        // which read as though inside cells were refined when the whole point of
+        // the skip is that they must not be.
         clearance[i] = exact <= 0 ? 0 : Math.min(MAX_STORED_CLEARANCE, Math.floor(exact));
       }
     }
@@ -601,7 +745,7 @@ export default class NavGrid {
    * enough that the correction is never visible, not wide enough that contact
    * never happens.
    *
-   * Reduced to half a cell (axis-aligned, the same correction `buildClearance`
+   * Reduced to half a cell (axis-aligned, the same correction `buildSignedField`
    * already applies once to turn "distance to a blocked cell centre" into a
    * lower bound on wall distance), a dense sweep of the shipped map — 9 points
    * per free cell, centre plus every corner and edge midpoint, ~700,000
@@ -628,9 +772,82 @@ export default class NavGrid {
     return radius + this.cellSize * 0.5;
   }
 
-  /** Stored clearance at a world point, in px. 0 inside a wall. */
+  /**
+   * Stored clearance at a world point, in px. 0 inside a wall.
+   *
+   * The clamp is what keeps this method's answer identical to what it gave
+   * before the field learned to go negative — everything that routes reads
+   * clearance through here or compares the raw array against a non-negative
+   * `required`, so navigation cannot tell the difference. Depth belongs to
+   * `signedDistanceAt`.
+   */
   clearanceAt(x: number, y: number): number {
-    return this.clearance[this.cellY(y) * this.cols + this.cellX(x)];
+    const stored = this.clearance[this.cellY(y) * this.cols + this.cellX(x)];
+    return stored < 0 ? 0 : stored;
+  }
+
+  /**
+   * Signed distance from a world point to the nearest wall surface: positive
+   * out in the open, negative inside a wall.
+   *
+   * Bilinear between the four surrounding cell centres rather than the raw cell
+   * value, because the callers are physics rather than routing. A body resolved
+   * against a piecewise-constant field lands on one of a few hundred discrete
+   * positions per cell and visibly stair-steps along a wall it walks past;
+   * interpolating costs three multiplies and makes the surface a surface.
+   *
+   * Off the grid the edge cells are extended outward, so a query past the map
+   * border answers as the border does. Nothing walks out there — `isWalkable`
+   * refuses out-of-bounds outright — and giving it a defined answer keeps every
+   * caller from needing its own bounds test.
+   */
+  signedDistanceAt(x: number, y: number): number {
+    const { cellSize, cols, rows, clearance } = this;
+    // -0.5 puts the sample in cell-*centre* space: world (0.5 * cellSize) is
+    // the centre of cell 0, and must interpolate to exactly that cell's value.
+    const gx = x / cellSize - 0.5;
+    const gy = y / cellSize - 0.5;
+    const fx = Math.floor(gx);
+    const fy = Math.floor(gy);
+    const tx = gx - fx;
+    const ty = gy - fy;
+
+    const x0 = fx < 0 ? 0 : fx > cols - 1 ? cols - 1 : fx;
+    const y0 = fy < 0 ? 0 : fy > rows - 1 ? rows - 1 : fy;
+    const x1 = fx + 1 < 0 ? 0 : fx + 1 > cols - 1 ? cols - 1 : fx + 1;
+    const y1 = fy + 1 < 0 ? 0 : fy + 1 > rows - 1 ? rows - 1 : fy + 1;
+
+    const rowTop = y0 * cols;
+    const rowBottom = y1 * cols;
+    const topLeft = clearance[rowTop + x0];
+    const topRight = clearance[rowTop + x1];
+    const bottomLeft = clearance[rowBottom + x0];
+    const bottomRight = clearance[rowBottom + x1];
+
+    const top = topLeft + (topRight - topLeft) * tx;
+    const bottom = bottomLeft + (bottomRight - bottomLeft) * tx;
+    return top + (bottom - top) * ty;
+  }
+
+  /**
+   * Unit vector pointing away from the nearest wall — the direction to push a
+   * body that is in one, and the outward normal of the surface it is touching.
+   *
+   * Central differences on the interpolated field. The stencil widens rather
+   * than giving up: a body exactly equidistant from two surfaces sits on the
+   * field's medial axis, where the gradient really is zero, and that is where
+   * a champion buried in the middle of a thick wall ends up. Widening finds
+   * the nearer way out; the fixed vector at the end is the convention from
+   * `Game.facing()`, because a direction must never be (0, 0).
+   */
+  outwardAt(x: number, y: number): { x: number; y: number } {
+    for (const step of [this.cellSize * 0.5, this.cellSize * 2, this.cellSize * 6]) {
+      const dx = this.signedDistanceAt(x + step, y) - this.signedDistanceAt(x - step, y);
+      const dy = this.signedDistanceAt(x, y + step) - this.signedDistanceAt(x, y - step);
+      const length = Math.hypot(dx, dy);
+      if (length > 1e-6) return { x: dx / length, y: dy / length };
+    }
+    return { x: 0, y: -1 };
   }
 
   /** Whether a body of `radius` fits at a world point. */

@@ -116,7 +116,11 @@ results.clickWall = await page.evaluate(() => {
   for (let attempt = 0; attempt < 5_000 && !wallCentre; attempt++) {
     const cx = Math.floor(Math.random() * grid.cols);
     const cy = Math.floor(Math.random() * grid.rows);
-    if (grid.clearance[cy * grid.cols + cx] !== 0) continue;
+    // `> 0` skips open ground. It used to read `!== 0`, which was the same
+    // thing while every wall cell held 0 — the field is signed now, so wall
+    // interiors are negative and `!== 0` excluded all 57,163 of them, leaving
+    // this search picking from the ~455 cells that happen to land on exactly 0.
+    if (grid.clearance[cy * grid.cols + cx] > 0) continue;
     // require a walkable spot within reach, so this is a real order, not one
     // that fails to find footing on either end
     const x = grid.centreX(cx);

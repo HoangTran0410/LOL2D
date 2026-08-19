@@ -2,6 +2,9 @@ import { vi } from 'vitest';
 import { Rectangle } from '../../src/libs/quadtree';
 import ObjectManager from '../../src/game/managers/ObjectManager';
 import EventManager from '../../src/managers/EventManager';
+import NavGrid from '../../src/game/nav/NavGrid';
+import TerrainField from '../../src/game/gameObject/map/TerrainField';
+import TerrainType from '../../src/game/enums/TerrainType';
 import type AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type GameObject from '../../src/game/gameObject/GameObject';
 import type { GameObjectRuntimeContext } from '../../src/game/gameObject/GameObject';
@@ -94,6 +97,51 @@ export function createGame(mapSize = 6_400): TestGame {
     setPlayer(value: AttackableUnit) {
       player = value;
     },
+  };
+}
+
+/**
+ * Gives `game` a terrain map with real walls at `polygons`, in world
+ * coordinates.
+ *
+ * A stub that only answered `getObstaclesInArea` used to be enough, because
+ * every spell read the polygons directly. They read `TerrainField` now — a
+ * signed distance field baked from the wall layer, so that a wall chopped into
+ * convex pieces stops having seams anything can fall between — and a field has
+ * to be built rather than faked. `getObstaclesInArea` is still answered for the
+ * parts of the game that legitimately want polygons: the draw pass, the fog and
+ * the bush/water tests.
+ *
+ * Two ways this is not the real `TerrainMap`, both fine for what tests ask of
+ * it and both worth knowing before writing an assertion against them:
+ *
+ * - **The grid only covers [0, mapSize].** A polygon reaching outside is clipped
+ *   to it, so a wall drawn across the axis is only half there. Keep what a test
+ *   asserts inside the box.
+ * - **`getObstaclesInArea` ignores its `area`** and hands back every polygon.
+ *   Wider than the real one, never narrower, which is the safe direction for a
+ *   caller that filters afterwards. The `type` is real, so a `TerrainType`
+ *   filter works — without it the layer reads as empty to anything that filters,
+ *   which is a way to write a test that passes for the wrong reason.
+ */
+export function withWalls(
+  game: GameObjectRuntimeContext,
+  polygons: { x: number; y: number }[][],
+  mapSize = 1_024
+): void {
+  const grid = NavGrid.fromPolygons(polygons, { size: mapSize });
+  const host = game as unknown as { terrainMap: unknown };
+  host.terrainMap = {
+    field: new TerrainField(game as never, grid),
+    wallPolygons: () => polygons,
+    getObstaclesInArea: (_area: unknown, terrainTypes: string[] = []) =>
+      terrainTypes.length > 0 && !terrainTypes.includes(TerrainType.WALL)
+        ? []
+        : polygons.map(vertices => ({
+            position: { x: 0, y: 0 },
+            vertices,
+            type: TerrainType.WALL,
+          })),
   };
 }
 
