@@ -182,6 +182,9 @@ export interface DebugLayerConfig {
   collision: boolean;
   vision: boolean;
   quadtree: boolean;
+  /** The on-screen FPS readout (`game/debug/FpsOverlay.ts`). A plain boolean like
+   *  `terrain`/`collision`/`vision`/`quadtree` — nothing live to alias onto. */
+  fps: boolean;
 }
 
 /**
@@ -291,6 +294,7 @@ export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
       collision: false,
       vision: false,
       quadtree: false,
+      fps: false,
     }),
     playerInvulnerable: false,
     botInvulnerable: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => false)),
@@ -304,6 +308,7 @@ export const DEBUG_LAYER_KEYS = [
   'collision',
   'vision',
   'quadtree',
+  'fps',
 ] as const satisfies readonly (keyof DebugLayerConfig)[];
 
 const STORAGE_KEY = 'lol2d:pregameConfig:v1';
@@ -391,6 +396,7 @@ export const sanitizeCheatConfig = (raw: unknown): CheatConfig => {
       collision: asBoolean(debug.collision, false),
       vision: asBoolean(debug.vision, false),
       quadtree: asBoolean(debug.quadtree, false),
+      fps: asBoolean(debug.fps, false),
     },
     playerInvulnerable: asBoolean(source.playerInvulnerable, false),
     botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, i) => asBoolean(rawBots[i], false)),

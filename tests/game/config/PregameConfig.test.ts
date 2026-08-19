@@ -250,7 +250,14 @@ describe('sanitizePregameConfig', () => {
       world: { jungle: false, minions: true },
       cheats: {
         revealMap: true,
-        debug: { routes: true, terrain: false, collision: false, vision: false, quadtree: true },
+        debug: {
+          routes: true,
+          terrain: false,
+          collision: false,
+          vision: false,
+          quadtree: true,
+          fps: false,
+        },
         playerInvulnerable: true,
         botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 1),
       },
@@ -354,7 +361,14 @@ describe('loadPregameConfig / savePregameConfig', () => {
       world: { jungle: true, minions: false },
       cheats: {
         revealMap: false,
-        debug: { routes: false, terrain: true, collision: false, vision: true, quadtree: false },
+        debug: {
+          routes: false,
+          terrain: true,
+          collision: false,
+          vision: true,
+          quadtree: false,
+          fps: true,
+        },
         playerInvulnerable: false,
         botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 3),
       },
@@ -595,7 +609,14 @@ describe('world', () => {
 describe('cheats', () => {
   const ALL_OFF = {
     revealMap: false,
-    debug: { routes: false, terrain: false, collision: false, vision: false, quadtree: false },
+    debug: {
+      routes: false,
+      terrain: false,
+      collision: false,
+      vision: false,
+      quadtree: false,
+      fps: false,
+    },
     playerInvulnerable: false,
     botInvulnerable: Array.from({ length: AI_COUNT_MAX }, () => false),
   };
