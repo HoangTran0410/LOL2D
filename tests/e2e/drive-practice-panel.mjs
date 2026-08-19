@@ -44,7 +44,7 @@
  *      teamId together; and, folded onto each champion's own row, the
  *      invulnerability toggle survives a close and reopen and a stack button
  *      moves the spell's own count *and* the HUD badge. The debug layers are the
- *      one thing left on Gian lận, since they change the match, not a champion;
+ *      one thing left on Cài đặt, since they change the match, not a champion;
  *  10. an invulnerable bot stops losing health across unpaused frames while a
  *      second bot, hit identically, does not — the only check here that proves
  *      the buff works in the real loop rather than in a fixture;
@@ -79,8 +79,8 @@ const VIEWPORT = { width: 1280, height: 900 };
 const CFG_KEY = 'lol2d:pregameConfig:v1';
 const KITS_KEY = 'lol2d:savedKits:v1';
 const KIT_NAME = 'E2E Kit';
-const TAB_IDS = ['roster', 'rules', 'cheats'];
-const TAB_LABELS = ['Đội', 'Trận đấu', 'Gian lận'];
+const TAB_IDS = ['roster', 'rules', 'settings'];
+const TAB_LABELS = ['Đội', 'Trận đấu', 'Cài đặt'];
 
 /**
  * A deterministic match. The player is a named champion so the cooldown probe
@@ -298,7 +298,7 @@ try {
   // the first: `'roster'` is the default, so a check that opened on it would
   // pass against a panel that had forgotten everything.
   await openPanel();
-  await selectTab('cheats');
+  await selectTab('settings');
   await closePanel();
   await openPanel();
   report.tabPersisted = await gameEval(
@@ -307,7 +307,7 @@ try {
   await closePanel();
   check(
     'the selected tab survives closing and reopening the panel',
-    report.tabPersisted === 'practice-tab-cheats',
+    report.tabPersisted === 'practice-tab-settings',
     String(report.tabPersisted)
   );
 
@@ -317,7 +317,7 @@ try {
   await selectTab('roster');
   const botsBeforeAdd = await liveBotIds();
   const rosterBeforeAdd = await rosterCount();
-  await tapSelector('.practice-add-bot'); // real thumb
+  await tapSelector('#practice-add-bot-blue'); // real thumb
   const rosterAfterAdd = await rosterCount();
   const botsWhilePaused = await liveBotIds();
   await page.screenshot({ path: `${OUT}-02-roster.png` });
@@ -435,13 +435,16 @@ try {
   await openPanel();
   await selectTab('roster');
   const PRESSES = AI_COUNT_MAX + 15;
-  for (let press = 0; press < PRESSES; press++) await tapSelector('.practice-add-bot', 30);
+  for (let press = 0; press < PRESSES; press++)
+    await tapSelector('#practice-add-bot-blue', 30);
   report.cap = {
     AI_COUNT_MAX,
     presses: PRESSES,
     rosterBots: await directorBotCount(),
     inWorldWhilePaused: (await liveBotIds()).length,
-    addButtonDisabled: await gameEval(() => document.querySelector('.practice-add-bot').disabled),
+    addButtonDisabled: await gameEval(
+      () => document.querySelector('#practice-add-bot-blue').disabled
+    ),
     countLabel: await gameEval(
       () => document.querySelector('.practice-add-bot-count')?.textContent.trim() ?? null
     ),
@@ -467,10 +470,26 @@ try {
 
   await openPanel();
   await selectTab('rules', true); // one tab switch under a thumb
+
+  /**
+   * The scroll check runs on **Cài đặt**, not on the tab selected above.
+   *
+   * It used to run on Trận đấu, which was then the long tab — it carried the
+   * render settings, the zoom slider and fullscreen as well as the rules. Those
+   * moved to Cài đặt when the setup screen and this panel became one, and Trận
+   * đấu is now four toggles and two buttons: on a 390px landscape phone it does
+   * not overflow, so there is nothing to scroll and a drag correctly does
+   * nothing. Asserting "scrollTop > 0" there was measuring the old layout.
+   *
+   * What the check is actually for — a hand-rolled scroll under a thumb, since
+   * `GameScene` cancels touch defaults — is unchanged, and Cài đặt is where a
+   * body that overflows now lives.
+   */
+  await selectTab('settings', true);
   await page.setViewportSize(MOBILE_VIEWPORT);
   await page.waitForTimeout(100);
   const rulesBody = await page.locator('.practice-tab-body').boundingBox();
-  if (!rulesBody) throw new Error('Trận đấu body has no bounding box');
+  if (!rulesBody) throw new Error('Cài đặt body has no bounding box');
   await gameEval(() => {
     document.querySelector('.practice-tab-body').scrollTop = 0;
   });
@@ -483,8 +502,23 @@ try {
   report.rulesScrollTop = await gameEval(
     () => document.querySelector('.practice-tab-body')?.scrollTop ?? 0
   );
+  /**
+   * The drag is a vertical swipe across a tab that now contains a range input,
+   * and a swipe that starts on one moves it — that is the browser's own
+   * behaviour for `<input type="range">`, not something this panel decides. It
+   * nudged the zoom a step and left it stored, which the "a fresh touch game
+   * starts at 100%" check below then read as the game's own doing. Put it back
+   * before moving on.
+   */
+  await gameEval(() => {
+    const camera = window.__lol2d.scene.oScene.game.camera;
+    camera.setZoomFactor(1);
+    camera.snapToScale();
+    localStorage.removeItem('lol2d.zoomFactor.touch');
+    localStorage.removeItem('lol2d.zoomFactor');
+  });
   check(
-    'Trận đấu: native touch drag scrolls the modal body',
+    'Cài đặt: native touch drag scrolls the modal body',
     report.rulesScrollTop > 0,
     `scrollTop=${report.rulesScrollTop}`
   );
@@ -529,6 +563,9 @@ try {
       Math.abs(report.zoomWhilePaused.currentScale - report.zoomWhilePaused.scale) < 1e-9,
     JSON.stringify(report.zoomWhilePaused)
   );
+  // Back to Trận đấu: the rules and the display settings used to share a tab and
+  // no longer do — zoom is the device's, CDR is the match's.
+  await selectTab('rules');
   const beforeCdr = await gameEval(() => ({
     multiplier: window.__lol2d.scene.oScene.game.matchRules.cooldownMultiplier,
     probeCooldownMs: window.__practiceProbe.effectiveCoolDownMs,
@@ -689,12 +726,12 @@ try {
     JSON.stringify(report.invulnToggle)
   );
 
-  // The debug layers, on the Gian lận tab (they change the whole match, not a
+  // The debug layers, on the Cài đặt tab (they change the whole match, not a
   // champion, so they stayed there when the per-unit cheats moved). `routes` is
   // the one worth driving: the checkbox and the `N` key must write one field,
   // not two — so this taps the checkbox and reads `navigation.debugRoutes`, the
   // field the key flips.
-  await selectTab('cheats', true);
+  await selectTab('settings', true);
   await tapSelector('#practice-debug-routes');
   await tapSelector('#practice-debug-terrain');
   const debugAfterTaps = await gameEval(() => {
@@ -720,7 +757,7 @@ try {
   });
   report.debugLayers = { debugAfterTaps, debugAfterOff };
   check(
-    'Gian lận: the debug toggles switch their layer, and routes is the same field the N key flips',
+    'Cài đặt: the debug toggles switch their layer, and routes is the same field the N key flips',
     debugAfterTaps.routes === true &&
       debugAfterTaps.navigation === true &&
       debugAfterTaps.terrain === true &&
@@ -736,7 +773,7 @@ try {
   // covered HUD deliberately stays on its last snapshot while the panel has
   // paused the match; rebuilding it at 20Hz under the modal was wasted work.
   // Back on the Đội tab, with the player's drawer re-opened — the stack row is
-  // inside it, and the debug detour above left us on Gian lận.
+  // inside it, and the debug detour above left us on Cài đặt.
   await selectTab('roster');
   await tapSelector('#practice-row-toggle-0');
   const stackId = cheatShape.stackRows[0];
@@ -782,8 +819,10 @@ try {
   // Two bots, added through the roster tab and flushed into the world by a
   // tick — check 6 cleared the field, and this check needs a pair.
   await selectTab('roster');
-  await tapSelector('.practice-add-bot');
-  await tapSelector('.practice-add-bot');
+  // Both on Blue, so "row 1 is the first bot, row 2 is the control" below is
+  // about two units on one side rather than about how the sides were balanced.
+  await tapSelector('#practice-add-bot-blue');
+  await tapSelector('#practice-add-bot-blue');
   await closePanel();
   await runMatch();
   await openPanel();
@@ -859,6 +898,22 @@ try {
   await tapSelector('.practice-roster-row.is-player .practice-roster-open');
   await page.waitForSelector('.loadout-modal', { state: 'visible', timeout: 5_000 });
   const shelfBeforeSaving = await gameEval(() => !!document.querySelector('.saved-kit-shelf'));
+
+  /**
+   * Make the draft a *custom* kit before saving one.
+   *
+   * "Lưu bộ" is `v-if="isCustomKit"` — a saved kit is a hand-assembled one, and
+   * a whole champion is already reachable by name from the roster, so there is
+   * nothing to store. The player is on Zed at this point (check 5 applied the
+   * whole kit), i.e. `mode: 'champion'`, and the button correctly does not
+   * exist. This step predates that rule and had been failing on it since.
+   *
+   * The dice on the slot bar is the cheapest way across: `randomizeSlot` goes
+   * through `writeSlots`, which calls `toCustom`. One tap, no catalogue search,
+   * and it leaves a kit that is still worth saving by name.
+   */
+  await tapSelector('.kit-slot-random');
+  await page.waitForSelector('.saved-kit-save', { state: 'visible', timeout: 5_000 });
 
   await tapSelector('.saved-kit-save'); // "Lưu bộ", through the touch bridge
   await page.waitForSelector('.saved-kit-form', { state: 'visible', timeout: 5_000 });
@@ -938,6 +993,7 @@ try {
       aiCount: storedParsed.ai?.count,
       rules: storedParsed.rules,
       world: storedParsed.world,
+      cheats: storedParsed.cheats,
       sections: Object.keys(storedParsed).sort(),
     },
   };
@@ -972,21 +1028,52 @@ try {
       report.savedKit.storedPregame?.championName === MATCH_CONFIG.player.championName,
     JSON.stringify(report.savedKit.storedPregame)
   );
-  // The other half of the line, and the one worth having a real browser for:
-  // check 9 turned on invulnerability, reveal-map and two debug layers, and
-  // check 9's stack row moved a spell's count. None of that is a match setting,
-  // and none of it may reach storage — a player who reloads into an invulnerable
-  // champion they don't remember asking for has found a bug, not a setting.
-  report.savedKit.cheatWordsInBlob = ['invulnerab', 'reveal', 'debug', 'stack'].filter(word =>
+  /**
+   * The other half of the line, and the one worth having a real browser for.
+   *
+   * **This assertion used to be the opposite**, and the reversal is the point
+   * rather than a relaxation. The rule was "match configuration persists,
+   * session state does not": cheats and debug layers were things a player
+   * switched on to try something, and an invulnerable champion nobody
+   * remembered asking for would be a bug report rather than a restored setting.
+   *
+   * What changed is that the setup screen and this panel became one panel,
+   * mounted over the menu as well as over a match. One panel with two classes
+   * of control — one that comes back and one that silently does not — is worse
+   * to explain than a cheat that stays on, and the old rule was invisible from
+   * the control itself. Legibility pays for it instead: the roster row marks an
+   * invulnerable participant without the drawer being open.
+   *
+   * Stack counts are still *not* stored — they are a count on a live spell
+   * instance, not a setting — so `stack` stays on the forbidden list while the
+   * other three move to the required one.
+   */
+  report.savedKit.cheatWordsInBlob = ['stack'].filter(word =>
     (storedConfig ?? '').toLowerCase().includes(word)
   );
+  /**
+   * Both directions in one blob, which is what makes this worth reading rather
+   * than just "cheats persist":
+   *
+   *   - check 10 made the **first bot** invulnerable and left it that way, so
+   *     `botInvulnerable[0]` is `true` and its neighbour — the control bot,
+   *     deliberately untouched — is `false`;
+   *   - check 9 switched the player's invulnerability and two debug layers on
+   *     and then **off again**, so those read `false`. Off has to persist as
+   *     surely as on, or switching a cheat off would leave it stored on.
+   */
   check(
-    'no cheat and no debug flag reaches the stored config',
+    'the cheats and debug layers reach the stored config, and stack counts do not',
     report.savedKit.cheatWordsInBlob.length === 0 &&
+      report.savedKit.storedPregame?.cheats?.botInvulnerable?.[0] === true &&
+      report.savedKit.storedPregame?.cheats?.botInvulnerable?.[1] === false &&
+      report.savedKit.storedPregame?.cheats?.playerInvulnerable === false &&
+      report.savedKit.storedPregame?.cheats?.debug?.terrain === false &&
       JSON.stringify(report.savedKit.storedPregame?.sections) ===
-        JSON.stringify(['ai', 'player', 'playerTeam', 'rules', 'world']),
+        JSON.stringify(['ai', 'cheats', 'player', 'playerTeam', 'rules', 'world']),
     JSON.stringify({
       words: report.savedKit.cheatWordsInBlob,
+      cheats: report.savedKit.storedPregame?.cheats,
       sections: report.savedKit.storedPregame?.sections,
     })
   );
@@ -1027,15 +1114,30 @@ try {
   }));
   await page.screenshot({ path: `${OUT}-08-reset-confirm.png` });
   await tapSelector('#practice-reset');
-  await page.waitForFunction(() => {
+  /**
+   * The bot count comes from `DEFAULT_PREGAME_CONFIG`, not from a literal.
+   *
+   * This waited for `=== 5` and had done since before commit 41ab2eb moved the
+   * default from 5 to 3 — it never went red because the step above it was
+   * failing first, so nothing here had run in a long time. The vitest suites
+   * asserting the same thing stayed green throughout precisely because they
+   * read the constant (`expect(director.bots()).toHaveLength(
+   * DEFAULT_PREGAME_CONFIG.ai.count)`). Copying a value out of the config is
+   * the whole bug; read it.
+   */
+  const defaultBotCount = await gameEval(async () => {
+    const config = await import('/src/game/config/PregameConfig.ts');
+    return config.DEFAULT_PREGAME_CONFIG.ai.count;
+  });
+  await page.waitForFunction(n => {
     const game = window.__lol2d?.scene?.oScene?.game;
     return (
       game?.director?.getRules().cooldownReductionPercent === 0 &&
-      game.director.bots().length === 5 &&
+      game.director.bots().length === n &&
       game.director.jungleEnabled === true &&
       game.director.minionsEnabled === true
     );
-  });
+  }, defaultBotCount);
   const afterReset = await gameEval(key => {
     const game = window.__lol2d.scene.oScene.game;
     return {
@@ -1063,10 +1165,10 @@ try {
     afterReset.cooldownMultiplier === 1 &&
       afterReset.jungleEnabled === true &&
       afterReset.monsters > 0 &&
-      afterReset.bots === 5 &&
+      afterReset.bots === defaultBotCount &&
       afterReset.stored?.rules?.cooldownReductionPercent === 0 &&
       afterReset.stored?.world?.jungle === true &&
-      afterReset.stored?.ai?.count === 5 &&
+      afterReset.stored?.ai?.count === defaultBotCount &&
       // The tab re-reads the director after resetting, so the controls show the
       // match rather than the settings that are gone.
       afterReset.cdrLabel === '0%' &&

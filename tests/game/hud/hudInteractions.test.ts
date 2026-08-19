@@ -52,11 +52,19 @@ describe('filterSpells', () => {
 });
 
 describe('practice range controls', () => {
-  it('applies CDR live without persisting every input event, then commits on change', () => {
-    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+  /**
+   * The DOM half of "apply while dragging, save on release". That the *source*
+   * honours `persist: false` is asserted behaviourally, against both
+   * implementations, in `matchConfigSource.contract.test.ts`; what a behaviour
+   * test cannot see is that the slider is wired to both events at all.
+   */
+  it('applies CDR live on input and commits on change', () => {
+    const source = readFileSync('src/game/hud/config/MatchTab.vue', 'utf8');
 
-    expect(source).toContain('hud.director.seedRules(next)');
+    expect(source).toContain('@input="onCdrInput"');
     expect(source).toContain('@change="onCdrChange"');
+    expect(source).toContain('setCdr(cdrValue(event), false)');
+    expect(source).toContain('setCdr(cdrValue(event), true)');
   });
 
   it('lazy-loads below-fold catalogue art instead of decoding it all on modal open', () => {
@@ -68,19 +76,19 @@ describe('practice range controls', () => {
     expect(icon).toContain(":loading=\"lazy ? 'lazy' : 'eager'\"");
   });
 
-  it('exposes persistent quality and FPS controls in the match tab', () => {
-    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+  it('exposes persistent quality and FPS controls in the settings tab', () => {
+    const source = readFileSync('src/game/hud/config/SettingsTab.vue', 'utf8');
 
     expect(source).toContain('id="practice-render-quality"');
     expect(source).toContain('id="practice-render-fps"');
-    expect(source).toContain('hud.setRenderQuality');
-    expect(source).toContain('hud.setRenderFps');
+    expect(source).toContain('source.setRenderQuality');
+    expect(source).toContain('source.setRenderFps');
   });
 
   it('waits for a default reset and disables its button while kits are loading', () => {
-    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+    const source = readFileSync('src/game/hud/config/MatchTab.vue', 'utf8');
 
-    expect(source).toContain('await hud.director.resetToDefaults()');
+    expect(source).toContain('await source.resetToDefaults()');
     expect(source).toContain(':disabled="resetting"');
   });
 });

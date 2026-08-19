@@ -248,6 +248,12 @@ describe('sanitizePregameConfig', () => {
       },
       rules: { cooldownReductionPercent: 40, manaFree: true },
       world: { jungle: false, minions: true },
+      cheats: {
+        revealMap: true,
+        debug: { routes: true, terrain: false, collision: false, vision: false, quadtree: true },
+        playerInvulnerable: true,
+        botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 1),
+      },
     };
     expect(sanitizePregameConfig(custom)).toEqual(custom);
   });
@@ -346,6 +352,12 @@ describe('loadPregameConfig / savePregameConfig', () => {
       },
       rules: { cooldownReductionPercent: 30, manaFree: true },
       world: { jungle: true, minions: false },
+      cheats: {
+        revealMap: false,
+        debug: { routes: false, terrain: true, collision: false, vision: true, quadtree: false },
+        playerInvulnerable: false,
+        botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 3),
+      },
     };
     savePregameConfig(custom);
     expect(loadPregameConfig()).toEqual(custom);
@@ -568,5 +580,77 @@ describe('world', () => {
       world: { jungle: false, minions: true },
     });
     expect(loadPregameConfig().world).toEqual({ jungle: false, minions: true });
+  });
+});
+
+/**
+ * The `cheats` branch, added when the setup screen and the practice panel
+ * became one panel and every setting it holds became persistent.
+ *
+ * The migration case is the one that matters: a blob saved before this section
+ * existed meant a match with nothing switched on, because nothing could be
+ * switched on across a reload. All-`false` is a lossless read of that, not a
+ * reset — the same per-field policy the rest of this validator follows.
+ */
+describe('cheats', () => {
+  const ALL_OFF = {
+    revealMap: false,
+    debug: { routes: false, terrain: false, collision: false, vision: false, quadtree: false },
+    playerInvulnerable: false,
+    botInvulnerable: Array.from({ length: AI_COUNT_MAX }, () => false),
+  };
+
+  it('defaults to nothing switched on', () => {
+    expect(DEFAULT_PREGAME_CONFIG.cheats).toEqual(ALL_OFF);
+  });
+
+  it('gives a config saved before this section existed everything off', () => {
+    expect(sanitizePregameConfig({ ai: { count: 2 } }).cheats).toEqual(ALL_OFF);
+  });
+
+  it('falls back per field rather than dropping the whole section', () => {
+    const cheats = sanitizePregameConfig({
+      cheats: { revealMap: true, debug: { terrain: true } },
+    }).cheats;
+    expect(cheats.revealMap).toBe(true);
+    expect(cheats.debug).toEqual({ ...ALL_OFF.debug, terrain: true });
+    expect(cheats.playerInvulnerable).toBe(false);
+  });
+
+  it('coerces botInvulnerable to exactly AI_COUNT_MAX entries', () => {
+    const short = sanitizePregameConfig({ cheats: { botInvulnerable: [true] } }).cheats;
+    expect(short.botInvulnerable).toHaveLength(AI_COUNT_MAX);
+    expect(short.botInvulnerable[0]).toBe(true);
+    expect(short.botInvulnerable[1]).toBe(false);
+
+    const long = sanitizePregameConfig({
+      cheats: { botInvulnerable: Array.from({ length: AI_COUNT_MAX + 5 }, () => true) },
+    }).cheats;
+    expect(long.botInvulnerable).toHaveLength(AI_COUNT_MAX);
+
+    const junk = sanitizePregameConfig({ cheats: { botInvulnerable: 'nope' } }).cheats;
+    expect(junk.botInvulnerable).toEqual(ALL_OFF.botInvulnerable);
+  });
+
+  it('round-trips through storage', () => {
+    vi.stubGlobal('localStorage', new MemoryStorage());
+    const botInvulnerable = Array.from({ length: AI_COUNT_MAX }, (_, i) => i === 2);
+    savePregameConfig({
+      ...DEFAULT_PREGAME_CONFIG,
+      cheats: {
+        revealMap: true,
+        debug: { routes: true, terrain: false, collision: false, vision: true, quadtree: false },
+        playerInvulnerable: true,
+        botInvulnerable,
+      },
+    });
+    const back = loadPregameConfig().cheats;
+    expect(back.revealMap).toBe(true);
+    expect(back.debug.routes).toBe(true);
+    expect(back.debug.vision).toBe(true);
+    expect(back.debug.terrain).toBe(false);
+    expect(back.playerInvulnerable).toBe(true);
+    expect(back.botInvulnerable[2]).toBe(true);
+    expect(back.botInvulnerable[0]).toBe(false);
   });
 });

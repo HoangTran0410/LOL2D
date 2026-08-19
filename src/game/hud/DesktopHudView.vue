@@ -13,7 +13,6 @@ import { inject } from 'vue';
 import FormatUtils from '@/utils/format.utils';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
-import PracticePanel from './PracticePanel.vue';
 
 defineProps<{ state: HudState }>();
 
@@ -133,5 +132,4 @@ const hud = inject<HudInteractions>('hud')!;
     </div>
   </div>
 
-  <PracticePanel v-if="hud.showSpellsPicker" />
 </template>

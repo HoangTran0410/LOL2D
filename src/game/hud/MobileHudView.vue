@@ -46,11 +46,9 @@
  */
 import { inject } from 'vue';
 import type { HudInteractions } from './hudInteractions';
-import PracticePanel from './PracticePanel.vue';
 
 const hud = inject<HudInteractions>('hud')!;
 </script>
 
 <template>
-  <PracticePanel v-if="hud.showSpellsPicker" />
 </template>

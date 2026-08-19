@@ -36,13 +36,25 @@ describe('Camera under resize', () => {
     expect(c.currentScale).toBeCloseTo(0.39, 5);
   });
 
+  /**
+   * The zoom slider lives in the config panel's Cài đặt tab and reaches the
+   * camera through `MatchConfigSource.live` — which is `null` on the menu, so
+   * the control is not rendered there at all. The two halves are scanned
+   * separately because they now sit in different files: the adapter owns the
+   * camera calls, the tab owns the DOM wiring.
+   */
   it('the paused settings slider snaps live zoom and persists only the committed mode', () => {
-    const source = readFileSync('src/game/hud/practice/RulesTab.vue', 'utf8');
+    const adapter = readFileSync('src/game/hud/config/MatchDirectorSource.ts', 'utf8');
+    const tab = readFileSync('src/game/hud/config/SettingsTab.vue', 'utf8');
 
-    expect(source).toMatch(
-      /const setZoom[\s\S]*camera\.setZoomFactor\(factor\);[\s\S]*camera\.snapToScale\(\);/
+    // Snapped, because `Camera.update()` cannot lerp toward the new target
+    // while the panel holds the match paused.
+    expect(adapter).toMatch(
+      /setZoom\(factor: number\): void \{[\s\S]*setZoomFactor\(factor\);[\s\S]*snapToScale\(\);/
     );
-    expect(source).toContain('setZoomFactorPreference(camera.zoomFactor, hud.touchUi)');
-    expect(source).toContain('@change="persistZoom"');
+    expect(adapter).toContain('setZoomFactorPreference(host.camera.zoomFactor, host.touchUi)');
+    // Dragging applies; only releasing writes the preference.
+    expect(tab).toContain('@input="onZoomInput"');
+    expect(tab).toContain('@change="persistZoom"');
   });
 });

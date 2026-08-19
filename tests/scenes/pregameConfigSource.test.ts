@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { usePregameConfig } from '../../src/scenes/setup/usePregameConfig';
+import PregameConfigSource from '../../src/game/hud/config/PregameConfigSource';
 import {
   AI_COUNT_MAX,
   DEFAULT_BOT_BEHAVIOUR,
@@ -12,10 +12,18 @@ import {
 import TeamId from '../../src/game/enums/TeamId';
 
 /**
- * The setup screen's own state, tested where it touches the *parallel* arrays
- * the practice panel's persistence added: `ai.bots` and `ai.botBehaviours` are
- * index-aligned, and a screen that splices one has to splice the other or a
- * bot's kit ends up wearing another bot's behaviour.
+ * The menu-side source, tested where it touches the **parallel arrays**:
+ * `ai.bots`, `ai.botTeams`, `ai.botBehaviours` and now
+ * `cheats.botInvulnerable` are index-aligned, and a removal that splices one
+ * without the others leaves a bot wearing somebody else's side, behaviour or
+ * cheat.
+ *
+ * That is the one piece of `usePregameConfig.ts` — the deleted setup screen's
+ * state — worth keeping a suite of its own for. Everything else it did is now
+ * asserted against *both* sources in
+ * `tests/game/config/matchConfigSource.contract.test.ts`; this is here because
+ * the arrays only exist on this side. The in-game source has live units, where
+ * the same question does not arise.
  */
 
 /** A minimal in-memory `localStorage` so persistence can be tested in node. */
@@ -37,11 +45,19 @@ class MemoryStorage {
 
 const behaviour = (autoMove: boolean): BotBehaviour => ({ ...DEFAULT_BOT_BEHAVIOUR, autoMove });
 
-beforeEach(() => vi.stubGlobal('localStorage', new MemoryStorage()));
+beforeEach(() => {
+  const storage = new MemoryStorage();
+  vi.stubGlobal('localStorage', storage);
+  vi.stubGlobal('window', { localStorage: storage, location: { search: '' } });
+  vi.stubGlobal('document', { body: { classList: { toggle: () => {} } } });
+});
 afterEach(() => vi.unstubAllGlobals());
 
-describe('usePregameConfig.removeBotAt', () => {
-  it('balances a bot added after removal without changing the surviving active teams', () => {
+/** Bot slots are positional ids out here — `bot-0` is the first active bot. */
+const BOT = (index: number): string => `bot-${index}`;
+
+describe('PregameConfigSource.removeBot', () => {
+  it('balances a bot added after removal without changing the surviving active teams', async () => {
     savePregameConfig({
       ...loadPregameConfig(),
       ai: {
@@ -56,12 +72,12 @@ describe('usePregameConfig.removeBotAt', () => {
         ],
       },
     });
-    const pregame = usePregameConfig();
+    const source = new PregameConfigSource();
 
-    pregame.removeBotAt(0);
-    expect(pregame.config.value.ai.botTeams.slice(0, 2)).toEqual([TeamId.BLUE, TeamId.RED]);
+    source.removeBot(BOT(0));
+    expect(loadPregameConfig().ai.botTeams.slice(0, 2)).toEqual([TeamId.BLUE, TeamId.RED]);
 
-    pregame.setAiCount(3);
+    await source.addBot();
 
     // Player + the Blue survivor already outnumber Red 2–1. The new bot must
     // therefore be Red; the two survivors keep the sides they had before add.
@@ -72,7 +88,7 @@ describe('usePregameConfig.removeBotAt', () => {
     ]);
   });
 
-  it('shifts teams and behaviours up with the loadouts they belong to', () => {
+  it('shifts teams, behaviours and cheats up with the loadouts they belong to', () => {
     savePregameConfig({
       ...loadPregameConfig(),
       ai: {
@@ -89,10 +105,15 @@ describe('usePregameConfig.removeBotAt', () => {
         // the flags would leave `Bot2` wearing `Bot1`'s.
         botBehaviours: Array.from({ length: AI_COUNT_MAX }, (_, i) => behaviour(i === 1)),
       },
+      cheats: {
+        ...loadPregameConfig().cheats,
+        // Same trap one array over: only the *last* of the three is immortal.
+        botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, i) => i === 2),
+      },
     });
-    const pregame = usePregameConfig();
+    const source = new PregameConfigSource();
 
-    pregame.removeBotAt(1);
+    source.removeBot(BOT(1));
 
     const stored = loadPregameConfig();
     expect(stored.ai.count).toBe(2);
@@ -100,6 +121,9 @@ describe('usePregameConfig.removeBotAt', () => {
     expect(stored.ai.botTeams.slice(0, 2)).toEqual([TeamId.RED, TeamId.RED]);
     expect(stored.ai.botBehaviours[0].autoMove).toBe(false);
     expect(stored.ai.botBehaviours[1].autoMove).toBe(false); // Bot2's own flag, not Bot1's
+    // Bot2 kept its own cheat as it moved down a slot.
+    expect(stored.cheats.botInvulnerable[0]).toBe(false);
+    expect(stored.cheats.botInvulnerable[1]).toBe(true);
   });
 
   it('refills the freed tail slot from the global flags, the same seed a new bot gets', () => {
@@ -107,14 +131,27 @@ describe('usePregameConfig.removeBotAt', () => {
       ...loadPregameConfig(),
       ai: { ...loadPregameConfig().ai, count: 2, autoMove: true, autoAttack: false },
     });
-    const pregame = usePregameConfig();
+    const source = new PregameConfigSource();
 
-    pregame.removeBotAt(0);
+    source.removeBot(BOT(0));
 
-    const tail = loadPregameConfig().ai.botBehaviours[AI_COUNT_MAX - 1];
-    expect(tail).toEqual({ autoMove: true, autoAttack: false, autoCast: true });
-    expect(loadPregameConfig().ai.botTeams[AI_COUNT_MAX - 1]).toBe(
+    const stored = loadPregameConfig();
+    expect(stored.ai.botBehaviours[AI_COUNT_MAX - 1]).toEqual({
+      autoMove: true,
+      autoAttack: false,
+      autoCast: true,
+    });
+    expect(stored.ai.botTeams[AI_COUNT_MAX - 1]).toBe(
       DEFAULT_PREGAME_CONFIG.ai.botTeams[AI_COUNT_MAX - 1]
     );
+    // A freed cheat slot is off, never inherited from whoever used to be there.
+    expect(stored.cheats.botInvulnerable[AI_COUNT_MAX - 1]).toBe(false);
+  });
+
+  it('ignores an id past the active bot count', () => {
+    const source = new PregameConfigSource();
+    const before = source.botCount();
+    source.removeBot(BOT(before + 3));
+    expect(source.botCount()).toBe(before);
   });
 });

@@ -19,7 +19,7 @@ npm run verify   # everything CI runs — do this before declaring work done
 
 **The app is an installable PWA**, so two build-time facts are load-bearing. `predev`/`prebuild` copy p5 and stats.js out of `node_modules` into `public/vendor/` (gitignored, `scripts/copy-vendor.mjs`) and `index.html` loads them from there rather than a CDN: p5 is a global the game cannot boot without, in dev or production, and a service worker can only cache a cross-origin script it has already seen fetched, so the first offline launch would otherwise be a white screen. Stats.js is the same story only in dev — `GameScene.setup()` gates `new Stats()` behind `import.meta.env.DEV` (three always-redrawing debug canvases cost real frame budget on a phone for a HUD nobody but a developer reads), so it stays vendored and precached for dev builds but is dead weight, not a boot dependency, in production. And `public/` is the only directory Vite copies verbatim, which is why `favicon/` lives there: the generated manifest points at those icons by path. `npm run e2e:pwa` builds and checks the whole thing in a real browser with the network cut — including clearing Chromium's own HTTP cache first, without which a missing precache entry still appears to work.
 
-In-game: right-click ground moves and right-clicking a visible enemy attacks it; `A Q W E R` abilities, `D F` summoners (`SpellHotKeys` in `src/game/constants.ts`), `Space` toggles camera follow, `N` the nav debug overlay, wheel zooms, `Esc` opens the practice panel. **`Esc` does not leave the match** — one mis-hit used to end it outright; the way out is the exit button in the panel's Trận đấu tab, behind a two-step confirm.
+In-game: right-click ground moves and right-clicking a visible enemy attacks it; `A Q W E R` abilities, `D F` summoners (`SpellHotKeys` in `src/game/constants.ts`), `Space` toggles camera follow, `N` the nav debug overlay, wheel zooms, `Esc` opens the match-config panel. **`Esc` does not leave the match** — one mis-hit used to end it outright; the way out is the exit button in the panel's Trận đấu tab, behind a two-step confirm.
 
 ## Code style
 
@@ -71,15 +71,26 @@ Objects: `GameObject` → `AttackableUnit` (`Champion`, `AIChampion`, `Minion`, 
 
 `GameObject.teamId` still defaults to a fresh uuid for neutral/standalone objects, but a running match assigns champions explicitly: the player is Blue and initial bots alternate Red/Blue (the default player + 3 bots is 2v2); a bot added later joins the smaller side. A champion shares its base's fountain, turret row (`turret1` blue, `turret2` red in `summoner_map.json`) and minions, and spawn/respawn always uses that team's fountain. `lanes.ts` holds three waypoint paths ordered blue → red; red minions walk them backwards, and `tests/game/minions/Lanes.test.ts` checks the coordinates against the wall polygons — edit them and re-run it. Waves start with three melee plus three caster minions; cannon cadence and mid/late wave thinning live in `MinionSpawner.ts`.
 
-### The practice panel
+### The match-config panel
 
-`hud/PracticePanel.vue` — three tabs over a paused match, opened by `Esc`. A **superset of the pregame setup screen**: setup sets AI behaviour globally, the panel sets it per bot. Tabs never touch `localStorage`; they call `MatchDirector`, which mutates the live match and then writes `lol2d:pregameConfig:v1`, so the match you shaped is the one you get back. **Cheats, debug layers and stack counts are session state and deliberately never stored** — a test asserts the blob is byte-identical after every cheat is switched on. `config/savedKits.ts` is the one thing a tab stores on its own. A fourth tab will not fit: `.pregame-tab` is `flex: 1` and 390px holds three plus the close button.
+`hud/config/MatchConfigPanel.vue` — **one panel, mounted in two places**: over the menu (`SetupScene.ts`) and over a paused match (`InGameHUD.vue`, opened by `Esc`). It used to be two screens with two backends, and they diverged exactly as you would expect — the setup screen alone could pick an input mode, the practice panel alone could assign sides or switch the jungle off, and every new control landed in whichever component its author was editing.
+
+The seam is `hud/config/MatchConfigSource.ts`, with two implementations: `PregameConfigSource` (reads and writes `lol2d:pregameConfig:v1`, `live` is `null`) and `MatchDirectorSource` (wraps `MatchDirector`, which mutates the live match and then persists it). **A control has to be served by both**, and `tests/game/config/matchConfigSource.contract.test.ts` runs one suite against each to make sure it is — that test, not discipline, is what stops the two drifting again.
+
+Three tabs: **Đội** (roster, sides, per-bot AI, per-unit cheats), **Trận đấu** (rules, world, reset, the way out), **Cài đặt** (controls, target priority, display, debug layers). A fourth will not fit: `.pregame-tab` is `flex: 1` and 390px holds three plus the close button.
+
+Two rules the panel is built on, both reversals of what came before:
+
+- **Everything it changes persists**, cheats and debug layers included (`PregameConfig.cheats`). They used to be session state on the grounds that an invulnerable champion surviving a reload reads as a bug; one panel with two classes of control — one that comes back and one that silently does not — turned out to be the worse thing to explain. The mitigation is legibility: a roster row shows a shield on an invulnerable participant. Stack counts are still not stored (they are an action on a live spell, not a setting), nor are refill and clear-cooldowns.
+- **The shared panel must not import a `src/game/` runtime value.** It is mounted over the menu, and one such import drags the whole match into the menu's chunk with nothing on screen looking wrong. `MatchDirectorSource.ts` is the single exempt file — every `instanceof`, `Champion` field and `Spell` lives there — and `tests/scenes/matchConfigChunk.test.ts` plus `pregameBootPath.test.ts` are what keep it that way. `vite.config.ts` carves `src/game/hud/config/` (minus that one file) into the `pregame` chunk.
+
+`config/savedKits.ts` is the one thing a tab stores on its own.
 
 ## Traps that have cost real time
 
 Each was found by measurement, more than once, and none is visible from the file you are editing. The seams named here carry the long version in their own doc comments.
 
-**The practice panel holds the match paused.** `Game.update()`/`draw()` return early while `paused`, and every `MatchDirector` method runs in exactly that window — so nothing has settled. Four bugs so far. **Read both `objects` and `_objectToBeAdd`, skip `toRemove` and deactivated entries, and clamp derived stats at the point of change rather than trusting `update()`.**
+**The match-config panel holds the match paused.** `Game.update()`/`draw()` return early while `paused`, and every `MatchDirector` method runs in exactly that window — so nothing has settled. Four bugs so far. **Read both `objects` and `_objectToBeAdd`, skip `toRemove` and deactivated entries, and clamp derived stats at the point of change rather than trusting `update()`.**
 
 **`GameScene` calls `preventDefault()` on every touch on the page**, so the browser synthesises neither the trailing `click` nor its own scrolling — anywhere, not just over the canvas. A checkbox, a range drag and a plain `@click` were each dead under a thumb and perfect under a mouse. **Every HUD control needs a touch handler beside its click handler**, and a scrollable panel body needs hand-rolled scroll. `RulesTab.vue` and `RosterTab.vue` carry the shapes.
 

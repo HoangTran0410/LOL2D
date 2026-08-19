@@ -76,48 +76,30 @@ import type { CastContext, Vec2 } from './spell/runtime/types';
 const JOYSTICK_LOOKAHEAD_FRAMES = 30;
 const JOYSTICK_LOOKAHEAD_MIN = 120;
 
-export type RenderFps = 30 | 60;
+/**
+ * The four render preferences now live in `game/config/renderPreferences.ts` —
+ * `localStorage` with no p5 and no imports of its own, so the match-config
+ * panel can read them from the menu without pulling this file (and the match
+ * with it) into the menu's chunk. Re-exported here so every existing
+ * `from '@/game/Game'` still resolves; this file remains the only thing that
+ * *applies* them.
+ */
+export {
+  renderQualityPreference,
+  setRenderQualityPreference,
+  renderFpsPreference,
+  setRenderFpsPreference,
+  type RenderFps,
+} from './config/renderPreferences';
 
-const RENDER_QUALITY_STORAGE_KEY = 'lol2d.renderQuality';
-const RENDER_FPS_STORAGE_KEY = 'lol2d.renderFps';
-
-export function renderQualityPreference(): RenderQuality {
-  try {
-    const stored = window.localStorage.getItem(RENDER_QUALITY_STORAGE_KEY);
-    if (stored === 'low' || stored === 'high') return stored;
-  } catch {
-    /* storage blocked: use automatic quality */
-  }
-  return 'auto';
-}
-
-export function setRenderQualityPreference(quality: RenderQuality): void {
-  try {
-    window.localStorage.setItem(
-      RENDER_QUALITY_STORAGE_KEY,
-      quality === 'low' || quality === 'high' ? quality : 'auto'
-    );
-  } catch {
-    /* storage blocked: the live setting still works */
-  }
-}
-
-export function renderFpsPreference(): RenderFps {
-  try {
-    if (window.localStorage.getItem(RENDER_FPS_STORAGE_KEY) === '30') return 30;
-  } catch {
-    /* storage blocked: use 60 FPS */
-  }
-  return 60;
-}
-
-export function setRenderFpsPreference(fps: RenderFps): void {
-  try {
-    window.localStorage.setItem(RENDER_FPS_STORAGE_KEY, fps === 30 ? '30' : '60');
-  } catch {
-    /* storage blocked: the live setting still works */
-  }
-}
+// A re-export does not bind the names locally; this file applies all four.
+import {
+  renderQualityPreference,
+  setRenderQualityPreference,
+  renderFpsPreference,
+  setRenderFpsPreference,
+  type RenderFps,
+} from './config/renderPreferences';
 
 export default class Game {
   readonly mapSize = 6400;
@@ -340,6 +322,13 @@ export default class Game {
     // skipped: a director that disagreed with the match would show a ticked box
     // over an empty jungle, and then write that lie over the player's setting.
     this.director.seedWorld(pregameConfig.world);
+    // And the cheats, which persist now (see `CheatConfig` in
+    // PregameConfig.ts). Last of the three seeds because it is the only one
+    // that lands on units: `seedCheats` reads the roster to apply per-slot
+    // invulnerability, and every bot above is already queued by this point —
+    // `MatchDirector.bots()` counts `_objectToBeAdd`, so it does not need the
+    // first `ObjectManager.update()` to have run.
+    this.director.seedCheats(pregameConfig.cheats);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();
@@ -834,7 +823,12 @@ export default class Game {
     // the clearance field, active routes and every agent's state. Not one of
     // SpellHotKeys' letters, so it never steals a cast.
     if (keyCode === 78 && !repeated) {
-      this.navigation.debugRoutes = !this.navigation.debugRoutes;
+      // Through the director, not `navigation.debugRoutes` directly: the debug
+      // layers persist now, and the director is the only thing that writes the
+      // config. Writing the field would leave the key and the panel's checkbox
+      // agreeing about the match (they are one boolean — see
+      // `createDebugFlags`) while disagreeing about what gets saved.
+      this.director?.setDebugFlag('routes', !this.navigation.debugRoutes);
     }
     this.spellInputController.keyDown(keyCode, repeated);
   }

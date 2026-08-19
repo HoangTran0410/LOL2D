@@ -35,14 +35,30 @@ const ALLOWED_GAME_MODULES = [
   '@/game/config/MatchTeams',
   '@/game/config/savedKits',
   '@/game/config/spellCatalog',
+  '@/game/config/renderPreferences',
+  '@/game/config/zoomBounds',
   '@/game/constants',
   '@/game/input/touchPreferences',
+  // The panel itself, which lives under `src/game/hud/config/` because it is
+  // about a match — and is carved into the `pregame` chunk for exactly the
+  // reason everything above it is. Only `MatchDirectorSource` in that directory
+  // touches the match, and it is excluded from both the carve-out and the scan
+  // below.
+  '@/game/hud/config/MatchConfigPanel.vue',
+  '@/game/hud/config/PregameConfigSource',
 ];
 
+/** The adapter that is *supposed* to reach the match. See `matchConfigChunk.test.ts`. */
+const MATCH_ONLY = 'MatchDirectorSource';
+
 function pregameFiles(): string[] {
-  const files = ['scenes/SetupScene.ts', 'scenes/SetupScene.vue'];
+  const files = ['scenes/SetupScene.ts'];
   for (const name of readdirSync(join(SRC, 'scenes/setup'))) {
     if (name.endsWith('.ts') || name.endsWith('.vue')) files.push(`scenes/setup/${name}`);
+  }
+  for (const name of readdirSync(join(SRC, 'game/hud/config'))) {
+    if (name.includes(MATCH_ONLY)) continue;
+    if (name.endsWith('.ts') || name.endsWith('.vue')) files.push(`game/hud/config/${name}`);
   }
   return files;
 }

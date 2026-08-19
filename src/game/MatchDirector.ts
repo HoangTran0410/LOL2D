@@ -31,14 +31,22 @@
  * was the better of the two. The clean slate a new match used to be is now the
  * "Đặt lại mặc định" button on the Trận đấu tab.
  *
- * What did *not* reverse is the line under it. Cheats — invulnerability,
- * reveal-map, stack counts — and the debug layers are session state and are
- * never written. They are things a player switches on to try something, and
- * inheriting one silently into the next visit would read as the game being
- * broken rather than as a restored setting. `persist()` is called from the
- * roster, loadout, rules and world methods and from nowhere else; the test that
- * holds that line is `MatchDirector.persistence.test.ts`'s "cheats and debug
- * flags do not leak into storage".
+ * The line under it moved too, later and for a different reason. Cheats —
+ * invulnerability, reveal-map — and the debug layers used to be session state
+ * that was never written, on the grounds that inheriting one silently into the
+ * next visit would read as the game being broken rather than as a restored
+ * setting. Then the setup screen and this panel became *one* panel
+ * (`hud/config/MatchConfigPanel.vue`), mounted over the menu as well as over a
+ * match, and a single panel with two classes of control — one that comes back
+ * and one that silently does not — turned out to be the worse thing to explain.
+ * So they persist, as `PregameConfig.cheats`, and legibility pays for it: a
+ * roster row marks an invulnerable participant without its drawer being open.
+ *
+ * `persist()` is therefore called from the roster, loadout, rules, world **and
+ * cheat** methods. What is still never written is `refill` and `clearCooldowns`
+ * (actions, with nothing to store) and stack counts (a count on a live spell
+ * instance, which would have to be keyed by slot and spell id and replayed at
+ * spawn). `MatchDirector.persistence.test.ts` holds both halves of that line.
  *
  * Written against `MatchDirectorContext`, not `Game`, so it unit-tests under
  * plain Vitest with no p5 globals and no scene. `Game` satisfies the interface
@@ -72,6 +80,7 @@ import {
 import type {
   BotBehaviour,
   ChampionLoadout,
+  CheatConfig,
   MatchRules,
   MatchRulesConfig,
   PregameConfig,
@@ -370,7 +379,82 @@ export default class MatchDirector {
       },
       rules: this.getRules(),
       world: { jungle: this.jungleEnabled, minions: this.minionsEnabled },
+      cheats: this.getCheats(stored),
     };
+  }
+
+  /**
+   * The cheat section, derived from live state exactly the way the roster and
+   * the rules above are — never patched field by field. Same argument as this
+   * method's own: a patch scheme has to be kept in step with the panel's
+   * controls forever, and what a match *is* cannot drift from what the player
+   * is looking at.
+   *
+   * Bot slots past the live bot count read back from storage, like every other
+   * per-slot array here, so lowering the bot count and raising it again does
+   * not quietly clear a flag the player set.
+   *
+   * That cheats are persisted at all is a reversal. They were session state on
+   * the grounds that an invulnerable champion surviving a reload reads as a bug
+   * — see `CheatConfig`'s own comment in `PregameConfig.ts` for why the unified
+   * panel changed that answer, and what pays for it.
+   */
+  private getCheats(stored: PregameConfig): CheatConfig {
+    const live = this.bots();
+    return {
+      revealMap: this._revealMap,
+      debug: {
+        routes: this.debug.routes,
+        terrain: this.debug.terrain,
+        collision: this.debug.collision,
+        vision: this.debug.vision,
+        quadtree: this.debug.quadtree,
+      },
+      playerInvulnerable: this.isInvulnerable(this.game.player),
+      botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, i) =>
+        i < live.length ? this.isInvulnerable(live[i]) : stored.cheats.botInvulnerable[i]
+      ),
+    };
+  }
+
+  /**
+   * What the panel reads. Public counterpart to the private derivation above,
+   * which needs a stored config for the inactive slots and is only ever called
+   * from `toPregameConfig`.
+   */
+  cheats(): CheatConfig {
+    return this.getCheats(loadPregameConfig());
+  }
+
+  /**
+   * Apply a stored cheat section to a match that is *booting*.
+   *
+   * `seed*` rather than the public setters, for the reason `seedRules` and
+   * `seedWorld` are: those persist, and a match being constructed has nothing
+   * to save — it is being told what it already is. Writing through the setters
+   * here would also mean `AI_COUNT_MAX` storage writes on every boot.
+   *
+   * Called from `Game`'s constructor after the roster exists, since the
+   * per-slot invulnerability lands on units.
+   */
+  seedCheats(cheats: CheatConfig): void {
+    this._revealMap = cheats.revealMap;
+    this.debug.routes = cheats.debug.routes;
+    this.debug.terrain = cheats.debug.terrain;
+    this.debug.collision = cheats.debug.collision;
+    this.debug.vision = cheats.debug.vision;
+    this.debug.quadtree = cheats.debug.quadtree;
+
+    // Both directions, not just "switch it on where the flag says so". On a
+    // booting match every unit is fresh and clearing is a no-op, but this is
+    // also how `resetToDefaults` puts an invulnerable player back — and a seed
+    // that could only ever add would leave that one unit immortal over a config
+    // that says otherwise.
+    this.applyInvulnerable(this.game.player, cheats.playerInvulnerable);
+    const live = this.bots();
+    for (let i = 0; i < live.length; i++) {
+      this.applyInvulnerable(live[i], !!cheats.botInvulnerable[i]);
+    }
   }
 
   /**
@@ -421,7 +505,7 @@ export default class MatchDirector {
    * for the one rolled kit before constructing the bot, so an early click
    * cannot race the background spell-catalogue warm-up.
    */
-  addBotLoaded(loadout: ChampionLoadout): Promise<AIChampion | null> {
+  addBotLoaded(loadout: ChampionLoadout, teamId?: MatchTeamId): Promise<AIChampion | null> {
     if (this.pendingAdd) return this.pendingAdd;
 
     this.invalidatePendingReset();
@@ -436,7 +520,12 @@ export default class MatchDirector {
     const pending = loading
       .then(preset => {
         if (generation !== this.addGeneration) return null;
-        return this.addBotWithPreset(loadout, preset);
+        // `teamId` is optional and stays optional: omitted, `addBotWithPreset`
+        // balances the sides, which is what a caller with no opinion wants. The
+        // panel does have one — its add button sits at the end of a *side* —
+        // and naming it there is the difference between "add a bot" and "add a
+        // bot to Đội Đỏ".
+        return this.addBotWithPreset(loadout, preset, teamId ? { teamId } : {});
       })
       .finally(() => {
         if (this.pendingAdd === pending) this.pendingAdd = null;
@@ -777,6 +866,15 @@ export default class MatchDirector {
       }
     }
 
+    // Cheats are part of "a clean slate" now that they persist. Seeded rather
+    // than set, for the same reason the rules and world above are: this method
+    // writes the whole config once, at the end, and `setInvulnerable` per unit
+    // would save `AI_COUNT_MAX` times on the way there. It clears as well as
+    // sets, which is what puts an invulnerable player back to mortal; the bots
+    // it reaches are the ones just added, the old ones being `toRemove` and off
+    // the roster already.
+    this.seedCheats(config.cheats);
+
     // The exact defaults, including inactive bot slots and global AI flags.
     savePregameConfig(config);
     return true;
@@ -819,7 +917,33 @@ export default class MatchDirector {
    * It lives here rather than on the minimap because it is a cheat, and putting
    * it in Gian lận means the minimap never has to reason about balance.
    */
-  revealMap = false;
+  private _revealMap = false;
+
+  get revealMap(): boolean {
+    return this._revealMap;
+  }
+
+  /**
+   * Writes through an accessor rather than being a plain field because it
+   * persists now. Every cheat does — see `getCheats` — so each one has to pass
+   * through something that can call `persist()`, and a bare public field
+   * cannot.
+   */
+  set revealMap(on: boolean) {
+    this._revealMap = on;
+    this.persist();
+  }
+
+  /**
+   * The debug layers' write path. `debug` itself stays directly readable (and
+   * `debug.routes` stays an alias onto `navigation.debugRoutes`, so the `N` key
+   * and the checkbox remain one boolean) — but a write has to come through here
+   * to be saved, including the one the `N` key makes.
+   */
+  setDebugFlag(key: keyof DebugFlags, on: boolean): void {
+    this.debug[key] = on;
+    this.persist();
+  }
 
   /** Whether `unit` is currently carrying the invulnerability buff. */
   isInvulnerable(unit: Champion): boolean {
@@ -831,6 +955,17 @@ export default class MatchDirector {
    * tab never has to know what invulnerability is made of.
    */
   setInvulnerable(unit: Champion, on: boolean): void {
+    this.applyInvulnerable(unit, on);
+    this.persist();
+  }
+
+  /**
+   * The mechanism without the write, so a booting match can be handed its
+   * stored flags without `AI_COUNT_MAX` storage writes — and without a match
+   * that is only being *told* what it is appearing to save something. See
+   * `seedCheats`.
+   */
+  private applyInvulnerable(unit: Champion, on: boolean): void {
     const existing = this.invulnerableBuffs(unit);
     if (on) {
       if (existing.length === 0) {

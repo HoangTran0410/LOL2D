@@ -21,17 +21,14 @@ export const VISION_SPAN = 1000;
 export const SCALE_MIN = 0.3;
 export const SCALE_MAX = 2.5;
 
-/** Bounds on the player's manual multiplier over the balanced base. */
-export const ZOOM_FACTOR_MIN = 0.6;
-export const ZOOM_FACTOR_MAX = 1.6;
-
 /**
- * `Math.min`, not p5's `constrain`: this is called from `zoomFactorPreference`
- * before any p5 global exists, and from Vitest's `environment: 'node'` with
- * nothing stubbed.
+ * The zoom bounds live in `game/config/zoomBounds.ts` — three p5-free values
+ * the match-config panel's slider reads from the menu, where this file (and the
+ * match with it) must not be loaded. Re-exported so every existing
+ * `from '.../Camera'` still resolves.
  */
-export const clampZoomFactor = (factor: number): number =>
-  Math.min(ZOOM_FACTOR_MAX, Math.max(ZOOM_FACTOR_MIN, factor));
+export { ZOOM_FACTOR_MIN, ZOOM_FACTOR_MAX, clampZoomFactor } from '@/game/config/zoomBounds';
+import { clampZoomFactor } from '@/game/config/zoomBounds';
 
 /**
  * The shorter side, so an ultrawide gets more horizontal world rather than a

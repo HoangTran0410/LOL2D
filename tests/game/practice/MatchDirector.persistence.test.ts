@@ -218,60 +218,103 @@ describe('MatchDirector persistence', () => {
   });
 
   /**
-   * The test that stops the hook being widened carelessly later.
+   * **This suite used to assert the opposite**, and the reversal is deliberate
+   * rather than a relaxation.
    *
-   * Cheats and debug layers are things a player switches on to try something.
-   * Inheriting them silently into the next visit would read as the game being
-   * broken — an invulnerable champion nobody remembers asking for is a bug
-   * report, not a restored setting. So the line is: match configuration
-   * persists, session state does not.
+   * The old rule was "match configuration persists, session state does not":
+   * cheats and debug layers were things a player switched on to try something,
+   * and an invulnerable champion nobody remembered asking for would read as a
+   * bug report rather than a restored setting.
+   *
+   * What changed is that the setup screen and the practice panel became one
+   * panel, mounted both over the menu and over a running match. A single panel
+   * with two classes of control — one that comes back and one that silently
+   * does not — is a worse thing to explain than a cheat that stays on, and the
+   * old rule was invisible from the control itself. The mitigation is
+   * legibility, not forgetting: the roster row marks an invulnerable
+   * participant without anything being expanded.
+   *
+   * What is still *not* persisted is `refill` and `clearCooldowns` — those are
+   * actions, not settings, and have nothing to store — and stack counts, which
+   * would need keying by slot and spell id and replaying at spawn.
    */
-  describe('cheats and debug flags do not leak into storage', () => {
-    it('leaves the stored config byte-for-byte unchanged', () => {
+  describe('cheats and debug flags persist', () => {
+    it('writes the config when a cheat is switched on, with nothing else moving', () => {
       const { director, ctx } = bench();
       director.setRules({ cooldownReductionPercent: 20, manaFree: false });
-      const before = storage.getItem(STORAGE_KEY);
-      expect(before).not.toBeNull();
+      const before = JSON.parse(storage.getItem(STORAGE_KEY)!) as Record<string, unknown>;
 
       director.setInvulnerable(ctx.player, true);
       director.revealMap = true;
-      director.debug.terrain = true;
-      director.debug.collision = true;
+      director.setDebugFlag('terrain', true);
+
+      const after = JSON.parse(storage.getItem(STORAGE_KEY)!) as Record<string, unknown>;
+      expect(after.cheats).not.toEqual(before.cheats);
+      // The rest of the blob is untouched: a cheat write is still a whole-config
+      // derivation, so a bug there would show up as the roster or the rules
+      // moving on their own.
+      for (const section of ['player', 'playerTeam', 'ai', 'rules', 'world']) {
+        expect(after[section]).toEqual(before[section]);
+      }
+    });
+
+    it('stores exactly what was switched on, per unit', () => {
+      const { director, ctx } = bench();
+      director.setInvulnerable(ctx.player, true);
+      director.revealMap = true;
+      director.setDebugFlag('quadtree', true);
+
+      const cheats = loadPregameConfig().cheats;
+      expect(cheats.playerInvulnerable).toBe(true);
+      expect(cheats.revealMap).toBe(true);
+      expect(cheats.debug.quadtree).toBe(true);
+      expect(cheats.debug.terrain).toBe(false);
+      expect(cheats.botInvulnerable.every(on => !on)).toBe(true);
+    });
+
+    it('switches a cheat back off in storage too', () => {
+      const { director, ctx } = bench();
+      director.setInvulnerable(ctx.player, true);
+      expect(loadPregameConfig().cheats.playerInvulnerable).toBe(true);
+
+      director.setInvulnerable(ctx.player, false);
+      expect(loadPregameConfig().cheats.playerInvulnerable).toBe(false);
+    });
+
+    it('writes the five sections and no more', () => {
+      const { director, ctx } = bench();
+      director.setInvulnerable(ctx.player, true);
+      director.setRules({ cooldownReductionPercent: 10, manaFree: false });
+
+      const raw = storedRaw()!;
+      expect(Object.keys(raw).sort()).toEqual([
+        'ai',
+        'cheats',
+        'player',
+        'playerTeam',
+        'rules',
+        'world',
+      ]);
+      expect(Object.keys(raw.cheats as object).sort()).toEqual([
+        'botInvulnerable',
+        'debug',
+        'playerInvulnerable',
+        'revealMap',
+      ]);
+    });
+
+    it('still stores nothing for refill, clearCooldowns or stacks', () => {
+      const { director, ctx } = bench();
+      director.setRules({ cooldownReductionPercent: 20, manaFree: false });
+      const before = storage.getItem(STORAGE_KEY);
+
       director.refill(ctx.player);
       director.clearCooldowns(ctx.player);
 
       expect(storage.getItem(STORAGE_KEY)).toBe(before);
-    });
-
-    it('writes only the four match-configuration sections, whatever else the director holds', () => {
-      const { director, ctx } = bench();
-      director.setInvulnerable(ctx.player, true);
-      director.revealMap = true;
-      director.debug.quadtree = true;
-      // A mutation *after* the cheats, so the write that lands is one taken
-      // with every cheat switched on.
-      director.setRules({ cooldownReductionPercent: 10, manaFree: false });
-
-      const raw = storedRaw()!;
-      expect(Object.keys(raw).sort()).toEqual(['ai', 'player', 'playerTeam', 'rules', 'world']);
-      expect(Object.keys(raw.ai as object).sort()).toEqual([
-        'autoAttack',
-        'autoCast',
-        'autoMove',
-        'botBehaviours',
-        'botTeams',
-        'bots',
-        'count',
-      ]);
-      // Belt and braces, and the part that survives a future field being added
-      // to one of those sections: no cheat's *name* appears anywhere in the
-      // blob. Stack counts are covered by construction — they go through
-      // `Spell.setStackCount` and the director never sees them — but a future
-      // stack cheat routed through here would trip this.
-      const blob = storage.getItem(STORAGE_KEY)!.toLowerCase();
-      for (const word of ['invulnerab', 'reveal', 'debug', 'quadtree', 'stack', 'cooldownreset']) {
-        expect(blob).not.toContain(word);
-      }
+      // Stack counts go through `Spell.setStackCount` and the director never
+      // sees them; this catches a future stack cheat being routed through here.
+      expect(storage.getItem(STORAGE_KEY)!.toLowerCase()).not.toContain('stack');
     });
   });
 

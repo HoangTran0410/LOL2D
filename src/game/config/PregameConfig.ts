@@ -169,6 +169,52 @@ export interface MatchRulesConfig {
   manaFree: boolean;
 }
 
+/**
+ * The five debug layers, structurally identical to `DebugFlags` in
+ * `game/debug/DebugOverlay.ts` and deliberately *not* imported from it: this
+ * module is pure data with no knowledge of anything that draws, and that
+ * separation is what lets the menu read a config without pulling the match
+ * chunk. `debug-flags-shape.test.ts` asserts the two stay the same shape.
+ */
+export interface DebugLayerConfig {
+  routes: boolean;
+  terrain: boolean;
+  collision: boolean;
+  vision: boolean;
+  quadtree: boolean;
+}
+
+/**
+ * What used to be session state.
+ *
+ * Cheats and debug layers were deliberately never stored — the reasoning was
+ * that an invulnerable champion surviving a reload reads as the game being
+ * broken rather than as a restored setting. That reversed when the setup
+ * screen and the practice panel became one panel: a panel with two classes of
+ * control, one that comes back and one that silently does not, is a worse
+ * thing to explain than a cheat that stays on. The mitigation is legibility
+ * instead of forgetting — the roster row shows a shield on an invulnerable
+ * participant without anything being expanded.
+ *
+ * `botInvulnerable` is index-aligned with `ai.bots`/`botTeams`/`botBehaviours`
+ * and the same fixed `AI_COUNT_MAX` length, for the same reason those are: a
+ * bot removed from the middle shifts the rest up, and a parallel array is the
+ * only shape where one splice keeps all four in step.
+ *
+ * Stack counts are *not* here. `+1/+10/+100` acts on a live spell instance, so
+ * persisting one would mean keying by slot and spell id and replaying it at
+ * spawn — a different feature, and the control is not offered outside a match
+ * anyway.
+ */
+export interface CheatConfig {
+  /** Show the whole map on the minimap, fog or no fog. */
+  revealMap: boolean;
+  debug: DebugLayerConfig;
+  playerInvulnerable: boolean;
+  /** One flag per bot *slot* (always `AI_COUNT_MAX` entries), 0-based. */
+  botInvulnerable: readonly boolean[];
+}
+
 export interface PregameConfig {
   player: ChampionLoadout;
   /**
@@ -182,6 +228,7 @@ export interface PregameConfig {
   ai: AIConfig;
   rules: MatchRulesConfig;
   world: WorldConfig;
+  cheats: CheatConfig;
 }
 
 export const AI_COUNT_MIN = 0;
@@ -236,7 +283,28 @@ export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
     jungle: true,
     minions: true,
   }),
+  cheats: Object.freeze({
+    revealMap: false,
+    debug: Object.freeze({
+      routes: false,
+      terrain: false,
+      collision: false,
+      vision: false,
+      quadtree: false,
+    }),
+    playerInvulnerable: false,
+    botInvulnerable: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => false)),
+  }),
 });
+
+/** The layer names, in the order the settings tab lists them. */
+export const DEBUG_LAYER_KEYS = [
+  'routes',
+  'terrain',
+  'collision',
+  'vision',
+  'quadtree',
+] as const satisfies readonly (keyof DebugLayerConfig)[];
 
 const STORAGE_KEY = 'lol2d:pregameConfig:v1';
 
@@ -292,6 +360,40 @@ export const sanitizeBotBehaviour = (raw: unknown, fallback: BotBehaviour): BotB
     autoMove: asBoolean(source.autoMove, fallback.autoMove),
     autoAttack: asBoolean(source.autoAttack, fallback.autoAttack),
     autoCast: asBoolean(source.autoCast, fallback.autoCast),
+  };
+};
+
+/**
+ * Sanitizes the cheat section, every field falling back to "off".
+ *
+ * "Off" is the migration answer as well as the default, and the two coincide
+ * for a real reason rather than by convenience: before this section existed
+ * nothing here *could* survive a reload, so a blob without it describes a
+ * match with everything switched off. Reading it that way loses nothing.
+ *
+ * `botInvulnerable` is coerced to exactly `AI_COUNT_MAX` entries — padded,
+ * truncated, and non-booleans replaced — the same treatment `customSlots` gets
+ * and for the same reason: an index into it can never be `undefined`, whatever
+ * a corrupt or hand-edited blob contained.
+ */
+export const sanitizeCheatConfig = (raw: unknown): CheatConfig => {
+  const source = (raw && typeof raw === 'object' ? raw : {}) as Partial<CheatConfig>;
+  const debug = (
+    source.debug && typeof source.debug === 'object' ? source.debug : {}
+  ) as Partial<DebugLayerConfig>;
+  const rawBots = Array.isArray(source.botInvulnerable) ? source.botInvulnerable : [];
+
+  return {
+    revealMap: asBoolean(source.revealMap, false),
+    debug: {
+      routes: asBoolean(debug.routes, false),
+      terrain: asBoolean(debug.terrain, false),
+      collision: asBoolean(debug.collision, false),
+      vision: asBoolean(debug.vision, false),
+      quadtree: asBoolean(debug.quadtree, false),
+    },
+    playerInvulnerable: asBoolean(source.playerInvulnerable, false),
+    botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, i) => asBoolean(rawBots[i], false)),
   };
 };
 
@@ -367,6 +469,7 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
       jungle: asBoolean(world.jungle, DEFAULT_PREGAME_CONFIG.world.jungle),
       minions: asBoolean(world.minions, DEFAULT_PREGAME_CONFIG.world.minions),
     },
+    cheats: sanitizeCheatConfig(source.cheats),
   };
 };
 

@@ -638,28 +638,41 @@
   min-width: 0;
 }
 
-/* A real, laid-out button rather than `.participant-card-open`'s invisible
-   `position: absolute; inset: 0` overlay: that trick works there because the
-   only things stacked over it are the kit icons, while a row here also
-   carries three checkboxes and a delete, and an invisible sheet across all of
-   them is the kind of overlapping tap target this screen's redesign removed. */
-.practice-roster-open {
+/* The portrait-and-name zone: everything that means "who this is", and the
+   whole of what tapping opens the loadout editor.
+
+   `.practice-roster-open` is `.participant-card-open`'s invisible overlay, and
+   it took two goes to land here. The overlay was rejected once, correctly: a
+   sheet across the *whole row* would have sat over the drawer toggle, the side
+   switch and the delete, which is the overlapping tap target the roster's
+   redesign removed. Scoped to this zone it covers none of them — the only
+   things stacked over it are the kit icons, exactly the situation the setup
+   screen's card used it in.
+
+   Why an overlay at all: the icons are buttons now (they open the ability
+   description, in both places, which used to work only on the setup screen),
+   and a `<button>` inside a `<button>` is not valid markup. */
+.practice-roster-identity {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   gap: 0.8rem;
   min-width: 0;
   padding: 0.6rem 0.8rem;
-  background: transparent;
-  border: none;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
-.practice-roster-open:hover {
+.practice-roster-identity:hover {
   background: #2a2f36;
+}
+
+.practice-roster-open {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .practice-roster-portrait {
@@ -713,9 +726,11 @@
   white-space: nowrap;
 }
 
-/* The champion's Q/W/E/R at a glance, under the name. Small on purpose — a
-   preview of the kit the row opens for editing, not a control (the whole row is
-   the tap target). An empty slot shows its letter instead of a broken icon. */
+/* The champion's Q/W/E/R at a glance, under the name. Small on purpose, but a
+   real control: tapping one opens that ability's description. `position:
+   relative` is what wins the click against `.practice-roster-open` stacked
+   underneath. An empty slot shows its letter instead of a broken icon, and has
+   nothing to describe — hence `.is-inert`. */
 .practice-roster-spells {
   display: flex;
   gap: 3px;
@@ -723,8 +738,10 @@
 }
 
 .practice-roster-spell {
+  position: relative;
   width: 20px;
   height: 20px;
+  padding: 0;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -733,6 +750,56 @@
   background: var(--hextech-sunken);
   border: 1px solid var(--hextech-line);
   border-radius: 3px;
+  cursor: pointer;
+}
+
+.practice-roster-spell:not(.is-inert):hover {
+  border-color: var(--hextech-teal);
+}
+
+.practice-roster-spell.is-inert {
+  cursor: default;
+}
+
+/* A cheat that outlives the session has to be visible without opening the
+   drawer that set it — see `CheatConfig` in PregameConfig.ts. */
+.practice-roster-badge {
+  margin-left: 4px;
+  color: var(--hextech-teal);
+  font-size: 0.9em;
+}
+
+/* Section headings inside a tab body. The Cài đặt tab is four groups deep
+   (controls, targeting, display, debug) and reads as one long list without
+   them. */
+.practice-section-title {
+  margin: 0.4rem 0 0.1rem;
+  color: var(--hextech-gold);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* The panel's own footer, and only outside a match: "Bắt Đầu" is the one
+   control the menu opened this panel to reach, so it does not live in a tab.
+   In a match there is no footer — closing the panel resumes play. */
+.match-config-actions {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 0.4rem 0.6rem;
+  border-top: 2px solid var(--hextech-line);
+}
+
+/* The menu's own `.hextech-btn` is 18px type in 0.75rem/2rem padding — 72px of
+   a 370px panel spent on one word, while the roster above it is the thing the
+   player is actually reading. Scoped to this bar, so the menu's buttons keep
+   their full size; still 44px tall, which is the thumb minimum. */
+.match-config-actions .hextech-btn {
+  min-height: 44px;
+  padding: 0.4rem 1.6rem;
+  font-size: 15px;
 }
 
 .practice-roster-spell img {
@@ -791,21 +858,33 @@
    90vh, so a button at the end of that flow is off screen in every viewport
    this game runs on, so native scrolling should not be required before the
    primary action is reachable. */
+/* One per side, at the end of that side's rows, scrolling with them.
+   It used to be a single `position: sticky; bottom: 0` bar across the scroller,
+   which cost a permanent 45px strip over the roster on every tab it appeared on
+   — on a 370px-tall window that strip plus the footer left 214px of list, under
+   two rows. Scrolling with the content costs nothing when you are not at the
+   bottom, and the button's *position* now also says which side the bot joins. */
 .practice-add-bot {
-  position: sticky;
-  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  min-height: 44px;
-  padding: 0.7rem;
-  background: var(--hextech-panel);
-  border: 2px dashed var(--hextech-line);
+  min-height: 34px;
+  margin-top: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  border: 1px dashed var(--hextech-line);
+  border-radius: 4px;
   color: var(--hextech-teal);
   font: inherit;
+  font-size: 0.9em;
   cursor: pointer;
+}
+
+/* The 44px thumb minimum `body.touch-ui .pregame-tab` sets for its own row. */
+body.touch-ui .practice-add-bot {
+  min-height: 44px;
 }
 
 .practice-add-bot:hover:not(:disabled) {

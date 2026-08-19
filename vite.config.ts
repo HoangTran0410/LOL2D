@@ -230,7 +230,18 @@ export default defineConfig({
             // setup screen was importing its own roster back out of the match.
             // Pinned to the side that can stand alone; the game chunk depends
             // on this one anyway, through `PregameConfig`.
-            id.includes('src/scenes/setup/')
+            id.includes('src/scenes/setup/') ||
+            // The match-config panel, which is now mounted in *both* places —
+            // over the menu and over a running match — so it is shared exactly
+            // the way the picker above it is, and would otherwise be hoisted
+            // into `game` and dragged back onto the menu.
+            //
+            // `MatchDirectorSource` is the deliberate exception and the whole
+            // point of the seam: it is the only file in that directory that
+            // touches `MatchDirector`, `AIChampion` and `Camera`, so it belongs
+            // to the match. `tests/scenes/matchConfigChunk.test.ts` is what
+            // keeps the rest of the directory able to live out here.
+            (id.includes('src/game/hud/config/') && !id.includes('MatchDirectorSource'))
           ) {
             return 'pregame';
           }

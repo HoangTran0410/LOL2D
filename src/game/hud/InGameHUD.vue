@@ -38,18 +38,60 @@
  * mounted, so it lives in local state and is pushed in through `setState`,
  * exposed below for the lifecycle wrapper to call.
  */
-import { provide, ref } from 'vue';
+import { markRaw, onUnmounted, provide, ref, shallowRef } from 'vue';
 import type { HudInteractions } from './hudInteractions';
 import type { HudState } from './hudState';
 import DesktopHudView from './DesktopHudView.vue';
 import MobileHudView from './MobileHudView.vue';
 import OrientationHint from './OrientationHint.vue';
+import MatchConfigPanel from './config/MatchConfigPanel.vue';
+import MatchDirectorSource from './config/MatchDirectorSource';
 
 const props = defineProps<{ hud: HudInteractions }>();
 
 provide('hud', props.hud);
 
 const state = ref<HudState | null>(null);
+
+/**
+ * ## The config panel is mounted here, not in the two layout views
+ *
+ * It is a modal over everything, not part of either layout, and it used to be
+ * `v-if`'d in both `DesktopHudView` and `MobileHudView` — two mount points for
+ * one dialog, which now also means two places to build its data source. One
+ * here, above the layout switch, is the honest shape.
+ *
+ * `markRaw` on the source for the same reason `hudInteractions.ts` uses it on
+ * the director it wraps: a `reactive()` source would hand back proxied units
+ * and proxied p5 vectors — the whole game graph — on every roster read. The
+ * panel drives its own re-renders through `ConfigPanelState.invalidate`.
+ *
+ * `shallowRef` and built lazily rather than at module scope: `Game` constructs
+ * its `InGameHUD` part-way through its own constructor, before `game.director`
+ * exists, and `MatchDirectorSource` reads the director eagerly in its
+ * constructor.
+ */
+const source = shallowRef<MatchDirectorSource | null>(null);
+
+const openPanel = (): MatchDirectorSource => {
+  if (!source.value) source.value = markRaw(new MatchDirectorSource(props.hud));
+  return source.value;
+};
+
+/**
+ * Escape closes the innermost layer first — the loadout editor over a tab, not
+ * the panel under it. The key never reaches the DOM (p5 binds `keydown` on
+ * `window` and `GameScene` routes it), so `HudInteractions` is the only thing
+ * the two ends share. Returning `false` when nothing is open lets Escape fall
+ * through to the panel, which is what closes it.
+ */
+const panel = ref<InstanceType<typeof MatchConfigPanel> | null>(null);
+
+props.hud.onEscapeInner = () => panel.value?.closeInnerLayer() ?? false;
+
+onUnmounted(() => {
+  props.hud.onEscapeInner = null;
+});
 
 /**
  * Exposed so `InGameHUD.ts` can drive the screen and so the e2e scripts
@@ -81,6 +123,13 @@ defineExpose({
 
   <DesktopHudView v-if="state && !hud.touchUi" :state="state" />
   <MobileHudView v-if="state && hud.touchUi" />
+
+  <MatchConfigPanel
+    v-if="hud.showSpellsPicker"
+    ref="panel"
+    :source="openPanel()"
+    @close="hud.closeSpellPicker()"
+  />
 
   <!-- Unconditional on purpose: it decides for itself whether to show, and a
        `v-if` here would remount it — and reset its dismissal — on every turn

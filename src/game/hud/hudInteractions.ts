@@ -98,6 +98,19 @@ export interface HudInteractions {
   readonly renderFps: RenderFps;
   setRenderQuality(quality: RenderQuality): void;
   setRenderFps(fps: RenderFps): void;
+  /**
+   * Apply a touch/pointer switch to the *running* match — the on-screen
+   * controls and the HUD layout both. The config panel's Cài đặt tab is the
+   * only caller: that control used to exist only on the pregame screen, so a
+   * player who had already pressed Chơi could not reach it at all.
+   *
+   * It does not remember anything. The panel stores the tri-state
+   * (`'auto' | 'touch' | 'pointer'`) through `setTouchModePreference` itself,
+   * and the boolean this takes cannot express `'auto'` — so `remember` is
+   * `false` here on purpose, or picking `Tự động` would be written back as
+   * whichever side detection happened to resolve to.
+   */
+  setTouchUiEnabled(enabled: boolean): void;
 
   /**
    * Set by whichever component has a layer open *over* the panel — today only
@@ -193,6 +206,11 @@ export function createHudInteractions(game: Game): HudInteractions {
     },
     setRenderFps(fps: RenderFps): void {
       game.setRenderFps(fps);
+    },
+    setTouchUiEnabled(enabled: boolean): void {
+      // `remember: false` — see the interface comment. The panel owns the
+      // stored tri-state; this only applies a resolved side to the live match.
+      game.setTouchControlsEnabled(enabled, false);
     },
 
     escape(): void {

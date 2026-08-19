@@ -66,7 +66,12 @@ await server.listen();
 const port = server.config.server.port ?? server.httpServer.address().port;
 const url = `http://localhost:${port}/`;
 
-const browser = await chromium.launch({ channel: 'chrome' });
+// `LOL2D_CHROME_CHANNEL=` (empty) swaps system Chrome for Playwright's bundled
+// Chromium, which is the only way this runs on a machine without Chrome
+// installed. Same line the shared harness uses; this script keeps its own boot
+// (it is not a harness importer), so it needs its own copy.
+const channel = process.env.LOL2D_CHROME_CHANNEL ?? 'chrome';
+const browser = await chromium.launch(channel ? { channel } : {});
 const page = await browser.newPage({ viewport: { width: 1280, height: 950 } });
 const errors = [];
 page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
@@ -85,8 +90,17 @@ const expect = (label, actual, expected) => {
   }
 };
 
+/**
+ * Opens the editor for the nth participant, 1-based, player first — the order
+ * the old flat participant list had.
+ *
+ * Addressed through `#practice-row-toggle-N` rather than `:nth-child`, because
+ * the roster is grouped into Đội Xanh and Đội Đỏ now and document order follows
+ * the sides. That id carries the position in the *full* roster (0 is the
+ * player), which is the thing this helper's argument actually means.
+ */
 const openParticipantAt = n =>
-  page.click(`#pregame-participant-list .participant-card:nth-child(${n}) .participant-card-main`);
+  page.click(`.practice-roster-main:has(#practice-row-toggle-${n - 1}) .practice-roster-open`);
 /**
  * The way out without committing. There used to be two — a "Huỷ" button in the
  * slot bar and this X — and the script drove each once. The button is gone
@@ -185,15 +199,18 @@ const catalogShape = () =>
     };
   });
 const setCdr = async percent => {
-  await page.click('#pregame-tab-settings');
-  await page.waitForSelector('#pregame-cdr', { state: 'visible' });
+  // The rules live on Trận đấu and the roster on Đội — one panel, but not one
+  // tab; the setup screen's two tabs were Tướng / Cấu hình.
+  await page.click('#practice-tab-rules');
+  await page.waitForSelector('#practice-cdr', { state: 'visible' });
   await evaluate(value => {
-    const range = document.querySelector('#pregame-cdr');
+    const range = document.querySelector('#practice-cdr');
     range.value = value;
     range.dispatchEvent(new Event('input', { bubbles: true }));
+    range.dispatchEvent(new Event('change', { bubbles: true }));
   }, String(percent));
-  await page.click('#pregame-tab-players');
-  await page.waitForSelector('#pregame-participant-list', { state: 'visible' });
+  await page.click('#practice-tab-roster');
+  await page.waitForSelector('.practice-roster-body', { state: 'visible' });
 };
 
 /** Opens the player's editor, runs `steps` inside it, commits, and returns what was actually stored. */
@@ -464,7 +481,7 @@ try {
   await page.waitForSelector('#config-btn', { state: 'visible' });
   await page.click('#config-btn');
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
-  await page.waitForSelector('#pregame-participant-list', { state: 'visible' });
+  await page.waitForSelector('.practice-roster-body', { state: 'visible' });
   await page.waitForTimeout(120);
 
   // ...and a kit assembled slot by slot, exactly as the free-form builder used
@@ -534,22 +551,30 @@ try {
     };
   });
   await page.screenshot({ path: `${OUT}-hover-description.png` });
-  // The same numbers straight from preset.ts, so "reflects CDR" is measured
-  // against the spell's own tuning rather than a copied constant.
+  /**
+   * The expected label, from the spell's own tuning number and arithmetic
+   * written out here.
+   *
+   * It used to call `preset.getSpellDisplay(entry.spellClass, …)` twice, and
+   * had been silently broken since the catalogue became generated data:
+   * `listSpellCatalog()` entries carry `id` where they used to carry
+   * `spellClass` (see the note in `config/spellCatalog.ts`), so this passed
+   * `undefined` to a `new SpellClass(...)`. That logged "SpellClass is not a
+   * constructor" twice and produced `0.0s` for *both* labels — an expectation
+   * that could never match, blaming a panel that was showing the right number.
+   *
+   * So: `display.coolDownMs` is the rule-free tuning value, and the halving is
+   * done by hand rather than through `toMatchRules`/`spellDisplayOf`. A check
+   * that reaches for the transform it is checking agrees with itself however
+   * wrong it is — see CLAUDE.md's Testing section.
+   */
   report.cooldownUnderCdr = await evaluate(async () => {
-    const preset = await import('/src/game/preset.ts');
-    const entry = preset.listSpellCatalog().find(e => e.id === 'Lux_Q');
-    const raw = preset.getSpellDisplay(entry.spellClass, {
-      cooldownMultiplier: 1,
-      manaFree: false,
-    });
-    const halved = preset.getSpellDisplay(entry.spellClass, {
-      cooldownMultiplier: 0.5,
-      manaFree: false,
-    });
+    const catalog = await import('/src/game/config/spellCatalog.ts');
+    const entry = catalog.listSpellCatalog().find(e => e.id === 'Lux_Q');
+    const rawMs = entry.display.coolDownMs;
     return {
-      rawLabel: `${(raw.effectiveCoolDownMs / 1000).toFixed(1)}s`,
-      halvedLabel: `${(halved.effectiveCoolDownMs / 1000).toFixed(1)}s`,
+      rawLabel: `${(rawMs / 1000).toFixed(1)}s`,
+      halvedLabel: `${((rawMs * 0.5) / 1000).toFixed(1)}s`,
     };
   });
   const peeked = report.hoverDescribesWithoutPicking;
@@ -638,8 +663,11 @@ try {
   }));
   // Same catalogue as the player's editor, because it is the same component —
   // derived, not restated, for the reason `catalogShape` gives.
+  // "Đổi tướng — Bot 1", not the bare "Bot 1" the setup screen used: the two
+  // panels became one and kept the in-game wording, which says what the modal
+  // is for rather than only who it is bound to.
   expect('bot1EditorIsSameComponent', report.bot1EditorIsSameComponent, {
-    title: 'Bot 1',
+    title: 'Đổi tướng — Bot 1',
     slotPills: 7,
     hasRandomSlotButton: true,
     catalogCardCount: report.catalog.entries,
@@ -647,7 +675,7 @@ try {
     backdropCount: 1,
   });
   report.playerCardNotClickableBehindModal = await page
-    .click('.participant-card-player .participant-card-main', { timeout: 500 })
+    .click('.practice-roster-row.is-player .practice-roster-open', { timeout: 500 })
     .then(() => 'click went through (bug)')
     .catch(() => 'blocked, as expected');
   expect(
@@ -662,7 +690,7 @@ try {
   report.bot1SummaryAfterPick = await evaluate(
     () =>
       document.querySelector(
-        '#pregame-participant-list .participant-card:nth-child(2) .participant-summary'
+        '.practice-roster-main:has(#practice-row-toggle-1) .practice-roster-name'
       )?.textContent
   );
   expect('bot1SummaryAfterPick', report.bot1SummaryAfterPick, 'Ahri');
@@ -684,7 +712,7 @@ try {
   await page.waitForSelector('#pregame-scene', { state: 'visible' });
   await page.waitForTimeout(150);
   const legacyBotCount = await evaluate(
-    () => document.querySelectorAll('.participant-card:not(.participant-card-player)').length
+    () => document.querySelectorAll('.practice-roster-row:not(.is-player)').length
   );
   await openParticipantAt(1);
   await page.waitForSelector('.loadout-modal', { state: 'visible' });
@@ -701,13 +729,13 @@ try {
   }));
   await dismissLoadoutModal();
   await page.waitForSelector('.loadout-modal', { state: 'detached' });
-  await page.click('#pregame-tab-settings');
-  await page.waitForSelector('#pregame-cdr', { state: 'visible' });
+  await page.click('#practice-tab-rules');
+  await page.waitForSelector('#practice-cdr', { state: 'visible' });
   report.legacyV1BlobLoaded = {
     ...legacyEditorState,
     botCount: legacyBotCount,
-    cdr: await evaluate(() => document.querySelector('#pregame-cdr').value),
-    urf: await evaluate(() => document.querySelector('#pregame-urf').checked),
+    cdr: await evaluate(() => document.querySelector('#practice-cdr').value),
+    urf: await evaluate(() => document.querySelector('#practice-urf').checked),
   };
   expect('legacyV1BlobLoaded.selectedShelf', report.legacyV1BlobLoaded.selectedShelf, 'Zed');
   expect('legacyV1BlobLoaded.slotsStillRandom', report.legacyV1BlobLoaded.slotsStillRandom, 0);
