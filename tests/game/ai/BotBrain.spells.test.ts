@@ -66,7 +66,12 @@ const setup = (difficulty: 'easy' | 'normal' | 'hard' = 'normal') => {
   game.setPlayer(bot);
   indexObjects(game, [bot, enemy]);
   const brain = new BotBrain(bot);
-  brain.rng = () => 0; // no noise: every score below is the raw one
+  // rng 0 is the LOW end of the symmetric multiplier, not the neutral point:
+  // it gives (1 - noise), i.e. 0.55 at normal. Deliberate and harmless — one
+  // decision applies one constant scalar to every candidate, so ordering and
+  // sign are preserved — but the scores below are not the raw ones. Use 0.5 if
+  // you ever need the raw value.
+  brain.rng = () => 0;
   return { game, bot, enemy, brain };
 };
 
@@ -82,12 +87,12 @@ describe('mana budget', () => {
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage), makeSpell(0), makeSpell(0), ultimate];
 
     // reserve = 500 * 0.25 = 125. budget = 200 - 125 = 75, by hand.
-    expect(brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 70 }), SpellRole.Damage)).toBe(
-      true
-    );
-    expect(brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 80 }), SpellRole.Damage)).toBe(
-      false
-    );
+    expect(
+      brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 70 }), SpellRole.Damage)
+    ).toBe(true);
+    expect(
+      brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 80 }), SpellRole.Damage)
+    ).toBe(false);
   });
 
   it('never budgets the ultimate against itself', () => {
@@ -97,7 +102,9 @@ describe('mana budget', () => {
     const ultimate = makeSpell(SpellRole.Damage, { cost: 120 });
     bot.spells = [makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0), ultimate];
 
-    expect(brain.withinManaBudget(ultimate, roles(SpellRole.Damage, SpellRole.Ultimate))).toBe(true);
+    expect(brain.withinManaBudget(ultimate, roles(SpellRole.Damage, SpellRole.Ultimate))).toBe(
+      true
+    );
   });
 
   it('stops reserving while the ultimate is on cooldown — that is liquid mana', () => {
@@ -107,9 +114,9 @@ describe('mana budget', () => {
     const ultimate = makeSpell(SpellRole.Damage, { cost: 60, castable: false });
     bot.spells = [makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0), ultimate];
 
-    expect(brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 190 }), SpellRole.Damage)).toBe(
-      true
-    );
+    expect(
+      brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 190 }), SpellRole.Damage)
+    ).toBe(true);
   });
 
   it('reserves nothing at easy, which has no reserve at all', () => {
@@ -117,9 +124,9 @@ describe('mana budget', () => {
     bot.stats.mana.baseValue = 100;
     bot.stats.maxMana.baseValue = 500;
     bot.spells = [makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0), makeSpell(0)];
-    expect(brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 100 }), SpellRole.Damage)).toBe(
-      true
-    );
+    expect(
+      brain.withinManaBudget(makeSpell(SpellRole.Damage, { cost: 100 }), SpellRole.Damage)
+    ).toBe(true);
   });
 });
 
@@ -252,7 +259,7 @@ describe('ghost cast', () => {
     expect(brain.chooseGhostSpell(entry(0, enemy), 0, AIM)).toBeNull();
   });
 
-  it('will not throw at a point outside the spell\'s own reach', () => {
+  it("will not throw at a point outside the spell's own reach", () => {
     // Without this bound, a bot throws a 300-range zone at a point 2000px
     // away and still pays the mana for it — the same reach discipline
     // `scoreSpell` applies, just never wired into the ghost path.
