@@ -1,5 +1,6 @@
 import type Spell from '@/game/gameObject/Spell';
-import type { CastSpec } from '@/game/spell/runtime/types';
+import type { TargetingMode } from '@/game/spell/runtime/types';
+import type { TargetTeam } from '@/game/spell/targeting/TargetResolver';
 
 /**
  * What an ability *does*, as bit flags, so one spell can be several things at
@@ -43,15 +44,22 @@ export const POKE_RANGE_THRESHOLD = 400;
  * What we can tell about an ability from what it already declares.
  *
  * Deliberately conservative: it never guesses `Dash`, `Escape` or `Summon`,
- * because nothing in `castSpec` distinguishes them and a wrong guess there
- * makes a bot flee with a gap-closer. Those need `static aiRoles`.
+ * because nothing here distinguishes them and a wrong guess there makes a
+ * bot flee with a gap-closer. Those need `static aiRoles`.
  */
-export function inferRoles(castSpec: Readonly<CastSpec>, manaCost: number): SpellRoleMask {
-  const range = (castSpec as { range?: number }).range ?? 0;
-  const targetTeam = (castSpec as { targetTeam?: string }).targetTeam;
+export interface InferenceInput {
+  targeting: TargetingMode;
+  /** 0 when the spell declares none. */
+  range: number;
+  targetTeam?: TargetTeam;
+  manaCost: number;
+}
+
+export function inferRoles(input: InferenceInput): SpellRoleMask {
+  const { range, targetTeam, manaCost } = input;
   const burst = manaCost >= BURST_MANA_THRESHOLD ? SpellRole.Burst : SpellRole.None;
 
-  switch (castSpec.targeting) {
+  switch (input.targeting) {
     case 'SELF':
       return manaCost === 0 ? SpellRole.Buff : roles(SpellRole.Buff, SpellRole.Shield);
     case 'UNIT':
@@ -85,7 +93,18 @@ export function rolesOf(spell: Spell, slotIndex: number): SpellRoleMask {
   const ctor = spell.constructor as Function & { aiRoles?: SpellRoleMask };
   let mask = classMask.get(ctor);
   if (mask === undefined) {
-    mask = ctor.aiRoles ?? inferRoles(spell.castSpec, spell.manaCost);
+    mask =
+      ctor.aiRoles ??
+      inferRoles({
+        // `range` and `targetTeam` are NOT on `CastSpec` — verified against
+        // `src/game/spell/runtime/types.ts`, which has neither. They live on
+        // `TargetingRequest`, reached through `spell.targetingRequest`, and
+        // `declaredRange` above is already the correct three-step chain.
+        targeting: spell.castSpec.targeting,
+        range: spell.declaredRange ?? 0,
+        targetTeam: spell.targetingRequest?.targetTeam,
+        manaCost: spell.manaCost,
+      });
     classMask.set(ctor, mask);
   }
   return slotIndex === ULTIMATE_SLOT ? mask | SpellRole.Ultimate : mask;
