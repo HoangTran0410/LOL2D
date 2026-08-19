@@ -108,6 +108,8 @@ describe('BotBrain perception', () => {
         focusTarget: null,
         rally: null,
         memory: new Map(),
+        lanes: new Map(),
+        laneAssignments: new Map(),
       })
     ).toBeNull();
   });

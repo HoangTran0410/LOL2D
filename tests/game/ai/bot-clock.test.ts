@@ -83,6 +83,9 @@ describe('a bot added mid-match shares the clock the match is already on', () =>
 
     newcomer.update();
 
-    expect(newcomer.brain.posture).toBe('ROAM');
+    // PUSH, not ROAM: a bot with a lane assignment and nobody to fight walks to
+    // its lane now. What this test is about is unchanged — SEARCH outranks
+    // PUSH, so a memory that had not expired would still show up here.
+    expect(newcomer.brain.posture).toBe('PUSH');
   });
 });

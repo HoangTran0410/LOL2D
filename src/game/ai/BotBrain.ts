@@ -1,4 +1,5 @@
 import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Minion from '@/game/gameObject/attackableUnits/Minion';
 import { canSee, type Seeable } from '@/game/combat/Vision';
 import { profileFor, type DifficultyProfile } from '@/game/ai/Difficulty';
 import {
@@ -7,7 +8,9 @@ import {
   type SeenEnemy,
   type TeamView,
 } from '@/game/ai/TeamBlackboard';
+import { laneApproach } from '@/game/ai/LaneObjectives';
 import type AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
+import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import {
   isChargeActivation,
   requireChargeSpec,
@@ -36,11 +39,22 @@ export const TARGET_LOW_HEALTH_WEIGHT = 12;
 /** Pixels per point of target score. 100px of walking is worth one point. */
 export const TARGET_DISTANCE_DIVISOR = 100;
 
-export type Posture = 'RETREAT' | 'RECOVER' | 'FIGHT' | 'SEARCH' | 'ENGAGE' | 'ROAM';
+export type Posture = 'RETREAT' | 'RECOVER' | 'FIGHT' | 'SEARCH' | 'ENGAGE' | 'PUSH' | 'ROAM';
 
 /** How far from an ally a focus target counts as "a fight worth joining". */
 export const ASSIST_RANGE = 700;
 export const ROAM_RADIUS = 500;
+/**
+ * How close our own wave has to be to a turret before a bot will hit it.
+ *
+ * A turret out-ranges a champion (430 against a melee body) and out-damages one
+ * per swing, so a bot that walks up to a building on its own is a bot that
+ * feeds it. This is the "are there minions here to shoot at instead" test,
+ * measured from the turret to the front of our wave — a little past the
+ * turret's own reach, so a wave that is still trading with it counts and one
+ * that has not arrived yet does not.
+ */
+export const PUSH_TURRET_ESCORT_PX = 450;
 /** Both must be met before a recovering bot rejoins. */
 export const RECOVER_HEALTH_PCT = 0.7;
 export const RECOVER_MANA_PCT = 0.5;
@@ -176,7 +190,7 @@ export class BotBrain {
    * The terrain half of perception, injectable purely so a test can state a
    * line-of-sight answer without building walls. Always `canSee` in the game.
    */
-  sees: (observer: AIChampion, target: Champion) => boolean = (observer, target) =>
+  sees: (observer: AIChampion, target: AttackableUnit) => boolean = (observer, target) =>
     canSee(observer as unknown as Seeable, target as unknown as Seeable);
 
   private lastThinkAtMs: number;
@@ -328,11 +342,47 @@ export class BotBrain {
 
     // An order already running outranks perception: `canKeep` has no vision
     // check, so the chase continues whatever the bot can currently see.
-    if (this.owner.basicAttack?.target) return 'FIGHT';
+    //
+    // A *champion* order, which the bare `basicAttack.target` stopped being the
+    // moment PUSH landed: a pushing bot's standing order is usually a minion,
+    // and reading the order alone would flip it into FIGHT on its first swing
+    // at a wave — with `target` null, which is `maybeCast`'s cue to choose a
+    // spell for nobody and empty the pool into a melee minion.
+    // `killCredit === 'champion'` is the discriminator the codebase already
+    // treats as authoritative (see CLAUDE.md); `instanceof` is not, because
+    // `Pet` and `Zed_W_Clone` both extend `Champion`.
+    if (this.owner.basicAttack?.target?.killCredit === 'champion') return 'FIGHT';
     if (target) return 'FIGHT';
     if (this.rememberedTarget(view, nowMs)) return 'SEARCH';
     if (this.assistableFocus(view)) return 'ENGAGE';
+    // Below every way of answering "is there a champion to deal with" and above
+    // wandering: decision 2 of the lane layer. A bot only farms when there is
+    // nobody to fight.
+    if (this.pushTarget(view)) return 'PUSH';
     return 'ROAM';
+  }
+
+  /**
+   * Where the front of this bot's lane is, or `null` if it has no lane.
+   *
+   * Three answers in order of how much they are worth walking to: our own wave,
+   * because standing with it is what makes it win; the next enemy turret, which
+   * is what the wave is for; and failing both, the last lane waypoint before
+   * the enemy fountain, which is where a bot with an empty lane should be
+   * heading. Never the fountain itself — see `laneApproach`.
+   */
+  pushTarget(view: TeamView): Vec2 | null {
+    const lane = view.laneAssignments.get(this.owner);
+    if (lane === undefined) return null;
+
+    const state = view.lanes.get(lane);
+    if (state?.frontier) return state.frontier;
+
+    const turret = state?.nextEnemyTurret;
+    if (turret && !turret.isDead && !turret.toRemove) {
+      return { x: turret.position.x, y: turret.position.y };
+    }
+    return laneApproach(lane, this.owner.teamId);
   }
 
   /** The freshest sighting this tier still remembers. */
@@ -609,7 +659,7 @@ export class BotBrain {
     const owner = this.owner;
     if (owner.isDead) return;
 
-    const view = blackboardFor(owner.game as BlackboardHost, nowMs).viewFor(owner.teamId);
+    const view = this.currentView();
     // One `pickTarget` per tick. It used to run twice — here and again inside
     // `decidePosture` — and at `easy` each pass costs a `canSee` raycast per
     // living enemy.
@@ -651,6 +701,15 @@ export class BotBrain {
           owner.navigateTo(view.focusTarget.position.x, view.focusTarget.position.y);
         }
         return;
+      case 'PUSH': {
+        // As in FIGHT: an order already running owns the walking, and stepping
+        // in would fight the attack controller for the destination every tick.
+        if (owner.basicAttack?.target) return;
+        // `front`, not `line` — `line` is a p5 global. See CLAUDE.md.
+        const front = this.pushTarget(view);
+        if (front) owner.navigateTo(front.x, front.y);
+        return;
+      }
       default: {
         // ROAM: hang around the team rather than crossing the map alone.
         if (owner.position.dist(owner.destination) >= owner.moveSpeed) return;
@@ -818,7 +877,7 @@ export class BotBrain {
         ],
       }) ?? [];
 
-    const view = blackboardFor(owner.game as BlackboardHost, this.nowMs).viewFor(owner.teamId);
+    const view = this.currentView();
     let best: Champion | null = null;
     let bestScore = Number.NEGATIVE_INFINITY;
     for (const candidate of found) {
@@ -831,6 +890,115 @@ export class BotBrain {
       }
     }
     return best;
+  }
+
+  /**
+   * What a *pushing* bot swings at when there is no champion to swing at.
+   *
+   * Deliberately a second, lower lookup rather than a widening of
+   * `findAttackTarget`: that one answers the aggro question and stays champions
+   * only, because an enemy champion in range always outranks farming (decision
+   * 2 of this layer). This one is reachable only from PUSH, which
+   * `decidePosture` places below every champion rule there is — so the priority
+   * is expressed once, in the posture chain, rather than twice.
+   *
+   * Nearest enemy minion **in the bot's own lane**, else the lane's next
+   * turret. The lane test is not cosmetic: a minion leashed off BOT and
+   * standing beside a MID bot is a fight that drags it off its wave, and
+   * `Minion.lane` is fixed at spawn so a straggler still answers honestly.
+   *
+   * A turret is only ever attacked with our own wave standing under it
+   * (`PUSH_TURRET_ESCORT_PX`) and only from inside the tier's aggro range. A
+   * bot that walks up to a building alone is a bot that feeds it.
+   */
+  findObjectiveTarget(from?: TeamView): AttackableUnit | null {
+    // The posture test first, and only then the board: `AIChampion` calls this
+    // on every attack scan, in every posture, and a default argument would ask
+    // for a snapshot before finding out the answer is `null`.
+    if (this.posture !== 'PUSH') return null;
+    const view = from ?? this.currentView();
+    const lane = view.laneAssignments.get(this.owner);
+    if (lane === undefined) return null;
+
+    const minion = this.nearestLaneMinion(lane);
+    if (minion) return minion;
+
+    const state = view.lanes.get(lane);
+    const turret = state?.nextEnemyTurret;
+    if (!turret || turret.isDead || turret.toRemove || !turret.targetable) return null;
+
+    const escort = state?.frontier;
+    if (!escort) return null;
+    if (
+      Math.hypot(escort.x - turret.position.x, escort.y - turret.position.y) > PUSH_TURRET_ESCORT_PX
+    ) {
+      return null;
+    }
+
+    const owner = this.owner;
+    const away = Math.hypot(
+      turret.position.x - owner.position.x,
+      turret.position.y - owner.position.y
+    );
+    return away <= this.profile.aggroRange ? turret : null;
+  }
+
+  /**
+   * The nearest hostile minion walking `lane`, inside the tier's aggro radius.
+   *
+   * A quadtree query on a bounded radius, on the attack-scan clock — never a
+   * walk of `objectManager.objects`, which is the blackboard's one pass and
+   * nobody else's (`TeamBlackboard.lanes.test.ts` scans this directory for it).
+   *
+   * Terrain gates acquisition here the same way `canPerceive` gates it for a
+   * champion, so `easy` can still be broken line of sight with and the other
+   * two tiers pay nothing for the question.
+   */
+  private nearestLaneMinion(lane: string): Minion | null {
+    const owner = this.owner;
+    const found =
+      owner.game.objectManager.queryObjects?.({
+        area: new Circle({
+          x: owner.position.x,
+          y: owner.position.y,
+          r: this.profile.aggroRange,
+        }),
+        filters: [
+          PredefinedFilters.type(Minion),
+          PredefinedFilters.canTakeDamageFromTeam(owner.teamId),
+          PredefinedFilters.excludeStealthed,
+        ],
+      }) ?? [];
+
+    let best: Minion | null = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const candidate of found) {
+      if (!(candidate instanceof Minion)) continue;
+      if (candidate.lane !== lane) continue;
+      if (!this.profile.seesThroughTerrain && !this.sees(owner, candidate)) continue;
+      const away = Math.hypot(
+        candidate.position.x - owner.position.x,
+        candidate.position.y - owner.position.y
+      );
+      if (away < bestDistance) {
+        bestDistance = away;
+        best = candidate;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * This bot's team's snapshot, dated from the clock `update` last wrote.
+   *
+   * One helper because three callers need it on three different clocks —
+   * `think` runs on the brain's tick, `findAttackTarget` and
+   * `findObjectiveTarget` on `AIChampion`'s scan interval, which is not the
+   * same one. `blackboardFor` rebuilds at most once per `BLACKBOARD_TTL_MS`
+   * whoever asks, so the extra calls cost a map lookup.
+   */
+  private currentView(): TeamView {
+    return blackboardFor(this.owner.game as BlackboardHost, this.nowMs).viewFor(this.owner.teamId);
   }
 }
 

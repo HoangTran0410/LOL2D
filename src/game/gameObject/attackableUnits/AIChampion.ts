@@ -63,6 +63,8 @@ export const AI_ATTACK_AGGRO_RANGE = 420;
 export const ROAM_SNAP_DISTANCE = 900;
 
 export default class AIChampion extends Champion {
+  /** See `Champion.isBot` — this is the class the flag exists to name. */
+  readonly isBot = true;
   _autoMove = true;
   _autoCast = true;
   _autoAttack = true;
@@ -130,7 +132,11 @@ export default class AIChampion extends Champion {
     // an order already running is left alone: re-picking every scan would make a
     // bot flip between two equidistant enemies and never finish either
     if (this.basicAttack.target) return;
-    this.basicAttack.order(this.findAttackTarget());
+    // Champions first, always. `findObjectiveTarget` answers only while the
+    // brain is in PUSH, which `decidePosture` ranks below every rule that
+    // involves an enemy champion — so this `??` cannot promote a minion over
+    // one, and the priority stays stated in exactly one place.
+    this.basicAttack.order(this.findAttackTarget() ?? this.findObjectiveTarget());
   }
 
   /**
@@ -139,6 +145,10 @@ export default class AIChampion extends Champion {
    * with a camp, or parked itself under a turret, would look broken rather
    * than dangerous.
    *
+   * Still champions only now that bots farm: this is the *aggro* question, and
+   * a champion in range beats a wave. The lane objectives are a separate,
+   * lower lookup — `findObjectiveTarget` below.
+   *
    * Not simply the nearest one: the scan lives on the brain, which ranks what
    * it finds by `scoreTarget` — distance, how close to dead, and whether the
    * team is already on it. This stays because it is what a bot's attack order
@@ -146,6 +156,15 @@ export default class AIChampion extends Champion {
    */
   findAttackTarget(): Champion | null {
     return this.brain.findAttackTarget();
+  }
+
+  /**
+   * The lane objective worth attacking when no champion is: the wave in front
+   * of this bot, then the turret behind it. Answers `null` in every posture but
+   * PUSH. See `BotBrain.findObjectiveTarget`.
+   */
+  findObjectiveTarget(): AttackableUnit | null {
+    return this.brain.findObjectiveTarget();
   }
 
   /**
