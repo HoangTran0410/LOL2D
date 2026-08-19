@@ -7,8 +7,7 @@ import Airborne from '@/game/gameObject/buffs/Airborne';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Speedup from '@/game/gameObject/buffs/Speedup';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
-import CollideUtils from '@/utils/collide.utils';
-import { wallOutlinesInArea } from '@/game/gameObject/map/DynamicTerrain';
+import { sweepToWall, type WallContact } from '@/game/gameObject/map/TerrainField';
 import { Circle, Rectangle } from '@/libs/quadtree';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
@@ -145,51 +144,67 @@ export class Camille_E_GrappleObject extends MissileSpellObject {
     this.useParticles(this.particleSystem);
   }
 
-  update() {
-    super.update();
+  private previousX = 0;
+  private previousY = 0;
 
-    // Every wall along the path, map-made and spell-made alike. Asking
-    // `terrainMap` directly — which this used to do — sees only the polygons
-    // from `summoner_map.json`, so the hook flew straight through an Anivia
-    // ice wall and through Jarvan's Cataclysm. See map/DynamicTerrain.ts.
-    const outlines = wallOutlinesInArea(
-      this.game as any,
-      new Circle({ x: this.position.x, y: this.position.y, r: 40 })
-    );
-
-    for (const outline of outlines) {
-      if (CollideUtils.pointPolygon(this.position.x, this.position.y, outline)) {
-        this.onHitWall(this.position.copy());
-        break;
-      }
-    }
+  onBeforeMove(): void {
+    this.previousX = this.position.x;
+    this.previousY = this.position.y;
   }
 
-  onHitWall(wallPos: p5.Vector) {
+  onAfterMove(): void {
+    // The whole step, not just where it landed. This used to test the hook's
+    // own position once a frame, which at speed 12 answers "is it inside the
+    // wall yet" — so the anchor was set as much as a frame's travel *past* the
+    // surface, Camille was then pulled to that point, and she spent the perch
+    // standing inside solid rock. `sweepToWall` finds the crossing itself, and
+    // for walls of both kinds at once: asking the map's polygons alone sent the
+    // hook straight through an Anivia ice wall and through Cataclysm.
+    const contact = sweepToWall(
+      this.game,
+      this.previousX,
+      this.previousY,
+      this.position.x,
+      this.position.y
+    );
+    if (contact) this.onHitWall(contact);
+  }
+
+  onHitWall(contact: WallContact) {
     this.toRemove = true;
 
     // Spark particles on wall contact
     for (let i = 0; i < 15; i++) {
       this.particleSystem.addParticle({
-        x: wallPos.x + random(-20, 20),
-        y: wallPos.y + random(-20, 20),
+        x: contact.x + random(-20, 20),
+        y: contact.y + random(-20, 20),
         r: random(5, 12),
       });
     }
 
+    // She perches *against* the wall, not in it: the anchor is on the surface,
+    // and her body stops a radius short of it along the outward normal. Sending
+    // her to the anchor itself buried her, and left the push-out to argue her
+    // back out of a wall it could not always win.
+    const anchor = createVector(contact.x, contact.y);
+    const perch = createVector(
+      contact.x + contact.normalX * this.owner.terrainRadius,
+      contact.y + contact.normalY * this.owner.terrainRadius
+    );
+
     // Pull Camille to wall
     const pullBuff = new Dash(800, this.owner, this.owner);
-    pullBuff.dashDestination = wallPos;
+    pullBuff.dashDestination = perch;
     pullBuff.dashSpeed = 13;
     pullBuff.onReachedDestination = () => {
       this.spellRef.attachedToWall = true;
-      this.spellRef.wallAttachPoint = wallPos.copy();
+      this.spellRef.wallAttachPoint = anchor.copy();
       this.spellRef.image = AssetManager.get('spell_camille_e2');
       this.spellRef.resetCoolDown();
 
       // the perch is a decision window, so it needs to be visible: a taut cable
       // back to the anchor and a ring that says the recast is live
-      const tether = new Camille_E_TetherObject(this.owner, wallPos.copy(), this.spellRef);
+      const tether = new Camille_E_TetherObject(this.owner, anchor.copy(), this.spellRef);
       this.spellRef.tetherObj = tether;
       this.game.objectManager.addObject(tether);
     };

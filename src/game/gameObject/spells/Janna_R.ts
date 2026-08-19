@@ -1,4 +1,4 @@
-import { Circle, Rectangle } from '@/libs/quadtree';
+import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import EventType from '@/game/enums/EventType';
 import StatusFlags from '@/game/enums/StatusFlags';
@@ -8,7 +8,7 @@ import CastTelegraph from '@/game/vfx/CastTelegraph';
 import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import VfxGroup from '@/game/vfx/VfxGroup';
 import Spell from '@/game/gameObject/Spell';
-import { wallOutlinesInArea } from '@/game/gameObject/map/DynamicTerrain';
+import { sweepToWall } from '@/game/gameObject/map/TerrainField';
 import Dash from '@/game/gameObject/buffs/Dash';
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import AreaSpellObject from '@/game/gameObject/spellObjects/AreaSpellObject';
@@ -211,69 +211,38 @@ export default class Janna_R extends Spell {
     this.stopWatching = [];
   }
 
+  /**
+   * As far out as the monsoon can actually carry someone.
+   *
+   * This used to intersect the knockback line against every edge of every wall
+   * outline and take the nearest crossing. Exact where it applies, and it has a
+   * hole that a `sweepToWall` does not: intersection only finds a wall the line
+   * *crosses*, so a victim who is already inside one — which used to be a state
+   * a body could get stuck in permanently, see `map/TerrainField.ts` — has no
+   * crossing anywhere along the line, and the monsoon blew them clean through
+   * the wall at full distance.
+   *
+   * Sweeping also asks the question with the victim's body rather than as a
+   * bare line, so the padding that used to be subtracted from the answer
+   * afterwards is now part of it.
+   */
   private clampKnockbackDestination(
     target: JannaTarget,
     desired: { x: number; y: number }
   ): { x: number; y: number } {
     const start = target.position;
-    const padding = target.collisionRadius;
     // Walls of both kinds: the monsoon used to blow people straight through an
     // Anivia wall and through Jarvan's arena, because only the map's own
-    // polygons were consulted. See map/DynamicTerrain.ts.
-    const walls = wallOutlinesInArea(
+    // polygons were consulted. `sweepToWall` answers for both at once.
+    const contact = sweepToWall(
       this.game,
-      new Rectangle({
-        x: Math.min(start.x, desired.x) - padding,
-        y: Math.min(start.y, desired.y) - padding,
-        w: Math.abs(desired.x - start.x) + padding * 2,
-        h: Math.abs(desired.y - start.y) + padding * 2,
-      })
+      start.x,
+      start.y,
+      desired.x,
+      desired.y,
+      target.collisionRadius
     );
-
-    let nearestRatio = 1;
-    for (const vertices of walls) {
-      for (let index = 0; index < vertices.length; index++) {
-        const ratio = this.intersectionRatio(
-          start,
-          desired,
-          vertices[index],
-          vertices[(index + 1) % vertices.length]
-        );
-        if (ratio !== undefined) nearestRatio = Math.min(nearestRatio, ratio);
-      }
-    }
-
-    if (nearestRatio === 1) return desired;
-    const dx = desired.x - start.x;
-    const dy = desired.y - start.y;
-    const length = Math.hypot(dx, dy);
-    const allowedDistance = Math.max(0, length * nearestRatio - padding);
-    return {
-      x: start.x + (dx / length) * allowedDistance,
-      y: start.y + (dy / length) * allowedDistance,
-    };
-  }
-
-  private intersectionRatio(
-    start: { x: number; y: number },
-    end: { x: number; y: number },
-    edgeStart: { x: number; y: number },
-    edgeEnd: { x: number; y: number }
-  ): number | undefined {
-    const rayX = end.x - start.x;
-    const rayY = end.y - start.y;
-    const edgeX = edgeEnd.x - edgeStart.x;
-    const edgeY = edgeEnd.y - edgeStart.y;
-    const denominator = rayX * edgeY - rayY * edgeX;
-    if (denominator === 0) return undefined;
-
-    const offsetX = edgeStart.x - start.x;
-    const offsetY = edgeStart.y - start.y;
-    const rayRatio = (offsetX * edgeY - offsetY * edgeX) / denominator;
-    const edgeRatio = (offsetX * rayY - offsetY * rayX) / denominator;
-    return rayRatio >= 0 && rayRatio <= 1 && edgeRatio >= 0 && edgeRatio <= 1
-      ? rayRatio
-      : undefined;
+    return contact ? { x: contact.x, y: contact.y } : desired;
   }
 }
 

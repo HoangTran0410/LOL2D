@@ -9,7 +9,7 @@ import SpellObject from '@/game/gameObject/SpellObject';
 import Dash from '@/game/gameObject/buffs/Dash';
 import Shield from '@/game/gameObject/buffs/Shield';
 import Stun from '@/game/gameObject/buffs/Stun';
-import { pointInWall } from '@/game/gameObject/map/DynamicTerrain';
+import { sweepToWall } from '@/game/gameObject/map/TerrainField';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import { isChallengedBy } from './XinZhao_E';
@@ -126,20 +126,26 @@ export default class XinZhao_R extends Spell {
   }
 
   /**
-   * How far the shove can actually carry before it would put someone inside a
-   * wall — the map's own walls *and* the ones spells are holding up, which is
-   * why this asks `pointInWall` rather than `terrainMap` (see DynamicTerrain).
+   * How far the shove can actually carry before the victim's body reaches a
+   * wall — the map's own *and* the ones spells are holding up.
+   *
+   * This used to sample its own line every 20px, which stops that far short of
+   * a wall at best and steps over one thinner than a stride at worst; the
+   * shipped map has a 6px sliver. `sweepToWall` puts the body against the
+   * surface instead, and does it with the victim's own radius rather than as a
+   * point — the old test asked where the *centre* would be, so a shove into a
+   * wall left half a champion buried in it.
    */
   private clearDistance(target: AttackableUnit, directionX: number, directionY: number): number {
-    const step = 20;
-    let carried = 0;
-    for (let travelled = step; travelled <= XINZHAO_R_KNOCKBACK_DISTANCE; travelled += step) {
-      const x = target.position.x + directionX * travelled;
-      const y = target.position.y + directionY * travelled;
-      if (pointInWall(this.game, x, y)) break;
-      carried = travelled;
-    }
-    return carried;
+    const contact = sweepToWall(
+      this.game,
+      target.position.x,
+      target.position.y,
+      target.position.x + directionX * XINZHAO_R_KNOCKBACK_DISTANCE,
+      target.position.y + directionY * XINZHAO_R_KNOCKBACK_DISTANCE,
+      target.terrainRadius
+    );
+    return contact ? contact.travelled : XINZHAO_R_KNOCKBACK_DISTANCE;
   }
 }
 

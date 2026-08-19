@@ -50,6 +50,16 @@ import AttackableUnit from '../../../src/game/gameObject/attackableUnits/Attacka
 import { spellGroups } from '../../../src/game/preset';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import { loadEverySpellForTests } from '../spell/registry';
+import { withWalls } from '../fixtures';
+
+/**
+ * How far the terrain seam's answer may sit from geometry written out by hand.
+ *
+ * `TerrainField` is a distance field on a 16px grid, read back bilinearly, so a
+ * wall face is located to about a pixel rather than exactly — measured at
+ * 1.20px worst case over the shipped map in tests/game/nav/SignedField.test.ts.
+ */
+const FIELD_PIXEL = 2;
 
 // Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
 // this fills the registry synchronously so a test can read the whole
@@ -364,15 +374,13 @@ describe('Janna R', () => {
     // enemy is then stopped a collisionRadius (20) shy of the face.
     const wallFaceX = KNOCKBACK_DISTANCE - 50;
     const clampedX = wallFaceX - 20;
-    owner.game.terrainMap.getObstaclesInArea.mockReturnValue([
-      {
-        vertices: [
-          { x: wallFaceX, y: -100 },
-          { x: wallFaceX + 100, y: -100 },
-          { x: wallFaceX + 100, y: 100 },
-          { x: wallFaceX, y: 100 },
-        ],
-      },
+    withWalls(owner.game, [
+      [
+        { x: wallFaceX, y: -100 },
+        { x: wallFaceX + 100, y: -100 },
+        { x: wallFaceX + 100, y: 100 },
+        { x: wallFaceX, y: 100 },
+      ],
     ]);
     const spell = new Janna_R(owner);
 
@@ -385,9 +393,16 @@ describe('Janna R', () => {
       dashDestination: TestVector;
       statusFlagsToEnable: number;
     };
-    expect(knockback).toMatchObject({
-      dashDestination: { x: clampedX, y: 0 },
-    });
+    // Within a pixel rather than exactly, and the pixel is the point. The wall
+    // is no longer a set of polygon edges the knockback line is intersected
+    // against; it is `TerrainField`, a distance field sampled on a 16px grid and
+    // read back bilinearly, which answers to about a pixel by construction
+    // (`tests/game/nav/SignedField.test.ts` measures its worst disagreement with
+    // the polygons at 1.20px). Asserting an exact 190 would be asserting
+    // something the seam does not promise. `clampedX` is still written by the
+    // test — face minus the enemy's own 20px radius — not read back out of it.
+    expect(knockback.dashDestination.y).toBe(0);
+    expect(Math.abs(knockback.dashDestination.x - clampedX)).toBeLessThanOrEqual(FIELD_PIXEL);
     expect(knockback.statusFlagsToEnable & StatusFlags.Immovable).toBeTruthy();
     expect(knockback.statusFlagsToEnable & StatusFlags.Silenced).toBeTruthy();
     expect(knockback.statusFlagsToEnable & StatusFlags.Ghosted).toBeFalsy();
@@ -397,8 +412,13 @@ describe('Janna R', () => {
     expect(enemy.destination).toEqual({ x: 100, y: 0 });
 
     knockback.deactivateBuff();
-    expect(enemy.position).toEqual({ x: clampedX, y: 0 });
-    expect(enemy.destination).toEqual({ x: clampedX, y: 0 });
+    // Same pixel of slack as the destination above, and for the same reason:
+    // `onDeactivate` writes the destination straight onto the victim, so both
+    // land wherever the field put the wall face.
+    expect(Math.abs(enemy.position.x - clampedX)).toBeLessThanOrEqual(FIELD_PIXEL);
+    expect(enemy.position.y).toBe(0);
+    expect(enemy.destination.x).toBe(enemy.position.x);
+    expect(enemy.destination.y).toBe(0);
   });
 
   it('draws a procedural monsoon vortex out to the real spell radius', () => {

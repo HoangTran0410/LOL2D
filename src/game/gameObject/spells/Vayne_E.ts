@@ -6,7 +6,7 @@ import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUni
 import Dash from '@/game/gameObject/buffs/Dash';
 import Stun from '@/game/gameObject/buffs/Stun';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
-import { pointInWall } from '@/game/gameObject/map/DynamicTerrain';
+import { sweepToWall } from '@/game/gameObject/map/TerrainField';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -28,8 +28,6 @@ export const VAYNE_E_WALL_BONUS = 18;
 
 /** One frame at 60fps, for turning a push duration into a per-frame step. */
 const FRAME_MS = 16.67;
-/** How finely the push path is walked when looking for a wall. */
-const SAMPLE_STEP = 20;
 /** How far past its centre the bolt paints. */
 const BOLT_REACH = 72;
 /** How long the skid streak behind a cleanly-pushed victim reaches. */
@@ -42,10 +40,11 @@ const SPLINTERS = 9;
 /**
  * Condemn — the signature, and the only ability of hers that is a skillshot.
  *
- * The wall question goes through `pointInWall`, not `terrainMap`: an ally's ice
- * wall or earthen slab is genuinely impassable but is a `SpellObject`, so the
- * raw map has holes exactly where somebody just built something, and a pin that
- * read the map would fire the victim straight through it.
+ * The wall question goes through `sweepToWall`, which answers for the map's own
+ * polygons and for the ones spells are holding up at the same time: an ally's
+ * ice wall or earthen slab is genuinely impassable but is a `SpellObject`, so
+ * the raw map has holes exactly where somebody just built something, and a pin
+ * that read the map would fire the victim straight through it.
  */
 export default class Vayne_E extends Spell {
   image = AssetManager.get('spell_vayne_e');
@@ -121,20 +120,23 @@ export class Vayne_E_Object extends MissileSpellObject {
     const unitX = (full.x - enemy.position.x) / VAYNE_E_PUSH;
     const unitY = (full.y - enemy.position.y) / VAYNE_E_PUSH;
 
-    let travelled = VAYNE_E_PUSH;
-    let contactX = full.x;
-    let contactY = full.y;
-    let pinned = false;
-    for (let walked = SAMPLE_STEP; walked <= VAYNE_E_PUSH; walked += SAMPLE_STEP) {
-      const sampleX = enemy.position.x + unitX * walked;
-      const sampleY = enemy.position.y + unitY * walked;
-      if (!pointInWall(this.game, sampleX, sampleY)) continue;
-      pinned = true;
-      travelled = Math.max(0, walked - SAMPLE_STEP);
-      contactX = sampleX;
-      contactY = sampleY;
-      break;
-    }
+    // Where the wall stops the shove, if one does. Sampled every 20px before,
+    // which put the pin up to a stride short of the wall and could step over
+    // one thinner than a stride; `sweepToWall` lands the body against the
+    // surface. The impact VFX wants the *wall*, not the resting body, so it
+    // reads a radius on past the contact.
+    const contact = sweepToWall(
+      this.game,
+      enemy.position.x,
+      enemy.position.y,
+      full.x,
+      full.y,
+      enemy.terrainRadius
+    );
+    const pinned = contact !== null;
+    const travelled = contact ? contact.travelled : VAYNE_E_PUSH;
+    const contactX = contact ? contact.x - contact.normalX * enemy.terrainRadius : full.x;
+    const contactY = contact ? contact.y - contact.normalY * enemy.terrainRadius : full.y;
 
     const heading = Math.atan2(unitY, unitX);
     const shove = new Dash(VAYNE_E_PUSH_MS + 140, this.owner, enemy);

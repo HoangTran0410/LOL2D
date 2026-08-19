@@ -31,6 +31,7 @@ import {
   createUnit,
   installSketchMathGlobals,
   installSpellObjectGlobals,
+  withWalls,
   type TestGame,
 } from '../spell/fixtures';
 
@@ -63,6 +64,10 @@ describe('Nautilus spells', () => {
     installSpellObjectGlobals();
     installSketchMathGlobals();
     game = createGame();
+    // A real terrain field with nothing in it. `sweepToWall` reaches spell-made
+    // slabs *through* the field — one seam for both kinds of wall — so even a
+    // test that only cares about a slab needs the map layer to exist.
+    withWalls(game, []);
     owner = unit(0, 'blue');
     game.setPlayer(owner);
     (game as any).worldMouse = createVector(Q_RANGE, 0);
@@ -134,18 +139,14 @@ describe('Nautilus spells', () => {
 
   it('Q catches on a map wall: Nautilus is hauled to it and nobody is damaged', () => {
     const bystander = unit(300, 'red');
-    (game as any).terrainMap = {
-      getObstaclesInArea: () => [
-        {
-          vertices: [
-            { x: 120, y: -120 },
-            { x: 180, y: -120 },
-            { x: 180, y: 120 },
-            { x: 120, y: 120 },
-          ],
-        },
+    withWalls(game, [
+      [
+        { x: 120, y: -120 },
+        { x: 180, y: -120 },
+        { x: 180, y: 120 },
+        { x: 120, y: 120 },
       ],
-    };
+    ]);
     game.objectManager.update();
 
     const hook = throwAnchor();

@@ -23,7 +23,7 @@ import Camille_E, { Camille_E_GrappleObject } from '../../../src/game/gameObject
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import { pointInWall, wallOutlinesInArea } from '../../../src/game/gameObject/map/DynamicTerrain';
 import { Rectangle } from '../../../src/libs/quadtree';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, withWalls, type TestGame } from '../fixtures';
 
 let game: TestGame;
 
@@ -31,10 +31,11 @@ beforeEach(() => {
   stubGameGlobals();
   game = createGame();
   // The fixture has no `TerrainMap`; every test here is about the *other* half,
-  // so an empty map layer is the honest stand-in for "no static wall nearby".
-  (game as unknown as { terrainMap: unknown }).terrainMap = {
-    getObstaclesInArea: () => [],
-  };
+  // so a map with no walls in it is the honest stand-in for "no static wall
+  // nearby". It has to be a real terrain field rather than a bare stub, because
+  // `sweepToWall` reaches spell-made walls *through* the field — one seam for
+  // both kinds is the point, and it costs the fixture one empty grid.
+  withWalls(game, []);
 });
 afterEach(() => vi.unstubAllGlobals());
 

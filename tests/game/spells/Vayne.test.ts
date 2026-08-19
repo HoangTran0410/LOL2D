@@ -26,6 +26,7 @@ import {
   createUnit,
   installSketchMathGlobals,
   installSpellObjectGlobals,
+  withWalls,
   type TestGame,
 } from '../spell/fixtures';
 
@@ -162,19 +163,14 @@ describe('Vayne spells', () => {
   });
 
   it('E into a wall pins the victim: stunned for E_STUN_MS, plus E_WALL_BONUS', () => {
-    (game as any).terrainMap = {
-      getObstaclesInArea: () => [
-        {
-          position: { x: 0, y: 0 },
-          vertices: [
-            { x: 150, y: -300 },
-            { x: 220, y: -300 },
-            { x: 220, y: 300 },
-            { x: 150, y: 300 },
-          ],
-        },
+    withWalls(game, [
+      [
+        { x: 150, y: -300 },
+        { x: 220, y: -300 },
+        { x: 220, y: 300 },
+        { x: 150, y: 300 },
       ],
-    };
+    ]);
     const victim = unit(100, 'red');
     const bolt = new Vayne_E_Object(owner);
     bolt.destination = createVector(400, 0);

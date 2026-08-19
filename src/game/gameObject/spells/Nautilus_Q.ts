@@ -1,6 +1,5 @@
-import { Circle, Rectangle } from '@/libs/quadtree';
+import { Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import CollideUtils from '@/utils/collide.utils';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 import Spell from '@/game/gameObject/Spell';
@@ -8,7 +7,7 @@ import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Dash from '@/game/gameObject/buffs/Dash';
 import Stun from '@/game/gameObject/buffs/Stun';
-import { wallOutlinesInArea } from '@/game/gameObject/map/DynamicTerrain';
+import { sweepToWall } from '@/game/gameObject/map/TerrainField';
 
 export const Q_DAMAGE = 20;
 export const Q_RANGE = 420;
@@ -136,9 +135,31 @@ export class Nautilus_Q_Object extends MissileSpellObject {
     if (wound >= 1) this.toRemove = true;
   }
 
+  private previousX = 0;
+  private previousY = 0;
+
+  onBeforeMove(): void {
+    this.previousX = this.position.x;
+    this.previousY = this.position.y;
+  }
+
   onAfterMove(): void {
     if (this.phase !== 'flight') return;
-    if (this.catchesWall()) this.anchorOnWall();
+    // The step, not the landing spot. Testing the head's own position once a
+    // frame answers "is it inside the wall yet", so the anchor was set up to a
+    // frame's travel past the surface and the chain visibly went into the rock
+    // before it caught. `sweepToWall` also answers for spell-made walls, which
+    // is what a hook flying through an Anivia wall used to be missing.
+    const contact = sweepToWall(
+      this.game,
+      this.previousX,
+      this.previousY,
+      this.position.x,
+      this.position.y
+    );
+    if (!contact) return;
+    this.position.set(contact.x, contact.y);
+    this.anchorOnWall();
   }
 
   checkCollision(): void {
@@ -157,21 +178,6 @@ export class Nautilus_Q_Object extends MissileSpellObject {
     this.game.objectManager.addObject(new Nautilus_Q_Impact(this.owner, enemy.position.copy()));
     this.beginReturn();
     this.dragTogether(enemy);
-  }
-
-  /**
-   * Whether the anchor head is inside a wall right now.
-   *
-   * `wallOutlinesInArea` rather than `terrainMap`: an ice wall or an earthen slab
-   * is genuinely impassable but is a `SpellObject`, so the raw map shows a hole
-   * exactly where somebody just built something to hook onto.
-   */
-  private catchesWall(): boolean {
-    const around = new Circle({ x: this.position.x, y: this.position.y, r: Q_WIDTH });
-    for (const outline of wallOutlinesInArea(this.game, around)) {
-      if (CollideUtils.pointPolygon(this.position.x, this.position.y, outline)) return true;
-    }
-    return false;
   }
 
   private anchorOnWall(): void {
