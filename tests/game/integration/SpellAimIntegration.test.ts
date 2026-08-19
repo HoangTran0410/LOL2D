@@ -11,6 +11,7 @@ import Spell from '../../../src/game/gameObject/Spell';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
+import { THINK_INTERVAL_MS } from '../../../src/game/ai/BotBrain';
 import Game from '../../../src/game/Game';
 import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
 import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
@@ -184,10 +185,11 @@ describe('spell aim integration', () => {
    * that": on a phone it is wherever the thumb is resting — the on-screen
    * control pad — so a bot that aimed by it fired at a button in the corner.
    *
-   * `deltaTime` is 300 because `BotBrain` decides once per `THINK_INTERVAL_MS`
-   * (250) and jitters its first tick by up to a full interval. One frame longer
-   * than the interval is what makes a single `update()` a decision whatever the
-   * jitter rolled; 16ms would make these tests depend on `Math.random`.
+   * `matchTimeMs` is one millisecond past `THINK_INTERVAL_MS` because a brain
+   * decides once per interval and jitters its first tick by up to a full one:
+   * a match clock past the interval is what makes a single `update()` a
+   * decision whatever the jitter rolled. `deltaTime` stays an ordinary frame —
+   * it is the frame *length*, and the brain no longer keeps a clock of its own.
    */
   const enemyChampion = (
     game: ReturnType<typeof gameWithMouse>,
@@ -233,7 +235,8 @@ describe('spell aim integration', () => {
     ai.spells = [new AimSpell(ai), spell];
     ai.brain.rng = () => 0; // no aim scatter and no score noise
     game.objectManager.objects = [ai, ...enemies];
-    vi.stubGlobal('deltaTime', 300);
+    game.matchTimeMs = THINK_INTERVAL_MS + 1;
+    vi.stubGlobal('deltaTime', 16);
     return { ai, spell };
   };
 
@@ -300,18 +303,59 @@ describe('spell aim integration', () => {
       // Something to fight: a damage spell scores nothing without a target, so
       // a bot alone on the map now correctly never presses this at all.
       game.objectManager.objects = [ai, enemyChampion(game, 200)];
-      vi.stubGlobal('deltaTime', 300);
+      game.matchTimeMs = THINK_INTERVAL_MS + 1;
+      vi.stubGlobal('deltaTime', 50);
 
       ai.update();
       expect(spell.state).toBe('CHARGING');
-      // Back to an ordinary frame for the charge itself: the bot releases at
-      // half of `maxDurationMs`, and a second 300ms frame would blow past the
-      // whole 100ms charge inside `SpellRuntime.update` before the brain ticked.
-      vi.stubGlobal('deltaTime', 50);
       ai.update();
       expect(spell.releases).toBe(1);
     }
   );
+
+  it('a bot killed mid-charge stops charging instead of firing from its corpse', () => {
+    const game = gameWithMouse();
+    const ai = new AIChampion({
+      game,
+      position: new TestVector(0, 0) as any,
+      teamId: 'red',
+      preset: { spells: [] },
+    });
+    makeResourcesWritable(ai);
+    ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
+    class ChargedSpell extends Spell {
+      releases = 0;
+      get castSpec() {
+        return {
+          activation: 'HOLD_RELEASE' as const,
+          targeting: 'DIRECTION' as const,
+          charge: { maxDurationMs: 4000, releaseAtMax: false },
+          resource: { commitAt: 'start' as const, refundOn: [] },
+          cooldown: { startAt: 'end' as const, durationMs: 0 },
+          interrupts: { move: false },
+        };
+      }
+      onRelease() {
+        this.releases += 1;
+      }
+    }
+    const spell = new ChargedSpell(ai);
+    ai.spells = [new ChargedSpell(ai), spell];
+    ai.brain.rng = () => 0;
+    game.objectManager.objects = [ai, enemyChampion(game, 200)];
+    game.matchTimeMs = THINK_INTERVAL_MS + 1;
+    vi.stubGlobal('deltaTime', 50);
+
+    ai.update();
+    expect(spell.state).toBe('CHARGING');
+
+    const hold = vi.spyOn(spell, 'hold');
+    ai.die({ reviveAfter: 999_999 });
+    ai.update();
+
+    expect(hold).not.toHaveBeenCalled();
+    expect(spell.releases).toBe(0);
+  });
 
   describe.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
     'Zed shadow mirroring a %s cast',
@@ -435,11 +479,50 @@ describe('spell aim integration', () => {
     ai.spells = [new UnitSpell(ai), spell];
     ai.brain.rng = () => 0;
     game.objectManager.objects = [ai, untargetable, nearest, wounded];
-    vi.stubGlobal('deltaTime', 300);
+    game.matchTimeMs = THINK_INTERVAL_MS + 1;
+    vi.stubGlobal('deltaTime', 16);
 
     ai.update();
 
     expect(spell.usedTarget).toBe(wounded);
+  });
+
+  it('follows the live cursor only while the PLAYER charges, never a bot', () => {
+    // `aimPoint`'s CHARGING branch is the player's own charge preview, and it
+    // was the one place in this method chain that forgot the owner check
+    // `onChargeUpdate` and `onRelease` below it both make. A bot charging a
+    // HOLD_RELEASE spell read the human's pointer — on a phone, the on-screen
+    // control pad. The seam scan cannot cover `Spell.ts`, which legitimately
+    // reads `worldMouse` for the player, so this test is the whole guard.
+    class ChargedSpell extends Spell {
+      get castSpec() {
+        return {
+          activation: 'HOLD_RELEASE' as const,
+          targeting: 'DIRECTION' as const,
+          charge: { maxDurationMs: 4000, releaseAtMax: false },
+          resource: { commitAt: 'start' as const, refundOn: [] },
+          cooldown: { startAt: 'end' as const, durationMs: 0 },
+          interrupts: { move: false },
+        };
+      }
+    }
+    const worldMouse = new TestVector(10, 0);
+    const game = gameWithMouse(worldMouse);
+    const player = ownerFor(game, 'player');
+    Object.assign(game, { player });
+    const bot = ownerFor(game, 'bot');
+
+    const botSpell = new ChargedSpell(bot);
+    const playerSpell = new ChargedSpell(player);
+    botSpell.press(castContext(bot));
+    playerSpell.press(castContext(player));
+    expect(botSpell.state).toBe('CHARGING');
+    expect(playerSpell.state).toBe('CHARGING');
+
+    worldMouse.set(900, 900);
+
+    expect(botSpell.aimPoint).toMatchObject({ x: 0, y: 10 }); // its cast context
+    expect(playerSpell.aimPoint).toMatchObject({ x: 900, y: 900 }); // the drag
   });
 
   it('creates player contexts from the actual spell targeting mode', () => {

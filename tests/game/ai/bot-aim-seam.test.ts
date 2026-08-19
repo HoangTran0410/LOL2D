@@ -21,15 +21,26 @@ const filesUnder = (directory: string): string[] => {
   return out;
 };
 
+const AI_DIRECTORY = join(ROOT, 'src/game/ai');
+
 describe("a bot never aims at the human player's cursor", () => {
   const targets = [
-    ...filesUnder(join(ROOT, 'src/game/ai')),
+    ...filesUnder(AI_DIRECTORY),
     join(ROOT, 'src/game/gameObject/attackableUnits/AIChampion.ts'),
   ];
 
-  it('scans a non-empty set of files', () => {
-    // Without this, a renamed directory turns the whole suite into a no-op.
-    expect(targets.length).toBeGreaterThan(4);
+  it('scans every module in src/game/ai, plus AIChampion', () => {
+    // Derived from the directory rather than counted by hand. The first version
+    // of this asserted `> 4` against a real count of six, so two modules could
+    // leave the scan and the suite would still be green — a guard against the
+    // directory being renamed that did not notice it being emptied.
+    const modules = readdirSync(AI_DIRECTORY)
+      .filter(entry => entry.endsWith('.ts'))
+      .map(entry => join(AI_DIRECTORY, entry));
+
+    expect(modules.length).toBeGreaterThan(0);
+    for (const path of modules) expect(targets).toContain(path);
+    expect(targets).toContain(join(ROOT, 'src/game/gameObject/attackableUnits/AIChampion.ts'));
   });
 
   it.each(targets)('%s does not mention worldMouse', path => {

@@ -14,7 +14,13 @@ import {
   type CastContext,
   type Vec2,
 } from '@/game/spell/runtime/types';
-import { hasRole, rolesOf, SpellRole, ULTIMATE_SLOT, type SpellRoleMask } from '@/game/ai/SpellRole';
+import {
+  hasRole,
+  rolesOf,
+  SpellRole,
+  ULTIMATE_SLOT,
+  type SpellRoleMask,
+} from '@/game/ai/SpellRole';
 import { effectiveRange } from '@/game/combat/Reach';
 import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
 import { DEFAULT_PROJECTILE_SPEED, predictAim } from '@/game/ai/AimPredictor';
@@ -374,7 +380,9 @@ export class BotBrain {
       : Number.POSITIVE_INFINITY;
     const declared = spell.declaredRange;
     const reach =
-      declared === undefined ? Number.POSITIVE_INFINITY : effectiveRange(declared, this.owner, target);
+      declared === undefined
+        ? Number.POSITIVE_INFINITY
+        : effectiveRange(declared, this.owner, target);
     const inReach = distance <= reach;
 
     // A spell that cannot reach is not worth scoring — unless closing the gap
@@ -647,6 +655,13 @@ export class BotBrain {
   private advanceCharge(deltaMs: number): boolean {
     const pending = this.pendingCharge;
     if (!pending) return false;
+    // A corpse does not finish a charge. The deleted `AIChampion` branch never
+    // asked either, so a bot killed while holding one kept calling `hold` and
+    // then `release` from the floor.
+    if (this.owner.isDead) {
+      this.pendingCharge = undefined;
+      return false;
+    }
     pending.elapsedMs += Math.max(0, deltaMs);
     const context = this.contextFor(pending.spell, pending.context.cursorWorld);
     if (context) {

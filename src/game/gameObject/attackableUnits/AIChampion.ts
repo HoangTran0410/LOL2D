@@ -89,15 +89,6 @@ export default class AIChampion extends Champion {
    * the walking and the attack order, and asks the brain what to do with them.
    */
   readonly brain = new BotBrain(this);
-  /**
-   * Match time, accumulated from `deltaTime`.
-   *
-   * The brain takes time as an argument and never reads a p5 global itself —
-   * `src/game/ai/` may not call one, because a local shadowing `random` or
-   * `map` there fails at runtime on a frame nobody is watching. This boundary
-   * is where the frame clock turns into a plain number.
-   */
-  private _nowMs = 0;
   private presetFactory: ChampionPresetFactory;
 
   constructor(options: AIChampionOptions) {
@@ -112,10 +103,13 @@ export default class AIChampion extends Champion {
   update() {
     super.update();
 
-    // Clock first: `updateAttackTargeting` reaches into the brain, which reads
-    // `nowMs` to date the blackboard snapshot.
-    this._nowMs += Math.max(0, deltaTime);
-    this.brain.update(this._nowMs, deltaTime);
+    // The game's clock, never one of our own: every bot and the blackboard they
+    // share have to be in one time domain, and bots are built mid-match. The
+    // brain goes before `updateAttackTargeting`, which reaches into it — the
+    // brain dates its blackboard snapshot from whatever it was last handed.
+    // `?? 0` because a headless context has no clock; `deltaTime` is still the
+    // frame length, which is a duration and needs no domain.
+    this.brain.update(this.game.matchTimeMs ?? 0, deltaTime);
     this.updateAttackTargeting();
   }
 
@@ -140,13 +134,15 @@ export default class AIChampion extends Champion {
   }
 
   /**
-   * Nearest hostile champion inside the aggro radius. Champions only — a bot
-   * that wandered into the jungle and started trading with a camp, or parked
-   * itself under a turret, would look broken rather than dangerous.
+   * The hostile champion worth attacking, inside the tier's aggro radius.
+   * Champions only — a bot that wandered into the jungle and started trading
+   * with a camp, or parked itself under a turret, would look broken rather
+   * than dangerous.
    *
-   * The scan itself lives on the brain, where the aggro range is a difficulty
-   * profile and perception has one home. This stays because it is what a bot's
-   * attack order is asked for, here and in two suites.
+   * Not simply the nearest one: the scan lives on the brain, which ranks what
+   * it finds by `scoreTarget` — distance, how close to dead, and whether the
+   * team is already on it. This stays because it is what a bot's attack order
+   * is asked for, here and in two suites outside this file.
    */
   findAttackTarget(): Champion | null {
     return this.brain.findAttackTarget();

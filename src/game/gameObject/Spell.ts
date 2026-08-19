@@ -130,7 +130,16 @@ export default class Spell {
   get aimPoint(): p5.Vector {
     if (this.spellRuntime?.state === 'CHARGING') {
       const liveAim = this.game?.worldMouse;
-      if (liveAim) return createVector(liveAim.x, liveAim.y);
+      // The live cursor is the *player's* charge preview, and only theirs —
+      // the same owner check `onChargeUpdate` and `onRelease` below already
+      // make, which this branch was missing. A bot charging a HOLD_RELEASE
+      // spell read the human's pointer, which on a phone is wherever the thumb
+      // rests. Read after `liveAim` so a context without a player never has to
+      // answer for one. Below this, `_castContext.cursorWorld` comes first, so
+      // a bot on the `BotBrain.cast` path never reaches the cursor at all.
+      if (liveAim && this.owner === this.game.player) {
+        return createVector(liveAim.x, liveAim.y);
+      }
     }
     const aim = this._castContext?.cursorWorld ?? this.game?.worldMouse;
     return createVector(aim ? aim.x : 0, aim ? aim.y : 0);
