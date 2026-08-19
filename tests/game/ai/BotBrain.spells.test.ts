@@ -10,6 +10,7 @@ import Zed_R from '../../../src/game/gameObject/spells/Zed_R';
 import Alistar_W from '../../../src/game/gameObject/spells/Alistar_W';
 import Nocturne_R from '../../../src/game/gameObject/spells/Nocturne_R';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
+import type { LaneState } from '../../../src/game/ai/LaneObjectives';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 const PRESET: ChampionPresetData = {
@@ -56,6 +57,8 @@ const view = (over: Partial<TeamView> = {}): TeamView => ({
   focusTarget: null,
   rally: null,
   memory: new Map<Champion, SeenEnemy>(),
+  lanes: new Map<string, LaneState>(),
+  laneAssignments: new Map<Champion, string>(),
   ...over,
 });
 

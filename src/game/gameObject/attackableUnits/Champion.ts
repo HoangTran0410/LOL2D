@@ -95,6 +95,19 @@ export default class Champion extends AttackableUnit {
   killCredit: KillCredit = 'champion';
 
   /**
+   * Whether a `BotBrain` is driving this body. `AIChampion` overrides it to
+   * true.
+   *
+   * A flag rather than an `instanceof AIChampion` at the read sites, because
+   * the one place that needs the answer is `TeamBlackboard` — and importing
+   * `AIChampion` there would close a cycle (`AIChampion` -> `BotBrain` ->
+   * `TeamBlackboard`). The board hands out lane assignments, and a human on
+   * the roster must not consume one: nothing would ever act on it, and the
+   * lane it took would be a lane no bot walked to.
+   */
+  readonly isBot: boolean = false;
+
+  /**
    * The number on the health bar, now a view of the ledger rather than its own
    * counter. It means exactly what it always did — kills minus deaths — but the
    * two halves are separately readable, which is what a scoreboard needs.

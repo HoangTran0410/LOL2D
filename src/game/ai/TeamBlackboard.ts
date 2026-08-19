@@ -1,7 +1,20 @@
+import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Minion from '@/game/gameObject/attackableUnits/Minion';
+import Turret from '@/game/gameObject/structures/Turret';
 import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
 import { canSee, type Seeable } from '@/game/combat/Vision';
 import { targetVelocity } from '@/game/ai/AimPredictor';
+import {
+  assignLanes,
+  laneAdvance,
+  laneNeed,
+  laneProgressAt,
+  nearestLane,
+  LANE_MEMBERSHIP_PX,
+  type LaneState,
+} from '@/game/ai/LaneObjectives';
+import { LANES } from '@/game/lanes';
 import type GameObject from '@/game/gameObject/GameObject';
 import type { Vec2 } from '@/game/spell/runtime/types';
 
@@ -47,6 +60,10 @@ export interface TeamView {
   focusTarget: Champion | null;
   rally: Vec2 | null;
   memory: ReadonlyMap<Champion, SeenEnemy>;
+  /** One entry per lane in `LANES`, scored from this team's side of the map. */
+  lanes: ReadonlyMap<string, LaneState>;
+  /** Which lane each of this team's bots is working. Humans are not in it. */
+  laneAssignments: ReadonlyMap<Champion, string>;
 }
 
 export type SeesFn = (observer: Champion, target: Champion) => boolean;
@@ -61,14 +78,23 @@ export const EMPTY_VIEW: TeamView = Object.freeze({
   focusTarget: null,
   rally: null,
   memory: new Map<Champion, SeenEnemy>(),
+  lanes: new Map<string, LaneState>(),
+  laneAssignments: new Map<Champion, string>(),
 });
 
 const defaultSees: SeesFn = (observer, target) =>
   canSee(observer as unknown as Seeable, target as unknown as Seeable);
 
+/** A unit and how far along its lane it is, 0 at the blue end and 1 at the red. */
+interface LaneUnit<T> {
+  unit: T;
+  progress: number;
+}
+
 export class TeamBlackboard {
   private views = new Map<unknown, TeamView>();
   private memories = new Map<unknown, Map<Champion, SeenEnemy>>();
+  private laneMemories = new Map<unknown, Map<Champion, string>>();
   private builtAtMs = Number.NEGATIVE_INFINITY;
 
   viewFor(teamId: unknown): TeamView {
@@ -85,8 +111,46 @@ export class TeamBlackboard {
     // One pass over the object list for the whole game. `filter` cannot narrow
     // types here — the polyfilled prototype in `src/main.ts` puts the
     // non-predicate overload first — so this is a plain loop, as MatchDirector.bots() is.
+    //
+    // It is also the ONLY full-list walk the whole AI layer is allowed, and
+    // `tests/game/ai/TeamBlackboard.lanes.test.ts` scans `src/game/ai/` to keep
+    // it that way. The lane economy — where each wave has got to, which turret
+    // is next — is gathered here rather than in a second pass or a per-frame
+    // quadtree query for exactly that reason: five bots asking cost one walk.
+    // The list holds every particle and trail in the match, so the
+    // `AttackableUnit` test comes first and the three subtype tests only run on
+    // what survives it.
     const living: Champion[] = [];
+    const laneMinions = new Map<string, LaneUnit<Minion>[]>();
+    const laneTurrets = new Map<string, LaneUnit<Turret>[]>();
+    for (const lane of LANES) {
+      laneMinions.set(lane, []);
+      laneTurrets.set(lane, []);
+    }
+
     for (const object of game.objectManager?.objects ?? []) {
+      if (!(object instanceof AttackableUnit)) continue;
+      if (object.toRemove || object.isDead) continue;
+
+      if (object instanceof Minion) {
+        const bucket = laneMinions.get(object.lane);
+        if (bucket) {
+          bucket.push({
+            unit: object,
+            progress: laneProgressAt(object.lane, object.position.x, object.position.y),
+          });
+        }
+        continue;
+      }
+
+      if (object instanceof Turret) {
+        // A turret never moves, so its lane and its place along that lane are
+        // measured once for the match rather than four times a second.
+        const placed = turretPlacement(object);
+        if (placed) laneTurrets.get(placed.lane)?.push({ unit: object, progress: placed.progress });
+        continue;
+      }
+
       if (!(object instanceof Champion)) continue;
       // `instanceof Champion` is not "is a champion": `Pet extends Champion`
       // (Tibbers, Shaco's box and clone, Jinx's chomper, Malzahar's voidling)
@@ -98,12 +162,19 @@ export class TeamBlackboard {
       // treats as authoritative for exactly this question — `Pet` sets it to
       // `'none'` *because* `instanceof` cannot tell them apart (see CLAUDE.md).
       if (object.killCredit !== 'champion') continue;
-      if (object.isDead || object.toRemove) continue;
       living.push(object);
     }
 
     const teams = new Set<unknown>();
     for (const champion of living) teams.add(champion.teamId);
+
+    // Where each champion stands, measured once for the whole rebuild rather
+    // than once per team: the answer does not change with who is asking.
+    const laneOfChampion = new Map<Champion, string>();
+    for (const champion of living) {
+      const nearest = nearestLane(champion.position.x, champion.position.y);
+      if (nearest.distance <= LANE_MEMBERSHIP_PX) laneOfChampion.set(champion, nearest.lane);
+    }
 
     this.views.clear();
     for (const teamId of teams) {
@@ -113,14 +184,131 @@ export class TeamBlackboard {
         if (champion.teamId === teamId) allies.push(champion);
         else enemies.push(champion);
       }
+      const lanes = this.buildLanes(teamId, enemies, laneOfChampion, laneMinions, laneTurrets);
       this.views.set(teamId, {
         allies,
         enemies,
         focusTarget: pickFocus(allies, enemies),
         rally: centroid(allies),
         memory: this.refreshMemory(teamId, allies, enemies, nowMs, sees),
+        lanes,
+        laneAssignments: this.refreshLaneAssignments(teamId, allies, lanes),
       });
     }
+  }
+
+  /**
+   * The three lanes as this team reads them.
+   *
+   * Everything here is a walk of buckets the one object pass already filled, so
+   * the cost is the wave and the turret rows, twice — not the object list.
+   */
+  private buildLanes(
+    teamId: unknown,
+    enemies: readonly Champion[],
+    laneOfChampion: ReadonlyMap<Champion, string>,
+    laneMinions: ReadonlyMap<string, LaneUnit<Minion>[]>,
+    laneTurrets: ReadonlyMap<string, LaneUnit<Turret>[]>
+  ): Map<string, LaneState> {
+    const side = String(teamId);
+    const lanes = new Map<string, LaneState>();
+
+    for (const lane of LANES) {
+      let alliedMinions = 0;
+      let enemyMinions = 0;
+      let frontier: Vec2 | null = null;
+      let frontierAdvance = Number.NEGATIVE_INFINITY;
+
+      for (const entry of laneMinions.get(lane) ?? []) {
+        if (entry.unit.teamId !== teamId) {
+          enemyMinions++;
+          continue;
+        }
+        alliedMinions++;
+        const advance = laneAdvance(side, entry.progress);
+        if (advance > frontierAdvance) {
+          frontierAdvance = advance;
+          frontier = { x: entry.unit.position.x, y: entry.unit.position.y };
+        }
+      }
+
+      let nextEnemyTurret: Turret | null = null;
+      let nextEnemyAdvance = Number.POSITIVE_INFINITY;
+      let ownTurret: Turret | null = null;
+      let ownAdvance = Number.NEGATIVE_INFINITY;
+
+      for (const entry of laneTurrets.get(lane) ?? []) {
+        const advance = laneAdvance(side, entry.progress);
+        if (entry.unit.teamId === teamId) {
+          // Ours: the one furthest from our base is the one their push meets.
+          if (advance > ownAdvance) {
+            ownAdvance = advance;
+            ownTurret = entry.unit;
+          }
+        } else if (advance < nextEnemyAdvance) {
+          // Theirs: the one nearest our base is the one we have to break first.
+          nextEnemyAdvance = advance;
+          nextEnemyTurret = entry.unit;
+        }
+      }
+
+      let enemyChampions = 0;
+      for (const enemy of enemies) {
+        if (laneOfChampion.get(enemy) === lane) enemyChampions++;
+      }
+
+      const state: LaneState = {
+        lane,
+        alliedMinions,
+        enemyMinions,
+        frontier,
+        nextEnemyTurret,
+        ownTurret,
+        ownTurretHealthPct: healthFraction(ownTurret),
+        enemyTurretHealthPct: healthFraction(nextEnemyTurret),
+        enemyChampions,
+        need: 0,
+      };
+      state.need = laneNeed(state);
+      lanes.set(lane, state);
+    }
+    return lanes;
+  }
+
+  /**
+   * Which lane each of this team's bots takes, remembered between rebuilds.
+   *
+   * The memory is what makes `LANE_SWITCH_MARGIN` mean anything: without a
+   * record of where a bot already is there is no incumbent, and the assignment
+   * is recomputed from scratch four times a second off numbers that move with
+   * every wave.
+   */
+  private refreshLaneAssignments(
+    teamId: unknown,
+    allies: readonly Champion[],
+    lanes: ReadonlyMap<string, LaneState>
+  ): ReadonlyMap<Champion, string> {
+    // Roster order, which is spawn order — not a uuid, so the answer is the
+    // same on every machine and a test can assert it. `filter` cannot narrow
+    // here (see the note on the object pass above), so this is a plain loop.
+    const bots: Champion[] = [];
+    for (const ally of allies) {
+      if (ally.isBot) bots.push(ally);
+    }
+
+    const needs = new Map<string, number>();
+    for (const [lane, state] of lanes) needs.set(lane, state.need);
+
+    let remembered = this.laneMemories.get(teamId);
+    if (!remembered) {
+      remembered = new Map<Champion, string>();
+      this.laneMemories.set(teamId, remembered);
+    }
+
+    const assigned = assignLanes(bots, needs, remembered);
+    remembered.clear();
+    for (const [bot, lane] of assigned) remembered.set(bot, lane);
+    return assigned;
   }
 
   private refreshMemory(
@@ -213,6 +401,41 @@ function pickFocus(allies: readonly Champion[], enemies: readonly Champion[]): C
   }
   return best;
 }
+
+/**
+ * Where a turret stands, worked out once and kept.
+ *
+ * A turret is `isImmovable` and re-anchors every frame, so its lane and its
+ * place along that lane are properties of the map rather than of the tick. A
+ * destroyed one rebuilds where it stood, so this survives that too.
+ */
+const turretPlaces = new WeakMap<Turret, { lane: string; progress: number } | null>();
+
+function turretPlacement(turret: Turret): { lane: string; progress: number } | null {
+  const known = turretPlaces.get(turret);
+  if (known !== undefined) return known;
+
+  const nearest = nearestLane(turret.position.x, turret.position.y);
+  const placed =
+    nearest.distance <= LANE_MEMBERSHIP_PX
+      ? { lane: nearest.lane, progress: nearest.progress }
+      : null;
+  turretPlaces.set(turret, placed);
+  return placed;
+}
+
+/**
+ * How much of a structure is left, as a fraction.
+ *
+ * **No turret reads as 0, not as 1.** An undefended lane is the urgent case,
+ * and `laneNeed` prices `1 - pct`; handing it 1 would make a lane whose turrets
+ * are all rubble look exactly as calm as one behind three full-health ones.
+ */
+const healthFraction = (unit: AttackableUnit | null): number => {
+  if (!unit) return 0;
+  const max = unit.stats.maxHealth.value;
+  return max > 0 ? Math.max(0, Math.min(1, unit.stats.health.value / max)) : 0;
+};
 
 function centroid(units: readonly Champion[]): Vec2 | null {
   if (units.length === 0) return null;
