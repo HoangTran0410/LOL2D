@@ -9,6 +9,8 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import ActionState from '../../../src/game/enums/ActionState';
 import Spell from '../../../src/game/gameObject/Spell';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
+import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
 import Game from '../../../src/game/Game';
 import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
 import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
@@ -103,7 +105,9 @@ const gameWithMouse = (worldMouse = new TestVector(10, 0)) => ({
     on: vi.fn(),
     unsub: vi.fn(),
   },
-  objectManager: { addObject: vi.fn() },
+  // `objects` is what `TeamBlackboard` reads to build the roster a bot decides
+  // from, and what `Game.createSpellContext` hands the resolver as candidates.
+  objectManager: { addObject: vi.fn(), objects: [] as unknown[] },
   mapSize: 6400,
 });
 
@@ -174,12 +178,38 @@ describe('spell aim integration', () => {
     expect(missile.destination.y).toBeCloseTo(350);
   });
 
-  // Bots fire at the human player's cursor on purpose — that is what makes them
-  // worth fighting. Aiming at `destination` instead looked equivalent only while
-  // `_autoMove` was on: with it off a bot never walks, so its destination stays
-  // on its own feet and every non-unit-targeted spell got cast into the ground
-  // under it.
-  const aimingAI = (game: ReturnType<typeof gameWithMouse>) => {
+  /**
+   * A bot aims at the enemy it chose, never at `game.worldMouse`. The cursor is
+   * still placed in these fixtures precisely so the assertions can say "not
+   * that": on a phone it is wherever the thumb is resting — the on-screen
+   * control pad — so a bot that aimed by it fired at a button in the corner.
+   *
+   * `deltaTime` is 300 because `BotBrain` decides once per `THINK_INTERVAL_MS`
+   * (250) and jitters its first tick by up to a full interval. One frame longer
+   * than the interval is what makes a single `update()` a decision whatever the
+   * jitter rolled; 16ms would make these tests depend on `Math.random`.
+   */
+  const enemyChampion = (
+    game: ReturnType<typeof gameWithMouse>,
+    x: number,
+    healthPct = 1
+  ): Champion => {
+    const enemy = new Champion({
+      game,
+      position: new TestVector(x, 0) as any,
+      teamId: 'blue',
+      preset: { spells: [] },
+    });
+    enemy.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
+    enemy.stats.health.baseValue = enemy.stats.maxHealth.value * healthPct;
+    return enemy;
+  };
+
+  const aimingAI = (
+    game: ReturnType<typeof gameWithMouse>,
+    enemies: Champion[] = [],
+    aiRoles?: number
+  ) => {
     const ai = new AIChampion({
       game,
       position: new TestVector(0, 0) as any,
@@ -190,48 +220,49 @@ describe('spell aim integration', () => {
     ai.destination = new TestVector(0, 20) as any;
     ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
     class AimSpell extends Spell {
+      static aiRoles = aiRoles;
       targetingMode = 'DIRECTION' as const;
       usedAim?: p5.Vector;
       onSpellCast() {
         this.usedAim = this.aimPoint;
       }
     }
+    // Slot 0 is the basic attack in a champion's kit and the brain scores from
+    // slot 1, so the spell under test is the second one.
     const spell = new AimSpell(ai);
-    ai.spells = [spell];
-    vi.stubGlobal(
-      'random',
-      vi.fn(() => 0)
-    );
+    ai.spells = [new AimSpell(ai), spell];
+    ai.brain.rng = () => 0; // no aim scatter and no score noise
+    game.objectManager.objects = [ai, ...enemies];
+    vi.stubGlobal('deltaTime', 300);
     return { ai, spell };
   };
 
-  it('aims an AI press at the player cursor, not at its own walk destination', () => {
-    const { ai, spell } = aimingAI(gameWithMouse(new TestVector(300, -40)));
-
-    ai.update();
-
-    expect(spell.usedAim).toMatchObject({ x: 300, y: -40 });
-  });
-
-  it('falls back to the destination when there is no cursor to aim at', () => {
-    const game = gameWithMouse();
-    (game as { worldMouse?: TestVector }).worldMouse = undefined;
-    const { ai, spell } = aimingAI(game);
-
-    ai.update();
-
-    expect(spell.usedAim).toMatchObject({ x: 0, y: 20 });
-  });
-
-  it('keeps a parked bot from casting into the ground under itself', () => {
-    // _autoMove is off, so position and destination coincide: the old aim would
-    // have produced a cast target identical to the caster's own feet.
-    const { ai, spell } = aimingAI(gameWithMouse(new TestVector(900, 900)));
+  it('aims an AI press at the enemy it picked, not at the cursor or its own feet', () => {
+    const game = gameWithMouse(new TestVector(300, -40));
+    const { ai, spell } = aimingAI(game, [enemyChampion(game, 200)]);
+    // Parked, as a bot with movement switched off is: destination sits on its
+    // own position, which is where the deleted aim fell back to.
+    ai._autoMove = false;
     ai.destination = new TestVector(ai.position.x, ai.position.y) as any;
 
     ai.update();
 
-    expect(spell.usedAim).not.toMatchObject({ x: ai.position.x, y: ai.position.y });
+    expect(spell.usedAim).toMatchObject({ x: 200, y: 0 });
+  });
+
+  it('casts nothing while it is roaming, even a spell it would otherwise want', () => {
+    // The deleted code rolled `random() < 0.1` every frame and fired whatever
+    // came up at the cursor. A self-buff scores 5 with no target at all, so the
+    // posture gate in `maybeCast` is the only thing holding this one back.
+    const { ai, spell } = aimingAI(
+      gameWithMouse(new TestVector(900, 900)),
+      [],
+      roles(SpellRole.Buff)
+    );
+
+    ai.update();
+
+    expect(spell.usedAim).toBeUndefined();
   });
 
   it.each(['HOLD_RELEASE', 'TAP_OR_HOLD'] as const)(
@@ -264,15 +295,19 @@ describe('spell aim integration', () => {
         }
       }
       const spell = new ChargedSpell(ai);
-      ai.spells = [spell];
-      vi.stubGlobal(
-        'random',
-        vi.fn(() => 0)
-      );
-      vi.stubGlobal('deltaTime', 50);
+      ai.spells = [new ChargedSpell(ai), spell];
+      ai.brain.rng = () => 0;
+      // Something to fight: a damage spell scores nothing without a target, so
+      // a bot alone on the map now correctly never presses this at all.
+      game.objectManager.objects = [ai, enemyChampion(game, 200)];
+      vi.stubGlobal('deltaTime', 300);
 
       ai.update();
       expect(spell.state).toBe('CHARGING');
+      // Back to an ordinary frame for the charge itself: the bot releases at
+      // half of `maxDurationMs`, and a second 300ms frame would blow past the
+      // whole 100ms charge inside `SpellRuntime.update` before the brain ticked.
+      vi.stubGlobal('deltaTime', 50);
       ai.update();
       expect(spell.releases).toBe(1);
     }
@@ -351,23 +386,21 @@ describe('spell aim integration', () => {
     }
   );
 
-  it('aims an AI UNIT cast at an eligible unit instead of its move destination', () => {
+  it('aims an AI UNIT cast at the enemy the brain picked, not the nearest body', () => {
     const untargetable = {
       position: new TestVector(50, 0),
       collisionRadius: 25,
       teamId: 'blue',
       targetable: false,
     };
-    const target = {
-      position: new TestVector(100, 0),
-      collisionRadius: 25,
-      teamId: 'blue',
-      targetable: true,
-    };
-    const game = Object.assign(gameWithMouse(), {
-      objectManager: { objects: [untargetable, target], addObject: vi.fn() },
+    const game = Object.assign(gameWithMouse(new TestVector(0, -400)), {
       createSpellContext: Game.prototype.createSpellContext,
     });
+    // The nearest body is not the one worth killing, and that is the point: the
+    // resolver takes whoever the aim points at, so this only lands on `wounded`
+    // if the aim came from the brain's own target choice.
+    const nearest = enemyChampion(game, 100);
+    const wounded = enemyChampion(game, 350, 0.1);
     const ai = new AIChampion({
       game,
       position: new TestVector(0, 0) as any,
@@ -375,6 +408,7 @@ describe('spell aim integration', () => {
       preset: { spells: [] },
     });
     makeResourcesWritable(ai);
+    ai._autoMove = false;
     ai.destination = new TestVector(0, 500) as any;
     ai.stats.actionState = ActionState.CAN_CAST | ActionState.TARGETABLE;
     class UnitSpell extends Spell {
@@ -398,15 +432,14 @@ describe('spell aim integration', () => {
       }
     }
     const spell = new UnitSpell(ai);
-    ai.spells = [spell];
-    vi.stubGlobal(
-      'random',
-      vi.fn(() => 0)
-    );
+    ai.spells = [new UnitSpell(ai), spell];
+    ai.brain.rng = () => 0;
+    game.objectManager.objects = [ai, untargetable, nearest, wounded];
+    vi.stubGlobal('deltaTime', 300);
 
     ai.update();
 
-    expect(spell.usedTarget).toBe(target);
+    expect(spell.usedTarget).toBe(wounded);
   });
 
   it('creates player contexts from the actual spell targeting mode', () => {

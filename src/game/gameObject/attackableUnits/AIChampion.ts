@@ -1,20 +1,9 @@
-import { Circle } from '@/libs/quadtree';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import { getChampionPresetRandom } from '@/game/preset';
 import type { AssetKey } from '@/managers/AssetManager';
 import Champion, { type ChampionOptions, type ChampionPresetData } from './Champion';
 import type AttackableUnit from './AttackableUnit';
-import { uuidv4 } from '@/utils';
-import { vecDist } from '@/utils/math.utils';
-import { effectiveRange } from '@/game/combat/Reach';
-import TargetResolver, {
-  defaultIsTargetable,
-  defaultTargetInfo,
-} from '@/game/spell/targeting/TargetResolver';
-import type Spell from '@/game/gameObject/Spell';
-import { isChargeActivation, requireChargeSpec, type CastContext } from '@/game/spell/runtime/types';
-import type { Vec2 } from '@/game/spell/runtime/types';
 import { type BotDifficulty, DEFAULT_DIFFICULTY } from '@/game/ai/Difficulty';
+import BotBrain from '@/game/ai/BotBrain';
 
 export type ChampionPresetFactory = () => ChampionPresetData & { avatar: AssetKey };
 
@@ -56,7 +45,14 @@ export interface AIChampionOptions extends ChampionOptions {
  * would cost a full board its frame rate.
  */
 export const AI_ATTACK_SCAN_INTERVAL_MS = 250;
-/** How far a bot looks for something to attack. Inside its 500 sight radius. */
+/**
+ * How far a bot looks for something to attack.
+ *
+ * The reach is a difficulty knob now — `DifficultyProfile.aggroRange`, which
+ * `BotBrain` reads — and this is `normal`'s value, i.e. the number every bot
+ * used before there were tiers. Kept exported as the record of that promise:
+ * a default match's aggro range did not change when the brain landed.
+ */
 export const AI_ATTACK_AGGRO_RANGE = 420;
 
 /**
@@ -88,12 +84,20 @@ export default class AIChampion extends Champion {
   _difficulty: BotDifficulty = DEFAULT_DIFFICULTY;
   /** ms until the next scan, jittered on construction. */
   _attackScanCooldown = Math.random() * AI_ATTACK_SCAN_INTERVAL_MS;
-  private pendingCharge?: {
-    spell: Spell;
-    context: CastContext;
-    elapsedMs: number;
-    releaseAtMs: number;
-  };
+  /**
+   * Everything this bot decides. `AIChampion` is the body: it owns the clock,
+   * the walking and the attack order, and asks the brain what to do with them.
+   */
+  readonly brain = new BotBrain(this);
+  /**
+   * Match time, accumulated from `deltaTime`.
+   *
+   * The brain takes time as an argument and never reads a p5 global itself —
+   * `src/game/ai/` may not call one, because a local shadowing `random` or
+   * `map` there fails at runtime on a frame nobody is watching. This boundary
+   * is where the frame clock turns into a plain number.
+   */
+  private _nowMs = 0;
   private presetFactory: ChampionPresetFactory;
 
   constructor(options: AIChampionOptions) {
@@ -108,52 +112,20 @@ export default class AIChampion extends Champion {
   update() {
     super.update();
 
+    // Clock first: `updateAttackTargeting` reaches into the brain, which reads
+    // `nowMs` to date the blackboard snapshot.
+    this._nowMs += Math.max(0, deltaTime);
+    this.brain.update(this._nowMs, deltaTime);
     this.updateAttackTargeting();
-
-    // an attack order owns the destination while it is running, so wandering off
-    // to a random point has to wait until the order is done
-    if (this._autoMove && !this.basicAttack.target) {
-      let distToDest = this.position.dist(this.destination);
-      if (distToDest < this.stats.speed.value) {
-        this.moveToRandomLocation();
-      }
-    }
-
-    if (this.pendingCharge) {
-      const pending = this.pendingCharge;
-      pending.elapsedMs += Math.max(0, deltaTime);
-      const context = this.createSpellContext(pending.spell);
-      if (context) {
-        pending.context = context;
-        pending.spell.hold(context);
-      }
-      if (pending.elapsedMs >= pending.releaseAtMs) {
-        pending.spell.release(pending.context);
-        this.pendingCharge = undefined;
-      }
-    } else if (this._autoCast) {
-      if (random() < 0.1) {
-        let spellIndex = floor(random(this.spells.length));
-        const spell = this.spells[spellIndex];
-        const context = this.createSpellContext(spell);
-        if (context && spell.press(context)) {
-          const castSpec = spell.castSpec;
-          if (!isChargeActivation(castSpec.activation)) return;
-          this.pendingCharge = {
-            spell,
-            context,
-            elapsedMs: 0,
-            releaseAtMs: requireChargeSpec(castSpec).maxDurationMs / 2,
-          };
-        }
-      }
-    }
   }
 
   /**
-   * Picks something to basic attack. Kept separate from spell aiming on purpose:
-   * `cursorForSpell` deliberately reads a live point rather than a locked unit,
-   * and folding the two together would change how bots aim their abilities.
+   * Picks something to basic attack, on its own clock.
+   *
+   * Deliberately not folded into the brain's think tick: a swing is a reflex
+   * and re-scanning for one four times a second is cheap, while a decision that
+   * moves the bot or spends mana is not. The two intervals are also read by
+   * different tests, and `_attackScanCooldown` is the one an e2e script pins.
    */
   updateAttackTargeting(): void {
     this._attackScanCooldown -= deltaTime;
@@ -171,96 +143,13 @@ export default class AIChampion extends Champion {
    * Nearest hostile champion inside the aggro radius. Champions only — a bot
    * that wandered into the jungle and started trading with a camp, or parked
    * itself under a turret, would look broken rather than dangerous.
+   *
+   * The scan itself lives on the brain, where the aggro range is a difficulty
+   * profile and perception has one home. This stays because it is what a bot's
+   * attack order is asked for, here and in two suites.
    */
   findAttackTarget(): Champion | null {
-    // optional call for the same reason MissileSpellObject uses one: spell tests
-    // hand in an object manager stub that only knows how to collect added objects
-    const found =
-      this.game.objectManager.queryObjects?.({
-        area: new Circle({
-          x: this.position.x,
-          y: this.position.y,
-          r: AI_ATTACK_AGGRO_RANGE,
-        }),
-        filters: [
-          PredefinedFilters.type(Champion),
-          PredefinedFilters.canTakeDamageFromTeam(this.teamId),
-          PredefinedFilters.excludeStealthed,
-        ],
-      }) ?? [];
-
-    let nearest: Champion | null = null;
-    let nearestDistance = Infinity;
-    for (const champion of found) {
-      if (champion === this) continue;
-      const distance = p5.Vector.dist(this.position, champion.position);
-      if (distance <= AI_ATTACK_AGGRO_RANGE && distance < nearestDistance) {
-        nearestDistance = distance;
-        nearest = champion;
-      }
-    }
-    return nearest;
-  }
-
-  private createSpellContext(spell: Spell): CastContext | undefined {
-    const cursorWorld = this.cursorForSpell(spell);
-    if (typeof this.game.createSpellContext === 'function') {
-      return cursorWorld ? this.game.createSpellContext(spell, this, cursorWorld) : undefined;
-    }
-    const result = TargetResolver.resolve(spell.castSpec.targeting, {
-      spellId: spell.id,
-      activationId: uuidv4(),
-      startedAtMs: Date.now(),
-      caster: this,
-      casterTeamId: this.teamId,
-      origin: this.position,
-      cursorWorld: cursorWorld ?? this.aimPoint(),
-      ...spell.targetingRequest,
-    });
-    return result.ok ? result.context : undefined;
-  }
-
-  /**
-   * Where a bot points a spell that is not aimed at a specific unit.
-   *
-   * The human player's cursor, deliberately: firing at the player is what makes
-   * the bots worth fighting, and it is how they behaved before the runtime gave
-   * them an aim of their own. `destination` is only a fallback for when there is
-   * no cursor (headless tests) — on its own it is a bad aim, because with
-   * `_autoMove` off a bot never walks anywhere, so its destination stays parked
-   * on its own feet and every spell gets cast into the ground under it.
-   */
-  private aimPoint(): Vec2 {
-    const cursor = this.game.worldMouse;
-    return cursor ? { x: cursor.x, y: cursor.y } : this.destination;
-  }
-
-  private cursorForSpell(spell: Spell): Vec2 | undefined {
-    if (spell.castSpec.targeting !== 'UNIT') return this.aimPoint();
-    const request = spell.targetingRequest;
-    const candidates = request.queryCandidates?.() ?? this.game.objectManager?.objects ?? [];
-    const getTargetInfo = request.getTargetInfo ?? defaultTargetInfo;
-    const isTargetable = request.isTargetable ?? defaultIsTargetable;
-    let nearest: { point: Vec2; distance: number } | undefined;
-
-    for (const candidate of candidates) {
-      const info = getTargetInfo(candidate);
-      if (!info || !isTargetable(candidate)) continue;
-      if (request.targetTeam === 'ENEMY' && info.teamId === this.teamId) continue;
-      if (request.targetTeam === 'ALLY' && info.teamId !== this.teamId) continue;
-      const distance = vecDist(info.position, this.position);
-      // Same size-corrected reach TargetResolver will apply a moment later; a
-      // bot that aimed by the raw number would pick a victim the resolver then
-      // rejects, and simply stop casting once its own body had grown.
-      if (
-        request.range !== undefined &&
-        distance > effectiveRange(request.range, this, candidate)
-      ) {
-        continue;
-      }
-      if (!nearest || distance < nearest.distance) nearest = { point: info.position, distance };
-    }
-    return nearest?.point;
+    return this.brain.findAttackTarget();
   }
 
   /**
@@ -272,9 +161,18 @@ export default class AIChampion extends Champion {
    * one. `nearestWalkable` costs a short ring scan and removes that outright.
    */
   moveToRandomLocation() {
-    let x = random(this.game.mapSize);
-    let y = random(this.game.mapSize);
+    this.navigateToWalkable(random(this.game.mapSize), random(this.game.mapSize));
+  }
 
+  /**
+   * Walk to a point, pulled onto standable ground first.
+   *
+   * The half of `moveToRandomLocation` that is not the dice roll. Extracted
+   * rather than reused because the reflexes still want the roll and the ROAM
+   * posture never does — a bot that flinches picks anywhere, a bot that is
+   * loitering stays near its team.
+   */
+  navigateToWalkable(x: number, y: number): void {
     const navigation = this.game.navigation;
     if (navigation) {
       const reachable = navigation.nearestWalkable(x, y, this.terrainRadius, ROAM_SNAP_DISTANCE);

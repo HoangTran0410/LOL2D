@@ -234,10 +234,11 @@ export const PredefinedFilters = {
    * or terrain is not asking about vision, and every caller's own filters have
    * already narrowed the units to the ones it may hit.
    *
-   * Deliberately not applied to `AIChampion`'s own target scan: a bot that can
-   * be broken line-of-sight with is a difficulty change, not a bug fix, and
-   * this is the same reasoning that leaves `AIChampion.aimPoint` alone. A bot
-   * *casting a spell* is gated like anyone else — that is the spell's rule.
+   * `AIChampion` no longer routes its target scan through this filter at all:
+   * whether a bot can be broken line-of-sight with is a difficulty knob now
+   * (`seesThroughTerrain` in `src/game/ai/Difficulty.ts` — off for `easy`, on
+   * for `normal` and `hard`), and `BotBrain.canPerceive` applies it directly so
+   * the three tiers can differ. Every other caller here is unchanged.
    */
   visibleTo:
     (observer: VisionObserver): GameObjectFilter =>

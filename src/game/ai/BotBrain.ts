@@ -1,12 +1,27 @@
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import { canSee, type Seeable } from '@/game/combat/Vision';
 import { profileFor, type DifficultyProfile } from '@/game/ai/Difficulty';
-import type { SeenEnemy, TeamView } from '@/game/ai/TeamBlackboard';
+import {
+  blackboardFor,
+  type BlackboardHost,
+  type SeenEnemy,
+  type TeamView,
+} from '@/game/ai/TeamBlackboard';
 import type AIChampion from '@/game/gameObject/attackableUnits/AIChampion';
-import type { Vec2 } from '@/game/spell/runtime/types';
+import {
+  isChargeActivation,
+  requireChargeSpec,
+  type CastContext,
+  type Vec2,
+} from '@/game/spell/runtime/types';
 import { hasRole, rolesOf, SpellRole, ULTIMATE_SLOT, type SpellRoleMask } from '@/game/ai/SpellRole';
 import { effectiveRange } from '@/game/combat/Reach';
 import { effectiveHealth } from '@/game/combat/ExecuteTargeting';
+import { DEFAULT_PROJECTILE_SPEED, predictAim } from '@/game/ai/AimPredictor';
+import { Circle } from '@/libs/quadtree';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import { uuidv4 } from '@/utils';
 import type Spell from '@/game/gameObject/Spell';
 
 /** How much a target's remaining health pulls the choice, at full health missing. */
@@ -42,6 +57,13 @@ export const SEARCH_MAX_DISTANCE_PX = 900;
 export const FRAME_MS = 1000 / 60;
 /** How far ahead an aimless cast points. Any positive number; never 0. */
 export const FALLBACK_AIM_PX = 100;
+/**
+ * ms between decisions. Four a second, jittered per bot on construction, and
+ * the whole performance story of this module: the code it replaces rolled
+ * `random() < 0.1` sixty times a second per bot. Matches `BLACKBOARD_TTL_MS`,
+ * so one board is built per window for the whole match rather than one per bot.
+ */
+export const THINK_INTERVAL_MS = 250;
 
 /**
  * A resource as a fraction. **No pool reads as full**, not as empty: a champion
@@ -89,7 +111,27 @@ export class BotBrain {
   sees: (observer: AIChampion, target: Champion) => boolean = (observer, target) =>
     canSee(observer as unknown as Seeable, target as unknown as Seeable);
 
-  constructor(readonly owner: AIChampion) {}
+  private lastThinkAtMs: number;
+  private lastCastAtMs = Number.NEGATIVE_INFINITY;
+  /**
+   * The clock, written once per frame at the top of `update`. `findAttackTarget`
+   * reads it too — `AIChampion.update` calls `updateAttackTargeting()` on its own
+   * cooldown, which is not this one, so without a shared field that path would
+   * ask the blackboard for a snapshot at whatever time it last thought.
+   */
+  private nowMs = 0;
+  private pendingCharge?: {
+    spell: Spell;
+    context: CastContext;
+    elapsedMs: number;
+    releaseAtMs: number;
+  };
+
+  constructor(readonly owner: AIChampion) {
+    // Jittered so five bots never think on the same frame. `Math.random` and
+    // not p5's `random`, per the no-globals rule for this directory.
+    this.lastThinkAtMs = -Math.random() * THINK_INTERVAL_MS;
+  }
 
   get profile(): Readonly<DifficultyProfile> {
     return profileFor(this.owner._difficulty);
@@ -146,7 +188,8 @@ export class BotBrain {
     return best;
   }
 
-  private scoreTarget(enemy: Champion, view: TeamView): number {
+  /** Not `private`: `findAttackTarget` ranks the quadtree's candidates with it. */
+  scoreTarget(enemy: Champion, view: TeamView): number {
     const dx = enemy.position.x - this.owner.position.x;
     const dy = enemy.position.y - this.owner.position.y;
     let score = -Math.hypot(dx, dy) / TARGET_DISTANCE_DIVISOR;
@@ -423,6 +466,232 @@ export class BotBrain {
       return { spell, slotIndex, mask, score: SCORE_ZONE };
     }
     return null;
+  }
+
+  /**
+   * Called every frame. Only the charge tick runs every frame; the decision
+   * runs four times a second, which is the whole performance story: the code
+   * this replaces rolled `random() < 0.1` sixty times a second per bot.
+   */
+  update(nowMs: number, deltaMs: number): void {
+    this.nowMs = nowMs;
+    if (this.advanceCharge(deltaMs)) return;
+    if (nowMs - this.lastThinkAtMs < THINK_INTERVAL_MS) return;
+    this.lastThinkAtMs = nowMs;
+    this.think(nowMs);
+  }
+
+  private think(nowMs: number): void {
+    const owner = this.owner;
+    if (owner.isDead) return;
+
+    const view = blackboardFor(owner.game as BlackboardHost, nowMs).viewFor(owner.teamId);
+    const posture = this.evaluatePosture(view, nowMs);
+    const target = this.pickTarget(view);
+
+    if (owner._autoMove) this.drive(posture, view, target, nowMs);
+    if (owner._autoCast) this.maybeCast(posture, view, target, nowMs);
+  }
+
+  private drive(posture: Posture, view: TeamView, target: Champion | null, nowMs: number): void {
+    const owner = this.owner;
+    switch (posture) {
+      case 'RETREAT': {
+        // `refuge`, not `point`: `point` is a p5 global. See CLAUDE.md.
+        const refuge = this.retreatPoint();
+        if (refuge) owner.navigateTo(refuge.x, refuge.y);
+        return;
+      }
+      case 'RECOVER':
+        owner.stopMovement();
+        return;
+      case 'FIGHT':
+        // The attack order owns the walking while it has one; only step in when
+        // there is a target but no order, which is the frame before one is given.
+        if (!owner.basicAttack?.target && target) {
+          owner.navigateTo(target.position.x, target.position.y);
+        }
+        return;
+      case 'SEARCH': {
+        const entry = this.rememberedTarget(view, nowMs);
+        if (!entry) return;
+        const hunch = this.searchPoint(entry, nowMs);
+        owner.navigateTo(hunch.x, hunch.y);
+        return;
+      }
+      case 'ENGAGE':
+        if (view.focusTarget) {
+          owner.navigateTo(view.focusTarget.position.x, view.focusTarget.position.y);
+        }
+        return;
+      default: {
+        // ROAM: hang around the team rather than crossing the map alone.
+        if (owner.position.dist(owner.destination) >= owner.moveSpeed) return;
+        const anchor = view.rally ?? this.retreatPoint();
+        if (!anchor) {
+          owner.moveToRandomLocation();
+          return;
+        }
+        const angle = this.rng() * Math.PI * 2;
+        const radius = this.rng() * ROAM_RADIUS;
+        owner.navigateToWalkable(
+          anchor.x + Math.cos(angle) * radius,
+          anchor.y + Math.sin(angle) * radius
+        );
+      }
+    }
+  }
+
+  private maybeCast(
+    posture: Posture,
+    view: TeamView,
+    target: Champion | null,
+    nowMs: number
+  ): void {
+    if (nowMs - this.lastCastAtMs < this.profile.castIntervalMs) return;
+
+    if (posture === 'SEARCH') {
+      const entry = this.rememberedTarget(view, nowMs);
+      if (!entry) return;
+      // The aim is computed first and handed to both: `chooseGhostSpell` gates
+      // on whether the spell can actually reach that point, so it has to see
+      // the same point the cast will use.
+      const aim = this.searchPoint(entry, nowMs);
+      const ghost = this.chooseGhostSpell(entry, nowMs, aim);
+      if (ghost) this.cast(ghost, aim, nowMs);
+      return;
+    }
+    if (posture !== 'FIGHT' && posture !== 'ENGAGE') return;
+
+    const choice = this.chooseSpell(target, view);
+    if (!choice) return;
+    this.cast(choice, this.aimFor(choice, target), nowMs);
+  }
+
+  /** Where this spell should point. The replacement for the player's cursor. */
+  private aimFor(choice: SpellChoice, target: Champion | null): Vec2 {
+    const owner = this.owner;
+    if (!target) return this.fallbackAim();
+    if (choice.spell.castSpec.targeting === 'UNIT' || choice.spell.castSpec.targeting === 'SELF') {
+      // The resolver picks the body; pointing at it is all this has to do.
+      return { x: target.position.x, y: target.position.y };
+    }
+    const declared = choice.spell.declaredRange;
+    const Ctor = choice.spell.constructor as { aiProjectileSpeed?: number };
+    return predictAim(owner.position, target, {
+      leadFactor: this.profile.leadFactor,
+      aimErrorPx: this.profile.aimErrorPx,
+      projectileSpeed: Ctor.aiProjectileSpeed ?? DEFAULT_PROJECTILE_SPEED,
+      maxRange: declared === undefined ? undefined : effectiveRange(declared, owner, target),
+      rng: this.rng,
+    });
+  }
+
+  /**
+   * Where to point when there is no target — a self-buff, or a spell cast in
+   * ENGAGE before anyone is in reach.
+   *
+   * `Game.facing()`'s rule restated for a bot: body heading, then a fixed
+   * vector, and never the caster's own position. Returning the position itself
+   * gives `TargetResolver` a zero direction, which every consumer multiplies by
+   * a range to get a dot at the caster's feet.
+   */
+  private fallbackAim(): Vec2 {
+    const owner = this.owner;
+    const dx = owner.destination.x - owner.position.x;
+    const dy = owner.destination.y - owner.position.y;
+    const length = Math.hypot(dx, dy);
+    if (length > 0.01) {
+      return {
+        x: owner.position.x + (dx / length) * FALLBACK_AIM_PX,
+        y: owner.position.y + (dy / length) * FALLBACK_AIM_PX,
+      };
+    }
+    return { x: owner.position.x + FALLBACK_AIM_PX, y: owner.position.y };
+  }
+
+  private cast(choice: SpellChoice, aim: Vec2, nowMs: number): void {
+    const context = this.contextFor(choice.spell, aim);
+    if (!context || !choice.spell.press(context)) return;
+    this.lastCastAtMs = nowMs;
+
+    const castSpec = choice.spell.castSpec;
+    if (!isChargeActivation(castSpec.activation)) return;
+    this.pendingCharge = {
+      spell: choice.spell,
+      context,
+      elapsedMs: 0,
+      releaseAtMs: requireChargeSpec(castSpec).maxDurationMs / 2,
+    };
+  }
+
+  private contextFor(spell: Spell, aim: Vec2): CastContext | undefined {
+    const game = this.owner.game;
+    if (typeof game.createSpellContext === 'function') {
+      return game.createSpellContext(spell, this.owner, aim);
+    }
+    const result = TargetResolver.resolve(spell.castSpec.targeting, {
+      spellId: spell.id,
+      activationId: uuidv4(),
+      startedAtMs: Date.now(),
+      caster: this.owner,
+      casterTeamId: this.owner.teamId,
+      origin: this.owner.position,
+      cursorWorld: aim,
+      ...spell.targetingRequest,
+    });
+    return result.ok ? result.context : undefined;
+  }
+
+  /** True while a charged cast owns the frame. Moved here verbatim from `AIChampion`. */
+  private advanceCharge(deltaMs: number): boolean {
+    const pending = this.pendingCharge;
+    if (!pending) return false;
+    pending.elapsedMs += Math.max(0, deltaMs);
+    const context = this.contextFor(pending.spell, pending.context.cursorWorld);
+    if (context) {
+      pending.context = context;
+      pending.spell.hold(context);
+    }
+    if (pending.elapsedMs >= pending.releaseAtMs) {
+      pending.spell.release(pending.context);
+      this.pendingCharge = undefined;
+    }
+    return true;
+  }
+
+  /** The quadtree scan, moved off `AIChampion` so perception has one home. */
+  findAttackTarget(): Champion | null {
+    const owner = this.owner;
+    // optional call for the same reason MissileSpellObject uses one: spell tests
+    // hand in an object manager stub that only knows how to collect added objects
+    const found =
+      owner.game.objectManager.queryObjects?.({
+        area: new Circle({
+          x: owner.position.x,
+          y: owner.position.y,
+          r: this.profile.aggroRange,
+        }),
+        filters: [
+          PredefinedFilters.type(Champion),
+          PredefinedFilters.canTakeDamageFromTeam(owner.teamId),
+          PredefinedFilters.excludeStealthed,
+        ],
+      }) ?? [];
+
+    const view = blackboardFor(owner.game as BlackboardHost, this.nowMs).viewFor(owner.teamId);
+    let best: Champion | null = null;
+    let bestScore = Number.NEGATIVE_INFINITY;
+    for (const candidate of found) {
+      if (!(candidate instanceof Champion)) continue;
+      if (!this.canPerceive(candidate)) continue;
+      const score = this.scoreTarget(candidate, view);
+      if (score > bestScore) {
+        bestScore = score;
+        best = candidate;
+      }
+    }
+    return best;
   }
 }
 
