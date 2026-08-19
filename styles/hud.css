@@ -524,6 +524,21 @@
    side in a frame the panel is too narrow to afford twice. */
 .practice-team {
   margin-bottom: 0.8rem;
+  padding: 0.4rem 0.5rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+/* A faint wash of the side's own colour behind the whole block, so "these rows
+   are Blue / these are Red" reads at a glance rather than only from the dot in
+   the header. Kept very low so the rows sitting on it stay legible. */
+.practice-team--blue {
+  background: rgba(74, 158, 255, 0.07);
+  border-color: rgba(74, 158, 255, 0.18);
+}
+.practice-team--red {
+  background: rgba(224, 86, 79, 0.07);
+  border-color: rgba(224, 86, 79, 0.18);
 }
 
 .practice-team-header {
@@ -698,9 +713,38 @@
   white-space: nowrap;
 }
 
-.practice-roster-chevron {
+/* The champion's Q/W/E/R at a glance, under the name. Small on purpose — a
+   preview of the kit the row opens for editing, not a control (the whole row is
+   the tap target). An empty slot shows its letter instead of a broken icon. */
+.practice-roster-spells {
+  display: flex;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.practice-roster-spell {
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
-  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--hextech-sunken);
+  border: 1px solid var(--hextech-line);
+  border-radius: 3px;
+}
+
+.practice-roster-spell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.practice-roster-spell-empty {
+  color: var(--hextech-muted);
+  font-size: 0.62em;
+  font-weight: bold;
 }
 
 /* `.participant-remove`'s column, to the pixel: 44px wide, ruled off from the
@@ -720,22 +764,22 @@
   background: #3a2222;
 }
 
-.practice-roster-flags {
+/* The bot's three AI-behaviour toggles, now the top of the Luyện tập card (see
+   RosterTab.vue) rather than a strip on the collapsed row. Stacked, and ruled
+   off from the cheats below so "how it plays" reads apart from "practice
+   tools". `.pregame-toggle` supplies the layout and the 44px-tall label that is
+   the real tap target. */
+.practice-cheat-behaviour {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0 1rem;
-  padding: 0 0.8rem 0.5rem;
-  border-top: 1px solid var(--hextech-line);
-  padding-top: 0.5rem;
+  flex-direction: column;
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--hextech-line);
 }
 
-/* `.pregame-toggle` supplies the layout and the type; this only stops the
-   three from stretching across the row and holds them to the 44px thumb
-   minimum the rest of this modal is held to (the label is the tap target —
-   see RosterTab.vue on why `change` alone is not enough here). */
-.practice-flag {
+.practice-cheat-flag {
   margin-bottom: 0;
-  min-height: 44px;
+  min-height: 34px;
 }
 
 /* `.participant-add-btn`'s dashed teal call to action, plus a live count:
@@ -788,26 +832,23 @@
 }
 
 /* ------------------------------------------- Stat sheet (participantStats.ts)
-   The scoreboard strip under each roster row, and the sheet it opens.
-
-   The strip is a button spanning the card rather than a chevron at one end:
-   three digits are a small target, and this modal holds everything else to the
-   44px thumb minimum. It is also the only row here that is *read-only*, so it
-   is deliberately quieter than the loadout button above it — no border of its
-   own, muted legend, the numbers doing the talking. */
+   The K/D/CS score, which doubles as the button that opens the stat + cheat
+   drawer. It rides *in* the row's top strip now (`.practice-roster-main`),
+   right of the name and its Q/W/E/R, so the empty middle of a wide row carries
+   it instead of a full-width strip of its own below — one fewer line on the
+   short landscape panel. A left rule sets it off from the name button; the full
+   labels it used to caption with live in the drawer's Thành tích section. */
 .practice-stat-toggle {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  width: 100%;
-  min-height: 40px;
-  padding: 0.35rem 0.8rem;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0 0.7rem;
   background: none;
   border: none;
-  border-top: 1px solid var(--hextech-line);
+  border-left: 1px solid var(--hextech-line);
   color: inherit;
   font: inherit;
-  text-align: left;
   cursor: pointer;
 }
 
@@ -839,33 +880,39 @@
   color: #666;
 }
 
-.practice-score-legend {
-  flex: 1;
-  min-width: 0;
-  color: var(--hextech-muted);
-  font-size: 0.7em;
-  letter-spacing: 0.5px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .practice-stat-caret {
   flex-shrink: 0;
   color: #999;
   font-size: 0.8em;
 }
 
-/* Two columns at panel width, one on a phone. `auto-fit` rather than a media
-   query so it collapses on the narrow *panel* too, which is what actually
-   varies — the modal is 760px on desktop and near-viewport on a handset. */
+/* The drawer is two zones: the stats on the left and the cheats on the right.
+   `flex-wrap` sits them side by side on a wide (landscape) panel — where the
+   old single grid left the whole right half empty — and stacks them on a narrow
+   one. Each zone declares a flex-basis so the wrap point is the panel's own
+   width, not the viewport's (the modal is 760px on desktop and near-viewport on
+   a handset, and only the container query the flex-basis stands in for tracks
+   that). */
 .practice-stat-sheet {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.2rem 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem 1.2rem;
   padding: 0.5rem 0.8rem 0.7rem;
   border-top: 1px solid var(--hextech-line);
   background: rgba(0, 0, 0, 0.18);
+}
+
+/* The stats zone. Its own auto-fit grid, so within whatever width the flex
+   parent grants it the four groups still reflow — two columns on a wide panel,
+   one on a phone (160px + the gap is just over half of a full-bleed body, so a
+   handset gets a single column). */
+.practice-stat-columns {
+  flex: 1 1 300px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.2rem 1.2rem;
+  align-content: start;
 }
 
 .practice-stat-title {
@@ -887,10 +934,25 @@
 }
 
 .practice-stat-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
   color: var(--hextech-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* The stat's icon: a fixed-width, dimmer-than-the-text anchor so a column of
+   them lines up and reads as a margin rail rather than competing with the
+   label. The word beside it stays the source of truth (participantStats.ts). */
+.practice-stat-icon {
+  flex-shrink: 0;
+  width: 0.95em;
+  text-align: center;
+  color: var(--hextech-gold-dim, #8a7a4a);
+  font-size: 0.92em;
 }
 
 /* Tabular figures so a column of numbers lines up on the decimal point rather
@@ -901,16 +963,18 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The folded-in per-unit cheats, the last section of the drawer. It spans every
-   column of the stat grid rather than sitting in a 160px cell: its buttons and
-   stack rows want the full width, and a caption of stats reads down a column
-   while a strip of controls reads across. A hairline above sets it off from the
-   numbers it follows. */
+/* The folded-in per-unit cheats — the drawer's right zone on a wide panel, its
+   bottom one when stacked. A recessed card rather than a bordered row, so it
+   reads as its own block whichever way it lands next to the stats without a
+   top-rule that only lines up in one of the two layouts. `flex-basis` a touch
+   under the stats' so a wide panel gives the numbers the larger share. */
 .practice-cheat-group {
-  grid-column: 1 / -1;
-  margin-top: 0.2rem;
-  padding-top: 0.4rem;
-  border-top: 1px solid var(--hextech-line);
+  flex: 1 1 220px;
+  align-self: stretch;
+  padding: 0.3rem 0.55rem 0.45rem;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--hextech-line);
+  border-radius: 4px;
 }
 
 .practice-cheat-invuln {
@@ -919,9 +983,31 @@
 }
 
 /* Native range controls still need a generous hit box: the browser track is
-   ~16px tall, while a thumb target should be at least 44px. */
+   ~16px tall, while a thumb target should be at least 44px.
+
+   `touch-action: pan-y` is the load-bearing line on a phone. The body scrolls
+   vertically (`.practice-tab-body` above is `pan-y` too), but `touch-action`
+   does not inherit, so a slider left at the default `auto` eats a vertical drag
+   that began on it as a value change — the finger meant to scroll the tab drags
+   the CDR or zoom instead. `pan-y` hands every vertical-dominant gesture back to
+   the scroller; only a tap or a deliberate horizontal drag reaches the slider,
+   which is exactly "update when you press it, ignore a scroll". */
 .practice-tab-body input[type='range'] {
   height: 44px;
+  touch-action: pan-y;
+}
+
+/* The same rule for the tab's selects, checkboxes and the labels that wrap
+   them: a vertical drag that starts on any of them is a scroll, not an
+   interaction. A checkbox toggles on a tap anywhere on its `.pregame-toggle`
+   label, so the label needs the rule too, or a drag beginning on the text still
+   flips the box. Checkboxes get their size below; all of these opt out of eating
+   the scroll here. */
+.practice-tab-body select,
+.practice-tab-body input[type='checkbox'],
+.practice-tab-body .pregame-toggle,
+.practice-tab-body .pregame-field {
+  touch-action: pan-y;
 }
 
 /* "Takes effect when you close the panel" (RulesTab.vue). An aside under the

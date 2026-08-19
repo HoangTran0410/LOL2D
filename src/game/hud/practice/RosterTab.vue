@@ -103,6 +103,24 @@ const roster = computed<RosterEntry[]>(() => {
 /** "Bạn", then Bot 1..n in spawn order — the position in the full roster, not a unit id. */
 const labelOf = (index: number): string => (index === 0 ? 'Bạn' : `Bot ${index}`);
 
+/**
+ * The four ability icons for a unit's row, Q/W/E/R. `spells` is indexed by
+ * `SpellHotKeys` — `[A, Q, W, E, R, D, F]` — so the abilities are slots 1‑4; a
+ * basic-attack-only or half-built kit leaves a slot empty, which shows the
+ * letter rather than a broken image. Decorative only: the whole row already
+ * opens the loadout editor, and a nested button inside that button is not valid
+ * markup.
+ */
+const ABILITY_SLOTS = [1, 2, 3, 4];
+const ABILITY_LETTERS = ['Q', 'W', 'E', 'R'];
+const abilityIconsOf = (
+  unit: Champion
+): { key: string; letter: string; url: string | null }[] =>
+  ABILITY_SLOTS.map((slot, i) => {
+    const image = unit.spells?.[slot]?.image as { url?: string } | null | undefined;
+    return { key: `${unit.id}-${slot}`, letter: ABILITY_LETTERS[i], url: image?.url ?? null };
+  });
+
 interface RosterRow {
   entry: RosterEntry;
   /** Index in the full roster, so the label stays stable when grouped by side. */
@@ -392,8 +410,44 @@ const applyLoadout = async (loadout: ChampionLoadout): Promise<void> => {
             <span class="practice-roster-text">
               <span class="practice-roster-label">{{ row.label }}</span>
               <span class="practice-roster-name">{{ row.entry.unit.name || 'Không tên' }}</span>
+              <span class="practice-roster-spells" aria-hidden="true">
+                <span
+                  v-for="ability of abilityIconsOf(row.entry.unit)"
+                  :key="ability.key"
+                  class="practice-roster-spell"
+                  :title="ability.letter"
+                >
+                  <img v-if="ability.url" :src="ability.url" alt="" />
+                  <span v-else class="practice-roster-spell-empty">{{ ability.letter }}</span>
+                </span>
+              </span>
             </span>
-            <i class="fas fa-chevron-right practice-roster-chevron" aria-hidden="true"></i>
+          </button>
+
+          <!-- KDA doubles as the drawer toggle, inline in the row rather than a
+               strip of its own below: it carries the row's empty middle, and the
+               short landscape panel keeps a row of height. Its full labels live
+               in the drawer's Thành tích section. -->
+          <button
+            type="button"
+            class="practice-stat-toggle"
+            :id="`practice-row-toggle-${row.index}`"
+            :aria-expanded="isExpanded(row.entry)"
+            :aria-label="`Chỉ số và luyện tập của ${row.label}`"
+            @click="toggleExpanded(row.entry)"
+          >
+            <span class="practice-score">
+              <span class="practice-score-k">{{ scoreLine(row.entry.unit).kills }}</span>
+              <span class="practice-score-sep">/</span>
+              <span class="practice-score-d">{{ scoreLine(row.entry.unit).deaths }}</span>
+              <span class="practice-score-sep">/</span>
+              <span class="practice-score-cs">{{ scoreLine(row.entry.unit).cs }}</span>
+            </span>
+            <i
+              class="fas practice-stat-caret"
+              :class="isExpanded(row.entry) ? 'fa-chevron-up' : 'fa-chevron-down'"
+              aria-hidden="true"
+            ></i>
           </button>
 
           <button
@@ -418,48 +472,49 @@ const applyLoadout = async (loadout: ChampionLoadout): Promise<void> => {
           </button>
         </div>
 
-        <!-- The scoreboard line, always on the card, and the way into the rest.
-             Three numbers is what fits beside a caret; stats and the practice
-             cheats are one tap away rather than eleven rows taller. -->
-        <button
-          type="button"
-          class="practice-stat-toggle"
-          :id="`practice-row-toggle-${row.index}`"
-          :aria-expanded="isExpanded(row.entry)"
-          :aria-label="`Chỉ số và luyện tập của ${row.label}`"
-          @click="toggleExpanded(row.entry)"
-        >
-          <span class="practice-score">
-            <span class="practice-score-k">{{ scoreLine(row.entry.unit).kills }}</span>
-            <span class="practice-score-sep">/</span>
-            <span class="practice-score-d">{{ scoreLine(row.entry.unit).deaths }}</span>
-            <span class="practice-score-sep">/</span>
-            <span class="practice-score-cs">{{ scoreLine(row.entry.unit).cs }}</span>
-          </span>
-          <span class="practice-score-legend">hạ gục / bị hạ / lính</span>
-          <i
-            class="fas practice-stat-caret"
-            :class="isExpanded(row.entry) ? 'fa-chevron-up' : 'fa-chevron-down'"
-            aria-hidden="true"
-          ></i>
-        </button>
-
+        <!-- Stats on the left, the folded-in cheats on the right: on a wide
+             (landscape) panel the two zones sit side by side and fill the row
+             rather than leaving the right half empty; on a narrow one they
+             stack. -->
         <div v-if="isExpanded(row.entry)" class="practice-stat-sheet">
-          <section
-            v-for="group of statGroups(row.entry.unit)"
-            :key="group.title"
-            class="practice-stat-group"
-          >
-            <h4 class="practice-stat-title">{{ group.title }}</h4>
-            <div v-for="stat of group.rows" :key="stat.label" class="practice-stat-row">
-              <span class="practice-stat-label">{{ stat.label }}</span>
-              <span class="practice-stat-value">{{ stat.value }}</span>
-            </div>
-          </section>
+          <div class="practice-stat-columns">
+            <section
+              v-for="group of statGroups(row.entry.unit)"
+              :key="group.title"
+              class="practice-stat-group"
+            >
+              <h4 class="practice-stat-title">{{ group.title }}</h4>
+              <div v-for="stat of group.rows" :key="stat.label" class="practice-stat-row">
+                <span class="practice-stat-label">
+                  <i class="fas practice-stat-icon" :class="stat.icon" aria-hidden="true"></i>
+                  {{ stat.label }}
+                </span>
+                <span class="practice-stat-value">{{ stat.value }}</span>
+              </div>
+            </section>
+          </div>
 
           <!-- The folded-in cheats: session state on this one unit. -->
-          <section class="practice-stat-group practice-cheat-group">
+          <section class="practice-cheat-group">
             <h4 class="practice-stat-title">Luyện tập</h4>
+
+            <!-- Bots only: how the AI plays this champion. Folded in here from
+                 the row so every per-bot setting sits in one place — the player
+                 drives its own movement, attacks and casts and has none. -->
+            <div v-if="row.entry.behaviour" class="practice-cheat-behaviour">
+              <label
+                v-for="flag of BEHAVIOUR_FLAGS"
+                :key="flag.key"
+                class="pregame-toggle practice-cheat-flag"
+              >
+                <input
+                  type="checkbox"
+                  :checked="row.entry.behaviour[flag.key]"
+                  @change="onFlagChange(row.entry, flag.key, $event)"
+                />
+                <span>{{ flag.label }}</span>
+              </label>
+            </div>
 
             <label class="pregame-toggle practice-cheat-invuln">
               <input
@@ -516,23 +571,6 @@ const applyLoadout = async (loadout: ChampionLoadout): Promise<void> => {
               </span>
             </div>
           </section>
-        </div>
-
-        <!-- Bots only: the player's own movement, attacks and casts are the
-             player's. -->
-        <div v-if="row.entry.behaviour" class="practice-roster-flags">
-          <label
-            v-for="flag of BEHAVIOUR_FLAGS"
-            :key="flag.key"
-            class="pregame-toggle practice-flag"
-          >
-            <input
-              type="checkbox"
-              :checked="row.entry.behaviour[flag.key]"
-              @change="onFlagChange(row.entry, flag.key, $event)"
-            />
-            <span>{{ flag.label }}</span>
-          </label>
         </div>
       </div>
     </section>

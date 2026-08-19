@@ -381,8 +381,11 @@ try {
 
   // ------------------------------------------------- 4. behaviour flags
 
+  // The AI-behaviour toggles fold into the bot's Luyện tập card now, so open its
+  // drawer first (row index 1 — the player is 0, this is the one bot).
+  await tapSelector('#practice-row-toggle-1');
   const flagsBefore = await botSnapshot(botId);
-  const FLAGS = `${ROW} .practice-roster-flags .practice-flag`;
+  const FLAGS = '.practice-cheat-behaviour .practice-cheat-flag';
   await tapSelector(`${FLAGS}:nth-child(1)`); // "Tự di chuyển", real thumb
   const afterTouchFlag = await botSnapshot(botId);
   await page.click(`${FLAGS}:nth-child(2) input`); // "Tự tấn công", mouse

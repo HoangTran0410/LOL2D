@@ -210,22 +210,25 @@ check(
   (await page.locator('.practice-stat-sheet').count()) === 0
 );
 
-// ── Narrow viewport: the sheet has to collapse to one column, not overflow ───
+// ── Narrow viewport: the stats collapse to one column, cheats stack, no overflow
 await page.setViewportSize({ width: 390, height: 844 });
 await page.waitForTimeout(300);
 await tapSelector('.practice-stat-toggle');
 const narrow = await page.evaluate(() => {
   const body = document.querySelector('.practice-tab-body');
   const sheetNode = document.querySelector('.practice-stat-sheet');
+  // The stat grid lives in `.practice-stat-columns` now — the sheet itself is a
+  // flex wrapper that stacks the stats zone and the cheats zone on a phone.
+  const gridNode = document.querySelector('.practice-stat-columns');
   return {
     open: !!sheetNode,
     bodyOverflows: body ? body.scrollWidth > body.clientWidth + 1 : true,
-    columns: sheetNode ? getComputedStyle(sheetNode).gridTemplateColumns.split(' ').length : 0,
+    columns: gridNode ? getComputedStyle(gridNode).gridTemplateColumns.split(' ').length : 0,
   };
 });
 await page.screenshot({ path: `${OUT}/2-stat-sheet-390px.png` });
 check(
-  'at 390px the sheet is one column and the panel still does not scroll sideways',
+  'at 390px the stats are one column and the panel still does not scroll sideways',
   narrow.open && narrow.columns === 1 && !narrow.bodyOverflows,
   `columns=${narrow.columns} bodyOverflows=${narrow.bodyOverflows}`
 );
