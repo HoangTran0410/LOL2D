@@ -35,27 +35,60 @@ export const MIN_FRAME_MS = 1000 / 240;
 export const MAX_FRAME_MS = 250;
 
 /**
- * A rolling average over per-frame deltas. Allocation-free per sample — one
- * numeric field, updated in place — so leaving it running costs nothing
- * worth measuring even every frame.
+ * How long the printed number is held before it is allowed to change.
+ *
+ * Smoothing alone does not make a readout readable. The EMA still moves every
+ * frame, so the text flickered through 56 57 56 55 at sixty changes a second —
+ * fast enough that reading it is guesswork and the flicker itself is more
+ * distracting than the number is useful. Half a second is slow enough to read a
+ * digit and fast enough to still show a drop as it happens.
+ */
+export const FPS_DISPLAY_INTERVAL_MS = 500;
+
+/**
+ * A rolling average over per-frame deltas, plus the worst single frame behind
+ * it. Allocation-free per sample — four numeric fields, updated in place — so
+ * leaving it running costs nothing worth measuring even every frame.
+ *
+ * The worst frame is there because an average is exactly the statistic that
+ * hides the problem people actually feel. A window that alternates 8ms and
+ * 25ms frames averages to a healthy-looking 60, and plays as a stutter; the
+ * number that tells them apart is the slowest frame in the window.
  */
 export class FpsMeter {
   private smoothed: number | null = null;
+  private windowMs = 0;
+  private windowWorstMs = 0;
+
+  /** The smoothed rate as last published — what to print. */
+  displayFps = 0;
+  /** The slowest single frame of the last window, as a rate. */
+  displayLow = 0;
 
   /**
    * Feed one frame's delta (`deltaTime`, in ms) in, get the current smoothed
    * fps back. The very first sample seeds the average directly rather than
    * blending from a starting value of 0 — otherwise the readout would spend
    * its first several frames climbing from near-zero instead of showing a
-   * true number immediately.
+   * true number immediately — and publishes at once, so the first frame after
+   * the toggle is turned on shows a real figure rather than a zero.
    */
   sample(deltaMs: number): number {
     const clamped = Math.min(MAX_FRAME_MS, Math.max(MIN_FRAME_MS, deltaMs));
     const instant = 1000 / clamped;
-    this.smoothed =
-      this.smoothed === null
-        ? instant
-        : this.smoothed + (instant - this.smoothed) * FPS_SMOOTHING_ALPHA;
+    const seeding = this.smoothed === null;
+    this.smoothed = seeding
+      ? instant
+      : this.smoothed! + (instant - this.smoothed!) * FPS_SMOOTHING_ALPHA;
+
+    if (clamped > this.windowWorstMs) this.windowWorstMs = clamped;
+    this.windowMs += clamped;
+    if (seeding || this.windowMs >= FPS_DISPLAY_INTERVAL_MS) {
+      this.displayFps = this.smoothed;
+      this.displayLow = 1000 / this.windowWorstMs;
+      this.windowMs = 0;
+      this.windowWorstMs = 0;
+    }
     return this.smoothed;
   }
 }
@@ -78,13 +111,19 @@ const TEXT_SIZE = 14;
  */
 export function drawFpsOverlay(host: FpsOverlayHost, meter: FpsMeter): void {
   if (!host.director.debug.fps) return;
-  const fps = meter.sample(deltaTime);
+  meter.sample(deltaTime);
 
   push();
   noStroke();
   fill(255, 255, 255, 220);
   textAlign(RIGHT, TOP);
   textSize(TEXT_SIZE);
-  text(`${Math.round(fps)} FPS`, width - MARGIN, TOP_OFFSET);
+  // `min` is the window's slowest frame, not a running minimum: a running one
+  // would latch onto the first hitch of the match and never move again.
+  text(
+    `${Math.round(meter.displayFps)} FPS · min ${Math.round(meter.displayLow)}`,
+    width - MARGIN,
+    TOP_OFFSET
+  );
   pop();
 }
