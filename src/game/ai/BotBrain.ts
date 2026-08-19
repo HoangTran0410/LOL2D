@@ -627,7 +627,13 @@ export class BotBrain {
     const order = this.owner.basicAttack?.target;
     if (order?.killCredit === 'champion' && !this.guardedByTurret(view, order)) return 'FIGHT';
     if (target && !this.guardedByTurret(view, target)) return 'FIGHT';
-    if (this.rememberedTarget(view, nowMs)) return 'SEARCH';
+    // Gated the same way and for the same reason: a sighting under a turret
+    // this bot may not dive is not somewhere to go. Without it the fall-through
+    // from FIGHT lands here instead of on the wave, and the bot stands on the
+    // keep-out line staring at the memory — which the seeded probe measured as
+    // 189 of 240 samples in SEARCH, going nowhere.
+    const memory = this.rememberedTarget(view, nowMs);
+    if (memory && !this.guardedByTurret(view, memory.unit)) return 'SEARCH';
     if (this.assistableFocus(view)) return 'ENGAGE';
     // Below every way of answering "is there a champion to deal with" and above
     // wandering: decision 2 of the lane layer. A bot only farms when there is
@@ -758,6 +764,23 @@ export class BotBrain {
       this.bodyRadius,
       TURRET_KEEP_OUT_PX
     );
+  }
+
+  /**
+   * Whether this bot may take a fight with `unit` at all.
+   *
+   * The public form of `guardedByTurret`, for the acquisition paths that do not
+   * already hold a `TeamView`. There are three of them and only two used to ask:
+   * `findAttackTarget` (the scan) and `decidePosture` (the posture). The third
+   * is `AIChampion.takeDamage`, which hits back at whoever hit it — so a
+   * champion standing under their own turret could simply poke a bot and have
+   * it hand itself an attack order that `BasicAttackController` then walked
+   * into the guns, every frame, with the scan and the posture both refusing the
+   * same target on the same tick. Found by the seeded probe in
+   * `drive-bot-discipline.mjs`, which no unit test had a shape for.
+   */
+  mayFight(unit: AttackableUnit): boolean {
+    return !this.guardedByTurret(this.currentView(), unit);
   }
 
   /**

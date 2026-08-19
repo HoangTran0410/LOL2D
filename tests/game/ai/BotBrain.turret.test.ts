@@ -8,11 +8,11 @@ import Turret from '../../../src/game/gameObject/structures/Turret';
 import {
   BotBrain,
   DIVE_LETHAL_HEALTH,
-  type Posture,
   PUSH_TURRET_ESCORT_PX,
   TURRET_HOSTILE_MS,
   TURRET_KEEP_OUT_PX,
 } from '../../../src/game/ai/BotBrain';
+import { driveTicks } from './botTrajectory';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
 import type { LaneState } from '../../../src/game/ai/LaneObjectives';
 import { getLaneWaypoints, Lane } from '../../../src/game/lanes';
@@ -306,50 +306,6 @@ describe('a bot held out of an enemy turret’s reach', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   /**
-   * The movement a think tick orders, walked out.
-   *
-   * Every other test in this file calls `drive` once and reads `destination`,
-   * which cannot see a rule that is stable for one tick and unstable across
-   * two — and that is the exact shape of the bug below. `BotBrain` decides four
-   * times a second and `AttackableUnit.update` walks the body in between, so
-   * the loop has to exist for the oscillation to.
-   *
-   * Written out here rather than driven through the real movement system: what
-   * is under test is where the brain *aims*, and a body that walks straight at
-   * its destination is the least generous reading of that.
-   */
-  const walk = (bot: Champion, distance: number) => {
-    const dx = bot.destination.x - bot.position.x;
-    const dy = bot.destination.y - bot.position.y;
-    const away = Math.hypot(dx, dy);
-    if (away <= distance) {
-      bot.position.set(bot.destination.x, bot.destination.y);
-      return;
-    }
-    bot.position.set(
-      bot.position.x + (dx / away) * distance,
-      bot.position.y + (dy / away) * distance
-    );
-  };
-
-  /** `ticks` decisions and the walk each one orders, as a posture/distance log. */
-  const run = (brain: BotBrain, bot: Champion, board: TeamView, ticks: number) => {
-    const postures: Posture[] = [];
-    const away: number[] = [];
-    for (let tick = 0; tick < ticks; tick += 1) {
-      const nowMs = tick * 250;
-      const target = brain.pickTarget(board);
-      const posture = brain.evaluatePosture(board, nowMs, target);
-      brain.drive(posture, board, target, nowMs);
-      // 250ms of walking at the default speed, which is 15 frames of it.
-      walk(bot, bot.moveSpeed * 15);
-      postures.push(posture);
-      away.push(Math.hypot(bot.position.x - TOWER.x, bot.position.y - TOWER.y));
-    }
-    return { postures, away };
-  };
-
-  /**
    * A hurt enemy holding the outer edge of its own turret's ring, which is
    * where a player actually stands: deep enough to be covered, near enough that
    * a bot stopped at the keep-out line still has it inside `aggroRange`. The
@@ -391,18 +347,21 @@ describe('a bot held out of an enemy turret’s reach', () => {
     // and the enemy bot pacing the edge of its range, in and out, forever —
     // two rules fighting, and legible from across the screen as a machine.
     const { bot, tower, board } = standoff();
-    const { away } = run(new BotBrain(bot), bot, board, 40);
+    const walk = driveTicks(new BotBrain(bot), bot, board, 40);
 
-    expect(Math.min(...away)).toBeGreaterThanOrEqual(guns(tower, bot));
+    expect(walk.nearestApproachTo(TOWER)).toBeGreaterThanOrEqual(guns(tower, bot));
+    // Pacing is crossings, not a single dip: the bug crossed the gun line every
+    // other tick for as long as the loop ran.
+    expect(walk.crossingsOf(TOWER, guns(tower, bot))).toBe(0);
   });
 
   it('is never rescued twice by the same disengage', () => {
     // DISENGAGE firing repeatedly is the tell: it only exists to get a bot out
     // of a place nothing should have walked it into.
     const { bot, board } = standoff();
-    const { postures } = run(new BotBrain(bot), bot, board, 40);
+    const walk = driveTicks(new BotBrain(bot), bot, board, 40);
 
-    expect(postures.filter(posture => posture === 'DISENGAGE')).toHaveLength(0);
+    expect(walk.countOf('DISENGAGE')).toBe(0);
   });
 
   it('goes back to its wave rather than standing on the line', () => {
@@ -410,10 +369,73 @@ describe('a bot held out of an enemy turret’s reach', () => {
     // a fight this bot may not walk to is not a fight, so the posture chain
     // falls through to the wave — which is also what eventually earns the dive.
     const { bot, board } = standoff();
-    const { postures, away } = run(new BotBrain(bot), bot, board, 40);
+    const walk = driveTicks(new BotBrain(bot), bot, board, 40);
+    const away = walk.distancesFrom(TOWER);
 
-    expect(postures).toContain('PUSH');
+    expect(walk.postures).toContain('PUSH');
     expect(away[away.length - 1]).toBeGreaterThan(away[0]);
+    // And it settles there rather than drifting back and forth over the line.
+    expect(walk.from(10).reversalsAround(TOWER)).toBe(0);
+  });
+
+  it('holds the ring on a push instead of stepping over it every other tick', () => {
+    // No champion anywhere: this is the clamp on its own, and it is the half of
+    // the pacing bug the posture gate cannot cover for. `pushTarget` answers
+    // with the turret's own coordinates once the lane holds no friendly wave,
+    // `safely()` pulls that back to the keep-out ring — and then the clamp used
+    // to go quiet, because it treated a body standing on the ring as one
+    // already inside it. The bot stepped in, DISENGAGE stepped it out, forever.
+    const game = createGame();
+    const bot = spawnBot(game, TOWER.x, TOWER.y + 900);
+    const tower = spawnTurret(game, RED, TOWER.x, TOWER.y);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, tower]);
+
+    const pushing = view({
+      enemyTurrets: [tower],
+      lanes: new Map([[Lane.MID, laneState({ nextEnemyTurret: tower })]]),
+      laneAssignments: new Map([[bot, Lane.MID]]),
+    });
+    const walk = driveTicks(new BotBrain(bot), bot, pushing, 40);
+
+    expect(walk.nearestApproachTo(TOWER)).toBeGreaterThanOrEqual(guns(tower, bot));
+    expect(walk.countOf('DISENGAGE')).toBe(0);
+    // It does arrive — a clamp that simply never lets the bot near the building
+    // would pass the two checks above and be a different bug.
+    expect(walk.nearestApproachTo(TOWER)).toBeLessThan(
+      keepOutRing(tower, bot) + bot.moveSpeed * 15
+    );
+  });
+
+  it('does not enlist in a fight it may not walk to just because it was poked', () => {
+    // The third acquisition path, and the one with no gate until the seeded
+    // probe in `drive-bot-discipline.mjs` found it. `AIChampion.takeDamage`
+    // hits back at whoever hit it, so a champion under their own turret could
+    // hand a bot an attack order it was never allowed to have — and the attack
+    // controller, which has never heard of a building, walks it in from there.
+    const game = createGame();
+    const bot = spawnBot(game, TOWER.x, TOWER.y + 700);
+    const tower = spawnTurret(game, RED, TOWER.x, TOWER.y);
+    const enemy = spawnEnemy(game, TOWER.x, TOWER.y + 300);
+    game.setPlayer(enemy);
+    indexObjects(game, [bot, tower, enemy]);
+
+    bot.takeDamage(5, enemy);
+
+    expect(bot.basicAttack.target).toBeNull();
+  });
+
+  it('still hits back at an enemy standing in the open', () => {
+    // The gate must not turn into a bot that never defends itself.
+    const game = createGame();
+    const bot = spawnBot(game, TOWER.x, TOWER.y + 700);
+    const enemy = spawnEnemy(game, TOWER.x, TOWER.y + 800);
+    game.setPlayer(enemy);
+    indexObjects(game, [bot, enemy]);
+
+    bot.takeDamage(5, enemy);
+
+    expect(bot.basicAttack.target).toBe(enemy);
   });
 
   it('does not walk straight back in the moment the turret retargets', () => {

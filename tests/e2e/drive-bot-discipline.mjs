@@ -3,13 +3,21 @@
  *
  * Three things Vitest can see the *rules* of but not the emergent loop:
  *
- *  1. **A bot dropped into an enemy turret's reach gets out.** The unit suites
- *     check `decidePosture` answers DISENGAGE and that `drive` picks a point
- *     outside the ring. They cannot see the four systems that fight over the
+ *  1. **A bot dropped into an enemy turret's reach gets out** — and **a bot
+ *     seeded on the line outside one stays out.** The unit suites check
+ *     `decidePosture` answers DISENGAGE and that `drive` picks a point outside
+ *     the ring. They cannot see the four systems that fight over the
  *     destination every frame afterwards — `BasicAttackController` re-issuing
  *     `navigateTo(target)`, `AIChampion.updateAttackTargeting` handing the
  *     order back on its own 250ms clock, `PathAgent` re-planning, the turret
- *     shooting. This is the scripted probe, and it is the strong check.
+ *     shooting. These are the scripted probes, and they are the strong checks.
+ *
+ *     Two seedings, because bugs live on boundaries and the first probe drops
+ *     the bot 150px past one. A bot parked *on* the keep-out ring with someone
+ *     worth hitting just inside it is the harder case, and the one that
+ *     shipped: the clamp treated a body standing on the ring as one already
+ *     inside it, went quiet, and the bot walked into the guns, was pushed back
+ *     out by DISENGAGE, and did it again four times a second.
  *  2. **A bot never fires an ability at nobody.** Reported from a real match:
  *     an ultimate pressed every cast interval while walking an empty lane.
  *     `BotBrain.cast` is wrapped, so every press is counted with the target it
@@ -30,6 +38,45 @@ import { startHarness } from './harness.mjs';
 const OBSERVE_MS = Number(process.env.LOL2D_OBSERVE_MS ?? 60_000);
 /** How long a bot planted under a turret is given to walk back out. */
 const ESCAPE_MS = 6_000;
+/** How long a bot seeded on the keep-out ring is watched for pacing. */
+const PACE_MS = 12_000;
+/**
+ * How often the seeded pair is put back where it started, in ms.
+ *
+ * One seeding is not a trial, it is an anecdote. A live match moves underneath
+ * the probe — a wave arrives and the dive becomes legal, the bot's lane calls
+ * it away, something hurts it and RETREAT owns the walk — so a single 8s watch
+ * measured whichever of those happened to come first, and the broken code and
+ * the fixed code scored 2 and 1. Re-seeding turns it into repeated trials of
+ * the same question: put the bot on the line with someone worth hitting just
+ * inside it, and see which way it goes.
+ */
+const RESEED_MS = 2_000;
+/**
+ * Clearance a bot keeps outside an enemy turret's reach — `TURRET_KEEP_OUT_PX`.
+ *
+ * Written out rather than imported: this half runs inside the page, against the
+ * built bundle, where the module is not reachable by name. If the constant
+ * moves, the seeding here stops sitting on the line and the probe quietly
+ * becomes the one above.
+ */
+const KEEP_OUT_PX = 60;
+/**
+ * How many times a seeded bot may walk **into** the guns before it is pacing.
+ *
+ * Entries, not crossings: one excursion is two crossings, and a bot that dives
+ * once behind its own wave and leaves is playing correctly, not pacing. Not
+ * zero either — bodies separate and minions shove.
+ *
+ * Measured, not guessed. Over thirteen re-seeded trials the broken code scored
+ * 3 entries and spent 16.67% of its samples inside the guns (198 of 240 samples
+ * in SEARCH, 29 in DISENGAGE — the bot standing on the line and being rescued
+ * off it); the fixed code scored 0 and 0%, with 229 of 241 samples in PUSH. The
+ * share is the wider of the two margins, so both are checked.
+ */
+const MAX_GUN_LINE_ENTRIES = 2;
+/** And the share of the watch it may spend in there. See above for the numbers. */
+const MAX_SEEDED_INSIDE_PCT = 8;
 /**
  * The longest a single bot may stay inside an enemy turret's reach, unbroken.
  *
@@ -81,6 +128,40 @@ try {
       return out;
     };
     window.__bots = bots;
+
+    // The enemy turret nearest the middle of the map — the outer one, which is
+    // the only turret a bot ever actually reaches, and the only one whose
+    // surroundings are open lane rather than base.
+    //
+    // Neither "the first in the array" (whichever row the map file lists first,
+    // i.e. the far corner of the enemy base) nor "nearest the bot" works: bots
+    // start on their own fountain, so both plant it somewhere no bot reaches by
+    // playing and whose escape ray points into the back wall of a base.
+    window.__outerEnemyTurret = of => {
+      const middle = { x: game.mapSize / 2, y: game.mapSize / 2 };
+      let turret = null;
+      let nearest = Infinity;
+      for (const candidate of game.turrets) {
+        if (candidate.teamId === of.teamId || candidate.isDead) continue;
+        const away = Math.hypot(candidate.position.x - middle.x, candidate.position.y - middle.y);
+        if (away < nearest) {
+          nearest = away;
+          turret = candidate;
+        }
+      }
+      return turret;
+    };
+
+    /** The unit vector from `turret` toward `of`'s own base — the side it arrives from. */
+    window.__homewardOf = (turret, of) => {
+      const home = game.fountains.find(f => f.teamId === of.teamId) ?? {
+        position: { x: game.mapSize / 2, y: game.mapSize / 2 },
+      };
+      const dx = home.position.x - turret.position.x;
+      const dy = home.position.y - turret.position.y;
+      const span = Math.hypot(dx, dy) || 1;
+      return { x: dx / span, y: dy / span };
+    };
 
     // Every ability a bot presses, with the target it was aimed at. `private`
     // in TypeScript is a compile-time word only, so the method is right here.
@@ -198,40 +279,19 @@ try {
     const game = window.__lol2d.scene.oScene.game;
     const bot = window.__bots().find(b => !b.isDead);
     if (!bot) return null;
-    // The enemy turret nearest the middle of the map — the outer one, which is
-    // the only turret a bot ever actually reaches, and the only one whose
-    // surroundings are open lane rather than base.
-    //
-    // Neither "the first in the array" (whichever row the map file lists first,
-    // i.e. the far corner of the enemy base) nor "nearest the bot" works: bots
-    // start on their own fountain, so both plant it somewhere no bot reaches by
-    // playing and whose escape ray points into the back wall of a base.
-    const middle = { x: game.mapSize / 2, y: game.mapSize / 2 };
-    let turret = null;
-    let nearest = Infinity;
-    for (const candidate of game.turrets) {
-      if (candidate.teamId === bot.teamId || candidate.isDead) continue;
-      const away = Math.hypot(candidate.position.x - middle.x, candidate.position.y - middle.y);
-      if (away < nearest) {
-        nearest = away;
-        turret = candidate;
-      }
-    }
+    const turret = window.__outerEnemyTurret(bot);
     if (!turret) return null;
 
     // Full health, so the retreat rules are not what answers — this has to be
-    // the turret rule and nothing else. Drop it 150px inside the reach.
+    // the turret rule and nothing else. Drop it 150px inside the reach, on the
+    // side facing its own base, which is the side a bot arrives from and the
+    // side the way out runs back down.
     bot.stats.health.baseValue = bot.stats.maxHealth.value;
     const reach = turret.attackRange + bot.stats.size.value / 2;
-    // On the side facing its own base, which is the side a bot arrives from and
-    // the side the way out runs back down.
-    const home = game.fountains.find(f => f.teamId === bot.teamId) ?? { position: middle };
-    const dx = home.position.x - turret.position.x;
-    const dy = home.position.y - turret.position.y;
-    const span = Math.hypot(dx, dy) || 1;
+    const homeward = window.__homewardOf(turret, bot);
     bot.teleportTo(
-      turret.position.x + (dx / span) * (reach - 150),
-      turret.position.y + (dy / span) * (reach - 150)
+      turret.position.x + homeward.x * (reach - 150),
+      turret.position.y + homeward.y * (reach - 150)
     );
     return {
       bot: bot.id,
@@ -291,6 +351,153 @@ try {
       escaped
         ? `clearance ${Math.round(escaped.clearance)}px, died=${escaped.dead}`
         : 'bot vanished'
+    );
+  }
+
+  // ------------------------- 1b. a bot seeded on the ring stays on the right side
+  const seeded = await page.evaluate(
+    ({ keepOut, avoid, reseedMs }) => {
+      const game = window.__lol2d.scene.oScene.game;
+      const bots = window.__bots().filter(b => !b.isDead);
+      // Not the one probe 1 planted, if there is another: that bot is still
+      // walking its way out of a ring and its trace would be that escape.
+      const bot = bots.find(b => b.id !== avoid && b.teamId) ?? bots[0];
+      if (!bot) return null;
+      const turret = window.__outerEnemyTurret(bot);
+      if (!turret) return null;
+      // Someone worth walking at, of the turret's own team. Parked rather than
+      // played: the reported bug is a *stationary* low-health player holding
+      // the ground under their turret, and a victim that wanders off turns the
+      // probe into a measurement of the victim.
+      const victim = bots.find(b => b.teamId === turret.teamId && b.id !== bot.id);
+      if (!victim) return null;
+
+      const reach = turret.attackRange + bot.stats.size.value / 2;
+      const homeward = window.__homewardOf(turret, bot);
+      const wasAuto = { move: victim._autoMove, cast: victim._autoCast };
+      victim._autoMove = false;
+      victim._autoCast = false;
+
+      /**
+       * One trial: the victim parked 60px inside the guns, the bot exactly on
+       * the keep-out line — the point `escapePoint` and the clamp both answer
+       * with, which is what made it the one place neither of them worked.
+       *
+       * Both at full health every time. A dive on a killable target is allowed
+       * and would be the right answer, so it must not be what this is watching;
+       * and a bot the match has hurt answers with RETREAT, which owns the walk
+       * and is not the rule under test either.
+       */
+      const seed = () => {
+        victim.stats.health.baseValue = victim.stats.maxHealth.value;
+        victim.stopMovement?.();
+        victim.teleportTo(
+          turret.position.x + homeward.x * (reach - 60),
+          turret.position.y + homeward.y * (reach - 60)
+        );
+        bot.stats.health.baseValue = bot.stats.maxHealth.value;
+        bot.teleportTo(
+          turret.position.x + homeward.x * (reach + keepOut),
+          turret.position.y + homeward.y * (reach + keepOut)
+        );
+      };
+      seed();
+
+      const pace = {
+        samples: 0,
+        trials: 1,
+        entries: 0,
+        insideSamples: 0,
+        minClearance: Infinity,
+        maxClearance: -Infinity,
+        postures: {},
+        died: false,
+      };
+      window.__pace = pace;
+
+      // Its own sampler rather than a branch inside the 10Hz one: that loop
+      // measures the whole match and this one measures one seeded body, and
+      // folding them together would mean the match half growing a mode for it.
+      // Every trial starts outside by construction, so the first sample of one
+      // can never be an entry.
+      let wasInside = false;
+      let frame = 0;
+      const samplesPerTrial = Math.round(reseedMs / 100);
+      const watch = () => {
+        requestAnimationFrame(watch);
+        if (game.paused || frame++ % 6 !== 0) return;
+        if (bot.isDead) {
+          pace.died = true;
+          return;
+        }
+        pace.samples += 1;
+        if (pace.samples % samplesPerTrial === 0) {
+          seed();
+          pace.trials += 1;
+          wasInside = false;
+          return;
+        }
+        pace.postures[bot.brain.posture] = (pace.postures[bot.brain.posture] ?? 0) + 1;
+        const clearance =
+          Math.hypot(turret.position.x - bot.position.x, turret.position.y - bot.position.y) -
+          reach;
+        pace.minClearance = Math.min(pace.minClearance, clearance);
+        pace.maxClearance = Math.max(pace.maxClearance, clearance);
+        const inside = clearance < 0;
+        if (inside) pace.insideSamples += 1;
+        if (inside && wasInside === false) pace.entries += 1;
+        wasInside = inside;
+      };
+      requestAnimationFrame(watch);
+
+      // Handed back so the probe can undo itself. A bot left parked for the
+      // rest of the run is a bot the other team plays a man down against, and
+      // the free-running half below would be measuring that rather than the
+      // match: leaving it parked once put a stationary target under an enemy
+      // turret for a minute and pushed the longest unbroken exposure from
+      // 800ms to 5200ms, failing a check that had nothing to do with it.
+      window.__releaseVictim = () => {
+        victim._autoMove = wasAuto.move;
+        victim._autoCast = wasAuto.cast;
+      };
+
+      return { bot: bot.id, victim: victim.id, reach: Math.round(reach) };
+    },
+    { keepOut: KEEP_OUT_PX, avoid: planted?.bot ?? null, reseedMs: RESEED_MS }
+  );
+  check('a bot could be seeded on an enemy turret’s keep-out line', Boolean(seeded));
+
+  if (seeded) {
+    await page.waitForTimeout(PACE_MS);
+    const paced = await page.evaluate(() => {
+      window.__releaseVictim?.();
+      return window.__pace;
+    });
+    report.seededOnTheRing = {
+      seconds: Math.round(PACE_MS / 1_000),
+      samples: paced.samples,
+      trials: paced.trials,
+      walkedIntoTheGuns: paced.entries,
+      insidePct: paced.samples ? +((paced.insideSamples / paced.samples) * 100).toFixed(2) : 0,
+      minClearance: Math.round(paced.minClearance),
+      maxClearance: Math.round(paced.maxClearance),
+      postures: paced.postures,
+      died: paced.died,
+    };
+    check(
+      'a bot seeded on the ring does not pace in and out of the guns',
+      paced.entries <= MAX_GUN_LINE_ENTRIES,
+      `walked into the guns ${paced.entries}x in ${PACE_MS / 1_000}s`
+    );
+    check(
+      'and spends no real time in there',
+      report.seededOnTheRing.insidePct <= MAX_SEEDED_INSIDE_PCT,
+      `${report.seededOnTheRing.insidePct}% of ${paced.samples} samples inside the guns`
+    );
+    check(
+      'and does not die standing on it',
+      !paced.died,
+      `min clearance ${Math.round(paced.minClearance)}px`
     );
   }
 
