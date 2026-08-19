@@ -132,6 +132,52 @@ describe('posture', () => {
     expect(brain.evaluatePosture(view(), 250)).toBe('RECOVER'); // already "there"
   });
 
+  it('retreats to the nearest living friendly turret, and recovers at arrival distance rather than moveSpeed', () => {
+    // `retreatPoint()` had no coverage at all — `createGame()` supplies neither
+    // `turrets` nor `fountains`, so every other retreat test exercises only the
+    // "nowhere to go" fallback. This is the branch that actually carried the
+    // `RETREAT_ARRIVE_PX` bug: `atRetreatPoint()` used to compare against
+    // `moveSpeed * 2` (6px at the default speed of 3), but body separation
+    // holds a 55px champion about 74px from a 92px turret's centre
+    // (`UnitCollisionSystem` separates by the sum of the radii) — a bot
+    // retreating to a turret could never arrive and never left RETREAT.
+    const game = createGame();
+    const bot = spawnBot(game, 'normal', 0, 0);
+    game.setPlayer(bot);
+    indexObjects(game, [bot]);
+    (game as unknown as { turrets: unknown[] }).turrets = [
+      { teamId: RED, isDead: false, position: createVector(50, 0) }, // enemy: ignored
+      { teamId: BLUE, isDead: true, position: createVector(60, 0) }, // dead ally: ignored
+      { teamId: BLUE, isDead: false, position: createVector(74, 0) }, // nearest living ally
+      { teamId: BLUE, isDead: false, position: createVector(500, 0) }, // farther living ally
+    ];
+    const brain = new BotBrain(bot);
+
+    expect(brain.retreatPoint()).toEqual({ x: 74, y: 0 });
+
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.1;
+    expect(brain.evaluatePosture(view(), 0)).toBe('RETREAT'); // the first tick latches
+    expect(brain.evaluatePosture(view(), 250)).toBe('RECOVER'); // 74px out — "arrived"
+  });
+
+  it('does not chase a sighting a teammate made across the map', () => {
+    // `TeamView.memory` is team-wide — `TeamBlackboard` writes an entry when
+    // ANY ally sees the enemy — so without a distance bound `rememberedTarget`
+    // would pull this bot toward a sighting made 2000px away by a teammate in
+    // a different lane, every tick.
+    const game = createGame();
+    const bot = spawnBot(game, 'normal', 0, 0);
+    const enemy = spawnEnemy(game, 5_000, 0); // far outside aggro range now
+    game.setPlayer(bot);
+    indexObjects(game, [bot, enemy]);
+
+    // 2000px away is well past SEARCH_MAX_DISTANCE_PX (900).
+    const memory = new Map<Champion, SeenEnemy>([
+      [enemy, { unit: enemy, atMs: 0, pos: { x: 2_000, y: 0 }, vel: { x: 0, y: 0 } }],
+    ]);
+    expect(new BotBrain(bot).evaluatePosture(view({ memory }), 1_000)).toBe('ROAM');
+  });
+
   it('searches toward a fresh memory when it can see nobody', () => {
     const game = createGame();
     const bot = spawnBot(game, 'normal');

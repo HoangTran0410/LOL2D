@@ -26,12 +26,30 @@ export const OUTNUMBERED_BY = 2;
 export const OUTNUMBERED_HEALTH_PCT = 0.6;
 /** Ceiling on how far a remembered heading is projected forward. */
 export const SEARCH_MAX_LEAD_PX = 300;
+/**
+ * How close counts as "arrived" at the retreat point.
+ *
+ * Sized to a body, not to a step. This was `moveSpeed * 2` — 6px at the
+ * default speed of 3 — while the retreat point is usually a turret, and body
+ * separation holds a 55px champion about 74px from a 92px turret's centre
+ * (`UnitCollisionSystem` separates by the sum of the radii). A bot retreating
+ * to a turret could therefore never arrive, and never left RETREAT for RECOVER.
+ */
+export const RETREAT_ARRIVE_PX = 120;
+/** How far a bot will walk to investigate a team-wide sighting. */
+export const SEARCH_MAX_DISTANCE_PX = 900;
 /** One frame, in ms. `SeenEnemy.vel` is pixels per *frame*, elapsed time is ms. */
 export const FRAME_MS = 1000 / 60;
 /** How far ahead an aimless cast points. Any positive number; never 0. */
 export const FALLBACK_AIM_PX = 100;
 
-const ratio = (value: number, max: number): number => (max > 0 ? value / max : 0);
+/**
+ * A resource as a fraction. **No pool reads as full**, not as empty: a champion
+ * with `maxMana` 0 would otherwise sit at 0% forever, never satisfy
+ * `manaPct > RECOVER_MANA_PCT`, and latch into RECOVER permanently after one
+ * low-health moment. Latent today — every shipped champion has a pool.
+ */
+const ratio = (value: number, max: number): number => (max > 0 ? value / max : 1);
 
 export interface SpellChoice {
   spell: Spell;
@@ -194,6 +212,15 @@ export class BotBrain {
     for (const entry of view.memory.values()) {
       if (entry.unit.isDead || entry.unit.toRemove) continue;
       if (nowMs - entry.atMs > this.profile.memoryTtlMs) continue;
+      // The memory is TEAM-wide: `TeamBlackboard` writes an entry when any ally
+      // can see the enemy. Without a distance bound a bot in one lane abandons
+      // what it is doing to investigate a sighting its teammate made across the
+      // map, every tick.
+      const away = Math.hypot(
+        entry.pos.x - this.owner.position.x,
+        entry.pos.y - this.owner.position.y
+      );
+      if (away > SEARCH_MAX_DISTANCE_PX) continue;
       if (!best || entry.atMs > best.atMs) best = entry;
     }
     return best;
@@ -210,9 +237,10 @@ export class BotBrain {
     let dy = entry.vel.y * frames;
     const lead = Math.hypot(dx, dy);
     if (lead > SEARCH_MAX_LEAD_PX) {
-      const scale = SEARCH_MAX_LEAD_PX / lead;
-      dx *= scale;
-      dy *= scale;
+      // `shrink`, not `scale`: `scale` is a p5 global. See CLAUDE.md.
+      const shrink = SEARCH_MAX_LEAD_PX / lead;
+      dx *= shrink;
+      dy *= shrink;
     }
     return { x: entry.pos.x + dx, y: entry.pos.y + dy };
   }
@@ -254,11 +282,13 @@ export class BotBrain {
   }
 
   private atRetreatPoint(): boolean {
-    const point = this.retreatPoint();
-    if (!point) return true; // nowhere to go: stand and recover where you are
+    // `refuge`, not `point`: `point` is a p5 global in this project and a local
+    // of the same name shadows it — see CLAUDE.md. Inert here, banned anyway.
+    const refuge = this.retreatPoint();
+    if (!refuge) return true; // nowhere to go: stand and recover where you are
     return (
-      Math.hypot(point.x - this.owner.position.x, point.y - this.owner.position.y) <=
-      this.owner.moveSpeed * 2
+      Math.hypot(refuge.x - this.owner.position.x, refuge.y - this.owner.position.y) <=
+      RETREAT_ARRIVE_PX
     );
   }
 
