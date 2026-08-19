@@ -55,6 +55,20 @@ export default class Spell {
   manaCost = 0;
   healthCost = 0;
 
+  /**
+   * What this ability *does*, for the bot brain — see `src/game/ai/SpellRole.ts`.
+   * Optional on purpose: an untagged spell is classified from its `castSpec`,
+   * so tagging is an improvement a champion can opt into, never a gate on
+   * shipping one.
+   */
+  static aiRoles?: number;
+
+  /**
+   * Pixels per frame this ability's projectile travels, for aim prediction.
+   * Defaults to `MissileSpellObject`'s own 7 when absent.
+   */
+  static aiProjectileSpeed?: number;
+
   id: string = uuidv4();
   owner: any;
   game: any;
@@ -627,6 +641,22 @@ export default class Spell {
   }
 
   /**
+   * The reach this spell declares, before any body-size correction.
+   *
+   * Public because the bot brain needs the same number `previewRadius` draws a
+   * ring from, and `previewRadius` is `protected` *and* applies the `UNIT`
+   * correction — which the brain must apply itself, per target, through
+   * `Reach.effectiveRange`.
+   */
+  get declaredRange(): number | undefined {
+    const declared =
+      this.targetingRequest?.range ??
+      (this as { range?: number }).range ??
+      (this as { castRange?: number }).castRange;
+    return typeof declared === 'number' && declared > 0 ? declared : undefined;
+  }
+
+  /**
    * The reach this spell should draw as its preview when nobody passes one.
    *
    * Same resolution order as `touchAimRange` in `src/game/input/SpellAim.ts`, on
@@ -642,11 +672,8 @@ export default class Spell {
    * number — the far end of a point cast is ground, and ground has no body.
    */
   protected get previewRadius(): number | undefined {
-    const declared =
-      this.targetingRequest?.range ??
-      (this as { range?: number }).range ??
-      (this as { castRange?: number }).castRange;
-    if (typeof declared !== 'number' || declared <= 0) return undefined;
+    const declared = this.declaredRange;
+    if (declared === undefined) return undefined;
     return this.castSpec.targeting === 'UNIT' ? effectiveRange(declared, this.owner) : declared;
   }
 
