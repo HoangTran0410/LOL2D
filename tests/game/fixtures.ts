@@ -57,12 +57,6 @@ export class TestVector {
     if (this.magSq() > max * max) this.setMag(max);
     return this;
   }
-  /** p5's: move this fraction of the way toward `vector`. In place. */
-  lerp(vector: TestVector, amount: number) {
-    this.x += (vector.x - this.x) * amount;
-    this.y += (vector.y - this.y) * amount;
-    return this;
-  }
   dist(vector: TestVector) {
     return Math.hypot(this.x - vector.x, this.y - vector.y);
   }
