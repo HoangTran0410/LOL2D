@@ -106,6 +106,19 @@ Theo thứ tự, dừng ở luật đầu tiên khớp:
 Cộng thêm `Burst` khi `manaCost >= 40`. Suy luận **không** đoán được `Dash`,
 `Escape`, `Summon` — đó là giá trị của việc gắn tay, và ta gắn dần.
 
+**Chiêu không khai tầm không có nghĩa là tầm vô hạn.** Bảng trên viết cho chiêu
+tướng và chưa từng đối chiếu với hai thứ mọi bot đều mang: **27 chiêu
+`POINT`/`DIRECTION` trong repo không khai `range`/`castRange`/`targetingRequest.range`
+nào**, cộng bốn phù phép. `Flash` là ví dụ đắt nhất — `targetingMode = 'POINT'`,
+không tầm, `manaCost = 100` — nên nó bị suy ra là `Damage | Zone | Burst`, chấm
+**18 điểm** khi có mục tiêu và **32** khi địch sắp chết, vượt xa một chiêu Q
+thường (10-16). Bot sẽ coi Flash là chiêu đánh chính.
+
+Nên: khi `declaredRange` là `undefined`, tầm dùng để lọc và để kẹp điểm ngắm là
+**`profile.aggroRange`**, không phải `Infinity`, và **không** cộng điểm `Zone`
+cho một tầm không biết. Luật chấm điểm nào thêm sau mà khoá theo tầm đều phải
+trả lời câu hỏi này trước.
+
 ### Cache và cờ `Ultimate`
 
 `Spell` **không** biết ô của chính nó — không có field `slot`/`index` nào trên
@@ -319,7 +332,22 @@ nguyên ngữ nghĩa hiện tại.
 "Nhìn thấy được" ở đây và ở luật FIGHT phía trên nghĩa là gì thì §6 định nghĩa,
 và nó khác nhau theo mức độ khó.
 
-### Chấm điểm chiêu — chỉ trong FIGHT và ENGAGE
+### Chấm điểm chiêu — tư thế nào được cast, và cast được gì
+
+| Tư thế | Được cast | Ứng viên |
+|---|---|---|
+| FIGHT, ENGAGE | có | mọi chiêu |
+| SEARCH | có | chỉ `Zone`/`Poke`, trong `ghostCastWindowMs` |
+| RETREAT, RECOVER | có | **chỉ `Escape`, `Heal`, `Shield`** |
+| ROAM | không | — |
+
+Bản đầu của mục này viết tiêu đề "chỉ trong FIGHT và ENGAGE" rồi ngay bên dưới
+lại cho `Escape` dòng điểm `+25 khi RETREAT` và `Heal/Shield` dòng `+20 khi máu
+thấp` — hai câu loại trừ nhau, và bản hiện thực đầu tiên đã theo tiêu đề. Hệ quả:
+bot tụt máu chạy về trụ, ngồi ở RECOVER, và **không bao giờ bấm chiêu hồi máu hay
+chiêu chạy trốn mà nó vừa được chấm điểm để bấm** — đúng thứ mục "cụt tay" của
+spec này hứa chữa. Bot đang chạy vẫn không được bắn chiêu sát thương; đó là lý do
+danh sách ứng viên bị thu hẹp chứ không mở toang.
 
 Với mỗi `spell` ở index `i >= 1` (bỏ ô A = đánh thường):
 
@@ -449,6 +477,14 @@ Khoản thêm vào đắt nhất là bảng tin: một lượt duyệt `objects`
 toàn bộ trận**. So với hôm nay — nơi mỗi bot tự duyệt riêng 1-2 lần/giây — 5
 bot đang trả 5-10 lượt/giây thì sau còn 4 lượt/giây bất kể bao nhiêu bot. Càng
 đông bot, chênh lệch càng nghiêng về phía mới.
+
+**Ghi chú trung thực về dòng "0 lượt duyệt".** Nó nói về lượt quét *tìm điểm ngắm*
+mà `cursorForSpell` từng làm, và lượt đó đã bị xoá thật. Nhưng
+`Game.createSpellContext` vẫn mặc định `queryCandidates` về toàn bộ danh sách
+object, và `BotBrain.advanceCharge` dựng lại context đó mỗi frame khi đang giữ
+chiêu sạc. Cả hai có trước nhánh này và giờ chạy ở ≤2 lần cast/giây thay vì ~6,
+nên kết luận "rẻ hơn trước" vẫn đứng — nhưng đây không phải "không còn lượt duyệt
+toàn danh sách nào trong game".
 
 Ba luật hiệu năng phải giữ khi hiện thực:
 
