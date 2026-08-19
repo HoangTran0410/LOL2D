@@ -8,6 +8,7 @@ import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import type { CastContext } from '@/game/spell/runtime/types';
 import { slabVertices, type DynamicWall } from '@/game/gameObject/map/DynamicTerrain';
 
 /**
@@ -40,12 +41,42 @@ export default class Anivia_W extends Spell {
   wallThickness = 34;
   duration = 5000;
 
-  onSpellCast() {
+  onSpellCast(context: CastContext) {
     const { to } = VectorUtils.getVectorWithMaxRange(
       this.owner.position,
       this.aimPoint,
       this.range
     );
+
+    // The slab must never spawn on top of Anivia herself.
+    //
+    // `_blockUnits` resolves an overlapping body to its *nearest* face, which is
+    // right for someone walking into the wall from outside and catastrophic for
+    // someone standing inside it: past the midplane the nearest face is the far
+    // one, so the push ejects them straight through. Measured on the shipped
+    // 34px slab, a champion whose centre starts on the midplane is 44.5px beyond
+    // the wall one frame later and walks away free.
+    //
+    // Anivia is the one person that reliably happens to, because the slab is
+    // centred on the aim point and on a phone the aim point is wherever the
+    // thumb rests — which is usually right on top of her own champion. So the
+    // wall blocked both teams and let its caster stroll through it.
+    //
+    // Holding the centre a half-thickness plus a body radius away puts her
+    // outside her own wall, so the ejection branch never runs for her and she is
+    // stopped by it exactly as everyone else is. `firingDirection` is what makes
+    // a cursor sitting on her feet still yield a direction: body heading first,
+    // then a fixed vector, never (0,0).
+    const heading = this.firingDirection(context);
+    const minimum = this.wallThickness / 2 + this.owner.stats.size.value / 2;
+    const dx = to.x - this.owner.position.x;
+    const dy = to.y - this.owner.position.y;
+    if (Math.hypot(dx, dy) < minimum) {
+      to.set(
+        this.owner.position.x + heading.x * minimum,
+        this.owner.position.y + heading.y * minimum
+      );
+    }
 
     const obj = new Anivia_W_Object(this.owner);
     obj.position = to;

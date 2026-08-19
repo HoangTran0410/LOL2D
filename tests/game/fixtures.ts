@@ -52,6 +52,11 @@ export class TestVector {
     if (magnitude > 0) this.mult(value / magnitude);
     return this;
   }
+  /** p5's: shorten to `max` if longer, leave a shorter vector alone. In place. */
+  limit(max: number) {
+    if (this.magSq() > max * max) this.setMag(max);
+    return this;
+  }
   dist(vector: TestVector) {
     return Math.hypot(this.x - vector.x, this.y - vector.y);
   }
