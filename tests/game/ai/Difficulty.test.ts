@@ -30,6 +30,11 @@ describe('difficulty profiles', () => {
       expect(higher.aggroRange).toBeGreaterThan(lower.aggroRange);
       expect(higher.memoryTtlMs).toBeGreaterThan(lower.memoryTtlMs);
       expect(higher.retreatHealthPct).toBeGreaterThan(lower.retreatHealthPct);
+      // A better bot husbands mana for its ultimate and leans harder on the
+      // human. Both consumed by Tasks 5 and 7, so a reversed column here shows
+      // up as odd bot behaviour rather than as a failing test.
+      expect(higher.manaReservePct).toBeGreaterThan(lower.manaReservePct);
+      expect(higher.playerBias).toBeGreaterThan(lower.playerBias);
     }
   });
 
