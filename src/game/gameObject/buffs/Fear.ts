@@ -2,6 +2,7 @@
 
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
+import { frameScale } from '@/game/time';
 import BuffAddType from '@/game/enums/BuffAddType';
 import StatusFlags from '@/game/enums/StatusFlags';
 import Buff from '@/game/gameObject/Buff';
@@ -26,7 +27,12 @@ export default class Fear extends Buff {
         .sub(this.sourcePosition || this.sourceUnit.position)
         .setMag(1000)
         .add(this.targetUnit.position);
-      VectorUtils.moveVectorToVector(this.targetUnit.position, destination, this.speed);
+      // Per-frame speed scaled by elapsed time. See `game/time.ts`.
+      VectorUtils.moveVectorToVector(
+        this.targetUnit.position,
+        destination,
+        this.speed * frameScale()
+      );
     }
   }
 

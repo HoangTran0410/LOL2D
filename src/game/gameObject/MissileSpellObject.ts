@@ -1,5 +1,6 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import VectorUtils from '@/utils/vector.utils';
+import { frameScale } from '@/game/time';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import SpellObject from './SpellObject';
 import AttackableUnit from './attackableUnits/AttackableUnit';
@@ -24,6 +25,12 @@ export default class MissileSpellObject extends SpellObject {
   declare position: p5.Vector;
   declare destination: p5.Vector;
   speed = 7;
+
+  /**
+   * How far this missile moved this frame — `speed` scaled by elapsed time.
+   * Written at the top of every `update`, read by the arrival test.
+   */
+  protected stepDistance = 0;
   size = 20;
   image?: AssetHandle;
   visualWidth = this.size;
@@ -62,8 +69,15 @@ export default class MissileSpellObject extends SpellObject {
 
     this.onBeforeMove();
 
+    // `speed` is authored per frame, so the step it means depends on how long
+    // this frame took — see `game/time.ts`. Stored rather than recomputed
+    // because `hasArrived` must measure against *this* frame's step: the move
+    // does not clamp to the destination, so a tolerance fixed at the unscaled
+    // speed would let a long frame overshoot without ever arriving, and the
+    // missile would then oscillate across its endpoint forever.
+    this.stepDistance = this.speed * frameScale();
     const previousPosition = this.position.copy();
-    VectorUtils.moveVectorToVector(this.position, this.destination, this.speed);
+    VectorUtils.moveVectorToVector(this.position, this.destination, this.stepDistance);
     if (this.hasArrived(previousPosition, this.position)) {
       this.onArrive();
       if (this.removeOnArrive) this.toRemove = true;
@@ -152,7 +166,7 @@ export default class MissileSpellObject extends SpellObject {
   onAfterMove(): void {}
   /** Preserves the original strict endpoint arrival rule for ordinary missiles. */
   protected hasArrived(_previousPosition: p5.Vector, position: p5.Vector): boolean {
-    return position.dist(this.destination) < this.speed;
+    return position.dist(this.destination) < this.stepDistance;
   }
   /** Homing missiles stop after arrival; ordinary missiles finish their terminal hooks. */
   protected shouldStopAfterArrival(): boolean {

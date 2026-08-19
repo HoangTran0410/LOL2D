@@ -10,6 +10,7 @@ import CombatText from '@/game/gameObject/helpers/CombatText';
 import MatchTally, { type KillCredit } from '@/game/combat/MatchTally';
 import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 import PathAgent from '@/game/nav/PathAgent';
+import { frameScale } from '@/game/time';
 import { NAV_MAX_TERRAIN_RADIUS } from '@/game/nav/NavGrid';
 import type Buff from '@/game/gameObject/Buff';
 import type { BuffConstructor } from '@/game/gameObject/Buff';
@@ -639,7 +640,12 @@ export default class AttackableUnit extends GameObject {
     const dx = this.destination.x - this.position.x;
     const dy = this.destination.y - this.position.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    const speed = this.stats.speed.value;
+    // `stats.speed` is authored per frame, so the step has to be scaled by how
+    // much time this frame actually took — otherwise distance covered is a
+    // function of the frame *count*. See `game/time.ts`: that is what made the
+    // 30fps render option halve the game's speed, and what makes a unit jiggle
+    // against a camera that interpolates over time.
+    const speed = this.stats.speed.value * frameScale();
 
     if (distance <= speed) {
       this.position.set(this.destination.x, this.destination.y);

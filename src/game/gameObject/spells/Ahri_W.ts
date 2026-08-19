@@ -1,6 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
+import { frameScale } from '@/game/time';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -135,7 +136,12 @@ export class Ahri_W_Object extends SpellObject {
     // attacking
     else if (this.phase === Ahri_W_Object.PHASES.ATTACKING && this.targetEnemy) {
       const previous = this.position.copy();
-      VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.moveSpeed);
+      // Per-frame speed scaled by elapsed time. See `game/time.ts`.
+      VectorUtils.moveVectorToVector(
+        this.position,
+        this.targetEnemy.position,
+        this.moveSpeed * frameScale()
+      );
       this.trailSystem.addTrail(this.position);
       // pointed at where it is actually going, so the dive is legible from the
       // shape alone — a wisp aimed sideways would look like it is drifting

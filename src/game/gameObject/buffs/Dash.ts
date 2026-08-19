@@ -6,6 +6,7 @@ import Airborne from './Airborne';
 import Root from './Root';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
+import { frameScale } from '@/game/time';
 import Stun from './Stun';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import Fear from './Fear';
@@ -95,11 +96,11 @@ export default class Dash extends Buff {
 
     // apply dash
     if (this.dashDestination) {
-      VectorUtils.moveVectorToVector(
-        this.targetUnit.position,
-        this.dashDestination,
-        this.dashSpeed
-      );
+      // Per-frame speed scaled by elapsed time (`game/time.ts`). The arrival
+      // test below uses the same step, because the move does not clamp to the
+      // destination and a long frame would otherwise overshoot it unnoticed.
+      const step = this.dashSpeed * frameScale();
+      VectorUtils.moveVectorToVector(this.targetUnit.position, this.dashDestination, step);
 
       // The owning spell gets the frame *after* the step, so a pass that damages
       // what it flies through tests the ground it has actually covered.
@@ -107,7 +108,7 @@ export default class Dash extends Buff {
 
       if (
         this.dashDestination &&
-        p5.Vector.dist(this.targetUnit.position, this.dashDestination) < this.dashSpeed
+        p5.Vector.dist(this.targetUnit.position, this.dashDestination) < step
       ) {
         this.onReachedDestination?.();
         this.deactivateBuff();

@@ -1,6 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
+import { frameScale } from '@/game/time';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -102,8 +103,10 @@ export class Shaco_W_Box extends Pet {
     // The slide happens before anything else so the box is at its resting spot
     // by the time it arms — a box that armed mid-flight would fear from the
     // wrong place.
-    if (this.slideTo && this.position.dist(this.slideTo) > this.slideSpeed) {
-      VectorUtils.moveVectorToVector(this.position, this.slideTo, this.slideSpeed);
+    // One step for the move and the "still sliding" test alike. See `game/time.ts`.
+    const slideStep = this.slideSpeed * frameScale();
+    if (this.slideTo && this.position.dist(this.slideTo) > slideStep) {
+      VectorUtils.moveVectorToVector(this.position, this.slideTo, slideStep);
     }
 
     super.update();
@@ -326,8 +329,9 @@ export class Shaco_W_Bullet_Object extends SpellObject {
   update() {
     // move phase
     if (this.phase === Shaco_W_Bullet_Object.PHASES.MOVING) {
-      if (this.position.dist(this.targetEnemy.position) > this.speed) {
-        VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, this.speed);
+      const step = this.speed * frameScale();
+      if (this.position.dist(this.targetEnemy.position) > step) {
+        VectorUtils.moveVectorToVector(this.position, this.targetEnemy.position, step);
         this.trailSystem.addTrail(this.position);
       } else {
         // hit target

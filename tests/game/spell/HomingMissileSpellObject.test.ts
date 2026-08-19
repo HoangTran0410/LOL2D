@@ -4,6 +4,7 @@ import MissileSpellObject from '../../../src/game/gameObject/MissileSpellObject'
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
 import { createGame, createUnit, installSpellObjectGlobals, type TestGame } from './fixtures';
+import { REFERENCE_FRAME_MS } from '../../../src/game/time';
 
 class TestHomingMissile extends HomingMissileSpellObject {
   speed = 5;
@@ -39,7 +40,15 @@ function target(game: TestGame, x: number, collisionRadius = 0): AttackableUnit 
 }
 
 describe('HomingMissileSpellObject', () => {
-  beforeEach(installSpellObjectGlobals);
+  beforeEach(() => {
+    installSpellObjectGlobals();
+    // A missile's step is `speed` scaled by how long the frame took
+    // (`game/time.ts`), and the shared fixture's 16ms is a hair short of a
+    // 16.667ms reference frame. Every assertion below is about *where* a
+    // missile steps and when it counts as arrived, not about frame pacing, so
+    // one frame here is one reference frame and `speed` means what it says.
+    vi.stubGlobal('deltaTime', REFERENCE_FRAME_MS);
+  });
   afterEach(() => {
     vi.unstubAllGlobals();
   });

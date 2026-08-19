@@ -31,6 +31,14 @@ export { ZOOM_FACTOR_MIN, ZOOM_FACTOR_MAX, clampZoomFactor } from '@/game/config
 import { clampZoomFactor } from '@/game/config/zoomBounds';
 
 /**
+ * The frame length every per-frame quantity in the codebase was tuned at.
+ * Defined in `game/time.ts` — the camera is one of several callers now, not
+ * its owner — and re-exported so existing `from '.../Camera'` imports resolve.
+ */
+export { REFERENCE_FRAME_MS } from '@/game/time';
+import { REFERENCE_FRAME_MS } from '@/game/time';
+
+/**
  * The shorter side, so an ultrawide gets more horizontal world rather than a
  * penalty. The consequence is intended: a 2.16-aspect phone ends up seeing
  * more horizontal world than a 1.78-aspect desktop. Aspect ratio decides
@@ -38,9 +46,6 @@ import { clampZoomFactor } from '@/game/config/zoomBounds';
  */
 export const baseScaleFor = (viewportWidth: number, viewportHeight: number): number =>
   Math.min(viewportWidth, viewportHeight) / VISION_SPAN;
-
-/** The frame length the two smoothing factors below were tuned at. */
-export const REFERENCE_FRAME_MS = 1000 / 60;
 
 /** Fraction of the remaining gap the camera closes per 60fps frame. */
 export const FOLLOW_PER_FRAME = 0.1;
