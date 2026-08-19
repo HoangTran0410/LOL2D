@@ -16,6 +16,7 @@ import {
 } from '@/game/spell/runtime/types';
 import {
   hasRole,
+  roles,
   rolesOf,
   SpellRole,
   ULTIMATE_SLOT,
@@ -109,6 +110,27 @@ export const BURST_TARGET_HEALTH = 40;
 /** Below this fraction, a heal or shield is worth more than another hit. */
 export const SUPPORT_HEALTH_PCT = 0.5;
 
+/**
+ * The only roles a bot running away is allowed to press.
+ *
+ * `scoreSpell` prices an escape at `SCORE_ESCAPE` **only** while the posture is
+ * RETREAT, and a heal at `SCORE_SUPPORT` only below half health — and neither
+ * row was reachable. `maybeCast` returned unless the posture was FIGHT, ENGAGE
+ * or SEARCH, while `decidePosture` latches a hurt bot into RETREAT/RECOVER
+ * until it has healed, which it cannot do without casting. So a bot at 20%
+ * health ran to its turret, stood there with a heal off cooldown, and pressed
+ * nothing.
+ *
+ * A fleeing bot may now cast, narrowed to these three roles: it presses its
+ * escape and its heal, and it does not turn round to trade damage while
+ * running. The rate limit (`castIntervalMs`) still applies, as everywhere else.
+ */
+export const RETREAT_ROLES: SpellRoleMask = roles(
+  SpellRole.Escape,
+  SpellRole.Heal,
+  SpellRole.Shield
+);
+
 export class BotBrain {
   /**
    * The terrain half of perception, injectable purely so a test can state a
@@ -146,9 +168,15 @@ export class BotBrain {
   /**
    * Whether this bot may *acquire* `target`.
    *
-   * Three gates, and which of them a tier skips is the whole of the difficulty
+   * Four gates, and which of them a tier skips is the whole of the difficulty
    * knob:
    *
+   * - **Targetability** blocks at every tier. `findAttackTarget`'s quadtree scan
+   *   gets this free from `PredefinedFilters.canTakeDamageFromTeam`, but the
+   *   blackboard path — `pickTarget` walking `view.enemies` — has no filter of
+   *   its own, so this is the only place it can come from. Without it a bot
+   *   chased and cast at a champion holding `Untargetable` (Fizz E, a Zed
+   *   shadow): the `UNIT` resolve fizzles and the skillshot is spent mana.
    * - **Range** is `profile.aggroRange`, at every tier. It is not vision's job:
    *   `canSee` applies no sight-radius cap on purpose (`Vision.ts:33`), because
    *   `Reach.ts` owns range and a 500px cap here once trimmed Warwick R to 500
@@ -165,6 +193,7 @@ export class BotBrain {
   canPerceive(target: Champion): boolean {
     if (target === this.owner) return false;
     if (target.isDead || target.toRemove) return false;
+    if (!target.targetable) return false;
     if (target.isStealthed) return false;
 
     const dx = target.position.x - this.owner.position.x;
@@ -202,7 +231,12 @@ export class BotBrain {
 
     const maxHealth = enemy.stats.maxHealth.value;
     if (maxHealth > 0) {
-      const healthPct = enemy.stats.health.value / maxHealth;
+      // `effectiveHealth`, not the raw pool: it counts the shields standing in
+      // front of it, which is the answer `pickFocus` and the `Burst` check both
+      // already use. Reading `stats.health` alone made one shielded enemy look
+      // nearly dead to the target picker and perfectly healthy to the burst
+      // check, on the same tick.
+      const healthPct = effectiveHealth(enemy) / maxHealth;
       score += TARGET_LOW_HEALTH_WEIGHT * (1 - healthPct);
     }
 
@@ -222,13 +256,19 @@ export class BotBrain {
    */
   private recovering = false;
 
-  evaluatePosture(view: TeamView, nowMs: number): Posture {
-    const posture = this.decidePosture(view, nowMs);
+  /**
+   * `target` is the enemy this tick already picked, handed in so the scan runs
+   * once. `undefined` means "nobody has asked yet" and `null` is a real answer
+   * — a bot that can perceive nobody — so this cannot be a `??`.
+   */
+  evaluatePosture(view: TeamView, nowMs: number, target?: Champion | null): Posture {
+    const chosen = target === undefined ? this.pickTarget(view) : target;
+    const posture = this.decidePosture(view, nowMs, chosen);
     this.posture = posture;
     return posture;
   }
 
-  private decidePosture(view: TeamView, nowMs: number): Posture {
+  private decidePosture(view: TeamView, nowMs: number, target: Champion | null): Posture {
     const healthPct = ratio(this.owner.stats.health.value, this.owner.stats.maxHealth.value);
     const manaPct = ratio(this.owner.stats.mana.value, this.owner.stats.maxMana.value);
 
@@ -249,7 +289,7 @@ export class BotBrain {
     // An order already running outranks perception: `canKeep` has no vision
     // check, so the chase continues whatever the bot can currently see.
     if (this.owner.basicAttack?.target) return 'FIGHT';
-    if (this.pickTarget(view)) return 'FIGHT';
+    if (target) return 'FIGHT';
     if (this.rememberedTarget(view, nowMs)) return 'SEARCH';
     if (this.assistableFocus(view)) return 'ENGAGE';
     return 'ROAM';
@@ -363,6 +403,30 @@ export class BotBrain {
     return spell.effectiveManaCost <= this.owner.stats.mana.value - reserve;
   }
 
+  /**
+   * How far this spell can actually be thrown.
+   *
+   * **An undeclared range is not an infinite one.** It used to read as
+   * `+Infinity`, and three things followed from that in one expression: the
+   * out-of-reach skip in `scoreSpell` never fired, `Zone`'s bonus was granted
+   * unconditionally (`Infinity <= Infinity`), and `aimFor` passed no `maxRange`
+   * so `predictAim` never clamped. `Flash` is the concrete case — `POINT`, no
+   * declared range, `manaCost` 100, so `inferRoles` calls it
+   * `Damage | Zone | Burst`, which scores 18 with a target and 32 against a
+   * wounded one against a typical Q's 10-16. Every bot carries it, so a bot's
+   * best combat spell was blinking at whatever it could see, on cooldown. 27
+   * other `POINT`/`DIRECTION` spells declare no range either.
+   *
+   * `profile.aggroRange` is the honest stand-in: it is already the furthest
+   * this tier was willing to acquire a target at.
+   */
+  private reachOf(spell: Spell, target: Champion | null): number {
+    const declared = spell.declaredRange;
+    return declared === undefined
+      ? this.profile.aggroRange
+      : effectiveRange(declared, this.owner, target);
+  }
+
   scoreSpell(
     spell: Spell,
     slotIndex: number,
@@ -378,12 +442,8 @@ export class BotBrain {
           target.position.y - this.owner.position.y
         )
       : Number.POSITIVE_INFINITY;
-    const declared = spell.declaredRange;
-    const reach =
-      declared === undefined
-        ? Number.POSITIVE_INFINITY
-        : effectiveRange(declared, this.owner, target);
-    const inReach = distance <= reach;
+    const knownReach = spell.declaredRange !== undefined;
+    const inReach = distance <= this.reachOf(spell, target);
 
     // A spell that cannot reach is not worth scoring — unless closing the gap
     // is the thing it does.
@@ -413,7 +473,11 @@ export class BotBrain {
       score += target && !inReach ? SCORE_DASH_GAPCLOSE : SCORE_DASH_WASTED;
     }
     if (hasRole(mask, SpellRole.Buff)) score += SCORE_BUFF;
-    if (hasRole(mask, SpellRole.Zone) && inReach) score += SCORE_ZONE;
+    // `knownReach`: a spell that declares no range has none of the area this
+    // bonus is paid for — the reach above it was measured against is a guess
+    // (`profile.aggroRange`), and a guess must not earn a bonus. Before, every
+    // range-less spell collected it, because `Infinity <= Infinity`.
+    if (hasRole(mask, SpellRole.Zone) && inReach && knownReach) score += SCORE_ZONE;
     if (hasRole(mask, SpellRole.Ultimate)) score += SCORE_ULTIMATE;
 
     // The randomness, and the only place it lives.
@@ -433,13 +497,23 @@ export class BotBrain {
     return score * (1 + (this.rng() * 2 - 1) * this.profile.noise);
   }
 
-  chooseSpell(target: Champion | null, view: TeamView): SpellChoice | null {
+  /**
+   * `allowedRoles` narrows the kit to spells carrying at least one of its bits
+   * — `RETREAT_ROLES` while running away. Omitted, every castable spell is a
+   * candidate, which is every other posture.
+   */
+  chooseSpell(
+    target: Champion | null,
+    view: TeamView,
+    allowedRoles?: SpellRoleMask
+  ): SpellChoice | null {
     let best: SpellChoice | null = null;
     // From 1: slot 0 is the basic attack, which is the attack controller's job.
     for (let slotIndex = 1; slotIndex < this.owner.spells.length; slotIndex++) {
       const spell = this.owner.spells[slotIndex];
       if (!spell?.isCastableNow) continue;
       const mask = rolesOf(spell, slotIndex);
+      if (allowedRoles !== undefined && !hasRole(mask, allowedRoles)) continue;
       if (!this.withinManaBudget(spell, mask)) continue;
       const score = this.scoreSpell(spell, slotIndex, mask, target, view);
       if (score <= 0 || !Number.isFinite(score)) continue;
@@ -494,8 +568,11 @@ export class BotBrain {
     if (owner.isDead) return;
 
     const view = blackboardFor(owner.game as BlackboardHost, nowMs).viewFor(owner.teamId);
-    const posture = this.evaluatePosture(view, nowMs);
+    // One `pickTarget` per tick. It used to run twice — here and again inside
+    // `decidePosture` — and at `easy` each pass costs a `canSee` raycast per
+    // living enemy.
     const target = this.pickTarget(view);
+    const posture = this.evaluatePosture(view, nowMs, target);
 
     if (owner._autoMove) this.drive(posture, view, target, nowMs);
     if (owner._autoCast) this.maybeCast(posture, view, target, nowMs);
@@ -569,9 +646,13 @@ export class BotBrain {
       if (ghost) this.cast(ghost, aim, nowMs);
       return;
     }
-    if (posture !== 'FIGHT' && posture !== 'ENGAGE') return;
+    // A bot running away still casts — but only what helps it leave. See
+    // `RETREAT_ROLES`: without this branch the `SCORE_ESCAPE` and
+    // `SCORE_SUPPORT` rows were both unreachable in a running match.
+    const running = posture === 'RETREAT' || posture === 'RECOVER';
+    if (!running && posture !== 'FIGHT' && posture !== 'ENGAGE') return;
 
-    const choice = this.chooseSpell(target, view);
+    const choice = this.chooseSpell(target, view, running ? RETREAT_ROLES : undefined);
     if (!choice) return;
     this.cast(choice, this.aimFor(choice, target), nowMs);
   }
@@ -584,13 +665,14 @@ export class BotBrain {
       // The resolver picks the body; pointing at it is all this has to do.
       return { x: target.position.x, y: target.position.y };
     }
-    const declared = choice.spell.declaredRange;
     const Ctor = choice.spell.constructor as { aiProjectileSpeed?: number };
     return predictAim(owner.position, target, {
       leadFactor: this.profile.leadFactor,
       aimErrorPx: this.profile.aimErrorPx,
       projectileSpeed: Ctor.aiProjectileSpeed ?? DEFAULT_PROJECTILE_SPEED,
-      maxRange: declared === undefined ? undefined : effectiveRange(declared, owner, target),
+      // Always a number now. `undefined` here meant "do not clamp", which is
+      // what let a range-less spell be aimed anywhere on the map — see `reachOf`.
+      maxRange: this.reachOf(choice.spell, target),
       rng: this.rng,
     });
   }

@@ -6,6 +6,8 @@ import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion'
 import { BotBrain } from '../../../src/game/ai/BotBrain';
 import { profileFor } from '../../../src/game/ai/Difficulty';
 import Invisible from '../../../src/game/gameObject/buffs/Invisible';
+import Shield from '../../../src/game/gameObject/buffs/Shield';
+import Untargetable from '../../../src/game/gameObject/buffs/Untargetable';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 const PRESET: ChampionPresetData = {
@@ -77,6 +79,61 @@ describe('BotBrain perception', () => {
       indexObjects(game, [bot, enemy]);
       expect(new BotBrain(bot).canPerceive(enemy)).toBe(false);
     }
+  });
+
+  it('never perceives an enemy nothing is allowed to target', () => {
+    // `pickTarget` walks `view.enemies` and carries no filter of its own — the
+    // quadtree path gets `targetable` free from `canTakeDamageFromTeam`, and
+    // this path had nothing. So a bot chased and cast at a champion holding
+    // `Untargetable` (Fizz E, a Zed shadow): the UNIT resolve fizzles and the
+    // skillshot is spent mana.
+    const game = createGame();
+    const bot = spawnBot(game, 'hard'); // the tier that skips the most gates
+    const enemy = spawnEnemy(game, 200, 0);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, enemy]);
+
+    const brain = new BotBrain(bot);
+    expect(brain.canPerceive(enemy)).toBe(true); // ...until it is untargetable
+
+    enemy.addBuff(new Untargetable(5_000, enemy, enemy));
+    enemy.updateBuffs();
+    expect(enemy.targetable).toBe(false);
+
+    expect(brain.canPerceive(enemy)).toBe(false);
+    expect(
+      brain.pickTarget({
+        allies: [],
+        enemies: [enemy],
+        focusTarget: null,
+        rally: null,
+        memory: new Map(),
+      })
+    ).toBeNull();
+  });
+
+  it('scans for a target once per think tick, not twice', () => {
+    // `think` called `pickTarget` and then `decidePosture` called it again. At
+    // `easy` — the one tier that does not skip terrain — each pass costs a
+    // `canSee` raycast per living enemy.
+    const game = createGame();
+    const bot = spawnBot(game, 'easy');
+    const enemy = spawnEnemy(game, 200, 0);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, enemy]);
+    // Neither of these is under test here, and both would drag in pathing.
+    bot._autoMove = false;
+    bot._autoCast = false;
+
+    const brain = new BotBrain(bot);
+    let looks = 0;
+    brain.sees = () => {
+      looks++;
+      return true;
+    };
+
+    brain.update(1_000, 16);
+    expect(looks).toBe(1);
   });
 
   it('lets normal and hard bots see through terrain, and stops easy ones', () => {
@@ -193,6 +250,29 @@ describe('BotBrain target choice', () => {
     // easy playerBias is 0, so the nearer one wins on distance alone.
     const easyBot = spawnBot(game, 'easy', 0, 0);
     expect(new BotBrain(easyBot).pickTarget(viewOf([otherBot, human]))).toBe(otherBot);
+  });
+
+  it('counts a shield when it judges how nearly dead an enemy is', () => {
+    // `pickFocus` and the `Burst` check both read `effectiveHealth`; this term
+    // read the raw pool, so one shielded enemy looked nearly dead to the target
+    // picker and perfectly healthy to the burst check on the same tick.
+    const game = createGame();
+    const bot = spawnBot(game, 'normal');
+    const healthy = spawnEnemy(game, 100, 0);
+    const shielded = spawnEnemy(game, 260, 0);
+    shielded.stats.health.baseValue = 5;
+    const shield = new Shield(5_000, shielded, shielded);
+    shield.amount = 95; // 5 + 95 is exactly `healthy`'s full pool
+    shielded.addBuff(shield);
+    shielded.updateBuffs();
+    expect(shielded.shieldAmount).toBe(95);
+
+    game.setPlayer(bot);
+    indexObjects(game, [bot, healthy, shielded]);
+
+    // Both now read as 100 effective health, so only distance separates them:
+    // -100/100 = -1 against -260/100 = -2.6, by hand.
+    expect(new BotBrain(bot).pickTarget(viewOf([shielded, healthy]))).toBe(healthy);
   });
 
   it('returns null when it can perceive nobody', () => {

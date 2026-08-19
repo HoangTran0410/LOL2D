@@ -226,6 +226,72 @@ describe('posture', () => {
   });
 });
 
+/**
+ * The five rules are a priority chain, and every test above isolates one of
+ * them against an otherwise-empty view: the retreat tests park their enemies at
+ * 900px so no FIGHT is possible, and the FIGHT test passes an empty memory and
+ * no focus. Reordering the if/else chain in `decidePosture` left the whole file
+ * green. These three pit two conditions against each other, so the ORDER is
+ * what is asserted.
+ */
+describe('posture priority', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('retreats rather than fights when both rules fire at once', () => {
+    const game = createGame();
+    const bot = spawnBot(game, 'normal'); // retreats under 0.30, aggro range 420
+    const enemy = spawnEnemy(game, 200, 0); // well inside it: a FIGHT is available
+    game.setPlayer(bot);
+    indexObjects(game, [bot, enemy]);
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.25;
+
+    expect(new BotBrain(bot).evaluatePosture(view({ enemies: [enemy] }), 0)).toBe('RETREAT');
+  });
+
+  it('keeps a running attack order ahead of a fresh sighting', () => {
+    const game = createGame();
+    const bot = spawnBot(game, 'normal');
+    // Outside aggro range, so `pickTarget` finds nothing and the ORDER is the
+    // only thing that can produce FIGHT here.
+    const chased = spawnEnemy(game, 5_000, 0);
+    const seen = spawnEnemy(game, 5_100, 0);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, chased, seen]);
+    bot.basicAttack.order(chased);
+
+    const memory = new Map<Champion, SeenEnemy>([
+      [seen, { unit: seen, atMs: 900, pos: { x: 300, y: 0 }, vel: { x: 0, y: 0 } }],
+    ]);
+    expect(new BotBrain(bot).evaluatePosture(view({ memory }), 1_000)).toBe('FIGHT');
+  });
+
+  it('investigates a fresh sighting before joining a fight it can only see second-hand', () => {
+    const game = createGame();
+    const bot = spawnBot(game, 'normal', 0, 0);
+    const focused = spawnEnemy(game, 800, 0); // outside aggro 420: not a FIGHT
+    const ally = new Champion({
+      game,
+      position: createVector(750, 0),
+      teamId: BLUE,
+      preset: PRESET,
+    });
+    const seen = spawnEnemy(game, 5_000, 0);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, ally, focused, seen]);
+
+    const memory = new Map<Champion, SeenEnemy>([
+      [seen, { unit: seen, atMs: 900, pos: { x: 300, y: 0 }, vel: { x: 0, y: 0 } }],
+    ]);
+    expect(
+      new BotBrain(bot).evaluatePosture(
+        view({ allies: [bot, ally], enemies: [focused], focusTarget: focused, memory }),
+        1_000
+      )
+    ).toBe('SEARCH');
+  });
+});
+
 describe('search point', () => {
   beforeEach(() => stubGameGlobals());
   afterEach(() => vi.unstubAllGlobals());

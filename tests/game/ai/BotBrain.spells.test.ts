@@ -3,7 +3,7 @@ import Champion, {
   type ChampionPresetData,
 } from '../../../src/game/gameObject/attackableUnits/Champion';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
-import { BotBrain } from '../../../src/game/ai/BotBrain';
+import { BotBrain, SCORE_DAMAGE, SCORE_ZONE } from '../../../src/game/ai/BotBrain';
 import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
 import type Spell from '../../../src/game/gameObject/Spell';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
@@ -18,9 +18,14 @@ const BLUE = 'team-blue';
 const RED = 'team-red';
 
 /**
- * The brain's whole contract with a spell is these six members, so a stub that
- * has them is a faithful stand-in — and each stub needs its OWN class, because
+ * The brain's whole contract with a spell is these members, so a stub that has
+ * them is a faithful stand-in — and each stub needs its OWN class, because
  * `rolesOf` caches the mask by constructor.
+ *
+ * `press` is a spy so a test can drive `BotBrain.update` end to end and ask
+ * which ability the bot actually pressed, rather than which one `chooseSpell`
+ * returned. It reports `true`, which is what a real spell returns once it has
+ * committed; `BotBrain.cast` only records the cast if it does.
  */
 const makeSpell = (
   aiRoles: number,
@@ -35,8 +40,11 @@ const makeSpell = (
     // No `range` here: `CastSpec` genuinely has none. Reach comes from
     // `declaredRange`, which is what `scoreSpell` reads.
     castSpec = { targeting: 'DIRECTION' as const };
+    press = vi.fn(() => true);
+    hold = vi.fn();
+    release = vi.fn();
   }
-  return new Stub() as unknown as Spell;
+  return new Stub() as unknown as Spell & { press: ReturnType<typeof vi.fn> };
 };
 
 const view = (over: Partial<TeamView> = {}): TeamView => ({
@@ -155,15 +163,6 @@ describe('spell choice', () => {
     expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(2); // hurt: heal
   });
 
-  it('prefers an escape while retreating', () => {
-    const { bot, brain, enemy } = setup();
-    bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage), makeSpell(SpellRole.Escape)];
-    expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(1);
-
-    brain.posture = 'RETREAT';
-    expect(brain.chooseSpell(enemy, view())?.slotIndex).toBe(2);
-  });
-
   it('skips a spell whose range cannot reach, unless it closes the gap itself', () => {
     const { bot, brain, enemy } = setup(); // enemy is 200px away
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage, { range: 100 })];
@@ -188,6 +187,52 @@ describe('spell choice', () => {
     const { bot, brain } = setup();
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Poke)];
     expect(brain.chooseSpell(null, view())).toBeNull();
+  });
+
+  it('reads an undeclared range as the tier reach, never as an infinite one', () => {
+    // `Flash` declares no range at all, and 27 other POINT/DIRECTION spells in
+    // `src/game/gameObject/spells/` declare none either. Reading that as
+    // +Infinity made every one of them reachable from anywhere on the map, so
+    // the skip below never fired for any of them.
+    const { game, bot, brain } = setup(); // normal aggroRange is 420
+    bot.spells = [makeSpell(0), makeSpell(SpellRole.Damage, { range: undefined })];
+
+    const beyond = new Champion({
+      game,
+      position: createVector(500, 0),
+      teamId: RED,
+      preset: PRESET,
+    });
+    expect(brain.chooseSpell(beyond, view())).toBeNull();
+
+    // ...and still offered inside that reach, so what the skip answers to is
+    // the distance and not merely the missing declaration.
+    const inside = new Champion({
+      game,
+      position: createVector(300, 0),
+      teamId: RED,
+      preset: PRESET,
+    });
+    expect(brain.chooseSpell(inside, view())?.slotIndex).toBe(1);
+  });
+
+  it('withholds the zone bonus from a spell whose reach it had to guess', () => {
+    // `Zone`'s +8 is paid for an area the spell covers. A range-less spell used
+    // to collect it unconditionally, because the reach it was compared against
+    // was +Infinity and `Infinity <= Infinity` is true. That is most of how
+    // Flash — `Damage | Zone | Burst` by inference — outscored every real Q.
+    const { brain, enemy } = setup(); // enemy 200px away, inside either reach
+    brain.rng = () => 0.5; // the neutral multiplier, so raw scores come through
+    const mask = roles(SpellRole.Damage, SpellRole.Zone);
+
+    const declared = makeSpell(mask, { range: 500 });
+    expect(brain.scoreSpell(declared, 1, mask, enemy, view())).toBeCloseTo(
+      SCORE_DAMAGE + SCORE_ZONE,
+      6
+    );
+
+    const guessed = makeSpell(mask, { range: undefined });
+    expect(brain.scoreSpell(guessed, 1, mask, enemy, view())).toBeCloseTo(SCORE_DAMAGE, 6);
   });
 
   it('turns into a different bot when the noise is turned up', () => {
@@ -267,5 +312,90 @@ describe('ghost cast', () => {
     bot.spells = [makeSpell(0), makeSpell(SpellRole.Zone)]; // declaredRange 500
     const farAim = { x: 3_000, y: 0 };
     expect(brain.chooseGhostSpell(entry(0, enemy), 500, farAim)).toBeNull();
+  });
+});
+
+/**
+ * The retreat casts, driven through `BotBrain.update` rather than by assigning
+ * `brain.posture`. The posture in each of these is produced by `decidePosture`
+ * from the bot's own health, which is the whole point: `SCORE_ESCAPE` and
+ * `SCORE_SUPPORT` were both written into the scorer and neither was reachable
+ * in a running match, and the test that covered them set the posture by hand.
+ */
+describe('casting while running away', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  /**
+   * `createGame`'s `createSpellContext` returns `undefined`, which makes
+   * `BotBrain.cast` bail before it presses anything — so a test driving the
+   * real path has to hand the brain a context it can cast with.
+   */
+  const casting = (difficulty: 'easy' | 'normal' | 'hard' = 'normal') => {
+    const made = setup(difficulty);
+    (made.game as unknown as { createSpellContext: () => unknown }).createSpellContext = () => ({
+      cursorWorld: { x: 0, y: 0 },
+    });
+    made.brain.rng = () => 0.5; // neutral multiplier, so raw scores rank
+    return made;
+  };
+
+  it('presses its escape while retreating, with nobody setting the posture', () => {
+    const { bot, brain } = casting(); // normal retreats below 30% health
+    const damage = makeSpell(SpellRole.Damage);
+    const getaway = makeSpell(SpellRole.Escape);
+    bot.spells = [makeSpell(0), damage, getaway];
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
+
+    brain.update(1_000, 16);
+
+    expect(brain.posture).toBe('RETREAT');
+    expect(getaway.press).toHaveBeenCalledTimes(1);
+    expect(damage.press).not.toHaveBeenCalled();
+  });
+
+  it('will not fire a damage spell while running away', () => {
+    // The other half of the ruling: a fleeing bot casts, but only what helps it
+    // leave. Without the role narrowing this kit's damage spell scores 10, wins
+    // its own selection and gets pressed at the enemy the bot is running from.
+    const { bot, brain } = casting();
+    const damage = makeSpell(SpellRole.Damage);
+    bot.spells = [makeSpell(0), damage];
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
+
+    brain.update(1_000, 16);
+
+    expect(brain.posture).toBe('RETREAT');
+    expect(damage.press).not.toHaveBeenCalled();
+  });
+
+  it('presses its heal once it has arrived and settled into RECOVER', () => {
+    // RECOVER is where a hurt bot spends most of its time — `decidePosture`
+    // latches it there until health AND mana are back, and it cannot heal
+    // without casting. `createGame` has no turrets and no fountain, so
+    // `atRetreatPoint()` is true and the second tick is RECOVER.
+    const { bot, brain } = casting();
+    const heal = makeSpell(SpellRole.Heal);
+    bot.spells = [makeSpell(0), heal];
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
+
+    brain.update(1_000, 16);
+    expect(brain.posture).toBe('RETREAT');
+    heal.press.mockClear();
+
+    brain.update(2_000, 16); // past normal's 900ms cast interval
+    expect(brain.posture).toBe('RECOVER');
+    expect(heal.press).toHaveBeenCalledTimes(1);
+  });
+
+  it('still obeys the cast interval while retreating', () => {
+    const { bot, brain } = casting();
+    const getaway = makeSpell(SpellRole.Escape);
+    bot.spells = [makeSpell(0), getaway];
+    bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.2;
+
+    brain.update(1_000, 16);
+    brain.update(1_400, 16); // 400ms later: a think tick, but inside 900ms
+    expect(getaway.press).toHaveBeenCalledTimes(1);
   });
 });
