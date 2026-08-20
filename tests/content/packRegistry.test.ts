@@ -96,7 +96,39 @@ describe('PackRegistry', () => {
   });
 
   it('refuses an invalid pack instead of half-installing it', () => {
-    expect(() => registry.install({ manifest: { id: 'bad:id' } } as never)).toThrow(/id/);
+    // The manifest id is fine — this pack is rejected for a different reason
+    // (a champion naming a spell the pack never declares) — but it still
+    // carries payload in every section a write-first install() would touch,
+    // so a reordering bug has something to leak. A pack whose only content is
+    // `{ manifest: { id: 'bad:id' } }` cannot pin this: there is nothing in
+    // it to write in the first place.
+    expect(() =>
+      registry.install(
+        pack('bad', {
+          spells: { Q: class {} } as never,
+          champions: [{ id: 'a', name: 'A', image: null, spells: ['Q', 'Missing'] }],
+          monsters: {
+            big: { id: 'big', name: 'Big', fills: ['epic'], health: 1000 },
+          } as never,
+          maps: [
+            {
+              id: 'arena',
+              size: 4000,
+              terrain: { wall: [], bush: [], water: [] },
+              factions: [{ id: 'solo' }],
+              slots: { spawn: [], minion: [], structure: [], neutral: [] },
+            },
+          ] as never,
+        })
+      )
+    ).toThrow(/Missing/);
     expect(registry.champions()).toEqual([]);
+    expect(registry.maps()).toEqual([]);
+    expect(registry.spellClass('bad:Q')).toBeNull();
+    expect(registry.monstersFilling('epic')).toEqual([]);
+  });
+
+  it('rejects a pack whose id is not a bare identifier', () => {
+    expect(() => registry.install({ manifest: { id: 'bad:id' } } as never)).toThrow(/id/);
   });
 });

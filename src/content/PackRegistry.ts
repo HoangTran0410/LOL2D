@@ -78,11 +78,11 @@ export class PackRegistry {
   }
 
   champions(): readonly QualifiedChampion[] {
-    return this.championList;
+    return [...this.championList];
   }
 
   maps(): readonly QualifiedMap[] {
-    return this.mapList;
+    return [...this.mapList];
   }
 
   spellClass(qualifiedId: string): SpellClass | null {
