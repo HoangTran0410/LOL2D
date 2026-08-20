@@ -2080,3 +2080,170 @@ config panel's chunk boundary standing."
 ## Not in this batch
 
 Migrating Riot content into `packs/riot/`, `MapDefinition` wiring into `TerrainMap`/`NavGrid`/`MinionSpawner`, removing `musterPointFor`, splitting `MonsterPreset` into slots and monsters, exporting the seams as re-pointable rules, and the reference map. Those are batch 2, and its plan should be written after this one lands — what batch 1 learns about `ContentApi` is what shapes it.
+
+---
+
+## Task 9: Recall is content, not a core mechanic
+
+Task 1 moved `Recall` into `coreSpells/` on the grounds that going home is a mechanic every pack presupposes. That is wrong, and the user caught it: **recall presupposes a fountain, and a fountain is map content.** A battle-royale map — a forest where everyone farms and fights and the last one standing wins, which is explicitly in scope per the spec's §7 — has no fountain to return to. `BasicAttack` is genuinely universal; every unit in every conceivable pack can swing. `Recall` is not.
+
+The fix is cheaper than it looks, because the defensive plumbing already exists: `Champion.ts:216,223` already call `this.recall?.update()` and `this.recall?.drawVfx()`; `Recall.ts:131-132` already degrades to `undefined` when no platform matches the team; and `Recall.ts:18-20` already declares a structural `TeamPlatform` so it never imports `Fountain`. The single thing asserting recall always exists is the field initialiser at `Champion.ts:137`.
+
+**Files:**
+- Move: `src/game/gameObject/coreSpells/Recall.ts` → `src/game/gameObject/spells/Recall.ts`
+- Modify: `src/game/gameObject/coreSpells/index.ts`, `src/game/gameObject/attackableUnits/Champion.ts:137`, `src/game/preset.ts`, `scripts/generate-spell-catalog.mjs`, `src/content/ContentPack.ts`, `src/content/validate.ts`
+- Test: `tests/content/recallIsContent.test.ts`, plus reverting four test files' `Recall` exclusions
+
+**Interfaces:**
+- Consumes: `ChampionEntry` from `src/content/ContentPack.ts`.
+- Produces: `Champion.recall: Spell | null`; `ChampionEntry.recall?: string`. Batch 2 supplies the latter from a pack; batch 1 keeps the game working by having `preset.ts` set it, exactly as `preset.ts` already supplies `BasicAttack`.
+
+- [ ] **Step 1: Write the failing test**
+
+`tests/content/recallIsContent.test.ts`:
+
+```ts
+import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+/**
+ * Recall is content, because it presupposes a fountain.
+ *
+ * It was briefly classified as a core mechanic alongside `BasicAttack`, on the
+ * grounds that every pack presupposes a way home. Every pack does not: a map
+ * with no spawn platform — a battle-royale forest, which the design explicitly
+ * allows — has nowhere to recall to. `BasicAttack` is universal because every
+ * unit can swing; `Recall` is a mechanic that only exists on maps that grant it.
+ *
+ * So `Champion` must not construct one. The class may hold a recall; it may not
+ * assume it has one.
+ */
+const SRC = join(__dirname, '../../src');
+const read = (rel: string): string => readFileSync(join(SRC, rel), 'utf8');
+const stripComments = (s: string): string =>
+  s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+
+describe('recall is content', () => {
+  it('Champion does not import or construct a Recall', () => {
+    const source = stripComments(read('game/gameObject/attackableUnits/Champion.ts'));
+    expect(source).not.toMatch(/new Recall\(/);
+    expect(source).not.toMatch(/from '[^']*Recall'/);
+  });
+
+  it('Champion.recall is nullable, so a map without a fountain is expressible', () => {
+    const source = stripComments(read('game/gameObject/attackableUnits/Champion.ts'));
+    expect(source).toMatch(/recall\s*:\s*[^=;]*\|\s*null/);
+  });
+
+  it('the core spell barrel carries only the basic attack', () => {
+    const source = stripComments(read('game/gameObject/coreSpells/index.ts'));
+    expect(source).toMatch(/BasicAttack/);
+    expect(source).not.toMatch(/Recall/);
+  });
+
+  it('a pack can declare a champion its way home', () => {
+    const source = stripComments(read('content/ContentPack.ts'));
+    expect(source).toMatch(/recall\?\s*:\s*string/);
+  });
+});
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Run: `npx vitest run tests/content/recallIsContent.test.ts`
+Expected: all four FAIL — `Champion.ts` still imports and constructs `Recall`, its field is non-nullable, the core barrel still exports `Recall`, and `ChampionEntry` has no `recall` field.
+
+- [ ] **Step 3: Move the file back to content**
+
+```bash
+git mv src/game/gameObject/coreSpells/Recall.ts src/game/gameObject/spells/Recall.ts
+```
+
+**Do NOT add it to `src/game/gameObject/spells/index.ts`.** It was never in that barrel, which is exactly why it never appeared in the loadout picker: `scripts/generate-spell-catalog.mjs` builds the catalogue from the barrel. Leaving it out restores the pre-Task-1 state precisely.
+
+In `src/game/gameObject/coreSpells/index.ts`, delete the `Recall` export line and adjust the doc comment — the barrel now carries one thing, the attack every unit has.
+
+- [ ] **Step 4: Delete the machinery that existed only for Recall**
+
+`scripts/generate-spell-catalog.mjs:70` holds `const CATALOG_HIDDEN_CORE_IDS = new Set(['Recall'])`, and line 131 filters the core barrel through it. Both exist solely because Task 1 put `Recall` into a barrel that feeds the catalogue. With `Recall` back in content and out of both barrels, delete the constant and the filter, and load `CoreSpells` directly.
+
+Then find the four test files that hard-code a `Recall` exclusion — `tests/game/preset.catalog.test.ts`, `tests/game/spellRegistry.test.ts`, `tests/game/config/spellCatalog.test.ts`, `tests/game/spells/cancel-policy.test.ts` — and revert each exclusion. They were added in Task 1 for the same reason and are now describing a situation that no longer exists. If any of them fails after reverting, that is information: report it rather than re-adding the exclusion.
+
+- [ ] **Step 5: Make `Champion.recall` a field the class does not fill**
+
+`src/game/gameObject/attackableUnits/Champion.ts:137` currently reads:
+
+```ts
+  readonly recall: Recall = new Recall(this);
+```
+
+Replace the field and its doc comment with:
+
+```ts
+  /**
+   * This champion's way home, or null on a map that grants none.
+   *
+   * Not built here. Recall needs a fountain to return to, and a fountain is
+   * something a map supplies — a battle-royale map has none, and on one the
+   * `B` key and the touch button do nothing rather than doing something
+   * meaningless. `preset.ts` fills this in today; a content pack declares it
+   * per champion (`ChampionEntry.recall`) once the boot path reads packs.
+   */
+  recall: Spell | null = null;
+```
+
+Drop the `Recall` import. Keep `this.recall?.update()` and `this.recall?.drawVfx()` — they already handle absence. Check `Champion.ts:271`'s `this.removeSpell(this.recall)` and guard it if it cannot take null.
+
+- [ ] **Step 6: Have `preset.ts` supply it, so the game keeps working**
+
+`preset.ts` already imports `BasicAttack` and uses it as the universal slot fallback; it is the layer where content decisions are made. Give it the same job for recall: import `Recall` from `@/game/gameObject/spells/Recall` and set `champion.recall = new Recall(champion)` wherever a champion is finished being built.
+
+Find the right seam by reading how `preset.ts` and `Champion`'s constructor actually cooperate — `presetFromPlan` / `getChampionPresetFromLoadout` are the likely places. The requirement is behavioural: **pressing `B` in a normal match must work exactly as it does today**, and `npm run e2e` must not regress. If the only honest seam is inside `Champion`'s constructor taking an optional recall factory in its options, that is acceptable — what must not survive is the class hard-coding which spell it is.
+
+- [ ] **Step 7: Add `recall` to the pack contract**
+
+In `src/content/ContentPack.ts`, extend `ChampionEntry`:
+
+```ts
+export interface ChampionEntry {
+  id: string;
+  name: string;
+  image: string | null;
+  spells: string[];
+  /** Local id of this champion's way home. Absent on a map that grants none. */
+  recall?: string;
+}
+```
+
+In `src/content/validate.ts`, `checkChampions` already verifies every id in `spells` is declared by the pack. Give `recall` the same treatment: if present it must be a string naming a spell the pack declares. Add a test case in `tests/content/validate.test.ts` for a champion whose `recall` names a spell that does not exist, and show it failing first.
+
+In `src/content/PackRegistry.ts`, qualify it like the others — `QualifiedChampion.recall` becomes `packId:localId` or stays undefined.
+
+- [ ] **Step 8: Verify**
+
+Run: `npx vitest run tests/content/ && npm run verify 2>&1 | grep -E "Tests |Test Files |error|FAIL"`
+Expected: green, at or above 3963 tests.
+
+Then confirm the behaviour by hand or by driving it: a normal match still recalls on `B`. Report which you did.
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add src/game/gameObject/spells/Recall.ts src/game/gameObject/coreSpells/index.ts \
+  src/game/gameObject/attackableUnits/Champion.ts src/game/preset.ts \
+  scripts/generate-spell-catalog.mjs src/generated/spellCatalog.ts src/generated/spellModules.ts \
+  src/content/ContentPack.ts src/content/validate.ts src/content/PackRegistry.ts \
+  tests/content tests/game/preset.catalog.test.ts tests/game/spellRegistry.test.ts \
+  tests/game/config/spellCatalog.test.ts tests/game/spells/cancel-policy.test.ts
+git commit -m "refactor(content): recall is content, because it presupposes a fountain
+
+Task 1 classified it as a mechanic every pack presupposes, alongside the
+basic attack. Every pack does not: a map with no spawn platform has
+nowhere to recall to, and lane-less N-player maps are explicitly in
+scope. Champion may hold a recall; it may not assume it has one.
+
+This also deletes CATALOG_HIDDEN_CORE_IDS and the four test-file Recall
+exclusions, which existed only because Task 1 put Recall into a barrel
+that feeds the loadout catalogue."
+```
