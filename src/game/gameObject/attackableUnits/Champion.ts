@@ -98,19 +98,34 @@ const STATUS_TEXT_BUFF_INDEX = new Map<unknown, number>(
   STATUS_TEXT_BUFFS.map((BuffClass, index) => [BuffClass.prototype, index])
 );
 
-/** `instanceof` against every `STATUS_TEXT_BUFFS` entry in one prototype-chain
- *  walk instead of nine separate chain walks, one per candidate class. -1 if
- *  `buff` is none of them (the common case for a champion carrying a large
- *  stacking buff — Cho'Gath Feast, Veigar Q, Nasus Q — none of which are
- *  crowd control). See the O(9N) note on `STATUS_TEXT_BUFFS` above. */
-const statusTextIndexOf = (buff: Buff): number => {
-  let proto: unknown = Object.getPrototypeOf(buff);
-  while (proto) {
-    const index = STATUS_TEXT_BUFF_INDEX.get(proto);
-    if (index !== undefined) return index;
-    proto = Object.getPrototypeOf(proto);
-  }
-  return -1;
+/**
+ * `instanceof` against every `STATUS_TEXT_BUFFS` entry in one prototype-chain
+ * walk instead of nine separate chain walks, one per candidate class. -1 if
+ * `buff` is none of them (the common case for a champion carrying a large
+ * stacking buff — Cho'Gath Feast, Veigar Q, Nasus Q — none of which are
+ * crowd control). See the O(9N) note on `STATUS_TEXT_BUFFS` above.
+ *
+ * Held as a method on a plain object, not a bare function, so a test can
+ * `vi.spyOn` it directly to count calls — the seam for
+ * `champion-status-text-duplicate-skip.test.ts`, which proves
+ * `drawHealthBar` stops calling it for the 2nd..Nth instance of a
+ * `singleRepresentativeDraw` stack (`Buff.ts`) once the first has answered
+ * for that `stackId`, same idea as `AttackableUnit.drawBuffs()`'s skip and
+ * for the same reason: at N in the thousands (a cheat-console stack count,
+ * not a design limit — see `.superpowers/perf-healthbar-report.md`), a
+ * prototype-chain walk run once per instance instead of once per *group* is
+ * a real, measured, avoidable cost.
+ */
+export const ChampionStatusText = {
+  indexOf(buff: Buff): number {
+    let proto: unknown = Object.getPrototypeOf(buff);
+    while (proto) {
+      const index = STATUS_TEXT_BUFF_INDEX.get(proto);
+      if (index !== undefined) return index;
+      proto = Object.getPrototypeOf(proto);
+    }
+    return -1;
+  },
 };
 
 export const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
@@ -541,9 +556,22 @@ export default class Champion extends AttackableUnit {
       // fixed class order regardless of where in `this.buffs` each one sits.
       const firstOfClass: (Buff | undefined)[] = new Array(STATUS_TEXT_BUFFS.length);
       let unfilled = STATUS_TEXT_BUFFS.length;
+      // A `singleRepresentativeDraw` stack (Cho'Gath Feast and friends) can
+      // be thousands of instances of the exact same class, and every one of
+      // them resolves to the exact same answer here — so once the first
+      // instance of a given `stackId` has been resolved, skip the
+      // prototype-chain walk entirely for the rest of that group rather than
+      // repeating it. `resolvedGroups` is only allocated if a stack that
+      // opts in is actually present.
+      let resolvedGroups: Set<BuffStackId> | null = null;
       for (let j = 0; j < this.buffs.length && unfilled > 0; j++) {
         const buff = this.buffs[j];
-        const index = statusTextIndexOf(buff);
+        if (buff.singleRepresentativeDraw) {
+          resolvedGroups ??= new Set();
+          if (resolvedGroups.has(buff.stackId)) continue;
+          resolvedGroups.add(buff.stackId);
+        }
+        const index = ChampionStatusText.indexOf(buff);
         if (index === -1 || firstOfClass[index]) continue;
         firstOfClass[index] = buff;
         unfilled--;

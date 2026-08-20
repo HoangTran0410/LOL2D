@@ -34,6 +34,24 @@ export default class Buff {
   timeElapsed = 0;
   toRemove = false;
 
+  /**
+   * When true, `AttackableUnit.drawBuffs()` calls `.draw()` on only the
+   * *first* live buff sharing this instance's `stackId` each pass, and skips
+   * every later one outright — a property read and a `Set` check, not a
+   * function call.
+   *
+   * For a buff that paints its own visual per instance (a spinning icon over
+   * the character, an aura ring), leave this `false` — the default, so every
+   * existing buff draws exactly as before. Opt in when a *stack* is a data
+   * count, not a drawable: Cho'Gath's Feast is one buff instance per stack
+   * (so `addBuff`'s grouping and a stat readout can count them), and its
+   * "crown of horns" ring already meant *one* stack's whole drawn output.
+   * Before this flag, all of them still got their own `.draw()` call — 999
+   * calls a frame to paint one ring is a real, measured cost at the stack
+   * counts a cheat can reach (`ChoGath_R.ts`, `.superpowers/perf-healthbar-report.md`).
+   */
+  singleRepresentativeDraw = false;
+
   statusFlagsToEnable = 0;
   statusFlagsToDisable = 0;
 

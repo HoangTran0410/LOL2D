@@ -155,53 +155,6 @@ export function createGrowthStack(owner: any, duration: number, image: any): Cho
 }
 
 /**
- * Which live `ChoGath_R_Growth` draws the shared ring for one champion this
- * rendered frame, and how many stacks it is standing in for.
- *
- * `AttackableUnit.drawBuffs()` has no notion of "one ring per stacking spell"
- * — it calls `.draw()` on every buff instance, and a Feast stack is its own
- * instance per stack (`STACKS_AND_CONTINUE`). So at N stacks, N `.draw()`
- * calls happen every frame, and only the first should paint anything.
- * Finding out which one that is used to mean re-scanning `owner.buffs` from
- * *inside every one of those N calls* — an O(N) scan run N times, i.e. O(N^2)
- * per champion per frame, growing with stack count alone and independent of
- * the `MAX_UNIT_SIZE` cap that bounds body growth. Measured cost at 99 stacks
- * on two champions: see `.superpowers/perf-healthbar-report.md`.
- *
- * The fix is memoizing the one scan a frame actually needs. Keyed by
- * `frameCount` (a p5 global already read by `draw()` below) rather than by
- * `owner.buffs.length`, so the cache is correct even if a stack is added or
- * removed between one draw call and the next within the same frame — it just
- * goes stale the instant a new frame starts, which is exactly the window the
- * result is valid for.
- */
-const growthLeadCache = new WeakMap<
-  AttackableUnit,
-  { frame: number; lead: ChoGath_R_Growth | undefined; count: number }
->();
-
-const growthLead = (
-  owner: AttackableUnit,
-  self: ChoGath_R_Growth
-): { isLead: boolean; count: number } => {
-  const cached = growthLeadCache.get(owner);
-  if (cached && cached.frame === frameCount) {
-    return { isLead: cached.lead === self, count: cached.count };
-  }
-
-  let lead: ChoGath_R_Growth | undefined;
-  let count = 0;
-  for (const buff of owner.buffs) {
-    if (buff instanceof ChoGath_R_Growth) {
-      if (!lead) lead = buff;
-      count++;
-    }
-  }
-  growthLeadCache.set(owner, { frame: frameCount, lead, count });
-  return { isLead: lead === self, count };
-};
-
-/**
  * Its own class rather than a bare `StatAmp`: `addBuff` groups stacks by
  * constructor, so a one-stack StatAmp from some other spell would otherwise
  * knock a Feast stack off the moment it landed.
@@ -221,6 +174,18 @@ export class ChoGath_R_Growth extends StatAmp {
    * One stack draws the whole crown of horns for all of them — doing it per
    * stack would redraw the same ring N times.
    *
+   * `AttackableUnit.drawBuffs()` reads this: past the first live stack it
+   * skips straight to the next buff without ever calling `.draw()` here, so
+   * this method now runs at most once per champion per frame regardless of
+   * stack count — the round-1 fix memoized the *cost* of finding that out
+   * (an O(N) scan run N times, i.e. O(N^2) — see
+   * `.superpowers/perf-healthbar-report.md`), but a champion cheated well
+   * past `maxStacks` (the cap does not actually hold for a burst
+   * `setStackCount` call — same report) still meant hundreds to thousands of
+   * *function calls* a frame to find out. `drawBuffs()` now guarantees
+   * there is only ever one call to begin with, so the scan below runs once,
+   * not once-cached-per-frame.
+   *
    * The horns are the *feel* of the count, not the count. The exact number is
    * already on the buff-icon row above the health bar, which `Champion`
    * assembles for every champion on screen by grouping buffs on `stackId` —
@@ -229,11 +194,12 @@ export class ChoGath_R_Growth extends StatAmp {
    * every future stacking spell would have had to invent a third. Nothing
    * world-space prints a tally any more.
    */
+  singleRepresentativeDraw = true;
+
   draw(): void {
     if (this.targetUnit.isDead) return;
 
-    const { isLead, count: n } = growthLead(this.targetUnit, this);
-    if (!isLead) return;
+    const n = liveStacks(this.targetUnit).length;
 
     const pos = this.targetUnit.position;
     const radius = this.targetUnit.animatedValues.displaySize / 2;

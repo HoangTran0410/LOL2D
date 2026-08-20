@@ -144,12 +144,14 @@ async function measure({ measureMs }) {
   const bucket = () => ({ calls: 0, ms: 0 });
   const buckets = {
     gameDraw: bucket(),
+    gameUpdate: bucket(),
     objectManagerDraw: bucket(),
     unitCollisionResolve: bucket(),
     fogOfWarDraw: bucket(),
     drawHealthBar: bucket(),
     drawBuffs: bucket(),
     growthDraw: bucket(),
+    updateBuffs: bucket(),
   };
 
   // `obj` is sometimes an actual instance (game, game.objectManager) and
@@ -187,6 +189,7 @@ async function measure({ measureMs }) {
     game.draw = originalGameDraw;
   });
 
+  wrap(game, 'update', buckets.gameUpdate);
   wrap(game.objectManager, 'draw', buckets.objectManagerDraw);
   wrap(game.objectManager.unitCollision, 'resolve', buckets.unitCollisionResolve);
   wrap(game.fogOfWar, 'draw', buckets.fogOfWarDraw);
@@ -199,6 +202,7 @@ async function measure({ measureMs }) {
   const unitProto = Object.getPrototypeOf(championProto);
   wrap(championProto, 'drawHealthBar', buckets.drawHealthBar);
   wrap(unitProto, 'drawBuffs', buckets.drawBuffs);
+  wrap(unitProto, 'updateBuffs', buckets.updateBuffs);
 
   const growth =
     player.buffs.find(b => b.constructor.name === 'ChoGath_R_Growth') ??

@@ -12,7 +12,7 @@ import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 import PathAgent from '@/game/nav/PathAgent';
 import { NAV_MAX_TERRAIN_RADIUS } from '@/game/nav/NavGrid';
 import type Buff from '@/game/gameObject/Buff';
-import type { BuffConstructor } from '@/game/gameObject/Buff';
+import type { BuffConstructor, BuffStackId } from '@/game/gameObject/Buff';
 
 export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
   game: GameObjectRuntimeContext;
@@ -293,7 +293,19 @@ export default class AttackableUnit extends GameObject {
   }
 
   drawBuffs(compact = false) {
+    // `singleRepresentativeDraw` buffs (see `Buff.ts`) are a data count with
+    // one shared visual, not one drawable per instance — so past the first
+    // live stack of a given `stackId`, skip straight past `.draw()` with a
+    // property read and a `Set` check instead of calling into it. A champion
+    // cheated to hundreds of Feast stacks used to mean hundreds of function
+    // calls a frame to paint one ring.
+    let seenSingleDraw: Set<BuffStackId> | null = null;
     for (const buff of this.buffs) {
+      if (buff.singleRepresentativeDraw) {
+        seenSingleDraw ??= new Set();
+        if (seenSingleDraw.has(buff.stackId)) continue;
+        seenSingleDraw.add(buff.stackId);
+      }
       if (!compact || (buff.statusFlagsToEnable | buff.statusFlagsToDisable) !== 0) {
         buff.draw?.();
       }
