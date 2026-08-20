@@ -1,0 +1,82 @@
+import type { ContentApi } from '@/content/ContentApi';
+
+/**
+ * Vera's Q — a short straight bolt.
+ *
+ * The reference pack's job is to be the second consumer of `ContentApi`, so it
+ * uses the base class, an asset, a buff and a particle system rather than the
+ * smallest thing that would compile. An API shaped by exactly one consumer is
+ * shaped *around* that consumer.
+ *
+ * Damage is scaled to the ~100 health pool the whole game is tuned against
+ * (`docs/VFX_STANDARD.md`): abilities 15-35, ultimates 40-60.
+ */
+export const VERA_Q_DAMAGE = 22;
+export const VERA_Q_RANGE = 420;
+export const VERA_Q_SPEED = 12;
+export const VERA_Q_COOLDOWN_MS = 6_000;
+export const VERA_Q_MANA = 30;
+
+export default function makeVeraQ(api: ContentApi) {
+  /**
+   * `MissileSpellObject` flies `position` -> `destination`, hits enemies it
+   * overlaps, dies on arrival. A subclass normally overrides only `onHit`,
+   * `draw` and the tuning fields. It already reports a correct
+   * `getDisplayBoundingBox()` sized from `size`, so nothing extra is needed
+   * here to keep it visible while its centre is on screen.
+   */
+  class VeraQObject extends api.MissileSpellObject {
+    speed = VERA_Q_SPEED;
+    size = 16;
+    damage = VERA_Q_DAMAGE;
+
+    onHit(target: { takeDamage(amount: number, source: unknown): void }): void {
+      target.takeDamage(this.damage, this.owner);
+    }
+
+    draw(): void {
+      // Named for what it is in the effect, never for the quantity's generic
+      // word: `fill`, `line`, `point` and `color` are p5 globals in this
+      // project and a local of the same name silently shadows one.
+      const bolt = this.position;
+      push();
+      noStroke();
+      fill(120, 200, 255, 220);
+      circle(bolt.x, bolt.y, this.size);
+      fill(220, 245, 255, 160);
+      circle(bolt.x, bolt.y, this.size * 0.5);
+      pop();
+    }
+  }
+
+  return class Vera_Q extends api.Spell {
+    name = 'Tia Lam (Vera_Q)';
+    image = api.asset('reference_vera_q');
+    description =
+      'Bắn một tia năng lượng thẳng, gây <span class="damage">22 sát thương</span> cho kẻ địch đầu tiên trúng.';
+    // Milliseconds. `Spell.coolDown` is ms throughout — Malphite_Q is 8_000.
+    coolDown = VERA_Q_COOLDOWN_MS;
+    manaCost = VERA_Q_MANA;
+    targetingMode = 'DIRECTION' as const;
+    // Read by the base class's `previewRadius`/`declaredRange`, so the HUD
+    // range ring has something to draw — the same field name Ashe_Q, Ekko_E
+    // and Malphite_Q all use for exactly this.
+    range = VERA_Q_RANGE;
+
+    onSpellCast(): void {
+      const shot = new VeraQObject(this.owner);
+      // `aimPoint` + `VectorUtils.getVectorWithRange` is the established
+      // DIRECTION idiom in this codebase (Ashe_Q, Ekko_E): a cursor that
+      // lands exactly on the caster degrades to a small random jitter
+      // instead of a (0,0) direction, so the shot never destinations onto
+      // its own origin. `aimPoint` reads the snapshotted cast context, so
+      // it resolves the same way for a bot caster as for the player.
+      shot.destination = api.utils.VectorUtils.getVectorWithRange(
+        this.owner.position,
+        this.aimPoint,
+        VERA_Q_RANGE
+      ).to;
+      this.game.objectManager.addObject(shot);
+    }
+  };
+}
