@@ -5,8 +5,8 @@ import Buff from '@/game/gameObject/Buff';
 /**
  * Shared across Anivia's kit: Flash Frost (Q) and a fully-formed Glacial Storm
  * (R) both mark a target Chilled, and Frostbite (E) reads it to double its
- * damage. Not a crowd-control effect — no statusFlags — so it keeps its own
- * ability-art icon instead of a CC icon like `buff_slow`.
+ * damage. Not a crowd-control effect — no statusFlags — so it carries its
+ * own frost mark rather than a CC icon like `buff_slow`.
  *
  * `RENEW_EXISTING` matches the Wiki text exactly: "refreshing on subsequent
  * hits" rather than stacking into something stronger.
@@ -14,7 +14,7 @@ import Buff from '@/game/gameObject/Buff';
 export const CHILL_DURATION_MS = 3_000;
 
 export default class Chilled extends Buff {
-  image: Buff['image'] = AssetManager.get('spell_anivia_e');
+  image: Buff['image'] = AssetManager.get('buff_chill');
   name = 'Nhiễm Lạnh';
   buffAddType = BuffAddType.RENEW_EXISTING;
 
