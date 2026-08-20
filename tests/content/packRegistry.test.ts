@@ -36,6 +36,34 @@ describe('PackRegistry', () => {
     expect(registry.champions()[0].spells).toEqual(['ref:Alpha_Q']);
   });
 
+  it('qualifies a champion recall the same way it qualifies its spells', () => {
+    registry.install(
+      pack('ref', {
+        spells: { Alpha_Q: class {}, Alpha_Recall: class {} } as never,
+        champions: [
+          {
+            id: 'alpha',
+            name: 'Alpha',
+            image: null,
+            spells: ['Alpha_Q'],
+            recall: 'Alpha_Recall',
+          },
+        ],
+      })
+    );
+    expect(registry.champions()[0].recall).toBe('ref:Alpha_Recall');
+  });
+
+  it('leaves recall undefined for a champion whose pack declares none', () => {
+    registry.install(
+      pack('ref', {
+        spells: { Alpha_Q: class {} } as never,
+        champions: [{ id: 'alpha', name: 'Alpha', image: null, spells: ['Alpha_Q'] }],
+      })
+    );
+    expect(registry.champions()[0].recall).toBeUndefined();
+  });
+
   it('keeps two packs that use the same local id apart', () => {
     const A = class {};
     const B = class {};

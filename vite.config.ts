@@ -274,6 +274,16 @@ export default defineConfig({
            */
           // `coreSpells/` is core and falls through to the `game` chunk below;
           // only the content directory is chunked per champion.
+          //
+          // `Recall` is the one content file that is not per-champion: it
+          // presupposes a fountain, not a kit, so it moved back to `spells/`
+          // (see that file's own header) — but `preset.ts` still imports it
+          // eagerly for every match this batch, exactly like `BasicAttack`.
+          // Left to the regex below it would land in its own `spell-common`
+          // chunk that nothing ever *dynamically* imports, which is exactly
+          // the static edge `chunks:check`'s `game` rule exists to catch.
+          // Carved out ahead of the regex so it bundles with `game` instead.
+          if (id.endsWith('src/game/gameObject/spells/Recall.ts')) return 'game';
           const spell =
             /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
           if (spell) {

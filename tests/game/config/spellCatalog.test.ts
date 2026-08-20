@@ -39,13 +39,10 @@ import { spellCatalog } from '../../../src/generated/spellCatalog';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
 // The catalogue is generated from two barrels — `spells/` (content) and
-// `coreSpells/` (`BasicAttack`, `Recall`) — merged content-last, so "the
-// barrel" this file checks against means both, merged the same way. `Recall`
-// itself is excluded: it is core plumbing bound to `Champion.recall`/`B`, not
-// a pickable ability, and `scripts/generate-spell-catalog.mjs`
-// (`CATALOG_HIDDEN_CORE_IDS`) deliberately gives it no catalogue entry.
+// `coreSpells/` (`BasicAttack`) — merged content-last, so "the barrel" this
+// file checks against means both, merged the same way.
 const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
-const barrelKeys = Object.keys(AllSpellsById).filter(key => key !== 'Recall');
+const barrelKeys = Object.keys(AllSpellsById);
 
 /** Plain, half CDR, URF, and both at once — the four corners of the rule space. */
 const RULE_SETS: { label: string; rules: MatchRules }[] = [

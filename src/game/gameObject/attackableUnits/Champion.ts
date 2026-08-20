@@ -18,7 +18,6 @@ import Slow from '@/game/gameObject/buffs/Slow';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
 import type { BuffStackId } from '@/game/gameObject/Buff';
-import Recall from '@/game/gameObject/coreSpells/Recall';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
 export interface ChampionAttackTuning {
@@ -124,17 +123,22 @@ export default class Champion extends AttackableUnit {
   basicAttack: BasicAttackController = new BasicAttackController(this);
 
   /**
-   * Everyone can go home. Deliberately **not** in `spells[]` — see the header
-   * of `Recall.ts`: that array is indexed by `SpellHotKeys` and an eighth entry
-   * ripples into the loadout editor's slots, `hudState`'s summoner-spell test,
-   * `MatchDirectorSource` and the generated catalogue. A champion swap does not
-   * take the ability to go home away, so `replaceSpells`/`applyPreset` never
-   * touch it either.
+   * This champion's way home, or null on a map that grants none.
    *
-   * A field initialiser is safe here: `super()` has already run and set `game`,
-   * which `new Recall(this)` reads through `Spell`'s constructor.
+   * Not built here. Recall needs a fountain to return to, and a fountain is
+   * something a map supplies — a battle-royale map has none, and on one the
+   * `B` key and the touch button do nothing rather than doing something
+   * meaningless. `preset.ts` fills this in today; a content pack declares it
+   * per champion (`ChampionEntry.recall`) once the boot path reads packs.
+   *
+   * Deliberately **not** in `spells[]` even when present — see the header of
+   * `spells/Recall.ts`: that array is indexed by `SpellHotKeys` and an eighth
+   * entry ripples into the loadout editor's slots, `hudState`'s
+   * summoner-spell test, `MatchDirectorSource` and the generated catalogue. A
+   * champion swap does not take the ability to go home away, so
+   * `replaceSpells`/`applyPreset` never touch it either.
    */
-  readonly recall: Recall = new Recall(this);
+  recall: Spell | null = null;
 
   constructor({
     game,
@@ -268,7 +272,9 @@ export default class Champion extends AttackableUnit {
 
   onRemoved() {
     this.spells.forEach(spell => this.removeSpell(spell));
-    this.removeSpell(this.recall);
+    // `?? undefined`: `removeSpell` takes `Spell | undefined`, and `recall` is
+    // `Spell | null` now that a map without a fountain can leave it unset.
+    this.removeSpell(this.recall ?? undefined);
   }
 
   /**

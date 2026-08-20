@@ -141,14 +141,11 @@ class FormSpell extends Spell {
 /**
  * Every spell class the game can put in a slot.
  *
- * `BasicAttack` is included — it is always slot 0. `Recall` is not: it can
- * never be put in a slot (bound to `Champion.recall`/`B` only), so
- * `CoreSpells` is filtered the same way the catalogue generator hides it —
- * see `CATALOG_HIDDEN_CORE_IDS` in `scripts/generate-spell-catalog.mjs`.
+ * `BasicAttack` is included — it is always slot 0.
  */
 const productionSpells = Object.entries({ ...AllSpells, ...CoreSpells }).filter(
   (entry): entry is [string, typeof Spell] =>
-    entry[0] !== 'Recall' && typeof entry[1] === 'function' && entry[1].prototype instanceof Spell
+    typeof entry[1] === 'function' && entry[1].prototype instanceof Spell
 );
 
 describe('cancel policy, driven through real spells', () => {

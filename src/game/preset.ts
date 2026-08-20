@@ -2,6 +2,7 @@ import AssetManager, { type AssetKey } from '@/managers/AssetManager';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
+import type Champion from './gameObject/attackableUnits/Champion';
 import {
   DEFAULT_CHAMPION_ATTACK,
   type ChampionAttackTuning,
@@ -26,6 +27,7 @@ import {
   type SpellClass,
 } from './spellRegistry';
 import BasicAttack from './gameObject/coreSpells/BasicAttack';
+import Recall from './gameObject/spells/Recall';
 
 /**
  * The barrel is gone from this file, and that is the whole of Stage 4.
@@ -41,6 +43,24 @@ import BasicAttack from './gameObject/coreSpells/BasicAttack';
  * arrived.
  */
 export type { SpellClass };
+
+/**
+ * Gives a freshly built champion its way home — the same kind of content
+ * decision this file already makes for `BasicAttack`, just made once per
+ * champion instead of once per slot.
+ *
+ * `Champion.recall` is deliberately not part of `ChampionPresetData`: a preset
+ * swap must not take the ability to go home away from a champion that already
+ * has one (see that field's doc comment), so this runs exactly once, right
+ * after construction, at every call site that builds a `Champion` for a real
+ * match — `Game.ts`'s player and initial bots, and `MatchDirector.addBotWithPreset`.
+ * A map with no fountain is future work for a content pack to express by
+ * simply not calling this; nothing here assumes every champion gets one.
+ */
+export const attachRecall = <T extends Champion>(champion: T): T => {
+  champion.recall = new Recall(champion);
+  return champion;
+};
 
 const random = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 

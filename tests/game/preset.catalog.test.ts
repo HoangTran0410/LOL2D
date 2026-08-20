@@ -34,13 +34,10 @@ import { loadEverySpellForTests } from '../game/spell/registry';
 // catalogue without awaiting 238 of them.
 beforeAll(loadEverySpellForTests);
 
-// Two barrels now — `spells/` (content) and `coreSpells/` (`BasicAttack`,
-// `Recall`) — merged content-last, matching the catalogue generator. `Recall`
-// itself never gets a catalogue entry (it is bound to `Champion.recall`/`B`,
-// not offered anywhere a player picks from — see `CATALOG_HIDDEN_CORE_IDS` in
-// `scripts/generate-spell-catalog.mjs`), so it is excluded here too.
+// Two barrels now — `spells/` (content) and `coreSpells/` (`BasicAttack`) —
+// merged content-last, matching the catalogue generator.
 const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
-const barrelKeys = Object.keys(AllSpellsById).filter(key => key !== 'Recall');
+const barrelKeys = Object.keys(AllSpellsById);
 
 describe('listSpellCatalog — catalogue completeness', () => {
   it('has exactly one entry per export in the AllSpells barrel', () => {

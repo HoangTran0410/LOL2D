@@ -14,6 +14,7 @@ import InGameHUD from './hud/InGameHUD';
 import {
   FountainPreset,
   MonsterPreset,
+  attachRecall,
   getChampionPresetFromLoadout,
   getTurretPositions,
   planLoadout,
@@ -249,12 +250,14 @@ export default class Game {
     // player is now a movable roster slot like any bot — so its side comes from
     // the config, which persists a team switch the same way it persists a bot's.
     const playerTeam = pregameConfig.playerTeam;
-    this.player = new Champion({
-      game: this,
-      position: this.randomSpawnPoint(playerTeam),
-      teamId: playerTeam,
-      preset: presetFromPlan(kits.player),
-    });
+    this.player = attachRecall(
+      new Champion({
+        game: this,
+        position: this.randomSpawnPoint(playerTeam),
+        teamId: playerTeam,
+        preset: presetFromPlan(kits.player),
+      })
+    );
     this.objectManager.addObject(this.player);
     this.spellInputController = new SpellInputController({
       keyBindings: SpellHotKeys,
@@ -294,22 +297,24 @@ export default class Game {
       const botLoadout = pregameConfig.ai.bots[i];
       const botBehaviour = pregameConfig.ai.botBehaviours[i];
       const botTeam = pregameConfig.ai.botTeams[i];
-      const bot = new AIChampion({
-        game: this,
-        position: this.randomSpawnPoint(botTeam),
-        teamId: botTeam,
-        preset: presetFromPlan(kits.bots[i] ?? planLoadout(botLoadout)),
-        // Re-resolving the same loadout on every respawn is what makes a
-        // bot configured with a fixed champion keep that identity across
-        // deaths, while a bot left on 'random' keeps re-rolling exactly as
-        // it always has (getChampionPresetFromLoadout falls through to
-        // getChampionPresetRandom for 'random').
-        presetFactory: () => getChampionPresetFromLoadout(botLoadout),
-        autoMove: botBehaviour.autoMove,
-        autoAttack: botBehaviour.autoAttack,
-        autoCast: botBehaviour.autoCast,
-        difficulty: botBehaviour.difficulty,
-      });
+      const bot = attachRecall(
+        new AIChampion({
+          game: this,
+          position: this.randomSpawnPoint(botTeam),
+          teamId: botTeam,
+          preset: presetFromPlan(kits.bots[i] ?? planLoadout(botLoadout)),
+          // Re-resolving the same loadout on every respawn is what makes a
+          // bot configured with a fixed champion keep that identity across
+          // deaths, while a bot left on 'random' keeps re-rolling exactly as
+          // it always has (getChampionPresetFromLoadout falls through to
+          // getChampionPresetRandom for 'random').
+          presetFactory: () => getChampionPresetFromLoadout(botLoadout),
+          autoMove: botBehaviour.autoMove,
+          autoAttack: botBehaviour.autoAttack,
+          autoCast: botBehaviour.autoCast,
+          difficulty: botBehaviour.difficulty,
+        })
+      );
       this.objectManager.addObject(bot);
       loadoutsInPlay.push({ unit: bot, loadout: botLoadout });
     }

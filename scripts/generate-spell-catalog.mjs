@@ -54,21 +54,6 @@ const modulesPath = resolve(root, 'src/generated/spellModules.ts');
 const barrelPath = resolve(root, 'src/game/gameObject/spells/index.ts');
 const coreBarrelPath = resolve(root, 'src/game/gameObject/coreSpells/index.ts');
 
-/**
- * Core exports that must not gain a catalogue/module-map entry despite living
- * in `coreSpells/index.ts`.
- *
- * `Recall` is there so `Champion.ts` and this generator both have one barrel
- * to point at, not because it is offered anywhere: its own class doc is
- * explicit — "Not part of any kit... not pickable in the setup screen" — and
- * `listSpellCatalog()` hands every catalogue id to the free-form per-slot
- * picker. Merging it in would make Hồi Thành selectable in a spell slot,
- * fighting the one already bound to `Champion.recall`/`B`. `BasicAttack` has
- * no such exemption: it keeps its own shelf (`BASIC_ATTACK_ID`) same as before
- * the move.
- */
-const CATALOG_HIDDEN_CORE_IDS = new Set(['Recall']);
-
 /** No cooldown reduction, no URF — the rule-free numbers this file stores. */
 const NO_MATCH_RULES = { cooldownMultiplier: 1, manaFree: false };
 
@@ -127,11 +112,8 @@ export async function renderSpellCatalogSource() {
   try {
     const CoreSpells = await server.ssrLoadModule('/src/game/gameObject/coreSpells/index.ts');
     const ContentSpells = await server.ssrLoadModule('/src/game/gameObject/spells/index.ts');
-    const CatalogedCoreSpells = Object.fromEntries(
-      Object.entries(CoreSpells).filter(([id]) => !CATALOG_HIDDEN_CORE_IDS.has(id))
-    );
     // Content-last: a content id can never shadow a core one.
-    const AllSpells = { ...ContentSpells, ...CatalogedCoreSpells };
+    const AllSpells = { ...ContentSpells, ...CoreSpells };
     const entries = Object.entries(AllSpells)
       .filter(([, value]) => typeof value === 'function')
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
@@ -226,13 +208,10 @@ export async function renderSpellModulesSource() {
     return [...source.matchAll(pattern)].map(([, id, importPath]) => ({ id, path: importPath }));
   };
 
-  const [contentEntries, rawCoreEntries] = await Promise.all([
+  const [contentEntries, coreEntries] = await Promise.all([
     parseBarrel(barrelPath),
     parseBarrel(coreBarrelPath),
   ]);
-  // See `CATALOG_HIDDEN_CORE_IDS`: `Recall` has no dynamic-import consumer
-  // (`Champion.ts` imports it statically) and must not be reachable by id.
-  const coreEntries = rawCoreEntries.filter(entry => !CATALOG_HIDDEN_CORE_IDS.has(entry.id));
 
   if (!contentEntries.length && !coreEntries.length) {
     throw new Error('no `export { default as X } from` lines in either barrel');

@@ -47,6 +47,41 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/Alpha_W/);
   });
 
+  it('names the champion whose recall id does not exist in the pack', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      spells: { Alpha_Q: class {} },
+      champions: [
+        {
+          id: 'alpha',
+          name: 'Alpha',
+          image: null,
+          spells: ['Alpha_Q'],
+          recall: 'Alpha_Recall',
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/Alpha_Recall/);
+  });
+
+  it('accepts a champion whose recall names a spell the pack declares', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      spells: { Alpha_Q: class {}, Alpha_Recall: class {} },
+      champions: [
+        {
+          id: 'alpha',
+          name: 'Alpha',
+          image: null,
+          spells: ['Alpha_Q'],
+          recall: 'Alpha_Recall',
+        },
+      ],
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it('rejects a map whose lane names a faction it never declared', () => {
     const result = validatePack({
       manifest: goodManifest,

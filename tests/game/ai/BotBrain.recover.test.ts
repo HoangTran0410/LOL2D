@@ -5,7 +5,7 @@ import Champion, {
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import Turret from '../../../src/game/gameObject/structures/Turret';
-import { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/coreSpells/Recall';
+import Recall, { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/spells/Recall';
 import { RECALL_CLEAR_PX, RECALL_SAFE_MS } from '../../../src/game/ai/BotBrain';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type Spell from '../../../src/game/gameObject/Spell';
@@ -34,6 +34,10 @@ const wounded = (game: TestGame, x: number, y: number) => {
     teamId: BLUE,
     preset: PRESET,
   });
+  // No longer built by the class itself — `Champion.recall` is nullable now
+  // that a map without a fountain can leave it unset. This is the same
+  // one-line attachment `preset.ts`'s `attachRecall` does for a real match.
+  bot.recall = new Recall(bot);
   bot.stats.health.baseValue = bot.stats.maxHealth.value * 0.15;
   bot._autoCast = false;
 

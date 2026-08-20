@@ -87,7 +87,11 @@ import type {
   PregameConfig,
   WorldConfig,
 } from './config/PregameConfig';
-import { getChampionPresetFromLoadout, loadChampionPresetFromLoadout } from './preset';
+import {
+  attachRecall,
+  getChampionPresetFromLoadout,
+  loadChampionPresetFromLoadout,
+} from './preset';
 import type GameObject from './gameObject/GameObject';
 import type { GameObjectRuntimeContext } from './gameObject/GameObject';
 import type Monster from './gameObject/attackableUnits/Monster';
@@ -556,20 +560,23 @@ export default class MatchDirector {
 
     const teamId = options.teamId ?? teamForAddedBot([this.game.player, ...bots]);
     const spawn = this.game.randomSpawnPoint(teamId);
-    const bot = new AIChampion({
-      game: this.game,
-      // Copied rather than handed straight through: `position` is mutated every
-      // tick from here on, and a spawn point the match still holds a reference
-      // to would be dragged around the map by the bot standing on it.
-      position: createVector(spawn.x, spawn.y),
-      teamId,
-      preset,
-      presetFactory: () => getChampionPresetFromLoadout(loadout),
-      autoMove: behaviour.autoMove,
-      autoAttack: behaviour.autoAttack,
-      autoCast: behaviour.autoCast,
-      difficulty: behaviour.difficulty,
-    });
+    const bot = attachRecall(
+      new AIChampion({
+        game: this.game,
+        // Copied rather than handed straight through: `position` is mutated
+        // every tick from here on, and a spawn point the match still holds a
+        // reference to would be dragged around the map by the bot standing on
+        // it.
+        position: createVector(spawn.x, spawn.y),
+        teamId,
+        preset,
+        presetFactory: () => getChampionPresetFromLoadout(loadout),
+        autoMove: behaviour.autoMove,
+        autoAttack: behaviour.autoAttack,
+        autoCast: behaviour.autoCast,
+        difficulty: behaviour.difficulty,
+      })
+    );
     this.game.objectManager.addObject(bot);
     this.loadouts.set(bot, loadout);
     if (options.persist !== false) this.persist();

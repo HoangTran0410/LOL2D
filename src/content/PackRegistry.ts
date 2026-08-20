@@ -66,6 +66,7 @@ export class PackRegistry {
         packId,
         id: qualify(packId, entry.id),
         spells: entry.spells.map(localId => qualify(packId, localId)),
+        recall: entry.recall === undefined ? undefined : qualify(packId, entry.recall),
       });
     }
     for (const monster of Object.values(pack.monsters ?? {})) {

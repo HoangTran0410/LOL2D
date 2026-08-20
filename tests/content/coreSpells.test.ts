@@ -3,13 +3,21 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
- * Core must not import out of the content directory.
+ * Core must not import out of the content directory — with one named,
+ * temporary exception.
  *
- * `Champion.ts` held `readonly recall = new Recall(this)` against
- * `spells/Recall`, so the engine could not compile without one content file,
- * and `preset.ts` used `spells/BasicAttack` as its universal slot fallback.
- * Both are mechanics every pack presupposes rather than content a pack
- * supplies, so they live in `coreSpells/`.
+ * `Champion.ts` never imports a content spell: it may *hold* a recall
+ * (`Champion.recall: Spell | null`) but does not construct one, so it stays
+ * buildable without a single file under `gameObject/spells/`.
+ *
+ * `preset.ts` is different, on purpose, for batch 1 only. `Recall` moved back
+ * to `spells/` because it presupposes a fountain — map content, not a
+ * mechanic every pack has — but *this* repo's boot path has no pack loader
+ * yet, so something has to keep a normal match's `B` key working. `preset.ts`
+ * is that something, exactly as it already is for `BasicAttack`'s fallback.
+ * Batch 2 replaces this with `ChampionEntry.recall` read off an installed
+ * pack; until then the import is deliberate, not a regression, and this test
+ * pins it to exactly one content symbol so nothing else rides along on it.
  *
  * A source scan because the failure is an import edge: it is legal
  * TypeScript, it compiles, and it only becomes visible when the content
@@ -23,16 +31,16 @@ const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
 describe('core does not import content', () => {
-  it.each(['game/gameObject/attackableUnits/Champion.ts', 'game/preset.ts'])(
-    '%s does not import from gameObject/spells',
-    file => {
-      expect(stripComments(read(file))).not.toMatch(/from '[^']*gameObject\/spells\//);
-    }
-  );
-
-  it('Champion still has a recall, from coreSpells', () => {
+  it('Champion.ts does not import from gameObject/spells', () => {
     const source = stripComments(read('game/gameObject/attackableUnits/Champion.ts'));
-    expect(source).toMatch(/from '@\/game\/gameObject\/coreSpells\/Recall'/);
-    expect(source).toMatch(/readonly recall/);
+    expect(source).not.toMatch(/from '[^']*gameObject\/spells\//);
+  });
+
+  it("preset.ts's only content import is Recall, the named batch-1 exception", () => {
+    const source = stripComments(read('game/preset.ts'));
+    const contentImports = [...source.matchAll(/from '([^']*gameObject\/spells\/[^']*)'/g)].map(
+      match => match[1]
+    );
+    expect(contentImports).toEqual(['./gameObject/spells/Recall']);
   });
 });

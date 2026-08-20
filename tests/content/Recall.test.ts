@@ -13,7 +13,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 
 import Champion from '../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../src/game/gameObject/structures/Fountain';
-import Recall, { RECALL_CHANNEL_MS } from '../../src/game/gameObject/coreSpells/Recall';
+import Recall, { RECALL_CHANNEL_MS } from '../../src/game/gameObject/spells/Recall';
 import { SpellRole, rolesOf } from '../../src/game/ai/SpellRole';
 import type AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type { CastContext } from '../../src/game/spell/runtime/types';
@@ -53,6 +53,10 @@ afterEach(() => vi.unstubAllGlobals());
 
 const unit = (teamId: string, x: number, y = 0): Champion => {
   const champion = new Champion({ game, teamId });
+  // No longer built by the class itself — `Champion.recall` is nullable now
+  // that a map without a fountain can leave it unset. This is the same
+  // one-line attachment `preset.ts`'s `attachRecall` does for a real match.
+  champion.recall = new Recall(champion);
   champion.position.set(x, y);
   champion.destination.set(x, y);
   if (!playerSet) {

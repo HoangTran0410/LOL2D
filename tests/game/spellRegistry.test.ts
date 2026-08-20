@@ -59,17 +59,12 @@ import {
 } from '../../src/game/config/PregameConfig';
 
 // The registry loads from two barrels now — `spells/` (content) and
-// `coreSpells/` (`BasicAttack`, `Recall`) — merged content-last exactly as
+// `coreSpells/` (`BasicAttack`) — merged content-last exactly as
 // `scripts/generate-spell-catalog.mjs` merges them.
 const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
 
-// `Recall` is exported from `coreSpells/index.ts` for `Champion.ts`'s sake,
-// but the generator deliberately keeps it out of `spellModules`/`spellCatalog`
-// — see `CATALOG_HIDDEN_CORE_IDS` there. "Everything the module map covers"
-// therefore excludes it too, or this coverage check would demand an entry the
-// generator is right to omit.
 const barrelKeys = Object.keys(AllSpellsById).filter(
-  key => typeof AllSpellsById[key] === 'function' && key !== 'Recall'
+  key => typeof AllSpellsById[key] === 'function'
 );
 
 beforeEach(() => resetSpellRegistryForTests());

@@ -38,6 +38,8 @@ export interface ChampionEntry {
   image: string | null;
   /** Local spell ids, in slot order. */
   spells: string[];
+  /** Local id of this champion's way home. Absent on a map that grants none. */
+  recall?: string;
 }
 
 export interface MonsterDef {

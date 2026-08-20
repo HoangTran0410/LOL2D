@@ -91,6 +91,13 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
         errors.push(`champions.${entry.id}: spell ${id} is not in this pack`);
       }
     }
+    if (entry.recall !== undefined) {
+      if (typeof entry.recall !== 'string') {
+        errors.push(`champions.${entry.id}.recall: must be a string`);
+      } else if (!(entry.recall in spells)) {
+        errors.push(`champions.${entry.id}: recall ${entry.recall} is not in this pack`);
+      }
+    }
   }
 }
 
