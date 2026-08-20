@@ -33,7 +33,8 @@ export interface MonsterAbility {
 
 export interface MonsterPresetData {
   name: string;
-  avatar: AssetKey;
+  /** Null for the anonymous fallback camp; every real camp names its art. */
+  avatar: AssetKey | null;
   camp: { x: number; y: number; r: number };
   speed: number;
   size: number;
@@ -82,15 +83,24 @@ export const MONSTER_CHASE_MARGIN = 350;
  *  home, so a target that ducks out and back is still pursued. */
 export const MONSTER_GIVE_UP_DELAY_MS = 2000;
 
+/**
+ * What a camp is when nobody said. Deliberately anonymous and at the origin.
+ *
+ * This was Baron — its name, its art and its Summoner's Rift coordinates —
+ * which made an engine file depend on one map's content and put any
+ * preset-less monster in the middle of that map's river. Every real camp comes
+ * from map data; this exists so the constructor has something total to fall
+ * back on, and a caller that reaches it has a bug worth seeing.
+ */
 const DEFAULT_PRESET: MonsterPresetData = {
-  name: 'Baron',
-  avatar: 'monster_Baron_Nashor',
-  camp: { x: 2147, y: 1876, r: 100 },
+  name: 'Quái',
+  avatar: null,
+  camp: { x: 0, y: 0, r: 100 },
   speed: 0,
-  size: 100,
-  attackRange: 400,
+  size: 60,
+  attackRange: 100,
   reviveTime: 3000,
-  health: 1000,
+  health: 300,
 };
 
 /**
@@ -141,7 +151,7 @@ export default class Monster extends AttackableUnit {
     super({
       game,
       position: createVector(preset.camp.x, preset.camp.y),
-      avatar: AssetManager.get(preset.avatar),
+      avatar: preset.avatar ? AssetManager.get(preset.avatar) : undefined,
     });
 
     this.name = preset.name;
