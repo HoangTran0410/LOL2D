@@ -486,7 +486,7 @@ An attack only reaches `ON_ATTACK_HIT` if it actually landed, so nothing fires w
 
 ## 10. The basic attack is itself a spell
 
-`src/game/gameObject/spells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `PredefinedFilters.visibleTo` over `combat/Vision.ts`) and hands it to `BasicAttackController.order()`. It asks the *attacker's* vision, never the fog's draw flag — see the note on `AttackableUnit.visibleToPlayerTeam` for why those are different questions. Right click is a move order and nothing else — it no longer doubles as an attack order, so a click meant to walk past a fight cannot commit to it. The slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
+`src/game/gameObject/coreSpells/BasicAttack.ts` is the default occupant of slot 0, which `SpellHotKeys[0]` binds to `A`. Pressing it acquires the enemy nearest the **cursor** (`findAttackTargetNearPoint`, `CURSOR_ACQUISITION_RADIUS`, fog respected via `PredefinedFilters.visibleTo` over `combat/Vision.ts`) and hands it to `BasicAttackController.order()`. It asks the *attacker's* vision, never the fog's draw flag — see the note on `AttackableUnit.visibleToPlayerTeam` for why those are different questions. Right click is a move order and nothing else — it no longer doubles as an attack order, so a click meant to walk past a fight cannot commit to it. The slot is swappable like every other — the spell is in the picker under its own group so it can be put back.
 
 Three consequences for a new spell:
 
