@@ -191,9 +191,14 @@ function buildBuffs(player: any): BuffDisplay[] {
     const key = buff.stackId ?? buff.constructor;
     const timeLeft = (buff.duration || 0) - (buff.timeElapsed || 0);
     const existing = buffRows.get(key);
+    // A `countedStacks` buff (Cho'Gath Feast, Veigar Q's power —
+    // `src/game/gameObject/Buff.ts`) is one instance carrying its whole
+    // count on `.stacks`; every other buff has never heard of that field, so
+    // this falls back to 1 and behaves exactly as a plain per-instance count.
+    const stacks = buff.stacks ?? 1;
 
     if (existing) {
-      existing.stacks++;
+      existing.stacks += stacks;
       if (timeLeft > existing.duration - existing.timeElapsed) {
         existing.duration = buff.duration;
         existing.timeElapsed = buff.timeElapsed;
@@ -207,7 +212,7 @@ function buildBuffs(player: any): BuffDisplay[] {
       duration: buff.duration,
       timeElapsed: buff.timeElapsed,
       timeLeftText: Math.ceil(timeLeft / 1000),
-      stacks: 1,
+      stacks,
     });
   }
   return [...buffRows.values()];
