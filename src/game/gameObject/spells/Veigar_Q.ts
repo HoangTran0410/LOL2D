@@ -36,38 +36,43 @@ export default class Veigar_Q extends Spell implements ExecuteSpell {
 
   /**
    * How many stacks Veigar is carrying, for the HUD badge and for the practice
-   * panel. Deactivated buffs are skipped: `deactivateBuff()` only marks
-   * `toRemove`, and `AttackableUnit.update()` — which is what drops it off the
-   * list — cannot run while the panel holds the match paused, so counting the
-   * marked ones would report stacks that no longer apply.
+   * panel. `Veigar_Q_Power` is a `countedStacks` buff — at most one live
+   * instance ever exists, carrying the true count on `stacks` — but this
+   * still sums across `liveStacks()` rather than reading index 0 directly,
+   * covering the one-tick window where an old (already `toRemove`) instance
+   * and a freshly-created one could both be in `owner.buffs` at once.
    */
   get stackCount(): number {
-    return liveStacks(this.owner).length;
+    return liveStacks(this.owner).reduce((sum, buff) => sum + buff.stacks, 0);
   }
 
   /**
-   * The practice panel's write side. Adds or removes whole buffs to reach
-   * `count` — the stacks *are* the buffs, so there is no separate number to
-   * keep honest.
+   * The practice panel's write side. An absolute, uncapped set on the one
+   * live instance's `stacks` — there is deliberately no `maxStacks` clamp
+   * here, the same reasoning as `ChoGath_R.setStackCount`: this cheat has to
+   * keep reaching whatever the tester asks for, and capped growth in real
+   * play is `AttackableUnit.addBuff`'s job, not this method's.
    */
   setStackCount(count: number): boolean {
     if (!this.owner) return false;
     const target = Math.max(0, Math.floor(count));
-    const current = liveStacks(this.owner);
+    const existing = liveStacks(this.owner)[0];
 
-    for (let i = current.length; i < target; i++) {
-      this.owner.addBuff(
-        createPowerStack(this.owner, {
-          image: this.image,
-          manaPerStack: this.manaPerStack,
-          stackDuration: this.stackDuration,
-          maxStacks: this.maxStacks,
-        })
-      );
+    if (target <= 0) {
+      existing?.deactivateBuff();
+    } else if (existing) {
+      existing.stacks = target;
+      existing.onStacksChanged();
+    } else {
+      const buff = createPowerStack(this.owner, {
+        image: this.image,
+        manaPerStack: this.manaPerStack,
+        stackDuration: this.stackDuration,
+        maxStacks: this.maxStacks,
+      });
+      buff.stacks = target;
+      this.owner.addBuff(buff);
     }
-    // Oldest first, so what is left is the stacks that have been there longest
-    // — the same ones a player who had stopped short would be holding.
-    for (const buff of current.slice(target)) buff.deactivateBuff();
     return true;
   }
 
@@ -211,19 +216,33 @@ export function createPowerStack(
  */
 export class Veigar_Q_Power extends StatAmp {
   /**
+   * Permanent and uniform, the same reasoning as `ChoGath_R_Growth`: no
+   * per-stack duration or source, every stack worth exactly `manaPerStack`,
+   * so N instances are N copies of the same information. One instance, a
+   * `stacks` counter — see `Buff.countedStacks` and
+   * `.superpowers/perf-healthbar-report.md`.
+   */
+  countedStacks = true;
+  /**
+   * One stack draws the whole orbit — otherwise every stack redraws all of
+   * it. `countedStacks` already makes that automatic (there is only ever one
+   * live instance), but this stays set anyway: it is the general mechanism
+   * `AttackableUnit.drawBuffs()` reads, independent of any one buff being
+   * counted, and it is what protects a *timed* stacking buff at high N.
+   *
    * The orbit says "a lot of stacks"; the exact figure is on the buff-icon row
    * above the health bar, which `Champion.drawHealthBar` builds for every
    * champion by grouping buffs on `stackId`. See the same note on
    * `ChoGath_R_Growth.draw` — one convention, no per-spell number plates.
    */
+  singleRepresentativeDraw = true;
+
   draw(): void {
     if (this.targetUnit.isDead) return;
 
-    const stacks = this.targetUnit.buffs.filter((b: any) => b instanceof Veigar_Q_Power);
-    // one stack draws the whole orbit — otherwise every stack redraws all of it
-    if (stacks[0] !== this) return;
-
-    const n = stacks.length;
+    // The one live instance's own count — `countedStacks` means there is
+    // never a second one to sum across.
+    const n = this.stacks;
     const pos = this.targetUnit.position;
     const radius = this.targetUnit.animatedValues.displaySize / 2 + 14;
     const shown = Math.min(n, 12);

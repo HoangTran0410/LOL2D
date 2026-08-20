@@ -132,6 +132,8 @@ async function setupScenario({ applyStacks, stackCount, warmupMs, settleMs, botO
     playerSize: player.stats.size.value,
     liveMinions: game.minionSpawner.minions.length,
     liveObjects: game.objectManager.objects.length,
+    playerBuffCount: player.buffs.length,
+    botBuffCount: bot.buffs.length,
   };
 }
 

@@ -40,33 +40,49 @@ export default class ChoGath_R extends Spell implements ExecuteSpell {
 
   /**
    * How many Feast stacks Cho'Gath is carrying, for the HUD badge and for the
-   * practice panel. Deactivated buffs are skipped: `deactivateBuff()` only
-   * marks `toRemove`, and `AttackableUnit.update()` — which is what drops it
-   * off the list — cannot run while the panel holds the match paused.
+   * practice panel. `ChoGath_R_Growth` is a `countedStacks` buff — at most
+   * one live instance ever exists, and it carries the true count on
+   * `stacks` — but this still sums across `liveStacks()` rather than reading
+   * index 0 directly, so it stays correct through the one-tick window where
+   * an old (already `toRemove`) instance and a freshly-created one could
+   * both be in `owner.buffs` at once.
    */
   get stackCount(): number {
-    return liveStacks(this.owner).length;
+    return liveStacks(this.owner).reduce((sum, buff) => sum + buff.stacks, 0);
   }
 
   /**
-   * The practice panel's write side. Raising heals the health it just added,
-   * exactly as `onSpellCast` does — 50 stacks that left Cho'Gath at a few
-   * percent of a huge pool would look like a bug rather than a cheat.
-   * Lowering does not heal, and has to clamp: see the note in the body.
+   * The practice panel's write side. An absolute, uncapped set — `stacks` is
+   * one number on one instance now, so "give me 1000" costs exactly the same
+   * as "give me 4"; there is deliberately no `maxStacks` clamp here, because
+   * this cheat has to keep reaching whatever the tester asks for, capped
+   * growth in real play is a different question (`AttackableUnit.addBuff`),
+   * and `.superpowers/perf-healthbar-report.md` is what happens when the two
+   * get conflated. Raising heals the health it just added, exactly as
+   * `onSpellCast` does; lowering does not heal, and has to clamp health back
+   * under the new (lower) maximum by hand — see the note in the body.
    */
   setStackCount(count: number): boolean {
     if (!this.owner) return false;
     const target = Math.max(0, Math.floor(count));
-    const current = liveStacks(this.owner);
+    const existing = liveStacks(this.owner)[0];
+    const before = existing?.stacks ?? 0;
+    if (target === before) return true;
 
-    for (let i = current.length; i < target; i++) {
-      this.owner.addBuff(createGrowthStack(this.owner, this.growthDuration, this.image));
+    if (target <= 0) {
+      existing?.deactivateBuff();
+    } else if (existing) {
+      existing.stacks = target;
+      existing.onStacksChanged();
+    } else {
+      const growth = createGrowthStack(this.owner, this.growthDuration, this.image);
+      growth.stacks = target;
+      this.owner.addBuff(growth);
     }
-    const added = Math.max(0, target - current.length);
-    if (added > 0) this.owner.takeHeal(MAX_HEALTH_PER_STACK * added, this.owner);
 
-    for (const buff of current.slice(target)) buff.deactivateBuff();
-    if (target < current.length) {
+    const delta = target - before;
+    if (delta > 0) this.owner.takeHeal(MAX_HEALTH_PER_STACK * delta, this.owner);
+    if (delta < 0) {
       // `Stats.update()` does constrain health to `maxHealth.value` — but only
       // when it runs, and it cannot: the panel that drives this holds the
       // match paused. Without this line Cho'Gath sits above his own maximum,
@@ -164,27 +180,33 @@ export class ChoGath_R_Growth extends StatAmp {
   buffAddType = BuffAddType.STACKS_AND_CONTINUE;
   maxStacks = 99;
 
+  /**
+   * Permanent and uniform — no stack has its own expiry or source, every
+   * stack is worth exactly `SIZE_PER_STACK`/`MAX_HEALTH_PER_STACK`, so N
+   * instances carrying identical bonuses would carry exactly zero
+   * information the number N does not. One instance, a `stacks` counter:
+   * `AttackableUnit.addBuff()` grows it in place instead of pushing a new
+   * instance per kill, and `StatAmp` scales `bonuses` by `stacks`
+   * automatically. See `Buff.countedStacks` and
+   * `.superpowers/perf-healthbar-report.md`.
+   */
+  countedStacks = true;
+
   bonuses = {
     size: { baseBonus: SIZE_PER_STACK },
     maxHealth: { baseBonus: MAX_HEALTH_PER_STACK },
   };
 
   /**
-   * A permanent stack that only makes the model bigger is impossible to count.
    * One stack draws the whole crown of horns for all of them — doing it per
-   * stack would redraw the same ring N times.
-   *
-   * `AttackableUnit.drawBuffs()` reads this: past the first live stack it
-   * skips straight to the next buff without ever calling `.draw()` here, so
-   * this method now runs at most once per champion per frame regardless of
-   * stack count — the round-1 fix memoized the *cost* of finding that out
-   * (an O(N) scan run N times, i.e. O(N^2) — see
-   * `.superpowers/perf-healthbar-report.md`), but a champion cheated well
-   * past `maxStacks` (the cap does not actually hold for a burst
-   * `setStackCount` call — same report) still meant hundreds to thousands of
-   * *function calls* a frame to find out. `drawBuffs()` now guarantees
-   * there is only ever one call to begin with, so the scan below runs once,
-   * not once-cached-per-frame.
+   * stack would redraw the same ring N times. `countedStacks` makes that
+   * automatic now (there is only ever one live instance to call `.draw()`
+   * on), but `singleRepresentativeDraw` stays set too: it is the general
+   * mechanism `AttackableUnit.drawBuffs()` and `Champion`'s status-text scan
+   * both read, independent of whether any given buff happens to be counted,
+   * and it is what protects a *timed* stacking buff at high N (see
+   * `Buff.ts`) — nothing here should look like this flag stopped earning
+   * its place just because this particular buff no longer needs the skip.
    *
    * The horns are the *feel* of the count, not the count. The exact number is
    * already on the buff-icon row above the health bar, which `Champion`
@@ -199,7 +221,9 @@ export class ChoGath_R_Growth extends StatAmp {
   draw(): void {
     if (this.targetUnit.isDead) return;
 
-    const n = liveStacks(this.targetUnit).length;
+    // The one live instance's own count — `countedStacks` means there is
+    // never a second one to sum across.
+    const n = this.stacks;
 
     const pos = this.targetUnit.position;
     const radius = this.targetUnit.animatedValues.displaySize / 2;

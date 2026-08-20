@@ -367,6 +367,33 @@ export default class AttackableUnit extends GameObject {
     const stackKey = buff.stackId;
     const preBuffs = this.buffs.filter(_buff => _buff.stackId === stackKey);
 
+    // A permanent, uniform stack (`Buff.countedStacks` — Cho'Gath Feast,
+    // Veigar Q's power) is one instance carrying a counter, not one instance
+    // per stack: grow the existing live instance's `stacks` instead of
+    // pushing a new one. Short-circuits ahead of `buffAddType` entirely,
+    // since representation (one instance vs. N) is a different axis from
+    // that switch's semantics (replace/renew/stack), and every other buff in
+    // the game leaves `countedStacks` at its default `false` and never
+    // reaches this branch.
+    if (buff.countedStacks) {
+      const existing = preBuffs.find(_buff => !_buff.toRemove);
+      if (existing) {
+        // Capped going up, but never clawed back down: a cheat can set
+        // `stacks` on a live instance straight past `maxStacks` (see
+        // `ChoGath_R.setStackCount`/`Veigar_Q.setStackCount`), and a later
+        // real-play stack must not silently erase that — it only ever adds
+        // up to the cap from where the count already stood.
+        const grown = Math.min(existing.stacks + buff.stacks, existing.maxStacks);
+        existing.stacks = Math.max(existing.stacks, grown);
+        existing.renewBuff();
+        existing.onStacksChanged();
+        return;
+      }
+      this.buffs.push(buff);
+      buff.activateBuff();
+      return;
+    }
+
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
         for (let b of preBuffs) b.deactivateBuff();

@@ -143,6 +143,33 @@ describe('computeHudState', () => {
     expect(slowRow.timeLeftText).toBe(4);
   });
 
+  /**
+   * A `countedStacks` buff (`ChoGath_R_Growth`, `Veigar_Q_Power` —
+   * `src/game/gameObject/Buff.ts`) is one instance carrying its whole count
+   * on `.stacks`, not one instance per stack. The row builder used to derive
+   * the badge count by incrementing once per array entry sharing a
+   * `stackId`, which is exactly wrong for a single instance representing
+   * hundreds of stacks — it has to sum `.stacks` instead, falling back to 1
+   * for a buff that has never heard of the field (every ordinary,
+   * non-counted buff, including the fakes above).
+   */
+  it('sums .stacks for a countedStacks buff instead of counting the single instance', () => {
+    const player = fakePlayer({
+      buffs: [
+        {
+          image: { path: 'buff.png', key: 'buff_x', status: 'ready' },
+          duration: 600_000,
+          timeElapsed: 1000,
+          stackId: 'chogath_r_growth',
+          stacks: 500,
+        },
+      ],
+    });
+    const state = computeHudState({ player } as any)!;
+    expect(state.buffs).toHaveLength(1);
+    expect(state.buffs[0].stacks).toBe(500);
+  });
+
   it('reports isDead and the revive countdown in whole seconds', () => {
     const player = fakePlayer({ isDead: true, deathData: { reviveAfter: 3500 } });
     const state = computeHudState({ player } as any)!;

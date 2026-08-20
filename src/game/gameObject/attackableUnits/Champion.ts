@@ -509,13 +509,19 @@ export default class Champion extends AttackableUnit {
     // of icons straight off the side of the screen.
     // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
     // drew every buff twice, and inside this block's tint().)
+    // `buff.stacks` rather than "one per array entry": a `countedStacks` buff
+    // (`ChoGath_R_Growth`, `Veigar_Q_Power`) is a single instance carrying
+    // its whole count on `.stacks`, and every other buff in the game leaves
+    // `.stacks` at `Buff`'s default of 1 — so summing it is exactly the old
+    // per-instance count for them, and the real stack count for a counted
+    // buff instead of always reading 1.
     const buffCounts = new Map<BuffStackId, { image: AssetHandle; count: number }>();
     for (const buff of this.buffs) {
       if (!buff.image) continue;
       const key = buff.stackId;
       const row = buffCounts.get(key);
-      if (row) row.count++;
-      else buffCounts.set(key, { image: buff.image, count: 1 });
+      if (row) row.count += buff.stacks;
+      else buffCounts.set(key, { image: buff.image, count: buff.stacks });
     }
 
     for (const { image: buffImage, count } of buffCounts.values()) {

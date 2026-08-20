@@ -52,6 +52,35 @@ export default class Buff {
    */
   singleRepresentativeDraw = false;
 
+  /**
+   * When true, `AttackableUnit.addBuff()` increments `stacks` on the
+   * existing live instance sharing this buff's `stackId` instead of pushing
+   * a new one — one instance, a counter, rather than N instances carrying
+   * identical bonuses.
+   *
+   * Correct only for a stack that is **permanent and uniform**: no per-stack
+   * duration, no per-stack source, every stack worth exactly the same as
+   * every other. A buff with a real per-stack expiry (a 10-stack Speedup
+   * whose stacks were applied at different moments and must wear off at
+   * different moments) needs the array — that is a list of expiry times
+   * wearing a different name, and collapsing it into a counter would delete
+   * information the model actually needs. Leave this `false` (the default)
+   * for anything with a per-stack timer; opt in only where `duration` is a
+   * single shared "how long since the last stack" clock, not N independent
+   * ones. See `ChoGath_R_Growth`, `Veigar_Q_Power`.
+   */
+  countedStacks = false;
+  /**
+   * How many stacks this instance is worth. 1 for an ordinary buff, and for
+   * a single fresh application of a counted one — `addBuff()` adds a new
+   * instance's `stacks` into the existing instance's `stacks` when
+   * `countedStacks` is set, rather than treating the new instance as a
+   * second drawable/timer. A `StatAmp` scales its modifier by this number
+   * unconditionally (see `StatAmp.ts`), which is a no-op for every buff that
+   * never touches it — it stays at the default of 1.
+   */
+  stacks = 1;
+
   statusFlagsToEnable = 0;
   statusFlagsToDisable = 0;
 
@@ -117,6 +146,14 @@ export default class Buff {
   onActivate(): void {}
   onDeactivate(): void {}
   draw(): void {}
+  /**
+   * `countedStacks` only: called on an already-active instance right after
+   * `AttackableUnit.addBuff()` changes `stacks` on it (never on the first
+   * stack, which goes through `onCreate`/`onActivate` instead, already
+   * reading the starting `stacks` value). Override to rescale whatever the
+   * stack count drives — `StatAmp` rebuilds and re-applies its modifier.
+   */
+  onStacksChanged(): void {}
 
   /**
    * Runs before damage reaches the target's health. Return what should get
