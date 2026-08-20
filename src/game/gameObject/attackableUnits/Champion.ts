@@ -17,6 +17,7 @@ import Silence from '@/game/gameObject/buffs/Silence';
 import Slow from '@/game/gameObject/buffs/Slow';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
+import type Buff from '@/game/gameObject/Buff';
 import type { BuffStackId } from '@/game/gameObject/Buff';
 import Recall from '@/game/gameObject/spells/Recall';
 
@@ -81,14 +82,66 @@ export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
  */
 const STATUS_TEXT_BUFFS = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear, Taunt];
 
-const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
-const MAX_TICKS = 20;
+/**
+ * `STATUS_TEXT_BUFFS[Cls.prototype]` -> that class's index, so a buff's slot
+ * can be found in one lookup instead of nine sequential `instanceof` checks.
+ *
+ * The naive version of this ("index by `buff.constructor`") is wrong: a
+ * knockback extends `Dash` (`Janna_R_Knockback`, `XinZhao_R_Knockback`) and
+ * `Teemo_R_Buff extends Slow`, so an exact-constructor match would silently
+ * stop showing "Ghosted"/"Chậm" for anyone hit by those. Walking the buff's
+ * own prototype chain and checking each level against this map reproduces
+ * `instanceof`'s subclass-matching exactly, at whatever depth a future spell
+ * adds — see `champion-status-text-scan-cost.test.ts`'s subclass case.
+ */
+const STATUS_TEXT_BUFF_INDEX = new Map<unknown, number>(
+  STATUS_TEXT_BUFFS.map((BuffClass, index) => [BuffClass.prototype, index])
+);
+
+/** `instanceof` against every `STATUS_TEXT_BUFFS` entry in one prototype-chain
+ *  walk instead of nine separate chain walks, one per candidate class. -1 if
+ *  `buff` is none of them (the common case for a champion carrying a large
+ *  stacking buff — Cho'Gath Feast, Veigar Q, Nasus Q — none of which are
+ *  crowd control). See the O(9N) note on `STATUS_TEXT_BUFFS` above. */
+const statusTextIndexOf = (buff: Buff): number => {
+  let proto: unknown = Object.getPrototypeOf(buff);
+  while (proto) {
+    const index = STATUS_TEXT_BUFF_INDEX.get(proto);
+    if (index !== undefined) return index;
+    proto = Object.getPrototypeOf(proto);
+  }
+  return -1;
+};
+
+export const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
+export const MAX_TICKS = 20;
+
+/** Rounds `raw` up to the next "nice" step — 1, 2 or 5 times a power of ten —
+ *  the standard technique for picking readable axis/tick spacing. Always
+ *  `>= raw`, so a step from this function can never let a tick count exceed
+ *  `maxHealth / step`'s ceiling. Only ever called past `TICK_LADDER`'s own
+ *  reach (health > 50,000), so `raw` here is always a few thousand or more —
+ *  not a general-purpose helper asked to behave at zero or negative input. */
+const niceStepAtLeast = (raw: number): number => {
+  const magnitude = 10 ** Math.floor(Math.log10(raw));
+  const normalized = raw / magnitude;
+  const niceMultiplier = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return niceMultiplier * magnitude;
+};
 
 export const healthTickStep = (maxHealth: number): number => {
   for (const step of TICK_LADDER) {
     if (maxHealth / step <= MAX_TICKS) return step;
   }
-  return TICK_LADDER[TICK_LADDER.length - 1];
+  // Past the curated ladder — reachable, not theoretical: Cho'Gath R's
+  // per-stack max health has no cap of its own (see MAX_HEALTH_PER_STACK in
+  // ChoGath_R.ts), so several uncapped max-health sources can compound a
+  // pool past 50,000 (TICK_LADDER's last rung x MAX_TICKS) over a long game.
+  // The old code returned the ladder's last rung here regardless of how far
+  // past it `maxHealth` had grown, so MAX_TICKS silently stopped holding
+  // right at this threshold. Deriving the step directly keeps the cap true
+  // at any input.
+  return niceStepAtLeast(maxHealth / MAX_TICKS);
 };
 
 export default class Champion extends AttackableUnit {
@@ -477,25 +530,30 @@ export default class Champion extends AttackableUnit {
         );
       }
     } else {
-      // Built with a plain loop over a hoisted class list rather than
-      // map/filter/join over a freshly-built array: this runs per champion per
-      // frame and the answer is the empty string almost always, so the old
-      // shape allocated four arrays and nine closures to say nothing. The
-      // `break` keeps `.find`'s semantics exactly — the *first* buff of a
-      // class decides, and a self-inflicted one prints nothing rather than
-      // deferring to a later buff of the same class.
+      // One pass over `this.buffs`, not nine: the old shape re-scanned the
+      // *whole* buff array once per STATUS_TEXT_BUFFS class (9 full passes)
+      // to find each class's first instance, which is O(9N) every frame for
+      // a champion whose N buffs are almost always none of the 9 — a large
+      // stacking buff (Cho'Gath Feast, Veigar Q, Nasus Q) most of all. This
+      // still gives the *first* buff of a class the final word — a
+      // self-inflicted one prints nothing rather than deferring to a later
+      // buff of the same class — and still prints in STATUS_TEXT_BUFFS'
+      // fixed class order regardless of where in `this.buffs` each one sits.
+      const firstOfClass: (Buff | undefined)[] = new Array(STATUS_TEXT_BUFFS.length);
+      let unfilled = STATUS_TEXT_BUFFS.length;
+      for (let j = 0; j < this.buffs.length && unfilled > 0; j++) {
+        const buff = this.buffs[j];
+        const index = statusTextIndexOf(buff);
+        if (index === -1 || firstOfClass[index]) continue;
+        firstOfClass[index] = buff;
+        unfilled--;
+      }
+
       let statusString = '';
-      if (this.buffs.length > 0) {
-        for (let i = 0; i < STATUS_TEXT_BUFFS.length; i++) {
-          const BuffClass = STATUS_TEXT_BUFFS[i];
-          for (let j = 0; j < this.buffs.length; j++) {
-            const buff = this.buffs[j];
-            if (!(buff instanceof BuffClass)) continue;
-            if (buff.sourceUnit !== this) {
-              statusString = statusString ? `${statusString}, ${buff.name}` : buff.name;
-            }
-            break;
-          }
+      for (let i = 0; i < firstOfClass.length; i++) {
+        const buff = firstOfClass[i];
+        if (buff && buff.sourceUnit !== this) {
+          statusString = statusString ? `${statusString}, ${buff.name}` : buff.name;
         }
       }
 
