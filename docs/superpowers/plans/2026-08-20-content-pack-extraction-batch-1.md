@@ -1715,7 +1715,6 @@ export default function makeVeraQ(api: ContentApi) {
 ```
 
 If `api.utils.VectorUtils` has no `scale`, use whatever the real module exports for "multiply this vector by a scalar" — check `src/utils/vector.utils.ts` and use the actual name. This is the first place the reference pack will find the API incomplete, and finding that is its job.
-```
 
 - [ ] **Step 4: Run the game's own seams against it**
 
