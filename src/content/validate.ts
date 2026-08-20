@@ -23,6 +23,14 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
 
+const isStringArray = (value: unknown): value is string[] => {
+  if (!Array.isArray(value)) return false;
+  for (const item of value) {
+    if (typeof item !== 'string') return false;
+  }
+  return true;
+};
+
 /** Bare identifier: the pack id becomes a prefix, so a colon is ambiguous. */
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
@@ -38,6 +46,22 @@ function checkManifest(value: unknown, errors: string[]): void {
   if (typeof value.coreRange !== 'string') errors.push('manifest.coreRange: must be a string');
 }
 
+function checkSpells(pack: Record<string, unknown>, errors: string[]): void {
+  if (pack.spells === undefined) return;
+  if (!isObject(pack.spells)) {
+    errors.push('spells: must be an object');
+    return;
+  }
+  for (const [id, value] of Object.entries(pack.spells)) {
+    // A spell class is a constructor. The success path casts this object to
+    // Record<string, SpellClass>; whatever eventually `new`s an entry must
+    // find a function there, not a string or a plain object.
+    if (typeof value !== 'function') {
+      errors.push(`spells.${id}: must be a class (constructor function)`);
+    }
+  }
+}
+
 function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
   if (pack.champions === undefined) return;
   if (!Array.isArray(pack.champions)) {
@@ -49,6 +73,12 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
     if (!isObject(entry) || typeof entry.id !== 'string') {
       errors.push('champions[]: each entry needs a string id');
       continue;
+    }
+    if (typeof entry.name !== 'string') {
+      errors.push(`champions.${entry.id}.name: must be a string`);
+    }
+    if (entry.image !== null && typeof entry.image !== 'string') {
+      errors.push(`champions.${entry.id}.image: must be a string or null`);
     }
     if (!Array.isArray(entry.spells)) {
       errors.push(`champions.${entry.id}.spells: must be an array`);
@@ -64,13 +94,44 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
   }
 }
 
-function checkMap(map: unknown, index: number, errors: string[]): void {
-  const where = `maps[${index}]`;
-  if (!isObject(map) || typeof map.id !== 'string') {
-    errors.push(`${where}: needs a string id`);
+function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
+  if (pack.monsters === undefined) return;
+  if (!isObject(pack.monsters)) {
+    errors.push('monsters: must be an object');
     return;
   }
-  const name = `maps.${map.id}`;
+  for (const [id, value] of Object.entries(pack.monsters)) {
+    if (!isObject(value)) {
+      errors.push(`monsters.${id}: must be an object`);
+      continue;
+    }
+    if (typeof value.id !== 'string') errors.push(`monsters.${id}.id: must be a string`);
+    if (typeof value.name !== 'string') errors.push(`monsters.${id}.name: must be a string`);
+    if (!isFiniteNumber(value.health)) {
+      errors.push(`monsters.${id}.health: must be a finite number`);
+    }
+    // PackRegistry.install() and monstersFilling(role) both call
+    // monster.fills.includes(role); a non-array fills is a runtime
+    // TypeError one layer downstream instead of a named error here.
+    if (!isStringArray(value.fills)) {
+      errors.push(`monsters.${id}: fills must be an array of strings`);
+    }
+  }
+}
+
+function checkMap(map: unknown, index: number, errors: string[]): void {
+  const where = `maps[${index}]`;
+  // The one legitimate early return: if `map` is not an object there is
+  // nothing left in it to inspect. Every other precondition below is
+  // guarded on its own so one malformed section does not hide its siblings.
+  if (!isObject(map)) {
+    errors.push(`${where}: must be an object`);
+    return;
+  }
+  if (typeof map.id !== 'string') {
+    errors.push(`${where}: needs a string id`);
+  }
+  const name = typeof map.id === 'string' ? `maps.${map.id}` : where;
   if (!isFiniteNumber(map.size) || map.size <= 0) {
     errors.push(`${name}.size: must be a positive number`);
   }
@@ -98,32 +159,32 @@ function checkMap(map: unknown, index: number, errors: string[]): void {
 
   if (!isObject(map.slots)) {
     errors.push(`${name}.slots: missing`);
-    return;
-  }
-  const slots = map.slots as Record<string, unknown>;
-  for (const group of ['spawn', 'minion', 'structure', 'neutral']) {
-    if (!Array.isArray(slots[group])) errors.push(`${name}.slots.${group}: must be an array`);
-  }
-
-  const structures = Array.isArray(slots.structure) ? slots.structure : [];
-  for (const slot of structures) {
-    if (!isObject(slot)) continue;
-    if (!STRUCTURE_KINDS.includes(slot.kind as StructureKind)) {
-      errors.push(
-        `${name}.slots.structure: unknown kind ${JSON.stringify(slot.kind)}; ` +
-          `core provides ${STRUCTURE_KINDS.join(', ')}`
-      );
+  } else {
+    const slots = map.slots;
+    for (const group of ['spawn', 'minion', 'structure', 'neutral']) {
+      if (!Array.isArray(slots[group])) errors.push(`${name}.slots.${group}: must be an array`);
     }
-    if (typeof slot.faction === 'string' && !factions.has(slot.faction)) {
-      errors.push(`${name}.slots.structure: faction ${slot.faction} was never declared`);
-    }
-  }
 
-  for (const group of ['spawn', 'minion'] as const) {
-    const groupSlots = Array.isArray(slots[group]) ? slots[group] : [];
-    for (const slot of groupSlots) {
-      if (isObject(slot) && typeof slot.faction === 'string' && !factions.has(slot.faction)) {
-        errors.push(`${name}.slots.${group}: faction ${slot.faction} was never declared`);
+    const structures = Array.isArray(slots.structure) ? slots.structure : [];
+    for (const slot of structures) {
+      if (!isObject(slot)) continue;
+      if (!STRUCTURE_KINDS.includes(slot.kind as StructureKind)) {
+        errors.push(
+          `${name}.slots.structure: unknown kind ${JSON.stringify(slot.kind)}; ` +
+            `core provides ${STRUCTURE_KINDS.join(', ')}`
+        );
+      }
+      if (typeof slot.faction === 'string' && !factions.has(slot.faction)) {
+        errors.push(`${name}.slots.structure: faction ${slot.faction} was never declared`);
+      }
+    }
+
+    for (const group of ['spawn', 'minion'] as const) {
+      const groupSlots = Array.isArray(slots[group]) ? slots[group] : [];
+      for (const slot of groupSlots) {
+        if (isObject(slot) && typeof slot.faction === 'string' && !factions.has(slot.faction)) {
+          errors.push(`${name}.slots.${group}: faction ${slot.faction} was never declared`);
+        }
       }
     }
   }
@@ -158,7 +219,9 @@ export function validatePack(candidate: unknown): ValidationResult {
   }
 
   checkManifest(candidate.manifest, errors);
+  checkSpells(candidate, errors);
   checkChampions(candidate, errors);
+  checkMonsters(candidate, errors);
 
   if (candidate.maps !== undefined) {
     if (!Array.isArray(candidate.maps)) errors.push('maps: must be an array');

@@ -108,4 +108,70 @@ describe('validatePack', () => {
     });
     expect(result.ok).toBe(true);
   });
+
+  it('names the monster whose fills is not an array of strings', () => {
+    // PackRegistry.install() iterates pack.monsters, and monstersFilling(role)
+    // calls monster.fills.includes(role) — a fills that is a string rather
+    // than an array turns into a runtime TypeError one layer downstream.
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: { wolf: { id: 'wolf', name: 'Wolf', fills: 'jungle', health: 20 } },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/fills/);
+  });
+
+  it('rejects a spells entry that is not a class', () => {
+    // The success cast claims spells: Record<string, SpellClass>. A string
+    // sitting where a constructor belongs must be named at load, not `new`-ed
+    // by whatever eventually instantiates it.
+    const result = validatePack({
+      manifest: goodManifest,
+      spells: { Alpha_Q: 'not-a-class' },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/Alpha_Q/);
+  });
+
+  it('rejects a champion whose name is not a string', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      champions: [{ id: 'alpha', name: 42, image: null, spells: [] }],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/name/);
+  });
+
+  it('rejects a champion whose image is neither a string nor null', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      champions: [{ id: 'alpha', name: 'Alpha', image: 42, spells: [] }],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/image/);
+  });
+
+  it('reports every defect in a single map, not just the first', () => {
+    // Regression for the early-return bug: a map missing `slots` used to
+    // `return` immediately, so the lane below — naming a faction nobody
+    // declared — was never reached or reported in the same pass.
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          size: 4000,
+          terrain: { wall: [], bush: [], water: [] },
+          factions: [{ id: 'blue' }],
+          lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      const joined = result.errors.join(' ');
+      expect(joined).toMatch(/slots/);
+      expect(joined).toMatch(/red/);
+    }
+  });
 });
