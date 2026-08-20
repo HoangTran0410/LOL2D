@@ -4,18 +4,23 @@ import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 import AreaSpellObject from '@/game/gameObject/spellObjects/AreaSpellObject';
-import BeamSpellObject from '@/game/gameObject/spellObjects/BeamSpellObject';
+import BeamSpellObject, {
+  beamBoundingBox,
+  intersectsBeam,
+} from '@/game/gameObject/spellObjects/BeamSpellObject';
 import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
 import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
+import { isChargeActivation } from '@/game/spell/runtime/types';
 
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
-import Champion from '@/game/gameObject/attackableUnits/Champion';
+import Champion, { DEFAULT_CHAMPION_ATTACK } from '@/game/gameObject/attackableUnits/Champion';
 import Pet from '@/game/gameObject/attackableUnits/Pet';
 import Monster from '@/game/gameObject/attackableUnits/Monster';
+import { MAX_UNIT_SIZE, StatModifier, StatsModifier } from '@/game/gameObject/Stats';
 
 import Airborne from '@/game/gameObject/buffs/Airborne';
 import Charm from '@/game/gameObject/buffs/Charm';
-import Chilled from '@/game/gameObject/buffs/Chilled';
+import Chilled, { CHILL_DURATION_MS } from '@/game/gameObject/buffs/Chilled';
 import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
 import DamageReflect from '@/game/gameObject/buffs/DamageReflect';
 import Dash from '@/game/gameObject/buffs/Dash';
@@ -35,7 +40,7 @@ import Stasis from '@/game/gameObject/buffs/Stasis';
 import StatAmp from '@/game/gameObject/buffs/StatAmp';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
-import TrueSight from '@/game/gameObject/buffs/TrueSight';
+import TrueSight, { createReveal } from '@/game/gameObject/buffs/TrueSight';
 import Untargetable from '@/game/gameObject/buffs/Untargetable';
 import Buff from '@/game/gameObject/Buff';
 
@@ -44,14 +49,19 @@ import * as Vision from '@/game/combat/Vision';
 import * as ExecuteTargeting from '@/game/combat/ExecuteTargeting';
 import * as AttackTargeting from '@/game/combat/AttackTargeting';
 import * as GlobalShot from '@/game/combat/GlobalShot';
-import * as TargetResolver from '@/game/spell/targeting/TargetResolver';
+import TargetResolver from '@/game/spell/targeting/TargetResolver';
+import { PredefinedFilters } from '@/game/managers/ObjectManager';
 
-import CastBar from '@/game/vfx/CastBar';
+import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import CastTelegraph from '@/game/vfx/CastTelegraph';
 import ChargeRangeTelegraph from '@/game/vfx/ChargeRangeTelegraph';
 import VfxGroup from '@/game/vfx/VfxGroup';
+import LuxBeamEffect from '@/game/vfx/LuxBeamEffect';
+import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
 
-import ParticleSystem from '@/game/gameObject/helpers/ParticleSystem';
+import ParticleSystem, {
+  PredefinedParticleSystems,
+} from '@/game/gameObject/helpers/ParticleSystem';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
 import CombatText from '@/game/gameObject/helpers/CombatText';
 
@@ -59,14 +69,17 @@ import ActionState from '@/game/enums/ActionState';
 import BuffAddType from '@/game/enums/BuffAddType';
 import EventType from '@/game/enums/EventType';
 import StatusFlags from '@/game/enums/StatusFlags';
+import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
+import { SpellRole } from '@/game/ai/SpellRole';
 
-import { wallOutlinesInArea } from '@/game/gameObject/map/DynamicTerrain';
-import TerrainField from '@/game/gameObject/map/TerrainField';
+import { wallOutlinesInArea, slabVertices } from '@/game/gameObject/map/DynamicTerrain';
+import TerrainField, { sweepToWall } from '@/game/gameObject/map/TerrainField';
 
 import VectorUtils from '@/utils/vector.utils';
 import CollideUtils from '@/utils/collide.utils';
 import * as Quadtree from '@/libs/quadtree';
 import SAT from '@/libs/SAT';
+import { uuidv4, hasFlag, rectToVertices } from '@/utils/index';
 
 /**
  * Everything a content pack is allowed to touch.
@@ -86,6 +99,18 @@ import SAT from '@/libs/SAT';
  * type-checks them against its own generated union. Type safety does not
  * vanish, it stops at the boundary — which is exactly where `validate.ts`
  * takes over.
+ *
+ * **A module import is not the same thing as the symbols a real spell needs
+ * from it.** The first cut of this file imported the *default* of every
+ * module the measured import table named and stopped there — but 8 of those
+ * modules also carry named exports real spells import alongside the default
+ * (`PredefinedParticleSystems` beside `ParticleSystem`, `createReveal` beside
+ * `TrueSight`, and six more), and three more modules — `ObjectManager`
+ * (`PredefinedFilters`, 153 files), `CancelPolicy` (`SpellForm`) and
+ * `ai/SpellRole` — were not carried at all. `contentApi-surface-seam.test.ts`
+ * is what keeps this from silently narrowing again: it scans every `@/`
+ * import in `spells/` and `coreSpells/` and fails naming any symbol this file
+ * does not expose.
  */
 export interface ContentApi {
   Spell: typeof Spell;
@@ -93,16 +118,31 @@ export interface ContentApi {
   MissileSpellObject: typeof MissileSpellObject;
   AreaSpellObject: typeof AreaSpellObject;
   BeamSpellObject: typeof BeamSpellObject;
+  beamBoundingBox: typeof beamBoundingBox;
+  intersectsBeam: typeof intersectsBeam;
   HomingMissileSpellObject: typeof HomingMissileSpellObject;
   AoePulse: typeof AoePulse;
+  isChargeActivation: typeof isChargeActivation;
+  /**
+   * Not inside `buffs`: every entry there is a constructor (see
+   * `contentApi.test.ts`'s "carries the 24 buffs as constructors" case), and
+   * this is a plain duration in milliseconds, not a class. It rides at the
+   * top level for the same reason `beamBoundingBox` does — a real symbol
+   * whose module has no clean home among the eight namespaces.
+   */
+  CHILL_DURATION_MS: typeof CHILL_DURATION_MS;
 
   units: {
     AttackableUnit: typeof AttackableUnit;
     Champion: typeof Champion;
     Pet: typeof Pet;
     Monster: typeof Monster;
+    DEFAULT_CHAMPION_ATTACK: typeof DEFAULT_CHAMPION_ATTACK;
+    MAX_UNIT_SIZE: typeof MAX_UNIT_SIZE;
+    StatModifier: typeof StatModifier;
+    StatsModifier: typeof StatsModifier;
   };
-  buffs: Record<string, unknown> & { Buff: typeof Buff; Slow: typeof Slow; Dash: typeof Dash };
+  buffs: typeof BUFFS;
   combat: typeof COMBAT;
   vfx: typeof VFX;
   helpers: typeof HELPERS;
@@ -120,16 +160,50 @@ const COMBAT = Object.freeze({
   AttackTargeting,
   GlobalShot,
   TargetResolver,
+  PredefinedFilters,
 });
-const VFX = Object.freeze({ CastBar, CastTelegraph, ChargeRangeTelegraph, VfxGroup });
-const HELPERS = Object.freeze({ ParticleSystem, TrailSystem, CombatText });
-const ENUMS = Object.freeze({ ActionState, BuffAddType, EventType, StatusFlags });
-const TERRAIN = Object.freeze({ wallOutlinesInArea, TerrainField });
-const UTILS = Object.freeze({ VectorUtils, CollideUtils, Quadtree, SAT });
+const VFX = Object.freeze({
+  CastBar,
+  unitCastBarAnchor,
+  CastTelegraph,
+  ChargeRangeTelegraph,
+  VfxGroup,
+  LuxBeamEffect,
+  drawAxeArc,
+  drawDariusAxe,
+});
+const HELPERS = Object.freeze({
+  ParticleSystem,
+  PredefinedParticleSystems,
+  TrailSystem,
+  CombatText,
+});
+const ENUMS = Object.freeze({
+  ActionState,
+  BuffAddType,
+  EventType,
+  StatusFlags,
+  SpellForm,
+  SpellRole,
+});
+const TERRAIN = Object.freeze({ wallOutlinesInArea, slabVertices, TerrainField, sweepToWall });
+const UTILS = Object.freeze({
+  VectorUtils,
+  CollideUtils,
+  Quadtree,
+  SAT,
+  uuidv4,
+  hasFlag,
+  rectToVertices,
+});
 
 // Every file in src/game/gameObject/buffs/ that has a default export — 24 of
 // them, not the 23 an earlier draft of this list counted; TrueSight was the
 // one missed. Buff itself is the base class, filed one directory up.
+// createReveal is a named export real spells import alongside TrueSight's
+// default; CHILL_DURATION_MS is Chilled's equivalent but is a plain number,
+// not a constructor, so it lives at the top level instead (see its own
+// interface doc comment) rather than breaking "every entry here is `new`-able".
 const BUFFS = Object.freeze({
   Buff,
   Airborne,
@@ -155,6 +229,7 @@ const BUFFS = Object.freeze({
   Stun,
   Taunt,
   TrueSight,
+  createReveal,
   Untargetable,
 });
 
@@ -169,9 +244,22 @@ export function buildContentApi(): ContentApi {
     MissileSpellObject,
     AreaSpellObject,
     BeamSpellObject,
+    beamBoundingBox,
+    intersectsBeam,
     HomingMissileSpellObject,
     AoePulse,
-    units: Object.freeze({ AttackableUnit, Champion, Pet, Monster }),
+    isChargeActivation,
+    CHILL_DURATION_MS,
+    units: Object.freeze({
+      AttackableUnit,
+      Champion,
+      Pet,
+      Monster,
+      DEFAULT_CHAMPION_ATTACK,
+      MAX_UNIT_SIZE,
+      StatModifier,
+      StatsModifier,
+    }),
     buffs: BUFFS,
     combat: COMBAT,
     vfx: VFX,
