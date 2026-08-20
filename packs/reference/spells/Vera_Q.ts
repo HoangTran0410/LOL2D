@@ -17,18 +17,29 @@ export const VERA_Q_SPEED = 12;
 export const VERA_Q_COOLDOWN_MS = 6_000;
 export const VERA_Q_MANA = 30;
 
-export default function makeVeraQ(api: ContentApi) {
-  /**
-   * `MissileSpellObject` flies `position` -> `destination`, hits enemies it
-   * overlaps, dies on arrival. A subclass normally overrides only `onHit`,
-   * `draw` and the tuning fields. It already reports a correct
-   * `getDisplayBoundingBox()` sized from `size`, so nothing extra is needed
-   * here to keep it visible while its centre is on screen.
-   */
-  class VeraQObject extends api.MissileSpellObject {
+/**
+ * `MissileSpellObject` flies `position` -> `destination`, hits enemies it
+ * overlaps, dies on arrival. A subclass normally overrides only `onHit`,
+ * `draw` and the tuning fields. It already reports a correct
+ * `getDisplayBoundingBox()` sized from `size`, so nothing extra is needed
+ * here to keep it visible while its centre is on screen.
+ *
+ * A named export, separate from the default `makeVeraQ`, so a test can drive
+ * the missile's own collision behaviour directly rather than through a full
+ * spell cast.
+ */
+export function makeVeraQObject(api: ContentApi) {
+  return class VeraQObject extends api.MissileSpellObject {
     speed = VERA_Q_SPEED;
     size = 16;
     damage = VERA_Q_DAMAGE;
+    // A single straight bolt: the tooltip promises "the first enemy hit", not
+    // a pierce. Without this it inherits MissileSpellObject's default of
+    // Infinity and damages every distinct enemy it overlaps along its whole
+    // flight. Ashe_Q_Object.maxHitCount = 1 is the real model for a
+    // single-target missile; a piercing skillshot like Yasuo Q omits it on
+    // purpose, which this spell is not.
+    maxHitCount = 1;
 
     onHit(target: { takeDamage(amount: number, source: unknown): void }): void {
       target.takeDamage(this.damage, this.owner);
@@ -47,7 +58,11 @@ export default function makeVeraQ(api: ContentApi) {
       circle(bolt.x, bolt.y, this.size * 0.5);
       pop();
     }
-  }
+  };
+}
+
+export default function makeVeraQ(api: ContentApi) {
+  const VeraQObject = makeVeraQObject(api);
 
   return class Vera_Q extends api.Spell {
     name = 'Tia Lam (Vera_Q)';

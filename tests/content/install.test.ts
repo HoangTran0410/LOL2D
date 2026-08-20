@@ -6,6 +6,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { installBundledPacks, BUNDLED_PACKS } from '../../src/content/install';
+import type { ContentPackFactory } from '../../src/content/ContentPack';
 
 /**
  * The loader, and the one file batch 2 replaces.
@@ -38,9 +39,7 @@ describe('installBundledPacks', () => {
     installBundledPacks(registry);
     for (const champion of registry.champions()) {
       for (const spellId of champion.spells) {
-        expect(registry.spellClass(spellId), `${champion.id} -> ${spellId}`).toBeTypeOf(
-          'function'
-        );
+        expect(registry.spellClass(spellId), `${champion.id} -> ${spellId}`).toBeTypeOf('function');
       }
     }
   });
@@ -50,6 +49,19 @@ describe('installBundledPacks', () => {
     // exists to prevent — `instanceof` stops answering and every pack spell
     // object misses its Z_INDEX_MAP key. Object identity is how that is
     // checked: each factory must receive the *same* api, not an equal one.
+    //
+    // `BUNDLED_PACKS` has exactly one real entry today, so
+    // `new Set(received).size === 1` would hold no matter what
+    // `installBundledPacks` did with the api it built — a one-element set
+    // cannot be any other size, and `buildContentApi()`'s own module cache
+    // means even a broken loop that rebuilt the api per factory would still
+    // hand out one identity. A second, synthetic factory — installed and
+    // then reverted, never left in `BUNDLED_PACKS` — gives the set
+    // assertion something it could actually fail to distinguish.
+    const synthetic: ContentPackFactory = () => ({
+      manifest: { id: 'install-test-synthetic', version: '0.0.0', coreRange: '^1' },
+    });
+
     const received: unknown[] = [];
     const spy = (factory: (api: never) => unknown) => (api: never) => {
       received.push(api);
@@ -57,13 +69,13 @@ describe('installBundledPacks', () => {
     };
     const registry = new PackRegistry();
     const originals = [...BUNDLED_PACKS];
-    BUNDLED_PACKS.splice(0, BUNDLED_PACKS.length, ...originals.map(spy as never));
+    BUNDLED_PACKS.splice(0, BUNDLED_PACKS.length, ...[...originals, synthetic].map(spy as never));
     try {
       installBundledPacks(registry);
     } finally {
       BUNDLED_PACKS.splice(0, BUNDLED_PACKS.length, ...originals);
     }
-    expect(received.length).toBe(originals.length);
+    expect(received.length).toBe(originals.length + 1);
     expect(new Set(received).size).toBe(1);
   });
 });
