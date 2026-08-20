@@ -11,20 +11,29 @@ import { describe, expect, it } from 'vitest';
 // `tests/game/buffs/Ground.test.ts`'s guard against `owner.teleportTo`.
 describe('every spell declares a targeting mode', () => {
   const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  // `coreSpells/` left `spells/` but did not stop being spells.
+  const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
   // `index.ts` only re-exports; `_EmptyExample.ts` is copy-paste scaffolding
   // for a new spell, never registered anywhere, and deliberately incomplete.
   const skip = new Set(['index.ts', '_EmptyExample.ts']);
   const targetingModePattern = /targeting\s*:\s*'(?:SELF|DIRECTION|POINT|UNIT)'/;
   const targetingModeFieldPattern = /\btargetingMode\s*[:=]/;
 
-  const files = readdirSync(spellsDir).filter(name => name.endsWith('.ts') && !skip.has(name));
+  const files = [
+    ...readdirSync(spellsDir)
+      .filter(name => name.endsWith('.ts') && !skip.has(name))
+      .map(name => ({ dir: spellsDir, name })),
+    ...readdirSync(coreSpellsDir)
+      .filter(name => name.endsWith('.ts') && !skip.has(name))
+      .map(name => ({ dir: coreSpellsDir, name })),
+  ];
 
   it('has spell files to check', () => {
     expect(files.length).toBeGreaterThan(0);
   });
 
-  it.each(files)('%s', name => {
-    const source = readFileSync(join(spellsDir, name), 'utf8');
+  it.each(files)('$name', ({ dir, name }) => {
+    const source = readFileSync(join(dir, name), 'utf8');
     const declaresItsOwnTargeting = targetingModePattern.test(source);
     const setsTargetingMode = targetingModeFieldPattern.test(source);
     expect(

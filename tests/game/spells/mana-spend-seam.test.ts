@@ -36,7 +36,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Spell from '../../../src/game/gameObject/Spell';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
-const SCANNED_DIRECTORIES = ['spells', 'spellObjects', 'buffs'];
+const SCANNED_DIRECTORIES = ['spells', 'coreSpells', 'spellObjects', 'buffs'];
 
 /** Any read or write of a caster's mana pool. */
 const TOUCHES_MANA = /\bstats\.mana\b|\bmana\.(?:baseValue|current)\b/;

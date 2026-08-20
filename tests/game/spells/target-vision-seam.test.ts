@@ -26,10 +26,27 @@ import { join } from 'node:path';
  * hiding in the bush, exactly as it should.
  */
 const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 
 /** Comments describe the rule; matching them would flag the documentation. */
 function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
+/**
+ * Every spell file, content and core alike — `coreSpells/` left the
+ * population `spells/` scans but did not stop being spells. `index.ts` is a
+ * barrel, not a spell, so it is excluded.
+ */
+function spellFiles(): { dir: string; file: string }[] {
+  return [
+    ...readdirSync(SPELLS_DIR)
+      .filter(name => name.endsWith('.ts'))
+      .map(file => ({ dir: SPELLS_DIR, file })),
+    ...readdirSync(CORE_SPELLS_DIR)
+      .filter(name => name.endsWith('.ts') && name !== 'index.ts')
+      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
+  ];
 }
 
 /**
@@ -49,8 +66,8 @@ describe('an auto-locking spell cannot pick a target it cannot see', () => {
   it('every nearest-enemy picker passes visibleTo to its query', () => {
     const offenders: string[] = [];
 
-    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
-      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+    for (const { dir, file } of spellFiles()) {
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       if (!source.includes('queryObjects')) continue;
       if (!PICKS_ONE_UNIT.test(source)) continue;
       if (ALLIES_ONLY.test(source)) continue;
@@ -63,8 +80,8 @@ describe('an auto-locking spell cannot pick a target it cannot see', () => {
   it('the scan is looking at a real population, not an empty one', () => {
     // A fingerprint that matched nothing would pass forever while the rule rots.
     let scanned = 0;
-    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
-      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+    for (const { dir, file } of spellFiles()) {
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       if (source.includes('queryObjects') && PICKS_ONE_UNIT.test(source)) scanned++;
     }
 
@@ -97,10 +114,10 @@ describe('an auto-locking spell cannot pick a target it cannot see', () => {
     const FOG_DRAW_FLAG = /\bwillDraw\b|\bvisibleToPlayerTeam\b/;
     const offenders: string[] = [];
 
-    for (const file of readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'))) {
+    for (const { dir, file } of spellFiles()) {
       // Comments stripped first: Lux R documents the flag at length, and
       // flagging that would be the scan reporting its own explanation.
-      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       if (FOG_DRAW_FLAG.test(source)) offenders.push(file);
     }
 

@@ -25,7 +25,7 @@ import {
   spellClassOfId,
   type SpellClass,
 } from './spellRegistry';
-import BasicAttack from './gameObject/spells/BasicAttack';
+import BasicAttack from './gameObject/coreSpells/BasicAttack';
 
 /**
  * The barrel is gone from this file, and that is the whole of Stage 4.

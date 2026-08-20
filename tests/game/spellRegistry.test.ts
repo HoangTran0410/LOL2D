@@ -28,6 +28,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import * as AllSpells from '../../src/game/gameObject/spells/index';
+import * as CoreSpells from '../../src/game/gameObject/coreSpells/index';
 import { DEFAULT_CHAMPION_ATTACK } from '../../src/game/gameObject/attackableUnits/Champion';
 import { spellModules } from '../../src/generated/spellModules';
 import { spellCatalog } from '../../src/generated/spellCatalog';
@@ -57,8 +58,18 @@ import {
   type ChampionLoadout,
 } from '../../src/game/config/PregameConfig';
 
-const barrelKeys = Object.keys(AllSpells).filter(
-  key => typeof (AllSpells as Record<string, unknown>)[key] === 'function'
+// The registry loads from two barrels now — `spells/` (content) and
+// `coreSpells/` (`BasicAttack`, `Recall`) — merged content-last exactly as
+// `scripts/generate-spell-catalog.mjs` merges them.
+const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
+
+// `Recall` is exported from `coreSpells/index.ts` for `Champion.ts`'s sake,
+// but the generator deliberately keeps it out of `spellModules`/`spellCatalog`
+// — see `CATALOG_HIDDEN_CORE_IDS` there. "Everything the module map covers"
+// therefore excludes it too, or this coverage check would demand an entry the
+// generator is right to omit.
+const barrelKeys = Object.keys(AllSpellsById).filter(
+  key => typeof AllSpellsById[key] === 'function' && key !== 'Recall'
 );
 
 beforeEach(() => resetSpellRegistryForTests());
@@ -201,7 +212,7 @@ describe('a match plan', () => {
       expect(preset.spells).toHaveLength(SLOT_COUNT);
       // Every slot is the exact class its id names — no fallbacks fired.
       kit.spellIds.forEach((id, slot) => {
-        expect(preset.spells![slot]).toBe((AllSpells as Record<string, unknown>)[id]);
+        expect(preset.spells![slot]).toBe(AllSpellsById[id]);
       });
     }
   });
@@ -228,7 +239,7 @@ describe('a miss degrades instead of throwing', () => {
       spellIds: ['Ahri_Q'],
     });
     expect(preset.spells).toHaveLength(1);
-    expect(preset.spells![0]).toBe(AllSpells.BasicAttack);
+    expect(preset.spells![0]).toBe(CoreSpells.BasicAttack);
   });
 
   it('still builds a kit with nothing loaded at all', () => {

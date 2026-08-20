@@ -5,7 +5,7 @@ import Champion, {
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import Turret from '../../../src/game/gameObject/structures/Turret';
-import { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/spells/Recall';
+import { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/coreSpells/Recall';
 import { RECALL_CLEAR_PX, RECALL_SAFE_MS } from '../../../src/game/ai/BotBrain';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type Spell from '../../../src/game/gameObject/Spell';

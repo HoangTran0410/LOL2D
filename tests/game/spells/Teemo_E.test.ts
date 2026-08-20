@@ -14,7 +14,7 @@ import Teemo_E, {
   Teemo_E_Object,
   Teemo_E_Splash,
 } from '../../../src/game/gameObject/spells/Teemo_E';
-import BasicAttack from '../../../src/game/gameObject/spells/BasicAttack';
+import BasicAttack from '../../../src/game/gameObject/coreSpells/BasicAttack';
 import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
 import EventManager from '../../../src/managers/EventManager';
 import EventType from '../../../src/game/enums/EventType';

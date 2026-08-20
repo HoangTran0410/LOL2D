@@ -18,7 +18,7 @@ import Slow from '@/game/gameObject/buffs/Slow';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
 import type { BuffStackId } from '@/game/gameObject/Buff';
-import Recall from '@/game/gameObject/spells/Recall';
+import Recall from '@/game/gameObject/coreSpells/Recall';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
 export interface ChampionAttackTuning {

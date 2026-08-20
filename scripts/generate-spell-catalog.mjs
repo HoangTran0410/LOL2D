@@ -52,6 +52,22 @@ const root = resolve(dirname(scriptPath), '..');
 const outputPath = resolve(root, 'src/generated/spellCatalog.ts');
 const modulesPath = resolve(root, 'src/generated/spellModules.ts');
 const barrelPath = resolve(root, 'src/game/gameObject/spells/index.ts');
+const coreBarrelPath = resolve(root, 'src/game/gameObject/coreSpells/index.ts');
+
+/**
+ * Core exports that must not gain a catalogue/module-map entry despite living
+ * in `coreSpells/index.ts`.
+ *
+ * `Recall` is there so `Champion.ts` and this generator both have one barrel
+ * to point at, not because it is offered anywhere: its own class doc is
+ * explicit — "Not part of any kit... not pickable in the setup screen" — and
+ * `listSpellCatalog()` hands every catalogue id to the free-form per-slot
+ * picker. Merging it in would make Hồi Thành selectable in a spell slot,
+ * fighting the one already bound to `Champion.recall`/`B`. `BasicAttack` has
+ * no such exemption: it keeps its own shelf (`BASIC_ATTACK_ID`) same as before
+ * the move.
+ */
+const CATALOG_HIDDEN_CORE_IDS = new Set(['Recall']);
 
 /** No cooldown reduction, no URF — the rule-free numbers this file stores. */
 const NO_MATCH_RULES = { cooldownMultiplier: 1, manaFree: false };
@@ -109,7 +125,13 @@ export async function renderSpellCatalogSource() {
   });
 
   try {
-    const AllSpells = await server.ssrLoadModule('/src/game/gameObject/spells/index.ts');
+    const CoreSpells = await server.ssrLoadModule('/src/game/gameObject/coreSpells/index.ts');
+    const ContentSpells = await server.ssrLoadModule('/src/game/gameObject/spells/index.ts');
+    const CatalogedCoreSpells = Object.fromEntries(
+      Object.entries(CoreSpells).filter(([id]) => !CATALOG_HIDDEN_CORE_IDS.has(id))
+    );
+    // Content-last: a content id can never shadow a core one.
+    const AllSpells = { ...ContentSpells, ...CatalogedCoreSpells };
     const entries = Object.entries(AllSpells)
       .filter(([, value]) => typeof value === 'function')
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
@@ -182,10 +204,15 @@ function render(entries) {
  * The other half: `id → () => import('./Yasuo_Q')`, so a match can fetch the
  * kits it is actually about to play instead of the whole barrel.
  *
- * Parsed out of `spells/index.ts` rather than guessed from the id, because the
- * barrel is the thing that decides which file an id names — `BasicAttack` is
- * `./BasicAttack`, `Yasuo_Q` is `./Yasuo_Q`, and nothing guarantees the two
- * always agree in future.
+ * Parsed out of `spells/index.ts` and `coreSpells/index.ts` rather than
+ * guessed from the id, because a barrel is the thing that decides which file
+ * and which directory an id names — `BasicAttack` is `coreSpells/BasicAttack`,
+ * `Yasuo_Q` is `spells/Yasuo_Q`, and nothing guarantees id and path always
+ * agree in future. The two barrels are independent `readFile`s (this function
+ * never touches `ssrLoadModule`), so `coreIds` is built here rather than
+ * reused from `renderSpellCatalogSource` — that function's `CoreSpells` is a
+ * different kind of value (loaded classes, not parsed text) in a scope this
+ * one does not share.
  *
  * The importers stay `() => import(...)` thunks rather than a resolved map:
  * Rollup only treats a dynamic import as a split point if it is literal and
@@ -193,18 +220,40 @@ function render(entries) {
  * this file back into one eager chunk.
  */
 export async function renderSpellModulesSource() {
-  const barrel = await readFile(barrelPath, 'utf8');
   const pattern = /export\s*\{\s*default\s+as\s+([A-Za-z0-9_]+)\s*\}\s*from\s*'(\.\/[^']+)'/g;
-  const entries = [...barrel.matchAll(pattern)]
-    .map(([, id, path]) => ({ id, path }))
-    .sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
+  const parseBarrel = async path => {
+    const source = await readFile(path, 'utf8');
+    return [...source.matchAll(pattern)].map(([, id, importPath]) => ({ id, path: importPath }));
+  };
 
-  if (!entries.length) throw new Error('no `export { default as X } from` lines in the barrel');
+  const [contentEntries, rawCoreEntries] = await Promise.all([
+    parseBarrel(barrelPath),
+    parseBarrel(coreBarrelPath),
+  ]);
+  // See `CATALOG_HIDDEN_CORE_IDS`: `Recall` has no dynamic-import consumer
+  // (`Champion.ts` imports it statically) and must not be reachable by id.
+  const coreEntries = rawCoreEntries.filter(entry => !CATALOG_HIDDEN_CORE_IDS.has(entry.id));
 
-  const records = entries.map(
-    entry =>
-      `  ${JSON.stringify(entry.id)}: () => import('@/game/gameObject/spells/${entry.path.slice(2)}'),`
+  if (!contentEntries.length && !coreEntries.length) {
+    throw new Error('no `export { default as X } from` lines in either barrel');
+  }
+
+  const coreIds = new Set(coreEntries.map(entry => entry.id));
+
+  // Content-last, matching `renderSpellCatalogSource`: a content id can never
+  // shadow a core one.
+  const merged = new Map();
+  for (const entry of contentEntries) merged.set(entry.id, entry);
+  for (const entry of coreEntries) merged.set(entry.id, entry);
+
+  const entries = [...merged.values()].sort((left, right) =>
+    left.id < right.id ? -1 : left.id > right.id ? 1 : 0
   );
+
+  const records = entries.map(entry => {
+    const dir = coreIds.has(entry.id) ? 'coreSpells' : 'spells';
+    return `  ${JSON.stringify(entry.id)}: () => import('@/game/gameObject/${dir}/${entry.path.slice(2)}'),`;
+  });
 
   return [
     '// Generated by scripts/generate-spell-catalog.mjs. Do not edit.',

@@ -27,6 +27,24 @@ import Spell from '../../../src/game/gameObject/Spell';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
+/**
+ * Every spell file, content and core alike, for the two source scans below.
+ * `coreSpells/` left `spells/` but did not stop being spells; `index.ts` is a
+ * barrel, not a spell.
+ */
+const spellFiles = (): { dir: string; name: string }[] => {
+  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
+  return [
+    ...readdirSync(spellsDir)
+      .filter(name => name.endsWith('.ts'))
+      .map(name => ({ dir: spellsDir, name })),
+    ...readdirSync(coreSpellsDir)
+      .filter(name => name.endsWith('.ts') && name !== 'index.ts')
+      .map(name => ({ dir: coreSpellsDir, name })),
+  ];
+};
+
 class TestVector {
   constructor(
     public x = 0,
@@ -362,10 +380,8 @@ describe('URF (manaFree) zeroes every mana path through the same getter', () => 
 // The seam only holds if nothing goes around it. Mirrors
 // tests/game/buffs/Ground.test.ts's guard for owner.teleportTo.
 describe('no spell file reaches for matchRules on its own', () => {
-  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
-
-  it.each(readdirSync(spellsDir).filter(name => name.endsWith('.ts')))('%s', name => {
-    const source = readFileSync(join(spellsDir, name), 'utf8');
+  it.each(spellFiles())('$name', ({ dir, name }) => {
+    const source = readFileSync(join(dir, name), 'utf8');
     expect(source).not.toMatch(/matchRules/);
   });
 });
@@ -390,8 +406,6 @@ describe('no spell file reaches for matchRules on its own', () => {
  * wrapping, and one of them deliberately passes a recast window.
  */
 describe('a spell that sets its own cooldown goes through reducedCooldown', () => {
-  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
-
   /**
    * Recast windows that happen to be *named* like cooldowns. Each is a fixed
    * "press the key again within N ms" window, so each must stay raw.
@@ -410,8 +424,8 @@ describe('a spell that sets its own cooldown goes through reducedCooldown', () =
   const ASSIGNMENT = /this\.currentCooldown\s*=\s*([^;]*);/g;
   const COOLDOWN_FIELD = /this\.(\w*(?:cool|coll)down\w*)/gi;
 
-  it.each(readdirSync(spellsDir).filter(name => name.endsWith('.ts')))('%s', name => {
-    const source = readFileSync(join(spellsDir, name), 'utf8');
+  it.each(spellFiles())('$name', ({ dir, name }) => {
+    const source = readFileSync(join(dir, name), 'utf8');
 
     for (const [assignment, rightHandSide] of source.matchAll(ASSIGNMENT)) {
       if (assignment.includes('reducedCooldown(')) continue;

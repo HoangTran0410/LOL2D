@@ -32,6 +32,7 @@ import {
  * millisecond to rule out across every spell at once.
  */
 const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 const BUFFS_DIR = join(__dirname, '../../../src/game/gameObject/buffs');
 
 /** Comments describe the rule; matching them would flag the documentation. */
@@ -43,12 +44,27 @@ function tsFilesIn(dir: string): string[] {
   return readdirSync(dir).filter(name => name.endsWith('.ts'));
 }
 
+/**
+ * Every spell file, content and core alike — `coreSpells/` left the population
+ * this scanned but did not stop being spells. `index.ts` is a barrel, not a
+ * spell, so it is excluded the same way `tsFilesIn` never had to think about
+ * it under `spells/` (that barrel is scanned too, but it never matched).
+ */
+function allSpellFiles(): { dir: string; file: string }[] {
+  return [
+    ...tsFilesIn(SPELLS_DIR).map(file => ({ dir: SPELLS_DIR, file })),
+    ...tsFilesIn(CORE_SPELLS_DIR)
+      .filter(file => file !== 'index.ts')
+      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
+  ];
+}
+
 describe('a spell hooks a dash frame, it does not replace it', () => {
   it('no spell assigns onUpdate onto a buff instance', () => {
     const offenders: string[] = [];
 
-    for (const file of tsFilesIn(SPELLS_DIR)) {
-      const source = stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8'));
+    for (const { dir, file } of allSpellFiles()) {
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       // `<identifier>.onUpdate =` — an assignment onto an existing object, as
       // opposed to `onUpdate() {}` declared inside a class body.
       const matches = source.match(/\b\w+\.onUpdate\s*=/g);

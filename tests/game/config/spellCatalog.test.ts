@@ -28,6 +28,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
+import * as CoreSpells from '../../../src/game/gameObject/coreSpells/index';
 import { getSpellDisplay } from '../../../src/game/preset';
 import {
   isSpellCatalogId,
@@ -37,7 +38,14 @@ import {
 import { spellCatalog } from '../../../src/generated/spellCatalog';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
-const barrelKeys = Object.keys(AllSpells);
+// The catalogue is generated from two barrels — `spells/` (content) and
+// `coreSpells/` (`BasicAttack`, `Recall`) — merged content-last, so "the
+// barrel" this file checks against means both, merged the same way. `Recall`
+// itself is excluded: it is core plumbing bound to `Champion.recall`/`B`, not
+// a pickable ability, and `scripts/generate-spell-catalog.mjs`
+// (`CATALOG_HIDDEN_CORE_IDS`) deliberately gives it no catalogue entry.
+const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
+const barrelKeys = Object.keys(AllSpellsById).filter(key => key !== 'Recall');
 
 /** Plain, half CDR, URF, and both at once — the four corners of the rule space. */
 const RULE_SETS: { label: string; rules: MatchRules }[] = [
@@ -64,7 +72,7 @@ describe('the generated spell catalogue', () => {
 
       for (const id of spellCatalogIds()) {
         const fromData = spellDisplayOf(id, rules);
-        const fromClass = getSpellDisplay((AllSpells as Record<string, unknown>)[id], rules);
+        const fromClass = getSpellDisplay(AllSpellsById[id], rules);
 
         for (const field of Object.keys(fromClass) as (keyof typeof fromClass)[]) {
           const left = fromData[field];

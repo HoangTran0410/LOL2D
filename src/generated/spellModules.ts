@@ -34,7 +34,7 @@ export const spellModules: Record<string, () => Promise<SpellModule>> = {
   "Ashe_Q": () => import('@/game/gameObject/spells/Ashe_Q'),
   "Ashe_R": () => import('@/game/gameObject/spells/Ashe_R'),
   "Ashe_W": () => import('@/game/gameObject/spells/Ashe_W'),
-  "BasicAttack": () => import('@/game/gameObject/spells/BasicAttack'),
+  "BasicAttack": () => import('@/game/gameObject/coreSpells/BasicAttack'),
   "Blitzcrank_E": () => import('@/game/gameObject/spells/Blitzcrank_E'),
   "Blitzcrank_Q": () => import('@/game/gameObject/spells/Blitzcrank_Q'),
   "Blitzcrank_R": () => import('@/game/gameObject/spells/Blitzcrank_R'),

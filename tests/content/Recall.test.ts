@@ -7,18 +7,18 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../src/managers/AssetManager', () => ({
+vi.mock('../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
 
-import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Fountain from '../../../src/game/gameObject/structures/Fountain';
-import Recall, { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/spells/Recall';
-import { SpellRole, rolesOf } from '../../../src/game/ai/SpellRole';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import type { CastContext } from '../../../src/game/spell/runtime/types';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
-import { installSketchMathGlobals, installSpellObjectGlobals } from '../spell/fixtures';
+import Champion from '../../src/game/gameObject/attackableUnits/Champion';
+import Fountain from '../../src/game/gameObject/structures/Fountain';
+import Recall, { RECALL_CHANNEL_MS } from '../../src/game/gameObject/coreSpells/Recall';
+import { SpellRole, rolesOf } from '../../src/game/ai/SpellRole';
+import type AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
+import type { CastContext } from '../../src/game/spell/runtime/types';
+import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../game/fixtures';
+import { installSketchMathGlobals, installSpellObjectGlobals } from '../game/spell/fixtures';
 
 const BLUE_BASE = { x: 400, y: 400 };
 const RED_BASE = { x: 3_000, y: 3_000 };

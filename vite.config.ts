@@ -272,31 +272,10 @@ export default defineConfig({
            * retuning one ability used to invalidate all 295KB (gzipped) of the
            * game chunk for every returning player.
            */
-          /**
-           * `BasicAttack` is the exception, and it has to be: `preset.ts`
-           * imports it *statically* (every kit holds it in slot 0, and it is the
-           * last-resort fallback when a lookup misses). A static edge from the
-           * `game` chunk into a spell chunk that imports `Spell`, `Champion` and
-           * the rest straight back out of `game` is a cycle **between chunks**,
-           * and Rollup resolves that into a live binding read before its
-           * initialiser runs: the menu died on "Cannot access 'd' before
-           * initialization" before it could draw. Left unassigned it lands in
-           * `game` beside the code that needs it, and the dynamic import in
-           * `spellModules.ts` simply resolves there.
-           */
-          /**
-           * `Recall` is the second exception, for the identical reason.
-           * `Champion.ts` holds one (`champion.recall`) as a field, so the
-           * `game` chunk imports it statically — and it imports `Spell`,
-           * `SpellObject` and `SpellRole` straight back out of `game`. Left in
-           * a `spell-` chunk that is the same inter-chunk cycle `BasicAttack`
-           * documents above, and `scripts/check-chunks.mjs` fails the build on
-           * the static edge before anyone gets to see the crash.
-           */
+          // `coreSpells/` is core and falls through to the `game` chunk below;
+          // only the content directory is chunked per champion.
           const spell =
-            id.includes('spells/BasicAttack.ts') || id.includes('spells/Recall.ts')
-              ? null
-              : /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
+            /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
           if (spell) {
             // Summoner spells and the basic attack have no champion prefix to
             // group by, and every kit can hold them — one shared chunk rather

@@ -47,7 +47,9 @@ const isSpellReceiver = (receiver: string): boolean =>
   receiver === 'super' || /spell/i.test(receiver);
 
 describe('a buff is ended with deactivateBuff(), never deactivate()', () => {
-  const files = ['spells', 'spellObjects', 'buffs', 'attackableUnits'].flatMap(sourceFiles);
+  const files = ['spells', 'coreSpells', 'spellObjects', 'buffs', 'attackableUnits'].flatMap(
+    sourceFiles
+  );
 
   it('scans a real set of files, so passing means something', () => {
     expect(files.length).toBeGreaterThan(100);

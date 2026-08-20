@@ -18,6 +18,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import * as AllSpells from '../../src/game/gameObject/spells/index';
+import * as CoreSpells from '../../src/game/gameObject/coreSpells/index';
 import {
   spellGroups,
   getChampionPresetFromLoadout,
@@ -33,7 +34,13 @@ import { loadEverySpellForTests } from '../game/spell/registry';
 // catalogue without awaiting 238 of them.
 beforeAll(loadEverySpellForTests);
 
-const barrelKeys = Object.keys(AllSpells);
+// Two barrels now — `spells/` (content) and `coreSpells/` (`BasicAttack`,
+// `Recall`) — merged content-last, matching the catalogue generator. `Recall`
+// itself never gets a catalogue entry (it is bound to `Champion.recall`/`B`,
+// not offered anywhere a player picks from — see `CATALOG_HIDDEN_CORE_IDS` in
+// `scripts/generate-spell-catalog.mjs`), so it is excluded here too.
+const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
+const barrelKeys = Object.keys(AllSpellsById).filter(key => key !== 'Recall');
 
 describe('listSpellCatalog — catalogue completeness', () => {
   it('has exactly one entry per export in the AllSpells barrel', () => {
@@ -47,7 +54,7 @@ describe('listSpellCatalog — catalogue completeness', () => {
     // and the one assertion that would catch the generated file and the barrel
     // having drifted apart.
     for (const entry of listSpellCatalog()) {
-      expect(spellClassOfId(entry.id)).toBe((AllSpells as Record<string, unknown>)[entry.id]);
+      expect(spellClassOfId(entry.id)).toBe(AllSpellsById[entry.id]);
     }
   });
 
@@ -56,9 +63,7 @@ describe('listSpellCatalog — catalogue completeness', () => {
     for (const group of spellGroups()) {
       for (const spellClass of group.spells) referenced.add(spellClass);
     }
-    const missing = barrelKeys.filter(
-      key => !referenced.has((AllSpells as Record<string, unknown>)[key])
-    );
+    const missing = barrelKeys.filter(key => !referenced.has(AllSpellsById[key]));
     expect(missing).toEqual([]);
   });
 
@@ -117,7 +122,7 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
     const slots = ['BasicAttack', 'Yasuo_Q', 'Lux_W', 'Anivia_E', 'Zed_R', 'Ghost', 'Ignite'];
     const preset = getChampionPresetFromLoadout(customLoadout(slots));
     expect(preset.spells).toEqual([
-      AllSpells.BasicAttack,
+      CoreSpells.BasicAttack,
       AllSpells.Yasuo_Q,
       AllSpells.Lux_W,
       AllSpells.Anivia_E,

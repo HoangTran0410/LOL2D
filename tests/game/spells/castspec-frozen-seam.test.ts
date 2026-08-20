@@ -37,6 +37,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
  * happy with it, and one millisecond rules it out across every spell at once.
  */
 const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 
 /**
  * Fields that genuinely do not change over a spell's life, so reading them in
@@ -110,14 +111,23 @@ function liveStateReads(body: string): string[] {
 }
 
 describe('castSpec is resolved once, so it may not depend on live state', () => {
-  const files = readdirSync(SPELLS_DIR).filter(name => name.endsWith('.ts'));
+  // `coreSpells/` left the population `spells/` scans but did not stop being
+  // spells; `index.ts` there is a barrel, not a spell, so it is excluded.
+  const files = [
+    ...readdirSync(SPELLS_DIR)
+      .filter(name => name.endsWith('.ts'))
+      .map(file => ({ dir: SPELLS_DIR, file })),
+    ...readdirSync(CORE_SPELLS_DIR)
+      .filter(name => name.endsWith('.ts') && name !== 'index.ts')
+      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
+  ];
 
   it('no new spell computes its cast spec from mutable state', () => {
     const offenders: string[] = [];
 
-    for (const file of files) {
+    for (const { dir, file } of files) {
       if (GRANDFATHERED.has(file)) continue;
-      const body = castSpecBody(stripComments(readFileSync(join(SPELLS_DIR, file), 'utf8')));
+      const body = castSpecBody(stripComments(readFileSync(join(dir, file), 'utf8')));
       if (body === null) continue;
       const reads = liveStateReads(body);
       if (reads.length > 0) offenders.push(`${file}: ${reads.join(', ')}`);

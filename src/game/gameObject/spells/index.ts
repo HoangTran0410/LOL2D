@@ -1,5 +1,3 @@
-export { default as BasicAttack } from './BasicAttack';
-
 export { default as Ghost } from './Ghost';
 export { default as Flash } from './Flash';
 export { default as Heal } from './Heal';

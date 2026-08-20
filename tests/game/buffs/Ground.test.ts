@@ -140,9 +140,21 @@ describe('Ground', () => {
 // holds as long as nothing goes around them, so fail the build if anything does.
 describe('no spell relocates its own caster behind the shared gate', () => {
   const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  // `coreSpells/` left `spells/` but did not stop being spells — Recall's own
+  // `blinkOwnerTo` call is the sanctioned gate this rule is about, so it has
+  // to stay in the scanned population. `index.ts` is a barrel, not a spell.
+  const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
+  const files = [
+    ...readdirSync(spellsDir)
+      .filter(name => name.endsWith('.ts'))
+      .map(name => ({ dir: spellsDir, name })),
+    ...readdirSync(coreSpellsDir)
+      .filter(name => name.endsWith('.ts') && name !== 'index.ts')
+      .map(name => ({ dir: coreSpellsDir, name })),
+  ];
 
-  it.each(readdirSync(spellsDir).filter(name => name.endsWith('.ts')))('%s', name => {
-    const source = readFileSync(join(spellsDir, name), 'utf8');
+  it.each(files)('$name', ({ dir, name }) => {
+    const source = readFileSync(join(dir, name), 'utf8');
     // `owner.teleportTo` moves the champion; `clone.teleportTo` / `shadow.teleportTo`
     // move a spell's own puppet, which grounding has no say over.
     expect(source).not.toMatch(/\bowner\.teleportTo\s*\(/);

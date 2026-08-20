@@ -12,11 +12,12 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import * as AllSpells from '../../../src/game/gameObject/spells/index';
+import * as CoreSpells from '../../../src/game/gameObject/coreSpells/index';
 import Spell from '../../../src/game/gameObject/Spell';
 import Stats from '../../../src/game/gameObject/Stats';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import Stasis from '../../../src/game/gameObject/buffs/Stasis';
-import BasicAttack from '../../../src/game/gameObject/spells/BasicAttack';
+import BasicAttack from '../../../src/game/gameObject/coreSpells/BasicAttack';
 import Janna_Q from '../../../src/game/gameObject/spells/Janna_Q';
 import Anivia_R from '../../../src/game/gameObject/spells/Anivia_R';
 import Rammus_Q, { Rammus_Q_Object } from '../../../src/game/gameObject/spells/Rammus_Q';
@@ -137,10 +138,17 @@ class FormSpell extends Spell {
   }
 }
 
-/** Every spell class the game can put in a slot. */
-const productionSpells = Object.entries(AllSpells).filter(
+/**
+ * Every spell class the game can put in a slot.
+ *
+ * `BasicAttack` is included — it is always slot 0. `Recall` is not: it can
+ * never be put in a slot (bound to `Champion.recall`/`B` only), so
+ * `CoreSpells` is filtered the same way the catalogue generator hides it —
+ * see `CATALOG_HIDDEN_CORE_IDS` in `scripts/generate-spell-catalog.mjs`.
+ */
+const productionSpells = Object.entries({ ...AllSpells, ...CoreSpells }).filter(
   (entry): entry is [string, typeof Spell] =>
-    typeof entry[1] === 'function' && entry[1].prototype instanceof Spell
+    entry[0] !== 'Recall' && typeof entry[1] === 'function' && entry[1].prototype instanceof Spell
 );
 
 describe('cancel policy, driven through real spells', () => {

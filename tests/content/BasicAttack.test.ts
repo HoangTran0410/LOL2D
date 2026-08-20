@@ -1,25 +1,25 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../src/managers/AssetManager', () => ({
+vi.mock('../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
 
-import BasicAttack from '../../../src/game/gameObject/spells/BasicAttack';
-import Spell from '../../../src/game/gameObject/Spell';
+import BasicAttack from '../../src/game/gameObject/coreSpells/BasicAttack';
+import Spell from '../../src/game/gameObject/Spell';
 import Champion, {
   type ChampionAttackTuning,
-} from '../../../src/game/gameObject/attackableUnits/Champion';
-import SpellInputController from '../../../src/game/spell/input/SpellInputController';
-import { HotKeys, SpellHotKeys } from '../../../src/game/constants';
-import { CURSOR_ACQUISITION_RADIUS } from '../../../src/game/combat/AttackTargeting';
-import { BasicAttackBolt } from '../../../src/game/combat/BasicAttack';
-import Disarm from '../../../src/game/gameObject/buffs/Disarm';
-import Stun from '../../../src/game/gameObject/buffs/Stun';
-import StatusFlags from '../../../src/game/enums/StatusFlags';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
-import basicAttackSpellSource from '../../../src/game/gameObject/spells/BasicAttack.ts?raw';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import type { CastContext, Vec2 } from '../../../src/game/spell/runtime/types';
+} from '../../src/game/gameObject/attackableUnits/Champion';
+import SpellInputController from '../../src/game/spell/input/SpellInputController';
+import { HotKeys, SpellHotKeys } from '../../src/game/constants';
+import { CURSOR_ACQUISITION_RADIUS } from '../../src/game/combat/AttackTargeting';
+import { BasicAttackBolt } from '../../src/game/combat/BasicAttack';
+import Disarm from '../../src/game/gameObject/buffs/Disarm';
+import Stun from '../../src/game/gameObject/buffs/Stun';
+import StatusFlags from '../../src/game/enums/StatusFlags';
+import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../game/fixtures';
+import basicAttackSpellSource from '../../src/game/gameObject/coreSpells/BasicAttack.ts?raw';
+import type AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
+import type { CastContext, Vec2 } from '../../src/game/spell/runtime/types';
 
 /** A spell that is not the basic attack, cheap enough to always go off. */
 class Probe extends Spell {
