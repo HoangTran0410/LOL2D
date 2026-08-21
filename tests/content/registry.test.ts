@@ -19,7 +19,13 @@ describe('the content registry', () => {
   });
 
   it('installs once, not once per read', () => {
+    // Against the count alone this would pass for an accessor that installed
+    // nothing at all — 0 === 0 — so it pins the roster as non-empty first.
+    // A re-installing accessor does not double the count either, it throws:
+    // `PackRegistry.install` refuses a pack id it already holds. Both failure
+    // shapes are covered, and both are legible.
     const first = contentRegistry().champions().length;
+    expect(first).toBeGreaterThan(30);
     contentRegistry();
     contentRegistry();
     expect(contentRegistry().champions()).toHaveLength(first);
