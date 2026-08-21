@@ -267,5 +267,9 @@ describe('validatePack', () => {
       champions: [{ id: 'c', name: 'C', image: 'art', playable: true, spells: ['A'] }],
     });
     expect(result.ok).toBe(false);
+    // Named, like its three siblings: `ok === false` alone would still pass if
+    // an unrelated validator regression rejected this fixture for some other
+    // reason, and the rule under test would have stopped being tested.
+    if (result.ok === false) expect(result.errors.join('\n')).toMatch(/four abilities/);
   });
 });
