@@ -23,7 +23,9 @@ import Spell from '../../../src/game/gameObject/Spell';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import CastBar from '../../../src/game/vfx/CastBar';
-import LuxBeamEffect from '../../../src/game/vfx/LuxBeamEffect';
+// `LuxBeamEffect` moved into `packs/riot/vfx/` (Task 2 of the content-pack
+// extraction).
+import LuxBeamEffect from '../../../packs/riot/vfx/LuxBeamEffect';
 import { Rectangle } from '../../../src/libs/quadtree';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 

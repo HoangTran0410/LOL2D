@@ -8,7 +8,9 @@ import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Slow from '@/game/gameObject/buffs/Slow';
 import { applyHemorrhage } from './Darius_Q';
-import { drawDariusAxe } from '@/game/vfx/DariusAxe';
+// Relative, not `@/`: `DariusAxe` moved into `packs/riot/vfx/` (Task 2 of the
+// content-pack extraction) — see `Lux_R.ts`'s identical note on `LuxBeamEffect`.
+import { drawDariusAxe } from '../../../../packs/riot/vfx/DariusAxe';
 
 /** How long the empowered swing waits to be spent. */
 export const WINDOW_MS = 4_000;

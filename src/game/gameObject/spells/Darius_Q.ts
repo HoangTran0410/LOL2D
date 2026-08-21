@@ -8,7 +8,9 @@ import SpellObject from '@/game/gameObject/SpellObject';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
-import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
+// Relative, not `@/`: `DariusAxe` moved into `packs/riot/vfx/` (Task 2 of the
+// content-pack extraction) — see `Lux_R.ts`'s identical note on `LuxBeamEffect`.
+import { drawAxeArc, drawDariusAxe } from '../../../../packs/riot/vfx/DariusAxe';
 
 /** He hefts the axe this long before it comes round; the whole telegraph. */
 export const WINDUP_MS = 550;

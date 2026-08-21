@@ -268,3 +268,74 @@ describe('every core symbol a spell imports is reachable through buildContentApi
     expect(required.length).toBeGreaterThan(50);
   });
 });
+
+const CONTENT_API_FILE = join(__dirname, '../../src/content/ContentApi.ts');
+
+/**
+ * Every id `<Champion>_[QWER][0-9]*.ts` names, across `spells/` and
+ * `coreSpells/` — the same population `allSpellFiles()` already walks for the
+ * scan above, filtered to the files that actually carry a champion prefix.
+ * `Flash.ts`, `Heal.ts`, `Recall.ts`, `BasicAttack.ts` and friends have no
+ * `_[QWER]` suffix at all, so they never enter this set — a summoner spell or
+ * the basic attack is not "a champion" for this rule's purpose.
+ */
+function championRoster(): string[] {
+  const names = new Set<string>();
+  for (const { file } of allSpellFiles()) {
+    const match = /^([A-Za-z0-9]+)_[QWER][0-9]*\.ts$/.exec(file);
+    if (match) names.add(match[1]);
+  }
+  return [...names];
+}
+
+/**
+ * The inversion of the scan above, and the point of it: `ContentApi.vfx`
+ * demanded exactly three champion-named exports (`LuxBeamEffect`,
+ * `drawAxeArc`, `drawDariusAxe`) because `Darius_Q/W/E.ts` and `Lux_R.ts`
+ * reached `@/game/vfx/LuxBeamEffect`/`@/game/vfx/DariusAxe` directly — a seam
+ * that exists to keep core's surface pack-neutral, requiring the opposite. A
+ * hard-coded list of those three names would pass again the moment a fourth
+ * champion did the same thing; this states the rule instead: no import this
+ * file makes under `@/game/vfx/` may come from a module named after a real
+ * champion.
+ *
+ * "Named after a champion" is judged the way `LuxBeamEffect.ts`/`DariusAxe.ts`
+ * actually are named: the module's own basename *starts with* a roster
+ * champion id, not a bare substring match — a prefix is what Riot's naming
+ * looks like on disk (`Lux` -> `LuxBeamEffect.ts`), and a substring match
+ * would false-positive on a short id like `Vi` turning up inside an unrelated
+ * word (`VfxGroup`, `unitCastBarAnchor`).
+ *
+ * Scoped to `/vfx/` imports specifically — every such import in this file
+ * today feeds `ContentApi.vfx` (see the `VFX` object literal above) — rather
+ * than re-parsing that object literal's members, which is both simpler and
+ * strictly more protective: it also refuses a champion-named `/vfx/` module
+ * smuggled into a *different* namespace.
+ */
+describe('ContentApi.vfx carries no champion-named symbol', () => {
+  it('flags every vfx import whose own module is named after a roster champion', () => {
+    const champions = championRoster();
+    // Sanity, same shape as the population check above: an empty roster would
+    // make every assertion below vacuously pass forever.
+    expect(champions.length).toBeGreaterThan(50);
+
+    const source = stripComments(readFileSync(CONTENT_API_FILE, 'utf8'));
+    const offenders: string[] = [];
+
+    for (const { module, symbols } of parseImports(source)) {
+      if (!module.includes('/vfx/')) continue; // scope: ContentApi.vfx's own feed
+      const basename = basenameOf(module).toLowerCase();
+      const champion = champions.find(name => basename.startsWith(name.toLowerCase()));
+      if (!champion) continue;
+
+      for (const symbol of symbols) {
+        if (symbol.isType) continue; // erased at runtime — nothing for `vfx` to carry
+        offenders.push(
+          `${module} -> ${symbol.name}  (module name starts with champion "${champion}")`
+        );
+      }
+    }
+
+    expect(offenders.sort()).toEqual([]);
+  });
+});

@@ -3,7 +3,12 @@ import StatusFlags from '@/game/enums/StatusFlags';
 import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import CastBar from '@/game/vfx/CastBar';
-import LuxBeamEffect from '@/game/vfx/LuxBeamEffect';
+// Relative, not `@/`: `LuxBeamEffect` moved into `packs/riot/vfx/` (Task 2 of
+// the content-pack extraction) and this file has not moved yet, so this is a
+// core file reaching into the Riot pack rather than the reverse. Temporary —
+// `Lux_R.ts` itself moves into `packs/riot/spells/` in a later task of the
+// same batch, at which point this becomes an ordinary sibling import.
+import LuxBeamEffect from '../../../../packs/riot/vfx/LuxBeamEffect';
 import Buff from '@/game/gameObject/Buff';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';

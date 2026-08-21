@@ -144,7 +144,8 @@ const staged = await page.evaluate(async offset => {
 
   // Counters for the two halves of the property.
   const counters = { prepare: 0, release: 0, casterDraws: 0 };
-  const { default: LuxBeamEffect } = await import('/src/game/vfx/LuxBeamEffect.ts');
+  // Moved into packs/riot/vfx/ (Task 2 of the content-pack extraction).
+  const { default: LuxBeamEffect } = await import('/packs/riot/vfx/LuxBeamEffect.ts');
   const beamDraw = LuxBeamEffect.prototype.draw;
   LuxBeamEffect.prototype.draw = function () {
     counters[this.phase] = (counters[this.phase] ?? 0) + 1;

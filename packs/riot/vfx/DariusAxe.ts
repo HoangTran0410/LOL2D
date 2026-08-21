@@ -1,6 +1,13 @@
 /**
  * Darius's axe, drawn once and shared by Q, W and E.
  *
+ * Moved out of `src/game/vfx/` (Task 2 of the content-pack extraction): it
+ * draws no `@/`-scoped core symbol at all — no imports, only the p5 globals
+ * every draw call in this codebase reaches for ambiently — so the move is a
+ * pure relocation. `Darius_Q.ts`, `Darius_W.ts` and `Darius_E.ts` (still core,
+ * pending their own later move) reach it by a relative path now instead of
+ * `@/game/vfx/DariusAxe`.
+ *
  * Each of the three used to draw its own idea of the weapon: Q built the head
  * from two stacked `arc(..., PIE)` half-discs (a lollipop on a stick — a PIE
  * arc is a *disc*, and no amount of colour makes a disc read as a blade), W cut

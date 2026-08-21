@@ -58,8 +58,6 @@ import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import CastTelegraph from '@/game/vfx/CastTelegraph';
 import ChargeRangeTelegraph from '@/game/vfx/ChargeRangeTelegraph';
 import VfxGroup from '@/game/vfx/VfxGroup';
-import LuxBeamEffect from '@/game/vfx/LuxBeamEffect';
-import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
 
 import ParticleSystem, {
   PredefinedParticleSystems,
@@ -176,15 +174,24 @@ const COMBAT = Object.freeze({
   TargetResolver,
   PredefinedFilters,
 });
+/**
+ * `LuxBeamEffect` and Darius's `drawAxeArc`/`drawDariusAxe` used to live here,
+ * and their presence was Batch 2's own whole-branch review flagging a bug:
+ * they are champion-named drawing helpers, which is exactly what
+ * `ContentApi` is not supposed to carry — a seam meant to keep core's surface
+ * pack-neutral was requiring the opposite. Task 2 of the content-pack
+ * extraction moved both into `packs/riot/vfx/`; `Darius_Q/W/E.ts` and
+ * `Lux_R.ts` (still core, pending their own later move) now reach them by a
+ * relative path instead. See `tests/content/contentApi-surface-seam.test.ts`'s
+ * "carries no champion-named symbol" rule, which is what would now catch a
+ * fourth one.
+ */
 const VFX = Object.freeze({
   CastBar,
   unitCastBarAnchor,
   CastTelegraph,
   ChargeRangeTelegraph,
   VfxGroup,
-  LuxBeamEffect,
-  drawAxeArc,
-  drawDariusAxe,
 });
 const HELPERS = Object.freeze({
   ParticleSystem,

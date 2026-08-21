@@ -1,11 +1,40 @@
-import type { BeamGeometry } from '@/game/gameObject/spellObjects/BeamSpellObject';
-import type { VfxHandle } from './SpellVfx';
+import type { Vec2 } from '@/content/types';
+
+/**
+ * Lux R's beam, moved out of `src/game/vfx/` (Task 2 of the content-pack
+ * extraction).
+ *
+ * Two things changed to cross the pack boundary, neither a behaviour change:
+ *
+ * - **`BeamGeometry` is redeclared here instead of imported from
+ *   `@/game/gameObject/spellObjects/BeamSpellObject`.** `packBoundary.test.ts`
+ *   only allows a pack file to reach core through `@/content/ContentApi`,
+ *   `@/content/ContentPack` and `@/content/types`, type-only — `BeamSpellObject`
+ *   is none of those. The shape is trivial (`{ start, end, width }` over the
+ *   same `Vec2` this file already gets from `@/content/types`), so redeclaring
+ *   it costs nothing: TypeScript's structural typing makes this interface and
+ *   core's `BeamGeometry` freely assignable to each other, so `Lux_R.ts`
+ *   (still core, still importing the original `BeamGeometry`) can keep
+ *   constructing this class with no cast on either side.
+ * - **The `VfxHandle` implements clause is dropped**, for the same boundary
+ *   reason — `./SpellVfx` is a core module, not one of the three allowed
+ *   specifiers. `implements` is a compile-time self-check only; this class
+ *   still has the exact `update`/`draw`/`dispose`/`complete` shape `VfxHandle`
+ *   describes; nothing that consumes it needs the label. `Lux_R.ts` holds its
+ *   instance typed as `LuxBeamEffect` directly and never as `VfxHandle`.
+ */
 
 type Phase = 'prepare' | 'release';
 
 const RELEASE_MS = 450;
 
-export default class LuxBeamEffect implements VfxHandle {
+export interface BeamGeometry {
+  readonly start: Vec2;
+  readonly end: Vec2;
+  readonly width: number;
+}
+
+export default class LuxBeamEffect {
   private elapsedMs = 0;
   private disposed = false;
   private started = false;

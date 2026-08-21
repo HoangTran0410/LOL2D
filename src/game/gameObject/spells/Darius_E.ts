@@ -9,7 +9,9 @@ import Airborne from '@/game/gameObject/buffs/Airborne';
 import Dash from '@/game/gameObject/buffs/Dash';
 import Slow from '@/game/gameObject/buffs/Slow';
 import { applyHemorrhage } from './Darius_Q';
-import { drawAxeArc, drawDariusAxe } from '@/game/vfx/DariusAxe';
+// Relative, not `@/`: `DariusAxe` moved into `packs/riot/vfx/` (Task 2 of the
+// content-pack extraction) — see `Lux_R.ts`'s identical note on `LuxBeamEffect`.
+import { drawAxeArc, drawDariusAxe } from '../../../../packs/riot/vfx/DariusAxe';
 
 export const CAST_TIME_MS = 250;
 export const CONE_RANGE = 300;
