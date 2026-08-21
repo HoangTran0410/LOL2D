@@ -1,12 +1,17 @@
 import type { ContentApi } from './ContentApi';
+import type { MonsterAbility } from '@/game/gameObject/attackableUnits/Monster';
+
+/** Re-exported so a pack may `import type { MonsterAbility } from '@/content/types'`. */
+export type { MonsterAbility };
 
 /**
  * What a content pack is, and why the code half is a function.
  *
  * A pack's contract splits into a data half (`ContentPackData` — manifest,
  * champions, spell display, monsters, maps: read to draw a picker) and a code
- * half (`ContentPackCode` — spells: real engine classes). `ContentPack`, the
- * union every existing reader still names, is their intersection.
+ * half (`ContentPackCode` — spells, monster abilities: real engine classes).
+ * `ContentPack`, the union every existing reader still names, is their
+ * intersection.
  *
  * The code half stays a factory taking core's API, because the alternative is
  * a pack that bundles its own copy of `Spell`, `SpellObject` and the buffs —
@@ -184,9 +189,13 @@ export interface MonsterBody {
  *
  * Deliberately **not** `abilities` on `MonsterBody` — those are engine code
  * (`MonsterAbility` callbacks), the same reason a champion's kit is a spell
- * *id* here and never a class. Baron's `BARON_ABILITIES` stays merged in on
- * the engine side, where the code already lives (`preset.ts`'s
- * `monsterBodyPreset`).
+ * *id* here and never a class. A monster's abilities arrive through the
+ * pack's code half instead — `ContentPackCode.monsterAbilities`, keyed by
+ * local monster id exactly the way `spells` is keyed by local spell id — and
+ * `preset.ts`'s `monsterBodyPreset` merges them back on by reading
+ * `contentRegistry().abilitiesFor(monster.id)`, never by importing a
+ * specific pack's file. Baron (`packs/riot/monsters/Baron.ts`) is the first
+ * and, as of this writing, only monster that supplies any.
  */
 export interface MonsterDef {
   id: string;
@@ -342,9 +351,19 @@ export interface ContentPackData {
  * The half of a pack that is real engine classes, and the only half a
  * `ContentPackFactory` ever hands back — see that type's own doc comment for
  * why it still needs the api even though the data half no longer does.
+ *
+ * `monsterAbilities` is a distinct field from `ContentPackData.monsters`
+ * rather than a same-named `abilities` addition to it — the two are keyed by
+ * local monster id but hold different halves (tuning data vs. real classes),
+ * and `ContentPack = ContentPackData & ContentPackCode` would otherwise
+ * require one property to answer to two incompatible types. See
+ * `MonsterBody`'s own doc comment for why abilities live here instead of on
+ * `MonsterBody`/`MonsterDef` in the first place.
  */
 export interface ContentPackCode {
   spells?: Record<string, SpellSource>;
+  /** Keyed by *local* monster id — the same keys as `ContentPackData.monsters`. */
+  monsterAbilities?: Record<string, MonsterAbility[]>;
 }
 
 /**

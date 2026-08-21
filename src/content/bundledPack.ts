@@ -13,6 +13,13 @@ import { CHAMPION_KITS } from '@/game/config/spellCatalog';
 import { spellCatalog } from '@/generated/spellCatalog';
 import { spellModules } from '@/generated/spellModules';
 import { summonersRift } from './maps/summonersRift';
+// `Baron.ts` moved into `packs/riot/monsters/` (Task 2 of the content-pack
+// extraction). This file's own header explains why reaching for it here is
+// fine: it is scaffolding wrapping content that has not finished moving into
+// `packs/riot/` yet, not core. `preset.ts` — real core — does not reach this
+// file directly; see `monsterBodyPreset`'s own doc comment for how it gets
+// Baron's abilities instead.
+import makeBaronAbilities from '../../packs/riot/monsters/Baron';
 
 /**
  * The game's own content, wrapped as a pack without moving a file.
@@ -21,7 +28,12 @@ import { summonersRift } from './maps/summonersRift';
  * and `assets/` into `packs/riot/` and deletes this file; what survives is the
  * consumption path, which by then will have been the pack path for two batches.
  * That ordering is the whole point — a wiring defect and a move defect look
- * identical in a diff that does both at once.
+ * identical in a diff that does both at once. Task 2 already moved the three
+ * files under this content whose names were Riot's own
+ * (`LuxBeamEffect`/`DariusAxe` into `packs/riot/vfx/`, `Baron.ts` into
+ * `packs/riot/monsters/`) — first, at a scale where a mistake would be
+ * obvious — which is why `monsterEntries()` below reads a comment pointing at
+ * a pack file already, ahead of the 240-spell move still to come.
  *
  * Nothing here is a copy. The roster is `CHAMPION_KITS`, the display data is
  * the generated catalogue, and the spells are the generated dynamic imports,
@@ -57,8 +69,9 @@ const spellSources = (): Record<string, SpellSource> => {
   // `spellDisplay` entry below. `preset.ts` already imports it statically for
   // every match, so nothing here needs it loaded eagerly a second time — and
   // an eager import was a real static edge into the `game` chunk that this
-  // module otherwise has no need for (`_api` above is unused; the rest of
-  // this file only reads pregame-side data). A loader — the same shape
+  // function otherwise has no need for (`spellSources` itself never touches
+  // `api` — the code half's own `api` use is `monsterAbilities`, below, and
+  // `data`'s three builders below this one still never touch it). A loader — the same shape
   // `spellModules`' entries already use — exercises the lazy arm of
   // `SpellSource` instead of the eager one, which is a better fit anyway:
   // this file has no *other* reason to reach into `src/game/gameObject/`.
@@ -152,7 +165,8 @@ const monsterEntries = (): Record<string, MonsterDef> => ({
         health: 1000,
         // Rooted with a long reach. The bite is small because it is the one
         // part of the fight nobody can dodge — the rest of Baron's kit lives
-        // in `BARON_ABILITIES` (merged in by `preset.ts`'s
+        // in `packs/riot/monsters/Baron.ts`'s `makeBaronAbilities` (wired
+        // below, in `code`, and merged onto the preset by `preset.ts`'s
         // `monsterBodyPreset`, which this data-only definition cannot
         // carry) and is all avoidable.
         damage: 12,
@@ -344,8 +358,14 @@ export const data: ContentPackData = {
   },
 };
 
-const code = (_api: ContentApi): ContentPackCode => ({
+const code = (api: ContentApi): ContentPackCode => ({
   spells: spellSources(),
+  // The one place `api` is actually used in this file — every other section
+  // (`championEntries`, `displayData`, `monsterEntries`) is pure data and
+  // never touches it. Baron is the only monster with a code half today.
+  monsterAbilities: {
+    baron: makeBaronAbilities(api),
+  },
 });
 
 export default code;

@@ -69,6 +69,41 @@ function checkSpells(pack: Record<string, unknown>, errors: string[]): void {
   }
 }
 
+/**
+ * `ContentPackCode.monsterAbilities` — the code half `MonsterBody`'s own doc
+ * comment points to. Structural, not deep: `cast` is a real closure over a
+ * pack's `ContentApi`, so the only thing checkable here without invoking it
+ * is that it is a function at all — the same shallow-but-real discipline
+ * `checkSpells` applies to a spell class/loader.
+ */
+function checkMonsterAbilities(pack: Record<string, unknown>, errors: string[]): void {
+  if (pack.monsterAbilities === undefined) return;
+  if (!isObject(pack.monsterAbilities)) {
+    errors.push('monsterAbilities: must be an object');
+    return;
+  }
+  for (const [id, value] of Object.entries(pack.monsterAbilities)) {
+    if (!Array.isArray(value) || value.length === 0) {
+      errors.push(`monsterAbilities.${id}: must be a non-empty array`);
+      continue;
+    }
+    value.forEach((ability, index) => {
+      const path = `monsterAbilities.${id}[${index}]`;
+      if (!isObject(ability)) {
+        errors.push(`${path}: must be an object`);
+        return;
+      }
+      if (typeof ability.name !== 'string') errors.push(`${path}.name: must be a string`);
+      if (!isFiniteNumber(ability.cooldownMs)) {
+        errors.push(`${path}.cooldownMs: must be a finite number`);
+      }
+      if (typeof ability.cast !== 'function') {
+        errors.push(`${path}.cast: must be a function`);
+      }
+    });
+  }
+}
+
 function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
   if (pack.champions === undefined) return;
   if (!Array.isArray(pack.champions)) {
@@ -413,6 +448,7 @@ export function validatePack(candidate: unknown): ValidationResult {
 
   checkManifest(candidate.manifest, errors);
   checkSpells(candidate, errors);
+  checkMonsterAbilities(candidate, errors);
   checkSpellDisplay(candidate, errors);
   checkChampions(candidate, errors);
   checkMonsters(candidate, errors);
@@ -454,7 +490,10 @@ export function validatePackData(candidate: unknown): DataValidationResult {
 export type CodeValidationResult =
   { ok: true; code: ContentPackCode } | { ok: false; errors: string[] };
 
-/** The code half alone: every entry in `spells` is a class or a loader. */
+/**
+ * The code half alone: every entry in `spells` is a class or a loader, and
+ * every entry in `monsterAbilities` is a well-shaped `MonsterAbility[]`.
+ */
 export function validatePackCode(candidate: unknown): CodeValidationResult {
   const errors: string[] = [];
   if (!isObject(candidate)) {
@@ -462,6 +501,7 @@ export function validatePackCode(candidate: unknown): CodeValidationResult {
   }
 
   checkSpells(candidate, errors);
+  checkMonsterAbilities(candidate, errors);
 
   if (errors.length > 0) return { ok: false, errors };
   return { ok: true, code: candidate as unknown as ContentPackCode };

@@ -49,6 +49,7 @@ export type {
   MapGeometrySource,
   MapSummary,
   MinionSlot,
+  MonsterAbility,
   MonsterDef,
   NeutralSlot,
   PackManifest,

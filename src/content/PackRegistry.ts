@@ -8,6 +8,7 @@ import type {
   MapGeometry,
   MapGeometrySource,
   MapSummary,
+  MonsterAbility,
   MonsterDef,
   SpellClass,
   SpellDisplayData,
@@ -59,6 +60,8 @@ export class PackRegistry {
   private readonly inFlight = new Map<string, Promise<SpellClass | null>>();
   private readonly installedIds = new Set<string>();
   private readonly monsterList: QualifiedMonster[] = [];
+  /** A monster's code half, by qualified monster id — mirrors `sources` for spells. */
+  private readonly monsterAbilities = new Map<string, MonsterAbility[]>();
   private readonly championList: QualifiedChampion[] = [];
   private readonly mapList: QualifiedMapSummary[] = [];
   /** A map's geometry source, by qualified id — mirrors `sources` for spells. */
@@ -182,6 +185,20 @@ export class PackRegistry {
         errors.push(`spellDisplay.${qualifiedId}: no spell named ${qualifiedId} in this pack`);
       }
     }
+    // The same pairing check, one field over: a `monsterAbilities` entry
+    // naming a monster the data half never declared is the Baron shape of
+    // the bug this method exists to catch — an ability array nothing ever
+    // resolves to, because `abilitiesFor` is only ever looked up by a real
+    // monster's qualified id.
+    const monsterIds = new Set(
+      this.monsterList.filter(monster => monster.packId === packId).map(monster => monster.id)
+    );
+    for (const localId of Object.keys(code.monsterAbilities ?? {})) {
+      const qualifiedId = qualify(packId, localId);
+      if (!monsterIds.has(qualifiedId)) {
+        errors.push(`monsterAbilities.${localId}: no monster named ${localId} in this pack`);
+      }
+    }
     if (errors.length > 0) {
       throw new Error(`content pack rejected:\n  ${errors.join('\n  ')}`);
     }
@@ -200,6 +217,7 @@ export class PackRegistry {
     for (const pack of this.packs) {
       if (pack.manifest.id === packId) {
         pack.spells = code.spells;
+        pack.monsterAbilities = code.monsterAbilities;
         return;
       }
     }
@@ -250,6 +268,13 @@ export class PackRegistry {
       if (!isSpellLoader(spellSource)) {
         this.resolved.set(qualifiedId, spellSource as SpellClass);
       }
+    }
+    // Monster abilities are always eager — unlike a spell, nothing here is
+    // lazy-loaded, because `data.monsters` (the matching data half) is
+    // already eager too; see `MonsterBody`'s doc comment for why the split
+    // exists at all.
+    for (const [localId, abilities] of Object.entries(code.monsterAbilities ?? {})) {
+      this.monsterAbilities.set(qualify(packId, localId), abilities);
     }
   }
 
@@ -434,10 +459,22 @@ export class PackRegistry {
     return out;
   }
 
+  /**
+   * A monster's code half — real `MonsterAbility` callbacks, built from the
+   * pack's own `ContentApi` — or `undefined` for a monster that declared
+   * none (every camp except Baron, today). `preset.ts`'s `monsterBodyPreset`
+   * is the one caller: this is what lets it merge Baron's kit onto the
+   * preset without core importing `packs/riot/monsters/Baron.ts` directly.
+   */
+  abilitiesFor(qualifiedMonsterId: string): MonsterAbility[] | undefined {
+    return this.monsterAbilities.get(qualifiedMonsterId);
+  }
+
   reset(): void {
     this.packs.length = 0;
     this.championList.length = 0;
     this.monsterList.length = 0;
+    this.monsterAbilities.clear();
     this.mapList.length = 0;
     this.sources.clear();
     this.display.clear();

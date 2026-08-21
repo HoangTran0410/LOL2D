@@ -8,6 +8,13 @@
  * about six seconds of standing still. Every point of it is dodgeable — the
  * spit is a skillshot, the slam telegraphs for 600ms before it lands, and the
  * pool is ground you can walk off. Only the 12-damage bite is unavoidable.
+ *
+ * `Baron.ts` moved into `packs/riot/monsters/` (Task 2 of the content-pack
+ * extraction) and its classes now come from factories taking `ContentApi`,
+ * the same shape `packs/reference/spells/Vera_Q.ts` established for a spell —
+ * see `referencePackVeraQ.test.ts` for the sibling pattern this file follows:
+ * `buildContentApi()` once, then each `make*` factory, all at module scope,
+ * since neither is per-test state.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
@@ -20,16 +27,23 @@ import TeamId from '../../../src/game/enums/TeamId';
 import { Lane } from '../../../src/game/lanes';
 import { monsterBodyPreset, monsterFillingSlot } from '../../../src/game/preset';
 import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
-import {
-  BARON_ABILITIES,
-  BaronPoisonPool,
-  BaronPoisonSpit,
-  BaronTailSlam,
+import { contentRegistry } from '../../../src/content/registry';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeBaronAbilities, {
+  makeBaronPoisonPool,
+  makeBaronPoisonSpit,
+  makeBaronTailSlam,
   POOL,
   SLAM,
   SPIT,
-} from '../../../src/game/gameObject/monsters/Baron';
+} from '../../../packs/riot/monsters/Baron';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+
+const api = buildContentApi();
+const BaronPoisonSpit = makeBaronPoisonSpit(api);
+const BaronTailSlam = makeBaronTailSlam(api);
+const BaronPoisonPool = makeBaronPoisonPool(api);
+const BARON_ABILITIES = makeBaronAbilities(api);
 
 let game: TestGame;
 
@@ -41,6 +55,19 @@ let game: TestGame;
 const baronSlot = summonersRiftGeometry.slots.neutral.find(slot => slot.role === 'baron')!;
 const baronMonster = () => monsterFillingSlot(baronSlot)!;
 const baronPreset = () => monsterBodyPreset(baronMonster(), baronMonster().members[0], baronSlot);
+
+/**
+ * The `MonsterAbility[]` `preset.ts` actually reads from the installed
+ * registry — a *different* array from this file's own module-scope
+ * `BARON_ABILITIES` above. `makeBaronAbilities(api)` builds a fresh array (and
+ * fresh classes) on every call, the same way `makeVeraQObject` does for a
+ * spell, so two separate calls with the same `api` are never `===` even
+ * though they are behaviourally identical. Tests below that check *identity*
+ * against what a real match would carry (`toBe`) or that a real cast spawns
+ * a real engine object (`instanceof`) need this one — the one the registry
+ * itself holds — not a second copy built locally.
+ */
+const installedBaronAbilities = () => contentRegistry().abilitiesFor(baronMonster().id)!;
 
 const makeBaron = () =>
   new Monster({ game, preset: baronPreset() } as ConstructorParameters<typeof Monster>[0]);
@@ -316,7 +343,7 @@ describe("Baron's kit", () => {
     });
 
     it('is what the Baron preset actually carries', () => {
-      expect(baronPreset().abilities).toBe(BARON_ABILITIES);
+      expect(baronPreset().abilities).toBe(installedBaronAbilities());
     });
 
     it('each cast puts its own object into the world', () => {
@@ -324,12 +351,19 @@ describe("Baron's kit", () => {
       const victim = championAt(baron.camp.x + 100, baron.camp.y);
       indexObjects(game, [baron, victim]);
 
-      for (const ability of BARON_ABILITIES) ability.cast(baron, victim);
+      // The registry's own abilities, not this file's `BARON_ABILITIES` —
+      // `installedBaronAbilities`'s own doc comment explains why the two are
+      // never the same array, or the same classes, even with the same `api`.
+      for (const ability of installedBaronAbilities()) ability.cast(baron, victim);
 
-      const spawned = game.objectManager._objectToBeAdd;
-      expect(spawned.some(o => o instanceof BaronPoisonSpit)).toBe(true);
-      expect(spawned.some(o => o instanceof BaronTailSlam)).toBe(true);
-      expect(spawned.some(o => o instanceof BaronPoisonPool)).toBe(true);
+      // Matched by constructor name rather than `instanceof` against this
+      // file's own `BaronPoisonSpit`/`BaronTailSlam`/`BaronPoisonPool` — those
+      // are a *different* call to the same factories, so a fresh, unrelated
+      // class each time; the name is the one thing stable across both calls.
+      const spawnedNames = game.objectManager._objectToBeAdd.map(o => o.constructor.name);
+      expect(spawnedNames).toContain('BaronPoisonSpit');
+      expect(spawnedNames).toContain('BaronTailSlam');
+      expect(spawnedNames).toContain('BaronPoisonPool');
     });
 
     it('only slams when you are close enough to be worth slamming', () => {

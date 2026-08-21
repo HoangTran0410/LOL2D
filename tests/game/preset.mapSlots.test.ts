@@ -27,7 +27,7 @@ import {
 } from '../../src/game/preset';
 import { summonersRift } from '../../src/content/maps/summonersRift';
 import { summonersRiftGeometry } from '../../src/content/maps/summonersRiftGeometry';
-import { BARON_ABILITIES } from '../../src/game/gameObject/monsters/Baron';
+import { contentRegistry } from '../../src/content/registry';
 import Champion from '../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../src/game/gameObject/structures/Fountain';
 import MinionSpawner from '../../src/game/managers/MinionSpawner';
@@ -270,10 +270,19 @@ describe('jungle camps built from a map slot', () => {
   });
 
   it("merges Baron's engine abilities onto the qualified baron monster, and nothing else", () => {
+    // Baron's abilities now come from the pack's own code half
+    // (`packs/riot/monsters/Baron.ts`'s `makeBaronAbilities`, wired through
+    // `bundledPack.ts` and stored by qualified monster id) rather than a
+    // statically-importable core constant — `monsterBodyPreset` is a thin
+    // forward onto exactly what the registry holds for this monster's own
+    // qualified id, and that identity (`toBe`, not `toEqual`) is what this
+    // asserts: the same array, not a look-alike copy.
     const baronSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'baron')!;
     const baronMonster = monsterFillingSlot(baronSlot)!;
+    const baronAbilities = contentRegistry().abilitiesFor(baronMonster.id);
+    expect(baronAbilities).toBeDefined();
     expect(monsterBodyPreset(baronMonster, baronMonster.members[0], baronSlot).abilities).toBe(
-      BARON_ABILITIES
+      baronAbilities
     );
 
     const wolfSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'wolves')!;

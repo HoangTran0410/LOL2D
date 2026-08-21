@@ -1,6 +1,5 @@
 import { contentRegistry } from '@/content/registry';
-import { qualify, type PackRegistry, type QualifiedMonster } from '@/content/PackRegistry';
-import { BUNDLED_PACK_ID } from '@/content/bundledPack';
+import type { PackRegistry, QualifiedMonster } from '@/content/PackRegistry';
 import type {
   Faction,
   MinionSlot,
@@ -12,7 +11,6 @@ import type {
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
-import { BARON_ABILITIES } from './gameObject/monsters/Baron';
 import type Champion from './gameObject/attackableUnits/Champion';
 import {
   DEFAULT_CHAMPION_ATTACK,
@@ -477,9 +475,6 @@ export const loadChampionPresetFromLoadout = async (
   return presetFromPlan(plan);
 };
 
-/** The bundled pack's own qualified id for Baron — see `monsterBodyPreset` below. */
-const BARON_QUALIFIED_ID = qualify(BUNDLED_PACK_ID, 'baron');
-
 /**
  * The monster that fills a neutral slot, or `null` when no installed pack
  * declares one — spec §6: *a slot nobody fills is left empty and the map
@@ -509,10 +504,15 @@ export const monsterFillingSlot = (slot: NeutralSlot): QualifiedMonster | null =
  * job, using the same `member.offset`.)
  *
  * `abilities` stays engine-only: a `MonsterBody` cannot carry `MonsterAbility`
- * callbacks (real code), so Baron's `BARON_ABILITIES` is merged in here by
- * the monster's qualified id — the same special case `preset.ts`'s old
- * `MonsterPreset` merge made, just against pack data instead of a hard-coded
- * table. Baron is a camp of one, so this only ever applies to `members[0]`.
+ * callbacks (real code — see that field's own doc comment on `MonsterBody`),
+ * so they are merged in here from the pack's *code* half instead —
+ * `contentRegistry().abilitiesFor(monster.id)`, keyed by the monster's own
+ * qualified id, the same way a champion's spell classes are resolved by
+ * qualified spell id. Baron (`packs/riot/monsters/Baron.ts`) is the only
+ * monster that supplies any today, and it is a camp of one, so in practice
+ * this only ever returns something for `members[0]`; nothing here is
+ * Baron-specific, though — a second pack's monster with its own kit needs no
+ * change here to pick this up.
  */
 export const monsterBodyPreset = (
   monster: QualifiedMonster,
@@ -530,7 +530,7 @@ export const monsterBodyPreset = (
   damage: member.damage,
   attackInterval: member.attackInterval,
   aggroRange: member.aggroRange,
-  abilities: monster.id === BARON_QUALIFIED_ID ? BARON_ABILITIES : undefined,
+  abilities: contentRegistry().abilitiesFor(monster.id),
 });
 
 /**
