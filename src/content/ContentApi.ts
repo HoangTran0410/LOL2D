@@ -10,7 +10,7 @@ import BeamSpellObject, {
 } from '@/game/gameObject/spellObjects/BeamSpellObject';
 import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
 import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
-import { isChargeActivation } from '@/game/spell/runtime/types';
+import { isChargeActivation, requireChargeSpec } from '@/game/spell/runtime/types';
 
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Champion, { DEFAULT_CHAMPION_ATTACK } from '@/game/gameObject/attackableUnits/Champion';
@@ -123,6 +123,7 @@ export interface ContentApi {
   HomingMissileSpellObject: typeof HomingMissileSpellObject;
   AoePulse: typeof AoePulse;
   isChargeActivation: typeof isChargeActivation;
+  requireChargeSpec: typeof requireChargeSpec;
   /**
    * Not inside `buffs`: every entry there is a constructor (see
    * `contentApi.test.ts`'s "carries the 24 buffs as constructors" case), and
@@ -249,6 +250,7 @@ export function buildContentApi(): ContentApi {
     HomingMissileSpellObject,
     AoePulse,
     isChargeActivation,
+    requireChargeSpec,
     CHILL_DURATION_MS,
     units: Object.freeze({
       AttackableUnit,

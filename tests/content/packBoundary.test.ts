@@ -17,21 +17,29 @@ import { join } from 'node:path';
  * to accept — a well-typed import is still an import that will not resolve
  * once the directory moves.
  *
- * `@/content/ContentApi` and `@/content/ContentPack` are the one exception,
- * and they are **type-only** — `ContentApi` also exports a real function,
- * `buildContentApi()`, that only core's `install.ts` may call, so a pack
- * writing `import { buildContentApi } from '@/content/ContentApi'` (no
- * `type` keyword) is reaching for a value, not a type, and is banned exactly
- * like any other core import. The API itself arrives as the argument to the
- * pack's factory; it is never imported as a value.
+ * `@/content/ContentApi`, `@/content/ContentPack` and `@/content/types` are
+ * the three exceptions, and they are **type-only** — `ContentApi` also
+ * exports a real function, `buildContentApi()`, that only core's
+ * `install.ts` may call, so a pack writing
+ * `import { buildContentApi } from '@/content/ContentApi'` (no `type`
+ * keyword) is reaching for a value, not a type, and is banned exactly like
+ * any other core import. The API itself arrives as the argument to the
+ * pack's factory; it is never imported as a value. `@/content/types` is the
+ * barrel a pack actually reaches for most — `CastContext`, `CastSpec` and
+ * the rest of the runtime types re-exported for a channelled or charged
+ * spell to name without a direct `@/game/` import.
  *
  * Comments are stripped before matching, or this file's own paragraphs above
  * would flag themselves.
  */
 const PACKS_DIR = join(__dirname, '../../packs');
 
-/** The only two specifiers a pack file may name, and only as `import type`. */
-const ALLOWED_TYPE_ONLY = new Set(['@/content/ContentApi', '@/content/ContentPack']);
+/** The only three specifiers a pack file may name, and only as `import type`. */
+const ALLOWED_TYPE_ONLY = new Set([
+  '@/content/ContentApi',
+  '@/content/ContentPack',
+  '@/content/types',
+]);
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
