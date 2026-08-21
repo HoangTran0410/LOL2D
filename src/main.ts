@@ -14,6 +14,7 @@ import SceneManager from './managers/SceneManager';
 import LoadingScene from './scenes/LoadingScene';
 import { registerServiceWorker } from './pwa/updates';
 import AssetManager from './managers/AssetManager';
+import { contentRegistry } from './content/registry';
 
 /*
  * No `import { System } from './libs/detect-collisions'` here.
@@ -50,6 +51,13 @@ Math.hypot = fastHypot;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 (window as any).setup = function setup() {
+  // Warm the content registry now, during the loading screen, rather than on
+  // the pregame screen's first read. Installing 60+ champions is free here;
+  // it is not free on the pregame screen's first paint. `contentRegistry()`
+  // touches no p5 global, but it still belongs inside setup() rather than at
+  // module eval time — see the header comment above.
+  contentRegistry();
+
   const mgr = new SceneManager() as any;
   mgr.wire();
 
