@@ -28,6 +28,7 @@ import {
 } from '../../src/game/preset';
 import { SLOT_COUNT, type ChampionLoadout } from '../../src/game/config/PregameConfig';
 import { loadEverySpellForTests } from '../game/spell/registry';
+import { contentRegistry } from '../../src/content/registry';
 
 // Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
 // this fills the registry synchronously so a test can read the whole
@@ -148,8 +149,18 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
     const preset = getChampionPresetFromLoadout(customLoadout(slots));
     expect(preset.spells).toHaveLength(SLOT_COUNT);
     expect(preset.spells[2]).toBe(AllSpells.Yasuo_Q);
+    // A 'random' slot draws from `allSpellIds()`, which is a union across
+    // every installed pack now (`spellRegistry.ts`) — not `riot`'s barrel
+    // alone — so the reference pack's own spells (e.g. `Vera_Q`) are a
+    // legitimate roll here too. The sanity pool widens to match: every name
+    // must belong to *some* installed pack's displayable spell.
+    const knownNames = new Set(barrelKeys);
+    for (const id of contentRegistry().spellDisplayIds()) {
+      const spellClass = contentRegistry().spellClass(id);
+      if (spellClass) knownNames.add((spellClass as { name: string }).name);
+    }
     for (const spell of preset.spells)
-      expect(barrelKeys).toContain((spell as { name: string }).name);
+      expect(knownNames.has((spell as { name: string }).name)).toBe(true);
   });
 
   it('pads a short customSlots array (e.g. from an older/corrupt save) rather than throwing', () => {

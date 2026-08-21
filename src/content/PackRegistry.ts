@@ -132,6 +132,26 @@ export class PackRegistry {
   }
 
   /**
+   * Every id with display data, across every installed pack.
+   *
+   * This is the population a `'random'` loadout slot is drawn from and a
+   * persisted slot is validated against (`spellRegistry.ts`'s `allSpellIds` /
+   * `isSpellId`) — deliberately not `spellIds()`. A pack may declare a spell
+   * that is loadable but has no display entry — the bundled pack's
+   * `riot:Recall`, so `Champion.recall` can name it — and a HUD asked to
+   * render a slot it has no name or icon for is exactly the bug this narrower
+   * population exists to prevent.
+   */
+  spellDisplayIds(): readonly string[] {
+    return [...this.display.keys()];
+  }
+
+  /** Whether `qualifiedId` has display data — the same population `spellDisplayIds` lists. */
+  hasDisplayFor(qualifiedId: string): boolean {
+    return this.display.has(qualifiedId);
+  }
+
+  /**
    * The class, fetching it if it has to.
    *
    * Memoised on the promise, not on the result, so two callers racing the same
@@ -164,6 +184,18 @@ export class PackRegistry {
     });
     this.inFlight.set(qualifiedId, run);
     return run;
+  }
+
+  /**
+   * Test seam: write a class straight into `resolved`, bypassing `sources`
+   * and `install()` entirely.
+   *
+   * A test that wants one lookup to succeed should not have to await 240
+   * dynamic imports to get it — this exists for exactly that case, never for
+   * production code, which always arrives through `install()`.
+   */
+  registerSpellForTests(qualifiedId: string, spellClass: SpellClass): void {
+    this.resolved.set(qualifiedId, spellClass);
   }
 
   /**

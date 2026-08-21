@@ -1,14 +1,19 @@
-import { spellModules } from '@/generated/spellModules';
+import { contentRegistry, resetContentRegistryForTests } from '@/content/registry';
+import { BUNDLED_PACK_ID } from '@/content/bundledPack';
 
 /**
  * Spell classes, fetched per champion and read back synchronously.
  *
  * ## The problem this solves
  *
- * `preset.ts` opened with `import * as AllSpells`, so every build of the game
- * contained all 238 spell modules in one chunk whether a match used two of them
- * or two hundred. That import is gone; what replaces it is a map of dynamic
- * importers (`src/generated/spellModules.ts`) plus this registry.
+ * Spell classes live behind `PackRegistry` now (`@/content/registry`), keyed
+ * by qualified id — `riot:Yasuo_Q`, not `Yasuo_Q` — because a second
+ * installed pack may reasonably reuse a local name. This module does not own
+ * a map of its own any more; it is the thin, bare-id-friendly adapter the
+ * rest of the engine already calls. `qualifySpellId` is the seam: a stored
+ * loadout in a player's browser holds `"Yasuo_Q"`, and that string keeps
+ * meaning "the bundled pack's Yasuo_Q" for as long as this file resolves it
+ * that way.
  *
  * ## Why the read side is synchronous
  *
@@ -39,18 +44,41 @@ import { spellModules } from '@/generated/spellModules';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SpellClass = any;
 
-const loaded = new Map<string, SpellClass>();
-/** In-flight loads, so N units asking for the same champion fetch it once. */
-const inFlight = new Map<string, Promise<void>>();
+/** Set once `loadRemainingSpells()` has been called, so a second call is free. */
 let everythingRequested = false;
 
-/** Every id this build knows, loaded or not. Cheap — these are just strings. */
-export const allSpellIds = (): string[] => Object.keys(spellModules);
+/**
+ * A bare id means the bundled pack.
+ *
+ * Loadouts persisted before content became packs hold `"Yasuo_Q"`, and a
+ * player's saved kit is not something to throw away over a prefix. A pack id
+ * is `[A-Za-z0-9][A-Za-z0-9._-]*` and a colon appears in no local id, so the
+ * test is unambiguous.
+ */
+export const qualifySpellId = (id: string): string =>
+  id.includes(':') ? id : `${BUNDLED_PACK_ID}:${id}`;
 
-export const isSpellId = (id: string): boolean => id in spellModules;
+/**
+ * Every id this build can offer a player, loaded or not. Cheap — a name and a
+ * lookup, no module fetched.
+ *
+ * Backed by display data (`PackRegistry.spellDisplayIds`), not `spellIds()`:
+ * this is the pool `preset.ts`'s `randomSpellId()` draws a `'random'` slot
+ * from and the population a persisted slot is validated against, so an id in
+ * here is a promise the HUD can render it. `riot:Recall` is a declared,
+ * loadable spell with no display data — it exists so `Champion.recall` can
+ * name it — and must never be dealt into an ability slot, which is exactly
+ * what leaving it out of this list prevents.
+ */
+export const allSpellIds = (): string[] => [...contentRegistry().spellDisplayIds()];
 
-/** Whether `id`'s module is in memory and `spellClassOfId` will answer for it. */
-export const isSpellLoaded = (id: string): boolean => loaded.has(id);
+/** Same population as `allSpellIds`, as a membership test. */
+export const isSpellId = (id: string): boolean =>
+  contentRegistry().hasDisplayFor(qualifySpellId(id));
+
+/** Whether `id`'s class is in memory and `spellClassOfId` will answer for it. */
+export const isSpellLoaded = (id: string): boolean =>
+  contentRegistry().spellClass(qualifySpellId(id)) !== null;
 
 /**
  * The class for an id, or `null` if its module has not been loaded.
@@ -59,13 +87,21 @@ export const isSpellLoaded = (id: string): boolean => loaded.has(id);
  * safe fallback. It is deliberately not an exception: a missing module is a
  * scheduling/load failure and must not take down the match.
  */
-export const spellClassOfId = (id: string): SpellClass | null => loaded.get(id) ?? null;
+export const spellClassOfId = (id: string): SpellClass | null =>
+  contentRegistry().spellClass(qualifySpellId(id));
 
 /** Every id currently in memory, primarily for diagnostics and tests. */
-export const loadedSpellIds = (): string[] => [...loaded.keys()];
+export const loadedSpellIds = (): string[] => {
+  const registry = contentRegistry();
+  const out: string[] = [];
+  for (const id of registry.spellIds()) {
+    if (registry.spellClass(id) !== null) out.push(id);
+  }
+  return out;
+};
 
 /**
- * Fetch these ids' modules. Idempotent, deduplicated, and safe to call with
+ * Fetch these ids' classes. Idempotent, deduplicated, and safe to call with
  * unknown ids (a stale `localStorage` slot naming a spell this build removed).
  *
  * `onSettled` fires once per id in `ids`, after that id is done — loaded,
@@ -73,49 +109,35 @@ export const loadedSpellIds = (): string[] => [...loaded.keys()];
  * rule is what makes it usable as a progress count: `GameScene` paints a bar
  * against `ids.length` while a match is waiting, and a bar that could stall
  * short of its own total on a dropped chunk would be worse than none.
+ *
+ * The fetches themselves are issued up front, in parallel — `PackRegistry`
+ * already shares one in-flight fetch across every caller asking for the same
+ * qualified id, so this module keeps no dedupe map of its own. `onSettled` is
+ * still delivered in `ids` order rather than completion order: two ids do not
+ * generally finish in the order they were requested (an unknown id resolves
+ * at once, a real one waits on its chunk), and a progress callback that jumps
+ * around is no easier to reason about than the class lookup it announces.
  */
 export async function loadSpells(
   ids: readonly string[],
   onSettled?: (id: string) => void
 ): Promise<void> {
-  const pending: Promise<void>[] = [];
+  const registry = contentRegistry();
 
-  for (const id of ids) {
-    if (loaded.has(id)) {
-      onSettled?.(id);
-      continue;
-    }
-    const existing = inFlight.get(id);
-    if (existing) {
-      pending.push(existing.then(() => onSettled?.(id)));
-      continue;
-    }
-    const importer = spellModules[id];
-    if (!importer) {
-      onSettled?.(id);
-      continue;
-    }
+  const settling = ids.map(id =>
+    registry.loadSpellClass(qualifySpellId(id)).catch(error => {
+      // One champion's chunk failing to arrive must not take the match with
+      // it: the id stays unloaded, `spellClassOfId` keeps returning null, and
+      // whatever asked for it falls back the same way it would for a stale id.
+      // eslint-disable-next-line no-console
+      console.error(`spellRegistry: could not load ${id}`, error);
+    })
+  );
 
-    const load = importer()
-      .then(module => {
-        loaded.set(id, module.default);
-      })
-      .catch(error => {
-        // One champion's chunk failing to arrive must not take the match with
-        // it: the id stays unloaded, `spellClassOfId` keeps returning null, and
-        // whatever asked for it falls back the same way it would for a stale id.
-        // eslint-disable-next-line no-console
-        console.error(`spellRegistry: could not load ${id}`, error);
-      })
-      .finally(() => {
-        inFlight.delete(id);
-      });
-
-    inFlight.set(id, load);
-    pending.push(load.then(() => onSettled?.(id)));
+  for (let i = 0; i < ids.length; i++) {
+    await settling[i];
+    onSettled?.(ids[i]);
   }
-
-  await Promise.all(pending);
 }
 
 /**
@@ -138,15 +160,14 @@ export function loadRemainingSpells(): Promise<void> {
  * individual slots from this pool.
  */
 export function randomLoadedId(): string | null {
-  if (loaded.size === 0) return null;
-  const ids = [...loaded.keys()];
+  const ids = loadedSpellIds();
+  if (ids.length === 0) return null;
   return ids[Math.floor(Math.random() * ids.length)];
 }
 
 /** Test seam: forget everything, so a test can observe a load from empty. */
 export function resetSpellRegistryForTests(): void {
-  loaded.clear();
-  inFlight.clear();
+  resetContentRegistryForTests();
   everythingRequested = false;
 }
 
@@ -155,8 +176,9 @@ export function resetSpellRegistryForTests(): void {
  *
  * Unit tests build spells directly and never touch the registry; this is for
  * the handful that drive `preset.ts`'s resolution, which would otherwise have
- * to await 238 dynamic imports to assert one lookup.
+ * to await 238 dynamic imports to assert one lookup. `id` is qualified the
+ * same way any other id passed into this module is.
  */
 export function registerSpellForTests(id: string, spellClass: SpellClass): void {
-  loaded.set(id, spellClass);
+  contentRegistry().registerSpellForTests(qualifySpellId(id), spellClass);
 }

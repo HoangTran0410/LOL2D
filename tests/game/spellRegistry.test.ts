@@ -38,10 +38,12 @@ import {
   isSpellLoaded,
   loadSpells,
   loadedSpellIds,
+  qualifySpellId,
   randomLoadedId,
   resetSpellRegistryForTests,
   spellClassOfId,
 } from '../../src/game/spellRegistry';
+import { contentRegistry } from '../../src/content/registry';
 import {
   getChampionPresetRandom,
   getChampionPresetFromLoadout,
@@ -80,9 +82,14 @@ describe('the generated module map', () => {
     expect(new Set(Object.keys(spellModules))).toEqual(new Set(Object.keys(spellCatalog)));
   });
 
-  it('exposes the ids without loading anything', () => {
-    expect(allSpellIds()).toHaveLength(barrelKeys.length);
-    expect(loadedSpellIds()).toEqual([]);
+  it('exposes the ids without loading anything from the dynamic catalogue', () => {
+    // `allSpellIds()` is a union across every installed pack now, not just the
+    // bundled one — the reference pack contributes its own ids too — so the
+    // bundled catalogue is checked as a subset rather than an exact count.
+    const riotIds = barrelKeys.map(qualifySpellId);
+    for (const id of riotIds) expect(allSpellIds()).toContain(id);
+    expect(allSpellIds().length).toBeGreaterThan(barrelKeys.length);
+    for (const id of riotIds) expect(loadedSpellIds()).not.toContain(id);
     expect(isSpellId('Yasuo_Q')).toBe(true);
     expect(isSpellId('Yasuo_T')).toBe(false);
   });
@@ -98,7 +105,11 @@ describe('loading', () => {
 
   it('loads a repeated or unknown id without complaint', async () => {
     await loadSpells(['Yasuo_Q', 'Yasuo_Q', 'NotASpell_Q']);
-    expect(loadedSpellIds()).toEqual(['Yasuo_Q']);
+    // Every other pack's own eager content (e.g. `riot:Recall`) also shows up
+    // in `loadedSpellIds()` now that it reads straight off the registry, so
+    // this checks membership rather than the exact set.
+    expect(loadedSpellIds()).toContain('riot:Yasuo_Q');
+    expect(loadedSpellIds()).not.toContain('riot:NotASpell_Q');
   });
 
   it('deduplicates concurrent requests for the same module', async () => {
@@ -238,7 +249,11 @@ describe('a miss degrades instead of throwing', () => {
   });
 
   it('still builds a kit with nothing loaded at all', () => {
-    expect(randomLoadedId()).toBeNull();
+    // "Nothing loaded" now means none of the dynamically-imported catalogue —
+    // a pack may always carry a few eager classes (`riot:Recall`, the whole
+    // reference pack), so `randomLoadedId()` is no longer guaranteed null.
+    for (const id of barrelKeys) expect(isSpellLoaded(id)).toBe(false);
+    expect(randomLoadedId()).toBeTypeOf('string');
     const preset = getChampionPresetFromLoadout(DEFAULT_CHAMPION_LOADOUT);
     expect(preset.spells).toHaveLength(SLOT_COUNT);
     for (const spellClass of preset.spells!) expect(typeof spellClass).toBe('function');
@@ -250,5 +265,49 @@ describe('a miss degrades instead of throwing', () => {
     const withHole = new Set(Object.keys(spellModules));
     withHole.delete('Yasuo_Q');
     expect(withHole).not.toEqual(new Set(barrelKeys));
+  });
+});
+
+describe('resolving through the pack registry', () => {
+  it('resolves an unqualified id against the bundled pack', async () => {
+    resetSpellRegistryForTests();
+    await loadSpells(['Yasuo_Q']);
+    expect(spellClassOfId('Yasuo_Q')).toBeTypeOf('function');
+    expect(spellClassOfId('riot:Yasuo_Q')).toBe(spellClassOfId('Yasuo_Q'));
+  });
+
+  it('resolves a pack-qualified id that is not the bundled pack', async () => {
+    resetSpellRegistryForTests();
+    await loadSpells(['reference:Vera_Q']);
+    expect(spellClassOfId('reference:Vera_Q')).toBeTypeOf('function');
+  });
+
+  it('knows an id from every installed pack', () => {
+    expect(isSpellId('Yasuo_Q')).toBe(true);
+    expect(isSpellId('reference:Vera_Q')).toBe(true);
+    expect(isSpellId('Nobody_Q')).toBe(false);
+  });
+
+  it('leaves Recall out of the pool a random slot is drawn from', () => {
+    // Declared by the bundled pack so a champion's `recall` can name it, and
+    // given no display data so it can never be rendered — which is also what
+    // keeps it out of here. A HELD channel dealt into an ability slot would be
+    // drawn by a HUD with no name and no icon for it.
+    expect(contentRegistry().hasSpell('riot:Recall')).toBe(true);
+    expect(isSpellId('Recall')).toBe(false);
+    expect(allSpellIds()).not.toContain('riot:Recall');
+    expect(allSpellIds().length).toBeGreaterThan(200);
+  });
+
+  it('still fires onSettled once per id, including for an unknown one', async () => {
+    resetSpellRegistryForTests();
+    const settled: string[] = [];
+    await loadSpells(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q'], id => settled.push(id));
+    expect(settled).toEqual(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q']);
+  });
+
+  it('qualifies a bare id against the bundled pack and leaves a qualified one alone', () => {
+    expect(qualifySpellId('Yasuo_Q')).toBe('riot:Yasuo_Q');
+    expect(qualifySpellId('reference:Vera_Q')).toBe('reference:Vera_Q');
   });
 });
