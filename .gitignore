@@ -5,3 +5,6 @@ dist/
 
 # Copied from node_modules by scripts/copy-vendor.mjs on predev/prebuild.
 public/vendor/
+
+# SDD scratch — ledgers, briefs, review packages. Never part of the repo.
+.superpowers/
