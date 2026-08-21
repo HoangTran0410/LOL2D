@@ -36,6 +36,7 @@ import {
   spellDisplayOf,
 } from '../../../src/game/config/spellCatalog';
 import { spellCatalog } from '../../../src/generated/spellCatalog';
+import { BUNDLED_PACK_ID } from '../../../src/content/bundledPack';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
 // The catalogue is generated from two barrels — `spells/` (content) and
@@ -112,5 +113,21 @@ describe('the generated spell catalogue', () => {
     const real = spellDisplayOf('Yasuo_Q', { cooldownMultiplier: 0.5, manaFree: false });
     const wrong = { ...real, effectiveCoolDownMs: real.effectiveCoolDownMs + 1 };
     expect(Math.abs(wrong.effectiveCoolDownMs - real.effectiveCoolDownMs) < 1e-6).toBe(false);
+  });
+
+  it("qualifies a bare id under the real bundled pack's id, not a stale copy", () => {
+    // `spellCatalog.ts` cannot import `BUNDLED_PACK_ID` from
+    // `@/content/bundledPack` (or `qualifySpellId` from `@/game/spellRegistry`,
+    // which reads that same constant) without closing a chunk cycle with
+    // `bundledPack.ts`, which reads `CHAMPION_KITS` back out of that same
+    // file — see `BUNDLED_PACK_PREFIX`'s doc comment. It restates the pack id
+    // as a literal instead, and this is the guard against the two drifting: a
+    // renamed `BUNDLED_PACK_ID` would make every registry lookup in this file
+    // miss silently, degrading every spell to `MISSING_SPELL_DISPLAY` rather
+    // than failing loudly.
+    expect(`${BUNDLED_PACK_ID}:Yasuo_Q`).toBe('riot:Yasuo_Q');
+    const display = spellDisplayOf('Yasuo_Q');
+    expect(display.name).not.toBe('?');
+    expect(display.name.length).toBeGreaterThan(0);
   });
 });

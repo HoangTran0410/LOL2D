@@ -132,3 +132,29 @@ describe('searching the roster by name', () => {
     }
   });
 });
+
+/**
+ * The roster now reads the pack registry (`contentRegistry()`) instead of
+ * `CHAMPION_KITS` directly — Task 7 of the content-pack-extraction plan.
+ */
+describe('the roster reads the pack registry', () => {
+  // Vera (`reference:vera`) has no portrait yet — `playable: false`,
+  // `image: null` — so she cannot appear in the selectable-champion picker.
+  // A portrait and `playable: true` land in Task 10; un-skipping this is a
+  // step *in* that task.
+  it.skip('offers a champion from a pack that is not the bundled one', () => {
+    const names = getPregameCatalog().champions.map(c => c.name);
+    expect(names).toContain('Vera');
+  });
+
+  it('still offers every champion it offered before packs', () => {
+    const names = getPregameCatalog()
+      .champions.map(c => c.name)
+      .sort();
+    const before = CHAMPION_KITS.filter(k => k.image && k.spells.length === 4)
+      .map(k => k.name)
+      .sort();
+    expect(before.length).toBeGreaterThan(20);
+    expect(names).toEqual(before);
+  });
+});

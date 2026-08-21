@@ -55,10 +55,9 @@
  * this component stays what it already was: a view of what it is handed.
  */
 import { watch, nextTick } from 'vue';
-import { spellDisplayOf, type SpellCatalogEntry } from '@/game/config/spellCatalog';
+import { packAsset, spellDisplayOf, type SpellCatalogEntry } from '@/game/config/spellCatalog';
 import type { MatchRules } from '@/game/config/PregameConfig';
 import type { SavedKit } from '@/game/config/savedKits';
-import AssetManager from '@/managers/AssetManager';
 import type { KitShelf } from './pregameCatalog';
 import SpellIcon from './SpellIcon.vue';
 import type { SpellPeek } from './useSpellPeek';
@@ -225,7 +224,7 @@ watch(
         :title="shelf === openShelf ? `Đóng ${shelf.name}` : `Xem bộ chiêu ${shelf.name}`"
         :aria-expanded="shelf === openShelf" @click="emit('toggleShelf', shelf)">
         <div class="catalog-avatar-wrap">
-          <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
+          <img v-if="shelf.avatar" class="catalog-group-avatar" :src="packAsset(shelf.avatar).url"
             :alt="shelf.name" loading="lazy" decoding="async" />
           <span v-if="isSelectedShelf(shelf) && shelf !== openShelf" class="kit-tile-badge" title="Đang chọn tướng này">
             <i class="fas fa-check" aria-hidden="true"></i>
@@ -244,7 +243,7 @@ watch(
         <!-- <i v-if="shelf !== openShelf" class="fas fa-chevron-down kit-shelf-chevron" aria-hidden="true"></i> -->
       </button>
       <div v-else class="kit-shelf-heading">
-        <img v-if="shelf.avatar" class="catalog-group-avatar" :src="AssetManager.get(shelf.avatar).url"
+        <img v-if="shelf.avatar" class="catalog-group-avatar" :src="packAsset(shelf.avatar).url"
           :alt="shelf.name" loading="lazy" decoding="async" />
         <span class="kit-shelf-name">{{ shelf.name }}</span>
       </div>

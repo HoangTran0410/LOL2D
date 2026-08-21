@@ -13,7 +13,7 @@
  * on every mount, and none of this wants to be re-derived by Vue or tested
  * through a mount.
  */
-import AssetManager from '@/managers/AssetManager';
+import { packAsset } from '@/game/config/spellCatalog';
 import type { ChampionLoadout } from '@/game/config/PregameConfig';
 import { getPregameCatalog } from '@/scenes/setup/pregameCatalog';
 /**
@@ -78,7 +78,7 @@ export const visualOfLoadout = (loadout: ChampionLoadout): LoadoutVisual => {
 
   return {
     title: champion.name,
-    avatarUrl: AssetManager.get(champion.avatar).url,
+    avatarUrl: packAsset(champion.avatar).url,
     abilities: ABILITY_LETTERS.map((letter, i) => {
       const spell = champion.spells[i];
       return {

@@ -1,6 +1,6 @@
 import {
   BASIC_ATTACK_ID,
-  CHAMPION_KITS,
+  bareCatalogId,
   listSelectableChampions,
   listSummonerSpells,
   listSpellCatalog,
@@ -9,8 +9,8 @@ import {
   type SummonerSpellOption,
   type SpellCatalogEntry,
 } from '@/game/config/spellCatalog';
+import { contentRegistry } from '@/content/registry';
 import { removeAccents } from '@/utils/index';
-import type { AssetKey } from '@/managers/AssetManager';
 
 /**
  * Folds a name for the picker's search box: case- and accent-insensitive.
@@ -52,7 +52,8 @@ export interface KitShelfEntry {
  */
 export interface KitShelf {
   name: string;
-  avatar: AssetKey | null;
+  /** A pack's own asset key — a plain string; resolve it through `packAsset` from `@/game/config/spellCatalog`. */
+  avatar: string | null;
   entries: KitShelfEntry[];
   /** The entries that name a Q/W/E/R slot. Empty for the two shelves that are not a champion (the basic attack, the summoner spells) — which is what leaves those without a whole-kit action. */
   kit: { entry: SpellCatalogEntry; slotIndex: number }[];
@@ -121,32 +122,50 @@ export const getPregameCatalog = (): PregameCatalog => {
       return null;
     };
 
-    /** `CHAMPION_KITS` order, for the pinned shelves — see the sort below. */
-    const sourceOrder = new Map(CHAMPION_KITS.map((kit, index) => [kit.name, index]));
+    /** Registry install order, for the pinned shelves — see the sort below. The riot pack installs first and lists these in `CHAMPION_KITS`'s own order, so this reproduces that ordering without reading `CHAMPION_KITS` directly. */
+    const sourceOrder = new Map(
+      contentRegistry()
+        .champions()
+        .map((champion, index) => [champion.name, index])
+    );
 
-    const kitShelves: KitShelf[] = CHAMPION_KITS.map(group => {
-      const entries: KitShelfEntry[] = group.spells
-        .map(id => catalogById.get(id))
-        .filter((entry): entry is SpellCatalogEntry => !!entry)
-        .map(entry => ({ entry, slotIndex: abilitySlotOfId(entry.id) }));
+    const kitShelves: KitShelf[] = contentRegistry()
+      .champions()
+      .map(champion => {
+        // `champion.spells` are registry-qualified (`riot:Yasuo_Q`);
+        // `catalogById` keys by this catalogue's own bare id
+        // (`spellCatalogIds()`'s population). `bareCatalogId` is the same
+        // crossing `spellCatalog.ts` uses internally — a champion from a pack
+        // this catalogue doesn't cover yet (none, today) yields no entries.
+        const entries: KitShelfEntry[] = [];
+        for (const qualifiedId of champion.spells) {
+          const id = bareCatalogId(qualifiedId);
+          const entry = id ? catalogById.get(id) : undefined;
+          if (entry) entries.push({ entry, slotIndex: abilitySlotOfId(entry.id) });
+        }
 
-      return {
-        name: group.name,
-        avatar: group.image,
-        entries,
-        kit: entries
-          .filter((e): e is { entry: SpellCatalogEntry; slotIndex: number } => e.slotIndex !== null)
-          .map(e => ({ entry: e.entry, slotIndex: e.slotIndex })),
-        // Deliberately the same test as `listSelectableChampions` — portrait
-        // plus exactly four abilities — and not "the kit covers all of
-        // Q/W/E/R". `getChampionPresetFromLoadout` resolves a `championName`
-        // by the shelf's *position* (spells[0] is Q), so a shelf this calls a
-        // champion must be one that function will also accept, whatever the
-        // ability names happen to say.
-        championName: group.image && group.spells.length === 4 ? group.name : null,
-        nonChampionKind: nonChampionKindOf(entries),
-      };
-    })
+        const kit: { entry: SpellCatalogEntry; slotIndex: number }[] = [];
+        for (const e of entries) {
+          if (e.slotIndex !== null) kit.push({ entry: e.entry, slotIndex: e.slotIndex });
+        }
+
+        return {
+          name: champion.name,
+          avatar: champion.image,
+          entries,
+          kit,
+          // `champion.playable` is exactly "portrait plus exactly four
+          // abilities" — validated once at pack install
+          // (`content/validate.ts`) rather than re-derived here, and it is
+          // the same rule `listSelectableChampions` now reads too.
+          // `getChampionPresetFromLoadout` resolves a `championName` by the
+          // shelf's *position* (spells[0] is Q), so a shelf this calls a
+          // champion must be one that function will also accept, whatever the
+          // ability names happen to say.
+          championName: champion.playable ? champion.name : null,
+          nonChampionKind: nonChampionKindOf(entries),
+        };
+      })
       .filter(shelf => shelf.entries.length > 0)
       /**
        * Champions by name, with the two shelves that are not a champion pinned

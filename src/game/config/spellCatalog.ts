@@ -1,7 +1,8 @@
-import AssetManager, { type AssetKey } from '@/managers/AssetManager';
-import { spellCatalog, type SpellCatalogId } from '@/generated/spellCatalog';
+import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
+import type { SpellCatalogId } from '@/generated/spellCatalog';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import type { MatchRules } from './PregameConfig';
+import { contentRegistry } from '@/content/registry';
 
 /**
  * The spell catalogue as **data**: names, icons, numbers and which abilities
@@ -19,8 +20,19 @@ import type { MatchRules } from './PregameConfig';
  * around it: touching `preset.ts` *was* loading the game.
  *
  * The instances are still built, once, by `scripts/generate-spell-catalog.mjs`
- * at build time. This module is the read side, and the only thing it needs at
- * runtime is a `Record` of strings and numbers.
+ * at build time — but this module no longer reads that generated table (or
+ * `CHAMPION_KITS`) directly. Both are `bundledPack.ts`'s data now, installed
+ * into the one `PackRegistry` every pack answers through (`contentRegistry()`
+ * from `@/content/registry`), and this module reads *that*: a spell's display
+ * data by qualified id, a champion's roster row by pack entry. The qualifying
+ * itself is a local `qualifyBundledId`, not the `qualifySpellId` the rest of
+ * the engine shares (`@/game/spellRegistry`) — that module sits in the `game`
+ * chunk, and reaching into it from here would close a cycle with
+ * `bundledPack.ts`, which reads `CHAMPION_KITS` back out of this file; see
+ * `qualifyBundledId`'s own doc comment. `CHAMPION_KITS` stays exported here
+ * only because `bundledPack.ts` still needs it to build the pack — see its own
+ * `@internal` doc comment below; nothing else in this file (or, after this
+ * change, outside it) reads it any more.
  *
  * ## The two numbers that move
  *
@@ -65,12 +77,70 @@ export interface SpellDisplay {
   effectiveManaCost: number;
 }
 
-/** Whether a stored slot choice still names a spell this build has. */
-export const isSpellCatalogId = (id: string): id is SpellCatalogId => id in spellCatalog;
+/**
+ * The bundled pack's id, restated as a literal rather than imported —
+ * `BUNDLED_PACK_ID` (`@/content/bundledPack`) and `qualifySpellId`
+ * (`@/game/spellRegistry`, which reads that same constant) both sit in the
+ * `game` chunk's own reach, and `bundledPack.ts` already reads
+ * `CHAMPION_KITS` back out of *this* module for its eager `Recall` import.
+ * A value import running the other way closes `pregame -> game -> pregame`,
+ * a cycle `npm run build` refuses to chunk ("Circular chunk: pregame ->
+ * game -> pregame") — confirmed by hitting it before this file settled on
+ * the literal. `tests/game/config/spellCatalog.test.ts` pins this string
+ * against `BUNDLED_PACK_ID` so a rename cannot drift the two apart in
+ * silence.
+ */
+const BUNDLED_PACK_PREFIX = 'riot:';
 
-/** Every catalogue id, in the barrel's own order. */
-export const spellCatalogIds = (): SpellCatalogId[] =>
-  Object.keys(spellCatalog) as SpellCatalogId[];
+/**
+ * A bare id, qualified for the bundled pack — the same rule `qualifySpellId`
+ * applies, restated locally for the chunk-boundary reason above. An
+ * already-qualified id (containing `:`) passes through unchanged.
+ */
+const qualifyBundledId = (id: string): string =>
+  id.includes(':') ? id : `${BUNDLED_PACK_PREFIX}${id}`;
+
+/**
+ * A registry-qualified id, stripped back to the bundled pack's own bare form
+ * — the id `spellCatalogIds()`/`listSpellCatalog()` and every persisted
+ * loadout slot already key by. `null` for an id from a different pack: this
+ * module's picker-facing functions are bundled-pack-only for now (a future
+ * pack's abilities are reachable through the registry directly, not through
+ * this catalogue), so a foreign id has nothing here to resolve to yet.
+ *
+ * Exported for `pregameCatalog.ts`, which faces the same crossing: a
+ * `QualifiedChampion.spells` entry has to key into this catalogue's own
+ * bare-id `catalogById` map.
+ */
+export const bareCatalogId = (qualifiedId: string): SpellCatalogId | null =>
+  qualifiedId.startsWith(BUNDLED_PACK_PREFIX)
+    ? (qualifiedId.slice(BUNDLED_PACK_PREFIX.length) as SpellCatalogId)
+    : null;
+
+/** Whether a stored slot choice still names a spell this build has. */
+export const isSpellCatalogId = (id: string): id is SpellCatalogId =>
+  contentRegistry().hasDisplayFor(qualifyBundledId(id));
+
+/** Every catalogue id the bundled pack has display data for, in registry order. */
+export const spellCatalogIds = (): SpellCatalogId[] => {
+  const ids: SpellCatalogId[] = [];
+  for (const qualifiedId of contentRegistry().spellDisplayIds()) {
+    const bare = bareCatalogId(qualifiedId);
+    if (bare) ids.push(bare);
+  }
+  return ids;
+};
+
+/** What `spellDisplayOf` returns for an id the registry has no display data for — a stale save naming a removed spell degrades to this rather than throwing. */
+const MISSING_SPELL_DISPLAY: SpellDisplay = {
+  iconUrl: null,
+  name: '?',
+  description: '',
+  coolDownMs: 0,
+  manaCost: 0,
+  effectiveCoolDownMs: 0,
+  effectiveManaCost: 0,
+};
 
 /**
  * One spell's display fields, with match rules applied.
@@ -83,13 +153,16 @@ export const spellDisplayOf = (
   id: SpellCatalogId,
   matchRules: MatchRules = NO_MATCH_RULES
 ): SpellDisplay => {
-  const entry = spellCatalog[id];
+  const entry = contentRegistry().spellDisplay(qualifyBundledId(id));
+  if (!entry) return MISSING_SPELL_DISPLAY;
   return {
     // `?.url` rather than `.url`: a handle is always returned in the real
     // manager, but "no icon" has to stay a missing picture rather than a thrown
     // error — which is exactly what the class-shaped `getSpellDisplay` promised
-    // with its own `handle?.url ?? null`.
-    iconUrl: entry.iconKey ? (AssetManager.get(entry.iconKey)?.url ?? null) : null,
+    // with its own `handle?.url ?? null`. `entry.iconKey` is a pack's own plain
+    // string, not core's generated `AssetKey` union — the same boundary
+    // `ContentApi.asset` crosses, and the same `as never`.
+    iconUrl: entry.iconKey ? (AssetManager.get(entry.iconKey as never)?.url ?? null) : null,
     name: entry.name,
     description: entry.description,
     coolDownMs: entry.coolDownMs,
@@ -144,6 +217,12 @@ export const ATTACK = {
  *
  * A mistyped id is a **compile error**, not a missing ability: `SpellCatalogId`
  * is `keyof typeof spellCatalog`, generated from the barrel itself.
+ *
+ * @internal Only `src/content/bundledPack.ts` may read this — it is the
+ * bundled pack's own source data, wrapped there into a `ContentPack` and
+ * installed into the registry everything else in this file (and everywhere
+ * outside it) reads instead. Task 9's scan enforces that; batch 4 deletes
+ * this constant together with the adapter that reads it.
  */
 export const CHAMPION_KITS: {
   name: string;
@@ -595,13 +674,32 @@ export interface SelectableChampionSpell {
 export interface SelectableChampion {
   /** Matches `ChampionLoadout.championName` and a `CHAMPION_KITS[i].name`. */
   name: string;
-  avatar: AssetKey;
+  /**
+   * A pack's own asset key — a plain string, not core's generated `AssetKey`
+   * union, because a pack's art is its own to type-check, not core's. See
+   * `packAsset` for the resolving side of this boundary.
+   */
+  avatar: string;
   spells: SelectableChampionSpell[];
 }
 
 /**
+ * A pack's own asset key, resolved to a handle — the same boundary
+ * `ContentApi.asset` crosses (`key as never`), for the same reason: a pack's
+ * icon/portrait key is a plain string, not core's generated `AssetKey`
+ * union. The pregame roster's own art (`SelectableChampion.avatar`,
+ * `KitShelf.avatar`) is bundled-pack-only today, so this always resolves —
+ * the cast is about the *type* boundary between a pack and core, not about
+ * degrading a lookup that might miss.
+ */
+export const packAsset = (key: string): AssetHandle => AssetManager.get(key as never);
+
+/**
  * Champions the pregame screen can offer as a coherent kit: a real portrait
- * and all four of Q/W/E/R implemented. `CHAMPION_KITS` also carries
+ * and all four of Q/W/E/R implemented — `playable` in the registry, which is
+ * exactly that rule, validated once at pack install rather than re-checked
+ * here (Task 3 moved it into pack validation; re-applying it here would mean
+ * two definitions of pickable again). `CHAMPION_KITS` also carries
  * single-ability stubs (Olaf, Graves, Thresh, ...) used to fill the random
  * pool — picking one of those directly would leave three of its four ability
  * slots empty, so they're left out of *this* picker and stay reachable
@@ -609,13 +707,14 @@ export interface SelectableChampion {
  */
 export const listSelectableChampions = (): SelectableChampion[] => {
   const champions: SelectableChampion[] = [];
-  for (const kit of CHAMPION_KITS) {
-    if (!kit.image || kit.spells.length !== 4) continue;
-    champions.push({
-      name: kit.name,
-      avatar: kit.image,
-      spells: kit.spells.map(id => ({ id, display: spellDisplayOf(id) })),
-    });
+  for (const champion of contentRegistry().champions()) {
+    if (!champion.playable || !champion.image) continue;
+    const spells: SelectableChampionSpell[] = [];
+    for (const qualifiedId of champion.spells) {
+      const id = bareCatalogId(qualifiedId);
+      if (id) spells.push({ id, display: spellDisplayOf(id) });
+    }
+    champions.push({ name: champion.name, avatar: champion.image, spells });
   }
   return champions;
 };
