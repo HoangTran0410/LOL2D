@@ -1010,7 +1010,7 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 
 **Interfaces:**
 - Consumes: `contentRegistry()` (Task 5), `PackRegistry.loadSpellClass`/`spellClass`/`hasSpell`/`spellIds` (Task 2).
-- Produces: same public names as today, plus `export const qualifySpellId = (id: string): string` and, on `PackRegistry`, `registerSpellForTests(qualifiedId: string, spellClass: SpellClass): void`.
+- Produces: same public names as today, plus `export const qualifySpellId = (id: string): string`; and on `PackRegistry`, `registerSpellForTests(qualifiedId: string, spellClass: SpellClass): void`, `spellDisplayIds(): readonly string[]` and `hasDisplayFor(qualifiedId: string): boolean` — the last two read the display map Task 3 added.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1034,6 +1034,17 @@ it('knows an id from every installed pack', () => {
   expect(isSpellId('Yasuo_Q')).toBe(true);
   expect(isSpellId('reference:Vera_Q')).toBe(true);
   expect(isSpellId('Nobody_Q')).toBe(false);
+});
+
+it('leaves Recall out of the pool a random slot is drawn from', () => {
+  // Declared by the bundled pack so a champion's `recall` can name it, and
+  // given no display data so it can never be rendered — which is also what
+  // keeps it out of here. A HELD channel dealt into an ability slot would be
+  // drawn by a HUD with no name and no icon for it.
+  expect(contentRegistry().hasSpell('riot:Recall')).toBe(true);
+  expect(isSpellId('Recall')).toBe(false);
+  expect(allSpellIds()).not.toContain('riot:Recall');
+  expect(allSpellIds().length).toBeGreaterThan(200);
 });
 
 it('still fires onSettled once per id, including for an unknown one', async () => {
@@ -1071,8 +1082,8 @@ export const qualifySpellId = (id: string): string =>
   id.includes(':') ? id : `${BUNDLED_PACK_ID}:${id}`;
 ```
 
-- `allSpellIds()` → `contentRegistry().spellIds()`
-- `isSpellId(id)` → `contentRegistry().hasSpell(qualifySpellId(id))`
+- `allSpellIds()` → `contentRegistry().spellDisplayIds()` — **not** `spellIds()`. This is the population a slot is *rolled from*: `preset.ts:290`'s `randomSpellId()` picks out of it for every `'random'` slot and `preset.ts:298` validates a persisted slot choice against it. `Recall` is a declared spell of the bundled pack (Task 4) with deliberately no display data, so `spellIds()` would let a random slot roll it — a HELD channel in an ability slot, drawn by a HUD that has no name or icon for it. A spell you can be dealt is a spell the HUD must draw, and having display data is exactly that test.
+- `isSpellId(id)` → `contentRegistry().hasDisplayFor(qualifySpellId(id))` — the same population, for the same reason. `hasSpell` stays the *loadability* question and keeps its own callers.
 - `isSpellLoaded(id)` / `spellClassOfId(id)` → `contentRegistry().spellClass(qualifySpellId(id))`
 - `loadedSpellIds()` → the registry's resolved ids
 - `loadSpells(ids, onSettled)` → `contentRegistry().loadSpellClass(qualifySpellId(id))` per id, **keeping the existing loop's structure**: the dedupe, the `onSettled` fired once per entry of `ids` (not once per distinct id), and the `.catch` that logs and leaves the id unloaded rather than rejecting.
