@@ -8,11 +8,20 @@ import {
   type LaneWaypoint,
 } from '../../../src/game/lanes';
 import mapData from '../../../assets/json/summoner_map.json';
+import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 
 type Point = [number, number];
 const walls = mapData.wall as Point[][];
-const turret1 = mapData.turret1 as Point[];
-const turret2 = mapData.turret2 as Point[];
+// `turret1`/`turret2` used to be read straight off the map JSON
+// (`mapData.turret1`/`.turret2`); they now come off the active map's own
+// `slots.structure` — same points, same order (blue's row first, then
+// red's — see `summonersRiftGeometry.ts`'s `TURRET_ROWS`), just read through
+// the map definition instead of the raw file.
+const turret1: Point[] = [];
+const turret2: Point[] = [];
+for (const slot of summonersRiftGeometry.slots.structure) {
+  (slot.faction === 'blue' ? turret1 : turret2).push([slot.x, slot.y]);
+}
 
 const BLUE_FOUNTAIN = { x: 400, y: 6_075 };
 const RED_FOUNTAIN = { x: 6_100, y: 375 };

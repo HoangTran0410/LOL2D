@@ -1,6 +1,5 @@
 import { createApp, type App } from 'vue';
 import { Scene } from '@/managers/SceneManager';
-import AssetManager from '@/managers/AssetManager';
 import LoadingSceneView from './LoadingScene.vue';
 import type MenuScene from './MenuScene';
 
@@ -37,13 +36,18 @@ export default class LoadingScene extends Scene {
     this.host.style.display = 'block';
     this.view?.reset();
 
-    AssetManager.ensure('json_summoner_map')
-      .then(() => {
+    // Used to await `AssetManager.ensure('json_summoner_map')` here first —
+    // the map's own terrain/turret/fountain data, read synchronously by
+    // `preset.ts`'s (now-deleted) `getTurretPositions()`. Nothing on this
+    // path reads that key synchronously any more: the active map's geometry
+    // is fetched by `GameScene.startGame()`, alongside the match's spell and
+    // art chunks, once a match is actually starting (see that method's own
+    // doc comment). This scene's only remaining job is handing off to the
+    // menu, whose own chunk is what `import('./MenuScene')` is fetching.
+    import('./MenuScene')
+      .then(({ default: MenuSceneClass }: { default: typeof MenuScene }) => {
         this.view?.setProgress(100);
         this.view?.setMessage('Đang khởi tạo game...');
-        return import('./MenuScene');
-      })
-      .then(({ default: MenuSceneClass }: { default: typeof MenuScene }) => {
         this.sceneManager.showScene(MenuSceneClass);
       })
       .catch(error => {

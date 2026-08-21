@@ -1,29 +1,31 @@
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
-import type { FountainPresetData } from './gameObject/structures/Fountain';
-import TeamId from './enums/TeamId';
 
 /**
- * The jungle-camp and fountain positions, split out of `preset.ts` so they
- * can be read without pulling in the engine.
+ * The jungle-camp positions, split out of `preset.ts` so they can be read
+ * without pulling in the engine.
  *
  * `preset.ts` is a kitchen-sink file: champion-kit planning needs `Spell`,
  * `Champion` and the rest of `src/game/gameObject/`, and that surface used
- * to come along for free with `MonsterPreset`/`FountainPreset` too, since all
- * three lived in one module. `src/content/maps/summonersRift.ts` (batch 3's
- * content-pack assembly) only wants the *positions* — but it sits in
- * `src/content/`, which `tests/content/contentApiChunk.test.ts` and
- * `vite.config.ts`'s `pregame` chunk both require to never reach
- * `src/game/gameObject/`. Importing `preset.ts` for this data broke exactly
- * that: `MonsterPreset.baron.abilities` alone (`BARON_ABILITIES`, from
- * `gameObject/monsters/Baron.ts`) dragged in `SpellObject`, every buff and
- * the rest of the engine.
+ * to come along for free with `MonsterPreset` too, since both lived in one
+ * module. `src/content/maps/summonersRiftGeometry.ts` (batch 3's content-pack
+ * assembly) only wants the *positions* — but it sits in `src/content/`, which
+ * `tests/content/contentApiChunk.test.ts` and `vite.config.ts`'s `pregame`
+ * chunk both require to never reach `src/game/gameObject/`. Importing
+ * `preset.ts` for this data broke exactly that: `MonsterPreset.baron.abilities`
+ * alone (`BARON_ABILITIES`, from `gameObject/monsters/Baron.ts`) dragged in
+ * `SpellObject`, every buff and the rest of the engine.
  *
  * This module is that data, minus Baron's `abilities` — the one field that
  * needed the engine — with the exact same values otherwise. `preset.ts`
- * re-exports both constants under their original names, merging
- * `BARON_ABILITIES` back onto `baron` there, so every existing reader of
- * `preset.ts`'s `MonsterPreset`/`FountainPreset` sees the identical shape it
- * always did.
+ * re-exports the constant under its original name, merging `BARON_ABILITIES`
+ * back onto `baron` there, so every existing reader of `preset.ts`'s
+ * `MonsterPreset` sees the identical shape it always did.
+ *
+ * The fountain positions that used to live beside this (`FountainPreset`)
+ * are gone as of Task 5: a fountain now comes from the active map's own
+ * `slots.spawn` (see `summonersRiftGeometry.ts`'s `spawnSlots`), read through
+ * `preset.ts`'s `fountainsFromSlots`. Nothing needs the two coordinates as a
+ * standalone table any more.
  */
 export const MonsterPreset: Record<string, Omit<MonsterPresetData, 'abilities'>> = {
   baron: {
@@ -258,18 +260,3 @@ export const MonsterPreset: Record<string, Omit<MonsterPresetData, 'abilities'>>
     health: 50,
   },
 };
-
-/**
- * The two spawn platforms, in the corners the map's own turret rows point at.
- * Coordinates were picked by scanning the wall polygons in summoner_map.json for
- * the roomiest open spot in each base — both sit ~260px clear of any wall.
- *
- * Order matters: index 0 is the bottom-left base and belongs to TeamId.BLUE,
- * index 1 is the top-right base and belongs to TeamId.RED. Game.spawnFountains()
- * reads the team straight off this index, and the minion spawner reads it back
- * off the fountain.
- */
-export const FountainPreset: FountainPresetData[] = [
-  { name: 'Bệ Đá Cổ', x: 400, y: 6075, r: 190, teamId: TeamId.BLUE },
-  { name: 'Bệ Đá Cổ', x: 6100, y: 375, r: 190, teamId: TeamId.RED },
-];

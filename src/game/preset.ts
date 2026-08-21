@@ -1,8 +1,9 @@
-import AssetManager from '@/managers/AssetManager';
 import { contentRegistry } from '@/content/registry';
 import type { PackRegistry } from '@/content/PackRegistry';
+import type { SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
+import type { FountainPresetData } from './gameObject/structures/Fountain';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
 import { MonsterPreset as MonsterCampPreset } from './mapPresets';
 import type Champion from './gameObject/attackableUnits/Champion';
@@ -468,7 +469,6 @@ export const loadChampionPresetFromLoadout = async (
   await loadSpells(plan.spellIds);
   return presetFromPlan(plan);
 };
-export { FountainPreset } from './mapPresets';
 
 /**
  * `preset.ts`'s own copy of `MonsterPreset`, re-exported under its original
@@ -482,6 +482,48 @@ export const MonsterPreset: Record<string, MonsterPresetData> = {
   baron: { ...MonsterCampPreset.baron, abilities: BARON_ABILITIES },
 };
 
+/**
+ * Bridges a map's own faction vocabulary — a pack's free-string `Faction.id`,
+ * e.g. `summonersRift`'s `'blue'`/`'red'` (`src/content/maps/summonersRift.ts`)
+ * — to the match's fixed two-team model. Every comparison the engine actually
+ * runs (`canTakeDamageFromTeam`, `PredefinedFilters.teamId`, `opposingTeam`,
+ * a champion's own `pregameConfig.playerTeam`) is against `TeamId.BLUE`/
+ * `TeamId.RED`, not the raw faction string, so a slot's faction has to land
+ * on one of those two before a `Fountain`/`Turret` can share a side with a
+ * champion. A faction this table has never heard of falls through to
+ * `undefined`, the same "isolated object" default every other unbound
+ * `teamId` gets (`GameObject.teamId`'s own fresh-uuid fallback) — a building
+ * on a faction the engine does not recognise ends up unaffiliated rather
+ * than crashing the match.
+ */
+const TEAM_ID_OF_FACTION: Record<string, string> = {
+  blue: TeamId.BLUE,
+  red: TeamId.RED,
+};
+
+/**
+ * A spawn slot's own fountain preset. `FountainPreset` — a hard-coded
+ * two-entry array whose *index* used to carry the team
+ * (`Game.spawnFountains()` read index 0 as blue, 1 as red) — is gone; the
+ * team now rides on the slot's own `faction` field, so the order the map
+ * lists its spawn slots in no longer matters. Every fountain gets the same
+ * name and the same defaults (tick interval, heal/mana percent) `Fountain`
+ * itself falls back to; only position, radius and team come from the map.
+ */
+export const fountainsFromSlots = (slots: SpawnSlot[]): FountainPresetData[] => {
+  const presets: FountainPresetData[] = [];
+  for (const slot of slots) {
+    presets.push({
+      name: 'Bệ Đá Cổ',
+      x: slot.x,
+      y: slot.y,
+      r: slot.r,
+      teamId: TEAM_ID_OF_FACTION[slot.faction],
+    });
+  }
+  return presets;
+};
+
 export interface TurretPosition {
   x: number;
   y: number;
@@ -489,35 +531,22 @@ export interface TurretPosition {
 }
 
 /**
- * summoner_map.json already ships the two turret rows (`turret1`/`turret2`) as
- * flat [x, y] points — 11 per side, all on open ground at lane chokepoints.
- * They were never read by anything; TerrainMap used to try to parse them as
- * polygons and produced NaN obstacles.
+ * A structure slot's own turret position. Replaces `getTurretPositions()`,
+ * which read the two turret rows straight out of `summoner_map.json` through
+ * a synchronous `AssetManager.get('json_summoner_map')` — a second hard-coded
+ * coupling to the map file, on top of the asset key itself. Turrets now come
+ * from the active map's own `slots.structure`, already resolved to `{x, y}`
+ * points with a `faction` by `summonersRiftGeometry.ts`.
  *
- * `turret1` is the bottom-left row and `turret2` the top-right one, so the two
- * keys already encode which base each turret defends. This used to flatten both
- * into one list and throw that away, which was fine while turrets were neutral
- * hazards and is not now that they are team buildings.
+ * `slot.kind` is always `'turret'` here: `validate.ts` refuses to install a
+ * pack whose `structure` slots carry any other kind (`STRUCTURE_KINDS` is
+ * `['turret']` today), so this loop does not defend against a kind that can
+ * never arrive.
  */
-const TURRET_ROW_TEAMS: { key: string; teamId: string }[] = [
-  { key: 'turret1', teamId: TeamId.BLUE },
-  { key: 'turret2', teamId: TeamId.RED },
-];
-
-export const getTurretPositions = (): TurretPosition[] => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapData: any = AssetManager.get('json_summoner_map').data;
+export const turretsFromSlots = (slots: StructureSlot[]): TurretPosition[] => {
   const positions: TurretPosition[] = [];
-
-  for (const { key, teamId } of TURRET_ROW_TEAMS) {
-    const points = mapData?.[key];
-    if (!Array.isArray(points)) continue;
-    for (const p of points) {
-      if (Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1])) {
-        positions.push({ x: p[0], y: p[1], teamId });
-      }
-    }
+  for (const slot of slots) {
+    positions.push({ x: slot.x, y: slot.y, teamId: TEAM_ID_OF_FACTION[slot.faction] });
   }
-
   return positions;
 };

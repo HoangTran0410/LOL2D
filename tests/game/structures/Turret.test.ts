@@ -8,8 +8,8 @@ import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
-import AssetManager from '../../../src/managers/AssetManager';
-import { getTurretPositions } from '../../../src/game/preset';
+import { turretsFromSlots } from '../../../src/game/preset';
+import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import mapData from '../../../assets/json/summoner_map.json';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import turretSource from '../../../src/game/gameObject/structures/Turret.ts?raw';
@@ -163,9 +163,10 @@ describe('Turret as a team building', () => {
 
   describe('team assignment', () => {
     it('gives turret1 to blue and turret2 to red, keeping every point', () => {
-      // getTurretPositions reads the live asset handle, which nothing has loaded here
-      AssetManager.get('json_summoner_map').data = mapData;
-      const positions = getTurretPositions();
+      // turretsFromSlots reads the active map's own structure slots — no
+      // asset load to stub, since `summonersRiftGeometry` assembles them
+      // from the map JSON directly (see that module's own doc comment).
+      const positions = turretsFromSlots(summonersRiftGeometry.slots.structure);
 
       expect(positions).toHaveLength(mapData.turret1.length + mapData.turret2.length);
       const blue = positions.filter(p => p.teamId === TeamId.BLUE);

@@ -36,9 +36,9 @@ describe("the Summoner's Rift map definition", () => {
 
   it('carries both turret rows as structure slots, with their teams', async () => {
     // `turret1` and `turret2` are flat lists of [x, y] points — 11 each,
-    // measured, not assumed. `getTurretPositions` in preset.ts is the
-    // existing reader; this copies its interpretation rather than inventing
-    // one.
+    // measured, not assumed. `preset.ts`'s `turretsFromSlots` is the reader
+    // that turns these slots into turrets; this copies its interpretation of
+    // which row is which faction rather than inventing one.
     const { slots } = await geometry();
     const blue: StructureSlot[] = [];
     const red: StructureSlot[] = [];

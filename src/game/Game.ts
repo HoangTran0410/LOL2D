@@ -1,4 +1,4 @@
-import type { ActiveMap } from '@/content/ContentPack';
+import type { ActiveMap, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import { HotKeys, SpellHotKeys } from './constants';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
@@ -13,14 +13,14 @@ import Fountain from './gameObject/structures/Fountain';
 import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
 import {
-  FountainPreset,
   MonsterPreset,
   attachRecall,
+  fountainsFromSlots,
   getChampionPresetFromLoadout,
-  getTurretPositions,
   planLoadout,
   planMatchKits,
   presetFromPlan,
+  turretsFromSlots,
   type MatchPlan,
 } from './preset';
 import {
@@ -264,7 +264,7 @@ export default class Game {
 
     // Fountains first: each champion asks the matching team fountain for its
     // initial point, and randomSpawnPoint falls back safely for UUID/FFA teams.
-    this.spawnFountains();
+    this.spawnFountains(map.slots.spawn);
 
     // Blue by default and for every match before the team tab existed, but the
     // player is now a movable roster slot like any bot — so its side comes from
@@ -346,7 +346,7 @@ export default class Game {
     // `ObjectManager.update()` and only swept by the second, i.e. one frame of
     // camps a player who switched the jungle off never asked to see.
     if (pregameConfig.world.jungle) this.spawnJungle();
-    this.spawnTurrets();
+    this.spawnTurrets(map.slots.structure);
     // the spawner reads teams off the fountains, so it comes after them
     this.minionSpawner = new MinionSpawner(this);
 
@@ -381,8 +381,13 @@ export default class Game {
     this.camera.position = this.player.position.copy();
   }
 
-  spawnFountains() {
-    for (const preset of FountainPreset) {
+  /**
+   * @param spawnSlots The active map's `slots.spawn` — one fountain per slot,
+   *   on the slot's own `faction` rather than its position in the array. See
+   *   `preset.ts`'s `fountainsFromSlots` for the faction -> `TeamId` bridge.
+   */
+  spawnFountains(spawnSlots: SpawnSlot[]) {
+    for (const preset of fountainsFromSlots(spawnSlots)) {
       const fountain = new Fountain({ game: this, preset });
       this.fountains.push(fountain);
       this.objectManager.addObject(fountain);
@@ -397,8 +402,15 @@ export default class Game {
     }
   }
 
-  spawnTurrets() {
-    for (const { x, y, teamId } of getTurretPositions()) {
+  /**
+   * @param structureSlots The active map's `slots.structure` — one turret per
+   *   slot, on the slot's own `faction`. Every entry's `kind` is `'turret'`
+   *   already (`preset.ts`'s `turretsFromSlots` doc comment explains why this
+   *   does not check), which is also the only structure kind `Turret` knows
+   *   how to be.
+   */
+  spawnTurrets(structureSlots: StructureSlot[]) {
+    for (const { x, y, teamId } of turretsFromSlots(structureSlots)) {
       const turret = new Turret({ game: this, position: createVector(x, y), teamId });
       this.turrets.push(turret);
       this.objectManager.addObject(turret);

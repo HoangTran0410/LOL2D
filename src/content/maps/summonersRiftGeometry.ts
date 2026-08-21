@@ -8,8 +8,7 @@
 // specifier first. `?raw` sidesteps the ambiguity in both dev and build: it
 // always yields the file's raw text, which is parsed explicitly below.
 import mapJsonRaw from '../../../assets/json/summoner_map.json?raw';
-import TeamId from '@/game/enums/TeamId';
-import { FountainPreset, MonsterPreset } from '@/game/mapPresets';
+import { MonsterPreset } from '@/game/mapPresets';
 import { LANE_WAYPOINTS, Lane } from '@/game/lanes';
 import type {
   LaneDefinition,
@@ -20,20 +19,22 @@ import type {
 } from '../ContentPack';
 
 /**
- * Summoner's Rift's heavy half — terrain and slots — assembled from the four
+ * Summoner's Rift's heavy half — terrain and slots — assembled from the
  * places that used to each hold a slice of it without knowing about the
  * others: `assets/json/summoner_map.json` (terrain and the two turret rows),
- * `preset.ts`'s `FountainPreset`/`MonsterPreset` (fountains and jungle camps,
- * read here via `./mapPresets` — see that module's header for why) and
- * `lanes.ts` (waypoints).
+ * `preset.ts`'s `MonsterPreset` (jungle camps, read here via `./mapPresets`
+ * — see that module's header for why) and `lanes.ts` (waypoints). The two
+ * spawn platforms are a small literal right here (see `spawnSlots` below) —
+ * they used to live in `preset.ts`'s `FountainPreset`, which Task 5 deleted
+ * once nothing but this module still read it.
  *
  * This module is Task 4's lazy half of `summonersRift.ts`'s `MapDefinition`:
  * `../maps/summonersRift.ts` exports only the summary
  * (`id`/`name`/`size`/`factions`) eagerly and reaches this file through
  * `() => import('./summonersRiftGeometry')`, so the JSON's raw text — and
- * `FountainPreset`/`MonsterPreset`/`lanes.ts`, none of which the menu's own
- * chunk has any use for — never rides along with the picker. Rollup gives
- * this module its own chunk because nothing reaches it by a static import;
+ * `MonsterPreset`/`lanes.ts`, neither of which the menu's own chunk has any
+ * use for — never rides along with the picker. Rollup gives this module its
+ * own chunk because nothing reaches it by a static import;
  * `tests/content/contentApiChunk.test.ts` and `scripts/check-chunks.mjs` are
  * what keep it that way.
  *
@@ -63,9 +64,7 @@ const toPolygons = (
 /**
  * `turret1`/`turret2` ship as flat `[x, y]` lists — 11 points per side, all on
  * open ground at lane chokepoints. `turret1` is the bottom-left row (blue's)
- * and `turret2` the top-right one (red's); this is the same mapping
- * `preset.ts`'s `TURRET_ROW_TEAMS`/`getTurretPositions` use — copied rather
- * than reinvented, per that function's own doc comment.
+ * and `turret2` the top-right one (red's).
  */
 const TURRET_ROWS: readonly { key: 'turret1' | 'turret2'; faction: 'blue' | 'red' }[] = [
   { key: 'turret1', faction: 'blue' },
@@ -82,21 +81,20 @@ const structureSlots = (): StructureSlot[] => {
   return slots;
 };
 
-/** `FountainPreset`'s own index-order dependency (see that constant's doc
- * comment) stops mattering once the faction rides on the slot itself. */
-const FACTION_OF_TEAM: Record<string, 'blue' | 'red'> = {
-  [TeamId.BLUE]: 'blue',
-  [TeamId.RED]: 'red',
-};
-
-const spawnSlots = (): SpawnSlot[] =>
-  FountainPreset.map(fountain => {
-    const faction = fountain.teamId === undefined ? undefined : FACTION_OF_TEAM[fountain.teamId];
-    if (faction === undefined) {
-      throw new Error(`FountainPreset entry "${fountain.name}" has no mapped faction`);
-    }
-    return { faction, x: fountain.x, y: fountain.y, r: fountain.r };
-  });
+/**
+ * The two spawn platforms, in the corners the map's own turret rows point at.
+ * Coordinates were picked by scanning the wall polygons in summoner_map.json
+ * for the roomiest open spot in each base — both sit ~260px clear of any
+ * wall. This used to be `preset.ts`'s `FountainPreset`, a two-element array
+ * whose *index* carried the team (`Game.spawnFountains()` read index 0 as
+ * blue, 1 as red). A slot carries its own `faction` field instead, so the
+ * order these two are listed in is no longer load-bearing — see
+ * `preset.ts`'s `fountainsFromSlots`, the reader on the other end.
+ */
+const spawnSlots = (): SpawnSlot[] => [
+  { faction: 'blue', x: 400, y: 6075, r: 190 },
+  { faction: 'red', x: 6100, y: 375, r: 190 },
+];
 
 /**
  * `MonsterPreset` is 21 entries because a multi-body camp (three wolves, four
