@@ -6,8 +6,10 @@ import makeVeraE from './spells/Vera_E';
 import makeVeraR from './spells/Vera_R';
 
 /**
- * The pack core ships with, so core is a complete game holding no content
- * anyone else owns.
+ * The pack core ships with — proof the content-pack seam works, not yet a
+ * playable game. Nothing in `src/` imports `src/content/install.ts` today, so
+ * shipping this pack does not make this champion selectable; wiring the
+ * registry into the boot path is batch 2's first step.
  *
  * It is three things at once and each one matters: the smoke test that the
  * seam works end to end, the living documentation an author reads to learn

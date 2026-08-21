@@ -1,9 +1,4 @@
-import {
-  STRUCTURE_KINDS,
-  type ContentPack,
-  type MapDefinition,
-  type StructureKind,
-} from './ContentPack';
+import { STRUCTURE_KINDS, type ContentPack, type StructureKind } from './ContentPack';
 
 /**
  * The boundary check, hand-written and dependency-free.

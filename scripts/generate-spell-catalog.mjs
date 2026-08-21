@@ -213,8 +213,11 @@ export async function renderSpellModulesSource() {
     parseBarrel(coreBarrelPath),
   ]);
 
-  if (!contentEntries.length && !coreEntries.length) {
-    throw new Error('no `export { default as X } from` lines in either barrel');
+  if (!contentEntries.length) {
+    throw new Error(`no \`export { default as X } from\` lines in ${barrelPath}`);
+  }
+  if (!coreEntries.length) {
+    throw new Error(`no \`export { default as X } from\` lines in ${coreBarrelPath}`);
   }
 
   const coreIds = new Set(coreEntries.map(entry => entry.id));

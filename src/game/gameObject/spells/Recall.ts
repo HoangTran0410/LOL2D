@@ -50,6 +50,15 @@ const recallCastBar = (spell: Recall, context: CastContext): CastBar =>
  * `SpellForm.HELD` (the default `interrupts`) is the whole tension of it:
  * moving or being crowd-controlled ends the trip. Taking damage ends it too,
  * which no form covers — see `onUpdate`.
+ *
+ * **Who builds one, now**: not `Champion` — it only holds `recall: Spell |
+ * null` and never constructs one itself. `preset.ts`'s `attachRecall`
+ * (`preset.ts:65`) does, once per champion right after construction, exactly
+ * as that file already does for `BasicAttack`'s fallback. Batch 2 replaces
+ * that call with a pack declaring `ChampionEntry.recall`, read off whatever
+ * the installed pack says a champion's way home is. `vite.config.ts:284`
+ * (the chunking carve-out) and `tests/content/coreSpells.test.ts:44` (the
+ * source-scan pin) each document this same bridge from their own end.
  */
 export default class Recall extends Spell {
   /**

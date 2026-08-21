@@ -16,12 +16,15 @@ import type { ContentPackFactory } from '../../src/content/ContentPack';
  * which is the entire reason the pack contract is a factory taking an API
  * rather than a module of exports.
  *
- * The reference pack is here because core has to be a complete game on its
- * own — it is the smoke test, the living documentation of `ContentApi`, and
- * the template someone copies to write their own.
+ * The reference pack is here to prove the seam, not because core is already
+ * a playable game: nothing in `src/` calls `installBundledPacks`, so this
+ * registry is written but never read by a boot path yet. It is the smoke
+ * test, the living documentation of `ContentApi`, and the template someone
+ * copies to write their own — wiring it into the boot path is batch 2's
+ * first step.
  */
 describe('installBundledPacks', () => {
-  it('ships at least one pack, so core is playable with no content installed', () => {
+  it('ships at least one pack, proving the seam even though nothing reads the registry yet', () => {
     expect(BUNDLED_PACKS.length).toBeGreaterThan(0);
   });
 

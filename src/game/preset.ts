@@ -56,6 +56,11 @@ export type { SpellClass };
  * match — `Game.ts`'s player and initial bots, and `MatchDirector.addBotWithPreset`.
  * A map with no fountain is future work for a content pack to express by
  * simply not calling this; nothing here assumes every champion gets one.
+ *
+ * Two sibling sites document this same bridge from their own end:
+ * `vite.config.ts`'s chunking carve-out for `Recall.ts`, and
+ * `tests/content/coreSpells.test.ts`'s pin naming this the one content import
+ * core is allowed for batch 1.
  */
 export const attachRecall = <T extends Champion>(champion: T): T => {
   champion.recall = new Recall(champion);
