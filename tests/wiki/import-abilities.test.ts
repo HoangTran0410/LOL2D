@@ -211,12 +211,12 @@ describe('League Wiki importer', () => {
     });
     expect(record.asset).toMatchObject({ key: 'spell_fizz_e' });
 
-    await expect(readFile(join(target, 'assets/images/spells/fizz_e.png'))).resolves.toEqual(
-      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1])
-    );
-    await expect(readFile(join(target, 'assets/images/spells/fizz_e2.png'))).resolves.toEqual(
-      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 2])
-    );
+    await expect(
+      readFile(join(target, 'packs/riot/assets/images/spells/fizz_e.png'))
+    ).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]));
+    await expect(
+      readFile(join(target, 'packs/riot/assets/images/spells/fizz_e2.png'))
+    ).resolves.toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 2]));
 
     const manifest = JSON.parse(
       await readFile(join(target, 'assets/source-manifest.json'), 'utf8')
@@ -226,7 +226,7 @@ describe('League Wiki importer', () => {
         (source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e'
       )
     ).toMatchObject({
-      localPath: 'assets/images/spells/fizz_e.png',
+      localPath: 'packs/riot/assets/images/spells/fizz_e.png',
       sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Playful.png',
     });
     expect(
@@ -234,7 +234,7 @@ describe('League Wiki importer', () => {
         (source: { localAssetKey: string }) => source.localAssetKey === 'spell_fizz_e2'
       )
     ).toMatchObject({
-      localPath: 'assets/images/spells/fizz_e2.png',
+      localPath: 'packs/riot/assets/images/spells/fizz_e2.png',
       sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
     });
 
@@ -300,8 +300,12 @@ describe('League Wiki importer', () => {
       champion: 'Janna',
       asset: { key: 'champ_janna' },
     });
-    expect(await readFile(join(target, 'assets/images/spells/janna_q.png'))).toHaveLength(8);
-    expect(await readFile(join(target, 'assets/images/champions/janna.png'))).toHaveLength(8);
+    expect(
+      await readFile(join(target, 'packs/riot/assets/images/spells/janna_q.png'))
+    ).toHaveLength(8);
+    expect(
+      await readFile(join(target, 'packs/riot/assets/images/champions/janna.png'))
+    ).toHaveLength(8);
     expect(
       manifest.sources.find(
         (source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q'
@@ -345,9 +349,9 @@ describe('League Wiki importer', () => {
     const data = await fixture();
     const target = await root();
     const championPath = join(target, 'docs/abilities/janna/champion.json');
-    const imagePath = join(target, 'assets/images/champions/janna.png');
+    const imagePath = join(target, 'packs/riot/assets/images/champions/janna.png');
     await mkdir(join(target, 'docs/abilities/janna'), { recursive: true });
-    await mkdir(join(target, 'assets/images/champions'), { recursive: true });
+    await mkdir(join(target, 'packs/riot/assets/images/champions'), { recursive: true });
     await writeFile(championPath, 'existing champion record\n');
     await writeFile(imagePath, 'existing champion image');
 
@@ -428,12 +432,12 @@ describe('League Wiki importer', () => {
       now: () => '2026-08-14T00:00:00.000Z',
     });
 
-    await expect(readFile(join(target, 'assets/images/spells/janna_q.png'))).resolves.toEqual(
-      Buffer.from(changedPng)
-    );
-    await expect(readFile(join(target, 'assets/images/champions/janna.png'))).resolves.toEqual(
-      Buffer.from(changedPng)
-    );
+    await expect(
+      readFile(join(target, 'packs/riot/assets/images/spells/janna_q.png'))
+    ).resolves.toEqual(Buffer.from(changedPng));
+    await expect(
+      readFile(join(target, 'packs/riot/assets/images/champions/janna.png'))
+    ).resolves.toEqual(Buffer.from(changedPng));
     const manifest = JSON.parse(
       await readFile(join(target, 'assets/source-manifest.json'), 'utf8')
     );
@@ -489,15 +493,19 @@ describe('League Wiki importer', () => {
       now: () => '2026-08-14T00:00:00.000Z',
     });
 
-    await expect(stat(join(target, 'assets/images/spells/janna_q.png'))).rejects.toMatchObject({
+    await expect(
+      stat(join(target, 'packs/riot/assets/images/spells/janna_q.png'))
+    ).rejects.toMatchObject({
       code: 'ENOENT',
     });
-    await expect(readFile(join(target, 'assets/images/spells/janna_q.jpg'))).resolves.toEqual(
-      Buffer.from(jpeg)
-    );
-    const generated = await readFile(join(target, 'src/generated/assetManifest.ts'), 'utf8');
-    expect(generated).toContain('assets/images/spells/janna_q.jpg?url');
-    expect(generated).not.toContain('assets/images/spells/janna_q.png?url');
+    await expect(
+      readFile(join(target, 'packs/riot/assets/images/spells/janna_q.jpg'))
+    ).resolves.toEqual(Buffer.from(jpeg));
+    // The spell's own icon lives in `packs/riot/assets/`, not core's tree — the
+    // manifest that changes with it is `packs/riot/generated/assetManifest.ts`.
+    const generated = await readFile(join(target, 'packs/riot/generated/assetManifest.ts'), 'utf8');
+    expect(generated).toContain('packs/riot/assets/images/spells/janna_q.jpg?url');
+    expect(generated).not.toContain('packs/riot/assets/images/spells/janna_q.png?url');
     await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
   });
 
@@ -513,13 +521,14 @@ describe('League Wiki importer', () => {
     });
     const tracked = [
       'docs/abilities/janna/q.json',
-      'assets/images/spells/janna_q.png',
+      'packs/riot/assets/images/spells/janna_q.png',
       'assets/source-manifest.json',
       'src/generated/assetManifest.ts',
+      'packs/riot/generated/assetManifest.ts',
     ];
     const before = await Promise.all(tracked.map(path => readFile(join(target, path))));
     await writeFile(
-      join(target, 'assets/images/spells/janna-q.webp'),
+      join(target, 'packs/riot/assets/images/spells/janna-q.webp'),
       new Uint8Array([82, 73, 70, 70])
     );
     const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
@@ -556,7 +565,9 @@ describe('League Wiki importer', () => {
     for (const [index, path] of tracked.entries()) {
       await expect(readFile(join(target, path))).resolves.toEqual(before[index]);
     }
-    await expect(stat(join(target, 'assets/images/spells/janna_q.jpg'))).rejects.toMatchObject({
+    await expect(
+      stat(join(target, 'packs/riot/assets/images/spells/janna_q.jpg'))
+    ).rejects.toMatchObject({
       code: 'ENOENT',
     });
   });
@@ -572,7 +583,7 @@ describe('League Wiki importer', () => {
       now: () => '2026-08-13T00:00:00.000Z',
     });
     const recordPath = join(target, 'docs/abilities/janna/q.json');
-    const imagePath = join(target, 'assets/images/spells/janna_q.png');
+    const imagePath = join(target, 'packs/riot/assets/images/spells/janna_q.png');
     const manifestPath = join(target, 'assets/source-manifest.json');
     const originalRecord = await readFile(recordPath);
     const originalImage = await readFile(imagePath);
@@ -591,7 +602,7 @@ describe('League Wiki importer', () => {
     const manifest = JSON.parse(originalManifest.toString());
     manifest.sources.find(
       (source: { localAssetKey: string }) => source.localAssetKey === 'spell_janna_q'
-    ).localPath = 'assets/images/spells/wrong.png';
+    ).localPath = 'packs/riot/assets/images/spells/wrong.png';
     await writeFile(manifestPath, JSON.stringify(manifest));
     await expect(checkAbilities(target)).rejects.toThrow(/asset key\/path/i);
     await writeFile(manifestPath, originalManifest);

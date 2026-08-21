@@ -164,6 +164,18 @@ export interface ContentApi {
   terrain: typeof TERRAIN;
   utils: typeof UTILS;
 
+  /**
+   * A bare local key (`'spell_ahri_e'`) resolves against whichever pack
+   * registered it first — the shape every `packs/riot/spells/*.ts` file
+   * already calls this with, unqualified, and keeps working unqualified.
+   * `'<packId>:<localKey>'` resolves against exactly the named pack and no
+   * other, for a caller (or a second pack whose own local keys collide with
+   * the first's) that needs to say precisely which pack it means. Both
+   * forms are the same `AssetManager.get` this function has always been —
+   * see `AssetManager.resolveDescriptor`'s own doc comment for the full
+   * three-try order, and `PackManifest.assets` for why `image`/`avatar`/
+   * `iconKey` fields never have to be written pre-qualified by hand.
+   */
   asset(key: string): AssetHandle;
   /**
    * `AssetManager.renderable`, for the two draw methods (Leblanc_W, Yasuo_Q)

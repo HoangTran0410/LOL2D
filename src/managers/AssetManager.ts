@@ -18,6 +18,20 @@ export interface AssetLoaders {
   audio: (url: string) => Promise<unknown>;
 }
 
+/** One entry of a generated asset manifest — core's own shape, or a pack's. */
+export interface AssetDescriptor {
+  kind: AssetKind;
+  url: string;
+  path: string;
+}
+
+/**
+ * A pack's own generated `assetManifest.ts` export — `packs/riot/generated/assetManifest.ts`'s
+ * shape, handed to `registerPackAssets` rather than imported by this module
+ * directly (`src/` may not import `packs/` — `corePacksBoundary.test.ts`).
+ */
+export type PackAssetManifest = Readonly<Record<string, AssetDescriptor>>;
+
 const PLACEHOLDER_SIZE = 64;
 
 function placeholderStyle(key: string): { label: string; hue: number } {
@@ -217,6 +231,14 @@ export default class AssetManager {
    */
   private static autoRetriedUrls = new Set<string>();
   private static placeholders = new Map<string, AssetHandle>();
+  /**
+   * Every installed pack's own generated manifest, by pack id — `Map`
+   * preserves insertion order, which is what makes the bare-key fallback in
+   * `resolveDescriptor` below "earliest-installed pack wins" rather than
+   * unspecified. Populated by `registerPackAssets`, never read directly by
+   * anything outside this file.
+   */
+  private static packManifests = new Map<string, PackAssetManifest>();
 
   /**
    * Whether the browser has discarded the off-DOM canvas backing stores.
@@ -290,11 +312,81 @@ export default class AssetManager {
     this.loaders = loaders;
   }
 
+  /**
+   * Registers one installed pack's own generated asset manifest, so
+   * `<packId>:<localKey>` — the same `qualify()` shape `PackRegistry` uses
+   * for every other id — resolves against exactly that pack's art and no
+   * other's. Called once per pack that declares `PackManifest.assets` (see
+   * that field's own doc comment); a pack that declares none is never
+   * registered here and its own `image`/`avatar`/`iconKey` strings, if it
+   * has any, are expected to already be keys in core's flat manifest.
+   *
+   * The caller, not this module, is what is allowed to have imported the
+   * manifest object in the first place — `AssetManager.ts` lives in `src/`
+   * and may not import `packs/riot/generated/assetManifest.ts` directly
+   * (`corePacksBoundary.test.ts`); `bundledPack.ts` is one of that scan's
+   * named exceptions and does the importing, handing the plain object here
+   * as a value with no import of its own required on this side.
+   */
+  static registerPackAssets(packId: string, manifest: PackAssetManifest): void {
+    this.packManifests.set(packId, manifest);
+  }
+
+  /**
+   * Turns a key into `{kind, url, path}`, or `undefined` for one nothing
+   * declares.
+   *
+   * Three tries, in order:
+   *
+   * 1. **Core's own generated manifest**, unqualified — every existing
+   *    caller before this task, unchanged.
+   * 2. **`<packId>:<localKey>`**, the explicit form — the same
+   *    `qualify(packId, localId)` shape `PackRegistry.ts` already uses for
+   *    spell/champion/monster/map ids, resolved against exactly the named
+   *    pack's own registered manifest and nothing else. This is what lets
+   *    two packs declare the identical local key (`'hero'`, say) and still
+   *    resolve to two different files: `PackRegistry.writeData` writes this
+   *    form into `image`/`avatar`/`iconKey` for any pack that declares
+   *    `manifest.assets`, so a caller reading those fields back never has
+   *    to build the qualified string itself.
+   * 3. **A bare key nothing above matched**, tried against every registered
+   *    pack's manifest in install order, first match wins. This is what
+   *    lets the ~240 pre-existing `api.asset('spell_x')` calls inside
+   *    `packs/riot/spells/` keep resolving unqualified — they were written
+   *    against a single flat namespace before this task existed and a
+   *    mechanical rewrite of every one of them was not this task's job.
+   *    `install.ts`'s own doc comment already documents "install order
+   *    decides" for the identical shape of conflict on ids; a second pack
+   *    whose own local keys happen to collide with the first's needs the
+   *    qualified form above to be unambiguous — arm 3 only ever promises
+   *    "some pack has this key," never "the pack you meant."
+   */
+  private static resolveDescriptor(key: string): AssetDescriptor | undefined {
+    const core = (assetManifest as Record<string, AssetDescriptor | undefined>)[key];
+    if (core) return core;
+
+    const separator = key.indexOf(':');
+    if (separator > 0) {
+      const packId = key.slice(0, separator);
+      const localKey = key.slice(separator + 1);
+      const qualified = this.packManifests.get(packId)?.[localKey];
+      if (qualified) return qualified;
+    }
+
+    for (const manifest of this.packManifests.values()) {
+      const bare = manifest[key];
+      if (bare) return bare;
+    }
+    return undefined;
+  }
+
   static get(key: AssetKey): AssetHandle {
     const cached = this.handles.get(key);
     if (cached) return cached;
 
-    const asset = assetManifest[key];
+    const asset = this.resolveDescriptor(key);
+    if (!asset) throw new Error(`Unknown asset key "${key}"`);
+
     const handle: AssetHandle = {
       key,
       kind: asset.kind,
@@ -398,8 +490,23 @@ export default class AssetManager {
     return handle;
   }
 
+  /**
+   * Unused today (verified: zero call sites) but kept correct rather than
+   * left silently broken. Before this task every `champ_` key lived in
+   * core's own manifest; after it, champion portraits are `packs/riot`'s
+   * art, registered under the `'riot'` pack id — so this now walks every
+   * registered pack's manifest too, qualifying the key the same way
+   * `PackRegistry.writeData` already qualifies a champion's own `image`.
+   */
   static getRandomChampion(): AssetHandle {
-    const keys = Object.keys(assetManifest).filter(key => key.startsWith('champ_')) as AssetKey[];
+    const keys: AssetKey[] = Object.keys(assetManifest).filter(key =>
+      key.startsWith('champ_')
+    ) as AssetKey[];
+    for (const [packId, manifest] of this.packManifests) {
+      for (const localKey of Object.keys(manifest)) {
+        if (localKey.startsWith('champ_')) keys.push(`${packId}:${localKey}` as AssetKey);
+      }
+    }
     return this.get(keys[Math.floor(Math.random() * keys.length)]);
   }
 }

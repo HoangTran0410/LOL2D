@@ -210,8 +210,8 @@ describe('representative spells through public commands', () => {
   it('registers typed champion portraits for the migrated Anivia and Janna groups', () => {
     const groups = Object.fromEntries(spellGroups().map(group => [group.name, group]));
 
-    expect(groups.Anivia.image).toBe('champ_anivia');
-    expect(groups.Janna.image).toBe('champ_janna');
+    expect(groups.Anivia.image).toBe('riot:champ_anivia');
+    expect(groups.Janna.image).toBe('riot:champ_janna');
   });
 
   it('honors PRESS, RECAST, and TOGGLE commit points', () => {

@@ -170,6 +170,6 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
 
   it('gives a custom kit a random avatar, same pool as a fully random champion', () => {
     const preset = getChampionPresetFromLoadout(customLoadout(Array(SLOT_COUNT).fill('random')));
-    expect(preset.avatar).toMatch(/^champ_/);
+    expect(preset.avatar).toMatch(/^riot:champ_/);
   });
 });

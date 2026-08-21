@@ -27,6 +27,15 @@ import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
  * `vite.config.ts`'s `manualChunks` pins this file to its own `shared`
  * chunk rather than letting it fall into either the `pregame` carve-out
  * (`src/game/config/`) or `game` (`src/content/`) — it is read from both.
+ *
+ * Still a bare passthrough after batch 4 task 4 gave a pack its own asset
+ * tree: the qualification a multi-pack namespace needs (`<packId>:<localKey>`,
+ * `AssetManager.registerPackAssets`/`resolveDescriptor`) lives entirely on
+ * the other side of `AssetManager.get`, either baked into the string by
+ * `PackRegistry.writeData` (every `image`/`avatar`/`iconKey` this crossing
+ * ever sees) or resolved by install order for a bare key nothing qualified
+ * (every existing `packs/riot/spells/*.ts` call). This leaf never had to
+ * learn which pack it is being asked about.
  */
 export const packAsset = (key: string): AssetHandle => AssetManager.get(key as never);
 

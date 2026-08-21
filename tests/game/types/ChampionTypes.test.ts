@@ -172,11 +172,11 @@ describe('champion and direct-subclass type boundary', () => {
     class TestSpell extends Spell {}
     const champion = new Champion({
       game,
-      avatar: AssetManager.get('champ_ahri'),
+      avatar: AssetManager.get('buff_stun'),
       preset: { name: 'Ahri', spells: [TestSpell] },
     });
 
-    expect(champion.avatar).toBe(AssetManager.get('champ_ahri'));
+    expect(champion.avatar).toBe(AssetManager.get('buff_stun'));
     expect(champion.name).toBe('Ahri');
     expect(champion.spells[0]).toBeInstanceOf(TestSpell);
     expectTypeOf(champion.spells).toEqualTypeOf<Spell[]>();

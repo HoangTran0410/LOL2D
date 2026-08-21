@@ -184,7 +184,7 @@ describe('a match plan', () => {
     for (const id of plan.spellIds) expect(isSpellId(id)).toBe(true);
     expect(plan).toMatchObject({
       name: 'Yasuo',
-      avatar: 'champ_yasuo',
+      avatar: 'riot:champ_yasuo',
       // Registry-qualified — see the named-champion case above.
       spellIds: [
         'BasicAttack',
@@ -204,7 +204,7 @@ describe('a match plan', () => {
     expect(random).toHaveBeenCalledTimes(1);
     expect(preset).toMatchObject({
       name: 'Yasuo',
-      avatar: 'champ_yasuo',
+      avatar: 'riot:champ_yasuo',
       attack: expect.any(Object),
     });
   });
@@ -278,7 +278,7 @@ describe('a miss degrades instead of throwing', () => {
     // mid-match re-roll that beat `loadRemainingSpells` to it.
     const preset = presetFromPlan({
       name: 'x',
-      avatar: 'champ_yasuo',
+      avatar: 'riot:champ_yasuo',
       attack: DEFAULT_CHAMPION_ATTACK,
       spellIds: ['Ahri_Q'],
     });

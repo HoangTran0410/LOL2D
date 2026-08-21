@@ -25,6 +25,16 @@ import { spellModules } from '../../packs/riot/generated/spellModules';
 // the rest of this bridge in Task 7.
 import { spellCatalog as coreSpellCatalog } from '@/generated/spellCatalog';
 import { spellModules as coreSpellModules } from '@/generated/spellModules';
+// Batch 4 task 4: 378 files (champion portraits, spell icons, monster art)
+// moved out of core's own `assets/` into `packs/riot/assets/`. This is the
+// one place that manifest is imported — `src/` may not reach `packs/`
+// outside the named exceptions (`corePacksBoundary.test.ts`), and this file
+// is one of them — and it is registered with `AssetManager` below so
+// `riot:<localKey>` resolves against it. See `PackManifest.assets`'s own
+// doc comment for why the manifest.assets string and this import travel
+// together rather than either alone.
+import { assetManifest as riotAssetManifest } from '../../packs/riot/generated/assetManifest';
+import AssetManager from '@/managers/AssetManager';
 import { summonersRift } from './maps/summonersRift';
 // `Baron.ts` moved into `packs/riot/monsters/` (Task 2 of the content-pack
 // extraction). This file's own header explains why reaching for it here is
@@ -61,6 +71,17 @@ import makeBaronAbilities from '../../packs/riot/monsters/Baron';
  * `ContentPackFactory`'s shape does not change per pack.
  */
 export const BUNDLED_PACK_ID = 'riot';
+
+// Registers packs/riot's own generated manifest so `riot:<localKey>` — and,
+// for a bare key no other pack claims, the unqualified key too (see
+// `AssetManager.resolveDescriptor`'s own doc comment) — resolves against it.
+// `?.` rather than a bare call: dozens of spell tests mock `AssetManager`
+// down to `get`/`getAsset` and still exercise this module through
+// `contentRegistry()` (`spellGroups()`, `loadEverySpellForTests()`), and none
+// of them ever resolve a real riot-namespaced key — a no-op under those
+// doubles is the correct behaviour, not a swallowed error. Idempotent
+// (`Map.set`), so re-running it on a module re-evaluation is harmless.
+AssetManager.registerPackAssets?.(BUNDLED_PACK_ID, riotAssetManifest);
 
 // Assignable both ways, checked by the compiler and costing nothing at
 // runtime. `ChampionAttack` is declared in the contract rather than imported
@@ -339,7 +360,7 @@ const monsterEntries = (): Record<string, MonsterDef> => ({
 });
 
 export const data: ContentPackData = {
-  manifest: { id: BUNDLED_PACK_ID, version: '1.0.0', coreRange: '^1' },
+  manifest: { id: BUNDLED_PACK_ID, version: '1.0.0', coreRange: '^1', assets: BUNDLED_PACK_ID },
   // Getters, not eagerly evaluated fields. `championEntries()`/`displayData()`
   // read `CHAMPION_KITS`/`spellCatalog` from `@/game/config/spellCatalog`,
   // which is itself part of the cycle this file sits in: `bundledPack.ts` ->

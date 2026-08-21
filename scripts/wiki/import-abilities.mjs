@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderAssetManifestSource } from '../generate-assets.mjs';
+import { renderAssetManifestSource, PACK_ASSET_TREES } from '../generate-assets.mjs';
 import { createMediaWikiClient } from './mediawiki.mjs';
 import { assertPcSource, championSkillForms, parseLuaData } from './lua-data.mjs';
 import { normalizeAbilityFields } from './normalize.mjs';
@@ -184,7 +184,7 @@ export async function importAbilities({
     validateImage(championBytes, championImageInfo.mime);
     const championExtension = imageExtension(championImageInfo.mime, championImageInfo.url);
     const championAssetKey = `champ_${slug.replaceAll('-', '_')}`;
-    const championLocalPath = `assets/images/champions/${slug}${championExtension}`;
+    const championLocalPath = `packs/riot/assets/images/champions/${slug}${championExtension}`;
     const championRecord = {
       schemaVersion: 1,
       champion: name,
@@ -254,7 +254,7 @@ export async function importAbilities({
         // convention (e.g. thresh_q.png/thresh_q2.png, zed_r1.png/zed_r2.png).
         const formSuffix = formIndex === 0 ? '' : String(formIndex + 1);
         const localAssetKey = `spell_${slug.replaceAll('-', '_')}_${slot.toLowerCase()}${formSuffix}`;
-        const localPath = `assets/images/spells/${slug}_${slot.toLowerCase()}${formSuffix}${extension}`;
+        const localPath = `packs/riot/assets/images/spells/${slug}_${slot.toLowerCase()}${formSuffix}${extension}`;
         const previousImageSource = sourceEntries.get(localAssetKey);
         const imageHash = contentHash(bytes);
         const imageChanged = previousImageSource?.contentHash !== imageHash || previousImageSource?.localPath !== localPath;
@@ -320,6 +320,21 @@ export async function importAbilities({
     await renderAssetManifestSource(root, {
       add: outputs.map(([path]) => path),
       remove: [...removals],
+    }),
+  ]);
+  // Champion portraits and spell icons land under `packs/riot/assets/`
+  // (batch 4 task 4), not core's own `assets/` — the call above regenerates
+  // core's manifest, and its `add`/`remove` filters silently drop any path
+  // outside `assets/`, so a downloaded portrait never reaches it. Without
+  // this second call `packs/riot/generated/assetManifest.ts` would go stale
+  // the moment a real import ran, and the next `assets:check:riot` would be
+  // the first thing to notice.
+  outputs.push([
+    'packs/riot/generated/assetManifest.ts',
+    await renderAssetManifestSource(root, {
+      add: outputs.map(([path]) => path),
+      remove: [...removals],
+      tree: PACK_ASSET_TREES.riot,
     }),
   ]);
   await commitFiles(resolve(root), outputs, [...removals]);

@@ -53,24 +53,24 @@ describe('AssetManager', () => {
   });
 
   it('returns the same handle before during and after loading', async () => {
-    const before = AssetManager.get('champ_ahri');
-    const loading = AssetManager.ensure('champ_ahri');
+    const before = AssetManager.get('buff_airborne');
+    const loading = AssetManager.ensure('buff_airborne');
 
-    expect(AssetManager.get('champ_ahri')).toBe(before);
+    expect(AssetManager.get('buff_airborne')).toBe(before);
     expect(before.status).toBe('loading');
 
     const image = { width: 64 };
     imageLoads.get(before.url)?.resolve(image);
     await loading;
 
-    expect(AssetManager.get('champ_ahri')).toBe(before);
+    expect(AssetManager.get('buff_airborne')).toBe(before);
     expect(before).toMatchObject({ status: 'ready', data: image });
   });
 
   it('deduplicates concurrent ensure calls', async () => {
-    const first = AssetManager.ensure('champ_ashe');
-    const second = AssetManager.ensure('champ_ashe');
-    const handle = AssetManager.get('champ_ashe');
+    const first = AssetManager.ensure('buff_charm');
+    const second = AssetManager.ensure('buff_charm');
+    const handle = AssetManager.get('buff_charm');
 
     expect(first).toBe(second);
     expect(imageLoader).toHaveBeenCalledTimes(1);
@@ -80,18 +80,18 @@ describe('AssetManager', () => {
   });
 
   it('keeps the handle identity and retries a transient failed load', async () => {
-    const handle = AssetManager.get('champ_lux');
-    const loading = AssetManager.ensure('champ_lux');
+    const handle = AssetManager.get('buff_stun');
+    const loading = AssetManager.ensure('buff_stun');
     const error = new Error('image failed');
 
     imageLoads.get(handle.url)?.reject(error);
     await expect(loading).rejects.toBe(error);
 
-    expect(AssetManager.get('champ_lux')).toBe(handle);
+    expect(AssetManager.get('buff_stun')).toBe(handle);
     expect(handle).toMatchObject({ status: 'error', data: null, error });
 
     const callsBeforeRetry = imageLoader.mock.calls.length;
-    const retry = AssetManager.ensure('champ_lux');
+    const retry = AssetManager.ensure('buff_stun');
     expect(retry).not.toBe(loading);
     expect(imageLoader).toHaveBeenCalledTimes(callsBeforeRetry + 1);
     expect(handle.status).toBe('loading');
@@ -100,7 +100,7 @@ describe('AssetManager', () => {
     imageLoads.get(handle.url)?.resolve(image);
     await retry;
 
-    expect(AssetManager.get('champ_lux')).toBe(handle);
+    expect(AssetManager.get('buff_stun')).toBe(handle);
     expect(handle).toMatchObject({ status: 'ready', data: image, error: undefined });
   });
 
@@ -111,7 +111,7 @@ describe('AssetManager', () => {
 
   it('renders a placeholder on first canvas use and loaded data through the same handle', async () => {
     const placeholder = stubPlaceholderGraphics({ placeholder: true });
-    const handle = AssetManager.get('champ_jinx');
+    const handle = AssetManager.get('buff_slow');
 
     expect(AssetManager.renderable(handle)).toBe(placeholder);
     expect(AssetManager.renderable(handle)).toBe(placeholder);
@@ -119,15 +119,15 @@ describe('AssetManager', () => {
 
     const image = { width: 64 };
     imageLoads.get(handle.url)?.resolve(image);
-    await AssetManager.ensure('champ_jinx');
+    await AssetManager.ensure('buff_slow');
 
     expect(AssetManager.renderable(handle)).toBe(image);
-    expect(AssetManager.get('champ_jinx')).toBe(handle);
+    expect(AssetManager.get('buff_slow')).toBe(handle);
   });
 
   it('auto-retries one failed on-use load without request-storming, while explicit retry remains available', async () => {
     const placeholder = stubPlaceholderGraphics({ placeholder: true });
-    const handle = AssetManager.get('champ_blitzcrank');
+    const handle = AssetManager.get('buff_root');
 
     expect(AssetManager.renderable(handle, 'Blitzcrank')).toBe(placeholder);
     imageLoads.get(handle.url)?.reject(new Error('draw load failed'));
@@ -156,7 +156,7 @@ describe('AssetManager', () => {
     expect(imageLoader).toHaveBeenCalledTimes(2);
 
     // A deliberate later request is never blocked by the automatic retry cap.
-    const explicitRetry = AssetManager.ensure('champ_blitzcrank');
+    const explicitRetry = AssetManager.ensure('buff_root');
     expect(imageLoader).toHaveBeenCalledTimes(3);
     const image = { width: 64, explicitlyRetried: true };
     imageLoads.get(handle.url)?.resolve(image);

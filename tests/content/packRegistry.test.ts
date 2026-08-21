@@ -99,6 +99,69 @@ describe('PackRegistry', () => {
     expect(registry.champions().map(c => c.id)).toEqual(['one:a', 'two:b']);
   });
 
+  /**
+   * The test that proves asset namespacing does not exist without it. Two
+   * champions from two different packs both declare the same *local* image
+   * key (`'hero'`) — the same collision `'concatenates champions across
+   * packs'` above proves ids survive, asked one field over. Before batch 4
+   * task 4, `image` traveled through `writeData` untouched (see `image:
+   * kit.image` — a plain spread, unlike `id`/`spells`/`recall`), so both
+   * champions would have carried the literal string `'hero'` and
+   * `AssetManager.get('hero')` could resolve only one file, ever — silently
+   * shadowing whichever pack loaded first. `manifest.assets` is what turns
+   * "declares an art tree of its own" into a real qualifier: each pack's
+   * `image` comes back as `<assets>:<localKey>`, and `AssetManager` resolves
+   * each qualified form against exactly that pack's own registered manifest
+   * (`registerPackAssets`) — see both modules' own doc comments for why the
+   * shape matches `qualify()` rather than inventing a second convention.
+   */
+  it('resolves two packs declaring the same local asset key to two different files', async () => {
+    const { default: AssetManager } = await import('../../src/managers/AssetManager');
+    AssetManager.registerPackAssets('collision-one', {
+      hero: { kind: 'image', url: '/one/hero.png', path: 'packs/one/assets/hero.png' },
+    });
+    AssetManager.registerPackAssets('collision-two', {
+      hero: { kind: 'image', url: '/two/hero.png', path: 'packs/two/assets/hero.png' },
+    });
+
+    registry.install(
+      pack('collision-one', {
+        manifest: {
+          id: 'collision-one',
+          version: '1.0.0',
+          coreRange: '^1',
+          assets: 'collision-one',
+        },
+        spells: { Q: class {} } as never,
+        champions: [{ id: 'a', name: 'A', image: 'hero', playable: false, spells: ['Q'] }],
+      })
+    );
+    registry.install(
+      pack('collision-two', {
+        manifest: {
+          id: 'collision-two',
+          version: '1.0.0',
+          coreRange: '^1',
+          assets: 'collision-two',
+        },
+        spells: { Q: class {} } as never,
+        champions: [{ id: 'b', name: 'B', image: 'hero', playable: false, spells: ['Q'] }],
+      })
+    );
+
+    const [champA, champB] = registry.champions();
+    // Qualified, and qualified *differently* — this is the assertion that
+    // would have failed before this task: both would have read back as the
+    // bare `'hero'` neither pack meant uniquely.
+    expect(champA.image).toBe('collision-one:hero');
+    expect(champB.image).toBe('collision-two:hero');
+    expect(champA.image).not.toBe(champB.image);
+
+    // And the qualified forms resolve to two genuinely different files.
+    expect(AssetManager.get(champA.image as never).url).toBe('/one/hero.png');
+    expect(AssetManager.get(champB.image as never).url).toBe('/two/hero.png');
+  });
+
   it('lists maps for selection rather than merging them', () => {
     // A match has many champions and exactly one world, so this section is a
     // choice, not a union — the asymmetry is deliberate.

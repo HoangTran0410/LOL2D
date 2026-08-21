@@ -98,18 +98,22 @@ export const PACK_SPELL_TREES = {
     // ever sees it. Core's own barrels are unaffected: `BasicAttack` stays a
     // plain class, exactly as before this tree existed.
     isPackFactory: true,
-    // Batch 4 task 3 moved the spell *classes*; task 4 moves the *art* and
-    // populates `packs/riot/generated/assetManifest.ts` for real. Until then
-    // every icon key this tree's spells declare (`spell_ahri_e`, ...) still
-    // only exists in core's own manifest — the files have not moved — and a
-    // generated file under `packs/` may not import core at all
-    // (`packBoundary.test.ts` scans generated output the same as hand-written
-    // source, and pointing this at `src/generated/assetManifest` was tried
-    // and correctly failed that scan). `iconKey` drops to a plain `string`
-    // for this tree only until task 4 gives it a real, pack-local `AssetKey`
-    // union to check against — the same trade `ContentApi.asset(key: string)`
-    // already makes at the boundary, for the same reason.
-    iconKeyType: 'string',
+    // Batch 4 task 4 moved the art and populated `packs/riot/generated/
+    // assetManifest.ts` for real, so `iconKeyType` is gone: `render()`
+    // defaults to `'AssetKey'` and imports it from `'./assetManifest'`,
+    // riot's own sibling file, not core's — a pack-local union, not a
+    // reach into core (`packBoundary.test.ts` would refuse the latter).
+    // Every `iconKey` this tree generates is now checked against it.
+    //
+    // `describe()` needs `instance.image` — a spell's own `api.asset('spell_x')`
+    // field initializer — to resolve rather than throw "Unknown asset key",
+    // and `AssetManager` cannot import a pack's manifest itself
+    // (`corePacksBoundary.test.ts`). `packId` and `assetManifestOutputPath`
+    // below are what let `renderSpellCatalogSource` register this tree's own
+    // manifest with `AssetManager` before any factory runs — the SSR-process
+    // equivalent of what `bundledPack.ts` does for the real game.
+    packId: 'riot',
+    assetManifestOutputPath: 'packs/riot/generated/assetManifest.ts',
   },
 };
 
@@ -183,6 +187,19 @@ export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
     const api = tree.isPackFactory
       ? (await server.ssrLoadModule('/src/content/ContentApi.ts')).buildContentApi()
       : null;
+    // Every spell's `image = api.asset('spell_x')` field initializer runs the
+    // moment `describe()` constructs it, so this tree's own art has to be
+    // registered with `AssetManager` first — the real game gets this from
+    // `bundledPack.ts`'s module-level `registerPackAssets` call, which this
+    // SSR process never imports (it loads only the spell barrel and
+    // `ContentApi.ts`, not the whole content-registry bridge).
+    if (tree.assetManifestOutputPath) {
+      const AssetManagerModule = await server.ssrLoadModule('/src/managers/AssetManager.ts');
+      const { assetManifest: packAssetManifest } = await server.ssrLoadModule(
+        `/${tree.assetManifestOutputPath}`
+      );
+      AssetManagerModule.default.registerPackAssets(tree.packId, packAssetManifest);
+    }
     const entries = Object.entries(AllSpells)
       .filter(([, value]) => typeof value === 'function')
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))

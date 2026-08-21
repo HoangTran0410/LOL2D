@@ -172,7 +172,7 @@ describe('Janna R', () => {
 
     expect(AllSpells.Janna_R).toBe(Janna_R);
     expect(group?.spells).toContain(Janna_R);
-    expect(group?.image).toBe('champ_janna');
+    expect(group?.image).toBe('riot:champ_janna');
   });
 
   it('keeps gameplay origin frozen while its channel telegraph follows Janna', () => {

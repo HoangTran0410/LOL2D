@@ -4,7 +4,7 @@
 // the roster without importing a spell class. See the generator for why, and
 // `src/game/config/spellCatalog.ts` for how match rules are reapplied on top.
 
-
+import type { AssetKey } from './assetManifest';
 
 export interface GeneratedSpellDisplay {
   readonly name: string;
@@ -18,7 +18,7 @@ export interface GeneratedSpellDisplay {
    * unless this tree has no manifest of its own yet, see the tree config's
    * own `iconKeyType` doc comment.
    */
-  readonly iconKey: string | null;
+  readonly iconKey: AssetKey | null;
   /** The spell's own tuning number, before match rules. */
   readonly coolDownMs: number;
   /** The spell's own tuning number, before match rules. */

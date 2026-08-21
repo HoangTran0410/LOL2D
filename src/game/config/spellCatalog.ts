@@ -1,4 +1,4 @@
-import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import AssetManager from '@/managers/AssetManager';
 // Relative, not `@/generated/spellCatalog`: batch 4 task 3 moved the 237
 // bundled spell ids `CHAMPION_KITS` names (`Flash`, `Yasuo_Q`, ...) into
 // `packs/riot/generated/spellCatalog.ts` — core's own generated union is now
@@ -318,7 +318,13 @@ export const ATTACK = {
  */
 export const CHAMPION_KITS: {
   name: string;
-  image: AssetKey | null;
+  // A plain string, not `AssetKey`: batch 4 task 4 moved every champion
+  // portrait's file out of core's `assets/` into `packs/riot/assets/`, so
+  // core's generated union no longer contains any of the `'champ_*'` keys
+  // below — `SelectableChampion.avatar` already made this same call for the
+  // registry-qualified read side; this is the raw catalogue's own copy of
+  // the same fact.
+  image: string | null;
   spells: SpellCatalogId[];
   /** The champion's basic-attack profile; see `ATTACK` above. */
   attack?: ChampionAttackTuning;

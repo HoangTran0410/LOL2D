@@ -166,11 +166,23 @@ export default defineConfig({
            * into the `game` chunk as a shared module, so the entry imported one
            * binding out of a megabyte and preloaded the lot before the menu
            * could draw.
+           *
+           * `generated/assetManifest` (no `src/` anchor) also catches
+           * `packs/riot/generated/assetManifest.ts` — batch 4 task 4 moved 377
+           * of the ~410 entries this comment describes out of core's own tree
+           * and into the pack's, and `bundledPack.ts` (forced into `pregame`
+           * by the `src/content/` rule below) imports that file directly to
+           * register it with `AssetManager`. Left unassigned, Rollup's
+           * single-importer default inlined the whole 377-entry manifest
+           * straight into `pregame` — the same "one new PNG re-downloads
+           * everything" problem this chunk exists to prevent, just moved to a
+           * bigger victim: it measured as a ~57KB, ceiling-breaching regression
+           * (`chunks:check`) the first time this file's own pack tree gained
+           * real art. A pack manifest changes exactly as often as core's does
+           * (an art update, never a code change), so it belongs in the same
+           * cache-stable chunk for the same reason.
            */
-          if (
-            id.includes('src/generated/assetManifest') ||
-            id.includes('src/managers/AssetManager')
-          ) {
+          if (id.includes('generated/assetManifest') || id.includes('src/managers/AssetManager')) {
             return 'asset-manifest';
           }
           /**

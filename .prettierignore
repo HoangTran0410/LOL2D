@@ -4,6 +4,11 @@
 # `npm run assets:generate`, never format it.
 src/generated/
 
+# A pack's own generated output — `packs/riot/generated/`, checked the same
+# byte-for-byte way by `assets:check:riot`/`catalog:check:riot`. Same reason,
+# one directory over: regenerate with `--tree=<id>`, never format it.
+packs/*/generated/
+
 # Copied out of node_modules by scripts/copy-vendor.mjs at predev/prebuild.
 public/vendor/
 dist/

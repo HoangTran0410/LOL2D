@@ -1,5 +1,6 @@
 import { checkMapGeometry, validatePack, validatePackCode, validatePackData } from './validate';
 import { isSpellLoader } from './ContentPack';
+import { assetManifest as coreAssetManifest } from '@/generated/assetManifest';
 import type {
   ChampionEntry,
   ContentPack,
@@ -225,20 +226,59 @@ export class PackRegistry {
 
   private writeData(data: ContentPackData): void {
     const packId = data.manifest.id;
+    // Present only for a pack that ships its own art tree (`assets:generate`
+    // run against its own `assets/` — `packs/riot/assets/` is the first);
+    // absent for one that names no art of its own, the reference pack's own
+    // `assets/images/reference/` files included — those still resolve
+    // directly against core's flat namespace, unqualified, exactly as before
+    // this field existed. See `PackManifest.assets`'s own doc comment for
+    // why a pack's asset base is qualified the same way `qualify()` already
+    // qualifies everything else here, and why doing it *conditionally* is
+    // what keeps a pack with no art tree from being rewritten into a broken
+    // reference.
+    const assetsBase = data.manifest.assets;
+    // Core-first, the same priority `AssetManager.resolveDescriptor` reads
+    // with: a key already known to core's own generated manifest is left
+    // bare rather than qualified. Without this, `bundledPack.ts`'s merged
+    // `{ ...spellCatalog, ...coreSpellCatalog }` (its `spellDisplay`, built
+    // from *two* sources — the riot pack's own generated catalogue and
+    // core's) would have this qualify `BasicAttack`'s `iconKey` into
+    // `'riot:spell_basic_attack'` even though that art never moved and
+    // `AssetManager.registerPackAssets('riot', …)` was never handed it —
+    // `coreSpells/BasicAttack.ts` still resolves it as `spell_basic_attack`,
+    // unqualified, directly off core's own manifest (see that file's
+    // permanent exclusion in `coreSpellsApiSurface.test.ts`).
+    const qualifyAsset = (key: string): string =>
+      assetsBase === undefined || key in coreAssetManifest ? key : qualify(assetsBase, key);
+
     for (const [localId, displayData] of Object.entries(data.spellDisplay ?? {})) {
-      this.display.set(qualify(packId, localId), displayData);
+      const qualifiedDisplay =
+        assetsBase === undefined || displayData.iconKey === null
+          ? displayData
+          : { ...displayData, iconKey: qualifyAsset(displayData.iconKey) };
+      this.display.set(qualify(packId, localId), qualifiedDisplay);
     }
     for (const entry of data.champions ?? []) {
       this.championList.push({
         ...entry,
         packId,
         id: qualify(packId, entry.id),
+        image: entry.image === null ? null : qualifyAsset(entry.image),
         spells: entry.spells.map(localId => qualify(packId, localId)),
         recall: entry.recall === undefined ? undefined : qualify(packId, entry.recall),
       });
     }
     for (const monster of Object.values(data.monsters ?? {})) {
-      this.monsterList.push({ ...monster, packId, id: qualify(packId, monster.id) });
+      const members =
+        assetsBase === undefined
+          ? monster.members
+          : monster.members.map(member => ({ ...member, avatar: qualifyAsset(member.avatar) }));
+      this.monsterList.push({
+        ...monster,
+        packId,
+        id: qualify(packId, monster.id),
+        members,
+      });
     }
     for (const map of data.maps ?? []) {
       // The split itself: `summary` is everything but `geometry`, and it is

@@ -102,17 +102,23 @@ describe('asset manifest generator', () => {
     });
 
     /**
-     * `packs/riot/assets/` is real — created by this task — and genuinely
-     * empty until batch 4 task 4 moves the art in. Generating against it is
-     * not a fixture standing in for a tree; it is what generating for that
-     * tree actually produces today: a valid, if trivial, manifest.
+     * `packs/riot/assets/` is real — batch 4 task 4 moved 377 champion
+     * portraits, spell icons and monster art files into it (378 minus
+     * `basic_attack.png`, which stays core's: `coreSpells/BasicAttack.ts`
+     * imports `AssetManager` directly and is typed against core's own
+     * `AssetKey` union, permanently — see `coreSpellsApiSurface.test.ts`).
+     * Generating against this tree now produces the real, populated
+     * manifest — still without ever reading core's own `assets/`.
      */
-    it('generates a real (empty) manifest for packs/riot/assets without reading core/assets at all', async () => {
+    it('generates the real manifest for packs/riot/assets, never reading core/assets', async () => {
       const source = await renderAssetManifestSource(root, { tree: PACK_ASSET_TREES.riot });
 
       expect(source).toContain('export const assetManifest = {');
-      expect(source).not.toMatch(/\?url';/);
-      expect(source).not.toContain('champ_janna');
+      expect(source).toContain('champ_janna');
+      expect(source).toContain('spell_janna_q');
+      // Core-only art (never moved) must not leak into the pack's own tree.
+      expect(source).not.toContain('buff_stun');
+      expect(source).not.toContain('spell_basic_attack');
     });
 
     it("leaves core's own manifest byte-identical to what is already checked in", async () => {

@@ -19,9 +19,25 @@
  */
 import { describe, expect, it, vi } from 'vitest';
 
+// `fromData` (below) reads `iconKey` off the registry, which qualifies it
+// (`riot:spell_ahri_e` — `PackRegistry.writeData`); `fromClass` reads it off
+// a spell built directly through `buildContentApi()`, whose `asset()` stays
+// the single shared, unqualified function every pack's factory receives
+// (`install.test.ts`'s "hands every pack code factory the same api object"
+// pins that identity, so `asset` cannot close over a packId). Both keys
+// resolve to the identical file through a real `AssetManager` — this test's
+// mock has to agree, or it fails on a cosmetic prefix a real resolver never
+// sees as a difference. Stripping any `<packId>:` before echoing is that
+// agreement, not a loophole: `AssetManager.resolveDescriptor`'s own
+// qualified-and-bare arms are which two forms this models.
+const localKey = (key: string): string => {
+  const separator = key.indexOf(':');
+  return separator > 0 ? key.slice(separator + 1) : key;
+};
+
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: {
-    get: vi.fn((key: string) => ({ key, url: `url:${key}` })),
+    get: vi.fn((key: string) => ({ key, url: `url:${localKey(key)}` })),
     getAsset: vi.fn(() => undefined),
     placeholder: vi.fn(() => ({ url: 'x' })),
   },
