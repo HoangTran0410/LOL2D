@@ -38,6 +38,22 @@
  * own, which is the "stray dev server holding 5173" condition CLAUDE.md names
  * as making the known flakes far likelier.
  *
+ * ## `guard()`, and why its own rule is scoped narrower than the rest
+ *
+ * `harness.mjs` now exports `guard(body)`, which runs a script's checks and
+ * guarantees `finish()` is called exactly once — including on a throw partway
+ * through, which the older `try { …checks… } finally { await finish(); }`
+ * shape silently turned into a reported success (see `guard`'s own doc
+ * comment in `harness.mjs`). A script that has adopted `guard()` must not
+ * also hand-roll that shape underneath it — that would either double-call
+ * `finish()` or mean the migration is only half done. This is *not* asserted
+ * against every importer the way the browser/server rules above are: most of
+ * this directory still predates `guard()`, and retrofitting all of it is a
+ * separate, larger change than the one that added the helper. The narrower
+ * rule applies only to scripts that call `guard(` at all — the same
+ * opt-in-by-importing shape the browser/server rules already use, one level
+ * further in.
+ *
  * ## What is deliberately not checked
  *
  * The *gesture*. `drive-minimap` taps with a 90ms hold and a 140ms settle,
@@ -86,11 +102,45 @@ const DECLARES_DEV_SERVER = /\bcreateServer\(/;
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[^\n]*?\/\/[^\n]*$/gm, '');
 
+/**
+ * A script that has adopted `guard(body)` — matched as a call, not merely as
+ * an import, so a script that destructures `guard` off `startHarness()` but
+ * never actually calls it (which would leave `finish()` never invoked at
+ * all) does not count as migrated.
+ */
+const USES_GUARD = /\bguard\(/;
+
+/**
+ * `finish()` called directly. `guard()` already calls it exactly once; a
+ * script that also calls it itself either double-calls it or has not
+ * actually finished migrating off the bare `try { …checks… } finally { await
+ * finish(); }` shape `guard()` exists to replace — see `harness.mjs`'s own
+ * doc comment on `guard` for the bug that shape hid: `process.exit()` inside
+ * that `finally` discards an in-flight exception, so a script that threw
+ * partway through its checks printed "all checks passed".
+ */
+const CALLS_FINISH_DIRECTLY = /\bfinish\(\)/;
+
+/** A bare `try` block — the wrapper `guard()` exists to make unnecessary. */
+const DECLARES_TRY = /\btry\s*\{/;
+
 const scripts = readdirSync(E2E_DIRECTORY).filter(name => name.endsWith('.mjs'));
 
 const read = (name: string) => stripComments(readFileSync(join(E2E_DIRECTORY, name), 'utf8'));
 
 const importers = scripts.filter(name => name !== HARNESS && IMPORTS_HARNESS.test(read(name)));
+
+/**
+ * The stricter half below applies only to scripts that have actually adopted
+ * `guard()` — not retroactively to every importer. Most of this directory
+ * still writes its own `try { …checks… } finally { await finish(); }`, the
+ * shape that predates `guard()` and that this rule would otherwise fail on
+ * sight; migrating all of them is a separate, much larger change than the one
+ * that added the helper. A script opts in by using `guard`, the same way an
+ * importer opts into the browser/server rules above by importing the harness
+ * at all.
+ */
+const guardUsers = importers.filter(name => USES_GUARD.test(read(name)));
 
 describe('tests/e2e scripts that share the harness take their whole boot from it', () => {
   it('ships the harness module', () => {
@@ -110,5 +160,17 @@ describe('tests/e2e scripts that share the harness take their whole boot from it
 
   it.each(importers)('%s does not start a second dev server', name => {
     expect(read(name)).not.toMatch(DECLARES_DEV_SERVER);
+  });
+
+  it('has guard() adopters to check, so its own rule cannot pass by finding nothing', () => {
+    expect(guardUsers.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it.each(guardUsers)('%s does not call finish() itself — guard() already does', name => {
+    expect(read(name)).not.toMatch(CALLS_FINISH_DIRECTLY);
+  });
+
+  it.each(guardUsers)('%s does not wrap its checks in a bare try — guard() replaces it', name => {
+    expect(read(name)).not.toMatch(DECLARES_TRY);
   });
 });

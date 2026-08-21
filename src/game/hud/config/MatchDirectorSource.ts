@@ -54,6 +54,8 @@ import type {
   RosterStack,
 } from './MatchConfigSource';
 import { ABILITY_LETTERS } from './rosterVisuals';
+import { contentCatalog } from '@/content/catalog';
+import type { QualifiedMapSummary } from '@/content/PackRegistry';
 
 /**
  * What this source needs from the HUD. `HudInteractions` satisfies it
@@ -64,6 +66,8 @@ export interface MatchDirectorHost {
   readonly director: MatchDirector;
   readonly camera: { zoomFactor: number; setZoomFactor(factor: number): void; snapToScale(): void };
   readonly touchUi: boolean;
+  /** The qualified id of the map this match is actually running on. See `MatchConfigSource.getMap`. */
+  readonly activeMapId: string;
   readonly renderQuality: RenderQuality;
   readonly renderFps: RenderFps;
   setRenderQuality(quality: RenderQuality): void;
@@ -300,6 +304,26 @@ export default class MatchDirectorSource implements MatchConfigSource {
   setWorld(world: Partial<WorldConfig>): void {
     if (world.jungle !== undefined) this.director.jungleEnabled = world.jungle;
     if (world.minions !== undefined) this.director.minionsEnabled = world.minions;
+  }
+
+  // --------------------------------------------------------------------- map
+
+  availableMaps(): QualifiedMapSummary[] {
+    return [...contentCatalog().maps()];
+  }
+
+  /**
+   * The live map, read straight off the host — never `this.director.mapChoice`,
+   * which is what the *next* match will boot onto and moves the moment
+   * `setMap` is called. See `MatchConfigSource.getMap`'s own doc comment.
+   */
+  getMap(): string {
+    return this.host.activeMapId;
+  }
+
+  /** Persists the choice for next time. Does not touch the running world — see `MatchConfigSource.setMap`. */
+  setMap(id: string): void {
+    this.director.setMapChoice(id);
   }
 
   // ------------------------------------------------------------------ cheats

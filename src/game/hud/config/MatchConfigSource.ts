@@ -49,6 +49,7 @@ import type { RenderFps } from '@/game/Game';
 import type { RenderQuality } from '@/game/managers/ObjectManager';
 import type { ScoreLine, StatGroup } from '@/game/hud/practice/participantStats';
 import type { SpellDisplay } from '@/game/config/spellCatalog';
+import type { QualifiedMapSummary } from '@/content/PackRegistry';
 
 /** One Q/W/E/R icon on a roster row. */
 export interface RosterAbility {
@@ -195,6 +196,34 @@ export interface MatchConfigSource {
 
   getWorld(): WorldConfig;
   setWorld(world: Partial<WorldConfig>): void;
+
+  // --------------------------------------------------------------------- map
+  /**
+   * Every map an installed pack offers, qualified —
+   * `contentCatalog().maps()` verbatim. Never empty: the bundled pack always
+   * installs at least Summoner's Rift.
+   */
+  availableMaps(): QualifiedMapSummary[];
+  /**
+   * The chosen map's qualified id (`<packId>:<localId>`).
+   *
+   * Outside a match this is a plain setting, round-tripped through
+   * `PregameConfig.mapId` — `setMap` writes it and this reads it straight
+   * back. **In a running match it is read-only**: a live match already has a
+   * terrain map, a nav grid and objects standing on that geometry, and
+   * nothing in this seam rebuilds any of it (see `MatchDirectorSource`'s own
+   * doc comment for the reasoning and the alternative it deliberately did not
+   * take). There, this always reports the map that is actually running,
+   * unmoved by `setMap` — a live world cannot be swapped from under it.
+   */
+  getMap(): string;
+  /**
+   * Writes the choice for the *next* match. Outside one, `getMap()` reads it
+   * straight back. In a running match it changes nothing about the running
+   * world — see `getMap`'s own doc comment — it only decides what boots the
+   * next time this match is left and a new one started.
+   */
+  setMap(id: string): void;
 
   // ------------------------------------------------------------------ cheats
   getCheats(): CheatConfig;

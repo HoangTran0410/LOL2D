@@ -6,6 +6,7 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_BOT_DIFFICULTY,
+  DEFAULT_MAP_ID,
   DEFAULT_PREGAME_CONFIG,
   SLOT_COUNT,
   loadPregameConfig,
@@ -265,6 +266,7 @@ describe('sanitizePregameConfig', () => {
         playerInvulnerable: true,
         botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 1),
       },
+      mapId: 'reference:proving-grounds',
     };
     expect(sanitizePregameConfig(custom)).toEqual(custom);
   });
@@ -377,6 +379,7 @@ describe('loadPregameConfig / savePregameConfig', () => {
         playerInvulnerable: false,
         botInvulnerable: Array.from({ length: AI_COUNT_MAX }, (_, index) => index === 3),
       },
+      mapId: 'reference:proving-grounds',
     };
     savePregameConfig(custom);
     expect(loadPregameConfig()).toEqual(custom);
@@ -697,6 +700,56 @@ describe('world', () => {
       world: { jungle: false, minions: true },
     });
     expect(loadPregameConfig().world).toEqual({ jungle: false, minions: true });
+  });
+});
+
+/**
+ * The chosen map, Task 10 of the content-pack extraction. Validated only as
+ * "is this a non-empty string" — see `mapId`'s own doc comment for why this
+ * module cannot check whether an id names an *installed* map.
+ */
+describe('mapId', () => {
+  it('defaults to the map every match played on before a second one shipped', () => {
+    expect(DEFAULT_PREGAME_CONFIG.mapId).toBe(DEFAULT_MAP_ID);
+  });
+
+  /**
+   * `DEFAULT_MAP_ID`'s own doc comment restates
+   * `qualify(BUNDLED_PACK_ID, summonersRift.id)` as a literal, because this
+   * module cannot import `PackRegistry` (pure data, no knowledge of the
+   * content-pack seam). Holding the two in step is the same discipline
+   * `BOT_DIFFICULTY_ORDER`'s own cross-check test uses for its second,
+   * independent copy of `game/ai/Difficulty.ts`'s tiers.
+   */
+  it('names the real bundled pack and the real Summoner’s Rift id', async () => {
+    const { qualify } = await import('../../../src/content/PackRegistry');
+    const { BUNDLED_PACK_ID } = await import('../../../src/content/bundledPack');
+    const { summonersRift } = await import('../../../src/content/maps/summonersRift');
+    expect(DEFAULT_MAP_ID).toBe(qualify(BUNDLED_PACK_ID, summonersRift.id));
+  });
+
+  it('keeps a valid qualified id unchanged', () => {
+    expect(sanitizePregameConfig({ mapId: 'reference:proving-grounds' }).mapId).toBe(
+      'reference:proving-grounds'
+    );
+  });
+
+  it('falls back to the default for anything that is not a non-empty string', () => {
+    expect(sanitizePregameConfig({ mapId: '' }).mapId).toBe(DEFAULT_MAP_ID);
+    expect(sanitizePregameConfig({ mapId: 42 }).mapId).toBe(DEFAULT_MAP_ID);
+    expect(sanitizePregameConfig({ mapId: null }).mapId).toBe(DEFAULT_MAP_ID);
+    expect(sanitizePregameConfig({}).mapId).toBe(DEFAULT_MAP_ID);
+  });
+
+  it('gives a config saved before this field existed the map it always meant', () => {
+    // The exact migration shape: an old blob has no `mapId` key at all.
+    expect(sanitizePregameConfig({ ai: { count: 2 } }).mapId).toBe(DEFAULT_MAP_ID);
+  });
+
+  it('round-trips a chosen map through storage', () => {
+    vi.stubGlobal('localStorage', new MemoryStorage());
+    savePregameConfig({ ...DEFAULT_PREGAME_CONFIG, mapId: 'reference:proving-grounds' });
+    expect(loadPregameConfig().mapId).toBe('reference:proving-grounds');
   });
 });
 

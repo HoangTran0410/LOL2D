@@ -138,8 +138,8 @@ export const startHarness = async ({
   /**
    * The tail every driver shared: dump the report, show the first page errors,
    * say where the frames went, then close both and exit non-zero if anything
-   * failed. Call it from a `finally` so a throw still tears the server down —
-   * a leaked Vite on 5173 is what makes the known flakes far likelier.
+   * failed. Prefer `guard()` below over calling this directly from a script's
+   * own `try`/`finally` — see its doc comment for why.
    */
   const finish = async () => {
     console.log('\n--- report ---');
@@ -160,6 +160,34 @@ export const startHarness = async ({
     process.exit(failures.length ? 1 : 0);
   };
 
+  /**
+   * Runs the whole check body and guarantees `finish()` is called exactly
+   * once, on every path: a clean run, a run with a failed `check()`, and a
+   * run that throws partway through.
+   *
+   * The natural shape without this was `try { ...checks... } finally { await
+   * finish(); }`, and it hid exactly the failure it looks like it handles. A
+   * throw partway through the checks falls into that `finally`, which calls
+   * `finish()` with whatever `failures` had accumulated *before* the throw —
+   * often none — prints "all checks passed", and calls `process.exit(0)`.
+   * `process.exit()` inside a `finally` terminates the process immediately;
+   * it does not let the in-flight exception keep propagating to a place that
+   * could report it. A script that crashed on check 5 of 10 reported success
+   * and ran only half its checks. `guard` records the throw as a failure of
+   * its own, in `failures`, before calling `finish()` — so a mid-run crash is
+   * exactly as loud as a failed `check()`, never quieter.
+   */
+  const guard = async body => {
+    try {
+      await body();
+    } catch (error) {
+      failures.push(`uncaught: ${error?.stack ?? error?.message ?? String(error)}`);
+      console.error(error);
+    } finally {
+      await finish();
+    }
+  };
+
   return {
     url,
     server,
@@ -177,5 +205,6 @@ export const startHarness = async ({
     tap,
     openPage,
     finish,
+    guard,
   };
 };

@@ -78,6 +78,37 @@ describe('MatchDirector persistence', () => {
     expect(storedRaw()).toBeNull();
   });
 
+  /**
+   * Task 10's own edge: a chosen map is a *next-match* setting, never a live
+   * mutation — nothing here rebuilds terrain, a nav grid or a spawned camp.
+   * `mapChoice` is what proves the choice actually lives on the director
+   * (`toPregameConfig()` reads `this._mapChoice`, not anything derived from a
+   * `Game`, which this bench has none of anyway) rather than being lost the
+   * moment some other setter's `persist()` runs.
+   */
+  describe('map choice', () => {
+    it('persists the chosen map, qualified, and nothing else moves', () => {
+      const { director } = bench();
+      director.setMapChoice('reference:proving-grounds');
+
+      expect(director.mapChoice).toBe('reference:proving-grounds');
+      expect(loadPregameConfig().mapId).toBe('reference:proving-grounds');
+    });
+
+    it('carries a seeded choice through a later, unrelated write', () => {
+      const { director } = bench();
+      director.seedMapChoice('reference:proving-grounds');
+
+      // Some other control writes storage; the seeded (never explicitly
+      // "set") map choice must ride along rather than reverting to the
+      // module default `toPregameConfig()` would fall back to if
+      // `_mapChoice` had never been told what the match actually booted on.
+      director.setRules({ cooldownReductionPercent: 20, manaFree: false });
+
+      expect(loadPregameConfig().mapId).toBe('reference:proving-grounds');
+    });
+  });
+
   // The round trip the spec asks for, minus its second half: booting a real
   // `Game` from the result needs a canvas, an asset manager and p5's globals,
   // so that half lives in `tests/e2e/drive-practice-panel.mjs`, which reloads
@@ -282,7 +313,7 @@ describe('MatchDirector persistence', () => {
       expect(loadPregameConfig().cheats.playerInvulnerable).toBe(false);
     });
 
-    it('writes the five sections and no more', () => {
+    it('writes the six sections and no more', () => {
       const { director, ctx } = bench();
       director.setInvulnerable(ctx.player, true);
       director.setRules({ cooldownReductionPercent: 10, manaFree: false });
@@ -291,6 +322,7 @@ describe('MatchDirector persistence', () => {
       expect(Object.keys(raw).sort()).toEqual([
         'ai',
         'cheats',
+        'mapId',
         'player',
         'playerTeam',
         'rules',

@@ -74,6 +74,35 @@ const onMinionsChange = (event: Event): void =>
   setWorld({ minions: (event.target as HTMLInputElement).checked });
 
 /**
+ * The map picker (Task 10 of the content-pack extraction).
+ *
+ * Outside a match this is a plain setting — `setMap` writes it, `getMap()`
+ * reads it straight back — so re-reading the source after every write would
+ * work fine here, the same idiom `setCdr` above uses. It would not work in a
+ * match: `MatchConfigSource.getMap`'s own doc comment is explicit that a
+ * running match reports its own map, unmoved, no matter what is picked,
+ * because nothing in this seam rebuilds a live terrain map or nav grid.
+ * Re-reading `getMap()` there would make the `<select>` visibly snap back to
+ * the running map the instant a different one was chosen — indistinguishable
+ * from the control being broken. `selectedMapId` tracks the *pick* instead,
+ * which is honest in both places: outside a match the pick and the setting
+ * are the same fact, and in one, the note below says what the select cannot.
+ */
+const maps = source.availableMaps();
+const selectedMapId = ref(source.getMap());
+
+const onMapChange = (event: Event): void => {
+  const id = (event.target as HTMLSelectElement).value;
+  source.setMap(id);
+  selectedMapId.value = id;
+};
+
+/** The running match's own map, by name — for the note below, in a match only. */
+const liveMapName = computed(
+  () => maps.find(map => map.id === source.getMap())?.name ?? source.getMap()
+);
+
+/**
  * ## The way out of the match
  *
  * Escape used to end it outright, with no confirmation and no way back. Escape
@@ -162,6 +191,25 @@ const resetLabel = computed(() =>
       <input type="checkbox" id="practice-urf" :checked="rules.manaFree" @change="onUrfChange" />
       <span>URF (không tốn mana)</span>
     </label>
+
+    <!-- `GameScene` cancels only canvas touches (see `SettingsTab.vue`'s file
+         comment), so a native `<select>` needs no touch handler of its own —
+         `@change` already fires under a thumb the same way it does under a
+         mouse. -->
+    <label class="pregame-field">
+      <span>Bản đồ</span>
+      <select id="practice-map" :value="selectedMapId" @change="onMapChange">
+        <option v-for="map of maps" :key="map.id" :value="map.id">{{ map.name }}</option>
+      </select>
+    </label>
+
+    <!-- Only in a match, and only for the map: a live match cannot swap its
+         own world out from under itself — see `MatchConfigSource.getMap`. -->
+    <p v-if="live" class="practice-note">
+      Bản đồ mới sẽ áp dụng cho trận tiếp theo — trận đang chạy vẫn trên
+      <strong>{{ liveMapName }}</strong
+      >.
+    </p>
 
     <label class="pregame-toggle">
       <input

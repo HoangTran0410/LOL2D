@@ -60,7 +60,10 @@
  * team tab let them switch. `world`
  * is the same story with a simpler answer: a config saved before it existed
  * meant a match with a full jungle and lane minions, because that is the only
- * match the game could boot.
+ * match the game could boot. `mapId` (Task 10 of the content-pack extraction)
+ * follows the same shape again: a blob with none gets `DEFAULT_MAP_ID`, the
+ * one map that existed before a second one shipped and a choice became
+ * possible.
  */
 import { initialBotTeam, isMatchTeamId, MatchTeam, type MatchTeamId } from './MatchTeams';
 import type { BotDifficulty } from '../ai/Difficulty';
@@ -256,12 +259,43 @@ export interface PregameConfig {
   rules: MatchRulesConfig;
   world: WorldConfig;
   cheats: CheatConfig;
+  /**
+   * The qualified id (`<packId>:<localId>`, `PackRegistry.qualify`) of the
+   * map the next match boots onto. Task 10 of the content-pack extraction:
+   * `MapDefinition` existed since batch 1 with nothing that ever read
+   * anything but the first installed one.
+   *
+   * Validated here only as "is this a non-empty string" — the same shallow
+   * check every other id-shaped field in this module gets
+   * (`championName`, `summonerD`, …). Whether it still names an *installed*
+   * map is a question this module cannot answer: it knows nothing of
+   * `PackRegistry`, on purpose (see the file header — pure data, no
+   * knowledge of the content-pack seam, safe to import from `MenuScene`).
+   * `GameScene.startGame()` is what resolves it against `contentCatalog()`
+   * and falls back to the first available map if the id names nothing
+   * installed, so a config naming an uninstalled or removed map still boots
+   * instead of bricking the menu.
+   */
+  mapId: string;
 }
 
 export const AI_COUNT_MIN = 0;
 export const AI_COUNT_MAX = 10;
 export const CDR_PERCENT_MIN = 0;
 export const CDR_PERCENT_MAX = 90;
+
+/**
+ * `PackRegistry.qualify('riot', 'summoners-rift')` — the map every match
+ * played on before this was configurable, restated as a literal because this
+ * module cannot import `PackRegistry` (see `mapId`'s own doc comment: pure
+ * data, no knowledge of the content-pack seam). A second, independent copy
+ * of the same fact `game/ai/Difficulty.ts`'s `BOT_DIFFICULTIES` is to
+ * `BOT_DIFFICULTY_ORDER` a few lines down — held in step by
+ * `tests/game/config/PregameConfig.test.ts`, which imports both sides and
+ * fails if the bundled pack's id or Summoner's Rift's own local id ever
+ * changes without this literal moving with them.
+ */
+export const DEFAULT_MAP_ID = 'riot:summoners-rift';
 
 /** The value every bot slot starts at, and what a freed slot is refilled with
  *  when a bot is removed from the middle of the list — see `removeBotAt` in
@@ -366,6 +400,7 @@ export const DEFAULT_PREGAME_CONFIG: Readonly<PregameConfig> = Object.freeze({
     playerInvulnerable: false,
     botInvulnerable: Object.freeze(Array.from({ length: AI_COUNT_MAX }, () => false)),
   }),
+  mapId: DEFAULT_MAP_ID,
 });
 
 /** The layer names, in the order the settings tab lists them. */
@@ -551,6 +586,12 @@ export const sanitizePregameConfig = (raw: unknown): PregameConfig => {
       minions: asBoolean(world.minions, DEFAULT_PREGAME_CONFIG.world.minions),
     },
     cheats: sanitizeCheatConfig(source.cheats),
+    // Non-empty string only — see `mapId`'s own doc comment for why "is this
+    // an installed map" is a question `GameScene.startGame()` answers, never
+    // this function. A blob saved before this field existed (or naming a map
+    // that has since been removed) falls back to the map every match played
+    // on before the choice existed.
+    mapId: asNonEmptyString(source.mapId, DEFAULT_MAP_ID),
   };
 };
 

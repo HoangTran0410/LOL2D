@@ -227,7 +227,8 @@ export default class GameScene extends Scene {
   async startGame() {
     this._exited = false;
 
-    const plan = planMatchKits(loadPregameConfig());
+    const config = loadPregameConfig();
+    const plan = planMatchKits(config);
     const kitIds = plannedSpellIds(plan);
     const artKeys = matchArtKeys(plan);
 
@@ -237,8 +238,14 @@ export default class GameScene extends Scene {
       this._kitsLoaded += 1;
     };
 
-    // The only map today; a config-driven pick is Task 10's.
-    const mapSummary = contentCatalog().maps()[0];
+    // Task 10: the config's own choice, by its qualified id
+    // (`PregameConfig.mapId` — see that field's own doc comment for why it is
+    // validated only as "a non-empty string" on the way in). A missing or
+    // stale id — a map an uninstalled pack used to provide — falls back to
+    // whatever installs first rather than throwing: a config that named a map
+    // that no longer exists must not brick the menu.
+    const maps = contentCatalog().maps();
+    const mapSummary = maps.find(map => map.id === config.mapId) ?? maps[0];
     if (!mapSummary) throw new Error('GameScene.startGame: no map installed');
 
     const [, geometry] = await Promise.all([

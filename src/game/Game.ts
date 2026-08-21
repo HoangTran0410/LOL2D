@@ -118,6 +118,18 @@ export default class Game {
    */
   readonly mapSize: number;
   /**
+   * The active map's own qualified id — `map.id`, set in the constructor.
+   * The one fact `MatchDirectorSource.getMap()` reads about a running
+   * match's world: a live match cannot swap its terrain, nav grid or
+   * standing objects out from under itself, so the panel reports this,
+   * unmoved, rather than whatever the player has since picked for next time
+   * (`MatchDirector`'s own `_mapChoice`). Read through `HudInteractions`
+   * (`hudInteractions.ts`), not through `MatchDirector` — the same seam
+   * `renderQuality`/`renderFps` already use for a fact about the match that
+   * is not one of its mutable settings.
+   */
+  readonly activeMapId: string;
+  /**
    * The active map's own `slots.minion`, teamId-bridged — where each team's
    * wave forms up, per lane. Set in the constructor, read by `MinionSpawner`
    * (`MinionSpawnerContext.minionMuster`) once per spawn rather than derived
@@ -249,6 +261,7 @@ export default class Game {
    */
   constructor(map: ActiveMap, plan?: MatchPlan) {
     this.mapSize = map.size;
+    this.activeMapId = map.id;
     this.minionMuster = minionMusterSlotsFrom(map.slots.minion);
     this.neutralSlots = map.slots.neutral;
     // Before anything queues a wave or builds a blackboard: `MinionSpawner`,
@@ -411,6 +424,14 @@ export default class Game {
     // `MatchDirector.bots()` counts `_objectToBeAdd`, so it does not need the
     // first `ObjectManager.update()` to have run.
     this.director.seedCheats(pregameConfig.cheats);
+    // What the *next* match boots onto if the player never touches the
+    // picker — see `MatchDirector.seedMapChoice`'s own doc comment for why
+    // this is not just `this.activeMapId`: the config's own `mapId` may have
+    // named a map nothing installs any more, in which case `GameScene`
+    // already fell back to a different one for *this* match, and the panel
+    // must not quietly overwrite the player's stored choice with that
+    // fallback the moment any other setting changes.
+    this.director.seedMapChoice(pregameConfig.mapId);
 
     this.camera.target = this.player.position;
     this.camera.position = this.player.position.copy();

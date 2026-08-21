@@ -72,6 +72,7 @@ import {
   CDR_PERCENT_MAX,
   CDR_PERCENT_MIN,
   DEFAULT_CHAMPION_LOADOUT,
+  DEFAULT_MAP_ID,
   DEFAULT_PREGAME_CONFIG,
   globalBotBehaviour,
   loadPregameConfig,
@@ -178,6 +179,24 @@ export default class MatchDirector {
    * open showing 0% over a match running at 40%.
    */
   private _rules: MatchRulesConfig = { cooldownReductionPercent: CDR_PERCENT_MIN, manaFree: false };
+
+  /**
+   * What the *next* match boots onto, the qualified id the panel's map picker
+   * edits. Not the same question as "which map is this match running on" —
+   * that is `this.game.activeMapId`, fixed for the whole match, read directly
+   * by `MatchDirectorSource` (see `Game.activeMapId`'s own doc comment) — and
+   * the two are expected to differ the moment the player picks a different
+   * one: a live match cannot swap its own terrain, nav grid or standing
+   * objects out from under itself (see this class's file header, "Nothing
+   * here takes effect immediately"), so the choice can only ever describe
+   * *next* time.
+   *
+   * Starts at `DEFAULT_MAP_ID` and `Game`'s constructor seeds it from the
+   * booting config's own `mapId` right after construction, the same two-step
+   * every other seeded field here takes (`_rules`, `_jungleEnabled` via
+   * `seedWorld`).
+   */
+  private _mapChoice: string = DEFAULT_MAP_ID;
 
   /**
    * Which `ChampionLoadout` each unit is currently carrying.
@@ -386,6 +405,12 @@ export default class MatchDirector {
       rules: this.getRules(),
       world: { jungle: this.jungleEnabled, minions: this.minionsEnabled },
       cheats: this.getCheats(stored),
+      // `this._mapChoice`, not `this.game.activeMapId` — the same split
+      // `rules` above takes with `_rules` versus `game.matchRules`. There is
+      // no live fact "which map do you want next time"; only "which map is
+      // this one running on", which is a different question. See
+      // `_mapChoice`'s own doc comment.
+      mapId: this._mapChoice,
     };
   }
 
@@ -823,6 +848,43 @@ export default class MatchDirector {
   }
 
   /**
+   * What the *next* match boots onto, read-only. Never the same question as
+   * "which map is this match running on" — see `_mapChoice`'s own doc
+   * comment. `MatchDirectorSource` does not read this at all: the panel's
+   * `getMap()` reads `Game.activeMapId` (via `HudInteractions`) instead,
+   * precisely so it keeps reporting the running match's own world regardless
+   * of what this getter answers.
+   */
+  get mapChoice(): string {
+    return this._mapChoice;
+  }
+
+  /**
+   * The map the config the match booted with named — again without writing,
+   * `seedRules`/`seedWorld`'s own pattern. `Game`'s constructor calls this
+   * once, after everything else is seeded, with the same `pregameConfig`
+   * every other seed reads.
+   */
+  seedMapChoice(id: string): void {
+    this._mapChoice = id;
+  }
+
+  /**
+   * Writes the choice for the next match. **Does not touch the running
+   * world** — no terrain rebuild, no nav grid, no respawn — a live match
+   * cannot be moved onto a different map from under itself (see this class's
+   * own file header). The player sees the pick reflected in the panel; the
+   * match they are standing in keeps playing on the map it started on, and
+   * the new choice takes effect the next time this match is left and a fresh
+   * one started.
+   */
+  setMapChoice(id: string): void {
+    this.invalidatePendingReset();
+    this._mapChoice = id;
+    this.persist();
+  }
+
+  /**
    * The clean slate back.
    *
    * Persisting everything took away the fresh match every restart used to be,
@@ -892,6 +954,14 @@ export default class MatchDirector {
     // it reaches are the ones just added, the old ones being `toRemove` and off
     // the roster already.
     this.seedCheats(config.cheats);
+
+    // The choice for the *next* match, put back to the default too — a
+    // stale `_mapChoice` left over from before the reset would otherwise
+    // overwrite `config.mapId` in storage the moment any later setter calls
+    // `persist()` (`toPregameConfig()` reads it, not `stored.mapId`). Never
+    // the running match's own map, which this reset does not and cannot
+    // touch — see `setMapChoice`'s own doc comment.
+    this.seedMapChoice(config.mapId);
 
     // The exact defaults, including inactive bot slots and global AI flags.
     savePregameConfig(config);

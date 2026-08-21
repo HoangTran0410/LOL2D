@@ -7,6 +7,7 @@ import PregameConfigSource from '../../../src/game/hud/config/PregameConfigSourc
 import type { MatchConfigSource } from '../../../src/game/hud/config/MatchConfigSource';
 import {
   AI_COUNT_MAX,
+  DEFAULT_MAP_ID,
   DEFAULT_PREGAME_CONFIG,
   loadPregameConfig,
   savePregameConfig,
@@ -83,6 +84,11 @@ const fakeHost = (director: MatchDirector): MatchDirectorHost => {
       snapToScale() {},
     },
     touchUi: false,
+    // Fixed, on purpose — this is the bench's stand-in for "the map this
+    // match actually booted onto", which a real `Game` never changes for the
+    // life of the match. `setMap` must never move it; that is exactly what
+    // the 'map' suite below asserts.
+    activeMapId: DEFAULT_MAP_ID,
     get renderQuality() {
       return quality;
     },
@@ -329,6 +335,58 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
     });
   });
 
+  /**
+   * Task 10 of the content-pack extraction. `getMap`/`setMap` genuinely
+   * differ by source — see `MatchConfigSource.getMap`'s own doc comment —
+   * and that difference is asserted here rather than skipped, the same way
+   * `roster()[].title` is: `PregameConfigSource` reports back whatever was
+   * last chosen, because outside a match a choice and a setting are the same
+   * fact; `MatchDirectorSource` keeps reporting the map the match actually
+   * booted onto no matter what is picked, because nothing in this seam
+   * rebuilds a live terrain map or nav grid — the only way to actually play
+   * a different one is to leave this match and start a new one.
+   */
+  describe('map', () => {
+    it('lists more than one installed map, by qualified id', () => {
+      const maps = source.availableMaps();
+      const ids = maps.map(map => map.id);
+      expect(ids.length).toBeGreaterThanOrEqual(2);
+      expect(ids).toContain('riot:summoners-rift');
+      expect(ids).toContain('reference:proving-grounds');
+    });
+
+    it('reads a qualified id', () => {
+      expect(source.getMap()).toBe(DEFAULT_MAP_ID);
+    });
+
+    it('persists a different choice through storage, as the qualified id', () => {
+      const other = source.availableMaps().find(map => map.id !== source.getMap())!;
+      source.setMap(other.id);
+      expect(loadPregameConfig().mapId).toBe(other.id);
+    });
+
+    it(
+      isPregame
+        ? 'reports the newly chosen map immediately — there is no running world to disagree with it'
+        : 'keeps reporting the running match’s own map — a live world cannot be swapped from under it',
+      () => {
+        const before = source.getMap();
+        const other = source.availableMaps().find(map => map.id !== before)!;
+
+        source.setMap(other.id);
+
+        if (isPregame) {
+          expect(source.getMap()).toBe(other.id);
+        } else {
+          expect(source.getMap()).toBe(before);
+          // The choice still lands in storage — it is what the *next* match
+          // boots onto — even though this running one does not move.
+          expect(loadPregameConfig().mapId).toBe(other.id);
+        }
+      }
+    );
+  });
+
   describe('cheats', () => {
     it('makes one participant invulnerable, on the row and in storage', () => {
       const id = source.roster()[1].id;
@@ -406,6 +464,16 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
       expect(source.roster()[0].invulnerable).toBe(false);
       expect(loadPregameConfig().rules).toEqual(DEFAULT_PREGAME_CONFIG.rules);
       expect(loadPregameConfig().cheats.playerInvulnerable).toBe(false);
+    });
+
+    it('puts the stored map choice back to the default too', async () => {
+      const other = source.availableMaps().find(map => map.id !== DEFAULT_MAP_ID)!;
+      source.setMap(other.id);
+      expect(loadPregameConfig().mapId).toBe(other.id);
+
+      await source.resetToDefaults();
+
+      expect(loadPregameConfig().mapId).toBe(DEFAULT_MAP_ID);
     });
   });
 });

@@ -94,6 +94,14 @@ export interface HudInteractions {
   spellInfo: { top: string; bottom: string; left: string; width: string };
   /** Mirrors game.touchControls.enabled; both views read it, neither owns it. */
   touchUi: boolean;
+  /**
+   * The qualified id of the map this match is actually running on —
+   * `game.activeMapId`, fixed for the whole match. `MatchDirectorSource.getMap()`
+   * reads this directly, the same way it reads `renderQuality`/`renderFps`
+   * off this object rather than through `director`: a fact about the match,
+   * not one of its mutable settings.
+   */
+  readonly activeMapId: string;
   readonly renderQuality: RenderQuality;
   readonly renderFps: RenderFps;
   setRenderQuality(quality: RenderQuality): void;
@@ -206,6 +214,9 @@ export function createHudInteractions(game: Game): HudInteractions {
     spellHover: null as any,
     spellInfo: { top: 'auto', bottom: '0px', left: '0px', width: '300px' },
     touchUi: false,
+    get activeMapId(): string {
+      return game.activeMapId;
+    },
     get renderQuality(): RenderQuality {
       return game.renderQuality;
     },

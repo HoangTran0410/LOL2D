@@ -52,6 +52,8 @@ import type { RenderQuality } from '@/game/managers/ObjectManager';
 import { isSpellCatalogId, spellDisplayOf, type SpellDisplay } from '@/game/config/spellCatalog';
 import type { ConfigRosterEntry, MatchConfigSource, MatchLiveControls } from './MatchConfigSource';
 import { visualOfLoadout, type LoadoutVisual } from './rosterVisuals';
+import { contentCatalog } from '@/content/catalog';
+import type { QualifiedMapSummary } from '@/content/PackRegistry';
 
 const PLAYER_ID = 'player';
 const BOT_PREFIX = 'bot-';
@@ -292,6 +294,21 @@ export default class PregameConfigSource implements MatchConfigSource {
 
   setWorld(world: Partial<WorldConfig>): void {
     this.config = { ...this.config, world: { ...this.config.world, ...world } };
+    this.persist();
+  }
+
+  // --------------------------------------------------------------------- map
+
+  availableMaps(): QualifiedMapSummary[] {
+    return [...contentCatalog().maps()];
+  }
+
+  getMap(): string {
+    return this.config.mapId;
+  }
+
+  setMap(id: string): void {
+    this.config = { ...this.config, mapId: id };
     this.persist();
   }
 
