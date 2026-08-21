@@ -109,6 +109,16 @@ export class PackRegistry {
    * rather than silently accepting one — an orphan code half is a pack that
    * half-exists, the exact failure mode `install()`'s validate-then-write
    * ordering was built to avoid, just reached from the other direction.
+   *
+   * Validates in two passes before writing anything, same discipline as
+   * `install()`: `validatePackCode` checks the code half's own shape (every
+   * entry is a class or a loader), and `verifyPairing` checks it against the
+   * data half `installData` already wrote (every champion ability/recall and
+   * every spell-display entry actually names a spell this code half
+   * supplies) — the cross-check `validatePack()` runs in one step for
+   * `install()`, split across two calls here because it genuinely needs both
+   * halves and neither `validatePackData` nor `validatePackCode` alone ever
+   * sees them together.
    */
   installCode(packId: string, code: ContentPackCode): void {
     if (!this.installedIds.has(packId)) {
@@ -118,7 +128,67 @@ export class PackRegistry {
     if (result.ok === false) {
       throw new Error(`content pack rejected:\n  ${result.errors.join('\n  ')}`);
     }
+    this.verifyPairing(packId, code);
     this.writeCode(packId, code);
+    this.completePackEntry(packId, code);
+  }
+
+  /**
+   * Every champion ability/recall and every spell-display entry already
+   * installed for `packId` actually names a spell `code` supplies. Not
+   * reachable through either bundled pack today — `bundledPack.ts` and
+   * `packs/reference/pack.ts` are each one file, so their own data and code
+   * halves can never disagree — but batch 4 splits the Riot pack across
+   * files, which is exactly when a data half naming a spell its code half
+   * forgot becomes possible. Without this, `installCode` would return
+   * successfully and the gap would only surface later, as an empty ability
+   * slot in a match. Runs before `writeCode`, so a failure here leaves the
+   * code half unwritten — the same validate-then-write discipline
+   * `installCode`'s own doc comment describes.
+   */
+  private verifyPairing(packId: string, code: ContentPackCode): void {
+    const qualifiedIds = new Set(
+      Object.keys(code.spells ?? {}).map(localId => qualify(packId, localId))
+    );
+    const errors: string[] = [];
+    for (const champion of this.championList) {
+      if (champion.packId !== packId) continue;
+      for (const spellId of champion.spells) {
+        if (!qualifiedIds.has(spellId)) {
+          errors.push(`champions.${champion.id}: spell ${spellId} is not in this pack`);
+        }
+      }
+      if (champion.recall !== undefined && !qualifiedIds.has(champion.recall)) {
+        errors.push(`champions.${champion.id}: recall ${champion.recall} is not in this pack`);
+      }
+    }
+    for (const qualifiedId of this.display.keys()) {
+      if (!qualifiedId.startsWith(`${packId}:`)) continue;
+      if (!qualifiedIds.has(qualifiedId)) {
+        errors.push(`spellDisplay.${qualifiedId}: no spell named ${qualifiedId} in this pack`);
+      }
+    }
+    if (errors.length > 0) {
+      throw new Error(`content pack rejected:\n  ${errors.join('\n  ')}`);
+    }
+  }
+
+  /**
+   * Merges the code half into the `packs` entry `installData` already wrote
+   * for `packId`, so `packs` keeps meaning "every installed pack, whole" on
+   * the two-step path too. Without this, an `installData` then `installCode`
+   * pair left a permanent `spells: undefined` entry sitting next to a fully
+   * installed pack — inert only because nothing reads `packs` outside
+   * `reset()` today, which is exactly why it would be silently wrong the
+   * first time something does.
+   */
+  private completePackEntry(packId: string, code: ContentPackCode): void {
+    for (const pack of this.packs) {
+      if (pack.manifest.id === packId) {
+        pack.spells = code.spells;
+        return;
+      }
+    }
   }
 
   private writeData(data: ContentPackData): void {

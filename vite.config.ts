@@ -268,6 +268,29 @@ export default defineConfig({
            * batch 2 — there is no longer a `pregame -> game` edge to close
            * the cycle: `vite build` no longer prints `Circular chunk:
            * pregame -> game -> pregame`.
+           *
+           * **Whoever writes batch 4's chunk rule: `pregame` now carries real
+           * spell-behaviour code, not just data.** `packs/reference/` is
+           * pinned here as a whole file per module, and a pack's own file —
+           * `packs/reference/spells/Vera_Q.ts` and its three siblings — mixes
+           * the tuning constants `data.spellDisplay` needs with the
+           * `onHit`/`draw`/damage logic only `code` ever calls; Vite cannot
+           * split one file's exports across two chunks, so the whole thing
+           * rides along. Measured at ~3.9KB for the reference pack's four
+           * spells — harmless, and the reason `scripts/check-chunks.mjs`'s
+           * engine-leak check now requires the `Name:` object-literal-key
+           * shape rather than a bare substring match (a `class extends
+           * api.MissileSpellObject` property access in exactly this file
+           * tripped the old, looser check). **It would not be harmless at
+           * 240** — the Riot pack batch 4 moves into `packs/riot/`. Pinning
+           * that whole directory here the same way would put every spell's
+           * real implementation into the chunk the menu downloads first,
+           * which is precisely the regression this task closed, reopened
+           * from a different file. Batch 4's pack will need its `data` and
+           * `code` kept in genuinely separate files (or its own manualChunks
+           * rule that pins spell implementation files to `game` regardless
+           * of which pack directory they live under) — do not pin it here by
+           * analogy with `packs/reference/`.
            */
           if (id.includes('/src/content/ContentApi') || id.includes('/src/content/registry')) {
             return 'game';

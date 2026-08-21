@@ -112,7 +112,7 @@ const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'Mi
 // Bytes, uncompressed. Batch 3 moved the whole content-pack *data* path here
 // on purpose — `PackRegistry`, `validate.ts`, `install.ts`, `catalog.ts`,
 // `ContentPack.ts`, `bundledPack.ts` and all of `packs/reference/` — which
-// measured 207,142 bytes against a pre-batch-3 baseline of 163,386 (`game`
+// measured 207,858 bytes against a pre-batch-3 baseline of 163,386 (`game`
 // shrank by roughly the same amount, confirming this is code moving chunks,
 // not duplicating). The ceiling leaves headroom to grow as data (more
 // champions, more display fields, more reference-pack spells) without

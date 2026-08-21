@@ -285,4 +285,86 @@ describe('PackRegistry', () => {
     expect(registry2.spellDisplay('p:A')?.name).toBe('Chiêu A');
     expect(registry2.spellDisplay('p:missing')).toBeNull();
   });
+
+  describe('the two-step install', () => {
+    it('installData then installCode ends up equivalent to a one-step install()', () => {
+      registry.installData({
+        manifest: { id: 'two-step', version: '1.0.0', coreRange: '^1' },
+        champions: [{ id: 'alpha', name: 'Alpha', image: null, playable: false, spells: ['Q'] }],
+      } as never);
+      // `champions()` is already populated — the whole point of the split —
+      // before any code exists to back it.
+      expect(registry.champions().map(c => c.id)).toEqual(['two-step:alpha']);
+      expect(registry.spellClass('two-step:Q')).toBeNull();
+
+      registry.installCode('two-step', { spells: { Q: class {} } } as never);
+      expect(registry.spellClass('two-step:Q')).toBeTypeOf('function');
+    });
+
+    it('installCode refuses a code half that leaves a champion’s ability unpaired', () => {
+      // The cross-check `validatePack()` runs in one step for `install()` —
+      // split across `installData`/`installCode` here because it needs both
+      // halves. Not reachable through either bundled pack today (each is one
+      // file), but this is exactly the gap batch 4 opens by splitting the
+      // Riot pack across files: a data half naming a spell its code half
+      // forgot.
+      registry.installData({
+        manifest: { id: 'orphan', version: '1.0.0', coreRange: '^1' },
+        champions: [
+          {
+            id: 'alpha',
+            name: 'Alpha',
+            image: null,
+            playable: false,
+            spells: ['Q', 'Missing'],
+          },
+        ],
+      } as never);
+      expect(() => registry.installCode('orphan', { spells: { Q: class {} } } as never)).toThrow(
+        /Missing/
+      );
+      // Refused before writing, same as `install()`'s own atomicity: the `Q`
+      // this call *did* supply never lands either.
+      expect(registry.spellClass('orphan:Q')).toBeNull();
+      expect(registry.hasSpell('orphan:Q')).toBe(false);
+    });
+
+    it('installCode refuses a code half that leaves a recall unpaired', () => {
+      registry.installData({
+        manifest: { id: 'orphan-recall', version: '1.0.0', coreRange: '^1' },
+        champions: [
+          {
+            id: 'alpha',
+            name: 'Alpha',
+            image: null,
+            playable: false,
+            spells: ['Q'],
+            recall: 'Missing',
+          },
+        ],
+      } as never);
+      expect(() =>
+        registry.installCode('orphan-recall', { spells: { Q: class {} } } as never)
+      ).toThrow(/Missing/);
+    });
+
+    it('installCode refuses a code half that leaves a spellDisplay entry unpaired', () => {
+      registry.installData({
+        manifest: { id: 'orphan-display', version: '1.0.0', coreRange: '^1' },
+        spellDisplay: {
+          Ghost: {
+            name: 'Ma',
+            description: 'mô tả',
+            iconKey: null,
+            coolDownMs: 1000,
+            manaCost: 0,
+            specCoolDownMs: 1000,
+          },
+        },
+      } as never);
+      expect(() => registry.installCode('orphan-display', { spells: {} } as never)).toThrow(
+        /Ghost/
+      );
+    });
+  });
 });
