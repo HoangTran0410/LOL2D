@@ -4,12 +4,12 @@ import type { PackRegistry } from '@/content/PackRegistry';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
+import { MonsterPreset as MonsterCampPreset } from './mapPresets';
 import type Champion from './gameObject/attackableUnits/Champion';
 import {
   DEFAULT_CHAMPION_ATTACK,
   type ChampionAttackTuning,
 } from './gameObject/attackableUnits/Champion';
-import type { FountainPresetData } from './gameObject/structures/Fountain';
 import type { ChampionPresetData } from './gameObject/attackableUnits/Champion';
 import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameConfig';
 import { SLOT_COUNT } from './config/PregameConfig';
@@ -468,254 +468,19 @@ export const loadChampionPresetFromLoadout = async (
   await loadSpells(plan.spellIds);
   return presetFromPlan(plan);
 };
-export const MonsterPreset: Record<string, MonsterPresetData> = {
-  baron: {
-    name: 'Baron',
-    avatar: 'monster_Baron_Nashor',
-    camp: { x: 2147, y: 1876, r: 100 },
-    speed: 0,
-    size: 100,
-    attackRange: 400,
-    reviveTime: 3000,
-    health: 1000,
-    // Rooted in place with a long reach. The bite is small because it is the
-    // one part of the fight nobody can dodge — the damage that makes Baron
-    // frightening lives in `BARON_ABILITIES`, and all of it is avoidable.
-    damage: 12,
-    attackInterval: 2000,
-    aggroRange: 480,
-    abilities: BARON_ABILITIES,
-  },
-  blue1: {
-    name: 'Blue',
-    avatar: 'monster_Blue_Sentinel',
-    camp: { x: 1631, y: 2958, r: 300 },
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  blue2: {
-    name: 'Blue',
-    avatar: 'monster_Blue_Sentinel',
-    camp: { x: 4794, y: 3419, r: 300 },
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  red1: {
-    name: 'Red',
-    avatar: 'monster_Red_Brambleback',
-    camp: { x: 3368, y: 4698, r: 300 },
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  red2: {
-    name: 'Red',
-    avatar: 'monster_Red_Brambleback',
-    camp: { x: 3085, y: 1672, r: 300 },
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  wolf1: {
-    name: 'Greater Wolf',
-    campId: 'wolf1',
-    avatar: 'monster_Greater_Murk_Wolf',
-    camp: { x: 1685, y: 3562, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  wolf1_a: {
-    name: 'Wolf',
-    campId: 'wolf1',
-    avatar: 'monster_Murk_Wolf',
-    camp: { x: 1602, y: 3511, r: 300 },
-    speed: 2.5,
-    size: 40,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 100,
-  },
-  wolf1_b: {
-    name: 'Wolf',
-    campId: 'wolf1',
-    avatar: 'monster_Murk_Wolf',
-    camp: { x: 1725, y: 3659, r: 300 },
-    speed: 2.5,
-    size: 40,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 100,
-  },
-  wolf2: {
-    name: 'Greater Wolf',
-    campId: 'wolf2',
-    avatar: 'monster_Greater_Murk_Wolf',
-    camp: { x: 4728, y: 2835, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
-  },
-  wolf2_a: {
-    name: 'Wolf',
-    campId: 'wolf2',
-    avatar: 'monster_Murk_Wolf',
-    camp: { x: 4709, y: 2743, r: 300 },
-    speed: 2.5,
-    size: 40,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 100,
-  },
-  wolf2_b: {
-    name: 'Wolf',
-    campId: 'wolf2',
-    avatar: 'monster_Murk_Wolf',
-    camp: { x: 4816, y: 2888, r: 300 },
-    speed: 2.5,
-    size: 40,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 100,
-  },
-  gomp1: {
-    name: 'Gromp',
-    avatar: 'monster_Gromp',
-    camp: { x: 914, y: 2784, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 300,
-  },
-  gomp2: {
-    name: 'Gromp',
-    avatar: 'monster_Gromp',
-    camp: { x: 5540, y: 3599, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 300,
-  },
-  raptor1: {
-    name: 'Crimson_Raptor',
-    campId: 'raptor1',
-    avatar: 'monster_Crimson_Raptor',
-    camp: { x: 2954, y: 4110, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 300,
-  },
-  raptor1_a: {
-    name: 'Raptor',
-    campId: 'raptor1',
-    avatar: 'monster_Raptor',
-    camp: { x: 3045, y: 4026, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-  raptor1_b: {
-    name: 'Raptor',
-    campId: 'raptor1',
-    avatar: 'monster_Raptor',
-    camp: { x: 3149, y: 4095, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-  raptor1_c: {
-    name: 'Raptor',
-    campId: 'raptor1',
-    avatar: 'monster_Raptor',
-    camp: { x: 3060, y: 4169, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-  raptor2: {
-    name: 'Crimson_Raptor',
-    campId: 'raptor2',
-    avatar: 'monster_Crimson_Raptor',
-    camp: { x: 3498, y: 2258, r: 300 },
-    speed: 2,
-    size: 70,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 300,
-  },
-  raptor2_a: {
-    name: 'Raptor',
-    campId: 'raptor2',
-    avatar: 'monster_Raptor',
-    camp: { x: 3432, y: 2356, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-  raptor2_b: {
-    name: 'Raptor',
-    campId: 'raptor2',
-    avatar: 'monster_Raptor',
-    camp: { x: 3307, y: 2295, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-  raptor2_c: {
-    name: 'Raptor',
-    campId: 'raptor2',
-    avatar: 'monster_Raptor',
-    camp: { x: 3378, y: 2183, r: 300 },
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-  },
-};
+export { FountainPreset } from './mapPresets';
 
 /**
- * The two spawn platforms, in the corners the map's own turret rows point at.
- * Coordinates were picked by scanning the wall polygons in summoner_map.json for
- * the roomiest open spot in each base — both sit ~260px clear of any wall.
- *
- * Order matters: index 0 is the bottom-left base and belongs to TeamId.BLUE,
- * index 1 is the top-right base and belongs to TeamId.RED. Game.spawnFountains()
- * reads the team straight off this index, and the minion spawner reads it back
- * off the fountain.
+ * `preset.ts`'s own copy of `MonsterPreset`, re-exported under its original
+ * name with `BARON_ABILITIES` merged onto `baron` — the one field
+ * `./mapPresets` leaves out because it needs the engine (see that module's
+ * own header). Every entry's data otherwise comes straight from there;
+ * nothing here transcribes a coordinate a second time.
  */
-export const FountainPreset: FountainPresetData[] = [
-  { name: 'Bệ Đá Cổ', x: 400, y: 6075, r: 190, teamId: TeamId.BLUE },
-  { name: 'Bệ Đá Cổ', x: 6100, y: 375, r: 190, teamId: TeamId.RED },
-];
+export const MonsterPreset: Record<string, MonsterPresetData> = {
+  ...MonsterCampPreset,
+  baron: { ...MonsterCampPreset.baron, abilities: BARON_ABILITIES },
+};
 
 export interface TurretPosition {
   x: number;

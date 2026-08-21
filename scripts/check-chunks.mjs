@@ -114,11 +114,21 @@ const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'Mi
 // `ContentPack.ts`, `bundledPack.ts` and all of `packs/reference/` — which
 // measured 207,858 bytes against a pre-batch-3 baseline of 163,386 (`game`
 // shrank by roughly the same amount, confirming this is code moving chunks,
-// not duplicating). The ceiling leaves headroom to grow as data (more
-// champions, more display fields, more reference-pack spells) without
-// leaving room for the ~80-module engine surface to fit back in unnoticed —
-// that regression, measured before this file existed, was +44KB on its own.
-const PREGAME_SIZE_CEILING_BYTES = 225_000;
+// not duplicating).
+//
+// Task 3 of that same batch raised the ceiling again, to 250,000, after
+// assembling Summoner's Rift into a `MapDefinition` (`src/content/maps/
+// summonersRift.ts`) pushed the measured size to 231,072 — +23,214 bytes,
+// almost exactly `assets/json/summoner_map.json`'s own 22,180-byte weight
+// (329 wall polygons, 40 bush, 26 water). That data has nowhere lighter to
+// live: `src/content/` is `pregame` in its entirety, nothing reads the map
+// yet (batches 4-8 move the readers), and the terrain is the map — there is
+// no smaller-but-still-correct encoding of 395 polygons. `game`'s own size
+// (270,119) barely moved, confirming this is new data, not a leak. The
+// ceiling still leaves ~19KB of headroom above the new measurement, for the
+// same reason the original one did: room to grow as data without room for
+// the engine to fit back in unnoticed.
+const PREGAME_SIZE_CEILING_BYTES = 250_000;
 
 {
   const file = chunk('pregame');

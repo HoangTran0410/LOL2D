@@ -11,6 +11,7 @@ import type {
 import { CHAMPION_KITS } from '@/game/config/spellCatalog';
 import { spellCatalog } from '@/generated/spellCatalog';
 import { spellModules } from '@/generated/spellModules';
+import { summonersRift } from './maps/summonersRift';
 
 /**
  * The game's own content, wrapped as a pack without moving a file.
@@ -122,6 +123,19 @@ export const data: ContentPackData = {
   },
   get champions() {
     return championEntries();
+  },
+  // A getter for the same reason `champions`/`spellDisplay` are: `./maps/summonersRift`
+  // imports `@/game/preset`, whose own first import is `@/content/registry` ->
+  // `catalog.ts` -> `install.ts` -> back to this file — the same cycle
+  // `CHAMPION_KITS` sits in, now closed through a second edge. Reading
+  // `summonersRift` eagerly here captures whatever the binding held at
+  // whichever point in that cycle this module happened to be reached, which
+  // measured out to `undefined` (`maps[0]: must be an object` at install
+  // time) the moment something else's import graph reached `bundledPack.ts`
+  // before `summonersRift.ts` had finished. Deferred to a getter, the read
+  // happens on first *use* — always after the whole cyclic load has settled.
+  get maps() {
+    return [summonersRift];
   },
 };
 
