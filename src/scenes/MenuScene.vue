@@ -24,7 +24,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import AssetManager from '@/managers/AssetManager';
 import DomUtils from '@/utils/dom.utils';
-import { applyUpdate, offlineReady, updateReady } from '@/pwa/updates';
+import { applyUpdate, offlineReady, updateDownloading, updateReady } from '@/pwa/updates';
 import { watchPreload, type PreloadState } from './gamePreload';
 
 const emit = defineEmits<{ play: []; openConfig: []; openAbout: [] }>();
@@ -150,6 +150,18 @@ const installUpdate = async (): Promise<void> => {
     <span v-if="offlineReady" class="menu-version-offline" title="Đã lưu để chơi offline">
       <i class="fas fa-circle-check" aria-hidden="true"></i> offline
     </span>
+  </p>
+
+  <!-- The fast half: a newer build has been detected and is downloading in
+       the background, well before it is ready to apply. Not a button — there
+       is nothing to press yet, see src/pwa/updates.ts. -->
+  <p
+    v-if="updateDownloading && !updateReady"
+    id="menu-update-checking"
+    class="menu-update-checking"
+  >
+    <i class="fas fa-arrow-rotate-right fa-spin" aria-hidden="true"></i>
+    Đang tải bản cập nhật mới…
   </p>
 
   <!-- Only ever on the menu, and only when a build is already downloaded and
