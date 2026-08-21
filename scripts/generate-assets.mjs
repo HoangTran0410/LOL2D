@@ -71,11 +71,18 @@ function assetKind(path) {
   throw new Error(`Unsupported asset file: ${path}`);
 }
 
-export function buildManifestEntries(paths) {
+/**
+ * `keyPrefix` lets a second tree's asset keys avoid colliding with the first
+ * tree's — two packs can each have `assets/images/champions/janna.png` and
+ * would otherwise both mint `champ_janna`. Empty by default: core needs none,
+ * and what a given pack's prefix should actually be is that pack's own
+ * decision (batch 4 task 4), not this function's.
+ */
+export function buildManifestEntries(paths, { keyPrefix = '' } = {}) {
   const entries = paths
     .map(path => path.replaceAll('\\', '/'))
     .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0))
-    .map(path => ({ key: assetKeyForPath(path), kind: assetKind(path), path }));
+    .map(path => ({ key: `${keyPrefix}${assetKeyForPath(path)}`, kind: assetKind(path), path }));
   const seen = new Map();
 
   for (const entry of entries) {
@@ -89,9 +96,18 @@ export function buildManifestEntries(paths) {
   return entries;
 }
 
-export function renderManifest(entries) {
+/**
+ * `importPrefix` is how far the generated file has to walk, from its own
+ * directory, back to the repository root that every entry's `path` is
+ * written relative to. `../../` for core's `src/generated/` (two segments
+ * down); a tree whose output lives deeper, like `packs/riot/generated/`,
+ * needs a longer one — see `importPrefixFor`, the only caller that computes
+ * it. A bare call (as every existing test makes) keeps the old, hardcoded
+ * default, so this is a widening, not a behaviour change.
+ */
+export function renderManifest(entries, { importPrefix = '../../' } = {}) {
   const imports = entries.map((entry, index) => {
-    const importPath = `../../${entry.path}?url`;
+    const importPath = `${importPrefix}${entry.path}?url`;
     return `import asset${index}Url from '${importPath}';`;
   });
   const records = entries.map(
@@ -132,20 +148,66 @@ async function walk(directory, root) {
   return paths;
 }
 
-export async function renderAssetManifestSource(root, { add = [], remove = [] } = {}) {
-  const paths = new Set(await walk(resolve(root, 'assets'), root));
+/**
+ * The tree this generator has always walked: `assets/` at the repository
+ * root, written to `src/generated/assetManifest.ts`. Every existing caller
+ * — `renderAssetManifestSource(root, { add, remove })`, `generate(root,
+ * check)`, `npm run assets:generate` — passes no tree at all and gets this
+ * one, so generalising to a second tree could not change core's output.
+ */
+export const CORE_ASSET_TREE = {
+  assetsDir: 'assets',
+  outputPath: 'src/generated/assetManifest.ts',
+  keyPrefix: '',
+};
+
+/**
+ * Trees a pack can generate for, selected from the CLI with `--tree=<name>`.
+ * Only `riot` exists so far, and it is a placeholder: `packs/riot/assets/`
+ * is empty until batch 4 task 4 moves the art in, so today this produces an
+ * empty manifest — a real, if trivial, answer, not an error.
+ */
+export const PACK_ASSET_TREES = {
+  riot: {
+    assetsDir: 'packs/riot/assets',
+    outputPath: 'packs/riot/generated/assetManifest.ts',
+    keyPrefix: '',
+  },
+};
+
+/**
+ * How far a tree's generated file must walk back to the repository root
+ * that every manifest entry's `path` is written relative to — `../../` for
+ * `src/generated/` (two segments down), `../../../` for the one-segment-
+ * deeper `packs/riot/generated/`. Computed from the tree's own `outputPath`
+ * rather than hard-coded, so a tree whose output lives somewhere else still
+ * gets working imports.
+ */
+function importPrefixFor(root, outputPath) {
+  const outputDir = dirname(resolve(root, outputPath));
+  const toRoot = relative(outputDir, root).replaceAll('\\', '/');
+  return toRoot === '' ? './' : `${toRoot}/`;
+}
+
+export async function renderAssetManifestSource(
+  root,
+  { add = [], remove = [], tree = CORE_ASSET_TREE } = {}
+) {
+  const { assetsDir, outputPath, keyPrefix } = tree;
+  const paths = new Set(await walk(resolve(root, assetsDir), root));
   for (const path of remove) paths.delete(path.replaceAll('\\', '/'));
   for (const path of add) {
     const normalized = path.replaceAll('\\', '/');
-    if (normalized.startsWith('assets/') && !MANIFEST_EXCLUDED_FILES.has(normalized))
+    if (normalized.startsWith(`${assetsDir}/`) && !MANIFEST_EXCLUDED_FILES.has(normalized))
       paths.add(normalized);
   }
-  return renderManifest(buildManifestEntries([...paths]));
+  const entries = buildManifestEntries([...paths], { keyPrefix });
+  return renderManifest(entries, { importPrefix: importPrefixFor(root, outputPath) });
 }
 
-export async function generate(root, check = false) {
-  const outputPath = resolve(root, 'src/generated/assetManifest.ts');
-  const source = await renderAssetManifestSource(root);
+export async function generate(root, check = false, tree = CORE_ASSET_TREE) {
+  const outputPath = resolve(root, tree.outputPath);
+  const source = await renderAssetManifestSource(root, { tree });
 
   if (check) {
     const current = await readFile(outputPath, 'utf8').catch(() => '');
@@ -161,8 +223,19 @@ export async function generate(root, check = false) {
 const scriptPath = fileURLToPath(import.meta.url);
 if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   const root = resolve(dirname(scriptPath), '..');
-  generate(root, process.argv.includes('--check')).catch(error => {
-    console.error(error instanceof Error ? error.message : error);
+  const treeArg = process.argv.find(arg => arg.startsWith('--tree='));
+  const treeName = treeArg?.slice('--tree='.length);
+  const tree = treeName ? PACK_ASSET_TREES[treeName] : CORE_ASSET_TREE;
+
+  if (treeName && !tree) {
+    console.error(
+      `Unknown asset tree "${treeName}". Known: ${Object.keys(PACK_ASSET_TREES).join(', ')}`
+    );
     process.exitCode = 1;
-  });
+  } else {
+    generate(root, process.argv.includes('--check'), tree).catch(error => {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    });
+  }
 }

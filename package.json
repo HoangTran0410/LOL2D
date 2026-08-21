@@ -5,8 +5,12 @@
   "scripts": {
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
+    "assets:generate:riot": "node scripts/generate-assets.mjs --tree=riot",
+    "assets:check:riot": "node scripts/generate-assets.mjs --check --tree=riot",
     "catalog:generate": "node scripts/generate-spell-catalog.mjs",
     "catalog:check": "node scripts/generate-spell-catalog.mjs --check",
+    "catalog:generate:riot": "node scripts/generate-spell-catalog.mjs --tree=riot",
+    "catalog:check:riot": "node scripts/generate-spell-catalog.mjs --check --tree=riot",
     "wiki:sync-index": "node scripts/wiki/import-abilities.mjs --index",
     "ability:import": "node scripts/wiki/import-abilities.mjs",
     "ability:update": "node scripts/wiki/import-abilities.mjs --update",

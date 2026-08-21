@@ -1,9 +1,12 @@
+import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   assetKeyForPath,
   buildManifestEntries,
+  CORE_ASSET_TREE,
+  PACK_ASSET_TREES,
   renderAssetManifestSource,
   renderManifest,
 } from '../../scripts/generate-assets.mjs';
@@ -68,5 +71,55 @@ describe('asset manifest generator', () => {
     const source = await renderAssetManifestSource(root);
     expect(source).not.toContain('json_summoner_map');
     expect(source).not.toContain('assets/json/summoner_map.json');
+  });
+
+  /**
+   * `buildManifestEntries`/`renderManifest` gained a second, tree-shaped
+   * caller (`packs/riot`, for now empty) beside core's. These two check the
+   * plumbing that makes a second tree's keys and imports distinguishable
+   * from core's without touching what core itself renders — the byte-
+   * identical proof for the default argument lives in the tests below,
+   * against the real checked-in files.
+   */
+  describe('a second tree', () => {
+    it('prefixes generated keys so two trees cannot collide on the same relative path', () => {
+      const bare = buildManifestEntries(['assets/images/champions/janna.png']);
+      const prefixed = buildManifestEntries(['assets/images/champions/janna.png'], {
+        keyPrefix: 'riot_',
+      });
+
+      expect(bare[0].key).toBe('champ_janna');
+      expect(prefixed[0].key).toBe('riot_champ_janna');
+    });
+
+    it('walks back further to the repository root for a deeper output file', () => {
+      const entries = buildManifestEntries(['assets/images/champions/janna.png']);
+      const coreDepth = renderManifest(entries);
+      const deeper = renderManifest(entries, { importPrefix: '../../../' });
+
+      expect(coreDepth).toContain("from '../../assets/images/champions/janna.png?url'");
+      expect(deeper).toContain("from '../../../assets/images/champions/janna.png?url'");
+    });
+
+    /**
+     * `packs/riot/assets/` is real — created by this task — and genuinely
+     * empty until batch 4 task 4 moves the art in. Generating against it is
+     * not a fixture standing in for a tree; it is what generating for that
+     * tree actually produces today: a valid, if trivial, manifest.
+     */
+    it('generates a real (empty) manifest for packs/riot/assets without reading core/assets at all', async () => {
+      const source = await renderAssetManifestSource(root, { tree: PACK_ASSET_TREES.riot });
+
+      expect(source).toContain('export const assetManifest = {');
+      expect(source).not.toMatch(/\?url';/);
+      expect(source).not.toContain('champ_janna');
+    });
+
+    it("leaves core's own manifest byte-identical to what is already checked in", async () => {
+      const generated = await renderAssetManifestSource(root);
+      const committed = await readFile(resolve(root, CORE_ASSET_TREE.outputPath), 'utf8');
+
+      expect(generated).toBe(committed);
+    });
   });
 });

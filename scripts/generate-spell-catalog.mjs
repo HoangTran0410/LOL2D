@@ -49,10 +49,53 @@ import { createServer } from 'vite';
 
 const scriptPath = fileURLToPath(import.meta.url);
 const root = resolve(dirname(scriptPath), '..');
-const outputPath = resolve(root, 'src/generated/spellCatalog.ts');
-const modulesPath = resolve(root, 'src/generated/spellModules.ts');
-const barrelPath = resolve(root, 'src/game/gameObject/spells/index.ts');
-const coreBarrelPath = resolve(root, 'src/game/gameObject/coreSpells/index.ts');
+
+/**
+ * A tree this generator can build a catalogue for: a list of barrels (each
+ * an `index.ts` of `export { default as X } from './X'` lines) plus where
+ * the two output files land. Later barrels win an id clash against earlier
+ * ones — "content-last" below is this rule applied to core's own two.
+ *
+ * `importBase` is the module specifier prefix a spell in that barrel is
+ * imported through in the generated `spellModules.ts` — `@/game/gameObject/
+ * spells` for core's content barrel, so the emitted line reads
+ * `import('@/game/gameObject/spells/Yasuo_Q')`, exactly as it did before
+ * this generalisation existed. It is per-barrel, not per-tree, because
+ * that is what `coreIds` was really encoding: not "which barrel" but
+ * "which directory does this id's file live in" — the barrel a spell
+ * comes from already answers that, so carrying it on the merged entry
+ * replaces the separate set entirely rather than sitting beside it.
+ */
+export const CORE_SPELL_TREE = {
+  outputPath: 'src/generated/spellCatalog.ts',
+  modulesOutputPath: 'src/generated/spellModules.ts',
+  // Content-last: a content id can never shadow a core one. `BasicAttack`
+  // is core's one spell (see `coreSpells/index.ts`'s own header for why it
+  // is split out at all); listing its barrel second is what makes it win.
+  barrels: [
+    { path: 'src/game/gameObject/spells/index.ts', importBase: '@/game/gameObject/spells' },
+    { path: 'src/game/gameObject/coreSpells/index.ts', importBase: '@/game/gameObject/coreSpells' },
+  ],
+};
+
+/**
+ * Trees a pack can generate a catalogue for, selected from the CLI with
+ * `--tree=<name>`. Only `riot` exists so far, and it is a placeholder:
+ * `packs/riot/spells/` has no barrel until batch 4 task 3 moves the spells
+ * in, so running this tree today fails on a missing file — the same honest
+ * failure `catalog:check` gives for any other stale/missing generated
+ * output, not a special case.
+ */
+export const PACK_SPELL_TREES = {
+  riot: {
+    outputPath: 'packs/riot/generated/spellCatalog.ts',
+    modulesOutputPath: 'packs/riot/generated/spellModules.ts',
+    // Relative, not `@/…`: the alias in `tsconfig.json` resolves only under
+    // `src/`, and a pack imports its own siblings the way
+    // `packs/reference/pack.ts` already does.
+    barrels: [{ path: 'packs/riot/spells/index.ts', importBase: '../spells' }],
+  },
+};
 
 /** No cooldown reduction, no URF — the rule-free numbers this file stores. */
 const NO_MATCH_RULES = { cooldownMultiplier: 1, manaFree: false };
@@ -100,7 +143,7 @@ function describe(id, SpellClass) {
   return { id, name, description, iconKey, coolDownMs, manaCost, specCoolDownMs };
 }
 
-export async function renderSpellCatalogSource() {
+export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
   const server = await createServer({
     root,
     configFile: resolve(root, 'vite.config.ts'),
@@ -110,10 +153,14 @@ export async function renderSpellCatalogSource() {
   });
 
   try {
-    const CoreSpells = await server.ssrLoadModule('/src/game/gameObject/coreSpells/index.ts');
-    const ContentSpells = await server.ssrLoadModule('/src/game/gameObject/spells/index.ts');
-    // Content-last: a content id can never shadow a core one.
-    const AllSpells = { ...ContentSpells, ...CoreSpells };
+    // Content-last: an earlier barrel's id can never shadow a later one's —
+    // core's own two barrels are `tree.barrels` in that order, matching
+    // `renderSpellModulesSource`.
+    let AllSpells = {};
+    for (const barrel of tree.barrels) {
+      const loaded = await server.ssrLoadModule(`/${barrel.path}`);
+      AllSpells = { ...AllSpells, ...loaded };
+    }
     const entries = Object.entries(AllSpells)
       .filter(([, value]) => typeof value === 'function')
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
@@ -186,56 +233,56 @@ function render(entries) {
  * The other half: `id → () => import('./Yasuo_Q')`, so a match can fetch the
  * kits it is actually about to play instead of the whole barrel.
  *
- * Parsed out of `spells/index.ts` and `coreSpells/index.ts` rather than
- * guessed from the id, because a barrel is the thing that decides which file
- * and which directory an id names — `BasicAttack` is `coreSpells/BasicAttack`,
+ * Parsed out of each barrel in `tree.barrels` rather than guessed from the
+ * id, because a barrel is the thing that decides which file and which
+ * directory an id names — `BasicAttack` is `coreSpells/BasicAttack`,
  * `Yasuo_Q` is `spells/Yasuo_Q`, and nothing guarantees id and path always
- * agree in future. The two barrels are independent `readFile`s (this function
- * never touches `ssrLoadModule`), so `coreIds` is built here rather than
- * reused from `renderSpellCatalogSource` — that function's `CoreSpells` is a
- * different kind of value (loaded classes, not parsed text) in a scope this
- * one does not share.
+ * agree in future. The barrels are independent `readFile`s (this function
+ * never touches `ssrLoadModule`), so a barrel's own `importBase` travels
+ * with each of its entries directly — the old two-barrel-only version
+ * built a separate `coreIds` set for the same purpose, which does not
+ * generalise past two.
  *
  * The importers stay `() => import(...)` thunks rather than a resolved map:
  * Rollup only treats a dynamic import as a split point if it is literal and
  * unexecuted at module scope, so writing them any other way silently collapses
  * this file back into one eager chunk.
  */
-export async function renderSpellModulesSource() {
+export async function renderSpellModulesSource(tree = CORE_SPELL_TREE) {
   const pattern = /export\s*\{\s*default\s+as\s+([A-Za-z0-9_]+)\s*\}\s*from\s*'(\.\/[^']+)'/g;
   const parseBarrel = async path => {
     const source = await readFile(path, 'utf8');
     return [...source.matchAll(pattern)].map(([, id, importPath]) => ({ id, path: importPath }));
   };
 
-  const [contentEntries, coreEntries] = await Promise.all([
-    parseBarrel(barrelPath),
-    parseBarrel(coreBarrelPath),
-  ]);
+  const barrels = await Promise.all(
+    tree.barrels.map(async barrel => {
+      const absolutePath = resolve(root, barrel.path);
+      const entries = await parseBarrel(absolutePath);
+      if (!entries.length) {
+        throw new Error(`no \`export { default as X } from\` lines in ${absolutePath}`);
+      }
+      return { importBase: barrel.importBase, entries };
+    })
+  );
 
-  if (!contentEntries.length) {
-    throw new Error(`no \`export { default as X } from\` lines in ${barrelPath}`);
-  }
-  if (!coreEntries.length) {
-    throw new Error(`no \`export { default as X } from\` lines in ${coreBarrelPath}`);
-  }
-
-  const coreIds = new Set(coreEntries.map(entry => entry.id));
-
-  // Content-last, matching `renderSpellCatalogSource`: a content id can never
-  // shadow a core one.
+  // Content-last, matching `renderSpellCatalogSource`: a later barrel's id
+  // can never be shadowed by an earlier one's.
   const merged = new Map();
-  for (const entry of contentEntries) merged.set(entry.id, entry);
-  for (const entry of coreEntries) merged.set(entry.id, entry);
+  for (const barrel of barrels) {
+    for (const entry of barrel.entries) {
+      merged.set(entry.id, { ...entry, importBase: barrel.importBase });
+    }
+  }
 
   const entries = [...merged.values()].sort((left, right) =>
     left.id < right.id ? -1 : left.id > right.id ? 1 : 0
   );
 
-  const records = entries.map(entry => {
-    const dir = coreIds.has(entry.id) ? 'coreSpells' : 'spells';
-    return `  ${JSON.stringify(entry.id)}: () => import('@/game/gameObject/${dir}/${entry.path.slice(2)}'),`;
-  });
+  const records = entries.map(
+    entry =>
+      `  ${JSON.stringify(entry.id)}: () => import('${entry.importBase}/${entry.path.slice(2)}'),`
+  );
 
   return [
     '// Generated by scripts/generate-spell-catalog.mjs. Do not edit.',
@@ -256,14 +303,14 @@ export async function renderSpellModulesSource() {
   ].join('\n');
 }
 
-export async function generateSpellCatalog(check = false) {
+export async function generateSpellCatalog(check = false, tree = CORE_SPELL_TREE) {
   const [catalog, modules] = await Promise.all([
-    renderSpellCatalogSource(),
-    renderSpellModulesSource(),
+    renderSpellCatalogSource(tree),
+    renderSpellModulesSource(tree),
   ]);
   const outputs = [
-    { path: outputPath, source: catalog },
-    { path: modulesPath, source: modules },
+    { path: resolve(root, tree.outputPath), source: catalog },
+    { path: resolve(root, tree.modulesOutputPath), source: modules },
   ];
 
   if (check) {
@@ -278,13 +325,24 @@ export async function generateSpellCatalog(check = false) {
     return;
   }
 
-  await mkdir(dirname(outputPath), { recursive: true });
+  await mkdir(dirname(outputs[0].path), { recursive: true });
   for (const { path, source } of outputs) await writeFile(path, source);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
-  generateSpellCatalog(process.argv.includes('--check')).catch(error => {
-    console.error(error instanceof Error ? error.message : error);
+  const treeArg = process.argv.find(arg => arg.startsWith('--tree='));
+  const treeName = treeArg?.slice('--tree='.length);
+  const tree = treeName ? PACK_SPELL_TREES[treeName] : CORE_SPELL_TREE;
+
+  if (treeName && !tree) {
+    console.error(
+      `Unknown spell tree "${treeName}". Known: ${Object.keys(PACK_SPELL_TREES).join(', ')}`
+    );
     process.exitCode = 1;
-  });
+  } else {
+    generateSpellCatalog(process.argv.includes('--check'), tree).catch(error => {
+      console.error(error instanceof Error ? error.message : error);
+      process.exitCode = 1;
+    });
+  }
 }
