@@ -54,6 +54,16 @@ vào content ngoài `spells/`; toàn bộ 24 file `buffs/` là cơ chế thuần
 
 Cả ba còn là ngoại lệ chống chu trình chunk ở `vite.config.ts:297`.
 
+**Hai coupling đầu không được gỡ theo cùng một cách.** `BasicAttack` là cơ chế
+phổ quát — không tướng nào, không map nào thiếu nó — nên nó chuyển hẳn vào
+core. `Recall` thì không: recall giả định một fountain, và fountain là
+content của map (§7.1 đã liệt map battle-royale không lane, không fountain,
+trong phạm vi). Recall ở lại làm content; chu trình tĩnh `Champion → Recall`
+được phá bằng cách khác — `Champion.recall` trở thành field **nullable** mà
+`preset.ts` điền, và `ChampionEntry.recall` là chỗ một pack khai nó về sau.
+Đây là điều chỉnh của người dùng lên phân loại ban đầu trong đo đạc này, không
+phải trôi dạt lúc code — xem §10 bước 1.
+
 ### 2.3 Bề mặt API — closure có biên, không kéo theo engine
 
 **72 module / 110 symbol** trực tiếp (không phải ~40 như ước lượng ban đầu từ
@@ -423,10 +433,15 @@ API/IndexedDB.
 Làm toàn bộ **trong repo này**, mỗi bước `verify` xanh. Bước tách repo là cơ
 học và đến cuối.
 
-1. **Gỡ ba coupling chặn đường** — `BasicAttack` + `Recall` về core như cơ chế
-   built-in (phá luôn chu trình `Champion → Recall`, làm `GlobalShot` và `Pet`
-   nhỏ lại); bỏ Baron khỏi `Monster.ts:85` làm mặc định. Core cần icon riêng
-   cho `Chilled.ts:17` (`spell_anivia_e`) và `Speedup.ts:16` (`spell_ghost`).
+1. **Gỡ ba coupling chặn đường** — `BasicAttack` về core như cơ chế built-in.
+   `Recall` ở lại làm content (recall giả định một fountain, và fountain là
+   content của map — điều chỉnh của người dùng lên phân loại ban đầu ở §2.2,
+   không phải trôi dạt lúc code): chu trình tĩnh `Champion → Recall` bị phá
+   bằng field **nullable** `Champion.recall` mà `preset.ts` điền, thay vì bằng
+   cách chuyển `Recall` vào core — kết quả vẫn là chu trình biến mất và
+   `GlobalShot`/`Pet` nhỏ lại, chỉ khác đích. Bỏ Baron khỏi `Monster.ts:85`
+   làm mặc định. Core cần icon riêng cho `Chilled.ts:17` (`spell_anivia_e`) và
+   `Speedup.ts:16` (`spell_ghost`).
 2. **`src/content/`** — `ContentApi`, `ContentPack`, `PackRegistry`,
    `validate`, `install`.
 3. **Reference pack ở `packs/reference/`** — *trước* khi API phải gánh 241
