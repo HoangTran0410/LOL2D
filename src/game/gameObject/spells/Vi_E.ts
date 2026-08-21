@@ -3,7 +3,7 @@ import AssetManager from '@/managers/AssetManager';
 import type { BasicAttackHit } from '@/game/combat/BasicAttack';
 import { effectiveRange } from '@/game/combat/Reach';
 import EventType from '@/game/enums/EventType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -244,9 +244,9 @@ export default class Vi_E extends Spell {
  * out, so this is a SpellObject with a real box rather than caster VFX.
  */
 export class Vi_E_Cone extends SpellObject {
-  // Ground art: Z_INDEX_MAP is keyed by exact constructor, so a subclass would
-  // fall through to 99 and cover the feet of everyone standing in the wedge.
-  zIndex = 2;
+  // Ground art: an un-overridden SpellObject subclass resolves to
+  // SPELL_EFFECT_Z_INDEX and would cover the feet of everyone standing in the wedge.
+  zIndex = GROUND_Z_INDEX;
   lifeTime = 320;
   age = 0;
   radius = E_LENGTH;

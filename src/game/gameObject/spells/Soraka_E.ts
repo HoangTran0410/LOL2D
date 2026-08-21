@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import BuffAddType from '@/game/enums/BuffAddType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Root from '@/game/gameObject/buffs/Root';
@@ -63,7 +63,7 @@ const GLYPH_COUNT = 8;
 
 export class Soraka_E_Object extends SpellObject {
   /** A field lying on the ground: units wade through it, not behind it. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   position: p5.Vector = this.owner.position.copy();
 

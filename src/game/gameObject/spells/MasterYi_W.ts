@@ -5,6 +5,7 @@ import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Shield from '@/game/gameObject/buffs/Shield';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 // Exported so the suite asserts the channel's wiring, not a copy of the
 // numbers — retuning a value must not mean editing a test.
@@ -112,11 +113,11 @@ export default class MasterYi_W extends Spell {
 /**
  * The mandala under him: a slow ground pattern rather than a burst, so the
  * enemy reading the screen can see the channel is still running and how long
- * it has left. Painted at `zIndex = 2` — ground art goes under the feet
+ * it has left. Painted at `zIndex = GROUND_Z_INDEX` — ground art goes under the feet
  * standing on it, the slot `Singed_W_Object` already established.
  */
 export class MasterYi_W_Object extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   /** Counts down after each heal tick, so the rings bloom on the beat. */
   _tickFlash = 0;

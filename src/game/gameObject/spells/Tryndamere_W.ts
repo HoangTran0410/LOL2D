@@ -1,6 +1,6 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Slow from '@/game/gameObject/buffs/Slow';
@@ -62,7 +62,7 @@ export default class Tryndamere_W extends Spell {
 export class Tryndamere_W_Object extends SpellObject {
   // The rings travel along the ground, so they pass under the champions they
   // reach instead of painting over them.
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   origin: p5.Vector;
   age = 0;
   lifeTime = 700;

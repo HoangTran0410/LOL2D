@@ -18,12 +18,16 @@ import {
 /**
  * A stain on the floor draws under the feet standing on it.
  *
- * `ObjectManager`'s `Z_INDEX_MAP` is keyed by *exact constructor*, so a
- * `SpellObject` subclass does not inherit SpellObject's slot of 2 — it falls
- * through to `DEFAULT_Z_INDEX`, which is 99, above `Champion.displayZIndex` of
- * 4. That is the right default for a missile or a blast, and exactly wrong for
- * ground art: Nocturne's Dusk Trail was painting over the feet of everyone
- * walking down it, and nothing in the type system says so.
+ * `ObjectManager`'s `Z_INDEX_MAP` is keyed by *exact constructor*. `classLayerOf`
+ * walks up from there (a `SpellObject` subclass with no zIndex of its own now
+ * resolves to `SPELL_EFFECT_Z_INDEX` instead of falling through to a bare
+ * default), but that walk still lands on the ordinary spell-effect slot, not
+ * the ground one — deliberately: `SPELL_EFFECT_Z_INDEX` is above
+ * `Champion.displayZIndex`, which is the right resting layer for a missile or
+ * a blast, and exactly wrong for ground art. Nocturne's Dusk Trail was
+ * painting over the feet of everyone walking down it before it got its own
+ * `GROUND_Z_INDEX` override, and nothing in the type system says a ground
+ * effect needs one.
  *
  * The number is not the property — being under a unit is. Comparing against the
  * unit z-indices means retuning either side cannot quietly invert the two.

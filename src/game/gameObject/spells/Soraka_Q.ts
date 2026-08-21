@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import BuffAddType from '@/game/enums/BuffAddType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
@@ -94,7 +94,7 @@ const FALL_HEIGHT = 260;
 
 export class Soraka_Q_Object extends SpellObject {
   /** Star dust settling on the floor: painted under the feet standing in it. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   position: p5.Vector = this.owner.position.copy();
 

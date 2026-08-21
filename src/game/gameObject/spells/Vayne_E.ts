@@ -10,6 +10,7 @@ import { sweepToWall } from '@/game/gameObject/map/TerrainField';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 /** How far the heavy bolt flies. */
 export const VAYNE_E_RANGE = 400;
@@ -196,11 +197,11 @@ export class Vayne_E_Object extends MissileSpellObject {
 
 /**
  * The clean push: the victim slides and the bolt streak trails behind it. Ground
- * art — `zIndex = 2`, because `Z_INDEX_MAP` is keyed by exact constructor and a
- * subclass otherwise lands at 99, over the feet of everyone nearby.
+ * art — `zIndex = GROUND_Z_INDEX`, because an un-overridden subclass otherwise
+ * resolves to `SPELL_EFFECT_Z_INDEX`, over the feet of everyone nearby.
  */
 export class Vayne_E_Slide extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = VAYNE_E_PUSH_MS;
   age = 0;
   private victim: AttackableUnit;

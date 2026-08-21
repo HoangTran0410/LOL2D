@@ -502,10 +502,7 @@ export default class AttackableUnit extends GameObject {
     heal = Math.round(heal);
     if (heal <= 0) return;
 
-    let combatText = new CombatText(this);
-    combatText.text = '+' + heal;
-    combatText.textColor = [0, 255, 0];
-    this.game.objectManager.addObject(combatText);
+    CombatText.show(this, 'heal', heal, [0, 255, 0]);
 
     this.stats.health.baseValue = constrain(
       this.stats.health.baseValue + heal,
@@ -554,10 +551,7 @@ export default class AttackableUnit extends GameObject {
       return;
     }
 
-    let combatText = new CombatText(this);
-    combatText.text = '-' + damage;
-    combatText.textColor = [255, 0, 0];
-    this.game.objectManager.addObject(combatText);
+    CombatText.show(this, 'damage', damage, [255, 0, 0]);
 
     // What actually landed, for the scoreboard: capped at the pool that was
     // there to take it, so a 200-damage execute on a 12-health minion is 12

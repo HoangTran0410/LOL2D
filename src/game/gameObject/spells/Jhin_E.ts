@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Slow from '@/game/gameObject/buffs/Slow';
@@ -32,9 +32,6 @@ export const JHIN_E_BLAST_RADIUS = 150;
 const MAGENTA: [number, number, number] = [232, 67, 147];
 const BONE: [number, number, number] = [245, 246, 250];
 const TRAP_PETALS = 4;
-/** Ground art sits below champions — Z_INDEX_MAP is keyed by exact constructor, so say it here. */
-const GROUND_Z_INDEX = 2;
-
 /** Every live trap in the match, so one Jhin's fourth planting evicts his own oldest. */
 const plantedTraps: Jhin_E_Trap[] = [];
 

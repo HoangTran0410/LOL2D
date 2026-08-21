@@ -37,16 +37,82 @@ type TargetableGameObject = GameObject & { targetable?: unknown };
 const hasTargetableProperty = (object: GameObject): object is TargetableGameObject =>
   'targetable' in object;
 
-// Explicit slots keep the Champion gap even though importing Champion here
-// would create a circular dependency through its targeting filters.
+/**
+ * Draw layers, back to front — lower paints first (further back), higher
+ * paints later (nearer the camera, on top of everything under it). One
+ * ordered list rather than a scatter of magic numbers: about a dozen
+ * ground-art spell files each used to hardcode `zIndex = 2` with their own
+ * explanatory comment, and every one of them now names `GROUND_Z_INDEX`
+ * instead. `Champion.displayZIndex`, `Minion.displayZIndex` and the instance
+ * `zIndex` on `Monster`/`Turret`/`Fountain` reference these too, so a value
+ * lives in exactly one place regardless of which of the two escape hatches
+ * (see `classLayerOf`) a class needs.
+ *
+ * The rule the ordering follows: **more important paints later.** A floating
+ * number reporting what just happened outranks the spell effect that caused
+ * it, which outranks the champion it happened to, which outranks the minion
+ * wave, which outranks the ground it is all standing on. The default used to
+ * be the opposite of this — an unlisted class fell through to
+ * `DEFAULT_Z_INDEX` (99), which outranked everything actually chosen on
+ * purpose, so the single most important object in a fight (a champion) was
+ * on top only by the accident of nobody having given it a more specific slot
+ * yet. `Champion` and `Minion` already had their own escape hatch and were
+ * fine; `AIChampion`, `Pet`, `DummyChampion` and every ordinary spell-effect
+ * class (a missile, a hit-spark, a buff aura — anything that is not ground
+ * art) did not, which is exactly the two bugs this ordering fixes: a bot's
+ * champion (`AIChampion`) painting above or below another champion by
+ * whichever order the quadtree happened to return them in rather than by
+ * anything either object's zIndex said, and `CombatText` (5, deliberately
+ * above the old `AttackableUnit` slot of 3) sitting *under* every champion
+ * that fell through to 99.
+ */
+export const FOUNTAIN_Z_INDEX = -1;
+export const TRAIL_Z_INDEX = 0;
+export const PARTICLE_Z_INDEX = 1;
+/** Ground art: a decal, a pool, a trail on the floor. Paints under the feet standing on it. */
+export const GROUND_Z_INDEX = 2;
+/** `AttackableUnit`'s own registered floor — nothing concrete resolves here directly today (every real subclass has a more specific slot below), but it is what `classLayerOf` lands a *hypothetical* undecorated unit on. */
+export const UNIT_Z_INDEX = 3;
+export const MINION_Z_INDEX = 3.2;
+/** Monster camps and turrets: above plain units and minions, below champions. */
+export const OBJECTIVE_Z_INDEX = 3.5;
+export const CHAMPION_Z_INDEX = 4;
+/**
+ * The ordinary case for a spell effect: a missile in flight, a hit-spark, a
+ * beam, a buff aura — anything that is not ground art, which explicitly
+ * overrides down to `GROUND_Z_INDEX` instead. This is the corrected,
+ * intentional version of what `DEFAULT_Z_INDEX` used to provide by accident:
+ * `ground-decal-zindex.test.ts`'s own comment used to call the *old*
+ * accidental 99 "the right default for a missile or a blast", which is the
+ * same judgement this constant now states on purpose.
+ */
+export const SPELL_EFFECT_Z_INDEX = 6;
+/**
+ * `CombatText` is an overlay, not a thing in the scene — it already draws at
+ * constant screen size regardless of zoom (`Camera.constantSize`). Above
+ * every unit and above ordinary spell effects, so a number is never the
+ * thing a flashy cast or a dying champion happens to cover.
+ */
+export const COMBAT_TEXT_Z_INDEX = 8;
+
 const Z_INDEX_MAP = new Map<Function, number>([
-  [TrailSystem, 0],
-  [ParticleSystem, 1],
-  [SpellObject, 2],
-  [AttackableUnit, 3],
-  [CombatText, 5],
+  [TrailSystem, TRAIL_Z_INDEX],
+  [ParticleSystem, PARTICLE_Z_INDEX],
+  [SpellObject, SPELL_EFFECT_Z_INDEX],
+  [AttackableUnit, UNIT_Z_INDEX],
+  [CombatText, COMBAT_TEXT_Z_INDEX],
 ]);
-const DEFAULT_Z_INDEX = 99;
+/**
+ * What an unregistered, un-overridden class falls back to. Deliberately no
+ * longer 99: the whole point of this file is that "unlisted" must not mean
+ * "wins every layer someone deliberately chose." In practice nothing real
+ * should ever reach this — `AttackableUnit`, `SpellObject`, `TrailSystem`,
+ * `ParticleSystem` and `Fountain` are the only direct `GameObject` subclasses
+ * in the game, and `classLayerOf` below finds one of the first four for every
+ * concrete class by walking up to it; `Fountain` always sets its own
+ * instance `zIndex` and so never reaches class resolution at all.
+ */
+const DEFAULT_Z_INDEX = UNIT_Z_INDEX;
 export const MOBILE_PARTICLE_DRAW_BUDGET = 800;
 export const MOBILE_CROWDED_PARTICLE_DRAW_BUDGET = 400;
 export const MOBILE_CROWDED_DRAWABLE_COUNT = 40;
@@ -55,35 +121,70 @@ export const MOBILE_COMPACT_UNIT_SCALE = 0.45;
 const ATTACKABLE_DRAW_MARGIN_PX = 100;
 
 /**
- * The table above is keyed by exact constructor, so a subclass it does not list
- * falls through to DEFAULT_Z_INDEX. Classes that need a specific slot but cannot
- * be imported here (structures import PredefinedFilters from this module) set
- * `zIndex` on themselves instead — e.g. Fountain paints under everything.
+ * Resolves a class's layer by walking from `constructor` up the *class*
+ * hierarchy (`Object.getPrototypeOf` on the constructor function itself —
+ * the `extends` chain, not an instance's `instanceof` chain) until it finds
+ * either a static `displayZIndex` own property or a `Z_INDEX_MAP` entry.
+ * Both escape hatches are checked at every step, so `Champion.displayZIndex`
+ * is what `AIChampion`, `Pet` and `DummyChampion` resolve to as well even
+ * though none of them declare their own — before this walk they fell
+ * straight through to `DEFAULT_Z_INDEX` the instant they were not an *exact*
+ * match for anything, which was the root of both z-index bugs. Likewise a
+ * `MissileSpellObject` subclass with no zIndex of its own climbs to
+ * `SpellObject`'s `SPELL_EFFECT_Z_INDEX` instead of the old 99 — a different
+ * number that happens to still mean "above the units", which is why no
+ * spell-effect visual moved.
+ *
+ * `Object.hasOwn` (not a plain property read) matters: a subclass never
+ * *has* an inherited static as its own property, only sees it through the
+ * constructor's own prototype chain when read directly — checking `hasOwn`
+ * at each step is what makes this walk equivalent to that natural JS
+ * inheritance instead of silently finding the same value one hop early via
+ * `current.displayZIndex` and never actually consulting `Z_INDEX_MAP` for
+ * classes in between.
  */
+function classLayerOf(constructor: Function): number {
+  let current: Function | null = constructor;
+  while (current && current !== Function.prototype && current !== Object.prototype) {
+    const own = (current as { displayZIndex?: unknown }).displayZIndex;
+    if (Object.hasOwn(current, 'displayZIndex') && typeof own === 'number') {
+      return own;
+    }
+    const mapped = Z_INDEX_MAP.get(current);
+    if (mapped !== undefined) return mapped;
+    current = Object.getPrototypeOf(current) as Function | null;
+  }
+  return DEFAULT_Z_INDEX;
+}
+
 function zIndexOf(o: GameObject): number {
-  const constructor = o.constructor;
-  const classZIndex =
-    Object.hasOwn(constructor, 'displayZIndex') &&
-    'displayZIndex' in constructor &&
-    typeof constructor.displayZIndex === 'number'
-      ? constructor.displayZIndex
-      : (Z_INDEX_MAP.get(constructor) ?? DEFAULT_Z_INDEX);
-  return o.zIndex ?? classZIndex;
+  return o.zIndex ?? classLayerOf(o.constructor as Function);
 }
 
 /**
  * Objects that exist only to be looked at, and so are indexed separately from
  * everything a gameplay query can ask about — see `ObjectManager._decorTree`.
  *
- * Deliberately a closed list of two rather than a `decorative = true` flag on
+ * Deliberately a closed list rather than a `decorative = true` flag on
  * `GameObject`: a flag invites a spell object to set it because "it's only
  * VFX", and a spell object is exactly the thing that must stay queryable. Add
  * to this list only for something that deals no damage, holds no target and
- * blocks nothing. `CombatText` is not here on purpose — it extends
- * `SpellObject`, so a query narrowing by that type would quietly stop seeing it.
+ * blocks nothing.
+ *
+ * `CombatText` used to be kept out on the theory that a query narrowing by
+ * `SpellObject` (the class it extends) would quietly stop seeing it. Audited
+ * against every call site instead of trusting that: nothing in the codebase
+ * filters on bare `instanceof SpellObject`. The one filter that comes close,
+ * `PredefinedFilters.missileSpellObject`, also requires `isMissile`, which
+ * `CombatText` never sets. It deals no damage, holds no target and blocks
+ * nothing — the criterion above, exactly — and a teamfight is precisely the
+ * moment `_objectsTree` is both biggest and most queried: measured at up to
+ * ~46% of the tree's live entries during a burst of damage/heal events
+ * (`tests/e2e/measure-combattext-perf.mjs`), every one of them dead weight to
+ * every vision check, target scan and AOE query that had to walk past it.
  */
 function isDecoration(o: GameObject): boolean {
-  return o instanceof ParticleSystem || o instanceof TrailSystem;
+  return o instanceof ParticleSystem || o instanceof TrailSystem || o instanceof CombatText;
 }
 
 export interface QueryOptions {
@@ -391,7 +492,7 @@ export default class ObjectManager {
     // the three full-length arrays (map region->object, map in z-index,
     // filter to drawables) this used to rebuild from scratch every frame for
     // the same object set — real GC churn at 60 draws/sec.
-    const drawables: { o: GameObject; z: number }[] = [];
+    const drawables: { o: GameObject; z: number; dead: boolean }[] = [];
     let particleCount = 0;
     let attackableCount = 0;
     // Both indexes: decoration lives in its own tree so gameplay queries never
@@ -401,21 +502,31 @@ export default class ObjectManager {
     for (const tree of [this._objectsTree, this._decorTree]) {
       for (const region of tree.retrieve(camBound) as GameObjectRegion[]) {
         const o = region.data;
+        let dead = false;
         if (o instanceof AttackableUnit) {
           // The fog's answer for the player's own eyes — rendering only. What a
           // unit may *target* is `combat/Vision.ts`, asked per observer.
           if (!o.visibleToPlayerTeam) continue;
           if (!o.getCollideBoundingBox().intersect(visualBound)) continue;
           attackableCount++;
+          dead = o.isDead;
         } else if (o instanceof ParticleSystem) {
           particleCount += o.particles.length;
         }
         // zIndexOf does a Map lookup + Object.hasOwn — computed once here
         // rather than repeatedly by the sort comparator below.
-        drawables.push({ o, z: zIndexOf(o) });
+        drawables.push({ o, z: zIndexOf(o), dead });
       }
     }
-    drawables.sort((a, b) => a.z - b.z);
+    // A per-object tiebreak, not a layer: a dead champion has no more claim
+    // to paint over a living one than the order the quadtree happened to
+    // return them in, which is what it was accidentally deciding by before
+    // this — a corpse added to the tree after a survivor painted over them
+    // whenever both fell on the same layer, which every champion (before
+    // `classLayerOf`'s walk) and every pair of same-tier structures still
+    // do. Belongs beside `zIndexOf`'s number rather than inside it: "is this
+    // particular instance dead right now" is not a property of the class.
+    drawables.sort((a, b) => (a.z !== b.z ? a.z - b.z : Number(b.dead) - Number(a.dead)));
 
     const quality = this.game.renderQuality ?? 'auto';
     const automaticCompact = Boolean(

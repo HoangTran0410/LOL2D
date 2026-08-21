@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import BuffAddType from '@/game/enums/BuffAddType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Ground from '@/game/gameObject/buffs/Ground';
@@ -68,7 +68,7 @@ export class Singed_W_Object extends SpellObject {
    * Painted with the other ground effects, under the units standing in it —
    * a puddle you can see your own champion's feet in reads as a puddle.
    */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   radius = 130;
   lifeTime = 5000;

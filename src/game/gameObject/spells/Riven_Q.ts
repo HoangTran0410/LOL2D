@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Airborne from '@/game/gameObject/buffs/Airborne';
@@ -293,12 +293,12 @@ export class Riven_Q_Slash extends SpellObject {
 }
 
 /**
- * The third charge's ground crack. Ground art, so zIndex is 2: Z_INDEX_MAP is keyed by
- * exact constructor and a SpellObject subclass would otherwise land on 99, over the feet
+ * The third charge's ground crack. Ground art, so zIndex is `GROUND_Z_INDEX`: an un-overridden SpellObject
+ * subclass would otherwise resolve to `SPELL_EFFECT_Z_INDEX`, over the feet
  * of everyone standing on it.
  */
 export class Riven_Q_GroundCrack extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = 520;
   age = 0;
   readonly heading: number;

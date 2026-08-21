@@ -1,6 +1,6 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -357,7 +357,7 @@ export class Morgana_R_Tether_Object extends SpellObject {
 /**
  * The 0.35s before the shackles exist.
  *
- * Ground art (`zIndex = 2`) on purpose: the most useful thing this draws is the
+ * Ground art (`zIndex = GROUND_Z_INDEX`) on purpose: the most useful thing this draws is the
  * latch circle, closing in on Morgana over the windup, and it has to be legible
  * under the feet of the people deciding whether to walk out of it. That circle
  * is the whole counterplay to Soul Shackles, and until now it was never drawn
@@ -366,7 +366,7 @@ export class Morgana_R_Tether_Object extends SpellObject {
 export class Morgana_R_Windup extends SpellObject {
   lifeTime = CAST_TIME_MS;
   age = 0;
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   update(): void {
     if (this.dropIfAttachmentLost()) return;

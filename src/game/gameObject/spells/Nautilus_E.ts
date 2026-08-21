@@ -2,7 +2,7 @@ import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
 import BuffAddType from '@/game/enums/BuffAddType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
@@ -58,12 +58,12 @@ export interface NautilusTide {
  * takes one. Sharing a single set would silently turn the ability into a single
  * 14-damage pulse with a long animation.
  *
- * Ground art, so `zIndex = 2` — `Z_INDEX_MAP` is keyed by exact constructor and a
- * `SpellObject` subclass otherwise falls through to 99, above the feet of
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — an un-overridden `SpellObject`
+ * subclass resolves to `SPELL_EFFECT_Z_INDEX` instead, above the feet of
  * everyone standing in the rings.
  */
 export class Nautilus_E_Object extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   lifeTime = (E_RADII.length - 1) * E_WAVE_GAP_MS + E_WAVE_LIFE_MS;
   waves: NautilusTide[] = [];

@@ -37,10 +37,7 @@ export default class Shield extends Buff {
     const absorbed = Math.min(this.amount, damage);
     this.amount -= absorbed;
 
-    const combatText = new CombatText(this.targetUnit);
-    combatText.text = String(Math.round(absorbed));
-    combatText.textColor = this.color;
-    this.game.objectManager.addObject(combatText);
+    CombatText.show(this.targetUnit, 'shield', absorbed, this.color);
 
     if (this.amount <= 0) this.deactivateBuff();
 

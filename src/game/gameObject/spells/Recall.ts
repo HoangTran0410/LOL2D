@@ -4,6 +4,7 @@ import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import { SpellRole } from '@/game/ai/SpellRole';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 // Exported so the suite asserts the wiring rather than a copy of the numbers —
 // retuning a value must not mean editing a test.
@@ -157,12 +158,12 @@ export default class Recall extends Spell {
  * Three layers and no more. The filling arc *is* the tooltip — an enemy reading
  * the screen can see both that the recall is running and how much of it is
  * left, which is the only thing worth knowing about it — and the upward lift
- * agrees with where the champion is about to go. Ground art, so `zIndex = 2`:
- * `Z_INDEX_MAP` is keyed by exact constructor and a subclass otherwise falls
- * through to 99, painting over the feet standing on it.
+ * agrees with where the champion is about to go. Ground art, so
+ * `zIndex = GROUND_Z_INDEX`: an un-overridden subclass resolves to
+ * `SPELL_EFFECT_Z_INDEX` instead, painting over the feet standing on it.
  */
 export class RecallPad extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   /** How far through the channel, handed over by the spell that spawned it. */
   progressOf: () => number = () => 0;

@@ -1,7 +1,7 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import StatusFlags from '@/game/enums/StatusFlags';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Slow from '@/game/gameObject/buffs/Slow';
@@ -120,7 +120,7 @@ const soar = (t: number): number => 1 - (1 - t) * (1 - t);
  * The ultimate itself: the clock, the flight path, the ground he is going to
  * hit, and the crater afterwards.
  *
- * `zIndex = 2` because everything this object draws is on the dirt — the target
+ * `zIndex = GROUND_Z_INDEX` because everything this object draws is on the dirt — the target
  * circle, the shadow racing under him and the crater all belong under the feet
  * of whoever is standing in them. The body coming down is `Pantheon_R_Meteor`,
  * which draws above them.
@@ -136,7 +136,7 @@ export class Pantheon_R_Object extends SpellObject {
   visionRadius = RADIUS;
   age = 0;
   landed = false;
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   /** Where on the ground plane he actually is; the flight writes it per frame. */
   _at: p5.Vector = this.owner.position.copy();

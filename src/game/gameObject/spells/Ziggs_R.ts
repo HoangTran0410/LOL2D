@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -60,11 +60,11 @@ export default class Ziggs_R extends Spell {
 
 /**
  * The shell on its way down. Ground art — the shadow and both rims are painted on the floor, so
- * it takes the ground zIndex explicitly: Z_INDEX_MAP is keyed by exact constructor and a
- * SpellObject subclass would otherwise land on 99, above the champions standing in the blast.
+ * it takes `GROUND_Z_INDEX` explicitly: an un-overridden SpellObject subclass
+ * would otherwise resolve to `SPELL_EFFECT_Z_INDEX`, above the champions standing in the blast.
  */
 export class Ziggs_R_Object extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   radius = R_OUTER_RADIUS;
   age = 0;
   detonated = false;

@@ -1,7 +1,7 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import StatusFlags from '@/game/enums/StatusFlags';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastSpec } from '@/game/spell/runtime/types';
 import CastTelegraph from '@/game/vfx/CastTelegraph';
 import Spell from '@/game/gameObject/Spell';
@@ -158,8 +158,9 @@ export default class XinZhao_R extends Spell {
  */
 export class XinZhao_R_Object extends SpellObject {
   // Ground art — the scoured disc covers 300px of floor, so it goes under the
-  // units standing on it rather than over their feet (DEFAULT_Z_INDEX is 99).
-  zIndex = 2;
+  // units standing on it rather than over their feet (the ordinary
+  // SPELL_EFFECT_Z_INDEX a SpellObject subclass resolves to by default).
+  zIndex = GROUND_Z_INDEX;
   origin: p5.Vector;
   age = 0;
   lifeTime = 620;

@@ -1,7 +1,7 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import TargetResolver from '@/game/spell/targeting/TargetResolver';
 import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
@@ -319,11 +319,12 @@ export class Malzahar_R_Grasp extends SpellObject {
  * The Null Zone: a hole in the floor that keeps eating whoever stands in it,
  * long after the pin is over.
  *
- * Ground art, so `zIndex = 2` — the slot `Singed_W_Object` established. Left at
- * the default 99 it would paint over the feet of everyone fighting in it.
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — the slot `Singed_W_Object`
+ * established. Left at the ordinary `SPELL_EFFECT_Z_INDEX` it would paint
+ * over the feet of everyone fighting in it.
  */
 export class Malzahar_R_Zone extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   center: p5.Vector = createVector();
   age = 0;
   sinceTick = 0;

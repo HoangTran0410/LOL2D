@@ -2,7 +2,7 @@ import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import type { BasicAttackHit } from '@/game/combat/BasicAttack';
 import EventType from '@/game/enums/EventType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
@@ -202,7 +202,7 @@ export class Nautilus_W_Shell extends SpellObject {
 
 /** The low sheet of water, on the ground, at exactly the radius that hit. */
 export class Nautilus_W_Splash extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = 420;
   age = 0;
 

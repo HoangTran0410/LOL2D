@@ -38,10 +38,7 @@ export default class Heal extends Spell {
 
     // combat text
     if (newHeal > currentHeal) {
-      let combatText = new CombatText(this.owner);
-      combatText.text = `+ ${~~(newHeal - currentHeal)}`;
-      combatText.textColor = [0, 255, 0];
-      this.game.objectManager.addObject(combatText);
+      CombatText.show(this.owner, 'heal', newHeal - currentHeal, [0, 255, 0]);
     }
   }
 }

@@ -2,7 +2,7 @@ import { Circle, Rectangle } from '@/libs/quadtree';
 import GameObject from '@/game/gameObject/GameObject';
 import type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
 import Champion from '@/game/gameObject/attackableUnits/Champion';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { FOUNTAIN_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 
 export interface FountainPresetData {
   name: string;
@@ -41,7 +41,7 @@ interface Mote {
 export default class Fountain extends GameObject {
   declare game: GameObjectRuntimeContext;
   /** Under everything else — it is a floor. */
-  zIndex = -1;
+  zIndex = FOUNTAIN_Z_INDEX;
 
   name: string;
   radius: number;
