@@ -1,5 +1,6 @@
 import type { ContentApi } from '@/content/ContentApi';
-import type { ContentPackCode, ContentPackData } from '@/content/ContentPack';
+import type { ContentPackCode, ContentPackData, MonsterDef } from '@/content/ContentPack';
+import { referenceMap } from './map';
 import makeVeraQ, { VERA_Q_COOLDOWN_MS, VERA_Q_DAMAGE, VERA_Q_MANA } from './spells/Vera_Q';
 import makeVeraW, {
   VERA_W_COOLDOWN_MS,
@@ -29,6 +30,12 @@ import makeVeraR, { VERA_R_COOLDOWN_MS, VERA_R_DAMAGE, VERA_R_MANA } from './spe
  * either; each takes `api` as a parameter of its exported factory and
  * nothing more. The default export stays the code half, still a factory,
  * because a pack's spells are still real engine classes and still need it.
+ *
+ * `monsters` and `maps` are Task 9's own addition: a second, deliberately
+ * hostile map (`./map.ts`) with one neutral slot, filled by `warden` below
+ * rather than by anything the bundled pack declares — proof that a monster
+ * "filling a role" (Task 7's split) is a real cross-pack match, not just
+ * something the bundled pack does to its own slots.
  */
 export const data: ContentPackData = {
   manifest: { id: 'reference', version: '1.0.0', coreRange: '^1' },
@@ -81,6 +88,32 @@ export const data: ContentPackData = {
       spells: ['Vera_Q', 'Vera_W', 'Vera_E', 'Vera_R'],
     },
   ],
+  // `provingGroundsGeometry.ts`'s one neutral slot names `role: 'warden'`;
+  // this is what fills it. A camp of one body, `offset: {0, 0}` — see
+  // `MonsterBody`'s own doc comment for why a multi-body camp needs more.
+  monsters: {
+    warden: {
+      id: 'warden',
+      name: 'Vệ Binh Đá',
+      fills: ['warden'],
+      members: [
+        {
+          name: 'Vệ Binh Đá',
+          avatar: 'reference_monster_warden',
+          speed: 1.5,
+          size: 90,
+          attackRange: 60,
+          reviveTime: 3000,
+          health: 250,
+          damage: 18,
+          attackInterval: 1500,
+          aggroRange: 200,
+          offset: { x: 0, y: 0 },
+        },
+      ],
+    } satisfies MonsterDef,
+  },
+  maps: [referenceMap],
 };
 
 const code = (api: ContentApi): ContentPackCode => ({

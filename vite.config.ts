@@ -307,9 +307,28 @@ export default defineConfig({
            * (`map-<id>`, lowercased) the same way spells are named per
            * champion, so Task 9's second map gets its own chunk instead of
            * growing this one.
+           *
+           * Task 9's own map lives under `packs/reference/`, not
+           * `src/content/maps/` — a pack's map ships with the rest of its
+           * pack, the same way `packs/reference/spells/` ships beside
+           * `pack.ts` rather than under `src/content/`. The pattern below
+           * matches either directory so `provingGroundsGeometry.ts` gets the
+           * same carve-out `summonersRiftGeometry.ts` gets, ahead of the
+           * blanket `/packs/reference/` -> `pregame` rule two lines down,
+           * which would otherwise win by matching first on path alone and
+           * quietly put this map's polygons back in the chunk the menu
+           * loads. Confirmed by `npm run chunks:check` plus a real
+           * `vite build` and reading the manifest, not assumed from the
+           * rule matching in isolation — see that script's own comment for
+           * why a source-level check cannot see this class of regression.
            */
-          if (/\/src\/content\/maps\/([A-Za-z0-9]+)Geometry\.ts$/.test(id)) {
-            const match = /\/src\/content\/maps\/([A-Za-z0-9]+)Geometry\.ts$/.exec(id);
+          if (
+            /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+)\/([A-Za-z0-9]+)Geometry\.ts$/.test(id)
+          ) {
+            const match =
+              /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+)\/([A-Za-z0-9]+)Geometry\.ts$/.exec(
+                id
+              );
             return `map-${match![1].toLowerCase()}`;
           }
           if (id.includes('/src/content/') || id.includes('/packs/reference/')) return 'pregame';
