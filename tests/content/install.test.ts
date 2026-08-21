@@ -16,15 +16,16 @@ import type { ContentPackFactory } from '../../src/content/ContentPack';
  * which is the entire reason the pack contract is a factory taking an API
  * rather than a module of exports.
  *
- * The reference pack is here to prove the seam, not because core is already
- * a playable game: nothing in `src/` calls `installBundledPacks`, so this
- * registry is written but never read by a boot path yet. It is the smoke
- * test, the living documentation of `ContentApi`, and the template someone
- * copies to write their own — wiring it into the boot path is batch 2's
- * first step.
+ * `BUNDLED_PACKS` is not a demo array any more: `bundledPack` wraps the
+ * game's own 60 champions and 238 spells in place, so it is the `riot` pack
+ * itself, installed first. The reference pack still follows it, now to prove
+ * the seam holds for a second, independent pack rather than to stand in for
+ * the game's own content. Nothing in `src/` calls `installBundledPacks` yet —
+ * this registry is written but not read by a boot path — so wiring it into
+ * the boot path remains later work, not something this file claims to do.
  */
 describe('installBundledPacks', () => {
-  it('ships at least one pack, proving the seam even though nothing reads the registry yet', () => {
+  it('ships the game core content as its first pack', () => {
     expect(BUNDLED_PACKS.length).toBeGreaterThan(0);
   });
 
@@ -35,14 +36,18 @@ describe('installBundledPacks', () => {
     expect(ids).toContain('reference:vera');
   });
 
-  it('every spell a bundled champion names resolves to a class', () => {
+  it('every spell a bundled champion names resolves to a class', async () => {
     // The failure this catches is a typo in a slot list, which is otherwise
     // invisible until someone picks that champion and the slot comes up empty.
+    // `loadSpellClass` (not the synchronous `spellClass`) because most of the
+    // riot pack's spells are lazy loaders — that is the whole point of it
+    // being lazy — so nothing here is resolved until asked for.
     const registry = new PackRegistry();
     installBundledPacks(registry);
     for (const champion of registry.champions()) {
       for (const spellId of champion.spells) {
-        expect(registry.spellClass(spellId), `${champion.id} -> ${spellId}`).toBeTypeOf('function');
+        const loaded = await registry.loadSpellClass(spellId);
+        expect(loaded, `${champion.id} -> ${spellId}`).toBeTypeOf('function');
       }
     }
   });

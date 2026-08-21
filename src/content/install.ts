@@ -1,6 +1,7 @@
 import { buildContentApi } from './ContentApi';
 import type { ContentPackFactory } from './ContentPack';
 import type { PackRegistry } from './PackRegistry';
+import { bundledPack } from './bundledPack';
 import referencePack from '../../packs/reference/pack';
 
 /**
@@ -15,8 +16,13 @@ import referencePack from '../../packs/reference/pack';
  *
  * Keeping that one seam is what makes Stage 2 a change to this file rather
  * than a rewrite of every pack.
+ *
+ * `riot` installs first: it is the game's own content, and install order is
+ * how two packs answering the same question resolve, so the player gets the
+ * answer they expect today. The reference pack follows to keep proving the
+ * seam against a second, independent pack.
  */
-export const BUNDLED_PACKS: ContentPackFactory[] = [referencePack];
+export const BUNDLED_PACKS: ContentPackFactory[] = [bundledPack, referencePack];
 
 /** Every pack gets the same api object, so there is one core in the process. */
 export function installBundledPacks(registry: PackRegistry): void {
