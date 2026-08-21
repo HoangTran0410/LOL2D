@@ -30,9 +30,11 @@ import { contentRegistry } from '@/content/registry';
  * chunk, and reaching into it from here would close a cycle with
  * `bundledPack.ts`, which reads `CHAMPION_KITS` back out of this file; see
  * `qualifyBundledId`'s own doc comment. `CHAMPION_KITS` stays exported here
- * only because `bundledPack.ts` still needs it to build the pack — see its own
- * `@internal` doc comment below; nothing else in this file (or, after this
- * change, outside it) reads it any more.
+ * only because `bundledPack.ts` needs it to build the pack — see its own
+ * `@internal` doc comment below. Two readers are still on it and both are
+ * scheduled: `shelfNameById` below, and `preset.ts`, which Task 8 moves onto
+ * the registry. Until then this comment describes where the roster is *read
+ * from*, not a boundary that already holds.
  *
  * ## The two numbers that move
  *
@@ -218,11 +220,16 @@ export const ATTACK = {
  * A mistyped id is a **compile error**, not a missing ability: `SpellCatalogId`
  * is `keyof typeof spellCatalog`, generated from the barrel itself.
  *
- * @internal Only `src/content/bundledPack.ts` may read this — it is the
- * bundled pack's own source data, wrapped there into a `ContentPack` and
- * installed into the registry everything else in this file (and everywhere
- * outside it) reads instead. Task 9's scan enforces that; batch 4 deletes
- * this constant together with the adapter that reads it.
+ * @internal The bundled pack's own source data, wrapped by
+ * `src/content/bundledPack.ts` into a `ContentPack` and installed into the
+ * registry that the roster is read from.
+ *
+ * **Not yet the only reader.** `shelfNameById` below still walks it for
+ * `listSpellCatalog`'s group tags, and `src/game/preset.ts` reads it for
+ * `PLAYABLE_CHAMPION_KITS`, `randomChampionKit` and `planKit` — Task 8 moves
+ * that one, and Task 9's scan is what closes the rule afterwards. Batch 4
+ * deletes this constant together with the adapter that reads it. Do not add a
+ * reader in the meantime; the list above is meant to shrink, not grow.
  */
 export const CHAMPION_KITS: {
   name: string;
@@ -708,6 +715,11 @@ export const packAsset = (key: string): AssetHandle => AssetManager.get(key as n
 export const listSelectableChampions = (): SelectableChampion[] => {
   const champions: SelectableChampion[] = [];
   for (const champion of contentRegistry().champions()) {
+    // `playable` is the whole rule. The `image` half is not a second rule —
+    // `validate.ts` already refuses to install a `playable` champion without a
+    // portrait — it is how `string | null` gets narrowed to the `string` that
+    // `avatar` wants, in a loop, because this project's `filter` polyfill
+    // cannot narrow a type.
     if (!champion.playable || !champion.image) continue;
     const spells: SelectableChampionSpell[] = [];
     for (const qualifiedId of champion.spells) {
