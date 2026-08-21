@@ -134,3 +134,41 @@ describe('CombatText.show merges per victim and kind', () => {
     expect(combatTexts(game)).toHaveLength(0);
   });
 });
+
+// Bug report (phone testing): under sustained fire, the number "keeps falling
+// forever and leaves the viewport." Root cause: `update()` integrated
+// `movedVector += velocity; velocity += gravity` every tick with no ceiling,
+// and a merge reset `age` but deliberately left `velocity`/`movedVector`
+// alone — so under repeated merges `age` never crossed `lifeTime` (the text
+// never died) while `velocity` accumulated `gravity` forever. This is the
+// probe that catches it: drive a merged text across many times one lifetime
+// and check its offset from the owner stays inside a stated envelope.
+describe('CombatText arc stays bounded under sustained merges', () => {
+  beforeEach(() => installSpellObjectGlobals());
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('does not run away when the same (victim, kind) merges every tick for 5s', () => {
+    const game = createGame();
+    const unit = createUnit(game, 0, 'blue');
+
+    // 5s of sustained fire — 5x COMBAT_TEXT_LIFETIME_MS, so a text that never
+    // dies (because every tick refreshes `age`) would, pre-fix, have
+    // integrated gravity for 5x as long as any single-hit text ever lives.
+    const totalMs = 5_000;
+    for (let elapsed = 0; elapsed < totalMs; elapsed += 16) {
+      CombatText.show(unit, 'damage', 1, [255, 0, 0]);
+      game.objectManager.update();
+    }
+
+    const [text] = combatTexts(game);
+    expect(text).toBeDefined();
+    // Generous envelope: a single, un-merged hit's whole arc — rise and
+    // fall — stays within roughly this range over its one lifetime (see
+    // ARC_LINEAR_PX/ARC_QUADRATIC_PX in CombatText.ts: peak ~10px up,
+    // settle ~30px down). A merged text held alive far longer must still
+    // stay inside it, not grow with how long the fire lasted. Pre-fix this
+    // reached 2113.8px — clearly off the bottom of a phone screen.
+    expect(Math.abs(text.offsetY)).toBeLessThan(100);
+    expect(Math.abs(text.offsetX)).toBeLessThan(100);
+  });
+});

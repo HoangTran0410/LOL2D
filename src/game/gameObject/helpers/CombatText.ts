@@ -6,6 +6,19 @@ import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUni
 export const COMBAT_TEXT_LIFETIME_MS = 1000;
 
 /**
+ * How long the rise-then-fall motion takes to play out, from creation.
+ *
+ * Deliberately its own constant rather than reusing `COMBAT_TEXT_LIFETIME_MS`
+ * at the call site, even though it is set to the same value: one is "how long
+ * until this fades and dies" (resets on every merge — see `CombatText.show`)
+ * and the other is "how long the arc takes" (never resets — see the class doc
+ * comment). They happen to agree so a single, un-merged hit's motion looks
+ * unchanged from before this file separated the two clocks; a future retune
+ * of one is not a retune of the other.
+ */
+export const COMBAT_TEXT_ARC_MS = 1000;
+
+/**
  * What a floating number is reporting. Drives both its format and its merge
  * key — see `CombatText.show`.
  */
@@ -35,6 +48,22 @@ const colorKey = (textColor: string | number[]): string =>
 const mergeTargets = new WeakMap<AttackableUnit, Map<string, CombatText>>();
 
 /**
+ * Closed-form "toss and fall": rises a little, then gravity wins and it
+ * settles below its start, expressed as coefficients of `p` and `p*p` where
+ * `p = min(elapsedMs, COMBAT_TEXT_ARC_MS) / COMBAT_TEXT_ARC_MS` — see
+ * `CombatText.update`. Reproduces the shape the old per-tick integration
+ * produced for a single, un-merged hit over its one lifetime (initial
+ * velocity -1px/tick, gravity +0.05px/tick^2, at the fixed 60Hz sim tick):
+ * peaks ~10px up around a third of the way through the arc, and ends ~30px
+ * below the start once the arc completes.
+ */
+const ARC_LINEAR_PX = -60;
+const ARC_QUADRATIC_PX = 90;
+
+/** Peak sideways drift once the arc completes, so two numbers on one unit don't sit on identical x. */
+const DRIFT_MAX_PX = 40;
+
+/**
  * A floating damage/heal/shield/reflect number over a unit's head.
  *
  * ## Why it merges, and the rule
@@ -55,19 +84,45 @@ const mergeTargets = new WeakMap<AttackableUnit, Map<string, CombatText>>();
  * fresh `COMBAT_TEXT_LIFETIME_MS`**, rather than spawning another object.
  * Sustained fire keeps one number alive and climbing for as long as the fire
  * continues; it only starts to fade once a full lifetime passes with nothing
- * new to add. Position and drift (`movedVector`/`velocity`) are left alone on
- * a merge, so the number keeps floating smoothly instead of popping back to
- * the unit's feet on every hit.
+ * new to add.
+ *
+ * ## Two clocks, not one — and the bug that came from conflating them
+ *
+ * A merge resets `age` (fade + removal) but must leave the *arc* — where the
+ * number sits on its rise-then-fall path — alone, or every hit pops the text
+ * back to the unit's feet and restarts the climb. The first version of this
+ * got that half right and then broke a different way: the arc was driven by
+ * integrating `velocity`/`gravity` into `movedVector` every tick, with
+ * nothing bounding it. A single un-merged hit is only ever alive for one
+ * `lifeTime`, so the integration was accidentally bounded by how long the
+ * object existed — but a merged text under sustained fire never dies (`age`
+ * keeps getting reset before it crosses `lifeTime`), so `velocity` kept
+ * accumulating `gravity` for as long as the fire lasted. A few seconds of
+ * continuous hits and the text was in free fall, off the bottom of the
+ * screen. Reported from a phone: "nó bay xuống hoài luôn, ra khỏi viewport
+ * luôn."
+ *
+ * The fix is a second clock. `elapsedMs` is time since this instance was
+ * *created* — a merge never resets it, unlike `age` — and the arc is a
+ * closed-form function of `min(elapsedMs, COMBAT_TEXT_ARC_MS)`, not an
+ * integrated velocity, so it cannot run away by construction: past
+ * `COMBAT_TEXT_ARC_MS` the position is simply constant. A single hit's
+ * motion is unchanged (it dies at `age > COMBAT_TEXT_LIFETIME_MS`, which
+ * equals `COMBAT_TEXT_ARC_MS`, so the clamp is never actually reached before
+ * removal). A merged text under sustained fire plays the same rise-and-fall
+ * once, then holds at the settled position while its running total keeps
+ * climbing; when the fire stops, `age` resumes counting up from its last
+ * reset and the held number fades from wherever it is.
  *
  * A fixed flush tick (accumulate for ~200-250ms, emit once) was the other
- * option on the table and was rejected: it would buy the same object-count
- * reduction — the steady-state is one live text per (victim, kind) either
- * way — at the cost of up to one tick of latency on an isolated hit, which
- * reads as input lag on the number a player is most likely to be watching:
- * their own. Merging into a still-alive text gets the same reduction with no
- * added latency and no scheduler; its effective window is
- * `COMBAT_TEXT_LIFETIME_MS` itself rather than a second constant to keep in
- * sync with it.
+ * option on the table for the *merge* rule and was rejected: it would buy
+ * the same object-count reduction — the steady-state is one live text per
+ * (victim, kind) either way — at the cost of up to one tick of latency on an
+ * isolated hit, which reads as input lag on the number a player is most
+ * likely to be watching: their own. Merging into a still-alive text gets the
+ * same reduction with no added latency and no scheduler; its effective
+ * window is `COMBAT_TEXT_LIFETIME_MS` itself rather than a second constant
+ * to keep in sync with it.
  *
  * No separate cap on top: merging already bounds live count to one text per
  * unit currently taking a given kind of event, which is bounded by the
@@ -77,11 +132,15 @@ const mergeTargets = new WeakMap<AttackableUnit, Map<string, CombatText>>();
  * should be trimming.
  */
 export default class CombatText extends SpellObject {
-  velocity: p5.Vector;
-  gravity: p5.Vector;
-  movedVector: p5.Vector;
   lifeTime: number;
   age: number;
+  /** Time since this instance was *created*. Never reset by a merge — see above. */
+  elapsedMs: number;
+  /** Current screen-space offset from `owner.position`, refreshed each `update()`. */
+  offsetX: number;
+  offsetY: number;
+  /** This instance's fixed sideways drift target, reached once the arc completes. */
+  driftTargetX: number;
   textSize: number;
   textColor: string | number[];
   text: string;
@@ -90,11 +149,12 @@ export default class CombatText extends SpellObject {
 
   constructor(owner: AttackableUnit) {
     super(owner);
-    this.velocity = createVector(0, -1);
-    this.gravity = createVector(random(-0.03, 0.03), 0.05);
-    this.movedVector = createVector();
     this.lifeTime = COMBAT_TEXT_LIFETIME_MS;
     this.age = 0;
+    this.elapsedMs = 0;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.driftTargetX = random(-DRIFT_MAX_PX, DRIFT_MAX_PX);
     this.textSize = 20;
     this.textColor = 'white';
     this.text = '';
@@ -136,8 +196,14 @@ export default class CombatText extends SpellObject {
   }
 
   update(): void {
-    this.movedVector.add(this.velocity);
-    this.velocity.add(this.gravity);
+    this.elapsedMs += deltaTime;
+    // p = 0 at creation, 1 once the arc has fully played out. Clamped rather
+    // than integrated, so holding this instance alive past COMBAT_TEXT_ARC_MS
+    // (a merge keeps refreshing `age` without touching `elapsedMs`) cannot
+    // push the position past where the arc ends — see the class doc comment.
+    const arcProgress = Math.min(this.elapsedMs, COMBAT_TEXT_ARC_MS) / COMBAT_TEXT_ARC_MS;
+    this.offsetY = ARC_LINEAR_PX * arcProgress + ARC_QUADRATIC_PX * arcProgress * arcProgress;
+    this.offsetX = this.driftTargetX * arcProgress * arcProgress;
 
     this.age += deltaTime;
     if (this.age > this.lifeTime) {
@@ -151,8 +217,8 @@ export default class CombatText extends SpellObject {
     const strokeColor = ColorUtils.applyColorAlpha('yellow', alpha);
     const colorAlpha = ColorUtils.applyColorAlpha(this.textColor, alpha);
     const size = this.owner.stats.size.value;
-    const x = this.owner.position.x + this.movedVector.x;
-    const y = this.owner.position.y + this.movedVector.y - size / 2;
+    const x = this.owner.position.x + this.offsetX;
+    const y = this.owner.position.y + this.offsetY - size / 2;
 
     strokeWeight(2);
     stroke(strokeColor);

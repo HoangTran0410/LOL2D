@@ -292,3 +292,98 @@ and the build. `npx prettier --check` passes on every file touched.
   though this one is display-only and I did fold it in as part of the
   refactor rather than leave two formatters alive for one inconsistent
   space.
+
+## Addendum: the arc under sustained merges was unbounded (fixed)
+
+Reported from a phone after the fix above shipped: the number's animation is
+normally "arcs up then falls while fading," but under sustained fire on the
+same (victim, kind) it "keeps falling forever and leaves the viewport."
+
+### Root cause
+
+`update()` integrated `movedVector += velocity; velocity += gravity` every
+tick with no ceiling. A single, un-merged hit is only ever alive for one
+`lifeTime` (~1000ms, ~60 ticks), so the integration was accidentally bounded
+by how long the object existed. `CombatText.show`'s merge branch resets
+`age` (fade/removal) on every merge but deliberately left `velocity`/
+`movedVector` alone — the old class doc comment said this was so the number
+"keeps floating smoothly instead of popping back to the unit's feet," which
+is correct about *why* it must not reset, but the comment stopped there and
+never noticed the other half: under sustained fire `age` never crosses
+`lifeTime`, so the text never dies, while `velocity` accumulates `gravity`
+forever. A few seconds of continuous hits put it in unbounded free fall.
+
+### Falsifying test, run before the fix
+
+`tests/game/helpers/CombatText.test.ts` › "does not run away when the same
+(victim, kind) merges every tick for 5s" — merges into the same text every
+16ms for 5 seconds (5x `COMBAT_TEXT_LIFETIME_MS`) and asserts the offset
+from the owner stays under 100px. Run against the pre-fix code:
+
+```
+AssertionError: expected 2113.8000000000025 to be less than 100
+```
+
+**2113.8px** — the number the bug produced, confirming it grows without
+bound rather than settling. Then the fix was applied and the same test
+(unmodified assertion, only the field name it reads) passes.
+
+### The fix
+
+Two clocks instead of one, in `src/game/gameObject/helpers/CombatText.ts`:
+
+- `age` — unchanged. Drives fade alpha and removal, resets to 0 on every
+  merge.
+- `elapsedMs` — new. Time since the instance was *created*. **Never reset by
+  a merge.** Drives the arc.
+
+The arc itself is no longer an integrated velocity; it's a closed form of
+`p = min(elapsedMs, COMBAT_TEXT_ARC_MS) / COMBAT_TEXT_ARC_MS` (a new
+exported constant, set equal to `COMBAT_TEXT_LIFETIME_MS` so a single hit's
+motion is pixel-identical to before): `offsetY = ARC_LINEAR_PX * p +
+ARC_QUADRATIC_PX * p*p`, reproducing the old integration's shape (peaks
+~10px up around a third of the way through, settles ~30px down by the time
+the arc completes) but as a formula that cannot exceed its `p = 1` value by
+construction — there is no accumulator left to run away. The small sideways
+drift is the same idea: a fixed per-instance `driftTargetX` reached via
+`driftTargetX * p*p`, bounded to ±40px, instead of an accumulated
+`gravity.x`. `velocity`/`gravity`/`movedVector` are gone; `draw()` reads
+`offsetX`/`offsetY`, recomputed once per `update()` tick.
+
+Confirmed by watching the three cases the design called for:
+
+- **Single hit** — `age` and `elapsedMs` advance together and the text dies
+  at `age > lifeTime = COMBAT_TEXT_ARC_MS`, i.e. right as `p` would reach 1
+  anyway, so the clamp is never actually engaged. Motion unchanged.
+- **Sustained fire** — plays the rise-and-fall once, then holds at the
+  settled position (`p` pinned at 1) while the running total keeps
+  climbing. No bounce, no jitter, no drift.
+- **Fire stops** — `age` resumes counting from its last reset; the held
+  number fades out from wherever it stopped, in place.
+
+The class doc comment is corrected accordingly (the old "position and drift
+are left alone on a merge" paragraph is replaced with a "two clocks, not
+one" section stating the actual invariant and the bug that came from not
+having it).
+
+### e2e numbers, unchanged
+
+Re-ran `tests/e2e/measure-combattext-perf.mjs` after the arc fix — the merge
+rule and tree routing are untouched, so these should (and do) match the
+earlier report within the same run-to-run variance already documented there:
+
+| metric | moderate (prior) | moderate (post arc-fix) | heavy (prior) | heavy (post arc-fix) |
+|---|---:|---:|---:|---:|
+| combat text constructions | 97-106 | 110 | 13-18 | 15 |
+| live mean / max | 60.7-63.7 / 69-70 | 62.8 / 72 | 79.4 / 80 | 79.6 / 80 |
+| `_objectsTree` size | 240-258 | 242 | 274-285 | 285 |
+| `_decorTree` size | 61-67 | 64 | 79-80 | 79 |
+| `_objectsTree` retrieve time | 25.4-27.5ms | 27.1ms | 34.3-34.8ms | 34.5ms |
+
+No regression to the object-count or quadtree-routing fix from this change.
+
+### Tests
+
+- `tests/game/helpers/CombatText.test.ts`: new describe block, one case
+  (above). All 10 cases in the file pass against the fixed code; `npm run
+verify` is green (244 files, 3950 tests, both `tsc` passes, build).
