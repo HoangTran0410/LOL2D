@@ -303,7 +303,14 @@ describe('resolving through the pack registry', () => {
     resetSpellRegistryForTests();
     const settled: string[] = [];
     await loadSpells(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q'], id => settled.push(id));
-    expect(settled).toEqual(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q']);
+    // Multiset, not sequence: the documented contract is "once per id in
+    // `ids`, after that id is done" — it says nothing about order, and
+    // `GameScene`'s progress bar wants completion order, not request order.
+    // Asserting an exact ordered array here would force notification to
+    // queue behind whichever entry sits earliest in `ids`, which is exactly
+    // the regression that stalls the bar on a slow chunk and then jumps it
+    // several steps at once.
+    expect([...settled].sort()).toEqual(['Nobody_Q', 'Yasuo_Q', 'Yasuo_Q']);
   });
 
   it('qualifies a bare id against the bundled pack and leaves a qualified one alone', () => {

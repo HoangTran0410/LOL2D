@@ -110,34 +110,39 @@ export const loadedSpellIds = (): string[] => {
  * against `ids.length` while a match is waiting, and a bar that could stall
  * short of its own total on a dropped chunk would be worse than none.
  *
- * The fetches themselves are issued up front, in parallel — `PackRegistry`
+ * Delivered in **completion order, not `ids` order** — that is the point of
+ * the callback existing at all. `contentRegistry()` is a module-level
+ * singleton that outlives one match, so `kitIds` routinely mixes a fresh slow
+ * chunk with ids a previous match already resolved; sequencing notification
+ * behind `ids`' position would freeze the bar at that slow entry and then
+ * jump several steps at once the moment it finally lands. `PackRegistry`
  * already shares one in-flight fetch across every caller asking for the same
- * qualified id, so this module keeps no dedupe map of its own. `onSettled` is
- * still delivered in `ids` order rather than completion order: two ids do not
- * generally finish in the order they were requested (an unknown id resolves
- * at once, a real one waits on its chunk), and a progress callback that jumps
- * around is no easier to reason about than the class lookup it announces.
+ * qualified id, so this module keeps no dedupe map of its own — each entry
+ * gets its own `.then(onSettled)`, gathered with one `Promise.all`.
  */
 export async function loadSpells(
   ids: readonly string[],
   onSettled?: (id: string) => void
 ): Promise<void> {
   const registry = contentRegistry();
+  const pending: Promise<void>[] = [];
 
-  const settling = ids.map(id =>
-    registry.loadSpellClass(qualifySpellId(id)).catch(error => {
-      // One champion's chunk failing to arrive must not take the match with
-      // it: the id stays unloaded, `spellClassOfId` keeps returning null, and
-      // whatever asked for it falls back the same way it would for a stale id.
-      // eslint-disable-next-line no-console
-      console.error(`spellRegistry: could not load ${id}`, error);
-    })
-  );
-
-  for (let i = 0; i < ids.length; i++) {
-    await settling[i];
-    onSettled?.(ids[i]);
+  for (const id of ids) {
+    const settled = registry
+      .loadSpellClass(qualifySpellId(id))
+      .catch(error => {
+        // One champion's chunk failing to arrive must not take the match with
+        // it: the id stays unloaded, `spellClassOfId` keeps returning null,
+        // and whatever asked for it falls back the same way it would for a
+        // stale id.
+        // eslint-disable-next-line no-console
+        console.error(`spellRegistry: could not load ${id}`, error);
+      })
+      .then(() => onSettled?.(id));
+    pending.push(settled);
   }
+
+  await Promise.all(pending);
 }
 
 /**
