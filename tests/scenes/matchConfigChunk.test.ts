@@ -44,6 +44,12 @@ const BANNED_MODULES = [
   'hudInteractions',
   'managers/ObjectManager',
   'PregameConfigSource',
+  // Batch 4: the 240 spells (and the rest of Riot's content) moved out of
+  // `src/game/` into `packs/riot/`, so a value import of a real spell class
+  // now has no `src/game/` substring in it at all — the same "the whole match
+  // rides along" bug the rest of this list guards against, wearing a
+  // specifier none of those patterns match.
+  'packs/riot',
 ];
 
 const stripComments = (source: string): string =>

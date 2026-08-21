@@ -19,6 +19,19 @@ import { join } from 'node:path';
  *
  * `import type` is fine and deliberately allowed: type-only imports are erased
  * before Rollup sees them.
+ *
+ * Batch 4 moved the 240 spells (and everything else Riot-content) out from
+ * under `src/game/` entirely, into `packs/riot/`. The specifier this scan
+ * used to catch the barrel with — `spells/index`, back when the barrel lived
+ * at `src/game/gameObject/spells/index.ts` — no longer names anything: the
+ * barrel is `packs/riot/spells/index.ts` now, a path with no `/game/` in it
+ * at all, so `reachesTheMatch`'s `/game/`-substring test walks straight past
+ * it. A pregame file reaching `packs/riot/spells` (the exact 1.1MB the
+ * comment above is about) would pass both checks clean. `packs/` is now
+ * banned outright: nothing on the pregame path has legitimate business
+ * reaching into a content pack's own code — the generated catalog
+ * (`@/game/config/spellCatalog`) is the sanctioned way to read a spell's name
+ * and icon without touching its class.
  */
 const ROOT = join(__dirname, '../..');
 const SRC = join(ROOT, 'src');
@@ -79,8 +92,12 @@ function staticImports(source: string): string[] {
 }
 
 const reachesTheMatch = (specifier: string): boolean =>
-  (specifier.startsWith('@/game/') || specifier.includes('/game/')) &&
-  !ALLOWED_GAME_MODULES.includes(specifier);
+  ((specifier.startsWith('@/game/') || specifier.includes('/game/')) &&
+    !ALLOWED_GAME_MODULES.includes(specifier)) ||
+  // Batch 4: the spells (and every other piece of Riot content) live outside
+  // `src/game/` now, so a reach into a pack's own code has no `/game/` in the
+  // specifier at all and would otherwise walk straight past the check above.
+  specifier.includes('packs/');
 
 describe('the pregame screen boots without the match', () => {
   it('finds the files it claims to check', () => {
@@ -108,10 +125,14 @@ describe('the pregame screen boots without the match', () => {
     // `preset.ts` is the specific module that used to do this, and the one an
     // editor auto-import is most likely to bring back — it still exports the
     // same names, so the code would compile and only the bundle would change.
+    // `packs/riot/spells` (batch 4) is the same bug wearing the barrel's new
+    // address, now that the 240 spells live outside `src/game/` entirely.
     const offenders: string[] = [];
     for (const file of pregameFiles()) {
       const source = stripComments(readFileSync(join(SRC, file), 'utf8'));
-      if (/from\s*['"][^'"]*(?:game\/preset|spells\/index)['"]/.test(source)) offenders.push(file);
+      if (/from\s*['"][^'"]*(?:game\/preset|spells\/index|packs\/[^'"]*\/spells)['"]/.test(source)) {
+        offenders.push(file);
+      }
     }
     expect(offenders).toEqual([]);
   });
@@ -140,5 +161,16 @@ describe('the pregame screen boots without the match', () => {
     const caught = staticImports(sample).filter(reachesTheMatch);
     // the preset import only: not the allowed config one, not the type, not the dynamic
     expect(caught).toEqual(['@/game/preset']);
+  });
+
+  it('the scan catches the barrel at its post-batch-4 address too', () => {
+    // The gap this task closed: a specifier with no `/game/` in it at all,
+    // which the pre-batch-4 rule walked straight past.
+    const sample = `
+      import { Ahri_Q } from '../../../packs/riot/spells';
+      import type { ContentApi } from '../../../src/content/ContentApi';
+    `;
+    const caught = staticImports(sample).filter(reachesTheMatch);
+    expect(caught).toEqual(['../../../packs/riot/spells']);
   });
 });
