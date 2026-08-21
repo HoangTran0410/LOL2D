@@ -75,15 +75,26 @@ function zIndexOf(o: GameObject): number {
  * Objects that exist only to be looked at, and so are indexed separately from
  * everything a gameplay query can ask about — see `ObjectManager._decorTree`.
  *
- * Deliberately a closed list of two rather than a `decorative = true` flag on
+ * Deliberately a closed list rather than a `decorative = true` flag on
  * `GameObject`: a flag invites a spell object to set it because "it's only
  * VFX", and a spell object is exactly the thing that must stay queryable. Add
  * to this list only for something that deals no damage, holds no target and
- * blocks nothing. `CombatText` is not here on purpose — it extends
- * `SpellObject`, so a query narrowing by that type would quietly stop seeing it.
+ * blocks nothing.
+ *
+ * `CombatText` used to be kept out on the theory that a query narrowing by
+ * `SpellObject` (the class it extends) would quietly stop seeing it. Audited
+ * against every call site instead of trusting that: nothing in the codebase
+ * filters on bare `instanceof SpellObject`. The one filter that comes close,
+ * `PredefinedFilters.missileSpellObject`, also requires `isMissile`, which
+ * `CombatText` never sets. It deals no damage, holds no target and blocks
+ * nothing — the criterion above, exactly — and a teamfight is precisely the
+ * moment `_objectsTree` is both biggest and most queried: measured at up to
+ * ~46% of the tree's live entries during a burst of damage/heal events
+ * (`tests/e2e/measure-combattext-perf.mjs`), every one of them dead weight to
+ * every vision check, target scan and AOE query that had to walk past it.
  */
 function isDecoration(o: GameObject): boolean {
-  return o instanceof ParticleSystem || o instanceof TrailSystem;
+  return o instanceof ParticleSystem || o instanceof TrailSystem || o instanceof CombatText;
 }
 
 export interface QueryOptions {
