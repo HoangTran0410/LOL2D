@@ -1285,9 +1285,21 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 Three tasks moved every reader onto the registry. This is the scan that keeps them there. It is the cheapest test in this plan and the only one that closes the class permanently — the model is `tests/game/spells/mana-spend-seam.test.ts`.
 
 **Files:**
+- Create: `src/game/config/packAsset.ts`
+- Modify: `src/game/config/spellCatalog.ts`, `src/game/gameObject/attackableUnits/Champion.ts`, `src/content/ContentApi.ts`, `vite.config.ts`
 - Test: `tests/content/rosterSource.test.ts` (create)
 
-- [ ] **Step 1: Write the scan**
+- [ ] **Step 1: Give the pack-asset cast one home**
+
+`AssetManager.get(key as never)` — the cast that lets a pack's own asset key through a function typed against core's generated `AssetKey` union — now exists in **three** places: `packAsset` in `src/game/config/spellCatalog.ts`, `ContentApi.asset` in `src/content/ContentApi.ts`, and `resolveAvatar` in `src/game/gameObject/attackableUnits/Champion.ts`. The third is a byte-identical copy of the first, and it exists because importing `packAsset` into `Champion.ts` closes a real cycle: `Champion.ts → spellCatalog.ts → registry.ts → install.ts → ContentApi.ts → Champion.ts`, since `ContentApi.ts` imports `Champion` and `Pet` as values. Re-adding that import fails 88 test files with `Class extends value undefined`.
+
+Extract it to a **leaf module** — `src/game/config/packAsset.ts`, importing `AssetManager` and nothing else. `spellCatalog.ts`, `Champion.ts` and `ContentApi.ts` all import it. `Champion.ts` then stops importing `spellCatalog.ts` altogether, so the cycle is gone structurally rather than avoided by duplication.
+
+**Pin its chunk explicitly.** `vite.config.ts` sends `src/game/config/` to `pregame` and `src/content/` to `game`; a module imported by both must not be left to the generic fall-through, which is the "goes wherever Rollup decides" trap the chunk rule's own header warns about and which cost a commit two tasks ago. Give it the same treatment the file already gives `vite/preload-helper` — its own named `shared` chunk — and say in the comment why: it is a two-line function that both the menu and the match need, and duplicating it into either chunk is cheaper than a cycle.
+
+Run `npm run build` and `npm run chunks:check` afterwards and report the pregame/game sizes. The byte-level guard in `scripts/check-chunks.mjs` is what catches a mistake here.
+
+- [ ] **Step 2: Write the scan**
 
 `tests/content/packBoundary.test.ts` carries the walker and the comment stripper this project uses — `readdirSync` + `statSync` recursion, no glob dependency. Copy that idiom rather than importing a new one.
 
@@ -1348,19 +1360,19 @@ describe('the roster has exactly one source', () => {
 });
 ```
 
-- [ ] **Step 2: Run it**
+- [ ] **Step 3: Run it**
 
 Run: `npx vitest run tests/content/rosterSource.test.ts`
 Expected: PASS after Tasks 6-8. If it names a file, that file is a reader nobody rewired — **rewire it; do not add it to `ALLOWED`.** The allow-list is closed at the two entries above: the adapter, and the module that declares `CHAMPION_KITS`. An allow-list that grows is a rule that has been repealed one caller at a time.
 
-- [ ] **Step 3: Prove it can fail**
+- [ ] **Step 4: Prove it can fail**
 
 Add `import { CHAMPION_KITS } from '@/game/config/spellCatalog';` to any `src/game/` file, run, watch it name that file, remove it. Report both outcomes.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
-git add tests/content/rosterSource.test.ts
+git add src/game/config/packAsset.ts src/game/config/spellCatalog.ts src/game/gameObject/attackableUnits/Champion.ts src/content/ContentApi.ts vite.config.ts tests/content/rosterSource.test.ts
 git commit -m "test(content): the roster has exactly one source, and a scan says so
 
 Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
@@ -1387,14 +1399,18 @@ Then `npm run assets:generate` and confirm `assets:check` passes. Never hand-edi
 
 **Open the PNG and look at it before moving on.** Batch 1 shipped two icons past a code review that could not see them — one indistinguishable from an existing icon, one whose arrows pointed the wrong way. A binary diff tells a reviewer nothing.
 
-- [ ] **Step 2: Make her playable**
+- [ ] **Step 2: Stop casting a pack's key back to `AssetKey`**
+
+`src/scenes/GameScene.ts`'s `matchArtKeys` still returns `AssetKey[]` and casts `kit.avatar as AssetKey`. That was harmless while every playable champion came from the bundled pack — this step is where it stops being: Vera's portrait key is the reference pack's own and is not a member of core's generated union. Widen the signature to `string[]` and follow the errors. It does not crash today (each key goes through `AssetManager.ensure(key).catch(() => undefined)`, so a miss degrades to a placeholder portrait rather than throwing), which is exactly why it has to be fixed here rather than discovered later as a champion with no picture.
+
+- [ ] **Step 3: Make her playable**
 
 In `packs/reference/pack.ts`, set `image` to the new key and `playable: true`. Un-skip the pregame test from Task 7 Step 1 and run it.
 
 Run: `npx vitest run tests/scenes/pregameCatalog.test.ts`
 Expected: PASS, including the Vera case.
 
-- [ ] **Step 3: Write the e2e script**
+- [ ] **Step 4: Write the e2e script**
 
 `tests/e2e/verify-pack-champion.mjs`, built on `tests/e2e/harness.mjs` — it provides the Vite server, the browser, page-error capture and the `check()`/`report`/`finish()` bookkeeping. Do **not** start your own server or browser; `tests/scripts/e2eHarness.test.ts` fails a script that does.
 
@@ -1406,21 +1422,21 @@ It must end in a **numeric summary and no screenshots**. `tests/e2e/drive-bot-di
 4. Casting each of Q/W/E/R produces an effect — count `game.objectManager.objects` before and after each cast, or read each spell's cooldown going from 0 to non-zero. Prefer the cooldown check: it is what "the cast happened" actually means and it does not depend on a spell that spawns an object.
 5. No page errors.
 
-- [ ] **Step 4: Prove the script is falsifiable**
+- [ ] **Step 5: Prove the script is falsifiable**
 
 Once, now, while it is new. Break one thing it checks — comment out `playable: true` — and confirm the script reports a failure rather than a pass. Restore it, re-run, confirm the pass. **Record both runs' numeric summaries in your report.** Do not repeat this on later changes; the project's notes call re-proving a settled e2e script the single most expensive habit available.
 
-- [ ] **Step 5: Wire the npm script**
+- [ ] **Step 6: Wire the npm script**
 
 `"e2e:pack": "node tests/e2e/verify-pack-champion.mjs"` in `package.json`, beside the existing `e2e:*` entries. It does **not** join `verify` — `verify` is Vitest plus the build, and a Playwright run is minutes.
 
-- [ ] **Step 6: Full verify**
+- [ ] **Step 7: Full verify**
 
 Run: `npm run verify 2>&1 | grep -E "Tests |Test Files |error|FAIL"`
 Run: `npm run e2e:pack`
 Expected: 0 failures in both. Report both summaries.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add assets/images/reference/champ_vera.png src/generated/assetManifest.ts packs/reference/pack.ts tests/e2e/verify-pack-champion.mjs package.json tests/scenes/pregameCatalog.test.ts
