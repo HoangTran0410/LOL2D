@@ -202,6 +202,45 @@ export default defineConfig({
            */
           if (id.includes('vite/preload-helper')) return 'shared';
           /**
+           * The content pack machinery — `src/content/` and the reference pack
+           * under `packs/reference/` — pinned to `game` ahead of the pregame
+           * carve-out and the generic `/src/game/` rule below.
+           *
+           * `spellCatalog.ts` (pinned `pregame` by the rule after this one)
+           * reads the roster and display data through `contentRegistry()`,
+           * which is `src/content/registry.ts`. That module's own dependency
+           * chain — `install.ts` -> `ContentApi.ts` — statically imports the
+           * ~80 real engine modules a content pack needs to build real spell
+           * classes (24 buffs, the combat and vfx helpers, the spell-object
+           * base classes: see `ContentApi.ts`'s own header). Left unassigned,
+           * that chain is reachable from *both* `pregame` (via `spellCatalog.ts`)
+           * and `game` (via `spellRegistry.ts`, which resolves match-time spell
+           * classes through the same registry) — and Rollup's own cycle
+           * resolution for that shape does not raise an error, it silently
+           * folds the whole chain, engine imports included, into `pregame`:
+           * `DamageReflect`, `TrueSight`, `ParticleSystem` and
+           * `MissileSpellObject` all measurably moved chunks this way, and
+           * pregame grew by the weight of code nothing pregame executes.
+           * Pinning the chain here keeps those classes where they already
+           * belong — this rule runs *before* the generic `/src/game/` rule
+           * only so the doc comment sits next to the reason, since neither
+           * `src/content/` nor `packs/` matches that path test anyway.
+           *
+           * This does not close the cycle — `vite build` still prints
+           * `Circular chunk: pregame -> game -> pregame` after this change,
+           * because `spellCatalog.ts` -> `registry.ts` -> ... -> `ContentApi.ts`
+           * (`pregame -> game`, required: a pack's spells are real engine
+           * classes) and `spellRegistry.ts` -> `registry.ts` plus `preset.ts`'s
+           * pre-existing `CHAMPION_KITS` import (`game -> pregame`, also
+           * required, and neither file is content's to change) are both real,
+           * and neither can be cut from here. `scripts/check-chunks.mjs` polices
+           * the consequence that *is* fixable — engine code leaking into the
+           * chunk that ships to a blank menu screen — rather than the warning,
+           * which would need the pack contract split into a data half and a
+           * code half (tracked, out of scope for this batch) to go away.
+           */
+          if (id.includes('/src/content/') || id.includes('/packs/reference/')) return 'game';
+          /**
            * The pregame screen's data layer, carved out of `src/game/` ahead of
            * the `game` rule below.
            *

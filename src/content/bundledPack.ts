@@ -10,7 +10,6 @@ import type {
 import { CHAMPION_KITS } from '@/game/config/spellCatalog';
 import { spellCatalog } from '@/generated/spellCatalog';
 import { spellModules } from '@/generated/spellModules';
-import Recall from '@/game/gameObject/spells/Recall';
 
 /**
  * The game's own content, wrapped as a pack without moving a file.
@@ -45,10 +44,15 @@ const spellSources = (): Record<string, SpellSource> => {
   }
   // Not in `spellModules`, on purpose: `Recall` is out of `spells/index.ts` so
   // that it can never reach the loadout picker, which is also why it gets no
-  // `spellDisplay` entry below. `preset.ts` already imports it statically, so
-  // declaring it eagerly here costs no chunk that was not already paid for —
-  // and it makes this pack exercise both arms of `SpellSource`.
-  out.Recall = Recall;
+  // `spellDisplay` entry below. `preset.ts` already imports it statically for
+  // every match, so nothing here needs it loaded eagerly a second time — and
+  // an eager import was a real static edge into the `game` chunk that this
+  // module otherwise has no need for (`_api` above is unused; the rest of
+  // this file only reads pregame-side data). A loader — the same shape
+  // `spellModules`' entries already use — exercises the lazy arm of
+  // `SpellSource` instead of the eager one, which is a better fit anyway:
+  // this file has no *other* reason to reach into `src/game/gameObject/`.
+  out.Recall = () => import('@/game/gameObject/spells/Recall').then(module => module.default);
   return out;
 };
 

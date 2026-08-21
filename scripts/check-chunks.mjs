@@ -74,6 +74,57 @@ for (const rule of RULES) {
   }
 }
 
+// `pregame -> game` is an accepted, one-directional edge: `spellCatalog.ts`
+// calls `contentRegistry()`, which builds a pack's `ContentApi` — the real
+// buff/combat/vfx/spell-object classes, because a content pack genuinely
+// needs them to construct real spells. `staticDeps` above cannot police that
+// (banning the edge outright would just break the build the pack work
+// depends on), so this checks the *compiled bytes* of the pregame chunk
+// instead of its import edges: these four names are class exports carried as
+// `ContentApi`'s object-literal property keys (`buffs: { DamageReflect, ... }`
+// and friends), which esbuild's minifier cannot rename — unlike the local
+// bindings that actually hold the classes. Their presence in the pregame
+// chunk's own text means the class *definition* rode along with it, not just
+// a cross-chunk reference into `game`. `BasicAttack` is deliberately not in
+// this list: `'BasicAttack'` is also a literal spell id the pregame roster
+// carries as data (`BASIC_ATTACK_ID`, a `CHAMPION_KITS` entry), so its
+// presence proves nothing either way.
+//
+// This is what would have caught the batch-2 regression this rule documents:
+// `spellCatalog.ts` gained a call to `contentRegistry()`, and Rollup's own
+// cycle resolution for the resulting `pregame -> game -> pregame` shape (see
+// `vite.config.ts`'s `src/content/` rule) does not error — it silently folds
+// the whole content chain, engine imports included, into `pregame`. Pinning
+// `src/content/` and `packs/reference/` to `game` there is what keeps these
+// four out now, even though the underlying cycle warning still prints (that
+// rule's comment has the edge list and why it cannot close without a larger
+// change).
+const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'MissileSpellObject'];
+// Bytes, uncompressed. The pregame chunk with no content chain reachable at
+// all measured ~159KB; this leaves room to grow as data (more champions, more
+// display fields) without leaving room for the ~80-module engine surface
+// above to fit back in unnoticed — that regression alone was +35KB.
+const PREGAME_SIZE_CEILING_BYTES = 175_000;
+
+{
+  const file = chunk('pregame');
+  const source = readFileSync(join(assets, file), 'utf8');
+  const leaked = PREGAME_ENGINE_LEAK.filter(name => source.includes(name));
+  if (leaked.length) {
+    failures.push(
+      `${file} contains engine code (${leaked.join(', ')}) that belongs in the game chunk — ` +
+        'the buff/combat/vfx surface has drifted into pregame'
+    );
+  }
+  const bytes = Buffer.byteLength(source, 'utf8');
+  if (bytes > PREGAME_SIZE_CEILING_BYTES) {
+    failures.push(
+      `${file} is ${bytes} bytes, over the ${PREGAME_SIZE_CEILING_BYTES}-byte pregame ceiling — ` +
+        'the pregame screen should stay data, not carry engine code'
+    );
+  }
+}
+
 // The spell split only means anything while it is actually many chunks: a
 // `manualChunks` rule that stops matching returns one big one and nothing else
 // would notice.
