@@ -5,6 +5,7 @@ import type {
   ChampionEntry,
   ContentPackCode,
   ContentPackData,
+  MonsterDef,
   SpellDisplayData,
   SpellSource,
 } from './ContentPack';
@@ -101,6 +102,106 @@ const championEntries = (): ChampionEntry[] => {
   return out;
 };
 
+/**
+ * The jungle, as monster identities — six of them, matching Task 7's split:
+ * the epic camp, the two buff camps, wolves, gromp, raptors. Where each one
+ * stands is `mapPresets.ts`'s `NEUTRAL_SLOTS`, read through
+ * `summonersRiftGeometry.ts`'s `slots.neutral`; a `role` here and a `role`
+ * there is the only thing tying a camp's identity to its place, and
+ * `PackRegistry.monstersFilling` is the match.
+ *
+ * No `CHAMPION_KITS`/`spellCatalog` reads, so — unlike `champions`/`spellDisplay`
+ * above — this needs no getter to dodge the module's own load-order cycle;
+ * it is safe to build once, eagerly.
+ *
+ * A pack of several (`wolves`, `raptors`) is one definition with `count`
+ * rather than one entry per body — `Game.spawnJungle()` spawns that many and
+ * gives every one of them the same camp point, which is what lets
+ * `Monster.alertCamp` find packmates without the `campId` string this
+ * replaces. Collapsing "Greater Wolf" + two "Wolf"s (or the raptor
+ * equivalent) into one shared identity is a real simplification — a pack
+ * pack's members are no longer visually distinct — traded for a monster
+ * being pure data instead of position-tagged code; nothing here changes camp
+ * *positions*, health totals or attack tuning per body.
+ */
+const monsterEntries = (): Record<string, MonsterDef> => ({
+  baron: {
+    id: 'baron',
+    name: 'Baron',
+    fills: ['baron'],
+    avatar: 'monster_Baron_Nashor',
+    speed: 0,
+    size: 100,
+    attackRange: 400,
+    reviveTime: 3000,
+    health: 1000,
+    // Rooted with a long reach. The bite is small because it is the one part
+    // of the fight nobody can dodge — the rest of Baron's kit lives in
+    // `BARON_ABILITIES` (merged in by `preset.ts`'s `monsterPresetFromSlot`,
+    // which this data-only definition cannot carry) and is all avoidable.
+    damage: 12,
+    attackInterval: 2000,
+    aggroRange: 480,
+  },
+  blue: {
+    id: 'blue',
+    name: 'Blue',
+    fills: ['blue'],
+    avatar: 'monster_Blue_Sentinel',
+    speed: 2,
+    size: 80,
+    attackRange: 50,
+    reviveTime: 3000,
+    health: 300,
+  },
+  red: {
+    id: 'red',
+    name: 'Red',
+    fills: ['red'],
+    avatar: 'monster_Red_Brambleback',
+    speed: 2,
+    size: 80,
+    attackRange: 50,
+    reviveTime: 3000,
+    health: 300,
+  },
+  wolves: {
+    id: 'wolves',
+    name: 'Wolf',
+    fills: ['wolves'],
+    avatar: 'monster_Murk_Wolf',
+    speed: 2.5,
+    size: 40,
+    attackRange: 50,
+    reviveTime: 3000,
+    health: 100,
+    count: 3,
+  },
+  gromp: {
+    id: 'gromp',
+    name: 'Gromp',
+    fills: ['gromp'],
+    avatar: 'monster_Gromp',
+    speed: 2,
+    size: 70,
+    attackRange: 150,
+    reviveTime: 3000,
+    health: 300,
+  },
+  raptors: {
+    id: 'raptors',
+    name: 'Raptor',
+    fills: ['raptors'],
+    avatar: 'monster_Raptor',
+    speed: 2,
+    size: 40,
+    attackRange: 150,
+    reviveTime: 3000,
+    health: 50,
+    count: 4,
+  },
+});
+
 export const data: ContentPackData = {
   manifest: { id: BUNDLED_PACK_ID, version: '1.0.0', coreRange: '^1' },
   // Getters, not eagerly evaluated fields. `championEntries()`/`displayData()`
@@ -124,6 +225,9 @@ export const data: ContentPackData = {
   get champions() {
     return championEntries();
   },
+  // Plain, not a getter: `monsterEntries()` has no `CHAMPION_KITS`/`spellCatalog`
+  // read to race, so there is no load-order cycle to defer past. Built once.
+  monsters: monsterEntries(),
   // A getter for consistency with `champions`/`spellDisplay` above, though
   // Task 4's split removed the cycle risk this one used to carry: before it,
   // `./maps/summonersRift` built its `terrain`/`slots` eagerly from

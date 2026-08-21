@@ -290,6 +290,87 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/fills/);
   });
 
+  it('names a monster missing the tuning fields Game.spawnJungle needs to build one', () => {
+    // A camp used to carry position and tuning in one MonsterPresetData
+    // entry; splitting position out to a NeutralSlot still leaves speed,
+    // size, attackRange and reviveTime with nowhere else to live.
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: { wolf: { id: 'wolf', name: 'Wolf', fills: ['wolves'], health: 100 } },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join(' ')).toMatch(/speed/);
+      expect(result.errors.join(' ')).toMatch(/size/);
+      expect(result.errors.join(' ')).toMatch(/attackRange/);
+      expect(result.errors.join(' ')).toMatch(/reviveTime/);
+    }
+  });
+
+  it('rejects a monster avatar that is neither a string nor null', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: {
+        wolf: {
+          id: 'wolf',
+          name: 'Wolf',
+          fills: ['wolves'],
+          avatar: 42,
+          speed: 2,
+          size: 40,
+          attackRange: 50,
+          reviveTime: 3000,
+          health: 100,
+        },
+      },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/avatar/);
+  });
+
+  it('rejects a monster count below one', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: {
+        wolf: {
+          id: 'wolf',
+          name: 'Wolf',
+          fills: ['wolves'],
+          avatar: null,
+          speed: 2,
+          size: 40,
+          attackRange: 50,
+          reviveTime: 3000,
+          health: 100,
+          count: 0,
+        },
+      },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/count/);
+  });
+
+  it('accepts a fully specified monster, a pack of several included', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: {
+        wolves: {
+          id: 'wolves',
+          name: 'Wolf',
+          fills: ['wolves'],
+          avatar: 'reference:wolf',
+          speed: 2,
+          size: 40,
+          attackRange: 50,
+          reviveTime: 3000,
+          health: 100,
+          count: 3,
+        },
+      },
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it('rejects a spells entry that is not a class', () => {
     // The success cast claims spells: Record<string, SpellClass>. A string
     // sitting where a constructor belongs must be named at load, not `new`-ed

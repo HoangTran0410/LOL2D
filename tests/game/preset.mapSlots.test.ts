@@ -18,8 +18,14 @@
  */
 import { describe, expect, it } from 'vitest';
 import TeamId from '../../src/game/enums/TeamId';
-import { fountainsFromSlots, turretsFromSlots } from '../../src/game/preset';
+import {
+  fountainsFromSlots,
+  monsterFillingSlot,
+  monsterPresetFromSlot,
+  turretsFromSlots,
+} from '../../src/game/preset';
 import { summonersRiftGeometry } from '../../src/content/maps/summonersRiftGeometry';
+import { BARON_ABILITIES } from '../../src/game/gameObject/monsters/Baron';
 
 describe('fountains and turrets built from a map slot', () => {
   it('spawns one fountain preset per spawn slot, on the slot’s own faction', () => {
@@ -73,5 +79,80 @@ describe('fountains and turrets built from a map slot', () => {
         teamId: slot.faction === 'blue' ? TeamId.BLUE : TeamId.RED,
       });
     });
+  });
+});
+
+/**
+ * `Game.spawnJungle()` is the same shape as `spawnFountains`/`spawnTurrets`
+ * above — a thin loop over `new Monster(...)` — so it is not tested directly
+ * either (no test in this codebase constructs a real `Game`, see this file's
+ * own header). `monsterFillingSlot`/`monsterPresetFromSlot` are the pure
+ * translation the loop is built on: resolving a neutral slot's `role` to an
+ * installed monster, and turning that monster plus that slot into a
+ * spawn-ready `MonsterPresetData`. Checked against the real bundled data —
+ * `summonersRiftGeometry.slots.neutral`, not a hand-rolled slot — so this
+ * also carries the coverage that used to live in `CampAggro.test.ts`'s "the
+ * map data" block, back when a pack's grouping was `campId` rather than
+ * `role`.
+ */
+describe('jungle camps built from a map slot', () => {
+  it('fills every neutral slot the real map declares', () => {
+    const { neutral } = summonersRiftGeometry.slots;
+    expect(neutral.length).toBeGreaterThan(0);
+    for (const slot of neutral) {
+      expect(monsterFillingSlot(slot), `nothing fills the ${slot.role} camp`).not.toBeNull();
+    }
+  });
+
+  it('leaves a slot empty rather than throwing when no installed monster fills its role', () => {
+    // Spec §6: a slot nobody fills is left empty and the map still plays.
+    // `role` is a free string core never interprets, so a role no pack
+    // supplies must resolve to "nothing here", not a crash.
+    const stranger = { role: 'nobody-fills-this', x: 3000, y: 3000, r: 100 };
+    expect(() => monsterFillingSlot(stranger)).not.toThrow();
+    expect(monsterFillingSlot(stranger)).toBeNull();
+  });
+
+  it('hands every body of a multi-body camp the exact same camp object', () => {
+    // `Monster.alertCamp` finds packmates by `camp` identity, not a shared
+    // `campId` string — so this is load-bearing, not incidental: two calls
+    // for the same slot must return presets whose `camp` is `===`, and a
+    // camp that actually holds more than one body (wolves, raptors) is what
+    // proves the resolution path a multi-body pack takes, not just a solo one.
+    const wolfSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'wolves')!;
+    expect(wolfSlot).toBeDefined();
+    const monster = monsterFillingSlot(wolfSlot)!;
+    expect(monster.count ?? 1).toBeGreaterThan(1);
+
+    const first = monsterPresetFromSlot(monster, wolfSlot);
+    const second = monsterPresetFromSlot(monster, wolfSlot);
+    expect(first.camp).toBe(wolfSlot);
+    expect(second.camp).toBe(wolfSlot);
+  });
+
+  it("merges Baron's engine abilities onto the qualified baron monster, and nothing else", () => {
+    const baronSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'baron')!;
+    const baronMonster = monsterFillingSlot(baronSlot)!;
+    expect(monsterPresetFromSlot(baronMonster, baronSlot).abilities).toBe(BARON_ABILITIES);
+
+    const wolfSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'wolves')!;
+    const wolfMonster = monsterFillingSlot(wolfSlot)!;
+    expect(monsterPresetFromSlot(wolfMonster, wolfSlot).abilities).toBeUndefined();
+  });
+
+  it("carries the resolved monster's own tuning through untouched", () => {
+    const baronSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'baron')!;
+    const baronMonster = monsterFillingSlot(baronSlot)!;
+    const preset = monsterPresetFromSlot(baronMonster, baronSlot);
+    expect(preset.name).toBe(baronMonster.name);
+    expect(preset.avatar).toBe(baronMonster.avatar);
+    expect(preset.speed).toBe(baronMonster.speed);
+    expect(preset.size).toBe(baronMonster.size);
+    expect(preset.attackRange).toBe(baronMonster.attackRange);
+    expect(preset.reviveTime).toBe(baronMonster.reviveTime);
+    expect(preset.health).toBe(baronMonster.health);
+    expect(preset.damage).toBe(baronMonster.damage);
+    expect(preset.attackInterval).toBe(baronMonster.attackInterval);
+    expect(preset.aggroRange).toBe(baronMonster.aggroRange);
   });
 });

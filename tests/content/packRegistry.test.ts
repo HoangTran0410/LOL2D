@@ -203,14 +203,19 @@ describe('PackRegistry', () => {
   });
 
   it('finds every monster that can fill a role, in install order', () => {
+    const tuning = { avatar: null, speed: 0, size: 100, attackRange: 400, reviveTime: 3000 };
     registry.install(
       pack('one', {
-        monsters: { big: { id: 'big', name: 'Big', fills: ['epic'], health: 1000 } } as never,
+        monsters: {
+          big: { id: 'big', name: 'Big', fills: ['epic'], health: 1000, ...tuning },
+        } as never,
       })
     );
     registry.install(
       pack('two', {
-        monsters: { huge: { id: 'huge', name: 'Huge', fills: ['epic'], health: 900 } } as never,
+        monsters: {
+          huge: { id: 'huge', name: 'Huge', fills: ['epic'], health: 900, ...tuning },
+        } as never,
       })
     );
     expect(registry.monstersFilling('epic').map(m => m.id)).toEqual(['one:big', 'two:huge']);

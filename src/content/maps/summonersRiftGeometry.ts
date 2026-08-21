@@ -8,7 +8,7 @@
 // specifier first. `?raw` sidesteps the ambiguity in both dev and build: it
 // always yields the file's raw text, which is parsed explicitly below.
 import mapJsonRaw from '../../../assets/json/summoner_map.json?raw';
-import { MonsterPreset } from '@/game/mapPresets';
+import { NEUTRAL_SLOTS } from '@/game/mapPresets';
 import { LANE_WAYPOINTS, Lane } from '@/game/lanes';
 import type {
   LaneDefinition,
@@ -23,17 +23,18 @@ import type {
  * Summoner's Rift's heavy half — terrain and slots — assembled from the
  * places that used to each hold a slice of it without knowing about the
  * others: `assets/json/summoner_map.json` (terrain and the two turret rows),
- * `preset.ts`'s `MonsterPreset` (jungle camps, read here via `./mapPresets`
- * — see that module's header for why) and `lanes.ts` (waypoints). The two
- * spawn platforms are a small literal right here (see `spawnSlots` below) —
- * they used to live in `preset.ts`'s `FountainPreset`, which Task 5 deleted
- * once nothing but this module still read it.
+ * `mapPresets.ts`'s `NEUTRAL_SLOTS` (jungle camp *positions* — see that
+ * module's header for why the identities that fill them live in
+ * `bundledPack.ts` instead) and `lanes.ts` (waypoints). The two spawn
+ * platforms are a small literal right here (see `spawnSlots` below) — they
+ * used to live in `preset.ts`'s `FountainPreset`, which Task 5 deleted once
+ * nothing but this module still read it.
  *
  * This module is Task 4's lazy half of `summonersRift.ts`'s `MapDefinition`:
  * `../maps/summonersRift.ts` exports only the summary
  * (`id`/`name`/`size`/`factions`) eagerly and reaches this file through
  * `() => import('./summonersRiftGeometry')`, so the JSON's raw text — and
- * `MonsterPreset`/`lanes.ts`, neither of which the menu's own chunk has any
+ * `NEUTRAL_SLOTS`/`lanes.ts`, neither of which the menu's own chunk has any
  * use for — never rides along with the picker. Rollup gives this module its
  * own chunk because nothing reaches it by a static import;
  * `tests/content/contentApiChunk.test.ts` and `scripts/check-chunks.mjs` are
@@ -98,29 +99,11 @@ const spawnSlots = (): SpawnSlot[] => [
 ];
 
 /**
- * `MonsterPreset` is 21 entries because a multi-body camp (three wolves, four
- * raptors) lists every body separately, tied together by a shared `campId`.
- * A neutral slot is a *place*, not a body count, so entries collapse — grouped
- * by `campId`, or by the entry's own key when it has none — down to the
- * position of the group's anchor: the one entry whose own key equals the
- * group id (the "big" member of a pack; a solo camp, with no `campId`, is
- * trivially its own anchor). The monsters that will stand here are Task 7's;
- * this only places where.
+ * `NEUTRAL_SLOTS` is `mapPresets.ts`'s own table (position and `role` only —
+ * no monster identity, no `campId`; see that module's header). Copied
+ * defensively so nothing downstream can mutate the shared source array.
  */
-const neutralSlots = (): NeutralSlot[] => {
-  const anchors: NeutralSlot[] = [];
-  for (const [key, preset] of Object.entries(MonsterPreset)) {
-    const groupId = preset.campId ?? key;
-    if (key !== groupId) continue;
-    anchors.push({
-      role: groupId.replace(/\d+$/, ''),
-      x: preset.camp.x,
-      y: preset.camp.y,
-      r: preset.camp.r,
-    });
-  }
-  return anchors;
-};
+const neutralSlots = (): NeutralSlot[] => [...NEUTRAL_SLOTS];
 
 const laneDefinitions = (): LaneDefinition[] =>
   [Lane.TOP, Lane.MID, Lane.BOT].map(id => ({

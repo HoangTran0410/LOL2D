@@ -1,11 +1,11 @@
 import { contentRegistry } from '@/content/registry';
-import type { PackRegistry } from '@/content/PackRegistry';
-import type { MinionSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
+import { qualify, type PackRegistry, type QualifiedMonster } from '@/content/PackRegistry';
+import { BUNDLED_PACK_ID } from '@/content/bundledPack';
+import type { MinionSlot, NeutralSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
-import { MonsterPreset as MonsterCampPreset } from './mapPresets';
 import type Champion from './gameObject/attackableUnits/Champion';
 import {
   DEFAULT_CHAMPION_ATTACK,
@@ -470,17 +470,54 @@ export const loadChampionPresetFromLoadout = async (
   return presetFromPlan(plan);
 };
 
+/** The bundled pack's own qualified id for Baron — see `monsterPresetFromSlot` below. */
+const BARON_QUALIFIED_ID = qualify(BUNDLED_PACK_ID, 'baron');
+
 /**
- * `preset.ts`'s own copy of `MonsterPreset`, re-exported under its original
- * name with `BARON_ABILITIES` merged onto `baron` — the one field
- * `./mapPresets` leaves out because it needs the engine (see that module's
- * own header). Every entry's data otherwise comes straight from there;
- * nothing here transcribes a coordinate a second time.
+ * The monster that fills a neutral slot, or `null` when no installed pack
+ * declares one — spec §6: *a slot nobody fills is left empty and the map
+ * still plays*. `role` is a free string core never interprets, so a map
+ * naming a role nobody supplies is not an error, just an empty camp.
+ *
+ * Several packs may answer the same `role`; `PackRegistry.monstersFilling`'s
+ * own doc comment is the ruling — install order decides, and the match
+ * config may override later.
  */
-export const MonsterPreset: Record<string, MonsterPresetData> = {
-  ...MonsterCampPreset,
-  baron: { ...MonsterCampPreset.baron, abilities: BARON_ABILITIES },
-};
+export const monsterFillingSlot = (slot: NeutralSlot): QualifiedMonster | null =>
+  contentRegistry().monstersFilling(slot.role)[0] ?? null;
+
+/**
+ * One neutral slot's monster, spawn-ready.
+ *
+ * `camp` is the slot object itself, never a copy. `Game.spawnJungle()` calls
+ * this once per slot and constructs every body a multi-body camp needs
+ * (`monster.count`) from the *same* returned preset, so every body ends up
+ * holding the exact same `camp` reference — which is what lets
+ * `Monster.alertCamp` find its packmates by identity instead of the
+ * `campId` string this replaces. See that method's own doc comment.
+ *
+ * `abilities` stays engine-only: a `MonsterDef` cannot carry `MonsterAbility`
+ * callbacks (real code), so Baron's `BARON_ABILITIES` is merged in here by
+ * qualified id — the same special case `preset.ts`'s old `MonsterPreset`
+ * merge made, just against pack data instead of a hard-coded table.
+ */
+export const monsterPresetFromSlot = (
+  monster: QualifiedMonster,
+  slot: NeutralSlot
+): MonsterPresetData => ({
+  name: monster.name,
+  avatar: monster.avatar,
+  camp: slot,
+  speed: monster.speed,
+  size: monster.size,
+  attackRange: monster.attackRange,
+  reviveTime: monster.reviveTime,
+  health: monster.health,
+  damage: monster.damage,
+  attackInterval: monster.attackInterval,
+  aggroRange: monster.aggroRange,
+  abilities: monster.id === BARON_QUALIFIED_ID ? BARON_ABILITIES : undefined,
+});
 
 /**
  * Bridges a map's own faction vocabulary — a pack's free-string `Faction.id`,

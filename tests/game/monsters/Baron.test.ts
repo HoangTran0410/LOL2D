@@ -18,7 +18,8 @@ import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane } from '../../../src/game/lanes';
-import { MonsterPreset } from '../../../src/game/preset';
+import { monsterFillingSlot, monsterPresetFromSlot } from '../../../src/game/preset';
+import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import {
   BARON_ABILITIES,
   BaronPoisonPool,
@@ -32,8 +33,15 @@ import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fix
 
 let game: TestGame;
 
+// The real neutral slot and the real installed monster that fills it, read
+// through the same `preset.ts` seam `Game.spawnJungle()` uses — not a
+// hand-rolled preset — so this test stays honest against what a match
+// actually spawns. See `preset.ts`'s `monsterPresetFromSlot` doc comment.
+const baronSlot = summonersRiftGeometry.slots.neutral.find(slot => slot.role === 'baron')!;
+const baronPreset = () => monsterPresetFromSlot(monsterFillingSlot(baronSlot)!, baronSlot);
+
 const makeBaron = () =>
-  new Monster({ game, preset: MonsterPreset.baron } as ConstructorParameters<typeof Monster>[0]);
+  new Monster({ game, preset: baronPreset() } as ConstructorParameters<typeof Monster>[0]);
 
 const championAt = (x: number, y: number, teamId = 'other') => {
   const champion = new Champion({ game, teamId });
@@ -67,7 +75,7 @@ describe("Baron's kit", () => {
 
   describe('the auto attack it is built around', () => {
     it('bites for a fraction of a champion, not a quarter of one', () => {
-      expect(MonsterPreset.baron.damage).toBe(12);
+      expect(baronPreset().damage).toBe(12);
     });
   });
 
@@ -306,7 +314,7 @@ describe("Baron's kit", () => {
     });
 
     it('is what the Baron preset actually carries', () => {
-      expect(MonsterPreset.baron.abilities).toBe(BARON_ABILITIES);
+      expect(baronPreset().abilities).toBe(BARON_ABILITIES);
     });
 
     it('each cast puts its own object into the world', () => {

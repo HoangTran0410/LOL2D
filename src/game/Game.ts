@@ -1,4 +1,4 @@
-import type { ActiveMap, SpawnSlot, StructureSlot } from '@/content/ContentPack';
+import type { ActiveMap, NeutralSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import { HotKeys, SpellHotKeys } from './constants';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
@@ -13,11 +13,12 @@ import Fountain from './gameObject/structures/Fountain';
 import Turret from './gameObject/structures/Turret';
 import InGameHUD from './hud/InGameHUD';
 import {
-  MonsterPreset,
   attachRecall,
   fountainsFromSlots,
   getChampionPresetFromLoadout,
   minionMusterSlotsFrom,
+  monsterFillingSlot,
+  monsterPresetFromSlot,
   planLoadout,
   planMatchKits,
   presetFromPlan,
@@ -122,6 +123,14 @@ export default class Game {
    * from the live turrets the way `musterPointFor` used to.
    */
   readonly minionMuster: MinionMusterPoint[];
+  /**
+   * The active map's own `slots.neutral` — where each jungle camp sits. Set
+   * in the constructor and read by `spawnJungle()`, which stays a no-arg
+   * method (`MatchDirectorContext.spawnJungle`) so `MatchDirector` can
+   * respawn the whole jungle when `jungleEnabled` is flipped back on
+   * mid-match without needing to hold the map itself.
+   */
+  readonly neutralSlots: NeutralSlot[];
   readonly fps = 60;
   renderFps: RenderFps = renderFpsPreference();
   renderQuality: RenderQuality = renderQualityPreference();
@@ -233,6 +242,7 @@ export default class Game {
   constructor(map: ActiveMap, plan?: MatchPlan) {
     this.mapSize = map.size;
     this.minionMuster = minionMusterSlotsFrom(map.slots.minion);
+    this.neutralSlots = map.slots.neutral;
     // Read once, before anything that might construct a Champion or a Spell:
     // `matchRules` has to be in place the moment the player's own kit is
     // built a few lines down. Validated/defaulted by `loadPregameConfig`
@@ -404,11 +414,37 @@ export default class Game {
     }
   }
 
+  /**
+   * Walks `this.neutralSlots` (the active map's `slots.neutral`) and, for
+   * each one, resolves the installed monster that fills its `role` and
+   * spawns `monster.count ?? 1` bodies there. A slot no installed pack fills
+   * is left empty rather than throwing — spec §6, `preset.ts`'s
+   * `monsterFillingSlot` doc comment.
+   *
+   * Every body for one slot is built from the *same* `monsterPresetFromSlot`
+   * result, so they all share one `camp` object — see `Monster.alertCamp`.
+   * A pack of several is nudged off the exact camp point on a small ring so
+   * `UnitCollisionSystem` is not asked to un-stack bodies spawned on top of
+   * each other; their camp point (where they idle and leash back to) is
+   * unaffected.
+   */
   spawnJungle() {
-    for (const key in MonsterPreset) {
-      const monster = new Monster({ game: this, preset: MonsterPreset[key] });
-      this.monsters.push(monster);
-      this.objectManager.addObject(monster);
+    for (const slot of this.neutralSlots) {
+      const monster = monsterFillingSlot(slot);
+      if (!monster) continue;
+
+      const preset = monsterPresetFromSlot(monster, slot);
+      const count = monster.count ?? 1;
+      for (let i = 0; i < count; i++) {
+        const body = new Monster({ game: this, preset });
+        if (count > 1) {
+          const angle = (i / count) * Math.PI * 2;
+          const spread = Math.min(80, slot.r * 0.3);
+          body.position.set(slot.x + Math.cos(angle) * spread, slot.y + Math.sin(angle) * spread);
+        }
+        this.monsters.push(body);
+        this.objectManager.addObject(body);
+      }
     }
   }
 

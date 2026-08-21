@@ -1,6 +1,6 @@
 import { withinRadius } from '@/utils/math.utils';
 import { Circle } from '@/libs/quadtree';
-import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import { packAsset } from '@/game/config/packAsset';
 import { PredefinedFilters } from '@/game/managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitRenderOptions } from './AttackableUnit';
@@ -33,8 +33,19 @@ export interface MonsterAbility {
 
 export interface MonsterPresetData {
   name: string;
-  /** Null for the anonymous fallback camp; every real camp names its art. */
-  avatar: AssetKey | null;
+  /**
+   * A pack-relative asset key (resolved through `packAsset`), or null for the
+   * anonymous fallback camp — every real camp names its art.
+   */
+  avatar: string | null;
+  /**
+   * The camp point — where this body sits at rest, chases from and leashes
+   * back to. **Also the pack's identity**: every body spawned into the same
+   * neutral slot is handed the exact same `camp` object (`Game.spawnJungle()`
+   * via `preset.ts`'s `monsterPresetFromSlot`), and `alertCamp` finds its
+   * packmates by that shared reference rather than a separate id — see its
+   * own doc comment.
+   */
   camp: { x: number; y: number; r: number };
   speed: number;
   size: number;
@@ -47,16 +58,6 @@ export interface MonsterPresetData {
   attackInterval?: number;
   /** Champions this close wake the camp up. Defaults to attackRange + 120. */
   aggroRange?: number;
-  /**
-   * Which pack this monster belongs to. Every camp-mate shares the string, and
-   * hitting any one of them pulls the rest in — see `alertCamp`.
-   *
-   * **Omit it only for a camp that is genuinely one body** (Baron, a buff, a
-   * gromp). A camp of one with no id skips the alert entirely, which is the
-   * whole reason the field is optional; adding a second monster to such a camp
-   * means giving both an id, or the new one fights alone.
-   */
-  campId?: string;
   /** Tried in order, one per frame. A camp that declares none just swings. */
   abilities?: MonsterAbility[];
 }
@@ -127,8 +128,6 @@ export default class Monster extends AttackableUnit {
   aggroRange: number;
   reviveTime = 0;
   targetLock: AttackableUnit | null = null;
-  /** Shared with every camp-mate; `null` for a camp of one. See `alertCamp`. */
-  campId: string | null;
 
   /** What this camp can do besides swing, in the order it prefers to do it. */
   abilities: MonsterAbility[];
@@ -151,7 +150,7 @@ export default class Monster extends AttackableUnit {
     super({
       game,
       position: createVector(preset.camp.x, preset.camp.y),
-      avatar: preset.avatar ? AssetManager.get(preset.avatar) : undefined,
+      avatar: preset.avatar ? packAsset(preset.avatar) : undefined,
     });
 
     this.name = preset.name;
@@ -172,7 +171,6 @@ export default class Monster extends AttackableUnit {
     this.attackInterval = preset.attackInterval ?? 1500;
     this.damage = preset.damage ?? Math.min(25, Math.max(3, Math.round(preset.health / 25)));
     this.aggroRange = preset.aggroRange ?? preset.attackRange + 120;
-    this.campId = preset.campId ?? null;
     this.abilities = preset.abilities ?? [];
     this._abilityCooldowns = this.abilities.map(() => 0);
 
@@ -482,11 +480,10 @@ export default class Monster extends AttackableUnit {
   /**
    * Pulls the rest of the pack in on `attacker`.
    *
-   * A camp is a pack, not three strangers standing near each other: the three
-   * wolves and the four raptors share a `campId`, and hitting any one of them
-   * used to wake exactly that one — the others watched their packmate die from
-   * 50px away, because `takeDamage` is the only thing that aggros a camp and it
-   * only ever aggroed the body it was called on.
+   * A camp is a pack, not three strangers standing near each other: hitting
+   * one wolf used to wake exactly that wolf — the others watched their
+   * packmate die from 50px away, because `takeDamage` is the only thing that
+   * aggros a camp and it only ever aggroed the body it was called on.
    *
    * Found by query rather than by a list wired up at spawn, so this works the
    * same in a headless test as it does in a match and survives the jungle being
@@ -494,13 +491,20 @@ export default class Monster extends AttackableUnit {
    * from scratch). The circle is measured from the *camp point*, not from this
    * body — the packmate we want is the one still sitting at home — and
    * `chaseLeashRange` is its radius because that is already this camp's
-   * definition of "ground we fight over". `campId` is what actually decides
-   * membership; the radius only keeps the query small.
+   * definition of "ground we fight over".
+   *
+   * Membership used to be a shared `campId` string every body in a pack
+   * carried. That field is gone: a camp is now a neutral slot, and every body
+   * `Game.spawnJungle()` spawns into one slot is handed the exact same `camp`
+   * object (`preset.ts`'s `monsterPresetFromSlot`) — so `mate.camp === this.camp`
+   * *is* "in this pack", with no id to keep in sync and no distance re-scan
+   * against map data. A solo camp's `camp` object is never shared with
+   * anything else, so this still finds nobody for it, same as before.
    *
    * Calls `aggroOn`, never `takeDamage`, so an alert cannot re-broadcast.
    */
   alertCamp(attacker: AttackableUnit) {
-    if (!this.campId || !this.game?.objectManager) return;
+    if (!this.game?.objectManager) return;
 
     const mates = this.game.objectManager.queryObjects({
       area: new Circle({ x: this.camp.x, y: this.camp.y, r: this.chaseLeashRange() }),
@@ -509,7 +513,7 @@ export default class Monster extends AttackableUnit {
 
     for (const mate of mates) {
       if (mate === this || mate === attacker) continue;
-      if (mate.campId !== this.campId) continue;
+      if (mate.camp !== this.camp) continue;
       if (mate.isDead || mate.toRemove) continue;
       // A packmate already busy keeps its own target: the pack converges on
       // whoever walked in, it does not re-target as a unit every time one of

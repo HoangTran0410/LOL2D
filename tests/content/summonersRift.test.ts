@@ -3,7 +3,7 @@ import { summonersRift } from '../../src/content/maps/summonersRift';
 import { validatePack } from '../../src/content/validate';
 import { data as bundledData, BUNDLED_PACK_ID } from '../../src/content/bundledPack';
 import { PackRegistry } from '../../src/content/PackRegistry';
-import { MonsterPreset } from '../../src/game/preset';
+import { NEUTRAL_SLOTS } from '../../src/game/mapPresets';
 import type { MapGeometry, StructureSlot } from '../../src/content/ContentPack';
 import mapJson from '../../assets/json/summoner_map.json';
 
@@ -64,25 +64,20 @@ describe("the Summoner's Rift map definition", () => {
     expect(factions).toEqual(['blue', 'red']);
   });
 
-  it('declares one neutral slot per distinct camp identity, and no monster identities', async () => {
-    // MonsterPreset is a large transcription (21 entries): a pack of wolves
-    // or raptors lists every body separately, tied together by a shared
-    // campId. Assert the neutral count against that grouping applied to the
-    // real source, not against a number typed into this file — a plan draft
-    // asserted "9 distinct camp positions" here, which does not hold up:
-    // MonsterPreset has 21 entries, 14 of them sharing one of 4 distinct
-    // campId values (wolf1, wolf2, raptor1, raptor2), and the other 7
-    // (baron, blue1, blue2, red1, red2, gomp1, gomp2) carry no campId and so
-    // are each their own group — 7 + 4 = 11 distinct camp identities.
-    const groupIds = new Set<string>();
-    for (const [key, entry] of Object.entries(MonsterPreset)) {
-      groupIds.add(entry.campId ?? key);
-    }
-    expect(Object.keys(MonsterPreset)).toHaveLength(21);
-    expect(groupIds.size).toBe(11);
+  it('declares one neutral slot per distinct camp position, and no monster identities', async () => {
+    // Task 7 split position from identity: `mapPresets.ts`'s NEUTRAL_SLOTS is
+    // now the one source of camp positions (11 of them — pre-split
+    // `MonsterPreset` had 21 entries, 14 of them sharing one of 4 distinct
+    // `campId` values (wolf1, wolf2, raptor1, raptor2), and the other 7
+    // (baron, blue1, blue2, red1, red2, gomp1, gomp2) carried no campId and
+    // so were each their own group — 7 + 4 = 11 distinct camp identities,
+    // unchanged by the split). Assert against that real source, not a number
+    // typed into this file — an earlier plan draft asserted "9" here, which
+    // does not hold up against the source.
+    expect(NEUTRAL_SLOTS).toHaveLength(11);
 
     const { slots } = await geometry();
-    expect(slots.neutral).toHaveLength(groupIds.size);
+    expect(slots.neutral).toEqual(NEUTRAL_SLOTS);
     for (const slot of slots.neutral) {
       expect(typeof slot.role).toBe('string');
       expect(slot).not.toHaveProperty('name');

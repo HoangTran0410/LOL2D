@@ -205,6 +205,22 @@ function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
     if (!isStringArray(value.fills)) {
       errors.push(`monsters.${id}: fills must be an array of strings`);
     }
+    // Same shape as `checkChampions`'s `image` check — a pack's own asset key,
+    // never validated against core's generated union.
+    if (value.avatar !== null && typeof value.avatar !== 'string') {
+      errors.push(`monsters.${id}.avatar: must be a string or null`);
+    }
+    if (!isFiniteNumber(value.speed)) errors.push(`monsters.${id}.speed: must be a finite number`);
+    if (!isFiniteNumber(value.size)) errors.push(`monsters.${id}.size: must be a finite number`);
+    if (!isFiniteNumber(value.attackRange)) {
+      errors.push(`monsters.${id}.attackRange: must be a finite number`);
+    }
+    if (!isFiniteNumber(value.reviveTime)) {
+      errors.push(`monsters.${id}.reviveTime: must be a finite number`);
+    }
+    if (value.count !== undefined && (!isFiniteNumber(value.count) || value.count < 1)) {
+      errors.push(`monsters.${id}.count: must be a positive finite number`);
+    }
   }
 }
 
