@@ -6,6 +6,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { installBundledPacks, BUNDLED_PACKS } from '../../src/content/install';
+import { bundledPack } from '../../src/content/bundledPack';
 import type { ContentPackFactory } from '../../src/content/ContentPack';
 
 /**
@@ -20,13 +21,21 @@ import type { ContentPackFactory } from '../../src/content/ContentPack';
  * game's own 60 champions and 238 spells in place, so it is the `riot` pack
  * itself, installed first. The reference pack still follows it, now to prove
  * the seam holds for a second, independent pack rather than to stand in for
- * the game's own content. Nothing in `src/` calls `installBundledPacks` yet —
- * this registry is written but not read by a boot path — so wiring it into
- * the boot path remains later work, not something this file claims to do.
+ * the game's own content. `src/content/registry.ts`'s `contentRegistry()`
+ * calls `installBundledPacks` on its first read, and `main.ts`'s `setup()`
+ * makes that first read happen during the loading screen — so the registry
+ * this file builds by hand is the same one every real match, and the
+ * pregame screen, already read through.
  */
 describe('installBundledPacks', () => {
   it('ships the game core content as its first pack', () => {
+    // Not just non-empty: install order is load-bearing — `PackRegistry`'s
+    // "where several packs answer the same question, install order decides"
+    // (`monstersFilling`'s own doc comment) and `pregameCatalog.ts`'s
+    // `sourceOrder` both read it — so this pins `bundledPack` at index 0
+    // rather than merely proving the array has *something* in it.
     expect(BUNDLED_PACKS.length).toBeGreaterThan(0);
+    expect(BUNDLED_PACKS[0]).toBe(bundledPack);
   });
 
   it('installs the reference pack and its champion', () => {

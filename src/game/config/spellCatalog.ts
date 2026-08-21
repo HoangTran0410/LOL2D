@@ -94,7 +94,10 @@ export interface SpellDisplay {
  * `BUNDLED_PACK_ID` (`@/content/bundledPack`) and `qualifySpellId`
  * (`@/game/spellRegistry`, which reads that same constant) both sit in the
  * `game` chunk's own reach, and `bundledPack.ts` already reads
- * `CHAMPION_KITS` back out of *this* module for its eager `Recall` import.
+ * `CHAMPION_KITS` back out of *this* module to build its roster (see
+ * `CHAMPION_KITS`'s own `@internal` doc comment below) — `Recall` has been a
+ * loader, not an eager class, since `188c372`, so it is no longer a reason
+ * either file reaches into the other.
  * A value import running the other way closes `pregame -> game -> pregame`,
  * a cycle `npm run build` refuses to chunk ("Circular chunk: pregame ->
  * game -> pregame") — confirmed by hitting it before this file settled on
@@ -140,18 +143,26 @@ export const bareCatalogId = (qualifiedId: string): SpellCatalogId | null =>
  * rather than through `spellDisplayOf`: that always re-qualifies a bare id
  * as the *bundled* pack's own (`qualifyBundledId`), which would ask the
  * registry for the wrong spell entirely once the id is some other pack's.
- * `id` on the entry returned is the local half — the same crossing
- * `packAsset` makes for an asset key, `as never` and all, because
- * `SpellCatalogEntry.id` is core's generated union and a pack's own spell id
- * is not a member of it.
+ *
+ * `id` on the entry returned is the **qualified** id, not the local half —
+ * this is the one thing that must survive from here into a persisted slot.
+ * Every display-backed population this module offers (`spellCatalogIds`,
+ * `isSpellCatalogId`, `spellDisplayOf`) keys by the qualified id, and so does
+ * `isSpellId`/`allSpellIds` in `@/game/spellRegistry`, which is what
+ * `preset.ts` validates a stored slot against before a match starts. Handing
+ * back the local half here used to write e.g. `Vera_Q` into a custom slot —
+ * a string that re-qualifies as `riot:Vera_Q` (the *bundled* pack's id,
+ * `qualifySpellId`'s bare-id rule) rather than `reference:Vera_Q`, so the
+ * slot silently failed every one of those lookups and `preset.ts` rerolled
+ * it to a random bundled spell. `SpellCatalogEntry.id` is `string`, not
+ * core's generated `SpellCatalogId` union, precisely so a pack's own
+ * qualified id can live here without a cast back into that union.
  */
 export const packSpellCatalogEntry = (qualifiedId: string): SpellCatalogEntry | null => {
   const entry = contentRegistry().spellDisplay(qualifiedId);
   if (!entry) return null;
-  const colon = qualifiedId.indexOf(':');
-  const localId = colon < 0 ? qualifiedId : qualifiedId.slice(colon + 1);
   return {
-    id: localId as never,
+    id: qualifiedId,
     display: displayFromEntry(entry, NO_MATCH_RULES),
     groupName: null,
   };
@@ -207,9 +218,19 @@ const displayFromEntry = (entry: SpellDisplayData, matchRules: MatchRules): Spel
   effectiveManaCost: matchRules.manaFree ? 0 : entry.manaCost,
 });
 
-/** One spell's display fields, with match rules applied — the bundled pack's own ids only; see `packSpellCatalogEntry` for any other pack's. */
+/**
+ * One spell's display fields, with match rules applied. `qualifyBundledId`
+ * passes an already-qualified id straight through, so this equally answers
+ * for a bare bundled-pack id (`'Yasuo_Q'`) and for another pack's own
+ * qualified id (`'reference:Vera_Q'`, e.g. from `SelectableChampionSpell.id`
+ * or a picker entry's `id`) — only a *bare* id from a pack other than the
+ * bundled one has nothing to resolve to here; see `packSpellCatalogEntry` for
+ * that case. `id` is `string`, not `SpellCatalogId`, for the same reason:
+ * every caller here now hands back whatever the registry actually keys by,
+ * bundled or not.
+ */
 export const spellDisplayOf = (
-  id: SpellCatalogId,
+  id: string,
   matchRules: MatchRules = NO_MATCH_RULES
 ): SpellDisplay => {
   const entry = contentRegistry().spellDisplay(qualifyBundledId(id));
@@ -726,7 +747,16 @@ export const CHAMPION_KITS: {
 // ---------------------------------------------------------------------------
 
 export interface SelectableChampionSpell {
-  id: SpellCatalogId;
+  /**
+   * The bundled pack's own bare id (`'Yasuo_Q'`) for a bundled champion, or
+   * another pack's registry-qualified id (`'reference:Vera_Q'`) for one of
+   * its champions — never that pack's *bare* local id. `string`, not
+   * `SpellCatalogId`: that generated union is the bundled pack's own bare ids
+   * only, and a pack's qualified id is not a member of it. This is the id a
+   * persisted slot ends up storing (`LoadoutEditorModal.pickSpell`), so it
+   * has to be whatever `isSpellId`/`spellDisplayOf` can resolve back.
+   */
+  id: string;
   display: SpellDisplay;
 }
 
@@ -852,7 +882,14 @@ const shelfNameById = (): Map<string, string> => {
 };
 
 export interface SpellCatalogEntry {
-  id: SpellCatalogId;
+  /**
+   * `string`, not `SpellCatalogId` — see `SelectableChampionSpell.id`'s doc
+   * comment. `listSpellCatalog` still only ever populates this with a bundled
+   * bare id, but `packSpellCatalogEntry` (read by `pregameCatalog.ts`'s shelf
+   * builder for a pack champion) hands back a qualified one, and the two have
+   * to share one type for the picker to treat them alike.
+   */
+  id: string;
   display: SpellDisplay;
   groupName: string | null;
 }

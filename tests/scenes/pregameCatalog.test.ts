@@ -5,7 +5,12 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import { getPregameCatalog, matchesQuery } from '../../src/scenes/setup/pregameCatalog';
-import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
+import {
+  CHAMPION_KITS,
+  isSpellCatalogId,
+  listSelectableChampions,
+  spellDisplayOf,
+} from '../../src/game/config/spellCatalog';
 
 /**
  * The roster's order, and the two shelves that are not a champion.
@@ -153,5 +158,44 @@ describe('the roster reads the pack registry', () => {
     const before = CHAMPION_KITS.filter(k => k.image && k.spells.length === 4).map(k => k.name);
     expect(before.length).toBeGreaterThan(20);
     expect(names).toEqual(expect.arrayContaining(before));
+  });
+});
+
+/**
+ * Every id the pregame catalogue can hand a player — off a champion's shelf
+ * or off a champion's `spells` row — has to be a *real* id: something
+ * `spellDisplayOf` can resolve to real display data and `isSpellCatalogId`
+ * recognises. This is deliberately a population-level walk rather than a case
+ * naming Vera: a test that named Vera specifically would pass again the
+ * moment a third pack shipped the same bug (a picker entry keyed by its own
+ * bare id instead of the registry-qualified one), so this instead demands
+ * the invariant of every id both `getPregameCatalog()`'s shelves and
+ * `listSelectableChampions()` can offer, regardless of which pack it came
+ * from.
+ */
+describe('every id the picker can offer resolves to real display data', () => {
+  it('has display data and passes isSpellCatalogId, for every offered id', () => {
+    const ids = new Set<string>();
+    for (const shelf of catalog.kitShelves) {
+      for (const shelfEntry of shelf.entries) ids.add(shelfEntry.entry.id);
+    }
+    for (const champion of listSelectableChampions()) {
+      for (const spell of champion.spells) ids.add(spell.id);
+    }
+    // Guards the walk itself: an empty set would make the loop below pass
+    // vacuously and prove nothing.
+    expect(ids.size).toBeGreaterThan(0);
+
+    const broken: string[] = [];
+    for (const id of ids) {
+      const display = spellDisplayOf(id);
+      const missingDisplay =
+        display.name === '?' &&
+        display.description === '' &&
+        display.coolDownMs === 0 &&
+        display.manaCost === 0;
+      if (missingDisplay || !isSpellCatalogId(id)) broken.push(id);
+    }
+    expect(broken).toEqual([]);
   });
 });

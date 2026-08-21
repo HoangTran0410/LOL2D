@@ -107,9 +107,14 @@ let cached: PregameCatalog | null = null;
 export const getPregameCatalog = (): PregameCatalog => {
   if (!cached) {
     const spellCatalog = listSpellCatalog();
-    const catalogById = new Map(spellCatalog.map(entry => [entry.id as string, entry]));
+    const catalogById = new Map(spellCatalog.map(entry => [entry.id, entry]));
     const summoners = listSummonerSpells();
-    const summonerIds = new Set(summoners.map(option => option.id));
+    // `Set<string>`, not the inferred `Set<SpellCatalogId>`: `summonerIds.has`
+    // below is checked against `KitShelfEntry.entry.id`, which is `string`
+    // now that a pack's own qualified id can live there too (see
+    // `SpellCatalogEntry.id`'s doc comment) — the membership test itself
+    // stays exact, this only widens what it is allowed to be asked about.
+    const summonerIds: Set<string> = new Set(summoners.map(option => option.id));
 
     /**
      * Which of the two non-champion shelves this is, if either. Written out

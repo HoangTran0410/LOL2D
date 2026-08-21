@@ -21,14 +21,18 @@ describe('the bundled pack', () => {
   it('hands them over lazily — installing loads no spell module', () => {
     const registry = new PackRegistry();
     registry.install(pack);
-    for (const id of registry.spellIds()) {
-      // Recall is declared as an eager class, not a loader (see
-      // bundledPack.ts): it is not in spellModules, so there is no chunk to
-      // defer, and PackRegistry.install() resolves any non-loader
-      // immediately. That immediacy is the documented exception, not a
-      // laziness bug — the other 238 real spell modules must still come back
-      // null until loadSpellClass is called.
-      if (id === `${BUNDLED_PACK_ID}:Recall`) continue;
+    const ids = registry.spellIds();
+    // Guards the loop below: an install that stored no spells at all would
+    // make every iteration below pass vacuously and prove nothing.
+    expect(ids.length).toBeGreaterThan(200);
+    // Recall is a loader too, same as every other entry here — `188c372`
+    // moved it off the eager-class shape it used to have (see
+    // `spellSources` in `bundledPack.ts`), specifically so an eager import
+    // would stop being a static edge into the `game` chunk. No id in this
+    // pack gets special treatment: `PackRegistry.install()` only resolves a
+    // spell immediately when its source is *not* a loader, and nothing here
+    // is.
+    for (const id of ids) {
       expect(registry.spellClass(id)).toBeNull();
     }
   });

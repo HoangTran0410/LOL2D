@@ -32,7 +32,20 @@
  *      0 to non-zero — what "the cast happened" means, and it does not
  *      depend on a spell that happens to spawn an object (Vera_W is a
  *      self-buff, nothing else on her kit spawns one visible object);
- *   5. no page errors the whole time.
+ *   5. the *custom*-slot path: opening her shelf and tapping each of her
+ *      four abilities into Q/W/E/R one at a time (rather than "dùng cả bộ"),
+ *      the way a player builds a mixed loadout, stores her real
+ *      registry-qualified ids (`reference:Vera_Q`, ...) and the match that
+ *      follows actually casts her four spells — not four rerolled bundled
+ *      ones. This is the path checks 1-4 do not cover: `packSpellCatalogEntry`
+ *      used to hand the picker Vera's *bare* local id (`Vera_Q`), which wrote
+ *      into a custom slot as a string `preset.ts` could not resolve back
+ *      (`isSpellId('Vera_Q')` re-qualifies as `riot:Vera_Q`, the *bundled*
+ *      pack's id, not `reference:Vera_Q`) and silently rerolled to a random
+ *      bundled spell — a match starting wrong with no error anywhere. Champion
+ *      mode (checks 1-4) never touched that code path, which is exactly why it
+ *      passed while this was broken;
+ *   6. no page errors the whole time.
  *
  * ai.count: 0 and world: { jungle: false, minions: false } in the seeded
  * config, so nothing else on the map can hit the player mid-check; manaFree
@@ -188,7 +201,98 @@ try {
     );
   }
 
-  // ------------------------------------------------------ 5. no page errors
+  // ------------------------------------------------- 5. the custom-slot path
+  // The `addInitScript` above reseeds `CFG_SEED` on every navigation,
+  // including this reload — so this phase starts clean rather than on top of
+  // check 2's `championName: 'Vera'`. That matters: a broken pick here must
+  // not leave the loadout on a leftover champion-mode pick, or the match that
+  // follows would still spawn the real Vera and pass by accident, hiding
+  // exactly the bug this phase exists to catch.
+  await page.goto(url, { waitUntil: 'load' });
+  await page.click('#config-btn');
+  await page.waitForSelector('#pregame-scene', { state: 'visible' });
+  await page.waitForTimeout(150);
+  await page.click('.practice-roster-main:has(#practice-row-toggle-0) .practice-roster-open');
+  await page.waitForSelector('.loadout-modal', { state: 'visible' });
+
+  // Opening the shelf and picking a card by DOM `.click()` rather than
+  // `page.click(selector)` — the same idiom `drive-kit-builder.mjs`'s
+  // `openShelf`/`pickSpell` use — so a card rendered under the *wrong* id
+  // (what this phase exists to catch: `packSpellCatalogEntry` handing back a
+  // pack champion's bare local id instead of its registry-qualified one)
+  // is a registered `check` failure instead of a Playwright selector timeout
+  // that would throw past every check after it and leave the run looking
+  // like fewer checks simply didn't apply.
+  const CUSTOM_ABILITY_IDS = [
+    'reference:Vera_Q',
+    'reference:Vera_W',
+    'reference:Vera_E',
+    'reference:Vera_R',
+  ];
+  const openedShelf = await page.evaluate(() => {
+    const shelf = document.querySelector('.kit-shelf[data-champion="Vera"]');
+    if (!shelf) return false;
+    if (!shelf.classList.contains('open')) shelf.querySelector('.kit-shelf-apply')?.click();
+    return true;
+  });
+  check("Vera's shelf is in the roster to open", openedShelf);
+
+  // Slot indices 1-4 are Q/W/E/R (`SpellHotKeys`'s own order — see
+  // `EXPECTED_SPELL_NAMES`'s comment above); `:nth-child` is 1-based and the
+  // random pill is the *eighth* `.kit-slot-pill`, past every slot this loop
+  // reaches, so it never collides.
+  let allCardsFound = true;
+  for (let i = 0; i < CUSTOM_ABILITY_IDS.length; i++) {
+    const slotIndex = i + 1;
+    await page.click(`.kit-slot-bar .kit-slot-pill:nth-child(${slotIndex + 1})`);
+    const picked = await page.evaluate(spellId => {
+      const card = document.querySelector(`.catalog-spell-card[data-spell="${spellId}"]`);
+      if (!card) return false;
+      card.click();
+      return true;
+    }, CUSTOM_ABILITY_IDS[i]);
+    if (!picked) allCardsFound = false;
+  }
+  check(
+    "the roster renders a card for each of Vera's four abilities under its real, registry-qualified id",
+    allCardsFound,
+    CUSTOM_ABILITY_IDS.join(', ')
+  );
+
+  await page.click('.kit-bar-btn:not(.secondary)'); // Xác nhận
+  await page.waitForSelector('.loadout-modal', { state: 'detached' });
+
+  const customStored = await page.evaluate(
+    key => JSON.parse(localStorage.getItem(key) ?? 'null')?.player ?? null,
+    CFG_KEY
+  );
+  report.customStoredPick = customStored;
+  check(
+    "a hand-built loadout of Vera's four abilities stores her real qualified ids, not rerolled bundled ones",
+    customStored?.mode === 'custom' &&
+      JSON.stringify(customStored.customSlots?.slice(1, 5)) === JSON.stringify(CUSTOM_ABILITY_IDS),
+    JSON.stringify(customStored?.customSlots)
+  );
+
+  await page.click('#pregame-start-btn'); // Bắt Đầu
+  await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
+    timeout: 30_000,
+  });
+  await page.waitForTimeout(500);
+
+  const customPlayer = await page.evaluate(() => {
+    const game = window.__lol2d.scene.oScene.game;
+    return { spellNames: (game.player?.spells ?? []).map(s => s?.name ?? null) };
+  });
+  report.customPlayer = customPlayer;
+  const customLiveSpellNames = customPlayer.spellNames.slice(1, 5);
+  check(
+    'the match starts with her four hand-picked abilities, not rerolled bundled spells',
+    JSON.stringify(customLiveSpellNames) === JSON.stringify(EXPECTED_SPELL_NAMES),
+    customLiveSpellNames.join(' / ')
+  );
+
+  // ------------------------------------------------------ 6. no page errors
   check('no page errors', errors.length === 0, errors[0]);
 } finally {
   await finish();
