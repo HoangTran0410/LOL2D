@@ -52,6 +52,7 @@ import {
   planMatchKits,
   plannedSpellIds,
   presetFromPlan,
+  spellGroups,
 } from '../../src/game/preset';
 import {
   DEFAULT_CHAMPION_LOADOUT,
@@ -145,7 +146,13 @@ describe('a match plan', () => {
     const plan = planLoadout(loadout({ championName: 'Yasuo' }));
     expect(plan.spellIds).toHaveLength(SLOT_COUNT);
     for (const id of plan.spellIds) expect(isSpellId(id)).toBe(true);
-    expect(plan.spellIds.slice(1, 5)).toEqual(['Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R']);
+    // Registry-qualified now — `QualifiedChampion.spells` is qualified by
+    // `PackRegistry.install()`, and `preset.ts`'s `playableKits()` reads a
+    // champion's spells straight off that, unlike the old `CHAMPION_KITS` row
+    // (bare ids). `classForId`/`isSpellId` both accept either form.
+    expect(plan.spellIds.slice(1, 5)).toEqual(
+      ['Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R'].map(qualifySpellId)
+    );
   });
 
   it('names only ids the registry can load — for a random champion', () => {
@@ -159,7 +166,13 @@ describe('a match plan', () => {
     expect(plan).toMatchObject({
       name: 'Yasuo',
       avatar: 'champ_yasuo',
-      spellIds: ['BasicAttack', 'Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R', 'Flash', 'Heal'],
+      // Registry-qualified — see the named-champion case above.
+      spellIds: [
+        'BasicAttack',
+        ...['Yasuo_Q', 'Yasuo_W', 'Yasuo_E', 'Yasuo_R'].map(qualifySpellId),
+        'Flash',
+        'Heal',
+      ],
       attack: expect.any(Object),
     });
   });
@@ -213,12 +226,18 @@ describe('a match plan', () => {
     const plan = planMatchKits(DEFAULT_PREGAME_CONFIG);
     await loadSpells(plannedSpellIds(plan));
 
+    // A named champion's own ids arrive registry-qualified now (`riot:Yasuo_Q`);
+    // `AllSpellsById` is keyed by the barrel's bare export names, so the
+    // expected-value lookup strips the bundled pack's own prefix back off —
+    // independently of `qualifySpellId`/`classForId`, the functions under test.
+    const bareRiotId = (id: string): string => id.replace(/^riot:/, '');
+
     for (const kit of [plan.player, ...plan.bots]) {
       const preset = presetFromPlan(kit);
       expect(preset.spells).toHaveLength(SLOT_COUNT);
       // Every slot is the exact class its id names — no fallbacks fired.
       kit.spellIds.forEach((id, slot) => {
-        expect(preset.spells![slot]).toBe(AllSpellsById[id]);
+        expect(preset.spells![slot]).toBe(AllSpellsById[bareRiotId(id)]);
       });
     }
   });
@@ -316,5 +335,77 @@ describe('resolving through the pack registry', () => {
   it('qualifies a bare id against the bundled pack and leaves a qualified one alone', () => {
     expect(qualifySpellId('Yasuo_Q')).toBe('riot:Yasuo_Q');
     expect(qualifySpellId('reference:Vera_Q')).toBe('reference:Vera_Q');
+  });
+});
+
+/**
+ * `preset.ts` is the last consumer to move off `CHAMPION_KITS` and onto
+ * `contentRegistry()` — Task 8 of the content-pack-extraction plan.
+ */
+describe('preset.ts reads the pack registry', () => {
+  // Vera (`reference:vera`) has no portrait yet — `playable: false`,
+  // `image: null` — so `playableKits()` (this file's `PlayableChampionKit`
+  // table) cannot offer her by name, the same rule
+  // `tests/scenes/pregameCatalog.test.ts` already documents for the roster.
+  // A portrait and `playable: true` land in Task 10; un-skipping this is a
+  // step *in* that task.
+  it.skip('can plan a match around a champion from a non-bundled pack', async () => {
+    resetSpellRegistryForTests();
+    await loadSpells([
+      'reference:Vera_Q',
+      'reference:Vera_W',
+      'reference:Vera_E',
+      'reference:Vera_R',
+    ]);
+    const plan = planLoadout({ ...DEFAULT_CHAMPION_LOADOUT, championName: 'Vera' });
+    expect(plan.name).toBe('Vera');
+    expect(plan.spellIds).toContain('reference:Vera_Q');
+  });
+
+  // `spellGroups()` is not gated on `playable` — it always mapped every
+  // `CHAMPION_KITS` row, shelf stubs included, and now maps every installed
+  // champion the same way — so it is the one place this task's registry read
+  // is observable today without waiting on Vera's portrait.
+  it('spellGroups() includes a champion from a pack that is not the bundled one', async () => {
+    resetSpellRegistryForTests();
+    await loadSpells([
+      'reference:Vera_Q',
+      'reference:Vera_W',
+      'reference:Vera_E',
+      'reference:Vera_R',
+    ]);
+
+    const vera = spellGroups().find(group => group.name === 'Vera');
+    expect(vera).toBeDefined();
+    // Real resolved classes, not the BasicAttack fallback — proves the ids
+    // came off `champion.spells` and were actually loaded, not guessed.
+    // Compared against each class's own declared name rather than against
+    // `spellClassOfId`/`classForId` again, so this does not verify the
+    // resolver by calling the resolver.
+    expect(vera?.spells.map(spellClass => (spellClass as { name: string }).name)).toEqual([
+      'Vera_Q',
+      'Vera_W',
+      'Vera_E',
+      'Vera_R',
+    ]);
+  });
+
+  it('still plans every riot champion it could plan before packs, by name', () => {
+    // Parity guard: every full-kit `CHAMPION_KITS` row must still resolve to
+    // its own Q/W/E/R through the registry-backed `playableKits()`, not just
+    // the one row (`Yasuo`) the tests above happen to exercise.
+    const named = ['Ahri', "Cho'Gath", 'Jinx', 'Irelia'];
+    for (const name of named) {
+      const plan = planLoadout({ ...DEFAULT_CHAMPION_LOADOUT, championName: name });
+      expect(plan.name).toBe(name);
+      expect(plan.spellIds.slice(1, 5)).toEqual(
+        [
+          `${name.replace("'", '')}_Q`,
+          `${name.replace("'", '')}_W`,
+          `${name.replace("'", '')}_E`,
+          `${name.replace("'", '')}_R`,
+        ].map(qualifySpellId)
+      );
+    }
   });
 });

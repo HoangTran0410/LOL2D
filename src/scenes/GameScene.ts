@@ -56,8 +56,13 @@ function matchArtKeys(plan: MatchPlan): AssetKey[] {
     if (UNIVERSAL_ART_PREFIXES.some(prefix => key.startsWith(prefix))) keys.add(key);
   }
 
-  // Every unit's portrait — the player's and each bot's.
-  for (const kit of [plan.player, ...plan.bots]) keys.add(kit.avatar);
+  // Every unit's portrait — the player's and each bot's. `kit.avatar` is a
+  // plain string now (`preset.ts`'s `PlayableChampionKit` — a pack's own
+  // asset key, not necessarily a member of this generated union), but every
+  // playable champion today is still the bundled pack's own, so this is the
+  // same documented, always-resolving crossing `packAsset` performs in
+  // `config/spellCatalog.ts`.
+  for (const kit of [plan.player, ...plan.bots]) keys.add(kit.avatar as AssetKey);
 
   // And the player's own ability icons, which are in the HUD from frame one.
   // Bot kits are only ever looked at through the practice panel, which opens on

@@ -1,11 +1,11 @@
 import { getChampionPresetRandom } from '@/game/preset';
-import type { AssetKey } from '@/managers/AssetManager';
 import Champion, { type ChampionOptions, type ChampionPresetData } from './Champion';
 import type AttackableUnit from './AttackableUnit';
 import { type BotDifficulty, DEFAULT_DIFFICULTY } from '@/game/ai/Difficulty';
 import BotBrain from '@/game/ai/BotBrain';
 
-export type ChampionPresetFactory = () => ChampionPresetData & { avatar: AssetKey };
+/** `avatar` is a pack's own asset key — see `ChampionPresetData.avatar`'s doc comment. */
+export type ChampionPresetFactory = () => ChampionPresetData & { avatar: string };
 
 export interface AIChampionOptions extends ChampionOptions {
   /**

@@ -1,4 +1,6 @@
-import AssetManager, { type AssetKey } from '@/managers/AssetManager';
+import AssetManager from '@/managers/AssetManager';
+import { contentRegistry } from '@/content/registry';
+import type { PackRegistry } from '@/content/PackRegistry';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import { BARON_ABILITIES } from './gameObject/monsters/Baron';
@@ -13,7 +15,6 @@ import type { ChampionLoadout, MatchRules, SlotChoice } from './config/PregameCo
 import { SLOT_COUNT } from './config/PregameConfig';
 import {
   BASIC_ATTACK_ID,
-  CHAMPION_KITS,
   SUMMONER_SPELL_IDS,
   listSelectableChampions,
   type SpellDisplay,
@@ -86,31 +87,75 @@ const classForId = (id: string): SpellClass => spellClassOfId(id) ?? BasicAttack
 /**
  * A catalogue row complete enough to be a real random champion.
  *
- * Kept as a narrowed table rather than repeatedly filtering `CHAMPION_KITS`:
+ * Kept as a narrowed table rather than repeatedly walking `contentRegistry()`:
  * random planning runs once per unit at boot and again on random bot respawns.
  * The loop is deliberate — this project's Array `filter` polyfill cannot narrow
- * types, so a predicate would still leave `image` and `attack` nullable.
+ * types, so a predicate would still leave `image` nullable.
+ *
+ * `image` and `spells` are plain `string`/`string[]` rather than
+ * `AssetKey`/`SpellCatalogId[]`: a `QualifiedChampion` may come from any
+ * installed pack, and a pack's own asset key or registry-qualified spell id
+ * (`reference:Vera_Q`) is not a member of core's generated unions. Nothing
+ * here casts back to the narrow type — see `packAsset` in
+ * `config/spellCatalog.ts`, the matching resolve-side helper Task 7 already
+ * introduced for the same crossing.
  */
 interface PlayableChampionKit {
   name: string;
-  image: AssetKey;
-  spells: SpellCatalogId[];
+  image: string;
+  spells: string[];
   attack: ChampionAttackTuning;
 }
 
-const PLAYABLE_CHAMPION_KITS: PlayableChampionKit[] = [];
-for (const kit of CHAMPION_KITS) {
-  if (!kit.image?.startsWith('champ_') || kit.spells.length !== 4 || !kit.attack) continue;
-  PLAYABLE_CHAMPION_KITS.push({
-    name: kit.name,
-    image: kit.image,
-    spells: kit.spells,
-    attack: kit.attack,
-  });
-}
+let playableCache: PlayableChampionKit[] | null = null;
+let playableCacheFor: PackRegistry | null = null;
 
-const randomChampionKit = (): PlayableChampionKit => random(PLAYABLE_CHAMPION_KITS);
-const randomAvatar = (): AssetKey => randomChampionKit().image;
+/**
+ * Built on first use, not at module load.
+ *
+ * The old array was filled by a `for` loop at module scope, which was fine
+ * while the roster was a literal in another module. It is not fine now: the
+ * roster comes from `contentRegistry()`, which installs on its first read, and
+ * a module-scope loop runs before `main.ts` has done anything at all. Memoised
+ * rather than recomputed because random planning runs once per unit at boot
+ * and again on every random bot respawn.
+ *
+ * Keyed on the registry **instance**, not a `resetPresetCachesForTests()`
+ * plumbed in from `src/content/`. `resetContentRegistryForTests()` discards
+ * the old `PackRegistry` and the next `contentRegistry()` call builds a fresh
+ * one, so comparing against the *current* instance invalidates this cache for
+ * free the moment a test installs a different pack set — a boolean latch would
+ * need a reset function threaded from core's content layer into the game
+ * layer above it, and would still go stale the first time a test installed a
+ * different registry without calling that function.
+ */
+const playableKits = (): PlayableChampionKit[] => {
+  const registry = contentRegistry();
+  if (playableCache && playableCacheFor === registry) return playableCache;
+  const out: PlayableChampionKit[] = [];
+  for (const champion of registry.champions()) {
+    // `playable` is the whole rule — `content/validate.ts` already refuses to
+    // install a playable champion without a portrait or without exactly four
+    // abilities. The `image` check below is narrowing `string | null` to
+    // `string`, not a second rule: it exists only because this project's
+    // `Array.prototype.filter` polyfill cannot narrow types (see
+    // `src/types/global.d.ts`), so a loop stands in for a predicate.
+    if (!champion.playable) continue;
+    if (!champion.image) continue;
+    out.push({
+      name: champion.name,
+      image: champion.image,
+      spells: champion.spells,
+      attack: champion.attack ?? DEFAULT_CHAMPION_ATTACK,
+    });
+  }
+  playableCache = out;
+  playableCacheFor = registry;
+  return playableCache;
+};
+
+const randomChampionKit = (): PlayableChampionKit => random(playableKits());
+const randomAvatar = (): string => randomChampionKit().image;
 
 /**
  * A wholly random champion — the AI's respawn re-roll, and what a loadout on
@@ -122,41 +167,44 @@ const randomAvatar = (): AssetKey => randomChampionKit().image;
  * not arrived degrades that slot to BasicAttack through `classForId`; it never
  * swaps in an unrelated loaded spell.
  */
-export const getChampionPresetRandom = (): ChampionPresetData & { avatar: AssetKey } =>
+export const getChampionPresetRandom = (): ChampionPresetData & { avatar: string } =>
   presetFromPlan(planRandomKit());
 
 /**
- * The kit table, and `ATTACK`, now live in `config/spellCatalog.ts` as ids —
- * re-exported here so every existing `from '@/game/preset'` keeps working.
- *
- * `SpellGroups` is that table with each id mapped back to its class — the one
- * direction that needs the barrel, and the reason this file is in the game
- * chunk and `spellCatalog.ts` is not. Data goes out to the picker as ids;
- * classes come back only for a match that is actually starting.
+ * `ATTACK` still lives in `config/spellCatalog.ts` — re-exported here so every
+ * existing `from '@/game/preset'` keeps working.
  */
 export { ATTACK } from '@/game/config/spellCatalog';
 
 /**
- * The kit table with each id resolved to its class.
+ * Every installed champion — playable rows and shelf-only stubs alike, same
+ * population `CHAMPION_KITS` used to give this function — with each spell id
+ * resolved to its class.
  *
  * A **function**, not the constant it used to be: the classes arrive
  * asynchronously now, so a value computed at module-eval time would be a table
  * of `undefined`. Callers must have loaded what they are about to read —
  * `loadSpells(allSpellIds())` in a test, `planMatchKits` in a match.
+ *
+ * `image` widens to `string | null`, matching `QualifiedChampion.image`: see
+ * `PlayableChampionKit`'s doc comment for why a pack's own asset key is not a
+ * member of core's generated `AssetKey` union.
  */
 export const spellGroups = (): {
   name: string;
-  image: AssetKey | null;
+  image: string | null;
   spells: SpellClass[];
   /** The champion's basic-attack profile; see `ATTACK`. */
   attack?: ChampionAttackTuning;
 }[] =>
-  CHAMPION_KITS.map(kit => ({
-    name: kit.name,
-    image: kit.image,
-    spells: kit.spells.map(classForId),
-    attack: kit.attack,
-  }));
+  contentRegistry()
+    .champions()
+    .map(champion => ({
+      name: champion.name,
+      image: champion.image,
+      spells: champion.spells.map(classForId),
+      attack: champion.attack,
+    }));
 
 // ---------------------------------------------------------------------------
 // Display data, from a class
@@ -275,7 +323,8 @@ export { spellClassOfId } from './spellRegistry';
 /** One unit's kit, decided before a single spell module has been fetched. */
 export interface KitPlan {
   name: string;
-  avatar: AssetKey;
+  /** A pack's own asset key — see `PlayableChampionKit`'s doc comment. */
+  avatar: string;
   /** The same catalogue row's basic-attack tuning; custom kits use the engine default. */
   attack: ChampionAttackTuning;
   /** Exactly `SLOT_COUNT` ids, in A/Q/W/E/R/D/F order. */
@@ -356,7 +405,7 @@ export const planLoadout = (loadout: ChampionLoadout): KitPlan => {
   const kit =
     loadout.championName === 'random'
       ? undefined
-      : PLAYABLE_CHAMPION_KITS.find(candidate => candidate.name === loadout.championName);
+      : playableKits().find(candidate => candidate.name === loadout.championName);
 
   if (!kit) return planRandomKit(loadout.summonerD, loadout.summonerF);
 
@@ -390,7 +439,7 @@ export const plannedSpellIds = (plan: MatchPlan): string[] => [
 ];
 
 /** A plan with its classes attached. Everything it names must already be loaded. */
-export const presetFromPlan = (plan: KitPlan): ChampionPresetData & { avatar: AssetKey } => ({
+export const presetFromPlan = (plan: KitPlan): ChampionPresetData & { avatar: string } => ({
   name: plan.name,
   avatar: plan.avatar,
   attack: plan.attack,
@@ -404,7 +453,7 @@ export const presetFromPlan = (plan: KitPlan): ChampionPresetData & { avatar: As
  */
 export const getChampionPresetFromLoadout = (
   loadout: ChampionLoadout
-): ChampionPresetData & { avatar: AssetKey } => presetFromPlan(planLoadout(loadout));
+): ChampionPresetData & { avatar: string } => presetFromPlan(planLoadout(loadout));
 
 /**
  * Safe live-match variant: decide the identity once, fetch exactly those spell
@@ -414,7 +463,7 @@ export const getChampionPresetFromLoadout = (
  */
 export const loadChampionPresetFromLoadout = async (
   loadout: ChampionLoadout
-): Promise<ChampionPresetData & { avatar: AssetKey }> => {
+): Promise<ChampionPresetData & { avatar: string }> => {
   const plan = planLoadout(loadout);
   await loadSpells(plan.spellIds);
   return presetFromPlan(plan);
