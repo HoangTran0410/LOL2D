@@ -246,14 +246,18 @@ function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
 }
 
 /**
- * The heavy half — terrain, slots, lanes — checked only when `geometry`
- * arrived as a plain object. A loader's body cannot be inspected
- * synchronously (see `checkSpells`'s identical treatment of a `SpellSource`
- * loader), so a lazy map's geometry goes unchecked here and is trusted once
- * `PackRegistry.loadMapGeometry` resolves it — the same trade a spell loader
- * already makes.
+ * The heavy half — terrain, slots, lanes. `checkMap` below calls this only
+ * when `geometry` arrived as a plain object, because a loader's body cannot
+ * be inspected synchronously (see `checkSpells`'s identical treatment of a
+ * `SpellSource` loader) — a lazy map's geometry goes unchecked at
+ * `checkMap` time. It is **not** unchecked forever: exported so
+ * `PackRegistry.loadMapGeometry` can call it again, against the resolved
+ * object, the moment a loader settles — both shipped maps
+ * (`summonersRift`, `referenceMap`) use loaders, so without that second
+ * call this function's whole terrain/slot/lane half never ran on either of
+ * them in production.
  */
-function checkMapGeometry(
+export function checkMapGeometry(
   geometry: Record<string, unknown>,
   name: string,
   factions: Set<string>,

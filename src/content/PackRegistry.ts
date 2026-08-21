@@ -1,4 +1,4 @@
-import { validatePack, validatePackCode, validatePackData } from './validate';
+import { checkMapGeometry, validatePack, validatePackCode, validatePackData } from './validate';
 import { isSpellLoader } from './ContentPack';
 import type {
   ChampionEntry,
@@ -349,6 +349,16 @@ export class PackRegistry {
    * `GameScene.startGame()`, say) share one `import()` instead of starting
    * two. `GameScene.startGame()` is the guarantee that this has resolved
    * before `new Game(...)` runs — see that method's own doc comment.
+   *
+   * Both branches run the resolved object through `validateMapGeometry`
+   * before caching or returning it — `validate.ts`'s `checkMap` only ever
+   * checked a *plain-object* `geometry` (a loader's body cannot be
+   * inspected synchronously), so this is the one place a lazy map's terrain
+   * layers, structure kinds, faction references and per-lane muster points
+   * are ever actually checked. Throws on a bad pack rather than returning
+   * broken geometry to `Game`'s constructor, the same "validate then hand
+   * over, never half" discipline `install()` already applies to the rest of
+   * a pack.
    */
   async loadMapGeometry(qualifiedId: string): Promise<MapGeometry | null> {
     const already = this.resolvedMapGeometry.get(qualifiedId);
@@ -358,6 +368,7 @@ export class PackRegistry {
     if (!source) return null;
 
     if (typeof source !== 'function') {
+      this.validateMapGeometry(qualifiedId, source);
       this.resolvedMapGeometry.set(qualifiedId, source);
       return source;
     }
@@ -366,12 +377,34 @@ export class PackRegistry {
     if (pending) return pending;
 
     const run = source().then(geometry => {
+      this.validateMapGeometry(qualifiedId, geometry);
       this.resolvedMapGeometry.set(qualifiedId, geometry);
       this.mapGeometryInFlight.delete(qualifiedId);
       return geometry;
     });
     this.mapGeometryInFlight.set(qualifiedId, run);
     return run;
+  }
+
+  /**
+   * Runs a resolved `MapGeometry` through `validate.ts`'s `checkMapGeometry`
+   * against the same `factions` its own `MapSummary` declared, and throws
+   * if it fails — `loadMapGeometry`'s only caller, on both the plain-object
+   * and the settled-loader path.
+   *
+   * `factions` comes from `mapList`, not from re-reading the pack: `writeData`
+   * already split `summary`/`geometry` apart and qualified the summary into
+   * `mapList`, so that is the one place this qualified id's declared
+   * factions still live.
+   */
+  private validateMapGeometry(qualifiedId: string, geometry: MapGeometry): void {
+    const summary = this.mapList.find(map => map.id === qualifiedId);
+    const factions = new Set((summary?.factions ?? []).map(faction => faction.id));
+    const errors: string[] = [];
+    checkMapGeometry(geometry as unknown as Record<string, unknown>, qualifiedId, factions, errors);
+    if (errors.length > 0) {
+      throw new Error(`map geometry rejected:\n  ${errors.join('\n  ')}`);
+    }
   }
 
   /**

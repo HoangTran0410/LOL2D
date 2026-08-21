@@ -262,7 +262,7 @@ export default class Game {
   constructor(map: ActiveMap, plan?: MatchPlan) {
     this.mapSize = map.size;
     this.activeMapId = map.id;
-    this.minionMuster = minionMusterSlotsFrom(map.slots.minion);
+    this.minionMuster = minionMusterSlotsFrom(map.slots.minion, map.factions);
     this.neutralSlots = map.slots.neutral;
     // Before anything queues a wave or builds a blackboard: `MinionSpawner`,
     // `TeamBlackboard` and `LaneObjectives.ts` all read `lanes.ts`'s live
@@ -312,7 +312,7 @@ export default class Game {
 
     // Fountains first: each champion asks the matching team fountain for its
     // initial point, and randomSpawnPoint falls back safely for UUID/FFA teams.
-    this.spawnFountains(map.slots.spawn);
+    this.spawnFountains(map.slots.spawn, map.factions);
 
     // Blue by default and for every match before the team tab existed, but the
     // player is now a movable roster slot like any bot — so its side comes from
@@ -394,7 +394,7 @@ export default class Game {
     // `ObjectManager.update()` and only swept by the second, i.e. one frame of
     // camps a player who switched the jungle off never asked to see.
     if (pregameConfig.world.jungle) this.spawnJungle();
-    this.spawnTurrets(map.slots.structure);
+    this.spawnTurrets(map.slots.structure, map.factions);
     // the spawner reads teams off the fountains, so it comes after them
     this.minionSpawner = new MinionSpawner(this);
 
@@ -441,9 +441,11 @@ export default class Game {
    * @param spawnSlots The active map's `slots.spawn` — one fountain per slot,
    *   on the slot's own `faction` rather than its position in the array. See
    *   `preset.ts`'s `fountainsFromSlots` for the faction -> `TeamId` bridge.
+   * @param factions The active map's own `factions`, in declared order —
+   *   `fountainsFromSlots`/`teamIdOfFaction` read position 0/1 as BLUE/RED.
    */
-  spawnFountains(spawnSlots: SpawnSlot[]) {
-    for (const preset of fountainsFromSlots(spawnSlots)) {
+  spawnFountains(spawnSlots: SpawnSlot[], factions: ActiveMap['factions']) {
+    for (const preset of fountainsFromSlots(spawnSlots, factions)) {
       const fountain = new Fountain({ game: this, preset });
       this.fountains.push(fountain);
       this.objectManager.addObject(fountain);
@@ -488,9 +490,11 @@ export default class Game {
    *   already (`preset.ts`'s `turretsFromSlots` doc comment explains why this
    *   does not check), which is also the only structure kind `Turret` knows
    *   how to be.
+   * @param factions The active map's own `factions`, in declared order — see
+   *   `spawnFountains`'s matching parameter.
    */
-  spawnTurrets(structureSlots: StructureSlot[]) {
-    for (const { x, y, teamId } of turretsFromSlots(structureSlots)) {
+  spawnTurrets(structureSlots: StructureSlot[], factions: ActiveMap['factions']) {
+    for (const { x, y, teamId } of turretsFromSlots(structureSlots, factions)) {
       const turret = new Turret({ game: this, position: createVector(x, y), teamId });
       this.turrets.push(turret);
       this.objectManager.addObject(turret);
@@ -608,15 +612,20 @@ export default class Game {
   }
 
   destroy() {
+    // First, not last: the seam that keeps `setActiveLanes`'s "one
+    // process-wide slot" guard (`lanes.ts`) from ever tripping on a real
+    // match sequence. `GameScene.stopGame()` calls this unconditionally
+    // before dropping its `Game` reference, so the *next* match's
+    // constructor never installs its lanes over an unstopped one's — but a
+    // throw from any of the three `.destroy()` calls below used to skip this
+    // entirely, latching the guard for the rest of the process and making
+    // every later match start throw out of `setActiveLanes`. Clearing the
+    // lanes before anything that can throw means one bad teardown loses at
+    // most its own cleanup, not every match after it.
+    clearActiveLanes();
     this.fogOfWar.destroy();
     this.minimap.destroy();
     this.inGameHUD.destroy();
-    // The seam that keeps `setActiveLanes`'s "one process-wide slot" guard
-    // (`lanes.ts`) from ever tripping on a real match sequence:
-    // `GameScene.stopGame()` calls this unconditionally before dropping its
-    // `Game` reference, so the *next* match's constructor never installs its
-    // lanes over an unstopped one's.
-    clearActiveLanes();
   }
 
   /**

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { referenceMap } from '../../packs/reference/map';
 import { data as referenceData } from '../../packs/reference/pack';
 import { validatePack } from '../../src/content/validate';
+import { PackRegistry } from '../../src/content/PackRegistry';
 import NavigationSystem from '../../src/game/nav/NavigationSystem';
 import { NAV_CELL_SIZE } from '../../src/game/nav/NavGrid';
 import type { MapGeometry, StructureSlot } from '../../src/content/ContentPack';
@@ -186,13 +187,24 @@ describe('Proving Grounds, the reference pack’s own map', () => {
     expect(filler?.members.length).toBeGreaterThan(0);
   });
 
-  it('passes validation as part of a pack', () => {
+  it('passes validation as part of a pack, geometry included', async () => {
     const result = validatePack({
       manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
       maps: [referenceMap],
     });
     expect(result.ok).toBe(true);
     if (result.ok === false) expect(result.errors).toEqual([]);
+
+    // `referenceMap.geometry` is a loader too — see `summonersRift.test.ts`'s
+    // matching test for why `validatePack` above cannot see past its summary,
+    // and why `PackRegistry.loadMapGeometry` (which validates the resolved
+    // geometry) is what actually has to run for this to mean anything.
+    const registry = new PackRegistry();
+    registry.installData({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      maps: [referenceMap],
+    });
+    await expect(registry.loadMapGeometry('p:proving-grounds')).resolves.toBeTruthy();
   });
 
   it('is carried in the reference pack’s own data', () => {

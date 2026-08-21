@@ -102,16 +102,33 @@ export const provingGroundsGeometry: MapGeometry = {
       from: 'amber',
       to: 'jade',
       // Waypoint 0 is the amber fountain, the same convention
-      // `src/game/lanes.ts` documents for Summoner's Rift. The middle three
-      // waypoints thread the corridor gap (x:1187 sits inside the free
-      // x:[1150,1230] band); the rest hug each faction's turret line.
+      // `src/game/lanes.ts` documents for Summoner's Rift. The three
+      // waypoints at x:1187 thread the corridor gap (that x sits inside the
+      // free x:[1150,1230] band); the rest hug each faction's own turret(s)
+      // without sitting *on* one.
+      //
+      // A first cut of this path put `{700,1700}`/`{1700,700}` here
+      // verbatim — the amber turret's own centre and one of jade's two —
+      // which is exactly the bug `src/game/lanes.ts`'s own header and
+      // `tests/content/laneTurretClearance.test.ts` exist to catch: a
+      // straight-line `moveTo` walk drives into the turret's body, is
+      // shoved around it by `UnitCollisionSystem`, and re-acquires the same
+      // line on the far side. Every waypoint and every straight run between
+      // two of them now clears every one of this map's three turrets by at
+      // least ~115px — `laneTurretClearance.test.ts`'s own floor is 100px
+      // for a run and 70px for a single point, and Summoner's Rift's real
+      // paths hold 118-256px, so this sits at the tight end of that same
+      // band on purpose (a 2400px map has far less room than a 6400px one)
+      // rather than by accident.
       waypoints: [
         { x: 300, y: 2100 },
-        { x: 700, y: 1700 },
+        { x: 300, y: 1820 },
+        { x: 950, y: 1820 }, // passes ~120px south of the amber turret
         { x: 1187, y: 1300 },
         { x: 1187, y: 1200 },
         { x: 1187, y: 1000 },
-        { x: 1700, y: 700 },
+        { x: 1450, y: 1000 },
+        { x: 1450, y: 550 }, // passes ~115-390px west of jade's two turrets
         { x: 2100, y: 300 },
       ],
     },

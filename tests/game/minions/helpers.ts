@@ -2,6 +2,7 @@ import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import type { MinionSpawnerContext } from '../../../src/game/managers/MinionSpawner';
 import { fountainsFromSlots, minionMusterSlotsFrom } from '../../../src/game/preset';
+import { summonersRift } from '../../../src/content/maps/summonersRift';
 import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import { createGame, stubGameGlobals, type TestGame } from '../fixtures';
 
@@ -25,15 +26,19 @@ export function createSpawnerContext(): SpawnerGame {
 
   const game = createGame() as SpawnerGame;
   game.setPlayer(new Champion({ game, teamId: 'player-uuid' }));
-  game.fountains = fountainsFromSlots(summonersRiftGeometry.slots.spawn).map(
-    preset => new Fountain({ game, preset })
-  );
+  game.fountains = fountainsFromSlots(
+    summonersRiftGeometry.slots.spawn,
+    summonersRift.factions
+  ).map(preset => new Fountain({ game, preset }));
   // A wave musters wherever the map declares (Task 6): straight off the map's
   // own `slots.minion`, teamId-bridged the same way `Game`'s own constructor
   // bridges it — rather than deriving it here from the live turrets, which is
   // what this replaced (`musterPointFor`, deleted, used to answer with `null`
   // for a team caught with fewer than two).
-  game.minionMuster = minionMusterSlotsFrom(summonersRiftGeometry.slots.minion);
+  game.minionMuster = minionMusterSlotsFrom(
+    summonersRiftGeometry.slots.minion,
+    summonersRift.factions
+  );
 
   return game;
 }

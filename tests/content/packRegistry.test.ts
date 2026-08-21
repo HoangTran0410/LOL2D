@@ -147,6 +147,44 @@ describe('PackRegistry', () => {
     expect(await registry.loadMapGeometry('missing:nowhere')).toBeNull();
   });
 
+  /**
+   * `validate.ts`'s `checkMapGeometry` — the terrain-layer whitelist, the
+   * structure-kind vocabulary, the faction-declared rule, the muster-per-lane
+   * rule — only ever runs against a *plain-object* `geometry`, because it
+   * cannot inspect a loader's body synchronously (`checkSpells` makes the
+   * identical trade for a `SpellSource` loader). `install()`'s `validatePack`
+   * therefore only ever checks a loader map's summary (id/name/size/
+   * factions); the resolved geometry itself is never checked unless
+   * `loadMapGeometry` checks it once the loader settles. Both shipped maps
+   * (`summonersRift`, `referenceMap`) use loaders, so this was a real gap,
+   * not a hypothetical one.
+   */
+  it('validates a loader map’s geometry once it resolves, not just its summary at install', async () => {
+    registry.install(
+      pack('broken', {
+        maps: [
+          {
+            id: 'arena',
+            name: 'Arena',
+            size: 4000,
+            factions: [{ id: 'solo' }],
+            geometry: () =>
+              Promise.resolve({
+                // `lava` is not `wall`/`bush`/`water` — `TerrainMap` drops an
+                // unrecognised layer in silence, which is exactly the
+                // failure `checkMapGeometry`'s terrain check exists to name
+                // instead.
+                terrain: { wall: [], bush: [], water: [], lava: [] },
+                slots: { spawn: [], minion: [], structure: [], neutral: [] },
+              }),
+          },
+        ] as never,
+      })
+    );
+
+    await expect(registry.loadMapGeometry('broken:arena')).rejects.toThrow(/lava/);
+  });
+
   it('does not call a map geometry loader at install time', () => {
     let calls = 0;
     registry.install(

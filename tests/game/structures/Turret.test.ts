@@ -9,6 +9,7 @@ import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
 import { turretsFromSlots } from '../../../src/game/preset';
+import { summonersRift } from '../../../src/content/maps/summonersRift';
 import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import mapData from '../../../assets/json/summoner_map.json';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
@@ -166,7 +167,10 @@ describe('Turret as a team building', () => {
       // turretsFromSlots reads the active map's own structure slots — no
       // asset load to stub, since `summonersRiftGeometry` assembles them
       // from the map JSON directly (see that module's own doc comment).
-      const positions = turretsFromSlots(summonersRiftGeometry.slots.structure);
+      const positions = turretsFromSlots(
+        summonersRiftGeometry.slots.structure,
+        summonersRift.factions
+      );
 
       expect(positions).toHaveLength(mapData.turret1.length + mapData.turret2.length);
       const blue = positions.filter(p => p.teamId === TeamId.BLUE);

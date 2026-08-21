@@ -85,13 +85,26 @@ describe("the Summoner's Rift map definition", () => {
     }
   });
 
-  it('passes validation as part of a pack', () => {
+  it('passes validation as part of a pack, geometry included', async () => {
     const result = validatePack({
       manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
       maps: [summonersRift],
     });
     expect(result.ok).toBe(true);
     if (result.ok === false) expect(result.errors).toEqual([]);
+
+    // `summonersRift.geometry` is a loader, so `validatePack` above never
+    // actually reached its terrain/slots/lanes — `checkMap` can only inspect
+    // a plain-object geometry synchronously (see `validate.ts`'s own doc
+    // comment). `PackRegistry.loadMapGeometry` is what validates a resolved
+    // loader's geometry in production; exercise that path too, or this test
+    // would pass just as well against arbitrarily broken terrain.
+    const registry = new PackRegistry();
+    registry.installData({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      maps: [summonersRift],
+    });
+    await expect(registry.loadMapGeometry('p:summoners-rift')).resolves.toBeTruthy();
   });
 
   it('is carried in the bundled pack, qualified by pack id, summary only', () => {

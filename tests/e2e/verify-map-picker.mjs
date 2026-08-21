@@ -50,12 +50,30 @@
  *      (a picker path that degraded silently, showing "?" and rerolling to
  *      something random at match start);
  *   5. that match's world is actually Proving Grounds', by every fact above;
- *   6. no page errors the whole time.
+ *   6. the match *runs*, not just draws the right numbers — a fountain
+ *      belongs to the player's own team, and a wave the spawner queues
+ *      actually produces minions;
+ *   7. no page errors the whole time.
+ *
+ * Check 6 is the one Task 10's original version of this script did not have,
+ * and the finding it exists to guard: the faction -> `TeamId` bridge every
+ * fountain/turret/muster point goes through named only `'blue'`/`'red'`, so
+ * every one of Proving Grounds' slots (`'amber'`/`'jade'`) bridged to
+ * `teamId: undefined` — a fountain belonging to nobody, and
+ * `MinionSpawner.queueWave`'s `teamId !== BLUE && teamId !== RED` guard
+ * skipping every fountain, so no wave ever formed up. Checks 1-5 (terrain
+ * polygon count, world size, structure count) all passed 15/15 the whole
+ * time that was true, because none of them ask whether the world any of
+ * those numbers describes is actually playable.
  *
  * `ai.count: 0` and `world: { jungle: false, minions: false }` in every
  * seeded config, the same shape `verify-pack-champion.mjs` uses: nothing else
  * on the map can raise a page error while the checks read off `game`, and
- * none of that is the behaviour under test.
+ * none of that is the behaviour under test. Check 6 works around the
+ * `minions: false` clock being off by calling `MinionSpawner.queueWave()`/
+ * `releaseQueued()` directly (the same seam `drive-game.mjs` uses to skip a
+ * real 30-second wait) rather than turning the wave clock on for this script
+ * alone and risking the instability that setting exists to avoid.
  *
  *   node tests/e2e/verify-map-picker.mjs
  *   LOL2D_CHROME_CHANNEL= node tests/e2e/verify-map-picker.mjs   # bundled Chromium
@@ -125,6 +143,36 @@ const waitForMatch = () =>
     timeout: 30_000,
   });
 
+/**
+ * The "does it actually run" half check 6 asks for. Reads the player's own
+ * team against every fountain — the faction bridge's first consequence, a
+ * fountain nobody's champion can heal at — and then forces one wave through
+ * `MinionSpawner` directly (`queueWave()` then `releaseQueued()`, the same
+ * seam `drive-game.mjs` uses to skip the real wave clock) rather than
+ * waiting out `world.minions: false`'s disabled spawner or a real 30-second
+ * interval. Both were silently broken for any map whose factions were not
+ * literally spelled `'blue'`/`'red'`: `randomSpawnPoint` would have picked
+ * either fountain for the player at random, and `queueWave`'s own `teamId
+ * !== BLUE && teamId !== RED` guard would have skipped every fountain, so
+ * `minionsAfter` would read `0` regardless of how many times a wave is
+ * queued.
+ */
+const forcesAWaveAndOwnsAFountain = () =>
+  page.evaluate(() => {
+    const game = window.__lol2d?.scene?.oScene?.game;
+    const spawner = game?.minionSpawner;
+    if (!game || !spawner) return null;
+    spawner.queueWave();
+    spawner.releaseQueued();
+    return {
+      playerTeamId: game.player?.teamId ?? null,
+      playerHasOwnFountain: game.fountains.some(
+        fountain => fountain.teamId === (game.player?.teamId ?? null)
+      ),
+      minionsAfter: spawner.minions.length,
+    };
+  });
+
 const checkWorldMatches = (label, expectedId) => async () => {
   await waitForMatch();
   await page.waitForTimeout(300);
@@ -146,6 +194,19 @@ const checkWorldMatches = (label, expectedId) => async () => {
     `${label}: structure count matches ${expectedId}`,
     facts?.structures === want.structures,
     `${facts?.structures} !== ${want.structures}`
+  );
+
+  const runs = await forcesAWaveAndOwnsAFountain();
+  report[`${label} (runs)`] = runs;
+  check(
+    `${label}: the player's own fountain belongs to their team`,
+    runs?.playerHasOwnFountain === true,
+    JSON.stringify(runs)
+  );
+  check(
+    `${label}: a queued wave actually produces minions`,
+    (runs?.minionsAfter ?? 0) > 0,
+    JSON.stringify(runs)
   );
 };
 
@@ -192,6 +253,6 @@ await harness.guard(async () => {
   // ---------------------------------------------- 5. the world it started
   await checkWorldMatches('picked Proving Grounds', PROVING_GROUNDS_ID)();
 
-  // ------------------------------------------------------ 6. no page errors
+  // ------------------------------------------------------ 7. no page errors
   check('no page errors', harness.errors.length === 0, harness.errors[0]);
 });

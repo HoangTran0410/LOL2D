@@ -2,6 +2,7 @@ import { contentRegistry } from '@/content/registry';
 import { qualify, type PackRegistry, type QualifiedMonster } from '@/content/PackRegistry';
 import { BUNDLED_PACK_ID } from '@/content/bundledPack';
 import type {
+  Faction,
   MinionSlot,
   MonsterBody,
   NeutralSlot,
@@ -535,20 +536,41 @@ export const monsterBodyPreset = (
 /**
  * Bridges a map's own faction vocabulary — a pack's free-string `Faction.id`,
  * e.g. `summonersRift`'s `'blue'`/`'red'` (`src/content/maps/summonersRift.ts`)
- * — to the match's fixed two-team model. Every comparison the engine actually
- * runs (`canTakeDamageFromTeam`, `PredefinedFilters.teamId`, `opposingTeam`,
- * a champion's own `pregameConfig.playerTeam`) is against `TeamId.BLUE`/
+ * or `referenceMap`'s `'amber'`/`'jade'` (`packs/reference/map.ts`) — to the
+ * match's fixed two-team model. Every comparison the engine actually runs
+ * (`canTakeDamageFromTeam`, `PredefinedFilters.teamId`, `opposingTeam`, a
+ * champion's own `pregameConfig.playerTeam`) is against `TeamId.BLUE`/
  * `TeamId.RED`, not the raw faction string, so a slot's faction has to land
  * on one of those two before a `Fountain`/`Turret` can share a side with a
- * champion. A faction this table has never heard of falls through to
- * `undefined`, the same "isolated object" default every other unbound
- * `teamId` gets (`GameObject.teamId`'s own fresh-uuid fallback) — a building
- * on a faction the engine does not recognise ends up unaffiliated rather
- * than crashing the match.
+ * champion.
+ *
+ * The bridge is **positional, not a fixed vocabulary**: `factions[0]` is
+ * BLUE and `factions[1]` is RED, whatever a map spells them — the order its
+ * own `MapSummary.factions` lists them in, the same list `validate.ts`
+ * already requires every slot's `faction` to be drawn from. A hard-coded
+ * `{blue: BLUE, red: RED}` table used to answer every other faction id with
+ * `undefined`, silently — every Proving Grounds fountain, turret and muster
+ * point bridged to no team at all, `randomSpawnPoint` fell back to picking
+ * either fountain at random for *every* spawn on *both* sides, and
+ * `MinionSpawner.queueWave` skipped every fountain outright (its `teamId
+ * !== BLUE && teamId !== RED` guard), so no wave ever formed up despite the
+ * map declaring a lane and two muster slots. Refusing any faction not
+ * literally called `blue`/`red` would "fix" that by freezing the
+ * abstraction as a lie instead — a map author writes `factions` and never
+ * touches `TeamId`, so the vocabulary has to be exactly as free as
+ * `Faction.id` already promises it is.
+ *
+ * A third-or-later faction (or a slot naming one `validate.ts` never saw,
+ * which cannot happen on an installed pack but costs nothing to guard here
+ * too) falls through to `undefined`, the same "isolated object" default
+ * every other unbound `teamId` gets (`GameObject.teamId`'s own fresh-uuid
+ * fallback) — a building on a faction the engine cannot seat on either team
+ * ends up unaffiliated rather than crashing the match.
  */
-const TEAM_ID_OF_FACTION: Record<string, string> = {
-  blue: TeamId.BLUE,
-  red: TeamId.RED,
+const teamIdOfFaction = (factions: readonly Faction[], factionId: string): string | undefined => {
+  if (factions[0]?.id === factionId) return TeamId.BLUE;
+  if (factions[1]?.id === factionId) return TeamId.RED;
+  return undefined;
 };
 
 /**
@@ -559,8 +581,15 @@ const TEAM_ID_OF_FACTION: Record<string, string> = {
  * lists its spawn slots in no longer matters. Every fountain gets the same
  * name and the same defaults (tick interval, heal/mana percent) `Fountain`
  * itself falls back to; only position, radius and team come from the map.
+ *
+ * @param factions The active map's own `MapSummary.factions`, in the order
+ *   it declares them — see `teamIdOfFaction`'s doc comment for why this is
+ *   what carries the team, not the faction's spelling.
  */
-export const fountainsFromSlots = (slots: SpawnSlot[]): FountainPresetData[] => {
+export const fountainsFromSlots = (
+  slots: SpawnSlot[],
+  factions: readonly Faction[]
+): FountainPresetData[] => {
   const presets: FountainPresetData[] = [];
   for (const slot of slots) {
     presets.push({
@@ -568,7 +597,7 @@ export const fountainsFromSlots = (slots: SpawnSlot[]): FountainPresetData[] => 
       x: slot.x,
       y: slot.y,
       r: slot.r,
-      teamId: TEAM_ID_OF_FACTION[slot.faction],
+      teamId: teamIdOfFaction(factions, slot.faction),
     });
   }
   return presets;
@@ -577,7 +606,8 @@ export const fountainsFromSlots = (slots: SpawnSlot[]): FountainPresetData[] => 
 export interface TurretPosition {
   x: number;
   y: number;
-  teamId: string;
+  /** Absent for a structure slot whose faction `teamIdOfFaction` cannot seat on either team. */
+  teamId?: string;
 }
 
 /**
@@ -592,17 +622,24 @@ export interface TurretPosition {
  * pack whose `structure` slots carry any other kind (`STRUCTURE_KINDS` is
  * `['turret']` today), so this loop does not defend against a kind that can
  * never arrive.
+ *
+ * @param factions The active map's own `MapSummary.factions` — see
+ *   `teamIdOfFaction`'s doc comment.
  */
-export const turretsFromSlots = (slots: StructureSlot[]): TurretPosition[] => {
+export const turretsFromSlots = (
+  slots: StructureSlot[],
+  factions: readonly Faction[]
+): TurretPosition[] => {
   const positions: TurretPosition[] = [];
   for (const slot of slots) {
-    positions.push({ x: slot.x, y: slot.y, teamId: TEAM_ID_OF_FACTION[slot.faction] });
+    positions.push({ x: slot.x, y: slot.y, teamId: teamIdOfFaction(factions, slot.faction) });
   }
   return positions;
 };
 
 export interface MinionMusterPoint {
-  teamId: string;
+  /** Absent for a minion slot whose faction `teamIdOfFaction` cannot seat on either team. */
+  teamId?: string;
   lane: string;
   x: number;
   y: number;
@@ -618,12 +655,18 @@ export interface MinionMusterPoint {
  * `validate.ts` refuses to install a map missing a slot for a lane one of
  * its declared factions walks, so by the time this runs on an installed
  * pack's map every lane a match actually queues waves for already has one.
+ *
+ * @param factions The active map's own `MapSummary.factions` — see
+ *   `teamIdOfFaction`'s doc comment.
  */
-export const minionMusterSlotsFrom = (slots: MinionSlot[]): MinionMusterPoint[] => {
+export const minionMusterSlotsFrom = (
+  slots: MinionSlot[],
+  factions: readonly Faction[]
+): MinionMusterPoint[] => {
   const points: MinionMusterPoint[] = [];
   for (const slot of slots) {
     points.push({
-      teamId: TEAM_ID_OF_FACTION[slot.faction],
+      teamId: teamIdOfFaction(factions, slot.faction),
       lane: slot.lane,
       x: slot.x,
       y: slot.y,
