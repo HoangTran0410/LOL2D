@@ -41,8 +41,14 @@ import {
  * `tests/game/spell/fixtures.ts`, which build the same `CastContext` the game
  * builds. `spell.press(context)` by hand is equally fine — the ban is on
  * reaching past the runtime, not on the helper being mandatory.
+ *
+ * "Every spell test" now spans two directories: the seam scans and generic
+ * behaviour tests here, and the champion-named tests moved to
+ * `tests/packs/riot/spells/` in batch 4 task 5. The rule is about the whole
+ * universe of spell tests, so it reaches into both rather than following the
+ * content out.
  */
-const SPELL_TESTS_DIR = __dirname;
+const SPELL_TESTS_DIRS = [__dirname, join(__dirname, '../../packs/riot/spells')];
 
 /** Every hook the runtime owns. A test may observe them; it may not call them. */
 const RUNTIME_HOOKS = [
@@ -115,9 +121,11 @@ function stripComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 }
 
-function spellTestFiles(): string[] {
-  return readdirSync(SPELL_TESTS_DIR).filter(
-    name => name.endsWith('.test.ts') && name !== 'spell-runtime-drive-seam.test.ts'
+function spellTestFiles(): { dir: string; name: string }[] {
+  return SPELL_TESTS_DIRS.flatMap(dir =>
+    readdirSync(dir)
+      .filter(name => name.endsWith('.test.ts') && name !== 'spell-runtime-drive-seam.test.ts')
+      .map(name => ({ dir, name }))
   );
 }
 
@@ -125,9 +133,9 @@ describe('a spell test presses the spell, it does not call its hooks', () => {
   it('no un-grandfathered spell test reaches past the runtime', () => {
     const offenders: string[] = [];
 
-    for (const file of spellTestFiles()) {
+    for (const { dir, name: file } of spellTestFiles()) {
       if (GRANDFATHERED.has(file)) continue;
-      const source = stripComments(readFileSync(join(SPELL_TESTS_DIR, file), 'utf8'));
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       const matches = source.match(CALL_PATTERN);
       if (matches) offenders.push(`${file}: ${[...new Set(matches)].join(', ')}`);
     }
@@ -137,9 +145,12 @@ describe('a spell test presses the spell, it does not call its hooks', () => {
 
   it('the debt list only names files that still owe the migration', () => {
     const stale: string[] = [];
+    const byName = new Map(spellTestFiles().map(({ dir, name }) => [name, dir]));
 
     for (const file of GRANDFATHERED) {
-      const source = stripComments(readFileSync(join(SPELL_TESTS_DIR, file), 'utf8'));
+      const dir = byName.get(file);
+      if (!dir) throw new Error(`${file}: named in GRANDFATHERED but no longer exists`);
+      const source = stripComments(readFileSync(join(dir, file), 'utf8'));
       if (!CALL_PATTERN.test(source)) stale.push(file);
       CALL_PATTERN.lastIndex = 0;
     }

@@ -14,7 +14,7 @@
  * stamping its reveal icon on them. Which is exactly how it was reported: the
  * Lux R icon appeared on the player's bar after a cast they never saw.
  *
- * `tests/game/spells/Lux_R.test.ts` pins the structural half (the beam is a
+ * `tests/packs/riot/spells/Lux_R.test.ts` pins the structural half (the beam is a
  * world object, drawn by the world pass rather than by the champion). It
  * cannot pin this half, because it simulates the draw pass rather than running
  * the real one. A future change to `ObjectManager.draw()` or `FogOfWar` could
