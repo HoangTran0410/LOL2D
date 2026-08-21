@@ -70,7 +70,15 @@ export const LANE_SWITCH_MARGIN = 8;
 
 /** Where a point sits relative to the lane nearest it. */
 export interface LanePoint {
-  lane: string;
+  /**
+   * `null` only when `LANES` is empty (a laneless map, Task 8) — there is
+   * nothing to be nearest *to*. `distance` stays `Infinity` in exactly that
+   * case, so every caller today already gates on `distance <=
+   * LANE_MEMBERSHIP_PX` before reading this and never observes the `null`,
+   * but the type says so honestly rather than lying with a placeholder id a
+   * direct caller could read past the distance check.
+   */
+  lane: string | null;
   /** Shortest distance from the point to the lane polyline, in pixels. */
   distance: number;
   /** 0 at the blue end of the lane, 1 at the red end. */
@@ -172,7 +180,7 @@ export function laneProgressAt(lane: string, x: number, y: number): number {
 
 /** The lane nearest a point, how far off it the point is, and how far along. */
 export function nearestLane(x: number, y: number): LanePoint {
-  let best: LanePoint = { lane: LANES[0], distance: Number.POSITIVE_INFINITY, progress: 0 };
+  let best: LanePoint = { lane: LANES[0] ?? null, distance: Number.POSITIVE_INFINITY, progress: 0 };
   const geo = laneGeometry();
   for (const lane of LANES) {
     const geometry = geo[lane];

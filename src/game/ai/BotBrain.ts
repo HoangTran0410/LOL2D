@@ -1742,6 +1742,20 @@ export class BotBrain {
    * A turret is only ever attacked with our own wave standing under it
    * (`PUSH_TURRET_ESCORT_PX`) and only from inside the tier's aggro range. A
    * bot that walks up to a building alone is a bot that feeds it.
+   *
+   * **This is the only entry point to PvE farming — lane creeps and jungle
+   * camps alike — and it is gated on `posture === 'PUSH'`, which is
+   * structurally unreachable with no lane assignment.** A laneless map
+   * (Task 8, `lanes.ts`'s `setActiveLanes(undefined)`) is therefore not
+   * merely lane-free: every jungle camp on it stands there forever untouched,
+   * because nothing in the posture chain ever calls this. Correct scope for
+   * that task — a laneless map today is the cheap half of the
+   * battle-royale question, and its bots are expected to only ROAM/FIGHT.
+   * The eventual battle-royale mode (a jungle map where everyone farms *and*
+   * fights) will need PvE farming reachable from a posture other than PUSH —
+   * `findObjectiveTarget` split from its lane test, or a second caller for
+   * whichever posture that mode adds — not a fix here so much as a thing
+   * this comment is here so it is not rediscovered the hard way.
    */
   findObjectiveTarget(from?: TeamView): AttackableUnit | null {
     // The posture test first, and only then the board: `AIChampion` calls this

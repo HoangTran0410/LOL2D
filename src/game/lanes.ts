@@ -137,6 +137,21 @@ const DEFAULT_LANES: readonly string[] = [Lane.TOP, Lane.MID, Lane.BOT];
  * `MinionSpawner.ts` both import this by name and loop it directly; neither
  * needed a code change for the lane set to become the map's; both already
  * read whatever this binding currently holds.
+ *
+ * **This is one process-wide slot, not one per `Game`.** There is exactly one
+ * live match at a time in this codebase (one `GameScene`, one `new Game(...)`
+ * call site) and every test file gets its own module registry, so nothing
+ * has ever needed a second. But it is a real hazard for anything that stops
+ * being true: build a `MinionSpawner` for map A, call `setActiveLanes(B)`
+ * before A is torn down, and A's spawner starts queueing *B*'s lane ids on
+ * its very next wave — `LANES` is no longer the array A's caller captured,
+ * because nothing captured it; every reader asks this binding fresh. Two
+ * live `Game`s sharing one process (a rematch that constructs the next match
+ * before the old one's `destroy()` has run, or a future side-by-side
+ * comparison) would hit exactly this, silently. `setActiveLanes` refuses to
+ * overwrite an unstopped match's lanes for that reason — see its own doc
+ * comment — rather than trusting every future caller to remember to clear
+ * first.
  */
 export let LANES: string[] = [...DEFAULT_LANES];
 
@@ -146,6 +161,15 @@ export let LANES: string[] = [...DEFAULT_LANES];
  * there: this file's own `redLaneWaypoints()` cache keys off it too.
  */
 export let LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = DEFAULT_LANE_WAYPOINTS;
+
+/**
+ * Whether the current `LANES`/`LANE_WAYPOINTS` were installed by a match that
+ * has not yet cleared them (`clearActiveLanes`/`resetLanesForTests`) — the
+ * guard `setActiveLanes` checks before ever overwriting them. Starts `false`:
+ * the out-of-the-box default above belongs to nobody, and installing over it
+ * is the ordinary first call from a match's `Game` constructor.
+ */
+let owned = false;
 
 /**
  * Installs the running match's own lane set. Called once, from `Game`'s
@@ -160,8 +184,32 @@ export let LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = DEFAULT_LANE_WAYPOIN
  * same binding — sees no lanes at all. None of those files needed a code
  * change to make that true: they already read `LANES`/`LANE_WAYPOINTS` live,
  * not a value captured at import time.
+ *
+ * **Throws if a previous match's lanes are still installed and unstopped.**
+ * This binding is one process-wide slot (see `LANES`'s own doc comment for
+ * the failure this prevents): a second call before `clearActiveLanes()` runs
+ * would otherwise silently hand the first match's `MinionSpawner` and
+ * `TeamBlackboard` the second match's lane ids the moment they next ask.
+ * Matching this codebase's own convention for a violated precondition
+ * (`MinionSpawner.musterSlotFor` and `validate.ts` both throw rather than
+ * degrade — see `validate.ts`'s file comment on why a silent failure here is
+ * worse than a loud one) rather than the softer "warn and continue": a stale
+ * lane set is exactly the class of bug this batch has spent seven tasks
+ * removing, and `Game`'s constructor already runs synchronously with nothing
+ * to catch a thrown error but the caller that broke the invariant.
+ * `GameScene.stopGame()` -> `Game.destroy()` -> `clearActiveLanes()` is the
+ * seam that keeps every real match sequence from ever reaching this.
  */
 export function setActiveLanes(lanes: readonly LaneDefinition[] | undefined): void {
+  if (owned) {
+    throw new Error(
+      "lanes.ts: setActiveLanes() called while a previous match's lane set is " +
+        'still installed. This is one process-wide slot — call clearActiveLanes() ' +
+        '(Game.destroy() does, when a match actually ends) before installing another, ' +
+        "or two live Games will silently share it and queue each other's lane ids."
+    );
+  }
+  owned = true;
   if (!lanes || lanes.length === 0) {
     LANES = [];
     LANE_WAYPOINTS = {};
@@ -178,17 +226,33 @@ export function setActiveLanes(lanes: readonly LaneDefinition[] | undefined): vo
 }
 
 /**
- * Test-only. Restores this module's out-of-the-box default (Summoner's
- * Rift's shipped three lanes).
+ * Restores this module's out-of-the-box default (Summoner's Rift's shipped
+ * three lanes) and releases the `setActiveLanes` guard above.
+ *
+ * The production seam: `Game.destroy()` calls this whenever a match actually
+ * ends (`GameScene.stopGame()` runs it unconditionally before dropping its
+ * `Game` reference), so the *next* match's `setActiveLanes(map.lanes)` never
+ * trips the "already installed" throw.
+ */
+export function clearActiveLanes(): void {
+  owned = false;
+  LANES = [...DEFAULT_LANES];
+  LANE_WAYPOINTS = DEFAULT_LANE_WAYPOINTS;
+}
+
+/**
+ * Test-only alias for `clearActiveLanes`, kept as its own name so a test's
+ * teardown reads as "this file's own state must not leak", distinct from the
+ * production seam that ends a real match.
  *
  * Vitest isolates module state per *test file*, not per `it()` — a test that
  * calls `setActiveLanes` and shares a file with others that assume the
- * default must call this in its own teardown, or the next test silently
- * starts on whatever the last one left behind.
+ * default (or that install their own lanes) must call this in its own
+ * teardown, or the next test either silently starts on whatever the last one
+ * left behind, or trips the guard above.
  */
 export function resetLanesForTests(): void {
-  LANES = [...DEFAULT_LANES];
-  LANE_WAYPOINTS = DEFAULT_LANE_WAYPOINTS;
+  clearActiveLanes();
 }
 
 // Reversed on first use rather than at module load, and memoised rather than

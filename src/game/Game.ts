@@ -1,6 +1,6 @@
 import type { ActiveMap, NeutralSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import { HotKeys, SpellHotKeys } from './constants';
-import { setActiveLanes } from './lanes';
+import { clearActiveLanes, setActiveLanes } from './lanes';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
@@ -590,6 +590,12 @@ export default class Game {
     this.fogOfWar.destroy();
     this.minimap.destroy();
     this.inGameHUD.destroy();
+    // The seam that keeps `setActiveLanes`'s "one process-wide slot" guard
+    // (`lanes.ts`) from ever tripping on a real match sequence:
+    // `GameScene.stopGame()` calls this unconditionally before dropping its
+    // `Game` reference, so the *next* match's constructor never installs its
+    // lanes over an unstopped one's.
+    clearActiveLanes();
   }
 
   /**

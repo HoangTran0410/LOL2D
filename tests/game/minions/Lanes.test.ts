@@ -5,6 +5,7 @@ import {
   LANE_WAYPOINTS,
   DEFAULT_LANE_WAYPOINTS,
   Lane,
+  clearActiveLanes,
   getLaneWaypoints,
   nextWaypointIndexFrom,
   resetLanesForTests,
@@ -18,6 +19,7 @@ import {
 } from '../../../src/content/maps/summonersRiftGeometry';
 import MinionSpawner from '../../../src/game/managers/MinionSpawner';
 import { createSpawnerContext } from './helpers';
+import Game from '../../../src/game/Game';
 
 type Point = [number, number];
 const walls = mapData.wall as Point[][];
@@ -621,9 +623,55 @@ describe('the active lane set, once a match installs one', () => {
 
   it('restores the default once a test resets it, even after an empty map', () => {
     setActiveLanes(undefined);
+    // The round trip this test is named for: assert the middle of it, not
+    // just the two ends, which a fully no-op setActiveLanes/resetLanesForTests
+    // would also satisfy since the before-default and after-reset-default are
+    // identical either way.
+    expect(LANES).toEqual([]);
+    expect(LANE_WAYPOINTS).toEqual({});
+
     resetLanesForTests();
     expect(LANES).toEqual([Lane.TOP, Lane.MID, Lane.BOT]);
     expect(getLaneWaypoints(Lane.MID, TeamId.BLUE)).toBe(DEFAULT_LANE_WAYPOINTS[Lane.MID]);
+  });
+
+  /**
+   * Fix round 1: reproduces the hazard a review found by running it, not by
+   * reasoning about it — `setActiveLanes(A)`, build something off `LANES`,
+   * `setActiveLanes(B)` before A's match ever clears, and A's reader (a
+   * `MinionSpawner`, a `TeamBlackboard`) starts reading B's lane ids on its
+   * very next ask, silently, because nothing captured A's array — every
+   * reader asks the live binding fresh. `LANES` is one process-wide slot
+   * (see its own doc comment); this is what stops a second `setActiveLanes`
+   * from overwriting it unnoticed.
+   */
+  it("refuses to overwrite an unstopped match's lanes silently", () => {
+    setActiveLanes([
+      { id: 'alpha', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.TOP] },
+    ]);
+
+    expect(() =>
+      setActiveLanes([
+        { id: 'beta', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.MID] },
+      ])
+    ).toThrow(/setActiveLanes/);
+
+    // The refused call did not partially apply — A's own lanes are untouched,
+    // which is the whole point: a caller that ignores the throw still cannot
+    // silently inherit B's ids.
+    expect(LANES).toEqual(['alpha']);
+  });
+
+  it('lets the next match install its own lanes once the old one clears', () => {
+    setActiveLanes([
+      { id: 'alpha', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.TOP] },
+    ]);
+    clearActiveLanes();
+    setActiveLanes([
+      { id: 'beta', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.MID] },
+    ]);
+
+    expect(LANES).toEqual(['beta']);
   });
 });
 
@@ -649,5 +697,42 @@ describe('a map with no lanes, end to end through the spawner', () => {
 
     expect(spawner.liveCount).toBe(0);
     expect(game.objectManager._objectToBeAdd).toHaveLength(0);
+  });
+});
+
+/**
+ * Fix round 1: the doc comments on `setActiveLanes`/`clearActiveLanes` claim
+ * `Game.destroy()` is the seam that keeps a real match sequence from ever
+ * tripping the "already installed" throw above. This is what proves that
+ * claim against the actual method rather than trusting the comment — called
+ * on `Game.prototype` directly with a stub `this`, so it does not pay for a
+ * full `Game` construction (canvas, camera, terrain rasterization) just to
+ * reach three destroy calls and a lane clear.
+ */
+describe('Game.destroy() clears the active lanes', () => {
+  afterEach(resetLanesForTests);
+
+  it('releases the setActiveLanes guard so the next match can install its own', () => {
+    setActiveLanes([
+      { id: 'alpha', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.TOP] },
+    ]);
+    expect(LANES).toEqual(['alpha']);
+
+    const stubGame = {
+      fogOfWar: { destroy: () => {} },
+      minimap: { destroy: () => {} },
+      inGameHUD: { destroy: () => {} },
+    };
+    Game.prototype.destroy.call(stubGame);
+
+    expect(LANES).toEqual([Lane.TOP, Lane.MID, Lane.BOT]);
+    // And the guard is released, not just the value reset — a second match's
+    // own setActiveLanes must not throw after this.
+    expect(() =>
+      setActiveLanes([
+        { id: 'beta', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.MID] },
+      ])
+    ).not.toThrow();
+    expect(LANES).toEqual(['beta']);
   });
 });

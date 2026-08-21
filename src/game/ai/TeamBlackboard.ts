@@ -200,7 +200,12 @@ export class TeamBlackboard {
     const laneOfChampion = new Map<Champion, string>();
     for (const champion of living) {
       const nearest = nearestLane(champion.position.x, champion.position.y);
-      if (nearest.distance <= LANE_MEMBERSHIP_PX) laneOfChampion.set(champion, nearest.lane);
+      // `nearest.lane` is `null` only when `LANES` is empty, in which case
+      // `distance` stays `Infinity` and this branch never runs — the extra
+      // check is what makes that provable here rather than merely true today.
+      if (nearest.distance <= LANE_MEMBERSHIP_PX && nearest.lane !== null) {
+        laneOfChampion.set(champion, nearest.lane);
+      }
     }
 
     this.views.clear();
@@ -448,8 +453,11 @@ function turretPlacement(turret: Turret): { lane: string; progress: number } | n
   if (known !== undefined) return known;
 
   const nearest = nearestLane(turret.position.x, turret.position.y);
+  // Same `!== null` reasoning as `laneOfChampion` above: unreachable on a
+  // laneless map today (distance is `Infinity` there), stated so rather than
+  // trusted.
   const placed =
-    nearest.distance <= LANE_MEMBERSHIP_PX
+    nearest.distance <= LANE_MEMBERSHIP_PX && nearest.lane !== null
       ? { lane: nearest.lane, progress: nearest.progress }
       : null;
   turretPlaces.set(turret, placed);
