@@ -120,15 +120,42 @@ const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'Mi
 // assembling Summoner's Rift into a `MapDefinition` (`src/content/maps/
 // summonersRift.ts`) pushed the measured size to 231,072 — +23,214 bytes,
 // almost exactly `assets/json/summoner_map.json`'s own 22,180-byte weight
-// (329 wall polygons, 40 bush, 26 water). That data has nowhere lighter to
-// live: `src/content/` is `pregame` in its entirety, nothing reads the map
-// yet (batches 4-8 move the readers), and the terrain is the map — there is
-// no smaller-but-still-correct encoding of 395 polygons. `game`'s own size
-// (270,119) barely moved, confirming this is new data, not a leak. The
-// ceiling still leaves ~19KB of headroom above the new measurement, for the
-// same reason the original one did: room to grow as data without room for
-// the engine to fit back in unnoticed.
-const PREGAME_SIZE_CEILING_BYTES = 250_000;
+// (329 wall polygons, 40 bush, 26 water). At the time nothing read the map
+// yet, so the whole `MapDefinition` — terrain included — sat in `pregame` in
+// its entirety.
+//
+// Task 4 is the fix that comment predicted was coming: `MapDefinition` split
+// into an eager `MapSummary` (`id`/`name`/`size`/`factions`) and a lazy
+// `geometry` — `summonersRift.ts` now exports only the summary, and
+// `src/content/maps/summonersRiftGeometry.ts` (the terrain, the slots, the
+// lanes, and the `?raw` JSON import that dominates their weight) sits behind
+// `() => import('./summonersRiftGeometry')`, fetched only once a match is
+// starting. **The split alone did not move a single byte on the first
+// build** — `vite.config.ts`'s `manualChunks` pinned everything under
+// `/src/content/` to `pregame` by *path*, with no exception for a module
+// reached only through a dynamic import, so the geometry chunk landed back
+// in `pregame` anyway and the measurement did not move. The real fix is the
+// `map-<id>` rule added just above the blanket `/src/content/` one — it
+// carves out `src/content/maps/*Geometry.ts` ahead of it, the same way the
+// `ContentApi`/`registry` exception already did for a different reason. With
+// that in place, `pregame` measures **209,139 bytes** — 209,139 vs. Task 1's
+// 207,858, i.e. back within 1,281 bytes of where it sat before Task 3 put the
+// map in this chunk at all, confirming the geometry genuinely left rather
+// than merely being renamed. It now lives in its own `map-summonersrift-*.js`
+// chunk, 23,301 bytes, fetched by `GameScene.startGame()` alongside the
+// match's spell/art loads — never by the menu. `game` itself (270,078) barely
+// moved, confirming nothing leaked the other way.
+//
+// The ceiling drops back to what a near-identical measurement already
+// justified once, at Task 1 — 225,000 leaves ~15.9KB of headroom above the
+// current 209,139, room for the summary half to grow (a longer name, a third
+// faction) without room for a stray static import of the geometry, or the
+// engine, to fit back in unnoticed. **It does not move again in this
+// batch** — Tasks 5-8 wire up readers for data this chunk already carries
+// (or, for slots/lanes, will only ever reach through the same lazy loader),
+// and Task 9's second map gets its own `map-<id>` chunk rather than growing
+// this one.
+const PREGAME_SIZE_CEILING_BYTES = 225_000;
 
 {
   const file = chunk('pregame');

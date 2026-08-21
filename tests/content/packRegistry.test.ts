@@ -104,14 +104,102 @@ describe('PackRegistry', () => {
     // choice, not a union — the asymmetry is deliberate.
     const map = (id: string) => ({
       id,
+      name: id,
       size: 4000,
-      terrain: { wall: [], bush: [], water: [] },
       factions: [{ id: 'solo' }],
-      slots: { spawn: [], minion: [], structure: [], neutral: [] },
+      geometry: {
+        terrain: { wall: [], bush: [], water: [] },
+        slots: { spawn: [], minion: [], structure: [], neutral: [] },
+      },
     });
     registry.install(pack('one', { maps: [map('arena')] as never }));
     registry.install(pack('two', { maps: [map('forest')] as never }));
     expect(registry.maps().map(m => m.id)).toEqual(['one:arena', 'two:forest']);
+  });
+
+  it('lists a map summary without pulling its geometry along, and loads it on demand', async () => {
+    registry.install(
+      pack('one', {
+        maps: [
+          {
+            id: 'arena',
+            name: 'Arena',
+            size: 4000,
+            factions: [{ id: 'solo' }],
+            geometry: {
+              terrain: { wall: [[{ x: 0, y: 0 }]], bush: [], water: [] },
+              slots: { spawn: [], minion: [], structure: [], neutral: [] },
+            },
+          },
+        ] as never,
+      })
+    );
+    const [summary] = registry.maps();
+    expect(summary.id).toBe('one:arena');
+    expect(summary).not.toHaveProperty('terrain');
+    expect(summary).not.toHaveProperty('slots');
+
+    const geometry = await registry.loadMapGeometry('one:arena');
+    expect(geometry?.terrain.wall).toHaveLength(1);
+  });
+
+  it('returns null for a map geometry id no pack provides', async () => {
+    expect(await registry.loadMapGeometry('missing:nowhere')).toBeNull();
+  });
+
+  it('does not call a map geometry loader at install time', () => {
+    let calls = 0;
+    registry.install(
+      pack('lazy', {
+        maps: [
+          {
+            id: 'arena',
+            name: 'Arena',
+            size: 4000,
+            factions: [{ id: 'solo' }],
+            geometry: () => {
+              calls += 1;
+              return Promise.resolve({
+                terrain: { wall: [], bush: [], water: [] },
+                slots: { spawn: [], minion: [], structure: [], neutral: [] },
+              });
+            },
+          },
+        ] as never,
+      })
+    );
+    expect(calls).toBe(0);
+  });
+
+  it('resolves a map geometry loader once however many callers ask', async () => {
+    let calls = 0;
+    const geometry = {
+      terrain: { wall: [], bush: [], water: [] },
+      slots: { spawn: [], minion: [], structure: [], neutral: [] },
+    };
+    registry.install(
+      pack('lazy', {
+        maps: [
+          {
+            id: 'arena',
+            name: 'Arena',
+            size: 4000,
+            factions: [{ id: 'solo' }],
+            geometry: () => {
+              calls += 1;
+              return Promise.resolve(geometry);
+            },
+          },
+        ] as never,
+      })
+    );
+    const [a, b] = await Promise.all([
+      registry.loadMapGeometry('lazy:arena'),
+      registry.loadMapGeometry('lazy:arena'),
+    ]);
+    expect(calls).toBe(1);
+    expect(a).toBe(geometry);
+    expect(b).toBe(geometry);
   });
 
   it('finds every monster that can fill a role, in install order', () => {
@@ -147,10 +235,13 @@ describe('PackRegistry', () => {
           maps: [
             {
               id: 'arena',
+              name: 'Arena',
               size: 4000,
-              terrain: { wall: [], bush: [], water: [] },
               factions: [{ id: 'solo' }],
-              slots: { spawn: [], minion: [], structure: [], neutral: [] },
+              geometry: {
+                terrain: { wall: [], bush: [], water: [] },
+                slots: { spawn: [], minion: [], structure: [], neutral: [] },
+              },
             },
           ] as never,
         })

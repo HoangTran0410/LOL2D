@@ -89,11 +89,14 @@ describe('validatePack', () => {
       maps: [
         {
           id: 'arena',
+          name: 'Arena',
           size: 4000,
-          terrain: { wall: [], bush: [], water: [] },
           factions: [{ id: 'blue' }],
-          slots: { spawn: [], minion: [], structure: [], neutral: [] },
-          lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: { spawn: [], minion: [], structure: [], neutral: [] },
+            lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          },
         },
       ],
     });
@@ -110,14 +113,17 @@ describe('validatePack', () => {
       maps: [
         {
           id: 'arena',
+          name: 'Arena',
           size: 4000,
-          terrain: { wall: [], bush: [], water: [] },
           factions: [{ id: 'blue' }],
-          slots: {
-            spawn: [],
-            minion: [],
-            structure: [{ faction: 'blue', kind: 'obelisk', x: 0, y: 0 }],
-            neutral: [],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: {
+              spawn: [],
+              minion: [],
+              structure: [{ faction: 'blue', kind: 'obelisk', x: 0, y: 0 }],
+              neutral: [],
+            },
           },
         },
       ],
@@ -135,14 +141,82 @@ describe('validatePack', () => {
       maps: [
         {
           id: 'forest',
+          name: 'Forest',
           size: 4000,
-          terrain: { wall: [], bush: [], water: [] },
           factions: [{ id: 'solo' }],
-          slots: { spawn: [], minion: [], structure: [], neutral: [] },
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: { spawn: [], minion: [], structure: [], neutral: [] },
+          },
         },
       ],
     });
     expect(result.ok).toBe(true);
+  });
+
+  it('refuses a terrain layer core does not know', () => {
+    // TerrainMap only knows wall/bush/water and used to drop anything else in
+    // silence — see this file's own header. A pack that declares `lava` must
+    // be told, not ignored.
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          name: 'Arena',
+          size: 4000,
+          factions: [{ id: 'solo' }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [], lava: [] },
+            slots: { spawn: [], minion: [], structure: [], neutral: [] },
+          },
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.errors.join('\n')).toMatch(/lava/);
+  });
+
+  it('accepts a map whose geometry is a lazy loader, unvalidated until it resolves', () => {
+    // Exactly like `SpellSource`: a loader's own body cannot be inspected
+    // synchronously, so validation checks that it is a function and stops —
+    // the same discipline `checkSpells` already applies to a spell loader.
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          name: 'Arena',
+          size: 4000,
+          factions: [{ id: 'solo' }],
+          geometry: () =>
+            Promise.resolve({
+              terrain: { wall: [], bush: [], water: [] },
+              slots: { spawn: [], minion: [], structure: [], neutral: [] },
+            }),
+        },
+      ],
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects a map with no name', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          size: 4000,
+          factions: [{ id: 'solo' }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: { spawn: [], minion: [], structure: [], neutral: [] },
+          },
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/name/);
   });
 
   it('names the monster whose fills is not an array of strings', () => {
@@ -204,10 +278,13 @@ describe('validatePack', () => {
       maps: [
         {
           id: 'arena',
+          name: 'Arena',
           size: 4000,
-          terrain: { wall: [], bush: [], water: [] },
           factions: [{ id: 'blue' }],
-          lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          },
         },
       ],
     });

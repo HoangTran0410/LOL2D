@@ -28,42 +28,40 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Rectangle } from '../../../src/libs/quadtree';
 import { TestVector, stubGameGlobals } from '../fixtures';
+import TerrainMap from '../../../src/game/gameObject/map/TerrainMap';
+import type { ActiveMap } from '../../../src/content/ContentPack';
+import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 
 /**
  * One 200x120 wall, authored the way `summoner_map.json` has to author one:
  * two convex boxes stacked across the slab's *depth*, sharing the edge at
  * y = 1060.
  */
-const { SEAM_MAP } = vi.hoisted(() => ({
-  SEAM_MAP: {
+const SEAM_MAP: ActiveMap = {
+  id: 'seam-test',
+  name: 'Seam Test',
+  size: 6_400,
+  factions: [{ id: 'blue' }, { id: 'red' }],
+  terrain: {
     wall: [
       [
-        [1_000, 1_000],
-        [1_200, 1_000],
-        [1_200, 1_060],
-        [1_000, 1_060],
+        { x: 1_000, y: 1_000 },
+        { x: 1_200, y: 1_000 },
+        { x: 1_200, y: 1_060 },
+        { x: 1_000, y: 1_060 },
       ],
       [
-        [1_000, 1_060],
-        [1_200, 1_060],
-        [1_200, 1_120],
-        [1_000, 1_120],
+        { x: 1_000, y: 1_060 },
+        { x: 1_200, y: 1_060 },
+        { x: 1_200, y: 1_120 },
+        { x: 1_000, y: 1_120 },
       ],
     ],
     bush: [],
     water: [],
   },
-}));
-
-vi.mock('../../../src/managers/AssetManager', () => ({
-  default: {
-    get: (key: string) => (key === 'json_summoner_map' ? { data: SEAM_MAP } : undefined),
-    getAsset: () => undefined,
-  },
-}));
-
-import TerrainMap from '../../../src/game/gameObject/map/TerrainMap';
-import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
+  slots: { spawn: [], minion: [], structure: [], neutral: [] },
+};
 
 /** The two boxes above, unioned by hand. Nothing computes this. */
 const SEAM_WALL_UNION = { left: 1_000, right: 1_200, top: 1_000, bottom: 1_120 };
@@ -129,7 +127,7 @@ let terrainMap: TerrainMap;
 
 beforeEach(() => {
   stubGameGlobals();
-  terrainMap = new TerrainMap({}, 6_400);
+  terrainMap = new TerrainMap({}, SEAM_MAP);
 });
 afterEach(() => vi.unstubAllGlobals());
 

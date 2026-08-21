@@ -188,16 +188,29 @@ export interface LaneDefinition {
   waypoints: { x: number; y: number }[];
 }
 
-export interface MapDefinition {
+/**
+ * A map's cheap half: enough to list, name and describe a world to a picker.
+ * `PackRegistry.maps()` returns exactly this, qualified — never the polygons.
+ */
+export interface MapSummary {
   id: string;
+  name: string;
   /** Square edge length in world units. */
   size: number;
+  factions: Faction[];
+}
+
+/**
+ * A map's heavy half: terrain to route and collide against, and the slots
+ * fountains, turrets, jungle camps and minions occupy. Fetched only once a
+ * match is actually starting — see `MapGeometrySource`.
+ */
+export interface MapGeometry {
   terrain: {
     wall: { x: number; y: number }[][];
     bush: { x: number; y: number }[][];
     water: { x: number; y: number }[][];
   };
-  factions: Faction[];
   slots: {
     spawn: SpawnSlot[];
     minion: MinionSlot[];
@@ -207,6 +220,43 @@ export interface MapDefinition {
   /** Absent on a map with no lanes — no waves, and PUSH falls through. */
   lanes?: LaneDefinition[];
 }
+
+/** A map's geometry that has not been fetched yet. Resolved at most once. */
+export type MapGeometryLoader = () => Promise<MapGeometry>;
+
+/**
+ * How a pack hands over a map's heavy half.
+ *
+ * A plain object for a small map; a loader for one the size of Summoner's
+ * Rift — 395 polygons a menu screen has no business downloading before it has
+ * even drawn a picker. See `SpellSource`'s own doc comment; the shape and the
+ * reason are identical, one level up.
+ */
+export type MapGeometrySource = MapGeometry | MapGeometryLoader;
+
+/**
+ * A map, as a pack declares it — the eager `MapSummary` a picker lists, plus
+ * the (possibly lazy) `geometry` a match actually plays on.
+ *
+ * Split the way `SpellSource` already splits a spell class from its loader,
+ * for the same reason: `size`/`name`/`factions` cost nothing to hold in the
+ * menu's own chunk, and `geometry` — the terrain, the slots, the lanes — is
+ * the one payload in the whole pack contract bigger than everything else in
+ * it combined. See `src/content/maps/summonersRift.ts` for the worked
+ * example: its own module holds only the summary, and `geometry` is
+ * `() => import('./summonersRiftGeometry')`.
+ */
+export interface MapDefinition extends MapSummary {
+  geometry: MapGeometrySource;
+}
+
+/**
+ * A map with its geometry already resolved — what `Game` and `TerrainMap`
+ * are actually handed once `PackRegistry.loadMapGeometry` has settled.
+ * `GameScene.startGame()` is what guarantees that has happened before
+ * `new Game(...)` runs; see its own doc comment.
+ */
+export type ActiveMap = MapSummary & MapGeometry;
 
 /**
  * Everything about a pack that a picker can render without the engine: no

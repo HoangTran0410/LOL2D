@@ -4,25 +4,45 @@ import { validatePack } from '../../src/content/validate';
 import { data as bundledData, BUNDLED_PACK_ID } from '../../src/content/bundledPack';
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { MonsterPreset } from '../../src/game/preset';
-import type { StructureSlot } from '../../src/content/ContentPack';
+import type { MapGeometry, StructureSlot } from '../../src/content/ContentPack';
 import mapJson from '../../assets/json/summoner_map.json';
 
+/** `summonersRift.geometry` is a loader now — resolve it once per test that needs it. */
+const geometry = (): Promise<MapGeometry> => {
+  const source = summonersRift.geometry;
+  if (typeof source !== 'function') return Promise.resolve(source);
+  return source();
+};
+
 describe("the Summoner's Rift map definition", () => {
-  it('carries every wall, bush and water polygon the JSON has', () => {
-    expect(mapJson.wall.length).toBeGreaterThan(10);
-    expect(summonersRift.terrain.wall).toHaveLength(mapJson.wall.length);
-    expect(summonersRift.terrain.bush).toHaveLength(mapJson.bush.length);
-    expect(summonersRift.terrain.water).toHaveLength(mapJson.water.length);
+  it('is a summary only — no terrain or slots on the object itself', () => {
+    // The whole point of Task 4's split: the eager half is cheap enough for
+    // the menu's own chunk, and nothing about "cheap" survives if the heavy
+    // fields ride along on the same object.
+    expect(summonersRift).not.toHaveProperty('terrain');
+    expect(summonersRift).not.toHaveProperty('slots');
+    expect(summonersRift).not.toHaveProperty('lanes');
+    expect(summonersRift.name).toBe("Summoner's Rift");
+    expect(typeof summonersRift.geometry).toBe('function');
   });
 
-  it('carries both turret rows as structure slots, with their teams', () => {
+  it('carries every wall, bush and water polygon the JSON has', async () => {
+    expect(mapJson.wall.length).toBeGreaterThan(10);
+    const { terrain } = await geometry();
+    expect(terrain.wall).toHaveLength(mapJson.wall.length);
+    expect(terrain.bush).toHaveLength(mapJson.bush.length);
+    expect(terrain.water).toHaveLength(mapJson.water.length);
+  });
+
+  it('carries both turret rows as structure slots, with their teams', async () => {
     // `turret1` and `turret2` are flat lists of [x, y] points — 11 each,
     // measured, not assumed. `getTurretPositions` in preset.ts is the
     // existing reader; this copies its interpretation rather than inventing
     // one.
+    const { slots } = await geometry();
     const blue: StructureSlot[] = [];
     const red: StructureSlot[] = [];
-    for (const slot of summonersRift.slots.structure) {
+    for (const slot of slots.structure) {
       (slot.faction === 'blue' ? blue : red).push(slot);
     }
     expect(blue).toHaveLength(mapJson.turret1.length);
@@ -36,14 +56,15 @@ describe("the Summoner's Rift map definition", () => {
     }
   });
 
-  it('places a spawn slot per faction where the fountains were', () => {
-    expect(summonersRift.slots.spawn).toHaveLength(2);
-    for (const slot of summonersRift.slots.spawn) expect(slot.r).toBeGreaterThan(0);
-    const factions = summonersRift.slots.spawn.map(slot => slot.faction).sort();
+  it('places a spawn slot per faction where the fountains were', async () => {
+    const { slots } = await geometry();
+    expect(slots.spawn).toHaveLength(2);
+    for (const slot of slots.spawn) expect(slot.r).toBeGreaterThan(0);
+    const factions = slots.spawn.map(slot => slot.faction).sort();
     expect(factions).toEqual(['blue', 'red']);
   });
 
-  it('declares one neutral slot per distinct camp identity, and no monster identities', () => {
+  it('declares one neutral slot per distinct camp identity, and no monster identities', async () => {
     // MonsterPreset is a large transcription (21 entries): a pack of wolves
     // or raptors lists every body separately, tied together by a shared
     // campId. Assert the neutral count against that grouping applied to the
@@ -60,8 +81,9 @@ describe("the Summoner's Rift map definition", () => {
     expect(Object.keys(MonsterPreset)).toHaveLength(21);
     expect(groupIds.size).toBe(11);
 
-    expect(summonersRift.slots.neutral).toHaveLength(groupIds.size);
-    for (const slot of summonersRift.slots.neutral) {
+    const { slots } = await geometry();
+    expect(slots.neutral).toHaveLength(groupIds.size);
+    for (const slot of slots.neutral) {
       expect(typeof slot.role).toBe('string');
       expect(slot).not.toHaveProperty('name');
       expect(slot).not.toHaveProperty('health');
@@ -77,11 +99,30 @@ describe("the Summoner's Rift map definition", () => {
     if (result.ok === false) expect(result.errors).toEqual([]);
   });
 
-  it('is carried in the bundled pack, qualified by pack id', () => {
+  it('is carried in the bundled pack, qualified by pack id, summary only', () => {
     const registry = new PackRegistry();
     registry.installData(bundledData);
     const maps = registry.maps();
     expect(maps).toHaveLength(1);
     expect(maps[0].id).toBe(`${BUNDLED_PACK_ID}:summoners-rift`);
+    expect(maps[0]).not.toHaveProperty('terrain');
+    expect(maps[0]).not.toHaveProperty('slots');
+  });
+
+  it('lists a map without pulling its geometry into the listing', async () => {
+    // The guard the size regression (231,072-byte pregame chunk) would have
+    // caught, restated as a behavioural assertion rather than a byte count —
+    // `scripts/check-chunks.mjs` and `contentApiChunk.test.ts` cover the
+    // structural/byte side.
+    const registry = new PackRegistry();
+    registry.installData(bundledData);
+    const summaries = registry.maps();
+    expect(summaries.length).toBeGreaterThan(0);
+    for (const summary of summaries) {
+      expect(summary).not.toHaveProperty('terrain');
+      expect(summary).not.toHaveProperty('slots');
+    }
+    const loaded = await registry.loadMapGeometry(summaries[0].id);
+    expect(loaded?.terrain.wall.length).toBeGreaterThan(100);
   });
 });

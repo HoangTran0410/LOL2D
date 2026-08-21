@@ -1,6 +1,5 @@
 import { Circle, Quadtree, Rectangle } from '@/libs/quadtree';
 import NavGrid from '@/game/nav/NavGrid';
-import AssetManager from '@/managers/AssetManager';
 import CollideUtils from '@/utils/collide.utils';
 import { hasFlag } from '@/utils/index';
 import ActionState from '@/game/enums/ActionState';
@@ -10,8 +9,16 @@ import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUni
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import Minion from '@/game/gameObject/attackableUnits/Minion';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import type { ActiveMap } from '@/content/ContentPack';
 import Obstacle from './Obstacle';
 import TerrainField from './TerrainField';
+
+/** The three layers `ActiveMap.terrain` may carry, in the order they are read. */
+const TERRAIN_LAYERS: readonly { key: 'wall' | 'bush' | 'water'; type: string }[] = [
+  { key: 'wall', type: TerrainType.WALL },
+  { key: 'bush', type: TerrainType.BUSH },
+  { key: 'water', type: TerrainType.WATER },
+];
 
 export default class TerrainMap {
   game: any;
@@ -20,9 +27,16 @@ export default class TerrainMap {
   rippleEffect: any;
   quadtree: Quadtree;
 
-  constructor(game: any, mapSize?: number) {
+  /**
+   * @param map The active match's map, geometry already resolved. Required,
+   *   not defaulted: `validate.ts` refuses a pack whose map has no size, so a
+   *   `TerrainMap` built without one is a programming error to surface, not
+   *   a `|| 6400` to paper over. See `GameScene.startGame()` for what
+   *   guarantees the geometry is actually resolved by the time this runs.
+   */
+  constructor(game: any, map: ActiveMap) {
     this.game = game;
-    this.size = mapSize || 6400;
+    this.size = map.size;
     this.obstacles = [];
 
     this.rippleEffect = PredefinedParticleSystems.ripple();
@@ -36,27 +50,18 @@ export default class TerrainMap {
       maxLevels: 6,
     });
 
-    const polygons: { vertices: number[][]; type: string }[] = [];
-    const terrains: any = AssetManager.get('json_summoner_map').data;
-    // summoner_map.json also carries `turret1`/`turret2`, which are flat [x, y]
-    // points rather than polygons. Feeding those through arrayToVertices built 22
-    // obstacles with NaN bounds and pushed them into the terrain quadtree; only
-    // real terrain layers belong here. Game.ts reads the turret points directly.
-    const terrainTypes: string[] = [TerrainType.WALL, TerrainType.BUSH, TerrainType.WATER];
-    for (const terrainType of terrainTypes) {
-      if (!terrains?.[terrainType]) continue;
-      polygons.push(
-        ...terrains[terrainType].map((_: number[][]) => ({
-          vertices: _,
-          type: terrainType,
-        }))
-      );
-    }
-
-    for (const { vertices, type } of polygons) {
-      const o = new Obstacle(0, 0, Obstacle.arrayToVertices(vertices), type);
-      this.obstacles.push(o);
-      this.quadtree.insert(o.getBoundingBox());
+    // The map's own vertices already arrive as `{x, y}` points — see
+    // `MapGeometry.terrain` — so, unlike the old `AssetManager`-sourced
+    // `number[][]` this replaced, they go straight into `Obstacle` with no
+    // `arrayToVertices` conversion. Turret rows are not terrain and were
+    // never read here — they arrive as `MapGeometry.slots.structure`
+    // (Task 5), never mixed into this quadtree.
+    for (const { key, type } of TERRAIN_LAYERS) {
+      for (const vertices of map.terrain[key] ?? []) {
+        const o = new Obstacle(0, 0, vertices, type);
+        this.obstacles.push(o);
+        this.quadtree.insert(o.getBoundingBox());
+      }
     }
   }
 
@@ -198,11 +203,7 @@ export default class TerrainMap {
     // radius `PathAgent` planned the route with — a route planned at one radius
     // and enforced at a larger one is a unit walking into a wall it was told it
     // could pass. See NAV_MAX_TERRAIN_RADIUS.
-    const resolved = this.field.resolveStatic(
-      unit.position.x,
-      unit.position.y,
-      unit.terrainRadius
-    );
+    const resolved = this.field.resolveStatic(unit.position.x, unit.position.y, unit.terrainRadius);
     if (!resolved) return;
 
     unit.position.x = resolved.x;

@@ -295,6 +295,23 @@ export default defineConfig({
           if (id.includes('/src/content/ContentApi') || id.includes('/src/content/registry')) {
             return 'game';
           }
+          /**
+           * A map's heavy geometry — Task 4's lazy half of `MapDefinition` —
+           * ahead of the blanket `/src/content/` rule below, which matches by
+           * *path* and does not know or care that this file is reached only
+           * through a dynamic `import()` from its own map's summary module
+           * (`summonersRift.ts` -> `() => import('./summonersRiftGeometry')`).
+           * Left to that rule, this measurably landed back in `pregame`
+           * anyway — the whole point of Task 4's split, undone by a chunking
+           * rule from batch 1 that predates the split existing. Named per map
+           * (`map-<id>`, lowercased) the same way spells are named per
+           * champion, so Task 9's second map gets its own chunk instead of
+           * growing this one.
+           */
+          if (/\/src\/content\/maps\/([A-Za-z0-9]+)Geometry\.ts$/.test(id)) {
+            const match = /\/src\/content\/maps\/([A-Za-z0-9]+)Geometry\.ts$/.exec(id);
+            return `map-${match![1].toLowerCase()}`;
+          }
           if (id.includes('/src/content/') || id.includes('/packs/reference/')) return 'pregame';
           /**
            * The pregame screen's data layer, carved out of `src/game/` ahead of

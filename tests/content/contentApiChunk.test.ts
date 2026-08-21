@@ -54,4 +54,21 @@ describe('the data half of the pack contract', () => {
     );
     expect(offenders.map(f => f.slice(ROOT.length))).toEqual([]);
   });
+
+  /**
+   * The structural version of "a map lists without pulling its geometry in".
+   * `summonersRift.ts` itself belongs in this closure — it is the eager
+   * summary `bundledPack.ts` lists — but its geometry sits behind a dynamic
+   * `import('./summonersRiftGeometry')`, which this walk's regex only
+   * matches on static `import ... from` / `export ... from`, so a module that
+   * genuinely reaches the geometry statically shows up here. That is what
+   * stops a later task quietly importing the polygons back into the listing
+   * path.
+   */
+  it('reaches a map summary but never its geometry module', () => {
+    const paths = [...closure].map(f => f.slice(ROOT.length));
+    expect(paths).toContain('src/content/maps/summonersRift.ts');
+    const offenders = paths.filter(f => f.includes('/content/maps/') && f.includes('Geometry'));
+    expect(offenders).toEqual([]);
+  });
 });

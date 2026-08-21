@@ -205,26 +205,24 @@ function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
   }
 }
 
-function checkMap(map: unknown, index: number, errors: string[]): void {
-  const where = `maps[${index}]`;
-  // The one legitimate early return: if `map` is not an object there is
-  // nothing left in it to inspect. Every other precondition below is
-  // guarded on its own so one malformed section does not hide its siblings.
-  if (!isObject(map)) {
-    errors.push(`${where}: must be an object`);
-    return;
-  }
-  if (typeof map.id !== 'string') {
-    errors.push(`${where}: needs a string id`);
-  }
-  const name = typeof map.id === 'string' ? `maps.${map.id}` : where;
-  if (!isFiniteNumber(map.size) || map.size <= 0) {
-    errors.push(`${name}.size: must be a positive number`);
-  }
-  if (!isObject(map.terrain)) {
+/**
+ * The heavy half — terrain, slots, lanes — checked only when `geometry`
+ * arrived as a plain object. A loader's body cannot be inspected
+ * synchronously (see `checkSpells`'s identical treatment of a `SpellSource`
+ * loader), so a lazy map's geometry goes unchecked here and is trusted once
+ * `PackRegistry.loadMapGeometry` resolves it — the same trade a spell loader
+ * already makes.
+ */
+function checkMapGeometry(
+  geometry: Record<string, unknown>,
+  name: string,
+  factions: Set<string>,
+  errors: string[]
+): void {
+  if (!isObject(geometry.terrain)) {
     errors.push(`${name}.terrain: missing`);
   } else {
-    for (const layer of Object.keys(map.terrain)) {
+    for (const layer of Object.keys(geometry.terrain)) {
       // TerrainMap only knows wall/bush/water and drops anything else in
       // silence. A pack that declares `lava` must be told, not ignored.
       if (layer !== 'wall' && layer !== 'bush' && layer !== 'water') {
@@ -233,20 +231,10 @@ function checkMap(map: unknown, index: number, errors: string[]): void {
     }
   }
 
-  const factions = new Set<string>();
-  if (!Array.isArray(map.factions) || map.factions.length === 0) {
-    errors.push(`${name}.factions: must list at least one faction`);
-  } else {
-    for (const faction of map.factions) {
-      if (isObject(faction) && typeof faction.id === 'string') factions.add(faction.id);
-      else errors.push(`${name}.factions[]: each faction needs a string id`);
-    }
-  }
-
-  if (!isObject(map.slots)) {
+  if (!isObject(geometry.slots)) {
     errors.push(`${name}.slots: missing`);
   } else {
-    const slots = map.slots;
+    const slots = geometry.slots;
     for (const group of ['spawn', 'minion', 'structure', 'neutral']) {
       if (!Array.isArray(slots[group])) errors.push(`${name}.slots.${group}: must be an array`);
     }
@@ -277,12 +265,12 @@ function checkMap(map: unknown, index: number, errors: string[]): void {
 
   // Absent lanes are a shape, not an omission: no waves, and BotBrain's PUSH
   // posture — the only rule that reads a lane — falls through to ROAM.
-  if (map.lanes === undefined) return;
-  if (!Array.isArray(map.lanes)) {
+  if (geometry.lanes === undefined) return;
+  if (!Array.isArray(geometry.lanes)) {
     errors.push(`${name}.lanes: must be an array when present`);
     return;
   }
-  for (const lane of map.lanes) {
+  for (const lane of geometry.lanes) {
     if (!isObject(lane) || typeof lane.id !== 'string') {
       errors.push(`${name}.lanes[]: each lane needs a string id`);
       continue;
@@ -296,6 +284,51 @@ function checkMap(map: unknown, index: number, errors: string[]): void {
       }
     }
   }
+}
+
+function checkMap(map: unknown, index: number, errors: string[]): void {
+  const where = `maps[${index}]`;
+  // The one legitimate early return: if `map` is not an object there is
+  // nothing left in it to inspect. Every other precondition below is
+  // guarded on its own so one malformed section does not hide its siblings.
+  if (!isObject(map)) {
+    errors.push(`${where}: must be an object`);
+    return;
+  }
+  if (typeof map.id !== 'string') {
+    errors.push(`${where}: needs a string id`);
+  }
+  const name = typeof map.id === 'string' ? `maps.${map.id}` : where;
+  if (typeof map.name !== 'string') {
+    errors.push(`${name}.name: must be a string`);
+  }
+  if (!isFiniteNumber(map.size) || map.size <= 0) {
+    errors.push(`${name}.size: must be a positive number`);
+  }
+
+  const factions = new Set<string>();
+  if (!Array.isArray(map.factions) || map.factions.length === 0) {
+    errors.push(`${name}.factions: must list at least one faction`);
+  } else {
+    for (const faction of map.factions) {
+      if (isObject(faction) && typeof faction.id === 'string') factions.add(faction.id);
+      else errors.push(`${name}.factions[]: each faction needs a string id`);
+    }
+  }
+
+  // `geometry` is a `MapGeometrySource`: a plain object, checked in full
+  // below, or a loader — see `checkMapGeometry`'s own header for why a loader
+  // gets only the structural check `checkSpells` already gives a spell loader.
+  if (map.geometry === undefined) {
+    errors.push(`${name}.geometry: missing`);
+    return;
+  }
+  if (typeof map.geometry === 'function') return;
+  if (!isObject(map.geometry)) {
+    errors.push(`${name}.geometry: must be an object or a loader function`);
+    return;
+  }
+  checkMapGeometry(map.geometry, name, factions, errors);
 }
 
 function checkMaps(pack: Record<string, unknown>, errors: string[]): void {

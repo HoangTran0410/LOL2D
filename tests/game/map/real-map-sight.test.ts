@@ -14,18 +14,11 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import summonerMap from '../../../assets/json/summoner_map.json';
-
-vi.mock('../../../src/managers/AssetManager', () => ({
-  default: {
-    get: (key: string) => (key === 'json_summoner_map' ? { data: summonerMap } : undefined),
-    getAsset: () => undefined,
-  },
-}));
-
 import TerrainMap from '../../../src/game/gameObject/map/TerrainMap';
 import TerrainType from '../../../src/game/enums/TerrainType';
 import { hasLineOfSight } from '../../../src/game/combat/Vision';
 import { stubGameGlobals } from '../fixtures';
+import { summonersRift } from '../../../src/content/maps/summonersRift';
 
 /** How far either side of a wall's edge the two lookers stand. */
 const STAND_OFF = 200;
@@ -33,9 +26,15 @@ const STAND_OFF = 200;
 let terrainMap: TerrainMap;
 let game: { terrainMap: TerrainMap };
 
-beforeEach(() => {
+beforeEach(async () => {
   stubGameGlobals();
-  terrainMap = new TerrainMap({}, 6_400);
+  // The real assembled map — `summonersRift.geometry` is Task 4's lazy
+  // loader, resolved here the same way `GameScene.startGame()` resolves it
+  // before building a match, so this drives the exact terrain a real match
+  // plays on rather than a second, hand-parsed copy of the JSON.
+  const source = summonersRift.geometry;
+  const geometry = typeof source === 'function' ? await source() : source;
+  terrainMap = new TerrainMap({}, { ...summonersRift, ...geometry });
   game = { terrainMap };
 });
 afterEach(() => vi.unstubAllGlobals());

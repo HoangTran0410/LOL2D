@@ -124,16 +124,15 @@ export const data: ContentPackData = {
   get champions() {
     return championEntries();
   },
-  // A getter for the same reason `champions`/`spellDisplay` are: `./maps/summonersRift`
-  // imports `@/game/preset`, whose own first import is `@/content/registry` ->
-  // `catalog.ts` -> `install.ts` -> back to this file — the same cycle
-  // `CHAMPION_KITS` sits in, now closed through a second edge. Reading
-  // `summonersRift` eagerly here captures whatever the binding held at
-  // whichever point in that cycle this module happened to be reached, which
-  // measured out to `undefined` (`maps[0]: must be an object` at install
-  // time) the moment something else's import graph reached `bundledPack.ts`
-  // before `summonersRift.ts` had finished. Deferred to a getter, the read
-  // happens on first *use* — always after the whole cyclic load has settled.
+  // A getter for consistency with `champions`/`spellDisplay` above, though
+  // Task 4's split removed the cycle risk this one used to carry: before it,
+  // `./maps/summonersRift` built its `terrain`/`slots` eagerly from
+  // `@/game/mapPresets` and `@/game/lanes`, and reading that binding at the
+  // wrong point in `CHAMPION_KITS`'s own import cycle could observe it
+  // mid-load. Now `summonersRift.ts` has no value imports at all — its
+  // geometry sits behind `() => import('./summonersRiftGeometry')`, which
+  // does not run until something calls it — so there is nothing left for
+  // eager field access here to race.
   get maps() {
     return [summonersRift];
   },

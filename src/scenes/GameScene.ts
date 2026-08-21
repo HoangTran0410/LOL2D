@@ -11,6 +11,7 @@ import AssetManager from '@/managers/AssetManager';
 import { ensurePackAsset } from '@/game/config/packAsset';
 import { setZoomFactorPreference } from '@/game/gameObject/map/Camera';
 import { renderAlpha } from '@/game/render/Interpolation';
+import { contentCatalog } from '@/content/catalog';
 
 let previousTime: number;
 
@@ -195,7 +196,9 @@ export default class GameScene extends Scene {
    * Fetch the kits this match will play, then start it.
    *
    * Async because the spell catalogue is loaded per champion now (see
-   * `game/spellRegistry.ts`). The order is load-bearing in both directions:
+   * `game/spellRegistry.ts`), and, since Task 4, because the active map's
+   * geometry is loaded per match too. The order is load-bearing in both
+   * directions:
    *
    *  - **Plan, then load, then construct.** A default match is six 'random'
    *    loadouts, so "what does this match need?" can only be answered by rolling
@@ -205,6 +208,17 @@ export default class GameScene extends Scene {
    *    happens inside `update()` with no chance to await anything. The
    *    background load closes that gap within a second, long before anything has
    *    died; `preset.classForId` is the backstop if it has not.
+   *
+   * The map load is the same shape as the spell/art loads it runs beside: a
+   * `MapDefinition`'s geometry may be a `() => Promise<MapGeometry>` (see
+   * `src/content/maps/summonersRift.ts`), and `Game`'s constructor reads
+   * `ActiveMap` synchronously — there is no `await` inside it, deliberately
+   * (`AIChampion` rebuilds mid-`update()`, and the engine's read side stays
+   * synchronous by design). This `await`, immediately before `new Game(...)`,
+   * is what makes "the geometry is loaded" true rather than merely usual —
+   * the old code relied on `LoadingScene` happening to run first and nothing
+   * racing it; once geometry is behind a promise that stops being guaranteed
+   * on its own.
    *
    * The scene may have been left before the load resolves — a player pressing
    * back out of a slow connection — so `exited` is checked before touching
@@ -223,22 +237,33 @@ export default class GameScene extends Scene {
       this._kitsLoaded += 1;
     };
 
-    await Promise.all([
-      loadSpells(kitIds, step),
-      // `.catch` per image, not for the batch: a missing portrait is a
-      // placeholder square, not a reason to refuse the match. `artKeys` is a
-      // plain-string list now — core keys and a pack's own mixed together —
-      // so it loads through `ensurePackAsset`, not `AssetManager.ensure`
-      // directly, which stays typed against core's own `AssetKey` union.
-      ...artKeys.map(key =>
-        ensurePackAsset(key)
-          .catch(() => undefined)
-          .then(step)
-      ),
+    // The only map today; a config-driven pick is Task 10's.
+    const mapSummary = contentCatalog().maps()[0];
+    if (!mapSummary) throw new Error('GameScene.startGame: no map installed');
+
+    const [, geometry] = await Promise.all([
+      Promise.all([
+        loadSpells(kitIds, step),
+        // `.catch` per image, not for the batch: a missing portrait is a
+        // placeholder square, not a reason to refuse the match. `artKeys` is a
+        // plain-string list now — core keys and a pack's own mixed together —
+        // so it loads through `ensurePackAsset`, not `AssetManager.ensure`
+        // directly, which stays typed against core's own `AssetKey` union.
+        ...artKeys.map(key =>
+          ensurePackAsset(key)
+            .catch(() => undefined)
+            .then(step)
+        ),
+      ]),
+      contentCatalog().loadMapGeometry(mapSummary.id),
     ]);
     if (this._exited) return;
+    if (!geometry) {
+      throw new Error(`GameScene.startGame: map ${mapSummary.id} has no geometry`);
+    }
 
-    this.game = new Game(plan);
+    const activeMap = { ...mapSummary, ...geometry };
+    this.game = new Game(activeMap, plan);
     this.warmRemainingSpells();
     // The match's own way out, since Escape is no longer one. `Game` holds no
     // reference to the scene manager and must not gain one — see

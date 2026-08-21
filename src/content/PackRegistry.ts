@@ -5,7 +5,9 @@ import type {
   ContentPack,
   ContentPackCode,
   ContentPackData,
-  MapDefinition,
+  MapGeometry,
+  MapGeometrySource,
+  MapSummary,
   MonsterDef,
   SpellClass,
   SpellDisplayData,
@@ -36,7 +38,13 @@ export interface QualifiedMonster extends Omit<MonsterDef, 'id'> {
   packId: string;
 }
 
-export interface QualifiedMap extends Omit<MapDefinition, 'id'> {
+/**
+ * The listing entry `PackRegistry.maps()` hands back — a map's cheap half,
+ * qualified. Never the geometry: see `MapDefinition`'s own doc comment for
+ * why that split exists, and `loadMapGeometry` for how the heavy half
+ * arrives.
+ */
+export interface QualifiedMapSummary extends Omit<MapSummary, 'id'> {
   id: string;
   packId: string;
 }
@@ -52,7 +60,13 @@ export class PackRegistry {
   private readonly installedIds = new Set<string>();
   private readonly monsterList: QualifiedMonster[] = [];
   private readonly championList: QualifiedChampion[] = [];
-  private readonly mapList: QualifiedMap[] = [];
+  private readonly mapList: QualifiedMapSummary[] = [];
+  /** A map's geometry source, by qualified id — mirrors `sources` for spells. */
+  private readonly mapGeometrySources = new Map<string, MapGeometrySource>();
+  /** Mirrors `resolved`: filled eagerly for a plain-object geometry, or once a loader lands. */
+  private readonly resolvedMapGeometry = new Map<string, MapGeometry>();
+  /** Mirrors `inFlight`: one promise per qualified id, shared by every racing caller. */
+  private readonly mapGeometryInFlight = new Map<string, Promise<MapGeometry | null>>();
 
   /**
    * Validate first, then write. A pack that fails leaves no trace — a
@@ -209,7 +223,20 @@ export class PackRegistry {
       this.monsterList.push({ ...monster, packId, id: qualify(packId, monster.id) });
     }
     for (const map of data.maps ?? []) {
-      this.mapList.push({ ...map, packId, id: qualify(packId, map.id) });
+      // The split itself: `summary` is everything but `geometry`, and it is
+      // that trimmed object — never `map` whole — that lands in `mapList`,
+      // the thing `maps()` returns. `geometry` goes only into
+      // `mapGeometrySources`, read by `loadMapGeometry`, never by `maps()`.
+      const { geometry, ...summary } = map;
+      const qualifiedId = qualify(packId, map.id);
+      this.mapList.push({ ...summary, packId, id: qualifiedId });
+      this.mapGeometrySources.set(qualifiedId, geometry);
+      // Same reasoning as `writeCode`'s eager-spell case: a plain-object
+      // geometry needs no fetch, so it is available to `loadMapGeometry`
+      // immediately without waiting on a loader that does not exist.
+      if (typeof geometry !== 'function') {
+        this.resolvedMapGeometry.set(qualifiedId, geometry);
+      }
     }
   }
 
@@ -230,7 +257,8 @@ export class PackRegistry {
     return [...this.championList];
   }
 
-  maps(): readonly QualifiedMap[] {
+  /** The listing — every installed map's cheap half, never its geometry. */
+  maps(): readonly QualifiedMapSummary[] {
     return [...this.mapList];
   }
 
@@ -313,6 +341,40 @@ export class PackRegistry {
   }
 
   /**
+   * A map's geometry, fetching it if it has to. `null` for an id no pack
+   * declared — the same "absent, not thrown" shape `spellClass` uses.
+   *
+   * Memoised on the promise, not the result, for the identical reason
+   * `loadSpellClass` is: two racing callers (a map picker's preview and
+   * `GameScene.startGame()`, say) share one `import()` instead of starting
+   * two. `GameScene.startGame()` is the guarantee that this has resolved
+   * before `new Game(...)` runs — see that method's own doc comment.
+   */
+  async loadMapGeometry(qualifiedId: string): Promise<MapGeometry | null> {
+    const already = this.resolvedMapGeometry.get(qualifiedId);
+    if (already) return already;
+
+    const source = this.mapGeometrySources.get(qualifiedId);
+    if (!source) return null;
+
+    if (typeof source !== 'function') {
+      this.resolvedMapGeometry.set(qualifiedId, source);
+      return source;
+    }
+
+    const pending = this.mapGeometryInFlight.get(qualifiedId);
+    if (pending) return pending;
+
+    const run = source().then(geometry => {
+      this.resolvedMapGeometry.set(qualifiedId, geometry);
+      this.mapGeometryInFlight.delete(qualifiedId);
+      return geometry;
+    });
+    this.mapGeometryInFlight.set(qualifiedId, run);
+    return run;
+  }
+
+  /**
    * Test seam: write a class straight into `resolved`, bypassing `sources`
    * and `install()` entirely.
    *
@@ -348,6 +410,9 @@ export class PackRegistry {
     this.display.clear();
     this.resolved.clear();
     this.inFlight.clear();
+    this.mapGeometrySources.clear();
+    this.resolvedMapGeometry.clear();
+    this.mapGeometryInFlight.clear();
     this.installedIds.clear();
   }
 }

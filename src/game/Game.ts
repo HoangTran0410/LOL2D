@@ -1,3 +1,4 @@
+import type { ActiveMap } from '@/content/ContentPack';
 import { HotKeys, SpellHotKeys } from './constants';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
@@ -104,7 +105,14 @@ import {
 } from './config/renderPreferences';
 
 export default class Game {
-  readonly mapSize = 6400;
+  /**
+   * The active map's edge length in world units — `map.size`, set in the
+   * constructor. Used to be a `6400` literal here (and a matching `|| 6400`
+   * fallback in `TerrainMap`); both now read the map instead. See the
+   * `map` constructor parameter's own doc comment for what guarantees the
+   * map is present.
+   */
+  readonly mapSize: number;
   readonly fps = 60;
   renderFps: RenderFps = renderFpsPreference();
   renderQuality: RenderQuality = renderQualityPreference();
@@ -195,6 +203,17 @@ export default class Game {
   touchUi: boolean;
 
   /**
+   * @param map The world this match plays on, geometry already resolved —
+   *   not the lazy `MapDefinition` a pack declares. Required, not defaulted:
+   *   `validate.ts` refuses a pack whose map has no size, so a `Game` built
+   *   without one is a programming error to surface loudly rather than a
+   *   `6400` to fall back to. `GameScene.startGame()` is what guarantees
+   *   this exists before construction — it awaits
+   *   `contentCatalog().loadMapGeometry(...)` alongside the spell/art loads
+   *   it already awaits, and only then calls `new Game(...)`. This
+   *   constructor itself stays synchronous on purpose: `AIChampion` rebuilds
+   *   mid-`update()`, and the engine's read side is synchronous by design —
+   *   see `CLAUDE.md`'s note on the trap this avoids.
    * @param plan Which kits every unit will play, with all randomness already
    *   rolled. `GameScene` passes one because it has to: the spell classes are
    *   fetched per champion now, so *something* has to decide what a match needs
@@ -202,7 +221,8 @@ export default class Game {
    *   constructor then builds from. Omitted, this plans for itself — which is
    *   correct only when the catalogue is already loaded, i.e. in tests.
    */
-  constructor(plan?: MatchPlan) {
+  constructor(map: ActiveMap, plan?: MatchPlan) {
+    this.mapSize = map.size;
     // Read once, before anything that might construct a Champion or a Spell:
     // `matchRules` has to be in place the moment the player's own kit is
     // built a few lines down. Validated/defaulted by `loadPregameConfig`
@@ -225,7 +245,7 @@ export default class Game {
     this.camera.snapToScale();
     this.objectManager = new ObjectManager(this);
     this.eventManager = new EventManager();
-    this.terrainMap = new TerrainMap(this, this.mapSize);
+    this.terrainMap = new TerrainMap(this, map);
     // The map is static, so every unit's routing is derived from the wall layer
     // once here — about 7ms and 1.6MB for the whole game — rather than per unit
     // per frame. Built off the same Obstacle list the collision push-out uses,
