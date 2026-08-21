@@ -58,6 +58,27 @@
  * be pointed at an already-running server; `verify-pwa-offline.mjs` serves the
  * *built* `dist/` through `preview()` and cuts the network. Folding either in
  * would mean the harness growing a mode for it.
+ *
+ * ## The second rule: a script must reach `finish()` through `guard()`
+ *
+ * `finish()` ends with `process.exit(failures.length ? 1 : 0)`. `process.exit()`
+ * inside a `finally` terminates the process before an in-flight exception can
+ * propagate — so `try { ...checks... } finally { await finish(); }`, with no
+ * `catch`, reaches `finally` after a throw, finds `failures` still empty
+ * because the throw happened before any check recorded one, and reports "all
+ * checks passed" with exit code 0. It ran a prefix of its checks and lied
+ * about the rest. `page.click(selector)` on a selector that does not exist —
+ * very often the exact thing a script is testing — is the commonest way in.
+ * Three scripts shipped exactly that shape; a fourth called `finish()` with no
+ * `try`/`catch` around it at all, which is the same hole with no bottom.
+ *
+ * `guard(body)` is the only correct way to run a driver's body: it always
+ * reaches `finish()` through a `catch` that has already turned the throw into
+ * a recorded failure, so the exit code always reflects what actually ran. A
+ * script that calls `finish()` itself — wrapped in its own `try`/`finally`,
+ * wrapped in nothing, named differently, it does not matter — has reopened
+ * the exact hole `guard()` exists to close, so this scan bans the call
+ * outright and requires `guard()` in its place.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -75,6 +96,18 @@ const DECLARES_BROWSER_BOOT = /\bchromium\.launch\(/;
 
 /** Booting a dev server, rather than asking the harness for one. */
 const DECLARES_DEV_SERVER = /\bcreateServer\(/;
+
+/**
+ * Calling `finish()` itself, rather than letting `guard()` be the only thing
+ * that ever does. This is the pattern regardless of what wraps it — a bare
+ * `try`/`finally` with no `catch`, no wrapping at all, or anything else —
+ * because every one of those shapes reopens the swallowed-exception hole
+ * `guard()` exists to close.
+ */
+const CALLS_FINISH_DIRECTLY = /\bfinish\s*\(/;
+
+/** Running the body through `guard()`, the only sanctioned replacement. */
+const CALLS_GUARD = /\bguard\s*\(/;
 
 /**
  * Comments have to go before anything is matched, or the scan flags its own
@@ -110,5 +143,13 @@ describe('tests/e2e scripts that share the harness take their whole boot from it
 
   it.each(importers)('%s does not start a second dev server', name => {
     expect(read(name)).not.toMatch(DECLARES_DEV_SERVER);
+  });
+
+  it.each(importers)('%s does not call finish() directly — only guard() may', name => {
+    expect(read(name)).not.toMatch(CALLS_FINISH_DIRECTLY);
+  });
+
+  it.each(importers)('%s runs its body through guard()', name => {
+    expect(read(name)).toMatch(CALLS_GUARD);
   });
 });

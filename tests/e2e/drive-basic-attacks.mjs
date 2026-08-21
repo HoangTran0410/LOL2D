@@ -22,7 +22,7 @@
 import { startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-attacks';
-const { url, page, errors, report, check, finish } = await startHarness({
+const { url, page, errors, report, check, guard } = await startHarness({
   out: OUT,
   viewport: { width: 1280, height: 800 },
 });
@@ -38,7 +38,7 @@ async function rightClick(x, y) {
   await page.waitForTimeout(80);
 }
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
@@ -572,12 +572,4 @@ try {
 
   report.errors = errors;
   check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
-} catch (error) {
-  check(
-    'the basic-attack driver completed',
-    false,
-    error instanceof Error ? (error.stack ?? error.message) : String(error)
-  );
-} finally {
-  await finish();
-}
+});

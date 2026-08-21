@@ -304,10 +304,12 @@ async function runScenario({ browser, url, applyStacks, label }) {
   return { setup, result, pageErrors };
 }
 
-const { url, browser, server } = await startHarness({ viewport: PHONE_VIEWPORT, deviceScaleFactor: 3 });
+const { url, browser, check, guard } = await startHarness({
+  viewport: PHONE_VIEWPORT,
+  deviceScaleFactor: 3,
+});
 
-let exitCode = 0;
-try {
+await guard(async () => {
   const baseline = await runScenario({ browser, url, applyStacks: false, label: 'baseline (0 stacks)' });
   const stacked = await runScenario({
     browser,
@@ -334,12 +336,9 @@ try {
     console.log(`  ${key}: baseline ${b}ms -> stacked ${s}ms (delta ${Number((s - b).toFixed(2))}ms)`);
   }
 
-  if (baseline.pageErrors.length || stacked.pageErrors.length) exitCode = 1;
-} catch (error) {
-  console.error(error);
-  exitCode = 1;
-} finally {
-  await browser.close();
-  await server.close();
-}
-process.exit(exitCode);
+  check(
+    'no page errors in either scenario',
+    baseline.pageErrors.length === 0 && stacked.pageErrors.length === 0,
+    `${baseline.pageErrors.length} baseline, ${stacked.pageErrors.length} stacked`
+  );
+});

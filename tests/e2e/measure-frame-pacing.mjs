@@ -30,7 +30,7 @@
  */
 import { startHarness } from './harness.mjs';
 
-const { url, page, check, report, finish } = await startHarness({});
+const { url, page, check, report, guard } = await startHarness({});
 
 /** Coefficient of variation of the per-frame drawn step, over one pass. */
 function stepStats(frames) {
@@ -59,7 +59,7 @@ function stepStats(frames) {
   };
 }
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
@@ -150,6 +150,4 @@ try {
     interpStats.cv < 0.15,
     `interp cv ${interpStats.cv} (min ${interpStats.min}px, max ${interpStats.max}px)`
   );
-} finally {
-  await finish();
-}
+});
