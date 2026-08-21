@@ -698,9 +698,9 @@ describe('the bundled pack', () => {
     expect(pack.champions).toHaveLength(CHAMPION_KITS.length);
   });
 
-  it('carries every generated spell module', () => {
+  it('carries every generated spell module, plus Recall', () => {
     expect(Object.keys(spellModules).length).toBeGreaterThan(200);
-    expect(Object.keys(pack.spells ?? {})).toHaveLength(Object.keys(spellModules).length);
+    expect(Object.keys(pack.spells ?? {})).toHaveLength(Object.keys(spellModules).length + 1);
   });
 
   it('hands them over lazily — installing loads no spell module', () => {
@@ -727,6 +727,12 @@ describe('the bundled pack', () => {
     const actual: string[] = [];
     for (const champion of pack.champions ?? []) if (champion.playable) actual.push(champion.name);
     expect(actual.sort()).toEqual(expected);
+  });
+
+  it('declares Recall, and keeps it out of the display data', () => {
+    expect(pack.spells?.Recall).toBeTypeOf('function');
+    expect(pack.spellDisplay?.Recall).toBeUndefined();
+    for (const champion of pack.champions ?? []) expect(champion.recall).toBe('Recall');
   });
 
   it('passes validation', () => {
@@ -843,7 +849,29 @@ const _attackShapesAgree: [ChampionAttack, ChampionAttackTuning] = [
 ];
 void _attackShapesAgree;
 ```
-- **`recall: 'Recall'`.** `Recall` is content (spec §2.2, as corrected), it is in the generated modules, and every Riot champion has it. A pack whose map grants no way home simply omits the field.
+- **`recall: 'Recall'`, and the adapter must *declare* `Recall` itself.** `Recall` is content (spec §2.2, as corrected) and every champion here has it — but it is **not** in `src/generated/spellModules.ts`, because it is deliberately absent from `spells/index.ts` so it can never show up in the loadout picker. `validate.ts` requires `entry.recall` to name a spell the pack declares, so `recall: 'Recall'` without declaring it rejects all 60 champions.
+
+  Declare it as an **eager class**, beside the 238 thunks:
+
+```ts
+import Recall from '@/game/gameObject/spells/Recall';
+
+const spellSources = (): Record<string, SpellSource> => {
+  const out: Record<string, SpellSource> = {};
+  for (const [id, load] of Object.entries(spellModules)) {
+    out[id] = () => load().then(module => module.default);
+  }
+  // Not in `spellModules`, on purpose: `Recall` is out of `spells/index.ts` so
+  // that it can never reach the loadout picker, which is also why it gets no
+  // `spellDisplay` entry below. `preset.ts` already imports it statically, so
+  // declaring it eagerly here costs no chunk that was not already paid for —
+  // and it makes this pack exercise both arms of `SpellSource`.
+  out.Recall = Recall;
+  return out;
+};
+```
+
+  It gets **no `spellDisplay` entry**. That is the mechanism, not an oversight: a spell with no display data cannot be rendered, which is how the "Recall is not in the picker" invariant survives without a hidden-id list.
 
 - [ ] **Step 4: Run the test**
 
@@ -1122,7 +1150,7 @@ Expected: the Vera case fails (not in the list); the regression case passes, bec
 - [ ] **Step 3: Rewire `src/game/config/spellCatalog.ts`**
 
 - `spellDisplayOf(id, matchRules)` reads `contentRegistry().spellDisplay(qualifySpellId(id))`. When the registry has no entry, return the same "missing" shape the function already produces for an id with no icon — do not throw. Its two computed fields (`effectiveCoolDownMs`, `effectiveManaCost`) keep the exact expressions they have now; the file header explains why they are recomputed rather than stored and that argument is unchanged.
-- `isSpellCatalogId` / `spellCatalogIds` → the registry's spell ids.
+- `isSpellCatalogId` / `spellCatalogIds` → **the ids the registry has display data for**, not `spellIds()`. This is load-bearing rather than incidental: `Recall` is a declared spell of the bundled pack (Task 4) and must never appear in the loadout picker, and `listSpellCatalog()` builds that picker from `spellCatalogIds()`. A spell with no display data cannot be rendered anyway, so "has display data" is the honest population — and it reproduces the old invariant without reintroducing a hidden-id list, which is what batch 1 deleted.
 - `listSelectableChampions()` → `contentRegistry().champions()`, keeping only `playable` entries, mapping each to `{ name, avatar, spells }`. **The `image`/`spells.length` filter disappears** — Task 3 moved that rule into pack validation, and re-applying it here would mean two definitions of pickable again.
 - `listSummonerSpells()` and `SUMMONER_SPELL_IDS` keep their hardcoded id list for now; they name five specific abilities and moving that list is batch 4's job. Qualify them through `qualifySpellId` so they still resolve.
 - `CHAMPION_KITS` keeps its export and gains an `@internal` note: only `src/content/bundledPack.ts` may read it, and Task 9's scan enforces that.
