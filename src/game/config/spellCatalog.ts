@@ -3,6 +3,7 @@ import type { SpellCatalogId } from '@/generated/spellCatalog';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import type { MatchRules } from './PregameConfig';
 import { contentRegistry } from '@/content/registry';
+import type { SpellDisplayData } from '@/content/ContentPack';
 import { packAsset } from './packAsset';
 
 /**
@@ -128,6 +129,34 @@ export const bareCatalogId = (qualifiedId: string): SpellCatalogId | null =>
     ? (qualifiedId.slice(BUNDLED_PACK_PREFIX.length) as SpellCatalogId)
     : null;
 
+/**
+ * `bareCatalogId`'s companion for the id it refuses: a `SpellCatalogEntry`
+ * built straight off the registry by the *qualified* id, for a caller that
+ * still needs something to show a champion whose kit is not the bundled
+ * pack's own — `pregameCatalog.ts`'s shelf builder, so a pack champion is
+ * not silently dropped from the picker for having no entries.
+ *
+ * Reads through `contentRegistry().spellDisplay(qualifiedId)` directly
+ * rather than through `spellDisplayOf`: that always re-qualifies a bare id
+ * as the *bundled* pack's own (`qualifyBundledId`), which would ask the
+ * registry for the wrong spell entirely once the id is some other pack's.
+ * `id` on the entry returned is the local half — the same crossing
+ * `packAsset` makes for an asset key, `as never` and all, because
+ * `SpellCatalogEntry.id` is core's generated union and a pack's own spell id
+ * is not a member of it.
+ */
+export const packSpellCatalogEntry = (qualifiedId: string): SpellCatalogEntry | null => {
+  const entry = contentRegistry().spellDisplay(qualifiedId);
+  if (!entry) return null;
+  const colon = qualifiedId.indexOf(':');
+  const localId = colon < 0 ? qualifiedId : qualifiedId.slice(colon + 1);
+  return {
+    id: localId as never,
+    display: displayFromEntry(entry, NO_MATCH_RULES),
+    groupName: null,
+  };
+};
+
 /** Whether a stored slot choice still names a spell this build has. */
 export const isSpellCatalogId = (id: string): id is SpellCatalogId =>
   contentRegistry().hasDisplayFor(qualifyBundledId(id));
@@ -154,33 +183,38 @@ const MISSING_SPELL_DISPLAY: SpellDisplay = {
 };
 
 /**
- * One spell's display fields, with match rules applied.
+ * A registry `SpellDisplayData` entry, with match rules applied — the shape
+ * both `spellDisplayOf` (bundled ids) and `packSpellCatalogEntry` (any other
+ * pack's) hand back, so the two never restate this mapping differently.
  *
  * The two rule-sensitive numbers are recomputed rather than stored, by the
  * same two expressions `Spell` uses — see this module's header for why that is
  * exact rather than approximate.
  */
+const displayFromEntry = (entry: SpellDisplayData, matchRules: MatchRules): SpellDisplay => ({
+  // `?.url` rather than `.url`: a handle is always returned in the real
+  // manager, but "no icon" has to stay a missing picture rather than a thrown
+  // error — which is exactly what the class-shaped `getSpellDisplay` promised
+  // with its own `handle?.url ?? null`. `entry.iconKey` is a pack's own plain
+  // string, not core's generated `AssetKey` union — the same boundary
+  // `ContentApi.asset` crosses, and the same `as never`.
+  iconUrl: entry.iconKey ? (AssetManager.get(entry.iconKey as never)?.url ?? null) : null,
+  name: entry.name,
+  description: entry.description,
+  coolDownMs: entry.coolDownMs,
+  manaCost: entry.manaCost,
+  effectiveCoolDownMs: entry.specCoolDownMs * matchRules.cooldownMultiplier,
+  effectiveManaCost: matchRules.manaFree ? 0 : entry.manaCost,
+});
+
+/** One spell's display fields, with match rules applied — the bundled pack's own ids only; see `packSpellCatalogEntry` for any other pack's. */
 export const spellDisplayOf = (
   id: SpellCatalogId,
   matchRules: MatchRules = NO_MATCH_RULES
 ): SpellDisplay => {
   const entry = contentRegistry().spellDisplay(qualifyBundledId(id));
   if (!entry) return MISSING_SPELL_DISPLAY;
-  return {
-    // `?.url` rather than `.url`: a handle is always returned in the real
-    // manager, but "no icon" has to stay a missing picture rather than a thrown
-    // error — which is exactly what the class-shaped `getSpellDisplay` promised
-    // with its own `handle?.url ?? null`. `entry.iconKey` is a pack's own plain
-    // string, not core's generated `AssetKey` union — the same boundary
-    // `ContentApi.asset` crosses, and the same `as never`.
-    iconUrl: entry.iconKey ? (AssetManager.get(entry.iconKey as never)?.url ?? null) : null,
-    name: entry.name,
-    description: entry.description,
-    coolDownMs: entry.coolDownMs,
-    manaCost: entry.manaCost,
-    effectiveCoolDownMs: entry.specCoolDownMs * matchRules.cooldownMultiplier,
-    effectiveManaCost: matchRules.manaFree ? 0 : entry.manaCost,
-  };
+  return displayFromEntry(entry, matchRules);
 };
 
 /**
@@ -745,7 +779,17 @@ export const listSelectableChampions = (): SelectableChampion[] => {
     const spells: SelectableChampionSpell[] = [];
     for (const qualifiedId of champion.spells) {
       const id = bareCatalogId(qualifiedId);
-      if (id) spells.push({ id, display: spellDisplayOf(id) });
+      if (id) {
+        spells.push({ id, display: spellDisplayOf(id) });
+        continue;
+      }
+      // A playable champion from a pack other than the bundled one —
+      // `bareCatalogId` refuses its qualified spell ids on purpose (see its
+      // own doc comment); `packSpellCatalogEntry` is the companion that still
+      // resolves one, the same crossing `pregameCatalog.ts`'s shelf builder
+      // uses for the same reason.
+      const entry = packSpellCatalogEntry(qualifiedId);
+      if (entry) spells.push({ id: entry.id, display: entry.display });
     }
     champions.push({ name: champion.name, avatar: champion.image, spells });
   }

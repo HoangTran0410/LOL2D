@@ -138,23 +138,20 @@ describe('searching the roster by name', () => {
  * `CHAMPION_KITS` directly — Task 7 of the content-pack-extraction plan.
  */
 describe('the roster reads the pack registry', () => {
-  // Vera (`reference:vera`) has no portrait yet — `playable: false`,
-  // `image: null` — so she cannot appear in the selectable-champion picker.
-  // A portrait and `playable: true` land in Task 10; un-skipping this is a
-  // step *in* that task.
-  it.skip('offers a champion from a pack that is not the bundled one', () => {
+  // Vera (`reference:vera`) now has a portrait and `playable: true` — Task 10.
+  it('offers a champion from a pack that is not the bundled one', () => {
     const names = getPregameCatalog().champions.map(c => c.name);
     expect(names).toContain('Vera');
   });
 
+  // `arrayContaining`, not exact equality: `CHAMPION_KITS` is only the
+  // bundled pack's own static data, so it never gained Vera and never will —
+  // the guarantee this test makes is that packs add to the roster, they
+  // don't remove from it.
   it('still offers every champion it offered before packs', () => {
-    const names = getPregameCatalog()
-      .champions.map(c => c.name)
-      .sort();
-    const before = CHAMPION_KITS.filter(k => k.image && k.spells.length === 4)
-      .map(k => k.name)
-      .sort();
+    const names = getPregameCatalog().champions.map(c => c.name);
+    const before = CHAMPION_KITS.filter(k => k.image && k.spells.length === 4).map(k => k.name);
     expect(before.length).toBeGreaterThan(20);
-    expect(names).toEqual(before);
+    expect(names).toEqual(expect.arrayContaining(before));
   });
 });

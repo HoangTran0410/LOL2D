@@ -1,6 +1,7 @@
 import {
   BASIC_ATTACK_ID,
   bareCatalogId,
+  packSpellCatalogEntry,
   listSelectableChampions,
   listSummonerSpells,
   listSpellCatalog,
@@ -132,15 +133,18 @@ export const getPregameCatalog = (): PregameCatalog => {
     const kitShelves: KitShelf[] = contentRegistry()
       .champions()
       .map(champion => {
-        // `champion.spells` are registry-qualified (`riot:Yasuo_Q`);
-        // `catalogById` keys by this catalogue's own bare id
-        // (`spellCatalogIds()`'s population). `bareCatalogId` is the same
-        // crossing `spellCatalog.ts` uses internally — a champion from a pack
-        // this catalogue doesn't cover yet (none, today) yields no entries.
+        // `champion.spells` are registry-qualified (`riot:Yasuo_Q`,
+        // `reference:Vera_Q`); `catalogById` keys by the *bundled* pack's own
+        // bare id (`spellCatalogIds()`'s population). `bareCatalogId` is the
+        // same crossing `spellCatalog.ts` uses internally, and for any other
+        // pack's id it answers `null` on purpose — `packSpellCatalogEntry` is
+        // its companion, reading the registry directly by the qualified id
+        // rather than dropping a champion whose kit lives entirely outside
+        // the bundled pack.
         const entries: KitShelfEntry[] = [];
         for (const qualifiedId of champion.spells) {
           const id = bareCatalogId(qualifiedId);
-          const entry = id ? catalogById.get(id) : undefined;
+          const entry = id ? catalogById.get(id) : packSpellCatalogEntry(qualifiedId);
           if (entry) entries.push({ entry, slotIndex: abilitySlotOfId(entry.id) });
         }
 

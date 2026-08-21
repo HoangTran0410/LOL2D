@@ -74,11 +74,8 @@ const referencePack = (api: ContentApi): ContentPack => ({
     {
       id: 'vera',
       name: 'Vera',
-      image: null,
-      // Not playable yet — a picker needs a portrait, and this pack has none.
-      // The portrait and playable: true land in Task 10, where an end-to-end
-      // browser test needs them.
-      playable: false,
+      image: 'reference_champ_vera',
+      playable: true,
       attack: { damage: 14, attacksPerSecond: 1.1, range: 300 },
       spells: ['Vera_Q', 'Vera_W', 'Vera_E', 'Vera_R'],
     },

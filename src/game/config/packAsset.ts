@@ -9,12 +9,13 @@ import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
  * core's union, so crossing that boundary needs a cast — `key as never` —
  * and this is that cast's one home.
  *
- * A **leaf on purpose**: nothing imported here but `AssetManager`. Three
+ * A **leaf on purpose**: nothing imported here but `AssetManager`. Four
  * call sites need this crossing — `spellCatalog.ts` (the pregame roster's
- * own art), `ContentApi.asset` (what a pack's spell code can resolve), and
- * `Champion`'s preset-avatar resolution (a live champion's portrait) — and
- * the last two cannot reach each other: `Champion.ts` importing anything
- * that chains into `ContentApi.ts` recreates a real cycle, because
+ * own art), `ContentApi.asset` (what a pack's spell code can resolve),
+ * `Champion`'s preset-avatar resolution (a live champion's portrait), and
+ * `GameScene.matchArtKeys`/`startGame` (a running match's preload list) —
+ * and the middle two cannot reach each other: `Champion.ts` importing
+ * anything that chains into `ContentApi.ts` recreates a real cycle, because
  * `ContentApi.ts` imports `Champion` and `Pet` as *values* —
  * `Champion.ts -> spellCatalog.ts -> registry.ts -> install.ts ->
  * ContentApi.ts -> Champion.ts` — which fails 88 test files with `Class
@@ -28,3 +29,14 @@ import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
  * (`src/game/config/`) or `game` (`src/content/`) — it is read from both.
  */
 export const packAsset = (key: string): AssetHandle => AssetManager.get(key as never);
+
+/**
+ * Same crossing as `packAsset` above, for the one caller that needs the
+ * asset *loaded* rather than merely looked up: `GameScene.startGame`'s
+ * match-art preload. Its key list is built from a plan's kit avatars and
+ * spell icons — a pack's own strings now that a pack champion can be
+ * playable — so it can no longer be cast back to core's `AssetKey` union at
+ * the call site; this is where that cast lives instead.
+ */
+export const ensurePackAsset = (key: string): Promise<AssetHandle> =>
+  AssetManager.ensure(key as never);

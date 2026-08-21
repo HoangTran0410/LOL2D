@@ -343,13 +343,11 @@ describe('resolving through the pack registry', () => {
  * `contentRegistry()` — Task 8 of the content-pack-extraction plan.
  */
 describe('preset.ts reads the pack registry', () => {
-  // Vera (`reference:vera`) has no portrait yet — `playable: false`,
-  // `image: null` — so `playableKits()` (this file's `PlayableChampionKit`
-  // table) cannot offer her by name, the same rule
-  // `tests/scenes/pregameCatalog.test.ts` already documents for the roster.
-  // A portrait and `playable: true` land in Task 10; un-skipping this is a
-  // step *in* that task.
-  it.skip('can plan a match around a champion from a non-bundled pack', async () => {
+  // Vera (`reference:vera`) now has a portrait and `playable: true` — Task 10
+  // — so `playableKits()` (this file's `PlayableChampionKit` table) can offer
+  // her by name, the same rule `tests/scenes/pregameCatalog.test.ts` already
+  // documents for the roster.
+  it('can plan a match around a champion from a non-bundled pack', async () => {
     resetSpellRegistryForTests();
     await loadSpells([
       'reference:Vera_Q',

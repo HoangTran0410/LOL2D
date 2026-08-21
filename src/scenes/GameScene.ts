@@ -8,6 +8,7 @@ import { assetManifest, type AssetKey } from '@/generated/assetManifest';
 import MenuScene from './MenuScene';
 import DomUtils from '@/utils/dom.utils';
 import AssetManager from '@/managers/AssetManager';
+import { ensurePackAsset } from '@/game/config/packAsset';
 import { setZoomFactorPreference } from '@/game/gameObject/map/Camera';
 import { renderAlpha } from '@/game/render/Interpolation';
 
@@ -48,8 +49,8 @@ const ZOOM_WHEEL_STEP = 0.1;
  */
 const UNIVERSAL_ART_PREFIXES = ['buff_', 'monster_', 'obj_'] as const;
 
-function matchArtKeys(plan: MatchPlan): AssetKey[] {
-  const keys = new Set<AssetKey>();
+function matchArtKeys(plan: MatchPlan): string[] {
+  const keys = new Set<string>();
 
   for (const key of Object.keys(assetManifest) as AssetKey[]) {
     if (assetManifest[key].kind !== 'image') continue;
@@ -57,21 +58,20 @@ function matchArtKeys(plan: MatchPlan): AssetKey[] {
   }
 
   // Every unit's portrait — the player's and each bot's. `kit.avatar` is a
-  // plain string now (`preset.ts`'s `PlayableChampionKit` — a pack's own
-  // asset key, not necessarily a member of this generated union), but every
-  // playable champion today is still the bundled pack's own, so this is the
-  // same documented, always-resolving crossing `packAsset` performs in
-  // `config/spellCatalog.ts`.
-  for (const kit of [plan.player, ...plan.bots]) keys.add(kit.avatar as AssetKey);
+  // plain string (`preset.ts`'s `PlayableChampionKit` — a pack's own asset
+  // key, not necessarily a member of core's generated `AssetKey` union now
+  // that a pack champion can be `playable: true`), so this function returns
+  // plain strings too rather than casting one back to `AssetKey`. Resolved
+  // through `ensurePackAsset`, below, at the one call site that loads them.
+  for (const kit of [plan.player, ...plan.bots]) keys.add(kit.avatar);
 
   // And the player's own ability icons, which are in the HUD from frame one.
   // Bot kits are only ever looked at through the practice panel, which opens on
   // a paused match with all the time in the world to fetch one. `spellIconKey`
-  // is a pack's own plain string, not necessarily a member of this generated
-  // union — the same always-resolving crossing as `kit.avatar` above.
+  // is a pack's own plain string too — same reasoning as `kit.avatar` above.
   for (const id of plan.player.spellIds) {
     const iconKey = spellIconKey(id);
-    if (iconKey) keys.add(iconKey as AssetKey);
+    if (iconKey) keys.add(iconKey);
   }
 
   return [...keys];
@@ -226,9 +226,12 @@ export default class GameScene extends Scene {
     await Promise.all([
       loadSpells(kitIds, step),
       // `.catch` per image, not for the batch: a missing portrait is a
-      // placeholder square, not a reason to refuse the match.
+      // placeholder square, not a reason to refuse the match. `artKeys` is a
+      // plain-string list now — core keys and a pack's own mixed together —
+      // so it loads through `ensurePackAsset`, not `AssetManager.ensure`
+      // directly, which stays typed against core's own `AssetKey` union.
       ...artKeys.map(key =>
-        AssetManager.ensure(key)
+        ensurePackAsset(key)
           .catch(() => undefined)
           .then(step)
       ),
