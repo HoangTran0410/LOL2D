@@ -54,8 +54,8 @@ const AllSpells: Record<string, unknown> = Object.fromEntries(
 // The generated catalogue now splits across two trees the same way the spell
 // classes do — core's own (`BasicAttack`) and the riot pack's (everything
 // else) — so "the generated catalogue" this file checks against means both,
-// merged content-last exactly as `scripts/generate-spell-catalog.mjs` merges
-// them.
+// merged core-last exactly as `scripts/generate-spell-catalog.mjs` merges
+// them (core spread after content, so it wins a collision).
 const spellCatalog: Record<string, { name: string; description: string; iconKey: unknown }> = {
   ...riotSpellCatalog,
   ...coreSpellCatalog,

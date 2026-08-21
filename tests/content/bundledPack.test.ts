@@ -4,8 +4,9 @@ import { buildContentApi } from '../../src/content/ContentApi';
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
 // The generated module map split across two trees in batch 4 task 3 — core's
-// own (`BasicAttack`) and the riot pack's (everything else) — the same way
-// `bundledPack.ts`'s own `spellSources()` merges them, content-last.
+// own (`BasicAttack`) and the riot pack's (everything else) — merged the
+// same way `bundledPack.ts`'s own `spellSources()` does: core spread last,
+// so it would win a (today impossible) id collision against content.
 import { spellModules as coreSpellModules } from '../../src/generated/spellModules';
 import { spellModules as riotSpellModules } from '../../packs/riot/generated/spellModules';
 import type { ContentPack } from '../../src/content/ContentPack';

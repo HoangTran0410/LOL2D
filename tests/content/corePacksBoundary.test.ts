@@ -73,6 +73,13 @@ function specifiers(source: string): string[] {
   while ((match = staticPattern.exec(source)) !== null) out.push(match[1]);
   const dynamicPattern = /\bimport\(\s*['"]([^'"]+)['"]/g;
   while ((match = dynamicPattern.exec(source)) !== null) out.push(match[1]);
+  // `import.meta.glob('/packs/...')` is the natural Vite idiom for
+  // enumerating a whole pack tree at once and is just as much a bundle-time
+  // reach into packs/ as a single import() — a core file discovering it
+  // could eagerly glob every spell in a pack was exactly the shape of
+  // mistake this scan exists to catch.
+  const globPattern = /\bimport\.meta\.glob\(\s*['"]([^'"]+)['"]/g;
+  while ((match = globPattern.exec(source)) !== null) out.push(match[1]);
   return out;
 }
 
@@ -80,7 +87,13 @@ describe('core does not import packs, outside the named exceptions', () => {
   const files = tsAndVueFilesUnder(SRC);
 
   it('finds core files to scan, or this proves nothing', () => {
-    expect(files.length).toBeGreaterThan(200);
+    // A floor, not the current count (203): this whole programme is moving
+    // files out of `src/`, and pinning this near the present size would make
+    // a later batch's honest shrinkage look like this scan's own failure.
+    // 20 is comfortably below any plausible "core accidentally emptied out"
+    // reading while still refusing to pass against a scan that silently
+    // matched nothing.
+    expect(files.length).toBeGreaterThan(20);
   });
 
   it('no core file reaches packs/ except the documented bridge', () => {

@@ -75,10 +75,11 @@ const AllSpells: Record<string, unknown> = Object.fromEntries(
 );
 
 // The registry loads from two barrels now — `spells/` (content) and
-// `coreSpells/` (`BasicAttack`) — merged content-last exactly as
-// `scripts/generate-spell-catalog.mjs` merges them. The generated module map
-// and catalogue split across the same two trees now — core's own generated
-// files (`BasicAttack`) and the riot pack's (everything else) — merged the
+// `coreSpells/` (`BasicAttack`) — merged core-last exactly as
+// `scripts/generate-spell-catalog.mjs` merges them (core spread after
+// content, so it wins a collision). The generated module map and catalogue
+// split across the same two trees now — core's own generated files
+// (`BasicAttack`) and the riot pack's (everything else) — merged the
 // same way.
 const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
 const spellModules: Record<string, unknown> = { ...riotSpellModules, ...coreSpellModules };

@@ -1,14 +1,22 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * `renderSpellModulesSource` reads two barrels — `spells/index.ts` (content)
- * and `coreSpells/index.ts` (core) — and used to throw only when *both* came
- * back with no `export { default as X } from` lines. That is too weak: an
- * emptied content barrel (all 238 spells removed, say by a bad merge) still
- * has a one-line core barrel, so the guard stayed quiet and the generator
- * would have silently written a one-entry `spellModules.ts` instead of
- * failing the build. Each barrel that is expected to have content must be
- * checked on its own.
+ * Renamed from `generateSpellCatalog.barrelGuard.test.ts` in batch 4 task 3's
+ * review round: this tests the *generic* per-barrel rule, not any real tree.
+ * `renderSpellModulesSource` used to throw only when *every* configured
+ * barrel came back with no `export { default as X } from` lines — so a
+ * two-barrel tree with one barrel emptied (all 238 spells removed, say by a
+ * bad merge) still had its other, one-line barrel, and the guard stayed
+ * quiet. Each barrel that is expected to have content must be checked on its
+ * own, and this file proves that against a synthetic `TWO_BARREL_TREE`
+ * rather than `CORE_SPELL_TREE` or the riot pack's tree — batch 4 task 3
+ * left both of those with exactly *one* barrel each (`coreSpells/` alone;
+ * `packs/riot/spells/` alone), so there is no longer a real tree with two
+ * distinct barrels to exercise this against. The two real trees' own
+ * generation is covered elsewhere (`catalog:check` / `catalog:check:riot`);
+ * this file is the one place the *rule itself* — "attribute the failure to
+ * the barrel that is actually empty" — is proven, independent of how many
+ * barrels either real tree happens to have today.
  */
 
 const CONTENT_EXPORT = "export { default as Foo } from './Foo';\n";

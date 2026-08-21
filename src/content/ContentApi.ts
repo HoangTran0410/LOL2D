@@ -107,10 +107,12 @@ import { uuidv4, hasFlag, rectToVertices } from '@/utils/index';
  * (`PredefinedParticleSystems` beside `ParticleSystem`, `createReveal` beside
  * `TrueSight`, and six more), and three more modules — `ObjectManager`
  * (`PredefinedFilters`, 153 files), `CancelPolicy` (`SpellForm`) and
- * `ai/SpellRole` — were not carried at all. `contentApi-surface-seam.test.ts`
- * is what keeps this from silently narrowing again: it scans every `@/`
- * import in `spells/` and `coreSpells/` and fails naming any symbol this file
- * does not expose.
+ * `ai/SpellRole` — were not carried at all. This was `coreSpellsApiSurface.test.ts`'s
+ * job before batch 4 task 3 (it kept it from silently narrowing again by
+ * scanning every `@/` import in `spells/` and `coreSpells/`); now that
+ * `packs/riot/spells/` cannot name a `@/` core module at all
+ * (`packBoundary.test.ts`), that scan's real population is `coreSpells/`
+ * alone — see its own header for the renamed, narrower guarantee.
  */
 export interface ContentApi {
   Spell: typeof Spell;
@@ -171,8 +173,21 @@ export interface ContentApi {
    * for this one. `AssetManager` itself stays off the pack allow-list
    * (`packBoundary.test.ts`); this is the same crossing `asset()` already
    * makes, for the other method a spell's `draw()` needs.
+   *
+   * Typed for what both real call sites actually do with it — feed it
+   * straight into p5's `image()`, whose first parameter accepts
+   * `p5.Image | p5.Element | p5.Framebuffer` — rather than the `unknown`
+   * `AssetManager.renderable` itself returns (that method's own signature is
+   * unrelated to this task and stays as it is; this is only the public type
+   * this wrapper hands a pack author). `p5.Framebuffer` is dropped: neither
+   * real call site resolves one, and the ambient `@types/p5` in this project
+   * does not expose it as a cross-file-referenceable member of the `p5`
+   * namespace, only inline within its own declaration file.
    */
-  renderableAsset(handle: AssetHandle | undefined, label?: string): unknown;
+  renderableAsset(
+    handle: AssetHandle | undefined,
+    label?: string
+  ): p5.Image | p5.Element;
 }
 
 const COMBAT = Object.freeze({
@@ -191,10 +206,11 @@ const COMBAT = Object.freeze({
  * `ContentApi` is not supposed to carry — a seam meant to keep core's surface
  * pack-neutral was requiring the opposite. Task 2 of the content-pack
  * extraction moved both into `packs/riot/vfx/`; `Darius_Q/W/E.ts` and
- * `Lux_R.ts` (still core, pending their own later move) now reach them by a
- * relative path instead. See `tests/content/contentApi-surface-seam.test.ts`'s
- * "carries no champion-named symbol" rule, which is what would now catch a
- * fourth one.
+ * `Lux_R.ts` reached them by a relative path in the interim and moved into
+ * `packs/riot/spells/` themselves in batch 4 task 3, where that relative
+ * reach is now an ordinary sibling-pack import. See
+ * `tests/content/coreSpellsApiSurface.test.ts`'s "carries no champion-named
+ * symbol" rule, which is what would now catch a fourth one.
  */
 const VFX = Object.freeze({
   CastBar,
@@ -302,7 +318,7 @@ export function buildContentApi(): ContentApi {
     utils: UTILS,
     asset: packAsset,
     renderableAsset: (handle: AssetHandle | undefined, label?: string) =>
-      AssetManager.renderable(handle, label),
+      AssetManager.renderable(handle, label) as p5.Image | p5.Element,
   }) as ContentApi;
   return cached;
 }

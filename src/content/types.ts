@@ -34,20 +34,27 @@ export type {
 } from '@/game/spell/runtime/types';
 
 /**
- * Five more type-only gaps, found the same way the rest of this barrel was:
- * measured against what the spell tree actually imports, not guessed.
- * `contentApi-surface-seam.test.ts` only ever asserted VALUE coverage — its
- * own doc comment says type-only imports are skipped, on purpose, because a
- * type is erased and has no runtime object to be "reachable" through — so
- * these five never had to justify themselves against that scan. They still
- * needed a home once packs/riot/spells/ could no longer reach into core
- * directly at all: `BasicAttackHit` is the `ON_ATTACK_HIT` payload shape
- * (15 files, all read-only); `BasicAttackController` names the field a bot
- * reads off `this.owner.basicAttack` (Jinx_Q, purely as a cast target, never
+ * More type-only gaps, found the same way the rest of this barrel was:
+ * measured against what the spell tree actually imports, not guessed —
+ * first by reading the import surface directly, then by the compiler itself
+ * once packs/riot/spells/ was real (each remaining `Cannot find name` under
+ * `tsc -p tsconfig.strict-core.json` named one more). `ContentApi`-surface
+ * checks (now `coreSpellsApiSurface.test.ts`) only ever asserted VALUE
+ * coverage — its own doc comment says type-only imports are skipped, on
+ * purpose, because a type is erased and has no runtime object to be
+ * "reachable" through — so none of these ever had to justify themselves
+ * against that scan. They still needed a home once packs/riot/spells/ could
+ * no longer reach into core directly at all: `BasicAttackHit` is the
+ * `ON_ATTACK_HIT` payload shape (15 files, all read-only);
+ * `BasicAttackController` names the field a bot reads off
+ * `this.owner.basicAttack` (Jinx_Q, purely as a cast target, never
  * constructed); `GameObjectRuntimeContext` is `Thresh_E`'s helper's `game`
  * parameter type; `KillCredit` is `Zed_W`'s clone declaring how a kill on it
  * should be scored; `TargetingRequest` is the shape every `UNIT`-targeting
- * spell's `targetingRequest` field returns (20 files).
+ * spell's `targetingRequest` field returns (20 files); the rest
+ * (`ExecuteFallback`/`ExecuteSpell`, `DynamicWall`, `BeamGeometry`,
+ * `WallContact`, `AssetHandle`) are one or two spells each, named in the
+ * commit that added them rather than repeated here.
  */
 export type { BasicAttackHit } from '@/game/combat/BasicAttack';
 export type { default as BasicAttackController } from '@/game/combat/BasicAttackController';

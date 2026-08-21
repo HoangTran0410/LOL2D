@@ -16,7 +16,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
  * merge them "content-last". Batch 4 task 1 generalises both into a `tree`
  * argument: an ordered list of barrels, a later one winning an id clash,
  * defaulting to `CORE_SPELL_TREE` so every existing call keeps its exact
- * output (see `generateSpellCatalog.barrelGuard.test.ts` for the guard this
+ * output (see `generateSpellCatalog.barrelGuardRule.test.ts` for the guard this
  * must not weaken, and `npm run catalog:check` for the byte-for-byte proof
  * on core's own tree, which stays part of `verify`).
  *

@@ -9,6 +9,21 @@ vi.mock('../../src/managers/AssetManager', () => ({
 import { buildContentApi } from '../../src/content/ContentApi';
 
 /**
+ * Renamed from `contentApi-surface-seam.test.ts` in batch 4 task 3's review
+ * round, because that name stopped describing what this file actually
+ * guards. It used to walk `content` and `coreSpells` together — 241 spell
+ * files reaching directly into `@/game/...` — and assert every value-level
+ * symbol they named was reachable off `buildContentApi()`. Batch 4 task 3
+ * moved the 238 content spells into `packs/riot/spells/` and converted them
+ * to the `make<Name>(api: ContentApi)` factory shape, so they no longer name
+ * a single `@/` core module — `packBoundary.test.ts` forbids it outright, and
+ * `packs/**` sits under `typecheck:core` (`tsconfig.strict-core.json`), which
+ * would refuse to compile a pack file reaching for something `ContentApi`
+ * does not carry. Those two together now hold the property this file used to
+ * check, structurally, for every pack file — this file's remaining, real job
+ * is `coreSpells/` alone (today, just `BasicAttack.ts`, the one spell core
+ * still constructs directly and imports `@/game/...` from as a plain value).
+ *
  * `ContentApi` is a hand-assembled list, and a hand-assembled list drifts.
  * The first cut of this file imported the default export of every core
  * module the measured import table named and stopped there — but eight of
@@ -22,11 +37,11 @@ import { buildContentApi } from '../../src/content/ContentApi';
  * namespace passes for `{}` just as well as for the real thing.
  *
  * So this is a source scan, in the shape of `dash-onupdate-seam.test.ts` and
- * `mana-spend-seam.test.ts`: walk every spell file, `content` and core alike,
- * collect every `@/`-prefixed import and the symbols it names, and assert
- * each one is reachable somewhere off `buildContentApi()`. A spell that
- * starts importing something new now fails this test instead of leaving a
- * silent hole a pack falls through later.
+ * `mana-spend-seam.test.ts`: walk every spell file (today, that population is
+ * `coreSpells/` alone), collect every `@/`-prefixed import and the symbols it
+ * names, and assert each one is reachable somewhere off `buildContentApi()`.
+ * A core spell that starts importing something new now fails this test
+ * instead of leaving a silent hole `ContentApi` never covered.
  *
  * Two things this scan has to be honest about:
  *
@@ -62,13 +77,12 @@ import { buildContentApi } from '../../src/content/ContentApi';
  * `@/managers/AssetManager` is a deliberate exclusion, not an oversight: the
  * module doc comment above explains that `asset(key)` stands in for
  * `AssetManager.get(key)` on purpose — the *class* is not meant to be
- * reachable, the function is, and `contentApi.test.ts` already covers it. As
- * of this writing every spell file still imports `AssetManager` directly
- * because none of them have migrated to `api.asset()` yet; that migration is
- * a later task's job, not this scan's.
+ * reachable, the function is, and `contentApi.test.ts` already covers it.
+ * Every pack spell has migrated to `api.asset()` as of batch 4 task 3;
+ * `coreSpells/BasicAttack.ts`, core, still imports `AssetManager` directly
+ * and always will — this exclusion is permanent, not a "not yet".
  */
 
-const SPELLS_DIR = join(__dirname, '../../packs/riot/spells');
 const CORE_SPELLS_DIR = join(__dirname, '../../src/game/gameObject/coreSpells');
 
 /** Comments describe the rule; matching them would flag the documentation. */
@@ -81,17 +95,16 @@ function tsFilesIn(dir: string): string[] {
 }
 
 /**
- * Every spell file, content and core alike — `coreSpells/` left the
- * population `spells/` scans but did not stop being spells. `index.ts` is a
- * barrel, not a spell, so it is excluded.
+ * `coreSpells/` alone now — `packs/riot/spells/` moved out in batch 4 task 3
+ * and cannot name a `@/` core module at all any more (`packBoundary.test.ts`
+ * plus `packs/**` under `typecheck:core`), so scanning it here would only
+ * ever contribute nothing. `index.ts` is a barrel, not a spell, so it is
+ * excluded.
  */
 function allSpellFiles(): { dir: string; file: string }[] {
-  return [
-    ...tsFilesIn(SPELLS_DIR).map(file => ({ dir: SPELLS_DIR, file })),
-    ...tsFilesIn(CORE_SPELLS_DIR)
-      .filter(file => file !== 'index.ts')
-      .map(file => ({ dir: CORE_SPELLS_DIR, file })),
-  ];
+  return tsFilesIn(CORE_SPELLS_DIR)
+    .filter(file => file !== 'index.ts')
+    .map(file => ({ dir: CORE_SPELLS_DIR, file }));
 }
 
 interface ImportedSymbol {
@@ -278,17 +291,26 @@ describe('every core symbol a spell imports is reachable through buildContentApi
 
 const CONTENT_API_FILE = join(__dirname, '../../src/content/ContentApi.ts');
 
+// Deliberately separate from `allSpellFiles()` above: that population
+// narrowed to `coreSpells/` alone (this file's real job now — see the header
+// comment), but the champion roster genuinely needs every real spell's
+// filename, which is `packs/riot/spells/` since batch 4 task 3 moved them.
+const PACK_SPELLS_DIR = join(__dirname, '../../packs/riot/spells');
+
 /**
- * Every id `<Champion>_[QWER][0-9]*.ts` names, across `spells/` and
- * `coreSpells/` — the same population `allSpellFiles()` already walks for the
- * scan above, filtered to the files that actually carry a champion prefix.
- * `Flash.ts`, `Heal.ts`, `Recall.ts`, `BasicAttack.ts` and friends have no
- * `_[QWER]` suffix at all, so they never enter this set — a summoner spell or
- * the basic attack is not "a champion" for this rule's purpose.
+ * Every id `<Champion>_[QWER][0-9]*.ts` names, across `packs/riot/spells/`
+ * and `coreSpells/`, filtered to the files that actually carry a champion
+ * prefix. `Flash.ts`, `Heal.ts`, `Recall.ts`, `BasicAttack.ts` and friends
+ * have no `_[QWER]` suffix at all, so they never enter this set — a summoner
+ * spell or the basic attack is not "a champion" for this rule's purpose.
  */
 function championRoster(): string[] {
   const names = new Set<string>();
-  for (const { file } of allSpellFiles()) {
+  const files = [
+    ...tsFilesIn(PACK_SPELLS_DIR),
+    ...tsFilesIn(CORE_SPELLS_DIR).filter(file => file !== 'index.ts'),
+  ];
+  for (const file of files) {
     const match = /^([A-Za-z0-9]+)_[QWER][0-9]*\.ts$/.exec(file);
     if (match) names.add(match[1]);
   }

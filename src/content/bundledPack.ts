@@ -19,9 +19,10 @@ import { spellModules } from '../../packs/riot/generated/spellModules';
 // header: "the last-resort fallback... must not itself be something that
 // might not have arrived"), and `CHAMPION_KITS`' "Đánh Thường" shelf and
 // slot 0 of every kit still name it as a bare id, unqualified from the
-// riot pack's own — merged in below, content-last, the same way the two
-// generated trees were one file before batch 4 task 3 split them.
-// `bundledPack.ts` dies with the rest of this bridge in Task 7.
+// riot pack's own — merged in below with core spread last, so a (today
+// impossible) id collision resolves to core rather than letting content
+// shadow the one spell every kit presupposes. `bundledPack.ts` dies with
+// the rest of this bridge in Task 7.
 import { spellCatalog as coreSpellCatalog } from '@/generated/spellCatalog';
 import { spellModules as coreSpellModules } from '@/generated/spellModules';
 import { summonersRift } from './maps/summonersRift';
