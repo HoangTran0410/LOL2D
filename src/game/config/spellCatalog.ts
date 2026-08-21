@@ -254,38 +254,14 @@ export const spellIconKey = (id: string): string | null =>
   contentCatalog().spellDisplay(qualifyBundledId(id))?.iconKey ?? null;
 
 /**
- * Basic-attack profiles by role.
- *
- * Every champion in the game shared `DEFAULT_CHAMPION_ATTACK` — the same 16
- * damage at 0.8/s from the same 300 range — so a marksman's autos were a tank's
- * autos, and a kit built to be carried by attack speed had no attack speed to be
- * carried by. Two consequences fall out of fixing that:
- *
- *  - **Melee is finally melee.** `MELEE_RANGE_THRESHOLD` is 140 and everyone sat
- *    at 300, so Garen and Malphite were quietly *shooting bolts*. The melee
- *    profiles drop under the threshold, which is what makes `BasicAttackController`
- *    swing instead, and they are paid for it in damage per hit.
- *  - **Reach costs dps.** The ranged profiles hit softer per swing than the melee
- *    ones; a marksman's payoff is that it never has to close, and that its dps
- *    rises fastest under an attack-speed buff.
- *
- * Numbers are stated as dps against the ~100 champion pool so the trade is
- * checkable at a glance rather than buried in two multiplied fields.
+ * Basic-attack role profiles (marksman, mage, bruiser, ...) moved out of
+ * here and into `packs/riot/data.ts`'s own `ATTACK` (a fix-round finding:
+ * this file's copy had no consumer left in `src/`, so it was a dead,
+ * unguarded duplicate of the numbers a match actually ships — the roster's
+ * vocabulary belongs to the roster, not the engine). `DEFAULT_CHAMPION_ATTACK`
+ * (`@/game/gameObject/attackableUnits/Champion`) is the mechanism that
+ * survives here: the fallback for a champion with no profile at all.
  */
-export const ATTACK = {
-  /** 16.5 dps at the longest reach in the roster, and the best buff scaling. */
-  MARKSMAN: { damage: 10, attacksPerSecond: 1.65, range: 410 },
-  /** 12.6 dps. Autos are chip damage between cooldowns, not the plan. */
-  MAGE: { damage: 12, attacksPerSecond: 1.05, range: 385 },
-  /** 10.0 dps. The lowest in the game on purpose; the kit is the contribution. */
-  SUPPORT: { damage: 10, attacksPerSecond: 1.0, range: 385 },
-  /** 18.8 dps, melee. Burst kits that still want to finish with their hands. */
-  ASSASSIN: { damage: 15, attacksPerSecond: 1.25, range: 130 },
-  /** 18.7 dps, melee. The sustained-damage end of the roster. */
-  BRUISER: { damage: 17, attacksPerSecond: 1.1, range: 130 },
-  /** 14.3 dps, melee. Slowest swing; the body is the point, not the axe. */
-  TANK: { damage: 15, attacksPerSecond: 0.95, range: 125 },
-} as const;
 
 /**
  * The roster itself — every champion this pack ships, what used to be

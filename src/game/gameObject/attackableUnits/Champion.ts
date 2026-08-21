@@ -41,7 +41,7 @@ export interface ChampionAttackTuning {
  *
  * 0.8/s was the previous rate, and it was the same rate for every champion in
  * the game: a kit designed to be carried by attack speed had none to be carried
- * by. Roles now declare their own profile — see `ATTACK` in `src/game/preset.ts`
+ * by. Roles now declare their own profile — see `ATTACK` in `packs/riot/data.ts`
  * — and this is only the fallback for anything that names no role.
  *
  * The range is 300, comfortably inside the 500 sight radius (so you can attack

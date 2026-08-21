@@ -190,12 +190,6 @@ export const getChampionPresetRandom = (): ChampionPresetData & { avatar: string
   presetFromPlan(planRandomKit());
 
 /**
- * `ATTACK` still lives in `config/spellCatalog.ts` — re-exported here so every
- * existing `from '@/game/preset'` keeps working.
- */
-export { ATTACK } from '@/game/config/spellCatalog';
-
-/**
  * Every installed champion — playable rows and shelf-only stubs alike, same
  * population `CHAMPION_KITS` used to give this function — with each spell id
  * resolved to its class.
@@ -213,7 +207,7 @@ export const spellGroups = (): {
   name: string;
   image: string | null;
   spells: SpellClass[];
-  /** The champion's basic-attack profile; see `ATTACK`. */
+  /** The champion's basic-attack profile — `packs/riot/data.ts`'s own `ATTACK` picks one per row. */
   attack?: ChampionAttackTuning;
 }[] =>
   contentRegistry()

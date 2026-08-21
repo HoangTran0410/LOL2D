@@ -25,24 +25,24 @@ export const BUNDLED_PACK_ID = 'riot';
 type RosterSpellId = PackSpellCatalogId | 'BasicAttack';
 
 /**
- * This pack's own copy of core's basic-attack role taxonomy
- * (`src/game/config/spellCatalog.ts`'s `ATTACK`, tested directly and
- * independently by `tests/game/combat/AttackProfiles.test.ts`).
- *
- * Duplicated, not imported: `tests/content/packBoundary.test.ts` refuses a
- * pack file any reach into core outside `@/content/ContentApi`,
- * `@/content/ContentPack` and `@/content/types`, all three type-only —
- * `ATTACK`'s six numeric profiles are a *value*, and core's own copy is a
- * balance invariant core's own test suite owns, not something this pack's
- * roster is entitled to import by reference. A real separate pack (the
- * point of this whole extraction) would not have core's module graph to
- * import from at all — it would pick its own six numbers, or its own one,
- * or none. These happen to start identical to core's because they are the
- * numbers this roster shipped with; nothing keeps the two in sync after
- * today, which is the correct amount of coupling for content that is meant
- * to leave this repository.
+ * This pack's own basic-attack role taxonomy — bruiser, marksman, and the
+ * rest. It used to be core's (`src/game/config/spellCatalog.ts`'s
+ * `ATTACK`), duplicated into this file so the roster below could reference
+ * it without a pack file reaching into core (`tests/content/packBoundary.test.ts`
+ * refuses that outside the three type-only specifiers it allows). That
+ * duplication was a fix-round finding: core's copy had no consumer left in
+ * `src/` (only `tests/game/combat/AttackProfiles.test.ts` read it), so the
+ * six numbers a match actually ships were the *unguarded* copy and the
+ * *guarded* one was dead — exactly the drift `mana-spend-seam.test.ts`'s
+ * own rule warns about, just for a tuning table instead of a spend path.
+ * `ATTACK` now lives here, once, exported so `tests/packs/riot/attackProfiles.test.ts`
+ * guards the copy a match actually plays with. A role taxonomy is the
+ * roster's vocabulary, not the engine's — `DEFAULT_CHAMPION_ATTACK`
+ * (`@/game/gameObject/attackableUnits/Champion`), the fallback for a
+ * champion with no profile at all, is core's, and stays there; it is a
+ * mechanism, not content.
  */
-const ATTACK = {
+export const ATTACK = {
   MARKSMAN: { damage: 10, attacksPerSecond: 1.65, range: 410 },
   MAGE: { damage: 12, attacksPerSecond: 1.05, range: 385 },
   SUPPORT: { damage: 10, attacksPerSecond: 1.0, range: 385 },
