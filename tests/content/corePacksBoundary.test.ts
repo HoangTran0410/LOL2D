@@ -8,24 +8,23 @@ import { join } from 'node:path';
  *
  * `packBoundary.test.ts` guards the forward direction: a pack may only reach
  * core through the injected `ContentApi`. Nothing guarded the reverse until
- * this task, and batch 4 task 3 is the first time it could actually happen —
- * before it, `packs/riot/` held only vfx helpers, a monster's abilities and
- * the reference pack, none of which core imported directly. The move puts
- * 238 real spell files (and their generated catalogue) under `packs/riot/`,
- * and two places in core now have a genuine reason to reach for one:
+ * batch 4 task 3, the first time it could actually happen — before it,
+ * `packs/riot/` held only vfx helpers, a monster's abilities and the
+ * reference pack, none of which core imported directly. The move put 238
+ * real spell files (and their generated catalogue) under `packs/riot/`, and
+ * three places in core have a genuine reason to reach for one:
  *
  * - `src/content/install.ts` — **permanent, by design.** This is Stage 1's
  *   pack loader; the whole point of the `ContentPackFactory` shape (see that
  *   file's own header) is that core statically imports a pack's factory
  *   today and dynamically imports the same shape from a URL in Stage 2. It
- *   already imports `packs/reference/pack` and will import `packs/riot/pack`
- *   directly once Task 7 deletes `bundledPack.ts`.
- * - `src/content/bundledPack.ts` — **temporary, with a date on it.** Its own
- *   header calls itself "scaffolding wrapping content that has not finished
- *   moving into `packs/riot/` yet" and names Task 7 as the task that deletes
- *   it. Exempted as a whole file rather than picked apart line by line: every
- *   reach it makes into `packs/riot/` (the generated catalogue, `Baron`'s
- *   abilities, `Recall`'s loader) is the same kind of bridge.
+ *   imports `packs/reference/pack` and `packs/riot/pack` directly — the
+ *   latter used to go through `src/content/bundledPack.ts`'s own adapter,
+ *   deleted in batch 4 task 7 (that file's own header called itself
+ *   "scaffolding with a date on it" since batch 2). Exempted as a whole
+ *   file rather than picked apart line by line: every reach it makes into
+ *   `packs/riot/` (both halves of the pack, its generated manifest) is the
+ *   same kind of loading, not a bridge with an end date any more.
  * - `src/game/preset.ts` — **one named line.** `attachRecall` builds a
  *   `Recall` for every champion synchronously at construction, before the
  *   async spell-registry path a match's other kits go through even exists —
@@ -33,10 +32,11 @@ import { join } from 'node:path';
  *   presupposes a fountain (map content, not a mechanic every pack has), so
  *   it lives under `packs/riot/spells/` like any other spell rather than in
  *   core; nothing here assumes every future pack supplies one.
- * - `src/game/config/spellCatalog.ts` — **one named line.** `CHAMPION_KITS`
- *   types its spell ids against the pack's own generated `SpellCatalogId`
- *   union (type-only, erased at runtime) — the same adapter role
- *   `tests/content/rosterSource.test.ts` already names this file for.
+ * - `src/game/config/spellCatalog.ts` — **one named line.** `SpellCatalogId`
+ *   types every catalogue id against the pack's own generated
+ *   `SpellCatalogId` union (type-only, erased at runtime) — a compile-time
+ *   check the rest of the engine's ids stay real, not a value this file
+ *   carries at runtime.
  *
  * A source scan, in the shape of `packBoundary.test.ts`: a millisecond, and
  * it closes the class of mistake rather than one instance of it.
@@ -44,7 +44,7 @@ import { join } from 'node:path';
 const SRC = join(__dirname, '../../src');
 
 /** Whole files exempted entirely — every `packs/` reach in them is the bridge. */
-const EXEMPT_FILES = new Set(['content/install.ts', 'content/bundledPack.ts']);
+const EXEMPT_FILES = new Set(['content/install.ts']);
 
 /** `relativePath -> the exact specifiers that file may name.` */
 const ALLOWED_LINES: Record<string, string[]> = {

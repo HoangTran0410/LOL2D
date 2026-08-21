@@ -40,10 +40,11 @@ const SPELLS_DIR = join(ROOT, 'packs/riot/spells');
 const TESTS_DIR = join(ROOT, 'tests/game/spells');
 const INDEX_FILE = join(SPELLS_DIR, 'index.ts');
 // `preset.ts` stopped being where a champion's kit lives before batch 4 —
-// see that file's own "Stage 4" header comment — CHAMPION_KITS in
-// config/spellCatalog.ts is the real roster now, keyed by bare spell id
+// see that file's own "Stage 4" header comment. The roster (what used to be
+// `CHAMPION_KITS` in `config/spellCatalog.ts`, before batch 4 task 7 moved
+// it into the pack itself) is real pack content now, keyed by bare spell id
 // string rather than an `AllSpells.X` class reference.
-const CATALOG_FILE = join(ROOT, 'src/game/config/spellCatalog.ts');
+const CATALOG_FILE = join(ROOT, 'packs/riot/data.ts');
 const VI_NAMES_FILE = join(ROOT, 'docs/spell-names-vi.json');
 
 const SLOTS = ['Q', 'W', 'E', 'R'];
@@ -596,15 +597,18 @@ function registerInBarrel() {
 }
 
 /**
- * A champion's kit lives in \`CHAMPION_KITS\` (\`config/spellCatalog.ts\`) now,
- * not \`preset.ts\` — that changed before batch 4, see \`preset.ts\`'s own
- * "Stage 4" header comment. \`spells: [...]\` there holds bare id strings
- * (\`'Ahri_Q'\`), not \`AllSpells.Ahri_Q\` class references.
+ * A champion's kit lives in the riot pack's own roster (\`packs/riot/data.ts\`)
+ * now, not \`preset.ts\` — that changed before batch 4, see \`preset.ts\`'s own
+ * "Stage 4" header comment. Batch 4 task 7 moved the roster itself out of
+ * \`config/spellCatalog.ts\` (where it was called \`CHAMPION_KITS\`) and into
+ * the pack, real content rather than a table core kept for an adapter to
+ * read. \`spells: [...]\` there holds bare id strings (\`'Ahri_Q'\`), not
+ * \`AllSpells.Ahri_Q\` class references.
  */
 function registerInChampionKit() {
   const source = readFileSync(CATALOG_FILE, 'utf8');
   if (new RegExp(`spells:\\s*\\[[^\\]]*'${slug}'`).test(source)) {
-    return 'already in CHAMPION_KITS';
+    return 'already in the roster';
   }
 
   const block = new RegExp(
@@ -612,7 +616,7 @@ function registerInChampionKit() {
   );
   const found = source.match(block);
   if (!found) {
-    return `no '${champion}' entry in CHAMPION_KITS — add '${slug}' to its spells: [] by hand`;
+    return `no '${champion}' entry in the roster (packs/riot/data.ts) — add '${slug}' to its spells: [] by hand`;
   }
 
   const existing = found[2]
@@ -625,7 +629,7 @@ function registerInChampionKit() {
   existing.sort((a, b) => SLOTS.indexOf(a.slice(-2, -1)) - SLOTS.indexOf(b.slice(-2, -1)));
 
   writeFileSync(CATALOG_FILE, source.replace(block, `$1${existing.join(', ')}$3`));
-  return "added to the champion's CHAMPION_KITS entry";
+  return "added to the champion's roster entry";
 }
 
 // ─── write ────────────────────────────────────────────────────────────────────

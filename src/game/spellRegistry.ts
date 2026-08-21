@@ -1,5 +1,5 @@
 import { contentRegistry, resetContentRegistryForTests } from '@/content/registry';
-import { BUNDLED_PACK_ID } from '@/content/bundledPack';
+import { BUNDLED_PACK_ID } from '@/content/install';
 
 /**
  * Spell classes, fetched per champion and read back synchronously.

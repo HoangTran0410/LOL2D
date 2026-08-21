@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { contentRegistry, resetContentRegistryForTests } from '../../src/content/registry';
 import { contentCatalog } from '../../src/content/catalog';
-import { BUNDLED_PACK_ID } from '../../src/content/bundledPack';
+import { BUNDLED_PACK_ID } from '../../src/content/install';
 
 describe('the content registry', () => {
   beforeEach(resetContentRegistryForTests);

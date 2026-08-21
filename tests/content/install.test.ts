@@ -10,8 +10,9 @@ import {
   installBundledPackCode,
   BUNDLED_PACK_DATA,
   BUNDLED_PACKS,
+  BUNDLED_PACK_ID,
 } from '../../src/content/install';
-import bundledCode, { data as bundledData } from '../../src/content/bundledPack';
+import { data as riotData } from '../../packs/riot/pack';
 import { buildContentApi } from '../../src/content/ContentApi';
 import type { ContentPackData, ContentPackFactory } from '../../src/content/ContentPack';
 
@@ -24,11 +25,11 @@ import type { ContentPackData, ContentPackFactory } from '../../src/content/Cont
  * identical in both, which is the entire reason the pack contract's code
  * half is a factory taking an API rather than a module of exports.
  *
- * `BUNDLED_PACKS` is not a demo array any more: `bundledPack` wraps the
- * game's own 60 champions and 238 spells in place, so it is the `riot` pack
- * itself, installed first. The reference pack still follows it, now to prove
- * the seam holds for a second, independent pack rather than to stand in for
- * the game's own content. `src/content/catalog.ts`'s `contentCatalog()`
+ * `BUNDLED_PACKS` is not a demo array any more: `packs/riot/pack.ts` wraps
+ * the game's own 59-row roster and 237 spells in place, so it is the `riot`
+ * pack itself, installed first. The reference pack still follows it, now to
+ * prove the seam holds for a second, independent pack rather than to stand
+ * in for the game's own content. `src/content/catalog.ts`'s `contentCatalog()`
  * calls `installBundledPackData` and `src/content/registry.ts`'s
  * `contentRegistry()` calls `installBundledPackCode` on top of it, both on
  * first read, and `main.ts`'s `setup()` makes that first read happen during
@@ -42,15 +43,27 @@ describe('the bundled-pack loader', () => {
     expect(BUNDLED_PACK_DATA.length).toBe(BUNDLED_PACKS.length);
   });
 
-  it('ships the game core content as its first pack', () => {
+  it('ships the riot pack, core BasicAttack folded on, as its first pack', () => {
     // Not just non-empty: install order is load-bearing — `PackRegistry`'s
     // "where several packs answer the same question, install order decides"
     // (`monstersFilling`'s own doc comment) and `pregameCatalog.ts`'s
     // `sourceOrder` both read it — so this pins the bundled pack at index 0
     // rather than merely proving the arrays have *something* in them.
+    //
+    // Not `.toBe(riotData)`: `BUNDLED_PACK_DATA[0]` is `riotData` with
+    // core's own `BasicAttack` display entry folded on (`install.ts`'s
+    // `riotDataWithCore`), a genuinely different object — champions are
+    // untouched by that merge, so those stay a same-reference check.
     expect(BUNDLED_PACKS.length).toBeGreaterThan(0);
-    expect(BUNDLED_PACKS[0]).toBe(bundledCode);
-    expect(BUNDLED_PACK_DATA[0]).toBe(bundledData);
+    expect(BUNDLED_PACK_DATA[0].manifest.id).toBe(BUNDLED_PACK_ID);
+    expect(BUNDLED_PACK_DATA[0].champions).toBe(riotData.champions);
+    expect(BUNDLED_PACK_DATA[0].spellDisplay?.BasicAttack).toBeDefined();
+    expect(BUNDLED_PACK_DATA[0].spellDisplay?.Yasuo_Q).toBeDefined();
+
+    const code = BUNDLED_PACKS[0](buildContentApi());
+    expect(code.spells?.BasicAttack).toBeTypeOf('function');
+    expect(code.spells?.Yasuo_Q).toBeTypeOf('function');
+    expect(code.monsterAbilities?.baron?.length).toBeGreaterThan(0);
   });
 
   it('installs the reference pack and its champion', () => {

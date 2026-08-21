@@ -723,7 +723,7 @@ describe('mapId', () => {
    */
   it('names the real bundled pack and the real Summoner’s Rift id', async () => {
     const { qualify } = await import('../../../src/content/PackRegistry');
-    const { BUNDLED_PACK_ID } = await import('../../../src/content/bundledPack');
+    const { BUNDLED_PACK_ID } = await import('../../../src/content/install');
     // Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/`
     // and into the pack.
     const { summonersRift } = await import('../../../packs/riot/maps/summonersRift');

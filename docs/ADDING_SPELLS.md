@@ -138,7 +138,7 @@ Read the checked-in record under `docs/abilities/<champion>/`. Keep English Wiki
 
 Image provenance currently records the source URL, source revision, fetch time, and content hash. The Wiki image API response used by the importer does not provide rights or license fields, so do not infer or add a license; record one only when the upstream API supplies it directly.
 
-Export the spell from `packs/riot/spells/index.ts` and add its id string to the champion's `spells: [...]` entry in `CHAMPION_KITS` (`src/game/config/spellCatalog.ts`) — `preset.ts` stopped being where a champion's kit lives before this move; see that file's own "Stage 4" header comment.
+Export the spell from `packs/riot/spells/index.ts` and add its id string to the champion's `spells: [...]` entry in the roster (`packs/riot/data.ts`) — `preset.ts` stopped being where a champion's kit lives before this move; see that file's own "Stage 4" header comment.
 
 ## 2. Choose activation and targeting
 

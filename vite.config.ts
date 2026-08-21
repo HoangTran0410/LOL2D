@@ -170,9 +170,11 @@ export default defineConfig({
            * `generated/assetManifest` (no `src/` anchor) also catches
            * `packs/riot/generated/assetManifest.ts` — batch 4 task 4 moved 377
            * of the ~410 entries this comment describes out of core's own tree
-           * and into the pack's, and `bundledPack.ts` (forced into `pregame`
-           * by the `src/content/` rule below) imports that file directly to
-           * register it with `AssetManager`. Left unassigned, Rollup's
+           * and into the pack's, and `src/content/install.ts` (forced into
+           * `pregame` by the `src/content/` rule below — the same role
+           * `bundledPack.ts` carried until batch 4 task 7 deleted it) imports
+           * that file directly to register it with `AssetManager`. Left
+           * unassigned, Rollup's
            * single-importer default inlined the whole 377-entry manifest
            * straight into `pregame` — the same "one new PNG re-downloads
            * everything" problem this chunk exists to prevent, just moved to a
@@ -261,8 +263,8 @@ export default defineConfig({
            * `ContentApi.ts` as a value: `ContentApi.ts` itself, and
            * `registry.ts`, whose `contentRegistry()` is the one place that
            * calls `buildContentApi()`. Every other file here — `catalog.ts`,
-           * `install.ts`, `PackRegistry.ts`, `validate.ts`, `ContentPack.ts`,
-           * `bundledPack.ts`, and all of `packs/reference/` (its spell files
+           * `install.ts`, `PackRegistry.ts`, `validate.ts`, `ContentPack.ts`
+           * — and all of `packs/reference/` (its spell files
            * take `ContentApi` as a *parameter* of their exported factory,
            * never an import — `tests/content/contentApiChunk.test.ts` walks
            * this exact closure) — never names the engine surface, so pinning
@@ -274,9 +276,9 @@ export default defineConfig({
            * imports `catalog.ts` (`pregame`) for the shared registry
            * instance — a `game -> pregame` edge, required, since installing
            * the code half means completing the same `PackRegistry` the data
-           * half already built. `preset.ts`'s pre-existing `CHAMPION_KITS`
-           * import is the other one, unrelated to content and not this
-           * batch's to change. Both run the same direction, so — unlike
+           * half already built. `preset.ts`'s pre-existing import of
+           * `config/spellCatalog.ts` is the other one, unrelated to content
+           * and not this batch's to change. Both run the same direction, so — unlike
            * batch 2 — there is no longer a `pregame -> game` edge to close
            * the cycle: `vite build` no longer prints `Circular chunk:
            * pregame -> game -> pregame`.
@@ -303,7 +305,28 @@ export default defineConfig({
            * rule that pins spell implementation files to `game` regardless
            * of which pack directory they live under) — do not pin it here by
            * analogy with `packs/reference/`.
+           *
+           * **Task 7 is that split**, and the rule right below is its
+           * chunking half: `packs/riot/data.ts`/`code.ts`/`pack.ts` (the
+           * replacement for `src/content/bundledPack.ts`) sit under
+           * `packs/riot/`, not `packs/reference/`, so nothing above or below
+           * this block matches them by path — without an explicit rule they
+           * would fall to Rollup's own default, which (their only static
+           * importer, `src/content/install.ts`, being pinned `pregame`
+           * itself) happens to land them in `pregame` anyway today, but
+           * silently, and one refactor of `install.ts` away from landing
+           * somewhere else unnoticed. Pinned explicitly instead, and
+           * deliberately **not** `game`: `registry.ts` already opens a
+           * `game -> pregame` edge (above), so a `pregame -> game` edge here
+           * would reopen the exact `pregame -> game -> pregame` cycle that
+           * paragraph describes closing. `packs/riot/spells/*.ts` — the 237
+           * real spell implementations `code.ts` reaches through
+           * `./generated/spellModules.ts`'s *lazy* loaders, never a static
+           * import — are untouched by this rule and keep landing in their
+           * own per-champion `spell-<name>` chunk via the regex further
+           * down, exactly as if this pack still lived one level up.
            */
+          if (/\/packs\/riot\/(pack|data|code)\.ts$/.test(id)) return 'pregame';
           if (id.includes('/src/content/ContentApi') || id.includes('/src/content/registry')) {
             return 'game';
           }

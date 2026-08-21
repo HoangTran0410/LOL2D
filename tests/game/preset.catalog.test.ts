@@ -173,3 +173,61 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
     expect(preset.avatar).toMatch(/^riot:champ_/);
   });
 });
+
+/**
+ * The compatibility promise batch 4 task 7 could break.
+ *
+ * A `PregameConfig` written to a player's browser before this batch stored
+ * `championName` as the bare kit name (`CHAMPION_KITS[i].name`, e.g.
+ * `'Yasuo'`) and `customSlots`/`summonerD`/`summonerF` as bare spell ids
+ * (`'Yasuo_Q'`, `'Flash'`) — there was no other pack, and no `riot:` prefix,
+ * for a save to have written. Batch 2 chose the champion's *kit name* as its
+ * local id inside the pack precisely so that string keeps meaning the same
+ * champion once the roster becomes `packs/riot/data.ts`'s own data. This
+ * test is the assertion of that promise, not just that resolving an old
+ * save does not throw — a silent fallback to a random champion is exactly
+ * as crash-free as a real one, and would be the actual failure mode of
+ * deleting `bundledPack.ts`/`CHAMPION_KITS` carelessly.
+ */
+describe('a loadout persisted before content became packs still resolves', () => {
+  it('mode: "champion" — an old bare championName still resolves to the real kit, not a random one', () => {
+    const loadout: ChampionLoadout = {
+      mode: 'champion',
+      championName: 'Yasuo',
+      summonerD: 'Flash',
+      summonerF: 'Ignite',
+      customSlots: [],
+    };
+    const preset = getChampionPresetFromLoadout(loadout);
+    expect(preset.name).toBe('Yasuo');
+    expect(preset.spells).toEqual([
+      CoreSpells.BasicAttack,
+      AllSpells.Yasuo_Q,
+      AllSpells.Yasuo_W,
+      AllSpells.Yasuo_E,
+      AllSpells.Yasuo_R,
+      AllSpells.Flash,
+      AllSpells.Ignite,
+    ]);
+  });
+
+  it('mode: "custom" — old bare slot ids still resolve to the same spells', () => {
+    const loadout: ChampionLoadout = {
+      mode: 'custom',
+      championName: 'random',
+      summonerD: 'Flash',
+      summonerF: 'Heal',
+      customSlots: ['BasicAttack', 'Ahri_Q', 'Ahri_W', 'Ahri_E', 'Ahri_R', 'Ghost', 'Heal'],
+    };
+    const preset = getChampionPresetFromLoadout(loadout);
+    expect(preset.spells).toEqual([
+      CoreSpells.BasicAttack,
+      AllSpells.Ahri_Q,
+      AllSpells.Ahri_W,
+      AllSpells.Ahri_E,
+      AllSpells.Ahri_R,
+      AllSpells.Ghost,
+      AllSpells.Heal,
+    ]);
+  });
+});

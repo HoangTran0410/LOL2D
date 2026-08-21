@@ -53,7 +53,7 @@ import {
 } from '../../../src/game/config/spellCatalog';
 import { spellCatalog as coreSpellCatalog } from '../../../src/generated/spellCatalog';
 import { spellCatalog as riotSpellCatalog } from '../../../packs/riot/generated/spellCatalog';
-import { BUNDLED_PACK_ID } from '../../../src/content/bundledPack';
+import { BUNDLED_PACK_ID } from '../../../src/content/install';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
 // Every pack spell's `default` export is now `(api: ContentApi) => SpellClass`
@@ -155,11 +155,11 @@ describe('the generated spell catalogue', () => {
 
   it("qualifies a bare id under the real bundled pack's id, not a stale copy", () => {
     // `spellCatalog.ts` cannot import `BUNDLED_PACK_ID` from
-    // `@/content/bundledPack` (or `qualifySpellId` from `@/game/spellRegistry`,
-    // which reads that same constant) without closing a chunk cycle with
-    // `bundledPack.ts`, which reads `CHAMPION_KITS` back out of that same
-    // file — see `BUNDLED_PACK_PREFIX`'s doc comment. It restates the pack id
-    // as a literal instead, and this is the guard against the two drifting: a
+    // `@/content/install` (or `qualifySpellId` from `@/game/spellRegistry`,
+    // which reads that same constant) without closing a `pregame -> game ->
+    // pregame` chunk cycle — see `BUNDLED_PACK_PREFIX`'s doc comment. It
+    // restates the pack id as a literal instead, and this is the guard
+    // against the two drifting: a
     // renamed `BUNDLED_PACK_ID` would make every registry lookup in this file
     // miss silently, degrading every spell to `MISSING_SPELL_DISPLAY` rather
     // than failing loudly.

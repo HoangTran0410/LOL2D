@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { summonersRift } from '../../../../packs/riot/maps/summonersRift';
 import { NEUTRAL_SLOTS } from '../../../../packs/riot/maps/summonersRiftGeometry';
 import { validatePack } from '../../../../src/content/validate';
-import { data as bundledData, BUNDLED_PACK_ID } from '../../../../src/content/bundledPack';
+import { data as riotData, BUNDLED_PACK_ID } from '../../../../packs/riot/pack';
 import { PackRegistry } from '../../../../src/content/PackRegistry';
 import type { MapGeometry, StructureSlot } from '../../../../src/content/ContentPack';
 import mapJson from '../../../../packs/riot/maps/summoner_map.json';
@@ -112,7 +112,7 @@ describe("the Summoner's Rift map definition", () => {
 
   it('is carried in the bundled pack, qualified by pack id, summary only', () => {
     const registry = new PackRegistry();
-    registry.installData(bundledData);
+    registry.installData(riotData);
     const maps = registry.maps();
     expect(maps).toHaveLength(1);
     expect(maps[0].id).toBe(`${BUNDLED_PACK_ID}:summoners-rift`);
@@ -126,7 +126,7 @@ describe("the Summoner's Rift map definition", () => {
     // `scripts/check-chunks.mjs` and `contentApiChunk.test.ts` cover the
     // structural/byte side.
     const registry = new PackRegistry();
-    registry.installData(bundledData);
+    registry.installData(riotData);
     const summaries = registry.maps();
     expect(summaries.length).toBeGreaterThan(0);
     for (const summary of summaries) {

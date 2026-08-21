@@ -4,21 +4,32 @@ import { join } from 'node:path';
 
 const SRC = join(__dirname, '../../src');
 
-/** The adapter is the one file allowed to read the old roster. */
-const ALLOWED = new Set(['content/bundledPack.ts', 'game/config/spellCatalog.ts']);
+/**
+ * `content/install.ts` alone — the one place core's own generated spell
+ * (`BasicAttack`) is folded onto the installed pack.
+ *
+ * Batch 4 task 7 deleted the other adapter, `content/bundledPack.ts`, and
+ * with it `CHAMPION_KITS` — the roster this scan used to also guard against
+ * a stray read of. That third rule is gone too, deliberately, rather than
+ * left pointed at a symbol that no longer exists (a scan whose needle names
+ * a deleted symbol is a scan that passes on every file forever, proving
+ * nothing): the roster now lives under `packs/riot/data.ts`, real pack
+ * content, and `tests/content/corePacksBoundary.test.ts` already refuses
+ * *any* core file outside `content/install.ts` a reach into `packs/` at
+ * all — a second, narrower scan aimed at the exact same risk would be
+ * redundant, not an extra layer. What is left here is the risk that scan
+ * cannot see: core's *own* generated barrel (`src/generated/spellCatalog.ts`,
+ * `spellModules.ts` — a `src/` path, not a `packs/` one) read as a shortcut
+ * around the registry, bypassing qualification and every other installed
+ * pack.
+ */
+const ALLOWED = new Set(['content/install.ts']);
 
 /**
- * Import specifiers, not bare words.
- *
- * `CHAMPION_KITS` appears in `src/game/config/spellCatalog.ts` because that is
- * where it is *declared*; the rule is about who reads it from elsewhere, so
- * the needle is the import, not the identifier.
+ * Import specifiers, not bare words. Both are core's own generated barrels —
+ * see `ALLOWED`'s own doc comment for what reading them directly bypasses.
  */
-const BANNED = [
-  /from\s+'@\/generated\/spellModules'/,
-  /from\s+'@\/generated\/spellCatalog'/,
-  /import\s*\{[^}]*\bCHAMPION_KITS\b[^}]*\}\s*from/,
-];
+const BANNED = [/from\s+'@\/generated\/spellModules'/, /from\s+'@\/generated\/spellCatalog'/];
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
@@ -33,24 +44,24 @@ function sourcesUnder(dir: string, base = dir): string[] {
   return out;
 }
 
-describe('the roster has exactly one source', () => {
+describe("core's own generated spell barrel has exactly one legitimate reader", () => {
   const files = sourcesUnder(SRC).filter(
     file => !ALLOWED.has(file.slice(SRC.length + 1).replace(/\\/g, '/'))
   );
 
   it('found sources to scan, or this proves nothing', () => {
-    // Not the current count (198, after batch 4 task 6 moved three files —
-    // `src/content/maps/summonersRift.ts`, `summonersRiftGeometry.ts` and
-    // `src/game/mapPresets.ts` — out of `src/` and into `packs/riot/maps/`):
-    // this whole programme keeps moving files out of `src/`, and pinning
-    // this near the present size would make a later batch's honest
-    // shrinkage look like this scan's own failure. 150 is comfortably below
-    // any plausible "core accidentally emptied out" reading while still
-    // refusing to pass against a scan that silently matched nothing.
+    // Not the current count: this whole programme keeps moving files out of
+    // `src/` (198 after batch 4 task 6, 199 after task 7 deleted
+    // `bundledPack.ts` but added nothing back), and pinning this near
+    // whatever the present size happens to be would make a later batch's
+    // honest shrinkage look like this scan's own failure. 150 is
+    // comfortably below any plausible "core accidentally emptied out"
+    // reading while still refusing to pass against a scan that silently
+    // matched nothing.
     expect(files.length).toBeGreaterThan(150);
   });
 
-  it.each(BANNED)('nothing outside the adapter reads %s', pattern => {
+  it.each(BANNED)('nothing outside install.ts reads %s', pattern => {
     const offenders: string[] = [];
     for (const file of files) {
       if (pattern.test(stripComments(readFileSync(file, 'utf8')))) {

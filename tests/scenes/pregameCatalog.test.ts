@@ -6,11 +6,16 @@ vi.mock('../../src/managers/AssetManager', () => ({
 
 import { getPregameCatalog, matchesQuery } from '../../src/scenes/setup/pregameCatalog';
 import {
-  CHAMPION_KITS,
   isSpellCatalogId,
   listSelectableChampions,
   spellDisplayOf,
 } from '../../src/game/config/spellCatalog';
+// The riot pack's own roster, moved out of `CHAMPION_KITS`
+// (`src/game/config/spellCatalog.ts`) and into `packs/riot/data.ts` — batch
+// 4 task 7. Used below only as an independent source to compare the
+// registry-backed catalogue's order/membership against, the same role
+// `CHAMPION_KITS` played here before the move.
+import { data as riotData } from '../../packs/riot/pack';
 
 /**
  * The roster's order, and the two shelves that are not a champion.
@@ -41,8 +46,8 @@ describe('the roster pins the two non-champion shelves and sorts the rest', () =
     expect(firstChampionAt).toBe(pinned.length);
   });
 
-  it('keeps them in CHAMPION_KITS order rather than sorting them too', () => {
-    const source = CHAMPION_KITS.map(group => group.name);
+  it("keeps them in the roster's own order rather than sorting them too", () => {
+    const source = (riotData.champions ?? []).map(champion => champion.name);
     const pinnedNames = pinned.map(shelf => shelf.name);
     const bySource = [...pinnedNames].sort((a, b) => source.indexOf(a) - source.indexOf(b));
     expect(pinnedNames).toEqual(bySource);
@@ -53,13 +58,13 @@ describe('the roster pins the two non-champion shelves and sorts the rest', () =
     expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
   });
 
-  it('really did reorder — the champions are not still in CHAMPION_KITS order', () => {
+  it("really did reorder — the champions are not still in the roster's own order", () => {
     // Without this the sort assertion above passes on an accident: a source
     // list that happened to be alphabetical would satisfy it having done
-    // nothing. `CHAMPION_KITS` starts Yasuo, Shaco, Ahri, so it is not.
-    const source = CHAMPION_KITS.filter(group => group.spells.length === 4).map(
-      group => group.name
-    );
+    // nothing. The roster starts Yasuo, Shaco, Ahri, so it is not.
+    const source = (riotData.champions ?? [])
+      .filter(champion => champion.spells.length === 4)
+      .map(champion => champion.name);
     expect(champions.map(shelf => shelf.name)).not.toEqual(source);
   });
 });
@@ -139,8 +144,11 @@ describe('searching the roster by name', () => {
 });
 
 /**
- * The roster now reads the pack registry (`contentRegistry()`) instead of
- * `CHAMPION_KITS` directly — Task 7 of the content-pack-extraction plan.
+ * The roster now reads the pack registry (`contentRegistry()`) instead of a
+ * module-scope constant — `packs/riot/data.ts`'s own roster (`CHAMPION_KITS`,
+ * as it used to be called here) is not that constant either, since Task 7 of
+ * the content-pack-extraction plan; it is real pack content, read the same
+ * way the reference pack's is.
  */
 describe('the roster reads the pack registry', () => {
   // Vera (`reference:vera`) now has a portrait and `playable: true` — Task 10.
@@ -149,13 +157,15 @@ describe('the roster reads the pack registry', () => {
     expect(names).toContain('Vera');
   });
 
-  // `arrayContaining`, not exact equality: `CHAMPION_KITS` is only the
-  // bundled pack's own static data, so it never gained Vera and never will —
-  // the guarantee this test makes is that packs add to the roster, they
-  // don't remove from it.
+  // `arrayContaining`, not exact equality: the riot pack's own roster is
+  // only its static data, so it never gained Vera and never will — the
+  // guarantee this test makes is that packs add to the roster, they don't
+  // remove from it.
   it('still offers every champion it offered before packs', () => {
     const names = getPregameCatalog().champions.map(c => c.name);
-    const before = CHAMPION_KITS.filter(k => k.image && k.spells.length === 4).map(k => k.name);
+    const before = (riotData.champions ?? [])
+      .filter(champion => champion.image && champion.spells.length === 4)
+      .map(champion => champion.name);
     expect(before.length).toBeGreaterThan(20);
     expect(names).toEqual(expect.arrayContaining(before));
   });

@@ -13,15 +13,15 @@ Math.hypot = fastHypot;
  * manifest knows — only a *registered* pack manifest does
  * (`registerPackAssets`, resolved by `AssetManager.resolveDescriptor`'s
  * install-order fallback). In the real app that registration is a side
- * effect of importing `src/content/bundledPack.ts`; a great many spell
+ * effect of importing `src/content/install.ts`; a great many spell
  * tests construct a real spell class straight from `buildContentApi()` and
  * a pack factory (`makeFlash(buildContentApi())`, `stacks.test.ts` and
- * others) without ever touching `bundledPack.ts` or `contentRegistry()`, so
+ * others) without ever touching `install.ts` or `contentRegistry()`, so
  * without this every one of those constructors threw "Unknown asset key"
  * the moment its `image = api.asset('spell_x')` field initializer ran.
  * One registration here, in the file every test file's environment already
  * runs before its own top-level code, covers every one of them — the same
- * shape `bundledPack.ts`'s own registration takes, just run once for the
+ * shape `install.ts`'s own registration takes, just run once for the
  * whole suite instead of once per pack install.
  *
  * `?.` because dozens of test files `vi.mock('.../AssetManager', ...)` with
