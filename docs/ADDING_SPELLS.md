@@ -2,6 +2,59 @@
 
 Use the typed spell runtime for new abilities. Existing spells may still use the legacy `cast()`/`onSpellCast()` bridge, but new code should describe its lifecycle in `castSpec` and implement only the relevant hooks.
 
+## A spell file is a factory, not a class
+
+`packs/riot/spells/` is a content pack, and a pack may not import
+`Spell`/`SpellObject`/a buff/anything else out of core as a *value* —
+`tests/content/packBoundary.test.ts` fails the build over it. Every spell
+file's default export is instead a function that **receives** `api:
+ContentApi` and returns the class:
+
+```ts
+import type { ContentApi } from '@/content/ContentApi';
+
+export default function makeMySpell(api: ContentApi) {
+  return class MySpell extends api.Spell {
+    image = api.asset('spell_champion_slot');
+    // ...
+  };
+}
+```
+
+`api` is where everything used to be a top-level import now lives:
+`api.Spell`/`api.SpellObject`/`api.MissileSpellObject`, `api.buffs.Slow`,
+`api.combat.Reach.effectiveRange`, `api.asset(key)` in place of
+`AssetManager.get(key)`, and so on — see `packs/riot/spells/_EmptyExample.ts`
+for the full surface and `packs/reference/spells/Vera_Q.ts` for a second,
+independent worked example.
+
+**Every factory must be memoized.** A bare `return class ...` is a new class
+object on every call, so the real game's `spellRegistry.ts` resolving a spell
+and a test building its own copy of the same spell get two different,
+`instanceof`-incompatible classes with the same name — a failure with nothing
+visible to explain it. The shape (copy it exactly, do not simplify it away):
+
+```ts
+function __buildMySpell(api: ContentApi) {
+  return class MySpell extends api.Spell {
+    /* ... */
+  };
+}
+const __cacheMySpell = new WeakMap<ContentApi, ReturnType<typeof __buildMySpell>>();
+export default function makeMySpell(api: ContentApi) {
+  const cached = __cacheMySpell.get(api);
+  if (cached) return cached;
+  const built = __buildMySpell(api);
+  __cacheMySpell.set(api, built);
+  return built;
+}
+```
+
+A spell object or buff a test needs to construct directly gets its own named,
+equally memoized export (`export function makeMySpell_Object(api) { ... }`),
+called from inside the main factory the same way `packs/reference/spells/Vera_Q.ts`'s
+`makeVeraQObject` is.
+
 ## Start here
 
 ```sh
@@ -10,8 +63,9 @@ npm run spell:new -- --champion Jhin --slot R --activation RECAST --recasts 4
 
 It writes the spell and a test already driven through `press()`, performs both
 registrations, and builds the `castSpec` out of constants — which is the shape
-that several of the traps below exist because somebody got wrong by hand. Use
-it even if you rewrite everything inside it.
+that several of the traps below exist because somebody got wrong by hand. It
+already generates the memoized factory shape above. Use it even if you rewrite
+everything inside it.
 
 ### Write the script before the code
 
@@ -84,7 +138,7 @@ Read the checked-in record under `docs/abilities/<champion>/`. Keep English Wiki
 
 Image provenance currently records the source URL, source revision, fetch time, and content hash. The Wiki image API response used by the importer does not provide rights or license fields, so do not infer or add a license; record one only when the upstream API supplies it directly.
 
-Export the spell from `src/game/gameObject/spells/index.ts` and add it to its champion group in `src/game/preset.ts`.
+Export the spell from `packs/riot/spells/index.ts` and add its id string to the champion's `spells: [...]` entry in `CHAMPION_KITS` (`src/game/config/spellCatalog.ts`) — `preset.ts` stopped being where a champion's kit lives before this move; see that file's own "Stage 4" header comment.
 
 ## 2. Choose activation and targeting
 
@@ -137,13 +191,18 @@ gets `castSpec` from `Spell`'s own default, which now **requires** a
 `targetingMode` field — it throws instead of guessing:
 
 ```ts
-export default class MySpell extends Spell {
-  coolDown = 5000;
-  targetingMode = 'POINT' as const; // 'as const', not `: TargetingMode`, so
-                                     // TS narrows the literal without an import
-  onSpellCast() { /* ... */ }
+export default function makeMySpell(api: ContentApi) {
+  return class MySpell extends api.Spell {
+    coolDown = 5000;
+    targetingMode = 'POINT' as const; // 'as const', not `: TargetingMode`, so
+                                       // TS narrows the literal without an import
+    onSpellCast() { /* ... */ }
+  };
 }
 ```
+
+(Elided here for focus — a real file also needs the memoized wrapper shown
+above.)
 
 There used to be no such field, and the default was a silent `'DIRECTION'` for
 every legacy spell — the one mode that discards a drag's distance, so on touch
@@ -276,7 +335,7 @@ Add optional `vfx` and `sfx` factories to `castSpec` for `castStart`, `castLoop`
 
 Looping effects are disposed by lifecycle transitions. Any spell-owned object or listener still needs idempotent cleanup in `onCancel`, `onComplete`, `deactivate`, and `onRemoved` as applicable.
 
-`CastBar`, `CastTelegraph`, `BeamRenderer`, `SpriteEffect`, `ParticleEmitter` and `ImpactEffect` all live in `src/game/vfx/` and are reachable **only through `castSpec.vfx`** — they take a `Vec2` and are driven by `SpellVfx`, not by the object manager. A legacy `onSpellCast` spell cannot use them; its tool is `PredefinedParticleSystems` from `src/game/gameObject/helpers/ParticleSystem.ts`, added to the world with `objectManager.addObject`. Reach for the right one for the path you are on rather than assuming the guideline's name exists in your file's world.
+`CastBar`, `CastTelegraph`, `BeamRenderer`, `SpriteEffect`, `ParticleEmitter` and `ImpactEffect` all live in `src/game/vfx/` and are reachable **only through `castSpec.vfx`** — they take a `Vec2` and are driven by `SpellVfx`, not by the object manager. A legacy `onSpellCast` spell cannot use them; its tool is `api.helpers.PredefinedParticleSystems`, added to the world with `objectManager.addObject`. Reach for the right one for the path you are on rather than assuming the guideline's name exists in your file's world.
 
 ### An effect that paints past its own centre owes the quadtree a box
 
@@ -339,14 +398,18 @@ assignment.
 
 ## 6. Use typed assets
 
-After adding an image, run `npm run assets:generate` and use its generated key:
+After adding an image, run `npm run assets:generate` and use its generated key
+through `api.asset`, never `AssetManager` directly — a pack may not import
+`AssetManager` at all (`packBoundary.test.ts`), which is also why
+`AssetManager.ensure`/`.ensureMany`/`.placeholder` have no equivalent on
+`ContentApi`: preloading a match's art is core's job
+(`GameScene.startGame`/`ensurePackAsset`), not a spell file's.
 
 ```ts
-const icon = AssetManager.get('spell_janna_q');
-await AssetManager.ensure('spell_janna_q');
+image = api.asset('spell_janna_q');
 ```
 
-Use `AssetManager.ensureMany` for a visible batch. If art is intentionally absent, use `AssetManager.placeholder('Pantheon background')`. Never invent a key or use the deprecated `getAsset(string)` bridge in new code.
+Never invent a key or use the deprecated `getAsset(string)` bridge in new code.
 
 ## 7. Test the public commands
 
@@ -443,11 +506,11 @@ exactly a no-op while both bodies are default-sized:
 ```ts
 // a query keeps its implicit collideWith filter, which already tests the
 // target's own body circle — so it takes the caster term alone
-area: new Circle({ x: owner.position.x, y: owner.position.y,
-                   r: effectiveRange(this.range, this.owner) })
+area: new api.utils.Quadtree.Circle({ x: owner.position.x, y: owner.position.y,
+                   r: api.combat.Reach.effectiveRange(this.range, this.owner) })
 
 // a hand-rolled distance test has no target term at all, so it takes both
-withinRange(this.range, this.owner, target)
+api.combat.Reach.withinRange(this.range, this.owner, target)
 ```
 
 Handing both ends to a query that already collides would count the target
@@ -470,13 +533,15 @@ An ability that triggers off basic attacks (Teemo's Toxic Shot, lifesteal, an at
 
 ```ts
 this.stopWatching = this.game.eventManager.on(
-  EventType.ON_ATTACK_HIT,
+  api.enums.EventType.ON_ATTACK_HIT,
   ({ attacker, victim, damage }: BasicAttackHit) => {
     if (attacker !== this.owner) return;
     victim.takeDamage(damage * 0.5, this.owner);
   }
 );
 ```
+
+(`BasicAttackHit` is a type, imported from `@/content/types` like `CastContext`.)
 
 Filter on `attacker === this.owner`: the event is global. Unsubscribe in `onCancel`, `onComplete`, `deactivate` and `onRemoved`, like every other listener a spell owns.
 

@@ -32,10 +32,18 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SPELLS_DIR = join(ROOT, 'src/game/gameObject/spells');
+// Batch 4 task 3 moved the spells into the riot pack — a pack spell is a
+// factory now (`(api: ContentApi) => SpellClass`), never a plain class
+// value-importing core; see docs/ADDING_SPELLS.md and
+// packs/riot/spells/_EmptyExample.ts for the shape this script generates.
+const SPELLS_DIR = join(ROOT, 'packs/riot/spells');
 const TESTS_DIR = join(ROOT, 'tests/game/spells');
 const INDEX_FILE = join(SPELLS_DIR, 'index.ts');
-const PRESET_FILE = join(ROOT, 'src/game/preset.ts');
+// `preset.ts` stopped being where a champion's kit lives before batch 4 —
+// see that file's own "Stage 4" header comment — CHAMPION_KITS in
+// config/spellCatalog.ts is the real roster now, keyed by bare spell id
+// string rather than an `AllSpells.X` class reference.
+const CATALOG_FILE = join(ROOT, 'src/game/config/spellCatalog.ts');
 const VI_NAMES_FILE = join(ROOT, 'docs/spell-names-vi.json');
 
 const SLOTS = ['Q', 'W', 'E', 'R'];
@@ -103,16 +111,13 @@ const isUnit = targeting === 'UNIT';
 const isCharge = activation === 'HOLD_RELEASE' || activation === 'TAP_OR_HOLD';
 const isRecast = activation === 'RECAST' || activation === 'TOGGLE';
 
+// A pack spell imports `ContentApi` as a type only and reaches everything
+// else — base classes, buffs, combat helpers — off the `api` argument its
+// factory receives. `packBoundary.test.ts` enforces this: a pack file
+// importing `Spell`/`AttackableUnit`/etc. as a *value* fails the build.
 const imports = [
-  `import AssetManager from '@/managers/AssetManager';`,
-  `import { effectiveRange${isUnit ? ', withinRange' : ''} } from '@/game/combat/Reach';`,
-  isUnit ? `import { canSee } from '@/game/combat/Vision';` : null,
-  isUnit ? `import TargetResolver from '@/game/spell/targeting/TargetResolver';` : null,
-  isUnit ? `import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';` : null,
-  `import type { CastContext, CastSpec } from '@/game/spell/runtime/types';`,
-  `import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';`,
-  `import Spell from '@/game/gameObject/Spell';`,
-  `import SpellObject from '@/game/gameObject/SpellObject';`,
+  `import type { ContentApi } from '@/content/ContentApi';`,
+  `import type { CastContext, CastSpec${isUnit ? ', TargetingRequest' : ''} } from '@/content/types';`,
 ]
   .filter(Boolean)
   .join('\n');
@@ -166,7 +171,7 @@ const targetingRequestBlock = isUnit
   press(context: CastContext): boolean {
     if (context.target !== undefined) return super.press(context);
 
-    const result = TargetResolver.resolve('UNIT', {
+    const result = api.combat.TargetResolver.resolve('UNIT', {
       ...context,
       casterTeamId: this.owner.teamId,
       ...this.targetingRequest,
@@ -187,17 +192,25 @@ const unitGuard = isUnit
       is${slug}Target(target) &&
       target !== this.owner &&
       target.teamId !== this.owner.teamId &&
-      canSee(this.owner, target) &&
-      withinRange(this.range, this.owner, target)
+      api.combat.Vision.canSee(this.owner, target) &&
+      api.combat.Reach.withinRange(this.range, this.owner, target)
     );
   }
 `
   : '';
 
-const unitPredicate = isUnit
+// A local closure inside the class factory, not a separate top-level export:
+// it needs api.units.AttackableUnit as a value (instanceof), and this
+// scaffold has no other caller for it yet — promote it to its own
+// exported, memoized factory (see the pattern below) the moment a second
+// file wants it.
+const unitPredicateLocal = isUnit
   ? `
-const is${slug}Target = (target: unknown): target is AttackableUnit =>
-  target instanceof AttackableUnit && target.targetable && !target.toRemove && !target.isDead;
+  const is${slug}Target = (target: unknown): target is AttackableUnit =>
+    target instanceof api.units.AttackableUnit &&
+    target.targetable &&
+    !target.toRemove &&
+    !target.isDead;
 `
   : '';
 
@@ -284,7 +297,7 @@ const fireBody =
     );`
       : `
     const direction = this.firingDirection(context);
-    const reach = effectiveRange(this.range, this.owner);
+    const reach = api.combat.Reach.effectiveRange(this.range, this.owner);
     const toX = this.owner.position.x + direction.x * reach;
     const toY = this.owner.position.y + direction.y * reach;
 
@@ -303,6 +316,10 @@ const stateFields = [
   .join('\n');
 
 const spellSource = `${imports}
+
+// A pack spell needs an instance type for a core class it never imports as a
+// value — see docs/ADDING_SPELLS.md's "the factory shape" section.
+type AttackableUnit = InstanceType<ContentApi['units']['AttackableUnit']>;
 
 // Tuning lives here as exported constants so a test imports them rather than
 // hard-coding a number — retuning must never mean editing a test.
@@ -325,8 +342,19 @@ export const ${CONST('MAX_CHARGE_MS')} = 1_000;`
     : ''
 }
 
-export default class ${slug} extends Spell {
-  image = AssetManager.get('spell_${classPrefix.toLowerCase()}_${slot.toLowerCase()}');
+/**
+ * Every pack spell factory is memoized: a bare \`return class ...\` here would
+ * hand two independent callers (the real game's \`spellRegistry.ts\`, an e2e
+ * script or a test building its own comparison value) two different,
+ * \`instanceof\`-incompatible classes with the same name. Copy this shape
+ * exactly — see \`packs/riot/spells/_EmptyExample.ts\`'s header for the full
+ * reasoning. Do not "simplify" it back to a bare \`return class ...\`.
+ */
+function __build${slug}(api: ContentApi) {${unitPredicateLocal}
+  const ${slug}_Object = make${slug}_Object(api);
+
+  return class ${slug} extends api.Spell {
+  image = api.asset('spell_${classPrefix.toLowerCase()}_${slot.toLowerCase()}');
   name = '${viName} (${slug})';
   description = \`TODO: describe what the player sees, with damage scaled to a ~100 health pool.\`;
   coolDown = 8_000;
@@ -353,16 +381,26 @@ ${stateFields ? `\n${stateFields}\n` : ''}
   }
 ${targetingRequestBlock}${hooks}${fireBody}${unitGuard}
   drawPreview(): void {
-    super.drawPreview(effectiveRange(this.range, this.owner));
+    super.drawPreview(api.combat.Reach.effectiveRange(this.range, this.owner));
   }
+  };
 }
-${unitPredicate}
+const __cache${slug} = new WeakMap<ContentApi, ReturnType<typeof __build${slug}>>();
+export default function make${slug}(api: ContentApi) {
+  const cached = __cache${slug}.get(api);
+  if (cached) return cached;
+  const built = __build${slug}(api);
+  __cache${slug}.set(api, built);
+  return built;
+}
+
 /**
  * TODO: the effect's own artwork. Read \`docs/VFX_STANDARD.md\` — a real windup,
  * the hit radius drawn at the radius the damage actually uses, the impact landed
  * on the victim, and as few layers as say it.
  */
-export class ${slug}_Object extends SpellObject {
+function __build${slug}_Object(api: ContentApi) {
+  return class ${slug}_Object extends api.SpellObject {
   lifeTime = 400;
   age = 0;
   radius = 60;
@@ -399,6 +437,15 @@ export class ${slug}_Object extends SpellObject {
   getDisplayBoundingBox() {
     return this.squareDisplayBoundingBox((this.radius + 24) * 2);
   }
+  };
+}
+const __cache${slug}_Object = new WeakMap<ContentApi, ReturnType<typeof __build${slug}_Object>>();
+export function make${slug}_Object(api: ContentApi) {
+  const cached = __cache${slug}_Object.get(api);
+  if (cached) return cached;
+  const built = __build${slug}_Object(api);
+  __cache${slug}_Object.set(api, built);
+  return built;
 }
 `;
 
@@ -419,7 +466,11 @@ vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
 
-import ${slug}, { ${CONST('DAMAGE')} } from '../../../src/game/gameObject/spells/${slug}';
+// Every pack spell's default export is a factory now (\`(api: ContentApi) =>
+// SpellClass\`) — resolved once against the same cached ContentApi singleton
+// the real game builds against.
+import { buildContentApi } from '../../../src/content/ContentApi';
+import make${slug}, { ${CONST('DAMAGE')} } from '../../../packs/riot/spells/${slug}';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -429,6 +480,9 @@ import {
   pressSpell,
   type TestGame,
 } from '../spell/fixtures';
+
+const api = buildContentApi();
+const ${slug} = make${slug}(api);
 
 /**
  * Write the player-visible script first and make these the test names:
@@ -541,27 +595,37 @@ function registerInBarrel() {
   return 'exported from spells/index.ts';
 }
 
-function registerInPreset() {
-  const source = readFileSync(PRESET_FILE, 'utf8');
-  if (new RegExp(`AllSpells\\.${slug}\\b`).test(source)) return 'already in preset';
+/**
+ * A champion's kit lives in \`CHAMPION_KITS\` (\`config/spellCatalog.ts\`) now,
+ * not \`preset.ts\` — that changed before batch 4, see \`preset.ts\`'s own
+ * "Stage 4" header comment. \`spells: [...]\` there holds bare id strings
+ * (\`'Ahri_Q'\`), not \`AllSpells.Ahri_Q\` class references.
+ */
+function registerInChampionKit() {
+  const source = readFileSync(CATALOG_FILE, 'utf8');
+  if (new RegExp(`spells:\\s*\\[[^\\]]*'${slug}'`).test(source)) {
+    return 'already in CHAMPION_KITS';
+  }
 
   const block = new RegExp(
-    `(name: '${champion.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}',[\\s\\S]*?spells: \\[)([^\\]]*)(\\])`
+    `(name: '${champion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}',[\s\S]*?spells: \[)([^\]]*)(\])`
   );
   const found = source.match(block);
   if (!found) {
-    return `no '${champion}' entry in preset.ts — add one with \`AllSpells.${slug}\` by hand`;
+    return `no '${champion}' entry in CHAMPION_KITS — add '${slug}' to its spells: [] by hand`;
   }
 
   const existing = found[2]
     .split(',')
     .map(entry => entry.trim())
     .filter(Boolean);
-  existing.push(`AllSpells.${slug}`);
-  existing.sort((a, b) => SLOTS.indexOf(a.slice(-1)) - SLOTS.indexOf(b.slice(-1)));
+  existing.push(`'${slug}'`);
+  // Each entry is a quoted id ('Ahri_Q') — the slot letter is the character
+  // before the closing quote, not the last character of the entry.
+  existing.sort((a, b) => SLOTS.indexOf(a.slice(-2, -1)) - SLOTS.indexOf(b.slice(-2, -1)));
 
-  writeFileSync(PRESET_FILE, source.replace(block, `$1${existing.join(', ')}$3`));
-  return "added to the champion's preset";
+  writeFileSync(CATALOG_FILE, source.replace(block, `$1${existing.join(', ')}$3`));
+  return "added to the champion's CHAMPION_KITS entry";
 }
 
 // ─── write ────────────────────────────────────────────────────────────────────
@@ -571,15 +635,15 @@ const testExisted = existsSync(testFile);
 if (!testExisted) writeFileSync(testFile, testSource);
 
 const barrel = registerInBarrel();
-const preset = registerInPreset();
+const kit = registerInChampionKit();
 
 console.log(`
   ${slug} — ${activation} / ${targeting}${recasts > 1 ? ` / ${recasts} recasts` : ''}
 
-    spell    src/game/gameObject/spells/${slug}.ts
+    spell    packs/riot/spells/${slug}.ts
     test     ${testExisted ? `tests/game/spells/${slug}.test.ts (kept — already existed)` : `tests/game/spells/${slug}.test.ts`}
     barrel   ${barrel}
-    preset   ${preset}
+    kit      ${kit}
 
   Next, in this order:
 
