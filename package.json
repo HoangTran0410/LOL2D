@@ -43,7 +43,8 @@
     "e2e:bots": "node tests/e2e/drive-bot-discipline.mjs",
     "e2e:render": "node tests/e2e/verify-render-guard.mjs",
     "e2e:pack": "node tests/e2e/verify-pack-champion.mjs",
-    "e2e:map-picker": "node tests/e2e/verify-map-picker.mjs"
+    "e2e:map-picker": "node tests/e2e/verify-map-picker.mjs",
+    "e2e:chunk-cascade": "node scripts/measure-chunk-cascade.mjs"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",
