@@ -3,17 +3,15 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Nocturne_Q, {
-  DUSK_GRACE_MS,
-  Nocturne_Dusk,
-  Nocturne_Q_Object,
-  Nocturne_Q_Trail,
-  SPEED_PERCENT,
-  TRAIL_MS,
-  TRAIL_RADIUS,
-} from '../../../src/game/gameObject/spells/Nocturne_Q';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DUSK_GRACE_MS, SPEED_PERCENT, TRAIL_MS, TRAIL_RADIUS } from '../../../packs/riot/spells/Nocturne_Q';
+import makeNocturne_Q, { makeNocturne_Dusk, makeNocturne_Q_Object, makeNocturne_Q_Trail } from '../../../packs/riot/spells/Nocturne_Q';
+const __api = buildContentApi();
+const Nocturne_Q = makeNocturne_Q(__api);
+const Nocturne_Dusk = makeNocturne_Dusk(__api);
+const Nocturne_Q_Object = makeNocturne_Q_Object(__api);
+const Nocturne_Q_Trail = makeNocturne_Q_Trail(__api);
 
 installSpellObjectGlobals();
 

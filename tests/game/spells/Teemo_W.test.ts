@@ -3,16 +3,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Teemo_W, {
-  DURATION_MS,
-  MANA_COST,
-  SPEED_PERCENT,
-  Teemo_W_Burst,
-} from '../../../src/game/gameObject/spells/Teemo_W';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
-import teemoWSource from '../../../src/game/gameObject/spells/Teemo_W.ts?raw';
+import teemoWSource from '../../../packs/riot/spells/Teemo_W.ts?raw';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DURATION_MS, MANA_COST, SPEED_PERCENT } from '../../../packs/riot/spells/Teemo_W';
+import makeTeemo_W, { makeTeemo_W_Burst } from '../../../packs/riot/spells/Teemo_W';
+const __api = buildContentApi();
+const Teemo_W = makeTeemo_W(__api);
+const Teemo_W_Burst = makeTeemo_W_Burst(__api);
 
 class TestVector {
   constructor(

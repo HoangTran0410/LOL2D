@@ -3,20 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Vayne_Q, { VAYNE_Q_BONUS } from '../../../src/game/gameObject/spells/Vayne_Q';
-import Vayne_W, { VAYNE_W_PROC, VAYNE_W_STACKS } from '../../../src/game/gameObject/spells/Vayne_W';
-import Vayne_E, {
-  VAYNE_E_DAMAGE,
-  VAYNE_E_PUSH,
-  VAYNE_E_STUN_MS,
-  VAYNE_E_WALL_BONUS,
-  Vayne_E_Object,
-} from '../../../src/game/gameObject/spells/Vayne_E';
-import Vayne_R, {
-  VAYNE_R_DURATION_MS,
-  VAYNE_R_Q_CDR,
-} from '../../../src/game/gameObject/spells/Vayne_R';
 import EventType from '../../../src/game/enums/EventType';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
@@ -29,6 +15,21 @@ import {
   withWalls,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { VAYNE_Q_BONUS } from '../../../packs/riot/spells/Vayne_Q';
+import makeVayne_Q from '../../../packs/riot/spells/Vayne_Q';
+import { VAYNE_W_PROC, VAYNE_W_STACKS } from '../../../packs/riot/spells/Vayne_W';
+import makeVayne_W from '../../../packs/riot/spells/Vayne_W';
+import { VAYNE_E_DAMAGE, VAYNE_E_PUSH, VAYNE_E_STUN_MS, VAYNE_E_WALL_BONUS } from '../../../packs/riot/spells/Vayne_E';
+import makeVayne_E, { makeVayne_E_Object } from '../../../packs/riot/spells/Vayne_E';
+import { VAYNE_R_DURATION_MS, VAYNE_R_Q_CDR } from '../../../packs/riot/spells/Vayne_R';
+import makeVayne_R from '../../../packs/riot/spells/Vayne_R';
+const __api = buildContentApi();
+const Vayne_Q = makeVayne_Q(__api);
+const Vayne_W = makeVayne_W(__api);
+const Vayne_E = makeVayne_E(__api);
+const Vayne_E_Object = makeVayne_E_Object(__api);
+const Vayne_R = makeVayne_R(__api);
 
 /**
  * The pool every unit here starts from. Written by the test, so every expected

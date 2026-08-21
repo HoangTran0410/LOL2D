@@ -3,21 +3,20 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Thresh_E, {
-  HALF_LENGTH,
-  HALF_WIDTH,
-  SWEEP_DISTANCE,
-  Thresh_E_Object,
-} from '../../../src/game/gameObject/spells/Thresh_E';
-import Thresh_W, {
-  RADIUS,
-  Thresh_W_Lantern_Throw,
-  Thresh_W_Object,
-} from '../../../src/game/gameObject/spells/Thresh_W';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { HALF_LENGTH, HALF_WIDTH, SWEEP_DISTANCE } from '../../../packs/riot/spells/Thresh_E';
+import makeThresh_E, { makeThresh_E_Object } from '../../../packs/riot/spells/Thresh_E';
+import { RADIUS } from '../../../packs/riot/spells/Thresh_W';
+import makeThresh_W, { makeThresh_W_Lantern_Throw, makeThresh_W_Object } from '../../../packs/riot/spells/Thresh_W';
+const __api = buildContentApi();
+const Thresh_E = makeThresh_E(__api);
+const Thresh_E_Object = makeThresh_E_Object(__api);
+const Thresh_W = makeThresh_W(__api);
+const Thresh_W_Lantern_Throw = makeThresh_W_Lantern_Throw(__api);
+const Thresh_W_Object = makeThresh_W_Object(__api);
 
 installSpellObjectGlobals();
 

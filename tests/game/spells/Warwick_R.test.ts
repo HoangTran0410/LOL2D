@@ -11,8 +11,12 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Warwick_R, { RANGE } from '../../../src/game/gameObject/spells/Warwick_R';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { RANGE } from '../../../packs/riot/spells/Warwick_R';
+import makeWarwick_R from '../../../packs/riot/spells/Warwick_R';
+const __api = buildContentApi();
+const Warwick_R = makeWarwick_R(__api);
 
 let game: TestGame;
 

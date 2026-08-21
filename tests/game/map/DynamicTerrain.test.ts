@@ -17,13 +17,19 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import { Anivia_W_Object } from '../../../src/game/gameObject/spells/Anivia_W';
-import { JarvanIV_R_WallObject } from '../../../src/game/gameObject/spells/JarvanIV_R';
-import Camille_E, { Camille_E_GrappleObject } from '../../../src/game/gameObject/spells/Camille_E';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import { pointInWall, wallOutlinesInArea } from '../../../src/game/gameObject/map/DynamicTerrain';
 import { Rectangle } from '../../../src/libs/quadtree';
 import { createGame, indexObjects, stubGameGlobals, withWalls, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeAnivia_W_Object } from '../../../packs/riot/spells/Anivia_W';
+import { makeJarvanIV_R_WallObject } from '../../../packs/riot/spells/JarvanIV_R';
+import makeCamille_E, { makeCamille_E_GrappleObject } from '../../../packs/riot/spells/Camille_E';
+const __api = buildContentApi();
+const Anivia_W_Object = makeAnivia_W_Object(__api);
+const JarvanIV_R_WallObject = makeJarvanIV_R_WallObject(__api);
+const Camille_E = makeCamille_E(__api);
+const Camille_E_GrappleObject = makeCamille_E_GrappleObject(__api);
 
 let game: TestGame;
 
@@ -182,7 +188,7 @@ describe('Camille E hooks spell-made walls', () => {
 
 describe('every terrain-reading spell reads both kinds', () => {
   it('no spell asks TerrainMap for walls on its own', () => {
-    const dir = join(process.cwd(), 'src/game/gameObject/spells');
+    const dir = join(process.cwd(), 'packs/riot/spells');
     const offenders: string[] = [];
 
     for (const name of readdirSync(dir)) {

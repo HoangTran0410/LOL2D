@@ -26,12 +26,14 @@ vi.mock('../../src/managers/AssetManager', () => ({
     placeholder: vi.fn(() => ({ url: 'x' })),
   },
 }));
-
-import * as AllSpells from '../../src/game/gameObject/spells/index';
 import * as CoreSpells from '../../src/game/gameObject/coreSpells/index';
+import * as AllSpellFactories from '../../packs/riot/spells/index';
+import { buildContentApi } from '../../src/content/ContentApi';
 import { DEFAULT_CHAMPION_ATTACK } from '../../src/game/gameObject/attackableUnits/Champion';
-import { spellModules } from '../../src/generated/spellModules';
-import { spellCatalog } from '../../src/generated/spellCatalog';
+import { spellModules as coreSpellModules } from '../../src/generated/spellModules';
+import { spellCatalog as coreSpellCatalog } from '../../src/generated/spellCatalog';
+import { spellModules as riotSpellModules } from '../../packs/riot/generated/spellModules';
+import { spellCatalog as riotSpellCatalog } from '../../packs/riot/generated/spellCatalog';
 import {
   allSpellIds,
   isSpellId,
@@ -61,10 +63,26 @@ import {
   type ChampionLoadout,
 } from '../../src/game/config/PregameConfig';
 
+
+// Every pack spell's `default` export is now `(api: ContentApi) => SpellClass`
+// (batch 4 task 3) — resolved once so `AllSpells.X` stays a plain class.
+const __api = buildContentApi();
+const AllSpells: Record<string, unknown> = Object.fromEntries(
+  Object.entries(AllSpellFactories).map(([id, factory]) => [
+    id,
+    typeof factory === 'function' ? (factory as (api: typeof __api) => unknown)(__api) : factory,
+  ])
+);
+
 // The registry loads from two barrels now — `spells/` (content) and
 // `coreSpells/` (`BasicAttack`) — merged content-last exactly as
-// `scripts/generate-spell-catalog.mjs` merges them.
+// `scripts/generate-spell-catalog.mjs` merges them. The generated module map
+// and catalogue split across the same two trees now — core's own generated
+// files (`BasicAttack`) and the riot pack's (everything else) — merged the
+// same way.
 const AllSpellsById: Record<string, unknown> = { ...AllSpells, ...CoreSpells };
+const spellModules: Record<string, unknown> = { ...riotSpellModules, ...coreSpellModules };
+const spellCatalog: Record<string, unknown> = { ...riotSpellCatalog, ...coreSpellCatalog };
 
 const barrelKeys = Object.keys(AllSpellsById).filter(
   key => typeof AllSpellsById[key] === 'function'

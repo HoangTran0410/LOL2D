@@ -8,17 +8,29 @@ import Pet, {
   PET_LEASH_RANGE,
   PET_SCAN_INTERVAL_MS,
 } from '../../../src/game/gameObject/attackableUnits/Pet';
-import Shaco_R from '../../../src/game/gameObject/spells/Shaco_R';
-import Shaco_W, { ARM_TIME_MS, Shaco_W_Box } from '../../../src/game/gameObject/spells/Shaco_W';
-import Jinx_E, {
-  CHOMPED_STACK_ID,
-  Jinx_E_Chomper,
-  LAND_TIME_MS,
-  ARM_TIME_MS as CHOMPER_ARM_MS,
-} from '../../../src/game/gameObject/spells/Jinx_E';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Annie_R from '../../../src/game/gameObject/spells/Annie_R';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeShaco_R from '../../../packs/riot/spells/Shaco_R';
+import { ARM_TIME_MS } from '../../../packs/riot/spells/Shaco_W';
+import makeShaco_W, { makeShaco_W_Box } from '../../../packs/riot/spells/Shaco_W';
+import { CHOMPED_STACK_ID, LAND_TIME_MS, ARM_TIME_MS as CHOMPER_ARM_MS } from '../../../packs/riot/spells/Jinx_E';
+import makeJinx_E, { makeJinx_E_Chomper } from '../../../packs/riot/spells/Jinx_E';
+import makeAnnie_R from '../../../packs/riot/spells/Annie_R';
+
+// Both classes are named as bare types below (`let box: Shaco_W_Box`) as well
+// as constructed — `const Shaco_W_Box = makeShaco_W_Box(__api)` only binds
+// the value, so the type needs its own alias off the factory's return type.
+type Shaco_W_Box = InstanceType<ReturnType<typeof makeShaco_W_Box>>;
+type Jinx_E_Chomper = InstanceType<ReturnType<typeof makeJinx_E_Chomper>>;
+
+const __api = buildContentApi();
+const Shaco_R = makeShaco_R(__api);
+const Shaco_W = makeShaco_W(__api);
+const Shaco_W_Box = makeShaco_W_Box(__api);
+const Jinx_E = makeJinx_E(__api);
+const Jinx_E_Chomper = makeJinx_E_Chomper(__api);
+const Annie_R = makeAnnie_R(__api);
 
 installSpellObjectGlobals();
 

@@ -1,6 +1,22 @@
-import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import * as CoreSpells from '../../../src/game/gameObject/coreSpells/index';
+import * as AllSpellFactories from '../../../packs/riot/spells/index';
+import { buildContentApi } from '../../../src/content/ContentApi';
 import { registerSpellForTests, resetSpellRegistryForTests } from '../../../src/game/spellRegistry';
+
+/**
+ * Every pack spell's `default` export is now `(api: ContentApi) => SpellClass`
+ * (batch 4 task 3), not the class itself — resolved once, here, against the
+ * same shared `buildContentApi()` singleton the real registry uses, so
+ * `AllSpells.Ahri_Q` etc. stay plain constructible classes for every caller
+ * below exactly like they were before the move.
+ */
+const __api = buildContentApi();
+const AllSpells: Record<string, unknown> = Object.fromEntries(
+  Object.entries(AllSpellFactories).map(([id, factory]) => [
+    id,
+    typeof factory === 'function' ? (factory as (api: typeof __api) => unknown)(__api) : factory,
+  ])
+);
 
 /**
  * Fill the spell registry, synchronously, for tests that need the whole

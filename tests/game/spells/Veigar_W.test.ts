@@ -3,18 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Veigar_W, {
-  DAMAGE,
-  IMPACT_LIFETIME_MS,
-  MANA_COST,
-  RADIUS,
-  RANGE,
-  Veigar_W_Object,
-  WINDUP_MS,
-} from '../../../src/game/gameObject/spells/Veigar_W';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE, IMPACT_LIFETIME_MS, MANA_COST, RADIUS, RANGE, WINDUP_MS } from '../../../packs/riot/spells/Veigar_W';
+import makeVeigar_W, { makeVeigar_W_Object } from '../../../packs/riot/spells/Veigar_W';
+const __api = buildContentApi();
+const Veigar_W = makeVeigar_W(__api);
+const Veigar_W_Object = makeVeigar_W_Object(__api);
 
 // A local vector with `.limit()`, which VectorUtils.getVectorWithMaxRange needs
 // and the shared test fixture's TestVector does not implement.

@@ -8,23 +8,6 @@ vi.mock('../../../src/managers/AssetManager', () => ({
     ensure: async () => undefined,
   },
 }));
-
-import Cassiopeia_E, {
-  Cassiopeia_E_Venom,
-  BASE_DAMAGE,
-} from '../../../src/game/gameObject/spells/Cassiopeia_E';
-import Cassiopeia_R, {
-  Cassiopeia_R_Cone,
-  DAMAGE as CASS_R_DAMAGE,
-} from '../../../src/game/gameObject/spells/Cassiopeia_R';
-import LeeSin_E, {
-  LeeSin_E_Object,
-  DAMAGE as LEE_DAMAGE,
-} from '../../../src/game/gameObject/spells/LeeSin_E';
-import Pantheon_W, {
-  DAMAGE as PANTHEON_DAMAGE,
-} from '../../../src/game/gameObject/spells/Pantheon_W';
-import Singed_E, { DAMAGE as SINGED_DAMAGE } from '../../../src/game/gameObject/spells/Singed_E';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -35,6 +18,26 @@ import {
   installSketchMathGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BASE_DAMAGE } from '../../../packs/riot/spells/Cassiopeia_E';
+import makeCassiopeia_E, { makeCassiopeia_E_Venom } from '../../../packs/riot/spells/Cassiopeia_E';
+import { DAMAGE as CASS_R_DAMAGE } from '../../../packs/riot/spells/Cassiopeia_R';
+import makeCassiopeia_R, { makeCassiopeia_R_Cone } from '../../../packs/riot/spells/Cassiopeia_R';
+import { DAMAGE as LEE_DAMAGE } from '../../../packs/riot/spells/LeeSin_E';
+import makeLeeSin_E, { makeLeeSin_E_Object } from '../../../packs/riot/spells/LeeSin_E';
+import { DAMAGE as PANTHEON_DAMAGE } from '../../../packs/riot/spells/Pantheon_W';
+import makePantheon_W from '../../../packs/riot/spells/Pantheon_W';
+import { DAMAGE as SINGED_DAMAGE } from '../../../packs/riot/spells/Singed_E';
+import makeSinged_E from '../../../packs/riot/spells/Singed_E';
+const __api = buildContentApi();
+const Cassiopeia_E = makeCassiopeia_E(__api);
+const Cassiopeia_E_Venom = makeCassiopeia_E_Venom(__api);
+const Cassiopeia_R = makeCassiopeia_R(__api);
+const Cassiopeia_R_Cone = makeCassiopeia_R_Cone(__api);
+const LeeSin_E = makeLeeSin_E(__api);
+const LeeSin_E_Object = makeLeeSin_E_Object(__api);
+const Pantheon_W = makePantheon_W(__api);
+const Singed_E = makeSinged_E(__api);
 
 /**
  * These six abilities all shipped the same bug: the damage and the crowd

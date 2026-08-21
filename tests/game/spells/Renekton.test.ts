@@ -3,20 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Renekton_Q, {
-  DAMAGE as Q_DAMAGE,
-  ENRAGED_DAMAGE as Q_ENRAGED_DAMAGE,
-  ENRAGED_RADIUS,
-  RADIUS,
-} from '../../../src/game/gameObject/spells/Renekton_Q';
-import Renekton_W, {
-  DAMAGE_PER_STRIKE,
-  ENRAGED_STRIKES,
-  STRIKES,
-} from '../../../src/game/gameObject/spells/Renekton_W';
-import Renekton_E, { DAMAGE as E_DAMAGE } from '../../../src/game/gameObject/spells/Renekton_E';
-import Renekton_R, { isEnraged } from '../../../src/game/gameObject/spells/Renekton_R';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
@@ -30,6 +16,20 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE as Q_DAMAGE, ENRAGED_DAMAGE as Q_ENRAGED_DAMAGE, ENRAGED_RADIUS, RADIUS } from '../../../packs/riot/spells/Renekton_Q';
+import makeRenekton_Q from '../../../packs/riot/spells/Renekton_Q';
+import { DAMAGE_PER_STRIKE, ENRAGED_STRIKES, STRIKES } from '../../../packs/riot/spells/Renekton_W';
+import makeRenekton_W from '../../../packs/riot/spells/Renekton_W';
+import { DAMAGE as E_DAMAGE } from '../../../packs/riot/spells/Renekton_E';
+import makeRenekton_E from '../../../packs/riot/spells/Renekton_E';
+import { isEnraged } from '../../../packs/riot/spells/Renekton_R';
+import makeRenekton_R from '../../../packs/riot/spells/Renekton_R';
+const __api = buildContentApi();
+const Renekton_Q = makeRenekton_Q(__api);
+const Renekton_W = makeRenekton_W(__api);
+const Renekton_E = makeRenekton_E(__api);
+const Renekton_R = makeRenekton_R(__api);
 
 const champion = (game: TestGame, x: number, y: number, teamId: string): AttackableUnit => {
   const unit = new Champion({ game, teamId } as never) as unknown as AttackableUnit;

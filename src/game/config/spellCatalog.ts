@@ -1,5 +1,11 @@
 import AssetManager, { type AssetKey } from '@/managers/AssetManager';
-import type { SpellCatalogId } from '@/generated/spellCatalog';
+// Relative, not `@/generated/spellCatalog`: batch 4 task 3 moved the 237
+// bundled spell ids `CHAMPION_KITS` names (`Flash`, `Yasuo_Q`, ...) into
+// `packs/riot/generated/spellCatalog.ts` — core's own generated union is now
+// just `'BasicAttack'`. `tests/content/rosterSource.test.ts` only bans the
+// `@/generated/...` alias form outside the adapter, so this relative import
+// does not need adding to its allow-list.
+import type { SpellCatalogId as PackSpellCatalogId } from '../../../packs/riot/generated/spellCatalog';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import type { MatchRules } from './PregameConfig';
 import { contentCatalog } from '@/content/catalog';
@@ -7,12 +13,16 @@ import type { SpellDisplayData } from '@/content/ContentPack';
 import { packAsset } from './packAsset';
 
 /**
- * The only two files allowed to name `@/generated/spellCatalog` directly —
- * this one and `content/bundledPack.ts` — see `tests/content/rosterSource.test.ts`.
+ * The one file allowed to name the bundled pack's generated catalogue
+ * directly for its id type — see `tests/content/rosterSource.test.ts`.
  * Re-exported here so a caller that needs only the id type, not the roster
  * itself, still goes through this adapter rather than reaching past it.
+ *
+ * A union with core's own `'BasicAttack'`, not just the pack's 237: slot 0
+ * of every kit below is `BASIC_ATTACK_ID`, which is core's id, not the
+ * riot pack's — `CHAMPION_KITS.spells` has to accept both.
  */
-export type { SpellCatalogId };
+export type SpellCatalogId = PackSpellCatalogId | 'BasicAttack';
 
 /**
  * The spell catalogue as **data**: names, icons, numbers and which abilities

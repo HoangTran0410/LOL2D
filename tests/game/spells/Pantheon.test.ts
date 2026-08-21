@@ -3,26 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Pantheon_W from '../../../src/game/gameObject/spells/Pantheon_W';
-import Pantheon_E, {
-  DURATION as E_DURATION,
-  HALF_ANGLE,
-  Pantheon_E_Aegis,
-  Pantheon_E_Object,
-  REACH,
-} from '../../../src/game/gameObject/spells/Pantheon_E';
-import Pantheon_R, {
-  DAMAGE as R_DAMAGE,
-  FALL_MS,
-  FLIGHT_MS,
-  LAUNCH_MS,
-  MAX_RANGE,
-  Pantheon_R_Meteor,
-  Pantheon_R_Object,
-  Pantheon_R_Skyward,
-  SKY_HEIGHT,
-} from '../../../src/game/gameObject/spells/Pantheon_R';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
@@ -36,6 +16,21 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makePantheon_W from '../../../packs/riot/spells/Pantheon_W';
+import { DURATION as E_DURATION, HALF_ANGLE, REACH } from '../../../packs/riot/spells/Pantheon_E';
+import makePantheon_E, { makePantheon_E_Aegis, makePantheon_E_Object } from '../../../packs/riot/spells/Pantheon_E';
+import { DAMAGE as R_DAMAGE, FALL_MS, FLIGHT_MS, LAUNCH_MS, MAX_RANGE, SKY_HEIGHT } from '../../../packs/riot/spells/Pantheon_R';
+import makePantheon_R, { makePantheon_R_Meteor, makePantheon_R_Object, makePantheon_R_Skyward } from '../../../packs/riot/spells/Pantheon_R';
+const __api = buildContentApi();
+const Pantheon_W = makePantheon_W(__api);
+const Pantheon_E = makePantheon_E(__api);
+const Pantheon_E_Aegis = makePantheon_E_Aegis(__api);
+const Pantheon_E_Object = makePantheon_E_Object(__api);
+const Pantheon_R = makePantheon_R(__api);
+const Pantheon_R_Meteor = makePantheon_R_Meteor(__api);
+const Pantheon_R_Object = makePantheon_R_Object(__api);
+const Pantheon_R_Skyward = makePantheon_R_Skyward(__api);
 
 const at = (game: TestGame, x: number, y: number, teamId: string): AttackableUnit => {
   const unit = createUnit(game, x, teamId);

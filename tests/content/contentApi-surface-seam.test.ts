@@ -68,7 +68,7 @@ import { buildContentApi } from '../../src/content/ContentApi';
  * a later task's job, not this scan's.
  */
 
-const SPELLS_DIR = join(__dirname, '../../src/game/gameObject/spells');
+const SPELLS_DIR = join(__dirname, '../../packs/riot/spells');
 const CORE_SPELLS_DIR = join(__dirname, '../../src/game/gameObject/coreSpells');
 
 /** Comments describe the rule; matching them would flag the documentation. */
@@ -262,10 +262,17 @@ describe('every core symbol a spell imports is reachable through buildContentApi
 
   it('the scan is looking at a real population, not an empty one', () => {
     // A parser that silently matched nothing would pass forever while the
-    // rule it enforces rots. 241 spell files import well over 80 distinct
-    // value-level symbols between them today.
+    // rule it enforces rots. The bar dropped hard in batch 4 task 3, and on
+    // purpose: `SPELLS_DIR` moved to `packs/riot/spells/`, and every one of
+    // those 238 files converted to the `make<Name>(api: ContentApi)` factory
+    // pattern — `packBoundary.test.ts` now forbids them from naming a `@/`
+    // core module at all, so this scan's own population there is
+    // structurally zero, not silently broken. What is left to require a
+    // value-level symbol here is `coreSpells/BasicAttack.ts` alone (still a
+    // plain `@/`-importing class, on purpose — see `coreSpells/index.ts`'s
+    // own header), so "not empty" is the honest bar now, not "over 50".
     const required = collectRequiredSymbols();
-    expect(required.length).toBeGreaterThan(50);
+    expect(required.length).toBeGreaterThan(0);
   });
 });
 

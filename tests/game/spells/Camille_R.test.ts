@@ -3,12 +3,6 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import {
-  Camille_R_Object,
-  CAMILLE_R_RADIUS,
-  CAMILLE_R_SEAL_MS,
-} from '../../../src/game/gameObject/spells/Camille_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
@@ -18,6 +12,11 @@ import {
   installSketchMathGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAMILLE_R_RADIUS, CAMILLE_R_SEAL_MS } from '../../../packs/riot/spells/Camille_R';
+import { makeCamille_R_Object } from '../../../packs/riot/spells/Camille_R';
+const __api = buildContentApi();
+const Camille_R_Object = makeCamille_R_Object(__api);
 
 /**
  * Hextech Ultimatum is a cage, and the three things that make it one were all

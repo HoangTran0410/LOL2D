@@ -1,7 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
-import Twitch_Q, { Twitch_Q_Object } from '../../../src/game/gameObject/spells/Twitch_Q';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeTwitch_Q, { makeTwitch_Q_Object } from '../../../packs/riot/spells/Twitch_Q';
+const __api = buildContentApi();
+const Twitch_Q = makeTwitch_Q(__api);
+const Twitch_Q_Object = makeTwitch_Q_Object(__api);
 
 const context: CastContext = Object.freeze({
   spellId: 'twitch-q',

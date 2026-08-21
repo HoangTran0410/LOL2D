@@ -3,26 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Darius_Q, {
-  BLADE_DAMAGE,
-  HANDLE_DAMAGE,
-  HEAL_PERCENT_CHAMPION,
-  HEAL_PERCENT_UNIT,
-  HEMORRHAGE_MAX_STACKS,
-  INNER_RADIUS,
-  OUTER_RADIUS,
-  applyHemorrhage,
-  hemorrhageStacks,
-} from '../../../src/game/gameObject/spells/Darius_Q';
-import Darius_E, {
-  CONE_RANGE,
-  PULL_STOP_DISTANCE,
-} from '../../../src/game/gameObject/spells/Darius_E';
-import Darius_R, {
-  BASE_DAMAGE,
-  DAMAGE_PER_STACK,
-} from '../../../src/game/gameObject/spells/Darius_R';
 import { pickExecuteTarget } from '../../../src/game/combat/ExecuteTargeting';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
@@ -36,6 +16,18 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BLADE_DAMAGE, HANDLE_DAMAGE, HEAL_PERCENT_CHAMPION, HEAL_PERCENT_UNIT, HEMORRHAGE_MAX_STACKS, INNER_RADIUS, OUTER_RADIUS, hemorrhageStacks } from '../../../packs/riot/spells/Darius_Q';
+import makeDarius_Q, { makeApplyHemorrhage } from '../../../packs/riot/spells/Darius_Q';
+import { CONE_RANGE, PULL_STOP_DISTANCE } from '../../../packs/riot/spells/Darius_E';
+import makeDarius_E from '../../../packs/riot/spells/Darius_E';
+import { BASE_DAMAGE, DAMAGE_PER_STACK } from '../../../packs/riot/spells/Darius_R';
+import makeDarius_R from '../../../packs/riot/spells/Darius_R';
+const __api = buildContentApi();
+const Darius_Q = makeDarius_Q(__api);
+const applyHemorrhage = makeApplyHemorrhage(__api);
+const Darius_E = makeDarius_E(__api);
+const Darius_R = makeDarius_R(__api);
 
 const makeMinion = (game: TestGame, x: number, y: number): Minion =>
   new Minion({

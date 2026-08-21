@@ -16,8 +16,6 @@ vi.mock('../../src/managers/AssetManager', () => ({
     placeholder: vi.fn(() => ({ url: 'x' })),
   },
 }));
-
-import * as AllSpells from '../../src/game/gameObject/spells/index';
 import * as CoreSpells from '../../src/game/gameObject/coreSpells/index';
 import {
   spellGroups,
@@ -27,8 +25,9 @@ import {
   spellClassOfId,
 } from '../../src/game/preset';
 import { SLOT_COUNT, type ChampionLoadout } from '../../src/game/config/PregameConfig';
-import { loadEverySpellForTests } from '../game/spell/registry';
+import { loadEverySpellForTests, AllSpells } from '../game/spell/registry';
 import { contentRegistry } from '../../src/content/registry';
+
 
 // Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
 // this fills the registry synchronously so a test can read the whole

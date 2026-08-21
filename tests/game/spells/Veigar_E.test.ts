@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AssetManager from '../../../src/managers/AssetManager';
-import { Veigar_E_Object } from '../../../src/game/gameObject/spells/Veigar_E';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeVeigar_E_Object } from '../../../packs/riot/spells/Veigar_E';
+const __api = buildContentApi();
+const Veigar_E_Object = makeVeigar_E_Object(__api);
 
 class Vector {
   constructor(

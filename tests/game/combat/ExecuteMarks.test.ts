@@ -10,12 +10,17 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import ChoGath_R from '../../../src/game/gameObject/spells/ChoGath_R';
-import Nasus_Q from '../../../src/game/gameObject/spells/Nasus_Q';
-import Flash from '../../../src/game/gameObject/spells/Flash';
 import SpellState from '../../../src/game/enums/SpellState';
 import { executeMarks, executeMarkTargets } from '../../../src/game/combat/ExecuteMarks';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeChoGath_R from '../../../packs/riot/spells/ChoGath_R';
+import makeNasus_Q from '../../../packs/riot/spells/Nasus_Q';
+import makeFlash from '../../../packs/riot/spells/Flash';
+const __api = buildContentApi();
+const ChoGath_R = makeChoGath_R(__api);
+const Nasus_Q = makeNasus_Q(__api);
+const Flash = makeFlash(__api);
 
 let game: TestGame;
 

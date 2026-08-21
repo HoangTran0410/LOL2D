@@ -15,7 +15,7 @@ import { join } from 'node:path';
  * A source scan, because the mistake is a hue and it costs a millisecond to
  * rule out across four files.
  */
-const SPELLS = join(__dirname, '../../../src/game/gameObject/spells');
+const SPELLS = join(__dirname, '../../../packs/riot/spells');
 
 /** Comments discuss the palette; matching them would flag the documentation. */
 function stripComments(source: string): string {

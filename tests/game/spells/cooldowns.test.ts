@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 describe('arcade cooldown boundary', () => {
   it('keeps every numeric spell cooldown at ten seconds or less', () => {
-    const directory = 'src/game/gameObject/spells';
+    const directory = 'packs/riot/spells';
     for (const name of readdirSync(directory).filter(name => name.endsWith('.ts'))) {
       const file = `${directory}/${name}`;
       const source = readFileSync(file, 'utf8');

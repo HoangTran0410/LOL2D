@@ -3,35 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Ziggs_Q, {
-  Q_BLAST_RADIUS,
-  Q_BOUNCE_COUNT,
-  Q_BOUNCE_GAP_MS,
-  Q_BOUNCE_STEP,
-  Q_DAMAGE,
-  Q_TRAVEL_MS,
-  Ziggs_Q_Object,
-} from '../../../src/game/gameObject/spells/Ziggs_Q';
-import Ziggs_W, {
-  W_DAMAGE,
-  W_FUSE_MS,
-  W_PUSH,
-  Ziggs_W_Object,
-} from '../../../src/game/gameObject/spells/Ziggs_W';
-import Ziggs_E, {
-  E_ARM_MS,
-  E_DAMAGE,
-  E_MAX_TRIPS_PER_UNIT,
-  E_MINE_COUNT,
-  Ziggs_E_Object,
-} from '../../../src/game/gameObject/spells/Ziggs_E';
-import Ziggs_R, {
-  R_FLIGHT_MS,
-  R_INNER_DAMAGE,
-  R_OUTER_DAMAGE,
-  Ziggs_R_Object,
-} from '../../../src/game/gameObject/spells/Ziggs_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
@@ -41,6 +12,24 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { Q_BLAST_RADIUS, Q_BOUNCE_COUNT, Q_BOUNCE_GAP_MS, Q_BOUNCE_STEP, Q_DAMAGE, Q_TRAVEL_MS } from '../../../packs/riot/spells/Ziggs_Q';
+import makeZiggs_Q, { makeZiggs_Q_Object } from '../../../packs/riot/spells/Ziggs_Q';
+import { W_DAMAGE, W_FUSE_MS, W_PUSH } from '../../../packs/riot/spells/Ziggs_W';
+import makeZiggs_W, { makeZiggs_W_Object } from '../../../packs/riot/spells/Ziggs_W';
+import { E_ARM_MS, E_DAMAGE, E_MAX_TRIPS_PER_UNIT, E_MINE_COUNT } from '../../../packs/riot/spells/Ziggs_E';
+import makeZiggs_E, { makeZiggs_E_Object } from '../../../packs/riot/spells/Ziggs_E';
+import { R_FLIGHT_MS, R_INNER_DAMAGE, R_OUTER_DAMAGE } from '../../../packs/riot/spells/Ziggs_R';
+import makeZiggs_R, { makeZiggs_R_Object } from '../../../packs/riot/spells/Ziggs_R';
+const __api = buildContentApi();
+const Ziggs_Q = makeZiggs_Q(__api);
+const Ziggs_Q_Object = makeZiggs_Q_Object(__api);
+const Ziggs_W = makeZiggs_W(__api);
+const Ziggs_W_Object = makeZiggs_W_Object(__api);
+const Ziggs_E = makeZiggs_E(__api);
+const Ziggs_E_Object = makeZiggs_E_Object(__api);
+const Ziggs_R = makeZiggs_R(__api);
+const Ziggs_R_Object = makeZiggs_R_Object(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

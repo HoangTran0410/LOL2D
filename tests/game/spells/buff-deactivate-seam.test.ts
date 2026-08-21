@@ -19,15 +19,19 @@ import { describe, expect, it } from 'vitest';
  * this closes it for the next spell someone writes.
  */
 const spellsRoot = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
+// Batch 4 task 3 moved `spells/` out from under `gameObject/` entirely, into
+// `packs/riot/spells/` — every other directory here stayed put.
+const packsRoot = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
+const rootFor = (directory: string): string => (directory === 'spells' ? packsRoot : spellsRoot);
 
 const sourceFiles = (directory: string): string[] =>
-  readdirSync(join(spellsRoot, directory), { recursive: true, encoding: 'utf8' })
+  readdirSync(join(rootFor(directory), directory), { recursive: true, encoding: 'utf8' })
     .filter(entry => entry.endsWith('.ts'))
     .map(entry => join(directory, entry));
 
 /** Comments describe the rule; only code may break it. */
 const codeOf = (relativePath: string): string =>
-  readFileSync(join(spellsRoot, relativePath), 'utf8')
+  readFileSync(join(rootFor(relativePath.split('/')[0]), relativePath), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '');
 

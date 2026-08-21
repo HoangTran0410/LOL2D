@@ -3,17 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Veigar_R, {
-  BASE_DAMAGE,
-  CAST_TIME_MS,
-  MANA_COST,
-  MAX_MISSING_HEALTH_MULTIPLIER,
-  MISSILE_SPEED,
-  RANGE,
-  Veigar_R_Burst,
-  Veigar_R_Object,
-} from '../../../src/game/gameObject/spells/Veigar_R';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -25,6 +14,13 @@ import {
   withCastTime,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BASE_DAMAGE, CAST_TIME_MS, MANA_COST, MAX_MISSING_HEALTH_MULTIPLIER, MISSILE_SPEED, RANGE } from '../../../packs/riot/spells/Veigar_R';
+import makeVeigar_R, { makeVeigar_R_Burst, makeVeigar_R_Object } from '../../../packs/riot/spells/Veigar_R';
+const __api = buildContentApi();
+const Veigar_R = makeVeigar_R(__api);
+const Veigar_R_Burst = makeVeigar_R_Burst(__api);
+const Veigar_R_Object = makeVeigar_R_Object(__api);
 
 /** The cast window this suite drives the runtime through — see `withCastTime`. */
 const TEST_CAST_TIME_MS = 250;

@@ -3,32 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Katarina_Q, {
-  KATARINA_DAGGER_E_REFUND_MS,
-  KATARINA_DAGGER_SLASH_DAMAGE,
-  KATARINA_MAX_DAGGERS,
-  KATARINA_PICKUP_RADIUS,
-  KATARINA_Q_BOUNCE_DAMAGE,
-  KATARINA_Q_FIRST_DAMAGE,
-  KATARINA_Q_MAX_TARGETS,
-  KATARINA_Q_WINDUP_MS,
-  Katarina_Dagger,
-  type Katarina_Q_Object,
-} from '../../../src/game/gameObject/spells/Katarina_Q';
-import Katarina_W, {
-  KATARINA_W_DROP_DELAY_MS,
-  KATARINA_W_SPEEDUP_MS,
-} from '../../../src/game/gameObject/spells/Katarina_W';
-import Katarina_E, {
-  KATARINA_E_STRIKE_DAMAGE,
-} from '../../../src/game/gameObject/spells/Katarina_E';
-import Katarina_R, {
-  KATARINA_R_DURATION_MS,
-  KATARINA_R_TICK_DAMAGE,
-  KATARINA_R_TICK_MS,
-  type Katarina_R_Lotus,
-} from '../../../src/game/gameObject/spells/Katarina_R';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
@@ -39,6 +13,23 @@ import {
   pressSpell,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import type { Katarina_Q_Object } from '../../../packs/riot/spells/Katarina_Q';
+import { KATARINA_DAGGER_E_REFUND_MS, KATARINA_DAGGER_SLASH_DAMAGE, KATARINA_MAX_DAGGERS, KATARINA_PICKUP_RADIUS, KATARINA_Q_BOUNCE_DAMAGE, KATARINA_Q_FIRST_DAMAGE, KATARINA_Q_MAX_TARGETS, KATARINA_Q_WINDUP_MS } from '../../../packs/riot/spells/Katarina_Q';
+import makeKatarina_Q, { makeKatarina_Dagger } from '../../../packs/riot/spells/Katarina_Q';
+import { KATARINA_W_DROP_DELAY_MS, KATARINA_W_SPEEDUP_MS } from '../../../packs/riot/spells/Katarina_W';
+import makeKatarina_W from '../../../packs/riot/spells/Katarina_W';
+import { KATARINA_E_STRIKE_DAMAGE } from '../../../packs/riot/spells/Katarina_E';
+import makeKatarina_E from '../../../packs/riot/spells/Katarina_E';
+import type { Katarina_R_Lotus } from '../../../packs/riot/spells/Katarina_R';
+import { KATARINA_R_DURATION_MS, KATARINA_R_TICK_DAMAGE, KATARINA_R_TICK_MS } from '../../../packs/riot/spells/Katarina_R';
+import makeKatarina_R from '../../../packs/riot/spells/Katarina_R';
+const __api = buildContentApi();
+const Katarina_Q = makeKatarina_Q(__api);
+const Katarina_Dagger = makeKatarina_Dagger(__api);
+const Katarina_W = makeKatarina_W(__api);
+const Katarina_E = makeKatarina_E(__api);
+const Katarina_R = makeKatarina_R(__api);
 
 const EXPECTED_R_TICKS = Math.floor(KATARINA_R_DURATION_MS / KATARINA_R_TICK_MS);
 

@@ -15,9 +15,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import FogOfWar from '../../../src/game/gameObject/map/FogOfWar';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import { Ashe_E_Object } from '../../../src/game/gameObject/spells/Ashe_E';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeAshe_E_Object } from '../../../packs/riot/spells/Ashe_E';
+const __api = buildContentApi();
+const Ashe_E_Object = makeAshe_E_Object(__api);
 
 const CAMERA = { x: 0, y: 0, w: 800, h: 600 };
 const AWAY = { x: 3_000, y: 3_000 };

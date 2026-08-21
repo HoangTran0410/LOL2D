@@ -3,17 +3,20 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import { Nocturne_Q_Trail } from '../../../src/game/gameObject/spells/Nocturne_Q';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
-import { Singed_W_Object } from '../../../src/game/gameObject/spells/Singed_W';
 import {
   createGame,
   createUnit,
   installSpellObjectGlobals,
   installSketchMathGlobals,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeNocturne_Q_Trail } from '../../../packs/riot/spells/Nocturne_Q';
+import { makeSinged_W_Object } from '../../../packs/riot/spells/Singed_W';
+const __api = buildContentApi();
+const Nocturne_Q_Trail = makeNocturne_Q_Trail(__api);
+const Singed_W_Object = makeSinged_W_Object(__api);
 
 /**
  * A stain on the floor draws under the feet standing on it.

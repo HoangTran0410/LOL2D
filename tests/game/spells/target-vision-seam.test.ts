@@ -25,7 +25,7 @@ import { join } from 'node:path';
  * application. Amumu W ticking on everyone inside its ring hits the champion
  * hiding in the bush, exactly as it should.
  */
-const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 
 /** Comments describe the rule; matching them would flag the documentation. */

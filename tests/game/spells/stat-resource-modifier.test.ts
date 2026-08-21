@@ -41,9 +41,13 @@ const SCANNED_DIRECTORIES = ['spells', 'spellObjects', 'buffs'];
 const RESOURCE_AS_STAT = /(?<![A-Za-z])(?:health|mana)\s*:\s*\{/;
 
 const gameObjectRoot = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
+// `spells/` moved into `packs/riot/spells/` (batch 4 task 3); the other
+// scanned directories stayed under `src/game/gameObject/`.
+const packsRoot = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
+const rootFor = (directory: string): string => (directory === 'spells' ? packsRoot : gameObjectRoot);
 
 const sourceFiles = (directory: string): string[] => {
-  const absolute = join(gameObjectRoot, directory);
+  const absolute = join(rootFor(directory), directory);
   return readdirSync(absolute, { recursive: true, encoding: 'utf8' })
     .filter(entry => entry.endsWith('.ts'))
     .map(entry => join(directory, entry));
@@ -57,7 +61,7 @@ const codeOnly = (line: string): string => {
 };
 
 const offendingLines = (relativePath: string): string[] =>
-  readFileSync(join(gameObjectRoot, relativePath), 'utf8')
+  readFileSync(join(rootFor(relativePath.split('/')[0]), relativePath), 'utf8')
     .split('\n')
     .map((line, index) => ({ code: codeOnly(line), line, number: index + 1 }))
     .filter(({ code }) => RESOURCE_AS_STAT.test(code))

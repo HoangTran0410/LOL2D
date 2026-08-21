@@ -3,17 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Malphite_Q, {
-  DAMAGE,
-  Malphite_Q_Object,
-  MISSILE_SPEED,
-  RANGE,
-  SLOW_DURATION_MS,
-  SLOW_PERCENT,
-  SPAWN_OFFSET_DISTANCE,
-  SPEEDUP_DURATION_MS,
-} from '../../../src/game/gameObject/spells/Malphite_Q';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
@@ -27,6 +16,12 @@ import {
   withCastTime,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE, MISSILE_SPEED, RANGE, SLOW_DURATION_MS, SLOW_PERCENT, SPAWN_OFFSET_DISTANCE, SPEEDUP_DURATION_MS } from '../../../packs/riot/spells/Malphite_Q';
+import makeMalphite_Q, { makeMalphite_Q_Object } from '../../../packs/riot/spells/Malphite_Q';
+const __api = buildContentApi();
+const Malphite_Q = makeMalphite_Q(__api);
+const Malphite_Q_Object = makeMalphite_Q_Object(__api);
 
 /** The cast window this suite drives the runtime through — see `withCastTime`. */
 const TEST_CAST_TIME_MS = 250;

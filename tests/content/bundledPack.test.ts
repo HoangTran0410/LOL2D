@@ -3,8 +3,14 @@ import bundledCode, { data, BUNDLED_PACK_ID } from '../../src/content/bundledPac
 import { buildContentApi } from '../../src/content/ContentApi';
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
-import { spellModules } from '../../src/generated/spellModules';
+// The generated module map split across two trees in batch 4 task 3 — core's
+// own (`BasicAttack`) and the riot pack's (everything else) — the same way
+// `bundledPack.ts`'s own `spellSources()` merges them, content-last.
+import { spellModules as coreSpellModules } from '../../src/generated/spellModules';
+import { spellModules as riotSpellModules } from '../../packs/riot/generated/spellModules';
 import type { ContentPack } from '../../src/content/ContentPack';
+
+const spellModules = { ...riotSpellModules, ...coreSpellModules };
 
 describe('the bundled pack', () => {
   // The merged shape every reader before the data/code split saw —

@@ -31,26 +31,24 @@ import EventManager from '../../../src/managers/EventManager';
 import EventType from '../../../src/game/enums/EventType';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import Spell from '../../../src/game/gameObject/Spell';
-import Ghost from '../../../src/game/gameObject/spells/Ghost';
-import Heal from '../../../src/game/gameObject/spells/Heal';
-import Ignite from '../../../src/game/gameObject/spells/Ignite';
-import Janna_R, {
-  CHANNEL_DURATION_MS,
-  HEAL_PER_TICK,
-  Janna_R_Object,
-  KNOCKBACK_DISTANCE,
-  KNOCKBACK_DURATION_MS,
-  MANA_COST,
-  RADIUS,
-  TICK_EVERY_MS,
-} from '../../../src/game/gameObject/spells/Janna_R';
-import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import AreaSpellObject from '../../../src/game/gameObject/spellObjects/AreaSpellObject';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import { spellGroups } from '../../../src/game/preset';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
-import { loadEverySpellForTests } from '../spell/registry';
+import { loadEverySpellForTests, AllSpells } from '../spell/registry';
 import { withWalls } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeGhost from '../../../packs/riot/spells/Ghost';
+import makeHeal from '../../../packs/riot/spells/Heal';
+import makeIgnite from '../../../packs/riot/spells/Ignite';
+import { CHANNEL_DURATION_MS, HEAL_PER_TICK, KNOCKBACK_DISTANCE, KNOCKBACK_DURATION_MS, MANA_COST, RADIUS, TICK_EVERY_MS } from '../../../packs/riot/spells/Janna_R';
+import makeJanna_R, { makeJanna_R_Object } from '../../../packs/riot/spells/Janna_R';
+const __api = buildContentApi();
+const Ghost = makeGhost(__api);
+const Heal = makeHeal(__api);
+const Ignite = makeIgnite(__api);
+const Janna_R = makeJanna_R(__api);
+const Janna_R_Object = makeJanna_R_Object(__api);
 
 /**
  * How far the terrain seam's answer may sit from geometry written out by hand.

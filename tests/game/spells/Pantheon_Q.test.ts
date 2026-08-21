@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
-import Pantheon_Q, {
-  Pantheon_Q_Spear,
-  Pantheon_Q_Thrust,
-  THRUST_BACKSWING,
-  THRUST_REACH,
-  THRUST_WIDTH,
-} from '../../../src/game/gameObject/spells/Pantheon_Q';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import ActionState from '../../../src/game/enums/ActionState';
 import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { THRUST_BACKSWING, THRUST_REACH, THRUST_WIDTH } from '../../../packs/riot/spells/Pantheon_Q';
+import makePantheon_Q, { makePantheon_Q_Spear, makePantheon_Q_Thrust } from '../../../packs/riot/spells/Pantheon_Q';
+const __api = buildContentApi();
+const Pantheon_Q = makePantheon_Q(__api);
+const Pantheon_Q_Spear = makePantheon_Q_Spear(__api);
+const Pantheon_Q_Thrust = makePantheon_Q_Thrust(__api);
 
 class Vector {
   constructor(

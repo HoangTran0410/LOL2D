@@ -10,22 +10,6 @@ import AttackableUnit from '../../../src/game/gameObject/attackableUnits/Attacka
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import { slabVertices } from '../../../src/game/gameObject/map/DynamicTerrain';
-import Nautilus_Q, {
-  Nautilus_Q_Object,
-  Q_DAMAGE,
-  Q_RANGE,
-} from '../../../src/game/gameObject/spells/Nautilus_Q';
-import Nautilus_E, {
-  E_RADII,
-  E_WAVE_DAMAGE,
-  Nautilus_E_Object,
-} from '../../../src/game/gameObject/spells/Nautilus_E';
-import Nautilus_R, {
-  Nautilus_R_Eruption,
-  Nautilus_R_Object,
-  R_DAMAGE,
-  R_PASS_DAMAGE,
-} from '../../../src/game/gameObject/spells/Nautilus_R';
 import {
   createGame,
   createUnit,
@@ -34,6 +18,21 @@ import {
   withWalls,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { Q_DAMAGE, Q_RANGE } from '../../../packs/riot/spells/Nautilus_Q';
+import makeNautilus_Q, { makeNautilus_Q_Object } from '../../../packs/riot/spells/Nautilus_Q';
+import { E_RADII, E_WAVE_DAMAGE } from '../../../packs/riot/spells/Nautilus_E';
+import makeNautilus_E, { makeNautilus_E_Object } from '../../../packs/riot/spells/Nautilus_E';
+import { R_DAMAGE, R_PASS_DAMAGE } from '../../../packs/riot/spells/Nautilus_R';
+import makeNautilus_R, { makeNautilus_R_Eruption, makeNautilus_R_Object } from '../../../packs/riot/spells/Nautilus_R';
+const __api = buildContentApi();
+const Nautilus_Q = makeNautilus_Q(__api);
+const Nautilus_Q_Object = makeNautilus_Q_Object(__api);
+const Nautilus_E = makeNautilus_E(__api);
+const Nautilus_E_Object = makeNautilus_E_Object(__api);
+const Nautilus_R = makeNautilus_R(__api);
+const Nautilus_R_Eruption = makeNautilus_R_Eruption(__api);
+const Nautilus_R_Object = makeNautilus_R_Object(__api);
 
 /** A spell-built slab: real, impassable terrain that `terrainMap` knows nothing about. */
 class TestSlab extends SpellObject {

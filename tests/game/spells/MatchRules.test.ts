@@ -19,13 +19,18 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
-
-import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
-import Anivia_Q from '../../../src/game/gameObject/spells/Anivia_Q';
-import Lux_R, { CAST_TIME_MS, MANA_COST } from '../../../src/game/gameObject/spells/Lux_R';
 import Spell from '../../../src/game/gameObject/Spell';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAhri_Q from '../../../packs/riot/spells/Ahri_Q';
+import makeAnivia_Q from '../../../packs/riot/spells/Anivia_Q';
+import { CAST_TIME_MS, MANA_COST } from '../../../packs/riot/spells/Lux_R';
+import makeLux_R from '../../../packs/riot/spells/Lux_R';
+const __api = buildContentApi();
+const Ahri_Q = makeAhri_Q(__api);
+const Anivia_Q = makeAnivia_Q(__api);
+const Lux_R = makeLux_R(__api);
 
 /**
  * Every spell file, content and core alike, for the two source scans below.
@@ -33,7 +38,7 @@ import type { MatchRules } from '../../../src/game/config/PregameConfig';
  * barrel, not a spell.
  */
 const spellFiles = (): { dir: string; name: string }[] => {
-  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  const spellsDir = join(process.cwd(), 'packs/riot/spells');
   const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
   return [
     ...readdirSync(spellsDir)

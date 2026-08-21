@@ -6,19 +6,6 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 
 import Airborne from '../../../src/game/gameObject/buffs/Airborne';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import Riven_Q, {
-  Q_CHARGES,
-  Q_DAMAGE,
-  Q_DAMAGE_FINAL,
-  Q_WINDOW_MS,
-} from '../../../src/game/gameObject/spells/Riven_Q';
-import Riven_R, {
-  R_DAMAGE,
-  R_DAMAGE_MAX,
-  R_DURATION_MS,
-  R_EXECUTE_THRESHOLD,
-  Riven_R_WindSlash,
-} from '../../../src/game/gameObject/spells/Riven_R';
 import {
   createGame,
   createUnit,
@@ -26,6 +13,15 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { Q_CHARGES, Q_DAMAGE, Q_DAMAGE_FINAL, Q_WINDOW_MS } from '../../../packs/riot/spells/Riven_Q';
+import makeRiven_Q from '../../../packs/riot/spells/Riven_Q';
+import { R_DAMAGE, R_DAMAGE_MAX, R_DURATION_MS, R_EXECUTE_THRESHOLD } from '../../../packs/riot/spells/Riven_R';
+import makeRiven_R, { makeRiven_R_WindSlash } from '../../../packs/riot/spells/Riven_R';
+const __api = buildContentApi();
+const Riven_Q = makeRiven_Q(__api);
+const Riven_R = makeRiven_R(__api);
+const Riven_R_WindSlash = makeRiven_R_WindSlash(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

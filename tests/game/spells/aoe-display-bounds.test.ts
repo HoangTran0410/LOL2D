@@ -3,16 +3,6 @@ import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import { Camille_R_Object } from '../../../src/game/gameObject/spells/Camille_R';
-import { Camille_W_Object } from '../../../src/game/gameObject/spells/Camille_W';
-import { Ekko_R_Object } from '../../../src/game/gameObject/spells/Ekko_R';
-import { Ekko_W_Object } from '../../../src/game/gameObject/spells/Ekko_W';
-import { JarvanIV_W_WaveObject } from '../../../src/game/gameObject/spells/JarvanIV_W';
-import {
-  JarvanIV_E_Object,
-  JARVAN_E_DROP_HEIGHT,
-} from '../../../src/game/gameObject/spells/JarvanIV_E';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -21,6 +11,21 @@ import {
   installSketchMathGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeCamille_R_Object } from '../../../packs/riot/spells/Camille_R';
+import { makeCamille_W_Object } from '../../../packs/riot/spells/Camille_W';
+import { makeEkko_R_Object } from '../../../packs/riot/spells/Ekko_R';
+import { makeEkko_W_Object } from '../../../packs/riot/spells/Ekko_W';
+import { makeJarvanIV_W_WaveObject } from '../../../packs/riot/spells/JarvanIV_W';
+import { JARVAN_E_DROP_HEIGHT } from '../../../packs/riot/spells/JarvanIV_E';
+import { makeJarvanIV_E_Object } from '../../../packs/riot/spells/JarvanIV_E';
+const __api = buildContentApi();
+const Camille_R_Object = makeCamille_R_Object(__api);
+const Camille_W_Object = makeCamille_W_Object(__api);
+const Ekko_R_Object = makeEkko_R_Object(__api);
+const Ekko_W_Object = makeEkko_W_Object(__api);
+const JarvanIV_W_WaveObject = makeJarvanIV_W_WaveObject(__api);
+const JarvanIV_E_Object = makeJarvanIV_E_Object(__api);
 
 /**
  * `GameObject.getDisplayBoundingBox` falls back to `visionRadius`, which is 0 for

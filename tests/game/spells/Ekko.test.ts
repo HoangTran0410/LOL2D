@@ -3,11 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Ekko_Q from '../../../src/game/gameObject/spells/Ekko_Q';
-import Ekko_W from '../../../src/game/gameObject/spells/Ekko_W';
-import Ekko_E from '../../../src/game/gameObject/spells/Ekko_E';
-import Ekko_R from '../../../src/game/gameObject/spells/Ekko_R';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -15,6 +10,16 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeEkko_Q from '../../../packs/riot/spells/Ekko_Q';
+import makeEkko_W from '../../../packs/riot/spells/Ekko_W';
+import makeEkko_E from '../../../packs/riot/spells/Ekko_E';
+import makeEkko_R from '../../../packs/riot/spells/Ekko_R';
+const __api = buildContentApi();
+const Ekko_Q = makeEkko_Q(__api);
+const Ekko_W = makeEkko_W(__api);
+const Ekko_E = makeEkko_E(__api);
+const Ekko_R = makeEkko_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

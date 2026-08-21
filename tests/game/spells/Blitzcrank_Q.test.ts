@@ -14,10 +14,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
-import { Blitzcrank_Q_Object } from '../../../src/game/gameObject/spells/Blitzcrank_Q';
-import { Morgana_E_BlackShield } from '../../../src/game/gameObject/spells/Morgana_E';
-import blitzSource from '../../../src/game/gameObject/spells/Blitzcrank_Q.ts?raw';
+import blitzSource from '../../../packs/riot/spells/Blitzcrank_Q.ts?raw';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeBlitzcrank_Q_Object } from '../../../packs/riot/spells/Blitzcrank_Q';
+import { makeMorgana_E_BlackShield } from '../../../packs/riot/spells/Morgana_E';
+const __api = buildContentApi();
+const Blitzcrank_Q_Object = makeBlitzcrank_Q_Object(__api);
+const Morgana_E_BlackShield = makeMorgana_E_BlackShield(__api);
 
 let game: TestGame;
 

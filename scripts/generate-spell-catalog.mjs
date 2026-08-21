@@ -69,22 +69,19 @@ const root = resolve(dirname(scriptPath), '..');
 export const CORE_SPELL_TREE = {
   outputPath: 'src/generated/spellCatalog.ts',
   modulesOutputPath: 'src/generated/spellModules.ts',
-  // Content-last: a content id can never shadow a core one. `BasicAttack`
-  // is core's one spell (see `coreSpells/index.ts`'s own header for why it
-  // is split out at all); listing its barrel second is what makes it win.
+  // Batch 4 Task 3 moved `src/game/gameObject/spells/` into `packs/riot/spells/`
+  // (see `PACK_SPELL_TREES.riot` below) — `BasicAttack` is now the only spell
+  // core generates a catalogue entry for at all, which is the whole point of
+  // `coreSpells/`'s own header: a mechanic every pack presupposes, not content.
   barrels: [
-    { path: 'src/game/gameObject/spells/index.ts', importBase: '@/game/gameObject/spells' },
     { path: 'src/game/gameObject/coreSpells/index.ts', importBase: '@/game/gameObject/coreSpells' },
   ],
 };
 
 /**
  * Trees a pack can generate a catalogue for, selected from the CLI with
- * `--tree=<name>`. Only `riot` exists so far, and it is a placeholder:
- * `packs/riot/spells/` has no barrel until batch 4 task 3 moves the spells
- * in, so running this tree today fails on a missing file — the same honest
- * failure `catalog:check` gives for any other stale/missing generated
- * output, not a special case.
+ * `--tree=<name>`. Only `riot` exists so far — `packs/riot/spells/index.ts`
+ * is the real barrel batch 4 task 3 moved in.
  */
 export const PACK_SPELL_TREES = {
   riot: {
@@ -94,6 +91,25 @@ export const PACK_SPELL_TREES = {
     // `src/`, and a pack imports its own siblings the way
     // `packs/reference/pack.ts` already does.
     barrels: [{ path: 'packs/riot/spells/index.ts', importBase: '../spells' }],
+    // A pack barrel's `default` export is `(api: ContentApi) => SpellClass`,
+    // never the class itself (`packBoundary.test.ts` forbids a pack from
+    // importing `Spell` etc. any other way) — `renderSpellCatalogSource`
+    // calls each factory with one real, shared `api` before `describe()`
+    // ever sees it. Core's own barrels are unaffected: `BasicAttack` stays a
+    // plain class, exactly as before this tree existed.
+    isPackFactory: true,
+    // Batch 4 task 3 moved the spell *classes*; task 4 moves the *art* and
+    // populates `packs/riot/generated/assetManifest.ts` for real. Until then
+    // every icon key this tree's spells declare (`spell_ahri_e`, ...) still
+    // only exists in core's own manifest — the files have not moved — and a
+    // generated file under `packs/` may not import core at all
+    // (`packBoundary.test.ts` scans generated output the same as hand-written
+    // source, and pointing this at `src/generated/assetManifest` was tried
+    // and correctly failed that scan). `iconKey` drops to a plain `string`
+    // for this tree only until task 4 gives it a real, pack-local `AssetKey`
+    // union to check against — the same trade `ContentApi.asset(key: string)`
+    // already makes at the boundary, for the same reason.
+    iconKeyType: 'string',
   },
 };
 
@@ -161,19 +177,28 @@ export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
       const loaded = await server.ssrLoadModule(`/${barrel.path}`);
       AllSpells = { ...AllSpells, ...loaded };
     }
+    // A pack barrel hands over factories; resolve each against one shared,
+    // real `api` — the same object every real spell in the pack would be
+    // built against at runtime — before `describe()` ever sees a class.
+    const api = tree.isPackFactory
+      ? (await server.ssrLoadModule('/src/content/ContentApi.ts')).buildContentApi()
+      : null;
     const entries = Object.entries(AllSpells)
       .filter(([, value]) => typeof value === 'function')
       .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
-      .map(([id, SpellClass]) => describe(id, SpellClass));
+      .map(([id, factoryOrClass]) => {
+        const SpellClass = tree.isPackFactory ? factoryOrClass(api) : factoryOrClass;
+        return describe(id, SpellClass);
+      });
 
     if (!entries.length) throw new Error('the spell barrel exported no classes');
-    return render(entries);
+    return render(entries, tree);
   } finally {
     await server.close();
   }
 }
 
-function render(entries) {
+function render(entries, tree = CORE_SPELL_TREE) {
   const records = entries.map(
     entry =>
       `  ${JSON.stringify(entry.id)}: {\n` +
@@ -193,7 +218,7 @@ function render(entries) {
     '// the roster without importing a spell class. See the generator for why, and',
     '// `src/game/config/spellCatalog.ts` for how match rules are reapplied on top.',
     '',
-    "import type { AssetKey } from './assetManifest';",
+    tree.iconKeyType ? '' : "import type { AssetKey } from './assetManifest';",
     '',
     'export interface GeneratedSpellDisplay {',
     '  readonly name: string;',
@@ -203,9 +228,11 @@ function render(entries) {
     "   * The icon's manifest key, resolved through `AssetManager.get` — never a",
     '   * built URL, which is a content hash and would drag this file into every',
     '   * rebuild that touched an image. Typed against the *other* generated file,',
-    '   * so renaming an icon without renaming it here is a compile error.',
+    '   * so renaming an icon without renaming it here is a compile error —',
+    "   * unless this tree has no manifest of its own yet, see the tree config's",
+    '   * own `iconKeyType` doc comment.',
     '   */',
-    '  readonly iconKey: AssetKey | null;',
+    `  readonly iconKey: ${tree.iconKeyType ?? 'AssetKey'} | null;`,
     "  /** The spell's own tuning number, before match rules. */",
     '  readonly coolDownMs: number;',
     "  /** The spell's own tuning number, before match rules. */",

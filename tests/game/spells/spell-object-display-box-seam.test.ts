@@ -52,14 +52,20 @@ import { describe, expect, it } from 'vitest';
  */
 const SPELL_DIRECTORIES = ['spells', 'spellObjects'];
 const GAME_OBJECT_DIR = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
+// `spells/` moved into `packs/riot/spells/` (batch 4 task 3); `spellObjects/`
+// stayed in core (`AreaSpellObject`/`BeamSpellObject`/`HomingMissileSpellObject`/
+// `AoePulse` are engine mechanism, not Riot content — see task-3-report.md).
+const PACKS_DIR = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
+const rootFor = (directory: string): string => (directory === 'spells' ? PACKS_DIR : GAME_OBJECT_DIR);
 
 /**
  * Only classes extending `SpellObject` *directly*. `[^{]*` absorbs an
  * `implements` clause without letting the match run past the class body's
- * opening brace.
+ * opening brace. No `export` requirement: a pack spell's class lives inside
+ * a `make<Name>(api)` factory now (batch 4 task 3) and is never itself
+ * `export`-prefixed — the factory around it is.
  */
-const DIRECT_SPELL_OBJECT =
-  /export\s+(?:default\s+)?class\s+(\w+)\s+extends\s+SpellObject\b[^{]*\{/g;
+const DIRECT_SPELL_OBJECT = /class\s+(\w+)\s+extends\s+SpellObject\b[^{]*\{/g;
 
 /** Either sanctioned way to state an extent. */
 const STATES_ITS_EXTENT = /getDisplayBoundingBox\s*\(|\bvisionRadius\b/;
@@ -86,7 +92,7 @@ interface Offender {
 const collectOffenders = (): Offender[] => {
   const offenders: Offender[] = [];
   for (const directory of SPELL_DIRECTORIES) {
-    const path = join(GAME_OBJECT_DIR, directory);
+    const path = join(rootFor(directory), directory);
     for (const file of readdirSync(path).filter(name => name.endsWith('.ts'))) {
       const source = stripComments(readFileSync(join(path, file), 'utf8'));
       DIRECT_SPELL_OBJECT.lastIndex = 0;
@@ -123,7 +129,7 @@ describe('every SpellObject states the extent it paints', () => {
     // style would otherwise make this suite pass by scanning nothing.
     let counted = 0;
     for (const directory of SPELL_DIRECTORIES) {
-      const path = join(GAME_OBJECT_DIR, directory);
+      const path = join(rootFor(directory), directory);
       for (const file of readdirSync(path).filter(name => name.endsWith('.ts'))) {
         const source = stripComments(readFileSync(join(path, file), 'utf8'));
         DIRECT_SPELL_OBJECT.lastIndex = 0;

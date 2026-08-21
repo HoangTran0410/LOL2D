@@ -11,16 +11,16 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Rammus_W, {
-  REFLECT_PERCENT,
-  SHIELD_AMOUNT,
-} from '../../../src/game/gameObject/spells/Rammus_W';
-import Rammus_E, {
-  DAMAGE as TAUNT_DAMAGE,
-  RANGE,
-} from '../../../src/game/gameObject/spells/Rammus_E';
 import Taunt from '../../../src/game/gameObject/buffs/Taunt';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { REFLECT_PERCENT, SHIELD_AMOUNT } from '../../../packs/riot/spells/Rammus_W';
+import makeRammus_W from '../../../packs/riot/spells/Rammus_W';
+import { DAMAGE as TAUNT_DAMAGE, RANGE } from '../../../packs/riot/spells/Rammus_E';
+import makeRammus_E from '../../../packs/riot/spells/Rammus_E';
+const __api = buildContentApi();
+const Rammus_W = makeRammus_W(__api);
+const Rammus_E = makeRammus_E(__api);
 
 let game: TestGame;
 

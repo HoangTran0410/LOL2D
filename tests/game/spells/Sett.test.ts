@@ -8,20 +8,6 @@ import EventType from '../../../src/game/enums/EventType';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
-import Sett_E, { SETT_E_DAMAGE } from '../../../src/game/gameObject/spells/Sett_E';
-import Sett_Q, { SETT_Q_BONUS, SETT_Q_HITS } from '../../../src/game/gameObject/spells/Sett_Q';
-import Sett_R, {
-  SETT_R_BLAST,
-  SETT_R_SLAM,
-  Sett_R_Carry,
-} from '../../../src/game/gameObject/spells/Sett_R';
-import Sett_W, {
-  SETT_W_BASE,
-  SETT_W_GRIT_DECAY_MS,
-  SETT_W_GRIT_MAX,
-  SETT_W_GRIT_RATIO,
-  SETT_W_GRIT_SCALE,
-} from '../../../src/game/gameObject/spells/Sett_W';
 import {
   createGame,
   createUnit,
@@ -29,6 +15,21 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { SETT_E_DAMAGE } from '../../../packs/riot/spells/Sett_E';
+import makeSett_E from '../../../packs/riot/spells/Sett_E';
+import { SETT_Q_BONUS, SETT_Q_HITS } from '../../../packs/riot/spells/Sett_Q';
+import makeSett_Q from '../../../packs/riot/spells/Sett_Q';
+import { SETT_R_BLAST, SETT_R_SLAM } from '../../../packs/riot/spells/Sett_R';
+import makeSett_R, { makeSett_R_Carry } from '../../../packs/riot/spells/Sett_R';
+import { SETT_W_BASE, SETT_W_GRIT_DECAY_MS, SETT_W_GRIT_MAX, SETT_W_GRIT_RATIO, SETT_W_GRIT_SCALE } from '../../../packs/riot/spells/Sett_W';
+import makeSett_W from '../../../packs/riot/spells/Sett_W';
+const __api = buildContentApi();
+const Sett_E = makeSett_E(__api);
+const Sett_Q = makeSett_Q(__api);
+const Sett_R = makeSett_R(__api);
+const Sett_R_Carry = makeSett_R_Carry(__api);
+const Sett_W = makeSett_W(__api);
 
 /**
  * Every unit lives on the +x axis so it stays inside the fixture's 1000-unit

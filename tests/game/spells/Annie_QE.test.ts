@@ -15,11 +15,17 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Annie_Q, { DAMAGE as Q_DAMAGE } from '../../../src/game/gameObject/spells/Annie_Q';
-import Annie_E, { RETURN_DAMAGE, SHIELD_AMOUNT } from '../../../src/game/gameObject/spells/Annie_E';
 import { lethalTargets } from '../../../src/game/combat/ExecuteTargeting';
 import { TargetResolver } from '../../../src/game/spell/targeting/TargetResolver';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE as Q_DAMAGE } from '../../../packs/riot/spells/Annie_Q';
+import makeAnnie_Q from '../../../packs/riot/spells/Annie_Q';
+import { RETURN_DAMAGE, SHIELD_AMOUNT } from '../../../packs/riot/spells/Annie_E';
+import makeAnnie_E from '../../../packs/riot/spells/Annie_E';
+const __api = buildContentApi();
+const Annie_Q = makeAnnie_Q(__api);
+const Annie_E = makeAnnie_E(__api);
 
 let game: TestGame;
 

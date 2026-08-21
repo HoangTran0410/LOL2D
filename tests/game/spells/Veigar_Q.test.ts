@@ -10,12 +10,14 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Veigar_Q, {
-  Veigar_Q_Object,
-  liveStacks,
-} from '../../../src/game/gameObject/spells/Veigar_Q';
 import { lethalTargets } from '../../../src/game/combat/ExecuteTargeting';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeVeigar_Q, { makeVeigar_Q_Object, makeLiveStacks } from '../../../packs/riot/spells/Veigar_Q';
+const __api = buildContentApi();
+const Veigar_Q = makeVeigar_Q(__api);
+const Veigar_Q_Object = makeVeigar_Q_Object(__api);
+const liveStacks = makeLiveStacks(__api);
 
 let game: TestGame;
 

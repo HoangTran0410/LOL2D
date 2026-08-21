@@ -1,18 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Morgana_W, {
-  CAST_TIME_MS,
-  DURATION_MS,
-  MANA_COST,
-  MAX_TICK_DAMAGE,
-  MIN_TICK_DAMAGE,
-  MONSTER_DAMAGE_MULTIPLIER,
-  Morgana_W_Object,
-  RADIUS,
-  RANGE,
-  SPIKE_COUNT,
-  spikeLayout,
-  TICK_EVERY_MS,
-} from '../../../src/game/gameObject/spells/Morgana_W';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import {
@@ -21,6 +7,12 @@ import {
   installSketchMathGlobals,
   installSpellObjectGlobals,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS, DURATION_MS, MANA_COST, MAX_TICK_DAMAGE, MIN_TICK_DAMAGE, MONSTER_DAMAGE_MULTIPLIER, RADIUS, RANGE, SPIKE_COUNT, spikeLayout, TICK_EVERY_MS } from '../../../packs/riot/spells/Morgana_W';
+import makeMorgana_W, { makeMorgana_W_Object } from '../../../packs/riot/spells/Morgana_W';
+const __api = buildContentApi();
+const Morgana_W = makeMorgana_W(__api);
+const Morgana_W_Object = makeMorgana_W_Object(__api);
 
 const context = (
   owner: { position: { x: number; y: number } },

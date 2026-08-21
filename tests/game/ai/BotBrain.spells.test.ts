@@ -6,12 +6,17 @@ import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion'
 import { BotBrain, SCORE_DAMAGE, SCORE_ZONE } from '../../../src/game/ai/BotBrain';
 import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
 import type Spell from '../../../src/game/gameObject/Spell';
-import Zed_R from '../../../src/game/gameObject/spells/Zed_R';
-import Alistar_W from '../../../src/game/gameObject/spells/Alistar_W';
-import Nocturne_R from '../../../src/game/gameObject/spells/Nocturne_R';
 import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
 import type { LaneState } from '../../../src/game/ai/LaneObjectives';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeZed_R from '../../../packs/riot/spells/Zed_R';
+import makeAlistar_W from '../../../packs/riot/spells/Alistar_W';
+import makeNocturne_R from '../../../packs/riot/spells/Nocturne_R';
+const __api = buildContentApi();
+const Zed_R = makeZed_R(__api);
+const Alistar_W = makeAlistar_W(__api);
+const Nocturne_R = makeNocturne_R(__api);
 
 const PRESET: ChampionPresetData = {
   name: 'Test',
@@ -244,7 +249,7 @@ describe('spell choice', () => {
 
   it('reads an undeclared range as the tier reach, never as an infinite one', () => {
     // `Flash` declares no range at all, and 27 other POINT/DIRECTION spells in
-    // `src/game/gameObject/spells/` declare none either. Reading that as
+    // `packs/riot/spells/` declare none either. Reading that as
     // +Infinity made every one of them reachable from anywhere on the map, so
     // the skip below never fired for any of them.
     const { game, bot, brain } = setup(); // normal aggroRange is 420
@@ -472,7 +477,7 @@ describe('casting while running away', () => {
   /**
    * The three tests in this file that use REAL spell classes, because the stubs
    * are what hid the bug they cover: every stub declares `static aiRoles`, and
-   * **no spell in `src/game/gameObject/spells/` does**. On real data `Escape`,
+   * **no spell in `packs/riot/spells/` does**. On real data `Escape`,
    * `Heal` and `Shield` come only from `inferRoles`, and it hands
    * `roles(Buff, Shield)` to every costed `SELF` cast — 72 of the 82 `SELF`
    * spells in that directory. In RETREAT that mask is the only thing the role

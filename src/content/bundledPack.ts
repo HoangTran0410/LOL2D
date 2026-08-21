@@ -10,8 +10,20 @@ import type {
   SpellSource,
 } from './ContentPack';
 import { CHAMPION_KITS } from '@/game/config/spellCatalog';
-import { spellCatalog } from '@/generated/spellCatalog';
-import { spellModules } from '@/generated/spellModules';
+// Relative, not `@/…`: batch 4 task 3 moved the spells (and their generated
+// catalogue) into `packs/riot/generated/`. Core's own `@/generated/spellCatalog`
+// now holds only `BasicAttack` — see that file's own header.
+import { spellCatalog } from '../../packs/riot/generated/spellCatalog';
+import { spellModules } from '../../packs/riot/generated/spellModules';
+// `BasicAttack` is core's own generated entry (`coreSpells/index.ts`'s own
+// header: "the last-resort fallback... must not itself be something that
+// might not have arrived"), and `CHAMPION_KITS`' "Đánh Thường" shelf and
+// slot 0 of every kit still name it as a bare id, unqualified from the
+// riot pack's own — merged in below, content-last, the same way the two
+// generated trees were one file before batch 4 task 3 split them.
+// `bundledPack.ts` dies with the rest of this bridge in Task 7.
+import { spellCatalog as coreSpellCatalog } from '@/generated/spellCatalog';
+import { spellModules as coreSpellModules } from '@/generated/spellModules';
 import { summonersRift } from './maps/summonersRift';
 // `Baron.ts` moved into `packs/riot/monsters/` (Task 2 of the content-pack
 // extraction). This file's own header explains why reaching for it here is
@@ -59,29 +71,36 @@ const _attackShapesAgree: [ChampionAttack, ChampionAttackTuning] = [
 ];
 void _attackShapesAgree;
 
-const spellSources = (): Record<string, SpellSource> => {
+const spellSources = (api: ContentApi): Record<string, SpellSource> => {
   const out: Record<string, SpellSource> = {};
+  // Every pack spell module's `default` is now `(api: ContentApi) => SpellClass`
+  // (batch 4 task 3) — the loader resolves the module *and* calls the factory,
+  // so whatever `PackRegistry` gets back is still a plain constructible class.
   for (const [id, load] of Object.entries(spellModules)) {
-    out[id] = () => load().then(module => module.default);
+    out[id] = () => load().then(module => module.default(api));
   }
   // Not in `spellModules`, on purpose: `Recall` is out of `spells/index.ts` so
   // that it can never reach the loadout picker, which is also why it gets no
-  // `spellDisplay` entry below. `preset.ts` already imports it statically for
-  // every match, so nothing here needs it loaded eagerly a second time — and
-  // an eager import was a real static edge into the `game` chunk that this
-  // function otherwise has no need for (`spellSources` itself never touches
-  // `api` — the code half's own `api` use is `monsterAbilities`, below, and
-  // `data`'s three builders below this one still never touch it). A loader — the same shape
-  // `spellModules`' entries already use — exercises the lazy arm of
-  // `SpellSource` instead of the eager one, which is a better fit anyway:
-  // this file has no *other* reason to reach into `src/game/gameObject/`.
-  out.Recall = () => import('@/game/gameObject/spells/Recall').then(module => module.default);
+  // `spellDisplay` entry below. `preset.ts` reaches it directly and
+  // synchronously for every match (`attachRecall`, a named, pinned exception —
+  // see `tests/content/coreSpells.test.ts`), so nothing here needs it loaded
+  // eagerly a second time. A loader — the same shape `spellModules`' entries
+  // already use — exercises the lazy arm of `SpellSource` instead of the
+  // eager one, which is a better fit anyway: this file has no *other* reason
+  // to reach into `packs/riot/spells/` outside the generated barrel above.
+  out.Recall = () =>
+    import('../../packs/riot/spells/Recall').then(module => module.default(api));
+  // Core's own entries (`BasicAttack`) are already plain classes on `default`
+  // — no factory to call, unlike every riot-pack loader above.
+  for (const [id, load] of Object.entries(coreSpellModules)) {
+    out[id] = () => load().then(module => module.default);
+  }
   return out;
 };
 
 const displayData = (): Record<string, SpellDisplayData> => {
   const out: Record<string, SpellDisplayData> = {};
-  for (const [id, entry] of Object.entries(spellCatalog)) {
+  for (const [id, entry] of Object.entries({ ...spellCatalog, ...coreSpellCatalog })) {
     out[id] = {
       name: entry.name,
       description: entry.description,
@@ -359,7 +378,7 @@ export const data: ContentPackData = {
 };
 
 const code = (api: ContentApi): ContentPackCode => ({
-  spells: spellSources(),
+  spells: spellSources(api),
   // The one place `api` is actually used in this file — every other section
   // (`championEntries`, `displayData`, `monsterEntries`) is pure data and
   // never touches it. Baron is the only monster with a code half today.

@@ -3,21 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Diana_Q, {
-  MOONLIGHT_MS,
-  Moonlight,
-  Q_DAMAGE,
-  Q_SWEEP_MS,
-  moonlightOn,
-} from '../../../src/game/gameObject/spells/Diana_Q';
-import Diana_W, {
-  W_SHIELD,
-  W_SPHERES,
-  W_SPHERE_DAMAGE,
-} from '../../../src/game/gameObject/spells/Diana_W';
-import Diana_E, { E_DAMAGE } from '../../../src/game/gameObject/spells/Diana_E';
-import Diana_R, { R_DAMAGE, R_PULL_MS } from '../../../src/game/gameObject/spells/Diana_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
@@ -27,6 +12,22 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { MOONLIGHT_MS, Q_DAMAGE, Q_SWEEP_MS } from '../../../packs/riot/spells/Diana_Q';
+import makeDiana_Q, { makeMoonlight, makeMoonlightOn } from '../../../packs/riot/spells/Diana_Q';
+import { W_SHIELD, W_SPHERES, W_SPHERE_DAMAGE } from '../../../packs/riot/spells/Diana_W';
+import makeDiana_W from '../../../packs/riot/spells/Diana_W';
+import { E_DAMAGE } from '../../../packs/riot/spells/Diana_E';
+import makeDiana_E from '../../../packs/riot/spells/Diana_E';
+import { R_DAMAGE, R_PULL_MS } from '../../../packs/riot/spells/Diana_R';
+import makeDiana_R from '../../../packs/riot/spells/Diana_R';
+const __api = buildContentApi();
+const Diana_Q = makeDiana_Q(__api);
+const Moonlight = makeMoonlight(__api);
+const moonlightOn = makeMoonlightOn(__api);
+const Diana_W = makeDiana_W(__api);
+const Diana_E = makeDiana_E(__api);
+const Diana_R = makeDiana_R(__api);
 
 /** Diana stands well inside the fixture's 1000x1000 map so no victim falls out of the tree. */
 const HOME_X = 500;

@@ -3,9 +3,12 @@ import Champion, {
   type ChampionPresetData,
 } from '../../../src/game/gameObject/attackableUnits/Champion';
 import Pet from '../../../src/game/gameObject/attackableUnits/Pet';
-import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
 import { blackboardFor, BLACKBOARD_TTL_MS } from '../../../src/game/ai/TeamBlackboard';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeZed_W_Clone } from '../../../packs/riot/spells/Zed_W';
+const __api = buildContentApi();
+const Zed_W_Clone = makeZed_W_Clone(__api);
 
 const PRESET: ChampionPresetData = {
   name: 'Test',

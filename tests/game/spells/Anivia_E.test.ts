@@ -3,15 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Anivia_E, {
-  Anivia_E_Bolt,
-  BASE_DAMAGE,
-  CHILLED_DAMAGE,
-  MISSILE_SPEED,
-  RANGE,
-  SPAWN_OFFSET_DISTANCE,
-} from '../../../src/game/gameObject/spells/Anivia_E';
 import Chilled from '../../../src/game/gameObject/buffs/Chilled';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -22,6 +13,12 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BASE_DAMAGE, CHILLED_DAMAGE, MISSILE_SPEED, RANGE, SPAWN_OFFSET_DISTANCE } from '../../../packs/riot/spells/Anivia_E';
+import makeAnivia_E, { makeAnivia_E_Bolt } from '../../../packs/riot/spells/Anivia_E';
+const __api = buildContentApi();
+const Anivia_E = makeAnivia_E(__api);
+const Anivia_E_Bolt = makeAnivia_E_Bolt(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

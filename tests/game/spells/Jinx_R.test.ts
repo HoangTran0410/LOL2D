@@ -3,16 +3,16 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Jinx_R, {
-  Jinx_R_Object,
-  Jinx_R_Smoke,
-  SMOKE_MS,
-  SMOKE_STEP,
-} from '../../../src/game/gameObject/spells/Jinx_R';
 import AoePulse from '../../../src/game/gameObject/spellObjects/AoePulse';
 import type { Rectangle } from '../../../src/libs/quadtree';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { SMOKE_MS, SMOKE_STEP } from '../../../packs/riot/spells/Jinx_R';
+import makeJinx_R, { makeJinx_R_Object, makeJinx_R_Smoke } from '../../../packs/riot/spells/Jinx_R';
+const __api = buildContentApi();
+const Jinx_R = makeJinx_R(__api);
+const Jinx_R_Object = makeJinx_R_Object(__api);
+const Jinx_R_Smoke = makeJinx_R_Smoke(__api);
 
 installSpellObjectGlobals();
 

@@ -3,19 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Vi_Q, {
-  Q_MAX_CHARGE_MS,
-  Q_MAX_DAMAGE,
-  Q_MAX_DISTANCE,
-  Q_MIN_DAMAGE,
-  Q_MIN_DISTANCE,
-  viQDamage,
-  viQDashDistance,
-} from '../../../src/game/gameObject/spells/Vi_Q';
-import Vi_W, { W_ATTACK_SPEED, W_PROC, W_STACKS } from '../../../src/game/gameObject/spells/Vi_W';
-import Vi_E, { E_CHARGES, E_DAMAGE } from '../../../src/game/gameObject/spells/Vi_E';
-import Vi_R, { R_DAMAGE, R_PASS_DAMAGE } from '../../../src/game/gameObject/spells/Vi_R';
 import Airborne from '../../../src/game/gameObject/buffs/Airborne';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -27,6 +14,20 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { Q_MAX_CHARGE_MS, Q_MAX_DAMAGE, Q_MAX_DISTANCE, Q_MIN_DAMAGE, Q_MIN_DISTANCE, viQDamage, viQDashDistance } from '../../../packs/riot/spells/Vi_Q';
+import makeVi_Q from '../../../packs/riot/spells/Vi_Q';
+import { W_ATTACK_SPEED, W_PROC, W_STACKS } from '../../../packs/riot/spells/Vi_W';
+import makeVi_W from '../../../packs/riot/spells/Vi_W';
+import { E_CHARGES, E_DAMAGE } from '../../../packs/riot/spells/Vi_E';
+import makeVi_E from '../../../packs/riot/spells/Vi_E';
+import { R_DAMAGE, R_PASS_DAMAGE } from '../../../packs/riot/spells/Vi_R';
+import makeVi_R from '../../../packs/riot/spells/Vi_R';
+const __api = buildContentApi();
+const Vi_Q = makeVi_Q(__api);
+const Vi_W = makeVi_W(__api);
+const Vi_E = makeVi_E(__api);
+const Vi_R = makeVi_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

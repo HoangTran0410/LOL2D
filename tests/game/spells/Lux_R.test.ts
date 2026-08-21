@@ -3,22 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
-
-import Lux_R, {
-  CAST_TIME_MS,
-  DAMAGE,
-  MANA_COST,
-  RANGE,
-  REVEAL_DURATION_MS,
-  REVEAL_VISION_RADIUS,
-  VISION_LIFETIME_MS,
-  WIDTH,
-} from '../../../src/game/gameObject/spells/Lux_R';
-import Flash from '../../../src/game/gameObject/spells/Flash';
-import Ghost from '../../../src/game/gameObject/spells/Ghost';
-import Heal from '../../../src/game/gameObject/spells/Heal';
-import Ignite from '../../../src/game/gameObject/spells/Ignite';
-import Lux_E, { Lux_E_Object } from '../../../src/game/gameObject/spells/Lux_E';
 import Spell from '../../../src/game/gameObject/Spell';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
@@ -28,6 +12,22 @@ import CastBar from '../../../src/game/vfx/CastBar';
 import LuxBeamEffect from '../../../packs/riot/vfx/LuxBeamEffect';
 import { Rectangle } from '../../../src/libs/quadtree';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS, DAMAGE, MANA_COST, RANGE, REVEAL_DURATION_MS, REVEAL_VISION_RADIUS, VISION_LIFETIME_MS, WIDTH } from '../../../packs/riot/spells/Lux_R';
+import makeLux_R from '../../../packs/riot/spells/Lux_R';
+import makeFlash from '../../../packs/riot/spells/Flash';
+import makeGhost from '../../../packs/riot/spells/Ghost';
+import makeHeal from '../../../packs/riot/spells/Heal';
+import makeIgnite from '../../../packs/riot/spells/Ignite';
+import makeLux_E, { makeLux_E_Object } from '../../../packs/riot/spells/Lux_E';
+const __api = buildContentApi();
+const Lux_R = makeLux_R(__api);
+const Flash = makeFlash(__api);
+const Ghost = makeGhost(__api);
+const Heal = makeHeal(__api);
+const Ignite = makeIgnite(__api);
+const Lux_E = makeLux_E(__api);
+const Lux_E_Object = makeLux_E_Object(__api);
 
 class TestVector {
   constructor(

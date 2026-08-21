@@ -26,18 +26,40 @@ vi.mock('../../../src/managers/AssetManager', () => ({
     placeholder: vi.fn(() => ({ url: 'x' })),
   },
 }));
-
-import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import * as CoreSpells from '../../../src/game/gameObject/coreSpells/index';
+import * as AllSpellFactories from '../../../packs/riot/spells/index';
+import { buildContentApi } from '../../../src/content/ContentApi';
 import { getSpellDisplay } from '../../../src/game/preset';
 import {
   isSpellCatalogId,
   spellCatalogIds,
   spellDisplayOf,
 } from '../../../src/game/config/spellCatalog';
-import { spellCatalog } from '../../../src/generated/spellCatalog';
+import { spellCatalog as coreSpellCatalog } from '../../../src/generated/spellCatalog';
+import { spellCatalog as riotSpellCatalog } from '../../../packs/riot/generated/spellCatalog';
 import { BUNDLED_PACK_ID } from '../../../src/content/bundledPack';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
+
+// Every pack spell's `default` export is now `(api: ContentApi) => SpellClass`
+// (batch 4 task 3) — resolved once here so `AllSpells.Ahri_Q` etc. stay plain
+// constructible classes, exactly like `tests/game/spell/registry.ts` does.
+const __api = buildContentApi();
+const AllSpells: Record<string, unknown> = Object.fromEntries(
+  Object.entries(AllSpellFactories).map(([id, factory]) => [
+    id,
+    typeof factory === 'function' ? (factory as (api: typeof __api) => unknown)(__api) : factory,
+  ])
+);
+
+// The generated catalogue now splits across two trees the same way the spell
+// classes do — core's own (`BasicAttack`) and the riot pack's (everything
+// else) — so "the generated catalogue" this file checks against means both,
+// merged content-last exactly as `scripts/generate-spell-catalog.mjs` merges
+// them.
+const spellCatalog: Record<string, { name: string; description: string; iconKey: unknown }> = {
+  ...riotSpellCatalog,
+  ...coreSpellCatalog,
+};
 
 // The catalogue is generated from two barrels — `spells/` (content) and
 // `coreSpells/` (`BasicAttack`) — merged content-last, so "the barrel" this

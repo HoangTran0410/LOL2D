@@ -3,11 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import JarvanIV_Q from '../../../src/game/gameObject/spells/JarvanIV_Q';
-import JarvanIV_W from '../../../src/game/gameObject/spells/JarvanIV_W';
-import JarvanIV_E from '../../../src/game/gameObject/spells/JarvanIV_E';
-import JarvanIV_R from '../../../src/game/gameObject/spells/JarvanIV_R';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -15,6 +10,16 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeJarvanIV_Q from '../../../packs/riot/spells/JarvanIV_Q';
+import makeJarvanIV_W from '../../../packs/riot/spells/JarvanIV_W';
+import makeJarvanIV_E from '../../../packs/riot/spells/JarvanIV_E';
+import makeJarvanIV_R from '../../../packs/riot/spells/JarvanIV_R';
+const __api = buildContentApi();
+const JarvanIV_Q = makeJarvanIV_Q(__api);
+const JarvanIV_W = makeJarvanIV_W(__api);
+const JarvanIV_E = makeJarvanIV_E(__api);
+const JarvanIV_R = makeJarvanIV_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

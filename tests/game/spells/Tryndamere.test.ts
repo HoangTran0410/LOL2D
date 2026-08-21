@@ -7,24 +7,6 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
-import Tryndamere_Q, {
-  TRYNDAMERE_Q_AD_BONUS_MAX,
-  TRYNDAMERE_Q_BASE_HEAL,
-  TRYNDAMERE_Q_MAX_HEAL,
-  TRYNDAMERE_Q_MISSING_HEALTH_HEAL,
-  TRYNDAMERE_Q_STACK_ID,
-} from '../../../src/game/gameObject/spells/Tryndamere_Q';
-import Tryndamere_W, {
-  TRYNDAMERE_W_AD_REDUCTION,
-  TRYNDAMERE_W_RADIUS,
-  TRYNDAMERE_W_STACK_ID,
-} from '../../../src/game/gameObject/spells/Tryndamere_W';
-import Tryndamere_E, {
-  TRYNDAMERE_E_DAMAGE,
-} from '../../../src/game/gameObject/spells/Tryndamere_E';
-import Tryndamere_R, {
-  TRYNDAMERE_R_STACK_ID,
-} from '../../../src/game/gameObject/spells/Tryndamere_R';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -33,6 +15,20 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { TRYNDAMERE_Q_AD_BONUS_MAX, TRYNDAMERE_Q_BASE_HEAL, TRYNDAMERE_Q_MAX_HEAL, TRYNDAMERE_Q_MISSING_HEALTH_HEAL, TRYNDAMERE_Q_STACK_ID } from '../../../packs/riot/spells/Tryndamere_Q';
+import makeTryndamere_Q from '../../../packs/riot/spells/Tryndamere_Q';
+import { TRYNDAMERE_W_AD_REDUCTION, TRYNDAMERE_W_RADIUS, TRYNDAMERE_W_STACK_ID } from '../../../packs/riot/spells/Tryndamere_W';
+import makeTryndamere_W from '../../../packs/riot/spells/Tryndamere_W';
+import { TRYNDAMERE_E_DAMAGE } from '../../../packs/riot/spells/Tryndamere_E';
+import makeTryndamere_E from '../../../packs/riot/spells/Tryndamere_E';
+import { TRYNDAMERE_R_STACK_ID } from '../../../packs/riot/spells/Tryndamere_R';
+import makeTryndamere_R from '../../../packs/riot/spells/Tryndamere_R';
+const __api = buildContentApi();
+const Tryndamere_Q = makeTryndamere_Q(__api);
+const Tryndamere_W = makeTryndamere_W(__api);
+const Tryndamere_E = makeTryndamere_E(__api);
+const Tryndamere_R = makeTryndamere_R(__api);
 
 describe('Tryndamere', () => {
   let game: TestGame;

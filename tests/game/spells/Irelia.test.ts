@@ -3,49 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Irelia_Q, {
-  applyIreliaMark,
-  Irelia_Q_Blades,
-  findIreliaMark,
-  IRELIA_MARK_MS,
-  Q_DAMAGE,
-  Q_RANGE,
-} from '../../../src/game/gameObject/spells/Irelia_Q';
-import Irelia_W, {
-  Irelia_W_Guard,
-  W_CHARGE_MS,
-  W_DAMAGE_REDUCTION,
-  W_HEAL_PER_HIT,
-  W_MAX_DAMAGE,
-  W_MIN_DAMAGE,
-  W_MIN_REACH,
-} from '../../../src/game/gameObject/spells/Irelia_W';
-import Irelia_E, {
-  E_DAMAGE,
-  E_RANGE,
-  E_RECAST_DELAY_MS,
-  E_THROW_SPEED,
-  E_WINDOW_MS,
-  Irelia_E_Blade,
-  Irelia_E_Throw,
-} from '../../../src/game/gameObject/spells/Irelia_E';
-import Irelia_R, {
-  Irelia_R_Volley,
-  Irelia_R_Wall,
-  R_APEX_OVERSHOOT,
-  R_ARM_LENGTH,
-  R_HOOK_LENGTH,
-  R_HOOK_TURN,
-  R_OPEN_MS,
-  R_DAMAGE,
-  R_RANGE,
-  R_VOLLEY_SIZE,
-  R_VOLLEY_SPEED,
-  R_WALL_COLLAPSE_MS,
-  R_WALL_DAMAGE,
-  R_WALL_MS,
-} from '../../../src/game/gameObject/spells/Irelia_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
@@ -60,6 +17,28 @@ import {
   releaseSpell,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { IRELIA_MARK_MS, Q_DAMAGE, Q_RANGE } from '../../../packs/riot/spells/Irelia_Q';
+import makeIrelia_Q, { makeApplyIreliaMark, makeIrelia_Q_Blades, makeFindIreliaMark } from '../../../packs/riot/spells/Irelia_Q';
+import { W_CHARGE_MS, W_DAMAGE_REDUCTION, W_HEAL_PER_HIT, W_MAX_DAMAGE, W_MIN_DAMAGE, W_MIN_REACH } from '../../../packs/riot/spells/Irelia_W';
+import makeIrelia_W, { makeIrelia_W_Guard } from '../../../packs/riot/spells/Irelia_W';
+import { E_DAMAGE, E_RANGE, E_RECAST_DELAY_MS, E_THROW_SPEED, E_WINDOW_MS } from '../../../packs/riot/spells/Irelia_E';
+import makeIrelia_E, { makeIrelia_E_Blade, makeIrelia_E_Throw } from '../../../packs/riot/spells/Irelia_E';
+import { R_APEX_OVERSHOOT, R_ARM_LENGTH, R_HOOK_LENGTH, R_HOOK_TURN, R_OPEN_MS, R_DAMAGE, R_RANGE, R_VOLLEY_SIZE, R_VOLLEY_SPEED, R_WALL_COLLAPSE_MS, R_WALL_DAMAGE, R_WALL_MS } from '../../../packs/riot/spells/Irelia_R';
+import makeIrelia_R, { makeIrelia_R_Volley, makeIrelia_R_Wall } from '../../../packs/riot/spells/Irelia_R';
+const __api = buildContentApi();
+const Irelia_Q = makeIrelia_Q(__api);
+const applyIreliaMark = makeApplyIreliaMark(__api);
+const Irelia_Q_Blades = makeIrelia_Q_Blades(__api);
+const findIreliaMark = makeFindIreliaMark(__api);
+const Irelia_W = makeIrelia_W(__api);
+const Irelia_W_Guard = makeIrelia_W_Guard(__api);
+const Irelia_E = makeIrelia_E(__api);
+const Irelia_E_Blade = makeIrelia_E_Blade(__api);
+const Irelia_E_Throw = makeIrelia_E_Throw(__api);
+const Irelia_R = makeIrelia_R(__api);
+const Irelia_R_Volley = makeIrelia_R_Volley(__api);
+const Irelia_R_Wall = makeIrelia_R_Wall(__api);
 
 const FRAME_MS = 16;
 

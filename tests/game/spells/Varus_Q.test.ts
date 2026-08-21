@@ -1,21 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Varus_Q, {
-  ARROW_SIZE,
-  ARROW_SPEED,
-  ARROW_VISUAL_HEIGHT,
-  ARROW_VISUAL_WIDTH,
-  DAMAGE_CHARGE_MS,
-  MANA_COST,
-  MAX_CENTER_TRAVEL,
-  MAX_CHARGE_MS,
-  MAX_DAMAGE,
-  MIN_CENTER_TRAVEL,
-  RANGE_CHARGE_MS,
-  SELF_SLOW_PERCENT,
-  Varus_Q_Arrow,
-} from '../../../src/game/gameObject/spells/Varus_Q';
 import Stats from '../../../src/game/gameObject/Stats';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { ARROW_SIZE, ARROW_SPEED, ARROW_VISUAL_HEIGHT, ARROW_VISUAL_WIDTH, DAMAGE_CHARGE_MS, MANA_COST, MAX_CENTER_TRAVEL, MAX_CHARGE_MS, MAX_DAMAGE, MIN_CENTER_TRAVEL, RANGE_CHARGE_MS, SELF_SLOW_PERCENT } from '../../../packs/riot/spells/Varus_Q';
+import makeVarus_Q, { makeVarus_Q_Arrow } from '../../../packs/riot/spells/Varus_Q';
+const __api = buildContentApi();
+const Varus_Q = makeVarus_Q(__api);
+const Varus_Q_Arrow = makeVarus_Q_Arrow(__api);
 
 class Vector {
   constructor(

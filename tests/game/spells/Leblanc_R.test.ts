@@ -1,9 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Leblanc_R, { COOLDOWN_MS, MANA_COST } from '../../../src/game/gameObject/spells/Leblanc_R';
-import Leblanc_Q, { Leblanc_Q_Object } from '../../../src/game/gameObject/spells/Leblanc_Q';
-import Leblanc_W from '../../../src/game/gameObject/spells/Leblanc_W';
-import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
-import Flash from '../../../src/game/gameObject/spells/Flash';
 import AssetManager from '../../../src/managers/AssetManager';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -15,6 +10,20 @@ import {
   TestVector,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { COOLDOWN_MS, MANA_COST } from '../../../packs/riot/spells/Leblanc_R';
+import makeLeblanc_R from '../../../packs/riot/spells/Leblanc_R';
+import makeLeblanc_Q, { makeLeblanc_Q_Object } from '../../../packs/riot/spells/Leblanc_Q';
+import makeLeblanc_W from '../../../packs/riot/spells/Leblanc_W';
+import makeAhri_Q from '../../../packs/riot/spells/Ahri_Q';
+import makeFlash from '../../../packs/riot/spells/Flash';
+const __api = buildContentApi();
+const Leblanc_R = makeLeblanc_R(__api);
+const Leblanc_Q = makeLeblanc_Q(__api);
+const Leblanc_Q_Object = makeLeblanc_Q_Object(__api);
+const Leblanc_W = makeLeblanc_W(__api);
+const Ahri_Q = makeAhri_Q(__api);
+const Flash = makeFlash(__api);
 
 // Leblanc_W's real onSpellCast calls VectorUtils.getVectorWithMaxRange, which
 // needs `.limit()`. The shared fixture vector does not have one; add it once

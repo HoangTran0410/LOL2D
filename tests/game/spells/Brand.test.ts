@@ -3,31 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Brand_Q, {
-  ABLAZE_STACK_ID,
-  Brand_Q_Missile,
-  DAMAGE as Q_DAMAGE,
-  STUN_DURATION_MS,
-  applyAblaze,
-  isAblaze,
-} from '../../../src/game/gameObject/spells/Brand_Q';
-import Brand_W, {
-  ABLAZE_DAMAGE_BONUS,
-  Brand_W_Object,
-  DAMAGE as W_DAMAGE,
-  ERUPT_DELAY_MS,
-} from '../../../src/game/gameObject/spells/Brand_W';
-import Brand_E, {
-  ABLAZE_SPREAD_RADIUS,
-  DAMAGE as E_DAMAGE,
-  SPREAD_RADIUS,
-} from '../../../src/game/gameObject/spells/Brand_E';
-import Brand_R, {
-  BOUNCE_COUNT,
-  Brand_R_Fireball,
-  DAMAGE_PER_BOUNCE,
-} from '../../../src/game/gameObject/spells/Brand_R';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -39,6 +14,24 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { ABLAZE_STACK_ID, DAMAGE as Q_DAMAGE, STUN_DURATION_MS, isAblaze } from '../../../packs/riot/spells/Brand_Q';
+import makeBrand_Q, { makeBrand_Q_Missile, makeApplyAblaze } from '../../../packs/riot/spells/Brand_Q';
+import { ABLAZE_DAMAGE_BONUS, DAMAGE as W_DAMAGE, ERUPT_DELAY_MS } from '../../../packs/riot/spells/Brand_W';
+import makeBrand_W, { makeBrand_W_Object } from '../../../packs/riot/spells/Brand_W';
+import { ABLAZE_SPREAD_RADIUS, DAMAGE as E_DAMAGE, SPREAD_RADIUS } from '../../../packs/riot/spells/Brand_E';
+import makeBrand_E from '../../../packs/riot/spells/Brand_E';
+import { BOUNCE_COUNT, DAMAGE_PER_BOUNCE } from '../../../packs/riot/spells/Brand_R';
+import makeBrand_R, { makeBrand_R_Fireball } from '../../../packs/riot/spells/Brand_R';
+const __api = buildContentApi();
+const Brand_Q = makeBrand_Q(__api);
+const Brand_Q_Missile = makeBrand_Q_Missile(__api);
+const applyAblaze = makeApplyAblaze(__api);
+const Brand_W = makeBrand_W(__api);
+const Brand_W_Object = makeBrand_W_Object(__api);
+const Brand_E = makeBrand_E(__api);
+const Brand_R = makeBrand_R(__api);
+const Brand_R_Fireball = makeBrand_R_Fireball(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

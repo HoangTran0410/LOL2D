@@ -3,17 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import {
-  BALL_SIZE_RATIO,
-  FALLBACK_BODY_SIZE,
-  Rammus_Q_Object,
-  Rammus_Q_Powerball,
-} from '../../../src/game/gameObject/spells/Rammus_Q';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import { createGame, createUnit } from '../spell/fixtures';
 import { MAX_UNIT_SIZE } from '../../../src/game/gameObject/Stats';
 import { TestVector } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BALL_SIZE_RATIO, FALLBACK_BODY_SIZE } from '../../../packs/riot/spells/Rammus_Q';
+import { makeRammus_Q_Object, makeRammus_Q_Powerball } from '../../../packs/riot/spells/Rammus_Q';
+const __api = buildContentApi();
+const Rammus_Q_Object = makeRammus_Q_Object(__api);
+const Rammus_Q_Powerball = makeRammus_Q_Powerball(__api);
 
 const caster = (bodySize: number) => ({
   position: new TestVector(0, 0),

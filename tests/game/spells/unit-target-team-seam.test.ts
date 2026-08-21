@@ -29,7 +29,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
  * source scan honestly reaches. The behaviour is pinned per spell in its own
  * suite; this is the net that catches the eighteenth one.
  */
-const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
 
 /**
  * `Annie_Q` resolves correctly on the path the game actually uses —

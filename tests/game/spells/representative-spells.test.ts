@@ -3,25 +3,32 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
-
-import Anivia_R from '../../../src/game/gameObject/spells/Anivia_R';
-import Janna_Q from '../../../src/game/gameObject/spells/Janna_Q';
-import Janna_R, {
-  CHANNEL_DURATION_MS as JANNA_R_CHANNEL_DURATION_MS,
-} from '../../../src/game/gameObject/spells/Janna_R';
-import Lux_R, {
-  CAST_TIME_MS as LUX_R_CAST_TIME_MS,
-} from '../../../src/game/gameObject/spells/Lux_R';
-import Malphite_Q, {
-  CAST_TIME_MS as MALPHITE_CAST_TIME_MS,
-} from '../../../src/game/gameObject/spells/Malphite_Q';
-import Pantheon_Q, { Pantheon_Q_Spear } from '../../../src/game/gameObject/spells/Pantheon_Q';
-import Varus_Q, { Varus_Q_Arrow } from '../../../src/game/gameObject/spells/Varus_Q';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
 import { spellGroups } from '../../../src/game/preset';
 import type { ActivationPattern, CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, createUnit, withCastTime } from '../spell/fixtures';
 import { loadEverySpellForTests } from '../spell/registry';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAnivia_R from '../../../packs/riot/spells/Anivia_R';
+import makeJanna_Q from '../../../packs/riot/spells/Janna_Q';
+import { CHANNEL_DURATION_MS as JANNA_R_CHANNEL_DURATION_MS } from '../../../packs/riot/spells/Janna_R';
+import makeJanna_R from '../../../packs/riot/spells/Janna_R';
+import { CAST_TIME_MS as LUX_R_CAST_TIME_MS } from '../../../packs/riot/spells/Lux_R';
+import makeLux_R from '../../../packs/riot/spells/Lux_R';
+import { CAST_TIME_MS as MALPHITE_CAST_TIME_MS } from '../../../packs/riot/spells/Malphite_Q';
+import makeMalphite_Q from '../../../packs/riot/spells/Malphite_Q';
+import makePantheon_Q, { makePantheon_Q_Spear } from '../../../packs/riot/spells/Pantheon_Q';
+import makeVarus_Q, { makeVarus_Q_Arrow } from '../../../packs/riot/spells/Varus_Q';
+const __api = buildContentApi();
+const Anivia_R = makeAnivia_R(__api);
+const Janna_Q = makeJanna_Q(__api);
+const Janna_R = makeJanna_R(__api);
+const Lux_R = makeLux_R(__api);
+const Malphite_Q = makeMalphite_Q(__api);
+const Pantheon_Q = makePantheon_Q(__api);
+const Pantheon_Q_Spear = makePantheon_Q_Spear(__api);
+const Varus_Q = makeVarus_Q(__api);
+const Varus_Q_Arrow = makeVarus_Q_Arrow(__api);
 
 // Spell classes arrive by dynamic import in the game (`spellRegistry.ts`);
 // this fills the registry synchronously so a test can read the whole

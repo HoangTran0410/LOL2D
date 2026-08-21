@@ -3,36 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Jhin_Q, {
-  JHIN_MARK_MS,
-  JHIN_Q_DAMAGE,
-  JHIN_Q_MAX_HITS,
-  Jhin_Q_Object,
-  applyJhinMark,
-  hasJhinMark,
-} from '../../../src/game/gameObject/spells/Jhin_Q';
-import Jhin_W, {
-  JHIN_W_CAST_MS,
-  JHIN_W_DAMAGE,
-  JHIN_W_RANGE,
-} from '../../../src/game/gameObject/spells/Jhin_W';
-import Jhin_E, {
-  JHIN_E_ARM_MS,
-  JHIN_E_BLAST_RADIUS,
-  JHIN_E_DAMAGE,
-  JHIN_E_FUSE_MS,
-  JHIN_E_MAX_TRAPS,
-  Jhin_E_Trap,
-} from '../../../src/game/gameObject/spells/Jhin_E';
-import Jhin_R, {
-  JHIN_R_DAMAGE,
-  JHIN_R_FINAL_DAMAGE,
-  JHIN_R_RANGE,
-  JHIN_R_SHOTS,
-  JHIN_R_SHOT_GAP_MS,
-  JHIN_R_WINDOW_MS,
-} from '../../../src/game/gameObject/spells/Jhin_R';
 import Root from '../../../src/game/gameObject/buffs/Root';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
@@ -43,6 +13,24 @@ import {
   pressSpell,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { JHIN_MARK_MS, JHIN_Q_DAMAGE, JHIN_Q_MAX_HITS } from '../../../packs/riot/spells/Jhin_Q';
+import makeJhin_Q, { makeJhin_Q_Object, makeApplyJhinMark, makeHasJhinMark } from '../../../packs/riot/spells/Jhin_Q';
+import { JHIN_W_CAST_MS, JHIN_W_DAMAGE, JHIN_W_RANGE } from '../../../packs/riot/spells/Jhin_W';
+import makeJhin_W from '../../../packs/riot/spells/Jhin_W';
+import { JHIN_E_ARM_MS, JHIN_E_BLAST_RADIUS, JHIN_E_DAMAGE, JHIN_E_FUSE_MS, JHIN_E_MAX_TRAPS } from '../../../packs/riot/spells/Jhin_E';
+import makeJhin_E, { makeJhin_E_Trap } from '../../../packs/riot/spells/Jhin_E';
+import { JHIN_R_DAMAGE, JHIN_R_FINAL_DAMAGE, JHIN_R_RANGE, JHIN_R_SHOTS, JHIN_R_SHOT_GAP_MS, JHIN_R_WINDOW_MS } from '../../../packs/riot/spells/Jhin_R';
+import makeJhin_R from '../../../packs/riot/spells/Jhin_R';
+const __api = buildContentApi();
+const Jhin_Q = makeJhin_Q(__api);
+const Jhin_Q_Object = makeJhin_Q_Object(__api);
+const applyJhinMark = makeApplyJhinMark(__api);
+const hasJhinMark = makeHasJhinMark(__api);
+const Jhin_W = makeJhin_W(__api);
+const Jhin_E = makeJhin_E(__api);
+const Jhin_E_Trap = makeJhin_E_Trap(__api);
+const Jhin_R = makeJhin_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string, pool = 100): AttackableUnit {
   const result = createUnit(game, x, teamId);

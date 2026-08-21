@@ -3,30 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Caitlyn_Q, {
-  CAITLYN_Q_DAMAGE,
-  CAITLYN_Q_REDUCED_DAMAGE,
-  Caitlyn_Q_Object,
-} from '../../../src/game/gameObject/spells/Caitlyn_Q';
-import Caitlyn_W, {
-  CAITLYN_W_DAMAGE,
-  CAITLYN_W_MAX_TRAPS,
-  CAITLYN_W_PLACE_RANGE,
-  CAITLYN_W_REVEAL_STACK_ID,
-  CAITLYN_W_ROOT_MS,
-  Caitlyn_W_Trap,
-} from '../../../src/game/gameObject/spells/Caitlyn_W';
-import Caitlyn_E, {
-  CAITLYN_E_DAMAGE,
-  CAITLYN_E_RECOIL_DISTANCE,
-  CAITLYN_E_SLOW_PERCENT,
-  Caitlyn_E_Net,
-} from '../../../src/game/gameObject/spells/Caitlyn_E';
-import Caitlyn_R, {
-  CAITLYN_R_CANCEL_COOLDOWN_MS,
-  CAITLYN_R_CHANNEL_MS,
-} from '../../../src/game/gameObject/spells/Caitlyn_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Root from '../../../src/game/gameObject/buffs/Root';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
@@ -38,6 +14,23 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAITLYN_Q_DAMAGE, CAITLYN_Q_REDUCED_DAMAGE } from '../../../packs/riot/spells/Caitlyn_Q';
+import makeCaitlyn_Q, { makeCaitlyn_Q_Object } from '../../../packs/riot/spells/Caitlyn_Q';
+import { CAITLYN_W_DAMAGE, CAITLYN_W_MAX_TRAPS, CAITLYN_W_PLACE_RANGE, CAITLYN_W_REVEAL_STACK_ID, CAITLYN_W_ROOT_MS } from '../../../packs/riot/spells/Caitlyn_W';
+import makeCaitlyn_W, { makeCaitlyn_W_Trap } from '../../../packs/riot/spells/Caitlyn_W';
+import { CAITLYN_E_DAMAGE, CAITLYN_E_RECOIL_DISTANCE, CAITLYN_E_SLOW_PERCENT } from '../../../packs/riot/spells/Caitlyn_E';
+import makeCaitlyn_E, { makeCaitlyn_E_Net } from '../../../packs/riot/spells/Caitlyn_E';
+import { CAITLYN_R_CANCEL_COOLDOWN_MS, CAITLYN_R_CHANNEL_MS } from '../../../packs/riot/spells/Caitlyn_R';
+import makeCaitlyn_R from '../../../packs/riot/spells/Caitlyn_R';
+const __api = buildContentApi();
+const Caitlyn_Q = makeCaitlyn_Q(__api);
+const Caitlyn_Q_Object = makeCaitlyn_Q_Object(__api);
+const Caitlyn_W = makeCaitlyn_W(__api);
+const Caitlyn_W_Trap = makeCaitlyn_W_Trap(__api);
+const Caitlyn_E = makeCaitlyn_E(__api);
+const Caitlyn_E_Net = makeCaitlyn_E_Net(__api);
+const Caitlyn_R = makeCaitlyn_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

@@ -11,17 +11,22 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import TrueSight from '../../../src/game/gameObject/buffs/TrueSight';
 import BeamSpellObject from '../../../src/game/gameObject/spellObjects/BeamSpellObject';
-import Lux_R, {
-  CAST_TIME_MS as LUX_R_CAST_TIME_MS,
-} from '../../../src/game/gameObject/spells/Lux_R';
-import { Ashe_E_Object } from '../../../src/game/gameObject/spells/Ashe_E';
-import LeeSin_Q, { LeeSin_Q_Object } from '../../../src/game/gameObject/spells/LeeSin_Q';
-import Morgana_R, {
-  CAST_TIME_MS as MORGANA_R_CAST_TIME_MS,
-} from '../../../src/game/gameObject/spells/Morgana_R';
 import { computeHudState } from '../../../src/game/hud/hudState';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS as LUX_R_CAST_TIME_MS } from '../../../packs/riot/spells/Lux_R';
+import makeLux_R from '../../../packs/riot/spells/Lux_R';
+import { makeAshe_E_Object } from '../../../packs/riot/spells/Ashe_E';
+import makeLeeSin_Q, { makeLeeSin_Q_Object } from '../../../packs/riot/spells/LeeSin_Q';
+import { CAST_TIME_MS as MORGANA_R_CAST_TIME_MS } from '../../../packs/riot/spells/Morgana_R';
+import makeMorgana_R from '../../../packs/riot/spells/Morgana_R';
+const __api = buildContentApi();
+const Lux_R = makeLux_R(__api);
+const Ashe_E_Object = makeAshe_E_Object(__api);
+const LeeSin_Q = makeLeeSin_Q(__api);
+const LeeSin_Q_Object = makeLeeSin_Q_Object(__api);
+const Morgana_R = makeMorgana_R(__api);
 
 const unit = (game: TestGame, x = 0, y = 0): AttackableUnit => {
   const created = new AttackableUnit({ game, position: createVector(x, y) });

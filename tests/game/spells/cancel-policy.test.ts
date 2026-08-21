@@ -10,17 +10,12 @@ vi.mock('../../../src/managers/AssetManager', () => ({
     placeholder: () => ({ url: '', status: 'ready' }),
   },
 }));
-
-import * as AllSpells from '../../../src/game/gameObject/spells/index';
 import * as CoreSpells from '../../../src/game/gameObject/coreSpells/index';
 import Spell from '../../../src/game/gameObject/Spell';
 import Stats from '../../../src/game/gameObject/Stats';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import Stasis from '../../../src/game/gameObject/buffs/Stasis';
 import BasicAttack from '../../../src/game/gameObject/coreSpells/BasicAttack';
-import Janna_Q from '../../../src/game/gameObject/spells/Janna_Q';
-import Anivia_R from '../../../src/game/gameObject/spells/Anivia_R';
-import Rammus_Q, { Rammus_Q_Object } from '../../../src/game/gameObject/spells/Rammus_Q';
 import {
   SPELL_FORM_NAMES,
   SpellForm,
@@ -29,6 +24,24 @@ import {
   type SpellFormName,
 } from '../../../src/game/spell/runtime/CancelPolicy';
 import type { CancelReason, CastContext, CastSpec } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeJanna_Q from '../../../packs/riot/spells/Janna_Q';
+import makeAnivia_R from '../../../packs/riot/spells/Anivia_R';
+import makeRammus_Q, { makeRammus_Q_Object } from '../../../packs/riot/spells/Rammus_Q';
+import * as AllSpellFactories from '../../../packs/riot/spells/index';
+const __api = buildContentApi();
+const Janna_Q = makeJanna_Q(__api);
+const Anivia_R = makeAnivia_R(__api);
+const Rammus_Q = makeRammus_Q(__api);
+const Rammus_Q_Object = makeRammus_Q_Object(__api);
+// Every pack spell's `default` export is now a factory (batch 4 task 3) —
+// resolved once so `AllSpells.Varus_Q` etc. below stay plain classes.
+const AllSpells: Record<string, unknown> = Object.fromEntries(
+  Object.entries(AllSpellFactories).map(([id, factory]) => [
+    id,
+    typeof factory === 'function' ? (factory as (api: typeof __api) => unknown)(__api) : factory,
+  ])
+);
 
 class TestVector {
   constructor(

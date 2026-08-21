@@ -5,12 +5,16 @@ import Champion, {
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import Turret from '../../../src/game/gameObject/structures/Turret';
-import Recall, { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/spells/Recall';
 import { RECALL_CLEAR_PX, RECALL_SAFE_MS } from '../../../src/game/ai/BotBrain';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type Spell from '../../../src/game/gameObject/Spell';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { RECALL_CHANNEL_MS } from '../../../packs/riot/spells/Recall';
+import makeRecall from '../../../packs/riot/spells/Recall';
+const __api = buildContentApi();
+const Recall = makeRecall(__api);
 
 const PRESET: ChampionPresetData = {
   name: 'Test',

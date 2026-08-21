@@ -3,11 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Singed_E, { THROW_DISTANCE } from '../../../src/game/gameObject/spells/Singed_E';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Airborne from '../../../src/game/gameObject/buffs/Airborne';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { THROW_DISTANCE } from '../../../packs/riot/spells/Singed_E';
+import makeSinged_E from '../../../packs/riot/spells/Singed_E';
+const __api = buildContentApi();
+const Singed_E = makeSinged_E(__api);
 
 installSpellObjectGlobals();
 

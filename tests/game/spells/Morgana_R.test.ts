@@ -1,18 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Morgana_R, {
-  CAST_TIME_MS,
-  INITIAL_DAMAGE,
-  LATCH_RADIUS,
-  MANA_COST,
-  Morgana_R_Tether,
-  Morgana_R_Tether_Object,
-  RESOLVE_DAMAGE,
-  SELF_HASTE_PERCENT,
-  SLOW_PERCENT,
-  STUN_DURATION_MS,
-  TETHER_DURATION_MS,
-  TETHER_RANGE,
-} from '../../../src/game/gameObject/spells/Morgana_R';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import Speedup from '../../../src/game/gameObject/buffs/Speedup';
@@ -24,6 +10,13 @@ import {
   installSketchMathGlobals,
   installSpellObjectGlobals,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS, INITIAL_DAMAGE, LATCH_RADIUS, MANA_COST, RESOLVE_DAMAGE, SELF_HASTE_PERCENT, SLOW_PERCENT, STUN_DURATION_MS, TETHER_DURATION_MS, TETHER_RANGE } from '../../../packs/riot/spells/Morgana_R';
+import makeMorgana_R, { makeMorgana_R_Tether, makeMorgana_R_Tether_Object } from '../../../packs/riot/spells/Morgana_R';
+const __api = buildContentApi();
+const Morgana_R = makeMorgana_R(__api);
+const Morgana_R_Tether = makeMorgana_R_Tether(__api);
+const Morgana_R_Tether_Object = makeMorgana_R_Tether_Object(__api);
 
 const context = (owner: { position: { x: number; y: number } }): CastContext =>
   Object.freeze({

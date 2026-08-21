@@ -20,7 +20,7 @@ import { describe, expect, it } from 'vitest';
  * Descriptions are deliberately **not** covered. The official ones carry no
  * damage numbers and LOL2D's are scaled to a ~100 health pool.
  */
-const SPELL_DIR = fileURLToPath(new URL('../../../src/game/gameObject/spells/', import.meta.url));
+const SPELL_DIR = fileURLToPath(new URL('../../../packs/riot/spells/', import.meta.url));
 const NAMES: { version: string; names: Record<string, string> } = JSON.parse(
   readFileSync(fileURLToPath(new URL('../../../docs/spell-names-vi.json', import.meta.url)), 'utf8')
 );

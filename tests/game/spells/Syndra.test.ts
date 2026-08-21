@@ -5,26 +5,6 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 }));
 
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
-import Syndra_E, {
-  SYNDRA_E_DAMAGE,
-  Syndra_E_Sphere,
-} from '../../../src/game/gameObject/spells/Syndra_E';
-import Syndra_Q, {
-  MAX_SPHERES,
-  SPHERE_GRAB_RADIUS,
-  SPHERE_LIFETIME_MS,
-  SYNDRA_Q_DAMAGE,
-  SYNDRA_Q_FALL_MS,
-  Syndra_Sphere,
-  groundedSpheres,
-} from '../../../src/game/gameObject/spells/Syndra_Q';
-import Syndra_R, {
-  SYNDRA_R_BASE,
-  SYNDRA_R_CONVERGE_MS,
-  SYNDRA_R_MAX,
-  SYNDRA_R_PER_SPHERE,
-} from '../../../src/game/gameObject/spells/Syndra_R';
-import Syndra_W, { SYNDRA_W_DAMAGE } from '../../../src/game/gameObject/spells/Syndra_W';
 import {
   createGame,
   createUnit,
@@ -32,6 +12,23 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { SYNDRA_E_DAMAGE } from '../../../packs/riot/spells/Syndra_E';
+import makeSyndra_E, { makeSyndra_E_Sphere } from '../../../packs/riot/spells/Syndra_E';
+import { MAX_SPHERES, SPHERE_GRAB_RADIUS, SPHERE_LIFETIME_MS, SYNDRA_Q_DAMAGE, SYNDRA_Q_FALL_MS } from '../../../packs/riot/spells/Syndra_Q';
+import makeSyndra_Q, { makeSyndra_Sphere, makeGroundedSpheres } from '../../../packs/riot/spells/Syndra_Q';
+import { SYNDRA_R_BASE, SYNDRA_R_CONVERGE_MS, SYNDRA_R_MAX, SYNDRA_R_PER_SPHERE } from '../../../packs/riot/spells/Syndra_R';
+import makeSyndra_R from '../../../packs/riot/spells/Syndra_R';
+import { SYNDRA_W_DAMAGE } from '../../../packs/riot/spells/Syndra_W';
+import makeSyndra_W from '../../../packs/riot/spells/Syndra_W';
+const __api = buildContentApi();
+const Syndra_E = makeSyndra_E(__api);
+const Syndra_E_Sphere = makeSyndra_E_Sphere(__api);
+const Syndra_Q = makeSyndra_Q(__api);
+const Syndra_Sphere = makeSyndra_Sphere(__api);
+const groundedSpheres = makeGroundedSpheres(__api);
+const Syndra_R = makeSyndra_R(__api);
+const Syndra_W = makeSyndra_W(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

@@ -120,7 +120,7 @@ describe('Champion spell presentation lifecycle', () => {
   it('routes production spell replacement through Champion cleanup', () => {
     const files = [
       '../../../src/game/gameObject/attackableUnits/AIChampion.ts',
-      '../../../src/game/gameObject/spells/Shaco_R.ts',
+      '../../../packs/riot/spells/Shaco_R.ts',
       '../../../src/game/hud/InGameHUD.ts',
       // The spell picker's `pick()` — what used to be InGameHUD's own
       // spell-swap logic — moved here when the HUD split into a shared

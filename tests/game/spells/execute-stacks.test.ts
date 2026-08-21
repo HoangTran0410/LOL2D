@@ -14,11 +14,19 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import ChoGath_R, { ChoGath_R_Growth } from '../../../src/game/gameObject/spells/ChoGath_R';
-import Nasus_Q, { BASE_DAMAGE } from '../../../src/game/gameObject/spells/Nasus_Q';
-import Garen_R, { BASE_DAMAGE as GAREN_BASE } from '../../../src/game/gameObject/spells/Garen_R';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeChoGath_R, { makeChoGath_R_Growth } from '../../../packs/riot/spells/ChoGath_R';
+import { BASE_DAMAGE } from '../../../packs/riot/spells/Nasus_Q';
+import makeNasus_Q from '../../../packs/riot/spells/Nasus_Q';
+import { BASE_DAMAGE as GAREN_BASE } from '../../../packs/riot/spells/Garen_R';
+import makeGaren_R from '../../../packs/riot/spells/Garen_R';
+const __api = buildContentApi();
+const ChoGath_R = makeChoGath_R(__api);
+const ChoGath_R_Growth = makeChoGath_R_Growth(__api);
+const Nasus_Q = makeNasus_Q(__api);
+const Garen_R = makeGaren_R(__api);
 
 let game: TestGame;
 

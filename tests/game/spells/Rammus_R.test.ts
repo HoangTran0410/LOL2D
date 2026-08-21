@@ -3,11 +3,15 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Rammus_R, { RADIUS, Rammus_R_Leap } from '../../../src/game/gameObject/spells/Rammus_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Untargetable from '../../../src/game/gameObject/buffs/Untargetable';
 import { createGame, createUnit, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { RADIUS } from '../../../packs/riot/spells/Rammus_R';
+import makeRammus_R, { makeRammus_R_Leap } from '../../../packs/riot/spells/Rammus_R';
+const __api = buildContentApi();
+const Rammus_R = makeRammus_R(__api);
+const Rammus_R_Leap = makeRammus_R_Leap(__api);
 
 installSpellObjectGlobals();
 

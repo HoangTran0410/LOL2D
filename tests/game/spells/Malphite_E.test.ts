@@ -3,18 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Malphite_E, {
-  CAST_TIME_MS,
-  COOLDOWN_MS,
-  DAMAGE,
-  FADE_MS,
-  Malphite_E_Object,
-  CRIPPLE_PERCENT,
-  RADIUS,
-  SLOW_DURATION_MS,
-  SLOW_PERCENT,
-} from '../../../src/game/gameObject/spells/Malphite_E';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -25,6 +13,12 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS, COOLDOWN_MS, DAMAGE, FADE_MS, CRIPPLE_PERCENT, RADIUS, SLOW_DURATION_MS, SLOW_PERCENT } from '../../../packs/riot/spells/Malphite_E';
+import makeMalphite_E, { makeMalphite_E_Object } from '../../../packs/riot/spells/Malphite_E';
+const __api = buildContentApi();
+const Malphite_E = makeMalphite_E(__api);
+const Malphite_E_Object = makeMalphite_E_Object(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

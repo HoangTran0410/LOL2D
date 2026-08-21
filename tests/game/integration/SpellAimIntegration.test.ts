@@ -13,9 +13,13 @@ import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import { SpellRole, roles } from '../../../src/game/ai/SpellRole';
 import { THINK_INTERVAL_MS } from '../../../src/game/ai/BotBrain';
 import Game from '../../../src/game/Game';
-import Ahri_Q from '../../../src/game/gameObject/spells/Ahri_Q';
-import { Zed_W_Clone } from '../../../src/game/gameObject/spells/Zed_W';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAhri_Q from '../../../packs/riot/spells/Ahri_Q';
+import { makeZed_W_Clone } from '../../../packs/riot/spells/Zed_W';
+const __api = buildContentApi();
+const Ahri_Q = makeAhri_Q(__api);
+const Zed_W_Clone = makeZed_W_Clone(__api);
 
 class TestVector {
   constructor(
@@ -605,7 +609,7 @@ describe('spell aim integration', () => {
 
   it('keeps shared worldMouse out of spell activation code', () => {
     const spellsDir = fileURLToPath(
-      new URL('../../../src/game/gameObject/spells/', import.meta.url)
+      new URL('../../../packs/riot/spells/', import.meta.url)
     );
     // Code, not prose — the same `codeOnly` split `mana-spend-seam` uses. A
     // scan that matches its own documentation punishes the one thing that

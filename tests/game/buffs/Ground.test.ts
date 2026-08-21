@@ -139,7 +139,7 @@ describe('Ground', () => {
 // teleportTo. Enforcing it in the Dash buff and in Spell.blinkOwnerTo only
 // holds as long as nothing goes around them, so fail the build if anything does.
 describe('no spell relocates its own caster behind the shared gate', () => {
-  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  const spellsDir = join(process.cwd(), 'packs/riot/spells');
   // `coreSpells/` left `spells/` but did not stop being spells — Recall's own
   // `blinkOwnerTo` call is the sanctioned gate this rule is about, so it has
   // to stay in the scanned population. `index.ts` is a barrel, not a spell.

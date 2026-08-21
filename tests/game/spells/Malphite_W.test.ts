@@ -3,16 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
-
-import Malphite_W, {
-  BOUNDING_MARGIN,
-  DURATION_MS,
-  HARD_STOP_MS,
-  Malphite_W_Armor,
-  PLATE_COUNT,
-  SHIELD_AMOUNT,
-  SIZE_BONUS,
-} from '../../../src/game/gameObject/spells/Malphite_W';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import Buff from '../../../src/game/gameObject/Buff';
@@ -23,6 +13,12 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BOUNDING_MARGIN, DURATION_MS, HARD_STOP_MS, PLATE_COUNT, SHIELD_AMOUNT, SIZE_BONUS } from '../../../packs/riot/spells/Malphite_W';
+import makeMalphite_W, { makeMalphite_W_Armor } from '../../../packs/riot/spells/Malphite_W';
+const __api = buildContentApi();
+const Malphite_W = makeMalphite_W(__api);
+const Malphite_W_Armor = makeMalphite_W_Armor(__api);
 
 function unit(game: TestGame, x = 0, teamId = 'blue') {
   const result = createUnit(game, x, teamId);

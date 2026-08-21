@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 // build time instead, for every registered spell file, mirroring
 // `tests/game/buffs/Ground.test.ts`'s guard against `owner.teleportTo`.
 describe('every spell declares a targeting mode', () => {
-  const spellsDir = join(process.cwd(), 'src/game/gameObject/spells');
+  const spellsDir = join(process.cwd(), 'packs/riot/spells');
   // `coreSpells/` left `spells/` but did not stop being spells.
   const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
   // `index.ts` only re-exports; `_EmptyExample.ts` is copy-paste scaffolding

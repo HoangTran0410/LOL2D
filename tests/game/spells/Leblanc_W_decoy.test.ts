@@ -7,10 +7,12 @@ vi.mock('../../../src/managers/AssetManager', () => ({
     renderable: () => 'image',
   },
 }));
-
-import { Leblanc_W_Object } from '../../../src/game/gameObject/spells/Leblanc_W';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import { createGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { makeLeblanc_W_Object } from '../../../packs/riot/spells/Leblanc_W';
+const __api = buildContentApi();
+const Leblanc_W_Object = makeLeblanc_W_Object(__api);
 
 /**
  * LeBlanc's W marker is a decoy, and a decoy has to fool somebody.

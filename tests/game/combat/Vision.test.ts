@@ -15,11 +15,15 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Warwick_R from '../../../src/game/gameObject/spells/Warwick_R';
-import { StealthWard_Object } from '../../../src/game/gameObject/spells/StealthWard';
 import { canSee, hasLineOfSight } from '../../../src/game/combat/Vision';
 import { Quadtree, Rectangle } from '../../../src/libs/quadtree';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeWarwick_R from '../../../packs/riot/spells/Warwick_R';
+import { makeStealthWard_Object } from '../../../packs/riot/spells/StealthWard';
+const __api = buildContentApi();
+const Warwick_R = makeWarwick_R(__api);
+const StealthWard_Object = makeStealthWard_Object(__api);
 
 let game: TestGame;
 

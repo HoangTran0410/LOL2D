@@ -27,7 +27,7 @@ import { join } from 'node:path';
 
 const REPO_ROOT = process.cwd();
 const GAME_OBJECT_ROOT = join(REPO_ROOT, 'src/game/gameObject');
-const SPELL_DIR = join(GAME_OBJECT_ROOT, 'spells');
+const SPELL_DIR = join(REPO_ROOT, 'packs/riot/spells');
 
 /**
  * Everywhere an ability's code can live. `spells/` alone is not enough and the
@@ -46,7 +46,8 @@ const SPELL_DIR = join(GAME_OBJECT_ROOT, 'spells');
  * of the tree it exists to watch.
  */
 const SCANNED: { label: string; root: string }[] = [
-  { label: 'spells', root: join(GAME_OBJECT_ROOT, 'spells') },
+  // Folded in, batch 4 task 3: `spells/` moved into `packs/riot/spells/`.
+  { label: 'spells', root: join(REPO_ROOT, 'packs/riot/spells') },
   { label: 'spellObjects', root: join(GAME_OBJECT_ROOT, 'spellObjects') },
   { label: 'buffs', root: join(GAME_OBJECT_ROOT, 'buffs') },
   { label: 'monsters', root: join(GAME_OBJECT_ROOT, 'monsters') },

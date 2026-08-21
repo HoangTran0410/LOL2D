@@ -3,25 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined, placeholder: () => undefined },
 }));
-
-import Ezreal_Q, {
-  EZREAL_Q_COOLDOWN_REFUND_MS,
-  EZREAL_Q_DAMAGE,
-  EZREAL_Q_RANGE,
-  Ezreal_Q_Object,
-} from '../../../src/game/gameObject/spells/Ezreal_Q';
-import Ezreal_W, {
-  EZREAL_W_DETONATE_DAMAGE,
-  EZREAL_W_MANA_REFUND,
-  EZREAL_W_MARK_DURATION_MS,
-  Ezreal_W_Orb,
-} from '../../../src/game/gameObject/spells/Ezreal_W';
-import Ezreal_E, { EZREAL_E_BLINK_RANGE } from '../../../src/game/gameObject/spells/Ezreal_E';
-import Ezreal_R, {
-  EZREAL_R_CAST_TIME_MS,
-  EZREAL_R_MINION_DAMAGE,
-  Ezreal_R_Object,
-} from '../../../src/game/gameObject/spells/Ezreal_R';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import type Spell from '../../../src/game/gameObject/Spell';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
@@ -32,6 +13,23 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { EZREAL_Q_COOLDOWN_REFUND_MS, EZREAL_Q_DAMAGE, EZREAL_Q_RANGE } from '../../../packs/riot/spells/Ezreal_Q';
+import makeEzreal_Q, { makeEzreal_Q_Object } from '../../../packs/riot/spells/Ezreal_Q';
+import { EZREAL_W_DETONATE_DAMAGE, EZREAL_W_MANA_REFUND, EZREAL_W_MARK_DURATION_MS } from '../../../packs/riot/spells/Ezreal_W';
+import makeEzreal_W, { makeEzreal_W_Orb } from '../../../packs/riot/spells/Ezreal_W';
+import { EZREAL_E_BLINK_RANGE } from '../../../packs/riot/spells/Ezreal_E';
+import makeEzreal_E from '../../../packs/riot/spells/Ezreal_E';
+import { EZREAL_R_CAST_TIME_MS, EZREAL_R_MINION_DAMAGE } from '../../../packs/riot/spells/Ezreal_R';
+import makeEzreal_R, { makeEzreal_R_Object } from '../../../packs/riot/spells/Ezreal_R';
+const __api = buildContentApi();
+const Ezreal_Q = makeEzreal_Q(__api);
+const Ezreal_Q_Object = makeEzreal_Q_Object(__api);
+const Ezreal_W = makeEzreal_W(__api);
+const Ezreal_W_Orb = makeEzreal_W_Orb(__api);
+const Ezreal_E = makeEzreal_E(__api);
+const Ezreal_R = makeEzreal_R(__api);
+const Ezreal_R_Object = makeEzreal_R_Object(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

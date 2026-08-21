@@ -3,17 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Teemo_E, {
-  MANA_COST,
-  ON_HIT_DAMAGE,
-  POISON_DAMAGE_PER_TICK,
-  POISON_DURATION_MS,
-  POISON_TICK_INTERVAL_MS,
-  RANGE,
-  Teemo_E_Object,
-  Teemo_E_Splash,
-} from '../../../src/game/gameObject/spells/Teemo_E';
 import BasicAttack from '../../../src/game/gameObject/coreSpells/BasicAttack';
 import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
 import EventManager from '../../../src/managers/EventManager';
@@ -25,6 +14,13 @@ import { HotKeys, SpellHotKeys } from '../../../src/game/constants';
 import { BasicAttackSwing, MELEE_WINDUP_MS } from '../../../src/game/combat/BasicAttack';
 import { TestVector } from '../spell/fixtures';
 import { createGame, indexObjects, stubGameGlobals } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { MANA_COST, ON_HIT_DAMAGE, POISON_DAMAGE_PER_TICK, POISON_DURATION_MS, POISON_TICK_INTERVAL_MS, RANGE } from '../../../packs/riot/spells/Teemo_E';
+import makeTeemo_E, { makeTeemo_E_Object, makeTeemo_E_Splash } from '../../../packs/riot/spells/Teemo_E';
+const __api = buildContentApi();
+const Teemo_E = makeTeemo_E(__api);
+const Teemo_E_Object = makeTeemo_E_Object(__api);
+const Teemo_E_Splash = makeTeemo_E_Splash(__api);
 
 const target = (teamId: string) =>
   Object.assign(Object.create(AttackableUnit.prototype) as AttackableUnit, {

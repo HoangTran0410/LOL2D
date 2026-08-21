@@ -3,23 +3,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Janna_Q, {
-  Janna_Q_Object,
-  MAX_AIRBORNE_MS,
-  MAX_CHARGE_MS,
-  MAX_DAMAGE,
-  MAX_RANGE,
-  MAX_SIZE,
-  MAX_SPEED,
-  MIN_AIRBORNE_MS,
-  MIN_DAMAGE,
-  MIN_RANGE,
-  MIN_SIZE,
-  MIN_SPEED,
-} from '../../../src/game/gameObject/spells/Janna_Q';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { MAX_AIRBORNE_MS, MAX_CHARGE_MS, MAX_DAMAGE, MAX_RANGE, MAX_SIZE, MAX_SPEED, MIN_AIRBORNE_MS, MIN_DAMAGE, MIN_RANGE, MIN_SIZE, MIN_SPEED } from '../../../packs/riot/spells/Janna_Q';
+import makeJanna_Q, { makeJanna_Q_Object } from '../../../packs/riot/spells/Janna_Q';
+const __api = buildContentApi();
+const Janna_Q = makeJanna_Q(__api);
+const Janna_Q_Object = makeJanna_Q_Object(__api);
 
 class TestVector {
   constructor(

@@ -404,7 +404,8 @@ export default defineConfig({
            * game chunk for every returning player.
            */
           // `coreSpells/` is core and falls through to the `game` chunk below;
-          // only the content directory is chunked per champion.
+          // only the pack's spells are chunked per champion — batch 4 task 3
+          // moved them from `src/game/gameObject/spells/` to `packs/riot/spells/`.
           //
           // `Recall` is the one content file that is not per-champion: it
           // presupposes a fountain, not a kit, so it moved back to `spells/`
@@ -414,9 +415,8 @@ export default defineConfig({
           // chunk that nothing ever *dynamically* imports, which is exactly
           // the static edge `chunks:check`'s `game` rule exists to catch.
           // Carved out ahead of the regex so it bundles with `game` instead.
-          if (id.endsWith('src/game/gameObject/spells/Recall.ts')) return 'game';
-          const spell =
-            /src\/game\/gameObject\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
+          if (id.endsWith('packs/riot/spells/Recall.ts')) return 'game';
+          const spell = /packs\/riot\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
           if (spell) {
             // Summoner spells and the basic attack have no champion prefix to
             // group by, and every kit can hold them — one shared chunk rather

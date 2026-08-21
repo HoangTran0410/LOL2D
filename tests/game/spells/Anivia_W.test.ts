@@ -18,11 +18,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Anivia_W, { Anivia_W_Object } from '../../../src/game/gameObject/spells/Anivia_W';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, stubGameGlobals, withWalls, type TestGame } from '../fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAnivia_W, { makeAnivia_W_Object } from '../../../packs/riot/spells/Anivia_W';
+const __api = buildContentApi();
+const Anivia_W = makeAnivia_W(__api);
+const Anivia_W_Object = makeAnivia_W_Object(__api);
 
 let game: TestGame;
 

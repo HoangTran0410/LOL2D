@@ -18,18 +18,43 @@ import {
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type SpellObject from '../../../src/game/gameObject/SpellObject';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
-
-import Ahri_W, { Ahri_W_Object } from '../../../src/game/gameObject/spells/Ahri_W';
-import Amumu_Q, { Amumu_Q_Object } from '../../../src/game/gameObject/spells/Amumu_Q';
-import Ashe_E, { Ashe_E_Object, Ashe_E_Ping } from '../../../src/game/gameObject/spells/Ashe_E';
-import Leblanc_E, { Leblanc_E_Object } from '../../../src/game/gameObject/spells/Leblanc_E';
-import LeeSin_Q, { LeeSin_Q_Object } from '../../../src/game/gameObject/spells/LeeSin_Q';
-import LeeSin_W, { LeeSin_W_Burst } from '../../../src/game/gameObject/spells/LeeSin_W';
-import Lux_W, { Lux_W_Burst, Lux_W_Object } from '../../../src/game/gameObject/spells/Lux_W';
-import Morgana_E, { Morgana_E_Object } from '../../../src/game/gameObject/spells/Morgana_E';
-import Thresh_Q, { Thresh_Q_Object } from '../../../src/game/gameObject/spells/Thresh_Q';
-import Twitch_Q, { Twitch_Q_Object } from '../../../src/game/gameObject/spells/Twitch_Q';
-import Zed_E, { Zed_E_Object } from '../../../src/game/gameObject/spells/Zed_E';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAhri_W, { makeAhri_W_Object } from '../../../packs/riot/spells/Ahri_W';
+import makeAmumu_Q, { makeAmumu_Q_Object } from '../../../packs/riot/spells/Amumu_Q';
+import makeAshe_E, { makeAshe_E_Object, makeAshe_E_Ping } from '../../../packs/riot/spells/Ashe_E';
+import makeLeblanc_E, { makeLeblanc_E_Object } from '../../../packs/riot/spells/Leblanc_E';
+import makeLeeSin_Q, { makeLeeSin_Q_Object } from '../../../packs/riot/spells/LeeSin_Q';
+import makeLeeSin_W, { makeLeeSin_W_Burst } from '../../../packs/riot/spells/LeeSin_W';
+import makeLux_W, { makeLux_W_Burst, makeLux_W_Object } from '../../../packs/riot/spells/Lux_W';
+import makeMorgana_E, { makeMorgana_E_Object } from '../../../packs/riot/spells/Morgana_E';
+import makeThresh_Q, { makeThresh_Q_Object } from '../../../packs/riot/spells/Thresh_Q';
+import makeTwitch_Q, { makeTwitch_Q_Object } from '../../../packs/riot/spells/Twitch_Q';
+import makeZed_E, { makeZed_E_Object } from '../../../packs/riot/spells/Zed_E';
+const __api = buildContentApi();
+const Ahri_W = makeAhri_W(__api);
+const Ahri_W_Object = makeAhri_W_Object(__api);
+const Amumu_Q = makeAmumu_Q(__api);
+const Amumu_Q_Object = makeAmumu_Q_Object(__api);
+const Ashe_E = makeAshe_E(__api);
+const Ashe_E_Object = makeAshe_E_Object(__api);
+const Ashe_E_Ping = makeAshe_E_Ping(__api);
+const Leblanc_E = makeLeblanc_E(__api);
+const Leblanc_E_Object = makeLeblanc_E_Object(__api);
+const LeeSin_Q = makeLeeSin_Q(__api);
+const LeeSin_Q_Object = makeLeeSin_Q_Object(__api);
+const LeeSin_W = makeLeeSin_W(__api);
+const LeeSin_W_Burst = makeLeeSin_W_Burst(__api);
+const Lux_W = makeLux_W(__api);
+const Lux_W_Burst = makeLux_W_Burst(__api);
+const Lux_W_Object = makeLux_W_Object(__api);
+const Morgana_E = makeMorgana_E(__api);
+const Morgana_E_Object = makeMorgana_E_Object(__api);
+const Thresh_Q = makeThresh_Q(__api);
+const Thresh_Q_Object = makeThresh_Q_Object(__api);
+const Twitch_Q = makeTwitch_Q(__api);
+const Twitch_Q_Object = makeTwitch_Q_Object(__api);
+const Zed_E = makeZed_E(__api);
+const Zed_E_Object = makeZed_E_Object(__api);
 
 const castContext = (caster: AttackableUnit): CastContext =>
   Object.freeze({

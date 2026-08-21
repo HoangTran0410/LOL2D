@@ -1,15 +1,19 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import Nasus_Q, {
-  BASE_DAMAGE,
-  DAMAGE_PER_STACK,
-} from '../../../src/game/gameObject/spells/Nasus_Q';
-import Flash from '../../../src/game/gameObject/spells/Flash';
-import Veigar_Q, { Veigar_Q_Power } from '../../../src/game/gameObject/spells/Veigar_Q';
-import ChoGath_R, {
-  ChoGath_R_Growth,
-  MAX_HEALTH_PER_STACK,
-} from '../../../src/game/gameObject/spells/ChoGath_R';
 import { context } from '../practice/helpers';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BASE_DAMAGE, DAMAGE_PER_STACK } from '../../../packs/riot/spells/Nasus_Q';
+import makeNasus_Q from '../../../packs/riot/spells/Nasus_Q';
+import makeFlash from '../../../packs/riot/spells/Flash';
+import makeVeigar_Q, { makeVeigar_Q_Power } from '../../../packs/riot/spells/Veigar_Q';
+import { MAX_HEALTH_PER_STACK } from '../../../packs/riot/spells/ChoGath_R';
+import makeChoGath_R, { makeChoGath_R_Growth } from '../../../packs/riot/spells/ChoGath_R';
+const __api = buildContentApi();
+const Nasus_Q = makeNasus_Q(__api);
+const Flash = makeFlash(__api);
+const Veigar_Q = makeVeigar_Q(__api);
+const Veigar_Q_Power = makeVeigar_Q_Power(__api);
+const ChoGath_R = makeChoGath_R(__api);
+const ChoGath_R_Growth = makeChoGath_R_Growth(__api);
 
 /**
  * The write side of `Spell.stackCount`, which the Gian lận tab drives.

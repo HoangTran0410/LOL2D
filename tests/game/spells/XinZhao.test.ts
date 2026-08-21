@@ -8,21 +8,6 @@ import EventType from '../../../src/game/enums/EventType';
 import Airborne from '../../../src/game/gameObject/buffs/Airborne';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
-import XinZhao_Q, {
-  XINZHAO_Q_ATTACKS,
-  XINZHAO_Q_BONUS_DAMAGE,
-} from '../../../src/game/gameObject/spells/XinZhao_Q';
-import XinZhao_W, {
-  XinZhao_W_Object,
-  XINZHAO_W_SLASH_DAMAGE,
-  XINZHAO_W_THRUST_DAMAGE,
-  XINZHAO_W_THRUST_DELAY_MS,
-} from '../../../src/game/gameObject/spells/XinZhao_W';
-import XinZhao_E, {
-  isChallengedBy,
-  XINZHAO_E_CHALLENGE_STACK_ID,
-} from '../../../src/game/gameObject/spells/XinZhao_E';
-import XinZhao_R, { XINZHAO_R_DAMAGE } from '../../../src/game/gameObject/spells/XinZhao_R';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -31,6 +16,21 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { XINZHAO_Q_ATTACKS, XINZHAO_Q_BONUS_DAMAGE } from '../../../packs/riot/spells/XinZhao_Q';
+import makeXinZhao_Q from '../../../packs/riot/spells/XinZhao_Q';
+import { XINZHAO_W_SLASH_DAMAGE, XINZHAO_W_THRUST_DAMAGE, XINZHAO_W_THRUST_DELAY_MS } from '../../../packs/riot/spells/XinZhao_W';
+import makeXinZhao_W, { makeXinZhao_W_Object } from '../../../packs/riot/spells/XinZhao_W';
+import { isChallengedBy, XINZHAO_E_CHALLENGE_STACK_ID } from '../../../packs/riot/spells/XinZhao_E';
+import makeXinZhao_E from '../../../packs/riot/spells/XinZhao_E';
+import { XINZHAO_R_DAMAGE } from '../../../packs/riot/spells/XinZhao_R';
+import makeXinZhao_R from '../../../packs/riot/spells/XinZhao_R';
+const __api = buildContentApi();
+const XinZhao_Q = makeXinZhao_Q(__api);
+const XinZhao_W = makeXinZhao_W(__api);
+const XinZhao_W_Object = makeXinZhao_W_Object(__api);
+const XinZhao_E = makeXinZhao_E(__api);
+const XinZhao_R = makeXinZhao_R(__api);
 
 describe('Xin Zhao', () => {
   let game: TestGame;

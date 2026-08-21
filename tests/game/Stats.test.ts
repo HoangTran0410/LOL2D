@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import Stats, { MAX_UNIT_SIZE, Stat, StatModifier } from '../../src/game/gameObject/Stats';
-import { SIZE_PER_STACK } from '../../src/game/gameObject/spells/ChoGath_R';
+import { SIZE_PER_STACK } from '../../packs/riot/spells/ChoGath_R';
 
 describe('Stat ceiling', () => {
   it('leaves a stat without a ceiling completely unclamped', () => {

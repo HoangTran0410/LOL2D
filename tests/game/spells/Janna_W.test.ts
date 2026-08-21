@@ -3,19 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Janna_W, {
-  DAMAGE,
-  Janna_W_Bolt,
-  Janna_W_Passive,
-  MISSILE_SPEED,
-  PASSIVE_SPEED_PERCENT,
-  RANGE,
-  SLOW_DURATION_MS,
-  SLOW_PERCENT,
-  SPAWN_OFFSET_DISTANCE,
-} from '../../../src/game/gameObject/spells/Janna_W';
-import Janna_E, { notifyJannaControlLanded } from '../../../src/game/gameObject/spells/Janna_E';
 import StatusFlags from '../../../src/game/enums/StatusFlags';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
@@ -28,6 +15,16 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE, MISSILE_SPEED, PASSIVE_SPEED_PERCENT, RANGE, SLOW_DURATION_MS, SLOW_PERCENT, SPAWN_OFFSET_DISTANCE } from '../../../packs/riot/spells/Janna_W';
+import makeJanna_W, { makeJanna_W_Bolt, makeJanna_W_Passive } from '../../../packs/riot/spells/Janna_W';
+import makeJanna_E, { makeNotifyJannaControlLanded } from '../../../packs/riot/spells/Janna_E';
+const __api = buildContentApi();
+const Janna_W = makeJanna_W(__api);
+const Janna_W_Bolt = makeJanna_W_Bolt(__api);
+const Janna_W_Passive = makeJanna_W_Passive(__api);
+const Janna_E = makeJanna_E(__api);
+const notifyJannaControlLanded = makeNotifyJannaControlLanded(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

@@ -34,7 +34,20 @@ import {
   type SpellClass,
 } from './spellRegistry';
 import BasicAttack from './gameObject/coreSpells/BasicAttack';
-import Recall from './gameObject/spells/Recall';
+// Relative into `packs/riot/`, not `@/…`: `Recall.ts` moved with the other
+// 237 spells in batch 4 task 3. Its default export is now a factory
+// (`(api: ContentApi) => SpellClass`, like every pack spell), so this also
+// needs a real `ContentApi` — `buildContentApi()` is otherwise reserved for
+// `install.ts`'s caller (`registry.ts`), but this file already carries the
+// one named, pinned exception `tests/content/coreSpells.test.ts` checks for,
+// and `tests/content/corePacksBoundary.test.ts` (the reverse-direction guard
+// this task adds) carries the matching one. Resolved once at module scope,
+// not per champion: `buildContentApi()` is a cached singleton and the class
+// itself never changes between champions.
+import { buildContentApi } from '@/content/ContentApi';
+import makeRecall from '../../packs/riot/spells/Recall';
+
+const RecallClass = makeRecall(buildContentApi());
 
 /**
  * The barrel is gone from this file, and that is the whole of Stage 4.
@@ -64,13 +77,13 @@ export type { SpellClass };
  * A map with no fountain is future work for a content pack to express by
  * simply not calling this; nothing here assumes every champion gets one.
  *
- * Two sibling sites document this same bridge from their own end:
+ * Three sibling sites document this same bridge from their own end:
  * `vite.config.ts`'s chunking carve-out for `Recall.ts`, and
- * `tests/content/coreSpells.test.ts`'s pin naming this the one content import
- * core is allowed for batch 1.
+ * `tests/content/coreSpells.test.ts` and `tests/content/corePacksBoundary.test.ts`'s
+ * pins naming this the one content import core is allowed.
  */
 export const attachRecall = <T extends Champion>(champion: T): T => {
-  champion.recall = new Recall(champion);
+  champion.recall = new RecallClass(champion);
   return champion;
 };
 

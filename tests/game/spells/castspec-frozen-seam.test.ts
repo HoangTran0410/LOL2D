@@ -36,7 +36,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
  * A source scan, like the other seams here: the mistake is a shape, `tsc` is
  * happy with it, and one millisecond rules it out across every spell at once.
  */
-const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 
 /**

@@ -13,36 +13,30 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Silence from '../../../src/game/gameObject/buffs/Silence';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
-import Malzahar_Q, {
-  DAMAGE as VOID_DAMAGE,
-  DELAY_MS as VOID_DELAY_MS,
-  Malzahar_Q_Object,
-  PORTAL_GAP,
-} from '../../../src/game/gameObject/spells/Malzahar_Q';
-import Malzahar_W, {
-  Malzahar_W_Rift,
-  Malzahar_W_Voidling,
-  SPAWN_DELAY_MS,
-  SPAWN_STAGGER_MS,
-  VOIDLING_COUNT,
-  VOIDLING_HEALTH,
-} from '../../../src/game/gameObject/spells/Malzahar_W';
-import Malzahar_E, {
-  MANA_ON_KILL,
-  Malzahar_E_Object,
-  VISIONS_STACK_ID,
-} from '../../../src/game/gameObject/spells/Malzahar_E';
-import Malzahar_R, {
-  CHANNEL_DURATION_MS,
-  Malzahar_R_Zone,
-  ZONE_DAMAGE_PER_TICK,
-  ZONE_TICK_MS,
-} from '../../../src/game/gameObject/spells/Malzahar_R';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import type GameObject from '../../../src/game/gameObject/GameObject';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 import { installSketchMathGlobals, installSpellObjectGlobals } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE as VOID_DAMAGE, DELAY_MS as VOID_DELAY_MS, PORTAL_GAP } from '../../../packs/riot/spells/Malzahar_Q';
+import makeMalzahar_Q, { makeMalzahar_Q_Object } from '../../../packs/riot/spells/Malzahar_Q';
+import { SPAWN_DELAY_MS, SPAWN_STAGGER_MS, VOIDLING_COUNT, VOIDLING_HEALTH } from '../../../packs/riot/spells/Malzahar_W';
+import makeMalzahar_W, { makeMalzahar_W_Rift, makeMalzahar_W_Voidling } from '../../../packs/riot/spells/Malzahar_W';
+import { MANA_ON_KILL, VISIONS_STACK_ID } from '../../../packs/riot/spells/Malzahar_E';
+import makeMalzahar_E, { makeMalzahar_E_Object } from '../../../packs/riot/spells/Malzahar_E';
+import { CHANNEL_DURATION_MS, ZONE_DAMAGE_PER_TICK, ZONE_TICK_MS } from '../../../packs/riot/spells/Malzahar_R';
+import makeMalzahar_R, { makeMalzahar_R_Zone } from '../../../packs/riot/spells/Malzahar_R';
+const __api = buildContentApi();
+const Malzahar_Q = makeMalzahar_Q(__api);
+const Malzahar_Q_Object = makeMalzahar_Q_Object(__api);
+const Malzahar_W = makeMalzahar_W(__api);
+const Malzahar_W_Rift = makeMalzahar_W_Rift(__api);
+const Malzahar_W_Voidling = makeMalzahar_W_Voidling(__api);
+const Malzahar_E = makeMalzahar_E(__api);
+const Malzahar_E_Object = makeMalzahar_E_Object(__api);
+const Malzahar_R = makeMalzahar_R(__api);
+const Malzahar_R_Zone = makeMalzahar_R_Zone(__api);
 
 let game: TestGame;
 let playerSet = false;

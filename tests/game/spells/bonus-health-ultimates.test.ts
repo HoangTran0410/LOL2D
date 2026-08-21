@@ -18,13 +18,6 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
-import Singed_R, {
-  BONUS_HEALTH as SINGED_BONUS,
-} from '../../../src/game/gameObject/spells/Singed_R';
-import Nasus_R, { BONUS_HEALTH as NASUS_BONUS } from '../../../src/game/gameObject/spells/Nasus_R';
-import Renekton_R, {
-  BONUS_HEALTH as RENEKTON_BONUS,
-} from '../../../src/game/gameObject/spells/Renekton_R';
 import type AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -32,6 +25,17 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { BONUS_HEALTH as SINGED_BONUS } from '../../../packs/riot/spells/Singed_R';
+import makeSinged_R from '../../../packs/riot/spells/Singed_R';
+import { BONUS_HEALTH as NASUS_BONUS } from '../../../packs/riot/spells/Nasus_R';
+import makeNasus_R from '../../../packs/riot/spells/Nasus_R';
+import { BONUS_HEALTH as RENEKTON_BONUS } from '../../../packs/riot/spells/Renekton_R';
+import makeRenekton_R from '../../../packs/riot/spells/Renekton_R';
+const __api = buildContentApi();
+const Singed_R = makeSinged_R(__api);
+const Nasus_R = makeNasus_R(__api);
+const Renekton_R = makeRenekton_R(__api);
 
 const champion = (game: TestGame): AttackableUnit => {
   const unit = new Champion({ game, teamId: 'blue' } as never) as unknown as AttackableUnit;

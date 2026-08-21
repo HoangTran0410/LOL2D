@@ -3,27 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: vi.fn(() => undefined), getAsset: vi.fn(() => undefined) },
 }));
-
-import Anivia_R, {
-  Anivia_R_Object,
-  DAMAGE_TICK_MS,
-  EMPOWERED_DAMAGE,
-  EMPOWERED_SLOW,
-  EMPOWERED_SLOW_DURATION_MS,
-  END_RADIUS,
-  GROWTH_MS,
-  MANA_COST,
-  NORMAL_DAMAGE,
-  NORMAL_SLOW,
-  NORMAL_SLOW_DURATION_MS,
-  START_RADIUS,
-  stormRadiusAt,
-  TETHER_RANGE,
-  UPKEEP_COST,
-  UPKEEP_TICK_MS,
-} from '../../../src/game/gameObject/spells/Anivia_R';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE_TICK_MS, EMPOWERED_DAMAGE, EMPOWERED_SLOW, EMPOWERED_SLOW_DURATION_MS, END_RADIUS, GROWTH_MS, MANA_COST, NORMAL_DAMAGE, NORMAL_SLOW, NORMAL_SLOW_DURATION_MS, START_RADIUS, stormRadiusAt, TETHER_RANGE, UPKEEP_COST, UPKEEP_TICK_MS } from '../../../packs/riot/spells/Anivia_R';
+import makeAnivia_R, { makeAnivia_R_Object } from '../../../packs/riot/spells/Anivia_R';
+const __api = buildContentApi();
+const Anivia_R = makeAnivia_R(__api);
+const Anivia_R_Object = makeAnivia_R_Object(__api);
 
 const URF: MatchRules = { cooldownMultiplier: 1, manaFree: true };
 

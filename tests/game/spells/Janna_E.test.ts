@@ -3,17 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Janna_E, {
-  COOLDOWN_MS,
-  Janna_E_Shell,
-  notifyJannaControlLanded,
-  REFUND_RATIO,
-  RANGE,
-  BONUS_ATTACK_DAMAGE,
-  SHIELD_AMOUNT,
-  SHIELD_DURATION_MS,
-} from '../../../src/game/gameObject/spells/Janna_E';
 import Shield from '../../../src/game/gameObject/buffs/Shield';
 import StatAmp from '../../../src/game/gameObject/buffs/StatAmp';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -25,6 +14,13 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { COOLDOWN_MS, REFUND_RATIO, RANGE, BONUS_ATTACK_DAMAGE, SHIELD_AMOUNT, SHIELD_DURATION_MS } from '../../../packs/riot/spells/Janna_E';
+import makeJanna_E, { makeJanna_E_Shell, makeNotifyJannaControlLanded } from '../../../packs/riot/spells/Janna_E';
+const __api = buildContentApi();
+const Janna_E = makeJanna_E(__api);
+const Janna_E_Shell = makeJanna_E_Shell(__api);
+const notifyJannaControlLanded = makeNotifyJannaControlLanded(__api);
 
 function champion(game: TestGame, x: number, teamId: string): Champion {
   const result = new Champion({ game, position: createVector(x, 0), teamId });

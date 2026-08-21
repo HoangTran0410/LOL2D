@@ -31,7 +31,7 @@ import {
  * invisible to `tsc` (assigning a method is perfectly legal), and it costs a
  * millisecond to rule out across every spell at once.
  */
-const SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/spells');
+const SPELLS_DIR = join(__dirname, '../../../packs/riot/spells');
 const CORE_SPELLS_DIR = join(__dirname, '../../../src/game/gameObject/coreSpells');
 const BUFFS_DIR = join(__dirname, '../../../src/game/gameObject/buffs');
 

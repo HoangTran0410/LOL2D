@@ -26,18 +26,30 @@ import AttackableUnit from '../../../src/game/gameObject/attackableUnits/Attacka
 import { Rectangle } from '../../../src/libs/quadtree';
 import EventManager from '../../../src/managers/EventManager';
 import { TestVector, installSpellObjectGlobals } from '../spell/fixtures';
-
-import Alistar_W from '../../../src/game/gameObject/spells/Alistar_W';
-import ChoGath_R from '../../../src/game/gameObject/spells/ChoGath_R';
-import Ignite from '../../../src/game/gameObject/spells/Ignite';
-import LeeSin_R from '../../../src/game/gameObject/spells/LeeSin_R';
-import LeeSin_W from '../../../src/game/gameObject/spells/LeeSin_W';
-import Nasus_Q from '../../../src/game/gameObject/spells/Nasus_Q';
-import Nocturne_R from '../../../src/game/gameObject/spells/Nocturne_R';
-import { Rammus_Q_Object } from '../../../src/game/gameObject/spells/Rammus_Q';
-import Shaco_E from '../../../src/game/gameObject/spells/Shaco_E';
-import Warwick_Q from '../../../src/game/gameObject/spells/Warwick_Q';
-import Zed_R from '../../../src/game/gameObject/spells/Zed_R';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeAlistar_W from '../../../packs/riot/spells/Alistar_W';
+import makeChoGath_R from '../../../packs/riot/spells/ChoGath_R';
+import makeIgnite from '../../../packs/riot/spells/Ignite';
+import makeLeeSin_R from '../../../packs/riot/spells/LeeSin_R';
+import makeLeeSin_W from '../../../packs/riot/spells/LeeSin_W';
+import makeNasus_Q from '../../../packs/riot/spells/Nasus_Q';
+import makeNocturne_R from '../../../packs/riot/spells/Nocturne_R';
+import { makeRammus_Q_Object } from '../../../packs/riot/spells/Rammus_Q';
+import makeShaco_E from '../../../packs/riot/spells/Shaco_E';
+import makeWarwick_Q from '../../../packs/riot/spells/Warwick_Q';
+import makeZed_R from '../../../packs/riot/spells/Zed_R';
+const __api = buildContentApi();
+const Alistar_W = makeAlistar_W(__api);
+const ChoGath_R = makeChoGath_R(__api);
+const Ignite = makeIgnite(__api);
+const LeeSin_R = makeLeeSin_R(__api);
+const LeeSin_W = makeLeeSin_W(__api);
+const Nasus_Q = makeNasus_Q(__api);
+const Nocturne_R = makeNocturne_R(__api);
+const Rammus_Q_Object = makeRammus_Q_Object(__api);
+const Shaco_E = makeShaco_E(__api);
+const Warwick_Q = makeWarwick_Q(__api);
+const Zed_R = makeZed_R(__api);
 
 /**
  * The size an enemy's centre is held at by body separation, which is what a

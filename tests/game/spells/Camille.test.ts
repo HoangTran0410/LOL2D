@@ -3,11 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Camille_Q from '../../../src/game/gameObject/spells/Camille_Q';
-import Camille_W from '../../../src/game/gameObject/spells/Camille_W';
-import Camille_E from '../../../src/game/gameObject/spells/Camille_E';
-import Camille_R from '../../../src/game/gameObject/spells/Camille_R';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import {
   createGame,
@@ -15,6 +10,16 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import makeCamille_Q from '../../../packs/riot/spells/Camille_Q';
+import makeCamille_W from '../../../packs/riot/spells/Camille_W';
+import makeCamille_E from '../../../packs/riot/spells/Camille_E';
+import makeCamille_R from '../../../packs/riot/spells/Camille_R';
+const __api = buildContentApi();
+const Camille_Q = makeCamille_Q(__api);
+const Camille_W = makeCamille_W(__api);
+const Camille_E = makeCamille_E(__api);
+const Camille_R = makeCamille_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

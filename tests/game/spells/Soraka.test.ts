@@ -3,33 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../../src/managers/AssetManager', () => ({
   default: { get: () => undefined, getAsset: () => undefined },
 }));
-
-import Soraka_Q, {
-  DAMAGE as Q_DAMAGE,
-  FALL_TIME_MS,
-  REJUVENATION_STACK_ID,
-  Soraka_Q_Object,
-  hasRejuvenation,
-  grantRejuvenation,
-} from '../../../src/game/gameObject/spells/Soraka_Q';
-import Soraka_W, {
-  HEAL as W_HEAL,
-  HEALTH_COST,
-  MIN_HEALTH_RATIO,
-  REJUVENATED_HEALTH_COST,
-} from '../../../src/game/gameObject/spells/Soraka_W';
-import Soraka_E, {
-  ERUPT_DAMAGE,
-  IMPACT_DAMAGE,
-  ROOT_DURATION_MS,
-  Soraka_E_Object,
-  ZONE_DURATION_MS,
-} from '../../../src/game/gameObject/spells/Soraka_E';
-import Soraka_R, {
-  HEAL as R_HEAL,
-  LOW_HEALTH_BONUS,
-  LOW_HEALTH_RATIO,
-} from '../../../src/game/gameObject/spells/Soraka_R';
 import Root from '../../../src/game/gameObject/buffs/Root';
 import Silence from '../../../src/game/gameObject/buffs/Silence';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
@@ -42,6 +15,23 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE as Q_DAMAGE, FALL_TIME_MS, REJUVENATION_STACK_ID, hasRejuvenation } from '../../../packs/riot/spells/Soraka_Q';
+import makeSoraka_Q, { makeSoraka_Q_Object, makeGrantRejuvenation } from '../../../packs/riot/spells/Soraka_Q';
+import { HEAL as W_HEAL, HEALTH_COST, MIN_HEALTH_RATIO, REJUVENATED_HEALTH_COST } from '../../../packs/riot/spells/Soraka_W';
+import makeSoraka_W from '../../../packs/riot/spells/Soraka_W';
+import { ERUPT_DAMAGE, IMPACT_DAMAGE, ROOT_DURATION_MS, ZONE_DURATION_MS } from '../../../packs/riot/spells/Soraka_E';
+import makeSoraka_E, { makeSoraka_E_Object } from '../../../packs/riot/spells/Soraka_E';
+import { HEAL as R_HEAL, LOW_HEALTH_BONUS, LOW_HEALTH_RATIO } from '../../../packs/riot/spells/Soraka_R';
+import makeSoraka_R from '../../../packs/riot/spells/Soraka_R';
+const __api = buildContentApi();
+const Soraka_Q = makeSoraka_Q(__api);
+const Soraka_Q_Object = makeSoraka_Q_Object(__api);
+const grantRejuvenation = makeGrantRejuvenation(__api);
+const Soraka_W = makeSoraka_W(__api);
+const Soraka_E = makeSoraka_E(__api);
+const Soraka_E_Object = makeSoraka_E_Object(__api);
+const Soraka_R = makeSoraka_R(__api);
 
 function unit(game: TestGame, x: number, teamId: string): AttackableUnit {
   const result = createUnit(game, x, teamId);

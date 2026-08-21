@@ -1,15 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Leblanc_Q, {
-  CAST_TIME_MS,
-  DAMAGE,
-  Leblanc_Q_Mark,
-  Leblanc_Q_Object,
-  MANA_COST,
-  MARK_DURATION_MS,
-  MISSILE_SIZE,
-  MISSILE_SPEED,
-  RANGE,
-} from '../../../src/game/gameObject/spells/Leblanc_Q';
 import HomingMissileSpellObject from '../../../src/game/gameObject/spellObjects/HomingMissileSpellObject';
 import TargetResolver from '../../../src/game/spell/targeting/TargetResolver';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
@@ -21,6 +10,13 @@ import {
   installSpellObjectGlobals,
   type TestGame,
 } from '../spell/fixtures';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { CAST_TIME_MS, DAMAGE, MANA_COST, MARK_DURATION_MS, MISSILE_SIZE, MISSILE_SPEED, RANGE } from '../../../packs/riot/spells/Leblanc_Q';
+import makeLeblanc_Q, { makeLeblanc_Q_Mark, makeLeblanc_Q_Object } from '../../../packs/riot/spells/Leblanc_Q';
+const __api = buildContentApi();
+const Leblanc_Q = makeLeblanc_Q(__api);
+const Leblanc_Q_Mark = makeLeblanc_Q_Mark(__api);
+const Leblanc_Q_Object = makeLeblanc_Q_Object(__api);
 
 function unit(game: TestGame, x: number, teamId: string) {
   const result = createUnit(game, x, teamId);

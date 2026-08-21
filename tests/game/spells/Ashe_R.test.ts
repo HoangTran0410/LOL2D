@@ -1,18 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AssetManager from '../../../src/managers/AssetManager';
-import Ashe_R, {
-  Ashe_R_Object,
-  DAMAGE,
-  EXPLODE_RADIUS,
-  FULL_POWER_DISTANCE,
-  MAX_SPEED,
-  MAX_STUN_MS,
-  MAX_TRAVEL,
-  MIN_STUN_MS,
-  SIZE,
-  SPEED,
-} from '../../../src/game/gameObject/spells/Ashe_R';
 import type { CastContext } from '../../../src/game/spell/runtime/types';
+import { buildContentApi } from '../../../src/content/ContentApi';
+import { DAMAGE, EXPLODE_RADIUS, FULL_POWER_DISTANCE, MAX_SPEED, MAX_STUN_MS, MAX_TRAVEL, MIN_STUN_MS, SIZE, SPEED } from '../../../packs/riot/spells/Ashe_R';
+import makeAshe_R, { makeAshe_R_Object } from '../../../packs/riot/spells/Ashe_R';
+const __api = buildContentApi();
+const Ashe_R = makeAshe_R(__api);
+const Ashe_R_Object = makeAshe_R_Object(__api);
 
 class Vector {
   constructor(
