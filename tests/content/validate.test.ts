@@ -290,37 +290,63 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/fills/);
   });
 
-  it('names a monster missing the tuning fields Game.spawnJungle needs to build one', () => {
-    // A camp used to carry position and tuning in one MonsterPresetData
-    // entry; splitting position out to a NeutralSlot still leaves speed,
-    // size, attackRange and reviveTime with nowhere else to live.
+  it('rejects a monster with no members', () => {
+    // A camp used to carry position and tuning in one flat MonsterPresetData
+    // entry; splitting position out to a NeutralSlot, and composition out to
+    // MonsterBody, still leaves a monster with nothing to spawn if its own
+    // members array is empty or missing — Game.spawnJungle() loops it
+    // unconditionally, so an empty camp here is a silent one there.
     const result = validatePack({
       manifest: goodManifest,
-      monsters: { wolf: { id: 'wolf', name: 'Wolf', fills: ['wolves'], health: 100 } },
+      monsters: { wolves: { id: 'wolves', name: 'Wolves', fills: ['wolves'], members: [] } },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/members/);
+  });
+
+  it('names a monster body missing the tuning fields Game.spawnJungle needs to build one', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: {
+        wolves: {
+          id: 'wolves',
+          name: 'Wolves',
+          fills: ['wolves'],
+          members: [{ name: 'Wolf', health: 100 }],
+        },
+      },
     });
     expect(result.ok).toBe(false);
     if (!result.ok) {
+      expect(result.errors.join(' ')).toMatch(/avatar/);
       expect(result.errors.join(' ')).toMatch(/speed/);
       expect(result.errors.join(' ')).toMatch(/size/);
       expect(result.errors.join(' ')).toMatch(/attackRange/);
       expect(result.errors.join(' ')).toMatch(/reviveTime/);
+      expect(result.errors.join(' ')).toMatch(/offset/);
     }
   });
 
-  it('rejects a monster avatar that is neither a string nor null', () => {
+  it('rejects a monster body avatar that is not a string', () => {
     const result = validatePack({
       manifest: goodManifest,
       monsters: {
-        wolf: {
-          id: 'wolf',
-          name: 'Wolf',
+        wolves: {
+          id: 'wolves',
+          name: 'Wolves',
           fills: ['wolves'],
-          avatar: 42,
-          speed: 2,
-          size: 40,
-          attackRange: 50,
-          reviveTime: 3000,
-          health: 100,
+          members: [
+            {
+              name: 'Wolf',
+              avatar: 42,
+              speed: 2,
+              size: 40,
+              attackRange: 50,
+              reviveTime: 3000,
+              health: 100,
+              offset: { x: 0, y: 0 },
+            },
+          ],
         },
       },
     });
@@ -328,43 +354,56 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/avatar/);
   });
 
-  it('rejects a monster count below one', () => {
-    const result = validatePack({
-      manifest: goodManifest,
-      monsters: {
-        wolf: {
-          id: 'wolf',
-          name: 'Wolf',
-          fills: ['wolves'],
-          avatar: null,
-          speed: 2,
-          size: 40,
-          attackRange: 50,
-          reviveTime: 3000,
-          health: 100,
-          count: 0,
-        },
-      },
-    });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.errors.join(' ')).toMatch(/count/);
-  });
-
-  it('accepts a fully specified monster, a pack of several included', () => {
+  it('rejects a monster body offset that is not {x, y}', () => {
     const result = validatePack({
       manifest: goodManifest,
       monsters: {
         wolves: {
           id: 'wolves',
-          name: 'Wolf',
+          name: 'Wolves',
           fills: ['wolves'],
-          avatar: 'reference:wolf',
-          speed: 2,
-          size: 40,
-          attackRange: 50,
-          reviveTime: 3000,
-          health: 100,
-          count: 3,
+          members: [
+            {
+              name: 'Wolf',
+              avatar: 'reference:wolf',
+              speed: 2,
+              size: 40,
+              attackRange: 50,
+              reviveTime: 3000,
+              health: 100,
+              offset: 'centre',
+            },
+          ],
+        },
+      },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/offset/);
+  });
+
+  it('accepts a fully specified monster, a pack of several members included', () => {
+    const member = (health: number, offset: { x: number; y: number }) => ({
+      name: 'Wolf',
+      avatar: 'reference:wolf',
+      speed: 2,
+      size: 40,
+      attackRange: 50,
+      reviveTime: 3000,
+      health,
+      offset,
+    });
+    const result = validatePack({
+      manifest: goodManifest,
+      monsters: {
+        wolves: {
+          id: 'wolves',
+          name: 'Wolves',
+          fills: ['wolves'],
+          members: [
+            member(300, { x: 0, y: 0 }),
+            member(100, { x: -83, y: -51 }),
+            member(100, { x: 40, y: 97 }),
+          ],
         },
       },
     });

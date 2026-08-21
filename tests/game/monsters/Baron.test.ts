@@ -18,7 +18,7 @@ import DamageOverTime from '../../../src/game/gameObject/buffs/DamageOverTime';
 import Slow from '../../../src/game/gameObject/buffs/Slow';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane } from '../../../src/game/lanes';
-import { monsterFillingSlot, monsterPresetFromSlot } from '../../../src/game/preset';
+import { monsterBodyPreset, monsterFillingSlot } from '../../../src/game/preset';
 import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import {
   BARON_ABILITIES,
@@ -36,9 +36,11 @@ let game: TestGame;
 // The real neutral slot and the real installed monster that fills it, read
 // through the same `preset.ts` seam `Game.spawnJungle()` uses — not a
 // hand-rolled preset — so this test stays honest against what a match
-// actually spawns. See `preset.ts`'s `monsterPresetFromSlot` doc comment.
+// actually spawns. See `preset.ts`'s `monsterBodyPreset` doc comment. Baron
+// is a camp of one, so its monster def has exactly one member.
 const baronSlot = summonersRiftGeometry.slots.neutral.find(slot => slot.role === 'baron')!;
-const baronPreset = () => monsterPresetFromSlot(monsterFillingSlot(baronSlot)!, baronSlot);
+const baronMonster = () => monsterFillingSlot(baronSlot)!;
+const baronPreset = () => monsterBodyPreset(baronMonster(), baronMonster().members[0], baronSlot);
 
 const makeBaron = () =>
   new Monster({ game, preset: baronPreset() } as ConstructorParameters<typeof Monster>[0]);

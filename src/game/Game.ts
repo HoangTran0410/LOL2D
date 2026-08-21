@@ -17,8 +17,8 @@ import {
   fountainsFromSlots,
   getChampionPresetFromLoadout,
   minionMusterSlotsFrom,
+  monsterBodyPreset,
   monsterFillingSlot,
-  monsterPresetFromSlot,
   planLoadout,
   planMatchKits,
   presetFromPlan,
@@ -417,31 +417,29 @@ export default class Game {
   /**
    * Walks `this.neutralSlots` (the active map's `slots.neutral`) and, for
    * each one, resolves the installed monster that fills its `role` and
-   * spawns `monster.count ?? 1` bodies there. A slot no installed pack fills
-   * is left empty rather than throwing — spec §6, `preset.ts`'s
+   * spawns one body per `member` of it — a camp is a composition
+   * (`MonsterDef.members`), not a repeat count. A slot no installed pack
+   * fills is left empty rather than throwing — spec §6, `preset.ts`'s
    * `monsterFillingSlot` doc comment.
    *
-   * Every body for one slot is built from the *same* `monsterPresetFromSlot`
-   * result, so they all share one `camp` object — see `Monster.alertCamp`.
-   * A pack of several is nudged off the exact camp point on a small ring so
-   * `UnitCollisionSystem` is not asked to un-stack bodies spawned on top of
-   * each other; their camp point (where they idle and leash back to) is
-   * unaffected.
+   * Every body for one slot is built from `monsterBodyPreset`, whose `camp`
+   * is the slot object itself — every member of the same camp ends up
+   * holding the exact same `camp` reference, which is what
+   * `Monster.alertCamp` matches on. Each body's starting `position` is then
+   * placed at `slot.{x,y} + member.offset` — a Greater Wolf and its two
+   * Wolves land where the pack's own layout says, not stacked on the slot's
+   * centre; the camp point they idle at and leash back to is `camp`
+   * (unaffected by the offset).
    */
   spawnJungle() {
     for (const slot of this.neutralSlots) {
       const monster = monsterFillingSlot(slot);
       if (!monster) continue;
 
-      const preset = monsterPresetFromSlot(monster, slot);
-      const count = monster.count ?? 1;
-      for (let i = 0; i < count; i++) {
+      for (const member of monster.members) {
+        const preset = monsterBodyPreset(monster, member, slot);
         const body = new Monster({ game: this, preset });
-        if (count > 1) {
-          const angle = (i / count) * Math.PI * 2;
-          const spread = Math.min(80, slot.r * 0.3);
-          body.position.set(slot.x + Math.cos(angle) * spread, slot.y + Math.sin(angle) * spread);
-        }
+        body.position.set(slot.x + member.offset.x, slot.y + member.offset.y);
         this.monsters.push(body);
         this.objectManager.addObject(body);
       }

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
+import { monsterBodyPreset, monsterFillingSlot } from '../../../src/game/preset';
+import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 /**
@@ -13,7 +15,7 @@ import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fix
  * That field is gone (Task 7: a camp is a slot, a monster is a thing that
  * fills it) — membership is now "spawned with the same `camp` object", the
  * way `Game.spawnJungle()` actually builds a multi-body camp (`preset.ts`'s
- * `monsterPresetFromSlot`: one preset per slot, reused for every body). So a
+ * `monsterBodyPreset`: one preset per member, reused `camp` for every body). So a
  * "pack" here is bodies that share one `camp` object literal; bodies that
  * happen to sit near each other with *different* `camp` objects are not a
  * pack, same as two neighbouring solo camps never were.
@@ -137,5 +139,38 @@ describe('camp aggro', () => {
 
     expect(alone.phase).toBe(Monster.PHASES.ATTACK);
     expect(other.phase).toBe(Monster.PHASES.IDLE);
+  });
+
+  /**
+   * The hand-rolled tests above prove the mechanism (`camp` identity); this
+   * proves it holds for the real bundled data end to end — a Greater Wolf
+   * and two Wolves (`bundledPack.ts`'s `wolves` MonsterDef, resolved through
+   * the same `monsterFillingSlot`/`monsterBodyPreset` seam `Game.spawnJungle()`
+   * uses), not a hand-rolled `campId`-free preset. Also confirms `killCredit`
+   * stays `'minion'` on every body, per the task's own "camps are CS" rule —
+   * `Monster` never overrides it, but checked here on real spawn-shaped
+   * instances rather than assumed from the class hierarchy alone.
+   */
+  it('resolves the real wolves camp to three distinct bodies that wake together and stay CS', () => {
+    const wolfSlot = summonersRiftGeometry.slots.neutral.find(s => s.role === 'wolves')!;
+    const monster = monsterFillingSlot(wolfSlot)!;
+    expect(monster.members.length).toBe(3);
+
+    const pack = monster.members.map(member => {
+      const body = new Monster({ game, preset: monsterBodyPreset(monster, member, wolfSlot) });
+      body.position.set(wolfSlot.x + member.offset.x, wolfSlot.y + member.offset.y);
+      return body;
+    });
+    const champion = new Champion({ game, teamId: 'other' });
+    champion.position.set(wolfSlot.x + 60, wolfSlot.y);
+    indexObjects(game, [...pack, champion]);
+
+    pack[0].takeDamage(10, champion);
+
+    for (const wolf of pack) {
+      expect(wolf.phase).toBe(Monster.PHASES.ATTACK);
+      expect(wolf.targetLock).toBe(champion);
+      expect(wolf.killCredit).toBe('minion');
+    }
   });
 });

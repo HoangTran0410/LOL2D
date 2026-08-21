@@ -138,31 +138,20 @@ export interface ChampionAttack {
 }
 
 /**
- * A monster, as a pack declares it — enough for `Game.spawnJungle()` to build
- * a real `Monster` once a neutral slot has resolved to one of these.
+ * One body of a camp — a camp is a **composition** of these, not N identical
+ * copies of one. A wolf pit is a Greater Wolf plus two Wolves, visibly
+ * different sprites and sizes; collapsing that to `count: 3` of one body was
+ * this field's first (wrong) shape — see `MonsterDef`'s own doc comment.
  *
- * Wider than `id`/`name`/`fills`/`health` alone: a camp used to carry its own
- * position *and* its full tuning in one `MonsterPresetData` entry
- * (`src/game/mapPresets.ts`, pre-Task-7). Splitting position out to
- * `NeutralSlot` still leaves a body that needs an avatar, a speed, a size, a
- * reach and a time to respawn — nothing else in the pack contract carries
- * those, so this does. `damage`, `attackInterval` and `aggroRange` stay
- * optional because `Monster`'s own constructor already has sensible defaults
- * for a camp that does not name them (a share of `health`, 1500ms,
- * `attackRange + 120`).
- *
- * Deliberately **not** `abilities` — those are engine code (`MonsterAbility`
- * callbacks), the same reason a champion's kit is a spell *id* here and never
- * a class. Baron's `BARON_ABILITIES` stays merged in on the engine side,
- * where the code already lives (`preset.ts`'s `monsterPresetFromSlot`).
+ * `offset` places a body relative to its slot's centre — `NeutralSlot`
+ * carries only where the *camp* sits, never an individual body, so a
+ * multi-body camp needs its own internal layout. `{0, 0}` is the common case
+ * for a camp of one (Baron, a buff, Gromp).
  */
-export interface MonsterDef {
-  id: string;
+export interface MonsterBody {
   name: string;
-  /** Slot roles this monster can occupy. Free strings; core only matches. */
-  fills: string[];
-  /** Pack-relative asset key, or null for a monster with no portrait. */
-  avatar: string | null;
+  /** Pack-relative asset key. */
+  avatar: string;
   speed: number;
   size: number;
   attackRange: number;
@@ -174,12 +163,38 @@ export interface MonsterDef {
   attackInterval?: number;
   /** Champions this close wake the camp. Defaults to `attackRange + 120`. */
   aggroRange?: number;
-  /**
-   * How many bodies stand together wherever this def fills a slot — a pack of
-   * wolves is one `MonsterDef` with `count: 3`, not three definitions tied
-   * together by a shared id the way `campId` used to. Defaults to 1.
-   */
-  count?: number;
+  /** This body's position relative to the slot's `{x, y}`. */
+  offset: { x: number; y: number };
+}
+
+/**
+ * A monster, as a pack declares it — enough for `Game.spawnJungle()` to build
+ * every real `Monster` a neutral slot needs once its `role` has resolved to
+ * one of these.
+ *
+ * `members` replaces an earlier shape that put one flat set of tuning plus a
+ * `count` directly on `MonsterDef` — collapsing a wolf pit (a Greater Wolf
+ * and two Wolves: different avatars, different sizes, different health) into
+ * three identical bodies. `monstersFilling(role)` answering with
+ * **alternatives** — several packs offering something for the same role,
+ * install order deciding — is a different question from **composition** —
+ * what a single camp is made of — and `count` conflated the two. A camp of
+ * three wolves is one `MonsterDef` with three `MonsterBody` entries, the way
+ * it actually was before position and identity were split apart.
+ *
+ * Deliberately **not** `abilities` on `MonsterBody` — those are engine code
+ * (`MonsterAbility` callbacks), the same reason a champion's kit is a spell
+ * *id* here and never a class. Baron's `BARON_ABILITIES` stays merged in on
+ * the engine side, where the code already lives (`preset.ts`'s
+ * `monsterBodyPreset`).
+ */
+export interface MonsterDef {
+  id: string;
+  name: string;
+  /** Slot roles this monster can occupy. Free strings; core only matches. */
+  fills: string[];
+  /** What this camp is made of. Never empty — a camp of one is one entry. */
+  members: MonsterBody[];
 }
 
 export interface Faction {

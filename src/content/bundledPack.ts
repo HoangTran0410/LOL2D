@@ -114,91 +114,193 @@ const championEntries = (): ChampionEntry[] => {
  * above — this needs no getter to dodge the module's own load-order cycle;
  * it is safe to build once, eagerly.
  *
- * A pack of several (`wolves`, `raptors`) is one definition with `count`
- * rather than one entry per body — `Game.spawnJungle()` spawns that many and
- * gives every one of them the same camp point, which is what lets
- * `Monster.alertCamp` find packmates without the `campId` string this
- * replaces. Collapsing "Greater Wolf" + two "Wolf"s (or the raptor
- * equivalent) into one shared identity is a real simplification — a pack
- * pack's members are no longer visually distinct — traded for a monster
- * being pure data instead of position-tagged code; nothing here changes camp
- * *positions*, health totals or attack tuning per body.
+ * **A camp is a composition, not N copies of one body.** `wolves.members`
+ * and `raptors.members` are a Greater Wolf/Crimson Raptor plus its smaller
+ * pack-mates, each with its own avatar, size and health — every number below
+ * is copied from the pre-Task-7 `MonsterPreset` table (`git show
+ * f2092e4:src/game/mapPresets.ts`), not retuned. `offset` is that same
+ * source's per-body `camp: {x, y}` minus its group's anchor position
+ * (`wolf1`'s own camp for the wolves offsets, `raptor1`'s for the raptors) —
+ * see `tests/game/preset.mapSlots.test.ts`'s "recovers the original preset
+ * entries" test, which checks `slot + offset === original camp` against that
+ * same historical table.
+ *
+ * `wolves` and `raptors` each fill **two** neutral slots (Summoner's Rift
+ * has a wolf pit and a raptor pit on both sides), but there is only one
+ * `MonsterDef` of each — its `members`/`offset` layout is reused at both
+ * slots. That is a real, disclosed loss of fidelity: the original data
+ * placed the second pit's small bodies at slightly different offsets from
+ * its own anchor than the first pit's. It is not a loss of *tuning* — the
+ * second pit's bodies had byte-identical avatar/speed/size/attackRange/
+ * reviveTime/health to the first's in the original table (verified, not
+ * assumed) — only of the incidental few-dozen-pixel arrangement within the
+ * pit, which one shared `MonsterDef` cannot carry two different versions of.
  */
 const monsterEntries = (): Record<string, MonsterDef> => ({
   baron: {
     id: 'baron',
     name: 'Baron',
     fills: ['baron'],
-    avatar: 'monster_Baron_Nashor',
-    speed: 0,
-    size: 100,
-    attackRange: 400,
-    reviveTime: 3000,
-    health: 1000,
-    // Rooted with a long reach. The bite is small because it is the one part
-    // of the fight nobody can dodge — the rest of Baron's kit lives in
-    // `BARON_ABILITIES` (merged in by `preset.ts`'s `monsterPresetFromSlot`,
-    // which this data-only definition cannot carry) and is all avoidable.
-    damage: 12,
-    attackInterval: 2000,
-    aggroRange: 480,
+    members: [
+      {
+        name: 'Baron',
+        avatar: 'monster_Baron_Nashor',
+        speed: 0,
+        size: 100,
+        attackRange: 400,
+        reviveTime: 3000,
+        health: 1000,
+        // Rooted with a long reach. The bite is small because it is the one
+        // part of the fight nobody can dodge — the rest of Baron's kit lives
+        // in `BARON_ABILITIES` (merged in by `preset.ts`'s
+        // `monsterBodyPreset`, which this data-only definition cannot
+        // carry) and is all avoidable.
+        damage: 12,
+        attackInterval: 2000,
+        aggroRange: 480,
+        offset: { x: 0, y: 0 },
+      },
+    ],
   },
   blue: {
     id: 'blue',
     name: 'Blue',
     fills: ['blue'],
-    avatar: 'monster_Blue_Sentinel',
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
+    members: [
+      {
+        name: 'Blue',
+        avatar: 'monster_Blue_Sentinel',
+        speed: 2,
+        size: 80,
+        attackRange: 50,
+        reviveTime: 3000,
+        health: 300,
+        offset: { x: 0, y: 0 },
+      },
+    ],
   },
   red: {
     id: 'red',
     name: 'Red',
     fills: ['red'],
-    avatar: 'monster_Red_Brambleback',
-    speed: 2,
-    size: 80,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 300,
+    members: [
+      {
+        name: 'Red',
+        avatar: 'monster_Red_Brambleback',
+        speed: 2,
+        size: 80,
+        attackRange: 50,
+        reviveTime: 3000,
+        health: 300,
+        offset: { x: 0, y: 0 },
+      },
+    ],
   },
+  // Anchor: wolf1 at (1685, 3562). wolf1_a (1602, 3511) -> offset (-83, -51).
+  // wolf1_b (1725, 3659) -> offset (40, 97). Total health 300 + 100 + 100 = 500.
   wolves: {
     id: 'wolves',
-    name: 'Wolf',
+    name: 'Wolves',
     fills: ['wolves'],
-    avatar: 'monster_Murk_Wolf',
-    speed: 2.5,
-    size: 40,
-    attackRange: 50,
-    reviveTime: 3000,
-    health: 100,
-    count: 3,
+    members: [
+      {
+        name: 'Greater Wolf',
+        avatar: 'monster_Greater_Murk_Wolf',
+        speed: 2,
+        size: 70,
+        attackRange: 50,
+        reviveTime: 3000,
+        health: 300,
+        offset: { x: 0, y: 0 },
+      },
+      {
+        name: 'Wolf',
+        avatar: 'monster_Murk_Wolf',
+        speed: 2.5,
+        size: 40,
+        attackRange: 50,
+        reviveTime: 3000,
+        health: 100,
+        offset: { x: -83, y: -51 },
+      },
+      {
+        name: 'Wolf',
+        avatar: 'monster_Murk_Wolf',
+        speed: 2.5,
+        size: 40,
+        attackRange: 50,
+        reviveTime: 3000,
+        health: 100,
+        offset: { x: 40, y: 97 },
+      },
+    ],
   },
   gromp: {
     id: 'gromp',
     name: 'Gromp',
     fills: ['gromp'],
-    avatar: 'monster_Gromp',
-    speed: 2,
-    size: 70,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 300,
+    members: [
+      {
+        name: 'Gromp',
+        avatar: 'monster_Gromp',
+        speed: 2,
+        size: 70,
+        attackRange: 150,
+        reviveTime: 3000,
+        health: 300,
+        offset: { x: 0, y: 0 },
+      },
+    ],
   },
+  // Anchor: raptor1 at (2954, 4110). raptor1_a (3045, 4026) -> offset (91, -84).
+  // raptor1_b (3149, 4095) -> offset (195, -15). raptor1_c (3060, 4169) ->
+  // offset (106, 59). Total health 300 + 50 + 50 + 50 = 450.
   raptors: {
     id: 'raptors',
-    name: 'Raptor',
+    name: 'Raptors',
     fills: ['raptors'],
-    avatar: 'monster_Raptor',
-    speed: 2,
-    size: 40,
-    attackRange: 150,
-    reviveTime: 3000,
-    health: 50,
-    count: 4,
+    members: [
+      {
+        name: 'Crimson Raptor',
+        avatar: 'monster_Crimson_Raptor',
+        speed: 2,
+        size: 70,
+        attackRange: 150,
+        reviveTime: 3000,
+        health: 300,
+        offset: { x: 0, y: 0 },
+      },
+      {
+        name: 'Raptor',
+        avatar: 'monster_Raptor',
+        speed: 2,
+        size: 40,
+        attackRange: 150,
+        reviveTime: 3000,
+        health: 50,
+        offset: { x: 91, y: -84 },
+      },
+      {
+        name: 'Raptor',
+        avatar: 'monster_Raptor',
+        speed: 2,
+        size: 40,
+        attackRange: 150,
+        reviveTime: 3000,
+        health: 50,
+        offset: { x: 195, y: -15 },
+      },
+      {
+        name: 'Raptor',
+        avatar: 'monster_Raptor',
+        speed: 2,
+        size: 40,
+        attackRange: 150,
+        reviveTime: 3000,
+        health: 50,
+        offset: { x: 106, y: 59 },
+      },
+    ],
   },
 });
 

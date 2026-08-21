@@ -183,6 +183,35 @@ function checkSpellDisplay(pack: Record<string, unknown>, errors: string[]): voi
   }
 }
 
+/** One `MonsterBody` entry of a `monsters.<id>.members` array. */
+function checkMonsterBody(path: string, value: unknown, errors: string[]): void {
+  if (!isObject(value)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  if (typeof value.name !== 'string') errors.push(`${path}.name: must be a string`);
+  // A body's own asset key, never validated against core's generated union —
+  // same shape as `checkChampions`'s `image` check, but not nullable: unlike
+  // a champion shelf entry, a jungle body with no art is not a real shape.
+  if (typeof value.avatar !== 'string') errors.push(`${path}.avatar: must be a string`);
+  if (!isFiniteNumber(value.speed)) errors.push(`${path}.speed: must be a finite number`);
+  if (!isFiniteNumber(value.size)) errors.push(`${path}.size: must be a finite number`);
+  if (!isFiniteNumber(value.attackRange)) {
+    errors.push(`${path}.attackRange: must be a finite number`);
+  }
+  if (!isFiniteNumber(value.reviveTime)) {
+    errors.push(`${path}.reviveTime: must be a finite number`);
+  }
+  if (!isFiniteNumber(value.health)) errors.push(`${path}.health: must be a finite number`);
+  if (
+    !isObject(value.offset) ||
+    !isFiniteNumber(value.offset.x) ||
+    !isFiniteNumber(value.offset.y)
+  ) {
+    errors.push(`${path}.offset: must be {x, y} finite numbers`);
+  }
+}
+
 function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
   if (pack.monsters === undefined) return;
   if (!isObject(pack.monsters)) {
@@ -196,31 +225,23 @@ function checkMonsters(pack: Record<string, unknown>, errors: string[]): void {
     }
     if (typeof value.id !== 'string') errors.push(`monsters.${id}.id: must be a string`);
     if (typeof value.name !== 'string') errors.push(`monsters.${id}.name: must be a string`);
-    if (!isFiniteNumber(value.health)) {
-      errors.push(`monsters.${id}.health: must be a finite number`);
-    }
     // PackRegistry.install() and monstersFilling(role) both call
     // monster.fills.includes(role); a non-array fills is a runtime
     // TypeError one layer downstream instead of a named error here.
     if (!isStringArray(value.fills)) {
       errors.push(`monsters.${id}: fills must be an array of strings`);
     }
-    // Same shape as `checkChampions`'s `image` check — a pack's own asset key,
-    // never validated against core's generated union.
-    if (value.avatar !== null && typeof value.avatar !== 'string') {
-      errors.push(`monsters.${id}.avatar: must be a string or null`);
+    // `Game.spawnJungle()` loops `members` unconditionally; an empty array
+    // is a camp that fills its slot with nothing, the same silent-failure
+    // shape this file exists to catch named rather than left to surface as
+    // an empty jungle later.
+    if (!Array.isArray(value.members) || value.members.length === 0) {
+      errors.push(`monsters.${id}.members: must be a non-empty array`);
+      continue;
     }
-    if (!isFiniteNumber(value.speed)) errors.push(`monsters.${id}.speed: must be a finite number`);
-    if (!isFiniteNumber(value.size)) errors.push(`monsters.${id}.size: must be a finite number`);
-    if (!isFiniteNumber(value.attackRange)) {
-      errors.push(`monsters.${id}.attackRange: must be a finite number`);
-    }
-    if (!isFiniteNumber(value.reviveTime)) {
-      errors.push(`monsters.${id}.reviveTime: must be a finite number`);
-    }
-    if (value.count !== undefined && (!isFiniteNumber(value.count) || value.count < 1)) {
-      errors.push(`monsters.${id}.count: must be a positive finite number`);
-    }
+    value.members.forEach((member, index) => {
+      checkMonsterBody(`monsters.${id}.members[${index}]`, member, errors);
+    });
   }
 }
 

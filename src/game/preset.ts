@@ -1,7 +1,13 @@
 import { contentRegistry } from '@/content/registry';
 import { qualify, type PackRegistry, type QualifiedMonster } from '@/content/PackRegistry';
 import { BUNDLED_PACK_ID } from '@/content/bundledPack';
-import type { MinionSlot, NeutralSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
+import type {
+  MinionSlot,
+  MonsterBody,
+  NeutralSlot,
+  SpawnSlot,
+  StructureSlot,
+} from '@/content/ContentPack';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
@@ -470,7 +476,7 @@ export const loadChampionPresetFromLoadout = async (
   return presetFromPlan(plan);
 };
 
-/** The bundled pack's own qualified id for Baron — see `monsterPresetFromSlot` below. */
+/** The bundled pack's own qualified id for Baron — see `monsterBodyPreset` below. */
 const BARON_QUALIFIED_ID = qualify(BUNDLED_PACK_ID, 'baron');
 
 /**
@@ -487,35 +493,42 @@ export const monsterFillingSlot = (slot: NeutralSlot): QualifiedMonster | null =
   contentRegistry().monstersFilling(slot.role)[0] ?? null;
 
 /**
- * One neutral slot's monster, spawn-ready.
+ * One body of a resolved monster's `members`, spawn-ready — `Game.spawnJungle()`
+ * calls this once per member and positions the resulting body at
+ * `slot.{x,y} + member.offset`, so a multi-body camp (a Greater Wolf plus two
+ * Wolves) lands exactly where the pack's `offset`s say, not stacked on the
+ * slot's own centre.
  *
- * `camp` is the slot object itself, never a copy. `Game.spawnJungle()` calls
- * this once per slot and constructs every body a multi-body camp needs
- * (`monster.count`) from the *same* returned preset, so every body ends up
- * holding the exact same `camp` reference — which is what lets
- * `Monster.alertCamp` find its packmates by identity instead of the
- * `campId` string this replaces. See that method's own doc comment.
+ * `camp` is the slot object itself, never a copy — every member of the same
+ * `monster` spawned for the same `slot` gets the *same* `camp` reference,
+ * which is what lets `Monster.alertCamp` find its packmates by identity
+ * instead of the `campId` string this replaces. See that method's own doc
+ * comment. (`camp` is still just the leash/home point — `{x, y, r}` — not
+ * where any one body's `position` starts; that positioning is `Game.spawnJungle()`'s
+ * job, using the same `member.offset`.)
  *
- * `abilities` stays engine-only: a `MonsterDef` cannot carry `MonsterAbility`
+ * `abilities` stays engine-only: a `MonsterBody` cannot carry `MonsterAbility`
  * callbacks (real code), so Baron's `BARON_ABILITIES` is merged in here by
- * qualified id — the same special case `preset.ts`'s old `MonsterPreset`
- * merge made, just against pack data instead of a hard-coded table.
+ * the monster's qualified id — the same special case `preset.ts`'s old
+ * `MonsterPreset` merge made, just against pack data instead of a hard-coded
+ * table. Baron is a camp of one, so this only ever applies to `members[0]`.
  */
-export const monsterPresetFromSlot = (
+export const monsterBodyPreset = (
   monster: QualifiedMonster,
+  member: MonsterBody,
   slot: NeutralSlot
 ): MonsterPresetData => ({
-  name: monster.name,
-  avatar: monster.avatar,
+  name: member.name,
+  avatar: member.avatar,
   camp: slot,
-  speed: monster.speed,
-  size: monster.size,
-  attackRange: monster.attackRange,
-  reviveTime: monster.reviveTime,
-  health: monster.health,
-  damage: monster.damage,
-  attackInterval: monster.attackInterval,
-  aggroRange: monster.aggroRange,
+  speed: member.speed,
+  size: member.size,
+  attackRange: member.attackRange,
+  reviveTime: member.reviveTime,
+  health: member.health,
+  damage: member.damage,
+  attackInterval: member.attackInterval,
+  aggroRange: member.aggroRange,
   abilities: monster.id === BARON_QUALIFIED_ID ? BARON_ABILITIES : undefined,
 });
 

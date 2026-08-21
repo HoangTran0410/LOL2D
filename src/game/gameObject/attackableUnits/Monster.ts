@@ -42,7 +42,7 @@ export interface MonsterPresetData {
    * The camp point — where this body sits at rest, chases from and leashes
    * back to. **Also the pack's identity**: every body spawned into the same
    * neutral slot is handed the exact same `camp` object (`Game.spawnJungle()`
-   * via `preset.ts`'s `monsterPresetFromSlot`), and `alertCamp` finds its
+   * via `preset.ts`'s `monsterBodyPreset`), and `alertCamp` finds its
    * packmates by that shared reference rather than a separate id — see its
    * own doc comment.
    */
@@ -496,7 +496,7 @@ export default class Monster extends AttackableUnit {
    * Membership used to be a shared `campId` string every body in a pack
    * carried. That field is gone: a camp is now a neutral slot, and every body
    * `Game.spawnJungle()` spawns into one slot is handed the exact same `camp`
-   * object (`preset.ts`'s `monsterPresetFromSlot`) — so `mate.camp === this.camp`
+   * object (`preset.ts`'s `monsterBodyPreset`) — so `mate.camp === this.camp`
    * *is* "in this pack", with no id to keep in sync and no distance re-scan
    * against map data. A solo camp's `camp` object is never shared with
    * anything else, so this still finds nobody for it, same as before.
