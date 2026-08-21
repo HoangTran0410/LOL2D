@@ -1,6 +1,6 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
 import type { CastContext } from '@/game/spell/runtime/types';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
@@ -61,11 +61,11 @@ export default class Nautilus_R extends Spell {
  * delete the object or fly it to a corpse's last coordinate and then delete it
  * without ever calling the arrival hook.
  *
- * Ground art — `zIndex = 2` — because the whole point of the travel is that it is
+ * Ground art — `zIndex = GROUND_Z_INDEX` — because the whole point of the travel is that it is
  * a telegraph the victim can read while standing on top of it.
  */
 export class Nautilus_R_Object extends MissileSpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   speed = R_SPEED;
   size = R_WIDTH;
   maxHitCount = Infinity;
@@ -196,7 +196,7 @@ export class Nautilus_R_Object extends MissileSpellObject {
 
 /** The blast radius, drawn on the ground where it actually landed. */
 export class Nautilus_R_Rim extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = R_RIM_MS;
   age = 0;
 

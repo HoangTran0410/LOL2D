@@ -387,3 +387,262 @@ No regression to the object-count or quadtree-routing fix from this change.
 - `tests/game/helpers/CombatText.test.ts`: new describe block, one case
   (above). All 10 cases in the file pass against the fixed code; `npm run
 verify` is green (244 files, 3950 tests, both `tsc` passes, build).
+
+## Addendum 2: z-index — combat text hidden behind the avatar, dead champions on top
+
+Two more phone reports, one root cause per the coordinator's own diagnosis
+(confirmed against the code, not re-derived from scratch):
+
+> perf text ko bị rớt nữa, nhưng giờ điểm cuối của animation lại nằm ngay sau
+> avatar champ, bị avatar che mất luôn, ko thấy luôn
+>
+> vs có 1 bug z-index nữa, dead champ lại render trên alive champ, please
+> update hệ thống z-index của game, cái gì quan trọng hơn cần đc render sau
+> (đè lên thứ ko quan trọng)
+
+The arc no longer runs away, but its resting point sits behind the champion
+sprite. Separately, a dead champion draws over a living one.
+
+### Root cause, verified against the code
+
+`ObjectManager.zIndexOf` resolved `Z_INDEX_MAP` by **exact constructor**:
+`TrailSystem 0, ParticleSystem 1, SpellObject 2, AttackableUnit 3, CombatText
+5`, default `99` for anything not an exact key.
+
+Checking every class in the hierarchy against this (not just trusting the
+summary): `Champion` itself was **not** broken — it has its own `static
+displayZIndex = 4`, checked via a separate `Object.hasOwn` escape hatch, so
+it already resolved correctly before this fix. What actually fell through to
+`99` were `Champion`'s own subclasses — `AIChampion`, `Pet`, `DummyChampion`
+— because a subclass never *owns* an inherited static field (`Object.hasOwn`
+returns `false` on them even though reading `AIChampion.displayZIndex`
+directly would find Champion's `4` through the prototype chain), and none of
+them are `Z_INDEX_MAP` keys either. In a default match (player + 3 bots) that
+is 3 of 4 champions on screen. Combined with `CombatText` sitting at `5` —
+below the `99` those subclasses fell through to — a number attached to any
+bot or pet painted under that unit's own sprite.
+
+The same walk gap affects a much larger, previously invisible set: **every
+concrete spell-effect class** (a missile, a hit-spark, an aura — anything
+built on `MissileSpellObject` or `SpellObject` that does not explicitly
+override `zIndex`) is a subclass with no map entry either, so essentially
+every spell VFX in the game was *also* resolving to `99` by the same
+accident. `ground-decal-zindex.test.ts`'s own doc comment even said so out
+loud: "That is the right default for a missile or a blast" — a correct
+judgement about the accidental value, never actually stated as an
+intentional constant.
+
+The dead-over-alive bug is the same root cause from a different angle: two
+champions on the same numeric layer (before the fix, two bots both falling
+through to `99`; after the class-resolution fix, *any* two champions, now
+correctly tied at `4`) have no tiebreak, so paint order is whatever the
+quadtree's traversal happened to return — insertion order, in effect —
+which is exactly what silently flipped a corpse on top of a survivor.
+
+### The fix
+
+**1. Named layers in `ObjectManager.ts`, one ordered list, doc comment
+states the rule.** `FOUNTAIN_Z_INDEX -1, TRAIL_Z_INDEX 0, PARTICLE_Z_INDEX 1,
+GROUND_Z_INDEX 2, UNIT_Z_INDEX 3, MINION_Z_INDEX 3.2, OBJECTIVE_Z_INDEX 3.5,
+CHAMPION_Z_INDEX 4, SPELL_EFFECT_Z_INDEX 6, COMBAT_TEXT_Z_INDEX 8`. The rule:
+**more important paints later.** `Champion.displayZIndex`,
+`Minion.displayZIndex`, and the instance `zIndex` on `Monster`, `Turret` and
+`Fountain` all now reference these constants instead of a private literal —
+verified none of the five files create an import cycle (`ObjectManager.ts`
+never imports any of them; `Minion.ts` and the structures already imported
+`PredefinedFilters` from it, so the direction was already established). The
+dozen-plus ground-art spell files (31 files, `Jhin_E.ts`'s previously-local
+`GROUND_Z_INDEX`, and `Syndra_Q.ts`'s `SPHERE_AIR_Z_INDEX`, which turned out
+to already independently equal the new `SPELL_EFFECT_Z_INDEX` by
+coincidence) now import the one shared constant instead of each hardcoding
+`zIndex = 2`.
+
+**2. `classLayerOf` resolves up the prototype (`extends`) chain.** Walks from
+the object's own constructor toward `Object.prototype`, checking at *every*
+step for either an own `displayZIndex` static or a `Z_INDEX_MAP` entry — the
+same two escape hatches as before, just no longer requiring an *exact* match.
+`AIChampion`/`Pet`/`DummyChampion` climb to `Champion.displayZIndex`; a
+`MissileSpellObject` subclass with nothing of its own climbs to
+`SpellObject`'s `SPELL_EFFECT_Z_INDEX`. `DEFAULT_Z_INDEX` (the true fallback,
+now `UNIT_Z_INDEX` instead of `99`) should be unreachable for anything real:
+`AttackableUnit`, `SpellObject`, `TrailSystem`, `ParticleSystem` and
+`Fountain` are the only direct `GameObject` subclasses in the game, and the
+walk finds one of the first four for every concrete class; `Fountain` always
+sets its own instance `zIndex` and never reaches class resolution.
+
+**3. Dead-below-alive is a per-object tiebreak beside the sort, not a
+layer.** `ObjectManager.draw()` now records `dead: o instanceof AttackableUnit
+&& o.isDead` alongside each drawable's `z` in the same pass that already
+computes it, then sorts `z` first and `dead` (alive-after-dead) second. Per
+the coordinator's explicit ask, this is deliberately **not** folded into
+`zIndexOf`'s number — "is this particular instance dead right now" is not a
+property of the class.
+
+**4. `CombatText` moved from `5` to `COMBAT_TEXT_Z_INDEX = 8`** — above
+`CHAMPION_Z_INDEX` (4) *and* `SPELL_EFFECT_Z_INDEX` (6), i.e. above every
+unit and every ordinary spell effect, not just above the old `AttackableUnit`
+slot of 3. It is an overlay, not a thing in the scene (it already draws at
+constant screen size regardless of zoom), so it now sits above everything
+else world-related.
+
+### A bug in my own first draft, caught by the test rather than shipped
+
+The first version of the dead/alive comparator was `Number(a.dead) -
+Number(b.dead)` — backwards. Running the new tests immediately surfaced it:
+the "insert dead first" case passed by insertion-order coincidence, but
+"insert dead last" failed with `['alive', 'dead']` instead of `['dead',
+'alive']`, and the representative-set test failed with "expected 7 to be
+less than 6" (the dead pet sorting *after* the live champion). Fixed to
+`Number(b.dead) - Number(a.dead)` and re-verified both tests pass. Recorded
+here because it is exactly the failure mode "build it both ways round" was
+asked for to catch — a comparator that is right for one insertion order and
+silently wrong for the other is indistinguishable from working, from a
+single test run.
+
+### Audit: what moved when the default stopped meaning "on top"
+
+Requested explicitly, enumerated before shipping rather than found from a
+screenshot:
+
+| class | before | after | verdict |
+|---|---:|---:|---|
+| `Champion` | 4 (`displayZIndex`, own field) | 4 (unchanged, now via the shared `CHAMPION_Z_INDEX` constant) | no change |
+| `Minion` | 3.2 (`displayZIndex`, own field) | 3.2 (unchanged, now via `MINION_Z_INDEX`) | no change |
+| `Monster`, `Turret` | 3.5 (instance `zIndex`) | 3.5 (unchanged, now via `OBJECTIVE_Z_INDEX`) | no change |
+| `Fountain` | -1 (instance `zIndex`) | -1 (unchanged, now via `FOUNTAIN_Z_INDEX`) | no change |
+| **`AIChampion`, `Pet`, `DummyChampion`** | 99 (fell through) | **4** (climbs to `Champion.displayZIndex`) | **fixes both reports** — a bot or a pet now sits on the same footing as any other champion, dead-vs-alive included |
+| **Every un-overridden `SpellObject`/`MissileSpellObject` subclass** (missiles, hit-sparks, auras — hundreds of classes across the roster) | 99 (fell through) | **6** (`SPELL_EFFECT_Z_INDEX`, climbs to `SpellObject`'s map entry) | **correct**: still above every unit, same relative position as before. Verified nothing in the codebase constructs a bare `new SpellObject(...)` for a real effect (grepped — only `CombatText`, which has its own entry), so this is the only population the change touches |
+| **`CombatText`** | 5 | **8** (`COMBAT_TEXT_Z_INDEX`) | **intentional, requirement #4** — now above spell effects too, not only above units. The one real behavioural delta: a flashy spell effect can no longer visually cover a damage number. Consistent with this project's own stated VFX principle ("legibility outranks looking good," `CLAUDE.md`) — a number the player needs to read should not lose to an explosion |
+| bare `AttackableUnit` (never instantiated directly in real gameplay) | 3 (exact map hit) | 3 (unchanged — first-hop match, no walk needed) | no change |
+| anything reaching the true `DEFAULT_Z_INDEX` fallback | 99 | 3 (`UNIT_Z_INDEX`) | should be unreachable for any real class — see `classLayerOf`'s doc comment |
+
+One remaining known tie, named rather than silently accepted: two *living*
+champions on the same layer (the ordinary case — the player next to a bot,
+or two bots) still have no deterministic order between them, only insertion
+order. That was true before this fix too and was never the reported bug
+(only *dead-vs-alive* was); a living-vs-living tiebreak was not requested
+and is not added here.
+
+### Research: how League actually presents floating combat text
+
+Requested explicitly. Riot does not publish the client's rendering internals,
+so this is drawn from patch notes, wiki pages and player-facing forum
+threads — behaviour and layout conventions only, no asset, font or artwork
+referenced or copied (this repo is mid-effort to separate from Riot IP).
+
+- **Color coding by damage type**: physical red, magic purple, true damage
+  white, healing green — introduced in the "Hecarim patch" combat-text
+  rework, which also fixed a bug where damage text could "linger on the
+  screen." ([Hecarim Patch Notes, MobaFire](https://www.mobafire.com/league-of-legends/forum/general/hecarim-patch-notes-formatted-14073))
+- **Anchor**: "damage is registered onto an enemy champion and displayed
+  above them, over their health bar" — not over the character model itself.
+  ([League of Legends Damage System, Explained — forum thread](http://forums.na.leagueoflegends.com/board/showthread.php?t=3284327))
+- **A recurring player complaint, independent of this project**: "the
+  floating text sometimes pops up and floats behind the health bar or is
+  sometimes just so small it's difficult to read." ([Cannot see floating
+  text/combat text — LoL forums](http://forums.na.leagueoflegends.com/board/showthread.php?t=2325214))
+- **Crit and gold changes** were made "to increase the impact of those
+  ceremonies and standardize the presentation across all regions." ([Floating
+  Combat Text — Gold and Crit Changes, PBE boards](https://boards.pbe.leagueoflegends.com/en/c/general-pbe-feedback/Li36FbmE-floating-combat-text-gold-and-crit-changes))
+- Separately, a WoW addon convention ("group by thousands" — batching many
+  small hits into one number above a threshold) turned up while searching
+  for "how simultaneous numbers avoid overlapping"; it is a Blizzard/WoW
+  addon feature, not something League itself does. ([Floating combat text on
+  target, mmo-champion](https://www.mmo-champion.com/threads/1477571-Floating-combat-text-on-target-Group-by-thousands))
+
+**Adopted**: the anchor convention (above the health bar, not over the
+character). `CombatText.draw()` now rests `HEALTH_BAR_CLEARANCE_PX` (20px,
+scaled like the bar) above where `AttackableUnit.drawHealthBar` puts the bar
+itself, clearing both the bar and its "12 / 100" label, with the existing
+arc (`offsetX`/`offsetY`) playing out from that higher point exactly as
+before. This is squarely a placement fix, in scope per the coordinator's
+explicit carve-out, and it is the same *kind* of bug LoL's own players have
+reported independently ("floats behind the health bar") — evidence this is a
+real failure mode worth guarding, not a speculative addition. Verified
+falsifiable: with the clearance term removed, the anchor sits exactly at the
+unit's top edge and the new test (`draws above the top of the unit body, not
+at its centre or feet`) fails with `expected -27.5 to be less than -27.5`.
+
+**Rejected / not applied**:
+- **Color-by-damage-type** (physical/magic/true). LOL2D's `CombatText.show`
+  is keyed on `kind` (`damage`/`heal`/`shield`/`reflect`), not on a damage
+  *type* the combat system does not currently track at the text layer —
+  plumbing physical/magic/true through to `CombatText.show` would touch the
+  damage pipeline itself, which is out of scope for a rendering/placement
+  fix and is explicitly the "combat feel" the brief says not to redesign.
+- **"Group by thousands" batching**. Not League's own behaviour (a WoW
+  addon), and this game already has a merge rule scaled to its own ~100
+  health pool (`CombatText`'s per-victim, per-kind merge from the first
+  addendum) — a second, differently-shaped batching rule on top would be two
+  ways of doing the same job.
+- **A deterministic per-kind horizontal lane** (so a simultaneous shield
+  absorb and damage number, or a reflect proc and its underlying damage
+  number, never share the same x by chance) was considered — the existing
+  bounded random `driftTargetX` per instance already gives *some* separation,
+  and no report named overlapping-but-different-kind numbers as a problem.
+  Left alone rather than added speculatively; flagging it here as the next
+  thing to reach for if that specific complaint shows up.
+
+### Tests
+
+- `tests/game/managers/drawOrder.test.ts` (new): the full representative set
+  — dead champion (`Pet`, standing in for the broken class), live champion,
+  monster, turret, fountain, ground decal, particle, trail, an unlabeled
+  `SpellObject` subclass, and combat text — asserted as one connected chain
+  of relations (not one pair), with `monster`/`turret`'s intentional tie
+  named rather than forced into a fake order. A second describe block builds
+  the dead-vs-alive case both insertion orders round. Run against the
+  pre-fix code (`git stash` on the touched `src/` files, temporarily
+  inlining `GROUND_Z_INDEX = 2` in the test since the old `ObjectManager.ts`
+  did not export it): the representative-set test failed with `expected 8 to
+  be less than 6` (the dead `Pet` sorting after the live champion — the
+  `AIChampion`/`Pet` bug), and the dead-vs-alive test failed on exactly one
+  of its two orderings (`insert dead first` passed by accident; `insert dead
+  last` produced `['alive', 'dead']`) — the insertion-order dependence
+  itself, caught by testing it both ways round rather than once.
+- `tests/game/helpers/CombatText.test.ts`: one case added for the raised
+  anchor (above).
+- `tests/game/spells/ground-decal-zindex.test.ts`: assertions unchanged
+  (still passes — `GROUND_Z_INDEX` kept its value of 2), doc comment updated
+  since its shape (the *reason* an override is needed) changed: it used to
+  say an un-overridden `SpellObject` falls through to `DEFAULT_Z_INDEX`
+  (99); it now resolves to the deliberate `SPELL_EFFECT_Z_INDEX` (6) instead,
+  which is *still* the wrong layer for ground art, for the same underlying
+  reason (a `SpellObject` subclass does not inherit the *ground* slot,
+  because that slot is intentionally a different, lower one).
+- Every other stale doc comment across the ~40 ground-art spell files that
+  mentioned the literal `zIndex = 2` or the old "falls through to 99" wording
+  was corrected in the same pass (`GROUND_Z_INDEX` / `SPELL_EFFECT_Z_INDEX`
+  named instead of the numbers), so a future reader is not told the old
+  mechanism.
+
+### e2e: object count and quadtree numbers, unchanged
+
+The z-index fix only reorders what `ObjectManager.draw()` paints and in what
+sequence — it does not touch `CombatText.show`'s merge logic, object
+construction, or which quadtree an object lives in. Re-ran
+`tests/e2e/measure-combattext-perf.mjs` to confirm:
+
+| metric | prior (post arc-fix) | post z-index-fix |
+|---|---:|---:|
+| moderate: live mean / max | 62.8-63.7 / 69-72 | 64.2 / 71 |
+| moderate: `_objectsTree` size | 242-258 | 244 |
+| moderate: retrieve time | 27.1-27.5ms | 26.7ms |
+| heavy: live mean / max | 79.4-79.6 / 80 | 79.6 / 80 |
+| heavy: `_objectsTree` size | 274-285 | 282 |
+| heavy: retrieve time | 34.3-34.8ms | 37.8ms |
+
+All within the same run-to-run variance already documented in this file —
+no regression.
+
+### Verify
+
+`npm run verify` green: 245 test files, 3954 tests, both `tsc` passes, build.
+`npx prettier --check` passes on every file this addendum touched, with two
+pre-existing exceptions carried forward unchanged: `Minion.ts` and
+`Turret.ts` already failed `--check` on `main` before this session (an
+unrelated line in each exceeds the column rule) — `prettier --write` was run
+across all 45 touched files to catch real formatting issues, and the two
+collateral reformats it produced on lines this session did not otherwise
+touch were manually reverted, per `CLAUDE.md`'s explicit instruction never to
+fix a predates-Prettier file as a side effect of an unrelated change.

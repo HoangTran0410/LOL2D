@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { bodyRadiusOf, effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Stun from '@/game/gameObject/buffs/Stun';
@@ -132,11 +132,12 @@ export default class Sett_E extends Spell {
  */
 export class Sett_E_Object extends SpellObject {
   /**
-   * Ground art, at zIndex 2 rather than the 99 a SpellObject subclass falls
-   * through to: the enemy has to be able to read which box he is standing in,
-   * which means the box goes under him, not over him.
+   * Ground art, at `GROUND_Z_INDEX` rather than the ordinary
+   * `SPELL_EFFECT_Z_INDEX` a `SpellObject` subclass resolves to by default:
+   * the enemy has to be able to read which box he is standing in, which
+   * means the box goes under him, not over him.
    */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = SETT_E_SWEEP_MS;
   age = 0;
   radius = SETT_E_BOX_LENGTH;

@@ -9,6 +9,7 @@ import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import { StatsModifier } from '@/game/gameObject/Stats';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 export const RANGE = 620;
 export const DAMAGE = 26;
@@ -133,14 +134,13 @@ export class Nocturne_Q_Trail extends SpellObject {
   /**
    * Under the units standing on it.
    *
-   * `Z_INDEX_MAP` is keyed by *exact* constructor, so a `SpellObject` subclass
-   * does not inherit SpellObject's slot of 2 — it falls through to
-   * `DEFAULT_Z_INDEX`, which is 99 and paints over champions. That is right for
+   * `classLayerOf` walks a `SpellObject` subclass with no zIndex of its own up
+   * to `SPELL_EFFECT_Z_INDEX`, which paints over champions. That is right for
    * a missile and wrong for a stain on the floor: the trail was covering the
    * feet of everyone walking down it. Same value `Singed_W` and `Cassiopeia_W`
    * set, for the same reason.
    */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   update() {
     const step = deltaTime;

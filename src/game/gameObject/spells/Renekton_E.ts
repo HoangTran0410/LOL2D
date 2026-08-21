@@ -1,6 +1,6 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import { SpellForm } from '@/game/spell/runtime/CancelPolicy';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import Spell from '@/game/gameObject/Spell';
@@ -172,13 +172,13 @@ export const GASH_LIFETIME_MS = 620;
 /**
  * The furrow the pass tears in the ground, from where he started to where he is.
  *
- * Ground art (`zIndex = 2`), so it lies under the feet crossing it, and a
+ * Ground art (`zIndex = GROUND_Z_INDEX`), so it lies under the feet crossing it, and a
  * `SpellObject` rather than caster VFX because it stretches most of a screen
  * away from his body — drawn off `Champion.draw` it would blink out whenever the
  * camera lost him and the damage would land invisibly.
  */
 export class Renekton_E_Object extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   origin: p5.Vector = this.owner.position.copy();
   /** Where along the furrow a body was caught; each gets a splash. */
   struck: p5.Vector[] = [];

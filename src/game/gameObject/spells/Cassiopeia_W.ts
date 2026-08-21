@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import BuffAddType from '@/game/enums/BuffAddType';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import DamageOverTime from '@/game/gameObject/buffs/DamageOverTime';
@@ -61,7 +61,7 @@ export class Cassiopeia_W_Object extends SpellObject {
   position: p5.Vector = this.owner.position.copy();
 
   /** A pool of venom on the floor: painted under the units wading through it. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   radius = 100;
   lifeTime = 5000;

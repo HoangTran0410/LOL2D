@@ -1,7 +1,7 @@
 import { Circle, Rectangle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Dash from '@/game/gameObject/buffs/Dash';
@@ -172,9 +172,9 @@ export default class XinZhao_E extends Spell {
  */
 export class XinZhao_E_Object extends SpellObject {
   // Ground art: the ring is scoured into the floor, so it paints *under* the
-  // bodies standing in it. A SpellObject subclass otherwise falls through to
-  // DEFAULT_Z_INDEX (99) and covers everyone's feet — see Nocturne's Dusk Trail.
-  zIndex = 2;
+  // bodies standing in it. An un-overridden SpellObject subclass otherwise
+  // resolves to SPELL_EFFECT_Z_INDEX and covers everyone's feet — see Nocturne's Dusk Trail.
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   lifeTime = 420;
   /** Spoke angles, seeded once — rolling them per frame flickers instead of animating. */

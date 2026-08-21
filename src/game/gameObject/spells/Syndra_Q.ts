@@ -2,7 +2,11 @@ import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import {
+  GROUND_Z_INDEX,
+  PredefinedFilters,
+  SPELL_EFFECT_Z_INDEX,
+} from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Spell from '@/game/gameObject/Spell';
@@ -40,8 +44,7 @@ export const SPHERE_EDGE: readonly [number, number, number] = [238, 232, 255];
 
 const Q_RIM_MS = 240;
 /** A sphere in her hand or in flight is over the bodies, not under them. */
-const SPHERE_AIR_Z_INDEX = 6;
-const GROUND_Z_INDEX = 2;
+const SPHERE_AIR_Z_INDEX = SPELL_EFFECT_Z_INDEX;
 const HELD_HEIGHT = 46;
 const SMEAR_POINTS = 10;
 const SMEAR_STEP = 9;

@@ -172,3 +172,48 @@ describe('CombatText arc stays bounded under sustained merges', () => {
     expect(Math.abs(text.offsetX)).toBeLessThan(100);
   });
 });
+
+// Research: real League anchors floating combat text above the health bar,
+// not over the character model — a forum complaint about text that "floats
+// behind the health bar" is the same failure mode this guards against, from
+// a different cause. See PERF-COMBATTEXT.md for the full citation.
+describe('CombatText anchors above the unit and its health bar', () => {
+  let textMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    installSpellObjectGlobals();
+    textMock = vi.fn();
+    vi.stubGlobal('push', vi.fn());
+    vi.stubGlobal('pop', vi.fn());
+    vi.stubGlobal('stroke', vi.fn());
+    vi.stubGlobal('fill', vi.fn());
+    vi.stubGlobal('strokeWeight', vi.fn());
+    vi.stubGlobal('textStyle', vi.fn());
+    vi.stubGlobal('textSize', vi.fn());
+    vi.stubGlobal('BOLD', 'bold');
+    vi.stubGlobal('color', () => ({ setAlpha: () => undefined }));
+    vi.stubGlobal(
+      'map',
+      (value: number, a: number, b: number, c: number, d: number) =>
+        c + ((value - a) / (b - a)) * (d - c)
+    );
+    vi.stubGlobal('text', textMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('draws above the top of the unit body, not at its centre or feet', () => {
+    const game = createGame();
+    const unit = createUnit(game, 0, 'blue');
+    const combatText = new CombatText(unit);
+    combatText.text = '-10';
+
+    combatText.draw();
+
+    expect(textMock).toHaveBeenCalledTimes(1);
+    const [, , y] = textMock.mock.calls[0] as [string, number, number];
+    const topOfUnit = unit.position.y - unit.stats.size.value / 2;
+    // Smaller y is higher on screen: the number must start above the unit's
+    // own top edge, clear of the health bar sitting just above that edge.
+    expect(y).toBeLessThan(topOfUnit);
+  });
+});

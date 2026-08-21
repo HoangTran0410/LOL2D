@@ -5,6 +5,7 @@ import Buff from '@/game/gameObject/Buff';
 import StatAmp from '@/game/gameObject/buffs/StatAmp';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 /** How long the night stays closed in. */
 export const VAYNE_R_DURATION_MS = 10_000;
@@ -74,12 +75,12 @@ export class Vayne_R_Buff extends Buff {
  * dark. Two layers, deliberately — a particle field on top of this would hide
  * both of them.
  *
- * Ground art, so `zIndex = 2`: `Z_INDEX_MAP` is keyed by exact constructor and a
- * `SpellObject` subclass otherwise falls through to 99, painting a 600px disc
- * over the feet of everyone standing in it.
+ * Ground art, so `zIndex = GROUND_Z_INDEX`: an un-overridden `SpellObject`
+ * subclass resolves to `SPELL_EFFECT_Z_INDEX` instead, which would paint a
+ * 600px disc over the feet of everyone standing in it.
  */
 export class Vayne_R_Aura extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   private host: AttackableUnit;
 

@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -72,12 +72,12 @@ export interface ZiggsMine {
 
 /**
  * The whole field is one object, because the trip cap is a property of the field and not of any
- * single plate. Ground art, so it takes the ground zIndex explicitly: Z_INDEX_MAP is keyed by
- * exact constructor and a SpellObject subclass would otherwise fall through to 99 and cover the
+ * single plate. Ground art, so it takes `GROUND_Z_INDEX` explicitly: an un-overridden
+ * SpellObject subclass resolves to `SPELL_EFFECT_Z_INDEX` instead, and would cover the
  * feet of everyone standing on it.
  */
 export class Ziggs_E_Object extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   radius = E_SCATTER_RADIUS + E_TRIGGER_RADIUS;
   age = 0;
   lifeTime = E_ARM_MS + E_LIFETIME_MS;

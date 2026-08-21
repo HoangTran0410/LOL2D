@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
@@ -460,7 +460,7 @@ export class Katarina_Blade_Impact extends SpellObject {
  * and triggers a 360-degree Dagger Slash!
  */
 export class Katarina_Dagger extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   lifeTime = KATARINA_DAGGER_LIFETIME_MS;
   pickupRadius = KATARINA_PICKUP_RADIUS;

@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange, withinRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import TargetResolver from '@/game/spell/targeting/TargetResolver';
 import type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
@@ -283,11 +283,11 @@ export class Sett_R_Carry extends SpellObject {
 }
 
 /**
- * Ground art, so zIndex = 2: Z_INDEX_MAP is keyed by exact constructor and a
- * SpellObject subclass otherwise falls through to 99, over everyone's feet.
+ * Ground art, so zIndex = GROUND_Z_INDEX: an un-overridden SpellObject subclass
+ * resolves to SPELL_EFFECT_Z_INDEX instead, over everyone's feet.
  */
 export class Sett_R_Crater extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = SETT_R_CRATER_MS;
   age = 0;
   radius: number;

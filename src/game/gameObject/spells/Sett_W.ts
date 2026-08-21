@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastContext, CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Buff from '@/game/gameObject/Buff';
@@ -275,7 +275,7 @@ export class Sett_W_Grit_Bar extends SpellObject {
 /** The windup: the cone sector grows to full reach while he pulls the fist back. */
 export class Sett_W_Telegraph extends SpellObject {
   /** Ground art: Z_INDEX_MAP is keyed by exact constructor, so a subclass must say so. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = SETT_W_WINDUP_MS;
   age = 0;
 
@@ -334,7 +334,7 @@ export class Sett_W_Telegraph extends SpellObject {
  * true-damage laser strip along the center.
  */
 export class Sett_W_Punch extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = PUNCH_LIFE_MS;
   age = 0;
   radius = SETT_W_LENGTH;

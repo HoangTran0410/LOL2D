@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import { effectiveRange } from '@/game/combat/Reach';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import type { CastSpec } from '@/game/spell/runtime/types';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Stun from '@/game/gameObject/buffs/Stun';
@@ -78,11 +78,11 @@ export default class Riven_W extends Spell {
 /**
  * The windup made visible: cracks crawl out of her feet and stop dead on the hit radius
  * over W_WINDUP_MS, which is the whole reaction window for whoever is standing there.
- * Ground art, so zIndex is 2 — Z_INDEX_MAP is keyed by exact constructor and a subclass
- * would otherwise fall through to 99, above the feet standing on it.
+ * Ground art, so zIndex is `GROUND_Z_INDEX` — an un-overridden subclass
+ * resolves to `SPELL_EFFECT_Z_INDEX` instead, above the feet standing on it.
  */
 export class Riven_W_Fracture extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   lifeTime = W_WINDUP_MS + 200;
   age = 0;
   readonly radius: number;

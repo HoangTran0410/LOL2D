@@ -5,6 +5,7 @@ import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Pet from '@/game/gameObject/attackableUnits/Pet';
 import { PredefinedParticleSystems } from '@/game/gameObject/helpers/ParticleSystem';
+import { GROUND_Z_INDEX } from '@/game/managers/ObjectManager';
 
 // Exported so the suite asserts the swarm's wiring rather than a copy of the
 // numbers — retuning a value must not mean editing a test.
@@ -67,12 +68,13 @@ export default class Malzahar_W extends Spell {
 }
 
 /**
- * The tear in the ground the swarm comes out of. Ground art, so `zIndex = 2`:
- * a `SpellObject` subclass otherwise falls through to `DEFAULT_Z_INDEX` (99)
- * and paints over the feet of everything standing on it.
+ * The tear in the ground the swarm comes out of. Ground art, so
+ * `zIndex = GROUND_Z_INDEX`: an un-overridden `SpellObject` subclass resolves
+ * to `SPELL_EFFECT_Z_INDEX` instead and paints over the feet of everything
+ * standing on it.
  */
 export class Malzahar_W_Rift extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   age = 0;
   spawned = 0;
 

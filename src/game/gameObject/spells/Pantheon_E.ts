@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import Shield from '@/game/gameObject/buffs/Shield';
@@ -38,7 +38,7 @@ export const PLANT_MS = 180;
  * bronze with a spear working from behind it — was not on screen at all.
  *
  * It is now two objects, because the two halves belong on different layers: the
- * dirt he tears up paints under the feet standing in it (`zIndex = 2`, the
+ * dirt he tears up paints under the feet standing in it (`zIndex = GROUND_Z_INDEX`, the
  * ground-decal rule in CLAUDE.md), and the shield he is holding paints over
  * them.
  */
@@ -103,7 +103,7 @@ export class Pantheon_E_Object extends SpellObject {
   tickCount = 0;
   visionRadius = REACH;
   /** Dirt, so it paints under the units standing on it. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
   aegis: Pantheon_E_Aegis | null = null;
 
   _fissures: Fissure[] = [];

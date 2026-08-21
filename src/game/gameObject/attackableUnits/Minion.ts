@@ -2,7 +2,7 @@ import { Circle } from '@/libs/quadtree';
 import { dist, distSq, withinRadius } from '@/utils/math.utils';
 import TeamId from '@/game/enums/TeamId';
 import type { LaneWaypoint } from '@/game/lanes';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { MINION_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import MissileSpellObject from '@/game/gameObject/MissileSpellObject';
 import SpellObject from '@/game/gameObject/SpellObject';
 import AttackableUnit from './AttackableUnit';
@@ -164,7 +164,7 @@ export default class Minion extends AttackableUnit {
    * Above a bare AttackableUnit, below jungle camps, turrets and champions.
    * A wave should never paint over the units the player is actually reading.
    */
-  static displayZIndex = 3.2;
+  static displayZIndex = MINION_Z_INDEX;
 
   /** Read by spell damage multipliers (Pantheon Q) to soften hits on a wave. */
   readonly unitType = 'minion';

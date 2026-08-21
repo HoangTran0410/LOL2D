@@ -1,7 +1,7 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
 import VectorUtils from '@/utils/vector.utils';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import type AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
@@ -87,8 +87,8 @@ export default class Caitlyn_W extends Spell {
 /**
  * The trap on the floor.
  *
- * Ground art, so `zIndex = 2` — a `SpellObject` subclass otherwise falls through
- * to the default 99 and paints over the feet of everyone standing on it, which
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — a `SpellObject` subclass otherwise
+ * resolves to `SPELL_EFFECT_Z_INDEX` and paints over the feet of everyone standing on it, which
  * for a trap would hide the champion it just caught.
  *
  * The motif is Piltover hardware: a hexagonal brass plate with sprung jaws and a
@@ -96,7 +96,7 @@ export default class Caitlyn_W extends Spell {
  * what makes it Caitlyn's from across the map.
  */
 export class Caitlyn_W_Trap extends SpellObject {
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   age = 0;
   armDelay = CAITLYN_W_ARM_DELAY_MS;

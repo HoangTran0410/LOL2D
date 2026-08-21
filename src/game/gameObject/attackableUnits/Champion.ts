@@ -1,4 +1,5 @@
 import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
+import { CHAMPION_Z_INDEX } from '@/game/managers/ObjectManager';
 import type Spell from '@/game/gameObject/Spell';
 import BasicAttackController from '@/game/combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
@@ -160,7 +161,7 @@ export const healthTickStep = (maxHealth: number): number => {
 };
 
 export default class Champion extends AttackableUnit {
-  static displayZIndex = 4;
+  static displayZIndex = CHAMPION_Z_INDEX;
   killCredit: KillCredit = 'champion';
 
   /**

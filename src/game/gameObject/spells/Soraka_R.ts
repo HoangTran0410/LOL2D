@@ -1,6 +1,6 @@
 import { Circle } from '@/libs/quadtree';
 import AssetManager from '@/managers/AssetManager';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { GROUND_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
@@ -66,7 +66,7 @@ export default class Soraka_R extends Spell {
 /** A shaft of starlight settling onto one healed ally. */
 export class Soraka_R_Blessing extends SpellObject {
   /** Light pooling on the ground around the ally's feet. */
-  zIndex = 2;
+  zIndex = GROUND_Z_INDEX;
 
   target: AttackableUnit;
   wounded = false;

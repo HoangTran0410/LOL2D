@@ -64,6 +64,20 @@ const ARC_QUADRATIC_PX = 90;
 const DRIFT_MAX_PX = 40;
 
 /**
+ * Extra clearance the arc's rest point keeps above the unit's health bar, in
+ * screen-space px (scaled like the bar itself — see `Camera.constantSize`).
+ *
+ * Real League anchors its floating numbers above the health bar, not over
+ * the character model (a live match's own forum complaint was text that
+ * "floats behind the health bar" — same failure mode this avoids, different
+ * cause). `AttackableUnit.drawHealthBar` already sits `(6 + 15) * k` above
+ * `size / 2`; this is the further gap on top of that, clearing both the bar
+ * and its "12 / 100" label so a merged, still-climbing number never has to
+ * fight the avatar or the bar for the same few pixels.
+ */
+const HEALTH_BAR_CLEARANCE_PX = 20;
+
+/**
  * A floating damage/heal/shield/reflect number over a unit's head.
  *
  * ## Why it merges, and the rule
@@ -217,8 +231,16 @@ export default class CombatText extends SpellObject {
     const strokeColor = ColorUtils.applyColorAlpha('yellow', alpha);
     const colorAlpha = ColorUtils.applyColorAlpha(this.textColor, alpha);
     const size = this.owner.stats.size.value;
+    const zoomFactor = this.game?.camera?.constantSize?.(1) ?? 1;
+    // Rest point above the health bar, not the character model — see
+    // HEALTH_BAR_CLEARANCE_PX. AttackableUnit.drawHealthBar's own bar sits
+    // `(6 + 15) * k` above `size / 2`; this adds a further gap on top of
+    // that so the number starts clear of both the bar and its "12 / 100"
+    // label, then the arc (offsetX/offsetY) plays out from there exactly as
+    // it did before this line existed.
+    const restY = this.owner.position.y - size / 2 - HEALTH_BAR_CLEARANCE_PX * zoomFactor;
     const x = this.owner.position.x + this.offsetX;
-    const y = this.owner.position.y + this.offsetY - size / 2;
+    const y = restY + this.offsetY;
 
     strokeWeight(2);
     stroke(strokeColor);
@@ -226,7 +248,7 @@ export default class CombatText extends SpellObject {
     textStyle(BOLD);
     // An overlay, not the world: a damage number is the same size on screen at
     // every zoom. See Camera.constantSize.
-    textSize(this.textSize * (this.game?.camera?.constantSize?.(1) ?? 1));
+    textSize(this.textSize * zoomFactor);
     text(this.text, x, y);
     pop();
   }
