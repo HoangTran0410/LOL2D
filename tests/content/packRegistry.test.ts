@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { PackRegistry } from '../../src/content/PackRegistry';
+import { lazy } from '../../src/content/ContentPack';
 import type { ContentPack } from '../../src/content/ContentPack';
 
 /**
@@ -158,5 +159,105 @@ describe('PackRegistry', () => {
 
   it('rejects a pack whose id is not a bare identifier', () => {
     expect(() => registry.install({ manifest: { id: 'bad:id' } } as never)).toThrow(/id/);
+  });
+
+  it('does not call a spell loader at install time', () => {
+    let calls = 0;
+    registry.install({
+      manifest: { id: 'lazy', version: '1.0.0', coreRange: '^1' },
+      spells: {
+        Late: () => {
+          calls += 1;
+          return Promise.resolve(class Late {});
+        },
+      },
+    } as never);
+    expect(calls).toBe(0);
+  });
+
+  it('resolves a loader once however many callers ask', async () => {
+    let calls = 0;
+    class Late {}
+    registry.install({
+      manifest: { id: 'lazy', version: '1.0.0', coreRange: '^1' },
+      spells: {
+        Late: () => {
+          calls += 1;
+          return Promise.resolve(Late);
+        },
+      },
+    } as never);
+    const [a, b] = await Promise.all([
+      registry.loadSpellClass('lazy:Late'),
+      registry.loadSpellClass('lazy:Late'),
+    ]);
+    expect(calls).toBe(1);
+    expect(a).toBe(Late);
+    expect(b).toBe(Late);
+  });
+
+  it('reports a loader-backed spell as absent to the synchronous reader until it lands', async () => {
+    class Late {}
+    registry.install({
+      manifest: { id: 'lazy', version: '1.0.0', coreRange: '^1' },
+      spells: { Late: () => Promise.resolve(Late) },
+    } as never);
+    expect(registry.hasSpell('lazy:Late')).toBe(true);
+    expect(registry.spellClass('lazy:Late')).toBeNull();
+    await registry.loadSpellClass('lazy:Late');
+    expect(registry.spellClass('lazy:Late')).toBe(Late);
+  });
+
+  it('still serves an eagerly declared class synchronously', () => {
+    class Now {}
+    registry.install({
+      manifest: { id: 'eager', version: '1.0.0', coreRange: '^1' },
+      spells: { Now },
+    } as never);
+    expect(registry.spellClass('eager:Now')).toBe(Now);
+  });
+
+  it('refuses a second pack with an id already installed', () => {
+    const dupPack = { manifest: { id: 'twice', version: '1.0.0', coreRange: '^1' } };
+    registry.install(dupPack as never);
+    expect(() =>
+      registry.install({ ...dupPack, manifest: { ...dupPack.manifest, version: '2.0.0' } } as never)
+    ).toThrow(/twice/);
+    expect(registry.champions()).toHaveLength(0);
+  });
+
+  it('misreads a bare function-expression loader as a class, because prototype alone cannot tell them apart', async () => {
+    // `function () {}` has a `.prototype` exactly like a class does, so the
+    // structural check alone cannot tell a function-expression loader from
+    // the class it might return. Documented here rather than silently true:
+    // an author who writes one unwrapped gets back the function itself, not
+    // whatever it resolves to. `lazy()` is the fix, proven below.
+    class Late {}
+    registry.install({
+      manifest: { id: 'fn', version: '1.0.0', coreRange: '^1' },
+      // eslint-disable-next-line object-shorthand
+      spells: {
+        Late: function () {
+          return Promise.resolve(Late);
+        },
+      },
+    } as never);
+    const resolved = await registry.loadSpellClass('fn:Late');
+    expect(resolved).not.toBe(Late);
+    expect(typeof resolved).toBe('function');
+  });
+
+  it('treats a function-expression loader wrapped in lazy() as a loader, not a class', async () => {
+    class Late {}
+    registry.install({
+      manifest: { id: 'fn-lazy', version: '1.0.0', coreRange: '^1' },
+      spells: {
+        // eslint-disable-next-line object-shorthand
+        Late: lazy(function () {
+          return Promise.resolve(Late);
+        }),
+      },
+    } as never);
+    expect(await registry.loadSpellClass('fn-lazy:Late')).toBe(Late);
   });
 });

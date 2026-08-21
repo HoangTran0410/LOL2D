@@ -168,6 +168,14 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/Alpha_Q/);
   });
 
+  it('accepts a lazy spell source', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      spells: { Late: () => Promise.resolve(class {}) },
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it('rejects a champion whose name is not a string', () => {
     const result = validatePack({
       manifest: goodManifest,

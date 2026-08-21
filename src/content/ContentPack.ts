@@ -31,6 +31,49 @@ export interface PackManifest {
 /** A spell class. Loose on purpose — `spellRegistry.SpellClass` is `any` too. */
 export type SpellClass = new (...args: never[]) => unknown;
 
+/** A spell class that has not been fetched yet. Resolved at most once. */
+export type SpellLoader = () => Promise<SpellClass>;
+
+/**
+ * How a pack hands over a spell.
+ *
+ * A class outright for a small pack; a thunk for a large one. The Riot pack is
+ * 240 spells behind `src/generated/spellModules.ts`'s dynamic imports, and
+ * handing those over eagerly would put every spell in the game into the first
+ * chunk a match downloads — a chunking optimisation this codebase already made
+ * once, on purpose, and which nothing in a type would have caught being undone.
+ */
+export type SpellSource = SpellClass | SpellLoader;
+
+/**
+ * Marks a `SpellLoader` explicitly, rather than asking `PackRegistry` to guess.
+ *
+ * The obvious discriminator — a class has a `prototype`, a loader does not —
+ * is only half true: an arrow-function loader indeed has none (an arrow
+ * function can never be a class, full stop), but a pack author who writes an
+ * ordinary `function` expression as a loader gets one too, and it would be
+ * misread as the spell class itself. `PackRegistry` trusts the no-`prototype`
+ * case unconditionally and otherwise requires this mark before treating a
+ * function as a loader; wrap a `function`-expression loader in `lazy()` and it
+ * is read correctly.
+ */
+const SPELL_LOADER_MARK: unique symbol = Symbol('lol2d.content.spellLoader');
+
+export function lazy(load: SpellLoader): SpellSource {
+  return Object.assign(load, { [SPELL_LOADER_MARK]: true as const });
+}
+
+/**
+ * True when `source` is a loader — a bare arrow function (which structurally
+ * can never be a class) or anything wrapped by `lazy()`. Exported for
+ * `PackRegistry`, the only reader of `SPELL_LOADER_MARK`.
+ */
+export function isSpellLoader(source: SpellSource): source is SpellLoader {
+  if (typeof source !== 'function') return false;
+  if (source.prototype === undefined) return true;
+  return (source as unknown as Record<symbol, unknown>)[SPELL_LOADER_MARK] === true;
+}
+
 export interface ChampionEntry {
   id: string;
   name: string;
@@ -115,7 +158,7 @@ export interface MapDefinition {
 
 export interface ContentPack {
   manifest: PackManifest;
-  spells?: Record<string, SpellClass>;
+  spells?: Record<string, SpellSource>;
   champions?: ChampionEntry[];
   monsters?: Record<string, MonsterDef>;
   maps?: MapDefinition[];

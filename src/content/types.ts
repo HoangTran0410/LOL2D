@@ -47,6 +47,8 @@ export type {
   PackManifest,
   SpawnSlot,
   SpellClass,
+  SpellLoader,
+  SpellSource,
   StructureKind,
   StructureSlot,
 } from './ContentPack';

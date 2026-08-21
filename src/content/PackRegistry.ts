@@ -1,10 +1,12 @@
 import { validatePack } from './validate';
+import { isSpellLoader } from './ContentPack';
 import type {
   ChampionEntry,
   ContentPack,
   MapDefinition,
   MonsterDef,
   SpellClass,
+  SpellSource,
 } from './ContentPack';
 
 /**
@@ -40,7 +42,10 @@ export const qualify = (packId: string, localId: string): string => `${packId}:$
 
 export class PackRegistry {
   private readonly packs: ContentPack[] = [];
-  private readonly spells = new Map<string, SpellClass>();
+  private readonly sources = new Map<string, SpellSource>();
+  private readonly resolved = new Map<string, SpellClass>();
+  private readonly inFlight = new Map<string, Promise<SpellClass | null>>();
+  private readonly installedIds = new Set<string>();
   private readonly monsterList: QualifiedMonster[] = [];
   private readonly championList: QualifiedChampion[] = [];
   private readonly mapList: QualifiedMap[] = [];
@@ -57,8 +62,19 @@ export class PackRegistry {
     }
     const packId = pack.manifest.id;
 
-    for (const [localId, spellClass] of Object.entries(pack.spells ?? {})) {
-      this.spells.set(qualify(packId, localId), spellClass);
+    if (this.installedIds.has(packId)) {
+      throw new Error(`content pack rejected:\n  pack id "${packId}" is already installed`);
+    }
+
+    for (const [localId, spellSource] of Object.entries(pack.spells ?? {})) {
+      const qualifiedId = qualify(packId, localId);
+      this.sources.set(qualifiedId, spellSource);
+      // An eager class needs no fetch, so it is available to the synchronous
+      // reader immediately — only a loader stays absent from `resolved` until
+      // something calls `loadSpellClass`.
+      if (!isSpellLoader(spellSource)) {
+        this.resolved.set(qualifiedId, spellSource as SpellClass);
+      }
     }
     for (const entry of pack.champions ?? []) {
       this.championList.push({
@@ -76,6 +92,7 @@ export class PackRegistry {
       this.mapList.push({ ...map, packId, id: qualify(packId, map.id) });
     }
     this.packs.push(pack);
+    this.installedIds.add(packId);
   }
 
   champions(): readonly QualifiedChampion[] {
@@ -86,8 +103,52 @@ export class PackRegistry {
     return [...this.mapList];
   }
 
+  hasSpell(qualifiedId: string): boolean {
+    return this.sources.has(qualifiedId);
+  }
+
+  spellIds(): readonly string[] {
+    return [...this.sources.keys()];
+  }
+
+  /** The class, if it is already here. A loader that has not run answers `null`. */
   spellClass(qualifiedId: string): SpellClass | null {
-    return this.spells.get(qualifiedId) ?? null;
+    return this.resolved.get(qualifiedId) ?? null;
+  }
+
+  /**
+   * The class, fetching it if it has to.
+   *
+   * Memoised on the promise, not on the result, so two callers racing the same
+   * spell share one import instead of starting two.
+   */
+  async loadSpellClass(qualifiedId: string): Promise<SpellClass | null> {
+    const already = this.resolved.get(qualifiedId);
+    if (already) return already;
+
+    const source = this.sources.get(qualifiedId);
+    if (!source) return null;
+
+    // A class is itself; only a loader has anything to await. `isSpellLoader`
+    // trusts an arrow function unconditionally (it can never be a class) and
+    // otherwise requires the `lazy()` mark — install() already resolved every
+    // other eager class into `resolved`, so reaching here with a non-loader
+    // only happens if a caller mutates `sources` directly, which nothing does.
+    if (!isSpellLoader(source)) {
+      this.resolved.set(qualifiedId, source as SpellClass);
+      return source as SpellClass;
+    }
+
+    const pending = this.inFlight.get(qualifiedId);
+    if (pending) return pending;
+
+    const run = source().then(spellClass => {
+      this.resolved.set(qualifiedId, spellClass);
+      this.inFlight.delete(qualifiedId);
+      return spellClass;
+    });
+    this.inFlight.set(qualifiedId, run);
+    return run;
   }
 
   /**
@@ -110,6 +171,9 @@ export class PackRegistry {
     this.championList.length = 0;
     this.monsterList.length = 0;
     this.mapList.length = 0;
-    this.spells.clear();
+    this.sources.clear();
+    this.resolved.clear();
+    this.inFlight.clear();
+    this.installedIds.clear();
   }
 }

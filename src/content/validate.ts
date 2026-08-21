@@ -48,9 +48,12 @@ function checkSpells(pack: Record<string, unknown>, errors: string[]): void {
     return;
   }
   for (const [id, value] of Object.entries(pack.spells)) {
-    // A spell class is a constructor. The success path casts this object to
-    // Record<string, SpellClass>; whatever eventually `new`s an entry must
-    // find a function there, not a string or a plain object.
+    // A spell class is a constructor; a spell loader is a thunk returning a
+    // promise of one. The success path casts this object to
+    // Record<string, SpellSource>, and both arms of that union are
+    // functions — a class is itself a function — so this one check already
+    // accepts either without needing to tell them apart. Only PackRegistry
+    // cares which arm it got, at resolution time.
     if (typeof value !== 'function') {
       errors.push(`spells.${id}: must be a class (constructor function)`);
     }
