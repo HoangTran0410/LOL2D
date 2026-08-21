@@ -59,7 +59,14 @@ try {
     const { default: DummyChampion } = await import(
       '/src/game/gameObject/attackableUnits/DummyChampion.ts'
     );
-    const { default: Rammus_Q } = await import('/src/game/gameObject/spells/Rammus_Q.ts');
+    // Every pack spell's export is a factory now (batch 4 task 3), resolved
+    // against the cached ContentApi singleton spellRegistry.ts itself builds
+    // against — reused below for Rammus_Q_Object too, so both share identity
+    // with whatever the live game has already resolved.
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
+    const { default: makeRammus_Q } = await import('/packs/riot/spells/Rammus_Q.ts');
+    const Rammus_Q = makeRammus_Q(api);
     const { getChampionPresetRandom } = await import('/src/game/preset.ts');
     const game = window.__lol2d.scene.oScene.game;
     const player = game.player;
@@ -153,9 +160,8 @@ try {
     // The ball is a circle glued to the caster; the attack controller stops the
     // caster at `attackRange` plus both bodies. Printing the two side by side is
     // the whole arithmetic of the contact question.
-    const ball = new (await import('/src/game/gameObject/spells/Rammus_Q.ts')).Rammus_Q_Object(
-      player
-    );
+    const { makeRammus_Q_Object } = await import('/packs/riot/spells/Rammus_Q.ts');
+    const ball = new (makeRammus_Q_Object(api))(player);
     return {
       playerChampion: player.name,
       laneHeadingDeg: Math.round((lane.angle * 180) / Math.PI),

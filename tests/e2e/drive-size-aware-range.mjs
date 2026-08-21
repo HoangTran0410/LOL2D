@@ -157,7 +157,10 @@ await page.evaluate(() => window.__quarantine());
  */
 const castLeeSinR = async (overrideRange = null) =>
   page.evaluate(async override => {
-    const { default: LeeSin_R } = await import('/src/game/gameObject/spells/LeeSin_R.ts');
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
+    const { default: makeLeeSin_R } = await import('/packs/riot/spells/LeeSin_R.ts');
+    const LeeSin_R = makeLeeSin_R(api);
     const { Circle } = await import('/src/libs/quadtree.ts');
     const { PredefinedFilters } = await import('/src/game/managers/ObjectManager.ts');
     const { DEFAULT_BODY_RADIUS, effectiveRange } = await import('/src/game/combat/Reach.ts');
@@ -238,7 +241,10 @@ await page.screenshot({ path: `${OUT}-default-size.png` });
 // the size while the bodies settle.
 const grow = await page.evaluate(async () => {
   const { MAX_UNIT_SIZE } = await import('/src/game/gameObject/Stats.ts');
-  const { ChoGath_R_Growth } = await import('/src/game/gameObject/spells/ChoGath_R.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeChoGath_R_Growth } = await import('/packs/riot/spells/ChoGath_R.ts');
+  const ChoGath_R_Growth = makeChoGath_R_Growth(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   const victim = window.__reachVictim;

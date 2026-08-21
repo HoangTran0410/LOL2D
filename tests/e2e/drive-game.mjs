@@ -110,8 +110,16 @@ await page.waitForTimeout(1_500);
 // player: frozen in place they stay in frame, so the screenshot shows the
 // projectile art rather than a blur leaving the screen.
 const spawned = await page.evaluate(async () => {
-  const varus = await import('/src/game/gameObject/spells/Varus_Q.ts');
-  const pantheon = await import('/src/game/gameObject/spells/Pantheon_Q.ts');
+  // Every pack spell's named siblings are factories now (batch 4 task 3) —
+  // resolved against the same cached ContentApi singleton spellRegistry.ts
+  // itself builds against, so identity matches whatever the live game
+  // already resolved.
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const varus = await import('/packs/riot/spells/Varus_Q.ts');
+  const pantheon = await import('/packs/riot/spells/Pantheon_Q.ts');
+  const Varus_Q_Arrow = varus.makeVarus_Q_Arrow(api);
+  const Pantheon_Q_Spear = pantheon.makePantheon_Q_Spear(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player ?? game.champion ?? game.objectManager.objects.find(o => o.spells);
 
@@ -124,9 +132,9 @@ const spawned = await page.evaluate(async () => {
     return object.constructor.name;
   };
 
-  const arrow = new varus.Varus_Q_Arrow(champion);
+  const arrow = new Varus_Q_Arrow(champion);
   arrow.chargeRatio = 1;
-  const spear = new pantheon.Pantheon_Q_Spear(champion);
+  const spear = new Pantheon_Q_Spear(champion);
   return [park(arrow, -80), park(spear, 40)];
 });
 

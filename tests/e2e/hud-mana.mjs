@@ -35,11 +35,16 @@ await page.waitForTimeout(1_500);
 // A stacking spell in slot 1 and a costly one in slot 2, so one icon carries the
 // stack badge and the mana badge at once — that is where they would collide.
 await page.evaluate(async () => {
-  const spells = await import('/src/game/gameObject/spells/index.ts');
+  // Every pack spell's default export is a factory now (batch 4 task 3),
+  // resolved against the cached ContentApi singleton spellRegistry.ts itself
+  // builds against.
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const spells = await import('/packs/riot/spells/index.ts');
   const game = window.__lol2d.scene.oScene.game;
-  game.player.replaceSpell(1, new spells.Nasus_Q(game.player));
-  game.player.replaceSpell(2, new spells.Ashe_R(game.player));
-  game.player.replaceSpell(3, new spells.Varus_Q(game.player));
+  game.player.replaceSpell(1, new (spells.Nasus_Q(api))(game.player));
+  game.player.replaceSpell(2, new (spells.Ashe_R(api))(game.player));
+  game.player.replaceSpell(3, new (spells.Varus_Q(api))(game.player));
 });
 await page.waitForTimeout(600);
 

@@ -157,7 +157,12 @@ try {
   // brawling since load, and a measurement taken in the middle of that is
   // measuring somebody else's spell.
   report.setup = await page.evaluate(async () => {
-    const AllSpells = await import('/src/game/gameObject/spells/index.ts');
+    // Every pack spell's default export is a factory now (batch 4 task 3),
+    // resolved against the cached ContentApi singleton spellRegistry.ts
+    // itself builds against.
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
+    const AllSpells = await import('/packs/riot/spells/index.ts');
     const game = window.__lol2d.scene.oScene.game;
     const player = game.player;
     const mapSize = game.mapSize;
@@ -210,8 +215,8 @@ try {
 
     // Known kit, so the assertions below are about the input and not about
     // whichever champion the lobby rolled.
-    player.replaceSpell(1, new AllSpells.Ahri_Q(player)); // DIRECTION, PRESS
-    player.replaceSpell(2, new AllSpells.Varus_Q(player)); // DIRECTION, HOLD_RELEASE
+    player.replaceSpell(1, new (AllSpells.Ahri_Q(api))(player)); // DIRECTION, PRESS
+    player.replaceSpell(2, new (AllSpells.Varus_Q(api))(player)); // DIRECTION, HOLD_RELEASE
     player.spells[1].manaCost = 40;
     player.spells[1].coolDown = 6000;
 
@@ -496,13 +501,15 @@ try {
   // eastward drag must release it and lock the enemy along that aim ray. This
   // is the thumb case an endpoint-only picker made unnecessarily precise.
   const unitAimSetup = await page.evaluate(async () => {
-    const AllSpells = await import('/src/game/gameObject/spells/index.ts');
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
+    const AllSpells = await import('/packs/riot/spells/index.ts');
     const game = window.__lol2d.scene.oScene.game;
     const player = game.player;
     const bots = game.objectManager.objects.filter(o => o.constructor.name === 'AIChampion');
     const nearest = bots[0];
     const intended = bots[1];
-    player.replaceSpell(3, new AllSpells.Leblanc_Q(player));
+    player.replaceSpell(3, new (AllSpells.Leblanc_Q(api))(player));
     nearest.position.set(player.position.x, player.position.y + 180);
     nearest.destination.set(nearest.position.x, nearest.position.y);
     intended.position.set(player.position.x + 500, player.position.y + 40);

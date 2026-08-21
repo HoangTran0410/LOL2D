@@ -37,7 +37,12 @@ try {
   // ------------------------------------------------------------------ setup
 
   report.setup = await page.evaluate(async () => {
-    const AllSpells = await import('/src/game/gameObject/spells/index.ts');
+    // Every pack spell's default export is a factory now (batch 4 task 3),
+    // resolved against the cached ContentApi singleton spellRegistry.ts
+    // itself builds against.
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
+    const AllSpells = await import('/packs/riot/spells/index.ts');
     const game = window.__lol2d.scene.oScene.game;
     const player = game.player;
     const mapSize = game.mapSize;
@@ -88,9 +93,9 @@ try {
 
     // Q = Zed_W (POINT, the headline bug), W = Malphite_Q (UNIT), E = Ahri_Q
     // (DIRECTION, unaffected — flies its own length no matter the drag).
-    player.replaceSpell(1, new AllSpells.Zed_W(player));
-    player.replaceSpell(2, new AllSpells.Malphite_Q(player));
-    player.replaceSpell(3, new AllSpells.Ahri_Q(player));
+    player.replaceSpell(1, new (AllSpells.Zed_W(api))(player));
+    player.replaceSpell(2, new (AllSpells.Malphite_Q(api))(player));
+    player.replaceSpell(3, new (AllSpells.Ahri_Q(api))(player));
     player.spells[1].manaCost = 0;
     player.spells[2].manaCost = 0;
     player.spells[3].manaCost = 0;

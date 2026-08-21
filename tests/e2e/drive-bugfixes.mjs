@@ -32,9 +32,16 @@ await page.waitForTimeout(1_500);
 // (an idle AI's resting aim, or a player who has not moved the mouse), and
 // must travel, not sit on the spawn point.
 const asheResult = await page.evaluate(async () => {
-  const { default: Ashe_R, Ashe_R_Object, RANGE } = await import(
-    '/src/game/gameObject/spells/Ashe_R.ts'
+  // Every pack spell's default and named siblings are factories now (batch 4
+  // task 3), resolved against the cached ContentApi singleton spellRegistry.ts
+  // itself builds against — RANGE is a plain tuning constant and needs none.
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { default: makeAshe_R, makeAshe_R_Object, RANGE } = await import(
+    '/packs/riot/spells/Ashe_R.ts'
   );
+  const Ashe_R = makeAshe_R(api);
+  const Ashe_R_Object = makeAshe_R_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
 
@@ -75,7 +82,10 @@ const asheResult = await page.evaluate(async () => {
 await page.waitForTimeout(1_000); // let several real frames run the arrow forward
 
 const asheAfter = await page.evaluate(async () => {
-  const { Ashe_R_Object } = await import('/src/game/gameObject/spells/Ashe_R.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeAshe_R_Object } = await import('/packs/riot/spells/Ashe_R.ts');
+  const Ashe_R_Object = makeAshe_R_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const arrow = game.objectManager.objects.find(o => o instanceof Ashe_R_Object);
   return arrow
@@ -88,9 +98,13 @@ await page.screenshot({ path: `${OUT}-ashe-r.png` });
 // --- Bug 3: Twitch Q's stealth VFX must not survive death, and must not
 // reappear after respawn somewhere else.
 const twitchBefore = await page.evaluate(async () => {
-  const { default: Twitch_Q, Twitch_Q_Object } = await import(
-    '/src/game/gameObject/spells/Twitch_Q.ts'
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { default: makeTwitch_Q, makeTwitch_Q_Object } = await import(
+    '/packs/riot/spells/Twitch_Q.ts'
   );
+  const Twitch_Q = makeTwitch_Q(api);
+  const Twitch_Q_Object = makeTwitch_Q_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   champion.stats.mana.baseValue = champion.stats.maxMana.value;
@@ -114,7 +128,10 @@ await page.waitForTimeout(500); // let the cloak object actually get added and s
 await page.screenshot({ path: `${OUT}-twitch-stealthed.png` });
 
 const twitchAfterDeath = await page.evaluate(async () => {
-  const { Twitch_Q_Object } = await import('/src/game/gameObject/spells/Twitch_Q.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeTwitch_Q_Object } = await import('/packs/riot/spells/Twitch_Q.ts');
+  const Twitch_Q_Object = makeTwitch_Q_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   // AI bots auto-cast randomly and may independently roll Twitch's preset, so
@@ -144,7 +161,10 @@ await page.screenshot({ path: `${OUT}-twitch-died.png` });
 // force an immediate respawn at a different spot, then confirm the cloak does
 // not resurrect and does not linger at the death location.
 const twitchAfterRespawn = await page.evaluate(async () => {
-  const { Twitch_Q_Object } = await import('/src/game/gameObject/spells/Twitch_Q.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeTwitch_Q_Object } = await import('/packs/riot/spells/Twitch_Q.ts');
+  const Twitch_Q_Object = makeTwitch_Q_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   champion.deathData.reviveAfter = 0;
@@ -154,7 +174,10 @@ const twitchAfterRespawn = await page.evaluate(async () => {
 await page.waitForTimeout(1_500); // real frames tick deathData down to 0 and respawn() fires
 
 const finalState = await page.evaluate(async () => {
-  const { Twitch_Q_Object } = await import('/src/game/gameObject/spells/Twitch_Q.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeTwitch_Q_Object } = await import('/packs/riot/spells/Twitch_Q.ts');
+  const Twitch_Q_Object = makeTwitch_Q_Object(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   const cloak = game.objectManager.objects.find(

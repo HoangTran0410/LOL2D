@@ -18,7 +18,7 @@ const OUT = process.argv[2] ?? '/tmp/lol2d-new-spells';
 const PORT = process.env.LOL2D_PORT ?? String(5_800 + Math.floor(Math.random() * 400));
 const URL = process.env.LOL2D_URL ?? `http://localhost:${PORT}/`;
 const OWN_SERVER = !process.env.LOL2D_URL;
-const CANARY = 'src/game/gameObject/spells/Malphite_E.ts';
+const CANARY = 'packs/riot/spells/Malphite_E.ts';
 
 let server;
 let serverLog = '';
@@ -156,8 +156,13 @@ const setup = await page.evaluate(async () => {
 
 const castOn = (spellModule, spellClass, targetHandle) =>
   page.evaluate(async ({ spellModule, spellClass, targetHandle }) => {
+    // Every pack spell's export is a factory now (batch 4 task 3), resolved
+    // against the cached ContentApi singleton spellRegistry.ts itself builds
+    // against.
+    const { buildContentApi } = await import('/src/content/ContentApi.ts');
+    const api = buildContentApi();
     const mod = await import(spellModule);
-    const SpellClass = mod[spellClass];
+    const SpellClass = mod[spellClass](api);
     const game = window.__lol2d.scene.oScene.game;
     const champion = game.player;
     const target = targetHandle ? window[targetHandle] : champion;
@@ -203,7 +208,7 @@ const results = {};
 
 // ---- Malphite E: Ground Slam ------------------------------------------
 results.malphiteE = await castOn(
-  '/src/game/gameObject/spells/Malphite_E.ts', 'default', undefined
+  '/packs/riot/spells/Malphite_E.ts', 'default', undefined
 );
 // CAST_TIME_MS is 250ms before the slam object even exists, and it fades out
 // over FADE_MS=450ms after that — the window to actually see it is ~250-700ms
@@ -215,7 +220,7 @@ await page.screenshot({ path: `${OUT}-1b-malphite-e-fading.png` });
 
 // ---- Anivia E: Frostbite, undoubled then doubled -----------------------
 results.aniviaE_plain = await castOn(
-  '/src/game/gameObject/spells/Anivia_E.ts', 'default', '__e2eEnemy'
+  '/packs/riot/spells/Anivia_E.ts', 'default', '__e2eEnemy'
 );
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${OUT}-2-anivia-e-plain.png` });
@@ -230,16 +235,20 @@ const chillInfo = await page.evaluate(async () => {
 results.aniviaE_chillApplied = chillInfo;
 
 results.aniviaE_doubled = await castOn(
-  '/src/game/gameObject/spells/Anivia_E.ts', 'default', '__e2eEnemy'
+  '/packs/riot/spells/Anivia_E.ts', 'default', '__e2eEnemy'
 );
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${OUT}-3-anivia-e-chilled-doubled.png` });
 
 // ---- Janna W: Zephyr (passive + active bolt) ----------------------------
 const passiveBefore = await page.evaluate(async () => {
-  const { default: Janna_W, Janna_W_Passive } = await import(
-    '/src/game/gameObject/spells/Janna_W.ts'
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { default: makeJanna_W, makeJanna_W_Passive } = await import(
+    '/packs/riot/spells/Janna_W.ts'
   );
+  const Janna_W = makeJanna_W(api);
+  const Janna_W_Passive = makeJanna_W_Passive(api);
   const { default: StatusFlags } = await import('/src/game/enums/StatusFlags.ts');
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
@@ -263,7 +272,7 @@ await page.waitForTimeout(300);
 await page.screenshot({ path: `${OUT}-4-janna-w-passive-ghosted.png` });
 
 results.jannaW_bolt = await castOn(
-  '/src/game/gameObject/spells/Janna_W.ts', 'default', '__e2eEnemy'
+  '/packs/riot/spells/Janna_W.ts', 'default', '__e2eEnemy'
 );
 // same 250ms castTimeMs windup as Malphite E before the bolt object exists
 await page.waitForTimeout(320);
@@ -273,13 +282,16 @@ await page.screenshot({ path: `${OUT}-5b-janna-w-bolt-impact.png` });
 
 // ---- Janna E: Eye of the Storm (shield shell on an ally) ----------------
 results.jannaE = await castOn(
-  '/src/game/gameObject/spells/Janna_E.ts', 'default', '__e2eAlly'
+  '/packs/riot/spells/Janna_E.ts', 'default', '__e2eAlly'
 );
 await page.waitForTimeout(250);
 await page.screenshot({ path: `${OUT}-6-janna-e-shield.png` });
 
 const jannaEState = await page.evaluate(async () => {
-  const { Janna_E_Shell } = await import('/src/game/gameObject/spells/Janna_E.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeJanna_E_Shell } = await import('/packs/riot/spells/Janna_E.ts');
+  const Janna_E_Shell = makeJanna_E_Shell(api);
   const { default: Shield } = await import('/src/game/gameObject/buffs/Shield.ts');
   const game = window.__lol2d.scene.oScene.game;
   const ally = window.__e2eAlly;

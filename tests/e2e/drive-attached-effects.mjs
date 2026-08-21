@@ -44,8 +44,17 @@ await page.evaluate(() => {
 });
 
 const cast = await page.evaluate(async () => {
-  const { default: Ahri_W } = await import('/src/game/gameObject/spells/Ahri_W.ts');
-  const { Varus_Q_Arrow } = await import('/src/game/gameObject/spells/Varus_Q.ts');
+  // Every pack spell's default export is now a factory (batch 4 task 3),
+  // `buildContentApi()` is a cached process-wide singleton, and every
+  // factory is memoized per api — so building against the same singleton
+  // spellRegistry.ts uses is what keeps `instanceof Ahri_W_Object` true
+  // across separate page.evaluate() calls below.
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { default: makeAhri_W } = await import('/packs/riot/spells/Ahri_W.ts');
+  const { makeVarus_Q_Arrow } = await import('/packs/riot/spells/Varus_Q.ts');
+  const Ahri_W = makeAhri_W(api);
+  const Varus_Q_Arrow = makeVarus_Q_Arrow(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   champion.stats.mana.baseValue = champion.stats.maxMana.value;
@@ -87,8 +96,12 @@ const cast = await page.evaluate(async () => {
 // AI bots roll their own presets, so every count below is filtered to the
 // fox-fires this script spawned on the player rather than the first ones found.
 const countOwn = async () => page.evaluate(async () => {
-  const { Ahri_W_Object } = await import('/src/game/gameObject/spells/Ahri_W.ts');
-  const { Varus_Q_Arrow } = await import('/src/game/gameObject/spells/Varus_Q.ts');
+  const { buildContentApi } = await import('/src/content/ContentApi.ts');
+  const api = buildContentApi();
+  const { makeAhri_W_Object } = await import('/packs/riot/spells/Ahri_W.ts');
+  const { makeVarus_Q_Arrow } = await import('/packs/riot/spells/Varus_Q.ts');
+  const Ahri_W_Object = makeAhri_W_Object(api);
+  const Varus_Q_Arrow = makeVarus_Q_Arrow(api);
   const game = window.__lol2d.scene.oScene.game;
   const champion = game.player;
   const own = game.objectManager.objects.filter(
