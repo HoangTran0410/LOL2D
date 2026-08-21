@@ -5,3 +5,7 @@ dist/
 
 # Copied from node_modules by scripts/copy-vendor.mjs on predev/prebuild.
 public/vendor/
+
+# Subagent-driven-development workspace: ledgers, briefs, reports, review diffs.
+# Process scaffolding, not source — and it holds full branch diffs.
+.superpowers/
