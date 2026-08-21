@@ -100,16 +100,18 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 
 ---
 
-### Task 2: The two vfx modules whose filenames are champion names
+### Task 2: The three files in core whose names are Riot's
 
 `src/game/vfx/LuxBeamEffect.ts` and `src/game/vfx/DariusAxe.ts` are two of the exactly three files in core whose names are Riot's. Batch 2's whole-branch review flagged them as an Important finding and deferred them here, with a sharp observation: `ContentApi` now **exports** them (`vfx.LuxBeamEffect`, `vfx.drawAxeArc`, `vfx.drawDariusAxe`), and `contentApi-surface-seam.test.ts` **enforces their presence** — so the seam that exists to keep core's surface clean is currently requiring the opposite.
 
-This task is small, and it is first among the moves because it exercises the whole path — move a file into the pack, take it off `ContentApi`, fix the seam that required it — at a scale where a mistake is obvious.
+**The third is `src/game/gameObject/monsters/Baron.ts`**, and it is not just a name: it exports `BARON_ABILITIES`, real behaviour that `preset.ts:15` imports and merges onto the monster definition. `ContentPack.ts:187` and `bundledPack.ts:155` both carry comments explaining that merge. So this task moves all three, and Baron is the one with actual wiring to unpick — a monster's abilities have to reach it from the pack rather than from a core import.
+
+This task is first among the moves because it exercises the whole path — move a file into the pack, take it off the injected surface, fix the seam that required it — at a scale where a mistake is obvious.
 
 **Files:**
-- Create: `packs/riot/vfx/LuxBeamEffect.ts`, `packs/riot/vfx/DariusAxe.ts`
-- Delete: `src/game/vfx/LuxBeamEffect.ts`, `src/game/vfx/DariusAxe.ts`
-- Modify: `src/content/ContentApi.ts`, `tests/content/contentApi-surface-seam.test.ts`
+- Create: `packs/riot/vfx/LuxBeamEffect.ts`, `packs/riot/vfx/DariusAxe.ts`, `packs/riot/monsters/Baron.ts`
+- Delete: `src/game/vfx/LuxBeamEffect.ts`, `src/game/vfx/DariusAxe.ts`, `src/game/gameObject/monsters/Baron.ts`
+- Modify: `src/content/ContentApi.ts`, `src/game/preset.ts`, `src/content/ContentPack.ts`, `tests/content/contentApi-surface-seam.test.ts`
 - Modify: the spell files that import them (find them; do not guess)
 
 **Interfaces:**
@@ -129,7 +131,9 @@ Run it. Expected: FAIL, naming all three.
 
 - [ ] **Step 4: Verify and commit**
 
-`npm run verify`, and confirm the three Riot-named files in core are now one. Say in your report which one is left and why it is not moving in this task.
+`npm run verify`, and confirm **zero** files under `src/` have a Riot name. Task 10's vocabulary scan will assert that for the whole tree; this task is where the three known ones go.
+
+`BARON_ABILITIES` is the interesting half: `preset.ts` merges it onto the monster definition today because `MonsterDef` carries data and abilities are code. Batch 3's `MonsterDef` split bodies out into `members`; decide whether abilities ride there or arrive through the pack's code half, and say which and why. This is the first monster whose behaviour comes from a pack, so whatever you choose is the pattern.
 
 ```bash
 git add packs/riot/vfx src/game/vfx src/content/ContentApi.ts tests/content src/game/gameObject/spells
