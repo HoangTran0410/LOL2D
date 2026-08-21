@@ -114,14 +114,12 @@ interface LaneGeometry {
   total: number;
 }
 
-/**
- * Built once at module load. Three polylines of a dozen points each, walked by
- * every minion and every turret the blackboard buckets — cheap per call, but
- * not cheap enough to rebuild the cumulative lengths on each one.
- */
-const GEOMETRY: Record<string, LaneGeometry> = (() => {
+let geometryCache: Record<string, LaneGeometry> | null = null;
+let geometryCacheFor: readonly string[] | null = null;
+
+function buildLaneGeometry(lanes: readonly string[]): Record<string, LaneGeometry> {
   const built: Record<string, LaneGeometry> = {};
-  for (const lane of LANES) {
+  for (const lane of lanes) {
     const waypoints = LANE_WAYPOINTS[lane] ?? [];
     const arcLengths: number[] = [];
     let running = 0;
@@ -137,7 +135,26 @@ const GEOMETRY: Record<string, LaneGeometry> = (() => {
     built[lane] = { waypoints, arcLengths, total: running };
   }
   return built;
-})();
+}
+
+/**
+ * Built on first use, not at module load. Three polylines of a dozen points
+ * each, walked by every minion and every turret the blackboard buckets —
+ * cheap per call, but not cheap enough to rebuild the cumulative lengths on
+ * each one, so the result is memoised.
+ *
+ * Keyed on `LANES`'s own *identity*, not a boolean latch — for now that is
+ * the module's single frozen array, so behaviour is unchanged. Task 9 swaps
+ * the key for the active map's lane set; an identity-keyed cache invalidates
+ * itself for free the moment that set changes, where a boolean would go
+ * stale the first time a test installed a different map.
+ */
+function laneGeometry(): Record<string, LaneGeometry> {
+  if (geometryCache && geometryCacheFor === LANES) return geometryCache;
+  geometryCache = buildLaneGeometry(LANES);
+  geometryCacheFor = LANES;
+  return geometryCache;
+}
 
 /**
  * How far along a lane a point is, 0 at the blue end and 1 at the red end.
@@ -148,7 +165,7 @@ const GEOMETRY: Record<string, LaneGeometry> = (() => {
  * to the empty string.
  */
 export function laneProgressAt(lane: string, x: number, y: number): number {
-  const geometry = GEOMETRY[lane];
+  const geometry = laneGeometry()[lane];
   if (!geometry || geometry.total <= 0) return 0;
   return projectOnto(geometry, x, y).progress;
 }
@@ -156,8 +173,9 @@ export function laneProgressAt(lane: string, x: number, y: number): number {
 /** The lane nearest a point, how far off it the point is, and how far along. */
 export function nearestLane(x: number, y: number): LanePoint {
   let best: LanePoint = { lane: LANES[0], distance: Number.POSITIVE_INFINITY, progress: 0 };
+  const geo = laneGeometry();
   for (const lane of LANES) {
-    const geometry = GEOMETRY[lane];
+    const geometry = geo[lane];
     if (!geometry || geometry.total <= 0) continue;
     const hit = projectOnto(geometry, x, y);
     // Strictly better, so a tie keeps the earlier lane and the answer never
@@ -185,7 +203,7 @@ export function laneApproach(lane: string, teamId: string): Vec2 | null {
   const path = getLaneWaypoints(lane, teamId);
   // `getLaneWaypoints` falls back to MID for an unknown lane; this layer wants
   // the honest "there is no such lane" instead.
-  if (!GEOMETRY[lane] || path.length === 0) return null;
+  if (!laneGeometry()[lane] || path.length === 0) return null;
   const chosen = path[path.length - 2] ?? path[path.length - 1];
   return { x: chosen.x, y: chosen.y };
 }
@@ -224,10 +242,11 @@ export function assignLanes<T>(
 ): Map<T, string> {
   const assigned = new Map<T, string>();
   const taken = new Map<string, number>();
+  const geo = laneGeometry();
 
   for (const unit of units) {
     const incumbent = previous.get(unit);
-    const held = incumbent !== undefined && GEOMETRY[incumbent] ? incumbent : null;
+    const held = incumbent !== undefined && geo[incumbent] ? incumbent : null;
     let best: string | null = null;
     let bestScore = Number.NEGATIVE_INFINITY;
 

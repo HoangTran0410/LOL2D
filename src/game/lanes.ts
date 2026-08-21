@@ -112,13 +112,28 @@ export const LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
   ],
 };
 
-// Reversed once at module load rather than per wave: a spawner asks for a path
-// every few seconds and hands the same array to every minion in the wave.
-const RED_LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
-  [Lane.TOP]: [...LANE_WAYPOINTS[Lane.TOP]].reverse(),
-  [Lane.MID]: [...LANE_WAYPOINTS[Lane.MID]].reverse(),
-  [Lane.BOT]: [...LANE_WAYPOINTS[Lane.BOT]].reverse(),
-};
+// Reversed on first use rather than at module load, and memoised rather than
+// rebuilt per call: a spawner asks for a path every few seconds and hands the
+// same array to every minion in the wave. Memoised on `LANE_WAYPOINTS`'s own
+// *identity*, not a boolean latch — for now that identity never changes (one
+// module-scope literal), so behaviour is unchanged, but a future caller that
+// swaps in a different waypoint set invalidates the cache for free instead of
+// serving a stale reversal forever.
+let redLaneWaypointsCache: Record<string, LaneWaypoint[]> | null = null;
+let redLaneWaypointsCacheFor: Record<string, LaneWaypoint[]> | null = null;
+
+function redLaneWaypoints(): Record<string, LaneWaypoint[]> {
+  if (redLaneWaypointsCache && redLaneWaypointsCacheFor === LANE_WAYPOINTS) {
+    return redLaneWaypointsCache;
+  }
+  redLaneWaypointsCache = {
+    [Lane.TOP]: [...LANE_WAYPOINTS[Lane.TOP]].reverse(),
+    [Lane.MID]: [...LANE_WAYPOINTS[Lane.MID]].reverse(),
+    [Lane.BOT]: [...LANE_WAYPOINTS[Lane.BOT]].reverse(),
+  };
+  redLaneWaypointsCacheFor = LANE_WAYPOINTS;
+  return redLaneWaypointsCache;
+}
 
 /**
  * The lane a minion of `teamId` should walk, from its own base outwards. The
@@ -126,7 +141,7 @@ const RED_LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
  * must never mutate it.
  */
 export const getLaneWaypoints = (lane: string, teamId: string): LaneWaypoint[] => {
-  const paths = teamId === TeamId.RED ? RED_LANE_WAYPOINTS : LANE_WAYPOINTS;
+  const paths = teamId === TeamId.RED ? redLaneWaypoints() : LANE_WAYPOINTS;
   return paths[lane] ?? paths[Lane.MID];
 };
 
