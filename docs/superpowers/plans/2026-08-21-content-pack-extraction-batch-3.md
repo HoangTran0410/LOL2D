@@ -351,7 +351,70 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 
 ---
 
-### Task 4: The world size and the terrain come from the map
+### Task 4: A map's geometry arrives lazily, and the world reads it
+
+**Read this first, because it changes what the task is.** Task 3 put Summoner's Rift's full geometry — 329 wall polygons, 40 bush, 26 water — into the pack's **data** half, which Task 1 pinned to the `pregame` chunk. The chunk the menu loads went 207,858 → 231,072 bytes, and `PREGAME_SIZE_CEILING_BYTES` was raised for the second time in three tasks: 175,000 → 225,000 → 250,000.
+
+Trace the whole trajectory: **158.8 KB at batch 1 → 149.96 after batch 2 → 207.9 → 231.1 now.** Task 9 adds a second map and Task 10 adds a picker, so on the current shape it grows twice more. Two ceiling raises in three tasks is a guard being renegotiated instead of a design being fixed, and this is the point to stop.
+
+**The menu needs a map's name to draw a picker. It does not need the map's polygons.** So `MapDefinition` splits the way `SpellSource` already did in batch 2, for the same reason and with the same shape:
+
+- **Eager, and tiny:** `id`, `name`, `size`, `factions`. Enough to list, name and describe a world.
+- **Lazy, and heavy:** `terrain`, `slots`, `lanes`. Fetched when a match is actually starting.
+
+This is not extra scope invented mid-batch — it is the same rule this batch has already applied twice (`SpellSource`, then Task 1's data/code split), applied to the one payload that is bigger than both. **The ceiling does not move again in this batch.** If your change needs it to, that is a finding to report, not a number to edit.
+
+**Files:**
+- Modify: `src/content/ContentPack.ts` (the `MapDefinition` split), `src/content/PackRegistry.ts`, `src/content/validate.ts`
+- Modify: `src/content/maps/summonersRift.ts`, `src/content/bundledPack.ts`
+- Modify: `src/game/Game.ts`, `src/game/gameObject/map/TerrainMap.ts`
+- Modify: `scripts/check-chunks.mjs` (lower the ceiling back toward where it was, and say what the new number is measured against)
+- Test: `tests/content/contentApiChunk.test.ts`, `tests/game/map/TerrainMap.test.ts`, `tests/content/validate.test.ts`
+
+**Interfaces:**
+- Produces:
+  - `interface MapSummary { id: string; name: string; size: number; factions: Faction[] }`
+  - `type MapGeometrySource = MapGeometry | (() => Promise<MapGeometry>)` — a plain object or a loader, exactly like `SpellSource`
+  - `PackRegistry.maps(): readonly QualifiedMapSummary[]` — the listing, always cheap
+  - `PackRegistry.loadMapGeometry(qualifiedId): Promise<MapGeometry | null>` — memoised on the promise, like `loadSpellClass`
+- Consumes: `summonersRift` (Task 3), threaded into `Game` and `TerrainMap` below.
+
+- [ ] **Step 1: Write the failing size test**
+
+The guard that would have caught this, and the one that keeps Tasks 9 and 10 honest:
+
+```ts
+it('lists a map without pulling its geometry into the listing', async () => {
+  const summaries = contentCatalog().maps();
+  expect(summaries.length).toBeGreaterThan(0);
+  for (const summary of summaries) {
+    expect(summary).not.toHaveProperty('terrain');
+    expect(summary).not.toHaveProperty('slots');
+  }
+  const geometry = await contentCatalog().loadMapGeometry(summaries[0].id);
+  expect(geometry?.terrain.wall.length).toBeGreaterThan(100);
+});
+```
+
+Extend `tests/content/contentApiChunk.test.ts`'s closure walk to assert the data-only entry point does not statically reach `src/content/maps/`. That is the structural version of the same rule, and it is what stops a later task quietly importing the geometry back into the listing path.
+
+- [ ] **Step 2: Run to verify it fails**
+
+Expected: FAIL — `maps()` returns full definitions today and `loadMapGeometry` does not exist. Record it.
+
+- [ ] **Step 3: Split, and make the geometry a dynamic import**
+
+`src/content/maps/summonersRift.ts` exports the summary eagerly and the geometry behind `() => import('./summonersRiftGeometry')`. Rollup will then emit the polygons as their own chunk, fetched when a match starts rather than when the menu paints.
+
+Note Task 3's finding: a plain `.json` import compiles and passes Vitest but **breaks `vite build`**, because `vite.config.ts`'s `assetsInclude: ['**/*.json']` claims the extension. Task 3 works around it with `?raw` + `JSON.parse`. Keep that, and keep the parse inside the lazily-imported module so the raw string is not in the listing chunk either.
+
+- [ ] **Step 4: Lower the ceiling**
+
+Set `PREGAME_SIZE_CEILING_BYTES` from what you actually measure after the split, with a sentence saying what the number is and what it is headroom for. It should land near where it was before Task 3 — if it does not, the geometry has not really left the chunk and you should say so rather than pick a bigger number.
+
+- [ ] **Step 5: The world size and the terrain come from the map**
+
+
 
 `Game.ts:107` is `readonly mapSize = 6400` — a literal, unrelated to what the map says. `TerrainMap.ts:25` repeats it as a fallback. Six test files repeat it again. Everything downstream is derived correctly from it (`ObjectManager`'s two quadtree roots, `NavigationSystem`, `Minimap`, `Soraka_R`, `BotBrain`'s wander target), so the fix is at the source, not at the twelve call sites.
 
@@ -366,7 +429,7 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 - Consumes: `summonersRift` (Task 3).
 - Produces: `Game` takes the active `MapDefinition` and exposes `mapSize` from it; `TerrainMap`'s constructor takes a `MapDefinition` instead of reading the asset manager.
 
-- [ ] **Step 1: Write the failing tests**
+- [ ] **Step 6: Write the failing tests**
 
 ```ts
 it('takes its size from the map, not from a constant', () => {
@@ -389,11 +452,11 @@ The first case is the one that matters and it must assert a **derived** value, n
 
 Use the existing `tests/game/fixtures.ts` helper rather than inventing a second way to build a `Game`; its `mapSize = 6_400` default parameter is one of the six literals the survey found, and it becomes the map's size here.
 
-- [ ] **Step 2: Run to verify they fail**
+- [ ] **Step 7: Run to verify they fail**
 
 Expected: FAIL — `Game` has no map parameter; `validatePack` accepts the unknown layer silently.
 
-- [ ] **Step 3: Thread the map through**
+- [ ] **Step 8: Thread the map through**
 
 `Game`'s constructor takes the chosen `MapDefinition`; `mapSize` is `map.size`. `TerrainMap` takes the definition and reads `terrain.wall/bush/water` from it. Delete the `'json_summoner_map'` read from `TerrainMap` and the `|| 6400` fallback — a missing map is now a programming error, not something to paper over with a default, and `validate` has already refused a map without a size.
 
@@ -401,17 +464,17 @@ Expected: FAIL — `Game` has no map parameter; `validatePack` accepts the unkno
 
 The survey's SURPRISE 3 is the trap here: `Game`'s constructor reads the map **synchronously**, and there is no `await AssetManager.ensure(...)` anywhere in `GameScene`. Once the definition comes from the registry rather than the asset manager that specific hazard is gone — but say in your report what now guarantees the map is present before `new Game(...)`, because "it happens to be" is what the old code relied on.
 
-- [ ] **Step 4: Follow it outward**
+- [ ] **Step 9: Follow it outward**
 
 `ObjectManager`, `NavigationSystem` and `Minimap` already derive from `game.mapSize`, so they need no change — **verify that rather than assuming it**, and list in your report every site the survey named (`Game.ts:521-522,805`, `Soraka_R.ts:54-56`, `BotBrain.ts:1337-1338`, `AIChampion.ts:195`) with whether it still reads correctly.
 
-- [ ] **Step 5: Take the map off the boot path**
+- [ ] **Step 10: Take the map off the boot path**
 
 `LoadingScene.enter()` blocks the menu on `AssetManager.ensure('json_summoner_map')`, and spec §9 calls that a boot blocker: the map has to load **after** the menu for choosing one at pregame to be possible at all. Task 3 imports the JSON at build time, so once `TerrainMap` stops reading the asset manager nothing needs that `ensure` — delete it and let `LoadingScene` go straight to the menu.
 
 Then confirm the three remaining `'json_summoner_map'` code readers the survey found are gone: `LoadingScene.ts:40`, `preset.ts:695`, `TerrainMap.ts:40`. The generated `assetManifest.ts` entry stays until batch 4 moves the file; the eleven test files referencing the key are updated by whichever task touches them.
 
-- [ ] **Step 6: Verify and commit**
+- [ ] **Step 11: Verify and commit**
 
 Run the nav suites specifically — `npx vitest run tests/game/nav/` — because they hard-code 6400 in four files and they are the ones that will notice a threading mistake.
 
