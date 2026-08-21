@@ -1051,7 +1051,14 @@ it('still fires onSettled once per id, including for an unknown one', async () =
   resetSpellRegistryForTests();
   const settled: string[] = [];
   await loadSpells(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q'], id => settled.push(id));
-  expect(settled).toEqual(['Yasuo_Q', 'Nobody_Q', 'Yasuo_Q']);
+  // A multiset, deliberately, not an ordered array. The contract is "once per
+  // entry of `ids`, after that id is done" — it says nothing about order, and
+  // it must not: `onSettled` fires at *completion*, so an unknown id settles
+  // instantly while a real chunk is still in flight. Asserting the order would
+  // force the implementation to await in `ids` order, which makes one slow
+  // champion hold back the callbacks of ids that already landed — the loading
+  // bar stalls and then jumps. Pin the count, never the sequence.
+  expect([...settled].sort()).toEqual(['Nobody_Q', 'Yasuo_Q', 'Yasuo_Q']);
 });
 ```
 
@@ -1086,7 +1093,7 @@ export const qualifySpellId = (id: string): string =>
 - `isSpellId(id)` → `contentRegistry().hasDisplayFor(qualifySpellId(id))` — the same population, for the same reason. `hasSpell` stays the *loadability* question and keeps its own callers.
 - `isSpellLoaded(id)` / `spellClassOfId(id)` → `contentRegistry().spellClass(qualifySpellId(id))`
 - `loadedSpellIds()` → the registry's resolved ids
-- `loadSpells(ids, onSettled)` → `contentRegistry().loadSpellClass(qualifySpellId(id))` per id, **keeping the existing loop's structure**: the dedupe, the `onSettled` fired once per entry of `ids` (not once per distinct id), and the `.catch` that logs and leaves the id unloaded rather than rejecting.
+- `loadSpells(ids, onSettled)` → `contentRegistry().loadSpellClass(qualifySpellId(id))` per id, **keeping the existing loop's structure**: the dedupe, the `onSettled` fired once per entry of `ids` (not once per distinct id), and the `.catch` that logs and leaves the id unloaded rather than rejecting. **Each callback fires when its own id settles**, the way the pre-existing code does it (`load.then(() => onSettled?.(id))` pushed per id, then one `Promise.all`) — not from a loop that awaits them in `ids` order. Sequenced notification lets one slow chunk hold back ids that already landed, and `GameScene.ts:325` renders that count straight into a progress bar.
 - `randomLoadedId()` → over the registry's resolved ids
 - `resetSpellRegistryForTests()` → `resetContentRegistryForTests()`
 - `registerSpellForTests(id, cls)` → a new `PackRegistry.registerSpellForTests(qualifiedId, spellClass)` writing straight into `resolved`, added in this task with a doc comment saying it exists so tests do not have to await 240 dynamic imports to assert one lookup.
