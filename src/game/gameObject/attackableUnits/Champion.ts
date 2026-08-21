@@ -1,4 +1,5 @@
 import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
+import { packAsset } from '@/game/config/packAsset';
 import type Spell from '@/game/gameObject/Spell';
 import BasicAttackController from '@/game/combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
@@ -57,17 +58,8 @@ export interface ChampionPresetData {
   /**
    * A pack's own asset key — a plain string, not core's generated `AssetKey`
    * union, because a pack's art is its own to type-check, not core's. See
-   * `preset.ts`'s `PlayableChampionKit` for the write side and `resolveAvatar`
-   * below for the read side.
-   *
-   * `resolveAvatar` does **not** reuse `config/spellCatalog.ts`'s `packAsset`,
-   * even though it is the same crossing: that module reaches `contentRegistry()`
-   * -> `install.ts` -> `ContentApi.ts`, which imports `Champion` itself (and
-   * `Pet`, which `extends Champion`) — a real circular *value* import, not
-   * just a type one. Importing `packAsset` here was tried and broke the whole
-   * suite: `Pet extends Champion` threw `Champion` as `undefined`, because
-   * `Champion.ts` had not finished initialising by the time the cycle reached
-   * back into it.
+   * `preset.ts`'s `PlayableChampionKit` for the write side and
+   * `@/game/config/packAsset` for the read side, below.
    */
   avatar?: string;
   spells?: Array<new (owner: Champion) => Spell>;
@@ -104,14 +96,6 @@ export const healthTickStep = (maxHealth: number): number => {
   }
   return TICK_LADDER[TICK_LADDER.length - 1];
 };
-
-/**
- * `ChampionPresetData.avatar`, resolved — the same `AssetManager.get(key as
- * never)` crossing `packAsset` performs, inlined rather than imported; see
- * that field's doc comment for why. Always resolves today: every playable
- * champion is still the bundled pack's own real `AssetKey`.
- */
-const resolveAvatar = (key: string): AssetHandle => AssetManager.get(key as never);
 
 export default class Champion extends AttackableUnit {
   static displayZIndex = 4;
@@ -181,7 +165,7 @@ export default class Champion extends AttackableUnit {
       visionRadius,
       teamId,
       id,
-      avatar: avatar ?? (preset?.avatar ? resolveAvatar(preset.avatar) : undefined),
+      avatar: avatar ?? (preset?.avatar ? packAsset(preset.avatar) : undefined),
       stats,
     });
 
@@ -217,7 +201,7 @@ export default class Champion extends AttackableUnit {
    */
   applyPreset(preset: ChampionPresetData): void {
     this.name = preset.name;
-    if (preset.avatar) this.avatar = resolveAvatar(preset.avatar);
+    if (preset.avatar) this.avatar = packAsset(preset.avatar);
     const previous = this.spells;
     this.replaceSpells(
       (preset.spells ?? []).map((SpellClass, index) => {

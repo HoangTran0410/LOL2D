@@ -1,4 +1,5 @@
-import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
+import type { AssetHandle } from '@/managers/AssetManager';
+import { packAsset } from '@/game/config/packAsset';
 
 import Spell from '@/game/gameObject/Spell';
 import SpellObject from '@/game/gameObject/SpellObject';
@@ -282,7 +283,7 @@ export function buildContentApi(): ContentApi {
     enums: ENUMS,
     terrain: TERRAIN,
     utils: UTILS,
-    asset: (key: string) => AssetManager.get(key as never),
+    asset: packAsset,
   }) as ContentApi;
   return cached;
 }

@@ -202,6 +202,24 @@ export default defineConfig({
            */
           if (id.includes('vite/preload-helper')) return 'shared';
           /**
+           * `packAsset` — the cast that lets a pack's own asset key through
+           * `AssetManager.get`, typed against core's generated `AssetKey`
+           * union. It lives under `src/game/config/`, which the pregame
+           * carve-out below would otherwise claim, but `ContentApi.ts`
+           * (pinned `game`, by the rule right after this one) imports it
+           * too — `Champion.ts` needs the same crossing and cannot import
+           * `spellCatalog.ts` to get it without recreating the
+           * `Champion.ts -> spellCatalog.ts -> registry.ts -> install.ts ->
+           * ContentApi.ts -> Champion.ts` cycle (see `packAsset.ts`'s own
+           * header). Left unassigned, this two-line leaf would be hoisted
+           * into whichever of `pregame`/`game` Rollup resolves first —
+           * exactly the trap `vite/preload-helper` above and the
+           * `src/content/` rule below both call out. Its own chunk is
+           * cheaper than either duplicating it back into two places or
+           * reopening the cycle.
+           */
+          if (id.includes('src/game/config/packAsset')) return 'shared';
+          /**
            * The content pack machinery — `src/content/` and the reference pack
            * under `packs/reference/` — pinned to `game` ahead of the pregame
            * carve-out and the generic `/src/game/` rule below.

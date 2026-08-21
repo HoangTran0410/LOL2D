@@ -17,9 +17,9 @@ import {
   BASIC_ATTACK_ID,
   SUMMONER_SPELL_IDS,
   listSelectableChampions,
+  type SpellCatalogId,
   type SpellDisplay,
 } from './config/spellCatalog';
-import type { SpellCatalogId } from '@/generated/spellCatalog';
 import {
   allSpellIds,
   isSpellId,

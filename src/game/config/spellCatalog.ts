@@ -1,8 +1,17 @@
-import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
+import AssetManager, { type AssetKey } from '@/managers/AssetManager';
 import type { SpellCatalogId } from '@/generated/spellCatalog';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import type { MatchRules } from './PregameConfig';
 import { contentRegistry } from '@/content/registry';
+import { packAsset } from './packAsset';
+
+/**
+ * The only two files allowed to name `@/generated/spellCatalog` directly —
+ * this one and `content/bundledPack.ts` — see `tests/content/rosterSource.test.ts`.
+ * Re-exported here so a caller that needs only the id type, not the roster
+ * itself, still goes through this adapter rather than reaching past it.
+ */
+export type { SpellCatalogId };
 
 /**
  * The spell catalogue as **data**: names, icons, numbers and which abilities
@@ -173,6 +182,15 @@ export const spellDisplayOf = (
     effectiveManaCost: matchRules.manaFree ? 0 : entry.manaCost,
   };
 };
+
+/**
+ * A spell's icon key, unresolved — for a caller that needs to
+ * `AssetManager.ensure()` the asset itself (a preload) rather than render it.
+ * The same registry lookup `spellDisplayOf` makes, minus the `AssetManager.get`
+ * step that turns the key into a handle.
+ */
+export const spellIconKey = (id: string): string | null =>
+  contentRegistry().spellDisplay(qualifyBundledId(id))?.iconKey ?? null;
 
 /**
  * Basic-attack profiles by role.
@@ -698,8 +716,11 @@ export interface SelectableChampion {
  * `KitShelf.avatar`) is bundled-pack-only today, so this always resolves —
  * the cast is about the *type* boundary between a pack and core, not about
  * degrading a lookup that might miss.
+ *
+ * Re-exported from `./packAsset`, the crossing's one home — see that
+ * module's header for why it has to be a leaf with no imports of its own.
  */
-export const packAsset = (key: string): AssetHandle => AssetManager.get(key as never);
+export { packAsset };
 
 /**
  * Champions the pregame screen can offer as a coherent kit: a real portrait

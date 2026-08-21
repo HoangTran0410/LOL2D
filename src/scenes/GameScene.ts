@@ -3,7 +3,7 @@ import Game, { renderFpsPreference } from '@/game/Game';
 import { planMatchKits, plannedSpellIds, type MatchPlan } from '@/game/preset';
 import { loadRemainingSpells, loadSpells } from '@/game/spellRegistry';
 import { loadPregameConfig } from '@/game/config/PregameConfig';
-import { spellCatalog } from '@/generated/spellCatalog';
+import { spellIconKey } from '@/game/config/spellCatalog';
 import { assetManifest, type AssetKey } from '@/generated/assetManifest';
 import MenuScene from './MenuScene';
 import DomUtils from '@/utils/dom.utils';
@@ -66,10 +66,12 @@ function matchArtKeys(plan: MatchPlan): AssetKey[] {
 
   // And the player's own ability icons, which are in the HUD from frame one.
   // Bot kits are only ever looked at through the practice panel, which opens on
-  // a paused match with all the time in the world to fetch one.
+  // a paused match with all the time in the world to fetch one. `spellIconKey`
+  // is a pack's own plain string, not necessarily a member of this generated
+  // union — the same always-resolving crossing as `kit.avatar` above.
   for (const id of plan.player.spellIds) {
-    const iconKey = spellCatalog[id as keyof typeof spellCatalog]?.iconKey;
-    if (iconKey) keys.add(iconKey);
+    const iconKey = spellIconKey(id);
+    if (iconKey) keys.add(iconKey as AssetKey);
   }
 
   return [...keys];
