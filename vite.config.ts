@@ -333,12 +333,23 @@ export default defineConfig({
            * `vite build` and reading the manifest, not assumed from the
            * rule matching in isolation — see that script's own comment for
            * why a source-level check cannot see this class of regression.
+           *
+           * Batch 4 task 6 moved Summoner's Rift's own map out of core and
+           * into `packs/riot/maps/summonersRiftGeometry.ts` — one path
+           * segment deeper than `packs/reference/provingGroundsGeometry.ts`,
+           * which sits directly under its pack's own root. The optional
+           * `(?:\/[A-Za-z0-9_-]+)?` segment below matches either shape, so a
+           * future pack's own `maps/` subdirectory (or a flat one, like the
+           * reference pack's) both get the same carve-out without this rule
+           * growing a third alternative per pack.
            */
           if (
-            /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+)\/([A-Za-z0-9]+)Geometry\.ts$/.test(id)
+            /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)?)\/([A-Za-z0-9]+)Geometry\.ts$/.test(
+              id
+            )
           ) {
             const match =
-              /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+)\/([A-Za-z0-9]+)Geometry\.ts$/.exec(
+              /\/(?:src\/content\/maps|packs\/[A-Za-z0-9_-]+(?:\/[A-Za-z0-9_-]+)?)\/([A-Za-z0-9]+)Geometry\.ts$/.exec(
                 id
               );
             return `map-${match![1].toLowerCase()}`;

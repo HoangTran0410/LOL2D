@@ -25,8 +25,10 @@ import {
   monsterFillingSlot,
   turretsFromSlots,
 } from '../../src/game/preset';
-import { summonersRift } from '../../src/content/maps/summonersRift';
-import { summonersRiftGeometry } from '../../src/content/maps/summonersRiftGeometry';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRift } from '../../packs/riot/maps/summonersRift';
+import { summonersRiftGeometry } from '../../packs/riot/maps/summonersRiftGeometry';
 import { contentRegistry } from '../../src/content/registry';
 import Champion from '../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../src/game/gameObject/structures/Fountain';
@@ -174,6 +176,10 @@ describe('the faction -> team bridge is positional, not a blue/red allowlist', (
       );
       game.minionMuster = minionMusterSlotsFrom(minionSlots, factions);
 
+      // `tests/setup.ts` installs Summoner's Rift's own lanes for every test
+      // file by default now — release that guard before installing this
+      // test's own amber/jade lane, or the call below throws.
+      resetLanesForTests();
       setActiveLanes([
         {
           id: 'mid',

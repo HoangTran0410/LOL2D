@@ -176,7 +176,7 @@ Each was found by measurement, more than once, and none is visible from the file
 
 ## Assets and data
 
-`assets/json/summoner_map.json` is the **map** — `wall`, `bush` and `water` polygons plus the two turret rows. Not summoner spell data. Everything else loads through `AssetManager` (`src/managers/AssetManager.ts`).
+`packs/riot/maps/summoner_map.json` is Summoner's Rift's own **map** — `wall`, `bush` and `water` polygons plus the two turret rows. Not summoner spell data. It moved out of core's `assets/json/` and into the pack (content-pack extraction batch 4, task 6), the same batch that moved `lanes.ts`'s `DEFAULT_LANE_WAYPOINTS` and `mapPresets.ts`'s `NEUTRAL_SLOTS` there with it — `src/game/lanes.ts` keeps only the mechanism (`LANES`, `setActiveLanes`, `getLaneWaypoints`, `nextWaypointIndexFrom`) and ships no map's coordinates of its own. Everything else loads through `AssetManager` (`src/managers/AssetManager.ts`).
 
 `npm run assets:generate` walks `assets/` and regenerates `src/generated/assetManifest.ts` with a typed `AssetKey` union, so a mistyped asset name is a compile error rather than a broken image at runtime. Never hand-edit the generated file; add the image and re-run. `assets:check` fails the build when the two drift.
 

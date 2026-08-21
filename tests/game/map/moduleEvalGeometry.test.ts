@@ -25,7 +25,7 @@ import { join } from 'node:path';
 const ROOT = join(__dirname, '../../..');
 
 /**
- * `src/content/maps/summonersRiftGeometry.ts` and
+ * `packs/riot/maps/summonersRiftGeometry.ts` and
  * `packs/reference/provingGroundsGeometry.ts` — a content pack's own map
  * geometry — landed after this scan's original three-file list and were
  * never added to it, even though both assemble a `MapGeometry` (`lanes`
@@ -35,12 +35,17 @@ const ROOT = join(__dirname, '../../..');
  * table), but "does not currently violate the rule" and "is covered by the
  * rule" are different claims — a future edit introducing the historical
  * bug pattern here would ship unseen without this.
+ *
+ * `summonersRiftGeometry.ts` moved from `src/content/maps/` into
+ * `packs/riot/maps/` by batch 4 task 6, which split its `DEFAULT_LANE_WAYPOINTS`
+ * off `src/game/lanes.ts` and relocated it there too — the scan still
+ * covers the same module, just at its new path.
  */
 const FILES = [
   'src/game/lanes.ts',
   'src/game/ai/LaneObjectives.ts',
   'src/game/Game.ts',
-  'src/content/maps/summonersRiftGeometry.ts',
+  'packs/riot/maps/summonersRiftGeometry.ts',
   'packs/reference/provingGroundsGeometry.ts',
 ];
 

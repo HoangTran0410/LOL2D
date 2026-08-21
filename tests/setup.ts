@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import { fastHypot } from '../src/utils/optimized.utils';
 import AssetManager from '../src/managers/AssetManager';
 import { assetManifest as riotAssetManifest } from '../packs/riot/generated/assetManifest';
+import { installSummonersRiftLanesForTests } from './game/lanesFixture';
 
 Math.hypot = fastHypot;
 
@@ -29,6 +30,33 @@ Math.hypot = fastHypot;
  * no-op under one is correct: those doubles never resolve a real key.
  */
 AssetManager.registerPackAssets?.('riot', riotAssetManifest);
+
+/**
+ * Batch 4 task 6 moved Summoner's Rift's own lane waypoints out of
+ * `src/game/lanes.ts` and into `packs/riot/maps/summonersRiftGeometry.ts` —
+ * core's own default is an empty, laneless map now (Spec §7), because core
+ * ships no map's coordinates (`tests/content/summonersRiftCoordinateBoundary.test.ts`
+ * is the scan that holds it to that). Before that move, `lanes.ts`'s own
+ * out-of-the-box default *was* Summoner's Rift's three lanes, so every test
+ * that reads `LANES`/`LANE_WAYPOINTS`/`getLaneWaypoints` without
+ * constructing a real `Game` (nothing in this suite does — see
+ * `fixtures.ts`'s `createGame`, always the lightweight test double) got a
+ * concrete lane for free, including at *module* scope — `MinionSpawner.test.ts`'s
+ * `WAVE_SIZE = 2 * LANES.length * ...` is computed once, at import time,
+ * which no per-test `beforeEach` could ever reach in time to fix. Installing
+ * the same real, checked-in map here — once, in the file every test file's
+ * environment already runs before its own top-level code — covers every one
+ * of those the same way the asset registration above covers `api.asset()`.
+ *
+ * A test that specifically wants the true empty default (or its own
+ * synthetic lane set) calls `resetLanesForTests()` first, to release the
+ * guard this takes — `tests/game/minions/Lanes.test.ts` and
+ * `tests/game/ai/TeamBlackboard.lanes.test.ts`/`BotBrain.push.test.ts`'s own
+ * "a laneless map" blocks do exactly that, and the latter two restore this
+ * same install afterward (`lanesFixture.ts`'s own doc comment explains why a
+ * bare `resetLanesForTests()` there is not enough).
+ */
+installSummonersRiftLanesForTests();
 
 Object.assign(globalThis, {
   deltaTime: 16,

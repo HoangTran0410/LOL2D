@@ -87,7 +87,12 @@ describe('the data half of the pack contract', () => {
 
   it('reaches a map summary but never its geometry module', () => {
     const paths = [...closure].map(f => f.slice(ROOT.length));
-    expect(paths).toContain('src/content/maps/summonersRift.ts');
+    // Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/`
+    // and into the pack — `bundledPack.ts` (an exception in
+    // `corePacksBoundary.test.ts`) now reaches it by a relative
+    // `../../packs/riot/maps/summonersRift` specifier, which this walk's
+    // `resolveSpecifier` follows the same as any other relative import.
+    expect(paths).toContain('packs/riot/maps/summonersRift.ts');
     const offenders = paths.filter(isGeometryModule);
     expect(offenders).toEqual([]);
   });

@@ -1,4 +1,4 @@
-import type { MapDefinition } from '../ContentPack';
+import type { MapDefinition } from '@/content/ContentPack';
 
 /**
  * Summoner's Rift's cheap half — enough for a picker to list, name and
@@ -7,7 +7,13 @@ import type { MapDefinition } from '../ContentPack';
  * lanes — lives behind `geometry`'s dynamic import (`./summonersRiftGeometry.ts`)
  * and is fetched only once a match is starting, never when the menu paints.
  *
- * This module deliberately has no *value* imports beyond that dynamic one:
+ * Task 6 of the content-pack extraction moved this whole module (and its
+ * geometry sibling) out of `src/content/maps/` and into the pack: Summoner's
+ * Rift is Riot's own map, not a mechanism core has to carry. `import type`
+ * only, matching the pack boundary every other file under `packs/` holds to
+ * (`tests/content/packBoundary.test.ts`) — this module has no *value* import
+ * beyond the dynamic one, same as before the move.
+ *
  * `tests/content/contentApiChunk.test.ts` walks `src/content/catalog.ts`'s
  * static closure and fails if it ever statically reaches
  * `summonersRiftGeometry.ts`, and `scripts/check-chunks.mjs` fails the build

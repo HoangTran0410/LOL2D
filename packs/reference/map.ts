@@ -20,7 +20,7 @@ import type { MapDefinition } from '@/content/ContentPack';
  * this pack's own monster. Batch 4 moves the Riot map out of core entirely;
  * this is what proves core can already ship a world that is not that one.
  *
- * Split the same way `src/content/maps/summonersRift.ts` splits, for the
+ * Split the same way `packs/riot/maps/summonersRift.ts` splits, for the
  * same reason: this module is the cheap summary a picker lists, and the
  * heavy half — walls, slots, the lane — sits behind `geometry`'s dynamic
  * import so it never rides along in the `pregame` chunk the menu loads.

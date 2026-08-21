@@ -13,12 +13,14 @@
  * question of every wall on the map.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import summonerMap from '../../../assets/json/summoner_map.json';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// `assets/json/` and into the pack.
+import summonerMap from '../../../packs/riot/maps/summoner_map.json';
 import TerrainMap from '../../../src/game/gameObject/map/TerrainMap';
 import TerrainType from '../../../src/game/enums/TerrainType';
 import { hasLineOfSight } from '../../../src/game/combat/Vision';
 import { stubGameGlobals } from '../fixtures';
-import { summonersRift } from '../../../src/content/maps/summonersRift';
+import { summonersRift } from '../../../packs/riot/maps/summonersRift';
 
 /** How far either side of a wall's edge the two lookers stand. */
 const STAND_OFF = 200;

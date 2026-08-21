@@ -35,7 +35,12 @@ import { spellModules as coreSpellModules } from '@/generated/spellModules';
 // together rather than either alone.
 import { assetManifest as riotAssetManifest } from '../../packs/riot/generated/assetManifest';
 import AssetManager from '@/managers/AssetManager';
-import { summonersRift } from './maps/summonersRift';
+// `../../packs/riot/maps/summonersRift`, not `./maps/summonersRift`: Task 6 of
+// the content-pack extraction moved Summoner's Rift's map out of core and
+// into the pack. This file is one of `corePacksBoundary.test.ts`'s named,
+// temporary exceptions — see that scan's own header — so reaching into
+// `packs/riot/` here is the bridge, not a violation of it.
+import { summonersRift } from '../../packs/riot/maps/summonersRift';
 // `Baron.ts` moved into `packs/riot/monsters/` (Task 2 of the content-pack
 // extraction). This file's own header explains why reaching for it here is
 // fine: it is scaffolding wrapping content that has not finished moving into
@@ -159,8 +164,9 @@ const championEntries = (): ChampionEntry[] => {
 /**
  * The jungle, as monster identities — six of them, matching Task 7's split:
  * the epic camp, the two buff camps, wolves, gromp, raptors. Where each one
- * stands is `mapPresets.ts`'s `NEUTRAL_SLOTS`, read through
- * `summonersRiftGeometry.ts`'s `slots.neutral`; a `role` here and a `role`
+ * stands is `packs/riot/maps/summonersRiftGeometry.ts`'s `NEUTRAL_SLOTS`
+ * (moved there from core's own `mapPresets.ts` by batch 4 task 6), read
+ * through that same module's `slots.neutral`; a `role` here and a `role`
  * there is the only thing tying a camp's identity to its place, and
  * `PackRegistry.monstersFilling` is the match.
  *
@@ -393,7 +399,9 @@ export const data: ContentPackData = {
   // mid-load. Now `summonersRift.ts` has no value imports at all — its
   // geometry sits behind `() => import('./summonersRiftGeometry')`, which
   // does not run until something calls it — so there is nothing left for
-  // eager field access here to race.
+  // eager field access here to race. Task 6 moved the module itself into
+  // `packs/riot/maps/`; the shape (summary eager, geometry lazy) is
+  // unchanged.
   get maps() {
     return [summonersRift];
   },

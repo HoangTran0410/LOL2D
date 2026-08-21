@@ -548,7 +548,7 @@ export const monsterBodyPreset = (
 
 /**
  * Bridges a map's own faction vocabulary — a pack's free-string `Faction.id`,
- * e.g. `summonersRift`'s `'blue'`/`'red'` (`src/content/maps/summonersRift.ts`)
+ * e.g. `summonersRift`'s `'blue'`/`'red'` (`packs/riot/maps/summonersRift.ts`)
  * or `referenceMap`'s `'amber'`/`'jade'` (`packs/reference/map.ts`) — to the
  * match's fixed two-team model. Every comparison the engine actually runs
  * (`canTakeDamageFromTeam`, `PredefinedFilters.teamId`, `opposingTeam`, a

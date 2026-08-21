@@ -1,4 +1,6 @@
-import mapData from '../../../assets/json/summoner_map.json';
+// Batch 4 task 6 moved Summoner's Rift's map out of `assets/json/` and into
+// the pack.
+import mapData from '../../../packs/riot/maps/summoner_map.json';
 
 /**
  * Clearance measured against the raw wall polygons, independent of the

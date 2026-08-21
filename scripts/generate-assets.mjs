@@ -12,22 +12,20 @@ const URL_EXTENSIONS = new Set(['.cur']);
  *  - `assets/sounds/index.js` is a legacy source file that happens to sit
  *    under `assets/`, not an asset — it was never meant to gain a `?url`
  *    import.
- *  - `assets/json/summoner_map.json` *is* a real asset, but
- *    `src/content/maps/summonersRiftGeometry.ts` reads it directly as raw
- *    text (a `?raw` import, parsed as JSON in that module — see its own
- *    header for why not through `AssetManager`), and nothing has read it
- *    through `AssetManager`/`assetManifest` since Task 5 moved the map off
- *    `preset.ts`'s old synchronous asset lookup. Left in, the generator kept
- *    minting a `json_summoner_map` entry nobody called — a second, separate
- *    `?url` import of the same 22,180 bytes, so a production build emitted
- *    `dist/assets/summoner_map-*.json` and the service worker precached it,
- *    on top of the identical bytes already inlined into
- *    `map-summonersrift-*.js` by the `?raw` import. A first offline install
- *    downloaded the map twice.
+ *
+ * `assets/json/summoner_map.json` used to need an entry here for the same
+ * reason: it is a real asset, but `summonersRiftGeometry.ts` has always read
+ * it directly as raw text (a `?raw` import, parsed as JSON in that module),
+ * never through `AssetManager`, so minting a `json_summoner_map` entry
+ * nobody called would ship the same 22,180 bytes twice — once inlined into
+ * `map-summonersrift-*.js` by the `?raw` import, once again as
+ * `dist/assets/summoner_map-*.json`, and the service worker would precache
+ * both. Batch 4 task 6 moved the file to `packs/riot/maps/summoner_map.json`
+ * — outside every asset tree this generator walks — so the exclusion is
+ * gone rather than duplicated: `walk()` simply never finds it there.
  */
 const MANIFEST_EXCLUDED_FILES = new Set([
   'assets/sounds/index.js',
-  'assets/json/summoner_map.json',
 ]);
 
 function normalizePart(value) {

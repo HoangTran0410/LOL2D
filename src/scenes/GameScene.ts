@@ -211,7 +211,7 @@ export default class GameScene extends Scene {
    *
    * The map load is the same shape as the spell/art loads it runs beside: a
    * `MapDefinition`'s geometry may be a `() => Promise<MapGeometry>` (see
-   * `src/content/maps/summonersRift.ts`), and `Game`'s constructor reads
+   * `packs/riot/maps/summonersRift.ts`), and `Game`'s constructor reads
    * `ActiveMap` synchronously — there is no `await` inside it, deliberately
    * (`AIChampion` rebuilds mid-`update()`, and the engine's read side stays
    * synchronous by design). This `await`, immediately before `new Game(...)`,

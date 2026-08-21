@@ -39,7 +39,15 @@ describe('the roster has exactly one source', () => {
   );
 
   it('found sources to scan, or this proves nothing', () => {
-    expect(files.length).toBeGreaterThan(200);
+    // Not the current count (198, after batch 4 task 6 moved three files —
+    // `src/content/maps/summonersRift.ts`, `summonersRiftGeometry.ts` and
+    // `src/game/mapPresets.ts` — out of `src/` and into `packs/riot/maps/`):
+    // this whole programme keeps moving files out of `src/`, and pinning
+    // this near the present size would make a later batch's honest
+    // shrinkage look like this scan's own failure. 150 is comfortably below
+    // any plausible "core accidentally emptied out" reading while still
+    // refusing to pass against a scan that silently matched nothing.
+    expect(files.length).toBeGreaterThan(150);
   });
 
   it.each(BANNED)('nothing outside the adapter reads %s', pattern => {

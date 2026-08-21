@@ -17,6 +17,7 @@ import {
 } from '../../../src/game/lanes';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { installSummonersRiftLanesForTests } from '../lanesFixture';
 
 const PRESET: ChampionPresetData = {
   name: 'Test',
@@ -343,8 +344,16 @@ describe('the turrets a team has to keep away from', () => {
  * second walk to get there.
  */
 describe('a laneless map', () => {
+  // `tests/setup.ts` installs Summoner's Rift's own lanes for every test
+  // file by default now — release that guard before each test's own
+  // `setActiveLanes` call below, or it throws. The `afterEach` restores
+  // that same ambient install rather than leaving it empty, or any describe
+  // below this one in the file silently sees a laneless match too
+  // (`lanesFixture.ts`'s own doc comment explains why).
+  beforeEach(() => resetLanesForTests());
   afterEach(() => {
     resetLanesForTests();
+    installSummonersRiftLanesForTests();
     vi.unstubAllGlobals();
   });
 

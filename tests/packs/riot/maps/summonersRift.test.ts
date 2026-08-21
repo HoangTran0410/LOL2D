@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { summonersRift } from '../../src/content/maps/summonersRift';
-import { validatePack } from '../../src/content/validate';
-import { data as bundledData, BUNDLED_PACK_ID } from '../../src/content/bundledPack';
-import { PackRegistry } from '../../src/content/PackRegistry';
-import { NEUTRAL_SLOTS } from '../../src/game/mapPresets';
-import type { MapGeometry, StructureSlot } from '../../src/content/ContentPack';
-import mapJson from '../../assets/json/summoner_map.json';
+// Batch 4 task 6 moved Summoner's Rift's map, whole, out of `src/content/maps/`
+// and into this pack's own `maps/` directory — `summonersRift`/`NEUTRAL_SLOTS`
+// are siblings of this test file now, rather than two directories up in `src/`.
+import { summonersRift } from '../../../../packs/riot/maps/summonersRift';
+import { NEUTRAL_SLOTS } from '../../../../packs/riot/maps/summonersRiftGeometry';
+import { validatePack } from '../../../../src/content/validate';
+import { data as bundledData, BUNDLED_PACK_ID } from '../../../../src/content/bundledPack';
+import { PackRegistry } from '../../../../src/content/PackRegistry';
+import type { MapGeometry, StructureSlot } from '../../../../src/content/ContentPack';
+import mapJson from '../../../../packs/riot/maps/summoner_map.json';
 
 /** `summonersRift.geometry` is a loader now — resolve it once per test that needs it. */
 const geometry = (): Promise<MapGeometry> => {

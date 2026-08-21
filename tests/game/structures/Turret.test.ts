@@ -9,9 +9,11 @@ import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
 import TeamId from '../../../src/game/enums/TeamId';
 import { turretsFromSlots } from '../../../src/game/preset';
-import { summonersRift } from '../../../src/content/maps/summonersRift';
-import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
-import mapData from '../../../assets/json/summoner_map.json';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRift } from '../../../packs/riot/maps/summonersRift';
+import { summonersRiftGeometry } from '../../../packs/riot/maps/summonersRiftGeometry';
+import mapData from '../../../packs/riot/maps/summoner_map.json';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import turretSource from '../../../src/game/gameObject/structures/Turret.ts?raw';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';

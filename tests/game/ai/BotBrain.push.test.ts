@@ -19,6 +19,7 @@ import {
 } from '../../../src/game/lanes';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { installSummonersRiftLanesForTests } from '../lanesFixture';
 import { driveTicks } from './botTrajectory';
 
 const PRESET: ChampionPresetData = {
@@ -189,9 +190,19 @@ describe('the PUSH posture', () => {
  * assignment, which an empty `laneAssignments` map never grants.
  */
 describe('a laneless map', () => {
-  beforeEach(() => stubGameGlobals());
+  // `tests/setup.ts` installs Summoner's Rift's own lanes for every test
+  // file by default now — release that guard before the second test's own
+  // `setActiveLanes(undefined)` call below, or it throws. The `afterEach`
+  // restores that same ambient install rather than leaving it empty, or
+  // every describe below this one in the file silently sees a laneless
+  // match too (`lanesFixture.ts`'s own doc comment explains why).
+  beforeEach(() => {
+    resetLanesForTests();
+    stubGameGlobals();
+  });
   afterEach(() => {
     resetLanesForTests();
+    installSummonersRiftLanesForTests();
     vi.unstubAllGlobals();
   });
 

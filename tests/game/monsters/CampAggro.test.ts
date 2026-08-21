@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import { monsterBodyPreset, monsterFillingSlot } from '../../../src/game/preset';
-import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRiftGeometry } from '../../../packs/riot/maps/summonersRiftGeometry';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
 /**

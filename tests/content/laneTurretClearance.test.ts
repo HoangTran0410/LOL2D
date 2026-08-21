@@ -1,12 +1,12 @@
 /**
- * The bug `lanes.ts:41-50`'s own header and `Lanes.test.ts:357`'s
- * `MIN_SEGMENT_TURRET_CLEARANCE` check exist to prevent — a lane waypoint
- * sitting on (or a lane segment passing through) a turret's own body, so a
- * wave drives into the building, is shoved around it by
- * `UnitCollisionSystem`, and re-acquires the same line on the far side —
- * was, until now, only ever checked against `DEFAULT_LANE_WAYPOINTS`, i.e.
- * Summoner's Rift. `referenceMap.test.ts` never checked a lane against a
- * turret at all.
+ * The bug `packs/riot/maps/summonersRiftGeometry.ts`'s own header and
+ * `tests/packs/riot/maps/Lanes.test.ts`'s `MIN_SEGMENT_TURRET_CLEARANCE`
+ * check exist to prevent — a lane waypoint sitting on (or a lane segment
+ * passing through) a turret's own body, so a wave drives into the building,
+ * is shoved around it by `UnitCollisionSystem`, and re-acquires the same
+ * line on the far side — was, until now, only ever checked against
+ * Summoner's Rift's own waypoints. `referenceMap.test.ts` never checked a
+ * lane against a turret at all.
  *
  * `packs/reference/provingGroundsGeometry.ts` shipped exactly that bug:
  * its one lane's waypoints included `{700,1700}` and `{1700,700}` — the
@@ -22,7 +22,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { MapGeometry } from '../../src/content/ContentPack';
-import { summonersRiftGeometry } from '../../src/content/maps/summonersRiftGeometry';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRiftGeometry } from '../../packs/riot/maps/summonersRiftGeometry';
 import { provingGroundsGeometry } from '../../packs/reference/provingGroundsGeometry';
 
 type Point = { x: number; y: number };

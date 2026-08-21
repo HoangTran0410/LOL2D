@@ -2,8 +2,10 @@ import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Fountain from '../../../src/game/gameObject/structures/Fountain';
 import type { MinionSpawnerContext } from '../../../src/game/managers/MinionSpawner';
 import { fountainsFromSlots, minionMusterSlotsFrom } from '../../../src/game/preset';
-import { summonersRift } from '../../../src/content/maps/summonersRift';
-import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRift } from '../../../packs/riot/maps/summonersRift';
+import { summonersRiftGeometry } from '../../../packs/riot/maps/summonersRiftGeometry';
 import { createGame, stubGameGlobals, type TestGame } from '../fixtures';
 
 export type SpawnerGame = TestGame &

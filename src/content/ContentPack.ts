@@ -363,7 +363,7 @@ export type MapGeometrySource = MapGeometry | MapGeometryLoader;
  * for the same reason: `size`/`name`/`factions` cost nothing to hold in the
  * menu's own chunk, and `geometry` — the terrain, the slots, the lanes — is
  * the one payload in the whole pack contract bigger than everything else in
- * it combined. See `src/content/maps/summonersRift.ts` for the worked
+ * it combined. See `packs/riot/maps/summonersRift.ts` for the worked
  * example: its own module holds only the summary, and `geometry` is
  * `() => import('./summonersRiftGeometry')`.
  */

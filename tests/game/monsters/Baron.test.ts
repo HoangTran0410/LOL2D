@@ -26,7 +26,9 @@ import Slow from '../../../src/game/gameObject/buffs/Slow';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane } from '../../../src/game/lanes';
 import { monsterBodyPreset, monsterFillingSlot } from '../../../src/game/preset';
-import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
+// Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/` and
+// into the pack.
+import { summonersRiftGeometry } from '../../../packs/riot/maps/summonersRiftGeometry';
 import { contentRegistry } from '../../../src/content/registry';
 import { buildContentApi } from '../../../src/content/ContentApi';
 import makeBaronAbilities, {
