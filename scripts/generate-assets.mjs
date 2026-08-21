@@ -5,7 +5,30 @@ import { fileURLToPath } from 'node:url';
 const IMAGE_EXTENSIONS = new Set(['.gif', '.jpeg', '.jpg', '.png', '.svg', '.webp']);
 const AUDIO_EXTENSIONS = new Set(['.mp3', '.ogg', '.wav']);
 const URL_EXTENSIONS = new Set(['.cur']);
-const LEGACY_SOURCE_FILES = new Set(['assets/sounds/index.js']);
+/**
+ * Files under `assets/` the manifest must never mint a key for, even though
+ * `walk()` would otherwise find them.
+ *
+ *  - `assets/sounds/index.js` is a legacy source file that happens to sit
+ *    under `assets/`, not an asset — it was never meant to gain a `?url`
+ *    import.
+ *  - `assets/json/summoner_map.json` *is* a real asset, but
+ *    `src/content/maps/summonersRiftGeometry.ts` reads it directly as raw
+ *    text (a `?raw` import, parsed as JSON in that module — see its own
+ *    header for why not through `AssetManager`), and nothing has read it
+ *    through `AssetManager`/`assetManifest` since Task 5 moved the map off
+ *    `preset.ts`'s old synchronous asset lookup. Left in, the generator kept
+ *    minting a `json_summoner_map` entry nobody called — a second, separate
+ *    `?url` import of the same 22,180 bytes, so a production build emitted
+ *    `dist/assets/summoner_map-*.json` and the service worker precached it,
+ *    on top of the identical bytes already inlined into
+ *    `map-summonersrift-*.js` by the `?raw` import. A first offline install
+ *    downloaded the map twice.
+ */
+const MANIFEST_EXCLUDED_FILES = new Set([
+  'assets/sounds/index.js',
+  'assets/json/summoner_map.json',
+]);
 
 function normalizePart(value) {
   return value.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -23,16 +46,17 @@ export function assetKeyForPath(inputPath) {
   if (prefix === 'champions') {
     prefix = parts[0] === 'background' ? `champ_${normalizePart(parts.shift())}` : 'champ';
   } else {
-    prefix = {
-      buffs: 'buff',
-      cursors: 'cursor',
-      monsters: 'monster',
-      objects: 'obj',
-      others: 'other',
-      screenshots: 'screenshot',
-      sounds: 'sound',
-      spells: 'spell',
-    }[prefix] ?? prefix;
+    prefix =
+      {
+        buffs: 'buff',
+        cursors: 'cursor',
+        monsters: 'monster',
+        objects: 'obj',
+        others: 'other',
+        screenshots: 'screenshot',
+        sounds: 'sound',
+        spells: 'spell',
+      }[prefix] ?? prefix;
   }
 
   return [prefix, ...parts.map(normalizePart)].filter(Boolean).join('_');
@@ -50,7 +74,7 @@ function assetKind(path) {
 export function buildManifestEntries(paths) {
   const entries = paths
     .map(path => path.replaceAll('\\', '/'))
-    .sort((left, right) => left < right ? -1 : left > right ? 1 : 0)
+    .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0))
     .map(path => ({ key: assetKeyForPath(path), kind: assetKind(path), path }));
   const seen = new Map();
 
@@ -70,8 +94,9 @@ export function renderManifest(entries) {
     const importPath = `../../${entry.path}?url`;
     return `import asset${index}Url from '${importPath}';`;
   });
-  const records = entries.map((entry, index) =>
-    `  ${JSON.stringify(entry.key)}: { kind: '${entry.kind}', url: asset${index}Url, path: ${JSON.stringify(entry.path)} },`
+  const records = entries.map(
+    (entry, index) =>
+      `  ${JSON.stringify(entry.key)}: { kind: '${entry.kind}', url: asset${index}Url, path: ${JSON.stringify(entry.path)} },`
   );
 
   return [
@@ -98,10 +123,10 @@ async function walk(directory, root) {
   for (const entry of entries) {
     if (entry.name.startsWith('.')) continue;
     const absolutePath = resolve(directory, entry.name);
-    if (entry.isDirectory()) paths.push(...await walk(absolutePath, root));
+    if (entry.isDirectory()) paths.push(...(await walk(absolutePath, root)));
     else {
       const path = relative(root, absolutePath).replaceAll('\\', '/');
-      if (!LEGACY_SOURCE_FILES.has(path)) paths.push(path);
+      if (!MANIFEST_EXCLUDED_FILES.has(path)) paths.push(path);
     }
   }
   return paths;
@@ -112,7 +137,8 @@ export async function renderAssetManifestSource(root, { add = [], remove = [] } 
   for (const path of remove) paths.delete(path.replaceAll('\\', '/'));
   for (const path of add) {
     const normalized = path.replaceAll('\\', '/');
-    if (normalized.startsWith('assets/') && !LEGACY_SOURCE_FILES.has(normalized)) paths.add(normalized);
+    if (normalized.startsWith('assets/') && !MANIFEST_EXCLUDED_FILES.has(normalized))
+      paths.add(normalized);
   }
   return renderManifest(buildManifestEntries([...paths]));
 }
@@ -123,7 +149,8 @@ export async function generate(root, check = false) {
 
   if (check) {
     const current = await readFile(outputPath, 'utf8').catch(() => '');
-    if (current !== source) throw new Error('Generated asset manifest is stale. Run npm run assets:generate.');
+    if (current !== source)
+      throw new Error('Generated asset manifest is stale. Run npm run assets:generate.');
     return;
   }
 

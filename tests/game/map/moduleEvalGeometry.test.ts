@@ -22,9 +22,27 @@ import { join } from 'node:path';
  * being enforced here, at length, and a scan that flags its own explanation
  * is a scan someone deletes.
  */
-const SRC = join(__dirname, '../../../src');
+const ROOT = join(__dirname, '../../..');
 
-const FILES = ['game/lanes.ts', 'game/ai/LaneObjectives.ts', 'game/Game.ts'];
+/**
+ * `src/content/maps/summonersRiftGeometry.ts` and
+ * `packs/reference/provingGroundsGeometry.ts` — a content pack's own map
+ * geometry — landed after this scan's original three-file list and were
+ * never added to it, even though both assemble a `MapGeometry` (`lanes`
+ * included) at their own module scope, exactly the shape this scan exists
+ * to police. Neither happens to trip either regex today (their top-level
+ * `const`s call a plain function, not a `.map()`/`.reverse()`/IIFE derived
+ * table), but "does not currently violate the rule" and "is covered by the
+ * rule" are different claims — a future edit introducing the historical
+ * bug pattern here would ship unseen without this.
+ */
+const FILES = [
+  'src/game/lanes.ts',
+  'src/game/ai/LaneObjectives.ts',
+  'src/game/Game.ts',
+  'src/content/maps/summonersRiftGeometry.ts',
+  'packs/reference/provingGroundsGeometry.ts',
+];
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
@@ -42,7 +60,7 @@ const TOP_LEVEL_IIFE = /^(?:export\s+)?const\s+\w+[^=\n]*=\s*\((?:\(\)\s*=>|func
 const TOP_LEVEL_COMPUTED = /^(?:export\s+)?const\s+\w+[^;]*?\.(?:map|reverse)\(\)/m;
 
 function offendersIn(relativePath: string): string[] {
-  const source = stripComments(readFileSync(join(SRC, relativePath), 'utf8'));
+  const source = stripComments(readFileSync(join(ROOT, relativePath), 'utf8'));
   const found: string[] = [];
   if (TOP_LEVEL_IIFE.test(source)) found.push(`${relativePath}: top-level IIFE`);
   if (TOP_LEVEL_COMPUTED.test(source)) {

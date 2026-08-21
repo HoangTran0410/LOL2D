@@ -138,23 +138,29 @@ const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'Mi
 // `map-<id>` rule added just above the blanket `/src/content/` one — it
 // carves out `src/content/maps/*Geometry.ts` ahead of it, the same way the
 // `ContentApi`/`registry` exception already did for a different reason. With
-// that in place, `pregame` measures **209,139 bytes** — 209,139 vs. Task 1's
-// 207,858, i.e. back within 1,281 bytes of where it sat before Task 3 put the
-// map in this chunk at all, confirming the geometry genuinely left rather
-// than merely being renamed. It now lives in its own `map-summonersrift-*.js`
-// chunk, 23,301 bytes, fetched by `GameScene.startGame()` alongside the
-// match's spell/art loads — never by the menu. `game` itself (270,078) barely
-// moved, confirming nothing leaked the other way.
+// that in place, `pregame` dropped back to just above Task 1's 207,858
+// baseline, confirming the geometry genuinely left rather than merely being
+// renamed. It now lives in its own `map-summonersrift-*.js` chunk, fetched
+// by `GameScene.startGame()` alongside the match's spell/art loads — never
+// by the menu. `game` itself barely moved, confirming nothing leaked the
+// other way.
 //
 // The ceiling drops back to what a near-identical measurement already
-// justified once, at Task 1 — 225,000 leaves ~15.9KB of headroom above the
-// current 209,139, room for the summary half to grow (a longer name, a third
-// faction) without room for a stray static import of the geometry, or the
-// engine, to fit back in unnoticed. **It does not move again in this
+// justified once, at Task 1 — 225,000 leaves comfortable headroom above
+// pregame's actual size, room for the summary half to grow (a longer name, a
+// third faction) without room for a stray static import of the geometry, or
+// the engine, to fit back in unnoticed. **It does not move again in this
 // batch** — Tasks 5-8 wire up readers for data this chunk already carries
 // (or, for slots/lanes, will only ever reach through the same lazy loader),
 // and Task 9's second map gets its own `map-<id>` chunk rather than growing
 // this one.
+//
+// Deliberately no exact byte figure in this comment any more: an earlier
+// version pinned one down twice (209,139, then again after this batch had
+// already moved it to 213,148) and both went stale the moment the next
+// task touched this chunk. The number the check actually enforces is
+// `PREGAME_SIZE_CEILING_BYTES` below; read `dist/assets/pregame-*.js`'s own
+// size after a real build if you need today's figure.
 const PREGAME_SIZE_CEILING_BYTES = 225_000;
 
 {

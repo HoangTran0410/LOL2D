@@ -411,8 +411,7 @@ import asset408Url from '../../assets/images/spells/ziggs_i.png?url';
 import asset409Url from '../../assets/images/spells/ziggs_q.png?url';
 import asset410Url from '../../assets/images/spells/ziggs_r.png?url';
 import asset411Url from '../../assets/images/spells/ziggs_w.png?url';
-import asset412Url from '../../assets/json/summoner_map.json?url';
-import asset413Url from '../../assets/source-manifest.json?url';
+import asset412Url from '../../assets/source-manifest.json?url';
 
 export type AssetKind = 'image' | 'json' | 'audio' | 'url';
 
@@ -829,8 +828,7 @@ export const assetManifest = {
   "spell_ziggs_q": { kind: 'image', url: asset409Url, path: "assets/images/spells/ziggs_q.png" },
   "spell_ziggs_r": { kind: 'image', url: asset410Url, path: "assets/images/spells/ziggs_r.png" },
   "spell_ziggs_w": { kind: 'image', url: asset411Url, path: "assets/images/spells/ziggs_w.png" },
-  "json_summoner_map": { kind: 'json', url: asset412Url, path: "assets/json/summoner_map.json" },
-  "source_manifest": { kind: 'json', url: asset413Url, path: "assets/source-manifest.json" },
+  "source_manifest": { kind: 'json', url: asset412Url, path: "assets/source-manifest.json" },
 } as const;
 
 export type AssetKey = keyof typeof assetManifest;

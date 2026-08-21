@@ -548,6 +548,13 @@ describe('the muster point a wave forms up on', () => {
   it.each(MUSTERS)('$side keeps its whole scatter ring off the walls', ({ at }) => {
     // The slot carries its own scatter radius now (`MinionSlot.scatter`), not
     // a shared `MinionSpawner` constant — a minion can land anywhere inside it.
+    //
+    // Asserted as a real, positive number before the `?? 0` fallback below
+    // ever runs it through the ring loop: a slot that silently dropped its
+    // own `scatter` would otherwise degrade this whole check to sampling one
+    // point 16 times, at radius 0, which passes regardless of whether the
+    // ring the map actually declares clears anything.
+    expect(at.scatter, `${JSON.stringify(at)} has no positive scatter radius`).toBeGreaterThan(0);
     const scatter = at.scatter ?? 0;
     for (let i = 0; i < 16; i++) {
       const angle = (i / 16) * Math.PI * 2;

@@ -64,11 +64,31 @@ describe('the data half of the pack contract', () => {
    * genuinely reaches the geometry statically shows up here. That is what
    * stops a later task quietly importing the polygons back into the listing
    * path.
+   *
+   * The offender test is `f.endsWith('Geometry.ts')`, not
+   * `f.includes('/content/maps/')`: `catalog.ts`'s closure already crosses
+   * out of `src/` into `packs/reference/` (`install.ts`'s static import of
+   * `packs/reference/pack.ts`, which this walk's `resolveSpecifier` follows
+   * same as any relative import), so `provingGroundsGeometry.ts` living
+   * under `packs/reference/` rather than `src/content/maps/` would have
+   * passed the old, path-anchored filter even if pulled in statically.
+   * `isGeometryModule` below is exercised directly, against a synthetic
+   * `packs/`-rooted path, so that claim does not rest on nothing in the
+   * repo happening to import it that way today.
    */
+  const isGeometryModule = (f: string): boolean => f.endsWith('Geometry.ts');
+
+  it('the offender test itself catches a geometry module under packs/, not just src/content/maps/', () => {
+    expect(isGeometryModule('src/content/maps/summonersRiftGeometry.ts')).toBe(true);
+    expect(isGeometryModule('packs/reference/provingGroundsGeometry.ts')).toBe(true);
+    expect(isGeometryModule('packs/some-other-pack/ArenaGeometry.ts')).toBe(true);
+    expect(isGeometryModule('src/content/maps/summonersRift.ts')).toBe(false);
+  });
+
   it('reaches a map summary but never its geometry module', () => {
     const paths = [...closure].map(f => f.slice(ROOT.length));
     expect(paths).toContain('src/content/maps/summonersRift.ts');
-    const offenders = paths.filter(f => f.includes('/content/maps/') && f.includes('Geometry'));
+    const offenders = paths.filter(isGeometryModule);
     expect(offenders).toEqual([]);
   });
 });
