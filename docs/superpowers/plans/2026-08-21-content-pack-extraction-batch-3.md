@@ -281,13 +281,20 @@ describe('the Summoner’s Rift map definition', () => {
   });
 
   it('carries both turret rows as structure slots, with their teams', () => {
-    const blue = summonersRift.slots.structure.filter(s => s.faction === 'blue');
-    const red = summonersRift.slots.structure.filter(s => s.faction === 'red');
-    expect(blue).toHaveLength(mapJson.turret1.length / 2);
-    expect(red).toHaveLength(mapJson.turret2.length / 2);
-    // The rows are deliberately asymmetric; a definition that made them equal
-    // has lost the thing MinionSpawner's muster rule is derived from.
-    expect(blue.length).not.toBe(red.length);
+    // `turret1` and `turret2` are flat lists of [x, y] points — 11 each,
+    // measured, not assumed. `getTurretPositions` in preset.ts is the existing
+    // reader; copy its interpretation rather than inventing one.
+    const blue: StructureSlot[] = [];
+    const red: StructureSlot[] = [];
+    for (const slot of summonersRift.slots.structure) {
+      (slot.faction === 'blue' ? blue : red).push(slot);
+    }
+    expect(blue).toHaveLength(mapJson.turret1.length);
+    expect(red).toHaveLength(mapJson.turret2.length);
+    // Every point survives the conversion, in order and unrounded.
+    for (const [index, point] of mapJson.turret1.entries()) {
+      expect([blue[index].x, blue[index].y]).toEqual(point);
+    }
   });
 
   it('places a spawn slot per faction where the fountains were', () => {
@@ -451,8 +458,8 @@ it('spawns a turret per structure slot and keeps the rows asymmetric', () => {
   for (const slot of summonersRift.slots.structure) {
     perFaction.set(slot.faction, (perFaction.get(slot.faction) ?? 0) + 1);
   }
-  expect([...perFaction.values()].every(n => n > 0)).toBe(true);
-  expect(new Set(perFaction.values()).size).toBe(2); // asymmetric on purpose
+  expect([...perFaction.keys()].sort()).toEqual(['blue', 'red']);
+  for (const count of perFaction.values()) expect(count).toBe(11);
 });
 ```
 
@@ -694,9 +701,11 @@ So the reference map is not a smoke test. It is a **hostile fixture**, and the t
 
 - [ ] **Step 1: Write the failing test — the hostility is the assertion**
 
+`wallGapWidths` does not exist — write it in the test file. It does not need to be a general narrowest-corridor solver, which is hard; it needs to answer *this* question about *this* fixture. The cheap honest version is to sample the map on a grid at the nav cell size, mark cells blocked by any wall polygon, and report the run lengths of free cells between blocked ones along each row and column. `NavGrid.fromPolygons` already rasterises exactly this way, so the measurement matches what the pathfinder will actually see rather than what the polygons look like on paper.
+
 ```ts
 it('has a corridor between 60 and 90 px, which is what exercises NavGrid clearance', () => {
-  const gaps = wallGapWidths(referenceMap.terrain.wall);
+  const gaps = wallGapWidths(referenceMap.terrain.wall, referenceMap.size);
   expect(gaps.some(g => g >= 60 && g <= 90)).toBe(true);
 });
 
