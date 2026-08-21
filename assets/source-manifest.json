@@ -5,7 +5,7 @@
       "contentHash": "7dadcce12c4f1c43bf8d0e7e098c56f67f4ebc6d11c3acd9697265cc6310eb23",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_alistar",
-      "localPath": "assets/images/champions/alistar.png",
+      "localPath": "packs/riot/assets/images/champions/alistar.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_OriginalSquare.png?12536"
     },
@@ -13,7 +13,7 @@
       "contentHash": "6f0a3c2db844489336be4d6d160dc6c85e95ed397966324cdb0d4b0133e87dce",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "champ_amumu",
-      "localPath": "assets/images/champions/amumu.png",
+      "localPath": "packs/riot/assets/images/champions/amumu.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_OriginalSquare.png?3fa85"
     },
@@ -21,7 +21,7 @@
       "contentHash": "030088d50ec496d694a97c04d1cfb4d078f3931d9490760cbda6da12713f2896",
       "fetchedAt": "2026-08-12T18:55:57.400Z",
       "localAssetKey": "champ_anivia",
-      "localPath": "assets/images/champions/anivia.png",
+      "localPath": "packs/riot/assets/images/champions/anivia.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_OriginalSquare.png?dda87"
     },
@@ -29,7 +29,7 @@
       "contentHash": "2633d548c09eae2f0e2365568f23035372b49dc6e5cfc550e41206d9f8ee6d0e",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "champ_annie",
-      "localPath": "assets/images/champions/annie.png",
+      "localPath": "packs/riot/assets/images/champions/annie.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_OriginalSquare.png?5e95f"
     },
@@ -37,7 +37,7 @@
       "contentHash": "63f798efd4cd9168c330c147b3df8cb65c235a8aaa0da5058c1b72f7dbe00ce6",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "champ_ashe",
-      "localPath": "assets/images/champions/ashe.png",
+      "localPath": "packs/riot/assets/images/champions/ashe.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_OriginalSquare.png?55e1d"
     },
@@ -45,7 +45,7 @@
       "contentHash": "fe4e85b3f2362eb5c204b4f4b0c64767dc95c68d01dd438f0a6d8348b236ea36",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_brand",
-      "localPath": "assets/images/champions/brand.png",
+      "localPath": "packs/riot/assets/images/champions/brand.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_OriginalSquare.png?336d6"
     },
@@ -53,7 +53,7 @@
       "contentHash": "f05bbf22409dbe264eeee2adb602599aad8eab1fd901cd5333a6ce370f07dc51",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_caitlyn",
-      "localPath": "assets/images/champions/caitlyn.png",
+      "localPath": "packs/riot/assets/images/champions/caitlyn.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_OriginalSquare.png?818cf"
     },
@@ -61,7 +61,7 @@
       "contentHash": "004ad765c94f14149b04d217c4b306a9d602cffd907d489e69224d5b4a7b2896",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "champ_camille",
-      "localPath": "assets/images/champions/camille.png",
+      "localPath": "packs/riot/assets/images/champions/camille.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_OriginalSquare.png?aba4a"
     },
@@ -69,7 +69,7 @@
       "contentHash": "61b91628353f08c0f9648167130f9b1186334e596dab6901ea3dc2a535c80206",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_cassiopeia",
-      "localPath": "assets/images/champions/cassiopeia.png",
+      "localPath": "packs/riot/assets/images/champions/cassiopeia.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_OriginalSquare.png?56ef7"
     },
@@ -77,7 +77,7 @@
       "contentHash": "8fdfc393c69a7b5aae11ac94a9c399e225ed18f2cc13b177d4925d12fae318c9",
       "fetchedAt": "2026-08-13T10:47:38.253Z",
       "localAssetKey": "champ_chogath",
-      "localPath": "assets/images/champions/chogath.png",
+      "localPath": "packs/riot/assets/images/champions/chogath.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_OriginalSquare.png?70f42"
     },
@@ -85,7 +85,7 @@
       "contentHash": "e7ba49090885f602122482a1ed3151f671ae0d2117fed9508248623189dd0f97",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_darius",
-      "localPath": "assets/images/champions/darius.png",
+      "localPath": "packs/riot/assets/images/champions/darius.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_OriginalSquare.png?aca4c"
     },
@@ -93,7 +93,7 @@
       "contentHash": "251a9cce45b7225d74156b7379040325efc3732ae37bf907f264a91baab186c6",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_diana",
-      "localPath": "assets/images/champions/diana.png",
+      "localPath": "packs/riot/assets/images/champions/diana.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_OriginalSquare.png?d5d54"
     },
@@ -101,7 +101,7 @@
       "contentHash": "27e299151a104d7f6a9894087050c5e98e3a75174ef04d07961ccb47ba439d59",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "champ_ekko",
-      "localPath": "assets/images/champions/ekko.png",
+      "localPath": "packs/riot/assets/images/champions/ekko.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_OriginalSquare.png?15376"
     },
@@ -109,7 +109,7 @@
       "contentHash": "3eec5e46027243055f1e8e0cbd35cd6bf42e7a2ee76216c5aeb4d0f6f1780509",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_ezreal",
-      "localPath": "assets/images/champions/ezreal.png",
+      "localPath": "packs/riot/assets/images/champions/ezreal.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_OriginalSquare.png?fc667"
     },
@@ -117,7 +117,7 @@
       "contentHash": "b55045fd48cd17cfb795f703d3ab95ed95fd7acce79dce72d7d38ce673f4fc0a",
       "fetchedAt": "2026-08-13T10:47:42.485Z",
       "localAssetKey": "champ_fizz",
-      "localPath": "assets/images/champions/fizz.png",
+      "localPath": "packs/riot/assets/images/champions/fizz.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_OriginalSquare.png?44c3d"
     },
@@ -125,7 +125,7 @@
       "contentHash": "9224e316f8ffb531cf65376bf552e646cb6ea6cacce1c44a7f7704e8558fc960",
       "fetchedAt": "2026-08-16T08:47:10.053Z",
       "localAssetKey": "champ_garen",
-      "localPath": "assets/images/champions/garen.png",
+      "localPath": "packs/riot/assets/images/champions/garen.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_OriginalSquare.png?37153"
     },
@@ -133,7 +133,7 @@
       "contentHash": "a76974d48f9f42a0e391a7a0c37977881b0aef6bf3b53315d998e0eea005b234",
       "fetchedAt": "2026-08-16T06:56:13.524Z",
       "localAssetKey": "champ_graves",
-      "localPath": "assets/images/champions/graves.png",
+      "localPath": "packs/riot/assets/images/champions/graves.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_OriginalSquare.png?1d234"
     },
@@ -141,7 +141,7 @@
       "contentHash": "63a9c3424b196da02b8a4eee51d8ba571cf693ed6f9e5f8f62b4568e4d782c67",
       "fetchedAt": "2026-08-12T18:53:58.621Z",
       "localAssetKey": "champ_janna",
-      "localPath": "assets/images/champions/janna.png",
+      "localPath": "packs/riot/assets/images/champions/janna.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_OriginalSquare.png?ec2a0"
     },
@@ -149,7 +149,7 @@
       "contentHash": "b871f2fc64a31f8cefe7e22c6d1428479822531d16e47553ef778391a5bc7361",
       "fetchedAt": "2026-08-16T14:46:30.773Z",
       "localAssetKey": "champ_jarvaniv",
-      "localPath": "assets/images/champions/jarvaniv.png",
+      "localPath": "packs/riot/assets/images/champions/jarvaniv.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_OriginalSquare.png?74a73"
     },
@@ -157,7 +157,7 @@
       "contentHash": "0e524d0daf2480855ef8a639d148f0f42ac72daffa61e7aa634159e06d39dc9a",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_jhin",
-      "localPath": "assets/images/champions/jhin.png",
+      "localPath": "packs/riot/assets/images/champions/jhin.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_OriginalSquare.png?893f1"
     },
@@ -165,7 +165,7 @@
       "contentHash": "e5750b955a9369305443f762200f5f19814e858ec40f3e95ee7dd2a5b97c75f4",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "champ_jinx",
-      "localPath": "assets/images/champions/jinx.png",
+      "localPath": "packs/riot/assets/images/champions/jinx.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_OriginalSquare.png?95e74"
     },
@@ -173,7 +173,7 @@
       "contentHash": "3586908ef364d4b54ace908eb535a5ab3f8d31921d717beea4a745fba8f83418",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "champ_katarina",
-      "localPath": "assets/images/champions/katarina.png",
+      "localPath": "packs/riot/assets/images/champions/katarina.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_OriginalSquare.png?e11e0"
     },
@@ -181,7 +181,7 @@
       "contentHash": "a56c0dc2b5b6f2d4d90bd1867a506ce780691efbd6529ef643fc5dd44076273c",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "champ_leblanc",
-      "localPath": "assets/images/champions/leblanc.png",
+      "localPath": "packs/riot/assets/images/champions/leblanc.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_OriginalSquare.png?4031b"
     },
@@ -189,7 +189,7 @@
       "contentHash": "cb1e8b3e7995bcfd6775680c0d4fec7a07baae209b781ad8b34eb12105abf4b7",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_leesin",
-      "localPath": "assets/images/champions/leesin.png",
+      "localPath": "packs/riot/assets/images/champions/leesin.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lee_Sin_OriginalSquare.png?f1618"
     },
@@ -197,7 +197,7 @@
       "contentHash": "453f1abd861dbdbf4878012ebe0cebee85be071748f1f6ec4497b2d479853b8c",
       "fetchedAt": "2026-08-12T18:53:49.922Z",
       "localAssetKey": "champ_lux",
-      "localPath": "assets/images/champions/lux.png",
+      "localPath": "packs/riot/assets/images/champions/lux.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_OriginalSquare.png?285c1"
     },
@@ -205,7 +205,7 @@
       "contentHash": "c0992388ba9b05472c3919f028e69b45e38d423aab7f9c1fd0941b6bbc97e222",
       "fetchedAt": "2026-08-12T18:56:28.291Z",
       "localAssetKey": "champ_malphite",
-      "localPath": "assets/images/champions/malphite.png",
+      "localPath": "packs/riot/assets/images/champions/malphite.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_OriginalSquare.png?e38f9"
     },
@@ -213,7 +213,7 @@
       "contentHash": "66c5fad02afa20afc1bff44dbcc1990cee07eef4f14b357e085d153de5412abe",
       "fetchedAt": "2026-08-16T08:46:46.579Z",
       "localAssetKey": "champ_malzahar",
-      "localPath": "assets/images/champions/malzahar.png",
+      "localPath": "packs/riot/assets/images/champions/malzahar.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_OriginalSquare.png?0d05f"
     },
@@ -221,7 +221,7 @@
       "contentHash": "57f7fe58160c8afab036c1377f9aeae808a7d7c0d6fa8aff80ca7ee06884981a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_masteryi",
-      "localPath": "assets/images/champions/masteryi.png",
+      "localPath": "packs/riot/assets/images/champions/masteryi.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_OriginalSquare.png?3d56a"
     },
@@ -229,7 +229,7 @@
       "contentHash": "c59a7f0292e2d55980c69cda0de6c74c20990f2bfd9856b2c10714e1b7ca2ddc",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "champ_morgana",
-      "localPath": "assets/images/champions/morgana.png",
+      "localPath": "packs/riot/assets/images/champions/morgana.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_OriginalSquare.png?03afb"
     },
@@ -237,7 +237,7 @@
       "contentHash": "c13679a1b03e905489cdec4ab178a4a209394e98d27aaf2dc3e1a9c1fafbe60f",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "champ_nasus",
-      "localPath": "assets/images/champions/nasus.png",
+      "localPath": "packs/riot/assets/images/champions/nasus.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_OriginalSquare.png?9a2f8"
     },
@@ -245,7 +245,7 @@
       "contentHash": "20bd71417a5e84c443a5c78b4b6ac594104c077c7ed3e64055001d9df6dcebb7",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_nautilus",
-      "localPath": "assets/images/champions/nautilus.png",
+      "localPath": "packs/riot/assets/images/champions/nautilus.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_OriginalSquare.png?8b72f"
     },
@@ -253,7 +253,7 @@
       "contentHash": "24a5d6e44951589868814b984fbe5a81c5d3e207d20c6f160dd0d2753dd75eaf",
       "fetchedAt": "2026-08-13T10:47:45.536Z",
       "localAssetKey": "champ_nocturne",
-      "localPath": "assets/images/champions/nocturne.png",
+      "localPath": "packs/riot/assets/images/champions/nocturne.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_OriginalSquare.png?3ed03"
     },
@@ -261,7 +261,7 @@
       "contentHash": "16823474bb21ded18bc8a4e64845cb69bd3ec6b404656eab484d238eefef59a0",
       "fetchedAt": "2026-08-16T06:56:08.637Z",
       "localAssetKey": "champ_olaf",
-      "localPath": "assets/images/champions/olaf.png",
+      "localPath": "packs/riot/assets/images/champions/olaf.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_OriginalSquare.png?4841d"
     },
@@ -269,7 +269,7 @@
       "contentHash": "44b6574407e2b359d75d599a6b87a9da5237d10125cb76d0f4bc93df166c028e",
       "fetchedAt": "2026-08-12T18:56:19.423Z",
       "localAssetKey": "champ_pantheon",
-      "localPath": "assets/images/champions/pantheon.png",
+      "localPath": "packs/riot/assets/images/champions/pantheon.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_OriginalSquare.png?81183"
     },
@@ -277,7 +277,7 @@
       "contentHash": "068ef88e44c8cdea006d457bd0a48ebb9923221bbc451151e5d8a9495f5c6c09",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "champ_rammus",
-      "localPath": "assets/images/champions/rammus.png",
+      "localPath": "packs/riot/assets/images/champions/rammus.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_OriginalSquare.png?3fbfd"
     },
@@ -285,7 +285,7 @@
       "contentHash": "db7b3306e5b92bb10e1c142f8061d7dc66d8b19ee2b47c27fd6d8851683dde3a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_renekton",
-      "localPath": "assets/images/champions/renekton.png",
+      "localPath": "packs/riot/assets/images/champions/renekton.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_OriginalSquare.png?0f653"
     },
@@ -293,7 +293,7 @@
       "contentHash": "5f6b44526a6c3287bd995dde316799295e6e822bbb6683d4837838deef508f79",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_riven",
-      "localPath": "assets/images/champions/riven.png",
+      "localPath": "packs/riot/assets/images/champions/riven.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_OriginalSquare.png?6e136"
     },
@@ -301,7 +301,7 @@
       "contentHash": "a698820a52dcacfc956556908bb4da4db0f9349db160f193b43cab8e9b37425c",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_sett",
-      "localPath": "assets/images/champions/sett.png",
+      "localPath": "packs/riot/assets/images/champions/sett.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_OriginalSquare.png?a9ec3"
     },
@@ -309,7 +309,7 @@
       "contentHash": "ef3d676a150f200b07cd3b575254918e6cbceefb8d951485dc86e138fed96ecb",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "champ_singed",
-      "localPath": "assets/images/champions/singed.png",
+      "localPath": "packs/riot/assets/images/champions/singed.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_OriginalSquare.png?e9e6e"
     },
@@ -317,7 +317,7 @@
       "contentHash": "d51eb78270df45f868cfd18e79bc72c6fdf1e2177199b320eaf454389fd20478",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_soraka",
-      "localPath": "assets/images/champions/soraka.png",
+      "localPath": "packs/riot/assets/images/champions/soraka.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_OriginalSquare.png?0c2df"
     },
@@ -325,7 +325,7 @@
       "contentHash": "d43dd909ce55df4de294964efe83b4fefdf784518365bba8284a6439f9b65663",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_syndra",
-      "localPath": "assets/images/champions/syndra.png",
+      "localPath": "packs/riot/assets/images/champions/syndra.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_OriginalSquare.png?f6b95"
     },
@@ -333,7 +333,7 @@
       "contentHash": "03de2b420118b8eaf84af8b475128095e8e016c6b0f806ebc3d726c5b9d9a60f",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "champ_teemo",
-      "localPath": "assets/images/champions/teemo.png",
+      "localPath": "packs/riot/assets/images/champions/teemo.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_OriginalSquare.png?783d6"
     },
@@ -341,7 +341,7 @@
       "contentHash": "6f9291f1a3c687cc0faa48f6f1228257642d2d1f39449e828349c6e5745d3212",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "champ_thresh",
-      "localPath": "assets/images/champions/thresh.png",
+      "localPath": "packs/riot/assets/images/champions/thresh.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_OriginalSquare.png?9ef1d"
     },
@@ -349,7 +349,7 @@
       "contentHash": "a5097e9a1704f8e37c68a4c59a249deb07ab509a4a94e87c5a53b439b7538795",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_tryndamere",
-      "localPath": "assets/images/champions/tryndamere.png",
+      "localPath": "packs/riot/assets/images/champions/tryndamere.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_OriginalSquare.png?3eb36"
     },
@@ -357,7 +357,7 @@
       "contentHash": "5ecae2df824f6b044d9d3ce6639d81201a0dd6aa4089d4d3cff8d26c4ec4ccf5",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "champ_twitch",
-      "localPath": "assets/images/champions/twitch.png",
+      "localPath": "packs/riot/assets/images/champions/twitch.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_OriginalSquare.png?143e2"
     },
@@ -365,7 +365,7 @@
       "contentHash": "585e84015a45bbd474b74d045785120fddf4be3e31a36851b3ff89fd537fc8af",
       "fetchedAt": "2026-08-12T18:56:06.302Z",
       "localAssetKey": "champ_varus",
-      "localPath": "assets/images/champions/varus.png",
+      "localPath": "packs/riot/assets/images/champions/varus.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_OriginalSquare.png?1f1e0"
     },
@@ -373,7 +373,7 @@
       "contentHash": "c84ab8439841e0067914bbafebb342b6fd1b2882c676f9a04eec0329911e9746",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_vayne",
-      "localPath": "assets/images/champions/vayne.png",
+      "localPath": "packs/riot/assets/images/champions/vayne.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_OriginalSquare.png?78bd3"
     },
@@ -381,7 +381,7 @@
       "contentHash": "f0baa374089c5a3906ece9018d1826697a72116708f200b0a9975564b0cde3c7",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "champ_veigar",
-      "localPath": "assets/images/champions/veigar.png",
+      "localPath": "packs/riot/assets/images/champions/veigar.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_OriginalSquare.png?2add0"
     },
@@ -389,7 +389,7 @@
       "contentHash": "806c16279e430929047c5d1f2ef23f6c027cbdb84a26a0a7105047d4c001e9b1",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_vi",
-      "localPath": "assets/images/champions/vi.png",
+      "localPath": "packs/riot/assets/images/champions/vi.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_OriginalSquare.png?78709"
     },
@@ -397,7 +397,7 @@
       "contentHash": "0f10e714665cfc9b88589216850873ed39288fd5f7bd0a620713ff1e6045857f",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "champ_warwick",
-      "localPath": "assets/images/champions/warwick.png",
+      "localPath": "packs/riot/assets/images/champions/warwick.png",
       "revisionId": 4051472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_OriginalSquare.png?cc8c7"
     },
@@ -405,7 +405,7 @@
       "contentHash": "e0e8550768a44efad4c6a096643df3b292e6a9cbbb52ba854d7cc2164973e762",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "champ_xinzhao",
-      "localPath": "assets/images/champions/xinzhao.png",
+      "localPath": "packs/riot/assets/images/champions/xinzhao.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_OriginalSquare.png?c48eb"
     },
@@ -413,7 +413,7 @@
       "contentHash": "398ec00ab5e8d0d46264bf51e1058fa296be03620dec7be292c1adaf096dda7e",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "champ_ziggs",
-      "localPath": "assets/images/champions/ziggs.png",
+      "localPath": "packs/riot/assets/images/champions/ziggs.png",
       "revisionId": 4052219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_OriginalSquare.png?d44a6"
     },
@@ -421,7 +421,7 @@
       "contentHash": "2ea70d9c8bd1c8b1fa9868750f6c68a6eff562bd74495aac803eea824136e606",
       "fetchedAt": "2026-08-16T06:19:05.066Z",
       "localAssetKey": "spell_alistar_e",
-      "localPath": "assets/images/spells/alistar_e.png",
+      "localPath": "packs/riot/assets/images/spells/alistar_e.png",
       "revisionId": 4038209,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Trample.png?2dc6f"
     },
@@ -429,7 +429,7 @@
       "contentHash": "c0c3334f1748507111389c9a1fb7de8e5fc568b250b57fc54edab0e40e90da3b",
       "fetchedAt": "2026-08-16T06:19:05.066Z",
       "localAssetKey": "spell_alistar_q",
-      "localPath": "assets/images/spells/alistar_q.png",
+      "localPath": "packs/riot/assets/images/spells/alistar_q.png",
       "revisionId": 4007562,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Pulverize.png?82123"
     },
@@ -437,7 +437,7 @@
       "contentHash": "34c511f54d66f9337dcbd14024dda1c5a1c527c56b6ee9a210e9158b09e6c348",
       "fetchedAt": "2026-08-16T06:19:05.066Z",
       "localAssetKey": "spell_alistar_r",
-      "localPath": "assets/images/spells/alistar_r.png",
+      "localPath": "packs/riot/assets/images/spells/alistar_r.png",
       "revisionId": 3956937,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Unbreakable_Will.png?f9bce"
     },
@@ -445,7 +445,7 @@
       "contentHash": "df9fdcf7b0ea44c6443a64f554fe2d480e7178ace3677354b7e41d0143a4da02",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_alistar_w",
-      "localPath": "assets/images/spells/alistar_w.png",
+      "localPath": "packs/riot/assets/images/spells/alistar_w.png",
       "revisionId": 4007563,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Alistar_Headbutt.png?54c2d"
     },
@@ -453,7 +453,7 @@
       "contentHash": "2c2a6642587fcd8b1991a7ce8b84c8483bfa4100a27f4d9da895edb82c125e59",
       "fetchedAt": "2026-08-16T06:18:35.945Z",
       "localAssetKey": "spell_amumu_e",
-      "localPath": "assets/images/spells/amumu_e.png",
+      "localPath": "packs/riot/assets/images/spells/amumu_e.png",
       "revisionId": 3996197,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Tantrum.png?7cb6b"
     },
@@ -461,7 +461,7 @@
       "contentHash": "81b1088ba9c094ac86e63e67513c9af7328b10e8e33523b59d2bc1ae3a0afca9",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_amumu_q",
-      "localPath": "assets/images/spells/amumu_q.png",
+      "localPath": "packs/riot/assets/images/spells/amumu_q.png",
       "revisionId": 4007564,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Bandage_Toss.png?73ee9"
     },
@@ -469,7 +469,7 @@
       "contentHash": "b53d5158faf91b0ee5e50813da2547bd4ae393d496a8f0c2ac72193b1c624c46",
       "fetchedAt": "2026-08-16T06:18:35.945Z",
       "localAssetKey": "spell_amumu_r",
-      "localPath": "assets/images/spells/amumu_r.png",
+      "localPath": "packs/riot/assets/images/spells/amumu_r.png",
       "revisionId": 3953818,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Curse_of_the_Sad_Mummy.png?d2979"
     },
@@ -477,7 +477,7 @@
       "contentHash": "46e8fbb577e57667a7f9f5e765abb2dd85d2733a6206f8454c9b8b21e6a701ca",
       "fetchedAt": "2026-08-16T06:18:35.945Z",
       "localAssetKey": "spell_amumu_w",
-      "localPath": "assets/images/spells/amumu_w.png",
+      "localPath": "packs/riot/assets/images/spells/amumu_w.png",
       "revisionId": 4006735,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Amumu_Despair.png?ab7b0"
     },
@@ -485,7 +485,7 @@
       "contentHash": "6ce81c5ffd8d07d4760da9c46eb07d95280fb8d831b8d53d044dd9eb8bef68ab",
       "fetchedAt": "2026-08-13T16:46:52.507Z",
       "localAssetKey": "spell_anivia_e",
-      "localPath": "assets/images/spells/anivia_e.png",
+      "localPath": "packs/riot/assets/images/spells/anivia_e.png",
       "revisionId": 3958096,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Frostbite.png?a5539"
     },
@@ -493,7 +493,7 @@
       "contentHash": "1761cd7907dec6b047ac1319c806b7ec41fbaa4dbb372f7b8fbbfdb7c63c2e3a",
       "fetchedAt": "2026-08-12T18:59:22.373Z",
       "localAssetKey": "spell_anivia_r",
-      "localPath": "assets/images/spells/anivia_r.png",
+      "localPath": "packs/riot/assets/images/spells/anivia_r.png",
       "revisionId": 4006729,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Anivia_Glacial_Storm.png?a3fdb"
     },
@@ -501,7 +501,7 @@
       "contentHash": "ec70736371e8879e11503fb5f21428ec75845742727c7900628b0ff0ccfac7f1",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "spell_annie_e",
-      "localPath": "assets/images/spells/annie_e.png",
+      "localPath": "packs/riot/assets/images/spells/annie_e.png",
       "revisionId": 4038214,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Molten_Shield.png?23e2d"
     },
@@ -509,7 +509,7 @@
       "contentHash": "0b687b0ac9bc715d0c2122424e618e313d2f5560606e0ae7826c57940f6658f2",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "spell_annie_q",
-      "localPath": "assets/images/spells/annie_q.png",
+      "localPath": "packs/riot/assets/images/spells/annie_q.png",
       "revisionId": 3992633,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Disintegrate.png?bbde6"
     },
@@ -517,7 +517,7 @@
       "contentHash": "9dca9d759f775b72433051dcbc0509271161cc22ad8a044bc12e801a188dd1b1",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "spell_annie_r",
-      "localPath": "assets/images/spells/annie_r.png",
+      "localPath": "packs/riot/assets/images/spells/annie_r.png",
       "revisionId": 4012758,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Summon-_Tibbers.png?e6cf9"
     },
@@ -525,7 +525,7 @@
       "contentHash": "9dca9d759f775b72433051dcbc0509271161cc22ad8a044bc12e801a188dd1b1",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "spell_annie_r2",
-      "localPath": "assets/images/spells/annie_r2.png",
+      "localPath": "packs/riot/assets/images/spells/annie_r2.png",
       "revisionId": 4012758,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Summon-_Tibbers.png?e6cf9"
     },
@@ -533,7 +533,7 @@
       "contentHash": "d8b221b0f714d96a90457750d6b9ec6ea30a7465ea172827672381df6053a223",
       "fetchedAt": "2026-08-16T08:46:36.640Z",
       "localAssetKey": "spell_annie_w",
-      "localPath": "assets/images/spells/annie_w.png",
+      "localPath": "packs/riot/assets/images/spells/annie_w.png",
       "revisionId": 3952555,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Annie_Incinerate.png?7fceb"
     },
@@ -541,7 +541,7 @@
       "contentHash": "6a5d5450a8b8275a66cd0e21c9d6086b3114368082f898a2f0cad7b3b236638e",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "spell_ashe_e",
-      "localPath": "assets/images/spells/ashe_e.png",
+      "localPath": "packs/riot/assets/images/spells/ashe_e.png",
       "revisionId": 3936951,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Hawkshot.png?eea42"
     },
@@ -549,7 +549,7 @@
       "contentHash": "c7d5ef88a2d4609625d823bb8b1f74f5f1e2afb86862fc77bd4dcdfd0f1df8eb",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "spell_ashe_q",
-      "localPath": "assets/images/spells/ashe_q.png",
+      "localPath": "packs/riot/assets/images/spells/ashe_q.png",
       "revisionId": 4050582,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Ranger%27s_Focus_2.png?8d02d"
     },
@@ -557,7 +557,7 @@
       "contentHash": "4ce72257166d9ff619e9c02af7a313218fd5c2145cc0ba175875ac442b6f9263",
       "fetchedAt": "2026-08-16T08:26:29.785Z",
       "localAssetKey": "spell_ashe_r",
-      "localPath": "assets/images/spells/ashe_r.png",
+      "localPath": "packs/riot/assets/images/spells/ashe_r.png",
       "revisionId": 4026934,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Enchanted_Crystal_Arrow.png?32d78"
     },
@@ -565,7 +565,7 @@
       "contentHash": "d19652355b4280f1fb354b02fd82743f33b73c85fc479bf5138f3e22041453b4",
       "fetchedAt": "2026-08-16T08:26:29.785Z",
       "localAssetKey": "spell_ashe_w",
-      "localPath": "assets/images/spells/ashe_w.png",
+      "localPath": "packs/riot/assets/images/spells/ashe_w.png",
       "revisionId": 4007430,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ashe_Volley.png?46b01"
     },
@@ -573,7 +573,7 @@
       "contentHash": "70e7b6c1a7064531ed7a31392b4c04665fab6fad5d64397c1528507ace4fb9b3",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_e",
-      "localPath": "assets/images/spells/brand_e.png",
+      "localPath": "packs/riot/assets/images/spells/brand_e.png",
       "revisionId": 4034693,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Conflagration.png?679f1"
     },
@@ -581,7 +581,7 @@
       "contentHash": "7b2a02c653f0f18437d731dd67719ab781ba12183f690a177202cdb34ab9811e",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_i",
-      "localPath": "assets/images/spells/brand_i.png",
+      "localPath": "packs/riot/assets/images/spells/brand_i.png",
       "revisionId": 4038221,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Blaze.png?c8036"
     },
@@ -589,7 +589,7 @@
       "contentHash": "7b2a02c653f0f18437d731dd67719ab781ba12183f690a177202cdb34ab9811e",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_i2",
-      "localPath": "assets/images/spells/brand_i2.png",
+      "localPath": "packs/riot/assets/images/spells/brand_i2.png",
       "revisionId": 4038221,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Blaze.png?c8036"
     },
@@ -597,7 +597,7 @@
       "contentHash": "5c5be257d2aa7f0eaa870e42519ad273fdd8b1142e96c12ff293004e397365f7",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_q",
-      "localPath": "assets/images/spells/brand_q.png",
+      "localPath": "packs/riot/assets/images/spells/brand_q.png",
       "revisionId": 4007576,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Sear.png?587d5"
     },
@@ -605,7 +605,7 @@
       "contentHash": "aae01dd68e1271f12c4f9b254332a75d2628c83ec35e01c02ff9211bdc8d2cb8",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_r",
-      "localPath": "assets/images/spells/brand_r.png",
+      "localPath": "packs/riot/assets/images/spells/brand_r.png",
       "revisionId": 3955099,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pyroclasm.png?fcadc"
     },
@@ -613,7 +613,7 @@
       "contentHash": "5b5d88b605b6a78e3527a8de5d59ce370bde1bcd97e1a4106456d57a484276fe",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_brand_w",
-      "localPath": "assets/images/spells/brand_w.png",
+      "localPath": "packs/riot/assets/images/spells/brand_w.png",
       "revisionId": 3955084,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Brand_Pillar_of_Flame.png?b08f8"
     },
@@ -621,7 +621,7 @@
       "contentHash": "979594731e47ee853c32acbdb445c72d134877b5dfc094907aa073a9db8611d3",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_caitlyn_e",
-      "localPath": "assets/images/spells/caitlyn_e.png",
+      "localPath": "packs/riot/assets/images/spells/caitlyn_e.png",
       "revisionId": 4007584,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_90_Caliber_Net.png?799e5"
     },
@@ -629,7 +629,7 @@
       "contentHash": "f94bd04e22ddd2044d74c9f823168bedec98a0305cf2e493343fe3a22ae55f85",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_caitlyn_i",
-      "localPath": "assets/images/spells/caitlyn_i.png",
+      "localPath": "packs/riot/assets/images/spells/caitlyn_i.png",
       "revisionId": 3982560,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Headshot.png?e7c96"
     },
@@ -637,7 +637,7 @@
       "contentHash": "94f596ddc8d9cd8c82531e8bf984370cc45d305dc66e9a21d680de4bef79a9c0",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_caitlyn_q",
-      "localPath": "assets/images/spells/caitlyn_q.png",
+      "localPath": "packs/riot/assets/images/spells/caitlyn_q.png",
       "revisionId": 4007583,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Piltover_Peacemaker.png?fdac7"
     },
@@ -645,7 +645,7 @@
       "contentHash": "91ae2f43f65e440f41e28fe00fd49908fd5ed282667a49ae17bb5d380e061eac",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_caitlyn_r",
-      "localPath": "assets/images/spells/caitlyn_r.png",
+      "localPath": "packs/riot/assets/images/spells/caitlyn_r.png",
       "revisionId": 3982561,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Ace_in_the_Hole.png?ae3c0"
     },
@@ -653,7 +653,7 @@
       "contentHash": "af4501755c176fecd3e0b879dc610ac2609c2de66adb59bee251c1b3a45d4614",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_caitlyn_w",
-      "localPath": "assets/images/spells/caitlyn_w.png",
+      "localPath": "packs/riot/assets/images/spells/caitlyn_w.png",
       "revisionId": 4023135,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Caitlyn_Yordle_Snap_Trap.png?08f6a"
     },
@@ -661,7 +661,7 @@
       "contentHash": "64c817e82340a932b851d04a04b6f99044dddf3fc7d0dabb7e87c0b72654510c",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_e",
-      "localPath": "assets/images/spells/camille_e.png",
+      "localPath": "packs/riot/assets/images/spells/camille_e.png",
       "revisionId": 3922084,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Hookshot.png?4e69f"
     },
@@ -669,7 +669,7 @@
       "contentHash": "b3651df005c9fcd46314a664f9acf5da0db3fa675b849206dfb6ae633aad021a",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_e2",
-      "localPath": "assets/images/spells/camille_e2.png",
+      "localPath": "packs/riot/assets/images/spells/camille_e2.png",
       "revisionId": 3922084,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Wall_Dive.png?50265"
     },
@@ -677,7 +677,7 @@
       "contentHash": "799aed730bd513e4d7726d49794c2710a9ba3ffe66558ffeaf41e82a649a3d92",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_i",
-      "localPath": "assets/images/spells/camille_i.png",
+      "localPath": "packs/riot/assets/images/spells/camille_i.png",
       "revisionId": 4051341,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Adaptive_Defenses.png?3ad68"
     },
@@ -685,7 +685,7 @@
       "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_q",
-      "localPath": "assets/images/spells/camille_q.png",
+      "localPath": "packs/riot/assets/images/spells/camille_q.png",
       "revisionId": 3972807,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
     },
@@ -693,7 +693,7 @@
       "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_q2",
-      "localPath": "assets/images/spells/camille_q2.png",
+      "localPath": "packs/riot/assets/images/spells/camille_q2.png",
       "revisionId": 3972807,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
     },
@@ -701,7 +701,7 @@
       "contentHash": "035168eab2a112851ce736932c01dcffcb26fd4b64002d90f18303772501bc9c",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_q3",
-      "localPath": "assets/images/spells/camille_q3.png",
+      "localPath": "packs/riot/assets/images/spells/camille_q3.png",
       "revisionId": 3972807,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Precision_Protocol.png?80293"
     },
@@ -709,7 +709,7 @@
       "contentHash": "917dc0c97207c87347c2ffccbba9b5574e530968b943f8d6555602c37fdf37a5",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_r",
-      "localPath": "assets/images/spells/camille_r.png",
+      "localPath": "packs/riot/assets/images/spells/camille_r.png",
       "revisionId": 4037519,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_The_Hextech_Ultimatum.png?33599"
     },
@@ -717,7 +717,7 @@
       "contentHash": "c2e5824c15680e52556c9cb8c3b98903ce783a28f8330eb7f7d2be684c860d49",
       "fetchedAt": "2026-08-16T14:45:22.975Z",
       "localAssetKey": "spell_camille_w",
-      "localPath": "assets/images/spells/camille_w.png",
+      "localPath": "packs/riot/assets/images/spells/camille_w.png",
       "revisionId": 4051342,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Camille_Tactical_Sweep.png?e76eb"
     },
@@ -725,7 +725,7 @@
       "contentHash": "2af2f3b852bbc486595147872494e733a4e95452a514a9ec1fc444d5fc38bd24",
       "fetchedAt": "2026-08-16T06:56:43.442Z",
       "localAssetKey": "spell_cassiopeia_e",
-      "localPath": "assets/images/spells/cassiopeia_e.png",
+      "localPath": "packs/riot/assets/images/spells/cassiopeia_e.png",
       "revisionId": 4038296,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Twin_Fang.png?16f82"
     },
@@ -733,7 +733,7 @@
       "contentHash": "189a9752c6ce5c1660863763eaf23d701612d66d9b94fbb0cc831f8cb591df65",
       "fetchedAt": "2026-08-16T06:56:43.442Z",
       "localAssetKey": "spell_cassiopeia_q",
-      "localPath": "assets/images/spells/cassiopeia_q.png",
+      "localPath": "packs/riot/assets/images/spells/cassiopeia_q.png",
       "revisionId": 3906813,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Noxious_Blast.png?6dc83"
     },
@@ -741,7 +741,7 @@
       "contentHash": "05709bf00a5ce293243357e066086a0b879ed3e9db9bd42f20e651132cfaae5a",
       "fetchedAt": "2026-08-16T06:56:43.442Z",
       "localAssetKey": "spell_cassiopeia_r",
-      "localPath": "assets/images/spells/cassiopeia_r.png",
+      "localPath": "packs/riot/assets/images/spells/cassiopeia_r.png",
       "revisionId": 3906603,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Petrifying_Gaze.png?5f10f"
     },
@@ -749,7 +749,7 @@
       "contentHash": "63ad066479e3a2741240c811f1615cb2ae03cb754512839c5db80080a7ecf6fe",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_cassiopeia_w",
-      "localPath": "assets/images/spells/cassiopeia_w.png",
+      "localPath": "packs/riot/assets/images/spells/cassiopeia_w.png",
       "revisionId": 3936292,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cassiopeia_Miasma.png?4b29e"
     },
@@ -757,7 +757,7 @@
       "contentHash": "65f371196935624609d18a8eec7b08cb1dc7b7c8f0eaa3024d4c2c9770f90493",
       "fetchedAt": "2026-08-13T10:47:38.253Z",
       "localAssetKey": "spell_chogath_e",
-      "localPath": "assets/images/spells/chogath_e.png",
+      "localPath": "packs/riot/assets/images/spells/chogath_e.png",
       "revisionId": 3971127,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_Vorpal_Spikes.png?19856"
     },
@@ -765,7 +765,7 @@
       "contentHash": "c7e6c7f193eb69a5797ae19a3cdf023448e2a94f3032575917d64a0ff5f87685",
       "fetchedAt": "2026-08-13T10:47:38.253Z",
       "localAssetKey": "spell_chogath_r",
-      "localPath": "assets/images/spells/chogath_r.png",
+      "localPath": "packs/riot/assets/images/spells/chogath_r.png",
       "revisionId": 3932267,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Cho%27Gath_Feast.png?bedd6"
     },
@@ -773,7 +773,7 @@
       "contentHash": "807ebe9f46c577fb470f8dee436976982ee8924dcff9b90e68aae52be4328a39",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_darius_e",
-      "localPath": "assets/images/spells/darius_e.png",
+      "localPath": "packs/riot/assets/images/spells/darius_e.png",
       "revisionId": 3906616,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Apprehend.png?07c87"
     },
@@ -781,7 +781,7 @@
       "contentHash": "47c72b0e4ab7fab789fa67e62cb22c5472953c252917d8183ceb7359993913b7",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_darius_i",
-      "localPath": "assets/images/spells/darius_i.png",
+      "localPath": "packs/riot/assets/images/spells/darius_i.png",
       "revisionId": 4043706,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Hemorrhage.png?dffa1"
     },
@@ -789,7 +789,7 @@
       "contentHash": "61cfc2fc62f95531f0c308aa0a0fad8d2b51a5067414a9d90a3e6751f8fc8736",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_darius_q",
-      "localPath": "assets/images/spells/darius_q.png",
+      "localPath": "packs/riot/assets/images/spells/darius_q.png",
       "revisionId": 4007591,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Decimate.png?ce9f7"
     },
@@ -797,7 +797,7 @@
       "contentHash": "74ce6688b278944714b481fd471549dc6cb5b110a29d5598b1bd8a115a8b2b6b",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_darius_r",
-      "localPath": "assets/images/spells/darius_r.png",
+      "localPath": "packs/riot/assets/images/spells/darius_r.png",
       "revisionId": 4004898,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Noxian_Guillotine.png?b093f"
     },
@@ -805,7 +805,7 @@
       "contentHash": "5ca2967f05bee78c34fa3d4e8e40d7a60e8ac70cb21671732432efff2216805f",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_darius_w",
-      "localPath": "assets/images/spells/darius_w.png",
+      "localPath": "packs/riot/assets/images/spells/darius_w.png",
       "revisionId": 4013692,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Darius_Crippling_Strike.png?cadc4"
     },
@@ -813,7 +813,7 @@
       "contentHash": "e69bddfc2f782dd961f74c7b052ddd0ce735f6180f2c41c7f9d75b5f4b77de16",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_diana_e",
-      "localPath": "assets/images/spells/diana_e.png",
+      "localPath": "packs/riot/assets/images/spells/diana_e.png",
       "revisionId": 3937024,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Lunar_Rush.png?5859f"
     },
@@ -821,7 +821,7 @@
       "contentHash": "7028bbbc10f6ecf75dc14dc3800871220fa631947d96703b9e817518b9f43f54",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_diana_i",
-      "localPath": "assets/images/spells/diana_i.png",
+      "localPath": "packs/riot/assets/images/spells/diana_i.png",
       "revisionId": 4047026,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonsilver_Blade.png?df846"
     },
@@ -829,7 +829,7 @@
       "contentHash": "16893515dcdffa9bbb85a3f263c0e373d91bcea10c5ab3ab9c280a0973bcb51c",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_diana_q",
-      "localPath": "assets/images/spells/diana_q.png",
+      "localPath": "packs/riot/assets/images/spells/diana_q.png",
       "revisionId": 4007592,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Crescent_Strike.png?6e97a"
     },
@@ -837,7 +837,7 @@
       "contentHash": "1845af400cd79c5bb397832635e8134ea9bdefa118f069a8910154466eb0956f",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_diana_r",
-      "localPath": "assets/images/spells/diana_r.png",
+      "localPath": "packs/riot/assets/images/spells/diana_r.png",
       "revisionId": 4007593,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Moonfall.png?b2777"
     },
@@ -845,7 +845,7 @@
       "contentHash": "348963a48faa9f7ab80b4be12d0360e19f1cab6eddee3f18632c779129253e9b",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_diana_w",
-      "localPath": "assets/images/spells/diana_w.png",
+      "localPath": "packs/riot/assets/images/spells/diana_w.png",
       "revisionId": 4022977,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Diana_Pale_Cascade.png?08994"
     },
@@ -853,7 +853,7 @@
       "contentHash": "b8b88cbec45fa9114cb4081ffd45a3be2e094c99f853b31645f7584a0dbe9956",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "spell_ekko_e",
-      "localPath": "assets/images/spells/ekko_e.png",
+      "localPath": "packs/riot/assets/images/spells/ekko_e.png",
       "revisionId": 4025604,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Phase_Dive.png?e356d"
     },
@@ -861,7 +861,7 @@
       "contentHash": "af89d085e2273652c7af462a9f8dc7fa8252f294646a6d0dfc39d96ca06b112d",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "spell_ekko_i",
-      "localPath": "assets/images/spells/ekko_i.png",
+      "localPath": "packs/riot/assets/images/spells/ekko_i.png",
       "revisionId": 4022978,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Z-Drive_Resonance.png?ba317"
     },
@@ -869,7 +869,7 @@
       "contentHash": "8c6b69cdd155cde74d6bad06b7de3c25b2828a4a72b030bab5968ad4e1de97d8",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "spell_ekko_q",
-      "localPath": "assets/images/spells/ekko_q.png",
+      "localPath": "packs/riot/assets/images/spells/ekko_q.png",
       "revisionId": 4007479,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Timewinder.png?f55f8"
     },
@@ -877,7 +877,7 @@
       "contentHash": "ba20ece8af15076b2d64413418a6b4e8bf43dab7e625faa830fa21324af75465",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "spell_ekko_r",
-      "localPath": "assets/images/spells/ekko_r.png",
+      "localPath": "packs/riot/assets/images/spells/ekko_r.png",
       "revisionId": 4012189,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Chronobreak.png?c3329"
     },
@@ -885,7 +885,7 @@
       "contentHash": "8d83ac09cffd232fec5e8d38c729fc88931c5c649889c3d979b9b5fc6f8049e3",
       "fetchedAt": "2026-08-16T14:45:07.816Z",
       "localAssetKey": "spell_ekko_w",
-      "localPath": "assets/images/spells/ekko_w.png",
+      "localPath": "packs/riot/assets/images/spells/ekko_w.png",
       "revisionId": 3956502,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ekko_Parallel_Convergence.png?a6cf9"
     },
@@ -893,7 +893,7 @@
       "contentHash": "9b66119834db1f178615a5f622903f0b3d896029cb837c594e74963825187105",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_ezreal_e",
-      "localPath": "assets/images/spells/ezreal_e.png",
+      "localPath": "packs/riot/assets/images/spells/ezreal_e.png",
       "revisionId": 3989862,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Arcane_Shift.png?c203f"
     },
@@ -901,7 +901,7 @@
       "contentHash": "cd2001eee2562a2db6f3408b40deb411c71e1c4f812d353b6bcad62ad411e615",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_ezreal_i",
-      "localPath": "assets/images/spells/ezreal_i.png",
+      "localPath": "packs/riot/assets/images/spells/ezreal_i.png",
       "revisionId": 3932280,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Rising_Spell_Force.png?d2c7d"
     },
@@ -909,7 +909,7 @@
       "contentHash": "a19d3f1d71ca6006ac06d938daafa54a73d9f61a55e0b8c0d744812f4549d62e",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_ezreal_q",
-      "localPath": "assets/images/spells/ezreal_q.png",
+      "localPath": "packs/riot/assets/images/spells/ezreal_q.png",
       "revisionId": 4013233,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Mystic_Shot.png?00b17"
     },
@@ -917,7 +917,7 @@
       "contentHash": "103f08e0f98c2be642da58d72039d04b2f186177be6341d143337b1bbedf80ee",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_ezreal_r",
-      "localPath": "assets/images/spells/ezreal_r.png",
+      "localPath": "packs/riot/assets/images/spells/ezreal_r.png",
       "revisionId": 4013235,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Trueshot_Barrage.png?66b5c"
     },
@@ -925,7 +925,7 @@
       "contentHash": "5e0d4e61a2aba3ed73896dd7c04720584ed791e32e59dba602802aa2368d8ccd",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_ezreal_w",
-      "localPath": "assets/images/spells/ezreal_w.png",
+      "localPath": "packs/riot/assets/images/spells/ezreal_w.png",
       "revisionId": 4013234,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ezreal_Essence_Flux.png?61864"
     },
@@ -933,7 +933,7 @@
       "contentHash": "ed65b73d811d9afcef9f3b9be33fbbde60809169400f090b856e7fa83e48eccd",
       "fetchedAt": "2026-08-13T10:47:42.485Z",
       "localAssetKey": "spell_fizz_e",
-      "localPath": "assets/images/spells/fizz_e.png",
+      "localPath": "packs/riot/assets/images/spells/fizz_e.png",
       "revisionId": 4008451,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Playful.png?4d944"
     },
@@ -941,7 +941,7 @@
       "contentHash": "7391440d0c356bf6b2a08feae707c690f844c04be26312ed6844d65ab19efbe3",
       "fetchedAt": "2026-08-16T06:56:48.369Z",
       "localAssetKey": "spell_fizz_q",
-      "localPath": "assets/images/spells/fizz_q.png",
+      "localPath": "packs/riot/assets/images/spells/fizz_q.png",
       "revisionId": 3948968,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Urchin_Strike.png?3bc1b"
     },
@@ -949,7 +949,7 @@
       "contentHash": "51a519da7fa6fb799bb030ee16e0385739c3af26e3e8db107178b6b672c49217",
       "fetchedAt": "2026-08-16T06:56:48.369Z",
       "localAssetKey": "spell_fizz_r",
-      "localPath": "assets/images/spells/fizz_r.png",
+      "localPath": "packs/riot/assets/images/spells/fizz_r.png",
       "revisionId": 4010638,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Chum_the_Waters.png?4b68f"
     },
@@ -957,7 +957,7 @@
       "contentHash": "fc705916c1280d7de83fd4ee4ff1263f6a5e037b97ce6596329401d5e1a73681",
       "fetchedAt": "2026-08-16T06:56:48.369Z",
       "localAssetKey": "spell_fizz_w",
-      "localPath": "assets/images/spells/fizz_w.png",
+      "localPath": "packs/riot/assets/images/spells/fizz_w.png",
       "revisionId": 4015181,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Fizz_Seastone_Trident.png?c6cbe"
     },
@@ -965,7 +965,7 @@
       "contentHash": "3ef18cac110ffcf6a171c983cca925fee04b84f4671280f4dc4baab4a8c95686",
       "fetchedAt": "2026-08-16T08:47:10.053Z",
       "localAssetKey": "spell_garen_e",
-      "localPath": "assets/images/spells/garen_e.png",
+      "localPath": "packs/riot/assets/images/spells/garen_e.png",
       "revisionId": 4009435,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Judgment.png?f9b3d"
     },
@@ -973,7 +973,7 @@
       "contentHash": "3ef18cac110ffcf6a171c983cca925fee04b84f4671280f4dc4baab4a8c95686",
       "fetchedAt": "2026-08-16T08:47:10.053Z",
       "localAssetKey": "spell_garen_e2",
-      "localPath": "assets/images/spells/garen_e2.png",
+      "localPath": "packs/riot/assets/images/spells/garen_e2.png",
       "revisionId": 4009435,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Judgment.png?f9b3d"
     },
@@ -981,7 +981,7 @@
       "contentHash": "bcc5b6e9b70c94b2b0fcab0a00fe34b0031726183688a875be0a48da9e261971",
       "fetchedAt": "2026-08-16T08:47:10.053Z",
       "localAssetKey": "spell_garen_q",
-      "localPath": "assets/images/spells/garen_q.png",
+      "localPath": "packs/riot/assets/images/spells/garen_q.png",
       "revisionId": 4004895,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Decisive_Strike.png?7c7d3"
     },
@@ -989,7 +989,7 @@
       "contentHash": "28591bd28f79c91d0fe6aabbccc00a17b3d52c367904bb561518b930ce77889c",
       "fetchedAt": "2026-08-16T08:47:10.053Z",
       "localAssetKey": "spell_garen_r",
-      "localPath": "assets/images/spells/garen_r.png",
+      "localPath": "packs/riot/assets/images/spells/garen_r.png",
       "revisionId": 4042864,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Demacian_Justice.png?5d849"
     },
@@ -997,7 +997,7 @@
       "contentHash": "fe1b15ecf8fdbcaa8fe31899d9919dfba2389902e870fd449d8c9c83f0ff0441",
       "fetchedAt": "2026-08-16T08:58:29.033Z",
       "localAssetKey": "spell_garen_w",
-      "localPath": "assets/images/spells/garen_w.png",
+      "localPath": "packs/riot/assets/images/spells/garen_w.png",
       "revisionId": 3932284,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Garen_Courage.png?3f179"
     },
@@ -1005,7 +1005,7 @@
       "contentHash": "938ebcf218d6a806913f66448b5eb0d0025d946e55542ae2dd3afa186b9568a6",
       "fetchedAt": "2026-08-16T06:56:13.524Z",
       "localAssetKey": "spell_graves_e",
-      "localPath": "assets/images/spells/graves_e.png",
+      "localPath": "packs/riot/assets/images/spells/graves_e.png",
       "revisionId": 4049953,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_Quickdraw.png?56982"
     },
@@ -1013,7 +1013,7 @@
       "contentHash": "8137d169fa10e64da0d9ceb0344335d5f12834aceeae892897b86f093fe4843a",
       "fetchedAt": "2026-08-16T06:56:13.524Z",
       "localAssetKey": "spell_graves_q",
-      "localPath": "assets/images/spells/graves_q.png",
+      "localPath": "packs/riot/assets/images/spells/graves_q.png",
       "revisionId": 4007501,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_End_of_the_Line.png?86f15"
     },
@@ -1021,7 +1021,7 @@
       "contentHash": "c661ec7669a072021e60eada125bec58f209c25116dad2aac3bdb4bf6f7a6892",
       "fetchedAt": "2026-08-16T06:56:13.524Z",
       "localAssetKey": "spell_graves_r",
-      "localPath": "assets/images/spells/graves_r.png",
+      "localPath": "packs/riot/assets/images/spells/graves_r.png",
       "revisionId": 4007499,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Graves_Collateral_Damage.png?c619a"
     },
@@ -1029,7 +1029,7 @@
       "contentHash": "ff12bbba6e954f118ff6006ffa7e23253bb3d2b6b45c6aca57582af1a573c1b5",
       "fetchedAt": "2026-08-13T16:46:52.507Z",
       "localAssetKey": "spell_janna_e",
-      "localPath": "assets/images/spells/janna_e.png",
+      "localPath": "packs/riot/assets/images/spells/janna_e.png",
       "revisionId": 3933659,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Eye_of_the_Storm.png?3de43"
     },
@@ -1037,7 +1037,7 @@
       "contentHash": "c0024c8fab783265d2b415f67453424f10623d11cfbab9ef319a8588642cf922",
       "fetchedAt": "2026-08-12T18:59:09.794Z",
       "localAssetKey": "spell_janna_q",
-      "localPath": "assets/images/spells/janna_q.png",
+      "localPath": "packs/riot/assets/images/spells/janna_q.png",
       "revisionId": 3800440,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Howling_Gale.png?922ce"
     },
@@ -1045,7 +1045,7 @@
       "contentHash": "b67ffd9e03e440ac9eafd67b82f59e68f6aa676fac13feb27cd85162d1d55e88",
       "fetchedAt": "2026-08-12T18:59:09.794Z",
       "localAssetKey": "spell_janna_r",
-      "localPath": "assets/images/spells/janna_r.png",
+      "localPath": "packs/riot/assets/images/spells/janna_r.png",
       "revisionId": 3959332,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Monsoon.png?edd52"
     },
@@ -1053,7 +1053,7 @@
       "contentHash": "b0cf5ca030f711caaea20ef5bca51016e2e92a2bb4fcd89279a3ef7154c28f52",
       "fetchedAt": "2026-08-13T16:46:52.507Z",
       "localAssetKey": "spell_janna_w",
-      "localPath": "assets/images/spells/janna_w.png",
+      "localPath": "packs/riot/assets/images/spells/janna_w.png",
       "revisionId": 3971180,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Janna_Zephyr.png?e17f1"
     },
@@ -1061,7 +1061,7 @@
       "contentHash": "cd370fcd98fe41c5e174d7300e7961e31b4a25ca44de6ebd6522a2e5be70fda5",
       "fetchedAt": "2026-08-16T14:45:15.197Z",
       "localAssetKey": "spell_jarvaniv_e",
-      "localPath": "assets/images/spells/jarvaniv_e.png",
+      "localPath": "packs/riot/assets/images/spells/jarvaniv_e.png",
       "revisionId": 4013709,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Demacian_Standard.png?a8e88"
     },
@@ -1069,7 +1069,7 @@
       "contentHash": "1106fc6ee4d9cbff08190f939ad992b89854905630d72c06ff007f59cabc5e43",
       "fetchedAt": "2026-08-16T14:45:15.197Z",
       "localAssetKey": "spell_jarvaniv_i",
-      "localPath": "assets/images/spells/jarvaniv_i.png",
+      "localPath": "packs/riot/assets/images/spells/jarvaniv_i.png",
       "revisionId": 4003791,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Martial_Cadence.png?5c092"
     },
@@ -1077,7 +1077,7 @@
       "contentHash": "8c560a01a7b4d7ee1a10ff31e8526039f14e36c00e10ccb1501706c9ac1f8288",
       "fetchedAt": "2026-08-16T14:45:15.197Z",
       "localAssetKey": "spell_jarvaniv_q",
-      "localPath": "assets/images/spells/jarvaniv_q.png",
+      "localPath": "packs/riot/assets/images/spells/jarvaniv_q.png",
       "revisionId": 4042687,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Dragon_Strike.png?a8e88"
     },
@@ -1085,7 +1085,7 @@
       "contentHash": "e4b13aa14579bbe972f1238407b97514b3ae95d13e139002662b452a4ff47989",
       "fetchedAt": "2026-08-16T14:45:15.197Z",
       "localAssetKey": "spell_jarvaniv_r",
-      "localPath": "assets/images/spells/jarvaniv_r.png",
+      "localPath": "packs/riot/assets/images/spells/jarvaniv_r.png",
       "revisionId": 4017869,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Cataclysm.png?9a194"
     },
@@ -1093,7 +1093,7 @@
       "contentHash": "43fb51ebf03694b77b591f27927791c5c0b7e6fa5cd4f404ea93a08d1d3a0316",
       "fetchedAt": "2026-08-16T14:45:15.197Z",
       "localAssetKey": "spell_jarvaniv_w",
-      "localPath": "assets/images/spells/jarvaniv_w.png",
+      "localPath": "packs/riot/assets/images/spells/jarvaniv_w.png",
       "revisionId": 3906940,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jarvan_IV_Golden_Aegis.png?9da7e"
     },
@@ -1101,7 +1101,7 @@
       "contentHash": "f188497b1d538aeb727fdd129fc2e6109ab6faba775fc5db960666dee9fa4302",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_e",
-      "localPath": "assets/images/spells/jhin_e.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_e.png",
       "revisionId": 4007613,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Captive_Audience.png?f5ed8"
     },
@@ -1109,7 +1109,7 @@
       "contentHash": "62bbe61e2f60f57b01b45ff2a81da5297d4ee2247aaccc5f05b1d5f14afdac5f",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_i",
-      "localPath": "assets/images/spells/jhin_i.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_i.png",
       "revisionId": 3998238,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Whisper.png?aad97"
     },
@@ -1117,7 +1117,7 @@
       "contentHash": "03f677969ace09eb5b3aeea30523153f2048968f9f28def8cf51ef4c6a042d18",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_q",
-      "localPath": "assets/images/spells/jhin_q.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_q.png",
       "revisionId": 4007611,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Dancing_Grenade.png?be6ff"
     },
@@ -1125,7 +1125,7 @@
       "contentHash": "328859cbe71dfc628bdf36f4d2ccb50ddd922f5c621a91d700abbc95405250f2",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_r",
-      "localPath": "assets/images/spells/jhin_r.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_r.png",
       "revisionId": 4007615,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Curtain_Call.png?9cc80"
     },
@@ -1133,7 +1133,7 @@
       "contentHash": "328859cbe71dfc628bdf36f4d2ccb50ddd922f5c621a91d700abbc95405250f2",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_r2",
-      "localPath": "assets/images/spells/jhin_r2.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_r2.png",
       "revisionId": 4007615,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Curtain_Call.png?9cc80"
     },
@@ -1141,7 +1141,7 @@
       "contentHash": "328859cbe71dfc628bdf36f4d2ccb50ddd922f5c621a91d700abbc95405250f2",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_r3",
-      "localPath": "assets/images/spells/jhin_r3.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_r3.png",
       "revisionId": 4007615,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Curtain_Call.png?9cc80"
     },
@@ -1149,7 +1149,7 @@
       "contentHash": "1562cef8587049ccd08db04fd51e188fd06a82db46cadee4a5a6d21a635cf154",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_w",
-      "localPath": "assets/images/spells/jhin_w.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_w.png",
       "revisionId": 4021795,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Deadly_Flourish.png?473eb"
     },
@@ -1157,7 +1157,7 @@
       "contentHash": "1562cef8587049ccd08db04fd51e188fd06a82db46cadee4a5a6d21a635cf154",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_jhin_w2",
-      "localPath": "assets/images/spells/jhin_w2.png",
+      "localPath": "packs/riot/assets/images/spells/jhin_w2.png",
       "revisionId": 4021795,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jhin_Deadly_Flourish.png?473eb"
     },
@@ -1165,7 +1165,7 @@
       "contentHash": "8e8734f89e18e2c1ff8ad2e6a2bf83ed71f1086043fd44f99ae6381e4b38b43e",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_e",
-      "localPath": "assets/images/spells/jinx_e.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_e.png",
       "revisionId": 3993368,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Flame_Chompers%21.png?e0b49"
     },
@@ -1173,7 +1173,7 @@
       "contentHash": "8e8734f89e18e2c1ff8ad2e6a2bf83ed71f1086043fd44f99ae6381e4b38b43e",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_e2",
-      "localPath": "assets/images/spells/jinx_e2.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_e2.png",
       "revisionId": 3993368,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Flame_Chompers%21.png?e0b49"
     },
@@ -1181,7 +1181,7 @@
       "contentHash": "0e81c664646c938a4adc59f692a3ac145e5c10ffbfef6282e508557502a0027b",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_q",
-      "localPath": "assets/images/spells/jinx_q.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_q.png",
       "revisionId": 3992483,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Pow-Pow.png?0ec71"
     },
@@ -1189,7 +1189,7 @@
       "contentHash": "0e81c664646c938a4adc59f692a3ac145e5c10ffbfef6282e508557502a0027b",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_q2",
-      "localPath": "assets/images/spells/jinx_q2.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_q2.png",
       "revisionId": 3992483,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Pow-Pow.png?0ec71"
     },
@@ -1197,7 +1197,7 @@
       "contentHash": "0e81c664646c938a4adc59f692a3ac145e5c10ffbfef6282e508557502a0027b",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_q3",
-      "localPath": "assets/images/spells/jinx_q3.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_q3.png",
       "revisionId": 3992483,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Pow-Pow.png?0ec71"
     },
@@ -1205,7 +1205,7 @@
       "contentHash": "0e81c664646c938a4adc59f692a3ac145e5c10ffbfef6282e508557502a0027b",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_q4",
-      "localPath": "assets/images/spells/jinx_q4.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_q4.png",
       "revisionId": 3992483,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Pow-Pow.png?0ec71"
     },
@@ -1213,7 +1213,7 @@
       "contentHash": "d602a74db9ee67b58238a41e52ac7bb7459467855a84f6175c855265bae460d8",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_r",
-      "localPath": "assets/images/spells/jinx_r.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_r.png",
       "revisionId": 4007616,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Super_Mega_Death_Rocket%21.png?7db52"
     },
@@ -1221,7 +1221,7 @@
       "contentHash": "a05cb5307104f12b592fb4a16236a5ecd9d6fef50f6ad0c97fbd356440c6b984",
       "fetchedAt": "2026-08-16T08:10:14.032Z",
       "localAssetKey": "spell_jinx_w",
-      "localPath": "assets/images/spells/jinx_w.png",
+      "localPath": "packs/riot/assets/images/spells/jinx_w.png",
       "revisionId": 3907092,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Jinx_Zap%21.png?03784"
     },
@@ -1229,7 +1229,7 @@
       "contentHash": "eb336813b209a50a4f88ec0c898279047c5c9f5688a489fcaab216716ecfbd23",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_e",
-      "localPath": "assets/images/spells/katarina_e.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_e.png",
       "revisionId": 4007625,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Shunpo.png?1b05d"
     },
@@ -1237,7 +1237,7 @@
       "contentHash": "35f28dac5b8833e3d4979559596823125adcd2f92c1e91391b5288b477d46cc1",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_i",
-      "localPath": "assets/images/spells/katarina_i.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_i.png",
       "revisionId": 4038392,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Voracity.png?03c2a"
     },
@@ -1245,7 +1245,7 @@
       "contentHash": "35f28dac5b8833e3d4979559596823125adcd2f92c1e91391b5288b477d46cc1",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_i2",
-      "localPath": "assets/images/spells/katarina_i2.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_i2.png",
       "revisionId": 4038392,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Voracity.png?03c2a"
     },
@@ -1253,7 +1253,7 @@
       "contentHash": "fe9d7a8caa70630a40178fb661669c0bbf4528205239de3728a007d92acf0f26",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_q",
-      "localPath": "assets/images/spells/katarina_q.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_q.png",
       "revisionId": 4015158,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Bouncing_Blade.png?45a1c"
     },
@@ -1261,7 +1261,7 @@
       "contentHash": "689be0d8ced88009c223900f34bb8d76a5e4ac6ac2868cad41f18a861f915c50",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_r",
-      "localPath": "assets/images/spells/katarina_r.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_r.png",
       "revisionId": 4044343,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Death_Lotus.png?d86a1"
     },
@@ -1269,7 +1269,7 @@
       "contentHash": "22eb5bdd464f5d0d23aed118306897f8408e6636bbb04ffa63cf49ee78e94c70",
       "fetchedAt": "2026-08-17T14:37:44.748Z",
       "localAssetKey": "spell_katarina_w",
-      "localPath": "assets/images/spells/katarina_w.png",
+      "localPath": "packs/riot/assets/images/spells/katarina_w.png",
       "revisionId": 3845920,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Katarina_Preparation.png?0273e"
     },
@@ -1277,7 +1277,7 @@
       "contentHash": "14006d6a3cf95b9b7456e93af99a294be5bdda773abb003c9a5d1a8d67e1a30c",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "spell_leblanc_q",
-      "localPath": "assets/images/spells/leblanc_q.png",
+      "localPath": "packs/riot/assets/images/spells/leblanc_q.png",
       "revisionId": 3985524,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Sigil_of_Malice.png?f3dfb"
     },
@@ -1285,7 +1285,7 @@
       "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "spell_leblanc_r",
-      "localPath": "assets/images/spells/leblanc_r.png",
+      "localPath": "packs/riot/assets/images/spells/leblanc_r.png",
       "revisionId": 4034699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
     },
@@ -1293,7 +1293,7 @@
       "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "spell_leblanc_r2",
-      "localPath": "assets/images/spells/leblanc_r2.png",
+      "localPath": "packs/riot/assets/images/spells/leblanc_r2.png",
       "revisionId": 4034699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
     },
@@ -1301,7 +1301,7 @@
       "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "spell_leblanc_r3",
-      "localPath": "assets/images/spells/leblanc_r3.png",
+      "localPath": "packs/riot/assets/images/spells/leblanc_r3.png",
       "revisionId": 4034699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
     },
@@ -1309,7 +1309,7 @@
       "contentHash": "68f0c27864380b4edcfc75618fcc8d445c608f4989a39c10b9ef633a086fc9d4",
       "fetchedAt": "2026-08-13T16:24:13.273Z",
       "localAssetKey": "spell_leblanc_r4",
-      "localPath": "assets/images/spells/leblanc_r4.png",
+      "localPath": "packs/riot/assets/images/spells/leblanc_r4.png",
       "revisionId": 4034699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/LeBlanc_Mimic.png?98d5e"
     },
@@ -1317,7 +1317,7 @@
       "contentHash": "33a3fd80347c41fd09848ee1a5357c0a34dd0c1a6293d2faff2db77a41494fcb",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_leesin_w",
-      "localPath": "assets/images/spells/leesin_w.png",
+      "localPath": "packs/riot/assets/images/spells/leesin_w.png",
       "revisionId": 4024314,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lee_Sin_Safeguard.png?877d3"
     },
@@ -1325,7 +1325,7 @@
       "contentHash": "0b517a57410b08c33fbc349db1f3b520f90f15d7140d50e090c908699bf7e4b5",
       "fetchedAt": "2026-08-12T18:59:01.216Z",
       "localAssetKey": "spell_lux_r",
-      "localPath": "assets/images/spells/lux_r.png",
+      "localPath": "packs/riot/assets/images/spells/lux_r.png",
       "revisionId": 3919833,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_Final_Spark.png?14069"
     },
@@ -1333,7 +1333,7 @@
       "contentHash": "3fd2da8e1edc6a30ad032e380ebd852871c87da5ed878a5a4e00d969026bb4d2",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_lux_w",
-      "localPath": "assets/images/spells/lux_w.png",
+      "localPath": "packs/riot/assets/images/spells/lux_w.png",
       "revisionId": 3992656,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Lux_Prismatic_Barrier.png?f9277"
     },
@@ -1341,7 +1341,7 @@
       "contentHash": "027e2d0051dd7c236baa720eb2b00cca73edf689e4703062adeb0dad94e9525b",
       "fetchedAt": "2026-08-13T16:46:52.507Z",
       "localAssetKey": "spell_malphite_e",
-      "localPath": "assets/images/spells/malphite_e.png",
+      "localPath": "packs/riot/assets/images/spells/malphite_e.png",
       "revisionId": 3985874,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Ground_Slam.png?f1044"
     },
@@ -1349,7 +1349,7 @@
       "contentHash": "50186d055900490c772881d72730ca6a0be4ba59447d2808ff96d252578d0d32",
       "fetchedAt": "2026-08-12T18:59:49.816Z",
       "localAssetKey": "spell_malphite_q",
-      "localPath": "assets/images/spells/malphite_q.png",
+      "localPath": "packs/riot/assets/images/spells/malphite_q.png",
       "revisionId": 4003493,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Seismic_Shard.png?08012"
     },
@@ -1357,7 +1357,7 @@
       "contentHash": "f9958866936ef94314c1a8029cc738e1b3ccb2b05e679410baaa9f913c89a6f1",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_malphite_w",
-      "localPath": "assets/images/spells/malphite_w.png",
+      "localPath": "packs/riot/assets/images/spells/malphite_w.png",
       "revisionId": 4013417,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malphite_Thunderclap.png?94f37"
     },
@@ -1365,7 +1365,7 @@
       "contentHash": "b5426dda85268260f43454f041f48c313eb3ebe066197d332786892ea8a9b105",
       "fetchedAt": "2026-08-16T08:46:46.579Z",
       "localAssetKey": "spell_malzahar_e",
-      "localPath": "assets/images/spells/malzahar_e.png",
+      "localPath": "packs/riot/assets/images/spells/malzahar_e.png",
       "revisionId": 4015185,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Malefic_Visions.png?15f44"
     },
@@ -1373,7 +1373,7 @@
       "contentHash": "1d70a217220384436728cc746d38cc6178bdb286d2c63224f1989910de23a02f",
       "fetchedAt": "2026-08-16T08:46:46.579Z",
       "localAssetKey": "spell_malzahar_q",
-      "localPath": "assets/images/spells/malzahar_q.png",
+      "localPath": "packs/riot/assets/images/spells/malzahar_q.png",
       "revisionId": 3906985,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Call_of_the_Void.png?9c204"
     },
@@ -1381,7 +1381,7 @@
       "contentHash": "321c34f6203629a958d92b76a7905544661c0a76230f3027e0929f3d575ca157",
       "fetchedAt": "2026-08-16T08:46:46.579Z",
       "localAssetKey": "spell_malzahar_r",
-      "localPath": "assets/images/spells/malzahar_r.png",
+      "localPath": "packs/riot/assets/images/spells/malzahar_r.png",
       "revisionId": 4015186,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Nether_Grasp.png?44bba"
     },
@@ -1389,7 +1389,7 @@
       "contentHash": "6415ada5cabf92734687f46b83b161e22bcaac1f84778a9f6d0b94539cce5f6d",
       "fetchedAt": "2026-08-16T08:46:46.579Z",
       "localAssetKey": "spell_malzahar_w",
-      "localPath": "assets/images/spells/malzahar_w.png",
+      "localPath": "packs/riot/assets/images/spells/malzahar_w.png",
       "revisionId": 4041818,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Malzahar_Void_Swarm.png?b4f30"
     },
@@ -1397,7 +1397,7 @@
       "contentHash": "c26edbb9368d898f8ba9ac73d960532aa8825197f5b206894d792e775aea8354",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_masteryi_e",
-      "localPath": "assets/images/spells/masteryi_e.png",
+      "localPath": "packs/riot/assets/images/spells/masteryi_e.png",
       "revisionId": 3959670,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Wuju_Style.png?7a97c"
     },
@@ -1405,7 +1405,7 @@
       "contentHash": "35145dbede61418710d71ae6f650490c2444518c9a56760494f7f51a4592da7f",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_masteryi_i",
-      "localPath": "assets/images/spells/masteryi_i.png",
+      "localPath": "packs/riot/assets/images/spells/masteryi_i.png",
       "revisionId": 3999525,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Double_Strike.png?f53dc"
     },
@@ -1413,7 +1413,7 @@
       "contentHash": "850cf062e9c964ca24215c20b6610d7fb9db463a79cc748968af07aba583056f",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_masteryi_q",
-      "localPath": "assets/images/spells/masteryi_q.png",
+      "localPath": "packs/riot/assets/images/spells/masteryi_q.png",
       "revisionId": 4032850,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Alpha_Strike.png?80b5d"
     },
@@ -1421,7 +1421,7 @@
       "contentHash": "b6d033530a6f51040763b856e505722a71f770bdc2b87f0799547eae31b974b7",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_masteryi_r",
-      "localPath": "assets/images/spells/masteryi_r.png",
+      "localPath": "packs/riot/assets/images/spells/masteryi_r.png",
       "revisionId": 4001544,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Highlander.png?2ebf6"
     },
@@ -1429,7 +1429,7 @@
       "contentHash": "b4c1cb9261814df77f8c1bc3c80966779da37afc73a11cb55bb24db89d4e20a2",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_masteryi_w",
-      "localPath": "assets/images/spells/masteryi_w.png",
+      "localPath": "packs/riot/assets/images/spells/masteryi_w.png",
       "revisionId": 4039653,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Master_Yi_Meditate.png?a3d63"
     },
@@ -1437,7 +1437,7 @@
       "contentHash": "a8f3e3dffce9516dd1bb0203efc82506b12e5bb24ccb8a52a4000f99ffe2773e",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "spell_morgana_e",
-      "localPath": "assets/images/spells/morgana_e.png",
+      "localPath": "packs/riot/assets/images/spells/morgana_e.png",
       "revisionId": 4050925,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Black_Shield.png?81c92"
     },
@@ -1445,7 +1445,7 @@
       "contentHash": "7ea78bb41abb2366f15e6c4a92eac6d00374532452bba84428fb0d36e4a4f5cf",
       "fetchedAt": "2026-08-13T10:47:30.447Z",
       "localAssetKey": "spell_morgana_q",
-      "localPath": "assets/images/spells/morgana_q.png",
+      "localPath": "packs/riot/assets/images/spells/morgana_q.png",
       "revisionId": 3936353,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Dark_Binding.png?a9483"
     },
@@ -1453,7 +1453,7 @@
       "contentHash": "87910a24e2f814687a14d595176468cd2f4c68717436a75087096d8234dc7089",
       "fetchedAt": "2026-08-13T16:24:07.519Z",
       "localAssetKey": "spell_morgana_r",
-      "localPath": "assets/images/spells/morgana_r.png",
+      "localPath": "packs/riot/assets/images/spells/morgana_r.png",
       "revisionId": 4020315,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Soul_Shackles.png?22c17"
     },
@@ -1461,7 +1461,7 @@
       "contentHash": "6d2d5fa6d17865410cfcfc7ecff7b18d775c48d16c15b8375969e14a2346849d",
       "fetchedAt": "2026-08-13T16:24:07.519Z",
       "localAssetKey": "spell_morgana_w",
-      "localPath": "assets/images/spells/morgana_w.png",
+      "localPath": "packs/riot/assets/images/spells/morgana_w.png",
       "revisionId": 3949929,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Morgana_Tormented_Shadow.png?27aaa"
     },
@@ -1469,7 +1469,7 @@
       "contentHash": "21df4e5e50109f78ab4657e924aca4b2ad6e53c079691e6c061f1ab5e9efd095",
       "fetchedAt": "2026-08-16T06:18:31.354Z",
       "localAssetKey": "spell_nasus_e",
-      "localPath": "assets/images/spells/nasus_e.png",
+      "localPath": "packs/riot/assets/images/spells/nasus_e.png",
       "revisionId": 4035787,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Spirit_Fire.png?d0f15"
     },
@@ -1477,7 +1477,7 @@
       "contentHash": "87f4c1db87f75daddd89d8592c119c6b8dd85a55d63c43dd8205716a93fd262c",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_nasus_q",
-      "localPath": "assets/images/spells/nasus_q.png",
+      "localPath": "packs/riot/assets/images/spells/nasus_q.png",
       "revisionId": 4051347,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Siphoning_Strike.png?6a6bb"
     },
@@ -1485,7 +1485,7 @@
       "contentHash": "f5fd82d5efedb74095de574607090c981cf32b72e9b7446a89824ce2b2e5bb9a",
       "fetchedAt": "2026-08-16T06:18:31.354Z",
       "localAssetKey": "spell_nasus_r",
-      "localPath": "assets/images/spells/nasus_r.png",
+      "localPath": "packs/riot/assets/images/spells/nasus_r.png",
       "revisionId": 4007699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Fury_of_the_Sands.png?7a113"
     },
@@ -1493,7 +1493,7 @@
       "contentHash": "421584da3f7420ba5c08e3a9a67e26f7b04d7d3c9a5de3f4b36178445c9bf92f",
       "fetchedAt": "2026-08-16T06:18:31.354Z",
       "localAssetKey": "spell_nasus_w",
-      "localPath": "assets/images/spells/nasus_w.png",
+      "localPath": "packs/riot/assets/images/spells/nasus_w.png",
       "revisionId": 3993736,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nasus_Wither.png?604e3"
     },
@@ -1501,7 +1501,7 @@
       "contentHash": "8d68c5faf412621c67646bf72e4772797deb0ee01e475114e1b5da31f67ab57d",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_e",
-      "localPath": "assets/images/spells/nautilus_e.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_e.png",
       "revisionId": 4007701,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Riptide.png?1cfa8"
     },
@@ -1509,7 +1509,7 @@
       "contentHash": "4b75eed53b60e1d569be354a1c0c5067261f078ca1c2035ab57f629555f8e1fc",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_i",
-      "localPath": "assets/images/spells/nautilus_i.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_i.png",
       "revisionId": 3985615,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Staggering_Blow.png?38b5c"
     },
@@ -1517,7 +1517,7 @@
       "contentHash": "2c022c7e3694c72fc7600cb1146520a6a53d36fb9f7c965b2f26c936974d8f3c",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_q",
-      "localPath": "assets/images/spells/nautilus_q.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_q.png",
       "revisionId": 4007700,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Dredge_Line.png?9f3b7"
     },
@@ -1525,7 +1525,7 @@
       "contentHash": "7f97e938fdc44f27ec5ea21ee8909718e0232d6ad46c47d4ccec31fe0c83a891",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_r",
-      "localPath": "assets/images/spells/nautilus_r.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_r.png",
       "revisionId": 4007702,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Depth_Charge.png?65525"
     },
@@ -1533,7 +1533,7 @@
       "contentHash": "7f97e938fdc44f27ec5ea21ee8909718e0232d6ad46c47d4ccec31fe0c83a891",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_r2",
-      "localPath": "assets/images/spells/nautilus_r2.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_r2.png",
       "revisionId": 4007702,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Depth_Charge.png?65525"
     },
@@ -1541,7 +1541,7 @@
       "contentHash": "8d98fdabf1bd69664cb811873319f81197514823c5d91ab0bcdc9c4a49536a64",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_nautilus_w",
-      "localPath": "assets/images/spells/nautilus_w.png",
+      "localPath": "packs/riot/assets/images/spells/nautilus_w.png",
       "revisionId": 3981480,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nautilus_Titan%27s_Wrath.png?e0144"
     },
@@ -1549,7 +1549,7 @@
       "contentHash": "b268969fce2f268f570a8b11951fcc549a07a7972fd7a3899b29d52f7e8cd229",
       "fetchedAt": "2026-08-16T06:56:36.519Z",
       "localAssetKey": "spell_nocturne_e",
-      "localPath": "assets/images/spells/nocturne_e.png",
+      "localPath": "packs/riot/assets/images/spells/nocturne_e.png",
       "revisionId": 4015219,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Unspeakable_Horror.png?17aaf"
     },
@@ -1557,7 +1557,7 @@
       "contentHash": "548bda55940eed294bb9a2c12def6f571bcf3d370235281ac0d391543ed2f313",
       "fetchedAt": "2026-08-16T06:56:36.519Z",
       "localAssetKey": "spell_nocturne_q",
-      "localPath": "assets/images/spells/nocturne_q.png",
+      "localPath": "packs/riot/assets/images/spells/nocturne_q.png",
       "revisionId": 4026429,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Duskbringer.png?72c30"
     },
@@ -1565,7 +1565,7 @@
       "contentHash": "8d675f45ca2b23074ab9d5b18cf39351c6fd55340d0c17bb1c18022203d094fa",
       "fetchedAt": "2026-08-13T10:47:45.536Z",
       "localAssetKey": "spell_nocturne_r",
-      "localPath": "assets/images/spells/nocturne_r.png",
+      "localPath": "packs/riot/assets/images/spells/nocturne_r.png",
       "revisionId": 4049972,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Paranoia.png?ae492"
     },
@@ -1573,7 +1573,7 @@
       "contentHash": "636a087307f94f3ed1559518d91fcaa9a99dd19c3257c0438caec447b72c07f6",
       "fetchedAt": "2026-08-16T06:56:36.519Z",
       "localAssetKey": "spell_nocturne_w",
-      "localPath": "assets/images/spells/nocturne_w.png",
+      "localPath": "packs/riot/assets/images/spells/nocturne_w.png",
       "revisionId": 3948584,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Nocturne_Shroud_of_Darkness.png?24249"
     },
@@ -1581,7 +1581,7 @@
       "contentHash": "1fe6666d113002205546d6dfa0c21566d81754795d753d43cecb0bc8b46b6d60",
       "fetchedAt": "2026-08-16T06:56:08.637Z",
       "localAssetKey": "spell_olaf_e",
-      "localPath": "assets/images/spells/olaf_e.png",
+      "localPath": "packs/riot/assets/images/spells/olaf_e.png",
       "revisionId": 4001134,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Reckless_Swing.png?834a4"
     },
@@ -1589,7 +1589,7 @@
       "contentHash": "f16534a8e711b96c8c864c5e3f9086595b9a156c98b64dc8978b0bfdc6f8f6fb",
       "fetchedAt": "2026-08-16T06:56:08.637Z",
       "localAssetKey": "spell_olaf_r",
-      "localPath": "assets/images/spells/olaf_r.png",
+      "localPath": "packs/riot/assets/images/spells/olaf_r.png",
       "revisionId": 3939795,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Ragnarok.png?834a4"
     },
@@ -1597,7 +1597,7 @@
       "contentHash": "c88bd62c98db8221a46e97df6d7a8a6ceb798bf5c884183a4f280f1093a854e7",
       "fetchedAt": "2026-08-16T06:56:08.637Z",
       "localAssetKey": "spell_olaf_w",
-      "localPath": "assets/images/spells/olaf_w.png",
+      "localPath": "packs/riot/assets/images/spells/olaf_w.png",
       "revisionId": 4033201,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Olaf_Tough_It_Out.png?ee498"
     },
@@ -1605,7 +1605,7 @@
       "contentHash": "12ba94c9e57238ae1a6ad2f40b6360690117a8b3e1893c641831ff912e75fbff",
       "fetchedAt": "2026-08-16T06:56:23.330Z",
       "localAssetKey": "spell_pantheon_e",
-      "localPath": "assets/images/spells/pantheon_e.png",
+      "localPath": "packs/riot/assets/images/spells/pantheon_e.png",
       "revisionId": 4049965,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Aegis_Assault.png?e05dd"
     },
@@ -1613,7 +1613,7 @@
       "contentHash": "6f99d51be655ba3f07e6b97097f10187616a3029313bd28cb597dfed1b15f06b",
       "fetchedAt": "2026-08-12T18:59:41.690Z",
       "localAssetKey": "spell_pantheon_q",
-      "localPath": "assets/images/spells/pantheon_q.png",
+      "localPath": "packs/riot/assets/images/spells/pantheon_q.png",
       "revisionId": 4016044,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Comet_Spear.png?dfd15"
     },
@@ -1621,7 +1621,7 @@
       "contentHash": "040b6728a718bebf4ccd2f6c2317bea8683e97a807ca516a8a31e92e56e9a863",
       "fetchedAt": "2026-08-16T06:56:23.330Z",
       "localAssetKey": "spell_pantheon_r",
-      "localPath": "assets/images/spells/pantheon_r.png",
+      "localPath": "packs/riot/assets/images/spells/pantheon_r.png",
       "revisionId": 4046502,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Grand_Starfall.png?b462d"
     },
@@ -1629,7 +1629,7 @@
       "contentHash": "a5a96a98808910f7ee3047f8157da2121c8a561008360959c3db7fb1203ec9c9",
       "fetchedAt": "2026-08-16T06:56:23.330Z",
       "localAssetKey": "spell_pantheon_w",
-      "localPath": "assets/images/spells/pantheon_w.png",
+      "localPath": "packs/riot/assets/images/spells/pantheon_w.png",
       "revisionId": 4026707,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Pantheon_Shield_Vault.png?a04ef"
     },
@@ -1637,7 +1637,7 @@
       "contentHash": "efcf1105459f7fb76803a9a87bedfe457e569b7c467712a89531885075fb98e9",
       "fetchedAt": "2026-08-16T06:19:09.913Z",
       "localAssetKey": "spell_rammus_e",
-      "localPath": "assets/images/spells/rammus_e.png",
+      "localPath": "packs/riot/assets/images/spells/rammus_e.png",
       "revisionId": 3910038,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Frenzying_Taunt.png?da9b7"
     },
@@ -1645,7 +1645,7 @@
       "contentHash": "7cae0507507908894768d78af979d532817ecb01c2d7b925e09f3a9fc4b92c28",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "spell_rammus_q",
-      "localPath": "assets/images/spells/rammus_q.png",
+      "localPath": "packs/riot/assets/images/spells/rammus_q.png",
       "revisionId": 3988570,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Powerball.png?0fd14"
     },
@@ -1653,7 +1653,7 @@
       "contentHash": "c76ecc560248f351a2f1a974bd81ef4207c459480fcf6670702c4a44f454880a",
       "fetchedAt": "2026-08-16T06:19:09.913Z",
       "localAssetKey": "spell_rammus_r",
-      "localPath": "assets/images/spells/rammus_r.png",
+      "localPath": "packs/riot/assets/images/spells/rammus_r.png",
       "revisionId": 4008005,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Soaring_Slam.png?12e92"
     },
@@ -1661,7 +1661,7 @@
       "contentHash": "7a8ec5629d457a9ee3d82855cab17b17ba8ba24ee10ec103535855c9339f6e3e",
       "fetchedAt": "2026-08-16T06:19:09.913Z",
       "localAssetKey": "spell_rammus_w",
-      "localPath": "assets/images/spells/rammus_w.png",
+      "localPath": "packs/riot/assets/images/spells/rammus_w.png",
       "revisionId": 3982827,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Rammus_Defensive_Ball_Curl.png?be053"
     },
@@ -1669,7 +1669,7 @@
       "contentHash": "deaa86dcdc5ebe2cdb2994621f5843d913c60592478ab70873181b58927f7fd4",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_renekton_e",
-      "localPath": "assets/images/spells/renekton_e.png",
+      "localPath": "packs/riot/assets/images/spells/renekton_e.png",
       "revisionId": 3943397,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Slice_and_Dice.png?4bbb8"
     },
@@ -1677,7 +1677,7 @@
       "contentHash": "15141024287ddd08c1bd6de5d3fb712dbb4bfc5f845eea9bd611b5792b17bc7a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_renekton_i",
-      "localPath": "assets/images/spells/renekton_i.png",
+      "localPath": "packs/riot/assets/images/spells/renekton_i.png",
       "revisionId": 3961774,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Reign_of_Anger.png?ad58c"
     },
@@ -1685,7 +1685,7 @@
       "contentHash": "3b7f23f9cf9be3f17c3e6f1a506e8a4e315db43bf4ed3f30bbc13103dc94645d",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_renekton_q",
-      "localPath": "assets/images/spells/renekton_q.png",
+      "localPath": "packs/riot/assets/images/spells/renekton_q.png",
       "revisionId": 4008014,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Cull_the_Meek.png?367c9"
     },
@@ -1693,7 +1693,7 @@
       "contentHash": "ebe757a562225376d617d741571b0334d24f560d70c2025ad077801f02c0ef22",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_renekton_r",
-      "localPath": "assets/images/spells/renekton_r.png",
+      "localPath": "packs/riot/assets/images/spells/renekton_r.png",
       "revisionId": 3963895,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Dominus.png?3a147"
     },
@@ -1701,7 +1701,7 @@
       "contentHash": "e40fca5716b4ac449aa1f876330017a5212456b85ef6909b9fd3a7ee6801159a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_renekton_w",
-      "localPath": "assets/images/spells/renekton_w.png",
+      "localPath": "packs/riot/assets/images/spells/renekton_w.png",
       "revisionId": 4015473,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Renekton_Ruthless_Predator.png?40001"
     },
@@ -1709,7 +1709,7 @@
       "contentHash": "27058cc345be5809714d0c8086af62df037a8de8553eeb1d50cf5e89a87fc671",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_e",
-      "localPath": "assets/images/spells/riven_e.png",
+      "localPath": "packs/riot/assets/images/spells/riven_e.png",
       "revisionId": 3959341,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Valor.png?9e9c6"
     },
@@ -1717,7 +1717,7 @@
       "contentHash": "5fca2967bdfd2c3c95a9e3657b36d52bf895f4566378299d49cb8f62caea4e18",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_i",
-      "localPath": "assets/images/spells/riven_i.png",
+      "localPath": "packs/riot/assets/images/spells/riven_i.png",
       "revisionId": 3989876,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Runic_Blade.png?a2669"
     },
@@ -1725,7 +1725,7 @@
       "contentHash": "d527d01609dd58d07dd52dbbf7838d314c4b6a8a98b33c0975a4681190d11727",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_q",
-      "localPath": "assets/images/spells/riven_q.png",
+      "localPath": "packs/riot/assets/images/spells/riven_q.png",
       "revisionId": 4025373,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Broken_Wings.png?ee943"
     },
@@ -1733,7 +1733,7 @@
       "contentHash": "aed177690b44b7b4618c64a3e4f0b593fba30843006ad613d0b269985dc37d1f",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_r",
-      "localPath": "assets/images/spells/riven_r.png",
+      "localPath": "packs/riot/assets/images/spells/riven_r.png",
       "revisionId": 4046587,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Blade_of_the_Exile.png?490bb"
     },
@@ -1741,7 +1741,7 @@
       "contentHash": "ba4c1db0da2014007149e5faf8ac87b88ec3365382e790be52b9587c50886f4a",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_r2",
-      "localPath": "assets/images/spells/riven_r2.png",
+      "localPath": "packs/riot/assets/images/spells/riven_r2.png",
       "revisionId": 4046587,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Wind_Slash.png?69c5a"
     },
@@ -1749,7 +1749,7 @@
       "contentHash": "54c50502c88897dbb7d898585df40f0c614aefe3e990eddbbec9fb05aae17d35",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_riven_w",
-      "localPath": "assets/images/spells/riven_w.png",
+      "localPath": "packs/riot/assets/images/spells/riven_w.png",
       "revisionId": 4024218,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Riven_Ki_Burst.png?86ec1"
     },
@@ -1757,7 +1757,7 @@
       "contentHash": "54aa52d35873467a51a9b35ed7880210a24d31f742b0f75ee7f77eb212e74691",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_e",
-      "localPath": "assets/images/spells/sett_e.png",
+      "localPath": "packs/riot/assets/images/spells/sett_e.png",
       "revisionId": 4013095,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Facebreaker.png?ce273"
     },
@@ -1765,7 +1765,7 @@
       "contentHash": "fd4ce8e7f8edad57a0d44542cb459d0b368dbccfa4cd296ce081b2a73fa9745b",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_i",
-      "localPath": "assets/images/spells/sett_i.png",
+      "localPath": "packs/riot/assets/images/spells/sett_i.png",
       "revisionId": 4018819,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Pit_Grit.png?b4ebb"
     },
@@ -1773,7 +1773,7 @@
       "contentHash": "0be61ddc581fb8822c982cce01a745e36f8557f4184596952f737be6751f5116",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_q",
-      "localPath": "assets/images/spells/sett_q.png",
+      "localPath": "packs/riot/assets/images/spells/sett_q.png",
       "revisionId": 4024545,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Knuckle_Down.png?a7444"
     },
@@ -1781,7 +1781,7 @@
       "contentHash": "0be61ddc581fb8822c982cce01a745e36f8557f4184596952f737be6751f5116",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_q2",
-      "localPath": "assets/images/spells/sett_q2.png",
+      "localPath": "packs/riot/assets/images/spells/sett_q2.png",
       "revisionId": 4024545,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Knuckle_Down.png?a7444"
     },
@@ -1789,7 +1789,7 @@
       "contentHash": "10447fdf798bf7d890d9acddac6e1c1a5b46e0cb22c2b12dad6bdc571ecaa002",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_r",
-      "localPath": "assets/images/spells/sett_r.png",
+      "localPath": "packs/riot/assets/images/spells/sett_r.png",
       "revisionId": 3936244,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_The_Show_Stopper.png?51bb2"
     },
@@ -1797,7 +1797,7 @@
       "contentHash": "d9048108e8c394c878b1418696cea544a15fa036192a499590b5050de89d0fe6",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_sett_w",
-      "localPath": "assets/images/spells/sett_w.png",
+      "localPath": "packs/riot/assets/images/spells/sett_w.png",
       "revisionId": 4008036,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Sett_Haymaker.png?0bca2"
     },
@@ -1805,7 +1805,7 @@
       "contentHash": "a0efcc7a62762d512facbaa07a9e8ee7b69b41cf07b6028342e75ad3b12bbb2e",
       "fetchedAt": "2026-08-16T06:19:00.109Z",
       "localAssetKey": "spell_singed_e",
-      "localPath": "assets/images/spells/singed_e.png",
+      "localPath": "packs/riot/assets/images/spells/singed_e.png",
       "revisionId": 4026605,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Fling.png?1de00"
     },
@@ -1813,7 +1813,7 @@
       "contentHash": "360e49cbcbb049e6d7a01d2d3ee25ff85a71500b618fc7ff04bce2013273c0f5",
       "fetchedAt": "2026-08-16T06:19:00.109Z",
       "localAssetKey": "spell_singed_q",
-      "localPath": "assets/images/spells/singed_q.png",
+      "localPath": "packs/riot/assets/images/spells/singed_q.png",
       "revisionId": 4006737,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Poison_Trail.png?e7701"
     },
@@ -1821,7 +1821,7 @@
       "contentHash": "a080fbd58274eb25009b23e57e577cadf3b97f440efdff6fc88c9a52da96aced",
       "fetchedAt": "2026-08-16T06:19:00.109Z",
       "localAssetKey": "spell_singed_r",
-      "localPath": "assets/images/spells/singed_r.png",
+      "localPath": "packs/riot/assets/images/spells/singed_r.png",
       "revisionId": 4005000,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Insanity_Potion.png?dd930"
     },
@@ -1829,7 +1829,7 @@
       "contentHash": "18b8be81ba86312160d727eef3927712ece9ea20cc6ff16477102a92c522ed07",
       "fetchedAt": "2026-08-13T10:47:04.843Z",
       "localAssetKey": "spell_singed_w",
-      "localPath": "assets/images/spells/singed_w.png",
+      "localPath": "packs/riot/assets/images/spells/singed_w.png",
       "revisionId": 4001677,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Singed_Mega_Adhesive.png?01b4c"
     },
@@ -1837,7 +1837,7 @@
       "contentHash": "cf934fbda68b622e5a6ca371a2342030421b339617d8bd80860c57252e1efbda",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_soraka_e",
-      "localPath": "assets/images/spells/soraka_e.png",
+      "localPath": "packs/riot/assets/images/spells/soraka_e.png",
       "revisionId": 3907153,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Equinox.png?52b29"
     },
@@ -1845,7 +1845,7 @@
       "contentHash": "f90d7566600fdda378570570fc2332ee95bc180c851c9124d4f695f36c7bfe8b",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_soraka_i",
-      "localPath": "assets/images/spells/soraka_i.png",
+      "localPath": "packs/riot/assets/images/spells/soraka_i.png",
       "revisionId": 3681502,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Salvation.png?a58c1"
     },
@@ -1853,7 +1853,7 @@
       "contentHash": "bdbe7bfb06d8fd3a6158437c20c34e02bc2e498729debf3b5b5322287e77d741",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_soraka_q",
-      "localPath": "assets/images/spells/soraka_q.png",
+      "localPath": "packs/riot/assets/images/spells/soraka_q.png",
       "revisionId": 3953362,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Starcall.png?c94fb"
     },
@@ -1861,7 +1861,7 @@
       "contentHash": "e3b186eed36223c631e3e1f87f036889e05e5753abf0a80ec369ec8d8b961e1a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_soraka_r",
-      "localPath": "assets/images/spells/soraka_r.png",
+      "localPath": "packs/riot/assets/images/spells/soraka_r.png",
       "revisionId": 3907154,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Wish.png?0cd6d"
     },
@@ -1869,7 +1869,7 @@
       "contentHash": "4d4a3bd51cc4ad3f8429515190911c5399683c5478cd692cf994458f767dd8b7",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_soraka_w",
-      "localPath": "assets/images/spells/soraka_w.png",
+      "localPath": "packs/riot/assets/images/spells/soraka_w.png",
       "revisionId": 4007066,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Soraka_Astral_Infusion.png?3546e"
     },
@@ -1877,7 +1877,7 @@
       "contentHash": "8018c0a2c0d8c049af46bba8ce8587cc16d4dd06e57f72bcc13a82d01aface75",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_e",
-      "localPath": "assets/images/spells/syndra_e.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_e.png",
       "revisionId": 4008068,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Scatter_the_Weak.png?5e7ab"
     },
@@ -1885,7 +1885,7 @@
       "contentHash": "433175bca0ba0805651ab1bc42665546c048be2feee66ebeb6c7db952001be7b",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_i",
-      "localPath": "assets/images/spells/syndra_i.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_i.png",
       "revisionId": 3986169,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Transcendent.png?dffcf"
     },
@@ -1893,7 +1893,7 @@
       "contentHash": "2c9752312d7bb03bb82fda848cb8c943d85e73e0800d43869106c96abffdcf38",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_q",
-      "localPath": "assets/images/spells/syndra_q.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_q.png",
       "revisionId": 4026460,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Dark_Sphere.png?54dcd"
     },
@@ -1901,7 +1901,7 @@
       "contentHash": "55b6893eacf2025151a5dc49ba3de43148faea94af5fff7f6701f7edfbab3a1e",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_r",
-      "localPath": "assets/images/spells/syndra_r.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_r.png",
       "revisionId": 4024661,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Unleashed_Power.png?99bea"
     },
@@ -1909,7 +1909,7 @@
       "contentHash": "03f0759fc705c98738ec8dfe278a90c16fbf7526d1fa192a126bd2763cfda543",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_w",
-      "localPath": "assets/images/spells/syndra_w.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_w.png",
       "revisionId": 4035699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Force_of_Will.png?4a25e"
     },
@@ -1917,7 +1917,7 @@
       "contentHash": "03f0759fc705c98738ec8dfe278a90c16fbf7526d1fa192a126bd2763cfda543",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_syndra_w2",
-      "localPath": "assets/images/spells/syndra_w2.png",
+      "localPath": "packs/riot/assets/images/spells/syndra_w2.png",
       "revisionId": 4035699,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Syndra_Force_of_Will.png?4a25e"
     },
@@ -1925,7 +1925,7 @@
       "contentHash": "995105df3702f1b580266d97763604eacfd178c765547a0f8cda4d3f22ba1103",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_teemo_e",
-      "localPath": "assets/images/spells/teemo_e.png",
+      "localPath": "packs/riot/assets/images/spells/teemo_e.png",
       "revisionId": 4022986,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Toxic_Shot.png?0cef0"
     },
@@ -1933,7 +1933,7 @@
       "contentHash": "094417b535b0fa13b60adbec096d787dd9102b2f1785696690cc5e317275500a",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_teemo_r",
-      "localPath": "assets/images/spells/teemo_r.png",
+      "localPath": "packs/riot/assets/images/spells/teemo_r.png",
       "revisionId": 4015245,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Noxious_Trap.png?9f6f9"
     },
@@ -1941,7 +1941,7 @@
       "contentHash": "cead68c9024621942e629f979204652f32925d129e7efd430a29884bbc506d67",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_teemo_w",
-      "localPath": "assets/images/spells/teemo_w.png",
+      "localPath": "packs/riot/assets/images/spells/teemo_w.png",
       "revisionId": 4010102,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Teemo_Move_Quick.png?c55c8"
     },
@@ -1949,7 +1949,7 @@
       "contentHash": "b9dc0da932f992fcefcfb4ba8df34e18648a3d0a1275d3af696519621324e47d",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_e",
-      "localPath": "assets/images/spells/thresh_e.gif",
+      "localPath": "packs/riot/assets/images/spells/thresh_e.gif",
       "revisionId": 4008203,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Flay.gif?dc39d"
     },
@@ -1957,7 +1957,7 @@
       "contentHash": "b9dc0da932f992fcefcfb4ba8df34e18648a3d0a1275d3af696519621324e47d",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_e2",
-      "localPath": "assets/images/spells/thresh_e2.gif",
+      "localPath": "packs/riot/assets/images/spells/thresh_e2.gif",
       "revisionId": 4008203,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Flay.gif?dc39d"
     },
@@ -1965,7 +1965,7 @@
       "contentHash": "b9dc0da932f992fcefcfb4ba8df34e18648a3d0a1275d3af696519621324e47d",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_e3",
-      "localPath": "assets/images/spells/thresh_e3.gif",
+      "localPath": "packs/riot/assets/images/spells/thresh_e3.gif",
       "revisionId": 4008203,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Flay.gif?dc39d"
     },
@@ -1973,7 +1973,7 @@
       "contentHash": "b9dc0da932f992fcefcfb4ba8df34e18648a3d0a1275d3af696519621324e47d",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_e4",
-      "localPath": "assets/images/spells/thresh_e4.gif",
+      "localPath": "packs/riot/assets/images/spells/thresh_e4.gif",
       "revisionId": 4008203,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Flay.gif?dc39d"
     },
@@ -1981,7 +1981,7 @@
       "contentHash": "b9dc0da932f992fcefcfb4ba8df34e18648a3d0a1275d3af696519621324e47d",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_e5",
-      "localPath": "assets/images/spells/thresh_e5.gif",
+      "localPath": "packs/riot/assets/images/spells/thresh_e5.gif",
       "revisionId": 4008203,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Flay.gif?dc39d"
     },
@@ -1989,7 +1989,7 @@
       "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "spell_thresh_q",
-      "localPath": "assets/images/spells/thresh_q.png",
+      "localPath": "packs/riot/assets/images/spells/thresh_q.png",
       "revisionId": 4008201,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
     },
@@ -1997,7 +1997,7 @@
       "contentHash": "d9a98799020e137be7c10dba40101f72183eed20e2dbeaae55cb101f873227bd",
       "fetchedAt": "2026-08-13T16:18:51.440Z",
       "localAssetKey": "spell_thresh_q2",
-      "localPath": "assets/images/spells/thresh_q2.png",
+      "localPath": "packs/riot/assets/images/spells/thresh_q2.png",
       "revisionId": 4008201,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Death_Sentence.png?a1373"
     },
@@ -2005,7 +2005,7 @@
       "contentHash": "dba529a7f3ad23e7dfcdb92b1a872ee8ace8300f384aadc785628cd52db6a64f",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_r",
-      "localPath": "assets/images/spells/thresh_r.png",
+      "localPath": "packs/riot/assets/images/spells/thresh_r.png",
       "revisionId": 4024674,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_The_Box.png?451f0"
     },
@@ -2013,7 +2013,7 @@
       "contentHash": "4b80d6012899b65dcd8d325d751aa686db9449cebbf5564312fe73b7e87e3bb2",
       "fetchedAt": "2026-08-16T06:56:28.042Z",
       "localAssetKey": "spell_thresh_w",
-      "localPath": "assets/images/spells/thresh_w.png",
+      "localPath": "packs/riot/assets/images/spells/thresh_w.png",
       "revisionId": 4017821,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Thresh_Dark_Passage.png?c606e"
     },
@@ -2021,7 +2021,7 @@
       "contentHash": "c58927f351aedac1e30593838fedaf933223182284399506015363016e2f8c26",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_tryndamere_e",
-      "localPath": "assets/images/spells/tryndamere_e.png",
+      "localPath": "packs/riot/assets/images/spells/tryndamere_e.png",
       "revisionId": 4007759,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Spinning_Slash.png?37aff"
     },
@@ -2029,7 +2029,7 @@
       "contentHash": "e0b1c6a5458aef6da516f3d9160a0f5fe80c79c67267aafe70bba2d30cdc4bbd",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_tryndamere_i",
-      "localPath": "assets/images/spells/tryndamere_i.png",
+      "localPath": "packs/riot/assets/images/spells/tryndamere_i.png",
       "revisionId": 4041166,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Battle_Fury.png?5eedd"
     },
@@ -2037,7 +2037,7 @@
       "contentHash": "0ae6754b177818973daadc22f7894e62a65f421e99504c6dd29f9b249983a15d",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_tryndamere_q",
-      "localPath": "assets/images/spells/tryndamere_q.png",
+      "localPath": "packs/riot/assets/images/spells/tryndamere_q.png",
       "revisionId": 4019656,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Bloodlust.png?433a2"
     },
@@ -2045,7 +2045,7 @@
       "contentHash": "8ff111ef10b9b583926e11f12b27d7a0c657a8d5e20340bc3907000beca1d4b3",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_tryndamere_r",
-      "localPath": "assets/images/spells/tryndamere_r.png",
+      "localPath": "packs/riot/assets/images/spells/tryndamere_r.png",
       "revisionId": 4018945,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Undying_Rage.png?1a711"
     },
@@ -2053,7 +2053,7 @@
       "contentHash": "16d497a2019198b688b44c74b98b735d011c1c50978aed31b7c7f88f483d6d3f",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_tryndamere_w",
-      "localPath": "assets/images/spells/tryndamere_w.png",
+      "localPath": "packs/riot/assets/images/spells/tryndamere_w.png",
       "revisionId": 3983173,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Tryndamere_Mocking_Shout.png?e3366"
     },
@@ -2061,7 +2061,7 @@
       "contentHash": "b06c549ae84d17bc25a7ca4663f954122aabe9f55094a1f255e488a99969190d",
       "fetchedAt": "2026-08-16T06:18:55.180Z",
       "localAssetKey": "spell_twitch_e",
-      "localPath": "assets/images/spells/twitch_e.png",
+      "localPath": "packs/riot/assets/images/spells/twitch_e.png",
       "revisionId": 3907215,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Contaminate.png?960a8"
     },
@@ -2069,7 +2069,7 @@
       "contentHash": "09b910060f0b9388f1c60b330bbbd9905c24485fdc2500485dd753ee9701476e",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_twitch_q",
-      "localPath": "assets/images/spells/twitch_q.png",
+      "localPath": "packs/riot/assets/images/spells/twitch_q.png",
       "revisionId": 3982645,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Ambush.png?f924b"
     },
@@ -2077,7 +2077,7 @@
       "contentHash": "96c0388c698d65d93939966f14b0a9e859d10120505d4eb07e80649dfa794dca",
       "fetchedAt": "2026-08-16T06:18:55.180Z",
       "localAssetKey": "spell_twitch_r",
-      "localPath": "assets/images/spells/twitch_r.png",
+      "localPath": "packs/riot/assets/images/spells/twitch_r.png",
       "revisionId": 3993607,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Spray_and_Pray.png?10b61"
     },
@@ -2085,7 +2085,7 @@
       "contentHash": "33e342c45979c57370b09cb8c0cdb286deafc3f01de2a73d31aa87bf3c921385",
       "fetchedAt": "2026-08-16T06:18:55.180Z",
       "localAssetKey": "spell_twitch_w",
-      "localPath": "assets/images/spells/twitch_w.png",
+      "localPath": "packs/riot/assets/images/spells/twitch_w.png",
       "revisionId": 4012250,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Twitch_Venom_Cask.png?ad8a1"
     },
@@ -2093,7 +2093,7 @@
       "contentHash": "d58654fb404a4d06828d1db1b84c7f091de929a92129f5ca4961d517f05b9721",
       "fetchedAt": "2026-08-16T06:56:18.650Z",
       "localAssetKey": "spell_varus_e",
-      "localPath": "assets/images/spells/varus_e.png",
+      "localPath": "packs/riot/assets/images/spells/varus_e.png",
       "revisionId": 3969402,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Hail_of_Arrows.png?ffc8d"
     },
@@ -2101,7 +2101,7 @@
       "contentHash": "31cea3a7a80aed2016ddd07c6f0ec4fc8530ae6baff684ef55b3141a216d7335",
       "fetchedAt": "2026-08-12T18:59:31.663Z",
       "localAssetKey": "spell_varus_q",
-      "localPath": "assets/images/spells/varus_q.png",
+      "localPath": "packs/riot/assets/images/spells/varus_q.png",
       "revisionId": 4026469,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Piercing_Arrow.png?283ea"
     },
@@ -2109,7 +2109,7 @@
       "contentHash": "64ca0e7e87b102b96316c503690523e7f6a22e123e00d4fba1e6cbb8b0e8c048",
       "fetchedAt": "2026-08-16T06:56:18.650Z",
       "localAssetKey": "spell_varus_r",
-      "localPath": "assets/images/spells/varus_r.png",
+      "localPath": "packs/riot/assets/images/spells/varus_r.png",
       "revisionId": 4008213,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Chain_of_Corruption.png?172ee"
     },
@@ -2117,7 +2117,7 @@
       "contentHash": "ab934a130184465de337597bc5af945d9f4e662eaa5238221970966a287e56ff",
       "fetchedAt": "2026-08-16T06:56:18.650Z",
       "localAssetKey": "spell_varus_w",
-      "localPath": "assets/images/spells/varus_w.png",
+      "localPath": "packs/riot/assets/images/spells/varus_w.png",
       "revisionId": 4026472,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Varus_Blighted_Quiver_2.png?7dacf"
     },
@@ -2125,7 +2125,7 @@
       "contentHash": "3ee120966e7d5ba7380471cd0cf48314e97c9c50b2388eb60f18d4e2f4866a53",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vayne_e",
-      "localPath": "assets/images/spells/vayne_e.png",
+      "localPath": "packs/riot/assets/images/spells/vayne_e.png",
       "revisionId": 4008541,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Condemn.png?6f6c9"
     },
@@ -2133,7 +2133,7 @@
       "contentHash": "00f80fdf6e96033539a0791d89e65cd5bd0a09478fd02d91ac1ad275532774e2",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vayne_i",
-      "localPath": "assets/images/spells/vayne_i.png",
+      "localPath": "packs/riot/assets/images/spells/vayne_i.png",
       "revisionId": 3920984,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Night_Hunter.png?110b5"
     },
@@ -2141,7 +2141,7 @@
       "contentHash": "ae961059691f099b4dd19cc6cb54cc322f1c025f11897a6e22077c4c04501703",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vayne_q",
-      "localPath": "assets/images/spells/vayne_q.png",
+      "localPath": "packs/riot/assets/images/spells/vayne_q.png",
       "revisionId": 4015566,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Tumble.png?0ef24"
     },
@@ -2149,7 +2149,7 @@
       "contentHash": "47c4719602cad3cdc9b0285f1f52fad03047450b73603463b2b157d472a241e4",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vayne_r",
-      "localPath": "assets/images/spells/vayne_r.png",
+      "localPath": "packs/riot/assets/images/spells/vayne_r.png",
       "revisionId": 3807995,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Final_Hour.png?6f6c9"
     },
@@ -2157,7 +2157,7 @@
       "contentHash": "5f80cdf69f233d20cc4eda757115a5ce5710905baa8df356b9246bbc02c72cab",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vayne_w",
-      "localPath": "assets/images/spells/vayne_w.png",
+      "localPath": "packs/riot/assets/images/spells/vayne_w.png",
       "revisionId": 3949891,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vayne_Silver_Bolts.png?0ef24"
     },
@@ -2165,7 +2165,7 @@
       "contentHash": "f3273d49229ceb325ab6e7df26b20d68377a79b4bfa8fda3f068d1452bff26a7",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_veigar_e",
-      "localPath": "assets/images/spells/veigar_e.png",
+      "localPath": "packs/riot/assets/images/spells/veigar_e.png",
       "revisionId": 4016714,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Event_Horizon.png?d257d"
     },
@@ -2173,7 +2173,7 @@
       "contentHash": "38fa6ec31c72bf2cf0258bba9a2610ee3cbe564b7729388599ad3b1c6ec46b69",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_veigar_q",
-      "localPath": "assets/images/spells/veigar_q.png",
+      "localPath": "packs/riot/assets/images/spells/veigar_q.png",
       "revisionId": 4050924,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Baleful_Strike.png?46b77"
     },
@@ -2181,7 +2181,7 @@
       "contentHash": "11731e78efbf830d0781c59606159ceac63b2507a02a0620bbf1371c9c1fba85",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_veigar_r",
-      "localPath": "assets/images/spells/veigar_r.png",
+      "localPath": "packs/riot/assets/images/spells/veigar_r.png",
       "revisionId": 4004085,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Primordial_Burst.png?b2042"
     },
@@ -2189,7 +2189,7 @@
       "contentHash": "033f615c2f98390346a0f0d0118f5169fd2e85ee3120da7b73adef55f58c9b7a",
       "fetchedAt": "2026-08-13T16:23:36.912Z",
       "localAssetKey": "spell_veigar_w",
-      "localPath": "assets/images/spells/veigar_w.png",
+      "localPath": "packs/riot/assets/images/spells/veigar_w.png",
       "revisionId": 3991312,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Veigar_Dark_Matter.png?91b6e"
     },
@@ -2197,7 +2197,7 @@
       "contentHash": "e6a6406ce82db339c436ea7f2853d35f88a4220ed35de36f3856ea793b928445",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_e",
-      "localPath": "assets/images/spells/vi_e.png",
+      "localPath": "packs/riot/assets/images/spells/vi_e.png",
       "revisionId": 3986710,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Relentless_Force_2.png?9f7e9"
     },
@@ -2205,7 +2205,7 @@
       "contentHash": "e6a6406ce82db339c436ea7f2853d35f88a4220ed35de36f3856ea793b928445",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_e2",
-      "localPath": "assets/images/spells/vi_e2.png",
+      "localPath": "packs/riot/assets/images/spells/vi_e2.png",
       "revisionId": 3986710,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Relentless_Force_2.png?9f7e9"
     },
@@ -2213,7 +2213,7 @@
       "contentHash": "b4b95b4ca576e96387604920f12a7215c72d59e4228388e01ed5a44b77d46370",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_i",
-      "localPath": "assets/images/spells/vi_i.png",
+      "localPath": "packs/riot/assets/images/spells/vi_i.png",
       "revisionId": 3986701,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Blast_Shield.png?5060b"
     },
@@ -2221,7 +2221,7 @@
       "contentHash": "d08e1ed735a7bb9e2a07c6c62332f98171ae074d3b0c0ca5d100ae9b01fbf8fa",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_q",
-      "localPath": "assets/images/spells/vi_q.png",
+      "localPath": "packs/riot/assets/images/spells/vi_q.png",
       "revisionId": 3921391,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Vault_Breaker.png?284bf"
     },
@@ -2229,7 +2229,7 @@
       "contentHash": "a11f3124cf7abb49b9183ae018f2693bc777a47521b1ec90d27776355c7a0961",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_r",
-      "localPath": "assets/images/spells/vi_r.png",
+      "localPath": "packs/riot/assets/images/spells/vi_r.png",
       "revisionId": 4004943,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Cease_and_Desist.png?02d62"
     },
@@ -2237,7 +2237,7 @@
       "contentHash": "ee3da0377be07913a968ac8ca8a0c11117c9d30780603ac6d248e23225784741",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_w",
-      "localPath": "assets/images/spells/vi_w.png",
+      "localPath": "packs/riot/assets/images/spells/vi_w.png",
       "revisionId": 3932548,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Denting_Blows.png?69ddf"
     },
@@ -2245,7 +2245,7 @@
       "contentHash": "ee3da0377be07913a968ac8ca8a0c11117c9d30780603ac6d248e23225784741",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_vi_w2",
-      "localPath": "assets/images/spells/vi_w2.png",
+      "localPath": "packs/riot/assets/images/spells/vi_w2.png",
       "revisionId": 3932548,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Vi_Denting_Blows.png?69ddf"
     },
@@ -2253,7 +2253,7 @@
       "contentHash": "6acf922c1a957c829f4ecbb9f1f78678aa79539f9b6a5089e1cd7131906b8e26",
       "fetchedAt": "2026-08-16T06:56:59.377Z",
       "localAssetKey": "spell_warwick_e",
-      "localPath": "assets/images/spells/warwick_e.png",
+      "localPath": "packs/riot/assets/images/spells/warwick_e.png",
       "revisionId": 4047663,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Primal_Howl.png?81bfa"
     },
@@ -2261,7 +2261,7 @@
       "contentHash": "94f80d944621c529f631592cf24f2b0f3a532dbe77a97b7fa10a411944f5068d",
       "fetchedAt": "2026-08-13T10:47:18.264Z",
       "localAssetKey": "spell_warwick_q",
-      "localPath": "assets/images/spells/warwick_q.png",
+      "localPath": "packs/riot/assets/images/spells/warwick_q.png",
       "revisionId": 4007380,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Jaws_of_the_Beast.png?36a39"
     },
@@ -2269,7 +2269,7 @@
       "contentHash": "19ebd06a275d5870f324da14522646390962583c2d6d0c6346065e915b70e5df",
       "fetchedAt": "2026-08-16T06:56:59.377Z",
       "localAssetKey": "spell_warwick_r",
-      "localPath": "assets/images/spells/warwick_r.png",
+      "localPath": "packs/riot/assets/images/spells/warwick_r.png",
       "revisionId": 4015471,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Infinite_Duress.png?89662"
     },
@@ -2277,7 +2277,7 @@
       "contentHash": "013ad7ff49af115e23f6f3494ad9af44b7ba7af05e2737003191ad4bef5e6bff",
       "fetchedAt": "2026-08-16T08:58:31.769Z",
       "localAssetKey": "spell_warwick_w",
-      "localPath": "assets/images/spells/warwick_w.png",
+      "localPath": "packs/riot/assets/images/spells/warwick_w.png",
       "revisionId": 3980738,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Warwick_Blood_Hunt.png?3dce3"
     },
@@ -2285,7 +2285,7 @@
       "contentHash": "21797d04d946a4ad684f2b825f6831f8923b25025cbad6a670f07f9cc891bc0f",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_e",
-      "localPath": "assets/images/spells/xinzhao_e.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_e.png",
       "revisionId": 4026484,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Audacious_Charge.png?71fca"
     },
@@ -2293,7 +2293,7 @@
       "contentHash": "07fd854d3054506e59dbfa847cfcf6bd7f0e2553aeb13ca24d22e811b5f81d87",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_i",
-      "localPath": "assets/images/spells/xinzhao_i.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_i.png",
       "revisionId": 4051470,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Determination.png?2ed90"
     },
@@ -2301,7 +2301,7 @@
       "contentHash": "07fd854d3054506e59dbfa847cfcf6bd7f0e2553aeb13ca24d22e811b5f81d87",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_i2",
-      "localPath": "assets/images/spells/xinzhao_i2.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_i2.png",
       "revisionId": 4051470,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Determination.png?2ed90"
     },
@@ -2309,7 +2309,7 @@
       "contentHash": "3c3c14502f4036d6eedf64cec2c78679de8a654f715bd29ca7300c7684cee9af",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_q",
-      "localPath": "assets/images/spells/xinzhao_q.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_q.png",
       "revisionId": 3986754,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Three_Talon_Strike.png?ff562"
     },
@@ -2317,7 +2317,7 @@
       "contentHash": "27292bb34142c70393b847a1e15f0385c1e780f48d56eefcf8693bbe548bee0a",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_r",
-      "localPath": "assets/images/spells/xinzhao_r.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_r.png",
       "revisionId": 4008632,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Crescent_Guard.png?53ad9"
     },
@@ -2325,7 +2325,7 @@
       "contentHash": "c6c7a1477a71a650912659d80af72933eb24d57962d672d3dd297f9d6f0cbe7c",
       "fetchedAt": "2026-08-16T21:32:17.622Z",
       "localAssetKey": "spell_xinzhao_w",
-      "localPath": "assets/images/spells/xinzhao_w.png",
+      "localPath": "packs/riot/assets/images/spells/xinzhao_w.png",
       "revisionId": 4026481,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Xin_Zhao_Wind_Becomes_Lightning.png?61ad7"
     },
@@ -2333,7 +2333,7 @@
       "contentHash": "d8b6658ec1228f5c7116474eccd391cfcb18398ae38626f27edd4e293809771f",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_ziggs_e",
-      "localPath": "assets/images/spells/ziggs_e.png",
+      "localPath": "packs/riot/assets/images/spells/ziggs_e.png",
       "revisionId": 4008673,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Hexplosive_Minefield.png?fdc5e"
     },
@@ -2341,7 +2341,7 @@
       "contentHash": "ecc310cb1c979ee5d62604afc0ee15146e14172e70a9917f6696131444723e61",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_ziggs_i",
-      "localPath": "assets/images/spells/ziggs_i.png",
+      "localPath": "packs/riot/assets/images/spells/ziggs_i.png",
       "revisionId": 4005222,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Short_Fuse.png?ca3bb"
     },
@@ -2349,7 +2349,7 @@
       "contentHash": "4d9a182a479d4a248e032cb09740a7c85aad626ebae1ff48c5a56af86988922d",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_ziggs_q",
-      "localPath": "assets/images/spells/ziggs_q.png",
+      "localPath": "packs/riot/assets/images/spells/ziggs_q.png",
       "revisionId": 4008669,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Bouncing_Bomb.png?30cb6"
     },
@@ -2357,7 +2357,7 @@
       "contentHash": "b8014a0e870b28a1c59b93cdaa4bab5849c01bf274973525b566dcf9ad5160ed",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_ziggs_r",
-      "localPath": "assets/images/spells/ziggs_r.png",
+      "localPath": "packs/riot/assets/images/spells/ziggs_r.png",
       "revisionId": 4008677,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Mega_Inferno_Bomb.png?af8a4"
     },
@@ -2365,7 +2365,7 @@
       "contentHash": "6e43dceb6878e6615c5903f73cce62572c3810115c81415e9e22bd21ca3c4835",
       "fetchedAt": "2026-08-17T14:38:03.922Z",
       "localAssetKey": "spell_ziggs_w",
-      "localPath": "assets/images/spells/ziggs_w.png",
+      "localPath": "packs/riot/assets/images/spells/ziggs_w.png",
       "revisionId": 4008672,
       "sourceUrl": "https://wiki.leagueoflegends.com/en-us/images/Ziggs_Satchel_Charge.png?6455f"
     }
