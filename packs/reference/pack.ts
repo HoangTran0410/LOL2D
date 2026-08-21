@@ -1,5 +1,5 @@
 import type { ContentApi } from '@/content/ContentApi';
-import type { ContentPack } from '@/content/ContentPack';
+import type { ContentPackCode, ContentPackData } from '@/content/ContentPack';
 import makeVeraQ, { VERA_Q_COOLDOWN_MS, VERA_Q_DAMAGE, VERA_Q_MANA } from './spells/Vera_Q';
 import makeVeraW, {
   VERA_W_COOLDOWN_MS,
@@ -22,15 +22,16 @@ import makeVeraR, { VERA_R_COOLDOWN_MS, VERA_R_DAMAGE, VERA_R_MANA } from './spe
  * around the Riot pack alone.
  *
  * Every id here is local. `PackRegistry` prefixes them with `reference:`.
+ *
+ * Split into a data half and a code half, batch 3's own change: `data` is
+ * reachable — a roster, a set of tooltips — without ever building a
+ * `ContentApi`, because none of `./spells/Vera_*.ts` imports the engine
+ * either; each takes `api` as a parameter of its exported factory and
+ * nothing more. The default export stays the code half, still a factory,
+ * because a pack's spells are still real engine classes and still need it.
  */
-const referencePack = (api: ContentApi): ContentPack => ({
+export const data: ContentPackData = {
   manifest: { id: 'reference', version: '1.0.0', coreRange: '^1' },
-  spells: {
-    Vera_Q: makeVeraQ(api),
-    Vera_W: makeVeraW(api),
-    Vera_E: makeVeraE(api),
-    Vera_R: makeVeraR(api),
-  },
   // Every number interpolated below is imported from the spell file it
   // describes, never restated by hand, so a description can never disagree
   // with the spell it describes. `specCoolDownMs` equals `coolDownMs` for
@@ -80,6 +81,15 @@ const referencePack = (api: ContentApi): ContentPack => ({
       spells: ['Vera_Q', 'Vera_W', 'Vera_E', 'Vera_R'],
     },
   ],
+};
+
+const code = (api: ContentApi): ContentPackCode => ({
+  spells: {
+    Vera_Q: makeVeraQ(api),
+    Vera_W: makeVeraW(api),
+    Vera_E: makeVeraE(api),
+    Vera_R: makeVeraR(api),
+  },
 });
 
-export default referencePack;
+export default code;

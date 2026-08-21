@@ -10,7 +10,7 @@ import {
   type SummonerSpellOption,
   type SpellCatalogEntry,
 } from '@/game/config/spellCatalog';
-import { contentRegistry } from '@/content/registry';
+import { contentCatalog } from '@/content/catalog';
 import { removeAccents } from '@/utils/index';
 
 /**
@@ -130,12 +130,12 @@ export const getPregameCatalog = (): PregameCatalog => {
 
     /** Registry install order, for the pinned shelves — see the sort below. The riot pack installs first and lists these in `CHAMPION_KITS`'s own order, so this reproduces that ordering without reading `CHAMPION_KITS` directly. */
     const sourceOrder = new Map(
-      contentRegistry()
+      contentCatalog()
         .champions()
         .map((champion, index) => [champion.name, index])
     );
 
-    const kitShelves: KitShelf[] = contentRegistry()
+    const kitShelves: KitShelf[] = contentCatalog()
       .champions()
       .map(champion => {
         // `champion.spells` are registry-qualified (`riot:Yasuo_Q`,

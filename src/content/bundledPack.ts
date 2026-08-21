@@ -3,7 +3,8 @@ import type { ContentApi } from './ContentApi';
 import type {
   ChampionAttack,
   ChampionEntry,
-  ContentPack,
+  ContentPackCode,
+  ContentPackData,
   SpellDisplayData,
   SpellSource,
 } from './ContentPack';
@@ -24,6 +25,13 @@ import { spellModules } from '@/generated/spellModules';
  * the generated catalogue, and the spells are the generated dynamic imports,
  * which is why the pack is lazy: 240 eager classes would put every spell in
  * the game into the chunk a match downloads first.
+ *
+ * Split the same way `packs/reference/pack.ts` is: `data` is a plain value,
+ * computed eagerly here rather than deferred behind a factory, because
+ * neither `championEntries()` nor `displayData()` ever touched the api (see
+ * git blame — the old `bundled(_api)` factory's parameter was already
+ * unused). `default` is the code half, still a factory, because
+ * `ContentPackFactory`'s shape does not change per pack.
  */
 export const BUNDLED_PACK_ID = 'riot';
 
@@ -92,12 +100,33 @@ const championEntries = (): ChampionEntry[] => {
   return out;
 };
 
-const bundled = (_api: ContentApi): ContentPack => ({
+export const data: ContentPackData = {
   manifest: { id: BUNDLED_PACK_ID, version: '1.0.0', coreRange: '^1' },
+  // Getters, not eagerly evaluated fields. `championEntries()`/`displayData()`
+  // read `CHAMPION_KITS`/`spellCatalog` from `@/game/config/spellCatalog`,
+  // which is itself part of the cycle this file sits in: `bundledPack.ts` ->
+  // `spellCatalog.ts` (for `CHAMPION_KITS`) -> `catalog.ts` -> `install.ts`
+  // -> `bundledPack.ts`. An eager field here reads `CHAMPION_KITS` at
+  // whichever point *this* module happens to be reached mid-cycle — which
+  // depends on which module a caller imports first, and is `undefined`
+  // (`spellCatalog.ts` has not reached that declaration yet) whenever this
+  // file is reached before it (`tests/scenes/pregameCatalog.test.ts` hit
+  // exactly this: `CHAMPION_KITS is not iterable`). A getter defers the read
+  // to whoever actually asks for the data — `PackRegistry.installData`,
+  // called from inside a function body, always well after every module in
+  // the cycle has finished loading — the same deferral the pre-split
+  // `bundled(api)` factory got for free by never being *called* until
+  // install time.
+  get spellDisplay() {
+    return displayData();
+  },
+  get champions() {
+    return championEntries();
+  },
+};
+
+const code = (_api: ContentApi): ContentPackCode => ({
   spells: spellSources(),
-  spellDisplay: displayData(),
-  champions: championEntries(),
 });
 
-export const bundledPack = bundled;
-export default bundled;
+export default code;

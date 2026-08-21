@@ -1,4 +1,10 @@
-import { STRUCTURE_KINDS, type ContentPack, type StructureKind } from './ContentPack';
+import {
+  STRUCTURE_KINDS,
+  type ContentPack,
+  type ContentPackCode,
+  type ContentPackData,
+  type StructureKind,
+} from './ContentPack';
 
 /**
  * The boundary check, hand-written and dependency-free.
@@ -66,6 +72,15 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
     errors.push('champions: must be an array');
     return;
   }
+  // `pack.spells` is absent, not empty, when only the data half is being
+  // validated (`validatePackData` — a `ContentPackData` has no `spells` key
+  // at all) — the code half has not arrived yet, so there is nothing to
+  // cross-check a champion's ability ids against, and skipping the check
+  // here is not a hole: `install()` still validates the merged pack, spells
+  // included, before either half is written. A *present* `spells: {}` (a
+  // pack that truly declares none) still fails every reference below, same
+  // as before the split.
+  const spellsProvided = pack.spells !== undefined;
   const spells = isObject(pack.spells) ? pack.spells : {};
   for (const entry of pack.champions) {
     if (!isObject(entry) || typeof entry.id !== 'string') {
@@ -108,14 +123,14 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
     for (const id of entry.spells) {
       if (typeof id !== 'string') {
         errors.push(`champions.${entry.id}.spells: ids must be strings`);
-      } else if (!(id in spells)) {
+      } else if (spellsProvided && !(id in spells)) {
         errors.push(`champions.${entry.id}: spell ${id} is not in this pack`);
       }
     }
     if (entry.recall !== undefined) {
       if (typeof entry.recall !== 'string') {
         errors.push(`champions.${entry.id}.recall: must be a string`);
-      } else if (!(entry.recall in spells)) {
+      } else if (spellsProvided && !(entry.recall in spells)) {
         errors.push(`champions.${entry.id}: recall ${entry.recall} is not in this pack`);
       }
     }
@@ -137,9 +152,13 @@ function checkSpellDisplay(pack: Record<string, unknown>, errors: string[]): voi
     errors.push('spellDisplay: must be an object');
     return;
   }
+  // See `checkChampions`'s identical guard: an absent `spells` key means only
+  // the data half is being validated, and there is nothing yet to check a
+  // display entry's id against.
+  const spellsProvided = pack.spells !== undefined;
   const spells = isObject(pack.spells) ? pack.spells : {};
   for (const [id, value] of Object.entries(pack.spellDisplay)) {
-    if (!(id in spells)) {
+    if (spellsProvided && !(id in spells)) {
       errors.push(`spellDisplay.${id}: no spell named ${id} in this pack`);
     }
     if (!isObject(value)) {
@@ -279,6 +298,15 @@ function checkMap(map: unknown, index: number, errors: string[]): void {
   }
 }
 
+function checkMaps(pack: Record<string, unknown>, errors: string[]): void {
+  if (pack.maps === undefined) return;
+  if (!Array.isArray(pack.maps)) {
+    errors.push('maps: must be an array');
+    return;
+  }
+  pack.maps.forEach((map: unknown, index: number) => checkMap(map, index, errors));
+}
+
 export function validatePack(candidate: unknown): ValidationResult {
   const errors: string[] = [];
   if (!isObject(candidate)) {
@@ -290,12 +318,53 @@ export function validatePack(candidate: unknown): ValidationResult {
   checkSpellDisplay(candidate, errors);
   checkChampions(candidate, errors);
   checkMonsters(candidate, errors);
-
-  if (candidate.maps !== undefined) {
-    if (!Array.isArray(candidate.maps)) errors.push('maps: must be an array');
-    else candidate.maps.forEach((map: unknown, index: number) => checkMap(map, index, errors));
-  }
+  checkMaps(candidate, errors);
 
   if (errors.length > 0) return { ok: false, errors };
   return { ok: true, pack: candidate as unknown as ContentPack };
+}
+
+export type DataValidationResult =
+  { ok: true; data: ContentPackData } | { ok: false; errors: string[] };
+
+/**
+ * The data half alone: manifest, champions, spell display, monsters, maps —
+ * everything `PackRegistry.installData` writes. Reuses the same section
+ * checks `validatePack` does; a `ContentPackData` candidate has no `spells`
+ * key at all (not an empty one), so `checkChampions`/`checkSpellDisplay`'s
+ * "does this id exist in `spells`" cross-check quietly skips itself (see
+ * their own `spellsProvided` guard) rather than flagging every reference as
+ * missing. `installCode` is what completes the pack; nothing here is a
+ * weaker check, only an earlier one.
+ */
+export function validatePackData(candidate: unknown): DataValidationResult {
+  const errors: string[] = [];
+  if (!isObject(candidate)) {
+    return { ok: false, errors: ['pack: must be an object'] };
+  }
+
+  checkManifest(candidate.manifest, errors);
+  checkSpellDisplay(candidate, errors);
+  checkChampions(candidate, errors);
+  checkMonsters(candidate, errors);
+  checkMaps(candidate, errors);
+
+  if (errors.length > 0) return { ok: false, errors };
+  return { ok: true, data: candidate as unknown as ContentPackData };
+}
+
+export type CodeValidationResult =
+  { ok: true; code: ContentPackCode } | { ok: false; errors: string[] };
+
+/** The code half alone: every entry in `spells` is a class or a loader. */
+export function validatePackCode(candidate: unknown): CodeValidationResult {
+  const errors: string[] = [];
+  if (!isObject(candidate)) {
+    return { ok: false, errors: ['pack: must be an object'] };
+  }
+
+  checkSpells(candidate, errors);
+
+  if (errors.length > 0) return { ok: false, errors };
+  return { ok: true, code: candidate as unknown as ContentPackCode };
 }

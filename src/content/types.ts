@@ -38,6 +38,8 @@ export type {
   ChampionAttack,
   ChampionEntry,
   ContentPack,
+  ContentPackCode,
+  ContentPackData,
   ContentPackFactory,
   Faction,
   LaneDefinition,

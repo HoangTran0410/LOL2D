@@ -74,42 +74,56 @@ for (const rule of RULES) {
   }
 }
 
-// `pregame -> game` is an accepted, one-directional edge: `spellCatalog.ts`
-// calls `contentRegistry()`, which builds a pack's `ContentApi` — the real
-// buff/combat/vfx/spell-object classes, because a content pack genuinely
-// needs them to construct real spells. `staticDeps` above cannot police that
-// (banning the edge outright would just break the build the pack work
-// depends on), so this checks the *compiled bytes* of the pregame chunk
-// instead of its import edges: these four names are class exports carried as
+// `pregame -> game` used to be an accepted, one-directional edge here:
+// `spellCatalog.ts` called `contentRegistry()`, which built a pack's
+// `ContentApi` — the real buff/combat/vfx/spell-object classes — because a
+// content pack genuinely needs them to construct real spells. Batch 3 closed
+// that edge: `spellCatalog.ts` and `pregameCatalog.ts` now read
+// `contentCatalog()` (`src/content/catalog.ts`), whose own value closure
+// never reaches `ContentApi.ts` (`tests/content/contentApiChunk.test.ts`
+// walks it), so `pregame` no longer has any reason to import the engine.
+//
+// This still checks the *compiled bytes* rather than trusting that, because
+// `staticDeps` above cannot see a leak that Rollup's own cycle resolution
+// causes silently: these four names are class exports carried as
 // `ContentApi`'s object-literal property keys (`buffs: { DamageReflect, ... }`
 // and friends), which esbuild's minifier cannot rename — unlike the local
-// bindings that actually hold the classes. Their presence in the pregame
-// chunk's own text means the class *definition* rode along with it, not just
-// a cross-chunk reference into `game`. `BasicAttack` is deliberately not in
-// this list: `'BasicAttack'` is also a literal spell id the pregame roster
-// carries as data (`BASIC_ATTACK_ID`, a `CHAMPION_KITS` entry), so its
+// bindings that actually hold the classes. `BasicAttack` is deliberately not
+// in this list: `'BasicAttack'` is also a literal spell id the pregame
+// roster carries as data (`BASIC_ATTACK_ID`, a `CHAMPION_KITS` entry), so its
 // presence proves nothing either way.
 //
-// This is what would have caught the batch-2 regression this rule documents:
-// `spellCatalog.ts` gained a call to `contentRegistry()`, and Rollup's own
-// cycle resolution for the resulting `pregame -> game -> pregame` shape (see
-// `vite.config.ts`'s `src/content/` rule) does not error — it silently folds
-// the whole content chain, engine imports included, into `pregame`. Pinning
-// `src/content/` and `packs/reference/` to `game` there is what keeps these
-// four out now, even though the underlying cycle warning still prints (that
-// rule's comment has the edge list and why it cannot close without a larger
-// change).
+// A **class definition** riding along shows up as `Name:` — the object-
+// literal key position `ContentApi.ts`'s `buildContentApi()` writes these
+// names in (`MissileSpellObject:$t`, `DamageReflect:_r`, ...; confirmed by
+// grepping the `game` chunk, where the real definitions live). Batch 3 gave
+// this a second, and legitimate, source of the same bare name: `pregame` now
+// carries all of `packs/reference/` (its `data` needs the same file's
+// tuning constants, and a pack is one file to an author — see
+// `packs/reference/pack.ts`'s own header), and a reference-pack spell reads
+// the engine through `api.MissileSpellObject` — a **property access**,
+// `Name` preceded by `.`, never followed by `:`. That is exactly the
+// sanctioned, injected-API pattern working as designed, not a leak: the
+// class *definition* stays in `game`, only a ~20-byte member-access string
+// crosses. Matching the bare name would flag every pack that touches the API
+// at all; requiring the colon is what keeps this rule aimed at the failure
+// it exists for.
 const PREGAME_ENGINE_LEAK = ['DamageReflect', 'TrueSight', 'ParticleSystem', 'MissileSpellObject'];
-// Bytes, uncompressed. The pregame chunk with no content chain reachable at
-// all measured ~159KB; this leaves room to grow as data (more champions, more
-// display fields) without leaving room for the ~80-module engine surface
-// above to fit back in unnoticed — that regression alone was +35KB.
-const PREGAME_SIZE_CEILING_BYTES = 175_000;
+// Bytes, uncompressed. Batch 3 moved the whole content-pack *data* path here
+// on purpose — `PackRegistry`, `validate.ts`, `install.ts`, `catalog.ts`,
+// `ContentPack.ts`, `bundledPack.ts` and all of `packs/reference/` — which
+// measured 207,142 bytes against a pre-batch-3 baseline of 163,386 (`game`
+// shrank by roughly the same amount, confirming this is code moving chunks,
+// not duplicating). The ceiling leaves headroom to grow as data (more
+// champions, more display fields, more reference-pack spells) without
+// leaving room for the ~80-module engine surface to fit back in unnoticed —
+// that regression, measured before this file existed, was +44KB on its own.
+const PREGAME_SIZE_CEILING_BYTES = 225_000;
 
 {
   const file = chunk('pregame');
   const source = readFileSync(join(assets, file), 'utf8');
-  const leaked = PREGAME_ENGINE_LEAK.filter(name => source.includes(name));
+  const leaked = PREGAME_ENGINE_LEAK.filter(name => new RegExp(`${name}:`).test(source));
   if (leaked.length) {
     failures.push(
       `${file} contains engine code (${leaked.join(', ')}) that belongs in the game chunk — ` +

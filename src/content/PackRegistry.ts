@@ -1,8 +1,10 @@
-import { validatePack } from './validate';
+import { validatePack, validatePackCode, validatePackData } from './validate';
 import { isSpellLoader } from './ContentPack';
 import type {
   ChampionEntry,
   ContentPack,
+  ContentPackCode,
+  ContentPackData,
   MapDefinition,
   MonsterDef,
   SpellClass,
@@ -56,6 +58,13 @@ export class PackRegistry {
    * Validate first, then write. A pack that fails leaves no trace — a
    * half-installed pack is worse than a refused one, because the failure
    * surfaces later and somewhere else.
+   *
+   * Implemented as `installData` then `installCode` in one atomic step: the
+   * whole pack is validated up front (spells included, so a champion naming
+   * a spell the pack never declares is still caught here, before anything is
+   * written), and only then are the two write helpers called — neither of
+   * which validates anything itself, so nothing is written unless the whole
+   * pack already passed.
    */
   install(pack: ContentPack): void {
     const result = validatePack(pack);
@@ -68,7 +77,74 @@ export class PackRegistry {
       throw new Error(`content pack rejected:\n  pack id "${packId}" is already installed`);
     }
 
-    for (const [localId, spellSource] of Object.entries(pack.spells ?? {})) {
+    this.writeData(pack);
+    this.writeCode(packId, pack);
+    this.packs.push(pack);
+    this.installedIds.add(packId);
+  }
+
+  /**
+   * The data half alone: manifest, champions, spell display, monsters, maps.
+   * `contentCatalog()` is the reader this exists for — a picker that draws a
+   * roster or a map list without ever building a `ContentApi`.
+   */
+  installData(data: ContentPackData): void {
+    const result = validatePackData(data);
+    if (result.ok === false) {
+      throw new Error(`content pack rejected:\n  ${result.errors.join('\n  ')}`);
+    }
+    const packId = data.manifest.id;
+
+    if (this.installedIds.has(packId)) {
+      throw new Error(`content pack rejected:\n  pack id "${packId}" is already installed`);
+    }
+
+    this.writeData(data);
+    this.packs.push(data as ContentPack);
+    this.installedIds.add(packId);
+  }
+
+  /**
+   * The code half, against a pack id whose data is already here. Throws
+   * rather than silently accepting one — an orphan code half is a pack that
+   * half-exists, the exact failure mode `install()`'s validate-then-write
+   * ordering was built to avoid, just reached from the other direction.
+   */
+  installCode(packId: string, code: ContentPackCode): void {
+    if (!this.installedIds.has(packId)) {
+      throw new Error(`content pack rejected:\n  pack id "${packId}" has no installed data`);
+    }
+    const result = validatePackCode(code);
+    if (result.ok === false) {
+      throw new Error(`content pack rejected:\n  ${result.errors.join('\n  ')}`);
+    }
+    this.writeCode(packId, code);
+  }
+
+  private writeData(data: ContentPackData): void {
+    const packId = data.manifest.id;
+    for (const [localId, displayData] of Object.entries(data.spellDisplay ?? {})) {
+      this.display.set(qualify(packId, localId), displayData);
+    }
+    for (const entry of data.champions ?? []) {
+      this.championList.push({
+        ...entry,
+        packId,
+        id: qualify(packId, entry.id),
+        spells: entry.spells.map(localId => qualify(packId, localId)),
+        recall: entry.recall === undefined ? undefined : qualify(packId, entry.recall),
+      });
+    }
+    for (const monster of Object.values(data.monsters ?? {})) {
+      this.monsterList.push({ ...monster, packId, id: qualify(packId, monster.id) });
+    }
+    for (const map of data.maps ?? []) {
+      this.mapList.push({ ...map, packId, id: qualify(packId, map.id) });
+    }
+  }
+
+  private writeCode(packId: string, code: ContentPackCode): void {
+    for (const [localId, spellSource] of Object.entries(code.spells ?? {})) {
       const qualifiedId = qualify(packId, localId);
       this.sources.set(qualifiedId, spellSource);
       // An eager class needs no fetch, so it is available to the synchronous
@@ -78,26 +154,6 @@ export class PackRegistry {
         this.resolved.set(qualifiedId, spellSource as SpellClass);
       }
     }
-    for (const [localId, data] of Object.entries(pack.spellDisplay ?? {})) {
-      this.display.set(qualify(packId, localId), data);
-    }
-    for (const entry of pack.champions ?? []) {
-      this.championList.push({
-        ...entry,
-        packId,
-        id: qualify(packId, entry.id),
-        spells: entry.spells.map(localId => qualify(packId, localId)),
-        recall: entry.recall === undefined ? undefined : qualify(packId, entry.recall),
-      });
-    }
-    for (const monster of Object.values(pack.monsters ?? {})) {
-      this.monsterList.push({ ...monster, packId, id: qualify(packId, monster.id) });
-    }
-    for (const map of pack.maps ?? []) {
-      this.mapList.push({ ...map, packId, id: qualify(packId, map.id) });
-    }
-    this.packs.push(pack);
-    this.installedIds.add(packId);
   }
 
   champions(): readonly QualifiedChampion[] {

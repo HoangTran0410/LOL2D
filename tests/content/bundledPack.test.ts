@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { bundledPack, BUNDLED_PACK_ID } from '../../src/content/bundledPack';
+import bundledCode, { data, BUNDLED_PACK_ID } from '../../src/content/bundledPack';
 import { buildContentApi } from '../../src/content/ContentApi';
 import { PackRegistry } from '../../src/content/PackRegistry';
 import { CHAMPION_KITS } from '../../src/game/config/spellCatalog';
 import { spellModules } from '../../src/generated/spellModules';
+import type { ContentPack } from '../../src/content/ContentPack';
 
 describe('the bundled pack', () => {
-  const pack = bundledPack(buildContentApi());
+  // The merged shape every reader before the data/code split saw —
+  // `data` is reachable with no api at all; `bundledCode(api)` is the spells.
+  const pack: ContentPack = { ...data, ...bundledCode(buildContentApi()) };
 
   it('carries every kit the catalogue declares', () => {
     expect(CHAMPION_KITS.length).toBeGreaterThan(30);

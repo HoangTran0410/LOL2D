@@ -1,24 +1,33 @@
 import type { ContentApi } from './ContentApi';
 
 /**
- * What a content pack is, and why it is a function.
+ * What a content pack is, and why the code half is a function.
  *
- * A pack could have been a module of exports. It is a factory taking core's
- * API instead, because the alternative is a pack that bundles its own copy of
- * `Spell`, `SpellObject` and the buffs — and then there are two classes of
- * every name in the process. `instanceof` stops answering, `Z_INDEX_MAP` is
- * looked up by base-class identity so a pack's spell object matches no key and
- * falls to z-index 99 on top of every champion, and the buff registry exists
- * twice. One core, handed in.
+ * A pack's contract splits into a data half (`ContentPackData` — manifest,
+ * champions, spell display, monsters, maps: read to draw a picker) and a code
+ * half (`ContentPackCode` — spells: real engine classes). `ContentPack`, the
+ * union every existing reader still names, is their intersection.
+ *
+ * The code half stays a factory taking core's API, because the alternative is
+ * a pack that bundles its own copy of `Spell`, `SpellObject` and the buffs —
+ * and then there are two classes of every name in the process. `instanceof`
+ * stops answering, `Z_INDEX_MAP` is looked up by base-class identity so a
+ * pack's spell object matches no key and falls to z-index 99 on top of every
+ * champion, and the buff registry exists twice. One core, handed in.
+ *
+ * The reason the split exists at all: reading a pack's *data* — its champion
+ * list, a map to offer in a picker — used to mean building that whole engine
+ * surface first, because the one function a pack exported needed the api to
+ * run. A menu screen that only wants names and icons now never has to.
  *
  * The same shape also loads at runtime, which is the whole point:
  *
- *     Stage 1  import factory from '@lol2d/content-riot'      -> factory(api)
- *     Stage 2  const { default: factory } = await import(url) -> factory(api)
+ *     Stage 1  import code from '@lol2d/content-riot'          -> code(api)
+ *     Stage 2  const { default: code } = await import(url)     -> code(api)
  *
  * so batch 2 changes `install.ts` and nothing a pack author wrote.
  */
-export type ContentPackFactory = (api: ContentApi) => ContentPack;
+export type ContentPackFactory = (api: ContentApi) => ContentPackCode;
 
 export interface PackManifest {
   /** A bare identifier. It becomes the prefix in every `<packId>:<localId>`. */
@@ -199,14 +208,37 @@ export interface MapDefinition {
   lanes?: LaneDefinition[];
 }
 
-export interface ContentPack {
+/**
+ * Everything about a pack that a picker can render without the engine: no
+ * spell class, no `ContentApi`, nothing that needs `Spell`/`SpellObject` in
+ * scope. `PackRegistry.installData` writes exactly this, and `contentCatalog()`
+ * installs only this — see that module's own header for why that closure
+ * matters.
+ */
+export interface ContentPackData {
   manifest: PackManifest;
-  spells?: Record<string, SpellSource>;
-  /** Keyed by *local* spell id — the same keys as `spells`. */
-  spellDisplay?: Record<string, SpellDisplayData>;
   champions?: ChampionEntry[];
+  /** Keyed by *local* spell id — the same keys as `ContentPackCode.spells`. */
+  spellDisplay?: Record<string, SpellDisplayData>;
   monsters?: Record<string, MonsterDef>;
   maps?: MapDefinition[];
 }
+
+/**
+ * The half of a pack that is real engine classes, and the only half a
+ * `ContentPackFactory` ever hands back — see that type's own doc comment for
+ * why it still needs the api even though the data half no longer does.
+ */
+export interface ContentPackCode {
+  spells?: Record<string, SpellSource>;
+}
+
+/**
+ * The whole pack, as every reader from before the split still names it —
+ * `PackRegistry.install()` takes one, and both halves' fields stay optional
+ * exactly as they were, since an intersection of two interfaces with only
+ * optional fields is satisfied by either half alone.
+ */
+export type ContentPack = ContentPackData & ContentPackCode;
 
 export const STRUCTURE_KINDS: readonly StructureKind[] = Object.freeze(['turret']);
