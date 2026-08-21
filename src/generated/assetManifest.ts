@@ -20,21 +20,20 @@ import asset17Url from '../../assets/images/buffs/stun.png?url';
 import asset18Url from '../../assets/images/buffs/taunt.png?url';
 import asset19Url from '../../assets/images/buffs/truesight.png?url';
 import asset20Url from '../../assets/images/buffs/untargetable.png?url';
-import asset21Url from '../../assets/images/objects/yasuo_q3.png?url';
-import asset22Url from '../../assets/images/others/logo.svg?url';
-import asset23Url from '../../assets/images/others/menu-bg.webp?url';
-import asset24Url from '../../assets/images/others/newlogo-en.png?url';
-import asset25Url from '../../assets/images/others/newlogo-vi.png?url';
-import asset26Url from '../../assets/images/reference/champ_vera.png?url';
-import asset27Url from '../../assets/images/reference/vera_e.png?url';
-import asset28Url from '../../assets/images/reference/vera_q.png?url';
-import asset29Url from '../../assets/images/reference/vera_r.png?url';
-import asset30Url from '../../assets/images/reference/vera_w.png?url';
-import asset31Url from '../../assets/images/screenshots/Screenshot_1.jpg?url';
-import asset32Url from '../../assets/images/screenshots/Screenshot_3.jpg?url';
-import asset33Url from '../../assets/images/screenshots/Screenshot_4.jpg?url';
-import asset34Url from '../../assets/images/spells/basic_attack.png?url';
-import asset35Url from '../../assets/source-manifest.json?url';
+import asset21Url from '../../assets/images/others/logo.svg?url';
+import asset22Url from '../../assets/images/others/menu-bg.webp?url';
+import asset23Url from '../../assets/images/others/newlogo-en.png?url';
+import asset24Url from '../../assets/images/others/newlogo-vi.png?url';
+import asset25Url from '../../assets/images/reference/champ_vera.png?url';
+import asset26Url from '../../assets/images/reference/vera_e.png?url';
+import asset27Url from '../../assets/images/reference/vera_q.png?url';
+import asset28Url from '../../assets/images/reference/vera_r.png?url';
+import asset29Url from '../../assets/images/reference/vera_w.png?url';
+import asset30Url from '../../assets/images/screenshots/Screenshot_1.jpg?url';
+import asset31Url from '../../assets/images/screenshots/Screenshot_3.jpg?url';
+import asset32Url from '../../assets/images/screenshots/Screenshot_4.jpg?url';
+import asset33Url from '../../assets/images/spells/basic_attack.png?url';
+import asset34Url from '../../assets/source-manifest.json?url';
 
 export type AssetKind = 'image' | 'json' | 'audio' | 'url';
 
@@ -60,21 +59,20 @@ export const assetManifest = {
   "buff_taunt": { kind: 'image', url: asset18Url, path: "assets/images/buffs/taunt.png" },
   "buff_truesight": { kind: 'image', url: asset19Url, path: "assets/images/buffs/truesight.png" },
   "buff_untargetable": { kind: 'image', url: asset20Url, path: "assets/images/buffs/untargetable.png" },
-  "obj_yasuo_q3": { kind: 'image', url: asset21Url, path: "assets/images/objects/yasuo_q3.png" },
-  "other_logo": { kind: 'image', url: asset22Url, path: "assets/images/others/logo.svg" },
-  "other_menu_bg": { kind: 'image', url: asset23Url, path: "assets/images/others/menu-bg.webp" },
-  "other_newlogo_en": { kind: 'image', url: asset24Url, path: "assets/images/others/newlogo-en.png" },
-  "other_newlogo_vi": { kind: 'image', url: asset25Url, path: "assets/images/others/newlogo-vi.png" },
-  "reference_champ_vera": { kind: 'image', url: asset26Url, path: "assets/images/reference/champ_vera.png" },
-  "reference_vera_e": { kind: 'image', url: asset27Url, path: "assets/images/reference/vera_e.png" },
-  "reference_vera_q": { kind: 'image', url: asset28Url, path: "assets/images/reference/vera_q.png" },
-  "reference_vera_r": { kind: 'image', url: asset29Url, path: "assets/images/reference/vera_r.png" },
-  "reference_vera_w": { kind: 'image', url: asset30Url, path: "assets/images/reference/vera_w.png" },
-  "screenshot_Screenshot_1": { kind: 'image', url: asset31Url, path: "assets/images/screenshots/Screenshot_1.jpg" },
-  "screenshot_Screenshot_3": { kind: 'image', url: asset32Url, path: "assets/images/screenshots/Screenshot_3.jpg" },
-  "screenshot_Screenshot_4": { kind: 'image', url: asset33Url, path: "assets/images/screenshots/Screenshot_4.jpg" },
-  "spell_basic_attack": { kind: 'image', url: asset34Url, path: "assets/images/spells/basic_attack.png" },
-  "source_manifest": { kind: 'json', url: asset35Url, path: "assets/source-manifest.json" },
+  "other_logo": { kind: 'image', url: asset21Url, path: "assets/images/others/logo.svg" },
+  "other_menu_bg": { kind: 'image', url: asset22Url, path: "assets/images/others/menu-bg.webp" },
+  "other_newlogo_en": { kind: 'image', url: asset23Url, path: "assets/images/others/newlogo-en.png" },
+  "other_newlogo_vi": { kind: 'image', url: asset24Url, path: "assets/images/others/newlogo-vi.png" },
+  "reference_champ_vera": { kind: 'image', url: asset25Url, path: "assets/images/reference/champ_vera.png" },
+  "reference_vera_e": { kind: 'image', url: asset26Url, path: "assets/images/reference/vera_e.png" },
+  "reference_vera_q": { kind: 'image', url: asset27Url, path: "assets/images/reference/vera_q.png" },
+  "reference_vera_r": { kind: 'image', url: asset28Url, path: "assets/images/reference/vera_r.png" },
+  "reference_vera_w": { kind: 'image', url: asset29Url, path: "assets/images/reference/vera_w.png" },
+  "screenshot_Screenshot_1": { kind: 'image', url: asset30Url, path: "assets/images/screenshots/Screenshot_1.jpg" },
+  "screenshot_Screenshot_3": { kind: 'image', url: asset31Url, path: "assets/images/screenshots/Screenshot_3.jpg" },
+  "screenshot_Screenshot_4": { kind: 'image', url: asset32Url, path: "assets/images/screenshots/Screenshot_4.jpg" },
+  "spell_basic_attack": { kind: 'image', url: asset33Url, path: "assets/images/spells/basic_attack.png" },
+  "source_manifest": { kind: 'json', url: asset34Url, path: "assets/source-manifest.json" },
 } as const;
 
 export type AssetKey = keyof typeof assetManifest;
