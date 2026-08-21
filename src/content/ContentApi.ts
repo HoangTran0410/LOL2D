@@ -1,4 +1,4 @@
-import type { AssetHandle } from '@/managers/AssetManager';
+import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 import { packAsset } from '@/game/config/packAsset';
 
 import Spell from '@/game/gameObject/Spell';
@@ -163,6 +163,16 @@ export interface ContentApi {
   utils: typeof UTILS;
 
   asset(key: string): AssetHandle;
+  /**
+   * `AssetManager.renderable`, for the two draw methods (Leblanc_W, Yasuo_Q)
+   * that resolve a handle to something `image()` can paint rather than just
+   * looking one up by key — `asset()` above is `AssetManager.get`, a
+   * different static method with a different shape, so it cannot stand in
+   * for this one. `AssetManager` itself stays off the pack allow-list
+   * (`packBoundary.test.ts`); this is the same crossing `asset()` already
+   * makes, for the other method a spell's `draw()` needs.
+   */
+  renderableAsset(handle: AssetHandle | undefined, label?: string): unknown;
 }
 
 const COMBAT = Object.freeze({
@@ -291,6 +301,8 @@ export function buildContentApi(): ContentApi {
     terrain: TERRAIN,
     utils: UTILS,
     asset: packAsset,
+    renderableAsset: (handle: AssetHandle | undefined, label?: string) =>
+      AssetManager.renderable(handle, label),
   }) as ContentApi;
   return cached;
 }

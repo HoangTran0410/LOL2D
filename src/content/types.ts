@@ -33,6 +33,33 @@ export type {
   Vec2,
 } from '@/game/spell/runtime/types';
 
+/**
+ * Five more type-only gaps, found the same way the rest of this barrel was:
+ * measured against what the spell tree actually imports, not guessed.
+ * `contentApi-surface-seam.test.ts` only ever asserted VALUE coverage — its
+ * own doc comment says type-only imports are skipped, on purpose, because a
+ * type is erased and has no runtime object to be "reachable" through — so
+ * these five never had to justify themselves against that scan. They still
+ * needed a home once packs/riot/spells/ could no longer reach into core
+ * directly at all: `BasicAttackHit` is the `ON_ATTACK_HIT` payload shape
+ * (15 files, all read-only); `BasicAttackController` names the field a bot
+ * reads off `this.owner.basicAttack` (Jinx_Q, purely as a cast target, never
+ * constructed); `GameObjectRuntimeContext` is `Thresh_E`'s helper's `game`
+ * parameter type; `KillCredit` is `Zed_W`'s clone declaring how a kill on it
+ * should be scored; `TargetingRequest` is the shape every `UNIT`-targeting
+ * spell's `targetingRequest` field returns (20 files).
+ */
+export type { BasicAttackHit } from '@/game/combat/BasicAttack';
+export type { default as BasicAttackController } from '@/game/combat/BasicAttackController';
+export type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
+export type { KillCredit } from '@/game/combat/MatchTally';
+export type { TargetingRequest } from '@/game/spell/targeting/TargetResolver';
+export type { ExecuteFallback, ExecuteSpell } from '@/game/combat/ExecuteTargeting';
+export type { DynamicWall } from '@/game/gameObject/map/DynamicTerrain';
+export type { BeamGeometry } from '@/game/gameObject/spellObjects/BeamSpellObject';
+export type { WallContact } from '@/game/gameObject/map/TerrainField';
+export type { AssetHandle } from '@/managers/AssetManager';
+
 export type { ContentApi } from './ContentApi';
 export type {
   ChampionAttack,
