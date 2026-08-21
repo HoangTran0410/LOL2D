@@ -35,6 +35,7 @@ export type {
 
 export type { ContentApi } from './ContentApi';
 export type {
+  ChampionAttack,
   ChampionEntry,
   ContentPack,
   ContentPackFactory,
@@ -47,6 +48,7 @@ export type {
   PackManifest,
   SpawnSlot,
   SpellClass,
+  SpellDisplayData,
   SpellLoader,
   SpellSource,
   StructureKind,

@@ -83,6 +83,49 @@ export interface ChampionEntry {
   spells: string[];
   /** Local id of this champion's way home. Absent on a map that grants none. */
   recall?: string;
+  /**
+   * Whether the pregame screen may offer this as a champion.
+   *
+   * `false` is the normal answer for a shelf — a group of loose abilities, or
+   * a one-ability stub that exists only to widen the random pool. Core used to
+   * decide this by testing whether the portrait key started with `champ_`,
+   * which is a naming convention no pack has any reason to share.
+   */
+  playable: boolean;
+  /** Basic-attack profile. Omitted means core's `DEFAULT_CHAMPION_ATTACK`. */
+  attack?: ChampionAttack;
+}
+
+/**
+ * One spell's display fields, as data.
+ *
+ * Field-for-field the same shape `src/generated/spellCatalog.ts` produces, and
+ * that is not a coincidence: the pregame screen renders a whole roster without
+ * loading a single spell class, and it can only keep doing that if a pack's
+ * spells arrive as data too. A pack repo generates this with its own
+ * `spell-catalog` command (spec §9) exactly the way core generates its own.
+ *
+ * `iconKey` is a plain string, not core's generated `AssetKey` union — a
+ * pack's art is its own and its keys type-check inside its own build.
+ */
+export interface SpellDisplayData {
+  name: string;
+  /** Vietnamese HTML — `<span class="damage">`/`.buff`/`.time`/plain `<span>`. */
+  description: string;
+  iconKey: string | null;
+  /** The spell's own tuning number, before match rules. */
+  coolDownMs: number;
+  /** The spell's own tuning number, before match rules. */
+  manaCost: number;
+  /** `castSpec.cooldown.durationMs` — what a countdown runs before CDR. */
+  specCoolDownMs: number;
+}
+
+/** A champion's basic-attack profile. Absent means core's default. */
+export interface ChampionAttack {
+  damage: number;
+  attacksPerSecond: number;
+  range: number;
 }
 
 export interface MonsterDef {
@@ -159,6 +202,8 @@ export interface MapDefinition {
 export interface ContentPack {
   manifest: PackManifest;
   spells?: Record<string, SpellSource>;
+  /** Keyed by *local* spell id — the same keys as `spells`. */
+  spellDisplay?: Record<string, SpellDisplayData>;
   champions?: ChampionEntry[];
   monsters?: Record<string, MonsterDef>;
   maps?: MapDefinition[];

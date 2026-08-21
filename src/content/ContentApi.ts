@@ -11,6 +11,7 @@ import BeamSpellObject, {
 import HomingMissileSpellObject from '@/game/gameObject/spellObjects/HomingMissileSpellObject';
 import AoePulse from '@/game/gameObject/spellObjects/AoePulse';
 import { isChargeActivation, requireChargeSpec } from '@/game/spell/runtime/types';
+import { lazy } from '@/content/ContentPack';
 
 import AttackableUnit from '@/game/gameObject/attackableUnits/AttackableUnit';
 import Champion, { DEFAULT_CHAMPION_ATTACK } from '@/game/gameObject/attackableUnits/Champion';
@@ -124,6 +125,17 @@ export interface ContentApi {
   AoePulse: typeof AoePulse;
   isChargeActivation: typeof isChargeActivation;
   requireChargeSpec: typeof requireChargeSpec;
+  /**
+   * Marks a `function`-expression spell loader as a loader rather than a
+   * class. `lazy()` itself lives on `@/content/ContentPack`, but that module
+   * is banned as a value import for a pack (`packBoundary.test.ts`) — an
+   * arrow-function loader never needs it (it structurally can never be a
+   * class), so the gap stayed invisible until an author reached for an
+   * ordinary `function () { return import('./X'); }` instead. It rides at
+   * the top level, beside `isChargeActivation`, for the same reason: a real
+   * value with no namespace of its own.
+   */
+  lazy: typeof lazy;
   /**
    * Not inside `buffs`: every entry there is a constructor (see
    * `contentApi.test.ts`'s "carries the 24 buffs as constructors" case), and
@@ -251,6 +263,7 @@ export function buildContentApi(): ContentApi {
     AoePulse,
     isChargeActivation,
     requireChargeSpec,
+    lazy,
     CHILL_DURATION_MS,
     units: Object.freeze({
       AttackableUnit,

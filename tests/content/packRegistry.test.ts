@@ -30,7 +30,9 @@ describe('PackRegistry', () => {
     registry.install(
       pack('ref', {
         spells: { Alpha_Q: class {} } as never,
-        champions: [{ id: 'alpha', name: 'Alpha', image: null, spells: ['Alpha_Q'] }],
+        champions: [
+          { id: 'alpha', name: 'Alpha', image: null, playable: false, spells: ['Alpha_Q'] },
+        ],
       })
     );
     expect(registry.champions()[0].id).toBe('ref:alpha');
@@ -46,6 +48,7 @@ describe('PackRegistry', () => {
             id: 'alpha',
             name: 'Alpha',
             image: null,
+            playable: false,
             spells: ['Alpha_Q'],
             recall: 'Alpha_Recall',
           },
@@ -59,7 +62,9 @@ describe('PackRegistry', () => {
     registry.install(
       pack('ref', {
         spells: { Alpha_Q: class {} } as never,
-        champions: [{ id: 'alpha', name: 'Alpha', image: null, spells: ['Alpha_Q'] }],
+        champions: [
+          { id: 'alpha', name: 'Alpha', image: null, playable: false, spells: ['Alpha_Q'] },
+        ],
       })
     );
     expect(registry.champions()[0].recall).toBeUndefined();
@@ -82,13 +87,13 @@ describe('PackRegistry', () => {
     registry.install(
       pack('one', {
         spells: { Q: class {} } as never,
-        champions: [{ id: 'a', name: 'A', image: null, spells: ['Q'] }],
+        champions: [{ id: 'a', name: 'A', image: null, playable: false, spells: ['Q'] }],
       })
     );
     registry.install(
       pack('two', {
         spells: { Q: class {} } as never,
-        champions: [{ id: 'b', name: 'B', image: null, spells: ['Q'] }],
+        champions: [{ id: 'b', name: 'B', image: null, playable: false, spells: ['Q'] }],
       })
     );
     expect(registry.champions().map(c => c.id)).toEqual(['one:a', 'two:b']);
@@ -259,5 +264,25 @@ describe('PackRegistry', () => {
       },
     } as never);
     expect(await registry.loadSpellClass('fn-lazy:Late')).toBe(Late);
+  });
+
+  it('serves a pack’s display data under the qualified id', () => {
+    const registry2 = new PackRegistry();
+    registry2.install({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      spells: { A: class {} },
+      spellDisplay: {
+        A: {
+          name: 'Chiêu A',
+          description: 'mô tả',
+          iconKey: 'icon_a',
+          coolDownMs: 4000,
+          manaCost: 30,
+          specCoolDownMs: 4000,
+        },
+      },
+    } as never);
+    expect(registry2.spellDisplay('p:A')?.name).toBe('Chiêu A');
+    expect(registry2.spellDisplay('p:missing')).toBeNull();
   });
 });

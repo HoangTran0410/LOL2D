@@ -78,6 +78,29 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
     if (entry.image !== null && typeof entry.image !== 'string') {
       errors.push(`champions.${entry.id}.image: must be a string or null`);
     }
+    if (typeof entry.playable !== 'boolean') {
+      errors.push(`champions.${entry.id}.playable: must be a boolean`);
+    } else if (entry.playable) {
+      // What `listSelectableChampions` and `PLAYABLE_CHAMPION_KITS` have
+      // always meant by "pickable": a portrait and all four of Q/W/E/R.
+      if (typeof entry.image !== 'string' || entry.image.length === 0) {
+        errors.push(`champions.${entry.id}: playable champion needs a portrait (image)`);
+      }
+      if (!Array.isArray(entry.spells) || entry.spells.length !== 4) {
+        errors.push(`champions.${entry.id}: playable champion needs exactly four abilities`);
+      }
+    }
+    if (entry.attack !== undefined) {
+      if (!isObject(entry.attack)) {
+        errors.push(`champions.${entry.id}.attack: must be an object`);
+      } else {
+        for (const field of ['damage', 'attacksPerSecond', 'range'] as const) {
+          if (!isFiniteNumber(entry.attack[field])) {
+            errors.push(`champions.${entry.id}.attack.${field}: must be a finite number`);
+          }
+        }
+      }
+    }
     if (!Array.isArray(entry.spells)) {
       errors.push(`champions.${entry.id}.spells: must be an array`);
       continue;
@@ -94,6 +117,45 @@ function checkChampions(pack: Record<string, unknown>, errors: string[]): void {
         errors.push(`champions.${entry.id}.recall: must be a string`);
       } else if (!(entry.recall in spells)) {
         errors.push(`champions.${entry.id}: recall ${entry.recall} is not in this pack`);
+      }
+    }
+  }
+}
+
+const SPELL_DISPLAY_FIELDS: Record<string, 'string' | 'number' | 'string-or-null'> = {
+  name: 'string',
+  description: 'string',
+  iconKey: 'string-or-null',
+  coolDownMs: 'number',
+  manaCost: 'number',
+  specCoolDownMs: 'number',
+};
+
+function checkSpellDisplay(pack: Record<string, unknown>, errors: string[]): void {
+  if (pack.spellDisplay === undefined) return;
+  if (!isObject(pack.spellDisplay)) {
+    errors.push('spellDisplay: must be an object');
+    return;
+  }
+  const spells = isObject(pack.spells) ? pack.spells : {};
+  for (const [id, value] of Object.entries(pack.spellDisplay)) {
+    if (!(id in spells)) {
+      errors.push(`spellDisplay.${id}: no spell named ${id} in this pack`);
+    }
+    if (!isObject(value)) {
+      errors.push(`spellDisplay.${id}: must be an object`);
+      continue;
+    }
+    for (const [field, kind] of Object.entries(SPELL_DISPLAY_FIELDS)) {
+      const fieldValue = value[field];
+      const ok =
+        kind === 'string'
+          ? typeof fieldValue === 'string'
+          : kind === 'number'
+            ? isFiniteNumber(fieldValue)
+            : fieldValue === null || typeof fieldValue === 'string';
+      if (!ok) {
+        errors.push(`spellDisplay.${id}.${field}: must be a ${kind}`);
       }
     }
   }
@@ -225,6 +287,7 @@ export function validatePack(candidate: unknown): ValidationResult {
 
   checkManifest(candidate.manifest, errors);
   checkSpells(candidate, errors);
+  checkSpellDisplay(candidate, errors);
   checkChampions(candidate, errors);
   checkMonsters(candidate, errors);
 

@@ -5,6 +5,7 @@ vi.mock('../../src/managers/AssetManager', () => ({
 }));
 
 import { buildContentApi } from '../../src/content/ContentApi';
+import { isSpellLoader } from '../../src/content/ContentPack';
 
 /**
  * The API is what a pack may touch, and its size is a measured number.
@@ -44,6 +45,21 @@ describe('buildContentApi', () => {
     for (const [name, ctor] of Object.entries(api.buffs)) {
       expect(ctor, `buff ${name} is not constructible`).toBeTypeOf('function');
     }
+  });
+
+  it('hands a pack `lazy()`, the only door to the mark a loader needs', () => {
+    // `lazy()` lives on `@/content/ContentPack`, and a pack may not import a
+    // value from that module (`packBoundary.test.ts`) — so `api.lazy` is the
+    // only way a pack can wrap a `function`-expression loader and have it
+    // recognised as a loader rather than misread as the class itself.
+    const api = buildContentApi();
+    expect(api.lazy).toBeTypeOf('function');
+
+    // eslint-disable-next-line object-shorthand
+    const wrapped = api.lazy(function () {
+      return Promise.resolve(class {});
+    });
+    expect(isSpellLoader(wrapped)).toBe(true);
   });
 
   it('resolves an asset by plain string, not by the generated union', () => {

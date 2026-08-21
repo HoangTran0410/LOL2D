@@ -74,6 +74,7 @@ describe('validatePack', () => {
           id: 'alpha',
           name: 'Alpha',
           image: null,
+          playable: false,
           spells: ['Alpha_Q'],
           recall: 'Alpha_Recall',
         },
@@ -216,5 +217,55 @@ describe('validatePack', () => {
       expect(joined).toMatch(/slots/);
       expect(joined).toMatch(/red/);
     }
+  });
+
+  it('rejects a spellDisplay entry with no matching spell', () => {
+    const result = validatePack({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      spells: { A: class {} },
+      spellDisplay: {
+        B: {
+          name: 'B',
+          description: '',
+          iconKey: null,
+          coolDownMs: 0,
+          manaCost: 0,
+          specCoolDownMs: 0,
+        },
+      },
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.errors.join('\n')).toMatch(/spellDisplay.*B/);
+  });
+
+  it('rejects a champion with no playable flag', () => {
+    const result = validatePack({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      spells: { A: class {} },
+      champions: [{ id: 'c', name: 'C', image: null, spells: ['A'] }],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.errors.join('\n')).toMatch(/playable/);
+  });
+
+  it('rejects a playable champion with no portrait', () => {
+    const result = validatePack({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      spells: { A: class {}, B: class {}, C: class {}, D: class {} },
+      champions: [
+        { id: 'c', name: 'C', image: null, playable: true, spells: ['A', 'B', 'C', 'D'] },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (result.ok === false) expect(result.errors.join('\n')).toMatch(/portrait|image/);
+  });
+
+  it('rejects a playable champion without four abilities', () => {
+    const result = validatePack({
+      manifest: { id: 'p', version: '1.0.0', coreRange: '^1' },
+      spells: { A: class {} },
+      champions: [{ id: 'c', name: 'C', image: 'art', playable: true, spells: ['A'] }],
+    });
+    expect(result.ok).toBe(false);
   });
 });

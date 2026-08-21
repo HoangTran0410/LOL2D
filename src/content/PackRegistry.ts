@@ -6,6 +6,7 @@ import type {
   MapDefinition,
   MonsterDef,
   SpellClass,
+  SpellDisplayData,
   SpellSource,
 } from './ContentPack';
 
@@ -43,6 +44,7 @@ export const qualify = (packId: string, localId: string): string => `${packId}:$
 export class PackRegistry {
   private readonly packs: ContentPack[] = [];
   private readonly sources = new Map<string, SpellSource>();
+  private readonly display = new Map<string, SpellDisplayData>();
   private readonly resolved = new Map<string, SpellClass>();
   private readonly inFlight = new Map<string, Promise<SpellClass | null>>();
   private readonly installedIds = new Set<string>();
@@ -75,6 +77,9 @@ export class PackRegistry {
       if (!isSpellLoader(spellSource)) {
         this.resolved.set(qualifiedId, spellSource as SpellClass);
       }
+    }
+    for (const [localId, data] of Object.entries(pack.spellDisplay ?? {})) {
+      this.display.set(qualify(packId, localId), data);
     }
     for (const entry of pack.champions ?? []) {
       this.championList.push({
@@ -114,6 +119,16 @@ export class PackRegistry {
   /** The class, if it is already here. A loader that has not run answers `null`. */
   spellClass(qualifiedId: string): SpellClass | null {
     return this.resolved.get(qualifiedId) ?? null;
+  }
+
+  /**
+   * A spell's display data — name, description, icon, tuning numbers — as the
+   * pregame screen needs it, with no class ever loaded. `null` when the pack
+   * declared no `spellDisplay` entry for this id, which is a shape, not a
+   * defect: only the reference pack's own picker entry depends on it existing.
+   */
+  spellDisplay(qualifiedId: string): SpellDisplayData | null {
+    return this.display.get(qualifiedId) ?? null;
   }
 
   /**
@@ -172,6 +187,7 @@ export class PackRegistry {
     this.monsterList.length = 0;
     this.mapList.length = 0;
     this.sources.clear();
+    this.display.clear();
     this.resolved.clear();
     this.inFlight.clear();
     this.installedIds.clear();
