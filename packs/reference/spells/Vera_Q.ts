@@ -28,7 +28,11 @@ export const VERA_Q_MANA = 30;
  * the missile's own collision behaviour directly rather than through a full
  * spell cast.
  */
-export function makeVeraQObject(api: ContentApi) {
+/**
+ * Memoized, like every pack factory must be — see
+ * `packs/riot/spells/_EmptyExample.ts`'s header for why.
+ */
+function __buildVeraQObject(api: ContentApi) {
   return class VeraQObject extends api.MissileSpellObject {
     speed = VERA_Q_SPEED;
     size = 16;
@@ -60,8 +64,16 @@ export function makeVeraQObject(api: ContentApi) {
     }
   };
 }
+const __cacheVeraQObject = new WeakMap<ContentApi, ReturnType<typeof __buildVeraQObject>>();
+export function makeVeraQObject(api: ContentApi) {
+  const cached = __cacheVeraQObject.get(api);
+  if (cached) return cached;
+  const built = __buildVeraQObject(api);
+  __cacheVeraQObject.set(api, built);
+  return built;
+}
 
-export default function makeVeraQ(api: ContentApi) {
+function __buildVeraQ(api: ContentApi) {
   const VeraQObject = makeVeraQObject(api);
 
   return class Vera_Q extends api.Spell {
@@ -94,4 +106,12 @@ export default function makeVeraQ(api: ContentApi) {
       this.game.objectManager.addObject(shot);
     }
   };
+}
+const __cacheVeraQ = new WeakMap<ContentApi, ReturnType<typeof __buildVeraQ>>();
+export default function makeVeraQ(api: ContentApi) {
+  const cached = __cacheVeraQ.get(api);
+  if (cached) return cached;
+  const built = __buildVeraQ(api);
+  __cacheVeraQ.set(api, built);
+  return built;
 }

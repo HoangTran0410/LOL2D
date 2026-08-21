@@ -18,7 +18,11 @@ export const VERA_R_RANGE = 500;
 export const VERA_R_COOLDOWN_MS = 60_000;
 export const VERA_R_MANA = 100;
 
-export default function makeVeraR(api: ContentApi) {
+/**
+ * Memoized, like every pack factory must be — see
+ * `packs/riot/spells/_EmptyExample.ts`'s header for why.
+ */
+function __buildVeraR(api: ContentApi) {
   return class Vera_R extends api.Spell {
     name = 'Vòng Tận (Vera_R)';
     image = api.asset('reference_vera_r');
@@ -61,4 +65,12 @@ export default function makeVeraR(api: ContentApi) {
       super.drawPreview(VERA_R_RANGE);
     }
   };
+}
+const __cacheVeraR = new WeakMap<ContentApi, ReturnType<typeof __buildVeraR>>();
+export default function makeVeraR(api: ContentApi) {
+  const cached = __cacheVeraR.get(api);
+  if (cached) return cached;
+  const built = __buildVeraR(api);
+  __cacheVeraR.set(api, built);
+  return built;
 }

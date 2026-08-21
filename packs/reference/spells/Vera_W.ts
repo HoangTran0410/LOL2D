@@ -6,7 +6,14 @@ export const VERA_W_DURATION_MS = 3_000;
 export const VERA_W_COOLDOWN_MS = 12_000;
 export const VERA_W_MANA = 50;
 
-export default function makeVeraW(api: ContentApi) {
+/**
+ * Memoized, like every pack factory must be: a bare `return class ...` here
+ * would hand two independent callers (the real game's `spellRegistry.ts`,
+ * an e2e script or a test building its own comparison value) two different,
+ * `instanceof`-incompatible classes with the same name. See
+ * `packs/riot/spells/_EmptyExample.ts`'s header for the full reasoning.
+ */
+function __buildVeraW(api: ContentApi) {
   return class Vera_W extends api.Spell {
     name = 'Vỏ Sáng (Vera_W)';
     image = api.asset('reference_vera_w');
@@ -27,4 +34,12 @@ export default function makeVeraW(api: ContentApi) {
       this.owner.addBuff(shield);
     }
   };
+}
+const __cacheVeraW = new WeakMap<ContentApi, ReturnType<typeof __buildVeraW>>();
+export default function makeVeraW(api: ContentApi) {
+  const cached = __cacheVeraW.get(api);
+  if (cached) return cached;
+  const built = __buildVeraW(api);
+  __cacheVeraW.set(api, built);
+  return built;
 }

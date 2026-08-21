@@ -21,7 +21,11 @@ export const VERA_E_DASH_DURATION_MS = 1_000;
 export const VERA_E_COOLDOWN_MS = 10_000;
 export const VERA_E_MANA = 40;
 
-export default function makeVeraE(api: ContentApi) {
+/**
+ * Memoized, like every pack factory must be — see
+ * `packs/riot/spells/_EmptyExample.ts`'s header for why.
+ */
+function __buildVeraE(api: ContentApi) {
   return class Vera_E extends api.Spell {
     name = 'Bước Chớp (Vera_E)';
     image = api.asset('reference_vera_e');
@@ -54,4 +58,12 @@ export default function makeVeraE(api: ContentApi) {
       this.owner.addBuff(dash);
     }
   };
+}
+const __cacheVeraE = new WeakMap<ContentApi, ReturnType<typeof __buildVeraE>>();
+export default function makeVeraE(api: ContentApi) {
+  const cached = __cacheVeraE.get(api);
+  if (cached) return cached;
+  const built = __buildVeraE(api);
+  __cacheVeraE.set(api, built);
+  return built;
 }

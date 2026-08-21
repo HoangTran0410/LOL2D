@@ -41,9 +41,10 @@
  *                   imported a spell class directly and constructed it; not
  *                   run over test *directories* (batch 4 task 5's job) or
  *                   test *behaviour*, only the import/construction shape.
- *   _EmptyExample.ts — the hand-written replacement for the spell-authoring
- *                   template (not run through the codemod: it is
- *                   documentation, not real content).
+ *
+ * `packs/riot/spells/_EmptyExample.ts` (the spell-authoring template) is
+ * hand-written, not run through this codemod — it is documentation, not real
+ * content — and lives only at its real path; no copy is kept here.
  *
  * Re-running today would no-op productively (regenerate byte-identical
  * output against the already-migrated tree) — the source directory this
