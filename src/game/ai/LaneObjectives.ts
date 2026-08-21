@@ -138,16 +138,16 @@ function buildLaneGeometry(lanes: readonly string[]): Record<string, LaneGeometr
 }
 
 /**
- * Built on first use, not at module load. Three polylines of a dozen points
- * each, walked by every minion and every turret the blackboard buckets —
- * cheap per call, but not cheap enough to rebuild the cumulative lengths on
- * each one, so the result is memoised.
+ * Built on first use, not at module load. One polyline per active lane,
+ * walked by every minion and every turret the blackboard buckets — cheap per
+ * call, but not cheap enough to rebuild the cumulative lengths on each one,
+ * so the result is memoised.
  *
- * Keyed on `LANES`'s own *identity*, not a boolean latch — for now that is
- * the module's single frozen array, so behaviour is unchanged. Task 9 swaps
- * the key for the active map's lane set; an identity-keyed cache invalidates
- * itself for free the moment that set changes, where a boolean would go
- * stale the first time a test installed a different map.
+ * Keyed on `LANES`'s own *identity*, not a boolean latch: `lanes.ts`'s
+ * `setActiveLanes` reassigns `LANES` to a fresh array rather than mutating it
+ * in place exactly so this invalidates for free the moment a match installs
+ * a different map's lanes (or none at all) — a boolean would go stale the
+ * first time a test installed a different map without also flipping it.
  */
 function laneGeometry(): Record<string, LaneGeometry> {
   if (geometryCache && geometryCacheFor === LANES) return geometryCache;

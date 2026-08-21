@@ -174,8 +174,16 @@ export default class MinionSpawner {
     this.releaseQueued();
   }
 
-  /** Queues one wave per lane from every base. Exposed so tests and the end-to-end
-   *  driver can skip the countdown instead of waiting out a real 30 seconds. */
+  /**
+   * Queues one wave per lane from every base. Exposed so tests and the
+   * end-to-end driver can skip the countdown instead of waiting out a real
+   * 30 seconds.
+   *
+   * `LANES` is `lanes.ts`'s active-match lane set, installed by `Game`'s
+   * constructor from the running map's own `lanes[]`. A map that declares
+   * none leaves it empty, so this loop queues nothing and no minion is ever
+   * spawned — spec §7's laneless map, "no lanes[] means no waves".
+   */
   queueWave() {
     this.waveCount += 1;
     const composition = waveComposition(this.waveCount, this._elapsedMs);

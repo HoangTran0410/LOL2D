@@ -9,11 +9,17 @@ import { BotBrain, PUSH_TURRET_ESCORT_PX } from '../../../src/game/ai/BotBrain';
 import { profileFor, type BotDifficulty } from '../../../src/game/ai/Difficulty';
 import { SpellRole } from '../../../src/game/ai/SpellRole';
 import type Spell from '../../../src/game/gameObject/Spell';
-import type { SeenEnemy, TeamView } from '../../../src/game/ai/TeamBlackboard';
+import { blackboardFor, type SeenEnemy, type TeamView } from '../../../src/game/ai/TeamBlackboard';
 import { laneApproach, type LaneState } from '../../../src/game/ai/LaneObjectives';
-import { getLaneWaypoints, Lane } from '../../../src/game/lanes';
+import {
+  getLaneWaypoints,
+  Lane,
+  resetLanesForTests,
+  setActiveLanes,
+} from '../../../src/game/lanes';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { driveTicks } from './botTrajectory';
 
 const PRESET: ChampionPresetData = {
   name: 'Test',
@@ -166,6 +172,63 @@ describe('the PUSH posture', () => {
     expect(bot.basicAttack.target).toBe(minion);
 
     expect(new BotBrain(bot).evaluatePosture(midView(bot), 0)).toBe('PUSH');
+  });
+});
+
+/**
+ * Task 8, spec §7: a map with no `lanes[]` publishes an empty
+ * `TeamView.lanes` (`TeamBlackboard.buildLanes` loops the active, now-empty
+ * `LANES`), so `view()` below — already the "nothing has given it a lane"
+ * fixture the single-tick test above uses — is exactly what a laneless
+ * match's blackboard hands a bot. `driveTicks` is the multi-tick driver
+ * (`tests/game/ai/botTrajectory.ts`): a one-sample check can only prove PUSH
+ * does not fire on the first decision, not that nothing later in the loop
+ * — a wave arriving, an assignment forming — quietly turns it on. Nothing
+ * in `decidePosture`'s chain changes for this: PUSH's own guard
+ * (`isTargetlessCandidate`-adjacent lane lookup) already requires a lane
+ * assignment, which an empty `laneAssignments` map never grants.
+ */
+describe('a laneless map', () => {
+  beforeEach(() => stubGameGlobals());
+  afterEach(() => {
+    resetLanesForTests();
+    vi.unstubAllGlobals();
+  });
+
+  it('never lets PUSH through, however long the bot sits with nothing to do', () => {
+    const game = createGame();
+    const bot = spawnBot(game);
+    game.setPlayer(bot);
+    indexObjects(game, [bot]);
+
+    const trace = driveTicks(new BotBrain(bot), bot, view(), 12);
+
+    expect(trace.countOf('PUSH')).toBe(0);
+    expect(trace.samples.every(sample => sample.posture !== undefined)).toBe(true);
+    // ROAM is the only posture available with no lane, no enemy and no
+    // memory of one — the fall-through the spec promises, not a stall.
+    expect(trace.postures.every(posture => posture === 'ROAM')).toBe(true);
+  });
+
+  it('falls through PUSH the same way when the board comes from a real blackboard', () => {
+    // The test above hand-builds `view()`, which was already laneless before
+    // this task — it proves the posture chain's own fall-through, not the
+    // wiring that makes a real match laneless. This drives the same bot off
+    // `blackboardFor`, with `lanes.ts`'s active set actually emptied by
+    // `setActiveLanes(undefined)` the way `Game`'s constructor empties it for
+    // a map with no `lanes[]`.
+    setActiveLanes(undefined);
+    const game = createGame();
+    const bot = spawnBot(game);
+    game.setPlayer(bot);
+    indexObjects(game, [bot]);
+
+    const board = blackboardFor(game, 0, () => false).viewFor(BLUE);
+    expect(board.lanes.size).toBe(0);
+
+    const trace = driveTicks(new BotBrain(bot), bot, board, 12);
+    expect(trace.countOf('PUSH')).toBe(0);
+    expect(trace.postures.every(posture => posture === 'ROAM')).toBe(true);
   });
 });
 

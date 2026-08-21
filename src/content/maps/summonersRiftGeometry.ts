@@ -9,7 +9,7 @@
 // always yields the file's raw text, which is parsed explicitly below.
 import mapJsonRaw from '../../../assets/json/summoner_map.json?raw';
 import { NEUTRAL_SLOTS } from '@/game/mapPresets';
-import { LANE_WAYPOINTS, Lane } from '@/game/lanes';
+import { DEFAULT_LANE_WAYPOINTS, Lane } from '@/game/lanes';
 import type {
   LaneDefinition,
   MapGeometry,
@@ -25,8 +25,12 @@ import type {
  * others: `assets/json/summoner_map.json` (terrain and the two turret rows),
  * `mapPresets.ts`'s `NEUTRAL_SLOTS` (jungle camp *positions* — see that
  * module's header for why the identities that fill them live in
- * `bundledPack.ts` instead) and `lanes.ts` (waypoints). The two spawn
- * platforms are a small literal right here (see `spawnSlots` below) — they
+ * `bundledPack.ts` instead) and `lanes.ts`'s `DEFAULT_LANE_WAYPOINTS` — this
+ * map's own waypoint data, imported here rather than the other way round, so
+ * that once a match installs it (`Game`'s constructor,
+ * `setActiveLanes(map.lanes)`) `lanes.ts` is reading the map's lanes rather
+ * than the map reading back whatever `lanes.ts` currently has active. The two
+ * spawn platforms are a small literal right here (see `spawnSlots` below) — they
  * used to live in `preset.ts`'s `FountainPreset`, which Task 5 deleted once
  * nothing but this module still read it.
  *
@@ -110,7 +114,7 @@ const laneDefinitions = (): LaneDefinition[] =>
     id,
     from: 'blue',
     to: 'red',
-    waypoints: LANE_WAYPOINTS[id],
+    waypoints: DEFAULT_LANE_WAYPOINTS[id],
   }));
 
 /**

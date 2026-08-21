@@ -1,4 +1,5 @@
 import TeamId from './enums/TeamId';
+import type { LaneDefinition } from '@/content/ContentPack';
 
 export const Lane = {
   TOP: 'top',
@@ -7,17 +8,15 @@ export const Lane = {
 };
 Object.freeze(Lane);
 
-/** Iteration order for wave spawning — one wave per lane, per base. */
-export const LANES: string[] = [Lane.TOP, Lane.MID, Lane.BOT];
-
 export interface LaneWaypoint {
   x: number;
   y: number;
 }
 
 /**
- * Lane paths, ordered blue base -> red base. Red minions walk the same list
- * backwards (see `getLaneWaypoints`), so a lane is one piece of data, not two.
+ * Summoner's Rift's own lane paths, ordered blue base -> red base. Red
+ * minions walk the same list backwards (see `getLaneWaypoints`), so a lane is
+ * one piece of data, not two.
  *
  * summoner_map.json ships no lane geometry — only the two turret rows. These
  * paths follow those rows, split by which edge of the map they hug, with the
@@ -68,8 +67,14 @@ export interface LaneWaypoint {
  * `tests/game/minions/Lanes.test.ts` asserts all three, per segment. Anything
  * edited here has to be re-checked against it — the floors are comfortable but
  * the corridors they run down are 300-500px wide, and there is no room to lose.
+ *
+ * This is a **default**, not a hard-coded fact about every match — see
+ * `LANES`/`LANE_WAYPOINTS`/`setActiveLanes` below. `summonersRiftGeometry.ts`
+ * imports this constant directly (never the live `LANE_WAYPOINTS` binding) to
+ * assemble Summoner's Rift's own `MapDefinition.lanes`, which is what
+ * `setActiveLanes` is handed back once that map is the one actually running.
  */
-export const LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
+export const DEFAULT_LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
   // up the left edge, then right along the top
   [Lane.TOP]: [
     { x: 400, y: 6075 }, // blue fountain
@@ -112,13 +117,87 @@ export const LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = {
   ],
 };
 
+/** Summoner's Rift's own lane order — TOP, then MID, then BOT. */
+const DEFAULT_LANES: readonly string[] = [Lane.TOP, Lane.MID, Lane.BOT];
+
+/**
+ * The active match's lane set — every id `getLaneWaypoints`, `nearestLane`,
+ * `laneApproach`, `assignLanes` and `TeamBlackboard`'s per-lane bucketing walk,
+ * in the map's own order. `Game`'s constructor installs the running match's
+ * own list (`setActiveLanes(map.lanes)`); nothing that never starts a `Game` —
+ * which is most of this codebase's tests — sees anything but Summoner's
+ * Rift's shipped three, because that is what this starts out holding.
+ *
+ * A `let`, not a `const`. `setActiveLanes` **reassigns** this to a fresh
+ * array rather than mutating it in place, because `LaneObjectives.ts`'s
+ * `laneGeometry()` cache keys off this binding's own *identity* — a new array
+ * invalidates it for free the moment the active map changes, where an
+ * in-place splice would leave every cache in this file and in
+ * `LaneObjectives.ts` serving a stale set forever. `TeamBlackboard.ts` and
+ * `MinionSpawner.ts` both import this by name and loop it directly; neither
+ * needed a code change for the lane set to become the map's; both already
+ * read whatever this binding currently holds.
+ */
+export let LANES: string[] = [...DEFAULT_LANES];
+
+/**
+ * The active match's own waypoints, keyed by lane id — reassigned alongside
+ * `LANES` by `setActiveLanes`, for the identity-cache reason documented
+ * there: this file's own `redLaneWaypoints()` cache keys off it too.
+ */
+export let LANE_WAYPOINTS: Record<string, LaneWaypoint[]> = DEFAULT_LANE_WAYPOINTS;
+
+/**
+ * Installs the running match's own lane set. Called once, from `Game`'s
+ * constructor, with `map.lanes` — the active `MapDefinition`'s own declared
+ * lanes, already resolved to an `ActiveMap`.
+ *
+ * `undefined` (or an empty array) is Spec §7's laneless map: `LANES` and
+ * `LANE_WAYPOINTS` both go empty, so `MinionSpawner.queueWave()`'s `for
+ * (const lane of LANES)` queues nothing and every reader in
+ * `LaneObjectives.ts` that loops `LANES` (`nearestLane`, `assignLanes`,
+ * `laneGeometry`) — and `TeamBlackboard`'s per-lane bucketing, which loops the
+ * same binding — sees no lanes at all. None of those files needed a code
+ * change to make that true: they already read `LANES`/`LANE_WAYPOINTS` live,
+ * not a value captured at import time.
+ */
+export function setActiveLanes(lanes: readonly LaneDefinition[] | undefined): void {
+  if (!lanes || lanes.length === 0) {
+    LANES = [];
+    LANE_WAYPOINTS = {};
+    return;
+  }
+  const ids: string[] = [];
+  const waypoints: Record<string, LaneWaypoint[]> = {};
+  for (const lane of lanes) {
+    ids.push(lane.id);
+    waypoints[lane.id] = lane.waypoints;
+  }
+  LANES = ids;
+  LANE_WAYPOINTS = waypoints;
+}
+
+/**
+ * Test-only. Restores this module's out-of-the-box default (Summoner's
+ * Rift's shipped three lanes).
+ *
+ * Vitest isolates module state per *test file*, not per `it()` — a test that
+ * calls `setActiveLanes` and shares a file with others that assume the
+ * default must call this in its own teardown, or the next test silently
+ * starts on whatever the last one left behind.
+ */
+export function resetLanesForTests(): void {
+  LANES = [...DEFAULT_LANES];
+  LANE_WAYPOINTS = DEFAULT_LANE_WAYPOINTS;
+}
+
 // Reversed on first use rather than at module load, and memoised rather than
 // rebuilt per call: a spawner asks for a path every few seconds and hands the
 // same array to every minion in the wave. Memoised on `LANE_WAYPOINTS`'s own
-// *identity*, not a boolean latch — for now that identity never changes (one
-// module-scope literal), so behaviour is unchanged, but a future caller that
-// swaps in a different waypoint set invalidates the cache for free instead of
-// serving a stale reversal forever.
+// *identity*, not a boolean latch: `setActiveLanes` reassigns rather than
+// mutates it, so installing a different map's lanes (or resetting to the
+// default) invalidates this cache for free instead of serving a stale
+// reversal forever.
 let redLaneWaypointsCache: Record<string, LaneWaypoint[]> | null = null;
 let redLaneWaypointsCacheFor: Record<string, LaneWaypoint[]> | null = null;
 
@@ -126,11 +205,13 @@ function redLaneWaypoints(): Record<string, LaneWaypoint[]> {
   if (redLaneWaypointsCache && redLaneWaypointsCacheFor === LANE_WAYPOINTS) {
     return redLaneWaypointsCache;
   }
-  redLaneWaypointsCache = {
-    [Lane.TOP]: [...LANE_WAYPOINTS[Lane.TOP]].reverse(),
-    [Lane.MID]: [...LANE_WAYPOINTS[Lane.MID]].reverse(),
-    [Lane.BOT]: [...LANE_WAYPOINTS[Lane.BOT]].reverse(),
-  };
+  // Every id `LANE_WAYPOINTS` currently carries, not a fixed TOP/MID/BOT
+  // triple — the active map may declare a different set (Task 8).
+  const reversed: Record<string, LaneWaypoint[]> = {};
+  for (const id of Object.keys(LANE_WAYPOINTS)) {
+    reversed[id] = [...LANE_WAYPOINTS[id]].reverse();
+  }
+  redLaneWaypointsCache = reversed;
   redLaneWaypointsCacheFor = LANE_WAYPOINTS;
   return redLaneWaypointsCache;
 }
@@ -139,10 +220,15 @@ function redLaneWaypoints(): Record<string, LaneWaypoint[]> {
  * The lane a minion of `teamId` should walk, from its own base outwards. The
  * returned array is shared — a minion tracks its progress with an index and
  * must never mutate it.
+ *
+ * Falls back to MID for a lane the active set does not know — `[]` if even
+ * that is missing, which only happens on a laneless map, where nothing calls
+ * this in practice (`MinionSpawner.queueWave()` loops `LANES`, which is empty
+ * there too) but a defensive caller must not be handed `undefined`.
  */
 export const getLaneWaypoints = (lane: string, teamId: string): LaneWaypoint[] => {
   const paths = teamId === TeamId.RED ? redLaneWaypoints() : LANE_WAYPOINTS;
-  return paths[lane] ?? paths[Lane.MID];
+  return paths[lane] ?? paths[Lane.MID] ?? [];
 };
 
 /**

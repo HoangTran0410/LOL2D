@@ -9,7 +9,12 @@ import Minion, { MinionPresets } from '../../../src/game/gameObject/attackableUn
 import Turret from '../../../src/game/gameObject/structures/Turret';
 import { blackboardFor, BLACKBOARD_TTL_MS } from '../../../src/game/ai/TeamBlackboard';
 import { LANE_SWITCH_MARGIN } from '../../../src/game/ai/LaneObjectives';
-import { getLaneWaypoints, Lane } from '../../../src/game/lanes';
+import {
+  getLaneWaypoints,
+  Lane,
+  resetLanesForTests,
+  setActiveLanes,
+} from '../../../src/game/lanes';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 
@@ -324,6 +329,57 @@ describe('the turrets a team has to keep away from', () => {
 
     expect(rubble.isDead).toBe(true);
     expect(blackboardFor(game, 0, blind).viewFor(BLUE).enemyTurrets).toEqual([]);
+  });
+});
+
+/**
+ * Task 8: `LANES` is the active match's own lane set now (`lanes.ts`'s
+ * `setActiveLanes`, installed by `Game`'s constructor from `map.lanes`), and
+ * `TeamBlackboard.buildLanes` needed no code change to respect it — it
+ * already looped the live `LANES` binding rather than a value captured at
+ * import time. These tests are what proves that, end to end through a real
+ * blackboard rebuild; `'the AI layer walks the whole object list exactly
+ * once'` below (unmodified by this task) is what proves it did not cost a
+ * second walk to get there.
+ */
+describe('a laneless map', () => {
+  afterEach(() => {
+    resetLanesForTests();
+    vi.unstubAllGlobals();
+  });
+
+  it('publishes no lane states and assigns no bot a lane', () => {
+    setActiveLanes(undefined);
+    stubGameGlobals();
+    const game = createGame();
+    const bot = spawnBot(game, BLUE, 400, 6_075);
+    const minion = spawnMinion(game, RED, Lane.MID, 2_623, 3_687);
+    const turret = spawnTurret(game, RED, 3_885, 2_723);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, minion, turret]);
+
+    const view = blackboardFor(game, 0, blind).viewFor(BLUE);
+    expect(view.lanes.size).toBe(0);
+    expect(view.laneAssignments.size).toBe(0);
+    // Nothing bucketed by lane still reaches the parts of the view that do
+    // not depend on one — a turret is still a turret to keep away from.
+    expect(view.enemyTurrets).toEqual([turret]);
+  });
+
+  it('buckets by whatever lane ids a different map declares, not by top/mid/bot', () => {
+    setActiveLanes([
+      { id: 'alpha', from: 'blue', to: 'red', waypoints: getLaneWaypoints(Lane.MID, BLUE) },
+    ]);
+    stubGameGlobals();
+    const game = createGame();
+    const bot = spawnBot(game, BLUE, 400, 6_075);
+    const minion = spawnMinion(game, BLUE, 'alpha', 1_697, 4_767);
+    game.setPlayer(bot);
+    indexObjects(game, [bot, minion]);
+
+    const view = blackboardFor(game, 0, blind).viewFor(BLUE);
+    expect([...view.lanes.keys()]).toEqual(['alpha']);
+    expect(view.lanes.get('alpha')?.alliedMinions).toBe(1);
   });
 });
 

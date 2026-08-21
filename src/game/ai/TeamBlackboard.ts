@@ -60,7 +60,13 @@ export interface TeamView {
   focusTarget: Champion | null;
   rally: Vec2 | null;
   memory: ReadonlyMap<Champion, SeenEnemy>;
-  /** One entry per lane in `LANES`, scored from this team's side of the map. */
+  /**
+   * One entry per lane in `LANES`, scored from this team's side of the map.
+   * `LANES` is the active match's own lane set (`lanes.ts`'s
+   * `setActiveLanes`, installed by `Game`'s constructor from `map.lanes`) —
+   * empty on a map that declares none, which is what leaves `BotBrain`'s
+   * PUSH posture with no objective to fall through from.
+   */
   lanes: ReadonlyMap<string, LaneState>;
   /** Which lane each of this team's bots is working. Humans are not in it. */
   laneAssignments: ReadonlyMap<Champion, string>;
@@ -134,6 +140,11 @@ export class TeamBlackboard {
     const living: Champion[] = [];
     /** Every standing turret, whatever lane it does or does not belong to. */
     const turrets: Turret[] = [];
+    // Seeded from `LANES` — the active match's own lane set, empty on a map
+    // with none — so this loop's cost tracks how many lanes the map actually
+    // declares, not a fixed three. Bucketing by id inside the walk below,
+    // rather than filtering `objects` once per lane afterwards, is what keeps
+    // the object-list read singular whatever `LANES` turns out to hold.
     const laneMinions = new Map<string, LaneUnit<Minion>[]>();
     const laneTurrets = new Map<string, LaneUnit<Turret>[]>();
     for (const lane of LANES) {

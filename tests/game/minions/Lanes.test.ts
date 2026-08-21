@@ -1,10 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import TeamId from '../../../src/game/enums/TeamId';
 import {
   LANES,
   LANE_WAYPOINTS,
+  DEFAULT_LANE_WAYPOINTS,
   Lane,
   getLaneWaypoints,
+  nextWaypointIndexFrom,
+  resetLanesForTests,
+  setActiveLanes,
   type LaneWaypoint,
 } from '../../../src/game/lanes';
 import mapData from '../../../assets/json/summoner_map.json';
@@ -12,6 +16,8 @@ import {
   minionMusterPoint,
   summonersRiftGeometry,
 } from '../../../src/content/maps/summonersRiftGeometry';
+import MinionSpawner from '../../../src/game/managers/MinionSpawner';
+import { createSpawnerContext } from './helpers';
 
 type Point = [number, number];
 const walls = mapData.wall as Point[][];
@@ -234,7 +240,7 @@ const segmentTurretClearance = (
 };
 
 /**
- * The split claimed in the comment on LANE_WAYPOINTS, written out so both
+ * The split claimed in the comment on DEFAULT_LANE_WAYPOINTS, written out so both
  * tests below check the same claim against the raw map data rather than
  * restating it twice.
  */
@@ -288,7 +294,7 @@ const laneTurrets = (lane: string): Point[] => [
 const owningLane = (point: Point): { lane: string; distance: number; runnerUp: number } => {
   const ranked = LANES.map(lane => ({
     lane,
-    distance: nearestOnPath(LANE_WAYPOINTS[lane], point).distance,
+    distance: nearestOnPath(DEFAULT_LANE_WAYPOINTS[lane], point).distance,
   })).sort((a, b) => a.distance - b.distance);
   return { lane: ranked[0].lane, distance: ranked[0].distance, runnerUp: ranked[1].distance };
 };
@@ -316,7 +322,7 @@ const turretClearance = (x: number, y: number): number =>
 describe('lane waypoints', () => {
   it('walks every lane end to end without clipping a wall', () => {
     for (const lane of LANES) {
-      const path = LANE_WAYPOINTS[lane];
+      const path = DEFAULT_LANE_WAYPOINTS[lane];
       for (let i = 0; i + 1 < path.length; i++) {
         const { clearance, at } = segmentClearance(path[i], path[i + 1]);
         expect(
@@ -330,7 +336,7 @@ describe('lane waypoints', () => {
 
   it('runs blue fountain to red fountain in every lane', () => {
     for (const lane of LANES) {
-      const path = LANE_WAYPOINTS[lane];
+      const path = DEFAULT_LANE_WAYPOINTS[lane];
       expect(path[0]).toEqual(BLUE_FOUNTAIN);
       expect(path[path.length - 1]).toEqual(RED_FOUNTAIN);
       expect(path.length).toBeGreaterThan(3);
@@ -348,7 +354,7 @@ describe('lane waypoints', () => {
    */
   it('keeps every waypoint outside a turret, so a minion can stand on it', () => {
     for (const lane of LANES) {
-      LANE_WAYPOINTS[lane].forEach((waypoint, i) => {
+      DEFAULT_LANE_WAYPOINTS[lane].forEach((waypoint, i) => {
         const clearance = turretClearance(waypoint.x, waypoint.y);
         expect(
           clearance,
@@ -368,7 +374,7 @@ describe('lane waypoints', () => {
    */
   it('keeps the whole walk out of the turrets, not just the waypoints', () => {
     for (const lane of LANES) {
-      const path = LANE_WAYPOINTS[lane];
+      const path = DEFAULT_LANE_WAYPOINTS[lane];
       for (let i = 0; i + 1 < path.length; i++) {
         const { clearance, at } = segmentTurretClearance(path[i], path[i + 1]);
         expect(
@@ -383,7 +389,7 @@ describe('lane waypoints', () => {
 
   it('walks past its own turret row, in order, so a lane is defended along its length', () => {
     for (const lane of LANES) {
-      const path = LANE_WAYPOINTS[lane];
+      const path = DEFAULT_LANE_WAYPOINTS[lane];
       const alongAt = (p: Point) => nearestOnPath(path, p).along;
 
       for (const point of laneTurrets(lane)) {
@@ -448,7 +454,7 @@ describe('lane waypoints', () => {
       const blue = getLaneWaypoints(lane, TeamId.BLUE);
       const red = getLaneWaypoints(lane, TeamId.RED);
 
-      expect(blue).toBe(LANE_WAYPOINTS[lane]);
+      expect(blue).toBe(DEFAULT_LANE_WAYPOINTS[lane]);
       expect(blue[0]).toEqual(BLUE_FOUNTAIN);
       expect(red[0]).toEqual(RED_FOUNTAIN);
       expect(red).toEqual([...blue].reverse());
@@ -456,11 +462,11 @@ describe('lane waypoints', () => {
       expect(getLaneWaypoints(lane, TeamId.RED)).toBe(red);
     }
 
-    expect(LANE_WAYPOINTS[Lane.TOP][0]).toEqual(BLUE_FOUNTAIN);
+    expect(DEFAULT_LANE_WAYPOINTS[Lane.TOP][0]).toEqual(BLUE_FOUNTAIN);
   });
 
   it('falls back to mid for a lane it does not know', () => {
-    expect(getLaneWaypoints('jungle', TeamId.BLUE)).toBe(LANE_WAYPOINTS[Lane.MID]);
+    expect(getLaneWaypoints('jungle', TeamId.BLUE)).toBe(DEFAULT_LANE_WAYPOINTS[Lane.MID]);
   });
 });
 
@@ -567,5 +573,81 @@ describe('the muster point a wave forms up on', () => {
     const point = minionMusterPoint('blue', BLUE_FOUNTAIN, []);
     expect(point).not.toBeNull();
     expect(point).toEqual(BLUE_FOUNTAIN);
+  });
+});
+
+/**
+ * Task 8: `LANES`/`LANE_WAYPOINTS` stop being a fixed module literal and start
+ * answering about whichever map is running — `Game`'s constructor installs
+ * it (`setActiveLanes(map.lanes)`), and everything above in this file, plus
+ * `LaneObjectives.ts` and `TeamBlackboard.ts`, reads the live binding rather
+ * than a value captured at import time.
+ */
+describe('the active lane set, once a match installs one', () => {
+  afterEach(resetLanesForTests);
+
+  it("serves Summoner Rift's own three, unset", () => {
+    expect(LANES).toEqual([Lane.TOP, Lane.MID, Lane.BOT]);
+    expect(LANE_WAYPOINTS).toBe(DEFAULT_LANE_WAYPOINTS);
+  });
+
+  it('walks the lanes the map declares, whatever they are called', () => {
+    // Two lanes, neither named 'top'/'mid'/'bot' — the old ids must not leak
+    // back in anywhere, and the geometry is SR's own TOP/MID so the numbers
+    // are still ones this file already validated above.
+    setActiveLanes([
+      { id: 'alpha', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.TOP] },
+      { id: 'beta', from: 'blue', to: 'red', waypoints: DEFAULT_LANE_WAYPOINTS[Lane.MID] },
+    ]);
+
+    expect(LANES).toEqual(['alpha', 'beta']);
+    expect(getLaneWaypoints('alpha', TeamId.BLUE)).toBe(DEFAULT_LANE_WAYPOINTS[Lane.TOP]);
+    expect(getLaneWaypoints('beta', TeamId.RED)).toEqual(
+      [...DEFAULT_LANE_WAYPOINTS[Lane.MID]].reverse()
+    );
+    // The retired ids answer as "no such lane" (empty), not as a silent
+    // fallback to whatever they used to mean.
+    expect(getLaneWaypoints('top', TeamId.BLUE)).toEqual([]);
+    expect(nextWaypointIndexFrom('bot', TeamId.BLUE, 3_000, 3_000)).toBe(0);
+  });
+
+  it('plays a map with no lanes at all', () => {
+    setActiveLanes(undefined);
+    expect(LANES).toEqual([]);
+    expect(LANE_WAYPOINTS).toEqual({});
+    expect(getLaneWaypoints('mid', TeamId.BLUE)).toEqual([]);
+    expect(nextWaypointIndexFrom('mid', TeamId.BLUE, 0, 0)).toBe(0);
+  });
+
+  it('restores the default once a test resets it, even after an empty map', () => {
+    setActiveLanes(undefined);
+    resetLanesForTests();
+    expect(LANES).toEqual([Lane.TOP, Lane.MID, Lane.BOT]);
+    expect(getLaneWaypoints(Lane.MID, TeamId.BLUE)).toBe(DEFAULT_LANE_WAYPOINTS[Lane.MID]);
+  });
+});
+
+describe('a map with no lanes, end to end through the spawner', () => {
+  afterEach(() => {
+    resetLanesForTests();
+    vi.unstubAllGlobals();
+  });
+
+  it('never queues, never spawns, however long the clock runs', () => {
+    setActiveLanes(undefined);
+    const game = createSpawnerContext();
+    const spawner = new MinionSpawner(game);
+
+    spawner.queueWave();
+    expect(spawner._queue).toHaveLength(0);
+
+    // Several wave intervals' worth of frames — not one tick, which could
+    // only ever prove the queue starts empty, not that it stays that way.
+    for (let elapsed = 0; elapsed < 5 * 30_000; elapsed += 16) {
+      spawner.update();
+    }
+
+    expect(spawner.liveCount).toBe(0);
+    expect(game.objectManager._objectToBeAdd).toHaveLength(0);
   });
 });

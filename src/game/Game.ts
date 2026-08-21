@@ -1,5 +1,6 @@
 import type { ActiveMap, NeutralSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import { HotKeys, SpellHotKeys } from './constants';
+import { setActiveLanes } from './lanes';
 import AttackableUnit from './gameObject/attackableUnits/AttackableUnit';
 import Champion from './gameObject/attackableUnits/Champion';
 import AIChampion from './gameObject/attackableUnits/AIChampion';
@@ -131,6 +132,13 @@ export default class Game {
    * mid-match without needing to hold the map itself.
    */
   readonly neutralSlots: NeutralSlot[];
+  /*
+   * There is no `readonly lanes: LaneDefinition[]` field beside the two
+   * above: `getLaneWaypoints`, `LANES` and the rest of `lanes.ts` have to
+   * stay callable without a `Game` in hand (see that module's own doc
+   * comment), so the constructor installs `map.lanes` into its live state
+   * (`setActiveLanes`) instead of holding it here.
+   */
   readonly fps = 60;
   renderFps: RenderFps = renderFpsPreference();
   renderQuality: RenderQuality = renderQualityPreference();
@@ -243,6 +251,13 @@ export default class Game {
     this.mapSize = map.size;
     this.minionMuster = minionMusterSlotsFrom(map.slots.minion);
     this.neutralSlots = map.slots.neutral;
+    // Before anything queues a wave or builds a blackboard: `MinionSpawner`,
+    // `TeamBlackboard` and `LaneObjectives.ts` all read `lanes.ts`'s live
+    // `LANES`/`LANE_WAYPOINTS` rather than a value handed to them, so this is
+    // what makes those the *this* match's lanes. `undefined` is a map with no
+    // `lanes[]` at all — spec §7's laneless case — which empties both and
+    // leaves PUSH nothing to fall through from ROAM/FIGHT for.
+    setActiveLanes(map.lanes);
     // Read once, before anything that might construct a Champion or a Spell:
     // `matchRules` has to be in place the moment the player's own kit is
     // built a few lines down. Validated/defaulted by `loadPregameConfig`
