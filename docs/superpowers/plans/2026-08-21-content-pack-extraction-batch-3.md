@@ -804,3 +804,15 @@ Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 - `src/content/bundledPack.ts` is the adapter batch 4 **deletes**, replacing it with a real `packs/riot/pack.ts`.
 - The 15 seams listed in spec §8.1 have to be repointed, and `@lol2d/core/seams` published so a pack repo can run them against its own tree.
 - `Monster.ts:154` still calls `AssetManager.get(preset.avatar)` typed against core's generated `AssetKey` — the one avatar path batch 2's `packAsset` sweep missed, and it bites the moment a pack supplies monster art.
+
+### The chunk-hash cascade, and why batch 4 is where it dies
+
+Measured on `main`: a built `spell-yasuo-*.js` carries `from "./game-<hash>.js"` — a **static import of the game chunk by its hashed filename**. So any change under `src/game/` re-hashes `game`, which changes the bytes of all 59 spell chunks, which re-hashes every one of them. A user's browser then re-downloads dozens of files it already had, and `workbox-precaching` installs changed entries **strictly sequentially** (upstream `GoogleChrome/workbox#2528`), which is why the update prompt takes 19 seconds to become actionable on a normal deploy. `docs/COMBAT_TEXT_PERF.md`'s sibling report on branch `perf-pwa-update` has the measurements.
+
+A migrated pack spell has no such import. `packs/reference/spells/Vera_Q.ts` imports exactly one thing — `import type { ContentApi }` — which is erased at compile time; the api arrives as the factory's argument. A pack spell module therefore has **no runtime dependency on core at all**, and its chunk's bytes do not move when core does.
+
+So the cascade should die as a consequence of batch 4 doing its job. **Do not assume it did.** Batch 4 owes a guard that measures the thing the player actually pays:
+
+> Build. Change one thing under `src/game/`. Build again. Assert the emitted `spell-*.js` **filenames are unchanged**.
+
+If they move, the migration left a static edge from a pack into core, and that is a defect in the migration rather than a chunking nicety. Do not fix the cascade on `main` beforehand — it would be a fix written for a module graph batch 4 replaces.
