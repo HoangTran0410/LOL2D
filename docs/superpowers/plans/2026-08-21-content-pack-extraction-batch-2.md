@@ -473,6 +473,7 @@ Two smaller gaps close here as well. `ChampionEntry` has no basic-attack profile
 
 **Files:**
 - Modify: `src/content/ContentPack.ts`
+- Modify: `src/content/ContentApi.ts`
 - Modify: `src/content/validate.ts`
 - Modify: `src/content/PackRegistry.ts`
 - Modify: `src/content/types.ts`
@@ -627,17 +628,23 @@ A `Map<string, SpellDisplayData>` filled in `install()` under `qualify(packId, l
 
 `QualifiedChampion` gains `playable` and `attack` by inheriting them through the existing `Omit<ChampionEntry, 'id' | 'spells'>`.
 
-- [ ] **Step 6: Add the new names to the type barrel**
+- [ ] **Step 6: Put `lazy()` where a pack can actually reach it**
+
+Task 2 added a `lazy()` wrapper to `src/content/ContentPack.ts` so a `function` expression can be declared as a loader rather than misread as a class. It is a **value**, and `tests/content/packBoundary.test.ts` bans a pack from importing a value out of `@/content/ContentPack` — so as shipped, no pack can call it. Idiomatic arrow thunks do not need it, which is exactly why this would have stayed invisible until someone wrote `function () { return import('./X'); }` and watched their spell get installed as a class.
+
+Values travel through `ContentApi`. Add `lazy` to the `ContentApi` interface and to the frozen object `buildContentApi()` returns, at the top level beside `isChargeActivation` and `requireChargeSpec`. Add a case to `tests/content/contentApi.test.ts` asserting `api.lazy` is a function and that a source it wraps is recognised by the registry as a loader, not a class.
+
+- [ ] **Step 7: Add the new names to the type barrel**
 
 `SpellDisplayData` and `ChampionAttack` join the `export type { ... } from './ContentPack'` list in `src/content/types.ts`. Re-run `tests/content/contentTypes.test.ts`.
 
-- [ ] **Step 7: Give Vera display data**
+- [ ] **Step 8: Give Vera display data**
 
 `packs/reference/pack.ts` gains a `spellDisplay` section for `Vera_Q/W/E/R` and `playable: true` plus an `attack` profile on the champion entry. The four descriptions are Vietnamese HTML in the same idiom as the generated file (`<span class="damage">`, `.buff`, `.time`), and the numbers must be **read from the spell files** — `Vera_Q.ts` and its siblings export their tuning constants, and a description that disagrees with the spell is worse than no description.
 
 `image` is `null` today, so Vera is not `playable` yet — she cannot be, without a portrait. Set `playable: false` here and leave a comment saying the portrait lands in Task 10, where the e2e proof needs it. Do **not** invent art in this task.
 
-- [ ] **Step 8: Run the content suite and verify**
+- [ ] **Step 9: Run the content suite and verify**
 
 Run: `npx vitest run tests/content/`
 Expected: PASS.
@@ -645,10 +652,10 @@ Expected: PASS.
 Run: `npm run verify 2>&1 | grep -E "Tests |Test Files |error|FAIL"`
 Expected: 0 failures.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add src/content/ContentPack.ts src/content/validate.ts src/content/PackRegistry.ts src/content/types.ts packs/reference/pack.ts tests/content/validate.test.ts tests/content/packRegistry.test.ts
+git add src/content/ContentPack.ts src/content/ContentApi.ts src/content/validate.ts src/content/PackRegistry.ts src/content/types.ts packs/reference/pack.ts tests/content/validate.test.ts tests/content/packRegistry.test.ts
 git commit -m "feat(content): a pack carries its own display data, attack profile and playability
 
 Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
