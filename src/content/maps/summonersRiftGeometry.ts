@@ -13,6 +13,7 @@ import { LANE_WAYPOINTS, Lane } from '@/game/lanes';
 import type {
   LaneDefinition,
   MapGeometry,
+  MinionSlot,
   NeutralSlot,
   SpawnSlot,
   StructureSlot,
@@ -129,6 +130,71 @@ const laneDefinitions = (): LaneDefinition[] =>
     waypoints: LANE_WAYPOINTS[id],
   }));
 
+/**
+ * How far a released minion may be scattered around its muster point.
+ *
+ * Small: the whole reason a wave is not stacked on one coordinate is that
+ * `UnitCollisionSystem` would then spend the first second of every wave
+ * shoving six bodies apart. Sized under the gap between this map's own two
+ * base turrets, so the scatter cannot put a body inside one — a fact about
+ * Summoner's Rift's own geometry, which is why it lives here rather than as
+ * a constant `MinionSpawner` (or any other map) would have to share.
+ */
+const MUSTER_SCATTER_PX = 55;
+
+/**
+ * Where a faction's wave forms up: the midpoint of the two turrets standing
+ * nearest its own fountain — the pair that guards the base.
+ *
+ * Used to be recomputed at spawn time, per wave, from the live `Turret`
+ * objects (`MinionSpawner.musterPointFor`, deleted in Task 6) — and it
+ * returned `null` for a team with fewer than two turrets, silently dropping
+ * every wave into the fountain until someone noticed. This is that same
+ * geometry, computed once here from the map's own structure slots and baked
+ * into `slots.minion`, so a lane with no muster point is a validation error
+ * at install (`validate.ts`) rather than a `null` discovered mid-match.
+ *
+ * Exported so `Lanes.test.ts` can exercise the "fewer than two turrets" case
+ * directly, without constructing a `Game` — a synthetic, truncated turret
+ * list in, a definite point out. Never returns null: two turrets gives a
+ * midpoint, one gives that turret's own position, and zero gives the
+ * fountain itself — always somewhere a minion can be told to stand.
+ */
+export const minionMusterPoint = (
+  faction: string,
+  fountain: { x: number; y: number },
+  structures: readonly Pick<StructureSlot, 'faction' | 'x' | 'y'>[]
+): { x: number; y: number } => {
+  const own = structures
+    .filter(s => s.faction === faction)
+    .map(s => ({ x: s.x, y: s.y, away: Math.hypot(s.x - fountain.x, s.y - fountain.y) }))
+    .sort((a, b) => a.away - b.away);
+
+  if (own.length >= 2) return { x: (own[0].x + own[1].x) / 2, y: (own[0].y + own[1].y) / 2 };
+  if (own.length === 1) return { x: own[0].x, y: own[0].y };
+  return { x: fountain.x, y: fountain.y };
+};
+
+/**
+ * One muster point per (faction, lane) — every lane a wave from that base
+ * queues for musters in the same place today, since nothing yet varies the
+ * point by lane (a lane-specific muster is future work, not this map
+ * declaring one). `MinionSpawner.musterPoint(teamId, lane)` is the reader.
+ */
+const minionSlots = (structures: StructureSlot[], spawns: SpawnSlot[]): MinionSlot[] => {
+  const slots: MinionSlot[] = [];
+  for (const spawn of spawns) {
+    const { x, y } = minionMusterPoint(spawn.faction, spawn, structures);
+    for (const lane of [Lane.TOP, Lane.MID, Lane.BOT]) {
+      slots.push({ faction: spawn.faction, lane, x, y, scatter: MUSTER_SCATTER_PX });
+    }
+  }
+  return slots;
+};
+
+const structures = structureSlots();
+const spawns = spawnSlots();
+
 export const summonersRiftGeometry: MapGeometry = {
   terrain: {
     wall: toPolygons(mapJson.wall),
@@ -136,9 +202,9 @@ export const summonersRiftGeometry: MapGeometry = {
     water: toPolygons(mapJson.water),
   },
   slots: {
-    spawn: spawnSlots(),
-    minion: [],
-    structure: structureSlots(),
+    spawn: spawns,
+    minion: minionSlots(structures, spawns),
+    structure: structures,
     neutral: neutralSlots(),
   },
   lanes: laneDefinitions(),

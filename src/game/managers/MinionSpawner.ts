@@ -2,6 +2,7 @@ import TeamId from '@/game/enums/TeamId';
 import Minion, { MinionPresets, type MinionKind } from '@/game/gameObject/attackableUnits/Minion';
 import type { GameObjectRuntimeContext } from '@/game/gameObject/GameObject';
 import type Fountain from '@/game/gameObject/structures/Fountain';
+import type { MinionMusterPoint } from '@/game/preset';
 import { LANES, getLaneWaypoints, nextWaypointIndexFrom } from '@/game/lanes';
 
 /** ms between waves, per base. */
@@ -19,15 +20,6 @@ const LATEGAME_WAVES_AT_MS = 30 * 60_000;
 export const FIRST_WAVE_DELAY_MS = 1_000;
 /** ms between the minions of one wave leaving the base, so they walk in a line. */
 export const MINION_RELEASE_INTERVAL_MS = 650;
-/**
- * How far a minion may be scattered around the muster point.
- *
- * Small: the whole reason a wave is not stacked on one coordinate is that
- * `UnitCollisionSystem` would then spend the first second of every wave shoving
- * six bodies apart. Sized under the gap between the two base turrets, so the
- * scatter cannot put a body inside one.
- */
-export const MUSTER_SCATTER_PX = 55;
 
 /**
  * Hard ceiling on live minions across both teams.
@@ -87,12 +79,14 @@ export const waveComposition = (waveNumber: number, elapsedMs = 0): readonly Min
 export interface MinionSpawnerContext extends GameObjectRuntimeContext {
   fountains: Fountain[];
   /**
-   * Both teams' buildings. Only `teamId` and `position` are read, and a
-   * destroyed one still counts — a turret rebuilds where it stood, so the
-   * muster point must not move when one falls. Optional because a headless
-   * context can have none, in which case the wave falls back to the fountain.
+   * Where each team's wave forms up, per lane — the active map's own
+   * `slots.minion`, teamId-bridged by `preset.ts`'s `minionMusterSlotsFrom`.
+   * `validate.ts` refuses to install a map missing one for a lane it
+   * declares, so `musterPoint` can trust this list rather than falling back
+   * to the fountain the way `musterPointFor` (deleted) used to for a team
+   * caught with fewer than two turrets.
    */
-  turrets?: readonly { teamId?: unknown; position: { x: number; y: number } }[];
+  minionMuster: readonly MinionMusterPoint[];
 }
 
 interface QueuedMinion {
@@ -225,17 +219,12 @@ export default class MinionSpawner {
   spawn({ teamId, lane, kind }: Pick<QueuedMinion, 'teamId' | 'lane' | 'kind'>): Minion | null {
     if (this.minions.length >= MINION_LIVE_CAP) return null;
 
-    const muster = this.musterPointFor(teamId);
-    const fountain = this.fountainFor(teamId);
-    if (!muster && !fountain) return null;
-
+    const muster = this.musterSlotFor(teamId, lane);
+    const position = this.scatterAround(muster);
     // Waypoint 0 is the fountain, so a wave leaving *from* it always started at
     // 1. The muster point is already past waypoint 1 on two of the three lanes,
     // and a minion sent back to one it has walked past turns round to reach it.
-    const position = muster ? this.scatterAround(muster) : fountain!.randomPointInside();
-    const startWaypointIndex = muster
-      ? nextWaypointIndexFrom(lane, teamId, position.x, position.y)
-      : 1;
+    const startWaypointIndex = nextWaypointIndexFrom(lane, teamId, position.x, position.y);
 
     const minion = new Minion({
       game: this.game,
@@ -253,58 +242,41 @@ export default class MinionSpawner {
   }
 
   /**
-   * Where this team's wave forms up: the midpoint of the two turrets standing
-   * nearest its own fountain — the pair that guards the base.
+   * The full declared slot for `(teamId, lane)`, scatter radius included.
+   * `musterPoint` is the public `{x, y}`-only form of this same lookup.
    *
-   * A wave used to appear *inside* the fountain, which reads as minions
-   * materialising on the spawn platform and then filing out past their own
-   * buildings. Lining them up between the base turrets is where a wave actually
-   * comes from, and it puts the first thing a player sees on the map rather
-   * than on top of their own respawn point.
-   *
-   * Derived from the live buildings rather than from a hard-coded coordinate,
-   * so moving a turret row in `summoner_map.json` moves the muster with it. The
-   * two rows are not symmetric — blue's base has one turret listed and red's
-   * two — so "the two nearest the fountain" is the rule that gives both sides
-   * the same answer without either row having to be labelled.
-   *
-   * `null` when the team has fewer than two turrets, which is the headless
-   * case; the caller falls back to the fountain.
+   * Throws rather than falling back to the fountain the way the old
+   * `musterPointFor` did for a team caught with fewer than two turrets: a
+   * lane with no slot is now a `validate.ts` error at install, so reaching
+   * this with nothing to find means the map that got installed should not
+   * have — a bug to surface loudly, not paper over with a silent fountain
+   * spawn nobody notices until the wave never shows up.
    */
-  musterPointFor(teamId: string): { x: number; y: number } | null {
-    const fountain = this.fountainFor(teamId);
-    if (!fountain) return null;
-
-    let nearest: { x: number; y: number } | null = null;
-    let nearestAway = Number.POSITIVE_INFINITY;
-    let second: { x: number; y: number } | null = null;
-    let secondAway = Number.POSITIVE_INFINITY;
-
-    for (const turret of this.game.turrets ?? []) {
-      if (turret.teamId !== teamId) continue;
-      const away = Math.hypot(
-        turret.position.x - fountain.position.x,
-        turret.position.y - fountain.position.y
-      );
-      if (away < nearestAway) {
-        second = nearest;
-        secondAway = nearestAway;
-        nearest = { x: turret.position.x, y: turret.position.y };
-        nearestAway = away;
-      } else if (away < secondAway) {
-        second = { x: turret.position.x, y: turret.position.y };
-        secondAway = away;
-      }
+  private musterSlotFor(teamId: string, lane: string): MinionMusterPoint {
+    for (const slot of this.game.minionMuster) {
+      if (slot.teamId === teamId && slot.lane === lane) return slot;
     }
+    throw new Error(`MinionSpawner: no muster point declared for team ${teamId} on lane ${lane}`);
+  }
 
-    if (!nearest || !second) return null;
-    return { x: (nearest.x + second.x) / 2, y: (nearest.y + second.y) / 2 };
+  /**
+   * Where this team's wave for `lane` forms up — the active map's own
+   * declared slot (`map.slots.minion`, teamId-bridged). Used to be derived
+   * at spawn time from the two live turrets nearest the fountain
+   * (`musterPointFor`, deleted) and returned `null` for a team caught with
+   * fewer than two; a map now declares the point once, so this never has to
+   * answer "I don't know" — `validate.ts` refuses to install a map that
+   * would leave it unable to.
+   */
+  musterPoint(teamId: string, lane: string): { x: number; y: number } {
+    const { x, y } = this.musterSlotFor(teamId, lane);
+    return { x, y };
   }
 
   /** A point near the muster, so six bodies do not start life inside each other. */
-  private scatterAround(muster: { x: number; y: number }): p5.Vector {
+  private scatterAround(muster: { x: number; y: number; scatter: number }): p5.Vector {
     const angle = random(TWO_PI);
-    const away = random(MUSTER_SCATTER_PX);
+    const away = random(muster.scatter);
     return createVector(muster.x + cos(angle) * away, muster.y + sin(angle) * away);
   }
 

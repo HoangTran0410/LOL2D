@@ -1,6 +1,6 @@
 import { contentRegistry } from '@/content/registry';
 import type { PackRegistry } from '@/content/PackRegistry';
-import type { SpawnSlot, StructureSlot } from '@/content/ContentPack';
+import type { MinionSlot, SpawnSlot, StructureSlot } from '@/content/ContentPack';
 import TeamId from './enums/TeamId';
 import type { MonsterPresetData } from './gameObject/attackableUnits/Monster';
 import type { FountainPresetData } from './gameObject/structures/Fountain';
@@ -549,4 +549,36 @@ export const turretsFromSlots = (slots: StructureSlot[]): TurretPosition[] => {
     positions.push({ x: slot.x, y: slot.y, teamId: TEAM_ID_OF_FACTION[slot.faction] });
   }
   return positions;
+};
+
+export interface MinionMusterPoint {
+  teamId: string;
+  lane: string;
+  x: number;
+  y: number;
+  /** `MinionSlot.scatter`, or 0 for a slot that declared none. */
+  scatter: number;
+}
+
+/**
+ * A minion slot's own muster point, teamId-bridged the same way
+ * `fountainsFromSlots`/`turretsFromSlots` bridge theirs. Where a wave for
+ * `(teamId, lane)` forms up — `MinionSpawner.musterPoint` is the reader.
+ *
+ * `validate.ts` refuses to install a map missing a slot for a lane one of
+ * its declared factions walks, so by the time this runs on an installed
+ * pack's map every lane a match actually queues waves for already has one.
+ */
+export const minionMusterSlotsFrom = (slots: MinionSlot[]): MinionMusterPoint[] => {
+  const points: MinionMusterPoint[] = [];
+  for (const slot of slots) {
+    points.push({
+      teamId: TEAM_ID_OF_FACTION[slot.faction],
+      lane: slot.lane,
+      x: slot.x,
+      y: slot.y,
+      scatter: slot.scatter ?? 0,
+    });
+  }
+  return points;
 };

@@ -17,11 +17,13 @@ import {
   attachRecall,
   fountainsFromSlots,
   getChampionPresetFromLoadout,
+  minionMusterSlotsFrom,
   planLoadout,
   planMatchKits,
   presetFromPlan,
   turretsFromSlots,
   type MatchPlan,
+  type MinionMusterPoint,
 } from './preset';
 import {
   loadPregameConfig,
@@ -113,6 +115,13 @@ export default class Game {
    * map is present.
    */
   readonly mapSize: number;
+  /**
+   * The active map's own `slots.minion`, teamId-bridged — where each team's
+   * wave forms up, per lane. Set in the constructor, read by `MinionSpawner`
+   * (`MinionSpawnerContext.minionMuster`) once per spawn rather than derived
+   * from the live turrets the way `musterPointFor` used to.
+   */
+  readonly minionMuster: MinionMusterPoint[];
   readonly fps = 60;
   renderFps: RenderFps = renderFpsPreference();
   renderQuality: RenderQuality = renderQualityPreference();
@@ -223,6 +232,7 @@ export default class Game {
    */
   constructor(map: ActiveMap, plan?: MatchPlan) {
     this.mapSize = map.size;
+    this.minionMuster = minionMusterSlotsFrom(map.slots.minion);
     // Read once, before anything that might construct a Champion or a Spell:
     // `matchRules` has to be in place the moment the player's own kit is
     // built a few lines down. Validated/defaulted by `loadPregameConfig`

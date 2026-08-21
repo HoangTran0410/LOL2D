@@ -11,10 +11,13 @@ import {
  *
  * Every rule here exists because the engine's own failure for it is silent.
  * `TerrainMap` drops a terrain layer it does not recognise without a word;
- * `MinionSpawner.musterPointFor` returns null for a team with fewer than two
- * turrets and the whole wave falls back into the fountain; a lane naming a
- * faction nobody declared walks minions to `undefined`. Each of those surfaces
- * as a broken match some minutes in. Named at load, they are a sentence.
+ * a lane naming a faction nobody declared walks minions to `undefined`; a
+ * lane with no declared muster point for one of its factions is a wave with
+ * nowhere to form up — `MinionSpawner.musterPointFor` used to answer that
+ * with `null` and drop the whole wave into the fountain, silently, until it
+ * walked back out (Task 6 deleted that fallback; now it is this file that
+ * refuses the map). Each of those surfaces as a broken match some minutes
+ * in. Named at load, they are a sentence.
  */
 export type ValidationResult = { ok: true; pack: ContentPack } | { ok: false; errors: string[] };
 
@@ -231,6 +234,11 @@ function checkMapGeometry(
     }
   }
 
+  // Slots that declare a muster point, kept so the lane loop below can ask
+  // "does this faction have somewhere to form up on this lane" — see the
+  // `minionSlots` use after the lanes are walked.
+  let minionSlots: Record<string, unknown>[] = [];
+
   if (!isObject(geometry.slots)) {
     errors.push(`${name}.slots: missing`);
   } else {
@@ -261,6 +269,10 @@ function checkMapGeometry(
         }
       }
     }
+
+    if (Array.isArray(slots.minion)) {
+      minionSlots = slots.minion.filter(isObject);
+    }
   }
 
   // Absent lanes are a shape, not an omission: no waves, and BotBrain's PUSH
@@ -280,6 +292,18 @@ function checkMapGeometry(
       if (typeof faction !== 'string' || !factions.has(faction)) {
         errors.push(
           `${name}.lanes.${lane.id}.${end}: faction ${String(faction)} was never declared`
+        );
+        continue;
+      }
+      // A faction that walks this lane and has no muster point on it is the
+      // exact silent failure this file's header names: `MinionSpawner` used
+      // to answer with `null` and drop the whole wave into the fountain, and
+      // nobody found out until the first wave walked out of it. Refused here
+      // instead, at install.
+      const musters = minionSlots.some(slot => slot.faction === faction && slot.lane === lane.id);
+      if (!musters) {
+        errors.push(
+          `${name}.slots.minion: no muster point for faction ${faction} on lane ${lane.id}`
         );
       }
     }

@@ -185,9 +185,10 @@ export default class Minion extends AttackableUnit {
    * Whether this minion has stood on a lane waypoint yet.
    *
    * A wave does not start on its lane: it musters between the two turrets
-   * nearest its own fountain and is handed the first waypoint *ahead* of that
-   * (`MinionSpawner.musterPointFor`, `nextWaypointIndexFrom`), which on TOP is
-   * 955px away across the corner of the base wall. The lane itself is built to
+   * nearest its own fountain — a point the active map declares
+   * (`MinionSpawner.musterPoint`) — and is handed the first waypoint *ahead*
+   * of that (`nextWaypointIndexFrom`), which on TOP is 955px away across the
+   * corner of the base wall. The lane itself is built to
    * be walked in straight lines — see the header of `lanes.ts` — but the join
    * onto it is not part of the lane and is not built to be anything. Measured
    * against the wall polygons that opening leg ran 42px *inside* a wall on TOP
@@ -276,8 +277,7 @@ export default class Minion extends AttackableUnit {
   distanceToLane(): number {
     const path = this.waypoints;
     if (path.length === 0) return 0;
-    if (path.length === 1)
-      return dist(this.position.x, this.position.y, path[0].x, path[0].y);
+    if (path.length === 1) return dist(this.position.x, this.position.y, path[0].x, path[0].y);
 
     const { x, y } = this.position;
     let best = Infinity;

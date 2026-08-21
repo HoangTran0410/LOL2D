@@ -104,6 +104,65 @@ describe('validatePack', () => {
     if (!result.ok) expect(result.errors.join(' ')).toMatch(/red/);
   });
 
+  it('rejects a lane whose faction has no declared muster point', () => {
+    // `MinionSpawner.musterPointFor` used to answer this with `null` and drop
+    // the whole wave into the fountain, silently, until the first wave walked
+    // back out of it (see this file's own header). Task 6 pushes that failure
+    // here instead — a lane's faction with nowhere to muster cannot install.
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          name: 'Arena',
+          size: 4000,
+          factions: [{ id: 'blue' }, { id: 'red' }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: {
+              spawn: [],
+              // blue musters here; red, which also walks MID, has nothing.
+              minion: [{ faction: 'blue', lane: 'MID', x: 0, y: 0 }],
+              structure: [],
+              neutral: [],
+            },
+            lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          },
+        },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.join(' ')).toMatch(/no muster point.*red.*MID/);
+  });
+
+  it('accepts a lane whose two factions both declare a muster point', () => {
+    const result = validatePack({
+      manifest: goodManifest,
+      maps: [
+        {
+          id: 'arena',
+          name: 'Arena',
+          size: 4000,
+          factions: [{ id: 'blue' }, { id: 'red' }],
+          geometry: {
+            terrain: { wall: [], bush: [], water: [] },
+            slots: {
+              spawn: [],
+              minion: [
+                { faction: 'blue', lane: 'MID', x: 0, y: 0 },
+                { faction: 'red', lane: 'MID', x: 10, y: 10 },
+              ],
+              structure: [],
+              neutral: [],
+            },
+            lanes: [{ id: 'MID', from: 'blue', to: 'red', waypoints: [] }],
+          },
+        },
+      ],
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it('rejects a structure slot whose kind is not core vocabulary', () => {
     // `role` on a neutral slot is a free string the packs agree on between
     // themselves; `kind` on a structure is core's own vocabulary, because

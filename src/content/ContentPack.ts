@@ -161,6 +161,18 @@ export interface MinionSlot {
   lane: string;
   x: number;
   y: number;
+  /**
+   * How far a released minion may be scattered around this point, so a wave
+   * does not spawn six bodies stacked on one coordinate for
+   * `UnitCollisionSystem` to shove apart. Absent means no scatter.
+   *
+   * Deliberately per-slot rather than a shared engine constant: the old
+   * `MUSTER_SCATTER_PX` was sized to stay under the gap between Summoner's
+   * Rift's own two base turrets, a fact about that map's geometry, not a
+   * rule every map shares. A map author who declares the point is the one
+   * who can see whether it needs a scatter radius, and how big.
+   */
+  scatter?: number;
 }
 
 /** Core's own vocabulary — `Turret` and `Fountain` are core classes. */

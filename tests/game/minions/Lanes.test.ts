@@ -8,7 +8,10 @@ import {
   type LaneWaypoint,
 } from '../../../src/game/lanes';
 import mapData from '../../../assets/json/summoner_map.json';
-import { summonersRiftGeometry } from '../../../src/content/maps/summonersRiftGeometry';
+import {
+  minionMusterPoint,
+  summonersRiftGeometry,
+} from '../../../src/content/maps/summonersRiftGeometry';
 
 type Point = [number, number];
 const walls = mapData.wall as Point[][];
@@ -463,11 +466,21 @@ describe('lane waypoints', () => {
 
 describe('the muster point a wave forms up on', () => {
   /**
-   * `MinionSpawner.musterPointFor` puts a wave between the two turrets nearest
-   * its own fountain. Those coordinates come out of this same map file, so the
-   * pair is recomputed here from `turret1`/`turret2` rather than pasted — but
-   * the *rule* is stated independently, so a spawner that started picking a
-   * different pair would fail this rather than agree with itself.
+   * Task 6: `MinionSpawner.musterPointFor` (deleted) used to recompute the
+   * pair of nearest turrets at spawn time, per wave, from the live `Turret`
+   * objects, and returned `null` for a team caught with fewer than two —
+   * dropping the whole wave silently into the fountain until it walked back
+   * out. A map now declares the point once, baked into `slots.minion` by
+   * `summonersRiftGeometry.ts`'s own `minionMusterPoint`, so a lane with no
+   * slot is a `validate.ts` error at install instead.
+   *
+   * The pair is still recomputed here from `turret1`/`turret2` rather than
+   * read back off the slot the assembly produced — the *rule* is stated
+   * independently, so a map that started declaring a different pair fails
+   * this rather than agreeing with itself. What changed is the target: the
+   * wall/turret/scatter checks below run against the declared **slot**
+   * (`summonersRiftGeometry.slots.minion`), which is what a minion actually
+   * gets told to stand on, not a value recomputed only for the test.
    */
   const musterFor = (row: Point[], fountain: { x: number; y: number }) => {
     const byDistance = [...row].sort(
@@ -479,10 +492,35 @@ describe('the muster point a wave forms up on', () => {
     return { x: (first[0] + second[0]) / 2, y: (first[1] + second[1]) / 2 };
   };
 
-  const MUSTERS = [
-    { side: 'blue', at: musterFor(turret1, BLUE_FOUNTAIN) },
-    { side: 'red', at: musterFor(turret2, RED_FOUNTAIN) },
-  ];
+  const minionSlot = (faction: string, lane: string) => {
+    const slot = summonersRiftGeometry.slots.minion.find(
+      s => s.faction === faction && s.lane === lane
+    );
+    expect(slot, `no declared minion slot for ${faction}/${lane}`).toBeDefined();
+    return slot!;
+  };
+
+  const MUSTERS = LANES.flatMap(lane => [
+    {
+      side: `blue ${lane}`,
+      lane,
+      at: minionSlot('blue', lane),
+      expected: musterFor(turret1, BLUE_FOUNTAIN),
+    },
+    {
+      side: `red ${lane}`,
+      lane,
+      at: minionSlot('red', lane),
+      expected: musterFor(turret2, RED_FOUNTAIN),
+    },
+  ]);
+
+  it.each(MUSTERS)(
+    '$side agrees with the independently computed nearest-turret pair',
+    ({ at, expected }) => {
+      expect({ x: at.x, y: at.y }).toEqual(expected);
+    }
+  );
 
   it.each(MUSTERS)('$side stands on open ground', ({ at }) => {
     expect(wallClearance(at.x, at.y)).toBeGreaterThan(MIN_CLEARANCE);
@@ -500,12 +538,34 @@ describe('the muster point a wave forms up on', () => {
   });
 
   it.each(MUSTERS)('$side keeps its whole scatter ring off the walls', ({ at }) => {
-    // `MUSTER_SCATTER_PX` is 55, and a minion can land anywhere inside it.
+    // The slot carries its own scatter radius now (`MinionSlot.scatter`), not
+    // a shared `MinionSpawner` constant — a minion can land anywhere inside it.
+    const scatter = at.scatter ?? 0;
     for (let i = 0; i < 16; i++) {
       const angle = (i / 16) * Math.PI * 2;
-      const x = at.x + Math.cos(angle) * 55;
-      const y = at.y + Math.sin(angle) * 55;
+      const x = at.x + Math.cos(angle) * scatter;
+      const y = at.y + Math.sin(angle) * scatter;
       expect(wallClearance(x, y)).toBeGreaterThan(MIN_CLEARANCE);
     }
+  });
+
+  it('musters a lane whose team has fewer than two turrets', () => {
+    // The old rule (`musterPointFor`, deleted) walked `this.game.turrets` at
+    // spawn time and returned null here — recorded against today's spawner
+    // before this task: `musterPointFor(TeamId.BLUE)` with one turret in the
+    // context answered `null`, and the whole wave fell back into the
+    // fountain. `minionMusterPoint` is the pure replacement, called directly
+    // with a truncated turret list — no `Game`, no `MinionSpawner`, just the
+    // same geometry math the map assembly runs once at build time.
+    const sparse = turret1.slice(0, 1).map(([x, y]) => ({ faction: 'blue', x, y }));
+    const point = minionMusterPoint('blue', BLUE_FOUNTAIN, sparse);
+    expect(point).not.toBeNull();
+    expect(point).toEqual({ x: sparse[0].x, y: sparse[0].y });
+  });
+
+  it('still answers when a team has no turrets at all', () => {
+    const point = minionMusterPoint('blue', BLUE_FOUNTAIN, []);
+    expect(point).not.toBeNull();
+    expect(point).toEqual(BLUE_FOUNTAIN);
   });
 });

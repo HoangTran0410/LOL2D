@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import MinionSpawner, {
   FIRST_WAVE_DELAY_MS,
-  MUSTER_SCATTER_PX,
   MINION_LIVE_CAP,
   MINION_RELEASE_INTERVAL_MS,
   WAVE_COMPOSITION,
@@ -167,11 +166,13 @@ describe('MinionSpawner', () => {
     });
 
     it('musters each side between the two turrets guarding its own base', () => {
-      // Hand-computed from `summoner_map.json`, not from `musterPointFor`:
-      // blue's fountain is 400,6075 and its two nearest turrets are 963,5626
-      // (720px) and 736,5392 (761px); red's is 6100,375 with 5646,967 (746px)
-      // and 5454,779 (762px). The next building on either side is over 1500px
-      // out, so the pair is not a close-run thing.
+      // Hand-computed from `summoner_map.json`, not from `musterPointFor`
+      // (deleted, Task 6): blue's fountain is 400,6075 and its two nearest
+      // turrets are 963,5626 (720px) and 736,5392 (761px); red's is 6100,375
+      // with 5646,967 (746px) and 5454,779 (762px). The next building on
+      // either side is over 1500px out, so the pair is not a close-run thing.
+      // `summonersRiftGeometry.ts` now bakes this pair into `slots.minion`
+      // once, at map-build time, and the spawner just looks it up.
       const MUSTER = {
         [TeamId.BLUE]: { x: (963 + 736) / 2, y: (5626 + 5392) / 2 },
         [TeamId.RED]: { x: (5646 + 5454) / 2, y: (967 + 779) / 2 },
@@ -183,10 +184,13 @@ describe('MinionSpawner', () => {
       const seen = new Set<string>();
       for (const minion of spawned()) {
         const muster = MUSTER[minion.teamId];
+        const scatter = game.minionMuster.find(
+          slot => slot.teamId === minion.teamId && slot.lane === minion.lane
+        )!.scatter;
         seen.add(minion.teamId);
         expect(
           Math.hypot(minion.position.x - muster.x, minion.position.y - muster.y)
-        ).toBeLessThanOrEqual(MUSTER_SCATTER_PX);
+        ).toBeLessThanOrEqual(scatter);
         // And no longer standing on the spawn platform, which is what this
         // replaced — a wave used to materialise inside its own fountain.
         const fountain = spawner.fountainFor(minion.teamId)!;
@@ -229,17 +233,35 @@ describe('MinionSpawner', () => {
       expect(indexOf(TeamId.RED, Lane.BOT)).toBe(1);
     });
 
-    it('falls back to the fountain for a base with no turrets to muster between', () => {
-      game.turrets = [];
-
+    it('never falls back to the fountain, whatever the live turrets look like', () => {
+      // `musterPointFor` (deleted) recomputed the pair from the live
+      // `Turret` objects on every spawn and returned null for a team caught
+      // with fewer than two, and the caller answered that null by dropping
+      // the whole wave into the fountain — silently, until the first wave
+      // walked back out of it. `musterPoint` is a lookup into what the map
+      // declared, so the live turret count has nothing to do with it any
+      // more; this asserts the muster still holds even with none standing.
       spawner.queueWave();
       spawner.releaseQueued();
 
       for (const minion of spawned()) {
         const fountain = spawner.fountainFor(minion.teamId)!;
-        expect(minion.position.dist(fountain.position)).toBeLessThanOrEqual(fountain.radius);
-        expect(minion.waypointIndex).toBe(1);
+        expect(minion.position.dist(fountain.position)).toBeGreaterThan(fountain.radius);
       }
+    });
+
+    it('throws rather than silently falling back to the fountain when a lane has no declared muster point', () => {
+      // The failure this used to be: a team with fewer than two turrets got
+      // `null` from `musterPointFor` and a wave that quietly spawned in the
+      // fountain. `validate.ts` now refuses to install a map missing a slot
+      // for a lane it declares, so reaching `musterPoint` with nothing to
+      // find means an installed map should have been refused — a bug to
+      // surface loudly, not one more silent fountain spawn.
+      game.minionMuster = game.minionMuster.filter(
+        slot => !(slot.teamId === TeamId.BLUE && slot.lane === Lane.TOP)
+      );
+
+      expect(() => spawner.musterPoint(TeamId.BLUE, Lane.TOP)).toThrow(/no muster point/);
     });
   });
 

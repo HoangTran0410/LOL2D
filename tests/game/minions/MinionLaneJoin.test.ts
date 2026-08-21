@@ -7,15 +7,19 @@ import { createGame, stubGameGlobals, type TestGame } from '../fixtures';
 
 /**
  * A wave does not start on its lane. It musters between the two turrets nearest
- * its own fountain (`MinionSpawner.musterPointFor`) and is handed the first
- * waypoint *ahead* of that, which on TOP is a 955px diagonal away — and
- * `updateWalk` goes to a waypoint with `moveTo`, a straight line with no
- * routing. Measured against the wall polygons, that opening leg passes 42px
- * *inside* the base wall on TOP and 19px from a turret centre on BOT, on the
- * old paths as much as the current ones: the lane is walkable end to end, but
- * the join onto it is not part of the lane.
+ * its own fountain — a point the active map declares in `slots.minion`
+ * (`MinionSpawner.musterPoint`; Task 6 moved this off `MinionSpawner`'s own
+ * `musterPointFor`, which recomputed it from the live turrets, onto the map)
+ * — and is handed the first waypoint *ahead* of that, which on TOP is a
+ * 955px diagonal away — and `updateWalk` goes to a waypoint with `moveTo`, a
+ * straight line with no routing. Measured against the wall polygons, that
+ * opening leg passes 42px *inside* the base wall on TOP and 19px from a
+ * turret centre on BOT, on the old paths as much as the current ones: the
+ * lane is walkable end to end, but the join onto it is not part of the lane.
  *
- * So the join, and only the join, is routed.
+ * So the join, and only the join, is routed. `BLUE_MUSTER` below is that same
+ * declared point for blue TOP — see `Lanes.test.ts`'s own muster-point block
+ * for the derivation and the wall-clearance proof.
  */
 
 let game: TestGame & { navigation?: unknown };
