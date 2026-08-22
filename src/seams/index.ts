@@ -1,6 +1,7 @@
 /**
- * `@lol2d/core/seams` — the engine's static-scan rules, exported as runnable
- * functions rather than left inlined inside `tests/game/spells/*-seam.test.ts`.
+ * `@moba2d/core/seams` — the engine's static-scan rules, exported as
+ * runnable functions rather than left inlined inside
+ * `tests/game/spells/*-seam.test.ts`.
  *
  * ## Why this exists
  *
@@ -59,10 +60,11 @@
  *
  * `scripts/check-seams.mjs` wraps exactly this as a CLI (`node
  * scripts/check-seams.mjs <root>`), the working form of the spec's
- * `lol2d-check-seams ./src`. What is **not** decided here, on a task-9
- * ruling: whether that CLI becomes an installed `bin`, what package publishes
- * it, and how `packs/riot/` — which gets no `package.json` from this task —
- * ends up invoking it. That is batch 5's call.
+ * `moba2d-check-seams ./src`. `package.json` now names the package
+ * `@moba2d/core` and declares that CLI as its `bin`
+ * (`moba2d-check-seams`) — decided in batch 5 task 3. What is still not
+ * decided here: how `packs/riot/` — which gets no `package.json` of its
+ * own from this task — ends up invoking it. That is batch 5 task 4's call.
  */
 import type { Seam, SeamCheckOptions, SeamViolation } from './types';
 import { walkTsFiles } from './shared';

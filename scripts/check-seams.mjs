@@ -1,13 +1,16 @@
+#!/usr/bin/env node
 /**
- * The CLI form of `@lol2d/core/seams` (`src/seams/index.ts`).
+ * The CLI form of `@moba2d/core/seams` (`src/seams/index.ts`), and the
+ * working implementation of spec §8.1's pack-side command
+ * `moba2d-check-seams ./src` — a pack's own build step, checking a pack's
+ * own tree, failing a pack's own build.
  *
- * Spec §8.1's pack-side command is `lol2d-check-seams ./src` — a pack's own
- * build step, checking a pack's own tree, failing a pack's own build. This
- * script is that command's working implementation. What it is *not*: an
- * installed `bin`, or a reason for `packs/riot/` to have a `package.json` —
- * both are ruled out for this task, and are batch 5's call once it decides
- * how packs are published. Until then, a pack (or this repo's own `packs/
- * riot/`) runs it as `node <path-to-core>/scripts/check-seams.mjs <root>`.
+ * `package.json`'s `bin` now points here, but that alone does not put it on
+ * anyone's `PATH`: Task 4 of the content-pack extraction is what adds the
+ * workspace link that makes `moba2d-check-seams` resolve as a bare command,
+ * and Task 6 is where a pack actually invokes it. Until a workspace links
+ * it, a pack (or this repo's own `packs/riot/`) runs it as
+ * `node <path-to-core>/scripts/check-seams.mjs <root>`.
  *
  * `src/seams/index.ts` is plain TypeScript with no p5/browser dependency —
  * just `node:fs` — but it lives under `src/`, which is not run directly by

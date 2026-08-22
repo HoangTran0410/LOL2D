@@ -9,7 +9,7 @@
  * same question. `src/seams/` is the closest existing precedent for
  * "extract inline scan logic into an importable module" — but it is a
  * different kind of thing on purpose: those are content-authoring rules,
- * `(root: string) => SeamViolation[]`, published as `@lol2d/core/seams` so a
+ * `(root: string) => SeamViolation[]`, published as `@moba2d/core/seams` so a
  * *pack*, in a future separate repository, can run them against its own
  * tree. This module answers a question about *this engine's own* source —
  * what does a file import, and is each one a type or a value — that no pack

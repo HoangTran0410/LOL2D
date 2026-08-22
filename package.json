@@ -1,7 +1,16 @@
 {
-  "name": "lol2d",
+  "name": "@moba2d/core",
   "version": "1.0.0",
   "type": "module",
+  "exports": {
+    "./content/ContentApi": "./src/content/ContentApi.ts",
+    "./content/ContentPack": "./src/content/ContentPack.ts",
+    "./content/types": "./src/content/types.ts",
+    "./seams": "./src/seams/index.ts"
+  },
+  "bin": {
+    "moba2d-check-seams": "./scripts/check-seams.mjs"
+  },
   "scripts": {
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
