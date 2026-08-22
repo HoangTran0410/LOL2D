@@ -239,6 +239,30 @@
   cursor: default;
 }
 
+/* Same corner, shown first: a newer build has been detected and is still
+   downloading — see src/pwa/updates.ts for why that can be seconds ahead of
+   .menu-update above. Not interactive, so no hover/disabled states and no
+   touch handler to match — there is nothing to press yet. */
+.menu-update-checking {
+  position: fixed;
+  bottom: calc(12px + var(--safe-bottom));
+  right: calc(12px + var(--safe-right));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  margin: 0;
+  background: rgba(10, 20, 40, 0.7);
+  border: 2px solid rgba(120, 190, 240, 0.3);
+  color: rgb(190, 225, 255);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
 /* --------------------------------------------------------------- Warm-up bar
 
    Stands where the two buttons will, so replacing it does not make the menu
