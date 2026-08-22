@@ -238,7 +238,7 @@ describe('League Wiki importer', () => {
       sourceUrl: 'https://wiki.leagueoflegends.com/images/Fizz_Trickster.png',
     });
 
-    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2, skippedByPack: new Map() });
   });
 
   it('writes deterministic raw and normalized caches with source metadata', async () => {
@@ -316,7 +316,7 @@ describe('League Wiki importer', () => {
         .digest('hex')
     );
 
-    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2, skippedByPack: new Map() });
     raw.source.fetchedAt = 'invalid';
     await writeFile(join(target, 'docs/abilities/cache/raw/janna/q.json'), JSON.stringify(raw));
     await expect(checkAbilities(target)).rejects.toThrow(/source timestamp/i);
@@ -509,7 +509,7 @@ describe('League Wiki importer', () => {
     const generated = await readFile(join(target, 'packs/riot/generated/assetManifest.ts'), 'utf8');
     expect(generated).toContain('../assets/images/spells/janna_q.jpg?url');
     expect(generated).not.toContain('../assets/images/spells/janna_q.png?url');
-    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2 });
+    await expect(checkAbilities(target)).resolves.toEqual({ records: 3, forms: 2, skippedByPack: new Map() });
   });
 
   it('writes nothing when hypothetical asset manifest generation fails', async () => {

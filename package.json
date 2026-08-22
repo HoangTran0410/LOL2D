@@ -31,6 +31,8 @@
     "vite.config.ts"
   ],
   "scripts": {
+    "packs:generate": "node scripts/generate-installed-packs.mjs",
+    "packs:check": "node scripts/generate-installed-packs.mjs --check",
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
     "assets:generate:riot": "node packs/riot/scripts/generate-assets.mjs",
@@ -45,9 +47,9 @@
     "names:sync": "node scripts/wiki/sync-spell-names.mjs",
     "names:apply": "node scripts/wiki/sync-spell-names.mjs --apply",
     "alias:migrate": "node scripts/migrate-to-alias.mjs",
-    "predev": "npm run assets:generate && npm run catalog:generate && npm run vendor:copy",
+    "predev": "npm run packs:generate && npm run assets:generate && npm run catalog:generate && npm run vendor:copy",
     "dev": "vite",
-    "prebuild": "npm run assets:generate && npm run catalog:generate && npm run vendor:copy",
+    "prebuild": "npm run packs:generate && npm run assets:generate && npm run catalog:generate && npm run vendor:copy",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
@@ -58,7 +60,7 @@
     "typecheck:pack-boundary": "tsc -p tsconfig.strict-core-boundary.json",
     "format": "prettier --write \"src/**/*.{ts,vue}\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.{ts,vue}\" \"tests/**/*.ts\"",
-    "verify": "npm run assets:check && npm run catalog:check && npm run ability:check && npm run typecheck && npm run typecheck:core && npm run test:all && npm run build && npm run chunks:check && npm run check-seams",
+    "verify": "npm run packs:check && npm run assets:check && npm run catalog:check && npm run ability:check && npm run typecheck && npm run typecheck:core && npm run test:all && npm run build && npm run chunks:check && npm run check-seams",
     "verify:all": "npm run verify && npm run typecheck:pack-boundary && npm run assets:check --workspace=@moba2d/content-riot && npm run catalog:check --workspace=@moba2d/content-riot && npm run typecheck --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-riot && npm run check-seams:monsters --workspace=@moba2d/content-riot && npm run check-seams --workspace=@moba2d/content-reference",
     "e2e": "node tests/e2e/drive-game.mjs",
     "e2e:hud": "node tests/e2e/hud-mana.mjs",
@@ -73,7 +75,9 @@
     "e2e:render": "node tests/e2e/verify-render-guard.mjs",
     "e2e:pack": "node tests/e2e/verify-pack-champion.mjs",
     "e2e:map-picker": "node tests/e2e/verify-map-picker.mjs",
-    "e2e:chunk-cascade": "node scripts/measure-chunk-cascade.mjs"
+    "e2e:core-alone": "node tests/e2e/verify-core-alone.mjs",
+    "e2e:chunk-cascade": "node scripts/measure-chunk-cascade.mjs",
+    "verify:without-packs": "node scripts/verify-without-packs.mjs"
   },
   "dependencies": {
     "detect-collisions": "^9.2.2",

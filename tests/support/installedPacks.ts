@@ -1,5 +1,5 @@
-import { existsSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { installedPackNames } from '../../src/generated/installedPacks';
 
 /**
  * content-pack-extraction batch 5 task 7: a scan that names a specific
@@ -18,27 +18,26 @@ import { join } from 'node:path';
  *     missing root was exactly this mistake, `terrain-field-seam.test.ts`
  *     fix round 1).
  *
- * `installedPackDirs`/`packIsInstalled` answer the first question by
- * reading `packs/`'s own directory listing — every subdirectory is
- * "installed" for this purpose, no pack name hardcoded, so a pack leaving
- * (or a third pack arriving) changes this list without anyone touching a
- * scan that calls it. `requireRoot` answers the second: given a root the
- * caller already decided it needs, throw with a message naming it rather
- * than returning `[]` or `undefined`.
- *
- * This is the cheapest real derivation available before task 8 lands its
- * generated installed-packs barrel (the actual single source of truth for
- * "which packs does this checkout have"); once that barrel exists, point
- * `installedPackDirs` at it instead of `readdirSync`.
+ * `installedPackDirs`/`packIsInstalled` answer the first question, and since
+ * task 8 they answer it out of `src/generated/installedPacks.ts` — the
+ * generated barrel `src/content/install.ts` and `tests/setup.ts` already read
+ * — rather than by listing `packs/` themselves. Task 7's own header said to
+ * do exactly this once the barrel existed, and the reason is the one that
+ * motivated the barrel: a directory listing of `packs/` answers "which packs
+ * are installed" for precisely as long as every pack lives in this
+ * repository, which is the assumption the whole extraction exists to remove.
+ * `installedPackNames` covers the reference pack too, so a scan's population
+ * does not collapse when the optional pack leaves. `requireRoot` answers the
+ * second question: given a root the caller already decided it needs, throw
+ * with a message naming it rather than returning `[]` or `undefined`.
  */
-export function installedPackDirs(packsDir: string): string[] {
-  if (!existsSync(packsDir)) return [];
-  return readdirSync(packsDir).filter(entry => statSync(join(packsDir, entry)).isDirectory());
+export function installedPackDirs(): string[] {
+  return [...installedPackNames];
 }
 
-/** Is `packName` (e.g. `'riot'`) present under `packsDir` right now? */
-export function packIsInstalled(packsDir: string, packName: string): boolean {
-  return installedPackDirs(packsDir).includes(packName);
+/** Is `packName` (e.g. `'riot'`) installed right now? */
+export function packIsInstalled(packName: string): boolean {
+  return installedPackDirs().includes(packName);
 }
 
 /**

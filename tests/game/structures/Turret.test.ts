@@ -16,7 +16,7 @@ import { summonersRiftGeometry } from '../../../packs/riot/maps/summonersRiftGeo
 import mapData from '../../../packs/riot/maps/summoner_map.json';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
 import turretSource from '../../../src/game/gameObject/structures/Turret.ts?raw';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, TEST_AVATAR_KEY, type TestGame } from '../fixtures';
 
 let game: TestGame;
 
@@ -82,7 +82,7 @@ describe('Turret as a team building', () => {
         game,
         preset: {
           name: 'Camp',
-          avatar: 'monster_Baron_Nashor',
+          avatar: TEST_AVATAR_KEY,
           camp: { x: 100, y: 0, r: 100 },
           speed: 0,
           size: 60,

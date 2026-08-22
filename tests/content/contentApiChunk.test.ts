@@ -1,20 +1,37 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, realpathSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { scanImports } from '@/seams/importScan';
+import { packIsInstalled } from '../support/installedPacks';
 
 const ROOT = join(__dirname, '../../');
 
-/** Resolve a `@/`-aliased or relative specifier to a file under src/. */
+/**
+ * Resolve a `@/`-aliased, relative, or `@moba2d/content-*` specifier to a file
+ * on disk.
+ *
+ * The third form is batch 5 task 8's and it is not optional decoration: that
+ * task moved core's reach into the riot pack behind
+ * `src/generated/installedPacks.ts`, which names the pack by *package* name
+ * (`@moba2d/content-riot/pack`) so the specifier keeps resolving once the pack
+ * is a repository of its own. A walk that only followed `@/` and `./` would
+ * simply have stopped at the barrel — and stopping is silent: the geometry
+ * guard below would have gone on passing while covering nothing of the pack at
+ * all. `realpathSync` is what turns the resolved `node_modules/@moba2d/...`
+ * path back into this monorepo's own `packs/riot/...`, so the assertions below
+ * read the same either way.
+ */
 const resolveSpecifier = (from: string, specifier: string): string | null => {
   const base = specifier.startsWith('@/')
     ? join(ROOT, 'src', specifier.slice(2))
     : specifier.startsWith('.')
       ? resolve(dirname(from), specifier)
-      : null;
+      : specifier.startsWith('@moba2d/content-')
+        ? join(ROOT, 'node_modules', specifier)
+        : null;
   if (!base) return null;
   for (const candidate of [base, `${base}.ts`, join(base, 'index.ts')]) {
-    if (existsSync(candidate) && candidate.endsWith('.ts')) return candidate;
+    if (existsSync(candidate) && candidate.endsWith('.ts')) return realpathSync(candidate);
   }
   return null;
 };
@@ -97,11 +114,15 @@ describe('the data half of the pack contract', () => {
   it('reaches a map summary but never its geometry module', () => {
     const paths = [...closure].map(f => f.slice(ROOT.length));
     // Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/`
-    // and into the pack — `bundledPack.ts` (an exception in
-    // `corePacksBoundary.test.ts`) now reaches it by a relative
-    // `../../packs/riot/maps/summonersRift` specifier, which this walk's
-    // `resolveSpecifier` follows the same as any other relative import.
-    expect(paths).toContain('packs/riot/maps/summonersRift.ts');
+    // and into the pack; batch 5 task 8 moved core's reach into that pack
+    // behind `src/generated/installedPacks.ts`'s `@moba2d/content-riot/pack`
+    // — which `resolveSpecifier` above follows and realpaths back to this
+    // path. Only asserted when that pack is actually installed: with it moved
+    // out of the tree there is no Summoner's Rift summary to reach, and the
+    // real claim of this test is the `offenders` line below, which holds for
+    // whatever maps a checkout does have.
+    if (packIsInstalled('riot')) expect(paths).toContain('packs/riot/maps/summonersRift.ts');
+    expect(paths).toContain('packs/reference/map.ts');
     const offenders = paths.filter(isGeometryModule);
     expect(offenders).toEqual([]);
   });

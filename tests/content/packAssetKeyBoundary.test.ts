@@ -81,7 +81,7 @@ function assetKeyCalls(source: string): string[] {
 
 describe('the pack asset-key boundary', () => {
   const files = tsFilesUnder(PACKS_DIR);
-  const packs = installedPackDirs(PACKS_DIR);
+  const packs = installedPackDirs();
 
   it('finds pack files to scan, or this proves nothing', () => {
     expect(packs.length).toBeGreaterThan(0);

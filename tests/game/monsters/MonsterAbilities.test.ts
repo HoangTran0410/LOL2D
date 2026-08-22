@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Monster, { type MonsterAbility } from '../../../src/game/gameObject/attackableUnits/Monster';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Stun from '../../../src/game/gameObject/buffs/Stun';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, TEST_AVATAR_KEY, type TestGame } from '../fixtures';
 
 const CAMP = { x: 1_000, y: 1_000, r: 100 };
 
@@ -35,7 +35,7 @@ const makeCamp = (abilities: MonsterAbility[], overrides: Record<string, unknown
     game,
     preset: {
       name: 'Camp',
-      avatar: 'monster_Baron_Nashor',
+      avatar: TEST_AVATAR_KEY,
       camp: { ...CAMP },
       speed: 0,
       size: 100,

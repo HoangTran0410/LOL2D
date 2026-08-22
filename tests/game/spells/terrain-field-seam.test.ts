@@ -47,7 +47,7 @@ import { packIsInstalled, requireRoot } from '../../support/installedPacks';
 const REPO_ROOT = process.cwd();
 const GAME_OBJECT_ROOT = join(REPO_ROOT, 'src/game/gameObject');
 const PACKS_DIR = join(REPO_ROOT, 'packs');
-const RIOT_INSTALLED = packIsInstalled(PACKS_DIR, 'riot');
+const RIOT_INSTALLED = packIsInstalled('riot');
 const SPELL_DIR = join(PACKS_DIR, 'riot/spells');
 
 /**

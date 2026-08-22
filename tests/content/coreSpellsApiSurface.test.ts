@@ -309,7 +309,7 @@ const CONTENT_API_FILE = join(__dirname, '../../src/content/ContentApi.ts');
 // possible to smuggle in from it either, so the scan below legitimately has
 // nothing to check and runs over `coreSpells/` alone.
 const PACKS_DIR = join(__dirname, '../../packs');
-const RIOT_INSTALLED = packIsInstalled(PACKS_DIR, 'riot');
+const RIOT_INSTALLED = packIsInstalled('riot');
 const PACK_SPELLS_DIR = join(PACKS_DIR, 'riot/spells');
 
 /**

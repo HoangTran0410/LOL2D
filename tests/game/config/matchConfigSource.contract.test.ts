@@ -14,6 +14,7 @@ import {
 } from '../../../src/game/config/PregameConfig';
 import { MatchTeam } from '../../../src/game/config/MatchTeams';
 import { context as practiceContext } from '../practice/helpers';
+import { packIsInstalled } from '../../support/installedPacks';
 
 /**
  * **The test that makes one panel possible.**
@@ -347,12 +348,22 @@ describe.each(SOURCES)('MatchConfigSource contract — %s', (name, make) => {
    * a different one is to leave this match and start a new one.
    */
   describe('map', () => {
-    it('lists more than one installed map, by qualified id', () => {
+    it('lists every installed map, by qualified id', () => {
       const maps = source.availableMaps();
       const ids = maps.map(map => map.id);
-      expect(ids.length).toBeGreaterThanOrEqual(2);
-      expect(ids).toContain('riot:summoners-rift');
+      // The reference pack's map is core's own and is always here; Summoner's
+      // Rift belongs to the riot pack and is not. Asserting `>= 2` and naming
+      // both was a literal about which packs a checkout has —
+      // content-pack-extraction batch 5 task 8's drill scored it `expected 1
+      // to be greater than or equal to 2` with the riot pack moved out of the
+      // tree, which is the correct answer to the wrong question. What this
+      // test is actually about is that ids come back *qualified*, which is
+      // batch 2's last bug (a picker that stored the bare local id and then
+      // rerolled to something random at match start).
       expect(ids).toContain('reference:proving-grounds');
+      if (packIsInstalled('riot')) expect(ids).toContain('riot:summoners-rift');
+      expect(ids.length).toBe(packIsInstalled('riot') ? 2 : 1);
+      for (const id of ids) expect(id).toMatch(/^[A-Za-z0-9][A-Za-z0-9._-]*:.+$/);
     });
 
     it('reads a qualified id', () => {

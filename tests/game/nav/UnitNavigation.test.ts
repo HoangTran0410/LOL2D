@@ -4,7 +4,7 @@ import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion'
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import Monster from '../../../src/game/gameObject/attackableUnits/Monster';
 import NavigationSystem from '../../../src/game/nav/NavigationSystem';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, TEST_AVATAR_KEY, type TestGame } from '../fixtures';
 
 /**
  * A corridor map: one wall band across the middle with a gap at the top, so
@@ -224,7 +224,7 @@ describe('unit navigation', () => {
       game,
       preset: {
         name: 'Test',
-        avatar: 'monster_Baron_Nashor',
+        avatar: TEST_AVATAR_KEY,
         camp: { x: NORTH.x, y: NORTH.y, r: 900 },
         speed: 12,
         size: 60,

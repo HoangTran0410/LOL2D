@@ -23,6 +23,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { contentPackInstalled } from './installed-packs.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = join(root, 'dist', 'assets');
@@ -228,8 +229,20 @@ const PREGAME_SIZE_CEILING_BYTES = 225_000;
 // The spell split only means anything while it is actually many chunks: a
 // `manualChunks` rule that stops matching returns one big one and nothing else
 // would notice.
+//
+// Gated on the pack that provides those champions actually being installed —
+// the same distinction `tests/support/installedPacks.ts` draws for the source
+// scans. Every `spell-<champion>-*.js` chunk comes from `packs/riot/spells/`
+// (`vite.config.ts`'s rule matches that path and no other); the reference
+// pack's four spells ride in `pregame` by design. So in a checkout with no
+// riot pack the honest count is zero and a flat floor of 40 would fail a
+// perfectly good build — which is exactly what `npm run verify:without-packs`
+// measured the first time it got this far. A floor that cannot be met is not
+// a check, and neither is one that is quietly skipped: with the pack present
+// this is unchanged.
+const RIOT_SPELL_CHUNK_FLOOR = 40;
 const spellChunks = readdirSync(assets).filter(name => /^spell-.+\.js$/.test(name));
-if (spellChunks.length < 40) {
+if (contentPackInstalled(root, 'riot') && spellChunks.length < RIOT_SPELL_CHUNK_FLOOR) {
   failures.push(
     `only ${spellChunks.length} spell-*.js chunks — the per-champion split is not applying`
   );

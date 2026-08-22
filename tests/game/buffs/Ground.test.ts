@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Dash from '../../../src/game/gameObject/buffs/Dash';
 import ActionState from '../../../src/game/enums/ActionState';
+import { packIsInstalled } from '../../support/installedPacks';
 
 class TestVector {
   constructor(
@@ -139,15 +140,23 @@ describe('Ground', () => {
 // teleportTo. Enforcing it in the Dash buff and in Spell.blinkOwnerTo only
 // holds as long as nothing goes around them, so fail the build if anything does.
 describe('no spell relocates its own caster behind the shared gate', () => {
-  const spellsDir = join(process.cwd(), 'packs/riot/spells');
+  // The riot pack's spells, when that pack is installed. Content-pack-extraction
+  // batch 5 task 8's drill `ENOENT`ed on this `readdirSync` with the pack moved
+  // out of the tree; the rule is the same either way, and what is conditional is
+  // only whether this checkout has that pack's 240 spells to hold to it. The
+  // core half below is unconditional and is what keeps this scan meaningful in a
+  // pack-free checkout.
+  const spellsDir = packIsInstalled('riot') ? join(process.cwd(), 'packs/riot/spells') : null;
   // `coreSpells/` left `spells/` but did not stop being spells — Recall's own
   // `blinkOwnerTo` call is the sanctioned gate this rule is about, so it has
   // to stay in the scanned population. `index.ts` is a barrel, not a spell.
   const coreSpellsDir = join(process.cwd(), 'src/game/gameObject/coreSpells');
   const files = [
-    ...readdirSync(spellsDir)
-      .filter(name => name.endsWith('.ts'))
-      .map(name => ({ dir: spellsDir, name })),
+    ...(spellsDir
+      ? readdirSync(spellsDir)
+          .filter(name => name.endsWith('.ts'))
+          .map(name => ({ dir: spellsDir, name }))
+      : []),
     ...readdirSync(coreSpellsDir)
       .filter(name => name.endsWith('.ts') && name !== 'index.ts')
       .map(name => ({ dir: coreSpellsDir, name })),

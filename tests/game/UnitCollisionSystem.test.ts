@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { TEST_AVATAR_KEY } from './fixtures';
 import { Rectangle } from '../../src/libs/quadtree';
 import AttackableUnit from '../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Minion from '../../src/game/gameObject/attackableUnits/Minion';
@@ -148,7 +149,7 @@ describe('unit body separation', () => {
     const system = new UnitCollisionSystem();
     const rooted: MonsterPresetData = {
       name: 'Baron',
-      avatar: 'monster_Baron_Nashor',
+      avatar: TEST_AVATAR_KEY,
       camp: { x: 1000, y: 1000, r: 100 },
       speed: 0,
       size: 100,

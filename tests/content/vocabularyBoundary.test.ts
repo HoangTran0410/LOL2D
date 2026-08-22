@@ -87,7 +87,7 @@ import { packIsInstalled, requireRoot } from '../support/installedPacks';
  */
 const SRC = join(__dirname, '../../src');
 const PACKS = join(__dirname, '../../packs');
-const RIOT_INSTALLED = packIsInstalled(PACKS, 'riot');
+const RIOT_INSTALLED = packIsInstalled('riot');
 
 function filesUnder(dir: string, extensions: string[]): string[] {
   const out: string[] = [];

@@ -102,7 +102,14 @@ const reachesTheMatch = (specifier: string): boolean =>
   // Batch 4: the spells (and every other piece of Riot content) live outside
   // `src/game/` now, so a reach into a pack's own code has no `/game/` in the
   // specifier at all and would otherwise walk straight past the check above.
-  specifier.includes('packs/');
+  //
+  // Batch 5 task 8 added the second spelling: a pack is resolvable by its own
+  // *package* name now (`@moba2d/content-riot/spells`), which is the address a
+  // pack has once it is a repository of its own — and which contains neither
+  // `/game/` nor `packs/`. One rule, both spellings, or the check is aimed at
+  // an address rather than at the thing.
+  specifier.includes('packs/') ||
+  specifier.startsWith('@moba2d/content-');
 
 describe('the pregame screen boots without the match', () => {
   it('finds the files it claims to check', () => {
@@ -177,5 +184,19 @@ describe('the pregame screen boots without the match', () => {
     `;
     const caught = staticImports(sample).filter(reachesTheMatch);
     expect(caught).toEqual(['../../../packs/riot/spells']);
+  });
+
+  it('the scan catches the barrel at its post-batch-5 package address too', () => {
+    // The address a pack has once it is installed rather than vendored — no
+    // `/game/`, no `packs/`. `src/generated/installedPacks.ts` is the one file
+    // in core allowed to write it, and it is not on the pregame file list this
+    // scan walks; anything on that list writing it is the same regression as
+    // the line above wearing a different name.
+    const sample = `
+      import { Ahri_Q } from '@moba2d/content-riot/spells';
+      import type { ContentPackData } from '@moba2d/core/content/ContentPack';
+    `;
+    const caught = staticImports(sample).filter(reachesTheMatch);
+    expect(caught).toEqual(['@moba2d/content-riot/spells']);
   });
 });

@@ -70,7 +70,22 @@ import { scanImports, stripComments } from '@/seams/importScan';
 const SRC = join(__dirname, '../../src');
 
 /** Whole files exempted entirely — every `packs/` reach in them is the bridge. */
-const EXEMPT_FILES = new Set(['content/install.ts']);
+const EXEMPT_FILES = new Set(['content/install.ts', 'generated/installedPacks.ts']);
+
+/**
+ * The two ways a specifier can name a pack, and both have to be banned.
+ *
+ * `/packs/` was the only one that existed until content-pack-extraction batch
+ * 5 task 8, because core reached both packs by relative path. That task made
+ * `src/generated/installedPacks.ts` import the riot pack by *package* name
+ * (`@moba2d/content-riot/pack`) — which is the whole point of it, since a
+ * relative path resolves to nothing once the pack is a repository of its own
+ * — and a specifier like that contains no `/packs/` at all. So the scan that
+ * exists to stop core reaching into a pack could not see the one new file
+ * that does. Adding the second pattern is what keeps this check aimed at the
+ * rule rather than at the spelling the rule happened to have.
+ */
+const PACK_SPECIFIER = /(?:^|\/)packs\/|^@moba2d\/content-/;
 
 /**
  * `relativePath -> the exact specifiers that file may name, and only as
@@ -150,7 +165,7 @@ describe('core does not import packs, outside the named exceptions', () => {
 
       const source = stripComments(readFileSync(file, 'utf8'));
       for (const { specifier, typeOnly } of references(source)) {
-        if (!specifier.includes('/packs/')) continue;
+        if (!PACK_SPECIFIER.test(specifier)) continue;
         const allowed = ALLOWED_TYPE_ONLY[relativePath] ?? [];
         if (typeOnly && allowed.includes(specifier)) continue;
         offenders.push(

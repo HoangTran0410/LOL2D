@@ -81,6 +81,28 @@ export class TestVector {
   }
 }
 
+/**
+ * A portrait key for a test unit that needs one and does not care which.
+ *
+ * `Monster`, `Minion` and `Turret` all resolve their `avatar` through
+ * `packAsset` -> `AssetManager.get`, which **throws** on a key nothing
+ * declares — so this is not decoration, it is the difference between a
+ * constructor working and a test file failing 19 times over.
+ *
+ * Eight core test files used `'monster_Baron_Nashor'` here, which is the riot
+ * pack's key: batch 4 task 4 moved that art into `packs/riot/assets/`, so
+ * every one of them silently required that pack to be installed to test a
+ * core mechanic that has nothing to do with it. Content-pack-extraction batch
+ * 5 task 8's departure drill is what made it visible — `Unknown asset key
+ * "monster_Baron_Nashor"`, 24 failures across six files, none of them about
+ * monsters, minions or turrets being wrong.
+ *
+ * `'other_logo'` is core's own, in `src/generated/assetManifest.ts`, and is
+ * there in every checkout by construction. Any core key would do; what
+ * matters is that it is not a pack's.
+ */
+export const TEST_AVATAR_KEY = 'other_logo';
+
 export type TestGame = GameObjectRuntimeContext & { setPlayer(player: AttackableUnit): void };
 
 export function createGame(mapSize = 6_400): TestGame {

@@ -1,8 +1,8 @@
 import { vi } from 'vitest';
 import { fastHypot } from '../src/utils/optimized.utils';
 import AssetManager from '../src/managers/AssetManager';
-import { assetManifest as riotAssetManifest } from '../packs/riot/generated/assetManifest';
-import { installSummonersRiftLanesForTests } from './game/lanesFixture';
+import { installedPacks } from '../src/generated/installedPacks';
+import { installSummonersRiftLanesForTests, loadPackLanesForTests } from './game/lanesFixture';
 
 Math.hypot = fastHypot;
 
@@ -28,8 +28,19 @@ Math.hypot = fastHypot;
  * a bare `{ get, getAsset }` double that has no `registerPackAssets` at
  * all — hoisted mocks apply to this setup file's own import too, and a
  * no-op under one is correct: those doubles never resolve a real key.
+ *
+ * Read out of `src/generated/installedPacks.ts` rather than importing
+ * `packs/riot/generated/assetManifest` by path, and not for tidiness: that
+ * static import was Vitest's *global setup*, so with `packs/riot/` moved out
+ * of the tree it was not the pack's own tests that failed, it was the entire
+ * suite failing to start. Content-pack-extraction batch 5 task 8's departure
+ * drill (`npm run verify:without-packs`) is what measured that. Same barrel
+ * `src/content/install.ts` reads, deliberately: two files answering "which
+ * packs exist" two different ways is how they drift.
  */
-AssetManager.registerPackAssets?.('riot', riotAssetManifest);
+for (const pack of installedPacks) {
+  AssetManager.registerPackAssets?.(pack.id, pack.assetManifest);
+}
 
 /**
  * Batch 4 task 6 moved Summoner's Rift's own lane waypoints out of
@@ -56,6 +67,7 @@ AssetManager.registerPackAssets?.('riot', riotAssetManifest);
  * same install afterward (`lanesFixture.ts`'s own doc comment explains why a
  * bare `resetLanesForTests()` there is not enough).
  */
+await loadPackLanesForTests();
 installSummonersRiftLanesForTests();
 
 Object.assign(globalThis, {

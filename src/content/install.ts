@@ -9,27 +9,42 @@ import type {
 import type { PackRegistry } from './PackRegistry';
 import type { ChampionAttackTuning } from '@/game/gameObject/attackableUnits/Champion';
 import AssetManager from '@/managers/AssetManager';
-// These three static imports are what makes core's own `verify` a build of
-// the pack as well as of the engine, and saying so here is the correction
-// fix round 4 of content-pack-extraction batch 5 task 6 owed the reader.
-// `tsconfig.json`'s `include: ["src/**/*"]` follows imports, so `typecheck`
-// compiles `packs/riot` and `packs/reference`; `vite build` bundles them.
-// Move `packs/` aside and `verify`'s first step stops on these three lines
-// — `error TS2307: Cannot find module '../../packs/riot/pack'` — which is
-// measured, not predicted.
+// **Every optional pack arrives through this one generated barrel**, and the
+// barrel names each one by *package* name (`@moba2d/content-riot`), never by
+// relative path — which is the whole of content-pack-extraction batch 5 task
+// 8.
 //
-// So "plain `verify` is core-only" describes what the *script list* was
-// scoped to (batch 5 task 6 split the pack's asset, catalogue, typecheck and
-// seam gates out into `verify:all`), not what the build actually reaches. A
-// pack-free `verify` needs this file to become the Stage 2 loader its own
-// header below describes — a fetch and an `import(blobUrl)`, no specifier
-// naming `packs/` at all — plus the 109 test files under `tests/` that
-// import from `packs/` moving to the pack's own suite. Both are later
-// tasks; neither is true today, and `.github/workflows/build.yml` says the
-// same thing beside the CI step that would otherwise be read as proof.
-import riotCode, { data as riotData, BUNDLED_PACK_ID } from '../../packs/riot/pack';
+// This file used to import `../../packs/riot/pack` directly, and the previous
+// version of this comment said so at length: `tsconfig.json`'s
+// `include: ["src/**/*"]` follows imports, so `typecheck` compiled
+// `packs/riot`, `vite build` bundled it, and moving `packs/` aside stopped
+// `verify` dead on this line with `error TS2307: Cannot find module
+// '../../packs/riot/pack'`. That was measured, not predicted, and it meant
+// core could not be built without the pack at all — the one claim the whole
+// extraction rests on.
+//
+// A relative path is also a path that resolves to *nothing* the day the pack
+// is a repository of its own and `npm install` puts it under `node_modules/`.
+// `src/generated/installedPacks.ts` is generated from what is actually
+// installed (`scripts/generate-installed-packs.mjs`, run by `predev`,
+// `prebuild` and checked by `verify`), so with the pack gone the barrel is
+// simply an empty array and this module still compiles, still boots, and
+// installs the reference pack alone. `npm run verify:without-packs` is the
+// drill that proves it, end to end, in one command.
+//
+// The barrel rather than a dynamic import because **this file's shape is
+// load-bearing**: it is spec §9.1's Stage 1 loader, `spellRegistry.ts` reads
+// `BUNDLED_PACK_ID` from it at module scope, and `Game` builds a match plan
+// synchronously. Nothing in ESM makes a *static* import conditional; what can
+// be conditional is the generated list of them. Same idiom as
+// `src/generated/assetManifest.ts` and `spellCatalog.ts`.
+import { installedPacks } from '@/generated/installedPacks';
+// **The reference pack is not optional and stays a plain import.** It is
+// core's own content — one champion, four spells, one map — and it is what
+// makes core a complete game standing alone rather than a menu. It never
+// leaves this repository, so it is never absent, so there is nothing for the
+// barrel to decide about it.
 import referenceCode, { data as referenceData } from '../../packs/reference/pack';
-import { assetManifest as riotAssetManifest } from '../../packs/riot/generated/assetManifest';
 // Core's own generated barrels — one entry each (`BasicAttack`) since batch 4
 // task 3 moved the other 237 into `packs/riot/generated/`.
 // `tests/content/rosterSource.test.ts` bans reading these two specifiers
@@ -40,8 +55,6 @@ import { assetManifest as riotAssetManifest } from '../../packs/riot/generated/a
 // `corePacksBoundary.test.ts`'s exemption list for the same reason.
 import { spellCatalog as coreSpellCatalog } from '@/generated/spellCatalog';
 import { spellModules as coreSpellModules } from '@/generated/spellModules';
-
-export { BUNDLED_PACK_ID };
 
 /**
  * Stage 1's loader, and the only file Stage 2 replaces.
@@ -68,10 +81,12 @@ export { BUNDLED_PACK_ID };
  * `contentRegistry()` — and handed to `installBundledPackCode` as a plain
  * argument.
  *
- * `riot` installs first: it is the game's own content, and install order is
- * how two packs answering the same question resolve, so the player gets the
- * answer they expect today. The reference pack follows to keep proving the
- * seam against a second, independent pack. `BUNDLED_PACK_DATA` and
+ * The optional packs install first: `riot` is the game's own content, and
+ * install order is how two packs answering the same question resolve, so the
+ * player gets the answer they expect today. The reference pack follows to
+ * keep proving the seam against a second, independent pack — and, when no
+ * optional pack is installed at all, to be the whole game on its own.
+ * `BUNDLED_PACK_DATA` and
  * `BUNDLED_PACKS` are parallel arrays — index `i` of one is the data half of
  * index `i` of the other's code — because `installBundledPackCode` needs
  * each factory's pack id before it has anything the factory returned yet.
@@ -89,18 +104,40 @@ export { BUNDLED_PACK_ID };
  * refuses a pack file any reach into `@/generated/spellCatalog`/
  * `@/generated/spellModules`/`@/game/gameObject/coreSpells/Recall`. So this
  * file does it instead, the one place already allowed to name both the pack
- * and core's own spells: `riotDataWithCore`/`riotCodeWithCore` below fold
- * core's `BasicAttack` entry (plus, on the code half only, `Recall` — it
- * carries no display data, so there is nothing to fold onto the data half)
- * onto what `packs/riot/pack.ts` returns, core-last, before either half is
- * installed — `PackRegistry.installData`/`installCode` reject a second
- * install under an id already taken, so this has to happen once, before the
- * call, not as a second install under the same `riot` id.
+ * and core's own spells: `withCoreSpells` below folds core's `BasicAttack`
+ * entry (plus, on the code half only, `Recall` — it carries no display data,
+ * so there is nothing to fold onto the data half) onto what the first
+ * installed pack returns, core-last, before either half is installed —
+ * `PackRegistry.installData`/`installCode` reject a second install under an
+ * id already taken, so this has to happen once, before the call, not as a
+ * second install under the same id.
+ *
+ * **"The first installed pack", not "riot".** Which pack owns bare ids is a
+ * consequence of install order, not a name written down twice — with the riot
+ * pack absent the reference pack is first and `BUNDLED_PACK_ID` is
+ * `'reference'`, and `BasicAttack`/`Recall` fold onto it instead, because a
+ * kit with no basic attack and no way home is not a playable game. There is
+ * always a first pack: the reference pack cannot be uninstalled.
  */
 
-// Registers packs/riot's own generated manifest so `riot:<localKey>` — and,
-// for a bare key no other pack claims, the unqualified key too (see
+/**
+ * One installed pack, as this file consumes it: the two halves plus the id
+ * they are installed under. The optional ones come from the generated barrel;
+ * the reference pack is built here from its own plain import.
+ */
+interface BundledPack {
+  id: string;
+  data: ContentPackData;
+  code: ContentPackFactory;
+}
+
+// Registers each installed pack's own generated manifest so `<packId>:<localKey>`
+// — and, for a bare key no other pack claims, the unqualified key too (see
 // `AssetManager.resolveDescriptor`'s own doc comment) — resolves against it.
+// The reference pack is not in this loop: its five images live in *core's*
+// own `assets/images/reference/` and are already in core's generated manifest,
+// so it has no pack manifest of its own to register.
+//
 // `?.` rather than a bare call: dozens of spell tests mock `AssetManager`
 // down to `get`/`getAsset` and still exercise this module through
 // `contentRegistry()` (`spellGroups()`, `loadEverySpellForTests()`), and none
@@ -110,7 +147,27 @@ export { BUNDLED_PACK_ID };
 // here from `bundledPack.ts`: a pack file may not import `AssetManager`
 // directly (the `pack-core-boundary` seam), so this registration was never the
 // pack's own to keep.
-AssetManager.registerPackAssets?.(BUNDLED_PACK_ID, riotAssetManifest);
+for (const pack of installedPacks) {
+  AssetManager.registerPackAssets?.(pack.id, pack.assetManifest);
+}
+
+/**
+ * Install order: every optional pack the barrel found, then the reference
+ * pack. Never empty — the reference pack is always here — which is what lets
+ * `BUNDLED_PACK_ID` and the core-spell fold below index `[0]` without a
+ * guard.
+ */
+const packsInInstallOrder: BundledPack[] = [
+  ...installedPacks.map(pack => ({ id: pack.id, data: pack.data, code: pack.code })),
+  { id: referenceData.manifest.id, data: referenceData, code: referenceCode },
+];
+
+/**
+ * The pack a bare, unqualified spell id resolves against — `spellRegistry.ts`'s
+ * `qualifySpellId`. `'riot'` in any build that has the riot pack, which is
+ * every shipped one; `'reference'` in a core-only checkout.
+ */
+export const BUNDLED_PACK_ID: string = packsInInstallOrder[0].id;
 
 // Assignable both ways, checked by the compiler and costing nothing at
 // runtime. `ChampionAttack` (`./ContentPack`) is declared in the contract
@@ -125,21 +182,21 @@ const _attackShapesAgree: [ChampionAttack, ChampionAttackTuning] = [
 void _attackShapesAgree;
 
 /**
- * `packs/riot/data.ts`'s own `spellDisplay`, plus core's `BasicAttack` entry
- * — core-last, so a (today impossible) id collision resolves to core rather
+ * The bundled pack's own `spellDisplay`, plus core's `BasicAttack` entry —
+ * core-last, so a (today impossible) id collision resolves to core rather
  * than letting content shadow the one spell every kit presupposes.
  */
-const riotDataWithCore: ContentPackData = {
-  ...riotData,
-  spellDisplay: { ...riotData.spellDisplay, ...coreSpellCatalog },
-};
+const dataWithCoreSpells = (data: ContentPackData): ContentPackData => ({
+  ...data,
+  spellDisplay: { ...data.spellDisplay, ...coreSpellCatalog },
+});
 
 /**
- * `packs/riot/code.ts`'s own spells, plus core's `BasicAttack` class and
- * `Recall` factory — same core-last merge as `riotDataWithCore`, on the code
- * half. `BasicAttack`'s entries are already plain classes on `default` — no
- * factory to call, unlike every pack loader `riotCode(api)` already wraps.
- * `Recall` is the opposite of both: not in `coreSpellModules` at all (see
+ * The bundled pack's own spells, plus core's `BasicAttack` class and `Recall`
+ * factory — same core-last merge as `dataWithCoreSpells`, on the code half.
+ * `BasicAttack`'s entries are already plain classes on `default` — no factory
+ * to call, unlike every pack loader `code(api)` already wraps. `Recall` is the
+ * opposite of both: not in `coreSpellModules` at all (see
  * `coreSpells/index.ts`'s own header for why it is deliberately not
  * catalogued there), and still a factory rather than a plain class — see
  * `preset.ts`'s own import comment for why — so it is folded on by hand.
@@ -152,24 +209,30 @@ const riotDataWithCore: ContentPackData = {
  * chunk's own header calls out as the regression the whole split exists to
  * prevent. A dynamic import is the sanctioned way across that boundary
  * (`scripts/check-chunks.mjs` only ever flags a *static* one) and is the
- * same shape `packs/riot/code.ts`'s own `Recall` entry used before this
- * task moved the file — a lazy loader is a better fit than an eager
+ * same shape `packs/riot/code.ts`'s own `Recall` entry used before batch 5
+ * task 1 moved the file — a lazy loader is a better fit than an eager
  * resolve anyway, since nothing here calls this path outside a test or a
  * pack composed and installed on its own.
  */
-const riotCodeWithCore: ContentPackFactory = (api: ContentApi): ContentPackCode => {
-  const code = riotCode(api);
-  const spells: Record<string, SpellSource> = { ...code.spells };
-  for (const [id, load] of Object.entries(coreSpellModules)) {
-    spells[id] = () => load().then(module => module.default);
-  }
-  spells.Recall = () =>
-    import('@/game/gameObject/coreSpells/Recall').then(module => module.default(api));
-  return { ...code, spells };
-};
+const codeWithCoreSpells =
+  (factory: ContentPackFactory): ContentPackFactory =>
+  (api: ContentApi): ContentPackCode => {
+    const code = factory(api);
+    const spells: Record<string, SpellSource> = { ...code.spells };
+    for (const [id, load] of Object.entries(coreSpellModules)) {
+      spells[id] = () => load().then(module => module.default);
+    }
+    spells.Recall = () =>
+      import('@/game/gameObject/coreSpells/Recall').then(module => module.default(api));
+    return { ...code, spells };
+  };
 
-export const BUNDLED_PACK_DATA: ContentPackData[] = [riotDataWithCore, referenceData];
-export const BUNDLED_PACKS: ContentPackFactory[] = [riotCodeWithCore, referenceCode];
+export const BUNDLED_PACK_DATA: ContentPackData[] = packsInInstallOrder.map((pack, index) =>
+  index === 0 ? dataWithCoreSpells(pack.data) : pack.data
+);
+export const BUNDLED_PACKS: ContentPackFactory[] = packsInInstallOrder.map((pack, index) =>
+  index === 0 ? codeWithCoreSpells(pack.code) : pack.code
+);
 
 if (BUNDLED_PACK_DATA.length !== BUNDLED_PACKS.length) {
   // A pack added to one array and not the other silently misaligns every

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { packIsInstalled } from '../../support/installedPacks';
 
 /**
  * No geometry may be computed at module-eval time.
@@ -41,11 +42,21 @@ const ROOT = join(__dirname, '../../..');
  * off `src/game/lanes.ts` and relocated it there too — the scan still
  * covers the same module, just at its new path.
  */
+/**
+ * Core's own three, plus one geometry module per installed pack.
+ *
+ * `packs/riot/maps/summonersRiftGeometry.ts` used to be an unconditional
+ * entry, which made this whole scan `ENOENT` the moment that pack was moved
+ * out of the tree — content-pack-extraction batch 5 task 8's drill. The rule
+ * a pack's geometry module is held to has not changed; what is conditional is
+ * only whether this checkout has that pack to hold. The reference pack's is
+ * unconditional because that pack never leaves.
+ */
 const FILES = [
   'src/game/lanes.ts',
   'src/game/ai/LaneObjectives.ts',
   'src/game/Game.ts',
-  'packs/riot/maps/summonersRiftGeometry.ts',
+  ...(packIsInstalled('riot') ? ['packs/riot/maps/summonersRiftGeometry.ts'] : []),
   'packs/reference/provingGroundsGeometry.ts',
 ];
 

@@ -401,6 +401,18 @@ export default defineConfig({
             id.includes('src/game/constants') ||
             id.includes('src/game/input/touchPreferences') ||
             id.includes('src/generated/spellCatalog') ||
+            // The generated installed-packs barrel. `src/content/install.ts`
+            // (already `pregame`, by the `/src/content/` rule above) is its
+            // only importer in the app, so Rollup would hoist it here anyway
+            // — pinned explicitly because "would anyway" is exactly the
+            // reasoning `DomUtils` and `__vitePreload` each falsified once,
+            // and because an unassigned module reached from two chunks lands
+            // in whichever one Rollup prefers. It carries a pack's `data`
+            // half and its generated asset manifest, both of which this
+            // chunk already had before batch 5 task 8 moved them behind the
+            // barrel; the `code` half stays out of `pregame` through
+            // `packs/riot/code.ts`'s own rule further up.
+            id.includes('src/generated/installedPacks') ||
             // The picker components themselves. They are *shared* — the in-game
             // practice panel opens the same `LoadoutEditorModal` — and a shared
             // module goes wherever Rollup puts it, which was `game`. So the

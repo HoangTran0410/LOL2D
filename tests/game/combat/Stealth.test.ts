@@ -25,7 +25,7 @@ import Invisible from '../../../src/game/gameObject/buffs/Invisible';
 import TrueSight from '../../../src/game/gameObject/buffs/TrueSight';
 import TeamId from '../../../src/game/enums/TeamId';
 import { Lane, getLaneWaypoints } from '../../../src/game/lanes';
-import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
+import { createGame, indexObjects, stubGameGlobals, TEST_AVATAR_KEY, type TestGame } from '../fixtures';
 
 const CAMP = { x: 1_000, y: 1_000, r: 300 };
 
@@ -57,7 +57,7 @@ const makeCamp = () =>
     game,
     preset: {
       name: 'Camp',
-      avatar: 'monster_Baron_Nashor',
+      avatar: TEST_AVATAR_KEY,
       camp: { ...CAMP },
       speed: 2,
       size: 80,

@@ -3,7 +3,6 @@ import { mkdir, mkdtemp, readFile, rename, rm, stat, writeFile } from 'node:fs/p
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderAssetManifestSource } from '../generate-assets.mjs';
-import { renderAssetManifestSource as renderPackAssetManifestSource } from '../../packs/riot/scripts/generate-assets.mjs';
 import { createMediaWikiClient } from './mediawiki.mjs';
 import { assertPcSource, championSkillForms, parseLuaData } from './lua-data.mjs';
 import { normalizeAbilityFields } from './normalize.mjs';
@@ -340,7 +339,23 @@ export async function importAbilities({
   // at `root`. So the call below re-roots: `packRoot`, not `root`, and
   // every `add`/`remove` path stripped of its `packs/riot/` prefix — the
   // same files, just named the way that generator names them.
+  //
+  // Reached with a *dynamic* `import()` rather than a static one at the top of
+  // this file, and that is content-pack-extraction batch 5 task 8's finding
+  // rather than a preference. `check-abilities.mjs` imports `contentHash` from
+  // this module, `npm run verify` runs it as `ability:check`, and a static
+  // `import ... from '../../packs/riot/scripts/generate-assets.mjs'` is
+  // resolved when the module loads — not when this function is called. So
+  // `ability:check` — a check over `docs/abilities/`, which is core's own tree
+  // and needs no pack at all — died with `ERR_MODULE_NOT_FOUND` the moment
+  // `packs/riot/` was moved aside. Measured by the drill, at step 4, on the
+  // very first run that got past `install.ts`. Down here the specifier is only
+  // resolved on the path that genuinely needs it: a real `ability:import`,
+  // which writes into `packs/riot/assets/` and has no meaning without the pack.
   const packRoot = resolve(root, 'packs/riot');
+  const { renderAssetManifestSource: renderPackAssetManifestSource } = await import(
+    '../../packs/riot/scripts/generate-assets.mjs'
+  );
   const toPackRelative = path =>
     path.startsWith(PACK_PATH_PREFIX) ? path.slice(PACK_PATH_PREFIX.length) : null;
   outputs.push([

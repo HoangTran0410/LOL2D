@@ -18,6 +18,7 @@ import ObjectManager from '../../../src/game/managers/ObjectManager';
 import Spell from '../../../src/game/gameObject/Spell';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
 import AIChampion from '../../../src/game/gameObject/attackableUnits/AIChampion';
+import { packIsInstalled } from '../../support/installedPacks';
 
 describe('Champion spell presentation lifecycle', () => {
   it('draws VFX for every owned spell in the champion world layer', () => {
@@ -118,9 +119,14 @@ describe('Champion spell presentation lifecycle', () => {
   });
 
   it('routes production spell replacement through Champion cleanup', () => {
+    // `Shaco_R.ts` is the riot pack's, and is only read when that pack is
+    // installed — batch 5 task 8's drill `ENOENT`ed here with it moved aside.
+    // It is in the list because a clone-spawning ultimate is the shape that
+    // used to assign `clone.spells[i] =` directly; core's own three files are
+    // the permanent half of the population.
     const files = [
       '../../../src/game/gameObject/attackableUnits/AIChampion.ts',
-      '../../../packs/riot/spells/Shaco_R.ts',
+      ...(packIsInstalled('riot') ? ['../../../packs/riot/spells/Shaco_R.ts'] : []),
       '../../../src/game/hud/InGameHUD.ts',
       // The spell picker's `pick()` — what used to be InGameHUD's own
       // spell-swap logic — moved here when the HUD split into a shared

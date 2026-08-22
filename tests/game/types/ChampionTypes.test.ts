@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { TEST_AVATAR_KEY } from '../fixtures';
 import { Rectangle } from '../../../src/libs/quadtree';
 import AssetManager from '../../../src/managers/AssetManager';
 import Champion from '../../../src/game/gameObject/attackableUnits/Champion';
@@ -212,7 +213,7 @@ describe('champion and direct-subclass type boundary', () => {
       game,
       preset: {
         name: 'Test Monster',
-        avatar: 'monster_Baron_Nashor',
+        avatar: TEST_AVATAR_KEY,
         camp: { x: 0, y: 0, r: 100 },
         speed: 0,
         size: 100,
