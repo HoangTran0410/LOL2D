@@ -21,8 +21,12 @@ import { buildContentApi } from '../../src/content/ContentApi';
  * would refuse to compile a pack file reaching for something `ContentApi`
  * does not carry. Those two together now hold the property this file used to
  * check, structurally, for every pack file — this file's remaining, real job
- * is `coreSpells/` alone (today, just `BasicAttack.ts`, the one spell core
- * still constructs directly and imports `@/game/...` from as a plain value).
+ * is `coreSpells/` alone. `Recall.ts` joined `BasicAttack.ts` there in batch 5
+ * task 1, but contributes nothing to this scan's population: its own two
+ * `@/`-prefixed imports (`@/content/ContentApi`, `@/content/types`) are both
+ * `import type`, erased before this file's `isType` filter even runs. So
+ * `BasicAttack.ts` stays, today, the one spell core constructs directly and
+ * imports `@/game/...` from as a plain value.
  *
  * `ContentApi` is a hand-assembled list, and a hand-assembled list drifts.
  * The first cut of this file imported the default export of every core

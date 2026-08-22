@@ -64,16 +64,20 @@ export { BUNDLED_PACK_ID };
  * bare, unqualified spell id has always meant "the bundled pack's own"
  * (`spellRegistry.ts`'s `qualifySpellId`, reading `BUNDLED_PACK_ID` from
  * here), and that has to include `BasicAttack` — core's own fallback spell,
- * which every kit's slot 0 names bare. `packs/riot/code.ts`/`data.ts` cannot
- * fold it in themselves: `tests/content/packBoundary.test.ts` refuses a pack
- * file any reach into `@/generated/spellCatalog`/`@/generated/spellModules`.
- * So this file does it instead, the one place already allowed to name both
- * the pack and core's own generated barrel: `riotDataWithCore`/
- * `riotCodeWithCore` below fold core's single `BasicAttack` entry onto what
- * `packs/riot/pack.ts` returns, core-last, before either half is installed —
- * `PackRegistry.installData`/`installCode` reject a second install under an
- * id already taken, so this has to happen once, before the call, not as a
- * second install under the same `riot` id.
+ * which every kit's slot 0 names bare — and, since batch 5 task 1, `Recall`:
+ * `packs/riot/data.ts`'s `championEntries()` still names every champion's
+ * way home as the bare string `'Recall'`. `packs/riot/code.ts`/`data.ts`
+ * cannot fold either in themselves: `tests/content/packBoundary.test.ts`
+ * refuses a pack file any reach into `@/generated/spellCatalog`/
+ * `@/generated/spellModules`/`@/game/gameObject/coreSpells/Recall`. So this
+ * file does it instead, the one place already allowed to name both the pack
+ * and core's own spells: `riotDataWithCore`/`riotCodeWithCore` below fold
+ * core's `BasicAttack` entry (plus, on the code half only, `Recall` — it
+ * carries no display data, so there is nothing to fold onto the data half)
+ * onto what `packs/riot/pack.ts` returns, core-last, before either half is
+ * installed — `PackRegistry.installData`/`installCode` reject a second
+ * install under an id already taken, so this has to happen once, before the
+ * call, not as a second install under the same `riot` id.
  */
 
 // Registers packs/riot's own generated manifest so `riot:<localKey>` — and,
@@ -113,10 +117,27 @@ const riotDataWithCore: ContentPackData = {
 };
 
 /**
- * `packs/riot/code.ts`'s own spells, plus core's `BasicAttack` class —
- * same core-last merge as `riotDataWithCore`, on the code half. Core's own
- * entries are already plain classes on `default` — no factory to call,
- * unlike every pack loader `riotCode(api)` already wraps.
+ * `packs/riot/code.ts`'s own spells, plus core's `BasicAttack` class and
+ * `Recall` factory — same core-last merge as `riotDataWithCore`, on the code
+ * half. `BasicAttack`'s entries are already plain classes on `default` — no
+ * factory to call, unlike every pack loader `riotCode(api)` already wraps.
+ * `Recall` is the opposite of both: not in `coreSpellModules` at all (see
+ * `coreSpells/index.ts`'s own header for why it is deliberately not
+ * catalogued there), and still a factory rather than a plain class — see
+ * `preset.ts`'s own import comment for why — so it is folded on by hand.
+ *
+ * Reached with a *dynamic* `import()`, deliberately, not the static import
+ * every other symbol in this file uses: this module (`src/content/`) is
+ * chunked `pregame`, and `coreSpells/Recall.ts` falls to the blanket
+ * `/src/game/` rule in `vite.config.ts` and lands in `game` — a *static*
+ * value import here would open exactly the `pregame -> game` edge that
+ * chunk's own header calls out as the regression the whole split exists to
+ * prevent. A dynamic import is the sanctioned way across that boundary
+ * (`scripts/check-chunks.mjs` only ever flags a *static* one) and is the
+ * same shape `packs/riot/code.ts`'s own `Recall` entry used before this
+ * task moved the file — a lazy loader is a better fit than an eager
+ * resolve anyway, since nothing here calls this path outside a test or a
+ * pack composed and installed on its own.
  */
 const riotCodeWithCore: ContentPackFactory = (api: ContentApi): ContentPackCode => {
   const code = riotCode(api);
@@ -124,6 +145,8 @@ const riotCodeWithCore: ContentPackFactory = (api: ContentApi): ContentPackCode 
   for (const [id, load] of Object.entries(coreSpellModules)) {
     spells[id] = () => load().then(module => module.default);
   }
+  spells.Recall = () =>
+    import('@/game/gameObject/coreSpells/Recall').then(module => module.default(api));
   return { ...code, spells };
 };
 

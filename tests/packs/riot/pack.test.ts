@@ -17,10 +17,11 @@ import type { ContentPack } from '../../../src/content/ContentPack';
  *
  * **This pack, on its own, is not installable — deliberately, and the last
  * test below pins that.** `data.champions` names `'BasicAttack'` (the "Đánh
- * Thường" shelf) and gives every champion a `Recall`; `code.ts` supplies
- * `Recall` but not `BasicAttack` — core's own spell, which
- * `tests/content/packBoundary.test.ts` refuses this pack any direct reach
- * for. `src/content/install.ts` is what folds core's `BasicAttack` onto
+ * Thường" shelf) and gives every champion a `'Recall'`; `code.ts` supplies
+ * neither — both are core's own spells (`Recall` came back to
+ * `src/game/gameObject/coreSpells/` in batch 5 task 1, beside `BasicAttack`)
+ * — which `tests/content/packBoundary.test.ts` refuses this pack any direct
+ * reach for. `src/content/install.ts` is what folds both core spells onto
  * this pack's data and code before installing either half
  * (`tests/content/install.test.ts` covers that composed, actually-installed
  * shape); a bare `{ ...data, ...riotCode(api) }` was never meant to stand
@@ -34,11 +35,12 @@ describe('the riot pack', () => {
     expect(data.champions?.length).toBeGreaterThan(30);
   });
 
-  it("carries every generated spell module, plus Recall — core's BasicAttack is install.ts's to add", () => {
+  it("carries exactly the generated spell modules — core's BasicAttack and Recall are install.ts's to add", () => {
     const code = riotCode(api);
     expect(Object.keys(riotSpellModules).length).toBeGreaterThan(200);
-    expect(Object.keys(code.spells ?? {})).toHaveLength(Object.keys(riotSpellModules).length + 1);
+    expect(Object.keys(code.spells ?? {})).toHaveLength(Object.keys(riotSpellModules).length);
     expect(code.spells?.BasicAttack).toBeUndefined();
+    expect(code.spells?.Recall).toBeUndefined();
   });
 
   it('hands every spell over lazily — each one is a loader, not a resolved class', () => {
@@ -47,9 +49,9 @@ describe('the riot pack', () => {
     expect(entries.length).toBeGreaterThan(200);
     for (const [id, source] of entries) {
       expect(typeof source, id).toBe('function');
-      // A class has a `prototype`; an arrow-function loader (the shape both
-      // `spellModules`'s entries and `Recall`'s own loader use) never does —
-      // see `isSpellLoader`'s own doc comment for this exact discriminator.
+      // A class has a `prototype`; an arrow-function loader (the shape every
+      // `spellModules` entry uses) never does — see `isSpellLoader`'s own
+      // doc comment for this exact discriminator.
       expect((source as { prototype?: unknown }).prototype, id).toBeUndefined();
     }
   });
@@ -81,9 +83,13 @@ describe('the riot pack', () => {
     expect(actual.sort()).toEqual(expected);
   });
 
-  it('declares Recall on every champion, and keeps it out of the display data', () => {
+  it('declares Recall on every champion by name, but supplies neither the class nor display data', () => {
+    // The class half moved to core (batch 5 task 1 — `tests/content/install.test.ts`
+    // covers the folded, actually-loadable `'riot:Recall'`); this pack keeps
+    // only the data-half promise, `recall: 'Recall'`, and — like `BasicAttack`
+    // — no display entry, so a random loadout roll can never draw it.
     const code = riotCode(api);
-    expect(code.spells?.Recall).toBeTypeOf('function');
+    expect(code.spells?.Recall).toBeUndefined();
     expect(data.spellDisplay?.Recall).toBeUndefined();
     for (const champion of data.champions ?? []) expect(champion.recall).toBe('Recall');
   });
@@ -93,13 +99,15 @@ describe('the riot pack', () => {
     expect(code.monsterAbilities?.baron?.length).toBeGreaterThan(0);
   });
 
-  it("is not independently installable — it depends on core's own BasicAttack", () => {
-    // `src/content/install.ts` folds `BasicAttack` onto this pack before
-    // installing it (`riotDataWithCore`/`riotCodeWithCore`); a bare
-    // `{ ...data, ...riotCode(api) }`, installed on its own, is missing a
-    // spell its own roster names. This pins the *reason* — a champion named
-    // "Đánh Thường" whose one ability is `'BasicAttack'` — so a future
-    // reader who hits this throw does not mistake it for a bug in the pack.
+  it("is not independently installable — it depends on core's own BasicAttack and Recall", () => {
+    // `src/content/install.ts` folds `BasicAttack` and `Recall` onto this
+    // pack before installing it (`riotDataWithCore`/`riotCodeWithCore`); a
+    // bare `{ ...data, ...riotCode(api) }`, installed on its own, is missing
+    // both — every champion's `recall: 'Recall'` unresolved on top of the
+    // "Đánh Thường" champion's one ability. This pins the *reason* the
+    // install still throws — `/BasicAttack/` is one of several errors the
+    // rejection message now joins, not the whole of it — so a future reader
+    // who hits this throw does not mistake it for a bug in the pack.
     const pack: ContentPack = { ...data, ...riotCode(api) };
     expect(() => new PackRegistry().install(pack)).toThrow(/BasicAttack/);
   });

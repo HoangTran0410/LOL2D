@@ -453,15 +453,17 @@ export default defineConfig({
           // only the pack's spells are chunked per champion — batch 4 task 3
           // moved them from `src/game/gameObject/spells/` to `packs/riot/spells/`.
           //
-          // `Recall` is the one content file that is not per-champion: it
-          // presupposes a fountain, not a kit, so it moved back to `spells/`
-          // (see that file's own header) — but `preset.ts` still imports it
-          // eagerly for every match this batch, exactly like `BasicAttack`.
-          // Left to the regex below it would land in its own `spell-common`
-          // chunk that nothing ever *dynamically* imports, which is exactly
-          // the static edge `chunks:check`'s `game` rule exists to catch.
-          // Carved out ahead of the regex so it bundles with `game` instead.
-          if (id.endsWith('packs/riot/spells/Recall.ts')) return 'game';
+          // `Recall.ts` used to need its own carve-out here: it lived under
+          // `packs/riot/spells/`, which the regex below would otherwise have
+          // put in its own `spell-common` chunk — one nothing ever
+          // *dynamically* imported, since `preset.ts` imported it eagerly,
+          // exactly like `BasicAttack` — which is the static edge
+          // `chunks:check`'s `game` rule exists to catch. Batch 5 task 1 moved
+          // the file back to `src/game/gameObject/coreSpells/Recall.ts`,
+          // beside `BasicAttack.ts`, so it now falls through to the blanket
+          // `/src/game/` rule a few lines down like every other core file —
+          // no carve-out needed any more, and the regex below no longer
+          // matches its path at all.
           const spell = /packs\/riot\/spells\/([A-Za-z0-9]+?)(?:_[QWER][0-9]*)?\.ts$/.exec(id);
           if (spell) {
             // Summoner spells and the basic attack have no champion prefix to

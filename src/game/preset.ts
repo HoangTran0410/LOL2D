@@ -34,18 +34,25 @@ import {
   type SpellClass,
 } from './spellRegistry';
 import BasicAttack from './gameObject/coreSpells/BasicAttack';
-// Relative into `packs/riot/`, not `@/…`: `Recall.ts` moved with the other
-// 237 spells in batch 4 task 3. Its default export is now a factory
-// (`(api: ContentApi) => SpellClass`, like every pack spell), so this also
-// needs a real `ContentApi` — `buildContentApi()` is otherwise reserved for
-// `install.ts`'s caller (`registry.ts`), but this file already carries the
-// one named, pinned exception `tests/content/coreSpells.test.ts` checks for,
-// and `tests/content/corePacksBoundary.test.ts` (the reverse-direction guard
-// this task adds) carries the matching one. Resolved once at module scope,
-// not per champion: `buildContentApi()` is a cached singleton and the class
-// itself never changes between champions.
+// Core mechanism now (batch 5 task 1 moved `Recall.ts` back from
+// `packs/riot/spells/`, beside `BasicAttack.ts`), not a content import — this
+// line is no longer the one named exception `corePacksBoundary.test.ts`
+// carries for this file; that file's allow-list no longer mentions
+// `preset.ts` at all. `Recall`'s default export is still a factory
+// (`(api: ContentApi) => SpellClass`) rather than a plain class like
+// `BasicAttack`: `packs/riot/data.ts` still names every champion's way home
+// as the bare string `'Recall'`, and `src/content/install.ts` still folds a
+// real `Recall` class onto the installed pack's spells to resolve it (the
+// same core-last fold that file already does for `BasicAttack`) — so the
+// factory shape stays, for that one other caller, rather than being
+// collapsed down to match `BasicAttack` exactly. `buildContentApi()` is
+// otherwise reserved for `install.ts`'s caller (`registry.ts`); called here
+// too because this is the second and only other place a real `Recall` class
+// is built outside that path. Resolved once at module scope, not per
+// champion: `buildContentApi()` is a cached singleton and the class itself
+// never changes between champions.
 import { buildContentApi } from '@/content/ContentApi';
-import makeRecall from '../../packs/riot/spells/Recall';
+import makeRecall from './gameObject/coreSpells/Recall';
 
 const RecallClass = makeRecall(buildContentApi());
 
@@ -65,9 +72,9 @@ const RecallClass = makeRecall(buildContentApi());
 export type { SpellClass };
 
 /**
- * Gives a freshly built champion its way home — the same kind of content
- * decision this file already makes for `BasicAttack`, just made once per
- * champion instead of once per slot.
+ * Gives a freshly built champion its way home — the same kind of core-
+ * mechanism decision this file already makes for `BasicAttack`, just made
+ * once per champion instead of once per slot.
  *
  * `Champion.recall` is deliberately not part of `ChampionPresetData`: a preset
  * swap must not take the ability to go home away from a champion that already
@@ -77,10 +84,12 @@ export type { SpellClass };
  * A map with no fountain is future work for a content pack to express by
  * simply not calling this; nothing here assumes every champion gets one.
  *
- * Three sibling sites document this same bridge from their own end:
- * `vite.config.ts`'s chunking carve-out for `Recall.ts`, and
- * `tests/content/coreSpells.test.ts` and `tests/content/corePacksBoundary.test.ts`'s
- * pins naming this the one content import core is allowed.
+ * Resolved once at module scope because `buildContentApi()` is a cached
+ * singleton and the class itself never changes between champions — this is
+ * the same reasoning `BasicAttack`'s own static import above rests on, not a
+ * content bridge any more. `coreSpells/index.ts`'s own header explains why
+ * `Recall` still is not re-exported from that barrel even though it lives
+ * beside `BasicAttack.ts` now.
  */
 export const attachRecall = <T extends Champion>(champion: T): T => {
   champion.recall = new RecallClass(champion);

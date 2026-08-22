@@ -43,7 +43,7 @@ describe('the bundled-pack loader', () => {
     expect(BUNDLED_PACK_DATA.length).toBe(BUNDLED_PACKS.length);
   });
 
-  it('ships the riot pack, core BasicAttack folded on, as its first pack', () => {
+  it('ships the riot pack, core BasicAttack and Recall folded on, as its first pack', () => {
     // Not just non-empty: install order is load-bearing — `PackRegistry`'s
     // "where several packs answer the same question, install order decides"
     // (`monstersFilling`'s own doc comment) and `pregameCatalog.ts`'s
@@ -59,11 +59,28 @@ describe('the bundled-pack loader', () => {
     expect(BUNDLED_PACK_DATA[0].champions).toBe(riotData.champions);
     expect(BUNDLED_PACK_DATA[0].spellDisplay?.BasicAttack).toBeDefined();
     expect(BUNDLED_PACK_DATA[0].spellDisplay?.Yasuo_Q).toBeDefined();
+    // `Recall` never gets a display entry — see `packs/riot/pack.test.ts`'s
+    // own "keeps it out of the display data" test — so there is nothing to
+    // assert here on the data half, only that the code half can build one.
+    expect(BUNDLED_PACK_DATA[0].spellDisplay?.Recall).toBeUndefined();
 
     const code = BUNDLED_PACKS[0](buildContentApi());
     expect(code.spells?.BasicAttack).toBeTypeOf('function');
     expect(code.spells?.Yasuo_Q).toBeTypeOf('function');
+    expect(code.spells?.Recall).toBeTypeOf('function');
     expect(code.monsterAbilities?.baron?.length).toBeGreaterThan(0);
+  });
+
+  it("resolves every champion's folded-in Recall to a real, constructible class", async () => {
+    // `verifyPairing` (`PackRegistry.installCode`) is what actually enforces
+    // this at install time — every champion's `recall: 'riot:Recall'` has to
+    // resolve against a real spell source or `installBundledPackCode` throws.
+    // This proves the resolved class is usable, not just present.
+    const registry = new PackRegistry();
+    installBundledPackData(registry);
+    installBundledPackCode(registry, buildContentApi());
+    const loaded = await registry.loadSpellClass('riot:Recall');
+    expect(loaded).toBeTypeOf('function');
   });
 
   it('installs the reference pack and its champion', () => {

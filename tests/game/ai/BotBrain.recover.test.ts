@@ -11,8 +11,8 @@ import type Spell from '../../../src/game/gameObject/Spell';
 import TeamId from '../../../src/game/enums/TeamId';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 import { buildContentApi } from '../../../src/content/ContentApi';
-import { RECALL_CHANNEL_MS } from '../../../packs/riot/spells/Recall';
-import makeRecall from '../../../packs/riot/spells/Recall';
+import { RECALL_CHANNEL_MS } from '../../../src/game/gameObject/coreSpells/Recall';
+import makeRecall from '../../../src/game/gameObject/coreSpells/Recall';
 const __api = buildContentApi();
 const Recall = makeRecall(__api);
 

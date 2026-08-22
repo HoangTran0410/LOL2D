@@ -19,8 +19,8 @@ import type { CastContext } from '../../src/game/spell/runtime/types';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../game/fixtures';
 import { installSketchMathGlobals, installSpellObjectGlobals } from '../game/spell/fixtures';
 import { buildContentApi } from '../../src/content/ContentApi';
-import { RECALL_CHANNEL_MS } from '../../packs/riot/spells/Recall';
-import makeRecall from '../../packs/riot/spells/Recall';
+import { RECALL_CHANNEL_MS } from '../../src/game/gameObject/coreSpells/Recall';
+import makeRecall from '../../src/game/gameObject/coreSpells/Recall';
 const __api = buildContentApi();
 const Recall = makeRecall(__api);
 
