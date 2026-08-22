@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "check-seams": "moba2d-check-seams ./spells"
+  },
   "devDependencies": {
     "@moba2d/core": "*"
   }

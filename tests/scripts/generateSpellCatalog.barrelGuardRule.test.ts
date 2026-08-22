@@ -13,9 +13,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
  * left both of those with exactly *one* barrel each (`coreSpells/` alone;
  * `packs/riot/spells/` alone), so there is no longer a real tree with two
  * distinct barrels to exercise this against. The two real trees' own
- * generation is covered elsewhere (`catalog:check` / `catalog:check:riot`);
- * this file is the one place the *rule itself* — "attribute the failure to
- * the barrel that is actually empty" — is proven, independent of how many
+ * generation is covered elsewhere (core's `catalog:check`; the pack's own
+ * `catalog:check`, in `packs/riot/package.json`, reached through root
+ * `verify:all`); this file is the one place the *rule itself* — "attribute
+ * the failure to the barrel that is actually empty" — is proven, independent of how many
  * barrels either real tree happens to have today.
  */
 

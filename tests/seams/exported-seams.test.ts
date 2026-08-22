@@ -227,51 +227,15 @@ describe('each exported check catches its violation on an arbitrary tree', () =>
   });
 });
 
-describe("checkSeams against this repo's own pack, with its known debt declared", () => {
-  it("packs/riot/spells is clean once the pack's own debt lists are passed in", () => {
-    // Mirrors the grandfathered/exempt sets the individual seam tests already
-    // carry (tests/game/spells/*-seam.test.ts) — proof that the exported
-    // module, called the way a real pack build would call it, agrees with
-    // the hand-written tests rather than just agreeing with itself.
-    const root = 'packs/riot/spells';
-    const violations = [
-      ...checkManaSpend(root),
-      ...checkDashOnUpdate(root),
-      ...checkTargetVision(root),
-      ...checkUnitTargetTeam(root, { noPressOverride: new Set(['Annie_Q.ts']) }),
-      ...checkCastSpecFrozen(root, {
-        grandfathered: new Set([
-          'Janna_Q.ts',
-          'Janna_R.ts',
-          'Lux_R.ts',
-          'Malzahar_R.ts',
-          'MasterYi_W.ts',
-          'Pantheon_Q.ts',
-          'Rammus_Q.ts',
-          'Riven_Q.ts',
-          'Varus_Q.ts',
-          'Vayne_Q.ts',
-        ]),
-      }),
-      ...checkCooldowns(root),
-      ...checkTargetingModeDeclared(root, {
-        skip: new Set(['index.ts', '_EmptyExample.ts']),
-      }),
-      ...checkTerrainField(root),
-      ...checkBuffDeactivate(root),
-      ...checkStatResourceModifier(root),
-      ...checkSpellObjectDisplayBox(root, {
-        grandfathered: new Set(['Flash_Object', 'Heal_Object', 'LeeSin_R_Object']),
-      }),
-      // world-mouse-in-spell-code is deliberately left with ITS known
-      // offender (Blitzcrank_E.ts) surfaced rather than suppressed: unlike
-      // the others, tests/game/integration/SpellAimIntegration.test.ts pins
-      // that exact line rather than exempting the file, so this asserts the
-      // scan finds precisely that one and nothing else.
-    ];
-    expect(violations).toEqual([]);
-
-    const worldMouse = checkWorldMouseInSpellCode(root);
-    expect(worldMouse.map(v => v.file)).toEqual(['Blitzcrank_E.ts']);
-  });
-});
+// A "checkSeams against this repo's own pack, with its known debt declared"
+// case used to live here, hand-listing packs/riot's grandfathered/exempt
+// sets inline. Content-pack-extraction batch 5 task 6 gave the pack a real
+// build-time gate of its own (`packs/riot/package.json`'s `check-seams`
+// script) with those same sets declared once, on the pack's own side
+// (`packs/riot/seam-debt.mjs`) — so this file hand-listing a second copy
+// was a duplicate that could silently drift from the one that actually
+// gates anything. `tests/scripts/checkSeams.bin.test.ts`'s "still finds
+// packs/riot's own spells clean, its known debt declared through
+// seam-debt.mjs" is that same proof now, run the way the pack's own build
+// really runs it (through the bin, from the pack's own directory) rather
+// than by re-deriving the pack's debt inline in a core test.

@@ -43,14 +43,48 @@
  *
  * Exits 1 and prints one line per violation if any seam finds one; exits 0
  * and prints a summary otherwise.
+ *
+ * ## A pack's own debt is the pack's to state, not the engine's
+ *
+ * `checkSeams(root, options)` takes one `options` object, shared across all
+ * thirteen seams (`src/seams/index.ts`) — a `skip` set every seam honours,
+ * plus whatever narrower field an individual seam's own `*Options` type
+ * adds (`grandfathered`, `noPressOverride`, `maxMs`, ...). A grandfathered
+ * cast spec or a pinned `worldMouse` line is a fact about *that pack's
+ * content*, never about the rule itself (spec §8.1, content-pack-extraction
+ * batch 5 task 6) — so it cannot live in `src/seams/`, and the pack's own
+ * `package.json` script is fixed at `moba2d-check-seams ./spells` with no
+ * room for extra flags (the form that keeps working once a pack is a
+ * sibling repository rather than a workspace here). `loadPackSeamDebt`
+ * below is the resolution: a plain ESM sibling file, `seam-debt.mjs`, one
+ * directory above whatever root the CLI was pointed at — `packs/riot/
+ * spells` looks for `packs/riot/seam-debt.mjs`. No TypeScript, no `vite`,
+ * no `@moba2d/core` import needed to read it, so it is exactly as portable
+ * as the debt it describes: it moves with the pack's own directory, monorepo
+ * workspace today or a standalone checkout tomorrow. A pack with no debt
+ * (`packs/reference`, today) simply has no such file, and `checkSeams` runs
+ * every seam at its strictest default.
  */
 import { resolve, dirname, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { realpathSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { existsSync, realpathSync } from 'node:fs';
 import { createServer } from 'vite';
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = resolve(dirname(scriptPath), '..');
+
+/**
+ * `<targetRoot>/../seam-debt.mjs`, loaded as plain ESM (not through Vite's
+ * SSR graph — this file has no TypeScript and no reason to depend on
+ * `@moba2d/core` just to be read) and returning its named `seamDebt`
+ * export, or `undefined` when the pack has declared no debt at all.
+ */
+async function loadPackSeamDebt(absoluteTarget) {
+  const debtConfigPath = resolve(absoluteTarget, '..', 'seam-debt.mjs');
+  if (!existsSync(debtConfigPath)) return undefined;
+  const module = await import(pathToFileURL(debtConfigPath).href);
+  return module.seamDebt;
+}
 
 export async function runCheckSeams(targetRoot) {
   const server = await createServer({
@@ -71,7 +105,8 @@ export async function runCheckSeams(targetRoot) {
     // means once this script is installed somewhere other than where it is
     // invoked from.
     const absoluteTarget = resolve(targetRoot);
-    const violations = checkSeams(absoluteTarget).map(violation => ({
+    const options = await loadPackSeamDebt(absoluteTarget);
+    const violations = checkSeams(absoluteTarget, options).map(violation => ({
       ...violation,
       // Report relative to the target root, which is what a violation's
       // `file` already is — kept here only for the summary's own path math.
@@ -82,8 +117,10 @@ export async function runCheckSeams(targetRoot) {
     // covered. Without it, an empty `violations` array reads as "clean" for
     // both a genuinely clean root and a root that does not exist (or whose
     // every file matched `skip`) — indistinguishable to whoever is reading
-    // the CLI's own default output.
-    const scannedCount = scannedSeamFiles(absoluteTarget).length;
+    // the CLI's own default output. Passed the same `options` as `checkSeams`
+    // above so a `skip`-exempted file — debt or a barrel — is not counted as
+    // "scanned" either; the two numbers describe the same walk.
+    const scannedCount = scannedSeamFiles(absoluteTarget, options).length;
     return { violations, scannedCount };
   } finally {
     await server.close();

@@ -330,8 +330,9 @@ export async function importAbilities({
   // core's manifest, and its `add`/`remove` filters silently drop any path
   // outside `assets/`, so a downloaded portrait never reaches it. Without
   // this second call `packs/riot/generated/assetManifest.ts` would go stale
-  // the moment a real import ran, and the next `assets:check:riot` would be
-  // the first thing to notice.
+  // the moment a real import ran, and the next `assets:check` run against
+  // the pack (`packs/riot/package.json`, reached through root `verify:all`)
+  // would be the first thing to notice.
   //
   // Batch 5 task 5 moved the pack's own tree out of this script (see
   // `../generate-assets.mjs`'s own header) and into `packs/riot/scripts/

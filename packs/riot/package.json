@@ -7,7 +7,9 @@
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
     "catalog:generate": "moba2d-generate-spell-catalog --tree=riot --root=.",
-    "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot --root=."
+    "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot --root=.",
+    "typecheck": "tsc -p ../../tsconfig.pack-riot.json",
+    "check-seams": "moba2d-check-seams ./spells"
   },
   "devDependencies": {
     "@moba2d/core": "*"

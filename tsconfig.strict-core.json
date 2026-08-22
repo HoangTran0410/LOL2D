@@ -34,7 +34,9 @@
     // Anivia_R, Varus_Q, Pantheon_Q, Malphite_Q) moved into `packs/riot/spells/`
     // in batch 4 task 3. `packs/**/*.ts` used to cover their new path here;
     // batch 5 task 2 moved that glob to the pack's own `tsconfig.pack-riot.json`
-    // (`typecheck:riot`, wired into `verify` beside `typecheck:core`). This
+    // (wired into root `verify` as `typecheck:riot`, beside `typecheck:core`,
+    // until batch 5 task 6 relocated it to `packs/riot/package.json`'s own
+    // `typecheck` script, reached through the new `verify:all` instead). This
     // program still resolves ~255 pack files transitively regardless — see
     // the `exclude` block's own comment below for the real, structural
     // reason (`AIChampion.ts` -> `preset.ts` -> `spellRegistry.ts` ->

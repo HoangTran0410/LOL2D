@@ -23,6 +23,18 @@
  * alone, and no spell in the tree sets a non-zero `healthCost` today (only
  * `Leblanc_R` touches it, zeroing the clone's). Health spending still goes
  * through the base class's commit/refund path.
+ *
+ * `spells/` (`packs/riot/spells/`) left this scan in content-pack-extraction
+ * batch 5 task 6: this exact rule is now `src/seams/manaSpend.ts`, exported
+ * so the pack can run it on *itself* (`packs/riot/package.json`'s own
+ * `check-seams` script, with the pack's own debt declared in
+ * `packs/riot/seam-debt.mjs`) — proven with a planted violation whose
+ * outcome was root `npm run verify` staying green while the pack's own
+ * build went red. Before this move, this file scanning `packs/riot/spells`
+ * directly meant the opposite: a pack-only violation still reddened core's
+ * own `verify`, which is exactly the "the seam has not moved, it has been
+ * copied" failure spec §8.1 exists to rule out. `coreSpells/`, `spellObjects/`
+ * and `buffs/` stay — they are still core's own tree, not a pack's.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -36,7 +48,7 @@ vi.mock('../../../src/managers/AssetManager', () => ({
 import Spell from '../../../src/game/gameObject/Spell';
 import type { MatchRules } from '../../../src/game/config/PregameConfig';
 
-const SCANNED_DIRECTORIES = ['spells', 'coreSpells', 'spellObjects', 'buffs'];
+const SCANNED_DIRECTORIES = ['coreSpells', 'spellObjects', 'buffs'];
 
 /** Any read or write of a caster's mana pool. */
 const TOUCHES_MANA = /\bstats\.mana\b|\bmana\.(?:baseValue|current)\b/;
@@ -52,13 +64,9 @@ const TOUCHES_MANA = /\bstats\.mana\b|\bmana\.(?:baseValue|current)\b/;
 const SANCTIONED = /this\.changeResource\(\s*this\.owner\.stats\.mana\s*,/;
 
 const gameObjectRoot = fileURLToPath(new URL('../../../src/game/gameObject/', import.meta.url));
-// `spells/` moved into `packs/riot/spells/` (batch 4 task 3); the other
-// scanned directories stayed under `src/game/gameObject/`.
-const packsRoot = fileURLToPath(new URL('../../../packs/riot/', import.meta.url));
-const rootFor = (directory: string): string => (directory === 'spells' ? packsRoot : gameObjectRoot);
 
 const sourceFiles = (directory: string): string[] => {
-  const absolute = join(rootFor(directory), directory);
+  const absolute = join(gameObjectRoot, directory);
   return readdirSync(absolute, { recursive: true, encoding: 'utf8' })
     .filter(entry => entry.endsWith('.ts'))
     .map(entry => join(directory, entry));
@@ -76,7 +84,7 @@ const codeOnly = (line: string): string => {
 };
 
 const offendingLines = (relativePath: string): string[] =>
-  readFileSync(join(rootFor(relativePath.split('/')[0]), relativePath), 'utf8')
+  readFileSync(join(gameObjectRoot, relativePath), 'utf8')
     .split('\n')
     .map((line, index) => ({ code: codeOnly(line), line, number: index + 1 }))
     .filter(({ code }) => TOUCHES_MANA.test(code) && !SANCTIONED.test(code))

@@ -25,13 +25,18 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run verify
+      - run: npm run verify:all
 
-      # `npm run verify` ends in `vite build`, so dist/ is already on disk and
-      # is the *verified* build — nothing ships that did not pass typecheck and
-      # the whole suite first. That is the point of deploying from here rather
-      # than connecting the repo to Cloudflare's own git builds, which would
-      # publish a red main.
+      # `npm run verify:all` runs core's own `verify` (which ends in `vite
+      # build`, so dist/ is already on disk as the *verified* build) plus
+      # every workspace's own checks — `packs/riot`'s and `packs/reference`'s
+      # asset/catalogue/typecheck/seam gates. Plain `verify` alone is
+      # core-only on purpose (content-pack-extraction batch 5 task 6): it has
+      # to keep passing once `packs/riot/` leaves this tree, which `verify:all`
+      # by construction cannot. Nothing ships that did not pass typecheck and
+      # the whole suite first — that is the point of deploying from here
+      # rather than connecting the repo to Cloudflare's own git builds, which
+      # would publish a red main.
       - name: Deploy to Cloudflare Pages
         if: >-
           github.event_name == 'push'
