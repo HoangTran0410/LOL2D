@@ -1,0 +1,42 @@
+// This pack's own strict typecheck program — self-contained inside
+// `packs/riot/`, no path reaching up into core's checkout. Content-pack-
+// extraction batch 5 task 6 fix round 2: the previous config,
+// `../../tsconfig.pack-riot.json`, lived at core's own repo root and this
+// pack's `typecheck` script reached it with a relative `../../` path — the
+// same defect Task 5 was found for on a different script, and one that
+// resolves to nothing the day this directory is a repository of its own.
+//
+// `extends` core by its package name, not a relative path, so this file
+// keeps working unchanged whether `@moba2d/core` is a workspace symlink
+// (today) or a real npm dependency (once this pack is a repository of its
+// own). `@moba2d/core/tsconfig.base.json` is the shared compiler-options
+// base `tsconfig.json` (core's own root program) also extends — including
+// `@/*`, core's own internal alias, resolved relative to *that config
+// file's own location* regardless of where this one lives (see its own
+// header for why that makes it portable rather than a second `../../` in
+// disguise). This pack's own code may still never write `@/...` itself —
+// that stays `packBoundary.test.ts`'s rule, an import-scanning check, not
+// a typecheck one — but this pack's compiler needs the alias resolvable
+// to see real types *through* `@moba2d/core`'s exported entry points,
+// which are core's own unbundled source and import via `@/*` internally
+// like the rest of that codebase.
+//
+// `types` fills the two ambient-declaration gaps that go with it:
+// `vite/client` for `generated/assetManifest.ts`'s `'...png?url'` asset
+// imports (Vite's own syntax — a real dependency this pack already has
+// through the workspace, not something to reach for in core's own copy
+// of the reference), and core's `global.d.ts` (p5 in global mode) and
+// `poly-decomp.d.ts` (the physics library's own missing types), both
+// published the same way `tsconfig.base.json` is.
+{
+  "extends": "@moba2d/core/tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": [
+      "vite/client",
+      "@moba2d/core/types/global.d.ts",
+      "@moba2d/core/types/poly-decomp.d.ts"
+    ]
+  },
+  "include": ["**/*.ts"]
+}

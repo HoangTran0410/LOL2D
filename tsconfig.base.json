@@ -1,0 +1,49 @@
+// The compiler options a TypeScript program needs to resolve this
+// codebase's own module shape — bundler resolution, isolated per-file
+// transpilation, no emit, and `@/*` for this package's own root
+// (`src/`) — with no opinion on `strict`, `include` or `exclude`, which
+// are each consumer's own call.
+//
+// Published at `@moba2d/core/tsconfig.base.json` (see `package.json`'s
+// `exports`) so a pack's own `tsconfig.json` can `extends` it by package
+// name rather than a relative path into core's checkout, which stops
+// resolving the day the pack is a repository of its own
+// (content-pack-extraction batch 5 task 6 fix round 2 — `../../
+// tsconfig.pack-riot.json` was exactly that relative path, the same
+// defect Task 5 was found for on a different file). `tsconfig.json`
+// (this package's own program) extends it too, so there is exactly one
+// place these options are stated.
+//
+// `paths` lives here, not in each extending config, on purpose: a
+// `paths` mapping declared by an `extends`-ed config is resolved
+// relative to *that config file's own location*, not the extending
+// config's — so `"./src/*"`, declared here, always means "core's own
+// `src/`" regardless of whether the extending config is `tsconfig.json`
+// two directories up or a pack's own `tsconfig.json` published as a
+// separate repository. `@moba2d/core`'s exported entry points
+// (`ContentApi.ts`, `content/types.ts`, ...) are core's own source,
+// shipped unbundled, and internally import via `@/*` like the rest of
+// this codebase — a consuming pack's typecheck has to resolve that alias
+// to see real types through them (proven the hard way: without it,
+// `api.MissileSpellObject`'s own methods silently degrade to errors
+// two and three hops downstream of the real cause, an unresolved
+// `@/managers/AssetManager` import inside `ContentApi.ts` itself).
+// `packBoundary.test.ts` is the actual rule that a pack's *own* code may
+// never write `@/...` — this mapping existing does not relax that; it
+// only lets a pack's compiler see through core's own internals.
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

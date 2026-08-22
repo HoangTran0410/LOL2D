@@ -36,8 +36,10 @@
     // batch 5 task 2 moved that glob to the pack's own `tsconfig.pack-riot.json`
     // (wired into root `verify` as `typecheck:riot`, beside `typecheck:core`,
     // until batch 5 task 6 relocated it to `packs/riot/package.json`'s own
-    // `typecheck` script, reached through the new `verify:all` instead). This
-    // program still resolves ~255 pack files transitively regardless — see
+    // `typecheck` script, reached through the new `verify:all` instead — fix
+    // round 2 then gave the pack its own self-contained `tsconfig.json`
+    // rather than one living at this repo's own root). This program still
+    // resolves ~255 pack files transitively regardless — see
     // the `exclude` block's own comment below for the real, structural
     // reason (`AIChampion.ts` -> `preset.ts` -> `spellRegistry.ts` ->
     // `@/content/install`, the permanent Stage 1 pack loader) — so "no pack
@@ -49,9 +51,12 @@
     // NOT `tests/game/spells/representative-spells.test.ts`: it imports real
     // pack spells by path (Anivia_R, Janna_Q, Janna_R, Lux_R, Malphite_Q,
     // Pantheon_Q, Varus_Q, ...) and is a test *about pack spells* — batch 5
-    // task 2 fix round 1 moved its strict coverage to `tsconfig.pack-riot.json`
+    // task 2 fix round 1 moved its strict coverage out of this program
     // after finding it transitively pulled 256 of 257 pack files into this
-    // program, defeating the point of the split above. Do not move it back.
+    // one, defeating the point of the split above — task 6 fix round 2 gave
+    // it `tsconfig.strict-core-boundary.json` instead of the pack's own
+    // config, since it is core's own test file, not the pack's. Do not move
+    // it back here.
     "tests/game/types/BaseObjectTypes.test.ts",
     "tests/game/types/BuffUnitTypes.test.ts",
     "tests/game/types/ChampionTypes.test.ts",
@@ -63,8 +68,12 @@
   // fill the spell registry synchronously for tests, and the five `*.test.ts`
   // files import specific pack spells by path or (`AttackProfiles.test.ts`)
   // call `registry.ts`'s loader. Each is now an include root in
-  // `tsconfig.pack-riot.json` instead, so their own strict coverage does not
-  // drop; only which config owns it changes.
+  // `tsconfig.strict-core-boundary.json` instead (renamed from
+  // `tsconfig.pack-riot.json` in task 6 fix round 2, once the pack got a
+  // real self-contained `tsconfig.json` of its own and this leftover set —
+  // core's own test files, not the pack's — needed a name that says so), so
+  // their own strict coverage does not drop; only which config owns it
+  // changes.
   //
   // This does NOT bring this program's own `packs/` count to zero — it drops
   // it from 256 to 255 (`tsc --listFiles -p tsconfig.strict-core.json | grep

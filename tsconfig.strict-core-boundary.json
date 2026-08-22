@@ -1,0 +1,38 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "strict": true },
+  // Content-pack-extraction batch 5 task 6 fix round 2: `packs/**/*.ts`
+  // left this config's `include` — the pack now owns its own strict
+  // program (`packs/riot/tsconfig.json`), self-contained inside its own
+  // directory rather than reaching `../../` into this file. What is left
+  // here is core's own: six test files that directly import real pack
+  // spells by relative path to prove core's own strict coverage still
+  // typechecks across that boundary. That reach into `packs/riot/spells/`
+  // is itself a pre-existing, separate fact (batch 5 task 7's territory —
+  // "the scans have to survive the pack's departure" — not this task's),
+  // which is exactly why this stays a `verify:all`-only config: plain
+  // `verify` has to keep passing with the pack absent (task 8), and these
+  // six files structurally cannot.
+  "include": [
+    "src/types/**/*.d.ts",
+    // Moved from tsconfig.strict-core.json in batch 5 task 2 fix round 1: it
+    // directly imports real pack spells (Anivia_R, Janna_Q, Janna_R, Lux_R,
+    // Malphite_Q, Pantheon_Q, Varus_Q, ...), so its strict coverage belongs
+    // here rather than core's own program — leaving it in `strict-core`
+    // pulled 256 of 257 pack files back into that program regardless of a
+    // `packs/**/*.ts` glob.
+    "tests/game/spells/representative-spells.test.ts",
+    // Moved in the same fix round, after re-measuring found round 1 alone
+    // still left 256 pack files reachable from strict-core: `registry.ts`
+    // value-imports the whole `packs/riot/spells/index` barrel to fill the
+    // spell registry for tests, and each of the five `*.test.ts` files below
+    // either calls that loader or imports specific pack spells by path
+    // directly. See `tsconfig.strict-core.json`'s matching `exclude` comment.
+    "tests/game/spell/registry.ts",
+    "tests/game/combat/AttackProfiles.test.ts",
+    "tests/game/combat/Pet.test.ts",
+    "tests/game/combat/ExecuteMarks.test.ts",
+    "tests/game/combat/Reach.test.ts",
+    "tests/game/combat/Vision.test.ts"
+  ]
+}

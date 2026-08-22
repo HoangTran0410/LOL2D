@@ -1,18 +1,7 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": false,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "strict": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "testzone", "tools", "dist"]

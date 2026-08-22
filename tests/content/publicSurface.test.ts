@@ -6,12 +6,24 @@ import { join } from 'node:path';
  * `package.json`'s `exports` is the whole answer to "what may a content pack
  * import from core" — not a convention documented in a doc comment
  * somewhere, a field a reviewer can see move in a diff. Widening it (adding
- * a fifth subpath, or pointing one at a different file) is a decision this
- * test forces to be deliberate: touch the list, touch this test.
+ * a subpath, or pointing one at a different file) is a decision this test
+ * forces to be deliberate: touch the list, touch this test.
  *
- * The measured surface (`docs/superpowers/surveys/2026-08-22-...`) is three
- * modules, all `import type`, plus `src/seams/` for the seam-checker CLI,
- * which is tooling rather than content API. That is exactly these four
+ * The original measured surface (`docs/superpowers/surveys/2026-08-22-...`)
+ * was three content modules, all `import type`, plus `src/seams/` for the
+ * seam-checker CLI, which is tooling rather than content API. Content-pack-
+ * extraction batch 5 task 6 fix round 2 widened it by three, all the same
+ * shape as `./seams` — build tooling a pack's own standalone `tsc` program
+ * needs, not content API: `./tsconfig.base.json` (the shared compiler
+ * options, and `@/*`, core's own internal alias — resolved relative to
+ * *this* file's location regardless of who extends it, which is what lets a
+ * pack's `tsconfig.json` reach it by package name instead of a `../../`
+ * path into this checkout) and `./types/global.d.ts` /
+ * `./types/poly-decomp.d.ts` (the ambient declarations — p5 in global mode,
+ * the physics library's missing types — a pack's own strict typecheck needs
+ * to see real types through `ContentApi`'s own internals, which are core's
+ * unbundled source and import via `@/*` like the rest of this codebase).
+ * `packs/riot/tsconfig.json`'s own header has the full account. Seven
  * subpaths and no more.
  */
 
@@ -23,13 +35,21 @@ function readPackageJson(): Record<string, unknown> {
 }
 
 describe('package.json public surface', () => {
-  it('declares exports as exactly the four content-pack-facing subpaths', () => {
+  it('declares exports as exactly the seven content-pack-facing subpaths', () => {
     const pkg = readPackageJson();
     const exportsMap = pkg.exports as Record<string, string> | undefined;
 
     expect(exportsMap).toBeDefined();
     expect(Object.keys(exportsMap!).sort()).toEqual(
-      ['./content/ContentApi', './content/ContentPack', './content/types', './seams'].sort()
+      [
+        './content/ContentApi',
+        './content/ContentPack',
+        './content/types',
+        './seams',
+        './tsconfig.base.json',
+        './types/global.d.ts',
+        './types/poly-decomp.d.ts',
+      ].sort()
     );
   });
 

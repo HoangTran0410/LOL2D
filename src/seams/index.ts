@@ -60,11 +60,42 @@
  *
  * `scripts/check-seams.mjs` wraps exactly this as a CLI (`node
  * scripts/check-seams.mjs <root>`), the working form of the spec's
- * `moba2d-check-seams ./src`. `package.json` now names the package
- * `@moba2d/core` and declares that CLI as its `bin`
- * (`moba2d-check-seams`) — decided in batch 5 task 3. What is still not
- * decided here: how `packs/riot/` — which gets no `package.json` of its
- * own from this task — ends up invoking it. That is batch 5 task 4's call.
+ * `moba2d-check-seams ./src`. `package.json` names the package
+ * `@moba2d/core` and declares that CLI as its `bin` (`moba2d-check-seams`)
+ * — decided in batch 5 task 3. `packs/riot/package.json` and
+ * `packs/reference/package.json` each run it against their own `./spells`
+ * (and, for `packs/riot`, `./monsters`) — batch 5 task 6.
+ *
+ * ## Core checks its own tree too
+ *
+ * Core authors spell-shaped code of its own — `src/game/gameObject/
+ * coreSpells/` (`BasicAttack`, `Recall`), `spellObjects/` and `buffs/` —
+ * and every one of these thirteen rules applies to it exactly as it does to
+ * a pack's. Root `package.json`'s own `check-seams` script runs the CLI
+ * against those three directories (task 6 fix round 2: two hand-written
+ * core tests had been *deleted* for having zero population today —
+ * `coreSpells/` authors no `UNIT`-targeted spell and none that reads the
+ * fog draw flag — which is correct only as long as something else still
+ * catches the day that changes. This is that something else, run through
+ * `verify` rather than left implicit).
+ *
+ * `attackableUnits/` is deliberately **not** in that list, even though it
+ * is core's own tree too: it is unit-side plumbing, not spell-authored
+ * code, and three of the thirteen rules have known, legitimate exceptions
+ * there that a pack's spell tree never needs — `AttackableUnit.restoreMana`
+ * and `Champion`'s HUD read are the sanctioned non-`Spell.spendMana()` mana
+ * paths `mana-spend-seam.test.ts` has always carved out by hand;
+ * `visibleToPlayerTeam` is `FogOfWar`'s own draw flag, read there by design
+ * (see `AttackableUnit.visibleToPlayerTeam`'s own doc comment), not a
+ * spell deciding targeting; and `game.worldMouse` is legitimately read
+ * there for the *player's own* touch input, the one place in the engine
+ * that is allowed to. `checkSeams(root, options)` applies all thirteen
+ * seams uniformly to whatever `root` it is given — there is no per-seam
+ * directory scoping — so folding `attackableUnits/` into this blanket scan
+ * would misreport all three as violations. `buff-deactivate-seam.test.ts`
+ * is the one rule that does legitimately reach `attackableUnits/`, and it
+ * stays a hand-written core test for exactly that reason: it is the only
+ * one of the thirteen this directory needs.
  */
 import type { Seam, SeamCheckOptions, SeamViolation } from './types';
 import { walkTsFiles } from './shared';
