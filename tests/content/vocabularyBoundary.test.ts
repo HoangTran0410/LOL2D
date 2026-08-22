@@ -46,21 +46,42 @@ import { join } from 'node:path';
  * shape that actually matters — a pack's id sitting in core as data — from
  * coming back.
  *
- * `src/scenes/about/changelog.ts` and `articles.ts` are excluded from all
- * three checks: hand-written, player-facing history of this fan game's own
- * past changes ("Reworked <champion>'s W"), not engine code — CLAUDE.md is
- * explicit these are written in Vietnamese for players, and
+ * `src/scenes/about/changelog.ts` is hand-written, player-facing history of
+ * this fan game's own past changes ("Reworked <champion>'s W"), not engine
+ * code — CLAUDE.md is explicit it is written in Vietnamese for players, and
  * `tests/scenes/aboutContent.test.ts` already bans the opposite leak
- * (internal class/module names) from the same two files. A changelog entry
- * with the champion's name redacted is not more pack-neutral, it is
- * useless to the player reading it.
+ * (internal class/module names) from it. A changelog entry with the
+ * champion's name redacted is not more pack-neutral, it is useless to the
+ * player reading it.
+ *
+ * Both files used to be excluded wholesale. Scanning both together turned
+ * up exactly **one** real hit — `Shaco`, in one changelog highlight line —
+ * so the exception below grandfathers that single line rather than either
+ * whole file: `articles.ts` names no champion, monster, spell id or
+ * summoner-spell literal anywhere and gets no exception at all, and the
+ * rest of `changelog.ts`'s copy stays covered by every one of the three
+ * checks below.
+ *
+ * ## A note for whoever does batch 5
+ *
+ * `championNamesFromPack()` and `monsterNamesFromPack()` below build this
+ * scan's own needle list by reading `packs/riot/spells` and
+ * `packs/riot/monsters` off disk — the only way to derive "every current
+ * champion and monster name" without hand-maintaining a second copy of the
+ * roster. That means this file's whole premise — "core carries none of
+ * Riot's vocabulary" — depends on Riot's content still being *somewhere
+ * this repo can read at test time*. Once a pack ships as its own published
+ * package (batch 5's stated direction, per `docs/superpowers/specs/`) and
+ * `packs/riot/` stops being a directory in this checkout, `readdirSync`
+ * above throws `ENOENT` rather than the suite passing or failing — this
+ * scan cannot certify core is content-free once the content it is
+ * certifying *against* has left. Batch 5 needs to either point these two
+ * functions at wherever the pack ends up (a dependency's own directory, a
+ * published manifest) or replace the derived list with something that does
+ * not require the pack tree to be locally present.
  */
 const SRC = join(__dirname, '../../src');
 const PACKS = join(__dirname, '../../packs');
-const EXCLUDED = new Set([
-  join(SRC, 'scenes/about/changelog.ts'),
-  join(SRC, 'scenes/about/articles.ts'),
-]);
 
 function filesUnder(dir: string, extensions: string[]): string[] {
   const out: string[] = [];
@@ -72,7 +93,7 @@ function filesUnder(dir: string, extensions: string[]): string[] {
   return out;
 }
 
-const scannedFiles = (): string[] => filesUnder(SRC, ['.ts', '.vue']).filter(f => !EXCLUDED.has(f));
+const scannedFiles = (): string[] => filesUnder(SRC, ['.ts', '.vue']);
 
 /** `Ahri_Q.ts` -> `Ahri`, `_EmptyExample.ts`/`index.ts` skipped (no `_[QWER]` suffix). */
 function championNamesFromPack(): string[] {
@@ -127,11 +148,23 @@ describe("core carries none of Riot's vocabulary", () => {
     expect(scannedFiles().length).toBeGreaterThan(20);
   });
 
+  /**
+   * The one surviving hit, narrowed to its own line rather than its whole
+   * file — see this file's header. `key` is `${absolute path}: ${line}`,
+   * matching the convention `SUMMONER_LITERAL_GRANDFATHERED` below already
+   * uses.
+   */
+  const CHAMPION_NAME_GRANDFATHERED = new Set([
+    `${join(SRC, 'scenes/about/changelog.ts')}: 'Làm lại kỹ năng W của Shaco.',`,
+  ]);
+
   it('names no champion or monster from the bundled pack, comments included', () => {
     // Comments are NOT stripped here, unlike packBoundary.test.ts: most of
     // this scan's real hits were doc comments illustrating a bug with the
     // real spell that exposed it, and that is exactly the vocabulary this
-    // check exists to purge.
+    // check exists to purge. Line-by-line (rather than one `.test()` over
+    // the whole file) so a single grandfathered line does not have to take
+    // its whole file off the scan with it.
     const names = bannedNames();
     const patterns = names.map(name => ({
       name,
@@ -141,8 +174,13 @@ describe("core carries none of Riot's vocabulary", () => {
     for (const file of scannedFiles()) {
       const source = readFileSync(file, 'utf8');
       const rel = file.slice(SRC.length + 1);
-      for (const { name, re } of patterns) {
-        if (re.test(source)) offenders.push(`${rel}: ${name}`);
+      for (const line of source.split('\n')) {
+        for (const { name, re } of patterns) {
+          if (!re.test(line)) continue;
+          const key = `${file}: ${line.trim()}`;
+          if (!CHAMPION_NAME_GRANDFATHERED.has(key))
+            offenders.push(`${rel}: ${name} (${line.trim()})`);
+        }
       }
     }
     expect(offenders).toEqual([]);

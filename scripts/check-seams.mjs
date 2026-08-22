@@ -37,14 +37,22 @@ export async function runCheckSeams(targetRoot) {
   });
 
   try {
-    const { checkSeams } = await server.ssrLoadModule('/src/seams/index.ts');
+    const { checkSeams, scannedSeamFiles } = await server.ssrLoadModule('/src/seams/index.ts');
     const absoluteTarget = resolve(repoRoot, targetRoot);
-    return checkSeams(absoluteTarget).map(violation => ({
+    const violations = checkSeams(absoluteTarget).map(violation => ({
       ...violation,
       // Report relative to the target root, which is what a violation's
       // `file` already is — kept here only for the summary's own path math.
       root: relative(repoRoot, absoluteTarget) || '.',
     }));
+    // Every seam walks the same tree `checkSeams` just did; this is that
+    // same walk, done once more, so the summary can say how much ground it
+    // covered. Without it, an empty `violations` array reads as "clean" for
+    // both a genuinely clean root and a root that does not exist (or whose
+    // every file matched `skip`) — indistinguishable to whoever is reading
+    // the CLI's own default output.
+    const scannedCount = scannedSeamFiles(absoluteTarget).length;
+    return { violations, scannedCount };
   } finally {
     await server.close();
   }
@@ -58,15 +66,17 @@ if (process.argv[1] && resolve(process.argv[1]) === scriptPath) {
   }
 
   runCheckSeams(targetRoot)
-    .then(violations => {
+    .then(({ violations, scannedCount }) => {
       if (violations.length === 0) {
-        console.log(`check-seams: clean (${targetRoot})`);
+        console.log(`check-seams: scanned ${scannedCount} file(s), clean (${targetRoot})`);
         return;
       }
       for (const v of violations) {
         console.error(`${v.seamId} :: ${v.root}/${v.file} :: ${v.message}`);
       }
-      console.error(`check-seams: ${violations.length} violation(s) in ${targetRoot}`);
+      console.error(
+        `check-seams: ${violations.length} violation(s) across ${scannedCount} file(s) scanned in ${targetRoot}`
+      );
       process.exitCode = 1;
     })
     .catch(error => {

@@ -71,6 +71,11 @@ function specifiers(source: string): string[] {
   const staticPattern = /^\s*(?:import|export)\s+(?:type\s+)?[\s\S]*?\bfrom\s+['"]([^'"]+)['"]/gm;
   let match: RegExpExecArray | null;
   while ((match = staticPattern.exec(source)) !== null) out.push(match[1]);
+  // A side-effect import — `import '../../packs/riot/spells/Recall';` — has
+  // no `from` clause, so the pattern above never sees it. It resolves at
+  // bundle time exactly like a named import; only the binding is missing.
+  const sideEffectPattern = /^\s*import\s+['"]([^'"]+)['"]/gm;
+  while ((match = sideEffectPattern.exec(source)) !== null) out.push(match[1]);
   const dynamicPattern = /\bimport\(\s*['"]([^'"]+)['"]/g;
   while ((match = dynamicPattern.exec(source)) !== null) out.push(match[1]);
   // `import.meta.glob('/packs/...')` is the natural Vite idiom for

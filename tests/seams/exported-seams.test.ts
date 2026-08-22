@@ -152,10 +152,22 @@ describe('each exported check catches its violation on an arbitrary tree', () =>
 
   it('targeting-mode-declared: a spell with neither a literal nor a field', () => {
     const dir = tempTree({
-      'Good.ts': `targetingMode = 'DIRECTION' as const;\n`,
-      'Bad.ts': `coolDown = 1000;\n`,
+      'Good.ts': `class Good extends Spell { targetingMode = 'DIRECTION' as const; }\n`,
+      'Bad.ts': `class Bad extends Spell { coolDown = 1000; }\n`,
     });
     expect(checkTargetingModeDeclared(dir).map(v => v.file)).toEqual(['Bad.ts']);
+  });
+
+  it('targeting-mode-declared: a non-spell file is never flagged, even with neither', () => {
+    // The gate itself: `map.ts`, `pack.ts` and `provingGroundsGeometry.ts`
+    // under `packs/reference/` name no `class X extends Spell` and are not
+    // spells — scanning a pack's whole source root (the CLI's own
+    // documented invocation) must stay quiet on them.
+    const dir = tempTree({
+      'map.ts': `export const referenceMap = { id: 'x' };\n`,
+      'pack.ts': `export const data = {};\n`,
+    });
+    expect(checkTargetingModeDeclared(dir)).toEqual([]);
   });
 
   it('terrain-field: reaching past sweepToWall for a half-answer', () => {

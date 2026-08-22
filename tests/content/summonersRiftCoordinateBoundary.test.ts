@@ -91,10 +91,18 @@ function sourceFilesUnder(dir: string): string[] {
  * in a file unrelated to each other would not — that is deliberately not
  * what this scan flags, or two-digit and three-digit unrelated constants a
  * few lines apart would false-positive.
+ *
+ * Also matches the two-element tuple shape — `[400, 6075]` — which is not
+ * a shape any pre-move `src/` file used, but is the shape
+ * `SR_COORDINATE_PAIRS` right above declares its own needles in. A scan
+ * that cannot see its own needle table's literal shape is not proof against
+ * a future file (a compact re-encoding, a serialized fixture) that writes a
+ * coordinate the same way.
  */
 function containsPair(source: string, x: number, y: number): boolean {
-  const pattern = new RegExp(`x:\\s*${x}\\s*,\\s*y:\\s*${y}\\b`);
-  return pattern.test(source);
+  const objectPattern = new RegExp(`x:\\s*${x}\\s*,\\s*y:\\s*${y}\\b`);
+  const tuplePattern = new RegExp(`\\[\\s*${x}\\s*,\\s*${y}\\s*\\]`);
+  return objectPattern.test(source) || tuplePattern.test(source);
 }
 
 describe("core contains no Summoner's Rift coordinate", () => {

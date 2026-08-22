@@ -157,6 +157,11 @@ export const CORE_ASSET_TREE = {
   assetsDir: 'assets',
   outputPath: 'src/generated/assetManifest.ts',
   keyPrefix: '',
+  // No `--tree=` name: this is the default tree `npm run assets:generate`
+  // (no flag) produces. Carried alongside `PACK_ASSET_TREES`' own `name`
+  // so `generate()`'s stale-manifest message can name the right command for
+  // whichever tree actually went stale, instead of always naming this one.
+  regenerateCommand: 'npm run assets:generate',
 };
 
 /**
@@ -170,6 +175,7 @@ export const PACK_ASSET_TREES = {
     assetsDir: 'packs/riot/assets',
     outputPath: 'packs/riot/generated/assetManifest.ts',
     keyPrefix: '',
+    regenerateCommand: 'npm run assets:generate:riot',
   },
 };
 
@@ -210,7 +216,7 @@ export async function generate(root, check = false, tree = CORE_ASSET_TREE) {
   if (check) {
     const current = await readFile(outputPath, 'utf8').catch(() => '');
     if (current !== source)
-      throw new Error('Generated asset manifest is stale. Run npm run assets:generate.');
+      throw new Error(`Generated asset manifest is stale. Run ${tree.regenerateCommand}.`);
     return;
   }
 

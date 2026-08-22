@@ -65,6 +65,7 @@
  * ends up invoking it. That is batch 5's call.
  */
 import type { Seam, SeamCheckOptions, SeamViolation } from './types';
+import { walkTsFiles } from './shared';
 import { checkManaSpend } from './manaSpend';
 import { checkDashOnUpdate } from './dashOnUpdate';
 import { checkTargetVision } from './targetVision';
@@ -168,6 +169,25 @@ export const seams: Seam[] = [
 
 export interface TaggedSeamViolation extends SeamViolation {
   seamId: string;
+}
+
+/**
+ * Every file `checkSeams(root, options)` walks — every seam does its own
+ * `walkTsFiles(root, options)` internally, all reaching the same tree, so
+ * one more walk with the same arguments answers for the whole set.
+ *
+ * Exists because `checkSeams` returning `[]` means two different things a
+ * caller cannot tell apart from the return value alone: "scanned N files,
+ * found nothing" and "root does not exist, or every file matched `skip`" —
+ * an empty tree prints the same "clean" a genuinely clean pack does. This
+ * repo's own recurring failure mode (`corePacksBoundary.test.ts`'s and
+ * `TeamBlackboard.lanes.test.ts`'s own "finds files to scan, or this proves
+ * nothing" guards exist for exactly this), now handed to every pack author
+ * through the CLI's default output (`scripts/check-seams.mjs`) instead of
+ * left to each caller to reinvent.
+ */
+export function scannedSeamFiles(root: string, options?: SeamCheckOptions): string[] {
+  return walkTsFiles(root, options);
 }
 
 /** Runs every seam in `seams` against `root` and returns one combined list. */

@@ -1,11 +1,13 @@
-import { readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   assetKeyForPath,
   buildManifestEntries,
   CORE_ASSET_TREE,
+  generate,
   PACK_ASSET_TREES,
   renderAssetManifestSource,
   renderManifest,
@@ -107,6 +109,29 @@ describe('asset manifest generator', () => {
       const committed = await readFile(resolve(root, CORE_ASSET_TREE.outputPath), 'utf8');
 
       expect(generated).toBe(committed);
+    });
+
+    /**
+     * `--check --tree=riot`'s stale message used to always say "npm run
+     * assets:generate" — the core command, regardless of which tree was
+     * actually stale. Under `--tree=riot` that regenerates the wrong
+     * manifest. Each tree now carries its own `regenerateCommand`.
+     */
+    it('names the tree-specific regenerate command in the stale-manifest message', async () => {
+      const tmpRoot = await mkdtemp(join(tmpdir(), 'lol2d-assets-stale-'));
+      try {
+        await mkdir(join(tmpRoot, 'packs/riot/assets'), { recursive: true });
+        await expect(generate(tmpRoot, true, PACK_ASSET_TREES.riot)).rejects.toThrow(
+          /Run npm run assets:generate:riot\./
+        );
+
+        await mkdir(join(tmpRoot, 'assets'), { recursive: true });
+        await expect(generate(tmpRoot, true, CORE_ASSET_TREE)).rejects.toThrow(
+          /Run npm run assets:generate\./
+        );
+      } finally {
+        await rm(tmpRoot, { recursive: true, force: true });
+      }
     });
   });
 });

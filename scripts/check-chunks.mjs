@@ -45,7 +45,17 @@ function chunk(prefix) {
   return found[0];
 }
 
-/** Each rule is "this chunk must not *statically* reach that family". */
+/** Every chunk whose filename starts with `prefix-` — for a family with many members (`spell-*`). */
+function chunksMatching(prefix) {
+  return readdirSync(assets).filter(name => new RegExp(`^${prefix}-[^.]+\\.js$`).test(name));
+}
+
+/**
+ * Each rule is "this chunk (or, with `many`, every chunk in this family)
+ * must not *statically* reach that family". `many` exists for `spell-*`:
+ * there are dozens of them, one per champion, so `chunk()`'s "exactly one"
+ * assumption does not hold.
+ */
 const RULES = [
   {
     chunk: 'MenuScene',
@@ -62,15 +72,26 @@ const RULES = [
     forbidden: /^spell-/,
     why: 'spell chunks are fetched per champion by `spellRegistry`; a static edge loads all of them',
   },
+  {
+    chunk: 'spell',
+    many: true,
+    forbidden: /^game-/,
+    why:
+      'this is the exact edge batch 4 killed to stop the chunk cascade (59/59 spell chunks re-hashed ' +
+      'on a core edit, before; 0/59, after) — a static import of `game-` by filename hash re-links ' +
+      'every spell chunk the moment `game-*.js` re-hashes, even when the spell itself did not change',
+  },
 ];
 
 const failures = [];
 
 for (const rule of RULES) {
-  const file = chunk(rule.chunk);
-  const offenders = staticDeps(file).filter(dep => rule.forbidden.test(dep));
-  if (offenders.length) {
-    failures.push(`${file} statically imports ${offenders.join(', ')} — ${rule.why}`);
+  const files = rule.many ? chunksMatching(rule.chunk) : [chunk(rule.chunk)];
+  for (const file of files) {
+    const offenders = staticDeps(file).filter(dep => rule.forbidden.test(dep));
+    if (offenders.length) {
+      failures.push(`${file} statically imports ${offenders.join(', ')} — ${rule.why}`);
+    }
   }
 }
 
