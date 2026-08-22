@@ -248,6 +248,13 @@ export default class PregameConfigSource implements MatchConfigSource {
     const ability = visualOfLoadout(this.loadoutOf(id)).abilities.find(
       entry => entry.letter === letter
     );
+    // `isSpellCatalogId` no longer narrows anything `string` doesn't already
+    // say (`SpellCatalogId` is `string` since batch 5 task 2) — this line's
+    // guarantee is entirely the runtime call, not the compiler. That's the
+    // guarantee that matters here: `ability.spellId` comes from a player's
+    // persisted `localStorage` config, which can name a spell this build no
+    // longer has, and this is what stops that stale id from reaching
+    // `spellDisplayOf` ungated.
     if (!ability?.spellId || !isSpellCatalogId(ability.spellId)) return null;
     return spellDisplayOf(ability.spellId, this.matchRules);
   }

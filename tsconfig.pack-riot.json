@@ -1,5 +1,26 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": { "strict": true },
-  "include": ["src/types/**/*.d.ts", "packs/**/*.ts"]
+  "include": [
+    "src/types/**/*.d.ts",
+    "packs/**/*.ts",
+    // Moved from tsconfig.strict-core.json in batch 5 task 2 fix round 1: it
+    // directly imports real pack spells (Anivia_R, Janna_Q, Janna_R, Lux_R,
+    // Malphite_Q, Pantheon_Q, Varus_Q, ...), so its strict coverage belongs to
+    // the pack's own config, not core's — and leaving it in core's pulled 256
+    // of 257 pack files back into that program regardless of the glob above.
+    "tests/game/spells/representative-spells.test.ts",
+    // Moved in the same fix round, after re-measuring found round 1 alone
+    // still left 256 pack files reachable from strict-core: `registry.ts`
+    // value-imports the whole `packs/riot/spells/index` barrel to fill the
+    // spell registry for tests, and each of the five `*.test.ts` files below
+    // either calls that loader or imports specific pack spells by path
+    // directly. See `tsconfig.strict-core.json`'s matching `exclude` comment.
+    "tests/game/spell/registry.ts",
+    "tests/game/combat/AttackProfiles.test.ts",
+    "tests/game/combat/Pet.test.ts",
+    "tests/game/combat/ExecuteMarks.test.ts",
+    "tests/game/combat/Reach.test.ts",
+    "tests/game/combat/Vision.test.ts"
+  ]
 }
