@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { join } from 'node:path';
 // @ts-expect-error — a plain .mjs build helper, shared with `vitest.config.ts`,
 // with no types of its own and not part of any TypeScript program.
-import { packDependentTests } from '../../scripts/pack-dependent-tests.mjs';
+import { packDependentTests, readSource } from '../../scripts/pack-dependent-tests.mjs';
 
 const ROOT = join(__dirname, '../..');
 
@@ -74,6 +74,38 @@ describe('which tests need a pack this checkout does not have', () => {
     expect(withoutRiot).not.toContain('tests/content/coreSpellsApiSurface.test.ts');
     expect(withoutRiot).not.toContain('tests/content/packAssetKeyBoundary.test.ts');
     expect(withoutRiot).not.toContain('tests/game/spells/terrain-field-seam.test.ts');
+  });
+
+  it('leaves a file whose only pack reach is a gated dynamic import in the run', () => {
+    // Round 1 excluded these four whole — 105 tests of stat ceilings, speed
+    // floors, regen, line of sight, vision and blackboard bucketing, none of
+    // which is about any pack — because one `it()` in each named a pack spell.
+    // Each now reaches it through `packIsInstalled('riot') ? await import(…) : null`
+    // and skips that one case.
+    const withoutRiot = packDependentTests(ROOT, ['reference']);
+    expect(withoutRiot).not.toContain('tests/game/config/PregameConfig.test.ts');
+    expect(withoutRiot).not.toContain('tests/game/Stats.test.ts');
+    expect(withoutRiot).not.toContain('tests/game/ai/TeamBlackboard.test.ts');
+    expect(withoutRiot).not.toContain('tests/game/combat/Vision.test.ts');
+  });
+
+  it('tells a static import from a deferred one, which is what the gate rests on', () => {
+    // The gate excuses a deferred specifier and must never excuse a static one:
+    // a static import of a module that is not there makes the *file*
+    // unloadable, so there is nothing a runtime check could save. No file in
+    // this repository carries both halves for a fixture to observe it through,
+    // so the split itself is pinned here.
+    const kinds = readSource(
+      [
+        "import a from './static';",
+        "export { b } from './re-exported';",
+        "vi.mock('./mocked');",
+        "const c = await import('./deferred');",
+        "const d = () => import('./lazy');",
+      ].join('\n')
+    );
+    expect(kinds.static).toEqual(['./static', './re-exported', './mocked']);
+    expect(kinds.deferred).toEqual(['./deferred', './lazy']);
   });
 
   it('is a real population, not an empty list that would pass either way', () => {

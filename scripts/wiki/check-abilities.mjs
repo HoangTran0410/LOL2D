@@ -8,6 +8,16 @@ import { existsSync } from 'node:fs';
 /**
  * The pack a manifest entry's file belongs to, or `null` for one of core's own.
  *
+ * Paired with `packTreeIsPresent` below, and the pair deliberately does **not**
+ * answer "is this pack installed" — that question has exactly one home,
+ * `scripts/installed-packs.mjs`, and a second answer to it would be a source of
+ * drift. This asks something different and narrower: does the root *being
+ * validated* contain that pack's tree. `checkAbilities(root)` is called with
+ * temporary fixture roots by `tests/wiki/import-abilities.test.ts`, which build
+ * a `packs/riot/assets/` of their own and have no `node_modules` at all, so
+ * "installed" is not even a meaningful question there — while "is the file this
+ * manifest row names supposed to be here" is, and is the one this check needs.
+ *
  * `assets/source-manifest.json` is core's file and records the wiki provenance
  * of every downloaded image — but batch 4 task 4 moved 377 of those images into
  * `packs/riot/assets/`, so most of its rows now name a file that only exists
@@ -18,6 +28,9 @@ import { existsSync } from 'node:fs';
  * that had no business being required.
  */
 const packOfPath = localPath => /^packs\/([A-Za-z0-9_-]+)\//.exec(localPath)?.[1] ?? null;
+
+/** Does `root` — whichever root this run was pointed at — hold that pack's tree? */
+const packTreeIsPresent = (root, pack) => existsSync(resolve(root, 'packs', pack));
 
 async function walk(path) {
   const entries = await readdir(path, { withFileTypes: true }).catch(error => {
@@ -78,14 +91,8 @@ export async function checkAbilities(root) {
     // that need the bytes on disk are conditional, and only on the pack that
     // owns them genuinely not being installed. A pack that *is* here and is
     // missing a file it declares still fails, loudly, exactly as before.
-    // "Is this pack's tree present under the root being checked", not
-    // `contentPackInstalled` — this function is called with a temporary
-    // fixture root by `tests/wiki/import-abilities.test.ts`, which builds a
-    // `packs/riot/assets/` of its own and has no `node_modules` at all. The
-    // question a manifest row asks is whether the file it names is supposed to
-    // be here, and the pack's own directory is what answers it either way.
     const pack = packOfPath(source.localPath);
-    if (pack && !existsSync(resolve(root, 'packs', pack))) {
+    if (pack && !packTreeIsPresent(root, pack)) {
       skippedByPack.set(pack, (skippedByPack.get(pack) ?? 0) + 1);
     } else {
       const bytes = await readFile(resolve(root, source.localPath)).catch(() => null);

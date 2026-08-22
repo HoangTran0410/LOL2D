@@ -45,6 +45,26 @@
  * iterating and only care about the pack-free half; `--skip-boot` drops step 6,
  * for a machine with no browser. The restore itself always runs, on every path,
  * including a throw and a SIGINT.
+ *
+ * ## Nothing here is ever allowed to delete the pack
+ *
+ * `cleanup()` removes the departure directory **only** when every pack is
+ * verifiably back in `packs/`, and even then with `rmdirSync`, which refuses a
+ * non-empty directory. The previous version got this exactly backwards and it
+ * is worth stating why, because the shape is seductive: the restore-failure
+ * branch printed "left at <path>" — telling the reader their content was safe —
+ * and then fell through to `rmSync(departureDir, { recursive: true })`, whose
+ * comment claimed it only removed an empty directory. It does not. A recursive
+ * remove deletes a non-empty tree silently, so the one branch that exists for
+ * "the restore went wrong" was the branch that turned a recoverable problem
+ * into 240 spells and 378 images gone, while printing a message saying they
+ * were fine. That is worse than having no safety copy at all, because it is
+ * trusted.
+ *
+ * `--prove-restore-failure` exercises that branch on purpose: it moves the
+ * pack, plants an obstacle where the pack has to go back, and goes straight to
+ * the restore, skipping every expensive step. Read the paths it names and check
+ * that both still hold the pack.
  */
 import { execFileSync } from 'node:child_process';
 import {
@@ -54,6 +74,7 @@ import {
   readFileSync,
   renameSync,
   rmSync,
+  rmdirSync,
   writeFileSync,
 } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -78,8 +99,22 @@ const DEPARTING = ['riot'];
  */
 const departureDir = join(dirname(root), `.${basename(root)}-pack-departure`);
 
+/**
+ * A byte-for-byte copy taken before anything moves, inside the departure
+ * directory. A rename that half-completes is recoverable; a run killed with
+ * `kill -9` between the rename and the restore is not, and the pack is not this
+ * script's to lose. Removed by `cleanup()` only once every pack is back.
+ */
+const safetyDir = join(departureDir, '.safety-copy');
+
 const lockPath = join(root, 'package-lock.json');
 const lockBefore = readFileSync(lockPath);
+
+/**
+ * Packs that could not be put back. **While this is non-empty nothing is
+ * deleted** — see this file's header for the bug that rule exists for.
+ */
+const stranded = [];
 
 const log = message => console.log(`\n=== ${message}`);
 
@@ -109,18 +144,25 @@ function depart() {
   }
 }
 
+/**
+ * Puts every moved pack back, and **removes nothing**. A pack it cannot put
+ * back is recorded in `stranded`; `cleanup()` is the only thing that deletes,
+ * and it refuses to while that list has anything in it.
+ */
 function restore() {
   for (const name of moved) {
     const from = join(departureDir, name);
     const to = join(root, 'packs', name);
     if (!existsSync(from)) {
       console.error(`CANNOT RESTORE packs/${name}: ${from} is gone`);
+      stranded.push(name);
       continue;
     }
     if (existsSync(to)) {
       // Something recreated the directory while the pack was away. Keep both
       // rather than clobbering either; a human decides.
-      console.error(`CANNOT RESTORE packs/${name}: ${to} exists again — left at ${from}`);
+      console.error(`CANNOT RESTORE packs/${name}: ${to} exists again`);
+      stranded.push(name);
       continue;
     }
     renameSync(from, to);
@@ -128,10 +170,46 @@ function restore() {
   }
   moved = [];
   writeFileSync(lockPath, lockBefore);
+}
+
+/**
+ * The only code in this file that deletes anything, and it deletes only when
+ * every pack is demonstrably back in the tree.
+ *
+ * Two guards, because one of them was the bug. First: `stranded` non-empty
+ * means the pack is still out here, so nothing goes — the run says where both
+ * copies are and stops. Second: `rmdirSync`, never `rmSync(..., { recursive:
+ * true })`. `rmdirSync` fails with `ENOTEMPTY` on a directory that still holds
+ * anything, which makes "only if it is empty" a property of the call rather
+ * than of a comment above it.
+ */
+function cleanup() {
+  if (stranded.length) {
+    const rule = '!'.repeat(74);
+    console.error(`\n${rule}`);
+    console.error('THE PACK IS NOT BACK IN THE TREE. Nothing has been deleted.');
+    for (const name of stranded) {
+      console.error(`  packs/${name} is at   ${join(departureDir, name)}`);
+      console.error(`  a second copy is at   ${join(safetyDir, name)}`);
+    }
+    console.error('');
+    console.error('Deal with whatever is sitting at packs/<name> now, then move the first');
+    console.error('path back by hand. The second is a byte-for-byte duplicate taken before');
+    console.error('anything moved, in case the first is somehow damaged. Delete neither');
+    console.error('until `packs/` is right and `npm install` has been run.');
+    console.error(`${rule}\n`);
+    return;
+  }
+  // Every pack is back, so the safety copy is now a duplicate of live content
+  // and is the one thing left in here.
+  rmSync(safetyDir, { recursive: true, force: true });
   try {
-    rmSync(departureDir, { recursive: true });
-  } catch {
-    /* only if empty and only if it can be — never worth failing the run over */
+    rmdirSync(departureDir);
+  } catch (error) {
+    console.error(
+      `left ${departureDir} in place (${error.code ?? error.message}) — something is in it ` +
+        'that this script did not put there; look before you remove it'
+    );
   }
 }
 
@@ -146,9 +224,28 @@ for (const signal of ['SIGINT', 'SIGTERM']) {
   process.on(signal, () => {
     console.error(`\n${signal} — restoring the pack before exiting`);
     restoreOnce();
-    process.exit(130);
+    cleanup();
+    process.exit(stranded.length ? 1 : 130);
   });
 }
+
+/**
+ * A drill of the drill: move the pack, plant an obstacle where it has to go
+ * back, and go straight to the restore — skipping `npm install`, `verify`,
+ * `build` and the browser, none of which the failure branch touches. It exists
+ * because that branch only ever runs when something has already gone wrong,
+ * which is exactly the condition nobody reproduces, and it is the branch that
+ * used to delete the pack.
+ */
+const PROVE_RESTORE_FAILURE = process.argv.includes('--prove-restore-failure');
+
+/**
+ * The sentinel `--prove-restore-failure` throws to reach the `finally`. Caught
+ * and swallowed below, so the run ends in the drill's own summary and a
+ * non-zero exit rather than an unhandled stack trace — a deliberate exercise
+ * should not read like a crash.
+ */
+const PROOF_DONE = Symbol('prove-restore-failure');
 
 const results = [];
 let failed = false;
@@ -167,6 +264,22 @@ try {
 
   log('step 1 — moving the optional packs out of the tree');
   depart();
+
+  if (PROVE_RESTORE_FAILURE) {
+    for (const name of DEPARTING) {
+      const blocked = join(root, 'packs', name);
+      mkdirSync(blocked, { recursive: true });
+      writeFileSync(
+        join(blocked, 'PLANTED-BY-PROVE-RESTORE-FAILURE'),
+        'Planted by `npm run verify:without-packs -- --prove-restore-failure`.\n' +
+          'Delete this directory, then move the pack back from the path the run printed.\n'
+      );
+      console.log(
+        `planted an obstacle at packs/${name} — the restore must refuse and keep both copies`
+      );
+    }
+    throw PROOF_DONE;
+  }
 
   log('step 2 — npm install, so the workspace link goes away');
   run('npm', ['install', '--no-audit', '--no-fund']);
@@ -199,15 +312,24 @@ try {
     results.push(['boots to a playable match (pack absent)', boot.ok]);
     failed ||= !boot.ok;
   }
+} catch (error) {
+  if (error !== PROOF_DONE) throw error;
 } finally {
   log('restoring the pack');
   restoreOnce();
-  run('npm', ['install', '--no-audit', '--no-fund'], { allowFailure: true });
-  run('node', ['scripts/generate-installed-packs.mjs'], { allowFailure: true });
-  rmSync(join(departureDir), { recursive: true, force: true });
+  if (!PROVE_RESTORE_FAILURE) {
+    run('npm', ['install', '--no-audit', '--no-fund'], { allowFailure: true });
+    run('node', ['scripts/generate-installed-packs.mjs'], { allowFailure: true });
+  }
+  cleanup();
 }
 
-if (!process.argv.includes('--skip-restore-verify')) {
+if (stranded.length) {
+  results.push([`packs/${stranded.join(', packs/')} restored`, false]);
+  failed = true;
+}
+
+if (!PROVE_RESTORE_FAILURE && !process.argv.includes('--skip-restore-verify')) {
   log('step 7 — npm run verify again, with the pack back');
   const again = run('npm', ['run', 'verify'], { allowFailure: true });
   results.push(['verify (pack restored)', again.ok]);

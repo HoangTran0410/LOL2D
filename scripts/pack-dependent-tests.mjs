@@ -60,11 +60,24 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
 /**
- * `import x from 'y'`, `export … from 'y'`, `import('y')`, `vi.mock('y')` —
- * over source whose string literals have already been lifted out and replaced
- * by their index in `literals`. See `readSource`.
+ * The two kinds, over source whose string literals have already been lifted out
+ * and replaced by their index in `literals`. See `readSource`.
+ *
+ * **`static`** — `import x from 'y'`, `export … from 'y'`, and `vi.mock('y')`
+ * (which resolves the real module unless a factory is given, so it is loaded
+ * for this purpose too). A static import of a module that is not there makes
+ * the *file* unloadable, whatever else the file says, so nothing can excuse
+ * one.
+ *
+ * **`deferred`** — `import('y')`. Vite leaves the specifier alone and nothing
+ * resolves it until the expression is evaluated, so a `import()` behind a
+ * condition that is false is inert. That is what lets a file keep the cases
+ * that do not need the pack — see `HANDLES_ABSENCE`.
  */
-const SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(\s*|\bvi\.mock\s*\(\s*) (\d+) /g;
+const SPECIFIER = {
+  static: /(?:\bfrom\s*|\bvi\.mock\s*\(\s*) (\d+) /g,
+  deferred: /\bimport\s*\(\s*(\d+) /g,
+};
 
 /**
  * Every module specifier `source` actually imports.
@@ -92,12 +105,18 @@ const SPECIFIER = /(?:\bfrom\s*|\bimport\s*\(\s*|\bvi\.mock\s*\(\s*) (\d+) /g;
  * because the whole string became one placeholder. Template literals are
  * dropped outright — a real specifier is never inside one.
  *
+ * Exported for `tests/scripts/packDependentTests.test.ts`, which pins the
+ * static/deferred split directly: that distinction is what decides whether a
+ * `packIsInstalled` gate is allowed to excuse a specifier, and no file in this
+ * repository happens to carry both halves of the crossing for a fixture to
+ * observe it through.
+ *
  * `'`/`"` strings end at a raw newline as well as at their closing quote,
  * which is the same bound `importScan.ts` takes against an apostrophe in
  * ordinary prose: real JavaScript cannot hold an unescaped newline inside one,
  * so reaching one proves the opening quote was never a delimiter.
  */
-function readSource(source) {
+export function readSource(source) {
   const literals = [];
   let state = 'code';
   let out = '';
@@ -150,7 +169,8 @@ function readSource(source) {
       state = 'code';
     }
   }
-  return [...out.matchAll(SPECIFIER)].map(match => literals[Number(match[1])]);
+  const at = regex => [...out.matchAll(regex)].map(match => literals[Number(match[1])]);
+  return { static: at(SPECIFIER.static), deferred: at(SPECIFIER.deferred) };
 }
 
 function filesUnder(dir) {
@@ -183,11 +203,12 @@ function filesUnder(dir) {
  *     `MinionSpawner.test.ts` (which needs *some* lanes and no particular
  *     ones) running, and it cannot help these — there is no synthetic map
  *     Summoner's Rift's hand-written coordinates are true of.
- *   - **the pack's *files*, read from disk rather than imported.**
+ *   - **the pack's *files*, read from disk rather than imported.** Three:
  *     `cc-buff-icons.test.ts` `readFileSync`s forty pack spells by
- *     template-literal path, and `generateSpellCatalog.siblingRepo.test.ts`
- *     copies `packs/riot/spells` into a temporary directory to prove the
- *     generator works outside this repo. A scan cannot tell those apart from
+ *     template-literal path, `vi-spell-names.test.ts` `readdirSync`s the whole
+ *     spell directory, and `generateSpellCatalog.siblingRepo.test.ts` copies
+ *     `packs/riot/spells` into a temporary directory to prove the generator
+ *     works outside this repo. A scan cannot tell those apart from
  *     the same path quoted as a *fixture*, which `pregameBootPath.test.ts` and
  *     `importScan.test.ts` both do — a signal that matched the text excluded
  *     those two as well, i.e. it would have stopped the drill from running two
@@ -211,6 +232,33 @@ const PACK_CONTENT_FIXTURE_TESTS = {
     'tests/scripts/generateSpellCatalog.siblingRepo.test.ts',
   ],
 };
+
+/** The pack a specifier names, by either spelling, or `null`. */
+const packNamed = specifier =>
+  /(?:^|\/)packs\/([A-Za-z0-9_-]+)(?:\/|$)/.exec(specifier)?.[1] ??
+  /^@moba2d\/content-([A-Za-z0-9_-]+)(?:\/|$)/.exec(specifier)?.[1] ??
+  null;
+
+/**
+ * Whether `source` declares that it has already handled `pack` being absent, by
+ * naming it to `tests/support/installedPacks.ts`'s `packIsInstalled` — task 7's
+ * seam, and the same one four scans in `tests/content/` already use.
+ *
+ * **This excuses a deferred import and never a static one.** A static import of
+ * a missing module makes the file unloadable no matter what else it says, so
+ * there is nothing for a runtime check to save; a deferred one behind
+ * `packIsInstalled('riot') ? await import(…) : null` is never evaluated and
+ * never resolved.
+ *
+ * The pack has to be named, not merely the function called, so a file that
+ * handles one pack's absence does not accidentally excuse itself for another's.
+ * Four files carry this today (`PregameConfig`, `Stats`, `TeamBlackboard`,
+ * `Vision`) and between them it is 105 tests of stat ceilings, regen, vision,
+ * line of sight and blackboard bucketing — core mechanism, every one of them —
+ * that round 1 skipped over a single `it()` apiece.
+ */
+const handles = (source, pack) =>
+  new RegExp(`packIsInstalled\\(\\s*['"\`]${pack}['"\`]`).test(source);
 
 /**
  * Every test file under `tests/` that reaches a pack outside `installed`, as
@@ -261,12 +309,14 @@ export function packDependentTests(root, installed) {
       file.slice(root.length).replace(/\\/g, '/')
     )?.[1];
     if (own && !installed.includes(own)) dependent.add(file);
-    for (const specifier of specifiers) {
-      const pack =
-        /(?:^|\/)packs\/([A-Za-z0-9_-]+)(?:\/|$)/.exec(specifier)?.[1] ??
-        /^@moba2d\/content-([A-Za-z0-9_-]+)(?:\/|$)/.exec(specifier)?.[1];
-      if (pack && !installed.includes(pack)) dependent.add(file);
-      if (specifier.startsWith('.')) locals.push(resolve(dirname(file), specifier));
+    for (const kind of ['static', 'deferred']) {
+      for (const specifier of specifiers[kind]) {
+        const pack = packNamed(specifier);
+        if (pack && !installed.includes(pack) && !(kind === 'deferred' && handles(source, pack))) {
+          dependent.add(file);
+        }
+        if (specifier.startsWith('.')) locals.push(resolve(dirname(file), specifier));
+      }
     }
     localImports.set(file, locals);
   }

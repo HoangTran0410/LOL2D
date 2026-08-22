@@ -20,6 +20,7 @@ import {
 } from '../../../src/game/config/PregameConfig';
 import { BOT_DIFFICULTIES, DEFAULT_DIFFICULTY } from '../../../src/game/ai/Difficulty';
 import TeamId from '../../../src/game/enums/TeamId';
+import { packIsInstalled } from '../../support/installedPacks';
 
 /** A minimal in-memory `localStorage` so persistence can be tested in node. */
 class MemoryStorage {
@@ -722,14 +723,20 @@ describe('mapId', () => {
    * `BOT_DIFFICULTY_ORDER`'s own cross-check test uses for its second,
    * independent copy of `game/ai/Difficulty.ts`'s tiers.
    */
-  it('names the real bundled pack and the real Summoner’s Rift id', async () => {
-    const { qualify } = await import('../../../src/content/PackRegistry');
-    const { BUNDLED_PACK_ID } = await import('../../../src/content/install');
-    // Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/`
-    // and into the pack.
-    const { summonersRift } = await import('../../../packs/riot/maps/summonersRift');
-    expect(DEFAULT_MAP_ID).toBe(qualify(BUNDLED_PACK_ID, summonersRift.id));
-  });
+  it.skipIf(!packIsInstalled('riot'))(
+    'names the real bundled pack and the real Summoner’s Rift id',
+    async () => {
+      const { qualify } = await import('../../../src/content/PackRegistry');
+      const { BUNDLED_PACK_ID } = await import('../../../src/content/install');
+      // Batch 4 task 6 moved Summoner's Rift's map out of `src/content/maps/`
+      // and into the pack. `skipIf` above, not a rewrite: `DEFAULT_MAP_ID` names
+      // that pack's map by construction, so with the pack uninstalled there is
+      // no id to agree with — and the other 61 cases in this file are about
+      // `sanitizePregameConfig` and are core's own either way.
+      const { summonersRift } = await import('../../../packs/riot/maps/summonersRift');
+      expect(DEFAULT_MAP_ID).toBe(qualify(BUNDLED_PACK_ID, summonersRift.id));
+    }
+  );
 
   it('keeps a valid qualified id unchanged', () => {
     expect(sanitizePregameConfig({ mapId: 'reference:proving-grounds' }).mapId).toBe(
@@ -762,14 +769,25 @@ describe('mapId', () => {
  * is the cross-check that stops them drifting from the bundled pack's own
  * summoner-spell shelf silently — the same discipline the `mapId` describe
  * block above applies to `DEFAULT_MAP_ID`.
+ *
+ * Gated on that pack being installed, because `Flash` and `Heal` *are* its
+ * content: **core alone ships no summoner spells at all**, so with the riot
+ * pack out of the tree `summonerSpellIds()` is legitimately empty and the two
+ * defaults name nothing. That is not this test failing, it is the shelf being
+ * empty — and it is visible in a running pack-free match too, where slots D and
+ * F fall back to `BasicAttack` through `preset.ts`'s `classForId`. Found by
+ * batch 5 task 8's drill once this file stopped being excluded whole.
  */
 describe('DEFAULT_CHAMPION_LOADOUT summoner defaults', () => {
-  it('names two real entries on the bundled pack’s own summoner-spell shelf', async () => {
-    const { summonerSpellIds } = await import('../../../src/game/config/spellCatalog');
-    const ids = summonerSpellIds();
-    expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerD);
-    expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerF);
-  });
+  it.skipIf(!packIsInstalled('riot'))(
+    'names two real entries on the bundled pack’s own summoner-spell shelf',
+    async () => {
+      const { summonerSpellIds } = await import('../../../src/game/config/spellCatalog');
+      const ids = summonerSpellIds();
+      expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerD);
+      expect(ids).toContain(DEFAULT_CHAMPION_LOADOUT.summonerF);
+    }
+  );
 });
 
 /**

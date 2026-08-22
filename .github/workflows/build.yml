@@ -25,6 +25,33 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+
+      # Playwright's own Chromium, for the departure drill's boot step below.
+      # `LOL2D_CHROME_CHANNEL=` (empty) is what makes `tests/e2e/harness.mjs`
+      # use it instead of system Chrome, which no runner has.
+      - run: npx --yes playwright install --with-deps chromium
+
+      # **The batch's acceptance test, and it runs before `verify:all` on
+      # purpose.** It moves `packs/riot/` out of the tree, `npm install`s so the
+      # workspace link goes, regenerates the barrel, and requires core to
+      # verify, build and boot a real browser to a real match on the reference
+      # pack's map — then puts everything back.
+      #
+      # Before, because its step 4 ends in `vite build` and therefore leaves a
+      # **pack-free** `dist/` on disk. `verify:all` running afterwards rebuilds
+      # it with the pack, so the artifact the deploy step publishes is the
+      # complete game rather than whichever build happened to run last. Getting
+      # this order wrong would ship a game with no champions in it, from a green
+      # pipeline.
+      #
+      # `--skip-restore-verify` drops the drill's own second `verify` for the
+      # same reason: `verify:all` on the next line *is* that verify, over the
+      # restored tree. Locally the flag is worth leaving off, because there the
+      # tree the drill restores is the one you keep working in.
+      - run: npm run verify:without-packs -- --skip-restore-verify
+        env:
+          LOL2D_CHROME_CHANNEL: ''
+
       - run: npm run verify:all
 
       # `npm run verify:all` runs core's own `verify` (which ends in `vite
@@ -35,18 +62,19 @@ jobs:
       # scoped to core *by intent* (content-pack-extraction batch 5 task 6),
       # and a pack's own gates are the pack's own to run.
       #
-      # What this comment used to say — that `verify` "has to keep passing
-      # once packs/riot/ leaves this tree" — is a goal, not a property, and
-      # fix round 4 corrected it rather than leaving CI documented by an
-      # aspiration. Today `verify` still compiles and tests the pack:
-      # `src/content/install.ts` statically imports `packs/riot/pack`,
-      # `packs/reference/pack` and `packs/riot/generated/assetManifest`, so
-      # `typecheck` and `build` both follow it in, and 109 test files under
-      # `tests/` import from `packs/`. Measured rather than assumed — with
-      # `packs/` moved aside, `vue-tsc` stops in `src/content/install.ts`:
-      # `error TS2307: Cannot find module '../../packs/riot/pack'`. Making
-      # that import the dynamic one `install.ts`'s own header describes as
-      # "Stage 2" is what closes it, and that is a later task's job.
+      # This comment used to say that `verify` still compiled and tested the
+      # pack — that `src/content/install.ts` statically imported
+      # `packs/riot/pack`, that `vue-tsc` stopped there with `error TS2307`
+      # with `packs/` moved aside, and that closing it was "a later task's
+      # job". That task is content-pack-extraction batch 5 task 8 and it is
+      # done: the riot pack is reached only through
+      # `src/generated/installedPacks.ts`, a generated barrel that names it by
+      # package name and is empty when it is not installed, so `verify` passes
+      # with the pack out of the tree — 156 files / 1531 tests, against 278 /
+      # 3802 with it. `install.ts` is still static and synchronous, which spec
+      # §9.1 requires of it; what became conditional is the generated list of
+      # imports, not the imports themselves. The drill step above is what holds
+      # that true rather than a comment claiming it.
       #
       # Nothing ships that did not pass typecheck and the whole suite first —
       # that is the point of deploying from here rather than connecting the

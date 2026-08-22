@@ -169,8 +169,28 @@ describe('getChampionPresetFromLoadout — mode: "custom"', () => {
   });
 
   it('gives a custom kit a random avatar, same pool as a fully random champion', () => {
+    // Not `/^riot:champ_/`. The pool is every *installed* pack's playable
+    // roster, so the reference pack's Vera is a legitimate roll — this
+    // assertion drew from a pool of ~60 and demanded one pack's prefix, which
+    // made `verify` fail about one run in sixty with
+    // `expected 'reference_champ_vera' to match /^riot:champ_/`. Exactly the
+    // correction the `'random'` *spell* test three cases above already carries
+    // in its own comment ("the sanity pool widens to match"); the avatar field
+    // was left behind. Found by batch 5 task 8, which is about this class of
+    // literal, on the second of two back-to-back `verify:all` runs.
+    //
+    // The pool is read off the registry rather than restated, so a pack
+    // arriving or leaving cannot make this wrong again. A pack's own keys are
+    // qualified (`riot:champ_ahri`) and core's own are not
+    // (`reference_champ_vera`), which is why this is a set membership test and
+    // not a pattern.
+    const playable = contentRegistry()
+      .champions()
+      .filter(champion => champion.playable && champion.image);
+    const avatars = new Set(playable.map(champion => champion.image));
+    expect(avatars.size).toBeGreaterThan(0);
     const preset = getChampionPresetFromLoadout(customLoadout(Array(SLOT_COUNT).fill('random')));
-    expect(preset.avatar).toMatch(/^riot:champ_/);
+    expect([...avatars]).toContain(preset.avatar);
   });
 });
 

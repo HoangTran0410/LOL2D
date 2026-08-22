@@ -6,9 +6,31 @@ import Pet from '../../../src/game/gameObject/attackableUnits/Pet';
 import { blackboardFor, BLACKBOARD_TTL_MS } from '../../../src/game/ai/TeamBlackboard';
 import { createGame, indexObjects, stubGameGlobals, type TestGame } from '../fixtures';
 import { buildContentApi } from '../../../src/content/ContentApi';
-import { makeZed_W_Clone } from '../../../packs/riot/spells/Zed_W';
+import { packIsInstalled } from '../../support/installedPacks';
+
 const __api = buildContentApi();
-const Zed_W_Clone = makeZed_W_Clone(__api);
+
+/**
+ * Zed's shadow, reached with a *lazy, gated* import so the other ten cases in
+ * this file — which are about the blackboard's own snapshot, TTL and bucketing
+ * and have nothing to do with any pack — still run in a checkout that has no
+ * riot pack.
+ *
+ * `packs/riot/spells/Zed_W` used to be a plain static import here, and one
+ * static import is enough to make the whole file unloadable: batch 5 task 8's
+ * first round excluded all eleven of these tests over it. A dynamic `import()`
+ * that is never evaluated is inert — Vite leaves the specifier alone and
+ * nothing resolves it — so the ternary is what does the work, and
+ * `packIsInstalled` is what the exclusion scanner reads to know this file has
+ * handled the pack's absence itself.
+ *
+ * A pet that is not a `Pet` is the thing under test, and Zed's clone is the
+ * one in the game that is written that way; there is no core stand-in to
+ * substitute, which is why this is gated rather than rewritten.
+ */
+const Zed_W_Clone = packIsInstalled('riot')
+  ? (await import('../../../packs/riot/spells/Zed_W')).makeZed_W_Clone(__api)
+  : null;
 
 const PRESET: ChampionPresetData = {
   name: 'Test',
@@ -78,24 +100,27 @@ describe('TeamBlackboard rosters', () => {
     expect(view.rally).toEqual({ x: 0, y: 0 });
   });
 
-  it('leaves a Zed shadow out too, which is a Champion without being a Pet', () => {
-    // `Zed_W_Clone extends Champion` directly, so it does not inherit `Pet`'s
-    // override and shipped as `killCredit: 'champion'` — a shadow counted
-    // toward a team's roster, and killing one scored a kill on someone's KDA.
-    const game = createGame();
-    const blue = spawn(game, BLUE, 0, 0);
-    const red = spawn(game, RED, 400, 0);
-    const shadow = new Zed_W_Clone({
-      game,
-      position: createVector(600, 0),
-      teamId: RED,
-    } as never);
-    game.setPlayer(blue);
-    indexObjects(game, [blue, red, shadow]);
+  it.skipIf(!Zed_W_Clone)(
+    'leaves a Zed shadow out too, which is a Champion without being a Pet',
+    () => {
+      // `Zed_W_Clone extends Champion` directly, so it does not inherit `Pet`'s
+      // override and shipped as `killCredit: 'champion'` — a shadow counted
+      // toward a team's roster, and killing one scored a kill on someone's KDA.
+      const game = createGame();
+      const blue = spawn(game, BLUE, 0, 0);
+      const red = spawn(game, RED, 400, 0);
+      const shadow = new Zed_W_Clone!({
+        game,
+        position: createVector(600, 0),
+        teamId: RED,
+      } as never);
+      game.setPlayer(blue);
+      indexObjects(game, [blue, red, shadow]);
 
-    expect(shadow.killCredit).toBe('none');
-    expect(blackboardFor(game, 0, blind).viewFor(BLUE).enemies).toEqual([red]);
-  });
+      expect(shadow.killCredit).toBe('none');
+      expect(blackboardFor(game, 0, blind).viewFor(BLUE).enemies).toEqual([red]);
+    }
+  );
 
   it('leaves out the dead and the removed', () => {
     const game = createGame();
