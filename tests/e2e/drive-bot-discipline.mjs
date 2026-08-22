@@ -92,9 +92,9 @@ const MAX_UNBROKEN_EXPOSURE_MS = 5_000;
 /** Sampler period: every 6th frame at 60fps. */
 const SAMPLE_MS = 100;
 
-const { url, page, report, check, finish, errors } = await startHarness();
+const { url, page, report, check, guard, errors } = await startHarness();
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
@@ -557,6 +557,4 @@ try {
   );
   check('bots did something at all', probe.casts > 0, `${probe.casts} casts`);
   check('no runtime errors', errors.length === 0, errors[0]);
-} finally {
-  await finish();
-}
+});

@@ -27,7 +27,7 @@ const OUT = process.argv[2] ?? '/tmp/lol2d-mobile-hud';
 
 // `deviceScaleFactor: 3` is load-bearing here rather than cosmetic: the badge
 // overlap this script checks for last was invisible at 1x.
-const { url, page, errors, report, failures, check, touchStart, touchMove, touchEnd, tap, finish } =
+const { url, page, errors, report, check, touchStart, touchMove, touchEnd, tap, guard } =
   await startHarness({
     out: OUT,
     viewport: PHONE_VIEWPORT,
@@ -36,7 +36,7 @@ const { url, page, errors, report, failures, check, touchStart, touchMove, touch
     touch: true,
   });
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.touchControls, null, {
@@ -232,8 +232,4 @@ try {
     path: `${OUT}-04-slot-bar-zoom.png`,
     clip: { x: 0, y: 30, width: 400, height: 90 },
   });
-} catch (error) {
-  failures.push(`threw: ${error.stack ?? error}`);
-} finally {
-  await finish();
-}
+});

@@ -160,6 +160,49 @@ export const startHarness = async ({
     process.exit(failures.length ? 1 : 0);
   };
 
+  /**
+   * The only safe way to run a driver's body.
+   *
+   * `finish()` calls `process.exit()`, and `process.exit()` inside a `finally`
+   * terminates the process before an in-flight exception can propagate. So a
+   * script written as `try { ...checks... } finally { await finish(); }` —
+   * with no `catch` — reaches `finally` after a throw, finds `failures` still
+   * empty because the throw happened before any check recorded one, prints
+   * "all checks passed", and exits 0. It ran a prefix of its checks and
+   * reported success for the whole thing. `page.click(selector)` on a
+   * selector that does not exist is the commonest way in, and it is very
+   * often the exact thing the script is testing.
+   *
+   * `guard(body)` is the fix: it is the only place allowed to call `finish()`,
+   * and it always reaches it through a `catch` that has already turned the
+   * throw into a recorded failure. A script's whole body becomes
+   * `await guard(async () => { ...checks... });` — no bare `try`/`finally`
+   * left for the next author to get wrong.
+   *
+   * `cleanup`, if given, runs after the body (pass or throw) and before
+   * `finish()` — for a script that has its own teardown beyond the browser
+   * and server (`drive-practice-panel.mjs` clears two `localStorage` keys so
+   * they cannot leak into the next script in the suite). A `cleanup` that
+   * itself throws is recorded as its own failure rather than replacing
+   * whatever the body already recorded, and `finish()` still runs after it.
+   */
+  const guard = async (body, { cleanup } = {}) => {
+    try {
+      await body();
+    } catch (error) {
+      failures.push(`threw: ${error?.stack ?? error?.message ?? error}`);
+    } finally {
+      if (cleanup) {
+        try {
+          await cleanup();
+        } catch (error) {
+          failures.push(`cleanup failed: ${error?.message ?? error}`);
+        }
+      }
+      await finish();
+    }
+  };
+
   return {
     url,
     server,
@@ -177,5 +220,6 @@ export const startHarness = async ({
     tap,
     openPage,
     finish,
+    guard,
   };
 };

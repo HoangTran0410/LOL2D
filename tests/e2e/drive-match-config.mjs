@@ -38,10 +38,11 @@ import { CFG_KEY, DESKTOP_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-match-config';
 
-const { url, page, check, finish } = await startHarness({
+const { url, page, check, guard } = await startHarness({
   viewport: DESKTOP_VIEWPORT,
 });
 
+await guard(async () => {
 const shot = name => page.screenshot({ path: `${OUT}-${name}.png` });
 
 const openMenu = async () => {
@@ -379,5 +380,4 @@ check(
   !resumed.paused && !resumed.panel,
   JSON.stringify(resumed)
 );
-
-await finish();
+});
