@@ -16,6 +16,16 @@
     "moba2d-check-seams": "./scripts/check-seams.mjs",
     "moba2d-generate-spell-catalog": "./scripts/generate-spell-catalog.mjs"
   },
+  "files": [
+    "assets",
+    "public",
+    "scripts",
+    "src",
+    "styles",
+    "index.html",
+    "tsconfig.json",
+    "vite.config.ts"
+  ],
   "scripts": {
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
@@ -23,8 +33,8 @@
     "assets:check:riot": "node packs/riot/scripts/generate-assets.mjs --check",
     "catalog:generate": "node scripts/generate-spell-catalog.mjs",
     "catalog:check": "node scripts/generate-spell-catalog.mjs --check",
-    "catalog:generate:riot": "node scripts/generate-spell-catalog.mjs --tree=riot",
-    "catalog:check:riot": "node scripts/generate-spell-catalog.mjs --check --tree=riot",
+    "catalog:generate:riot": "node scripts/generate-spell-catalog.mjs --tree=riot --root=packs/riot",
+    "catalog:check:riot": "node scripts/generate-spell-catalog.mjs --check --tree=riot --root=packs/riot",
     "wiki:sync-index": "node scripts/wiki/import-abilities.mjs --index",
     "ability:import": "node scripts/wiki/import-abilities.mjs",
     "ability:update": "node scripts/wiki/import-abilities.mjs --update",

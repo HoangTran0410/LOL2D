@@ -6,8 +6,8 @@
   "scripts": {
     "assets:generate": "node scripts/generate-assets.mjs",
     "assets:check": "node scripts/generate-assets.mjs --check",
-    "catalog:generate": "moba2d-generate-spell-catalog --tree=riot",
-    "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot"
+    "catalog:generate": "moba2d-generate-spell-catalog --tree=riot --root=.",
+    "catalog:check": "moba2d-generate-spell-catalog --check --tree=riot --root=."
   },
   "devDependencies": {
     "@moba2d/core": "*"

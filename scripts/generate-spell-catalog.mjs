@@ -24,10 +24,46 @@
  * `realpathSync` output rather than the raw argv path: `import.meta.url`
  * always names this file's real location, but `process.argv[1]` keeps
  * whatever path was actually invoked — the bin symlink itself when run that
- * way — and a bare `resolve()` never reconciles the two. Confirmed against
- * `scripts/check-seams.mjs`, which still uses the raw comparison: invoking
- * its bin (`node_modules/.bin/moba2d-check-seams ...`) loads the module but
- * never enters its CLI block, exits 0, and prints nothing.
+ * way — and a bare `resolve()` never reconciles the two.
+ *
+ * ## The tree's root is a caller argument, not a table in this file
+ *
+ * Fix round 1 (content-pack-extraction batch 5, task 5): `PACK_SPELL_TREES.riot`
+ * used to hardcode its paths (`'packs/riot/generated/spellCatalog.ts'`, etc.)
+ * relative to *this script's own* directory — i.e. core's root. That
+ * coincides with where the pack actually lives inside this monorepo, so
+ * every existing call and test passed, for the wrong reason: the day the
+ * pack is a sibling repository, `packs/riot/` no longer sits under this
+ * file at all, and the same call resolves nonsense paths under core's own
+ * checkout instead. `scripts/check-seams.mjs` has the identical shape —
+ * `resolve(repoRoot, targetRoot)` instead of `resolve(targetRoot)` — and
+ * the review that found this confirmed it the same way: `cd packs/riot &&
+ * node ../../scripts/check-seams.mjs ./spells` throws ENOENT against the
+ * wrong root.
+ *
+ * So every tree's paths (`outputPath`, `modulesOutputPath`, `barrels[].path`,
+ * `assetManifestOutputPath`) are now relative to a `treeRoot` argument
+ * `renderSpellCatalogSource`/`renderSpellModulesSource`/`generateSpellCatalog`
+ * all take explicitly, defaulting to `coreRoot` (this file's own directory)
+ * only because that is genuinely what `CORE_SPELL_TREE` means — core
+ * generating its own catalogue against itself needs no argument from
+ * anyone. A pack tree has no such default: the CLI below *requires*
+ * `--root=<path>` whenever `--tree=` names one, resolved from the
+ * *invoking shell's* current directory, never from this file's location.
+ * `packs/riot/package.json`'s own `catalog:generate` passes `--root=.`
+ * (its own directory); this repo's root `package.json` passes
+ * `--root=packs/riot` for the same tree, because *its* current directory
+ * is the monorepo root instead. Core no longer hardcodes the string
+ * `"packs/riot"` as a location anywhere — only as a tree *name*
+ * (`PACK_SPELL_TREES`'s key), which is metadata about the tree's shape
+ * (its barrels, whether it is a pack factory, its asset-manifest
+ * companion), not a claim about where it lives on disk.
+ *
+ * Because a pack's tree root can now be physically outside `coreRoot`
+ * entirely, barrel and asset-manifest loads go through Vite's `/@fs/`
+ * absolute-path form rather than a root-relative URL, and the dev server's
+ * `fs.allow` explicitly lists both roots — otherwise Vite's default file
+ * boundary refuses to serve anything outside its own project root.
  *
  * ## Why this exists
  *
@@ -75,7 +111,7 @@ import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
 
 const scriptPath = fileURLToPath(import.meta.url);
-const root = resolve(dirname(scriptPath), '..');
+const coreRoot = resolve(dirname(scriptPath), '..');
 
 /**
  * A tree this generator can build a catalogue for: a list of barrels (each
@@ -107,17 +143,21 @@ export const CORE_SPELL_TREE = {
 
 /**
  * Trees a pack can generate a catalogue for, selected from the CLI with
- * `--tree=<name>`. Only `riot` exists so far — `packs/riot/spells/index.ts`
- * is the real barrel batch 4 task 3 moved in.
+ * `--tree=<name>`. Only `riot` exists so far — `spells/index.ts` is the
+ * real barrel batch 4 task 3 moved in.
+ *
+ * Every path below is relative to a `treeRoot` the caller supplies (see
+ * this file's own header) — `packs/riot/` inside this monorepo today, but
+ * this object itself no longer says so anywhere.
  */
 export const PACK_SPELL_TREES = {
   riot: {
-    outputPath: 'packs/riot/generated/spellCatalog.ts',
-    modulesOutputPath: 'packs/riot/generated/spellModules.ts',
+    outputPath: 'generated/spellCatalog.ts',
+    modulesOutputPath: 'generated/spellModules.ts',
     // Relative, not `@/…`: the alias in `tsconfig.json` resolves only under
     // `src/`, and a pack imports its own siblings the way
     // `packs/reference/pack.ts` already does.
-    barrels: [{ path: 'packs/riot/spells/index.ts', importBase: '../spells' }],
+    barrels: [{ path: 'spells/index.ts', importBase: '../spells' }],
     // A pack barrel's `default` export is `(api: ContentApi) => SpellClass`,
     // never the class itself (`packBoundary.test.ts` forbids a pack from
     // importing `Spell` etc. any other way) — `renderSpellCatalogSource`
@@ -140,7 +180,7 @@ export const PACK_SPELL_TREES = {
     // manifest with `AssetManager` before any factory runs — the SSR-process
     // equivalent of what `bundledPack.ts` does for the real game.
     packId: 'riot',
-    assetManifestOutputPath: 'packs/riot/generated/assetManifest.ts',
+    assetManifestOutputPath: 'generated/assetManifest.ts',
   },
 };
 
@@ -190,12 +230,21 @@ function describe(id, SpellClass) {
   return { id, name, description, iconKey, coolDownMs, manaCost, specCoolDownMs };
 }
 
-export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
+export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE, treeRoot = coreRoot) {
   const server = await createServer({
-    root,
-    configFile: resolve(root, 'vite.config.ts'),
+    root: coreRoot,
+    configFile: resolve(coreRoot, 'vite.config.ts'),
     logLevel: 'error',
-    server: { middlewareMode: true, hmr: false },
+    // `/@fs/` reaches outside `root` (see this file's header) — `fs.allow`
+    // is the boundary that would otherwise refuse it. `coreRoot` is always
+    // needed (ContentApi.ts, AssetManager.ts); `treeRoot` only when it is a
+    // different directory, which the `Set` collapses back to one entry for
+    // core's own tree.
+    server: {
+      middlewareMode: true,
+      hmr: false,
+      fs: { allow: [...new Set([coreRoot, treeRoot])] },
+    },
     appType: 'custom',
   });
 
@@ -205,7 +254,7 @@ export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
     // `renderSpellModulesSource`.
     let AllSpells = {};
     for (const barrel of tree.barrels) {
-      const loaded = await server.ssrLoadModule(`/${barrel.path}`);
+      const loaded = await server.ssrLoadModule(`/@fs/${resolve(treeRoot, barrel.path)}`);
       AllSpells = { ...AllSpells, ...loaded };
     }
     // A pack barrel hands over factories; resolve each against one shared,
@@ -223,7 +272,7 @@ export async function renderSpellCatalogSource(tree = CORE_SPELL_TREE) {
     if (tree.assetManifestOutputPath) {
       const AssetManagerModule = await server.ssrLoadModule('/src/managers/AssetManager.ts');
       const { assetManifest: packAssetManifest } = await server.ssrLoadModule(
-        `/${tree.assetManifestOutputPath}`
+        `/@fs/${resolve(treeRoot, tree.assetManifestOutputPath)}`
       );
       AssetManagerModule.default.registerPackAssets(tree.packId, packAssetManifest);
     }
@@ -319,7 +368,7 @@ function render(entries, tree = CORE_SPELL_TREE) {
  * unexecuted at module scope, so writing them any other way silently collapses
  * this file back into one eager chunk.
  */
-export async function renderSpellModulesSource(tree = CORE_SPELL_TREE) {
+export async function renderSpellModulesSource(tree = CORE_SPELL_TREE, treeRoot = coreRoot) {
   const pattern = /export\s*\{\s*default\s+as\s+([A-Za-z0-9_]+)\s*\}\s*from\s*'(\.\/[^']+)'/g;
   const parseBarrel = async path => {
     const source = await readFile(path, 'utf8');
@@ -328,7 +377,7 @@ export async function renderSpellModulesSource(tree = CORE_SPELL_TREE) {
 
   const barrels = await Promise.all(
     tree.barrels.map(async barrel => {
-      const absolutePath = resolve(root, barrel.path);
+      const absolutePath = resolve(treeRoot, barrel.path);
       const entries = await parseBarrel(absolutePath);
       if (!entries.length) {
         throw new Error(`no \`export { default as X } from\` lines in ${absolutePath}`);
@@ -374,14 +423,18 @@ export async function renderSpellModulesSource(tree = CORE_SPELL_TREE) {
   ].join('\n');
 }
 
-export async function generateSpellCatalog(check = false, tree = CORE_SPELL_TREE) {
+export async function generateSpellCatalog(
+  check = false,
+  tree = CORE_SPELL_TREE,
+  treeRoot = coreRoot
+) {
   const [catalog, modules] = await Promise.all([
-    renderSpellCatalogSource(tree),
-    renderSpellModulesSource(tree),
+    renderSpellCatalogSource(tree, treeRoot),
+    renderSpellModulesSource(tree, treeRoot),
   ]);
   const outputs = [
-    { path: resolve(root, tree.outputPath), source: catalog },
-    { path: resolve(root, tree.modulesOutputPath), source: modules },
+    { path: resolve(treeRoot, tree.outputPath), source: catalog },
+    { path: resolve(treeRoot, tree.modulesOutputPath), source: modules },
   ];
 
   if (check) {
@@ -420,14 +473,28 @@ if (invokedDirectly()) {
   const treeArg = process.argv.find(arg => arg.startsWith('--tree='));
   const treeName = treeArg?.slice('--tree='.length);
   const tree = treeName ? PACK_SPELL_TREES[treeName] : CORE_SPELL_TREE;
+  const rootArg = process.argv.find(arg => arg.startsWith('--root='));
+  const rootValue = rootArg?.slice('--root='.length);
 
   if (treeName && !tree) {
     console.error(
       `Unknown spell tree "${treeName}". Known: ${Object.keys(PACK_SPELL_TREES).join(', ')}`
     );
     process.exitCode = 1;
+  } else if (treeName && !rootValue) {
+    // A named tree has no root of its own any more (see this file's own
+    // header) — the caller must say where it lives, resolved from *its*
+    // current directory, not from wherever this script happens to sit.
+    console.error(
+      `--tree=${treeName} requires --root=<path>, resolved from the current directory.`
+    );
+    process.exitCode = 1;
   } else {
-    generateSpellCatalog(process.argv.includes('--check'), tree).catch(error => {
+    // `resolve()` with one argument resolves against `process.cwd()` —
+    // exactly the portability property this fix is for: a sibling
+    // repository's own shell, not this script's install location.
+    const treeRoot = rootValue ? resolve(rootValue) : coreRoot;
+    generateSpellCatalog(process.argv.includes('--check'), tree, treeRoot).catch(error => {
       console.error(error instanceof Error ? error.message : error);
       process.exitCode = 1;
     });
