@@ -9,7 +9,11 @@ import { codeOnly, readSource, walkTsFiles } from './shared';
  * `mana:` changes the number the bar reads while leaving the pool the game
  * actually spends untouched.
  *
- * See `tests/game/spells/stat-resource-modifier.test.ts`.
+ * Enforced by `moba2d-check-seams`, which every pack runs over its own
+ * tree and core runs over its own; the rule itself is unit-tested in
+ * `tests/seams/exported-seams.test.ts`. The hand-written scan this
+ * comment used to name was deleted once the CLI covered the same
+ * population from the side that owns it.
  */
 const RESOURCE_AS_STAT = /(?<![A-Za-z])(?:health|mana)\s*:\s*\{/;
 

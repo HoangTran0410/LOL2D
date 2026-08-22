@@ -61,7 +61,7 @@ import type {
  * above) rather than through `AssetManager`: this module is build-time data
  * assembly, and routing it through the asset manager would make the
  * definition depend on a load having already happened. It also does not sit
- * under `packs/riot/assets/` — the tree `assets:generate:riot` walks to mint
+ * under `packs/riot/assets/` — the tree this pack's own `assets:generate` walks to mint
  * `AssetManager` keys — for the same reason core's own generator used to
  * carry a dedicated exclusion for it: nothing has ever read this file
  * through `AssetManager`, and a second, separate `?url` import of the same
