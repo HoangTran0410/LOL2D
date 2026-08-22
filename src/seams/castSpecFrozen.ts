@@ -58,14 +58,37 @@ function liveStateReads(body: string): string[] {
 
 export const checkCastSpecFrozen: SeamCheck = (root, options?: CastSpecFrozenOptions) => {
   const grandfathered = options?.grandfathered ?? new Set<string>();
+  // Which declared `grandfathered` entries actually suppressed a real
+  // would-be violation this run — the rest are stale (fix round 3).
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
 
   for (const file of walkTsFiles(root, options)) {
-    if (grandfathered.has(file)) continue;
+    // Computed regardless of the exemption, unlike the old `if
+    // (grandfathered.has(file)) continue;` short-circuit — the exemption's
+    // own staleness depends on knowing whether it would have mattered.
     const body = castSpecBody(stripComments(readSource(root, file)));
     if (body === null) continue;
     const reads = liveStateReads(body);
-    if (reads.length > 0) violations.push({ file, message: reads.join(', ') });
+    if (reads.length === 0) continue;
+
+    if (grandfathered.has(file)) {
+      consumed.add(file);
+    } else {
+      violations.push({ file, message: reads.join(', ') });
+    }
   }
+
+  for (const file of grandfathered) {
+    if (!consumed.has(file)) {
+      violations.push({
+        file,
+        message:
+          'grandfathered exemption matches nothing — this file no longer reads live state in castSpec, has no castSpec getter, or does not exist',
+        kind: 'stale-exemption',
+      });
+    }
+  }
+
   return violations;
 };

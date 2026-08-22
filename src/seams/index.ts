@@ -96,9 +96,29 @@
  * is the one rule that does legitimately reach `attackableUnits/`, and it
  * stays a hand-written core test for exactly that reason: it is the only
  * one of the thirteen this directory needs.
+ *
+ * ## An exemption that matches nothing is also a violation
+ *
+ * `skip`, `grandfathered`, `grandfatheredClasses`, `noPressOverride` and
+ * `pinned` are every licence this module hands out to break a rule.
+ * Fix round 3 (task 6): a licence nobody ever revokes is how a seam
+ * quietly stops meaning anything — the sharpest case is a `pinned`
+ * `file:line` entry outliving the exact line it names, since the file
+ * stays silently exempt at whatever now sits at that number. Every seam
+ * that reads an exemption set now computes each entry's underlying
+ * condition *regardless* of the exemption, and reports any entry that
+ * never actually suppressed a real would-be violation — tagged `kind:
+ * 'stale-exemption'` on the same `SeamViolation` shape, distinct from an
+ * ordinary `kind: 'violation'` (the default), because "you broke a rule"
+ * and "you are exempting something that no longer offends" are opposite
+ * problems with opposite fixes. `skip` is checked once, centrally
+ * (`staleSkipEntries` in `shared.ts`), since it is shared identically by
+ * every seam rather than seam-specific. Both kinds fail `checkSeams`'s
+ * caller the same way (a non-empty list), by design: an unrevoked licence
+ * is exactly as much a reason to stop and look as a fresh violation is.
  */
 import type { Seam, SeamCheckOptions, SeamViolation } from './types';
-import { walkTsFiles } from './shared';
+import { staleSkipEntries, walkTsFiles } from './shared';
 import { checkManaSpend } from './manaSpend';
 import { checkDashOnUpdate } from './dashOnUpdate';
 import { checkTargetVision } from './targetVision';
@@ -114,6 +134,7 @@ import { checkSpellRuntimeDrive } from './spellRuntimeDrive';
 import { checkWorldMouseInSpellCode } from './worldMouseInSpellCode';
 
 export type { Seam, SeamCheck, SeamCheckOptions, SeamViolation } from './types';
+export { staleSkipEntries } from './shared';
 export { checkManaSpend } from './manaSpend';
 export { checkDashOnUpdate } from './dashOnUpdate';
 export { checkTargetVision } from './targetVision';
@@ -226,9 +247,20 @@ export function scannedSeamFiles(root: string, options?: SeamCheckOptions): stri
   return walkTsFiles(root, options);
 }
 
-/** Runs every seam in `seams` against `root` and returns one combined list. */
+/**
+ * Runs every seam in `seams` against `root` and returns one combined list,
+ * plus `options.skip`'s own stale-exemption check (fix round 3) — `skip` is
+ * shared, honoured identically by every seam via `walkTsFiles`, so it is
+ * checked once here (`seamId: 'skip'`) rather than once per seam, which
+ * would report the same dead entry thirteen times.
+ */
 export function checkSeams(root: string, options?: SeamCheckOptions): TaggedSeamViolation[] {
-  return seams.flatMap(seam =>
+  const fromSeams = seams.flatMap(seam =>
     seam.check(root, options).map(violation => ({ seamId: seam.id, ...violation }))
   );
+  const fromSkip = staleSkipEntries(root, options).map(violation => ({
+    seamId: 'skip',
+    ...violation,
+  }));
+  return [...fromSeams, ...fromSkip];
 }

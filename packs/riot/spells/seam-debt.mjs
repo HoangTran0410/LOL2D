@@ -14,24 +14,26 @@
  * into the pack's own build step.
  *
  * `checkSeams` hands this one object to every seam; a seam that does not
- * read a given field (`grandfathered`, `noPressOverride`, `pinned`) simply
- * ignores it, which is what lets `grandfathered` below carry two seams'
- * worth of names — `castspec-frozen` matches by file basename,
- * `spell-object-display-box` by class name, and neither domain collides
- * with the other.
+ * read a given field simply ignores it. `grandfathered` and
+ * `grandfatheredClasses` are deliberately two separate fields, not one
+ * shared name — fix round 3: `castspec-frozen` matches by file basename
+ * and `spell-object-display-box` by class name, and each seam now also
+ * checks its own exemption entries for staleness (an entry that matched
+ * nothing this run). Sharing one `grandfathered` field would have made
+ * every entry meant for the *other* seam look stale to whichever seam
+ * read it, since a class name never matches a file basename.
+ *
+ * Every entry here is checked for staleness on every run — see
+ * `src/seams/index.ts`'s own "An exemption that matches nothing is also a
+ * violation" section. This file has none, as of the last measurement
+ * (task 6 fix round 3): every entry below currently suppresses a real
+ * would-be violation.
  */
 
 /** `castspec-frozen`: cast specs that still read live state on every cast
  *  (`this.shotsRemaining`-shaped fields), pre-dating the rule. File
- *  basenames.
- *
- *  `spell-object-display-box`: `SpellObject` subclasses reporting a
- *  zero-area box, pre-dating the extent rule. Class names, not file names —
- *  `Flash_Object` lives in `Flash.ts`, `Heal_Object` in `Heal.ts`,
- *  `LeeSin_R_Object` in `LeeSin_R.ts`.
- */
+ *  basenames. */
 const GRANDFATHERED = new Set([
-  // castspec-frozen
   'Janna_Q.ts',
   'Janna_R.ts',
   'Lux_R.ts',
@@ -42,11 +44,13 @@ const GRANDFATHERED = new Set([
   'Riven_Q.ts',
   'Varus_Q.ts',
   'Vayne_Q.ts',
-  // spell-object-display-box
-  'Flash_Object',
-  'Heal_Object',
-  'LeeSin_R_Object',
 ]);
+
+/** `spell-object-display-box`: `SpellObject` subclasses reporting a
+ *  zero-area box, pre-dating the extent rule. Class names, not file
+ *  names — `Flash_Object` lives in `Flash.ts`, `Heal_Object` in
+ *  `Heal.ts`, `LeeSin_R_Object` in `LeeSin_R.ts`. */
+const GRANDFATHERED_CLASSES = new Set(['Flash_Object', 'Heal_Object', 'LeeSin_R_Object']);
 
 /** `unit-target-team`: `Annie_Q.ts` resolves correctly on the path the game
  *  actually uses without its own `press()` override — see
@@ -63,7 +67,10 @@ const NO_PRESS_OVERRIDE = new Set(['Annie_Q.ts']);
  * line-level exemption field — which exempted the *whole file* from *every*
  * seam, not just this one line, a real loss of coverage on a file that has
  * already needed pinning once. `WorldMouseInSpellCodeOptions.pinned` closes
- * that gap; only this exact line is exempt now, from only this one rule.
+ * that gap; only this exact line is exempt now, from only this one rule —
+ * checked against that exact line on every run (fix round 3), not just the
+ * file, so a future edit that shifts this line's number would surface as a
+ * stale entry rather than silently exempting whatever moved into line 83.
  */
 const PINNED = new Set(['Blitzcrank_E.ts:83']);
 
@@ -83,6 +90,7 @@ const SKIP = new Set(['index.ts', '_EmptyExample.ts']);
 export const seamDebt = {
   skip: SKIP,
   grandfathered: GRANDFATHERED,
+  grandfatheredClasses: GRANDFATHERED_CLASSES,
   noPressOverride: NO_PRESS_OVERRIDE,
   pinned: PINNED,
 };

@@ -16,8 +16,21 @@ import { readSource, stripComments, walkTsFiles } from './shared';
  * checks the box is actually big enough, which this scan cannot).
  */
 export interface SpellObjectDisplayBoxOptions extends SeamCheckOptions {
-  /** Class names known to predate the rule and stay caster-centred. */
-  grandfathered?: Set<string>;
+  /**
+   * Class names known to predate the rule and stay caster-centred. Named
+   * `grandfatheredClasses`, not `grandfathered` — content-pack-extraction
+   * batch 5 task 6 fix round 3: `checkSeams(root, options)` hands one
+   * options object to all thirteen seams, and `castSpecFrozen`'s own
+   * `grandfathered` is file-basename-keyed while this one is class-name-
+   * keyed. Sharing the field name was harmless for suppressing violations
+   * (the two vocabularies never collided in practice), but it broke
+   * stale-exemption checking outright: each seam would see the *other*
+   * seam's entries in its own set and report every one of them stale,
+   * since a class name never matches a file basename or vice versa. A
+   * distinct field name per seam is what makes "did this specific seam
+   * actually consume this specific entry" answerable at all.
+   */
+  grandfatheredClasses?: Set<string>;
 }
 
 /** Only classes extending `SpellObject` directly. */
@@ -30,7 +43,10 @@ export const checkSpellObjectDisplayBox: SeamCheck = (
   root,
   options?: SpellObjectDisplayBoxOptions
 ) => {
-  const grandfathered = options?.grandfathered ?? new Set<string>();
+  const grandfatheredClasses = options?.grandfatheredClasses ?? new Set<string>();
+  // Which declared `grandfatheredClasses` entries actually suppressed a
+  // real would-be violation this run — the rest are stale (fix round 3).
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
 
   for (const file of walkTsFiles(root, options)) {
@@ -53,9 +69,28 @@ export const checkSpellObjectDisplayBox: SeamCheck = (
       }
       const body = source.slice(pattern.lastIndex, end);
       if (STATES_ITS_EXTENT.test(body)) continue;
-      if (grandfathered.has(className)) continue;
-      violations.push({ file, message: `${className} inherits a zero-area display box` });
+      // Computed regardless of the exemption, unlike the old `if
+      // (grandfathered.has(className)) continue;` short-circuit — the
+      // exemption's own staleness depends on knowing whether it would
+      // have mattered.
+      if (grandfatheredClasses.has(className)) {
+        consumed.add(className);
+      } else {
+        violations.push({ file, message: `${className} inherits a zero-area display box` });
+      }
     }
   }
+
+  for (const className of grandfatheredClasses) {
+    if (!consumed.has(className)) {
+      violations.push({
+        file: className,
+        message:
+          'grandfatheredClasses exemption matches nothing — this class now states its own extent, no longer extends SpellObject directly, or does not exist',
+        kind: 'stale-exemption',
+      });
+    }
+  }
+
   return violations;
 };

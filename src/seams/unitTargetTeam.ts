@@ -31,6 +31,9 @@ export interface UnitTargetTeamOptions extends SeamCheckOptions {
 
 export const checkUnitTargetTeam: SeamCheck = (root, options?: UnitTargetTeamOptions) => {
   const noPressOverride = options?.noPressOverride ?? new Set<string>();
+  // Which declared `noPressOverride` entries actually suppressed a real
+  // would-be violation this run — the rest are stale (fix round 3).
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
 
   for (const file of walkTsFiles(root, options)) {
@@ -43,12 +46,31 @@ export const checkUnitTargetTeam: SeamCheck = (root, options?: UnitTargetTeamOpt
     if (!/targetingRequest/.test(source)) {
       violations.push({ file, message: 'UNIT spell supplies no targetingRequest' });
     }
-    if (!noPressOverride.has(file) && !/\bpress\s*\(/.test(source)) {
+    // Computed regardless of the exemption, unlike the old `if
+    // (!noPressOverride.has(file) && ...)` short-circuit — the exemption's
+    // own staleness depends on knowing whether it would have mattered.
+    if (!/\bpress\s*\(/.test(source)) {
+      if (noPressOverride.has(file)) {
+        consumed.add(file);
+      } else {
+        violations.push({
+          file,
+          message: 'UNIT spell has no press() to refuse an unresolved context',
+        });
+      }
+    }
+  }
+
+  for (const file of noPressOverride) {
+    if (!consumed.has(file)) {
       violations.push({
         file,
-        message: 'UNIT spell has no press() to refuse an unresolved context',
+        message:
+          'noPressOverride exemption matches nothing — this file now has its own press(), is no longer a UNIT spell, or does not exist',
+        kind: 'stale-exemption',
       });
     }
   }
+
   return violations;
 };

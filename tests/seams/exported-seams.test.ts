@@ -19,6 +19,7 @@ import {
   checkSpellObjectDisplayBox,
   checkSpellRuntimeDrive,
   checkWorldMouseInSpellCode,
+  staleSkipEntries,
 } from '@/seams';
 
 /**
@@ -203,10 +204,12 @@ describe('each exported check catches its violation on an arbitrary tree', () =>
     expect(offenders).toEqual(['BadObject inherits a zero-area display box']);
   });
 
-  it('spell-object-display-box: the grandfathered list is honoured', () => {
+  it('spell-object-display-box: the grandfatheredClasses list is honoured', () => {
     const dir = tempTree({ 'Old.ts': `class OldObject extends SpellObject {}\n` });
     expect(checkSpellObjectDisplayBox(dir).length).toBe(1);
-    expect(checkSpellObjectDisplayBox(dir, { grandfathered: new Set(['OldObject']) })).toEqual([]);
+    expect(
+      checkSpellObjectDisplayBox(dir, { grandfatheredClasses: new Set(['OldObject']) })
+    ).toEqual([]);
   });
 
   it('spell-runtime-drive: a test calling a runtime hook directly', () => {
@@ -262,3 +265,131 @@ describe('each exported check catches its violation on an arbitrary tree', () =>
 // seam-debt.mjs" is that same proof now, run the way the pack's own build
 // really runs it (through the bin, from the pack's own directory) rather
 // than by re-deriving the pack's debt inline in a core test.
+
+describe('an exemption entry that matches nothing is reported, distinctly, and fails the run', () => {
+  // Content-pack-extraction batch 5 task 6 fix round 3: "you broke a rule"
+  // and "you are exempting something that no longer offends" are opposite
+  // problems, so a stale entry carries `kind: 'stale-exemption'` rather
+  // than being indistinguishable from an ordinary violation.
+
+  it('noPressOverride: a stale entry (the file already has press()) is reported and a live one is not', () => {
+    const dir = tempTree({
+      // Declares targetTeam so only the press()-related check is under
+      // test here — already has press(), so the exemption does nothing.
+      'Stale.ts': `
+        get castSpec() { return { targeting: 'UNIT', targetingRequest: { targetTeam: 'ENEMY' } }; }
+        press(ctx) { return super.press(ctx); }
+      `,
+      // Genuinely missing press() — the exemption is load-bearing.
+      'Live.ts': `get castSpec() { return { targeting: 'UNIT', targetingRequest: { targetTeam: 'ENEMY' } }; }`,
+    });
+
+    const result = checkUnitTargetTeam(dir, {
+      noPressOverride: new Set(['Stale.ts', 'Live.ts']),
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        file: 'Stale.ts',
+        kind: 'stale-exemption',
+      }),
+    ]);
+  });
+
+  it('castspec-frozen: a stale grandfathered entry (no longer reads live state) is reported and a live one is not', () => {
+    const dir = tempTree({
+      'Stale.ts': `get castSpec() { return { cooldown: { durationMs: this.coolDown } }; }\n`,
+      'Live.ts': `get castSpec() { return { cooldown: { durationMs: this.charges } }; }\n`,
+    });
+
+    const result = checkCastSpecFrozen(dir, {
+      grandfathered: new Set(['Stale.ts', 'Live.ts']),
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({ file: 'Stale.ts', kind: 'stale-exemption' }),
+    ]);
+  });
+
+  it('castspec-frozen: a grandfathered entry naming a file that does not exist is stale', () => {
+    const dir = tempTree({ 'Real.ts': `export const real = 1;\n` });
+
+    const result = checkCastSpecFrozen(dir, { grandfathered: new Set(['GhostFile.ts']) });
+
+    expect(result).toEqual([
+      expect.objectContaining({ file: 'GhostFile.ts', kind: 'stale-exemption' }),
+    ]);
+  });
+
+  it('spell-object-display-box: a stale grandfatheredClasses entry (now states its own extent) is reported and a live one is not', () => {
+    const dir = tempTree({
+      'Stale.ts': `class StaleObject extends SpellObject { visionRadius = 100; }\n`,
+      'Live.ts': `class LiveObject extends SpellObject { draw() {} }\n`,
+    });
+
+    const result = checkSpellObjectDisplayBox(dir, {
+      grandfatheredClasses: new Set(['StaleObject', 'LiveObject']),
+    });
+
+    expect(result).toEqual([
+      expect.objectContaining({ file: 'StaleObject', kind: 'stale-exemption' }),
+    ]);
+  });
+
+  it('world-mouse-in-spell-code: a pinned entry is checked against its exact line, not just its file', () => {
+    // The sharpest staleness case (the brief's own words): the file still
+    // reads worldMouse, but not on the pinned line any more — a file-level
+    // check would miss this entirely.
+    const dir = tempTree({
+      'Drifted.ts':
+        `const a = 1;\n` + // line 1
+        `const angle = getAngle(this.owner.position, this.game.worldMouse);\n`, // line 2, not line 1
+    });
+
+    const result = checkWorldMouseInSpellCode(dir, {
+      pinned: new Set(['Drifted.ts:1']),
+    });
+
+    // The real offense on line 2 is still caught, as an ordinary violation
+    // (no `kind`, unlike the stale pin)...
+    expect(result[0]).toMatchObject({ file: 'Drifted.ts' });
+    expect(result[0].kind).toBeUndefined();
+    // ...and the stale pin on line 1 is reported separately.
+    expect(result[1]).toEqual(
+      expect.objectContaining({ file: 'Drifted.ts:1', kind: 'stale-exemption' })
+    );
+    expect(result).toHaveLength(2);
+  });
+
+  it('world-mouse-in-spell-code: a pinned entry naming the real line is not stale', () => {
+    const dir = tempTree({
+      'Pinned.ts': `const angle = getAngle(this.owner.position, this.game.worldMouse);\n`,
+    });
+
+    const result = checkWorldMouseInSpellCode(dir, { pinned: new Set(['Pinned.ts:1']) });
+
+    expect(result).toEqual([]);
+  });
+
+  it('skip: an entry matching no file anywhere in the tree is stale', () => {
+    const dir = tempTree({ 'Real.ts': `export const real = 1;\n` });
+
+    const stale = staleSkipEntries(dir, { skip: new Set(['index.ts', 'Real.ts']) });
+
+    expect(stale).toEqual([expect.objectContaining({ file: 'index.ts', kind: 'stale-exemption' })]);
+  });
+
+  it('checkSeams surfaces a stale skip entry tagged seamId "skip"', () => {
+    const dir = tempTree({ 'Real.ts': `export const real = 1;\n` });
+
+    const violations = checkSeams(dir, { skip: new Set(['GhostBarrel.ts']) });
+
+    expect(violations).toEqual([
+      expect.objectContaining({
+        seamId: 'skip',
+        file: 'GhostBarrel.ts',
+        kind: 'stale-exemption',
+      }),
+    ]);
+  });
+});

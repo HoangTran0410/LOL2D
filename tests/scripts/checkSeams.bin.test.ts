@@ -101,7 +101,7 @@ describe('moba2d-check-seams bin', () => {
     expect(result.stdout).toMatch(/clean/);
   });
 
-  it('discovers a sibling seam-debt.mjs and suppresses the debt it declares (the mechanism packs/riot/seam-debt.mjs uses for real)', async () => {
+  it('discovers a seam-debt.mjs inside the scanned tree and suppresses the debt it declares (the mechanism packs/riot/spells/seam-debt.mjs uses for real)', async () => {
     // Deliberately synthetic, not `packs/riot/spells` — a regression test
     // asserting on a real pack's current debt count is exactly the fixture
     // this repo's own notes warn about (see this file's header): it stops
@@ -110,13 +110,16 @@ describe('moba2d-check-seams bin', () => {
     // pack's cleanliness — the "seam has not moved, it has been copied"
     // failure content-pack-extraction batch 5 task 6 exists to rule out.
     // This proves the mechanism (`loadPackSeamDebt` in `check-seams.mjs`)
-    // in isolation instead: a sibling `seam-debt.mjs`, one directory above
-    // the scanned root, discovered and honoured through the real bin.
+    // in isolation instead: a `seam-debt.mjs` *inside* the scanned root
+    // (fix round 3 — not a sibling one directory above it, which a pack
+    // authoring more than one scanned tree, as `packs/riot` does, would
+    // have had discover the *same* file for every tree), discovered and
+    // honoured through the real bin.
     violationRoot = await mkdtemp(join(tmpdir(), 'lol2d-check-seams-debt-'));
     await mkdir(join(violationRoot, 'target'));
     await writeFile(join(violationRoot, 'target', 'Bad.ts'), `owner.stats.mana.baseValue -= 10;\n`);
     await writeFile(
-      join(violationRoot, 'seam-debt.mjs'),
+      join(violationRoot, 'target', 'seam-debt.mjs'),
       `export const seamDebt = { skip: new Set(['Bad.ts']) };\n`
     );
 
@@ -124,5 +127,36 @@ describe('moba2d-check-seams bin', () => {
 
     expect(result.status).toBe(0);
     expect(result.stdout).toMatch(/clean/);
+  });
+
+  it("does not let one tree's seam-debt.mjs leak into a sibling tree's scan", async () => {
+    // The exact bug fix round 3 found for real: packs/riot authors two
+    // scanned trees (./spells, ./monsters) under one pack directory, and
+    // the old sibling-of-the-target-root discovery made both find the
+    // *same* seam-debt.mjs — every entry meant for ./spells silently
+    // applied to ./monsters too, which the new stale-exemption check
+    // turned from a harmless no-op into false "stale" reports the moment
+    // it existed to notice (a Set of debt entries for `treeA` scanned
+    // against unrelated `treeB` matches nothing, by construction). Two
+    // sibling trees under one parent, only one with its own seam-debt.mjs
+    // (inside it, not beside the parent) — the other must see none of it.
+    violationRoot = await mkdtemp(join(tmpdir(), 'lol2d-check-seams-sibling-'));
+    await mkdir(join(violationRoot, 'treeA'));
+    await mkdir(join(violationRoot, 'treeB'));
+    await writeFile(join(violationRoot, 'treeA', 'Bad.ts'), `owner.stats.mana.baseValue -= 10;\n`);
+    await writeFile(join(violationRoot, 'treeB', 'Clean.ts'), `export const clean = 1;\n`);
+    await writeFile(
+      join(violationRoot, 'treeA', 'seam-debt.mjs'),
+      `export const seamDebt = { skip: new Set(['Bad.ts']) };\n`
+    );
+
+    const treeA = spawnSync(bin, ['./treeA'], { cwd: violationRoot, encoding: 'utf8' });
+    expect(treeA.status).toBe(0);
+    expect(treeA.stdout).toMatch(/clean/);
+
+    const treeB = spawnSync(bin, ['./treeB'], { cwd: violationRoot, encoding: 'utf8' });
+    expect(treeB.status).toBe(0);
+    expect(treeB.stdout).toMatch(/clean/);
+    expect(treeB.stdout + treeB.stderr).not.toMatch(/stale/i);
   });
 });

@@ -49,21 +49,33 @@
  * `checkSeams(root, options)` takes one `options` object, shared across all
  * thirteen seams (`src/seams/index.ts`) — a `skip` set every seam honours,
  * plus whatever narrower field an individual seam's own `*Options` type
- * adds (`grandfathered`, `noPressOverride`, `maxMs`, ...). A grandfathered
- * cast spec or a pinned `worldMouse` line is a fact about *that pack's
- * content*, never about the rule itself (spec §8.1, content-pack-extraction
- * batch 5 task 6) — so it cannot live in `src/seams/`, and the pack's own
- * `package.json` script is fixed at `moba2d-check-seams ./spells` with no
- * room for extra flags (the form that keeps working once a pack is a
- * sibling repository rather than a workspace here). `loadPackSeamDebt`
- * below is the resolution: a plain ESM sibling file, `seam-debt.mjs`, one
- * directory above whatever root the CLI was pointed at — `packs/riot/
- * spells` looks for `packs/riot/seam-debt.mjs`. No TypeScript, no `vite`,
- * no `@moba2d/core` import needed to read it, so it is exactly as portable
- * as the debt it describes: it moves with the pack's own directory, monorepo
- * workspace today or a standalone checkout tomorrow. A pack with no debt
- * (`packs/reference`, today) simply has no such file, and `checkSeams` runs
- * every seam at its strictest default.
+ * adds (`grandfathered`, `grandfatheredClasses`, `noPressOverride`,
+ * `pinned`, `maxMs`, ...). A grandfathered cast spec or a pinned
+ * `worldMouse` line is a fact about *that pack's content*, never about the
+ * rule itself (spec §8.1, content-pack-extraction batch 5 task 6) — so it
+ * cannot live in `src/seams/`, and the pack's own `package.json` scripts
+ * are fixed at `moba2d-check-seams ./spells` (and, where a pack authors
+ * more than one tree, `./monsters` and the like) with no room for extra
+ * flags — the form that keeps working once a pack is a sibling repository
+ * rather than a workspace here. `loadPackSeamDebt` below is the
+ * resolution: a plain ESM file, `seam-debt.mjs`, living *inside* whatever
+ * root the CLI was pointed at — `packs/riot/spells` looks for
+ * `packs/riot/spells/seam-debt.mjs`, `packs/riot/monsters` for
+ * `packs/riot/monsters/seam-debt.mjs`, each independently. Colocated with
+ * the tree it describes, not one directory above it (fix round 3 of task
+ * 6: a pack that authors more than one scanned tree, as `packs/riot` does
+ * once `check-seams:monsters` exists, would otherwise have both trees
+ * discover the *same* sibling file — every entry meant for `./spells`
+ * would apply, wrongly, to a `./monsters` run too, which the new
+ * stale-exemption check (`src/seams/index.ts`) turned from a harmless
+ * no-op into seventeen false "stale" reports the moment it existed to
+ * notice). `.mjs`, not `.ts`, so `walkTsFiles` never picks the debt file
+ * itself up as a spell to check. No TypeScript, no `vite`, no
+ * `@moba2d/core` import needed to read it, so it is exactly as portable as
+ * the debt it describes: it moves with the pack's own directory, monorepo
+ * workspace today or a standalone checkout tomorrow. A tree with no debt
+ * (`packs/reference/spells`, `packs/riot/monsters`, today) simply has no
+ * such file, and `checkSeams` runs every seam at its strictest default.
  */
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -74,13 +86,15 @@ const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = resolve(dirname(scriptPath), '..');
 
 /**
- * `<targetRoot>/../seam-debt.mjs`, loaded as plain ESM (not through Vite's
- * SSR graph — this file has no TypeScript and no reason to depend on
- * `@moba2d/core` just to be read) and returning its named `seamDebt`
- * export, or `undefined` when the pack has declared no debt at all.
+ * `<targetRoot>/seam-debt.mjs` — *inside* the scanned tree, not a sibling
+ * of it (fix round 3; see this file's own header for why the distinction
+ * matters) — loaded as plain ESM (not through Vite's SSR graph — this file
+ * has no TypeScript and no reason to depend on `@moba2d/core` just to be
+ * read) and returning its named `seamDebt` export, or `undefined` when
+ * this specific tree has declared no debt at all.
  */
 async function loadPackSeamDebt(absoluteTarget) {
-  const debtConfigPath = resolve(absoluteTarget, '..', 'seam-debt.mjs');
+  const debtConfigPath = resolve(absoluteTarget, 'seam-debt.mjs');
   if (!existsSync(debtConfigPath)) return undefined;
   const module = await import(pathToFileURL(debtConfigPath).href);
   return module.seamDebt;
@@ -154,11 +168,25 @@ if (invokedDirectly()) {
         console.log(`check-seams: scanned ${scannedCount} file(s), clean (${targetRoot})`);
         return;
       }
-      for (const v of violations) {
+      // Fix round 3: a stale exemption ("you are exempting something that
+      // no longer offends") and a real violation ("you broke a rule") are
+      // opposite problems with opposite fixes, so they print under
+      // different labels rather than one undifferentiated list — a run
+      // that prints them the same way trains people to ignore both. Both
+      // still fail the run; see `src/seams/index.ts`'s own header for why.
+      const realViolations = violations.filter(v => v.kind !== 'stale-exemption');
+      const staleExemptions = violations.filter(v => v.kind === 'stale-exemption');
+      for (const v of realViolations) {
         console.error(`${v.seamId} :: ${v.root}/${v.file} :: ${v.message}`);
       }
+      for (const v of staleExemptions) {
+        console.error(`STALE-EXEMPTION :: ${v.seamId} :: ${v.root}/${v.file} :: ${v.message}`);
+      }
+      const parts = [];
+      if (realViolations.length > 0) parts.push(`${realViolations.length} violation(s)`);
+      if (staleExemptions.length > 0) parts.push(`${staleExemptions.length} stale exemption(s)`);
       console.error(
-        `check-seams: ${violations.length} violation(s) across ${scannedCount} file(s) scanned in ${targetRoot}`
+        `check-seams: ${parts.join(', ')} across ${scannedCount} file(s) scanned in ${targetRoot}`
       );
       process.exitCode = 1;
     })

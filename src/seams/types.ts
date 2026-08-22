@@ -11,6 +11,22 @@ export interface SeamViolation {
   file: string;
   /** What is wrong, and (for a line-level scan) which line said so. */
   message: string;
+  /**
+   * `'violation'` (the default, and every pre-round-3 caller's only case) is
+   * a real rule break — the file did something the seam bans. `'stale-
+   * exemption'` is the opposite problem wearing the same shape: a debt entry
+   * (`grandfathered`, `noPressOverride`, `pinned`, `skip`) that matched
+   * nothing this run — the file it names no longer offends, was renamed, or
+   * never existed. Content-pack-extraction batch 5 task 6 fix round 3: a
+   * licence nobody ever revokes is how a seam quietly stops meaning
+   * anything, and a `pinned` entry outliving the line it names is the
+   * sharpest case — the line number drifts, the exemption keeps matching
+   * nothing, and the file is silently exempt at a line that no longer
+   * exists. Both kinds fail the run; they are kept distinguishable in the
+   * report because "you broke a rule" and "you are exempting something that
+   * no longer offends" are opposite problems with opposite fixes.
+   */
+  kind?: 'violation' | 'stale-exemption';
 }
 
 /** Options every seam accepts, beyond the tree it is pointed at. */

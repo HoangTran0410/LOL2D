@@ -32,6 +32,13 @@ export interface WorldMouseInSpellCodeOptions extends SeamCheckOptions {
    * vocabularyBoundary.test.ts` bans Riot's own vocabulary from — the
    * concrete file and line for this pack's one known offender live in
    * `packs/riot/seam-debt.mjs`, not here.)
+   *
+   * Fix round 3: checked against the exact line it names, not just the
+   * file — the sharpest staleness case of the four exemption shapes. A
+   * file-level check would wave through a `pinned` entry whose line number
+   * has drifted (an edit above it shifted every line down, say) even
+   * though the *line it actually names* no longer reads `worldMouse` at
+   * all — silently exempting whatever code now sits at that number.
    */
   pinned?: Set<string>;
 }
@@ -41,16 +48,38 @@ export const checkWorldMouseInSpellCode: SeamCheck = (
   options?: WorldMouseInSpellCodeOptions
 ) => {
   const pinned = options?.pinned ?? new Set<string>();
+  // Which declared `pinned` entries actually named a real `worldMouse`
+  // line this run — the rest are stale (fix round 3).
+  const consumed = new Set<string>();
   const violations: SeamViolation[] = [];
+
   for (const file of walkTsFiles(root, options)) {
     const lines = readSource(root, file).split('\n');
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
-      if (pinned.has(`${file}:${lineNumber}`)) return;
-      if (codeOnly(line).includes(WORLD_MOUSE)) {
+      const key = `${file}:${lineNumber}`;
+      if (!codeOnly(line).includes(WORLD_MOUSE)) return;
+      // Computed regardless of the exemption, unlike the old early
+      // `return` — the exemption's own staleness depends on knowing
+      // whether it would have mattered.
+      if (pinned.has(key)) {
+        consumed.add(key);
+      } else {
         violations.push({ file, message: `${lineNumber}: ${line.trim()}` });
       }
     });
   }
+
+  for (const key of pinned) {
+    if (!consumed.has(key)) {
+      violations.push({
+        file: key,
+        message:
+          'pinned exemption matches nothing — this exact file:line no longer reads worldMouse (the line moved, the code changed, or the file does not exist)',
+        kind: 'stale-exemption',
+      });
+    }
+  }
+
   return violations;
 };
