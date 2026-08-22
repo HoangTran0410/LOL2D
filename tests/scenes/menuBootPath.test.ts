@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { scanImports, stripComments } from '../support/importScan';
 
 /**
  * Nothing on the path to the menu may statically import the game.
@@ -20,6 +21,13 @@ import { join } from 'node:path';
  * `import type` is fine and deliberately allowed: type-only imports are erased
  * before Rollup sees them, so they cost nothing at runtime. `LoadingScene`
  * already relies on exactly that for its `MenuScene` type.
+ *
+ * `staticImports` below is now a thin, value-only filter over
+ * `tests/support/importScan.ts`'s `scanImports` rather than its own inline
+ * parser — fix round 3 found this file's own copy shared a hole with
+ * `pregameBootPath.test.ts` and `aboutBootPath.test.ts`: all three anchored
+ * a statement to a line start, so two statements sharing one line silently
+ * dropped the second one's specifier. See `importScan.ts`'s own header.
  */
 const SRC = join(__dirname, '../../src');
 
@@ -33,24 +41,17 @@ const BOOT_PATH = [
   'scenes/gamePreload.ts',
 ];
 
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-}
-
 /**
- * Static `import ... from '<spec>'` only. `import(` is a dynamic import and is
- * the sanctioned way to reach the game; `import type` is erased.
+ * Static `import ... from '<spec>'` only, value ones — `import(` is a
+ * dynamic import and is the sanctioned way to reach the game, `import type`
+ * (whole-statement or an inline `{ type Foo }` clause where every member is
+ * type-prefixed) is erased, and a side-effect `import 'x';` is not a shape
+ * this file has ever checked for.
  */
 function staticImports(source: string): string[] {
-  const found: string[] = [];
-  const pattern = /(^|\n)\s*import\s+(?!type\s)([^;'"]*?)from\s*['"]([^'"]+)['"]/g;
-  for (const [, , clause, specifier] of source.matchAll(pattern)) {
-    // `import { type Foo }` with nothing else is still type-only in effect,
-    // but `verbatimModuleSyntax` is not on here, so treat any value import as real.
-    if (/^\s*type\s/.test(clause)) continue;
-    found.push(specifier);
-  }
-  return found;
+  return scanImports(source)
+    .filter(({ kind }) => kind === 'value')
+    .map(({ specifier }) => specifier);
 }
 
 const reachesGame = (specifier: string): boolean =>

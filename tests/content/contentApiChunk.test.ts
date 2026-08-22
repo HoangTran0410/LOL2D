@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { scanImports } from '../support/importScan';
 
 const ROOT = join(__dirname, '../../');
-
-const stripComments = (source: string): string =>
-  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
 /** Resolve a `@/`-aliased or relative specifier to a file under src/. */
 const resolveSpecifier = (from: string, specifier: string): string | null => {
@@ -21,7 +19,20 @@ const resolveSpecifier = (from: string, specifier: string): string | null => {
   return null;
 };
 
-/** Every module reachable from `entry` by a *value* import. */
+/**
+ * Every module reachable from `entry` by a *value* import.
+ *
+ * Fix round 3 replaced this walk's own inline regex — the exact original,
+ * single-quote-only `import`/`export ... from` matcher two earlier rounds
+ * had already found and fixed two holes in over in
+ * `corePacksBoundary.test.ts` — with `tests/support/importScan.ts`'s
+ * `scanImports`. Deliberately still narrower than that module's full
+ * surface: this walk only ever followed static `from`-clause *value*
+ * imports (never `import type`, never a side-effect import, never a
+ * dynamic `import()`), and keeps exactly that scope rather than silently
+ * widening what it follows the moment a shared parser makes the other
+ * kinds easy to reach for.
+ */
 const valueClosure = (entry: string): Set<string> => {
   const seen = new Set<string>();
   const queue = [entry];
@@ -29,12 +40,10 @@ const valueClosure = (entry: string): Set<string> => {
     const file = queue.pop() as string;
     if (seen.has(file)) continue;
     seen.add(file);
-    const source = stripComments(readFileSync(file, 'utf8'));
-    const pattern = /^\s*(?:import|export)\s+(type\s+)?[\s\S]*?\bfrom\s+'([^']+)'/gm;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(source)) !== null) {
-      if (match[1]) continue; // `import type` is erased; it cannot pull code in.
-      const target = resolveSpecifier(file, match[2]);
+    const source = readFileSync(file, 'utf8');
+    for (const { specifier, kind } of scanImports(source)) {
+      if (kind !== 'value') continue;
+      const target = resolveSpecifier(file, specifier);
       if (target) queue.push(target);
     }
   }

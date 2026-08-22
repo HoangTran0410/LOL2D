@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { scanImports, stripComments } from '../support/importScan';
 
 /**
  * The pregame screen renders the roster without loading a spell.
@@ -32,6 +33,13 @@ import { join } from 'node:path';
  * reaching into a content pack's own code — the generated catalog
  * (`@/game/config/spellCatalog`) is the sanctioned way to read a spell's name
  * and icon without touching its class.
+ *
+ * `staticImports` below is now a thin, value-only filter over
+ * `tests/support/importScan.ts`'s `scanImports` rather than its own inline
+ * parser — fix round 3 found this file's own copy shared a hole with
+ * `menuBootPath.test.ts` and `aboutBootPath.test.ts`: all three anchored a
+ * statement to a line start, so two statements sharing one line silently
+ * dropped the second one's specifier. See `importScan.ts`'s own header.
  */
 const ROOT = join(__dirname, '../..');
 const SRC = join(ROOT, 'src');
@@ -76,19 +84,16 @@ function pregameFiles(): string[] {
   return files;
 }
 
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
-}
-
-/** Static `import ... from '<spec>'` only — `import(` is dynamic, `import type` is erased. */
+/**
+ * Static `import ... from '<spec>'` only, value ones — `import(` is dynamic,
+ * `import type` (whole-statement or a fully type-prefixed inline clause) is
+ * erased, and a side-effect `import 'x';` is not a shape this file has ever
+ * checked for.
+ */
 function staticImports(source: string): string[] {
-  const found: string[] = [];
-  const pattern = /(^|\n)\s*import\s+(?!type\s)([^;'"]*?)from\s*['"]([^'"]+)['"]/g;
-  for (const [, , clause, specifier] of source.matchAll(pattern)) {
-    if (/^\s*type\s/.test(clause)) continue;
-    found.push(specifier);
-  }
-  return found;
+  return scanImports(source)
+    .filter(({ kind }) => kind === 'value')
+    .map(({ specifier }) => specifier);
 }
 
 const reachesTheMatch = (specifier: string): boolean =>

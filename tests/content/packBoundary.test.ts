@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { scanImports, stripComments } from '../support/importScan';
 
 /**
  * A pack may reach core through the injected `ContentApi` and nowhere else.
@@ -31,6 +32,18 @@ import { join } from 'node:path';
  *
  * Comments are stripped before matching, or this file's own paragraphs above
  * would flag themselves.
+ *
+ * The parser itself — "what does this file import, and is it a type or a
+ * value" — is `tests/support/importScan.ts`'s `scanImports`, not a copy
+ * inline here. Fix round 3 of content-pack-extraction batch 5 task 1 found
+ * this file carrying the *exact original* version of the regex two earlier
+ * rounds had already found and fixed two holes in, over in
+ * `corePacksBoundary.test.ts` — a value import misclassified as type-only,
+ * and a specifier silently dropped whenever a statement had no trailing
+ * semicolon or two statements shared one line. This file is the rule the
+ * whole content-pack extraction rests on, so it carried both holes into
+ * every task that leans on it. See `importScan.ts`'s own header for the
+ * fix and why it now lives in one place instead of six.
  */
 const PACKS_DIR = join(__dirname, '../../packs');
 
@@ -40,9 +53,6 @@ const ALLOWED_TYPE_ONLY = new Set([
   '@/content/ContentPack',
   '@/content/types',
 ]);
-
-const stripComments = (source: string): string =>
-  source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
 function tsFilesUnder(dir: string): string[] {
   const out: string[] = [];
@@ -64,25 +74,19 @@ interface Reference {
  * Every module specifier a file names in a way that must resolve at bundle
  * time: a static `import`/`export ... from`, and a dynamic `import(...)`.
  * `export ... from '...'` is a re-export of core through the pack, which is
- * exactly as much of a leak as importing it directly, so it is covered by
- * the same pattern as `import ... from '...'` rather than a separate one.
+ * exactly as much of a leak as importing it directly, so `scanImports`
+ * already covers both under the same `import`/`export` alternation rather
+ * than a separate pattern.
+ *
+ * Deliberately excludes `scanImports`'s `'side-effect'` kind: this file's
+ * rule has never checked a bare `import 'x';` for one, and preserving that
+ * — rather than silently widening what counts as an offense the moment a
+ * shared parser makes it easy to — is fix round 3's own instruction.
  */
 function references(source: string): Reference[] {
-  const out: Reference[] = [];
-
-  const staticPattern = /^\s*(?:import|export)\s+(type\s+)?[\s\S]*?\bfrom\s+['"]([^'"]+)['"]/gm;
-  let match: RegExpExecArray | null;
-  while ((match = staticPattern.exec(source)) !== null) {
-    out.push({ specifier: match[2], typeOnly: Boolean(match[1]) });
-  }
-
-  // Dynamic import('...') has no type-only form — it is always a runtime load.
-  const dynamicPattern = /\bimport\(\s*['"]([^'"]+)['"]/g;
-  while ((match = dynamicPattern.exec(source)) !== null) {
-    out.push({ specifier: match[1], typeOnly: false });
-  }
-
-  return out;
+  return scanImports(source)
+    .filter(({ kind }) => kind !== 'side-effect')
+    .map(({ specifier, kind }) => ({ specifier, typeOnly: kind === 'type' }));
 }
 
 describe('the pack boundary', () => {
