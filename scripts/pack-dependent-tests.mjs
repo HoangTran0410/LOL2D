@@ -3,19 +3,19 @@
  *
  * `vitest.config.ts` adds the answer to its own `exclude`, so a checkout with
  * no `packs/riot/` runs core's own suite rather than failing to start. This is
- * content-pack-extraction batch 5 task 8's answer to "what happens to the 131
+ * content-pack-extraction batch 5 task 8's answer to "what happens to the 138
  * test files that import the pack": nothing, yet — they stay exactly where
  * they are and keep running in every ordinary checkout, and they are skipped
  * only in the one condition where their subject is genuinely absent. Moving
  * them into the pack's own suite is the pack repository's job, on the day the
- * pack becomes a repository; deleting or rewriting 131 entries to prove core can
+ * pack becomes a repository; deleting or rewriting 138 entries to prove core can
  * boot without them would be paying that cost twice.
  *
  * ## Why a closure and not a glob
  *
  * `tests/packs/riot/**` is 69 of them and would have been a one-line glob. The
- * other 62 are spread across `tests/game/` (47), `tests/e2e/` (10),
- * `tests/content/` (2), `tests/scenes/`, `tests/scripts/` and `tests/wiki/`
+ * other 69 are spread across `tests/game/` (51), `tests/e2e/` (10),
+ * `tests/content/` (5), `tests/scenes/`, `tests/scripts/` and `tests/wiki/`
  * (1 each) — they import a real
  * pack spell to check an engine rule against a real subject — and a glob would
  * have missed every one. Worse, some reach the pack *transitively*:

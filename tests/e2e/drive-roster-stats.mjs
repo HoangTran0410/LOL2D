@@ -34,7 +34,7 @@ const MATCH_CONFIG = {
   rules: { cooldownReductionPercent: 0, manaFree: true },
 };
 
-const { url, page, browser, server, errors, failures, check } = await startHarness({
+const { url, page, errors, check, guard } = await startHarness({
   viewport: DESKTOP_VIEWPORT,
 });
 
@@ -45,6 +45,7 @@ const { url, page, browser, server, errors, failures, check } = await startHarne
  * one: this script taps twice in a run and the detach is what proves a stat
  * sheet opened by a finger survives the finger going away.
  */
+await guard(async () => {
 const session = async () => page.context().newCDPSession(page);
 const tapSelector = async selector => {
   const box = await page.locator(selector).first().boundingBox();
@@ -234,13 +235,4 @@ check(
 );
 
 check('no runtime errors', errors.length === 0, errors.slice(0, 3).join(' | '));
-
-await browser.close();
-await server.close();
-
-console.log(`\nframes in ${OUT}`);
-if (failures.length) {
-  console.error(`\n${failures.length} FAILED`);
-  process.exit(1);
-}
-console.log('\nall checks passed');
+});

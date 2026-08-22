@@ -1,5 +1,6 @@
 import AssetManager, { type AssetHandle, type AssetKey } from '@/managers/AssetManager';
 import { packAsset } from '@/game/config/packAsset';
+import { CHAMPION_Z_INDEX } from '@/game/managers/ObjectManager';
 import type Spell from '@/game/gameObject/Spell';
 import BasicAttackController from '@/game/combat/BasicAttackController';
 import AttackableUnit from './AttackableUnit';
@@ -18,6 +19,7 @@ import Silence from '@/game/gameObject/buffs/Silence';
 import Slow from '@/game/gameObject/buffs/Slow';
 import Stun from '@/game/gameObject/buffs/Stun';
 import Taunt from '@/game/gameObject/buffs/Taunt';
+import type Buff from '@/game/gameObject/Buff';
 import type { BuffStackId } from '@/game/gameObject/Buff';
 
 /** A champion's basic attack profile. `range` alone decides melee or ranged. */
@@ -87,18 +89,86 @@ export interface ChampionOptions extends Omit<AttackableUnitOptions, 'avatar'> {
  */
 const STATUS_TEXT_BUFFS = [Airborne, Root, Silence, Dash, Stun, Slow, Charm, Fear, Taunt];
 
-const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
-const MAX_TICKS = 20;
+/**
+ * `STATUS_TEXT_BUFFS[Cls.prototype]` -> that class's index, so a buff's slot
+ * can be found in one lookup instead of nine sequential `instanceof` checks.
+ *
+ * The naive version of this ("index by `buff.constructor`") is wrong: a
+ * content pack subclasses these freely — two ultimates on the bundled roster
+ * ship a knockback extending `Dash`, and one ships a movement debuff
+ * extending `Slow` — so an exact-constructor match would silently stop
+ * showing "Ghosted"/"Chậm" for anyone hit by those. Walking the buff's
+ * own prototype chain and checking each level against this map reproduces
+ * `instanceof`'s subclass-matching exactly, at whatever depth a future spell
+ * adds — see `champion-status-text-scan-cost.test.ts`'s subclass case.
+ */
+const STATUS_TEXT_BUFF_INDEX = new Map<unknown, number>(
+  STATUS_TEXT_BUFFS.map((BuffClass, index) => [BuffClass.prototype, index])
+);
+
+/**
+ * `instanceof` against every `STATUS_TEXT_BUFFS` entry in one prototype-chain
+ * walk instead of nine separate chain walks, one per candidate class. -1 if
+ * `buff` is none of them (the common case for a champion carrying a large
+ * permanent stat stack, none of which are crowd control). See the O(9N)
+ * note on `STATUS_TEXT_BUFFS` above.
+ *
+ * Held as a method on a plain object, not a bare function, so a test can
+ * `vi.spyOn` it directly to count calls — the seam for
+ * `champion-status-text-duplicate-skip.test.ts`, which proves
+ * `drawHealthBar` stops calling it for the 2nd..Nth instance of a
+ * `singleRepresentativeDraw` stack (`Buff.ts`) once the first has answered
+ * for that `stackId`, same idea as `AttackableUnit.drawBuffs()`'s skip and
+ * for the same reason: at N in the thousands (a cheat-console stack count,
+ * not a design limit — see `.superpowers/perf-healthbar-report.md`), a
+ * prototype-chain walk run once per instance instead of once per *group* is
+ * a real, measured, avoidable cost.
+ */
+export const ChampionStatusText = {
+  indexOf(buff: Buff): number {
+    let proto: unknown = Object.getPrototypeOf(buff);
+    while (proto) {
+      const index = STATUS_TEXT_BUFF_INDEX.get(proto);
+      if (index !== undefined) return index;
+      proto = Object.getPrototypeOf(proto);
+    }
+    return -1;
+  },
+};
+
+export const TICK_LADDER = [50, 100, 250, 500, 1_000, 2_500] as const;
+export const MAX_TICKS = 20;
+
+/** Rounds `raw` up to the next "nice" step — 1, 2 or 5 times a power of ten —
+ *  the standard technique for picking readable axis/tick spacing. Always
+ *  `>= raw`, so a step from this function can never let a tick count exceed
+ *  `maxHealth / step`'s ceiling. Only ever called past `TICK_LADDER`'s own
+ *  reach (health > 50,000), so `raw` here is always a few thousand or more —
+ *  not a general-purpose helper asked to behave at zero or negative input. */
+const niceStepAtLeast = (raw: number): number => {
+  const magnitude = 10 ** Math.floor(Math.log10(raw));
+  const normalized = raw / magnitude;
+  const niceMultiplier = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return niceMultiplier * magnitude;
+};
 
 export const healthTickStep = (maxHealth: number): number => {
   for (const step of TICK_LADDER) {
     if (maxHealth / step <= MAX_TICKS) return step;
   }
-  return TICK_LADDER[TICK_LADDER.length - 1];
+  // Past the curated ladder — reachable, not theoretical: a permanent
+  // per-stack max-health bonus has no cap of its own, so several uncapped
+  // max-health sources can compound a pool past 50,000 (TICK_LADDER's last
+  // rung x MAX_TICKS) over a long game.
+  // The old code returned the ladder's last rung here regardless of how far
+  // past it `maxHealth` had grown, so MAX_TICKS silently stopped holding
+  // right at this threshold. Deriving the step directly keeps the cap true
+  // at any input.
+  return niceStepAtLeast(maxHealth / MAX_TICKS);
 };
 
 export default class Champion extends AttackableUnit {
-  static displayZIndex = 4;
+  static displayZIndex = CHAMPION_Z_INDEX;
   killCredit: KillCredit = 'champion';
 
   /**
@@ -454,13 +524,19 @@ export default class Champion extends AttackableUnit {
     // of icons straight off the side of the screen.
     // (buff.draw() belongs to AttackableUnit.drawBuffs(); calling it here too
     // drew every buff twice, and inside this block's tint().)
+    // `buff.stacks` rather than "one per array entry": a `countedStacks`
+    // buff is a single instance carrying its whole count on `.stacks`, and
+    // every other buff in the game leaves
+    // `.stacks` at `Buff`'s default of 1 — so summing it is exactly the old
+    // per-instance count for them, and the real stack count for a counted
+    // buff instead of always reading 1.
     const buffCounts = new Map<BuffStackId, { image: AssetHandle; count: number }>();
     for (const buff of this.buffs) {
       if (!buff.image) continue;
       const key = buff.stackId;
       const row = buffCounts.get(key);
-      if (row) row.count++;
-      else buffCounts.set(key, { image: buff.image, count: 1 });
+      if (row) row.count += buff.stacks;
+      else buffCounts.set(key, { image: buff.image, count: buff.stacks });
     }
 
     for (const { image: buffImage, count } of buffCounts.values()) {
@@ -490,25 +566,43 @@ export default class Champion extends AttackableUnit {
         );
       }
     } else {
-      // Built with a plain loop over a hoisted class list rather than
-      // map/filter/join over a freshly-built array: this runs per champion per
-      // frame and the answer is the empty string almost always, so the old
-      // shape allocated four arrays and nine closures to say nothing. The
-      // `break` keeps `.find`'s semantics exactly — the *first* buff of a
-      // class decides, and a self-inflicted one prints nothing rather than
-      // deferring to a later buff of the same class.
+      // One pass over `this.buffs`, not nine: the old shape re-scanned the
+      // *whole* buff array once per STATUS_TEXT_BUFFS class (9 full passes)
+      // to find each class's first instance, which is O(9N) every frame for
+      // a champion whose N buffs are almost always none of the 9 — a large
+      // permanent stat stack most of all. This
+      // still gives the *first* buff of a class the final word — a
+      // self-inflicted one prints nothing rather than deferring to a later
+      // buff of the same class — and still prints in STATUS_TEXT_BUFFS'
+      // fixed class order regardless of where in `this.buffs` each one sits.
+      const firstOfClass: (Buff | undefined)[] = new Array(STATUS_TEXT_BUFFS.length);
+      let unfilled = STATUS_TEXT_BUFFS.length;
+      // A `singleRepresentativeDraw` stack can
+      // be thousands of instances of the exact same class, and every one of
+      // them resolves to the exact same answer here — so once the first
+      // instance of a given `stackId` has been resolved, skip the
+      // prototype-chain walk entirely for the rest of that group rather than
+      // repeating it. `resolvedGroups` is only allocated if a stack that
+      // opts in is actually present.
+      let resolvedGroups: Set<BuffStackId> | null = null;
+      for (let j = 0; j < this.buffs.length && unfilled > 0; j++) {
+        const buff = this.buffs[j];
+        if (buff.singleRepresentativeDraw) {
+          resolvedGroups ??= new Set();
+          if (resolvedGroups.has(buff.stackId)) continue;
+          resolvedGroups.add(buff.stackId);
+        }
+        const index = ChampionStatusText.indexOf(buff);
+        if (index === -1 || firstOfClass[index]) continue;
+        firstOfClass[index] = buff;
+        unfilled--;
+      }
+
       let statusString = '';
-      if (this.buffs.length > 0) {
-        for (let i = 0; i < STATUS_TEXT_BUFFS.length; i++) {
-          const BuffClass = STATUS_TEXT_BUFFS[i];
-          for (let j = 0; j < this.buffs.length; j++) {
-            const buff = this.buffs[j];
-            if (!(buff instanceof BuffClass)) continue;
-            if (buff.sourceUnit !== this) {
-              statusString = statusString ? `${statusString}, ${buff.name}` : buff.name;
-            }
-            break;
-          }
+      for (let i = 0; i < firstOfClass.length; i++) {
+        const buff = firstOfClass[i];
+        if (buff && buff.sourceUnit !== this) {
+          statusString = statusString ? `${statusString}, ${buff.name}` : buff.name;
         }
       }
 

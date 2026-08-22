@@ -98,7 +98,7 @@ export default function makeNautilus_R(api: ContentApi) {
  * delete the object or fly it to a corpse's last coordinate and then delete it
  * without ever calling the arrival hook.
  *
- * Ground art — `zIndex = 2` — because the whole point of the travel is that it is
+ * Ground art — `zIndex = GROUND_Z_INDEX` — because the whole point of the travel is that it is
  * a telegraph the victim can read while standing on top of it.
  */
 function __buildNautilus_R_Object(api: ContentApi) {
@@ -110,8 +110,9 @@ function __buildNautilus_R_Object(api: ContentApi) {
   const Airborne = api.buffs.Airborne;
   const Nautilus_R_Rim = makeNautilus_R_Rim(api);
   const Nautilus_R_Eruption = makeNautilus_R_Eruption(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Nautilus_R_Object extends MissileSpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     speed = R_SPEED;
     size = R_WIDTH;
     maxHitCount = Infinity;
@@ -256,8 +257,9 @@ function __buildNautilus_R_Rim(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Nautilus_R_Rim extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = R_RIM_MS;
     age = 0;
 

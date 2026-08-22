@@ -88,6 +88,7 @@ function __buildSinged_W_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const Ground = api.buffs.Ground;
   const Slow = api.buffs.Slow;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Singed_W_Object extends SpellObject {
     image = api.asset('spell_singed_w');
     position: p5.Vector = this.owner.position.copy();
@@ -96,7 +97,7 @@ function __buildSinged_W_Object(api: ContentApi) {
      * Painted with the other ground effects, under the units standing in it —
      * a puddle you can see your own champion's feet in reads as a puddle.
      */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     radius = 130;
     lifeTime = 5000;

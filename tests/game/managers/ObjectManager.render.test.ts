@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Game from '../../../src/game/Game';
 import AttackableUnit from '../../../src/game/gameObject/attackableUnits/AttackableUnit';
 import Minion from '../../../src/game/gameObject/attackableUnits/Minion';
+import CombatText from '../../../src/game/gameObject/helpers/CombatText';
 import ParticleSystem from '../../../src/game/gameObject/helpers/ParticleSystem';
 import TrailSystem from '../../../src/game/gameObject/helpers/TrailSystem';
 import GameObject from '../../../src/game/gameObject/GameObject';
@@ -79,6 +80,36 @@ describe('the decoration index', () => {
 
     manager.draw();
     expect(particlesPainted).toBeGreaterThan(0);
+  });
+
+  /**
+   * `CombatText` fits the same criterion as particles and trails — it deals no
+   * damage, holds no target and blocks nothing — and a teamfight is exactly
+   * when `_objectsTree` is biggest and busiest. See the doc comment on
+   * `isDecoration` for why it used to be kept out (a worry that turned out not
+   * to match any actual query) and `tests/e2e/measure-combattext-perf.mjs` for
+   * the measured cost.
+   */
+  it('routes CombatText into the decoration tree, not the gameplay one', () => {
+    const manager = new ObjectManager({ mapSize: 1_000, camera } as never);
+    const host = { mapSize: 1_000, camera, objectManager: manager } as any;
+    const owner = new AttackableUnit({ game: host, position: createVector(50, 50) });
+    const combatText = new CombatText(owner);
+
+    manager.addObject(combatText);
+    manager.update();
+
+    const countNode = (node: any): number =>
+      node.objects.length +
+      node.nodes.reduce((sum: number, child: any) => sum + countNode(child), 0);
+    expect(countNode(manager._decorTree)).toBe(1);
+    expect(countNode(manager._objectsTree)).toBe(0);
+
+    const hits = manager.queryObjects({
+      area: new Rectangle({ x: 0, y: 0, w: 100, h: 100 }),
+      queryByDisplayBoundingBox: true,
+    });
+    expect(hits).not.toContain(combatText);
   });
 });
 

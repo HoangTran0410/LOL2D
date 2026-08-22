@@ -102,17 +102,19 @@ export default function makeMalzahar_W(api: ContentApi) {
 
 
 /**
- * The tear in the ground the swarm comes out of. Ground art, so `zIndex = 2`:
- * a `SpellObject` subclass otherwise falls through to `DEFAULT_Z_INDEX` (99)
- * and paints over the feet of everything standing on it.
+ * The tear in the ground the swarm comes out of. Ground art, so
+ * `zIndex = GROUND_Z_INDEX`: an un-overridden `SpellObject` subclass resolves
+ * to `SPELL_EFFECT_Z_INDEX` instead and paints over the feet of everything
+ * standing on it.
  */
 function __buildMalzahar_W_Rift(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
   const Malzahar_W_Voidling = makeMalzahar_W_Voidling(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Malzahar_W_Rift extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     age = 0;
     spawned = 0;
 

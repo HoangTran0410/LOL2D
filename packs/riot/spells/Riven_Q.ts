@@ -350,15 +350,16 @@ export function makeRiven_Q_Slash(api: ContentApi) {
 
 
 /**
- * The third charge's ground crack. Ground art, so zIndex is 2: Z_INDEX_MAP is keyed by
- * exact constructor and a SpellObject subclass would otherwise land on 99, over the feet
+ * The third charge's ground crack. Ground art, so zIndex is `GROUND_Z_INDEX`: an un-overridden SpellObject
+ * subclass would otherwise resolve to `SPELL_EFFECT_Z_INDEX`, over the feet
  * of everyone standing on it.
  */
 function __buildRiven_Q_GroundCrack(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Riven_Q_GroundCrack extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = 520;
     age = 0;
     readonly heading: number;

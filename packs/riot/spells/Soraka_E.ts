@@ -95,9 +95,10 @@ function __buildSoraka_E_Object(api: ContentApi) {
   const Root = api.buffs.Root;
   const Silence = api.buffs.Silence;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Soraka_E_Object extends SpellObject {
     /** A field lying on the ground: units wade through it, not behind it. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     position: p5.Vector = this.owner.position.copy();
 

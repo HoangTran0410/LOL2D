@@ -11,7 +11,7 @@ import { packDependentTests } from './scripts/pack-dependent-tests.mjs';
  * Test files whose subject is a content pack this checkout does not have.
  *
  * Empty in every ordinary checkout — both packs are here, so nothing is
- * excluded and all 272 files run. It is only ever non-empty inside
+ * excluded and all 281 files run. It is only ever non-empty inside
  * `npm run verify:without-packs`, the drill that moves `packs/riot/` out of
  * the tree and requires core to still build, boot and pass. Without this the
  * drill cannot even start: Vitest resolves every collected file's imports
@@ -19,7 +19,7 @@ import { packDependentTests } from './scripts/pack-dependent-tests.mjs';
  * fails the whole run rather than the file that named it.
  *
  * Derived, never listed: see `scripts/pack-dependent-tests.mjs` for why a glob
- * would have caught 69 of the 131 and why the closure is over `tests/`'s own
+ * would have caught 69 of the 138 and why the closure is over `tests/`'s own
  * import graph.
  */
 const installed = installedContentPackages(__dirname).map((pack: { name: string }) => pack.name);

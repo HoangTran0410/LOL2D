@@ -429,7 +429,7 @@ export function makeMorgana_R_Tether_Object(api: ContentApi) {
 /**
  * The 0.35s before the shackles exist.
  *
- * Ground art (`zIndex = 2`) on purpose: the most useful thing this draws is the
+ * Ground art (`zIndex = GROUND_Z_INDEX`) on purpose: the most useful thing this draws is the
  * latch circle, closing in on Morgana over the windup, and it has to be legible
  * under the feet of the people deciding whether to walk out of it. That circle
  * is the whole counterplay to Soul Shackles, and until now it was never drawn
@@ -438,10 +438,11 @@ export function makeMorgana_R_Tether_Object(api: ContentApi) {
 function __buildMorgana_R_Windup(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Morgana_R_Windup extends SpellObject {
     lifeTime = CAST_TIME_MS;
     age = 0;
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     update(): void {
       if (this.dropIfAttachmentLost()) return;

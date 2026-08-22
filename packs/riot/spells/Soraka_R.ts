@@ -93,9 +93,10 @@ export default function makeSoraka_R(api: ContentApi) {
 function __buildSoraka_R_Blessing(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Soraka_R_Blessing extends SpellObject {
     /** Light pooling on the ground around the ally's feet. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     target: AttackableUnit;
     wounded = false;

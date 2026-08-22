@@ -10,7 +10,7 @@
  * cooldown tick. This script is that last mile.
  *
  * Built on `tests/e2e/harness.mjs` (Vite server, browser, page-error capture,
- * `check()`/`report`/`finish()`) — see `tests/e2e/drive-bot-discipline.mjs`
+ * `check()`/`report`/`guard()`) — see `tests/e2e/drive-bot-discipline.mjs`
  * for the model: wrap real methods, count what actually happened, end in a
  * numeric summary with no screenshots at all.
  *
@@ -79,9 +79,9 @@ const EXPECTED_SPELL_NAMES = [
   'Vòng Tận (Vera_R)',
 ];
 
-const { url, page, report, check, finish, errors } = await startHarness();
+const { url, page, report, check, guard, errors } = await startHarness();
 
-try {
+await guard(async () => {
   // Seeded before the first navigation, same as `smoke-new-champions.mjs`:
   // `PregameConfigSource` reads `localStorage` once, at construction, when
   // the panel mounts.
@@ -294,6 +294,4 @@ try {
 
   // ------------------------------------------------------ 6. no page errors
   check('no page errors', errors.length === 0, errors[0]);
-} finally {
-  await finish();
-}
+});

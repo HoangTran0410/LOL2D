@@ -12,7 +12,7 @@ import AssetManager, { type AssetHandle } from '@/managers/AssetManager';
 import PathAgent from '@/game/nav/PathAgent';
 import { NAV_MAX_TERRAIN_RADIUS } from '@/game/nav/NavGrid';
 import type Buff from '@/game/gameObject/Buff';
-import type { BuffConstructor } from '@/game/gameObject/Buff';
+import type { BuffConstructor, BuffStackId } from '@/game/gameObject/Buff';
 
 export interface AttackableUnitOptions extends Omit<GameObjectOptions, 'game'> {
   game: GameObjectRuntimeContext;
@@ -293,7 +293,19 @@ export default class AttackableUnit extends GameObject {
   }
 
   drawBuffs(compact = false) {
+    // `singleRepresentativeDraw` buffs (see `Buff.ts`) are a data count with
+    // one shared visual, not one drawable per instance — so past the first
+    // live stack of a given `stackId`, skip straight past `.draw()` with a
+    // property read and a `Set` check instead of calling into it. A champion
+    // cheated to hundreds of Feast stacks used to mean hundreds of function
+    // calls a frame to paint one ring.
+    let seenSingleDraw: Set<BuffStackId> | null = null;
     for (const buff of this.buffs) {
+      if (buff.singleRepresentativeDraw) {
+        seenSingleDraw ??= new Set();
+        if (seenSingleDraw.has(buff.stackId)) continue;
+        seenSingleDraw.add(buff.stackId);
+      }
       if (!compact || (buff.statusFlagsToEnable | buff.statusFlagsToDisable) !== 0) {
         buff.draw?.();
       }
@@ -354,6 +366,33 @@ export default class AttackableUnit extends GameObject {
     // generic class (StatAmp, DamageOverTime) do not evict each other
     const stackKey = buff.stackId;
     const preBuffs = this.buffs.filter(_buff => _buff.stackId === stackKey);
+
+    // A permanent, uniform stack (`Buff.countedStacks`) is one instance
+    // carrying a counter, not one instance per stack: grow the existing
+    // live instance's `stacks` instead of
+    // pushing a new one. Short-circuits ahead of `buffAddType` entirely,
+    // since representation (one instance vs. N) is a different axis from
+    // that switch's semantics (replace/renew/stack), and every other buff in
+    // the game leaves `countedStacks` at its default `false` and never
+    // reaches this branch.
+    if (buff.countedStacks) {
+      const existing = preBuffs.find(_buff => !_buff.toRemove);
+      if (existing) {
+        // Capped going up, but never clawed back down: a cheat can set
+        // `stacks` on a live instance straight past `maxStacks` (the
+        // practice panel's write side, which a pack's spell implements), and a later
+        // real-play stack must not silently erase that — it only ever adds
+        // up to the cap from where the count already stood.
+        const grown = Math.min(existing.stacks + buff.stacks, existing.maxStacks);
+        existing.stacks = Math.max(existing.stacks, grown);
+        existing.renewBuff();
+        existing.onStacksChanged();
+        return;
+      }
+      this.buffs.push(buff);
+      buff.activateBuff();
+      return;
+    }
 
     switch (buff.buffAddType) {
       case BuffAddType.REPLACE_EXISTING:
@@ -463,10 +502,7 @@ export default class AttackableUnit extends GameObject {
     heal = Math.round(heal);
     if (heal <= 0) return;
 
-    let combatText = new CombatText(this);
-    combatText.text = '+' + heal;
-    combatText.textColor = [0, 255, 0];
-    this.game.objectManager.addObject(combatText);
+    CombatText.show(this, 'heal', heal, [0, 255, 0]);
 
     this.stats.health.baseValue = constrain(
       this.stats.health.baseValue + heal,
@@ -515,10 +551,7 @@ export default class AttackableUnit extends GameObject {
       return;
     }
 
-    let combatText = new CombatText(this);
-    combatText.text = '-' + damage;
-    combatText.textColor = [255, 0, 0];
-    this.game.objectManager.addObject(combatText);
+    CombatText.show(this, 'damage', damage, [255, 0, 0]);
 
     // What actually landed, for the scoreboard: capped at the pool that was
     // there to take it, so a 200-damage execute on a 12-health minion is 12

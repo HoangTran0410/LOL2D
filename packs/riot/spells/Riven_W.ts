@@ -109,14 +109,15 @@ export default function makeRiven_W(api: ContentApi) {
 /**
  * The windup made visible: cracks crawl out of her feet and stop dead on the hit radius
  * over W_WINDUP_MS, which is the whole reaction window for whoever is standing there.
- * Ground art, so zIndex is 2 — Z_INDEX_MAP is keyed by exact constructor and a subclass
- * would otherwise fall through to 99, above the feet standing on it.
+ * Ground art, so zIndex is `GROUND_Z_INDEX` — an un-overridden subclass
+ * resolves to `SPELL_EFFECT_Z_INDEX` instead, above the feet standing on it.
  */
 function __buildRiven_W_Fracture(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Riven_W_Fracture extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = W_WINDUP_MS + 200;
     age = 0;
     readonly radius: number;

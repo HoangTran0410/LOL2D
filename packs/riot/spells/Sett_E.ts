@@ -165,13 +165,15 @@ export default function makeSett_E(api: ContentApi) {
 function __buildSett_E_Object(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Sett_E_Object extends SpellObject {
     /**
-     * Ground art, at zIndex 2 rather than the 99 a SpellObject subclass falls
-     * through to: the enemy has to be able to read which box he is standing in,
-     * which means the box goes under him, not over him.
+     * Ground art, at `GROUND_Z_INDEX` rather than the ordinary
+     * `SPELL_EFFECT_Z_INDEX` a `SpellObject` subclass resolves to by default:
+     * the enemy has to be able to read which box he is standing in, which
+     * means the box goes under him, not over him.
      */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = SETT_E_SWEEP_MS;
     age = 0;
     radius = SETT_E_BOX_LENGTH;

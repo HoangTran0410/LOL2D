@@ -50,9 +50,6 @@ const BONE: [number, number, number] = [245, 246, 250];
 
 const TRAP_PETALS = 4;
 
-/** Ground art sits below champions — Z_INDEX_MAP is keyed by exact constructor, so say it here. */
-const GROUND_Z_INDEX = 2;
-
 
 /** Every live trap in the match, so one Jhin's fourth planting evicts his own oldest. */
 const plantedTraps: Jhin_E_Trap[] = [];
@@ -232,6 +229,7 @@ function __buildJhin_E_Trap(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const applyJhinMark = makeApplyJhinMark(api);
   const Jhin_E_Bloom = makeJhin_E_Bloom(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Jhin_E_Trap extends SpellObject {
     zIndex = GROUND_Z_INDEX;
     radius = JHIN_E_TRIGGER_RADIUS;

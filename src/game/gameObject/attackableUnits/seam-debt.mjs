@@ -46,8 +46,8 @@
  *   charge, and this is the one place in core where that matters.
  */
 const PINNED_MANA_LINES = new Set([
-  'AttackableUnit.ts:456:this.stats.mana.baseValue = constrain(this.stats.mana.baseValue + amount, 0, max);',
-  'Champion.ts:319:let mana = this.stats.mana.value;',
+  'AttackableUnit.ts:495:this.stats.mana.baseValue = constrain(this.stats.mana.baseValue + amount, 0, max);',
+  'Champion.ts:389:let mana = this.stats.mana.value;',
 ]);
 
 /**

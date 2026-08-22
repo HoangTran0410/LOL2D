@@ -208,10 +208,12 @@ function __buildXinZhao_R_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class XinZhao_R_Object extends SpellObject {
     // Ground art — the scoured disc covers 300px of floor, so it goes under the
-    // units standing on it rather than over their feet (DEFAULT_Z_INDEX is 99).
-    zIndex = 2;
+    // units standing on it rather than over their feet (the ordinary
+    // SPELL_EFFECT_Z_INDEX a SpellObject subclass resolves to by default).
+    zIndex = GROUND_Z_INDEX;
     origin: p5.Vector;
     age = 0;
     lifeTime = 620;

@@ -260,8 +260,9 @@ function __buildNautilus_W_Splash(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Nautilus_W_Splash extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = 420;
     age = 0;
 

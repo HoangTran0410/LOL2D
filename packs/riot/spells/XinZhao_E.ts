@@ -210,11 +210,12 @@ function __buildXinZhao_E_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class XinZhao_E_Object extends SpellObject {
     // Ground art: the ring is scoured into the floor, so it paints *under* the
-    // bodies standing in it. A SpellObject subclass otherwise falls through to
-    // DEFAULT_Z_INDEX (99) and covers everyone's feet — see Nocturne's Dusk Trail.
-    zIndex = 2;
+    // bodies standing in it. An un-overridden SpellObject subclass otherwise
+    // resolves to SPELL_EFFECT_Z_INDEX and covers everyone's feet — see Nocturne's Dusk Trail.
+    zIndex = GROUND_Z_INDEX;
     age = 0;
     lifeTime = 420;
     /** Spoke angles, seeded once — rolling them per frame flickers instead of animating. */

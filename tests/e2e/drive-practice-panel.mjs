@@ -109,8 +109,11 @@ const MATCH_CONFIG = {
 // taps HUD controls with a real finger but never asks for the Wild Rift
 // controls themselves. `check` records a mismatch instead of throwing, so one
 // bad expectation cannot hide the rest of the run — that is the harness's.
-const { url, page, browser, server, errors, report, failures, check, touchStart, touchMove, touchEnd } =
-  await startHarness({ out: OUT, viewport: VIEWPORT, hasTouch: true });
+const { url, page, report, check, touchStart, touchMove, touchEnd, guard } = await startHarness({
+  out: OUT,
+  viewport: VIEWPORT,
+  hasTouch: true,
+});
 
 /** A 60ms hold rather than the harness's 70: tuned against this panel's controls. */
 const tap = async (x, y, holdMs = 60) => {
@@ -224,7 +227,7 @@ const startMatch = async () => {
   await page.waitForTimeout(1_200);
 };
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await gameEval(
     ({ cfgKey, kitsKey, config }) => {
@@ -1247,11 +1250,11 @@ try {
       afterConfirm.panel === false,
     JSON.stringify(report.exitButton)
   );
-} catch (error) {
-  failures.push(`threw: ${error.stack ?? error}`);
-} finally {
-  // Never leave either key behind for the next script in the suite.
-  try {
+}, {
+  // Never leave either key behind for the next script in the suite. Runs
+  // whether the body above passed or threw; a throw in here is its own
+  // recorded failure rather than replacing whatever the body already found.
+  cleanup: async () => {
     await page.evaluate(
       keys => keys.forEach(key => localStorage.removeItem(key)),
       [KITS_KEY, CFG_KEY]
@@ -1260,23 +1263,5 @@ try {
       keys => keys.map(key => localStorage.getItem(key)),
       [KITS_KEY, CFG_KEY]
     );
-  } catch (error) {
-    failures.push(`cleanup failed: ${error.message}`);
-  }
-
-  console.log('\n--- report ---');
-  console.log(JSON.stringify(report, null, 2));
-  console.log('\n--- page errors ---');
-  if (errors.length) for (const error of errors.slice(0, 10)) console.log(error);
-  else console.log('(none)');
-  console.log(`\nscreenshots: ${OUT}-*.png`);
-  if (failures.length) {
-    console.log('\n--- FAILURES ---');
-    for (const failure of failures) console.log(failure);
-  } else {
-    console.log('\nall checks passed');
-  }
-  await browser.close();
-  await server.close();
-  process.exit(failures.length ? 1 : 0);
-}
+  },
+});

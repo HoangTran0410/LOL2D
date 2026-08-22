@@ -249,14 +249,15 @@ export function makeVayne_E_Object(api: ContentApi) {
 
 /**
  * The clean push: the victim slides and the bolt streak trails behind it. Ground
- * art — `zIndex = 2`, because `Z_INDEX_MAP` is keyed by exact constructor and a
- * subclass otherwise lands at 99, over the feet of everyone nearby.
+ * art — `zIndex = GROUND_Z_INDEX`, because an un-overridden subclass otherwise
+ * resolves to `SPELL_EFFECT_Z_INDEX`, over the feet of everyone nearby.
  */
 function __buildVayne_E_Slide(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Vayne_E_Slide extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = VAYNE_E_PUSH_MS;
     age = 0;
     private victim: AttackableUnit;

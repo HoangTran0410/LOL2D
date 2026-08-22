@@ -83,12 +83,13 @@ function __buildCassiopeia_W_Object(api: ContentApi) {
   const DamageOverTime = api.buffs.DamageOverTime;
   const Ground = api.buffs.Ground;
   const Slow = api.buffs.Slow;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Cassiopeia_W_Object extends SpellObject {
     image = api.asset('spell_cassiopeia_w');
     position: p5.Vector = this.owner.position.copy();
 
     /** A pool of venom on the floor: painted under the units wading through it. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     radius = 100;
     lifeTime = 5000;

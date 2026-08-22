@@ -93,10 +93,11 @@ function __buildTryndamere_W_Object(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Tryndamere_W_Object extends SpellObject {
     // The rings travel along the ground, so they pass under the champions they
     // reach instead of painting over them.
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     origin: p5.Vector;
     age = 0;
     lifeTime = 700;

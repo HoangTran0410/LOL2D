@@ -102,8 +102,8 @@ export interface ZiggsMine {
 
 /**
  * The whole field is one object, because the trip cap is a property of the field and not of any
- * single plate. Ground art, so it takes the ground zIndex explicitly: Z_INDEX_MAP is keyed by
- * exact constructor and a SpellObject subclass would otherwise fall through to 99 and cover the
+ * single plate. Ground art, so it takes `GROUND_Z_INDEX` explicitly: an un-overridden
+ * SpellObject subclass resolves to `SPELL_EFFECT_Z_INDEX` instead, and would cover the
  * feet of everyone standing on it.
  */
 function __buildZiggs_E_Object(api: ContentApi) {
@@ -113,8 +113,9 @@ function __buildZiggs_E_Object(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const Slow = api.buffs.Slow;
   const Ziggs_E_Pop = makeZiggs_E_Pop(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Ziggs_E_Object extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     radius = E_SCATTER_RADIUS + E_TRIGGER_RADIUS;
     age = 0;
     lifeTime = E_ARM_MS + E_LIFETIME_MS;

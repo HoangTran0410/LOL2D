@@ -86,8 +86,8 @@ export default function makeZiggs_R(api: ContentApi) {
 
 /**
  * The shell on its way down. Ground art — the shadow and both rims are painted on the floor, so
- * it takes the ground zIndex explicitly: Z_INDEX_MAP is keyed by exact constructor and a
- * SpellObject subclass would otherwise land on 99, above the champions standing in the blast.
+ * it takes `GROUND_Z_INDEX` explicitly: an un-overridden SpellObject subclass
+ * would otherwise resolve to `SPELL_EFFECT_Z_INDEX`, above the champions standing in the blast.
  */
 function __buildZiggs_R_Object(api: ContentApi) {
   const Circle = api.utils.Quadtree.Circle;
@@ -95,8 +95,9 @@ function __buildZiggs_R_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
   const Ziggs_R_Blast = makeZiggs_R_Blast(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Ziggs_R_Object extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     radius = R_OUTER_RADIUS;
     age = 0;
     detonated = false;

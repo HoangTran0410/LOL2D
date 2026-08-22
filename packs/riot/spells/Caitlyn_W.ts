@@ -112,8 +112,8 @@ export default function makeCaitlyn_W(api: ContentApi) {
 /**
  * The trap on the floor.
  *
- * Ground art, so `zIndex = 2` — a `SpellObject` subclass otherwise falls through
- * to the default 99 and paints over the feet of everyone standing on it, which
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — a `SpellObject` subclass otherwise
+ * resolves to `SPELL_EFFECT_Z_INDEX` and paints over the feet of everyone standing on it, which
  * for a trap would hide the champion it just caught.
  *
  * The motif is Piltover hardware: a hexagonal brass plate with sprung jaws and a
@@ -129,8 +129,9 @@ function __buildCaitlyn_W_Trap(api: ContentApi) {
   const Root = api.buffs.Root;
   const createReveal = api.buffs.createReveal;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Caitlyn_W_Trap extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     age = 0;
     armDelay = CAITLYN_W_ARM_DELAY_MS;

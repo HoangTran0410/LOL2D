@@ -61,11 +61,6 @@ export const SPHERE_EDGE: readonly [number, number, number] = [238, 232, 255];
 
 const Q_RIM_MS = 240;
 
-/** A sphere in her hand or in flight is over the bodies, not under them. */
-const SPHERE_AIR_Z_INDEX = 6;
-
-const GROUND_Z_INDEX = 2;
-
 const HELD_HEIGHT = 46;
 
 const SMEAR_POINTS = 10;
@@ -84,6 +79,9 @@ function distanceBetween(a: { x: number; y: number }, b: { x: number; y: number 
 function __group0_SPHERE_REGISTRYBuild(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
+  /** A sphere in her hand or in flight is over the bodies, not under them. */
+  const SPHERE_AIR_Z_INDEX = api.layers.SPELL_EFFECT_Z_INDEX;
 
 
   const SPHERE_REGISTRY = new WeakMap<object, Syndra_Sphere[]>();
@@ -451,6 +449,7 @@ export default function makeSyndra_Q(api: ContentApi) {
 function __buildSyndra_Q_Telegraph(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Syndra_Q_Telegraph extends SpellObject {
     zIndex: number | null = GROUND_Z_INDEX;
     lifeTime = SYNDRA_Q_FALL_MS + Q_RIM_MS;
@@ -628,6 +627,7 @@ export function makeSyndra_Q_Fall(api: ContentApi) {
 function __buildSyndra_Burst(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Syndra_Burst extends SpellObject {
     zIndex: number | null = GROUND_Z_INDEX;
     radius: number;

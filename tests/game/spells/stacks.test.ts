@@ -75,8 +75,26 @@ const chogathR = () => {
   return { spell, owner: player };
 };
 
-const countBuffs = (owner: { buffs: { toRemove: boolean }[] }, Kind: unknown): number =>
-  owner.buffs.filter(buff => buff instanceof (Kind as never) && !buff.toRemove).length;
+/**
+ * How many stacks of `Kind` `owner` is carrying — model-agnostic on purpose.
+ * A `countedStacks` buff (`Buff.ts`) is one live instance carrying its whole
+ * count on `.stacks`; an ordinary buff is one instance per stack, same as it
+ * always was. Summing instance-length here would misreport a counted buff
+ * (always 1, whatever the real count); reading `.stacks` unconditionally
+ * would make this agree with `spell.stackCount` — which sums the same field
+ * — by construction, collapsing two independent checks into one that could
+ * never disagree with itself. Branching on `countedStacks` keeps this an
+ * *independent* re-derivation of the count straight from `owner.buffs`, not
+ * a restatement of the getter it sits beside in every assertion below — do
+ * not "simplify" this back to a bare `.length` or a bare `.stacks` sum.
+ */
+const countBuffs = (
+  owner: { buffs: { toRemove: boolean; countedStacks?: boolean; stacks?: number }[] },
+  Kind: unknown
+): number =>
+  owner.buffs
+    .filter(buff => buff instanceof (Kind as never) && !buff.toRemove)
+    .reduce((sum, buff) => sum + (buff.countedStacks ? (buff.stacks ?? 0) : 1), 0);
 
 describe('Veigar Q stacks', () => {
   it('reports the buff count, which nothing was feeding before', () => {

@@ -171,6 +171,7 @@ function __buildNocturne_Q_Trail(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
   const Nocturne_Dusk = makeNocturne_Dusk(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Nocturne_Q_Trail extends SpellObject {
     source: SpellObject | AttackableUnit | null = null;
     /** For a painted champion: how long they keep dropping patches. */
@@ -182,14 +183,13 @@ function __buildNocturne_Q_Trail(api: ContentApi) {
     /**
      * Under the units standing on it.
      *
-     * `Z_INDEX_MAP` is keyed by *exact* constructor, so a `SpellObject` subclass
-     * does not inherit SpellObject's slot of 2 — it falls through to
-     * `DEFAULT_Z_INDEX`, which is 99 and paints over champions. That is right for
+     * `classLayerOf` walks a `SpellObject` subclass with no zIndex of its own up
+     * to `SPELL_EFFECT_Z_INDEX`, which paints over champions. That is right for
      * a missile and wrong for a stain on the floor: the trail was covering the
      * feet of everyone walking down it. Same value `Singed_W` and `Cassiopeia_W`
      * set, for the same reason.
      */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     update() {
       const step = deltaTime;

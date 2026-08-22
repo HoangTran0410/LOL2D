@@ -44,14 +44,24 @@ export default class StatAmp extends Buff {
   onCreate(): void {
     // built here rather than at construction so callers can set `bonuses` first
     this.statsModifier = new StatsModifier();
+    this.applyBonuses();
+  }
 
+  /**
+   * Builds `statsModifier` from `bonuses`, scaled by `this.stacks`. A no-op
+   * change for every ordinary StatAmp — `stacks` stays at `Buff`'s default of
+   * 1, so `bonus * 1` is exactly the old unscaled value. It only matters for
+   * a `countedStacks` buff, where one instance stands in for N and its
+   * modifier has to carry N stacks' worth, not one's.
+   */
+  private applyBonuses(): void {
     for (const stat of Object.keys(this.bonuses) as StatName[]) {
       const modifier = this.statsModifier[stat];
       const bonus = this.bonuses[stat];
       if (!modifier || !bonus) continue;
 
       for (const kind of Object.keys(bonus) as BonusKind[]) {
-        modifier[kind] += bonus[kind] ?? 0;
+        modifier[kind] += (bonus[kind] ?? 0) * this.stacks;
       }
     }
   }
@@ -62,5 +72,20 @@ export default class StatAmp extends Buff {
 
   onDeactivate(): void {
     this.targetUnit.stats.removeModifier(this.statsModifier);
+  }
+
+  /**
+   * `countedStacks` only: `AttackableUnit.addBuff()` calls this after
+   * changing `stacks` on an already-active instance. The modifier already
+   * applied to `targetUnit.stats` was built for the *old* stack count, so it
+   * has to come off before a fresh one — scaled for the new count — goes on;
+   * there is no "just add the delta" shortcut here because `bonuses` can
+   * carry percent terms, which do not compose by addition.
+   */
+  onStacksChanged(): void {
+    this.targetUnit.stats.removeModifier(this.statsModifier);
+    this.statsModifier = new StatsModifier();
+    this.applyBonuses();
+    this.targetUnit.stats.addModifier(this.statsModifier);
   }
 }

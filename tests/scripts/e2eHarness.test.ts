@@ -38,21 +38,36 @@
  * own, which is the "stray dev server holding 5173" condition CLAUDE.md names
  * as making the known flakes far likelier.
  *
- * ## `guard()`, and why its own rule is scoped narrower than the rest
+ * ## The second rule: a script must reach `finish()` through `guard()`
  *
- * `harness.mjs` now exports `guard(body)`, which runs a script's checks and
- * guarantees `finish()` is called exactly once — including on a throw partway
- * through, which the older `try { …checks… } finally { await finish(); }`
- * shape silently turned into a reported success (see `guard`'s own doc
- * comment in `harness.mjs`). A script that has adopted `guard()` must not
- * also hand-roll that shape underneath it — that would either double-call
- * `finish()` or mean the migration is only half done. This is *not* asserted
- * against every importer the way the browser/server rules above are: most of
- * this directory still predates `guard()`, and retrofitting all of it is a
- * separate, larger change than the one that added the helper. The narrower
- * rule applies only to scripts that call `guard(` at all — the same
- * opt-in-by-importing shape the browser/server rules already use, one level
- * further in.
+ * `finish()` ends with `process.exit(failures.length ? 1 : 0)`. `process.exit()`
+ * inside a `finally` terminates the process before an in-flight exception can
+ * propagate — so `try { ...checks... } finally { await finish(); }`, with no
+ * `catch`, reaches `finally` after a throw, finds `failures` still empty
+ * because the throw happened before any check recorded one, and reports "all
+ * checks passed" with exit code 0. It ran a prefix of its checks and lied
+ * about the rest. `page.click(selector)` on a selector that does not exist —
+ * very often the exact thing a script is testing — is the commonest way in.
+ * Three scripts shipped exactly that shape; a fourth called `finish()` with no
+ * `try`/`catch` around it at all, which is the same hole with no bottom.
+ *
+ * `guard(body)` is the only correct way to run a driver's body: it always
+ * reaches `finish()` through a `catch` that has already turned the throw into
+ * a recorded failure, so the exit code always reflects what actually ran. A
+ * script that calls `finish()` itself — wrapped in its own `try`/`finally`,
+ * wrapped in nothing, named differently, it does not matter — has reopened
+ * the exact hole `guard()` exists to close, so this scan bans the call
+ * outright and requires `guard()` in its place.
+ *
+ * And the wrapper itself is banned, not only the call inside it: no importer
+ * may declare a `finally` block. `guard()` *is* the try/finally every driver
+ * used to write, and its `cleanup` option is the sanctioned place for a
+ * script's own teardown (`drive-practice-panel.mjs` clears two `localStorage`
+ * keys there). A hand-rolled `finally` underneath `guard()` either duplicates
+ * that or means the migration is half done. Deliberately `finally` and not
+ * `try`: a `try`/`catch` with no `finally` is a probe, not a wrapper —
+ * `drive-practice-panel.mjs` uses one to click a dialog that may or may not
+ * have been prompted — and banning it would be banning the wrong shape.
  *
  * ## What is deliberately not checked
  *
@@ -74,6 +89,7 @@
  * be pointed at an already-running server; `verify-pwa-offline.mjs` serves the
  * *built* `dist/` through `preview()` and cuts the network. Folding either in
  * would mean the harness growing a mode for it.
+
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -93,6 +109,28 @@ const DECLARES_BROWSER_BOOT = /\bchromium\.launch\(/;
 const DECLARES_DEV_SERVER = /\bcreateServer\(/;
 
 /**
+ * Calling `finish()` itself, rather than letting `guard()` be the only thing
+ * that ever does. This is the pattern regardless of what wraps it — a bare
+ * `try`/`finally` with no `catch`, no wrapping at all, or anything else —
+ * because every one of those shapes reopens the swallowed-exception hole
+ * `guard()` exists to close.
+ */
+const CALLS_FINISH_DIRECTLY = /\bfinish\s*\(/;
+
+/** Running the body through `guard()`, the only sanctioned replacement. */
+const CALLS_GUARD = /\bguard\s*\(/;
+
+/**
+ * A hand-rolled `finally` block — the wrapper `guard()` exists to make
+ * unnecessary, and whose `cleanup` option is where a script's own teardown
+ * belongs. Matched on `finally` rather than on `try`: a `try`/`catch` with no
+ * `finally` is a probe for something that may legitimately not be there
+ * (`drive-practice-panel.mjs` clicks a discard dialog that is only sometimes
+ * prompted), which is not the shape this rule is about.
+ */
+const DECLARES_FINALLY = /\bfinally\s*\{/;
+
+/**
  * Comments have to go before anything is matched, or the scan flags its own
  * documentation: this file's prose names every pattern it bans, and so do the
  * migrated scripts' headers, which still explain what the harness does for
@@ -102,45 +140,11 @@ const DECLARES_DEV_SERVER = /\bcreateServer\(/;
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[^\n]*?\/\/[^\n]*$/gm, '');
 
-/**
- * A script that has adopted `guard(body)` — matched as a call, not merely as
- * an import, so a script that destructures `guard` off `startHarness()` but
- * never actually calls it (which would leave `finish()` never invoked at
- * all) does not count as migrated.
- */
-const USES_GUARD = /\bguard\(/;
-
-/**
- * `finish()` called directly. `guard()` already calls it exactly once; a
- * script that also calls it itself either double-calls it or has not
- * actually finished migrating off the bare `try { …checks… } finally { await
- * finish(); }` shape `guard()` exists to replace — see `harness.mjs`'s own
- * doc comment on `guard` for the bug that shape hid: `process.exit()` inside
- * that `finally` discards an in-flight exception, so a script that threw
- * partway through its checks printed "all checks passed".
- */
-const CALLS_FINISH_DIRECTLY = /\bfinish\(\)/;
-
-/** A bare `try` block — the wrapper `guard()` exists to make unnecessary. */
-const DECLARES_TRY = /\btry\s*\{/;
-
 const scripts = readdirSync(E2E_DIRECTORY).filter(name => name.endsWith('.mjs'));
 
 const read = (name: string) => stripComments(readFileSync(join(E2E_DIRECTORY, name), 'utf8'));
 
 const importers = scripts.filter(name => name !== HARNESS && IMPORTS_HARNESS.test(read(name)));
-
-/**
- * The stricter half below applies only to scripts that have actually adopted
- * `guard()` — not retroactively to every importer. Most of this directory
- * still writes its own `try { …checks… } finally { await finish(); }`, the
- * shape that predates `guard()` and that this rule would otherwise fail on
- * sight; migrating all of them is a separate, much larger change than the one
- * that added the helper. A script opts in by using `guard`, the same way an
- * importer opts into the browser/server rules above by importing the harness
- * at all.
- */
-const guardUsers = importers.filter(name => USES_GUARD.test(read(name)));
 
 describe('tests/e2e scripts that share the harness take their whole boot from it', () => {
   it('ships the harness module', () => {
@@ -162,15 +166,15 @@ describe('tests/e2e scripts that share the harness take their whole boot from it
     expect(read(name)).not.toMatch(DECLARES_DEV_SERVER);
   });
 
-  it('has guard() adopters to check, so its own rule cannot pass by finding nothing', () => {
-    expect(guardUsers.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it.each(guardUsers)('%s does not call finish() itself — guard() already does', name => {
+  it.each(importers)('%s does not call finish() directly — only guard() may', name => {
     expect(read(name)).not.toMatch(CALLS_FINISH_DIRECTLY);
   });
 
-  it.each(guardUsers)('%s does not wrap its checks in a bare try — guard() replaces it', name => {
-    expect(read(name)).not.toMatch(DECLARES_TRY);
+  it.each(importers)('%s runs its body through guard()', name => {
+    expect(read(name)).toMatch(CALLS_GUARD);
+  });
+
+  it.each(importers)('%s hand-rolls no finally block — guard() is the wrapper', name => {
+    expect(read(name)).not.toMatch(DECLARES_FINALLY);
   });
 });

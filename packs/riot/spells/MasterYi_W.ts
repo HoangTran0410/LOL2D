@@ -142,14 +142,15 @@ export default function makeMasterYi_W(api: ContentApi) {
 /**
  * The mandala under him: a slow ground pattern rather than a burst, so the
  * enemy reading the screen can see the channel is still running and how long
- * it has left. Painted at `zIndex = 2` — ground art goes under the feet
+ * it has left. Painted at `zIndex = GROUND_Z_INDEX` — ground art goes under the feet
  * standing on it, the slot `Singed_W_Object` already established.
  */
 function __buildMasterYi_W_Object(api: ContentApi) {
   const Rectangle = api.utils.Quadtree.Rectangle;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class MasterYi_W_Object extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     age = 0;
     /** Counts down after each heal tick, so the rings bloom on the beat. */
     _tickFlash = 0;

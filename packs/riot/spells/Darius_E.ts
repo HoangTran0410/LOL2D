@@ -207,15 +207,16 @@ const BARB_COUNT = 9;
 /**
  * The wedge on the floor and the hooks reeling in.
  *
- * Ground art, so it takes `zIndex = 2` and paints under the feet it is dragging.
+ * Ground art, so it takes `zIndex = GROUND_Z_INDEX` and paints under the feet it is dragging.
  * The chains are drawn back to Darius rather than only around the victims —
  * which is why the bounding box has to cover the whole cone.
  */
 function __buildDarius_E_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Darius_E_Object extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     heading = 0;
     age = 0;
     /** Everyone the wedge caught; a line is drawn to each while it reels in. */

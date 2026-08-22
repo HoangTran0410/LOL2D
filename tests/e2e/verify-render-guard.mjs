@@ -17,13 +17,13 @@
  */
 import { startHarness } from './harness.mjs';
 
-const { url, page, report, check, errors, finish } = await startHarness();
+const { url, page, report, check, errors, guard } = await startHarness();
 
 /** How many frames p5 has drawn. `frameCount` is a p5 global in this project. */
 const frames = () => page.evaluate(() => window.frameCount ?? 0);
 const settle = ms => page.waitForTimeout(ms);
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.objectManager, null, {
@@ -92,6 +92,4 @@ try {
   report.pageErrors = { forced: forced.length, other: errors.length - forced.length };
   check('the error still reaches pageerror, once', forced.length === 1, `${forced.length}`);
   check('nothing else went wrong', errors.length === forced.length, errors.join(' | '));
-} finally {
-  await finish();
-}
+});

@@ -347,9 +347,10 @@ export function makeSett_W_Grit_Bar(api: ContentApi) {
 function __buildSett_W_Telegraph(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Sett_W_Telegraph extends SpellObject {
     /** Ground art: Z_INDEX_MAP is keyed by exact constructor, so a subclass must say so. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = SETT_W_WINDUP_MS;
     age = 0;
 
@@ -421,8 +422,9 @@ export function makeSett_W_Telegraph(api: ContentApi) {
 function __buildSett_W_Punch(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Sett_W_Punch extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = PUNCH_LIFE_MS;
     age = 0;
     radius = SETT_W_LENGTH;

@@ -20,7 +20,7 @@ import { PHONE_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-minimap';
 
-const { url, page, errors, report, failures, check, dispatch, finish } = await startHarness({
+const { url, page, errors, report, check, dispatch, guard } = await startHarness({
   out: OUT,
   viewport: PHONE_VIEWPORT,
   hasTouch: true,
@@ -49,7 +49,7 @@ const state = () =>
     };
   });
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.minimap, null, {
@@ -219,8 +219,4 @@ try {
     report.pausedToggle.whilePaused > report.pausedToggle.off,
     JSON.stringify(report.pausedToggle)
   );
-} catch (error) {
-  failures.push(`threw: ${error.stack ?? error}`);
-} finally {
-  await finish();
-}
+});

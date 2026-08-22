@@ -276,10 +276,11 @@ export default function makeVi_E(api: ContentApi) {
 function __buildVi_E_Cone(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Vi_E_Cone extends SpellObject {
-    // Ground art: Z_INDEX_MAP is keyed by exact constructor, so a subclass would
-    // fall through to 99 and cover the feet of everyone standing in the wedge.
-    zIndex = 2;
+    // Ground art: an un-overridden SpellObject subclass resolves to
+    // SPELL_EFFECT_Z_INDEX and would cover the feet of everyone standing in the wedge.
+    zIndex = GROUND_Z_INDEX;
     lifeTime = 320;
     age = 0;
     radius = E_LENGTH;

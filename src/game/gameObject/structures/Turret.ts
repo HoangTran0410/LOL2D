@@ -6,7 +6,7 @@ import type { AttackableUnitOptions } from '@/game/gameObject/attackableUnits/At
 import Champion from '@/game/gameObject/attackableUnits/Champion';
 import Minion, { AGGRO_SCAN_INTERVAL_MS, teamColors } from '@/game/gameObject/attackableUnits/Minion';
 import TrailSystem from '@/game/gameObject/helpers/TrailSystem';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { OBJECTIVE_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import { canSee } from '@/game/combat/Vision';
 
 export interface TurretPresetData {
@@ -59,7 +59,7 @@ export default class Turret extends AttackableUnit {
   killCredit: KillCredit = 'none';
 
   /** Above plain units, below champions. */
-  zIndex = 3.5;
+  zIndex = OBJECTIVE_Z_INDEX;
   /** A building the player has seen stays drawn through the fog. */
   alwaysVisible = true;
   /**

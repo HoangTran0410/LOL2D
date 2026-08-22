@@ -147,9 +147,10 @@ function __buildSoraka_Q_Object(api: ContentApi) {
   const Slow = api.buffs.Slow;
   const PredefinedParticleSystems = api.helpers.PredefinedParticleSystems;
   const grantRejuvenation = makeGrantRejuvenation(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Soraka_Q_Object extends SpellObject {
     /** Star dust settling on the floor: painted under the feet standing in it. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     position: p5.Vector = this.owner.position.copy();
 

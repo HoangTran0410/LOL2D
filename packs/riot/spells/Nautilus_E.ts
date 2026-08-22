@@ -88,8 +88,8 @@ export interface NautilusTide {
  * takes one. Sharing a single set would silently turn the ability into a single
  * 14-damage pulse with a long animation.
  *
- * Ground art, so `zIndex = 2` — `Z_INDEX_MAP` is keyed by exact constructor and a
- * `SpellObject` subclass otherwise falls through to 99, above the feet of
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — an un-overridden `SpellObject`
+ * subclass resolves to `SPELL_EFFECT_Z_INDEX` instead, above the feet of
  * everyone standing in the rings.
  */
 function __buildNautilus_E_Object(api: ContentApi) {
@@ -101,8 +101,9 @@ function __buildNautilus_E_Object(api: ContentApi) {
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
   const Slow = api.buffs.Slow;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Nautilus_E_Object extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     age = 0;
     lifeTime = (E_RADII.length - 1) * E_WAVE_GAP_MS + E_WAVE_LIFE_MS;
     waves: NautilusTide[] = [];

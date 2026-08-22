@@ -15,7 +15,7 @@ import { PHONE_VIEWPORT, startHarness } from './harness.mjs';
 
 const OUT = process.argv[2] ?? '/tmp/lol2d-touch-aiming';
 
-const { url, page, errors, report, failures, check, touchStart, touchMove, touchEnd, finish } =
+const { url, page, errors, report, check, touchStart, touchMove, touchEnd, guard } =
   await startHarness({
     out: OUT,
     viewport: PHONE_VIEWPORT,
@@ -26,7 +26,7 @@ const { url, page, errors, report, failures, check, touchStart, touchMove, touch
 
 const settle = (ms = 120) => page.waitForTimeout(ms);
 
-try {
+await guard(async () => {
   await page.goto(url, { waitUntil: 'load' });
   await page.click('#play-btn');
   await page.waitForFunction(() => window.__lol2d?.scene?.oScene?.game?.touchControls, null, {
@@ -473,8 +473,4 @@ try {
     `\ntouchControls.draw() p95: idle ${idleP95}ms, thumb-down-with-telegraph ${heldP95}ms, ` +
       `telegraph adds ~${report.telegraphAddedP95Ms}ms/frame`
   );
-} catch (error) {
-  failures.push(`threw: ${error.stack ?? error}`);
-} finally {
-  await finish();
-}
+});

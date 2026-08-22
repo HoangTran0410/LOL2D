@@ -50,7 +50,7 @@ export const PLANT_MS = 180;
  * bronze with a spear working from behind it — was not on screen at all.
  *
  * It is now two objects, because the two halves belong on different layers: the
- * dirt he tears up paints under the feet standing in it (`zIndex = 2`, the
+ * dirt he tears up paints under the feet standing in it (`zIndex = GROUND_Z_INDEX`, the
  * ground-decal rule in CLAUDE.md), and the shield he is holding paints over
  * them.
  */
@@ -128,6 +128,7 @@ function __buildPantheon_E_Object(api: ContentApi) {
   const Circle = api.utils.Quadtree.Circle;
   const PredefinedFilters = api.combat.PredefinedFilters;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Pantheon_E_Object extends SpellObject {
     direction: p5.Vector = this.owner.position.copy();
     lifeTime = DURATION;
@@ -137,7 +138,7 @@ function __buildPantheon_E_Object(api: ContentApi) {
     tickCount = 0;
     visionRadius = REACH;
     /** Dirt, so it paints under the units standing on it. */
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     aegis: Pantheon_E_Aegis | null = null;
 
     _fissures: Fissure[] = [];

@@ -558,8 +558,9 @@ function __buildKatarina_Dagger(api: ContentApi) {
   const Spell = api.Spell;
   const SpellObject = api.SpellObject;
   const Katarina_Dagger_Slash = makeKatarina_Dagger_Slash(api);
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Katarina_Dagger extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     age = 0;
     lifeTime = KATARINA_DAGGER_LIFETIME_MS;
     pickupRadius = KATARINA_PICKUP_RADIUS;

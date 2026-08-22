@@ -387,8 +387,9 @@ export function makeMalzahar_R_Grasp(api: ContentApi) {
  * The Null Zone: a hole in the floor that keeps eating whoever stands in it,
  * long after the pin is over.
  *
- * Ground art, so `zIndex = 2` — the slot `Singed_W_Object` established. Left at
- * the default 99 it would paint over the feet of everyone fighting in it.
+ * Ground art, so `zIndex = GROUND_Z_INDEX` — the slot `Singed_W_Object`
+ * established. Left at the ordinary `SPELL_EFFECT_Z_INDEX` it would paint
+ * over the feet of everyone fighting in it.
  */
 function __buildMalzahar_R_Zone(api: ContentApi) {
   const Circle = api.utils.Quadtree.Circle;
@@ -396,8 +397,9 @@ function __buildMalzahar_R_Zone(api: ContentApi) {
   const PredefinedFilters = api.combat.PredefinedFilters;
   const SpellObject = api.SpellObject;
   const AttackableUnit = api.units.AttackableUnit;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Malzahar_R_Zone extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     center: p5.Vector = createVector();
     age = 0;
     sinceTick = 0;

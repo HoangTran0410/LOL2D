@@ -72,6 +72,7 @@
     "check-seams": "moba2d-check-seams ./src/game/gameObject/coreSpells && moba2d-check-seams ./src/game/gameObject/spellObjects && moba2d-check-seams ./src/game/gameObject/buffs && moba2d-check-seams ./src/game/gameObject/attackableUnits",
     "version:show": "node scripts/version.mjs",
     "e2e:pwa": "npm run build && node tests/e2e/verify-pwa-offline.mjs",
+    "e2e:pwa-update": "node tests/e2e/measure-pwa-update-latency.mjs",
     "e2e:champions": "node tests/e2e/smoke-new-champions.mjs",
     "e2e:bots": "node tests/e2e/drive-bot-discipline.mjs",
     "e2e:render": "node tests/e2e/verify-render-guard.mjs",

@@ -23,7 +23,17 @@ import { isSpellLoader } from '../../src/content/ContentPack';
 describe('buildContentApi', () => {
   it('exposes exactly the agreed namespaces', () => {
     const api = buildContentApi() as unknown as Record<string, unknown>;
-    const namespaces = ['units', 'buffs', 'combat', 'vfx', 'helpers', 'enums', 'terrain', 'utils'];
+    const namespaces = [
+      'units',
+      'buffs',
+      'combat',
+      'layers',
+      'vfx',
+      'helpers',
+      'enums',
+      'terrain',
+      'utils',
+    ];
     for (const name of namespaces) {
       expect(api[name], `missing namespace ${name}`).toBeTypeOf('object');
     }
@@ -60,6 +70,36 @@ describe('buildContentApi', () => {
       return Promise.resolve(class {});
     });
     expect(isSpellLoader(wrapped)).toBe(true);
+  });
+
+  it('hands over the draw-layer vocabulary, not a magic number per spell file', () => {
+    // `classLayerOf` resolves a `SpellObject` subclass with no zIndex of its
+    // own to `SPELL_EFFECT_Z_INDEX`, which is *above* the champions. Ground
+    // art has to say so, and a pack cannot value-import `ObjectManager` to
+    // find the constant — so the vocabulary rides here or it is a literal 2
+    // in a dozen pack files again.
+    const api = buildContentApi();
+    for (const name of [
+      'FOUNTAIN_Z_INDEX',
+      'TRAIL_Z_INDEX',
+      'PARTICLE_Z_INDEX',
+      'GROUND_Z_INDEX',
+      'UNIT_Z_INDEX',
+      'MINION_Z_INDEX',
+      'OBJECTIVE_Z_INDEX',
+      'CHAMPION_Z_INDEX',
+      'SPELL_EFFECT_Z_INDEX',
+      'COMBAT_TEXT_Z_INDEX',
+    ]) {
+      expect(
+        (api.layers as unknown as Record<string, unknown>)[name],
+        `missing layer ${name}`
+      ).toBeTypeOf('number');
+    }
+    // The property that actually matters, and the bug that produced the
+    // vocabulary: ground art below the feet, ordinary spell effects above.
+    expect(api.layers.GROUND_Z_INDEX).toBeLessThan(api.layers.CHAMPION_Z_INDEX);
+    expect(api.layers.SPELL_EFFECT_Z_INDEX).toBeGreaterThan(api.layers.CHAMPION_Z_INDEX);
   });
 
   it('resolves an asset by plain string, not by the generated union', () => {

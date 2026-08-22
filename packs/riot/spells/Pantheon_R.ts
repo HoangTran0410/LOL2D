@@ -168,7 +168,7 @@ const soar = (t: number): number => 1 - (1 - t) * (1 - t);
  * The ultimate itself: the clock, the flight path, the ground he is going to
  * hit, and the crater afterwards.
  *
- * `zIndex = 2` because everything this object draws is on the dirt — the target
+ * `zIndex = GROUND_Z_INDEX` because everything this object draws is on the dirt — the target
  * circle, the shadow racing under him and the crater all belong under the feet
  * of whoever is standing in them. The body coming down is `Pantheon_R_Meteor`,
  * which draws above them.
@@ -179,6 +179,7 @@ function __buildPantheon_R_Object(api: ContentApi) {
   const PredefinedFilters = api.combat.PredefinedFilters;
   const SpellObject = api.SpellObject;
   const Slow = api.buffs.Slow;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Pantheon_R_Object extends SpellObject {
     launch: p5.Vector = this.owner.position.copy();
     landing: p5.Vector = this.owner.position.copy();
@@ -190,7 +191,7 @@ function __buildPantheon_R_Object(api: ContentApi) {
     visionRadius = RADIUS;
     age = 0;
     landed = false;
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
 
     /** Where on the ground plane he actually is; the flight writes it per frame. */
     _at: p5.Vector = this.owner.position.copy();

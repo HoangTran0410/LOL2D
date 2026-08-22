@@ -69,11 +69,7 @@ export default class DamageReflect extends Buff {
     reflecting = true;
     try {
       attacker.takeDamage(payload, this.targetUnit);
-
-      const text = new CombatText(attacker);
-      text.text = '⟲' + payload;
-      text.textColor = this.color;
-      this.game.objectManager.addObject(text);
+      CombatText.show(attacker, 'reflect', payload, this.color);
     } finally {
       reflecting = false;
     }

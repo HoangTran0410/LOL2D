@@ -1,7 +1,7 @@
 import { withinRadius } from '@/utils/math.utils';
 import { Circle } from '@/libs/quadtree';
 import { packAsset } from '@/game/config/packAsset';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import { OBJECTIVE_Z_INDEX, PredefinedFilters } from '@/game/managers/ObjectManager';
 import AttackableUnit from './AttackableUnit';
 import type { AttackableUnitRenderOptions } from './AttackableUnit';
 import type { AttackableUnitOptions, UnitDeathData } from './AttackableUnit';
@@ -117,7 +117,7 @@ export default class Monster extends AttackableUnit {
   };
 
   /** Between AttackableUnit and Champion: monsters must not paint over players. */
-  zIndex = 3.5;
+  zIndex = OBJECTIVE_Z_INDEX;
 
   name: string;
   phase: MonsterPhase = Monster.PHASES.IDLE;

@@ -342,14 +342,15 @@ export function makeSett_R_Carry(api: ContentApi) {
 
 
 /**
- * Ground art, so zIndex = 2: Z_INDEX_MAP is keyed by exact constructor and a
- * SpellObject subclass otherwise falls through to 99, over everyone's feet.
+ * Ground art, so zIndex = GROUND_Z_INDEX: an un-overridden SpellObject subclass
+ * resolves to SPELL_EFFECT_Z_INDEX instead, over everyone's feet.
  */
 function __buildSett_R_Crater(api: ContentApi) {
   const AttackableUnit = api.units.AttackableUnit;
   const SpellObject = api.SpellObject;
+  const GROUND_Z_INDEX = api.layers.GROUND_Z_INDEX;
   class Sett_R_Crater extends SpellObject {
-    zIndex = 2;
+    zIndex = GROUND_Z_INDEX;
     lifeTime = SETT_R_CRATER_MS;
     age = 0;
     radius: number;

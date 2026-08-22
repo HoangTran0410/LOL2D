@@ -52,7 +52,19 @@ import * as ExecuteTargeting from '@/game/combat/ExecuteTargeting';
 import * as AttackTargeting from '@/game/combat/AttackTargeting';
 import * as GlobalShot from '@/game/combat/GlobalShot';
 import TargetResolver from '@/game/spell/targeting/TargetResolver';
-import { PredefinedFilters } from '@/game/managers/ObjectManager';
+import {
+  PredefinedFilters,
+  FOUNTAIN_Z_INDEX,
+  TRAIL_Z_INDEX,
+  PARTICLE_Z_INDEX,
+  GROUND_Z_INDEX,
+  UNIT_Z_INDEX,
+  MINION_Z_INDEX,
+  OBJECTIVE_Z_INDEX,
+  CHAMPION_Z_INDEX,
+  SPELL_EFFECT_Z_INDEX,
+  COMBAT_TEXT_Z_INDEX,
+} from '@/game/managers/ObjectManager';
 
 import CastBar, { unitCastBarAnchor } from '@/game/vfx/CastBar';
 import CastTelegraph from '@/game/vfx/CastTelegraph';
@@ -158,6 +170,27 @@ export interface ContentApi {
   };
   buffs: typeof BUFFS;
   combat: typeof COMBAT;
+  /**
+   * The draw-layer vocabulary, back to front — `ObjectManager`'s own ten
+   * exported constants, under their own names so one `GROUND_Z_INDEX` grep
+   * finds every site in core and in every pack at once.
+   *
+   * A pack needs these *more* than core does. `Z_INDEX_MAP` is keyed by class
+   * and `classLayerOf` walks the `extends` chain, so a `SpellObject` subclass
+   * with no `zIndex` of its own resolves to `SPELL_EFFECT_Z_INDEX` — above
+   * the champions. Right for a missile, wrong for ground art, and the
+   * difference is invisible from inside the spell file: about a dozen
+   * ground-art spells each hardcoded a magic `2` with its own paragraph
+   * explaining why, and the one that forgot painted a decal over the feet of
+   * everyone standing on it. Naming the layer is how a content author states
+   * that intent instead of restating the number.
+   *
+   * A value import of `@/game/managers/ObjectManager` is exactly what the
+   * `pack-core-boundary` seam bans, so this namespace is the only door — the
+   * same reason `PredefinedFilters` rides on `combat` rather than being
+   * imported where it is used.
+   */
+  layers: typeof LAYERS;
   vfx: typeof VFX;
   helpers: typeof HELPERS;
   enums: typeof ENUMS;
@@ -210,6 +243,24 @@ const COMBAT = Object.freeze({
   GlobalShot,
   TargetResolver,
   PredefinedFilters,
+});
+/**
+ * Read the ordering rule off `ObjectManager`'s own header: **more important
+ * paints later.** Every value here is that module's exported constant rather
+ * than a copy, so retuning a layer moves core and every pack together and
+ * cannot leave the two disagreeing.
+ */
+const LAYERS = Object.freeze({
+  FOUNTAIN_Z_INDEX,
+  TRAIL_Z_INDEX,
+  PARTICLE_Z_INDEX,
+  GROUND_Z_INDEX,
+  UNIT_Z_INDEX,
+  MINION_Z_INDEX,
+  OBJECTIVE_Z_INDEX,
+  CHAMPION_Z_INDEX,
+  SPELL_EFFECT_Z_INDEX,
+  COMBAT_TEXT_Z_INDEX,
 });
 /**
  * A beam ability's draw helper and an axe-throw ability's `drawAxeArc`/`drawAxe` used to live here,
@@ -324,6 +375,7 @@ export function buildContentApi(): ContentApi {
     }),
     buffs: BUFFS,
     combat: COMBAT,
+    layers: LAYERS,
     vfx: VFX,
     helpers: HELPERS,
     enums: ENUMS,
