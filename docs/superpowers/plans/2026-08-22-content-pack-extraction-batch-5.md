@@ -541,3 +541,123 @@ git commit -m "docs(content): batch 5 complete — what the repo split still owe
 
 Claude-Session: https://claude.ai/code/session_01U1wfNJ78TNE9N2dFKouSbK"
 ```
+
+---
+
+## Handover: what the physical split still owes
+
+Batch 5 finished preparation, entirely inside one repository — no `git init`, no remote,
+no history rewrite. This section is the brief for the session that does the actual split.
+It answers one question: **what is left to do once the user authorises it?**
+
+### Files that move, files that stay
+
+**Moves to the new repository, as a unit:**
+- `packs/riot/` (`@moba2d/content-riot`) — 239 spell `.ts` files, 373 image files, its own
+  `package.json`, `tsconfig.json` and generator scripts. Confirmed by the drill: this is the
+  only directory `scripts/verify-without-packs.mjs` ever relocates (`DEPARTING = ['riot']`).
+- `tests/packs/riot/` — **69 test files today** (not 64; the number moved during this batch).
+  They live in CORE's tree, not inside `packs/riot/`, because they're written against core's
+  own `vitest.config.ts` / `tests/setup.ts`. Batch 5 deliberately left them here — task 9 is
+  where that gets decided, not packaging. Whether they move with the pack (rewritten against
+  its own test runner) or stay in core forever is the actual open question.
+- `docs/abilities/<champion>/` — 54 champion directories of Riot Wiki ability data
+  (`scripts/wiki/import-abilities.mjs`'s output). Lives at **core's repo root**, not under
+  `packs/riot/`. Easy to miss with a plain `git mv packs/riot`.
+- `assets/source-manifest.json` — 296 provenance rows, every `localPath` pointing at
+  `packs/riot/assets/...`. Also at core's root, also entirely about Riot content, also
+  outside `packs/riot/`.
+- `scripts/wiki/*.mjs` (`import-abilities.mjs`, `check-abilities.mjs`, `sync-spell-names.mjs`,
+  `mediawiki.mjs`, `lua-data.mjs`, `normalize.mjs`) — the tooling that produces the two files
+  above. Lives at core root; only meaningful with the riot pack present.
+
+**Stays in core:**
+- `packs/reference/` (`@moba2d/content-reference`) — never departs, not even in the drill.
+  It is core's own content: `src/content/install.ts` imports it unconditionally, and it is
+  what makes core "a complete game standing alone" rather than a menu (see the open question
+  below).
+- Everything else: `src/`, the generated barrels, `scripts/*.mjs` other than `scripts/wiki/`,
+  and `tests/` minus `tests/packs/riot/`.
+
+### `devDependencies`: `"*"` to a git dependency
+
+Both `packs/riot/package.json` and `packs/reference/package.json` declare
+`"@moba2d/core": "*"` today — resolvable only because npm workspaces link it locally
+(`workspaces: [".", "packs/*"]` in the root `package.json`). Once `packs/riot/` is a separate
+repository, that line has to become something npm can fetch on its own:
+`"@moba2d/core": "github:<org>/<core-repo>#<tag-or-commit>"`, or a published npm version once
+one exists. `packs/reference/` stays inside core's own workspace, so its manifest does not
+need this change.
+
+### `npm install` for someone who clones core alone
+
+Today, root `npm install` links both packs via the `packs/*` workspace glob. After the split,
+a bare clone of core has no `packs/` directory beyond `packs/reference/` (which travels with
+core) — `npm install` still succeeds, because core has no hard runtime dependency on the riot
+pack. What changes: `src/generated/installedPacks.ts` regenerates naming only `[reference]`,
+`verify` runs the pack-absent shape by default (161 files / 1632 tests + 9 skipped, this
+session's measurement), and `verify:all` — which reaches into `packs/riot/` explicitly for
+its pack-specific checks — has nothing to run against and needs its own guard, or removal
+from a core-alone `package.json`.
+
+### `@types/node`
+
+Only `tsconfig.json` (`npm run typecheck`, i.e. `vue-tsc --noEmit`) has `include: ["src/**/*"]`,
+which reaches `src/seams/` — `shared.ts` and `packCoreBoundary.ts` both import `node:fs` /
+`node:path`. `tsconfig.strict-core.json` (`npm run typecheck:core`) carries its own explicit
+`include` list and never names `src/seams/`. So `@types/node` (in root `devDependencies`
+today) is needed for `npm run typecheck` to succeed, but `typecheck:core` alone would work
+without it. Whether a split-off core repo keeps the broader `vue-tsc` check or narrows to
+`typecheck:core` is a scoping call, not a technical blocker either way.
+
+### Moving files does not clean git history
+
+Spec §1 already says this, and it is worth restating so nobody re-discovers it mid-split:
+moving a file does not remove it from git history. Every Riot asset this repo has ever held
+is in every commit that ever touched it. A `git mv packs/riot new-repo/` (or a `git subtree
+split`, or a fresh orphan commit) leaves a "core" repository whose `.git` still contains every
+Riot image and spell file ever committed — retrievable with `git log -p` by anyone who clones
+it. A genuinely IP-clean core needs `git filter-repo` run against core's own history, which
+rewrites every commit SHA and breaks every existing clone, tag and PR reference downstream.
+That is a separate, disruptive decision nobody has made yet — flag it to the user explicitly
+before touching history, do not fold it into "the split."
+
+### The 131-file exclusion list, and its one hand-maintained corner
+
+`scripts/pack-dependent-tests.mjs` derives which of core's own `tests/` files cannot run
+without an absent pack, three ways: (1) an import — static or deferred — of an absent pack,
+followed transitively through local helpers; (2) living under `tests/packs/<pack>/`; (3)
+`PACK_CONTENT_FIXTURE_TESTS` — **nine hand-listed entries**, for tests that depend on pack
+*content* without ever naming the pack in a way an import scan can see (six lane tests
+reading Summoner's Rift coordinates out of `LANES`, plus `cc-buff-icons.test.ts`,
+`vi-spell-names.test.ts` and `generateSpellCatalog.siblingRepo.test.ts`, which `readFileSync`/
+`readdirSync` pack files by path). Each of the nine is checked to exist at config-load time
+and throws by name if a path rots.
+
+With riot absent and reference present — the real departure condition, since reference never
+leaves — the derived list is **131 files** (reconfirmed live this session via
+`packDependentTests(root, ['reference'])`, matching where task 8's fix round landed). It is
+provably **0** in an ordinary checkout with both packs installed, and a test asserts that
+emptiness directly.
+
+This is the one place a human must keep a list in step by hand, and **the split is exactly
+when it stops being maintainable in this form**: once `packs/riot/` is a separate repository,
+the 69 files under `tests/packs/riot/` plus the ~62 files elsewhere (`tests/game/`,
+`tests/scenes/`, `tests/content/`) that reach the pack transitively either move with it
+(rewritten against its own test runner) or stay in core and require the nine-entry list to
+keep growing by hand indefinitely. Deciding which is part of executing the split, not a
+prerequisite to it — but whoever does it should budget time for exactly this decision, because
+it touches ~131 files, not a handful.
+
+### The open product question spec §8.2 leans on
+
+Core alone ships **no summoner spells** — `D` and `F` fall back to `BasicAttack`
+(`SpellHotKeys` in `src/game/constants.ts`; summoner spells are Riot content and live only in
+`packs/riot/`). So "a complete game standing alone," the claim spec §8.2 uses to justify
+shipping the reference pack unconditionally, is today: one champion (Vera), four abilities,
+one map (Proving Grounds), zero summoner spells.
+`tests/e2e/verify-core-alone.mjs` proves that much boots and is genuinely playable — 12/12
+checks, confirmed both with riot present and with riot absent this session. Whether that is
+"complete enough" to ship core as a standalone product, or whether core needs its own
+summoner-spell pair before that claim holds, is a product decision for the user to make. It
+is not a defect this batch found and left unfixed.
