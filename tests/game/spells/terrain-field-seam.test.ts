@@ -31,14 +31,24 @@
  * five specific pack spells by path, the same way `cc-buff-icons.test.ts`
  * pins this pack's own champions — content-specific regression history, not
  * a population scan a generic exported function could replace.
+ *
+ * Task 7 note: that pin still hardcoded `packs/riot/spells` directly and
+ * threw `ENOENT` the moment that directory left the tree, which is exactly
+ * the failure task 8 needs `npm run verify` to survive — a pin about riot's
+ * five spells has nothing to check once riot is not installed, so it now
+ * skips (a legitimate "nothing to check") rather than crashing, and stays
+ * loud if riot claims to be installed but one of the five files is gone.
  */
 import { describe, expect, it } from 'vitest';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { packIsInstalled, requireRoot } from '../../support/installedPacks';
 
 const REPO_ROOT = process.cwd();
 const GAME_OBJECT_ROOT = join(REPO_ROOT, 'src/game/gameObject');
-const SPELL_DIR = join(REPO_ROOT, 'packs/riot/spells');
+const PACKS_DIR = join(REPO_ROOT, 'packs');
+const RIOT_INSTALLED = packIsInstalled(PACKS_DIR, 'riot');
+const SPELL_DIR = join(PACKS_DIR, 'riot/spells');
 
 /**
  * Everywhere in *core's own tree* an ability's code can live, for the BAN
@@ -121,11 +131,20 @@ describe('the terrain seam', () => {
     expect(offenders).toEqual([]);
   });
 
-  it('is reached by every spell that needs terrain', () => {
+  it('is reached by every spell that needs terrain, when riot is installed', () => {
     // The other direction, and the one a ban alone cannot cover: a spell could
     // satisfy the scan above by asking nothing at all. These five are the
     // abilities whose behaviour is defined by where a wall is, and each of them
     // has been wrong about it in a shipped build.
+    //
+    // content-pack-extraction batch 5 task 7: this pin names five specific
+    // files under `packs/riot/spells` directly, which used to throw ENOENT
+    // the moment that directory left the tree (task 8) — a pin about riot's
+    // own content has nothing to check once riot is not installed, so that
+    // is a legitimate skip. Installed-but-missing (the pack claims to be
+    // here but one of these five files is gone) stays a real, loud failure.
+    if (!RIOT_INSTALLED) return;
+    requireRoot(SPELL_DIR, 'terrain-field-seam: packs/riot/spells');
     const mustSweep = ['Camille_E.ts', 'Nautilus_Q.ts', 'XinZhao_R.ts', 'Vayne_E.ts', 'Janna_R.ts'];
 
     for (const name of mustSweep) {

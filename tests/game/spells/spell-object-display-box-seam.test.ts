@@ -121,6 +121,15 @@ describe('every SpellObject states the extent it paints', () => {
   it('finds the classes to check at all', () => {
     // Guards the regex itself: a rename of `SpellObject` or a change of export
     // style would otherwise make this suite pass by scanning nothing.
+    //
+    // content-pack-extraction batch 5 task 6 lowered this from `> 200`
+    // (`packs/riot/spells/` + `spellObjects/` combined) to `> 2` when the
+    // scan narrowed to `spellObjects/` alone — but `spellObjects/` holds
+    // only a handful of classes, so `> 2` against an actual count of 3 was
+    // already the "floor that survives almost any accident" shape this task
+    // exists to remove. `> 0` is the honest bar: this test's only job is
+    // "did the regex find real classes, or silently zero", and any positive
+    // count answers that.
     let counted = 0;
     for (const directory of SPELL_DIRECTORIES) {
       const path = join(rootFor(directory), directory);
@@ -130,7 +139,7 @@ describe('every SpellObject states the extent it paints', () => {
         while (DIRECT_SPELL_OBJECT.exec(source) !== null) counted += 1;
       }
     }
-    expect(counted).toBeGreaterThan(2);
+    expect(counted).toBeGreaterThan(0);
   });
 
   it('declares getDisplayBoundingBox() or a non-zero visionRadius', () => {

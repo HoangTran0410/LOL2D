@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { packIsInstalled, requireRoot } from '../support/installedPacks';
 
 /**
  * Task 10 of the content-pack extraction: a scan over `src/` for Riot's
@@ -62,7 +63,7 @@ import { join } from 'node:path';
  * rest of `changelog.ts`'s copy stays covered by every one of the three
  * checks below.
  *
- * ## A note for whoever does batch 5
+ * ## Task 7 note (was: "A note for whoever does batch 5")
  *
  * `championNamesFromPack()` and `monsterNamesFromPack()` below build this
  * scan's own needle list by reading `packs/riot/spells` and
@@ -70,18 +71,23 @@ import { join } from 'node:path';
  * champion and monster name" without hand-maintaining a second copy of the
  * roster. That means this file's whole premise — "core carries none of
  * Riot's vocabulary" — depends on Riot's content still being *somewhere
- * this repo can read at test time*. Once a pack ships as its own published
- * package (batch 5's stated direction, per `docs/superpowers/specs/`) and
- * `packs/riot/` stops being a directory in this checkout, `readdirSync`
- * above throws `ENOENT` rather than the suite passing or failing — this
- * scan cannot certify core is content-free once the content it is
- * certifying *against* has left. Batch 5 needs to either point these two
- * functions at wherever the pack ends up (a dependency's own directory, a
- * published manifest) or replace the derived list with something that does
- * not require the pack tree to be locally present.
+ * this repo can read at test time*, and it always will: this rule audits
+ * *core's own tree* for leaked vocabulary, which is not something the pack's
+ * own `check-seams` (it scans its own tree, not core's) can ever take over.
+ *
+ * What batch 5 task 7 changes is what happens once `packs/riot/` really
+ * does stop being a directory in this checkout (task 8): `RIOT_INSTALLED`,
+ * derived from `packs/`'s own listing rather than hardcoded, decides
+ * whether there is a riot vocabulary to certify core against at all. Not
+ * installed is a legitimate "nothing to check core against" — the scan
+ * below runs over an empty needle list and finds nothing, correctly.
+ * Installed-but-missing (the directory gone while the pack still claims to
+ * be there) is the real bug, and `requireRoot` is what turns that into a
+ * loud, named failure instead of `readdirSync`'s bare `ENOENT`.
  */
 const SRC = join(__dirname, '../../src');
 const PACKS = join(__dirname, '../../packs');
+const RIOT_INSTALLED = packIsInstalled(PACKS, 'riot');
 
 function filesUnder(dir: string, extensions: string[]): string[] {
   const out: string[] = [];
@@ -95,9 +101,15 @@ function filesUnder(dir: string, extensions: string[]): string[] {
 
 const scannedFiles = (): string[] => filesUnder(SRC, ['.ts', '.vue']);
 
-/** `Ahri_Q.ts` -> `Ahri`, `_EmptyExample.ts`/`index.ts` skipped (no `_[QWER]` suffix). */
+/**
+ * `Ahri_Q.ts` -> `Ahri`, `_EmptyExample.ts`/`index.ts` skipped (no `_[QWER]`
+ * suffix). `[]` when the riot pack is not installed — there is no vocabulary
+ * to certify core against, which is a legitimate "nothing to check", not a
+ * crash. When it *is* installed, the directory it names must resolve.
+ */
 function championNamesFromPack(): string[] {
-  const dir = join(PACKS, 'riot/spells');
+  if (!RIOT_INSTALLED) return [];
+  const dir = requireRoot(join(PACKS, 'riot/spells'), 'vocabularyBoundary: packs/riot/spells');
   const names = new Set<string>();
   for (const file of readdirSync(dir)) {
     const match = file.match(/^([A-Za-z]+)_[QWERP][A-Za-z0-9]*\.ts$/);
@@ -106,9 +118,14 @@ function championNamesFromPack(): string[] {
   return [...names];
 }
 
-/** `Baron.ts` -> `Baron`. Every `.ts` file directly under `packs/riot/monsters/`. */
+/**
+ * `Baron.ts` -> `Baron`. Every `.ts` file directly under
+ * `packs/riot/monsters/` — `[]` when the riot pack is not installed, see
+ * `championNamesFromPack`.
+ */
 function monsterNamesFromPack(): string[] {
-  const dir = join(PACKS, 'riot/monsters');
+  if (!RIOT_INSTALLED) return [];
+  const dir = requireRoot(join(PACKS, 'riot/monsters'), 'vocabularyBoundary: packs/riot/monsters');
   return readdirSync(dir)
     .filter(f => f.endsWith('.ts'))
     .map(f => f.replace(/\.ts$/, ''));
@@ -139,9 +156,22 @@ const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
 describe("core carries none of Riot's vocabulary", () => {
-  it('has a real, non-empty champion/monster name list, or this scan proves nothing', () => {
-    const names = bannedNames();
-    expect(names.length).toBeGreaterThan(50);
+  it('has real champion and monster names to check core against, when riot is installed', () => {
+    // Not `names.length > 50` any more: that combined total survived riot's
+    // departure looking healthy right up until it didn't — 50 is a number
+    // about today's roster size, not about whether the scan is looking at
+    // anything real. Per-root instead: each source independently
+    // contributed something, which is the actual failure worth naming if
+    // one of them quietly stops.
+    if (!RIOT_INSTALLED) return; // nothing installed to certify core against
+    expect(
+      championNamesFromPack().length,
+      'packs/riot/spells contributed 0 champion names'
+    ).toBeGreaterThan(0);
+    expect(
+      monsterNamesFromPack().length,
+      'packs/riot/monsters contributed 0 monster names'
+    ).toBeGreaterThan(0);
   });
 
   it('finds source files under src/ to scan, or this scan proves nothing', () => {

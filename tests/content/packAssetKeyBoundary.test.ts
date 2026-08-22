@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { assetManifest as coreAssetManifest } from '../../src/generated/assetManifest';
+import { installedPackDirs } from '../support/installedPacks';
 
 /**
  * The asset-key equivalent of `corePacksBoundary.test.ts`: a pack may call
@@ -42,6 +43,17 @@ import { assetManifest as coreAssetManifest } from '../../src/generated/assetMan
  *
  * Comments are stripped before matching, or this file's own paragraphs
  * above would flag themselves.
+ *
+ * content-pack-extraction batch 5 task 7: `files.length > 0` on the whole
+ * `packs/` parent used to be the only population guard here, and it is
+ * trivially satisfied by `packs/reference/`'s 7 files alone — so the day
+ * `packs/riot/` (258 of those files) leaves this tree, the scan silently
+ * certifies almost nothing and its own guard stays green. The fix is
+ * per-pack: assert every pack this checkout actually has (derived from
+ * `packs/`'s own listing, see `installedPackDirs`) independently
+ * contributed at least one file, so a pack whose directory exists but whose
+ * contribution has quietly dropped to zero is the failure this reports,
+ * rather than a total that happens to still clear a flat floor.
  */
 const PACKS_DIR = join(__dirname, '../../packs');
 
@@ -69,9 +81,24 @@ function assetKeyCalls(source: string): string[] {
 
 describe('the pack asset-key boundary', () => {
   const files = tsFilesUnder(PACKS_DIR);
+  const packs = installedPackDirs(PACKS_DIR);
 
   it('finds pack files to scan, or this proves nothing', () => {
+    expect(packs.length).toBeGreaterThan(0);
     expect(files.length).toBeGreaterThan(0);
+  });
+
+  it('every installed pack independently contributes files to the scan', () => {
+    // The real guard: a total that still clears a flat `> 0` floor could be
+    // one pack quietly contributing nothing (its directory renamed, its
+    // files moved, a glob typo) while a sibling pack's population carries
+    // the total. Each pack has to answer for itself.
+    for (const pack of packs) {
+      expect(
+        tsFilesUnder(join(PACKS_DIR, pack)).length,
+        `packs/${pack} contributed 0 files to the scan`
+      ).toBeGreaterThan(0);
+    }
   });
 
   it('no pack spell resolves a core asset key', () => {
