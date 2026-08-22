@@ -153,7 +153,8 @@ describe('the pack boundary', () => {
       for (const { specifier, typeOnly } of references(source)) {
         const isOldAlias = specifier.startsWith('@/');
         const isBareSrc = specifier === 'src' || specifier.startsWith('src/');
-        const isCorePackage = specifier === CORE_PACKAGE || specifier.startsWith(`${CORE_PACKAGE}/`);
+        const isCorePackage =
+          specifier === CORE_PACKAGE || specifier.startsWith(`${CORE_PACKAGE}/`);
         const isRelativeEscape = escapesOwnPackage(file, specifier);
 
         if (!isOldAlias && !isBareSrc && !isCorePackage && !isRelativeEscape) continue;

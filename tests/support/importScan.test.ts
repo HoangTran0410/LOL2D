@@ -219,7 +219,7 @@ describe('stripComments', () => {
   it('the real hidden-import case: the same shape, with the real specifier from summonersRiftGeometry.ts', () => {
     const source = [
       "// `assetsInclude: ['**/*.json']` so `AssetManager` can hand out every JSON",
-      "// file as a fetchable URL at runtime, and that claims the extension ahead of",
+      '// file as a fetchable URL at runtime, and that claims the extension ahead of',
       "import type { MapGeometry } from '@moba2d/core/content/ContentPack';",
       '',
       '/**',
@@ -269,12 +269,58 @@ describe('stripComments', () => {
     expect(scanImports(source)).toEqual([{ specifier: './real', kind: 'value' }]);
   });
 
+  it('an unpaired quote does not run past the end of its own line (fix round 2)', () => {
+    // The real shape: `src/game/hud/config/MatchConfigPanel.vue`,
+    // `MatchTab.vue` and `RosterTab.vue` all carry an apostrophe in ordinary
+    // English prose inside an HTML template comment
+    // (`<!-- The shell's own way out ... -->`) — a canary probe over every
+    // file this module's six real callers scan found exactly these 3 doing
+    // it. All three are safe today only because `<script setup>` (their
+    // real imports) comes *before* `<template>` (the apostrophe); reproduced
+    // here with the trap moved ahead of the code it would otherwise corrupt,
+    // and with a real `//` comment in between naming a fake specifier — the
+    // shape that turns "swallows a comment" into "invents an import nothing
+    // wrote". A version of this scanner without the newline reset finds two
+    // references here, `./fake` included; the fix finds exactly the one
+    // real one.
+    const source = [
+      "<!-- The shell's own way out -->",
+      "// see import from './fake' for reference",
+      "import { Y } from './real';",
+    ].join('\n');
+    expect(scanImports(source)).toEqual([{ specifier: './real', kind: 'value' }]);
+  });
+
   it('nested template-literal substitutions are tracked by depth, not by the first "}"', () => {
-    // `` `${`${x}`}` `` — an inner template literal's own substitution
-    // closes with a `}` that must not be mistaken for the outer one's.
-    const source = 'const t = `${`${x}`}`;\nimport { X } from \'./real\';';
+    // Fix round 2: the original version of this case —
+    // `` `${`${x}`}` `` plus a real import on the next line — contains no
+    // comment marker anywhere, and `stripComments` only ever *removes*
+    // characters while in comment state, so its output equals its input for
+    // *any* implementation, correct or not (the reviewer proved this by
+    // running a deliberately depth-broken stripper — one boolean flag,
+    // "am I in a substitution", flipped false by the *first* `}` seen,
+    // rather than a real depth count — against the old input: both
+    // assertions still passed). An input has to contain something that a
+    // wrongly-early return to template-literal state would treat
+    // differently than staying in code would, and nothing here did.
+    //
+    // This one does: a substitution holding a nested object literal's own
+    // `{}` ahead of a real block comment. A depth-broken stripper treats
+    // the object literal's closing `}` as the *substitution's* closing
+    // brace — one bare `}`, first one wins — and drops back into
+    // template-literal text a full brace early, where a comment is just
+    // more literal text and `/* must be stripped */` is never recognised as
+    // one at all. A depth-correct stripper is still one level of nesting
+    // away from the substitution's own close at that point, stays in code,
+    // and strips it normally. Proved failing under the depth-broken
+    // reimplementation before landing this version — see fix round 2 of
+    // content-pack-extraction batch 5 task 4's own report for the repro.
+    const source = [
+      'const t = `${ {} /* must be stripped */ }rest`;',
+      "import { X } from './real';",
+    ].join('\n');
     const stripped = stripComments(source);
-    expect(stripped).toContain('const t = `${`${x}`}`;');
-    expect(stripped).toContain("import { X } from './real';");
+    expect(stripped).not.toContain('must be stripped');
+    expect(scanImports(source)).toEqual([{ specifier: './real', kind: 'value' }]);
   });
 });

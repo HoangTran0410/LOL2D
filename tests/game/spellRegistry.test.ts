@@ -314,7 +314,15 @@ describe('a match plan', () => {
       // reference), not just the bundled one, since `planMatchKits` picks a
       // champion at random across all of them and this oracle must too.
       kit.spellIds.forEach((id, slot) => {
-        expect(preset.spells![slot]).toBe(AllSpellsByQualifiedId[qualify(id)]);
+        const expected = AllSpellsByQualifiedId[qualify(id)];
+        // Guards the guard, fix round 2: `toBe` alone is satisfied by two
+        // absences (`undefined === undefined`) — an id from a pack this
+        // oracle does not know would silently agree with a real fallback or
+        // a real miss instead of failing the "no fallbacks fired" claim
+        // this test exists to check. Asserting the oracle itself has an
+        // answer first turns that silent pass into a named failure.
+        expect(expected, `no oracle entry for ${qualify(id)} (slot ${slot})`).not.toBeUndefined();
+        expect(preset.spells![slot]).toBe(expected);
       });
     }
   });

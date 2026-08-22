@@ -110,23 +110,67 @@ export interface ImportReference {
  * this function tracks it explicitly instead.
  *
  * Escapes (`\'`, `\"`, `` \` ``) keep a string or template literal open past
- * a quote character that would otherwise close it. A template literal's
- * `${...}` substitution is code again — it can hold its own strings,
- * comments, and even a nested template literal — so `braceDepth` on the
- * stack tracks exactly which `}` closes the substitution and returns to the
- * literal's text, one frame per nesting level (`` `${`${x}`}` `` is legal
- * JavaScript and round-trips through this correctly). A comment's own
- * characters are dropped; everything else, including every character inside
- * a string or template literal, passes through unchanged — this module's
- * callers only ever look for `import`/`export` keywords and specifiers
- * outside of strings, so string *contents* are never this function's
- * business. **Stated limit, inherited from the version this replaces and
- * unchanged by it:** a `/` that starts a regex literal (not a string, not a
- * comment) is not modelled — `/[/*]/` would still be misread as opening a
- * comment. No file this module currently scans contains that shape
- * (checked, not assumed, the same way `STATIC_PATTERN`'s own stated limit
- * above documents a checked-not-assumed boundary); a caller that starts
- * scanning a tree where it might would need to widen this.
+ * a quote character that would otherwise close it. A single- or
+ * double-quoted string additionally resets straight to `'code'` the instant
+ * it reaches a raw newline, rather than staying open — fix round 2 of
+ * content-pack-extraction batch 5 task 4, after a canary probe over every
+ * file this module's six real callers scan found 7 where an *unpaired*
+ * `'`/`"` flips the scanner into string state for the rest of the file. Real
+ * JavaScript syntax guarantees a `'`/`"` string can never contain an
+ * unescaped newline, so reaching one while "inside" one proves the opening
+ * quote was never a real string delimiter — the shape found was an
+ * apostrophe in ordinary English prose, sitting inside an HTML `.vue`
+ * template comment (`<!-- The shell's own way out -->`, in
+ * `src/game/hud/config/MatchConfigPanel.vue`, `MatchTab.vue` and
+ * `RosterTab.vue`), which is benign in all three today only because
+ * `<script setup>` happens to come before `<template>` in each — reorder
+ * either and the real imports above the false entry go blind again. The
+ * reset bounds any such mis-entry to a single line: whatever follows the
+ * next newline is scanned fresh no matter what triggered the false entry.
+ *
+ * A template literal's `${...}` substitution is code again — it can hold
+ * its own strings, comments, and even a nested template literal — so
+ * `braceDepth` on the stack tracks exactly which `}` closes the
+ * substitution and returns to the literal's text, one frame per nesting
+ * level (`` `${`${x}`}` `` is legal JavaScript and round-trips through this
+ * correctly). Backticks get no newline reset, on purpose and unlike `'`/
+ * `"`: a template literal spanning lines is real, common JavaScript — the
+ * reason the syntax exists at all — so a raw newline inside one proves
+ * nothing. An unpaired backtick therefore keeps the old, unbounded-blast-
+ * radius risk the reset above closes for `'`/`"`; checked (not assumed)
+ * against every file the two real trees below contain, not just imagined —
+ * see the regex-literal paragraph, which found none.
+ *
+ * A comment's own characters are dropped; everything else, including every
+ * character inside a string or template literal, passes through unchanged
+ * — this module's callers only ever look for `import`/`export` keywords
+ * and specifiers outside of strings, so string *contents* are never this
+ * function's business.
+ *
+ * **Stated limit, corrected in the same fix round after being found
+ * narrower than the real one:** a `/` that starts a regex literal is not
+ * modelled as one — this function has no notion of "inside a regex", so a
+ * `'`, `"`, `` ` ``, `//`, `/*` or `*‍/` inside a regex literal's own
+ * pattern reads exactly as it would in plain code. The old wording named
+ * only one narrow shape (`/[/*]/`) as the risk; the real one is any of
+ * those five characters appearing inside a regex literal at all. Checked
+ * with a real parser (`ts.isRegularExpressionLiteral`, not a hand-rolled
+ * heuristic) over `src/**‍/*.{ts,vue}` and `packs/**‍/*.ts` — the only two
+ * trees this module's six real callers ever feed it — rather than assumed:
+ * zero regex literals in either tree carry a backtick or a `//`/`/*`/
+ * `*‍/` sequence today; exactly two carry a quote,
+ * `src/seams/targetingModeDeclared.ts:25` and
+ * `src/seams/unitTargetTeam.ts:32`, both `/targeting\s*:\s*'...'/`-shaped
+ * with an even number of quotes and no comment-shaped text between them —
+ * so both round-trip correctly today (the pattern's own two quotes open
+ * and close a phantom string that contains nothing a comment-stripper
+ * would have treated differently anyway). That is closer to luck than a
+ * guarantee: an *odd* quote count is now bounded to one line by the reset
+ * above, but a backtick or a real comment-marker character inside a regex
+ * literal is not caught by anything here. A caller whose tree grows one of
+ * those needs this function widened, not itself — the same
+ * checked-not-assumed discipline `STATIC_PATTERN`'s own stated limit below
+ * follows.
  */
 export function stripComments(source: string): string {
   type State = 'code' | 'line' | 'block' | 'single' | 'double' | 'template';
@@ -167,6 +211,24 @@ export function stripComments(source: string): string {
       if (ch === '\\' && next !== undefined) {
         out += ch + next;
         i += 2;
+        continue;
+      }
+      if (ch === '\n') {
+        // A single- or double-quoted JS string can never contain a raw,
+        // unescaped newline — that is a syntax error, not a multi-line
+        // string. Reaching one while "inside" one therefore proves the
+        // opening quote was never a real string delimiter in the first
+        // place (an apostrophe in English prose inside an HTML comment,
+        // `<!-- The shell's own way out -->`, is the real shape this
+        // closes: `MatchConfigPanel.vue`, `MatchTab.vue` and
+        // `RosterTab.vue` all carry one). Resetting to 'code' here bounds
+        // the damage from any such mis-entry to a single line — the next
+        // line starts fresh — rather than the (previous, real) failure
+        // mode of running to the next matching quote anywhere later in the
+        // file, however far that is or whatever real code sits in between.
+        out += ch;
+        state = 'code';
+        i++;
         continue;
       }
       out += ch;
