@@ -75,12 +75,24 @@ describe('the bundled-pack loader', () => {
     // `verifyPairing` (`PackRegistry.installCode`) is what actually enforces
     // this at install time — every champion's `recall: 'riot:Recall'` has to
     // resolve against a real spell source or `installBundledPackCode` throws.
-    // This proves the resolved class is usable, not just present.
+    // This proves the resolved class is usable, not just present: `typeof
+    // === 'function'` alone (fix round 1's finding) is true of both a real
+    // class and the still-unresolved lazy loader that produces it — an
+    // arrow function and a class are the same JS type. `.prototype` is the
+    // discriminator `tests/packs/riot/pack.test.ts` already uses for the
+    // opposite claim ("every entry is a loader, not a resolved class"): a
+    // class always has one, an arrow-function loader never does. `.name`
+    // pins it further — a bare `class Recall` grabs `Recall` as the name
+    // `describe()`/`makeRecall`'s own class declaration in `Recall.ts`, not
+    // a name Vite's dynamic `import()` machinery would happen to hand an
+    // anonymous loader.
     const registry = new PackRegistry();
     installBundledPackData(registry);
     installBundledPackCode(registry, buildContentApi());
     const loaded = await registry.loadSpellClass('riot:Recall');
     expect(loaded).toBeTypeOf('function');
+    expect(loaded).toHaveProperty('prototype');
+    expect((loaded as { name?: string } | null)?.name).toBe('Recall');
   });
 
   it('installs the reference pack and its champion', () => {

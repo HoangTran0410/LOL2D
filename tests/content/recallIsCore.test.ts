@@ -35,6 +35,17 @@ import { join } from 'node:path';
  * checked and both still true for an unrelated reason now: not "a map may
  * lack a fountain" but "a preset swap must not take a champion's way home
  * away from it" (see `Champion.recall`'s own doc comment).
+ *
+ * Fix round 1 found this file asserted the ruling in prose only: every
+ * check below is a source scan of some *other* file (`Champion.ts`,
+ * `coreSpells/index.ts`, `ContentPack.ts`), and none of them actually looks
+ * at `Recall.ts` itself — moving it back to `packs/riot/spells/` (the
+ * reviewer's own reproduction) left all four green, and so did
+ * `coreSpells.test.ts` and `corePacksBoundary.test.ts`, which scan `src/`
+ * for import *specifiers* and never noticed the file at the far end of one
+ * was gone. The first check below closes that: a real dynamic `import()` of
+ * `../../src/game/gameObject/coreSpells/Recall`, which only resolves if the
+ * file is actually there.
  */
 const SRC = join(__dirname, '../../src');
 const read = (rel: string): string => readFileSync(join(SRC, rel), 'utf8');
@@ -42,6 +53,16 @@ const stripComments = (s: string): string =>
   s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
 
 describe('Recall is core mechanism, kept off the catalogued barrel', () => {
+  it('Recall actually resolves as a module from coreSpells/, not from a pack', async () => {
+    // Falsifiable exactly the way the reviewer proved the old version was
+    // not: `git mv src/game/gameObject/coreSpells/Recall.ts
+    // packs/riot/spells/Recall.ts` makes this dynamic import fail to
+    // resolve, and every other check in this file keeps passing regardless.
+    const recallModule = await import('../../src/game/gameObject/coreSpells/Recall');
+    expect(recallModule.default).toBeTypeOf('function');
+    expect(recallModule.RECALL_CHANNEL_MS).toBeTypeOf('number');
+  });
+
   it('Champion does not import or construct a Recall', () => {
     const source = stripComments(read('game/gameObject/attackableUnits/Champion.ts'));
     expect(source).not.toMatch(/new Recall\(/);

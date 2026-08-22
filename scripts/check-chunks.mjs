@@ -81,6 +81,28 @@ const RULES = [
       'on a core edit, before; 0/59, after) — a static import of `game-` by filename hash re-links ' +
       'every spell chunk the moment `game-*.js` re-hashes, even when the spell itself did not change',
   },
+  {
+    // Fix round 1 on content-pack-extraction batch 5 task 1 found this rule
+    // missing: `src/content/install.ts` folds core's `Recall` onto the
+    // installed pack with a *dynamic* `import('@/game/gameObject/coreSpells/Recall')`,
+    // deliberately, because `install.ts` sits in `pregame` and `Recall.ts`
+    // falls into `game` — a static import there would open exactly this
+    // edge. Nothing was actually checking that choice stuck: `install.ts`
+    // is a named exclusion in `pregameBootPath.test.ts`'s own scan (it
+    // legitimately needs `packs/riot/pack` and friends, which that scan
+    // would otherwise flag), and `contentApiChunk.test.ts` walks outward
+    // from `catalog.ts` and never reaches it either. Reproduced against a
+    // real build before this rule existed: turning that one dynamic import
+    // static compiled clean, `pregame-*.js` genuinely gained a static
+    // `from"./game-*.js"` edge, and `chunks:check` still printed "ok" — the
+    // same class of gap batch 4's review found for `spell-*` importing
+    // `game-*`, one level up the chunk graph. A source scan cannot see this
+    // (`vite.config.ts`'s own header on the `map-<id>` carve-out makes the
+    // same point about a different chunk); only the compiled bytes can.
+    chunk: 'pregame',
+    forbidden: /^game-/,
+    why: 'the pregame screen (menu + setup) would statically pull in the whole match chunk',
+  },
 ];
 
 const failures = [];
